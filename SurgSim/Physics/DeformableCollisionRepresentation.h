@@ -39,6 +39,9 @@ namespace Physics
 class DeformableRepresentationState;
 class DeformableRepresentationBase;
 
+/// A collision representation that can be attached to a deformable, when this contains a mesh with the same number
+/// of vertices as the deformable has nodes, the mesh vertices will move to match the positions of the nodes in
+/// the deformable.
 class DeformableCollisionRepresentation : public SurgSim::Collision::Representation
 {
 public:
@@ -52,51 +55,51 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::DeformableCollisionRepresentation);
 
+	/// Set the mesh to be used in this collision representation
+	/// the vertices in the mesh need to be the same number as the vertices in the
+	/// deformable representation
+	/// \param mesh The mesh to be used for the collision calculation and updates
+	void setMesh(std::shared_ptr<SurgSim::DataStructures::TriangleMesh> mesh);
+
 	/// \return The mesh that is part of this representation
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh() const;
 
-	/// Overridden from Collision::Representation
-	/// This will fail if the shape is not a mesh shape
+	/// Set the shape for this collision representation, has to me a meshShape
+	/// \param shape The shape to be used.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);
 
-	/// Overridden from Collision::Representation
-	const std::shared_ptr<SurgSim::Math::Shape> getShape() const;
-
-	/// Set the mesh to be used in this collision representation
-	void setMesh(std::shared_ptr<SurgSim::DataStructures::TriangleMesh> mesh);
+	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
 	/// Sets the deformable to which this collision representation is connected
 	/// \param representation The deformable that will be used to update the contained mesh
 	void setDeformableRepresentation(std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase> representation);
 
 	/// \return The deformable that is used to update the contained mesh
-	const std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase> getDeformable() const;
+	const std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase> getDeformableRepresentation() const;
 
-	/// Overridden from Collision::Representation
 	virtual int getShapeType() const override;
 
-	/// Overridden from Collision::Representation
 	virtual void update(const double& dt) override;
 
-	/// Overridden from Collision::Representation
 	virtual bool doInitialize() override;
 
-	/// Overridden from Collision::Representation
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
-	/// Overridden from Collision::Representation
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override;
 
-	/// Overridden from Collision::Representation
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
-	/// Overridden from Collision::Representation
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
 
 private:
 
+	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::MeshShape> m_shape;
+
+	/// Mesh used for collision detection
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
+
+	/// Reference to the deformable driving changes to this mesh
 	std::weak_ptr<SurgSim::Physics::DeformableRepresentationBase> m_deformable;
 };
 

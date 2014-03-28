@@ -84,8 +84,8 @@ void DeformableRepresentation<M, D, K, S>::resetState()
 }
 
 template <class M, class D, class K, class S>
-void DeformableRepresentation<M, D, K, S>::setInitialState(std::shared_ptr<DeformableRepresentationState>
-		initialState)
+void DeformableRepresentation<M, D, K, S>::setInitialState(
+	std::shared_ptr<DeformableRepresentationState> initialState)
 {
 	// This initializes and allocates the m_initialState data member
 	m_initialState = initialState;
@@ -101,22 +101,19 @@ void DeformableRepresentation<M, D, K, S>::setInitialState(std::shared_ptr<Defor
 }
 
 template <class M, class D, class K, class S>
-const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M, D, K, S>::getCurrentState()
-const
+const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M, D, K, S>::getCurrentState() const
 {
 	return m_currentState;
 }
 
 template <class M, class D, class K, class S>
-const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M, D, K, S>::getPreviousState()
-const
+const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M, D, K, S>::getPreviousState() const
 {
 	return m_previousState;
 }
 
 template <class M, class D, class K, class S>
-const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M, D, K, S>::getFinalState()
-const
+const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M, D, K, S>::getFinalState() const
 {
 	return m_finalState;
 }
@@ -128,8 +125,7 @@ unsigned int DeformableRepresentation<M, D, K, S>::getNumDofPerNode() const
 }
 
 template <class M, class D, class K, class S>
-void DeformableRepresentation<M, D, K, S>::setIntegrationScheme(SurgSim::Math::IntegrationScheme
-		integrationScheme)
+void DeformableRepresentation<M, D, K, S>::setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	if (m_integrationScheme != integrationScheme)
 	{
@@ -149,8 +145,7 @@ SurgSim::Math::IntegrationScheme DeformableRepresentation<M, D, K, S>::getIntegr
 template <class M, class D, class K, class S>
 const SurgSim::Math::Matrix& DeformableRepresentation<M, D, K, S>::getComplianceMatrix() const
 {
-	SURGSIM_ASSERT(m_odeSolver) <<
-								"Ode solver not initialized yet, call beforeUpdate(dt)";
+	SURGSIM_ASSERT(m_odeSolver)  << "Ode solver not initialized yet, call beforeUpdate(dt)";
 
 	return m_odeSolver->getCompliance();
 }
@@ -178,16 +173,13 @@ void  DeformableRepresentation<M, D, K, S>::beforeUpdate(double dt)
 		switch (m_integrationScheme)
 		{
 		case SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER:
-			m_odeSolver = std::make_shared
-						  <ExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			m_odeSolver = std::make_shared <ExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER:
-			m_odeSolver = std::make_shared
-						  <ModifiedExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			m_odeSolver = std::make_shared <ModifiedExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER:
-			m_odeSolver = std::make_shared
-						  <ImplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			m_odeSolver = std::make_shared <ImplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		default:
 			SURGSIM_ASSERT(m_odeSolver)

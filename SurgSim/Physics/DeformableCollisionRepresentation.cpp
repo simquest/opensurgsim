@@ -16,7 +16,6 @@
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
 #include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
@@ -40,7 +39,6 @@ DeformableCollisionRepresentation::DeformableCollisionRepresentation(const std::
 
 DeformableCollisionRepresentation::~DeformableCollisionRepresentation()
 {
-
 }
 
 void DeformableCollisionRepresentation::setMesh(std::shared_ptr<SurgSim::DataStructures::TriangleMesh> mesh)

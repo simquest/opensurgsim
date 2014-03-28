@@ -146,14 +146,14 @@ protected:
 	/// \return The gravity vector
 	const SurgSim::Math::Vector3d& getGravity() const;
 
-	/// This entities collision representation, these are usually very specific to the physics representation
+	/// This entity's collision representation, these are usually very specific to the physics representation
 	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 
 private:
 	/// NO copy constructor
 	Representation(const Representation& a);
 
-	/// NO assignement operator
+	/// NO assignment operator
 	Representation& operator =(const Representation& a);
 
 	/// Gravity vector

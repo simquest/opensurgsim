@@ -35,13 +35,11 @@ public:
 	/// \param name Name of the representation.
 	explicit DeformableRepresentationBase(const std::string& name) : Representation(name)
 	{
-
 	}
 
 	/// Destructor
 	virtual ~DeformableRepresentationBase()
 	{
-
 	}
 
 	/// Set the initial state (in the global frame)

@@ -23,17 +23,19 @@ namespace SurgSim
 namespace Physics
 {
 
+/// Computation that calls the CollisionRepresentations update() function
 class UpdateCollisionRepresentations : public Computation
 {
 public:
 	/// Constructor
+	/// \param doCopyState whether to copy the PhysicsManagerState on update
 	explicit UpdateCollisionRepresentations(bool doCopyState);
 
 	/// Destructor
 	virtual ~UpdateCollisionRepresentations();
 
 	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt, const std::shared_ptr<PhysicsManagerState>& state);
+		const double& dt, const std::shared_ptr<PhysicsManagerState>& state) override;
 
 };
 

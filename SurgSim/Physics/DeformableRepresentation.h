@@ -56,52 +56,26 @@ public:
 	/// Destructor
 	virtual ~DeformableRepresentation();
 
-	/// Set the initial pose of the representation (used to transform the initial state on setup)
-	/// \param pose The initial pose
-	/// \note This is a feature to place the object in the scene on loading
-	/// \note A deformable representation is expressed in global frame (local frame = global frame)
-	/// \note This method needs to be called prior to calling setInitialState to be effective
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
-	/// Get the initial pose of the representation
-	/// \return The initial pose used to transform the loaded state
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override;
 
-	/// Set the current pose of the representation
-	/// \param pose The current pose
-	/// \note A deformable representation is expressed in global frame (local frame = global frame)
-	/// \note This method should not be called, as a deformable pose cannot be set !
-	/// \note Calling this method will raise an exception
 	void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
 	/// Get the current pose of the representation
 	/// \return The current pose (Identity)
 	/// \note A deformable representation is expressed in global frame (local frame = global frame)
 	/// \note Therefore its pose is always Identity
-	const SurgSim::Math::RigidTransform3d& getPose() const;
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
 
-	/// Called to reset the Representation state to its initial state
 	virtual void resetState() override;
 
-	/// Set the initial state (in the global frame)
-	/// \param initialState The initial state for this deformable representation (will potentially be changed)
-	/// \note 'initialState' will be transformed by the initialPose, if any has been specified
-	/// \note The parameter will be kept internally as the shared_ptr and the content will be transformed,
-	/// \note   so after this call, do not expect 'initialState' to be unchanged.
-	/// \note All internal states are initialized with the transformed initialState to make the simulation ready.
-	/// \note This method also sets the number of dof for this Representation
 	virtual void setInitialState(std::shared_ptr<DeformableRepresentationState> initialState) override;
 
-	/// Get the current state (in the global frame), this is for use inside the physics calculation only
-	/// \return The current state of this deformable representation
 	virtual const std::shared_ptr<DeformableRepresentationState> getCurrentState() const override;
 
-	/// Get the previous state (in the global frame), this is for use inside the physics calculation only
-	/// \return The previous state of this deformable representation
 	virtual const std::shared_ptr<DeformableRepresentationState> getPreviousState() const override;
 
-	/// Get the final state (in the global frame), this is for use inside the physics calculation only
-	/// \return The final state of this deformable representation
 	virtual const std::shared_ptr<DeformableRepresentationState> getFinalState() const override;
 
 	/// Gets the number of degrees of freedom per node
@@ -120,12 +94,12 @@ public:
 	/// \return The compliance matrix
 	const SurgSim::Math::Matrix& getComplianceMatrix() const;
 
-	/// Preprocessing done before the update call
-	/// \param dt The time step (in seconds)
-	/// \note DeformableRepresentation::beforeUpdate takes care of the OdeSolver setup
-	/// \note All derived classes overriding this method should call DeformableRepresentation::beforeUpdate(dt)
 	virtual void beforeUpdate(double dt) override;
 
+	/// Set the collision representation for this physics representation, when the collision object
+	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
+	/// Specializes for discarding anything besides a rigid collision representation.
+	/// \param representation The collision representation to be used.
 	virtual void setCollisionRepresentation(
 		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
