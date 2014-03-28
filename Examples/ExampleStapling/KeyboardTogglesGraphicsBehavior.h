@@ -72,6 +72,6 @@ private:
 	std::unordered_map<int, std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>> m_keyRegister;
 };
 
-#include "Examples/ExampleStapling/KeyboardBehavior-inl.h"
+#include "Examples/ExampleStapling/KeyboardTogglesGraphicsBehavior-inl.h"
 
 #endif //EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H

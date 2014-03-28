@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Examples/ExampleStapling/KeyboardBehavior.h"
+#include "Examples/ExampleStapling/KeyboardTogglesGraphicsBehavior.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
