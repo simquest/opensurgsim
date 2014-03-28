@@ -13,17 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Examples/ExampleStapling/VisualizeContactsBehavior.h"
-
 #include <algorithm>
 
+#include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgVectorFieldRepresentation.h"
 #include "SurgSim/Graphics/VectorField.h"
-#include "SurgSim/Graphics/VectorFieldRepresentation.h"
 
 using SurgSim::DataStructures::Vertex;
 using SurgSim::Collision::Contact;
@@ -31,16 +29,17 @@ using SurgSim::Collision::Representation;
 using SurgSim::Graphics::OsgVectorFieldRepresentation;
 using SurgSim::Graphics::VectorField;
 using SurgSim::Graphics::VectorFieldData;
-using SurgSim::Math::Vector3d;
+
+namespace SurgSim
+{
+
+namespace Blocks
+{
 
 VisualizeContactsBehavior::VisualizeContactsBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),
-	m_vectorFiled(std::make_shared<OsgVectorFieldRepresentation>("VisualizeContacts"))
+	m_vectorField(std::make_shared<OsgVectorFieldRepresentation>("VisualizeContacts"))
 {
-	// Note: Since usually the penetration depth of a collision is so small (at the magnitude of mm),
-	// if we use the depth as the length of vector, the vector field will be too small to be seen on the screen.
-	// Thus, we manually enlarge the vector field by 200 times.
-	m_vectorFiled->setScale(200);
 }
 
 void VisualizeContactsBehavior::setCollisionRepresentation(
@@ -56,23 +55,16 @@ void VisualizeContactsBehavior::update(double dt)
 		std::unordered_map<std::shared_ptr<Representation>,
 						   std::list<std::shared_ptr<Contact>>> collisions = m_collisionRepresentation->getCollisions();
 
-		unsigned int totalContacts = 0;
-		std::for_each(std::begin(collisions), std::end(collisions),
-			[&totalContacts](const std::pair<std::shared_ptr<Representation>,
-											 std::list<std::shared_ptr<Contact>>>& collision)
-			{
-				totalContacts += static_cast<int>(collision.second.size());
-			});
-
-		std::shared_ptr<VectorField> vectorField = m_vectorFiled->getVectorField();
-		int itemsToPop = static_cast<int>(vectorField->getNumVertices()) - static_cast<int>(2 * totalContacts);
-		if (itemsToPop < 0)
+		size_t totalContacts = 0;
+		for (auto collision = collisions.cbegin(); collision != collisions.cend(); ++collision)
 		{
-			vectorField->getVertices().reserve(2 * totalContacts);
+			totalContacts += collision->second.size();
 		}
-		m_vectorFiled->getVectorField()->clear();
 
-		unsigned int index = 0;
+		std::shared_ptr<VectorField> vectorField = m_vectorField->getVectorField();
+		vectorField->getVertices().reserve(2 * totalContacts);
+		vectorField->clear();
+
 		for (auto it = std::begin(collisions); it != std::end(collisions); ++it)
 		{
 			for (auto iter = std::begin((*it).second); iter != std::end((*it).second); ++iter)
@@ -91,11 +83,11 @@ void VisualizeContactsBehavior::update(double dt)
 				vectorField->addVertex(vertex2);
 			}
 		}
-		m_vectorFiled->setVisible(true);
+		m_vectorField->setVisible(true);
 	}
 	else
 	{
-		m_vectorFiled->setVisible(false);
+		m_vectorField->setVisible(false);
 	}
 }
 
@@ -112,6 +104,15 @@ bool VisualizeContactsBehavior::doInitialize()
 
 bool VisualizeContactsBehavior::doWakeUp()
 {
-	getSceneElement()->addComponent(m_vectorFiled);
+	getSceneElement()->addComponent(m_vectorField);
 	return true;
 }
+
+void VisualizeContactsBehavior::setVectorFieldScale(double scale)
+{
+	SURGSIM_ASSERT(scale > 0.0) << "Scale of vector field must be positive.";
+	m_vectorField->setScale(scale);
+}
+
+} // namespace Blocks
+} // namespace SurgSim

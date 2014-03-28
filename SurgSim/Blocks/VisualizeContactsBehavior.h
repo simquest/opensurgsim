@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_EXAMPLESTAPLING_VISUALIZECONTACTSBEHAVIOR_H
-#define EXAMPLES_EXAMPLESTAPLING_VISUALIZECONTACTSBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_VISUALIZECONTACTSBEHAVIOR_H
+#define SURGSIM_BLOCKS_VISUALIZECONTACTSBEHAVIOR_H
 
 #include <memory>
 #include <string>
@@ -34,7 +34,8 @@ namespace Collision
 class Representation;
 }
 
-} // namespace SurgSim
+namespace Blocks
+{
 
 /// This behavior is used to visualize the contacts
 /// on collision representation through vector field
@@ -46,7 +47,7 @@ public:
 	explicit VisualizeContactsBehavior(const std::string& name);
 
 	/// Set the collision representation whose contacts, if any, will be visualized.
-	/// \param	staplerRepresentation The representation of a stapler
+	/// \param	collisionRepresentation The collision representation of a stapler.
 	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation);
 
 	/// Update the behavior, show vector field for contacts if there is any.
@@ -57,15 +58,19 @@ public:
 	/// \return An integer indicating which manger should be responsible for this behavior.
 	virtual int getTargetManagerType() const override;
 
+	/// Set the scale of vector field, default 1.0.
+	// \param scale The scale of the vector field.
+	void setVectorFieldScale(double scale);
+
 protected:
 	/// Initialize this behavior
 	/// \return True on success, otherwise false.
-	/// \note: In current implementation, this method always returns "true".
+	/// \note In current implementation, this method always returns "true".
 	virtual bool doInitialize() override;
 
 	/// Wakeup this behavior
 	/// \return True on success, otherwise false.
-	/// \note: In current implementation, this method always returns "true".
+	/// \note In current implementation, this method always returns "true".
 	virtual bool doWakeUp() override;
 
 private:
@@ -73,7 +78,10 @@ private:
 	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 
 	/// The osg vector field for visualizing contacts on collision representation
-	std::shared_ptr<SurgSim::Graphics::VectorFieldRepresentation> m_vectorFiled;
+	std::shared_ptr<SurgSim::Graphics::VectorFieldRepresentation> m_vectorField;
 };
 
-#endif  // EXAMPLES_EXAMPLESTAPLING_VISUALIZECONTACTSBEHAVIOR_H
+} // namesapce Blocks
+} // namespace SurgSim
+
+#endif  // SURGSIM_BLOCKS_VISUALIZECONTACTSBEHAVIOR_H

@@ -26,13 +26,11 @@ set(EXAMPLESTAPLING_SOURCES
 	main.cpp
 	StapleElement.cpp
 	StaplerBehavior.cpp
-	VisualizeContactsBehavior.cpp
 )
 
 set(EXAMPLESTAPLING_HEADERS
 	StapleElement.h
 	StaplerBehavior.h
-	VisualizeContactsBehavior.h
 )
 
 add_executable(ExampleStapling
