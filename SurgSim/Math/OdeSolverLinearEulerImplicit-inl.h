@@ -48,7 +48,7 @@ void LinearImplicitEuler<State, MT, DT, KT, ST>::solve(double dt, const State& c
 
 		newState->getVelocities() = currentState.getVelocities() + deltaV;
 		newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();
-		newState->getAccelerations() /= dt;
+		newState->getAccelerations() = deltaV / dt;
 	}
 }
 
