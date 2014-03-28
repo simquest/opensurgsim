@@ -50,9 +50,7 @@ public:
 
 	/// Loads the file
 	/// \return true if successful
-	/// \note This function is provided for the convenience of manually adjusting the representation's parameters
-	/// before initialization.  Otherwise, if a filename has been set, the initialization process of the PhysicsManager
-	/// will load the file.
+	/// \note This function is a temporary workaround and its usage is discouraged.
 	bool loadFile();
 
 	/// Query the representation type

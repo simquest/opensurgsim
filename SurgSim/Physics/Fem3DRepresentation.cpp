@@ -123,13 +123,13 @@ bool Fem3DRepresentation::loadFile()
 
 	if (!reader.isValid())
 	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " could not be found.";
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is not valid.";
 		return false;
 	}
 
 	if (!reader.setDelegate(readerDelegate))
 	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is not acceptable PLY.";
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is not acceptable an PLY.";
 		return false;
 	}
 

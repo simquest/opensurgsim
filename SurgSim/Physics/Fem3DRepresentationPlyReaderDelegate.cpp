@@ -122,7 +122,7 @@ void Fem3DRepresentationPlyReaderDelegate::startParseFile()
 {
 	SURGSIM_ASSERT(m_fem != nullptr) << "The Representation cannot be nullptr.";
 	SURGSIM_ASSERT(m_fem->getNumFemElements() == 0)
-		<< "The Representation cannot be initialized with elements.";
+		<< "The Representation already contains fem elements, so it cannot be initialized.";
 	SURGSIM_ASSERT(m_fem->getInitialState() == nullptr)
 		<< "The Representation's initial state must be uninitialized.";
 
