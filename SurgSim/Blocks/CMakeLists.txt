@@ -21,6 +21,7 @@ include_directories(
 )
 
 set(SURGSIM_BLOCKS_SOURCES
+	KeyboardTogglesGraphicsBehavior.cpp
 	MassSpring1DRepresentation.cpp
 	MassSpring2DRepresentation.cpp
 	MassSpring3DRepresentation.cpp
@@ -33,6 +34,7 @@ set(SURGSIM_BLOCKS_SOURCES
 )
 
 set(SURGSIM_BLOCKS_HEADERS
+	KeyboardTogglesGraphicsBehavior.h
 	MassSpring1DRepresentation.h
 	MassSpring2DRepresentation.h
 	MassSpring3DRepresentation.h
