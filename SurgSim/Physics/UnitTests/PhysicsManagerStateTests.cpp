@@ -66,7 +66,7 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	EXPECT_EQ(expectedMapValue, actualRepresentationsIndexMapping.getValue(rigid1AsRepresentation.get()));
 	actualCollisionsToPhysicsMap = physicsState->getCollisionToPhysicsMap();
 	EXPECT_EQ(0, actualCollisionsToPhysicsMap.size());
-	
+
 	// Add a second representation.  This one has a collision representation.
 	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
 	auto collisionRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("rigid2 collision");
@@ -84,7 +84,7 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	expectedMapValue += 6; // the number of DOF for a rigid representation
 	std::shared_ptr<Representation> rigid2AsRepresentation = rigid2;
 	EXPECT_EQ(expectedMapValue, actualRepresentationsIndexMapping.getValue(rigid2AsRepresentation.get()));
-	
+
 	// check the collisionsToPhysicsMap
 	actualCollisionsToPhysicsMap = physicsState->getCollisionToPhysicsMap();
 	ASSERT_EQ(1, actualCollisionsToPhysicsMap.size());

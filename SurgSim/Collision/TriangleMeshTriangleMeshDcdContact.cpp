@@ -67,15 +67,15 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 	for (size_t i = 0; i < collisionMeshA->getNumTriangles(); ++i)
 	{
 		// The triangleA vertices.
-		const Vector3d& triangleA0 = meshBCoordinatesFromMeshACoordinates
-									 * collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[0]);
-		const Vector3d& triangleA1 = meshBCoordinatesFromMeshACoordinates
-									 * collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[1]);
-		const Vector3d& triangleA2 = meshBCoordinatesFromMeshACoordinates
-									 * collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[2]);
+		const Vector3d& triangleA0InLocalB = meshBCoordinatesFromMeshACoordinates *
+			collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[0]);
+		const Vector3d& triangleA1InLocalB = meshBCoordinatesFromMeshACoordinates *
+			collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[1]);
+		const Vector3d& triangleA2InLocalB = meshBCoordinatesFromMeshACoordinates *
+			collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[2]);
 
-		const Vector3d& normalA = collisionMeshA->getNormal(i);
-		if (normalA.isZero())
+		const Vector3d& normalAInLocalB = meshBCoordinatesFromMeshACoordinates.linear() * collisionMeshA->getNormal(i);
+		if (normalAInLocalB.isZero())
 		{
 			continue;
 		}
@@ -97,9 +97,10 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 				collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(j).verticesId[2]);
 
 			// Check if the triangles intersect.
-			if (SurgSim::Math::calculateContactTriangleTriangle(triangleA0, triangleA1, triangleA2,
+			if (SurgSim::Math::calculateContactTriangleTriangle(triangleA0InLocalB, triangleA1InLocalB,
+																triangleA2InLocalB,
 																triangleB0, triangleB1, triangleB2,
-																normalA, normalB, &depth,
+																normalAInLocalB, normalB, &depth,
 																&penetrationPointA, &penetrationPointB,
 																&normal))
 			{

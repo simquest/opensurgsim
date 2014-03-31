@@ -407,7 +407,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SceneElement> woundSceneElement =
 		createFemSceneElement("wound",
 							  woundFilename,
-							  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, // Physics loop update technique
+							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
 							  1000.0,										   // Mass Density
 							  0.45,											   // Poisson Ratio
 							  75e3,											   // Young Modulus
