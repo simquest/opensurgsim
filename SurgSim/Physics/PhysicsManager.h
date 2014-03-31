@@ -28,25 +28,27 @@ namespace SurgSim
 {
 namespace Framework
 {
-	class Component;
+class Component;
 }
 
 namespace Collision
 {
-	class Representation;
+class Representation;
 }
 namespace Physics
 {
 
 class BuildMlcp;
+class ConstraintComponent;
 class ContactConstraintGeneration;
-class FreeMotion;
 class DcdCollision;
+class FreeMotion;
 class PostUpdate;
 class PreUpdate;
 class PushResults;
 class Representation;
 class SolveMlcp;
+class UpdateCollisionRepresentations;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
@@ -66,7 +68,7 @@ public:
 	/// Get the last PhysicsManagerState from the previous PhysicsManager update.
 	/// \param [out] s pointer to an allocated PhysicsManagerState object.
 	/// \warning The state contains many pointers.  The objects pointed to are not thread-safe.
-	void getFinalState(SurgSim::Physics::PhysicsManagerState *s) const;
+	void getFinalState(SurgSim::Physics::PhysicsManagerState* s) const;
 
 protected:
 
@@ -90,6 +92,7 @@ private:
 
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
 
+	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;
 
 	///@{
 	/// Steps to perform the physics update
@@ -101,6 +104,7 @@ private:
 	std::unique_ptr<SolveMlcp> m_solveMlcpStep;
 	std::unique_ptr<PushResults> m_pushResultsStep;
 	std::unique_ptr<PostUpdate> m_postUpdateStep;
+	std::unique_ptr<UpdateCollisionRepresentations> m_updateCollisionRepresentationsStep;
 	///@}
 
 	/// A thread-safe copy of the last PhysicsManagerState in the previous update.

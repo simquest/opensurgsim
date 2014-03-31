@@ -27,7 +27,7 @@ ExplicitEuler<State, MT, DT, KT, ST>::ExplicitEuler(
 	OdeEquation<State, MT, DT, KT, ST>* equation) :
 	OdeSolver<State, MT, DT, KT, ST>(equation)
 {
-	this->m_name = "Explicit Euler";
+	m_name = "Explicit Euler";
 }
 
 template <class State, class MT, class DT, class KT, class ST>
@@ -39,18 +39,18 @@ void ExplicitEuler<State, MT, DT, KT, ST>::solve(double dt, const State& current
 	//   (M/dt).deltaV = f(t, x(t), v(t))
 
 	// Computes f(t, x(t), v(t))
-	const Vector& f = this->m_equation.computeF(currentState);
+	const Vector& f = m_equation.computeF(currentState);
 
 	// Computes M
-	const MT& M = this->m_equation.computeM(currentState);
+	const MT& M = m_equation.computeM(currentState);
 
 	// Computes the system matrix (left-hand-side matrix)
 	m_MsystemMatrix = M * (1.0 / dt);
-	this->m_systemMatrix = m_MsystemMatrix;
+	m_systemMatrix = m_MsystemMatrix;
 
 	// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
 	Vector& deltaV = newState->getAccelerations();
-	m_solveAndInverse(m_MsystemMatrix, f, &deltaV, &(this->m_compliance));
+	m_solveAndInverse(m_MsystemMatrix, f, &deltaV, &(m_compliance));
 
 	// Compute the new state using the Euler Explicit scheme:
 	newState->getPositions()  = currentState.getPositions()  + dt * currentState.getVelocities();

@@ -20,6 +20,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	BuildMlcpTests.cpp
 	ComputationTests.cpp
+	ConstraintComponentTests.cpp
 	ConstraintTests.cpp
 	ContactConstraintDataTests.cpp
 	ContactConstraintGenerationTests.cpp
@@ -33,6 +34,7 @@ set(UNIT_TEST_SOURCES
 	Fem3DRepresentationReaderTests.cpp
 	Fem3DRepresentationTests.cpp
 	FemElement1DBeamTests.cpp
+	FemElement2DTriangleTests.cpp
 	FemElement3DCubeTests.cpp
 	FemElement3DTetrahedronTests.cpp
 	FemElementTests.cpp
@@ -49,6 +51,7 @@ set(UNIT_TEST_SOURCES
 	MassSpringRepresentationLocalizationTest.cpp
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
+	PhysicsManagerStateTests.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
 	PreUpdateTests.cpp

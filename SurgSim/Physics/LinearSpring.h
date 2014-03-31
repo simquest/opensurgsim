@@ -56,32 +56,47 @@ public:
 	/// \return The rest length assigned to the spring (in m)
 	double getRestLength() const;
 
-	/// Computes the spring force from a given state
+	/// Adds the spring force (computed for a given state) to a complete system force vector F (assembly)
 	/// \param state The state to compute the force with
-	/// \return The computed spring force of size (3 x getNumNodes())
-	/// \note (non-const) because it uses an internal data member to store and return the result
-	const SurgSim::Math::Vector& computeForce(const DeformableRepresentationState& state) override;
+	/// \param[in,out] F The complete system force vector to add the spring force into
+	/// \param scale A factor to scale the added force with
+	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+						  double scale = 1.0) override;
 
-	/// Computes the spring stiffness matrix K (= -df/dx) from a given state
-	/// \param state The state to compute the stiffness matrix with
-	/// \return The computed spring stiffness matrix of size (3 x getNumNodes(), 3 x getNumNodes())
-	/// \note (non-const) because it uses an internal data member to store and return the result
-	const SurgSim::Math::Matrix& computeStiffness(const DeformableRepresentationState& state) override;
-
-	/// Computes the spring damping matrix D (= -df/dv) from a given state
+	/// Adds the spring damping matrix D (= -df/dv) (computed for a given state) to a complete system damping matrix
+	/// D (assembly)
 	/// \param state The state to compute the damping matrix with
-	/// \return The computed spring damping matrix  of size (3 x getNumNodes(), 3 x getNumNodes())
-	/// \note (non-const) because it uses an internal data member to store and return the result
-	const SurgSim::Math::Matrix& computeDamping(const DeformableRepresentationState& state) override;
+	/// \param[in,out] D The complete system damping matrix to add the spring damping matrix into
+	/// \param scale A factor to scale the added damping matrix with
+	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
+							double scale = 1.0) override;
 
-	/// Computes the spring force vector as well as stiffness and damping matrices from a given state
+	/// Adds the spring stiffness matrix K (= -df/dx) (computed for a given state) to a complete system stiffness
+	/// matrix K (assembly)
+	/// \param state The state to compute the stiffness matrix with
+	/// \param[in,out] K The complete system stiffness matrix to add the spring stiffness matrix into
+	/// \param scale A factor to scale the added stiffness matrix with
+	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
+							  double scale = 1.0) override;
+
+	/// Adds the spring force vector, mass, stiffness and damping matrices (computed for a given state) into a
+	/// complete system data structure F, D, K (assembly)
 	/// \param state The state to compute everything with
-	/// \param[out] f The computed spring force of size (3 x getNumNodes())
-	/// \param[out] D The computed spring damping matrix of size (3 x getNumNodes(), 3 x getNumNodes())
-	/// \param[out] K The computed spring stiffness matrix of size (3 x getNumNodes(), 3 x getNumNodes())
-	/// \note (non-const) because it uses internal data members to store and return the results
-	void computeFDK(const DeformableRepresentationState& state,
-		SurgSim::Math::Vector** f, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K);
+	/// \param[in,out] F The complete system force vector to add the spring force into
+	/// \param[in,out] D The complete system damping matrix to add the spring damping matrix into
+	/// \param[in,out] K The complete system stiffness matrix to add the spring stiffness matrix into
+	virtual void addFDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+						 SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override;
+
+	/// Adds the spring matrix-vector contribution F += (alphaD.D + alphaK.K).x (computed for a given
+	/// state) into a complete system data structure F (assembly)
+	/// \param state The state to compute everything with
+	/// \param alphaD The scaling factor for the damping contribution
+	/// \param alphaK The scaling factor for the stiffness contribution
+	/// \param vector A complete system vector to use as the vector in the matrix-vector multiplication
+	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
+	virtual void addMatVec(const DeformableRepresentationState& state, double alphaD, double alphaK,
+						   const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* F) override;
 
 	/// Comparison operator (equality)
 	/// \param spring Spring to compare it to

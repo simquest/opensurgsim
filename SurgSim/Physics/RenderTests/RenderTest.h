@@ -20,8 +20,10 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Physics/PhysicsManager.h"
 
 namespace SurgSim
 {
@@ -38,6 +40,8 @@ public:
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager;
+	std::shared_ptr<SurgSim::Physics::PhysicsManager> physicsManager;
+	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager;
 	std::shared_ptr<SurgSim::Framework::Scene> scene;
 	std::shared_ptr<SurgSim::Graphics::OsgViewElement> viewElement;
 };

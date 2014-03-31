@@ -33,10 +33,10 @@ Representation::~Representation()
 }
 
 std::list<std::shared_ptr<SurgSim::Collision::Contact>> Representation::getCollisionsWith(
-	const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const
+			const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const
 {
 	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-					   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> collisions;
+		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> collisions;
 	m_collisions.get(&collisions);
 
 	auto result = collisions.find(collisionRepresentation);
@@ -52,7 +52,7 @@ std::list<std::shared_ptr<SurgSim::Collision::Contact>> Representation::getColli
 }
 
 std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-				   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> Representation::getCollisions() const
+	std::list<std::shared_ptr<SurgSim::Collision::Contact>>> Representation::getCollisions() const
 {
 	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> collisions;
@@ -96,8 +96,13 @@ bool Representation::hasCollision() const
 void Representation::clearCollisions()
 {
 	static std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-							  std::list<std::shared_ptr<SurgSim::Collision::Contact>>> emptyCollision;
+		   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> emptyCollision;
 	m_collisions.set(emptyCollision);
+}
+
+void Representation::update(const double& dt)
+{
+
 }
 
 }; // namespace Collision

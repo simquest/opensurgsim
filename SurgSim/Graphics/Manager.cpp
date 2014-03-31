@@ -28,7 +28,6 @@ using SurgSim::Graphics::View;
 
 Manager::Manager() : ComponentManager("Graphics Manager")
 {
-	m_logger = SurgSim::Framework::Logger::getLogger(getName());
 }
 
 Manager::~Manager()

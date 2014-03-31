@@ -41,8 +41,9 @@ Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(
 	return result;
 }
 
-bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(const Node& node,
-		std::shared_ptr<SurgSim::Framework::Component>& rhs)
+bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(
+			const Node& node,
+			std::shared_ptr<SurgSim::Framework::Component>& rhs)
 {
 	bool result = false;
 
@@ -66,10 +67,10 @@ bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(const Node&
 			if (sharedComponent != registry.end())
 			{
 				SURGSIM_ASSERT(data[NamePropertyName].as<std::string>() == sharedComponent->second->getName() &&
-						className == sharedComponent->second->getClassName()) <<
-						"The current node: " << std::endl << node << "has the same id as an instance " <<
-						"already registered, but the name and/or the className are different. This is " <<
-						"likely a problem with a manually assigned id.";
+							   className == sharedComponent->second->getClassName())
+						<< "The current node: " << std::endl << node << "has the same id as an instance "
+						<< "already registered, but the name and/or the className are different. This is "
+						<< "likely a problem with a manually assigned id.";
 				rhs = sharedComponent->second;
 			}
 			else

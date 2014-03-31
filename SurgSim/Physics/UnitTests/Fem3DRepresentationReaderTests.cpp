@@ -24,13 +24,16 @@
 using SurgSim::Math::Vector3d;
 using SurgSim::DataStructures::PlyReader;
 
-static std::string findFile(std::string filename)
+namespace
+{
+std::string findFile(std::string filename)
 {
 	std::vector<std::string> paths;
 	paths.push_back("Data/PlyReaderTests");
 	SurgSim::Framework::ApplicationData data(paths);
 
 	return data.findFile(filename);
+}
 }
 
 namespace SurgSim
@@ -64,20 +67,26 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	std::array<unsigned int, 4> tetrahedron0 = {0, 1, 2, 3};
 	std::array<unsigned int, 4> tetrahedron11 = {10, 25, 11, 9};
 
-	EXPECT_TRUE(
-		std::equal(std::begin(tetrahedron0), std::end(tetrahedron0), std::begin(fem->getFemElement(0)->getNodeIds())));
 	EXPECT_TRUE(std::equal(
-		std::begin(tetrahedron11), std::end(tetrahedron11), std::begin(fem->getFemElement(11)->getNodeIds())));
+					std::begin(tetrahedron0), std::end(tetrahedron0),
+					std::begin(fem->getFemElement(0)->getNodeIds())));
+	EXPECT_TRUE(std::equal(
+					std::begin(tetrahedron11), std::end(tetrahedron11),
+					std::begin(fem->getFemElement(11)->getNodeIds())));
 
 	// Boundary conditions
-	ASSERT_EQ(8u, fem->getInitialState()->getNumBoundaryConditions());
+	ASSERT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
 
-	unsigned int boundaryCondition0 = 8;
-	unsigned int boundaryCondition7 = 11;
+	// Boundary condition 0 is on node 8, this
+	unsigned int boundaryNode0 = 8;
+	unsigned int boundaryNode7 = 11;
 
-	EXPECT_EQ(boundaryCondition0, fem->getInitialState()->getBoundaryConditions().at(0));
-	EXPECT_EQ(boundaryCondition7, fem->getInitialState()->getBoundaryConditions().at(7));
-
+	EXPECT_EQ(3 * boundaryNode0, fem->getInitialState()->getBoundaryConditions().at(0));
+	EXPECT_EQ(3 * boundaryNode0 + 1, fem->getInitialState()->getBoundaryConditions().at(1));
+	EXPECT_EQ(3 * boundaryNode0 + 2, fem->getInitialState()->getBoundaryConditions().at(2));
+	EXPECT_EQ(3 * boundaryNode7, fem->getInitialState()->getBoundaryConditions().at(21));
+	EXPECT_EQ(3 * boundaryNode7 + 1, fem->getInitialState()->getBoundaryConditions().at(22));
+	EXPECT_EQ(3 * boundaryNode7 + 2, fem->getInitialState()->getBoundaryConditions().at(23));
 	// Material
 	auto fem2 = fem->getFemElement(2);
 	EXPECT_EQ(0.1432, fem2->getMassDensity());

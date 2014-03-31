@@ -16,9 +16,10 @@
 #include "SurgSim/Input/InputComponent.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/LockedContainer.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Framework/LockedContainer.h"
 
 namespace SurgSim
 {
@@ -92,7 +93,8 @@ bool InputComponent::isDeviceConnected()
 
 void InputComponent::getData(SurgSim::DataStructures::DataGroup* dataGroup)
 {
-	SURGSIM_ASSERT(m_deviceConnected) << "No device connected to " << getName() << ". Unable to getData.";
+	SURGSIM_ASSERT(m_deviceConnected) << "No device connected to InputComponent named '" << getName() <<
+		"'. Unable to getData.";
 	m_input->getData(dataGroup);
 }
 

@@ -29,6 +29,7 @@ MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData,
 
 	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
 
+	// Computes the geometric properties for the initial mesh
 	computeVolumeIntegrals();
 }
 

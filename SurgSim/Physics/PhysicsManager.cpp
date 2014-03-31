@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Physics/BuildMlcp.h"
+#include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
 #include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Physics/FreeMotion.h"
@@ -26,6 +27,7 @@
 #include "SurgSim/Physics/PushResults.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/SolveMlcp.h"
+#include "SurgSim/Physics/UpdateCollisionRepresentations.h"
 
 #include <list>
 
@@ -35,7 +37,7 @@ namespace Physics
 {
 
 PhysicsManager::PhysicsManager() :
-  ComponentManager("Physics Manager")
+	ComponentManager("Physics Manager")
 {
 	setRate(1000.0);
 }
@@ -62,7 +64,7 @@ bool PhysicsManager::doStartUp()
 	return true;
 }
 
-void PhysicsManager::getFinalState(SurgSim::Physics::PhysicsManagerState *s) const
+void PhysicsManager::getFinalState(SurgSim::Physics::PhysicsManagerState* s) const
 {
 	m_finalState.get(s);
 }
@@ -73,14 +75,16 @@ bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::
 	std::shared_ptr<Representation> representation = tryAddComponent(component, &m_representations);
 	std::shared_ptr<SurgSim::Collision::Representation> collisionRep =
 		tryAddComponent(component, &m_collisionRepresentations);
-	return representation != nullptr || collisionRep != nullptr;
+	std::shared_ptr<ConstraintComponent> constraintComponent = tryAddComponent(component, &m_constraintComponents);
+	return representation != nullptr || collisionRep != nullptr || constraintComponent != nullptr;
 }
 
 bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	bool removed1 = tryRemoveComponent(component, &m_representations);
 	bool removed2 = tryRemoveComponent(component, &m_collisionRepresentations);
-	return removed1 || removed2;
+	bool removed3 = tryRemoveComponent(component, &m_constraintComponents);
+	return removed1 || removed2 || removed3;
 }
 
 bool PhysicsManager::doUpdate(double dt)
@@ -95,14 +99,17 @@ bool PhysicsManager::doUpdate(double dt)
 	stateList.push_back(state);
 	state->setRepresentations(m_representations);
 	state->setCollisionRepresentations(m_collisionRepresentations);
+	state->setConstraintComponents(m_constraintComponents);
 
 	stateList.push_back(m_preUpdateStep->update(dt, stateList.back()));
 	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
+	stateList.push_back(m_updateCollisionRepresentationsStep->update(dt, stateList.back()));
 	stateList.push_back(m_dcdCollisionStep->update(dt, stateList.back()));
 	stateList.push_back(m_constraintGenerationStep->update(dt, stateList.back()));
 	stateList.push_back(m_buildMlcpStep->update(dt, stateList.back()));
 	stateList.push_back(m_solveMlcpStep->update(dt, stateList.back()));
 	stateList.push_back(m_pushResultsStep->update(dt, stateList.back()));
+	stateList.push_back(m_updateCollisionRepresentationsStep->update(dt, stateList.back()));
 	stateList.push_back(m_postUpdateStep->update(dt, stateList.back()));
 
 	m_finalState.set(*(stateList.back()));
@@ -120,6 +127,7 @@ void PhysicsManager::initializeComputations(bool copyState)
 	m_solveMlcpStep.reset(new SolveMlcp(copyState));
 	m_pushResultsStep.reset(new PushResults(copyState));
 	m_postUpdateStep.reset(new PostUpdate(copyState));
+	m_updateCollisionRepresentationsStep.reset(new UpdateCollisionRepresentations(copyState));
 }
 
 
