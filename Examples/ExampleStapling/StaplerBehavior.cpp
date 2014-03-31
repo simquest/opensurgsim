@@ -25,11 +25,13 @@
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
+#include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
 
 using SurgSim::Physics::ConstraintImplementation;
+using SurgSim::Physics::FixedRepresentationBilateral3D;
 using SurgSim::Physics::RigidRepresentationBilateral3D;
 using SurgSim::Physics::Localization;
 
@@ -83,7 +85,7 @@ static std::shared_ptr<SurgSim::Collision::Contact> findDeepestContact(
 	const std::shared_ptr<SurgSim::Collision::Representation>& object,
 	const std::shared_ptr<SurgSim::Collision::Representation>& intersectingObject)
 {
-	const std::list<std::shared_ptr<SurgSim::Collision::Contact>>& contacts
+	std::list<std::shared_ptr<SurgSim::Collision::Contact>> contacts
 		= object->getCollisions().at(intersectingObject);
 
 	if (contacts.empty())
@@ -109,7 +111,7 @@ void StaplerBehavior::update(double dt)
 	bool button1 = false;
 	dataGroup.booleans().get("button1", &button1);
 
-	bool processButtonPush = button1 && m_buttonPreviouslyPressed;
+	bool processButtonPush = button1 && !m_buttonPreviouslyPressed;
 	m_buttonPreviouslyPressed = button1;
 
 	if (!processButtonPush)
@@ -196,7 +198,7 @@ void StaplerBehavior::update(double dt)
 				std::make_shared<SurgSim::Physics::ConstraintData>(),
 				std::make_shared<RigidRepresentationBilateral3D>(),
 				stapleLocalization,
-				std::make_shared<RigidRepresentationBilateral3D>(),
+				std::make_shared<FixedRepresentationBilateral3D>(),
 				otherLocalization);
 
 		std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
