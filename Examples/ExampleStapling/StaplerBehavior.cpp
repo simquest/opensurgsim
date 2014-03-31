@@ -45,10 +45,10 @@ void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputCom
 	m_from = inputComponent;
 }
 
-void StaplerBehavior::setCollisionRepresentation(
-	 std::shared_ptr<SurgSim::Collision::Representation> staplerRepresentation)
+void StaplerBehavior::setRepresentation(
+	 std::shared_ptr<SurgSim::Framework::Representation> staplerRepresentation)
 {
-	m_collisionRepresentation = staplerRepresentation;
+	m_representation = staplerRepresentation;
 }
 
 void StaplerBehavior::setVirtualStaple(std::shared_ptr<SurgSim::Collision::Representation> virtualTooth1,
@@ -120,7 +120,7 @@ void StaplerBehavior::update(double dt)
 	// Create the staple (not added to the scene right now).
 	std::string stapleName = "stapleId_" + boost::to_string(m_numElements++);
 	auto staple = std::make_shared<StapleElement>(stapleName);
-	staple->setPose(m_collisionRepresentation->getPose());
+	staple->setPose(m_representation->getPose());
 
 	int toothId = 0;
 	bool stapleAdded = false;

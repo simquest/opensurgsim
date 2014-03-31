@@ -250,7 +250,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	// Also, it is aware of collisions of the stapler.
 	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>("Behavior");
 	staplerBehavior->setInputComponent(inputComponent);
-	staplerBehavior->setCollisionRepresentation(collisionRepresentation);
+	staplerBehavior->setRepresentation(physicsRepresentation);
 
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
 		std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");

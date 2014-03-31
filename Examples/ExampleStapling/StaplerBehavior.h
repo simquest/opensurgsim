@@ -24,6 +24,10 @@
 
 namespace SurgSim
 {
+namespace Framework
+{
+class Representation;
+}
 
 namespace Graphics
 {
@@ -56,9 +60,9 @@ public:
 	/// \param	inputComponent	The input component which sends the pose.
 	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent);
 
-	/// Set the collision representation of the stapler
+	/// Set the representation of the stapler
 	/// \param	staplerRepresentation The representation of a stapler
-	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> staplerRepresentation);
+	void setRepresentation(std::shared_ptr<SurgSim::Framework::Representation> staplerRepresentation);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -89,8 +93,8 @@ private:
 	/// Input component from which to get the pose.
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
 
-	/// The collision representation of a stapler.
-	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
+	/// The representation of the stapler.
+	std::shared_ptr<SurgSim::Framework::Representation> m_representation;
 
 	/// The number of staples added
 	int m_numElements;
