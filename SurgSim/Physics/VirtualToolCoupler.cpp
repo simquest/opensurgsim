@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <Eigen/Eigenvalues> 
+#include <Eigen/Eigenvalues>
 
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Framework/LogMacros.h"
@@ -162,13 +162,18 @@ bool VirtualToolCoupler::doWakeUp()
 		return false;
 	}
 
-	//Provide sensible defaults based on the rigid representation
+	// Provide sensible defaults based on the rigid representation.
+	// If one or both of the stiffness and damping are not provided, they are
+	// calculated to provide a critically damped system (dampingRatio-1.0).
+	// For a mass-spring system, the damping ratio is defined as:
+	//
+	//     dampingRatio = (damping) / (2 * sqrt(mass * stiffness))
+	//
 	double dampingRatio = 1.0;
-
-	double mass = m_rigid->getInitialParameters().getMass();
-	if (! m_linearDamping.hasValue())
+	double mass = m_rigid->getCurrentParameters().getMass();
+	if (!m_linearDamping.hasValue())
 	{
-		if (! m_linearStiffness.hasValue())
+		if (!m_linearStiffness.hasValue())
 		{
 			m_linearStiffness.setValue(mass * 800.0);
 		}
@@ -176,17 +181,17 @@ bool VirtualToolCoupler::doWakeUp()
 	}
 	else
 	{
-		if (! m_linearStiffness.hasValue())
+		if (!m_linearStiffness.hasValue())
 		{
 			m_linearStiffness.setValue(pow(m_linearDamping.getValue() / dampingRatio, 2) / (4.0 * mass));
 		}
 	}
 
-	const Matrix33d& inertia = m_rigid->getInitialParameters().getLocalInertia();
+	const Matrix33d& inertia = m_rigid->getCurrentParameters().getLocalInertia();
 	double maxInertia = inertia.eigenvalues().real().maxCoeff();
-	if (! m_angularDamping.hasValue())
+	if (!m_angularDamping.hasValue())
 	{
-		if (! m_angularStiffness.hasValue())
+		if (!m_angularStiffness.hasValue())
 		{
 			m_angularStiffness.setValue(maxInertia * 1000.0);
 		}
@@ -194,7 +199,7 @@ bool VirtualToolCoupler::doWakeUp()
 	}
 	else
 	{
-		if (! m_angularStiffness.hasValue())
+		if (!m_angularStiffness.hasValue())
 		{
 			m_angularStiffness.setValue(pow(m_angularDamping.getValue() / dampingRatio, 2) / (4.0 * maxInertia));
 		}

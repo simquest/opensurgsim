@@ -15,8 +15,11 @@
 
 #include <gtest/gtest.h>
 
+#include <math.h>
+
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -25,10 +28,12 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Input::InputComponent;
+using SurgSim::Framework::Runtime;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -66,14 +71,9 @@ struct VirtualToolCouplerTest : public ::testing::Test
 		device = std::make_shared<IdentityPoseDevice>("Device");
 		input->connectDevice(device);
 
-		virtualToolCoupler = std::make_shared<VirtualToolCoupler>("Virtual Tool Coupler");
+		virtualToolCoupler = std::make_shared<MockVirtualToolCoupler>();
 		virtualToolCoupler->setInput(input);
 		virtualToolCoupler->setRepresentation(rigidBody);
-		const double mass = parameters.getMass();
-		virtualToolCoupler->setAngularDamping(mass * 1.0 );
-		virtualToolCoupler->setAngularStiffness(mass * 200);
-		virtualToolCoupler->setLinearDamping(mass * 50);
-		virtualToolCoupler->setLinearStiffness(mass * 200);
 	}
 
 	virtual void TearDown()
@@ -81,7 +81,7 @@ struct VirtualToolCouplerTest : public ::testing::Test
 	}
 
 	std::shared_ptr<RigidRepresentation> rigidBody;
-	std::shared_ptr<VirtualToolCoupler> virtualToolCoupler;
+	std::shared_ptr<MockVirtualToolCoupler> virtualToolCoupler;
 	std::shared_ptr<InputComponent> input;
 	std::shared_ptr<IdentityPoseDevice> device;
 
@@ -96,10 +96,95 @@ protected:
 			rigidBody->afterUpdate(dt);
 		}
 	}
+
+	void checkLinearIsCriticallyDamped()
+	{
+		RigidTransform3d initialPose = RigidTransform3d::Identity();
+		initialPose.translation() = Vector3d(0.1, 0.0, 0.0);
+		rigidBody->setInitialPose(initialPose);
+		rigidBody->setIsGravityEnabled(false);
+
+		std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+		virtualToolCoupler->initialize(runtime);
+		virtualToolCoupler->wakeUp();
+
+		// Criticall damped mass-damper systems settle to within 5% of their
+		// equilibrium when:
+		//      t = 4.744 * naturalFrequency;
+		// we will run the system to this point, and then check that the
+		// final position is 5.1% of if it's initial position
+		double mass = rigidBody->getCurrentParameters().getMass();
+		double stiffness = virtualToolCoupler->getLinearStiffness();
+		double naturalFrequency = sqrt(stiffness / mass);
+		double expectedSettlingTime = 4.744 / naturalFrequency;
+		const int NUM_STEPS = 1000;
+		double dt = expectedSettlingTime / NUM_STEPS;
+		Vector3d previousPosition = initialPose.translation();
+		Vector3d currentPosition;
+		for(int step=0; step<NUM_STEPS; step++)
+		{
+			virtualToolCoupler->update(dt);
+			rigidBody->beforeUpdate(dt);
+			rigidBody->update(dt);
+			rigidBody->afterUpdate(dt);
+			currentPosition = rigidBody->getCurrentState().getPose().translation();
+			// Check for exponential behavior. The position should monotonically decrease and not oscillate.
+			ASSERT_TRUE((previousPosition.array() >= currentPosition.array()).all());
+			previousPosition = currentPosition;
+		}
+		Vector3d expectedPosition = 0.051 * initialPose.translation();
+		EXPECT_TRUE((expectedPosition.array() >= currentPosition.array()).all());
+	}
+
+	void checkAngularIsCriticallyDamped()
+	{
+		double initialAngle = M_PI/4.0;
+		RigidTransform3d initialPose = RigidTransform3d::Identity();
+		initialPose.linear() = Matrix33d(Eigen::AngleAxisd(initialAngle, Vector3d::UnitY()));
+		rigidBody->setInitialPose(initialPose);
+		rigidBody->setIsGravityEnabled(false);
+
+		std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+		virtualToolCoupler->initialize(runtime);
+		virtualToolCoupler->wakeUp();
+
+		// Criticall damped mass-damper systems settle to within 5% of their
+		// equilibrium when:
+		//      t = 4.744 * naturalFrequency;
+		// we will run the system to this point, and then check that the
+		// final position is 5.1% of if it's initial angle
+		double inertia = rigidBody->getCurrentParameters().getLocalInertia()(1,1);
+		double stiffness = virtualToolCoupler->getAngularStiffness();
+		double naturalFrequency = sqrt(stiffness / inertia);
+		double expectedSettlingTime = 4.744 / naturalFrequency;
+		const int NUM_STEPS = 500;
+		double dt = expectedSettlingTime / NUM_STEPS;
+		double previousAngle = initialAngle;
+		double currentAngle;
+		for(int step=0; step<NUM_STEPS; step++)
+		{
+			virtualToolCoupler->update(dt);
+			rigidBody->beforeUpdate(dt);
+			rigidBody->update(dt);
+			rigidBody->afterUpdate(dt);
+			RigidTransform3d currentPose = rigidBody->getCurrentState().getPose();
+			currentAngle = atan2(-currentPose(2, 0), currentPose(0, 0));
+			// Check for exponential behavior. The angle should monotonically decrease and not oscillate.
+			ASSERT_GT(previousAngle, currentAngle);
+			previousAngle = currentAngle;
+		}
+		EXPECT_GT(0.051 * initialAngle, currentAngle);
+	}
 };
 
 TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 {
+	const double mass = rigidBody->getCurrentParameters().getMass();
+	virtualToolCoupler->setAngularDamping(mass * 1.0 );
+	virtualToolCoupler->setAngularStiffness(mass * 200);
+	virtualToolCoupler->setLinearDamping(mass * 50);
+	virtualToolCoupler->setLinearStiffness(mass * 200);
+
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.translation() = Vector3d(0.1, 0.0, 0.0);
 	rigidBody->setInitialPose(initialPose);
@@ -120,6 +205,13 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 
 TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 {
+	const double mass = rigidBody->getCurrentParameters().getMass();
+	virtualToolCoupler->setAngularDamping(mass * 1.0 );
+	virtualToolCoupler->setAngularStiffness(mass * 200);
+	virtualToolCoupler->setLinearDamping(mass * 50);
+	virtualToolCoupler->setLinearStiffness(mass * 200);
+
+
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.linear() = Matrix33d(Eigen::AngleAxisd(M_PI/4.0, Vector3d::UnitY()));
 	rigidBody->setInitialPose(initialPose);
@@ -140,6 +232,12 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 
 TEST_F(VirtualToolCouplerTest, WithGravity)
 {
+	const double mass = rigidBody->getCurrentParameters().getMass();
+	virtualToolCoupler->setAngularDamping(mass * 1.0 );
+	virtualToolCoupler->setAngularStiffness(mass * 200);
+	virtualToolCoupler->setLinearDamping(mass * 50);
+	virtualToolCoupler->setLinearStiffness(mass * 200);
+
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.translation() = Vector3d(0.0, 0.0, 0.0);
 	rigidBody->setInitialPose(initialPose);
@@ -163,6 +261,46 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
 	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
+}
+
+TEST_F(VirtualToolCouplerTest, DefaultLinearParameters)
+{
+	SCOPED_TRACE("Default Linear Parameters");
+	checkLinearIsCriticallyDamped();
+}
+
+TEST_F(VirtualToolCouplerTest, SetLinearStiffness)
+{
+	SCOPED_TRACE("Set Linear Stiffness");
+	virtualToolCoupler->setLinearStiffness(1.234);
+	checkLinearIsCriticallyDamped();
+}
+
+TEST_F(VirtualToolCouplerTest, SetLinearDamping)
+{
+	SCOPED_TRACE("Set Linear Damping");
+	virtualToolCoupler->setLinearDamping(500.2);
+	checkLinearIsCriticallyDamped();
+}
+
+TEST_F(VirtualToolCouplerTest, DefaultAngularParameters)
+{
+	SCOPED_TRACE("Default Linear Parameters");
+	checkAngularIsCriticallyDamped();
+}
+
+TEST_F(VirtualToolCouplerTest, SetAngularStiffness)
+{
+	SCOPED_TRACE("Set Angular Stiffness");
+	virtualToolCoupler->setAngularStiffness(1234.6);
+	checkAngularIsCriticallyDamped();
+}
+
+TEST_F(VirtualToolCouplerTest, SetAngularDamping)
+{
+	SCOPED_TRACE("Set Angular Damping");
+	virtualToolCoupler->setAngularDamping(0.1235);
+	checkAngularIsCriticallyDamped();
 }
 
 }; // namespace Physics
