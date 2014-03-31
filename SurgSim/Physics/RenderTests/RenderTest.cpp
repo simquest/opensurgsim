@@ -22,10 +22,17 @@ namespace Physics
 
 void RenderTests::SetUp()
 {
-	runtime = std::make_shared<SurgSim::Framework::Runtime>();
-	graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
+	runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
+	graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 	runtime->addManager(graphicsManager);
+
+	physicsManager = std::make_shared<SurgSim::Physics::PhysicsManager>();
+	runtime->addManager(physicsManager);
+
+	behaviorManager = std::make_shared<SurgSim::Framework::BehaviorManager>();
+	runtime->addManager(behaviorManager);
+
 	scene = runtime->getScene();
 
 	viewElement = std::make_shared<SurgSim::Graphics::OsgViewElement>("Physics Render Scene");

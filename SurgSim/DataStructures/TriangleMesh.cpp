@@ -20,6 +20,12 @@ namespace SurgSim
 namespace DataStructures
 {
 
+TriangleMesh::TriangleMesh()
+{
+
+}
+
+
 const SurgSim::Math::Vector3d& TriangleMesh::getNormal(int triangleId)
 {
 	return getTriangle(triangleId).data.normal;
