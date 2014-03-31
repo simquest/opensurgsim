@@ -25,5 +25,6 @@
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/OctreeShape.h"
 #include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/SurfaceMeshShape.h"
 
 #endif // SURGSIM_MATH_SHAPES_H

@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Physics/BuildMlcp.h"
+#include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
 #include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Physics/FreeMotion.h"
@@ -74,14 +75,16 @@ bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::
 	std::shared_ptr<Representation> representation = tryAddComponent(component, &m_representations);
 	std::shared_ptr<SurgSim::Collision::Representation> collisionRep =
 		tryAddComponent(component, &m_collisionRepresentations);
-	return representation != nullptr || collisionRep != nullptr;
+	std::shared_ptr<ConstraintComponent> constraintComponent = tryAddComponent(component, &m_constraintComponents);
+	return representation != nullptr || collisionRep != nullptr || constraintComponent != nullptr;
 }
 
 bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	bool removed1 = tryRemoveComponent(component, &m_representations);
 	bool removed2 = tryRemoveComponent(component, &m_collisionRepresentations);
-	return removed1 || removed2;
+	bool removed3 = tryRemoveComponent(component, &m_constraintComponents);
+	return removed1 || removed2 || removed3;
 }
 
 bool PhysicsManager::doUpdate(double dt)
@@ -96,6 +99,7 @@ bool PhysicsManager::doUpdate(double dt)
 	stateList.push_back(state);
 	state->setRepresentations(m_representations);
 	state->setCollisionRepresentations(m_collisionRepresentations);
+	state->setConstraintComponents(m_constraintComponents);
 
 	stateList.push_back(m_preUpdateStep->update(dt, stateList.back()));
 	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));

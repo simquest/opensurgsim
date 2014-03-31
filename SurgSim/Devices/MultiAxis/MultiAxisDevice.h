@@ -56,69 +56,99 @@ class MultiAxisDevice : public SurgSim::Input::DeviceInterface
 {
 public:
 	/// Constructor.
-	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit MultiAxisDevice(const std::string& uniqueName);
 
 	/// Destructor.
 	virtual ~MultiAxisDevice();
 
+	/// Get the device name.
+	/// \return The device name.
 	virtual std::string getName() const override;
 
+	/// Fully initialize the device.
+	/// When the manager object creates the device, the internal state of the device usually isn't fully
+	/// initialized yet.  This method performs any needed initialization.
+	/// \return True on success.
 	virtual bool initialize() override;
+
+	/// Finalize (de-initialize) the device.
+	/// \return True on success.
 	virtual bool finalize() override;
 
 	/// Check whether this device is initialized.
+	/// \return True if initialized.
 	bool isInitialized() const;
 
+	/// Connect this device to an InputConsumerInterface, which will receive the data that comes from this device.
+	/// \param inputConsumer The InputConsumerInterface to connect with.
+	/// \return True if successful.
 	virtual bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
+
+	/// Disconnect this device from an InputConsumerInterface, which will no longer receive data from this device.
+	/// \param inputConsumer The InputConsumerInterface to disconnect from.
+	/// \return True if successful.
 	virtual bool removeInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
 
+	/// Connect this device to an OutputProducerInterface, which will send data to this device.
+	/// \param outputProducer The OutputProducerInterface to connect with.
+	/// \return True if successful.
 	virtual bool setOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer) override;
+
+	/// Disconnect this device from an OutputProducerInterface, which will no longer send data to this device.
+	/// \param outputProducer The OutputProducerInterface to disconnect from.
+	/// \return True if successful.
 	virtual bool removeOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer) override;
 
+	/// Getter for whether or not this device is connected with an OutputProducerInterface.
+	/// \return True if an OutputProducerInterface is connected.
 	virtual bool hasOutputProducer() override;
 
 	/// Sets the position scale for this device.
 	/// The position scale controls how much the pose changes for a given device translation.
 	/// The default value for a raw device tries to correspond to the actual physical motion of the device.
 	void setPositionScale(double scale);
+
 	/// Gets the position scale for this device.
+	/// \return The position scale.
 	double getPositionScale() const;
 
 	/// Sets the orientation scale for this device.
 	/// The orientation scale controls how much the pose changes for a given device rotation.
-	/// The default value for a raw device tries to correspond to the actual physical motion of the device.
+	/// \param scale The new scale.
+	/// \note The default value for a raw device tries to correspond to the actual physical motion of the device.
 	void setOrientationScale(double scale);
+
 	/// Gets the orientation scale for this device.
+	/// \return The orientation scale.
 	double getOrientationScale() const;
 
 	/// Turns on or off the axis dominance setting for this device.
 	/// When axis dominance is on, only one (the largest) of the 6 pure axis directions is allowed to be active.
 	/// In other words, the device will be translating in X, or in Y, or in Z, or rotating around X, or around Y,
 	/// or around Z; but only one of those at a time.
+	/// \param onOff Whether or not to use only the dominant axis.
 	void setAxisDominance(bool onOff);
+
 	/// Gets the axis dominance setting for this device.
+	/// \return True if using axis dominance.
 	bool isUsingAxisDominance() const;
 
 private:
-	// Returns the default position scale, in meters per tick.
-	static double defaultPositionScale()
-	{
-		return 0.00001;
-	}
+	/// Get the default position scale from device ticks to meters.
+	/// \return The default position scale, in meters per tick.
+	static double defaultPositionScale();
 
-	// Returns the default rotation scale, in radians per tick.
-	static double defaultOrientationScale()
-	{
-		return 0.0001;
-	}
-
+	/// Get the default rotation from device ticks to radians.
+	/// \return The default rotation scale, in radians per tick.
+	static double defaultOrientationScale();
 
 	/// The device name.
 	std::string m_name;
+
 	/// The raw underlying device.
 	std::shared_ptr<RawMultiAxisDevice> m_rawDevice;
+
 	/// The pose integration filter.
 	std::shared_ptr<PoseIntegrator> m_filter;
 };

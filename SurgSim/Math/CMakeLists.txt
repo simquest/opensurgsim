@@ -34,6 +34,7 @@ set(SURGSIM_MATH_SOURCES
 	PlaneShape.cpp
 	Shape.cpp
 	SphereShape.cpp
+	SurfaceMeshShape.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
@@ -67,12 +68,20 @@ set(SURGSIM_MATH_HEADERS
 	OdeSolverEulerExplicitModified-inl.h
 	OdeSolverEulerImplicit.h
 	OdeSolverEulerImplicit-inl.h
+	OdeSolverLinearEulerExplicit.h
+	OdeSolverLinearEulerExplicit-inl.h
+	OdeSolverLinearEulerExplicitModified.h
+	OdeSolverLinearEulerExplicitModified-inl.h
+	OdeSolverLinearEulerImplicit.h
+	OdeSolverLinearEulerImplicit-inl.h
 	PlaneShape.h
 	Quaternion.h
 	RigidTransform.h
 	Shape.h
 	Shapes.h
 	SphereShape.h
+	SurfaceMeshShape.h
+	SurfaceMeshShape-inl.h
 	Valid.h
 	Valid-inl.h
 	Vector.h

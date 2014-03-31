@@ -31,8 +31,11 @@ namespace Math
 /// Each Ode Solver should have its own entry in this enum
 enum IntegrationScheme {
 	INTEGRATIONSCHEME_EXPLICIT_EULER = 0,
+	INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER,
 	INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER,
-	INTEGRATIONSCHEME_IMPLICIT_EULER
+	INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER,
+	INTEGRATIONSCHEME_IMPLICIT_EULER,
+	INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER
 };
 
 /// Base class for all solvers of ode equation of order 2 of the form M(x(t), v(t)).a(t) = f(t, x(t), v(t))

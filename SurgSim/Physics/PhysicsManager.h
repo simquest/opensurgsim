@@ -39,9 +39,10 @@ namespace Physics
 {
 
 class BuildMlcp;
+class ConstraintComponent;
 class ContactConstraintGeneration;
-class FreeMotion;
 class DcdCollision;
+class FreeMotion;
 class PostUpdate;
 class PreUpdate;
 class PushResults;
@@ -91,6 +92,7 @@ private:
 
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
 
+	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;
 
 	///@{
 	/// Steps to perform the physics update

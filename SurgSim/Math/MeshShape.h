@@ -34,9 +34,18 @@ namespace Math
 {
 
 /// Mesh shape: shape made of a triangle mesh
-/// Various geometrical properties are computed from the triangle mesh using
+/// The triangle mesh needs to be watertight to produce valid volume, center and second moment of
+/// volume. If it is not the case and you need valid geometric properties, use SurfaceMeshShape instead.
+/// Various geometrical properties (volume based) are computed from the triangle mesh using
 /// David Eberly's work:
 /// http://www.geometrictools.com/Documentation/PolyhedralMassProperties.pdf
+///
+/// \note The internal mesh should not be modified, otherwise the geometric properties will be invalid.
+/// \note Practical use cases:
+/// \note * Fixed/Rigid object, the mesh will not change anyway.
+/// \note * Deformable  object, the mesh will be updated, but the geometric properties will not be used.
+///
+/// \sa SurfaceMeshShape
 class MeshShape : public Shape
 {
 public:
@@ -51,7 +60,7 @@ public:
 
 	/// Get mesh
 	/// \return The collision mesh associated to this MeshShape
-	const std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh() const;
+	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh();
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)

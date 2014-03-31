@@ -38,7 +38,7 @@ public:
 protected:
 	/// Initialize this scene element
 	/// \return True on success, otherwise false.
-	virtual bool doInitialize();
+	virtual bool doInitialize() override;
 
 private:
 	/// Name of this scene element

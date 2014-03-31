@@ -134,6 +134,16 @@ bool MultiAxisDevice::isUsingAxisDominance() const
 	return m_rawDevice->isUsingAxisDominance();
 }
 
+double MultiAxisDevice::defaultPositionScale()
+{
+	return 0.00001; // The default position scale, in meters per tick.
+}
+
+double MultiAxisDevice::defaultOrientationScale()
+{
+	return 0.0001; // The default rotation scale, in radians per tick.
+}
+
 
 };  // namespace Device
 };  // namespace SurgSim

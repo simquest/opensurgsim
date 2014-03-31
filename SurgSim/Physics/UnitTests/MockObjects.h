@@ -19,9 +19,11 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
+#include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
 
 using SurgSim::Math::Matrix;
@@ -258,6 +260,68 @@ public:
 	MockDescendent() : Base() {}
 	explicit MockDescendent(const std::string &name) : Base(name) {}
 };
+
+class MockLocalization : public Localization
+{
+public:
+	MockLocalization() : Localization()
+	{
+	}
+
+	explicit MockLocalization(std::shared_ptr<Representation> representation) : Localization(representation)
+	{
+	}
+
+private:
+	/// Calculates the global position of this localization
+	/// \param time The time in [0..1] at which the position should be calculated
+	/// \return The global position of the localization at the requested time
+	/// \note time can useful when dealing with CCD
+	virtual SurgSim::Math::Vector3d doCalculatePosition(double time)
+	{
+		return SurgSim::Math::Vector3d::Zero();
+	}
+};
+
+class MockConstraintImplementation : public ConstraintImplementation
+{
+public:
+	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const
+	{
+		return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	}
+
+	virtual RepresentationType getRepresentationType() const
+	{
+		return SurgSim::Physics::REPRESENTATION_TYPE_FIXED;
+	}
+
+private:
+	virtual unsigned int doGetNumDof() const
+	{
+		return 1;
+	}
+
+	virtual void doBuild(double dt,
+						 const ConstraintData& data,
+						 const std::shared_ptr<Localization>& localization,
+						 MlcpPhysicsProblem* mlcp,
+						 unsigned int indexOfRepresentation,
+						 unsigned int indexOfConstraint,
+						 ConstraintSideSign sign)
+	{
+	}
+};
+
+inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepresentation> firstRepresentation,
+													  std::shared_ptr<MockRepresentation> secondRepresentation)
+{
+	return std::make_shared<Constraint>(std::make_shared<ConstraintData>(),
+										std::make_shared<MockConstraintImplementation>(),
+										std::make_shared<MockLocalization>(firstRepresentation),
+										std::make_shared<MockConstraintImplementation>(),
+										std::make_shared<MockLocalization>(secondRepresentation));
+}
 
 }; // Physics
 }; // SurgSim
