@@ -67,10 +67,12 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	std::array<unsigned int, 4> tetrahedron0 = {0, 1, 2, 3};
 	std::array<unsigned int, 4> tetrahedron11 = {10, 25, 11, 9};
 
-	EXPECT_TRUE(
-		std::equal(std::begin(tetrahedron0), std::end(tetrahedron0), std::begin(fem->getFemElement(0)->getNodeIds())));
 	EXPECT_TRUE(std::equal(
-					std::begin(tetrahedron11), std::end(tetrahedron11), std::begin(fem->getFemElement(11)->getNodeIds())));
+					std::begin(tetrahedron0), std::end(tetrahedron0),
+					std::begin(fem->getFemElement(0)->getNodeIds())));
+	EXPECT_TRUE(std::equal(
+					std::begin(tetrahedron11), std::end(tetrahedron11),
+					std::begin(fem->getFemElement(11)->getNodeIds())));
 
 	// Boundary conditions
 	ASSERT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
