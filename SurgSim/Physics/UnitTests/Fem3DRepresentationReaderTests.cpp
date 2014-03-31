@@ -43,13 +43,13 @@ namespace Physics
 
 TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 {
+	auto fem = std::make_shared<Fem3DRepresentation>("Representation");
+
 	PlyReader reader(findFile("Tetrahedron.ply"));
-	auto delegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>();
+	auto delegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(fem);
 
 	ASSERT_TRUE(reader.setDelegate(delegate));
 	ASSERT_NO_THROW(reader.parseFile());
-
-	auto fem = delegate->getFem();
 
 	// Vertices
 	ASSERT_EQ(3u, fem->getNumDofPerNode());
@@ -87,6 +87,16 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	EXPECT_EQ(3 * boundaryNode7, fem->getInitialState()->getBoundaryConditions().at(21));
 	EXPECT_EQ(3 * boundaryNode7 + 1, fem->getInitialState()->getBoundaryConditions().at(22));
 	EXPECT_EQ(3 * boundaryNode7 + 2, fem->getInitialState()->getBoundaryConditions().at(23));
+	// Material
+	auto fem2 = fem->getFemElement(2);
+	EXPECT_EQ(0.1432, fem2->getMassDensity());
+	EXPECT_EQ(0.224, fem2->getPoissonRatio());
+	EXPECT_EQ(0.472, fem2->getYoungModulus());
+
+	auto fem8 = fem->getFemElement(8);
+	EXPECT_EQ(0.1432, fem2->getMassDensity());
+	EXPECT_EQ(0.224, fem2->getPoissonRatio());
+	EXPECT_EQ(0.472, fem2->getYoungModulus());
 }
 
 }

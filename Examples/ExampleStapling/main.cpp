@@ -81,7 +81,6 @@ using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::MeshShape;
-using SurgSim::Math::MeshShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::Matrix33d;
@@ -112,44 +111,10 @@ static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& file
 	return std::make_shared<SurgSim::Graphics::Mesh>(*triangleMeshDelegate->getMesh());
 }
 
-static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
-	const std::string& fileName,
-	SurgSim::Math::IntegrationScheme integrationScheme,
-	double massDensity,
-	double poissonRatio,
-	double youngModulus)
-{
-	// The PlyReader and Fem3DRepresentationPlyReaderDelegate work together to load 3d fems.
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	std::shared_ptr<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate> fem3dDelegate
-		= std::make_shared<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate>();
-
-	SURGSIM_ASSERT(reader.setDelegate(fem3dDelegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
-
-	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> fem = fem3dDelegate->getFem();
-
-	// The FEM requires the implicit Euler integration scheme to avoid "blowing up"
-	fem->setIntegrationScheme(integrationScheme);
-
-	// Physical parameters must be set for the finite elements in order to be valid for the simulation.
-	for (size_t i = 0; i < fem->getNumFemElements(); i++)
-	{
-		fem->getFemElement(i)->setMassDensity(massDensity);
-		fem->getFemElement(i)->setPoissonRatio(poissonRatio);
-		fem->getFemElement(i)->setYoungModulus(youngModulus);
-	}
-
-	return fem;
-}
-
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
 	SurgSim::Math::IntegrationScheme integrationScheme,
-	double massDensity,
-	double poissonRatio,
-	double youngModulus,
 	bool displayPointCloud,
 	const SurgSim::Math::RigidTransform3d& pose)
 {
@@ -159,7 +124,13 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Load the tetrahedral mesh and initialize the finite element model
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> physicsRepresentation
-		= loadFem(filename, integrationScheme, massDensity, poissonRatio, youngModulus);
+		= std::make_shared<SurgSim::Physics::Fem3DRepresentation>(name + " physics");
+	physicsRepresentation->setFilename(filename);
+	physicsRepresentation->setIntegrationScheme(integrationScheme);
+	// Note: Directly calling loadFile is a workaround.  The TransferDeformableStateToVerticesBehavior requires a
+	// pointer to the Physics Representation's state, which is not created until the file is loaded and the internal 
+	// structure is initialized.  Therefore we create the state now by calling loadFile.
+	physicsRepresentation->loadFile();
 	physicsRepresentation->setInitialPose(pose);
 	sceneElement->addComponent(physicsRepresentation);
 
@@ -408,9 +379,6 @@ int main(int argc, char* argv[])
 		createFemSceneElement("wound",
 							  woundFilename,
 							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
-							  1000.0,										   // Mass Density
-							  0.45,											   // Poisson Ratio
-							  75e3,											   // Young Modulus
 							  true,											   // Display point cloud
 							  armPose);										   // Pose of wound on arm
 
