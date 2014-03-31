@@ -28,6 +28,7 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
@@ -61,7 +62,7 @@ public:
 		Vector3d t(1.2, 2.1, 12.21);
 		m_state.setAngularVelocity(Vector3d(1, 2, 3));
 		m_state.setLinearVelocity(Vector3d(3, 2, 1));
-		m_state.setPose(SurgSim::Math::makeRigidTransform(q,t ));
+		m_state.setPose(SurgSim::Math::makeRigidTransform(q, t));
 
 		m_maxNumSimulationStepTest = 100;
 	}
@@ -91,7 +92,7 @@ public:
 
 TEST_F(RigidRepresentationTest, ConstructorTest)
 {
-	ASSERT_NO_THROW( {RigidRepresentation rigidBody("Rigid");});
+	ASSERT_NO_THROW({RigidRepresentation rigidBody("Rigid");});
 }
 
 TEST_F(RigidRepresentationTest, ResetTest)
@@ -226,9 +227,9 @@ TEST_F(RigidRepresentationTest, GravityTest)
 		// Implicit numerical integration gives v(t+dt) = v(t) + dt.a(t+dt) = v(t) + dt.g
 		//                                      p(t+dt) = p(t) + dt.v(t+dt) = p(t) + dt.v(t) + dt^2.g
 		Vector3d tmpV = vprev + gravity * m_dt;
-		double diffV = (v-tmpV).norm();
+		double diffV = (v - tmpV).norm();
 		Vector3d tmpG = Gprev + tmpV * m_dt;
-		double diffG = (G-tmpG).norm();
+		double diffG = (G - tmpG).norm();
 
 		double epsilon = 1e-15;
 		ASSERT_NEAR(0.0, diffG, epsilon);
@@ -261,7 +262,8 @@ TEST_F(RigidRepresentationTest, PreviousStateDifferentFromCurrentTest)
 }
 
 void disableWhenDivergeTest(std::shared_ptr<RigidRepresentation> rigidBody,
-	const RigidRepresentationParameters& param, const RigidRepresentationState& state, double dt)
+							const RigidRepresentationParameters& param,
+							const RigidRepresentationState& state, double dt)
 {
 	// Setup phase
 	rigidBody->setIsActive(true);
@@ -371,7 +373,7 @@ TEST_F(RigidRepresentationTest, LocalizationCreation)
 {
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 	Location loc0;
-	loc0.globalPosition.setValue(Vector3d(1.0,2.0,3.0));
+	loc0.globalPosition.setValue(Vector3d(1.0, 2.0, 3.0));
 
 	std::shared_ptr<Localization> localization = rigidBody->createLocalization(loc0);
 	localization->setRepresentation(rigidBody);
@@ -380,7 +382,7 @@ TEST_F(RigidRepresentationTest, LocalizationCreation)
 	EXPECT_TRUE(loc0.globalPosition.getValue().isApprox(localization->calculatePosition(1.0)));
 
 	Location loc1;
-	loc1.rigidLocalPosition.setValue(Vector3d(3.0,2.0,1.0));
+	loc1.rigidLocalPosition.setValue(Vector3d(3.0, 2.0, 1.0));
 
 	localization = rigidBody->createLocalization(loc1);
 	localization->setRepresentation(rigidBody);
@@ -416,6 +418,31 @@ TEST_F(RigidRepresentationTest, InvalidShapes)
 		std::shared_ptr<SurgSim::Framework::Component> component = rigidBody;
 		EXPECT_THROW(component->initialize(runtime), SurgSim::Framework::AssertionFailure);
 	}
+}
+
+TEST_F(RigidRepresentationTest, CollisionRepresentationTest)
+{
+	auto rigidBody(std::make_shared<RigidRepresentation>("Rigid"));
+
+	auto collision1(std::make_shared<RigidCollisionRepresentation>("collision1"));
+	auto collision2(std::make_shared<RigidCollisionRepresentation>("collision2"));
+
+	EXPECT_EQ(nullptr, rigidBody->getCollisionRepresentation());
+	EXPECT_NO_THROW(rigidBody->setCollisionRepresentation(collision1));
+	EXPECT_EQ(collision1, rigidBody->getCollisionRepresentation());
+	EXPECT_EQ(rigidBody, collision1->getRigidRepresentation());
+
+	// Change the collision object
+	EXPECT_NO_THROW(rigidBody->setCollisionRepresentation(collision2));
+	EXPECT_EQ(collision2, rigidBody->getCollisionRepresentation());
+	EXPECT_EQ(rigidBody, collision2->getRigidRepresentation());
+	EXPECT_EQ(nullptr, collision1->getRigidRepresentation());
+
+	// Clear the collision representation
+	EXPECT_NO_THROW(rigidBody->setCollisionRepresentation(nullptr));
+	EXPECT_EQ(nullptr, rigidBody->getCollisionRepresentation());
+	EXPECT_EQ(nullptr, collision1->getRigidRepresentation());
+	EXPECT_EQ(nullptr, collision2->getRigidRepresentation());
 }
 
 }; // namespace Physics

@@ -28,6 +28,10 @@ element polyhedron 1476
 property list uint uint vertex_indices
 element boundary_condition 79
 property uint vertex_index
+element material 1
+property double mass_density
+property double poisson_ratio
+property double young_modulus
 end_header
 -0.017638 0.001427 -0.012363
 -0.018984 0.002069 -0.016867
@@ -2382,3 +2386,4 @@ end_header
 202
 122
 356
+1000.0 0.45 7.5e4

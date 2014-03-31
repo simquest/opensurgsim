@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_FEM3DREPRESENTATION_H
 
 #include <memory>
+#include <string>
 
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Math/Matrix.h"
@@ -39,6 +40,19 @@ public:
 	/// Destructor
 	virtual ~Fem3DRepresentation();
 
+	/// Sets the name of the file to be loaded
+	/// \param filename The name of the file to be loaded
+	void setFilename(const std::string& filename);
+
+	/// Gets the name of the file to be loaded
+	/// \return filename The name of the file to be loaded
+	const std::string& getFilename() const;
+
+	/// Loads the file
+	/// \return true if successful
+	/// \note This function is a temporary workaround and its usage is discouraged.
+	bool loadFile();
+
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
@@ -53,6 +67,10 @@ public:
 	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
 protected:
+	/// Interface to be implemented by derived classes
+	/// \return True if component is initialized successfully; otherwise, false.
+	virtual bool doInitialize() override;
+
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
@@ -66,6 +84,13 @@ protected:
 
 	/// Deactivate and call resetState
 	void deactivateAndReset(void);
+
+private:
+	/// Filename for loading the fem3d representation.
+	std::string m_filename;
+
+	/// Whether the file should be loaded or not.
+	bool m_doLoadFile;
 };
 
 } // namespace Physics

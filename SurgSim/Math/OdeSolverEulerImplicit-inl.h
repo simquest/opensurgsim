@@ -27,7 +27,7 @@ ImplicitEuler<State, MT, DT, KT, ST>::ImplicitEuler(
 	OdeEquation<State, MT, DT, KT, ST>* equation) :
 	OdeSolver<State, MT, DT, KT, ST>(equation)
 {
-	this->m_name = "Implicit Euler";
+	m_name = "Implicit Euler";
 }
 
 template <class State, class MT, class DT, class KT, class ST>
@@ -46,19 +46,19 @@ void ImplicitEuler<State, MT, DT, KT, ST>::solve(double dt, const State& current
 	DT* D;
 	KT* K;
 	Vector* f;
-	this->m_equation.computeFMDK(currentState, &f, &M, &D, &K);
+	m_equation.computeFMDK(currentState, &f, &M, &D, &K);
 
 	// Adds the Euler Implicit terms on the right-hand-side
 	*f -= ((*K) * currentState.getVelocities()) * dt;
 
 	// Computes the system matrix (left-hand-side matrix)
-	this->m_systemMatrix  = (*M) * (1.0 / dt);
-	this->m_systemMatrix += (*D);
-	this->m_systemMatrix += (*K) * dt;
+	m_systemMatrix  = (*M) * (1.0 / dt);
+	m_systemMatrix += (*D);
+	m_systemMatrix += (*K) * dt;
 
 	// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
 	Vector& deltaV = newState->getAccelerations();
-	m_solveAndInverse(this->m_systemMatrix, *f, &deltaV, &(this->m_compliance));
+	m_solveAndInverse(m_systemMatrix, *f, &deltaV, &(m_compliance));
 
 	// Compute the new state using the Euler Implicit scheme:
 	newState->getVelocities() = currentState.getVelocities() + deltaV;

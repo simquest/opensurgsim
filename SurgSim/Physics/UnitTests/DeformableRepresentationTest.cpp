@@ -35,10 +35,10 @@ using SurgSim::Math::Matrix;
 
 namespace
 {
-	const unsigned int numNodes = 100;
-	const unsigned int numDofPerNode = 3;
-	const unsigned int numDof = numDofPerNode * numNodes;
-	const double epsilon = 1e-10;
+const unsigned int numNodes = 100;
+const unsigned int numDofPerNode = 3;
+const unsigned int numDof = numDofPerNode* numNodes;
+const double epsilon = 1e-10;
 };
 
 class MockObject : public DeformableRepresentation<Matrix, Matrix, Matrix, Matrix>
@@ -78,7 +78,7 @@ public:
 	virtual void update(double dt) override
 	{
 		// Update the current state with something... (+=)
-		for(unsigned int i = 0; i < m_currentState->getNumDof(); i++)
+		for (unsigned int i = 0; i < m_currentState->getNumDof(); i++)
 		{
 			m_currentState->getVelocities()[i] += static_cast<double>(i);
 			m_currentState->getPositions()[i]  += m_currentState->getVelocities()[i] * dt;
@@ -128,13 +128,13 @@ public:
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
 	void computeFMDK(const DeformableRepresentationState& state,
-		Vector **f, Matrix **M, Matrix **D, Matrix **K) override
+					 Vector** f, Matrix** M, Matrix** D, Matrix** K) override
 	{
 	}
 
 protected:
 	void transformState(std::shared_ptr<DeformableRepresentationState> state,
-		const SurgSim::Math::RigidTransform3d& transform) override
+						const SurgSim::Math::RigidTransform3d& transform) override
 	{
 		using SurgSim::Math::setSubVector;
 		using SurgSim::Math::getSubVector;
@@ -194,10 +194,10 @@ TEST_F(DeformableRepresentationTest, ConstructorTest)
 	ASSERT_NO_THROW({MockObject deformable;});
 
 	// Test the object creation through the operator new
-	ASSERT_NO_THROW({MockObject *deformable = new MockObject; delete deformable;});
+	ASSERT_NO_THROW({MockObject* deformable = new MockObject; delete deformable;});
 
 	// Test the object creation through the operator new []
-	ASSERT_NO_THROW({MockObject *deformable = new MockObject[10]; delete [] deformable;});
+	ASSERT_NO_THROW({MockObject* deformable = new MockObject[10]; delete [] deformable;});
 
 	// Test the object creation through a shared_ptr
 	ASSERT_NO_THROW({std::shared_ptr<MockObject> deformable = std::make_shared<MockObject>(); });
@@ -286,12 +286,12 @@ TEST_F(DeformableRepresentationTest, UpdateChangesStateTest)
 	update(1e-3);
 	// afterUpdate should backup current into final
 	afterUpdate(1e-3);
-	EXPECT_TRUE (*m_localInitialState == *m_initialState);
-	EXPECT_TRUE (*m_localInitialState == *m_previousState);
+	EXPECT_TRUE(*m_localInitialState == *m_initialState);
+	EXPECT_TRUE(*m_localInitialState == *m_previousState);
 	EXPECT_FALSE(*m_localInitialState == *m_currentState);
 	EXPECT_FALSE(*m_localInitialState == *m_finalState);
-	EXPECT_TRUE (*m_localInitialState == *getInitialState());
-	EXPECT_TRUE (*m_localInitialState == *getPreviousState());
+	EXPECT_TRUE(*m_localInitialState == *getInitialState());
+	EXPECT_TRUE(*m_localInitialState == *getPreviousState());
 	EXPECT_FALSE(*m_localInitialState == *getCurrentState());
 	EXPECT_FALSE(*m_localInitialState == *getFinalState());
 	EXPECT_FALSE(*m_previousState     == *m_currentState);
@@ -303,11 +303,11 @@ TEST_F(DeformableRepresentationTest, UpdateChangesStateTest)
 	update(1e-3);
 	// afterUpdate should backup current into final
 	afterUpdate(1e-3);
-	EXPECT_TRUE (*m_localInitialState == *m_initialState);
+	EXPECT_TRUE(*m_localInitialState == *m_initialState);
 	EXPECT_FALSE(*m_localInitialState == *m_previousState);
 	EXPECT_FALSE(*m_localInitialState == *m_currentState);
 	EXPECT_FALSE(*m_localInitialState == *m_finalState);
-	EXPECT_TRUE (*m_localInitialState == *getInitialState());
+	EXPECT_TRUE(*m_localInitialState == *getInitialState());
 	EXPECT_FALSE(*m_localInitialState == *getPreviousState());
 	EXPECT_FALSE(*m_localInitialState == *getCurrentState());
 	EXPECT_FALSE(*m_localInitialState == *getFinalState());
@@ -330,11 +330,11 @@ TEST_F(DeformableRepresentationTest, ResetStateTest)
 	update(1e-3);
 	afterUpdate(1e-3);
 
-	EXPECT_TRUE (*m_localInitialState == *m_initialState);
+	EXPECT_TRUE(*m_localInitialState == *m_initialState);
 	EXPECT_FALSE(*m_localInitialState == *m_previousState);
 	EXPECT_FALSE(*m_localInitialState == *m_currentState);
 	EXPECT_FALSE(*m_localInitialState == *m_finalState);
-	EXPECT_TRUE (*m_localInitialState == *getInitialState());
+	EXPECT_TRUE(*m_localInitialState == *getInitialState());
 	EXPECT_FALSE(*m_localInitialState == *getPreviousState());
 	EXPECT_FALSE(*m_localInitialState == *getCurrentState());
 	EXPECT_FALSE(*m_localInitialState == *getFinalState());

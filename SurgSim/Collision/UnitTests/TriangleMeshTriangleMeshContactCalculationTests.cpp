@@ -270,6 +270,11 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::RigidTransform3d;
 
+	RigidTransform3d pose;
+	pose = SurgSim::Math::makeRigidTransform(
+			SurgSim::Math::makeRotationQuaternion(0.3468, Vector3d(0.2577, 0.8245, 1.0532).normalized()),
+			Vector3d(120.34, 567.23, -832.84));
+
 	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
 
 	{
@@ -283,22 +288,23 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 		Vector3d expectedNormal, expectedContact;
 		for (int i = 0; i < numTriangles; i++)
 		{
-			addNewTriangle(baseTriangles, Vector3d(0.5, 0.5, static_cast<double>(i) / numTriangles),
-			Vector3d(-0.5, 0.5, static_cast<double>(i) / numTriangles),
-			Vector3d(0.0, -0.5, static_cast<double>(i) / numTriangles));
+			addNewTriangle(baseTriangles,
+						   Vector3d(0.5, 0.5, static_cast<double>(i) / numTriangles),
+						   Vector3d(-0.5, 0.5, static_cast<double>(i) / numTriangles),
+						   Vector3d(0.0, -0.5, static_cast<double>(i) / numTriangles));
 			expectedDepth = static_cast<double>(i) / numTriangles;
 			if (expectedDepth > 0.5)
 			{
 				expectedDepth = 0.5;
-				expectedNormal = Vector3d(0,1,0);
-				expectedPoint0 = Vector3d(0,-0.5,static_cast<double>(i) / numTriangles);
-				expectedPoint1 = Vector3d(0,0,static_cast<double>(i) / numTriangles);
+				expectedNormal = pose.linear() * Vector3d(0,1,0);
+				expectedPoint0 = pose * Vector3d(0,-0.5,static_cast<double>(i) / numTriangles);
+				expectedPoint1 = pose * Vector3d(0,0,static_cast<double>(i) / numTriangles);
 			}
 			else
 			{
-				expectedNormal = Vector3d(0,0,-1);
-				expectedPoint0 = Vector3d(0,0,static_cast<double>(i) / numTriangles);
-				expectedPoint1 = Vector3d(0,0,0);
+				expectedNormal = pose.linear() * Vector3d(0,0,-1);
+				expectedPoint0 = pose * Vector3d(0,0,static_cast<double>(i) / numTriangles);
+				expectedPoint1 = pose * Vector3d(0,0,0);
 			}
 			if (expectedDepth > 0.0)
 			{
@@ -312,7 +318,9 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 		auto baseMesh = std::make_shared<MeshShape>(*baseTriangles);
 
 		auto intersectingTriangle = std::make_shared<TriangleMesh>();
-		addNewTriangle(intersectingTriangle, Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 1.0),
+		addNewTriangle(intersectingTriangle,
+					   Vector3d(0.0, 0.0, 0.0),
+					   Vector3d(0.0, 0.0, 1.0),
 					   Vector3d(1.0, 0.0, 0.5));
 		auto triangleMesh = std::make_shared<MeshShape>(*intersectingTriangle);
 
@@ -351,8 +359,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 		//                 |--| => 2k
 		//
 
-		doTriangleMeshTriangleMeshTest(baseMesh, RigidTransform3d::Identity(), triangleMesh,
-									   RigidTransform3d::Identity(), expectedContacts);
+		doTriangleMeshTriangleMeshTest(baseMesh, pose, triangleMesh,
+									   pose, expectedContacts);
 	}
 }
 

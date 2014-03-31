@@ -43,9 +43,9 @@ struct TestListener : public SurgSim::Input::InputConsumerInterface
 		bool button1, button2, button3;
 		double x, y;
 		int scrollDeltaX, scrollDeltaY;
-		inputData.booleans().get("button1", &button1);
-		inputData.booleans().get("button2", &button2);
-		inputData.booleans().get("button3", &button3);
+		inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_1, &button1);
+		inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_2, &button2);
+		inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_3, &button3);
 		inputData.scalars().get("x", &x);
 		inputData.scalars().get("y", &y);
 		inputData.integers().get("scrollDeltaX", &scrollDeltaX);

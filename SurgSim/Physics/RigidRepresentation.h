@@ -43,15 +43,13 @@ public:
 	/// Destructor
 	virtual ~RigidRepresentation();
 
-	/// Query the representation type
-	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
 
 	/// Set the current pose of the rigid representation
 	/// \param pose The current pose (translation + rotation)
-	/// \note Does Not Apply to this representation (the pose is fully controlled by the
+	/// \note Does not apply to this representation (the pose is fully controlled by the
 	/// physics simulation).
-	void setPose(const SurgSim::Math::RigidTransform3d& pose);
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
 	/// Set the current linear velocity of the rigid representation
 	/// \param linearVelocity The linear velocity
@@ -76,34 +74,30 @@ public:
 	/// \param K The angular stiffness matrix associated with the torque (jacobian of the torque w.r.t position)
 	/// \param D The angular damping matrix associated with the torque (jacobian of the torque w.r.t velocity)
 	void addExternalTorque(const SurgSim::Math::Vector3d& torque,
-						  const SurgSim::Math::Matrix33d& K = SurgSim::Math::Matrix33d::Zero(),
-						  const SurgSim::Math::Matrix33d& D = SurgSim::Math::Matrix33d::Zero());
+						   const SurgSim::Math::Matrix33d& K = SurgSim::Math::Matrix33d::Zero(),
+						   const SurgSim::Math::Matrix33d& D = SurgSim::Math::Matrix33d::Zero());
 
-	/// Preprocessing done before the update call
-	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt) override;
-	/// Update the representation state to the current time step (compute free motion)
-	/// \param dt The time step (in seconds)
+
 	virtual	void update(double dt) override;
-	/// Postprocessing done after the update call
-	/// \param dt The time step (in seconds)
+
 	virtual	void afterUpdate(double dt) override;
 
-	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
-	/// deltaVelocity.
-	///
-	/// This function typically is called in the physics pipeline (PhysicsManager::doUpdate) after solving the equations
-	/// that enforce constraints when collisions occur.  Specifically it is called in the PushResults::doUpdate step.
-	/// \param dt The time step
-	/// \param deltaVelocity The block of a vector containing the correction to be applied to the velocity
 	void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
-	/// Reset the rigid representation parameters to the initial parameters
-	void resetParameters();
+	virtual void resetParameters() override;
 
 	/// Retrieve the rigid body 6x6 compliance matrix
 	/// \return the 6x6 compliance matrix
 	const SurgSim::Math::Matrix66d& getComplianceMatrix() const;
+
+	/// Set the collision representation for this physics representation, when the collision object
+	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
+	/// Specializes to register this representation in the collision representation if the collision representation
+	/// is a RigidCollisionRepresentation.
+	/// \param representation The collision representation to be used.
+	virtual void setCollisionRepresentation(
+		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
 protected:
 	/// Inertia matrices in global coordinates
@@ -134,6 +128,8 @@ private:
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
 	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
+
+
 };
 
 }; // Physics

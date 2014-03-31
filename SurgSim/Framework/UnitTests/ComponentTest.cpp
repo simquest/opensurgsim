@@ -83,10 +83,22 @@ public:
 		return true;
 	}
 
-	int getValueOne() const { return valueOne; }
-	void setValueOne(int val) { valueOne = val; }
-	int getValueTwo() const { return valueTwo; }
-	void setValueTwo(int val) { valueTwo = val; }
+	int getValueOne() const
+	{
+		return valueOne;
+	}
+	void setValueOne(int val)
+	{
+		valueOne = val;
+	}
+	int getValueTwo() const
+	{
+		return valueTwo;
+	}
+	void setValueTwo(int val)
+	{
+		valueTwo = val;
+	}
 
 	std::string getClassName() const override
 	{
@@ -117,7 +129,7 @@ public:
 
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(
 			TestComponent3,
-			std::shared_ptr<Component>,
+			std::shared_ptr<TestComponent2>,
 			ComponentTwo,
 			getComponentTwo,
 			setComponentTwo);
@@ -133,10 +145,22 @@ public:
 		return true;
 	}
 
-	std::shared_ptr<Component> getComponentOne() const { return m_componentOne; }
-	void setComponentOne(std::shared_ptr<Component> val) { m_componentOne = val; }
-	std::shared_ptr<Component> getComponentTwo() const { return m_componentTwo; }
-	void setComponentTwo(std::shared_ptr<Component> val) { m_componentTwo = val; }
+	std::shared_ptr<Component> getComponentOne() const
+	{
+		return m_componentOne;
+	}
+	void setComponentOne(std::shared_ptr<Component> val)
+	{
+		m_componentOne = val;
+	}
+	std::shared_ptr<TestComponent2> getComponentTwo() const
+	{
+		return m_componentTwo;
+	}
+	void setComponentTwo(std::shared_ptr<TestComponent2> val)
+	{
+		m_componentTwo = val;
+	}
 
 	std::string getClassName() const override
 	{
@@ -146,12 +170,13 @@ public:
 private:
 
 	std::shared_ptr<Component> m_componentOne;
-	std::shared_ptr<Component> m_componentTwo;
+	std::shared_ptr<TestComponent2> m_componentTwo;
 };
 
-namespace {
-	SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent2);
-	SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent3);
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent2);
+SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent3);
 }
 
 TEST(ComponentTests, Constructor)
@@ -334,8 +359,8 @@ TEST(ComponentTests, ComponentReferences)
 	ASSERT_NE(nullptr, resultTwo);
 
 	// The references should have been resolved correctly
-	EXPECT_EQ(resultContainer->getComponentOne(), resultOne);
-	EXPECT_EQ(resultContainer->getComponentTwo(), resultTwo);
+	ASSERT_EQ(resultContainer->getComponentOne(), resultOne);
+	ASSERT_EQ(resultContainer->getComponentTwo(), resultTwo);
 
 
 	// All components should have the correct values ...
@@ -354,7 +379,7 @@ TEST(ComponentTests, ComponentReferences)
 
 TEST(ComponentTests, MockComponent)
 {
-	auto component = SurgSim::Framework::Component::getFactory().create("MockComponent","testcomponent");
+	auto component = SurgSim::Framework::Component::getFactory().create("MockComponent", "testcomponent");
 
 	ASSERT_NE(nullptr, component);
 
@@ -362,8 +387,8 @@ TEST(ComponentTests, MockComponent)
 	/// there is not SerializationMockComponent, but this should still suceed, this test protects
 	/// against linker optimization
 	auto nonDefinedComponent = SurgSim::Framework::Component::getFactory().create(
-		"SerializationMockComponent",
-		"othercomponent");
+								   "SerializationMockComponent",
+								   "othercomponent");
 
 	ASSERT_NE(nullptr, nonDefinedComponent) << "It looks like SerializationMockComponent was lost during linkage.";
 
