@@ -26,7 +26,7 @@ namespace Blocks
 
 KeyboardTogglesGraphicsBehavior::KeyboardTogglesGraphicsBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
-	m_keyPressed(false)
+	m_keyPressedLastUpdate(false)
 {
 }
 
@@ -39,14 +39,15 @@ void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
 												  std::shared_ptr<SurgSim::Framework::Component> component)
 {
 	auto graphicsRepresentation = std::dynamic_pointer_cast<SurgSim::Graphics::Representation>(component);
-	if (graphicsRepresentation != nullptr)
+	if (nullptr != graphicsRepresentation)
 	{
-		m_register[static_cast<int>(key)].push_back(graphicsRepresentation);
+		m_register[static_cast<int>(key)].insert(graphicsRepresentation);
 	}
 	else
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"Can not register component " << component->getName() << ".\n";
+			"KeyboardTogglesGraphicsBehavior::registerKey(): Can not register component " << component->getName() << 
+			". It's not a SurgSim::Graphics::Representation.\n";
 	}
 }
 
@@ -59,14 +60,14 @@ void KeyboardTogglesGraphicsBehavior::update(double dt)
 	if (dataGroup.integers().get("key", &key))
 	{
 		auto match = m_register.find(key);
-		if (match != m_register.end() && !m_keyPressed)
+		if (match != m_register.end() && !m_keyPressedLastUpdate)
 		{
 			for (auto it = std::begin(match->second); it != std::end(match->second); ++it)
 			{
 				(*it)->setVisible(!(*it)->isVisible());
 			};
 		}
-		m_keyPressed = (SurgSim::Device::KeyCode::NONE != key);
+		m_keyPressedLastUpdate = (SurgSim::Device::KeyCode::NONE != key);
 	}
 }
 
@@ -77,6 +78,12 @@ bool KeyboardTogglesGraphicsBehavior::doInitialize()
 
 bool KeyboardTogglesGraphicsBehavior::doWakeUp()
 {
+	if (nullptr == m_inputComponent)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "KeyboardTogglesGraphicsBehavior " <<
+			getName() << " does not have an Input Component.";
+		return false;
+	}
 	return true;
 }
 

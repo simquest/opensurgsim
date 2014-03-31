@@ -16,7 +16,7 @@
 #ifndef SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
 #define SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
 
-#include <list>
+#include <unordered_set>
 
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Behavior.h"
@@ -38,7 +38,7 @@ class InputComponent;
 namespace Blocks
 {
 
-/// This behavior is used to turn on and off registered graphical representation(s)
+/// This behavior is used to turn on and off the visibility of registered graphical representation(s)
 /// when the corresponding registered key is pressed.
 class KeyboardTogglesGraphicsBehavior : public SurgSim::Framework::Behavior
 {
@@ -77,10 +77,10 @@ private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_inputComponent;
 
 	/// A mapping between key and the graphical representation(s) it controls.
-	std::unordered_map<int, std::list<std::shared_ptr<SurgSim::Graphics::Representation>>> m_register;
+	std::unordered_map<int, std::unordered_set<std::shared_ptr<SurgSim::Graphics::Representation>>> m_register;
 
 	/// Record if any key has been pressed.
-	bool m_keyPressed;
+	bool m_keyPressedLastUpdate;
 };
 
 }; // namespace Blocks
