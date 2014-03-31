@@ -428,6 +428,10 @@ int main(int argc, char* argv[])
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, armSceneElement->getComponent("forearm"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, armSceneElement->getComponent("upperarm"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, armSceneElement->getComponent("ArmOsgMesh"));
+	keyboardBehavior->registerKey(
+		SurgSim::Device::KeyCode::KEY_E, woundSceneElement->getComponent("wound triangle mesh"));
+	keyboardBehavior->registerKey(
+		SurgSim::Device::KeyCode::KEY_F, woundSceneElement->getComponent("wound point cloud"));
 
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>("SceneElement");
 	sceneElement->addComponent(keyboardComponent);
