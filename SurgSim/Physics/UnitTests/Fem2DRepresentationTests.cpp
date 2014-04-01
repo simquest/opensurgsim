@@ -44,9 +44,15 @@ class Fem2DRepresentationTests : public ::testing::Test
 {
 public:
 	std::shared_ptr<Fem2DRepresentation> m_fem;
+
 	SurgSim::Math::RigidTransform3d m_initialPose;
 	std::shared_ptr<DeformableRepresentationState> m_initialState;
 
+	Vector m_expectedTransformedPositions;
+	Vector m_expectedTransformedVelocities;
+	Vector m_expectedTransformedAccelerations;
+
+private:
 	// Physical properties
 	double m_rho;
 	double m_nu;
@@ -54,11 +60,6 @@ public:
 
 	// Geometric properties
 	double m_thickness;
-	double m_A;
-
-	Vector m_expectedTransformedPositions;
-	Vector m_expectedTransformedVelocities;
-	Vector m_expectedTransformedAccelerations;
 
 protected:
 	virtual void SetUp() override
@@ -72,7 +73,6 @@ protected:
 
 		// Geometric properties
 		m_thickness = 1e-3;
-		m_A = 0.5;
 
 		// Initial Pose
 		SurgSim::Math::Quaterniond q(1.9, 4.2, 9.3, 2.1);
@@ -141,8 +141,7 @@ protected:
 
 TEST_F(Fem2DRepresentationTests, ConstructorTest)
 {
-	ASSERT_NO_THROW(
-		{ Fem2DRepresentation("name"); });
+	ASSERT_NO_THROW({Fem2DRepresentation("name");});
 }
 
 TEST_F(Fem2DRepresentationTests, GetTypeTest)
@@ -162,8 +161,6 @@ TEST_F(Fem2DRepresentationTests, TransformInitialStateTest)
 
 TEST_F(Fem2DRepresentationTests, UpdateTest)
 {
-	using SurgSim::Framework::Runtime;
-
 	// Need to call beforeUpdate() prior to calling update()
 	// + Need to call setInitialState() prior to calling beforeUpdate()
 	ASSERT_ANY_THROW(m_fem->update(dt));
@@ -173,7 +170,7 @@ TEST_F(Fem2DRepresentationTests, UpdateTest)
 	// Need to call Initialize after addFemElement and setInitialState to initialize the mass information
 	ASSERT_ANY_THROW(m_fem->update(dt));
 
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>()));
 	ASSERT_NO_THROW(m_fem->update(dt));
 
 	// Previous and current state should contains the proper information
@@ -188,13 +185,11 @@ TEST_F(Fem2DRepresentationTests, UpdateTest)
 
 TEST_F(Fem2DRepresentationTests, AfterUpdateTest)
 {
-	using SurgSim::Framework::Runtime;
-
 	// Need to call setInitialState() prior to calling afterUpdate()
 	ASSERT_ANY_THROW(m_fem->afterUpdate(dt));
 
 	m_fem->setInitialState(m_initialState);
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>()));
 	m_fem->beforeUpdate(dt);
 	m_fem->update(dt);
 	ASSERT_NO_THROW(m_fem->afterUpdate(dt));
