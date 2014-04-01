@@ -117,50 +117,19 @@ loadMesh(const std::string& fileName)
 	return delegate->getMesh();
 }
 
-static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
-	const std::string& fileName,
-	SurgSim::Math::IntegrationScheme integrationScheme,
-	double massDensity,
-	double poissonRatio,
-	double youngModulus)
-{
-	// The PlyReader and Fem3DRepresentationPlyReaderDelegate work together to load 3d fems.
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	std::shared_ptr<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate> fem3dDelegate
-		= std::make_shared<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate>();
-
-	SURGSIM_ASSERT(reader.setDelegate(fem3dDelegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
-
-	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> fem = fem3dDelegate->getFem();
-
-	// The FEM requires the implicit Euler integration scheme to avoid "blowing up"
-	fem->setIntegrationScheme(integrationScheme);
-
-	// Physical parameters must be set for the finite elements in order to be valid for the simulation.
-	for (size_t i = 0; i < fem->getNumFemElements(); i++)
-	{
-		fem->getFemElement(i)->setMassDensity(massDensity);
-		fem->getFemElement(i)->setPoissonRatio(poissonRatio);
-		fem->getFemElement(i)->setYoungModulus(youngModulus);
-	}
-
-	return fem;
-}
-
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
-	SurgSim::Math::IntegrationScheme integrationScheme,
-	double massDensity,
-	double poissonRatio,
-	double youngModulus)
+	SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>(name);
 
 	// Load the tetrahedral mesh and initialize the finite element model
-	auto fem = loadFem(filename, integrationScheme, massDensity, poissonRatio, youngModulus);
+	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("fem3d");
+	fem->setFilename(filename);
+	fem->setIntegrationScheme(integrationScheme);
+	fem->loadFile();
 	sceneElement->addComponent(fem);
 
 	// The mesh for visualizing the surface of the finite element model
@@ -249,8 +218,7 @@ TEST_F(Fem3DMeshRenderTest, MeshRenderTest)
 	auto data = runtime->getApplicationData();
 	auto filename = data->findFile("Fem3DMeshRenderTest/wound_deformable.ply");
 
-	auto fem =
-		createFemSceneElement("Fem", filename, SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, 1000, 0.45, 75e3);
+	auto fem = createFemSceneElement("Fem", filename, SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
 	runtime->getScene()->addSceneElement(fem);
 
