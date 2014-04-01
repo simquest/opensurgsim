@@ -41,12 +41,12 @@ public:
 	void setPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Return the staple physics representation.
-	/// \return The shared poiter to the physics representation.
+	/// \return The shared pointer to the physics representation.
 	const std::shared_ptr<SurgSim::Physics::RigidRepresentation> getPhysicsRepresentation();
 
-	/// Specify if the collision representation should be created or not.
-	/// \param flag Flag to specify if the collision representation should be created or not.
-	void setHasCollisionRepresentation(bool flag);
+	/// Specify whether the staple was bound with a bilateral 3d constraint
+	/// \param flag Flag to specify whether the staple was constrained.
+	void setIsBilateral3DConstrained(bool flag);
 
 	/// Destructor
 	~StapleElement();
@@ -63,8 +63,8 @@ private:
 	/// The shared pointer to the physics representation.
 	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_physicsRepresentation;
 
-	/// Flag to specify if the stapleElement needs to be created with a collision representation.
-	bool m_hasCollisionRepresentation;
+	/// Flag to specify if the stapleElement was created with a bilateral 3d constraint
+	bool m_isBilateral3DConstrained;
 };
 
 #endif //EXAMPLES_EXAMPLESTAPLING_STAPLEELEMENT_H

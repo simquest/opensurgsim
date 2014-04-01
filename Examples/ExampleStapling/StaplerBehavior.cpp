@@ -177,7 +177,7 @@ void StaplerBehavior::update(double dt)
 		// Create the staple with no collision representation.
 		if (!stapleAdded)
 		{
-			staple->setHasCollisionRepresentation(false);
+			staple->setIsBilateral3DConstrained(true);
 			getScene()->addSceneElement(staple);
 			stapleAdded = true;
 		}
