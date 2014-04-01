@@ -371,7 +371,7 @@ TEST_F(Fem3DRepresentationTests, SetFilenameTest)
 
 		EXPECT_EQ(3u, fem->getNumDofPerNode());
 		EXPECT_EQ(3u * 26u, fem->getNumDof());
-		EXPECT_EQ(8u, fem->getInitialState()->getNumBoundaryConditions());
+		EXPECT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
 	}
 
 	{
@@ -400,7 +400,7 @@ TEST_F(Fem3DRepresentationTests, SetFilenameTest)
 
 	{
 		SCOPED_TRACE("Loading with non-shared ptr");
-		auto fem = Fem3DRepresentation("fem3d");
+		Fem3DRepresentation fem("fem3d");
 
 		ASSERT_NO_THROW(fem.setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
 		EXPECT_THROW(fem.loadFile(), SurgSim::Framework::AssertionFailure);
