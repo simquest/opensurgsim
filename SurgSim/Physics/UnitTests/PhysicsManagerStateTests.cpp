@@ -70,7 +70,7 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	// Add a second representation.  This one has a collision representation.
 	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
 	auto collisionRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("rigid2 collision");
-	collisionRepresentation->setRigidRepresentation(rigid2);
+	rigid2->setCollisionRepresentation(collisionRepresentation);
 	expectedRepresentations.push_back(rigid2);
 	physicsState->setRepresentations(expectedRepresentations);
 	actualRepresentations = physicsState->getRepresentations();
