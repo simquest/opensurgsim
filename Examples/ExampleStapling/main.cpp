@@ -233,7 +233,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
-	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	std::shared_ptr<InputComponent> inputComponent = std::make_shared<InputComponent>("InputComponent");
 	inputComponent->setDeviceName(deviceName);
@@ -361,7 +361,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
-	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>(armName + "SceneElement");
 	armSceneElement->addComponent(forearmSceneryRepresentation);

@@ -99,7 +99,7 @@ bool StapleElement::doInitialize()
 	{
 		std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 			std::make_shared<RigidCollisionRepresentation>("Collision");
-		collisionRepresentation->setRigidRepresentation(m_physicsRepresentation);
+		m_physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 		addComponent(collisionRepresentation);
 	}
