@@ -80,6 +80,9 @@ bool StapleElement::doInitialize()
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
 
+	params.setLinearDamping(1e-2);
+	params.setAngularDamping(1e-4);
+
 	m_physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	m_physicsRepresentation->setInitialParameters(params);
 	m_physicsRepresentation->setInitialPose(m_pose);
@@ -105,6 +108,10 @@ bool StapleElement::doInitialize()
 		m_physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 		addComponent(collisionRepresentation);
+	}
+	else
+	{
+		m_physicsRepresentation->setIsGravityEnabled(false);
 	}
 
 	return true;
