@@ -270,16 +270,19 @@ TEST(PoseTransformDeviceFilterTest, OutputDataFilter)
 	Vector3d expectedtorque(-2.0, -4.0, 8.0);
 	EXPECT_TRUE(actualtorque.isApprox(expectedtorque, ERROR_EPSILON));
 
-	// The springJacobian should have each 3x3 block anti-rotated, and the first three columns un-scaled.
+	// The springJacobian should be transformed into device space, so each 3x3 block should be left-multiplied by
+	// the rotation, and right-multiplied by the anti-rotation, then the first three columns of the 6x6 should
+	// be scaled by the translation scaling factor so that the forces & torques are the right magnitude for
+	// the scene.
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType actualSpringJacobian;
 	ASSERT_TRUE(actualData.matrices().get(SurgSim::DataStructures::Names::SPRING_JACOBIAN, &actualSpringJacobian));
 	Matrix66d expectedSpringJacobian;
-	expectedSpringJacobian << -52.0, -56.0, -60.0, -32.0, -34.0, -36.0,
-		28.0, 32.0, 36.0, 20.0, 22.0, 24.0,
-		4.0, 8.0, 12.0, 8.0, 10.0, 12.0,
-		52.0, 56.0, 60.0, 32.0, 34.0, 36.0,
-		-28.0, -32.0, -36.0, -20.0, -22.0, -24.0,
-		-4.0, -8.0, -12.0, -8.0, -10.0, -12.0;
+	expectedSpringJacobian << 60.0, -56.0, -52.0, 36.0, -34.0, -32.0,
+		-36.0, 32.0, 28.0, -24.0, 22.0, 20.0,
+		-12.0, 8.0, 4.0, -12.0, 10.0, 8.0,
+		-60.0, 56.0, 52.0, -36.0, 34.0, 32.0,
+		36.0, -32.0, -28.0, 24.0, -22.0, -20.0,
+		12.0, -8.0, -4.0, 12.0, -10.0, -8.0;
 	EXPECT_TRUE(actualSpringJacobian.isApprox(expectedSpringJacobian, ERROR_EPSILON));
 
 	// The inputPose should be anti-transformed, and have its translation un-scaled.
@@ -290,16 +293,16 @@ TEST(PoseTransformDeviceFilterTest, OutputDataFilter)
 		Vector3d(3.0, -3.5, -4.0));
 	EXPECT_TRUE(actualInputPose.isApprox(expectedInputPose, ERROR_EPSILON));
 
-	// The damperJacobian should have each 3x3 block anti-rotated, and the first three columns un-scaled.
+	// The damperJacobian should be transformed the same as the springJacobian.
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType actualDamperJacobian;
 	ASSERT_TRUE(actualData.matrices().get(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, &actualDamperJacobian));
 	Matrix66d expectedDamperJacobian;
-	expectedDamperJacobian << -108.0, -116.0, -124.0, -66.0, -70.0, -74.0,
-		60.0, 68.0, 76.0, 42.0, 46.0, 50.0,
-		12.0, 20.0, 28.0, 18.0, 22.0, 26.0,
-		108.0, 116.0, 124.0, 66.0, 70.0, 74.0,
-		-60.0, -68.0, -76.0, -42.0, -46.0, -50.0,
-		-12.0, -20.0, -28.0, -18.0, -22.0, -26.0;
+	expectedDamperJacobian << 124.0, -116.0, -108.0, 74.0, -70.0, -66.0,
+		-76.0, 68.0, 60.0, -50.0, 46.0, 42.0,
+		-28.0, 20.0, 12.0, -26.0, 22.0, 18.0,
+		-124.0, 116.0, 108.0, -74.0, 70.0, 66.0,
+		76.0, -68.0, -60.0, 50.0, -46.0, -42.0,
+		28.0, -20.0, -12.0, 26.0, -22.0, -18.0;
 	EXPECT_TRUE(actualDamperJacobian.isApprox(expectedDamperJacobian, ERROR_EPSILON));
 
 	// The inputLinearVelocity should be anti-rotated and un-scaled.
