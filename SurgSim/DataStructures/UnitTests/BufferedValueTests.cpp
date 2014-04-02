@@ -145,6 +145,21 @@ TEST(BufferedValueTests, ReadAccessorTest)
 
 	EXPECT_EQ(20, *unsafeValue);
 	EXPECT_EQ(20, *safeValue);
+
+	*readWriteValue = 30;
+	readWriteValue.publish();
+
+	bool didRead = false;
+
+	EXPECT_TRUE(safeValue.isStale());
+	safeValue.updateIfNew(&didRead);
+	EXPECT_TRUE(didRead);
+	EXPECT_FALSE(safeValue.isStale());
+
+	safeValue.updateIfNew(&didRead);
+	EXPECT_FALSE(didRead);
+	EXPECT_FALSE(safeValue.isStale());
+
 }
 
 

@@ -33,6 +33,9 @@ template <class T> class UnsafeAccessor;
 /// BufferedValue is a class to enable a representation of two values for one variable, where both values need to be
 /// accessible at the same time, one in a thread safe, single threaded context, the other in a thread unsafe context.
 /// It is intended to be used with wrapper classes to actual perform the access.
+/// Please note that all the test on for new data do not rely on the inequality of two data but on the generation count
+/// if the writer calls publish() without having updated its data it will still show up as 'new' in respect to the safe
+/// reader.
 /// \tparam T Type that is used for the value.
 template <class T>
 class BufferedValue
@@ -76,7 +79,11 @@ protected:
 	/// \throws SurgSim::Assertion::Failure If value or generation are nullptr
 	/// \param [out] value The pointer to the memory for the new data.
 	/// \param [inout] generation The pointer to the generation count.
-	void getValueIfNew(T* value, size_t* generation) const;
+	bool getValueIfNew(T* value, size_t* generation) const;
+
+	/// Determine if there is a new value available
+	/// \return true if generation is not equal to the internal value
+	bool hasNewValue(size_t generation) const;
 
 	/// Copy the internal value to the memory indicated by the pointer, additionally fetch the generation count
 	/// \throws SurgSim::Assertion::Failure if value is a nullptr
@@ -109,6 +116,7 @@ private:
 	boost::thread::id m_threadId;
 };
 
+
 /// Base class for the accessor classes, just wraps the buffer value
 template <class T>
 class BaseAccessor
@@ -138,6 +146,26 @@ public:
 		BaseAccessor<T>(value)
 	{
 		m_value->getValue(&m_localData, &m_generation);
+	}
+
+	/// Explicit version of the -> operator function, update the the value if the generation counts do not match
+	/// additionally return wether an update has been executed, if you need to know wether there was an update
+	/// this should be faster than calling isStale() and then the update as there is only one locking operation
+	/// involved.
+	/// \param [out] didUpdate Address of bool for writing the result, can't be nullptr
+	/// \return pointer to const data.
+	const T* updateIfNew(bool* didUpdate)
+	{
+		SURGSIM_ASSERT(didUpdate != nullptr) << "nullptr passed.";
+		*didUpdate = m_value->getValueIfNew(&m_localData, &m_generation);
+		return &m_localData;
+	}
+
+	/// Check whether the data on the other side has been updated
+	/// \return true if the generation counts are not equal.
+	bool isStale() const
+	{
+		return m_value->hasNewValue(m_generation);
 	}
 
 	/// Overloaded operator for easier access

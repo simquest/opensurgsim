@@ -64,7 +64,7 @@ void BufferedValue<T>::releaseWriteBuffer()
 }
 
 template <class T>
-void BufferedValue<T>::getValueIfNew(T* value, size_t* generation) const
+bool BufferedValue<T>::getValueIfNew(T* value, size_t* generation) const
 {
 	SURGSIM_ASSERT(value != nullptr) << "getValueIfNew called with nullptr for value.";
 	SURGSIM_ASSERT(generation != nullptr) << "getValueIfNew called with nullptr for generation.";
@@ -75,7 +75,16 @@ void BufferedValue<T>::getValueIfNew(T* value, size_t* generation) const
 	{
 		*value = m_values.second;
 		*generation = m_generation;
+		return true;
 	}
+	return false;
+}
+
+template <class T>
+bool SurgSim::DataStructures::BufferedValue<T>::hasNewValue(size_t generation) const
+{
+	SharedLock lock(m_mutex);
+	return generation != m_generation;
 }
 
 template <class T>
