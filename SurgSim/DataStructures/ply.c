@@ -1566,7 +1566,7 @@ void ascii_get_element(PlyFile *plyfile, char *elem_ptr)
 
   /* read in the element */
 
-  words = get_words (plyfile->fp, &nwords, &orig_line);
+  words = get_words (fp, &nwords, &orig_line);
   if (words == NULL) {
     fprintf (stderr, "ply_get_element: unexpected end of file\n");
     exit (-1);
