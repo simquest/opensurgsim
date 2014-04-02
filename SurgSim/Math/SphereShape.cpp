@@ -13,16 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/SphereShape.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SphereShape);
+}
 
 namespace SurgSim
 {
 namespace Math
 {
 
-SphereShape::SphereShape(double radius)
+SphereShape::SphereShape(double radius) : m_radius(radius)
 {
-	m_radius = radius;
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphereShape, double, Radius, getRadius, setRadius);
 }
 
 int SphereShape::getType()
@@ -33,6 +39,11 @@ int SphereShape::getType()
 double SphereShape::getRadius() const
 {
 	return m_radius;
+}
+
+void SphereShape::setRadius(double radius)
+{
+	m_radius = radius;
 }
 
 double SphereShape::getVolume() const
@@ -56,27 +67,6 @@ SurgSim::Math::Matrix33d SphereShape::getSecondMomentOfVolume() const
 	secondMoment.diagonal().setConstant(diagonalCoefficient);
 
 	return secondMoment;
-}
-
-YAML::Node SurgSim::Math::SphereShape::encode()
-
-{
-	YAML::Node node;
-	node = SurgSim::Math::Shape::encode();
-	node["Radius"] = getRadius();
-	return node;
-}
-
-bool SurgSim::Math::SphereShape::decode(const YAML::Node& node)
-{
-	bool isSuccess = SurgSim::Math::Shape::decode(node);
-	if (! isSuccess)
-	{
-		return false;
-	}
-
-	m_radius = node["Radius"].as<double>();
-	return true;
 }
 
 }; // namespace Math
