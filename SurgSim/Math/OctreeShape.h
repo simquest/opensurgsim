@@ -16,10 +16,9 @@
 #ifndef SURGSIM_MATH_OCTREESHAPE_H
 #define SURGSIM_MATH_OCTREESHAPE_H
 
-#include <vector>
-
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 
@@ -38,6 +37,8 @@ public:
 
 	/// Constructor
 	OctreeShape();
+
+	SURGSIM_CLASSNAME(SurgSim::Math::OctreeShape);
 
 	/// Construct an OctreeShape by copying data from an OctreeNode
 	/// NOTE: The Data stored in the octree node will not be copied into the
@@ -66,21 +67,13 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
-	/// Get the root node
-	/// \return the octree root node of this shape
-	virtual std::shared_ptr<NodeType> getRootNode();
-
 	/// const version to get the root node
 	/// \return A const reference of the shared pointer, which points to the octree root node of this shape.
-	virtual const std::shared_ptr<const NodeType> getRootNode() const;
+	const std::shared_ptr<const NodeType> getRootNode() const;
 
 	/// Set the root node
 	/// \param node the octree root node of this shape
-	virtual void setRootNode(std::shared_ptr<NodeType> node);
-
-	/// Get the name of the class
-	/// \return the class name
-	virtual std::string getClassName() override;
+	void setRootNode(std::shared_ptr<NodeType> node);
 
 private:
 	/// Root node of the octree datastructure

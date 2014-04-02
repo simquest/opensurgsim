@@ -13,10 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#include "SurgSim/Math/OctreeShape.h"
-
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/OctreeShape.h"
 
 namespace SurgSim
 {
@@ -54,11 +52,6 @@ Matrix33d OctreeShape::getSecondMomentOfVolume() const
 	return Matrix33d::Zero();
 }
 
-std::shared_ptr<OctreeShape::NodeType> OctreeShape::getRootNode()
-{
-	return m_rootNode;
-}
-
 const std::shared_ptr<const OctreeShape::NodeType> OctreeShape::getRootNode() const
 {
 	return m_rootNode;
@@ -67,11 +60,6 @@ const std::shared_ptr<const OctreeShape::NodeType> OctreeShape::getRootNode() co
 void OctreeShape::setRootNode(std::shared_ptr<OctreeShape::NodeType> node)
 {
 	m_rootNode = node;
-}
-
-std::string OctreeShape::getClassName()
-{
-	return std::string("SurgSim::Math::OctreeShape");
 }
 
 }; // namespace Math
