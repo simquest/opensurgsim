@@ -55,4 +55,4 @@ public:
 } // namespace Physics
 } // namespace SurgSim
 
-#endif // SURGSIM_TESTING_PERFORMANCETESTINGPHYSICSMANAGER_H
+#endif // SURGSIM_TESTING_PHYSICSMANAGER_H
