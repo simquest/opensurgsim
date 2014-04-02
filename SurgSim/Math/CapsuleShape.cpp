@@ -13,17 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/CapsuleShape.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::CapsuleShape);
+}
 
 namespace SurgSim
 {
 namespace Math
 {
 
-CapsuleShape::CapsuleShape(double length, double radius)
+CapsuleShape::CapsuleShape(double length, double radius) : m_length(length), m_radius(radius)
 {
-	m_length = length;
-	m_radius = radius;
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CapsuleShape, double, Radius, getRadius, setRadius);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CapsuleShape, double, Length, getLength, setLength);
 }
 
 int CapsuleShape::getType()
@@ -39,6 +45,16 @@ double CapsuleShape::getLength() const
 double CapsuleShape::getRadius() const
 {
 	return m_radius;
+}
+
+void CapsuleShape::setLength(double length)
+{
+	m_length = length;
+}
+
+void CapsuleShape::setRadius(double radius)
+{
+	m_radius = radius;
 }
 
 double CapsuleShape::getVolume() const
@@ -103,29 +119,6 @@ SurgSim::Math::Matrix33d CapsuleShape::getSecondMomentOfVolume() const
 	secondMoment(1, 1) = a + c;
 
 	return secondMoment;
-}
-
-YAML::Node SurgSim::Math::CapsuleShape::encode()
-{
-	YAML::Node node;
-	node = SurgSim::Math::Shape::encode();
-	node["Radius"] = getRadius();
-	node["Length"] = getLength();
-
-	return node;
-}
-
-bool SurgSim::Math::CapsuleShape::decode(const YAML::Node& node)
-{
-	bool isSuccess = SurgSim::Math::Shape::decode(node);
-	if (! isSuccess)
-	{
-		return false;
-	}
-
-	m_radius = node["Radius"].as<double>();
-	m_length = node["Length"].as<double>();
-	return true;
 }
 
 }; // namespace Math
