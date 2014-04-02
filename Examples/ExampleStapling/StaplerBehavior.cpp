@@ -21,6 +21,7 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/SceneryRepresentation.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Physics/Constraint.h"
@@ -58,6 +59,11 @@ void StaplerBehavior::setVirtualStaple(std::shared_ptr<SurgSim::Collision::Repre
 {
 	m_virtualTeeth[0] = virtualTooth1;
 	m_virtualTeeth[1] = virtualTooth2;
+}
+
+void StaplerBehavior::enableStaplingForSceneElement(std::string sceneElementName)
+{
+	m_stapleEnabledSceneElements.push_back(sceneElementName);
 }
 
 static std::shared_ptr<SurgSim::Collision::Representation> findMostCollidedRepresentation(

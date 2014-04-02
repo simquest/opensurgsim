@@ -78,6 +78,10 @@ public:
 	void setVirtualStaple(std::shared_ptr<SurgSim::Collision::Representation> virtualTooth1,
 						  std::shared_ptr<SurgSim::Collision::Representation> virtualTooth2);
 
+	/// Add a scene element (name) for which stapling is enabled within this behaviour.
+	/// \param sceneElementName The name of the scene element that this behaviour can staple.
+	void enableStaplingForSceneElement(std::string sceneElementName);
+
 protected:
 	/// Initialize this behavior
 	/// \return True on success, otherwise false.
@@ -104,6 +108,9 @@ private:
 
 	/// Contains the teeth for detecting collisions
 	std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> m_virtualTeeth;
+
+	/// The list of scene element names that this behaviour can staple.
+	std::list<std::string> m_stapleEnabledSceneElements;
 };
 
 #endif  // EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
