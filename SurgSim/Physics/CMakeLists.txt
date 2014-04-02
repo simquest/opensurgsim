@@ -28,6 +28,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	ConstraintImplementationFactory.cpp
 	ContactConstraintGeneration.cpp
 	DcdCollision.cpp
+	DeformableCollisionRepresentation.cpp
 	DeformableRepresentationState.cpp
 	Fem1DRepresentation.cpp
 	Fem3DRepresentation.cpp
@@ -37,6 +38,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DRepresentationPlyReaderDelegate.cpp
 	FemElement.cpp
 	FemElement1DBeam.cpp
+	FemElement2DTriangle.cpp
 	FemElement3DCube.cpp
 	FemElement3DTetrahedron.cpp
 	FemRepresentationCoordinate.cpp
@@ -63,6 +65,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
 	SolveMlcp.cpp
+	UpdateCollisionRepresentations.cpp
 	VirtualToolCoupler.cpp
 )
 
@@ -77,8 +80,10 @@ set(SURGSIM_PHYSICS_HEADERS
 	ContactConstraintData.h
 	ContactConstraintGeneration.h
 	DcdCollision.h
+	DeformableCollisionRepresentation.h
 	DeformableRepresentation.h
 	DeformableRepresentation-inl.h
+	DeformableRepresentationBase.h
 	DeformableRepresentationState.h
 	Fem1DRepresentation.h
 	Fem3DRepresentation.h
@@ -88,6 +93,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DRepresentationPlyReaderDelegate.h
 	FemElement.h
 	FemElement1DBeam.h
+	FemElement2DTriangle.h
 	FemElement3DCube.h
 	FemElement3DTetrahedron.h
 	FemRepresentation.h
@@ -126,6 +132,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationState.h
 	SolveMlcp.h
 	Spring.h
+	UpdateCollisionRepresentations.h
 	VirtualToolCoupler.h
 )
 

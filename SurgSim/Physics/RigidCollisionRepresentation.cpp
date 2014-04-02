@@ -34,9 +34,6 @@ void RigidCollisionRepresentation::setRigidRepresentation(
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation)
 {
 	m_physicsRepresentation = representation;
-	std::shared_ptr<RigidCollisionRepresentation> shared = std::static_pointer_cast<RigidCollisionRepresentation>(
-		getSharedPtr());
-	representation->setCollisionRepresentation(shared);
 }
 
 std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> RigidCollisionRepresentation::getRigidRepresentation()
@@ -47,21 +44,21 @@ std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> RigidCollisionReprese
 int RigidCollisionRepresentation::getShapeType() const
 {
 	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
-		"PhysicsRepresentation went out of scope for Collision Representation " << getName();
+			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
 	return m_physicsRepresentation.lock()->getCurrentParameters().getShapeUsedForMassInertia()->getType();
 }
 
 const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
 {
 	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
-		"PhysicsRepresentation went out of scope for Collision Representation " << getName();
+			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
 	return m_physicsRepresentation.lock()->getCurrentParameters().getShapeUsedForMassInertia();
 }
 
 const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getPose() const
 {
 	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
-		"PhysicsRepresentation went out of scope for Collision Representation " << getName();
+			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
 	return m_physicsRepresentation.lock()->getCurrentPose();
 }
 
@@ -78,7 +75,7 @@ void RigidCollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTran
 const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getInitialPose() const
 {
 	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
-		"PhysicsRepresentation went out of scope for Collision Representation " << getName();
+			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
 	return m_physicsRepresentation.lock()->getInitialPose();
 }
 

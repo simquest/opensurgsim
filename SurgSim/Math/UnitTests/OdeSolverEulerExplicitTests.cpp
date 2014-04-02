@@ -22,6 +22,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
+#include "SurgSim/Math/OdeSolverLinearEulerExplicit.h"
 #include "SurgSim/Math/UnitTests/MockObject.h"
 
 namespace SurgSim
@@ -30,28 +31,33 @@ namespace SurgSim
 namespace Math
 {
 
-TEST(OdeSolverEulerExplicit, ConstructorTest)
+template<class T>
+void doConstructorTest()
 {
-	typedef ExplicitEuler<MassPointState, Matrix, Matrix, Matrix, Matrix> SolverType;
-
 	MassPoint m;
-
-	ASSERT_NO_THROW({SolverType solver(&m);});
-	ASSERT_NO_THROW({SolverType* solver = new SolverType(&m); delete solver;});
-	ASSERT_NO_THROW({std::shared_ptr<SolverType> solver = std::make_shared<SolverType>(&m);});
+	ASSERT_NO_THROW({T solver(&m);});
 }
 
-TEST(OdeSolverEulerExplicit, SolveTest)
+TEST(OdeSolverEulerExplicit, ConstructorTest)
 {
-	typedef ExplicitEuler<MassPointState, Matrix, Matrix, Matrix, Matrix> SolverType;
-
 	{
-		SCOPED_TRACE("OdeSolverEulerExplicit solve test with 0 viscosity");
+		SCOPED_TRACE("EulerExplicit");
+		doConstructorTest<ExplicitEuler<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+	}
+	{
+		SCOPED_TRACE("LinearEulerExplicit");
+		doConstructorTest<LinearExplicitEuler<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+	}
+}
 
+template<class T>
+void doSolveTest()
+{
+	{
 		MassPoint m;
 		MassPointState defaultState, currentState, newState;
 
-		SolverType solver(&m);
+		T solver(&m);
 		ASSERT_NO_THROW({solver.solve(1e-3, currentState, &newState);});
 		EXPECT_EQ(defaultState, currentState);
 		EXPECT_NE(defaultState, newState);
@@ -60,17 +66,27 @@ TEST(OdeSolverEulerExplicit, SolveTest)
 	}
 
 	{
-		SCOPED_TRACE("OdeSolverEulerExplicit solve test with non 0 viscosity");
-
 		MassPoint m(0.1);
 		MassPointState defaultState, currentState, newState;
 
-		SolverType solver(&m);
+		T solver(&m);
 		ASSERT_NO_THROW({solver.solve(1e-3, currentState, &newState);});
 		EXPECT_EQ(defaultState, currentState);
 		EXPECT_NE(defaultState, newState);
 		EXPECT_TRUE(newState.getVelocities().isApprox((m.m_gravity - 0.1 * currentState.getVelocities()) * 1e-3));
 		EXPECT_TRUE(newState.getPositions().isZero());
+	}
+}
+
+TEST(OdeSolverEulerExplicit, SolveTest)
+{
+	{
+		SCOPED_TRACE("EulerExplicit");
+		doSolveTest<ExplicitEuler<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+	}
+	{
+		SCOPED_TRACE("LinearEulerExplicit");
+		doSolveTest<LinearExplicitEuler<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
 	}
 }
 

@@ -296,7 +296,7 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	pose.linear() = orientation;
 	pose.translation() = position;
 
-	inputData.poses().set("pose", pose);
+	inputData.poses().set(SurgSim::DataStructures::Names::POSE, pose);
 
 	return true;
 }
@@ -378,7 +378,7 @@ bool TrackIRScaffold::stopCamera(DeviceData* info)
 SurgSim::DataStructures::DataGroup TrackIRScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
-	builder.addPose("pose");
+	builder.addPose(SurgSim::DataStructures::Names::POSE);
 	return builder.createData();
 }
 

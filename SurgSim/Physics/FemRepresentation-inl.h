@@ -93,7 +93,7 @@ template <class MT, class DT, class KT, class ST>
 bool FemRepresentation<MT, DT, KT, ST>::isValidCoordinate(const FemRepresentationCoordinate& coordinate) const
 {
 	return (coordinate.elementId < m_femElements.size())
-		&& m_femElements[coordinate.elementId]->isValidCoordinate(coordinate.naturalCoordinate);
+		   && m_femElements[coordinate.elementId]->isValidCoordinate(coordinate.naturalCoordinate);
 }
 
 template <class MT, class DT, class KT, class ST>
@@ -139,10 +139,10 @@ void FemRepresentation<MT, DT, KT, ST>::beforeUpdate(double dt)
 		return;
 	}
 
-	SURGSIM_ASSERT(getNumFemElements()) <<
-		"No fem element specified yet, call addFemElement() prior to running the simulation";
-	SURGSIM_ASSERT(getNumDof()) <<
-		"State has not been initialized yet, call setInitialState() prior to running the simulation";
+	SURGSIM_ASSERT(getNumFemElements())
+			<< "No fem element specified yet, call addFemElement() prior to running the simulation";
+	SURGSIM_ASSERT(getNumDof())
+			<<	"State has not been initialized yet, call setInitialState() prior to running the simulation";
 
 	// Call the DeformableRepresentation implementation to take care of the OdeSolver setup
 	DeformableRepresentation<MT, DT, KT, ST>::beforeUpdate(dt);
@@ -157,9 +157,9 @@ void FemRepresentation<MT, DT, KT, ST>::update(double dt)
 	}
 
 	SURGSIM_ASSERT(m_odeSolver != nullptr) <<
-		"Ode solver has not been set yet. Did you call beforeUpdate() ?";
+										   "Ode solver has not been set yet. Did you call beforeUpdate() ?";
 	SURGSIM_ASSERT(m_initialState != nullptr) <<
-		"Initial state has not been set yet. Did you call setInitialState() ?";
+			"Initial state has not been set yet. Did you call setInitialState() ?";
 
 	// Solve the ode
 	m_odeSolver->solve(dt, *m_currentState, m_newState.get());
@@ -179,7 +179,7 @@ void FemRepresentation<MT, DT, KT, ST>::afterUpdate(double dt)
 	}
 
 	SURGSIM_ASSERT(m_initialState != nullptr) <<
-		"Initial state has not been set yet. Did you call setInitialState() ?";
+			"Initial state has not been set yet. Did you call setInitialState() ?";
 
 	// Back up the current state into the final state
 	*m_finalState = *m_currentState;
@@ -187,7 +187,7 @@ void FemRepresentation<MT, DT, KT, ST>::afterUpdate(double dt)
 
 template <class MT, class DT, class KT, class ST>
 void FemRepresentation<MT, DT, KT, ST>::applyCorrection(double dt,
-	const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
+		const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
 {
 }
 
@@ -203,8 +203,8 @@ SurgSim::Math::Vector& FemRepresentation<MT, DT, KT, ST>::computeF(const Deforma
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		boundaryCondition != std::end(state.getBoundaryConditions());
-		boundaryCondition++)
+		 boundaryCondition != std::end(state.getBoundaryConditions());
+		 boundaryCondition++)
 	{
 		m_f[*boundaryCondition] = 0.0;
 	}
@@ -225,8 +225,8 @@ const MT& FemRepresentation<MT, DT, KT, ST>::computeM(const DeformableRepresenta
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		boundaryCondition != std::end(state.getBoundaryConditions());
-		boundaryCondition++)
+		 boundaryCondition != std::end(state.getBoundaryConditions());
+		 boundaryCondition++)
 	{
 		m_M.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
 		m_M.block(0, *boundaryCondition, getNumDof(), 1).setZero();
@@ -271,8 +271,8 @@ const DT& FemRepresentation<MT, DT, KT, ST>::computeD(const DeformableRepresenta
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		boundaryCondition != std::end(state.getBoundaryConditions());
-		boundaryCondition++)
+		 boundaryCondition != std::end(state.getBoundaryConditions());
+		 boundaryCondition++)
 	{
 		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
 		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
@@ -295,8 +295,8 @@ const KT& FemRepresentation<MT, DT, KT, ST>::computeK(const DeformableRepresenta
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		boundaryCondition != std::end(state.getBoundaryConditions());
-		boundaryCondition++)
+		 boundaryCondition != std::end(state.getBoundaryConditions());
+		 boundaryCondition++)
 	{
 		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
 		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
@@ -308,7 +308,7 @@ const KT& FemRepresentation<MT, DT, KT, ST>::computeK(const DeformableRepresenta
 
 template <class MT, class DT, class KT, class ST>
 void FemRepresentation<MT, DT, KT, ST>::computeFMDK(const DeformableRepresentationState& state,
-	SurgSim::Math::Vector** f, MT** M, DT** D, KT** K)
+		SurgSim::Math::Vector** f, MT** M, DT** D, KT** K)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
 	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
@@ -346,8 +346,8 @@ void FemRepresentation<MT, DT, KT, ST>::computeFMDK(const DeformableRepresentati
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		boundaryCondition != std::end(state.getBoundaryConditions());
-		boundaryCondition++)
+		 boundaryCondition != std::end(state.getBoundaryConditions());
+		 boundaryCondition++)
 	{
 		m_M.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
 		m_M.block(0, *boundaryCondition, getNumDof(), 1).setZero();
@@ -426,9 +426,9 @@ void FemRepresentation<MT, DT, KT, ST>::addRayleighDampingForce(
 }
 
 template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::addFemElementsForce(SurgSim::Math::Vector *force,
-															const DeformableRepresentationState& state,
-															double scale)
+void FemRepresentation<MT, DT, KT, ST>::addFemElementsForce(SurgSim::Math::Vector* force,
+		const DeformableRepresentationState& state,
+		double scale)
 {
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
@@ -437,14 +437,14 @@ void FemRepresentation<MT, DT, KT, ST>::addFemElementsForce(SurgSim::Math::Vecto
 }
 
 template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::addGravityForce(SurgSim::Math::Vector *f,
-														const DeformableRepresentationState& state,
-														double scale)
+void FemRepresentation<MT, DT, KT, ST>::addGravityForce(SurgSim::Math::Vector* f,
+		const DeformableRepresentationState& state,
+		double scale)
 {
 	using SurgSim::Math::addSubVector;
 
 	SURGSIM_ASSERT(m_massPerNode.size() == state.getNumNodes()) <<
-		"Mass per node has not been properly allocated. Did you call Initialize() ?";
+			"Mass per node has not been properly allocated. Did you call Initialize() ?";
 
 	// Prepare a gravity vector of the proper size
 	SurgSim::Math::Vector gravitynD;

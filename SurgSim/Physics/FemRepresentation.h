@@ -184,16 +184,16 @@ protected:
 	/// \note This method does not do anything if gravity is disabled
 	void addGravityForce(SurgSim::Math::Vector *f, const DeformableRepresentationState& state, double scale = 1.0);
 
-private:
 	/// Interface to be implemented by derived classes
 	/// \return True if component is initialized successfully; otherwise, false.
 	virtual bool doInitialize() override;
 
+private:
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;
 
 	/// Useful information per node
-	std::vector<double> m_massPerNode; //< Useful in seting up the gravity force F=mg
+	std::vector<double> m_massPerNode; //< Useful in setting up the gravity force F=mg
 
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)
 	/// D = massCoefficient.M + stiffnessCoefficient.K

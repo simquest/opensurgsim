@@ -360,6 +360,69 @@ TEST_F(Fem3DRepresentationTests, ComputesTest)
 	testVector(*f, m_expectedF);
 }
 
+TEST_F(Fem3DRepresentationTests, SetFilenameTest)
+{
+	{
+		SCOPED_TRACE("Calling setFileName with real file");
+		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
+		ASSERT_TRUE(fem->loadFile());
+
+		EXPECT_EQ(3u, fem->getNumDofPerNode());
+		EXPECT_EQ(3u * 26u, fem->getNumDof());
+		EXPECT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
+	}
+
+	{
+		SCOPED_TRACE("Calling setFileName with bad name");
+		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+		ASSERT_NO_THROW(fem->setFilename("Non existent fake name"));
+		EXPECT_FALSE(fem->loadFile());
+	}
+
+	{
+		SCOPED_TRACE("Loading file with no filename");
+		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+		EXPECT_FALSE(fem->loadFile());
+	}
+
+	{
+		SCOPED_TRACE("Loading twice");
+		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
+		ASSERT_TRUE(fem->loadFile());
+		ASSERT_FALSE(fem->loadFile());
+	}
+
+	{
+		SCOPED_TRACE("Loading with non-shared ptr");
+		Fem3DRepresentation fem("fem3d");
+
+		ASSERT_NO_THROW(fem.setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
+		EXPECT_THROW(fem.loadFile(), SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		SCOPED_TRACE("Loading file with incorrect PLY format");
+		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/WrongPlyTetrahedron.ply"));
+		EXPECT_FALSE(fem->loadFile());
+	}
+
+	{
+		SCOPED_TRACE("Loading file with incorrect data");
+		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/WrongDataTetrahedron.ply"));
+		EXPECT_THROW(fem->loadFile(), SurgSim::Framework::AssertionFailure);
+	}
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

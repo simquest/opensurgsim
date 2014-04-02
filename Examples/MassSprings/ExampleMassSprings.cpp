@@ -82,10 +82,10 @@ std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 								  numNodesPerDim,
 								  boundaryConditions,
 								  0.1, // total mass (in Kg)
-								  100.0, // Stiffness stretching
-								  0.0, // Damping stretching
-								  10.0, // Stiffness bending
-								  0.0); // Damping bending
+								  5.0, // Stiffness stretching
+								  0.5, // Damping stretching
+								  1.0, // Stiffness bending
+								  0.5); // Damping bending
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	physicsRepresentation->setRayleighDampingMass(1e-1);
@@ -148,12 +148,12 @@ std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 								  numNodesPerDim,
 								  boundaryConditions,
 								  0.1, // total mass (in Kg)
-								  100.0, // Stiffness stretching
-								  0.0, // Damping stretching
-								  10.0, // Stiffness bending
-								  0.0, // Damping bending
-								  10.0, // Stiffness face diagonal
-								  0.0); // Damping face diagonal
+								  5.0, // Stiffness stretching
+								  0.5, // Damping stretching
+								  1.0, // Stiffness bending
+								  0.5, // Damping bending
+								  1.0, // Stiffness face diagonal
+								  0.5); // Damping face diagonal
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	physicsRepresentation->setRayleighDampingMass(1e-1);
@@ -226,14 +226,14 @@ std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name,
 								  numNodesPerDim,
 								  boundaryConditions,
 								  0.1, // total mass (in Kg)
-								  100.0, // Stiffness stretching
-								  0.0, // Damping stretching
-								  10.0, // Stiffness bending
-								  0.0,  // Damping bending
-								  10.0, // Stiffness face diagonal
-								  0.0, // Damping face diagonal
-								  10.0, // Stiffness volume diagonal
-								  0.0); // Damping volume diagonal
+								  5.0, // Stiffness stretching
+								  0.5, // Damping stretching
+								  1.0, // Stiffness bending
+								  0.5,  // Damping bending
+								  1.0, // Stiffness face diagonal
+								  0.5, // Damping face diagonal
+								  1.0, // Stiffness volume diagonal
+								  0.5); // Damping volume diagonal
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	physicsRepresentation->setRayleighDampingMass(1e-1);
