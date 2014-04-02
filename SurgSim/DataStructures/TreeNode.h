@@ -17,6 +17,7 @@
 #define SURGSIM_DATA_STRUCTURES_TREE_NODE_H
 
 #include <vector>
+#include <memory>
 
 namespace SurgSim
 {
@@ -25,6 +26,7 @@ namespace DataStructures
 {
 
 class TreeData;
+
 
 /// Basic tree node structure.
 /// The nodes build up the structure of a Tree.
@@ -81,12 +83,12 @@ public:
 	}
 
 	/// Returns true if the nodes are equal; otherwise, returns false.
-	/// If the nodes are not of the same type, returns false; 
+	/// If the nodes are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const TreeNode&).
 	bool operator==(const TreeNode& node) const;
 
 	/// Returns true if the nodes are not equal; otherwise, returns false.
-	/// If the nodes are not of the same type, returns false; 
+	/// If the nodes are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const TreeNode&).
 	bool operator!=(const TreeNode& node) const;
 

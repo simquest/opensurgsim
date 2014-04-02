@@ -22,6 +22,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Quaternion.h"
 
+#include <Eigen/geometry>
+
 namespace SurgSim
 {
 namespace Testing
@@ -84,9 +86,20 @@ SurgSim::Math::RigidTransform3d interpolatePose(
 	const SurgSim::Math::Vector3d& endPosition,
 	const double& t);
 
+
 }
 }
 
+
+namespace Eigen {
+
+	template<class T,int Dim>
+	::std::ostream& operator<<(::std::ostream& os, const Eigen::AlignedBox<T, Dim>& box)
+	{
+		os << "[" << box.min().transpose() << ", " << box.max().transpose() << "]";
+		return os;
+	}
+}
 #endif
 
 

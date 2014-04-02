@@ -13,25 +13,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "TreeData.h"
+#ifndef SURGSIM_DATASTRUCTURES_AABBTREENODE_H
+#define SURGSIM_DATASTRUCTURES_AABBTREENODE_H
 
-#include <typeinfo>
+#include "SurgSim/DataStructures/TreeNode.h"
+#include "SurgSim/DataStructures/AabbTreeData.h"
 
-using SurgSim::DataStructures::TreeData;
+#include "SurgSim/Math/Aabb.h"
 
-TreeData::TreeData()
+#include <array>
+
+namespace SurgSim
 {
-}
-TreeData::~TreeData() 
+namespace DataStructures
 {
+
+class AabbTreeNode : public TreeNode
+{
+public:
+
+	explicit AabbTreeNode();
+
+	virtual ~AabbTreeNode();
+
+	void splitNode();
+
+	const SurgSim::Math::Aabbd& getAabb() const;
+
+	void addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t maxNodeData = -1);
+
+private:
+	SurgSim::Math::Aabbd m_aabd;
+};
+
+}
 }
 
-bool TreeData::operator==(const TreeData& data) const
-{
-	return (typeid(*this) == typeid(data)) && isEqual(&data);
-}
-
-bool TreeData::operator!=(const TreeData& data) const
-{
-	return (typeid(*this) != typeid(data)) || ! isEqual(&data);
-}
+#endif

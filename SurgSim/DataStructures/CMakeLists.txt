@@ -19,6 +19,8 @@ include_directories(
 )
 
 set(SURGSIM_DATA_STRUCTURES_SOURCES
+	AabbTree.cpp
+	AabbTreeData.cpp
 	AabbTreeNode.cpp
 	DataGroupBuilder.cpp
 	IndexDirectory.cpp
@@ -32,6 +34,8 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 )
 
 set(SURGSIM_DATA_STRUCTURES_HEADERS
+	AabbTree.h
+	AabbTreeData.h
 	AabbTreeNode.h
 	DataGroup.h
 	DataGroup-inl.h

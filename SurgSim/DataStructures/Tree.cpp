@@ -15,7 +15,7 @@
 
 #include "Tree.h"
 
-#include <SurgSim/DataStructures/Trees/TreeNode.h>
+#include <SurgSim/DataStructures/TreeNode.h>
 
 #include <typeinfo>
 

@@ -18,6 +18,8 @@ include_directories (
 )
 
 set(UNIT_TEST_SOURCES
+	AabbTreeDataTests.cpp
+	AabbTreeNodeTests.cpp
 	DataGroupTests.cpp
 	IndexDirectoryTests.cpp
 	MeshElementTest.cpp

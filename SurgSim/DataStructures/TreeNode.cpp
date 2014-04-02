@@ -15,13 +15,13 @@
 
 #include "TreeNode.h"
 
-#include <SurgSim/DataStructures/Trees/TreeData.h>
+#include <SurgSim/DataStructures/TreeData.h>
 
 #include <typeinfo>
 
 using SurgSim::DataStructures::TreeNode;
 
-TreeNode::TreeNode() : m_data(nullptr) 
+TreeNode::TreeNode() : m_data(nullptr)
 {
 }
 TreeNode::~TreeNode()
@@ -40,7 +40,7 @@ bool TreeNode::operator!=(const TreeNode& node) const
 
 bool TreeNode::isEqual(const TreeNode& node) const
 {
-	if ( (m_data != nullptr && node.m_data == nullptr) || (m_data == nullptr && node.m_data != nullptr) )
+	if ((m_data != nullptr && node.m_data == nullptr) || (m_data == nullptr && node.m_data != nullptr))
 	{
 		return false;
 	}

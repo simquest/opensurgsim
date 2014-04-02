@@ -47,7 +47,7 @@ public:
 private:
 	/// Returns true if the trees are equal; otherwise, returns false.
 	/// Implement this method in derived classes to do the comparison.
-	virtual bool isEqual(const TreeData& data) const = 0;
+	virtual bool isEqual(const TreeData* data) const = 0;
 };
 
 };  // namespace DataStructures
