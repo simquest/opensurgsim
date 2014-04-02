@@ -189,7 +189,7 @@ void StaplerBehavior::update(double dt)
 		stapleLocalization->setRepresentation(staple->getPhysicsRepresentation());
 
 		std::shared_ptr<Localization> otherLocalization
-			= physicsRepresentation->createLocalization(targetContact->penetrationPoints.second);
+			= physicsRepresentation->createLocalization(targetContact->penetrationPoints.first);
 		otherLocalization->setRepresentation(physicsRepresentation);
 
 		// Create the Constraint.
