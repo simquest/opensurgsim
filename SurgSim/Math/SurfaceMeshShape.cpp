@@ -15,6 +15,13 @@
 //
 
 #include "SurgSim/Math/SurfaceMeshShape.h"
+#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SurfaceMeshShape);
+}
 
 namespace
 {
@@ -25,6 +32,10 @@ namespace SurgSim
 {
 namespace Math
 {
+
+SurfaceMeshShape::SurfaceMeshShape()
+{
+}
 
 int SurfaceMeshShape::getType()
 {
@@ -38,16 +49,31 @@ std::shared_ptr<SurgSim::DataStructures::TriangleMesh> SurfaceMeshShape::getMesh
 
 double SurfaceMeshShape::getVolume() const
 {
+	if (nullptr == m_mesh)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No mesh set for SurfaceMeshShape, so it cannot compute center.";
+	}
 	return m_volume;
 }
 
 SurgSim::Math::Vector3d SurfaceMeshShape::getCenter() const
 {
+	if (nullptr == m_mesh)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No mesh set for SurfaceMeshShape, so it cannot compute center.";
+	}
 	return m_center;
 }
 
 SurgSim::Math::Matrix33d SurfaceMeshShape::getSecondMomentOfVolume() const
 {
+	if (nullptr == m_mesh)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No mesh set for SurfaceMeshShape, so it cannot compute center.";
+	}
 	return m_secondMomentOfVolume;
 }
 
@@ -143,12 +169,6 @@ void SurfaceMeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume *=  m_thickness;
 	m_volume = (area * m_thickness);
 }
-
-std::string SurfaceMeshShape::getClassName()
-{
-	return std::string("SurgSim::Math::SurfaceMeshShape");
-}
-
 
 }; // namespace Math
 }; // namespace SurgSim
