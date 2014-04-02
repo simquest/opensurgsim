@@ -16,10 +16,10 @@
 #ifndef SURGSIM_MATH_SHAPE_H
 #define SURGSIM_MATH_SHAPE_H
 
+#include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
-
-#include "SurgSim/Framework/Convert.h"
 
 namespace SurgSim
 {
@@ -29,7 +29,12 @@ namespace Math
 
 /// Type defining the shape direction for certain templatized shape
 /// (i.e. CylinderShape and CapsuleShape)
-typedef enum { SHAPE_DIRECTION_AXIS_X=0, SHAPE_DIRECTION_AXIS_Y=1, SHAPE_DIRECTION_AXIS_Z=2} ShapeDirection;
+typedef enum
+{
+	SHAPE_DIRECTION_AXIS_X = 0,
+	SHAPE_DIRECTION_AXIS_Y = 1,
+	SHAPE_DIRECTION_AXIS_Z = 2
+} ShapeDirection;
 
 /// Fixed List of enums for the available Shape types, do not explicitly assign values, ShapeCount is
 /// used to determine the number of actual shape types
@@ -51,13 +56,14 @@ typedef enum
 /// Generic rigid shape class defining a shape
 /// \note This class gives the ability to analyze the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
-class Shape
+class Shape : public SurgSim::Framework::Accessible
 {
 public:
 	typedef ::SurgSim::Math::Vector3d Vector3d;
 	typedef ::SurgSim::Math::Matrix33d Matrix33d;
 
-	virtual ~Shape() {}
+	// Destructor
+	virtual ~Shape();
 
 	/// \return the type of shape
 	virtual int getType() = 0;
@@ -75,18 +81,16 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const = 0;
 
-	/// Store data of RigidShape
-	virtual YAML::Node encode();
+	typedef SurgSim::Framework::ObjectFactory<SurgSim::Math::Shape> FactoryType0;
 
-	/// Load data of RigidShape
-	virtual bool decode(const YAML::Node& node);
+	/// \return The static class factory that is being used in the conversion.
+	static FactoryType0& getFactory();
 
 	/// Get class name
-	virtual std::string getClassName() = 0;
+	virtual std::string getClassName() const;
 };
 
 }; // Math
-
 }; // SurgSim
 
 #endif // SURGSIM_MATH_SHAPE_H
