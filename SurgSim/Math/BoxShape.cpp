@@ -13,7 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/BoxShape.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::BoxShape);
+}
 
 namespace SurgSim
 {
@@ -24,6 +30,9 @@ BoxShape::BoxShape(double sizeX, double sizeY, double sizeZ) :
 	m_size(Vector3d(sizeX, sizeY, sizeZ))
 {
 	calculateVertices();
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxShape, double, SizeX, getSizeX, setSizeX);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxShape, double, SizeY, getSizeY, setSizeY);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxShape, double, SizeZ, getSizeZ, setSizeZ);
 }
 
 
@@ -36,7 +45,6 @@ Vector3d BoxShape::getSize() const
 {
 	return m_size;
 }
-
 
 double BoxShape::getSizeX() const
 {
@@ -51,6 +59,21 @@ double BoxShape::getSizeY() const
 double BoxShape::getSizeZ() const
 {
 	return m_size[2];
+}
+
+void BoxShape::setSizeX(double sizeX)
+{
+	m_size[0] = sizeX;
+}
+
+void BoxShape::setSizeY(double sizeY)
+{
+	m_size[1] = sizeY;
+}
+
+void BoxShape::setSizeZ(double sizeZ)
+{
+	m_size[2] = sizeZ;
 }
 
 double BoxShape::getVolume() const
@@ -89,45 +112,18 @@ const std::array<Vector3d, 8>& BoxShape::getVertices() const
 void BoxShape::calculateVertices()
 {
 	static const std::array<Vector3d, 8> multiplier = {{Vector3d(-0.5, -0.5, -0.5),
-													   Vector3d(-0.5, -0.5,  0.5),
-													   Vector3d(-0.5,  0.5,  0.5),
-													   Vector3d(-0.5,  0.5, -0.5),
-													   Vector3d( 0.5, -0.5, -0.5),
-													   Vector3d( 0.5, -0.5,  0.5),
-													   Vector3d( 0.5,  0.5,  0.5),
-													   Vector3d( 0.5,  0.5, -0.5)}};
+														Vector3d(-0.5, -0.5,  0.5),
+														Vector3d(-0.5,  0.5,  0.5),
+														Vector3d(-0.5,  0.5, -0.5),
+														Vector3d( 0.5, -0.5, -0.5),
+														Vector3d( 0.5, -0.5,  0.5),
+														Vector3d( 0.5,  0.5,  0.5),
+														Vector3d( 0.5,  0.5, -0.5)}};
 	for(int i = 0; i < 8; ++i)
 	{
 		m_vertices[i] = m_size.array() * multiplier[i].array();
 	}
 }
-
-YAML::Node SurgSim::Math::BoxShape::encode()
-{
-	YAML::Node node;
-	node = SurgSim::Math::Shape::encode();
-	node["SizeX"] = getSizeX();
-	node["SizeY"] = getSizeY();
-	node["SizeZ"] = getSizeZ();
-
-	return node;
-}
-
-bool SurgSim::Math::BoxShape::decode(const YAML::Node& node)
-{
-	bool isSuccess = SurgSim::Math::Shape::decode(node);
-	if (! isSuccess)
-	{
-		return false;
-	}
-
-	m_size[0] = node["SizeX"].as<double>();
-	m_size[1] = node["SizeY"].as<double>();
-	m_size[2] = node["SizeZ"].as<double>();
-
-	return true;
-}
-
 
 }; // namespace Math
 }; // namespace SurgSim
