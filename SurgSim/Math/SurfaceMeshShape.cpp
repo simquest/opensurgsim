@@ -52,7 +52,7 @@ double SurfaceMeshShape::getVolume() const
 	if (nullptr == m_mesh)
 	{
 		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"No mesh set for SurfaceMeshShape, so it cannot compute center.";
+			"No mesh set for SurfaceMeshShape, so it cannot compute volume.";
 	}
 	return m_volume;
 }
@@ -72,7 +72,7 @@ SurgSim::Math::Matrix33d SurfaceMeshShape::getSecondMomentOfVolume() const
 	if (nullptr == m_mesh)
 	{
 		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"No mesh set for SurfaceMeshShape, so it cannot compute center.";
+			"No mesh set for SurfaceMeshShape, so it cannot compute second moment of volume.";
 	}
 	return m_secondMomentOfVolume;
 }
