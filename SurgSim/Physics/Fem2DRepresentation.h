@@ -40,14 +40,9 @@ public:
 	/// Destructor
 	virtual ~Fem2DRepresentation();
 
-	/// Query the representation type
-	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
 
 protected:
-	/// Transform a state using a given transformation
-	/// \param[in,out] state The state to be transformed
-	/// \param transform The transformation to apply
 	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
 								const SurgSim::Math::RigidTransform3d& transform) override;
 };
