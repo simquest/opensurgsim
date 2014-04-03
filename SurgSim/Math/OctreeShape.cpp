@@ -13,8 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Assert.h"
+
 #include "SurgSim/Math/OctreeShape.h"
+
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {
@@ -50,6 +52,11 @@ Matrix33d OctreeShape::getSecondMomentOfVolume() const
 {
 	SURGSIM_FAILURE() << "OctreeShape::getSecondMomentOfVolume not implemented";
 	return Matrix33d::Zero();
+}
+
+std::shared_ptr<OctreeShape::NodeType> OctreeShape::getRootNode()
+{
+	return m_rootNode;
 }
 
 const std::shared_ptr<const OctreeShape::NodeType> OctreeShape::getRootNode() const

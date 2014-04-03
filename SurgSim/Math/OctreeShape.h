@@ -67,6 +67,10 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
+	/// Get the root node
+	/// \return the octree root node of this shape
+	std::shared_ptr<NodeType> getRootNode();
+
 	/// const version to get the root node
 	/// \return A const reference of the shared pointer, which points to the octree root node of this shape.
 	const std::shared_ptr<const NodeType> getRootNode() const;
