@@ -68,6 +68,7 @@ protected:
 	/// \throws SurgSim::Assertion::Failure if there is already a writer or if the thread of the writer and the buffer
 	///         are not the same
 	/// \param id The id of the thread of the calling function
+	/// \return pointer to the internal data
 	T* acquireWriteBuffer(boost::thread::id id);
 
 	/// Release this object and enable another writer to access it
@@ -78,7 +79,8 @@ protected:
 	/// the internal data will be copied to the memory location passed into the function
 	/// \throws SurgSim::Assertion::Failure If value or generation are nullptr
 	/// \param [out] value The pointer to the memory for the new data.
-	/// \param [inout] generation The pointer to the generation count.
+	/// \param [in,out] generation The pointer to the generation count.
+	/// \return true if a new value was copied, false otherwise
 	bool getValueIfNew(T* value, size_t* generation) const;
 
 	/// Determine if there is a new value available
@@ -266,14 +268,14 @@ public:
 
 	/// Overloaded operator for easier access.
 	/// \return The actual address of the data on the private side.
-	T* operator->() const
+	T* operator->()
 	{
 		return m_directPointer;
 	}
 
 	/// Overloaded operator for easier access.
 	/// \return The a reference to the data on the private side.
-	T& operator*() const
+	T& operator*()
 	{
 		return *m_directPointer;
 	}
