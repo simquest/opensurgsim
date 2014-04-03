@@ -38,6 +38,16 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #include <string.h>
 #include "SurgSim/DataStructures/ply.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+// HS-2014-apr-03 There are a few warnings from gcc regarding these
+// in the spirit of changing this file as little as possible we decided
+// to ignore these. The variables concerned are:
+// line 1621 'item'
+// line 1736 'item_size'
+// line 2378 'item'
+// line 1717 'other_data'
+
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable:4996)
@@ -1127,6 +1137,7 @@ PlyOtherProp *ply_get_other_properties(
 {
   int i;
   PlyElement *elem;
+
   PlyOtherProp *other;
   PlyProperty *prop;
   int nprops;
