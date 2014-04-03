@@ -77,10 +77,10 @@ TEST_F(ShapeTest, SphereSerialize)
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(1u, node.size());
 
-	SphereShape expectedSphere;
-	ASSERT_NO_THROW({expectedSphere.decode(node);});
-	EXPECT_EQ(m_radius, expectedSphere.getValue<double>("Radius"));
-	EXPECT_EQ("SurgSim::Math::SphereShape", expectedSphere.getClassName());
+	SphereShape actualSphere;
+	ASSERT_NO_THROW({actualSphere.decode(node);});
+	EXPECT_EQ(m_radius, actualSphere.getValue<double>("Radius"));
+	EXPECT_EQ("SurgSim::Math::SphereShape", actualSphere.getClassName());
 }
 
 TEST_F(ShapeTest, Sphere)
@@ -124,12 +124,12 @@ TEST_F(ShapeTest, BoxSerialize)
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(3u, node.size());
 
-	BoxShape expectedBox;
-	ASSERT_NO_THROW({expectedBox.decode(node);});
-	EXPECT_EQ(m_size[0], expectedBox.getValue<double>("SizeX"));
-	EXPECT_EQ(m_size[1], expectedBox.getValue<double>("SizeY"));
-	EXPECT_EQ(m_size[2], expectedBox.getValue<double>("SizeZ"));
-	EXPECT_EQ("SurgSim::Math::BoxShape", expectedBox.getClassName());
+	BoxShape actualBox;
+	ASSERT_NO_THROW({actualBox.decode(node);});
+	EXPECT_EQ(m_size[0], actualBox.getValue<double>("SizeX"));
+	EXPECT_EQ(m_size[1], actualBox.getValue<double>("SizeY"));
+	EXPECT_EQ(m_size[2], actualBox.getValue<double>("SizeZ"));
+	EXPECT_EQ("SurgSim::Math::BoxShape", actualBox.getClassName());
 }
 
 TEST_F(ShapeTest, Box)
@@ -177,11 +177,11 @@ TEST_F(ShapeTest, CylinderSerialize)
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(2u, node.size());
 
-	CylinderShape expectedCylinder;
-	ASSERT_NO_THROW({expectedCylinder.decode(node);});
-	EXPECT_EQ(m_length, expectedCylinder.getValue<double>("Length"));
-	EXPECT_EQ(m_radius, expectedCylinder.getValue<double>("Radius"));
-	EXPECT_EQ("SurgSim::Math::CylinderShape", expectedCylinder.getClassName());
+	CylinderShape actualCylinder;
+	ASSERT_NO_THROW({actualCylinder.decode(node);});
+	EXPECT_EQ(m_length, actualCylinder.getValue<double>("Length"));
+	EXPECT_EQ(m_radius, actualCylinder.getValue<double>("Radius"));
+	EXPECT_EQ("SurgSim::Math::CylinderShape", actualCylinder.getClassName());
 }
 
 TEST_F(ShapeTest, Cylinder)
@@ -227,11 +227,11 @@ TEST_F(ShapeTest, CapsuleSerialize)
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(2u, node.size());
 
-	CapsuleShape expectedCapsule;
-	ASSERT_NO_THROW({expectedCapsule.decode(node);});
-	EXPECT_EQ(m_length, expectedCapsule.getValue<double>("Length"));
-	EXPECT_EQ(m_radius, expectedCapsule.getValue<double>("Radius"));
-	EXPECT_EQ("SurgSim::Math::CapsuleShape", expectedCapsule.getClassName());
+	CapsuleShape actualCapsule;
+	ASSERT_NO_THROW({actualCapsule.decode(node);});
+	EXPECT_EQ(m_length, actualCapsule.getValue<double>("Length"));
+	EXPECT_EQ(m_radius, actualCapsule.getValue<double>("Radius"));
+	EXPECT_EQ("SurgSim::Math::CapsuleShape", actualCapsule.getClassName());
 }
 
 TEST_F(ShapeTest, Capsule)
