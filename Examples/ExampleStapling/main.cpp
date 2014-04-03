@@ -251,7 +251,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>("Behavior");
 	staplerBehavior->setInputComponent(inputComponent);
 	staplerBehavior->setRepresentation(physicsRepresentation);
-
+	
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
 		std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");
 	visualizeContactsBehavior->setCollisionRepresentation(collisionRepresentation);
@@ -417,6 +417,14 @@ int main(int argc, char* argv[])
 							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
 							  true,											   // Display point cloud
 							  armPose);										   // Pose of wound on arm
+
+	// Enable arm and wound to be stapled by the stapler.
+	std::shared_ptr<StaplerBehavior> staplerBehavior =
+		std::dynamic_pointer_cast<StaplerBehavior>(staplerSceneElement->getComponent("Behavior"));
+	if (staplerBehavior != nullptr)
+	{
+		staplerBehavior->enableStaplingForSceneElement("armSceneElement");
+	}
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
 	keyboardComponent->setDeviceName("Keyboard"); // Name of device is case sensitive.

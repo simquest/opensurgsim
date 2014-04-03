@@ -66,13 +66,40 @@ void StaplerBehavior::enableStaplingForSceneElement(std::string sceneElementName
 	m_stapleEnabledSceneElements.push_back(sceneElementName);
 }
 
+static void filterCollisionMapForStapleEnabledRepresentations(
+	std::unordered_map<
+		std::shared_ptr<SurgSim::Collision::Representation>,
+		std::list<std::shared_ptr<SurgSim::Collision::Contact>>>& collisionsMap,
+	const std::list<std::string>& enabledSceneElements)
+{
+	if (collisionsMap.empty())
+	{
+		return;
+	}
+
+	for (auto it = collisionsMap.begin(); it != collisionsMap.end();)
+	{
+		if (std::find(enabledSceneElements.begin(),
+					  enabledSceneElements.end(),
+					  (*it).first->getSceneElement()->getName()) == enabledSceneElements.end())
+		{
+			// Representation's scene element is not in the enabledSceneElements.
+			it = collisionsMap.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+}
+
 static std::shared_ptr<SurgSim::Collision::Representation> findMostCollidedRepresentation(
-	const std::shared_ptr<SurgSim::Collision::Representation>& object)
+	std::unordered_map<
+		std::shared_ptr<SurgSim::Collision::Representation>,
+		std::list<std::shared_ptr<SurgSim::Collision::Contact>>>& collisionsMap)
 {
 	typedef std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 							   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> MapType;
-
-	MapType collisionsMap = object->getCollisions();
 
 	if (collisionsMap.empty())
 	{
@@ -140,9 +167,16 @@ void StaplerBehavior::update(double dt)
 		}
 
 		// The virtual tooth could be in contact with any number of objects in the scene.
-		// Find the object it has most collision pairs with.
+		// Get its collisionMap.
+		std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+			std::list<std::shared_ptr<SurgSim::Collision::Contact>>> collisionsMap = (*virtualTooth)->getCollisions();
+
+		// Remove representations from this map that are not enabled to be stapled.
+		filterCollisionMapForStapleEnabledRepresentations(collisionsMap, m_stapleEnabledSceneElements);
+
+		// Find the object in the map that the virtualTooth has most collision pairs with.
 		std::shared_ptr<SurgSim::Collision::Representation> targetRepresentation
-			= findMostCollidedRepresentation(*virtualTooth);
+			= findMostCollidedRepresentation(collisionsMap);
 
 		if (targetRepresentation == nullptr)
 		{
