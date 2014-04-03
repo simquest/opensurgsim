@@ -225,42 +225,40 @@ void addNewTriangle(std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<Em
 {
 	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
 
-	static const EmptyData emptyData;
-
 	// Add vertices
-	TriangleMesh::VertexType vertexMesh(Vector3d::Zero(), emptyData);
+	TriangleMesh::VertexType vertexMesh(Vector3d::Zero());
 
-	vertexMesh = TriangleMesh::VertexType(point0, emptyData);
+	vertexMesh = TriangleMesh::VertexType(point0);
 	unsigned int index0 = mesh->addVertex(vertexMesh);
 
-	vertexMesh = TriangleMesh::VertexType(point1, emptyData);
+	vertexMesh = TriangleMesh::VertexType(point1);
 	unsigned int index1 = mesh->addVertex(vertexMesh);
 
-	vertexMesh = TriangleMesh::VertexType(point2, emptyData);
+	vertexMesh = TriangleMesh::VertexType(point2);
 	unsigned int index2 = mesh->addVertex(vertexMesh);
 
 	// Add edges
 	std::array<unsigned int, 2> edge;
-	TriangleMesh::EdgeType meshEdge(edge, emptyData);
+	TriangleMesh::EdgeType meshEdge(edge);
 
 	edge[0] = index0;
 	edge[1] = index1;
-	meshEdge = TriangleMesh::EdgeType(edge, emptyData);
+	meshEdge = TriangleMesh::EdgeType(edge);
 	mesh->addEdge(meshEdge);
 
 	edge[0] = index1;
 	edge[1] = index2;
-	meshEdge = TriangleMesh::EdgeType(edge, emptyData);
+	meshEdge = TriangleMesh::EdgeType(edge);
 	mesh->addEdge(meshEdge);
 
 	edge[0] = index2;
 	edge[1] = index0;
-	meshEdge = TriangleMesh::EdgeType(edge, emptyData);
+	meshEdge = TriangleMesh::EdgeType(edge);
 	mesh->addEdge(meshEdge);
 
 	// Add triangle
 	std::array<unsigned int, 3> triangle = {index0, index1, index2};
-	TriangleMesh::TriangleType meshTriangle(triangle, emptyData);
+	TriangleMesh::TriangleType meshTriangle(triangle);
 	mesh->addTriangle(meshTriangle);
 }
 
