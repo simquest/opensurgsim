@@ -81,10 +81,10 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const = 0;
 
-	typedef SurgSim::Framework::ObjectFactory<SurgSim::Math::Shape> FactoryType0;
+	typedef SurgSim::Framework::ObjectFactory<SurgSim::Math::Shape> FactoryType;
 
 	/// \return The static class factory that is being used in the conversion.
-	static FactoryType0& getFactory();
+	static FactoryType& getFactory();
 
 	/// Get class name
 	virtual std::string getClassName() const;

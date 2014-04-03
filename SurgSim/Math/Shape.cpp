@@ -27,9 +27,9 @@ Shape::~Shape()
 {
 }
 
-Shape::FactoryType0& Shape::getFactory()
+Shape::FactoryType& Shape::getFactory()
 {
-	static FactoryType0 factory;
+	static FactoryType factory;
 	return factory;
 }
 
