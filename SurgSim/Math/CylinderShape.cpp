@@ -13,17 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/CylinderShape.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::CylinderShape);
+}
 
 namespace SurgSim
 {
 namespace Math
 {
 
-CylinderShape::CylinderShape(double length, double radius)
+CylinderShape::CylinderShape(double length, double radius) : m_length(length), m_radius(radius)
 {
-	m_length = length;
-	m_radius = radius;
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CylinderShape, double, Radius, getRadius, setRadius);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CylinderShape, double, Length, getLength, setLength);
 }
 
 int CylinderShape::getType()
@@ -39,6 +45,17 @@ double CylinderShape::getLength() const
 double CylinderShape::getRadius() const
 {
 	return m_radius;
+}
+
+
+void CylinderShape::setLength(double length)
+{
+	m_length = length;
+}
+
+void CylinderShape::setRadius(double radius)
+{
+	m_radius = radius;
 }
 
 double CylinderShape::getVolume() const
@@ -65,28 +82,6 @@ SurgSim::Math::Matrix33d CylinderShape::getSecondMomentOfVolume() const
 	secondMoment(1, 1) = coefDir * (squareRadius);
 
 	return secondMoment;
-}
-
-YAML::Node SurgSim::Math::CylinderShape::encode()
-{
-	YAML::Node node;
-	node = SurgSim::Math::Shape::encode();
-	node["Radius"] = getRadius();
-	node["Length"] = getLength();
-	return node;
-}
-
-bool SurgSim::Math::CylinderShape::decode(const YAML::Node& node)
-{
-	bool isSuccess = SurgSim::Math::Shape::decode(node);
-	if (! isSuccess)
-	{
-		return false;
-	}
-
-	m_radius = node["Radius"].as<double>();
-	m_length = node["Length"].as<double>();
-	return true;
 }
 
 }; // namespace Math

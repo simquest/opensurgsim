@@ -24,7 +24,7 @@
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/Framework/Convert.h"
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -50,10 +50,15 @@ class MeshShape : public Shape
 {
 public:
 	/// Constructor
+	MeshShape();
+
+	/// Constructor
 	/// \param mesh The triangle mesh to build the shape from
 	/// \exception Raise an exception if the mesh is invalid
 	template <class VertexData, class EdgeData, class TriangleData>
 	explicit MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh);
+
+	SURGSIM_CLASSNAME(SurgSim::Math::MeshShape);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -74,9 +79,6 @@ public:
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
-
-	/// Get the complete name of the mesh
-	virtual std::string getClassName() override;
 
 private:
 
