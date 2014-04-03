@@ -81,9 +81,9 @@ TEST_F(MouseDeviceTest, InputConsumer)
 
 	MouseDeviceTest::update(device);
 
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button1"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button2"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button3"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_1));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_2));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_3));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasData("x"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasData("y"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("scrollDeltaX"));

@@ -21,6 +21,7 @@ include_directories(
 )
 
 set(SURGSIM_BLOCKS_SOURCES
+	KeyboardTogglesGraphicsBehavior.cpp
 	MassSpring1DRepresentation.cpp
 	MassSpring2DRepresentation.cpp
 	MassSpring3DRepresentation.cpp
@@ -29,9 +30,11 @@ set(SURGSIM_BLOCKS_SOURCES
 	SphereElement.cpp
 	TransferInputPoseBehavior.cpp
 	TransferPoseBehavior.cpp
+	VisualizeContactsBehavior.cpp
 )
 
 set(SURGSIM_BLOCKS_HEADERS
+	KeyboardTogglesGraphicsBehavior.h
 	MassSpring1DRepresentation.h
 	MassSpring2DRepresentation.h
 	MassSpring3DRepresentation.h
@@ -42,6 +45,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	TransferDeformableStateToVerticesBehavior-inl.h
 	TransferInputPoseBehavior.h
 	TransferPoseBehavior.h
+	VisualizeContactsBehavior.h
 )
 
 surgsim_add_library(

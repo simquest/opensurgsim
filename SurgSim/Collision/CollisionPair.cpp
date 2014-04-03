@@ -95,7 +95,12 @@ void CollisionPair::addContact(const std::shared_ptr<Contact>& contact)
 {
 	m_contacts.push_back(contact);
 	m_representations.first->addCollisionWith(m_representations.second, contact);
-	m_representations.second->addCollisionWith(m_representations.first, contact);
+	std::shared_ptr<Contact> contact2 =
+		std::make_shared<Contact>(contact->depth, contact->contact, -contact->normal,
+								  std::pair<Location, Location>(
+									contact->penetrationPoints.second,
+									contact->penetrationPoints.first));
+	m_representations.second->addCollisionWith(m_representations.first, contact2);
 }
 
 const std::list<std::shared_ptr<Contact>>& CollisionPair::getContacts() const

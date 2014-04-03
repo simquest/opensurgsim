@@ -208,11 +208,11 @@ TEST(MultiAxisDeviceTest, InputConsumer)
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 90);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 110);
 
-	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button1"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button2"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button3"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button4"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_1));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_2));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_3));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_4));
 }
 
 TEST(MultiAxisDeviceTest, OutputProducer)

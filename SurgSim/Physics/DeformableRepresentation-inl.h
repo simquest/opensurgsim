@@ -21,6 +21,11 @@
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverLinearEulerExplicit.h"
+#include "SurgSim/Math/OdeSolverLinearEulerExplicitModified.h"
+#include "SurgSim/Math/OdeSolverLinearEulerImplicit.h"
+
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
 namespace SurgSim
 {
@@ -29,8 +34,8 @@ namespace Physics
 {
 
 template <class M, class D, class K, class S>
-DeformableRepresentation<M,D,K,S>::DeformableRepresentation(const std::string& name) :
-	Representation(name),
+DeformableRepresentation<M, D, K, S>::DeformableRepresentation(const std::string& name) :
+	DeformableRepresentationBase(name),
 	SurgSim::Math::OdeEquation<DeformableRepresentationState, M, D, K, S>(),
 	m_numDofPerNode(0),
 	m_integrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER),
@@ -41,36 +46,36 @@ DeformableRepresentation<M,D,K,S>::DeformableRepresentation(const std::string& n
 }
 
 template <class M, class D, class K, class S>
-DeformableRepresentation<M,D,K,S>::~DeformableRepresentation()
+DeformableRepresentation<M, D, K, S>::~DeformableRepresentation()
 {
 }
 
 template <class M, class D, class K, class S>
-void DeformableRepresentation<M,D,K,S>::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
+void DeformableRepresentation<M, D, K, S>::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	m_initialPose = pose;
 }
 
 template <class M, class D, class K, class S>
-const SurgSim::Math::RigidTransform3d& DeformableRepresentation<M,D,K,S>::getInitialPose() const
+const SurgSim::Math::RigidTransform3d& DeformableRepresentation<M, D, K, S>::getInitialPose() const
 {
 	return m_initialPose;
 }
 
 template <class M, class D, class K, class S>
-void DeformableRepresentation<M,D,K,S>::setPose(const SurgSim::Math::RigidTransform3d& pose)
+void DeformableRepresentation<M, D, K, S>::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	SURGSIM_ASSERT(false) << "setPose has been called on a physics DeformableRepresentation";
 }
 
 template <class M, class D, class K, class S>
-const SurgSim::Math::RigidTransform3d& DeformableRepresentation<M,D,K,S>::getPose() const
+const SurgSim::Math::RigidTransform3d& DeformableRepresentation<M, D, K, S>::getPose() const
 {
 	return m_identityPose;
 }
 
 template <class M, class D, class K, class S>
-void DeformableRepresentation<M,D,K,S>::resetState()
+void DeformableRepresentation<M, D, K, S>::resetState()
 {
 	Representation::resetState();
 
@@ -82,7 +87,8 @@ void DeformableRepresentation<M,D,K,S>::resetState()
 }
 
 template <class M, class D, class K, class S>
-void DeformableRepresentation<M,D,K,S>::setInitialState(std::shared_ptr<DeformableRepresentationState> initialState)
+void DeformableRepresentation<M, D, K, S>::setInitialState(
+	std::shared_ptr<DeformableRepresentationState> initialState)
 {
 	// This initializes and allocates the m_initialState data member
 	m_initialState = initialState;
@@ -98,33 +104,33 @@ void DeformableRepresentation<M,D,K,S>::setInitialState(std::shared_ptr<Deformab
 }
 
 template <class M, class D, class K, class S>
-const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M,D,K,S>::getCurrentState() const
+const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M, D, K, S>::getCurrentState() const
 {
 	return m_currentState;
 }
 
 template <class M, class D, class K, class S>
-const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M,D,K,S>::getPreviousState() const
+const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M, D, K, S>::getPreviousState() const
 {
 	return m_previousState;
 }
 
 template <class M, class D, class K, class S>
-const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M,D,K,S>::getFinalState() const
+const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M, D, K, S>::getFinalState() const
 {
 	return m_finalState;
 }
 
 template <class M, class D, class K, class S>
-unsigned int DeformableRepresentation<M,D,K,S>::getNumDofPerNode() const
+unsigned int DeformableRepresentation<M, D, K, S>::getNumDofPerNode() const
 {
 	return m_numDofPerNode;
 }
 
 template <class M, class D, class K, class S>
-void DeformableRepresentation<M,D,K,S>::setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme)
+void DeformableRepresentation<M, D, K, S>::setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme)
 {
-	if (m_integrationScheme != integrationScheme )
+	if (m_integrationScheme != integrationScheme)
 	{
 		// Sets the new integration scheme
 		m_integrationScheme = integrationScheme;
@@ -134,26 +140,28 @@ void DeformableRepresentation<M,D,K,S>::setIntegrationScheme(SurgSim::Math::Inte
 }
 
 template <class M, class D, class K, class S>
-SurgSim::Math::IntegrationScheme DeformableRepresentation<M,D,K,S>::getIntegrationScheme() const
+SurgSim::Math::IntegrationScheme DeformableRepresentation<M, D, K, S>::getIntegrationScheme() const
 {
 	return m_integrationScheme;
 }
 
 template <class M, class D, class K, class S>
-const SurgSim::Math::Matrix& DeformableRepresentation<M,D,K,S>::getComplianceMatrix() const
+const SurgSim::Math::Matrix& DeformableRepresentation<M, D, K, S>::getComplianceMatrix() const
 {
-	SURGSIM_ASSERT(m_odeSolver) <<
-		"Ode solver not initialized yet, call beforeUpdate(dt)";
+	SURGSIM_ASSERT(m_odeSolver)  << "Ode solver not initialized yet, call beforeUpdate(dt)";
 
 	return m_odeSolver->getCompliance();
 }
 
 template <class M, class D, class K, class S>
-void  DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
+void  DeformableRepresentation<M, D, K, S>::beforeUpdate(double dt)
 {
 	using SurgSim::Math::ExplicitEuler;
 	using SurgSim::Math::ModifiedExplicitEuler;
 	using SurgSim::Math::ImplicitEuler;
+	using SurgSim::Math::LinearExplicitEuler;
+	using SurgSim::Math::LinearModifiedExplicitEuler;
+	using SurgSim::Math::LinearImplicitEuler;
 
 	if (! isActive())
 	{
@@ -168,27 +176,63 @@ void  DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
 			m_odeSolver.reset();
 		}
 
-		switch(m_integrationScheme)
+		switch (m_integrationScheme)
 		{
 		case SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER:
-			m_odeSolver = std::make_shared
-				<ExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			m_odeSolver = std::make_shared <ExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER:
-			m_odeSolver = std::make_shared
-				<ModifiedExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			m_odeSolver = std::make_shared <ModifiedExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER:
+			m_odeSolver = std::make_shared <ImplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			break;
+		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER:
 			m_odeSolver = std::make_shared
-				<ImplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+				<LinearExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			break;
+		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER:
+			m_odeSolver = std::make_shared
+				<LinearModifiedExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			break;
+		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER:
+			m_odeSolver = std::make_shared
+				<LinearImplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		default:
-			SURGSIM_ASSERT(m_odeSolver) <<
-				"Ode solver (integration scheme) not initialized yet, call setIntegrationScheme()";
+			SURGSIM_ASSERT(m_odeSolver)
+					<< "Ode solver (integration scheme) not initialized yet, call setIntegrationScheme()";
 			break;
 		}
 
 		m_needToReloadOdeSolver = false;
+	}
+}
+
+template <class M, class D, class K, class S>
+void  DeformableRepresentation<M, D, K, S>::
+setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation)
+{
+	if (m_collisionRepresentation != representation)
+	{
+		// If we have an old collision representation clear the dependency if it was a deformable collision
+		// representation
+		auto oldCollisionRep =
+			std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
+		if (oldCollisionRep != nullptr)
+		{
+			oldCollisionRep->setDeformableRepresentation(nullptr);
+		}
+
+		Representation::setCollisionRepresentation(representation);
+
+		// If its a RigidCollisionRepresentation connect with this representation
+		auto newCollisionRep = std::dynamic_pointer_cast<DeformableCollisionRepresentation>(representation);
+		if (newCollisionRep != nullptr)
+		{
+			newCollisionRep->setDeformableRepresentation(
+				std::static_pointer_cast<DeformableRepresentation>(getSharedPtr()));
+		}
 	}
 }
 
