@@ -108,11 +108,11 @@ protected:
 		virtualToolCoupler->initialize(runtime);
 		virtualToolCoupler->wakeUp();
 
-		// Criticall damped mass-damper systems settle to within 5% of their
+		// Critically damped mass-damper systems settle to within 5% of their
 		// equilibrium when:
 		//      t = 4.744 * naturalFrequency;
 		// we will run the system to this point, and then check that the
-		// final position is 5.1% of if it's initial position
+		// final position is 5.1% of its initial position
 		double mass = rigidBody->getCurrentParameters().getMass();
 		double stiffness = virtualToolCoupler->getLinearStiffness();
 		double naturalFrequency = sqrt(stiffness / mass);
@@ -148,11 +148,11 @@ protected:
 		virtualToolCoupler->initialize(runtime);
 		virtualToolCoupler->wakeUp();
 
-		// Criticall damped mass-damper systems settle to within 5% of their
+		// Critically damped mass-damper systems settle to within 5% of their
 		// equilibrium when:
 		//      t = 4.744 * naturalFrequency;
 		// we will run the system to this point, and then check that the
-		// final position is 5.1% of if it's initial angle
+		// final position is 5.1% of its initial position
 		double inertia = rigidBody->getCurrentParameters().getLocalInertia()(1,1);
 		double stiffness = virtualToolCoupler->getAngularStiffness();
 		double naturalFrequency = sqrt(stiffness / inertia);
