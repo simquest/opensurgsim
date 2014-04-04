@@ -50,7 +50,8 @@ void OctreeDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 }
 
 void OctreeDcdContact::calculateContactWithNode(
-	std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> node, std::shared_ptr<CollisionPair> pair,
+	std::shared_ptr<const SurgSim::Math::OctreeShape::NodeType> node,
+	std::shared_ptr<CollisionPair> pair,
 	std::shared_ptr<SurgSim::DataStructures::OctreePath> nodePath)
 {
 	if (! node->isActive())

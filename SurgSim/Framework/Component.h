@@ -114,6 +114,14 @@ public:
 	/// \return	The shared pointer.
 	std::shared_ptr<Component> getSharedPtr();
 
+	/// Interface to be implemented by derived classes
+	/// \return True if component is initialized successfully; otherwise, false.
+	virtual bool doInitialize() = 0;
+
+	/// Interface to be implemented by derived classes
+	/// \return True if component is woken up successfully; otherwise, false.
+	virtual bool doWakeUp() = 0;
+
 private:
 	/// Name of this component
 	std::string m_name;
@@ -129,15 +137,6 @@ private:
 
 	/// SceneElement which contains this component
 	std::weak_ptr<SceneElement> m_sceneElement;
-
-	/// Interface to be implemented by derived classes
-	/// \return True if component is initialized successfully; otherwise, false.
-	virtual bool doInitialize() = 0;
-
-	/// Interface to be implemented by derived classes
-	/// \return True if component is woken up successfully; otherwise, false.
-	virtual bool doWakeUp() = 0;
-
 
 	/// Indicates if doInitialize() has been called
 	bool m_didInit;

@@ -4,7 +4,7 @@ comment Created by hand
 element vertex 26
 property double x
 property double y
-property double z
+property double zi
 element polyhedron 12
 property list uint uint vertex_indices
 element boundary_condition 8

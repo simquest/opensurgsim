@@ -26,8 +26,8 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate()
-	: vertexIterator(nullptr), m_hasBoundaryConditions(false)
+Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem)
+	: vertexIterator(nullptr), m_fem(fem), m_hasBoundaryConditions(false)
 {
 }
 
@@ -46,6 +46,10 @@ bool Fem3DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& rea
 
 	result = result && reader.hasProperty("polyhedron", "vertex_indices");
 	result = result && !reader.isScalar("polyhedron", "vertex_indices");
+
+	result = result && reader.hasProperty("material", "mass_density");
+	result = result && reader.hasProperty("material", "poisson_ratio");
+	result = result && reader.hasProperty("material", "young_modulus");
 
 	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
 
@@ -81,6 +85,19 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 								PlyReader::TYPE_UNSIGNED_INT,
 								offsetof(PolyhedronData, vertexCount));
 
+	reader->requestElement(
+		"material",
+		std::bind(
+			&Fem3DRepresentationPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
+		nullptr,
+		nullptr);
+	reader->requestScalarProperty(
+		"material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, massDensity));
+	reader->requestScalarProperty(
+		"material", "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, poissonRatio));
+	reader->requestScalarProperty(
+		"material", "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, youngModulus));
+
 	// Boundary Condition Processing
 	if (m_hasBoundaryConditions)
 	{
@@ -91,7 +108,7 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 					  std::placeholders::_1,
 					  std::placeholders::_2),
 			std::bind(&Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
-			std::bind(&Fem3DRepresentationPlyReaderDelegate::endBoundaryConditions, this, std::placeholders::_1));
+			nullptr);
 		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
 	}
 
@@ -101,19 +118,26 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	return true;
 }
 
-std::shared_ptr<Fem3DRepresentation> Fem3DRepresentationPlyReaderDelegate::getFem()
-{
-	return m_fem;
-}
-
 void Fem3DRepresentationPlyReaderDelegate::startParseFile()
 {
-	m_fem = std::make_shared<Fem3DRepresentation>("Ply loaded Fem3d");
+	SURGSIM_ASSERT(m_fem != nullptr) << "The Representation cannot be nullptr.";
+	SURGSIM_ASSERT(m_fem->getNumFemElements() == 0)
+		<< "The Representation already contains fem elements, so it cannot be initialized.";
+	SURGSIM_ASSERT(m_fem->getInitialState() == nullptr)
+		<< "The Representation's initial state must be uninitialized.";
+
 	m_state = std::make_shared<DeformableRepresentationState>();
 }
 
 void Fem3DRepresentationPlyReaderDelegate::endParseFile()
 {
+	for (size_t i = 0; i < m_fem->getNumFemElements(); i++)
+	{
+		m_fem->getFemElement(i)->setMassDensity(m_materialData.massDensity);
+		m_fem->getFemElement(i)->setPoissonRatio(m_materialData.poissonRatio);
+		m_fem->getFemElement(i)->setYoungModulus(m_materialData.youngModulus);
+	}
+
 	m_fem->setInitialState(m_state);
 }
 
@@ -156,6 +180,11 @@ void Fem3DRepresentationPlyReaderDelegate::endPolyhedrons(const std::string& ele
 	m_polyhedronData.indicies = nullptr;
 }
 
+void* Fem3DRepresentationPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)
+{
+	return &m_materialData;
+}
+
 void* Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
 		size_t boundaryConditionCount)
 {
@@ -167,10 +196,6 @@ void Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition(const std::s
 	m_state->addBoundaryCondition(3 * m_boundaryConditionData);
 	m_state->addBoundaryCondition(3 * m_boundaryConditionData + 1);
 	m_state->addBoundaryCondition(3 * m_boundaryConditionData + 2);
-}
-
-void Fem3DRepresentationPlyReaderDelegate::endBoundaryConditions(const std::string& elementName)
-{
 }
 
 } // namespace SurgSim

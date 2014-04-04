@@ -15,8 +15,13 @@
 
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Valid.h"
+#include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
+
+using SurgSim::Framework::Logger;
 
 namespace
 {
@@ -53,7 +58,7 @@ namespace Physics
 {
 
 Fem3DRepresentation::Fem3DRepresentation(const std::string& name) :
-	FemRepresentation(name)
+	FemRepresentation(name), m_doLoadFile(false)
 {
 	// Reminder: m_numDofPerNode is held by DeformableRepresentation
 	// but needs to be set by all concrete derived classes
@@ -84,6 +89,69 @@ void Fem3DRepresentation::applyCorrection(double dt,
 	{
 		deactivateAndReset();
 	}
+}
+
+void Fem3DRepresentation::setFilename(const std::string& filename)
+{
+	m_filename = filename;
+
+	m_doLoadFile = !m_filename.empty();
+}
+
+const std::string& Fem3DRepresentation::getFilename() const
+{
+	return m_filename;
+}
+
+bool Fem3DRepresentation::loadFile()
+{
+	if (m_filename.empty())
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Filename not set.";
+		return false;
+	}
+
+	if (!m_doLoadFile)
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File already loaded.";
+		return false;
+	}
+
+	SurgSim::DataStructures::PlyReader reader(m_filename);
+	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
+	auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
+
+	if (!reader.isValid())
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is not valid.";
+		return false;
+	}
+
+	if (!reader.setDelegate(readerDelegate))
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is not acceptable an PLY.";
+		return false;
+	}
+
+	// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
+	reader.parseFile();
+
+	m_doLoadFile = false;
+	return true;
+}
+
+bool Fem3DRepresentation::doInitialize()
+{
+	if (m_doLoadFile && !loadFile())
+	{
+		SURGSIM_LOG_SEVERE(Logger::getDefaultLogger()) << "Failed to initialize from file " << m_filename;
+		return false;
+	}
+
+	return FemRepresentation<SurgSim::Math::Matrix,
+							 SurgSim::Math::Matrix,
+							 SurgSim::Math::Matrix,
+							 SurgSim::Math::Matrix>::doInitialize();
 }
 
 void Fem3DRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,

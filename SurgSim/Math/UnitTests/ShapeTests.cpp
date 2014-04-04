@@ -15,23 +15,20 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/DataStructures/OctreeNode.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Shapes.h"
+#include "SurgSim/Math/Vector.h"
 
-using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
-using SurgSim::Math::RigidTransform3d;
 
 using SurgSim::Math::BoxShape;
-using SurgSim::Math::CylinderShape;
 using SurgSim::Math::CapsuleShape;
+using SurgSim::Math::CylinderShape;
 using SurgSim::Math::MeshShape;
 using SurgSim::Math::OctreeShape;
+using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
 
 namespace {
@@ -68,13 +65,31 @@ public:
 	double m_size[3];
 };
 
+TEST_F(ShapeTest, SphereSerialize)
+{
+	std::shared_ptr<Shape> sphere;
+	EXPECT_NO_THROW({sphere = Shape::getFactory().create("SurgSim::Math::SphereShape");});
+	sphere->setValue("Radius", m_radius);
+
+	YAML::Node node;
+	ASSERT_NO_THROW({node = sphere->encode();});
+
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(1u, node.size());
+
+	SphereShape actualSphere;
+	ASSERT_NO_THROW({actualSphere.decode(node);});
+	EXPECT_EQ(m_radius, actualSphere.getValue<double>("Radius"));
+	EXPECT_EQ("SurgSim::Math::SphereShape", actualSphere.getClassName());
+}
+
 TEST_F(ShapeTest, Sphere)
 {
-	ASSERT_NO_THROW({SphereShape s(m_radius);});
+	ASSERT_NO_THROW({SphereShape sphere(m_radius);});
 
-	SphereShape s(m_radius);
-	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_SPHERE, s.getType());
-	EXPECT_EQ(m_radius, s.getRadius());
+	SphereShape sphere(m_radius);
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_SPHERE, sphere.getType());
+	EXPECT_EQ(m_radius, sphere.getRadius());
 
 	const double& r = m_radius;
 	const double r2 = r * r;
@@ -83,27 +98,51 @@ TEST_F(ShapeTest, Sphere)
 	double coef = 2.0 / 5.0 * expectedMass * r2;
 	Matrix33d expectedInertia;
 	expectedInertia << coef, 0.0, 0.0,
-		0.0, coef, 0.0,
-		0.0, 0.0, coef;
+					   0.0, coef, 0.0,
+					   0.0, 0.0, coef;
 
-	double volume = s.getVolume();
-	Vector3d center = s.getCenter();
-	Matrix33d inertia = s.getSecondMomentOfVolume() * m_rho;
+	double volume = sphere.getVolume();
+	Vector3d center = sphere.getCenter();
+	Matrix33d inertia = sphere.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
+TEST_F(ShapeTest, BoxSerialize)
+{
+	std::shared_ptr<Shape> box;
+	EXPECT_NO_THROW({box = Shape::getFactory().create("SurgSim::Math::BoxShape");});
+	box->setValue("SizeX", m_size[0]);
+	box->setValue("SizeY", m_size[1]);
+	box->setValue("SizeZ", m_size[2]);
+
+	YAML::Node node;
+	ASSERT_NO_THROW({node = box->encode();});
+
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(3u, node.size());
+
+	BoxShape actualBox;
+	ASSERT_NO_THROW({actualBox.decode(node);});
+	EXPECT_EQ(m_size[0], actualBox.getValue<double>("SizeX"));
+	EXPECT_EQ(m_size[1], actualBox.getValue<double>("SizeY"));
+	EXPECT_EQ(m_size[2], actualBox.getValue<double>("SizeZ"));
+	EXPECT_EQ("SurgSim::Math::BoxShape", actualBox.getClassName());
+}
+
 TEST_F(ShapeTest, Box)
 {
-	ASSERT_NO_THROW({BoxShape b(m_size[0], m_size[1], m_size[2]);});
+	ASSERT_NO_THROW({BoxShape box(m_size[0], m_size[1], m_size[2]);});
 
-	BoxShape b(m_size[0], m_size[1], m_size[2]);
-	EXPECT_EQ(m_size[0], b.getSizeX());
-	EXPECT_EQ(m_size[1], b.getSizeY());
-	EXPECT_EQ(m_size[2], b.getSizeZ());
-	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_BOX, b.getType());
+	Vector3d size(m_size[0], m_size[1], m_size[2]);
+	BoxShape box(m_size[0], m_size[1], m_size[2]);
+	EXPECT_EQ(m_size[0], box.getSizeX());
+	EXPECT_EQ(m_size[1], box.getSizeY());
+	EXPECT_EQ(m_size[2], box.getSizeZ());
+	EXPECT_TRUE(box.getSize().isApprox(size));
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_BOX, box.getType());
 
 	double expectedVolume = m_size[0] * m_size[1] * m_size[2];
 	double expectedMass = m_rho * expectedVolume;
@@ -112,27 +151,47 @@ TEST_F(ShapeTest, Box)
 	double y2 = m_size[1] * m_size[1];
 	double z2 = m_size[2] * m_size[2];
 	Matrix33d expectedInertia;
-	expectedInertia << coef*(y2 + z2), 0.0, 0.0,
-		0.0, coef*(x2 + z2), 0.0,
-		0.0, 0.0, coef*(x2 + y2);
+	expectedInertia << coef * (y2 + z2), 0.0, 0.0,
+					   0.0, coef * (x2 + z2), 0.0,
+					   0.0, 0.0, coef * (x2 + y2);
 
-	double volume = b.getVolume();
-	Vector3d center = b.getCenter();
-	Matrix33d inertia = b.getSecondMomentOfVolume() * m_rho;
+	double volume = box.getVolume();
+	Vector3d center = box.getCenter();
+	Matrix33d inertia = box.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
+TEST_F(ShapeTest, CylinderSerialize)
+{
+	std::shared_ptr<Shape> cylinder;
+	EXPECT_NO_THROW({cylinder = Shape::getFactory().create("SurgSim::Math::CylinderShape");});
+	cylinder->setValue("Length", m_length);
+	cylinder->setValue("Radius", m_radius);
+
+	YAML::Node node;
+	ASSERT_NO_THROW({node = cylinder->encode();});
+
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(2u, node.size());
+
+	CylinderShape actualCylinder;
+	ASSERT_NO_THROW({actualCylinder.decode(node);});
+	EXPECT_EQ(m_length, actualCylinder.getValue<double>("Length"));
+	EXPECT_EQ(m_radius, actualCylinder.getValue<double>("Radius"));
+	EXPECT_EQ("SurgSim::Math::CylinderShape", actualCylinder.getClassName());
+}
+
 TEST_F(ShapeTest, Cylinder)
 {
-	ASSERT_NO_THROW({CylinderShape c(m_length, m_radius);});
+	ASSERT_NO_THROW({CylinderShape cyliner(m_length, m_radius);});
 
-	CylinderShape c(m_length, m_radius);
-	EXPECT_EQ(m_length, c.getLength());
-	EXPECT_EQ(m_radius, c.getRadius());
-	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_CYLINDER, c.getType());
+	CylinderShape cylinder(m_length, m_radius);
+	EXPECT_EQ(m_length, cylinder.getLength());
+	EXPECT_EQ(m_radius, cylinder.getRadius());
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_CYLINDER, cylinder.getType());
 
 	double expectedVolume = M_PI * m_radius * m_radius * m_length;
 	double expectedMass = m_rho * expectedVolume;
@@ -143,26 +202,46 @@ TEST_F(ShapeTest, Cylinder)
 	double coef    = 1.0 / 12.0 * expectedMass * (3.0 * (r1sq) + l2);
 	Matrix33d expectedInertia;
 	expectedInertia << coef, 0.0, 0.0,
-		0.0, coefDir, 0.0,
-		0.0, 0.0, coef;
+					   0.0, coefDir, 0.0,
+					   0.0, 0.0, coef;
 
-	double volume = c.getVolume();
-	Vector3d center = c.getCenter();
-	Matrix33d inertia = c.getSecondMomentOfVolume() * m_rho;
+	double volume = cylinder.getVolume();
+	Vector3d center = cylinder.getCenter();
+	Matrix33d inertia = cylinder.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
+TEST_F(ShapeTest, CapsuleSerialize)
+{
+	std::shared_ptr<Shape> capsule;
+	EXPECT_NO_THROW({capsule = Shape::getFactory().create("SurgSim::Math::CapsuleShape");});
+	capsule->setValue("Length", m_length);
+	capsule->setValue("Radius", m_radius);
+
+	YAML::Node node;
+	ASSERT_NO_THROW({node = capsule->encode();});
+
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(2u, node.size());
+
+	CapsuleShape actualCapsule;
+	ASSERT_NO_THROW({actualCapsule.decode(node);});
+	EXPECT_EQ(m_length, actualCapsule.getValue<double>("Length"));
+	EXPECT_EQ(m_radius, actualCapsule.getValue<double>("Radius"));
+	EXPECT_EQ("SurgSim::Math::CapsuleShape", actualCapsule.getClassName());
+}
+
 TEST_F(ShapeTest, Capsule)
 {
-	ASSERT_NO_THROW({CapsuleShape c(m_length, m_radius);});
+	ASSERT_NO_THROW({CapsuleShape capsule(m_length, m_radius);});
 
-	CapsuleShape c(m_length, m_radius);
-	EXPECT_EQ(m_length, c.getLength());
-	EXPECT_EQ(m_radius, c.getRadius());
-	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_CAPSULE, c.getType());
+	CapsuleShape capsule(m_length, m_radius);
+	EXPECT_EQ(m_length, capsule.getLength());
+	EXPECT_EQ(m_radius, capsule.getRadius());
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_CAPSULE, capsule.getType());
 
 	double r2 = m_radius * m_radius;
 	double r3 = r2 * m_radius;
@@ -177,15 +256,15 @@ TEST_F(ShapeTest, Capsule)
 	double coef    = coefDir;
 	coefDir += 1.0 / 2.0 * massCylinder * r2;
 	coef += massSphere  * (1.0 / 4.0 * l2 + 3.0 / 8.0 * m_radius * m_length);
-	coef += 1.0 / 12.0 * massCylinder * (3*r2 + l2);
+	coef += 1.0 / 12.0 * massCylinder * (3 * r2 + l2);
 	Matrix33d expectedInertia;
 	expectedInertia << coef, 0.0, 0.0,
-		0.0, coefDir, 0.0,
-		0.0, 0.0, coef;
+					   0.0, coefDir, 0.0,
+					   0.0, 0.0, coef;
 
-	double volume = c.getVolume();
-	Vector3d center = c.getCenter();
-	Matrix33d inertia = c.getSecondMomentOfVolume() * m_rho;
+	double volume = capsule.getVolume();
+	Vector3d center = capsule.getCenter();
+	Matrix33d inertia = capsule.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());

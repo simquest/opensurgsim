@@ -18,6 +18,7 @@
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -52,6 +53,9 @@ class SurfaceMeshShape : public Shape
 {
 public:
 	/// Constructor
+	SurfaceMeshShape();
+
+	/// Constructor
 	/// \param mesh The triangle mesh to build the shape from
 	/// \param thickness The thickness associated to this surface mesh
 	/// \exception Raise an exception if the mesh is invalid
@@ -59,6 +63,8 @@ public:
 	SurfaceMeshShape(
 		const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh,
 		double thickness = 1e-2);
+
+	SURGSIM_CLASSNAME(SurgSim::Math::SurfaceMeshShape);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -79,9 +85,6 @@ public:
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
-
-	/// Get the complete name of the mesh
-	virtual std::string getClassName() override;
 
 private:
 

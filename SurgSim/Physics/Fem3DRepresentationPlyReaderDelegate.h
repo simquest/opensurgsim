@@ -33,13 +33,9 @@ class Fem3DRepresentation;
 class Fem3DRepresentationPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
-	/// Default constructor
-	Fem3DRepresentationPlyReaderDelegate();
-
-	/// Gets a shared pointer to the fem.  This class maintains its copy of the pointer until the next time
-	/// PlyReader::parseFile is called on the registered PlyReader.
-	/// \return The stored fem.
-	std::shared_ptr<Fem3DRepresentation> getFem();
+	/// Constructor
+	/// \param fem The object that is updated when PlyReader::parseFile is called.
+	explicit Fem3DRepresentationPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem);
 
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
@@ -85,6 +81,12 @@ public:
 	/// \param elementName Name of the element.
 	void endPolyhedrons(const std::string& elementName);
 
+	/// Callback function, begin the processing of materials.
+	/// \param elementName Name of the element.
+	/// \param materialCount Number of materials.
+	/// \return memory for material data to the reader.
+	void* beginMaterials(const std::string& elementName, size_t materialCount);
+
 	/// Callback function, begin the processing of boundary conditions.
 	/// \param elementName Name of the element.
 	/// \param boundaryConditionCount Number of boundary conditions.
@@ -94,10 +96,6 @@ public:
 	/// Callback function to process one boundary condition.
 	/// \param elementName Name of the element.
 	void processBoundaryCondition(const std::string& elementName);
-
-	/// Callback function to finalize processing of boundary conditions.
-	/// \param elementName Name of the element.
-	void endBoundaryConditions(const std::string& elementName);
 
 private:
 	/// Internal data to receive the "vertex" element
@@ -117,6 +115,14 @@ private:
 
 	/// Internal data to receive the "boundary_condition" element
 	unsigned int m_boundaryConditionData;
+
+	/// Internal data to receive the "material" data
+	struct MaterialData
+	{
+		double massDensity;
+		double poissonRatio;
+		double youngModulus;
+	} m_materialData;
 
 	/// The fem that will be created by loading
 	std::shared_ptr<Fem3DRepresentation> m_fem;

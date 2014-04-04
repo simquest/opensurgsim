@@ -18,10 +18,8 @@
 
 #include <array>
 
-#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
-
-#include "SurgSim/Framework/Convert.h"
 
 namespace SurgSim
 {
@@ -37,6 +35,8 @@ public:
 	/// Constructor
 	/// \param sizeX, sizeY, sizeZ the box sizes in all 3 directions (in m)
 	BoxShape(double sizeX = 0.0, double sizeY = 0.0, double sizeZ = 0.0);
+
+	SURGSIM_CLASSNAME(SurgSim::Math::BoxShape);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -79,8 +79,20 @@ public:
 	/// \return All eight vertices of the box
 	const std::array<Vector3d, 8>& getVertices() const;
 
-	/// Serialize declarations of the box
-	OSS_SERIALIZE(SurgSim::Math::BoxShape);
+protected:
+	// Setters in 'protected' sections are for serialization purpose only.
+
+	/// Set size in X direction
+	/// \param sizeX	the size in the X direction (in m)
+	void setSizeX(double sizeX);
+
+	/// Set size in Y direction
+	/// \param sizeY	the size in the Y direction (in m)
+	void setSizeY(double sizeY);
+
+	/// Set size in Z direction
+	/// \param sizeZ	the size in the Z direction (in m)
+	void setSizeZ(double sizeZ);
 
 private:
 	/// Function that calculates the box vertices.
