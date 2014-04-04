@@ -73,11 +73,11 @@ protected:
 	void setRadius(double radius);
 
 private:
-	/// The cylinder radius
-	double m_radius;
-
 	/// The cylinder length
 	double m_length;
+
+	/// The cylinder radius
+	double m_radius;
 };
 
 }; // Math
