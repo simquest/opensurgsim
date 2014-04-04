@@ -105,6 +105,79 @@ TEST(ForceScaleDeviceFilterTest, InputDataFilter)
 	EXPECT_TRUE(actualLinearVelocity.isApprox(Vector3d(5.0, 6.0, 7.0), ERROR_EPSILON));
 }
 
+TEST(ForceScaleDeviceFilterTest, OutputDataFilterDefaultScaling)
+{
+	auto forceScaler = std::make_shared<MockForceScale>("ForceScaleFilter");
+	ASSERT_TRUE(forceScaler->initialize());
+
+	DataGroupBuilder builder;
+	builder.addVector(SurgSim::DataStructures::Names::FORCE);
+	builder.addVector(SurgSim::DataStructures::Names::TORQUE);
+	builder.addMatrix(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
+	builder.addMatrix(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
+	builder.addBoolean("extraData");
+
+	DataGroup data = builder.createData();
+	const Vector3d initialForce(1.0, 2.5, -13.8);
+	data.vectors().set(SurgSim::DataStructures::Names::FORCE, initialForce);
+	const Vector3d initialTorque(-7.0, 5.0, -1.2);
+	data.vectors().set(SurgSim::DataStructures::Names::TORQUE, initialTorque);
+
+	Matrix66d initialSpringJacobian;
+	initialSpringJacobian << 0.1, 0.2, 0.3, 0.4, 0.5, 0.6,
+		0.7, 0.8, 0.9, 1.0, 1.1, 1.2,
+		1.3, 1.4, 1.5, 1.6, 1.7, 1.8,
+		0.1, 0.2, 0.3, 0.4, 0.5, 0.6,
+		0.7, 0.8, 0.9, 1.0, 1.1, 1.2,
+		1.3, 1.4, 1.5, 1.6, 1.7, 1.8;
+	data.matrices().set(SurgSim::DataStructures::Names::SPRING_JACOBIAN, initialSpringJacobian);
+
+	Matrix66d initialDamperJacobian;
+	initialDamperJacobian << 0.91, 0.82, 0.73, 0.64, 0.55, 0.46,
+		0.37, 0.28, 0.19, 11.0, 21.1, 31.2,
+		41.3, 51.4, 61.5, 71.6, 81.7, 91.8,
+		0.91, 0.82, 0.73, 0.64, 0.55, 0.46,
+		0.37, 0.28, 0.19, 11.0, 21.1, 31.2,
+		41.3, 51.4, 61.5, 71.6, 81.7, 91.8;
+	data.matrices().set(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, initialDamperJacobian);
+
+	const bool initialBoolean = true;
+	data.booleans().set("extraData", initialBoolean);
+
+	// Normally the data would be set by a behavior, then the output device scaffold would call requestOutput on the
+	// filter, which would call requestOutput on the OutputComponent.
+	auto testOutputProducer = std::make_shared<TestOutputProducerInterface>();
+	testOutputProducer->m_data = data;
+
+	// The OutputProducer sends data out to the filter, which sends data out to the device.
+	forceScaler->setOutputProducer(testOutputProducer);
+
+	DataGroup actualData;
+	ASSERT_TRUE(forceScaler->requestOutput("device", &actualData));
+
+	// Check the default scaling.  Should be identity.
+	Vector3d actualForce;
+	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::FORCE, &actualForce));
+	EXPECT_TRUE(actualForce.isApprox(initialForce, ERROR_EPSILON));
+
+	Vector3d actualTorque;
+	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::TORQUE, &actualTorque));
+	EXPECT_TRUE(actualTorque.isApprox(initialTorque, ERROR_EPSILON));
+
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType actualSpringJacobian;
+	ASSERT_TRUE(actualData.matrices().get(SurgSim::DataStructures::Names::SPRING_JACOBIAN, &actualSpringJacobian));
+	EXPECT_TRUE(actualSpringJacobian.isApprox(initialSpringJacobian, ERROR_EPSILON));
+
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType actualDamperJacobian;
+	ASSERT_TRUE(actualData.matrices().get(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, &actualDamperJacobian));
+	EXPECT_TRUE(actualDamperJacobian.isApprox(initialDamperJacobian, ERROR_EPSILON));
+
+	// Other data should pass through.
+	bool actualBoolean;
+	ASSERT_TRUE(actualData.booleans().get("extraData", &actualBoolean));
+	EXPECT_EQ(actualBoolean, initialBoolean);
+}
+
 TEST(ForceScaleDeviceFilterTest, OutputDataFilter)
 {
 	auto forceScaler = std::make_shared<MockForceScale>("ForceScaleFilter");
@@ -152,7 +225,7 @@ TEST(ForceScaleDeviceFilterTest, OutputDataFilter)
 	forceScaler->setOutputProducer(testOutputProducer);
 
 	DataGroup actualData;
-	forceScaler->requestOutput("device", &actualData);
+	ASSERT_TRUE(forceScaler->requestOutput("device", &actualData));
 
 	// Check the scaling.
 	Vector3d actualForce;
