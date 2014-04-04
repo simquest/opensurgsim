@@ -419,7 +419,8 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 	const SurgSim::Math::Vector3d c = restState.getPosition(m_nodeIds[2]);
 
 	// Transforms the 3 triangle points in 2D triangle cartesian coordinates
-	SurgSim::Math::RigidTransform3d inverseTransform = SurgSim::Math::makeRigidTransform(m_initialRotation, a).inverse();
+	SurgSim::Math::RigidTransform3d inverseTransform;
+	inverseTransform = SurgSim::Math::makeRigidTransform(m_initialRotation, a).inverse();
 	SurgSim::Math::Vector2d a2D = (inverseTransform * a).segment(0, 2);
 	SurgSim::Math::Vector2d b2D = (inverseTransform * b).segment(0, 2);
 	SurgSim::Math::Vector2d c2D = (inverseTransform * c).segment(0, 2);
