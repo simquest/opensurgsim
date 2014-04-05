@@ -17,6 +17,7 @@
 #define SURGSIM_FRAMEWORK_CONVERT_H
 
 #include "SurgSim/Framework/Log.h"
+#include <yaml-cpp/yaml.h>
 
 /// \note HS-2013-dec-23 The gcc and msvc compilers seem to have different requirements when a template class
 ///       needs to be passed template parameters in a specialization, that extend the original template interface

@@ -81,11 +81,11 @@ protected:
 	void setRadius(double radius);
 
 private:
-	/// Capsule radius
-	double m_radius;
-
 	/// Capsule length
 	double m_length;
+
+	/// Capsule radius
+	double m_radius;
 };
 
 }; // Math
