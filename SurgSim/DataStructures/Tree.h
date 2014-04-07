@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_TREE_H
-#define SURGSIM_DATA_STRUCTURES_TREE_H
+#ifndef SURGSIM_DATASTRUCTURES_TREE_H
+#define SURGSIM_DATASTRUCTURES_TREE_H
 
 #include <memory>
 
@@ -49,12 +49,12 @@ public:
 	}
 
 	/// Returns true if the trees are equal; otherwise, returns false.
-	/// If the trees are not of the same type, returns false; 
+	/// If the trees are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const Tree&).
 	bool operator==(const Tree& tree) const;
 
 	/// Returns true if the trees are not equal; otherwise, returns false.
-	/// If the trees are not of the same type, returns false; 
+	/// If the trees are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const Tree&).
 	bool operator!=(const Tree& tree) const;
 
@@ -74,4 +74,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATA_STRUCTURES_TREE_H
+#endif  // SURGSIM_DATASTRUCTURES_TREE_H

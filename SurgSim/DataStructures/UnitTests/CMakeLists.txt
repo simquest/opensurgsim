@@ -20,6 +20,7 @@ include_directories (
 set(UNIT_TEST_SOURCES
 	AabbTreeDataTests.cpp
 	AabbTreeNodeTests.cpp
+	AabbTreeTests.cpp
 	DataGroupTests.cpp
 	IndexDirectoryTests.cpp
 	MeshElementTest.cpp
@@ -43,6 +44,11 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS
 	SurgSimDataStructures
+)
+
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
 surgsim_add_unit_tests(SurgSimDataStructuresTest)

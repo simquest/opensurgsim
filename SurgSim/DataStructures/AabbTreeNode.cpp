@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/DataStructures/AabbTreeNode.h>
-#include <SurgSim/DataStructures/AabbTreeData.h>
+#include "SurgSim/DataStructures/AabbTreeNode.h"
+#include "SurgSim/DataStructures/AabbTreeData.h"
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {
@@ -46,8 +46,13 @@ void AabbTreeNode::splitNode()
 			child = std::make_shared<AabbTreeNode>();
 			addChild(std::move(child));
 		}
-		m_aabd = leftData->getAabb();
-		m_aabd.extend(rightData->getAabb());
+
+		// Update the local aabb
+		// The axis won't change after it has been split
+		m_aabb = leftData->getAabb();
+		m_aabb.extend(rightData->getAabb());
+		m_aabb.sizes().maxCoeff(&m_axis);
+
 		getChild(0)->setData(std::move(leftData));
 		getChild(1)->setData(std::move(rightData));
 		setData(nullptr);
@@ -59,7 +64,7 @@ const SurgSim::Math::Aabbd& AabbTreeNode::getAabb() const
 	auto data = std::static_pointer_cast<AabbTreeData>(getData());
 	if (data == nullptr)
 	{
-		return m_aabd;
+		return m_aabb;
 	}
 	else
 	{
@@ -72,14 +77,10 @@ void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t m
 
 	if (getNumChildren() > 0)
 	{
-		for (size_t i = 0; i < getNumChildren(); ++i)
-		{
-			auto childData = std::static_pointer_cast<AabbTreeNode>(getChild(i));
-			if (SurgSim::Math::doAabbIntersect(childData->getAabb(), aabb))
-			{
-				childData->addData(aabb, id, maxNodeData);
-			}
-		}
+		size_t childIndex = (aabb.center()(m_axis) < m_aabb.center()(m_axis)) ? 0 : 1;
+		auto childData = std::static_pointer_cast<AabbTreeNode>(getChild(childIndex));
+		childData->addData(aabb, id, maxNodeData);
+		m_aabb.extend(aabb);
 	}
 	else
 	{
@@ -95,6 +96,17 @@ void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t m
 			splitNode();
 		}
 	}
+}
+
+bool AabbTreeNode::doAccept(TreeVisitor* visitor)
+{
+	return visitor->handle(this);
+}
+
+void AabbTreeNode::getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result)
+{
+	auto data = std::static_pointer_cast<AabbTreeData>(getData());
+	data->getIntersections(aabb, result);
 }
 
 }

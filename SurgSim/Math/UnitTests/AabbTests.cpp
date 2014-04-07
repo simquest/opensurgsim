@@ -15,8 +15,8 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Math/Aabb.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Aabb.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
@@ -58,6 +58,16 @@ TEST(AabbTests, DoIntersectTest)
 			}
 		}
 	}
+}
+
+TEST(AabbdTests, makeAabb)
+{
+	Vector3d one(0.0, 0.0, 0.0);
+	Vector3d two(-1.0, -1.0, -1.0);
+	Vector3d three(1.0, 1.0, 1.0);
+	Aabbd aabb(makeAabb(one, two, three));
+	Aabbd expected(Vector3d(-1.0, -1.0, -1.0), Vector3d(1.0, 1.0, 1.0));
+	EXPECT_TRUE(expected.isApprox(aabb));
 }
 
 }

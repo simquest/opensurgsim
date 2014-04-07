@@ -13,11 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_TREE_NODE_H
-#define SURGSIM_DATA_STRUCTURES_TREE_NODE_H
+#ifndef SURGSIM_DATASTRUCTURES_TREENODE_H
+#define SURGSIM_DATASTRUCTURES_TREENODE_H
 
 #include <vector>
 #include <memory>
+
+#include "SurgSim/DataStructures/TreeVisitor.h"
 
 namespace SurgSim
 {
@@ -36,69 +38,75 @@ class TreeNode
 public:
 	/// Constructor. After construction, the node has no children, and the data is null.
 	TreeNode();
+
 	/// Destructor
 	virtual ~TreeNode();
 
 	/// Sets the data of this node.
-	void setData(std::shared_ptr<TreeData> data)
-	{
-		m_data = data;
-	}
-	/// Returns the data of this node.
-	std::shared_ptr<TreeData> getData() const
-	{
-		return m_data;
-	}
+	/// \param data The data for this node.
+	void setData(std::shared_ptr<TreeData> data);
+
+	/// \return The data of this node.
+	std::shared_ptr<TreeData> getData() const;
 
 	/// Sets the number of children of this node.
 	/// Any added children will be null.
-	void setNumChildren(unsigned int numChildren)
-	{
-		m_children.resize(numChildren);
-	}
-	/// Returns the number of children of this node.
-	unsigned int getNumChildren() const
-	{
-		return m_children.size();
-	}
+	/// \param numChildren The new number of children.
+	void setNumChildren(unsigned int numChildren);
+
+	/// \return The number of children of this node.
+	unsigned int getNumChildren() const;
 
 	/// Add a child to this node.
-	void addChild(std::shared_ptr<TreeNode>& node)
-	{
-		m_children.push_back(node);
-	}
+	/// \param node The new child node.
+	void addChild(const std::shared_ptr<TreeNode>& node);
+
+	/// Add a child to this node.
+	/// \param node The new child node.
+	void addChild(const std::shared_ptr<TreeNode>&& node);
+
 	/// Set a specific child of this node.
 	/// \param index	Index of the child
 	/// \param node		Node to become a child
-	void setChild(unsigned int index, std::shared_ptr<TreeNode>& node)
-	{
-		m_children[index] = node;
-	}
+	void setChild(unsigned int index, const std::shared_ptr<TreeNode>& node);
+
 	/// Returns the specified child of this node.
 	/// \param index	Index of the child
 	/// \return Child at the specified index
-	std::shared_ptr<TreeNode> getChild(unsigned int index) const
-	{
-		return m_children[index];
-	}
+	std::shared_ptr<TreeNode> getChild(unsigned int index) const;
+
+	/// Public entry point for visitor, currently this performs pre-order traversal of the tree
+	/// \param visitor The visitor that wants to traverse the tree
+	virtual void accept(TreeVisitor* visitor);
 
 	/// Returns true if the nodes are equal; otherwise, returns false.
 	/// If the nodes are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const TreeNode&).
+	/// \param node The node for comparison.
 	bool operator==(const TreeNode& node) const;
 
 	/// Returns true if the nodes are not equal; otherwise, returns false.
 	/// If the nodes are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const TreeNode&).
+	/// \param node The node for comparison.
 	bool operator!=(const TreeNode& node) const;
 
 protected:
+
 	/// Returns true if the nodes are equal; otherwise, returns false.
 	/// Recurses on children.
 	/// Override this method in derived classes to implement different comparisons.
+	/// \param The node for comparison.
 	virtual bool isEqual(const TreeNode& node) const;
 
+	/// Private function for use with the visitor pattern, this needs to be implemented
+	/// to make the correct double dispatch call to the dynamic type of this class.
+	/// \param visitor The visitor that is trying to traverse the tree.
+	/// \return true to indicate proceeding with the visitor, false indicates to abort the traversal.
+	virtual bool doAccept(TreeVisitor* visitor) = 0;
+
 private:
+
 	/// Children of this node.
 	std::vector<std::shared_ptr<TreeNode>> m_children;
 
@@ -110,4 +118,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATA_STRUCTURES_TREE_NODE_H
+#endif  // SURGSIM_DATASTRUCTURES_TREENODE_H

@@ -21,21 +21,23 @@ include_directories(
 set(SURGSIM_DATA_STRUCTURES_SOURCES
 	AabbTree.cpp
 	AabbTreeData.cpp
+	AabbTreeIntersectionVisitor.cpp
 	AabbTreeNode.cpp
 	DataGroupBuilder.cpp
 	IndexDirectory.cpp
 	TriangleMesh.cpp
 	ply.c
 	PlyReader.cpp
-	TriangleMeshPlyReaderDelegate.cpp
 	Tree.cpp
 	TreeData.cpp
 	TreeNode.cpp
+	TriangleMeshPlyReaderDelegate.cpp
 )
 
 set(SURGSIM_DATA_STRUCTURES_HEADERS
 	AabbTree.h
 	AabbTreeData.h
+	AabbTreeIntersectionVisitor.h
 	AabbTreeNode.h
 	DataGroup.h
 	DataGroup-inl.h
@@ -54,11 +56,12 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	ply.h
 	PlyReader.h
 	PlyReaderDelegate.h
+	TetrahedronMesh.h
+	TetrahedronMesh-inl.h
 	Tree.h
 	TreeData.h
 	TreeNode.h
-	TetrahedronMesh.h
-	TetrahedronMesh-inl.h
+	TreeVisitor.h
 	TriangleMesh.h
 	TriangleMesh-inl.h
 	TriangleMeshBase.h

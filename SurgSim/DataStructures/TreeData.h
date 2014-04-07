@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_TREE_DATA_H
-#define SURGSIM_DATA_STRUCTURES_TREE_DATA_H
+#ifndef SURGSIM_DATASTRUCTURES_TREEDATA_H
+#define SURGSIM_DATASTRUCTURES_TREEDATA_H
 
 #include <typeinfo>
 
@@ -35,12 +35,12 @@ public:
 	virtual ~TreeData();
 
 	/// Returns true if the data are equal; otherwise, returns false.
-	/// If the data are not of the same type, returns false; 
+	/// If the data are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const TreeData&).
 	bool operator==(const TreeData& data) const;
 
 	/// Returns true if the data are not equal; otherwise, returns false.
-	/// If the data are not of the same type, returns false; 
+	/// If the data are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const TreeData&).
 	bool operator!=(const TreeData& data) const;
 
@@ -54,4 +54,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATA_STRUCTURES_TREE_DATA_H
+#endif  // SURGSIM_DATASTRUCTURES_TREEDATA_H

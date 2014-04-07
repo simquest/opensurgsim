@@ -13,16 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Tree.h"
-
-#include <SurgSim/DataStructures/TreeNode.h>
+#include "SurgSim/DataStructures/Tree.h"
+#include "SurgSim/DataStructures/TreeNode.h"
 
 #include <typeinfo>
 
 using SurgSim::DataStructures::Tree;
 using SurgSim::DataStructures::TreeNode;
 
-Tree::Tree() 
+Tree::Tree()
 {
 }
 

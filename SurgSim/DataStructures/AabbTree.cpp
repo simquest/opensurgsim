@@ -26,13 +26,15 @@ namespace DataStructures
 AabbTree::AabbTree() :
 	m_maxObjectsPerNode(3)
 {
-
+	m_typedRoot = std::make_shared<AabbTreeNode>();
+	setRoot(m_typedRoot);
 }
 
 AabbTree::AabbTree(size_t maxObjectsPerNode) :
 	m_maxObjectsPerNode(maxObjectsPerNode)
 {
-
+	m_typedRoot = std::make_shared<AabbTreeNode>();
+	setRoot(m_typedRoot);
 }
 
 AabbTree::~AabbTree()
@@ -42,24 +44,17 @@ AabbTree::~AabbTree()
 
 void AabbTree::add(const SurgSim::Math::Aabbd& aabb, size_t objectId)
 {
-	if (getRoot() == nullptr)
-	{
-		m_typedRoot = std::make_shared<AabbTreeNode>();
-		setRoot(std::make_shared<AabbTreeNode>());
-	}
 	m_typedRoot->addData(aabb, objectId, m_maxObjectsPerNode);
-}
-
-std::vector<size_t> AabbTree::getIntersections(const SurgSim::Math::Aabbd& aabb)
-{
-	std::vector<size_t> result;
-	// return m_typedRoot->getIntersections(aabb);
-	return std::move(result);
 }
 
 size_t AabbTree::getMaxObjectsPerNode() const
 {
 	return m_maxObjectsPerNode;
+}
+
+SurgSim::Math::Aabbd AabbTree::getAabb()
+{
+	return m_typedRoot->getAabb();
 }
 
 }

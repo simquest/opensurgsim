@@ -29,28 +29,56 @@ typedef Eigen::AlignedBox<float, 3> Aabbf;
 /// Wrapper around the Eigen type
 typedef Eigen::AlignedBox<double, 3> Aabbd;
 
-/// 	http://www.gamasutra.com/view/feature/131790/simple_intersection_tests_for_games.php?page=3
-/// Another alternative is probably to use !a.intersection(b).isEmpty() as a test ...
+/// Determine whether two AABBs have an intersection with each other, for the calculation see
+/// http://www.gamasutra.com/view/feature/131790/simple_intersection_tests_for_games.php?page=3
+/// \tparam Scalar numeric type
+/// \tparam Dim dimension of the space to be used
+/// \param aabb0 first axis aligned bounding box
+/// \param aabb1 second axis aligned bounding box
+/// \param tolerance the bounding boxes will be considered bigger by this amount
+/// \return true if there is an overlap between the two boxes
 template <class Scalar, int Dim>
-bool doAabbIntersect(const Eigen::AlignedBox<Scalar, Dim>& a,
-					 const Eigen::AlignedBox<Scalar, Dim>& b,
+bool doAabbIntersect(const Eigen::AlignedBox<Scalar, Dim>& aabb0,
+					 const Eigen::AlignedBox<Scalar, Dim>& aabb1,
 					 double tolerance)
 {
 	typedef typename Eigen::AlignedBox<Scalar, Dim>::VectorType VectorType;
 
-	VectorType vector = (b.center() - a.center()).array().abs();
-	VectorType totalSizes = ((a.sizes() + b.sizes()) * 0.5).array() + tolerance;
+	VectorType vector = (aabb1.center() - aabb0.center()).array().abs();
+	VectorType totalSizes = ((aabb0.sizes() + aabb1.sizes()) * 0.5).array() + tolerance;
 
 	return (vector.array() <= totalSizes.array()).all();
 }
 
+/// Determine whether two AABBs overlap, using a minimal set of eigen calls, does not take a tolerance
+/// \tparam Scalar numeric type
+/// \tparam Dim dimension of the space to be used
+/// \param aabb0 first axis aligned bounding box
+/// \param aabb1 second axis aligned bounding box
+/// \param tolerance the bounding boxes will be considered bigger by this amount
+/// \return true if there is an overlap between the two boxestemplate <class Scalar, int Dim>
 template <class Scalar, int Dim>
 bool doAabbIntersect(const Eigen::AlignedBox<Scalar, Dim>& a,
 					 const Eigen::AlignedBox<Scalar, Dim>& b)
 {
 	return !a.intersection(b).isEmpty();
 }
-
+/// Convenience function for creating a bounding box from three vertices (e.g. the vertices of a triangle)
+/// \tparam Scalar numeric type
+/// \tparam Dim dimension of the space to be used
+/// \tparam MType the eigen type of the vectors
+/// \return an AABB containing all the points passed
+template <class Scalar, int Dim, int MType>
+Eigen::AlignedBox<Scalar, Dim> makeAabb(
+	const Eigen::Matrix<Scalar, Dim, 1, MType>& vector0,
+	const Eigen::Matrix<Scalar, Dim, 1, MType>& vector1,
+	const Eigen::Matrix<Scalar, Dim, 1, MType>& vector2)
+{
+	Eigen::AlignedBox<Scalar, Dim> result(vector0);
+	result.extend(vector1);
+	result.extend(vector2);
+	return std::move(result);
+}
 }
 }
 

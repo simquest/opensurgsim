@@ -13,14 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "TreeNode.h"
+#include "SurgSim/DataStructures/TreeNode.h"
 
-#include <SurgSim/DataStructures/TreeData.h>
+#include "SurgSim/DataStructures/TreeData.h"
 
 #include <typeinfo>
 
-using SurgSim::DataStructures::TreeNode;
-
+namespace SurgSim
+{
+namespace DataStructures
+{
 TreeNode::TreeNode() : m_data(nullptr)
 {
 }
@@ -50,3 +52,58 @@ bool TreeNode::isEqual(const TreeNode& node) const
 	}
 	return true;
 }
+
+void TreeNode::setData(std::shared_ptr<TreeData> data)
+{
+	m_data = data;
+}
+
+std::shared_ptr<TreeData> TreeNode::getData() const
+{
+	return m_data;
+}
+
+void TreeNode::setNumChildren(unsigned int numChildren)
+{
+	m_children.resize(numChildren);
+}
+
+unsigned int TreeNode::getNumChildren() const
+{
+	return m_children.size();
+}
+
+void TreeNode::addChild(const std::shared_ptr<TreeNode>& node)
+{
+	m_children.push_back(node);
+}
+
+void TreeNode::addChild(const std::shared_ptr<TreeNode>&& node)
+{
+	m_children.push_back(node);
+}
+
+void TreeNode::setChild(unsigned int index, const std::shared_ptr<TreeNode>& node)
+{
+	m_children[index] = node;
+}
+
+std::shared_ptr<TreeNode> TreeNode::getChild(unsigned int index) const
+{
+	return m_children[index];
+}
+
+void TreeNode::accept(TreeVisitor* visitor)
+{
+	if (doAccept(visitor))
+	{
+		for (size_t i = 0; i < getNumChildren(); ++i)
+		{
+			getChild(i)->accept(visitor);
+		}
+	}
+}
+
+}
+}
+

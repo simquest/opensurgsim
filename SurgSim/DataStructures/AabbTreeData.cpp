@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/DataStructures/AabbTreeData.h>
+#include "SurgSim/DataStructures/AabbTreeData.h"
 
 #include <algorithm>
 
@@ -110,13 +110,13 @@ void AabbTreeData::recalculateAabb()
 	});
 }
 
-void AabbTreeData::getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* ids) const
+void AabbTreeData::getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result) const
 {
 	std::for_each(m_data.begin(), m_data.end(), [&](const Item & item)
 	{
 		if (SurgSim::Math::doAabbIntersect(item.first, aabb))
 		{
-			ids->push_back(item.second);
+			result->push_back(item.second);
 		}
 	});
 }

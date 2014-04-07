@@ -15,10 +15,10 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/DataStructures/AabbTreeNode.h>
-
-#include <SurgSim/Math/Aabb.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Aabb.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/DataStructures/TreeVisitor.h"
+#include "SurgSim/DataStructures/AabbTreeNode.h"
 
 using SurgSim::Math::Aabbd;
 using SurgSim::Math::Vector3d;
@@ -70,6 +70,32 @@ TEST(AabbTreeNodeTests, AddTest)
 	EXPECT_TRUE(two.isApprox(child->getAabb()));
 
 }
+
+class TestVisitor : public TreeVisitor
+{
+public:
+	virtual ~TestVisitor() {}
+
+	virtual bool handle(TreeNode* node) override
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+		return false;
+	}
+
+	virtual bool handle(AabbTreeNode* node) override
+	{
+		return true;
+	}
+
+};
+
+TEST(AabbTreeNodeTests, VisitorTest)
+{
+	TestVisitor visitor;
+	auto node = std::make_shared<AabbTreeNode>();
+	node->accept(&visitor);
+}
+
 
 }
 }

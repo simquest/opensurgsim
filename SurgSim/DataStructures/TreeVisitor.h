@@ -13,25 +13,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/TreeData.h"
+#ifndef SURGSIM_DATASTRUCTURES_TREEVISITOR_H
+#define SURGSIM_DATASTRUCTURES_TREEVISITOR_H
 
-#include <typeinfo>
 
-using SurgSim::DataStructures::TreeData;
 
-TreeData::TreeData()
+namespace SurgSim
 {
-}
-TreeData::~TreeData()
+namespace DataStructures
 {
+
+class TreeNode;
+class AabbTreeNode;
+
+class TreeVisitor
+{
+public:
+
+	virtual ~TreeVisitor()
+	{
+
+	}
+
+	virtual bool handle(TreeNode* node) = 0;
+
+	virtual bool handle(AabbTreeNode* node)
+	{
+		return false;
+	};
+};
+
+}
 }
 
-bool TreeData::operator==(const TreeData& data) const
-{
-	return (typeid(*this) == typeid(data)) && isEqual(&data);
-}
-
-bool TreeData::operator!=(const TreeData& data) const
-{
-	return (typeid(*this) != typeid(data)) || ! isEqual(&data);
-}
+#endif

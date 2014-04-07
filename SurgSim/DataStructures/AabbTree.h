@@ -30,23 +30,41 @@ namespace DataStructures
 
 class AabbTreeNode;
 
+/// AabbTree is a tree that is organized by the bounding boxes of the referenced objects, the bounding box used is
+/// the Axis Aligned Bounding Box (AABB), with the extents of an AABB describing the min and max of each coordinate
+/// for the given object.
 class AabbTree : public Tree
 {
 public:
+
+	/// Constructor
 	AabbTree();
 
+	/// Constructor
+	/// \param maxObjectsPerNode, if the number of objects exceeds this a split of the node will be triggered
 	explicit AabbTree(size_t maxObjectsPerNode);
 
-	size_t getMaxObjectsPerNode() const;
-
+	/// Destructor
 	virtual ~AabbTree();
 
+	/// \return the number of objects per node that will trigger a split for this tree
+	size_t getMaxObjectsPerNode() const;
+
+
+	/// Add a give object identified by objectId to the tree, this id should be unqiue on the users side, but no
+	/// checks are made in the inside of the tree
+	/// \param aabb AABB of this object.
+	/// \param objectId Id for the object to be identified with this bounding box
 	void add(const SurgSim::Math::Aabbd& aabb, size_t objectId);
 
-	std::vector<size_t> getIntersections(const SurgSim::Math::Aabbd& aabb);
+	SurgSim::Math::Aabbd getAabb();
+
 private:
+
+	/// Number of objects in a node that will trigger a split
 	size_t m_maxObjectsPerNode;
 
+	/// A typed version of the root for access without typecasting
 	std::shared_ptr<AabbTreeNode> m_typedRoot;
 };
 
