@@ -39,7 +39,6 @@ using SurgSim::Physics::RigidRepresentationParameters;
 
 StapleElement::StapleElement(const std::string& name) :
 	SurgSim::Framework::SceneElement(name),
-	m_physicsRepresentation(nullptr),
 	m_hasCollisionRepresentation(false)
 {
 }
@@ -51,11 +50,6 @@ StapleElement::~StapleElement()
 void StapleElement::setPose(const RigidTransform3d& pose)
 {
 	m_pose = pose;
-}
-
-const std::shared_ptr<SurgSim::Physics::RigidRepresentation> StapleElement::getPhysicsRepresentation2()
-{
-	return m_physicsRepresentation;
 }
 
 void StapleElement::setHasCollisionRepresentation(bool flag)
@@ -83,9 +77,9 @@ bool StapleElement::doInitialize()
 	params.setLinearDamping(1e-2);
 	params.setAngularDamping(1e-4);
 
-	m_physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
-	m_physicsRepresentation->setInitialParameters(params);
-	m_physicsRepresentation->setInitialPose(m_pose);
+	auto physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
+	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setInitialPose(m_pose);
 
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSceneryRepresentation>("Graphics");
@@ -94,10 +88,10 @@ bool StapleElement::doInitialize()
 
 	std::shared_ptr<TransferPoseBehavior> transferPose =
 		std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPose->setPoseSender(m_physicsRepresentation);
+	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
 
-	addComponent(m_physicsRepresentation);
+	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
 	addComponent(transferPose);
 
@@ -105,7 +99,7 @@ bool StapleElement::doInitialize()
 	{
 		std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 			std::make_shared<RigidCollisionRepresentation>("Collision");
-		m_physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
+		physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 		addComponent(collisionRepresentation);
 	}

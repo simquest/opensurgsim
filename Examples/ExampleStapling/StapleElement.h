@@ -40,10 +40,6 @@ public:
 	/// \param pose	The initial pose to set.
 	void setPose(const SurgSim::Math::RigidTransform3d& pose);
 
-	/// Return the staple physics representation.
-	/// \return The shared pointer to the physics representation.
-	const std::shared_ptr<SurgSim::Physics::RigidRepresentation> getPhysicsRepresentation2();
-
 	/// Specify whether the staple was created with a collision representation.
 	/// \param flag Flag to specify whether the staple was created with a collision representation.
 	void setHasCollisionRepresentation(bool flag);
@@ -59,9 +55,6 @@ protected:
 private:
 	/// The pose of this scene element
 	SurgSim::Math::RigidTransform3d m_pose;
-
-	/// The shared pointer to the physics representation.
-	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_physicsRepresentation;
 
 	/// Flag to specify if the stapleElement was created with a collision representation.
 	bool m_hasCollisionRepresentation;
