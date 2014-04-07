@@ -27,6 +27,8 @@ namespace SurgSim
 namespace Framework
 {
 
+class PoseComponent;
+
 /// Representations are manifestations of a SceneElement. For example, a
 /// SceneElement can be represented in graphics, physics, etc. Each of these
 /// representation will be derived from this class.
@@ -51,9 +53,14 @@ public:
 	/// \return The pose of this representation
 	virtual SurgSim::Math::RigidTransform3d getPose() const;
 
+	virtual void setSceneElement(std::weak_ptr<SceneElement> sceneElement) override;
+
 private:
 	/// Local Pose of the Representation with respect to the SceneElement
 	SurgSim::Math::RigidTransform3d m_localPose;
+
+	/// Shared Pointer to the Pose Component that holds the SceneElement pose
+	std::shared_ptr<PoseComponent> m_poseComponent;
 
 	virtual bool doInitialize() override;
 	virtual bool doWakeUp() override;

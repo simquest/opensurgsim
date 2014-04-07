@@ -35,6 +35,7 @@ namespace Framework
 {
 
 class Component;
+class PoseComponent;
 class Scene;
 class Runtime;
 
@@ -102,6 +103,11 @@ public:
 	/// \return the pose
 	const SurgSim::Math::RigidTransform3d& getPose() const;
 
+	/// Get the PoseComponent that controls the pose all Representations
+	/// in this SceneElement
+	/// \return the PoseComponent
+	std::shared_ptr<PoseComponent> getPoseComponent();
+
 	/// Sets the Scene.
 	/// \param scene Pointer to the scene.
 	void setScene(std::weak_ptr<Scene> scene);
@@ -141,7 +147,7 @@ private:
 	/// Name of this SceneElement
 	std::string m_name;
 
-	SurgSim::Math::RigidTransform3d m_pose;
+	std::shared_ptr<SurgSim::Framework::PoseComponent> m_pose;
 
 	/// A collection of Components
 	std::unordered_map<std::string, std::shared_ptr<Component>> m_components;

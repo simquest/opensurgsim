@@ -18,6 +18,7 @@
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
 
 #include <yaml-cpp/yaml.h>
@@ -28,8 +29,10 @@ namespace Framework
 {
 
 SceneElement::SceneElement(const std::string& name) :
-	m_name(name), m_pose(SurgSim::Math::RigidTransform3d::Identity()), m_isInitialized(false)
+	m_name(name), m_isInitialized(false)
 {
+	m_pose = std::make_shared<SurgSim::Framework::PoseComponent>("Pose");
+	m_pose->setPose(SurgSim::Math::RigidTransform3d::Identity());
 }
 
 SceneElement::~SceneElement()
@@ -102,6 +105,7 @@ std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) c
 bool SceneElement::initialize()
 {
 	SURGSIM_ASSERT(!m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
+	addComponent(m_pose);
 	m_isInitialized = doInitialize();
 
 	if (m_isInitialized)
@@ -126,10 +130,15 @@ std::string SceneElement::getName() const
 
 void SceneElement::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
-	m_pose = pose;
+	m_pose->setPose(pose);
 }
 
 const SurgSim::Math::RigidTransform3d& SceneElement::getPose() const
+{
+	return m_pose->getPose();
+}
+
+std::shared_ptr<PoseComponent> SceneElement::getPoseComponent()
 {
 	return m_pose;
 }

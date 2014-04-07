@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
@@ -34,6 +35,16 @@ Representation::~Representation()
 {
 }
 
+void Representation::setSceneElement(std::weak_ptr<SceneElement> sceneElement) 
+{
+	Component::setSceneElement(sceneElement);
+	std::shared_ptr<SceneElement> element = getSceneElement();
+	if (element != nullptr)
+	{
+		m_poseComponent = element->getPoseComponent();
+	}
+}
+
 bool Representation::doInitialize()
 {
 	return true;
@@ -51,14 +62,13 @@ void Representation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
 
 SurgSim::Math::RigidTransform3d Representation::getPose() const
 {
-	std::shared_ptr<const SceneElement> element = getSceneElement();
-	if (element == nullptr)
+	if (m_poseComponent == nullptr)
 	{
 		return m_localPose;
 	}
 	else
 	{
-		return element->getPose() * getLocalPose();
+		return m_poseComponent->getPose() * getLocalPose();
 	}
 }
 

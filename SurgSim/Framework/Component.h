@@ -88,7 +88,7 @@ public:
 
 	/// Sets the scene element.
 	/// \param sceneElement The scene element for this component.
-	void setSceneElement(std::weak_ptr<SceneElement> sceneElement);
+	virtual void setSceneElement(std::weak_ptr<SceneElement> sceneElement);
 
 	/// Gets the scene element.
 	/// \return The scene element for this component.
