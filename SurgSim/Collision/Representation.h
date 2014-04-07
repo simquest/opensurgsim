@@ -48,6 +48,9 @@ struct Contact;
 class Representation : public SurgSim::Framework::Representation
 {
 public:
+	typedef std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+							   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> ContactMapType;
+
 	/// Constructor
 	/// \param name Name of this collision representation
 	explicit Representation(const std::string& name);
@@ -66,8 +69,7 @@ public:
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
-	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> getCollisions() const;
+	ContactMapType getCollisions() const;
 
 	/// Return the list of contacts between the given collision representation and this collision representation.
 	/// \param collisionRepresentation The collision representation with which this collision representation collides.
@@ -104,9 +106,7 @@ protected:
 	/// A map which associates a list of contacts with each collision representation.
 	/// Every contact added to this map follows the convention of pointing the contact normal toward this
 	/// representation. And the first penetration point is on this representation.
-	SurgSim::Framework::LockedContainer<std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-			std::list<std::shared_ptr<SurgSim::Collision::Contact>>>>
-			m_collisions;
+	SurgSim::Framework::LockedContainer<ContactMapType> m_collisions;
 };
 
 
