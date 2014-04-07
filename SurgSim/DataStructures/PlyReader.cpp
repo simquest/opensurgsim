@@ -293,7 +293,7 @@ void PlyReader::parseFile()
 			// easy way to ignore an element
 			// The data for other is stored internally in the plyFile data structure
 			// and should not be freed
-			PlyOtherElems* other = ply_get_other_element(m_data->plyFile, currentElementName, numberOfElements);
+			ply_get_other_element(m_data->plyFile, currentElementName, numberOfElements);
 
 		}
 
