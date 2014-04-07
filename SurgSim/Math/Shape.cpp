@@ -13,18 +13,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Shape.h"
 
-/// Specialize of YAML::convert<> template RigidShape class.
-YAML::Node SurgSim::Math::Shape::encode()
+namespace SurgSim
 {
-	YAML::Node node;
-	node["ClassName"] = getClassName();
-	return node;
+
+namespace Math
+{
+
+Shape::~Shape()
+{
 }
 
-bool SurgSim::Math::Shape::decode(const YAML::Node& node)
+Shape::FactoryType& Shape::getFactory()
 {
-	SURGSIM_ASSERT(node["ClassName"].as<std::string>() == getClassName());
-	return true;
+	static FactoryType factory;
+	return factory;
 }
+
+/// Get class name
+std::string Shape::getClassName() const
+{
+	SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+		"getClassName() called on Math::Shape base class, this is wrong" <<
+		" in almost all cases, this means there is a class that does not have getClassName() defined.";
+	return "SurgSim::Math::Shape";
+}
+
+} // namespace Math
+} // namespace SurgSim

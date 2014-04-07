@@ -16,6 +16,7 @@
 #ifndef SURGSIM_MATH_DOUBLESIDEDPLANESHAPE_H
 #define SURGSIM_MATH_DOUBLESIDEDPLANESHAPE_H
 
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -29,9 +30,10 @@ namespace Math
 class DoubleSidedPlaneShape: public Shape
 {
 public:
-
-	/// Constructor: No members to initialize.
+	/// Constructor
 	DoubleSidedPlaneShape();
+
+	SURGSIM_CLASSNAME(SurgSim::Math::DoubleSidedPlaneShape);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -56,14 +58,9 @@ public:
 	/// Gets the normal of the plane equation.
 	/// \return	The value of the normal (always Y axis).
 	Vector3d getNormal() const;
-
-	/// Serialize declarations of the double sided plane
-	OSS_SERIALIZE(SurgSim::Math::DoubleSidedPlaneShape);
-
 };
 
 }; // Math
-
 }; // SurgSim
 
 #endif // SURGSIM_MATH_DOUBLESIDEDPLANESHAPE_H

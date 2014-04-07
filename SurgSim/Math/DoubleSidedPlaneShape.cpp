@@ -13,7 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::DoubleSidedPlaneShape);
+}
 
 namespace SurgSim
 {
@@ -52,16 +58,6 @@ double DoubleSidedPlaneShape::getD() const
 SurgSim::Math::Vector3d DoubleSidedPlaneShape::getNormal() const
 {
 	return Vector3d(0.0, 1.0, 0.0);
-}
-
-YAML::Node SurgSim::Math::DoubleSidedPlaneShape::encode()
-{
-	return SurgSim::Math::Shape::encode();
-}
-
-bool SurgSim::Math::DoubleSidedPlaneShape::decode(const YAML::Node& node)
-{
-	return SurgSim::Math::Shape::decode(node);
 }
 
 }; // namespace Math

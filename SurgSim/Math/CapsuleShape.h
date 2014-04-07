@@ -16,6 +16,7 @@
 #ifndef SURGSIM_MATH_CAPSULESHAPE_H
 #define SURGSIM_MATH_CAPSULESHAPE_H
 
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -33,6 +34,8 @@ public:
 	/// \param length The capsule length (i.e. of the cylinder) (in m)
 	/// \param radius The capsule radius (i.e. of the cylinder/spheres) (in m)
 	CapsuleShape(double length = 0.0, double radius = 0.0);
+
+	SURGSIM_CLASSNAME(SurgSim::Math::CapsuleShape);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -66,19 +69,26 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
-	/// Serialize declarations of the capsule
-	OSS_SERIALIZE(SurgSim::Math::CapsuleShape);
+protected:
+	// Setters in 'protected' sections are for serialization purpose only.
+
+	/// Set the capsule length (i.e. cylinder length)
+	/// \param length	The capsule length (in m)
+	void setLength(double length);
+
+	/// Set the capsule radius (i.e. cylinder/spheres radius)
+	/// \param radius	The capsule radius (in m)
+	void setRadius(double radius);
 
 private:
-	/// Capsule radius
-	double   m_radius;
-
 	/// Capsule length
-	double   m_length;
+	double m_length;
+
+	/// Capsule radius
+	double m_radius;
 };
 
 }; // Math
-
 }; // SurgSim
 
 #endif // SURGSIM_MATH_CAPSULESHAPE_H

@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
@@ -63,23 +64,29 @@ public:
 	/// \param    poseName Name of the pose data in the input to transfer
 	void setPoseName(const std::string& poseName = SurgSim::DataStructures::Names::POSE);
 
-	/// Update the behavior
-	/// \param dt    The length of time (seconds) between update calls.
-	virtual void update(double dt);
+	virtual void update(double dt) override;
 
 	/// Set linear stiffness connecting the input device and the physics representation
+	/// If this value is not provided, the stiffness will be automatically tuned using
+	/// the properties of the Representation
 	/// \param linearStiffness The stiffness of the vtc in linear mode (in N·m-1)
 	void setLinearStiffness(double linearStiffness);
 
 	/// Set linear damping connecting the input device and the physics representation
+	/// If this value is not provided, the damping will be automatically tuned using
+	/// the properties of the Representation
 	/// \param linearDamping The damping of the vtc in linear mode (in N·s·m-1 or Kg·s-1)
 	void setLinearDamping(double linearDamping);
 
 	/// Set angular stiffness connecting the input device and the physics representation
+	/// If this value is not provided, the stiffness will be automatically tuned using
+	/// the properties of the Representation
 	/// \param angularStiffness The stiffness of the vtc in angular mode (in N·m rad-1)
 	void setAngularStiffness(double angularStiffness);
 
 	/// Set angular damping connecting the input device and the physics representation
+	/// If this value is not provided, the damping will be automatically tuned using
+	/// the properties of the Representation
 	/// \param angularDamping The damping of the vtc in angular mode (in N·m·s·rad-1)
 	void setAngularDamping(double angularDamping);
 
@@ -92,35 +99,27 @@ public:
 	void setOutputTorqueScaling(double torqueScaling);
 
 protected:
-	/// Initialize the behavior.  Does nothing.
-	/// \return True if component is initialized successfully; otherwise, false.
-	virtual bool doInitialize();
+	virtual bool doInitialize() override;
+	virtual bool doWakeUp() override;
+	virtual int getTargetManagerType() const override;
 
-	/// Wakeup the behavior.  Does nothing.
-	/// \return True if component is woken up successfully; otherwise, false.
-	virtual bool doWakeUp();
+	/// Vtc stiffness parameter in linear mode (in N·m-1)
+	SurgSim::DataStructures::OptionalValue<double> m_linearStiffness;
 
-	/// Put this behavior in physics, so everything updates once per physics loop.
-	/// \return int corresponding to enum in Behavior.h.
-	virtual int getTargetManagerType() const;
+	/// Vtc damping parameter in linear mode (in N·s·m-1 or Kg·s-1)
+	SurgSim::DataStructures::OptionalValue<double> m_linearDamping;
+
+	/// Vtc stiffness parameter in angular mode (in N·m rad-1)
+	SurgSim::DataStructures::OptionalValue<double> m_angularStiffness;
+
+	/// Vtc damping parameter in angular mode (in N·m·s·rad-1)
+	SurgSim::DataStructures::OptionalValue<double> m_angularDamping;
 
 private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_input;
 	std::shared_ptr<SurgSim::Input::OutputComponent> m_output;
 	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
 	std::string m_poseName;
-
-	/// Vtc stiffness parameter in linear mode (in N·m-1)
-	double m_linearStiffness;
-
-	/// Vtc damping parameter in linear mode (in N·s·m-1 or Kg·s-1)
-	double m_linearDamping;
-
-	/// Vtc stiffness parameter in angular mode (in N·m rad-1)
-	double m_angularStiffness;
-
-	/// Vtc damping parameter in angular mode (in N·m·s·rad-1)
-	double m_angularDamping;
 
 	/// Scaling factor for the forces sent to the OutputComponent
 	double m_outputForceScaling;

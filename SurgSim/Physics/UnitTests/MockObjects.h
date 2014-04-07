@@ -25,6 +25,7 @@
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::OdeSolver;
@@ -311,6 +312,36 @@ private:
 						 ConstraintSideSign sign)
 	{
 	}
+};
+
+class MockVirtualToolCoupler : public VirtualToolCoupler
+{
+public:
+	MockVirtualToolCoupler() :
+		VirtualToolCoupler("Mock Virtual Tool Coupler")
+	{
+	}
+
+	double getLinearStiffness() const
+	{
+		return m_linearStiffness.getValue();
+	}
+
+	double getLinearDamping() const
+	{
+		return m_linearDamping.getValue();
+	}
+
+	double getAngularStiffness() const
+	{
+		return m_angularStiffness.getValue();
+	}
+
+	double getAngularDamping() const
+	{
+		return m_angularDamping.getValue();
+	}
+
 };
 
 inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepresentation> firstRepresentation,

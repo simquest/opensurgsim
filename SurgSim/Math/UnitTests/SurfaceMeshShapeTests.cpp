@@ -73,7 +73,7 @@ public:
 		}
 
 		// Define the triangles
-		for (size_t triId = 1; triId < totalNumNodes - 1; ++triId)
+		for (unsigned int triId = 1; triId < totalNumNodes - 1; ++triId)
 		{
 			std::array<unsigned int, 3> indices = {{ 0, triId, triId + 1}};
 			disk.addTriangle(TriangleMeshBase::TriangleType(indices));
