@@ -16,7 +16,6 @@
 #ifndef SURGSIM_MATH_GEOMETRY_H
 #define SURGSIM_MATH_GEOMETRY_H
 
-#include <boost/container/static_vector.hpp>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -1567,14 +1566,19 @@ bool calculateContactTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt> *n[2] = {&t0n, &t1n};
 	T d[2];
 	T signedDFromPlaneB[2][3];
-	boost::container::static_vector<unsigned int, 3> underPlaneB[2];
-	boost::container::static_vector<unsigned int, 3> onOrAbovePlaneB[2];
-	boost::container::static_vector<bool, 3> abovePlaneBFlag[2];
+	std::vector<unsigned int> underPlaneB[2];
+	std::vector<unsigned int> onOrAbovePlaneB[2];
+	std::vector<bool> abovePlaneBFlag[2];
 
 	for (unsigned int A = 0, B = 1; A < 2; ++A, --B)
 	{
 		// Calculate distance of plane of B from origin.
 		d[B] = -v[B][0]->dot(*n[B]);
+
+		// Reserve memory (for higher performance).
+		underPlaneB[A].reserve(3);
+		onOrAbovePlaneB[A].reserve(3);
+		abovePlaneBFlag[A].reserve(3);
 
 		// Calculate signedDFromPlaneB and place the index into appropriate under/onOrAbove PlaneB list.
 		for (unsigned int i = 0; i < 3; ++i)
