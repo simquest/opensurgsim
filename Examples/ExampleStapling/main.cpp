@@ -251,7 +251,8 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>("Behavior");
 	staplerBehavior->setInputComponent(inputComponent);
 	staplerBehavior->setRepresentation(physicsRepresentation);
-	
+	staplerBehavior->enableStaplingForSceneElement("armSceneElement");
+
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
 		std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");
 	visualizeContactsBehavior->setCollisionRepresentation(collisionRepresentation);
@@ -288,8 +289,8 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	virtualTeethShapes.push_back(std::make_shared<MeshShape>(*loadMesh("Data/Geometry/virtual_staple_2.ply")));
 
 	int i = 0;
-	std::array<std::shared_ptr<ShapeCollisionRepresentation>, 2> virtualTeeth;
-	for (auto it = virtualTeethShapes.begin(); it != virtualTeethShapes.end(); ++it)
+	std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> virtualTeeth;
+	for (auto it = virtualTeethShapes.begin(); it != virtualTeethShapes.end(); ++it, ++i)
 	{
 		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision
 			= std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
@@ -307,11 +308,9 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 		sceneElement->addComponent(virtualToothMesh);
 		recievesPhysicsPose.push_back(virtualToothMesh);
-
-		i++;
 	}
 
-	staplerBehavior->setVirtualStaple(virtualTeeth[0], virtualTeeth[1]);
+	staplerBehavior->setVirtualStaple(virtualTeeth);
 
 	for (auto it = recievesPhysicsPose.begin(); it != recievesPhysicsPose.end(); ++it)
 	{
@@ -418,14 +417,6 @@ int main(int argc, char* argv[])
 							  true,											   // Display point cloud
 							  armPose);										   // Pose of wound on arm
 
-	// Enable arm and wound to be stapled by the stapler.
-	std::shared_ptr<StaplerBehavior> staplerBehavior =
-		std::dynamic_pointer_cast<StaplerBehavior>(staplerSceneElement->getComponent("Behavior"));
-	if (staplerBehavior != nullptr)
-	{
-		staplerBehavior->enableStaplingForSceneElement("armSceneElement");
-	}
-
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
 	keyboardComponent->setDeviceName("Keyboard"); // Name of device is case sensitive.
 	std::shared_ptr<KeyboardTogglesGraphicsBehavior> keyboardBehavior =
@@ -453,7 +444,7 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(view);
 	scene->addSceneElement(armSceneElement);
 	scene->addSceneElement(staplerSceneElement);
-	scene->addSceneElement(woundSceneElement);
+	//scene->addSceneElement(woundSceneElement);
 	scene->addSceneElement(sceneElement);
 
 	runtime->execute();

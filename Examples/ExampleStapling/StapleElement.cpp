@@ -40,7 +40,7 @@ using SurgSim::Physics::RigidRepresentationParameters;
 StapleElement::StapleElement(const std::string& name) :
 	SurgSim::Framework::SceneElement(name),
 	m_physicsRepresentation(nullptr),
-	m_isBilateral3DConstrained(false)
+	m_hasCollisionRepresentation(false)
 {
 }
 
@@ -53,14 +53,14 @@ void StapleElement::setPose(const RigidTransform3d& pose)
 	m_pose = pose;
 }
 
-const std::shared_ptr<SurgSim::Physics::RigidRepresentation> StapleElement::getPhysicsRepresentation()
+const std::shared_ptr<SurgSim::Physics::RigidRepresentation> StapleElement::getPhysicsRepresentation2()
 {
 	return m_physicsRepresentation;
 }
 
-void StapleElement::setIsBilateral3DConstrained(bool flag)
+void StapleElement::setHasCollisionRepresentation(bool flag)
 {
-	m_isBilateral3DConstrained = flag;
+	m_hasCollisionRepresentation = flag;
 }
 
 bool StapleElement::doInitialize()
@@ -101,17 +101,13 @@ bool StapleElement::doInitialize()
 	addComponent(graphicsRepresentation);
 	addComponent(transferPose);
 
-	if (!m_isBilateral3DConstrained)
+	if (m_hasCollisionRepresentation)
 	{
 		std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 			std::make_shared<RigidCollisionRepresentation>("Collision");
 		m_physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 		addComponent(collisionRepresentation);
-	}
-	else
-	{
-		m_physicsRepresentation->setIsGravityEnabled(false);
 	}
 
 	return true;

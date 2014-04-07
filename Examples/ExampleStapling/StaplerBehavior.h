@@ -73,10 +73,8 @@ public:
 	virtual int getTargetManagerType() const override;
 
 	/// Sets the virtual teeth for the virtual staple
-	/// \param virtualTooth1 collision representation for the virtual staple tooth
-	/// \param virtualTooth2 collision representation for the virtual staple tooth
-	void setVirtualStaple(std::shared_ptr<SurgSim::Collision::Representation> virtualTooth1,
-						  std::shared_ptr<SurgSim::Collision::Representation> virtualTooth2);
+	/// \param virtualTeeth Array of collision representations for the virtual staple teeth.
+	void setVirtualStaple(const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& virtualTeeth);
 
 	/// Add a scene element (name) for which stapling is enabled within this behaviour.
 	/// \param sceneElementName The name of the scene element that this behaviour can staple.
@@ -94,6 +92,11 @@ protected:
 	virtual bool doWakeUp() override;
 
 private:
+	/// Function to create the staple element.
+	/// \note This function also checks for collision with stapling enabled objects in the scene to create
+	/// bilateral constraint between the staple element and the object.
+	void createStaple();
+
 	/// Input component from which to get the pose.
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
 
@@ -102,6 +105,12 @@ private:
 
 	/// The number of staples added
 	int m_numElements;
+
+	/// The NamedData index for the button1.
+	int m_button1Index;
+
+	/// Flag for caching the the NamedData button1Index.
+	bool m_button1IndexCached;
 
 	/// Used to record if a button was previously pressed
 	bool m_buttonPreviouslyPressed;
