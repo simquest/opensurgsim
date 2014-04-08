@@ -44,8 +44,8 @@ class DivisbleCubeRepresentation : public Fem3DRepresentation
 {
 public:
 	/// Constructor
-	/// \param name	The name of the truth cube representation.
-	/// \param corners The 8 corners of the truth cube
+	/// \param name	The name of the divisible cube representation.
+	/// \param corners The 8 corners of the divisible cube
 	DivisbleCubeRepresentation(const std::string& name, unsigned int nodesPerAxis)
 		: Fem3DRepresentation(name), m_numNodesPerAxis(nodesPerAxis)
 	{
@@ -81,7 +81,7 @@ protected:
 		return m_numNodesPerAxis * m_numNodesPerAxis * i + m_numNodesPerAxis * j + k;
 	}
 
-	/// Fills up a given deformable state with the truth cube nodes
+	/// Fills up a given deformable state with the cube's nodes
 	/// border nodes and internal nodes (i.e. the beads)
 	/// \param[in,out] state	The deformable state to be filled up
 	void fillUpDeformableState(std::shared_ptr<DeformableRepresentationState> state)
@@ -170,7 +170,7 @@ private:
 	// Number of point per dimensions
 	unsigned int m_numNodesPerAxis;
 
-	// Nodes of the original truth cube
+	// Corner nodes of the original cube
 	std::array<SurgSim::Math::Vector3d, 8> m_cubeNodes;
 };
 
