@@ -440,7 +440,7 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(view);
 	scene->addSceneElement(armSceneElement);
 	scene->addSceneElement(staplerSceneElement);
-	//scene->addSceneElement(woundSceneElement);
+	scene->addSceneElement(woundSceneElement);
 	scene->addSceneElement(sceneElement);
 
 	runtime->execute();
