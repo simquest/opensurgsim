@@ -137,6 +137,14 @@ void DeformableCollisionRepresentation::setDeformableRepresentation(
 	m_deformable = representation;
 }
 
+const std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase>
+	DeformableCollisionRepresentation::getDeformableRepresentation() const
+{
+	SURGSIM_ASSERT(m_deformable.expired())
+		<< "Cannot get the deformable representation because it was not initialized.";
+	return m_deformable.lock();
+}
+
 }
 }
 
