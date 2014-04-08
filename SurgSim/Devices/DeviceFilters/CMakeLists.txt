@@ -23,10 +23,12 @@ include_directories(
 )
 
 set(DEVICE_FILTERS_SOURCES
+	ForceScale.cpp
 	PoseTransform.cpp
 )
 
 set(DEVICE_FILTERS_HEADERS
+	ForceScale.h
 	PoseTransform.h
 )
 
