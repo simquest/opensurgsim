@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_TESTING_PHYSICSMANAGER_H
-#define SURGSIM_TESTING_PHYSICSMANAGER_H
+#ifndef SURGSIM_TESTING_MOCKPHYSICSMANAGER_H
+#define SURGSIM_TESTING_MOCKPHYSICSMANAGER_H
 
 #include "SurgSim/Physics/PhysicsManager.h"
 
@@ -23,7 +23,8 @@ namespace SurgSim
 namespace Testing
 {
 
-class PhysicsManager : public SurgSim::Physics::PhysicsManager
+/// Testing class used to publicly expose PhysicsManager's protected member functions
+class MockPhysicsManager : public SurgSim::Physics::PhysicsManager
 {
 public:
 	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override
@@ -55,4 +56,4 @@ public:
 } // namespace Physics
 } // namespace SurgSim
 
-#endif // SURGSIM_TESTING_PHYSICSMANAGER_H
+#endif // SURGSIM_TESTING_MOCKPHYSICSMANAGER_H

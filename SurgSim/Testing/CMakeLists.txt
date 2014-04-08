@@ -26,8 +26,8 @@ set(SURGSIM_TESTING_SOURCES
 )
 
 set(SURGSIM_TESTING_HEADERS
-	PhysicsManager.h
 	MathUtilities.h
+	MockPhysicsManager.h
 	TestCube.h
 )
 
