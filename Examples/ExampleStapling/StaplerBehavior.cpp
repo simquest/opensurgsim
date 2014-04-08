@@ -26,7 +26,10 @@
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
+#include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
@@ -34,6 +37,7 @@
 using SurgSim::Physics::ConstraintImplementation;
 using SurgSim::Physics::FixedRepresentationBilateral3D;
 using SurgSim::Physics::RigidRepresentationBilateral3D;
+using SurgSim::Physics::Fem3DRepresentationBilateral3D;
 using SurgSim::Physics::Localization;
 
 StaplerBehavior::StaplerBehavior(const std::string& name):
@@ -96,16 +100,30 @@ static void filterCollisionMapForStapleEnabledRepresentations(
 static std::shared_ptr<SurgSim::Physics::Representation> findCorrespondingPhysicsRepresentation(
 	std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation)
 {
+	std::shared_ptr<SurgSim::Physics::Representation> physicsRepresentation = nullptr;
+
 	// Check if the collisionRepresenation is for a Rigid body.
 	std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> rigidCollisionRepresentation =
 		std::dynamic_pointer_cast<SurgSim::Physics::RigidCollisionRepresentation>(collisionRepresentation);
 
 	if (rigidCollisionRepresentation != nullptr)
 	{
-		return rigidCollisionRepresentation->getRigidRepresentation();
+		physicsRepresentation = rigidCollisionRepresentation->getRigidRepresentation();
 	}
 
-	return nullptr;
+	if (physicsRepresentation == nullptr)
+	{
+		// Check if the collisionRepresenation is for a deformable body.
+		std::shared_ptr<SurgSim::Physics::DeformableCollisionRepresentation> deformableCollisionRepresentation =
+			std::dynamic_pointer_cast<SurgSim::Physics::DeformableCollisionRepresentation>(collisionRepresentation);
+
+		if (deformableCollisionRepresentation != nullptr)
+		{
+			physicsRepresentation = deformableCollisionRepresentation->getDeformableRepresentation();
+		}
+	}
+
+	return physicsRepresentation;
 }
 
 static void filterCollisionMapForSupportedRepresentationTypes(
@@ -145,27 +163,40 @@ static std::shared_ptr<SurgSim::Physics::Constraint> createBilateral3DConstraint
 		= otherRep->createLocalization(contraintLocation);
 	otherRepLocatization->setRepresentation(otherRep);
 
+	std::shared_ptr<SurgSim::Physics::Constraint> constraint = nullptr;
+
 	// Create the Constraint with appropriate constraint implementation.
 	switch (otherRep->getType())
 	{
 	case SurgSim::Physics::REPRESENTATION_TYPE_FIXED:
-		return std::make_shared<SurgSim::Physics::Constraint>(
-				std::make_shared<SurgSim::Physics::ConstraintData>(),
-				std::make_shared<RigidRepresentationBilateral3D>(),
-				stapleRepLocalization,
-				std::make_shared<FixedRepresentationBilateral3D>(),
-				otherRepLocatization);
+		constraint = std::make_shared<SurgSim::Physics::Constraint>(
+						std::make_shared<SurgSim::Physics::ConstraintData>(),
+						std::make_shared<RigidRepresentationBilateral3D>(),
+						stapleRepLocalization,
+						std::make_shared<FixedRepresentationBilateral3D>(),
+						otherRepLocatization);
+		break;
 
 	case SurgSim::Physics::REPRESENTATION_TYPE_RIGID:
-		return std::make_shared<SurgSim::Physics::Constraint>(
-				std::make_shared<SurgSim::Physics::ConstraintData>(),
-				std::make_shared<RigidRepresentationBilateral3D>(),
-				stapleRepLocalization,
-				std::make_shared<RigidRepresentationBilateral3D>(),
-				otherRepLocatization);
+		constraint = std::make_shared<SurgSim::Physics::Constraint>(
+						std::make_shared<SurgSim::Physics::ConstraintData>(),
+						std::make_shared<RigidRepresentationBilateral3D>(),
+						stapleRepLocalization,
+						std::make_shared<RigidRepresentationBilateral3D>(),
+						otherRepLocatization);
+		break;
+
+	case SurgSim::Physics::REPRESENTATION_TYPE_FEM3D:
+		constraint = std::make_shared<SurgSim::Physics::Constraint>(
+						std::make_shared<SurgSim::Physics::ConstraintData>(),
+						std::make_shared<RigidRepresentationBilateral3D>(),
+						stapleRepLocalization,
+						std::make_shared<Fem3DRepresentationBilateral3D>(),
+						otherRepLocatization);
+		break;
 	}
 
-	return nullptr;
+	return constraint;
 }
 
 void StaplerBehavior::createStaple()
