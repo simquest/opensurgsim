@@ -18,6 +18,7 @@ include_directories (
 )
 
 set(UNIT_TEST_SOURCES
+	BufferedValueTests.cpp
 	DataGroupTests.cpp
 	IndexDirectoryTests.cpp
 	MeshElementTest.cpp
