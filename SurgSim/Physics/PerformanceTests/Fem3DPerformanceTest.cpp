@@ -33,6 +33,15 @@ namespace
 {
 static const double dt = 0.001;
 static const int frameCount = 100;
+
+static const char* IntegrationSchemeNames[] = { 
+	"INTEGRATIONSCHEME_EXPLICIT_EULER",
+	"INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER",
+	"INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER",
+	"INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER",
+	"INTEGRATIONSCHEME_IMPLICIT_EULER",
+	"INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER"
+};
 }
 
 namespace SurgSim
@@ -174,7 +183,7 @@ private:
 	std::array<SurgSim::Math::Vector3d, 8> m_cubeNodes;
 };
 
-class Fem3DPerformanceTest : public ::testing::Test
+class Fem3DPerformanceTestBase : public ::testing::Test
 {
 public:
 	virtual void SetUp()
@@ -214,125 +223,64 @@ protected:
 	std::shared_ptr<SurgSim::Testing::MockPhysicsManager> m_physicsManager;
 };
 
-TEST_F(Fem3DPerformanceTest, WoundTest)
+class IntegrationSchemeParamTest : public Fem3DPerformanceTestBase,
+								   public ::testing::WithParamInterface<SurgSim::Math::IntegrationScheme>
 {
+};
+
+class IntegrationSchemeAndCountParamTest
+	: public Fem3DPerformanceTestBase,
+	  public ::testing::WithParamInterface<std::tuple<SurgSim::Math::IntegrationScheme, int> >
+{
+};
+
+TEST_P(IntegrationSchemeParamTest, WoundTest)
+{
+	SurgSim::Math::IntegrationScheme integrationScheme = GetParam();
+	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
+
 	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("wound");
 	fem->setFilename("Data/Fem3DPerformanceTest/wound_deformable.ply");
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
+	fem->setIntegrationScheme(integrationScheme);
 
 	initializeRepresentation(fem);
 	performTimingTest();
 }
 
-TEST_F(Fem3DPerformanceTest, Cube2Test)
+TEST_P(IntegrationSchemeAndCountParamTest, CubeTest)
 {
-	static const int numCubes = 2;
+	int numCubes;
+	SurgSim::Math::IntegrationScheme integrationScheme;
+	std::tie(integrationScheme, numCubes) = GetParam();
+	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
+	RecordProperty("CubeDivisions", boost::to_string(numCubes));
+
 	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
+	fem->setIntegrationScheme(integrationScheme);
 
 	initializeRepresentation(fem);
 	performTimingTest();
 }
 
-TEST_F(Fem3DPerformanceTest, Cube3Test)
-{
-	static const int numCubes = 3;
-	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
+INSTANTIATE_TEST_CASE_P(Fem3DPerformanceTest,
+						IntegrationSchemeParamTest,
+						::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER,
+										  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER,
+										  SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER,
+										  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER,
+										  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER,
+										  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
 
-	initializeRepresentation(fem);
-	performTimingTest();
-}
-
-TEST_F(Fem3DPerformanceTest, Cube4Test)
-{
-	static const int numCubes = 4;
-	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-
-	initializeRepresentation(fem);
-	performTimingTest();
-}
-
-TEST_F(Fem3DPerformanceTest, Cube5Test)
-{
-	static const int numCubes = 5;
-	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-
-	initializeRepresentation(fem);
-	performTimingTest();
-}
-
-TEST_F(Fem3DPerformanceTest, Cube6Test)
-{
-	static const int numCubes = 6;
-	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-
-	initializeRepresentation(fem);
-	performTimingTest();
-}
-
-TEST_F(Fem3DPerformanceTest, Cube7Test)
-{
-	static const int numCubes = 7;
-	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-
-	initializeRepresentation(fem);
-	performTimingTest();
-}
-
-TEST_F(Fem3DPerformanceTest, Cube8Test)
-{
-	static const int numCubes = 8;
-	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-
-	initializeRepresentation(fem);
-	performTimingTest();
-}
-
-TEST_F(Fem3DPerformanceTest, Cube9Test)
-{
-	static const int numCubes = 9;
-	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-
-	initializeRepresentation(fem);
-	performTimingTest();
-}
-
-TEST_F(Fem3DPerformanceTest, Cube10Test)
-{
-	static const int numCubes = 10;
-	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-
-	initializeRepresentation(fem);
-	performTimingTest();
-}
-
-TEST_F(Fem3DPerformanceTest, Cube11Test)
-{
-	static const int numCubes = 11;
-	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-
-	initializeRepresentation(fem);
-	performTimingTest();
-}
-
-TEST_F(Fem3DPerformanceTest, Cube12Test)
-{
-	static const int numCubes = 12;
-	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
-	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-
-	initializeRepresentation(fem);
-	performTimingTest();
-}
+INSTANTIATE_TEST_CASE_P(
+	Fem3DPerformanceTest,
+	IntegrationSchemeAndCountParamTest,
+	::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER,
+										 SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER,
+										 SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER,
+										 SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER,
+										 SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER,
+										 SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER),
+					   ::testing::Values(2, 3, 4, 5, 6, 7, 8)));
 
 } // namespace Physics
 } // namespace SurgSim
