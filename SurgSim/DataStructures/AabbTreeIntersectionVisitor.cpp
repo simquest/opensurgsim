@@ -75,9 +75,9 @@ SurgSim::Math::Aabbd AabbTreeIntersectionVisitor::getAabb() const
 }
 
 
-void AabbTreeIntersectionVisitor::setAabb(SurgSim::Math::Aabbd val)
+void AabbTreeIntersectionVisitor::setAabb(const SurgSim::Math::Aabbd& aabb)
 {
-	m_aabb = val;
+	m_aabb = aabb;
 	reset();
 }
 

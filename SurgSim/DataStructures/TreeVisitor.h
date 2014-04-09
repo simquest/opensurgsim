@@ -26,17 +26,24 @@ namespace DataStructures
 class TreeNode;
 class AabbTreeNode;
 
+/// Abstract Class for visitors, this needs to be extended for other tree nodes when necessary
+/// return false from handle() to abort traversal.
 class TreeVisitor
 {
 public:
 
+	/// Destructor
 	virtual ~TreeVisitor()
 	{
 
 	}
 
+	/// Handle TreeNode basic type,
+	/// \return true To indicates that the visitor wishes to continue traversal, false if the visitor wants
+	///              to abort traversal.
 	virtual bool handle(TreeNode* node) = 0;
 
+	/// Handle AabbTreeNode basic type
 	virtual bool handle(AabbTreeNode* node)
 	{
 		return false;

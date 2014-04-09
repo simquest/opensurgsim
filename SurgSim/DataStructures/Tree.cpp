@@ -43,3 +43,13 @@ bool Tree::isEqual(const Tree& tree) const
 {
 	return *m_root == *tree.m_root;
 }
+
+void SurgSim::DataStructures::Tree::setRoot(std::shared_ptr<TreeNode> root)
+{
+	m_root = root;
+}
+
+std::shared_ptr<TreeNode> SurgSim::DataStructures::Tree::getRoot() const
+{
+	return m_root;
+}

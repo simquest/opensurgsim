@@ -26,32 +26,47 @@ namespace SurgSim
 namespace DataStructures
 {
 
+/// Visitor class to collect the items that intersect with a given bounding box
 class AabbTreeIntersectionVisitor : public TreeVisitor
 {
 public:
+
+	/// Constructor
 	AabbTreeIntersectionVisitor();
 
+	/// Constructor
+	/// \param aabb the bounding box to be used.
 	explicit AabbTreeIntersectionVisitor(const SurgSim::Math::Aabbd& aabb);
 
+	/// Destructor
 	virtual ~AabbTreeIntersectionVisitor();
 
 	virtual bool handle(TreeNode* node) override;
 
 	virtual bool handle(AabbTreeNode* node) override;
 
+	/// \return true if the visitor has found intersections
 	bool hasIntersections();
 
+	/// Resets the data in the tree
 	void reset();
 
+	/// \return the bounding box to be used for the test.
 	SurgSim::Math::Aabbd getAabb() const;
 
-	void setAabb(SurgSim::Math::Aabbd val);
+	/// Sets a new bounding box, will also call reset()
+	/// \param aabb The new bounding box.
+	void setAabb(const SurgSim::Math::Aabbd& aabb);
 
+	/// \return a reference to the found intersections.
 	const std::list<size_t>& getIntersections() const;
 
 private:
 
+	/// List of objects found for intersections
 	std::list<size_t> m_intersections;
+
+	/// Bounding box used for intersection test
 	SurgSim::Math::Aabbd m_aabb;
 };
 

@@ -29,8 +29,10 @@ namespace DataStructures
 class TreeData
 {
 public:
+
 	/// Constructor
 	TreeData();
+
 	/// Destructor
 	virtual ~TreeData();
 
@@ -45,6 +47,7 @@ public:
 	bool operator!=(const TreeData& data) const;
 
 private:
+
 	/// Returns true if the trees are equal; otherwise, returns false.
 	/// Implement this method in derived classes to do the comparison.
 	virtual bool isEqual(const TreeData* data) const = 0;

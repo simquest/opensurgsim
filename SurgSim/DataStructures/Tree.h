@@ -34,19 +34,16 @@ class Tree
 public:
 	/// Constructor. After construction, the root is null.
 	Tree();
+
 	/// Destructor
 	virtual ~Tree();
 
 	/// Sets the root of the tree.
-	void setRoot(std::shared_ptr<TreeNode> root)
-	{
-		m_root = root;
-	}
-	/// Gets the root of the tree.
-	std::shared_ptr<TreeNode> getRoot() const
-	{
-		return m_root;
-	}
+	/// \param root The new root of the tree.
+	void setRoot(std::shared_ptr<TreeNode> root);
+
+	/// \return The root of the tree.
+	std::shared_ptr<TreeNode> getRoot() const;
 
 	/// Returns true if the trees are equal; otherwise, returns false.
 	/// If the trees are not of the same type, returns false;
