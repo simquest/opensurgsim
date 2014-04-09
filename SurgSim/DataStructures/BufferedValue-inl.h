@@ -105,4 +105,98 @@ const T* BufferedValue<T>::getPrivateValue() const
 	return &m_values.first;
 }
 
+template <class T>
+SafeReadAccessor<T>::SafeReadAccessor(std::shared_ptr<BufferedValue<T>> value) :
+	BaseAccessor<T>(value)
+{
+	m_value->getValue(&m_localData, &m_generation);
+}
+
+template <class T>
+const T* SafeReadAccessor<T>::updateIfNew(bool* didUpdate)
+{
+	SURGSIM_ASSERT(didUpdate != nullptr) << "nullptr passed.";
+	*didUpdate = m_value->getValueIfNew(&m_localData, &m_generation);
+	return &m_localData;
+}
+
+template <class T>
+bool SafeReadAccessor<T>::isStale() const
+{
+	return m_value->hasNewValue(m_generation);
+}
+
+template <class T>
+const T* SafeReadAccessor<T>::operator->()
+{
+	m_value->getValueIfNew(&m_localData, &m_generation);
+	return &m_localData;
+}
+
+template <class T>
+const T& SafeReadAccessor<T>::operator*()
+{
+	m_value->getValueIfNew(&m_localData, &m_generation);
+	return m_localData;
+}
+
+template <class T>
+ReadAccessor<T>::ReadAccessor(std::shared_ptr<BufferedValue<T>> value) :
+	BaseAccessor<T>(value),
+	m_directPointer(value->getPrivateValue())
+{
+
+}
+
+template <class T>
+const T* ReadAccessor<T>::operator->() const
+{
+	return m_directPointer;
+}
+
+template <class T>
+const T& ReadAccessor<T>::operator*() const
+{
+	return *m_directPointer;
+}
+
+
+template <class T>
+ReadWriteAccessor<T>::ReadWriteAccessor(std::shared_ptr<BufferedValue<T>> value) :
+	BaseAccessor<T>(value),
+	m_directPointer(value->acquireWriteBuffer(boost::this_thread::get_id()))
+{
+
+}
+
+template <class T>
+ReadWriteAccessor<T>::~ReadWriteAccessor()
+{
+	m_value->releaseWriteBuffer();
+}
+
+template <class T>
+void ReadWriteAccessor<T>::publish()
+{
+	m_value->publish();
+}
+
+template <class T>
+T* ReadWriteAccessor<T>::get()
+{
+	return m_directPointer;
+}
+
+template <class T>
+T* ReadWriteAccessor<T>::operator->()
+{
+	return m_directPointer;
+}
+
+template <class T>
+T& ReadWriteAccessor<T>::operator*()
+{
+	return *m_directPointer;
+}
+
 #endif

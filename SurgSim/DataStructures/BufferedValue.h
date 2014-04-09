@@ -27,8 +27,8 @@ namespace DataStructures
 {
 
 template <class T> class ReadWriteAccessor;
-template <class T> class SafeAccessor;
-template <class T> class UnsafeAccessor;
+template <class T> class SafeReadAccessor;
+template <class T> class ReadAccessor;
 
 /// BufferedValue is a class to enable a representation of two values for one variable, where both values need to be
 /// accessible at the same time, one in a thread safe, single threaded context, the other in a thread unsafe context.
@@ -52,8 +52,8 @@ public:
 	typedef T Type;
 
 	friend class ReadWriteAccessor<T>;
-	friend class SafeAccessor<T>;
-	friend class UnsafeAccessor<T>;
+	friend class SafeReadAccessor<T>;
+	friend class ReadAccessor<T>;
 
 	/// Destructor
 	~BufferedValue() {};
@@ -138,17 +138,13 @@ protected:
 /// This is the threadsafe accessor, it only provides read access via copying the data
 /// use *accessor, and accessor->xxx for access
 template <class T>
-class SafeAccessor : public BaseAccessor<T>
+class SafeReadAccessor : public BaseAccessor<T>
 {
 public:
 
 	/// Constructor
 	/// \param value The value to be used.
-	explicit SafeAccessor(std::shared_ptr<BufferedValue<T>> value) :
-		BaseAccessor<T>(value)
-	{
-		m_value->getValue(&m_localData, &m_generation);
-	}
+	explicit SafeReadAccessor(std::shared_ptr<BufferedValue<T>> value);
 
 	/// Explicit version of the -> operator function, update the the value if the generation counts do not match
 	/// additionally return wether an update has been executed, if you need to know wether there was an update
@@ -156,35 +152,19 @@ public:
 	/// involved.
 	/// \param [out] didUpdate Address of bool for writing the result, can't be nullptr
 	/// \return pointer to const data.
-	const T* updateIfNew(bool* didUpdate)
-	{
-		SURGSIM_ASSERT(didUpdate != nullptr) << "nullptr passed.";
-		*didUpdate = m_value->getValueIfNew(&m_localData, &m_generation);
-		return &m_localData;
-	}
+	const T* updateIfNew(bool* didUpdate);
 
 	/// Check whether the data on the other side has been updated
 	/// \return true if the generation counts are not equal.
-	bool isStale() const
-	{
-		return m_value->hasNewValue(m_generation);
-	}
+	bool isStale() const;
 
 	/// Overloaded operator for easier access
 	/// \return pointer to const data.
-	const T* operator->()
-	{
-		m_value->getValueIfNew(&m_localData, &m_generation);
-		return &m_localData;
-	}
+	const T* operator->();
 
 	/// Overloaded operator for easier access
 	/// \return reference to const data.
-	const T& operator*()
-	{
-		m_value->getValueIfNew(&m_localData, &m_generation);
-		return m_localData;
-	}
+	const T& operator*();
 
 private:
 
@@ -198,29 +178,18 @@ private:
 /// const access to it,
 /// use *accessor, and accessor->xxx for access
 template <class T>
-class UnsafeAccessor : public BaseAccessor<T>
+class ReadAccessor : public BaseAccessor<T>
 {
 public:
-	UnsafeAccessor(std::shared_ptr<BufferedValue<T>> value) :
-		BaseAccessor<T>(value),
-		m_directPointer(value->getPrivateValue())
-	{
-
-	}
+	ReadAccessor(std::shared_ptr<BufferedValue<T>> value);
 
 	/// Overloaded operator for easier access
 	/// \return internal pointer to const data.
-	const T* operator->() const
-	{
-		return m_directPointer;
-	}
+	const T* operator->() const;
 
 	/// Overloaded operator for easier access
 	/// \return reference to const data of internal side.
-	const T& operator*() const
-	{
-		return *m_directPointer;
-	}
+	const T& operator*() const;
 
 private:
 
@@ -242,43 +211,24 @@ public:
 
 	/// Constructor
 	/// \param value Pointer to BufferedValue
-	explicit ReadWriteAccessor(std::shared_ptr<BufferedValue<T>> value) :
-		BaseAccessor<T>(value),
-		m_directPointer(value->acquireWriteBuffer(boost::this_thread::get_id()))
-	{
-	}
+	explicit ReadWriteAccessor(std::shared_ptr<BufferedValue<T>> value);
 
 	/// Destructor
-	~ReadWriteAccessor()
-	{
-		m_value->releaseWriteBuffer();
-	}
+	~ReadWriteAccessor();
 
 	/// Make the internal value available to the outside
-	void publish()
-	{
-		m_value->publish();
-	}
+	void publish();
 
 	/// \return The actual address of the data on the private side.
-	T* get()
-	{
-		return m_directPointer;
-	}
+	T* get();
 
 	/// Overloaded operator for easier access.
 	/// \return The actual address of the data on the private side.
-	T* operator->()
-	{
-		return m_directPointer;
-	}
+	T* operator->();
 
 	/// Overloaded operator for easier access.
 	/// \return The a reference to the data on the private side.
-	T& operator*()
-	{
-		return *m_directPointer;
-	}
+	T& operator*();
 
 private:
 

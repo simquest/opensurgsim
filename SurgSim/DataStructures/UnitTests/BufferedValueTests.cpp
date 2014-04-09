@@ -130,8 +130,8 @@ TEST(BufferedValueTests, ReadAccessorTest)
 {
 	auto buffer = std::make_shared<BufferedValue<int>>(10);
 	ReadWriteAccessor<int> readWriteValue(buffer);
-	UnsafeAccessor<int> unsafeValue(buffer);
-	SafeAccessor<int> safeValue(buffer);
+	ReadAccessor<int> unsafeValue(buffer);
+	SafeReadAccessor<int> safeValue(buffer);
 
 	EXPECT_EQ(10, *unsafeValue);
 	EXPECT_EQ(10, *safeValue);
