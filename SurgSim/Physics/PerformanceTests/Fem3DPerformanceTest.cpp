@@ -93,7 +93,7 @@ public:
 	}
 
 protected:
-	/// Convert an node index from a 3d indexing to a 1d indexing
+	/// Convert a node index from a 3d indexing to a 1d indexing
 	/// \param i, j, k Indices along the X, Y and Z axis
 	/// \return Unique index of the corresponding point (to access a linear array for example)
 	size_t get1DIndexFrom3D(size_t i, size_t j, size_t k)
@@ -101,8 +101,7 @@ protected:
 		return m_numNodesPerAxis * m_numNodesPerAxis * i + m_numNodesPerAxis * j + k;
 	}
 
-	/// Fills up a given deformable state with the cube's nodes
-	/// border nodes and internal nodes (i.e. the beads)
+	/// Fills up a given deformable state with the cube's nodes, border nodes, and internal nodes
 	/// \param[in,out] state	The deformable state to be filled up
 	void fillUpDeformableState(std::shared_ptr<DeformableRepresentationState> state)
 	{
