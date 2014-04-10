@@ -35,9 +35,9 @@ namespace
 static const double dt = 0.001;
 static const int frameCount = 100;
 
-static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string> getIntegrationSchemeNames()
+static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::hash<int>> getIntegrationSchemeNames()
 {
-	std::unordered_map<SurgSim::Math::IntegrationScheme, std::string> result;
+	std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::hash<int>> result;
 
 #define FEM3DPERFORMANCETEST_MAP_NAME(map, name) (map)[name] = #name
 	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
@@ -51,7 +51,7 @@ static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string> getInte
 	return result;
 }
 
-static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string> IntegrationSchemeNames
+static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::hash<int>> IntegrationSchemeNames
 	= getIntegrationSchemeNames();
 }
 
