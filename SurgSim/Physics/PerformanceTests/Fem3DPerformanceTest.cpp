@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include <unordered_map>
 #include <memory>
 
 #include "SurgSim/DataStructures/PlyReader.h"
@@ -34,14 +35,24 @@ namespace
 static const double dt = 0.001;
 static const int frameCount = 100;
 
-static const char* IntegrationSchemeNames[] = { 
-	"INTEGRATIONSCHEME_EXPLICIT_EULER",
-	"INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER",
-	"INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER",
-	"INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER",
-	"INTEGRATIONSCHEME_IMPLICIT_EULER",
-	"INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER"
-};
+static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string> getIntegrationSchemeNames()
+{
+	std::unordered_map<SurgSim::Math::IntegrationScheme, std::string> result;
+
+#define FEM3DPERFORMANCETEST_MAP_NAME(map, name) (map)[name] = #name
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER);
+#undef FEM3DPERFORMANCETEST_MAP_NAME
+
+	return result;
+}
+
+static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string> IntegrationSchemeNames
+	= getIntegrationSchemeNames();
 }
 
 namespace SurgSim
