@@ -223,11 +223,6 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	inputCoupler->setInput(inputComponent);
 	inputCoupler->setOutput(outputComponent);
 	inputCoupler->setRepresentation(physicsRepresentation);
-	inputCoupler->setLinearStiffness(params.getMass() * 1000);
-	inputCoupler->setLinearDamping(params.getMass() * 25);
-	inputCoupler->setAngularStiffness(params.getMass() * 250);
-	inputCoupler->setAngularDamping(params.getMass() * 10);
-	inputCoupler->setOutputForceScaling(1.0);
 
 	// The SceneElement
 	std::shared_ptr<BasicSceneElement> boxElement = std::make_shared<BasicSceneElement>(name);

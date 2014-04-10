@@ -28,6 +28,8 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 )
 
 set(SURGSIM_DATA_STRUCTURES_HEADERS
+	BufferedValue.h
+	BufferedValue-inl.h
 	DataGroup.h
 	DataGroup-inl.h
 	DataGroupBuilder.h

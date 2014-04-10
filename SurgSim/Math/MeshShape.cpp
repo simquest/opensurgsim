@@ -15,11 +15,22 @@
 //
 
 #include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::MeshShape);
+}
 
 namespace SurgSim
 {
 namespace Math
 {
+
+MeshShape::MeshShape()
+{
+}
 
 int MeshShape::getType()
 {
@@ -33,16 +44,31 @@ std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh()
 
 double MeshShape::getVolume() const
 {
+	if (nullptr == m_mesh)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No mesh set for MeshShape, so it cannot compute volume.";
+	}
 	return m_volume;
 }
 
 SurgSim::Math::Vector3d MeshShape::getCenter() const
 {
+	if (nullptr == m_mesh)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No mesh set for MeshShape, so it cannot compute center.";
+	}
 	return m_center;
 }
 
 SurgSim::Math::Matrix33d MeshShape::getSecondMomentOfVolume() const
 {
+	if (nullptr == m_mesh)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No mesh set for MeshShape, so it cannot compute SecondMomentOfVolume.";
+	}
 	return m_secondMomentOfVolume;
 }
 
@@ -131,12 +157,6 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(0, 2) = -(integral[9] - m_volume * m_center.z() * m_center.x());
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
-
-std::string MeshShape::getClassName()
-{
-	return std::string("SurgSim::Math::MeshShape");
-}
-
 
 }; // namespace Math
 }; // namespace SurgSim

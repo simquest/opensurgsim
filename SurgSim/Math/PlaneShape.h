@@ -16,6 +16,7 @@
 #ifndef SURGSIM_MATH_PLANESHAPE_H
 #define SURGSIM_MATH_PLANESHAPE_H
 
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -37,6 +38,8 @@ public:
 
 	/// Constructor: No members to initialize.
 	PlaneShape();
+
+	SURGSIM_CLASSNAME(SurgSim::Math::PlaneShape);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -61,9 +64,6 @@ public:
 	/// Gets the normal of the plane equation.
 	/// \return	The value of the normal (always Y axis).
 	Vector3d getNormal() const;
-
-	/// Serialize declarations of the plane
-	OSS_SERIALIZE(SurgSim::Math::PlaneShape);
 };
 
 }; // Math

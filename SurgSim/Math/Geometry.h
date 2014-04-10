@@ -1605,7 +1605,6 @@ bool calculateContactTriangleTriangle(
 	for (unsigned int A = 0, B = 1; A < 2; ++A, --B)
 	{
 		Eigen::Matrix<T, 3, 1, MOpt> vUnder[2];
-		Eigen::Matrix<T, 3, 1, MOpt> vUnderBary[2];
 		Eigen::Matrix<T, 3, 1, MOpt> vUnderOnPlaneB[2];
 		Eigen::Matrix<T, 3, 1, MOpt> vUnderOnPlaneBBary[2];
 		bool vUnderInsideB[2] = {false, false};
@@ -1617,9 +1616,7 @@ bool calculateContactTriangleTriangle(
 		bool vOnInsideB[2] = {false, false};
 		int iOn = 0;
 		T parametricPointOnProjectedEdge[2] = {T(1), T(1)};
-		T segmentIntersectionParam[2] = {T(0), T(0)};
 		Eigen::Matrix<T, 3, 1, MOpt> segmentSegmentIntersection[2];
-		T temp = T(0);
 
 		bool underPlaneEdgeIntersectsB = false;
 
