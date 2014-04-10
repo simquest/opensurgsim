@@ -66,7 +66,7 @@ public:
 	/// Constructor
 	/// \param name	The name of the divisible cube representation.
 	/// \param corners The 8 corners of the divisible cube
-	DivisbleCubeRepresentation(const std::string& name, unsigned int nodesPerAxis)
+	DivisbleCubeRepresentation(const std::string& name, size_t nodesPerAxis)
 		: Fem3DRepresentation(name), m_numNodesPerAxis(nodesPerAxis)
 	{
 		// Compute the center point of the cube
@@ -96,7 +96,7 @@ protected:
 	/// Convert an node index from a 3d indexing to a 1d indexing
 	/// \param i, j, k Indices along the X, Y and Z axis
 	/// \return Unique index of the corresponding point (to access a linear array for example)
-	unsigned int get1DIndexFrom3D(unsigned int i, unsigned int j, unsigned int k)
+	size_t get1DIndexFrom3D(size_t i, size_t j, size_t k)
 	{
 		return m_numNodesPerAxis * m_numNodesPerAxis * i + m_numNodesPerAxis * j + k;
 	}
@@ -109,7 +109,7 @@ protected:
 		state->setNumDof(getNumDofPerNode(), m_numNodesPerAxis * m_numNodesPerAxis * m_numNodesPerAxis);
 		SurgSim::Math::Vector& nodePositions = state->getPositions();
 
-		for (unsigned int i = 0; i < m_numNodesPerAxis; i++)
+		for (size_t i = 0; i < m_numNodesPerAxis; i++)
 		{
 			// For a given index i, we intersect the cube with a (Y Z) plane, which defines a square on a (Y Z) plane
 			Vector3d extremitiesX0[4] = {m_cubeNodes[0], m_cubeNodes[2], m_cubeNodes[4], m_cubeNodes[6]};
@@ -117,14 +117,14 @@ protected:
 			Vector3d extremitiesXi[4];
 			double coefI = static_cast<double>(i) / (static_cast<double>(m_numNodesPerAxis) - 1.0);
 
-			for (int index = 0; index < 4; index++)
+			for (size_t index = 0; index < 4; index++)
 			{
 				extremitiesXi[index] =
 					extremitiesX0[index] * (1.0 - coefI) +
 					extremitiesX1[index] *        coefI;
 			}
 
-			for (unsigned int j = 0; j < m_numNodesPerAxis; j++)
+			for (size_t j = 0; j < m_numNodesPerAxis; j++)
 			{
 				// For a given index j, we intersect the square with a (X Z) plane, which defines a line along (Z)
 				Vector3d extremitiesY0[2] = {extremitiesXi[0], extremitiesXi[2]};
@@ -132,19 +132,20 @@ protected:
 				Vector3d extremitiesYi[2];
 				double coefJ = static_cast<double>(j) / (static_cast<double>(m_numNodesPerAxis) - 1.0);
 
-				for (int index = 0; index < 2; index++)
+				for (size_t index = 0; index < 2; index++)
 				{
 					extremitiesYi[index] =
 						extremitiesY0[index] * (1.0 - coefJ) +
 						extremitiesY1[index] *        coefJ;
 				}
 
-				for (unsigned int k = 0; k < m_numNodesPerAxis; k++)
+				for (size_t k = 0; k < m_numNodesPerAxis; k++)
 				{
 					// For a given index k, we intersect the line with a (X Y) plane, which defines a 3d point
 					double coefK = static_cast<double>(k) / (static_cast<double>(m_numNodesPerAxis) - 1.0);
 					Vector3d position3d = extremitiesYi[0] * (1.0 - coefK) + extremitiesYi[1] * coefK;
-					SurgSim::Math::setSubVector(position3d, get1DIndexFrom3D(i, j, k), 3, &nodePositions);
+					SurgSim::Math::setSubVector(
+						position3d, static_cast<unsigned int>(get1DIndexFrom3D(i, j, k)), 3, &nodePositions);
 				}
 			}
 		}
@@ -154,21 +155,21 @@ protected:
 	/// \param state	The deformable state for initialization.
 	void addFemCubes(std::shared_ptr<DeformableRepresentationState> state)
 	{
-		for (unsigned int i = 0; i < m_numNodesPerAxis - 1; i++)
+		for (size_t i = 0; i < m_numNodesPerAxis - 1; i++)
 		{
-			for (unsigned int j = 0; j < m_numNodesPerAxis - 1; j++)
+			for (size_t j = 0; j < m_numNodesPerAxis - 1; j++)
 			{
-				for (unsigned int k = 0; k < m_numNodesPerAxis - 1; k++)
+				for (size_t k = 0; k < m_numNodesPerAxis - 1; k++)
 				{
 					std::array<unsigned int, 8> cubeNodeIds;
-					cubeNodeIds[0] = get1DIndexFrom3D(i  , j  , k  );
-					cubeNodeIds[1] = get1DIndexFrom3D(i+1, j  , k  );
-					cubeNodeIds[2] = get1DIndexFrom3D(i  , j+1, k  );
-					cubeNodeIds[3] = get1DIndexFrom3D(i+1, j+1, k  );
-					cubeNodeIds[4] = get1DIndexFrom3D(i  , j  , k+1);
-					cubeNodeIds[5] = get1DIndexFrom3D(i+1, j  , k+1);
-					cubeNodeIds[6] = get1DIndexFrom3D(i  , j+1, k+1);
-					cubeNodeIds[7] = get1DIndexFrom3D(i+1, j+1, k+1);
+					cubeNodeIds[0] = static_cast<unsigned int>(get1DIndexFrom3D(i  , j  , k  ));
+					cubeNodeIds[1] = static_cast<unsigned int>(get1DIndexFrom3D(i+1, j  , k  ));
+					cubeNodeIds[2] = static_cast<unsigned int>(get1DIndexFrom3D(i  , j+1, k  ));
+					cubeNodeIds[3] = static_cast<unsigned int>(get1DIndexFrom3D(i+1, j+1, k  ));
+					cubeNodeIds[4] = static_cast<unsigned int>(get1DIndexFrom3D(i  , j  , k+1));
+					cubeNodeIds[5] = static_cast<unsigned int>(get1DIndexFrom3D(i+1, j  , k+1));
+					cubeNodeIds[6] = static_cast<unsigned int>(get1DIndexFrom3D(i  , j+1, k+1));
+					cubeNodeIds[7] = static_cast<unsigned int>(get1DIndexFrom3D(i+1, j+1, k+1));
 
 					std::array<unsigned int, 8> cube = {
 						cubeNodeIds[0], cubeNodeIds[1], cubeNodeIds[3], cubeNodeIds[2],
@@ -188,7 +189,7 @@ protected:
 
 private:
 	// Number of point per dimensions
-	unsigned int m_numNodesPerAxis;
+	size_t m_numNodesPerAxis;
 
 	// Corner nodes of the original cube
 	std::array<SurgSim::Math::Vector3d, 8> m_cubeNodes;
