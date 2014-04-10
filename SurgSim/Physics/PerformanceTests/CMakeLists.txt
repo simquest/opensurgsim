@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2013, SimQuest Solutions Inc.
+# Copyright 2012-2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,36 +13,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${gmock_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}/include
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
-set(SURGSIM_TESTING_SOURCES
-	MathUtilities.cpp
-	TestCube.cpp
-	TestingMain.cpp
+set(UNIT_TEST_SOURCES
+	Fem3DPerformanceTest.cpp
 )
 
-set(SURGSIM_TESTING_HEADERS
-	MathUtilities.h
-	MockPhysicsManager.h
-	TestCube.h
+set(UNIT_TEST_HEADERS
 )
 
-surgsim_add_library(
-	SurgSimTesting
-	"${SURGSIM_TESTING_SOURCES}"
-	"${SURGSIM_TESTING_HEADERS}"
-	"SurgSim/Testing"
+set(LIBS
+	SurgSimPhysics
 )
 
-add_subdirectory(MlcpIO)
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-if(GLUT_FOUND)
-	add_subdirectory(VisualTestCommon)
-endif(GLUT_FOUND)
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
 
+surgsim_add_unit_tests(SurgSimPhysicsPerformanceTest)
 
-set_target_properties(SurgSimTesting PROPERTIES FOLDER "Testing")
+set_target_properties(SurgSimPhysicsPerformanceTest PROPERTIES FOLDER "Physics")

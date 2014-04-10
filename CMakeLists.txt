@@ -82,6 +82,7 @@ include(CTest)
 configure_file(CTestCustom.cmake.in CTestCustom.cmake)
 
 option(BUILD_RENDER_TESTING "Build the render testing tree." OFF)
+option(BUILD_PERFORMANCE_TESTING "Build the performance testing tree." OFF)
 
 if(BUILD_TESTING)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
