@@ -23,6 +23,9 @@
 
 #include "SurgSim/Math/Shapes.h"
 
+#include "SurgSim/Math/MeshShape.h"
+
+
 using SurgSim::DataStructures::EmptyData;
 
 // CUBE
@@ -191,4 +194,25 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 		EXPECT_TRUE((boxShape.getCenter() - boxMesh.getCenter()).isZero());
 		EXPECT_TRUE(boxShape.getSecondMomentOfVolume().isApprox(boxMesh.getSecondMomentOfVolume(), 1e-8));
 	}
+}
+
+TEST_F(MeshShapeTest, SerializeTest)
+{
+	std::shared_ptr<SurgSim::Math::MeshShape> mesh = std::make_shared<SurgSim::Math::MeshShape>();
+	mesh->setFileName("MeshShapeData/staple_collision.ply");
+
+	// Encoding a mesh
+	YAML::Node node;
+	ASSERT_NO_THROW(node = mesh->encode());
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(1u, node.size());
+
+	// Decoding the mesh
+	std::shared_ptr<SurgSim::Math::MeshShape> newMesh = std::make_shared<SurgSim::Math::MeshShape>();
+	ASSERT_NO_THROW(newMesh->decode(node));
+	EXPECT_EQ("SurgSim::Math::MeshShape", newMesh->getClassName());
+	EXPECT_EQ("MeshShapeData/staple_collision.ply", newMesh->getFileName());
+	EXPECT_EQ(mesh->getMesh()->getNumVertices(), newMesh->getMesh()->getNumVertices());
+	EXPECT_EQ(mesh->getMesh()->getNumEdges(), newMesh->getMesh()->getNumEdges());
+	EXPECT_EQ(mesh->getMesh()->getNumTriangles(), newMesh->getMesh()->getNumTriangles());
 }

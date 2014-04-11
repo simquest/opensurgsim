@@ -23,6 +23,7 @@ namespace SurgSim
 {
 namespace DataStructures
 {
+class EmptyData;
 
 /// Basic class for storing Triangle Meshes, handling basic vertex, edge, and triangle functionality.
 ///
@@ -161,6 +162,12 @@ public:
 	using typename Vertices<VertexData>::VertexType;
 	using Vertices<VertexData>::addVertex;
 };
+
+
+/// A free function to load a triangle mesh base from file
+/// \param fileName	Name of the external file, from which to load the triangle mesh.
+/// \return A triangle mesh.
+std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadTriangleMesh(const std::string& fileName);
 
 };  // namespace DataStructures
 

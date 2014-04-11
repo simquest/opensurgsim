@@ -22,6 +22,7 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	DataGroupBuilder.cpp
 	IndexDirectory.cpp
 	TriangleMesh.cpp
+	TriangleMeshBase.cpp
 	ply.c
 	PlyReader.cpp
 	TriangleMeshPlyReaderDelegate.cpp

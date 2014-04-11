@@ -39,6 +39,7 @@ set(UNIT_TEST_HEADERS
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/TriangleMeshBaseTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS
 	SurgSimDataStructures
