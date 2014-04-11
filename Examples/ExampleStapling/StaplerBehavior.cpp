@@ -91,7 +91,7 @@ void StaplerBehavior::filterCollisionMapForStapleEnabledRepresentations(
 	}
 }
 
-static std::shared_ptr<SurgSim::Physics::Representation> findCorrespondingPhysicsRepresentation(
+std::shared_ptr<SurgSim::Physics::Representation> StaplerBehavior::findCorrespondingPhysicsRepresentation(
 	std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation)
 {
 	std::shared_ptr<SurgSim::Physics::Representation> physicsRepresentation = nullptr;
@@ -119,14 +119,9 @@ static std::shared_ptr<SurgSim::Physics::Representation> findCorrespondingPhysic
 	return physicsRepresentation;
 }
 
-static void filterCollisionMapForSupportedRepresentationTypes(
+void StaplerBehavior::filterCollisionMapForSupportedRepresentationTypes(
 	SurgSim::Collision::Representation::ContactMapType* collisionsMap)
 {
-	if (collisionsMap->empty())
-	{
-		return;
-	}
-
 	for (auto it = collisionsMap->begin(); it != collisionsMap->end();)
 	{
 		if (findCorrespondingPhysicsRepresentation((*it).first) == nullptr)
@@ -141,7 +136,7 @@ static void filterCollisionMapForSupportedRepresentationTypes(
 	}
 }
 
-static std::shared_ptr<SurgSim::Physics::Constraint> createBilateral3DConstraint(
+std::shared_ptr<SurgSim::Physics::Constraint> StaplerBehavior::createBilateral3DConstraint(
 	std::shared_ptr<SurgSim::Physics::Representation> stapleRep,
 	std::shared_ptr<SurgSim::Physics::Representation> otherRep,
 	SurgSim::Collision::Location contraintLocation)

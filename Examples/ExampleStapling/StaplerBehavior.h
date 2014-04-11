@@ -26,9 +26,20 @@
 
 namespace SurgSim
 {
+
 namespace Framework
 {
 class Representation;
+}
+
+namespace Physics
+{
+class Constraint;
+}
+
+namespace Collision
+{
+struct Location;
 }
 
 namespace Graphics
@@ -91,11 +102,31 @@ protected:
 private:
 	/// Given a collision map, remove entries whose representations are not part of
 	/// enabled scene element lists.
-	/// \param in out collisionsMap The collision map to be filtered.
+	/// \param [in,out] collisionsMap The collision map to be filtered.
 	void StaplerBehavior::filterCollisionMapForStapleEnabledRepresentations(
 		SurgSim::Collision::Representation::ContactMapType *collisionsMap);
 
-private:
+	/// Given a Collision::Representation, get the corresponding Physics::Representation.
+	/// \param collisionRepresentation shared_ptr to the collision representation.
+	/// \return The shared_ptr of the Physics::Representation. Can be nullptr.
+	std::shared_ptr<SurgSim::Physics::Representation> findCorrespondingPhysicsRepresentation(
+		std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation);
+
+	/// Given a collision map, remove entries whose representations are not supported to be stapled to.
+	/// \param [in,out] collisionsMap The collision map to be filtered.
+	void filterCollisionMapForSupportedRepresentationTypes(
+		SurgSim::Collision::Representation::ContactMapType* collisionsMap);
+
+	/// Create a bilateral constraint given two Physics::Representation and a constraint (global) location.
+	/// \param stapleRep The physics representation of the staple element. This is known to be RigidRepresentation.
+	/// \param otherRep The physics representaiton of the object stapled to. This could be Rigid, Fixed or Fem3D.
+	/// \param constraintLocation The global location where the constraint is created.
+	/// \return The shared_ptr of the constraint created.
+	std::shared_ptr<SurgSim::Physics::Constraint> createBilateral3DConstraint(
+		std::shared_ptr<SurgSim::Physics::Representation> stapleRep,
+		std::shared_ptr<SurgSim::Physics::Representation> otherRep,
+		SurgSim::Collision::Location contraintLocation);
+
 	/// Function to create the staple element.
 	/// \note This function also checks for collision with stapling enabled objects in the scene to create
 	/// bilateral constraint between the staple element and the object.
