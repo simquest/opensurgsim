@@ -115,3 +115,25 @@ TEST_F(SurfaceMeshShapeTest, NonAlignedDiskShapeTest)
 	EXPECT_TRUE(diskShape->getCenter().isApprox(m_center, 1e-2));
 	EXPECT_TRUE(diskShape->getSecondMomentOfVolume().isApprox(rotatedExpectedMatrix, 1e-2));
 }
+
+
+TEST_F(SurfaceMeshShapeTest, SerializeTest)
+{
+	std::shared_ptr<SurgSim::Math::SurfaceMeshShape> mesh = std::make_shared<SurgSim::Math::SurfaceMeshShape>();
+	mesh->setFileName("MeshShapeData/staple_collision.ply");
+
+	// Encoding a mesh
+	YAML::Node node;
+	ASSERT_NO_THROW(node = mesh->encode());
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(1u, node.size());
+
+	// Decoding the mesh
+	std::shared_ptr<SurgSim::Math::SurfaceMeshShape> newMesh = std::make_shared<SurgSim::Math::SurfaceMeshShape>();
+	ASSERT_NO_THROW(newMesh->decode(node));
+	EXPECT_EQ("SurgSim::Math::SurfaceMeshShape", newMesh->getClassName());
+	EXPECT_EQ("MeshShapeData/staple_collision.ply", newMesh->getFileName());
+	EXPECT_EQ(mesh->getMesh()->getNumVertices(), newMesh->getMesh()->getNumVertices());
+	EXPECT_EQ(mesh->getMesh()->getNumEdges(), newMesh->getMesh()->getNumEdges());
+	EXPECT_EQ(mesh->getMesh()->getNumTriangles(), newMesh->getMesh()->getNumTriangles());
+}
