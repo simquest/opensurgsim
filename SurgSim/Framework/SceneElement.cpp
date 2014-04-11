@@ -14,11 +14,11 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/Runtime.h"
+
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Log.h"
-
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Runtime.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -27,9 +27,9 @@ namespace SurgSim
 namespace Framework
 {
 
-SceneElement::SceneElement(const std::string& name) : m_name(name), m_isInitialized(false)
+SceneElement::SceneElement(const std::string& name) :
+	m_name(name), m_pose(SurgSim::Math::RigidTransform3d::Identity()), m_isInitialized(false)
 {
-
 }
 
 SceneElement::~SceneElement()
@@ -122,6 +122,16 @@ bool SceneElement::initialize()
 std::string SceneElement::getName() const
 {
 	return m_name;
+}
+
+void SceneElement::setPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	m_pose = pose;
+}
+
+const SurgSim::Math::RigidTransform3d& SceneElement::getPose() const
+{
+	return m_pose;
 }
 
 std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
