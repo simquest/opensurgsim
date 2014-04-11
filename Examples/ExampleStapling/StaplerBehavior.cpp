@@ -13,10 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "Examples/ExampleStapling/StaplerBehavior.h"
+
 #include <boost/exception/to_string.hpp>
 
 #include "Examples/ExampleStapling/StapleElement.h"
-#include "Examples/ExampleStapling/StaplerBehavior.h"
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataGroup.h"
@@ -63,8 +64,7 @@ void StaplerBehavior::setRepresentation(
 void StaplerBehavior::setVirtualStaple(
 	const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& virtualTeeth)
 {
-	m_virtualTeeth[0] = virtualTeeth[0];
-	m_virtualTeeth[1] = virtualTeeth[1];
+	m_virtualTeeth = virtualTeeth;
 }
 
 void StaplerBehavior::enableStaplingForSceneElement(std::string sceneElementName)
@@ -72,22 +72,16 @@ void StaplerBehavior::enableStaplingForSceneElement(std::string sceneElementName
 	m_stapleEnabledSceneElements.push_back(sceneElementName);
 }
 
-static void filterCollisionMapForStapleEnabledRepresentations(
-	SurgSim::Collision::Representation::ContactMapType* collisionsMap,
-	const std::list<std::string>& enabledSceneElements)
+void StaplerBehavior::filterCollisionMapForStapleEnabledRepresentations(
+	SurgSim::Collision::Representation::ContactMapType* collisionsMap)
 {
-	if (collisionsMap->empty())
-	{
-		return;
-	}
-
 	for (auto it = collisionsMap->begin(); it != collisionsMap->end();)
 	{
-		if (std::find(enabledSceneElements.begin(),
-					  enabledSceneElements.end(),
-					  (*it).first->getSceneElement()->getName()) == enabledSceneElements.end())
+		if (std::find(m_stapleEnabledSceneElements.begin(),
+					  m_stapleEnabledSceneElements.end(),
+					  (*it).first->getSceneElement()->getName()) == m_stapleEnabledSceneElements.end())
 		{
-			// Representation's scene element is not in the enabledSceneElements.
+			// Representation's scene element is not in the m_stapleEnabledSceneElements.
 			it = collisionsMap->erase(it);
 		}
 		else
@@ -110,8 +104,7 @@ static std::shared_ptr<SurgSim::Physics::Representation> findCorrespondingPhysic
 	{
 		physicsRepresentation = rigidCollisionRepresentation->getRigidRepresentation();
 	}
-
-	if (physicsRepresentation == nullptr)
+	else
 	{
 		// Check if the collisionRepresenation is for a deformable body.
 		std::shared_ptr<SurgSim::Physics::DeformableCollisionRepresentation> deformableCollisionRepresentation =
@@ -220,7 +213,7 @@ void StaplerBehavior::createStaple()
 		}
 
 		// Remove representations from the collision map that are not enabled to be stapled.
-		filterCollisionMapForStapleEnabledRepresentations(&collisionsMap, m_stapleEnabledSceneElements);
+		filterCollisionMapForStapleEnabledRepresentations(&collisionsMap);
 
 		// If the collision map is emptied after filtering, continue to next loop iteration.
 		if (collisionsMap.empty())
@@ -268,14 +261,14 @@ void StaplerBehavior::createStaple()
 		// Note that the targetPhysicsRepresentation will NOT be a nullptr, because the
 		// collisionsMap was filtered earlier to remove Representations that returned nullptr
 		// when the function findCorrespondingPhysicsRepresentation was called.
-		// (see filterCollisionMapForSupportedRepresentationTypes above).
+		// (see filterCollisionMapForStapleEnabledRepresentations above).
 		std::shared_ptr<SurgSim::Physics::Representation> targetPhysicsRepresentation =
 			findCorrespondingPhysicsRepresentation(targetRepresentationContacts.first);
 
 		// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
 		std::shared_ptr<SurgSim::Physics::Constraint> constraint =
 			createBilateral3DConstraint(staple->getComponents<SurgSim::Physics::Representation>()[0],
-										findCorrespondingPhysicsRepresentation(targetRepresentationContacts.first),
+										targetPhysicsRepresentation,
 										targetContact->penetrationPoints.first);
 
 		if (constraint == nullptr)

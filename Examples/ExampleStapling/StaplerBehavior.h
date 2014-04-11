@@ -19,8 +19,10 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
 {
@@ -32,11 +34,6 @@ class Representation;
 namespace Graphics
 {
 class SceneryRepresentation;
-}
-
-namespace Collision
-{
-class Representation;
 }
 
 namespace Input
@@ -90,6 +87,13 @@ protected:
 	/// \return True on success, otherwise false.
 	/// \note: In current implementation, this method always returns "true".
 	virtual bool doWakeUp() override;
+
+private:
+	/// Given a collision map, remove entries whose representations are not part of
+	/// enabled scene element lists.
+	/// \param in out collisionsMap The collision map to be filtered.
+	void StaplerBehavior::filterCollisionMapForStapleEnabledRepresentations(
+		SurgSim::Collision::Representation::ContactMapType *collisionsMap);
 
 private:
 	/// Function to create the staple element.
