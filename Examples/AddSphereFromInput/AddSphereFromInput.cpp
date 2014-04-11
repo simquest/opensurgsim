@@ -63,6 +63,8 @@ using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
+using SurgSim::Math::makeRigidTransform;
+using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
@@ -174,13 +176,13 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(createBox("box"));
 
 	std::shared_ptr<SceneElement> plane = createPlane("plane");
-	plane->setPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0)));
+	plane->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0)));
 	scene->addSceneElement(plane);
 
 	std::shared_ptr<ViewElement> viewElement = std::make_shared<OsgViewElement>("view");
 	viewElement->getView()->setPosition(0, 0);
 	viewElement->getView()->setDimensions(1023, 768);
-	viewElement->setPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	viewElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 	scene->addSceneElement(viewElement);
 
 	runtime->execute();

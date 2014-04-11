@@ -125,7 +125,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	physicsRepresentation->setFilename(filename);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	// Note: Directly calling loadFile is a workaround.  The TransferDeformableStateToVerticesBehavior requires a
-	// pointer to the Physics Representation's state, which is not created until the file is loaded and the internal 
+	// pointer to the Physics Representation's state, which is not created until the file is loaded and the internal
 	// structure is initialized.  Therefore we create the state now by calling loadFile.
 	physicsRepresentation->loadFile();
 	sceneElement->addComponent(physicsRepresentation);

@@ -97,10 +97,12 @@ TEST(OsgPlaneRepresentationRenderTests, MovingPlanesTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		/// Interpolate pose
-		planeRepresentation1->setLocalPose(makeRigidTransform(makeRotationQuaternion((1.0 - t) * startAngle1 + t * endAngle1,
-			Vector3d(1.0, 0.0, 0.0)), (1.0 - t) * startPosition1 + t * endPosition1));
-		planeRepresentation2->setLocalPose(makeRigidTransform(makeRotationQuaternion((1.0 - t) * startAngle2 + t * endAngle2,
-			Vector3d(0.0, 0.0, 1.0)), (1.0 - t) * startPosition2 + t * endPosition2));
+		planeRepresentation1->setLocalPose(makeRigidTransform(
+			makeRotationQuaternion((1.0 - t) * startAngle1 + t * endAngle1, Vector3d(1.0, 0.0, 0.0)),
+			(1.0 - t) * startPosition1 + t * endPosition1));
+		planeRepresentation2->setLocalPose(makeRigidTransform(
+			makeRotationQuaternion((1.0 - t) * startAngle2 + t * endAngle2, Vector3d(0.0, 0.0, 1.0)),
+			(1.0 - t) * startPosition2 + t * endPosition2));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 

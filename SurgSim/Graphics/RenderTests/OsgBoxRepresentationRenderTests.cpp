@@ -146,14 +146,16 @@ TEST(OsgBoxRepresentationRenderTests, MovingBoxesTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		/// Interpolate position and radius
-		boxRepresentation1->setLocalPose(makeRigidTransform(makeRotationQuaternion((1.0 - t) * startAngleX1 + t * endAngleX1,
-			Vector3d(1.0, 0.0, 0.0)) * makeRotationQuaternion((1.0 - t) * startAngleY1 + t * endAngleY1,
-			Vector3d(0.0, 1.0, 0.0)) * makeRotationQuaternion((1.0 - t) * startAngleZ1 + t * endAngleZ1,
-			Vector3d(0.0, 0.0, 1.0)), (1.0 - t) * startPosition1 + t * endPosition1));
-		boxRepresentation2->setLocalPose(makeRigidTransform(makeRotationQuaternion((1.0 - t) * startAngleX2 + t * endAngleX2,
-			Vector3d(1.0, 0.0, 0.0)) * makeRotationQuaternion((1.0 - t) * startAngleY2 + t * endAngleY2,
-			Vector3d(0.0, 1.0, 0.0)) * makeRotationQuaternion((1.0 - t) * startAngleZ2 + t * endAngleZ2,
-			Vector3d(0.0, 0.0, 1.0)), (1.0 - t) * startPosition2 + t * endPosition2));
+		boxRepresentation1->setLocalPose(makeRigidTransform(
+			makeRotationQuaternion((1.0 - t) * startAngleX1 + t * endAngleX1, Vector3d(1.0, 0.0, 0.0)) *
+			makeRotationQuaternion((1.0 - t) * startAngleY1 + t * endAngleY1, Vector3d(0.0, 1.0, 0.0)) *
+			makeRotationQuaternion((1.0 - t) * startAngleZ1 + t * endAngleZ1, Vector3d(0.0, 0.0, 1.0)),
+			(1.0 - t) * startPosition1 + t * endPosition1));
+		boxRepresentation2->setLocalPose(makeRigidTransform(
+			makeRotationQuaternion((1.0 - t) * startAngleX2 + t * endAngleX2, Vector3d(1.0, 0.0, 0.0)) *
+			makeRotationQuaternion((1.0 - t) * startAngleY2 + t * endAngleY2, Vector3d(0.0, 1.0, 0.0)) *
+			makeRotationQuaternion((1.0 - t) * startAngleZ2 + t * endAngleZ2, Vector3d(0.0, 0.0, 1.0)),
+			(1.0 - t) * startPosition2 + t * endPosition2));
 		if(boxSetterType == static_cast<int>(BoxSetterTypeIndividual))
 		{
 			boxRepresentation1->setSizeX((1 - t) * startSizeX1 + t * endSizeX1);

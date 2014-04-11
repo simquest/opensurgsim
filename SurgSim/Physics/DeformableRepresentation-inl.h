@@ -137,7 +137,7 @@ bool DeformableRepresentation<M,D,K,S>::doWakeUp()
 {
 	transformState(m_initialState, getPose());
 
-	// Since the pose is now embeded in the state, reset element and local pose to 
+	// Since the pose is now embeded in the state, reset element and local pose to
 	// identity.
 	setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
 	std::shared_ptr<SurgSim::Framework::SceneElement> element = getSceneElement();

@@ -22,16 +22,15 @@
 namespace SurgSim
 {
 
-namespace Physics 
+namespace Physics
 {
-	class Representation;
+class Representation;
 }
 
 namespace Blocks
 {
 
-/// Behavior to copy a pose from one representation to another.
-/// For example, this behavior is used to send pose updates from physics to graphics.
+/// Behavior to drive the SceneElement pose with a Physics Representation
 class DriveElementBehavior : public SurgSim::Framework::Behavior
 {
 public:

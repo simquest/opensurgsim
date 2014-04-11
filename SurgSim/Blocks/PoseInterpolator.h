@@ -54,7 +54,7 @@ public:
 
 	/// Set the target of the interpolation, this is where the interpolated transform
 	/// will be applied to. If this value is not set, the Scene Element that contains
-	/// this PoseInterpolator will be used. If no starting pose is set, the pose of 
+	/// this PoseInterpolator will be used. If no starting pose is set, the pose of
 	/// this scene element will be used as the starting pose
 	/// \param target The target that will use the interpolated pose.
 	void setTarget(std::shared_ptr<SurgSim::Framework::SceneElement> target);

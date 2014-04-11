@@ -22,16 +22,15 @@
 namespace SurgSim
 {
 
-namespace Input 
+namespace Input
 {
-	class InputComponent;
+class InputComponent;
 }
 
 namespace Blocks
 {
 
-/// Behavior to copy a pose from one representation to another.
-/// For example, this behavior is used to send pose updates from physics to graphics.
+/// Behavior to copy a pose from an input component to a SceneElement
 class DriveElementFromInputBehavior : public SurgSim::Framework::Behavior
 {
 public:
