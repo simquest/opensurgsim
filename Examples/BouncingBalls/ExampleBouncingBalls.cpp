@@ -142,20 +142,17 @@ private:
 /// Creates a planar SceneElement with graphics, physics, and collision.
 std::shared_ptr<SceneElement> createPlane(const std::string& name)
 {
-	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
+	std::shared_ptr<DoubleSidedPlaneShape> shape = std::make_shared<DoubleSidedPlaneShape>();
 
 	// A FixedRepresentation has no motion or compliance. It does not change.
-	std::shared_ptr<FixedRepresentation> physicsRepresentation =
-		std::make_shared<FixedRepresentation>(name + " Physics");
+	std::shared_ptr<FixedRepresentation> physics = std::make_shared<FixedRepresentation>("Physics");
 	RigidRepresentationParameters params;
-	params.setShapeUsedForMassInertia(planeShape);
-	physicsRepresentation->setInitialParameters(params);
-
+	params.setShapeUsedForMassInertia(shape);
+	physics->setInitialParameters(params);
 
 	// An OsgPlaneRepresentation is a Component containing the OSG-specific graphics information to display a plane.
-	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
-		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
-	// The initial graphical pose of the plane is set to match the initial physical pose.
+	std::shared_ptr<OsgPlaneRepresentation> graphics;
+	graphics = std::make_shared<OsgPlaneRepresentation>("Graphics");
 
 	// A OsgMaterial is an OSG implementation of a Material.  Materials define visual appearance and contain Uniforms
 	// and a Shader.  Uniforms represent values that are relatively constant, e.g., textures or position of a light.
@@ -176,32 +173,33 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 		"	gl_FragColor = color;\n"
 		"}");
 	material->setShader(shader);
-	graphicsRepresentation->setMaterial(material);
-
-	// Here the SceneElement for the plane is created, to which the various Components that collectively define the
-	// plane are added.
-	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
-	planeElement->addComponent(physicsRepresentation);
-	planeElement->addComponent(graphicsRepresentation);
+	graphics->setMaterial(material);
 
 	std::shared_ptr<DriveElementBehavior> driver;
 	driver = std::make_shared<DriveElementBehavior>("Driver");
-	driver->setFrom(physicsRepresentation);
-	planeElement->addComponent(driver);
+	driver->setFrom(physics);
 
 	// RigidCollisionRepresentation will use provided physics representation to do collisions.  Collision detection
 	// occurs in SurgSim::Physics::DcdCollision::doUpdate(), which uses the Shape.  Then the physics representations
 	// (of the colliding pair) are used to generate constraints that the solver uses to calculate forces that will
 	// un-collide the pair.  The entire process of collision detection, constraint generation, and solving is handled in
 	// SurgSim::PhysicsManager::doUpdate().
-	auto rigidRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
-	rigidRepresentation->setRigidRepresentation(physicsRepresentation);
-	planeElement->addComponent(rigidRepresentation);
+	std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> collision;
+	collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Collision");
+	collision->setRigidRepresentation(physics);
+
+	// Here the SceneElement for the plane is created, to which the various Components that collectively define the
+	// plane are added.
+	std::shared_ptr<SceneElement> element = std::make_shared<BasicSceneElement>(name);
+	element->addComponent(physics);
+	element->addComponent(collision);
+	element->addComponent(graphics);
+	element->addComponent(driver);
 
 	// This Behavior will add balls to the Scene at random locations every few seconds.
-	planeElement->addComponent(std::make_shared<AddRandomSphereBehavior>());
+	element->addComponent(std::make_shared<AddRandomSphereBehavior>());
 
-	return planeElement;
+	return element;
 }
 
 
@@ -209,13 +207,12 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationData& data, const std::string& name)
 {
 	// A RigidRepresentation is for a non-deformable 6 degree-of-freedom (DOF) object with compliance and inertia.
-	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(name + " Physics");
+	std::shared_ptr<RigidRepresentation> physics = std::make_shared<RigidRepresentation>("Physics");
 
 	// A RigidRepresentationParameters defines physical parameters for a rigid body like mass/inertia/damping.
 	RigidRepresentationParameters params;
 	// Density determines inertia and compliance, which are used in the collision response.
-	params.setDensity(5513.0); // Earth
+	params.setDensity(5513.0);
 	// Damping generates a force that opposes the velocity.
 	params.setLinearDamping(0.1);
 
@@ -223,11 +220,10 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	// volume, and inertia. The constructor's argument is the radius in meters.
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5);
 	params.setShapeUsedForMassInertia(shape);
-	physicsRepresentation->setInitialParameters(params);
+	physics->setInitialParameters(params);
 
-	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
-		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
-	graphicsRepresentation->setRadius(shape->getRadius());
+	std::shared_ptr<OsgSphereRepresentation> graphics = std::make_shared<OsgSphereRepresentation>("Graphics");
+	graphics->setRadius(shape->getRadius());
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
 	std::shared_ptr<OsgTexture2d> texture = std::make_shared<OsgTexture2d>();
@@ -241,24 +237,23 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 		std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("diffuseMap");
 	uniform->set(texture);
 	material->addUniform(uniform);
+	graphics->setMaterial(material);
 
-	graphicsRepresentation->setMaterial(material);
+	// By adding the PrintoutBehavior, the BehaviorManager will output this SceneElement's position each update.
+	std::shared_ptr<PrintoutBehavior> printoutBehavior = std::make_shared<PrintoutBehavior>();
+	printoutBehavior->setRepresentation(physics);
+
+	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>("Driver");
+	driver->setFrom(physics);
 
 	// Now create the SceneElement based on the physics and graphics.  Note there is no collision Component.
-	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
-	sphereElement->addComponent(physicsRepresentation);
-	sphereElement->addComponent(graphicsRepresentation);
-	// By adding the PrintoutBehavior, the BehaviorManager will output this SceneElement's position each update.
-	auto printoutBehavior = std::make_shared<PrintoutBehavior>();
-	printoutBehavior->setRepresentation(physicsRepresentation);
-	sphereElement->addComponent(printoutBehavior);
-	// Each time the BehaviorManager updates the Behaviors, transfer the pose from the physics Representation to the
-	// graphics Representation.
-	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>("Driver");
-	driver->setFrom(physicsRepresentation);
-	sphereElement->addComponent(driver);
+	std::shared_ptr<SceneElement> element = std::make_shared<BasicSceneElement>(name);
+	element->addComponent(physics);
+	element->addComponent(graphics);
+	element->addComponent(printoutBehavior);
+	element->addComponent(driver);
 
-	return sphereElement;
+	return element;
 }
 
 
@@ -299,10 +294,10 @@ int main(int argc, char* argv[])
 	plane->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0)));
 	scene->addSceneElement(plane);
 
-	std::shared_ptr<ViewElement> viewElement = std::make_shared<OsgViewElement>("view");
-	viewElement->getView()->setDimensions(963, 707);
-	viewElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
-	scene->addSceneElement(viewElement);
+	std::shared_ptr<ViewElement> view = std::make_shared<OsgViewElement>("view");
+	view->getView()->setDimensions(963, 707);
+	view->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	scene->addSceneElement(view);
 
 	// Run the simulation, starting with initialize/startup of Managers and Components. For each Component of each
 	// Element (Runtime::preprocessSceneElements) the Runtime tries to give access to the Component to each of the
