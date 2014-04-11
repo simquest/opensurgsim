@@ -79,9 +79,24 @@ public:
 	/// \param node the octree root node of this shape
 	void setRootNode(std::shared_ptr<NodeType> node);
 
+	/// Set the file name from which the octree will be loaded.
+	/// \param filename    The filename to load
+	/// \note The octree will be loaded right after the file name is set,
+	///       if 'fileName' indicates a file containing a valid octree.
+	/// \note If the valid file contains an empty octree, i.e. no vertex is specified in that file,
+	///       an empty octree will be held by this octree shape.
+	void setFileName(const std::string& fileName);
+
+	/// Get the file name of the external file which contains the octree.
+	/// \return File name of the external file which contains the octree.
+	std::string getFileName() const;
+
 private:
 	/// Root node of the octree datastructure
 	std::shared_ptr<NodeType> m_rootNode;
+
+	/// File name of the external file which contains the octree.
+	std::string m_fileName;
 };
 
 }; // Math

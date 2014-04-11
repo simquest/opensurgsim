@@ -17,6 +17,7 @@
 #include "SurgSim/Math/OctreeShape.h"
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
@@ -26,6 +27,7 @@ namespace Math
 
 OctreeShape::OctreeShape()
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OctreeShape, std::string, FileName, getFileName, setFileName);
 }
 
 OctreeShape::~OctreeShape()
@@ -35,6 +37,17 @@ OctreeShape::~OctreeShape()
 int OctreeShape::getType()
 {
 	return SHAPE_TYPE_OCTREE;
+}
+
+void OctreeShape::setFileName(const std::string& fileName)
+{
+	m_fileName = fileName;
+	m_rootNode = std::make_shared<NodeType>(*SurgSim::DataStructures::loadOctree(fileName));
+}
+
+std::string OctreeShape::getFileName() const
+{
+	return m_fileName;
 }
 
 double OctreeShape::getVolume() const
