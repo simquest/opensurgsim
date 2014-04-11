@@ -47,18 +47,20 @@ public:
 		return REPRESENTATION_TYPE_FIXED;
 	}
 
-	/// Set the current pose of the rigid representation
-	/// \param pose The current pose (translation + rotation)
-	void setPose(const RigidTransform3d& pose)
-	{
-		m_previousState = m_currentState;
-		m_finalState.setPose(pose);
-		m_currentState.setPose(pose);
-	}
-
 	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state)
 	{
 		// Do Nothing it is a fixed object
+	}
+
+	virtual void beforeUpdate(double dt) override
+	{
+		m_previousState = m_currentState;
+		m_currentState.setPose(getPose());
+	}
+
+	virtual	void afterUpdate(double dt) override
+	{
+		m_finalState = m_currentState;
 	}
 
 private:

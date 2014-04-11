@@ -98,10 +98,9 @@ public:
 	/// \return true if gravity enabled, false if not.
 	bool isGravityEnabled() const;
 
-	/// Set the pose of the physics representation
-	/// \param pose The pose to request the representation to be at
-	/// \note setPose should be called only once per time step!
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
+	/// Driving function that will update the element based on this physics
+	/// representation
+	virtual void driveElement() = 0;
 
 	/// Preprocessing done before the update call
 	/// This needs to be called from the outside usually from a Computation

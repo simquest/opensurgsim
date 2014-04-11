@@ -26,7 +26,7 @@ namespace SurgSim
 {
 namespace Framework
 {
-	class Representation;
+	class SceneElement;
 }
 }
 
@@ -53,10 +53,11 @@ public:
 	void setEndingPose(const SurgSim::Math::RigidTransform3d transform);
 
 	/// Set the target of the interpolation, this is where the interpolated transform
-	/// will be applied to. If no starting pose is set, the pose of this representation will
-	/// be used as the starting pose
+	/// will be applied to. If this value is not set, the Scene Element that contains
+	/// this PoseInterpolator will be used. If no starting pose is set, the pose of 
+	/// this scene element will be used as the starting pose
 	/// \param target The target that will use the interpolated pose.
-	void setTarget(std::shared_ptr<SurgSim::Framework::Representation> target);
+	void setTarget(std::shared_ptr<SurgSim::Framework::SceneElement> target);
 
 	/// Set the duration of the interpolation.
 	/// \param t The duration in seconds.
@@ -96,7 +97,7 @@ private:
 	SurgSim::Math::RigidTransform3d m_endingPose;
 
 	/// Target for the interpolated RigidTransform
-	std::shared_ptr<SurgSim::Framework::Representation> m_target;
+	std::shared_ptr<SurgSim::Framework::SceneElement> m_target;
 
 	/// Duration of the interpolation
 	double m_duration;

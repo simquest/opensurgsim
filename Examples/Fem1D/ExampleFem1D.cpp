@@ -118,7 +118,7 @@ std::shared_ptr<SceneElement> createFem1D(const std::string& name,
 
 	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsRepresentation
 			= std::make_shared<OsgPointCloudRepresentation<void>>("Graphics Representation: " + name);
-	graphicsRepresentation->setInitialPose(gfxPose);
+	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
 	graphicsRepresentation->setVisible(true);
@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
 
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
-	camera->setInitialPose(SurgSim::Math::makeRigidTransform(quaternionIdentity, Vector3d(0.0, 0.5, 5.0)));
+	camera->setLocalPose(SurgSim::Math::makeRigidTransform(quaternionIdentity, Vector3d(0.0, 0.5, 5.0)));
 
 	runtime->execute();
 

@@ -55,12 +55,6 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 	return REPRESENTATION_TYPE_RIGID;
 }
 
-void RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), SEVERE) <<
-			"RigidRepresentation::setPose does nothing.";
-}
-
 void RigidRepresentation::addExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& K,
 		const SurgSim::Math::Matrix33d& D)
 {
@@ -117,9 +111,6 @@ void RigidRepresentation::update(double dt)
 	Vector3d         w = m_currentState.getAngularVelocity();
 	Quaterniond     dq;
 	double       qNorm = q.norm(); // Norm of q before normalization
-
-	// Backup the state
-	m_previousState = m_currentState;
 
 	// Rigid body dynamics (using backward euler numerical integration scheme):
 	// { Id33.m.(v(t+dt) - v(t))/dt = f

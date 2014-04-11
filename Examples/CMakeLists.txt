@@ -25,5 +25,9 @@ endif(BUILD_DEVICE_MULTIAXIS OR BUILD_DEVICE_NOVINT)
 add_subdirectory(BouncingBalls)
 add_subdirectory(Fem1D)
 add_subdirectory(Fem3D)
-add_subdirectory(GraphicsScene)
+
+# Graphics Scene is currently not working with the element pose changes
+# need to fix and reenable
+#add_subdirectory(GraphicsScene)
+
 add_subdirectory(MassSprings)

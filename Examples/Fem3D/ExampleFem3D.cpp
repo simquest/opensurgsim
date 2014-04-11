@@ -121,7 +121,7 @@ std::shared_ptr<SceneElement> createTetrahedronFem3D(const std::string& name,
 	// Graphics Representation
 	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation;
 	graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics object ");
-	graphicsRepresentation->setInitialPose(pose);
+	graphicsRepresentation->setLocalPose(pose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
 	graphicsRepresentation->setVisible(true);
@@ -189,7 +189,7 @@ std::shared_ptr<SceneElement> createCubeFem3D(const std::string& name,
 	// Graphics Representation
 	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation;
 	graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics object ");
-	graphicsRepresentation->setInitialPose(pose);
+	graphicsRepresentation->setLocalPose(pose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
 	graphicsRepresentation->setVisible(true);
@@ -280,7 +280,7 @@ int main(int argc, char* argv[])
 
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
-	graphicsManager->getDefaultCamera()->setInitialPose(
+	graphicsManager->getDefaultCamera()->setLocalPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
 	runtime->execute();

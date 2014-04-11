@@ -172,7 +172,6 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// The point-cloud for visualizing the nodes of the finite element model
 	auto pointCloud
 		= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>("point cloud");
-	pointCloud->setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
 	pointCloud->setColor(SurgSim::Math::Vector4d(0.2, 0.2, 1.0, 1.0));
 	pointCloud->setPointSize(3.0f);
 	pointCloud->setVisible(true);

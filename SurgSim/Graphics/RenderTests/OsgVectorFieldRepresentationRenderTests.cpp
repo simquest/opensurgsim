@@ -136,7 +136,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, AddVectors)
 	auto vectors = makeVectors(points, colors);
 	auto vectorField = vectorRepresentation->getVectorField();
 
-	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
+	vectorRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 	viewElement->addComponent(vectorRepresentation);
 
 	/// Run the thread
@@ -161,7 +161,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
 	auto vectors = makeVectors(points, colors);
 	auto vectorRepresentation = makeVectorFieldRepresentation(points, vectors);
 
-	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
+	vectorRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 
 	viewElement->addComponent(vectorRepresentation);
 	runtime->start();
@@ -194,7 +194,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingVectorField)
 	auto endVectors = makeVectors(endPoints, endColors);
 
 	auto vectorRepresentation = makeVectorFieldRepresentation(startPoints, endVectors);
-	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
+	vectorRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 
 	viewElement->addComponent(vectorRepresentation);
 	runtime->start();

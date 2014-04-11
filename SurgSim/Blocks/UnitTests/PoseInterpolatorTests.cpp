@@ -17,6 +17,7 @@
 
 
 #include "SurgSim/Blocks/PoseInterpolator.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -36,37 +37,6 @@ namespace
 	RigidTransform3d endPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(3.0, 2.0, 1.0));
 }
 
-class PoseTestRepresentation : public SurgSim::Framework::Representation
-{
-public:
-	explicit PoseTestRepresentation(const std::string& name) : Representation(name)
-	{
-	}
-
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-	{
-		m_pose = pose;
-	}
-
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
-	{
-		return m_pose;
-	}
-
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose)
-	{
-		m_pose = pose;
-	}
-
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const
-	{
-		return m_pose;
-	}
-
-private:
-	RigidTransform3d m_pose;
-};
-
 namespace SurgSim
 {
 namespace Blocks
@@ -80,12 +50,15 @@ TEST(PoseInterpolatorTests, InitTest)
 TEST(PoseInterpolatorTests, StartAndEndPose)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
-	auto representation = std::make_shared<PoseTestRepresentation>("representation");
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
+	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
 	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
 
 	interpolator->setStartingPose(startPose);
 	interpolator->setEndingPose(endPose);
-	interpolator->setTarget(representation);
+
+	element->addComponent(representation);
+	element->addComponent(interpolator);
 
 	interpolator->initialize(runtime);
 	interpolator->wakeUp();
@@ -102,12 +75,16 @@ TEST(PoseInterpolatorTests, StartAndEndPose)
 TEST(PoseInterpolatorTests, UseOptionalStartPose)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
-	auto representation = std::make_shared<PoseTestRepresentation>("representation");
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
+	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
 	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
 
-	representation->setInitialPose(startPose);
+	interpolator->setStartingPose(startPose);
 	interpolator->setEndingPose(endPose);
-	interpolator->setTarget(representation);
+	interpolator->setTarget(element);
+
+	element->addComponent(representation);
+	element->addComponent(interpolator);
 
 	interpolator->initialize(runtime);
 	interpolator->wakeUp();
@@ -124,12 +101,15 @@ TEST(PoseInterpolatorTests, UseOptionalStartPose)
 TEST(PoseInterpolatorTests, UseLoop)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
-	auto representation = std::make_shared<PoseTestRepresentation>("representation");
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
+	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
 	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
 
 	interpolator->setStartingPose(startPose);
 	interpolator->setEndingPose(endPose);
-	interpolator->setTarget(representation);
+
+	element->addComponent(representation);
+	element->addComponent(interpolator);
 
 	interpolator->setPingPong(true);
 	interpolator->setLoop(true);
@@ -159,12 +139,15 @@ TEST(PoseInterpolatorTests, UseLoop)
 TEST(PoseInterpolatorTests, UsePingPong)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
-	auto representation = std::make_shared<PoseTestRepresentation>("representation");
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
+	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
 	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
 
 	interpolator->setStartingPose(startPose);
 	interpolator->setEndingPose(endPose);
-	interpolator->setTarget(representation);
+
+	element->addComponent(representation);
+	element->addComponent(interpolator);
 
 	interpolator->setLoop(true);
 	interpolator->setPingPong(true);

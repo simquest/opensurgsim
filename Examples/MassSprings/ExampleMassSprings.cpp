@@ -102,7 +102,7 @@ std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 		std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
 					std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
 
-		graphicsRepresentation->setInitialPose(*gfxPose);
+		graphicsRepresentation->setLocalPose(*gfxPose);
 		graphicsRepresentation->setColor(color);
 		graphicsRepresentation->setPointSize(3.0f);
 		graphicsRepresentation->setVisible(true);
@@ -170,7 +170,7 @@ std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 		std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
 					std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
 
-		graphicsRepresentation->setInitialPose(*gfxPose);
+		graphicsRepresentation->setLocalPose(*gfxPose);
 		graphicsRepresentation->setColor(color);
 		graphicsRepresentation->setPointSize(3.0f);
 		graphicsRepresentation->setVisible(true);
@@ -250,7 +250,7 @@ std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name,
 		std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
 					std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
 
-		graphicsRepresentation->setInitialPose(*gfxPose);
+		graphicsRepresentation->setLocalPose(*gfxPose);
 		graphicsRepresentation->setColor(color);
 		graphicsRepresentation->setPointSize(3.0f);
 		graphicsRepresentation->setVisible(true);
@@ -363,7 +363,7 @@ int main(int argc, char* argv[])
 
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
-	graphicsManager->getDefaultCamera()->setInitialPose(
+	graphicsManager->getDefaultCamera()->setLocalPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
 	runtime->execute();

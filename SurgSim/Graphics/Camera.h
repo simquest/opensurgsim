@@ -54,15 +54,13 @@ public:
 	/// \param	name	Name of the camera
 	explicit Camera(const std::string& name) : Representation(name)
 	{
-		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, viewMatrix, getViewMatrix, setViewMatrix);
 		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, projectionMatrix,
 			getProjectionMatrix, setProjectionMatrix);
 
+		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, viewMatrix, getViewMatrix);
 		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatViewMatrix, getViewMatrix);
 		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatProjectionMatrix, getProjectionMatrix);
 		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatInverseViewMatrix, getInverseViewMatrix);
-
-
 	}
 
 	/// Sets the group of representations that will be seen by this camera.
@@ -83,17 +81,13 @@ public:
 		return m_group;
 	}
 
-	/// Sets the view matrix of the camera
-	/// \param	matrix	View matrix
-	virtual void setViewMatrix(const SurgSim::Math::Matrix44d& matrix) = 0;
-
 	/// Gets the view matrix of the camera
 	/// \return	View matrix
-	virtual const SurgSim::Math::Matrix44d& getViewMatrix() const = 0;
+	virtual SurgSim::Math::Matrix44d getViewMatrix() const = 0;
 
 	/// Gets the inverse view matrix of the camera
 	/// \return	Inverse view matrix
-	virtual const SurgSim::Math::Matrix44d& getInverseViewMatrix() const = 0;
+	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const = 0;
 
 	/// Sets the projection matrix of the camera
 	/// \param	matrix	Projection matrix

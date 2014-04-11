@@ -16,8 +16,9 @@
 #include <memory>
 
 #include <gtest/gtest.h>
-#include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/MassSpringRepresentationContact.h"
 #include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
@@ -69,6 +70,8 @@ public:
 		m_massSpring->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
 
 		m_massSpring->setIsActive(true);
+		m_massSpring->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		m_massSpring->wakeUp();
 
 		// Update model by one timestep
 		m_massSpring->beforeUpdate(dt);

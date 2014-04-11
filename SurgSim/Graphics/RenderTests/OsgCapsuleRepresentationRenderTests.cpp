@@ -134,8 +134,8 @@ TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		/// Interpolate position and angle
-		capsuleRepresentation1->setPose(interpolatePose(startAngles1, endAngles1, startPosition1, endPosition1, t));
-		capsuleRepresentation2->setPose(interpolatePose(startAngles2, endAngles2, startPosition2, endPosition2, t));
+		capsuleRepresentation1->setLocalPose(interpolatePose(startAngles1, endAngles1, startPosition1, endPosition1, t));
+		capsuleRepresentation2->setLocalPose(interpolatePose(startAngles2, endAngles2, startPosition2, endPosition2, t));
 
 		/// Test different ways to set the size of capsule
 		if(setterType == static_cast<int>(SetterTypeIndividual))

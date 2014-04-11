@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_TRANSFERPOSEBEHAVIOR_H
-#define SURGSIM_BLOCKS_TRANSFERPOSEBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_DRIVEELEMENTBEHAVIOR_H
+#define SURGSIM_BLOCKS_DRIVEELEMENTBEHAVIOR_H
 
 #include "SurgSim/Framework/Behavior.h"
 
@@ -22,7 +22,7 @@
 namespace SurgSim
 {
 
-namespace Framework
+namespace Physics 
 {
 	class Representation;
 }
@@ -32,20 +32,16 @@ namespace Blocks
 
 /// Behavior to copy a pose from one representation to another.
 /// For example, this behavior is used to send pose updates from physics to graphics.
-class TransferPoseBehavior : public SurgSim::Framework::Behavior
+class DriveElementBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	explicit TransferPoseBehavior(const std::string& name);
+	explicit DriveElementBehavior(const std::string& name);
 
 	/// Set the representation which sends the pose.
 	/// \param	sender	Representation which sends the pose.
-	void setPoseSender(std::shared_ptr<SurgSim::Framework::Representation> sender);
-
-	/// Set the representation to receive the pose.
-	/// \param	receiver	Representation to receive the pose.
-	void setPoseReceiver(std::shared_ptr<SurgSim::Framework::Representation> receiver);
+	void setFrom(std::shared_ptr<SurgSim::Physics::Representation> from);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -59,10 +55,8 @@ protected:
 	virtual bool doWakeUp();
 
 private:
-	/// Representation to get the pose
-	std::shared_ptr<SurgSim::Framework::Representation> m_from;
-	/// Representation to set the pose
-	std::shared_ptr<SurgSim::Framework::Representation> m_to;
+	/// Representation to drive the scene element
+	std::shared_ptr<SurgSim::Physics::Representation> m_from;
 };
 
 
@@ -70,4 +64,5 @@ private:
 
 };  // namespace SurgSim
 
-#endif  //SURGSIM_BLOCKS_TRANSFERPOSEBEHAVIOR_H
+
+#endif // SURGSIM_BLOCKS_DRIVEELEMENTBEHAVIOR_H

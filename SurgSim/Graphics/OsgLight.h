@@ -116,11 +116,9 @@ public:
 	/// \return	The quadratic attenuation.
 	virtual double getQuadraticAttenuation() override;
 
-	/// Overridden from representation to change the uniform if needed.
-	/// \param	pose	The pose.
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
-
 private:
+	virtual void doUpdate(double dt) override;
+
 	/// Applies all the lights variables to the given StateSet
 	void apply(osg::ref_ptr<osg::StateSet> stateSet);
 

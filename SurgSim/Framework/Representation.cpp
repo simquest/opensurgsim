@@ -13,26 +13,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
 
-SurgSim::Framework::Representation::Representation(const std::string& m_name) : Component(m_name)
+namespace SurgSim
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, Pose, getPose, setPose);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, SurgSim::Math::RigidTransform3d,
-									  InitialPose, getInitialPose, setInitialPose);
+namespace Framework
+{
+
+Representation::Representation(const std::string& m_name) :
+	Component(m_name), m_localPose(SurgSim::Math::RigidTransform3d::Identity())
+{
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, LocalPose, getLocalPose,
+			setLocalPose);
 }
 
-SurgSim::Framework::Representation::~Representation()
+Representation::~Representation()
 {
 }
 
-bool SurgSim::Framework::Representation::doInitialize()
+bool Representation::doInitialize()
 {
 	return true;
 }
 
-bool SurgSim::Framework::Representation::doWakeUp()
+bool Representation::doWakeUp()
 {
 	return true;
 }
+
+void Representation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	m_localPose = pose;
+}
+
+SurgSim::Math::RigidTransform3d Representation::getPose() const
+{
+	std::shared_ptr<const SceneElement> element = getSceneElement();
+	if (element == nullptr)
+	{
+		return m_localPose;
+	}
+	else
+	{
+		return element->getPose() * getLocalPose();
+	}
+}
+
+SurgSim::Math::RigidTransform3d Representation::getLocalPose() const
+{
+	return m_localPose;
+}
+
+}; // namespace Framework
+}; // namespace SurgSim

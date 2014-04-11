@@ -15,7 +15,7 @@
 
 #include "Examples/ExampleStapling/StapleElement.h"
 
-#include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Blocks/DriveElementBehavior.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Framework/ApplicationData.h"
@@ -25,7 +25,7 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::Blocks::DriveElementBehavior;
 using SurgSim::DataStructures::PlyReader;
 using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Framework::ApplicationData;
@@ -47,11 +47,6 @@ StapleElement::~StapleElement()
 {
 }
 
-void StapleElement::setPose(const RigidTransform3d& pose)
-{
-	m_pose = pose;
-}
-
 bool StapleElement::doInitialize()
 {
 	std::vector<std::string> paths;
@@ -71,7 +66,6 @@ bool StapleElement::doInitialize()
 
 	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(m_pose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
@@ -80,17 +74,15 @@ bool StapleElement::doInitialize()
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSceneryRepresentation>("Graphics");
 	graphicsRepresentation->setFileName("Geometry/staple.obj");
-	graphicsRepresentation->setInitialPose(m_pose);
 
-	std::shared_ptr<TransferPoseBehavior> transferPose =
-		std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPose->setPoseSender(physicsRepresentation);
-	transferPose->setPoseReceiver(graphicsRepresentation);
+	std::shared_ptr<DriveElementBehavior> driver;
+	driver = std::make_shared<DriveElementBehavior>("Driver");
+	driver->setFrom(physicsRepresentation);
 
 	addComponent(physicsRepresentation);
 	addComponent(collisionRepresentation);
 	addComponent(graphicsRepresentation);
-	addComponent(transferPose);
+	addComponent(driver);
 
 	return true;
 }

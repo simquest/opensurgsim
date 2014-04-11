@@ -100,30 +100,6 @@ void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::
 
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
 	m_mesh = meshShape->getMesh();
-
-}
-
-void DeformableCollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_FAILURE() << "The initial pose cannot be set";
-}
-
-const SurgSim::Math::RigidTransform3d& DeformableCollisionRepresentation::getInitialPose() const
-{
-	SURGSIM_ASSERT(m_deformable.expired()) <<
-										   "Cannot get the initial pose because the deformable was not initialized.";
-	return m_deformable.lock()->getInitialPose();
-}
-
-void DeformableCollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_FAILURE() << "The pose cannot be set";
-}
-
-const SurgSim::Math::RigidTransform3d& DeformableCollisionRepresentation::getPose() const
-{
-	SURGSIM_ASSERT(m_deformable.expired()) << "Cannot get the pose because the deformable was not initialized.";
-	return m_deformable.lock()->getInitialPose();
 }
 
 const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::getShape() const

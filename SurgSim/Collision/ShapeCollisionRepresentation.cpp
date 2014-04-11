@@ -25,16 +25,15 @@ namespace Collision
 ShapeCollisionRepresentation::ShapeCollisionRepresentation(
 		const std::string& name,
 		std::shared_ptr<SurgSim::Math::Shape> shape,
-		const SurgSim::Math::RigidTransform3d& pose ) :
+		const SurgSim::Math::RigidTransform3d& pose) :
 	Representation(name),
-	m_shape(shape),
-	m_pose(pose)
+	m_shape(shape)
 {
+	setLocalPose(pose);
 }
 
 ShapeCollisionRepresentation::~ShapeCollisionRepresentation()
 {
-
 }
 
 int ShapeCollisionRepresentation::getShapeType() const
@@ -45,26 +44,6 @@ int ShapeCollisionRepresentation::getShapeType() const
 const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getShape() const
 {
 	return m_shape;
-}
-
-void ShapeCollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	m_pose = pose;
-}
-
-const SurgSim::Math::RigidTransform3d& ShapeCollisionRepresentation::getPose() const
-{
-	return m_pose;
-}
-
-void ShapeCollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	m_pose = pose;
-}
-
-const SurgSim::Math::RigidTransform3d& ShapeCollisionRepresentation::getInitialPose() const
-{
-	return m_pose;
 }
 
 }; // namespace Collision

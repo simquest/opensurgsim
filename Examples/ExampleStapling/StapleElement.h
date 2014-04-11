@@ -28,10 +28,6 @@ public:
 	/// \param name Name of the staple element.
 	explicit StapleElement(const std::string& name);
 
-	/// Set initial pose of the staple
-	/// \param pose	The initial pose to set.
-	void setPose(const SurgSim::Math::RigidTransform3d& pose);
-
 	/// Destructor
 	~StapleElement();
 

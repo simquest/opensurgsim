@@ -18,8 +18,8 @@
 
 #include "Examples/AddSphereFromInput/AddSphereBehavior.h"
 
-#include "SurgSim/Blocks/TransferPoseBehavior.h"
-#include "SurgSim/Blocks/TransferInputPoseBehavior.h"
+#include "SurgSim/Blocks/DriveElementBehavior.h"
+#include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
@@ -47,8 +47,8 @@
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-using SurgSim::Blocks::TransferPoseBehavior;
-using SurgSim::Blocks::TransferInputPoseBehavior;
+using SurgSim::Blocks::DriveElementBehavior;
+using SurgSim::Blocks::DriveElementFromInputBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
@@ -79,8 +79,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	return viewElement;
 }
 
-std::shared_ptr<SceneElement> createPlane(const std::string& name,
-		const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createPlane(const std::string& name)
 {
 	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
 
@@ -89,11 +88,9 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	RigidRepresentationParameters params;
 	params.setShapeUsedForMassInertia(planeShape);
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
 		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
-	graphicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
@@ -115,10 +112,9 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
-	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPose->setPoseSender(physicsRepresentation);
-	transferPose->setPoseReceiver(graphicsRepresentation);
-	planeElement->addComponent(transferPose);
+	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>("Driver");
+	driver->setFrom(physicsRepresentation);
+	planeElement->addComponent(driver);
 
 	auto rigidCollision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
 	rigidCollision->setRigidRepresentation(physicsRepresentation);
@@ -143,10 +139,10 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	boxElement->addComponent(graphicsRepresentation);
 	boxElement->addComponent(inputComponent);
 
-	auto transferPose = std::make_shared<TransferInputPoseBehavior>("Input to Graphics");
-	transferPose->setPoseSender(inputComponent);
-	transferPose->setPoseReceiver(graphicsRepresentation);
-	boxElement->addComponent(transferPose);
+	std::shared_ptr<DriveElementFromInputBehavior> driver;
+	driver = std::make_shared<DriveElementFromInputBehavior>("Driver");
+	driver->setFrom(inputComponent);
+	boxElement->addComponent(driver);
 
 	auto addSphere = std::make_shared<AddSphereFromInputBehavior>("SphereAdder");
 	addSphere->setInputComponent(inputComponent);
@@ -183,11 +179,13 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("box"));
-	scene->addSceneElement(createPlane("plane",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
+	std::shared_ptr<SceneElement> plane = createPlane("plane");
+	plane->setPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0)));
+	scene->addSceneElement(plane);
+
 	scene->addSceneElement(createView("view", 0, 0, 1023, 768));
 
-	graphicsManager->getDefaultCamera()->setInitialPose(
+	graphicsManager->getDefaultCamera()->setLocalPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
 	runtime->execute();

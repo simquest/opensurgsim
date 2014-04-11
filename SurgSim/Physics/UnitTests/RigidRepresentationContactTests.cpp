@@ -57,7 +57,7 @@ TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 	std::shared_ptr<RigidRepresentation> rigid = std::make_shared<RigidRepresentation>("Rigid");
 	rigid->setIsActive(true);
 	rigid->setIsGravityEnabled(false);
-	rigid->setInitialPose(poseRigid);
+	rigid->setLocalPose(poseRigid);
 	{
 		RigidRepresentationParameters param;
 		param.setDensity(1000.0);

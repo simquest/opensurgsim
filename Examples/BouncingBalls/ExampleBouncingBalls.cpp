@@ -16,7 +16,7 @@
 #include <memory>
 #include <boost/thread.hpp>
 
-#include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Blocks/DriveElementBehavior.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Behavior.h"
@@ -48,7 +48,7 @@
 #include "Examples/BouncingBalls/AddRandomSphereBehavior.h"
 
 using SurgSim::Blocks::AddRandomSphereBehavior;
-using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::Blocks::DriveElementBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
@@ -59,6 +59,8 @@ using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgTexture2d;
 using SurgSim::Graphics::OsgUniform;
 using SurgSim::Math::DoubleSidedPlaneShape;
+using SurgSim::Math::makeRigidTransform;
+using SurgSim::Math::Quaterniond;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector4f;
 using SurgSim::Math::Vector3d;
@@ -156,8 +158,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 }
 
 /// Creates a planar SceneElement with graphics, physics, and collision.
-std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationData& data, const std::string& name,
-		const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createPlane(const std::string& name)
 {
 	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
 
@@ -168,14 +169,11 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	params.setShapeUsedForMassInertia(planeShape);
 	physicsRepresentation->setInitialParameters(params);
 
-	// A RigidTransform3d pose is the 6 degree-of-freedom (DOF) position and orientation.
-	physicsRepresentation->setInitialPose(pose);
 
 	// An OsgPlaneRepresentation is a Component containing the OSG-specific graphics information to display a plane.
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
 		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
 	// The initial graphical pose of the plane is set to match the initial physical pose.
-	graphicsRepresentation->setInitialPose(pose);
 
 	// A OsgMaterial is an OSG implementation of a Material.  Materials define visual appearance and contain Uniforms
 	// and a Shader.  Uniforms represent values that are relatively constant, e.g., textures or position of a light.
@@ -203,15 +201,11 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
-	// The TransferPoseBehavior will copy the pose from the physics representation to the graphics representation.
-	// The physics pose typically updates due to gravity and collisions, but this SceneElement will not move since it
-	// uses a FixedRepresentation for physics.  Therefore, its physics pose will not change unless it is altered
-	// outside of the physics/collision calculations, making this Component unnecessary for this example.  It is good
-	// practice to ensure that the physics and graphics poses are synced anyway.
-	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPose->setPoseSender(physicsRepresentation);
-	transferPose->setPoseReceiver(graphicsRepresentation);
-	planeElement->addComponent(transferPose);
+
+	std::shared_ptr<DriveElementBehavior> driver;
+	driver = std::make_shared<DriveElementBehavior>("Driver");
+	driver->setFrom(physicsRepresentation);
+	planeElement->addComponent(driver);
 
 	// RigidCollisionRepresentation will use provided physics representation to do collisions.  Collision detection
 	// occurs in SurgSim::Physics::DcdCollision::doUpdate(), which uses the Shape.  Then the physics representations
@@ -230,10 +224,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 
 
 /// Creates a SceneElement of a rigid sphere with a graphic texture loaded from an image file.
-/// \note This SceneElement does not have a collision Component.
-/// \note Alternatively, a SurgSim::Blocks::SphereElement could be constructed and then its member variables altered.
-std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationData& data, const std::string& name,
-		const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationData& data, const std::string& name)
 {
 	// A RigidRepresentation is for a non-deformable 6 degree-of-freedom (DOF) object with compliance and inertia.
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
@@ -250,14 +241,11 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	// volume, and inertia. The constructor's argument is the radius in meters.
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5);
 	params.setShapeUsedForMassInertia(shape);
-
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
-	graphicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
 	std::shared_ptr<OsgTexture2d> texture = std::make_shared<OsgTexture2d>();
@@ -284,10 +272,10 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	sphereElement->addComponent(printoutBehavior);
 	// Each time the BehaviorManager updates the Behaviors, transfer the pose from the physics Representation to the
 	// graphics Representation.
-	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPose->setPoseSender(physicsRepresentation);
-	transferPose->setPoseReceiver(graphicsRepresentation);
-	sphereElement->addComponent(transferPose);
+	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>("Driver");
+	driver->setFrom(physicsRepresentation);
+	sphereElement->addComponent(driver);
+
 	return sphereElement;
 }
 
@@ -321,19 +309,13 @@ int main(int argc, char* argv[])
 	// Since the Scene contains all of the Elements, a Runtime therefore has access to all of the Components.
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
-	scene->addSceneElement(createEarth(data, "earth1",
-			SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 3.0, 0.0))));
+	std::shared_ptr<SceneElement> earth = createEarth(data, "earth");
+	earth->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 3.0, 0.0)));
+	scene->addSceneElement(earth);
 
-	scene->addSceneElement(createPlane(data, "plane1",
-			SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0))));
-
-	// Creates a ViewElement and adds it to the Scene.  A ViewElement is required for graphical display.
-	scene->addSceneElement(createView("view1", 30, 30, 963, 707));
-
-	// Place the camera.
-	graphicsManager->getDefaultCamera()->setInitialPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
-
+	std::shared_ptr<SceneElement> plane = createPlane("plane");
+	plane->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0)));
+	scene->addSceneElement(plane);
 
 
 	// Run the simulation, starting with initialize/startup of Managers and Components. For each Component of each

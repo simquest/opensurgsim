@@ -13,12 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Blocks/TransferInputPoseBehavior.h"
+#include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::RigidTransform3d;
@@ -28,59 +27,49 @@ namespace SurgSim
 namespace Blocks
 {
 
-TransferInputPoseBehavior::TransferInputPoseBehavior(const std::string& name) :
+DriveElementFromInputBehavior::DriveElementFromInputBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
-	m_poseName(SurgSim::DataStructures::Names::POSE)
+	m_poseName("pose")
 {
 }
 
-void TransferInputPoseBehavior::setPoseSender(std::shared_ptr<SurgSim::Input::InputComponent> sender)
+void DriveElementFromInputBehavior::setFrom(std::shared_ptr<SurgSim::Input::InputComponent> from)
 {
-	m_from = sender;
+	m_from = from;
 }
 
-void TransferInputPoseBehavior::setPoseReceiver(std::shared_ptr<SurgSim::Framework::Representation> receiver)
-{
-	m_to = receiver;
-}
-
-void TransferInputPoseBehavior::setPoseName(const std::string& poseName)
+void DriveElementFromInputBehavior::setPoseName(const std::string& poseName)
 {
 	m_poseName = poseName;
 }
 
-void TransferInputPoseBehavior::update(double dt)
+void DriveElementFromInputBehavior::update(double dt)
 {
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_from->getData(&dataGroup);
 	RigidTransform3d pose;
 	if (dataGroup.poses().get(m_poseName, &pose))
 	{
-		m_to->setPose(pose);
+		getSceneElement()->setPose(pose);
 	}
 }
 
-bool TransferInputPoseBehavior::doInitialize()
+bool DriveElementFromInputBehavior::doInitialize()
+{
+	return true;
+}
+
+bool DriveElementFromInputBehavior::doWakeUp()
 {
 	bool result = true;
 	if (m_from == nullptr)
 	{
-		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"No pose sender set for TransferInputPoseBehavior named '" << getName() << "', so it cannot initialize.";
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "DriveElementFromInputBehavior named '" +
+			getName() + "' must have a driver to do anything.";
 		result = false;
 	}
-	if (m_to == nullptr)
-	{
-		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"No pose receiver set for TransferInputPoseBehavior named '" << getName() << "', so it cannot initialize.";
-		result = false;
-	}
-	return result;
-}
 
-bool TransferInputPoseBehavior::doWakeUp()
-{
-	return true;
+	return result;
 }
 
 }; //namespace Blocks

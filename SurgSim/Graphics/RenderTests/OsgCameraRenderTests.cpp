@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 #include "SurgSim/Blocks/SphereElement.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
@@ -33,6 +34,7 @@
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Testing/MathUtilities.h"
 
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector3f;
@@ -73,7 +75,6 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	auto defaultCamera = graphicsManager->getDefaultCamera();
 	auto renderPass = std::make_shared<OsgCamera>("RenderPass");
 
-	renderPass ->setViewMatrix(defaultCamera->getViewMatrix());
 	renderPass ->setProjectionMatrix(defaultCamera->getProjectionMatrix());
 
 	int width, height;
@@ -136,15 +137,21 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(M_PI,Vector3d::UnitY());
 	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0, 0.0, -0.2));
 
-	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("Box Representation");
+	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("Box Representation 1");
 	boxRepresentation1->setSizeXYZ(0.05, 0.05, 0.05);
-	boxRepresentation1->setPose(startPose);
 	renderPass->getGroup()->add(boxRepresentation1);
+	auto boxElement1 = std::make_shared<BasicSceneElement>("Box Element 1");
+	boxElement1->addComponent(boxRepresentation1);
+	boxElement1->setPose(startPose);
+	scene->addSceneElement(boxElement1);
 
-	auto boxRepresentation = std::make_shared<OsgBoxRepresentation>("Box Representation");
-	boxRepresentation->setSizeXYZ(0.05, 0.05, 0.05);
-	boxRepresentation->setMaterial(material1);
-	viewElement->addComponent(boxRepresentation);
+	auto boxRepresentation2 = std::make_shared<OsgBoxRepresentation>("Box Representation 2");
+	boxRepresentation2->setSizeXYZ(0.05, 0.05, 0.05);
+	boxRepresentation2->setMaterial(material1);
+	auto boxElement2 = std::make_shared<BasicSceneElement>("Box Element 2");
+	boxElement2->addComponent(boxRepresentation2);
+	boxElement2->setPose(startPose);
+	scene->addSceneElement(boxElement2);
 
 	/// Run the thread
 	runtime->start();
@@ -154,11 +161,8 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	for (int i = 0; i < numSteps; ++i)
 	{
 		double t = static_cast<double>(i) / numSteps;
-		boxRepresentation->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(startPose, endPose, t));
-		boxRepresentation1->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(endPose, startPose, t));
-		renderPass->setViewMatrix(defaultCamera->getViewMatrix());
-		renderPass->setProjectionMatrix(defaultCamera->getProjectionMatrix());
-
+		boxElement1->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(endPose, startPose, t));
+		boxElement2->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(startPose, endPose, t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / 100));
 	}
 }

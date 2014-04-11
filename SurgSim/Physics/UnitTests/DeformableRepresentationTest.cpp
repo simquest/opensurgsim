@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Math/Vector.h"
@@ -26,12 +27,12 @@
 #include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverEulerImplicit.h"
 
-using SurgSim::Physics::DeformableRepresentation;
-using SurgSim::Physics::DeformableRepresentationState;
-
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
+using SurgSim::Physics::DeformableRepresentation;
+using SurgSim::Physics::DeformableRepresentationState;
 
 namespace
 {
@@ -205,23 +206,23 @@ TEST_F(DeformableRepresentationTest, ConstructorTest)
 
 TEST_F(DeformableRepresentationTest, SetGetTest)
 {
-	// Test setInitialPose/getInitialPose
-	setInitialPose(m_nonIdentityTransform);
-	EXPECT_TRUE(getInitialPose().isApprox(m_nonIdentityTransform, epsilon));
-	EXPECT_FALSE(getInitialPose().isApprox(m_identityTransform, epsilon));
-	setInitialPose(m_identityTransform);
-	EXPECT_FALSE(getInitialPose().isApprox(m_nonIdentityTransform, epsilon));
-	EXPECT_TRUE(getInitialPose().isApprox(m_identityTransform, epsilon));
+	// Test setLocalPose/getLocalPose
+	setLocalPose(m_nonIdentityTransform);
+	EXPECT_TRUE(getLocalPose().isApprox(m_nonIdentityTransform, epsilon));
+	EXPECT_FALSE(getLocalPose().isApprox(m_identityTransform, epsilon));
+	EXPECT_FALSE(getPose().isApprox(m_identityTransform, epsilon));
 
-	// Test setPose/getPose (always return Identity)
-	EXPECT_THROW(setPose(m_nonIdentityTransform), SurgSim::Framework::AssertionFailure);
-	EXPECT_THROW(setPose(m_identityTransform), SurgSim::Framework::AssertionFailure);
+	setLocalPose(m_identityTransform);
+	EXPECT_FALSE(getLocalPose().isApprox(m_nonIdentityTransform, epsilon));
+	EXPECT_TRUE(getLocalPose().isApprox(m_identityTransform, epsilon));
 	EXPECT_TRUE(getPose().isApprox(m_identityTransform, epsilon));
 
 	// Test set/get states
 	// Note that the initialState is in OdeEquation but is set in DeformableRepresentation
 	// Its getter is actually in OdeEquation (considered tested here)
 	setInitialState(m_localInitialState);
+	doWakeUp();
+
 	EXPECT_TRUE(*m_initialState     == *m_localInitialState);
 	EXPECT_TRUE(*m_currentState     == *m_localInitialState);
 	EXPECT_TRUE(*m_previousState    == *m_localInitialState);
@@ -279,6 +280,7 @@ TEST_F(DeformableRepresentationTest, UpdateChangesStateTest)
 {
 	// setInitialState sets all 4 states (tested in method above !)
 	setInitialState(m_localInitialState);
+	doWakeUp();
 
 	// beforeUpdate should backup current (=initial) into previous
 	beforeUpdate(1e-3);
@@ -319,6 +321,7 @@ TEST_F(DeformableRepresentationTest, ResetStateTest)
 {
 	// setInitialState sets all 4 states (tested in method above !)
 	setInitialState(m_localInitialState);
+	doWakeUp();
 
 	// 1st time step
 	beforeUpdate(1e-3);

@@ -96,16 +96,6 @@ void OsgScreenSpaceQuadRepresentation::getSize(double* width, double* height) co
 	*height = m_scale.y();
 }
 
-void OsgScreenSpaceQuadRepresentation::setPose(const SurgSim::Math::RigidTransform3d& transform)
-{
-	// HS-2013-jun-28 This function should probably be protected by a mutes, but I can see
-	// the assumption could be that this is only called from on thread.
-	// #threadsafety
-	m_pose = transform;
-	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(m_pose);
-	m_transform->setPosition(pose.second);
-}
-
 bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<Texture> texture)
 {
 	SURGSIM_ASSERT(texture != nullptr) << "Null texture passed to setTexture";
@@ -196,18 +186,22 @@ void OsgScreenSpaceQuadRepresentation::setLocation(double x, double y)
 {
 	SurgSim::Math::RigidTransform3d transform =
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(x,y,0));
-	setPose(transform);
+	setLocalPose(transform);
 }
 
 void OsgScreenSpaceQuadRepresentation::getLocation(double* x, double* y)
 {
 	SURGSIM_ASSERT( x !=  nullptr && y != nullptr) << "Cannot use a nulptr as an output paramter.";
-	SurgSim::Math::Vector3d position = getPose().translation();
+	SurgSim::Math::Vector3d position = getLocalPose().translation();
 	*x = position.x();
 	*y = position.y();
 }
 
 
+void OsgScreenSpaceQuadRepresentation::doUpdate(double dt)
+{
+	m_transform->setAttitude(osg::Quat(0.0, 0.0, 0.0, 1.0));
+}
 
 }; // Graphics
 }; // SurgSim

@@ -17,15 +17,17 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h" //< Used to initialize the Component Fem3DRepresentation
-
-#include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
-
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+
+using SurgSim::Framework::BasicSceneElement;
+using SurgSim::Framework::Runtime;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::getSubVector;
@@ -56,6 +58,8 @@ public:
 
 	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix, m_expectedStiffnessMatrix;
 	SurgSim::Math::Vector m_expectedF;
+
+	std::shared_ptr<BasicSceneElement> m_element;
 
 protected:
 	virtual void SetUp() override
@@ -139,6 +143,9 @@ protected:
 		m_expectedVolume = 1.0 / 6.0;
 
 		computeExpectedFMDK();
+
+		m_element = std::make_shared<BasicSceneElement>("element");
+		m_element->addComponent(m_fem);
 	}
 
 	void computeExpectedFMDK()
@@ -226,8 +233,11 @@ TEST_F(Fem3DRepresentationTests, GetTypeTest)
 
 TEST_F(Fem3DRepresentationTests, TransformInitialStateTest)
 {
-	m_fem->setInitialPose(m_initialPose);
+	m_fem->setLocalPose(m_initialPose);
 	m_fem->setInitialState(m_initialState);
+
+	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_fem->wakeUp());
 
 	EXPECT_TRUE(m_fem->getInitialState()->getPositions().isApprox(m_expectedTransformedPositions));
 	EXPECT_TRUE(m_fem->getInitialState()->getVelocities().isApprox(m_expectedTransformedVelocities));
@@ -237,18 +247,18 @@ TEST_F(Fem3DRepresentationTests, TransformInitialStateTest)
 
 TEST_F(Fem3DRepresentationTests, UpdateTest)
 {
-	using SurgSim::Framework::Runtime;
-
 	// Need to call beforeUpdate() prior to calling update()
 	// + Need to call setInitialState() prior to calling beforeUpdate()
 	ASSERT_ANY_THROW(m_fem->update(m_dt));
 
 	m_fem->setInitialState(m_initialState);
-	m_fem->beforeUpdate(m_dt);
+	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_fem->wakeUp());
+
 	// Need to call Initialize after addFemElement and setInitialState to initialize the mass information
 	ASSERT_ANY_THROW(m_fem->update(m_dt));
 
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_NO_THROW(m_fem->beforeUpdate(m_dt));
 	ASSERT_NO_THROW(m_fem->update(m_dt));
 
 	// Previous and current state should contains the proper information
@@ -263,13 +273,12 @@ TEST_F(Fem3DRepresentationTests, UpdateTest)
 
 TEST_F(Fem3DRepresentationTests, AfterUpdateTest)
 {
-	using SurgSim::Framework::Runtime;
-
 	// Need to call setInitialState() prior to calling afterUpdate()
 	ASSERT_ANY_THROW(m_fem->afterUpdate(m_dt));
 
 	m_fem->setInitialState(m_initialState);
 	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_fem->wakeUp());
 	m_fem->beforeUpdate(m_dt);
 	m_fem->update(m_dt);
 	ASSERT_NO_THROW(m_fem->afterUpdate(m_dt));
@@ -285,6 +294,8 @@ TEST_F(Fem3DRepresentationTests, ApplyCorrectionTest)
 {
 	double epsilon = 1e-12;
 	m_fem->setInitialState(m_initialState);
+	m_fem->initialize(std::make_shared<Runtime>());
+	m_fem->wakeUp();
 
 	SurgSim::Math::Vector dv;
 	dv.resize(m_fem->getNumDof());
@@ -340,10 +351,9 @@ void testVector(Vector V, Vector expectedV)
 
 TEST_F(Fem3DRepresentationTests, ComputesTest)
 {
-	using SurgSim::Framework::Runtime;
-
 	m_fem->setInitialState(m_initialState);
 	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_fem->wakeUp());
 	m_fem->setIsGravityEnabled(false);
 
 	testMatrix(m_fem->computeM(*m_initialState), m_expectedMassMatrix);

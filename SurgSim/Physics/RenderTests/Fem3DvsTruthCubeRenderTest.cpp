@@ -17,6 +17,7 @@
 
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
 #include "SurgSim/Graphics/OsgCamera.h"
@@ -462,6 +463,10 @@ void doSimulation(std::shared_ptr<TruthCubeData> truthCubeData,
 
 	// Setup boundary conditions and displacement
 	truthCubeRepresentation->defineBoundaryCondition(displacement);
+
+	// Wake Up the Representation
+	truthCubeRepresentation->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	truthCubeRepresentation->wakeUp();
 
 	// Call staticSolver to find the offset values
 	SurgSim::Math::Vector offset = staticSolver(truthCubeRepresentation);

@@ -45,12 +45,6 @@ public:
 
 	virtual RepresentationType getType() const override;
 
-	/// Set the current pose of the rigid representation
-	/// \param pose The current pose (translation + rotation)
-	/// \note Does not apply to this representation (the pose is fully controlled by the
-	/// physics simulation).
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
-
 	/// Set the current linear velocity of the rigid representation
 	/// \param linearVelocity The linear velocity
 	void setLinearVelocity(const SurgSim::Math::Vector3d& linearVelocity);

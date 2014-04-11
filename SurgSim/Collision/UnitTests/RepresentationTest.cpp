@@ -18,6 +18,7 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -27,6 +28,7 @@
 using SurgSim::Collision::Contact;
 using SurgSim::Collision::Location;
 using SurgSim::Collision::ShapeCollisionRepresentation;
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Quaterniond;
@@ -48,16 +50,21 @@ struct RepresentationTest : public ::testing::Test
 {
 	virtual void SetUp()
 	{
+		element = std::make_shared<BasicSceneElement>("Element");
 		plane = std::make_shared<PlaneShape>();
 		sphere = std::make_shared<SphereShape>(1.0);
 		planeRep = std::make_shared<ShapeCollisionRepresentation>("PlaneShape", plane, RigidTransform3d::Identity());
 		sphereRep = std::make_shared<ShapeCollisionRepresentation>("SphereShape", sphere, RigidTransform3d::Identity());
+
+		element->addComponent(planeRep);
+		element->addComponent(sphereRep);
 	}
 
 	virtual void TearDown()
 	{
 	}
 
+	std::shared_ptr<BasicSceneElement> element;
 	std::shared_ptr<PlaneShape> plane;
 	std::shared_ptr<SphereShape> sphere;
 	std::shared_ptr<Representation> planeRep;
@@ -74,12 +81,15 @@ TEST_F(RepresentationTest, InitTest)
 TEST_F(RepresentationTest, PoseTest)
 {
 	RigidTransform3d initialPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(1.0, 2.0, 3.0));
-	planeRep->setInitialPose(initialPose);
+	planeRep->setLocalPose(initialPose);
 	EXPECT_TRUE(initialPose.isApprox(planeRep->getPose(), epsilon));
 
 	RigidTransform3d pose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 2.0, 0.0));
-	sphereRep->setPose(pose);
+	element->setPose(pose);
 	EXPECT_TRUE(pose.isApprox(sphereRep->getPose(), epsilon));
+
+	sphereRep->setLocalPose(initialPose);
+	EXPECT_TRUE((pose * initialPose).isApprox(sphereRep->getPose(), epsilon));
 }
 
 TEST_F(RepresentationTest, ShapeTest)
