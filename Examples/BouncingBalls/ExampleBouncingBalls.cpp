@@ -34,6 +34,7 @@
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/ViewElement.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -58,6 +59,8 @@ using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgTexture2d;
 using SurgSim::Graphics::OsgUniform;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
@@ -135,27 +138,6 @@ private:
 	// A Logger can output to file or stream.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
-
-/// Create a ViewElement to be added to the Scene.
-/// \param name The name.
-/// \param x The number of pixels from the left side of your display to place the window.
-/// \param y The number of pixels from the top of your display to place the window.
-/// \param width The width in pixels of the window.
-/// \param height The height in pixels of the window.
-/// \note The Scene is the container of all the SceneElements, e.g., a ball.  SceneElements are containers of
-/// Components, e.g., RigidRepresentation and RigidCollisionRepresentation.
-/// A ViewElement is a SceneElement that wraps a View.  A View is necessary to graphically visualize the Scene.
-std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
-{
-	// An OsgViewElement is an OSG implementation of a ViewElement.
-	using SurgSim::Graphics::OsgViewElement;
-
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
-	viewElement->getView()->setPosition(x, y);
-	viewElement->getView()->setDimensions(width, height);
-
-	return viewElement;
-}
 
 /// Creates a planar SceneElement with graphics, physics, and collision.
 std::shared_ptr<SceneElement> createPlane(const std::string& name)
@@ -317,6 +299,10 @@ int main(int argc, char* argv[])
 	plane->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0)));
 	scene->addSceneElement(plane);
 
+	std::shared_ptr<ViewElement> viewElement = std::make_shared<OsgViewElement>("view");
+	viewElement->getView()->setDimensions(963, 707);
+	viewElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	scene->addSceneElement(viewElement);
 
 	// Run the simulation, starting with initialize/startup of Managers and Components. For each Component of each
 	// Element (Runtime::preprocessSceneElements) the Runtime tries to give access to the Component to each of the

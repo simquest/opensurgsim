@@ -59,6 +59,8 @@ using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgUniform;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::makeRigidTransform;
@@ -70,17 +72,6 @@ using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::VirtualToolCoupler;
 using SurgSim::Physics::RigidRepresentationParameters;
-
-std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
-{
-	using SurgSim::Graphics::OsgViewElement;
-
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
-	viewElement->getView()->setPosition(x, y);
-	viewElement->getView()->setDimensions(width, height);
-
-	return viewElement;
-}
 
 std::shared_ptr<SceneElement> createPlane(const std::string& name)
 {
@@ -275,8 +266,10 @@ int main(int argc, char* argv[])
 	plane->setPose(makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0)));
 	scene->addSceneElement(plane);
 
-	graphicsManager->getDefaultCamera()->setLocalPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	std::shared_ptr<ViewElement> viewElement = std::make_shared<OsgViewElement>("view");
+	viewElement->getView()->setDimensions(1023, 768);
+	viewElement->setPose(makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	scene->addSceneElement(viewElement);
 
 	runtime->execute();
 

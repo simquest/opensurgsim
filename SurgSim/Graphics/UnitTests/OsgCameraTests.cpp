@@ -66,7 +66,7 @@ TEST(OsgCameraTests, InitTest)
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()))) <<
 			"Camera's projection matrix should be initialized to the osg::Camera's projection matrix!";
 
-	EXPECT_NE(nullptr, camera->getGroup());
+	EXPECT_EQ(nullptr, camera->getGroup());
 }
 
 TEST(OsgCameraTests, OsgNodesTest)
@@ -113,7 +113,7 @@ TEST(OsgCameraTests, GroupTest)
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
 
-	EXPECT_NE(nullptr, camera->getGroup());
+	EXPECT_EQ(nullptr, camera->getGroup());
 
 	/// Adding an OsgGroup should succeed
 	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test group");

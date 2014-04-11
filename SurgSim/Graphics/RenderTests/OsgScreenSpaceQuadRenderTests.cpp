@@ -156,7 +156,7 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 {
 
-	auto defaultCamera = graphicsManager->getDefaultCamera();
+	auto defaultCamera = viewElement->getCamera();
 	auto camera = std::make_shared<OsgCamera>("Texture");
 	camera->setProjectionMatrix(defaultCamera->getProjectionMatrix());
 

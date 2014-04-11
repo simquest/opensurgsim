@@ -36,6 +36,7 @@
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/ViewElement.h"
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
@@ -53,10 +54,13 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
+using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgUniform;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::Vector3d;
@@ -67,17 +71,6 @@ using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::RigidRepresentationParameters;
 
-
-std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
-{
-	using SurgSim::Graphics::OsgViewElement;
-
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
-	viewElement->getView()->setPosition(x, y);
-	viewElement->getView()->setDimensions(width, height);
-
-	return viewElement;
-}
 
 std::shared_ptr<SceneElement> createPlane(const std::string& name)
 {
@@ -179,14 +172,16 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("box"));
+
 	std::shared_ptr<SceneElement> plane = createPlane("plane");
 	plane->setPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0)));
 	scene->addSceneElement(plane);
 
-	scene->addSceneElement(createView("view", 0, 0, 1023, 768));
-
-	graphicsManager->getDefaultCamera()->setLocalPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	std::shared_ptr<ViewElement> viewElement = std::make_shared<OsgViewElement>("view");
+	viewElement->getView()->setPosition(0, 0);
+	viewElement->getView()->setDimensions(1023, 768);
+	viewElement->setPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	scene->addSceneElement(viewElement);
 
 	runtime->execute();
 

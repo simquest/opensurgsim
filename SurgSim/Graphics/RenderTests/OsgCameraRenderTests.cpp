@@ -72,10 +72,10 @@ struct OsgCameraRenderTests: public RenderTest
 
 TEST_F(OsgCameraRenderTests, PassTest)
 {
-	auto defaultCamera = graphicsManager->getDefaultCamera();
-	auto renderPass = std::make_shared<OsgCamera>("RenderPass");
-
-	renderPass ->setProjectionMatrix(defaultCamera->getProjectionMatrix());
+	auto camera = viewElement->getCamera();
+	auto renderPass = std::make_shared<SurgSim::Graphics::OsgCamera>("RenderPass");
+	renderPass->setGroup(std::make_shared<SurgSim::Graphics::OsgGroup>("RenderPass Group"));
+	renderPass ->setProjectionMatrix(camera->getProjectionMatrix());
 
 	int width, height;
 	viewElement->getView()->getDimensions(&width,&height);

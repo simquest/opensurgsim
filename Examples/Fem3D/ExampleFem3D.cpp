@@ -30,6 +30,7 @@
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/ViewElement.h"
 
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement3DCube.h"
@@ -45,6 +46,8 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::ViewElement;
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::FemElement;
@@ -207,17 +210,6 @@ std::shared_ptr<SceneElement> createCubeFem3D(const std::string& name,
 	return femSceneElement;
 }
 
-std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
-{
-	using SurgSim::Graphics::OsgViewElement;
-
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
-	viewElement->getView()->setPosition(x, y);
-	viewElement->getView()->setDimensions(width, height);
-
-	return viewElement;
-}
-
 int main(int argc, char* argv[])
 {
 	using SurgSim::Math::makeRigidTransform;
@@ -278,10 +270,10 @@ int main(int argc, char* argv[])
 						   Vector4d(0, 0, 1, 1),
 						   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
 
-	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
-
-	graphicsManager->getDefaultCamera()->setLocalPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view");
+	viewElement->getView()->setDimensions(1023, 768);
+	viewElement->setPose(makeRigidTransform(qIdentity, Vector3d(0.0, 0.5, 5.0)));
+	scene->addSceneElement(viewElement);
 
 	runtime->execute();
 

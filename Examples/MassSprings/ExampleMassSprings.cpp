@@ -31,6 +31,7 @@
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/ViewElement.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -44,6 +45,8 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::ViewElement;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4f;
@@ -51,16 +54,6 @@ using SurgSim::Math::Vector4f;
 /// \file
 /// Example of how to put together a very simple demo of mass springs
 
-std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
-{
-	using SurgSim::Graphics::OsgViewElement;
-
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
-	viewElement->getView()->setPosition(x, y);
-	viewElement->getView()->setDimensions(width, height);
-
-	return viewElement;
-}
 
 std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 		const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
@@ -361,10 +354,10 @@ int main(int argc, char* argv[])
 							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 
-	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
-
-	graphicsManager->getDefaultCamera()->setLocalPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view");
+	viewElement->getView()->setDimensions(1023, 768);
+	viewElement->setPose(makeRigidTransform(qIdentity, Vector3d(0.0, 0.5, 5.0)));
+	scene->addSceneElement(viewElement);
 
 	runtime->execute();
 

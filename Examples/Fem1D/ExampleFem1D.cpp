@@ -26,6 +26,7 @@
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/ViewElement.h"
 #include "SurgSim/Graphics/PointCloudRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -38,6 +39,8 @@ using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem1DRepresentation;
@@ -83,17 +86,6 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 		beam->setYoungModulus(1e6);
 		physicsRepresentation->addFemElement(beam);
 	}
-}
-
-std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
-{
-	using SurgSim::Graphics::OsgViewElement;
-
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
-	viewElement->getView()->setPosition(x, y);
-	viewElement->getView()->setDimensions(width, height);
-
-	return viewElement;
 }
 
 // Generates a 1d fem comprised of adjacent elements along a straight line.  The number of fem elements is determined
@@ -151,7 +143,6 @@ int main(int argc, char* argv[])
 	runtime->addManager(graphicsManager);
 	runtime->addManager(behaviorManager);
 
-	std::shared_ptr<SurgSim::Graphics::OsgCamera> camera = graphicsManager->getDefaultCamera();
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	const SurgSim::Math::Quaterniond quaternionIdentity = SurgSim::Math::Quaterniond::Identity();
@@ -174,9 +165,10 @@ int main(int argc, char* argv[])
 					Vector4d(0, 0, 1, 1),
 					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
 
-	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
-
-	camera->setLocalPose(SurgSim::Math::makeRigidTransform(quaternionIdentity, Vector3d(0.0, 0.5, 5.0)));
+	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view");
+	viewElement->getView()->setDimensions(1023, 768);
+	viewElement->setPose(makeRigidTransform(quaternionIdentity, Vector3d(0.0, 0.5, 5.0)));
+	scene->addSceneElement(viewElement);
 
 	runtime->execute();
 

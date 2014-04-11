@@ -85,9 +85,6 @@ OsgCamera::OsgCamera(const std::string& name) :
 
 	/// Update storage of view and projection matrices
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
-
-	// Set a default group
-	setGroup(std::make_shared<OsgGroup>(name+" default group"));
 }
 
 bool OsgCamera::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)

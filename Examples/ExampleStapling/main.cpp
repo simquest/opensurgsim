@@ -74,12 +74,10 @@ using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::Mesh;
 using SurgSim::Graphics::MeshRepresentation;
 using SurgSim::Graphics::SceneryRepresentation;
-using SurgSim::Graphics::ViewElement;
 using SurgSim::Graphics::OsgManager;
 using SurgSim::Graphics::OsgMeshRepresentation;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
-using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::MeshShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationMatrix;
@@ -175,18 +173,6 @@ std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& na
 	std::shared_ptr<SceneryRepresentation> sceneryRepresentation = std::make_shared<OsgSceneryRepresentation>(name);
 	sceneryRepresentation->setFileName(fileName);
 	return sceneryRepresentation;
-}
-
-std::shared_ptr<ViewElement> createView()
-{
-	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
-
-	view->enableManipulator(true);
-	view->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
-
-	view->enableKeyboardDevice(true);
-
-	return view;
 }
 
 std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName,
@@ -332,7 +318,10 @@ int main(int argc, char* argv[])
 	}
 	inputManager->addDevice(device);
 
-	std::shared_ptr<ViewElement> view = createView();
+	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
+	view->enableManipulator(true);
+	view->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
+	view->enableKeyboardDevice(true);
 	inputManager->addDevice(view->getKeyboardDevice());
 
 	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
