@@ -13,37 +13,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories (
+
+include_directories(
 	${gtest_SOURCE_DIR}/include
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
-	BufferedValueTests.cpp
-	DataGroupTests.cpp
-	IndexDirectoryTests.cpp
-	MeshElementTest.cpp
-	MeshTest.cpp
-	MeshVertexTest.cpp
-	NamedDataTests.cpp
-	NamedVariantDataTests.cpp
-	OctreeNodeTests.cpp
-	OptionalValueTests.cpp
-	PlyReaderTests.cpp
-	TetrahedronMeshTest.cpp
-	TriangleMeshBaseTest.cpp
-	TriangleMeshTest.cpp
+	Fem3DPerformanceTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
-	MockObjects.h
+)
+
+set(LIBS
+	SurgSimPhysics
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-set(LIBS
-	SurgSimDataStructures
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-surgsim_add_unit_tests(SurgSimDataStructuresTest)
+surgsim_add_unit_tests(SurgSimPhysicsPerformanceTest)
 
-set_target_properties(SurgSimDataStructuresTest PROPERTIES FOLDER "DataStructures")
+set_target_properties(SurgSimPhysicsPerformanceTest PROPERTIES FOLDER "Physics")
