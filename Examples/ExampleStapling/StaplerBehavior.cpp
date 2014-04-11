@@ -288,6 +288,7 @@ void StaplerBehavior::createStaple()
 	if (!stapleAdded)
 	{
 		// Create the staple element.
+		staple->setHasCollisionRepresentation(true);
 		getScene()->addSceneElement(staple);
 	}
 }
