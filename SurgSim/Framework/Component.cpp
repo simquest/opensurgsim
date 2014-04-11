@@ -107,6 +107,11 @@ std::shared_ptr<SceneElement> Component::getSceneElement()
 	return m_sceneElement.lock();
 }
 
+std::shared_ptr<const SceneElement> Component::getSceneElement() const
+{
+   return m_sceneElement.lock();
+}
+
 std::shared_ptr<Runtime> Component::getRuntime() const
 {
 	return m_runtime.lock();
