@@ -97,6 +97,14 @@ public:
 	/// \return The current parameters of the rigid representation
 	const RigidRepresentationParameters& getCurrentParameters() const;
 
+	/// Set the collision representation for this physics representation, when the collision object
+	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
+	/// Specializes to register this representation in the collision representation if the collision representation
+	/// is a RigidCollisionRepresentation.
+	/// \param representation The collision representation to be used.
+	virtual void setCollisionRepresentation(
+		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
+
 protected:
 	/// Initial rigid representation state (useful for reset)
 	RigidRepresentationState m_initialState;
