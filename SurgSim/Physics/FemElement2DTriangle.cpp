@@ -102,7 +102,7 @@ void FemElement2DTriangle::addForce(const DeformableRepresentationState& state, 
 	// K.(x - x0) = F_ext
 	// 0 = F_ext + F_int, with F_int = -K.(x - x0)
 	getSubVector(state.getPositions(), m_nodeIds, 6, &x);
-	f = - scale * (m_K * (x - m_x0));
+	f = -scale * (m_K * (x - m_x0));
 	addSubVector(f, m_nodeIds, 6, F);
 }
 
@@ -455,6 +455,8 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 	// Notation: xij = xi - xj (reminder Przemieniecki use  1-based indexing, while we use 0-based)
 	//
 	// Shape functions fi(x, y) = ai + bi.x + ci.y
+	// Let's note A the area of the triangle
+	//
 	// Identifying coefficient for f1:
 	// (a0)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(1)   1/2A (x1y2-x2y1)        ( x1y2-x2y1)
 	// (b0) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(0) = 1/2A y12         = 1/2A (-y21      )
@@ -467,19 +469,22 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 	// (a2)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(0)    1/2A (x0y1-x1y0)        ( x0y1-x1y0)
 	// (b2) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(0) =  1/2A y01         = 1/2A (-y10      )
 	// (c2)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(1)    1/2A x10                ( x10      )
+	//
+	// The above equation has been simplified in the following assignment using x0=y0=y1=0
+	// and 2A = x1y2 (cf. above for more details)
 
 	// f0(x, y) = a0 + b0.x + c0.y, store a0 b0 c0
-	m_membraneShapeFunctionsParameters(0, 0) = 1.0;                  //inv_2A * (x1 * y2 - x2 * y1)
-	m_membraneShapeFunctionsParameters(0, 1) = -1.0 / x1;            //inv_2A * (y1 - y2)
-	m_membraneShapeFunctionsParameters(0, 2) = (x2 / x1 - 1.0) / y2; //inv_2A * (x2 - x1)
+	m_membraneShapeFunctionsParameters(0, 0) = 1.0;                  // = (x1 * y2 - x2 * y1) / 2A
+	m_membraneShapeFunctionsParameters(0, 1) = -1.0 / x1;            // = (y1 - y2) / 2A
+	m_membraneShapeFunctionsParameters(0, 2) = (x2 / x1 - 1.0) / y2; // = (x2 - x1) / 2A
 	// f1(x, y) = a1 + b1.x + c1.y, store a1 b1 c1
-	m_membraneShapeFunctionsParameters(1, 0) = 0.0;                  //inv_2A * (x2 * y0 - x0 * y2)
-	m_membraneShapeFunctionsParameters(1, 1) = 1.0 / x1;             //inv_2A * (y2 - y0)
-	m_membraneShapeFunctionsParameters(1, 2) = -x2 / (x1 * y2);      //inv_2A * (x0 - x2)
+	m_membraneShapeFunctionsParameters(1, 0) = 0.0;                  // = (x2 * y0 - x0 * y2) / 2A
+	m_membraneShapeFunctionsParameters(1, 1) = 1.0 / x1;             // = (y2 - y0) / 2A
+	m_membraneShapeFunctionsParameters(1, 2) = -x2 / (x1 * y2);      // = (x0 - x2) / 2A
 	// f2(x, y) = a2 + b2.x + c2.y, store a2 b2 c2
-	m_membraneShapeFunctionsParameters(2, 0) = 0.0;                  //inv_2A * (x0 * y1 - x1 * y0)
-	m_membraneShapeFunctionsParameters(2, 1) = 0.0;                  //inv_2A * (y0 - y1)
-	m_membraneShapeFunctionsParameters(2, 2) = 1.0 / y2;             //inv_2A * (x1 - x0)
+	m_membraneShapeFunctionsParameters(2, 0) = 0.0;                  // = (x0 * y1 - x1 * y0) / 2A
+	m_membraneShapeFunctionsParameters(2, 1) = 0.0;                  // = (y0 - y1) / 2A
+	m_membraneShapeFunctionsParameters(2, 2) = 1.0 / y2;             // = (x1 - x0) / 2A
 
 	// Thin-Plate Batoz specific data
 	m_xij[0] = x1 - x2; // xij[0] = x1 - x2
