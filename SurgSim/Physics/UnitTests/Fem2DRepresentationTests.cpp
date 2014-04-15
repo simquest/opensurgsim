@@ -290,7 +290,7 @@ public:
 	void addPunctualLoad(size_t nodeId, const Vector3d& f)
 	{
 		// Apply load at extremity
-		if (m_F.size() != m_fem->getInitialState()->getNumDof())
+		if (m_F.size() != static_cast<Vector::Index>(m_fem->getInitialState()->getNumDof()))
 		{
 			m_F.resize(m_fem->getInitialState()->getNumDof());
 			m_F.setZero();
@@ -364,7 +364,6 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest1)
 	const double thickness = 1.0  * inchToMeter;
 	const double L = 48.0 * inchToMeter;
 	const double h = 12.0 * inchToMeter;
-	const size_t numNodes = 10;
 
 	std::vector<Vector3d> nodes;
 	nodes.push_back(Vector3d(-L / 2.0, - h / 2.0, 0.0));
@@ -414,7 +413,6 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 	const double thickness = 1.0  * inchToMeter;
 	const double L = 48.0 * inchToMeter;
 	const double h = 12.0 * inchToMeter;
-	const size_t numNodes = 27;
 
 	std::vector<Vector3d> nodes;
 	nodes.push_back(Vector3d(-L / 2.0, - h / 2.0, 0.0)); // 0
@@ -488,8 +486,8 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 ///  1---2---3---4---N  array2
 ///  | \ | \ | \ | \ |
 ///  1---2---3---4---N  array1
-template <int N, int M>
-static void defineTriangleStrips(std::array<unsigned int, N> array1, std::array<unsigned int, N> array2,
+template <size_t N, size_t M>
+void defineTriangleStrips(std::array<unsigned int, N> array1, std::array<unsigned int, N> array2,
 								 std::array<std::array<unsigned int, 3>, M>& triangleLists, size_t& triangleId)
 {
 	for (size_t i = 0; i < N - 1; i++)
@@ -509,7 +507,6 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	const double radius = 3.0 * inchToMeter;
 	const double L = 16.0 * inchToMeter;
 	const double h = 6.0 * inchToMeter;
-	const size_t numNodes = 27;
 
 	double startAngle = -M_PI/2.0;
 	double deltaAngle = M_PI/12.0;
@@ -764,7 +761,6 @@ TEST_F(Fem2DMechanicalValidationTests, PlateBendingSquarePlateMeshPatternATest)
 	const double thickness = 6.0  * inchToMeter;
 	const double L = 144.0 * inchToMeter;
 	const double deltaL = L / 8.0;
-	const size_t numNodes = 9 * 9;
 
 	std::vector<Vector3d> nodes;
 	std::vector<size_t> fixedNodes;
@@ -824,7 +820,6 @@ TEST_F(Fem2DMechanicalValidationTests, PlateBendingSquarePlateMeshPatternBTest)
 	const double thickness = 6.0  * inchToMeter;
 	const double L = 144.0 * inchToMeter;
 	const double deltaL = L / 8.0;
-	const size_t numNodes = 9 * 9;
 
 	std::vector<Vector3d> nodes;
 	std::vector<size_t> fixedNodes;
@@ -884,7 +879,6 @@ TEST_F(Fem2DMechanicalValidationTests, CantileverPlateTest)
 	const double thickness = 6.0  * inchToMeter;
 	const double L = 96.0 * inchToMeter;
 	const double deltaL = L / 8;
-	const size_t numNodes = 9 * 9;
 
 	std::vector<Vector3d> nodes;
 	std::vector<size_t> fixedNodes;
