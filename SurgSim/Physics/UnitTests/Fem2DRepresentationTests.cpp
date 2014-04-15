@@ -380,7 +380,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest1)
 	std::vector<size_t> fixedNodes;
 	fixedNodes.push_back(0);
 	fixedNodes.push_back(5);
-	
+
 	setNodePositions(nodes, fixedNodes);
 
 	const int numTriangles = 8;
@@ -389,7 +389,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest1)
 		{{0, 6, 5}}, {{0, 1, 6}}, {{1, 7, 6}}, {{1, 2, 7}},
 		{{2, 8, 7}}, {{2, 3, 8}}, {{3, 9, 8}}, {{3, 4, 9}}
 	}};
-	
+
 	for (size_t triangleId = 0; triangleId < numTriangles; triangleId++)
 	{
 		addTriangle(trianglesNodeIds[triangleId], youngModulus, poissonRatio, thickness);
@@ -449,7 +449,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 	fixedNodes.push_back(0);
 	fixedNodes.push_back(5);
 	fixedNodes.push_back(12);
-	
+
 	setNodePositions(nodes, fixedNodes);
 
 	const int numTriangles = 32;
@@ -464,7 +464,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 		{{3, 23, 22}}, {{23, 24, 22}}, {{22, 24, 25}}, {{22, 25, 8}},
 		{{23, 4, 24}}, {{4, 26, 24}}, {{24, 26, 9}}, {{24, 9, 25}}
 	}};
-	
+
 	for (size_t triangleId = 0; triangleId < numTriangles; triangleId++)
 	{
 		addTriangle(trianglesNodeIds[triangleId], youngModulus, poissonRatio, thickness);
