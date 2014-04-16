@@ -19,8 +19,6 @@
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
-
-
 /// Concrete Representation for testing
 class MockRepresentation : public SurgSim::Framework::Representation
 {
@@ -103,5 +101,6 @@ private:
 	}
 };
 
+SURGSIM_REGISTER(SurgSim::Framework::Component, MockRepresentation);
 
 #endif  // SURGSIM_BLOCKS_UNITTESTS_MOCKOBJECTS_H

@@ -15,9 +15,14 @@
 
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 
-#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Representation.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::TransferPoseBehavior);
+}
 
 namespace SurgSim
 {
@@ -27,6 +32,10 @@ namespace Blocks
 TransferPoseBehavior::TransferPoseBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TransferPoseBehavior, std::shared_ptr<SurgSim::Framework::Representation>,
+		PoseSender, getPoseSender, setPoseSender);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TransferPoseBehavior, std::shared_ptr<SurgSim::Framework::Representation>,
+		PoseReceiver, getPoseReceiver, setPoseReceiver);
 }
 
 void TransferPoseBehavior::setPoseSender(std::shared_ptr<SurgSim::Framework::Representation> sender)
@@ -38,6 +47,17 @@ void TransferPoseBehavior::setPoseReceiver(std::shared_ptr<SurgSim::Framework::R
 {
 	m_to = receiver;
 }
+
+std::shared_ptr<SurgSim::Framework::Representation> TransferPoseBehavior::getPoseSender() const
+{
+	return m_from;
+}
+
+std::shared_ptr<SurgSim::Framework::Representation> TransferPoseBehavior::getPoseReceiver() const
+{
+	return m_to;
+}
+
 
 void TransferPoseBehavior::update(double dt)
 {

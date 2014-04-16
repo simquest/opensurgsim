@@ -24,7 +24,7 @@ namespace SurgSim
 
 namespace Framework
 {
-	class Representation;
+class Representation;
 }
 
 namespace Blocks
@@ -38,6 +38,8 @@ public:
 	/// Constructor
 	/// \param	name	Name of the behavior
 	explicit TransferPoseBehavior(const std::string& name);
+
+	SURGSIM_CLASSNAME(SurgSim::Framework::TransferPoseBehavior);
 
 	/// Set the representation which sends the pose.
 	/// \param	sender	Representation which sends the pose.
@@ -57,6 +59,16 @@ protected:
 
 	/// Wakeup the behavior, which copies the initial pose
 	virtual bool doWakeUp();
+
+	// The following two methods are for serialization purpose only.
+
+	/// Get the pose sender.
+	/// \return The pose sender.
+	std::shared_ptr<SurgSim::Framework::Representation> getPoseSender() const;
+
+	/// Get the pose receiver.
+	/// \return The pose receiver.
+	std::shared_ptr<SurgSim::Framework::Representation> getPoseReceiver() const;
 
 private:
 	/// Representation to get the pose

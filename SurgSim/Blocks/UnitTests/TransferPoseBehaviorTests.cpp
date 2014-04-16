@@ -28,7 +28,6 @@
 
 #include <gtest/gtest.h>
 
-#include <random>
 
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Behavior;
@@ -106,6 +105,24 @@ TEST(TransferPoseBehaviorTests, UpdateTest)
 			"The behavior should copy the new pose on update!";
 
 	runtime->stop();
+}
+
+TEST(TransferPoseBehaviorTests, TransferPoseBehaviorSerializationTests)
+{
+	std::shared_ptr<TransferPoseBehavior> behavior = std::make_shared<TransferPoseBehavior>("TransferPoseBehavior");
+	auto sender = std::make_shared<MockRepresentation>("TestRepresentation1");
+	auto receiver = std::make_shared<MockRepresentation>("TestRepresentation2");
+	behavior->setPoseSender(sender);
+	behavior->setPoseReceiver(receiver);
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = behavior->encode());
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(2u, node.size());
+
+	std::shared_ptr<TransferPoseBehavior> result = std::make_shared<TransferPoseBehavior>("TransferPoseBehavior");
+	ASSERT_NO_THROW(result->decode(node));
+	EXPECT_EQ("SurgSim::Framework::TransferPoseBehavior", result->getClassName());
 }
 
 };  // namespace Blocks
