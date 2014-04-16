@@ -96,13 +96,13 @@ void FemElement2DTriangle::initialize(const DeformableRepresentationState& state
 
 void FemElement2DTriangle::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale)
 {
-	Eigen::Matrix<double, 18, 1> x, f;
+	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> x, f;
 
 	// K.U = F_ext
 	// K.(x - x0) = F_ext
 	// 0 = F_ext + F_int, with F_int = -K.(x - x0)
 	getSubVector(state.getPositions(), m_nodeIds, 6, &x);
-	f = (-scale) * m_K * (x - m_x0);
+	f = -scale * (m_K * (x - m_x0));
 	addSubVector(f, m_nodeIds, 6, F);
 }
 
@@ -183,8 +183,8 @@ void FemElement2DTriangle::computeMass(const DeformableRepresentationState& stat
 		// m = rho.A(123).t/12.0.[2 1 1]
 		//                       [1 2 1]
 		//                       [1 1 2]
-		m_MLocal.block(i * 6, i * 6, 3, 3).setConstant(mass / 12.0);
-		m_MLocal.block(i * 6, i * 6, 3, 3).diagonal().setConstant(mass / 6.0);
+		m_MLocal.block<3, 3>(i * 6, i * 6).setConstant(mass / 12.0);
+		m_MLocal.block<3, 3>(i * 6, i * 6).diagonal().setConstant(mass / 6.0);
 
 		// Plate inertia matrix developed from Batoz paper
 		// Interpolation of the rotational displacement over the triangle w.r.t. DOF:
@@ -252,15 +252,13 @@ void FemElement2DTriangle::computeMass(const DeformableRepresentationState& stat
 	for (size_t rowId = 0; rowId < 6; ++rowId)
 	{
 		auto MLocal3x3block = getSubMatrix(m_MLocal, rowId, rowId, 3, 3);
-		setSubMatrix(rotationTranspose * MLocal3x3block * rotation, rowId, rowId, 3, 3, &m_M);
+		setSubMatrix(rotation * MLocal3x3block * rotationTranspose, rowId, rowId, 3, 3, &m_M);
 	}
 }
 
 void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState& state,
 										Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* k)
 {
-	m_KLocal.setZero();
-
 	// Membrane part from "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
 	// Compute the membrane local strain-displacement matrix
 	Matrix36Type membraneStrainDisplacement;
@@ -271,10 +269,10 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 		// u(x,y) = f0(x,y).u0 + f1(x,y).u1 + f2(x,y).u2
 		// The strain is E=(Exx , Eyy , Exy)
 		// Exx = dux/dx = df0/dx.u0x + df1/dx.u1x + df2/dx.u2x
-		//                dfi/dx = bi = m_membraneShapeFunctionXCoefficient
+		//                dfi/dx = bi
 		membraneStrainDisplacement(0, 2 * i) = m_membraneShapeFunctionsParameters(i, 1);
 		// Eyy = duy/dy = df0/dy.u0y + df1/dy.u1y + df2/dy.u2y
-		//                dfi/dy = ci = m_membraneShapeFunctionYCoefficient
+		//                dfi/dy = ci
 		membraneStrainDisplacement(1, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 2);
 		// Exy = dux/dy + duy/dx =
 		// (df0/dy.u0x + df0/dx.u0y) + (df1/dy.u1x + df1/dx.u1y) + (df2/dy.u2x + df2/dx.u2y)
@@ -283,9 +281,7 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 	}
 	// Membrane material stiffness coming from Hooke Law (isotropic material)
 	Matrix33Type membraneElasticMaterial;
-	membraneElasticMaterial.setZero();
-	membraneElasticMaterial(0, 0) = 1.0;
-	membraneElasticMaterial(1, 1) = 1.0;
+	membraneElasticMaterial.setIdentity();
 	membraneElasticMaterial(2, 2) = 0.5 * (1.0 - m_nu);
 	membraneElasticMaterial(0, 1) = m_nu;
 	membraneElasticMaterial(1, 0) = m_nu;
@@ -328,7 +324,7 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 		for(size_t column = 0; column < 3; ++column)
 		{
 			// Membrane part
-			m_KLocal.block(6 * row, 6 * column, 2, 2) = membraneKLocal.block(2 * row , 2 * column, 2, 2);
+			m_KLocal.block<2, 2>(6 * row, 6 * column) = membraneKLocal.block<2 ,2>(2 * row , 2 * column);
 
 			// Thin-plate part
 			m_KLocal.block(6 * row + 2, 6 * column + 2, 3, 3) = plateKLocal.block(3 * row, 3 * column, 3, 3);
@@ -336,15 +332,14 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 	}
 
 	// Transformation Local -> Global
-	m_K.setZero();
 	const SurgSim::Math::Matrix33d& rotation = m_initialRotation;
 	const SurgSim::Math::Matrix33d rotationTranspose = m_initialRotation.transpose();
-	for (size_t rowId = 0; rowId < 6; ++rowId)
+	for (size_t rowBlockId = 0; rowBlockId < 6; ++rowBlockId)
 	{
-		for (size_t colId = 0; colId < 6; ++colId)
+		for (size_t colBlockId = 0; colBlockId < 6; ++colBlockId)
 		{
-			auto KLocal3x3block = getSubMatrix(m_KLocal, rowId, colId, 3, 3);
-			setSubMatrix(rotationTranspose * KLocal3x3block * rotation, rowId, colId, 3, 3, &m_K);
+			auto KLocal3x3block = getSubMatrix(m_KLocal, rowBlockId, colBlockId, 3, 3);
+			setSubMatrix(rotation * KLocal3x3block * rotationTranspose, rowBlockId, colBlockId, 3, 3, &m_K);
 		}
 	}
 }
@@ -375,7 +370,7 @@ void FemElement2DTriangle::computeInitialRotation(const DeformableRepresentation
 	j = k.cross(i);
 	j.normalize();
 
-	// Initialize the initial rotation matrix
+	// Initialize the initial rotation matrix (transform vectors from local to global coordinates)
 	m_initialRotation.col(0) = i;
 	m_initialRotation.col(1) = j;
 	m_initialRotation.col(2) = k;
@@ -460,31 +455,36 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 	// Notation: xij = xi - xj (reminder Przemieniecki use  1-based indexing, while we use 0-based)
 	//
 	// Shape functions fi(x, y) = ai + bi.x + ci.y
+	// Let's note A the area of the triangle
+	//
 	// Identifying coefficient for f1:
 	// (a0)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(1)   1/2A (x1y2-x2y1)        ( x1y2-x2y1)
 	// (b0) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(0) = 1/2A y12         = 1/2A (-y21      )
 	// (c0)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(0)   1/2A x21                ( x21      )
 	// Similarly for f2:
-	// (a1)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(0)   1/2A (x2y0-x0y2)        (-x0y2-x2y0)
+	// (a1)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(0)   1/2A (x2y0-x0y2)        (-x0y2+x2y0)
 	// (b1) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(1) = 1/2A y20         = 1/2A ( y20      )
 	// (c1)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(0)   1/2A x02                (-x20      )
 	// Similarly for f3:
 	// (a2)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(0)    1/2A (x0y1-x1y0)        ( x0y1-x1y0)
 	// (b2) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(0) =  1/2A y01         = 1/2A (-y10      )
 	// (c2)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(1)    1/2A x10                ( x10      )
-	double inv_2A = 1.0 / (2.0 * m_restArea);
+	//
+	// The above equation has been simplified in the following assignment using x0=y0=y1=0
+	// and 2A = x1y2 (cf. above for more details)
+
 	// f0(x, y) = a0 + b0.x + c0.y, store a0 b0 c0
-	m_membraneShapeFunctionsParameters(0, 0) = inv_2A * x1 * y2;   // Because y1 = 0
-	m_membraneShapeFunctionsParameters(0, 1) =-inv_2A * y2;        // Because y1 = 0
-	m_membraneShapeFunctionsParameters(0, 2) = inv_2A * x2 - x1;
+	m_membraneShapeFunctionsParameters(0, 0) = 1.0;                  // = (x1 * y2 - x2 * y1) / 2A
+	m_membraneShapeFunctionsParameters(0, 1) = -1.0 / x1;            // = (y1 - y2) / 2A
+	m_membraneShapeFunctionsParameters(0, 2) = (x2 / x1 - 1.0) / y2; // = (x2 - x1) / 2A
 	// f1(x, y) = a1 + b1.x + c1.y, store a1 b1 c1
-	m_membraneShapeFunctionsParameters(1, 0) = 0.0;                // Because x0 = 0 and y0 = 0
-	m_membraneShapeFunctionsParameters(1, 1) = inv_2A * y2;        // Because y0 = 0
-	m_membraneShapeFunctionsParameters(1, 2) =-inv_2A * x2;        // Because x0 = 0
+	m_membraneShapeFunctionsParameters(1, 0) = 0.0;                  // = (x2 * y0 - x0 * y2) / 2A
+	m_membraneShapeFunctionsParameters(1, 1) = 1.0 / x1;             // = (y2 - y0) / 2A
+	m_membraneShapeFunctionsParameters(1, 2) = -x2 / (x1 * y2);      // = (x0 - x2) / 2A
 	// f2(x, y) = a2 + b2.x + c2.y, store a2 b2 c2
-	m_membraneShapeFunctionsParameters(2, 0) = 0.0;                // Because x0 = 0 and y0 = 0
-	m_membraneShapeFunctionsParameters(2, 1) = 0.0;                // Because y0 = 0 and y1 = 0
-	m_membraneShapeFunctionsParameters(2, 2) = inv_2A * x1;        // Because x0 = 0
+	m_membraneShapeFunctionsParameters(2, 0) = 0.0;                  // = (x0 * y1 - x1 * y0) / 2A
+	m_membraneShapeFunctionsParameters(2, 1) = 0.0;                  // = (y0 - y1) / 2A
+	m_membraneShapeFunctionsParameters(2, 2) = 1.0 / y2;             // = (x1 - x0) / 2A
 
 	// Thin-Plate Batoz specific data
 	m_xij[0] = x1 - x2; // xij[0] = x1 - x2
