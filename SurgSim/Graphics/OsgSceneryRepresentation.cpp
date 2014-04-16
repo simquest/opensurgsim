@@ -13,16 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 
 #include <osg/PositionAttitudeTransform>
 #include <osg/Switch>
 #include <osgDB/ReadFile>
 
-using SurgSim::Graphics::OsgSceneryRepresentation;
-using SurgSim::Graphics::OsgRepresentation;
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgSceneryRepresentation);
+}
+
+namespace SurgSim
+{
+
+namespace Graphics
+{
 
 OsgSceneryRepresentation::OsgSceneryRepresentation(const std::string& name) :
 	Representation(name),
@@ -49,13 +58,16 @@ bool OsgSceneryRepresentation::doInitialize()
 	return true;
 }
 
-std::string SurgSim::Graphics::OsgSceneryRepresentation::getFileName() const
+std::string OsgSceneryRepresentation::getFileName() const
 {
 	return m_fileName;
 }
 
-void SurgSim::Graphics::OsgSceneryRepresentation::setFileName( const std::string& fileName )
+void OsgSceneryRepresentation::setFileName(const std::string& fileName)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Can't set the filename after the object has been initialized.";
 	m_fileName = fileName;
 }
+
+};	// namespace Graphics
+};	// namespace SurgSim

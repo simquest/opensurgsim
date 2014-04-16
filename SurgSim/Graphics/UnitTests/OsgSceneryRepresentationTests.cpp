@@ -16,21 +16,19 @@
 /// \file
 /// Unit Tests for the OsgSceneryRepresentation class.
 
+#include <memory>
+
+#include <gtest/gtest.h>
+
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 
-#include <memory>
-
-#include <gtest/gtest.h>
-
-
-namespace SurgSim
-{
-namespace Graphics
-{
+using SurgSim::Graphics::OsgSceneryRepresentation;
+using SurgSim::Graphics::OsgViewElement;
 
 class OsgSceneryRepresentationTest: public ::testing::Test
 {
@@ -76,6 +74,40 @@ TEST_F(OsgSceneryRepresentationTest, InitTest)
 	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject2));
 }
 
+TEST_F(OsgSceneryRepresentationTest, AccessibleTest)
+{
+	std::shared_ptr<SurgSim::Framework::Component> component;
+	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
+		"SurgSim::Graphics::OsgSceneryRepresentation",
+		"scenery"));
 
-}  // namespace Graphics
-}  // namespace SurgSim
+	EXPECT_EQ("SurgSim::Graphics::OsgSceneryRepresentation", component->getClassName());
+
+	std::string fileName("TestFileName");
+	component->setValue("FileName", fileName);
+	YAML::Node node(YAML::convert<SurgSim::Framework::Component>::encode(*component));
+
+	auto decoded = std::dynamic_pointer_cast<SurgSim::Graphics::OsgSceneryRepresentation>(
+		node.as<std::shared_ptr<SurgSim::Framework::Component>>());
+
+	EXPECT_NE(nullptr, decoded);
+	EXPECT_EQ(fileName, decoded->getValue<std::string>("FileName"));
+}
+
+TEST_F(OsgSceneryRepresentationTest, OsgSceneryRepresentationSerializationTests)
+{
+	std::shared_ptr<OsgSceneryRepresentation> scenery = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
+
+	std::string fileName("TestFileName");
+	scenery->setFileName(fileName);
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = scenery->encode());
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(5u, node.size());
+
+	std::shared_ptr<OsgSceneryRepresentation> result = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
+	ASSERT_NO_THROW(result->decode(node));
+	EXPECT_EQ("SurgSim::Graphics::OsgSceneryRepresentation", result->getClassName());
+	EXPECT_EQ(fileName, result->getFileName());
+}
