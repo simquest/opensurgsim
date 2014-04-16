@@ -159,8 +159,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(
 	return viewElement;
 }
 
-// Generates a 1d fem comprised of adjacent elements along a straight line.  The number of fem elements is determined
-// by loadModelFem1D.
+// Generates a 2d fem comprised of a cylinder. The number of fem elements is determined by loadModelFem2D.
 std::shared_ptr<SceneElement> createFem2D(const std::string& name,
 		const SurgSim::Math::RigidTransform3d& gfxPose,
 		const SurgSim::Math::Vector4d& color,
