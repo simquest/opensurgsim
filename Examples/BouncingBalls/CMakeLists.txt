@@ -52,6 +52,7 @@ SET(LIBS
 	SurgSimPhysics
 	SurgSimGraphics
 	SurgSimMath
+	${YAML_CPP_LIBRARIES}
 )
 
 target_link_libraries(ExampleBouncingBalls ${LIBS})
