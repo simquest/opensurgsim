@@ -482,21 +482,31 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 }
 
 /// Generic algorithm to define the triangles in between 2 arrays of consecutive node indices:
-/// secondStartIndex
+/// beginIndex2
 ///  *---1---2---3---4  array2
 ///  | \ | \ | \ | \ |
 ///  *---1---2---3---4  array1
-/// firstStartIndex
+/// beginIndex1
 template <int M>
-void defineTriangleStrips(size_t firstStartIndex, size_t secondStartIndex, size_t number,
+void defineTriangleStrips(size_t beginIndex1, size_t beginIndex2, size_t number,
 						  std::array<std::array<unsigned int, 3>, M>* triangleLists, size_t* triangleId)
 {
 	for (size_t i = 0; i < number - 1; i++)
 	{
-		std::array<unsigned int, 3> triangle1 = {{firstStartIndex + i, firstStartIndex + i + 1, secondStartIndex + i}};
-		std::array<unsigned int, 3> triangle2 = {{firstStartIndex + i + 1, secondStartIndex + i + 1, secondStartIndex + i}};
+		std::array<unsigned int, 3> triangle1 = {{beginIndex1 + i, beginIndex1 + i + 1, beginIndex2 + i}};
+		std::array<unsigned int, 3> triangle2 = {{beginIndex1 + i + 1, beginIndex2 + i + 1, beginIndex2 + i}};
 		(*triangleLists)[(*triangleId)++] = triangle1;
 		(*triangleLists)[(*triangleId)++] = triangle2;
+	}
+}
+
+void membranePlateWithSemiCircularHoleAddNodesForAngle(double angle, size_t numNodes, double L, double radius,
+													   std::vector<Vector3d>* nodes)
+{
+	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
+	{
+		double distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
+		(*nodes).push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0));
 	}
 }
 
@@ -517,41 +527,25 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 
 	// Node 0..5
 	angle = startAngle + 0.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 6; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 0..5
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 6, L, radius, &nodes);
 
 	// Node 6..10
 	angle = startAngle + 1.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 5; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 6..10
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 5, L, radius, &nodes);
 	// Node 11 (we have distance.sin(angle) = -L/2)
 	distance = - L / (2.0 * sin(angle));
 	nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 11
 
 	// Node 12..17
 	angle = startAngle + 2.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 6; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 12..17
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 6, L, radius, &nodes);
 	// Node 18 (we have distance.sin(angle) = -L/2)
 	distance = - L / (2.0 * sin(angle));
 	nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 18
 
 	// Node 19..23
 	angle = startAngle + 3.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 5; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 19..23
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 5, L, radius, &nodes);
 	// Node 24 (we have distance.cos(angle) = h)
 	distance = h / cos(angle);
 	nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 24
@@ -560,63 +554,39 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 
 	// Node 26..29
 	angle = startAngle + 4.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 4; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 26..29
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 4, L, radius, &nodes);
 	// Node 30 (we have distance.cos(angle) = h)
 	distance = h / cos(angle);
 	nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 30
 
 	// Node 31..33
 	angle = startAngle + 5.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 3; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 31..33
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 3, L, radius, &nodes);
 	// Node 34 (we have distance.cos(angle) = h)
 	distance = h / cos(angle);
 	nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 34
 
 	// Node 35..38
 	angle = startAngle + 6.0 * deltaAngle; // (=0)
-	for (size_t nodeId = 0; nodeId < 4; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 35..38
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 4, L, radius, &nodes);
 
 	// Node 39..41
 	angle = startAngle + 7.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 3; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 39..41
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 3, L, radius, &nodes);
 	// Node 42 (we have distance.cos(angle) = h)
 	distance = h / cos(angle);
 	nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 42
 
 	// Node 43..46
 	angle = startAngle + 8.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 4; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 43..46
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 4, L, radius, &nodes);
 	// Node 47 (we have distance.cos(angle) = h)
 	distance = h / cos(angle);
 	nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 47
 
 	// Node 48..52
 	angle = startAngle + 9.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 5; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 48..52
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 5, L, radius, &nodes);
 	// Node 53 (we have distance.cos(angle) = h)
 	distance = h / cos(angle);
 	nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 53
@@ -625,33 +595,21 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 
 	// Node 55..60
 	angle = startAngle + 10.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 6; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 55..60
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 6, L, radius, &nodes);
 	// Node 61 (we have distance.sin(angle) = L / 2)
 	distance = L / (2.0 * sin(angle));
 	nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 61
 
 	// Node 62..66
 	angle = startAngle + 11.0 * deltaAngle;
-	for (size_t nodeId = 0; nodeId < 5; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 62..66
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 5, L, radius, &nodes);
 	// Node 67 (we have distance.sin(angle) = L / 2)
 	distance = L / (2.0 * sin(angle));
 	nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 67
 
 	// Node 69..73
 	angle = startAngle + 12.0 * deltaAngle;  // (= M_PI / 2)
-	for (size_t nodeId = 0; nodeId < 6; nodeId++)
-	{
-		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
-		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 69..73
-	}
+	membranePlateWithSemiCircularHoleAddNodesForAngle(angle, 6, L, radius, &nodes);
 
 	std::vector<size_t> fixedNodes;
 	fixedNodes.push_back(54);
