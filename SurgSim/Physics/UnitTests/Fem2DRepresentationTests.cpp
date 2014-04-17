@@ -259,17 +259,16 @@ public:
 	{
 		const size_t numDofPerNode = m_fem->getNumDofPerNode();
 		std::shared_ptr<DeformableRepresentationState> state = std::make_shared<DeformableRepresentationState>();
-		state->setNumDof(m_fem->getNumDofPerNode(), nodes.size());
+		state->setNumDof(numDofPerNode, nodes.size());
 		for (size_t nodeId = 0; nodeId < nodes.size(); nodeId++)
 		{
-			state->getPositions().segment(numDofPerNode * nodeId, 3) =
-				nodes[nodeId];
+			state->getPositions().segment<3>(numDofPerNode * nodeId) = nodes[nodeId];
 		}
 		for (auto fixedNodeId = fixedNodes.begin(); fixedNodeId != fixedNodes.end(); fixedNodeId++)
 		{
-			for (size_t dofId = 0; dofId < m_fem->getNumDofPerNode(); dofId++)
+			for (size_t dofId = 0; dofId < numDofPerNode; dofId++)
 			{
-				state->addBoundaryCondition(m_fem->getNumDofPerNode() * (*fixedNodeId) + dofId);
+				state->addBoundaryCondition(numDofPerNode * (*fixedNodeId) + dofId);
 			}
 		}
 		m_fem->setInitialState(state);
@@ -321,9 +320,9 @@ public:
 			const double Area = ((B - A).cross(C - A)).norm() / 2.0;
 			Vector3d f = Area * forceInNewtonPerSquareMeter;
 			// Uniform distribution, so the resulting force f is to be applied at the triangle center of mass:
-			forces[nodeId0] += f/3.0;
-			forces[nodeId1] += f/3.0;
-			forces[nodeId2] += f/3.0;
+			forces[nodeId0] += f / 3.0;
+			forces[nodeId1] += f / 3.0;
+			forces[nodeId2] += f / 3.0;
 		}
 
 		for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
@@ -508,8 +507,8 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	const double L = 16.0 * inchToMeter;
 	const double h = 6.0 * inchToMeter;
 
-	double startAngle = -M_PI/2.0;
-	double deltaAngle = M_PI/12.0;
+	double startAngle = -M_PI / 2.0;
+	double deltaAngle = M_PI / 12.0;
 
 	std::vector<Vector3d> nodes;
 	double angle, distance;
@@ -518,7 +517,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 0.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 6; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 0..5
 	}
 
@@ -526,7 +525,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 1.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 5; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 6..10
 	}
 	// Node 11 (we have distance.sin(angle) = -L/2)
@@ -537,7 +536,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 2.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 6; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 12..17
 	}
 	// Node 18 (we have distance.sin(angle) = -L/2)
@@ -548,7 +547,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 3.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 5; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 19..23
 	}
 	// Node 24 (we have distance.cos(angle) = h)
@@ -561,7 +560,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 4.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 4; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 26..29
 	}
 	// Node 30 (we have distance.cos(angle) = h)
@@ -572,7 +571,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 5.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 3; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 31..33
 	}
 	// Node 34 (we have distance.cos(angle) = h)
@@ -583,7 +582,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 6.0 * deltaAngle; // (=0)
 	for (size_t nodeId = 0; nodeId < 4; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 35..38
 	}
 
@@ -591,7 +590,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 7.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 3; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 39..41
 	}
 	// Node 42 (we have distance.cos(angle) = h)
@@ -602,7 +601,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 8.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 4; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 43..46
 	}
 	// Node 47 (we have distance.cos(angle) = h)
@@ -613,7 +612,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 9.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 5; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 48..52
 	}
 	// Node 53 (we have distance.cos(angle) = h)
@@ -626,7 +625,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 10.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 6; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 55..60
 	}
 	// Node 61 (we have distance.sin(angle) = L / 2)
@@ -637,7 +636,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 11.0 * deltaAngle;
 	for (size_t nodeId = 0; nodeId < 5; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 62..66
 	}
 	// Node 67 (we have distance.sin(angle) = L / 2)
@@ -648,7 +647,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	angle = startAngle + 12.0 * deltaAngle;  // (= M_PI / 2)
 	for (size_t nodeId = 0; nodeId < 6; nodeId++)
 	{
-		distance = radius + nodeId * (L/2 - radius) / 5.0;
+		distance = radius + nodeId * (L / 2.0 - radius) / 5.0;
 		nodes.push_back(Vector3d(distance * cos(angle), distance * sin(angle), 0.0)); // 69..73
 	}
 
