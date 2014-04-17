@@ -248,7 +248,7 @@ void FemElement1DBeam::computeMass(const DeformableRepresentationState& state,
 	m_MLocal *= m;
 
 	// Transformation Local -> Global
-	m_M = m_R0.transpose() * m_MLocal * m_R0;
+	m_M = m_R0 * m_MLocal * m_R0.transpose();
 }
 
 void FemElement1DBeam::computeStiffness(const DeformableRepresentationState& state,
@@ -331,7 +331,7 @@ void FemElement1DBeam::computeStiffness(const DeformableRepresentationState& sta
 	m_KLocal(5, 7)   = m_KLocal(7, 5);
 
 	// Transformation Local -> Global
-	m_K = m_R0.transpose() * m_KLocal * m_R0;
+	m_K = m_R0 * m_KLocal * m_R0.transpose();
 }
 
 void FemElement1DBeam::computeInitialRotation(const DeformableRepresentationState& state)
