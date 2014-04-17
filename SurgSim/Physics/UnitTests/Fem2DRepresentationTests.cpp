@@ -255,7 +255,7 @@ protected:
 	}
 
 public:
-	void setNodePositions(std::vector<Vector3d> nodes, std::vector<size_t> fixedNodes)
+	void setNodePositions(const std::vector<Vector3d>& nodes, const std::vector<size_t>& fixedNodes)
 	{
 		const size_t numDofPerNode = m_fem->getNumDofPerNode();
 		std::shared_ptr<DeformableRepresentationState> state = std::make_shared<DeformableRepresentationState>();
@@ -481,20 +481,22 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 	EXPECT_NEAR( 0.062971 * inchToMeter, getUy(7), epsilonCantilever2);
 }
 
-/// Generic algorithm to define the triangles in between 2 arrays of nodes:
-///  1---2---3---4---N  array2
+/// Generic algorithm to define the triangles in between 2 arrays of consecutive node indices:
+/// secondStartIndex
+///  *---1---2---3---4  array2
 ///  | \ | \ | \ | \ |
-///  1---2---3---4---N  array1
-template <size_t N, size_t M>
-void defineTriangleStrips(std::array<unsigned int, N> array1, std::array<unsigned int, N> array2,
-								 std::array<std::array<unsigned int, 3>, M>& triangleLists, size_t& triangleId)
+///  *---1---2---3---4  array1
+/// firstStartIndex
+template <int M>
+void defineTriangleStrips(size_t firstStartIndex, size_t secondStartIndex, size_t number,
+						  std::array<std::array<unsigned int, 3>, M>* triangleLists, size_t* triangleId)
 {
-	for (size_t i = 0; i < N - 1; i++)
+	for (size_t i = 0; i < number - 1; i++)
 	{
-		std::array<unsigned int, 3> triangle1 = {{array1[i], array1[i + 1], array2[i]}};
-		std::array<unsigned int, 3> triangle2 = {{array1[i + 1], array2[i + 1], array2[i]}};
-		triangleLists[triangleId++] = triangle1;
-		triangleLists[triangleId++] = triangle2;
+		std::array<unsigned int, 3> triangle1 = {{firstStartIndex + i, firstStartIndex + i + 1, secondStartIndex + i}};
+		std::array<unsigned int, 3> triangle2 = {{firstStartIndex + i + 1, secondStartIndex + i + 1, secondStartIndex + i}};
+		(*triangleLists)[(*triangleId)++] = triangle1;
+		(*triangleLists)[(*triangleId)++] = triangle2;
 	}
 }
 
@@ -662,78 +664,42 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	const int numTriangles = 110;
 	std::array<std::array<unsigned int, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
+	defineTriangleStrips(0, 6, 6, &trianglesNodeIds, &triangleId);
+	defineTriangleStrips(6, 12, 6, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 6> array1 = {{0, 1, 2, 3, 4, 5}};
-		std::array<unsigned int, 6> array2 = {{6, 7, 8, 9, 10, 11}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
-	}
-	{
-		std::array<unsigned int, 6> array1 = {{6, 7, 8, 9, 10, 11}};
-		std::array<unsigned int, 6> array2 = {{12, 13, 14, 15, 16, 17}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
 		std::array<unsigned int, 3> triangle = {{11, 18, 17}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
+	defineTriangleStrips(12, 19, 7, &trianglesNodeIds, &triangleId);
+	defineTriangleStrips(19, 26, 5, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 7> array1 = {{12, 13, 14, 15, 16, 17, 18}};
-		std::array<unsigned int, 7> array2 = {{19, 20, 21, 22, 23, 24, 25}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
-	}
-	{
-		std::array<unsigned int, 5> array1 = {{19, 20, 21, 22, 23}};
-		std::array<unsigned int, 5> array2 = {{26, 27, 28, 29, 30}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
 		std::array<unsigned int, 3> triangle = {{23, 24, 30}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
+	defineTriangleStrips(26, 31, 4, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 4> array2 = {{26, 27, 28, 29}};
-		std::array<unsigned int, 4> array1 = {{31, 32, 33, 34}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
 		std::array<unsigned int, 3> triangle = {{29, 30, 34}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
+	defineTriangleStrips(31, 35, 4, &trianglesNodeIds, &triangleId);
+	defineTriangleStrips(35, 39, 4, &trianglesNodeIds, &triangleId);
+	defineTriangleStrips(39, 43, 4, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 4> array1 = {{31, 32, 33, 34}};
-		std::array<unsigned int, 4> array2 = {{35, 36, 37, 38}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
-	}
-	{
-		std::array<unsigned int, 4> array1 = {{35, 36, 37, 38}};
-		std::array<unsigned int, 4> array2 = {{39, 40, 41, 42}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
-	}
-	{
-		std::array<unsigned int, 4> array1 = {{39, 40, 41, 42}};
-		std::array<unsigned int, 4> array2 = {{43, 44, 45, 46}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
 		std::array<unsigned int, 3> triangle = {{42, 47, 46}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
+	defineTriangleStrips(43, 48, 5, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 5> array1 = {{43, 44, 45, 46, 47}};
-		std::array<unsigned int, 5> array2 = {{48, 49, 50, 51, 52}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
 		std::array<unsigned int, 3> triangle = {{47, 53, 52}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
+	defineTriangleStrips(48, 55, 7, &trianglesNodeIds, &triangleId);
+	defineTriangleStrips(55, 62, 6, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 7> array1 = {{48, 49, 50, 51, 52, 53, 54}};
-		std::array<unsigned int, 7> array2 = {{55, 56, 57, 58, 59, 60, 61}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
-	}
-	{
-		std::array<unsigned int, 6> array1 = {{55, 56, 57, 58, 59, 60}};
-		std::array<unsigned int, 6> array2 = {{62, 63, 64, 65, 66, 67}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
 		std::array<unsigned int, 3> triangle = {{60, 61, 67}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
-	{
-		std::array<unsigned int, 6> array1 = {{62, 63, 64, 65, 66, 67}};
-		std::array<unsigned int, 6> array2 = {{68, 69, 70, 71, 72, 73}};
-		defineTriangleStrips(array1, array2, trianglesNodeIds, triangleId);
-	}
+	defineTriangleStrips(62, 68, 6, &trianglesNodeIds, &triangleId);
 
 	for (size_t triangleId = 0; triangleId < numTriangles; triangleId++)
 	{
