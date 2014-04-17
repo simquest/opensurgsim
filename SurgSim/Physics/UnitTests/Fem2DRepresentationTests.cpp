@@ -919,8 +919,8 @@ TEST_F(Fem2DMechanicalValidationTests, CantileverPlateTest)
 	solve();
 
 	// Expect 5% error max (in the Thesis, the author gets 4.96% error)
-	const double epsilonNode76 = 1.67787 * inchToMeter * 0.05;
-	EXPECT_NEAR(-1.67787 * inchToMeter, getUz(76), epsilonNode76);
+	const double epsilonNode76 = 1.68787 * inchToMeter * 0.05;
+	EXPECT_NEAR(-1.68787 * inchToMeter, getUz(76), epsilonNode76);
 
 	// Expect 5% error max (in the Thesis, the author gets 4.98% error)
 	const double epsilonNode40 = 0.599412 * inchToMeter * 0.05;
