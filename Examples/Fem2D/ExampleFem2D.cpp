@@ -169,7 +169,7 @@ std::shared_ptr<SceneElement> createFem2D(const std::string& name,
 	createFem2DCylinder(physicsRepresentation);
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
-	physicsRepresentation->setRayleighDampingMass(1e-2);
+	physicsRepresentation->setRayleighDampingMass(1e0);
 	physicsRepresentation->setRayleighDampingStiffness(1e-3);
 
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
