@@ -147,6 +147,7 @@ TEST(BasicThreadTest, SynchronousThread)
 	barrier->wait(true);
 
 	barrier->wait(false);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	m.stop();
 }
 
