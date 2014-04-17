@@ -20,8 +20,6 @@
 
 #include "SurgSim/Math/Aabb.h"
 
-#include <vector>
-
 namespace SurgSim
 {
 

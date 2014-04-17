@@ -64,7 +64,7 @@ public:
 	/// The split is done along the longest axis of the enclosing aabb, the center of this axis is the point where
 	/// the split occurs. This object will keep items that have a smaller coordinate than the center, the result will
 	/// receive all items that have a larger coordinate on the determined axis.
-	/// \return AabbTreeData with the items to the ight of the center of the longest axis.
+	/// \return AabbTreeData with the items to the right of the center of the longest axis.
 	std::shared_ptr<AabbTreeData> split();
 
 	/// Check whether there could be any intersections with a given bounding box.

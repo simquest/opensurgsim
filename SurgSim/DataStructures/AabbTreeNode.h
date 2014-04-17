@@ -26,7 +26,7 @@ namespace SurgSim
 namespace DataStructures
 {
 
-/// Node class for the AabbTree, this handles groups of items and subdivision if the number of items gets too long
+/// Node class for the AabbTree, this handles groups of items and subdivision if the number of items gets too big
 class AabbTreeNode : public TreeNode
 {
 public:
@@ -47,9 +47,13 @@ public:
 	/// Add data to this node, if maxNodeData is >0 the node will split if the number of data items exceeds maxNodeData
 	/// \param aabb The aabb for the item to be added.
 	/// \param id The id for the item that is being added, handled by the user of this class.
-	/// \param maxNodeData number of maximum items of data in this node, if more, the node will split
+	/// \param maxNodeData number of maximum items of data in this node, if more, the node will split,
+	///					   if -1 the node will not be split
 	void addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t maxNodeData = -1);
 
+	/// Fetch a list of items that have AABBs intersecting with the given AABB
+	/// \param aabb The bounding box for the query.
+	/// \param result [out] location to receive the results of the call.
 	void getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result);
 
 protected:
@@ -60,6 +64,8 @@ private:
 
 	/// The internal bounding box for this node, it is used when the node does not have any data
 	SurgSim::Math::Aabbd m_aabb;
+
+	/// Cache for the index of the longest axis on this node
 	unsigned int m_axis;
 };
 

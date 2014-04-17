@@ -16,6 +16,7 @@
 #include "SurgSim/DataStructures/TreeNode.h"
 
 #include "SurgSim/DataStructures/TreeData.h"
+#include "SurgSim/Framework/Assert.h"
 
 #include <typeinfo>
 
@@ -63,33 +64,35 @@ std::shared_ptr<TreeData> TreeNode::getData() const
 	return m_data;
 }
 
-void TreeNode::setNumChildren(unsigned int numChildren)
+void TreeNode::setNumChildren(size_t numChildren)
 {
 	m_children.resize(numChildren);
 }
 
-unsigned int TreeNode::getNumChildren() const
+size_t TreeNode::getNumChildren() const
 {
 	return m_children.size();
 }
 
 void TreeNode::addChild(const std::shared_ptr<TreeNode>& node)
 {
-	m_children.push_back(node);
+	m_children.emplace_back(node);
 }
 
 void TreeNode::addChild(const std::shared_ptr<TreeNode>&& node)
 {
-	m_children.push_back(node);
+	m_children.emplace_back(node);
 }
 
-void TreeNode::setChild(unsigned int index, const std::shared_ptr<TreeNode>& node)
+void TreeNode::setChild(size_t index, const std::shared_ptr<TreeNode>& node)
 {
+	SURGSIM_ASSERT(index < m_children.size()) << "setChild() with invalid index for child.";
 	m_children[index] = node;
 }
 
-std::shared_ptr<TreeNode> TreeNode::getChild(unsigned int index) const
+std::shared_ptr<TreeNode> TreeNode::getChild(size_t index) const
 {
+	SURGSIM_ASSERT(index < m_children.size()) << "getChild() with invalid index for child.";
 	return m_children[index];
 }
 

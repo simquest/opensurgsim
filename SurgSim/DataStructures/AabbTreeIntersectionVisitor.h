@@ -63,7 +63,7 @@ public:
 
 private:
 
-	/// List of objects found for intersections
+	/// List of ids found for intersections
 	std::list<size_t> m_intersections;
 
 	/// Bounding box used for intersection test

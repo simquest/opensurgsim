@@ -78,8 +78,8 @@ void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t m
 	if (getNumChildren() > 0)
 	{
 		size_t childIndex = (aabb.center()(m_axis) < m_aabb.center()(m_axis)) ? 0 : 1;
-		auto childData = std::static_pointer_cast<AabbTreeNode>(getChild(childIndex));
-		childData->addData(aabb, id, maxNodeData);
+		auto childNode = std::static_pointer_cast<AabbTreeNode>(getChild(childIndex));
+		childNode->addData(aabb, id, maxNodeData);
 		m_aabb.extend(aabb);
 	}
 	else

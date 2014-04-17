@@ -37,7 +37,7 @@ bool AabbTreeData::isEqual(const TreeData* data) const
 	// The type safety of this is guaranteed by the == operator in TreeData
 	const AabbTreeData* treeData = static_cast<const AabbTreeData*>(data);
 	bool result = false;
-	if (getSize() == treeData->getSize())
+	if (getSize() == treeData->getSize() && getAabb().isApprox(treeData->getAabb()))
 	{
 		result = true;
 		auto it = m_data.cbegin();

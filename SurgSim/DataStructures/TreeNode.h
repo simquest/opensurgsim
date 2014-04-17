@@ -49,13 +49,51 @@ public:
 	/// \return The data of this node.
 	std::shared_ptr<TreeData> getData() const;
 
+	/// \return The number of children of this node.
+	size_t getNumChildren() const;
+
+	/// Returns the specified child of this node.
+	/// \param index	Index of the child
+	/// \return Child at the specified index
+	std::shared_ptr<TreeNode> getChild(size_t index) const;
+
+	/// Public entry point for visitor, currently this performs pre-order traversal of the tree
+	/// \param visitor The visitor that wants to traverse the tree
+	void accept(TreeVisitor* visitor);
+
+	/// Returns true if the nodes are equal; otherwise, returns false.
+	/// If the nodes are not of the same type, returns false;
+	/// otherwise, compares with the implementation of isEqual(const TreeNode&).
+	/// \param node The node for comparison.
+	/// \return true is this node and the one from the parameter are equal.
+	bool operator==(const TreeNode& node) const;
+
+	/// Returns true if the nodes are not equal; otherwise, returns false.
+	/// If the nodes are not of the same type, returns false;
+	/// otherwise, compares with the implementation of isEqual(const TreeNode&).
+	/// \param node The node for comparison.
+	/// \return true if this node and the parameter are not equal
+	bool operator!=(const TreeNode& node) const;
+
+protected:
+
+	/// Returns true if the nodes are equal; otherwise, returns false.
+	/// Recurses on children.
+	/// Override this method in derived classes to implement different comparisons.
+	/// \param The node for comparison.
+	/// \return true if this node is equal to the node in the parameter.
+	virtual bool isEqual(const TreeNode& node) const;
+
+	/// Private function for use with the visitor pattern, this needs to be implemented
+	/// to make the correct double dispatch call to the dynamic type of this class.
+	/// \param visitor The visitor that is trying to traverse the tree.
+	/// \return true to indicate proceeding with the visitor, false indicates to abort the traversal.
+	virtual bool doAccept(TreeVisitor* visitor) = 0;
+
 	/// Sets the number of children of this node.
 	/// Any added children will be null.
 	/// \param numChildren The new number of children.
-	void setNumChildren(unsigned int numChildren);
-
-	/// \return The number of children of this node.
-	unsigned int getNumChildren() const;
+	void setNumChildren(size_t numChildren);
 
 	/// Add a child to this node.
 	/// \param node The new child node.
@@ -68,42 +106,7 @@ public:
 	/// Set a specific child of this node.
 	/// \param index	Index of the child
 	/// \param node		Node to become a child
-	void setChild(unsigned int index, const std::shared_ptr<TreeNode>& node);
-
-	/// Returns the specified child of this node.
-	/// \param index	Index of the child
-	/// \return Child at the specified index
-	std::shared_ptr<TreeNode> getChild(unsigned int index) const;
-
-	/// Public entry point for visitor, currently this performs pre-order traversal of the tree
-	/// \param visitor The visitor that wants to traverse the tree
-	virtual void accept(TreeVisitor* visitor);
-
-	/// Returns true if the nodes are equal; otherwise, returns false.
-	/// If the nodes are not of the same type, returns false;
-	/// otherwise, compares with the implementation of isEqual(const TreeNode&).
-	/// \param node The node for comparison.
-	bool operator==(const TreeNode& node) const;
-
-	/// Returns true if the nodes are not equal; otherwise, returns false.
-	/// If the nodes are not of the same type, returns false;
-	/// otherwise, compares with the implementation of isEqual(const TreeNode&).
-	/// \param node The node for comparison.
-	bool operator!=(const TreeNode& node) const;
-
-protected:
-
-	/// Returns true if the nodes are equal; otherwise, returns false.
-	/// Recurses on children.
-	/// Override this method in derived classes to implement different comparisons.
-	/// \param The node for comparison.
-	virtual bool isEqual(const TreeNode& node) const;
-
-	/// Private function for use with the visitor pattern, this needs to be implemented
-	/// to make the correct double dispatch call to the dynamic type of this class.
-	/// \param visitor The visitor that is trying to traverse the tree.
-	/// \return true to indicate proceeding with the visitor, false indicates to abort the traversal.
-	virtual bool doAccept(TreeVisitor* visitor) = 0;
+	void setChild(size_t index, const std::shared_ptr<TreeNode>& node);
 
 private:
 
