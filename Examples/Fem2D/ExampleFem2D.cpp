@@ -113,7 +113,7 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 			// On a given cross-section, each node will be connected to the next node
 			// The last node is connected to the 1st node via a modulo in the node index calculation
 
-			std::array<std::array<unsigned int, 2>, 2> nodeIds =
+			std::array<std::array<size_t, 2>, 2> nodeIds =
 			{{
 				{{
 					sectionId * numNodesOnSection + nodeIdOnSection,
@@ -125,7 +125,8 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 					(sectionId + 1) * numNodesOnSection + (nodeIdOnSection + 1) % numNodesOnSection
 				}}
 			}};
-			std::array<unsigned int, 3> triangle1NodeIds = {{nodeIds[0][0], nodeIds[0][1], nodeIds[1][1]}};
+			std::array<unsigned int, 3> triangle1NodeIds = {{static_cast<unsigned int>(nodeIds[0][0]),
+				static_cast<unsigned int>(nodeIds[0][1]), static_cast<unsigned int>(nodeIds[1][1])}};
 			std::shared_ptr<FemElement2DTriangle> triangle1 = std::make_shared<FemElement2DTriangle>(triangle1NodeIds);
 			triangle1->setThickness(thickness);
 			triangle1->setMassDensity(massDensity);
@@ -133,7 +134,8 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 			triangle1->setYoungModulus(youngModulus);
 			physicsRepresentation->addFemElement(triangle1);
 
-			std::array<unsigned int, 3> triangle2NodeIds = {{nodeIds[0][0], nodeIds[1][1], nodeIds[1][0]}};
+			std::array<unsigned int, 3> triangle2NodeIds = {{static_cast<unsigned int>(nodeIds[0][0]),
+				static_cast<unsigned int>(nodeIds[1][1]), static_cast<unsigned int>(nodeIds[1][0])}};
 			std::shared_ptr<FemElement2DTriangle> triangle2 = std::make_shared<FemElement2DTriangle>(triangle2NodeIds);
 			triangle2->setThickness(thickness);
 			triangle2->setMassDensity(massDensity);
