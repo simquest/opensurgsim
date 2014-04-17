@@ -50,19 +50,29 @@ using SurgSim::Physics::PhysicsManager;
 namespace
 {
 
-/// Load a cylinder shape as a Fem2D
-void loadModelFem2D(std::shared_ptr<Fem2DRepresentation> physicsRepresentation)
+/// Create a Fem2D with a cylinder shape
+/// \note This is defining a cylinder based on cylindrical coordinates M(length, angle)
+/// \note The cylinder is composed of cross-sections with nodes added radially to each cross-section.
+/// \note The nodes of 2 consecutives cross-sections are connected to form square-patches which in turns
+/// \note are decomposed into 2 FemElement2DTriangle.
+void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentation)
 {
+	// Mechanical properties
 	const double youngModulus = 1e6;
 	const double poissonRatio = 0.35;
 	const double massDensity = 5000.0;
+	// Geometrical properties
 	const double length = 1.0;
 	const double radius = 1e-1;
 	const double thickness = 3e-2;
+	// Number of cross-sections and their discretization in nodes
 	const size_t numSections = 7;
 	const size_t numNodesOnSection = 8;
 	const size_t numNodes = numSections * numNodesOnSection;
+
+	// Distance between 2 consecutive cross-section
 	const double deltaL = length / (numSections - 1);
+	// Angle between 2 consecutive nodes on a cross-section
 	const double deltaAngle = 2.0 * M_PI / numNodesOnSection;
 
 	std::shared_ptr<DeformableRepresentationState> restState = std::make_shared<DeformableRepresentationState>();
@@ -80,12 +90,15 @@ void loadModelFem2D(std::shared_ptr<Fem2DRepresentation> physicsRepresentation)
 				Vector3d(-length / 2.0 + sectionId * deltaL, radius * cos(angle), radius * sin(angle));
 		}
 	}
+	// We fix the nodes on the 1st and last cross-sections
+	const size_t section0 = 0;
+	const size_t section1 = numSections - 1;
 	for (size_t nodeId = 0; nodeId < numNodesOnSection; nodeId++)
 	{
 		for (size_t dofId = 0; dofId < numDofPerNode; dofId++)
 		{
-			restState->addBoundaryCondition(nodeId * numDofPerNode + dofId);
-			restState->addBoundaryCondition((numNodes - 1 - nodeId) * numDofPerNode + dofId);
+			restState->addBoundaryCondition((nodeId + numNodesOnSection * section0) * numDofPerNode + dofId);
+			restState->addBoundaryCondition((nodeId + numNodesOnSection * section1) * numDofPerNode + dofId);
 		}
 	}
 	physicsRepresentation->setInitialState(restState);
@@ -93,18 +106,23 @@ void loadModelFem2D(std::shared_ptr<Fem2DRepresentation> physicsRepresentation)
 	// Adds all the FemElements
 	for (size_t sectionId = 0; sectionId < numSections - 1; sectionId++)
 	{
-		for (size_t nodeIdOnSection = 0; nodeIdOnSection < numNodesOnSection - 1; nodeIdOnSection++)
+		// For each cross-section, we connect the nodes of this cross-section to the nodes of the next cross-section
+
+		for (size_t nodeIdOnSection = 0; nodeIdOnSection < numNodesOnSection; nodeIdOnSection++)
 		{
+			// On a given cross-section, each node will be connected to the next node
+			// The last node is connected to the 1st node via a modulo in the node index calculation
+
 			std::array<std::array<unsigned int, 2>, 2> nodeIds =
 			{{
 				{{
 					sectionId * numNodesOnSection + nodeIdOnSection,
-					sectionId * numNodesOnSection + nodeIdOnSection + 1
+					sectionId * numNodesOnSection + (nodeIdOnSection + 1) % numNodesOnSection
 				}}
 				,
 				{{
 					(sectionId + 1) * numNodesOnSection + nodeIdOnSection,
-					(sectionId + 1) * numNodesOnSection + nodeIdOnSection + 1
+					(sectionId + 1) * numNodesOnSection + (nodeIdOnSection + 1) % numNodesOnSection
 				}}
 			}};
 			std::array<unsigned int, 3> triangle1NodeIds = {{nodeIds[0][0], nodeIds[0][1], nodeIds[1][1]}};
@@ -123,27 +141,6 @@ void loadModelFem2D(std::shared_ptr<Fem2DRepresentation> physicsRepresentation)
 			triangle2->setYoungModulus(youngModulus);
 			physicsRepresentation->addFemElement(triangle2);
 		}
-		size_t nodeIdOnSection = numNodesOnSection - 1;
-		std::array<std::array<unsigned int, 2>, 2> nodeIds = {{
-			{{sectionId * numNodesOnSection + nodeIdOnSection, sectionId * numNodesOnSection + 0}}
-			,
-			{{(sectionId + 1) * numNodesOnSection + nodeIdOnSection, (sectionId + 1) * numNodesOnSection + 0}}
-		}};
-		std::array<unsigned int, 3> triangle1NodeIds = {{nodeIds[0][0], nodeIds[0][1], nodeIds[1][1]}};
-		std::shared_ptr<FemElement2DTriangle> triangle1 = std::make_shared<FemElement2DTriangle>(triangle1NodeIds);
-		triangle1->setThickness(thickness);
-		triangle1->setMassDensity(massDensity);
-		triangle1->setPoissonRatio(poissonRatio);
-		triangle1->setYoungModulus(youngModulus);
-		physicsRepresentation->addFemElement(triangle1);
-
-		std::array<unsigned int, 3> triangle2NodeIds = {{nodeIds[0][0], nodeIds[1][1], nodeIds[1][0]}};
-		std::shared_ptr<FemElement2DTriangle> triangle2 = std::make_shared<FemElement2DTriangle>(triangle2NodeIds);
-		triangle2->setThickness(thickness);
-		triangle2->setMassDensity(massDensity);
-		triangle2->setPoissonRatio(poissonRatio);
-		triangle2->setYoungModulus(youngModulus);
-		physicsRepresentation->addFemElement(triangle2);
 	}
 }
 
@@ -159,17 +156,17 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(
 	return viewElement;
 }
 
-// Generates a 2d fem comprised of a cylinder. The number of fem elements is determined by loadModelFem2D.
+// Generates a 2d fem comprised of a cylinder. The number of fem elements is determined by createFem2DCylinder.
 std::shared_ptr<SceneElement> createFem2D(const std::string& name,
 		const SurgSim::Math::RigidTransform3d& gfxPose,
 		const SurgSim::Math::Vector4d& color,
 		SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<Fem2DRepresentation> physicsRepresentation
-		= std::make_shared<Fem2DRepresentation>("Physics Representation: " + name);
+		= std::make_shared<Fem2DRepresentation>("Physics Representation");
 
 	// In this example, the physics representations are not transformed, only the graphics will be transformed
-	loadModelFem2D(physicsRepresentation);
+	createFem2DCylinder(physicsRepresentation);
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	physicsRepresentation->setRayleighDampingMass(1e-2);
@@ -180,7 +177,7 @@ std::shared_ptr<SceneElement> createFem2D(const std::string& name,
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
-		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
+		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("TriangleMesh Representation");
 	graphicsTriangleMeshRepresentation->setInitialPose(gfxPose);
 	auto mesh = graphicsTriangleMeshRepresentation->getMesh();
 	// Create vertices
@@ -202,12 +199,12 @@ std::shared_ptr<SceneElement> createFem2D(const std::string& name,
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	femSceneElement->addComponent(
 		std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
-			name + " physics to triangle mesh",
+			"physics to triangle mesh",
 			physicsRepresentation->getFinalState(),
 			graphicsTriangleMeshRepresentation->getMesh()));
 
 	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsPointCloudRepresentation
-			= std::make_shared<OsgPointCloudRepresentation<void>>("Graphics Representation: " + name);
+			= std::make_shared<OsgPointCloudRepresentation<void>>("PointCloud Representation");
 	graphicsPointCloudRepresentation->setInitialPose(gfxPose);
 	graphicsPointCloudRepresentation->setColor(color);
 	graphicsPointCloudRepresentation->setPointSize(3.0f);
@@ -215,7 +212,7 @@ std::shared_ptr<SceneElement> createFem2D(const std::string& name,
 	femSceneElement->addComponent(graphicsPointCloudRepresentation);
 
 	femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
-		"Transfer from Physics to Graphics point cloud: " + name,
+		"Transfer from Physics to Graphics point cloud",
 		physicsRepresentation->getFinalState(),
 		graphicsPointCloudRepresentation->getVertices()));
 
@@ -264,7 +261,7 @@ int main(int argc, char* argv[])
 					Vector4d(0, 0, 1, 1),
 					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
 
-	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
+	scene->addSceneElement(createView("view1", 0, 0, 1024, 768));
 
 	camera->setInitialPose(SurgSim::Math::makeRigidTransform(quaternionIdentity, Vector3d(0.0, 0.0, 2.0)));
 
