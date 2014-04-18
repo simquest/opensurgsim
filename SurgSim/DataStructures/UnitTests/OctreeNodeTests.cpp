@@ -276,7 +276,7 @@ TEST(OctreeNodeTests, EmptyData)
 }
 
 
-TEST(OctreeNodeTests, loadOctree)
+TEST(OctreeNodeTests, LoadOctree)
 {
 	std::shared_ptr<OctreeNode<SurgSim::DataStructures::EmptyData>> octree;
 	EXPECT_NO_THROW(octree = SurgSim::DataStructures::loadOctree("OctreeShapeData/staple.vox"));

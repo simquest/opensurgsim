@@ -80,7 +80,7 @@ public:
 	void setRootNode(std::shared_ptr<NodeType> node);
 
 	/// Set the file name from which the octree will be loaded.
-	/// \param filename    The filename to load
+	/// \param fileName The filename to load.
 	/// \note The octree will be loaded right after the file name is set,
 	///       if 'fileName' indicates a file containing a valid octree.
 	/// \note If the valid file contains an empty octree, i.e. no vertex is specified in that file,

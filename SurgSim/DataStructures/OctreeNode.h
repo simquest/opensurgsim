@@ -151,7 +151,7 @@ protected:
 
 
 /// A free function to load an octree from file.
-/// \param filename	Name of the external file which contains an octree.
+/// \param fileName	Name of the external file which contains an octree.
 /// \return A std::shared_ptr<> pointing to an OctreeNode.
 std::shared_ptr<OctreeNode<SurgSim::DataStructures::EmptyData>> loadOctree(const std::string& fileName);
 
