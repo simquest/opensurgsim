@@ -21,10 +21,11 @@ include_directories(
 set(SURGSIM_DATA_STRUCTURES_SOURCES
 	DataGroupBuilder.cpp
 	IndexDirectory.cpp
-	TriangleMesh.cpp
-	TriangleMeshBase.cpp
+	OctreeNode.cpp
 	ply.c
 	PlyReader.cpp
+	TriangleMesh.cpp
+	TriangleMeshBase.cpp
 	TriangleMeshPlyReaderDelegate.cpp
 )
 

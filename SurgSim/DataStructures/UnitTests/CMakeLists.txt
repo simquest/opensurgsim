@@ -45,6 +45,8 @@ set(LIBS
 	SurgSimDataStructures
 )
 
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OctreeShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 surgsim_add_unit_tests(SurgSimDataStructuresTest)
 
 set_target_properties(SurgSimDataStructuresTest PROPERTIES FOLDER "DataStructures")

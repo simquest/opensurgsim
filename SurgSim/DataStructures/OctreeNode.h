@@ -20,6 +20,7 @@
 #include <memory>
 #include <Eigen/Geometry>
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Math/Vector.h"
 
 
@@ -147,6 +148,12 @@ protected:
 	/// The children of this node
 	std::array<std::shared_ptr<OctreeNode<Data> >, 8> m_children;
 };
+
+
+/// A free function to load an octree from file.
+/// \param fileName	Name of the external file which contains an octree.
+/// \return A std::shared_ptr<> pointing to an OctreeNode.
+std::shared_ptr<OctreeNode<SurgSim::DataStructures::EmptyData>> loadOctree(const std::string& fileName);
 
 };  // namespace DataStructures
 };  // namespace SurgSim

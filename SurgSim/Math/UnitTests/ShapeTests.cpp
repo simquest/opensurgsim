@@ -65,7 +65,7 @@ public:
 	double m_size[3];
 };
 
-TEST_F(ShapeTest, SphereSerialize)
+TEST_F(ShapeTest, SphereSerializeTest)
 {
 	std::shared_ptr<Shape> sphere;
 	EXPECT_NO_THROW({sphere = Shape::getFactory().create("SurgSim::Math::SphereShape");});
@@ -110,7 +110,7 @@ TEST_F(ShapeTest, Sphere)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(ShapeTest, BoxSerialize)
+TEST_F(ShapeTest, BoxSerializeTest)
 {
 	std::shared_ptr<Shape> box;
 	EXPECT_NO_THROW({box = Shape::getFactory().create("SurgSim::Math::BoxShape");});
@@ -164,7 +164,7 @@ TEST_F(ShapeTest, Box)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(ShapeTest, CylinderSerialize)
+TEST_F(ShapeTest, CylinderSerializeTest)
 {
 	std::shared_ptr<Shape> cylinder;
 	EXPECT_NO_THROW({cylinder = Shape::getFactory().create("SurgSim::Math::CylinderShape");});
@@ -214,7 +214,7 @@ TEST_F(ShapeTest, Cylinder)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(ShapeTest, CapsuleSerialize)
+TEST_F(ShapeTest, CapsuleSerializeTest)
 {
 	std::shared_ptr<Shape> capsule;
 	EXPECT_NO_THROW({capsule = Shape::getFactory().create("SurgSim::Math::CapsuleShape");});
@@ -269,6 +269,27 @@ TEST_F(ShapeTest, Capsule)
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
+}
+
+
+TEST_F(ShapeTest, OctreeSerializeTest)
+{
+	std::shared_ptr<SurgSim::Math::OctreeShape> octree = std::make_shared<SurgSim::Math::OctreeShape>();
+	octree->setFileName("OctreeShapeData/staple.vox");
+
+	// Encoding a OctreeShape
+	YAML::Node node;
+	ASSERT_NO_THROW(node = octree->encode());
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(1u, node.size());
+
+	// Decoding the OctreeShape
+	std::shared_ptr<SurgSim::Math::OctreeShape> newOctree = std::make_shared<SurgSim::Math::OctreeShape>();
+	ASSERT_NO_THROW(newOctree->decode(node));
+	EXPECT_EQ("SurgSim::Math::OctreeShape", newOctree->getClassName());
+	EXPECT_EQ("OctreeShapeData/staple.vox", newOctree->getFileName());
+	EXPECT_EQ(octree->getRootNode()->isActive(), newOctree->getRootNode()->isActive());
+	EXPECT_EQ(octree->getRootNode()->hasChildren(), newOctree->getRootNode()->hasChildren());
 }
 
 TEST_F(ShapeTest, Octree)
