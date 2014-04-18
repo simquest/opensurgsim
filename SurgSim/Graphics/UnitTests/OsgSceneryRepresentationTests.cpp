@@ -29,6 +29,7 @@
 
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::SceneryRepresentation;
 
 class OsgSceneryRepresentationTest: public ::testing::Test
 {
@@ -81,22 +82,14 @@ TEST_F(OsgSceneryRepresentationTest, AccessibleTest)
 		"SurgSim::Graphics::OsgSceneryRepresentation",
 		"scenery"));
 
-	EXPECT_EQ("SurgSim::Graphics::OsgSceneryRepresentation", component->getClassName());
-
 	std::string fileName("TestFileName");
 	component->setValue("FileName", fileName);
-	YAML::Node node(YAML::convert<SurgSim::Framework::Component>::encode(*component));
-
-	auto decoded = std::dynamic_pointer_cast<SurgSim::Graphics::OsgSceneryRepresentation>(
-		node.as<std::shared_ptr<SurgSim::Framework::Component>>());
-
-	EXPECT_NE(nullptr, decoded);
-	EXPECT_EQ(fileName, decoded->getValue<std::string>("FileName"));
+	EXPECT_EQ(fileName, component->getValue<std::string>("FileName"));
 }
 
-TEST_F(OsgSceneryRepresentationTest, OsgSceneryRepresentationSerializationTests)
+TEST_F(OsgSceneryRepresentationTest, SerializationTests)
 {
-	std::shared_ptr<OsgSceneryRepresentation> scenery = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
+	std::shared_ptr<SceneryRepresentation> scenery = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
 
 	std::string fileName("TestFileName");
 	scenery->setFileName(fileName);
@@ -106,7 +99,7 @@ TEST_F(OsgSceneryRepresentationTest, OsgSceneryRepresentationSerializationTests)
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(5u, node.size());
 
-	std::shared_ptr<OsgSceneryRepresentation> result = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
+	std::shared_ptr<SceneryRepresentation> result = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
 	ASSERT_NO_THROW(result->decode(node));
 	EXPECT_EQ("SurgSim::Graphics::OsgSceneryRepresentation", result->getClassName());
 	EXPECT_EQ(fileName, result->getFileName());
