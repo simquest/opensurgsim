@@ -107,7 +107,7 @@ TEST(TransferPoseBehaviorTests, UpdateTest)
 	runtime->stop();
 }
 
-TEST(TransferPoseBehaviorTests, TransferPoseBehaviorSerializationTests)
+TEST(TransferPoseBehaviorTests, SerializationTests)
 {
 	std::shared_ptr<TransferPoseBehavior> behavior = std::make_shared<TransferPoseBehavior>("TransferPoseBehavior");
 	auto sender = std::make_shared<MockRepresentation>("TestRepresentation1");
@@ -123,6 +123,8 @@ TEST(TransferPoseBehaviorTests, TransferPoseBehaviorSerializationTests)
 	std::shared_ptr<TransferPoseBehavior> result = std::make_shared<TransferPoseBehavior>("TransferPoseBehavior");
 	ASSERT_NO_THROW(result->decode(node));
 	EXPECT_EQ("SurgSim::Framework::TransferPoseBehavior", result->getClassName());
+	EXPECT_EQ(sender->getName(), result->getPoseSender()->getName());
+	EXPECT_EQ(receiver->getName(), result->getPoseReceiver()->getName());
 }
 
 };  // namespace Blocks

@@ -45,9 +45,17 @@ public:
 	/// \param	sender	Representation which sends the pose.
 	void setPoseSender(std::shared_ptr<SurgSim::Framework::Representation> sender);
 
+	/// Get the pose sender.
+	/// \return The pose sender.
+	std::shared_ptr<SurgSim::Framework::Representation> getPoseSender() const;
+
 	/// Set the representation to receive the pose.
 	/// \param	receiver	Representation to receive the pose.
 	void setPoseReceiver(std::shared_ptr<SurgSim::Framework::Representation> receiver);
+
+	/// Get the pose receiver.
+	/// \return The pose receiver.
+	std::shared_ptr<SurgSim::Framework::Representation> getPoseReceiver() const;
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -59,16 +67,6 @@ protected:
 
 	/// Wakeup the behavior, which copies the initial pose
 	virtual bool doWakeUp();
-
-	// The following two methods are for serialization purpose only.
-
-	/// Get the pose sender.
-	/// \return The pose sender.
-	std::shared_ptr<SurgSim::Framework::Representation> getPoseSender() const;
-
-	/// Get the pose receiver.
-	/// \return The pose receiver.
-	std::shared_ptr<SurgSim::Framework::Representation> getPoseReceiver() const;
 
 private:
 	/// Representation to get the pose
