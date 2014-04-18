@@ -79,10 +79,10 @@ bool TransferPropertiesBehavior::connect(const Property& source, const Property&
 	auto sharedSource = source.accessible.lock();
 	auto sharedTarget = target.accessible.lock();
 
-	SURGSIM_ASSERT(sharedSource != sharedTarget || source.name != target.name) 
+	SURGSIM_ASSERT(sharedSource != sharedTarget || source.name != target.name)
 		<< "Cannot Read/Write with exactly the same property and object.";
 
-	SURGSIM_ASSERT(sharedSource->isReadable(source.name)) 
+	SURGSIM_ASSERT(sharedSource->isReadable(source.name))
 		<< "Source does not have a readable property called <" << source.name << ">.";
 
 	SURGSIM_ASSERT(sharedTarget->isWriteable(target.name))
