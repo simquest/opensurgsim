@@ -34,7 +34,7 @@ class Uniform : public virtual UniformBase
 public:
 
 	Uniform() {
-		SURGSIM_ADD_RW_PROPERTY(Uniform, T, value, get, set);
+		SURGSIM_ADD_RW_PROPERTY(Uniform, T, Value, get, set);
 	}
 
 	/// Sets the value of the uniform
