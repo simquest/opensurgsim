@@ -13,14 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
-
 #include <osg/PositionAttitudeTransform>
-#include <osg/Switch>
 #include <osgDB/ReadFile>
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 
 namespace
 {
