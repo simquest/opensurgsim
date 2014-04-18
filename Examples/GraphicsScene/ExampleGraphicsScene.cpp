@@ -321,24 +321,24 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime,
 
 	// connect the light pose and the light map camera pose, so when the light moves,
 	// this camera will move as well
-	copier->connect(light, "pose", camera, "pose");
+	copier->connect(light, "Pose", camera, "Pose");
 
 	// The following three uniforms in the shadowMapPass, are carry the information from the
 	// lightMapPass. They are used to project the incoming point into the space of the lightMap
 	// The view matrix of the camera used to render the light map
 	auto lightViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightViewMatrix");
 	shadowMapPass->getMaterial()->addUniform(lightViewMatrix);
-	copier->connect(lightMapPass->getCamera(), "floatViewMatrix", lightViewMatrix, "value");
+	copier->connect(lightMapPass->getCamera(), "FloatViewMatrix", lightViewMatrix, "Value");
 
 	// The projection matrix of the camera used to render the light map
 	auto lightProjectionMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightProjectionMatrix");
 	shadowMapPass->getMaterial()->addUniform(lightProjectionMatrix);
-	copier->connect(lightMapPass->getCamera(), "floatProjectionMatrix", lightProjectionMatrix, "value");
+	copier->connect(lightMapPass->getCamera(), "FloatProjectionMatrix", lightProjectionMatrix, "Value");
 
 	// The inverse view matrix of the camera used to render the light map
 	auto inverseViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_inverseViewMatrix");
 	shadowMapPass->getMaterial()->addUniform(inverseViewMatrix);
-	copier->connect(shadowMapPass->getCamera(), "floatInverseViewMatrix", inverseViewMatrix , "value");
+	copier->connect(shadowMapPass->getCamera(), "FloatInverseViewMatrix", inverseViewMatrix , "Value");
 
 	// Get the result of the lightMapPass and pass it on to the shadowMapPass
 	auto lightDepthTexture =
@@ -348,9 +348,9 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime,
 
 	// Make the camera in the shadowMapPass follow the main camera that is being used to render the
 	// whole scene
-	copier->connect(graphicsManager->getDefaultCamera(), "pose", shadowMapPass->getCamera(), "pose");
-	copier->connect(graphicsManager->getDefaultCamera(), "projectionMatrix",
-					shadowMapPass->getCamera() , "projectionMatrix");
+	copier->connect(graphicsManager->getDefaultCamera(), "Pose", shadowMapPass->getCamera(), "Pose");
+	copier->connect(graphicsManager->getDefaultCamera(), "ProjectionMatrix",
+					shadowMapPass->getCamera() , "ProjectionMatrix");
 
 	scene->addSceneElement(lightMapPass);
 	scene->addSceneElement(shadowMapPass);

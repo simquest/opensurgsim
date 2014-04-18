@@ -49,6 +49,7 @@ SET(LIBS
 	SurgSimCollision
 	SurgSimFramework
 	SurgSimMath
+	${YAML_CPP_LIBRARIES}
 )
 
 target_link_libraries(ExampleFem3D ${LIBS})

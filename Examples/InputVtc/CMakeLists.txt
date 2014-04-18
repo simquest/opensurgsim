@@ -44,6 +44,7 @@ set(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
 	SurgSimMath
+	${YAML_CPP_LIBRARIES}
 )
 
 if(BUILD_DEVICE_MULTIAXIS)

@@ -50,6 +50,7 @@ SET(LIBS
 	SurgSimCollision
 	SurgSimFramework
 	SurgSimMath
+	${YAML_CPP_LIBRARIES}
 )
 
 target_link_libraries(ExampleMassSprings ${LIBS})

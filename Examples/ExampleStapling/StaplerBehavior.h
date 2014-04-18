@@ -103,7 +103,7 @@ private:
 	/// Given a collision map, remove entries whose representations are not part of
 	/// enabled scene element lists.
 	/// \param [in,out] collisionsMap The collision map to be filtered.
-	void StaplerBehavior::filterCollisionMapForStapleEnabledRepresentations(
+	void filterCollisionMapForStapleEnabledRepresentations(
 		SurgSim::Collision::Representation::ContactMapType *collisionsMap);
 
 	/// Given a Collision::Representation, get the corresponding Physics::Representation.

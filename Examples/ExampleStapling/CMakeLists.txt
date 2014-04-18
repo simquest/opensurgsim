@@ -40,12 +40,14 @@ add_executable(ExampleStapling
 surgsim_show_ide_folders(
 	"${EXAMPLESTAPLING_SOURCES}" "${EXAMPLESTAPLING_HEADERS}")
 
-set(LIBS ${LIBS}
-		 IdentityPoseDevice
-		 MultiAxisDevice
-		 SurgSimBlocks
-		 SurgSimFramework
-		 SurgSimGraphics
+set(LIBS 
+	${LIBS}
+	IdentityPoseDevice
+	MultiAxisDevice
+	SurgSimBlocks
+	SurgSimFramework
+	SurgSimGraphics
+	${YAML_CPP_LIBRARIES}
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
