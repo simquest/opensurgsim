@@ -80,8 +80,19 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
-private:
+	/// Set loading filename
+	/// \param filename	The filename to load
+	/// \note The mesh will be loaded right after the file name is set,
+	///       if 'fileName' indicates a file containing a valid mesh.
+	/// \note If the valid file contains an empty mesh, i.e. no vertex is specified in that file,
+	///       an empty mesh will be held by this mesh shape.
+	void setFileName(const std::string& fileName);
 
+	/// Get the file name of the external file which contains the triangle mesh.
+	/// \return File name of the external file which contains the triangle mesh.
+	std::string getFileName() const;
+
+private:
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.
 	void computeVolumeIntegrals();
@@ -95,13 +106,15 @@ private:
 	/// Second moment of volume
 	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
 
-	/// Collision mesh associated to this MeshShape
+	/// The triangle mesh contained by this shape.
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
+
+	/// File name of the external file which contains the triangle mesh.
+	std::string m_fileName;
 };
 
 }; // Math
 }; // SurgSim
-
 
 #include "SurgSim/Math/MeshShape-inl.h"
 

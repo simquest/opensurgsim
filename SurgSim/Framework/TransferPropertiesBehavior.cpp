@@ -79,17 +79,16 @@ bool TransferPropertiesBehavior::connect(const Property& source, const Property&
 	auto sharedSource = source.accessible.lock();
 	auto sharedTarget = target.accessible.lock();
 
-	if (sharedSource == sharedTarget && source.name == target.name)
-	{
-		return false;
-	}
+	SURGSIM_ASSERT(sharedSource != sharedTarget || source.name != target.name) 
+		<< "Cannot Read/Write with exactly the same property and object.";
 
-	if (!sharedSource->isReadable(source.name) || !sharedTarget->isWriteable(target.name))
-	{
-		return false;
-	}
+	SURGSIM_ASSERT(sharedSource->isReadable(source.name)) 
+		<< "Source does not have a readable property called <" << source.name << ">.";
 
-	// \note HS-2013-nov-26 should also check matching types here
+	SURGSIM_ASSERT(sharedTarget->isWriteable(target.name))
+		<< "Target does not have a writeable property called <" << target.name << ">.";
+
+	// \note HS-2013-nov-26 should also that the type of the output can be converted to the input
 
 	auto entry = std::make_pair(source, target);
 

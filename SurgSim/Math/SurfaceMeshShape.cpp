@@ -15,6 +15,7 @@
 //
 
 #include "SurgSim/Math/SurfaceMeshShape.h"
+
 #include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
@@ -33,13 +34,27 @@ namespace SurgSim
 namespace Math
 {
 
-SurfaceMeshShape::SurfaceMeshShape()
+SurfaceMeshShape::SurfaceMeshShape() : m_volume(0.0), m_thickness(1e-2)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurfaceMeshShape, std::string, FileName, getFileName, setFileName);
 }
 
 int SurfaceMeshShape::getType()
 {
 	return SHAPE_TYPE_SURFACEMESH;
+}
+
+
+void SurfaceMeshShape::setFileName(const std::string& fileName)
+{
+	using SurgSim::DataStructures::TriangleMesh;
+	m_fileName = fileName;
+	m_mesh = std::make_shared<TriangleMesh>(*SurgSim::DataStructures::loadTriangleMesh(fileName));
+}
+
+std::string SurfaceMeshShape::getFileName() const
+{
+	return m_fileName;
 }
 
 std::shared_ptr<SurgSim::DataStructures::TriangleMesh> SurfaceMeshShape::getMesh()

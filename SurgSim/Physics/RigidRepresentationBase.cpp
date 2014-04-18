@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
@@ -74,10 +75,6 @@ const RigidRepresentationState& RigidRepresentationBase::getPreviousState() cons
 	return m_previousState;
 }
 
-
-
-
-
 const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getInitialPose() const
 {
 	return m_initialState.getPose();
@@ -125,6 +122,29 @@ const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::
 const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getCurrentParameters() const
 {
 	return m_currentParameters;
+}
+
+void RigidRepresentationBase::setCollisionRepresentation(
+	std::shared_ptr<SurgSim::Collision::Representation> representation)
+{
+	if (m_collisionRepresentation != representation)
+	{
+		// If we have an old collision representation clear the dependency
+		auto oldCollisionRep = std::dynamic_pointer_cast<RigidCollisionRepresentation>(m_collisionRepresentation);
+		if (oldCollisionRep != nullptr)
+		{
+			oldCollisionRep->setRigidRepresentation(nullptr);
+		}
+
+		Representation::setCollisionRepresentation(representation);
+
+		// If its a RigidCollisionRepresentation connect with this representation
+		auto newCollisionRep = std::dynamic_pointer_cast<RigidCollisionRepresentation>(representation);
+		if (newCollisionRep != nullptr)
+		{
+			newCollisionRep->setRigidRepresentation(std::static_pointer_cast<RigidRepresentationBase>(getSharedPtr()));
+		}
+	}
 }
 
 }; // Physics

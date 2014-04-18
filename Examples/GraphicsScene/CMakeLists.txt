@@ -51,6 +51,7 @@ surgsim_show_ide_folders(
 SET(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
+	${YAML_CPP_LIBRARIES}
 )
 
 target_link_libraries(ExampleGraphicsScene ${LIBS})
