@@ -86,9 +86,9 @@ bool TransferPropertiesBehavior::connect(const Property& source, const Property&
 		<< "Source does not have a readable property called <" << source.name << ">.";
 
 	SURGSIM_ASSERT(sharedTarget->isWriteable(target.name))
-		<< "Target does not have a readable property called <" << target.name << ">.";
+		<< "Target does not have a writeable property called <" << target.name << ">.";
 
-	// \note HS-2013-nov-26 should also check matching types here
+	// \note HS-2013-nov-26 should also that the type of the output can be converted to the input
 
 	auto entry = std::make_pair(source, target);
 
