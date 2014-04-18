@@ -24,7 +24,7 @@ namespace SurgSim
 
 namespace Framework
 {
-	class Representation;
+class Representation;
 }
 
 namespace Blocks
@@ -39,13 +39,23 @@ public:
 	/// \param	name	Name of the behavior
 	explicit TransferPoseBehavior(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Framework::TransferPoseBehavior);
+
 	/// Set the representation which sends the pose.
 	/// \param	sender	Representation which sends the pose.
 	void setPoseSender(std::shared_ptr<SurgSim::Framework::Representation> sender);
 
+	/// Get the pose sender.
+	/// \return The pose sender.
+	std::shared_ptr<SurgSim::Framework::Representation> getPoseSender() const;
+
 	/// Set the representation to receive the pose.
 	/// \param	receiver	Representation to receive the pose.
 	void setPoseReceiver(std::shared_ptr<SurgSim::Framework::Representation> receiver);
+
+	/// Get the pose receiver.
+	/// \return The pose receiver.
+	std::shared_ptr<SurgSim::Framework::Representation> getPoseReceiver() const;
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
