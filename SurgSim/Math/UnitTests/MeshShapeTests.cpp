@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/DataStructures/AabbTree.h"
+#include "SurgSim/DataStructures/AabbTreeNode.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/MathConvert.h"
@@ -219,4 +221,26 @@ TEST_F(MeshShapeTest, SerializationTest)
 	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), newMeshShape->getMesh()->getNumVertices());
 	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), newMeshShape->getMesh()->getNumEdges());
 	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), newMeshShape->getMesh()->getNumTriangles());
+}
+
+TEST_F(MeshShapeTest, CreateAabbTreeTest)
+{
+	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
+	meshShape->setFileName(fileName);
+
+	auto tree = meshShape->createAabbTree();
+
+	auto triangles = meshShape->getMesh()->getTriangles();
+	auto vertices = meshShape->getMesh()->getVertices();
+
+	EXPECT_EQ(224u, triangles.size());
+	EXPECT_EQ(504u, vertices.size());
+
+	for (auto it = triangles.begin(); it != triangles.end(); ++it)
+	{
+		auto ids = it->verticesId;
+		EXPECT_TRUE(tree->getAabb().contains(
+			SurgSim::Math::makeAabb(vertices[ids[0]].position, vertices[ids[1]].position, vertices[ids[2]].position)));
+	}
 }

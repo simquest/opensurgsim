@@ -21,6 +21,7 @@
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
+#include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
@@ -90,6 +91,10 @@ public:
 	/// Get the file name of the external file which contains the triangle mesh.
 	/// \return File name of the external file which contains the triangle mesh.
 	std::string getFileName() const;
+
+	/// Create an AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	/// \return The object's associated AabbTree
+	std::shared_ptr<SurgSim::DataStructures::AabbTree> createAabbTree();
 
 private:
 	/// Compute useful volume integrals based on the triangle mesh, which
