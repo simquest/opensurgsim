@@ -63,9 +63,21 @@ public:
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
+	virtual const std::shared_ptr<SurgSim::Math::Shape> getGlobalShape() const override;
+
+	virtual const std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree() const override;
+
+	virtual void update(const double& dt);
+
 private:
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
 	SurgSim::Math::RigidTransform3d m_pose;
+
+	/// The object's shape transformed into global coordinates, used to cache calculations for some shapes.
+	std::shared_ptr<SurgSim::Math::Shape> m_globalShape;
+
+	/// The object's Aabb tree, optionally used for the acceleration of contact-contact algorithms.
+	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
 };
 
 

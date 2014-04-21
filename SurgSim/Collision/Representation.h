@@ -26,6 +26,11 @@
 namespace SurgSim
 {
 
+namespace DataStructures
+{
+class AabbTree;
+}
+
 namespace Math
 {
 class Shape;
@@ -65,6 +70,14 @@ public:
 	/// Get the shape
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const = 0;
+
+	/// Get the shape in global coordinates
+	/// \return The actual shape used for collision.
+	virtual const std::shared_ptr<SurgSim::Math::Shape> getGlobalShape() const = 0;
+
+	/// Get the associated AABB tree
+	/// \return the associated AABB tree
+	virtual const std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree() const = 0;
 
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.

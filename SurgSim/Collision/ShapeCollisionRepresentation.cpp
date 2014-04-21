@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/DataStructures/AabbTree.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
@@ -47,6 +49,16 @@ const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getSha
 	return m_shape;
 }
 
+const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getGlobalShape() const
+{
+	return m_globalShape;
+}
+
+const std::shared_ptr<SurgSim::DataStructures::AabbTree> ShapeCollisionRepresentation::getAabbTree() const
+{
+	return m_aabbTree;
+}
+
 void ShapeCollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	m_pose = pose;
@@ -65,6 +77,27 @@ void ShapeCollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTran
 const SurgSim::Math::RigidTransform3d& ShapeCollisionRepresentation::getInitialPose() const
 {
 	return m_pose;
+}
+
+void ShapeCollisionRepresentation::update(const double& dt)
+{
+	auto& shape = m_shape;
+
+	if (shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+	{
+		auto localMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(shape);
+
+		if (m_globalShape == nullptr)
+		{
+			m_globalShape = std::make_shared<SurgSim::Math::MeshShape>(*localMesh->getMesh());
+		}
+
+		auto globalMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(m_globalShape);
+
+		// Update global-space mesh using local-space mesh
+		globalMesh->getMesh()->setTransformedFrom(m_pose, *localMesh->getMesh());
+		m_aabbTree = globalMesh->createAabbTree();
+	}
 }
 
 }; // namespace Collision
