@@ -23,6 +23,7 @@
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/DataStructures/AabbTreeIntersectionVisitor.h"
 #include "SurgSim/Math/Aabb.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Framework/ApplicationData.h"
@@ -30,6 +31,7 @@
 #include "SurgSim/Testing/MathUtilities.h"
 
 using SurgSim::Math::Aabbd;
+using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
 namespace
@@ -184,8 +186,116 @@ TEST(AabbTreeTests, MeshIntersectionTest)
 	EXPECT_EQ(mesh->getNumTriangles(), intersector.getIntersections().size());
 }
 
+template <typename NodeType>
+class TreeLeavesVisitor : public TreeVisitor
+{
+public:
 
+	virtual bool handle(TreeNode* node) override
+	{
+		SURGSIM_FAILURE() << "Function " __FUNCTION__ " not implemented";
+		return false;
+	}
+
+	virtual bool handle(NodeType* node) override
+	{
+		if (node->getNumChildren() == 0)
+		{
+			leaves.push_back(node);
+		}
+		return true;
+	}
+
+	std::vector<NodeType*> leaves;
+};
+
+template <typename PairTypeLhs, typename PairTypeRhs>
+static typename std::vector<PairTypeLhs>::const_iterator getEquivalentPair(const std::vector<PairTypeLhs>& list,
+																		   const PairTypeRhs& item)
+{
+	return std::find_if(list.cbegin(), list.cend(),
+						[&item] (const PairTypeLhs& pair)
+		{
+			return (pair.first->getAabb().isApprox(item.first->getAabb())
+					&& pair.second->getAabb().isApprox(item.second->getAabb()))
+				|| (pair.first->getAabb().isApprox(item.second->getAabb())
+					&& pair.second->getAabb().isApprox(item.first->getAabb()));
+		}
+	);
+}
+
+TEST(AabbTreeTests, SpatialJoinTest)
+{
+	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
+	meshA->setFileName(fileName);
+
+	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();
+	meshB->setFileName(fileName);
+	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
+	meshB->getMesh()->setTransformedFrom(rhsPose, *meshA->getMesh());
+
+	auto aabbA = meshA->createAabbTree();
+	auto aabbB = meshB->createAabbTree();
+
+	auto actualIntersection = spatialJoin(aabbA, aabbB);
+
+	TreeLeavesVisitor<SurgSim::DataStructures::AabbTreeNode> leavesVisitorA;
+	std::static_pointer_cast<SurgSim::DataStructures::AabbTreeNode>(aabbA->getRoot())->accept(&leavesVisitorA);
+	auto& leavesA = leavesVisitorA.leaves;
+
+	TreeLeavesVisitor<SurgSim::DataStructures::AabbTreeNode> leavesVisitorB;
+	std::static_pointer_cast<SurgSim::DataStructures::AabbTreeNode>(aabbB->getRoot())->accept(&leavesVisitorB);
+	auto& leavesB = leavesVisitorB.leaves;
+
+	std::vector<std::pair<SurgSim::DataStructures::AabbTreeNode*, SurgSim::DataStructures::AabbTreeNode*>>
+		expectedIntersection;
+	for (auto leafA = leavesA.begin(); leafA != leavesA.end(); ++leafA)
+	{
+		for (auto leafB = leavesB.begin(); leafB != leavesB.end(); ++leafB)
+		{
+			if (SurgSim::Math::doAabbIntersect((*leafA)->getAabb(), (*leafB)->getAabb()))
+			{
+				expectedIntersection.emplace_back(*leafA, *leafB);
+			}
+		}
+	}
+
+	{
+		SCOPED_TRACE("Equivalent sets");
+
+		ASSERT_GT(expectedIntersection.size(), 0u);
+		ASSERT_EQ(expectedIntersection.size(), actualIntersection.size());
+
+		// Sets A and B are equal if and only if A is a subset of B and B is a subset of A.
+		for (auto it = actualIntersection.begin(); it != actualIntersection.end(); ++it)
+		{
+			EXPECT_TRUE(getEquivalentPair(expectedIntersection, *it) != expectedIntersection.cend());
+		}
+
+		for (auto it = expectedIntersection.begin(); it != expectedIntersection.end(); ++it)
+		{
+			EXPECT_TRUE(getEquivalentPair(actualIntersection, *it) != actualIntersection.cend());
+		}
+	}
+
+	{
+		SCOPED_TRACE("Inequivalent sets.");
+
+		auto newNode = std::make_shared<SurgSim::DataStructures::AabbTreeNode>();
+		newNode->addData(
+			SurgSim::Math::makeAabb(Vector3d(-0.1, 0.3, 5.3), Vector3d(5.4, -5.8, 1.1), Vector3d(0, 0.5, 11)), 4543);
+
+		expectedIntersection.emplace_back(newNode.get(), expectedIntersection.front().second);
+		actualIntersection.emplace_back(newNode, actualIntersection.back().first);
+
+		ASSERT_GT(expectedIntersection.size(), 0u);
+		ASSERT_EQ(expectedIntersection.size(), actualIntersection.size());
+
+		EXPECT_FALSE(getEquivalentPair(expectedIntersection, actualIntersection.back()) != expectedIntersection.cend());
+		EXPECT_FALSE(getEquivalentPair(actualIntersection, expectedIntersection.back()) != actualIntersection.cend());
+	}
+}
 
 }
 }
-

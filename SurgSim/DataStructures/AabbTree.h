@@ -16,6 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_AABBTREE_H
 #define SURGSIM_DATASTRUCTURES_AABBTREE_H
 
+#include <vector>
+
 #include "SurgSim/DataStructures/Tree.h"
 
 #include "SurgSim/Math/Aabb.h"
@@ -65,6 +67,14 @@ private:
 	/// A typed version of the root for access without typecasting
 	std::shared_ptr<AabbTreeNode> m_typedRoot;
 };
+
+typedef std::pair<std::shared_ptr<AabbTreeNode>, std::shared_ptr<AabbTreeNode>> TreeNodePairType;
+
+/// Query to find all pairs of intersecting nodes between two aabb r-trees.
+/// \param lhs The first tree to compare
+/// \param rhs The second tree to compare
+/// return The list of all pairs of intersecting nodes
+std::vector<TreeNodePairType> spatialJoin(std::shared_ptr<AabbTree> lhs, std::shared_ptr<AabbTree> rhs);
 
 }
 }
