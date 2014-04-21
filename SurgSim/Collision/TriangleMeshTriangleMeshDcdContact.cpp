@@ -17,6 +17,8 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/DataStructures/AabbTree.h"
+#include "SurgSim/DataStructures/AabbTreeNode.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Math/Geometry.h"
@@ -49,70 +51,74 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 	std::shared_ptr<Representation> representationMeshB = pair->getSecond();
 
 	std::shared_ptr<TriangleMesh> collisionMeshA =
-		std::static_pointer_cast<MeshShape>(representationMeshA->getShape())->getMesh();
+		std::static_pointer_cast<MeshShape>(representationMeshA->getGlobalShape())->getMesh();
 	std::shared_ptr<TriangleMesh> collisionMeshB =
-		std::static_pointer_cast<MeshShape>(representationMeshB->getShape())->getMesh();
+		std::static_pointer_cast<MeshShape>(representationMeshB->getGlobalShape())->getMesh();
 
-	RigidTransform3d globalCoordinatesFromMeshACoordinates = representationMeshA->getPose();
-	RigidTransform3d globalCoordinatesFromMeshBCoordinates = representationMeshB->getPose();
-
-	RigidTransform3d meshBCoordinatesFromGlobalCoordinates = globalCoordinatesFromMeshBCoordinates.inverse();
-	RigidTransform3d meshBCoordinatesFromMeshACoordinates = meshBCoordinatesFromGlobalCoordinates
-															* globalCoordinatesFromMeshACoordinates;
+	std::vector<SurgSim::DataStructures::TreeNodePairType> intersectionList
+		= SurgSim::DataStructures::spatialJoin(representationMeshA->getAabbTree(), representationMeshB->getAabbTree());
 
 	double depth = 0.0;
 	Vector3d normal;
 	Vector3d penetrationPointA, penetrationPointB;
 
-	for (size_t i = 0; i < collisionMeshA->getNumTriangles(); ++i)
+	for (auto intersection = intersectionList.begin(); intersection != intersectionList.end(); ++intersection)
 	{
-		// The triangleA vertices.
-		const Vector3d& triangleA0InLocalB = meshBCoordinatesFromMeshACoordinates *
-			collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[0]);
-		const Vector3d& triangleA1InLocalB = meshBCoordinatesFromMeshACoordinates *
-			collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[1]);
-		const Vector3d& triangleA2InLocalB = meshBCoordinatesFromMeshACoordinates *
-			collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[2]);
+		std::shared_ptr<SurgSim::DataStructures::AabbTreeNode> nodeA = intersection->first;
+		std::shared_ptr<SurgSim::DataStructures::AabbTreeNode> nodeB = intersection->second;
 
-		const Vector3d& normalAInLocalB = meshBCoordinatesFromMeshACoordinates.linear() * collisionMeshA->getNormal(i);
-		if (normalAInLocalB.isZero())
-		{
-			continue;
-		}
+		std::list<size_t> triangleListA;
+		std::list<size_t> triangleListB;
 
-		for (size_t j = 0; j < collisionMeshB->getNumTriangles(); ++j)
+		nodeA->getIntersections(nodeB->getAabb(), &triangleListA);
+		nodeB->getIntersections(nodeA->getAabb(), &triangleListB);
+
+		for (auto i = triangleListA.begin(); i != triangleListA.end(); ++i)
 		{
-			const Vector3d& normalB = collisionMeshB->getNormal(j);
-			if (normalB.isZero())
+			const Vector3d& normalA = collisionMeshA->getNormal(*i);
+			if (normalA.isZero())
 			{
 				continue;
 			}
 
-			// The triangleB vertices.
-			const Vector3d& triangleB0 =
-				collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(j).verticesId[0]);
-			const Vector3d& triangleB1 =
-				collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(j).verticesId[1]);
-			const Vector3d& triangleB2 =
-				collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(j).verticesId[2]);
+			// The triangleA vertices.
+			const Vector3d& triangleA0 =
+				collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(*i).verticesId[0]);
+			const Vector3d& triangleA1 =
+				collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(*i).verticesId[1]);
+			const Vector3d& triangleA2 =
+				collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(*i).verticesId[2]);
 
-			// Check if the triangles intersect.
-			if (SurgSim::Math::calculateContactTriangleTriangle(triangleA0InLocalB, triangleA1InLocalB,
-																triangleA2InLocalB,
-																triangleB0, triangleB1, triangleB2,
-																normalAInLocalB, normalB, &depth,
-																&penetrationPointA, &penetrationPointB,
-																&normal))
+			for (auto j = triangleListB.begin(); j != triangleListB.end(); ++j)
 			{
-				// Create the contact.
-				std::pair<Location, Location> penetrationPoints;
-				penetrationPoints.first.globalPosition.setValue(globalCoordinatesFromMeshBCoordinates
-																* penetrationPointA);
-				penetrationPoints.second.globalPosition.setValue(globalCoordinatesFromMeshBCoordinates
-																 * penetrationPointB);
+				const Vector3d& normalB = collisionMeshB->getNormal(*j);
+				if (normalB.isZero())
+				{
+					continue;
+				}
 
-				pair->addContact(std::abs(depth), globalCoordinatesFromMeshBCoordinates.linear() * normal,
-								 penetrationPoints);
+				// The triangleB vertices.
+				const Vector3d& triangleB0 =
+					collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(*j).verticesId[0]);
+				const Vector3d& triangleB1 =
+					collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(*j).verticesId[1]);
+				const Vector3d& triangleB2 =
+					collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(*j).verticesId[2]);
+
+				// Check if the triangles intersect.
+				if (SurgSim::Math::calculateContactTriangleTriangle(triangleA0, triangleA1, triangleA2,
+																	triangleB0, triangleB1, triangleB2,
+																	normalA, normalB, &depth,
+																	&penetrationPointA, &penetrationPointB,
+																	&normal))
+				{
+					// Create the contact.
+					std::pair<Location, Location> penetrationPoints;
+					penetrationPoints.first.globalPosition.setValue(penetrationPointA);
+					penetrationPoints.second.globalPosition.setValue(penetrationPointB);
+
+					pair->addContact(std::abs(depth), normal, penetrationPoints);
+				}
 			}
 		}
 	}
