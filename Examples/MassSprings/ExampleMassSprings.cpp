@@ -363,7 +363,7 @@ int main(int argc, char* argv[])
 							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 
-	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
+	scene->addSceneElement(createView("view1", 0, 0, 1024, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 8.0)));
