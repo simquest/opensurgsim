@@ -34,7 +34,7 @@ OdeSolverLinearEulerImplicit<State, MT, DT, KT, ST>::OdeSolverLinearEulerImplici
 template <class State, class MT, class DT, class KT, class ST>
 void OdeSolverLinearEulerImplicit<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
 {
-	if (! m_initialized)
+	if (!m_initialized)
 	{
 		OdeSolverEulerImplicit<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
 		m_constantK = m_equation.computeK(currentState);

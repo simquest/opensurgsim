@@ -35,7 +35,7 @@ template <class State, class MT, class DT, class KT, class ST>
 void OdeSolverLinearEulerExplicitModified<State, MT, DT, KT, ST>::solve(double dt, const State& currentState,
 																		State* newState)
 {
-	if (! m_initialized)
+	if (!m_initialized)
 	{
 		OdeSolverEulerExplicitModified<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
 		m_initialized = true;
