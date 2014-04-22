@@ -54,6 +54,7 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 		if (isInitialized())
 		{
 			auto runtime = getRuntime();
+			SURGSIM_ASSERT(runtime != nullptr) << "Runtime cannot be expired when adding a component " << getName();
 			result = component->initialize(runtime);
 			runtime->addComponent(component);
 		}

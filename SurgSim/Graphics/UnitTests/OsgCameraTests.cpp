@@ -138,6 +138,8 @@ TEST(OsgCameraTests, PoseTest)
 	std::shared_ptr<Camera> camera = osgCamera;
 	std::shared_ptr<BasicSceneElement> element = std::make_shared<BasicSceneElement>("element");
 	element->addComponent(camera);
+	element->initialize();
+	camera->wakeUp();
 
 	RigidTransform3d elementPose = SurgSim::Math::makeRigidTransform(
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());

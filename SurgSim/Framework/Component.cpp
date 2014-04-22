@@ -61,7 +61,6 @@ bool Component::isInitialized() const
 bool Component::initialize(const std::weak_ptr<Runtime>& runtime)
 {
 	SURGSIM_ASSERT(!m_didInit) << "Double initialization called in component " << getName();
-	SURGSIM_ASSERT(!runtime.expired()) << "Runtime cannot be expired at initialization in component " << getName();
 	m_runtime = runtime;
 
 	m_didInit = true;

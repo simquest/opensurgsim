@@ -53,7 +53,7 @@ public:
 	/// \return The pose of this representation
 	virtual SurgSim::Math::RigidTransform3d getPose() const;
 
-	virtual void setSceneElement(std::weak_ptr<SceneElement> sceneElement) override;
+	virtual bool wakeUp() override;
 
 private:
 	/// Local Pose of the Representation with respect to the SceneElement

@@ -58,6 +58,9 @@ struct RepresentationTest : public ::testing::Test
 
 		element->addComponent(planeRep);
 		element->addComponent(sphereRep);
+		element->initialize();
+		planeRep->wakeUp();
+		sphereRep->wakeUp();
 	}
 
 	virtual void TearDown()

@@ -18,7 +18,6 @@
 
 #include "SurgSim/Blocks/PoseInterpolator.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -49,7 +48,6 @@ TEST(PoseInterpolatorTests, InitTest)
 
 TEST(PoseInterpolatorTests, StartAndEndPose)
 {
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
 	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
 	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
@@ -59,9 +57,10 @@ TEST(PoseInterpolatorTests, StartAndEndPose)
 
 	element->addComponent(representation);
 	element->addComponent(interpolator);
+	element->initialize();
 
-	interpolator->initialize(runtime);
 	interpolator->wakeUp();
+	representation->wakeUp();
 	interpolator->update(0.0);
 
 	EXPECT_TRUE(startPose.isApprox(representation->getPose()));
@@ -74,7 +73,6 @@ TEST(PoseInterpolatorTests, StartAndEndPose)
 
 TEST(PoseInterpolatorTests, UseOptionalStartPose)
 {
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
 	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
 	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
@@ -85,9 +83,10 @@ TEST(PoseInterpolatorTests, UseOptionalStartPose)
 
 	element->addComponent(representation);
 	element->addComponent(interpolator);
+	element->initialize();
 
-	interpolator->initialize(runtime);
 	interpolator->wakeUp();
+	representation->wakeUp();
 	interpolator->update(0.0);
 
 	EXPECT_TRUE(startPose.isApprox(representation->getPose()));
@@ -100,7 +99,6 @@ TEST(PoseInterpolatorTests, UseOptionalStartPose)
 
 TEST(PoseInterpolatorTests, UseLoop)
 {
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
 	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
 	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
@@ -110,6 +108,7 @@ TEST(PoseInterpolatorTests, UseLoop)
 
 	element->addComponent(representation);
 	element->addComponent(interpolator);
+	element->initialize();
 
 	interpolator->setPingPong(true);
 	interpolator->setLoop(true);
@@ -118,8 +117,8 @@ TEST(PoseInterpolatorTests, UseLoop)
 	EXPECT_TRUE(interpolator->isLoop());
 	EXPECT_FALSE(interpolator->isPingPong());
 
-	interpolator->initialize(runtime);
 	interpolator->wakeUp();
+	representation->wakeUp();
 	interpolator->update(0.0);
 
 	EXPECT_TRUE(startPose.isApprox(representation->getPose()));
@@ -138,7 +137,6 @@ TEST(PoseInterpolatorTests, UseLoop)
 
 TEST(PoseInterpolatorTests, UsePingPong)
 {
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
 	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
 	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
@@ -148,6 +146,7 @@ TEST(PoseInterpolatorTests, UsePingPong)
 
 	element->addComponent(representation);
 	element->addComponent(interpolator);
+	element->initialize();
 
 	interpolator->setLoop(true);
 	interpolator->setPingPong(true);
@@ -156,8 +155,8 @@ TEST(PoseInterpolatorTests, UsePingPong)
 	EXPECT_FALSE(interpolator->isLoop());
 	EXPECT_TRUE(interpolator->isPingPong());
 
-	interpolator->initialize(runtime);
 	interpolator->wakeUp();
+	representation->wakeUp();
 	interpolator->update(0.0);
 
 	EXPECT_TRUE(startPose.isApprox(representation->getPose()));

@@ -76,7 +76,7 @@ public:
 	/// Wakeup this component, this will be called when the component is inserted into the ComponentManager that is
 	/// responsible for handling this component.
 	/// \return True if this component is woken up successfully; otherwise, false.
-	bool wakeUp();
+	virtual bool wakeUp();
 
 	/// Sets the scene.
 	/// \param scene The scene for this component
@@ -88,7 +88,7 @@ public:
 
 	/// Sets the scene element.
 	/// \param sceneElement The scene element for this component.
-	virtual void setSceneElement(std::weak_ptr<SceneElement> sceneElement);
+	void setSceneElement(std::weak_ptr<SceneElement> sceneElement);
 
 	/// Gets the scene element.
 	/// \return The scene element for this component.

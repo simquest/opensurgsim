@@ -35,19 +35,25 @@ Representation::~Representation()
 {
 }
 
-void Representation::setSceneElement(std::weak_ptr<SceneElement> sceneElement) 
-{
-	Component::setSceneElement(sceneElement);
-	std::shared_ptr<SceneElement> element = getSceneElement();
-	if (element != nullptr)
-	{
-		m_poseComponent = element->getPoseComponent();
-	}
-}
-
 bool Representation::doInitialize()
 {
 	return true;
+}
+
+bool Representation::wakeUp()
+{
+	std::shared_ptr<SurgSim::Framework::SceneElement> element = getSceneElement();
+	if (element != nullptr)
+	{
+		auto poseComponents = element->getComponents<SurgSim::Framework::PoseComponent>();
+		SURGSIM_ASSERT(poseComponents.size() <= 1) << " SceneElement " << element->getName()
+			<< " has more than one PoseComponent. This is not supported.";
+		if (poseComponents.size() == 1)
+		{
+			m_poseComponent = poseComponents[0];
+		}
+	}
+	return Component::wakeUp();
 }
 
 bool Representation::doWakeUp()

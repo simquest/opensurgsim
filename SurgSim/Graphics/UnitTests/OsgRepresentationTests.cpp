@@ -76,6 +76,8 @@ TEST(OsgRepresentationTests, PoseTest)
 	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
 	std::shared_ptr<BasicSceneElement> element = std::make_shared<BasicSceneElement>("element");
 	element->addComponent(representation);
+	element->initialize();
+	representation->wakeUp();
 
 	{
 		SCOPED_TRACE("Check Initial Pose");
