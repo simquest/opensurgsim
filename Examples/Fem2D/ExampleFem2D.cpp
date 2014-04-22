@@ -53,7 +53,7 @@ namespace
 /// Create a Fem2D with a cylinder shape
 /// \note This is defining a cylinder based on cylindrical coordinates M(length, angle)
 /// \note The cylinder is composed of cross-sections with nodes added radially to each cross-section.
-/// \note The nodes of 2 consecutives cross-sections are connected to form square-patches which in turns
+/// \note The nodes of 2 consecutives cross-sections are connected to form square-patches which in turn
 /// \note are decomposed into 2 FemElement2DTriangle.
 void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentation)
 {
