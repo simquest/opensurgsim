@@ -21,9 +21,11 @@
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverStatic.h"
 #include "SurgSim/Math/OdeSolverLinearEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverLinearEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverLinearEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverLinearStatic.h"
 
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
@@ -159,9 +161,11 @@ void  DeformableRepresentation<M, D, K, S>::beforeUpdate(double dt)
 	using SurgSim::Math::OdeSolverEulerExplicit;
 	using SurgSim::Math::OdeSolverEulerExplicitModified;
 	using SurgSim::Math::OdeSolverEulerImplicit;
+	using SurgSim::Math::OdeSolverStatic;
 	using SurgSim::Math::OdeSolverLinearEulerExplicit;
 	using SurgSim::Math::OdeSolverLinearEulerExplicitModified;
 	using SurgSim::Math::OdeSolverLinearEulerImplicit;
+	using SurgSim::Math::OdeSolverLinearStatic;
 
 	if (! isActive())
 	{
@@ -178,6 +182,9 @@ void  DeformableRepresentation<M, D, K, S>::beforeUpdate(double dt)
 
 		switch (m_integrationScheme)
 		{
+		case SurgSim::Math::INTEGRATIONSCHEME_STATIC:
+			m_odeSolver = std::make_shared <OdeSolverStatic<DeformableRepresentationState, M, D, K, S>>(this);
+			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER:
 			m_odeSolver = std::make_shared <OdeSolverEulerExplicit<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
@@ -187,6 +194,10 @@ void  DeformableRepresentation<M, D, K, S>::beforeUpdate(double dt)
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER:
 			m_odeSolver = std::make_shared <OdeSolverEulerImplicit<DeformableRepresentationState, M, D, K, S>>(this);
+			break;
+		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC:
+			m_odeSolver = std::make_shared
+				<OdeSolverLinearStatic<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER:
 			m_odeSolver = std::make_shared

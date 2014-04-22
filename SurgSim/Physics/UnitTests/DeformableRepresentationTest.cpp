@@ -25,6 +25,11 @@
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverStatic.h"
+#include "SurgSim/Math/OdeSolverLinearEulerExplicit.h"
+#include "SurgSim/Math/OdeSolverLinearEulerExplicitModified.h"
+#include "SurgSim/Math/OdeSolverLinearEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverLinearStatic.h"
 
 using SurgSim::Physics::DeformableRepresentation;
 using SurgSim::Physics::DeformableRepresentationState;
@@ -251,6 +256,11 @@ TEST_F(DeformableRepresentationTest, BeforeUpdateInitializesOdeSolverTest)
 	using SurgSim::Math::OdeSolverEulerExplicit;
 	using SurgSim::Math::OdeSolverEulerExplicitModified;
 	using SurgSim::Math::OdeSolverEulerImplicit;
+	using SurgSim::Math::OdeSolverStatic;
+	using SurgSim::Math::OdeSolverLinearEulerExplicit;
+	using SurgSim::Math::OdeSolverLinearEulerExplicitModified;
+	using SurgSim::Math::OdeSolverLinearEulerImplicit;
+	using SurgSim::Math::OdeSolverLinearStatic;
 
 	// setInitialState sets all 4 states (tested in method above !)
 	setInitialState(m_localInitialState);
@@ -273,6 +283,32 @@ TEST_F(DeformableRepresentationTest, BeforeUpdateInitializesOdeSolverTest)
 	IESolver* implicitEuler;
 	implicitEuler = dynamic_cast<IESolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, implicitEuler);
+
+	typedef OdeSolverStatic<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> StaticSolver;
+	StaticSolver* staticSolver;
+	staticSolver = dynamic_cast<StaticSolver*>(m_odeSolver.get());
+	ASSERT_EQ(nullptr, staticSolver);
+
+	typedef OdeSolverLinearEulerExplicit<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> EELinearSolver;
+	EELinearSolver* explicitEulerLinear;
+	explicitEulerLinear = dynamic_cast<EELinearSolver*>(m_odeSolver.get());
+	ASSERT_EQ(nullptr, explicitEulerLinear);
+
+	typedef OdeSolverLinearEulerExplicitModified<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix>
+		MEELinearSolver;
+	MEELinearSolver* modifiedExplicitEulerLinear;
+	modifiedExplicitEulerLinear = dynamic_cast<MEELinearSolver*>(m_odeSolver.get());
+	ASSERT_EQ(nullptr, modifiedExplicitEulerLinear);
+
+	typedef OdeSolverLinearEulerImplicit<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> IELinearSolver;
+	IELinearSolver* implicitEulerLinear;
+	implicitEulerLinear = dynamic_cast<IELinearSolver*>(m_odeSolver.get());
+	ASSERT_EQ(nullptr, implicitEulerLinear);
+
+	typedef OdeSolverLinearStatic<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> StaticLinearSolver;
+	StaticLinearSolver* staticLinearSolver;
+	staticLinearSolver = dynamic_cast<StaticLinearSolver*>(m_odeSolver.get());
+	ASSERT_EQ(nullptr, staticLinearSolver);
 }
 
 TEST_F(DeformableRepresentationTest, UpdateChangesStateTest)
