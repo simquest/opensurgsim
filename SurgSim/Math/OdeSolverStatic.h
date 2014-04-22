@@ -40,12 +40,12 @@ namespace Math
 /// \note   Vector& getVelocities();
 /// \note   Vector& getAccelerations();
 template <class State, class MT, class DT, class KT, class ST>
-class Static : public OdeSolver<State, MT, DT, KT, ST>
+class OdeSolverStatic : public OdeSolver<State, MT, DT, KT, ST>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit Static(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverStatic(OdeEquation<State, MT, DT, KT, ST>* equation);
 
 	virtual void solve(double dt, const State& currentState, State* newState) override;
 

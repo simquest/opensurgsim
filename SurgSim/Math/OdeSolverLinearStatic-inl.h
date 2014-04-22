@@ -23,20 +23,20 @@ namespace Math
 {
 
 template <class State, class MT, class DT, class KT, class ST>
-LinearStatic<State, MT, DT, KT, ST>::LinearStatic(
+OdeSolverLinearStatic<State, MT, DT, KT, ST>::OdeSolverLinearStatic(
 	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	Static<State, MT, DT, KT, ST>(equation),
+	OdeSolverStatic<State, MT, DT, KT, ST>(equation),
 	m_initialized(false)
 {
-	m_name = "Linear static";
+	m_name = "Ode Solver Linear Static";
 }
 
 template <class State, class MT, class DT, class KT, class ST>
-void LinearStatic<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverLinearStatic<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
 {
 	if (!m_initialized)
 	{
-		Static<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
+		OdeSolverStatic<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
 		m_initialized = true;
 	}
 	else

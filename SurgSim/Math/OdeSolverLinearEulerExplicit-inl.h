@@ -23,20 +23,20 @@ namespace Math
 {
 
 template <class State, class MT, class DT, class KT, class ST>
-LinearExplicitEuler<State, MT, DT, KT, ST>::LinearExplicitEuler(
+OdeSolverLinearEulerExplicit<State, MT, DT, KT, ST>::OdeSolverLinearEulerExplicit(
 	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	ExplicitEuler<State, MT, DT, KT, ST>(equation),
+	OdeSolverEulerExplicit<State, MT, DT, KT, ST>(equation),
 	m_initialized(false)
 {
-	m_name = "Linear Explicit Euler";
+	m_name = "Ode Solver Linear Euler Explicit";
 }
 
 template <class State, class MT, class DT, class KT, class ST>
-void LinearExplicitEuler<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverLinearEulerExplicit<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
 {
 	if (! m_initialized)
 	{
-		ExplicitEuler<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
+		OdeSolverEulerExplicit<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
 		m_initialized = true;
 	}
 	else

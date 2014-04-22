@@ -248,9 +248,9 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 
 TEST_F(DeformableRepresentationTest, BeforeUpdateInitializesOdeSolverTest)
 {
-	using SurgSim::Math::ExplicitEuler;
-	using SurgSim::Math::ModifiedExplicitEuler;
-	using SurgSim::Math::ImplicitEuler;
+	using SurgSim::Math::OdeSolverEulerExplicit;
+	using SurgSim::Math::OdeSolverEulerExplicitModified;
+	using SurgSim::Math::OdeSolverEulerImplicit;
 
 	// setInitialState sets all 4 states (tested in method above !)
 	setInitialState(m_localInitialState);
@@ -259,17 +259,17 @@ TEST_F(DeformableRepresentationTest, BeforeUpdateInitializesOdeSolverTest)
 	beforeUpdate(1e-3);
 	ASSERT_NE(nullptr, m_odeSolver);
 
-	typedef ExplicitEuler<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> EESolver;
+	typedef OdeSolverEulerExplicit<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> EESolver;
 	EESolver* explicitEuler;
 	explicitEuler = dynamic_cast<EESolver*>(m_odeSolver.get());
 	ASSERT_NE(nullptr, explicitEuler);
 
-	typedef ModifiedExplicitEuler<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> MEESolver;
+	typedef OdeSolverEulerExplicitModified<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> MEESolver;
 	MEESolver* modifiedExplicitEuler;
 	modifiedExplicitEuler = dynamic_cast<MEESolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, modifiedExplicitEuler);
 
-	typedef ImplicitEuler<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> IESolver;
+	typedef OdeSolverEulerImplicit<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> IESolver;
 	IESolver* implicitEuler;
 	implicitEuler = dynamic_cast<IESolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, implicitEuler);

@@ -23,15 +23,15 @@ namespace Math
 {
 
 template <class State, class MT, class DT, class KT, class ST>
-Static<State, MT, DT, KT, ST>::Static(
+OdeSolverStatic<State, MT, DT, KT, ST>::OdeSolverStatic(
 	OdeEquation<State, MT, DT, KT, ST>* equation) :
 	OdeSolver<State, MT, DT, KT, ST>(equation)
 {
-	m_name = "Static";
+	m_name = "Ode Solver Static";
 }
 
 template <class State, class MT, class DT, class KT, class ST>
-void Static<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverStatic<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
 {
 	// General equation to solve:
 	//   K.deltaX = Fext + Fint(t)
