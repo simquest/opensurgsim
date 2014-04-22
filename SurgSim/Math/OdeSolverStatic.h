@@ -27,8 +27,9 @@ namespace Math
 
 /// Static ode solver
 /// \note M(x(t), v(t)).a(t) = f(t, x(t), v(t))
-/// \note This ode equation is solved by discarding all time derived variables, resulting in simply solving
-/// \note K.deltaX = F
+/// \note This ode equation is solved w.r.t. x, by discarding all time derived variables (i.e. v, a)
+/// \note reducing the equation to solve to:
+/// \note 0 = f(t, x(t)) = Fext + Fint(t, x(t)) = Fext - K.(x - x0)
 /// \tparam State Type of the state y=(x v)
 /// \tparam MT Type of the matrix M
 /// \tparam DT Type of the matrix D

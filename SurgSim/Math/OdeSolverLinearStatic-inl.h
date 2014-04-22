@@ -34,7 +34,7 @@ LinearStatic<State, MT, DT, KT, ST>::LinearStatic(
 template <class State, class MT, class DT, class KT, class ST>
 void LinearStatic<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
 {
-	if (! m_initialized)
+	if (!m_initialized)
 	{
 		Static<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
 		m_initialized = true;
