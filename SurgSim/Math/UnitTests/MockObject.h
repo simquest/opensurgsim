@@ -154,6 +154,8 @@ public:
 
 
 
+/// State class for static resolution
+/// It contains 3 nodes with 3 dofs each, with positions (0 0 0) (1 0 0) (2 0 0) and null velocities/accelerations
 class MassPointsStateForStatic
 {
 public:
@@ -213,14 +215,10 @@ public:
 		return m_gravityForce;
 	}
 
-	/// Evaluation of the RHS function f(x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
-	/// \return The vector containing f(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
 	virtual Vector& computeF(const MassPointsStateForStatic& state) override
 	{
 		// Internale deformation forces
-		m_f = - computeK(state) * (state.getPositions() - m_initialState->getPositions());
+		m_f = -computeK(state) * (state.getPositions() - m_initialState->getPositions());
 
 		// Gravity pulling on the free nodes
 		m_f += m_gravityForce;
@@ -228,30 +226,18 @@ public:
 		return m_f;
 	}
 
-	/// Evaluation of the LHS matrix M(x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
-	/// \return The matrix M(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
 	virtual const Matrix& computeM(const MassPointsStateForStatic& state) override
 	{
 		m_M.setZero();
 		return m_M;
 	}
 
-	/// Evaluation of D = -df/dv (x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \return The matrix D = -df/dv(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
 	virtual const Matrix& computeD(const MassPointsStateForStatic& state) override
 	{
 		m_D.setZero();
 		return m_D;
 	}
 
-	/// Evaluation of K = -df/dx (x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \return The matrix K = -df/dx(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
 	virtual const Matrix& computeK(const MassPointsStateForStatic& state)
 	{
 		// A fake but valid stiffness matrix (node 0 fixed)
@@ -261,16 +247,8 @@ public:
 		return m_K;
 	}
 
-	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
-	/// When all the terms are needed, this method can perform optimization in evaluating everything together
-	/// \param state (x, v) the current position and velocity to evaluate the various terms with
-	/// \param[out] f The RHS f(x,v)
-	/// \param[out] M The matrix M(x,v)
-	/// \param[out] D The matrix D = -df/dv(x,v)
-	/// \param[out] K The matrix K = -df/dx(x,v)
-	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
-	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const MassPointsStateForStatic& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override
+	virtual void computeFMDK(const MassPointsStateForStatic& state, Vector** f, Matrix** M, Matrix** D, Matrix** K)
+		override
 	{
 		m_f = computeF(state);
 		m_M = computeM(state);

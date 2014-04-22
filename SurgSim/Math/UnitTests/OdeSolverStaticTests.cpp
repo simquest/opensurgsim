@@ -63,8 +63,8 @@ void doSolveTest()
 
 	// Solve manually K.(x - x0) = Fext
 	const Vector &Fext = m.getExternalForces();
-	Vector expectedU = m.computeK(currentState).inverse() * Fext;
-	Vector expectedX = defaultState.getPositions() + expectedU;
+	Vector expectedDeltaX = m.computeK(currentState).inverse() * Fext;
+	Vector expectedX = defaultState.getPositions() + expectedDeltaX;
 	EXPECT_TRUE(newState.getPositions().isApprox(expectedX));
 }
 
