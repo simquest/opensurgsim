@@ -44,12 +44,12 @@ void LinearStatic<State, MT, DT, KT, ST>::solve(double dt, const State& currentS
 		Vector& f = m_equation.computeF(currentState);
 		Vector deltaX = m_compliance * f;
 
-		// Compute the new state
-		newState->getPositions()  = currentState.getPositions()  + deltaX;
-		// Approximate velocities as (x(t+dt) - x(t))/dt
-		newState->getVelocities() = deltaX / dt;
-		// Approximate accelerations as (v(t+dt) - v(t))/dt
-		newState->getAccelerations() = (newState->getVelocities() - currentState.getVelocities())/ dt;
+		// Compute the new state using the static scheme:
+		newState->getPositions() = currentState.getPositions()  + deltaX;
+		// Velocities are null in static mode (no time dependency)
+		newState->getVelocities().setZero();
+		// Accelerations are null in static mode (no time dependency)
+		newState->getAccelerations().setZero();
 	}
 }
 

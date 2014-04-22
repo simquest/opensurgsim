@@ -48,12 +48,12 @@ void Static<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, 
 	Vector& deltaX = newState->getVelocities();
 	m_solveAndInverse(m_systemMatrix, f, &deltaX, &(m_compliance));
 
-	// Compute the new state using the Euler Implicit scheme:
+	// Compute the new state using the static scheme:
 	newState->getPositions()  = currentState.getPositions()  + deltaX;
-	// Approximate velocities as (x(t+dt) - x(t))/dt
-	newState->getVelocities() = deltaX / dt;
-	// Approximate accelerations as (v(t+dt) - v(t))/dt
-	newState->getAccelerations() = (newState->getVelocities() - currentState.getVelocities())/ dt;
+	// Velocities are null in static mode (no time dependency)
+	newState->getVelocities().setZero();
+	// Accelerations are null in static mode (no time dependency)
+	newState->getAccelerations().setZero();
 }
 
 }; // namespace Math
