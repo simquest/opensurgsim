@@ -155,6 +155,9 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
 
+	viewElement->enableManipulator(true);
+	viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 2.0), Vector3d::Zero());
+
 	return viewElement;
 }
 
