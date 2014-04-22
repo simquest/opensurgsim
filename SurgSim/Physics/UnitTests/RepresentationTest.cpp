@@ -17,100 +17,19 @@
 
 #include <string>
 
-#include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Physics::Representation;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Physics::RigidCollisionRepresentation;
+using SurgSim::Physics::MockRepresentation;
 
-/// Concrete representation class for testing
-class MockRepresentation : public Representation
-{
-public:
-	/// Constructor
-	/// \name	Name of the representation
-	explicit MockRepresentation(const std::string& name) : Representation(name)
-	{
-	}
-
-	virtual SurgSim::Physics::RepresentationType getType() const
-	{
-		return SurgSim::Physics::REPRESENTATION_TYPE_FIXED;
-	}
-
-	/// Sets the initial pose
-	/// \param pose The initial pose to set the MockRepresentation to
-	void setInitialPose(const RigidTransform3d& pose)
-	{
-		m_initialPose = pose;
-	}
-
-	/// Gets the initial pose of the representation
-	/// \return The initial pose of this MockRepresentation
-	const RigidTransform3d& getInitialPose() const
-	{
-		return m_initialPose;
-	}
-
-	/// Sets the current pose of the representation
-	/// \param pose The current pose of this MockRepresentation
-	void setPose(const RigidTransform3d& pose)
-	{
-		m_currentPose = pose;
-	}
-
-	/// Returns the previous pose of the representation
-	/// \return The previous pose of this MockRepresentation
-	const RigidTransform3d& getPreviousPose() const
-	{
-		return m_previousPose;
-	}
-
-	/// Returns the final pose of the representation
-	/// \return The final pose of this MockRepresentation
-	const RigidTransform3d& getPose() const
-	{
-		return m_finalPose;
-	}
-
-	void beforeUpdate(double dt)
-	{
-		m_previousPose = m_currentPose;
-	}
-
-	void update(double dt)
-	{
-		m_currentPose.translation() += SurgSim::Math::Vector3d(1.0, 2.0, 3.0);
-	}
-
-	void afterUpdate(double dt)
-	{
-		m_finalPose = m_currentPose;
-	}
-
-	void resetState(void)
-	{
-		m_currentPose  = m_initialPose;
-		m_previousPose = m_initialPose;
-		m_finalPose    = m_initialPose;
-	}
-
-private:
-	/// Pose of the representation
-	RigidTransform3d m_initialPose;
-
-	/// Pose of the representation
-	RigidTransform3d m_previousPose;
-
-	/// Pose of the representation
-	RigidTransform3d m_currentPose;
-
-	/// Pose of the representation
-	RigidTransform3d m_finalPose;
-};
 
 TEST(RepresentationTest, ConstructorTest)
 {
@@ -138,4 +57,37 @@ TEST(RepresentationTest, SetGetAndDefaultValueTest)
 	ASSERT_FALSE(representation->isGravityEnabled());
 	representation->setIsGravityEnabled(true);
 	ASSERT_TRUE(representation->isGravityEnabled());
+}
+
+TEST(RepresentationTest, SetGetCollisionRepresentationTest)
+{
+	std::shared_ptr<Representation> physicsRepresentation = std::make_shared<MockRepresentation>("MockRepresentation");
+	auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>("CollisionRepresentatoin");
+
+	EXPECT_NO_THROW(physicsRepresentation->setCollisionRepresentation(collisionRepresentation));
+	EXPECT_EQ(collisionRepresentation, physicsRepresentation->getCollisionRepresentation());
+}
+
+TEST(RepresentationTest, SerializationTest)
+{
+	std::shared_ptr<Representation> physicsRepresentation = std::make_shared<MockRepresentation>("MockRepresentation");
+	physicsRepresentation->setIsActive(false);
+	physicsRepresentation->setIsGravityEnabled(false);
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = physicsRepresentation->encode());
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(5u, node.size());
+
+	std::shared_ptr<Representation> newRepresentation = std::make_shared<MockRepresentation>("Mock");
+	ASSERT_NO_THROW(newRepresentation->decode(node));
+
+	// Note: In current serialization strategy,
+	// name of the decoded representation is different from the name of original representation.
+	EXPECT_NE(physicsRepresentation->getName(), newRepresentation->getName());
+
+	EXPECT_EQ("SurgSim::Physics::MockRepresentation", newRepresentation->getClassName());
+	EXPECT_EQ(false, newRepresentation->isActive());
+	EXPECT_EQ(false, newRepresentation->isGravityEnabled());
+	EXPECT_EQ(0u, newRepresentation->getNumDof());
 }
