@@ -49,7 +49,7 @@ public:
 	}
 
 	/// Returns the groups assigned to the manager
-	const std::vector<std::shared_ptr<Group>>& getGroups() const
+	const std::unordered_map<std::string, std::shared_ptr<Group>>& getGroups() const
 	{
 		return m_groups;
 	}
@@ -117,6 +117,8 @@ protected:
 	/// Overrides ComponentManager::getType()
 	virtual int getType() const override;
 
+	virtual std::shared_ptr<Group> getOrCreateGroup(const std::string& name) = 0;
+
 private:
 	/// Initializes the manager
 	/// \return True if it succeeds, false if it fails
@@ -132,7 +134,7 @@ private:
 	/// Representations assigned to the manager
 	std::vector<std::shared_ptr<Representation>> m_representations;
 	/// Groups assigned to the manager
-	std::vector<std::shared_ptr<Group>> m_groups;
+	std::unordered_map<std::string, std::shared_ptr<Group>> m_groups;
 	/// Views assigned to the manager
 	std::vector<std::shared_ptr<View>> m_views;
 };

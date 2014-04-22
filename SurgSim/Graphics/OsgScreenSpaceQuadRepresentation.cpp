@@ -42,7 +42,7 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(const std::st
 	Representation(name),
 	OsgRepresentation(name),
 	ScreenSpaceQuadRepresentation(name),
-	m_scale(1.0,1.0,1.0)
+	m_scale(1.0, 1.0, 1.0)
 {
 	m_switch = new osg::Switch;
 	m_switch->setName(name + " Switch");
@@ -55,16 +55,16 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(const std::st
 	// Make the quad
 	float depth = 0.0;
 	m_geometry = osg::createTexturedQuadGeometry(
-		osg::Vec3(0.0, 0.0, depth),
-		osg::Vec3(1.0, 0.0, depth),
-		osg::Vec3(0.0, 1.0, depth));
+					 osg::Vec3(0.0, 0.0, depth),
+					 osg::Vec3(1.0, 0.0, depth),
+					 osg::Vec3(0.0, 1.0, depth));
 
 	osg::Vec4Array* colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	m_geometry->setColorArray(colors);
 	m_geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
-	m_geometry->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,4));
+	m_geometry->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
 
 	m_geode->addDrawable(m_geometry);
 
@@ -74,7 +74,8 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(const std::st
 
 	m_switch->addChild(m_transform);
 
-	addGroupReference("ossHud");
+	removeGroupReference(Representation::DefaultGroupName);
+	addGroupReference(Representation::DefaultHudGroupName);
 }
 
 OsgScreenSpaceQuadRepresentation::~OsgScreenSpaceQuadRepresentation()
@@ -132,7 +133,7 @@ bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<OsgTexture2d> 
 	newUniform->set(osgTexture);
 	if (replaceUniform("diffuseMap", newUniform))
 	{
-		setTextureCoordinates(0.0,0.0,1.0,1.0);
+		setTextureCoordinates(0.0, 0.0, 1.0, 1.0);
 		result = true;
 	}
 	return result;
@@ -147,7 +148,7 @@ bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<OsgTextureRect
 	{
 		int width, height;
 		osgTexture->getSize(&width, &height);
-		setTextureCoordinates(0.0,0.0,static_cast<float>(width),static_cast<float>(height));
+		setTextureCoordinates(0.0, 0.0, static_cast<float>(width), static_cast<float>(height));
 		result = true;
 	}
 	return result;
@@ -185,23 +186,23 @@ bool OsgScreenSpaceQuadRepresentation::replaceUniform(const std::string& name, s
 void OsgScreenSpaceQuadRepresentation::setTextureCoordinates(float left, float bottom, float right, float top)
 {
 	osg::Vec2Array* tcoords = new osg::Vec2Array(4);
-	(*tcoords)[0].set(left,top);
-	(*tcoords)[1].set(left,bottom);
-	(*tcoords)[2].set(right,bottom);
-	(*tcoords)[3].set(right,top);
-	m_geometry->setTexCoordArray(0,tcoords);
+	(*tcoords)[0].set(left, top);
+	(*tcoords)[1].set(left, bottom);
+	(*tcoords)[2].set(right, bottom);
+	(*tcoords)[3].set(right, top);
+	m_geometry->setTexCoordArray(0, tcoords);
 }
 
 void OsgScreenSpaceQuadRepresentation::setLocation(double x, double y)
 {
 	SurgSim::Math::RigidTransform3d transform =
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(x,y,0));
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(x, y, 0));
 	setPose(transform);
 }
 
 void OsgScreenSpaceQuadRepresentation::getLocation(double* x, double* y)
 {
-	SURGSIM_ASSERT( x !=  nullptr && y != nullptr) << "Cannot use a nulptr as an output paramter.";
+	SURGSIM_ASSERT(x !=  nullptr && y != nullptr) << "Cannot use a nulptr as an output paramter.";
 	SurgSim::Math::Vector3d position = getPose().translation();
 	*x = position.x();
 	*y = position.y();

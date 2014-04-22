@@ -56,7 +56,7 @@ public:
 	friend class ReadAccessor<T>;
 
 	/// Destructor
-	~BufferedValue() {};
+	~BufferedValue() {}
 
 protected:
 

@@ -77,6 +77,7 @@ OsgCamera::OsgCamera(const std::string& name) :
 
 	m_switch->addChild(m_camera);
 	m_camera->addChild(m_materialProxy);
+	m_materialProxy->setName(name + " MaterialProxy");
 
 	/// Update pose to inverse of view matrix
 	osg::Matrixd inverseViewMatrix = osg::Matrixd::inverse(m_camera->getViewMatrix());
@@ -92,12 +93,16 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_inverseViewMatrix = fromOsg(m_camera->getInverseViewMatrix());
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 
-	// Set a default group
-	setGroup(std::make_shared<OsgGroup>(name+" default group"));
+
 }
 
 bool OsgCamera::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 {
+
+	SURGSIM_ASSERT(group->getName() == Camera::getRenderGroupReference())
+			<< "Trying to set the wrong group in the camera getRenderGroupName() returns <"
+			<< Camera::getRenderGroupReference() << "> group->getName() is <" << group->getName() << ">.";
+
 	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
 	if (osgGroup && SurgSim::Graphics::Camera::setGroup(group))
 	{
@@ -192,7 +197,7 @@ bool OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)
 
 		int width, height;
 		renderTarget->getSize(&width, &height);
-		m_camera->setViewport(0,0,width,height);
+		m_camera->setViewport(0, 0, width, height);
 
 		attachRenderTargetTexture(osg::Camera::DEPTH_BUFFER, renderTarget->getDepthTarget());
 
@@ -276,7 +281,7 @@ void OsgCamera::attachRenderTargetTexture(osg::Camera::BufferComponent buffer, s
 
 	osg::Texture* actualTexture = osgTexture->getOsgTexture();
 	SURGSIM_ASSERT(actualTexture != nullptr) <<
-											 "Could not find texture";
+			"Could not find texture";
 
 	m_camera->attach(buffer, actualTexture, 0, 0);
 }

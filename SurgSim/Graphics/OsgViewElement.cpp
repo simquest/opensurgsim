@@ -13,23 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Graphics/OsgViewElement.h"
+
 #include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
 #include "SurgSim/Devices/Keyboard/OsgKeyboardHandler.h"
-
 #include "SurgSim/Devices/Mouse/MouseDevice.h"
 #include "SurgSim/Devices/Mouse/OsgMouseHandler.h"
-
-#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgConversions.h"
-#include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
-
+#include "SurgSim/Graphics/OsgView.h"
 
 using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;
 
 OsgViewElement::OsgViewElement(const std::string& name) :
-	SurgSim::Graphics::ViewElement(name, std::make_shared<OsgView>(name + " View")),
+	SurgSim::Graphics::ViewElement(name,
+								   std::make_shared<OsgView>("view"),
+								   std::make_shared<OsgCamera>("camera")),
 	m_manipulatorPosition(SurgSim::Math::Vector3d(3.0, 3.0, 3.0)),
 	m_manipulatorLookat(SurgSim::Math::Vector3d(0.0, 0.0, 0.0)),
 	m_keyboardEnabled(false),
@@ -80,7 +81,7 @@ void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
 		m_manipulator->setTransformation(
 			SurgSim::Graphics::toOsg(m_manipulatorPosition),
 			SurgSim::Graphics::toOsg(m_manipulatorLookat),
-			osg::Vec3d(0.0f,1.0f,0.0f));
+			osg::Vec3d(0.0f, 1.0f, 0.0f));
 	}
 
 	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
@@ -111,7 +112,7 @@ void SurgSim::Graphics::OsgViewElement::enableKeyboardDevice(bool val)
 	{
 		std::shared_ptr<SurgSim::Input::CommonDevice> keyboardDevice = getKeyboardDevice();
 		osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandle =
-				std::static_pointer_cast<SurgSim::Device::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
+			std::static_pointer_cast<SurgSim::Device::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
 		if (val)
 		{
 			view->getOsgView()->addEventHandler(keyboardHandle);
@@ -187,6 +188,6 @@ void SurgSim::Graphics::OsgViewElement::setManipulatorParameters(
 		m_manipulator->setTransformation(
 			SurgSim::Graphics::toOsg(m_manipulatorPosition),
 			SurgSim::Graphics::toOsg(m_manipulatorLookat),
-			osg::Vec3d(0.0f,1.0f,0.0f));
+			osg::Vec3d(0.0f, 1.0f, 0.0f));
 	}
 }

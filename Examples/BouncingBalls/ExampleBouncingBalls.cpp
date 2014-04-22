@@ -151,6 +151,8 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
+	viewElement->getCamera()->setInitialPose(
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
 	return viewElement;
 }
@@ -321,20 +323,20 @@ int main(int argc, char* argv[])
 	// Since the Scene contains all of the Elements, a Runtime therefore has access to all of the Components.
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
-	scene->addSceneElement(createEarth(data, "earth1",
-			SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 3.0, 0.0))));
+	scene->addSceneElement(createEarth(data,
+									   "earth1",
+									   SurgSim::Math::makeRigidTransform(
+										   SurgSim::Math::Quaterniond::Identity(),
+										   Vector3d(0.0, 3.0, 0.0))));
 
-	scene->addSceneElement(createPlane(data, "plane1",
-			SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0))));
+	scene->addSceneElement(createPlane(data,
+									   "plane1",
+									   SurgSim::Math::makeRigidTransform(
+										   SurgSim::Math::Quaterniond::Identity(),
+										   Vector3d(0.0, 0.0, 0.0))));
 
 	// Creates a ViewElement and adds it to the Scene.  A ViewElement is required for graphical display.
 	scene->addSceneElement(createView("view1", 30, 30, 963, 707));
-
-	// Place the camera.
-	graphicsManager->getDefaultCamera()->setInitialPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
-
-
 
 	// Run the simulation, starting with initialize/startup of Managers and Components. For each Component of each
 	// Element (Runtime::preprocessSceneElements) the Runtime tries to give access to the Component to each of the

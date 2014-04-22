@@ -70,17 +70,19 @@ struct OsgCameraRenderTests: public RenderTest
 
 TEST_F(OsgCameraRenderTests, PassTest)
 {
-	auto defaultCamera = graphicsManager->getDefaultCamera();
+	auto defaultCamera = std::dynamic_pointer_cast<Camera>(viewElement->getComponent("camera"));
 	auto renderPass = std::make_shared<OsgCamera>("RenderPass");
 
-	renderPass ->setViewMatrix(defaultCamera->getViewMatrix());
-	renderPass ->setProjectionMatrix(defaultCamera->getProjectionMatrix());
+	renderPass->setViewMatrix(defaultCamera->getViewMatrix());
+	renderPass->setProjectionMatrix(defaultCamera->getProjectionMatrix());
+	renderPass->setRenderGroupReference("RenderPass");
+	renderPass->setGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
 	int width, height;
-	viewElement->getView()->getDimensions(&width,&height);
+	viewElement->getView()->getDimensions(&width, &height);
 
 	std::shared_ptr<OsgRenderTarget2d> renderTargetOsg =
-		std::make_shared<OsgRenderTarget2d>(width,height, 1.0, 2, true);
+		std::make_shared<OsgRenderTarget2d>(width, height, 1.0, 2, true);
 	renderPass->setRenderTarget(renderTargetOsg);
 	renderPass->setRenderOrder(Camera::RENDER_ORDER_PRE_RENDER, 0);
 
@@ -98,15 +100,15 @@ TEST_F(OsgCameraRenderTests, PassTest)
 
 
 	auto uniform = std::make_shared<OsgUniform<Vector3f>>("ambientColor");
-	uniform->set(Vector3f(0.2,0.2,0.2));
+	uniform->set(Vector3f(0.2, 0.2, 0.2));
 	material1->addUniform(uniform);
 
 	uniform = std::make_shared<OsgUniform<Vector3f>>("otherColor");
-	uniform->set(Vector3f(1.0,0.0,0.0));
+	uniform->set(Vector3f(1.0, 0.0, 0.0));
 	material1->addUniform(uniform);
 
 	uniform = std::make_shared<OsgUniform<Vector3f>>("otherColor");
-	uniform->set(Vector3f(0.0,1.0,0.0));
+	uniform->set(Vector3f(0.0, 1.0, 0.0));
 	material2->addUniform(uniform);
 
 
@@ -115,15 +117,15 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	int screenWidth = 800;
 	int screenHeight = 600;
 
-	width = width/3;
-	height = height/3;
+	width = width / 3;
+	height = height / 3;
 
 	std::shared_ptr<ScreenSpaceQuadRepresentation> quad;
 	quad = makeQuad("Color1", width, height, screenWidth - width, screenHeight - height);
 	quad->setTexture(renderTargetOsg->getColorTargetOsg(0));
 	viewElement->addComponent(quad);
 
-	quad = makeQuad("Color2", width, height, screenWidth - width, screenHeight - height*2);
+	quad = makeQuad("Color2", width, height, screenWidth - width, screenHeight - height * 2);
 	quad->setTexture(renderTargetOsg->getColorTargetOsg(1));
 	viewElement->addComponent(quad);
 
@@ -132,16 +134,17 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	viewElement->addComponent(quad);
 
 	Quaterniond quat = Quaterniond::Identity();
-	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat,Vector3d(0.0, 0.0, -0.2));
-	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(M_PI,Vector3d::UnitY());
+	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0, 0.0, -0.2));
+	quat = SurgSim::Math::makeRotationQuaternion<double, Eigen::DontAlign>(M_PI, Vector3d::UnitY());
 	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0, 0.0, -0.2));
 
-	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("Box Representation");
+	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("RenderPassBox");
 	boxRepresentation1->setSizeXYZ(0.05, 0.05, 0.05);
 	boxRepresentation1->setPose(startPose);
-	renderPass->getGroup()->add(boxRepresentation1);
+	boxRepresentation1->setGroupReference("RenderPass");
+	viewElement->addComponent(boxRepresentation1);
 
-	auto boxRepresentation = std::make_shared<OsgBoxRepresentation>("Box Representation");
+	auto boxRepresentation = std::make_shared<OsgBoxRepresentation>("DefaultGroupBox");
 	boxRepresentation->setSizeXYZ(0.05, 0.05, 0.05);
 	boxRepresentation->setMaterial(material1);
 	viewElement->addComponent(boxRepresentation);
@@ -149,8 +152,8 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	/// Run the thread
 	runtime->start();
 
-	int numSteps = 1000;
-	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+	int numSteps = 100;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	for (int i = 0; i < numSteps; ++i)
 	{
 		double t = static_cast<double>(i) / numSteps;

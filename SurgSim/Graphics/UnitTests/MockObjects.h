@@ -29,6 +29,34 @@
 #include "SurgSim/Graphics/ViewElement.h"
 #include "SurgSim/Graphics/Texture.h"
 
+class MockGroup : public SurgSim::Graphics::Group
+{
+public:
+	/// Constructor. The group is initially empty.
+	/// \param	name	Name of the group
+	explicit MockGroup(const std::string& name) : SurgSim::Graphics::Group(name)
+	{
+	}
+
+	/// Sets whether the group is currently visible
+	/// \param	visible	True for visible, false for invisible
+	virtual void setVisible(bool visible)
+	{
+		m_isVisible = visible;
+	}
+
+	/// Gets whether the group is currently visible
+	/// \return	visible	True for visible, false for invisible
+	virtual bool isVisible() const
+	{
+		return m_isVisible;
+	}
+
+private:
+	/// Whether this group is currently visible or not
+	bool m_isVisible;
+};
+
 /// Manager class for testing
 class MockManager : public SurgSim::Graphics::Manager
 {
@@ -63,6 +91,15 @@ public:
 	virtual int getType() const override
 	{
 		return SurgSim::Framework::MANAGER_TYPE_NONE;
+	}
+
+	virtual std::shared_ptr<SurgSim::Graphics::Group> getOrCreateGroup(const std::string& name)
+	{
+		if (getGroups().find(name) == std::end(getGroups()))
+		{
+			addGroup(std::make_shared<MockGroup>(name));
+		}
+		return getGroups().at(name);
 	}
 
 private:
@@ -203,24 +240,6 @@ public:
 		return identity;
 	}
 
-	virtual bool addGroupReference(const std::string& name) override
-	{
-		return false;
-	}
-
-	virtual void addGroupReferences(const std::vector<std::string>& groups) override
-	{
-	}
-
-	virtual void setGroupReferences(const std::vector<std::string>& groups) override
-	{
-	}
-
-	virtual std::vector<std::string> getGroupReferences() override
-	{
-		return std::vector<std::string>();
-	}
-
 private:
 	/// Initializes the representation
 	/// \post m_isInitialized is set to true
@@ -252,34 +271,6 @@ private:
 
 	/// Rigid transform describing pose of the representation
 	SurgSim::Math::RigidTransform3d m_transform;
-};
-
-class MockGroup : public SurgSim::Graphics::Group
-{
-public:
-	/// Constructor. The group is initially empty.
-	/// \param	name	Name of the group
-	explicit MockGroup(const std::string& name) : SurgSim::Graphics::Group(name)
-	{
-	}
-
-	/// Sets whether the group is currently visible
-	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible)
-	{
-		m_isVisible = visible;
-	}
-
-	/// Gets whether the group is currently visible
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const
-	{
-		return m_isVisible;
-	}
-
-private:
-	/// Whether this group is currently visible or not
-	bool m_isVisible;
 };
 
 /// Camera class for testing
@@ -441,24 +432,6 @@ public:
 	virtual void setRenderOrder(RenderOrder bin, int value) override
 	{
 
-	}
-
-	virtual bool addGroupReference(const std::string& name) override
-	{
-		return false;
-	}
-
-	virtual void addGroupReferences(const std::vector<std::string>& groups) override
-	{
-	}
-
-	virtual void setGroupReferences(const std::vector<std::string>& groups) override
-	{
-	}
-
-	virtual std::vector<std::string> getGroupReferences() override
-	{
-		return std::vector<std::string>();
 	}
 
 	virtual const SurgSim::Math::Matrix44d& getInverseViewMatrix() const

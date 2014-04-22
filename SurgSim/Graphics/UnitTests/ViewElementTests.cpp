@@ -40,7 +40,9 @@ namespace Graphics
 class MockViewElement : public ViewElement
 {
 public:
-	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
+	explicit MockViewElement(const std::string& name) : ViewElement(name,
+				std::make_shared<MockView>("View"),
+				std::make_shared<MockCamera>("Camera")),
 		m_isInitialized(false)
 	{
 	}

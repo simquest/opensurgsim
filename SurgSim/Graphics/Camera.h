@@ -52,36 +52,26 @@ public:
 
 	/// Constructor
 	/// \param	name	Name of the camera
-	explicit Camera(const std::string& name) : Representation(name)
-	{
-		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, ViewMatrix, getViewMatrix, setViewMatrix);
-		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, ProjectionMatrix,
-			getProjectionMatrix, setProjectionMatrix);
+	explicit Camera(const std::string& name);
 
-		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatViewMatrix, getViewMatrix);
-		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatProjectionMatrix, getProjectionMatrix);
-		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatInverseViewMatrix, getInverseViewMatrix);
+	/// Set the group reference that this camera wants to use as the group for rendering. Objects that, reference
+	/// the same group will be rendered by this camera.
+	/// \param name Name of the group to be used for rendering
+	void setRenderGroupReference(const std::string& name);
 
-
-	}
+	/// Gets the render group reference t
+	std::string getRenderGroupReference();
 
 	/// Sets the group of representations that will be seen by this camera.
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
 	/// \param	group	Group of representations
 	/// \return	True if it succeeded, false if it failed
-	virtual bool setGroup(std::shared_ptr<Group> group)
-	{
-		m_group = group;
-		return true;
-	}
+	virtual bool setGroup(std::shared_ptr<Group> group);
 
 	/// Gets the group of representations that will be seen by this camera.
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
 	/// \return	Group of representations
-	std::shared_ptr<Group> getGroup() const
-	{
-		return m_group;
-	}
+	std::shared_ptr<Group> getGroup() const;
 
 	/// Sets the view matrix of the camera
 	/// \param	matrix	View matrix
@@ -123,6 +113,10 @@ private:
 	/// Group of representations that this camera sees
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
 	std::shared_ptr<Group> m_group;
+
+	/// The name of the group that the camera wants to use for rendering, the graphics manager will actually assign
+	/// this group
+	std::string m_renderGroupReference;
 };
 
 };  // namespace Graphics

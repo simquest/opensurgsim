@@ -16,12 +16,13 @@
 /// \file
 /// Render Tests for the OsgCapsuleRepresentation class.
 
-#include "SurgSim/Graphics/OsgManager.h"
-#include "SurgSim/Graphics/OsgCapsuleRepresentation.h"
-#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Graphics/OsgCapsuleRepresentation.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Testing/MathUtilities.h"
 
@@ -44,37 +45,10 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct OsgCapsuleRepresentationRenderTests : public ::testing::Test
+struct OsgCapsuleRepresentationRenderTests : public RenderTest
 {
-	virtual void SetUp()
-	{
-		runtime = std::make_shared<SurgSim::Framework::Runtime>();
-		manager = std::make_shared<SurgSim::Graphics::OsgManager>();
-
-		runtime->addManager(manager);
-
-		scene = runtime->getScene();
-
-		viewElement = std::make_shared<OsgViewElement>("view element");
-		scene->addSceneElement(viewElement);
-
-	}
-
-	virtual void TearDown()
-	{
-		runtime->stop();
-	}
-
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-	std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
-	std::shared_ptr<SurgSim::Framework::Scene> scene;
-	std::shared_ptr<OsgViewElement> viewElement;
-
-protected:
 
 };
-
-
 
 TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 {
@@ -88,25 +62,26 @@ TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 
 	/// Run the thread
 	runtime->start();
-	EXPECT_TRUE(manager->isInitialized());
+	EXPECT_TRUE(graphicsManager->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	enum SetterType {SetterTypeIndividual,
 					 SetterTypeTogether,
 					 SetterTypeVector2d,
 					 // Add more setter types above this line.
-					 BoxSetterTypeCount};
+					 BoxSetterTypeCount
+					};
 	int setterType = 0;
 
 	Vector2d capsule1Size, capsule2Size;
 
-	/// Initial positoin of capsule 1
+	/// Initial position of capsule 1
 	Vector3d startPosition1(-0.1, 0.0, -0.2);
 	/// Final position of capsule 1
 	Vector3d endPosition1(0.1, 0.0, -0.2);
-	/// Initial size (radius, hegiht) of capsule 1
+	/// Initial size (radius, height) of capsule 1
 	Vector2d startSize1(0.001, 0.011);
-	/// Final size (radius, hegiht) of capsule 1
+	/// Final size (radius, height) of capsule 1
 	Vector2d endSize1(0.01, 0.02);
 	/// Initial angles (X, Y, Z) of the capsule 1
 	Vector3d startAngles1(0.0, 0.0, 0.0);
@@ -117,9 +92,9 @@ TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 	Vector3d startPosition2(0.0, -0.1, -0.2);
 	/// Final position capsule 2
 	Vector3d endPosition2(0.0, 0.1, -0.2);
-	/// Initial size (radius, hegiht) of capsule 2
+	/// Initial size (radius, height) of capsule 2
 	Vector2d startSize2(0.001, 0.01);
-	/// Final size (radius, hegiht) of capsule 2
+	/// Final size (radius, height) of capsule 2
 	Vector2d endSize2(0.011, 0.02);
 	/// Initial angles (X, Y, Z) of the capsule 2
 	Vector3d startAngles2(-M_PI_2, -M_PI_2, -M_PI_2);
@@ -138,7 +113,7 @@ TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 		capsuleRepresentation2->setPose(interpolatePose(startAngles2, endAngles2, startPosition2, endPosition2, t));
 
 		/// Test different ways to set the size of capsule
-		if(setterType == static_cast<int>(SetterTypeIndividual))
+		if (setterType == static_cast<int>(SetterTypeIndividual))
 		{
 			capsuleRepresentation1->setRadius(interpolate(startSize1.x(), endSize1.x(), t));
 			capsuleRepresentation1->setHeight(interpolate(startSize1.y(), endSize1.y(), t));
@@ -146,15 +121,15 @@ TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 			capsuleRepresentation2->setRadius(interpolate(startSize2.x(), endSize2.x(), t));
 			capsuleRepresentation2->setHeight(interpolate(startSize2.y(), endSize2.y(), t));
 		}
-		else if(setterType == static_cast<int>(SetterTypeTogether))
+		else if (setterType == static_cast<int>(SetterTypeTogether))
 		{
 			capsuleRepresentation1->setSize(interpolate(startSize1.x(), endSize1.x(), t),
-					interpolate(startSize1.y(), endSize1.y(), t));
+											interpolate(startSize1.y(), endSize1.y(), t));
 
 			capsuleRepresentation2->setSize(interpolate(startSize2.x(), endSize2.x(), t),
-					interpolate(startSize2.y(), endSize2.y(), t));
+											interpolate(startSize2.y(), endSize2.y(), t));
 		}
-		else if(setterType == static_cast<int>(SetterTypeVector2d))
+		else if (setterType == static_cast<int>(SetterTypeVector2d))
 		{
 			capsule1Size.x() = interpolate(startSize1.x(), endSize1.x(), t);
 			capsule1Size.y() = interpolate(startSize1.y(), endSize1.y(), t);

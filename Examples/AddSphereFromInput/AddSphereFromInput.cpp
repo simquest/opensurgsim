@@ -76,6 +76,11 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
 
+	viewElement->getCamera()->setInitialPose(
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+
+
+
 	return viewElement;
 }
 
@@ -183,12 +188,10 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("box"));
-	scene->addSceneElement(createPlane("plane",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
+	scene->addSceneElement(createPlane("plane", SurgSim::Math::makeRigidTransform(
+										   SurgSim::Math::Quaterniond::Identity(),
+										   Vector3d(0.0, -1.0, 0.0))));
 	scene->addSceneElement(createView("view", 0, 0, 1023, 768));
-
-	graphicsManager->getDefaultCamera()->setInitialPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
 	runtime->execute();
 

@@ -100,7 +100,7 @@ protected:
 	}
 
 	std::vector<SurgSim::Graphics::VectorFieldData> makeVectors(const std::vector<Vector3d>& points,
-															   const std::vector<Vector4d>& colors)
+			const std::vector<Vector4d>& colors)
 	{
 		std::vector<SurgSim::Graphics::VectorFieldData> vecs(8);
 		for (auto i = 0; i < 8; ++i)
@@ -112,8 +112,8 @@ protected:
 	}
 
 	std::shared_ptr<VectorFieldRepresentation>
-		makeVectorFieldRepresentation(const std::vector<Vector3d>& points,
-						const std::vector<SurgSim::Graphics::VectorFieldData>& vectors)
+	makeVectorFieldRepresentation(const std::vector<Vector3d>& points,
+								  const std::vector<SurgSim::Graphics::VectorFieldData>& vectors)
 	{
 		auto representation = std::make_shared<OsgVectorFieldRepresentation>("Vector Field Representation");
 		auto vertices =  representation->getVectorField();
@@ -143,14 +143,14 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, AddVectors)
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 
 	auto it = std::begin(points);
 	auto v = std::begin(vectors);
 	for (; it != std::end(points); ++it, ++v)
 	{
 		vectorField->addVertex(Vertex<SurgSim::Graphics::VectorFieldData>((*it), *v));
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	}
 }
 
@@ -167,7 +167,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 
 	int numSteps = 100;
 	double startWidth = 0.0;
@@ -200,9 +200,9 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingVectorField)
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 
-	auto & vertexList = vectorRepresentation->getVectorField()->getVertices();
+	auto& vertexList = vectorRepresentation->getVectorField()->getVertices();
 	int numSteps = 100;
 	for (int i = 0; i < numSteps; ++i)
 	{
@@ -213,6 +213,6 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingVectorField)
 			vertexList[j].data.direction = interpolate(endVectors[j].direction, startVectors[j].direction, t);
 			vertexList[j].data.color.setValue(interpolate(startColors[j], endColors[j], t));
 		}
-		boost::this_thread::sleep(boost::posix_time::milliseconds(5000 / numSteps));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 }

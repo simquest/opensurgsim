@@ -13,37 +13,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include <gtest/gtest.h>
 
 #include <algorithm>
 #include <memory>
+#include <utility>
 #include <vector>
 
+#include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/Graphics/OsgManager.h"
-#include "SurgSim/Graphics/OsgBoxRepresentation.h"
-#include "SurgSim/Graphics/OsgViewElement.h"
-#include "SurgSim/Graphics/OsgShader.h"
-#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgUniform.h"
-
-#include "SurgSim/DataStructures/Vertices.h"
-
-#include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/RigidTransform.h"
-
-#include "SurgSim/Testing/MathUtilities.h"
-
+#include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Testing/MathUtilities.h"
 #include "SurgSim/Testing/TestCube.h"
-
-
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
@@ -56,9 +52,6 @@ using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Testing::interpolate;
 using SurgSim::Testing::interpolatePose;
 
-#include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/Behavior.h"
-#include <utility>
 
 namespace SurgSim
 {
@@ -74,8 +67,6 @@ protected:
 	std::vector<unsigned int> cubeTriangles;
 	std::vector<Vector4d> cubeColors;
 	std::vector<Vector2d> cubeTextures;
-
-
 
 	std::shared_ptr<MeshRepresentation> makeRepresentation(const std::string& name)
 	{

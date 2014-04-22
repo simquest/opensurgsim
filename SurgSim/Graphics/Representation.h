@@ -18,8 +18,10 @@
 
 #include "SurgSim/Framework/Representation.h"
 
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
+
+#include <unordered_set>
 
 namespace SurgSim
 {
@@ -33,10 +35,15 @@ class Material;
 /// Base graphics representation class, which defines the interface that all graphics representations must implement.
 ///
 /// A Graphics::Representation is the visual Framework::Representation of a Framework::SceneElement in the
-/// Framework::Scene.
+/// Framework::Scene. Graphical representations can request to be assigned to groups, groups are used to select certain
+/// elements for rendering in various special effects.
 class Representation : public SurgSim::Framework::Representation
 {
 public:
+
+	static const std::string DefaultGroupName;
+	static const std::string DefaultHudGroupName;
+
 	/// Constructor
 	/// \param	name	Name of the representation
 	explicit Representation(const std::string& name);
@@ -58,7 +65,6 @@ public:
 	/// \return	Graphics material
 	virtual std::shared_ptr<Material> getMaterial() const = 0;
 
-
 	/// Removes the material from the representation
 	virtual void clearMaterial() = 0;
 
@@ -70,19 +76,43 @@ public:
 	/// the same name.
 	/// \param	name	The name of the group.
 	/// \return	true if it succeeds, false if the group reference already exists.
-	virtual bool addGroupReference(const std::string& name) = 0;
+	bool addGroupReference(const std::string& name);
+
 
 	/// Adds a list of group references.
 	/// \param	groups	The references.
-	virtual void addGroupReferences(const std::vector<std::string>& groups) = 0;
+	void addGroupReferences(const std::vector<std::string>& groups);
 
 	/// Sets the list of group references. Clearing all the old references
 	/// \param groups The references.
-	virtual void setGroupReferences(const std::vector<std::string>& groups) = 0;
+	void setGroupReferences(const std::vector<std::string>& groups);
+
+	/// Helper functions, this clears all the references and sets, only the reference
+	/// given in the parameter
+	/// \param group The reference to be used for this representation
+	void setGroupReference(const std::string& group);
 
 	/// Gets group references.
 	/// \return	The group references.
-	virtual std::vector<std::string> getGroupReferences() = 0;
+	std::vector<std::string> getGroupReferences();
+
+	/// Function to remove an unwanted reference.
+	/// \param group The name of the reference that should be removed
+	/// \return true If the reference was found and removed
+	bool removeGroupReference(const std::string& group);
+
+	/// Clear all the Group references
+	void clearGroupReferences();
+
+private:
+
+	/// List of groups that this representation would like to be added
+	std::unordered_set<std::string> m_groups;
+
+	/// Check if the representation is awake and print a warning message if it is.
+	/// \param functionName the name of the calling function to be used in the error message
+	/// \return the value of isAwake()
+	bool checkAwake(const std::string& functionName);
 
 };
 

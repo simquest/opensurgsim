@@ -92,6 +92,9 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
+	viewElement->getCamera()->setInitialPose(
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+
 
 	return viewElement;
 }
@@ -151,7 +154,6 @@ int main(int argc, char* argv[])
 	runtime->addManager(graphicsManager);
 	runtime->addManager(behaviorManager);
 
-	std::shared_ptr<SurgSim::Graphics::OsgCamera> camera = graphicsManager->getDefaultCamera();
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	const SurgSim::Math::Quaterniond quaternionIdentity = SurgSim::Math::Quaterniond::Identity();
@@ -175,8 +177,6 @@ int main(int argc, char* argv[])
 					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
 
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
-
-	camera->setInitialPose(SurgSim::Math::makeRigidTransform(quaternionIdentity, Vector3d(0.0, 0.5, 5.0)));
 
 	runtime->execute();
 

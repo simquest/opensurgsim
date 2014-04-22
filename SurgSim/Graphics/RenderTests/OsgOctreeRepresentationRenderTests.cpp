@@ -17,13 +17,13 @@
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
-#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Graphics/OctreeRepresentation.h"
 #include "SurgSim/Graphics/OsgOctreeRepresentation.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/OctreeShape.h"
 #include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Graphics::OsgOctreeRepresentation;
 using SurgSim::Graphics::OctreeRepresentation;
@@ -56,15 +56,17 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 	boundingBox.min() = Vector3d::Ones() * -2.0;
 	boundingBox.max() = Vector3d::Ones() * 2.0;
 
-	std::array<Vector3d, 8> secondLevelPositions = {{ Vector3d(-1.0, -1.0, -1.0),
-													  Vector3d( 1.0, -1.0, -1.0),
-													  Vector3d(-1.0,  1.0, -1.0),
-													  Vector3d( 1.0,  1.0, -1.0),
-													  Vector3d(-1.0, -1.0,  1.0),
-													  Vector3d( 1.0, -1.0,  1.0),
-													  Vector3d(-1.0,  1.0,  1.0),
-													  Vector3d( 1.0,  1.0,  1.0)
-												   }};
+	std::array<Vector3d, 8> secondLevelPositions = {{
+			Vector3d(-1.0, -1.0, -1.0),
+			Vector3d(1.0, -1.0, -1.0),
+			Vector3d(-1.0,  1.0, -1.0),
+			Vector3d(1.0,  1.0, -1.0),
+			Vector3d(-1.0, -1.0,  1.0),
+			Vector3d(1.0, -1.0,  1.0),
+			Vector3d(-1.0,  1.0,  1.0),
+			Vector3d(1.0,  1.0,  1.0)
+		}
+	};
 	auto octree = std::make_shared<OctreeShape::NodeType>(boundingBox);
 	octree->addData(secondLevelPositions[0], emptyData, 2);
 	octree->addData(secondLevelPositions[1], emptyData, 2);
@@ -76,8 +78,8 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Octree Representation");
 	octreeRepresentation->setInitialPose(makeRigidTransform(
-											makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
-											Vector3d(0.0, 0.0, -20.0))
+			makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
+			Vector3d(0.0, 0.0, -20.0))
 										);
 	viewElement->addComponent(octreeRepresentation);
 	octreeRepresentation->setOctree(octreeShape);

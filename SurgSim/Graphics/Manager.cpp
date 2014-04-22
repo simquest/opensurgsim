@@ -42,11 +42,7 @@ bool Manager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Componen
 	{
 		result = removeRepresentation(representation);
 	}
-	std::shared_ptr<Group> group = std::dynamic_pointer_cast<Group>(component);
-	if (group != nullptr)
-	{
-		result = removeGroup(group);
-	}
+
 	std::shared_ptr<View> view = std::dynamic_pointer_cast<View>(component);
 	if (view != nullptr)
 	{
@@ -63,11 +59,7 @@ bool Manager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Compone
 	{
 		result = addRepresentation(representation);
 	}
-	std::shared_ptr<Group> group = std::dynamic_pointer_cast<Group>(component);
-	if (group != nullptr)
-	{
-		result = addGroup(group);
-	}
+
 	std::shared_ptr<View> view = std::dynamic_pointer_cast<View>(component);
 	if (view != nullptr)
 	{
@@ -82,6 +74,15 @@ bool Manager::addRepresentation(std::shared_ptr<Representation> representation)
 	if (std::find(m_representations.begin(), m_representations.end(), representation) == m_representations.end())
 	{
 		m_representations.push_back(representation);
+
+		// Add the component to all the groups that it wants to be in
+		std::vector<std::string> requestedGroups = representation->getGroupReferences();
+		for (auto groupName = std::begin(requestedGroups); groupName != std::end(requestedGroups); ++groupName)
+		{
+			auto group = getOrCreateGroup(*groupName);
+			group->add(representation);
+		}
+
 		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added representation " << representation->getName();
 		result = true;
 	}
@@ -94,14 +95,11 @@ bool Manager::addRepresentation(std::shared_ptr<Representation> representation)
 bool Manager::addGroup(std::shared_ptr<Group> group)
 {
 	bool result = false;
-	if (std::find_if(
-		m_groups.begin(),
-		m_groups.end(),
-		[group](std::shared_ptr<Group> in){ return in->getName() == group->getName();}) == m_groups.end())
+
+	if (m_groups.find(group->getName()) == std::end(m_groups))
 	{
-		m_groups.push_back(group);
+		m_groups[group->getName()] = group;
 		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added group " << group->getName();
-		result = true;
 	}
 	else
 	{
@@ -109,6 +107,7 @@ bool Manager::addGroup(std::shared_ptr<Group> group)
 	}
 	return result;
 }
+
 bool Manager::addView(std::shared_ptr<View> view)
 {
 	bool result = false;
@@ -128,6 +127,13 @@ bool Manager::addView(std::shared_ptr<View> view)
 bool Manager::removeRepresentation(std::shared_ptr<Representation> representation)
 {
 	bool result = false;
+
+	auto groupReferences = representation->getGroupReferences();
+	for (auto it = groupReferences.cbegin(); it != groupReferences.cend(); ++it)
+	{
+		m_groups[*it]->remove(representation);
+	}
+
 	auto it = std::find(m_representations.begin(), m_representations.end(), representation);
 	if (it != m_representations.end())
 	{
@@ -144,7 +150,7 @@ bool Manager::removeRepresentation(std::shared_ptr<Representation> representatio
 bool Manager::removeGroup(std::shared_ptr<Group> group)
 {
 	bool result = false;
-	auto it = std::find(m_groups.begin(), m_groups.end(), group);
+	auto it = m_groups.find(group->getName());
 	if (it != m_groups.end())
 	{
 		m_groups.erase(it);
@@ -157,6 +163,7 @@ bool Manager::removeGroup(std::shared_ptr<Group> group)
 	}
 	return result;
 }
+
 bool Manager::removeView(std::shared_ptr<View> view)
 {
 	bool result = false;
@@ -193,10 +200,12 @@ bool Manager::doUpdate(double dt)
 	{
 		(*it)->update(dt);
 	}
+
 	for (auto it = m_views.begin(); it != m_views.end(); ++it)
 	{
 		(*it)->update(dt);
 	}
+
 	return true;
 }
 

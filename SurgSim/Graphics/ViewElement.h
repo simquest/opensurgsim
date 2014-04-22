@@ -30,18 +30,22 @@ namespace Graphics
 {
 
 class View;
+class Camera;
 
 /// Basic SceneElement that wraps a View so that it can be added to the Scene.
 ///
 /// A Scene needs at least one Graphics::View component for any visualization of Graphics:Representation objects
-/// to be shown.
+/// to be shown. A view needs a camera to do its' rendering, this component can connect all the pieces correctly.
 class ViewElement : public Framework::SceneElement
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the scene element
 	/// \param	view	View component that provides the visualization of the graphics representations
-	ViewElement(const std::string& name, std::shared_ptr<SurgSim::Graphics::View> view);
+	/// \param  camera  Camera component to be used for this view,
+	ViewElement(const std::string& name,
+				std::shared_ptr<SurgSim::Graphics::View> view,
+				std::shared_ptr <SurgSim::Graphics::Camera> camera);
 
 	/// Destructor
 	virtual ~ViewElement();
@@ -52,11 +56,20 @@ public:
 
 	/// Returns the view component that provides the visualization of the graphics representations
 	/// \return A shared_ptr pointing to the View component
-	std::shared_ptr<View> getView() const;
+	std::shared_ptr<View> getView();
+
+	/// Sets the camera for the view in this sceneelement
+	/// \param camera The camera to be used with the view
+	void setCamera(std::shared_ptr<Camera> camera);
+
+	/// Get the camera for the view in this sceneelement.
+	/// \return The camera used in the view of this sceneelement.
+	std::shared_ptr<Camera> getCamera();
 
 	/// Return the keyboard to be used with this view.
 	/// \return A keyboard device
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() = 0;
+
 	/// Turn on/off the keyboard device to be used.
 	/// \param val Indicate whether or not to use keyboard device
 	virtual	void enableKeyboardDevice(bool val) = 0;
@@ -64,6 +77,7 @@ public:
 	/// Return the mouse to be used with this view.
 	/// \return A mouse device
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() = 0;
+
 	/// Turn on/off the mouse device to be used.
 	/// \param val Indicate whether or not to use mouse device
 	virtual	void enableMouseDevice(bool val) = 0;
@@ -76,6 +90,9 @@ protected:
 private:
 	/// View component that provides the visualization of the graphics representations
 	std::shared_ptr<View> m_view;
+
+	/// Camera component connected to the view
+	std::shared_ptr<Camera> m_camera;
 };
 
 };  // namespace Graphics

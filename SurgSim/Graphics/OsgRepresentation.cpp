@@ -38,7 +38,7 @@ OsgRepresentation::OsgRepresentation(const std::string& name) :
 	Representation(name)
 {
 	m_switch = new osg::Switch;
-	m_switch->setName(name + " Switch");
+	m_switch->setName(name + " Representation Switch");
 
 	m_transform = new osg::PositionAttitudeTransform();
 	m_transform->setName(name + " Transform");
@@ -46,6 +46,8 @@ OsgRepresentation::OsgRepresentation(const std::string& name) :
 	m_switch->addChild(m_transform);
 
 	setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
+
+	addGroupReference(DefaultGroupName);
 }
 
 OsgRepresentation::~OsgRepresentation()
@@ -129,65 +131,6 @@ osg::ref_ptr<osg::Node> OsgRepresentation::getOsgNode() const
 void OsgRepresentation::doUpdate(double dt)
 {
 
-}
-
-bool OsgRepresentation::addGroupReference(const std::string& name)
-{
-	bool result = false;
-	if (!isAwake())
-	{
-		auto insertion = m_groups.insert(name);
-		result = insertion.second;
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
-				"Representation::requestGroup() was called while the component was already awake for component " <<
-				getName() << " this has no effect and should be avoided.";
-	}
-	return result;
-
-}
-
-void OsgRepresentation::addGroupReferences(const std::vector<std::string>& groups)
-{
-	if (! isAwake())
-	{
-		for (auto it = groups.cbegin(); it != groups.cend(); ++it)
-		{
-			addGroupReference(*it);
-		}
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
-				"Representation::addGroupReferences() was called while the component " <<
-				"was already awake for component " << getName() << " this has no effect and should be avoided.";
-	}
-
-}
-
-void OsgRepresentation::setGroupReferences(const std::vector<std::string>& groups)
-{
-	if (! isAwake())
-	{
-		m_groups.clear();
-		for (auto it = groups.cbegin(); it != groups.cend(); ++it)
-		{
-			addGroupReference(*it);
-		}
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
-				"Representation::setGroupReferences() was called while the component " <<
-				"was already awake for component " << getName() << " this has no effect and should be avoided.";
-	}
-}
-
-std::vector<std::string> OsgRepresentation::getGroupReferences()
-{
-	return std::vector<std::string>(std::begin(m_groups), std::end(m_groups));
 }
 
 }; // Graphics

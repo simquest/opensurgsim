@@ -37,6 +37,7 @@ using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::makeRigidTransform;
 
 namespace SurgSim
 {
@@ -64,7 +65,8 @@ TEST(OsgCameraTests, InitTest)
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()))) <<
 			"Camera's projection matrix should be initialized to the osg::Camera's projection matrix!";
 
-	EXPECT_NE(nullptr, camera->getGroup());
+	// Camera does not have a group by default
+	EXPECT_EQ(nullptr, camera->getGroup());
 }
 
 TEST(OsgCameraTests, OsgNodesTest)
@@ -111,10 +113,10 @@ TEST(OsgCameraTests, GroupTest)
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
 
-	EXPECT_NE(nullptr, camera->getGroup());
+	EXPECT_EQ(nullptr, camera->getGroup());
 
 	/// Adding an OsgGroup should succeed
-	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test group");
+	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>(camera->getRenderGroupReference());
 	std::shared_ptr<Group> group = osgGroup;
 	EXPECT_TRUE(camera->setGroup(group));
 	EXPECT_EQ(group, camera->getGroup());
@@ -123,7 +125,7 @@ TEST(OsgCameraTests, GroupTest)
 	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0)->asGroup()->getChild(0));
 
 	/// Adding a group that does not derive from OsgGroup should fail
-	std::shared_ptr<Group> mockGroup = std::make_shared<MockGroup>("non-osg group");
+	std::shared_ptr<Group> mockGroup = std::make_shared<MockGroup>(camera->getRenderGroupReference());
 	EXPECT_FALSE(camera->setGroup(mockGroup));
 	EXPECT_EQ(group, camera->getGroup());
 	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0)->asGroup()->getChild(0));
@@ -144,8 +146,8 @@ TEST(OsgCameraTests, PoseTest)
 	RigidTransform3d initialPose;
 	{
 		SCOPED_TRACE("Set Initial Pose");
-		initialPose = SurgSim::Math::makeRigidTransform(
-						  Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		initialPose =
+			makeRigidTransform(Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		camera->setInitialPose(initialPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
@@ -156,8 +158,8 @@ TEST(OsgCameraTests, PoseTest)
 
 	{
 		SCOPED_TRACE("Set Current Pose");
-		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		RigidTransform3d currentPose =
+			makeRigidTransform(Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		camera->setPose(currentPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getPose().isApprox(currentPose));
@@ -168,8 +170,8 @@ TEST(OsgCameraTests, PoseTest)
 
 	{
 		SCOPED_TRACE("Change Initial Pose");
-		initialPose = SurgSim::Math::makeRigidTransform(
-						  Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		initialPose =
+			makeRigidTransform(Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		camera->setInitialPose(initialPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
@@ -186,7 +188,8 @@ TEST(OsgCameraTests, MatricesTest)
 
 	/// Create a random view and projection matrix
 	RigidTransform3d viewTransform = SurgSim::Math::makeRigidTransform(
-		Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+										 Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(),
+										 Vector3d::Random());
 	Matrix44d viewMatrix = viewTransform.matrix();
 
 	Matrix44d projectionMatrix = Matrix44d::Random();

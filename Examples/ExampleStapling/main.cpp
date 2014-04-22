@@ -132,7 +132,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	physicsRepresentation->setFilename(filename);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	// Note: Directly calling loadFile is a workaround.  The TransferDeformableStateToVerticesBehavior requires a
-	// pointer to the Physics Representation's state, which is not created until the file is loaded and the internal 
+	// pointer to the Physics Representation's state, which is not created until the file is loaded and the internal
 	// structure is initialized.  Therefore we create the state now by calling loadFile.
 	physicsRepresentation->loadFile();
 	physicsRepresentation->setInitialPose(pose);
@@ -156,7 +156,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	{
 		// Create a point-cloud for visualizing the nodes of the finite element model
 		std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>> graphicsPointCloudRepresentation
-			= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>(name + " point cloud");
+				= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>(name + " point cloud");
 		graphicsPointCloudRepresentation->setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
 		graphicsPointCloudRepresentation->setColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
 		graphicsPointCloudRepresentation->setPointSize(3.0f);
@@ -199,8 +199,8 @@ std::shared_ptr<ViewElement> createView()
 }
 
 std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName,
-														const std::string& deviceName,
-														const SurgSim::Math::RigidTransform3d& pose)
+		const std::string& deviceName,
+		const SurgSim::Math::RigidTransform3d& pose)
 {
 	std::vector<std::shared_ptr<SurgSim::Framework::Representation>> recievesPhysicsPose;
 
@@ -290,7 +290,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	{
 		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision
 			= std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
-				"VirtualToothCollision" + boost::to_string(i), *it, RigidTransform3d::Identity());
+				  "VirtualToothCollision" + boost::to_string(i), *it, RigidTransform3d::Identity());
 
 		virtualTeeth[i] = virtualToothCollision;
 		sceneElement->addComponent(virtualToothCollision);
@@ -388,7 +388,7 @@ int main(int argc, char* argv[])
 	if (!device->initialize())
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "Could not initialize device " << device->getName() << " for the tool.";
+				<< "Could not initialize device " << device->getName() << " for the tool.";
 
 		device = std::make_shared<IdentityPoseDevice>(deviceName);
 	}
@@ -400,7 +400,7 @@ int main(int argc, char* argv[])
 	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
 	std::shared_ptr<SceneElement> armSceneElement = createArmSceneElement("arm", armPose);
 	std::shared_ptr<SceneElement> staplerSceneElement = createStaplerSceneElement(
-		"stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero()));
+				"stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero()));
 
 	// Load the FEM
 	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
