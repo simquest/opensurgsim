@@ -26,8 +26,9 @@ using SurgSim::Math::Matrix33d;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::CylinderShape;
-using SurgSim::Math::MeshShape;
+using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::OctreeShape;
+using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
 
@@ -65,7 +66,7 @@ public:
 	double m_size[3];
 };
 
-TEST_F(ShapeTest, SphereSerializeTest)
+TEST_F(ShapeTest, SphereSerializationTest)
 {
 	std::shared_ptr<Shape> sphere;
 	EXPECT_NO_THROW({sphere = Shape::getFactory().create("SurgSim::Math::SphereShape");});
@@ -110,7 +111,7 @@ TEST_F(ShapeTest, Sphere)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(ShapeTest, BoxSerializeTest)
+TEST_F(ShapeTest, BoxSerializationTest)
 {
 	std::shared_ptr<Shape> box;
 	EXPECT_NO_THROW({box = Shape::getFactory().create("SurgSim::Math::BoxShape");});
@@ -164,7 +165,7 @@ TEST_F(ShapeTest, Box)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(ShapeTest, CylinderSerializeTest)
+TEST_F(ShapeTest, CylinderSerializationTest)
 {
 	std::shared_ptr<Shape> cylinder;
 	EXPECT_NO_THROW({cylinder = Shape::getFactory().create("SurgSim::Math::CylinderShape");});
@@ -214,7 +215,7 @@ TEST_F(ShapeTest, Cylinder)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(ShapeTest, CapsuleSerializeTest)
+TEST_F(ShapeTest, CapsuleSerializationTest)
 {
 	std::shared_ptr<Shape> capsule;
 	EXPECT_NO_THROW({capsule = Shape::getFactory().create("SurgSim::Math::CapsuleShape");});
@@ -271,10 +272,33 @@ TEST_F(ShapeTest, Capsule)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-
-TEST_F(ShapeTest, OctreeSerializeTest)
+TEST_F(ShapeTest, DoubleSidedPlaneShapeSerializationTest)
 {
-	std::shared_ptr<SurgSim::Math::OctreeShape> octree = std::make_shared<SurgSim::Math::OctreeShape>();
+	std::shared_ptr<Shape> box;
+	EXPECT_NO_THROW(box = Shape::getFactory().create("SurgSim::Math::DoubleSidedPlaneShape"));
+
+	// Nothing for DoubleSidedPlaneShape to be encoded/decoded.
+}
+
+TEST_F(ShapeTest, DoubleSidedPlaneShape)
+{
+	EXPECT_NO_THROW(DoubleSidedPlaneShape doubleSidedPlaneShape);
+	DoubleSidedPlaneShape doubleSidedPlaneShape;
+
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE, doubleSidedPlaneShape.getType());
+	EXPECT_NEAR(0.0, doubleSidedPlaneShape.getVolume(), epsilon);
+	EXPECT_TRUE(doubleSidedPlaneShape.getCenter().isZero());
+	EXPECT_TRUE(doubleSidedPlaneShape.getSecondMomentOfVolume().isApprox(Matrix33d::Zero()));
+	EXPECT_NEAR(0.0, doubleSidedPlaneShape.getD(), epsilon);
+	EXPECT_EQ(Vector3d(0.0, 1.0, 0.0), doubleSidedPlaneShape.getNormal());
+}
+
+
+TEST_F(ShapeTest, OctreeSerializationTest)
+{
+	std::shared_ptr<OctreeShape> octree;
+	EXPECT_NO_THROW(
+		octree = std::dynamic_pointer_cast<OctreeShape>(Shape::getFactory().create("SurgSim::Math::OctreeShape")));
 	octree->setFileName("OctreeShapeData/staple.vox");
 
 	// Encoding a OctreeShape
@@ -284,7 +308,7 @@ TEST_F(ShapeTest, OctreeSerializeTest)
 	EXPECT_EQ(1u, node.size());
 
 	// Decoding the OctreeShape
-	std::shared_ptr<SurgSim::Math::OctreeShape> newOctree = std::make_shared<SurgSim::Math::OctreeShape>();
+	std::shared_ptr<OctreeShape> newOctree = std::make_shared<OctreeShape>();
 	ASSERT_NO_THROW(newOctree->decode(node));
 	EXPECT_EQ("SurgSim::Math::OctreeShape", newOctree->getClassName());
 	EXPECT_EQ("OctreeShapeData/staple.vox", newOctree->getFileName());
@@ -318,4 +342,26 @@ TEST_F(ShapeTest, Octree)
 		EXPECT_THROW(octree.getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
 		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
 	}
+}
+
+
+TEST_F(ShapeTest, PlaneShapeSerializationTest)
+{
+	std::shared_ptr<Shape> box;
+	EXPECT_NO_THROW(box = Shape::getFactory().create("SurgSim::Math::PlaneShape"));
+
+	// Nothing for PlaneShape to be encoded/decoded.
+}
+
+TEST_F(ShapeTest, PlaneShape)
+{
+	EXPECT_NO_THROW(PlaneShape planeShape);
+	PlaneShape planeShape;
+
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_PLANE, planeShape.getType());
+	EXPECT_NEAR(0.0, planeShape.getVolume(), epsilon);
+	EXPECT_TRUE(planeShape.getCenter().isZero());
+	EXPECT_TRUE(planeShape.getSecondMomentOfVolume().isApprox(Matrix33d::Zero()));
+	EXPECT_NEAR(0.0, planeShape.getD(), epsilon);
+	EXPECT_EQ(Vector3d(0.0, 1.0, 0.0), planeShape.getNormal());
 }
