@@ -16,9 +16,6 @@
 #ifndef SURGSIM_FRAMEWORK_CONVERT_H
 #define SURGSIM_FRAMEWORK_CONVERT_H
 
-#include "SurgSim/Framework/Log.h"
-#include <yaml-cpp/yaml.h>
-
 /// \note HS-2013-dec-23 The gcc and msvc compilers seem to have different requirements when a template class
 ///       needs to be passed template parameters in a specialization, that extend the original template interface
 ///       gcc needs the template<> statement before the new template parameters, msvc does not like it at all.
@@ -27,16 +24,5 @@
 #else
 #define SURGSIM_DOUBLE_SPECIALIZATION
 #endif
-
-
-namespace SurgSim
-{
-namespace Serialize
-{
-	/// Logger name for Serialization
-	const std::string serializeLogger = "Serialization";
-
-};
-};
 
 #endif // SURGSIM_FRAMEWORK_CONVERT_H

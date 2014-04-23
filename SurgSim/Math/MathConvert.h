@@ -16,15 +16,12 @@
 #ifndef SURGSIM_MATH_MATHCONVERT_H
 #define SURGSIM_MATH_MATHCONVERT_H
 
-#include "SurgSim/Framework/Convert.h"
-
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/RigidTransform.h"
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include <yaml-cpp/yaml.h>
+
+#include "SurgSim/Framework/Convert.h"
 
 /// \file MathConvert.h
 /// This contains a series of functions to encode and decode Eigen data structures to

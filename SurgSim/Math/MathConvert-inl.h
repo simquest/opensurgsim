@@ -16,11 +16,17 @@
 #ifndef SURGSIM_MATH_MATHCONVERT_INL_H
 #define SURGSIM_MATH_MATHCONVERT_INL_H
 
+#include <string>
+
+#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/LogMacros.h"
+
 namespace
 {
 const std::string RotationPropertyName = "quaternion";
 const std::string TranslationPropertyName = "translation";
-}
+const std::string serializeLogger = "Serialization";
+};
 
 SURGSIM_DOUBLE_SPECIALIZATION
 template <typename Type, int Rows, int MOpt>
@@ -58,7 +64,7 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, 1, MOpt>>::decode(
 		{
 			rhs[i] = std::numeric_limits<Type>::quiet_NaN();
 
-			auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::Serialize::serializeLogger);
+			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
 			SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
 		}
 	}
@@ -111,7 +117,7 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 			catch (YAML::RepresentationException)
 			{
 				rhs.row(row)[col] = std::numeric_limits<Type>::quiet_NaN();
-				auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::Serialize::serializeLogger);
+				auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
 				SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
 			}
 		}

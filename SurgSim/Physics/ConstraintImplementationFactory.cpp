@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/LogMacros.h"
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
 #include "SurgSim/Physics/FixedRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"

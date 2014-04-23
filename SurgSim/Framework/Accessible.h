@@ -25,8 +25,6 @@
 
 #include "SurgSim/Math/Matrix.h"
 
-#include "SurgSim/Framework/Convert.h"
-
 namespace SurgSim
 {
 namespace Framework
