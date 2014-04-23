@@ -23,6 +23,14 @@
 
 #include "SurgSim/Framework/Convert.h"
 
+namespace SurgSim
+{
+namespace Math
+{
+class Shape;
+}
+}
+
 /// \file MathConvert.h
 /// This contains a series of functions to encode and decode Eigen data structures to
 /// and from YAML nodes. These conversion functions will extinguish Eigen options, these
@@ -69,6 +77,12 @@ namespace YAML
 		static bool decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
 	};
 
+	template <>
+	struct convert<std::shared_ptr<SurgSim::Math::Shape>>
+	{
+		static Node encode(const std::shared_ptr<SurgSim::Math::Shape>& rhs);
+		static bool decode(const Node& node, std::shared_ptr<SurgSim::Math::Shape>& rhs);
+	};
 };
 
 #include "SurgSim/Math/MathConvert-inl.h"
