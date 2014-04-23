@@ -17,10 +17,17 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Input/InputComponent.h"
-#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::RigidTransform3d;
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::DriveElementFromInputBehavior);
+}
 
 namespace SurgSim
 {
@@ -31,11 +38,21 @@ DriveElementFromInputBehavior::DriveElementFromInputBehavior(const std::string& 
 	SurgSim::Framework::Behavior(name),
 	m_poseName("pose")
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DriveElementFromInputBehavior, std::shared_ptr<SurgSim::Framework::Component>,
+			Source, getSource, setSource);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DriveElementFromInputBehavior, std::string, PoseName, getPoseName, setPoseName);
 }
 
-void DriveElementFromInputBehavior::setFrom(std::shared_ptr<SurgSim::Input::InputComponent> from)
+void DriveElementFromInputBehavior::setSource(std::shared_ptr<SurgSim::Framework::Component> source)
 {
-	m_from = from;
+	m_source = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(source);
+	SURGSIM_ASSERT(m_source != nullptr) << " setSource for " << getClassName()
+		<< " requires a SurgSim::Input::InputComponent";
+}
+
+std::shared_ptr<SurgSim::Framework::Component> DriveElementFromInputBehavior::getSource()
+{
+	return m_source;
 }
 
 void DriveElementFromInputBehavior::setPoseName(const std::string& poseName)
@@ -43,14 +60,19 @@ void DriveElementFromInputBehavior::setPoseName(const std::string& poseName)
 	m_poseName = poseName;
 }
 
+std::string DriveElementFromInputBehavior::getPoseName()
+{
+	return m_poseName;
+}
+
 void DriveElementFromInputBehavior::update(double dt)
 {
 	SurgSim::DataStructures::DataGroup dataGroup;
-	m_from->getData(&dataGroup);
+	m_source->getData(&dataGroup);
 	RigidTransform3d pose;
 	if (dataGroup.poses().get(m_poseName, &pose))
 	{
-		getSceneElement()->setPose(pose);
+		getPoseComponent()->setPose(pose);
 	}
 }
 
@@ -62,10 +84,17 @@ bool DriveElementFromInputBehavior::doInitialize()
 bool DriveElementFromInputBehavior::doWakeUp()
 {
 	bool result = true;
-	if (m_from == nullptr)
+	if (m_source == nullptr)
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "DriveElementFromInputBehavior named '" +
-			getName() + "' must have a driver to do anything.";
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
+			getName() + "' must have a source to do anything.";
+		result = false;
+	}
+
+	if (getPoseComponent() == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
+			getName() + "' must belong to a SceneElement with a PoseComponent.";
 		result = false;
 	}
 

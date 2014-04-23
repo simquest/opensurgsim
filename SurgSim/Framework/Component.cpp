@@ -134,6 +134,11 @@ std::shared_ptr<const PoseComponent> Component::getPoseComponent() const
 	return m_poseComponent.lock();
 }
 
+std::shared_ptr<PoseComponent> Component::getPoseComponent()
+{
+	return m_poseComponent.lock();
+}
+
 boost::uuids::uuid Component::getUuid() const
 {
 	return m_uuid;

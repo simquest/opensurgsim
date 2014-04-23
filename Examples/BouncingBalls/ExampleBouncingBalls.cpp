@@ -177,7 +177,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 
 	std::shared_ptr<DriveElementBehavior> driver;
 	driver = std::make_shared<DriveElementBehavior>("Driver");
-	driver->setFrom(physics);
+	driver->setSource(physics);
 
 	// RigidCollisionRepresentation will use provided physics representation to do collisions.  Collision detection
 	// occurs in SurgSim::Physics::DcdCollision::doUpdate(), which uses the Shape.  Then the physics representations
@@ -244,7 +244,7 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	printoutBehavior->setRepresentation(physics);
 
 	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>("Driver");
-	driver->setFrom(physics);
+	driver->setSource(physics);
 
 	// Now create the SceneElement based on the physics and graphics.  Note there is no collision Component.
 	std::shared_ptr<SceneElement> element = std::make_shared<BasicSceneElement>(name);

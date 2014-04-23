@@ -108,7 +108,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	planeElement->addComponent(graphicsRepresentation);
 
 	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>("Driver");
-	driver->setFrom(physicsRepresentation);
+	driver->setSource(physicsRepresentation);
 	planeElement->addComponent(driver);
 
 	auto rigidCollision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
@@ -136,7 +136,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 
 	std::shared_ptr<DriveElementFromInputBehavior> driver;
 	driver = std::make_shared<DriveElementFromInputBehavior>("Driver");
-	driver->setFrom(inputComponent);
+	driver->setSource(inputComponent);
 	boxElement->addComponent(driver);
 
 	auto addSphere = std::make_shared<AddSphereFromInputBehavior>("SphereAdder");

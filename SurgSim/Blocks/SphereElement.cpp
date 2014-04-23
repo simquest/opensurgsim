@@ -85,7 +85,7 @@ bool SphereElement::doInitialize()
 	graphicsRepresentation->setMaterial(material);
 
 	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>("Sphere Driver");
-	driver->setFrom(physicsRepresentation);
+	driver->setSource(physicsRepresentation);
 
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);

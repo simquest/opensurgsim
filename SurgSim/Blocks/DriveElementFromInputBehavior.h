@@ -31,6 +31,8 @@ namespace Blocks
 {
 
 /// Behavior to copy a pose from an input component to a SceneElement
+/// By adding this behavior to a SceneElement, that SceneElement will be moved
+/// in correspondance to the input.
 class DriveElementFromInputBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -38,13 +40,23 @@ public:
 	/// \param	name	Name of the behavior
 	explicit DriveElementFromInputBehavior(const std::string& name);
 
-	/// Set the representation which sends the pose.
-	/// \param	sender	Representation which sends the pose.
-	void setFrom(std::shared_ptr<SurgSim::Input::InputComponent> from);
+	SURGSIM_CLASSNAME(SurgSim::Blocks::DriveElementFromInputBehavior);
+
+	/// Set the InputComponent that provides the pose
+	/// \param	source A SurgSim::Input::InputComponent
+	void setSource(std::shared_ptr<SurgSim::Framework::Component> source);
+
+	/// Get the InputComponent which is being used by this behavior
+	/// \return A SurgSim::Component::InputComponent
+	std::shared_ptr<SurgSim::Framework::Component> getSource();
 
 	/// Set name of the pose.
 	/// \param	poseName	The name of the pose.
 	void setPoseName(const std::string& poseName);
+
+	/// Get name of the pose.
+	/// \return The name of the pose.
+	std::string getPoseName();
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -59,7 +71,7 @@ protected:
 
 private:
 	/// InputComponent to get the pose
-	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
+	std::shared_ptr<SurgSim::Input::InputComponent> m_source;
 
 	std::string m_poseName;
 };

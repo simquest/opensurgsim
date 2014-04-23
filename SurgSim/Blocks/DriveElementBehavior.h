@@ -31,6 +31,8 @@ namespace Blocks
 {
 
 /// Behavior to drive the SceneElement pose with a Physics Representation
+/// By adding this behavior to a SceneElement, that SceneElement will be moved
+/// in correspondance to the source PhysicsRepresentation.
 class DriveElementBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -38,9 +40,15 @@ public:
 	/// \param	name	Name of the behavior
 	explicit DriveElementBehavior(const std::string& name);
 
-	/// Set the representation which sends the pose.
-	/// \param	sender	Representation which sends the pose.
-	void setFrom(std::shared_ptr<SurgSim::Physics::Representation> from);
+	SURGSIM_CLASSNAME(SurgSim::Blocks::DriveElementBehavior);
+
+	/// Set the component which drives the SceneElement
+	/// \param source A SurgSim::Physics::Representation
+	void setSource(std::shared_ptr<SurgSim::Framework::Component> source);
+
+	/// Get the component which drives the SceneElement
+	/// \return A SurgSim::Physics::Representation
+	std::shared_ptr<SurgSim::Framework::Component> getSource();
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -55,7 +63,7 @@ protected:
 
 private:
 	/// Representation to drive the scene element
-	std::shared_ptr<SurgSim::Physics::Representation> m_from;
+	std::shared_ptr<SurgSim::Physics::Representation> m_source;
 };
 
 

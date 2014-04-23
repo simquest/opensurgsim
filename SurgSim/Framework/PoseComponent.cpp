@@ -48,6 +48,11 @@ std::shared_ptr<const PoseComponent> PoseComponent::getPoseComponent() const
 	return nullptr;
 }
 
+std::shared_ptr<PoseComponent> PoseComponent::getPoseComponent()
+{
+	return nullptr;
+}
+
 bool PoseComponent::doInitialize()
 {
 	return true;

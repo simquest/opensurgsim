@@ -77,7 +77,7 @@ bool StapleElement::doInitialize()
 
 	std::shared_ptr<DriveElementBehavior> driver;
 	driver = std::make_shared<DriveElementBehavior>("Driver");
-	driver->setFrom(physicsRepresentation);
+	driver->setSource(physicsRepresentation);
 
 	addComponent(physicsRepresentation);
 	addComponent(collisionRepresentation);

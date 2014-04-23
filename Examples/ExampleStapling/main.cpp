@@ -243,7 +243,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(createSceneryObject("Trigger",   "Geometry/stapler_trigger.obj"));
 
 	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>(" Driver");
-	driver->setFrom(physicsRepresentation);
+	driver->setSource(physicsRepresentation);
 	sceneElement->addComponent(driver);
 
 	return sceneElement;

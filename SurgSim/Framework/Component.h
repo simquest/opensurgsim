@@ -130,6 +130,10 @@ public:
 protected:
 	/// Get the PoseComponent for this component
 	/// \return The PoseComponent
+	virtual std::shared_ptr<PoseComponent> getPoseComponent();
+
+	/// Get the PoseComponent for this component, constant access
+	/// \return The PoseComponent
 	virtual std::shared_ptr<const PoseComponent> getPoseComponent() const;
 
 private:
