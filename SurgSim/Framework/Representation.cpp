@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Framework/SceneElement.h"
@@ -55,7 +54,7 @@ SurgSim::Math::RigidTransform3d Representation::getPose() const
 	std::shared_ptr<const PoseComponent> poseComponent = getPoseComponent();
 	if (poseComponent == nullptr)
 	{
-		return m_localPose;
+		return getLocalPose();
 	}
 	else
 	{

@@ -24,8 +24,6 @@
 
 #include "SurgSim/Collision/Location.h"
 
-#include "SurgSim/Math/RigidTransform.h"
-
 namespace SurgSim
 {
 namespace Physics
@@ -37,8 +35,6 @@ namespace Physics
 class RigidRepresentationBase : public Representation
 {
 public:
-	typedef SurgSim::Math::RigidTransform3d RigidTransform3d;
-
 	/// Constructor
 	/// \param name The rigid representation's name
 	explicit RigidRepresentationBase(const std::string& name);

@@ -55,6 +55,9 @@ std::shared_ptr<Camera> ViewElement::getCamera()
 
 bool ViewElement::doInitialize()
 {
+	SURGSIM_ASSERT(m_view != nullptr) << "ViewElements require a View";
+	SURGSIM_ASSERT(m_camera != nullptr) << "ViewElements require a Camera";
+
 	m_view->setCamera(m_camera);
 	addComponent(m_view);
 	addComponent(m_camera);

@@ -96,7 +96,7 @@ public:
 	std::shared_ptr<SceneElement> getSceneElement();
 
 	/// Gets the scene element, constant version
-	/// \return The a constant scene element for this component.
+	/// \return The scene element for this component.
 	std::shared_ptr<const SceneElement> getSceneElement() const;
 
 	/// Get the runtime which contains this component.

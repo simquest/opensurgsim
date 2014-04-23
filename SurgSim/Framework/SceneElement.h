@@ -97,6 +97,7 @@ public:
 	std::string getName() const;
 
 	/// Set the pose of this SceneElement
+	/// \param pose The pose
 	void setPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Get the pose of this SceneElement

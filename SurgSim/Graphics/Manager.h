@@ -27,7 +27,6 @@ namespace SurgSim
 namespace Graphics
 {
 
-class Camera;
 class Group;
 class Representation;
 class View;
