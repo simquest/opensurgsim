@@ -57,68 +57,29 @@ static const double ScalarEpsilon = 1e-10;
 
 }
 
-/// Determine the parameter that is the smallest of the five and returns its numerical index in the order as they
+/// Determine the parameter that is the smallest of the three and returns its numerical index in the order as they
 /// appear in the list of parameters.
 /// \tparam T Floating point type of the calculation, can usually be inferred.
 /// \param a,b,c Values that are searched for the minimum.
 /// \return [0-2] with then number being equivalent to the place of the parameter with the smallest value
-template <class T> inline
-size_t indexOfMinimum(T a, T b, T c)
+template <class T> inline size_t indexOfMinimum(T a, T b, T c)
 {
-	int index = 0;
-	if (b < a)
-	{
-		index = 1;
-	}
-	else
-	{
-		b = a;
-	}
-	if (c < b)
-	{
-		index = 2;
-	}
+	size_t index;
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>(a, b, c).minCoeff(&index);
 	return index;
 }
 
 /// Determine the parameter that is the smallest of the five and returns its numerical index in the order as they
-/// appear in the list of parameters. If you need tests with more parameters, think about using
-/// boost::minmax for example.
+/// appear in the list of parameters.
 /// \tparam T Floating point type of the calculation, can usually be inferred.
 /// \param a,b,c,d,e Values that are searched for the minimum.
 /// \return [0-4] with then number being equivalent to the place of the parameter with the smallest value
-template <class T> inline
-size_t indexOfMinimum(T a, T b, T c, T d, T e)
+template <class T> inline size_t indexOfMinimum(T a, T b, T c, T d, T e)
 {
-	int index = 0;
-	if (b < a)
-	{
-		index = 1;
-	}
-	else
-	{
-		b = a;
-	}
-	if (c < b)
-	{
-		index = 2;
-	}
-	else
-	{
-		c = b;
-	}
-	if (d < c)
-	{
-		index = 3;
-	}
-	else
-	{
-		d = c;
-	}
-	if (e < d)
-	{
-		index = 4;
-	}
+	Eigen::Matrix<T, 5, 1, Eigen::DontAlign> v;
+	size_t index;
+	v << a, b, c, d, e;
+	v.minCoeff(&index);
 	return index;
 }
 
