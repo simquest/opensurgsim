@@ -33,6 +33,7 @@ class Component;
 
 namespace Collision
 {
+class CollisionPair;
 class Representation;
 }
 namespace Physics
@@ -70,6 +71,18 @@ public:
 	/// \warning The state contains many pointers.  The objects pointed to are not thread-safe.
 	void getFinalState(SurgSim::Physics::PhysicsManagerState* s) const;
 
+	/// Add an excluded collision pair to the Physics Manager.  The pair will not participate in collisions.
+	/// \param representation1 The first Collision::Representation for the pair
+	/// \param representation2 The second Collision::Representation for the pair
+	void addExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
+								  std::shared_ptr<SurgSim::Collision::Representation> representation2);
+
+	/// Remove an excluded collision pair to the Physics Manager.  The pair will not be excluded from collisions.
+	/// \param representation1 The first Collision::Representation for the pair
+	/// \param representation2 The second Collision::Representation for the pair
+	void removeExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
+									 std::shared_ptr<SurgSim::Collision::Representation> representation2);
+
 protected:
 
 	///@{
@@ -87,12 +100,22 @@ protected:
 
 	void initializeComputations(bool copyState);
 private:
+	/// Get an iterator to an excluded collision pair.
+	/// \param representation1 The first Collision::Representation for the pair
+	/// \param representation2 The second Collision::Representation for the pair
+	/// \return iterator to the excluded collision pair
+	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>::iterator findExcludedCollisionPair(
+		std::shared_ptr<SurgSim::Collision::Representation> representation1,
+		std::shared_ptr<SurgSim::Collision::Representation> representation2);
 
 	std::vector<std::shared_ptr<Representation>> m_representations;
 
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
 
 	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;
+
+	/// List of Collision::Representation pairs to be excluded from contact generation.
+	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> m_excludedCollisionPairs;
 
 	///@{
 	/// Steps to perform the physics update

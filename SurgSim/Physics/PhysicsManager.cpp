@@ -69,6 +69,45 @@ void PhysicsManager::getFinalState(SurgSim::Physics::PhysicsManagerState* s) con
 	m_finalState.get(s);
 }
 
+std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>::iterator PhysicsManager::findExcludedCollisionPair(
+	std::shared_ptr<SurgSim::Collision::Representation> representation1,
+	std::shared_ptr<SurgSim::Collision::Representation> representation2)
+{
+	return std::find_if(m_excludedCollisionPairs.begin(), m_excludedCollisionPairs.end(),
+						[&representation1, &representation2] (const std::shared_ptr<SurgSim::Collision::CollisionPair>&
+															  pair)
+						{
+							return (pair->getFirst() == representation1 && pair->getSecond() == representation2)
+								|| (pair->getFirst() == representation2 && pair->getSecond() == representation1);
+						});
+}
+
+void PhysicsManager::addExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
+											  std::shared_ptr<SurgSim::Collision::Representation> representation2)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Failed to add excluded collision pair.  List of excluded collision pairs "
+										"cannot be modified after PhysicsManager is initialized.";
+
+	if (findExcludedCollisionPair(representation1, representation2) == m_excludedCollisionPairs.end())
+	{
+		m_excludedCollisionPairs.push_back(
+			std::make_shared<SurgSim::Collision::CollisionPair>(representation1, representation2));
+	}
+}
+
+void PhysicsManager::removeExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
+												 std::shared_ptr<SurgSim::Collision::Representation> representation2)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Failed to add excluded collision pair.  List of excluded collision pairs "
+										"cannot be modified after PhysicsManager is initialized.";
+
+	auto candidatePair = findExcludedCollisionPair(representation1, representation2);
+
+	if (candidatePair != m_excludedCollisionPairs.end())
+	{
+		m_excludedCollisionPairs.erase(candidatePair);
+	}
+}
 
 bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
@@ -100,6 +139,7 @@ bool PhysicsManager::doUpdate(double dt)
 	state->setRepresentations(m_representations);
 	state->setCollisionRepresentations(m_collisionRepresentations);
 	state->setConstraintComponents(m_constraintComponents);
+	state->setExcludedCollisionPairs(m_excludedCollisionPairs);
 
 	stateList.push_back(m_preUpdateStep->update(dt, stateList.back()));
 	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
