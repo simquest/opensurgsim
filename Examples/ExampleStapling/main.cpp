@@ -132,7 +132,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	physicsRepresentation->setFilename(filename);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	// Note: Directly calling loadFile is a workaround.  The TransferDeformableStateToVerticesBehavior requires a
-	// pointer to the Physics Representation's state, which is not created until the file is loaded and the internal 
+	// pointer to the Physics Representation's state, which is not created until the file is loaded and the internal
 	// structure is initialized.  Therefore we create the state now by calling loadFile.
 	physicsRepresentation->loadFile();
 	physicsRepresentation->setInitialPose(pose);
@@ -368,6 +368,19 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 	return armSceneElement;
 }
 
+template <typename Type>
+std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement,
+										  const std::string& name)
+{
+	std::shared_ptr<SurgSim::Framework::Component> component = sceneElement->getComponent(name);
+	SURGSIM_ASSERT(component != nullptr) << "Failed to get Component named '" << name << "'.";
+
+	std::shared_ptr<Type> result = std::dynamic_pointer_cast<Type>(component);
+	SURGSIM_ASSERT(result != nullptr) << "Failed to convert Component to requested type.";
+
+	return result;
+}
+
 int main(int argc, char* argv[])
 {
 	const std::string deviceName = "MultiAxisDevice";
@@ -442,6 +455,15 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(staplerSceneElement);
 	scene->addSceneElement(woundSceneElement);
 	scene->addSceneElement(sceneElement);
+
+	// Exclude collision between certain Collision::Representations
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(staplerSceneElement, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(staplerSceneElement, "VirtualToothCollision0"));
+
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(staplerSceneElement, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(staplerSceneElement, "VirtualToothCollision1"));
 
 	runtime->execute();
 	return 0;
