@@ -1947,4 +1947,7 @@ bool calculateContactTriangleTriangle(
 }; // namespace SurgSim
 
 
+#include "SurgSim/Math/TriangleTriangleIntersection.h"
+
+
 #endif

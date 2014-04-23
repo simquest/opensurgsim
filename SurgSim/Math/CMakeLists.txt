@@ -82,6 +82,7 @@ set(SURGSIM_MATH_HEADERS
 	SphereShape.h
 	SurfaceMeshShape.h
 	SurfaceMeshShape-inl.h
+	TriangleTriangleIntersection.h
 	Valid.h
 	Valid-inl.h
 	Vector.h

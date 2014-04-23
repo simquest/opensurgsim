@@ -24,6 +24,7 @@
 
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/UnitTests/Triangle.h"
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace SurgSim
@@ -97,69 +98,7 @@ public:
 	}
 };
 
-class Triangle
-{
-public:
-	VectorType v0;
-	VectorType v1;
-	VectorType v2;
 
-	VectorType v0v1;
-	VectorType v0v2;
-	VectorType v1v2;
-
-	VectorType n;
-
-	Triangle() {}
-	Triangle(VectorType vertex0, VectorType vertex1, VectorType vertex2) :
-		v0(vertex0), v1(vertex1), v2(vertex2), v0v1(vertex1 - vertex0), v0v2(vertex2 - vertex0), v1v2(vertex2 - vertex1)
-	{
-		n = v0v1.cross(v0v2);
-		n.normalize();
-	}
-
-	VectorType pointInTriangle(SizeType a, SizeType b)
-	{
-		return v0 + a * v0v1 + b * v0v2;
-	}
-
-	void move(VectorType v)
-	{
-		v0 += v;
-		v1 += v;
-		v2 += v;
-	}
-
-	void rotateByXDegrees(double angle)
-	{
-		using SurgSim::Math::RigidTransform3d;
-		RigidTransform3d r(Eigen::AngleAxis<double>(angle * (M_PI / 180.0), Vector3d(1, 0, 0)));
-		v0  = r * v0;
-		v1  = r * v1;
-		v2  = r * v2;
-		n = r * n;
-	}
-
-	void rotateByYDegrees(double angle)
-	{
-		using SurgSim::Math::RigidTransform3d;
-		RigidTransform3d r(Eigen::AngleAxis<double>(angle * (M_PI / 180.0), Vector3d(0, 1, 0)));
-		v0  = r * v0;
-		v1  = r * v1;
-		v2  = r * v2;
-		n = r * n;
-	}
-
-	void rotateByZDegrees(double angle)
-	{
-		using SurgSim::Math::RigidTransform3d;
-		RigidTransform3d r(Eigen::AngleAxis<double>(angle * (M_PI / 180.0), Vector3d(0, 0, 1)));
-		v0  = r * v0;
-		v1  = r * v1;
-		v2  = r * v2;
-		n = r * n;
-	}
-};
 namespace
 {
 SizeType epsilon = 1e-10;
