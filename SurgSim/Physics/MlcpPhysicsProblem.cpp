@@ -30,7 +30,7 @@ MlcpPhysicsProblem::~MlcpPhysicsProblem()
 
 void MlcpPhysicsProblem::updateConstraint(
 	const Eigen::SparseVector<double> &newSubH,
-	const Eigen::MatrixXd &subC,
+	const Eigen::Ref<const Eigen::MatrixXd> &subC,
 	size_t indexSubC,
 	size_t indexNewSubH)
 {
