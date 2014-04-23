@@ -40,22 +40,6 @@ bool Representation::doInitialize()
 	return true;
 }
 
-bool Representation::wakeUp()
-{
-	std::shared_ptr<SurgSim::Framework::SceneElement> element = getSceneElement();
-	if (element != nullptr)
-	{
-		auto poseComponents = element->getComponents<SurgSim::Framework::PoseComponent>();
-		SURGSIM_ASSERT(poseComponents.size() <= 1) << " SceneElement " << element->getName()
-			<< " has more than one PoseComponent. This is not supported.";
-		if (poseComponents.size() == 1)
-		{
-			m_poseComponent = poseComponents[0];
-		}
-	}
-	return Component::wakeUp();
-}
-
 bool Representation::doWakeUp()
 {
 	return true;
@@ -68,13 +52,14 @@ void Representation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
 
 SurgSim::Math::RigidTransform3d Representation::getPose() const
 {
-	if (m_poseComponent == nullptr)
+	std::shared_ptr<const PoseComponent> poseComponent = getPoseComponent();
+	if (poseComponent == nullptr)
 	{
 		return m_localPose;
 	}
 	else
 	{
-		return m_poseComponent->getPose() * getLocalPose();
+		return poseComponent->getPose() * getLocalPose();
 	}
 }
 

@@ -45,7 +45,14 @@ public:
 
 	/// Get the pose of the PoseComponent
 	/// \return The pose in world coordinates
-	const SurgSim::Math::RigidTransform3d& getPose();
+	const SurgSim::Math::RigidTransform3d& getPose() const;
+
+protected:
+	/// Get the PoseComponent for this component
+	/// A PoseComponent cannot have a PoseComponent, so this will
+	/// return nullptr.
+	/// \return The PoseComponent
+	virtual std::shared_ptr<const PoseComponent> getPoseComponent() const override;
 
 private:
 	virtual bool doInitialize() override;

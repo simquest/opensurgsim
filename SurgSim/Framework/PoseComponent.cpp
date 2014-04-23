@@ -38,9 +38,14 @@ void PoseComponent::setPose(const SurgSim::Math::RigidTransform3d& pose)
 	m_pose = pose;
 }
 
-const SurgSim::Math::RigidTransform3d& PoseComponent::getPose()
+const SurgSim::Math::RigidTransform3d& PoseComponent::getPose() const
 {
 	return m_pose;
+}
+
+std::shared_ptr<const PoseComponent> PoseComponent::getPoseComponent() const
+{
+	return nullptr;
 }
 
 bool PoseComponent::doInitialize()

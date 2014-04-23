@@ -31,6 +31,7 @@ namespace Framework
 {
 
 // Forward References
+class PoseComponent;
 class Runtime;
 class Scene;
 class SceneElement;
@@ -76,7 +77,7 @@ public:
 	/// Wakeup this component, this will be called when the component is inserted into the ComponentManager that is
 	/// responsible for handling this component.
 	/// \return True if this component is woken up successfully; otherwise, false.
-	virtual bool wakeUp();
+	bool wakeUp();
 
 	/// Sets the scene.
 	/// \param scene The scene for this component
@@ -126,6 +127,11 @@ public:
 	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp() = 0;
 
+protected:
+	/// Get the PoseComponent for this component
+	/// \return The PoseComponent
+	virtual std::shared_ptr<const PoseComponent> getPoseComponent() const;
+
 private:
 	/// Name of this component
 	std::string m_name;
@@ -154,7 +160,8 @@ private:
 	/// Indicates if this component is awake
 	bool m_isAwake;
 
-
+	/// PoseComponent associated with this Component
+	std::weak_ptr<PoseComponent> m_poseComponent;
 };
 
 }; // namespace Framework

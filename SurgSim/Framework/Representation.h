@@ -53,14 +53,9 @@ public:
 	/// \return The pose of this representation
 	virtual SurgSim::Math::RigidTransform3d getPose() const;
 
-	virtual bool wakeUp() override;
-
 private:
 	/// Local Pose of the Representation with respect to the SceneElement
 	SurgSim::Math::RigidTransform3d m_localPose;
-
-	/// Shared Pointer to the Pose Component that holds the SceneElement pose
-	std::shared_ptr<PoseComponent> m_poseComponent;
 
 	virtual bool doInitialize() override;
 	virtual bool doWakeUp() override;
