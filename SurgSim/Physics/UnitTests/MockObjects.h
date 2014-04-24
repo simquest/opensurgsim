@@ -56,10 +56,6 @@ public:
 		return REPRESENTATION_TYPE_FIXED;
 	}
 
-	virtual void driveElement()
-	{
-	}
-
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt)

@@ -59,8 +59,6 @@ public:
 	/// \return The previous state (pose + lin/ang velocities)
 	const RigidRepresentationState& getPreviousState() const;
 
-	virtual void driveElement() override;
-
 	std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location);
 
 	/// Set the initial parameters of the rigid representation
@@ -77,6 +75,9 @@ public:
 	/// Get the current parameters of the rigid representation
 	/// \return The current parameters of the rigid representation
 	const RigidRepresentationParameters& getCurrentParameters() const;
+
+	virtual	void beforeUpdate(double dt) override;
+	virtual	void afterUpdate(double dt) override;
 
 protected:
 	bool doWakeUp() override;

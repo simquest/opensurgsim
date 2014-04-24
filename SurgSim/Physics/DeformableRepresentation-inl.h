@@ -17,7 +17,7 @@
 #define SURGSIM_PHYSICS_DEFORMABLEREPRESENTATION_INL_H
 
 #include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverEulerImplicit.h"
@@ -46,12 +46,6 @@ DeformableRepresentation<M, D, K, S>::DeformableRepresentation(const std::string
 template <class M, class D, class K, class S>
 DeformableRepresentation<M, D, K, S>::~DeformableRepresentation()
 {
-}
-
-template <class M, class D, class K, class S>
-void DeformableRepresentation<M,D,K,S>::driveElement()
-{
-	//do nothing
 }
 
 template <class M, class D, class K, class S>
@@ -140,10 +134,10 @@ bool DeformableRepresentation<M,D,K,S>::doWakeUp()
 	// Since the pose is now embeded in the state, reset element and local pose to
 	// identity.
 	setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
-	std::shared_ptr<SurgSim::Framework::SceneElement> element = getSceneElement();
-	if (element != nullptr)
+	std::shared_ptr<SurgSim::Framework::PoseComponent> poseComponent = getPoseComponent();
+	if (poseComponent != nullptr)
 	{
-		element->setPose(SurgSim::Math::RigidTransform3d::Identity());
+		poseComponent->setPose(SurgSim::Math::RigidTransform3d::Identity());
 	}
 
 	*m_previousState = *m_initialState;
@@ -206,6 +200,19 @@ void DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
 		}
 
 		m_needToReloadOdeSolver = false;
+	}
+}
+
+template <class M, class D, class K, class S>
+void DeformableRepresentation<M,D,K,S>::afterUpdate(double dt)
+{
+	if (isDrivingElement())
+	{
+		std::shared_ptr<SurgSim::Framework::PoseComponent> poseComponent = getPoseComponent();
+		if (poseComponent != nullptr)
+		{
+			poseComponent->setPose(SurgSim::Math::RigidTransform3d::Identity());
+		}
 	}
 }
 

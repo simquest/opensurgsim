@@ -56,8 +56,6 @@ public:
 	/// Destructor
 	virtual ~DeformableRepresentation();
 
-	virtual void driveElement() override;
-
 	virtual void resetState() override;
 
 	virtual void setInitialState(std::shared_ptr<DeformableRepresentationState> initialState) override;
@@ -85,6 +83,8 @@ public:
 	const SurgSim::Math::Matrix& getComplianceMatrix() const;
 
 	virtual void beforeUpdate(double dt) override;
+
+	virtual void afterUpdate(double dt) override;
 
 	/// Set the collision representation for this physics representation, when the collision object
 	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.

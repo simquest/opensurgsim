@@ -15,7 +15,6 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/DriveElementBehavior.h"
 #include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
@@ -49,7 +48,6 @@
 
 #include "Examples/InputVtc/DeviceFactory.h"
 
-using SurgSim::Blocks::DriveElementBehavior;
 using SurgSim::Blocks::DriveElementFromInputBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
@@ -106,11 +104,6 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
-	std::shared_ptr<DriveElementBehavior> driver;
-	driver = std::make_shared<DriveElementBehavior>(name + " Driver");
-	driver->setSource(physicsRepresentation);
-	planeElement->addComponent(driver);
-
 	std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> collisionRepresentation;
 	collisionRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>(name + " Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
@@ -149,9 +142,6 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> graphicsRepresentation =
 		std::make_shared<OsgBoxRepresentation>(name + " Graphics");
 	graphicsRepresentation->setSizeXYZ(box->getSizeX(), box->getSizeY(), box->getSizeZ());
-
-	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>(name + " Driver");
-	driver->setSource(physicsRepresentation);
 
 	// Input Components
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
@@ -194,7 +184,6 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	boxElement->addComponent(physicsRepresentation);
 	boxElement->addComponent(collisionRepresentation);
 	boxElement->addComponent(graphicsRepresentation);
-	boxElement->addComponent(driver);
 	boxElement->addComponent(inputComponent);
 	boxElement->addComponent(outputComponent);
 	boxElement->addComponent(inputCoupler);

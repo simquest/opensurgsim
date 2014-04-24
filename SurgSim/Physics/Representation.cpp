@@ -30,7 +30,8 @@ Representation::Representation(const std::string& name) :
 	m_gravity(0.0, -9.81, 0.0),
 	m_numDof(0),
 	m_isGravityEnabled(true),
-	m_isActive(true)
+	m_isActive(true),
+	m_isDrivingElement(true)
 {
 
 }
@@ -63,6 +64,16 @@ void Representation::setIsGravityEnabled(bool isGravityEnabled)
 bool Representation::isGravityEnabled() const
 {
 	return m_isGravityEnabled;
+}
+
+void Representation::setIsDrivingElement(bool isDrivingElement)
+{
+	m_isDrivingElement = isDrivingElement;
+}
+
+bool Representation::isDrivingElement()
+{
+	return m_isDrivingElement;
 }
 
 void Representation::beforeUpdate(double dt)

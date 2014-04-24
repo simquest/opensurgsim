@@ -16,7 +16,6 @@
 #include <string>
 
 #include "SurgSim/Blocks/SphereElement.h"
-#include "SurgSim/Blocks/DriveElementBehavior.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
@@ -27,7 +26,6 @@
 
 
 using SurgSim::Blocks::SphereElement;
-using SurgSim::Blocks::DriveElementBehavior;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;
@@ -84,12 +82,8 @@ bool SphereElement::doInitialize()
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
-	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>("Sphere Driver");
-	driver->setSource(physicsRepresentation);
-
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
-	addComponent(driver);
 
 	auto rigidCollision = std::make_shared<RigidCollisionRepresentation>
 		("Sphere Collision Representation");

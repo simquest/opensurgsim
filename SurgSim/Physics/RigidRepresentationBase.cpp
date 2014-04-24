@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
@@ -39,11 +40,6 @@ bool RigidRepresentationBase::doWakeUp()
 	m_previousState = m_initialState;
 	updateGlobalInertiaMatrices(m_currentState);
 	return true;
-}
-
-void RigidRepresentationBase::driveElement()
-{
-	getSceneElement()->setPose(m_finalState.getPose() * getLocalPose().inverse());
 }
 
 void RigidRepresentationBase::setInitialState(const RigidRepresentationState& state)
@@ -108,6 +104,25 @@ const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::
 const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getCurrentParameters() const
 {
 	return m_currentParameters;
+}
+
+
+void SurgSim::Physics::RigidRepresentationBase::beforeUpdate(double dt)
+{
+	m_previousState = m_currentState;
+}
+
+void SurgSim::Physics::RigidRepresentationBase::afterUpdate(double dt)
+{
+	m_finalState = m_currentState;
+	if (isDrivingElement())
+	{
+		std::shared_ptr<SurgSim::Framework::PoseComponent> poseComponent = getPoseComponent();
+		if (poseComponent != nullptr)
+		{
+			poseComponent->setPose(m_finalState.getPose() * getLocalPose().inverse());
+		}
+	}
 }
 
 }; // Physics

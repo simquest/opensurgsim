@@ -18,7 +18,6 @@
 
 #include "Examples/AddSphereFromInput/AddSphereBehavior.h"
 
-#include "SurgSim/Blocks/DriveElementBehavior.h"
 #include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
@@ -48,7 +47,6 @@
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-using SurgSim::Blocks::DriveElementBehavior;
 using SurgSim::Blocks::DriveElementFromInputBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
@@ -106,10 +104,6 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
-
-	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>("Driver");
-	driver->setSource(physicsRepresentation);
-	planeElement->addComponent(driver);
 
 	auto rigidCollision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
 	rigidCollision->setRigidRepresentation(physicsRepresentation);

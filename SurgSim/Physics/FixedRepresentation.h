@@ -52,19 +52,10 @@ public:
 		// Do Nothing it is a fixed object
 	}
 
-	virtual void beforeUpdate(double dt) override
+	virtual void update(double dt) override
 	{
-		m_previousState = m_currentState;
 		m_currentState.setPose(getPose());
 	}
-
-	virtual	void afterUpdate(double dt) override
-	{
-		m_finalState = m_currentState;
-	}
-
-private:
-
 };
 
 }; // Physics

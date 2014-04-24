@@ -20,7 +20,6 @@
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
-#include "SurgSim/Blocks/DriveElementBehavior.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/DataStructures/EmptyData.h"
@@ -57,7 +56,6 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
-using SurgSim::Blocks::DriveElementBehavior;
 using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
 using SurgSim::Blocks::VisualizeContactsBehavior;
 using SurgSim::DataStructures::EmptyData;
@@ -241,10 +239,6 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(createSceneryObject("Indicator", "Geometry/stapler_indicator.obj"));
 	sceneElement->addComponent(createSceneryObject("Markings",  "Geometry/stapler_markings.obj"));
 	sceneElement->addComponent(createSceneryObject("Trigger",   "Geometry/stapler_trigger.obj"));
-
-	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>(" Driver");
-	driver->setSource(physicsRepresentation);
-	sceneElement->addComponent(driver);
 
 	return sceneElement;
 }

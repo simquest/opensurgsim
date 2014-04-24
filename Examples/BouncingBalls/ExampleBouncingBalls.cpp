@@ -16,7 +16,6 @@
 #include <memory>
 #include <boost/thread.hpp>
 
-#include "SurgSim/Blocks/DriveElementBehavior.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Behavior.h"
@@ -49,7 +48,6 @@
 #include "Examples/BouncingBalls/AddRandomSphereBehavior.h"
 
 using SurgSim::Blocks::AddRandomSphereBehavior;
-using SurgSim::Blocks::DriveElementBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
@@ -175,10 +173,6 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	material->setShader(shader);
 	graphics->setMaterial(material);
 
-	std::shared_ptr<DriveElementBehavior> driver;
-	driver = std::make_shared<DriveElementBehavior>("Driver");
-	driver->setSource(physics);
-
 	// RigidCollisionRepresentation will use provided physics representation to do collisions.  Collision detection
 	// occurs in SurgSim::Physics::DcdCollision::doUpdate(), which uses the Shape.  Then the physics representations
 	// (of the colliding pair) are used to generate constraints that the solver uses to calculate forces that will
@@ -194,7 +188,6 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	element->addComponent(physics);
 	element->addComponent(collision);
 	element->addComponent(graphics);
-	element->addComponent(driver);
 
 	// This Behavior will add balls to the Scene at random locations every few seconds.
 	element->addComponent(std::make_shared<AddRandomSphereBehavior>());
@@ -243,15 +236,11 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	std::shared_ptr<PrintoutBehavior> printoutBehavior = std::make_shared<PrintoutBehavior>();
 	printoutBehavior->setRepresentation(physics);
 
-	std::shared_ptr<DriveElementBehavior> driver = std::make_shared<DriveElementBehavior>("Driver");
-	driver->setSource(physics);
-
 	// Now create the SceneElement based on the physics and graphics.  Note there is no collision Component.
 	std::shared_ptr<SceneElement> element = std::make_shared<BasicSceneElement>(name);
 	element->addComponent(physics);
 	element->addComponent(graphics);
 	element->addComponent(printoutBehavior);
-	element->addComponent(driver);
 
 	return element;
 }

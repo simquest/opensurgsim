@@ -98,9 +98,15 @@ public:
 	/// \return true if gravity enabled, false if not.
 	bool isGravityEnabled() const;
 
-	/// Driving function that will update the element based on this physics
-	/// representation
-	virtual void driveElement() = 0;
+	/// Set whether this Representation is controling the pose of the SceneElement
+	/// that it is part of.
+	/// \param isDrivingElement true if this Representation is driving the pose of the SceneElement
+	void setIsDrivingElement(bool isDrivingElement);
+
+	/// Query if this Representation is controling the pose of the SceneElement
+	/// that it is part of.
+	/// \return true if this Representation is controlling the pose of the SceneElement
+	bool isDrivingElement();
 
 	/// Preprocessing done before the update call
 	/// This needs to be called from the outside usually from a Computation
@@ -167,6 +173,9 @@ private:
 
 	/// Is this representation active or not ?
 	bool m_isActive;
+
+	/// Is this representation driving the SceneElement
+	bool m_isDrivingElement;
 
 };
 

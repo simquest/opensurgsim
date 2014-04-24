@@ -21,7 +21,6 @@ include_directories(
 )
 
 set(SURGSIM_BLOCKS_SOURCES
-	DriveElementBehavior.cpp
 	DriveElementFromInputBehavior.cpp
 	KeyboardTogglesGraphicsBehavior.cpp
 	MassSpring1DRepresentation.cpp
@@ -34,7 +33,6 @@ set(SURGSIM_BLOCKS_SOURCES
 )
 
 set(SURGSIM_BLOCKS_HEADERS
-	DriveElementBehavior.h
 	DriveElementFromInputBehavior.h
 	KeyboardTogglesGraphicsBehavior.h
 	MassSpring1DRepresentation.h

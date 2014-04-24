@@ -15,7 +15,6 @@
 
 #include "Examples/ExampleStapling/StapleElement.h"
 
-#include "SurgSim/Blocks/DriveElementBehavior.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Framework/ApplicationData.h"
@@ -25,7 +24,6 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-using SurgSim::Blocks::DriveElementBehavior;
 using SurgSim::DataStructures::PlyReader;
 using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Framework::ApplicationData;
@@ -75,14 +73,9 @@ bool StapleElement::doInitialize()
 		std::make_shared<OsgSceneryRepresentation>("Graphics");
 	graphicsRepresentation->setFileName("Geometry/staple.obj");
 
-	std::shared_ptr<DriveElementBehavior> driver;
-	driver = std::make_shared<DriveElementBehavior>("Driver");
-	driver->setSource(physicsRepresentation);
-
 	addComponent(physicsRepresentation);
 	addComponent(collisionRepresentation);
 	addComponent(graphicsRepresentation);
-	addComponent(driver);
 
 	return true;
 }

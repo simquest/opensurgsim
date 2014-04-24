@@ -73,6 +73,8 @@ void RigidRepresentation::addExternalTorque(const SurgSim::Math::Vector3d& torqu
 
 void RigidRepresentation::beforeUpdate(double dt)
 {
+	RigidRepresentationBase::beforeUpdate(dt);
+
 	bool isParametersValid = m_currentParameters.isValid();
 	SURGSIM_LOG_IF(!isParametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
@@ -82,8 +84,6 @@ void RigidRepresentation::beforeUpdate(double dt)
 		setIsActive(false);
 		return;
 	}
-
-	m_previousState = m_currentState;
 }
 
 void RigidRepresentation::update(double dt)
@@ -191,6 +191,8 @@ void RigidRepresentation::update(double dt)
 
 void RigidRepresentation::afterUpdate(double dt)
 {
+	RigidRepresentationBase::afterUpdate(dt);
+
 	bool isParametersValid = m_currentParameters.isValid();
 	SURGSIM_LOG_IF(!isParametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
@@ -201,7 +203,6 @@ void RigidRepresentation::afterUpdate(double dt)
 		return;
 	}
 
-	m_finalState = m_currentState;
 	m_externalForce = SurgSim::Math::Vector3d::Zero();
 	m_externalTorque = SurgSim::Math::Vector3d::Zero();
 	m_externalStiffnessMatrix = Matrix66d::Zero();
