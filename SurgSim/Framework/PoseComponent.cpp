@@ -15,7 +15,6 @@
 
 #include "SurgSim/Framework/PoseComponent.h"
 
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/MathConvert.h"
 
 namespace
