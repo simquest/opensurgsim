@@ -74,6 +74,9 @@ public:
 	/// Calculate normals for all triangles.
 	/// \note Normals will be normalized.
 	void calculateNormals();
+
+protected:
+	virtual void doUpdate() override;
 };
 
 }; // namespace DataStructures
