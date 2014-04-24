@@ -59,7 +59,9 @@ std::shared_ptr<SurgSim::DataStructures::TriangleMesh> DeformableCollisionRepres
 void DeformableCollisionRepresentation::update(const double& dt)
 {
 	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr) << "Deformable has expired, cannot update the mesh.";
+	SURGSIM_ASSERT(physicsRepresentation != nullptr)
+		<< "Failed to update.  The DeformableCollisionRepresentation either was not attached to a "
+		"Physics::Representation or the Physics::Representation has expired.";
 
 	auto state = physicsRepresentation->getCurrentState();
 
@@ -80,7 +82,9 @@ bool DeformableCollisionRepresentation::doInitialize()
 	SURGSIM_ASSERT(m_mesh != nullptr) << "Mesh was not set.";
 
 	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr) << "Can't startup without a deformable.";
+	SURGSIM_ASSERT(physicsRepresentation != nullptr)
+		<< "Failed to initialize.  The DeformableCollisionRepresentation either was not attached to a "
+		   "Physics::Representation or the Physics::Representation has expired.";
 
 	auto state = physicsRepresentation->getCurrentState();
 	SURGSIM_ASSERT(m_mesh->getNumVertices() == state->getNumNodes())
@@ -115,7 +119,8 @@ const SurgSim::Math::RigidTransform3d& DeformableCollisionRepresentation::getIni
 {
 	auto physicsRepresentation = m_deformable.lock();
 	SURGSIM_ASSERT(physicsRepresentation != nullptr)
-		<< "Cannot get the initial pose because the deformable was not initialized.";
+		<< "Failed to get the initial pose.  The DeformableCollisionRepresentation either was not attached to a "
+		   "Physics::Representation or the Physics::Representation has expired.";
 
 	return physicsRepresentation->getInitialPose();
 }
@@ -128,7 +133,9 @@ void DeformableCollisionRepresentation::setPose(const SurgSim::Math::RigidTransf
 const SurgSim::Math::RigidTransform3d& DeformableCollisionRepresentation::getPose() const
 {
 	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr) << "Cannot get the pose because the deformable was not initialized.";
+	SURGSIM_ASSERT(physicsRepresentation != nullptr)
+		<< "Failed to get the pose.  The DeformableCollisionRepresentation either was not attached to a "
+		   "Physics::Representation or the Physics::Representation has expired.";
 
 	return physicsRepresentation->getPose();
 }
@@ -149,7 +156,8 @@ const std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase>
 {
 	auto physicsRepresentation = m_deformable.lock();
 	SURGSIM_ASSERT(physicsRepresentation != nullptr)
-		<< "Cannot get the deformable representation because it was not initialized.";
+		<< "Failed to get the deformable representation.  The DeformableCollisionRepresentation either was not "
+		   "attached to a Physics::Representation or the Physics::Representation has expired.";
 
 	return physicsRepresentation;
 }
