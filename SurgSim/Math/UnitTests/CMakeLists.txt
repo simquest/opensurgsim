@@ -28,6 +28,7 @@ set(UNIT_TEST_SOURCES
 	OdeSolverEulerExplicitModifiedTests.cpp
 	OdeSolverEulerExplicitTests.cpp
 	OdeSolverEulerImplicitTests.cpp
+	OdeSolverStaticTests.cpp
 	OdeSolverTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp

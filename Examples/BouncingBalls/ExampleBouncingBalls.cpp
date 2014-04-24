@@ -219,7 +219,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	// un-collide the pair.  The entire process of collision detection, constraint generation, and solving is handled in
 	// SurgSim::PhysicsManager::doUpdate().
 	auto rigidRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
-	rigidRepresentation->setRigidRepresentation(physicsRepresentation);
+	physicsRepresentation->setCollisionRepresentation(rigidRepresentation);
 	planeElement->addComponent(rigidRepresentation);
 
 	// This Behavior will add balls to the Scene at random locations every few seconds.

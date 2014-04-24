@@ -215,6 +215,9 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
 
+	viewElement->enableManipulator(true);
+	viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 7.0), Vector3d::Zero());
+
 	return viewElement;
 }
 
@@ -236,7 +239,6 @@ int main(int argc, char* argv[])
 	auto scene = runtime->getScene();
 
 	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
-	SurgSim::Math::Vector3d translate(0, 0, -3);
 
 	std::cout << "Scene description:" << std::endl;
 	std::cout << "Columns:" << std::endl;
@@ -248,40 +250,40 @@ int main(int argc, char* argv[])
 
 	// Cube with cube FemElement
 	scene->addSceneElement(createCubeFem3D("CubeElement Euler Explicit",
-										   makeRigidTransform(qIdentity, translate + Vector3d(-2.5, 2.0, 0.0)),
+										   makeRigidTransform(qIdentity, Vector3d(-2.0, 1.5, 0.0)),
 										   Vector4d(1, 0, 0, 1),
 										   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER));
 
 	scene->addSceneElement(createCubeFem3D("CubeElement Modified Euler Explicit",
-										   makeRigidTransform(qIdentity, translate + Vector3d(0.0, 2.0, 0.0)),
+										   makeRigidTransform(qIdentity, Vector3d(0.0, 1.5, 0.0)),
 										   Vector4d(0, 1, 0, 1),
 										   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER));
 
 	scene->addSceneElement(createCubeFem3D("CubeElement Fem 3D Euler Implicit",
-										   makeRigidTransform(qIdentity, translate + Vector3d(2.5, 2.0, 0.0)),
+										   makeRigidTransform(qIdentity, Vector3d(2.0, 1.5, 0.0)),
 										   Vector4d(0, 0, 1, 1),
 										   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
 
 	// Cube with tetrahedron FemElement
 	scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Euler Explicit",
-						   makeRigidTransform(qIdentity, translate + Vector3d(-2.5, -1.0, 0.0)),
+						   makeRigidTransform(qIdentity, Vector3d(-2.0, -0.5, 0.0)),
 						   Vector4d(1, 0, 0, 1),
 						   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER));
 
 	scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Modified Euler Explicit",
-						   makeRigidTransform(qIdentity, translate + Vector3d(0.0, -1.0, 0.0)),
+						   makeRigidTransform(qIdentity, Vector3d(0.0, -0.5, 0.0)),
 						   Vector4d(0, 1, 0, 1),
 						   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER));
 
 	scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Fem 3D Euler Implicit",
-						   makeRigidTransform(qIdentity, translate + Vector3d(2.5, -1.0, 0.0)),
+						   makeRigidTransform(qIdentity, Vector3d(2.0, -0.5, 0.0)),
 						   Vector4d(0, 0, 1, 1),
 						   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
 
-	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
+	scene->addSceneElement(createView("view1", 0, 0, 1024, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 7.0)));
 
 	runtime->execute();
 
