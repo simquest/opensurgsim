@@ -22,6 +22,7 @@ namespace YAML
 Node convert<std::shared_ptr<SurgSim::Math::Shape>>::encode(
 	const std::shared_ptr<SurgSim::Math::Shape>& rhs)
 {
+	SURGSIM_ASSERT(nullptr != rhs) << "Trying to encode nullptr SurgSim::Math::Shape";
 	Node result;
 	result[rhs->getClassName()] = rhs->encode();
 

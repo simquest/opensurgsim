@@ -67,6 +67,12 @@ public:
 	double m_size[3];
 };
 
+TEST_F(ShapeTest, EncodeEmptyShapeTest)
+{
+	std::shared_ptr<Shape> shape;
+	EXPECT_ANY_THROW(YAML::convert<std::shared_ptr<Shape>>::encode(shape));
+}
+
 TEST_F(ShapeTest, SphereSerializationTest)
 {
 	{
