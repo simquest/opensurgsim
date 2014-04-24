@@ -72,7 +72,7 @@ void DeformableCollisionRepresentation::update(const double& dt)
 	{
 		m_mesh->setVertexPosition(nodeId, state->getPosition(nodeId));
 	}
-	m_mesh->calculateNormals();
+	m_mesh->update();
 }
 
 bool DeformableCollisionRepresentation::doInitialize()
