@@ -31,6 +31,7 @@ set(UNIT_TEST_SOURCES
 	OdeSolverTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
+	TriangleTriangleContactCalculationTests.cpp
 	TriangleTriangleIntersectionTests.cpp
 	ValidTests.cpp
 )

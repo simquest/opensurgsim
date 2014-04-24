@@ -124,11 +124,11 @@ protected:
 		{
 			std::string scenario = "vertex t1v0 inside t0 - 2";
 			Triangle t0(T0);
-			Vector3d t0p(0, -3.333333333, 0);
+			Vector3d t0p;
 			Triangle t1(T1);
 			t1.move(Vector3d(0.0, -3.3, -0.1));
-			Vector3d t1p(0, -3.3, 0);
-			m_testCases.push_back(TriangleTriangleTestCase(scenario, t0, t1, true, true, t0p, t1p));
+			Vector3d t1p;
+			m_testCases.push_back(TriangleTriangleTestCase(scenario, t0, t1, true, false, t0p, t1p));
 		}
 		{
 			std::string scenario = "vertex t1v0 inside t0 - 3";
@@ -206,6 +206,30 @@ protected:
 			t1.rotateByYDegrees(180.0);
 			t1.rotateByZDegrees(90.0);
 			t1.move(Vector3d(4.0, -4.0, 6.0));
+			Vector3d t1p;
+			m_testCases.push_back(TriangleTriangleTestCase(scenario, t0, t1, true, false, t0p, t1p));
+		}
+		{
+			std::string scenario = "Failed case in Stapler demo - 1";
+			Triangle t0(Vector3d(-0.0063320380397585046, 0.0028276973112210521, 0.014661107730129588),
+						Vector3d(-0.012108385700376603, 0.0012180224983028599, 0.011926511653863735),
+						Vector3d(-0.016994324947197881, -0.011073183474260971, 0.022191024814086323));
+			Vector3d t0p;
+			Triangle t1(Vector3d(-0.031071999999999999, 0.0028570000000000002, 0.012547000000000001),
+						Vector3d(-0.0016770000000000001, -0.0010070000000000001, 0.0048640000000000003),
+						Vector3d(-0.0013829999999999999, -0.0010030000000000000, 0.012973000000000000));
+			Vector3d t1p;
+			m_testCases.push_back(TriangleTriangleTestCase(scenario, t0, t1, true, false, t0p, t1p));
+		}
+		{
+			std::string scenario = "Failed case in Stapler demo - 2";
+			Triangle t0(Vector3d(3.4602053093157404, -1.1441614263267368, 37.870346680755349),
+						Vector3d(3.3720821269094003, -0.20927613787449697, 118.95490947665477),
+						Vector3d(3.2033802246727975, -36.106495941162471, 119.36861234419522));
+			Vector3d t0p;
+			Triangle t1(Vector3d(0.50000000000000002, 3.8999999999999999, 53.099999999999996),
+						Vector3d(0.50000000000000002, -3.8999999999999999, 53.099999999999996),
+						Vector3d(21.299999999999999, 0.00000000000000000, 53.299999999999997));
 			Vector3d t1p;
 			m_testCases.push_back(TriangleTriangleTestCase(scenario, t0, t1, true, false, t0p, t1p));
 		}
