@@ -1264,58 +1264,53 @@ T distanceSegmentTriangle(
 	}
 	// At this point the segment is nearest point to one of the triangle edges or one of the end points
 	Eigen::Matrix<T, 3, 1, MOpt> segColPt01, segColPt02, segColPt12, triColPt01, triColPt02, triColPt12;
-	Vector3d distancesSegmentSegment( // Segment-Segment [01] [02] [12]
-		distanceSegmentSegment(sv0, sv1, tv0, tv1, &segColPt01, &triColPt01),
-		distanceSegmentSegment(sv0, sv1, tv0, tv2, &segColPt02, &triColPt02),
-		distanceSegmentSegment(sv0, sv1, tv1, tv2, &segColPt12, &triColPt12));
+	T dst01 = distanceSegmentSegment(sv0, sv1, tv0, tv1, &segColPt01, &triColPt01);
+	T dst02 = distanceSegmentSegment(sv0, sv1, tv0, tv2, &segColPt02, &triColPt02);
+	T dst12 = distanceSegmentSegment(sv0, sv1, tv1, tv2, &segColPt12, &triColPt12);
 	Eigen::Matrix<T, 3, 1, MOpt> ptTriCol0, ptTriCol1;
-	Vector2d distancesPointPlane( // Point-Plane [0] [1]
-		std::abs(distancePointPlane(sv0, n, d, &ptTriCol0)),
-		std::abs(distancePointPlane(sv1, n, d, &ptTriCol1)));
+	T dstPtTri0 = std::abs(distancePointPlane(sv0, n, d, &ptTriCol0));
 	barycentricCoordinates(ptTriCol0, tv0, tv1, tv2, normal, &baryCoords);
 	if (baryCoords[0] < 0 || baryCoords[1] < 0 || baryCoords[2] < 0)
 	{
-		distancesPointPlane[0] = std::numeric_limits<T>::max();
+		dstPtTri0 = std::numeric_limits<T>::max();
 	}
+	T dstPtTri1 = std::abs(distancePointPlane(sv1, n, d, &ptTriCol1));
 	barycentricCoordinates(ptTriCol1, tv0, tv1, tv2, normal, &baryCoords);
 	if (baryCoords[0] < 0 || baryCoords[1] < 0 || baryCoords[2] < 0)
 	{
-		distancesPointPlane[1] = std::numeric_limits<T>::max();
+		dstPtTri1 = std::numeric_limits<T>::max();
 	}
-
-	int minCoeffIndex;
-	Eigen::Matrix<double, 5, 1, Eigen::DontAlign> allDistances;
-	allDistances.segment<3>(0) = distancesSegmentSegment;
-	allDistances.segment<2>(3) = distancesPointPlane;
-	allDistances.minCoeff(&minCoeffIndex);
-	switch (minCoeffIndex)
+	
+	int minIndex;
+	Eigen::Matrix<double, 5, 1> distances;
+	(distances << dst01, dst02, dst12, dstPtTri0, dstPtTri1).finished().minCoeff(&minIndex);
+	switch (minIndex)
 	{
 	case 0:
 		*segmentPoint = segColPt01;
 		*trianglePoint = triColPt01;
-		break;
+		return dst01;
 	case 1:
 		*segmentPoint = segColPt02;
 		*trianglePoint = triColPt02;
-		break;
+		return dst02;
 	case 2:
 		*segmentPoint = segColPt12;
 		*trianglePoint = triColPt12;
-		break;
+		return dst12;
 	case 3:
 		*segmentPoint = sv0;
 		*trianglePoint = ptTriCol0;
-		break;
+		return dstPtTri0;
 	case 4:
 		*segmentPoint = sv1;
 		*trianglePoint = ptTriCol1;
-		break;
-	default:
-		// Invalid ...
-		return std::numeric_limits<T>::quiet_NaN();
+		return dstPtTri1;
 	}
 
-	return allDistances[minCoeffIndex];
+	// Invalid ...
+	return std::numeric_limits<T>::quiet_NaN();
+
 }
 
 
