@@ -21,7 +21,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "SurgSim/Framework/Convert.h"
+#include "SurgSim/Framework/Macros.h"
 
 namespace SurgSim
 {

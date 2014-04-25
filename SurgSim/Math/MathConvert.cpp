@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/MathConvert.h"
+
 #include "SurgSim/Math/Shape.h"
 
 namespace YAML
