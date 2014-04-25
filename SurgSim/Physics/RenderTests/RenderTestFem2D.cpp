@@ -13,39 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+///\file Fem2D render test
+
 #include <memory>
 
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/BehaviorManager.h"
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Graphics/OsgCamera.h"
-#include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Graphics/OsgView.h"
-#include "SurgSim/Graphics/OsgViewElement.h"
-#include "SurgSim/Graphics/PointCloudRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/FemElement2DTriangle.h"
-#include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem2DRepresentation;
 using SurgSim::Physics::FemElement2DTriangle;
-using SurgSim::Physics::PhysicsManager;
-
-///\file Example of how to put together a very simple demo of Fem2D
 
 namespace
 {
@@ -146,23 +135,8 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 	}
 }
 
-std::shared_ptr<SurgSim::Graphics::ViewElement> createView(
-	const std::string& name, int x, int y, int width, int height)
-{
-	using SurgSim::Graphics::OsgViewElement;
-
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
-	viewElement->getView()->setPosition(x, y);
-	viewElement->getView()->setDimensions(width, height);
-
-	viewElement->enableManipulator(true);
-	viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 2.0), Vector3d::Zero());
-
-	return viewElement;
-}
-
 // Generates a 2d fem comprised of a cylinder. The number of fem elements is determined by createFem2DCylinder.
-std::shared_ptr<SceneElement> createFem2D(const std::string& name,
+std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string& name,
 		const SurgSim::Math::RigidTransform3d& gfxPose,
 		const SurgSim::Math::Vector4d& color,
 		SurgSim::Math::IntegrationScheme integrationScheme)
@@ -170,7 +144,7 @@ std::shared_ptr<SceneElement> createFem2D(const std::string& name,
 	std::shared_ptr<Fem2DRepresentation> physicsRepresentation
 		= std::make_shared<Fem2DRepresentation>("Physics Representation");
 
-	// In this example, the physics representations are not transformed, only the graphics will be transformed
+	// In this test, the physics representations are not transformed, only the graphics will be transformed
 	createFem2DCylinder(physicsRepresentation);
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
@@ -226,26 +200,17 @@ std::shared_ptr<SceneElement> createFem2D(const std::string& name,
 
 } // anonymous namespace
 
+namespace SurgSim
+{
 
-int main(int argc, char* argv[])
+namespace Physics
+{
+
+TEST_F(RenderTests, VisualTestFem2D)
 {
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::Vector4d;
 
-	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
-	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager
-		= std::make_shared<SurgSim::Framework::BehaviorManager>();
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
-
-	runtime->addManager(physicsManager);
-	runtime->addManager(graphicsManager);
-	runtime->addManager(behaviorManager);
-
-	std::shared_ptr<SurgSim::Graphics::OsgCamera> camera = graphicsManager->getDefaultCamera();
-	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
-
-	const SurgSim::Math::Quaterniond quaternionIdentity = SurgSim::Math::Quaterniond::Identity();
 	const SurgSim::Math::Quaterniond quaternion(Eigen::AngleAxisd(-M_PI / 6.0, Vector3d(0.0, 1.0, 0.0)));
 
 	scene->addSceneElement(
@@ -266,11 +231,9 @@ int main(int argc, char* argv[])
 					Vector4d(0, 0, 1, 1),
 					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
 
-	scene->addSceneElement(createView("view1", 0, 0, 1024, 768));
-
-	camera->setInitialPose(SurgSim::Math::makeRigidTransform(quaternionIdentity, Vector3d(0.0, 0.0, 2.0)));
-
-	runtime->execute();
-
-	return 0;
+	runTest(Vector3d(0.0, 0.0, 2.0), Vector3d::Zero(), 5000.0);
 }
+
+}; // namespace Physics
+
+}; // namespace SurgSim

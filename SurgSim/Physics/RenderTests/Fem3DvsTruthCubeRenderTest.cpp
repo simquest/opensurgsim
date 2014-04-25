@@ -534,21 +534,6 @@ struct Fem3DVSTruthCubeRenderTests : public RenderTests
 		viewElement->addComponent(component);
 	}
 
-	void runTest(double miliseconds)
-	{
-		viewElement->enableManipulator(true);
-		viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero());
-
-		std::shared_ptr<OsgAxesRepresentation> axes = std::make_shared<OsgAxesRepresentation>("axes");
-		axes->setSize(1.0);
-		viewElement->addComponent(axes);
-
-		/// Run the thread
-		runtime->start();
-
-		boost::this_thread::sleep(boost::posix_time::milliseconds(miliseconds));
-	}
-
 	virtual void SetUp() override
 	{
 		RenderTests::SetUp();
@@ -617,7 +602,7 @@ TEST_F(Fem3DVSTruthCubeRenderTests, rawDataTest)
 	copyExperimentalBeadsIntoPointCloud(truthCubeData->cubeData3, points3);
 	addComponent(points3);
 
-	runTest(3000.0);
+	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 3000.0);
 }
 
 /// Simulate truth cube with 5% strain (4mm of displacement).
@@ -646,10 +631,10 @@ TEST_F(Fem3DVSTruthCubeRenderTests, Test5percentsStrain)
 	addComponent(experimentalpoints);
 
 	double maxError = analyzeError(truthCubeData->cubeData1, truthCubeRepresentation->getCurrentState());
-	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " mm" << std::endl;
+	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " m" << std::endl;
 
 	/// Run the thread
-	runTest(3000.0);
+	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 3000.0);
 }
 
 /// Simulate truth cube with 12.5% strain (10mm of displacement).
@@ -678,10 +663,10 @@ TEST_F(Fem3DVSTruthCubeRenderTests, Test12percentsAndHalfStrain)
 	addComponent(experimentalpoints);
 
 	double maxError = analyzeError(truthCubeData->cubeData2, truthCubeRepresentation->getCurrentState());
-	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " mm" << std::endl;
+	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " m" << std::endl;
 
 	/// Run the thread
-	runTest(3000.0);
+	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 3000.0);
 }
 
 /// Simulate truth cube with 18.25% strain (14.6mm of displacement).
@@ -710,10 +695,10 @@ TEST_F(Fem3DVSTruthCubeRenderTests, Test18percentsAndQuarterStrain)
 	addComponent(experimentalpoints);
 
 	double maxError = analyzeError(truthCubeData->cubeData3, truthCubeRepresentation->getCurrentState());
-	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " mm" << std::endl;
+	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " m" << std::endl;
 
 	/// Run the thread
-	runTest(3000.0);
+	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 3000.0);
 }
 
 }; // namespace Physics
