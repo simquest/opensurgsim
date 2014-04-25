@@ -18,7 +18,6 @@
 #include <string>
 
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -26,7 +25,6 @@
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Framework::Runtime;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -58,7 +56,6 @@ public:
 		m_identityTransformation.setIdentity();
 
 		m_fixedRepresentation = std::make_shared<FixedRepresentation>("FixedRepresentation");
-		m_runtime = std::make_shared<Runtime>();
 		m_element = std::make_shared<BasicSceneElement>("element");
 		m_element->addComponent(m_fixedRepresentation);
 	}
@@ -69,7 +66,6 @@ public:
 
 	std::shared_ptr<FixedRepresentation> m_fixedRepresentation;
 	std::shared_ptr<BasicSceneElement> m_element;
-	std::shared_ptr<Runtime> m_runtime;
 
 	// Fixed representation initialization pose
 	RigidTransform3d m_initialTransformation;
@@ -92,7 +88,7 @@ TEST_F(FixedRepresentationTest, ResetStateTest)
 	m_fixedRepresentation->setIsGravityEnabled(false);
 	m_fixedRepresentation->setLocalPose(m_initialTransformation);
 
-	m_fixedRepresentation->initialize(m_runtime);
+	m_element->initialize();
 	m_fixedRepresentation->wakeUp();
 
 	// Initial = Current = Previous = m_initialTransformation
@@ -167,7 +163,7 @@ TEST_F(FixedRepresentationTest, UpdateTest)
 	double dt = 1.0;
 
 	m_fixedRepresentation->setLocalPose(m_initialTransformation);
-	m_fixedRepresentation->initialize(m_runtime);
+	m_element->initialize();
 	m_fixedRepresentation->wakeUp();
 
 	m_fixedRepresentation->setLocalPose(m_currentTransformation);

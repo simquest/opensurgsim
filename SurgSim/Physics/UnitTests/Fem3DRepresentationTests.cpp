@@ -18,7 +18,6 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/Runtime.h" //< Used to initialize the Component Fem3DRepresentation
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -27,7 +26,6 @@
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"
 
 using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Framework::Runtime;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::getSubVector;
@@ -236,7 +234,7 @@ TEST_F(Fem3DRepresentationTests, TransformInitialStateTest)
 	m_fem->setLocalPose(m_initialPose);
 	m_fem->setInitialState(m_initialState);
 
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_element->initialize());
 	ASSERT_TRUE(m_fem->wakeUp());
 
 	EXPECT_TRUE(m_fem->getInitialState()->getPositions().isApprox(m_expectedTransformedPositions));
@@ -252,7 +250,7 @@ TEST_F(Fem3DRepresentationTests, UpdateTest)
 	ASSERT_ANY_THROW(m_fem->update(m_dt));
 
 	m_fem->setInitialState(m_initialState);
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_element->initialize());
 	ASSERT_TRUE(m_fem->wakeUp());
 
 	// Need to call Initialize after addFemElement and setInitialState to initialize the mass information
@@ -277,7 +275,7 @@ TEST_F(Fem3DRepresentationTests, AfterUpdateTest)
 	ASSERT_ANY_THROW(m_fem->afterUpdate(m_dt));
 
 	m_fem->setInitialState(m_initialState);
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_element->initialize());
 	ASSERT_TRUE(m_fem->wakeUp());
 	m_fem->beforeUpdate(m_dt);
 	m_fem->update(m_dt);
@@ -294,7 +292,7 @@ TEST_F(Fem3DRepresentationTests, ApplyCorrectionTest)
 {
 	double epsilon = 1e-12;
 	m_fem->setInitialState(m_initialState);
-	m_fem->initialize(std::make_shared<Runtime>());
+	m_element->initialize();
 	m_fem->wakeUp();
 
 	SurgSim::Math::Vector dv;
@@ -352,7 +350,7 @@ void testVector(Vector V, Vector expectedV)
 TEST_F(Fem3DRepresentationTests, ComputesTest)
 {
 	m_fem->setInitialState(m_initialState);
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_element->initialize());
 	ASSERT_TRUE(m_fem->wakeUp());
 	m_fem->setIsGravityEnabled(false);
 

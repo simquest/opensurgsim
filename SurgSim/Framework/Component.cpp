@@ -85,12 +85,9 @@ bool Component::wakeUp()
 	if (element != nullptr)
 	{
 		auto poseComponents = element->getComponents<SurgSim::Framework::PoseComponent>();
-		SURGSIM_ASSERT(poseComponents.size() <= 1) << " SceneElement " << element->getName()
-			<< " has more than one PoseComponent. This is not supported.";
-		if (poseComponents.size() == 1)
-		{
-			m_poseComponent = poseComponents[0];
-		}
+		SURGSIM_ASSERT(poseComponents.size() == 1) << " SceneElement " << element->getName()
+			<< " needs one and only one PoseComponent.";
+		m_poseComponent = poseComponents[0];
 	}
 
 	m_didWakeUp = true;

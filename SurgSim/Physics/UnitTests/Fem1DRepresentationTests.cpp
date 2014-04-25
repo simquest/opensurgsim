@@ -18,7 +18,6 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -27,7 +26,6 @@
 #include "SurgSim/Physics/FemElement1DBeam.h"
 
 using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Framework::Runtime;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
@@ -247,7 +245,7 @@ TEST_F(Fem1DRepresentationTests, TransformInitialStateTest)
 	m_fem->setLocalPose(m_initialPose);
 	m_fem->setInitialState(m_initialState);
 
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_element->initialize());
 	ASSERT_TRUE(m_fem->wakeUp());
 
 	EXPECT_TRUE(m_fem->getInitialState()->getPositions().isApprox(m_expectedTransformedPositions));
@@ -265,7 +263,7 @@ TEST_F(Fem1DRepresentationTests, UpdateTest)
 	// Need to call Initialize after addFemElement and setInitialState to initialize the mass information
 	ASSERT_ANY_THROW(m_fem->update(dt));
 
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_element->initialize());
 	ASSERT_TRUE(m_fem->wakeUp());
 	m_fem->beforeUpdate(dt);
 	ASSERT_NO_THROW(m_fem->update(dt));
@@ -286,7 +284,7 @@ TEST_F(Fem1DRepresentationTests, AfterUpdateTest)
 	ASSERT_ANY_THROW(m_fem->afterUpdate(dt));
 
 	m_fem->setInitialState(m_initialState);
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_element->initialize());
 	ASSERT_TRUE(m_fem->wakeUp());
 	m_fem->beforeUpdate(dt);
 	m_fem->update(dt);
