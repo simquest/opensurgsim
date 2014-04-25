@@ -61,8 +61,7 @@ class MassPoint : public SurgSim::Math::OdeEquation<MassPointState, Matrix, Matr
 {
 public:
 	/// Constructor
-	/// \param x The mass initial position
-	/// \param mass The mass (in Kg)
+	/// \param viscosity The mass viscosity
 	explicit MassPoint(double viscosity = 0.0) :
 		m_mass(1.0),
 		m_viscosity(viscosity),

@@ -189,7 +189,7 @@ public:
 	}
 
 	/// Set the initial pose of the representation
-	/// \param	pose	The initial pose
+	/// \param	transform	The initial pose
 	/// \note	This will reset initial, current, and final poses all to the new initial pose.
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
@@ -403,7 +403,7 @@ public:
 	}
 
 	/// Set the initial pose of the representation
-	/// \param	pose	The initial pose
+	/// \param	transform	The initial pose
 	/// \note	This will reset initial, current, and final poses all to the new initial pose.
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
 	{

@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Simple Test for FreeMotion calculation
+/// \file FreeMotionTests.cpp
+/// Simple Test for FreeMotion calculation
 
 #include <gtest/gtest.h>
 

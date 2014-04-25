@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Simple Test for BuildMlcp calculation
+/// \file BuildMlcpTests.cpp
+/// Simple Test for BuildMlcp calculation
 
 #include <gtest/gtest.h>
 

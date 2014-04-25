@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Common data structure for physics tests
+/// \file CommonTests.h
+/// Common data structure for physics tests
 
 #ifndef SURGSIM_PHYSICS_UNITTESTS_COMMONTESTS_H
 #define SURGSIM_PHYSICS_UNITTESTS_COMMONTESTS_H

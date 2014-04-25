@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Simple Test for PushResults calculation
+/// \file PushResultsTests.cpp
+/// Simple Test for PushResults calculation
 
 #include <gtest/gtest.h>
 
