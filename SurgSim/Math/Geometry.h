@@ -1088,28 +1088,26 @@ T distanceTrianglePlane(
 	}
 
 	// Is there an intersection
-	if ((distances[0] <= Geometry::DistanceEpsilon || distances[1] <= Geometry::DistanceEpsilon ||
-		 distances[2] <= Geometry::DistanceEpsilon) &&
-		(distances[0] > Geometry::DistanceEpsilon || distances[1] > Geometry::DistanceEpsilon ||
-		 distances[2] > Geometry::DistanceEpsilon))
+	if ((distances.array() < -Geometry::DistanceEpsilon).any() &&
+		(distances.array() > Geometry::DistanceEpsilon).any())
 	{
 		if (distances[0] * distances[1] < 0)
 		{
-			*closestPointTriangle = tv0 + (-d-n.dot(tv0))/n.dot(t01) * t01;
+			*closestPointTriangle = tv0 + (-d - n.dot(tv0)) / n.dot(t01) * t01;
 			if (distances[0] * distances[2] < 0)
 			{
-				*planeProjectionPoint = tv0 + (-d-n.dot(tv0))/n.dot(t02) * t02;
+				*planeProjectionPoint = tv0 + (-d - n.dot(tv0)) / n.dot(t02) * t02;
 			}
 			else
 			{
 				Eigen::Matrix<T, 3, 1, MOpt> t12 = tv2-tv1;
-				*planeProjectionPoint = tv1 + (-d-n.dot(tv1))/n.dot(t12) * t12;
+				*planeProjectionPoint = tv1 + (-d - n.dot(tv1)) / n.dot(t12) * t12;
 			}
 		}
 		else
 		{
-			*closestPointTriangle = tv0 + (-d-n.dot(tv0))/n.dot(t02) * t02;
-			*planeProjectionPoint = tv1 + (-d-n.dot(tv1))/n.dot(t12) * t12;
+			*closestPointTriangle = tv0 + (-d - n.dot(tv0)) / n.dot(t02) * t02;
+			*planeProjectionPoint = tv1 + (-d - n.dot(tv1)) / n.dot(t12) * t12;
 		}
 
 		// Find the midpoint, take this out to return the segment endpoints
@@ -1121,15 +1119,15 @@ T distanceTrianglePlane(
 	distances.cwiseAbs().minCoeff(&index);
 	switch (index)
 	{
-	case 0: //dist0 is closest
+	case 0: //distances[0] is closest
 		*closestPointTriangle = tv0;
 		*planeProjectionPoint = tv0 - n * distances[0];
 		return distances[0];
-	case 1: //dist1 is closest
+	case 1: //distances[1] is closest
 		*closestPointTriangle = tv1;
 		*planeProjectionPoint = tv1 - n * distances[1];
 		return distances[1];
-	case 2: //dist2 is closest
+	case 2: //distances[2] is closest
 		*closestPointTriangle = tv2;
 		*planeProjectionPoint = tv2 - n * distances[2];
 		return distances[2];
