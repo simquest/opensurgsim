@@ -16,8 +16,9 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/Shapes.h"
+#include "SurgSim/Math/SurfaceMeshShape.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::EmptyData;
@@ -117,23 +118,29 @@ TEST_F(SurfaceMeshShapeTest, NonAlignedDiskShapeTest)
 }
 
 
-TEST_F(SurfaceMeshShapeTest, SerializeTest)
+TEST_F(SurfaceMeshShapeTest, SerializationTest)
 {
-	std::shared_ptr<SurgSim::Math::SurfaceMeshShape> mesh = std::make_shared<SurgSim::Math::SurfaceMeshShape>();
-	mesh->setFileName("MeshShapeData/staple_collision.ply");
+	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	auto surfaceMeshShape = std::make_shared<SurgSim::Math::SurfaceMeshShape>();
+	surfaceMeshShape->setFileName(fileName);
 
-	// Encoding a mesh
+	// We chose to let YAML serialization only works with base class pointer.
+	// i.e. We need to serialize 'surfaceMeshShape' via a SurgSim::Math::Shape pointer.
+	// The usage YAML::Node node = surfaceMeshShape; will not compile.
+	std::shared_ptr<SurgSim::Math::Shape> shape = surfaceMeshShape;
+
 	YAML::Node node;
-	ASSERT_NO_THROW(node = mesh->encode());
+	ASSERT_NO_THROW(node = shape); // YAML::convert<std::shared_ptr<SurgSim::Math::Shape>> will be called.
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(1u, node.size());
 
-	// Decoding the mesh
-	std::shared_ptr<SurgSim::Math::SurfaceMeshShape> newMesh = std::make_shared<SurgSim::Math::SurfaceMeshShape>();
-	ASSERT_NO_THROW(newMesh->decode(node));
-	EXPECT_EQ("SurgSim::Math::SurfaceMeshShape", newMesh->getClassName());
-	EXPECT_EQ("MeshShapeData/staple_collision.ply", newMesh->getFileName());
-	EXPECT_EQ(mesh->getMesh()->getNumVertices(), newMesh->getMesh()->getNumVertices());
-	EXPECT_EQ(mesh->getMesh()->getNumEdges(), newMesh->getMesh()->getNumEdges());
-	EXPECT_EQ(mesh->getMesh()->getNumTriangles(), newMesh->getMesh()->getNumTriangles());
+	std::shared_ptr<SurgSim::Math::SurfaceMeshShape> newSurfaceMesh;
+	ASSERT_NO_THROW(newSurfaceMesh =
+		std::dynamic_pointer_cast<SurgSim::Math::SurfaceMeshShape>(node.as<std::shared_ptr<SurgSim::Math::Shape>>()));
+
+	EXPECT_EQ("SurgSim::Math::SurfaceMeshShape", newSurfaceMesh->getClassName());
+	EXPECT_EQ(fileName, newSurfaceMesh->getFileName());
+	EXPECT_EQ(surfaceMeshShape->getMesh()->getNumVertices(), newSurfaceMesh->getMesh()->getNumVertices());
+	EXPECT_EQ(surfaceMeshShape->getMesh()->getNumEdges(), newSurfaceMesh->getMesh()->getNumEdges());
+	EXPECT_EQ(surfaceMeshShape->getMesh()->getNumTriangles(), newSurfaceMesh->getMesh()->getNumTriangles());
 }

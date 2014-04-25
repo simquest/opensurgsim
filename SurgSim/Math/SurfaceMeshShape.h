@@ -18,7 +18,6 @@
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
