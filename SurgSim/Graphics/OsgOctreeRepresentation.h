@@ -66,7 +66,7 @@ private:
 	/// Draw the Octree associated with this OSG representation.
 	/// \param parentTransformNode The osg::PositionAttitudeTransform node under which either the octreeNode or its
 	///                            children will be drawn.
-	/// \param octreeNode The OctreeNode to be drawn.
+	/// \param octree The octree to be drawn.
 	void buildOctree(osg::ref_ptr<osg::Group> parentTransformNode,
 					 std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree);
 

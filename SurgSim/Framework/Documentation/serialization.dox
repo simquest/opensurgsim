@@ -1,6 +1,4 @@
-/*!
-
-\page Serialization Serialization
+/*! \page Serialization Serialization
 
 Loading and storing of instances from the OpenSurgSim framework utilizes the facilities provided by YAML-cpp, the duck typing and introspection capabilities provided by SurgSim::Framework::Accessible and when necessary a generic class registration and factory mechanism provided by SurgSim::Framework::ObjectFactory. Together these classes enable a serialization solution that can load and store instances of classes without the need of knowing the structure.
 
