@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_ODESOLVERLINEAREULERIMPLICIT_H
-#define SURGSIM_MATH_ODESOLVERLINEAREULERIMPLICIT_H
+#ifndef SURGSIM_MATH_ODESOLVERLINEARSTATIC_H
+#define SURGSIM_MATH_ODESOLVERLINEARSTATIC_H
 
-#include "SurgSim/Math/OdeSolverEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverStatic.h"
 
 namespace SurgSim
 {
@@ -24,23 +24,19 @@ namespace SurgSim
 namespace Math
 {
 
-/// Linear Version of the Euler Implicit ode solver
-/// This solver assumes that the system is linear, ie that Mass,
-/// Damping, and Stiffness matrices do not change.
+/// Linear version of the static ode solver
+/// This solver assumes that the system is linear, ie that Stiffness matrix does not change.
 template <class State, class MT, class DT, class KT, class ST>
-class OdeSolverLinearEulerImplicit : public OdeSolverEulerImplicit<State, MT, DT, KT, ST>
+class OdeSolverLinearStatic : public OdeSolverStatic<State, MT, DT, KT, ST>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverLinearEulerImplicit(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverLinearStatic(OdeEquation<State, MT, DT, KT, ST>* equation);
 
 	virtual void solve(double dt, const State& currentState, State* newState) override;
 
 private:
-	/// The constant stiffness matrix
-	KT m_constantK;
-
 	/// Has the solver been initialized
 	bool m_initialized;
 
@@ -55,6 +51,6 @@ public:
 
 }; // namespace SurgSim
 
-#include "SurgSim/Math/OdeSolverLinearEulerImplicit-inl.h"
+#include "SurgSim/Math/OdeSolverLinearStatic-inl.h"
 
-#endif // SURGSIM_MATH_ODESOLVERLINEAREULERIMPLICIT_H
+#endif // SURGSIM_MATH_ODESOLVERLINEARSTATIC_H

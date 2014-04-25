@@ -38,8 +38,7 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #include <string.h>
 #include "SurgSim/DataStructures/ply.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+
 // HS-2014-apr-03 There are a few warnings from gcc regarding these
 // in the spirit of changing this file as little as possible we decided
 // to ignore these. The variables concerned are:
@@ -51,6 +50,9 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable:4996)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
 char *type_names[] = {

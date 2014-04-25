@@ -23,15 +23,15 @@ namespace Math
 {
 
 template <class State, class MT, class DT, class KT, class ST>
-ImplicitEuler<State, MT, DT, KT, ST>::ImplicitEuler(
+OdeSolverEulerImplicit<State, MT, DT, KT, ST>::OdeSolverEulerImplicit(
 	OdeEquation<State, MT, DT, KT, ST>* equation) :
 	OdeSolver<State, MT, DT, KT, ST>(equation)
 {
-	m_name = "Implicit Euler";
+	m_name = "Ode Solver Euler Implicit";
 }
 
 template <class State, class MT, class DT, class KT, class ST>
-void ImplicitEuler<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverEulerImplicit<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
 {
 	// General equation to solve:
 	//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
