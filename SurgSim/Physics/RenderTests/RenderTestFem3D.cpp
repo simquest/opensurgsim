@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-///\file Fem3D render test
+///\file RenderTestFem3D.cpp render test for Fem3D
 
 #include <memory>
 
@@ -189,7 +189,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	return femSceneElement;
 }
 
-};
+}; // anonymous namespace
 
 namespace SurgSim
 {

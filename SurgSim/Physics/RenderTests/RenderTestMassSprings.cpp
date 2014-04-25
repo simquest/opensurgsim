@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Mass-Springs render test
+///\file RenderTestMassSprings.cpp render test for MassSprings
 
 #include <memory>
 
@@ -247,7 +247,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	return massSpringElement;
 }
 
-};
+}; // anonymous namespace
 
 namespace SurgSim
 {

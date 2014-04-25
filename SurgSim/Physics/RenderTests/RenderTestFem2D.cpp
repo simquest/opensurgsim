@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-///\file Fem2D render test
+///\file RenderTestFem2D.cpp render test for Fem2D
 
 #include <memory>
 
@@ -198,7 +198,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 	return femSceneElement;
 }
 
-} // anonymous namespace
+}; // anonymous namespace
 
 namespace SurgSim
 {

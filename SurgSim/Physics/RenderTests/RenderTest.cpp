@@ -45,7 +45,8 @@ void RenderTests::TearDown()
 	runtime->stop();
 }
 
-void RenderTests::runTest(const SurgSim::Math::Vector3d& cameraPosition, const SurgSim::Math::Vector3d& cameraLookAt, double miliseconds)
+void RenderTests::runTest(const SurgSim::Math::Vector3d& cameraPosition, const SurgSim::Math::Vector3d& cameraLookAt,
+						  double miliseconds)
 {
 	using SurgSim::Graphics::OsgAxesRepresentation;
 
