@@ -15,8 +15,7 @@
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
-#include "SurgSim/Framework/Logger.h"
-#include "SurgSim/Framework/LogMacros.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
 

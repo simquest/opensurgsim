@@ -18,8 +18,7 @@
 
 #include <string>
 
-#include "SurgSim/Framework/Logger.h"
-#include "SurgSim/Framework/LogMacros.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace
 {
