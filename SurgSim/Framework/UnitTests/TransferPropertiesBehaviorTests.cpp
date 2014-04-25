@@ -57,10 +57,10 @@ TEST(TransferPropertiesBehaviorTest, ValidConnections)
 	EXPECT_ANY_THROW(behavior.connect(nullptr, "", a ,"a"));
 	EXPECT_ANY_THROW(behavior.connect(a, "a", nullptr, ""));
 
-	EXPECT_FALSE(behavior.connect(a, "a", a, "a"));
+	EXPECT_ANY_THROW(behavior.connect(a, "a", a, "a"));
 
-	EXPECT_FALSE(behavior.connect(a, "xxx", b, "a"));
-	EXPECT_FALSE(behavior.connect(a, "a", b, "xxx"));
+	EXPECT_ANY_THROW(behavior.connect(a, "xxx", b, "a"));
+	EXPECT_ANY_THROW(behavior.connect(a, "a", b, "xxx"));
 
 	EXPECT_TRUE(behavior.connect(a, "a", b, "b"));
 }

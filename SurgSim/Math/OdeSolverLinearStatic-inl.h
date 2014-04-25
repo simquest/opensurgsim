@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_ODESOLVERLINEAREULEREXPLICIT_INL_H
-#define SURGSIM_MATH_ODESOLVERLINEAREULEREXPLICIT_INL_H
+#ifndef SURGSIM_MATH_ODESOLVERLINEARSTATIC_INL_H
+#define SURGSIM_MATH_ODESOLVERLINEARSTATIC_INL_H
 
 namespace SurgSim
 {
@@ -23,30 +23,33 @@ namespace Math
 {
 
 template <class State, class MT, class DT, class KT, class ST>
-OdeSolverLinearEulerExplicit<State, MT, DT, KT, ST>::OdeSolverLinearEulerExplicit(
+OdeSolverLinearStatic<State, MT, DT, KT, ST>::OdeSolverLinearStatic(
 	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	OdeSolverEulerExplicit<State, MT, DT, KT, ST>(equation),
+	OdeSolverStatic<State, MT, DT, KT, ST>(equation),
 	m_initialized(false)
 {
-	m_name = "Ode Solver Linear Euler Explicit";
+	m_name = "Ode Solver Linear Static";
 }
 
 template <class State, class MT, class DT, class KT, class ST>
-void OdeSolverLinearEulerExplicit<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverLinearStatic<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
 {
 	if (!m_initialized)
 	{
-		OdeSolverEulerExplicit<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
+		OdeSolverStatic<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
 		m_initialized = true;
 	}
 	else
 	{
-		const Vector& f = m_equation.computeF(currentState);
-		Vector deltaV = m_compliance * f;
+		Vector& f = m_equation.computeF(currentState);
+		Vector deltaX = m_compliance * f;
 
-		newState->getPositions()  = currentState.getPositions()  + dt * currentState.getVelocities();
-		newState->getVelocities() = currentState.getVelocities() + deltaV;
-		newState->getAccelerations() = deltaV / dt;
+		// Compute the new state using the static scheme:
+		newState->getPositions() = currentState.getPositions()  + deltaX;
+		// Velocities are null in static mode (no time dependency)
+		newState->getVelocities().setZero();
+		// Accelerations are null in static mode (no time dependency)
+		newState->getAccelerations().setZero();
 	}
 }
 
@@ -54,6 +57,4 @@ void OdeSolverLinearEulerExplicit<State, MT, DT, KT, ST>::solve(double dt, const
 
 }; // namespace SurgSim
 
-#endif // SURGSIM_MATH_ODESOLVERLINEAREULEREXPLICIT_INL_H
-
-
+#endif // SURGSIM_MATH_ODESOLVERLINEARSTATIC_INL_H

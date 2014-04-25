@@ -124,7 +124,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	planeElement->addComponent(transferPose);
 	auto collisionRepresentation =
 		std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
-	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 	planeElement->addComponent(collisionRepresentation);
 	return planeElement;
 }
@@ -144,7 +144,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	// damping (translational and angular) should be adjusted to make the system close to critically damped in free
 	// motion (i.e., converges quickly without oscillation when no collisions are occurring).
 	params.setDensity(0.1);
-	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.8, 2.0, 0.2); // in m
+	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.8, 2.0, 0.2); // in meter
 	params.setShapeUsedForMassInertia(box);
 
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
@@ -154,7 +154,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 
 	auto collisionRepresentation =
 		std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Box Collision Representation");
-	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	// Graphics Components
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> graphicsRepresentation =

@@ -59,6 +59,9 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
 
+	viewElement->enableManipulator(true);
+	viewElement->setManipulatorParameters(Vector3d(0.0, 0.5, 8.0), Vector3d::Zero());
+
 	return viewElement;
 }
 
@@ -287,27 +290,26 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
-	SurgSim::Math::Vector3d translate(0, 0, -3);
 
 	// MassSpring1D
 	{
 		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-3.0, 3.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(-3.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(3.0, 3.0, 0.0)));
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Explicit",
 							   gfxPoses, Vector4d(1, 0, 0, 1),
 							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-1.0, 3.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(-1.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(3.0, 3.0, 0.0)));
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Modified Euler Explicit",
 							   gfxPoses, Vector4d(0, 1, 0, 1),
 							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(1.0, 3.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(1.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(3.0, 3.0, 0.0)));
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Implicit",
 							   gfxPoses, Vector4d(0, 0, 1, 1),
 							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
@@ -316,22 +318,22 @@ int main(int argc, char* argv[])
 	// MassSpring2D
 	{
 		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-3.0, 1.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(-3.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(3.0, 1.5, 0.0)));
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Explicit",
 							   gfxPoses, Vector4d(1, 0, 0, 1),
 							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-1.0, 1.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(-1.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(3.0, 1.5, 0.0)));
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Modified Euler Explicit",
 							   gfxPoses, Vector4d(0, 1, 0, 1),
 							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(1.0, 1.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(1.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(3.0, 1.5, 0.0)));
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Implicit",
 							   gfxPoses, Vector4d(0, 0, 1, 1),
 							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
@@ -340,31 +342,31 @@ int main(int argc, char* argv[])
 	// MassSpring3D
 	{
 		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-3.0, -0.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(-3.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(3.0, -0.5, 0.0)));
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Explicit",
 							   gfxPoses, Vector4d(1, 0, 0, 1),
 							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-1.0, -0.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(-1.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(3.0, -0.5, 0.0)));
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Modified Euler Explicit",
 							   gfxPoses, Vector4d(0, 1, 0, 1),
 							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(1.0, -0.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(1.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, Vector3d(3.0, -0.5, 0.0)));
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Implicit",
 							   gfxPoses, Vector4d(0, 0, 1, 1),
 							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 
-	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
+	scene->addSceneElement(createView("view1", 0, 0, 1024, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 8.0)));
 
 	runtime->execute();
 
