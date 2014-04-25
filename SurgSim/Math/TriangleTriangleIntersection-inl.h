@@ -13,18 +13,80 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_TRIANGLETRIANGLEINTERSECTION_H
-#define SURGSIM_MATH_TRIANGLETRIANGLEINTERSECTION_H
+#ifndef SURGSIM_MATH_TRIANGLETRIANGLEINTERSECTION_INL_H
+#define SURGSIM_MATH_TRIANGLETRIANGLEINTERSECTION_INL_H
 
-
-#include "SurgSim/Framework/Log.h"
-#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
 
 namespace Math
 {
+
+
+/// A local class to represent a plane.
+template <class T, int MOpt>
+class Plane
+{
+	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
+
+public:
+	/// Contructor takes in th eplane normal and a point on the plane.
+	/// \param normal Normal of the plane.
+	/// \param pointOnPlane A point on the plane.
+	Plane(const Vector3& normal, const Vector3& pointOnPlane)
+		: m_normal(normal), m_d(-pointOnPlane.dot(normal))
+	{}
+
+	/// Calculate the signed distance of the given point from the plane.
+	/// \param point Point whose signed distance from plane needs to be calculated.
+	/// \return The signed distance of the given point from the plane
+	T signedDistanceFrom(const Vector3& point)
+	{
+		return point.dot(m_normal) + m_d;
+	}
+
+	/// Normal of the plane.
+	Vector3 m_normal;
+
+	/// d from the plane equation (n.x + d = 0).
+	T m_d;
+};
+
+
+/// Two ends of triangle edge are given in terms of the following vertex properties.
+///		- Signed distance from the colliding triangle.
+///		- Projection on the separating axis.
+/// Get the intersection of this edge and the plane in terms of the projection of the vertices.
+/// \param dStart Signed distance of the start of edge from the plane of the colliding triangle.
+/// \param dEnd Signed distance of the end of edge from the plane of the colliding triangle.
+/// \param pvStart Projection of the start of edge from the plane of the colliding triangle.
+/// \param dStart Signed distance of the first vertex from the plane of the colliding triangle.
+template<class T>
+void edgeIntersection(T dStart, T dEnd, T pvStart, T pvEnd, T *t, int *tCount)
+{
+	// Epsilon used in this function.
+	static const T EPSILON = T(Geometry::DistanceEpsilon);
+
+	bool startIsUnder = dStart < -EPSILON && dEnd >= -EPSILON;
+	bool startIsOver = dStart > EPSILON && dEnd <= EPSILON;
+
+	if (startIsUnder || startIsOver)
+	{
+		bool isEndOnPlane = startIsUnder ? dEnd < EPSILON : dEnd > -EPSILON;
+
+		if (isEndOnPlane)
+		{
+			// The intersection of the edge and the plane is the end.
+			t[(*tCount)++] = pvEnd;
+		}
+		else
+		{
+			// The intersection of the edge and the plane is got by clipping the edge onto the plane.
+			t[(*tCount)++] = pvStart + (pvEnd - pvStart) * (dStart / (dStart - dEnd));
+		}
+	}
+}
 
 /// Check if the two triangles intersect using separating axis test.
 /// Algorithm is implemented from http://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tritri.pdf
@@ -33,8 +95,8 @@ namespace Math
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param t1v0,t1v1,t1v2 Vertices of the first triangle.
 /// \param t2v0,t2v1,t2v2 Vertices of the second triangle.
-/// \param t1n Normal of the first triangle.
-/// \param t2n Normal of the second triangle
+/// \param t1n Normal of the first triangle, should be normalized.
+/// \param t2n Normal of the second triangle, should be normalized.
 /// \return True, if intersection is detected.
 template <class T, int MOpt> inline
 bool checkTriangleTriangleIntersection(
@@ -47,19 +109,16 @@ bool checkTriangleTriangleIntersection(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t2n)
 {
-	// Epsilon used in this function.
-	T e = T(Geometry::DistanceEpsilon);
+	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
 
-	// struct to store a plane.
-	struct Plane
+	if (t1n.isZero() || t2n.isZero())
 	{
-	public:
-		Plane(const Eigen::Matrix<T, 3, 1, MOpt>& n, T d)
-			: m_n(n), m_d(d)
-		{}
-		Eigen::Matrix<T, 3, 1, MOpt> m_n;
-		T m_d;
-	};
+		// Degenerate triangle(s) passed to checkTriangleTriangleIntersection.
+		return false;
+	}
+
+	// Epsilon used in this function.
+	static const T EPSILON = T(Geometry::DistanceEpsilon);
 
 	// Variable names mentioned here are the notations used in the paper:
 	// T1		- Triangle with vertices (t1v0, t1v1, t1v2).
@@ -83,25 +142,27 @@ bool checkTriangleTriangleIntersection(
 	// there is no intersection.
 
 	// Check if all the vertices of T2 are on one side of p1.
-	Plane p1(t1n, -t1v0.dot(t1n));
-	T d2[3] = {t2v0.dot(p1.m_n) + p1.m_d, t2v1.dot(p1.m_n) + p1.m_d, t2v2.dot(p1.m_n) + p1.m_d};
-	if ((d2[0] <= e && d2[1] <= e && d2[2] <= e) ||
-		(d2[0] >= -e && d2[1] >= -e && d2[2] >= -e))
+	Plane<T, MOpt> p1(t1n, t1v0);
+	T d2[3] = {p1.signedDistanceFrom(t2v0), p1.signedDistanceFrom(t2v1), p1.signedDistanceFrom(t2v2)};
+
+	if ((d2[0] <= EPSILON && d2[1] <= EPSILON && d2[2] <= EPSILON) ||
+		(d2[0] >= -EPSILON && d2[1] >= -EPSILON && d2[2] >= -EPSILON))
 	{
 		return false;
 	}
 
 	// Check if all the vertices of T1 are on one side of p2.
-	Plane p2(t2n, -t2v0.dot(t2n));
-	T d1[3] = {t1v0.dot(p2.m_n) + p2.m_d, t1v1.dot(p2.m_n) + p2.m_d, t1v2.dot(p2.m_n) + p2.m_d};
-	if ((d1[0] <= e && d1[1] <= e && d1[2] <= e) ||
-		(d1[0] >= -e && d1[1] >= -e && d1[2] >= -e))
+	Plane<T, MOpt> p2(t2n, t2v0);
+	T d1[3] = {p2.signedDistanceFrom(t1v0), p2.signedDistanceFrom(t1v1), p2.signedDistanceFrom(t1v2)};
+
+	if ((d1[0] <= EPSILON && d1[1] <= EPSILON && d1[2] <= EPSILON) ||
+		(d1[0] >= -EPSILON && d1[1] >= -EPSILON && d1[2] >= -EPSILON))
 	{
 		return false;
 	}
 
 	// The separating axis.
-	Eigen::Matrix<T, 3, 1, MOpt> D = p1.m_n.cross(p2.m_n);
+	Eigen::Matrix<T, 3, 1, MOpt> D = t1n.cross(t2n);
 
 	// Projection of the triangle vertices on the separating axis.
 	T pv1[3] = {D.dot(t1v0), D.dot(t1v1), D.dot(t1v2)};
@@ -110,70 +171,19 @@ bool checkTriangleTriangleIntersection(
 	T t[3], s[3];
 	int tCount = 0, sCount = 0;
 
-	// Loop through the edges of each triangle and "clip" the edges to be on the plane of
-	// the other triangle.
+	// Loop through the edges of each triangle and find the intersectio of these edges onto
+	// the plane of the other triangle.
 	for (int i = 0; i < 3; ++i)
 	{
 		int j = (i + 1) % 3;
 
-		// First triangle.
-		if (d1[i] < -e && d1[j] >= -e)
-		{
-			// i is under p2. j is on or above p2.
-			if (d1[j] < e)
-			{
-				// j is on p2. No clipping is necessary.
-				t[tCount++] = pv1[j];
-			}
-			else
-			{
-				// j is above p2. Clip it to be on p2.
-				t[tCount++] = pv1[i] + (pv1[j] - pv1[i]) * (d1[i] / (d1[i] - d1[j]));
-			}
-		}
-		else if (d1[i] > e && d1[j] <= e)
-		{
-			// i is above p2. j is on or under p2.
-			if (d1[j] > -e)
-			{
-				// j is on p2. No clipping is necessary.
-				t[tCount++] = pv1[j];
-			}
-			else
-			{
-				// j is under p2. Clip it to be on p2.
-				t[tCount++] = pv1[i] + (pv1[j] - pv1[i]) * (d1[i] / (d1[i] - d1[j]));
-			}
-		}
-
-		// Second triangle.
-		if (d2[i] < -e && d2[j] >= -e)
-		{
-			if (d2[j] < e)
-			{
-				s[sCount++] = pv2[j];
-			}
-			else
-			{
-				s[sCount++] = pv2[i] + (pv2[j] - pv2[i]) * (d2[i] / (d2[i] - d2[j]));
-			}
-		}
-		else if (d2[i] > e && d2[j] <= e)
-		{
-			if (d2[j] > -e)
-			{
-				s[sCount++] = pv2[j];
-			}
-			else
-			{
-				s[sCount++] = pv2[i] + (pv2[j] - pv2[i]) * (d2[i] / (d2[i] - d2[j]));
-			}
-		}
+		edgeIntersection(d1[i], d1[j], pv1[i], pv1[j], t, &tCount);
+		edgeIntersection(d2[i], d2[j], pv2[i], pv2[j], s, &sCount);
 	}
 
 	SURGSIM_ASSERT(tCount == 2 && sCount == 2)
 		<< "The intersection between the triangle and the separating axis is not a line segment."
-		<< " This scenario cannot happen, at this point in the process.";
+		<< " This scenario cannot happen, at this point in the algorithm.";
 
 	// Check if (t[0], t[1]) and (s[0], s[1]) overlap.
 	return !(t[0] <= s[0] && t[0] <= s[1] && t[1] <= s[0] && t[1] <= s[1]) &&
@@ -213,4 +223,4 @@ bool checkTriangleTriangleIntersection(
 } // namespace SurgSim
 
 
-#endif // SURGSIM_MATH_TRIANGLETRIANGLEINTERSECTION_H
+#endif // SURGSIM_MATH_TRIANGLETRIANGLEINTERSECTION_INL_H

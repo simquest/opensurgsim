@@ -1504,12 +1504,115 @@ void intersectionsSegmentBox(
 }
 
 
+/// Check if the two triangles intersect using separating axis test.
+/// Algorithm is implemented from http://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tritri.pdf
+///
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param t1v0,t1v1,t1v2 Vertices of the first triangle.
+/// \param t2v0,t2v1,t2v2 Vertices of the second triangle.
+/// \param t1n Normal of the first triangle, should be normalized.
+/// \param t2n Normal of the second triangle, should be normalized.
+/// \return True, if intersection is detected.
+template <class T, int MOpt> inline
+bool checkTriangleTriangleIntersection(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t2v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t2v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t2v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t2n);
+
+/// Check if the two triangles intersect using separating axis test.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param t1v0,t1v1,t1v2 Vertices of the first triangle.
+/// \param t2v0,t2v1,t2v2 Vertices of the second triangle.
+/// \return True, if intersection is detected.
+template <class T, int MOpt> inline
+bool checkTriangleTriangleIntersection(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t2v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t2v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t2v2);
+
+/// Calculate the contact between two triangles.
+/// Algorithm presented in
+/// https://docs.google.com/a/simquest.com/document/d/11ajMD7QoTVelT2_szGPpeUEY0wHKKxW1TOgMe8k5Fsc/pub.
+/// If the triangle are known to intersect, the deepest penetration of the triangles into each other is calculated.
+/// The triangle which penetrates less into the other triangle is chosen as contact.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
+/// \param t0n Unit length normal of the first triangle, should be normalized.
+/// \param t1n Unit length normal of the second triangle, should be normalized.
+/// \param [out] depth The depth of penetration.
+/// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
+/// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
+/// \param [out] normal The contact normal that points from triangle1 to triangle0.
+/// \return True, if intersection is detected.
+/// \note The [out] params are not modified if there is no intersection.
+/// \note If penetrationPoint0 is moved by -(normal*depth*0.5) and penetrationPoint1 is moved by (normal*depth*0.5),
+/// the triangles will no longer be intersecting. penetrationPoint0/normal/depth/penetrationPoint1 are all
+/// [out] parameters.
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangle(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0n,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
+	T *depth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* normal);
+
+/// Calculate the contact between two triangles.
+/// Algorithm presented in
+/// https://docs.google.com/a/simquest.com/document/d/11ajMD7QoTVelT2_szGPpeUEY0wHKKxW1TOgMe8k5Fsc/pub.
+/// If the triangle are known to intersect, the deepest penetration of the triangles into each other is calculated.
+/// The triangle which penetrates less into the other triangle is chosen as contact.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle, should be normalized.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle, should be normalized.
+/// \param [out] depth The depth of penetration.
+/// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
+/// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
+/// \param [out] normal The contact normal that points from triangle1 to triangle0.
+/// \return True, if intersection is detected.
+/// \note The [out] params are not modified if there is no intersection.
+/// \note If penetrationPoint0 is moved by -(normal*depth*0.5) and penetrationPoint1 is moved by (normal*depth*0.5),
+/// the triangles will no longer be intersecting. penetrationPoint0/normal/depth/penetrationPoint1 are all
+/// [out] parameters.
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangle(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	T *depth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* normal);
+
+
 }; // namespace Math
 }; // namespace SurgSim
 
 
-#include "SurgSim/Math/TriangleTriangleIntersection.h"
-#include "SurgSim/Math/TriangleTriangleContactCalculation.h"
+#include "SurgSim/Math/TriangleTriangleIntersection-inl.h"
+#include "SurgSim/Math/TriangleTriangleContactCalculation-inl.h"
 
 
 #endif

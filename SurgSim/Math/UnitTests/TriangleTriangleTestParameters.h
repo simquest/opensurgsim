@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_UNITTESTS_TRIANGLETRIANGLETEST_H
-#define SURGSIM_MATH_UNITTESTS_TRIANGLETRIANGLETEST_H
+#ifndef SURGSIM_MATH_UNITTESTS_TRIANGLETRIANGLETESTPARAMETERS_H
+#define SURGSIM_MATH_UNITTESTS_TRIANGLETRIANGLETESTPARAMETERS_H
 
 
 #include "SurgSim/Math/Vector.h"
@@ -28,7 +28,7 @@ namespace Math
 {
 
 /// A base class for triangle-triangle tests, which has a preset list of test cases.
-class TriangleTriangleTest
+class TriangleTriangleTestParameters
 {
 protected:
 	typedef std::tuple<std::string,	// String to describe the scenario.
@@ -44,7 +44,7 @@ protected:
 	std::vector<TriangleTriangleTestCase> m_testCases;
 
 	/// Default constructor.
-	TriangleTriangleTest()
+	TriangleTriangleTestParameters()
 	{
 		double d = 5.0 * Geometry::DistanceEpsilon;
 		Triangle t0(Vector3d(-5, 0, 0), Vector3d(0, 10, 0), Vector3d(5, 0, 0));
@@ -241,4 +241,4 @@ protected:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_MATH_UNITTESTS_TRIANGLETRIANGLETEST_H
+#endif // SURGSIM_MATH_UNITTESTS_TRIANGLETRIANGLETESTPARAMETERS_H

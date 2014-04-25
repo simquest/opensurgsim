@@ -15,15 +15,15 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Math/TriangleTriangleIntersection.h"
-#include "SurgSim/Math/UnitTests/TriangleTriangleTest.h"
+#include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/UnitTests/TriangleTriangleTestParameters.h"
 
 namespace SurgSim
 {
 namespace Math
 {
 
-class TriangleTriangleIntersectionTest : public ::testing::Test, public TriangleTriangleTest
+class TriangleTriangleIntersectionTest : public ::testing::Test, public TriangleTriangleTestParameters
 {
 protected:
 	virtual void SetUp()
@@ -43,11 +43,14 @@ protected:
 		bool intersectionExpected = std::get<3>(data);
 
 		bool intersectionFound = false;
-		std::string traceMessage[3] = {"Normal Test",
+		std::string traceMessage[6] = {"Normal Test",
 									   "Shift t0 edges once",
-									   "Shift t0 edges twice"
+									   "Shift t0 edges twice",
+									   "Switched triangles: Normal Test",
+									   "Switched triangles: Shift t1 edges once",
+									   "Switched triangles: Shift t1 edges twise"
 									  };
-		for (int count = 0; count < 3; ++count)
+		for (int count = 0; count < 6; ++count)
 		{
 			SCOPED_TRACE(traceMessage[count]);
 
@@ -61,6 +64,15 @@ protected:
 				break;
 			case 2:
 				intersectionFound = checkTriangleTriangleIntersection(t0.v2, t0.v0, t0.v1, t1.v0, t1.v1, t1.v2);
+				break;
+			case 3:
+				intersectionFound = checkTriangleTriangleIntersection(t1.v0, t1.v1, t1.v2, t0.v0, t0.v1, t0.v2);
+				break;
+			case 4:
+				intersectionFound = checkTriangleTriangleIntersection(t1.v1, t1.v2, t1.v0, t0.v0, t0.v1, t0.v2);
+				break;
+			case 5:
+				intersectionFound = checkTriangleTriangleIntersection(t1.v2, t1.v0, t1.v1, t0.v0, t0.v1, t0.v2);
 				break;
 			}
 
