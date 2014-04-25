@@ -301,13 +301,13 @@ public:
 	/// \param state	The deformable state for initialization.
 	void addFemCubes(std::shared_ptr<DeformableRepresentationState> state)
 	{
-		for (int i = 0; i < m_numNodesPerAxis - 1; i++)
+		for (size_t i = 0; i < static_cast<size_t>(m_numNodesPerAxis - 1); i++)
 		{
-			for (int j = 0; j < m_numNodesPerAxis - 1; j++)
+			for (size_t j = 0; j < static_cast<size_t>(m_numNodesPerAxis - 1); j++)
 			{
-				for (int k = 0; k < m_numNodesPerAxis - 1; k++)
+				for (size_t k = 0; k < static_cast<size_t>(m_numNodesPerAxis - 1); k++)
 				{
-					std::array<int, 8> cubeNodeIds;
+					std::array<size_t, 8> cubeNodeIds;
 					cubeNodeIds[0] = get1DIndexFrom3D(i  , j  , k  );
 					cubeNodeIds[1] = get1DIndexFrom3D(i+1, j  , k  );
 					cubeNodeIds[2] = get1DIndexFrom3D(i  , j+1, k  );
@@ -318,8 +318,10 @@ public:
 					cubeNodeIds[7] = get1DIndexFrom3D(i+1, j+1, k+1);
 
 					std::array<unsigned int, 8> cube = {
-						cubeNodeIds[0], cubeNodeIds[1], cubeNodeIds[3], cubeNodeIds[2],
-						cubeNodeIds[4], cubeNodeIds[5], cubeNodeIds[7], cubeNodeIds[6]};
+						static_cast<unsigned int>(cubeNodeIds[0]), static_cast<unsigned int>(cubeNodeIds[1]),
+						static_cast<unsigned int>(cubeNodeIds[3]), static_cast<unsigned int>(cubeNodeIds[2]),
+						static_cast<unsigned int>(cubeNodeIds[4]), static_cast<unsigned int>(cubeNodeIds[5]),
+						static_cast<unsigned int>(cubeNodeIds[7]), static_cast<unsigned int>(cubeNodeIds[6])};
 
 					// Add FemElement3DCube for each cube
 					std::shared_ptr<FemElement3DCube> femElement = std::make_shared<FemElement3DCube>(cube, *state);
@@ -424,7 +426,6 @@ void buildConstrainedSystem(std::shared_ptr<TruthCubeRepresentation> truthCubeRe
 /// \return the vector of displacement for each dof (degree of freedom)
 SurgSim::Math::Vector staticSolver(std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation)
 {
-	int numConstraints = truthCubeRepresentation->getBoundaryConditions().size();
 	int numDof = truthCubeRepresentation->getNumDof();
 
 	// Build the constrained system A.X = B
