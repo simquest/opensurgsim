@@ -87,16 +87,6 @@ void testCreateDeviceSeveralTimes(bool doSleep)
 		// the device will be destroyed here
 	}
 }
-
-// Create a string representation from an int.
-// C++11 adds std::to_string() to do this for various types, but VS2010 only half-supports that.
-template <typename T>
-inline std::string makeString(T value)
-{
-	std::ostringstream out;
-	out << value;
-	return out.str();
-}
 };
 
 TEST(LabJackDeviceTest, CreateUninitializedDevice)
@@ -159,27 +149,6 @@ TEST(LabJackDeviceTest, CreateDevicesWithSameName)
 	std::shared_ptr<LabJackDevice> device2 = std::make_shared<LabJackDevice>("LabJack");
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
 	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate name.";
-}
-
-TEST(LabJackDeviceTest, CreateAllDevices)
-{
-	//LabJackScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::vector<std::shared_ptr<LabJackDevice>> devices;
-
-	for (int i = 1;  ;  ++i)
-	{
-		std::string name = "LabJack" + makeString(i);
-		std::shared_ptr<LabJackDevice> device = std::make_shared<LabJackDevice>(name);
-		ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-		if (!device->initialize())
-		{
-			break;
-		}
-		devices.emplace_back(std::move(device));
-	}
-
-	std::cout << devices.size() << " devices initialized." << std::endl;
-	ASSERT_GT(devices.size(), 0U) << "Initialization failed.  Is a LabJack device plugged in?";
 }
 
 TEST(LabJackDeviceTest, InputConsumer)
