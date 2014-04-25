@@ -17,100 +17,20 @@
 
 #include <string>
 
-#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Physics::Representation;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Physics::RigidCollisionRepresentation;
+using SurgSim::Physics::MockRepresentation;
 
-/// Concrete representation class for testing
-class MockRepresentation : public Representation
-{
-public:
-	/// Constructor
-	/// \name	Name of the representation
-	explicit MockRepresentation(const std::string& name) : Representation(name)
-	{
-	}
-
-	virtual SurgSim::Physics::RepresentationType getType() const
-	{
-		return SurgSim::Physics::REPRESENTATION_TYPE_FIXED;
-	}
-
-	/// Sets the initial pose
-	/// \param pose The initial pose to set the MockRepresentation to
-	void setInitialPose(const RigidTransform3d& pose)
-	{
-		m_initialPose = pose;
-	}
-
-	/// Gets the initial pose of the representation
-	/// \return The initial pose of this MockRepresentation
-	const RigidTransform3d& getInitialPose() const
-	{
-		return m_initialPose;
-	}
-
-	/// Sets the current pose of the representation
-	/// \param pose The current pose of this MockRepresentation
-	void setPose(const RigidTransform3d& pose)
-	{
-		m_currentPose = pose;
-	}
-
-	/// Returns the previous pose of the representation
-	/// \return The previous pose of this MockRepresentation
-	const RigidTransform3d& getPreviousPose() const
-	{
-		return m_previousPose;
-	}
-
-	/// Returns the final pose of the representation
-	/// \return The final pose of this MockRepresentation
-	const RigidTransform3d& getPose() const
-	{
-		return m_finalPose;
-	}
-
-	void beforeUpdate(double dt)
-	{
-		m_previousPose = m_currentPose;
-	}
-
-	void update(double dt)
-	{
-		m_currentPose.translation() += SurgSim::Math::Vector3d(1.0, 2.0, 3.0);
-	}
-
-	void afterUpdate(double dt)
-	{
-		m_finalPose = m_currentPose;
-	}
-
-	void resetState(void)
-	{
-		m_currentPose  = m_initialPose;
-		m_previousPose = m_initialPose;
-		m_finalPose    = m_initialPose;
-	}
-
-private:
-	/// Pose of the representation
-	RigidTransform3d m_initialPose;
-
-	/// Pose of the representation
-	RigidTransform3d m_previousPose;
-
-	/// Pose of the representation
-	RigidTransform3d m_currentPose;
-
-	/// Pose of the representation
-	RigidTransform3d m_finalPose;
-};
 
 TEST(RepresentationTest, ConstructorTest)
 {
@@ -138,4 +58,111 @@ TEST(RepresentationTest, SetGetAndDefaultValueTest)
 	ASSERT_FALSE(representation->isGravityEnabled());
 	representation->setIsGravityEnabled(true);
 	ASSERT_TRUE(representation->isGravityEnabled());
+}
+
+TEST(RepresentationTest, SetGetCollisionRepresentationTest)
+{
+	std::shared_ptr<Representation> physicsRepresentation = std::make_shared<MockRepresentation>("MockRepresentation");
+	auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>("CollisionRepresentatoin");
+
+	EXPECT_NO_THROW(physicsRepresentation->setCollisionRepresentation(collisionRepresentation));
+	EXPECT_EQ(collisionRepresentation, physicsRepresentation->getCollisionRepresentation());
+}
+
+TEST(RepresentationTest, SerializationTest)
+{
+	{
+		SCOPED_TRACE("Encode instance, decoded as shared_ptr<>");
+		std::shared_ptr<Representation> representation = std::make_shared<MockRepresentation>("MockRepresentation");
+		size_t numDof = 1;
+		representation->setValue("NumDof", numDof);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*representation));
+		EXPECT_TRUE(node.IsMap());
+		EXPECT_EQ(1u, node.size());
+
+		YAML::Node data = node["SurgSim::Physics::MockRepresentation"];
+		EXPECT_EQ(7u, data.size());
+
+		std::shared_ptr<MockRepresentation> newRepresentation;
+		ASSERT_NO_THROW(newRepresentation =
+			std::dynamic_pointer_cast<MockRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+
+		EXPECT_EQ(representation->getName(), newRepresentation->getName());
+		EXPECT_EQ("SurgSim::Physics::MockRepresentation", newRepresentation->getClassName());
+		EXPECT_EQ(true, newRepresentation->isActive());
+		EXPECT_EQ(true, newRepresentation->isGravityEnabled());
+		EXPECT_EQ(1u, newRepresentation->getValue<size_t>("NumDof"));
+	}
+
+	{
+		SCOPED_TRACE("Encode shared_ptr<>, decoded as shared_ptr<>");
+		std::shared_ptr<Representation> representation = std::make_shared<MockRepresentation>("MockRepresentation");
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(representation));
+		EXPECT_TRUE(node.IsMap());
+		EXPECT_EQ(1u, node.size());
+
+		YAML::Node data = node["SurgSim::Physics::MockRepresentation"];
+		EXPECT_EQ(2u, data.size());
+
+		std::shared_ptr<MockRepresentation> newRepresentation;
+		ASSERT_NO_THROW(newRepresentation =
+			std::dynamic_pointer_cast<MockRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+
+		EXPECT_NE(nullptr, newRepresentation);
+	}
+
+	{
+		SCOPED_TRACE("Test serialization for accesible boolean properties");
+		std::shared_ptr<Representation> representation = std::make_shared<MockRepresentation>("MockRepresentation");
+		std::shared_ptr<Representation> representation2 = std::make_shared<MockRepresentation>("MockRepresentation2");
+		std::shared_ptr<Representation> representation3 = std::make_shared<MockRepresentation>("MockRepresentation3");
+		std::shared_ptr<Representation> representation4 = std::make_shared<MockRepresentation>("MockRepresentation4");
+
+		representation2->setValue("IsActive", false);
+
+		representation3->setValue("IsGravityEnabled", false);
+
+		representation4->setValue("IsActive", false);
+		representation4->setValue("IsGravityEnabled", false);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node.push_back(YAML::convert<SurgSim::Framework::Component>::encode(*representation)));
+		ASSERT_NO_THROW(node.push_back(YAML::convert<SurgSim::Framework::Component>::encode(*representation2)));
+		ASSERT_NO_THROW(node.push_back(YAML::convert<SurgSim::Framework::Component>::encode(*representation3)));
+		ASSERT_NO_THROW(node.push_back(YAML::convert<SurgSim::Framework::Component>::encode(*representation4)));
+
+		std::shared_ptr<MockRepresentation> newRepresentation;
+		ASSERT_NO_THROW(newRepresentation =
+		  std::dynamic_pointer_cast<MockRepresentation>(node[0].as<std::shared_ptr<SurgSim::Framework::Component>>()));
+		std::shared_ptr<MockRepresentation> newRepresentation2;
+		ASSERT_NO_THROW(newRepresentation2 =
+		  std::dynamic_pointer_cast<MockRepresentation>(node[1].as<std::shared_ptr<SurgSim::Framework::Component>>()));
+		std::shared_ptr<MockRepresentation> newRepresentation3;
+		ASSERT_NO_THROW(newRepresentation3 =
+		  std::dynamic_pointer_cast<MockRepresentation>(node[2].as<std::shared_ptr<SurgSim::Framework::Component>>()));
+		std::shared_ptr<MockRepresentation> newRepresentation4;
+		ASSERT_NO_THROW(newRepresentation4 =
+		  std::dynamic_pointer_cast<MockRepresentation>(node[3].as<std::shared_ptr<SurgSim::Framework::Component>>()));
+
+		EXPECT_EQ(representation->getName(), newRepresentation->getName());
+		EXPECT_EQ(representation2->getName(), newRepresentation2->getName());
+		EXPECT_EQ(representation3->getName(), newRepresentation3->getName());
+		EXPECT_EQ(representation4->getName(), newRepresentation4->getName());
+
+		EXPECT_EQ(true, newRepresentation->isActive());
+		EXPECT_EQ(true, newRepresentation->isGravityEnabled());
+
+		EXPECT_EQ(false, newRepresentation2->isActive());
+		EXPECT_EQ(true, newRepresentation2->isGravityEnabled());
+
+		EXPECT_EQ(true, newRepresentation3->isActive());
+		EXPECT_EQ(false, newRepresentation3->isGravityEnabled());
+
+		EXPECT_EQ(false, newRepresentation4->isActive());
+		EXPECT_EQ(false, newRepresentation4->isGravityEnabled());
+	}
 }
