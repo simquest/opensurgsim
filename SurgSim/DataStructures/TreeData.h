@@ -36,20 +36,25 @@ public:
 	/// Destructor
 	virtual ~TreeData();
 
-	/// Returns true if the data are equal; otherwise, returns false.
 	/// If the data are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const TreeData&).
+	/// \param data Other TreeData for comparison.
+	/// \return true if the data are equal; otherwise, returns false.
 	bool operator==(const TreeData& data) const;
 
 	/// Returns true if the data are not equal; otherwise, returns false.
 	/// If the data are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const TreeData&).
+	/// \param data Other TreeData for comparison.
+	/// \return true if the data are equal; otherwise, returns false.
 	bool operator!=(const TreeData& data) const;
 
 private:
 
 	/// Returns true if the trees are equal; otherwise, returns false.
 	/// Implement this method in derived classes to do the comparison.
+	/// \param data Other TreeData for comparison.
+	/// \return true if the data are equal; otherwise, returns false.
 	virtual bool isEqual(const TreeData* data) const = 0;
 };
 

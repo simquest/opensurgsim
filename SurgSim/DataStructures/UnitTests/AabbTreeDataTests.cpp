@@ -117,7 +117,7 @@ TEST(AabbTreeDataTests, SimpleSplitTest)
 	Aabbd expectedRight(Vector3d(5.0, -1.0, -1.0), Vector3d(12.0, 1.0, 1.0));
 
 	EXPECT_TRUE(original.isApprox(data.getAabb())) << original << ", " << data.getAabb();
-	std::shared_ptr<AabbTreeData> ptr = data.split();
+	std::shared_ptr<AabbTreeData> ptr = data.takeLargerElements();
 
 	EXPECT_EQ(5u, data.getSize());
 	EXPECT_TRUE(expectedLeft.isApprox(data.getAabb())) << expectedLeft << ", " << data.getAabb();

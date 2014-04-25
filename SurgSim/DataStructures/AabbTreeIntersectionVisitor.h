@@ -46,7 +46,7 @@ public:
 	virtual bool handle(AabbTreeNode* node) override;
 
 	/// \return true if the visitor has found intersections
-	bool hasIntersections();
+	bool hasIntersections() const;
 
 	/// Resets the data in the tree
 	void reset();

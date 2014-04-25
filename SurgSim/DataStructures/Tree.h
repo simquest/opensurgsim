@@ -45,20 +45,23 @@ public:
 	/// \return The root of the tree.
 	std::shared_ptr<TreeNode> getRoot();
 
-	/// Returns true if the trees are equal; otherwise, returns false.
 	/// If the trees are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const Tree&).
+	/// \param tree Other tree for comparison.
+	/// \return true if the trees are equal; otherwise, returns false.
 	bool operator==(const Tree& tree) const;
 
-	/// Returns true if the trees are not equal; otherwise, returns false.
 	/// If the trees are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const Tree&).
+	/// \param tree Other tree for comparison.
+	/// \return true if the trees are not equal; otherwise, returns false.
 	bool operator!=(const Tree& tree) const;
 
 protected:
-	/// Returns true if the trees are equal; otherwise, returns false.
 	/// Recurses through the tree, starting at the root.
 	/// Override this method in derived classes to implement different comparisons.
+	/// \param tree Other tree for comparison.
+	/// \return true if the trees are equal; otherwise, returns false.
 	virtual bool isEqual(const Tree& tree) const;
 
 private:

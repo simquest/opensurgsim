@@ -55,7 +55,7 @@ public:
 	/// \param objectId Id for the object to be identified with this bounding box
 	void add(const SurgSim::Math::Aabbd& aabb, size_t objectId);
 
-	SurgSim::Math::Aabbd getAabb();
+	const SurgSim::Math::Aabbd& getAabb() const;
 
 private:
 

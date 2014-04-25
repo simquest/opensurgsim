@@ -87,7 +87,7 @@ const std::list<size_t>& AabbTreeIntersectionVisitor::getIntersections() const
 	return m_intersections;
 }
 
-bool AabbTreeIntersectionVisitor::hasIntersections()
+bool AabbTreeIntersectionVisitor::hasIntersections() const
 {
 	return !m_intersections.empty();
 }

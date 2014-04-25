@@ -38,12 +38,15 @@ public:
 
 	}
 
-	/// Handle TreeNode basic type,
+	/// Handle TreeNode basic type.
+	/// \param node Node to process.
 	/// \return true To indicates that the visitor wishes to continue traversal, false if the visitor wants
 	///              to abort traversal.
 	virtual bool handle(TreeNode* node) = 0;
 
-	/// Handle AabbTreeNode basic type
+	/// Handle AabbTreeNode basic type, default body, override for specific work.
+	/// \param node Node to process.
+	/// \return true to continue traversal, false to abort.
 	virtual bool handle(AabbTreeNode* node)
 	{
 		return false;

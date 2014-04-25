@@ -37,7 +37,7 @@ void AabbTreeNode::splitNode()
 	auto leftData = std::static_pointer_cast<AabbTreeData>(getData());
 	if (leftData->getSize() > 0)
 	{
-		std::shared_ptr<AabbTreeData> rightData = leftData->split();
+		std::shared_ptr<AabbTreeData> rightData = leftData->takeLargerElements();
 		if (getNumChildren() != 2)
 		{
 			std::shared_ptr<TreeNode> child = std::make_shared<AabbTreeNode>();
@@ -106,6 +106,7 @@ bool AabbTreeNode::doAccept(TreeVisitor* visitor)
 void AabbTreeNode::getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result)
 {
 	auto data = std::static_pointer_cast<AabbTreeData>(getData());
+	SURGSIM_ASSERT(data != nullptr) << "AabbTreeNode data is nullptr.";
 	data->getIntersections(aabb, result);
 }
 

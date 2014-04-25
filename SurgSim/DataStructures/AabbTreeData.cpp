@@ -82,7 +82,7 @@ size_t AabbTreeData::getSize() const
 	return m_data.size();
 }
 
-std::shared_ptr<AabbTreeData> AabbTreeData::split()
+std::shared_ptr<AabbTreeData> AabbTreeData::takeLargerElements()
 {
 	std::shared_ptr<AabbTreeData> result(std::make_shared<AabbTreeData>());
 

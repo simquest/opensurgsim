@@ -65,7 +65,7 @@ public:
 	/// the split occurs. This object will keep items that have a smaller coordinate than the center, the result will
 	/// receive all items that have a larger coordinate on the determined axis.
 	/// \return AabbTreeData with the items to the right of the center of the longest axis.
-	std::shared_ptr<AabbTreeData> split();
+	std::shared_ptr<AabbTreeData> takeLargerElements();
 
 	/// Check whether there could be any intersections with a given bounding box.
 	/// \param aabb bounding box to use for the intersection check.

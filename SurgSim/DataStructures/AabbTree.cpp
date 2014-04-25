@@ -52,7 +52,7 @@ size_t AabbTree::getMaxObjectsPerNode() const
 	return m_maxObjectsPerNode;
 }
 
-SurgSim::Math::Aabbd AabbTree::getAabb()
+const SurgSim::Math::Aabbd& AabbTree::getAabb() const
 {
 	return m_typedRoot->getAabb();
 }
