@@ -56,7 +56,7 @@ public:
 	friend class ReadAccessor<T>;
 
 	/// Destructor
-	~BufferedValue() {};
+	~BufferedValue() {}
 
 protected:
 
@@ -125,7 +125,7 @@ class BaseAccessor
 {
 public:
 
-	BaseAccessor(std::shared_ptr<BufferedValue<T>> value) :
+	explicit BaseAccessor(std::shared_ptr<BufferedValue<T>> value) :
 		m_value(value)
 	{
 	}
@@ -181,7 +181,7 @@ template <class T>
 class ReadAccessor : public BaseAccessor<T>
 {
 public:
-	ReadAccessor(std::shared_ptr<BufferedValue<T>> value);
+	explicit ReadAccessor(std::shared_ptr<BufferedValue<T>> value);
 
 	/// Overloaded operator for easier access
 	/// \return internal pointer to const data.

@@ -1278,7 +1278,7 @@ T distanceSegmentTriangle(
 	{
 		dstPtTri1 = std::numeric_limits<T>::max();
 	}
-	
+
 	int minIndex;
 	Eigen::Matrix<double, 5, 1> distances;
 	(distances << dst01, dst02, dst12, dstPtTri0, dstPtTri1).finished().minCoeff(&minIndex);
