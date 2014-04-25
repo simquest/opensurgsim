@@ -11,7 +11,7 @@
 # Attempt to define LABJACK_INCLUDE_DIR if undefined
 find_path(LABJACK_INCLUDE_DIR
 	NAMES LabJackUD.h labjackusb.h
-	PATHS "$ENV{LABJACK_SDK}" "/usr/local"
+	PATHS "$ENV{LABJACK_SDK}" "/usr/local" "/usr"
 	PATH_SUFFIXES "include"
 	NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 )
@@ -22,7 +22,7 @@ endif(LABJACK_INCLUDE_DIR)
 
 find_library(LABJACK_LIBRARY
 	NAMES LabJackUD labjackusb
-	HINTS ${LABJACK_ROOT_DIR} "/usr/local/lib"
+	HINTS ${LABJACK_ROOT_DIR} "/usr/local/lib" "/usr/lib"
 	NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 )
 mark_as_advanced(LABJACK_LIBRARY)
