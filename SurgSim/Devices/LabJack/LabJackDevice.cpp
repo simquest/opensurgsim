@@ -108,7 +108,7 @@ const std::string& LabJackDevice::getAddress() const
 	return m_address;
 }
 
-void LabJackDevice::setDigitalInputChannels(const std::unordered_set<int> digitalInputChannels)
+void LabJackDevice::setDigitalInputChannels(const std::unordered_set<int>& digitalInputChannels)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Digital inputs cannot be set for a LabJackDevice after it is initialized.";
 	m_digitalInputChannels = digitalInputChannels;
@@ -119,7 +119,7 @@ const std::unordered_set<int>& LabJackDevice::getDigitalInputChannels() const
 	return m_digitalInputChannels;
 }
 
-void LabJackDevice::setDigitalOutputChannels(const std::unordered_set<int> digitalOutputChannels)
+void LabJackDevice::setDigitalOutputChannels(const std::unordered_set<int>& digitalOutputChannels)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Digital outputs cannot be set for a LabJackDevice after it is initialized.";
 	m_digitalOutputChannels = digitalOutputChannels;

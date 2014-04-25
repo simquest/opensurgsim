@@ -95,11 +95,11 @@ enum LabJackTimerMode
 /// The custom data type used for the input values from the LabJack.  The key is the line/timer/counter number.
 /// The high-level driver (LabJackUD) returns the value as a double, while the low-level driver returns a signed
 /// integer in 4 bytes.  To avoid the difficulty of cross-platform fixed-size integers, we store the value in a double.
-typedef std::unordered_map<int,double> LabJackInputValuesType;
+typedef std::unordered_map<int, double> LabJackInputValuesType;
 
 /// The custom data type used for the digital and timer output values to the LabJack.  The value type must hold at
 /// least 16 bits.  The key is the line/timer/counter number.
-typedef std::unordered_map<int,int> LabJackDigitalOutputValuesType;
+typedef std::unordered_map<int, int> LabJackDigitalOutputValuesType;
 
 /// A class implementing the communication with a LabJack data acquisition (DAQ) device.  Should work for the U3, U6,
 /// and U9 models at least. See the manual(s) for your LabJack device(s) to understand the input and output data, the
@@ -159,7 +159,7 @@ public:
 	/// \return The connection type of the LabJack, e.g., USB.
 	LabJackConnection getConnection() const;
 
-	/// Set the address the LabJack, e.g., "1" or "192.168.7.23".  If the address is zero-length, attempt to open the
+	/// Set the address of the LabJack, e.g., "1" or "192.168.7.23".  If the address is zero-length, attempt to open the
 	/// first-found device of the specified type on the specified connection.
 	/// \param address The address for the device, or a zero-length string.
 	/// \exception Asserts if already initialized.
@@ -171,7 +171,7 @@ public:
 	/// Enable digital input lines.
 	/// \param digitalInputChannels The set of channel numbers.
 	/// \exception Asserts if already initialized.
-	void setDigitalInputChannels(const std::unordered_set<int> digitalInputChannels);
+	void setDigitalInputChannels(const std::unordered_set<int>& digitalInputChannels);
 
 	/// \return The enabled digital input lines.
 	const std::unordered_set<int>& getDigitalInputChannels() const;
@@ -179,7 +179,7 @@ public:
 	/// Enable digital output lines.
 	/// \param digitalOutputChannels The set of channel numbers.
 	/// \exception Asserts if already initialized.
-	void setDigitalOutputChannels(const std::unordered_set<int> digitalOutputChannels);
+	void setDigitalOutputChannels(const std::unordered_set<int>& digitalOutputChannels);
 
 	/// \return The enabled digital output lines.
 	const std::unordered_set<int>& getDigitalOutputChannels() const;
@@ -217,10 +217,10 @@ public:
 	/// \param timers A map from the index of the timer (not the line number, see setTimerCounterPinOffset) to the
 	///		type of timer to enable.
 	/// \exception Asserts if already initialized.
-	void setTimers(const std::unordered_map<int,LabJackTimerMode>& timers);
+	void setTimers(const std::unordered_map<int, LabJackTimerMode>& timers);
 
 	/// \return The enabled timers.
-	const std::unordered_map<int,LabJackTimerMode>& getTimers() const;
+	const std::unordered_map<int, LabJackTimerMode>& getTimers() const;
 
 	/// Set the maximum update rate for the LabJackThread.  Since the device driver blocks thread execution
 	/// while acquiring new data, update rates have a definite upper-bound that is dependent on the requested
@@ -268,7 +268,7 @@ private:
 	int m_timerCounterPinOffset;
 
 	/// A map from the timers' line numbers to their modes.
-	std::unordered_map<int,LabJackTimerMode> m_timers;
+	std::unordered_map<int, LabJackTimerMode> m_timers;
 
 	/// The maximum update rate for the LabJackThread.
 	double m_threadRate;
