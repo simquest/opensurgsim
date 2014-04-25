@@ -16,6 +16,7 @@
 #include "SurgSim/Devices/LabJack/LabJackScaffold.h"
 
 #include <algorithm>
+#include <array>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 #include <errno.h>
@@ -23,6 +24,8 @@
 #include <list>
 #include <memory>
 #include <stdint.h> // fixed-width integer types are used for low-level data communication
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "SurgSim/DataStructures/DataGroup.h"
@@ -39,6 +42,9 @@ namespace Device
 
 namespace
 {
+/// The maximum size of a read or write buffer for labjackusb driver.
+static const int MAX_BUFFER = 64;
+
 /// Distinguish the name of the hardware library's handle from our wrapper with a prefix.
 typedef HANDLE LJ_HANDLE;
 
@@ -50,7 +56,7 @@ static const LJ_HANDLE LABJACK_INVALID_HANDLE = NULL;
 /// \param bytes The buffer of bytes.
 /// \param count The number of bytes to check.
 /// \return The checksum byte.
-BYTE normalChecksum8(const BYTE* bytes, int count)
+BYTE normalChecksum8(const std::array<BYTE, MAX_BUFFER>& bytes, int count)
 {
 	uint16_t accumulator;
 
@@ -74,7 +80,7 @@ BYTE normalChecksum8(const BYTE* bytes, int count)
 /// \param bytes The buffer of bytes.
 /// \param count The number of bytes to check.
 /// \return The checksum byte.
-uint16_t extendedChecksum16(const BYTE* bytes, int count)
+uint16_t extendedChecksum16(const std::array<BYTE, MAX_BUFFER>& bytes, int count)
 {
 	int accumulator = 0;
 
@@ -91,7 +97,7 @@ uint16_t extendedChecksum16(const BYTE* bytes, int count)
 /// low-level LabJack driver.
 /// \param bytes The buffer of bytes.
 /// \return The checksum byte.
-BYTE extendedChecksum8(const BYTE* bytes)
+BYTE extendedChecksum8(const std::array<BYTE, MAX_BUFFER>& bytes)
 {
 	int accumulator = 0;
 
@@ -113,34 +119,41 @@ BYTE extendedChecksum8(const BYTE* bytes)
 /// low-level LabJack driver, and stores the result in the buffer.
 /// \param [in,out] bytes The buffer of bytes.
 /// \param count The number of bytes to check.
-void normalChecksum(BYTE* bytes, int count)
+void normalChecksum(std::array<BYTE, MAX_BUFFER>* bytes, int count)
 {
-	bytes[0] = normalChecksum8(bytes, count);
+	(*bytes)[0] = normalChecksum8(*bytes, count);
 }
 
 /// Performs the 1's complement unsigned checksums required for extended command communication with the
 /// low-level LabJack driver, and stores the results in the buffer.
 /// \param [in,out] bytes The buffer of bytes.
 /// \param count The number of bytes to check.
-void extendedChecksum(BYTE* bytes, int count)
+void extendedChecksum(std::array<BYTE, MAX_BUFFER>* bytes, int count)
 {
-	uint16_t accumulator = extendedChecksum16(bytes, count);
-	bytes[4] = static_cast<BYTE>(accumulator & 0xff);
-	bytes[5] = static_cast<BYTE>((accumulator / 256) & 0xff);
-	bytes[0] = extendedChecksum8(bytes);
+	uint16_t accumulator = extendedChecksum16(*bytes, count);
+	(*bytes)[4] = static_cast<BYTE>(accumulator & 0xff);
+	(*bytes)[5] = static_cast<BYTE>((accumulator / 256) & 0xff);
+	(*bytes)[0] = extendedChecksum8(*bytes);
 }
+
+/// A struct containing the default settings that depend on the type of LabJack.
+struct LabJackDefaults
+{
+	LabJackDefaults()
+	{
+		timerBase[LabJackType::LABJACKTYPE_U3] = LabJackTimerBase::LABJACKTIMERBASE_2;
+		timerBase[LabJackType::LABJACKTYPE_U6] = LabJackTimerBase::LABJACKTIMERBASE_2;
+		timerBase[LabJackType::LABJACKTYPE_UE9] = LabJackTimerBase::LABJACKTIMERBASE_1;
+	}
+
+	/// The default timer base rate.
+	std::unordered_map<LabJackType, LabJackTimerBase, std::hash<int>> timerBase;
+};
 };
 
 class LabJackScaffold::Handle
 {
 public:
-	/// Default constructor.
-	Handle() :
-		m_deviceHandle(LABJACK_INVALID_HANDLE),
-		m_scaffold(LabJackScaffold::getOrCreateSharedInstance())
-	{
-	}
-
 	/// Constructor that attempts to open a device.
 	/// \param deviceType The type of LabJack device to open (see strings in LabJackUD.h).
 	/// \param connectionType How to connect to the device (e.g., USB) (see strings in LabJackUD.h).
@@ -258,7 +271,7 @@ private:
 	Handle(const Handle&) /*= delete*/;
 	Handle& operator=(const Handle&) /*= delete*/;
 
-	/// The HDAL device handle (or LABJACK_INVALID_HANDLE if not valid).
+	/// The exodriver device handle (or LABJACK_INVALID_HANDLE if not valid).
 	LJ_HANDLE m_deviceHandle;
 	/// The address used to open the device.  Can be the empty string if the first-found device was opened.
 	std::string m_address;
@@ -433,15 +446,15 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 		// Create a handle, opening communications.
 		// If the device's type is SEARCH, iterate over the options.
 		std::vector<LabJackType> typesToSearch;
-		if (device->getType() != LABJACKTYPE_SEARCH)
+		if (device->getType() == LABJACKTYPE_SEARCH)
 		{
-			typesToSearch.push_back(device->getType());
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": searching for types U3 and U6.";
+			typesToSearch.push_back(LABJACKTYPE_U6);
+			typesToSearch.push_back(LABJACKTYPE_U3);
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": searching for type.";
-			typesToSearch.push_back(LABJACKTYPE_U6);
-			typesToSearch.push_back(LABJACKTYPE_U3);
+			typesToSearch.push_back(device->getType());
 		}
 
 		// If the device's connection is search, set it to USB since that is all we currently support for the
@@ -540,7 +553,12 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	bool result = true;
 
 	// Use one Feedback command for all the digital/timer inputs and outputs.
-	BYTE sendBytes[64]; // Feedback commands send a max of 64 bytes.
+	// According to the Users Guide, the Feedback command has a max size of 64 bytes.  With 7 command bytes, a max of
+	// 4 timers (4 bytes each), and 2 bytes per digital input/output, the user would have to read/write 21+ digital
+	// channels to trigger this assertion.  That setup is not possible on the U6 or U3, but to be safe the
+	// std::array::at function is used for any access to a non-constant index, and will throw an out_of_range exception
+	// if the index is too large.
+	std::array<BYTE, MAX_BUFFER> sendBytes;
 	sendBytes[1] = 0xF8;  //Command byte, Feedback
 	sendBytes[3] = 0x00;  //Extended command number
 
@@ -553,8 +571,8 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	const std::unordered_set<int>& digitalInputChannels = device->getDigitalInputChannels();
 	for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 	{
-		sendBytes[sendBytesSize++] = 10;  //IOType, BitStateRead
-		sendBytes[sendBytesSize++] = *input;  //Bits 0-4: IO Number
+		sendBytes.at(sendBytesSize++) = 10;  //IOType, BitStateRead
+		sendBytes.at(sendBytesSize++) = *input;  //Bits 0-4: IO Number
 		++readBytesSize;
 	}
 
@@ -567,8 +585,8 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		if (digitalOutputs.count(*output) > 0)
 		{
 			const BYTE value = digitalOutputs.at(*output);
-			sendBytes[sendBytesSize++] = 11;  //IOType, BitStateWrite
-			sendBytes[sendBytesSize++] = (*output) + 128 * value;  //Bits 0-4: IO Number, Bit 7: State
+			sendBytes.at(sendBytesSize++) = 11;  //IOType, BitStateWrite
+			sendBytes.at(sendBytesSize++) = (*output) + 128 * value;  //Bits 0-4: IO Number, Bit 7: State
 		}
 	}
 
@@ -577,10 +595,10 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	outputData.customData().get(SurgSim::DataStructures::Names::TIMER_OUTPUTS, &timerOutputs);
 	for (auto timer = timerOutputs.cbegin(); timer != timerOutputs.cend(); ++timer)
 	{
-		sendBytes[sendBytesSize++] = 42 + 2 * timer->first;  //IOType, Timer#
-		sendBytes[sendBytesSize++] = 1;  //Bit 0: UpdateReset
-		sendBytes[sendBytesSize++] = timer->second & 255;  //LSB
-		sendBytes[sendBytesSize++] = (timer->second & 65280) / 256;  //MSB
+		sendBytes.at(sendBytesSize++) = 42 + 2 * timer->first;  //IOType, Timer#
+		sendBytes.at(sendBytesSize++) = 1;  //Bit 0: UpdateReset
+		sendBytes.at(sendBytesSize++) = timer->second & 255;  //LSB
+		sendBytes.at(sendBytesSize++) = (timer->second & 65280) / 256;  //MSB
 		readBytesSize += 4;
 	}
 
@@ -591,10 +609,10 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		// If we write to a timer, the response to that write will have the timer value so we don't need to request it.
 		if (timerOutputs.count(*timer) == 0)
 		{
-			sendBytes[sendBytesSize++] = 42 + 2 * (*timer);  //IOType, Timer#
-			sendBytes[sendBytesSize++] = 0;  //Bit 0: UpdateReset
-			sendBytes[sendBytesSize++] = 0;  //LSB
-			sendBytes[sendBytesSize++] = 0;  //MSB
+			sendBytes.at(sendBytesSize++) = 42 + 2 * (*timer);  //IOType, Timer#
+			sendBytes.at(sendBytesSize++) = 0;  //Bit 0: UpdateReset
+			sendBytes.at(sendBytesSize++) = 0;  //LSB
+			sendBytes.at(sendBytesSize++) = 0;  //MSB
 			readBytesSize += 4;
 		}
 	}
@@ -603,18 +621,8 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	// Must send an even number of bytes.
 	if (sendBytesSize % 2 == 1)
 	{
-		sendBytes[sendBytesSize++] = 0;
+		sendBytes.at(sendBytesSize++) = 0;
 	}
-
-	// According to the Users Guide, the Feedback command has a max size of 64 bytes.  With 7 command bytes, a max of
-	// 4 timers (4 bytes each), and 2 bytes per digital input/output, the user would have to read/write 21+ digital
-	// channels to trigger this assertion.  That setup is not possible on the U6 or U3 so this assertion is actually
-	// checking for incorrect configuration/datagroups.
-	SURGSIM_ASSERT(sendBytesSize <= 64) << "LabJackScaffold: Failed to update device named '" << device->getName() <<
-		"', and caused out-of-bounds memory access." << std::endl <<
-		"  The low-level LabJack communication function 'Feedback' has a max Write size of 64 bytes. " <<
-		"The current configuration and output DataGroup would cause a size of " << sendBytesSize << " bytes." <<
-		std::endl;
 
 	// Must read an even number of bytes
 	if (readBytesSize % 2 == 1)
@@ -622,13 +630,16 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		++readBytesSize;
 	}
 
+	// According to the Users Guide, the Feedback command has a max Response/Read size of 64 bytes.
 	// Most IOTypes Read no more bytes than they Write, including the digital input/output and timers currently
-	// supported, but some IOTypes do Read more than they Write.  According to the Users Guide, the Feedback command's
-	// max Read buffer is 64 bytes.
-	if (readBytesSize > 64)
+	// supported, but some IOTypes do Read more than they Write. Thus, this assertion should never be triggered, and
+	// to make sure the access indices into the buffer are being correctly calculated, the std::array::at function is
+	// used for any access to a non-constant index, and will throw an out_of_range exception if the index is too large.
+	if (readBytesSize > MAX_BUFFER)
 	{
 		SURGSIM_LOG_SEVERE(m_logger) << "Failed to update device named '" << device->getName() <<
-		"'. The low-level LabJack communication function 'Feedback' has a max Response size of 64 bytes. " <<
+		"'. The low-level LabJack communication function 'Feedback' has a max Response size of " <<
+		std::to_string(MAX_BUFFER) << " bytes. " <<
 		"The current configuration and output DataGroup would cause a size of " << readBytesSize << " bytes." <<
 		std::endl;
 		result = false;
@@ -639,9 +650,9 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		const BYTE sendCommandBytes = 6;
 		const BYTE dataWords = (sendBytesSize - sendCommandBytes) / 2;
 		sendBytes[2] = dataWords;
-		extendedChecksum(sendBytes, sendBytesSize);
+		extendedChecksum(&sendBytes, sendBytesSize);
 
-		const int sent = LJUSB_Write(rawHandle, sendBytes, sendBytesSize);
+		const int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
 		if (sent < sendBytesSize)
 		{
@@ -655,14 +666,14 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	}
 
 	const BYTE readCommandBytes = 6;
-	BYTE readBytes[64]; // Feedback commands respond with a max of 64 bytes
+	std::array<BYTE, MAX_BUFFER> readBytes; // Feedback commands respond with a max of 64 bytes
 
 	// Read the response for the feedback command.
 	if (result)
 	{
 		const BYTE dataWords = (readBytesSize - readCommandBytes) / 2;
 
-		const int read = LJUSB_Read(rawHandle, readBytes, readBytesSize);
+		const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
 		const uint16_t checksumTotal = extendedChecksum16(readBytes, readBytesSize);
 		if (read < readBytesSize)
 		{
@@ -724,7 +735,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		LabJackInputValuesType digitalInputs;
 		for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 		{
-			digitalInputs[*input] = readBytes[currentByte++];
+			digitalInputs[*input] = readBytes.at(currentByte++);
 		}
 		inputData.customData().set(SurgSim::DataStructures::Names::DIGITAL_INPUTS, digitalInputs);
 
@@ -733,13 +744,13 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		for (auto timer = timerOutputs.cbegin(); timer != timerOutputs.cend(); ++timer)
 		{
 			// Collect the 4 bytes into a single variable.
-			uint32_t value = readBytes[currentByte + 3];
+			uint32_t value = readBytes.at(currentByte + 3);
 			value = value << 8;
-			value += readBytes[currentByte + 2];
+			value += readBytes.at(currentByte + 2);
 			value = value << 8;
-			value += readBytes[currentByte + 1];
+			value += readBytes.at(currentByte + 1);
 			value = value << 8;
-			value += readBytes[currentByte];
+			value += readBytes.at(currentByte);
 			currentByte += 4;
 			// Interpret the value as signed.
 			timerInputs[timer->first] = *(reinterpret_cast<int32_t*>(&value));
@@ -748,13 +759,13 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		for (auto timer = timerInputChannels.cbegin(); timer != timerInputChannels.cend(); ++timer)
 		{
 			// Collect the 4 bytes into a single variable.
-			uint32_t value = readBytes[currentByte + 3];
+			uint32_t value = readBytes.at(currentByte + 3);
 			value = value << 8;
-			value += readBytes[currentByte + 2];
+			value += readBytes.at(currentByte + 2);
 			value = value << 8;
-			value += readBytes[currentByte + 1];
+			value += readBytes.at(currentByte + 1);
 			value = value << 8;
-			value += readBytes[currentByte];
+			value += readBytes.at(currentByte);
 			currentByte += 4;
 			// Interpret the value as signed.
 			timerInputs[*timer] = *(reinterpret_cast<int32_t*>(&value));
@@ -808,12 +819,12 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
 	// The longest write here is the Feedback command, which can send a max of 64 bytes.
-	BYTE sendBytes[64];
+	std::array<BYTE, MAX_BUFFER> sendBytes;
 	// The longest read here is the Feedback command, which can send a max of 64 bytes.
-	BYTE readBytes[64];
+	std::array<BYTE, MAX_BUFFER> readBytes;
 
 	// One-time configuration of counters and timers.
-	const std::unordered_map<int,LabJackTimerMode> timers = device->getTimers();
+	const std::unordered_map<int, LabJackTimerMode> timers = device->getTimers();
 	const BYTE numberOfTimers = timers.size();
 	const BYTE counterEnable = 0; // Counters are not currently supported.
 	const BYTE pinOffset = device->getTimerCounterPinOffset();
@@ -834,9 +845,9 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 	{
 		sendBytes[i] = 0;  //Reserved
 	}
-	extendedChecksum(sendBytes, 16);
+	extendedChecksum(&sendBytes, 16);
 
-	int sent = LJUSB_Write(rawHandle, sendBytes, sendBytesSize);
+	int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
 	if (sent < sendBytesSize)
 	{
@@ -850,7 +861,7 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 	if (result)
 	{
 		const int readBytesSize = 16; // timerCounterConfig replies with 16 bytes.
-		const int read = LJUSB_Read(rawHandle, readBytes, readBytesSize);
+		const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
 		const uint16_t checksumTotal = extendedChecksum16(readBytes, readBytesSize);
 		if (read < readBytesSize)
 		{
@@ -896,12 +907,8 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 		LabJackTimerBase base = device->getTimerBase();
 		if (base == LABJACKTIMERBASE_DEFAULT)
 		{
-			// U3 and U6 default to 48 MHz, which is value 2 for the low-level driver.
-			base = LABJACKTIMERBASE_2;
-			if (device->getType() == LABJACKTYPE_UE9)
-			{
-				base = LABJACKTIMERBASE_1; // UE9 defaults to 48 MHz, value 1.
-			}
+			LabJackDefaults defaults;
+			base = defaults.timerBase[device->getType()];
 		}
 
 		// Second, set the clock base and divisor
@@ -931,9 +938,9 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 		sendBytes[9] = divisor;  //TimerClockDivisor
 
 		sendBytesSize = 10; // ConfigTimerClock sends 10 bytes
-		extendedChecksum(sendBytes, sendBytesSize);
+		extendedChecksum(&sendBytes, sendBytesSize);
 
-		sent = LJUSB_Write(rawHandle, sendBytes, sendBytesSize);
+		sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
 		if (sent < sendBytesSize)
 		{
@@ -949,7 +956,7 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 		{
 			// Read the response for the clock configuration.
 			const int readBytesSize = 10; // ConfigTimerClock replies with 10 bytes.
-			const int read = LJUSB_Read(rawHandle, readBytes, readBytesSize);
+			const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
 			const uint16_t checksumTotal = extendedChecksum16(readBytes, readBytesSize);
 			if (read < readBytesSize)
 			{
@@ -1016,19 +1023,19 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 				if (result)
 				{
 					const BYTE timerConfigCode = timer->first * 2 + 43; // The timer configs are 43, 45, 47, and 49.
-					sendBytes[sendBytesSize++] = timerConfigCode;  //IOType, Timer#Config (e.g., Timer0Config)
-					sendBytes[sendBytesSize++] = timer->second;  //TimerMode
-					sendBytes[sendBytesSize++] = 0;  //Value LSB
-					sendBytes[sendBytesSize++] = 0;  //Value MSB
+					sendBytes.at(sendBytesSize++) = timerConfigCode;  //IOType, Timer#Config (e.g., Timer0Config)
+					sendBytes.at(sendBytesSize++) = timer->second;  //TimerMode
+					sendBytes.at(sendBytesSize++) = 0;  //Value LSB
+					sendBytes.at(sendBytesSize++) = 0;  //Value MSB
 
 					if ((timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM8) ||
 						(timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM16))
 					{  // Initialize PWMs to almost-always low.
 						const BYTE timerCode = timerConfigCode - 1;
-						sendBytes[sendBytesSize++] = timerCode;   //IOType, Timer# (e.g., Timer0)
-						sendBytes[sendBytesSize++] = 1;    //UpdateReset
-						sendBytes[sendBytesSize++] = 255;  //Value LSB
-						sendBytes[sendBytesSize++] = 255;  //Value MSB
+						sendBytes.at(sendBytesSize++) = timerCode;   //IOType, Timer# (e.g., Timer0)
+						sendBytes.at(sendBytesSize++) = 1;    //UpdateReset
+						sendBytes.at(sendBytesSize++) = 255;  //Value LSB
+						sendBytes.at(sendBytesSize++) = 255;  //Value MSB
 						readBytesSize += 4; // A Timer# IOType causes 4 read bytes.
 					}
 				}
@@ -1040,14 +1047,14 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 				// Must send an even number of bytes.
 				if (sendBytesSize % 2 == 1)
 				{
-					sendBytes[sendBytesSize++] = 0;
+					sendBytes.at(sendBytesSize++) = 0;
 				}
 				const BYTE sendCommandBytes = 6;
 				const BYTE dataWords = (sendBytesSize - sendCommandBytes) / 2;
 				sendBytes[2] = dataWords;
-				extendedChecksum(sendBytes, sendBytesSize);
+				extendedChecksum(&sendBytes, sendBytesSize);
 
-				sent = LJUSB_Write(rawHandle, sendBytes, sendBytesSize);
+				sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
 				if (sent < sendBytesSize)
 				{
@@ -1071,7 +1078,7 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 				const BYTE readCommandBytes = 6;
 				const BYTE dataWords = (readBytesSize - readCommandBytes) / 2;
 
-				const int read = LJUSB_Read(rawHandle, readBytes, readBytesSize);
+				const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
 				const uint16_t checksumTotal = extendedChecksum16(readBytes, readBytesSize);
 				if (read < readBytesSize)
 				{
@@ -1140,27 +1147,27 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 		int readBytesSize = 9; // Reading after a Feedback command provides 9+ bytes.
 		for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 		{
-			sendBytes[sendBytesSize++] = 13;  //IOType, BitDirWrite
-			sendBytes[sendBytesSize++] = *input;  //Bits 0-4: IO Number, Bit 7: Direction (1=output, 0=input)
+			sendBytes.at(sendBytesSize++) = 13;  //IOType, BitDirWrite
+			sendBytes.at(sendBytesSize++) = *input;  //Bits 0-4: IO Number, Bit 7: Direction (1=output, 0=input)
 		}
 		for (auto output = digitalOutputChannels.cbegin(); output != digitalOutputChannels.cend(); ++output)
 		{
-			sendBytes[sendBytesSize++] = 13;  //IOType, BitDirWrite
-			sendBytes[sendBytesSize++] = *output + 128;  //Bits 0-4: IO Number, Bit 7: Direction (1=output, 0=input)
+			sendBytes.at(sendBytesSize++) = 13;  //IOType, BitDirWrite
+			sendBytes.at(sendBytesSize++) = *output + 128;  //Bits 0-4: IO Number, Bit 7: Direction (1=output, 0=input)
 		}
 
 		// Write the digital input/output Feedback command.
 		// Must send an even number of bytes.
 		if (sendBytesSize % 2 == 1)
 		{
-			sendBytes[sendBytesSize++] = 0;
+			sendBytes.at(sendBytesSize++) = 0;
 		}
 		const BYTE sendCommandBytes = 6;
 		const BYTE dataWords = (sendBytesSize - sendCommandBytes) / 2;
 		sendBytes[2] = dataWords;
-		extendedChecksum(sendBytes, sendBytesSize);
+		extendedChecksum(&sendBytes, sendBytesSize);
 
-		sent = LJUSB_Write(rawHandle, sendBytes, sendBytesSize);
+		sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
 		if (sent < sendBytesSize)
 		{
@@ -1183,7 +1190,7 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 			const BYTE readCommandBytes = 6;
 			const BYTE dataWords = (readBytesSize - readCommandBytes) / 2;
 
-			const int read = LJUSB_Read(rawHandle, readBytes, readBytesSize);
+			const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
 			const uint16_t checksumTotal = extendedChecksum16(readBytes, readBytesSize);
 			if (read < readBytesSize)
 			{
@@ -1235,6 +1242,11 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 		}
 	}
 	return result;
+}
+
+std::shared_ptr<SurgSim::Framework::Logger> LabJackScaffold::getLogger() const
+{
+	return m_logger;
 }
 
 SurgSim::Framework::LogLevel LabJackScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_DEBUG;

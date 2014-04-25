@@ -19,10 +19,14 @@
 #include <memory>
 
 #include "SurgSim/Framework/Logger.h"
-#include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
 {
+namespace DataStructures
+{
+class DataGroup;
+};
+
 namespace Device
 {
 
@@ -47,10 +51,7 @@ public:
 
 	/// Gets the logger used by this object and the devices it manages.
 	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
-	{
-		return m_logger;
-	}
+	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
 
 	/// Gets or creates the scaffold shared by all LabJackDevice instances.
 	/// The scaffold is managed using a SingleInstance object, so it will be destroyed when all devices are released.
@@ -65,7 +66,6 @@ public:
 	/// Does one-time configuration of the LabJack for timers, counters, and analog inputs.
 	/// Must be called by the LabJackThread because the LabJack separates all commands by the calling thread.
 	/// \param device The device.
-	/// \param handle The handle used by the LabJack SDK.
 	/// \return False if any errors.
 	bool configureLabJack(DeviceData* device);
 

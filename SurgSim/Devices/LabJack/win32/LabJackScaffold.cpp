@@ -21,6 +21,7 @@
 #include <LabJackUD.h> // the high-level LabJack library.
 #include <list>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "SurgSim/DataStructures/DataGroup.h"
@@ -58,18 +59,25 @@ std::string getErrorAsString(LJ_ERROR code)
 	ErrorToString(code, error);
 	return std::string(error);
 }
+
+/// A struct containing the default settings that depend on the type of LabJack.
+struct LabJackDefaults
+{
+	LabJackDefaults()
+	{
+		timerBase[LabJackType::LABJACKTYPE_U3] = LabJackTimerBase::LABJACKTIMERBASE_22;
+		timerBase[LabJackType::LABJACKTYPE_U6] = LabJackTimerBase::LABJACKTIMERBASE_22;
+		timerBase[LabJackType::LABJACKTYPE_UE9] = LabJackTimerBase::LABJACKTIMERBASE_1;
+	}
+
+	/// The default timer base rate.
+	std::unordered_map<LabJackType, LabJackTimerBase> timerBase;
+};
 };
 
 class LabJackScaffold::Handle
 {
 public:
-	/// Default constructor.
-	Handle() :
-		m_deviceHandle(LABJACK_INVALID_HANDLE),
-		m_scaffold(LabJackScaffold::getOrCreateSharedInstance())
-	{
-	}
-
 	/// Constructor that attempts to open a device.
 	/// \param deviceType The type of LabJack device to open (see strings in LabJackUD.h).
 	/// \param connectionType How to connect to the device (e.g., USB) (see strings in LabJackUD.h).
@@ -128,7 +136,7 @@ public:
 
 	bool destroy()
 	{
-		bool result = true;
+		bool result = false;
 		if (isValid())
 		{
 			// Reset the pin configuration.
@@ -141,16 +149,12 @@ public:
 					<< m_address << "'." << std::endl <<
 					"  LabJackUD returned error code: " <<
 					error << ", " << getErrorAsString(error) << std::endl;
-				result = false;
 			}
 			else
 			{
 				m_deviceHandle = LABJACK_INVALID_HANDLE;
+				result = true;
 			}
-		}
-		else
-		{
-			result = false;
 		}
 		return result;
 	}
@@ -215,7 +219,7 @@ private:
 	/// Given all the timers, return just the ones that provide inputs.
 	/// \param timers The timers.
 	/// \return The timers that provide inputs.
-	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int,LabJackTimerMode>& timers) const
+	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int, LabJackTimerMode>& timers) const
 	{
 		std::unordered_set<int> timersWithInputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
@@ -340,28 +344,29 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 		// Create a handle, opening communications.
 		// If the device's type or connection are SEARCH, iterate over the options.
 		std::vector<LabJackType> typesToSearch;
-		if (device->getType() != LABJACKTYPE_SEARCH)
+		if (device->getType() == LABJACKTYPE_SEARCH)
 		{
-			typesToSearch.push_back(device->getType());
-		}
-		else
-		{
-			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": searching for type.";
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": searching for types U3, U6, and UE9.";
 			typesToSearch.push_back(LABJACKTYPE_U6);
 			typesToSearch.push_back(LABJACKTYPE_U3);
 			typesToSearch.push_back(LABJACKTYPE_UE9);
 		}
+		else
+		{
+			typesToSearch.push_back(device->getType());
+		}
 
 		std::vector<LabJackConnection> connectionsToSearch;
-		if (device->getConnection() != LABJACKCONNECTION_SEARCH)
+		if (device->getConnection() == LABJACKCONNECTION_SEARCH)
 		{
-			connectionsToSearch.push_back(device->getConnection());
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() <<
+				": searching for connections USB and Ethernet.";
+			connectionsToSearch.push_back(LABJACKCONNECTION_USB);
+			connectionsToSearch.push_back(LABJACKCONNECTION_ETHERNET);
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": searching for connection.";
-			connectionsToSearch.push_back(LABJACKCONNECTION_USB);
-			connectionsToSearch.push_back(LABJACKCONNECTION_ETHERNET);
+			connectionsToSearch.push_back(device->getConnection());
 		}
 
 		for (auto type = typesToSearch.cbegin(); type != typesToSearch.cend(); ++type)
@@ -543,16 +548,16 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	{
 		double value;
 		const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_DIGITAL_BIT, *input, &value);
-		if (!isAnyError(error))
-		{
-			digitalInputs[*input] = value;
-		}
-		else
+		if (isAnyError(error))
 		{
 			SURGSIM_LOG_WARNING(m_logger) << "Failed to get digital input for a device named '" <<
 				info->deviceObject->getName() << "', line number " << *input << "." << std::endl <<
 				"  LabJackUD returned error code: " << error << ", and string: " <<
 				getErrorAsString(error) << std::endl;
+		}
+		else
+		{
+			digitalInputs[*input] = value;
 		}
 	}
 	inputData.customData().set(SurgSim::DataStructures::Names::DIGITAL_INPUTS, digitalInputs);
@@ -563,16 +568,16 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	{
 		double value;
 		const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_TIMER, *timer, &value);
-		if (!isAnyError(error))
-		{
-			timerInputs[*timer] = value;
-		}
-		else
+		if (isAnyError(error))
 		{
 			SURGSIM_LOG_WARNING(m_logger) << "Failed to get timer input for a device named '" <<
 				info->deviceObject->getName() << "', channel number " << *timer << "." << std::endl <<
 				"  LabJackUD returned error code: " << error << ", and string: " <<
 				getErrorAsString(error) << std::endl;
+		}
+		else
+		{
+			timerInputs[*timer] = value;
 		}
 	}
 	inputData.customData().set(SurgSim::DataStructures::Names::TIMER_INPUTS, timerInputs);
@@ -663,12 +668,8 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 		LabJackTimerBase base = device->getTimerBase();
 		if (base == LABJACKTIMERBASE_DEFAULT)
 		{
-			// U3 and U6 default to 48 MHz, which is value 22 for LabJackUD.
-			base = LABJACKTIMERBASE_22;
-			if (device->getType() == LABJACKTYPE_UE9)
-			{
-				base = LABJACKTIMERBASE_1; // UE9 defaults to 48 MHz, value 1.
-			}
+			LabJackDefaults defaults;
+			base = defaults.timerBase[device->getType()];
 		}
 		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_BASE, base, 0);
 		if (isAnyError(error))
@@ -736,6 +737,11 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 		}
 	}
 	return result;
+}
+
+std::shared_ptr<SurgSim::Framework::Logger> LabJackScaffold::getLogger() const
+{
+	return m_logger;
 }
 
 SurgSim::Framework::LogLevel LabJackScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_DEBUG;
