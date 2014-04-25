@@ -125,14 +125,17 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int QOpt>
-YAML::Node YAML::convert<typename Eigen::Quaternion<Type, QOpt>>::encode(const typename Eigen::Quaternion<Type, QOpt>& rhs)
+YAML::Node YAML::convert<typename Eigen::Quaternion<Type, QOpt>>::encode(
+	const typename Eigen::Quaternion<Type, QOpt>& rhs)
 {
 	return Node(convert<typename Eigen::Matrix<Type, 4, 1, QOpt>>::encode(rhs.coeffs()));
 }
 
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int QOpt>
-bool YAML::convert<typename Eigen::Quaternion<Type, QOpt>>::decode(const Node& node, typename Eigen::Quaternion<Type, QOpt>& rhs)
+bool YAML::convert<typename Eigen::Quaternion<Type, QOpt>>::decode(
+	const Node& node,
+	typename Eigen::Quaternion<Type, QOpt>& rhs)
 {
 	bool result = false;
 	if (node.IsSequence() && node.size() == 4)
