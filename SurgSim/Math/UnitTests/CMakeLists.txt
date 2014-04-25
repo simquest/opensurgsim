@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	AabbTests.cpp
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
 	MeshShapeTests.cpp
