@@ -22,8 +22,8 @@
 
 namespace
 {
-const std::string RotationPropertyName = "quaternion";
-const std::string TranslationPropertyName = "translation";
+const std::string rotationPropertyName = "Quaternion";
+const std::string translationPropertyName = "Translation";
 const std::string serializeLogger = "Serialization";
 };
 
@@ -154,8 +154,8 @@ YAML::Node YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::encode(
 	Eigen::Matrix<Type, Dim, 1, TOptions> translation(rhs.translation());
 
 	Node node;
-	node[RotationPropertyName] = quaternion;
-	node[TranslationPropertyName] = translation;
+	node[rotationPropertyName] = quaternion;
+	node[translationPropertyName] = translation;
 	return node;
 }
 
@@ -172,14 +172,14 @@ bool YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(
 	{
 		Eigen::Quaternion<Type, TOptions> rotation(Eigen::Quaternion<Type, TOptions>::Identity());
 		Eigen::Matrix<Type, Dim, 1, TOptions> translation(Eigen::Matrix<Type, Dim, 1, TOptions>::Zero());
-		if (node[RotationPropertyName].IsDefined())
+		if (node[rotationPropertyName].IsDefined())
 		{
-			rotation = node[RotationPropertyName].as<Eigen::Quaternion<Type, TOptions>>();
+			rotation = node[rotationPropertyName].as<Eigen::Quaternion<Type, TOptions>>();
 			result = true;
 		}
-		if (node[TranslationPropertyName].IsDefined())
+		if (node[translationPropertyName].IsDefined())
 		{
-			translation = node[TranslationPropertyName].as<Eigen::Matrix<Type, Dim, 1, TOptions>>();
+			translation = node[translationPropertyName].as<Eigen::Matrix<Type, Dim, 1, TOptions>>();
 			result = true;
 		}
 		rhs.makeAffine();
