@@ -206,7 +206,7 @@ void DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
 template <class M, class D, class K, class S>
 void DeformableRepresentation<M,D,K,S>::afterUpdate(double dt)
 {
-	if (isDrivingElement())
+	if (isDrivingSceneElementPose())
 	{
 		std::shared_ptr<SurgSim::Framework::PoseComponent> poseComponent = getPoseComponent();
 		if (poseComponent != nullptr)

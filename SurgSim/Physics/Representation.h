@@ -100,13 +100,13 @@ public:
 
 	/// Set whether this Representation is controling the pose of the SceneElement
 	/// that it is part of.
-	/// \param isDrivingElement true if this Representation is driving the pose of the SceneElement
-	void setIsDrivingElement(bool isDrivingElement);
+	/// \param isDrivingSceneElementPose true if this Representation is driving the pose of the SceneElement
+	void setIsDrivingSceneElementPose(bool isDrivingSceneElementPose);
 
 	/// Query if this Representation is controling the pose of the SceneElement
 	/// that it is part of.
 	/// \return true if this Representation is controlling the pose of the SceneElement
-	bool isDrivingElement();
+	bool isDrivingSceneElementPose();
 
 	/// Preprocessing done before the update call
 	/// This needs to be called from the outside usually from a Computation
@@ -175,7 +175,7 @@ private:
 	bool m_isActive;
 
 	/// Is this representation driving the SceneElement
-	bool m_isDrivingElement;
+	bool m_isDrivingSceneElementPose;
 
 };
 

@@ -115,7 +115,7 @@ void SurgSim::Physics::RigidRepresentationBase::beforeUpdate(double dt)
 void SurgSim::Physics::RigidRepresentationBase::afterUpdate(double dt)
 {
 	m_finalState = m_currentState;
-	if (isDrivingElement())
+	if (isDrivingSceneElementPose())
 	{
 		std::shared_ptr<SurgSim::Framework::PoseComponent> poseComponent = getPoseComponent();
 		if (poseComponent != nullptr)

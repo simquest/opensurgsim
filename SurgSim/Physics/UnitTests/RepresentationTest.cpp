@@ -55,10 +55,10 @@ TEST(RepresentationTest, SetGetAndDefaultValueTest)
 	representation->setIsGravityEnabled(true);
 	ASSERT_TRUE(representation->isGravityEnabled());
 
-	/// Set/Get isDrivingElement [default = true]
-	EXPECT_TRUE(representation->isDrivingElement());
-	representation->setIsDrivingElement(false);
-	ASSERT_FALSE(representation->isDrivingElement());
-	representation->setIsDrivingElement(true);
-	ASSERT_TRUE(representation->isDrivingElement());
+	/// Set/Get isDrivingSceneElementPose [default = true]
+	EXPECT_TRUE(representation->isDrivingSceneElementPose());
+	representation->setIsDrivingSceneElementPose(false);
+	ASSERT_FALSE(representation->isDrivingSceneElementPose());
+	representation->setIsDrivingSceneElementPose(true);
+	ASSERT_TRUE(representation->isDrivingSceneElementPose());
 }
