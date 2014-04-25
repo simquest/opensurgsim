@@ -121,9 +121,13 @@ TEST_F(SurfaceMeshShapeTest, NonAlignedDiskShapeTest)
 TEST_F(SurfaceMeshShapeTest, SerializationTest)
 {
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
-	std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SurgSim::Math::SurfaceMeshShape>();
-	auto surfaceMeshShape = std::dynamic_pointer_cast<SurgSim::Math::SurfaceMeshShape>(shape);
+	auto surfaceMeshShape = std::make_shared<SurgSim::Math::SurfaceMeshShape>();
 	surfaceMeshShape->setFileName(fileName);
+
+	// We chose to let YAML serialization only works with base class pointer.
+	// i.e. We need to serialize 'surfaceMeshShape' via a SurgSim::Math::Shape pointer.
+	// The usage YAML::Node node = surfaceMeshShape; will not compile.
+	std::shared_ptr<SurgSim::Math::Shape> shape = surfaceMeshShape;
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = shape); // YAML::convert<std::shared_ptr<SurgSim::Math::Shape>> will be called.

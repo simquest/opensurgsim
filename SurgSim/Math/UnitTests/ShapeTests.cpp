@@ -113,7 +113,7 @@ TEST_F(ShapeTest, Sphere)
 
 	SphereShape sphere(m_radius);
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_SPHERE, sphere.getType());
-	EXPECT_EQ(m_radius, sphere.getRadius());
+	EXPECT_NEAR(m_radius, sphere.getRadius(), epsilon);
 
 	const double& r = m_radius;
 	const double r2 = r * r;
@@ -182,9 +182,9 @@ TEST_F(ShapeTest, Box)
 
 	Vector3d size(m_size[0], m_size[1], m_size[2]);
 	BoxShape box(m_size[0], m_size[1], m_size[2]);
-	EXPECT_EQ(m_size[0], box.getSizeX());
-	EXPECT_EQ(m_size[1], box.getSizeY());
-	EXPECT_EQ(m_size[2], box.getSizeZ());
+	EXPECT_NEAR(m_size[0], box.getSizeX(), epsilon);
+	EXPECT_NEAR(m_size[1], box.getSizeY(), epsilon);
+	EXPECT_NEAR(m_size[2], box.getSizeZ(), epsilon);
 	EXPECT_TRUE(box.getSize().isApprox(size));
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_BOX, box.getType());
 
@@ -252,8 +252,8 @@ TEST_F(ShapeTest, Cylinder)
 	ASSERT_NO_THROW({CylinderShape cyliner(m_length, m_radius);});
 
 	CylinderShape cylinder(m_length, m_radius);
-	EXPECT_EQ(m_length, cylinder.getLength());
-	EXPECT_EQ(m_radius, cylinder.getRadius());
+	EXPECT_NEAR(m_length, cylinder.getLength(), epsilon);
+	EXPECT_NEAR(m_radius, cylinder.getRadius(), epsilon);
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_CYLINDER, cylinder.getType());
 
 	double expectedVolume = M_PI * m_radius * m_radius * m_length;
@@ -321,8 +321,8 @@ TEST_F(ShapeTest, Capsule)
 	ASSERT_NO_THROW({CapsuleShape capsule(m_length, m_radius);});
 
 	CapsuleShape capsule(m_length, m_radius);
-	EXPECT_EQ(m_length, capsule.getLength());
-	EXPECT_EQ(m_radius, capsule.getRadius());
+	EXPECT_NEAR(m_length, capsule.getLength(), epsilon);
+	EXPECT_NEAR(m_radius, capsule.getRadius(), epsilon);
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_CAPSULE, capsule.getType());
 
 	double r2 = m_radius * m_radius;
@@ -396,7 +396,7 @@ TEST_F(ShapeTest, DoubleSidedPlaneShape)
 	EXPECT_TRUE(doubleSidedPlaneShape.getCenter().isZero());
 	EXPECT_TRUE(doubleSidedPlaneShape.getSecondMomentOfVolume().isApprox(Matrix33d::Zero()));
 	EXPECT_NEAR(0.0, doubleSidedPlaneShape.getD(), epsilon);
-	EXPECT_EQ(Vector3d(0.0, 1.0, 0.0), doubleSidedPlaneShape.getNormal());
+	EXPECT_TRUE(doubleSidedPlaneShape.getNormal().isApprox(Vector3d(0.0, 1.0, 0.0)));
 }
 
 
@@ -511,5 +511,5 @@ TEST_F(ShapeTest, PlaneShape)
 	EXPECT_TRUE(planeShape.getCenter().isZero());
 	EXPECT_TRUE(planeShape.getSecondMomentOfVolume().isApprox(Matrix33d::Zero()));
 	EXPECT_NEAR(0.0, planeShape.getD(), epsilon);
-	EXPECT_EQ(Vector3d(0.0, 1.0, 0.0), planeShape.getNormal());
+	EXPECT_TRUE(planeShape.getNormal().isApprox(Vector3d(0.0, 1.0, 0.0)));
 }

@@ -197,22 +197,26 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 TEST_F(MeshShapeTest, SerializationTest)
 {
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
-	std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SurgSim::Math::MeshShape>();
-	auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
-	mesh->setFileName(fileName);
+	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
+	meshShape->setFileName(fileName);
+
+	// We chose to let YAML serialization only works with base class pointer.
+	// i.e. We need to serialize 'meshShape' via a SurgSim::Math::Shape pointer.
+	// The usage YAML::Node node = meshShape; will not compile.
+	std::shared_ptr<SurgSim::Math::Shape> shape = meshShape;
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = shape); // YAML::convert<std::shared_ptr<SurgSim::Math::Shape>> will be called.
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(1u, node.size());
 
-	std::shared_ptr<SurgSim::Math::MeshShape> newMesh;
-	ASSERT_NO_THROW(newMesh =
+	std::shared_ptr<SurgSim::Math::MeshShape> newMeshShape;
+	ASSERT_NO_THROW(newMeshShape =
 				std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(node.as<std::shared_ptr<SurgSim::Math::Shape>>()));
 
-	EXPECT_EQ("SurgSim::Math::MeshShape", newMesh->getClassName());
-	EXPECT_EQ(fileName, newMesh->getFileName());
-	EXPECT_EQ(mesh->getMesh()->getNumVertices(), newMesh->getMesh()->getNumVertices());
-	EXPECT_EQ(mesh->getMesh()->getNumEdges(), newMesh->getMesh()->getNumEdges());
-	EXPECT_EQ(mesh->getMesh()->getNumTriangles(), newMesh->getMesh()->getNumTriangles());
+	EXPECT_EQ("SurgSim::Math::MeshShape", newMeshShape->getClassName());
+	EXPECT_EQ(fileName, newMeshShape->getFileName());
+	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), newMeshShape->getMesh()->getNumVertices());
+	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), newMeshShape->getMesh()->getNumEdges());
+	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), newMeshShape->getMesh()->getNumTriangles());
 }
