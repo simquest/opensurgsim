@@ -91,8 +91,8 @@ TEST(RepresentationTest, SerializationTest)
 
 		EXPECT_EQ(representation->getName(), newRepresentation->getName());
 		EXPECT_EQ("SurgSim::Physics::MockRepresentation", newRepresentation->getClassName());
-		EXPECT_EQ(true, newRepresentation->isActive());
-		EXPECT_EQ(true, newRepresentation->isGravityEnabled());
+		EXPECT_TRUE(newRepresentation->getValue<bool>("IsActive"));
+		EXPECT_TRUE(newRepresentation->getValue<bool>("IsGravityEnabled"));
 		EXPECT_EQ(1u, newRepresentation->getValue<size_t>("NumDof"));
 	}
 
@@ -153,16 +153,16 @@ TEST(RepresentationTest, SerializationTest)
 		EXPECT_EQ(representation3->getName(), newRepresentation3->getName());
 		EXPECT_EQ(representation4->getName(), newRepresentation4->getName());
 
-		EXPECT_EQ(true, newRepresentation->isActive());
-		EXPECT_EQ(true, newRepresentation->isGravityEnabled());
+		EXPECT_TRUE(newRepresentation->getValue<bool>("IsActive"));
+		EXPECT_TRUE(newRepresentation->getValue<bool>("IsGravityEnabled"));
 
-		EXPECT_EQ(false, newRepresentation2->isActive());
-		EXPECT_EQ(true, newRepresentation2->isGravityEnabled());
+		EXPECT_FALSE(newRepresentation2->getValue<bool>("IsActive"));
+		EXPECT_TRUE(newRepresentation2->getValue<bool>("IsGravityEnabled"));
 
-		EXPECT_EQ(true, newRepresentation3->isActive());
-		EXPECT_EQ(false, newRepresentation3->isGravityEnabled());
+		EXPECT_TRUE(newRepresentation3->getValue<bool>("IsActive"));
+		EXPECT_FALSE(newRepresentation3->getValue<bool>("IsGravityEnabled"));
 
-		EXPECT_EQ(false, newRepresentation4->isActive());
-		EXPECT_EQ(false, newRepresentation4->isGravityEnabled());
+		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsActive"));
+		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsGravityEnabled"));
 	}
 }
