@@ -31,6 +31,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	DeformableCollisionRepresentation.cpp
 	DeformableRepresentationState.cpp
 	Fem1DRepresentation.cpp
+	Fem2DRepresentation.cpp
 	Fem3DRepresentation.cpp
 	Fem3DRepresentationBilateral3D.cpp
 	Fem3DRepresentationContact.cpp
@@ -86,6 +87,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableRepresentationBase.h
 	DeformableRepresentationState.h
 	Fem1DRepresentation.h
+	Fem2DRepresentation.h
 	Fem3DRepresentation.h
 	Fem3DRepresentationBilateral3D.h
 	Fem3DRepresentationContact.h
@@ -154,6 +156,10 @@ if(BUILD_TESTING)
 
 	if(BUILD_RENDER_TESTING)
 		add_subdirectory(RenderTests)
+	endif()
+
+	if(BUILD_PERFORMANCE_TESTING)
+		add_subdirectory(PerformanceTests)
 	endif()
 endif()
 

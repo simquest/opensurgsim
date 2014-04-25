@@ -43,12 +43,12 @@ namespace Math
 /// \note   Vector& getVelocities();
 /// \note   Vector& getAccelerations();
 template <class State, class MT, class DT, class KT, class ST>
-class ModifiedExplicitEuler : public OdeSolver<State, MT, DT, KT, ST>
+class OdeSolverEulerExplicitModified : public OdeSolver<State, MT, DT, KT, ST>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit ModifiedExplicitEuler(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverEulerExplicitModified(OdeEquation<State, MT, DT, KT, ST>* equation);
 
 	virtual void solve(double dt, const State& currentState, State* newState) override;
 

@@ -77,9 +77,9 @@ std::pair<Type, boost::any> testAccessible(const Type& value)
 {
 	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
 
-	osgUniform->setValue("value", value);
+	osgUniform->setValue("Value", value);
 
-	return std::make_pair(osgUniform->get(), osgUniform->getValue("value"));
+	return std::make_pair(osgUniform->get(), osgUniform->getValue("Value"));
 }
 
 /// Constructs an OsgUniform that stores a vector of values, sets it to the given vector values, and returns the result

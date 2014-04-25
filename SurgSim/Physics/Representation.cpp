@@ -13,12 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Collision/Location.h"
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
-
-#include "SurgSim/Collision/Location.h"
-
-#include "SurgSim/Math/MlcpSolution.h"
 
 namespace SurgSim
 {
@@ -27,32 +25,42 @@ namespace Physics
 
 Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
+	m_collisionRepresentation(nullptr),
 	m_gravity(0.0, -9.81, 0.0),
 	m_numDof(0),
 	m_isGravityEnabled(true),
 	m_isActive(true)
 {
-
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, size_t, NumDof, getNumDof, setNumDof);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, IsGravityEnabled, isGravityEnabled, setIsGravityEnabled);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, IsActive, isActive, setIsActive);
 }
 
 Representation::~Representation()
 {
-
 }
 
 void Representation::resetState()
 {
-
 }
 
 void Representation::resetParameters()
 {
+}
 
+size_t Representation::getNumDof() const
+{
+	return m_numDof;
 }
 
 void Representation::setIsActive(bool isActive)
 {
 	m_isActive = isActive;
+}
+
+bool Representation::isActive() const
+{
+	return m_isActive;
 }
 
 void Representation::setIsGravityEnabled(bool isGravityEnabled)
@@ -67,17 +75,14 @@ bool Representation::isGravityEnabled() const
 
 void Representation::beforeUpdate(double dt)
 {
-
 }
 
 void Representation::update(double dt)
 {
-
 }
 
 void Representation::afterUpdate(double dt)
 {
-
 }
 
 std::shared_ptr<Localization> Representation::createLocalization(const SurgSim::Collision::Location& location)
@@ -87,10 +92,9 @@ std::shared_ptr<Localization> Representation::createLocalization(const SurgSim::
 
 void Representation::applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
 {
-
 }
 
-void Representation::setNumDof(unsigned int numDof)
+void Representation::setNumDof(size_t numDof)
 {
 	m_numDof = numDof;
 }
@@ -110,5 +114,5 @@ void Representation::setCollisionRepresentation(std::shared_ptr<SurgSim::Collisi
 	m_collisionRepresentation = val;
 }
 
-}; // Physics
-}; // SurgSim
+}; // namespace Physics
+}; // namespace SurgSim

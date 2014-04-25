@@ -23,7 +23,6 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 using SurgSim::Collision::Location;
@@ -362,29 +361,6 @@ void RigidRepresentation::setLinearVelocity(const SurgSim::Math::Vector3d& linea
 void RigidRepresentation::setAngularVelocity(const SurgSim::Math::Vector3d& angularVelocity)
 {
 	m_currentState.setAngularVelocity(angularVelocity);
-}
-
-void RigidRepresentation::setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation)
-{
-	if (m_collisionRepresentation != representation)
-	{
-		// If we have an old collision representation clear the dependency
-		auto oldCollisionRep = std::dynamic_pointer_cast<RigidCollisionRepresentation>(m_collisionRepresentation);
-		if (oldCollisionRep != nullptr)
-		{
-			oldCollisionRep->setRigidRepresentation(nullptr);
-		}
-
-		Representation::setCollisionRepresentation(representation);
-
-		// If its a RigidCollisionRepresentation connect with this representation
-		auto newCollisionRep = std::dynamic_pointer_cast<RigidCollisionRepresentation>(representation);
-		if (newCollisionRep != nullptr)
-		{
-			newCollisionRep->setRigidRepresentation(std::static_pointer_cast<RigidRepresentation>(getSharedPtr()));
-		}
-	}
-
 }
 
 }; /// Physics

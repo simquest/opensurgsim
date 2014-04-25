@@ -16,14 +16,39 @@
 
 #include "SurgSim/Math/MeshShape.h"
 
+#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::MeshShape);
+}
+
 namespace SurgSim
 {
 namespace Math
 {
 
+MeshShape::MeshShape() : m_volume(0.0), m_fileName()
+{
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshShape, std::string, FileName, getFileName, setFileName);
+}
+
 int MeshShape::getType()
 {
 	return SHAPE_TYPE_MESH;
+}
+
+void MeshShape::setFileName(const std::string& fileName)
+{
+	using SurgSim::DataStructures::TriangleMesh;
+	m_fileName = fileName;
+	m_mesh = std::make_shared<TriangleMesh>(*SurgSim::DataStructures::loadTriangleMesh(fileName));
+}
+
+std::string MeshShape::getFileName() const
+{
+	return m_fileName;
 }
 
 std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh()
@@ -33,16 +58,31 @@ std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh()
 
 double MeshShape::getVolume() const
 {
+	if (nullptr == m_mesh)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No mesh set for MeshShape, so it cannot compute volume.";
+	}
 	return m_volume;
 }
 
 SurgSim::Math::Vector3d MeshShape::getCenter() const
 {
+	if (nullptr == m_mesh)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No mesh set for MeshShape, so it cannot compute center.";
+	}
 	return m_center;
 }
 
 SurgSim::Math::Matrix33d MeshShape::getSecondMomentOfVolume() const
 {
+	if (nullptr == m_mesh)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No mesh set for MeshShape, so it cannot compute SecondMomentOfVolume.";
+	}
 	return m_secondMomentOfVolume;
 }
 
@@ -131,12 +171,6 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(0, 2) = -(integral[9] - m_volume * m_center.z() * m_center.x());
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
-
-std::string MeshShape::getClassName()
-{
-	return std::string("SurgSim::Math::MeshShape");
-}
-
 
 }; // namespace Math
 }; // namespace SurgSim

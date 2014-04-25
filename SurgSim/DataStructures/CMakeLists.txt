@@ -25,12 +25,14 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	AabbTreeNode.cpp
 	DataGroupBuilder.cpp
 	IndexDirectory.cpp
-	TriangleMesh.cpp
+	OctreeNode.cpp
 	ply.c
 	PlyReader.cpp
 	Tree.cpp
 	TreeData.cpp
 	TreeNode.cpp
+	TriangleMesh.cpp
+	TriangleMeshBase.cpp
 	TriangleMeshPlyReaderDelegate.cpp
 )
 
@@ -39,6 +41,8 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	AabbTreeData.h
 	AabbTreeIntersectionVisitor.h
 	AabbTreeNode.h
+	BufferedValue.h
+	BufferedValue-inl.h
 	DataGroup.h
 	DataGroup-inl.h
 	DataGroupBuilder.h

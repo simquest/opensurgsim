@@ -16,6 +16,7 @@
 #ifndef SURGSIM_MATH_SPHERESHAPE_H
 #define SURGSIM_MATH_SPHERESHAPE_H
 
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -31,6 +32,8 @@ public:
 	/// Constructor
 	/// \param radius The sphere radius (in m)
 	explicit SphereShape(double radius = 0.0);
+
+	SURGSIM_CLASSNAME(SurgSim::Math::SphereShape);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -52,8 +55,12 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
-	/// Serialize declarations of the sphere
-	OSS_SERIALIZE(SurgSim::Math::SphereShape);
+protected:
+	// Setters in 'protected' sections are for serialization purpose only.
+
+	/// Set the sphere radius
+	/// \param radius	The sphere radius
+	void setRadius(double radius);
 
 private:
 	/// Sphere radius
@@ -61,7 +68,6 @@ private:
 };
 
 }; // Math
-
 }; // SurgSim
 
 #endif // SURGSIM_MATH_SPHERESHAPE_H

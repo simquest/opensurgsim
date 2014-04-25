@@ -35,6 +35,7 @@ public:
 	/// \param	name	The name of the representation.
 	explicit SceneryRepresentation(const std::string& name): Representation(name)
 	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(SceneryRepresentation, std::string, FileName, getFileName, setFileName);
 	}
 
 	/// Return file name of the object

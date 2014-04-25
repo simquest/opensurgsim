@@ -29,6 +29,8 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
 	Fem1DRepresentationTests.cpp
+	Fem2DMechanicalValidationTests.cpp
+	Fem2DRepresentationTests.cpp
 	Fem3DRepresentationBilateral3DTests.cpp
 	Fem3DRepresentationContactTests.cpp
 	Fem3DRepresentationReaderTests.cpp

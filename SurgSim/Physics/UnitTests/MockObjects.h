@@ -16,6 +16,8 @@
 #ifndef SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 
+#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -25,6 +27,7 @@
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::OdeSolver;
@@ -42,12 +45,17 @@ protected:
 	int m_postUpdateCount;
 
 public:
-	MockRepresentation() :
-		Representation("MockRepresentation"), m_preUpdateCount(0), m_updateCount(0), m_postUpdateCount(0)
+	explicit MockRepresentation(const std::string& name = "MockRepresention") :
+		Representation(name),
+		m_preUpdateCount(0),
+		m_updateCount(0),
+		m_postUpdateCount(0)
 	{}
 
 	virtual ~MockRepresentation()
 	{}
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::MockRepresentation);
 
 	virtual RepresentationType getType() const override
 	{
@@ -108,6 +116,11 @@ public:
 	int getPostUpdateCount() const
 	{ return m_postUpdateCount; }
 };
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::MockRepresentation);
+}
 
 class MockFemElement : public FemElement
 {
@@ -311,6 +324,36 @@ private:
 						 ConstraintSideSign sign)
 	{
 	}
+};
+
+class MockVirtualToolCoupler : public VirtualToolCoupler
+{
+public:
+	MockVirtualToolCoupler() :
+		VirtualToolCoupler("Mock Virtual Tool Coupler")
+	{
+	}
+
+	double getLinearStiffness() const
+	{
+		return m_linearStiffness.getValue();
+	}
+
+	double getLinearDamping() const
+	{
+		return m_linearDamping.getValue();
+	}
+
+	double getAngularStiffness() const
+	{
+		return m_angularStiffness.getValue();
+	}
+
+	double getAngularDamping() const
+	{
+		return m_angularDamping.getValue();
+	}
+
 };
 
 inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepresentation> firstRepresentation,

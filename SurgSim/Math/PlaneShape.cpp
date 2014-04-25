@@ -13,7 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/PlaneShape.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::PlaneShape);
+}
 
 namespace SurgSim
 {
@@ -52,16 +58,6 @@ double PlaneShape::getD() const
 SurgSim::Math::Vector3d PlaneShape::getNormal() const
 {
 	return Vector3d(0.0, 1.0, 0.0);
-}
-
-YAML::Node SurgSim::Math::PlaneShape::encode()
-{
-	return SurgSim::Math::Shape::encode();
-}
-
-bool SurgSim::Math::PlaneShape::decode(const YAML::Node& node)
-{
-	return SurgSim::Math::Shape::decode(node);
 }
 
 }; // namespace Math

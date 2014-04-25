@@ -38,9 +38,21 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #include <string.h>
 #include "SurgSim/DataStructures/ply.h"
 
+
+// HS-2014-apr-03 There are a few warnings from gcc regarding these
+// in the spirit of changing this file as little as possible we decided
+// to ignore these. The variables concerned are:
+// line 1621 'item'
+// line 1736 'item_size'
+// line 2378 'item'
+// line 1717 'other_data'
+
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable:4996)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
 char *type_names[] = {
@@ -1127,6 +1139,7 @@ PlyOtherProp *ply_get_other_properties(
 {
   int i;
   PlyElement *elem;
+
   PlyOtherProp *other;
   PlyProperty *prop;
   int nprops;
@@ -1566,7 +1579,7 @@ void ascii_get_element(PlyFile *plyfile, char *elem_ptr)
 
   /* read in the element */
 
-  words = get_words (plyfile->fp, &nwords, &orig_line);
+  words = get_words (fp, &nwords, &orig_line);
   if (words == NULL) {
     fprintf (stderr, "ply_get_element: unexpected end of file\n");
     exit (-1);

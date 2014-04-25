@@ -21,6 +21,7 @@ set(UNIT_TEST_SOURCES
 	AabbTreeDataTests.cpp
 	AabbTreeNodeTests.cpp
 	AabbTreeTests.cpp
+	BufferedValueTests.cpp
 	DataGroupTests.cpp
 	IndexDirectoryTests.cpp
 	MeshElementTest.cpp
@@ -41,10 +42,13 @@ set(UNIT_TEST_HEADERS
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/TriangleMeshBaseTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS
 	SurgSimDataStructures
 )
+
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OctreeShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"

@@ -21,9 +21,11 @@
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverStatic.h"
 #include "SurgSim/Math/OdeSolverLinearEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverLinearEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverLinearEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverLinearStatic.h"
 
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
@@ -156,12 +158,14 @@ const SurgSim::Math::Matrix& DeformableRepresentation<M, D, K, S>::getCompliance
 template <class M, class D, class K, class S>
 void  DeformableRepresentation<M, D, K, S>::beforeUpdate(double dt)
 {
-	using SurgSim::Math::ExplicitEuler;
-	using SurgSim::Math::ModifiedExplicitEuler;
-	using SurgSim::Math::ImplicitEuler;
-	using SurgSim::Math::LinearExplicitEuler;
-	using SurgSim::Math::LinearModifiedExplicitEuler;
-	using SurgSim::Math::LinearImplicitEuler;
+	using SurgSim::Math::OdeSolverEulerExplicit;
+	using SurgSim::Math::OdeSolverEulerExplicitModified;
+	using SurgSim::Math::OdeSolverEulerImplicit;
+	using SurgSim::Math::OdeSolverStatic;
+	using SurgSim::Math::OdeSolverLinearEulerExplicit;
+	using SurgSim::Math::OdeSolverLinearEulerExplicitModified;
+	using SurgSim::Math::OdeSolverLinearEulerImplicit;
+	using SurgSim::Math::OdeSolverLinearStatic;
 
 	if (! isActive())
 	{
@@ -178,26 +182,34 @@ void  DeformableRepresentation<M, D, K, S>::beforeUpdate(double dt)
 
 		switch (m_integrationScheme)
 		{
+		case SurgSim::Math::INTEGRATIONSCHEME_STATIC:
+			m_odeSolver = std::make_shared <OdeSolverStatic<DeformableRepresentationState, M, D, K, S>>(this);
+			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER:
-			m_odeSolver = std::make_shared <ExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			m_odeSolver = std::make_shared <OdeSolverEulerExplicit<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER:
-			m_odeSolver = std::make_shared <ModifiedExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			m_odeSolver =
+				std::make_shared <OdeSolverEulerExplicitModified<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER:
-			m_odeSolver = std::make_shared <ImplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+			m_odeSolver = std::make_shared <OdeSolverEulerImplicit<DeformableRepresentationState, M, D, K, S>>(this);
+			break;
+		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC:
+			m_odeSolver = std::make_shared
+				<OdeSolverLinearStatic<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER:
 			m_odeSolver = std::make_shared
-				<LinearExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+				<OdeSolverLinearEulerExplicit<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER:
 			m_odeSolver = std::make_shared
-				<LinearModifiedExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+				<OdeSolverLinearEulerExplicitModified<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER:
 			m_odeSolver = std::make_shared
-				<LinearImplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
+				<OdeSolverLinearEulerImplicit<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		default:
 			SURGSIM_ASSERT(m_odeSolver)

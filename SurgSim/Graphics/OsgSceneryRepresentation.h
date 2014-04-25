@@ -41,6 +41,8 @@ public:
 	/// \param name Name of OsgSceneryRepresentation
 	explicit OsgSceneryRepresentation(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgSceneryRepresentation);
+
 	/// Return file name of the object
 	/// \return File name of the object
 	std::string getFileName() const override;
