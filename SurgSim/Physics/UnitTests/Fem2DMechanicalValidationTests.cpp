@@ -320,14 +320,16 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 ///  | \ | \ | \ | \ |
 ///  *---1---2---3---4  array1
 /// beginIndex1
-template <int M>
+template <size_t M>
 void defineTriangleStrips(size_t beginIndex1, size_t beginIndex2, size_t number,
 						  std::array<std::array<unsigned int, 3>, M>* triangleLists, size_t* triangleId)
 {
 	for (size_t i = 0; i < number - 1; i++)
 	{
-		std::array<unsigned int, 3> triangle1 = {{beginIndex1 + i, beginIndex1 + i + 1, beginIndex2 + i}};
-		std::array<unsigned int, 3> triangle2 = {{beginIndex1 + i + 1, beginIndex2 + i + 1, beginIndex2 + i}};
+		std::array<unsigned int, 3> triangle1 = {{static_cast<unsigned int>(beginIndex1 + i),
+			static_cast<unsigned int>(beginIndex1 + i + 1), static_cast<unsigned int>(beginIndex2 + i)}};
+		std::array<unsigned int, 3> triangle2 = {{ static_cast<unsigned int>(beginIndex1 + i + 1),
+			static_cast<unsigned int>(beginIndex2 + i + 1), static_cast<unsigned int>(beginIndex2 + i)}};
 		(*triangleLists)[(*triangleId)++] = triangle1;
 		(*triangleLists)[(*triangleId)++] = triangle2;
 	}
@@ -555,9 +557,9 @@ TEST_F(Fem2DMechanicalValidationTests, PlateBendingSquarePlateMeshPatternATest)
 	const int numTriangles = 128;
 	std::array<std::array<unsigned int, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
-	for(size_t Y = 0; Y < 8; Y++)
+	for(unsigned int Y = 0; Y < 8; Y++)
 	{
-		for(size_t X = 0; X < 8; X++)
+		for(unsigned int X = 0; X < 8; X++)
 		{
 			std::array<unsigned int, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + (X + 1)}};
 			trianglesNodeIds[triangleId++] = triangle1;
@@ -614,9 +616,9 @@ TEST_F(Fem2DMechanicalValidationTests, PlateBendingSquarePlateMeshPatternBTest)
 	const int numTriangles = 128;
 	std::array<std::array<unsigned int, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
-	for(size_t Y = 0; Y < 8; Y++)
+	for(unsigned int Y = 0; Y < 8; Y++)
 	{
-		for(size_t X = 0; X < 8; X++)
+		for(unsigned int X = 0; X < 8; X++)
 		{
 			std::array<unsigned int, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + X}};
 			trianglesNodeIds[triangleId++] = triangle1;
@@ -664,9 +666,9 @@ TEST_F(Fem2DMechanicalValidationTests, CantileverPlateTest)
 	const int numTriangles = 128;
 	std::array<std::array<unsigned int, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
-	for(size_t Y = 0; Y < 8; Y++)
+	for(unsigned int Y = 0; Y < 8; Y++)
 	{
-		for(size_t X = 0; X < 8; X++)
+		for(unsigned int X = 0; X < 8; X++)
 		{
 			std::array<unsigned int, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + X}};
 			trianglesNodeIds[triangleId++] = triangle1;
