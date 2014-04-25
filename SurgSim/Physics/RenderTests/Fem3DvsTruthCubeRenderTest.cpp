@@ -301,13 +301,13 @@ public:
 	/// \param state	The deformable state for initialization.
 	void addFemCubes(std::shared_ptr<DeformableRepresentationState> state)
 	{
-		for (int i = 0; i < m_numNodesPerAxis - 1; i++)
+		for (size_t i = 0; i < static_cast<size_t>(m_numNodesPerAxis - 1); i++)
 		{
-			for (int j = 0; j < m_numNodesPerAxis - 1; j++)
+			for (size_t j = 0; j < static_cast<size_t>(m_numNodesPerAxis - 1); j++)
 			{
-				for (int k = 0; k < m_numNodesPerAxis - 1; k++)
+				for (size_t k = 0; k < static_cast<size_t>(m_numNodesPerAxis - 1); k++)
 				{
-					std::array<int, 8> cubeNodeIds;
+					std::array<size_t, 8> cubeNodeIds;
 					cubeNodeIds[0] = get1DIndexFrom3D(i  , j  , k  );
 					cubeNodeIds[1] = get1DIndexFrom3D(i+1, j  , k  );
 					cubeNodeIds[2] = get1DIndexFrom3D(i  , j+1, k  );
@@ -318,8 +318,10 @@ public:
 					cubeNodeIds[7] = get1DIndexFrom3D(i+1, j+1, k+1);
 
 					std::array<unsigned int, 8> cube = {
-						cubeNodeIds[0], cubeNodeIds[1], cubeNodeIds[3], cubeNodeIds[2],
-						cubeNodeIds[4], cubeNodeIds[5], cubeNodeIds[7], cubeNodeIds[6]};
+						static_cast<unsigned int>(cubeNodeIds[0]), static_cast<unsigned int>(cubeNodeIds[1]),
+						static_cast<unsigned int>(cubeNodeIds[3]), static_cast<unsigned int>(cubeNodeIds[2]),
+						static_cast<unsigned int>(cubeNodeIds[4]), static_cast<unsigned int>(cubeNodeIds[5]),
+						static_cast<unsigned int>(cubeNodeIds[7]), static_cast<unsigned int>(cubeNodeIds[6])};
 
 					// Add FemElement3DCube for each cube
 					std::shared_ptr<FemElement3DCube> femElement = std::make_shared<FemElement3DCube>(cube, *state);
@@ -424,7 +426,6 @@ void buildConstrainedSystem(std::shared_ptr<TruthCubeRepresentation> truthCubeRe
 /// \return the vector of displacement for each dof (degree of freedom)
 SurgSim::Math::Vector staticSolver(std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation)
 {
-	int numConstraints = truthCubeRepresentation->getBoundaryConditions().size();
 	int numDof = truthCubeRepresentation->getNumDof();
 
 	// Build the constrained system A.X = B
@@ -534,21 +535,6 @@ struct Fem3DVSTruthCubeRenderTests : public RenderTests
 		viewElement->addComponent(component);
 	}
 
-	void runTest(double miliseconds)
-	{
-		viewElement->enableManipulator(true);
-		viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero());
-
-		std::shared_ptr<OsgAxesRepresentation> axes = std::make_shared<OsgAxesRepresentation>("axes");
-		axes->setSize(1.0);
-		viewElement->addComponent(axes);
-
-		/// Run the thread
-		runtime->start();
-
-		boost::this_thread::sleep(boost::posix_time::milliseconds(miliseconds));
-	}
-
 	virtual void SetUp() override
 	{
 		RenderTests::SetUp();
@@ -617,7 +603,7 @@ TEST_F(Fem3DVSTruthCubeRenderTests, rawDataTest)
 	copyExperimentalBeadsIntoPointCloud(truthCubeData->cubeData3, points3);
 	addComponent(points3);
 
-	runTest(3000.0);
+	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 3000.0);
 }
 
 /// Simulate truth cube with 5% strain (4mm of displacement).
@@ -646,10 +632,10 @@ TEST_F(Fem3DVSTruthCubeRenderTests, Test5percentsStrain)
 	addComponent(experimentalpoints);
 
 	double maxError = analyzeError(truthCubeData->cubeData1, truthCubeRepresentation->getCurrentState());
-	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " mm" << std::endl;
+	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " m" << std::endl;
 
 	/// Run the thread
-	runTest(3000.0);
+	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 3000.0);
 }
 
 /// Simulate truth cube with 12.5% strain (10mm of displacement).
@@ -678,10 +664,10 @@ TEST_F(Fem3DVSTruthCubeRenderTests, Test12percentsAndHalfStrain)
 	addComponent(experimentalpoints);
 
 	double maxError = analyzeError(truthCubeData->cubeData2, truthCubeRepresentation->getCurrentState());
-	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " mm" << std::endl;
+	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " m" << std::endl;
 
 	/// Run the thread
-	runTest(3000.0);
+	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 3000.0);
 }
 
 /// Simulate truth cube with 18.25% strain (14.6mm of displacement).
@@ -710,10 +696,10 @@ TEST_F(Fem3DVSTruthCubeRenderTests, Test18percentsAndQuarterStrain)
 	addComponent(experimentalpoints);
 
 	double maxError = analyzeError(truthCubeData->cubeData3, truthCubeRepresentation->getCurrentState());
-	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " mm" << std::endl;
+	std::cout << "The maximum error between simulated and experimental setup is " << maxError << " m" << std::endl;
 
 	/// Run the thread
-	runTest(3000.0);
+	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 3000.0);
 }
 
 }; // namespace Physics
