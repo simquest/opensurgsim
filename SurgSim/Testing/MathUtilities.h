@@ -22,6 +22,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Quaternion.h"
 
+#include <Eigen/Geometry>
+
 namespace SurgSim
 {
 namespace Testing
@@ -33,13 +35,13 @@ namespace Testing
 /// \param	t	 	The percentage for the interpolation.
 /// \return	the interpolated value.
 template <class T>
-T interpolate(const T& start, const T& end,const double& t)
+T interpolate(const T& start, const T& end, const double& t)
 {
-	return (1-t)*start + t*end;
+	return (1 - t) * start + t * end;
 }
 
 template <class T>
-T interpolate(const std::pair<T,T>& values, const double& t)
+T interpolate(const std::pair<T, T>& values, const double& t)
 {
 	return interpolate<T>(values.first, values.second, t);
 }
@@ -84,9 +86,21 @@ SurgSim::Math::RigidTransform3d interpolatePose(
 	const SurgSim::Math::Vector3d& endPosition,
 	const double& t);
 
+
 }
 }
 
+
+namespace Eigen
+{
+
+template<class T, int Dim>
+::std::ostream& operator<<(::std::ostream& os, const Eigen::AlignedBox<T, Dim>& box)
+{
+	os << "[" << box.min().transpose() << ", " << box.max().transpose() << "]";
+	return os;
+}
+}
 #endif
 
 

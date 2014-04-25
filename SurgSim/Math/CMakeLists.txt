@@ -39,6 +39,7 @@ set(SURGSIM_MATH_SOURCES
 )
 
 set(SURGSIM_MATH_HEADERS
+	Aabb.h
 	BoxShape.h
 	CapsuleShape.h
 	CylinderShape.h

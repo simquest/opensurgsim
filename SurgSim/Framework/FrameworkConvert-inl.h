@@ -17,6 +17,7 @@
 #define SURGSIM_FRAMEWORK_FRAMEWORKCONVERT_INL_H
 
 #include <type_traits>
+#include "SurgSim/Framework/Assert.h"
 
 // Use of enable_if. this function is only created if 'T' is a subclass of SurgSim::Framework::Component
 // Which means for each subclass that is being deserialized, a new converter function is created

@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 namespace SurgSim
@@ -42,6 +43,24 @@ void RenderTests::SetUp()
 void RenderTests::TearDown()
 {
 	runtime->stop();
+}
+
+void RenderTests::runTest(const SurgSim::Math::Vector3d& cameraPosition, const SurgSim::Math::Vector3d& cameraLookAt,
+						  double miliseconds)
+{
+	using SurgSim::Graphics::OsgAxesRepresentation;
+
+	viewElement->enableManipulator(true);
+	viewElement->setManipulatorParameters(cameraPosition, cameraLookAt);
+
+	std::shared_ptr<OsgAxesRepresentation> axes = std::make_shared<OsgAxesRepresentation>("axes");
+	axes->setSize(1.0);
+	viewElement->addComponent(axes);
+
+	/// Run the thread
+	runtime->start();
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(miliseconds));
 }
 
 }; // namespace Physics
