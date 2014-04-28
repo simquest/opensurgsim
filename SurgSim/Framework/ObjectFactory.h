@@ -91,7 +91,7 @@ public:
 	template <typename Derived>
 	bool registerClass(const std::string& className);
 
-	/// Create an instance of a class based on the specific class name, which constructor takes 1 parameter.
+	/// Create an instance of a class based on the specific class name, whose constructor takes 1 parameter.
 	/// \param className The class name.
 	/// \param val The value of the parameter.
 	/// \return a shared pointer to the object of type className instantiated with the given parameter,
