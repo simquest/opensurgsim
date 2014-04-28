@@ -60,6 +60,29 @@ std::string getErrorAsString(LJ_ERROR code)
 	return std::string(error);
 }
 
+/// Logs a message if there was an error.  Appends the LabJackUD error code and string equivalent.
+/// \param errorCode The error code used by LabJackUD.
+/// \param logger The logger.
+/// \param logLevel The level of the log message.
+/// \param errorString The message.
+/// \return True if an error occurred.
+bool logIfError(LJ_ERROR errorCode, std::shared_ptr<SurgSim::Framework::Logger> logger,
+				SurgSim::Framework::LogLevel logLevel, std::string errorString)
+{
+	bool result = false;
+	if (isAnyError(errorCode))
+	{
+		if (logLevel >= logger->getThreshold())
+		{
+			SurgSim::Framework::LogMessage(logger, logLevel) << errorString << std::endl <<
+			"  LabJackUD returned error code: " << errorCode << ", and string: " << getErrorAsString(errorCode) <<
+			std::endl;
+		}
+		result = true;
+	}
+	return result;
+}
+
 /// A struct containing the default settings that depend on the type of LabJack.
 struct LabJackDefaults
 {
@@ -118,20 +141,12 @@ public:
 			firstFound = 1;  // If no address is specified, grab the first device found of this type and connection.
 		}
 
-		bool result = true;
 		const LJ_ERROR error = OpenLabJack(m_type, m_connection, m_address.c_str(), firstFound, &m_deviceHandle);
-		if (isAnyError(error))
-		{
-			SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Failed to initialize a device." <<
-				std::endl <<
-				"  Type: '" << m_type << "'.  Connection: '" << m_connection << "'.  Address: '" <<
-				m_address << "'." << std::endl <<
-				"  LabJackUD returned error code: " << error << ", and string: " <<
-				getErrorAsString(error) << std::endl;
-			result = false;
-		}
 
-		return result;
+		return !logIfError(error, m_scaffold->getLogger(), SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+			std::string("Failed to initialize a device. Type: ") + std::to_string(m_type) +
+			std::string(". Connection: ") + std::to_string(m_connection) + std::string(". Address: '") + m_address +
+			std::string("'."));
 	}
 
 	bool destroy()
@@ -141,19 +156,13 @@ public:
 		{
 			// Reset the pin configuration.
 			const LJ_ERROR error = ePut(m_deviceHandle, LJ_ioPIN_CONFIGURATION_RESET, 0, 0, 0);
-			if (isAnyError(error))
-			{
-				SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) <<
-					"Failed to reset a device's pin configuration." << std::endl <<
-					"  Type: '" << m_type << "'.  Connection: '" << m_connection << "'.  Address: '"
-					<< m_address << "'." << std::endl <<
-					"  LabJackUD returned error code: " <<
-					error << ", " << getErrorAsString(error) << std::endl;
-			}
-			else
+			result = !logIfError(error, m_scaffold->getLogger(), SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+				std::string("Failed to reset a device's pin configuration. Type: ") + std::to_string(m_type) +
+				std::string(". Connection: ") + std::to_string(m_connection) + std::string(". Address: '") + m_address +
+				std::string("'."));
+			if (result)
 			{
 				m_deviceHandle = LABJACK_INVALID_HANDLE;
-				result = true;
 			}
 		}
 		return result;
@@ -468,13 +477,9 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 	{
 		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_DIGITAL_BIT, *input, 0, 0, 0);
-		if (isAnyError(error))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Failed to request digital input for a device named '" <<
-				info->deviceObject->getName() << "', line number " << *input << "." << std::endl <<
-				"  LabJackUD returned error code: " << error << ", and string: " <<
-				getErrorAsString(error) << std::endl;
-		}
+		logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+			std::string("Failed to request digital input for a device named '") + info->deviceObject->getName() +
+			std::string("', line number ") + std::to_string(*input) + std::string("."));
 	}
 
 	// Request to set digital outputs.
@@ -488,14 +493,10 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			const int line = *output;
 			const int value = digitalOutputs.at(line);
 			const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_DIGITAL_BIT, line, value, 0, 0);
-			if (isAnyError(error))
-			{
-				SURGSIM_LOG_WARNING(m_logger) << "Failed to set digital output for a device named '" <<
-					info->deviceObject->getName() << "', line number " << line << ", value " << value <<
-					"." << std::endl <<
-					"  LabJackUD returned error code: " << error << ", and string: " <<
-					getErrorAsString(error) << std::endl;
-			}
+			logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
+				std::string("Failed to set digital output for a device named '") + info->deviceObject->getName() +
+				std::string("', line number ") + std::to_string(line) + std::string(", value ") +
+				std::to_string(value) + std::string("."));
 		}
 	}
 
@@ -505,14 +506,10 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	for (auto timer = timerOutputs.cbegin(); timer != timerOutputs.cend(); ++timer)
 	{
 		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, timer->second, 0, 0);
-		if (isAnyError(error))
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Failed to set timer value for a device named '" <<
-				info->deviceObject->getName() << "', line number " << timer->first << ", value " << timer->second <<
-				"." << std::endl <<
-				"  LabJackUD returned error code: " << error << ", and string: " <<
-				getErrorAsString(error) << std::endl;
-		}
+		logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
+			std::string("Failed to set timer value for a device named '") + info->deviceObject->getName() +
+			std::string("', channel number ") + std::to_string(timer->first) + std::string(", value ") +
+			std::to_string(timer->second) + std::string("."));
 	}
 
 	// Request inputs from timers.
@@ -521,66 +518,59 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	{
 		//double value;
 		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_TIMER, *timer, 0, 0, 0);
-		if (isAnyError(error))
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Failed to request timer input for a device named '" <<
-				info->deviceObject->getName() << "', channel number " << *timer << "." << std::endl <<
-				"  LabJackUD returned error code: " << error << ", and string: " <<
-				getErrorAsString(error) << std::endl;
-		}
+		logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
+			std::string("Failed to request timer input for a device named '") + info->deviceObject->getName() +
+			std::string("', channel number ") + std::to_string(*timer) + std::string("."));
 	}
 
 	// GoOne, telling this specific LabJack to perform the requests.
 	const LJ_ERROR error = GoOne(rawHandle);
-	if (isAnyError(error))
-	{
-		SURGSIM_LOG_WARNING(m_logger) << "Failed to submit requests for device named '" <<
-			info->deviceObject->getName() << "'." << std::endl <<
-			"  LabJackUD returned error code: " << error << ", and string: " <<
-			getErrorAsString(error) << std::endl;
-	}
+	const bool isRequestOk = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
+		std::string("Failed to submit requests for a device named '") + info->deviceObject->getName() +
+		std::string("'."));
 
 	// Finally we get the results.
-	// Digital inputs.
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	LabJackInputValuesType digitalInputs;
-	for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
+	if (isRequestOk)
 	{
-		double value;
-		const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_DIGITAL_BIT, *input, &value);
-		if (isAnyError(error))
+		// Digital inputs.
+		LabJackInputValuesType digitalInputs;
+		for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 		{
-			SURGSIM_LOG_WARNING(m_logger) << "Failed to get digital input for a device named '" <<
-				info->deviceObject->getName() << "', line number " << *input << "." << std::endl <<
-				"  LabJackUD returned error code: " << error << ", and string: " <<
-				getErrorAsString(error) << std::endl;
-		}
-		else
-		{
-			digitalInputs[*input] = value;
-		}
-	}
-	inputData.customData().set(SurgSim::DataStructures::Names::DIGITAL_INPUTS, digitalInputs);
+			double value;
+			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_DIGITAL_BIT, *input, &value);
 
-	// Timer inputs.
-	LabJackInputValuesType timerInputs;
-	for (auto timer = timerInputChannels.cbegin(); timer != timerInputChannels.cend(); ++timer)
-	{
-		double value;
-		const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_TIMER, *timer, &value);
-		if (isAnyError(error))
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Failed to get timer input for a device named '" <<
-				info->deviceObject->getName() << "', channel number " << *timer << "." << std::endl <<
-				"  LabJackUD returned error code: " << error << ", and string: " <<
-				getErrorAsString(error) << std::endl;
+			const bool isGetOk = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
+				std::string("Failed to get digital input for a device named '") + info->deviceObject->getName() +
+				std::string("', line number ") + std::to_string(*input) + std::string("."));
+			if (isGetOk)
+			{
+				digitalInputs[*input] = value;
+			}
 		}
-		else
+		inputData.customData().set(SurgSim::DataStructures::Names::DIGITAL_INPUTS, digitalInputs);
+
+		// Timer inputs.
+		LabJackInputValuesType timerInputs;
+		for (auto timer = timerInputChannels.cbegin(); timer != timerInputChannels.cend(); ++timer)
 		{
-			timerInputs[*timer] = value;
+			double value;
+			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_TIMER, *timer, &value);
+
+			const bool isGetOk = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
+				std::string("Failed to get timer input for a device named '") + info->deviceObject->getName() +
+				std::string("', channel number ") + std::to_string(*timer) + std::string("."));
+			if (isGetOk)
+			{
+				timerInputs[*timer] = value;
+			}
 		}
+		inputData.customData().set(SurgSim::DataStructures::Names::TIMER_INPUTS, timerInputs);
 	}
-	inputData.customData().set(SurgSim::DataStructures::Names::TIMER_INPUTS, timerInputs);
+	else
+	{
+		inputData.resetAll();
+	}
 
 	return true;
 }
@@ -624,14 +614,9 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 
 	// Reset the configuration.
 	const LJ_ERROR error = ePut(rawHandle, LJ_ioPIN_CONFIGURATION_RESET, 0, 0, 0);
-	if (isAnyError(error))
-	{
-		SURGSIM_LOG_SEVERE(m_logger) <<
-			"Failed to reset configuration for a device named '" << device->getName() << "'." << std::endl <<
-			"  LabJackUD returned error code: " <<
-			error << ", and string: " << getErrorAsString(error) << std::endl;
-		result = false;
-	}
+	result = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+		std::string("Failed to reset configuration for a device named '") + device->getName() +
+		std::string("'."));
 
 	// One-time configuration of counters.  Counters are not yet supported so they are explicitly disabled.
 	const int numberOfChannels = 2; // The LabJack U3, U6, and UE9 models each have two counters.
@@ -639,14 +624,9 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 	{
 		const int enable = 0; // Disable both counters.
 		const LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_COUNTER_ENABLE, channel, enable, 0);
-		if (isAnyError(error))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to enable/disable counter for a device named '" << device->getName() << "'." << std::endl <<
-				"  LabJackUD returned error code: " <<
-				error << ", and string: " << getErrorAsString(error) << std::endl;
-			result = false;
-		}
+		result = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+			std::string("Failed to enable/disable counter for a device named '") + device->getName() +
+			std::string("'."));
 	}
 
 	// One-time configuration of timers
@@ -655,15 +635,9 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 	{
 		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_COUNTER_PIN_OFFSET,
 			device->getTimerCounterPinOffset(), 0);
-		if (isAnyError(error))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to configure timer/counter pin offset for a device named '" <<
-				device->getName() << "', with offset " << device->getTimerCounterPinOffset() << "." << std::endl <<
-				"  LabJackUD returned error code: " <<
-				error << ", and string: " << getErrorAsString(error) << std::endl;
-			result = false;
-		}
+		result = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+			std::string("Failed to configure timer/counter pin offset for a device named '") + device->getName() +
+			std::string("', with offset ") + std::to_string(device->getTimerCounterPinOffset()) + std::string("."));
 
 		LabJackTimerBase base = device->getTimerBase();
 		if (base == LABJACKTIMERBASE_DEFAULT)
@@ -672,66 +646,41 @@ bool LabJackScaffold::configureLabJack(DeviceData* deviceData)
 			base = defaults.timerBase[device->getType()];
 		}
 		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_BASE, base, 0);
-		if (isAnyError(error))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to configure the timer base rate for a device named '" <<
-				device->getName() << "', with timer base " << device->getTimerBase() << "." << std::endl <<
-				"  LabJackUD returned error code: " <<
-				error << ", and string: " << getErrorAsString(error) << std::endl;
-			result = false;
-		}
+		result = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+			std::string("Failed to configure the timer base rate for a device named '") + device->getName() +
+			std::string("', with timer base ") + std::to_string(device->getTimerBase()) + std::string("."));
 
 		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_DIVISOR, device->getTimerClockDivisor(), 0);
-		if (isAnyError(error))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to configure the timer/clock divisor for a device named '" <<
-				device->getName() << "', with divisor " << device->getTimerClockDivisor() << "." << std::endl <<
-				"  LabJackUD returned error code: " <<
-				error << ", and string: " << getErrorAsString(error) << std::endl;
-			result = false;
-		}
+		result = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+			std::string("Failed to configure the timer/clock divisor for a device named '") + device->getName() +
+			std::string("', with divisor ") + std::to_string(device->getTimerClockDivisor()) + std::string("."));
 
 		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, timers.size(), 0);
-		if (isAnyError(error))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to configure number of enabled timers for a device named '" <<
-				device->getName() << "', with number of timers " << timers.size() << "." << std::endl <<
-				"  LabJackUD returned error code: " <<
-				error << ", and string: " << getErrorAsString(error) << std::endl;
-			result = false;
-		}
+		result = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+			std::string("Failed to configure number of enabled timers for a device named '") + device->getName() +
+			std::string("', with number of timers ") + std::to_string(timers.size()) + std::string("."));
 
 		if (result)
 		{
 			for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 			{
 				error = ePut(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, timer->second, 0);
-				if (isAnyError(error))
-				{
-					SURGSIM_LOG_SEVERE(m_logger) << "Failed to configure a timer for a device named '" <<
-						device->getName() << "', timer number " << timer->first << ", with mode code " <<
-						timer->second << "." << std::endl <<
-						"  LabJackUD returned error code: " << error << ", and string: " <<
-						getErrorAsString(error) << std::endl;
-					result = false;
-				}
-				else if ((timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM8) ||
-					(timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM16))
+				result = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+					std::string("Failed to configure a timer for a device named '") + device->getName() +
+					std::string("', timer number ") + std::to_string(timer->first) + std::string(", with mode code ") +
+					std::to_string(timer->second) + std::string("."));
+				if (result &&
+					((timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM8) ||
+					 (timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM16)))
 				{  // Initialize PWMs to almost-always low.
-					error = ePut(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, 65535, 0);
-					if (isAnyError(error))
-					{
-						SURGSIM_LOG_SEVERE(m_logger) <<
-							"Failed to set the initial value for a PWM timer for a device named '" <<
-							device->getName() << "', timer number " << timer->first << ", with mode code " <<
-							timer->second << "." << std::endl <<
-							"  LabJackUD returned error code: " << error << ", and string: " <<
-							getErrorAsString(error) << std::endl;
-						result = false;
-					}
+					const int value = 65535; // the value corresponding to a PWM that is low as much as possible.
+					error = ePut(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, value, 0);
+					result = !logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_SEVERE,
+						std::string("Failed to set the initial value for a PWM timer  for a device named '") +
+						device->getName() +
+						std::string("', timer number ") + std::to_string(timer->first) +
+						std::string(", with mode code ") + std::to_string(timer->second) + std::string(", and value ") +
+						std::to_string(value) + std::string("."));
 				}
 			}
 		}
