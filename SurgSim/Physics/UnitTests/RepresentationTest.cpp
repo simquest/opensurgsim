@@ -35,7 +35,7 @@ using SurgSim::Physics::MockRepresentation;
 
 TEST(RepresentationTest, ConstructorTest)
 {
-	ASSERT_NO_THROW({MockRepresentation representation();});
+	ASSERT_NO_THROW({MockRepresentation representation;});
 }
 
 TEST(RepresentationTest, SetGetAndDefaultValueTest)

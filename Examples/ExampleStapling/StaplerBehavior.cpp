@@ -183,6 +183,10 @@ std::shared_ptr<SurgSim::Physics::Constraint> StaplerBehavior::createBilateral3D
 						std::make_shared<Fem3DRepresentationBilateral3D>(),
 						otherRepLocatization);
 		break;
+
+	default:
+		SURGSIM_FAILURE() << "Stapling constraint not supported for this representation type";
+		break;
 	}
 
 	return constraint;

@@ -185,10 +185,8 @@ TYPED_TEST(QuaternionTests, YamlConvert)
 	EXPECT_TRUE(node.IsSequence());
 	EXPECT_EQ(4u, node.size());
 
-	Quaternion expected;
-
-	ASSERT_NO_THROW(expected = node.as<Quaternion>());
-	EXPECT_TRUE(quaternion.isApprox(expected));
+	ASSERT_NO_THROW({Quaternion expected = node.as<Quaternion>();});
+	EXPECT_TRUE(quaternion.isApprox(node.as<Quaternion>()));
 }
 
 
