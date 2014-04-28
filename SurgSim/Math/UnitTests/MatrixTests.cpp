@@ -19,9 +19,11 @@
 
 #include <math.h>
 
-#include "SurgSim/Math/MathConvert.h"
 #include <Eigen/Geometry>  // SurgSim/Math/Matrix.h by itself does not provide cross()
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
+#include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/Matrix.h"
 
 // Define test fixture class templates.
 // We don't really need fixtures as such, but the templatization encodes type.

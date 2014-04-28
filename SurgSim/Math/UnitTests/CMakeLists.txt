@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	AabbTests.cpp
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
 	MeshShapeTests.cpp
@@ -28,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	OdeSolverEulerExplicitModifiedTests.cpp
 	OdeSolverEulerExplicitTests.cpp
 	OdeSolverEulerImplicitTests.cpp
+	OdeSolverStaticTests.cpp
 	OdeSolverTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
@@ -68,6 +70,8 @@ set(LIBS
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OctreeShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 surgsim_add_unit_tests(SurgSimMathTest)
 

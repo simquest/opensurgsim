@@ -37,12 +37,17 @@ using SurgSim::Physics::RigidRepresentationParameters;
 
 StapleElement::StapleElement(const std::string& name) :
 	SurgSim::Framework::SceneElement(name),
-	m_name(name)
+	m_hasCollisionRepresentation(true)
 {
 }
 
 StapleElement::~StapleElement()
 {
+}
+
+void StapleElement::setHasCollisionRepresentation(bool flag)
+{
+	m_hasCollisionRepresentation = flag;
 }
 
 bool StapleElement::doInitialize()
@@ -62,20 +67,27 @@ bool StapleElement::doInitialize()
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
 
-	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
-	physicsRepresentation->setInitialParameters(params);
+	params.setLinearDamping(1e-2);
+	params.setAngularDamping(1e-4);
 
-	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<RigidCollisionRepresentation>("Collision");
-	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	auto physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
+	physicsRepresentation->setInitialParameters(params);
 
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSceneryRepresentation>("Graphics");
 	graphicsRepresentation->setFileName("Geometry/staple.obj");
 
 	addComponent(physicsRepresentation);
-	addComponent(collisionRepresentation);
 	addComponent(graphicsRepresentation);
+
+	if (m_hasCollisionRepresentation)
+	{
+		std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
+			std::make_shared<RigidCollisionRepresentation>("Collision");
+		physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
+
+		addComponent(collisionRepresentation);
+	}
 
 	return true;
 }

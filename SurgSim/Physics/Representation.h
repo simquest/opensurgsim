@@ -18,18 +18,15 @@
 
 #include <string>
 
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/MlcpSolution.h"
-
 #include "SurgSim/Framework/Representation.h"
-
-#include "SurgSim/Collision/Location.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
 
 namespace Collision
 {
+struct Location;
 class Representation;
 }
 
@@ -74,25 +71,19 @@ public:
 
 	/// Query the object number of degrees of freedom
 	/// \return The number of degrees of freedom
-	inline unsigned int getNumDof() const
-	{
-		return m_numDof;
-	}
+	size_t getNumDof() const;
 
 	/// Set active flag for this Representation
 	/// \param isActive True if the Representation is being activated, False otherwise
-	virtual void setIsActive(bool isActive);
+	void setIsActive(bool isActive);
 
 	/// Query if this object is active in the scene.
 	/// \return true if active, false if not.
-	inline bool isActive() const
-	{
-		return m_isActive;
-	}
+	bool isActive() const;
 
 	/// Set the gravity enable flag
 	/// \param isGravityEnabled True if gravity enabled, false if not.
-	virtual void setIsGravityEnabled(bool isGravityEnabled);
+	void setIsGravityEnabled(bool isGravityEnabled);
 
 	/// Get the gravity enable flag
 	/// \return true if gravity enabled, false if not.
@@ -146,7 +137,7 @@ protected:
 	/// \param numDof The number of degrees of freedom
 	/// \note protected so that nobody can change the number of DOF
 	/// \note except daughter classes
-	void setNumDof(unsigned int numDof);
+	void setNumDof(size_t numDof);
 
 	/// Get the gravity used by this Representation
 	/// \return The gravity vector
@@ -157,16 +148,16 @@ protected:
 
 private:
 	/// NO copy constructor
-	Representation(const Representation& a);
+	Representation(const Representation&);
 
 	/// NO assignment operator
-	Representation& operator =(const Representation& a);
+	Representation& operator =(const Representation&);
 
 	/// Gravity vector
 	const SurgSim::Math::Vector3d m_gravity;
 
 	/// Number of degrees of freedom for this representation
-	unsigned int m_numDof;
+	size_t m_numDof;
 
 	/// Gravity enabled flag
 	bool m_isGravityEnabled;

@@ -16,15 +16,20 @@
 #ifndef SURGSIM_MATH_MATHCONVERT_H
 #define SURGSIM_MATH_MATHCONVERT_H
 
-#include "SurgSim/Framework/Convert.h"
-
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/RigidTransform.h"
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include <yaml-cpp/yaml.h>
+
+#include "SurgSim/Framework/Macros.h"
+
+namespace SurgSim
+{
+namespace Math
+{
+class Shape;
+}
+}
 
 /// \file MathConvert.h
 /// This contains a series of functions to encode and decode Eigen data structures to
@@ -72,6 +77,12 @@ namespace YAML
 		static bool decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
 	};
 
+	template <>
+	struct convert<std::shared_ptr<SurgSim::Math::Shape>>
+	{
+		static Node encode(const std::shared_ptr<SurgSim::Math::Shape>& rhs);
+		static bool decode(const Node& node, std::shared_ptr<SurgSim::Math::Shape>& rhs);
+	};
 };
 
 #include "SurgSim/Math/MathConvert-inl.h"

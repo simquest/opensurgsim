@@ -18,6 +18,7 @@
 #include <boost/uuid/random_generator.hpp>
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
 

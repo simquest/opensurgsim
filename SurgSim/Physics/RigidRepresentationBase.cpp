@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
@@ -106,7 +107,6 @@ const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::
 	return m_currentParameters;
 }
 
-
 void SurgSim::Physics::RigidRepresentationBase::beforeUpdate(double dt)
 {
 	m_previousState = m_currentState;
@@ -121,6 +121,29 @@ void SurgSim::Physics::RigidRepresentationBase::afterUpdate(double dt)
 		if (poseComponent != nullptr)
 		{
 			poseComponent->setPose(m_finalState.getPose() * getLocalPose().inverse());
+		}
+	}
+}
+
+void RigidRepresentationBase::setCollisionRepresentation(
+	std::shared_ptr<SurgSim::Collision::Representation> representation)
+{
+	if (m_collisionRepresentation != representation)
+	{
+		// If we have an old collision representation clear the dependency
+		auto oldCollisionRep = std::dynamic_pointer_cast<RigidCollisionRepresentation>(m_collisionRepresentation);
+		if (oldCollisionRep != nullptr)
+		{
+			oldCollisionRep->setRigidRepresentation(nullptr);
+		}
+
+		Representation::setCollisionRepresentation(representation);
+
+		// If its a RigidCollisionRepresentation connect with this representation
+		auto newCollisionRep = std::dynamic_pointer_cast<RigidCollisionRepresentation>(representation);
+		if (newCollisionRep != nullptr)
+		{
+			newCollisionRep->setRigidRepresentation(std::static_pointer_cast<RigidRepresentationBase>(getSharedPtr()));
 		}
 	}
 }

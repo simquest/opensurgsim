@@ -85,9 +85,8 @@ bool SphereElement::doInitialize()
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
 
-	auto rigidCollision = std::make_shared<RigidCollisionRepresentation>
-		("Sphere Collision Representation");
-	rigidCollision->setRigidRepresentation(physicsRepresentation);
+	auto rigidCollision = std::make_shared<RigidCollisionRepresentation>("Sphere Collision Representation");
+	physicsRepresentation->setCollisionRepresentation(rigidCollision);
 	addComponent(rigidCollision);
 
 	return true;

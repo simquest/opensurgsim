@@ -16,15 +16,18 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <boost/exception/to_string.hpp>
 
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
@@ -58,9 +61,11 @@
 
 using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
 using SurgSim::Blocks::VisualizeContactsBehavior;
+using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::DataStructures::PlyReader;
+using SurgSim::DataStructures::TriangleMeshBase;
 using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Device::MultiAxisDevice;
 using SurgSim::Framework::ApplicationData;
@@ -93,8 +98,7 @@ using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
 
-
-static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName)
+static std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadMesh(const std::string& fileName)
 {
 	// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
 	SurgSim::DataStructures::PlyReader reader(fileName);
@@ -104,7 +108,7 @@ static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& file
 	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileName << " is malformed.";
 	reader.parseFile();
 
-	return std::make_shared<SurgSim::Graphics::Mesh>(*triangleMeshDelegate->getMesh());
+	return triangleMeshDelegate->getMesh();
 }
 
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
@@ -131,7 +135,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
-	*graphicsTriangleMeshRepresentation->getMesh() = *loadMesh(filename);
+	*graphicsTriangleMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*loadMesh(filename));
 	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
@@ -202,7 +206,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
-	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	std::shared_ptr<InputComponent> inputComponent = std::make_shared<InputComponent>("InputComponent");
 	inputComponent->setDeviceName(deviceName);
@@ -215,7 +219,8 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	// Also, it is aware of collisions of the stapler.
 	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>("Behavior");
 	staplerBehavior->setInputComponent(inputComponent);
-	staplerBehavior->setCollisionRepresentation(collisionRepresentation);
+	staplerBehavior->setRepresentation(physicsRepresentation);
+	staplerBehavior->enableStaplingForSceneElement("armSceneElement");
 
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
 		std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");
@@ -240,8 +245,34 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(createSceneryObject("Markings",  "Geometry/stapler_markings.obj"));
 	sceneElement->addComponent(createSceneryObject("Trigger",   "Geometry/stapler_trigger.obj"));
 
+	std::vector<std::shared_ptr<MeshShape>> virtualTeethShapes;
+	virtualTeethShapes.push_back(std::make_shared<MeshShape>(*loadMesh("Data/Geometry/virtual_staple_1.ply")));
+	virtualTeethShapes.push_back(std::make_shared<MeshShape>(*loadMesh("Data/Geometry/virtual_staple_2.ply")));
+
+	int i = 0;
+	std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> virtualTeeth;
+	for (auto it = virtualTeethShapes.begin(); it != virtualTeethShapes.end(); ++it, ++i)
+	{
+		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision
+			= std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
+				"VirtualToothCollision" + boost::to_string(i), *it, RigidTransform3d::Identity());
+
+		virtualTeeth[i] = virtualToothCollision;
+		sceneElement->addComponent(virtualToothCollision);
+
+		std::shared_ptr<OsgMeshRepresentation> virtualToothMesh
+			= std::make_shared<OsgMeshRepresentation>("virtualToothMesh" + boost::to_string(i));
+		*virtualToothMesh->getMesh() = SurgSim::Graphics::Mesh(*(*it)->getMesh());
+		virtualToothMesh->setDrawAsWireFrame(true);
+
+		sceneElement->addComponent(virtualToothMesh);
+	}
+
+	staplerBehavior->setVirtualStaple(virtualTeeth);
+
 	return sceneElement;
 }
+
 std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 {
 	std::vector<std::string> paths;
@@ -274,7 +305,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
-	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>(armName + "SceneElement");
 	armSceneElement->addComponent(forearmSceneryRepresentation);

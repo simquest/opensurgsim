@@ -85,14 +85,6 @@ public:
 	/// \return the 6x6 compliance matrix
 	const SurgSim::Math::Matrix66d& getComplianceMatrix() const;
 
-	/// Set the collision representation for this physics representation, when the collision object
-	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
-	/// Specializes to register this representation in the collision representation if the collision representation
-	/// is a RigidCollisionRepresentation.
-	/// \param representation The collision representation to be used.
-	virtual void setCollisionRepresentation(
-		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
-
 protected:
 	/// Inertia matrices in global coordinates
 	SurgSim::Math::Matrix33d m_globalInertia;

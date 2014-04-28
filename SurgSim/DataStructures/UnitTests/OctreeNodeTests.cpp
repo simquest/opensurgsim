@@ -37,7 +37,6 @@ struct MockData
 };
 
 typedef OctreeNode<MockData> OctreeNodeType;
-typedef OctreeNode<MockData>::AxisAlignedBoundingBox AxisAlignedBoundingBox;
 
 namespace
 {
@@ -46,7 +45,7 @@ const double epsilon = 1e-14;
 
 TEST(OctreeNodeTests, CanConstruct)
 {
-	AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones());
+	SurgSim::Math::Aabbd boundingBox(Vector3d::Zero(), Vector3d::Ones());
 
 	EXPECT_NO_THROW({OctreeNodeType octree(boundingBox);});
 	EXPECT_NO_THROW(std::make_shared<OctreeNodeType>(boundingBox));
@@ -54,7 +53,7 @@ TEST(OctreeNodeTests, CanConstruct)
 
 TEST(OctreeNodeTests, InitialValues)
 {
-	AxisAlignedBoundingBox expectedBoundingBox(Vector3d::Zero(), Vector3d::Ones());
+	SurgSim::Math::Aabbd expectedBoundingBox(Vector3d::Zero(), Vector3d::Ones());
 	OctreeNodeType octree(expectedBoundingBox);
 
 	EXPECT_FALSE(octree.isActive());
@@ -62,7 +61,7 @@ TEST(OctreeNodeTests, InitialValues)
 	EXPECT_TRUE(expectedBoundingBox.isApprox(octree.getBoundingBox()));
 
 	auto children = octree.getChildren();
-	for(auto child=children.cbegin(); child!=children.cend(); ++child)
+	for (auto child = children.cbegin(); child != children.cend(); ++child)
 	{
 		EXPECT_EQ(nullptr, *child);
 	}
@@ -70,7 +69,7 @@ TEST(OctreeNodeTests, InitialValues)
 
 TEST(OctreeNodeTests, Subdivide)
 {
-	AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones() * 16.0);
+	SurgSim::Math::Aabbd boundingBox(Vector3d::Zero(), Vector3d::Ones() * 16.0);
 	OctreeNodeType octree(boundingBox);
 
 	EXPECT_FALSE(octree.hasChildren());
@@ -80,26 +79,28 @@ TEST(OctreeNodeTests, Subdivide)
 	EXPECT_FALSE(octree.isActive());
 
 	auto children = octree.getChildren();
-	for(auto child=children.cbegin(); child!=children.cend(); ++child)
+	for (auto child = children.cbegin(); child != children.cend(); ++child)
 	{
 		ASSERT_NE(nullptr, *child);
 		EXPECT_FALSE((*child)->isActive());
 		EXPECT_FALSE((*child)->hasChildren());
 	}
 
-	std::array<AxisAlignedBoundingBox, 8> expectedBoxes = {{
-		AxisAlignedBoundingBox(Vector3d(0.0, 0.0, 0.0), Vector3d(8.0, 8.0, 8.0)),
-		AxisAlignedBoundingBox(Vector3d(0.0, 0.0, 8.0), Vector3d(8.0, 8.0, 16.0)),
-		AxisAlignedBoundingBox(Vector3d(0.0, 8.0, 0.0), Vector3d(8.0, 16.0, 8.0)),
-		AxisAlignedBoundingBox(Vector3d(0.0, 8.0, 8.0), Vector3d(8.0, 16.0, 16.0)),
-		AxisAlignedBoundingBox(Vector3d(8.0, 0.0, 0.0), Vector3d(16.0, 8.0, 8.0)),
-		AxisAlignedBoundingBox(Vector3d(8.0, 0.0, 8.0), Vector3d(16.0, 8.0, 16.0)),
-		AxisAlignedBoundingBox(Vector3d(8.0, 8.0, 0.0), Vector3d(16.0, 16.0, 8.0)),
-		AxisAlignedBoundingBox(Vector3d(8.0, 8.0, 8.0), Vector3d(16.0, 16.0, 16.0))}};
-	for (auto expectedBox=expectedBoxes.cbegin(); expectedBox!=expectedBoxes.cend(); ++expectedBox)
+	std::array<SurgSim::Math::Aabbd, 8> expectedBoxes = {{
+			SurgSim::Math::Aabbd(Vector3d(0.0, 0.0, 0.0), Vector3d(8.0, 8.0, 8.0)),
+			SurgSim::Math::Aabbd(Vector3d(0.0, 0.0, 8.0), Vector3d(8.0, 8.0, 16.0)),
+			SurgSim::Math::Aabbd(Vector3d(0.0, 8.0, 0.0), Vector3d(8.0, 16.0, 8.0)),
+			SurgSim::Math::Aabbd(Vector3d(0.0, 8.0, 8.0), Vector3d(8.0, 16.0, 16.0)),
+			SurgSim::Math::Aabbd(Vector3d(8.0, 0.0, 0.0), Vector3d(16.0, 8.0, 8.0)),
+			SurgSim::Math::Aabbd(Vector3d(8.0, 0.0, 8.0), Vector3d(16.0, 8.0, 16.0)),
+			SurgSim::Math::Aabbd(Vector3d(8.0, 8.0, 0.0), Vector3d(16.0, 16.0, 8.0)),
+			SurgSim::Math::Aabbd(Vector3d(8.0, 8.0, 8.0), Vector3d(16.0, 16.0, 16.0))
+		}
+	};
+	for (auto expectedBox = expectedBoxes.cbegin(); expectedBox != expectedBoxes.cend(); ++expectedBox)
 	{
 		bool boxFound = false;
-		for(auto child=children.cbegin(); child!=children.cend(); ++child)
+		for (auto child = children.cbegin(); child != children.cend(); ++child)
 		{
 			if (expectedBox->isApprox((*child)->getBoundingBox()))
 			{
@@ -117,7 +118,7 @@ int countOctreeLevels(std::shared_ptr<OctreeNodeType> node)
 	{
 		auto children = node->getChildren();
 		int maxLevels = 0;
-		for(auto child=children.cbegin(); child!=children.cend(); ++child)
+		for (auto child = children.cbegin(); child != children.cend(); ++child)
 		{
 			if ((*child)->isActive())
 			{
@@ -135,7 +136,7 @@ int countOctreeLevels(std::shared_ptr<OctreeNodeType> node)
 
 TEST(OctreeNodeTests, AddNodes)
 {
-	AxisAlignedBoundingBox boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
+	SurgSim::Math::Aabbd boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
 	std::shared_ptr<OctreeNodeType> octree = std::make_shared<OctreeNodeType>(boundingBox);
 
 	const int levels = 5;
@@ -153,7 +154,7 @@ TEST(OctreeNodeTests, AddNodes)
 
 	int numActive = 0;
 	auto children = octree->getChildren();
-	for(auto child=children.cbegin(); child!=children.cend(); ++child)
+	for (auto child = children.cbegin(); child != children.cend(); ++child)
 	{
 		if ((*child)->isActive())
 		{
@@ -165,7 +166,7 @@ TEST(OctreeNodeTests, AddNodes)
 
 TEST(OctreeNodeTests, Data)
 {
-	AxisAlignedBoundingBox boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
+	SurgSim::Math::Aabbd boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
 	OctreeNodeType octree(boundingBox);
 
 	const int levels = 1;
@@ -184,7 +185,7 @@ TEST(OctreeNodeTests, Data)
 
 TEST(OctreeNodeTests, OctreePath)
 {
-	AxisAlignedBoundingBox boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
+	SurgSim::Math::Aabbd boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
 	std::shared_ptr<OctreeNodeType> octree = std::make_shared<OctreeNodeType>(boundingBox);
 
 	SurgSim::DataStructures::OctreePath path;
@@ -211,7 +212,7 @@ TEST(OctreeNodeTests, CopyConstructor)
 		double value;
 	};
 
-	AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), 2*Vector3d::Ones());
+	SurgSim::Math::Aabbd boundingBox(Vector3d::Zero(), 2 * Vector3d::Ones());
 	std::shared_ptr<OctreeNode<Data1>> octree1 = std::make_shared<OctreeNode<Data1>>(boundingBox);
 	Data1 dataRoot = {"root"};
 	octree1->addData(Vector3d(1.0, 1.0, 1.0), dataRoot, 1);
@@ -225,7 +226,7 @@ TEST(OctreeNodeTests, CopyConstructor)
 		EXPECT_TRUE(octree1->getBoundingBox().isApprox(octree2->getBoundingBox()));
 		EXPECT_EQ(octree1->hasChildren(), octree2->hasChildren());
 		EXPECT_EQ(octree1->isActive(), octree2->isActive());
-		for(size_t i = 0; i < 8; i++)
+		for (size_t i = 0; i < 8; i++)
 		{
 			if (octree1->getChild(i) == nullptr)
 			{
@@ -249,7 +250,7 @@ TEST(OctreeNodeTests, CopyConstructor)
 		EXPECT_EQ(octree1->hasChildren(), octree2->hasChildren());
 		EXPECT_EQ(octree1->isActive(), octree2->isActive());
 		EXPECT_EQ(octree1->data.name, octree2->data.name);
-		for(size_t i = 0; i < 8; i++)
+		for (size_t i = 0; i < 8; i++)
 		{
 			if (octree1->getChild(i) == nullptr)
 			{
@@ -269,10 +270,34 @@ TEST(OctreeNodeTests, CopyConstructor)
 
 TEST(OctreeNodeTests, EmptyData)
 {
-	AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones());
+	SurgSim::Math::Aabbd boundingBox(Vector3d::Zero(), Vector3d::Ones());
 
 	EXPECT_NO_THROW({OctreeNode<EmptyData> octree(boundingBox);});
 	EXPECT_NO_THROW(std::make_shared<OctreeNode<EmptyData>>(boundingBox));
 }
 
 
+TEST(OctreeNodeTests, LoadOctree)
+{
+	std::shared_ptr<OctreeNode<SurgSim::DataStructures::EmptyData>> octree;
+	EXPECT_NO_THROW(octree = SurgSim::DataStructures::loadOctree("OctreeShapeData/staple.vox"));
+
+	ASSERT_TRUE(nullptr != octree);
+	auto boundingBox = octree->getBoundingBox();
+
+	SurgSim::Math::Vector3d boundingMin(-0.00207699998282, -0.00532899983227, -0.000403999991249);
+	SurgSim::Math::Vector3d boundingMax(0.01392300001718, 0.01067100016773, 0.015596000008751);
+	EXPECT_TRUE(boundingMin.isApprox(boundingBox.min()));
+	EXPECT_TRUE(boundingMax.isApprox(boundingBox.max()));
+
+	EXPECT_TRUE(octree->isActive());
+	EXPECT_TRUE(octree->hasChildren());
+
+	EXPECT_TRUE(octree->getChild(0)->isActive());
+	EXPECT_TRUE(octree->getChild(0)->hasChildren());
+
+	EXPECT_TRUE(octree->getChild(0)->getChild(2)->isActive());
+	EXPECT_TRUE(octree->getChild(0)->getChild(2)->hasChildren());
+
+	EXPECT_TRUE(octree->getChild(0)->getChild(2)->getChild(2)->isActive());
+}

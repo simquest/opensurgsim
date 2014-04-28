@@ -47,5 +47,10 @@ void TriangleMesh::calculateNormals()
 	}
 }
 
+void TriangleMesh::doUpdate()
+{
+	calculateNormals();
+}
+
 }; // namespace DataStructures
 }; // namespace SurgSim

@@ -31,7 +31,7 @@ OctreeNode<Data>::OctreeNode() :
 
 
 template<class Data>
-OctreeNode<Data>::OctreeNode(const typename OctreeNode<Data>::AxisAlignedBoundingBox& boundingBox) :
+OctreeNode<Data>::OctreeNode(const SurgSim::Math::Aabbd& boundingBox) :
 	m_boundingBox(boundingBox),
 	m_isActive(false),
 	m_hasChildren(false)
@@ -48,16 +48,16 @@ SurgSim::DataStructures::OctreeNode<Data>::OctreeNode(const OctreeNode& other)
 	// Also copy the data since they are the same type
 	data = other.data;
 
-	for(size_t i = 0; i < other.m_children.size(); i++)
+	for (size_t i = 0; i < other.m_children.size(); i++)
 	{
-	   if (other.getChild(i) == nullptr)
-	   {
-		   m_children[i] = nullptr;
-	   }
-	   else
-	   {
-		   m_children[i] = std::make_shared<OctreeNode<Data>>(*other.m_children[i]);
-	   }
+		if (other.getChild(i) == nullptr)
+		{
+			m_children[i] = nullptr;
+		}
+		else
+		{
+			m_children[i] = std::make_shared<OctreeNode<Data>>(*other.m_children[i]);
+		}
 	}
 }
 
@@ -69,7 +69,7 @@ SurgSim::DataStructures::OctreeNode<Data>::OctreeNode(const OctreeNode<T>& other
 	m_hasChildren = other.hasChildren();
 	m_isActive = other.isActive();
 
-	for(size_t i = 0; i < m_children.size(); i++)
+	for (size_t i = 0; i < m_children.size(); i++)
 	{
 		auto child = other.getChild(i);
 		if (child == nullptr)
@@ -89,7 +89,7 @@ OctreeNode<Data>::~OctreeNode()
 }
 
 template<class Data>
-const typename OctreeNode<Data>::AxisAlignedBoundingBox& OctreeNode<Data>::getBoundingBox() const
+const SurgSim::Math::Aabbd& OctreeNode<Data>::getBoundingBox() const
 {
 	return m_boundingBox;
 }
@@ -137,7 +137,7 @@ bool OctreeNode<Data>::addData(const SurgSim::Math::Vector3d& position, const Da
 
 template<class Data>
 bool OctreeNode<Data>::doAddData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
-		const int currentLevel)
+								 const int currentLevel)
 {
 	if (! m_boundingBox.contains(position))
 	{
@@ -157,7 +157,7 @@ bool OctreeNode<Data>::doAddData(const SurgSim::Math::Vector3d& position, const 
 	}
 	for (auto child = m_children.begin(); child != m_children.end(); ++child)
 	{
-		if ((*child)->doAddData(position, nodeData, level, currentLevel+1))
+		if ((*child)->doAddData(position, nodeData, level, currentLevel + 1))
 		{
 			m_isActive = true;
 			return true;
@@ -198,7 +198,7 @@ std::shared_ptr<OctreeNode<Data>> OctreeNode<Data>::getNode(const OctreePath& pa
 	{
 		node = node->getChild(*index);
 		SURGSIM_ASSERT(node != nullptr)
-			<< "Octree path is invalid. Path is longer than octree is deep in this given branch.";
+				<< "Octree path is invalid. Path is longer than octree is deep in this given branch.";
 	}
 	return node;
 }

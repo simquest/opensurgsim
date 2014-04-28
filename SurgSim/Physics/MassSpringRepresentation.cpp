@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 

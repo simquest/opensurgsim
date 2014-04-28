@@ -54,13 +54,12 @@ public:
 	/// \param	name	Name of the camera
 	explicit Camera(const std::string& name) : Representation(name)
 	{
-		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, projectionMatrix,
+		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, ProjectionMatrix,
 			getProjectionMatrix, setProjectionMatrix);
 
-		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, viewMatrix, getViewMatrix);
-		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatViewMatrix, getViewMatrix);
-		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatProjectionMatrix, getProjectionMatrix);
-		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatInverseViewMatrix, getInverseViewMatrix);
+		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatViewMatrix, getViewMatrix);
+		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatProjectionMatrix, getProjectionMatrix);
+		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatInverseViewMatrix, getInverseViewMatrix);
 	}
 
 	/// Sets the group of representations that will be seen by this camera.

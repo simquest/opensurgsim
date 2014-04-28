@@ -52,6 +52,7 @@ set(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
 	SurgSimMath
+	${YAML_CPP_LIBRARIES}
 )
 
 target_link_libraries(ExampleAddSphereFromInput ${LIBS}

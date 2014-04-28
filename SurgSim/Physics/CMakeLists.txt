@@ -157,6 +157,10 @@ if(BUILD_TESTING)
 	if(BUILD_RENDER_TESTING)
 		add_subdirectory(RenderTests)
 	endif()
+
+	if(BUILD_PERFORMANCE_TESTING)
+		add_subdirectory(PerformanceTests)
+	endif()
 endif()
 
 set_target_properties(SurgSimPhysics PROPERTIES FOLDER "Physics")

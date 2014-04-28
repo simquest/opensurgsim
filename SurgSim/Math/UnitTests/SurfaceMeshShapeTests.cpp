@@ -16,8 +16,9 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/Shapes.h"
+#include "SurgSim/Math/SurfaceMeshShape.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::EmptyData;
@@ -114,4 +115,32 @@ TEST_F(SurfaceMeshShapeTest, NonAlignedDiskShapeTest)
 	EXPECT_NEAR(m_expectedVolume, diskShape->getVolume(), 1e-2);
 	EXPECT_TRUE(diskShape->getCenter().isApprox(m_center, 1e-2));
 	EXPECT_TRUE(diskShape->getSecondMomentOfVolume().isApprox(rotatedExpectedMatrix, 1e-2));
+}
+
+
+TEST_F(SurfaceMeshShapeTest, SerializationTest)
+{
+	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	auto surfaceMeshShape = std::make_shared<SurgSim::Math::SurfaceMeshShape>();
+	surfaceMeshShape->setFileName(fileName);
+
+	// We chose to let YAML serialization only works with base class pointer.
+	// i.e. We need to serialize 'surfaceMeshShape' via a SurgSim::Math::Shape pointer.
+	// The usage YAML::Node node = surfaceMeshShape; will not compile.
+	std::shared_ptr<SurgSim::Math::Shape> shape = surfaceMeshShape;
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = shape); // YAML::convert<std::shared_ptr<SurgSim::Math::Shape>> will be called.
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(1u, node.size());
+
+	std::shared_ptr<SurgSim::Math::SurfaceMeshShape> newSurfaceMesh;
+	ASSERT_NO_THROW(newSurfaceMesh =
+		std::dynamic_pointer_cast<SurgSim::Math::SurfaceMeshShape>(node.as<std::shared_ptr<SurgSim::Math::Shape>>()));
+
+	EXPECT_EQ("SurgSim::Math::SurfaceMeshShape", newSurfaceMesh->getClassName());
+	EXPECT_EQ(fileName, newSurfaceMesh->getFileName());
+	EXPECT_EQ(surfaceMeshShape->getMesh()->getNumVertices(), newSurfaceMesh->getMesh()->getNumVertices());
+	EXPECT_EQ(surfaceMeshShape->getMesh()->getNumEdges(), newSurfaceMesh->getMesh()->getNumEdges());
+	EXPECT_EQ(surfaceMeshShape->getMesh()->getNumTriangles(), newSurfaceMesh->getMesh()->getNumTriangles());
 }

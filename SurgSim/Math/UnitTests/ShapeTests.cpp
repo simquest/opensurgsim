@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Shapes.h"
@@ -26,8 +27,9 @@ using SurgSim::Math::Matrix33d;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::CylinderShape;
-using SurgSim::Math::MeshShape;
+using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::OctreeShape;
+using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
 
@@ -65,22 +67,44 @@ public:
 	double m_size[3];
 };
 
-TEST_F(ShapeTest, SphereSerialize)
+TEST_F(ShapeTest, EncodeEmptyShapeTest)
 {
-	std::shared_ptr<Shape> sphere;
-	EXPECT_NO_THROW({sphere = Shape::getFactory().create("SurgSim::Math::SphereShape");});
-	sphere->setValue("Radius", m_radius);
+	std::shared_ptr<Shape> shape;
+	EXPECT_ANY_THROW(YAML::convert<std::shared_ptr<Shape>>::encode(shape));
+}
 
-	YAML::Node node;
-	ASSERT_NO_THROW({node = sphere->encode();});
+TEST_F(ShapeTest, SphereSerializationTest)
+{
+	{
+		YAML::Node node;
+		node["SurgSim::Math::SphereShape"]["Radius"] = m_radius;
 
-	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(1u, node.size());
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = node.as<std::shared_ptr<Shape>>());
 
-	SphereShape actualSphere;
-	ASSERT_NO_THROW({actualSphere.decode(node);});
-	EXPECT_EQ(m_radius, actualSphere.getValue<double>("Radius"));
-	EXPECT_EQ("SurgSim::Math::SphereShape", actualSphere.getClassName());
+		EXPECT_EQ("SurgSim::Math::SphereShape", shape->getClassName());
+		EXPECT_NEAR(m_radius, shape->getValue<double>("Radius"), epsilon);
+	}
+
+	{
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = Shape::getFactory().create("SurgSim::Math::SphereShape"));
+		shape->setValue("Radius", m_radius);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = shape);
+		EXPECT_TRUE(node.IsMap());
+		EXPECT_EQ(1u, node.size());
+
+		ASSERT_TRUE(node["SurgSim::Math::SphereShape"].IsDefined());
+		auto data = node["SurgSim::Math::SphereShape"];
+		EXPECT_EQ(1u, data.size());
+
+		std::shared_ptr<SphereShape> sphereShape;
+		ASSERT_NO_THROW(sphereShape = std::dynamic_pointer_cast<SphereShape>(node.as<std::shared_ptr<Shape>>()));
+		EXPECT_EQ("SurgSim::Math::SphereShape", sphereShape->getClassName());
+		EXPECT_NEAR(m_radius, sphereShape->getValue<double>("Radius"), epsilon);
+	}
 }
 
 TEST_F(ShapeTest, Sphere)
@@ -89,7 +113,7 @@ TEST_F(ShapeTest, Sphere)
 
 	SphereShape sphere(m_radius);
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_SPHERE, sphere.getType());
-	EXPECT_EQ(m_radius, sphere.getRadius());
+	EXPECT_NEAR(m_radius, sphere.getRadius(), epsilon);
 
 	const double& r = m_radius;
 	const double r2 = r * r;
@@ -110,26 +134,46 @@ TEST_F(ShapeTest, Sphere)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(ShapeTest, BoxSerialize)
+TEST_F(ShapeTest, BoxSerializationTest)
 {
-	std::shared_ptr<Shape> box;
-	EXPECT_NO_THROW({box = Shape::getFactory().create("SurgSim::Math::BoxShape");});
-	box->setValue("SizeX", m_size[0]);
-	box->setValue("SizeY", m_size[1]);
-	box->setValue("SizeZ", m_size[2]);
+	{
+		YAML::Node node;
+		node["SurgSim::Math::BoxShape"]["SizeX"] = m_size[0];
+		node["SurgSim::Math::BoxShape"]["SizeY"] = m_size[1];
+		node["SurgSim::Math::BoxShape"]["SizeZ"] = m_size[2];
 
-	YAML::Node node;
-	ASSERT_NO_THROW({node = box->encode();});
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = node.as<std::shared_ptr<Shape>>());
 
-	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(3u, node.size());
+		EXPECT_EQ("SurgSim::Math::BoxShape", shape->getClassName());
+		EXPECT_NEAR(m_size[0], shape->getValue<double>("SizeX"), epsilon);
+		EXPECT_NEAR(m_size[1], shape->getValue<double>("SizeY"), epsilon);
+		EXPECT_NEAR(m_size[2], shape->getValue<double>("SizeZ"), epsilon);
+	}
 
-	BoxShape actualBox;
-	ASSERT_NO_THROW({actualBox.decode(node);});
-	EXPECT_EQ(m_size[0], actualBox.getValue<double>("SizeX"));
-	EXPECT_EQ(m_size[1], actualBox.getValue<double>("SizeY"));
-	EXPECT_EQ(m_size[2], actualBox.getValue<double>("SizeZ"));
-	EXPECT_EQ("SurgSim::Math::BoxShape", actualBox.getClassName());
+	{
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = Shape::getFactory().create("SurgSim::Math::BoxShape"));
+		shape->setValue("SizeX", m_size[0]);
+		shape->setValue("SizeY", m_size[1]);
+		shape->setValue("SizeZ", m_size[2]);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = shape);
+		EXPECT_TRUE(node.IsMap());
+		EXPECT_EQ(1u, node.size());
+
+		ASSERT_TRUE(node["SurgSim::Math::BoxShape"].IsDefined());
+		auto data = node["SurgSim::Math::BoxShape"];
+		EXPECT_EQ(3u, data.size());
+
+		std::shared_ptr<BoxShape> boxShape;
+		ASSERT_NO_THROW(boxShape = std::dynamic_pointer_cast<BoxShape>(node.as<std::shared_ptr<Shape>>()));
+		EXPECT_EQ("SurgSim::Math::BoxShape", boxShape->getClassName());
+		EXPECT_NEAR(m_size[0], boxShape->getValue<double>("SizeX"), epsilon);
+		EXPECT_NEAR(m_size[1], boxShape->getValue<double>("SizeY"), epsilon);
+		EXPECT_NEAR(m_size[2], boxShape->getValue<double>("SizeZ"), epsilon);
+	}
 }
 
 TEST_F(ShapeTest, Box)
@@ -138,9 +182,9 @@ TEST_F(ShapeTest, Box)
 
 	Vector3d size(m_size[0], m_size[1], m_size[2]);
 	BoxShape box(m_size[0], m_size[1], m_size[2]);
-	EXPECT_EQ(m_size[0], box.getSizeX());
-	EXPECT_EQ(m_size[1], box.getSizeY());
-	EXPECT_EQ(m_size[2], box.getSizeZ());
+	EXPECT_NEAR(m_size[0], box.getSizeX(), epsilon);
+	EXPECT_NEAR(m_size[1], box.getSizeY(), epsilon);
+	EXPECT_NEAR(m_size[2], box.getSizeZ(), epsilon);
 	EXPECT_TRUE(box.getSize().isApprox(size));
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_BOX, box.getType());
 
@@ -164,24 +208,43 @@ TEST_F(ShapeTest, Box)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(ShapeTest, CylinderSerialize)
+TEST_F(ShapeTest, CylinderSerializationTest)
 {
-	std::shared_ptr<Shape> cylinder;
-	EXPECT_NO_THROW({cylinder = Shape::getFactory().create("SurgSim::Math::CylinderShape");});
-	cylinder->setValue("Length", m_length);
-	cylinder->setValue("Radius", m_radius);
+	{
+		YAML::Node node;
+		node["SurgSim::Math::CylinderShape"]["Length"] = m_length;
+		node["SurgSim::Math::CylinderShape"]["Radius"] = m_length;
 
-	YAML::Node node;
-	ASSERT_NO_THROW({node = cylinder->encode();});
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = node.as<std::shared_ptr<Shape>>());
 
-	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(2u, node.size());
+		EXPECT_EQ("SurgSim::Math::CylinderShape", shape->getClassName());
+		EXPECT_NEAR(m_length, shape->getValue<double>("Length"), epsilon);
+		EXPECT_NEAR(m_length, shape->getValue<double>("Radius"), epsilon);
+	}
 
-	CylinderShape actualCylinder;
-	ASSERT_NO_THROW({actualCylinder.decode(node);});
-	EXPECT_EQ(m_length, actualCylinder.getValue<double>("Length"));
-	EXPECT_EQ(m_radius, actualCylinder.getValue<double>("Radius"));
-	EXPECT_EQ("SurgSim::Math::CylinderShape", actualCylinder.getClassName());
+	{
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = Shape::getFactory().create("SurgSim::Math::CylinderShape"));
+		shape->setValue("Length", m_length);
+		shape->setValue("Radius", m_radius);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = shape);
+
+		EXPECT_TRUE(node.IsMap());
+		EXPECT_EQ(1u, node.size());
+
+		ASSERT_TRUE(node["SurgSim::Math::CylinderShape"].IsDefined());
+		auto data = node["SurgSim::Math::CylinderShape"];
+		EXPECT_EQ(2u, data.size());
+
+		std::shared_ptr<CylinderShape> cylinderShape;
+		ASSERT_NO_THROW(cylinderShape = std::dynamic_pointer_cast<CylinderShape>(node.as<std::shared_ptr<Shape>>()));
+		EXPECT_EQ("SurgSim::Math::CylinderShape", cylinderShape->getClassName());
+		EXPECT_NEAR(m_length, cylinderShape->getValue<double>("Length"), epsilon);
+		EXPECT_NEAR(m_radius, cylinderShape->getValue<double>("Radius"), epsilon);
+	}
 }
 
 TEST_F(ShapeTest, Cylinder)
@@ -189,8 +252,8 @@ TEST_F(ShapeTest, Cylinder)
 	ASSERT_NO_THROW({CylinderShape cyliner(m_length, m_radius);});
 
 	CylinderShape cylinder(m_length, m_radius);
-	EXPECT_EQ(m_length, cylinder.getLength());
-	EXPECT_EQ(m_radius, cylinder.getRadius());
+	EXPECT_NEAR(m_length, cylinder.getLength(), epsilon);
+	EXPECT_NEAR(m_radius, cylinder.getRadius(), epsilon);
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_CYLINDER, cylinder.getType());
 
 	double expectedVolume = M_PI * m_radius * m_radius * m_length;
@@ -214,24 +277,43 @@ TEST_F(ShapeTest, Cylinder)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(ShapeTest, CapsuleSerialize)
+TEST_F(ShapeTest, CapsuleSerializationTest)
 {
-	std::shared_ptr<Shape> capsule;
-	EXPECT_NO_THROW({capsule = Shape::getFactory().create("SurgSim::Math::CapsuleShape");});
-	capsule->setValue("Length", m_length);
-	capsule->setValue("Radius", m_radius);
+	{
+		YAML::Node node;
+		node["SurgSim::Math::CapsuleShape"]["Length"] = m_length;
+		node["SurgSim::Math::CapsuleShape"]["Radius"] = m_length;
 
-	YAML::Node node;
-	ASSERT_NO_THROW({node = capsule->encode();});
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = node.as<std::shared_ptr<Shape>>());
 
-	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(2u, node.size());
+		EXPECT_EQ("SurgSim::Math::CapsuleShape", shape->getClassName());
+		EXPECT_NEAR(m_length, shape->getValue<double>("Length"), epsilon);
+		EXPECT_NEAR(m_length, shape->getValue<double>("Radius"), epsilon);
+	}
 
-	CapsuleShape actualCapsule;
-	ASSERT_NO_THROW({actualCapsule.decode(node);});
-	EXPECT_EQ(m_length, actualCapsule.getValue<double>("Length"));
-	EXPECT_EQ(m_radius, actualCapsule.getValue<double>("Radius"));
-	EXPECT_EQ("SurgSim::Math::CapsuleShape", actualCapsule.getClassName());
+	{
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = Shape::getFactory().create("SurgSim::Math::CapsuleShape"));
+		shape->setValue("Length", m_length);
+		shape->setValue("Radius", m_radius);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = shape);
+
+		EXPECT_TRUE(node.IsMap());
+		EXPECT_EQ(1u, node.size());
+
+		ASSERT_TRUE(node["SurgSim::Math::CapsuleShape"].IsDefined());
+		auto data = node["SurgSim::Math::CapsuleShape"];
+		EXPECT_EQ(2u, data.size());
+
+		std::shared_ptr<CapsuleShape> capsuleShape;
+		ASSERT_NO_THROW(capsuleShape = std::dynamic_pointer_cast<CapsuleShape>(node.as<std::shared_ptr<Shape>>()));
+		EXPECT_EQ("SurgSim::Math::CapsuleShape", capsuleShape->getClassName());
+		EXPECT_NEAR(m_length, capsuleShape->getValue<double>("Length"), epsilon);
+		EXPECT_NEAR(m_radius, capsuleShape->getValue<double>("Radius"), epsilon);
+	}
 }
 
 TEST_F(ShapeTest, Capsule)
@@ -239,8 +321,8 @@ TEST_F(ShapeTest, Capsule)
 	ASSERT_NO_THROW({CapsuleShape capsule(m_length, m_radius);});
 
 	CapsuleShape capsule(m_length, m_radius);
-	EXPECT_EQ(m_length, capsule.getLength());
-	EXPECT_EQ(m_radius, capsule.getRadius());
+	EXPECT_NEAR(m_length, capsule.getLength(), epsilon);
+	EXPECT_NEAR(m_radius, capsule.getRadius(), epsilon);
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_CAPSULE, capsule.getType());
 
 	double r2 = m_radius * m_radius;
@@ -271,7 +353,90 @@ TEST_F(ShapeTest, Capsule)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(ShapeTest, Octree)
+TEST_F(ShapeTest, DoubleSidedPlaneShapeSerializationTest)
+{
+	{
+		YAML::Node node, empty;
+		node["SurgSim::Math::DoubleSidedPlaneShape"] = empty;
+
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = node.as<std::shared_ptr<Shape>>());
+
+		EXPECT_EQ("SurgSim::Math::DoubleSidedPlaneShape", shape->getClassName());
+	}
+
+	{
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = Shape::getFactory().create("SurgSim::Math::DoubleSidedPlaneShape"));
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = shape);
+
+		EXPECT_TRUE(node.IsMap());
+		EXPECT_EQ(1u, node.size());
+
+		ASSERT_TRUE(node["SurgSim::Math::DoubleSidedPlaneShape"].IsDefined());
+		auto data = node["SurgSim::Math::DoubleSidedPlaneShape"];
+		EXPECT_EQ(0u, data.size()); // DoubleSidedPlaneShape has no serialized property .
+
+		std::shared_ptr<DoubleSidedPlaneShape> doubleSidedPlaneShape;
+		ASSERT_NO_THROW(doubleSidedPlaneShape =
+			std::dynamic_pointer_cast<DoubleSidedPlaneShape>(node.as<std::shared_ptr<Shape>>()));
+		EXPECT_EQ("SurgSim::Math::DoubleSidedPlaneShape", doubleSidedPlaneShape->getClassName());
+	}
+}
+
+TEST_F(ShapeTest, DoubleSidedPlaneShape)
+{
+	EXPECT_NO_THROW(DoubleSidedPlaneShape doubleSidedPlaneShape);
+	DoubleSidedPlaneShape doubleSidedPlaneShape;
+
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE, doubleSidedPlaneShape.getType());
+	EXPECT_NEAR(0.0, doubleSidedPlaneShape.getVolume(), epsilon);
+	EXPECT_TRUE(doubleSidedPlaneShape.getCenter().isZero());
+	EXPECT_TRUE(doubleSidedPlaneShape.getSecondMomentOfVolume().isApprox(Matrix33d::Zero()));
+	EXPECT_NEAR(0.0, doubleSidedPlaneShape.getD(), epsilon);
+	EXPECT_TRUE(doubleSidedPlaneShape.getNormal().isApprox(Vector3d(0.0, 1.0, 0.0)));
+}
+
+
+TEST_F(ShapeTest, OctreeSerializationTest)
+{
+	const std::string fileName = "OctreeShapeData/staple.vox";
+
+	{
+		YAML::Node node;
+		node["SurgSim::Math::OctreeShape"]["FileName"] = fileName;
+
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = node.as<std::shared_ptr<Shape>>());
+
+		EXPECT_EQ("SurgSim::Math::OctreeShape", shape->getClassName());
+		EXPECT_EQ(fileName, shape->getValue<std::string>("FileName"));
+	}
+
+	{
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = Shape::getFactory().create("SurgSim::Math::OctreeShape"));
+		shape->setValue("FileName", fileName);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = shape);
+		EXPECT_TRUE(node.IsMap());
+		EXPECT_EQ(1u, node.size());
+
+		ASSERT_TRUE(node["SurgSim::Math::OctreeShape"].IsDefined());
+		auto data = node["SurgSim::Math::OctreeShape"];
+		EXPECT_EQ(1u, data.size());
+
+		std::shared_ptr<OctreeShape> newOctreeShape;
+		ASSERT_NO_THROW(newOctreeShape = std::dynamic_pointer_cast<OctreeShape>(node.as<std::shared_ptr<Shape>>()));
+		EXPECT_EQ("SurgSim::Math::OctreeShape", newOctreeShape->getClassName());
+		EXPECT_EQ(fileName, newOctreeShape->getFileName());
+	}
+}
+
+TEST_F(ShapeTest, OctreeShape)
 {
 	OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), m_size);
 	std::shared_ptr<OctreeShape::NodeType> node = std::make_shared<OctreeShape::NodeType>(boundingBox);
@@ -289,12 +454,62 @@ TEST_F(ShapeTest, Octree)
 	}
 
 	{
+		const std::string fileName = "OctreeShapeData/staple.vox";
 		OctreeShape octree;
-		octree.setRootNode(node);
+		EXPECT_NO_THROW(octree.setRootNode(node));
+		EXPECT_NO_THROW(octree.setFileName(fileName));
+
+		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
 		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, octree.getType());
 		EXPECT_THROW(octree.getVolume(), SurgSim::Framework::AssertionFailure);
 		EXPECT_TRUE(octree.getCenter().isApprox(Vector3d::Zero(), epsilon));
 		EXPECT_THROW(octree.getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
-		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
+		EXPECT_EQ(fileName, octree.getFileName());
 	}
+}
+
+
+TEST_F(ShapeTest, PlaneShapeSerializationTest)
+{
+	{
+		YAML::Node node, empty;
+		node["SurgSim::Math::PlaneShape"] = empty;
+
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = node.as<std::shared_ptr<Shape>>());
+
+		EXPECT_EQ("SurgSim::Math::PlaneShape", shape->getClassName());
+	}
+
+	{
+		std::shared_ptr<Shape> shape;
+		ASSERT_NO_THROW(shape = Shape::getFactory().create("SurgSim::Math::PlaneShape"));
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = shape);
+
+		EXPECT_TRUE(node.IsMap());
+		EXPECT_EQ(1u, node.size());
+
+		ASSERT_TRUE(node["SurgSim::Math::PlaneShape"].IsDefined());
+		auto data = node["SurgSim::Math::PlaneShape"];
+		EXPECT_EQ(0u, data.size()); //PlaneShape has no serialized property.
+
+		std::shared_ptr<PlaneShape> planeShape;
+		ASSERT_NO_THROW(planeShape = std::dynamic_pointer_cast<PlaneShape>(node.as<std::shared_ptr<Shape>>()));
+		EXPECT_EQ("SurgSim::Math::PlaneShape", planeShape->getClassName());
+	}
+}
+
+TEST_F(ShapeTest, PlaneShape)
+{
+	EXPECT_NO_THROW(PlaneShape planeShape);
+	PlaneShape planeShape;
+
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_PLANE, planeShape.getType());
+	EXPECT_NEAR(0.0, planeShape.getVolume(), epsilon);
+	EXPECT_TRUE(planeShape.getCenter().isZero());
+	EXPECT_TRUE(planeShape.getSecondMomentOfVolume().isApprox(Matrix33d::Zero()));
+	EXPECT_NEAR(0.0, planeShape.getD(), epsilon);
+	EXPECT_TRUE(planeShape.getNormal().isApprox(Vector3d(0.0, 1.0, 0.0)));
 }

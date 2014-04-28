@@ -998,7 +998,7 @@ TEST_F(FemElement2DTriangleTests, StiffnessMatrixTest)
 		"KLocal expected = " << std::endl << expectedLocalStiffness << std::endl;
 
 	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
-	EXPECT_TRUE(tri->getGlobalStiffnessMatrix().isApprox(R0.transpose() * expectedLocalStiffness * R0)) <<
+	EXPECT_TRUE(tri->getGlobalStiffnessMatrix().isApprox(R0 * expectedLocalStiffness * R0.transpose())) <<
 		"R0 = " << std::endl << R0 << std::endl <<
 		"KGlobal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
 		"KGlobal expected = " << std::endl << expectedLocalStiffness << std::endl;
@@ -1023,7 +1023,7 @@ TEST_F(FemElement2DTriangleTests, MassMatrixTest)
 	getExpectedLocalMassMatrix(expectedMassMatrix);
 	EXPECT_TRUE(tri->getLocalMassMatrix().isApprox(expectedMassMatrix));
 	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
-	EXPECT_TRUE(tri->getGlobalMassMatrix().isApprox(R0.transpose() * expectedMassMatrix * R0));
+	EXPECT_TRUE(tri->getGlobalMassMatrix().isApprox(R0 * expectedMassMatrix * R0.transpose()));
 }
 
 TEST_F(FemElement2DTriangleTests, ForceAndMatricesAPITest)
@@ -1047,13 +1047,13 @@ TEST_F(FemElement2DTriangleTests, ForceAndMatricesAPITest)
 	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> expected18x18StiffnessMatrix;
 	getExpectedLocalStiffnessMatrix(expected18x18StiffnessMatrix);
 	expectedStiffnessMatrix.setZero();
-	addSubMatrix(R0.transpose() * expected18x18StiffnessMatrix * R0, tri->getNodeIds(), 6, &expectedStiffnessMatrix);
+	addSubMatrix(R0 * expected18x18StiffnessMatrix * R0.transpose(), tri->getNodeIds(), 6, &expectedStiffnessMatrix);
 
 	// Assemble manually the expectedMassMatrix
 	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> expected18x18MassMatrix;
 	getExpectedLocalMassMatrix(expected18x18MassMatrix);
 	expectedMassMatrix.setZero();
-	addSubMatrix(R0.transpose() * expected18x18MassMatrix * R0, tri->getNodeIds(), 6, &expectedMassMatrix);
+	addSubMatrix(R0 * expected18x18MassMatrix * R0.transpose(), tri->getNodeIds(), 6, &expectedMassMatrix);
 
 	forceVector.setZero();
 	massMatrix.setZero();

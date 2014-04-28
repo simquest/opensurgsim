@@ -24,6 +24,10 @@ set(UNIT_TEST_SOURCES
 	Fem3DMeshRenderTest.cpp
 	Fem3DvsTruthCubeRenderTest.cpp
 	RenderTest.cpp
+	RenderTestFem1D.cpp
+	RenderTestFem2D.cpp
+	RenderTestFem3D.cpp
+	RenderTestMassSprings.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -36,6 +40,7 @@ configure_file(
 )
 
 set(LIBS
+	SurgSimBlocks
 	SurgSimGraphics
 	SurgSimPhysics
 )

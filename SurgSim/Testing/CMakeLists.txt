@@ -27,6 +27,7 @@ set(SURGSIM_TESTING_SOURCES
 
 set(SURGSIM_TESTING_HEADERS
 	MathUtilities.h
+	MockPhysicsManager.h
 	TestCube.h
 )
 
@@ -43,5 +44,6 @@ if(GLUT_FOUND)
 	add_subdirectory(VisualTestCommon)
 endif(GLUT_FOUND)
 
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set_target_properties(SurgSimTesting PROPERTIES FOLDER "Testing")

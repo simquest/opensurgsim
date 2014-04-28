@@ -18,6 +18,7 @@
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Math/RigidTransform.h"

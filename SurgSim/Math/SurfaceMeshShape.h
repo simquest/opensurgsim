@@ -18,7 +18,6 @@
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -86,6 +85,18 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
+	/// Set loading filename
+	/// \param filename	The filename to load
+	/// \note The mesh will be loaded right after the file name is set,
+	///       if 'fileName' indicates a file containing a valid mesh.
+	/// \note If the valid file contains an empty mesh, i.e. no vertex is specified in that file,
+	///       a empty mesh will be held by this mesh shape.
+	void setFileName(const std::string& fileName);
+
+	/// Get the file name of the external file which contains the triangle mesh.
+	/// \return File name of the external file which contains the triangle mesh.
+	std::string getFileName() const;
+
 private:
 
 	/// Compute useful volume integrals based on the triangle mesh, which
@@ -106,6 +117,9 @@ private:
 
 	/// Surface mesh thickness
 	double m_thickness;
+
+	/// File name of the external file which contains the triangle mesh.
+	std::string m_fileName;
 };
 
 }; // Math

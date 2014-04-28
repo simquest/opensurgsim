@@ -32,7 +32,9 @@ using SurgSim::Math::Vector3d;
 
 namespace
 {
+
 static const double dt = 1e-3;
+
 }
 
 namespace SurgSim

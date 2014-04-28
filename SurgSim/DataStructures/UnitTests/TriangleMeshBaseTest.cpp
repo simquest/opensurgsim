@@ -537,3 +537,24 @@ TEST_F(TriangleMeshBaseTest, CopyConstructorTest)
 		EXPECT_EQ(mesh.getTriangle(i).verticesId, mesh2.getTriangle(i).verticesId);
 	}
 }
+
+TEST_F(TriangleMeshBaseTest, loadTriangleMeshTest)
+{
+	auto mesh = SurgSim::DataStructures::loadTriangleMesh("TriangleMeshBaseTests/Cube.ply");
+
+	EXPECT_EQ(26u, mesh->getNumVertices());
+	EXPECT_EQ(12u, mesh->getNumTriangles());
+
+	// The first and last vertices from the file
+	Vector3d vertex0(1.0, 1.0, -1.0);
+	Vector3d vertex25(-1.0, -1.0, 1.0);
+
+	EXPECT_TRUE(vertex0.isApprox(mesh->getVertex(0).position));
+	EXPECT_TRUE(vertex25.isApprox(mesh->getVertex(25).position));
+
+	std::array<unsigned int, 3> triangle0 = {0, 1, 2};
+	std::array<unsigned int, 3> triangle11 = {10, 25, 11};
+
+	EXPECT_EQ(triangle0, mesh->getTriangle(0).verticesId);
+	EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);
+}

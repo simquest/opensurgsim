@@ -180,7 +180,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	// SurgSim::PhysicsManager::doUpdate().
 	std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> collision;
 	collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Collision");
-	collision->setRigidRepresentation(physics);
+	physics->setCollisionRepresentation(collision);
 
 	// Here the SceneElement for the plane is created, to which the various Components that collectively define the
 	// plane are added.

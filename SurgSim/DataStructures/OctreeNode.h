@@ -18,10 +18,10 @@
 
 #include <array>
 #include <memory>
-#include <Eigen/Geometry>
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Math/Vector.h"
-
+#include "SurgSim/Math/Aabb.h"
 
 namespace SurgSim
 {
@@ -65,14 +65,14 @@ public:
 
 	/// Constructor
 	/// \param  boundingBox The region contained by this octree node
-	explicit OctreeNode(const AxisAlignedBoundingBox& boundingBox);
+	explicit OctreeNode(const SurgSim::Math::Aabbd& boundingBox);
 
 	/// Destructor
 	virtual ~OctreeNode();
 
 	/// Get the bounding box for this octree node
 	/// \return the bounding box
-	const AxisAlignedBoundingBox& getBoundingBox() const;
+	const SurgSim::Math::Aabbd& getBoundingBox() const;
 
 	/// Is this node active
 	/// \return true if there is any data inside this node, including data held
@@ -133,10 +133,10 @@ protected:
 	/// \param currentLevel Used to keep track of the current level during recursive calls
 	/// \return true if data is added
 	bool doAddData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
-			const int currentLevel);
+				   const int currentLevel);
 
 	/// The bounding box of the current OctreeNode
-	AxisAlignedBoundingBox m_boundingBox;
+	SurgSim::Math::Aabbd m_boundingBox;
 
 	/// True if there is any data inside this node, including data held by children, children's children, etc.
 	bool m_isActive;
@@ -147,6 +147,12 @@ protected:
 	/// The children of this node
 	std::array<std::shared_ptr<OctreeNode<Data> >, 8> m_children;
 };
+
+
+/// A free function to load an octree from file.
+/// \param fileName	Name of the external file which contains an octree.
+/// \return A std::shared_ptr<> pointing to an OctreeNode.
+std::shared_ptr<OctreeNode<SurgSim::DataStructures::EmptyData>> loadOctree(const std::string& fileName);
 
 };  // namespace DataStructures
 };  // namespace SurgSim
