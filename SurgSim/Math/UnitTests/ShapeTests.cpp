@@ -69,8 +69,19 @@ public:
 
 TEST_F(ShapeTest, EncodeEmptyShapeTest)
 {
+	YAML::Node node;
 	std::shared_ptr<Shape> shape;
-	EXPECT_ANY_THROW(YAML::convert<std::shared_ptr<Shape>>::encode(shape));
+
+	// Allow encode empty shape is to support serializing something holds a shared pointer to Math::Shape and
+	// when the shared_ptr<> is empty.
+	// For example, Physics::RidigRepresentationParameters holds a shared_ptr<> to Math::Shape.
+	// When serializing, it may holds an empty shared_ptr<> to Math::Shape. In this case, the serialization of
+	// Physics::RigidRepresentationParameters should succeed.
+	ASSERT_NO_THROW(node = YAML::convert<std::shared_ptr<Shape>>::encode(shape));
+	ASSERT_FALSE(node.IsMap());
+
+	// However, decode an empty YAML node which declares to be a Math::Shape should fail.
+	EXPECT_ANY_THROW(shape = node.as<std::shared_ptr<Shape>>());
 }
 
 TEST_F(ShapeTest, SphereSerializationTest)
