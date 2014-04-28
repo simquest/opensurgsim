@@ -21,6 +21,7 @@ include_directories(
 )
 
 set(SURGSIM_BLOCKS_SOURCES
+	DriveElementFromInputBehavior.cpp
 	KeyboardTogglesGraphicsBehavior.cpp
 	MassSpring1DRepresentation.cpp
 	MassSpring2DRepresentation.cpp
@@ -28,12 +29,11 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpringNDRepresentationUtils.cpp
 	PoseInterpolator.cpp
 	SphereElement.cpp
-	TransferInputPoseBehavior.cpp
-	TransferPoseBehavior.cpp
 	VisualizeContactsBehavior.cpp
 )
 
 set(SURGSIM_BLOCKS_HEADERS
+	DriveElementFromInputBehavior.h
 	KeyboardTogglesGraphicsBehavior.h
 	MassSpring1DRepresentation.h
 	MassSpring2DRepresentation.h
@@ -43,8 +43,6 @@ set(SURGSIM_BLOCKS_HEADERS
 	SphereElement.h
 	TransferDeformableStateToVerticesBehavior.h
 	TransferDeformableStateToVerticesBehavior-inl.h
-	TransferInputPoseBehavior.h
-	TransferPoseBehavior.h
 	VisualizeContactsBehavior.h
 )
 

@@ -108,7 +108,7 @@ void OsgMeshRepresentation::setDrawAsWireFrame(bool val)
 	state->setAttributeAndModes(polygonMode, osg::StateAttribute::ON);
 }
 
-void OsgMeshRepresentation::update(double dt)
+void OsgMeshRepresentation::doUpdate(double dt)
 {
 	SURGSIM_ASSERT(m_mesh->isValid()) << "The mesh in the OsgMeshRepresentation " << getName() << " is invalid.";
 

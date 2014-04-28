@@ -27,6 +27,7 @@
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Math::Matrix;
@@ -61,30 +62,6 @@ public:
 	{
 		return REPRESENTATION_TYPE_FIXED;
 	}
-
-	/// Set the initial pose of the representation
-	/// \param pose The initial pose
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-	{}
-
-	/// Get the initial pose of the representation
-	/// \return The initial pose
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
-	{ static SurgSim::Math::RigidTransform3d pose; return pose; }
-
-	/// Set the pose of the representation
-	/// \param pose The pose to set the representation to
-	/// \note This requests the representation to set its pose to the given pose
-	/// \note In physics, the actual pose of the representation might not be exactly the requested one
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose)
-	{}
-
-	/// Get the pose of the representation
-	/// \return The pose of this representation
-	/// \note getPose may or may not return the pose last sets by setPose
-	/// \note In physics, the simulation will drive the pose internally
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const
-	{ static SurgSim::Math::RigidTransform3d pose; return pose; }
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
@@ -121,6 +98,29 @@ namespace
 {
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::MockRepresentation);
 }
+
+class MockRigidRepresentation : public RigidRepresentation
+{
+public:
+	MockRigidRepresentation() :
+		RigidRepresentation("MockRigidRepresentation")
+	{
+	}
+
+	// Non constand access to the states
+	RigidRepresentationState& getInitialState()
+	{
+		return m_initialState;
+	}
+	RigidRepresentationState& getCurrentState()
+	{
+		return m_currentState;
+	}
+	RigidRepresentationState& getPreviousState()
+	{
+		return m_previousState;
+	}
+};
 
 class MockFemElement : public FemElement
 {

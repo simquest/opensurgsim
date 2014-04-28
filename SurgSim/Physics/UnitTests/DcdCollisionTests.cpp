@@ -53,7 +53,7 @@ std::shared_ptr<RigidRepresentation> createSphere(const std::string& name, const
 	params.setShapeUsedForMassInertia(shape);
 
 	representation->setInitialParameters(params);
-	representation->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), position));
+	representation->setLocalPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), position));
 
 	return representation;
 }

@@ -29,6 +29,7 @@ class CommonDevice;
 namespace Graphics
 {
 
+class Camera;
 class View;
 
 /// Basic SceneElement that wraps a View so that it can be added to the Scene.
@@ -41,7 +42,7 @@ public:
 	/// Constructor
 	/// \param	name	Name of the scene element
 	/// \param	view	View component that provides the visualization of the graphics representations
-	ViewElement(const std::string& name, std::shared_ptr<SurgSim::Graphics::View> view);
+	explicit ViewElement(const std::string& name);
 
 	/// Destructor
 	virtual ~ViewElement();
@@ -52,7 +53,14 @@ public:
 
 	/// Returns the view component that provides the visualization of the graphics representations
 	/// \return A shared_ptr pointing to the View component
-	std::shared_ptr<View> getView() const;
+	std::shared_ptr<View> getView();
+
+	/// Sets the camera for this view
+	void setCamera(std::shared_ptr<SurgSim::Graphics::Camera> camera);
+
+	/// Returns the camera for this view
+	/// \return A shared_ptr pointing to the Camera component
+	std::shared_ptr<Camera> getCamera();
 
 	/// Return the keyboard to be used with this view.
 	/// \return A keyboard device
@@ -76,6 +84,8 @@ protected:
 private:
 	/// View component that provides the visualization of the graphics representations
 	std::shared_ptr<View> m_view;
+
+	std::shared_ptr<Camera> m_camera;
 };
 
 };  // namespace Graphics

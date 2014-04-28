@@ -24,6 +24,7 @@
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
+using SurgSim::Physics::MockRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -34,13 +35,13 @@ using SurgSim::Physics::MockRepresentation;
 
 TEST(RepresentationTest, ConstructorTest)
 {
-	ASSERT_NO_THROW({MockRepresentation representation("Representation");});
+	ASSERT_NO_THROW({MockRepresentation representation();});
 }
 
 TEST(RepresentationTest, SetGetAndDefaultValueTest)
 {
 	/// Create the representation
-	std::shared_ptr<Representation> representation = std::make_shared<MockRepresentation>("Representation");
+	std::shared_ptr<Representation> representation = std::make_shared<MockRepresentation>();
 
 	/// Get/Set active flag [default = true]
 	EXPECT_TRUE(representation->isActive());
@@ -58,6 +59,13 @@ TEST(RepresentationTest, SetGetAndDefaultValueTest)
 	ASSERT_FALSE(representation->isGravityEnabled());
 	representation->setIsGravityEnabled(true);
 	ASSERT_TRUE(representation->isGravityEnabled());
+
+	/// Set/Get isDrivingSceneElementPose [default = true]
+	EXPECT_TRUE(representation->isDrivingSceneElementPose());
+	representation->setIsDrivingSceneElementPose(false);
+	ASSERT_FALSE(representation->isDrivingSceneElementPose());
+	representation->setIsDrivingSceneElementPose(true);
+	ASSERT_TRUE(representation->isDrivingSceneElementPose());
 }
 
 TEST(RepresentationTest, SetGetCollisionRepresentationTest)
@@ -83,7 +91,7 @@ TEST(RepresentationTest, SerializationTest)
 		EXPECT_EQ(1u, node.size());
 
 		YAML::Node data = node["SurgSim::Physics::MockRepresentation"];
-		EXPECT_EQ(7u, data.size());
+		EXPECT_EQ(6u, data.size());
 
 		std::shared_ptr<MockRepresentation> newRepresentation;
 		ASSERT_NO_THROW(newRepresentation =

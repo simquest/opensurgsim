@@ -81,9 +81,9 @@ TEST_F(OsgCylinderRepresentationRenderTests, MovingCylinderTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		/// Interpolate position and radius
-		cylinderRepresentation1->setPose(
+		cylinderRepresentation1->setLocalPose(
 			interpolatePose(startAngles1, finalAngles1, startPosition1, finalPosition1, t));
-		cylinderRepresentation2->setPose(
+		cylinderRepresentation2->setLocalPose(
 			interpolatePose(startAngles2, finalAngles2, startPosition1, finalPosition2, t));
 
 		if(setterType == static_cast<int>(SetterTypeIndividual))

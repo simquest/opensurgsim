@@ -56,18 +56,6 @@ public:
 	/// Destructor
 	virtual ~DeformableRepresentation();
 
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) override;
-
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override;
-
-	void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
-
-	/// Get the current pose of the representation
-	/// \return The current pose (Identity)
-	/// \note A deformable representation is expressed in global frame (local frame = global frame)
-	/// \note Therefore its pose is always Identity
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
-
 	virtual void resetState() override;
 
 	virtual void setInitialState(std::shared_ptr<DeformableRepresentationState> initialState) override;
@@ -96,6 +84,8 @@ public:
 
 	virtual void beforeUpdate(double dt) override;
 
+	virtual void afterUpdate(double dt) override;
+
 	/// Set the collision representation for this physics representation, when the collision object
 	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
 	/// Specializes for discarding anything besides a rigid collision representation.
@@ -104,6 +94,8 @@ public:
 		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
 protected:
+	bool doWakeUp() override;
+
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
@@ -123,12 +115,6 @@ protected:
 	/// Last valid state (a.k.a final state)
 	/// \note Backup of the current state for thread-safety access while the current state is being recomputed.
 	std::shared_ptr<DeformableRepresentationState> m_finalState;
-
-	/// Initial pose that will transform the state on setup
-	SurgSim::Math::RigidTransform3d m_initialPose;
-
-	/// Identity pose (to avoid a static variable in the method getPose)
-	SurgSim::Math::RigidTransform3d m_identityPose;
 
 	/// Force applied on the deformable representation
 	SurgSim::Math::Vector m_f;

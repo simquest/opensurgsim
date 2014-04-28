@@ -18,14 +18,16 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
-using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationLocalization;
-
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
+
+using SurgSim::Physics::MockRigidRepresentation;
+using SurgSim::Physics::RigidRepresentation;
+using SurgSim::Physics::RigidRepresentationLocalization;
 
 namespace
 {
@@ -98,12 +100,12 @@ TEST_F(RigidRepresentationLocalizationTest, SetGetRepresentation)
 TEST_F(RigidRepresentationLocalizationTest, GetPositionTest)
 {
 	// Create the rigid body
-	std::shared_ptr<RigidRepresentation> rigidRepresentation =
-		std::make_shared<RigidRepresentation>("RigidRepresentation");
+	std::shared_ptr<MockRigidRepresentation> rigidRepresentation =
+		std::make_shared<MockRigidRepresentation>();
 
 	// Activate the rigid body and setup its initial pose
 	rigidRepresentation->setIsActive(true);
-	rigidRepresentation->setInitialPose(m_initialTransformation);
+	rigidRepresentation->getCurrentState().setPose(m_initialTransformation);
 
 	RigidRepresentationLocalization localization = RigidRepresentationLocalization(rigidRepresentation);
 	ASSERT_EQ(rigidRepresentation, localization.getRepresentation());

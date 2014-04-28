@@ -168,6 +168,8 @@ void MassSpringRepresentation::afterUpdate(double dt)
 
 	// Back up the current state into the final state
 	*m_finalState = *m_currentState;
+
+	DeformableRepresentation::afterUpdate(dt);
 }
 
 void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlock<Vector>& deltaVelocity)

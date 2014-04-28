@@ -94,7 +94,7 @@ void RigidRepresentationBilateral3D::doBuild(double dt,
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
 
 	// Fill up H with the transform from rigid body velocity -> constraint space
-	Vector3d GP = globalPosition - rigid->getCurrentPose().translation();
+	Vector3d GP = globalPosition - rigid->getCurrentState().getPose().translation();
 	m_newH.resize(rigid->getNumDof());
 	m_newH.reserve(3);
 
