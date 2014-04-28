@@ -69,27 +69,13 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const;
 
-	/// Sets the current pose of the camera
-	/// The view matrix is set to the inverse of the transform.
-	/// \param	transform	Rigid transformation that describes the current pose of the camera
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform);
-
-	/// Gets the current pose of the camera
-	/// The transform returned is the inverse of the view matrix.
-	/// \return	Rigid transformation that describes the current pose of the camera
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const;
-
-	/// Sets the view matrix of the camera
-	/// \param	matrix	View matrix
-	virtual void setViewMatrix(const SurgSim::Math::Matrix44d& matrix);
-
 	/// Gets the view matrix of the camera
 	/// \return	View matrix
-	virtual const SurgSim::Math::Matrix44d& getViewMatrix() const;
+	virtual SurgSim::Math::Matrix44d getViewMatrix() const;
 
 	/// Gets the inverse view matrix of the camera
 	/// \return	Inverse view matrix
-	virtual const SurgSim::Math::Matrix44d& getInverseViewMatrix() const;
+	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const;
 
 	/// Sets the projection matrix of the camera
 	/// \param	matrix	Projection matrix
@@ -142,14 +128,6 @@ private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
 	osg::ref_ptr<osg::Group> m_materialProxy;
-
-	/// Pose of the camera, which is the inverse of the view matrix
-	SurgSim::Math::RigidTransform3d m_pose;
-	/// View matrix of the camera
-	SurgSim::Math::Matrix44d m_viewMatrix;
-
-	/// Inverse view matrix of the camera
-	SurgSim::Math::Matrix44d m_inverseViewMatrix;
 
 	/// Projection matrix of the camera
 	SurgSim::Math::Matrix44d m_projectionMatrix;

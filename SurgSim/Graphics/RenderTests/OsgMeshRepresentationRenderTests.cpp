@@ -80,7 +80,7 @@ protected:
 	std::shared_ptr<MeshRepresentation> makeRepresentation(const std::string& name)
 	{
 		auto meshRepresentation = std::make_shared<OsgMeshRepresentation>(name);
-		meshRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0)));
+		meshRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0)));
 		return meshRepresentation;
 	}
 };

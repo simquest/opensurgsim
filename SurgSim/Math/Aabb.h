@@ -53,10 +53,9 @@ bool doAabbIntersect(const Eigen::AlignedBox<Scalar, Dim>& aabb0,
 /// Determine whether two AABBs overlap, using a minimal set of eigen calls, does not take a tolerance
 /// \tparam Scalar numeric type
 /// \tparam Dim dimension of the space to be used
-/// \param aabb0 first axis aligned bounding box
-/// \param aabb1 second axis aligned bounding box
-/// \param tolerance the bounding boxes will be considered bigger by this amount
-/// \return true if there is an overlap between the two boxestemplate <class Scalar, int Dim>
+/// \param a first axis aligned bounding box
+/// \param b second axis aligned bounding box
+/// \return true if there is an overlap between the two boxes
 template <class Scalar, int Dim>
 bool doAabbIntersect(const Eigen::AlignedBox<Scalar, Dim>& a,
 					 const Eigen::AlignedBox<Scalar, Dim>& b)

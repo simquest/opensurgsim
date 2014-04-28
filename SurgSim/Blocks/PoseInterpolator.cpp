@@ -16,7 +16,6 @@
 #include "SurgSim/Blocks/PoseInterpolator.h"
 
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/Representation.h"
 
 #include <memory>
 
@@ -52,7 +51,7 @@ void PoseInterpolator::setEndingPose(const SurgSim::Math::RigidTransform3d trans
 	}
 }
 
-void PoseInterpolator::setTarget(std::shared_ptr<SurgSim::Framework::Representation> target)
+void PoseInterpolator::setTarget(std::shared_ptr<SurgSim::Framework::SceneElement> target)
 {
 	if (!isInitialized())
 	{
@@ -81,9 +80,13 @@ bool PoseInterpolator::doInitialize()
 bool PoseInterpolator::doWakeUp()
 {
 	bool result = false;
+	if (m_target == nullptr)
+	{
+		m_target = getSceneElement();
+	}
 	if (m_target != nullptr)
 	{
-		m_startingPose = (m_optionalStartPose.hasValue()) ? m_optionalStartPose.getValue() : m_target->getInitialPose();
+		m_startingPose = (m_optionalStartPose.hasValue()) ? m_optionalStartPose.getValue() : m_target->getPose();
 		result = true;
 	}
 	return result;

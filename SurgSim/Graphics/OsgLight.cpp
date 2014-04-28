@@ -67,7 +67,6 @@ OsgLight::OsgLight(const std::string& name) :
 	m_switch->addChild(m_lightSource);
 
 	m_uniforms[POSITION] = new osg::Uniform(Uniform::FLOAT_VEC4,prefix + "position");
-	setPose(getPose());
 
 	m_uniforms[AMBIENT_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "ambient");
 	setAmbientColor(m_ambientColor);
@@ -207,6 +206,14 @@ double OsgLight::getQuadraticAttenuation()
 	return m_quadraticAttenuation;
 }
 
+void OsgLight::doUpdate(double dt)
+{
+	SurgSim::Math::Vector3f position = getPose().translation().cast<float>();
+	osg::Vec4f osgVec(osg::Vec4f(toOsg(position),1.0));
+	m_uniforms[POSITION]->set(osgVec);
+	m_light->setPosition(osgVec);
+}
+
 void OsgLight::apply(osg::ref_ptr<osg::StateSet> stateSet)
 {
 	for (auto it = std::begin(m_uniforms); it != std::end(m_uniforms); ++it)
@@ -222,17 +229,6 @@ void OsgLight::remove(osg::ref_ptr<osg::StateSet> stateSet)
 		stateSet->removeUniform(it->second);
 	}
 }
-
-void OsgLight::setPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	OsgRepresentation::setPose(pose);
-	SurgSim::Math::Vector3f position = pose.translation().cast<float>();
-	osg::Vec4f osgVec(osg::Vec4f(toOsg(position),1.0));
-	m_uniforms[POSITION]->set(osgVec);
-	m_light->setPosition(osgVec);
-}
-
-
 
 }; // Graphics
 }; // SurgSim

@@ -50,6 +50,7 @@ struct TrackIRScaffold::DeviceData
 {
 	/// Constructor
 	/// \param device Device to be wrapped
+	/// \param cameraID The camera identifier
 	explicit DeviceData(TrackIRDevice* device, int cameraID) :
 		deviceObject(device),
 		thread(),

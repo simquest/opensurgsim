@@ -58,7 +58,7 @@ struct VirtualToolCouplerTest : public ::testing::Test
 		parameters.setAngularDamping(0.0);
 		parameters.setLinearDamping(0.0);
 		parameters.setShapeUsedForMassInertia(std::make_shared<SphereShape>(0.1));
-		rigidBody->setCurrentParameters(parameters);
+		rigidBody->setInitialParameters(parameters);
 
 		RigidRepresentationState state;
 		state.setAngularVelocity(Vector3d::Zero());
@@ -101,12 +101,14 @@ protected:
 	{
 		RigidTransform3d initialPose = RigidTransform3d::Identity();
 		initialPose.translation() = Vector3d(0.1, 0.0, 0.0);
-		rigidBody->setInitialPose(initialPose);
+		rigidBody->setLocalPose(initialPose);
 		rigidBody->setIsGravityEnabled(false);
 
 		std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 		virtualToolCoupler->initialize(runtime);
+		rigidBody->initialize(runtime);
 		virtualToolCoupler->wakeUp();
+		rigidBody->wakeUp();
 
 		// Critically damped mass-damper systems settle to within 5% of their
 		// equilibrium when:
@@ -141,12 +143,14 @@ protected:
 		double initialAngle = M_PI/4.0;
 		RigidTransform3d initialPose = RigidTransform3d::Identity();
 		initialPose.linear() = Matrix33d(Eigen::AngleAxisd(initialAngle, Vector3d::UnitY()));
-		rigidBody->setInitialPose(initialPose);
+		rigidBody->setLocalPose(initialPose);
 		rigidBody->setIsGravityEnabled(false);
 
 		std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 		virtualToolCoupler->initialize(runtime);
+		rigidBody->initialize(runtime);
 		virtualToolCoupler->wakeUp();
+		rigidBody->wakeUp();
 
 		// Critically damped mass-damper systems settle to within 5% of their
 		// equilibrium when:
@@ -187,7 +191,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.translation() = Vector3d(0.1, 0.0, 0.0);
-	rigidBody->setInitialPose(initialPose);
+	rigidBody->setLocalPose(initialPose);
 	rigidBody->setIsGravityEnabled(false);
 
 	EXPECT_TRUE(rigidBody->isActive());
@@ -214,7 +218,7 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.linear() = Matrix33d(Eigen::AngleAxisd(M_PI/4.0, Vector3d::UnitY()));
-	rigidBody->setInitialPose(initialPose);
+	rigidBody->setLocalPose(initialPose);
 	rigidBody->setIsGravityEnabled(false);
 
 	EXPECT_TRUE(rigidBody->isActive());
@@ -240,7 +244,7 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.translation() = Vector3d(0.0, 0.0, 0.0);
-	rigidBody->setInitialPose(initialPose);
+	rigidBody->setLocalPose(initialPose);
 	rigidBody->setIsGravityEnabled(true);
 
 	const double stiffness = 1000;

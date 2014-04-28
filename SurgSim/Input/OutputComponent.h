@@ -63,7 +63,7 @@ public:
 	void disconnectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
 
 	/// Sets the output data.
-	/// \para dataGroup The data to output.
+	/// \param dataGroup The data to output.
 	void setData(const SurgSim::DataStructures::DataGroup& dataGroup);
 
 	/// Overridden from Component, do nothing

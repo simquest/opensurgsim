@@ -13,63 +13,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_TRANSFERINPUTPOSEBEHAVIOR_H
-#define SURGSIM_BLOCKS_TRANSFERINPUTPOSEBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_DRIVEELEMENTFROMINPUTBEHAVIOR_H
+#define SURGSIM_BLOCKS_DRIVEELEMENTFROMINPUTBEHAVIOR_H
 
-#include <string>
 #include "SurgSim/Framework/Behavior.h"
+
 
 namespace SurgSim
 {
 
 namespace Input
 {
-	class InputComponent;
-}
-
-namespace Framework
-{
-	class Representation;
+class InputComponent;
 }
 
 namespace Blocks
 {
 
-class TransferInputPoseBehavior : public SurgSim::Framework::Behavior
+/// Behavior to copy a pose from an input component to a SceneElement
+/// By adding this behavior to a SceneElement, that SceneElement will be moved
+/// in correspondance to the input.
+class DriveElementFromInputBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	explicit TransferInputPoseBehavior(const std::string& name);
+	explicit DriveElementFromInputBehavior(const std::string& name);
 
-	/// Set the InputComponent which sends the pose.
-	/// \param	sender	InputComponent which sends the pose.
-	void setPoseSender(std::shared_ptr<SurgSim::Input::InputComponent> sender);
+	SURGSIM_CLASSNAME(SurgSim::Blocks::DriveElementFromInputBehavior);
 
-	/// Set the representation to receive the pose.
-	/// \param	receiver	Representation to receive the pose.
-	void setPoseReceiver(std::shared_ptr<SurgSim::Framework::Representation> receiver);
+	/// Set the InputComponent that provides the pose
+	/// \param	source A SurgSim::Input::InputComponent
+	void setSource(std::shared_ptr<SurgSim::Framework::Component> source);
+
+	/// Get the InputComponent which is being used by this behavior
+	/// \return A SurgSim::Component::InputComponent
+	std::shared_ptr<SurgSim::Framework::Component> getSource();
 
 	/// Set name of the pose.
 	/// \param	poseName	The name of the pose.
 	void setPoseName(const std::string& poseName);
+
+	/// Get name of the pose.
+	/// \return The name of the pose.
+	std::string getPoseName();
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt);
 
 protected:
-	/// Initialize the behavior.  Checks for sender and receiver.
+	/// Initialize the behavior
 	virtual bool doInitialize();
 
-	/// Wakeup the behavior
+	/// Wakeup the behavior, which copies the initial pose
 	virtual bool doWakeUp();
 
 private:
-	/// Representation to get the pose
-	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
-	/// Representation to set the pose
-	std::shared_ptr<SurgSim::Framework::Representation> m_to;
+	/// InputComponent to get the pose
+	std::shared_ptr<SurgSim::Input::InputComponent> m_source;
 
 	std::string m_poseName;
 };
@@ -79,4 +81,5 @@ private:
 
 };  // namespace SurgSim
 
-#endif  //SURGSIM_BLOCKS_TRANSFERINPUTPOSEBEHAVIOR_H
+
+#endif // SURGSIM_BLOCKS_DRIVEELEMENTFROMINPUTBEHAVIOR_H

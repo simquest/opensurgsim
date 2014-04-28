@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file This file tests the non-abstract functionalities of the base class FemRepresentation
+/// \file FemRepresentationTests.cpp
+/// This file tests the non-abstract functionalities of the base class FemRepresentation
 
 #include <gtest/gtest.h>
 
@@ -174,6 +175,7 @@ TEST_F(FemRepresentationTests, InitializeTest)
 	ASSERT_ANY_THROW({SurgSim::Math::Vector F = fem.computeF(*state);});
 
 	fem.initialize(std::make_shared<Runtime>());
+	fem.wakeUp();
 	// Initial state setup (and we even have 1 FemElement) + Initialize called
 	// BUTE note as well that the number of nodes don't match between initialState and state
 	ASSERT_ANY_THROW({SurgSim::Math::Vector F = fem.computeF(*state);});

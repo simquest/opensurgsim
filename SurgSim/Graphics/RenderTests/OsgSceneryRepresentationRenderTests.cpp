@@ -61,13 +61,13 @@ TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 
 	auto sceneryObject1 = std::make_shared<OsgSceneryRepresentation>("Torus1");
 	sceneryObject1->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
-	sceneryObject1->setInitialPose(SurgSim::Math::makeRigidTransform(
+	sceneryObject1->setLocalPose(SurgSim::Math::makeRigidTransform(
 									SurgSim::Math::Quaterniond::Identity(),	startPosition1));
 	viewElement->addComponent(sceneryObject1);
 
 	auto sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("Torus2");
 	sceneryObject2->setFileName("Data/OsgSceneryRepresentationTests/Torus.osgb");
-	sceneryObject2->setInitialPose(SurgSim::Math::makeRigidTransform(
+	sceneryObject2->setLocalPose(SurgSim::Math::makeRigidTransform(
 									SurgSim::Math::Quaterniond::Identity(),	startPosition2));
 	viewElement->addComponent(sceneryObject2);
 
@@ -79,8 +79,8 @@ TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 		double t = static_cast<double>(i) / numSteps;
 
 		/// Interpolate position
-		sceneryObject1->setPose(interpolatePose(startAngles1, endAngles1, startPosition1, endPosition1, t));
-		sceneryObject2->setPose(interpolatePose(startAngles2, endAngles2, startPosition2, endPosition2, t));
+		sceneryObject1->setLocalPose(interpolatePose(startAngles1, endAngles1, startPosition1, endPosition1, t));
+		sceneryObject2->setLocalPose(interpolatePose(startAngles2, endAngles2, startPosition2, endPosition2, t));
 
 		/// The total number of steps should complete in 1 second
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));

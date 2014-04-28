@@ -192,7 +192,7 @@ public:
 	/// Constructor
 	/// \param	id	Unique ID of the tetrahedron in its mesh
 	/// \param	edges	IDs of the tetrahedron's edges in its mesh (6 edges)
-	/// \param	edges	IDs of the tetrahedron's triangles in its mesh (4 triangles)
+	/// \param	triangles	IDs of the tetrahedron's triangles in its mesh (4 triangles)
 	MockTetrahedronData(unsigned int id,
 		const std::array<unsigned int, 6>& edges,
 		const std::array<unsigned int, 4>& triangles) :
@@ -329,7 +329,6 @@ public:
 
 	/// Create a new edge in the mesh
 	/// \param	vertices	Edge vertices
-	/// \param normal Normal of the vertex
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createEdge(const std::array<unsigned int, 2>& vertices)
 	{
@@ -339,8 +338,8 @@ public:
 	}
 
 	/// Create a new triangle in the mesh
-	/// \param	vertices
-	/// \param normal Normal of the vertex
+	/// \param	vertices	The triangle vertices
+	/// \param	edges	The triangle edges
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createTriangle(const std::array<unsigned int, 3>& vertices, const std::array<unsigned int, 3>& edges)
 	{

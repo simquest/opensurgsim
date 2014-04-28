@@ -22,6 +22,7 @@
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgVectorFieldRepresentation.h"
 #include "SurgSim/Graphics/VectorField.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::DataStructures::Vertex;
 using SurgSim::Collision::Contact;
@@ -65,6 +66,7 @@ void VisualizeContactsBehavior::update(double dt)
 		vectorField->clear();
 		vectorField->getVertices().reserve(2 * totalContacts);
 
+		SurgSim::Math::RigidTransform3d inverseElementPose = getSceneElement()->getPose().inverse();
 		for (auto it = std::begin(collisions); it != std::end(collisions); ++it)
 		{
 			for (auto iter = std::begin((*it).second); iter != std::end((*it).second); ++iter)
@@ -79,6 +81,8 @@ void VisualizeContactsBehavior::update(double dt)
 				Vertex<VectorFieldData> vertex2 =
 					Vertex<VectorFieldData>((*iter)->penetrationPoints.second.globalPosition.getValue(), vectorData2);
 
+				vertex1.position = inverseElementPose * vertex1.position;
+				vertex2.position = inverseElementPose * vertex2.position;
 				vectorField->addVertex(vertex1);
 				vectorField->addVertex(vertex2);
 			}

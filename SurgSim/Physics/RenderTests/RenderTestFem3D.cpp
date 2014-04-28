@@ -31,6 +31,8 @@
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::ViewElement;
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::FemElement;
@@ -105,7 +107,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 	// Graphics Representation
 	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation;
 	graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics object ");
-	graphicsRepresentation->setInitialPose(pose);
+	graphicsRepresentation->setLocalPose(pose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
 	graphicsRepresentation->setVisible(true);
@@ -172,7 +174,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	// Graphics Representation
 	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation;
 	graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics object ");
-	graphicsRepresentation->setInitialPose(pose);
+	graphicsRepresentation->setLocalPose(pose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
 	graphicsRepresentation->setVisible(true);

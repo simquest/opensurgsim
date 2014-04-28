@@ -20,6 +20,7 @@
 
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Blocks/UnitTests/SpringTestUtils.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
 using SurgSim::Math::Vector3d;
@@ -43,6 +44,8 @@ TEST(MassSpring1DRepresentationTests, init1DTest)
 	boundaryConditions.push_back(numNodesPerDim[0] - 1);
 	m.init1D(extremities, numNodesPerDim, boundaryConditions,
 		totalMass, stiffnessStretching, dampingStretching, stiffnessBending, dampingBending);
+	m.initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	m.wakeUp();
 
 	EXPECT_EQ(numNodesPerDim[0] * 3, m.getNumDof());
 	EXPECT_EQ(numNodesPerDim[0], m.getNumMasses());
