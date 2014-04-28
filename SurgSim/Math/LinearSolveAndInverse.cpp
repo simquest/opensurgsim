@@ -36,25 +36,6 @@ void SolveAndInverse<Matrix>::operator ()
 	(*Ainv) = lu.inverse();
 }
 
-void SolveAndInverse<Eigen::SparseMatrix<double,Eigen::ColMajor>>::operator ()
-	(const Eigen::SparseMatrix<double,Eigen::ColMajor>& A, const Vector& b, Vector* x, Matrix* Ainv)
-{
-	Eigen::SparseLU<const Eigen::SparseMatrix<double, Eigen::ColMajor>> solver;
-	// Compute the ordering permutation vector from the structural pattern of A
-	solver.analyzePattern(A);
-	// Compute the numerical factorization
-	solver.factorize(A);
-	//Use the factors to solve the linear system
-	(*x) = solver.solve(b);
-
-	if (m_identity.rows() != A.rows())
-	{
-		m_identity.resize(A.rows(), A.cols());
-		m_identity.setIdentity();
-	}
-	(*Ainv) = solver.solve(m_identity);
-}
-
 }; // namespace Math
 
 }; // namespace SurgSim

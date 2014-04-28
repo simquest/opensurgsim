@@ -22,7 +22,6 @@
 #include "SurgSim/Math/Matrix.h"
 
 #include <Eigen/Core>
-#include <Eigen/Sparse>
 
 namespace SurgSim
 {
@@ -83,26 +82,6 @@ public:
 	/// \param[out] Ainv Linear system matrix inverse = A^-1
 	/// \note Ainv is of generic type Matrix as in most cases, it will be a dense matrix (except for diagonal matrix)
 	void operator ()(const Matrix& A, const Vector& b, Vector* x, Matrix* Ainv);
-};
-
-
-/// Specialization for SparseMatrix type
-template <>
-class SolveAndInverse<Eigen::SparseMatrix<double,Eigen::ColMajor>>
-{
-private:
-	/// Intermediate identity matrix useful to compute the inverse by solving A.X = I
-	/// \note This matrix will be allocated and initialized on 1st call, only reallocated if the system changes size
-	Matrix m_identity;
-
-public:
-	/// Solve a linear system A.x=b and compute the matrix A^-1
-	/// \param A Linear system matrix
-	/// \param b Linear system right-hand-side
-	/// \param[out] x Linear system unknown
-	/// \param[out] Ainv Linear system matrix inverse = A^-1
-	/// \note Ainv is of generic type Matrix as in most cases, it will be a dense matrix (except for diagonal matrix)
-	void operator ()(const Eigen::SparseMatrix<double,Eigen::ColMajor>& A, const Vector& b, Vector* x, Matrix* Ainv);
 };
 
 }; // namespace Math

@@ -98,47 +98,6 @@ public:
 	Vector x, expectedX;
 };
 
-class LinearSolveAndInverseSparseMatrixTests : public ::testing::Test
-{
-public:
-	static void SetUpTestCase()
-	{
-		initializeMatrixVector();
-	}
-
-	LinearSolveAndInverseSparseMatrixTests() : matrix(size, size)
-	{
-		std::vector<Eigen::Triplet<double>> coefficients; // list of non-zeros coefficients
-		coefficients.reserve(size + size-1+ size-1); // Tri diagonal matrix structure
-		for(int rowId = 0; rowId < size; rowId++)
-		{
-			// Tri diagonal matrix structure
-			if (rowId > 0)
-			{
-				coefficients.push_back(Eigen::Triplet<double>(rowId, rowId - 1, 3.2 - 3.24*rowId));
-			}
-			coefficients.push_back(Eigen::Triplet<double>(rowId, rowId, 3.4 + rowId));
-			if (rowId < size - 1)
-			{
-				coefficients.push_back(Eigen::Triplet<double>(rowId, rowId + 1, 8.12 + 1.9*rowId));
-			}
-		}
-		matrix.setFromTriplets(coefficients.begin(), coefficients.end());
-		denseMatrix = matrix;
-		expectedInverse = denseMatrix.inverse();
-		resizeVector(&b, size);
-		b = gVector;
-		resizeVector(&x, size);
-		expectedX = expectedInverse * b;
-	}
-	Eigen::SparseMatrix<double,Eigen::ColMajor> matrix;
-	Matrix denseMatrix;
-	Matrix expectedInverse;
-	Matrix inverse;
-	Vector b;
-	Vector x, expectedX;
-};
-
 TEST_F(LinearSolveAndInverseDiagonalMatrixTests, solve)
 {
 	SolveAndInverse<DiagonalMatrix> solveAndInverse;
@@ -151,15 +110,6 @@ TEST_F(LinearSolveAndInverseDiagonalMatrixTests, solve)
 TEST_F(LinearSolveAndInverseMatrixTests, solve)
 {
 	SolveAndInverse<Matrix> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverse);
-
-	EXPECT_TRUE(x.isApprox(expectedX));
-	EXPECT_TRUE(inverse.isApprox(expectedInverse));
-};
-
-TEST_F(LinearSolveAndInverseSparseMatrixTests, solve)
-{
-	SolveAndInverse<Eigen::SparseMatrix<double,Eigen::ColMajor>> solveAndInverse;
 	solveAndInverse(matrix, b, &x, &inverse);
 
 	EXPECT_TRUE(x.isApprox(expectedX));
