@@ -41,7 +41,6 @@ class ViewElement : public Framework::SceneElement
 public:
 	/// Constructor
 	/// \param	name	Name of the scene element
-	/// \param	view	View component that provides the visualization of the graphics representations
 	explicit ViewElement(const std::string& name);
 
 	/// Destructor
