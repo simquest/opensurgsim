@@ -150,6 +150,7 @@ private:
 		// Iterate over the edges of the current polygon.
 		for (; start != m_clippedVertices.end(); ++start, ++startSignedDistance)
 		{
+			// If the end has reached the end of list, point it back to the front of list.
 			end = start + 1;
 			if (end == m_clippedVertices.end())
 			{
@@ -162,18 +163,20 @@ private:
 				endSignedDistance = signedDistanceFromPlane.begin();
 			}
 
+			// If the vertex is above the plane, it needs to be deleted.
 			if (*startSignedDistance > EPSILON)
 			{
-				// If the vertex is above the plane, it needs to be deleted.
 				toBeDeletedVertices.push_back(start);
 			}
 
+			// If the edge runs from one side of the plane to another. Clip it.
 			if (*startSignedDistance < -EPSILON && *endSignedDistance > EPSILON ||
 				*startSignedDistance > EPSILON && *endSignedDistance < -EPSILON)
 			{
-				// If the edge runs from one side of the plane to another. Clip it.
 				ratio = *startSignedDistance / (*startSignedDistance - *endSignedDistance);
 				newVertex = *start + (*end - *start) * ratio;
+				// If start->end are vertices at end of list and start of list, insert
+				// the new vertex at the end of the list.
 				if (++start == m_clippedVertices.end())
 				{
 					m_clippedVertices.push_back(newVertex);
@@ -184,10 +187,32 @@ private:
 				}
 			}
 		}
-
-		for (auto it = toBeDeletedVertices.rbegin(); it != toBeDeletedVertices.rend(); ++it)
+		
+		// Delete the vertices in toBeDeletedVertices.
+		// The vertex positions in the toBeDeletedVertices list are already in ascending order.
+		// Consider the sub-list which runs from toBeDeletedVertices.begin() to m_clippedVertices.end().
+		// The first vertex in this sub-list is always a to-be-deleted vertex.
+		// dest = start-of-sub-list
+		// for (vertex in (start-of-sub-list to end-of-sub-list))
+		//		if (vertex is not to-be-deleted)
+		//			dest = vertex
+		//			++dest
+		if (toBeDeletedVertices.size() > 0)
 		{
-			m_clippedVertices.erase(*it);
+			auto dest = *toBeDeletedVertices.begin();
+			auto deleted = toBeDeletedVertices.begin() + 1;
+			for (auto src = dest + 1; src != m_clippedVertices.end(); ++src)
+			{
+				if (*deleted == src)
+				{
+					++deleted;
+					continue;
+				}
+
+				*dest = *src;
+				++dest;
+			}
+			m_clippedVertices.resize(m_clippedVertices.size() - toBeDeletedVertices.size());
 		}
 	}
 
