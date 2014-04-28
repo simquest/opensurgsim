@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include <yaml-cpp/yaml.h>
+
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Matrix.h"
@@ -24,6 +26,11 @@
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::SphereShape;
+
+namespace
+{
+const double epsilon = 1e-10;
+}
 
 namespace SurgSim
 {
@@ -260,6 +267,52 @@ TEST_F(RigidRepresentationParametersTest, DensityWithSphereShapeTest)
 
 	// Test mass center
 	EXPECT_TRUE(rigidRepresentationParam->getMassCenter().isZero());
+}
+
+TEST_F(RigidRepresentationParametersTest, SerializationTest)
+{
+	RigidRepresentationParameters oldParameters;
+
+	{
+		SCOPED_TRACE("Encode with shape for mass inertia not set");
+
+		oldParameters.setValue("Density", 0.1);
+		oldParameters.setValue("LinearDamping", 0.2);
+		oldParameters.setValue("AngularDamping", 0.3);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = oldParameters.encode());
+		EXPECT_EQ(4u, node.size());
+
+		RigidRepresentationParameters newParameters;
+		ASSERT_NO_THROW(newParameters.decode(node));
+		EXPECT_NEAR(0.1, newParameters.getValue<double>("Density"), epsilon);
+		EXPECT_NEAR(0.2, newParameters.getValue<double>("LinearDamping"), epsilon);
+		EXPECT_NEAR(0.3, newParameters.getValue<double>("AngularDamping"), epsilon);
+
+		EXPECT_EQ(nullptr, newParameters.getValue<std::shared_ptr<SurgSim::Math::Shape>>("ShapeUsedForMassInertia"));
+	}
+
+	{
+		SCOPED_TRACE("Encode with shape for mass inertia set");
+
+		std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SphereShape>(1.0);
+		oldParameters.setValue("ShapeUsedForMassInertia", shape);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = oldParameters.encode());
+		EXPECT_EQ(4u, node.size());
+
+		RigidRepresentationParameters newParameters;
+		ASSERT_NO_THROW(newParameters.decode(node));
+
+		// Shape is encoded/decoded as concrete object instead of reference/shared_ptr<>.
+		EXPECT_NE(shape, newParameters.getValue<std::shared_ptr<SurgSim::Math::Shape>>("ShapeUsedForMassInertia"));
+
+		auto decodedShape = newParameters.getValue<std::shared_ptr<SurgSim::Math::Shape>>("ShapeUsedForMassInertia");
+		EXPECT_EQ(shape->getClassName(), decodedShape->getClassName());
+		EXPECT_NEAR(shape->getVolume(), decodedShape->getVolume(), epsilon);
+	}
 }
 
 }; // Physics

@@ -20,6 +20,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/Localization.h"
