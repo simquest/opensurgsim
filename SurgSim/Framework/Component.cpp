@@ -19,6 +19,8 @@
 
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Framework/SceneElement.h"
 
 namespace SurgSim
 {
@@ -28,7 +30,6 @@ namespace Framework
 // Forward References
 class Runtime;
 class Scene;
-class SceneElement;
 
 Component::Component(const std::string& name) :
 	m_name(name),
@@ -62,7 +63,6 @@ bool Component::isInitialized() const
 bool Component::initialize(const std::weak_ptr<Runtime>& runtime)
 {
 	SURGSIM_ASSERT(!m_didInit) << "Double initialization called in component " << getName();
-	SURGSIM_ASSERT(!runtime.expired()) << "Runtime cannot be expired at initialization in component " << getName();
 	m_runtime = runtime;
 
 	m_didInit = true;
@@ -81,6 +81,15 @@ bool Component::wakeUp()
 	SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component." << getName();
 	SURGSIM_ASSERT(m_didInit) << "Component " << getName() << " was awoken without being initialized.";
 	SURGSIM_ASSERT(m_isInitialized) << "Wakeup called even though initialization failed on component." << getName();
+
+	std::shared_ptr<SurgSim::Framework::SceneElement> element = getSceneElement();
+	if (element != nullptr)
+	{
+		auto poseComponents = element->getComponents<SurgSim::Framework::PoseComponent>();
+		SURGSIM_ASSERT(poseComponents.size() == 1) << " SceneElement " << element->getName()
+			<< " needs one and only one PoseComponent.";
+		m_poseComponent = poseComponents[0];
+	}
 
 	m_didWakeUp = true;
 	m_isAwake = doWakeUp();
@@ -108,9 +117,24 @@ std::shared_ptr<SceneElement> Component::getSceneElement()
 	return m_sceneElement.lock();
 }
 
+std::shared_ptr<const SceneElement> Component::getSceneElement() const
+{
+	return m_sceneElement.lock();
+}
+
 std::shared_ptr<Runtime> Component::getRuntime() const
 {
 	return m_runtime.lock();
+}
+
+std::shared_ptr<const PoseComponent> Component::getPoseComponent() const
+{
+	return m_poseComponent.lock();
+}
+
+std::shared_ptr<PoseComponent> Component::getPoseComponent()
+{
+	return m_poseComponent.lock();
 }
 
 boost::uuids::uuid Component::getUuid() const

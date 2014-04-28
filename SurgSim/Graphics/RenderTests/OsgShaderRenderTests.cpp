@@ -98,7 +98,7 @@ TEST(OsgShaderRenderTests, SphereShaderTest)
 	std::shared_ptr<SphereRepresentation> sphereRepresentation =
 		std::make_shared<OsgSphereRepresentation>("sphere representation");
 	sphereRepresentation->setRadius(0.25);
-	sphereRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.25, 0.0, -1.0)));
+	sphereRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.25, 0.0, -1.0)));
 
 	/// Add a shader to the sphere
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();

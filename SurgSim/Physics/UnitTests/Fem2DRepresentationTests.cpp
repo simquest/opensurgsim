@@ -26,6 +26,7 @@
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/FemElement2DTriangle.h"
 
+using SurgSim::Framework::Runtime;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
@@ -154,8 +155,11 @@ TEST_F(Fem2DRepresentationTests, GetTypeTest)
 
 TEST_F(Fem2DRepresentationTests, TransformInitialStateTest)
 {
-	m_fem->setInitialPose(m_initialPose);
+	m_fem->setLocalPose(m_initialPose);
 	m_fem->setInitialState(m_initialState);
+
+	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_fem->wakeUp());
 
 	EXPECT_TRUE(m_fem->getInitialState()->getPositions().isApprox(m_expectedTransformedPositions));
 	EXPECT_TRUE(m_fem->getInitialState()->getVelocities().isApprox(m_expectedTransformedVelocities));
@@ -169,11 +173,13 @@ TEST_F(Fem2DRepresentationTests, UpdateTest)
 	ASSERT_ANY_THROW(m_fem->update(dt));
 
 	m_fem->setInitialState(m_initialState);
-	m_fem->beforeUpdate(dt);
+	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_fem->wakeUp());
+
 	// Need to call Initialize after addFemElement and setInitialState to initialize the mass information
 	ASSERT_ANY_THROW(m_fem->update(dt));
 
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>()));
+	ASSERT_NO_THROW(m_fem->beforeUpdate(dt));
 	ASSERT_NO_THROW(m_fem->update(dt));
 
 	// Previous and current state should contains the proper information
@@ -192,7 +198,8 @@ TEST_F(Fem2DRepresentationTests, AfterUpdateTest)
 	ASSERT_ANY_THROW(m_fem->afterUpdate(dt));
 
 	m_fem->setInitialState(m_initialState);
-	ASSERT_TRUE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>()));
+	ASSERT_TRUE(m_fem->initialize(std::make_shared<Runtime>()));
+	ASSERT_TRUE(m_fem->wakeUp());
 	m_fem->beforeUpdate(dt);
 	m_fem->update(dt);
 	ASSERT_NO_THROW(m_fem->afterUpdate(dt));

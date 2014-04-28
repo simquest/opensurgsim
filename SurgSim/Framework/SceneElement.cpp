@@ -14,11 +14,12 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/Runtime.h"
+
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Log.h"
-
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Framework/Runtime.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -27,9 +28,11 @@ namespace SurgSim
 namespace Framework
 {
 
-SceneElement::SceneElement(const std::string& name) : m_name(name), m_isInitialized(false)
+SceneElement::SceneElement(const std::string& name) :
+	m_name(name), m_isInitialized(false)
 {
-
+	m_pose = std::make_shared<SurgSim::Framework::PoseComponent>("Pose");
+	m_pose->setPose(SurgSim::Math::RigidTransform3d::Identity());
 }
 
 SceneElement::~SceneElement()
@@ -51,6 +54,7 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 		if (isInitialized())
 		{
 			auto runtime = getRuntime();
+			SURGSIM_ASSERT(runtime != nullptr) << "Runtime cannot be expired when adding a component " << getName();
 			result = component->initialize(runtime);
 			runtime->addComponent(component);
 		}
@@ -102,6 +106,7 @@ std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) c
 bool SceneElement::initialize()
 {
 	SURGSIM_ASSERT(!m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
+	addComponent(m_pose);
 	m_isInitialized = doInitialize();
 
 	if (m_isInitialized)
@@ -122,6 +127,21 @@ bool SceneElement::initialize()
 std::string SceneElement::getName() const
 {
 	return m_name;
+}
+
+void SceneElement::setPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	m_pose->setPose(pose);
+}
+
+const SurgSim::Math::RigidTransform3d& SceneElement::getPose() const
+{
+	return m_pose->getPose();
+}
+
+std::shared_ptr<PoseComponent> SceneElement::getPoseComponent()
+{
+	return m_pose;
 }
 
 std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const

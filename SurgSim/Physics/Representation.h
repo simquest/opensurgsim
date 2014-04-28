@@ -89,6 +89,16 @@ public:
 	/// \return true if gravity enabled, false if not.
 	bool isGravityEnabled() const;
 
+	/// Set whether this Representation is controling the pose of the SceneElement
+	/// that it is part of.
+	/// \param isDrivingSceneElementPose true if this Representation is driving the pose of the SceneElement
+	void setIsDrivingSceneElementPose(bool isDrivingSceneElementPose);
+
+	/// Query if this Representation is controling the pose of the SceneElement
+	/// that it is part of.
+	/// \return true if this Representation is controlling the pose of the SceneElement
+	bool isDrivingSceneElementPose();
+
 	/// Preprocessing done before the update call
 	/// This needs to be called from the outside usually from a Computation
 	/// \param dt The time step (in seconds)
@@ -154,6 +164,9 @@ private:
 
 	/// Is this representation active or not ?
 	bool m_isActive;
+
+	/// Is this representation driving the SceneElement
+	bool m_isDrivingSceneElementPose;
 
 };
 

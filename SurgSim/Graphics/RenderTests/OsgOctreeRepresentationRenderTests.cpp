@@ -75,7 +75,7 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 	octreeShape.setRootNode(octree);
 
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Octree Representation");
-	octreeRepresentation->setInitialPose(makeRigidTransform(
+	octreeRepresentation->setLocalPose(makeRigidTransform(
 											makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
 											Vector3d(0.0, 0.0, -20.0))
 										);

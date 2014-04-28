@@ -16,7 +16,6 @@
 #include <string>
 
 #include "SurgSim/Blocks/SphereElement.h"
-#include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
@@ -27,7 +26,6 @@
 
 
 using SurgSim::Blocks::SphereElement;
-using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;
@@ -36,8 +34,8 @@ using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 
-SphereElement::SphereElement(const std::string& name, const SurgSim::Math::RigidTransform3d& pose):
-	SurgSim::Framework::SceneElement(name), m_name(name), m_pose(pose)
+SphereElement::SphereElement(const std::string& name) :
+	SurgSim::Framework::SceneElement(name), m_name(name)
 {
 }
 
@@ -59,12 +57,10 @@ bool SphereElement::doInitialize()
 	params.setShapeUsedForMassInertia(shape);
 
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(m_pose);
 
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSphereRepresentation>(m_name + " Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
-	graphicsRepresentation->setInitialPose(m_pose);
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
@@ -88,11 +84,6 @@ bool SphereElement::doInitialize()
 
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
-
-	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPose->setPoseSender(physicsRepresentation);
-	transferPose->setPoseReceiver(graphicsRepresentation);
-	addComponent(transferPose);
 
 	auto rigidCollision = std::make_shared<RigidCollisionRepresentation>("Sphere Collision Representation");
 	physicsRepresentation->setCollisionRepresentation(rigidCollision);

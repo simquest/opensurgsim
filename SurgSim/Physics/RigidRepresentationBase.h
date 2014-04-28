@@ -24,8 +24,6 @@
 
 #include "SurgSim/Collision/Location.h"
 
-#include "SurgSim/Math/RigidTransform.h"
-
 namespace SurgSim
 {
 namespace Physics
@@ -37,8 +35,6 @@ namespace Physics
 class RigidRepresentationBase : public Representation
 {
 public:
-	typedef SurgSim::Math::RigidTransform3d RigidTransform3d;
-
 	/// Constructor
 	/// \param name The rigid representation's name
 	explicit RigidRepresentationBase(const std::string& name);
@@ -46,9 +42,6 @@ public:
 	/// Destructor
 	virtual ~RigidRepresentationBase();
 
-	/// Set the initial pose of the rigid representation
-	/// \param pose The initial pose (translation + rotation)
-	void setInitialPose(const SurgSim::Math::RigidTransform3d& pose);
 	/// Set the initial state of the rigid representation
 	/// \param state The initial state (pose + lin/ang velocities)
 	/// This will also set the current/previous states to the initial state
@@ -65,20 +58,6 @@ public:
 	/// Get the previous state of the rigid representation
 	/// \return The previous state (pose + lin/ang velocities)
 	const RigidRepresentationState& getPreviousState() const;
-
-	/// Get the initial pose of the rigid representation
-	/// \return The initial pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getInitialPose() const;
-	/// Get the previous pose of the rigid representation
-	/// \return The previous pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getPreviousPose() const;
-	/// Get the current pose of the rigid representation
-	/// \return The current pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getCurrentPose() const;
-
-	/// Get the final pose of the rigid representation
-	/// \return The final pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getPose() const;
 
 	std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location);
 
@@ -105,7 +84,12 @@ public:
 	virtual void setCollisionRepresentation(
 		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
+	virtual	void beforeUpdate(double dt) override;
+	virtual	void afterUpdate(double dt) override;
+
 protected:
+	bool doWakeUp() override;
+
 	/// Initial rigid representation state (useful for reset)
 	RigidRepresentationState m_initialState;
 	/// Previous rigid representation state
