@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file This file tests the non-abstract functionalities of the base class FemRepresentation
+/// \file FemRepresentationTests.cpp
+/// This file tests the non-abstract functionalities of the base class FemRepresentation
 
 #include <gtest/gtest.h>
 

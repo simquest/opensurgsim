@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Tests for the DcdCollision Class
+/// \file DcdCollisionTests.cpp
+/// Tests for the DcdCollision Class
 
 #include <gtest/gtest.h>
 

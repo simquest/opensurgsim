@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file This file tests the functionalities of the class Fem1DRepresentation.
+/// \file Fem1DRepresentationTests.cpp
+/// This file tests the functionalities of the class Fem1DRepresentation.
 
 #include <gtest/gtest.h>
 
