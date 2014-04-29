@@ -276,9 +276,18 @@ TEST_F(RigidRepresentationParametersTest, SerializationTest)
 	{
 		SCOPED_TRACE("Encode with shape for mass inertia not set");
 
+		YAML::Node node;
+		EXPECT_ANY_THROW(node = oldParameters.encode());
+	}
+
+	{
+		SCOPED_TRACE("Encode with shape for mass inertia set");
+
+		std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SphereShape>(1.0);
 		oldParameters.setValue("Density", 0.1);
 		oldParameters.setValue("LinearDamping", 0.2);
 		oldParameters.setValue("AngularDamping", 0.3);
+		oldParameters.setValue("ShapeUsedForMassInertia", shape);
 
 		YAML::Node node;
 		ASSERT_NO_THROW(node = oldParameters.encode());
@@ -289,22 +298,6 @@ TEST_F(RigidRepresentationParametersTest, SerializationTest)
 		EXPECT_NEAR(0.1, newParameters.getValue<double>("Density"), epsilon);
 		EXPECT_NEAR(0.2, newParameters.getValue<double>("LinearDamping"), epsilon);
 		EXPECT_NEAR(0.3, newParameters.getValue<double>("AngularDamping"), epsilon);
-
-		EXPECT_EQ(nullptr, newParameters.getValue<std::shared_ptr<SurgSim::Math::Shape>>("ShapeUsedForMassInertia"));
-	}
-
-	{
-		SCOPED_TRACE("Encode with shape for mass inertia set");
-
-		std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SphereShape>(1.0);
-		oldParameters.setValue("ShapeUsedForMassInertia", shape);
-
-		YAML::Node node;
-		ASSERT_NO_THROW(node = oldParameters.encode());
-		EXPECT_EQ(4u, node.size());
-
-		RigidRepresentationParameters newParameters;
-		ASSERT_NO_THROW(newParameters.decode(node));
 
 		// Shape is encoded/decoded as concrete object instead of reference/shared_ptr<>.
 		EXPECT_NE(shape, newParameters.getValue<std::shared_ptr<SurgSim::Math::Shape>>("ShapeUsedForMassInertia"));

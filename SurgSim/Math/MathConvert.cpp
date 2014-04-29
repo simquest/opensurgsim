@@ -15,7 +15,6 @@
 
 #include "SurgSim/Math/MathConvert.h"
 
-#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace YAML
@@ -24,16 +23,9 @@ namespace YAML
 Node convert<std::shared_ptr<SurgSim::Math::Shape>>::encode(
 	const std::shared_ptr<SurgSim::Math::Shape>& rhs)
 {
+	SURGSIM_ASSERT(nullptr != rhs) << "Trying to encode nullptr SurgSim::Math::Shape";
 	Node result;
-	if (nullptr != rhs)
-	{
-		result[rhs->getClassName()] = rhs->encode();
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "Trying to encode nullptr SurgSim::Math::Shape";
-	}
+	result[rhs->getClassName()] = rhs->encode();
 
 	return result;
 }
