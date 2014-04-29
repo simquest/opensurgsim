@@ -49,7 +49,8 @@ static void assertIsCoplanar(const Vector3d& triangle0, const Vector3d& triangle
 	SURGSIM_ASSERT(abs((triangle2 - triangle0).dot((triangle1 - triangle0).cross(point - triangle2)))
 				   < SurgSim::Math::Geometry::ScalarEpsilon)
 		<< "Coplanarity failed with: "
-		<< "t0 " << triangle0 << ", t1 " << triangle1 << ", t2 " << triangle2 << ", pt " << point;
+		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
+		<< ", pt " << point.transpose();
 }
 
 static void assertIsConstrained(const Vector3d& point,
@@ -65,49 +66,47 @@ static void assertIsConstrained(const Vector3d& point,
 	SURGSIM_ASSERT(barycentricCoordinate.x() >= -SurgSim::Math::Geometry::ScalarEpsilon
 				   && barycentricCoordinate.x() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon)
 		<< "Constrained failed with: "
-		<< "t0 " << triangle0 << ", t1 " << triangle1 << ", t2 " << triangle2 << ", n " << normal << ", pt " << point;
+		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
+		<< ", n " << normal.transpose() << ", pt " << point.transpose();
 	SURGSIM_ASSERT(barycentricCoordinate.y() >= -SurgSim::Math::Geometry::ScalarEpsilon
 				   && barycentricCoordinate.y() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon)
 		<< "Constrained failed with: "
-		<< "t0 " << triangle0 << ", t1 " << triangle1 << ", t2 " << triangle2 << ", n " << normal << ", pt " << point;
+		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
+		<< ", n " << normal.transpose() << ", pt " << point.transpose();
 	SURGSIM_ASSERT(barycentricCoordinate.z() >= -SurgSim::Math::Geometry::ScalarEpsilon
 				   && barycentricCoordinate.z() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon)
 		<< "Constrained failed with: "
-		<< "t0 " << triangle0 << ", t1 " << triangle1 << ", t2 " << triangle2 << ", n " << normal << ", pt " << point;
+		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
+		<< ", n " << normal.transpose() << ", pt " << point.transpose();
 }
 
 static void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 										  double penetrationDepth,
-										  Vector3d triangleA0,
-										  Vector3d triangleA1,
-										  Vector3d triangleA2,
-										  Vector3d triangleB0,
-										  Vector3d triangleB1,
-										  Vector3d triangleB2)
+										  const Vector3d& triangleA0,
+										  const Vector3d& triangleA1,
+										  const Vector3d& triangleA2,
+										  const Vector3d& triangleB0,
+										  const Vector3d& triangleB1,
+										  const Vector3d& triangleB2)
 {
-	Vector3d correction = normal * (0.5 * (penetrationDepth + 2.0 * SurgSim::Math::Geometry::DistanceEpsilon));
-	triangleA0 += correction;
-	triangleA1 += correction;
-	triangleA2 += correction;
-	triangleB0 += correction;
-	triangleB1 += correction;
-	triangleB2 += correction;
+	Vector3d correction = normal * (penetrationDepth + 2 * SurgSim::Math::Geometry::DistanceEpsilon);
 
 	Vector3d temp1, temp2;
-	double expectedDistance = SurgSim::Math::distanceTriangleTriangle(triangleA0, triangleA1, triangleA2,
-																	  triangleB0, triangleB1, triangleB2,
-																	  &temp1, &temp2);
+	double expectedDistance = SurgSim::Math::distanceTriangleTriangle(
+		(Vector3d)(triangleA0 + correction), (Vector3d)(triangleA1 + correction), (Vector3d)(triangleA2 + correction),
+		triangleB0, triangleB1, triangleB2,
+		&temp1, &temp2);
 
-	SURGSIM_ASSERT(expectedDistance >= 0.0)
+	SURGSIM_ASSERT(expectedDistance > 0.0)
 		<< "Normal and depth failed with: "
-		<< "n " << normal << ", d " << penetrationDepth 
-		<< ", a0 " << triangleA0 << ", a1 " << triangleA1 << ", a2 " << triangleA2 
-		<< ", b0 " << triangleB0 << ", b1 " << triangleB1 << ", b2 " << triangleB2;
+		<< "calcD " << expectedDistance << ", n " << normal.transpose() << ", d " << penetrationDepth
+		<< ", a0 " << triangleA0.transpose() << ", a1 " << triangleA1.transpose() << ", a2 " << triangleA2.transpose()
+		<< ", b0 " << triangleB0.transpose() << ", b1 " << triangleB1.transpose() << ", b2 " << triangleB2.transpose();
 	SURGSIM_ASSERT(expectedDistance <= 2.1 * SurgSim::Math::Geometry::DistanceEpsilon)
 		<< "Normal and depth failed with: "
-		<< "n " << normal << ", d " << penetrationDepth 
-		<< ", a0 " << triangleA0 << ", a1 " << triangleA1 << ", a2 " << triangleA2 
-		<< ", b0 " << triangleB0 << ", b1 " << triangleB1 << ", b2 " << triangleB2;
+		<< "calcD " << expectedDistance << ", n " << normal.transpose() << ", d " << penetrationDepth
+		<< ", a0 " << triangleA0.transpose() << ", a1 " << triangleA1.transpose() << ", a2 " << triangleA2.transpose()
+		<< ", b0 " << triangleB0.transpose() << ", b1 " << triangleB1.transpose() << ", b2 " << triangleB2.transpose();
 }
 
 void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
