@@ -34,11 +34,10 @@ TEST(RenderPassTests, InitTest)
 	ASSERT_NO_THROW({renderPass = std::make_shared<RenderPass>("testpass");});
 
 	EXPECT_NE(nullptr, renderPass->getCamera());
-	EXPECT_NE(nullptr, renderPass->getGroup());
-	EXPECT_EQ(renderPass->getCamera()->getGroup(), renderPass->getGroup());
-	EXPECT_EQ(renderPass->getName(), renderPass->getGroup()->getName());
 	EXPECT_NE(nullptr, renderPass->getMaterial());
 	EXPECT_EQ(renderPass->getCamera()->getMaterial(), renderPass->getMaterial());
+	EXPECT_EQ(renderPass->getCamera()->getRenderGroupReference(), renderPass->getName());
+
 }
 
 TEST(RenderPassTests, SettersTest)

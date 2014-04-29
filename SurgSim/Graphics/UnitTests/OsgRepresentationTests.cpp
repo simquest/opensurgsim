@@ -31,6 +31,7 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::makeRigidTransform;
 
 namespace SurgSim
 {
@@ -40,7 +41,8 @@ namespace Graphics
 TEST(OsgRepresentationTests, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<Representation> representation =
-		std::make_shared<MockOsgRepresentation>("test name");});
+						 std::make_shared<MockOsgRepresentation>("test name");
+					});
 
 	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
 
@@ -89,7 +91,7 @@ TEST(OsgRepresentationTests, PoseTest)
 	{
 		SCOPED_TRACE("Set Local Pose");
 		localPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+						  Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		representation->setLocalPose(localPose);
 		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
 		EXPECT_TRUE(representation->getPose().isApprox(localPose));
@@ -161,6 +163,8 @@ TEST(OsgRepresentationTests, GroupTest)
 {
 	std::shared_ptr<Representation> rep = std::make_shared<MockOsgRepresentation>("TestRepresentation");
 
+	rep->clearGroupReferences();
+
 	EXPECT_TRUE(rep->addGroupReference("group1"));
 	EXPECT_FALSE(rep->addGroupReference("group1"));
 
@@ -180,6 +184,8 @@ TEST(OsgRepresentationTests, GroupTest)
 TEST(OsgRepresentationTests, GroupsTest)
 {
 	std::shared_ptr<Representation> rep = std::make_shared<MockOsgRepresentation>("TestRepresentation");
+
+	rep->clearGroupReferences();
 
 	std::vector<std::string> newGroups;
 	newGroups.push_back("group1");

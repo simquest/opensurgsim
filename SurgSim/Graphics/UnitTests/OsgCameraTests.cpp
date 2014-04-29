@@ -39,6 +39,7 @@ using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::makeRigidTransform;
 
 namespace SurgSim
 {
@@ -116,7 +117,7 @@ TEST(OsgCameraTests, GroupTest)
 	EXPECT_EQ(nullptr, camera->getGroup());
 
 	/// Adding an OsgGroup should succeed
-	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test group");
+	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>(camera->getRenderGroupReference());
 	std::shared_ptr<Group> group = osgGroup;
 	EXPECT_TRUE(camera->setGroup(group));
 	EXPECT_EQ(group, camera->getGroup());
@@ -125,7 +126,7 @@ TEST(OsgCameraTests, GroupTest)
 	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0)->asGroup()->getChild(0));
 
 	/// Adding a group that does not derive from OsgGroup should fail
-	std::shared_ptr<Group> mockGroup = std::make_shared<MockGroup>("non-osg group");
+	std::shared_ptr<Group> mockGroup = std::make_shared<MockGroup>(camera->getRenderGroupReference());
 	EXPECT_FALSE(camera->setGroup(mockGroup));
 	EXPECT_EQ(group, camera->getGroup());
 	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0)->asGroup()->getChild(0));

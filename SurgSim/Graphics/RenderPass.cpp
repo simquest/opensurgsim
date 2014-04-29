@@ -31,10 +31,10 @@ namespace Graphics
 RenderPass::RenderPass(const std::string& name) :
 	SceneElement(name)
 {
-	m_group = std::make_shared<OsgGroup>(getName());
-	m_camera = std::make_shared<OsgCamera>(getName()+" camera");
+	m_camera = std::make_shared<OsgCamera>(getName() + " camera");
+	m_camera->setRenderGroupReference(name);
+	m_camera->setGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
-	m_camera->setGroup(m_group);
 	m_material = std::make_shared<OsgMaterial>();
 	m_camera->setMaterial(m_material);
 }
@@ -46,7 +46,6 @@ RenderPass::~RenderPass()
 
 bool RenderPass::doInitialize()
 {
-	addComponent(m_group);
 	addComponent(m_camera);
 	return true;
 }
@@ -54,11 +53,6 @@ bool RenderPass::doInitialize()
 std::shared_ptr<Camera> RenderPass::getCamera()
 {
 	return m_camera;
-}
-
-std::shared_ptr<Group> RenderPass::getGroup()
-{
-	return m_group;
 }
 
 bool RenderPass::setRenderTarget(std::shared_ptr<RenderTarget> target)
@@ -105,15 +99,15 @@ void RenderPass::showColorTarget(int x, int y, int width, int height)
 	}
 	if (m_debugColor != nullptr)
 	{
-		m_debugColor->setLocation(x,y);
-		m_debugColor->setSize(width,height);
+		m_debugColor->setLocation(x, y);
+		m_debugColor->setSize(width, height);
 		m_debugColor->setVisible(true);
 	}
 }
 
 void RenderPass::hideColorTarget()
 {
-	if(m_debugColor != nullptr)
+	if (m_debugColor != nullptr)
 	{
 		m_debugColor->setVisible(false);
 	}
@@ -128,8 +122,8 @@ void RenderPass::showDepthTarget(int x, int y, int width, int height)
 	}
 	if (m_debugDepth != nullptr)
 	{
-		m_debugDepth->setLocation(x,y);
-		m_debugDepth->setSize(width,height);
+		m_debugDepth->setLocation(x, y);
+		m_debugDepth->setSize(width, height);
 		m_debugDepth->setVisible(true);
 	}
 }

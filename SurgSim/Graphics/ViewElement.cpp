@@ -13,9 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Graphics/Camera.h"
-#include "SurgSim/Graphics/View.h"
 #include "SurgSim/Graphics/ViewElement.h"
+
+#include "SurgSim/Graphics/Camera.h"
+#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Graphics/View.h"
 
 namespace SurgSim
 {
@@ -35,6 +37,7 @@ ViewElement::~ViewElement()
 bool ViewElement::setView(std::shared_ptr<View> view)
 {
 	m_view = view;
+	m_view->setCamera(m_camera);
 	return true;
 }
 
@@ -63,6 +66,8 @@ bool ViewElement::doInitialize()
 	addComponent(m_camera);
 	return true;
 }
+
+
 
 }; // End of namespace Graphics
 }; // End of namespace SurgSim
