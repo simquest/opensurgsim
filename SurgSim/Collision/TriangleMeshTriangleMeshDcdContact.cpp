@@ -43,6 +43,8 @@ std::pair<int,int> TriangleMeshTriangleMeshDcdContact::getShapeTypes()
 	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_MESH, SurgSim::Math::SHAPE_TYPE_MESH);
 }
 
+#ifdef SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
+
 static void assertIsCoplanar(const Vector3d& triangle0, const Vector3d& triangle1, const Vector3d& triangle2,
 					   const Vector3d& point)
 {
@@ -108,6 +110,8 @@ static void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 		<< ", a0 " << triangleA0.transpose() << ", a1 " << triangleA1.transpose() << ", a2 " << triangleA2.transpose()
 		<< ", b0 " << triangleB0.transpose() << ", b1 " << triangleB1.transpose() << ", b2 " << triangleB2.transpose();
 }
+
+#endif // SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
 
 void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
