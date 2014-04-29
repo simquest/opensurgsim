@@ -15,7 +15,6 @@
 
 /// \file
 /// Tests for the LinearSolveAndInverse.cpp functions.
-///
 
 #include <gtest/gtest.h>
 
@@ -27,93 +26,180 @@ namespace SurgSim
 namespace Math
 {
 
-namespace
+class LinearSolveAndInverseTests : public ::testing::Test
 {
-	const int size = 10;
-	SurgSim::Math::Matrix gMatrix(size, size);
-	SurgSim::Math::Vector gVector(size);
+private:
+	size_t size;
 
-	void initializeMatrixVector()
+	void initializeVector(Vector* v)
 	{
+		v->resize(size);
+		for (size_t row = 0; row < size; row++)
+		{
+			(*v)(row) = fmod(-4.1 * row * row + 3.46, 5.0);
+		}
+	}
+
+	void initializeDenseMatrix(Matrix* m)
+	{
+		m->resize(size, size);
 		for (size_t row = 0; row < size; row++)
 		{
 			for (size_t col = 0; col < size; col++)
 			{
-				gMatrix(row, col) = 1.47 * sqrt((static_cast<double>(row + 1))) + 8.3 * row * col - 0.24 * col + 13.24;
+				(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
 			}
-			gVector(row) = -4.1 * row * row + 3.46;
+			}
+	}
+
+	void initializeDiagonalMatrix(Matrix* m)
+	{
+		m->resize(size, size);
+		m->setZero();
+		for (size_t row = 0; row < size; row++)
+		{
+			(*m)(row, row) = fmod((10.3 * cos(static_cast<double>(row * row)) + 3.24), 10.0);
 		}
 	}
-};
 
-
-class LinearSolveAndInverseMatrixTests : public ::testing::Test
-{
-public:
-	static void SetUpTestCase()
+	template <size_t BlockSize>
+	void initializeTriDiagonalBlockMatrix(Matrix* m)
 	{
-		initializeMatrixVector();
+		size_t numBlocks = size / BlockSize;
+
+		m->resize(size, size);
+
+		for (size_t row = 0; row < size; row++)
+		{
+			for (size_t col = 0; col < size; col++)
+			{
+				(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
+			}
+		}
+
+		auto zeroBlock = Eigen::Matrix<double, BlockSize, BlockSize>::Zero();
+		for (size_t rowBlockId = 0; rowBlockId < numBlocks; rowBlockId++)
+		{
+			for (size_t colBlockId = rowBlockId + 2; colBlockId < numBlocks; colBlockId++)
+	{
+				SurgSim::Math::setSubMatrix(zeroBlock, rowBlockId, colBlockId, BlockSize, BlockSize, m);
+				SurgSim::Math::setSubMatrix(zeroBlock, colBlockId, rowBlockId, BlockSize, BlockSize, m);
+			}
+		}
 	}
 
-	LinearSolveAndInverseMatrixTests()
+	void setupTest()
 	{
-		resizeMatrix(&matrix, size, size, false);
-		matrix = gMatrix;
+		initializeVector(&b);
 		expectedInverse = matrix.inverse();
-		resizeVector(&b, size);
-		b = gVector;
-		resizeVector(&x, size);
 		expectedX = expectedInverse * b;
 	}
-	Matrix matrix;
-	Matrix inverse, expectedInverse;
-	Vector b;
-	Vector x, expectedX;
-};
 
-class LinearSolveAndInverseDiagonalMatrixTests : public ::testing::Test
-{
 public:
-	static void SetUpTestCase()
+
+	void setupDenseMatrixTest()
 	{
-		initializeMatrixVector();
+		size = 18;
+		initializeDenseMatrix(&matrix);
+		setupTest();
 	}
 
-	LinearSolveAndInverseDiagonalMatrixTests()
+	void setupDiagonalMatrixTest()
 	{
-		resizeMatrix(&matrix, size, size, false);
-		matrix.diagonal() = gMatrix.diagonal();
-		denseMatrix = matrix;
-		expectedInverse = denseMatrix.inverse();
-		resizeVector(&b, size);
-		b = gVector;
-		resizeVector(&x, size);
-		expectedX = expectedInverse * b;
+		size = 18;
+		initializeDiagonalMatrix(&matrix);
+		setupTest();
 	}
-	DiagonalMatrix matrix;
-	Matrix denseMatrix;
-	Matrix expectedInverse;
-	Matrix inverse;
+
+	template <size_t BlockSize>
+	void setupTriDiagonalBlockMatrixTest()
+	{
+		size = BlockSize * 6;
+		initializeTriDiagonalBlockMatrix<BlockSize>(&matrix);
+		setupTest();
+	}
+
+	Matrix matrix;
+	Matrix inverseMatrix, expectedInverse;
 	Vector b;
 	Vector x, expectedX;
 };
 
-TEST_F(LinearSolveAndInverseDiagonalMatrixTests, solve)
+TEST_F(LinearSolveAndInverseTests, DenseMatrixTests)
 {
-	SolveAndInverse<DiagonalMatrix> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverse);
+	setupDenseMatrixTest();
+
+	LinearSolveAndInverseDenseMatrix solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
 
 	EXPECT_TRUE(x.isApprox(expectedX));
-	EXPECT_TRUE(inverse.isApprox(expectedInverse));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
 };
 
-TEST_F(LinearSolveAndInverseMatrixTests, solve)
+TEST_F(LinearSolveAndInverseTests, DiagonalMatrixTests)
 {
-	SolveAndInverse<Matrix> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverse);
+	setupDiagonalMatrixTest();
+
+	LinearSolveAndInverseDiagonalMatrix solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
 
 	EXPECT_TRUE(x.isApprox(expectedX));
-	EXPECT_TRUE(inverse.isApprox(expectedInverse));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize2Tests)
+{
+	setupTriDiagonalBlockMatrixTest<2>();
+
+	LinearSolveAndInverseTriDiagonalBlockMatrix<2> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize3Tests)
+{
+	setupTriDiagonalBlockMatrixTest<3>();
+
+	LinearSolveAndInverseTriDiagonalBlockMatrix<3> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize4Tests)
+{
+	setupTriDiagonalBlockMatrixTest<4>();
+
+	LinearSolveAndInverseTriDiagonalBlockMatrix<4> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize5Tests)
+{
+	setupTriDiagonalBlockMatrixTest<5>();
+
+	LinearSolveAndInverseTriDiagonalBlockMatrix<5> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize6Tests)
+{
+	setupTriDiagonalBlockMatrixTest<6>();
+
+	LinearSolveAndInverseTriDiagonalBlockMatrix<6> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
 };
 
 }; // namespace Math

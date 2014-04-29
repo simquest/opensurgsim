@@ -148,10 +148,7 @@ bool Fem3DRepresentation::doInitialize()
 		return false;
 	}
 
-	return FemRepresentation<SurgSim::Math::Matrix,
-							 SurgSim::Math::Matrix,
-							 SurgSim::Math::Matrix,
-							 SurgSim::Math::Matrix>::doInitialize();
+	return FemRepresentation::doInitialize();
 }
 
 void Fem3DRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,

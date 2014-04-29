@@ -22,21 +22,19 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State, class MT, class DT, class KT, class ST>
-OdeSolverLinearEulerExplicit<State, MT, DT, KT, ST>::OdeSolverLinearEulerExplicit(
-	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	OdeSolverEulerExplicit<State, MT, DT, KT, ST>(equation),
+template <class State> OdeSolverLinearEulerExplicit<State>::OdeSolverLinearEulerExplicit(OdeEquation<State>* equation)
+	: OdeSolverEulerExplicit<State>(equation),
 	m_initialized(false)
 {
 	m_name = "Ode Solver Linear Euler Explicit";
 }
 
-template <class State, class MT, class DT, class KT, class ST>
-void OdeSolverLinearEulerExplicit<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+template <class State>
+void OdeSolverLinearEulerExplicit<State>::solve(double dt, const State& currentState, State* newState)
 {
 	if (!m_initialized)
 	{
-		OdeSolverEulerExplicit<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
+		OdeSolverEulerExplicit<State>::solve(dt, currentState, newState);
 		m_initialized = true;
 	}
 	else

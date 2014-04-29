@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/LinearSolveAndInverse.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 
 namespace
@@ -59,6 +60,19 @@ Fem1DRepresentation::~Fem1DRepresentation()
 RepresentationType Fem1DRepresentation::getType() const
 {
 	return REPRESENTATION_TYPE_FEM1D;
+}
+
+bool Fem1DRepresentation::doWakeUp()
+{
+	if (!FemRepresentation::doWakeUp())
+	{
+		return false;
+	}
+
+	// Make use of a specialized linear solver for tri-diagonal block matrix of block size 6
+	m_odeSolver->setLinearSolver(std::make_shared<SurgSim::Math::LinearSolveAndInverseTriDiagonalBlockMatrix<6>>());
+
+	return true;
 }
 
 void Fem1DRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,

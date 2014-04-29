@@ -22,16 +22,14 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State, class MT, class DT, class KT, class ST>
-OdeSolverStatic<State, MT, DT, KT, ST>::OdeSolverStatic(
-	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	OdeSolver<State, MT, DT, KT, ST>(equation)
+template <class State> OdeSolverStatic<State>::OdeSolverStatic(OdeEquation<State>* equation)
+	: OdeSolver<State>(equation)
 {
 	m_name = "Ode Solver Static";
 }
 
-template <class State, class MT, class DT, class KT, class ST>
-void OdeSolverStatic<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+template <class State>
+void OdeSolverStatic<State>::solve(double dt, const State& currentState, State* newState)
 {
 	// General equation to solve:
 	//   K.deltaX = Fext + Fint(t)
@@ -40,13 +38,13 @@ void OdeSolverStatic<State, MT, DT, KT, ST>::solve(double dt, const State& curre
 	//   K.(x(t+dt) - x(0)) = Fext
 
 	// Computes f(t, x(t), v(t)) and K
-	const KT& K = m_equation.computeK(currentState);
+	const Matrix& K = m_equation.computeK(currentState);
 	const Vector& f = m_equation.computeF(currentState);
 
 	m_systemMatrix = K;
 
 	Vector& deltaX = newState->getVelocities();
-	m_solveAndInverse(m_systemMatrix, f, &deltaX, &(m_compliance));
+	(*m_linearSolver)(m_systemMatrix, f, &deltaX, &m_compliance);
 
 	// Compute the new state using the static scheme:
 	newState->getPositions()  = currentState.getPositions()  + deltaX;

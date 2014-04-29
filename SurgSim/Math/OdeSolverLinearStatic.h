@@ -26,13 +26,12 @@ namespace Math
 
 /// Linear version of the static ode solver
 /// This solver assumes that the system is linear, ie that Stiffness matrix does not change.
-template <class State, class MT, class DT, class KT, class ST>
-class OdeSolverLinearStatic : public OdeSolverStatic<State, MT, DT, KT, ST>
+template <class State> class OdeSolverLinearStatic : public OdeSolverStatic<State>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverLinearStatic(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverLinearStatic(OdeEquation<State>* equation);
 
 	virtual void solve(double dt, const State& currentState, State* newState) override;
 
@@ -42,9 +41,9 @@ private:
 
 public:
 	// Variables used from OdeSolver
-	using OdeSolver<State, MT, DT, KT, ST>::m_name;
-	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
-	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
+	using OdeSolver<State>::m_compliance;
+	using OdeSolver<State>::m_equation;
+	using OdeSolver<State>::m_name;
 };
 
 }; // namespace Math

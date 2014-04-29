@@ -18,17 +18,15 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"
 #include "SurgSim/Physics/FemElement3DCube.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
-
-using SurgSim::Framework::Runtime;
-using SurgSim::Math::getSubVector;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::Fem3DRepresentationLocalization;
+using SurgSim::Math::getSubVector;
+
+#include "SurgSim/Math/Vector.h"
 
 namespace
 {
@@ -58,8 +56,6 @@ public:
 	void SetUp()
 	{
 		using SurgSim::Math::Vector3d;
-
-		m_runtime = std::make_shared<Runtime>();
 
 		m_fem = std::make_shared<Fem3DRepresentation>("Fem3dRepresentation");
 		auto state = std::make_shared<DeformableRepresentationState>();
@@ -91,8 +87,6 @@ public:
 
 		m_fem->setInitialState(state);
 		m_fem->setIsActive(true);
-		m_fem->initialize(m_runtime);
-		m_fem->wakeUp();
 
 		// FEMRepresentation for FemElement3DCube
 		m_fem3DCube = std::make_shared<Fem3DRepresentation>("Fem3dCubeRepresentation");
@@ -121,15 +115,12 @@ public:
 		}
 		m_fem3DCube->setInitialState(restState);
 		m_fem3DCube->setIsActive(true);
-		m_fem3DCube->initialize(m_runtime);
-		m_fem3DCube->wakeUp();
 	}
 
 	void TearDown()
 	{
 	}
 
-	std::shared_ptr<Runtime> m_runtime;
 	std::shared_ptr<Fem3DRepresentation> m_fem;
 	std::shared_ptr<Fem3DRepresentation> m_fem3DCube;
 };
