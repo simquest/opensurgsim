@@ -92,15 +92,6 @@ enum LabJackTimerMode
 	LABJACKTIMERMODE_LINETOLINE = 14 // Line to Line measurement
 };
 
-/// The custom data type used for the input values from the LabJack.  The key is the line/timer/counter number.
-/// The high-level driver (LabJackUD) returns the value as a double, while the low-level driver returns a signed
-/// integer in 4 bytes.  To avoid the difficulty of cross-platform fixed-size integers, we store the value in a double.
-typedef std::unordered_map<int, double> LabJackInputValuesType;
-
-/// The custom data type used for the digital and timer output values to the LabJack.  The value type must hold at
-/// least 16 bits.  The key is the line/timer/counter number.
-typedef std::unordered_map<int, int> LabJackDigitalOutputValuesType;
-
 /// A class implementing the communication with a LabJack data acquisition (DAQ) device.  Should work for the U3, U6,
 /// and U9 models at least. See the manual(s) for your LabJack device(s) to understand the input and output data, the
 /// configuration parameters, timing limitations, etc.  Currently timers and digital input/output are supported.

@@ -42,8 +42,9 @@ public:
 	LabJackToPoseFilter(const std::string& name, int firstTimerForQuadrature,
 		int lineForPlusX, int lineForMinusX, double translationPerUpdate) :
 		SurgSim::Input::CommonDevice(name),
-		m_digitalInputsIndex(-1),
-		m_timerInputsIndex(-1),
+		m_digitalInputPlusXIndex(-1),
+		m_digitalInputMinusXIndex(-1),
+		m_timerInputIndex(-1),
 		m_pose(RigidTransform3d::Identity()),
 		m_lineForPlusX(lineForPlusX),
 		m_lineForMinusX(lineForMinusX),
@@ -74,8 +75,12 @@ public:
 
 	void initializeInput(const std::string& device, const DataGroup& inputData)
 	{
-		m_digitalInputsIndex = inputData.customData().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUTS);
-		m_timerInputsIndex = inputData.customData().getIndex(SurgSim::DataStructures::Names::TIMER_INPUTS);
+		m_digitalInputPlusXIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+			std::to_string(m_lineForPlusX));
+		m_digitalInputMinusXIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+			std::to_string(m_lineForMinusX));
+		m_timerInputIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
+			std::to_string(m_firstTimerForQuadrature));
 
 		inputFilter(inputData, &getInitialInputData());
 		getInputData() = getInitialInputData();
@@ -100,36 +105,38 @@ public:
 	void inputFilter(const DataGroup& dataToFilter, DataGroup* result)
 	{
 		// Turn LabJack inputs into a pose so it can control the sphere.
-		if (m_digitalInputsIndex >= 0)
+		if (m_digitalInputPlusXIndex >= 0)
 		{
-			SurgSim::Device::LabJackInputValuesType digitalInputs;
-			if (dataToFilter.customData().get(m_digitalInputsIndex, &digitalInputs))
+			double value;
+			if (dataToFilter.scalars().get(m_digitalInputPlusXIndex, &value))
 			{
 				// If the device passed us this line's input, and the input is high...
-				if ((digitalInputs.count(m_lineForPlusX) > 0) &&
-					(digitalInputs.at(m_lineForPlusX) > 0.5))
+				if (value > 0.5)
 				{
 					m_pose.translate(Vector3d::UnitX() * m_translationPerUpdate);
 				}
-
-				if ((digitalInputs.count(m_lineForMinusX) > 0) &&
-					(digitalInputs.at(m_lineForMinusX) > 0.5))
+			}
+		}
+		if (m_digitalInputPlusXIndex >= 0)
+		{
+			double value;
+			if (dataToFilter.scalars().get(m_digitalInputMinusXIndex, &value))
+			{
+				// If the device passed us this line's input, and the input is high...
+				if (value > 0.5)
 				{
 					m_pose.translate(-Vector3d::UnitX() * m_translationPerUpdate);
 				}
 			}
 		}
 
-		if (m_timerInputsIndex >= 0)
+		if (m_timerInputIndex >= 0)
 		{
-			SurgSim::Device::LabJackInputValuesType timerInputs;
-			if (dataToFilter.customData().get(m_timerInputsIndex, &timerInputs))
+			double value;
+			// For quadrature inputs, we only need the input value of the first of the timers.
+			if (dataToFilter.scalars().get(m_timerInputIndex, &value))
 			{
-				// For quadrature inputs, we only need the input value of the first of the timers.
-				if (timerInputs.count(m_firstTimerForQuadrature) > 0)
-				{
-					m_pose.translation()[1] = timerInputs.at(m_firstTimerForQuadrature) * m_translationPerUpdate;
-				}
+				m_pose.translation()[1] = value * m_translationPerUpdate;
 			}
 		}
 		result->poses().set(m_poseIndex, m_pose);
@@ -141,9 +148,10 @@ public:
 	}
 
 private:
-	int m_digitalInputsIndex;
+	int m_digitalInputPlusXIndex;
+	int m_digitalInputMinusXIndex;
 	int m_digitalOutputsIndex;
-	int m_timerInputsIndex;
+	int m_timerInputIndex;
 	int m_poseIndex;
 	RigidTransform3d m_pose;
 	int m_lineForPlusX;

@@ -22,6 +22,7 @@
 #include <list>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "SurgSim/DataStructures/DataGroup.h"
@@ -202,7 +203,9 @@ public:
 		thread(),
 		digitalInputChannels(device->getDigitalInputChannels()),
 		digitalOutputChannels(device->getDigitalOutputChannels()),
-		timerInputChannels(getTimerInputChannels(device->getTimers()))
+		timerInputChannels(getTimerInputChannels(device->getTimers())),
+		timerOutputChannels(getTimerOutputChannels(device->getTimers())),
+		cachedOutputIndices(false)
 	{
 	}
 
@@ -223,6 +226,18 @@ public:
 	const std::unordered_set<int> digitalOutputChannels;
 	/// The timer channels that provide inputs.
 	const std::unordered_set<int> timerInputChannels;
+	/// The timer channels set for timer outputs (e.g., PWM outputs).
+	const std::unordered_set<int> timerOutputChannels;
+	/// The DataGroup indices for the digital outputs.
+	std::unordered_map<int, int> digitalOutputIndices;
+	/// The DataGroup indices for the digital inputs.
+	std::unordered_map<int, int> digitalInputIndices;
+	/// The DataGroup indices for the timer outputs.
+	std::unordered_map<int, int> timerOutputIndices;
+	/// The DataGroup indices for the timer inputs.
+	std::unordered_map<int, int> timerInputIndices;
+	/// True if the output indices have been cached.
+	bool cachedOutputIndices;
 
 private:
 	/// Given all the timers, return just the ones that provide inputs.
@@ -241,6 +256,33 @@ private:
 			}
 		}
 		return timersWithInputs;
+	}
+
+	/// Given all the timers, return just the ones that take outputs.
+	/// \param timers The timers.
+	/// \return The timers that take outputs.
+	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int, LabJackTimerMode>& timers) const
+	{
+		std::unordered_set<int> timersWithOutputs;
+		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
+		{
+			if ((timer->second != LABJACKTIMERMODE_PWM16) &&
+				(timer->second != LABJACKTIMERMODE_PWM8) &&
+				(timer->second != LABJACKTIMERMODE_RISINGEDGES32) &&
+				(timer->second != LABJACKTIMERMODE_FALLINGEDGES32) &&
+				(timer->second != LABJACKTIMERMODE_DUTYCYCLE) &&
+				(timer->second != LABJACKTIMERMODE_FIRMCOUNTER) &&
+				(timer->second != LABJACKTIMERMODE_FIRMCOUNTERDEBOUNCE) &&
+				(timer->second != LABJACKTIMERMODE_FREQOUT) &&
+				(timer->second != LABJACKTIMERMODE_QUAD) &&
+				(timer->second != LABJACKTIMERMODE_RISINGEDGES16) &&
+				(timer->second != LABJACKTIMERMODE_FALLINGEDGES16) &&
+				(timer->second != LABJACKTIMERMODE_LINETOLINE))
+			{
+				timersWithOutputs.insert(timer->first);
+			}
+		}
+		return timersWithOutputs;
 	}
 
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -407,6 +449,34 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 				if (result)
 				{
 					std::unique_ptr<DeviceData> info(new DeviceData(device, std::move(handle)));
+
+					// Cache the NamedData indices for the input DataGroup.
+					const SurgSim::DataStructures::DataGroup& inputData = device->getInputData();
+
+					for (auto input = info->digitalInputChannels.cbegin();
+						input != info->digitalInputChannels.cend();
+						++input)
+					{
+						info->digitalInputIndices[*input] =
+							inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+							std::to_string(*input));
+						SURGSIM_ASSERT(info->digitalInputIndices[*input] >= 0) << "LabJackScaffold::DeviceData " <<
+							"failed to get a valid NamedData index for the digital input for line " << *input <<
+							".  Make sure that is a valid line number.";
+					}
+
+					for (auto timer = info->timerInputChannels.cbegin();
+						timer != info->timerInputChannels.cend();
+						++timer)
+					{
+						info->timerInputIndices[*timer] =
+							inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
+							std::to_string(*timer));
+						SURGSIM_ASSERT(info->timerInputIndices[*timer] >= 0) << "LabJackScaffold::DeviceData " <<
+							"failed to get a valid NamedData index for the timer for channel " << *timer <<
+							".  Make sure that is a valid timer number.";
+					}
+
 					std::unique_ptr<LabJackThread> thread(new LabJackThread(this, info.get()));
 					thread->setRate(device->getMaximumUpdateRate());
 					thread->start();
@@ -457,6 +527,30 @@ bool LabJackScaffold::unregisterDevice(const LabJackDevice* const device)
 bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 {
 	info->deviceObject->pullOutput();
+
+	if (!info->cachedOutputIndices)
+	{
+		const SurgSim::DataStructures::DataGroup& initialOutputData = info->deviceObject->getOutputData();
+
+		const std::unordered_set<int>& digitalOutputChannels = info->digitalOutputChannels;
+		for (auto output = digitalOutputChannels.cbegin(); output != digitalOutputChannels.cend(); ++output)
+		{
+			info->digitalOutputIndices[*output] =
+				initialOutputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX +
+				std::to_string(*output));
+		}
+
+		const std::unordered_set<int>& timerOutputChannels = info->timerOutputChannels;
+		for (auto timer = timerOutputChannels.cbegin(); timer != timerOutputChannels.cend(); ++timer)
+		{
+			info->timerOutputIndices[*timer] =
+				initialOutputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_OUTPUT_PREFIX +
+				std::to_string(*timer));
+		}
+
+		info->cachedOutputIndices = true;
+	}
+
 	if (!updateDevice(info))
 	{
 		return false;
@@ -483,40 +577,56 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	}
 
 	// Request to set digital outputs.
-	LabJackDigitalOutputValuesType digitalOutputs;
-	outputData.customData().get(SurgSim::DataStructures::Names::DIGITAL_OUTPUTS, &digitalOutputs);
 	const std::unordered_set<int>& digitalOutputChannels = info->digitalOutputChannels;
 	for (auto output = digitalOutputChannels.cbegin(); output != digitalOutputChannels.cend(); ++output)
 	{
-		if (digitalOutputs.count(*output) > 0)
+		if (info->digitalOutputIndices.count(*output) > 0)
 		{
-			const int line = *output;
-			const int value = digitalOutputs.at(line);
-			const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_DIGITAL_BIT, line, value, 0, 0);
-			logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
-				std::string("Failed to set digital output for a device named '") + info->deviceObject->getName() +
-				std::string("', line number ") + std::to_string(line) + std::string(", value ") +
-				std::to_string(value) + std::string("."));
+			const int index = info->digitalOutputIndices[*output];
+			SURGSIM_ASSERT(index >= 0) << "LabJackScaffold: A LabJackDevice was configured with line " << *output <<
+				" set to digital output, but the scaffold does not know the correct index into the NamedData. " <<
+				" Make sure there is an entry in the scalars with the correct string key.";
+
+			double value;
+			if (outputData.scalars().get(index, &value))
+			{
+				const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_DIGITAL_BIT, *output, value, 0, 0);
+				logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
+					std::string("Failed to set digital output for a device named '") +
+					info->deviceObject->getName() +
+					std::string("', line number ") + std::to_string(*output) + std::string(", value ") +
+					std::to_string(value) + std::string("."));
+			}
 		}
 	}
 
 	// Request to set to timers (e.g., resetting firmware counters).
-	LabJackDigitalOutputValuesType timerOutputs;
-	outputData.customData().get(SurgSim::DataStructures::Names::TIMER_OUTPUTS, &timerOutputs);
-	for (auto timer = timerOutputs.cbegin(); timer != timerOutputs.cend(); ++timer)
+	const std::unordered_set<int>& timerOutputChannels = info->timerOutputChannels;
+	for (auto timer = timerOutputChannels.cbegin(); timer != timerOutputChannels.cend(); ++timer)
 	{
-		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, timer->second, 0, 0);
-		logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
-			std::string("Failed to set timer value for a device named '") + info->deviceObject->getName() +
-			std::string("', channel number ") + std::to_string(timer->first) + std::string(", value ") +
-			std::to_string(timer->second) + std::string("."));
+		if (info->timerOutputIndices.count(*timer) > 0)
+		{
+			const int index = info->timerOutputIndices[*timer];
+			// We do not ensure that all the timers can be output to, because the user might not need to reset them.
+			if (index >= 0)
+			{
+				double value;
+				if (outputData.scalars().get(index, &value))
+				{
+					const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_TIMER_VALUE, *timer, value, 0, 0);
+					logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
+						std::string("Failed to set timer value for a device named '") + info->deviceObject->getName() +
+						std::string("', channel number ") + std::to_string(*timer) + std::string(", value ") +
+						std::to_string(value) + std::string("."));
+				}
+			}
+		}
 	}
 
 	// Request inputs from timers.
 	const std::unordered_set<int>& timerInputChannels = info->timerInputChannels;
 	for (auto timer = timerInputChannels.cbegin(); timer != timerInputChannels.cend(); ++timer)
 	{
-		//double value;
 		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_TIMER, *timer, 0, 0, 0);
 		logIfError(error, m_logger, SurgSim::Framework::LogLevel::LOG_LEVEL_WARNING,
 			std::string("Failed to request timer input for a device named '") + info->deviceObject->getName() +
@@ -534,7 +644,6 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	if (isRequestOk)
 	{
 		// Digital inputs.
-		LabJackInputValuesType digitalInputs;
 		for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 		{
 			double value;
@@ -545,13 +654,11 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 				std::string("', line number ") + std::to_string(*input) + std::string("."));
 			if (isGetOk)
 			{
-				digitalInputs[*input] = value;
+				inputData.scalars().set(info->digitalInputIndices[*input], value);
 			}
 		}
-		inputData.customData().set(SurgSim::DataStructures::Names::DIGITAL_INPUTS, digitalInputs);
 
 		// Timer inputs.
-		LabJackInputValuesType timerInputs;
 		for (auto timer = timerInputChannels.cbegin(); timer != timerInputChannels.cend(); ++timer)
 		{
 			double value;
@@ -562,10 +669,9 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 				std::string("', channel number ") + std::to_string(*timer) + std::string("."));
 			if (isGetOk)
 			{
-				timerInputs[*timer] = value;
+				inputData.scalars().set(info->timerInputIndices[*timer], value);
 			}
 		}
-		inputData.customData().set(SurgSim::DataStructures::Names::TIMER_INPUTS, timerInputs);
 	}
 	else
 	{
@@ -589,8 +695,19 @@ bool LabJackScaffold::destroyPerDeviceThread(DeviceData* data)
 SurgSim::DataStructures::DataGroup LabJackScaffold::buildDeviceInputData()
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
-	builder.addCustom(SurgSim::DataStructures::Names::DIGITAL_INPUTS);
-	builder.addCustom(SurgSim::DataStructures::Names::TIMER_INPUTS);
+	// We don't know which input lines we need until after the configuration, but LabJackDevice must be constructed with
+	// a valid DataGroup, so we add every possible line.
+	const int maxDigitalInputs = 23; // The UE9 can have 23 digital inputs.
+	for (int i = 0; i < maxDigitalInputs; ++i)
+	{
+		builder.addScalar(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(i));
+	}
+
+	const int maxTimerInputs = 6; // The UE9 can have 6 timers.
+	for (int i = 0; i < maxTimerInputs; ++i)
+	{
+		builder.addScalar(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX + std::to_string(i));
+	}
 	return builder.createData();
 }
 
