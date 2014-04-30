@@ -78,7 +78,7 @@ void OdeSolverRungeKutta4<State, MT, DT, KT, ST>::solve(double dt, const State& 
 	newState->getVelocities() += (m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
 
 	// Computes the system matrix and compliance matrix
-	m_systemMatrix = M / dt;
+	m_systemMatrix = M * (1.0 / dt);
 	m_compliance *= dt;
 }
 
