@@ -135,11 +135,11 @@ private:
 		T ratio;
 
 		// Iterators for the end vertices of an edge.
-		boost::container::static_vector<Vector3, CAPACITY>::iterator end;
+		typename boost::container::static_vector<Vector3, CAPACITY>::iterator end;
 
 		// Iterators for the signed distance from plane of the start and end vertices of an edge.
 		auto startSignedDistance = signedDistanceFromPlane.begin();
-		boost::container::static_vector<T, CAPACITY>::iterator endSignedDistance;
+		typename boost::container::static_vector<T, CAPACITY>::iterator endSignedDistance;
 
 		// Iterate over the edges of the current polygon.
 		for (auto start = originalVertices.begin(); start != originalVertices.end(); ++start, ++startSignedDistance)
