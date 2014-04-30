@@ -14,8 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
-#include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

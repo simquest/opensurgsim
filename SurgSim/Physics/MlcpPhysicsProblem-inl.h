@@ -16,6 +16,8 @@
 #ifndef SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_INL_H
 #define SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_INL_H
 
+#include "SurgSim/Math/Vector.h"
+
 namespace SurgSim
 {
 namespace Physics
