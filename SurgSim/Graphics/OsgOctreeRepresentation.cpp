@@ -96,6 +96,8 @@ void OsgOctreeRepresentation::setOctree(const SurgSim::Math::OctreeShape& octree
 
 void OsgOctreeRepresentation::setNodeVisible(const SurgSim::DataStructures::OctreePath& path, bool visibility)
 {
+	SURGSIM_ASSERT(0 != m_transform->getNumChildren()) << "No Octree held by OsgOctreeRepresentation";
+
 	osg::ref_ptr<osg::Group> result = m_transform->getChild(0)->asGroup();
 	for(auto index = std::begin(path); index != std::end(path); ++index)
 	{
