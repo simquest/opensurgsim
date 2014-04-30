@@ -64,9 +64,11 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 	/// \param subC Compliance matrix associated with the Representation
 	/// \param indexSubC Index of the Representation's compliance matrix
 	/// \param indexNewSubH Index of the new constraint within H
+	/// \tparam SubCDerivedType the CRTP derived type of the passed subC matrix, which usually can be deduced
+	template <typename SubCDerivedType>
 	void updateConstraint(
 		const Eigen::SparseVector<double> &newSubH,
-		const Eigen::Ref<const Eigen::MatrixXd> &subC,
+		const Eigen::MatrixBase<SubCDerivedType> &subC,
 		size_t indexSubC,
 		size_t indexNewSubH);
 
@@ -86,5 +88,7 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 
 };  // namespace Physics
 };  // namespace SurgSim
+
+#include "SurgSim/Physics/MlcpPhysicsProblem-inl.h"
 
 #endif  // SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H

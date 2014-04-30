@@ -27,34 +27,6 @@ MlcpPhysicsProblem::~MlcpPhysicsProblem()
 {
 }
 
-
-void MlcpPhysicsProblem::updateConstraint(
-	const Eigen::SparseVector<double> &newSubH,
-	const Eigen::Ref<const Eigen::MatrixXd> &subC,
-	size_t indexSubC,
-	size_t indexNewSubH)
-{
-	using SurgSim::Math::Vector;
-
-	// Update H, CHt, and HCHt with newSubH, denoted H'.
-	//
-	// Note that updates are linear for H and CHt, but not for HCHt:
-	// (H+H') = H+H'
-	// => H += H';
-	//
-	// C(H+H')t = CHt + CH't
-	// => CHt += CH't;
-	//
-	// (H+H')C(H+H')t = HCHt + HCH't + H'C(H+H')t
-	// => HCHt += H(CH't) + H'[C(H+H')t];
-
-	Vector newCHt = subC * newSubH;
-	A.col(indexNewSubH) += H.middleCols(indexSubC, subC.rows()) * newCHt;
-	H.block(indexNewSubH, indexSubC, 1, subC.rows()) += newSubH.transpose();
-	CHt.block(indexSubC, indexNewSubH, subC.rows(), 1) += newCHt;
-	A.row(indexNewSubH) += newSubH.transpose() * CHt.middleRows(indexSubC, subC.rows());
-}
-
 void MlcpPhysicsProblem::setZero(int numDof, int numConstraintDof, int numConstraints)
 {
 	MlcpProblem::setZero(numDof, numConstraintDof, numConstraints);
