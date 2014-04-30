@@ -102,6 +102,13 @@ void doSolveTest()
 
 	EXPECT_GT(deltaWithoutViscosity.norm(), deltaWithViscosity.norm());
 
+	struct RungeKuttaState
+	{
+		RungeKuttaState(){}
+		RungeKuttaState(const Vector& p, const Vector& v) : position(p), velocity(v){}
+		Vector position;
+		Vector velocity;
+	};
 	// Test Runge Kutta 4 algorithm itself (without viscosity)
 	{
 		MassPoint m;
@@ -122,16 +129,9 @@ void doSolveTest()
 		// with k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
 		// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
 
-		struct State
-		{
-			State(){}
-			State(const Vector& p, const Vector& v) : velocity(v), position(p){}
-			Vector position;
-			Vector velocity;
-		};
-		State yn(currentState.getPositions(), currentState.getVelocities());
-		State k1, k2, k3, k4;
-		State yn_plus_1;
+		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
+		RungeKuttaState k1, k2, k3, k4;
+		RungeKuttaState yn_plus_1;
 
 		// 1st evaluation k1 = f(t(n)       , y(n)            )
 		k1.position = yn.velocity;
@@ -183,16 +183,9 @@ void doSolveTest()
 		// with k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
 		// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
 
-		struct State
-		{
-			State(){}
-			State(const Vector& p, const Vector& v) : velocity(v), position(p){}
-			Vector position;
-			Vector velocity;
-		};
-		State yn(currentState.getPositions(), currentState.getVelocities());
-		State k1, k2, k3, k4;
-		State yn_plus_1;
+		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
+		RungeKuttaState k1, k2, k3, k4;
+		RungeKuttaState yn_plus_1;
 
 		// 1st evaluation k1 = f(t(n)       , y(n)            )
 		k1.position = yn.velocity;

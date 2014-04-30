@@ -88,6 +88,7 @@ public:
 	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
 	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
 	using OdeSolver<State, MT, DT, KT, ST>::m_name;
+	using OdeSolver<State, MT, DT, KT, ST>::m_systemMatrix;
 };
 
 }; // namespace Math
