@@ -29,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	OdeSolverEulerExplicitModifiedTests.cpp
 	OdeSolverEulerExplicitTests.cpp
 	OdeSolverEulerImplicitTests.cpp
+	OdeSolverRungeKutta4Tests.cpp
 	OdeSolverStaticTests.cpp
 	OdeSolverTests.cpp
 	ShapeTests.cpp

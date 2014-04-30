@@ -76,8 +76,12 @@ set(SURGSIM_MATH_HEADERS
 	OdeSolverLinearEulerExplicitModified-inl.h
 	OdeSolverLinearEulerImplicit.h
 	OdeSolverLinearEulerImplicit-inl.h
+	OdeSolverLinearRungeKutta4.h
+	OdeSolverLinearRungeKutta4-inl.h
 	OdeSolverLinearStatic.h
 	OdeSolverLinearStatic-inl.h
+	OdeSolverRungeKutta4.h
+	OdeSolverRungeKutta4-inl.h
 	OdeSolverStatic.h
 	OdeSolverStatic-inl.h
 	PlaneShape.h
