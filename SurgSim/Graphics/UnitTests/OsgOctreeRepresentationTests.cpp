@@ -67,12 +67,16 @@ TEST(OsgOctreeRepresentationTests, SetNodeVisibilityTest)
 	octreeShape.setRootNode(octreeNode);
 
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Test Octree");
-	octreeRepresentation->setOctree(octreeShape);
 
 	// Path to leaf node
 	SurgSim::DataStructures::OctreePath path;
 	path.push_back(0);
 	path.push_back(0);
+
+	// Set node visibility when no octree is held by OsgOctreeRepresentation will throw.
+	EXPECT_ANY_THROW(octreeRepresentation->setNodeVisible(path, true));
+
+	octreeRepresentation->setOctree(octreeShape);
 	EXPECT_NO_THROW(octreeRepresentation->setNodeVisible(path, false));
 
 	// Path to internal node
