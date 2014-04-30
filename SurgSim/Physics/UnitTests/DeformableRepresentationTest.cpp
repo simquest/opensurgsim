@@ -250,6 +250,21 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER, getIntegrationScheme());
 	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, getIntegrationScheme());
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_STATIC);
+	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_STATIC, getIntegrationScheme());
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4);
+	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4, getIntegrationScheme());
+
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER);
+	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER, getIntegrationScheme());
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER);
+	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER, getIntegrationScheme());
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER);
+	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER, getIntegrationScheme());
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC);
+	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC, getIntegrationScheme());
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4);
+	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4, getIntegrationScheme());
 }
 
 TEST_F(DeformableRepresentationTest, BeforeUpdateInitializesOdeSolverTest)

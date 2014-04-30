@@ -21,10 +21,12 @@
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverRungeKutta4.h"
 #include "SurgSim/Math/OdeSolverStatic.h"
 #include "SurgSim/Math/OdeSolverLinearEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverLinearEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverLinearEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverLinearRungeKutta4.h"
 #include "SurgSim/Math/OdeSolverLinearStatic.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
@@ -155,10 +157,12 @@ void DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
 	using SurgSim::Math::OdeSolverEulerExplicit;
 	using SurgSim::Math::OdeSolverEulerExplicitModified;
 	using SurgSim::Math::OdeSolverEulerImplicit;
+	using SurgSim::Math::OdeSolverRungeKutta4;
 	using SurgSim::Math::OdeSolverStatic;
 	using SurgSim::Math::OdeSolverLinearEulerExplicit;
 	using SurgSim::Math::OdeSolverLinearEulerExplicitModified;
 	using SurgSim::Math::OdeSolverLinearEulerImplicit;
+	using SurgSim::Math::OdeSolverLinearRungeKutta4;
 	using SurgSim::Math::OdeSolverLinearStatic;
 
 	if (! isActive())
@@ -189,6 +193,9 @@ void DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
 		case SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER:
 			m_odeSolver = std::make_shared <OdeSolverEulerImplicit<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
+		case SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4:
+			m_odeSolver = std::make_shared <OdeSolverRungeKutta4<DeformableRepresentationState, M, D, K, S>>(this);
+			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC:
 			m_odeSolver = std::make_shared
 				<OdeSolverLinearStatic<DeformableRepresentationState, M, D, K, S>>(this);
@@ -204,6 +211,10 @@ void DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
 		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER:
 			m_odeSolver = std::make_shared
 				<OdeSolverLinearEulerImplicit<DeformableRepresentationState, M, D, K, S>>(this);
+			break;
+		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4:
+			m_odeSolver =
+				std::make_shared <OdeSolverLinearRungeKutta4<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		default:
 			SURGSIM_ASSERT(m_odeSolver)
