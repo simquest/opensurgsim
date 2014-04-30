@@ -16,7 +16,7 @@
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
-#include "SurgSim/Devices/MultiAxis/PoseIntegrator.h"
+#include "SurgSim/Devices/DeviceFilters/PoseIntegrator.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Assert.h"
 

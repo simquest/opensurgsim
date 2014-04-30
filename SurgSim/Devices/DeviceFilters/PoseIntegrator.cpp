@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/MultiAxis/PoseIntegrator.h"
+#include "SurgSim/Devices/DeviceFilters/PoseIntegrator.h"
 
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
@@ -59,6 +59,12 @@ void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::D
 {
 	getInitialInputData() = inputData;
 	getInputData() = inputData;
+
+	SurgSim::Math::RigidTransform3d pose;
+	if (inputData.poses().get(SurgSim::DataStructures::Names::POSE, &pose))
+	{
+		m_poseResult = pose;
+	}
 }
 
 void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
