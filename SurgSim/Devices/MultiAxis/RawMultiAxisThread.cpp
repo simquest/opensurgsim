@@ -15,12 +15,17 @@
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
 
-#include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"
-
 namespace SurgSim
 {
 namespace Device
 {
+
+RawMultiAxisThread::RawMultiAxisThread(RawMultiAxisScaffold* scaffold, RawMultiAxisScaffold::DeviceData* deviceData) :
+	BasicThread("RawMultiAxis thread"),
+	m_scaffold(scaffold),
+	m_deviceData(deviceData)
+{
+}
 
 RawMultiAxisThread::~RawMultiAxisThread()
 {

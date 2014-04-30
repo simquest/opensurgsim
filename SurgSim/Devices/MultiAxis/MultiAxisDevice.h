@@ -134,6 +134,14 @@ public:
 	/// \return True if using axis dominance.
 	bool isUsingAxisDominance() const;
 
+	/// Sets the expected update rate for the thread.
+	/// \param rate The update rate in Hz.
+	/// \exception Asserts if the device has been initialized.
+	void setRate(double rate);
+
+	/// \return The expected rate in Hz at which the device will update.
+	double getRate() const;
+
 private:
 	/// Get the default position scale from device ticks to meters.
 	/// \return The default position scale, in meters per tick.

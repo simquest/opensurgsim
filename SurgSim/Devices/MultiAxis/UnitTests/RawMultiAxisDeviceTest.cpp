@@ -37,6 +37,10 @@ using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 
+namespace
+{
+	const double ERROR_EPSILON = 1e-7;
+}
 
 struct RawTestListener : public InputConsumerInterface, public OutputProducerInterface
 {
@@ -93,14 +97,15 @@ TEST(RawMultiAxisDeviceTest, CreateAndInitializeDevice)
 	EXPECT_TRUE(device->isInitialized());
 }
 
-TEST(RawMultiAxisDeviceTest, Name)
+TEST(RawMultiAxisDeviceTest, SettersAndGetters)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_EQ("TestRawMultiAxis", device->getName());
-	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
-	EXPECT_EQ("TestRawMultiAxis", device->getName());
+	const double rate = 20.0;
+	device->setRate(rate);
+	EXPECT_NEAR(rate, device->getRate(), ERROR_EPSILON);
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
+	EXPECT_THROW(device->setRate(rate), SurgSim::Framework::AssertionFailure);
 }
 
 static void testCreateDeviceSeveralTimes(bool doSleep)
@@ -205,7 +210,7 @@ TEST(RawMultiAxisDeviceTest, InputConsumer)
 	EXPECT_FALSE(device->addInputConsumer(consumer));
 
 	// Sleep for a second, to see how many times the consumer is invoked.
-	// (A RawMultiAxis device updates internally at 60Hz, but our code currently runs at 120Hz to reduce latency.)
+	// (A RawMultiAxis device updates internally at 60Hz, but our code currently runs at 100Hz to reduce latency.)
 	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
@@ -215,10 +220,12 @@ TEST(RawMultiAxisDeviceTest, InputConsumer)
 
 	// Check the number of invocations.
 	EXPECT_EQ(1, consumer->m_numTimesInitializedInput);
-	EXPECT_GE(consumer->m_numTimesReceivedInput, 90);
-	EXPECT_LE(consumer->m_numTimesReceivedInput, 110);
+	EXPECT_GE(consumer->m_numTimesReceivedInput, 0.9 * device->getRate());
+	EXPECT_LE(consumer->m_numTimesReceivedInput, 1.1 * device->getRate());
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.vectors().hasData(SurgSim::DataStructures::Names::LINEAR_VELOCITY));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.vectors().hasData(SurgSim::DataStructures::Names::ANGULAR_VELOCITY));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_1));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_2));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_3));
@@ -250,6 +257,6 @@ TEST(RawMultiAxisDeviceTest, OutputProducer)
 	EXPECT_FALSE(device->removeOutputProducer(producer));
 
 	// Check the number of invocations.
-	EXPECT_GE(producer->m_numTimesRequestedOutput, 90);
-	EXPECT_LE(producer->m_numTimesRequestedOutput, 110);
+	EXPECT_GE(producer->m_numTimesRequestedOutput, 0.9 * device->getRate());
+	EXPECT_LE(producer->m_numTimesRequestedOutput, 1.1 * device->getRate());
 }

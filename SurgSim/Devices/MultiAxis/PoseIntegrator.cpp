@@ -15,15 +15,20 @@
 
 #include "SurgSim/Devices/MultiAxis/PoseIntegrator.h"
 
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Vector.h"
+
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
 namespace Device
 {
 
-PoseIntegrator::PoseIntegrator(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
-	CommonDevice(name, inputData),
-	m_poseResult(PoseType::Identity())
+PoseIntegrator::PoseIntegrator(const std::string& name) :
+	CommonDevice(name),
+	m_poseResult(PoseType::Identity()),
+	m_rate(1.0)
 {
 }
 
@@ -62,7 +67,24 @@ void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataS
 	SurgSim::Math::RigidTransform3d pose;
 	if (inputData.poses().get(SurgSim::DataStructures::Names::POSE, &pose))
 	{
+		// Before updating the current pose, use it to calculate the angular velocity.
+		Vector3d unused;
+		if (inputData.vectors().get(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, &unused))
+		{
+			Vector3d rotationAxis;
+			double angle;
+			SurgSim::Math::computeAngleAndAxis(pose.rotation(), &angle, &rotationAxis);
+			rotationAxis = m_poseResult.rotation() * rotationAxis; // rotate the axis into global space
+			getInputData().vectors().set(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, rotationAxis *
+				angle * m_rate);
+		}
+
 		getInputData().poses().set(SurgSim::DataStructures::Names::POSE, integrate(pose));
+
+		if (inputData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY, &unused))
+		{
+			getInputData().vectors().set(SurgSim::DataStructures::Names::LINEAR_VELOCITY, pose.translation() * m_rate);
+		}
 	}
 	pushInput();
 }
@@ -75,6 +97,16 @@ bool PoseIntegrator::requestOutput(const std::string& device, SurgSim::DataStruc
 		*outputData = getOutputData();
 	}
 	return state;
+}
+
+void PoseIntegrator::setRate(double rate)
+{
+	m_rate = rate;
+}
+
+double PoseIntegrator::getRate() const
+{
+	return m_rate;
 }
 
 

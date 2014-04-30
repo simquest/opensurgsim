@@ -92,6 +92,14 @@ public:
 	/// Gets the axis dominance setting for this device.
 	bool isUsingAxisDominance() const;
 
+	/// Sets the expected update rate for the thread.
+	/// \param rate The update rate in Hz.
+	/// \exception Asserts if the device has been initialized.
+	void setRate(double rate);
+
+	/// \return The expected rate in Hz at which the device will update.
+	double getRate() const;
+
 private:
 	// Returns the default position scale, in meters per tick.
 	static double defaultPositionScale()
@@ -119,6 +127,9 @@ private:
 	double m_orientationScale;
 	/// Controls whether dominance will be enabled; stored locally before the device is initialized.
 	bool m_useAxisDominance;
+
+	/// Expected update rate of the thread, in Hz.
+	double m_rate;
 };
 
 };  // namespace Device

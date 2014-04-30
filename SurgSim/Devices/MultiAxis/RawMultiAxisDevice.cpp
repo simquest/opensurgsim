@@ -30,7 +30,8 @@ RawMultiAxisDevice::RawMultiAxisDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, RawMultiAxisScaffold::buildDeviceInputData()),
 	m_positionScale(defaultPositionScale()),
 	m_orientationScale(defaultOrientationScale()),
-	m_useAxisDominance(false)
+	m_useAxisDominance(false),
+	m_rate(100.0)
 {
 }
 
@@ -125,6 +126,18 @@ void RawMultiAxisDevice::setAxisDominance(bool onOff)
 bool RawMultiAxisDevice::isUsingAxisDominance() const
 {
 	return m_useAxisDominance;
+}
+
+void RawMultiAxisDevice::setRate(double rate)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Cannot change the update rate for a RawMultiAxisDevice after it has been initialized.";
+	m_rate = rate;
+}
+
+double RawMultiAxisDevice::getRate() const
+{
+	return m_rate;
 }
 
 

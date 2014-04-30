@@ -29,6 +29,7 @@ namespace SurgSim
 namespace Device
 {
 /// A device filter that integrates the pose, turning a relative device into an absolute one.
+/// Also provides the instantaneous linear and angular velocities.
 /// \sa	SurgSim::Input::CommonDevice
 /// \sa	SurgSim::Input::InputConsumerInterface
 /// \sa	SurgSim::Input::OutputProducerInterface
@@ -41,8 +42,7 @@ public:
 
 	/// Constructor.
 	/// \param name	Name of this device filter.
-	/// \param inputData An initial value for the application's input from the device (i.e., pose).
-	PoseIntegrator(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData);
+	explicit PoseIntegrator(const std::string& name);
 
 	/// Integrates the pose.
 	/// \param pose	The latest differential pose.
@@ -55,15 +55,32 @@ public:
 
 	bool isInitialized() const;
 
+	/// \param inputData An initial value for the application's input from the device (i.e., pose).
 	virtual void initializeInput(const std::string& device,
 		const SurgSim::DataStructures::DataGroup& inputData) override;
 
+	/// Notifies the consumer that the application input coming from the device has been updated.
+	/// Treats the pose coming from the input device as a delta pose and integrates it to get the output pose.
+	/// \param device The name of the device that is producing the input.  This should only be used to identify
+	/// 	the device (e.g. if the consumer is listening to several devices at once).
+	/// \param inputData The application input state coming from the device.
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
 	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
+	/// Sets the expected update rate for the thread.  The rate is used to calculate the velocities from the delta pose.
+	/// \param rate The update rate in Hz.
+	void setRate(double rate);
+
+	/// \return The expected rate in Hz at which the thread will update.
+	double getRate() const;
+
 private:
+	/// The result of integrating the input poses.
 	PoseType m_poseResult;
+
+	/// The expected update rate for the thread, in Hz.
+	double m_rate;
 };
 
 
