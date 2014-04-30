@@ -97,6 +97,7 @@ public:
 
 		m_fem->setInitialState(state);
 		m_fem->initialize(std::make_shared<Runtime>());
+		m_fem->wakeUp();
 
 		m_fem->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
 		m_fem->setIsActive(true);

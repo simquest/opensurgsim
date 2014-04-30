@@ -17,16 +17,20 @@
 
 #include <string>
 
-#include "SurgSim/Physics/FixedRepresentation.h"
-using SurgSim::Physics::Representation;
-using SurgSim::Physics::FixedRepresentation;
-
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationState.h"
+
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Physics::Representation;
+using SurgSim::Physics::FixedRepresentation;
+using SurgSim::Physics::RigidRepresentationState;
 
 class FixedRepresentationTest : public ::testing::Test
 {
@@ -50,11 +54,18 @@ public:
 		} while (m_initialTransformation.isApprox(m_currentTransformation));
 
 		m_identityTransformation.setIdentity();
+
+		m_fixedRepresentation = std::make_shared<FixedRepresentation>("FixedRepresentation");
+		m_element = std::make_shared<BasicSceneElement>("element");
+		m_element->addComponent(m_fixedRepresentation);
 	}
 
 	void TearDown()
 	{
 	}
+
+	std::shared_ptr<FixedRepresentation> m_fixedRepresentation;
+	std::shared_ptr<BasicSceneElement> m_element;
 
 	// Fixed representation initialization pose
 	RigidTransform3d m_initialTransformation;
@@ -73,119 +84,95 @@ TEST_F(FixedRepresentationTest, ConstructorTest)
 
 TEST_F(FixedRepresentationTest, ResetStateTest)
 {
-	// Create the rigid body
-	std::shared_ptr<FixedRepresentation> fixedRepresentation =
-		std::make_shared<FixedRepresentation>("FixedRepresentation");
+	m_fixedRepresentation->setIsActive(false);
+	m_fixedRepresentation->setIsGravityEnabled(false);
+	m_fixedRepresentation->setLocalPose(m_initialTransformation);
 
-	fixedRepresentation->setIsActive(false);
-	fixedRepresentation->setIsGravityEnabled(false);
-	fixedRepresentation->setInitialPose(m_initialTransformation);
+	m_element->initialize();
+	m_fixedRepresentation->wakeUp();
+
 	// Initial = Current = Previous = m_initialTransformation
-	EXPECT_TRUE(fixedRepresentation->getPose().isApprox(fixedRepresentation->getInitialPose()));
-	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
-	EXPECT_TRUE(fixedRepresentation->getPose().isApprox(m_initialTransformation));
-	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(m_initialTransformation));
-	EXPECT_TRUE(fixedRepresentation->getInitialPose().isApprox(m_initialTransformation));
+	EXPECT_TRUE(m_fixedRepresentation->getInitialState().getPose().isApprox(m_initialTransformation));
+	EXPECT_TRUE(m_fixedRepresentation->getCurrentState() == m_fixedRepresentation->getInitialState());
+	EXPECT_TRUE(m_fixedRepresentation->getPreviousState() == m_fixedRepresentation->getInitialState());
 
-	fixedRepresentation->setPose(m_currentTransformation);
-	// setCurrent is supposed to backup current in previous and set current
+	m_fixedRepresentation->setLocalPose(m_currentTransformation);
+	m_fixedRepresentation->beforeUpdate(1.0);
+	m_fixedRepresentation->update(1.0);
+	m_fixedRepresentation->afterUpdate(1.0);
+	// update is supposed to backup current in previous and set current
 	// Therefore it should not affect initial
 	// Initial = Previous = m_initialTransformation
 	// Current = m_currentTransformation
-	EXPECT_FALSE(fixedRepresentation->getPose().isApprox(fixedRepresentation->getInitialPose()));
-	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
-	EXPECT_FALSE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getPose()));
-	EXPECT_TRUE(fixedRepresentation->getPose().isApprox(m_currentTransformation));
+	EXPECT_TRUE(m_fixedRepresentation->getCurrentState() != m_fixedRepresentation->getInitialState());
+	EXPECT_TRUE(m_fixedRepresentation->getPreviousState() == m_fixedRepresentation->getInitialState());
+	EXPECT_TRUE(m_fixedRepresentation->getPreviousState() != m_fixedRepresentation->getCurrentState());
+	EXPECT_TRUE(m_fixedRepresentation->getCurrentState().getPose().isApprox(m_currentTransformation));
 
-	fixedRepresentation->setPose(m_currentTransformation);
-	// setCurrent is supposed to backup current in previous and set current
+	m_fixedRepresentation->setLocalPose(m_currentTransformation);
+	m_fixedRepresentation->beforeUpdate(1.0);
+	m_fixedRepresentation->update(1.0);
+	m_fixedRepresentation->afterUpdate(1.0);
+	// update is supposed to backup current in previous and set current
 	// Therefore it should not affect initial
 	// Initial = m_initialTransformation
 	// Previous = Current = m_currentTransformation
-	EXPECT_FALSE(fixedRepresentation->getPose().isApprox(fixedRepresentation->getInitialPose()));
-	EXPECT_FALSE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
-	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getPose()));
-	EXPECT_TRUE(fixedRepresentation->getPose().isApprox(m_currentTransformation));
+	EXPECT_TRUE(m_fixedRepresentation->getCurrentState() != m_fixedRepresentation->getInitialState());
+	EXPECT_TRUE(m_fixedRepresentation->getPreviousState() != m_fixedRepresentation->getInitialState());
+	EXPECT_TRUE(m_fixedRepresentation->getPreviousState() == m_fixedRepresentation->getCurrentState());
+	EXPECT_TRUE(m_fixedRepresentation->getCurrentState().getPose().isApprox(m_currentTransformation));
 
-	std::shared_ptr<Representation> representation = fixedRepresentation;
+	std::shared_ptr<Representation> representation = m_fixedRepresentation;
 	// reset the representation (NOT THE FIXED REPRESENTATION, test polymorphism)
 	representation->resetState();
 
 	// isActive flag unchanged
-	EXPECT_FALSE(fixedRepresentation->isActive());
+	EXPECT_FALSE(m_fixedRepresentation->isActive());
 	// isGravityEnable flag unchanged
-	EXPECT_FALSE(fixedRepresentation->isGravityEnabled());
+	EXPECT_FALSE(m_fixedRepresentation->isGravityEnabled());
 	// The current rigid state should be exactly the initial rigid state
-	EXPECT_TRUE(fixedRepresentation->getPose().isApprox(fixedRepresentation->getInitialPose()));
-	EXPECT_TRUE(fixedRepresentation->getPose().isApprox(m_initialTransformation));
-	EXPECT_TRUE(fixedRepresentation->getInitialPose().isApprox(m_initialTransformation));
+	EXPECT_TRUE(m_fixedRepresentation->getCurrentState() == m_fixedRepresentation->getInitialState());
+	EXPECT_TRUE(m_fixedRepresentation->getCurrentState().getPose().isApprox(m_initialTransformation));
+	EXPECT_TRUE(m_fixedRepresentation->getInitialState().getPose().isApprox(m_initialTransformation));
 	// The previous rigid state should be exactly the initial rigid state
-	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
-	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(m_initialTransformation));
+	EXPECT_TRUE(m_fixedRepresentation->getPreviousState() == m_fixedRepresentation->getInitialState());
 }
 
 TEST_F(FixedRepresentationTest, SetGetAndDefaultValueTest)
 {
-	// Create the fixed representation
-	std::shared_ptr<FixedRepresentation> fixedRepresentation =
-		std::make_shared<FixedRepresentation>("FixedRepresentation");
-
 	// Get/Set active flag [default = true]
-	EXPECT_TRUE(fixedRepresentation->isActive());
-	fixedRepresentation->setIsActive(false);
-	ASSERT_FALSE(fixedRepresentation->isActive());
-	fixedRepresentation->setIsActive(true);
-	ASSERT_TRUE(fixedRepresentation->isActive());
+	EXPECT_TRUE(m_fixedRepresentation->isActive());
+	m_fixedRepresentation->setIsActive(false);
+	ASSERT_FALSE(m_fixedRepresentation->isActive());
+	m_fixedRepresentation->setIsActive(true);
+	ASSERT_TRUE(m_fixedRepresentation->isActive());
 
 	// Get numDof = 0
-	ASSERT_EQ(0u, fixedRepresentation->getNumDof());
+	ASSERT_EQ(0u, m_fixedRepresentation->getNumDof());
 
 	// Set/Get isGravityEnabled [default = true]
-	EXPECT_TRUE(fixedRepresentation->isGravityEnabled());
-	fixedRepresentation->setIsGravityEnabled(false);
-	ASSERT_FALSE(fixedRepresentation->isGravityEnabled());
-	fixedRepresentation->setIsGravityEnabled(true);
-	ASSERT_TRUE(fixedRepresentation->isGravityEnabled());
-
-	// Set/Get current pose [default = no translation, no rotation]
-	EXPECT_TRUE(m_identityTransformation.isApprox(fixedRepresentation->getPose()));
-	fixedRepresentation->setPose(m_currentTransformation);
-	fixedRepresentation->afterUpdate(1.0); // afterUpdate backs up current into final
-	ASSERT_TRUE(m_currentTransformation.isApprox(fixedRepresentation->getPose()));
-	fixedRepresentation->setPose(m_identityTransformation);
-	fixedRepresentation->afterUpdate(1.0); // afterUpdate backs up current into final
-	ASSERT_TRUE(m_identityTransformation.isApprox(fixedRepresentation->getPose()));
-
-	// Set/Get initial pose [default = no translation, no rotation]
-	EXPECT_TRUE(m_identityTransformation.isApprox(fixedRepresentation->getInitialPose()));
-	fixedRepresentation->setInitialPose(m_initialTransformation);
-	ASSERT_TRUE(m_initialTransformation.isApprox(fixedRepresentation->getInitialPose()));
-	fixedRepresentation->setInitialPose(m_identityTransformation);
-	ASSERT_TRUE(m_identityTransformation.isApprox(fixedRepresentation->getInitialPose()));
+	EXPECT_TRUE(m_fixedRepresentation->isGravityEnabled());
+	m_fixedRepresentation->setIsGravityEnabled(false);
+	ASSERT_FALSE(m_fixedRepresentation->isGravityEnabled());
+	m_fixedRepresentation->setIsGravityEnabled(true);
+	ASSERT_TRUE(m_fixedRepresentation->isGravityEnabled());
 }
 
 TEST_F(FixedRepresentationTest, UpdateTest)
 {
-	// Create the fixed representation
-	std::shared_ptr<FixedRepresentation> fixedRepresentation =
-		std::make_shared<FixedRepresentation>("FixedRepresentation");
-
 	double dt = 1.0;
 
-	// Sets Initial state and reset all other state with initial state
-	fixedRepresentation->setInitialPose(m_initialTransformation);
-	// Backs up current state into previous state and set the current
-	fixedRepresentation->setPose(m_currentTransformation);
+	m_fixedRepresentation->setLocalPose(m_initialTransformation);
+	m_element->initialize();
+	m_fixedRepresentation->wakeUp();
 
-	// Does not do anything
-	fixedRepresentation->beforeUpdate(dt);
-	// Does not do anything
-	fixedRepresentation->update(dt);
-	// Backs up current state into final state
-	fixedRepresentation->afterUpdate(dt);
+	m_fixedRepresentation->setLocalPose(m_currentTransformation);
+	m_fixedRepresentation->beforeUpdate(dt);
+	m_fixedRepresentation->update(dt);
+	m_fixedRepresentation->afterUpdate(dt);
 
-	EXPECT_FALSE(fixedRepresentation->getPose().isApprox(fixedRepresentation->getPreviousPose()));
-	EXPECT_FALSE(fixedRepresentation->getPose().isApprox(fixedRepresentation->getInitialPose()));
-	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
+	EXPECT_TRUE(m_fixedRepresentation->getCurrentState() != m_fixedRepresentation->getPreviousState());
+	EXPECT_TRUE(m_fixedRepresentation->getCurrentState() != m_fixedRepresentation->getInitialState());
+	EXPECT_TRUE(m_fixedRepresentation->getPreviousState() == m_fixedRepresentation->getInitialState());
 }
 

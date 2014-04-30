@@ -16,14 +16,15 @@
 #include "SurgSim/Graphics/Manager.h"
 
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/Group.h"
+#include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Graphics/View.h"
 
-using SurgSim::Graphics::Representation;
+using SurgSim::Graphics::Camera;
 using SurgSim::Graphics::Group;
 using SurgSim::Graphics::Manager;
+using SurgSim::Graphics::Representation;
 using SurgSim::Graphics::View;
 
 Manager::Manager() : ComponentManager("Graphics Manager")

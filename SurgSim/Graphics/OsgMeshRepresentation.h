@@ -64,10 +64,6 @@ public:
 	/// \param	val	true if this mesh should be rendered as a wire-frame.
 	virtual void setDrawAsWireFrame(bool val) override;
 
-	/// Updates the mesh with the new vertex positions.
-	/// \param	dt	The time step.
-	virtual void update(double dt) override;
-
 	/// Sets the structures that are expected to change during the lifetime of the mesh, these will be updated
 	/// every frame, independent of a structural change in the mesh. UPDATE_OPTION_VERTICES is set in the constructor
 	/// as a default value.
@@ -79,8 +75,11 @@ public:
 	virtual int getUpdateOptions() const override;
 
 	osg::ref_ptr<osg::Geometry> getOsgGeometry();
-private:
 
+protected:
+	virtual void doUpdate(double dt) override;
+
+private:
 	/// The mesh.
 	std::shared_ptr<Mesh> m_mesh;
 

@@ -55,7 +55,7 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("Fixed");
 	fixed->setIsActive(true);
 	fixed->setIsGravityEnabled(false);
-	fixed->setInitialPose(poseFixed);
+	fixed->setLocalPose(poseFixed);
 
 	std::shared_ptr<FixedRepresentationLocalization> loc = std::make_shared<FixedRepresentationLocalization>(fixed);
 	loc->setLocalPosition(contactPosition);

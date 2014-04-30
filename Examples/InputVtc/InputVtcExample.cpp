@@ -15,8 +15,7 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferPoseBehavior.h"
-#include "SurgSim/Blocks/TransferInputPoseBehavior.h"
+#include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
@@ -49,8 +48,7 @@
 
 #include "Examples/InputVtc/DeviceFactory.h"
 
-using SurgSim::Blocks::TransferPoseBehavior;
-using SurgSim::Blocks::TransferInputPoseBehavior;
+using SurgSim::Blocks::DriveElementFromInputBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
@@ -59,8 +57,11 @@ using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgUniform;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
+using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Vector4f;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::FixedRepresentation;
@@ -70,19 +71,7 @@ using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::VirtualToolCoupler;
 using SurgSim::Physics::RigidRepresentationParameters;
 
-std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
-{
-	using SurgSim::Graphics::OsgViewElement;
-
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
-	viewElement->getView()->setPosition(x, y);
-	viewElement->getView()->setDimensions(width, height);
-
-	return viewElement;
-}
-
-std::shared_ptr<SceneElement> createPlane(const std::string& name,
-		const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createPlane(const std::string& name)
 {
 	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
 
@@ -91,11 +80,9 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	RigidRepresentationParameters params;
 	params.setShapeUsedForMassInertia(planeShape);
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
 		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
-	graphicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
@@ -117,13 +104,8 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
-	std::shared_ptr<TransferPoseBehavior> transferPose =
-		std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPose->setPoseSender(physicsRepresentation);
-	transferPose->setPoseReceiver(graphicsRepresentation);
-	planeElement->addComponent(transferPose);
-	auto collisionRepresentation =
-		std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
+	std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> collisionRepresentation;
+	collisionRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>(name + " Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 	planeElement->addComponent(collisionRepresentation);
 	return planeElement;
@@ -148,7 +130,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	params.setShapeUsedForMassInertia(box);
 
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(name + "-Physics");
+		std::make_shared<RigidRepresentation>(name + " Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setIsGravityEnabled(false);
 
@@ -158,44 +140,17 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 
 	// Graphics Components
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> graphicsRepresentation =
-		std::make_shared<OsgBoxRepresentation>(name + "-Graphics");
+		std::make_shared<OsgBoxRepresentation>(name + " Graphics");
 	graphicsRepresentation->setSizeXYZ(box->getSizeX(), box->getSizeY(), box->getSizeZ());
-
-	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> rawInputGraphicsRepresentation =
-		std::make_shared<OsgBoxRepresentation>(name + "-RawInput-Graphics");
-	rawInputGraphicsRepresentation->setSizeXYZ(box->getSizeX(), box->getSizeY(), box->getSizeZ());
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
-	shader->setVertexShaderSource(
-		"void main(void)\n"
-		"{\n"
-		"    gl_Position = ftransform();\n"
-		"}");
-	shader->setFragmentShaderSource(
-		"void main(void)\n"
-		"{\n"
-		"    gl_FragColor = vec4(0.2, 0.2, 0.2, 1.0);\n"
-		"}");
-	material->setShader(shader);
-	rawInputGraphicsRepresentation->setMaterial(material);
-
-	std::shared_ptr<TransferPoseBehavior> transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics");
-	transferPose->setPoseSender(physicsRepresentation);
-	transferPose->setPoseReceiver(graphicsRepresentation);
 
 	// Input Components
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
-		std::make_shared<SurgSim::Input::InputComponent>("input component");
+		std::make_shared<SurgSim::Input::InputComponent>(name + " Input");
 	inputComponent->setDeviceName(toolDeviceName);
 
 	std::shared_ptr<SurgSim::Input::OutputComponent> outputComponent = nullptr;
-	outputComponent = std::make_shared<SurgSim::Input::OutputComponent>("output component");
+	outputComponent = std::make_shared<SurgSim::Input::OutputComponent>(name + " Output");
 	outputComponent->setDeviceName(toolDeviceName);
-
-	std::shared_ptr<TransferInputPoseBehavior> transferInputPose =
-		std::make_shared<TransferInputPoseBehavior>("Input to RawInputGraphics");
-	transferInputPose->setPoseSender(inputComponent);
-	transferInputPose->setPoseReceiver(rawInputGraphicsRepresentation);
 
 	// A VTC (virtual tool coupler, aka "god object") is used to couple an input/output thread and a physics thread,
 	// running at different rates.  Picture a user holding a haptic device (e.g., Falcon or Omni).  The
@@ -219,7 +174,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	// thread.  We pass the device forces&torques and the derivatives (Jacobians) of forces&torques with respect to
 	// position and velocity, so that the device's Scaffold can make those calculations.  The forces on the device can
 	// be scaled up or down from the forces on the virtual tool.
-	std::shared_ptr<VirtualToolCoupler> inputCoupler = std::make_shared<VirtualToolCoupler>("Input Coupler");
+	std::shared_ptr<VirtualToolCoupler> inputCoupler = std::make_shared<VirtualToolCoupler>(name + " Input Coupler");
 	inputCoupler->setInput(inputComponent);
 	inputCoupler->setOutput(outputComponent);
 	inputCoupler->setRepresentation(physicsRepresentation);
@@ -229,14 +184,47 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	boxElement->addComponent(physicsRepresentation);
 	boxElement->addComponent(collisionRepresentation);
 	boxElement->addComponent(graphicsRepresentation);
-	boxElement->addComponent(rawInputGraphicsRepresentation);
-	boxElement->addComponent(transferPose);
 	boxElement->addComponent(inputComponent);
 	boxElement->addComponent(outputComponent);
-	boxElement->addComponent(transferInputPose);
 	boxElement->addComponent(inputCoupler);
 
 	return boxElement;
+}
+
+std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, const std::string& toolDeviceName)
+{
+	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> graphicsRepresentation;
+	graphicsRepresentation = std::make_shared<OsgBoxRepresentation>(name + " Graphics");
+	graphicsRepresentation->setSizeXYZ(0.8, 2.0, 0.2);
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+	shader->setVertexShaderSource(
+		"void main(void)\n"
+		"{\n"
+		"    gl_Position = ftransform();\n"
+		"}");
+	shader->setFragmentShaderSource(
+		"void main(void)\n"
+		"{\n"
+		"    gl_FragColor = vec4(0.2, 0.2, 0.2, 1.0);\n"
+		"}");
+	material->setShader(shader);
+	graphicsRepresentation->setMaterial(material);
+
+	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent;
+	inputComponent = std::make_shared<SurgSim::Input::InputComponent>(name + " Input");
+	inputComponent->setDeviceName(toolDeviceName);
+
+	std::shared_ptr<DriveElementFromInputBehavior> driver;
+	driver = std::make_shared<DriveElementFromInputBehavior>(name + " Driver");
+	driver->setSource(inputComponent);
+
+	std::shared_ptr<BasicSceneElement> element = std::make_shared<BasicSceneElement>(name);
+	element->addComponent(graphicsRepresentation);
+	element->addComponent(inputComponent);
+	element->addComponent(driver);
+
+	return element;
 }
 
 int main(int argc, char* argv[])
@@ -260,13 +248,17 @@ int main(int argc, char* argv[])
 	runtime->addManager(inputManager);
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
-	scene->addSceneElement(createBox("box", toolDeviceName));
-	scene->addSceneElement(createPlane("plane",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
-	scene->addSceneElement(createView("view", 0, 0, 1023, 768));
+	scene->addSceneElement(createBox("VTC Box", toolDeviceName));
+	scene->addSceneElement(createBoxForRawInput("Raw Input", toolDeviceName));
 
-	graphicsManager->getDefaultCamera()->setInitialPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	std::shared_ptr<SceneElement> plane =  createPlane("Plane");
+	plane->setPose(makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0)));
+	scene->addSceneElement(plane);
+
+	std::shared_ptr<ViewElement> viewElement = std::make_shared<OsgViewElement>("view");
+	viewElement->getView()->setDimensions(1023, 768);
+	viewElement->setPose(makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
+	scene->addSceneElement(viewElement);
 
 	runtime->execute();
 

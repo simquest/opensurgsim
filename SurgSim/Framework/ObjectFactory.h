@@ -91,10 +91,11 @@ public:
 	template <typename Derived>
 	bool registerClass(const std::string& className);
 
-	/// Create an instance of a class based on the specific class name.
+	/// Create an instance of a class based on the specific class name, whose constructor takes 1 parameter.
 	/// \param className The class name.
-	/// \return a shared pointer to the object of type className, fails with an
-	///         assertion otherwise.
+	/// \param val The value of the parameter.
+	/// \return a shared pointer to the object of type className instantiated with the given parameter,
+	///         fails with an assertion otherwise.
 	std::shared_ptr<Base> create(const std::string& className, const Parameter1& val);
 
 	/// Check whether the class is registered in the factory.

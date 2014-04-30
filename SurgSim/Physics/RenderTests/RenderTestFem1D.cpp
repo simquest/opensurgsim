@@ -20,6 +20,7 @@
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Graphics/PointCloudRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -96,7 +97,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 
 	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsRepresentation
 			= std::make_shared<OsgPointCloudRepresentation<void>>("Graphics Representation: " + name);
-	graphicsRepresentation->setInitialPose(gfxPose);
+	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
 	graphicsRepresentation->setVisible(true);

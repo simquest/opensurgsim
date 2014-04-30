@@ -80,7 +80,7 @@ protected:
 	/// Returns true if the nodes are equal; otherwise, returns false.
 	/// Recurses on children.
 	/// Override this method in derived classes to implement different comparisons.
-	/// \param The node for comparison.
+	/// \param node The node for comparison.
 	/// \return true if this node is equal to the node in the parameter.
 	virtual bool isEqual(const TreeNode& node) const;
 

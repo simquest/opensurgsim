@@ -47,6 +47,7 @@ T SurgSim::Framework::Accessible::getValue(const std::string& name) const
 	catch (boost::bad_any_cast exception)
 	{
 		SURGSIM_FAILURE() << "Failure to cast to the given type. <" << exception.what() << ">";
+		return T();
 	}
 	return result;
 }

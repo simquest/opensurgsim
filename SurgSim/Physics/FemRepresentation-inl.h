@@ -183,6 +183,8 @@ void FemRepresentation<MT, DT, KT, ST>::afterUpdate(double dt)
 
 	// Back up the current state into the final state
 	*m_finalState = *m_currentState;
+
+	DeformableRepresentation<MT, DT, KT, ST>::afterUpdate(dt);
 }
 
 template <class MT, class DT, class KT, class ST>

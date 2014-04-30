@@ -184,8 +184,6 @@ protected:
 	/// \note This method does not do anything if gravity is disabled
 	void addGravityForce(SurgSim::Math::Vector *f, const DeformableRepresentationState& state, double scale = 1.0);
 
-	/// Interface to be implemented by derived classes
-	/// \return True if component is initialized successfully; otherwise, false.
 	virtual bool doInitialize() override;
 
 private:

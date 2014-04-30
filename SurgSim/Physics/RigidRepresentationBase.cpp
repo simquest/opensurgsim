@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
@@ -31,13 +33,14 @@ RigidRepresentationBase::~RigidRepresentationBase()
 {
 }
 
-void RigidRepresentationBase::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
+bool RigidRepresentationBase::doWakeUp()
 {
-	m_initialState.setPose(pose);
-	m_currentState.setPose(pose);
-	m_previousState.setPose(pose);
-	m_finalState.setPose(pose);
+	m_initialState.setPose(getPose());
+	m_currentState = m_initialState;
+	m_finalState = m_initialState;
+	m_previousState = m_initialState;
 	updateGlobalInertiaMatrices(m_currentState);
+	return true;
 }
 
 void RigidRepresentationBase::setInitialState(const RigidRepresentationState& state)
@@ -75,26 +78,6 @@ const RigidRepresentationState& RigidRepresentationBase::getPreviousState() cons
 	return m_previousState;
 }
 
-const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getInitialPose() const
-{
-	return m_initialState.getPose();
-}
-
-const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getPreviousPose() const
-{
-	return m_previousState.getPose();
-}
-
-const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getCurrentPose() const
-{
-	return m_currentState.getPose();
-}
-
-const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getPose() const
-{
-	return m_finalState.getPose();
-}
-
 std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(const SurgSim::Collision::Location& location)
 {
 	return std::move(createTypedLocalization<RigidRepresentationLocalization>(location));
@@ -122,6 +105,24 @@ const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::
 const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getCurrentParameters() const
 {
 	return m_currentParameters;
+}
+
+void SurgSim::Physics::RigidRepresentationBase::beforeUpdate(double dt)
+{
+	m_previousState = m_currentState;
+}
+
+void SurgSim::Physics::RigidRepresentationBase::afterUpdate(double dt)
+{
+	m_finalState = m_currentState;
+	if (isDrivingSceneElementPose())
+	{
+		std::shared_ptr<SurgSim::Framework::PoseComponent> poseComponent = getPoseComponent();
+		if (poseComponent != nullptr)
+		{
+			poseComponent->setPose(m_finalState.getPose() * getLocalPose().inverse());
+		}
+	}
 }
 
 void RigidRepresentationBase::setCollisionRepresentation(
