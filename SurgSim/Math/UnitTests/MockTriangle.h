@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_UNITTESTS_TRIANGLE_H
-#define SURGSIM_MATH_UNITTESTS_TRIANGLE_H
+#ifndef SURGSIM_MATH_UNITTESTS_MOCKTRIANGLE_H
+#define SURGSIM_MATH_UNITTESTS_MOCKTRIANGLE_H
 
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -24,15 +24,15 @@ namespace SurgSim
 namespace Math
 {
 
-/// Triangle class used in the unit tests.
-class Triangle
+/// MockTriangle class used in the unit tests.
+class MockTriangle
 {
 public:
 	// Default constructor.
-	Triangle() {}
+	MockTriangle() {}
 
 	// Constructor.
-	Triangle(Vector3d vertex0, Vector3d vertex1, Vector3d vertex2) :
+	MockTriangle(const Vector3d& vertex0, const Vector3d& vertex1, const Vector3d& vertex2) :
 		v0(vertex0), v1(vertex1), v2(vertex2), v0v1(vertex1 - vertex0), v0v2(vertex2 - vertex0),
 		v1v2(vertex2 - vertex1)
 	{
@@ -40,14 +40,14 @@ public:
 		n.normalize();
 	}
 
-	// Find a point inside the triangle, given a pair of parameters.
+	// Find a point inside the triangle, given a pair of scaling factor for the edges (v0v1 and v0v2).
 	Vector3d pointInTriangle(double a, double b) const
 	{
 		return v0 + a * v0v1 + b * v0v2;
 	}
 
 	// Move this triangle by the given vector.
-	void move(Vector3d v)
+	void translate(const Vector3d& v)
 	{
 		v0 += v;
 		v1 += v;
@@ -55,7 +55,7 @@ public:
 	}
 
 	// Rotate this triangle about the x-axis by the given angle.
-	void rotateByXDegrees(double angle)
+	void rotateAboutXBy(double angle)
 	{
 		RigidTransform3d r(Eigen::AngleAxis<double>(angle * (M_PI / 180.0), Vector3d(1, 0, 0)));
 		v0  = r * v0;
@@ -65,7 +65,7 @@ public:
 	}
 
 	// Rotate this triangle about the y-axis by the given angle.
-	void rotateByYDegrees(double angle)
+	void rotateAboutYBy(double angle)
 	{
 		SurgSim::Math::RigidTransform3d r(Eigen::AngleAxis<double>(angle * (M_PI / 180.0), Vector3d(0, 1, 0)));
 		v0  = r * v0;
@@ -75,7 +75,7 @@ public:
 	}
 
 	// Rotate this triangle about the z-axis by the given angle.
-	void rotateByZDegrees(double angle)
+	void rotateAboutZBy(double angle)
 	{
 		SurgSim::Math::RigidTransform3d r(Eigen::AngleAxis<double>(angle * (M_PI / 180.0), Vector3d(0, 0, 1)));
 		v0  = r * v0;
@@ -103,4 +103,4 @@ public:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_MATH_UNITTESTS_TRIANGLE_H
+#endif // SURGSIM_MATH_UNITTESTS_MOCKTRIANGLE_H

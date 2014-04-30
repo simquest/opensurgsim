@@ -38,7 +38,7 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	MockObject.h
-	Triangle.h
+	MockTriangle.h
 	TriangleTriangleTestParameters.h
 )
 

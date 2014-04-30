@@ -26,14 +26,6 @@ namespace Math
 class TriangleTriangleContactCalculationTest : public ::testing::Test, public TriangleTriangleTestParameters
 {
 protected:
-	virtual void SetUp()
-	{
-	}
-
-	virtual void TearDown()
-	{
-	}
-
 	void checkEqual(const Vector3d& v1, const Vector3d& v2)
 	{
 		if (v1.isZero(Geometry::DistanceEpsilon))
@@ -50,8 +42,8 @@ protected:
 	{
 		SCOPED_TRACE(std::get<0>(data));
 
-		Triangle t0 = std::get<1>(data);
-		Triangle t1 = std::get<2>(data);
+		MockTriangle t0 = std::get<1>(data);
+		MockTriangle t1 = std::get<2>(data);
 		bool contactExpected = std::get<3>(data);
 		bool checkForPenetrationPoints = std::get<4>(data);
 		Vector3d expectedT0Point = std::get<5>(data);
@@ -149,10 +141,10 @@ protected:
 					// Switched triangles.
 					correction = -correction;
 				}
-				Triangle correctedT0(t0);
-				correctedT0.move(correction);
-				Triangle correctedT1(t1);
-				correctedT1.move(-correction);
+				MockTriangle correctedT0(t0);
+				correctedT0.translate(correction);
+				MockTriangle correctedT1(t1);
+				correctedT1.translate(-correction);
 				double expectedDistance = distanceTriangleTriangle(correctedT0.v0, correctedT0.v1, correctedT0.v2,
 										  correctedT1.v0, correctedT1.v1, correctedT1.v2,
 										  &t0Point, &t1Point);

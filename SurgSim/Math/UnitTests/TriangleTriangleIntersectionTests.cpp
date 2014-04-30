@@ -26,20 +26,12 @@ namespace Math
 class TriangleTriangleIntersectionTest : public ::testing::Test, public TriangleTriangleTestParameters
 {
 protected:
-	virtual void SetUp()
-	{
-	}
-
-	virtual void TearDown()
-	{
-	}
-
 	void testTriangleTriangleIntersection(const TriangleTriangleTestCase& data)
 	{
 		SCOPED_TRACE(std::get<0>(data));
 
-		Triangle t0 = std::get<1>(data);
-		Triangle t1 = std::get<2>(data);
+		MockTriangle t0 = std::get<1>(data);
+		MockTriangle t1 = std::get<2>(data);
 		bool intersectionExpected = std::get<3>(data);
 
 		bool intersectionFound = false;
