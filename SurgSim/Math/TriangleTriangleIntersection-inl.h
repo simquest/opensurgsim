@@ -149,9 +149,7 @@ bool checkTriangleTriangleIntersection(
 
 	// Check if all the vertices of T2 are on one side of p1.
 	Plane<T, MOpt> p1(t1n, t1v0);
-	Eigen::Matrix<T, 3, 1, MOpt> d2(p1.signedDistanceFrom(t2v0),
-									p1.signedDistanceFrom(t2v1),
-									p1.signedDistanceFrom(t2v2));
+	Vector3 d2(p1.signedDistanceFrom(t2v0), p1.signedDistanceFrom(t2v1), p1.signedDistanceFrom(t2v2));
 
 	if ((d2.array() <= EPSILON).all() || (d2.array() >= -EPSILON).all())
 	{
@@ -160,9 +158,7 @@ bool checkTriangleTriangleIntersection(
 
 	// Check if all the vertices of T1 are on one side of p2.
 	Plane<T, MOpt> p2(t2n, t2v0);
-	Eigen::Matrix<T, 3, 1, MOpt> d1(p2.signedDistanceFrom(t1v0),
-									p2.signedDistanceFrom(t1v1),
-									p2.signedDistanceFrom(t1v2));
+	Vector3 d1(p2.signedDistanceFrom(t1v0), p2.signedDistanceFrom(t1v1), p2.signedDistanceFrom(t1v2));
 
 	if ((d1.array() <= EPSILON).all() || (d1.array() >= -EPSILON).all())
 	{
@@ -170,11 +166,11 @@ bool checkTriangleTriangleIntersection(
 	}
 
 	// The separating axis.
-	Eigen::Matrix<T, 3, 1, MOpt> D = t1n.cross(t2n);
+	Vector3 D = t1n.cross(t2n);
 
 	// Projection of the triangle vertices on the separating axis.
-	Eigen::Matrix<T, 3, 1, MOpt> pv1(D.dot(t1v0), D.dot(t1v1), D.dot(t1v2));
-	Eigen::Matrix<T, 3, 1, MOpt> pv2(D.dot(t2v0), D.dot(t2v1), D.dot(t2v2));
+	Vector3 pv1(D.dot(t1v0), D.dot(t1v1), D.dot(t1v2));
+	Vector3 pv2(D.dot(t2v0), D.dot(t2v1), D.dot(t2v2));
 
 	// The intersection of the triangles with the separating axis (D).
 	T s1[3];
