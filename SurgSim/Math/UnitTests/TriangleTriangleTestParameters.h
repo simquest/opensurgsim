@@ -38,7 +38,7 @@ protected:
 					   bool,		// Flag to indicate if expected contact info is available to check against.
 					   Vector3d,	// Expected penetration point in the first triangle.
 					   Vector3d>	// Expected penetration point in the second triangle.
-		TriangleTriangleTestCase;
+			TriangleTriangleTestCase;
 
 	/// A list of common test cases.
 	std::vector<TriangleTriangleTestCase> m_testCases;
@@ -183,7 +183,7 @@ protected:
 			Vector3d t0p;
 			Triangle t1(T1);
 			t1.rotateByZDegrees(90.0);
-			t1.move(Vector3d(0.0, -4.0, -5.0));
+			t1.move(Vector3d(0.0, -3.5, -9.0));
 			Vector3d t1p;
 			m_testCases.push_back(TriangleTriangleTestCase(scenario, t0, t1, true, false, t0p, t1p));
 		}

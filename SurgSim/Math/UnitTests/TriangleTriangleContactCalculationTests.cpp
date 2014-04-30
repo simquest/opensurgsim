@@ -76,33 +76,33 @@ protected:
 			{
 			case 0:
 				EXPECT_NO_THROW(
-				contactFound = calculateContactTriangleTriangle(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2,
-							   &penetrationDepth, &t0Point, &t1Point, &normal););
+					contactFound = calculateContactTriangleTriangle(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2,
+																	&penetrationDepth, &t0Point, &t1Point, &normal););
 				break;
 			case 1:
 				EXPECT_NO_THROW(
-				contactFound = calculateContactTriangleTriangle(t0.v1, t0.v2, t0.v0, t1.v0, t1.v1, t1.v2,
-							   &penetrationDepth, &t0Point, &t1Point, &normal););
+					contactFound = calculateContactTriangleTriangle(t0.v1, t0.v2, t0.v0, t1.v0, t1.v1, t1.v2,
+																	&penetrationDepth, &t0Point, &t1Point, &normal););
 				break;
 			case 2:
 				EXPECT_NO_THROW(
-				contactFound = calculateContactTriangleTriangle(t0.v2, t0.v0, t0.v1, t1.v0, t1.v1, t1.v2,
-							   &penetrationDepth, &t0Point, &t1Point, &normal););
+					contactFound = calculateContactTriangleTriangle(t0.v2, t0.v0, t0.v1, t1.v0, t1.v1, t1.v2,
+																	&penetrationDepth, &t0Point, &t1Point, &normal););
 				break;
 			case 3:
 				EXPECT_NO_THROW(
-				contactFound = calculateContactTriangleTriangle(t1.v0, t1.v1, t1.v2, t0.v0, t0.v1, t0.v2,
-							   &penetrationDepth, &t1Point, &t0Point, &normal););
+					contactFound = calculateContactTriangleTriangle(t1.v0, t1.v1, t1.v2, t0.v0, t0.v1, t0.v2,
+																	&penetrationDepth, &t1Point, &t0Point, &normal););
 				break;
 			case 4:
 				EXPECT_NO_THROW(
-				contactFound = calculateContactTriangleTriangle(t1.v1, t1.v2, t1.v0, t0.v0, t0.v1, t0.v2,
-							   &penetrationDepth, &t1Point, &t0Point, &normal););
+					contactFound = calculateContactTriangleTriangle(t1.v1, t1.v2, t1.v0, t0.v0, t0.v1, t0.v2,
+																	&penetrationDepth, &t1Point, &t0Point, &normal););
 				break;
 			case 5:
 				EXPECT_NO_THROW(
-				contactFound = calculateContactTriangleTriangle(t1.v2, t1.v0, t1.v1, t0.v0, t0.v1, t0.v2,
-							   &penetrationDepth, &t1Point, &t0Point, &normal););
+					contactFound = calculateContactTriangleTriangle(t1.v2, t1.v0, t1.v1, t0.v0, t0.v1, t0.v2,
+																	&penetrationDepth, &t1Point, &t0Point, &normal););
 				break;
 			}
 
@@ -127,7 +127,7 @@ protected:
 				// Check that t0Point is inside t0.
 				Vector3d bary0;
 				barycentricCoordinates(t0Point, t0.v0, t0.v1, t0.v2, &bary0);
-				bool isBary0WithinTriangle = 
+				bool isBary0WithinTriangle =
 					bary0[0] >= -Geometry::DistanceEpsilon && bary0[0] <= (1.0 + Geometry::DistanceEpsilon) &&
 					bary0[1] >= -Geometry::DistanceEpsilon && bary0[1] <= (1.0 + Geometry::DistanceEpsilon) &&
 					bary0[2] >= -Geometry::DistanceEpsilon && bary0[2] <= (1.0 + Geometry::DistanceEpsilon);
@@ -136,14 +136,14 @@ protected:
 				// Check that t1Point is inside t1.
 				Vector3d bary1;
 				barycentricCoordinates(t1Point, t1.v0, t1.v1, t1.v2, &bary1);
-				bool isBary1WithinTriangle = 
+				bool isBary1WithinTriangle =
 					bary1[0] >= -Geometry::DistanceEpsilon && bary1[0] <= (1.0 + Geometry::DistanceEpsilon) &&
 					bary1[1] >= -Geometry::DistanceEpsilon && bary1[1] <= (1.0 + Geometry::DistanceEpsilon) &&
 					bary1[2] >= -Geometry::DistanceEpsilon && bary1[2] <= (1.0 + Geometry::DistanceEpsilon);
 				EXPECT_TRUE(isBary1WithinTriangle);
 
 				// Check if the penetration depth when applied as correction, separates the triangles.
-				Vector3d correction = normal * (0.5 * (penetrationDepth + 2.0 * Geometry::DistanceEpsilon));
+				Vector3d correction = normal * (0.5 * penetrationDepth + 3.0 * Geometry::DistanceEpsilon);
 				if (count > 2)
 				{
 					// Switched triangles.
@@ -156,13 +156,8 @@ protected:
 				double expectedDistance = distanceTriangleTriangle(correctedT0.v0, correctedT0.v1, correctedT0.v2,
 										  correctedT1.v0, correctedT1.v1, correctedT1.v2,
 										  &t0Point, &t1Point);
-				EXPECT_GE(expectedDistance, 0.0);
-				EXPECT_LE(expectedDistance, 2.1 * Geometry::DistanceEpsilon);
-				if (expectedDistance < 0.0 || expectedDistance > 2.1 * Geometry::DistanceEpsilon)
-				{
-					EXPECT_GE(expectedDistance, 0.0);
-					EXPECT_LE(expectedDistance, 2.1 * Geometry::DistanceEpsilon);
-				}
+				EXPECT_GE(expectedDistance, 4.0 * Geometry::DistanceEpsilon);
+				EXPECT_LE(expectedDistance, 8.0 * Geometry::DistanceEpsilon);
 			}
 		}
 	}

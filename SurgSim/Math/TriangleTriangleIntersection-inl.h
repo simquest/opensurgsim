@@ -31,7 +31,7 @@ class Plane
 	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
 
 public:
-	/// Contructor takes in th eplane normal and a point on the plane.
+	/// Contructor takes in the plane normal and a point on the plane.
 	/// \param normal Normal of the plane.
 	/// \param pointOnPlane A point on the plane.
 	Plane(const Vector3& normal, const Vector3& pointOnPlane)
@@ -54,16 +54,21 @@ public:
 };
 
 
-/// Two ends of triangle edge are given in terms of the following vertex properties.
+/// Two ends of the triangle edge are given in terms of the following vertex properties.
 ///		- Signed distance from the colliding triangle.
 ///		- Projection on the separating axis.
-/// Get the intersection of this edge and the plane in terms of the projection of the vertices.
+/// Get the intersection of this edge and the plane in terms of the projection on the separating axis.
+/// \tparam T Accuracy of the calculation, can usually be inferred.
 /// \param dStart Signed distance of the start of edge from the plane of the colliding triangle.
 /// \param dEnd Signed distance of the end of edge from the plane of the colliding triangle.
 /// \param pvStart Projection of the start of edge from the plane of the colliding triangle.
 /// \param dStart Signed distance of the first vertex from the plane of the colliding triangle.
+/// \param parametricIntersection Parametric representation of the intersection between the triangle edge
+///		   and the plane in terms of the projection on the separating axis.
+/// \param parametricIntersectionIndex The array index of parametricIntersection.
 template<class T>
-void edgeIntersection(T dStart, T dEnd, T pvStart, T pvEnd, T *t, int *tCount)
+void edgeIntersection(T dStart, T dEnd, T pvStart, T pvEnd, T* parametricIntersection,
+					  size_t* parametricIntersectionIndex)
 {
 	// Epsilon used in this function.
 	static const T EPSILON = T(Geometry::DistanceEpsilon);
@@ -78,12 +83,13 @@ void edgeIntersection(T dStart, T dEnd, T pvStart, T pvEnd, T *t, int *tCount)
 		if (isEndOnPlane)
 		{
 			// The intersection of the edge and the plane is the end.
-			t[(*tCount)++] = pvEnd;
+			parametricIntersection[(*parametricIntersectionIndex)++] = pvEnd;
 		}
 		else
 		{
 			// The intersection of the edge and the plane is got by clipping the edge onto the plane.
-			t[(*tCount)++] = pvStart + (pvEnd - pvStart) * (dStart / (dStart - dEnd));
+			parametricIntersection[(*parametricIntersectionIndex)++] =
+				pvStart + (pvEnd - pvStart) * (dStart / (dStart - dEnd));
 		}
 	}
 }
@@ -128,10 +134,10 @@ bool checkTriangleTriangleIntersection(
 	// D		- Separating axis used for the test. This is calculated as the cross products of the triangle normals.
 	// pv1[3]	- Projection of the vertices of T1 onto the separating axis (D).
 	// pv2[3]	- Projection of the vertices of T2 onto the separating axis (D).
-	// t[2]		- The intersection between T1 and D is a line segment.
-	//			  t[0] and t[1] are the parametric representation of the ends of this line segment.
-	// s[2]		- The intersection between T2 and D is a line segment.
-	//			  s[0] and s[1] are the parametric representation of the ends of this line segment.
+	// s1[2]	- The intersection between T1 and D is a line segment.
+	//			  s1[0] and s1[1] are the parametric representation of the ends of this line segment.
+	// s2[2]	- The intersection between T2 and D is a line segment.
+	//			  s2[0] and s2[1] are the parametric representation of the ends of this line segment.
 
 	// Some extra variables:
 	// p1		- The plane of the triangle T1.
@@ -143,20 +149,22 @@ bool checkTriangleTriangleIntersection(
 
 	// Check if all the vertices of T2 are on one side of p1.
 	Plane<T, MOpt> p1(t1n, t1v0);
-	T d2[3] = {p1.signedDistanceFrom(t2v0), p1.signedDistanceFrom(t2v1), p1.signedDistanceFrom(t2v2)};
+	Eigen::Matrix<T, 3, 1, MOpt> d2(p1.signedDistanceFrom(t2v0),
+									p1.signedDistanceFrom(t2v1),
+									p1.signedDistanceFrom(t2v2));
 
-	if ((d2[0] <= EPSILON && d2[1] <= EPSILON && d2[2] <= EPSILON) ||
-		(d2[0] >= -EPSILON && d2[1] >= -EPSILON && d2[2] >= -EPSILON))
+	if ((d2.array() <= EPSILON).all() || (d2.array() >= -EPSILON).all())
 	{
 		return false;
 	}
 
 	// Check if all the vertices of T1 are on one side of p2.
 	Plane<T, MOpt> p2(t2n, t2v0);
-	T d1[3] = {p2.signedDistanceFrom(t1v0), p2.signedDistanceFrom(t1v1), p2.signedDistanceFrom(t1v2)};
+	Eigen::Matrix<T, 3, 1, MOpt> d1(p2.signedDistanceFrom(t1v0),
+									p2.signedDistanceFrom(t1v1),
+									p2.signedDistanceFrom(t1v2));
 
-	if ((d1[0] <= EPSILON && d1[1] <= EPSILON && d1[2] <= EPSILON) ||
-		(d1[0] >= -EPSILON && d1[1] >= -EPSILON && d1[2] >= -EPSILON))
+	if ((d1.array() <= EPSILON).all() || (d1.array() >= -EPSILON).all())
 	{
 		return false;
 	}
@@ -165,11 +173,14 @@ bool checkTriangleTriangleIntersection(
 	Eigen::Matrix<T, 3, 1, MOpt> D = t1n.cross(t2n);
 
 	// Projection of the triangle vertices on the separating axis.
-	T pv1[3] = {D.dot(t1v0), D.dot(t1v1), D.dot(t1v2)};
-	T pv2[3] = {D.dot(t2v0), D.dot(t2v1), D.dot(t2v2)};
+	Eigen::Matrix<T, 3, 1, MOpt> pv1(D.dot(t1v0), D.dot(t1v1), D.dot(t1v2));
+	Eigen::Matrix<T, 3, 1, MOpt> pv2(D.dot(t2v0), D.dot(t2v1), D.dot(t2v2));
 
-	T t[3], s[3];
-	int tCount = 0, sCount = 0;
+	// The intersection of the triangles with the separating axis (D).
+	T s1[3];
+	T s2[3];
+	size_t s1Index = 0;
+	size_t s2Index = 0;
 
 	// Loop through the edges of each triangle and find the intersectio of these edges onto
 	// the plane of the other triangle.
@@ -177,17 +188,16 @@ bool checkTriangleTriangleIntersection(
 	{
 		int j = (i + 1) % 3;
 
-		edgeIntersection(d1[i], d1[j], pv1[i], pv1[j], t, &tCount);
-		edgeIntersection(d2[i], d2[j], pv2[i], pv2[j], s, &sCount);
+		edgeIntersection(d1[i], d1[j], pv1[i], pv1[j], s1, &s1Index);
+		edgeIntersection(d2[i], d2[j], pv2[i], pv2[j], s2, &s2Index);
 	}
 
-	SURGSIM_ASSERT(tCount == 2 && sCount == 2)
-		<< "The intersection between the triangle and the separating axis is not a line segment."
-		<< " This scenario cannot happen, at this point in the algorithm.";
+	SURGSIM_ASSERT(s1Index == 2 && s2Index == 2)
+			<< "The intersection between the triangle and the separating axis is not a line segment."
+			<< " This scenario cannot happen, at this point in the algorithm.";
 
-	// Check if (t[0], t[1]) and (s[0], s[1]) overlap.
-	return !(t[0] <= s[0] && t[0] <= s[1] && t[1] <= s[0] && t[1] <= s[1]) &&
-		   !(t[0] >= s[0] && t[0] >= s[1] && t[1] >= s[0] && t[1] >= s[1]);
+	return !(s1[0] <= s2[0] && s1[0] <= s2[1] && s1[1] <= s2[0] && s1[1] <= s2[1]) &&
+		   !(s1[0] >= s2[0] && s1[0] >= s2[1] && s1[1] >= s2[0] && s1[1] >= s2[1]);
 }
 
 /// Check if the two triangles intersect using separating axis test.
