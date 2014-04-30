@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Tests for the DcdCollision Class
+/// \file DcdCollisionTests.cpp
+/// Tests for the DcdCollision Class
 
 #include <gtest/gtest.h>
 
@@ -53,7 +54,7 @@ std::shared_ptr<RigidRepresentation> createSphere(const std::string& name, const
 	params.setShapeUsedForMassInertia(shape);
 
 	representation->setInitialParameters(params);
-	representation->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), position));
+	representation->setLocalPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), position));
 
 	return representation;
 }
@@ -68,10 +69,12 @@ TEST(DcdCollisionTest, RigidRigidCollisionTest)
 
 	std::shared_ptr<SurgSim::Collision::Representation> sphere1Collision =
 		std::make_shared<RigidCollisionRepresentation>("Sphere1 Collision");
-	std::dynamic_pointer_cast<RigidCollisionRepresentation>(sphere1Collision)->setRigidRepresentation(sphere1);
+	sphere1->setCollisionRepresentation(sphere1Collision);
+
 	std::shared_ptr<SurgSim::Collision::Representation> sphere2Collision =
 		std::make_shared<RigidCollisionRepresentation>("Sphere2 Collision");
-	std::dynamic_pointer_cast<RigidCollisionRepresentation>(sphere2Collision)->setRigidRepresentation(sphere2);
+	sphere2->setCollisionRepresentation(sphere2Collision);
+
 	std::vector<std::shared_ptr<Representation>> representations;
 	representations.push_back(sphere1);
 	representations.push_back(sphere2);
@@ -97,7 +100,7 @@ TEST(DcdCollisionTest, FixedRigidCollisionTest)
 
 	std::shared_ptr<SurgSim::Collision::Representation> sphere1Collision =
 		std::make_shared<RigidCollisionRepresentation>("Sphere Collision");
-	std::dynamic_pointer_cast<RigidCollisionRepresentation>(sphere1Collision)->setRigidRepresentation(sphere1);
+	sphere1->setCollisionRepresentation(sphere1Collision);
 
 	RigidRepresentationParameters params;
 	std::shared_ptr<Shape> shape = std::make_shared<DoubleSidedPlaneShape>();
@@ -106,7 +109,7 @@ TEST(DcdCollisionTest, FixedRigidCollisionTest)
 	fixed->setInitialParameters(params);
 	std::shared_ptr<SurgSim::Collision::Representation> fixedCollision =
 		std::make_shared<RigidCollisionRepresentation>("Plane Collision");
-	std::dynamic_pointer_cast<RigidCollisionRepresentation>(fixedCollision)->setRigidRepresentation(fixed);
+	fixed->setCollisionRepresentation(fixedCollision);
 
 	std::vector<std::shared_ptr<Representation>> representations;
 	representations.push_back(sphere1);

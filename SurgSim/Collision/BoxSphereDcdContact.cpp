@@ -95,11 +95,9 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 		// (boxSize.x() - abs(closestPoint.x())) gives the distance from the closestPoint to whichever x-axis face is
 		// closest. This value is calculated for all the axes. The axis with the minimum value contains the
 		// colliding face.
-		double distancesFromFaces[3] = {boxSize.x() - std::abs(closestPoint.x()),
-										boxSize.y() - std::abs(closestPoint.y()),
-										boxSize.z() - std::abs(closestPoint.z())};
-		int minimumDistanceId = SurgSim::Math::indexOfMinimum(distancesFromFaces[0], distancesFromFaces[1],
-															  distancesFromFaces[2]);
+		Vector3d distancesFromFaces = boxSize - closestPoint.cwiseAbs();
+		int minimumDistanceId;
+		distancesFromFaces.minCoeff(&minimumDistanceId);
 		// The mininumDistanceId is the index of the non-zero component of the normal of the closest face.
 		// The normal points toward the first representation, the box.  So the sign (or direction) of that entry is +1
 		// if the closestPoint component is negative and vice versa.

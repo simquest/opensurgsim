@@ -21,6 +21,7 @@
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/SceneryRepresentation.h"
@@ -181,6 +182,10 @@ std::shared_ptr<SurgSim::Physics::Constraint> StaplerBehavior::createBilateral3D
 						stapleRepLocalization,
 						std::make_shared<Fem3DRepresentationBilateral3D>(),
 						otherRepLocatization);
+		break;
+
+	default:
+		SURGSIM_FAILURE() << "Stapling constraint not supported for this representation type";
 		break;
 	}
 

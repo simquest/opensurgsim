@@ -77,9 +77,9 @@ std::pair<Type, boost::any> testAccessible(const Type& value)
 {
 	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
 
-	osgUniform->setValue("value", value);
+	osgUniform->setValue("Value", value);
 
-	return std::make_pair(osgUniform->get(), osgUniform->getValue("value"));
+	return std::make_pair(osgUniform->get(), osgUniform->getValue("Value"));
 }
 
 /// Constructs an OsgUniform that stores a vector of values, sets it to the given vector values, and returns the result
@@ -137,6 +137,7 @@ void testUniformFloat(FloatType min, FloatType max)
 /// \tparam	FloatType	Floating point type (float, double, ...)
 /// \param	min	Minimum random value
 /// \param	max	Maximum random value
+/// \param	numElements	Number of elements
 template <class FloatType>
 void testUniformElementsFloat(FloatType min, FloatType max, unsigned int numElements)
 {
@@ -183,6 +184,7 @@ void testUniformInt(IntType min, IntType max)
 /// \tparam	IntType	Integer type (int, unsigned int, ...)
 /// \param	min	Minimum random value
 /// \param	max	Maximum random value
+/// \param	numElements	Number of elements
 template <class IntType>
 void testUniformElementsInt(IntType min, IntType max, unsigned int numElements)
 {

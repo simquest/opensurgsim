@@ -26,6 +26,7 @@ set(SURGSIM_MATH_SOURCES
 	DoubleSidedPlaneShape.cpp
 	GaussLegendreQuadrature.cpp
 	LinearSolveAndInverse.cpp
+	MathConvert.cpp
 	Matrix.cpp
 	MeshShape.cpp
 	MlcpGaussSeidelSolver.cpp
@@ -38,6 +39,7 @@ set(SURGSIM_MATH_SOURCES
 )
 
 set(SURGSIM_MATH_HEADERS
+	Aabb.h
 	BoxShape.h
 	CapsuleShape.h
 	CylinderShape.h
@@ -74,6 +76,10 @@ set(SURGSIM_MATH_HEADERS
 	OdeSolverLinearEulerExplicitModified-inl.h
 	OdeSolverLinearEulerImplicit.h
 	OdeSolverLinearEulerImplicit-inl.h
+	OdeSolverLinearStatic.h
+	OdeSolverLinearStatic-inl.h
+	OdeSolverStatic.h
+	OdeSolverStatic-inl.h
 	PlaneShape.h
 	Quaternion.h
 	RigidTransform.h

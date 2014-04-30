@@ -69,7 +69,7 @@ std::shared_ptr<ScreenSpaceQuadRepresentation> RenderTest::makeQuad(
 	quad->setSize(width,height);
 	Quaterniond quat;
 	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(0.0,Vector3d::UnitY());
-	quad->setInitialPose(SurgSim::Math::makeRigidTransform(quat, Vector3d(x,y,-0.2)));
+	quad->setLocalPose(SurgSim::Math::makeRigidTransform(quat, Vector3d(x,y,-0.2)));
 	return quad;
 }
 

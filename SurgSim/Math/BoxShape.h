@@ -18,7 +18,6 @@
 
 #include <array>
 
-#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim

@@ -23,18 +23,22 @@
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
+#include "SurgSim/Graphics/OsgCamera.h"
 
 
+using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;
 
 OsgViewElement::OsgViewElement(const std::string& name) :
-	SurgSim::Graphics::ViewElement(name, std::make_shared<OsgView>(name + " View")),
+	SurgSim::Graphics::ViewElement(name),
 	m_manipulatorPosition(SurgSim::Math::Vector3d(3.0, 3.0, 3.0)),
 	m_manipulatorLookat(SurgSim::Math::Vector3d(0.0, 0.0, 0.0)),
 	m_keyboardEnabled(false),
 	m_mouseEnabled(false)
 {
+	setView(std::make_shared<OsgView>(name + " View"));
+	setCamera(std::make_shared<OsgCamera>(name + " Camera"));
 }
 
 OsgViewElement::~OsgViewElement()

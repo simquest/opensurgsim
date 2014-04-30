@@ -31,6 +31,7 @@ namespace Framework
 {
 
 // Forward References
+class PoseComponent;
 class Runtime;
 class Scene;
 class SceneElement;
@@ -94,6 +95,10 @@ public:
 	/// \return The scene element for this component.
 	std::shared_ptr<SceneElement> getSceneElement();
 
+	/// Gets the scene element, constant version
+	/// \return The scene element for this component.
+	std::shared_ptr<const SceneElement> getSceneElement() const;
+
 	/// Get the runtime which contains this component.
 	/// \return The runtime which contains this component.
 	std::shared_ptr<Runtime> getRuntime() const;
@@ -121,6 +126,15 @@ public:
 	/// Interface to be implemented by derived classes
 	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp() = 0;
+
+protected:
+	/// Get the PoseComponent for this component
+	/// \return The PoseComponent
+	virtual std::shared_ptr<PoseComponent> getPoseComponent();
+
+	/// Get the PoseComponent for this component, constant access
+	/// \return The PoseComponent
+	virtual std::shared_ptr<const PoseComponent> getPoseComponent() const;
 
 private:
 	/// Name of this component
@@ -150,7 +164,8 @@ private:
 	/// Indicates if this component is awake
 	bool m_isAwake;
 
-
+	/// PoseComponent associated with this Component
+	std::weak_ptr<PoseComponent> m_poseComponent;
 };
 
 }; // namespace Framework

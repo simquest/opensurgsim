@@ -40,9 +40,10 @@ namespace Graphics
 class MockViewElement : public ViewElement
 {
 public:
-	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
-		m_isInitialized(false)
+	explicit MockViewElement(const std::string& name) : ViewElement(name), m_isInitialized(false)
 	{
+		setView(std::make_shared<MockView>(name + " View"));
+		setCamera(std::make_shared<MockCamera>(name + " Camera"));
 	}
 
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override

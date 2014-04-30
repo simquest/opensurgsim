@@ -99,7 +99,7 @@ namespace SurgSim
 				std::shared_ptr<PointCloudRepresentation<void>> cloud =
 					std::make_shared<OsgPointCloudRepresentation<void>>("cloud representation");
 
-				cloud->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
+				cloud->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
 				for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
 				{
 					cloud->getVertices()->addVertex(SurgSim::DataStructures::Vertices<void>::VertexType(*it));
@@ -121,7 +121,7 @@ namespace SurgSim
 
 			RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(0.2, Vector3d(1.0,1.0,1.0)),
 				Vector3d(0.0,0.0,-0.2));
-			representation->setInitialPose(pose);
+			representation->setLocalPose(pose);
 
 			viewElement->addComponent(representation);
 
@@ -160,7 +160,7 @@ namespace SurgSim
 			{
 				/// Calculate t in [0.0, 1.0]
 				double t = static_cast<double>(i) / numSteps;
-				cloud->setPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
+				cloud->setLocalPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
 				boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 			}
 		}

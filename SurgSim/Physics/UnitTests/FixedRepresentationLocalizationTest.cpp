@@ -18,14 +18,15 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
-using SurgSim::Physics::FixedRepresentation;
-using SurgSim::Physics::RigidRepresentationLocalization;
-
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
+
+using SurgSim::Physics::FixedRepresentation;
+using SurgSim::Physics::RigidRepresentationLocalization;
 
 namespace
 {
@@ -78,7 +79,9 @@ TEST_F(FixedRepresentationLocalizationTest, GetPositionTest)
 
 	// Activate the rigid body and setup its initial pose
 	fixedRepresentation->setIsActive(true);
-	fixedRepresentation->setInitialPose(m_initialTransformation);
+	fixedRepresentation->setLocalPose(m_initialTransformation);
+	fixedRepresentation->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	fixedRepresentation->wakeUp();
 
 	RigidRepresentationLocalization localization = RigidRepresentationLocalization(fixedRepresentation);
 	ASSERT_EQ(fixedRepresentation, localization.getRepresentation());

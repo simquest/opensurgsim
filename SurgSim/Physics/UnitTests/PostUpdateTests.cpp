@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Simple Test for PostUpdate calculation
+/// \file PostUpdateTests.cpp
+/// Simple Test for PostUpdate calculation
 
 #include <gtest/gtest.h>
 
