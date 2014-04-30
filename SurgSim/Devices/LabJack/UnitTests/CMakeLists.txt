@@ -23,6 +23,10 @@ set(UNIT_TEST_SOURCES
 	LabJackScaffoldTest.cpp
 )
 
+if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	list(APPEND UNIT_TEST_SOURCES LabJackChecksumsTest.cpp)
+endif()
+
 set(LIBS
 	LabJackDevice
 	SurgSimInput
