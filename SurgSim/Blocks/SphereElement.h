@@ -31,7 +31,7 @@ class SphereElement : public SurgSim::Framework::SceneElement
 {
 public:
 
-	explicit SphereElement(const std::string& name, const SurgSim::Math::RigidTransform3d& pose);
+	explicit SphereElement(const std::string& name);
 
 	~SphereElement();
 
@@ -44,7 +44,6 @@ protected:
 
 private:
 	std::string m_name;
-	SurgSim::Math::RigidTransform3d m_pose;
 
 };
 

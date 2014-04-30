@@ -105,7 +105,7 @@ TEST_F(RigidRepresentationTest, ResetTest)
 	rigidBody->setInitialState(m_state);
 	rigidBody->setIsActive(false);
 	rigidBody->setIsGravityEnabled(false);
-	rigidBody->setPose(RigidTransform3d::Identity());
+	rigidBody->setLocalPose(RigidTransform3d::Identity());
 
 	// reset the representation state
 	rigidBody->resetState();
@@ -387,7 +387,7 @@ TEST_F(RigidRepresentationTest, LocalizationCreation)
 	localization = rigidBody->createLocalization(loc1);
 	localization->setRepresentation(rigidBody);
 
-	Vector3d globalPos = rigidBody->getCurrentPose() * loc1.rigidLocalPosition.getValue();
+	Vector3d globalPos = rigidBody->getCurrentState().getPose() * loc1.rigidLocalPosition.getValue();
 
 	EXPECT_TRUE(globalPos.isApprox(localization->calculatePosition(0.0)));
 	EXPECT_TRUE(globalPos.isApprox(localization->calculatePosition(1.0)));

@@ -19,9 +19,11 @@
 
 #include <math.h>
 
-#include "SurgSim/Math/MathConvert.h"
 #include <Eigen/Geometry>  // SurgSim/Math/Matrix.h by itself does not provide cross()
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
+#include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/Matrix.h"
 
 // Define test fixture class templates.
 // We don't really need fixtures as such, but the templatization encodes type.
@@ -434,7 +436,6 @@ TYPED_TEST(AllMatrixTests, YamlConvert)
 {
 	typedef typename TestFixture::Matrix Matrix;
 	typedef typename TestFixture::Scalar T;
-	const int SIZE = Matrix::RowsAtCompileTime;
 
 	// This array has more elements than we will need.
 	// The element type must match the matrix!
@@ -453,10 +454,8 @@ TYPED_TEST(AllMatrixTests, YamlConvert)
 	EXPECT_TRUE(node.IsSequence());
 	EXPECT_EQ(matrix.rows(), node.size());
 
-	Matrix expected;
-
-	ASSERT_NO_THROW(expected = node.as<Matrix>());
-	EXPECT_TRUE(matrix.isApprox(expected));
+	ASSERT_NO_THROW({Matrix expected = node.as<Matrix>();});
+	EXPECT_TRUE(matrix.isApprox(node.as<Matrix>()));
 }
 
 /// Test assignment.

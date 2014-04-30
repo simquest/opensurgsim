@@ -18,6 +18,7 @@
 
 #include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -30,6 +31,7 @@
 
 #include <random>
 
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
@@ -129,39 +131,44 @@ TEST(OsgSphereRepresentationTests, RadiusTest)
 TEST(OsgSphereRepresentationTests, PoseTest)
 {
 	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
+	std::shared_ptr<BasicSceneElement> element = std::make_shared<BasicSceneElement>("element");
+	element->addComponent(representation);
+	element->initialize();
+	representation->wakeUp();
 
 	{
 		SCOPED_TRACE("Check Initial Pose");
-		EXPECT_TRUE(representation->getInitialPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(representation->getLocalPose().isApprox(RigidTransform3d::Identity()));
 		EXPECT_TRUE(representation->getPose().isApprox(RigidTransform3d::Identity()));
 	}
 
-	RigidTransform3d initialPose;
+	RigidTransform3d localPose;
 	{
-		SCOPED_TRACE("Set Initial Pose");
-		initialPose = SurgSim::Math::makeRigidTransform(
+		SCOPED_TRACE("Set Local Pose");
+		localPose = SurgSim::Math::makeRigidTransform(
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
-		representation->setInitialPose(initialPose);
-		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
+		representation->setLocalPose(localPose);
+		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
+		EXPECT_TRUE(representation->getPose().isApprox(localPose));
+	}
+
+	RigidTransform3d elementPose;
+	{
+		SCOPED_TRACE("Set Element Pose");
+		elementPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		element->setPose(elementPose);
+		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
+		EXPECT_TRUE(representation->getPose().isApprox(elementPose * localPose));
 	}
 
 	{
-		SCOPED_TRACE("Set Current Pose");
-		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
+		SCOPED_TRACE("Change Local Pose");
+		localPose = SurgSim::Math::makeRigidTransform(
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
-		representation->setPose(currentPose);
-		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getPose().isApprox(currentPose));
-	}
-
-	{
-		SCOPED_TRACE("Change Initial Pose");
-		initialPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
-		representation->setInitialPose(initialPose);
-		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
+		representation->setLocalPose(localPose);
+		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
+		EXPECT_TRUE(representation->getPose().isApprox(elementPose * localPose));
 	}
 }
 

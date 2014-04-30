@@ -56,10 +56,11 @@ void AddSphereFromInputBehavior::update(double dt)
 
 		std::string name = "sphereId_" + elementCount.str();
 
-		std::shared_ptr<SurgSim::Framework::SceneElement> m_element =
-			std::make_shared<SurgSim::Blocks::SphereElement>(name, pose);
+		std::shared_ptr<SurgSim::Framework::SceneElement> element =
+			std::make_shared<SurgSim::Blocks::SphereElement>(name);
+		element->setPose(pose);
 
-		getScene()->addSceneElement(m_element);
+		getScene()->addSceneElement(element);
 	}
 	m_buttonPreviouslyPressed = button1;
 }

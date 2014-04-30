@@ -129,11 +129,11 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
 
-	boxRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), boxPosition));
-	capsuleRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), capsulePosition));
-	cylinderRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), cylinderPosition));
-	sphereRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), spherePosition));
-	axesRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -0.2)));
+	boxRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), boxPosition));
+	capsuleRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), capsulePosition));
+	cylinderRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), cylinderPosition));
+	sphereRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), spherePosition));
+	axesRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -0.2)));
 
 	/// Set the size of box
 	boxRepresentation->setSizeXYZ(boxSize.x(), boxSize.y(), boxSize.z());

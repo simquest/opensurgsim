@@ -71,7 +71,11 @@ bool OsgManager::addRepresentation(std::shared_ptr<SurgSim::Graphics::Representa
 	std::shared_ptr<OsgRepresentation> osgRepresentation = std::dynamic_pointer_cast<OsgRepresentation>(representation);
 	if (osgRepresentation && Manager::addRepresentation(osgRepresentation))
 	{
-		SURGSIM_ASSERT(m_defaultGroup->add(osgRepresentation)) << "Failed to add representation to default group!";
+		auto camera = std::dynamic_pointer_cast<Camera>(representation);
+		if (camera == nullptr || camera->getGroup() != m_defaultGroup)
+		{
+		   SURGSIM_ASSERT(m_defaultGroup->add(osgRepresentation)) << "Failed to add representation to default group!";
+		}
 
 		// Add the component to all the groups that it wants to be in
 		std::vector<std::string> requestedGroups = representation->getGroupReferences();
@@ -140,6 +144,7 @@ bool OsgManager::addView(std::shared_ptr<SurgSim::Graphics::View> view)
 		}
 		else if (! osgView->getCamera()->getGroup())
 		{
+			m_defaultGroup->remove(osgView->getCamera());
 			osgView->getCamera()->setGroup(m_defaultGroup);
 		}
 		m_viewer->addView(osgView->getOsgView());
@@ -187,7 +192,6 @@ bool OsgManager::doUpdate(double dt)
 	}
 
 	m_defaultCamera->update(dt);
-
 
 	if (Manager::doUpdate(dt))
 	{

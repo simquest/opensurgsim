@@ -210,6 +210,9 @@ TEST(ComponentTests, SetAndGetSceneTest)
 
 TEST(ComponentTests, PointerEncode)
 {
+	std::shared_ptr<Component> emptyComponent;
+	EXPECT_ANY_THROW(YAML::convert<std::shared_ptr<Component>>::encode(emptyComponent));
+
 	auto component = std::make_shared<TestComponent1>("TestComponent");
 	YAML::Node node = YAML::convert<std::shared_ptr<Component>>::encode(component);
 

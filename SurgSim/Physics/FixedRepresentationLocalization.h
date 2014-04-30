@@ -74,24 +74,23 @@ private:
 	SurgSim::Math::Vector3d doCalculatePosition(double time)
 	{
 		std::shared_ptr<FixedRepresentation> fixed = std::static_pointer_cast<FixedRepresentation>(getRepresentation());
+		const SurgSim::Math::RigidTransform3d& currentPose  = fixed->getCurrentState().getPose();
+		const SurgSim::Math::RigidTransform3d& previousPose = fixed->getPreviousState().getPose();
 
 		if (time == 0.0)
 		{
-			return fixed->getPreviousPose() * m_position;
+			return previousPose * m_position;
 		}
 		else if (time == 1.0)
 		{
-			return fixed->getPose() * m_position;
+			return currentPose * m_position;
 		}
-		else if (fixed->getPose().isApprox(fixed->getPreviousPose()))
+		else if (currentPose.isApprox(previousPose))
 		{
-			return fixed->getPose() * m_position;
+			return currentPose * m_position;
 		}
 
-		const SurgSim::Math::RigidTransform3d& currentPose  = fixed->getPose();
-		const SurgSim::Math::RigidTransform3d& previousPose = fixed->getPreviousPose();
 		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::interpolate(previousPose, currentPose, time);
-
 		return pose * m_position;
 	}
 

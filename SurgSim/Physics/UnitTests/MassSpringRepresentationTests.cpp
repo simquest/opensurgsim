@@ -17,21 +17,23 @@
 
 #include <string>
 
-#include "SurgSim/Physics/MassSpringRepresentation.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-#include "SurgSim/Physics/LinearSpring.h"
-
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Physics/MassSpringRepresentation.h"
 
+
+using SurgSim::Framework::Runtime;
+using SurgSim::Math::Quaterniond;
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector;
 using SurgSim::Physics::MassSpringRepresentation;
 using SurgSim::Physics::LinearSpring;
 using SurgSim::Physics::DeformableRepresentationState;
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Vector;
-using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 
 namespace
 {
@@ -55,8 +57,8 @@ public:
 		using SurgSim::Physics::Mass;
 		using SurgSim::Physics::LinearSpring;
 
-		// Note: setInitialPose MUST be called before setInitialState to be effective !
-		setInitialPose(pose);
+		// Note: setLocalPose MUST be called before WakeUp to be effective !
+		setLocalPose(pose);
 
 		std::shared_ptr<DeformableRepresentationState> state;
 		state = std::make_shared<DeformableRepresentationState>();
@@ -168,14 +170,10 @@ TEST_F(MassSpringRepresentationTests, SetGetMethods)
 	EXPECT_EQ(name, m.getName());
 
 	// set/get InitialPose
-	m.setInitialPose(m_poseRandom);
-	EXPECT_TRUE(m.getInitialPose().isApprox(m_poseRandom));
+	m.setLocalPose(m_poseRandom);
+	EXPECT_TRUE(m.getLocalPose().isApprox(m_poseRandom));
 
-	// set/get Pose
-	EXPECT_TRUE(m.getPose().isApprox(m_poseIdentity));
-	EXPECT_THROW(m.setPose(m_poseIdentity), SurgSim::Framework::AssertionFailure);
-	EXPECT_THROW(m.setPose(m_poseRandom), SurgSim::Framework::AssertionFailure);
-	EXPECT_TRUE(m.getPose().isApprox(m_poseIdentity));
+	EXPECT_TRUE(m.getPose().isApprox(m_poseRandom));
 
 	// get{NumDof | NumMasses | NumSprings} initial value is 0
 	EXPECT_EQ(0u, m.getNumDof());
@@ -231,6 +229,8 @@ TEST_F(MassSpringRepresentationTests, NoGravityTest)
 		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
 
 	m.setIsGravityEnabled(false);
+	m.initialize(std::make_shared<Runtime>());
+	m.wakeUp();
 
 	m.beforeUpdate(m_dt);
 	m.update(m_dt);
@@ -263,6 +263,9 @@ TEST_F(MassSpringRepresentationTests, OneSpringFrequencyTest)
 	// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
 	std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
 	m.setIsGravityEnabled(false);
+
+	m.initialize(std::make_shared<Runtime>());
+	m.wakeUp();
 
 	// Frequency = 1/(2PI) sqrt(k / m)
 	double f = 1.0/(2.0 * M_PI) * sqrt(m_springStiffness / (m_totalMass/2.0));
@@ -333,6 +336,9 @@ TEST_F(MassSpringRepresentationTests, FallingTest)
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
 		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
 
+	m.initialize(std::make_shared<Runtime>());
+	m.wakeUp();
+
 	// run few iterations of simulation...
 	for (int i = 0; i< 5; i++)
 	{
@@ -378,6 +384,9 @@ TEST_F(MassSpringRepresentationTests, EnergyTest)
 			m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
 			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
 
+		m.initialize(std::make_shared<Runtime>());
+		m.wakeUp();
+
 		// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
 		std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
 		m.setIsGravityEnabled(false);
@@ -413,6 +422,9 @@ TEST_F(MassSpringRepresentationTests, EnergyTest)
 			m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
 			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
+		m.initialize(std::make_shared<Runtime>());
+		m.wakeUp();
+
 		// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
 		std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
 		m.setIsGravityEnabled(false);
@@ -447,6 +459,9 @@ TEST_F(MassSpringRepresentationTests, EnergyTest)
 		MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_boundaryConditions, m_totalMass,
 			m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
 			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
+
+		m.initialize(std::make_shared<Runtime>());
+		m.wakeUp();
 
 		// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
 		std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
@@ -488,6 +503,9 @@ TEST_F(MassSpringRepresentationTests, ApplyCorrectionTest)
 	MockMassSpring m("MassSpring", m_poseIdentity, m_numNodes, m_boundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
 		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
+
+	m.initialize(std::make_shared<Runtime>());
+	m.wakeUp();
 
 	SurgSim::Math::Vector dv;
 	dv.resize(m.getNumDof());

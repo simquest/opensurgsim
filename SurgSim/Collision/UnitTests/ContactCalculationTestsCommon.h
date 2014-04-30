@@ -76,8 +76,8 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 												  const std::list<std::shared_ptr<Contact>>& contactsList);
 
 /// Function that checks if two given list of contacts are the same.
-/// \param expected The expected contact lists.
-/// \param contactsList The list of given contact list.
+/// \param expectedContacts The expected contact lists.
+/// \param calculatedContacts The list of given contact list.
 void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expectedContacts,
 							  const std::list<std::shared_ptr<Contact>>& calculatedContacts);
 

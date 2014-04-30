@@ -15,7 +15,7 @@
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
-#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
 
@@ -46,7 +46,7 @@ void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
 	else
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"KeyboardTogglesGraphicsBehavior::registerKey(): Can not register component " << component->getName() << 
+			"KeyboardTogglesGraphicsBehavior::registerKey(): Can not register component " << component->getName() <<
 			". It's not a SurgSim::Graphics::Representation.\n";
 	}
 }

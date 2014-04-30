@@ -16,6 +16,10 @@
 #ifndef SURGSIM_DATASTRUCTURES_BUFFEREDVALUE_INL_H
 #define SURGSIM_DATASTRUCTURES_BUFFEREDVALUE_INL_H
 
+namespace SurgSim
+{
+namespace DataStructures
+{
 
 template <class T>
 BufferedValue<T>::BufferedValue() :
@@ -198,5 +202,8 @@ T& ReadWriteAccessor<T>::operator*()
 {
 	return *m_directPointer;
 }
+
+} // DataStructures
+} // SurgSim
 
 #endif

@@ -24,7 +24,6 @@
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -81,7 +80,7 @@ public:
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
 	/// Set loading filename
-	/// \param filename	The filename to load
+	/// \param fileName	The filename to load
 	/// \note The mesh will be loaded right after the file name is set,
 	///       if 'fileName' indicates a file containing a valid mesh.
 	/// \note If the valid file contains an empty mesh, i.e. no vertex is specified in that file,

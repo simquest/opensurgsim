@@ -60,23 +60,6 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const;
 
-	/// Set the initial pose of the representation
-	/// \param	pose	The initial pose
-	/// \note	This will reset initial, current, and final poses all to the new initial pose.
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose);
-
-	/// Get the initial pose of the representation
-	/// \return	The initial pose
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const;
-
-	/// Sets the current pose of the representation
-	/// \param	pose	Rigid transformation that describes the current pose of the representation
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose);
-
-	/// Gets the current pose of the representation
-	/// \return	Rigid transformation that describes the current pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const;
-
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
 	/// \return	True if set successfully, otherwise false
@@ -120,10 +103,6 @@ protected:
 	/// Transform used to pose the representation
 	osg::ref_ptr<osg::PositionAttitudeTransform> m_transform;
 
-	/// Initial pose of the representation
-	SurgSim::Math::RigidTransform3d m_initialPose;
-	/// Current pose of the representation
-	SurgSim::Math::RigidTransform3d m_pose;
 	/// Material defining the visual appearance of the representation
 	std::shared_ptr<OsgMaterial> m_material;
 

@@ -69,10 +69,6 @@ public:
 	/// \param [out]	height	If non-null, the height. Throws exception otherwise.
 	virtual void getSize(double* width, double* height) const override;
 
-	/// Sets the current pose of the representation
-	/// \param	pose	Rigid transformation that describes the current pose of the representation
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
-
 	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
 	/// this will use the uniform name "diffuseMap" for the uniform in this operation. This can be accomplished
 	/// from the outside as well by using the material.
@@ -92,6 +88,9 @@ public:
 	/// \param	texture	The texture to be set on the quad.
 	/// \return	true if it succeeds, false if it fails.
 	bool setTexture(std::shared_ptr<OsgTextureRectangle> texture);
+
+protected:
+	virtual void doUpdate(double dt) override;
 
 private:
 

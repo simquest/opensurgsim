@@ -172,7 +172,6 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// The point-cloud for visualizing the nodes of the finite element model
 	auto pointCloud
 		= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>("point cloud");
-	pointCloud->setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
 	pointCloud->setColor(SurgSim::Math::Vector4d(0.2, 0.2, 1.0, 1.0));
 	pointCloud->setPointSize(3.0f);
 	pointCloud->setVisible(true);
@@ -189,31 +188,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	return sceneElement;
 }
 
-struct Fem3DMeshRenderTest : public RenderTests
-{
-
-	void runTest(double miliseconds)
-	{
-		/// Run the thread
-		runtime->start();
-		boost::this_thread::sleep(boost::posix_time::milliseconds(miliseconds));
-	}
-
-	virtual void SetUp() override
-	{
-		RenderTests::SetUp();
-
-		viewElement->enableManipulator(true);
-		viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero());
-
-		auto axes = std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes");
-		axes->setSize(1.0);
-		viewElement->addComponent(axes);
-	}
-
-};
-
-TEST_F(Fem3DMeshRenderTest, MeshRenderTest)
+TEST_F(RenderTests, MeshRenderTest)
 {
 	auto data = runtime->getApplicationData();
 	auto filename = data->findFile("Fem3DMeshRenderTest/wound_deformable.ply");
@@ -222,7 +197,7 @@ TEST_F(Fem3DMeshRenderTest, MeshRenderTest)
 
 	runtime->getScene()->addSceneElement(fem);
 
-	runTest(50000);
+	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 5000.0);
 }
 
 }

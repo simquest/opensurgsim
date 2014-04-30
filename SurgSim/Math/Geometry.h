@@ -57,71 +57,6 @@ static const double ScalarEpsilon = 1e-10;
 
 }
 
-/// Determine the parameter that is the smallest of the five and returns its numerical index in the order as they
-/// appear in the list of parameters.
-/// \tparam T Floating point type of the calculation, can usually be inferred.
-/// \param a,b,c Values that are searched for the minimum.
-/// \return [0-2] with then number being equivalent to the place of the parameter with the smallest value
-template <class T> inline
-size_t indexOfMinimum(T a, T b, T c)
-{
-	int index = 0;
-	if (b < a)
-	{
-		index = 1;
-	}
-	else
-	{
-		b = a;
-	}
-	if (c < b)
-	{
-		index = 2;
-	}
-	return index;
-}
-
-/// Determine the parameter that is the smallest of the five and returns its numerical index in the order as they
-/// appear in the list of parameters. If you need tests with more parameters, think about using
-/// boost::minmax for example.
-/// \tparam T Floating point type of the calculation, can usually be inferred.
-/// \param a,b,c,d,e Values that are searched for the minimum.
-/// \return [0-4] with then number being equivalent to the place of the parameter with the smallest value
-template <class T> inline
-size_t indexOfMinimum(T a, T b, T c, T d, T e)
-{
-	int index = 0;
-	if (b < a)
-	{
-		index = 1;
-	}
-	else
-	{
-		b = a;
-	}
-	if (c < b)
-	{
-		index = 2;
-	}
-	else
-	{
-		c = b;
-	}
-	if (d < c)
-	{
-		index = 3;
-	}
-	else
-	{
-		d = c;
-	}
-	if (e < d)
-	{
-		index = 4;
-	}
-	return index;
-}
-
 /// Calculate the barycentric coordinates of a point with respect to a triangle.
 /// \pre The normal must be unit length
 /// \pre The triangle vertices must be in counter clockwise order in respect to the normal
@@ -1134,9 +1069,7 @@ T distanceTrianglePlane(
 	Eigen::Matrix<T, 3, 1, MOpt>* closestPointTriangle,
 	Eigen::Matrix<T, 3, 1, MOpt>* planeProjectionPoint)
 {
-	T dist0 = n.dot(tv0) + d;
-	T dist1 = n.dot(tv1) + d;
-	T dist2 = n.dot(tv2) + d;
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> distances(n.dot(tv0) + d, n.dot(tv1) + d, n.dot(tv2) + d);
 	Eigen::Matrix<T, 3, 1, MOpt> t01 = tv1-tv0;
 	Eigen::Matrix<T, 3, 1, MOpt> t02 = tv2-tv0;
 	Eigen::Matrix<T, 3, 1, MOpt> t12 = tv2-tv1;
@@ -1150,33 +1083,31 @@ T distanceTrianglePlane(
 	if (std::abs(n.dot(t01)) <= Geometry::AngularEpsilon && std::abs(n.dot(t02)) <= Geometry::AngularEpsilon)
 	{
 		*closestPointTriangle = (tv0 + tv1 + tv2) / T(3);
-		*planeProjectionPoint = *closestPointTriangle - n*dist0;
-		return dist0;
+		*planeProjectionPoint = *closestPointTriangle - n * distances[0];
+		return distances[0];
 	}
 
 	// Is there an intersection
-	if ((dist0 <= Geometry::DistanceEpsilon || dist1 <= Geometry::DistanceEpsilon ||
-		 dist2 <= Geometry::DistanceEpsilon) &&
-		(dist0 > Geometry::DistanceEpsilon || dist1 > Geometry::DistanceEpsilon ||
-		 dist2 > Geometry::DistanceEpsilon))
+	if ((distances.array() < -Geometry::DistanceEpsilon).any() &&
+		(distances.array() > Geometry::DistanceEpsilon).any())
 	{
-		if (dist0 * dist1 < 0)
+		if (distances[0] * distances[1] < 0)
 		{
-			*closestPointTriangle = tv0 + (-d-n.dot(tv0))/n.dot(t01) * t01;
-			if (dist0 * dist2 < 0)
+			*closestPointTriangle = tv0 + (-d - n.dot(tv0)) / n.dot(t01) * t01;
+			if (distances[0] * distances[2] < 0)
 			{
-				*planeProjectionPoint = tv0 + (-d-n.dot(tv0))/n.dot(t02) * t02;
+				*planeProjectionPoint = tv0 + (-d - n.dot(tv0)) / n.dot(t02) * t02;
 			}
 			else
 			{
 				Eigen::Matrix<T, 3, 1, MOpt> t12 = tv2-tv1;
-				*planeProjectionPoint = tv1 + (-d-n.dot(tv1))/n.dot(t12) * t12;
+				*planeProjectionPoint = tv1 + (-d - n.dot(tv1)) / n.dot(t12) * t12;
 			}
 		}
 		else
 		{
-			*closestPointTriangle = tv0 + (-d-n.dot(tv0))/n.dot(t02) * t02;
-			*planeProjectionPoint = tv1 + (-d-n.dot(tv1))/n.dot(t12) * t12;
+			*closestPointTriangle = tv0 + (-d - n.dot(tv0)) / n.dot(t02) * t02;
+			*planeProjectionPoint = tv1 + (-d - n.dot(tv1)) / n.dot(t12) * t12;
 		}
 
 		// Find the midpoint, take this out to return the segment endpoints
@@ -1184,21 +1115,22 @@ T distanceTrianglePlane(
 		return 0;
 	}
 
-	int index = indexOfMinimum(std::abs(dist0), std::abs(dist1), std::abs(dist2));
+	int index;
+	distances.cwiseAbs().minCoeff(&index);
 	switch (index)
 	{
-	case 0: //dist0 is closest
+	case 0: //distances[0] is closest
 		*closestPointTriangle = tv0;
-		*planeProjectionPoint = tv0 - n*dist0;
-		return dist0;
-	case 1: //dist1 is closest
+		*planeProjectionPoint = tv0 - n * distances[0];
+		return distances[0];
+	case 1: //distances[1] is closest
 		*closestPointTriangle = tv1;
-		*planeProjectionPoint = tv1 - n*dist1;
-		return dist1;
-	case 2: //dist2 is closest
+		*planeProjectionPoint = tv1 - n * distances[1];
+		return distances[1];
+	case 2: //distances[2] is closest
 		*closestPointTriangle = tv2;
-		*planeProjectionPoint = tv2 - n*dist2;
-		return dist2;
+		*planeProjectionPoint = tv2 - n * distances[2];
+		return distances[2];
 	}
 
 	return std::numeric_limits<T>::quiet_NaN();
@@ -1346,7 +1278,11 @@ T distanceSegmentTriangle(
 	{
 		dstPtTri1 = std::numeric_limits<T>::max();
 	}
-	switch (indexOfMinimum(dst01, dst02, dst12, dstPtTri0, dstPtTri1))
+
+	int minIndex;
+	Eigen::Matrix<double, 5, 1> distances;
+	(distances << dst01, dst02, dst12, dstPtTri0, dstPtTri1).finished().minCoeff(&minIndex);
+	switch (minIndex)
 	{
 	case 0:
 		*segmentPoint = segColPt01;

@@ -16,6 +16,8 @@
 #ifndef SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 
+#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -25,6 +27,7 @@
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Math::Matrix;
@@ -43,41 +46,22 @@ protected:
 	int m_postUpdateCount;
 
 public:
-	MockRepresentation() :
-		Representation("MockRepresentation"), m_preUpdateCount(0), m_updateCount(0), m_postUpdateCount(0)
+	explicit MockRepresentation(const std::string& name = "MockRepresention") :
+		Representation(name),
+		m_preUpdateCount(0),
+		m_updateCount(0),
+		m_postUpdateCount(0)
 	{}
 
 	virtual ~MockRepresentation()
 	{}
 
+	SURGSIM_CLASSNAME(SurgSim::Physics::MockRepresentation);
+
 	virtual RepresentationType getType() const override
 	{
 		return REPRESENTATION_TYPE_FIXED;
 	}
-
-	/// Set the initial pose of the representation
-	/// \param pose The initial pose
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-	{}
-
-	/// Get the initial pose of the representation
-	/// \return The initial pose
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
-	{ static SurgSim::Math::RigidTransform3d pose; return pose; }
-
-	/// Set the pose of the representation
-	/// \param pose The pose to set the representation to
-	/// \note This requests the representation to set its pose to the given pose
-	/// \note In physics, the actual pose of the representation might not be exactly the requested one
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose)
-	{}
-
-	/// Get the pose of the representation
-	/// \return The pose of this representation
-	/// \note getPose may or may not return the pose last sets by setPose
-	/// \note In physics, the simulation will drive the pose internally
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const
-	{ static SurgSim::Math::RigidTransform3d pose; return pose; }
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
@@ -108,6 +92,34 @@ public:
 
 	int getPostUpdateCount() const
 	{ return m_postUpdateCount; }
+};
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::MockRepresentation);
+}
+
+class MockRigidRepresentation : public RigidRepresentation
+{
+public:
+	MockRigidRepresentation() :
+		RigidRepresentation("MockRigidRepresentation")
+	{
+	}
+
+	// Non constand access to the states
+	RigidRepresentationState& getInitialState()
+	{
+		return m_initialState;
+	}
+	RigidRepresentationState& getCurrentState()
+	{
+		return m_currentState;
+	}
+	RigidRepresentationState& getPreviousState()
+	{
+		return m_previousState;
+	}
 };
 
 class MockFemElement : public FemElement

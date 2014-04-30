@@ -14,9 +14,13 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+
 #include "SurgSim/Framework/Accessible.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 
 // We need ALL of the math types

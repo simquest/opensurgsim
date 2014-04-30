@@ -117,7 +117,7 @@ protected:
 		m_rigid = std::make_shared<RigidRepresentation>("Rigid");
 		m_rigid->setIsActive(true);
 		m_rigid->setIsGravityEnabled(false);
-		m_rigid->setInitialPose(m_poseRigid);
+		m_rigid->setLocalPose(m_poseRigid);
 		{
 			RigidRepresentationParameters param;
 			param.setDensity(1000.0);
@@ -131,7 +131,7 @@ protected:
 		m_fixed = std::make_shared<FixedRepresentation>("Fixed");
 		m_fixed->setIsActive(true);
 		m_fixed->setIsGravityEnabled(false);
-		m_fixed->setInitialPose(m_poseFixed);
+		m_fixed->setLocalPose(m_poseFixed);
 		m_numDof += m_fixed->getNumDof();
 
 		std::shared_ptr<FixedRepresentationLocalization> locFixedPlane;
