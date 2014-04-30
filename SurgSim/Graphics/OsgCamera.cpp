@@ -57,6 +57,9 @@ const osg::Camera::RenderOrder RenderOrderEnums[3] =
 	osg::Camera::NESTED_RENDER,
 	osg::Camera::POST_RENDER
 };
+
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgCamera);
+
 };
 
 

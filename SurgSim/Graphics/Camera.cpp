@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Graphics/Camera.h"
+#include "SurgSim/Math/MathConvert.h"
 
 namespace SurgSim
 {
@@ -22,8 +23,10 @@ namespace Graphics
 
 Camera::Camera(const std::string& name) : Representation(name)
 {
-	SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, ProjectionMatrix,
-							getProjectionMatrix, setProjectionMatrix);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, SurgSim::Math::Matrix44d, ProjectionMatrix,
+									  getProjectionMatrix, setProjectionMatrix);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, std::string, RenderGroupReference,
+									  getRenderGroupReference, setRenderGroupReference);
 
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44d, ViewMatrix, getViewMatrix);
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatViewMatrix, getViewMatrix);

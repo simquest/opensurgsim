@@ -21,6 +21,8 @@
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/Texture.h"
+#include "SurgSim/Framework/Macros.h"
+
 
 #include <osg/Camera>
 #include <osg/Switch>
@@ -53,15 +55,15 @@ public:
 	/// Z Near of 0.01, and Z Far of 10.0.
 	explicit OsgCamera(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgCamera);
+
 	virtual bool setGroup(std::shared_ptr<Group> group) override;
 
 	virtual void setVisible(bool visible) override;
 
 	virtual bool isVisible() const override;
 
-
 	virtual SurgSim::Math::Matrix44d getViewMatrix() const;
-
 
 	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const;
 
