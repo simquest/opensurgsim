@@ -68,6 +68,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
 	RigidRepresentationParameters.cpp
+	RigidRepresentationState.cpp
 	SolveMlcp.cpp
 	UpdateCollisionRepresentations.cpp
 	VirtualToolCoupler.cpp
