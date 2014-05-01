@@ -57,54 +57,36 @@ const SurgSim::Math::Aabbd& AabbTree::getAabb() const
 	return m_typedRoot->getAabb();
 }
 
-// Functions associated with spatialJoin
-
-static void spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
-						std::shared_ptr<AabbTreeNode> rhsParent,
-						std::vector<TreeNodePairType>* result);
-
-std::vector<TreeNodePairType> spatialJoin(std::shared_ptr<AabbTree> lhs, std::shared_ptr<AabbTree> rhs)
+std::list<AabbTree::TreeNodePairType> AabbTree::spatialJoin(const AabbTree& otherTree) const
 {
-	std::vector<TreeNodePairType> result;
+	std::list<TreeNodePairType> result;
 
-	spatialJoin(std::static_pointer_cast<AabbTreeNode>(lhs->getRoot()),
-				std::static_pointer_cast<AabbTreeNode>(rhs->getRoot()),
+	spatialJoin(std::static_pointer_cast<AabbTreeNode>(getRoot()),
+				std::static_pointer_cast<AabbTreeNode>(otherTree.getRoot()),
 				&result);
 
 	return result;
 }
 
-static void spatialJoinInnerLoop(std::shared_ptr<AabbTreeNode> lhs,
-								 std::shared_ptr<AabbTreeNode> rhs,
-								 std::vector<TreeNodePairType>* result)
+void AabbTree::spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
+						   std::shared_ptr<AabbTreeNode> rhsParent,
+						   std::list<TreeNodePairType>* result)
 {
-	if (SurgSim::Math::doAabbIntersect(lhs->getAabb(), rhs->getAabb()))
+	if (!SurgSim::Math::doAabbIntersect(lhsParent->getAabb(), rhsParent->getAabb()))
 	{
-		if ((lhs->getNumChildren() == 0) && (rhs->getNumChildren() == 0))
-		{
-			result->emplace_back(lhs, rhs);
-		}
-		else
-		{
-			spatialJoin(lhs, rhs, result);
-		}
+		return;
 	}
-}
 
-static void spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
-						std::shared_ptr<AabbTreeNode> rhsParent,
-						std::vector<TreeNodePairType>* result)
-{
 	if ((lhsParent->getNumChildren() == 0) && (rhsParent->getNumChildren() == 0))
 	{
-		spatialJoinInnerLoop(lhsParent, rhsParent, result);
+		result->emplace_back(lhsParent, rhsParent);
 	}
 	else if (lhsParent->getNumChildren() == 0)
 	{
 		for (size_t j = 0; j < rhsParent->getNumChildren(); j++)
 		{
 			auto rhs = std::static_pointer_cast<AabbTreeNode>(rhsParent->getChild(j));
-			spatialJoinInnerLoop(lhsParent, rhs, result);
+			spatialJoin(lhsParent, rhs, result);
 		}
 	}
 	else if (rhsParent->getNumChildren() == 0)
@@ -112,7 +94,7 @@ static void spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
 		for (size_t i = 0; i < lhsParent->getNumChildren(); i++)
 		{
 			auto lhs = std::static_pointer_cast<AabbTreeNode>(lhsParent->getChild(i));
-			spatialJoinInnerLoop(lhs, rhsParent, result);
+			spatialJoin(lhs, rhsParent, result);
 		}
 	}
 	else
@@ -124,7 +106,7 @@ static void spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
 			for (size_t j = 0; j < rhsParent->getNumChildren(); j++)
 			{
 				auto rhs = std::static_pointer_cast<AabbTreeNode>(rhsParent->getChild(j));
-				spatialJoinInnerLoop(lhs, rhs, result);
+				spatialJoin(lhs, rhs, result);
 			}
 		}
 	}

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_AABBTREE_H
 #define SURGSIM_DATASTRUCTURES_AABBTREE_H
 
-#include <vector>
+#include <list>
 
 #include "SurgSim/DataStructures/Tree.h"
 
@@ -59,6 +59,22 @@ public:
 
 	const SurgSim::Math::Aabbd& getAabb() const;
 
+	/// Type indicating a relationship between two AabbTreeNodes
+	typedef std::pair<std::shared_ptr<AabbTreeNode>, std::shared_ptr<AabbTreeNode>> TreeNodePairType;
+
+	/// Query to find all pairs of intersecting nodes between two aabb r-trees.
+	/// \param otherTree The other tree to compare against
+	/// return The list of all pairs of intersecting nodes
+	std::list<TreeNodePairType> spatialJoin(const AabbTree& otherTree) const;
+
+	/// Query to find all pairs of intersecting nodes between two aabb r-trees.
+	/// \param lhsParent root node of the first tree
+	/// \param rhsParent root node of the second tree
+	/// \param result the list of all pairs of intersecting nodes
+	static void spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
+							std::shared_ptr<AabbTreeNode> rhsParent,
+							std::list<TreeNodePairType>* result);
+
 private:
 
 	/// Number of objects in a node that will trigger a split
@@ -67,14 +83,6 @@ private:
 	/// A typed version of the root for access without typecasting
 	std::shared_ptr<AabbTreeNode> m_typedRoot;
 };
-
-typedef std::pair<std::shared_ptr<AabbTreeNode>, std::shared_ptr<AabbTreeNode>> TreeNodePairType;
-
-/// Query to find all pairs of intersecting nodes between two aabb r-trees.
-/// \param lhs The first tree to compare
-/// \param rhs The second tree to compare
-/// return The list of all pairs of intersecting nodes
-std::vector<TreeNodePairType> spatialJoin(std::shared_ptr<AabbTree> lhs, std::shared_ptr<AabbTree> rhs);
 
 }
 }

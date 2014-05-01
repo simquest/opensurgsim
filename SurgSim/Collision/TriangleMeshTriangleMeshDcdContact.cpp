@@ -55,8 +55,8 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 	std::shared_ptr<TriangleMesh> collisionMeshB =
 		std::static_pointer_cast<MeshShape>(representationMeshB->getGlobalShape())->getMesh();
 
-	std::vector<SurgSim::DataStructures::TreeNodePairType> intersectionList
-		= SurgSim::DataStructures::spatialJoin(representationMeshA->getAabbTree(), representationMeshB->getAabbTree());
+	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
+		= representationMeshA->getAabbTree()->spatialJoin(*representationMeshB->getAabbTree());
 
 	double depth = 0.0;
 	Vector3d normal;

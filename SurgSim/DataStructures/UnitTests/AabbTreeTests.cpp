@@ -210,8 +210,8 @@ public:
 };
 
 template <typename PairTypeLhs, typename PairTypeRhs>
-static typename std::vector<PairTypeLhs>::const_iterator getEquivalentPair(const std::vector<PairTypeLhs>& list,
-																		   const PairTypeRhs& item)
+static typename std::list<PairTypeLhs>::const_iterator getEquivalentPair(const std::list<PairTypeLhs>& list,
+																		 const PairTypeRhs& item)
 {
 	return std::find_if(list.cbegin(), list.cend(),
 						[&item] (const PairTypeLhs& pair)
@@ -238,7 +238,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	auto aabbA = meshA->createAabbTree();
 	auto aabbB = meshB->createAabbTree();
 
-	auto actualIntersection = spatialJoin(aabbA, aabbB);
+	auto actualIntersection = aabbA->spatialJoin(*aabbB);
 
 	TreeLeavesVisitor<SurgSim::DataStructures::AabbTreeNode> leavesVisitorA;
 	std::static_pointer_cast<SurgSim::DataStructures::AabbTreeNode>(aabbA->getRoot())->accept(&leavesVisitorA);
@@ -248,7 +248,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	std::static_pointer_cast<SurgSim::DataStructures::AabbTreeNode>(aabbB->getRoot())->accept(&leavesVisitorB);
 	auto& leavesB = leavesVisitorB.leaves;
 
-	std::vector<std::pair<SurgSim::DataStructures::AabbTreeNode*, SurgSim::DataStructures::AabbTreeNode*>>
+	std::list<std::pair<SurgSim::DataStructures::AabbTreeNode*, SurgSim::DataStructures::AabbTreeNode*>>
 		expectedIntersection;
 	for (auto leafA = leavesA.begin(); leafA != leavesA.end(); ++leafA)
 	{
