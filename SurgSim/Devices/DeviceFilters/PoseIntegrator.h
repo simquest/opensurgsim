@@ -81,6 +81,13 @@ private:
 
 	/// The expected update rate for the thread, in Hz.
 	double m_rate;
+
+	///@{
+	/// The indices into the DataGroups.
+	int m_poseIndex;
+	int m_linearVelocityIndex;
+	int m_angularVelocityIndex;
+	///@}
 };
 
 

@@ -28,7 +28,10 @@ namespace Device
 PoseIntegrator::PoseIntegrator(const std::string& name) :
 	CommonDevice(name),
 	m_poseResult(PoseType::Identity()),
-	m_rate(1.0)
+	m_rate(1.0),
+	m_poseIndex(-1),
+	m_linearVelocityIndex(-1),
+	m_angularVelocityIndex(-1)
 {
 }
 
@@ -57,6 +60,10 @@ bool PoseIntegrator::isInitialized() const
 
 void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
+	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::Names::POSE);
+	m_linearVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
+	m_angularVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
+
 	getInitialInputData() = inputData;
 	getInputData() = inputData;
 
@@ -70,26 +77,28 @@ void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::D
 void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
 	getInputData() = inputData;
-	SurgSim::Math::RigidTransform3d pose;
-	if (inputData.poses().get(SurgSim::DataStructures::Names::POSE, &pose))
+
+	if (m_poseIndex >= 0)
 	{
-		// Before updating the current pose, use it to calculate the angular velocity.
-		Vector3d unused;
-		if (inputData.vectors().get(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, &unused))
+		SurgSim::Math::RigidTransform3d pose;
+		if (inputData.poses().get(m_poseIndex, &pose))
 		{
-			Vector3d rotationAxis;
-			double angle;
-			SurgSim::Math::computeAngleAndAxis(pose.rotation(), &angle, &rotationAxis);
-			rotationAxis = m_poseResult.rotation() * rotationAxis; // rotate the axis into global space
-			getInputData().vectors().set(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, rotationAxis *
-				angle * m_rate);
-		}
+			// Before updating the current pose, use it to calculate the angular velocity.
+			if (m_angularVelocityIndex >= 0)
+			{
+				Vector3d rotationAxis;
+				double angle;
+				SurgSim::Math::computeAngleAndAxis(pose.rotation(), &angle, &rotationAxis);
+				rotationAxis = m_poseResult.rotation() * rotationAxis; // rotate the axis into global space
+				getInputData().vectors().set(m_angularVelocityIndex, rotationAxis * angle * m_rate);
+			}
 
-		getInputData().poses().set(SurgSim::DataStructures::Names::POSE, integrate(pose));
+			getInputData().poses().set(m_poseIndex, integrate(pose));
 
-		if (inputData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY, &unused))
-		{
-			getInputData().vectors().set(SurgSim::DataStructures::Names::LINEAR_VELOCITY, pose.translation() * m_rate);
+			if (m_linearVelocityIndex >= 0)
+			{
+				getInputData().vectors().set(m_linearVelocityIndex, pose.translation() * m_rate);
+			}
 		}
 	}
 	pushInput();
