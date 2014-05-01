@@ -77,7 +77,7 @@ if(MSVC)
 	#  But this works, and gets put in the proper place in the project.]
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=2")
 	# Enable parallel builds:
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /WX")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")  # is this needed?
 	set(CMAKE_DEBUG_POSTFIX "d")
 
