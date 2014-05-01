@@ -13,17 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-
 #include <string>
 
+#include <gtest/gtest.h>
 #include <yaml-cpp/yaml.h>
 
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
-#include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Physics/PhysicsConvert.h"
 
 using SurgSim::Math::SphereShape;
 
@@ -87,7 +87,7 @@ public:
 
 TEST_F(RigidRepresentationParametersTest, ConstructorTest)
 {
-	ASSERT_NO_THROW( {RigidRepresentationParameters rigidRepresentationParam;});
+	ASSERT_NO_THROW(RigidRepresentationParameters rigidRepresentationParam);
 }
 
 TEST_F(RigidRepresentationParametersTest, DefaultValueTest)
@@ -97,15 +97,15 @@ TEST_F(RigidRepresentationParametersTest, DefaultValueTest)
 		std::make_shared<RigidRepresentationParameters>();
 
 	// Mass density [default = 0]
-	EXPECT_EQ(0.0, rigidRepresentationParam->getDensity());
+	EXPECT_NEAR(0.0, rigidRepresentationParam->getDensity(), epsilon);
 	// Mass [default = qNaA]
 	EXPECT_FALSE(SurgSim::Math::isValid(rigidRepresentationParam->getMass()));
 	// Inertia 3x3 symmetric matrix [default = qNaN values]
 	EXPECT_FALSE(SurgSim::Math::isValid(rigidRepresentationParam->getLocalInertia()));
 	// Linear damping [default = 0]
-	EXPECT_EQ(0.0, rigidRepresentationParam->getLinearDamping());
+	EXPECT_NEAR(0.0, rigidRepresentationParam->getLinearDamping(), epsilon);
 	// Angular damping [default = 0]
-	EXPECT_EQ(0.0, rigidRepresentationParam->getAngularDamping());
+	EXPECT_NEAR(0.0, rigidRepresentationParam->getAngularDamping(), epsilon);
 	// Mesh [default = nullptr]
 	EXPECT_EQ(0u, rigidRepresentationParam->getShapes().size());
 	// Shape [default = nullptr]
@@ -125,15 +125,15 @@ TEST_F(RigidRepresentationParametersTest, SetGetTest)
 
 	// Mass density
 	rigidRepresentationParam->setDensity(m_density);
-	EXPECT_EQ(m_density, rigidRepresentationParam->getDensity());
+	EXPECT_NEAR(m_density, rigidRepresentationParam->getDensity(), epsilon);
 	rigidRepresentationParam->setDensity(0.0);
-	EXPECT_EQ(0.0, rigidRepresentationParam->getDensity());
+	EXPECT_NEAR(0.0, rigidRepresentationParam->getDensity(), epsilon);
 
 	// Mass
 	rigidRepresentationParam->setMass(m_mass);
-	EXPECT_EQ(m_mass, rigidRepresentationParam->getMass());
+	EXPECT_NEAR(m_mass, rigidRepresentationParam->getMass(), epsilon);
 	rigidRepresentationParam->setMass(0.0);
-	EXPECT_EQ(0.0, rigidRepresentationParam->getMass());
+	EXPECT_NEAR(0.0, rigidRepresentationParam->getMass(), epsilon);
 
 	// isValid
 	rigidRepresentationParam->setMass(m_mass);
@@ -146,21 +146,21 @@ TEST_F(RigidRepresentationParametersTest, SetGetTest)
 
 	// Inertia 3x3 symmetric matrix
 	rigidRepresentationParam->setLocalInertia(m_inertia);
-	EXPECT_EQ(m_inertia, rigidRepresentationParam->getLocalInertia());
+	EXPECT_TRUE(m_inertia.isApprox(rigidRepresentationParam->getLocalInertia()));
 	rigidRepresentationParam->setLocalInertia(m_id33);
-	EXPECT_EQ(m_id33, rigidRepresentationParam->getLocalInertia());
+	EXPECT_TRUE(m_id33.isApprox(rigidRepresentationParam->getLocalInertia()));
 
 	// Linear damping
 	rigidRepresentationParam->setLinearDamping(5.5);
-	EXPECT_EQ(5.5, rigidRepresentationParam->getLinearDamping());
+	EXPECT_NEAR(5.5, rigidRepresentationParam->getLinearDamping(), epsilon);
 	rigidRepresentationParam->setLinearDamping(0.0);
-	EXPECT_EQ(0.0, rigidRepresentationParam->getLinearDamping());
+	EXPECT_NEAR(0.0, rigidRepresentationParam->getLinearDamping(), epsilon);
 
 	// Angular damping
 	rigidRepresentationParam->setAngularDamping(5.5);
-	EXPECT_EQ(5.5, rigidRepresentationParam->getAngularDamping());
+	EXPECT_NEAR(5.5, rigidRepresentationParam->getAngularDamping(), epsilon);
 	rigidRepresentationParam->setAngularDamping(0.0);
-	EXPECT_EQ(0.0, rigidRepresentationParam->getAngularDamping());
+	EXPECT_NEAR(0.0, rigidRepresentationParam->getAngularDamping(), epsilon);
 
 	// Shape
 	rigidRepresentationParam->setShapeUsedForMassInertia(m_sphere);
@@ -274,14 +274,14 @@ TEST_F(RigidRepresentationParametersTest, SerializationTest)
 	RigidRepresentationParameters oldParameters;
 
 	{
-		SCOPED_TRACE("Encode with shape for mass inertia not set");
+		SCOPED_TRACE("Encode with shape for mass inertia not set should fail");
 
 		YAML::Node node;
 		EXPECT_ANY_THROW(node = oldParameters.encode());
 	}
 
 	{
-		SCOPED_TRACE("Encode with shape for mass inertia set");
+		SCOPED_TRACE("Encode with shape for mass inertia set should succeed");
 
 		std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SphereShape>(1.0);
 		oldParameters.setValue("Density", 0.1);
@@ -290,11 +290,10 @@ TEST_F(RigidRepresentationParametersTest, SerializationTest)
 		oldParameters.setValue("ShapeUsedForMassInertia", shape);
 
 		YAML::Node node;
-		ASSERT_NO_THROW(node = oldParameters.encode());
-		EXPECT_EQ(4u, node.size());
+		ASSERT_NO_THROW(node = YAML::convert<SurgSim::Physics::RigidRepresentationParameters>::encode(oldParameters));
+		EXPECT_EQ(1u, node.size());
 
-		RigidRepresentationParameters newParameters;
-		ASSERT_NO_THROW(newParameters.decode(node));
+		RigidRepresentationParameters newParameters = node.as<SurgSim::Physics::RigidRepresentationParameters>();
 		EXPECT_NEAR(0.1, newParameters.getValue<double>("Density"), epsilon);
 		EXPECT_NEAR(0.2, newParameters.getValue<double>("LinearDamping"), epsilon);
 		EXPECT_NEAR(0.3, newParameters.getValue<double>("AngularDamping"), epsilon);

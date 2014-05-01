@@ -43,6 +43,41 @@ RigidRepresentationParameters::RigidRepresentationParameters() :
 									  ShapeUsedForMassInertia, getShapeUsedForMassInertia, setShapeUsedForMassInertia);
 }
 
+RigidRepresentationParameters::RigidRepresentationParameters(const RigidRepresentationParameters& rhs) :
+	m_rho(rhs.m_rho),
+	m_mass(rhs.m_mass),
+	m_massCenter(rhs.m_massCenter),
+	m_localInertia(rhs.m_localInertia),
+	m_linearDamping(rhs.m_linearDamping),
+	m_angularDamping(rhs.m_angularDamping),
+	m_shapes(rhs.m_shapes),
+	m_shapeForMassInertia(rhs.m_shapeForMassInertia),
+	m_isValid(rhs.m_isValid)
+{
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double, Density, getDensity, setDensity);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double,
+		LinearDamping, getLinearDamping, setLinearDamping);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double,
+		AngularDamping, getAngularDamping, setAngularDamping);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, std::shared_ptr<SurgSim::Math::Shape>,
+		ShapeUsedForMassInertia, getShapeUsedForMassInertia, setShapeUsedForMassInertia);
+}
+
+RigidRepresentationParameters& RigidRepresentationParameters::operator=(const RigidRepresentationParameters& rhs)
+{
+	m_rho = rhs.m_rho;
+	m_mass = rhs.m_mass;
+	m_massCenter = rhs.m_massCenter;
+	m_localInertia = rhs.m_localInertia;
+	m_linearDamping = rhs.m_linearDamping;
+	m_angularDamping = rhs.m_angularDamping;
+	m_shapes = rhs.m_shapes;
+	m_shapeForMassInertia = rhs.m_shapeForMassInertia;
+	m_isValid = rhs.m_isValid;
+
+	return *this;
+}
+
 RigidRepresentationParameters::~RigidRepresentationParameters()
 {
 }
@@ -209,5 +244,6 @@ void RigidRepresentationParameters::updateProperties()
 		m_isValid = checkValidity();
 	}
 }
+
 }; // namespace Physics
 }; // namespace SurgSim

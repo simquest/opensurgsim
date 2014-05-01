@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
 
 #include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -52,8 +53,19 @@ public:
 	/// Default constructor
 	RigidRepresentationParameters();
 
+	/// Copy Constructor
+	/// \param rhs Right hand side RigidRepresentationParameters used to initialize a new RigidRepresentationParameters
+	RigidRepresentationParameters(const RigidRepresentationParameters& rhs);
+
+	/// Copy assignment
+	/// \param rhs Right hand side RigidRepresentationParameters from which data are copied.
+	/// \note 'm_functors' in base class Accessible is NOT copied.
+	RigidRepresentationParameters& operator=(const RigidRepresentationParameters& rhs);
+
 	/// Destructor
 	virtual ~RigidRepresentationParameters();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentationParameters);
 
 	/// Comparison operator
 	/// \param rhs A RigidRepresentationParameters to compare it to
