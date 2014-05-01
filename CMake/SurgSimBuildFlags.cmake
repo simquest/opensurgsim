@@ -34,7 +34,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOSS_DEBUG")
 # G++ (C++ compilation) specific settings
 if(CMAKE_COMPILER_IS_GNUCXX)
 	# default G++ compilation flags
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
 
 	# Enable support for C++0x/C++11 for G++ if available
 	include(CheckCXXCompilerFlag)
