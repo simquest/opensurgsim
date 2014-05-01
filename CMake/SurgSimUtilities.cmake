@@ -132,6 +132,7 @@ macro(surgsim_copy_to_target_directory_for_release TARGET)
 		"${TARGET}" ${ARGN})
 endmacro()
 
+option(SURGSIM_RUN_TEST_WITHIN_BUILD "This exectutes the tests directly from the chosen build system." OFF)
 # Build the unit test executable.
 # Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS, LIBS, UNIT_TEST_SHARED_LIBS,
 # UNIT_TEST_SHARED_RELEASE_LIBS and UNIT_TEST_SHARED_DEBUG_LIBS.
@@ -140,6 +141,14 @@ macro(surgsim_add_unit_tests TESTNAME)
 	add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
 	target_link_libraries(${TESTNAME} SurgSimTesting gmock ${LIBS})
 	add_test(NAME ${TESTNAME} COMMAND ${TESTNAME} "--gtest_output=xml")
+	
+	if(SURGSIM_RUN_TEST_WITHIN_BUILD)
+        add_custom_command(TARGET ${TESTNAME} POST_BUILD
+            COMMAND ${SURGSIM_TEST_RUN_PREFIX} $<TARGET_FILE:${TESTNAME}>
+                ${SURGSIM_TEST_RUN_SUFFIX}
+            VERBATIM)
+    endif()
+
 
 	# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
 	surgsim_copy_to_target_directory(${TESTNAME}
