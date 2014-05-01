@@ -53,6 +53,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	MassSpringRepresentationContact.cpp
 	MassSpringRepresentationLocalization.cpp
 	MlcpPhysicsProblem.cpp
+	PhysicsConvert.cpp
 	PhysicsManager.cpp
 	PhysicsManagerState.cpp
 	PostUpdate.cpp
@@ -117,6 +118,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
 	MlcpPhysicsSolution.h
+	PhysicsConvert.h
 	PhysicsManager.h
 	PhysicsManagerState.h
 	PostUpdate.h
