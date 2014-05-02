@@ -43,23 +43,35 @@ std::pair<int,int> TriangleMeshTriangleMeshDcdContact::getShapeTypes()
 	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_MESH, SurgSim::Math::SHAPE_TYPE_MESH);
 }
 
-#ifdef SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
+namespace
+{
 
-static void assertIsCoplanar(const Vector3d& triangle0, const Vector3d& triangle1, const Vector3d& triangle2,
-					   const Vector3d& point)
+/// Asserts the points are coplanar, and prints debug output on the failing condition.
+/// \param triangle0, triangle1, triangle2 the vertices of the triangle
+/// \param point the point to compare against
+/// \throws If the points are not coplanar
+void assertIsCoplanar(const Vector3d& triangle0,
+					  const Vector3d& triangle1,
+					  const Vector3d& triangle2,
+					  const Vector3d& point)
 {
 	SURGSIM_ASSERT(abs((triangle2 - triangle0).dot((triangle1 - triangle0).cross(point - triangle2)))
 				   < SurgSim::Math::Geometry::ScalarEpsilon)
-		<< "Coplanarity failed with: "
+		<< "Coplanar assertion failed with: "
 		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
 		<< ", pt " << point.transpose();
 }
 
-static void assertIsConstrained(const Vector3d& point,
-								const Vector3d& triangle0,
-								const Vector3d& triangle1,
-								const Vector3d& triangle2,
-								const Vector3d& normal)
+/// Asserts the point is inside the triangle, and prints debug output on the failing condition.
+/// \param point the point to compare against
+/// \param triangle0, triangle1, triangle2 the vertices of the triangle
+/// \param normal the unit normal of the triangle
+/// \throws If the point is not inside the triangle
+void assertIsPointInsideTriangle(const Vector3d& point,
+								 const Vector3d& triangle0,
+								 const Vector3d& triangle1,
+								 const Vector3d& triangle2,
+								 const Vector3d& normal)
 {
 	Vector3d barycentricCoordinate;
 
@@ -67,29 +79,36 @@ static void assertIsConstrained(const Vector3d& point,
 
 	SURGSIM_ASSERT(barycentricCoordinate.x() >= -SurgSim::Math::Geometry::ScalarEpsilon
 				   && barycentricCoordinate.x() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon)
-		<< "Constrained failed with: "
+		<< "Point inside triangle assertion failed with: "
 		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
 		<< ", n " << normal.transpose() << ", pt " << point.transpose();
 	SURGSIM_ASSERT(barycentricCoordinate.y() >= -SurgSim::Math::Geometry::ScalarEpsilon
 				   && barycentricCoordinate.y() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon)
-		<< "Constrained failed with: "
+		<< "Point inside triangle assertion failed with: "
 		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
 		<< ", n " << normal.transpose() << ", pt " << point.transpose();
 	SURGSIM_ASSERT(barycentricCoordinate.z() >= -SurgSim::Math::Geometry::ScalarEpsilon
 				   && barycentricCoordinate.z() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon)
-		<< "Constrained failed with: "
+		<< "Point inside triangle assertion failed with: "
 		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
 		<< ", n " << normal.transpose() << ", pt " << point.transpose();
 }
 
-static void assertIsCorrectNormalAndDepth(const Vector3d& normal,
-										  double penetrationDepth,
-										  const Vector3d& triangleA0,
-										  const Vector3d& triangleA1,
-										  const Vector3d& triangleA2,
-										  const Vector3d& triangleB0,
-										  const Vector3d& triangleB1,
-										  const Vector3d& triangleB2)
+/// Asserts the provided normal and depth minimally resolve the interpenetration of the two triangles, and prints debug
+/// output on the failing condition.
+/// \param normal the unit normal in the direction to resolve the penetration
+/// \param penetrationDepth the depth of penetration to check
+/// \param triangleA0, triangleA1, triangleA2 the vertices of the first triangle
+/// \param triangleB0, triangleB1, triangleB2 the vertices of the second triangle
+/// \throws If the normal and depth do not minimally resolve the interpenetration of the two triangles
+void assertIsCorrectNormalAndDepth(const Vector3d& normal,
+								   double penetrationDepth,
+								   const Vector3d& triangleA0,
+								   const Vector3d& triangleA1,
+								   const Vector3d& triangleA2,
+								   const Vector3d& triangleB0,
+								   const Vector3d& triangleB1,
+								   const Vector3d& triangleB2)
 {
 	Vector3d correction = normal * (penetrationDepth + 2 * SurgSim::Math::Geometry::DistanceEpsilon);
 
@@ -100,18 +119,18 @@ static void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 		&temp1, &temp2);
 
 	SURGSIM_ASSERT(expectedDistance > 0.0)
-		<< "Normal and depth failed with: "
+		<< "Correct normal and depth assertion failed with: "
 		<< "calcD " << expectedDistance << ", n " << normal.transpose() << ", d " << penetrationDepth
 		<< ", a0 " << triangleA0.transpose() << ", a1 " << triangleA1.transpose() << ", a2 " << triangleA2.transpose()
 		<< ", b0 " << triangleB0.transpose() << ", b1 " << triangleB1.transpose() << ", b2 " << triangleB2.transpose();
 	SURGSIM_ASSERT(expectedDistance <= 2.1 * SurgSim::Math::Geometry::DistanceEpsilon)
-		<< "Normal and depth failed with: "
+		<< "Correct normal and depth assertion failed with: "
 		<< "calcD " << expectedDistance << ", n " << normal.transpose() << ", d " << penetrationDepth
 		<< ", a0 " << triangleA0.transpose() << ", a1 " << triangleA1.transpose() << ", a2 " << triangleA2.transpose()
 		<< ", b0 " << triangleB0.transpose() << ", b1 " << triangleB1.transpose() << ", b2 " << triangleB2.transpose();
 }
 
-#endif // SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
+}
 
 void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
@@ -178,9 +197,9 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 				assertIsCoplanar(triangleA0InLocalB, triangleA1InLocalB, triangleA2InLocalB, penetrationPointA);
 				assertIsCoplanar(triangleB0, triangleB1, triangleB2, penetrationPointB);
 
-				assertIsConstrained(
+				assertIsPointInsideTriangle(
 					penetrationPointA, triangleA0InLocalB, triangleA1InLocalB, triangleA2InLocalB, normalAInLocalB);
-				assertIsConstrained(penetrationPointB, triangleB0, triangleB1, triangleB2, normalB);
+				assertIsPointInsideTriangle(penetrationPointB, triangleB0, triangleB1, triangleB2, normalB);
 
 				assertIsCorrectNormalAndDepth(normal, depth, triangleA0InLocalB, triangleA1InLocalB, triangleA2InLocalB,
 					triangleB0, triangleB1, triangleB2);
