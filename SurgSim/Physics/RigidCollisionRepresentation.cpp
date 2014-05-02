@@ -17,6 +17,8 @@
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Math/Shape.h"
+#include "SurgSim/Physics/RigidRepresentationBase.h"
 
 namespace
 {

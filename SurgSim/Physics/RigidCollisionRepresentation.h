@@ -19,14 +19,12 @@
 #include <memory>
 
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
+class RigidRepresentationBase;
 
 /// Collision Representation class that wraps a RigidRepresentation, this can be used to strictly tie the
 /// Collision Representation to the Rigid, so even if the shape of the rigid changes, the collision representation
