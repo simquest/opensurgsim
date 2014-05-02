@@ -303,14 +303,10 @@ private:
 	StateData& operator=(const StateData&) /*= delete*/;
 };
 
-LabJackScaffold::LabJackScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new StateData)
+LabJackScaffold::LabJackScaffold() :
+	m_state(new StateData)
 {
-	if (m_logger == nullptr)
-	{
-		m_logger = SurgSim::Framework::Logger::getLogger("LabJack device");
-		m_logger->setThreshold(m_defaultLogLevel);
-	}
+	m_logger = SurgSim::Framework::Logger::getLogger("LabJack device");
 	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold created.  LabJackUD driver version: " <<
 		GetDriverVersion() << ".";
 }
@@ -716,11 +712,6 @@ std::shared_ptr<LabJackScaffold> LabJackScaffold::getOrCreateSharedInstance()
 	return sharedInstance.get();
 }
 
-void LabJackScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
-{
-	m_defaultLogLevel = logLevel;
-}
-
 bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 {
 	bool result = true;
@@ -814,8 +805,6 @@ std::shared_ptr<SurgSim::Framework::Logger> LabJackScaffold::getLogger() const
 {
 	return m_logger;
 }
-
-SurgSim::Framework::LogLevel LabJackScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_DEBUG;
 
 };  // namespace Device
 };  // namespace SurgSim

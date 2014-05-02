@@ -18,14 +18,17 @@
 
 #include <memory>
 
-#include "SurgSim/Framework/Logger.h"
-
 namespace SurgSim
 {
 namespace DataStructures
 {
 class DataGroup;
 };
+
+namespace Framework
+{
+class Logger;
+}
 
 namespace Device
 {
@@ -42,9 +45,7 @@ public:
 	struct DeviceData;
 
 	/// Constructor.
-	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
-	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit LabJackScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+	LabJackScaffold();
 
 	/// Destructor.
 	~LabJackScaffold();
@@ -57,11 +58,6 @@ public:
 	/// The scaffold is managed using a SingleInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
 	static std::shared_ptr<LabJackScaffold> getOrCreateSharedInstance();
-
-	/// Sets the default log level.
-	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
-	/// \param logLevel The log level.
-	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
 
 	/// Does one-time configuration of the LabJack for timers, counters, and analog inputs.
 	/// Must be called by the LabJackThread because the LabJack separates all commands by the calling thread.
@@ -114,9 +110,6 @@ private:
 
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
-
-	/// The default logging level.
-	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 };
 
 };  // namespace Device
