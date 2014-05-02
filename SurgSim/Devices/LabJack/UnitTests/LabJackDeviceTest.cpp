@@ -134,7 +134,7 @@ TEST(LabJackDeviceTest, InputConsumer)
 	EXPECT_FALSE(device->addInputConsumer(consumer));
 
 	// Sleep to see how many times the consumer is invoked.
-	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(200));
+	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
 
@@ -173,7 +173,7 @@ TEST(LabJackDeviceTest, OutputProducer)
 	EXPECT_TRUE(device->setOutputProducer(producer));
 
 	// Sleep to see how many times the producer is invoked.
-	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(200));
+	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeOutputProducer(producer));
 
