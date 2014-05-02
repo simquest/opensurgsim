@@ -55,8 +55,7 @@ void assertIsCoplanar(const Vector3d& triangle0,
 					  const Vector3d& triangle2,
 					  const Vector3d& point)
 {
-	SURGSIM_ASSERT(abs((triangle2 - triangle0).dot((triangle1 - triangle0).cross(point - triangle2)))
-				   < SurgSim::Math::Geometry::ScalarEpsilon)
+	SURGSIM_ASSERT(SurgSim::Math::isCoplanar(triangle0, triangle1, triangle2, point))
 		<< "Coplanar assertion failed with: "
 		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
 		<< ", pt " << point.transpose();
@@ -73,22 +72,7 @@ void assertIsPointInsideTriangle(const Vector3d& point,
 								 const Vector3d& triangle2,
 								 const Vector3d& normal)
 {
-	Vector3d barycentricCoordinate;
-
-	SurgSim::Math::barycentricCoordinates(point, triangle0, triangle1, triangle2, normal, &barycentricCoordinate);
-
-	SURGSIM_ASSERT(barycentricCoordinate.x() >= -SurgSim::Math::Geometry::ScalarEpsilon
-				   && barycentricCoordinate.x() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon)
-		<< "Point inside triangle assertion failed with: "
-		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
-		<< ", n " << normal.transpose() << ", pt " << point.transpose();
-	SURGSIM_ASSERT(barycentricCoordinate.y() >= -SurgSim::Math::Geometry::ScalarEpsilon
-				   && barycentricCoordinate.y() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon)
-		<< "Point inside triangle assertion failed with: "
-		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
-		<< ", n " << normal.transpose() << ", pt " << point.transpose();
-	SURGSIM_ASSERT(barycentricCoordinate.z() >= -SurgSim::Math::Geometry::ScalarEpsilon
-				   && barycentricCoordinate.z() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon)
+	SURGSIM_ASSERT(SurgSim::Math::isPointInsideTriangle(point, triangle0, triangle1, triangle2, normal))
 		<< "Point inside triangle assertion failed with: "
 		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
 		<< ", n " << normal.transpose() << ", pt " << point.transpose();
