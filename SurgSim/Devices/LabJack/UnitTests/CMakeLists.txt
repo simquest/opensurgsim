@@ -23,8 +23,12 @@ set(UNIT_TEST_SOURCES
 	LabJackScaffoldTest.cpp
 )
 
+set(UNIT_TEST_LINUX_SOURCES
+	LabJackChecksumsTest.cpp
+)
+
 if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-	list(APPEND UNIT_TEST_SOURCES LabJackChecksumsTest.cpp)
+	list(APPEND UNIT_TEST_SOURCES ${UNIT_TEST_LINUX_SOURCES})
 endif()
 
 set(LIBS

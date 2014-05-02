@@ -89,5 +89,5 @@ TEST(LabJackChecksumsTest, ExtendedChecksum)
 	EXPECT_EQ(5, bytes[5]);
 	// extendedChecksum alters the buffer before setting bytes[0] to the return value of extendedChecksum8.
 	// sum = 100 + 100 + 100 + 120 + 5 = 425, quotient = 1, remainder = 169, quotient + remainder = 170
-	EXPECT_EQ(170, bytes[0]); 
+	EXPECT_EQ(170, bytes[0]);
 }
