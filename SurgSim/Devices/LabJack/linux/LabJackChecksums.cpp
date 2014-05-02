@@ -43,7 +43,7 @@ unsigned char normalChecksum8(const std::array<unsigned char, LABJACK_MAXIMUM_BU
 
 uint16_t extendedChecksum16(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes, int count)
 {
-	int accumulator = 0;
+	uint16_t accumulator = 0;
 
 	//Sums bytes 6 to n-1 to an unsigned 2 byte value
 	for (int i = 6; i < count; ++i)
