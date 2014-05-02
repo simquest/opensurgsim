@@ -53,11 +53,6 @@ bool PoseIntegrator::finalize()
 	return true;
 }
 
-bool PoseIntegrator::isInitialized() const
-{
-	return true;
-}
-
 void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
 	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::Names::POSE);

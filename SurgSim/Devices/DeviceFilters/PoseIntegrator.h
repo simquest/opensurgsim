@@ -53,9 +53,6 @@ public:
 
 	virtual bool finalize() override;
 
-	bool isInitialized() const;
-
-	/// \param inputData An initial value for the application's input from the device (i.e., pose).
 	virtual void initializeInput(const std::string& device,
 		const SurgSim::DataStructures::DataGroup& inputData) override;
 

@@ -73,7 +73,7 @@ bool MultiAxisDevice::finalize()
 
 bool MultiAxisDevice::isInitialized() const
 {
-	return m_rawDevice->isInitialized() && m_filter->isInitialized();
+	return m_rawDevice->isInitialized();
 }
 
 bool MultiAxisDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer)
