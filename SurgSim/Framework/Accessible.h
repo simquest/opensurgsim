@@ -37,6 +37,12 @@ class Accessible
 {
 public:
 
+	/// Default Constructor
+	Accessible();
+
+	/// Destructor
+	~Accessible();
+
 	typedef std::function<boost::any(void)> GetterType;
 	typedef std::function<void (boost::any)> SetterType;
 
@@ -122,6 +128,12 @@ public:
 	void decode(const YAML::Node& node);
 
 private:
+
+	/// @{
+	/// Prevent default copy construction and default assignment
+	Accessible(const Accessible& other) /*= delete*/;
+	Accessible& operator=(const Accessible& other) /*= delete*/;
+	/// @}
 
 	/// Private struct to keep the map under control
 	struct Functors
