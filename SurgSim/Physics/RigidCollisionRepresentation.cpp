@@ -15,6 +15,14 @@
 
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidCollisionRepresentation);
+}
+
 namespace SurgSim
 {
 namespace Physics
@@ -23,6 +31,9 @@ namespace Physics
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
 	Representation(name)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidCollisionRepresentation,
+		std::shared_ptr<SurgSim::Physics::RigidRepresentationBase>,
+		PhysicsRepresentation, getRigidRepresentation, setRigidRepresentation);
 }
 
 RigidCollisionRepresentation::~RigidCollisionRepresentation()
@@ -67,7 +78,3 @@ SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
 
 }; // namespace Collision
 }; // namespace SurgSim
-
-
-
-
