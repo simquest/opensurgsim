@@ -83,7 +83,7 @@ void Representation::clearGroupReferences()
 bool Representation::removeGroupReference(const std::string& name)
 {
 	bool result = false;
-	if (!isAwake())
+	if (!checkAwake("removeGroupReference"))
 	{
 		result = (m_groups.erase(name) != 0u);
 	}
@@ -98,7 +98,7 @@ void Representation::setGroupReference(const std::string& group)
 
 bool Representation::checkAwake(const std::string& functionName)
 {
-	if (!isAwake())
+	if (isAwake())
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
 				"Representation::" << functionName << "() was called while the component " <<
