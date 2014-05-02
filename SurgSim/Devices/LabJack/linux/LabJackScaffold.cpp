@@ -897,11 +897,12 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 			device->setConnection(LABJACKCONNECTION_USB);
 		}
 
+		std::unique_ptr<Handle> handle;
 		for (auto type = typesToSearch.cbegin(); type != typesToSearch.cend(); ++type)
 		{
 			device->setType(*type);
 
-			std::unique_ptr<Handle> handle(new Handle(*type, device->getConnection(), address));
+			handle = std::unique_ptr<Handle>(new Handle(*type, device->getConnection(), address));
 			result = handle->isValid();
 			if (result)
 			{
@@ -918,47 +919,50 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 					handle->destroy(); // The handle was initialized and will be destructed.
 					result = false;
 				}
+				else
+				{
+					break;
+				}
 			}
+		}
 
-			if (result)
+		if (result)
+		{
+			std::unique_ptr<DeviceData> info(new DeviceData(device, std::move(handle)));
+
+			// Cache the NamedData indices for the input DataGroup.
+			const SurgSim::DataStructures::DataGroup& inputData = device->getInputData();
+
+			for (auto input = info->digitalInputChannels.cbegin();
+				input != info->digitalInputChannels.cend();
+				++input)
 			{
-				std::unique_ptr<DeviceData> info(new DeviceData(device, std::move(handle)));
-
-				// Cache the NamedData indices for the input DataGroup.
-				const SurgSim::DataStructures::DataGroup& inputData = device->getInputData();
-
-				for (auto input = info->digitalInputChannels.cbegin();
-					input != info->digitalInputChannels.cend();
-					++input)
-				{
-					info->digitalInputIndices[*input] =
-						inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
-						std::to_string(*input));
-					SURGSIM_ASSERT(info->digitalInputIndices[*input] >= 0) << "LabJackScaffold::DeviceData " <<
-						"failed to get a valid NamedData index for the digital input for line " << *input <<
-						".  Make sure that is a valid line number.";
-				}
-
-				for (auto timer = info->timerInputChannels.cbegin();
-					timer != info->timerInputChannels.cend();
-					++timer)
-				{
-					info->timerInputIndices[*timer] =
-						inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
-						std::to_string(*timer));
-					SURGSIM_ASSERT(info->timerInputIndices[*timer] >= 0) << "LabJackScaffold::DeviceData " <<
-						"failed to get a valid NamedData index for the timer for channel " << *timer <<
-						".  Make sure that is a valid timer number.";
-				}
-
-				std::unique_ptr<LabJackThread> thread(new LabJackThread(this, info.get()));
-				thread->setRate(device->getMaximumUpdateRate());
-				thread->start();
-
-				info.get()->thread = std::move(thread);
-				m_state->activeDeviceList.emplace_back(std::move(info));
-				break;
+				info->digitalInputIndices[*input] =
+					inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+					std::to_string(*input));
+				SURGSIM_ASSERT(info->digitalInputIndices[*input] >= 0) << "LabJackScaffold::DeviceData " <<
+					"failed to get a valid NamedData index for the digital input for line " << *input <<
+					".  Make sure that is a valid line number.";
 			}
+
+			for (auto timer = info->timerInputChannels.cbegin();
+				timer != info->timerInputChannels.cend();
+				++timer)
+			{
+				info->timerInputIndices[*timer] =
+					inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
+					std::to_string(*timer));
+				SURGSIM_ASSERT(info->timerInputIndices[*timer] >= 0) << "LabJackScaffold::DeviceData " <<
+					"failed to get a valid NamedData index for the timer for channel " << *timer <<
+					".  Make sure that is a valid timer number.";
+			}
+
+			std::unique_ptr<LabJackThread> thread(new LabJackThread(this, info.get()));
+			thread->setRate(device->getMaximumUpdateRate());
+			thread->start();
+
+			info.get()->thread = std::move(thread);
+			m_state->activeDeviceList.emplace_back(std::move(info));
 		}
 	}
 
