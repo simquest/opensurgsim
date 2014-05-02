@@ -23,53 +23,16 @@
 #include <gtest/gtest.h>
 #include "SurgSim/Devices/LabJack/LabJackDevice.h"
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Testing/DevicesUtilities.h"
 
 using SurgSim::Device::LabJackDevice;
 using SurgSim::Device::LabJackScaffold;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
-
-struct RawTestListener : public InputConsumerInterface, public OutputProducerInterface
-{
-public:
-	RawTestListener() :
-		m_numTimesInitializedInput(0),
-		m_numTimesReceivedInput(0),
-		m_numTimesRequestedOutput(0)
-	{
-	}
-
-	virtual void initializeInput(const std::string& device, const DataGroup& inputData);
-	virtual void handleInput(const std::string& device, const DataGroup& inputData);
-	virtual bool requestOutput(const std::string& device, DataGroup* outputData);
-
-	int m_numTimesInitializedInput;
-	int m_numTimesReceivedInput;
-	int m_numTimesRequestedOutput;
-	DataGroup m_lastReceivedInput;
-};
-
-void RawTestListener::initializeInput(const std::string& device, const DataGroup& inputData)
-{
-	++m_numTimesInitializedInput;
-}
-
-void RawTestListener::handleInput(const std::string& device, const DataGroup& inputData)
-{
-	++m_numTimesReceivedInput;
-	m_lastReceivedInput = inputData;
-}
-
-bool RawTestListener::requestOutput(const std::string& device, DataGroup* outputData)
-{
-	++m_numTimesRequestedOutput;
-	return false;
-}
+using SurgSim::Testing::MockInputOutput;
 
 namespace
 {
@@ -153,12 +116,11 @@ TEST(LabJackDeviceTest, CreateDevicesWithSameName)
 
 TEST(LabJackDeviceTest, InputConsumer)
 {
-	//LabJackScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<LabJackDevice> device = std::make_shared<LabJackDevice>("TestLabJack");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a LabJack device plugged in?";
 
-	std::shared_ptr<RawTestListener> consumer = std::make_shared<RawTestListener>();
+	std::shared_ptr<MockInputOutput> consumer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, consumer->m_numTimesInitializedInput);
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
@@ -202,7 +164,7 @@ TEST(LabJackDeviceTest, OutputProducer)
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a LabJack device plugged in?";
 
-	std::shared_ptr<RawTestListener> producer = std::make_shared<RawTestListener>();
+	std::shared_ptr<MockInputOutput> producer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
 	EXPECT_FALSE(device->removeOutputProducer(producer));
