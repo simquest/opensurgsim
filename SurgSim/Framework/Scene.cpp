@@ -93,26 +93,13 @@ YAML::Node Scene::encode() const
 {
 	YAML::Node result(YAML::NodeType::Map);
 	YAML::Node data(YAML::NodeType::Map);
-
-
-	// Pre-encode all the components so that the scene elements only see references to those components.
-	std::set<std::shared_ptr<SurgSim::Framework::Component>> componentSet;
-	std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>> sceneElements;
 	for (auto sceneElement = m_elements.begin(); sceneElement != m_elements.end(); ++sceneElement)
 	{
-		sceneElements.push_back(*sceneElement);
-		auto components = (*sceneElement)->getComponents();
-		componentSet.insert(components.begin(), components.end());
+		data["SceneElements"].push_back(*sceneElement);
 	}
 
-	std::for_each(componentSet.begin(), componentSet.end(),
-				  [&data](std::shared_ptr<Component> component)
-	{
-		data["Components"].push_back(*component);
-	});
-
-	data["SceneElements"] = sceneElements;
 	result["SurgSim::Framework::Scene"] = data;
+
 	return result;
 }
 
