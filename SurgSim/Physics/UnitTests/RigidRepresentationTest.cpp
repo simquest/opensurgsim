@@ -19,6 +19,7 @@
 
 #include "SurgSim/Collision/Location.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -443,6 +444,27 @@ TEST_F(RigidRepresentationTest, CollisionRepresentationTest)
 	EXPECT_EQ(nullptr, rigidBody->getCollisionRepresentation());
 	EXPECT_EQ(nullptr, collision1->getRigidRepresentation());
 	EXPECT_EQ(nullptr, collision2->getRigidRepresentation());
+}
+
+TEST_F(RigidRepresentationTest, SerializationTest)
+{
+	auto rigidRepresentation = std::make_shared<RigidRepresentation>("TestRigidRepresentation");
+	YAML::Node node;
+	// Encode a share_ptr<> to RigidRepresentation should be OK.
+	ASSERT_NO_THROW(node = YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(rigidRepresentation));
+
+	// Encode an instance of RigidRepresentation without a shape, expect to throw.
+	EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
+
+	// Encode an instance of RigidRepresentation with a valid shape (shape contained in RigidRepresentatoinParameters),
+	// should not throw.
+	rigidRepresentation->setInitialParameters(m_param);
+	EXPECT_NO_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
+
+	// Decode as shared_ptr<> to RigidRepresentation should be OK.
+	std::shared_ptr<RigidRepresentation> newRepresentation;
+	EXPECT_NO_THROW(newRepresentation =
+		std::dynamic_pointer_cast<RigidRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 }
 
 }; // namespace Physics

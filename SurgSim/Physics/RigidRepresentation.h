@@ -16,11 +16,10 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 
-#include "SurgSim/Physics/RigidRepresentationBase.h"
-
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/RigidRepresentationBase.h"
 
 namespace SurgSim
 {
@@ -35,13 +34,14 @@ class RigidRepresentationState;
 class RigidRepresentation : public RigidRepresentationBase
 {
 public:
-
 	/// Constructor
 	/// \param name The rigid representation's name
 	explicit RigidRepresentation(const std::string& name);
 
 	/// Destructor
 	virtual ~RigidRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentation);
 
 	virtual RepresentationType getType() const override;
 
@@ -86,21 +86,22 @@ public:
 	const SurgSim::Math::Matrix66d& getComplianceMatrix() const;
 
 protected:
-	/// Inertia matrices in global coordinates
-	SurgSim::Math::Matrix33d m_globalInertia;
-	/// Inverse of inertia matrix in global coordinates
-	SurgSim::Math::Matrix33d m_invGlobalInertia;
-
 	/// Current force applied on the rigid representation (in N)
 	SurgSim::Math::Vector3d m_force;
 	/// Current torque applied on the rigid representation (in N.m)
 	SurgSim::Math::Vector3d m_torque;
 
+	SurgSim::Math::Vector3d m_externalForce;
+	SurgSim::Math::Vector3d m_externalTorque;
+
+	/// Inertia matrices in global coordinates
+	SurgSim::Math::Matrix33d m_globalInertia;
+	/// Inverse of inertia matrix in global coordinates
+	SurgSim::Math::Matrix33d m_invGlobalInertia;
+
 	/// Compliance matrix (size of the number of Dof = 6)
 	SurgSim::Math::Matrix66d m_C;
 
-	SurgSim::Math::Vector3d m_externalForce;
-	SurgSim::Math::Vector3d m_externalTorque;
 	SurgSim::Math::Matrix66d m_externalStiffnessMatrix;
 	SurgSim::Math::Matrix66d m_externalDampingMatrix;
 
@@ -114,12 +115,9 @@ private:
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
 	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
-
-
 };
 
 }; // Physics
-
 }; // SurgSim
 
 #endif // SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
