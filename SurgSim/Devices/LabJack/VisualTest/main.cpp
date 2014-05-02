@@ -203,10 +203,10 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		printf("\nError initializing tool.\n");
+		std::cout << std::endl << "Error initializing tool." << std::endl;
 	}
 
-	printf("\nExiting.\n");
+	std::cout << std::endl << "Exiting." << std::endl;
 	// Cleanup and shutdown will happen automatically as objects go out of scope.
 
 	return 0;
