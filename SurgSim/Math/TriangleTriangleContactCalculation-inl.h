@@ -53,10 +53,10 @@ public:
 	/// Given a triangle, find the deepest vertex in the swept volume of that triangle.
 	/// \param triangle The triangle against which the penetration is checked.
 	/// \param [out] penetrationDepth The depth of the deepest point in this triangle to the triangle sent in.
-	/// \param [out] penetationPoint0 The penetration point on this triangle.
-	/// \param [out] penetationPoint1 The penetration point on the triangle sent in.
+	/// \param [out] penetrationPoint0 The penetration point on this triangle.
+	/// \param [out] penetrationPoint1 The penetration point on the triangle sent in.
 	void findDeepestPenetrationWithTriangle(const TriangleHelper& triangle, T* penetrationDepth,
-											Vector3* penetationPoint0, Vector3* penetrationPoint1)
+											Vector3* penetrationPoint0, Vector3* penetrationPoint1)
 	{
 		m_clippedVerticesBuffer[0].push_back(*m_vertices[0]);
 		m_clippedVerticesBuffer[0].push_back(*m_vertices[1]);
@@ -72,13 +72,13 @@ public:
 			clipAgainstPlane(clipPlaneNormal, clipPlaneD);
 		}
 
-		findDeepestVertexUnderPlane(triangle.m_normal, triangle.m_planeD, penetrationDepth, penetationPoint0);
+		findDeepestVertexUnderPlane(triangle.m_normal, triangle.m_planeD, penetrationDepth, penetrationPoint0);
 
 		SURGSIM_ASSERT(*penetrationDepth <= T(0))
 				<< "The distance from triangle is calculated as " << *penetrationDepth << ". At this point in the"
 				<< " algorithm, the depth is expected to be negative.";
 
-		*penetrationPoint1 = *penetationPoint0 - (triangle.m_normal * (*penetrationDepth));
+		*penetrationPoint1 = *penetrationPoint0 - (triangle.m_normal * (*penetrationDepth));
 		*penetrationDepth = -(*penetrationDepth);
 	}
 

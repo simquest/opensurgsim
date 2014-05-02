@@ -62,7 +62,7 @@ public:
 /// \param dStart Signed distance of the start of edge from the plane of the colliding triangle.
 /// \param dEnd Signed distance of the end of edge from the plane of the colliding triangle.
 /// \param pvStart Projection of the start of edge from the plane of the colliding triangle.
-/// \param dStart Signed distance of the first vertex from the plane of the colliding triangle.
+/// \param pvEnd Projection of the end of edge from the plane of the colliding triangle.
 /// \param parametricIntersection Parametric representation of the intersection between the triangle edge
 ///		   and the plane in terms of the projection on the separating axis.
 /// \param parametricIntersectionIndex The array index of parametricIntersection.
