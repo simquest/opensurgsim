@@ -13,16 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-
 #include <string>
 
+#include <gtest/gtest.h>
+
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Vector3d;
@@ -60,10 +63,6 @@ public:
 		m_element->addComponent(m_fixedRepresentation);
 	}
 
-	void TearDown()
-	{
-	}
-
 	std::shared_ptr<FixedRepresentation> m_fixedRepresentation;
 	std::shared_ptr<BasicSceneElement> m_element;
 
@@ -79,7 +78,7 @@ public:
 
 TEST_F(FixedRepresentationTest, ConstructorTest)
 {
-	ASSERT_NO_THROW( {FixedRepresentation fixedRepresentation("FixedRepresentation");});
+	ASSERT_NO_THROW(FixedRepresentation fixedRepresentation("FixedRepresentation"));
 }
 
 TEST_F(FixedRepresentationTest, ResetStateTest)
@@ -176,3 +175,26 @@ TEST_F(FixedRepresentationTest, UpdateTest)
 	EXPECT_TRUE(m_fixedRepresentation->getPreviousState() == m_fixedRepresentation->getInitialState());
 }
 
+
+TEST_F(FixedRepresentationTest, SerializationTest)
+{
+	YAML::Node node;
+	// Encode a share_ptr<> to FixedRepresentation should be OK.
+	ASSERT_NO_THROW(node =
+		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(m_fixedRepresentation));
+
+	// Encode an instance of FixedRepresentation without a shape, expect to throw.
+	EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*m_fixedRepresentation));
+
+	SurgSim::Physics::RigidRepresentationParameters param;
+	param.setShapeUsedForMassInertia(std::make_shared<SurgSim::Math::SphereShape>(0.1));
+	// Encode an instance of FixedRepresentation with a valid shape (shape contained in RigidRepresentatoinParameters),
+	// should not throw.
+	m_fixedRepresentation->setInitialParameters(param);
+	EXPECT_NO_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*m_fixedRepresentation));
+
+	// Decode as shared_ptr<> to FixedRepresentation should be OK.
+	std::shared_ptr<FixedRepresentation> newRepresentation;
+	EXPECT_NO_THROW(newRepresentation =
+		std::dynamic_pointer_cast<FixedRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+}

@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
 #define SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 #include "SurgSim/Physics/RigidRepresentationBaseState.h"
 
@@ -32,8 +33,8 @@ class FixedRepresentation : public RigidRepresentationBase
 public:
 	/// Constructor
 	/// \param name The fixed representation's name
-	explicit FixedRepresentation(const std::string& name)
-		: RigidRepresentationBase(name)
+	explicit FixedRepresentation(const std::string& name) :
+		RigidRepresentationBase(name)
 	{
 	}
 
@@ -42,12 +43,14 @@ public:
 	{
 	}
 
+	SURGSIM_CLASSNAME(SurgSim::Physics::FixedRepresentation);
+
 	virtual RepresentationType getType() const override
 	{
 		return REPRESENTATION_TYPE_FIXED;
 	}
 
-	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state)
+	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override
 	{
 		// Do Nothing it is a fixed object
 	}
@@ -58,8 +61,12 @@ public:
 	}
 };
 
-}; // Physics
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::FixedRepresentation);
+}
 
+}; // Physics
 }; // SurgSim
 
 #endif  // SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
