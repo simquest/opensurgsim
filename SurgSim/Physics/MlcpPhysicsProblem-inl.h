@@ -25,8 +25,8 @@ namespace Physics
 
 template <typename SubCDerivedType>
 void MlcpPhysicsProblem::updateConstraint(
-	const Eigen::SparseVector<double> &newSubH,
-	const Eigen::MatrixBase<SubCDerivedType> &subC,
+	const Eigen::SparseVector<double>& newSubH,
+	const Eigen::MatrixBase<SubCDerivedType>& subC,
 	size_t indexSubC,
 	size_t indexNewSubH)
 {
