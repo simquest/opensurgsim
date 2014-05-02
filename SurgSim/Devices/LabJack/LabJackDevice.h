@@ -101,17 +101,30 @@ enum LabJackTimerMode
 ///		are not in agreement, the requests to the LabJack device driver will not be correct.
 ///
 /// \par Application input provided by the device:
-///   | type       | name              |                                                                           |
-///   | ----       | ----              | ---                                                                       |
-///   | customData | "digitalInputs"   | %Digital inputs.                                                          |
-///   | customData | "timerInputs"     | %The inputs from each timer that provides input values.                   |
+///   | type   | name              |                                                                           |
+///   | ----   | ----              | ---                                                                       |
+///   | scalar | "digitalInput0"   | %Digital input, line #0                                                   |
+///   | scalar | "digitalInput1"   | %Digital input, line #1                                                   |
+///   | ...    |  ...              | ...                                                                       |
+///   | scalar | "digitalInput23"  | %Digital input, line #23                                                  |
+///   | scalar | "timerInput0"     | %The input from timer #0 if that timer provides input values              |
+///   | scalar | "timerInput1"     | %The input from timer #1 if that timer provides input values              |
+///   | ...    |  ...              | ...                                                                       |
+///   | scalar | "timerInput6"     | %The input from timer #6 if that timer provides input values              |
 ///
 ///
 /// \par Application output used by the device:
-///   | type       | name              |                                                                           |
-///   | ----       | ----              | ---                                                                       |
-///   | customData | "digitalOutputs"  | %Digital outputs.                                                         |
-///   | customData | "timerOutputs"    | %The outputs for each timer that takes output values.                     |
+///   | type   | name              |                                                                           |
+///   | ----   | ----              | ---                                                                       |
+///   | ----   | ----              | ---                                                                       |
+///   | scalar | "digitalOutput0"  | %Digital output, line #0                                                  |
+///   | scalar | "digitalOutput1"  | %Digital output, line #1                                                  |
+///   | ...    |  ...              | ...                                                                       |
+///   | scalar | "digitalOutput23" | %Digital output, line #23                                                 |
+///   | scalar | "timerOutput0"    | %The output from timer #0 if that timer provides output values            |
+///   | scalar | "timerOutput1"    | %The output from timer #1 if that timer provides output values            |
+///   | ...    |  ...              | ...                                                                       |
+///   | scalar | "timerOutput6"    | %The output from timer #6 if that timer provides output values            |
 ///
 /// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface, LabJackScaffold
 class LabJackDevice : public SurgSim::Input::CommonDevice
