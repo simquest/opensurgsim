@@ -67,7 +67,7 @@ public:
 	/// Must be called by the LabJackThread because the LabJack separates all commands by the calling thread.
 	/// \param device The device.
 	/// \return False if any errors.
-	bool configureLabJack(DeviceData* device);
+	bool configureDevice(DeviceData* device);
 
 private:
 	/// Internal shared state data type.
