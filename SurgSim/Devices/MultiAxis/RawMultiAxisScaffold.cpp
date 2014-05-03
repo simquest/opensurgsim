@@ -580,7 +580,6 @@ bool RawMultiAxisScaffold::createPerDeviceThread(DeviceData* data)
 	SURGSIM_ASSERT(! data->thread);
 
 	std::unique_ptr<RawMultiAxisThread> thread(new RawMultiAxisThread(this, data));
-	thread->setRate(data->deviceObject->getRate());
 	thread->start();
 	data->thread = std::move(thread);
 

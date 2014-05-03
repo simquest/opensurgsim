@@ -28,7 +28,6 @@ namespace Device
 PoseIntegrator::PoseIntegrator(const std::string& name) :
 	CommonDevice(name),
 	m_poseResult(PoseType::Identity()),
-	m_rate(1.0),
 	m_poseIndex(-1),
 	m_linearVelocityIndex(-1),
 	m_angularVelocityIndex(-1)
@@ -78,6 +77,14 @@ void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataS
 		SurgSim::Math::RigidTransform3d pose;
 		if (inputData.poses().get(m_poseIndex, &pose))
 		{
+			m_timer.markFrame();
+			double rate = m_timer.getAverageFrameRate();
+			if (m_timer.getNumberOfClockFails() > 0)
+			{
+				m_timer.start();
+				rate = 0.0;
+			}
+
 			// Before updating the current pose, use it to calculate the angular velocity.
 			if (m_angularVelocityIndex >= 0)
 			{
@@ -85,14 +92,14 @@ void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataS
 				double angle;
 				SurgSim::Math::computeAngleAndAxis(pose.rotation(), &angle, &rotationAxis);
 				rotationAxis = m_poseResult.rotation() * rotationAxis; // rotate the axis into global space
-				getInputData().vectors().set(m_angularVelocityIndex, rotationAxis * angle * m_rate);
+				getInputData().vectors().set(m_angularVelocityIndex, rotationAxis * angle * rate);
 			}
 
 			getInputData().poses().set(m_poseIndex, integrate(pose));
 
 			if (m_linearVelocityIndex >= 0)
 			{
-				getInputData().vectors().set(m_linearVelocityIndex, pose.translation() * m_rate);
+				getInputData().vectors().set(m_linearVelocityIndex, pose.translation() * rate);
 			}
 		}
 	}
@@ -108,17 +115,6 @@ bool PoseIntegrator::requestOutput(const std::string& device, SurgSim::DataStruc
 	}
 	return state;
 }
-
-void PoseIntegrator::setRate(double rate)
-{
-	m_rate = rate;
-}
-
-double PoseIntegrator::getRate() const
-{
-	return m_rate;
-}
-
 
 };  // namespace Device
 };  // namespace SurgSim

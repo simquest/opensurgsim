@@ -35,10 +35,6 @@ using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 
-namespace
-{
-	const double ERROR_EPSILON = 1e-7;
-}
 
 struct TestListener : public InputConsumerInterface, public OutputProducerInterface
 {
@@ -93,15 +89,13 @@ TEST(MultiAxisDeviceTest, CreateAndInitializeDevice)
 	EXPECT_TRUE(device->isInitialized());
 }
 
-TEST(MultiAxisDeviceTest, SettersAndGetters)
+TEST(MultiAxisDeviceTest, Name)
 {
 	std::shared_ptr<MultiAxisDevice> device = std::make_shared<MultiAxisDevice>("TestMultiAxis");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_EQ("TestMultiAxis", device->getName());
-	const double rate = 20.0;
-	EXPECT_NO_THROW(device->setRate(rate));
-	EXPECT_NEAR(rate, device->getRate(), ERROR_EPSILON);
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
-	EXPECT_THROW(device->setRate(rate), SurgSim::Framework::AssertionFailure);
+	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
+	EXPECT_EQ("TestMultiAxis", device->getName());
 }
 
 static void testCreateDeviceSeveralTimes(bool doSleep)
@@ -211,8 +205,8 @@ TEST(MultiAxisDeviceTest, InputConsumer)
 
 	// Check the number of invocations.
 	EXPECT_EQ(1, consumer->m_numTimesInitializedInput);
-	EXPECT_GE(consumer->m_numTimesReceivedInput, 0.9 * device->getRate());
-	EXPECT_LE(consumer->m_numTimesReceivedInput, 1.1 * device->getRate());
+	EXPECT_GE(consumer->m_numTimesReceivedInput, 90);
+	EXPECT_LE(consumer->m_numTimesReceivedInput, 110);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.vectors().hasData(SurgSim::DataStructures::Names::LINEAR_VELOCITY));
@@ -247,6 +241,6 @@ TEST(MultiAxisDeviceTest, OutputProducer)
 	EXPECT_FALSE(device->removeOutputProducer(producer));
 
 	// Check the number of invocations.
-	EXPECT_GE(producer->m_numTimesRequestedOutput, 0.9 * device->getRate());
-	EXPECT_LE(producer->m_numTimesRequestedOutput, 1.1 * device->getRate());
+	EXPECT_GE(producer->m_numTimesRequestedOutput, 90);
+	EXPECT_LE(producer->m_numTimesRequestedOutput, 110);
 }

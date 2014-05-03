@@ -25,6 +25,7 @@ RawMultiAxisThread::RawMultiAxisThread(RawMultiAxisScaffold* scaffold, RawMultiA
 	m_scaffold(scaffold),
 	m_deviceData(deviceData)
 {
+	setRate(100.0);
 }
 
 RawMultiAxisThread::~RawMultiAxisThread()

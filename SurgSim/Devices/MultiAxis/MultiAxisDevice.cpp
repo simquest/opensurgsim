@@ -33,7 +33,6 @@ MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
 {
 	m_filter = std::make_shared<PoseIntegrator>(uniqueName + "_Integrator");
 	m_filter->setNameForCallback(uniqueName);  // the filter should make callbacks as the entire device
-	m_filter->setRate(m_rawDevice->getRate());
 
 	m_rawDevice->addInputConsumer(m_filter);
 	m_rawDevice->setOutputProducer(m_filter);
@@ -144,20 +143,6 @@ double MultiAxisDevice::defaultOrientationScale()
 {
 	return 0.0001; // The default rotation scale, in radians per tick.
 }
-
-void MultiAxisDevice::setRate(double rate)
-{
-	SURGSIM_ASSERT(!isInitialized()) <<
-		"Cannot change the update rate for a MultiAxisDevice after it has been initialized.";
-	m_rawDevice->setRate(rate); // The raw device's rate variable determines the thread's update rate.
-	m_filter->setRate(rate); // The PoseIntegrator needs to know the thread's rate to calculate velocities.
-}
-
-double MultiAxisDevice::getRate() const
-{
-	return m_rawDevice->getRate();
-}
-
 
 };  // namespace Device
 };  // namespace SurgSim

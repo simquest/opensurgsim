@@ -23,6 +23,7 @@
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Framework/Timer.h"
 
 namespace SurgSim
 {
@@ -65,19 +66,11 @@ public:
 
 	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
-	/// Sets the expected update rate for the thread.  The rate is used to calculate the velocities from the delta pose.
-	/// \param rate The update rate in Hz.
-	void setRate(double rate);
-
-	/// \return The expected rate in Hz at which the thread will update.
-	double getRate() const;
-
 private:
 	/// The result of integrating the input poses.
 	PoseType m_poseResult;
 
-	/// The expected update rate for the thread, in Hz.
-	double m_rate;
+	SurgSim::Framework::Timer m_timer;
 
 	///@{
 	/// The indices into the DataGroups.

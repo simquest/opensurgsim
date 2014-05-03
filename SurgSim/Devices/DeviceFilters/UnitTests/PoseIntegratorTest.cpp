@@ -109,19 +109,9 @@ void TestInputDataGroup(const DataGroup& actualData, const DataGroup& expectedDa
 }
 };
 
-TEST(PoseIntegratorDeviceFilterTest, SettersAndGetters)
-{
-	auto integrator = std::make_shared<MockPoseIntegrator>("PoseIntegratorFilter");
-	const double rate = 100.0;
-	EXPECT_NO_THROW(integrator->setRate(rate));
-	EXPECT_NEAR(rate, integrator->getRate(), ERROR_EPSILON);
-}
-
 TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 {
 	auto integrator = std::make_shared<MockPoseIntegrator>("PoseIntegratorFilter");
-	const double rate = 10.0;
-	integrator->setRate(rate);
 	ASSERT_TRUE(integrator->initialize());
 
 	DataGroupBuilder builder;
@@ -171,7 +161,20 @@ TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 		2.0 * translation);
 	expectedData.poses().set(SurgSim::DataStructures::Names::POSE, expectedPose);
 
-	// The linearVelocity should be the translation (as a delta) times the rate.
+	// The linearVelocity should be the translation (as a delta) times the rate.  We don't know the rate, so we'll
+	// back-calculate it from the linear velocity...then we'll make sure the same rate was used for both linear and
+	// angular velocities.
+	const DataGroup actualTransformedInputData = integrator->doGetInputData();
+	Vector3d actualLinearVelocity;
+	ASSERT_TRUE(actualTransformedInputData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY,
+		&actualLinearVelocity));
+	const double rate = actualLinearVelocity.norm() / translation.norm();
+
+	Vector3d actualAngularVelocity;
+	ASSERT_TRUE(actualTransformedInputData.vectors().get(SurgSim::DataStructures::Names::ANGULAR_VELOCITY,
+		&actualAngularVelocity));
+	ASSERT_NEAR(rate, actualAngularVelocity.norm() / rotationAngle, ERROR_EPSILON);
+
 	Vector3d expectedLinearVelocity = translation * rate;
 	expectedData.vectors().set(SurgSim::DataStructures::Names::LINEAR_VELOCITY, expectedLinearVelocity);
 
@@ -183,14 +186,13 @@ TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 
 	{
 		SCOPED_TRACE("Testing Input Data, after HandleInput.");
-		DataGroup actualTransformedInputData = integrator->doGetInputData();
 		TestInputDataGroup(actualTransformedInputData, expectedData);
 	}
 
 	// handleInput should not change the initial input data.
 	{
 		SCOPED_TRACE("Testing Initial Input Data, after HandleInput, expecting no change.");
-		DataGroup actualInitialInputData = integrator->doGetInitialInputData();
+		const DataGroup actualInitialInputData = integrator->doGetInitialInputData();
 		TestInputDataGroup(actualInitialInputData, data);
 	}
 }
@@ -198,7 +200,6 @@ TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 TEST(PoseIntegratorDeviceFilterTest, OutputDataFilter)
 {
 	auto integrator = std::make_shared<MockPoseIntegrator>("PoseIntegratorFilter");
-	integrator->setRate(9123.3);
 	ASSERT_TRUE(integrator->initialize());
 
 	DataGroupBuilder builder;
