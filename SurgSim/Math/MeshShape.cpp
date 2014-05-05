@@ -176,7 +176,7 @@ void MeshShape::computeVolumeIntegrals()
 
 void MeshShape::setGlobalPose(const SurgSim::Math::RigidTransform3d &pose)
 {
-	m_mesh->setTransformedFrom(pose, *m_initialMesh);
+	m_mesh->copyWithTransform(pose, *m_initialMesh);
 }
 
 std::shared_ptr<SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree()

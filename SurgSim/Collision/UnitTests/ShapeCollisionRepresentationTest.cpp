@@ -57,7 +57,7 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 	collisionRepresentation->setPose(transform);
 	collisionRepresentation->update(dt);
 
-	expectedMesh->setTransformedFrom(transform, *originalMesh);
+	expectedMesh->copyWithTransform(transform, *originalMesh);
 
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());

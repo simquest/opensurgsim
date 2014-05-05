@@ -114,7 +114,7 @@ TEST(TriangleMeshTest, SetTransformedFromTest)
 		it->data.normal = transform.linear() * it->data.normal;
 	}
 
-	actualMesh->setTransformedFrom(transform, *originalMesh);
+	actualMesh->copyWithTransform(transform, *originalMesh);
 
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());

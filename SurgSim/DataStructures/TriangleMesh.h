@@ -79,8 +79,8 @@ public:
 	/// Sets the mesh's vertices and normals by transforming a similar mesh.  The two meshes must have the same number
 	/// of vertices, edges, and triangles.
 	/// \param pose the transformation to be applied to the vertices and norms
-	/// \param similarMesh the mesh suppling the vertices and norms
-	void setTransformedFrom(const SurgSim::Math::RigidTransform3d &pose, const TriangleMesh& similarMesh);
+	/// \param source the mesh suppling the vertices and norms
+	void copyWithTransform(const SurgSim::Math::RigidTransform3d &pose, const TriangleMesh& source);
 
 protected:
 	virtual void doUpdate() override;

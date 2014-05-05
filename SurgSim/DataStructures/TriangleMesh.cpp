@@ -52,17 +52,17 @@ void TriangleMesh::doUpdate()
 	calculateNormals();
 }
 
-void TriangleMesh::setTransformedFrom(const SurgSim::Math::RigidTransform3d &pose, const TriangleMesh& similarMesh)
+void TriangleMesh::copyWithTransform(const SurgSim::Math::RigidTransform3d &pose, const TriangleMesh& source)
 {
-	SURGSIM_ASSERT(getNumVertices() == similarMesh.getNumVertices())
+	SURGSIM_ASSERT(getNumVertices() == source.getNumVertices())
 		<< "The similar mesh must have the same number of vertices.";
-	SURGSIM_ASSERT(getNumEdges() == similarMesh.getNumEdges())
+	SURGSIM_ASSERT(getNumEdges() == source.getNumEdges())
 		<< "The similar mesh must have the same number of edges";
-	SURGSIM_ASSERT(getNumTriangles() == similarMesh.getNumTriangles())
+	SURGSIM_ASSERT(getNumTriangles() == source.getNumTriangles())
 		<< "The similar mesh must have the same number of triangles";
 
 	auto targetVertex = getVertices().begin();
-	auto const& vertices = similarMesh.getVertices();
+	auto const& vertices = source.getVertices();
 	for (auto it = vertices.cbegin(); it != vertices.cend(); ++it)
 	{
 		targetVertex->position = pose * it->position;
@@ -70,7 +70,7 @@ void TriangleMesh::setTransformedFrom(const SurgSim::Math::RigidTransform3d &pos
 	}
 
 	auto targetTriangle = getTriangles().begin();
-	auto const& triangles = similarMesh.getTriangles();
+	auto const& triangles = source.getTriangles();
 	for (auto it = triangles.cbegin(); it != triangles.cend(); ++it)
 	{
 		targetTriangle->data.normal = pose.linear() * it->data.normal;

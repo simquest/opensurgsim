@@ -233,7 +233,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();
 	meshB->setFileName(fileName);
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
-	meshB->getMesh()->setTransformedFrom(rhsPose, *meshA->getMesh());
+	meshB->getMesh()->copyWithTransform(rhsPose, *meshA->getMesh());
 
 	meshA->updateAabbTree();
 	meshB->updateAabbTree();
