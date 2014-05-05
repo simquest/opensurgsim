@@ -31,10 +31,16 @@ endif()
 # Define our own debug symbol
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOSS_DEBUG")
 
+option(SURGSIM_WARNINGS_AS_ERRORS "Treat warnings as errors in the compilation process" ON) 
+
 # G++ (C++ compilation) specific settings
 if(CMAKE_COMPILER_IS_GNUCXX)
 	# default G++ compilation flags
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ")
+	
+	if (SURGSIM_WARNINGS_AS_ERRORS)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+	endif()
 
 	# Enable support for C++0x/C++11 for G++ if available
 	include(CheckCXXCompilerFlag)
@@ -56,6 +62,11 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 if(CMAKE_COMPILER_IS_GNUCC)  # "CC"?  really?  sigh.
 	# default GCC compilation flags
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+	
+	if (SURGSIM_WARNINGS_AS_ERRORS)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+	endif(SURGSIM_WARNINGS_AS_ERRORS)
+
 endif(CMAKE_COMPILER_IS_GNUCC)
 
 # Visual Studio C/C++ specific settings
@@ -77,7 +88,12 @@ if(MSVC)
 	#  But this works, and gets put in the proper place in the project.]
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=2")
 	# Enable parallel builds:
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /WX")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+	
+	if (SURGSIM_WARNINGS_AS_ERRORS)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+	endif(SURGSIM_WARNINGS_AS_ERRORS)
+	
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")  # is this needed?
 	set(CMAKE_DEBUG_POSTFIX "d")
 
