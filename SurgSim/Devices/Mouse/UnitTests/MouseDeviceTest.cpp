@@ -21,6 +21,7 @@
 #include "SurgSim/Devices/Mouse/MouseDevice.h"
 #include "SurgSim/Devices/Mouse/MouseScaffold.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Testing/DevicesUtilities.h"
 
 namespace SurgSim
 {
@@ -29,17 +30,7 @@ namespace Device
 
 using SurgSim::Device::MouseDevice;
 using SurgSim::DataStructures::DataGroup;
-
-struct TestListener : public SurgSim::Input::InputConsumerInterface
-{
-	virtual void initializeInput(const std::string& device, const DataGroup& inputData) override {}
-	virtual void handleInput(const std::string& device, const DataGroup& inputData) override
-	{
-		m_lastReceivedInput = inputData;
-	}
-
-	DataGroup m_lastReceivedInput;
-};
+using SurgSim::Testing::MockInputOutput;
 
 class MouseDeviceTest : public ::testing::Test
 {
@@ -76,7 +67,7 @@ TEST_F(MouseDeviceTest, InputConsumer)
 	std::shared_ptr<MouseDevice> device = std::make_shared<MouseDevice>("TestMouse");
 	device->initialize();
 
-	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
+	std::shared_ptr<MockInputOutput> consumer = std::make_shared<MockInputOutput>();
 	EXPECT_TRUE(device->addInputConsumer(consumer));
 
 	MouseDeviceTest::update(device);

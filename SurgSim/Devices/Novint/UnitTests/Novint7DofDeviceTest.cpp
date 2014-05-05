@@ -29,6 +29,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Framework/Clock.h"
+#include "SurgSim/Testing/DevicesUtilities.h"
 
 using SurgSim::Device::Novint7DofDevice;
 using SurgSim::Device::NovintScaffold;
@@ -38,50 +39,11 @@ using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Framework::Clock;
-
+using SurgSim::Testing::MockInputOutput;
 
 // Define common device names used in the Novint device tests.
 extern const char* const NOVINT_TEST_DEVICE_NAME;
 extern const char* const NOVINT_TEST_DEVICE_NAME_2;
-
-
-struct Test7DofListener : public InputConsumerInterface, public OutputProducerInterface
-{
-public:
-	Test7DofListener() :
-		m_numTimesInitializedInput(0),
-		m_numTimesReceivedInput(0),
-		m_numTimesRequestedOutput(0)
-	{
-	}
-
-	virtual void initializeInput(const std::string& device, const DataGroup& inputData);
-	virtual void handleInput(const std::string& device, const DataGroup& inputData);
-	virtual bool requestOutput(const std::string& device, DataGroup* outputData);
-
-	int m_numTimesInitializedInput;
-	int m_numTimesReceivedInput;
-	int m_numTimesRequestedOutput;
-	DataGroup m_lastReceivedInput;
-};
-
-void Test7DofListener::initializeInput(const std::string& device, const DataGroup& inputData)
-{
-	++m_numTimesInitializedInput;
-}
-
-void Test7DofListener::handleInput(const std::string& device, const DataGroup& inputData)
-{
-	++m_numTimesReceivedInput;
-	m_lastReceivedInput = inputData;
-}
-
-bool Test7DofListener::requestOutput(const std::string& device, DataGroup* outputData)
-{
-	++m_numTimesRequestedOutput;
-	return false;
-}
-
 
 TEST(Novint7DofDeviceTest, CreateUninitializedDevice)
 {
@@ -202,7 +164,7 @@ TEST(Novint7DofDeviceTest, InputConsumer)
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 
-	std::shared_ptr<Test7DofListener> consumer = std::make_shared<Test7DofListener>();
+	std::shared_ptr<MockInputOutput> consumer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
 	EXPECT_FALSE(device->removeInputConsumer(consumer));
@@ -238,7 +200,7 @@ TEST(Novint7DofDeviceTest, OutputProducer)
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 
-	std::shared_ptr<Test7DofListener> producer = std::make_shared<Test7DofListener>();
+	std::shared_ptr<MockInputOutput> producer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
 	EXPECT_FALSE(device->removeOutputProducer(producer));
