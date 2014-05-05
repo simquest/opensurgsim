@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	AabbTests.cpp
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
 	MeshShapeTests.cpp
@@ -28,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	OdeSolverEulerExplicitModifiedTests.cpp
 	OdeSolverEulerExplicitTests.cpp
 	OdeSolverEulerImplicitTests.cpp
+	OdeSolverStaticTests.cpp
 	OdeSolverTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp

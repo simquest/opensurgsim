@@ -83,14 +83,6 @@ public:
 
 	virtual bool doInitialize() override;
 
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) override;
-
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override;
-
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
-
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
-
 private:
 
 	/// Shape used for collision detection

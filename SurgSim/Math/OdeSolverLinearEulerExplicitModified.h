@@ -28,12 +28,12 @@ namespace Math
 /// This solver assumes that the system is linear, ie that Mass,
 /// Damping, and Stiffness matrices do not change.
 template <class State, class MT, class DT, class KT, class ST>
-class LinearModifiedExplicitEuler : public ModifiedExplicitEuler<State, MT, DT, KT, ST>
+class OdeSolverLinearEulerExplicitModified : public OdeSolverEulerExplicitModified<State, MT, DT, KT, ST>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit LinearModifiedExplicitEuler(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverLinearEulerExplicitModified(OdeEquation<State, MT, DT, KT, ST>* equation);
 
 	virtual void solve(double dt, const State& currentState, State* newState) override;
 

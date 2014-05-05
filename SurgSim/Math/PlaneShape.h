@@ -16,7 +16,6 @@
 #ifndef SURGSIM_MATH_PLANESHAPE_H
 #define SURGSIM_MATH_PLANESHAPE_H
 
-#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim

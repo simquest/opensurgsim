@@ -274,4 +274,56 @@ private:
 
 };
 
+class MockRepresentation : public SurgSim::Framework::Representation
+{
+public:
+	/// Constructor
+	/// \param	name	Name of the representation
+	/// \post	m_pose is initialized to identity
+	/// \post	m_didInit is initialized to false
+	/// \post	m_didWakeUp is initialized to false
+	explicit MockRepresentation(const std::string& name) : SurgSim::Framework::Representation(name),
+		m_didInit(false),
+		m_didWakeUp(false)
+	{
+	}
+
+	SURGSIM_CLASSNAME(MockRepresentation);
+
+	/// Returns true if the representation has been initialized, otherwise false
+	bool didInit() const
+	{
+		return m_didInit;
+	}
+
+	/// Returns true if the representation has been woken up, otherwise false
+	bool didWakeUp() const
+	{
+		return m_didWakeUp;
+	}
+
+private:
+	/// Whether the representation has been initialized
+	bool m_didInit;
+	/// Whether the representation has been woken up
+	bool m_didWakeUp;
+
+	/// Initializes the representation
+	/// \return	True if succeeds, otherwise false
+	virtual bool doInitialize()
+	{
+		m_didInit = true;
+		return true;
+	}
+
+	/// Wakes up the representation
+	/// \return	True if succeeds, otherwise false
+	virtual bool doWakeUp()
+	{
+		m_didWakeUp = true;
+		return true;
+	}
+};
+
+
 #endif  // SURGSIM_FRAMEWORK_UNITTESTS_MOCKOBJECTS_H

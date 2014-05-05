@@ -19,6 +19,11 @@
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::OctreeShape);
+}
+
 namespace SurgSim
 {
 

@@ -54,12 +54,6 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 	return REPRESENTATION_TYPE_RIGID;
 }
 
-void RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), SEVERE) <<
-			"RigidRepresentation::setPose does nothing.";
-}
-
 void RigidRepresentation::addExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& K,
 		const SurgSim::Math::Matrix33d& D)
 {
@@ -78,6 +72,8 @@ void RigidRepresentation::addExternalTorque(const SurgSim::Math::Vector3d& torqu
 
 void RigidRepresentation::beforeUpdate(double dt)
 {
+	RigidRepresentationBase::beforeUpdate(dt);
+
 	bool isParametersValid = m_currentParameters.isValid();
 	SURGSIM_LOG_IF(!isParametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
@@ -87,8 +83,6 @@ void RigidRepresentation::beforeUpdate(double dt)
 		setIsActive(false);
 		return;
 	}
-
-	m_previousState = m_currentState;
 }
 
 void RigidRepresentation::update(double dt)
@@ -116,9 +110,6 @@ void RigidRepresentation::update(double dt)
 	Vector3d         w = m_currentState.getAngularVelocity();
 	Quaterniond     dq;
 	double       qNorm = q.norm(); // Norm of q before normalization
-
-	// Backup the state
-	m_previousState = m_currentState;
 
 	// Rigid body dynamics (using backward euler numerical integration scheme):
 	// { Id33.m.(v(t+dt) - v(t))/dt = f
@@ -199,6 +190,8 @@ void RigidRepresentation::update(double dt)
 
 void RigidRepresentation::afterUpdate(double dt)
 {
+	RigidRepresentationBase::afterUpdate(dt);
+
 	bool isParametersValid = m_currentParameters.isValid();
 	SURGSIM_LOG_IF(!isParametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
@@ -209,7 +202,6 @@ void RigidRepresentation::afterUpdate(double dt)
 		return;
 	}
 
-	m_finalState = m_currentState;
 	m_externalForce = SurgSim::Math::Vector3d::Zero();
 	m_externalTorque = SurgSim::Math::Vector3d::Zero();
 	m_externalStiffnessMatrix = Matrix66d::Zero();

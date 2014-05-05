@@ -39,6 +39,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	LoggerManager.cpp
 	LogMessageBase.cpp
 	LogOutput.cpp
+	PoseComponent.cpp
 	Representation.cpp
 	Runtime.cpp
 	Scene.cpp
@@ -62,7 +63,6 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Component.h
 	ComponentManager.h
 	ComponentManager-inl.h
-	Convert.h
 	FrameworkConvert.h
 	FrameworkConvert-inl.h
 	LockedContainer.h
@@ -76,6 +76,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Macros.h
 	ObjectFactory.h
 	ObjectFactory-inl.h
+	PoseComponent.h
 	Representation.h
 	ReuseFactory.h
 	Runtime.h

@@ -15,7 +15,6 @@
 
 #include "Examples/ExampleStapling/StapleElement.h"
 
-#include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Framework/ApplicationData.h"
@@ -25,7 +24,6 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::DataStructures::PlyReader;
 using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Framework::ApplicationData;
@@ -45,11 +43,6 @@ StapleElement::StapleElement(const std::string& name) :
 
 StapleElement::~StapleElement()
 {
-}
-
-void StapleElement::setPose(const RigidTransform3d& pose)
-{
-	m_pose = pose;
 }
 
 void StapleElement::setHasCollisionRepresentation(bool flag)
@@ -79,21 +72,13 @@ bool StapleElement::doInitialize()
 
 	auto physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(m_pose);
 
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSceneryRepresentation>("Graphics");
 	graphicsRepresentation->setFileName("Geometry/staple.obj");
-	graphicsRepresentation->setInitialPose(m_pose);
-
-	std::shared_ptr<TransferPoseBehavior> transferPose =
-		std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPose->setPoseSender(physicsRepresentation);
-	transferPose->setPoseReceiver(graphicsRepresentation);
 
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
-	addComponent(transferPose);
 
 	if (m_hasCollisionRepresentation)
 	{

@@ -22,9 +22,6 @@
 #include <boost/any.hpp>
 
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Framework/Convert.h"
-
-
 
 class TestClass : public SurgSim::Framework::Accessible
 {

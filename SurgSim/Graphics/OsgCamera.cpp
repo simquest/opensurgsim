@@ -78,22 +78,13 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_switch->addChild(m_camera);
 	m_camera->addChild(m_materialProxy);
 
-	/// Update pose to inverse of view matrix
-	osg::Matrixd inverseViewMatrix = osg::Matrixd::inverse(m_camera->getViewMatrix());
-	m_pose = makeRigidTransform(fromOsg<double>(inverseViewMatrix.getRotate()), fromOsg(inverseViewMatrix.getTrans()));
-
-	m_camera->setViewMatrixAsLookAt(osg::Vec3d(0.0, 0.0, 0.0), osg::Vec3d(0.0, 0.0, -1.0), osg::Vec3d(0.0, 1.0, 0.0));
+	m_camera->setViewMatrix(toOsg(getLocalPose().inverse().matrix()));
 	m_camera->setProjectionMatrixAsPerspective(45.0, 1.0, 0.01, 10.0);
 
 	m_camera->setComputeNearFarMode(osgUtil::CullVisitor::DO_NOT_COMPUTE_NEAR_FAR);
 
 	/// Update storage of view and projection matrices
-	m_viewMatrix = fromOsg(m_camera->getViewMatrix());
-	m_inverseViewMatrix = fromOsg(m_camera->getInverseViewMatrix());
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
-
-	// Set a default group
-	setGroup(std::make_shared<OsgGroup>(name+" default group"));
 }
 
 bool OsgCamera::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
@@ -121,34 +112,9 @@ bool OsgCamera::isVisible() const
 	return m_switch->getChildValue(m_camera);
 }
 
-void OsgCamera::setPose(const SurgSim::Math::RigidTransform3d& transform)
+SurgSim::Math::Matrix44d OsgCamera::getViewMatrix() const
 {
-	setViewMatrix(transform.matrix().inverse());
-}
-
-const SurgSim::Math::RigidTransform3d& OsgCamera::getPose() const
-{
-	return m_pose;
-}
-
-void OsgCamera::setViewMatrix(const SurgSim::Math::Matrix44d& matrix)
-{
-	m_viewMatrix = matrix;
-
-	/// Set the pose to the inverse of the view matrix
-	osg::Matrixd osgViewMatrix = toOsg(matrix);
-	osg::Matrixd osgInverseViewMatrix = osg::Matrixd::inverse(osgViewMatrix);
-	m_pose = makeRigidTransform(fromOsg<double>(osgInverseViewMatrix.getRotate()),
-								fromOsg(osgInverseViewMatrix.getTrans()));
-
-	m_inverseViewMatrix = fromOsg(osgInverseViewMatrix);
-
-	m_camera->setViewMatrix(osgViewMatrix);
-}
-
-const SurgSim::Math::Matrix44d& OsgCamera::getViewMatrix() const
-{
-	return m_viewMatrix;
+	return getPose().inverse().matrix();
 }
 
 void OsgCamera::setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
@@ -164,20 +130,12 @@ const SurgSim::Math::Matrix44d& OsgCamera::getProjectionMatrix() const
 
 void OsgCamera::update(double dt)
 {
-	/// Update pose to inverse of view matrix
-	osg::Matrixd inverseViewMatrix = osg::Matrixd::inverse(m_camera->getViewMatrix());
-	m_pose = makeRigidTransform(fromOsg<double>(inverseViewMatrix.getRotate()), fromOsg(inverseViewMatrix.getTrans()));
-
-	/// Update storage of view and projection matrices
-	m_viewMatrix = fromOsg(m_camera->getViewMatrix());
-	m_inverseViewMatrix = fromOsg(m_camera->getInverseViewMatrix());
-	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+	m_camera->setViewMatrix(toOsg(getViewMatrix()));
 }
 
 bool OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)
 {
 	bool result = false;
-
 
 	// Check for correct dynamic type
 	auto osg2dTarget = std::dynamic_pointer_cast<OsgRenderTarget2d>(renderTarget);
@@ -299,9 +257,9 @@ osg::ref_ptr<osg::Node> OsgCamera::getOsgNode() const
 	return m_switch;
 }
 
-const SurgSim::Math::Matrix44d& OsgCamera::getInverseViewMatrix() const
+SurgSim::Math::Matrix44d OsgCamera::getInverseViewMatrix() const
 {
-	return m_inverseViewMatrix;
+	return getPose().matrix();
 }
 
 }; // namespace Graphics

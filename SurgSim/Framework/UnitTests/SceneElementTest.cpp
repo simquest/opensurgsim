@@ -16,6 +16,9 @@
 #include <gtest/gtest.h>
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
 
 #include "MockObjects.h"  //NOLINT
 
@@ -25,6 +28,21 @@ using SurgSim::Framework::SceneElement;
 TEST(SceneElementTest, Constructor)
 {
 	ASSERT_NO_THROW({MockSceneElement element;});
+}
+
+TEST(SceneElementTest, Pose)
+{
+	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::Quaterniond;
+	using SurgSim::Math::RigidTransform3d;
+	using SurgSim::Math::Vector3d;
+
+	MockSceneElement element;
+	EXPECT_TRUE(element.getPose().isApprox(RigidTransform3d::Identity()));
+
+	RigidTransform3d pose(makeRigidTransform(Quaterniond(0.0, 1.0, 0.0, 0.0), Vector3d(1.0, 2.0, 3.0)));
+	element.setPose(pose);
+	EXPECT_TRUE(element.getPose().isApprox(pose));
 }
 
 TEST(SceneElementTest, UpdateFunctions)

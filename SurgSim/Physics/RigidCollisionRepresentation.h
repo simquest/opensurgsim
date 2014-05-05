@@ -46,21 +46,9 @@ public:
 	/// Destructor
 	virtual ~RigidCollisionRepresentation();
 
-	/// Set the initial pose of the representation
-	/// \param pose The initial pose
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) override;
-
-	/// Get the initial pose of the representation
-	/// \return The initial pose
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override;
-
-	/// Set the pose of the representation
-	/// \param pose The pose to set the representation to
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
-
 	/// Get the pose of the representation
 	/// \return The pose of this representation
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
+	virtual SurgSim::Math::RigidTransform3d getPose() const override;
 
 	/// Get the shape type id
 	/// \return The unique type of the shape, used to determine which calculation to use.

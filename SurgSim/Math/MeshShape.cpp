@@ -16,7 +16,7 @@
 
 #include "SurgSim/Math/MeshShape.h"
 
-#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
 namespace
