@@ -16,14 +16,18 @@
 #ifndef SURGSIM_DATASTRUCTURES_INDEXDIRECTORY_H
 #define SURGSIM_DATASTRUCTURES_INDEXDIRECTORY_H
 
+#include <memory>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 namespace SurgSim
 {
 namespace DataStructures
 {
+
+/// The type used for copying values between two IndexDirectory objects that cannot assign to each other.  /sa findMap.
+typedef std::unordered_map<int, int> IndexDirectoryCopyMap;
 
 /// A simple bidirectional mapping between names (strings) and distinct consecutive non-negative indices.
 ///
@@ -102,6 +106,12 @@ public:
 	{
 		return static_cast<int>(m_names.size());
 	}
+
+	/// Find the entries (by name) in this IndexDirectory that are in another IndexDirectory, and return the matching
+	/// indices.
+	/// \param other The IndexDirectory with which to compare.
+	/// \return The matched indices.
+	IndexDirectoryCopyMap findMap(std::shared_ptr<const IndexDirectory> other) const;
 
 protected:
 	template <typename T>

@@ -262,6 +262,12 @@ public:
 	/// \sa size()
 	inline int getNumEntries() const;
 
+	/// Copy the data from another NamedData, based on a map of indices.
+	/// \param other The "from" NamedData.
+	/// \param map The map of indices.
+	template <typename N>
+	inline void copy(const NamedData<N>& other, const IndexDirectoryCopyMap& map);
+
 private:
 	/// The mapping between names and indices.
 	std::shared_ptr<const IndexDirectory> m_directory;

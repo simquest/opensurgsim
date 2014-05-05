@@ -161,6 +161,32 @@ inline void DataGroup::resetAll()
 	m_customData.resetAll();
 }
 
+inline DataGroupCopyMap DataGroup::findMap(const DataGroup& other) const
+{
+	DataGroupCopyMap maps;
+	maps[0] = m_poses.getDirectory()->findMap(other.poses().getDirectory());
+	maps[1] = m_vectors.getDirectory()->findMap(other.vectors().getDirectory());
+	maps[2] = m_matrices.getDirectory()->findMap(other.matrices().getDirectory());
+	maps[3] = m_scalars.getDirectory()->findMap(other.scalars().getDirectory());
+	maps[4] = m_integers.getDirectory()->findMap(other.integers().getDirectory());
+	maps[5] = m_booleans.getDirectory()->findMap(other.booleans().getDirectory());
+	maps[6] = m_strings.getDirectory()->findMap(other.strings().getDirectory());
+	maps[7] = m_customData.getDirectory()->findMap(other.customData().getDirectory());
+	return maps;
+}
+
+
+inline void DataGroup::copy(const DataGroup& other, const DataGroupCopyMap& maps)
+{
+	m_poses.copy(other.poses(), maps[0]);
+	m_vectors.copy(other.vectors(), maps[1]);
+	m_matrices.copy(other.matrices(), maps[2]);
+	m_scalars.copy(other.scalars(), maps[3]);
+	m_integers.copy(other.integers(), maps[4]);
+	m_booleans.copy(other.booleans(), maps[5]);
+	m_strings.copy(other.strings(), maps[6]);
+	m_customData.copy(other.customData(), maps[7]);
+}
 
 };  // namespace Input
 };  // namespace SurgSim

@@ -105,3 +105,22 @@ TEST(IndexDirectoryTests, BadKeyOrIndex)
 	EXPECT_EQ("", dir->getName(+56789));
 	EXPECT_EQ("", dir->getName(2));
 }
+
+/// Find the map from one IndexDirectory to another.
+TEST(IndexDirectoryTests, FindMap)
+{
+	NamedDataBuilder<float> fromBuilder;
+	ASSERT_EQ(0, fromBuilder.addEntry("first"));
+	ASSERT_EQ(1, fromBuilder.addEntry("second"));
+	NamedDataBuilder<float> toBuilder;
+	ASSERT_EQ(0, toBuilder.addEntry("second"));
+	ASSERT_EQ(1, toBuilder.addEntry("third"));
+
+	std::shared_ptr<const IndexDirectory> fromDirectory = fromBuilder.createData().getDirectory();
+	std::shared_ptr<const IndexDirectory> toDirectory = toBuilder.createData().getDirectory();
+	const SurgSim::DataStructures::IndexDirectoryCopyMap map = toDirectory->findMap(fromDirectory);
+
+	ASSERT_EQ(1, map.size()); // Only one name is in both IndexDirectories.
+	ASSERT_EQ(1, map.count(1)); // That name is at index 1 of the fromDirectory
+	EXPECT_EQ(0, map.at(1)); // The map should point from index 1 of the fromDirectory to index 0 of the toDirectory.
+}

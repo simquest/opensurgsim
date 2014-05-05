@@ -62,6 +62,21 @@ int IndexDirectory::addEntry(const std::string& name)
 	return index;
 }
 
+IndexDirectoryCopyMap IndexDirectory::findMap(std::shared_ptr<const IndexDirectory> other) const
+{
+	IndexDirectoryCopyMap map;
+	const std::vector<std::string>& otherNames = other->getAllNames();
+	for (auto it = otherNames.cbegin(); it != otherNames.cend(); ++it)
+	{
+		const int index = getIndex(*it);
+		if (index > -1)
+		{
+			map[other->getIndex(*it)] = index;
+		}
+	}
+	return map;
+}
+
 
 };  // namespace Input
 };  // namespace SurgSim

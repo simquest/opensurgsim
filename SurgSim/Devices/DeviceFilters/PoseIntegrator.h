@@ -19,6 +19,8 @@
 #include <memory>
 #include <string>
 
+#include "Surgsim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Input/CommonDevice.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Input/OutputProducerInterface.h"
@@ -70,7 +72,14 @@ private:
 	/// The result of integrating the input poses.
 	PoseType m_poseResult;
 
+	/// A timer for the update rate needed for calculating velocity.
 	SurgSim::Framework::Timer m_timer;
+
+	/// true if the input DataGroup should be created.
+	bool m_firstInput;
+
+	/// The maps from the device's DataGroup to this object's input DataGroup.
+	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::DataGroupCopyMap> m_map;
 
 	///@{
 	/// The indices into the DataGroups.

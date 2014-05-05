@@ -15,6 +15,7 @@
 
 #include "SurgSim/Devices/DeviceFilters/PoseIntegrator.h"
 
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -28,6 +29,7 @@ namespace Device
 PoseIntegrator::PoseIntegrator(const std::string& name) :
 	CommonDevice(name),
 	m_poseResult(PoseType::Identity()),
+	m_firstInput(true),
 	m_poseIndex(-1),
 	m_linearVelocityIndex(-1),
 	m_angularVelocityIndex(-1)
@@ -54,12 +56,37 @@ bool PoseIntegrator::finalize()
 
 void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
-	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::Names::POSE);
-	m_linearVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
-	m_angularVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
+	if (m_firstInput)
+	{
+		m_firstInput = false;
 
-	getInitialInputData() = inputData;
-	getInputData() = inputData;
+		if (!inputData.vectors().hasEntry(SurgSim::DataStructures::Names::LINEAR_VELOCITY) ||
+			!inputData.vectors().hasEntry(SurgSim::DataStructures::Names::ANGULAR_VELOCITY))
+		{
+			SurgSim::DataStructures::DataGroupBuilder builder;
+			builder.addEntriesFrom(inputData);
+			builder.addVector(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
+			builder.addVector(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
+			getInitialInputData() = builder.createData();
+			getInputData() = getInitialInputData();
+
+			m_map.setValue(getInputData().findMap(inputData));
+		}
+	}
+
+	if (m_map.hasValue())
+	{
+		getInitialInputData().copy(inputData, m_map.getValue());
+	}
+	else
+	{
+		getInitialInputData() = inputData;
+	}
+	getInputData() = getInitialInputData();
+
+	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::Names::POSE);
+	m_linearVelocityIndex = getInputData().vectors().getIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
+	m_angularVelocityIndex = getInputData().vectors().getIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
 
 	SurgSim::Math::RigidTransform3d pose;
 	if (inputData.poses().get(SurgSim::DataStructures::Names::POSE, &pose))
@@ -70,7 +97,14 @@ void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::D
 
 void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
-	getInputData() = inputData;
+	if (m_map.hasValue())
+	{
+		getInputData().copy(inputData, m_map.getValue());
+	}
+	else
+	{
+		getInputData() = inputData;
+	}
 
 	if (m_poseIndex >= 0)
 	{
@@ -86,21 +120,16 @@ void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataS
 			}
 
 			// Before updating the current pose, use it to calculate the angular velocity.
-			if (m_angularVelocityIndex >= 0)
-			{
-				Vector3d rotationAxis;
-				double angle;
-				SurgSim::Math::computeAngleAndAxis(pose.rotation(), &angle, &rotationAxis);
-				rotationAxis = m_poseResult.rotation() * rotationAxis; // rotate the axis into global space
-				getInputData().vectors().set(m_angularVelocityIndex, rotationAxis * angle * rate);
-			}
+			Vector3d rotationAxis;
+			double angle;
+			SurgSim::Math::computeAngleAndAxis(pose.rotation(), &angle, &rotationAxis);
+			rotationAxis = m_poseResult.rotation() * rotationAxis; // rotate the axis into global space
+			// The angular and linear indices must exist because the entries were added in initializeInput.
+			getInputData().vectors().set(m_angularVelocityIndex, rotationAxis * angle * rate);
 
 			getInputData().poses().set(m_poseIndex, integrate(pose));
 
-			if (m_linearVelocityIndex >= 0)
-			{
-				getInputData().vectors().set(m_linearVelocityIndex, pose.translation() * rate);
-			}
+			getInputData().vectors().set(m_linearVelocityIndex, pose.translation() * rate);
 		}
 	}
 	pushInput();

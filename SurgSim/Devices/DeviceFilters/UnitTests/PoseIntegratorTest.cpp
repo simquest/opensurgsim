@@ -109,6 +109,74 @@ void TestInputDataGroup(const DataGroup& actualData, const DataGroup& expectedDa
 }
 };
 
+// If the Device being filtered does not provide the linear and/or angular velocity vectors in its DataGroup, the
+// PoseIntegrator adds them.
+TEST(PoseIntegratorDeviceFilterTest, AddVelocityDataEntries)
+{
+	auto integrator = std::make_shared<MockPoseIntegrator>("PoseIntegratorFilter");
+	ASSERT_TRUE(integrator->initialize());
+
+	DataGroupBuilder builder;
+	builder.addPose(SurgSim::DataStructures::Names::POSE);
+	builder.addVector("someVector");
+	builder.addBoolean("extraData");
+
+	DataGroup data = builder.createData();
+	const double rotationAngle = 0.1;
+	const Vector3d rotationAxis = Vector3d::UnitX();
+	const Vector3d translation(2.0, 3.0, 4.0);
+	const RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(rotationAngle, rotationAxis), translation);
+	data.poses().set(SurgSim::DataStructures::Names::POSE, pose);
+	const Vector3d expectedVector(24.0, -3.2, 0.0);
+	data.vectors().set("someVector", expectedVector);
+	const bool expectedBoolean = true;
+	data.booleans().set("extraData", expectedBoolean);
+
+	{	// Test the code-path in initializeInput when the filter has to add entries.
+		// Normally the input device's initial input data would be set by the constructor or scaffold, then
+		// initializeInput would be called in addInputConsumer.
+		integrator->initializeInput("device", data);
+		const DataGroup actualInputData = integrator->doGetInputData();
+
+		// Test that the velocity entries were added
+		EXPECT_TRUE(actualInputData.vectors().hasEntry(SurgSim::DataStructures::Names::LINEAR_VELOCITY));
+		EXPECT_TRUE(actualInputData.vectors().hasEntry(SurgSim::DataStructures::Names::ANGULAR_VELOCITY));
+
+		RigidTransform3d actualPose;
+		ASSERT_TRUE(actualInputData.poses().get(SurgSim::DataStructures::Names::POSE, &actualPose));
+		EXPECT_TRUE(actualPose.isApprox(pose, ERROR_EPSILON));
+
+		Vector3d actualVector;
+		ASSERT_TRUE(actualInputData.vectors().get("someVector", &actualVector));
+		EXPECT_TRUE(actualVector.isApprox(expectedVector, ERROR_EPSILON));
+
+		bool actualBoolean;
+		ASSERT_TRUE(actualInputData.booleans().get("extraData", &actualBoolean));
+		EXPECT_EQ(expectedBoolean, actualBoolean);
+	}
+
+	const RigidTransform3d newPose = pose.inverse();
+	data.poses().set(SurgSim::DataStructures::Names::POSE, newPose);
+	const Vector3d newVector = Vector3d(-0.77, 3.9, 99.0);
+	data.vectors().set("someVector", newVector);
+	const bool newBoolean = !expectedBoolean;
+	data.booleans().set("extraData", newBoolean);
+
+	{   // Test that the code-path through handleInput if the filter had to add entries...did it correctly pass data.
+		// The InputDataFilter test checks for correctness of the pose and velocity entries.
+		integrator->handleInput("device", data);
+		const DataGroup actualInputData = integrator->doGetInputData();
+
+		Vector3d actualVector;
+		ASSERT_TRUE(actualInputData.vectors().get("someVector", &actualVector));
+		EXPECT_TRUE(actualVector.isApprox(newVector, ERROR_EPSILON));
+
+		bool actualBoolean;
+		ASSERT_TRUE(actualInputData.booleans().get("extraData", &actualBoolean));
+		EXPECT_EQ(newBoolean, actualBoolean);
+	}
+};
+
 TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 {
 	auto integrator = std::make_shared<MockPoseIntegrator>("PoseIntegratorFilter");
