@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_PHYSICSMANAGER_H
 #define SURGSIM_PHYSICS_PHYSICSMANAGER_H
 
+#include <boost/thread/mutex.hpp>
 #include <memory>
 #include <vector>
 
@@ -84,6 +85,8 @@ public:
 									 std::shared_ptr<SurgSim::Collision::Representation> representation2);
 
 protected:
+	/// Mutex to protect m_excludedCollisionPairs from being read/written simultaneously.
+	boost::mutex m_excludedCollisionPairMutex;
 
 	///@{
 	/// Overridden from ComponentManager

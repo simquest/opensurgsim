@@ -85,8 +85,7 @@ std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>::iterator Physic
 void PhysicsManager::addExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
 											  std::shared_ptr<SurgSim::Collision::Representation> representation2)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "Failed to add excluded collision pair.  List of excluded collision pairs "
-										"cannot be modified after PhysicsManager is initialized.";
+	boost::mutex::scoped_lock lock(m_excludedCollisionPairMutex);
 
 	if (findExcludedCollisionPair(representation1, representation2) == m_excludedCollisionPairs.end())
 	{
@@ -98,8 +97,7 @@ void PhysicsManager::addExcludedCollisionPair(std::shared_ptr<SurgSim::Collision
 void PhysicsManager::removeExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
 												 std::shared_ptr<SurgSim::Collision::Representation> representation2)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "Failed to add excluded collision pair.  List of excluded collision pairs "
-										"cannot be modified after PhysicsManager is initialized.";
+	boost::mutex::scoped_lock lock(m_excludedCollisionPairMutex);
 
 	auto candidatePair = findExcludedCollisionPair(representation1, representation2);
 
@@ -139,7 +137,10 @@ bool PhysicsManager::doUpdate(double dt)
 	state->setRepresentations(m_representations);
 	state->setCollisionRepresentations(m_collisionRepresentations);
 	state->setConstraintComponents(m_constraintComponents);
+
+	m_excludedCollisionPairMutex.lock();
 	state->setExcludedCollisionPairs(m_excludedCollisionPairs);
+	m_excludedCollisionPairMutex.unlock();
 
 	stateList.push_back(m_preUpdateStep->update(dt, stateList.back()));
 	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
