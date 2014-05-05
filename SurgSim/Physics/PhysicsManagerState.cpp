@@ -122,7 +122,8 @@ void PhysicsManagerState::setExcludedCollisionPairs(
 	m_excludedCollisionPairs = val;
 }
 
-const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& PhysicsManagerState::getExcludedCollisionPairs()
+const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>&
+	PhysicsManagerState::getExcludedCollisionPairs() const
 {
 	return m_excludedCollisionPairs;
 }

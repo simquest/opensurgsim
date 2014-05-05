@@ -96,7 +96,7 @@ public:
 
 	/// Gets the exclusion pairs
 	/// \return The stored exclusion pairs
-	const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& getExcludedCollisionPairs();
+	const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& getExcludedCollisionPairs() const;
 
 	/// Sets the group of constraints to a given value, the grouping indicates what type of constraint we are dealing
 	/// with.

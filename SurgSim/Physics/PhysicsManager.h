@@ -106,7 +106,8 @@ private:
 	/// Get an iterator to an excluded collision pair.
 	/// \param representation1 The first Collision::Representation for the pair
 	/// \param representation2 The second Collision::Representation for the pair
-	/// \return iterator to the excluded collision pair
+	/// \return If the pair is found, an iterator to the excluded collision pair; otherwise an iterator to the
+	/// container's past-the-end element.
 	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>::iterator findExcludedCollisionPair(
 		std::shared_ptr<SurgSim::Collision::Representation> representation1,
 		std::shared_ptr<SurgSim::Collision::Representation> representation2);

@@ -74,12 +74,11 @@ std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>::iterator Physic
 	std::shared_ptr<SurgSim::Collision::Representation> representation2)
 {
 	return std::find_if(m_excludedCollisionPairs.begin(), m_excludedCollisionPairs.end(),
-						[&representation1, &representation2] (const std::shared_ptr<SurgSim::Collision::CollisionPair>&
-															  pair)
-						{
-							return (pair->getFirst() == representation1 && pair->getSecond() == representation2)
-								|| (pair->getFirst() == representation2 && pair->getSecond() == representation1);
-						});
+		[&representation1, &representation2] (const std::shared_ptr<SurgSim::Collision::CollisionPair>&pair)
+		{
+			return (pair->getFirst() == representation1 && pair->getSecond() == representation2)
+				|| (pair->getFirst() == representation2 && pair->getSecond() == representation1);
+		});
 }
 
 void PhysicsManager::addExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
