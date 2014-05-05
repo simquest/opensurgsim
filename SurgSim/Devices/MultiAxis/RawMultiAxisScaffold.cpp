@@ -601,8 +601,6 @@ SurgSim::DataStructures::DataGroup RawMultiAxisScaffold::buildDeviceInputData()
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addPose(SurgSim::DataStructures::Names::POSE);
-	builder.addVector(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
-	builder.addVector(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
 	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_1);
 	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_2);
 	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_3);

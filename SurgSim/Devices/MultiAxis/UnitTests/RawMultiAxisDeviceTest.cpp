@@ -219,8 +219,6 @@ TEST(RawMultiAxisDeviceTest, InputConsumer)
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 110);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.vectors().hasData(SurgSim::DataStructures::Names::LINEAR_VELOCITY));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.vectors().hasData(SurgSim::DataStructures::Names::ANGULAR_VELOCITY));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_1));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_2));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_3));
