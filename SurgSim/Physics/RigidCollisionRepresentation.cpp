@@ -13,12 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/RigidCollisionRepresentation.h"
-
 #include "SurgSim/Math/MeshShape.h"
-
-#include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 namespace SurgSim
 {
@@ -43,20 +39,11 @@ void RigidCollisionRepresentation::update(const double& dt)
 
 	auto shape = physicsRepresentation->getCurrentParameters().getShapeUsedForMassInertia();
 
-	if (shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
+	if (meshShape != nullptr)
 	{
-		auto localMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(shape);
-
-		if (m_globalShape == nullptr)
-		{
-			m_globalShape = std::make_shared<SurgSim::Math::MeshShape>(*localMesh->getMesh());
-		}
-
-		auto globalMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(m_globalShape);
-
-		// Update global-space mesh using local-space mesh
-		globalMesh->getMesh()->setTransformedFrom(physicsRepresentation->getCurrentPose(), *localMesh->getMesh());
-		m_aabbTree = globalMesh->createAabbTree();
+		meshShape->setGlobalPose(physicsRepresentation->getCurrentPose());
+		meshShape->updateAabbTree();
 	}
 }
 
@@ -83,16 +70,6 @@ const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getSha
 	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
 			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
 	return m_physicsRepresentation.lock()->getCurrentParameters().getShapeUsedForMassInertia();
-}
-
-const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getGlobalShape() const
-{
-	return m_globalShape;
-}
-
-const std::shared_ptr<SurgSim::DataStructures::AabbTree> RigidCollisionRepresentation::getAabbTree() const
-{
-	return m_aabbTree;
 }
 
 const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getPose() const

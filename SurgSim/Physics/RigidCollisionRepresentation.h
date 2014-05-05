@@ -72,22 +72,12 @@ public:
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
-	virtual const std::shared_ptr<SurgSim::Math::Shape> getGlobalShape() const override;
-
-	virtual const std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree() const override;
-
 	/// Gets physics representation.
 	/// \return	The physics representation.
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> getRigidRepresentation();
 
 private:
 	std::weak_ptr<SurgSim::Physics::RigidRepresentationBase> m_physicsRepresentation;
-
-	/// The object's shape transformed into global coordinates, used to cache calculations for some shapes.
-	std::shared_ptr<SurgSim::Math::Shape> m_globalShape;
-
-	/// The object's Aabb tree, optionally used for the acceleration of contact-contact algorithms.
-	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
 };
 
 }; // namespace Collision

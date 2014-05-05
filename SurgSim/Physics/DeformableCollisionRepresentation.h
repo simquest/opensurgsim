@@ -70,10 +70,6 @@ public:
 
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
-	virtual const std::shared_ptr<SurgSim::Math::Shape> getGlobalShape() const override;
-
-	virtual const std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree() const override;
-
 	/// Sets the deformable to which this collision representation is connected
 	/// \param representation The deformable that will be used to update the contained mesh
 	void setDeformableRepresentation(std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase> representation);
@@ -105,9 +101,6 @@ private:
 
 	/// Reference to the deformable driving changes to this mesh
 	std::weak_ptr<SurgSim::Physics::DeformableRepresentationBase> m_deformable;
-
-	/// The object's Aabb tree, optionally used for the acceleration of contact-contact algorithms.
-	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
 };
 
 }

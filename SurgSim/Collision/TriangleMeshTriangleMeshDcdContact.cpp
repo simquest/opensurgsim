@@ -47,16 +47,14 @@ std::pair<int,int> TriangleMeshTriangleMeshDcdContact::getShapeTypes()
 
 void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	std::shared_ptr<Representation> representationMeshA = pair->getFirst();
-	std::shared_ptr<Representation> representationMeshB = pair->getSecond();
+	auto meshShapeA = std::static_pointer_cast<MeshShape>(pair->getFirst()->getShape());
+	auto meshShapeB = std::static_pointer_cast<MeshShape>(pair->getSecond()->getShape());
 
-	std::shared_ptr<TriangleMesh> collisionMeshA =
-		std::static_pointer_cast<MeshShape>(representationMeshA->getGlobalShape())->getMesh();
-	std::shared_ptr<TriangleMesh> collisionMeshB =
-		std::static_pointer_cast<MeshShape>(representationMeshB->getGlobalShape())->getMesh();
+	std::shared_ptr<TriangleMesh> collisionMeshA = meshShapeA->getMesh();
+	std::shared_ptr<TriangleMesh> collisionMeshB = meshShapeB->getMesh();
 
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
-		= representationMeshA->getAabbTree()->spatialJoin(*representationMeshB->getAabbTree());
+		= meshShapeA->getAabbTree()->spatialJoin(*meshShapeB->getAabbTree());
 
 	double depth = 0.0;
 	Vector3d normal;

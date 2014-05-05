@@ -15,13 +15,12 @@
 
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
-#include "SurgSim/DataStructures/AabbTree.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Shape.h"
-#include "SurgSim/Physics/DeformableRepresentation.h"
 
 namespace
 {
@@ -76,7 +75,7 @@ void DeformableCollisionRepresentation::update(const double& dt)
 		m_mesh->setVertexPosition(nodeId, state->getPosition(nodeId));
 	}
 	m_mesh->update();
-	m_aabbTree = m_shape->createAabbTree();
+	m_shape->updateAabbTree();
 }
 
 bool DeformableCollisionRepresentation::doInitialize()
@@ -145,16 +144,6 @@ const SurgSim::Math::RigidTransform3d& DeformableCollisionRepresentation::getPos
 const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::getShape() const
 {
 	return m_shape;
-}
-
-const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::getGlobalShape() const
-{
-	return m_shape;
-}
-
-const std::shared_ptr<SurgSim::DataStructures::AabbTree> DeformableCollisionRepresentation::getAabbTree() const
-{
-	return m_aabbTree;
 }
 
 void DeformableCollisionRepresentation::setDeformableRepresentation(

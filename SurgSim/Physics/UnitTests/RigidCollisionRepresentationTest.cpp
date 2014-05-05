@@ -55,7 +55,7 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 	auto originalMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*meshShape->getMesh());
 	auto expectedMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*meshShape->getMesh());
 	auto actualMesh
-		= std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getGlobalShape())->getMesh();
+		= std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getShape())->getMesh();
 
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
