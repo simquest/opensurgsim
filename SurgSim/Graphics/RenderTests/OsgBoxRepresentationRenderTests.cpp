@@ -171,7 +171,7 @@ TEST_F(OsgBoxRepresentationRenderTests, MovingBoxesTest)
 		/// The total number of steps should complete in 1 second
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
-	graphicsManager->dumpDebugInfo();
+
 	runtime->stop();
 }
 

@@ -192,7 +192,7 @@ void OsgScreenSpaceQuadRepresentation::setLocation(double x, double y)
 
 void OsgScreenSpaceQuadRepresentation::getLocation(double* x, double* y)
 {
-	SURGSIM_ASSERT(x !=  nullptr && y != nullptr) << "Cannot use a nulptr as an output paramter.";
+	SURGSIM_ASSERT(x !=  nullptr && y != nullptr) << "Cannot use a nullptr as an output parameter.";
 	SurgSim::Math::Vector3d position = getLocalPose().translation();
 
 	*x = position.x();

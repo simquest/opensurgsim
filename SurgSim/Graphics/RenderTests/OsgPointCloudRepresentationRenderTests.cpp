@@ -27,6 +27,7 @@
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/PointCloudRepresentation.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -49,31 +50,9 @@ namespace Graphics
 
 typedef SurgSim::DataStructures::Vertices<void> CloudMesh;
 
-struct OsgPointCloudRepresentationRenderTests : public ::testing::Test
+struct OsgPointCloudRepresentationRenderTests : public RenderTest
 {
-	virtual void SetUp()
-	{
-		runtime = std::make_shared<SurgSim::Framework::Runtime>();
-		graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
-		runtime->addManager(graphicsManager);
-
-		scene = runtime->getScene();
-
-		viewElement = std::make_shared<OsgViewElement>("view element");
-		scene->addSceneElement(viewElement);
-
-	}
-
-	virtual void TearDown()
-	{
-		runtime->stop();
-	}
-
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager;
-	std::shared_ptr<SurgSim::Framework::Scene> scene;
-	std::shared_ptr<OsgViewElement> viewElement;
 
 protected:
 	std::vector<Vector3d> makeCube()
@@ -97,11 +76,11 @@ protected:
 		std::shared_ptr<PointCloudRepresentation<void>> cloud =
 					std::make_shared<OsgPointCloudRepresentation<void>>("cloud representation");
 
-				cloud->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
-				for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
-				{
-					cloud->getVertices()->addVertex(SurgSim::DataStructures::Vertices<void>::VertexType(*it));
-				}
+		cloud->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -0.2)));
+		for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
+		{
+			cloud->getVertices()->addVertex(SurgSim::DataStructures::Vertices<void>::VertexType(*it));
+		}
 
 		viewElement->addComponent(cloud);
 
@@ -117,9 +96,9 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointAdd)
 	auto pointCloud = representation->getVertices();
 	representation->setPointSize(2.0);
 
-			RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(0.2, Vector3d(1.0,1.0,1.0)),
-				Vector3d(0.0,0.0,-0.2));
-			representation->setLocalPose(pose);
+	RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(0.2, Vector3d(1.0, 1.0, 1.0)),
+							Vector3d(0.0, 0.0, -0.2));
+	representation->setLocalPose(pose);
 
 	viewElement->addComponent(representation);
 
@@ -154,14 +133,14 @@ TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
 	Vector3d startPosition(-0.1, 0.0, -0.0);
 	Vector3d endPosition(0.1, 0.0, -0.4);
 
-			for (int i = 0; i < numSteps; ++i)
-			{
-				/// Calculate t in [0.0, 1.0]
-				double t = static_cast<double>(i) / numSteps;
-				cloud->setLocalPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
-				boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-			}
-		}
+	for (int i = 0; i < numSteps; ++i)
+	{
+		/// Calculate t in [0.0, 1.0]
+		double t = static_cast<double>(i) / numSteps;
+		cloud->setLocalPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+	}
+}
 
 TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
 {
