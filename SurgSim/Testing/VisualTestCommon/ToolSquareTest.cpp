@@ -36,15 +36,15 @@ void runToolSquareTest(std::shared_ptr<DeviceInterface> toolDevice, std::shared_
 	SURGSIM_ASSERT(toolDevice && squareDevice);
 	if (! toolDevice->initialize())
 	{
-		printf("Could not initialize device '%s' for the tool.\n"
-			   "--- Press Enter to quit the application! ---\n", toolDevice->getName().c_str());
+		std::cout << std::endl << "Could not initialize device named '" << toolDevice->getName() <<
+			"' for the tool." << std::endl << "--- Press Enter to quit the application! ---" << std::endl;
 		getc(stdin);
 		return;
 	}
 	if (! squareDevice->initialize())
 	{
-		printf("Could not initialize device '%s' for the square.\n"
-			   "--- Press Enter to quit the application! ---\n", squareDevice->getName().c_str());
+		std::cout << std::endl << "Could not initialize device named '" << squareDevice->getName() <<
+			"' for the square." << std::endl << "--- Press Enter to quit the application! ---" << std::endl;
 		getc(stdin);
 		return;
 	}
@@ -60,13 +60,9 @@ void runToolSquareTest(std::shared_ptr<DeviceInterface> toolDevice, std::shared_
 	toolDevice->addInputConsumer(squareGlutWindow);
 	squareDevice->addInputConsumer(squareGlutWindow);
 
-	printf("\n"
-		   "**********************************************************************\n"
-		   "%s\n"
-		   "\n"
-		   "When done, press Enter to quit the application.\n"
-		   "**********************************************************************\n",
-		   testDescriptionMessage);
+	std::cout << std::endl << "**********************************************************************" << std::endl <<
+		   testDescriptionMessage << std::endl << std::endl << "When done, press Enter to quit the application." <<
+		   std::endl << "**********************************************************************" << std::endl;
 
 	// Wait for a key; the display, force generation, etc. all happen in separate threads.
 	getc(stdin);

@@ -27,6 +27,7 @@
 #include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Testing/DevicesUtilities.h"
 
 using SurgSim::Device::MultiAxisDevice;
 using SurgSim::DataStructures::DataGroup;
@@ -34,44 +35,7 @@ using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
-
-
-struct TestListener : public InputConsumerInterface, public OutputProducerInterface
-{
-public:
-	TestListener() :
-		m_numTimesInitializedInput(0),
-		m_numTimesReceivedInput(0),
-		m_numTimesRequestedOutput(0)
-	{
-	}
-
-	virtual void initializeInput(const std::string& device, const DataGroup& inputData);
-	virtual void handleInput(const std::string& device, const DataGroup& inputData);
-	virtual bool requestOutput(const std::string& device, DataGroup* outputData);
-
-	int m_numTimesInitializedInput;
-	int m_numTimesReceivedInput;
-	int m_numTimesRequestedOutput;
-	DataGroup m_lastReceivedInput;
-};
-
-void TestListener::initializeInput(const std::string& device, const DataGroup& inputData)
-{
-	++m_numTimesInitializedInput;
-}
-
-void TestListener::handleInput(const std::string& device, const DataGroup& inputData)
-{
-	++m_numTimesReceivedInput;
-	m_lastReceivedInput = inputData;
-}
-
-bool TestListener::requestOutput(const std::string& device, DataGroup* outputData)
-{
-	++m_numTimesRequestedOutput;
-	return false;
-}
+using SurgSim::Testing::MockInputOutput;
 
 
 TEST(MultiAxisDeviceTest, CreateUninitializedDevice)
@@ -181,7 +145,7 @@ TEST(MultiAxisDeviceTest, InputConsumer)
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
 
-	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
+	std::shared_ptr<MockInputOutput> consumer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, consumer->m_numTimesInitializedInput);
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
@@ -221,7 +185,7 @@ TEST(MultiAxisDeviceTest, OutputProducer)
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
 
-	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
+	std::shared_ptr<MockInputOutput> producer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
 	EXPECT_FALSE(device->removeOutputProducer(producer));
