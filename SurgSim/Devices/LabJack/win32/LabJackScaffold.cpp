@@ -51,31 +51,15 @@ bool isOk(LJ_ERROR code)
 	return (code == LJE_NOERROR);
 }
 
-/// A class for outputting a string containing the LabJackUD error code and text equivalent.
-/// Example usage: std::cout << "Problem! " << FormatErrorMessage(code) << std::endl;
-class FormatErrorMessage
+/// Outputs a string containing the LabJackUD error code and text equivalent.
+/// \param errorCode The error code used by LabJackUD.
+/// \return A string containing the message.
+std::string formatErrorMessage(LJ_ERROR code)
 {
-public:
-	/// Constructor
-	explicit FormatErrorMessage(LJ_ERROR code) : m_code(code)
-	{
-	}
-
-	/// Outputs a string containing the LabJackUD error code and text equivalent.
-	/// \param errorCode The error code used by LabJackUD.
-	/// \return A string containing the message.
-	friend std::ostream& operator<<(std::ostream& os, const FormatErrorMessage& formatErrorMessage)
-	{
-		char error[256]; // According to LabJackUD.h, the buffer must store at least 256 elements.
-		ErrorToString(formatErrorMessage.m_code, error);
-		os << "LabJackUD returned error code: " << formatErrorMessage.m_code << ", and string: " << std::string(error);
-		return os;
-	}
-
-private:
-	/// The error code.
-	LJ_ERROR m_code;
-};
+	char error[256]; // According to LabJackUD.h, the buffer must store at least 256 elements.
+	ErrorToString(code, error);
+	return std::string("LabJackUD returned error code: ") + std::to_string(code) + ", and string: " + error;
+}
 
 /// A struct containing the default settings that depend on the type of LabJack.
 struct LabJackDefaults
@@ -138,7 +122,7 @@ public:
 		bool result = isOk(error);
 		SURGSIM_LOG_IF(!result, m_scaffold->getLogger(), SEVERE) <<
 			"Failed to initialize a device. Type: " << m_type << ". Connection: " << m_connection << ". Address: '" <<
-			m_address << "'." << std::endl << FormatErrorMessage(error);
+			m_address << "'." << std::endl << formatErrorMessage(error);
 	}
 
 	bool destroy()
@@ -151,7 +135,7 @@ public:
 			result = isOk(error);
 			SURGSIM_LOG_IF(!result, m_scaffold->getLogger(), SEVERE) <<
 				"Failed to reset a device's pin configuration. Type: " << m_type << ". Connection: " << m_connection <<
-				". Address: '" << m_address << "'." << std::endl << FormatErrorMessage(error);
+				". Address: '" << m_address << "'." << std::endl << formatErrorMessage(error);
 			if (result)
 			{
 				m_deviceHandle = LABJACK_INVALID_HANDLE;
@@ -564,7 +548,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_DIGITAL_BIT, *input, 0, 0, 0);
 		SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
 			"Failed to request digital input for a device named '" << info->deviceObject->getName() <<
-			"', line number " << *input << "." << std::endl << FormatErrorMessage(error);
+			"', line number " << *input << "." << std::endl << formatErrorMessage(error);
 	}
 
 	// Request to set digital outputs.
@@ -585,7 +569,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 				SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
 					"Failed to set digital output for a device named '" << info->deviceObject->getName() <<
 					"', line number " << *output << ", value " << value << "." <<
-					std::endl << FormatErrorMessage(error);
+					std::endl << formatErrorMessage(error);
 			}
 		}
 	}
@@ -607,7 +591,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 					SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
 						"Failed to set timer value for a device named '" << info->deviceObject->getName() <<
 						"', channel number " << *timer << ", value " << value << "." <<
-						std::endl << FormatErrorMessage(error);
+						std::endl << formatErrorMessage(error);
 				}
 			}
 		}
@@ -620,7 +604,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_TIMER, *timer, 0, 0, 0);
 		SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
 			"Failed to request timer input for a device named '" << info->deviceObject->getName() <<
-			"', channel number " << *timer << "." << std::endl << FormatErrorMessage(error);
+			"', channel number " << *timer << "." << std::endl << formatErrorMessage(error);
 	}
 
 	// GoOne, telling this specific LabJack to perform the requests.
@@ -628,7 +612,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	bool result = isOk(error);
 	SURGSIM_LOG_IF(!result, m_logger, WARNING) <<
 		"Failed to submit requests for a device named '" << info->deviceObject->getName() << "." <<
-		std::endl << FormatErrorMessage(error);
+		std::endl << formatErrorMessage(error);
 
 	// Finally we get the results.
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
@@ -642,7 +626,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			result = isOk(error);
 			SURGSIM_LOG_IF(!result, m_logger, WARNING) <<
 				"Failed to get digital input for a device named '" << info->deviceObject->getName() <<
-				"', line number " << *input << "." << std::endl << FormatErrorMessage(error);
+				"', line number " << *input << "." << std::endl << formatErrorMessage(error);
 			if (result)
 			{
 				inputData.scalars().set(info->digitalInputIndices[*input], value);
@@ -661,7 +645,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			result = isOk(error);
 			SURGSIM_LOG_IF(!result, m_logger, WARNING) <<
 				"Failed to get timer input for a device named '" << info->deviceObject->getName() <<
-				"', channel number " << *timer << "." << std::endl << FormatErrorMessage(error);
+				"', channel number " << *timer << "." << std::endl << formatErrorMessage(error);
 			if (result)
 			{
 				inputData.scalars().set(info->timerInputIndices[*timer], value);
@@ -728,7 +712,7 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 	result = isOk(error);
 	SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
 		"Failed to reset configuration for a device named '" << device->getName() << "." <<
-		std::endl << FormatErrorMessage(error);
+		std::endl << formatErrorMessage(error);
 
 	// One-time configuration of counters.  Counters are not yet supported so they are explicitly disabled.
 	const int numberOfChannels = 2; // The LabJack U3, U6, and UE9 models each have two counters.
@@ -739,7 +723,7 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 		result = result && isOk(error);
 		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
 			"Failed to enable/disable counter for a device named '" << device->getName() << "." <<
-			std::endl << FormatErrorMessage(error);
+			std::endl << formatErrorMessage(error);
 	}
 
 	// One-time configuration of timers
@@ -751,7 +735,7 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 		result = result && isOk(error);
 		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
 			"Failed to configure timer/counter pin offset for a device named '" << device->getName() <<
-			"', with offset " << device->getTimerCounterPinOffset() << "." << std::endl << FormatErrorMessage(error);
+			"', with offset " << device->getTimerCounterPinOffset() << "." << std::endl << formatErrorMessage(error);
 
 		LabJackTimerBase base = device->getTimerBase();
 		if (base == LABJACKTIMERBASE_DEFAULT)
@@ -763,19 +747,19 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 		result = result && isOk(error);
 		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
 			"Failed to configure the timer base rate for a device named '" << device->getName() <<
-			"', with timer base " << device->getTimerBase() << "." << std::endl << FormatErrorMessage(error);
+			"', with timer base " << device->getTimerBase() << "." << std::endl << formatErrorMessage(error);
 
 		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_DIVISOR, device->getTimerClockDivisor(), 0);
 		result = result && isOk(error);
 		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
 			"Failed to configure the timer/clock divisor for a device named '" << device->getName() <<
-			"', with divisor " << device->getTimerClockDivisor() << "." << std::endl << FormatErrorMessage(error);
+			"', with divisor " << device->getTimerClockDivisor() << "." << std::endl << formatErrorMessage(error);
 
 		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, timers.size(), 0);
 		result = result && isOk(error);
 		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
 			"Failed to configure number of enabled timers for a device named '" << device->getName() <<
-			"', with number of timers " << timers.size() << "." << std::endl << FormatErrorMessage(error);
+			"', with number of timers " << timers.size() << "." << std::endl << formatErrorMessage(error);
 
 		if (result)
 		{
@@ -786,7 +770,7 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 				SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
 					"Failed to configure a timer for a device named '" << device->getName() <<
 					"', timer number " << timer->first << ", with mode code " << timer->second << "." <<
-					std::endl << FormatErrorMessage(error);
+					std::endl << formatErrorMessage(error);
 				if (result &&
 					((timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM8) ||
 					 (timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM16)))
@@ -797,7 +781,7 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 					SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
 						"Failed to set the initial value for a PWM timer for a device named '" << device->getName() <<
 						"', timer number " << timer->first << ", with mode code " << timer->second <<
-						", and value " << value << "."  << std::endl << FormatErrorMessage(error);
+						", and value " << value << "."  << std::endl << formatErrorMessage(error);
 				}
 			}
 		}
