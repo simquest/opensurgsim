@@ -33,9 +33,6 @@ namespace Physics
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
 	Representation(name)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidCollisionRepresentation,
-		std::shared_ptr<SurgSim::Physics::RigidRepresentationBase>,
-		PhysicsRepresentation, getRigidRepresentation, setRigidRepresentation);
 }
 
 RigidCollisionRepresentation::~RigidCollisionRepresentation()

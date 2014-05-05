@@ -91,9 +91,9 @@ TEST_F(RigidCollisionRepresentationTest, PoseTest)
 TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 {
 	m_rigidCollisionRepresentation = std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
-	m_rigidCollisionRepresentation->setRigidRepresentation(m_rigidRepresentation);
 
 	YAML::Node node;
+	// Same as call YAML::convert<SurgSim::Framework::Component>::encode(m_rigidCollisionRepresentation);
 	ASSERT_NO_THROW(node = m_rigidCollisionRepresentation);
 
 	std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> newRigidCollisionRepresentation;
@@ -101,7 +101,4 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 		std::dynamic_pointer_cast<SurgSim::Physics::RigidCollisionRepresentation>
 			(node.as<std::shared_ptr<SurgSim::Framework::Component>>())
 		);
-
-	// Needs serialization of RigidRepresentation to work properly.
-	//EXPECT_EQ(m_rigidRepresentation, newRigidCollisionRepresentation->getRigidRepresentation());
 }

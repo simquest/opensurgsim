@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
@@ -31,6 +32,8 @@ RigidRepresentationBase::RigidRepresentationBase(const std::string& name) : Repr
 		RigidRepresentationState, getInitialState, setInitialState);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, RigidRepresentationParameters,
 		RigidRepresentationParameters, getInitialParameters, setInitialParameters);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, std::shared_ptr<SurgSim::Collision::Representation>,
+		CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
 }
 
 RigidRepresentationBase::~RigidRepresentationBase()

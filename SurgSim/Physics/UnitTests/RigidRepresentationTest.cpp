@@ -13,9 +13,9 @@
 //// See the License for the specific language governing permissions and
 //// limitations under the License.
 
-#include <gtest/gtest.h>
-
 #include <string>
+
+#include <gtest/gtest.h>
 
 #include "SurgSim/Collision/Location.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -31,14 +31,17 @@
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
+using SurgSim::Framework::Component;
+using SurgSim::Framework::Runtime;
+using SurgSim::Collision::Location;
 using SurgSim::Math::Matrix33d;
+using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
+using SurgSim::Math::PlaneShape;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
-
-using SurgSim::Collision::Location;
-
 
 namespace SurgSim
 {
@@ -93,7 +96,7 @@ public:
 
 TEST_F(RigidRepresentationTest, ConstructorTest)
 {
-	ASSERT_NO_THROW({RigidRepresentation rigidBody("Rigid");});
+	ASSERT_NO_THROW(RigidRepresentation rigidBody("Rigid"));
 }
 
 TEST_F(RigidRepresentationTest, ResetTest)
@@ -287,9 +290,9 @@ void disableWhenDivergeTest(std::shared_ptr<RigidRepresentation> rigidBody,
 
 TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 {
-	SurgSim::Math::Quaterniond q  = SurgSim::Math::Quaterniond::Identity();
-	SurgSim::Math::Vector3d vZero = SurgSim::Math::Vector3d::Zero();
-	SurgSim::Math::Vector3d vMax  = SurgSim::Math::Vector3d::Constant(std::numeric_limits<double>::max());
+	Quaterniond q  = Quaterniond::Identity();
+	Vector3d vZero = Vector3d::Zero();
+	Vector3d vMax  = Vector3d::Constant(std::numeric_limits<double>::max());
 
 	// Test linear failure (with Signaling Nan)
 	{
@@ -310,7 +313,7 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		// Sets the state
 		m_state.reset();
-		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vMax));
+		m_state.setPose(makeRigidTransform(q, vMax));
 		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN()));
 
 		SCOPED_TRACE("Testing linear with Quiet Nan");
@@ -323,7 +326,7 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		// Sets the state
 		m_state.reset();
-		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vMax));
+		m_state.setPose(makeRigidTransform(q, vMax));
 		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
 
 		SCOPED_TRACE("Testing linear with double max");
@@ -336,7 +339,7 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		// Sets the state
 		m_state.reset();
-		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vZero));
+		m_state.setPose(makeRigidTransform(q, vZero));
 		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::signaling_NaN()));
 
 		SCOPED_TRACE("Testing angular with Signaling Nan");
@@ -349,7 +352,7 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		// Sets the state
 		m_state.reset();
-		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vZero));
+		m_state.setPose(makeRigidTransform(q, vZero));
 		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN()));
 
 		SCOPED_TRACE("Testing angular with Quiet Nan");
@@ -362,7 +365,7 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		// Sets the state
 		m_state.reset();
-		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vZero));
+		m_state.setPose(makeRigidTransform(q, vZero));
 		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
 
 		SCOPED_TRACE("Testing angular with double max");
@@ -397,8 +400,8 @@ TEST_F(RigidRepresentationTest, LocalizationCreation)
 
 TEST_F(RigidRepresentationTest, InvalidShapes)
 {
-	std::shared_ptr<SurgSim::Math::Shape> shapeWithNoVolume = std::make_shared<SurgSim::Math::PlaneShape>();
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	std::shared_ptr<Shape> shapeWithNoVolume = std::make_shared<PlaneShape>();
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 
 	{
 		RigidRepresentationParameters parameters;
@@ -406,7 +409,7 @@ TEST_F(RigidRepresentationTest, InvalidShapes)
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		rigidBody->setCurrentParameters(parameters);
 
-		std::shared_ptr<SurgSim::Framework::Component> component = rigidBody;
+		std::shared_ptr<Component> component = rigidBody;
 		EXPECT_THROW(component->initialize(runtime), SurgSim::Framework::AssertionFailure);
 	}
 
@@ -416,7 +419,7 @@ TEST_F(RigidRepresentationTest, InvalidShapes)
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		rigidBody->setInitialParameters(parameters);
 
-		std::shared_ptr<SurgSim::Framework::Component> component = rigidBody;
+		std::shared_ptr<Component> component = rigidBody;
 		EXPECT_THROW(component->initialize(runtime), SurgSim::Framework::AssertionFailure);
 	}
 }
@@ -448,25 +451,62 @@ TEST_F(RigidRepresentationTest, CollisionRepresentationTest)
 
 TEST_F(RigidRepresentationTest, SerializationTest)
 {
-	auto rigidRepresentation = std::make_shared<RigidRepresentation>("TestRigidRepresentation");
-	YAML::Node node;
-	// Encode a share_ptr<> to RigidRepresentation should be OK.
-	ASSERT_NO_THROW(node = YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(rigidRepresentation));
+	{
+		SCOPED_TRACE("Encode/Decode as shared_ptr<>, should be OK");
+		auto rigidRepresentation = std::make_shared<RigidRepresentation>("TestRigidRepresentation");
+		YAML::Node node;
+		ASSERT_NO_THROW(node =
+			YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(rigidRepresentation));
 
-	// Encode an instance of RigidRepresentation without a shape, expect to throw.
-	EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
+		std::shared_ptr<RigidRepresentation> newRepresentation;
+		EXPECT_NO_THROW(newRepresentation =
+			std::dynamic_pointer_cast<RigidRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	}
 
-	// Encode an instance of RigidRepresentation with a valid shape (shape contained in RigidRepresentatoinParameters),
-	// should not throw.
-	rigidRepresentation->setInitialParameters(m_param);
-	EXPECT_NO_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
+	{
+		SCOPED_TRACE("Encode a RigidRepresentation object without a shape, should throw.");
+		auto rigidRepresentation = std::make_shared<RigidRepresentation>("TestRigidRepresentation");
+		auto rigidCollisionRepresentation =
+			std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
 
-	// Decode as shared_ptr<> to RigidRepresentation should be OK.
-	std::shared_ptr<RigidRepresentation> newRepresentation;
-	EXPECT_NO_THROW(newRepresentation =
-		std::dynamic_pointer_cast<RigidRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+		rigidRepresentation->setCollisionRepresentation(rigidCollisionRepresentation);
+
+		EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
+	}
+
+	{
+		SCOPED_TRACE("Encode a RigidRepresentation object without RigidCollisionRepresentation should throw.");
+		auto rigidRepresentation = std::make_shared<RigidRepresentation>("TestRigidRepresentation");
+		auto rigidCollisionRepresentation =
+			std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
+
+		rigidRepresentation->setInitialParameters(m_param);
+
+		EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
+	}
+
+	{
+		SCOPED_TRACE("Encode a RigidRepresentation object with valid RigidCollisionRepresentation and shape, no thorw");
+		auto rigidRepresentation = std::make_shared<RigidRepresentation>("TestRigidRepresentation");
+		auto rigidCollisionRepresentation =
+			std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
+
+		rigidRepresentation->setCollisionRepresentation(rigidCollisionRepresentation);
+		rigidRepresentation->setInitialParameters(m_param);
+
+		YAML::Node node;
+		EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
+
+		std::shared_ptr<RigidRepresentation> newRepresentation;
+		newRepresentation =
+			std::dynamic_pointer_cast<RigidRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>());
+		EXPECT_NE(nullptr, newRepresentation->getCollisionRepresentation());
+
+		auto newCollisionRepresentation =
+			std::dynamic_pointer_cast<RigidCollisionRepresentation>(newRepresentation->getCollisionRepresentation());
+		EXPECT_EQ(newRepresentation, newCollisionRepresentation->getRigidRepresentation());
+	}
 }
 
 }; // namespace Physics
 }; // namespace SurgSim
-
