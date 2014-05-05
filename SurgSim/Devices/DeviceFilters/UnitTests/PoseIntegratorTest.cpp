@@ -23,22 +23,20 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/DeviceFilters/PoseIntegrator.h"
 #include "SurgSim/Input/CommonDevice.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 using SurgSim::Device::PoseIntegrator;
 using SurgSim::Input::CommonDevice;
-using SurgSim::Input::InputConsumerInterface;
-using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Testing::MockInputOutput;
 
 namespace
 {
@@ -61,22 +59,6 @@ public:
 	{
 		return getInputData();
 	}
-};
-
-class TestOutputProducerInterface : public OutputProducerInterface
-{
-public:
-	TestOutputProducerInterface()
-	{
-	}
-
-	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override
-	{
-		*outputData = m_data;
-		return true;
-	}
-
-	DataGroup m_data;
 };
 
 void TestInputDataGroup(const DataGroup& actualData, const DataGroup& expectedData)
@@ -284,9 +266,9 @@ TEST(PoseIntegratorDeviceFilterTest, OutputDataFilter)
 
 	// Normally the data would be set by a behavior, then the output device scaffold would call requestOutput on the
 	// filter, which would call requestOutput on the OutputComponent.
-	auto testOutputProducer = std::make_shared<TestOutputProducerInterface>();
-	testOutputProducer->m_data = data;
-	integrator->setOutputProducer(testOutputProducer);
+	auto producer = std::make_shared<MockInputOutput>();
+	producer->m_output.setValue(data);
+	integrator->setOutputProducer(producer);
 
 	DataGroup actualData;
 	integrator->requestOutput("device", &actualData);

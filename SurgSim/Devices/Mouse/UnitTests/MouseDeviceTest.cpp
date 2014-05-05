@@ -21,7 +21,7 @@
 #include "SurgSim/Devices/Mouse/MouseDevice.h"
 #include "SurgSim/Devices/Mouse/MouseScaffold.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Testing/DevicesUtilities.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 namespace SurgSim
 {
