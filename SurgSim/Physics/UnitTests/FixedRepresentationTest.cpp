@@ -24,6 +24,7 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
@@ -31,9 +32,12 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::SphereShape;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::FixedRepresentation;
+using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentationState;
+using SurgSim::Physics::RigidRepresentationParameters;
 
 class FixedRepresentationTest : public ::testing::Test
 {
@@ -178,23 +182,63 @@ TEST_F(FixedRepresentationTest, UpdateTest)
 
 TEST_F(FixedRepresentationTest, SerializationTest)
 {
-	YAML::Node node;
-	// Encode a share_ptr<> to FixedRepresentation should be OK.
-	ASSERT_NO_THROW(node =
-		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(m_fixedRepresentation));
+	auto sphereShaper = std::make_shared<SphereShape>(0.1);
+	RigidRepresentationParameters params;
+	params.setShapeUsedForMassInertia(sphereShaper);
 
-	// Encode an instance of FixedRepresentation without a shape, expect to throw.
-	EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*m_fixedRepresentation));
+	{
+		SCOPED_TRACE("Encode/Decode as shared_ptr<>, should be OK");
+		auto rigidRepresentation = std::make_shared<FixedRepresentation>("TestFixedRepresentation");
+		YAML::Node node;
+		ASSERT_NO_THROW(node =
+			YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(rigidRepresentation));
 
-	SurgSim::Physics::RigidRepresentationParameters param;
-	param.setShapeUsedForMassInertia(std::make_shared<SurgSim::Math::SphereShape>(0.1));
-	// Encode an instance of FixedRepresentation with a valid shape (shape contained in RigidRepresentatoinParameters),
-	// should not throw.
-	m_fixedRepresentation->setInitialParameters(param);
-	EXPECT_NO_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*m_fixedRepresentation));
+		std::shared_ptr<FixedRepresentation> newRepresentation;
+		EXPECT_NO_THROW(newRepresentation =
+			std::dynamic_pointer_cast<FixedRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	}
 
-	// Decode as shared_ptr<> to FixedRepresentation should be OK.
-	std::shared_ptr<FixedRepresentation> newRepresentation;
-	EXPECT_NO_THROW(newRepresentation =
-		std::dynamic_pointer_cast<FixedRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	{
+		SCOPED_TRACE("Encode a FixedRepresentation object without a shape, should throw.");
+		auto rigidRepresentation = std::make_shared<FixedRepresentation>("TestFixedRepresentation");
+		auto rigidCollisionRepresentation =
+			std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
+
+		rigidRepresentation->setCollisionRepresentation(rigidCollisionRepresentation);
+
+		EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
+	}
+
+	{
+		SCOPED_TRACE("Encode a FixedRepresentation object without RigidCollisionRepresentation should throw.");
+		auto rigidRepresentation = std::make_shared<FixedRepresentation>("TestFixedRepresentation");
+		auto rigidCollisionRepresentation =
+			std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
+
+		rigidRepresentation->setInitialParameters(params);
+
+		EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
+	}
+
+	{
+		SCOPED_TRACE("Encode a FixedRepresentation object with valid RigidCollisionRepresentation and shape, no thorw");
+		auto rigidRepresentation = std::make_shared<FixedRepresentation>("TestFixedRepresentation");
+		auto rigidCollisionRepresentation =
+			std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
+
+		rigidRepresentation->setCollisionRepresentation(rigidCollisionRepresentation);
+		rigidRepresentation->setInitialParameters(params);
+
+		YAML::Node node;
+		EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
+
+		std::shared_ptr<FixedRepresentation> newRepresentation;
+		newRepresentation =
+			std::dynamic_pointer_cast<FixedRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>());
+		EXPECT_NE(nullptr, newRepresentation->getCollisionRepresentation());
+
+		auto newCollisionRepresentation =
+			std::dynamic_pointer_cast<RigidCollisionRepresentation>(newRepresentation->getCollisionRepresentation());
+		EXPECT_EQ(newRepresentation, newCollisionRepresentation->getRigidRepresentation());
+	}
 }
