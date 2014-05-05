@@ -184,12 +184,6 @@ std::shared_ptr<SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree()
 	return m_aabbTree;
 }
 
-std::shared_ptr<SurgSim::DataStructures::AabbTree> MeshShape::createAabbTree()
-{
-	updateAabbTree();
-	return m_aabbTree;
-}
-
 void MeshShape::updateAabbTree()
 {
 	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();

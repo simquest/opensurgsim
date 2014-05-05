@@ -108,10 +108,6 @@ public:
 	/// \return The object's associated AabbTree
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree();
 
-	/// Create an AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
-	/// \return The object's associated AabbTree
-	std::shared_ptr<SurgSim::DataStructures::AabbTree> createAabbTree();
-
 private:
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.

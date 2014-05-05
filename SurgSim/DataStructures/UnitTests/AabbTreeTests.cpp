@@ -235,8 +235,11 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
 	meshB->getMesh()->setTransformedFrom(rhsPose, *meshA->getMesh());
 
-	auto aabbA = meshA->createAabbTree();
-	auto aabbB = meshB->createAabbTree();
+	meshA->updateAabbTree();
+	meshB->updateAabbTree();
+
+	auto aabbA = meshA->getAabbTree();
+	auto aabbB = meshB->getAabbTree();
 
 	auto actualIntersection = aabbA->spatialJoin(*aabbB);
 
