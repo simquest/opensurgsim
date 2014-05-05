@@ -186,17 +186,18 @@ std::shared_ptr<SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree()
 
 void MeshShape::updateAabbTree()
 {
+	using SurgSim::Math::makeAabb;
+
 	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
 
 	auto const& vertices = m_mesh->getVertices();
 	auto const& triangles = m_mesh->getTriangles();
 
-	for (size_t i = 0; i < triangles.size(); i++)
+	size_t i = 0;
+	for (auto triangle = triangles.begin(); triangle != triangles.end(); ++triangle)
 	{
-		auto ids = triangles[i].verticesId;
-		m_aabbTree->add(
-			SurgSim::Math::makeAabb(vertices[ids[0]].position, vertices[ids[1]].position, vertices[ids[2]].position),
-			i);
+		auto& ids = triangle->verticesId;
+		m_aabbTree->add(makeAabb(vertices[ids[0]].position, vertices[ids[1]].position, vertices[ids[2]].position), i++);
 	}
 }
 }; // namespace Math
