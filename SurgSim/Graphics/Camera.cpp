@@ -40,18 +40,18 @@ void Camera::setRenderGroupReference(const std::string& name)
 	m_renderGroupReference = name;
 }
 
-std::string Camera::getRenderGroupReference()
+std::string Camera::getRenderGroupReference() const
 {
 	return m_renderGroupReference;
 }
 
-bool Camera::setGroup(std::shared_ptr<Group> group)
+bool Camera::setRenderGroup(std::shared_ptr<Group> group)
 {
 	m_group = group;
 	return true;
 }
 
-std::shared_ptr<Group> Camera::getGroup() const
+std::shared_ptr<Group> Camera::getRenderGroup() const
 {
 	return m_group;
 }

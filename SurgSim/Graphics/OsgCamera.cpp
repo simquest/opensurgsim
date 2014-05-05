@@ -91,7 +91,7 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 }
 
-bool OsgCamera::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
+bool OsgCamera::setRenderGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 {
 
 	SURGSIM_ASSERT(group->getName() == Camera::getRenderGroupReference())
@@ -99,7 +99,7 @@ bool OsgCamera::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 			<< Camera::getRenderGroupReference() << "> group->getName() is <" << group->getName() << ">.";
 
 	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
-	if (osgGroup && SurgSim::Graphics::Camera::setGroup(group))
+	if (osgGroup && SurgSim::Graphics::Camera::setRenderGroup(group))
 	{
 		m_materialProxy->removeChildren(0, m_camera->getNumChildren());  /// Remove any previous group
 		m_materialProxy->addChild(osgGroup->getOsgGroup());

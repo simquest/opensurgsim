@@ -78,6 +78,11 @@ void Group::clear()
 	m_representations.clear();
 }
 
+std::string Group::getName() const
+{
+	return m_name;
+}
+
 }
 }
 

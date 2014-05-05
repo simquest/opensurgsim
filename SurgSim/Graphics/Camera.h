@@ -59,19 +59,19 @@ public:
 	/// \param name Name of the group to be used for rendering
 	void setRenderGroupReference(const std::string& name);
 
-	/// Gets the render group reference t
-	std::string getRenderGroupReference();
+	/// \return The render group reference for this camera
+	std::string getRenderGroupReference() const;
 
 	/// Sets the group of representations that will be seen by this camera.
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
 	/// \param	group	Group of representations
 	/// \return	True if it succeeded, false if it failed
-	virtual bool setGroup(std::shared_ptr<Group> group);
+	virtual bool setRenderGroup(std::shared_ptr<Group> group);
 
 	/// Gets the group of representations that will be seen by this camera.
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
 	/// \return	Group of representations
-	std::shared_ptr<Group> getGroup() const;
+	std::shared_ptr<Group> getRenderGroup() const;
 
 	/// Gets the view matrix of the camera
 	/// \return	View matrix

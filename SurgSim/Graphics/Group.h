@@ -71,13 +71,11 @@ public:
 	/// Returns the representations in this group
 	const std::vector<std::shared_ptr<Representation>>& getMembers() const;
 
-	/// Removes all representations
+	/// Removes all representations.
 	virtual void clear();
 
-	std::string getName()
-	{
-		return m_name;
-	}
+	/// \return The name of this group.
+	std::string getName() const;
 
 private:
 

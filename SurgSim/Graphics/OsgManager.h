@@ -54,48 +54,28 @@ public:
 	friend class OsgManagerTest;
 
 	/// Returns the OSG CompositeViewer used to manage and render the views
-	osg::ref_ptr<osgViewer::CompositeViewer> getOsgCompositeViewer() const
-	{
-		return m_viewer;
-	}
+	osg::ref_ptr<osgViewer::CompositeViewer> getOsgCompositeViewer() const;
 
 	/// OsgManager will write out the scenegraph in the working directory
 	virtual void dumpDebugInfo() const override;
 
 protected:
-	/// Performs an update for a single timestep
-	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual bool doUpdate(double dt) override;
 
-	/// Initializes the manager
-	/// \return True if it succeeds, false if it fails
-	/// \post	The default camera component is in the list of managed representations.
-	/// \post	The default group component is in the list of managed groups.
 	virtual bool doInitialize() override;
 
-	/// Starts up the manager after all threads have initialized
-	/// \return True if it succeeds, false if it fails
 	virtual bool doStartUp() override;
 
 	/// Adds an representation to the manager
 	/// \param	representation	The representation to be added.
 	/// Only allows OsgRepresentation components, any other will not be set and it will return false.
 	/// \return	True if the representation was not in this manager and has been successfully added, false if it fails.
-	/// \post	The representation is added to the default group.
 	virtual bool addRepresentation(std::shared_ptr<Representation> representation) override;
-
-	/// Adds a group to the manager
-	/// \param	group	The group to be added.
-	/// Only allows OsgGroup components, any other will not be set and it will return false.
-	/// \return	True if the group was not in this manager and has been successfully added, false if it fails.
-	/// \post	The group is added to the default group.
-	virtual bool addGroup(std::shared_ptr<Group> group) override;
 
 	/// Adds a view to the manager
 	/// \param	view	The view to be added.
 	/// Only allows OsgView components, any other will not be set and it will return false.
 	/// \return	True if the view was not in this manager and has been successfully added, false if it fails.
-	/// \post	If the view had no camera, it's camera will be set to the default camera.
 	virtual bool addView(std::shared_ptr<View> view) override;
 
 	/// Removes a view from the manager

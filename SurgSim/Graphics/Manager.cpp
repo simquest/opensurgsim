@@ -76,6 +76,13 @@ bool Manager::addRepresentation(std::shared_ptr<Representation> representation)
 	{
 		m_representations.push_back(representation);
 
+		auto camera = std::dynamic_pointer_cast<Camera>(representation);
+		// If we have a camera we need to find, and set the group that is is rendering
+		if (camera != nullptr)
+		{
+			camera->setRenderGroup(getOrCreateGroup(camera->getRenderGroupReference()));
+		}
+
 		// Add the component to all the groups that it wants to be in
 		std::vector<std::string> requestedGroups = representation->getGroupReferences();
 		for (auto groupName = std::begin(requestedGroups); groupName != std::end(requestedGroups); ++groupName)
@@ -90,21 +97,6 @@ bool Manager::addRepresentation(std::shared_ptr<Representation> representation)
 	else
 	{
 		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Duplicate representation " << representation->getName();
-	}
-	return result;
-}
-bool Manager::addGroup(std::shared_ptr<Group> group)
-{
-	bool result = false;
-
-	if (m_groups.find(group->getName()) == std::end(m_groups))
-	{
-		m_groups[group->getName()] = group;
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added group " << group->getName();
-	}
-	else
-	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Duplicate group " << group->getName();
 	}
 	return result;
 }
@@ -145,22 +137,6 @@ bool Manager::removeRepresentation(std::shared_ptr<Representation> representatio
 	else
 	{
 		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Representation not found " << representation->getName();
-	}
-	return result;
-}
-bool Manager::removeGroup(std::shared_ptr<Group> group)
-{
-	bool result = false;
-	auto it = m_groups.find(group->getName());
-	if (it != m_groups.end())
-	{
-		m_groups.erase(it);
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Removed group " << group->getName();
-		result = true;
-	}
-	else
-	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Group not found " << group->getName();
 	}
 	return result;
 }
@@ -213,4 +189,12 @@ bool Manager::doUpdate(double dt)
 int Manager::getType() const
 {
 	return SurgSim::Framework::MANAGER_TYPE_GRAPHICS;
+}
+
+void SurgSim::Graphics::Manager::addGroup(std::shared_ptr<Group> group)
+{
+	auto oldGroup = m_groups.find(group->getName());
+	SURGSIM_ASSERT(oldGroup == m_groups.end()) << "Tried to add a group that has already been added.";
+	m_groups[group->getName()] = group;
+	SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added group " << group->getName();
 }

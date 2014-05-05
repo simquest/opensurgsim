@@ -48,12 +48,6 @@ OsgManager::~OsgManager()
 {
 }
 
-void addCamera(std::shared_ptr<OsgCamera> newCamera)
-{
-
-
-}
-
 std::shared_ptr<Group> OsgManager::getOrCreateGroup(const std::string& name)
 {
 	std::shared_ptr<OsgGroup> result;
@@ -78,51 +72,19 @@ std::shared_ptr<Group> OsgManager::getOrCreateGroup(const std::string& name)
 bool OsgManager::addRepresentation(std::shared_ptr<SurgSim::Graphics::Representation> representation)
 {
 	std::shared_ptr<OsgRepresentation> osgRepresentation = std::dynamic_pointer_cast<OsgRepresentation>(representation);
-	if (osgRepresentation && Manager::addRepresentation(osgRepresentation))
+	bool result;
+	if (osgRepresentation)
 	{
-		auto camera = std::dynamic_pointer_cast<OsgCamera>(representation);
-
-		// If we have a camera we need to find, and set the group that is is rendering
-		if (camera != nullptr)
-		{
-			camera->setGroup(getOrCreateGroup(camera->getRenderGroupReference()));
-		}
-
-		return true;
+		result = Manager::addRepresentation(osgRepresentation);
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(getLogger()) << __FUNCTION__ << " Representation is not a subclass of OsgRepresentation " <<
-									  representation->getName();
-		return false;
+		SURGSIM_LOG_INFO(getLogger())
+				<< __FUNCTION__ << " Representation is not a subclass of OsgRepresentation "
+				<< representation->getName();
+		result = false;
 	}
-}
-
-bool OsgManager::addGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
-{
-	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
-	if (osgGroup && Manager::addGroup(osgGroup))
-	{
-		// Check if there are any representations that might want to be included
-		// in this group
-		std::string name = group->getName();
-		auto representations = getRepresentations();
-		for (auto it = std::begin(representations); it != std::end(representations); ++it)
-		{
-			auto requested = (*it)->getGroupReferences();
-			if (std::find(std::begin(requested), std::end(requested), name) != std::end(requested))
-			{
-				group->add(*it);
-			}
-		}
-
-		return true;
-	}
-	else
-	{
-		SURGSIM_LOG_INFO(getLogger()) << __FUNCTION__ << " Group is not a subclass of OsgGroup " << group->getName();
-		return false;
-	}
+	return result;
 }
 
 bool OsgManager::addView(std::shared_ptr<SurgSim::Graphics::View> view)
@@ -203,6 +165,11 @@ void OsgManager::doBeforeStop()
 
 	// Delete the viewer so that the graphics context will be released in the manager's thread
 	m_viewer = nullptr;
+}
+
+osg::ref_ptr<osgViewer::CompositeViewer> OsgManager::getOsgCompositeViewer() const
+{
+	return m_viewer;
 }
 
 void SurgSim::Graphics::OsgManager::dumpDebugInfo() const

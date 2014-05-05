@@ -57,7 +57,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgCamera);
 
-	virtual bool setGroup(std::shared_ptr<Group> group) override;
+	virtual bool setRenderGroup(std::shared_ptr<Group> group) override;
 
 	virtual void setVisible(bool visible) override;
 
