@@ -21,14 +21,19 @@
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
-#include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+class AabbTree;
+}
 
 namespace Math
 {
@@ -92,6 +97,17 @@ public:
 	/// \return File name of the external file which contains the triangle mesh.
 	std::string getFileName() const;
 
+	/// Set the object's global pose
+	/// \param pose the rigid transform to apply
+	void setGlobalPose(const SurgSim::Math::RigidTransform3d &pose);
+
+	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void updateAabbTree();
+
+	/// Get the AabbTree
+	/// \return The object's associated AabbTree
+	std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree();
+
 	/// Create an AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
 	/// \return The object's associated AabbTree
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> createAabbTree();
@@ -112,6 +128,12 @@ private:
 
 	/// The triangle mesh contained by this shape.
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
+
+	/// The initial triangle mesh contained by this shape.
+	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_initialMesh;
+
+	/// The aabb tree used to accelerate collision detection against the mesh
+	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
 
 	/// File name of the external file which contains the triangle mesh.
 	std::string m_fileName;
