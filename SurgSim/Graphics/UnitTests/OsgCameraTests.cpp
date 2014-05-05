@@ -200,6 +200,29 @@ TEST(OsgCameraTests, RenderTargetTest)
 	EXPECT_TRUE(osgCamera->getOsgCamera()->isRenderToTextureCamera());
 }
 
+TEST(OsgCameraTests, CameraGroupTest)
+{
+	std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("TestRepresentation");
+
+	camera->clearGroupReferences();
+	camera->addGroupReference("test1");
+	camera->addGroupReference("test2");
+
+	EXPECT_EQ(2u, camera->getGroupReferences().size());
+
+	camera->setRenderGroupReference("otherTest");
+	EXPECT_EQ(2u, camera->getGroupReferences().size());
+
+	// Setting the render group of a camera to the group that it is in should remove the group
+	// from the set
+	camera->setRenderGroupReference("test1");
+	EXPECT_EQ(1u, camera->getGroupReferences().size());
+
+	// Should not be able to set group reference to the current render group
+	EXPECT_FALSE(camera->addGroupReference("test1"));
+	EXPECT_EQ(1u, camera->getGroupReferences().size());
+}
+
 
 }  // namespace Graphics
 }  // namespace SurgSim

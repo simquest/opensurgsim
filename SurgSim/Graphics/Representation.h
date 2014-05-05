@@ -81,7 +81,7 @@ public:
 	/// the same name.
 	/// \param	name	The name of the group.
 	/// \return	true if it succeeds, false if the group reference already exists.
-	bool addGroupReference(const std::string& name);
+	virtual bool addGroupReference(const std::string& name);
 
 
 	/// Adds a list of group references.

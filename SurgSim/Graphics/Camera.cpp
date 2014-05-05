@@ -36,7 +36,7 @@ Camera::Camera(const std::string& name) : Representation(name)
 
 void Camera::setRenderGroupReference(const std::string& name)
 {
-	removeGroupReference(Representation::DefaultGroupName);
+	removeGroupReference(name);
 	m_renderGroupReference = name;
 }
 
@@ -54,6 +54,16 @@ bool Camera::setRenderGroup(std::shared_ptr<Group> group)
 std::shared_ptr<Group> Camera::getRenderGroup() const
 {
 	return m_group;
+}
+
+bool Camera::addGroupReference(const std::string& name)
+{
+	bool result = false;
+	if (name != m_renderGroupReference)
+	{
+		result = Representation::addGroupReference(name);
+	}
+	return result;
 }
 
 }

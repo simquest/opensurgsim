@@ -50,7 +50,7 @@ OsgManager::~OsgManager()
 
 std::shared_ptr<Group> OsgManager::getOrCreateGroup(const std::string& name)
 {
-	std::shared_ptr<OsgGroup> result;
+	std::shared_ptr<Group> result;
 	auto groups = getGroups();
 
 	auto group = groups.find(name);
@@ -63,7 +63,7 @@ std::shared_ptr<Group> OsgManager::getOrCreateGroup(const std::string& name)
 	}
 	else
 	{
-		result = std::dynamic_pointer_cast<OsgGroup>(group->second);
+		result = group->second;
 	}
 
 	return result;

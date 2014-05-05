@@ -105,6 +105,8 @@ public:
 	/// 			 determined.
 	virtual void setRenderOrder(RenderOrder order, int value) = 0;
 
+	virtual bool addGroupReference(const std::string& name) override;
+
 private:
 	/// Group of representations that this camera sees
 	/// Only the representations in this group will be rendered when this camera's view is rendered.

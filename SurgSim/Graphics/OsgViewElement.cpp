@@ -23,7 +23,6 @@
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
 #include "SurgSim/Graphics/OsgView.h"
-#include "SurgSim/Graphics/OsgCamera.h"
 
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;

@@ -47,8 +47,6 @@ OsgRepresentation::OsgRepresentation(const std::string& name) :
 
 	m_transform->setAttitude(osg::Quat(0.0, 0.0, 0.0, 1.0));
 	m_transform->setPosition(osg::Vec3d(0.0, 0.0, 0.0));
-
-	addGroupReference(DefaultGroupName);
 }
 
 OsgRepresentation::~OsgRepresentation()

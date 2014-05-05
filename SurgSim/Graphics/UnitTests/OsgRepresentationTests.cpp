@@ -19,6 +19,7 @@
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgCamera.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -91,7 +92,7 @@ TEST(OsgRepresentationTests, PoseTest)
 	{
 		SCOPED_TRACE("Set Local Pose");
 		localPose = SurgSim::Math::makeRigidTransform(
-						  Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+						Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		representation->setLocalPose(localPose);
 		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
 		EXPECT_TRUE(representation->getPose().isApprox(localPose));
@@ -101,7 +102,7 @@ TEST(OsgRepresentationTests, PoseTest)
 	{
 		SCOPED_TRACE("Set Element Pose");
 		elementPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+						  Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		element->setPose(elementPose);
 		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
 		EXPECT_TRUE(representation->getPose().isApprox(elementPose * localPose));
@@ -110,7 +111,7 @@ TEST(OsgRepresentationTests, PoseTest)
 	{
 		SCOPED_TRACE("Change Local Pose");
 		localPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+						Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		representation->setLocalPose(localPose);
 		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
 		EXPECT_TRUE(representation->getPose().isApprox(elementPose * localPose));
@@ -178,7 +179,6 @@ TEST(OsgRepresentationTests, GroupTest)
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group1"));
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group2"));
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group3"));
-
 }
 
 TEST(OsgRepresentationTests, GroupsTest)
