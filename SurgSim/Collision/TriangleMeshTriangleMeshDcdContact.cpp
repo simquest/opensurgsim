@@ -79,13 +79,7 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 				continue;
 			}
 
-			// The triangleA vertices.
-			const Vector3d& triangleA0 =
-				collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(*i).verticesId[0]);
-			const Vector3d& triangleA1 =
-				collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(*i).verticesId[1]);
-			const Vector3d& triangleA2 =
-				collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(*i).verticesId[2]);
+			auto verticesA = collisionMeshA->getTriangleVerticesPositions(*i);
 
 			for (auto j = triangleListB.begin(); j != triangleListB.end(); ++j)
 			{
@@ -95,17 +89,11 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 					continue;
 				}
 
-				// The triangleB vertices.
-				const Vector3d& triangleB0 =
-					collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(*j).verticesId[0]);
-				const Vector3d& triangleB1 =
-					collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(*j).verticesId[1]);
-				const Vector3d& triangleB2 =
-					collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(*j).verticesId[2]);
+				auto verticesB = collisionMeshB->getTriangleVerticesPositions(*j);
 
 				// Check if the triangles intersect.
-				if (SurgSim::Math::calculateContactTriangleTriangle(triangleA0, triangleA1, triangleA2,
-																	triangleB0, triangleB1, triangleB2,
+				if (SurgSim::Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],
+																	verticesB[0], verticesB[1], verticesB[2],
 																	normalA, normalB, &depth,
 																	&penetrationPointA, &penetrationPointB,
 																	&normal))

@@ -136,6 +136,21 @@ typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType&
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
+std::array<SurgSim::Math::Vector3d, 3>
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangleVerticesPositions(unsigned int id) const
+{
+	auto& ids = getTriangle(id).verticesId;
+	std::array<SurgSim::Math::Vector3d, 3> result
+		= {{
+				Vertices<VertexData>::getVertex(ids[0]).position,
+				Vertices<VertexData>::getVertex(ids[1]).position,
+				Vertices<VertexData>::getVertex(ids[2]).position
+		}};
+
+	return result;
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
 bool TriangleMeshBase<VertexData, EdgeData, TriangleData>::isValid() const
 {
 	typedef typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType EdgeType;

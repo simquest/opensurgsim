@@ -16,6 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_H
 
+#include <array>
+
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/Vertices.h"
 
@@ -128,6 +130,11 @@ public:
 	/// Retrieve a specific triangle (non const version)
 	/// Returns the specified triangle.
 	TriangleType& getTriangle(unsigned int id);
+
+	/// Returns an array of the triangle's vertices' positions
+	/// \param id the id of the triangle
+	/// \return an array of the triangle's vertices' positions
+	std::array<SurgSim::Math::Vector3d, 3> getTriangleVerticesPositions(unsigned int id) const;
 
 	/// Test if the TriangleMeshBase is valid (valid vertex Ids used in all MeshElements)
 	/// \return True if the TriangleMeshBase is valid, False otherwise (the topology is then broken)
