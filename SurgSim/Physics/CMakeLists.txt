@@ -115,6 +115,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	MassSpringRepresentationLocalization.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
+	MlcpPhysicsProblem-inl.h
 	MlcpPhysicsSolution.h
 	PhysicsManager.h
 	PhysicsManagerState.h
