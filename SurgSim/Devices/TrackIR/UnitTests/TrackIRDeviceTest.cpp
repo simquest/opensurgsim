@@ -27,37 +27,12 @@
 #include "SurgSim/Devices/TrackIR/TrackIRDevice.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Testing/DevicesUtilities.h"
 
 using SurgSim::Device::TrackIRDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Input::InputConsumerInterface;
-
-
-struct TestListener : public InputConsumerInterface
-{
-public:
-	TestListener() :
-		m_numTimesInitializedInput(0),
-		m_numTimesReceivedInput(0)
-	{
-	}
-
-	virtual void initializeInput(const std::string& device, const DataGroup& inputData)
-	{
-		++m_numTimesInitializedInput;
-	}
-	virtual void handleInput(const std::string& device, const DataGroup& inputData)
-	{
-		++m_numTimesReceivedInput;
-		m_lastReceivedInput = inputData;
-	}
-
-	int m_numTimesInitializedInput;
-	int m_numTimesReceivedInput;
-	DataGroup m_lastReceivedInput;
-};
-
-
+using SurgSim::Testing::MockInputOutput;
 
 TEST(TrackIRDeviceTest, CreateAndInitializeDevice)
 {
@@ -115,7 +90,7 @@ TEST(TrackIRDeviceTest, InputConsumer)
 	ASSERT_TRUE(nullptr != device) << "Device creation failed.";
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
 
-	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
+	std::shared_ptr<MockInputOutput> consumer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 	EXPECT_TRUE(device->addInputConsumer(consumer));
 

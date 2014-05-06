@@ -13,36 +13,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Testing/DevicesUtilities.h"
+
+using SurgSim::DataStructures::DataGroup;
 
 namespace SurgSim
 {
-
-namespace Physics
+namespace Testing
 {
 
-MlcpPhysicsProblem::~MlcpPhysicsProblem()
+MockInputOutput::MockInputOutput() :
+	m_numTimesInitializedInput(0),
+	m_numTimesReceivedInput(0),
+	m_numTimesRequestedOutput(0)
 {
 }
 
-void MlcpPhysicsProblem::setZero(int numDof, int numConstraintDof, int numConstraints)
+bool MockInputOutput::requestOutput(const std::string& device, DataGroup* outputData)
 {
-	MlcpProblem::setZero(numDof, numConstraintDof, numConstraints);
-
-	H.resize(numConstraintDof, numDof);
-	H.setZero();
-	CHt.resize(numDof, numConstraintDof);
-	CHt.setZero();
+	++m_numTimesRequestedOutput;
+	return false;
 }
 
-MlcpPhysicsProblem MlcpPhysicsProblem::Zero(int numDof, int numConstraintDof, int numConstraints)
+void MockInputOutput::handleInput(const std::string& device, const DataGroup& inputData)
 {
-	MlcpPhysicsProblem result;
-	result.setZero(numDof, numConstraintDof, numConstraints);
-
-	return result;
+	++m_numTimesReceivedInput;
+	m_lastReceivedInput = inputData;
 }
 
-}; // namespace Physics
+void MockInputOutput::initializeInput(const std::string& device, const DataGroup& inputData)
+{
+	++m_numTimesInitializedInput;
+}
 
-}; // namespace SurgSim
+}; // Testing
+}; // SurgSim
