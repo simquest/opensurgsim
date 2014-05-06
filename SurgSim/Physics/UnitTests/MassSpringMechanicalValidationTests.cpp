@@ -132,8 +132,8 @@ public:
 			}
 			else
 			{
-				EXPECT_NEAR(currentEnergy, previousEnergy, 2.6e-6) << " Local diff = " << currentEnergy - previousEnergy;
-				EXPECT_NEAR(currentEnergy, initialEnergy, 3e-4) << " Global diff = " << currentEnergy - initialEnergy;
+				EXPECT_NEAR(currentEnergy, previousEnergy, 2.6e-6);
+				EXPECT_NEAR(currentEnergy, initialEnergy, 3e-4);
 			}
 
 			time += m_dt;
