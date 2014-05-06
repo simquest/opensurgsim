@@ -57,8 +57,10 @@ void assertIsCoplanar(const Vector3d& triangle0,
 {
 	SURGSIM_ASSERT(SurgSim::Math::isCoplanar(triangle0, triangle1, triangle2, point))
 		<< "Coplanar assertion failed with: "
-		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
-		<< ", pt " << point.transpose();
+		"t0 [" << triangle0.transpose() << "], "
+		"t1 [" << triangle1.transpose() << "], "
+		"t2 [" << triangle2.transpose() << "], "
+		"pt [" << point.transpose() << "]";
 }
 
 /// Asserts the point is inside the triangle, and prints debug output on the failing condition.
@@ -74,8 +76,11 @@ void assertIsPointInsideTriangle(const Vector3d& point,
 {
 	SURGSIM_ASSERT(SurgSim::Math::isPointInsideTriangle(point, triangle0, triangle1, triangle2, normal))
 		<< "Point inside triangle assertion failed with: "
-		<< "t0 " << triangle0.transpose() << ", t1 " << triangle1.transpose() << ", t2 " << triangle2.transpose()
-		<< ", n " << normal.transpose() << ", pt " << point.transpose();
+		"t0 [" << triangle0.transpose() << "], "
+		"t1 [" << triangle1.transpose() << "], "
+		"t2 [" << triangle2.transpose() << "], "
+		"n [" << normal.transpose() << "], "
+		"pt [" << point.transpose() << "]";
 }
 
 /// Asserts the provided normal and depth minimally resolve the interpenetration of the two triangles, and prints debug
@@ -100,9 +105,14 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 		(Vector3d)(triangleA0 + correction), (Vector3d)(triangleA1 + correction), (Vector3d)(triangleA2 + correction),
 		triangleB0, triangleB1, triangleB2))
 		<< "Correct normal and depth assertion failed with: "
-		<< "n " << normal.transpose() << ", d " << penetrationDepth
-		<< ", a0 " << triangleA0.transpose() << ", a1 " << triangleA1.transpose() << ", a2 " << triangleA2.transpose()
-		<< ", b0 " << triangleB0.transpose() << ", b1 " << triangleB1.transpose() << ", b2 " << triangleB2.transpose();
+		"n [" << normal.transpose() << "], "
+		"d [" << penetrationDepth << "], "
+		"a0 [" << triangleA0.transpose() << "], "
+		"a1 [" << triangleA1.transpose() << "], "
+		"a2 [" << triangleA2.transpose() << "], "
+		"b0 [" << triangleB0.transpose() << "], "
+		"b1 [" << triangleB1.transpose() << "], "
+		"b2 [" << triangleB2.transpose() << "]";
 
 	correction = normal * (penetrationDepth + 2.0 * SurgSim::Math::Geometry::DistanceEpsilon);
 
@@ -110,9 +120,14 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 		(Vector3d)(triangleA0 + correction), (Vector3d)(triangleA1 + correction), (Vector3d)(triangleA2 + correction),
 		triangleB0, triangleB1, triangleB2))
 		<< "Correct normal and depth assertion failed with: "
-		<< "n " << normal.transpose() << ", d " << penetrationDepth
-		<< ", a0 " << triangleA0.transpose() << ", a1 " << triangleA1.transpose() << ", a2 " << triangleA2.transpose()
-		<< ", b0 " << triangleB0.transpose() << ", b1 " << triangleB1.transpose() << ", b2 " << triangleB2.transpose();
+		"n [" << normal.transpose() << "], "
+		"d [" << penetrationDepth << "], "
+		"a0 [" << triangleA0.transpose() << "], "
+		"a1 [" << triangleA1.transpose() << "], "
+		"a2 [" << triangleA2.transpose() << "], "
+		"b0 [" << triangleB0.transpose() << "], "
+		"b1 [" << triangleB1.transpose() << "], "
+		"b2 [" << triangleB2.transpose() << "]";
 }
 
 }
