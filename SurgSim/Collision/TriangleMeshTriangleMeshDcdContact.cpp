@@ -94,22 +94,23 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 								   const Vector3d& triangleB1,
 								   const Vector3d& triangleB2)
 {
-	Vector3d correction = normal * (penetrationDepth + 2.0 * SurgSim::Math::Geometry::DistanceEpsilon);
+	Vector3d correction = normal * (penetrationDepth - 2.0 * SurgSim::Math::Geometry::DistanceEpsilon);
 
-	Vector3d temp1, temp2;
-	double expectedDistance = SurgSim::Math::distanceTriangleTriangle(
+	SURGSIM_ASSERT(SurgSim::Math::doesIntersectTriangleTriangle(
 		(Vector3d)(triangleA0 + correction), (Vector3d)(triangleA1 + correction), (Vector3d)(triangleA2 + correction),
-		triangleB0, triangleB1, triangleB2,
-		&temp1, &temp2);
-
-	SURGSIM_ASSERT(expectedDistance > 0.0)
+		triangleB0, triangleB1, triangleB2))
 		<< "Correct normal and depth assertion failed with: "
-		<< "calcD " << expectedDistance << ", n " << normal.transpose() << ", d " << penetrationDepth
+		<< "n " << normal.transpose() << ", d " << penetrationDepth
 		<< ", a0 " << triangleA0.transpose() << ", a1 " << triangleA1.transpose() << ", a2 " << triangleA2.transpose()
 		<< ", b0 " << triangleB0.transpose() << ", b1 " << triangleB1.transpose() << ", b2 " << triangleB2.transpose();
-	SURGSIM_ASSERT(expectedDistance < 4.0 * SurgSim::Math::Geometry::DistanceEpsilon)
+
+	correction = normal * (penetrationDepth + 2.0 * SurgSim::Math::Geometry::DistanceEpsilon);
+
+	SURGSIM_ASSERT(!SurgSim::Math::doesIntersectTriangleTriangle(
+		(Vector3d)(triangleA0 + correction), (Vector3d)(triangleA1 + correction), (Vector3d)(triangleA2 + correction),
+		triangleB0, triangleB1, triangleB2))
 		<< "Correct normal and depth assertion failed with: "
-		<< "calcD " << expectedDistance << ", n " << normal.transpose() << ", d " << penetrationDepth
+		<< "n " << normal.transpose() << ", d " << penetrationDepth
 		<< ", a0 " << triangleA0.transpose() << ", a1 " << triangleA1.transpose() << ", a2 " << triangleA2.transpose()
 		<< ", b0 " << triangleB0.transpose() << ", b1 " << triangleB1.transpose() << ", b2 " << triangleB2.transpose();
 }
