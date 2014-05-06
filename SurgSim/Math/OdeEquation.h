@@ -34,13 +34,8 @@ namespace Math
 /// \note To allow the use of explicit and implicit solver, we need to be able to evaluate
 /// \note M(x,v), F(x,v) but also K = -dF/dx(x,v), D = -dF/dv(x,v)
 /// \note Models wanting the use of implicit solvers will need to compute these Jacobian matrices.
-/// \note Also, the matrices types are all templatized to allow for optimization
 /// \tparam State Type of the state y=(x v)
-/// \tparam MT Type of the matrix M
-/// \tparam DT Type of the matrix D
-/// \tparam KT Type of the matrix K
-/// \tparam ST Type of the system matrix (linear combination of M, D, K)
-template <class State, class MT, class DT, class KT, class ST>
+template <class State>
 class OdeEquation
 {
 public:
@@ -62,19 +57,19 @@ public:
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
 	/// \return The matrix M(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	virtual const MT& computeM(const State& state) = 0;
+	virtual const Matrix& computeM(const State& state) = 0;
 
 	/// Evaluation of D = -df/dv (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix D = -df/dv(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	virtual const DT& computeD(const State& state) = 0;
+	virtual const Matrix& computeD(const State& state) = 0;
 
 	/// Evaluation of K = -df/dx (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix K = -df/dx(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	virtual const KT& computeK(const State& state) = 0;
+	virtual const Matrix& computeK(const State& state) = 0;
 
 	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
 	/// When all the terms are needed, this method can perform optimization in evaluating everything together
@@ -85,7 +80,7 @@ public:
 	/// \param[out] K The matrix K = -df/dx(x,v)
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const State& state, Vector** f, MT** M, DT** D, KT** K) = 0;
+	virtual void computeFMDK(const State& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) = 0;
 
 protected:
 	/// The initial state (which defines the ODE initial conditions (x0, v0))

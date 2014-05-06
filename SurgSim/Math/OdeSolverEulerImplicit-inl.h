@@ -22,16 +22,15 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State, class MT, class DT, class KT, class ST>
-OdeSolverEulerImplicit<State, MT, DT, KT, ST>::OdeSolverEulerImplicit(
-	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	OdeSolver<State, MT, DT, KT, ST>(equation)
+template <class State>
+OdeSolverEulerImplicit<State>::OdeSolverEulerImplicit(OdeEquation<State>* equation)
+	: OdeSolver<State>(equation)
 {
 	m_name = "Ode Solver Euler Implicit";
 }
 
-template <class State, class MT, class DT, class KT, class ST>
-void OdeSolverEulerImplicit<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+template <class State>
+void OdeSolverEulerImplicit<State>::solve(double dt, const State& currentState, State* newState)
 {
 	// General equation to solve:
 	//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
@@ -42,9 +41,9 @@ void OdeSolverEulerImplicit<State, MT, DT, KT, ST>::solve(double dt, const State
 	//   (M/dt + D + dt.K).deltaV = f(t) - dt.K.v(t)
 
 	// Computes f(t, x(t), v(t)), M, D, K all at the same time
-	MT* M;
-	DT* D;
-	KT* K;
+	Matrix* M;
+	Matrix* D;
+	Matrix* K;
 	Vector* f;
 	m_equation.computeFMDK(currentState, &f, &M, &D, &K);
 
@@ -58,7 +57,7 @@ void OdeSolverEulerImplicit<State, MT, DT, KT, ST>::solve(double dt, const State
 
 	// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
 	Vector& deltaV = newState->getAccelerations();
-	m_solveAndInverse(m_systemMatrix, *f, &deltaV, &(m_compliance));
+	(*m_linearSolver)(m_systemMatrix, *f, &deltaV, &m_compliance);
 
 	// Compute the new state using the Euler Implicit scheme:
 	newState->getVelocities() = currentState.getVelocities() + deltaV;

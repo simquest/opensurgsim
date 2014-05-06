@@ -22,33 +22,48 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State, class MT, class DT, class KT, class ST>
-OdeSolver<State, MT, DT, KT, ST>::OdeSolver(OdeEquation<State, MT, DT, KT, ST>* equation) :
-	m_equation(*equation)
+template <class State>
+OdeSolver<State>::OdeSolver(OdeEquation<State>* equation)
+	: m_equation(*equation)
 {
 	allocate(m_equation.getInitialState()->getPositions().size());
+
+	// Default linear solver
+	setLinearSolver(std::make_shared<LinearSolveAndInverseDenseMatrix>());
 }
 
-template <class State, class MT, class DT, class KT, class ST>
-const std::string OdeSolver<State, MT, DT, KT, ST>::getName() const
+template <class State>
+const std::string OdeSolver<State>::getName() const
 {
 	return m_name;
 }
 
-template <class State, class MT, class DT, class KT, class ST>
-const ST& OdeSolver<State, MT, DT, KT, ST>::getSystemMatrix() const
+template <class State>
+void OdeSolver<State>::setLinearSolver(std::shared_ptr<LinearSolveAndInverse> linearSolver)
+{
+	m_linearSolver = linearSolver;
+}
+
+template <class State>
+std::shared_ptr<LinearSolveAndInverse> OdeSolver<State>::getLinearSolver() const
+{
+	return m_linearSolver;
+}
+
+template <class State>
+const Matrix& OdeSolver<State>::getSystemMatrix() const
 {
 	return m_systemMatrix;
 }
 
-template <class State, class MT, class DT, class KT, class ST>
-const Matrix& OdeSolver<State, MT, DT, KT, ST>::getCompliance() const
+template <class State>
+const Matrix& OdeSolver<State>::getCompliance() const
 {
 	return m_compliance;
 }
 
-template <class State, class MT, class DT, class KT, class ST>
-void OdeSolver<State, MT, DT, KT, ST>::allocate(unsigned int size)
+template <class State>
+void OdeSolver<State>::allocate(unsigned int size)
 {
 	resizeMatrix(&m_systemMatrix, size, size);
 	resizeMatrix(&m_compliance, size, size);

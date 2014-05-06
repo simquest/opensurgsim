@@ -20,12 +20,14 @@ include_directories(
 )
 
 set(SURGSIM_TESTING_SOURCES
+	DevicesUtilities.cpp
 	MathUtilities.cpp
 	TestCube.cpp
 	TestingMain.cpp
 )
 
 set(SURGSIM_TESTING_HEADERS
+	DevicesUtilities.h
 	MathUtilities.h
 	MockPhysicsManager.h
 	TestCube.h

@@ -29,8 +29,7 @@ namespace Physics
 {
 
 /// Finite Element Model 2D is a fem built with 2D FemElement
-class Fem2DRepresentation : public FemRepresentation<SurgSim::Math::Matrix, SurgSim::Math::Matrix,
-													 SurgSim::Math::Matrix, SurgSim::Math::Matrix>
+class Fem2DRepresentation : public FemRepresentation
 {
 public:
 	/// Constructor

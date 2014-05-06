@@ -35,13 +35,12 @@ namespace
 	const std::string name = "MockOdeSolver";
 };
 
-class MockOdeSolver : public OdeSolver<MassPointState, Matrix, Matrix, Matrix, Matrix>
+class MockOdeSolver : public OdeSolver<MassPointState>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	MockOdeSolver(OdeEquation<MassPointState, Matrix, Matrix, Matrix, Matrix>* equation) :
-		OdeSolver(equation)
+	explicit MockOdeSolver(OdeEquation<MassPointState>* equation) : OdeSolver(equation)
 	{
 		this->m_name = name;
 	}
