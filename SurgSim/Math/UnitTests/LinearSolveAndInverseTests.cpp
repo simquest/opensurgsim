@@ -63,7 +63,7 @@ private:
 	}
 
 	template <size_t BlockSize>
-	void initializeTriDiagonalBlockMatrix(Matrix* m)
+	void initializeTriDiagonalBlockMatrix(Matrix* m, bool isSymmetric)
 	{
 		size_t numBlocks = size / BlockSize;
 
@@ -88,6 +88,18 @@ private:
 						size_t col = colBlockId * BlockSize + colInBlockId;
 						(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
 					}
+				}
+			}
+		}
+
+		if (isSymmetric)
+		{
+			// Force symmetry (lower triangular is copied from the upper triangular)
+			for (size_t row = 0; row < size; ++row)
+			{
+				for (size_t col = row + 1; col < size; ++col)
+				{
+					(*m)(col, row) = (*m)(row, col);
 				}
 			}
 		}
@@ -117,10 +129,10 @@ public:
 	}
 
 	template <size_t BlockSize>
-	void setupTriDiagonalBlockMatrixTest()
+	void setupTriDiagonalBlockMatrixTest(bool isSymmetric = false)
 	{
 		size = BlockSize * 6;
-		initializeTriDiagonalBlockMatrix<BlockSize>(&matrix);
+		initializeTriDiagonalBlockMatrix<BlockSize>(&matrix, isSymmetric);
 		setupTest();
 	}
 
@@ -207,6 +219,60 @@ TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize6Tests)
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
 };
 
+TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize2Tests)
+{
+	setupTriDiagonalBlockMatrixTest<2>(true);
+
+	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<2> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize3Tests)
+{
+	setupTriDiagonalBlockMatrixTest<3>(true);
+
+	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<3> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize4Tests)
+{
+	setupTriDiagonalBlockMatrixTest<4>(true);
+
+	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<4> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize5Tests)
+{
+	setupTriDiagonalBlockMatrixTest<5>(true);
+
+	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<5> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize6Tests)
+{
+	setupTriDiagonalBlockMatrixTest<6>(true);
+
+	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<6> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
 }; // namespace Math
 
 }; // namespace SurgSim

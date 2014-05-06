@@ -171,6 +171,28 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::operator ()(const M
 	}
 }
 
+template <int BlockSize>
+void LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<BlockSize>::operator ()(const Matrix& A, const Vector& b,
+																				  Vector* x,
+																				  Matrix* Ainv)
+{
+	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
+
+	if (Ainv != nullptr)
+	{
+		inverseTriDiagonalBlock(A, Ainv, true);
+		if (x != nullptr)
+		{
+			(*x) = (*Ainv) * b;
+		}
+	}
+	else if (x != nullptr)
+	{
+		inverseTriDiagonalBlock(A, &m_inverse, true);
+		(*x) = m_inverse * b;
+	}
+}
+
 };  // namespace Math
 
 };  // namespace SurgSim

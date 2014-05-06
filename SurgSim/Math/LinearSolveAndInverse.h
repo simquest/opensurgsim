@@ -65,6 +65,20 @@ public:
 template <int BlockSize>
 class LinearSolveAndInverseTriDiagonalBlockMatrix : public LinearSolveAndInverse
 {
+protected:
+	/// Computes the inverse matrix
+	/// \param A The matrix to inverse
+	/// \param[out] inv The inverse matrix
+	/// \param isSymmetric True if the matrix is symmetric, False otherwise
+	/// \note isSymmetric is only indicative and helps optimizing the computation when the matrix is symmetric.
+	/// \note On the other side, if the flag is true and the matrix is not symmetric, the result will be wrong.
+	/// \note Assert on inverse matrix pointer (inv), on the matrix being square and on
+	/// \note proper size matching between the matrix size and the blockSize
+	void inverseTriDiagonalBlock(const SurgSim::Math::Matrix& A, SurgSim::Math::Matrix* inv, bool isSymmetric = false);
+
+	/// Member variable to hold the inverse matrix in case only the solving is requested
+	Matrix m_inverse;
+
 private:
 	static_assert(BlockSize > 0,
 		"Cannot define a tri-diagonal block matrix with block size 0 or negative");
@@ -89,26 +103,26 @@ private:
 	/// \return The upper-diagonal block element requested (i.e. block (i, i+1))
 	const Eigen::Block<const Matrix, BlockSize, BlockSize> minusCi(const SurgSim::Math::Matrix& A, size_t i) const;
 
-	/// Computes the inverse matrix
-	/// \param A The matrix to inverse
-	/// \param[out] inv The inverse matrix
-	/// \param isSymmetric True if the matrix is symmetric, False otherwise
-	/// \note isSymmetric is only indicative and helps optimizing the computation when the matrix is symmetric.
-	/// \note On the other side, if the flag is true and the matrix is not symmetric, the result will be wrong.
-	/// \note Assert on inverse matrix pointer (inv), on the matrix being square and on
-	/// \note proper size matching between the matrix size and the blockSize
-	void inverseTriDiagonalBlock(const SurgSim::Math::Matrix& A, SurgSim::Math::Matrix* inv, bool isSymmetric = false);
-
 	///@{
 	/// Intermediate block matrices, helpful to construct the inverse matrix
 	std::vector<Block> m_Di, m_Ei, m_Bi_AiDiminus1_inv;
 	///@}
 
-	/// Member variable to hold the inverse matrix in case only the solving is requested
-	Matrix m_inverse;
-
 public:
 	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+};
+
+/// Derivation for symmetric tri-diagonal block matrix type
+/// \tparam BlockSize Define the block size of the tri-diagonal block matrix
+template <int BlockSize>
+class LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix :
+	public LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>
+{
+public:
+	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+
+	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalBlock;
+	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::m_inverse;
 };
 
 }; // namespace Math
