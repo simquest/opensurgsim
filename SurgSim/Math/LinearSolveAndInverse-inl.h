@@ -47,10 +47,10 @@ const Eigen::Block<const Matrix, BlockSize, BlockSize>
 
 template <int BlockSize>
 void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalBlock(const SurgSim::Math::Matrix& A,
-																			   SurgSim::Math::Matrix* inv,
-																			   bool isSymmetric)
+																					 SurgSim::Math::Matrix* inverse,
+																					 bool isSymmetric)
 {
-	SURGSIM_ASSERT(inv != nullptr) << "Null inverse matrix pointer";
+	SURGSIM_ASSERT(inverse != nullptr) << "Null inverse matrix pointer";
 
 	SURGSIM_ASSERT(A.cols() == A.rows()) <<
 		"Cannot inverse a non square tri-diagonal block matrix ("<< A.rows() <<" x "<< A.cols() <<")";
@@ -66,13 +66,13 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 	// composed of an unique block, simply call the normal Eigen inverse method.
 	if (size <= 4 || numBlocks == static_cast<size_t>(1))
 	{
-		*inv = A.inverse();
+		*inverse = A.inverse();
 		return;
 	}
 
-	if (inv->rows() != size || inv->cols() != size)
+	if (inverse->rows() != size || inverse->cols() != size)
 	{
-		inv->resize(size, size);
+		inverse->resize(size, size);
 	}
 
 	m_Bi_AiDiminus1_inv.resize(numBlocks);
@@ -86,7 +86,7 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 	m_Di[0] = m_Bi_AiDiminus1_inv[0] * (-minusCi(A, 0));
 	// Bi_AiDiminus1_inv[i] = (Bi - Ai.D[i-1])^-1
 	// Di               [i] = (Bi - Ai.D[i-1])^-1 . Ci
-	for(size_t i = 1; i < numBlocks - 1; i++)
+	for(size_t i = 1; i < numBlocks - 1; ++i)
 	{
 		m_Bi_AiDiminus1_inv[i] = (Bi(A, i) - (-minusAi(A, i)) * m_Di[i - 1]).inverse();
 		m_Di[i] = m_Bi_AiDiminus1_inv[i] * (-minusCi(A, i));
@@ -100,7 +100,7 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 	// Ei           = (Bi - Ci.E(i+1))^-1 . Ai
 	// E0           = UNDEFINED because A0 does not exist
 	m_Ei[numBlocks - 1] = Bi(A, numBlocks - 1).inverse() * (-minusAi(A, numBlocks - 1));
-	for(int i = static_cast<int>(numBlocks) - 2; i > 0; --i)
+	for(size_t i = numBlocks - 2; i > 0; --i)
 	{
 		m_Ei[i] = (Bi(A, i) - (-minusCi(A, i)) * m_Ei[i + 1]).inverse() * (-minusAi(A, i));
 	}
@@ -109,11 +109,11 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 	// inv(i,i) = (I - Di.E(i+1))^-1.Bi_AiDiminus1_inv[i]
 	for(size_t i = 0; i < numBlocks - 1; ++i)
 	{
-		inv->block<BlockSize, BlockSize>(BlockSize * i, BlockSize * i) =
+		inverse->block<BlockSize, BlockSize>(BlockSize * i, BlockSize * i) =
 			(Block::Identity() - m_Di[i] * m_Ei[i + 1]).inverse() * m_Bi_AiDiminus1_inv[i];
 	}
 	// inv(nbBlock-1,nbBlock-1) = Bi_AiDiminus1_inv[nbBlock-1]
-	inv->block<BlockSize, BlockSize>(BlockSize * (numBlocks - 1), BlockSize * (numBlocks - 1)) =
+	inverse->block<BlockSize, BlockSize>(BlockSize * (numBlocks - 1), BlockSize * (numBlocks - 1)) =
 		m_Bi_AiDiminus1_inv[numBlocks - 1];
 
 	// Inverse off-diagonal blocks:
@@ -121,14 +121,14 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 	// inv(i,j) = Ei.inv(i-1,j) for i>j
 	if (isSymmetric)
 	{
-		for(int j = 0; j < static_cast<int>(numBlocks); ++j)
+		for(size_t j = 1; j < numBlocks; ++j)
 		{
-			for(int i = j - 1; i >= 0; --i)
+			for(size_t i = j; i > 0; --i)
 			{
-				inv->block<BlockSize, BlockSize>(BlockSize * i, BlockSize * j) =
-					m_Di[i] * inv->block<BlockSize, BlockSize>(BlockSize * (i + 1), BlockSize * j);
-				inv->block<BlockSize, BlockSize>(BlockSize * j, BlockSize * i) =
-					inv->block<BlockSize, BlockSize>(BlockSize * i, BlockSize * j).transpose();
+				inverse->block<BlockSize, BlockSize>(BlockSize * (i - 1), BlockSize * j) =
+					m_Di[i - 1] * inverse->block<BlockSize, BlockSize>(BlockSize * i, BlockSize * j);
+				inverse->block<BlockSize, BlockSize>(BlockSize * j, BlockSize * (i - 1)) =
+					inverse->block<BlockSize, BlockSize>(BlockSize * (i - 1), BlockSize * j).transpose();
 			}
 		}
 	}
@@ -138,13 +138,13 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 		{
 			for(int i = j - 1; i >= 0; --i)
 			{
-				inv->block<BlockSize, BlockSize>(BlockSize * i, BlockSize * j) =
-					m_Di[i] * inv->block<BlockSize, BlockSize>(BlockSize * (i + 1), BlockSize * j);
+				inverse->block<BlockSize, BlockSize>(BlockSize * i, BlockSize * j) =
+					m_Di[i] * inverse->block<BlockSize, BlockSize>(BlockSize * (i + 1), BlockSize * j);
 			}
 			for(int i = j + 1; i < static_cast<int>(numBlocks); ++i)
 			{
-				inv->block<BlockSize, BlockSize>(BlockSize * i, BlockSize * j) =
-					m_Ei[i] * inv->block<BlockSize, BlockSize>(BlockSize * (i - 1), BlockSize * j);
+				inverse->block<BlockSize, BlockSize>(BlockSize * i, BlockSize * j) =
+					m_Ei[i] * inverse->block<BlockSize, BlockSize>(BlockSize * (i - 1), BlockSize * j);
 			}
 		}
 	}
@@ -152,21 +152,20 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 
 template <int BlockSize>
 void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::operator ()(const Matrix& A, const Vector& b, Vector* x,
-																   Matrix* Ainv)
+																		 Matrix* Ainv)
 {
 	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
 
 	if (Ainv != nullptr)
 	{
 		inverseTriDiagonalBlock(A, Ainv);
-		(*x) = (*Ainv) * b;
+		if (x != nullptr)
+		{
+			(*x) = (*Ainv) * b;
+		}
 	}
 	else if (x != nullptr)
 	{
-		if (m_inverse.rows() != A.rows() || m_inverse.cols() != A.cols())
-		{
-			m_inverse.resize(A.rows(), A.cols());
-		}
 		inverseTriDiagonalBlock(A, &m_inverse);
 		(*x) = m_inverse * b;
 	}

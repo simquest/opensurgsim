@@ -22,14 +22,16 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State> OdeSolverLinearStatic<State>::OdeSolverLinearStatic(OdeEquation<State>* equation)
+template <class State>
+OdeSolverLinearStatic<State>::OdeSolverLinearStatic(OdeEquation<State>* equation)
 	: OdeSolverStatic<State>(equation),
 	m_initialized(false)
 {
 	m_name = "Ode Solver Linear Static";
 }
 
-template <class State> void OdeSolverLinearStatic<State>::solve(double dt, const State& currentState, State* newState)
+template <class State>
+void OdeSolverLinearStatic<State>::solve(double dt, const State& currentState, State* newState)
 {
 	if (!m_initialized)
 	{

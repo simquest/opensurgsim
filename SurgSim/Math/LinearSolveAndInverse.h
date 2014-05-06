@@ -62,7 +62,8 @@ public:
 
 /// Derivation for tri-diagonal block matrix type
 /// \tparam BlockSize Define the block size of the tri-diagonal block matrix
-template <int BlockSize> class LinearSolveAndInverseTriDiagonalBlockMatrix : public LinearSolveAndInverse
+template <int BlockSize>
+class LinearSolveAndInverseTriDiagonalBlockMatrix : public LinearSolveAndInverse
 {
 private:
 	static_assert(BlockSize > 0,

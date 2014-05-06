@@ -33,7 +33,11 @@ void LinearSolveAndInverseDiagonalMatrix::operator ()(const Matrix& A, const Vec
 		}
 		Ainv->setZero();
 		Ainv->diagonal() = A.diagonal().cwiseInverse();
-		(*x) = Ainv->diagonal().cwiseProduct(b);
+
+		if (x != nullptr)
+		{
+			(*x) = Ainv->diagonal().cwiseProduct(b);
+		}
 	}
 	else if (x != nullptr)
 	{

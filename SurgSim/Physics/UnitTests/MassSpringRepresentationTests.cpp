@@ -27,7 +27,6 @@
 
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::MassSpringRepresentation;
-using SurgSim::Physics::MockMassSpring;
 using SurgSim::Physics::MockSpring;
 
 namespace

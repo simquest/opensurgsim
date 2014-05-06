@@ -57,7 +57,8 @@ enum IntegrationScheme {
 /// \note   Vector& getPositions();
 /// \note   Vector& getVelocities();
 /// \note   Vector& getAccelerations();
-template <class State> class OdeSolver
+template <class State>
+class OdeSolver
 {
 public:
 	/// Constructor

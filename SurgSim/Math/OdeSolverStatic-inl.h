@@ -22,7 +22,8 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State> OdeSolverStatic<State>::OdeSolverStatic(OdeEquation<State>* equation)
+template <class State>
+OdeSolverStatic<State>::OdeSolverStatic(OdeEquation<State>* equation)
 	: OdeSolver<State>(equation)
 {
 	m_name = "Ode Solver Static";

@@ -22,7 +22,8 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State> OdeSolverLinearEulerExplicit<State>::OdeSolverLinearEulerExplicit(OdeEquation<State>* equation)
+template <class State>
+OdeSolverLinearEulerExplicit<State>::OdeSolverLinearEulerExplicit(OdeEquation<State>* equation)
 	: OdeSolverEulerExplicit<State>(equation),
 	m_initialized(false)
 {

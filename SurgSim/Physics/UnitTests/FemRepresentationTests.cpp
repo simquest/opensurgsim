@@ -105,10 +105,10 @@ protected:
 		// Gravity force should be m.gravity for each node of each element
 		m_expectedGravityForce = Vector::Zero(9);
 		SurgSim::Math::Vector3d g(0.0, -9.81, 0.0);
-		m_expectedGravityForce .segment<3>(0) += g * element01->getMass(*m_initialState) / 2.0;
-		m_expectedGravityForce .segment<3>(3) += g * element01->getMass(*m_initialState) / 2.0;
-		m_expectedGravityForce .segment<3>(3) += g * element12->getMass(*m_initialState) / 2.0;
-		m_expectedGravityForce .segment<3>(6) += g * element12->getMass(*m_initialState) / 2.0;
+		m_expectedGravityForce.segment<3>(0) += g * element01->getMass(*m_initialState) / 2.0;
+		m_expectedGravityForce.segment<3>(3) += g * element01->getMass(*m_initialState) / 2.0;
+		m_expectedGravityForce.segment<3>(3) += g * element12->getMass(*m_initialState) / 2.0;
+		m_expectedGravityForce.segment<3>(6) += g * element12->getMass(*m_initialState) / 2.0;
 
 		// Rayleigh damping force should be -(alpha.M + beta.K).(1...1)^t
 		// with (alpha.M + beta.K) a diagonal matrix

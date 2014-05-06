@@ -26,7 +26,8 @@ namespace Math
 
 /// Linear version of the static ode solver
 /// This solver assumes that the system is linear, ie that Stiffness matrix does not change.
-template <class State> class OdeSolverLinearStatic : public OdeSolverStatic<State>
+template <class State>
+class OdeSolverLinearStatic : public OdeSolverStatic<State>
 {
 public:
 	/// Constructor

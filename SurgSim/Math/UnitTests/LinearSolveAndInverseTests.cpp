@@ -67,23 +67,28 @@ private:
 	{
 		size_t numBlocks = size / BlockSize;
 
-		m->resize(size, size);
+		SurgSim::Math::resizeMatrix(m, size, size, true);
 
-		for (size_t row = 0; row < size; row++)
-		{
-			for (size_t col = 0; col < size; col++)
-			{
-				(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
-			}
-		}
-
-		auto zeroBlock = Eigen::Matrix<double, BlockSize, BlockSize>::Zero();
 		for (size_t rowBlockId = 0; rowBlockId < numBlocks; rowBlockId++)
 		{
-			for (size_t colBlockId = rowBlockId + 2; colBlockId < numBlocks; colBlockId++)
-	{
-				SurgSim::Math::setSubMatrix(zeroBlock, rowBlockId, colBlockId, BlockSize, BlockSize, m);
-				SurgSim::Math::setSubMatrix(zeroBlock, colBlockId, rowBlockId, BlockSize, BlockSize, m);
+			for (int colBlockId = static_cast<int>(rowBlockId) - 1;
+				colBlockId <= static_cast<int>(rowBlockId) + 1;
+				colBlockId++)
+			{
+				if (colBlockId < 0 || colBlockId >= static_cast<int>(numBlocks))
+				{
+					continue;
+				}
+
+				for (size_t rowInBlockId = 0; rowInBlockId < BlockSize; ++rowInBlockId)
+				{
+					for (size_t colInBlockId = 0; colInBlockId < BlockSize; ++colInBlockId)
+					{
+						size_t row = rowBlockId * BlockSize + rowInBlockId;
+						size_t col = colBlockId * BlockSize + colInBlockId;
+						(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
+					}
+				}
 			}
 		}
 	}

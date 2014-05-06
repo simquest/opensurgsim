@@ -37,7 +37,8 @@ namespace Math
 /// \note   Vector& getPositions();
 /// \note   Vector& getVelocities();
 /// \note   Vector& getAccelerations();
-template <class State> class OdeSolverEulerExplicitModified : public OdeSolver<State>
+template <class State>
+class OdeSolverEulerExplicitModified : public OdeSolver<State>
 {
 public:
 	/// Constructor

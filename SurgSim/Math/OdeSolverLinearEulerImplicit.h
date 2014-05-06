@@ -27,7 +27,8 @@ namespace Math
 /// Linear Version of the Euler Implicit ode solver
 /// This solver assumes that the system is linear, ie that Mass,
 /// Damping, and Stiffness matrices do not change.
-template <class State> class OdeSolverLinearEulerImplicit : public OdeSolverEulerImplicit<State>
+template <class State>
+class OdeSolverLinearEulerImplicit : public OdeSolverEulerImplicit<State>
 {
 public:
 	/// Constructor

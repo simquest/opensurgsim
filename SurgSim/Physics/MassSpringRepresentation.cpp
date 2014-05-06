@@ -23,7 +23,6 @@
 #include "SurgSim/Math/Valid.h"
 
 using SurgSim::Math::Vector;
-using SurgSim::Math::DiagonalMatrix;
 using SurgSim::Math::Matrix;
 
 namespace SurgSim
@@ -189,7 +188,6 @@ const Matrix& MassSpringRepresentation::computeM(const DeformableRepresentationS
 	using SurgSim::Math::setSubVector;
 
 	// Make sure the mass matrix has been properly allocated
-	// It does not need to be zeroed out, as it will be directly set
 	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), true);
 
 	Eigen::MatrixBase<Matrix>::DiagonalReturnType diagonal = m_M.diagonal();
@@ -296,7 +294,6 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
 
 	// Make sure the mass matrix has been properly allocated
-	// It does not need to be zeroed out, as it will be directly set
 	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), true);
 
 	// Make sure the damping matrix has been properly allocated and zeroed out

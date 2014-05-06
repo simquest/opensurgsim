@@ -22,13 +22,15 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State> OdeSolverEulerExplicit<State>::OdeSolverEulerExplicit(OdeEquation<State>* equation)
+template <class State>
+OdeSolverEulerExplicit<State>::OdeSolverEulerExplicit(OdeEquation<State>* equation)
 	: OdeSolver<State>(equation)
 {
 	m_name = "Ode Solver Euler Explicit";
 }
 
-template <class State> void OdeSolverEulerExplicit<State>::solve(double dt, const State& currentState, State* newState)
+template <class State>
+void OdeSolverEulerExplicit<State>::solve(double dt, const State& currentState, State* newState)
 {
 	// General equation to solve:
 	//   M.a(t) = f(t, x(t), v(t))

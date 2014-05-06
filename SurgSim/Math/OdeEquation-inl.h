@@ -24,7 +24,8 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State> const std::shared_ptr<State> OdeEquation<State>::getInitialState() const
+template <class State>
+const std::shared_ptr<State> OdeEquation<State>::getInitialState() const
 {
 	return m_initialState;
 }
