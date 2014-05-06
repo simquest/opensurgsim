@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 					  "\n"
 					  "One controller will control the sphere tool, the other the square.");
 
-	printf("\nExiting.\n");
+	std::cout << std::endl << "Exiting." << std::endl;
 	// Cleanup and shutdown will happen automatically as objects go out of scope.
 
 	return 0;

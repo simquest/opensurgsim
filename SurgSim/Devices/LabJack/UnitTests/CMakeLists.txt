@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2013, SimQuest Solutions Inc.
+# Copyright 2012-2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,39 +13,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${gmock_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}/include
 )
 
-set(SURGSIM_TESTING_SOURCES
-	DevicesUtilities.cpp
-	MathUtilities.cpp
-	TestCube.cpp
-	TestingMain.cpp
+set(UNIT_TEST_SOURCES
+	LabJackDeviceTest.cpp
+	LabJackScaffoldTest.cpp
 )
 
-set(SURGSIM_TESTING_HEADERS
-	DevicesUtilities.h
-	MathUtilities.h
-	MockPhysicsManager.h
-	TestCube.h
+set(UNIT_TEST_LINUX_SOURCES
+	LabJackChecksumsTest.cpp
 )
 
-surgsim_add_library(
-	SurgSimTesting
-	"${SURGSIM_TESTING_SOURCES}"
-	"${SURGSIM_TESTING_HEADERS}"
-	"SurgSim/Testing"
+if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	list(APPEND UNIT_TEST_SOURCES ${UNIT_TEST_LINUX_SOURCES})
+endif()
+
+set(LIBS
+	LabJackDevice
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
+	${Boost_LIBRARIES}
 )
 
-add_subdirectory(MlcpIO)
+surgsim_add_unit_tests(LabJackDeviceTest)
 
-if(GLUT_FOUND)
-	add_subdirectory(VisualTestCommon)
-endif(GLUT_FOUND)
-
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-set_target_properties(SurgSimTesting PROPERTIES FOLDER "Testing")
+set_target_properties(LabJackDeviceTest PROPERTIES FOLDER "Devices")

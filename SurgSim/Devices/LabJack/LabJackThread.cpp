@@ -13,36 +13,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Devices/LabJack/LabJackThread.h"
 
 namespace SurgSim
 {
-
-namespace Physics
+namespace Device
 {
-
-MlcpPhysicsProblem::~MlcpPhysicsProblem()
+LabJackThread::LabJackThread(LabJackScaffold* scaffold, LabJackScaffold::DeviceData* deviceData) :
+	BasicThread("LabJack thread"),
+	m_scaffold(scaffold),
+	m_deviceData(deviceData)
 {
 }
 
-void MlcpPhysicsProblem::setZero(int numDof, int numConstraintDof, int numConstraints)
+LabJackThread::~LabJackThread()
 {
-	MlcpProblem::setZero(numDof, numConstraintDof, numConstraints);
-
-	H.resize(numConstraintDof, numDof);
-	H.setZero();
-	CHt.resize(numDof, numConstraintDof);
-	CHt.setZero();
 }
 
-MlcpPhysicsProblem MlcpPhysicsProblem::Zero(int numDof, int numConstraintDof, int numConstraints)
+bool LabJackThread::doInitialize()
 {
-	MlcpPhysicsProblem result;
-	result.setZero(numDof, numConstraintDof, numConstraints);
-
-	return result;
+	return m_scaffold->configureDevice(m_deviceData);
 }
 
-}; // namespace Physics
+bool LabJackThread::doStartUp()
+{
+	return true;
+}
 
-}; // namespace SurgSim
+bool LabJackThread::doUpdate(double dt)
+{
+	return m_scaffold->runInputFrame(m_deviceData);
+}
+
+};  // namespace Device
+};  // namespace SurgSim
