@@ -111,10 +111,12 @@ protected:
 	std::shared_ptr<LinearSolveAndInverse> m_linearSolver;
 
 	/// System matrix (can be M, K, combination of MDK depending on the solver)
+	/// A static solver will have K for system matrix
+	/// A dynamic explicit solver will have M for system matrix
+	/// A dynamic implicit solver will have a combination of M, D and K for system matrix
 	Matrix m_systemMatrix;
 
 	/// Compliance matrix which is the inverse of the system matrix
-	/// Compliance is always a dense matrix (full matrix unless we have a diagonal matrix)
 	Matrix m_compliance;
 };
 
