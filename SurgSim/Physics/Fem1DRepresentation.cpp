@@ -64,13 +64,15 @@ RepresentationType Fem1DRepresentation::getType() const
 
 bool Fem1DRepresentation::doWakeUp()
 {
+	using SurgSim::Math::LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix;
+
 	if (!FemRepresentation::doWakeUp())
 	{
 		return false;
 	}
 
-	// Make use of a specialized linear solver for tri-diagonal block matrix of block size 6
-	m_odeSolver->setLinearSolver(std::make_shared<SurgSim::Math::LinearSolveAndInverseTriDiagonalBlockMatrix<6>>());
+	// Make use of a specialized linear solver for symmetric tri-diagonal block matrix of block size 6
+	m_odeSolver->setLinearSolver(std::make_shared<LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<6>>());
 
 	return true;
 }

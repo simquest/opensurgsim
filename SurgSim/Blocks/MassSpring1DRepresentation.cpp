@@ -87,7 +87,7 @@ void MassSpring1DRepresentation::init1D(
 
 bool MassSpring1DRepresentation::doWakeUp()
 {
-	using SurgSim::Math::LinearSolveAndInverseTriDiagonalBlockMatrix;
+	using SurgSim::Math::LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix;
 
 	if (!MassSpringRepresentation::doWakeUp())
 	{
@@ -128,7 +128,7 @@ bool MassSpring1DRepresentation::doWakeUp()
 	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER:
 		if (getInitialState()->getNumNodes() % 2 == 0)
 		{
-			m_odeSolver->setLinearSolver(std::make_shared<LinearSolveAndInverseTriDiagonalBlockMatrix<6>>());
+			m_odeSolver->setLinearSolver(std::make_shared<LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<6>>());
 		}
 		else
 		{
