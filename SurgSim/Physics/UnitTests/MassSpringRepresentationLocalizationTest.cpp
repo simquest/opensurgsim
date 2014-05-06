@@ -20,7 +20,6 @@
 
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
@@ -79,10 +78,6 @@ TEST (MassSpringRepresentationLocalizationTest, GetPositionTest)
 		0.0, // Damping stretching
 		10.0, // Stiffness bending
 		0.0); // Damping bending
-
-	massSpring->setIsActive(true);
-	massSpring->initialize(std::make_shared<SurgSim::Framework::Runtime>());
-	massSpring->wakeUp();
 
 	MassSpringRepresentationLocalization localization = MassSpringRepresentationLocalization(massSpring);
 

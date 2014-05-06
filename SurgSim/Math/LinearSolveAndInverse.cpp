@@ -21,19 +21,46 @@ namespace SurgSim
 namespace Math
 {
 
-void SolveAndInverse<DiagonalMatrix>::operator ()
-	(const DiagonalMatrix& A, const Vector& b, Vector* x, Matrix* Ainv)
+void LinearSolveAndInverseDiagonalMatrix::operator ()(const Matrix& A, const Vector& b, Vector* x, Matrix* Ainv)
 {
-	(*Ainv) = m_Ainv = A.inverse();
-	(*x) = m_Ainv * b;
+	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
+
+	if (Ainv != nullptr)
+	{
+		if (Ainv->cols() != A.cols() || Ainv->rows() != A.cols())
+		{
+			Ainv->resize(A.rows(), A.cols());
+		}
+		Ainv->setZero();
+		Ainv->diagonal() = A.diagonal().cwiseInverse();
+
+		if (x != nullptr)
+		{
+			(*x) = Ainv->diagonal().cwiseProduct(b);
+		}
+	}
+	else if (x != nullptr)
+	{
+		(*x) = A.diagonal().cwiseInverse().cwiseProduct(b);
+	}
 }
 
-void SolveAndInverse<Matrix>::operator ()
-	(const Matrix& A, const Vector& b, Vector* x, Matrix* Ainv)
+void LinearSolveAndInverseDenseMatrix::operator ()(const Matrix& A, const Vector& b, Vector* x, Matrix* Ainv)
 {
-	Eigen::PartialPivLU<Matrix> lu(A);
-	(*x) = lu.solve(b);
-	(*Ainv) = lu.inverse();
+	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
+
+	if (x != nullptr || Ainv != nullptr)
+	{
+		const Eigen::PartialPivLU<typename Eigen::MatrixBase<Matrix>::PlainObject> lu = A.partialPivLu();
+		if (x != nullptr)
+		{
+			(*x) = lu.solve(b);
+		}
+		if (Ainv != nullptr)
+		{
+			(*Ainv) = lu.inverse();
+		}
+	}
 }
 
 }; // namespace Math
