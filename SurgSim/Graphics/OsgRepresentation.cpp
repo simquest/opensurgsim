@@ -45,7 +45,8 @@ OsgRepresentation::OsgRepresentation(const std::string& name) :
 
 	m_switch->addChild(m_transform);
 
-	setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
+	m_transform->setAttitude(osg::Quat(0.0, 0.0, 0.0, 1.0));
+	m_transform->setPosition(osg::Vec3d(0.0, 0.0, 0.0));
 }
 
 OsgRepresentation::~OsgRepresentation()
@@ -65,35 +66,10 @@ bool OsgRepresentation::isVisible() const
 
 void OsgRepresentation::update(double dt)
 {
-	doUpdate(dt);
-}
-
-void OsgRepresentation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	m_initialPose = pose;
-	setPose(m_initialPose);
-}
-
-
-const SurgSim::Math::RigidTransform3d& OsgRepresentation::getInitialPose() const
-{
-	return m_initialPose;
-}
-
-void OsgRepresentation::setPose(const SurgSim::Math::RigidTransform3d& transform)
-{
-	// HS-2013-jun-28 This function should probably be protected by a mutes, but I can see
-	// the assumption could be that this is only called from on thread.
-	// #threadsafety
-	m_pose = transform;
-	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(m_pose);
+	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(getPose());
 	m_transform->setAttitude(pose.first);
 	m_transform->setPosition(pose.second);
-}
-
-const SurgSim::Math::RigidTransform3d& OsgRepresentation::getPose() const
-{
-	return m_pose;
+	doUpdate(dt);
 }
 
 bool OsgRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)

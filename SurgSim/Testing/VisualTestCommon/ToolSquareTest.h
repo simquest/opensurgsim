@@ -17,8 +17,21 @@
 #define SURGSIM_TESTING_VISUALTESTCOMMON_TOOLSQUARETEST_H
 
 #include <memory>
-#include "SurgSim/Input/DeviceInterface.h"
 
+namespace SurgSim
+{
+namespace Input
+{
+class DeviceInterface;
+};
+};
+
+/// Creates a GLUT window containing a sphere and a square each controlled by a device, with interaction forces.
+/// \warning Does not return, instead calls exit(0).  Therefore, will not destruct the device or its scaffold.
+/// \sa MovingSquareForce, MovingSquareGlutWindow
+/// \param toolDevice The device providing an input pose to control the sphere.
+/// \param squareDevice The device providing an input pose to control the square.
+/// \param testDescriptionMessage A message to be printed to the screen, e.g., instructions for operation.
 void runToolSquareTest(std::shared_ptr<SurgSim::Input::DeviceInterface> toolDevice,
 					   std::shared_ptr<SurgSim::Input::DeviceInterface> squareDevice,
 					   const char* testDescriptionMessage);

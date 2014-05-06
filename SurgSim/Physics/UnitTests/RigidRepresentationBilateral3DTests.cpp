@@ -17,8 +17,10 @@
 
 #include <memory>
 
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/MlcpConstraintType.h"
+#include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"
@@ -26,6 +28,7 @@
 #include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Math::makeSkewSymmetricMatrix;
 using SurgSim::Math::makeRigidTransform;
@@ -73,10 +76,10 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcp)
 	Vector3d constraintPoint = Vector3d(8.0, 6.4, 3.5);
 
 	// Setup parameters for RigidRepresentationBilateral3D::build
-	auto representation = std::make_shared<RigidRepresentation>("representation");
+	auto representation = std::make_shared<MockRigidRepresentation>();
 	auto localization = std::make_shared<RigidRepresentationLocalization>(representation);
 	localization->setLocalPosition(objectPose.inverse() * constraintPoint);
-	representation->setInitialPose(objectPose);
+	representation->getCurrentState().setPose(objectPose);
 
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(6, 3, 1);
 
@@ -124,16 +127,16 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcpTwoStep)
 
 	ConstraintData emptyConstraint;
 
-	auto representation = std::make_shared<RigidRepresentation>("representation");
+	auto representation = std::make_shared<MockRigidRepresentation>();
 	auto localization = std::make_shared<RigidRepresentationLocalization>(representation);
 
 	localization->setLocalPosition(objectPoseLhs.inverse() * constraintPointLhs);
-	representation->setInitialPose(objectPoseLhs);
+	representation->getCurrentState().setPose(objectPoseLhs);
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
 	localization->setLocalPosition(objectPoseRhs.inverse() * constraintPointRhs);
-	representation->setInitialPose(objectPoseRhs);
+	representation->getCurrentState().setPose(objectPoseRhs);
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 6, 0, SurgSim::Physics::CONSTRAINT_NEGATIVE_SIDE));
 

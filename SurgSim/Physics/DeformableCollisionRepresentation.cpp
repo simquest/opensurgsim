@@ -110,36 +110,6 @@ void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::
 	m_mesh = meshShape->getMesh();
 }
 
-void DeformableCollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_FAILURE() << "The initial pose cannot be set";
-}
-
-const SurgSim::Math::RigidTransform3d& DeformableCollisionRepresentation::getInitialPose() const
-{
-	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr)
-		<< "Failed to get the initial pose.  The DeformableCollisionRepresentation either was not attached to a "
-		   "Physics::Representation or the Physics::Representation has expired.";
-
-	return physicsRepresentation->getInitialPose();
-}
-
-void DeformableCollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_FAILURE() << "The pose cannot be set";
-}
-
-const SurgSim::Math::RigidTransform3d& DeformableCollisionRepresentation::getPose() const
-{
-	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr)
-		<< "Failed to get the pose.  The DeformableCollisionRepresentation either was not attached to a "
-		   "Physics::Representation or the Physics::Representation has expired.";
-
-	return physicsRepresentation->getPose();
-}
-
 const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::getShape() const
 {
 	return m_shape;

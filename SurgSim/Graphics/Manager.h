@@ -27,8 +27,8 @@ namespace SurgSim
 namespace Graphics
 {
 
-class Representation;
 class Group;
+class Representation;
 class View;
 
 /// Basic graphics manager class which manages graphics components to provide a visualization of the scene to the user.

@@ -21,6 +21,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgUniform.h"
@@ -41,6 +42,7 @@
 
 #include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
 
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -87,10 +89,10 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		RigidTransform3d currentPose = SurgSim::Testing::interpolatePose(
-			Vector3d::Identity(), Vector3d::Identity(),
+			Vector3d::Zero(), Vector3d::Zero(),
 			startPosition, endPosition, t);
 
-		quad->setPose(currentPose);
+		quad->setLocalPose(currentPose);
 
 		SurgSim::Math::Vector2d size = SurgSim::Testing::interpolate(startSize,endSize,t);
 		quad->setSize(size.x(), size.y());
@@ -123,7 +125,7 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad 1");
 
 	quad1->setSize(256,256);
-	quad1->setInitialPose(SurgSim::Math::makeRigidTransform(
+	quad1->setLocalPose(SurgSim::Math::makeRigidTransform(
 		Quaterniond::Identity(),
 		Vector3d(800-256,600-256,-0.2)));
 	EXPECT_TRUE(quad1->setTexture(checkerTexture));
@@ -154,9 +156,8 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 {
 
-	auto defaultCamera = graphicsManager->getDefaultCamera();
+	auto defaultCamera = viewElement->getCamera();
 	auto camera = std::make_shared<OsgCamera>("Texture");
-	camera->setViewMatrix(defaultCamera->getViewMatrix());
 	camera->setProjectionMatrix(defaultCamera->getProjectionMatrix());
 
 	int width, height;
@@ -195,17 +196,24 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(M_PI,Vector3d::UnitY());
 	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0, 0.0, -0.2));
 
-	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("Box Representation");
+	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("Box Representation 1");
 	boxRepresentation1->setSizeXYZ(0.05, 0.05, 0.05);
-	boxRepresentation1->setPose(startPose);
+	auto boxElement1 = std::make_shared<BasicSceneElement>("Box Element 1");
+	boxElement1->addComponent(boxRepresentation1);
+	boxElement1->setPose(startPose);
+	scene->addSceneElement(boxElement1);
+
 	auto group = std::make_shared<OsgGroup>("RenderPass");
 	group->add(boxRepresentation1);
 	camera->setGroup(group);
 	viewElement->addComponent(group);
 
-	auto boxRepresentation = std::make_shared<OsgBoxRepresentation>("Box Representation");
-	boxRepresentation->setSizeXYZ(0.05, 0.05, 0.05);
-	viewElement->addComponent(boxRepresentation);
+	auto boxRepresentation2 = std::make_shared<OsgBoxRepresentation>("Box Representation 2");
+	boxRepresentation2->setSizeXYZ(0.05, 0.05, 0.05);
+	auto boxElement2 = std::make_shared<BasicSceneElement>("Box Element 2");
+	boxElement2->addComponent(boxRepresentation2);
+	boxElement2->setPose(startPose);
+	scene->addSceneElement(boxElement2);
 
 	/// Run the thread
 	runtime->start();
@@ -215,11 +223,8 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 	for (int i = 0; i < numSteps; ++i)
 	{
 		double t = static_cast<double>(i) / numSteps;
-		boxRepresentation->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(startPose, endPose, t));
-		boxRepresentation1->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(endPose, startPose, t));
-		camera->setViewMatrix(defaultCamera->getViewMatrix());
-		camera->setProjectionMatrix(defaultCamera->getProjectionMatrix());
-
+		boxElement1->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(startPose, endPose, t));
+		boxElement2->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(endPose, startPose, t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / 100));
 	}
 }

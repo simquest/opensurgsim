@@ -89,6 +89,7 @@ static std::shared_ptr<Fem3DRepresentation> getTestingFem3d(const std::string &n
 
 	fem->setInitialState(state);
 	fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	fem->wakeUp();
 
 	fem->setIsGravityEnabled(false);
 

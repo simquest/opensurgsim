@@ -25,11 +25,9 @@ set(UNIT_TEST_SOURCES
 	PoseInterpolatorTests.cpp
 	SpringTestUtils.cpp
 	TransferDeformableStateToVerticesBehaviorTests.cpp
-	TransferPoseBehaviorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
-	MockObjects.h
 	SpringTestUtils.h
 )
 

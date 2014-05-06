@@ -18,15 +18,12 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Physics/UnitTests/MockObjects.h"
-
+#include "SurgSim/Blocks/MassSpring1DRepresentation.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
-#include "SurgSim/Blocks/MassSpring1DRepresentation.h"
-
 #include "SurgSim/Physics/RigidRepresentation.h"
-
-#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace
 {
@@ -81,8 +78,6 @@ TEST (MassSpringRepresentationLocalizationTest, GetPositionTest)
 		0.0, // Damping stretching
 		10.0, // Stiffness bending
 		0.0); // Damping bending
-
-	massSpring->setIsActive(true);
 
 	MassSpringRepresentationLocalization localization = MassSpringRepresentationLocalization(massSpring);
 

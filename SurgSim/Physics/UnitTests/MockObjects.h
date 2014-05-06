@@ -21,16 +21,26 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/DeformableRepresentation.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
+#include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/Mass.h"
+#include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::OdeSolver;
+using SurgSim::Math::Vector;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -61,30 +71,6 @@ public:
 	{
 		return REPRESENTATION_TYPE_FIXED;
 	}
-
-	/// Set the initial pose of the representation
-	/// \param pose The initial pose
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-	{}
-
-	/// Get the initial pose of the representation
-	/// \return The initial pose
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
-	{ static SurgSim::Math::RigidTransform3d pose; return pose; }
-
-	/// Set the pose of the representation
-	/// \param pose The pose to set the representation to
-	/// \note This requests the representation to set its pose to the given pose
-	/// \note In physics, the actual pose of the representation might not be exactly the requested one
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose)
-	{}
-
-	/// Get the pose of the representation
-	/// \return The pose of this representation
-	/// \note getPose may or may not return the pose last sets by setPose
-	/// \note In physics, the simulation will drive the pose internally
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const
-	{ static SurgSim::Math::RigidTransform3d pose; return pose; }
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
@@ -122,10 +108,224 @@ namespace
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::MockRepresentation);
 }
 
+class MockRigidRepresentation : public RigidRepresentation
+{
+public:
+	MockRigidRepresentation() :
+		RigidRepresentation("MockRigidRepresentation")
+	{
+	}
+
+	// Non constand access to the states
+	RigidRepresentationState& getInitialState()
+	{
+		return m_initialState;
+	}
+	RigidRepresentationState& getCurrentState()
+	{
+		return m_currentState;
+	}
+	RigidRepresentationState& getPreviousState()
+	{
+		return m_previousState;
+	}
+};
+
+class MockDeformableRepresentation : public SurgSim::Physics::DeformableRepresentation
+{
+public:
+	MockDeformableRepresentation() : SurgSim::Physics::DeformableRepresentation("MockDeformableRepresentation")
+	{
+		this->m_numDofPerNode = 3;
+		m_F = Vector::LinSpaced(3, 1.0, 3.0);
+		m_M = Matrix::Identity(3, 3);
+		m_D = Matrix::Identity(3, 3);
+		m_K = Matrix::Identity(3, 3);
+	}
+
+	/// Query the representation type
+	/// \return the RepresentationType for this representation
+	/// \note DeformableRepresentation is abstract because there is really no deformable behind this class !
+	/// \note For the test, we simply set the type to INVALID
+	virtual SurgSim::Physics::RepresentationType getType() const override
+	{
+		return SurgSim::Physics::REPRESENTATION_TYPE_INVALID;
+	}
+
+	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
+	/// This API will be tested in derived classes when the API will be provided
+	Vector& computeF(const SurgSim::Physics::DeformableRepresentationState& state) override
+	{
+		return m_F;
+	}
+
+	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
+	/// This API will be tested in derived classes when the API will be provided
+	const Matrix& computeM(const SurgSim::Physics::DeformableRepresentationState& state) override
+	{
+		return m_M;
+	}
+
+	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
+	/// This API will be tested in derived classes when the API will be provided
+	const Matrix& computeD(const SurgSim::Physics::DeformableRepresentationState& state) override
+	{
+		return m_D;
+	}
+
+	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
+	/// This API will be tested in derived classes when the API will be provided
+	const Matrix& computeK(const SurgSim::Physics::DeformableRepresentationState& state) override
+	{
+		return m_K;
+	}
+
+	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
+	/// This API will be tested in derived classes when the API will be provided
+	void computeFMDK(const SurgSim::Physics::DeformableRepresentationState& state,
+					 Vector** f, Matrix** M, Matrix** D, Matrix** K) override
+	{
+		*f = &m_F;
+		*M = &m_M;
+		*D = &m_D;
+		*K = &m_K;
+	}
+
+protected:
+	void transformState(std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
+						const SurgSim::Math::RigidTransform3d& transform) override
+	{
+		using SurgSim::Math::setSubVector;
+		using SurgSim::Math::getSubVector;
+
+		Vector& x = state->getPositions();
+		Vector& v = state->getVelocities();
+		for (unsigned int nodeId = 0; nodeId < state->getNumNodes(); nodeId++)
+		{
+			Vector3d xi = getSubVector(x, nodeId, 3);
+			Vector3d xiTransformed = transform * xi;
+			setSubVector(xiTransformed, nodeId, 3, &x);
+
+			Vector3d vi = getSubVector(v, nodeId, 3);
+			Vector3d viTransformed = transform.linear() * vi;
+			setSubVector(viTransformed, nodeId, 3, &v);
+		}
+	}
+
+	Vector m_F;
+	Matrix m_M, m_D, m_K;
+};
+
+class MockSpring : public SurgSim::Physics::Spring
+{
+public:
+	MockSpring() : SurgSim::Physics::Spring()
+	{
+		m_F = Vector::LinSpaced(6, 1.0, 6.0);
+		m_D = Matrix::Identity(6, 6) * 2.0;
+		m_K = Matrix::Identity(6, 6) * 3.0;
+	}
+
+	void addNode(unsigned int nodeId)
+	{
+		this->m_nodeIds.push_back(nodeId);
+	}
+
+	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+		double scale = 1.0) override
+	{
+		SurgSim::Math::addSubVector(scale * m_F, m_nodeIds, 3, F);
+	}
+	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
+		double scale = 1.0) override
+	{
+		SurgSim::Math::addSubMatrix(scale * m_D, m_nodeIds, 3, D);
+	}
+	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
+		double scale = 1.0) override
+	{
+		SurgSim::Math::addSubMatrix(scale * m_K, m_nodeIds, 3, K);
+	}
+	virtual void addFDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* f,
+		SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override
+	{
+		addForce(state, f);
+		addDamping(state, D);
+		addStiffness(state, K);
+	}
+	virtual void addMatVec(const DeformableRepresentationState& state, double alphaD, double alphaK,
+		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override
+	{
+		Vector xLocal(3 * m_nodeIds.size()), fLocal;
+		SurgSim::Math::getSubVector(x, m_nodeIds, 3, &xLocal);
+		fLocal = (alphaD * m_D + alphaK * m_K) * xLocal;
+		SurgSim::Math::addSubVector(fLocal, m_nodeIds, 3, F);
+	}
+
+private:
+	Vector m_F;
+	Matrix m_D, m_K;
+};
+
+class MockMassSpring : public SurgSim::Physics::MassSpringRepresentation
+{
+public:
+	explicit MockMassSpring(const std::string& name,
+		const SurgSim::Math::RigidTransform3d& pose,
+		unsigned int numNodes, std::vector<unsigned int> boundaryConditions,
+		double totalMass,
+		double rayleighDampingMass, double rayleighDampingStiffness,
+		double springStiffness, double springDamping,
+		SurgSim::Math::IntegrationScheme integrationScheme) :
+		SurgSim::Physics::MassSpringRepresentation(name)
+	{
+		using SurgSim::Math::getSubVector;
+		using SurgSim::Math::setSubVector;
+		using SurgSim::Physics::Mass;
+		using SurgSim::Physics::LinearSpring;
+
+		// Note: setLocalPose MUST be called before WakeUp to be effective !
+		setLocalPose(pose);
+
+		std::shared_ptr<DeformableRepresentationState> state;
+		state = std::make_shared<DeformableRepresentationState>();
+		state->setNumDof(3, numNodes);
+		for (unsigned int i = 0; i < numNodes; i++)
+		{
+			Vector3d p(static_cast<double>(i)/static_cast<double>(numNodes), 0, 0);
+			setSubVector(p, i, 3, &state->getPositions());
+			addMass(std::make_shared<Mass>(totalMass / numNodes));
+		}
+		for (auto bc = std::begin(boundaryConditions); bc != std::end(boundaryConditions); bc++)
+		{
+			state->addBoundaryCondition(*bc);
+		}
+		for (unsigned int i = 0; i < numNodes - 1; i++)
+		{
+			std::shared_ptr<LinearSpring> spring = std::make_shared<LinearSpring>(i, i+1);
+			spring->setDamping(springDamping);
+			spring->setStiffness(springStiffness);
+			const Vector3d& xi = getSubVector(state->getPositions(), i, 3);
+			const Vector3d& xj = getSubVector(state->getPositions(), i+1, 3);
+			spring->setRestLength( (xj - xi).norm() );
+			addSpring(spring);
+		}
+		setInitialState(state);
+		setIntegrationScheme(integrationScheme);
+		setRayleighDampingMass(rayleighDampingMass);
+		setRayleighDampingStiffness(rayleighDampingStiffness);
+	}
+
+	virtual ~MockMassSpring()
+	{}
+
+	const Vector3d& getGravityVector() const { return getGravity(); }
+};
+
 class MockFemElement : public FemElement
 {
 public:
-	MockFemElement() : FemElement()
+	MockFemElement() : FemElement(), m_isInitialized(false)
 	{
 		setNumDofPerNode(3);
 	}
@@ -139,39 +339,75 @@ public:
 	{ return 1; }
 	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
 		double scale = 1.0) override
-	{}
+	{
+		SurgSim::Math::addSubVector(scale * m_F, m_nodeIds, 3, F);
+	}
 	virtual void addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M,
 		double scale = 1.0) override
-	{}
+	{
+		SurgSim::Math::addSubMatrix(scale * m_M, m_nodeIds, 3, M);
+	}
 	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
 		double scale = 1.0) override
-	{}
+	{
+		SurgSim::Math::addSubMatrix(scale * m_D, m_nodeIds, 3, D);
+	}
 	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
 		double scale = 1.0) override
-	{}
+	{
+		SurgSim::Math::addSubMatrix(scale * m_K, m_nodeIds, 3, K);
+	}
 	virtual void addFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* f,
 		SurgSim::Math::Matrix* M, SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override
-	{}
+	{
+		addForce(state, f);
+		addMass(state, M);
+		addDamping(state, D);
+		addStiffness(state, K);
+	}
 	virtual void addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override
-	{}
+	{
+		Vector xLocal(3 * m_nodeIds.size()), fLocal;
+		SurgSim::Math::getSubVector(x, m_nodeIds, 3, &xLocal);
+		fLocal = (alphaM * m_M + alphaD * m_D + alphaK * m_K) * xLocal;
+		SurgSim::Math::addSubVector(fLocal, m_nodeIds, 3, F);
+	}
 	virtual bool isValidCoordinate(const SurgSim::Math::Vector &naturalCoordinate) const override
 	{ return true; }
-	virtual SurgSim::Math::Vector computeCartesianCoordinate(
-		const DeformableRepresentationState& state,
+	virtual SurgSim::Math::Vector computeCartesianCoordinate(const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector &barycentricCoordinate) const override
 	{ return SurgSim::Math::Vector3d::Zero(); }
+
+	virtual void initialize(const DeformableRepresentationState& state) override
+	{
+		FemElement::initialize(state);
+		const int numDof = 3 * m_nodeIds.size();
+		m_F = Vector::LinSpaced(numDof, 1.0, static_cast<double>(numDof));
+		m_M = Matrix::Identity(numDof, numDof) * 1.0;
+		m_D = Matrix::Identity(numDof, numDof) * 2.0;
+		m_K = Matrix::Identity(numDof, numDof) * 3.0;
+		m_isInitialized = true;
+	}
+
+	bool isInitialized() const
+	{
+		return m_isInitialized;
+	}
+
+private:
+	Vector m_F;
+	Matrix m_M, m_D, m_K;
+	bool m_isInitialized;
 };
 
 // Concrete class for testing
-class MockFemRepresentation : public
-	FemRepresentation<Matrix, Matrix, Matrix, Matrix>
+class MockFemRepresentation : public FemRepresentation
 {
 public:
 	/// Constructor
 	/// \param name The name of the FemRepresentation
-	explicit MockFemRepresentation(const std::string& name) :
-	FemRepresentation<Matrix, Matrix, Matrix, Matrix>(name)
+	explicit MockFemRepresentation(const std::string& name) : FemRepresentation(name)
 	{
 		this->m_numDofPerNode = 3;
 	}
@@ -186,10 +422,14 @@ public:
 		return REPRESENTATION_TYPE_INVALID;
 	}
 
-	std::shared_ptr<OdeSolver<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix>>
-		getOdeSolver() const
+	std::shared_ptr<OdeSolver<DeformableRepresentationState>> getOdeSolver() const
 	{
 		return this->m_odeSolver;
+	}
+
+	const std::vector<double>& getMassPerNode() const
+	{
+		return m_massPerNode;
 	}
 
 protected:
@@ -199,6 +439,19 @@ protected:
 	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
 		const SurgSim::Math::RigidTransform3d& transform) override
 	{
+	}
+};
+
+class MockFem1DRepresentation : public SurgSim::Physics::Fem1DRepresentation
+{
+public:
+	explicit MockFem1DRepresentation(const std::string& name)
+		: SurgSim::Physics::Fem1DRepresentation(name)
+	{}
+
+	const std::shared_ptr<SurgSim::Math::OdeSolver<DeformableRepresentationState>> getOdeSolver() const
+	{
+		return this->m_odeSolver;
 	}
 };
 

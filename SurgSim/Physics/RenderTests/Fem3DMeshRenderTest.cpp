@@ -13,27 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
-#include "SurgSim/Physics/RenderTests/RenderTest.h"
-
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
-#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/Graphics/OsgAxesRepresentation.h"
-#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
-#include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
-#include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/Behavior.h"
-
-#include <memory>
+#include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::DataStructures::EmptyData;
@@ -172,7 +172,6 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// The point-cloud for visualizing the nodes of the finite element model
 	auto pointCloud
 		= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>("point cloud");
-	pointCloud->setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
 	pointCloud->setColor(SurgSim::Math::Vector4d(0.2, 0.2, 1.0, 1.0));
 	pointCloud->setPointSize(3.0f);
 	pointCloud->setVisible(true);

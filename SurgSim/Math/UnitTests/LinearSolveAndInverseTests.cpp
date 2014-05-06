@@ -15,7 +15,6 @@
 
 /// \file
 /// Tests for the LinearSolveAndInverse.cpp functions.
-///
 
 #include <gtest/gtest.h>
 
@@ -27,145 +26,253 @@ namespace SurgSim
 namespace Math
 {
 
-namespace
+class LinearSolveAndInverseTests : public ::testing::Test
 {
-	const int size = 10;
-	SurgSim::Math::Matrix gMatrix(size, size);
-	SurgSim::Math::Vector gVector(size);
+private:
+	size_t size;
 
-	void initializeMatrixVector()
+	void initializeVector(Vector* v)
 	{
+		v->resize(size);
+		for (size_t row = 0; row < size; row++)
+		{
+			(*v)(row) = fmod(-4.1 * row * row + 3.46, 5.0);
+		}
+	}
+
+	void initializeDenseMatrix(Matrix* m)
+	{
+		m->resize(size, size);
 		for (size_t row = 0; row < size; row++)
 		{
 			for (size_t col = 0; col < size; col++)
 			{
-				gMatrix(row, col) = 1.47 * sqrt((static_cast<double>(row + 1))) + 8.3 * row * col - 0.24 * col + 13.24;
+				(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
 			}
-			gVector(row) = -4.1 * row * row + 3.46;
-		}
-	}
-};
-
-
-class LinearSolveAndInverseMatrixTests : public ::testing::Test
-{
-public:
-	static void SetUpTestCase()
-	{
-		initializeMatrixVector();
+			}
 	}
 
-	LinearSolveAndInverseMatrixTests()
+	void initializeDiagonalMatrix(Matrix* m)
 	{
-		resizeMatrix(&matrix, size, size, false);
-		matrix = gMatrix;
-		expectedInverse = matrix.inverse();
-		resizeVector(&b, size);
-		b = gVector;
-		resizeVector(&x, size);
-		expectedX = expectedInverse * b;
-	}
-	Matrix matrix;
-	Matrix inverse, expectedInverse;
-	Vector b;
-	Vector x, expectedX;
-};
-
-class LinearSolveAndInverseDiagonalMatrixTests : public ::testing::Test
-{
-public:
-	static void SetUpTestCase()
-	{
-		initializeMatrixVector();
-	}
-
-	LinearSolveAndInverseDiagonalMatrixTests()
-	{
-		resizeMatrix(&matrix, size, size, false);
-		matrix.diagonal() = gMatrix.diagonal();
-		denseMatrix = matrix;
-		expectedInverse = denseMatrix.inverse();
-		resizeVector(&b, size);
-		b = gVector;
-		resizeVector(&x, size);
-		expectedX = expectedInverse * b;
-	}
-	DiagonalMatrix matrix;
-	Matrix denseMatrix;
-	Matrix expectedInverse;
-	Matrix inverse;
-	Vector b;
-	Vector x, expectedX;
-};
-
-class LinearSolveAndInverseSparseMatrixTests : public ::testing::Test
-{
-public:
-	static void SetUpTestCase()
-	{
-		initializeMatrixVector();
-	}
-
-	LinearSolveAndInverseSparseMatrixTests() : matrix(size, size)
-	{
-		std::vector<Eigen::Triplet<double>> coefficients; // list of non-zeros coefficients
-		coefficients.reserve(size + size-1+ size-1); // Tri diagonal matrix structure
-		for(int rowId = 0; rowId < size; rowId++)
+		m->resize(size, size);
+		m->setZero();
+		for (size_t row = 0; row < size; row++)
 		{
-			// Tri diagonal matrix structure
-			if (rowId > 0)
+			(*m)(row, row) = fmod((10.3 * cos(static_cast<double>(row * row)) + 3.24), 10.0);
+		}
+	}
+
+	template <size_t BlockSize>
+	void initializeTriDiagonalBlockMatrix(Matrix* m, bool isSymmetric)
+	{
+		size_t numBlocks = size / BlockSize;
+
+		SurgSim::Math::resizeMatrix(m, size, size, true);
+
+		for (size_t rowBlockId = 0; rowBlockId < numBlocks; rowBlockId++)
+		{
+			for (int colBlockId = static_cast<int>(rowBlockId) - 1;
+				colBlockId <= static_cast<int>(rowBlockId) + 1;
+				colBlockId++)
 			{
-				coefficients.push_back(Eigen::Triplet<double>(rowId, rowId - 1, 3.2 - 3.24*rowId));
-			}
-			coefficients.push_back(Eigen::Triplet<double>(rowId, rowId, 3.4 + rowId));
-			if (rowId < size - 1)
-			{
-				coefficients.push_back(Eigen::Triplet<double>(rowId, rowId + 1, 8.12 + 1.9*rowId));
+				if (colBlockId < 0 || colBlockId >= static_cast<int>(numBlocks))
+				{
+					continue;
+				}
+
+				for (size_t rowInBlockId = 0; rowInBlockId < BlockSize; ++rowInBlockId)
+				{
+					for (size_t colInBlockId = 0; colInBlockId < BlockSize; ++colInBlockId)
+					{
+						size_t row = rowBlockId * BlockSize + rowInBlockId;
+						size_t col = colBlockId * BlockSize + colInBlockId;
+						(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
+					}
+				}
 			}
 		}
-		matrix.setFromTriplets(coefficients.begin(), coefficients.end());
-		denseMatrix = matrix;
-		expectedInverse = denseMatrix.inverse();
-		resizeVector(&b, size);
-		b = gVector;
-		resizeVector(&x, size);
+
+		if (isSymmetric)
+		{
+			// Force symmetry (lower triangular is copied from the upper triangular)
+			for (size_t row = 0; row < size; ++row)
+			{
+				for (size_t col = row + 1; col < size; ++col)
+				{
+					(*m)(col, row) = (*m)(row, col);
+				}
+			}
+		}
+	}
+
+	void setupTest()
+	{
+		initializeVector(&b);
+		expectedInverse = matrix.inverse();
 		expectedX = expectedInverse * b;
 	}
-	Eigen::SparseMatrix<double,Eigen::ColMajor> matrix;
-	Matrix denseMatrix;
-	Matrix expectedInverse;
-	Matrix inverse;
+
+public:
+
+	void setupDenseMatrixTest()
+	{
+		size = 18;
+		initializeDenseMatrix(&matrix);
+		setupTest();
+	}
+
+	void setupDiagonalMatrixTest()
+	{
+		size = 18;
+		initializeDiagonalMatrix(&matrix);
+		setupTest();
+	}
+
+	template <size_t BlockSize>
+	void setupTriDiagonalBlockMatrixTest(bool isSymmetric = false)
+	{
+		size = BlockSize * 6;
+		initializeTriDiagonalBlockMatrix<BlockSize>(&matrix, isSymmetric);
+		setupTest();
+	}
+
+	Matrix matrix;
+	Matrix inverseMatrix, expectedInverse;
 	Vector b;
 	Vector x, expectedX;
 };
 
-TEST_F(LinearSolveAndInverseDiagonalMatrixTests, solve)
+TEST_F(LinearSolveAndInverseTests, DenseMatrixTests)
 {
-	SolveAndInverse<DiagonalMatrix> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverse);
+	setupDenseMatrixTest();
+
+	LinearSolveAndInverseDenseMatrix solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
 
 	EXPECT_TRUE(x.isApprox(expectedX));
-	EXPECT_TRUE(inverse.isApprox(expectedInverse));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
 };
 
-TEST_F(LinearSolveAndInverseMatrixTests, solve)
+TEST_F(LinearSolveAndInverseTests, DiagonalMatrixTests)
 {
-	SolveAndInverse<Matrix> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverse);
+	setupDiagonalMatrixTest();
+
+	LinearSolveAndInverseDiagonalMatrix solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
 
 	EXPECT_TRUE(x.isApprox(expectedX));
-	EXPECT_TRUE(inverse.isApprox(expectedInverse));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
 };
 
-TEST_F(LinearSolveAndInverseSparseMatrixTests, solve)
+TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize2Tests)
 {
-	SolveAndInverse<Eigen::SparseMatrix<double,Eigen::ColMajor>> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverse);
+	setupTriDiagonalBlockMatrixTest<2>();
+
+	LinearSolveAndInverseTriDiagonalBlockMatrix<2> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
 
 	EXPECT_TRUE(x.isApprox(expectedX));
-	EXPECT_TRUE(inverse.isApprox(expectedInverse));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
 };
 
+TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize3Tests)
+{
+	setupTriDiagonalBlockMatrixTest<3>();
+
+	LinearSolveAndInverseTriDiagonalBlockMatrix<3> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize4Tests)
+{
+	setupTriDiagonalBlockMatrixTest<4>();
+
+	LinearSolveAndInverseTriDiagonalBlockMatrix<4> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize5Tests)
+{
+	setupTriDiagonalBlockMatrixTest<5>();
+
+	LinearSolveAndInverseTriDiagonalBlockMatrix<5> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize6Tests)
+{
+	setupTriDiagonalBlockMatrixTest<6>();
+
+	LinearSolveAndInverseTriDiagonalBlockMatrix<6> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize2Tests)
+{
+	setupTriDiagonalBlockMatrixTest<2>(true);
+
+	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<2> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize3Tests)
+{
+	setupTriDiagonalBlockMatrixTest<3>(true);
+
+	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<3> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize4Tests)
+{
+	setupTriDiagonalBlockMatrixTest<4>(true);
+
+	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<4> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize5Tests)
+{
+	setupTriDiagonalBlockMatrixTest<5>(true);
+
+	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<5> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
+
+TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize6Tests)
+{
+	setupTriDiagonalBlockMatrixTest<6>(true);
+
+	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<6> solveAndInverse;
+	solveAndInverse(matrix, b, &x, &inverseMatrix);
+
+	EXPECT_TRUE(x.isApprox(expectedX));
+	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+};
 }; // namespace Math
 
 }; // namespace SurgSim

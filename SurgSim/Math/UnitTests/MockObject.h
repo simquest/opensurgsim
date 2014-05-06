@@ -57,12 +57,11 @@ private:
 	Vector m_x, m_v, m_a;
 };
 
-class MassPoint : public SurgSim::Math::OdeEquation<MassPointState, Matrix, Matrix, Matrix, Matrix>
+class MassPoint : public SurgSim::Math::OdeEquation<MassPointState>
 {
 public:
 	/// Constructor
-	/// \param x The mass initial position
-	/// \param mass The mass (in Kg)
+	/// \param viscosity The mass viscosity
 	explicit MassPoint(double viscosity = 0.0) :
 		m_mass(1.0),
 		m_viscosity(viscosity),
@@ -192,7 +191,7 @@ private:
 };
 
 // Model of 3 nodes connected by springs with the 1st node fixed (no mass, no damping, only deformations)
-class MassPointsForStatic : public SurgSim::Math::OdeEquation<MassPointsStateForStatic, Matrix, Matrix, Matrix, Matrix>
+class MassPointsForStatic : public SurgSim::Math::OdeEquation<MassPointsStateForStatic>
 {
 public:
 	/// Constructor

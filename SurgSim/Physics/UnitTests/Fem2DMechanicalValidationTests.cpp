@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file This file tests the mechanical behaviors of the Fem2DRepresentation.
+/// \file Fem2DMechanicalValidationTests.cpp
+/// This file tests the mechanical behaviors of the Fem2DRepresentation.
 
 #include <gtest/gtest.h>
 

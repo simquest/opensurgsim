@@ -83,9 +83,11 @@ void AddRandomSphereBehavior::update(double dt)
 			(SurgSim::Math::Quaterniond::Identity(), Vector3d(m_x, m_y, m_z));
 
 		// Create the SphereElement.
-		std::shared_ptr<SceneElement> m_element = std::make_shared<SphereElement>(name, pose);
+		std::shared_ptr<SceneElement> element = std::make_shared<SphereElement>(name);
+		element->setPose(pose);
+
 		// Add the SphereElement to the Scene.
-		getScene()->addSceneElement(m_element);
+		getScene()->addSceneElement(element);
 	}
 }
 

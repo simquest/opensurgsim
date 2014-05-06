@@ -21,38 +21,46 @@ namespace SurgSim
 namespace Math
 {
 
-void SolveAndInverse<DiagonalMatrix>::operator ()
-	(const DiagonalMatrix& A, const Vector& b, Vector* x, Matrix* Ainv)
+void LinearSolveAndInverseDiagonalMatrix::operator ()(const Matrix& A, const Vector& b, Vector* x, Matrix* Ainv)
 {
-	(*Ainv) = m_Ainv = A.inverse();
-	(*x) = m_Ainv * b;
-}
+	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
 
-void SolveAndInverse<Matrix>::operator ()
-	(const Matrix& A, const Vector& b, Vector* x, Matrix* Ainv)
-{
-	Eigen::PartialPivLU<Matrix> lu(A);
-	(*x) = lu.solve(b);
-	(*Ainv) = lu.inverse();
-}
-
-void SolveAndInverse<Eigen::SparseMatrix<double,Eigen::ColMajor>>::operator ()
-	(const Eigen::SparseMatrix<double,Eigen::ColMajor>& A, const Vector& b, Vector* x, Matrix* Ainv)
-{
-	Eigen::SparseLU<const Eigen::SparseMatrix<double, Eigen::ColMajor>> solver;
-	// Compute the ordering permutation vector from the structural pattern of A
-	solver.analyzePattern(A);
-	// Compute the numerical factorization
-	solver.factorize(A);
-	//Use the factors to solve the linear system
-	(*x) = solver.solve(b);
-
-	if (m_identity.rows() != A.rows())
+	if (Ainv != nullptr)
 	{
-		m_identity.resize(A.rows(), A.cols());
-		m_identity.setIdentity();
+		if (Ainv->cols() != A.cols() || Ainv->rows() != A.cols())
+		{
+			Ainv->resize(A.rows(), A.cols());
+		}
+		Ainv->setZero();
+		Ainv->diagonal() = A.diagonal().cwiseInverse();
+
+		if (x != nullptr)
+		{
+			(*x) = Ainv->diagonal().cwiseProduct(b);
+		}
 	}
-	(*Ainv) = solver.solve(m_identity);
+	else if (x != nullptr)
+	{
+		(*x) = A.diagonal().cwiseInverse().cwiseProduct(b);
+	}
+}
+
+void LinearSolveAndInverseDenseMatrix::operator ()(const Matrix& A, const Vector& b, Vector* x, Matrix* Ainv)
+{
+	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
+
+	if (x != nullptr || Ainv != nullptr)
+	{
+		const Eigen::PartialPivLU<typename Eigen::MatrixBase<Matrix>::PlainObject> lu = A.partialPivLu();
+		if (x != nullptr)
+		{
+			(*x) = lu.solve(b);
+		}
+		if (Ainv != nullptr)
+		{
+			(*Ainv) = lu.inverse();
+		}
+	}
 }
 
 }; // namespace Math

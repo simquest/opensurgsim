@@ -378,10 +378,8 @@ TYPED_TEST(AllVectorTests, YamlConvert)
 	EXPECT_TRUE(node.IsSequence());
 	EXPECT_EQ(original.size(), node.size());
 
-	Vector expected;
-
-	ASSERT_NO_THROW(expected = node.as<Vector>());
-	EXPECT_TRUE(original.isApprox(expected));
+	ASSERT_NO_THROW({Vector expected = node.as<Vector>();});
+	EXPECT_TRUE(original.isApprox(node.as<Vector>()));
 }
 
 

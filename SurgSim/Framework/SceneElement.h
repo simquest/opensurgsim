@@ -22,6 +22,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "SurgSim/Math/RigidTransform.h"
+
 namespace YAML
 {
 class Node;
@@ -33,6 +35,7 @@ namespace Framework
 {
 
 class Component;
+class PoseComponent;
 class Scene;
 class Runtime;
 
@@ -93,6 +96,19 @@ public:
 	/// \return	The name.
 	std::string getName() const;
 
+	/// Set the pose of this SceneElement
+	/// \param pose The pose
+	void setPose(const SurgSim::Math::RigidTransform3d& pose);
+
+	/// Get the pose of this SceneElement
+	/// \return the pose
+	const SurgSim::Math::RigidTransform3d& getPose() const;
+
+	/// Get the PoseComponent that controls the pose all Representations
+	/// in this SceneElement
+	/// \return the PoseComponent
+	std::shared_ptr<PoseComponent> getPoseComponent();
+
 	/// Sets the Scene.
 	/// \param scene Pointer to the scene.
 	void setScene(std::weak_ptr<Scene> scene);
@@ -116,7 +132,6 @@ public:
 	/// \return	The shared pointer.
 	std::shared_ptr<SceneElement> getSharedPtr();
 
-
 	/// Convert to a YAML::Node
 	/// \param standalone when true, all the components will be represented as full component, when false
 	///                   they will be represented as references
@@ -132,6 +147,8 @@ public:
 private:
 	/// Name of this SceneElement
 	std::string m_name;
+
+	std::shared_ptr<SurgSim::Framework::PoseComponent> m_pose;
 
 	/// A collection of Components
 	std::unordered_map<std::string, std::shared_ptr<Component>> m_components;

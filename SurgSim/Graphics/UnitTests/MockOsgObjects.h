@@ -71,20 +71,6 @@ public:
 		return m_sumDt;
 	}
 
-	/// Sets the current pose of the representation
-	/// \param	transform	Rigid transformation that describes the current pose of the representation
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
-	{
-		m_transform = transform;
-	}
-
-	/// Gets the current pose of the representation
-	/// \return	Rigid transformation that describes the current pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const
-	{
-		return m_transform;
-	}
-
 	/// Updates the representation.
 	/// \param	dt	The time in seconds of the preceding timestep.
 	/// \post m_numUpdates is incremented and dt is added to m_sumDt

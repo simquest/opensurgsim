@@ -1454,26 +1454,61 @@ void intersectionsSegmentBox(
 }
 
 
-/// Calculates the intersection between two triangles
-///
-/// If any edge of triangle 't0' passes through triangle 't1' (or vice versa), then the minimum displacement needed to
-/// remove the penetration is calculated and returned by parameter.  The displacement is parallel to a triangle's
-/// normal.
+/// Check if the two triangles intersect using separating axis test.
+/// Algorithm is implemented from http://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tritri.pdf
 ///
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
 /// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
-/// \param t0n Unit length normal of the first triangle.
-/// \param t1n Unit length normal of the second triangle.
-/// \param [out] depth The depth of penetration.
+/// \param t0n Normal of the first triangle, should be normalized.
+/// \param t1n Normal of the second triangle, should be normalized.
+/// \return True, if intersection is detected.
+template <class T, int MOpt> inline
+bool doesIntersectTriangleTriangle(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0n,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1n);
+
+/// Check if the two triangles intersect using separating axis test.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
+/// \return True, if intersection is detected.
+template <class T, int MOpt> inline
+bool doesIntersectTriangleTriangle(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2);
+
+/// Calculate the contact between two triangles.
+/// Algorithm presented in
+/// https://docs.google.com/a/simquest.com/document/d/11ajMD7QoTVelT2_szGPpeUEY0wHKKxW1TOgMe8k5Fsc/pub.
+/// If the triangle are known to intersect, the deepest penetration of the triangles into each other is calculated.
+/// The triangle which penetrates less into the other triangle is chosen as contact.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
+/// \param t0n Unit length normal of the first triangle, should be normalized.
+/// \param t1n Unit length normal of the second triangle, should be normalized.
+/// \param [out] penetrationDepth The depth of penetration.
 /// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
 /// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
-/// \param [out] normal The contact normal that points from triangle1 to triangle0.
+/// \param [out] contactNormal The contact normal that points from triangle1 to triangle0.
 /// \return True, if intersection is detected.
 /// \note The [out] params are not modified if there is no intersection.
-/// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved by (nomal*depth*0.5), the
-/// triangles will no longer be intersecting.
+/// \note If penetrationPoint0 is moved by (contactNormal*penetrationDepth*0.5) and penetrationPoint1
+/// is moved by -(contactNormal*penetrationDepth*0.5), the triangles will no longer be intersecting.
 template <class T, int MOpt> inline
 bool calculateContactTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
@@ -1484,387 +1519,28 @@ bool calculateContactTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0n,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
-	T *depth,
+	T* penetrationDepth,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
-	Eigen::Matrix<T, 3, 1, MOpt>* normal)
-{
-	// Check for degenerate triangle.
-	if (t0n.isZero() || t1n.isZero())
-	{
-		return false;
-	}
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
 
-	// - Let A and B be the two triangles.
-	// - Let vA([0],[1],[2]) and vB([0],[1],[2]) be vertices of A and B.
-	// - Let nA, nB be the normals of A and B respectively.
-	// - Let dA, dB be the distance of the planes of A and B from origin.
-
-	// Steps:
-	// 1) Find signedDFromPlaneB([0],[1],[2]) by calculating (vA[0].nB + dB, vA[1].nB + dB, vA[2].nB + dB).
-	// 2) Depending on the sign of signedDFromPlaneB, the vertex can be classified as UnderPlaneB, OnPlaneB
-	//    or AbovePlaneB.
-	// 3) Every edge, from vertex UnderPlaneB to vertex OnPlaneB/AbovePlaneB and between vertices UnderPlaneB,
-	//    is projected onto the PlaneB and checked, to determine if there is any intersection with TriangleB.
-	// 4) In case of intersection, the minimum distance by which the point on the edge needs to be moved
-	//    along nB, to bring the edge above B is calculated. It is the penetration depth. And the
-	//    corresponding points are penetration points.
-	// 5) Do step 1 to 4 for the other triangle and find the penetration depth.
-	// 6) The contact having the lower of the two penetration depths is returned.
-
-	// For these variables, <var-name>[0] is the first triangle and <var-name>[1] is the second triangle.
-	const Eigen::Matrix<T, 3, 1, MOpt> *v[2][3] = {{&t0v0, &t0v1, &t0v2}, {&t1v0, &t1v1, &t1v2}};
-	const Eigen::Matrix<T, 3, 1, MOpt> *n[2] = {&t0n, &t1n};
-	T d[2];
-	T signedDFromPlaneB[2][3];
-	boost::container::static_vector<unsigned int, 3> underPlaneB[2];
-	boost::container::static_vector<unsigned int, 3> onOrAbovePlaneB[2];
-	boost::container::static_vector<bool, 3> abovePlaneBFlag[2];
-
-	for (unsigned int A = 0, B = 1; A < 2; ++A, --B)
-	{
-		// Calculate distance of plane of B from origin.
-		d[B] = -v[B][0]->dot(*n[B]);
-
-		// Calculate signedDFromPlaneB and place the index into appropriate under/onOrAbove PlaneB list.
-		for (unsigned int i = 0; i < 3; ++i)
-		{
-			signedDFromPlaneB[A][i] = n[B]->dot(*v[A][i]) + d[B];
-
-			if (signedDFromPlaneB[A][i] < -Geometry::DistanceEpsilon)
-			{
-				underPlaneB[A].push_back(i);
-			}
-			else
-			{
-				abovePlaneBFlag[A].push_back(signedDFromPlaneB[A][i] > Geometry::DistanceEpsilon);
-				onOrAbovePlaneB[A].push_back(i);
-			}
-		}
-
-		if (underPlaneB[A].size() == 0 || underPlaneB[A].size() == 3)
-		{
-			return false;
-		}
-	}
-
-	// Contact info.
-	bool contactCaclulated[2] = {false, false};
-	T penetrationDepth[2] = {T(0), T(0)};
-	Eigen::Matrix<T, 3, 1, MOpt> penetrationPoint[2][2];
-
-	for (unsigned int A = 0, B = 1; A < 2; ++A, --B)
-	{
-		Eigen::Matrix<T, 3, 1, MOpt> vUnder[2];
-		Eigen::Matrix<T, 3, 1, MOpt> vUnderOnPlaneB[2];
-		Eigen::Matrix<T, 3, 1, MOpt> vUnderOnPlaneBBary[2];
-		bool vUnderInsideB[2] = {false, false};
-		T dFromPlaneB[2] = {T(0.0), T(0.0)};
-		int iUnder = 0;
-		Eigen::Matrix<T, 3, 1, MOpt> vOn[2];
-		Eigen::Matrix<T, 3, 1, MOpt> vOnBary[2];
-		int vOnToUnderId[2] = {-1, -1};
-		bool vOnInsideB[2] = {false, false};
-		int iOn = 0;
-		T parametricPointOnProjectedEdge[2] = {T(1), T(1)};
-		Eigen::Matrix<T, 3, 1, MOpt> segmentSegmentIntersection[2];
-
-		bool underPlaneEdgeIntersectsB = false;
-
-		// Now, the only edges of interest in A are the ones going from underPlaneB
-		// to either onOrAbovePlaneB or underPlaneB.
-		for (auto edgeStartVertexId = underPlaneB[A].begin();
-			 edgeStartVertexId != underPlaneB[A].end();
-			 ++edgeStartVertexId)
-		{
-			vUnder[iUnder] = *v[A][*edgeStartVertexId];
-
-			// This vertex is at the depth.
-			dFromPlaneB[iUnder] = std::abs(signedDFromPlaneB[A][*edgeStartVertexId]);
-
-			// Find the projection of vUnder[iUnder] on plane B.
-			vUnderOnPlaneB[iUnder] = vUnder[iUnder] - *n[B] * signedDFromPlaneB[A][*edgeStartVertexId];
-
-			// Find the barycentric coordinates of vUnderOnPlaneB[iUnder] w.r.t. B.
-			barycentricCoordinates(vUnderOnPlaneB[iUnder], *v[B][0], *v[B][1], *v[B][2], *n[B],
-								   &vUnderOnPlaneBBary[iUnder]);
-
-			// Find if vUnderOnPlaneB[iUnder] is inside B.
-			vUnderInsideB[iUnder] = vUnderOnPlaneBBary[iUnder][0] >= -Geometry::DistanceEpsilon &&
-									vUnderOnPlaneBBary[iUnder][1] >= -Geometry::DistanceEpsilon &&
-									vUnderOnPlaneBBary[iUnder][2] >= -Geometry::DistanceEpsilon;
-
-			auto edgeEndAbovePlaneBFlag = abovePlaneBFlag[A].begin();
-			for (auto edgeEndVertexId = onOrAbovePlaneB[A].begin();
-				 edgeEndVertexId != onOrAbovePlaneB[A].end();
-				 ++edgeEndVertexId, ++edgeEndAbovePlaneBFlag)
-			{
-				if (*edgeEndAbovePlaneBFlag)
-				{
-					// In the case of edgeEndAbovePlaneBFlag, the edge can be pruned,
-					// so that the "Above" vertex is trimmed to be "On" the plane of B.
-					vOn[iOn] = vUnder[iUnder] + (*v[A][*edgeEndVertexId] - vUnder[iUnder]) *
-												((-d[B] - vUnder[iUnder].dot(*n[B])) /
-												 (*v[A][*edgeEndVertexId] - vUnder[iUnder]).dot(*n[B]));
-				}
-				else
-				{
-					vOn[iOn] = *v[A][*edgeEndVertexId];
-				}
-
-				// This edge orginates from:
-				vOnToUnderId[iOn] = iUnder;
-
-				// Find the barycentric coordinates of vOn[iOn] w.r.t. B.
-				barycentricCoordinates(vOn[iOn], *v[B][0], *v[B][1], *v[B][2], *n[B], &vOnBary[iOn]);
-
-				// Find if vOn[iOn] is inside B.
-				vOnInsideB[iOn] = vOnBary[iOn][0] >= -Geometry::DistanceEpsilon &&
-								  vOnBary[iOn][1] >= -Geometry::DistanceEpsilon &&
-								  vOnBary[iOn][2] >= -Geometry::DistanceEpsilon;
-
-				++iOn;
-			}
-
-			++iUnder;
-		}
-
-		// Check if the line vOn[0]->vOn[1] intersects with B.
-		bool vOn0To1IntersectsTriangleB = vOnInsideB[0] || vOnInsideB[1];
-		T pruneParam[2] = {T(2.0), T(-2.0)};
-		Eigen::Matrix<T, 3, 1, MOpt> prunePoint[2] = {vOn[0], vOn[1]};
-		if (!vOnInsideB[0] || !vOnInsideB[1])
-		{
-			for (unsigned int b = 0; b < 3; ++b)
-			{
-				T s[2] = {T(-1), T(-1)};
-				if (std::abs(distanceSegmentSegment(vOn[0], vOn[1], *v[B][(b+1)%3], *v[B][(b+2)%3],
-													&segmentSegmentIntersection[0], &segmentSegmentIntersection[1],
-													&s[0], &s[1]))
-														< Geometry::DistanceEpsilon)
-				{
-					if (s[0] > -Geometry::DistanceEpsilon &&
-						s[0] < (T(1) + Geometry::DistanceEpsilon) &&
-						s[1] > -Geometry::DistanceEpsilon &&
-						s[1] < (T(1) + Geometry::DistanceEpsilon))
-					{
-						vOn0To1IntersectsTriangleB = true;
-
-						if (!vOnInsideB[0] && s[0] < pruneParam[0])
-						{
-							pruneParam[0] = s[0];
-							prunePoint[0] = segmentSegmentIntersection[0];
-						}
-
-						if (!vOnInsideB[1] && s[0] > pruneParam[1])
-						{
-							pruneParam[1] = s[0];
-							prunePoint[1] = segmentSegmentIntersection[0];
-						}
-					}
-				}
-			}
-		}
-
-		if (!vOn0To1IntersectsTriangleB)
-		{
-			continue;
-		}
-
-		if (!vOnInsideB[0])
-		{
-			vOn[0] = prunePoint[0];
-		}
-
-		if (!vOnInsideB[1])
-		{
-			vOn[1] = prunePoint[1];
-		}
-
-		if (iUnder == 2 && (!vUnderInsideB[0] || !vUnderInsideB[1]))
-		{
-			// Check if the edge vUnderOnPlaneB[0]->vUnderOnPlaneB[1] intersects with B.
-			// If so, prune the edge vUnderOnPlaneB[0]->vUnderOnPlaneB[1] to be within B.
-			pruneParam[0] = T(vUnderInsideB[0] ? 0.0 : 2.0);
-			pruneParam[1] = T(vUnderInsideB[1] ? 1.0: -2.0);
-			for (unsigned int b = 0; b < 3; ++b)
-			{
-				T s[2] = {T(-1), T(-1)};
-				if (std::abs(distanceSegmentSegment(vUnderOnPlaneB[0], vUnderOnPlaneB[1],
-													*v[B][(b+1)%3], *v[B][(b+2)%3],
-													&segmentSegmentIntersection[0], &segmentSegmentIntersection[1],
-													&s[0], &s[1]))
-														< Geometry::DistanceEpsilon)
-				{
-					if (s[0] > -Geometry::DistanceEpsilon &&
-						s[0] < (T(1) + Geometry::DistanceEpsilon) &&
-						s[1] > -Geometry::DistanceEpsilon &&
-						s[1] < (T(1) + Geometry::DistanceEpsilon))
-					{
-						if (!vUnderInsideB[0] && s[0] < pruneParam[0])
-						{
-							underPlaneEdgeIntersectsB = true;
-							pruneParam[0] = s[0];
-							prunePoint[0] = segmentSegmentIntersection[0];
-						}
-
-						if (!vUnderInsideB[1] && s[0] > pruneParam[1])
-						{
-							underPlaneEdgeIntersectsB = true;
-							pruneParam[1] = s[0];
-							prunePoint[1] = segmentSegmentIntersection[0];
-						}
-					}
-				}
-			}
-		}
-
-		// Prune the edge from vOn[i]->vUnder[vOnToUnderId[i]], to be within B.
-		for (int i = 0; i < iOn; ++i)
-		{
-			if (!vUnderInsideB[vOnToUnderId[i]])
-			{
-				for (unsigned int b = 0; b < 3; ++b)
-				{
-					if (vUnderOnPlaneBBary[vOnToUnderId[i]][b] > T(0))
-					{
-						continue;
-					}
-
-					T s[2] = {T(0), T(0)};
-					if (std::abs(distanceSegmentSegment(vOn[i], vUnderOnPlaneB[vOnToUnderId[i]],
-														*v[B][(b+1)%3], *v[B][(b+2)%3],
-														&segmentSegmentIntersection[0], &segmentSegmentIntersection[1],
-														&s[0], &s[1]))
-															< Geometry::DistanceEpsilon)
-					{
-						if (s[0] > -Geometry::DistanceEpsilon &&
-							s[0] < (T(1) + Geometry::DistanceEpsilon) &&
-							s[1] > -Geometry::DistanceEpsilon &&
-							s[1] < (T(1) + Geometry::DistanceEpsilon))
-						{
-							b = 3;
-
-							vUnderOnPlaneB[vOnToUnderId[i]] = segmentSegmentIntersection[0];
-							parametricPointOnProjectedEdge[i] = s[0];
-						}
-					}
-				}
-
-				vUnderInsideB[vOnToUnderId[i]] = true;
-			}
-		}
-
-		T depth[2] = {std::abs(parametricPointOnProjectedEdge[0]*dFromPlaneB[vOnToUnderId[0]]),
-					  std::abs(parametricPointOnProjectedEdge[1]*dFromPlaneB[vOnToUnderId[1]])};
-		int dpi =
-			(std::abs(parametricPointOnProjectedEdge[0]*dFromPlaneB[vOnToUnderId[0]]) >
-				std::abs(parametricPointOnProjectedEdge[1]*dFromPlaneB[vOnToUnderId[1]])) ? 0 : 1;
-
-		if (underPlaneEdgeIntersectsB)
-		{
-			T differenceInD = dFromPlaneB[vOnToUnderId[1]] - dFromPlaneB[vOnToUnderId[0]];
-			T depth2[2] = {std::abs(dFromPlaneB[vOnToUnderId[0]] + pruneParam[0]*differenceInD),
-						   std::abs(dFromPlaneB[vOnToUnderId[0]] + pruneParam[1]*differenceInD)};
-			int dpi2 = depth2[0] > depth2[1] ? 0 : 1;
-
-			if (depth2[dpi2] > std::abs(parametricPointOnProjectedEdge[dpi]*dFromPlaneB[vOnToUnderId[dpi]]))
-			{
-				penetrationDepth[A] = depth2[dpi2];
-				penetrationPoint[A][A] = vUnder[0] + pruneParam[dpi2] * (vUnder[1] - vUnder[0]);
-				penetrationPoint[A][B] = vUnderOnPlaneB[0] + pruneParam[dpi2] * (vUnderOnPlaneB[1] - vUnderOnPlaneB[0]);
-				if (differenceInD > -Geometry::DistanceEpsilon && differenceInD < Geometry::DistanceEpsilon)
-				{
-					// Same depth.
-					dpi2 = (dpi2 + 1) % 2;
-					penetrationPoint[A][A] += vUnder[0] + pruneParam[dpi2] * (vUnder[1] - vUnder[0]);
-					penetrationPoint[A][A] *= 0.5;
-					penetrationPoint[A][B] += vUnderOnPlaneB[0] +
-											  pruneParam[dpi2] * (vUnderOnPlaneB[1] - vUnderOnPlaneB[0]);
-					penetrationPoint[A][B] *= 0.5;
-				}
-				contactCaclulated[A] = true;
-				continue;
-			}
-			else
-			{
-				penetrationDepth[A] = depth[dpi];
-				penetrationPoint[A][A] = vOn[dpi] +
-										 parametricPointOnProjectedEdge[dpi] * (vUnder[vOnToUnderId[dpi]] - vOn[dpi]);
-				penetrationPoint[A][B] = vUnderOnPlaneB[vOnToUnderId[dpi]];
-				if (depth[0] > depth[1] - Geometry::DistanceEpsilon && depth[0] < depth[1] + Geometry::DistanceEpsilon)
-				{
-					// Same depth.
-					dpi = (dpi + 1) % 2;
-					penetrationPoint[A][A] += vOn[dpi] + parametricPointOnProjectedEdge[dpi] *
-														 (vUnder[vOnToUnderId[dpi]] - vOn[dpi]);
-					penetrationPoint[A][A] *= 0.5;
-					penetrationPoint[A][B] += vUnderOnPlaneB[vOnToUnderId[dpi]];
-					penetrationPoint[A][B] *= 0.5;
-				}
-				contactCaclulated[A] = true;
-			}
-		}
-		else
-		{
-			penetrationDepth[A] = depth[dpi];
-			penetrationPoint[A][A] = vOn[dpi] +
-									 parametricPointOnProjectedEdge[dpi] * (vUnder[vOnToUnderId[dpi]] - vOn[dpi]);
-			penetrationPoint[A][B] = vUnderOnPlaneB[vOnToUnderId[dpi]];
-			contactCaclulated[A] = true;
-		}
-	}
-
-	// We may have found the penetrationDepth along both triangle normals.
-	// Choose the one that is smaller.
-	if (contactCaclulated[0] || contactCaclulated[1])
-	{
-		bool useFirstTriangle = contactCaclulated[0];
-
-		if (contactCaclulated[0] && contactCaclulated[1])
-		{
-			useFirstTriangle = penetrationDepth[0] < penetrationDepth[1];
-		}
-
-		if (useFirstTriangle)
-		{
-			*depth = penetrationDepth[0];
-			*normal = *n[1];
-			*penetrationPoint0 = penetrationPoint[0][0];
-			*penetrationPoint1 = penetrationPoint[0][1];
-		}
-		else
-		{
-			*depth = penetrationDepth[1];
-			*normal = -*n[0];
-			*penetrationPoint0 = penetrationPoint[1][0];
-			*penetrationPoint1 = penetrationPoint[1][1];
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-/// Calculates the intersection between two triangles
-///
-/// If any edge of triangle 't0' passes through triangle 't1' (or vice versa), then the minimum displacement needed to
-/// remove the penetration is calculated and returned by parameter.  The displacement is parallel to a triangle's
-/// normal.
-///
+/// Calculate the contact between two triangles.
+/// Algorithm presented in
+/// https://docs.google.com/a/simquest.com/document/d/11ajMD7QoTVelT2_szGPpeUEY0wHKKxW1TOgMe8k5Fsc/pub.
+/// If the triangle are known to intersect, the deepest penetration of the triangles into each other is calculated.
+/// The triangle which penetrates less into the other triangle is chosen as contact.
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
-/// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
-/// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
-/// \param [out] depth The depth of penetration.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle, should be normalized.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle, should be normalized.
+/// \param [out] penetrationDepth The depth of penetration.
 /// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
 /// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
-/// \param [out] normal The contact normal that points from triangle1 to triangle0.
+/// \param [out] contactNormal The contact normal that points from triangle1 to triangle0.
 /// \return True, if intersection is detected.
 /// \note The [out] params are not modified if there is no intersection.
-/// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved by (nomal*depth*0.5), the
-/// triangles will no longer be intersecting.
+/// \note If penetrationPoint0 is moved by (contactNormal*penetrationDepth*0.5) and penetrationPoint1
+/// is moved by -(contactNormal*penetrationDepth*0.5), the triangles will no longer be intersecting.
 template <class T, int MOpt> inline
 bool calculateContactTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
@@ -1873,28 +1549,18 @@ bool calculateContactTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
-	T *depth,
+	T* penetrationDepth,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
-	Eigen::Matrix<T, 3, 1, MOpt>* normal)
-{
-	Eigen::Matrix<T, 3, 1, MOpt> t0n = (t0v1 - t0v0).cross(t0v2 - t0v0);
-	Eigen::Matrix<T, 3, 1, MOpt> t1n = (t1v1 - t1v0).cross(t1v2 - t1v0);
-	if (t0n.isZero() || t1n.isZero())
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "Degenerate triangle(s) passed to calculateContactTriangleTriangle.";
-		return false;
-	}
-	t0n.normalize();
-	t1n.normalize();
-	return calculateContactTriangleTriangle(t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t0n, t1n, depth, penetrationPoint0,
-											penetrationPoint1, normal);
-}
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
 
 
 }; // namespace Math
 }; // namespace SurgSim
+
+
+#include "SurgSim/Math/TriangleTriangleIntersection-inl.h"
+#include "SurgSim/Math/TriangleTriangleContactCalculation-inl.h"
 
 
 #endif

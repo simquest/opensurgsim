@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Tests for the DcdCollision Class
+/// \file DcdCollisionTests.cpp
+/// Tests for the DcdCollision Class
 
 #include <gtest/gtest.h>
 
@@ -53,7 +54,7 @@ std::shared_ptr<RigidRepresentation> createSphere(const std::string& name, const
 	params.setShapeUsedForMassInertia(shape);
 
 	representation->setInitialParameters(params);
-	representation->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), position));
+	representation->setLocalPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), position));
 
 	return representation;
 }
