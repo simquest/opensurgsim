@@ -24,36 +24,6 @@ namespace Math
 {
 
 
-/// A local class to represent a plane.
-template <class T, int MOpt>
-class Plane
-{
-	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
-
-public:
-	/// Contructor takes in the plane normal and a point on the plane.
-	/// \param normal Normal of the plane.
-	/// \param pointOnPlane A point on the plane.
-	Plane(const Vector3& normal, const Vector3& pointOnPlane)
-		: m_normal(normal), m_d(-pointOnPlane.dot(normal))
-	{}
-
-	/// Calculate the signed distance of the given point from the plane.
-	/// \param point Point whose signed distance from plane needs to be calculated.
-	/// \return The signed distance of the given point from the plane
-	T signedDistanceFrom(const Vector3& point)
-	{
-		return point.dot(m_normal) + m_d;
-	}
-
-	/// Normal of the plane.
-	Vector3 m_normal;
-
-	/// d from the plane equation (n.x + d = 0).
-	T m_d;
-};
-
-
 /// Two ends of the triangle edge are given in terms of the following vertex properties.
 ///		- Signed distance from the colliding triangle.
 ///		- Projection on the separating axis.
@@ -129,17 +99,16 @@ bool doesIntersectTriangleTriangle(
 	// s2[2]	- The intersection between T2 and D is a line segment.
 	//			  s2[0] and s2[1] are the parametric representation of the ends of this line segment.
 
-	// Some extra variables:
-	// p1		- The plane of the triangle T1.
-	// p2		- The plane of the triangle T2.
-
 	// Early Rejection test:
 	// If all the vertices of one triangle are on one side of the plane of the other triangle,
 	// there is no intersection.
 
 	// Check if all the vertices of T2 are on one side of p1.
-	Plane<T, MOpt> p1(t0n, t0v0);
-	Vector3 d2(p1.signedDistanceFrom(t1v0), p1.signedDistanceFrom(t1v1), p1.signedDistanceFrom(t1v2));
+	// Plane eqn of T1: DotProduct(t0n, X) + distanceFromOrigin = 0
+	// where distanceFromOrigin = -DotProduct(t0n, t0v0)
+	// So, plane eqn of T1: DotProduct(t0n, X - t0v0) = 0
+	// Distance of first vertex of T2 from the plane of T1 is: DotProduct(t0n, t1v0 - t0v0)
+	Vector3 d2(t0n.dot(t1v0 - t0v0), t0n.dot(t1v1 - t0v0), t0n.dot(t1v2 - t0v0));
 
 	if ((d2.array() <= EPSILON).all() || (d2.array() >= -EPSILON).all())
 	{
@@ -147,8 +116,7 @@ bool doesIntersectTriangleTriangle(
 	}
 
 	// Check if all the vertices of T1 are on one side of p2.
-	Plane<T, MOpt> p2(t1n, t1v0);
-	Vector3 d1(p2.signedDistanceFrom(t0v0), p2.signedDistanceFrom(t0v1), p2.signedDistanceFrom(t0v2));
+	Vector3 d1(t1n.dot(t0v0 - t1v0), t1n.dot(t0v1 - t1v0), t1n.dot(t0v2 - t1v0));
 
 	if ((d1.array() <= EPSILON).all() || (d1.array() >= -EPSILON).all())
 	{

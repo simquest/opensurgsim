@@ -135,21 +135,38 @@ protected:
 				EXPECT_TRUE(isBary1WithinTriangle);
 
 				// Check if the penetration depth when applied as correction, separates the triangles.
-				Vector3d correction = normal * (0.5 * penetrationDepth + 3.0 * Geometry::DistanceEpsilon);
-				if (count > 2)
+				// First move the triangles apart by just short of the penetration depth, to make sure
+				// the triangles are still colliding.
 				{
-					// Switched triangles.
-					correction = -correction;
+					Vector3d correction = normal * (0.5 * penetrationDepth - Geometry::DistanceEpsilon);
+					if (count > 2)
+					{
+						// Switched triangles.
+						correction = -correction;
+					}
+					MockTriangle correctedT0(t0);
+					correctedT0.translate(correction);
+					MockTriangle correctedT1(t1);
+					correctedT1.translate(-correction);
+					EXPECT_EQ(true, doesIntersectTriangleTriangle(correctedT0.v0, correctedT0.v1, correctedT0.v2,
+																  correctedT1.v0, correctedT1.v1, correctedT1.v2));
 				}
-				MockTriangle correctedT0(t0);
-				correctedT0.translate(correction);
-				MockTriangle correctedT1(t1);
-				correctedT1.translate(-correction);
-				double expectedDistance = distanceTriangleTriangle(correctedT0.v0, correctedT0.v1, correctedT0.v2,
-										  correctedT1.v0, correctedT1.v1, correctedT1.v2,
-										  &t0Point, &t1Point);
-				EXPECT_GE(expectedDistance, 4.0 * Geometry::DistanceEpsilon);
-				EXPECT_LE(expectedDistance, 8.0 * Geometry::DistanceEpsilon);
+				// Now move the triangles apart by just a little farther than the penetration depth, to establish
+				// that the triangles are not colliding.
+				{
+					Vector3d correction = normal * (0.5 * penetrationDepth + Geometry::DistanceEpsilon);
+					if (count > 2)
+					{
+						// Switched triangles.
+						correction = -correction;
+					}
+					MockTriangle correctedT0(t0);
+					correctedT0.translate(correction);
+					MockTriangle correctedT1(t1);
+					correctedT1.translate(-correction);
+					EXPECT_EQ(false, doesIntersectTriangleTriangle(correctedT0.v0, correctedT0.v1, correctedT0.v2,
+																   correctedT1.v0, correctedT1.v1, correctedT1.v2));
+				}
 			}
 		}
 	}
