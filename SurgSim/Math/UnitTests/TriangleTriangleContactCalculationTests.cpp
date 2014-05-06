@@ -148,8 +148,8 @@ protected:
 					correctedT0.translate(correction);
 					MockTriangle correctedT1(t1);
 					correctedT1.translate(-correction);
-					EXPECT_EQ(true, doesIntersectTriangleTriangle(correctedT0.v0, correctedT0.v1, correctedT0.v2,
-																  correctedT1.v0, correctedT1.v1, correctedT1.v2));
+					EXPECT_TRUE(doesIntersectTriangleTriangle(correctedT0.v0, correctedT0.v1, correctedT0.v2,
+															  correctedT1.v0, correctedT1.v1, correctedT1.v2));
 				}
 				// Now move the triangles apart by just a little farther than the penetration depth, to establish
 				// that the triangles are not colliding.
@@ -164,8 +164,8 @@ protected:
 					correctedT0.translate(correction);
 					MockTriangle correctedT1(t1);
 					correctedT1.translate(-correction);
-					EXPECT_EQ(false, doesIntersectTriangleTriangle(correctedT0.v0, correctedT0.v1, correctedT0.v2,
-																   correctedT1.v0, correctedT1.v1, correctedT1.v2));
+					EXPECT_FALSE(doesIntersectTriangleTriangle(correctedT0.v0, correctedT0.v1, correctedT0.v2,
+															   correctedT1.v0, correctedT1.v1, correctedT1.v2));
 				}
 			}
 		}
