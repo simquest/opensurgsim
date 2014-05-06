@@ -85,9 +85,6 @@ public:
 									 std::shared_ptr<SurgSim::Collision::Representation> representation2);
 
 protected:
-	/// Mutex to protect m_excludedCollisionPairs from being read/written simultaneously.
-	boost::mutex m_excludedCollisionPairMutex;
-
 	///@{
 	/// Overridden from ComponentManager
 	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
@@ -104,6 +101,7 @@ protected:
 	void initializeComputations(bool copyState);
 private:
 	/// Get an iterator to an excluded collision pair.
+	/// \note Lock m_excludedCollisionPairMutex before calling
 	/// \param representation1 The first Collision::Representation for the pair
 	/// \param representation2 The second Collision::Representation for the pair
 	/// \return If the pair is found, an iterator to the excluded collision pair; otherwise an iterator to the
@@ -120,6 +118,9 @@ private:
 
 	/// List of Collision::Representation pairs to be excluded from contact generation.
 	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> m_excludedCollisionPairs;
+
+	/// Mutex to protect m_excludedCollisionPairs from being read/written simultaneously.
+	boost::mutex m_excludedCollisionPairMutex;
 
 	///@{
 	/// Steps to perform the physics update

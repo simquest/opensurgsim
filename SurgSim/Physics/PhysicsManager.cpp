@@ -137,9 +137,10 @@ bool PhysicsManager::doUpdate(double dt)
 	state->setCollisionRepresentations(m_collisionRepresentations);
 	state->setConstraintComponents(m_constraintComponents);
 
-	m_excludedCollisionPairMutex.lock();
-	state->setExcludedCollisionPairs(m_excludedCollisionPairs);
-	m_excludedCollisionPairMutex.unlock();
+	{
+		boost::mutex::scoped_lock lock(m_excludedCollisionPairMutex);
+		state->setExcludedCollisionPairs(m_excludedCollisionPairs);
+	}
 
 	stateList.push_back(m_preUpdateStep->update(dt, stateList.back()));
 	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
