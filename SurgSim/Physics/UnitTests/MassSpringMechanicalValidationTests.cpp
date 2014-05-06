@@ -68,6 +68,78 @@ public:
 		m_poseRandom = SurgSim::Math::makeRigidTransform(q, t);
 	}
 
+	/// Run the energy test on a spring
+	/// \param scheme The numerical integration scheme to be used
+	/// \param expectedBehavior -1 if the energy should decrease, 1 if it should increase, 0 if stable
+	void runEnergyTest(SurgSim::Math::IntegrationScheme scheme, int expectedBehavior)
+	{
+		m_dt = 1e-3;
+
+		// 2 nodes, the 1st node fixed, no Rayleigh damping and no spring damping
+		// A spring oscillating, only subject to mass and stiffness
+		m_numNodes = 2;
+		m_totalMass = 0.1;
+		m_springStiffness = 1.0;
+		m_springDamping = 0.0;
+		m_rayleighDampingMass = 0.0;
+		m_rayleighDampingStiffness = 0.0;
+		m_boundaryConditions.clear();
+		m_boundaryConditions.push_back(0);
+		m_boundaryConditions.push_back(1);
+		m_boundaryConditions.push_back(2);
+
+		MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_boundaryConditions, m_totalMass,
+			m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
+			scheme);
+
+		m.initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		m.wakeUp();
+
+		// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
+		std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
+		m.setIsGravityEnabled(false);
+
+		Vector3d initialDelta = m.getCurrentState()->getPosition(1) - m.getCurrentState()->getPosition(0);
+		double initialEk = 0.5 * (m_totalMass/2.0) * m.getCurrentState()->getVelocity(1).squaredNorm();
+		double initialEs = 0.5 * m_springStiffness * initialDelta.squaredNorm();
+		double initialEnergy = initialEk + initialEs;
+
+		// Simulate 2 seconds of virtual time
+		double time = 0.0;
+		while(time < 2.0)
+		{
+			m.beforeUpdate(m_dt);
+			m.update(m_dt);
+			m.afterUpdate(m_dt);
+
+			Vector3d previousDelta = m.getPreviousState()->getPosition(1) - m.getPreviousState()->getPosition(0);
+			Vector3d currentDelta = m.getCurrentState()->getPosition(1) - m.getCurrentState()->getPosition(0);
+
+			// Calculate previous/current system energy (kinetic energy + spring energy)
+			double previousEk = 0.5 * (m_totalMass/2.0) * m.getPreviousState()->getVelocity(1).squaredNorm();
+			double previousEs = 0.5 * m_springStiffness * previousDelta.squaredNorm();
+			double previousEnergy = previousEk + previousEs;
+			double currentEk = 0.5 * (m_totalMass/2.0) * m.getCurrentState()->getVelocity(1).squaredNorm();
+			double currentEs = 0.5 * m_springStiffness * currentDelta.squaredNorm();
+			double currentEnergy = currentEk + currentEs;
+			if (expectedBehavior < 0)
+			{
+				EXPECT_LT(currentEnergy, previousEnergy);
+			}
+			else if (expectedBehavior > 0)
+			{
+				EXPECT_GT(currentEnergy, previousEnergy);
+			}
+			else
+			{
+				EXPECT_NEAR(currentEnergy, previousEnergy, 2.6e-6) << " Local diff = " << currentEnergy - previousEnergy;
+				EXPECT_NEAR(currentEnergy, initialEnergy, 3e-4) << " Global diff = " << currentEnergy - initialEnergy;
+			}
+
+			time += m_dt;
+		}
+	}
+
 protected:
 	/// Simulation parameters
 	double m_dt;
@@ -231,136 +303,24 @@ TEST_F(MassSpringMechanicalValidationTests, FallingTest)
 
 TEST_F(MassSpringMechanicalValidationTests, EnergyTest)
 {
-	m_dt = 1e-3;
-
-	m_numNodes = 2;
-	m_totalMass = 0.1;
-	m_springStiffness = 1.0;
-	m_springDamping = 0.0;
-	m_rayleighDampingMass = 0.0;
-	m_rayleighDampingStiffness = 0.0;
-	m_boundaryConditions.clear();
-	m_boundaryConditions.push_back(0);
-	m_boundaryConditions.push_back(1);
-	m_boundaryConditions.push_back(2);
-
 	{
 		SCOPED_TRACE("Testing energy increase for Euler explicit");
 
-		MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_boundaryConditions, m_totalMass,
-			m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
-
-		m.initialize(std::make_shared<SurgSim::Framework::Runtime>());
-		m.wakeUp();
-
-		// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
-		std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
-		m.setIsGravityEnabled(false);
-
-		// Simulate 2 seconds of virtual time
-		double time = 0.0;
-		while(time < 2.0)
-		{
-			m.beforeUpdate(m_dt);
-			m.update(m_dt);
-			m.afterUpdate(m_dt);
-
-			Vector3d previousDelta = m.getPreviousState()->getPosition(1) - m.getPreviousState()->getPosition(0);
-			Vector3d currentDelta = m.getCurrentState()->getPosition(1) - m.getCurrentState()->getPosition(0);
-
-			// Calculate previous/current system energy (kinetic energy + spring energy)
-			double previousEk = 0.5 * (m_totalMass/2.0) * m.getPreviousState()->getVelocity(1).squaredNorm();
-			double previousEs = 0.5 * m_springStiffness * previousDelta.squaredNorm();
-			double previousEnergy = previousEk + previousEs;
-			double currentEk = 0.5 * (m_totalMass/2.0) * m.getCurrentState()->getVelocity(1).squaredNorm();
-			double currentEs = 0.5 * m_springStiffness * currentDelta.squaredNorm();
-			double currentEnergy = currentEk + currentEs;
-			EXPECT_GT(currentEnergy, previousEnergy);
-
-			time += m_dt;
-		}
+		// For Euler explicit, the energy should increase
+		runEnergyTest(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER, 1);
 	}
 
 	{
 		SCOPED_TRACE("Testing energy decrease for Euler implicit");
 
-		MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_boundaryConditions, m_totalMass,
-			m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-
-		m.initialize(std::make_shared<SurgSim::Framework::Runtime>());
-		m.wakeUp();
-
-		// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
-		std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
-		m.setIsGravityEnabled(false);
-
-		// Simulate 2 seconds of virtual time
-		double time = 0.0;
-		while(time < 2.0)
-		{
-			m.beforeUpdate(m_dt);
-			m.update(m_dt);
-			m.afterUpdate(m_dt);
-
-			Vector3d previousDelta = m.getPreviousState()->getPosition(1) - m.getPreviousState()->getPosition(0);
-			Vector3d currentDelta = m.getCurrentState()->getPosition(1) - m.getCurrentState()->getPosition(0);
-
-			// Calculate previous/current system energy (kinetic energy + spring energy)
-			double previousEk = 0.5 * (m_totalMass/2.0) * m.getPreviousState()->getVelocity(1).squaredNorm();
-			double previousEs = 0.5 * m_springStiffness * previousDelta.squaredNorm();
-			double previousEnergy = previousEk + previousEs;
-			double currentEk = 0.5 * (m_totalMass/2.0) * m.getCurrentState()->getVelocity(1).squaredNorm();
-			double currentEs = 0.5 * m_springStiffness * currentDelta.squaredNorm();
-			double currentEnergy = currentEk + currentEs;
-			EXPECT_LT(currentEnergy, previousEnergy);
-
-			time += m_dt;
-		}
+		// For Euler implicit, the energy should decrease
+		runEnergyTest(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, -1);
 	}
 
 	{
 		SCOPED_TRACE("Testing energy stability for Modified Euler explicit");
 
-		MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_boundaryConditions, m_totalMass,
-			m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
-
-		m.initialize(std::make_shared<SurgSim::Framework::Runtime>());
-		m.wakeUp();
-
-		// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
-		std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
-		m.setIsGravityEnabled(false);
-
-		Vector3d initialDelta = m.getCurrentState()->getPosition(1) - m.getCurrentState()->getPosition(0);
-		double initialEk = 0.5 * (m_totalMass/2.0) * m.getCurrentState()->getVelocity(1).squaredNorm();
-		double initialEs = 0.5 * m_springStiffness * initialDelta.squaredNorm();
-		double initialEnergy = initialEk + initialEs;
-
-		// Simulate 2 seconds of virtual time
-		double time = 0.0;
-		while(time < 2.0)
-		{
-			m.beforeUpdate(m_dt);
-			m.update(m_dt);
-			m.afterUpdate(m_dt);
-
-			Vector3d previousDelta = m.getPreviousState()->getPosition(1) - m.getPreviousState()->getPosition(0);
-			Vector3d currentDelta = m.getCurrentState()->getPosition(1) - m.getCurrentState()->getPosition(0);
-
-			// Calculate previous/current system energy (kinetic energy + spring energy)
-			double previousEk = 0.5 * (m_totalMass/2.0) * m.getPreviousState()->getVelocity(1).squaredNorm();
-			double previousEs = 0.5 * m_springStiffness * previousDelta.squaredNorm();
-			double previousEnergy = previousEk + previousEs;
-			double currentEk = 0.5 * (m_totalMass/2.0) * m.getCurrentState()->getVelocity(1).squaredNorm();
-			double currentEs = 0.5 * m_springStiffness * currentDelta.squaredNorm();
-			double currentEnergy = currentEk + currentEs;
-			EXPECT_NEAR(currentEnergy, previousEnergy, 2.6e-6) << " Local diff = " << currentEnergy - previousEnergy;
-			EXPECT_NEAR(currentEnergy, initialEnergy, 3e-4) << " Global diff = " << currentEnergy - initialEnergy;
-
-			time += m_dt;
-		}
+		// For modified Euler explicit , the energy should be stable
+		runEnergyTest(SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER, 0);
 	}
 }
