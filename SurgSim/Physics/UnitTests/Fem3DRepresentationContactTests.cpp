@@ -96,11 +96,11 @@ public:
 		addTetraheadron(m_fem.get(), 0, 1, 4, 5, *state);
 
 		m_fem->setInitialState(state);
-		m_fem->initialize(std::make_shared<Runtime>());
-		m_fem->wakeUp();
-
 		m_fem->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
 		m_fem->setIsActive(true);
+
+		m_fem->initialize(std::make_shared<Runtime>());
+		m_fem->wakeUp();
 
 		// Update model by one timestep
 		m_fem->beforeUpdate(dt);

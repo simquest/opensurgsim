@@ -34,11 +34,15 @@ set(UNIT_TEST_SOURCES
 	OdeSolverTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
+	TriangleTriangleContactCalculationTests.cpp
+	TriangleTriangleIntersectionTests.cpp
 	ValidTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
 	MockObject.h
+	MockTriangle.h
+	TriangleTriangleTestParameters.h
 )
 
 set(UNIT_TEST_EIGEN_TYPE_SOURCES

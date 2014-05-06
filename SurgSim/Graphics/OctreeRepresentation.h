@@ -44,6 +44,11 @@ public:
 	/// Set the Octree of this representation. The Octree is retrieved from a Math::OctreeShape.
 	/// \param octreeShape The OctreeShape from which the octree is retrieved.
 	virtual void setOctree(const SurgSim::Math::OctreeShape& octreeShape) = 0;
+
+	/// Mark the OctreeNode visible/invisible in the given a OctreePath (typedef-ed in OctreeNode.h).
+	/// \param path An OctreePath, giving the path leads to the OctreeNode whose visibility to be changed.
+	/// \param visibility Whether or not the OctreeNode specified by 'path' is visible or not.
+	virtual	void setNodeVisible(const SurgSim::DataStructures::OctreePath& path, bool visibility) = 0;
 };
 
 }; // Graphics

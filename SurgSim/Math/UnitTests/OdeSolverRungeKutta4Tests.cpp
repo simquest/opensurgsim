@@ -41,11 +41,11 @@ TEST(OdeSolverRungeKutta4, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("OdeSolverRungeKutta4");
-		doConstructorTest<OdeSolverRungeKutta4<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doConstructorTest<OdeSolverRungeKutta4<MassPointState>>();
 	}
 	{
 		SCOPED_TRACE("OdeSolverLinearRungeKutta4");
-		doConstructorTest<OdeSolverLinearRungeKutta4<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doConstructorTest<OdeSolverLinearRungeKutta4<MassPointState>>();
 	}
 }
 
@@ -222,11 +222,11 @@ TEST(OdeSolverRungeKutta4, SolveTest)
 {
 	{
 		SCOPED_TRACE("OdeSolverRungeKutta4");
-		doSolveTest<OdeSolverRungeKutta4<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doSolveTest<OdeSolverRungeKutta4<MassPointState>>();
 	}
 	{
 		SCOPED_TRACE("OdeSolverLinearRungeKutta4");
-		doSolveTest<OdeSolverLinearRungeKutta4<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doSolveTest<OdeSolverLinearRungeKutta4<MassPointState>>();
 	}
 }
 

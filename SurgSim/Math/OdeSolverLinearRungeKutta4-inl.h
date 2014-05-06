@@ -22,21 +22,20 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State, class MT, class DT, class KT, class ST>
-OdeSolverLinearRungeKutta4<State, MT, DT, KT, ST>::OdeSolverLinearRungeKutta4(
-	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	OdeSolverRungeKutta4<State, MT, DT, KT, ST>(equation),
+template <class State>
+OdeSolverLinearRungeKutta4<State>::OdeSolverLinearRungeKutta4(OdeEquation<State>* equation)
+	: OdeSolverRungeKutta4<State>(equation),
 	m_initialized(false)
 {
 	m_name = "Ode Solver Linear Runge Kutta 4";
 }
 
-template <class State, class MT, class DT, class KT, class ST>
-void OdeSolverLinearRungeKutta4<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+template <class State>
+void OdeSolverLinearRungeKutta4<State>::solve(double dt, const State& currentState, State* newState)
 {
 	if (!m_initialized)
 	{
-		OdeSolverRungeKutta4<State, MT, DT, KT, ST>::solve(dt, currentState, newState);
+		OdeSolverRungeKutta4<State>::solve(dt, currentState, newState);
 		m_initialized = true;
 	}
 	else

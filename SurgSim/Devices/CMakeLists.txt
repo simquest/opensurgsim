@@ -19,6 +19,7 @@ add_subdirectory(Keyboard)
 add_subdirectory(Mouse)
 
 set(DEVICES
+	LabJack
 	MultiAxis
 	Novint
 	Phantom

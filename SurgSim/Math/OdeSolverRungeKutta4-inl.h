@@ -22,16 +22,15 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State, class MT, class DT, class KT, class ST>
-OdeSolverRungeKutta4<State, MT, DT, KT, ST>::OdeSolverRungeKutta4(
-	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	OdeSolver<State, MT, DT, KT, ST>(equation)
+template <class State>
+OdeSolverRungeKutta4<State>::OdeSolverRungeKutta4(OdeEquation<State>* equation)
+	: OdeSolver<State>(equation)
 {
 	m_name = "Ode Solver Runge Kutta 4";
 }
 
-template <class State, class MT, class DT, class KT, class ST>
-void OdeSolverRungeKutta4<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+template <class State>
+void OdeSolverRungeKutta4<State>::solve(double dt, const State& currentState, State* newState)
 {
 	// General equation to solve:
 	//   M.a(t) = F(t, x(t), v(t)), which is an ode of order 2 that can be reduced to an ode of order 1:
@@ -47,29 +46,29 @@ void OdeSolverRungeKutta4<State, MT, DT, KT, ST>::solve(double dt, const State& 
 	// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
 
 	// Computes M
-	const MT& M = m_equation.computeM(currentState);
+	const Matrix& M = m_equation.computeM(currentState);
 
 	// 1st evaluate k1 (note that y(n) is currentState)
 	m_k1.position = currentState.getVelocities();
-	m_solveAndInverse(M, m_equation.computeF(currentState), &m_k1.velocity, &(m_compliance));
+	(*m_linearSolver)(M, m_equation.computeF(currentState), &m_k1.velocity, &(m_compliance));
 
 	// 2nd evaluate k2
 	newState->getPositions()  = currentState.getPositions()  + m_k1.position * dt / 2.0;
 	newState->getVelocities() = currentState.getVelocities() + m_k1.velocity * dt / 2.0;
 	m_k2.position = newState->getVelocities();
-	m_solveAndInverse(M, m_equation.computeF(*newState), &m_k2.velocity, &(m_compliance));
+	(*m_linearSolver)(M, m_equation.computeF(*newState), &m_k2.velocity, &(m_compliance));
 
 	// 3rd evaluate k3
 	newState->getPositions()  = currentState.getPositions()  + m_k2.position * dt / 2.0;
 	newState->getVelocities() = currentState.getVelocities() + m_k2.velocity * dt / 2.0;
 	m_k3.position = newState->getVelocities();
-	m_solveAndInverse(M, m_equation.computeF(*newState), &m_k3.velocity, &(m_compliance));
+	(*m_linearSolver)(M, m_equation.computeF(*newState), &m_k3.velocity, &(m_compliance));
 
 	// 4th evaluate k4
 	newState->getPositions()  = currentState.getPositions()  + m_k3.position * dt;
 	newState->getVelocities() = currentState.getVelocities() + m_k3.velocity * dt;
 	m_k4.position = newState->getVelocities();
-	m_solveAndInverse(M, m_equation.computeF(*newState), &m_k4.velocity, &(m_compliance));
+	(*m_linearSolver)(M, m_equation.computeF(*newState), &m_k4.velocity, &(m_compliance));
 
 	// Compute the new state using Runge Kutta 4 integration scheme:
 	newState->getPositions()  = currentState.getPositions();
@@ -78,7 +77,7 @@ void OdeSolverRungeKutta4<State, MT, DT, KT, ST>::solve(double dt, const State& 
 	newState->getVelocities() += (m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
 
 	// Computes the system matrix and compliance matrix
-	m_systemMatrix = M * (1.0 / dt);
+	m_systemMatrix = M / dt;
 	m_compliance *= dt;
 }
 

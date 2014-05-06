@@ -27,13 +27,13 @@ namespace Math
 /// Linear Version of the Runge Kutta 4 ode solver
 /// This solver assumes that the system is linear, ie that Mass,
 /// Damping, and Stiffness matrices do not change.
-template <class State, class MT, class DT, class KT, class ST>
-class OdeSolverLinearRungeKutta4 : public OdeSolverRungeKutta4<State, MT, DT, KT, ST>
+template <class State>
+class OdeSolverLinearRungeKutta4 : public OdeSolverRungeKutta4<State>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverLinearRungeKutta4(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverLinearRungeKutta4(OdeEquation<State>* equation);
 
 	virtual void solve(double dt, const State& currentState, State* newState) override;
 
@@ -42,15 +42,15 @@ private:
 
 public:
 	// Variables used from OdeSolver
-	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
-	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
-	using OdeSolver<State, MT, DT, KT, ST>::m_name;
+	using OdeSolver<State>::m_compliance;
+	using OdeSolver<State>::m_equation;
+	using OdeSolver<State>::m_name;
 
-	using OdeSolverRungeKutta4<State, MT, DT, KT, ST>::m_force;
-	using OdeSolverRungeKutta4<State, MT, DT, KT, ST>::m_k1;
-	using OdeSolverRungeKutta4<State, MT, DT, KT, ST>::m_k2;
-	using OdeSolverRungeKutta4<State, MT, DT, KT, ST>::m_k3;
-	using OdeSolverRungeKutta4<State, MT, DT, KT, ST>::m_k4;
+	using OdeSolverRungeKutta4<State>::m_force;
+	using OdeSolverRungeKutta4<State>::m_k1;
+	using OdeSolverRungeKutta4<State>::m_k2;
+	using OdeSolverRungeKutta4<State>::m_k3;
+	using OdeSolverRungeKutta4<State>::m_k4;
 };
 
 }; // namespace Math

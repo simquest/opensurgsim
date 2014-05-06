@@ -29,8 +29,7 @@ namespace Physics
 {
 
 /// Finite Element Model 3D is a fem built with 3D FemElement
-class Fem3DRepresentation:
-	public FemRepresentation<SurgSim::Math::Matrix, SurgSim::Math::Matrix, SurgSim::Math::Matrix, SurgSim::Math::Matrix>
+class Fem3DRepresentation : public FemRepresentation
 {
 public:
 	/// Constructor

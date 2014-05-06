@@ -19,7 +19,6 @@
 #include <array>
 
 #include "SurgSim/Math/OdeSolver.h"
-#include "SurgSim/Math/LinearSolveAndInverse.h"
 
 namespace SurgSim
 {
@@ -42,21 +41,17 @@ namespace Math
 /// \note k3 = f(t+dt/2, y(n) + k2.dt/2)
 /// \note k4 = f(t+dt  , y(n) + k3.dt)
 /// \tparam State Type of the state y=(x v)
-/// \tparam MT Type of the matrix M
-/// \tparam DT Type of the matrix D
-/// \tparam KT Type of the matrix K
-/// \tparam ST Type of the system matrix (linear combination of M, D, K)
 /// \note State is expected to hold on to the dof derivatives and have the API:
 /// \note   Vector& getPositions();
 /// \note   Vector& getVelocities();
 /// \note   Vector& getAccelerations();
-template <class State, class MT, class DT, class KT, class ST>
-class OdeSolverRungeKutta4 : public OdeSolver<State, MT, DT, KT, ST>
+template <class State>
+class OdeSolverRungeKutta4 : public OdeSolver<State>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverRungeKutta4(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverRungeKutta4(OdeEquation<State>* equation);
 
 	/// Solves the equation
 	/// \param dt The time step
@@ -79,16 +74,12 @@ protected:
 	/// Runge kutta 4 intermediate system evaluations
 	RungeKuttaState m_k1, m_k2, m_k3, m_k4;
 
-private:
-	/// Helper class to solve and inverse a system of linear equations
-	/// Optimized with the matrix type
-	SolveAndInverse<MT> m_solveAndInverse;
-
 public:
-	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
-	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
-	using OdeSolver<State, MT, DT, KT, ST>::m_name;
-	using OdeSolver<State, MT, DT, KT, ST>::m_systemMatrix;
+	using OdeSolver<State>::m_compliance;
+	using OdeSolver<State>::m_equation;
+	using OdeSolver<State>::m_linearSolver;
+	using OdeSolver<State>::m_name;
+	using OdeSolver<State>::m_systemMatrix;
 };
 
 }; // namespace Math
