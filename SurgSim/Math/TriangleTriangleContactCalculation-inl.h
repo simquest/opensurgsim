@@ -229,14 +229,8 @@ bool calculateContactTriangleTriangle(
 {
 	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
 
-	// Check for degenerate triangle.
-	if (t0n.isZero() || t1n.isZero())
-	{
-		return false;
-	}
-
 	// Check if the triangles intersect.
-	if (!checkTriangleTriangleIntersection(t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t0n, t1n))
+	if (!doesIntersectTriangleTriangle(t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t0n, t1n))
 	{
 		return false;
 	}

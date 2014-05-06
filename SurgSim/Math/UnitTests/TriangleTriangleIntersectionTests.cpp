@@ -25,59 +25,24 @@ namespace Math
 
 class TriangleTriangleIntersectionTest : public ::testing::Test, public TriangleTriangleTestParameters
 {
-protected:
-	void testTriangleTriangleIntersection(const TriangleTriangleTestCase& data)
-	{
-		SCOPED_TRACE(std::get<0>(data));
-
-		MockTriangle t0 = std::get<1>(data);
-		MockTriangle t1 = std::get<2>(data);
-		bool intersectionExpected = std::get<3>(data);
-
-		bool intersectionFound = false;
-		std::string traceMessage[6] = {"Normal Test",
-									   "Shift t0 edges once",
-									   "Shift t0 edges twice",
-									   "Switched triangles: Normal Test",
-									   "Switched triangles: Shift t1 edges once",
-									   "Switched triangles: Shift t1 edges twise"
-									  };
-		for (int count = 0; count < 6; ++count)
-		{
-			SCOPED_TRACE(traceMessage[count]);
-
-			switch (count)
-			{
-			case 0:
-				intersectionFound = checkTriangleTriangleIntersection(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2);
-				break;
-			case 1:
-				intersectionFound = checkTriangleTriangleIntersection(t0.v1, t0.v2, t0.v0, t1.v0, t1.v1, t1.v2);
-				break;
-			case 2:
-				intersectionFound = checkTriangleTriangleIntersection(t0.v2, t0.v0, t0.v1, t1.v0, t1.v1, t1.v2);
-				break;
-			case 3:
-				intersectionFound = checkTriangleTriangleIntersection(t1.v0, t1.v1, t1.v2, t0.v0, t0.v1, t0.v2);
-				break;
-			case 4:
-				intersectionFound = checkTriangleTriangleIntersection(t1.v1, t1.v2, t1.v0, t0.v0, t0.v1, t0.v2);
-				break;
-			case 5:
-				intersectionFound = checkTriangleTriangleIntersection(t1.v2, t1.v0, t1.v1, t0.v0, t0.v1, t0.v2);
-				break;
-			}
-
-			EXPECT_EQ(intersectionExpected, intersectionFound);
-		}
-	}
 };
 
 TEST_F(TriangleTriangleIntersectionTest, TestCases)
 {
 	for (auto it = m_testCases.begin(); it != m_testCases.end(); ++it)
 	{
-		testTriangleTriangleIntersection(*it);
+		SCOPED_TRACE(std::get<0>(*it));
+
+		MockTriangle t0 = std::get<1>(*it);
+		MockTriangle t1 = std::get<2>(*it);
+		bool intersectionExpected = std::get<3>(*it);
+
+		EXPECT_EQ(intersectionExpected, doesIntersectTriangleTriangle(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2));
+		EXPECT_EQ(intersectionExpected, doesIntersectTriangleTriangle(t0.v1, t0.v2, t0.v0, t1.v0, t1.v1, t1.v2));
+		EXPECT_EQ(intersectionExpected, doesIntersectTriangleTriangle(t0.v2, t0.v0, t0.v1, t1.v0, t1.v1, t1.v2));
+		EXPECT_EQ(intersectionExpected, doesIntersectTriangleTriangle(t1.v0, t1.v1, t1.v2, t0.v0, t0.v1, t0.v2));
+		EXPECT_EQ(intersectionExpected, doesIntersectTriangleTriangle(t1.v1, t1.v2, t1.v0, t0.v0, t0.v1, t0.v2));
+		EXPECT_EQ(intersectionExpected, doesIntersectTriangleTriangle(t1.v2, t1.v0, t1.v1, t0.v0, t0.v1, t0.v2));
 	}
 }
 

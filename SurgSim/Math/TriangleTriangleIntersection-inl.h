@@ -95,7 +95,7 @@ void edgeIntersection(T dStart, T dEnd, T pvStart, T pvEnd, T* parametricInterse
 }
 
 template <class T, int MOpt> inline
-bool checkTriangleTriangleIntersection(
+bool doesIntersectTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
@@ -188,7 +188,7 @@ bool checkTriangleTriangleIntersection(
 
 
 template <class T, int MOpt> inline
-bool checkTriangleTriangleIntersection(
+bool doesIntersectTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
@@ -205,7 +205,7 @@ bool checkTriangleTriangleIntersection(
 	}
 	t0n.normalize();
 	t1n.normalize();
-	return checkTriangleTriangleIntersection(t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t0n, t1n);
+	return doesIntersectTriangleTriangle(t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t0n, t1n);
 }
 
 

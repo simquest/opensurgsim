@@ -1451,7 +1451,7 @@ void intersectionsSegmentBox(
 /// \param t1n Normal of the second triangle, should be normalized.
 /// \return True, if intersection is detected.
 template <class T, int MOpt> inline
-bool checkTriangleTriangleIntersection(
+bool doesIntersectTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
@@ -1468,7 +1468,7 @@ bool checkTriangleTriangleIntersection(
 /// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
 /// \return True, if intersection is detected.
 template <class T, int MOpt> inline
-bool checkTriangleTriangleIntersection(
+bool doesIntersectTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
