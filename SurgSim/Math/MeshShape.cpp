@@ -43,7 +43,9 @@ void MeshShape::setFileName(const std::string& fileName)
 {
 	using SurgSim::DataStructures::TriangleMesh;
 	m_fileName = fileName;
+
 	m_mesh = std::make_shared<TriangleMesh>(*SurgSim::DataStructures::loadTriangleMesh(fileName));
+	computeVolumeIntegrals();
 }
 
 std::string MeshShape::getFileName() const
