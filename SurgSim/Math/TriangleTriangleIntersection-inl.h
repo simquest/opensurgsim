@@ -94,30 +94,20 @@ void edgeIntersection(T dStart, T dEnd, T pvStart, T pvEnd, T* parametricInterse
 	}
 }
 
-/// Check if the two triangles intersect using separating axis test.
-/// Algorithm is implemented from http://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tritri.pdf
-///
-/// \tparam T		Accuracy of the calculation, can usually be inferred.
-/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
-/// \param t1v0,t1v1,t1v2 Vertices of the first triangle.
-/// \param t2v0,t2v1,t2v2 Vertices of the second triangle.
-/// \param t1n Normal of the first triangle, should be normalized.
-/// \param t2n Normal of the second triangle, should be normalized.
-/// \return True, if intersection is detected.
 template <class T, int MOpt> inline
 bool checkTriangleTriangleIntersection(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v0,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v2,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2n)
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0n,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1n)
 {
 	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
 
-	if (t1n.isZero() || t2n.isZero())
+	if (t0n.isZero() || t1n.isZero())
 	{
 		// Degenerate triangle(s) passed to checkTriangleTriangleIntersection.
 		return false;
@@ -127,8 +117,8 @@ bool checkTriangleTriangleIntersection(
 	static const T EPSILON = T(Geometry::DistanceEpsilon);
 
 	// Variable names mentioned here are the notations used in the paper:
-	// T1		- Triangle with vertices (t1v0, t1v1, t1v2).
-	// T2		- Triangle with vertices (t2v0, t2v1, t2v2).
+	// T1		- Triangle with vertices (t0v0, t0v1, t0v2).
+	// T2		- Triangle with vertices (t1v0, t1v1, t1v2).
 	// d1[3]	- Signed distances of the vertices of T1 from the plane of T2.
 	// d2[3]	- Signed distances of the vertices of T2 from the plane of T1.
 	// D		- Separating axis used for the test. This is calculated as the cross products of the triangle normals.
@@ -148,8 +138,8 @@ bool checkTriangleTriangleIntersection(
 	// there is no intersection.
 
 	// Check if all the vertices of T2 are on one side of p1.
-	Plane<T, MOpt> p1(t1n, t1v0);
-	Vector3 d2(p1.signedDistanceFrom(t2v0), p1.signedDistanceFrom(t2v1), p1.signedDistanceFrom(t2v2));
+	Plane<T, MOpt> p1(t0n, t0v0);
+	Vector3 d2(p1.signedDistanceFrom(t1v0), p1.signedDistanceFrom(t1v1), p1.signedDistanceFrom(t1v2));
 
 	if ((d2.array() <= EPSILON).all() || (d2.array() >= -EPSILON).all())
 	{
@@ -157,8 +147,8 @@ bool checkTriangleTriangleIntersection(
 	}
 
 	// Check if all the vertices of T1 are on one side of p2.
-	Plane<T, MOpt> p2(t2n, t2v0);
-	Vector3 d1(p2.signedDistanceFrom(t1v0), p2.signedDistanceFrom(t1v1), p2.signedDistanceFrom(t1v2));
+	Plane<T, MOpt> p2(t1n, t1v0);
+	Vector3 d1(p2.signedDistanceFrom(t0v0), p2.signedDistanceFrom(t0v1), p2.signedDistanceFrom(t0v2));
 
 	if ((d1.array() <= EPSILON).all() || (d1.array() >= -EPSILON).all())
 	{
@@ -166,11 +156,11 @@ bool checkTriangleTriangleIntersection(
 	}
 
 	// The separating axis.
-	Vector3 D = t1n.cross(t2n);
+	Vector3 D = t0n.cross(t1n);
 
 	// Projection of the triangle vertices on the separating axis.
-	Vector3 pv1(D.dot(t1v0), D.dot(t1v1), D.dot(t1v2));
-	Vector3 pv2(D.dot(t2v0), D.dot(t2v1), D.dot(t2v2));
+	Vector3 pv1(D.dot(t0v0), D.dot(t0v1), D.dot(t0v2));
+	Vector3 pv2(D.dot(t1v0), D.dot(t1v1), D.dot(t1v2));
 
 	// The intersection of the triangles with the separating axis (D).
 	T s1[3];
@@ -196,31 +186,26 @@ bool checkTriangleTriangleIntersection(
 		   !(s1[0] >= s2[0] && s1[0] >= s2[1] && s1[1] >= s2[0] && s1[1] >= s2[1]);
 }
 
-/// Check if the two triangles intersect using separating axis test.
-/// \tparam T		Accuracy of the calculation, can usually be inferred.
-/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
-/// \param t1v0,t1v1,t1v2 Vertices of the first triangle.
-/// \param t2v0,t2v1,t2v2 Vertices of the second triangle.
-/// \return True, if intersection is detected.
+
 template <class T, int MOpt> inline
 bool checkTriangleTriangleIntersection(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v0,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v2)
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2)
 {
+	Eigen::Matrix<T, 3, 1, MOpt> t0n = (t0v1 - t0v0).cross(t0v2 - t0v0);
 	Eigen::Matrix<T, 3, 1, MOpt> t1n = (t1v1 - t1v0).cross(t1v2 - t1v0);
-	Eigen::Matrix<T, 3, 1, MOpt> t2n = (t2v1 - t2v0).cross(t2v2 - t2v0);
-	if (t1n.isZero() || t2n.isZero())
+	if (t0n.isZero() || t1n.isZero())
 	{
 		// Degenerate triangle(s) passed to checkTriangleTriangleIntersection.
 		return false;
 	}
+	t0n.normalize();
 	t1n.normalize();
-	t2n.normalize();
-	return checkTriangleTriangleIntersection(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2, t1n, t2n);
+	return checkTriangleTriangleIntersection(t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t0n, t1n);
 }
 
 

@@ -1445,36 +1445,36 @@ void intersectionsSegmentBox(
 ///
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
-/// \param t1v0,t1v1,t1v2 Vertices of the first triangle.
-/// \param t2v0,t2v1,t2v2 Vertices of the second triangle.
-/// \param t1n Normal of the first triangle, should be normalized.
-/// \param t2n Normal of the second triangle, should be normalized.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
+/// \param t0n Normal of the first triangle, should be normalized.
+/// \param t1n Normal of the second triangle, should be normalized.
 /// \return True, if intersection is detected.
 template <class T, int MOpt> inline
 bool checkTriangleTriangleIntersection(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v0,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v2,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2n);
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0n,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1n);
 
 /// Check if the two triangles intersect using separating axis test.
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
-/// \param t1v0,t1v1,t1v2 Vertices of the first triangle.
-/// \param t2v0,t2v1,t2v2 Vertices of the second triangle.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
 /// \return True, if intersection is detected.
 template <class T, int MOpt> inline
 bool checkTriangleTriangleIntersection(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v0,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& t2v2);
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2);
 
 /// Calculate the contact between two triangles.
 /// Algorithm presented in
