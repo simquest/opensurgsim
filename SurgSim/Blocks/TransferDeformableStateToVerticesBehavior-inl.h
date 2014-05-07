@@ -16,9 +16,9 @@
 #ifndef SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_INL_H
 #define SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_INL_H
 
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-#include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Math/OdeState.h"
 
 namespace SurgSim
 {
@@ -29,7 +29,7 @@ namespace Blocks
 template <class VertexData>
 TransferDeformableStateToVerticesBehavior<VertexData>::TransferDeformableStateToVerticesBehavior(
 	const std::string& name,
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> from,
+	std::shared_ptr<SurgSim::Math::OdeState> from,
 	std::shared_ptr<SurgSim::DataStructures::Vertices<VertexData>> to) :
 	SurgSim::Framework::Behavior(name),
 	m_from(from),

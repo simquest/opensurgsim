@@ -21,7 +21,6 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
@@ -30,7 +29,6 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::LinearSpring;
 using SurgSim::Physics::MassSpringRepresentation;
 using SurgSim::Physics::MockMassSpring;

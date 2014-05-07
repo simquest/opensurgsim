@@ -81,7 +81,6 @@ TEST(MassSpring1DRepresentationTests, init1DTest)
 	// States should contains expected values
 	Vector3d delta = (extremities[1] - extremities[0]) / (numNodesPerDim[0] - 1);
 	EXPECT_TRUE(m.getFinalState()->getVelocities().isZero());
-	EXPECT_TRUE(m.getFinalState()->getAccelerations().isZero());
 	EXPECT_FALSE(m.getFinalState()->getPositions().isZero());
 	for (unsigned int nodeId = 0; nodeId < numNodesPerDim[0]; nodeId++)
 	{

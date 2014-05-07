@@ -16,7 +16,6 @@
 #include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
 
 #include "SurgSim/Physics/LinearSpring.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 
 namespace SurgSim
 {
@@ -25,7 +24,7 @@ namespace Blocks
 {
 
 std::shared_ptr<SurgSim::Physics::LinearSpring> createLinearSpring(
-	const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
+	const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int nodeId0, unsigned int nodeId1,
 	double stiffness, double damping)
 {

@@ -13,14 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
-
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/DeformableRepresentation.h"
 
 namespace
 {

@@ -19,12 +19,10 @@
 #include <array>
 
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
 
 using SurgSim::Physics::FemElement3DTetrahedron;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
@@ -70,7 +68,7 @@ public:
 		return m_x0;
 	}
 
-	void setupInitialParams(const DeformableRepresentationState &state,
+	void setupInitialParams(const SurgSim::Math::OdeState &state,
 							double massDensity,
 							double poissonRatio,
 							double youngModulus)
@@ -86,7 +84,7 @@ class FemElement3DTetrahedronTests : public ::testing::Test
 {
 public:
 	std::array<unsigned int, 4> m_nodeIds;
-	DeformableRepresentationState m_restState;
+	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
 	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_expectedX0;
 	double m_rho, m_E, m_nu;

@@ -32,7 +32,6 @@ using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem2DRepresentation;
 using SurgSim::Physics::FemElement2DTriangle;
 
@@ -64,7 +63,7 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 	// Angle between 2 consecutive nodes on a cross-section
 	const double deltaAngle = 2.0 * M_PI / numNodesOnSection;
 
-	std::shared_ptr<DeformableRepresentationState> restState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> restState = std::make_shared<SurgSim::Math::OdeState>();
 	restState->setNumDof(physicsRepresentation->getNumDofPerNode(), numNodes);
 
 	// Sets the initial state (node positions and boundary conditions)

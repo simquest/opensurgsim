@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Math/Geometry.h"
 
@@ -68,7 +67,7 @@ double LinearSpring::getRestLength() const
 	return m_restLength;
 }
 
-void LinearSpring::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale)
+void LinearSpring::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
 {
 	const Vector& x = state.getPositions();
 	const Vector& v = state.getVelocities();
@@ -95,7 +94,7 @@ void LinearSpring::addForce(const DeformableRepresentationState& state, SurgSim:
 	addSubVector(-f, m_nodeIds[1], 3, F);
 }
 
-void LinearSpring::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D, double scale)
+void LinearSpring::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale)
 {
 	const Vector& x = state.getPositions();
 	Vector3d u = getSubVector(x, m_nodeIds[1], 3) - getSubVector(x, m_nodeIds[0], 3);
@@ -116,7 +115,7 @@ void LinearSpring::addDamping(const DeformableRepresentationState& state, SurgSi
 	addSubMatrix( D00, m_nodeIds[1], m_nodeIds[1], 3, 3, D);
 }
 
-void LinearSpring::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K, double scale)
+void LinearSpring::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale)
 {
 	const Vector& x = state.getPositions();
 	const Vector& v = state.getVelocities();
@@ -148,7 +147,7 @@ void LinearSpring::addStiffness(const DeformableRepresentationState& state, Surg
 	addSubMatrix( K00, m_nodeIds[1], m_nodeIds[1], 3, 3, K);
 }
 
-void LinearSpring::addFDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+void LinearSpring::addFDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
 							   SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K)
 {
 	const Vector& x = state.getPositions();
@@ -190,7 +189,7 @@ void LinearSpring::addFDK(const DeformableRepresentationState& state, SurgSim::M
 	addSubVector(-f, m_nodeIds[1], 3, F);
 }
 
-void LinearSpring::addMatVec(const DeformableRepresentationState& state, double alphaD, double alphaK,
+void LinearSpring::addMatVec(const SurgSim::Math::OdeState& state, double alphaD, double alphaK,
 							 const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* F)
 {
 	// Premature return if both factors are zero

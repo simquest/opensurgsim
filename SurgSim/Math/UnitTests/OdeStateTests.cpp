@@ -17,61 +17,58 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Math/OdeState.h"
 
-using SurgSim::Physics::DeformableRepresentationState;
+using SurgSim::Math::OdeState;
 
 namespace
 {
 	const double epsilon = 1e-10;
 };
 
-TEST(DeformableRepresentationStateTest, ConstructorTest)
+TEST(OdeStateTest, ConstructorTest)
 {
 	// Test the constructor normally
-	ASSERT_NO_THROW( {DeformableRepresentationState state;});
+	ASSERT_NO_THROW({OdeState state;});
 
 	// Test the object creation through the operator new
 	// Eigen needs special care with fixed-size matrix member variables of a class created dynamically via new.
 	// We are using non fixed-size matrix, so it should be all fine...this is just to make sure.
-	ASSERT_NO_THROW( {DeformableRepresentationState* state = new DeformableRepresentationState; delete state; });
+	ASSERT_NO_THROW({OdeState* state = new OdeState; delete state; });
 
 	// Test the object creation through the operator new []
 	// Eigen needs special care with fixed-size matrix member variables of a class created dynamically via new [].
 	// We are using non fixed-size matrix, so it should be all fine...this is just to make sure.
-	ASSERT_NO_THROW( {DeformableRepresentationState* state = new DeformableRepresentationState[10]; delete [] state; });
+	ASSERT_NO_THROW({OdeState* state = new OdeState[10]; delete [] state; });
 
 	// Test the object creation through std::shared_ptr
 	// Eigen needs special care with fixed-size matrix member variables of a class created dynamically via new.
 	// We are using non fixed-size matrix, so it should be all fine...this is just to make sure.
-	ASSERT_NO_THROW( {std::shared_ptr<DeformableRepresentationState> state = \
-		std::make_shared<DeformableRepresentationState>();});
+	ASSERT_NO_THROW({std::shared_ptr<OdeState> state = std::make_shared<OdeState>();});
 }
 
-TEST(DeformableRepresentationStateTest, AllocateTest)
+TEST(OdeStateTest, AllocateTest)
 {
-	DeformableRepresentationState state;
+	OdeState state;
 	EXPECT_EQ(0u, state.getNumDof());
 	EXPECT_EQ(0u, state.getNumNodes());
 	EXPECT_EQ(0u, state.getNumBoundaryConditions());
 	EXPECT_EQ(static_cast<std::vector<unsigned int>::size_type>(0), state.getBoundaryConditions().size());
 	EXPECT_EQ(0, state.getPositions().size());
 	EXPECT_EQ(0, state.getVelocities().size());
-	EXPECT_EQ(0, state.getAccelerations().size());
 
 	ASSERT_NO_THROW(state.setNumDof(3u, 3u));
 	EXPECT_EQ(9u, state.getNumDof());
 	EXPECT_EQ(3u, state.getNumNodes());
 	EXPECT_EQ(9, state.getPositions().size());
 	EXPECT_EQ(9, state.getVelocities().size());
-	EXPECT_EQ(9, state.getAccelerations().size());
 	EXPECT_EQ(0u , state.getNumBoundaryConditions());
 	EXPECT_EQ(static_cast<std::vector<unsigned int>::size_type>(0) , state.getBoundaryConditions().size());
 }
 
-TEST(DeformableRepresentationStateTest, GetPositionsTest)
+TEST(OdeStateTest, GetPositionsTest)
 {
-	DeformableRepresentationState state1, state2;
+	OdeState state1, state2;
 	state1.setNumDof(3u, 3u);
 	state2.setNumDof(3u, 3u);
 	for(unsigned int i = 0; i < state1.getNumDof(); i++)
@@ -98,9 +95,9 @@ TEST(DeformableRepresentationStateTest, GetPositionsTest)
 	EXPECT_EQ(state2.getPositions(), state1.getPositions());
 }
 
-TEST(DeformableRepresentationStateTest, GetVelocitiesTest)
+TEST(OdeStateTest, GetVelocitiesTest)
 {
-	DeformableRepresentationState state1, state2;
+	OdeState state1, state2;
 	state1.setNumDof(3u, 3u);
 	state2.setNumDof(3u, 3u);
 	for(unsigned int i = 0; i < state1.getNumDof(); i++)
@@ -127,38 +124,9 @@ TEST(DeformableRepresentationStateTest, GetVelocitiesTest)
 	EXPECT_EQ(state2.getVelocities(), state1.getVelocities());
 }
 
-TEST(DeformableRepresentationStateTest, GetAccelerationsTest)
+TEST(OdeStateTest, AddGetIsBoundaryConditionsTest)
 {
-	DeformableRepresentationState state1, state2;
-	state1.setNumDof(3u, 3u);
-	state2.setNumDof(3u, 3u);
-	for(unsigned int i = 0; i < state1.getNumDof(); i++)
-	{
-		state1.getAccelerations()[i] = static_cast<double>(i);
-		state2.getAccelerations()[i] = 0.0;
-	}
-	// state1.m_a contains (0 1 2 3 4 5 6 7 8 9 10) & state2.m_a contains (0 0 0 0 0 0 0 0 0 0 0)
-	EXPECT_NE(state2.getAccelerations(), state1.getAccelerations());
-	state2.getAccelerations() = state1.getAccelerations();
-	// state1.m_a contains (0 1 2 3 4 5 6 7 8 9 10) & state2.m_a contains (0 1 2 3 4 5 6 7 8 9 10)
-	EXPECT_EQ(state2.getAccelerations(), state1.getAccelerations());
-
-	state1.reset();
-	// state1.m_a contains (0 0 0 0 0 0 0 0 0 0 0) & state2.m_a contains (0 1 2 3 4 5 6 7 8 9 10)
-	for(unsigned int i = 0; i < state1.getNumDof(); i++)
-	{
-		EXPECT_EQ(0.0, state1.getAccelerations()[i]);
-		EXPECT_EQ(static_cast<double>(i), state2.getAccelerations()[i]);
-	}
-
-	state2.reset();
-	// state1.m_a contains (0 0 0 0 0 0 0 0 0 0 0) & state2.m_a contains (0 0 0 0 0 0 0 0 0 0 0)
-	EXPECT_EQ(state2.getAccelerations(), state1.getAccelerations());
-}
-
-TEST(DeformableRepresentationStateTest, AddGetIsBoundaryConditionsTest)
-{
-	DeformableRepresentationState state;
+	OdeState state;
 	state.setNumDof(3u, 2u);
 
 	state.addBoundaryCondition(0);
@@ -179,10 +147,8 @@ TEST(DeformableRepresentationStateTest, AddGetIsBoundaryConditionsTest)
 	EXPECT_EQ(0u, state.getBoundaryConditions()[0]);
 	EXPECT_EQ(6, state.getPositions().size());
 	EXPECT_EQ(6, state.getVelocities().size());
-	EXPECT_EQ(6, state.getAccelerations().size());
 	EXPECT_TRUE(state.getPositions().isZero());
 	EXPECT_TRUE(state.getVelocities().isZero());
-	EXPECT_TRUE(state.getAccelerations().isZero());
 
 	state.addBoundaryCondition(2);
 	EXPECT_EQ(6u, state.getNumDof());
@@ -203,10 +169,8 @@ TEST(DeformableRepresentationStateTest, AddGetIsBoundaryConditionsTest)
 	}
 	EXPECT_EQ(6, state.getPositions().size());
 	EXPECT_EQ(6, state.getVelocities().size());
-	EXPECT_EQ(6, state.getAccelerations().size());
 	EXPECT_TRUE(state.getPositions().isZero());
 	EXPECT_TRUE(state.getVelocities().isZero());
-	EXPECT_TRUE(state.getAccelerations().isZero());
 
 	state.addBoundaryCondition(4);
 	EXPECT_EQ(6u, state.getNumDof());
@@ -228,22 +192,19 @@ TEST(DeformableRepresentationStateTest, AddGetIsBoundaryConditionsTest)
 	}
 	EXPECT_EQ(6, state.getPositions().size());
 	EXPECT_EQ(6, state.getVelocities().size());
-	EXPECT_EQ(6, state.getAccelerations().size());
 	EXPECT_TRUE(state.getPositions().isZero());
 	EXPECT_TRUE(state.getVelocities().isZero());
-	EXPECT_TRUE(state.getAccelerations().isZero());
 }
 
-TEST(DeformableRepresentationStateTest, ResetTest)
+TEST(OdeStateTest, ResetTest)
 {
-	DeformableRepresentationState state1, state2;
+	OdeState state1, state2;
 	state1.setNumDof(3u, 3u);
 	state2.setNumDof(3u, 3u);
 	for(unsigned int i = 0; i < state1.getNumDof(); i++)
 	{
 		state1.getPositions()[i] = static_cast<double>(i);
 		state1.getVelocities()[i] = 2.0*static_cast<double>(i);
-		state1.getAccelerations()[i] = 4.0*static_cast<double>(i);
 	}
 	state1.addBoundaryCondition(0);
 	state1.addBoundaryCondition(state1.getNumDof() - 1);
@@ -255,26 +216,24 @@ TEST(DeformableRepresentationStateTest, ResetTest)
 	EXPECT_EQ(3u, state1.getNumNodes());
 	EXPECT_TRUE(state1.getPositions().isZero());
 	EXPECT_TRUE(state1.getVelocities().isZero());
-	EXPECT_TRUE(state1.getAccelerations().isZero());
 	EXPECT_EQ(0u, state1.getNumBoundaryConditions());
 	EXPECT_EQ(static_cast<std::vector<unsigned int>::size_type>(0), state1.getBoundaryConditions().size());
 }
 
-TEST(DeformableRepresentationStateTest, CopyConstructorAndAssignmentTest)
+TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 {
-	DeformableRepresentationState state, stateAssigned;
+	OdeState state, stateAssigned;
 	state.setNumDof(3u, 3u);
 	for(unsigned int i = 0; i < state.getNumDof(); i++)
 	{
 		state.getPositions()[i] = static_cast<double>(i);
 		state.getVelocities()[i] = 2.0*static_cast<double>(i);
-		state.getAccelerations()[i] = 4.0*static_cast<double>(i);
 	}
 	state.addBoundaryCondition(0);
 	state.addBoundaryCondition(state.getNumDof() - 1);
 
 	{
-		DeformableRepresentationState stateCopied(state);
+		OdeState stateCopied(state);
 
 		ASSERT_EQ(9u, stateCopied.getNumDof());
 		ASSERT_EQ(state.getNumDof(), stateCopied.getNumDof());
@@ -282,8 +241,6 @@ TEST(DeformableRepresentationStateTest, CopyConstructorAndAssignmentTest)
 		ASSERT_EQ(state.getPositions().size(), stateCopied.getPositions().size());
 		ASSERT_EQ(9, stateCopied.getVelocities().size());
 		ASSERT_EQ(state.getVelocities().size(), stateCopied.getVelocities().size());
-		ASSERT_EQ(9, stateCopied.getAccelerations().size());
-		ASSERT_EQ(state.getAccelerations().size(), stateCopied.getAccelerations().size());
 
 		for(unsigned int i = 0; i < stateCopied.getNumDof(); i++)
 		{
@@ -291,8 +248,6 @@ TEST(DeformableRepresentationStateTest, CopyConstructorAndAssignmentTest)
 			EXPECT_NEAR(static_cast<double>(i), stateCopied.getPositions()[i], epsilon);
 			EXPECT_NEAR(state.getVelocities()[i], stateCopied.getVelocities()[i], epsilon);
 			EXPECT_NEAR(2.0*static_cast<double>(i), stateCopied.getVelocities()[i], epsilon);
-			EXPECT_NEAR(state.getAccelerations()[i], stateCopied.getAccelerations()[i], epsilon);
-			EXPECT_NEAR(4.0*static_cast<double>(i), stateCopied.getAccelerations()[i], epsilon);
 		}
 
 		ASSERT_EQ(2u, stateCopied.getNumBoundaryConditions());
@@ -314,8 +269,6 @@ TEST(DeformableRepresentationStateTest, CopyConstructorAndAssignmentTest)
 		ASSERT_EQ(state.getPositions().size(), stateAssigned.getPositions().size());
 		ASSERT_EQ(9, stateAssigned.getVelocities().size());
 		ASSERT_EQ(state.getVelocities().size(), stateAssigned.getVelocities().size());
-		ASSERT_EQ(9, stateAssigned.getAccelerations().size());
-		ASSERT_EQ(state.getAccelerations().size(), stateAssigned.getAccelerations().size());
 
 		for(unsigned int i = 0; i < stateAssigned.getNumDof(); i++)
 		{
@@ -323,8 +276,6 @@ TEST(DeformableRepresentationStateTest, CopyConstructorAndAssignmentTest)
 			EXPECT_NEAR(static_cast<double>(i), stateAssigned.getPositions()[i], epsilon);
 			EXPECT_NEAR(state.getVelocities()[i], stateAssigned.getVelocities()[i], epsilon);
 			EXPECT_NEAR(2.0*static_cast<double>(i), stateAssigned.getVelocities()[i], epsilon);
-			EXPECT_NEAR(state.getAccelerations()[i], stateAssigned.getAccelerations()[i], epsilon);
-			EXPECT_NEAR(4.0*static_cast<double>(i), stateAssigned.getAccelerations()[i], epsilon);
 		}
 
 		ASSERT_EQ(2u, stateAssigned.getNumBoundaryConditions());
@@ -336,4 +287,55 @@ TEST(DeformableRepresentationStateTest, CopyConstructorAndAssignmentTest)
 		ASSERT_EQ(state.getNumDof() - 1, stateAssigned.getBoundaryConditions()[1]);
 		ASSERT_EQ(state.getBoundaryConditions()[1], stateAssigned.getBoundaryConditions()[1]);
 	}
+}
+
+TEST(OdeStateTest, ApplyBoundaryConditionsToVectorTest)
+{
+	OdeState state;
+	state.setNumDof(3u, 3u);
+	state.addBoundaryCondition(1u);
+	state.addBoundaryCondition(state.getNumDof() - 1u);
+
+	SurgSim::Math::Vector F(state.getNumDof());
+	F.setLinSpaced(1.0, 2.0);
+	SurgSim::Math::Vector initialF = F;
+
+	state.applyBoundaryConditionsToVector(&F);
+	EXPECT_FALSE(F.isApprox(initialF));
+	for (unsigned int dofId = 0; dofId < state.getNumDof(); ++dofId)
+	{
+		if (dofId == 1u || dofId == state.getNumDof() - 1u)
+		{
+			EXPECT_NE(initialF[dofId], F[dofId]);
+			EXPECT_EQ(0u, F[dofId]);
+		}
+		else
+		{
+			EXPECT_EQ(initialF[dofId], F[dofId]);
+		}
+	}
+}
+
+TEST(OdeStateTest, ApplyBoundaryConditionsToMatrixTest)
+{
+	OdeState state;
+	state.setNumDof(3u, 3u);
+	state.addBoundaryCondition(1u);
+	state.addBoundaryCondition(state.getNumDof() - 1u);
+
+	unsigned int numDof = state.getNumDof();
+	SurgSim::Math::Matrix M = 2.0 * SurgSim::Math::Matrix::Ones(numDof, numDof);
+	SurgSim::Math::Matrix initialM = M;
+	SurgSim::Math::Matrix expectedM = M;
+	for (int bcId = 0; bcId < 2; ++bcId)
+	{
+		unsigned int dofId = state.getBoundaryConditions()[bcId];
+		expectedM.block<1, 9>(dofId, 0).setZero();
+		expectedM.block<9, 1>(0, dofId).setZero();
+		expectedM(dofId, dofId) = 1.0;
+	}
+
+	state.applyBoundaryConditionsToMatrix(&M);
+	EXPECT_FALSE(M.isApprox(initialM));
+	EXPECT_TRUE(M.isApprox(expectedM));
 }

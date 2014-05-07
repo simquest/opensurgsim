@@ -151,15 +151,14 @@ bool Fem3DRepresentation::doInitialize()
 	return FemRepresentation::doInitialize();
 }
 
-void Fem3DRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,
+void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 	const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-	transformVectorByBlockOf3(transform, &state->getAccelerations(), true);
 }
 
-bool Fem3DRepresentation::isValidState(const DeformableRepresentationState &state) const
+bool Fem3DRepresentation::isValidState(const SurgSim::Math::OdeState& state) const
 {
 	return SurgSim::Math::isValid(state.getPositions())
 		&& SurgSim::Math::isValid(state.getVelocities());
@@ -170,8 +169,7 @@ void Fem3DRepresentation::deactivateAndReset(void)
 	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
 		<< getName() << " deactivated and reset:" << std::endl
 		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
-		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl
-		<< "acceleration=(" << m_currentState->getAccelerations() << ")" << std::endl;
+		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
 
 	resetState();
 	setIsActive(false);

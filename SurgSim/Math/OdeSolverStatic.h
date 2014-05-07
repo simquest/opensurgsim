@@ -29,34 +29,18 @@ namespace Math
 /// \note This ode equation is solved w.r.t. x, by discarding all time derived variables (i.e. v, a)
 /// \note reducing the equation to solve to:
 /// \note 0 = f(t, x(t)) = Fext + Fint(t, x(t)) = Fext - K.(x - x0)
-/// \tparam State Type of the state y=(x v)
-/// \note State is expected to hold on to the dof derivatives and have the API:
-/// \note   Vector& getPositions();
-/// \note   Vector& getVelocities();
-/// \note   Vector& getAccelerations();
-template <class State>
-class OdeSolverStatic : public OdeSolver<State>
+class OdeSolverStatic : public OdeSolver
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverStatic(OdeEquation<State>* equation);
+	explicit OdeSolverStatic(OdeEquation* equation);
 
-	virtual void solve(double dt, const State& currentState, State* newState) override;
-
-public:
-	// Variables used from OdeSolver
-	using OdeSolver<State>::m_compliance;
-	using OdeSolver<State>::m_equation;
-	using OdeSolver<State>::m_linearSolver;
-	using OdeSolver<State>::m_name;
-	using OdeSolver<State>::m_systemMatrix;
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 };
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#include "SurgSim/Math/OdeSolverStatic-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVERSTATIC_H

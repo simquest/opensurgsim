@@ -23,13 +23,14 @@
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
+
 
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
 using SurgSim::DataStructures::Vertices;
 using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Physics::DeformableRepresentationState;
 
 namespace
 {
@@ -58,8 +59,8 @@ void testConstructor()
 	const unsigned int numDofPerNode = 3;
 	const unsigned int numNode = 10;
 
-	std::shared_ptr<DeformableRepresentationState> state;
-	state = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> state;
+	state = std::make_shared<SurgSim::Math::OdeState>();
 	state->setNumDof(numDofPerNode, numNode);
 	state->getPositions().setRandom();
 
@@ -122,9 +123,9 @@ void testUpdate()
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>("scene element");
 	std::shared_ptr<TransferDeformableStateToVerticesBehavior<T>> m;
 	std::shared_ptr<Vertices<T>> vertices;
-	std::shared_ptr<DeformableRepresentationState> state;
+	std::shared_ptr<SurgSim::Math::OdeState> state;
 	{
-		state = std::make_shared<DeformableRepresentationState>();
+		state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(numDofPerNode, numNode);
 		state->getPositions().setRandom();
 
@@ -177,11 +178,11 @@ void testUpdate<void>()
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>("scene element");
 	std::shared_ptr<TransferDeformableStateToVerticesBehavior<void>> m;
 	std::shared_ptr<Vertices<void>> vertices;
-	std::shared_ptr<DeformableRepresentationState> state;
+	std::shared_ptr<SurgSim::Math::OdeState> state;
 	{
-		state = std::make_shared<DeformableRepresentationState>();
+		state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(numDofPerNode, numNode);
-		state->getPositions().setRandom();
+		state->getPositions().setLinSpaced(0.453, 9.823);
 
 		vertices = std::make_shared<Vertices<void>>();
 

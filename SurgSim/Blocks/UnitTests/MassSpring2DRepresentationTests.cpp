@@ -149,7 +149,6 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 
 	// States should contains expected values
 	EXPECT_TRUE(m.getFinalState()->getVelocities().isZero());
-	EXPECT_TRUE(m.getFinalState()->getAccelerations().isZero());
 	EXPECT_FALSE(m.getFinalState()->getPositions().isZero());
 	Vector3d rowExtremititiesDelta[2] =
 	{

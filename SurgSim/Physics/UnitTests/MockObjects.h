@@ -25,7 +25,6 @@
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
@@ -154,35 +153,35 @@ public:
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
-	Vector& computeF(const SurgSim::Physics::DeformableRepresentationState& state) override
+	Vector& computeF(const SurgSim::Math::OdeState& state) override
 	{
 		return m_F;
 	}
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
-	const Matrix& computeM(const SurgSim::Physics::DeformableRepresentationState& state) override
+	const Matrix& computeM(const SurgSim::Math::OdeState& state) override
 	{
 		return m_M;
 	}
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
-	const Matrix& computeD(const SurgSim::Physics::DeformableRepresentationState& state) override
+	const Matrix& computeD(const SurgSim::Math::OdeState& state) override
 	{
 		return m_D;
 	}
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
-	const Matrix& computeK(const SurgSim::Physics::DeformableRepresentationState& state) override
+	const Matrix& computeK(const SurgSim::Math::OdeState& state) override
 	{
 		return m_K;
 	}
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
-	void computeFMDK(const SurgSim::Physics::DeformableRepresentationState& state,
+	void computeFMDK(const SurgSim::Math::OdeState& state,
 					 Vector** f, Matrix** M, Matrix** D, Matrix** K) override
 	{
 		*f = &m_F;
@@ -192,7 +191,7 @@ public:
 	}
 
 protected:
-	void transformState(std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
+	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 						const SurgSim::Math::RigidTransform3d& transform) override
 	{
 		using SurgSim::Math::setSubVector;
@@ -231,29 +230,29 @@ public:
 		this->m_nodeIds.push_back(nodeId);
 	}
 
-	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+	virtual void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
 		double scale = 1.0) override
 	{
 		SurgSim::Math::addSubVector(scale * m_F, m_nodeIds, 3, F);
 	}
-	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
+	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 		double scale = 1.0) override
 	{
 		SurgSim::Math::addSubMatrix(scale * m_D, m_nodeIds, 3, D);
 	}
-	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
+	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
 		double scale = 1.0) override
 	{
 		SurgSim::Math::addSubMatrix(scale * m_K, m_nodeIds, 3, K);
 	}
-	virtual void addFDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* f,
+	virtual void addFDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* f,
 		SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override
 	{
 		addForce(state, f);
 		addDamping(state, D);
 		addStiffness(state, K);
 	}
-	virtual void addMatVec(const DeformableRepresentationState& state, double alphaD, double alphaK,
+	virtual void addMatVec(const SurgSim::Math::OdeState& state, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override
 	{
 		Vector xLocal(3 * m_nodeIds.size()), fLocal;
@@ -287,8 +286,8 @@ public:
 		// Note: setLocalPose MUST be called before WakeUp to be effective !
 		setLocalPose(pose);
 
-		std::shared_ptr<DeformableRepresentationState> state;
-		state = std::make_shared<DeformableRepresentationState>();
+		std::shared_ptr<SurgSim::Math::OdeState> state;
+		state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(3, numNodes);
 		for (unsigned int i = 0; i < numNodes; i++)
 		{
@@ -335,29 +334,29 @@ public:
 		this->m_nodeIds.push_back(nodeId);
 	}
 
-	virtual double getVolume(const DeformableRepresentationState& state) const override
+	virtual double getVolume(const SurgSim::Math::OdeState& state) const override
 	{ return 1; }
-	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+	virtual void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
 		double scale = 1.0) override
 	{
 		SurgSim::Math::addSubVector(scale * m_F, m_nodeIds, 3, F);
 	}
-	virtual void addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M,
+	virtual void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M,
 		double scale = 1.0) override
 	{
 		SurgSim::Math::addSubMatrix(scale * m_M, m_nodeIds, 3, M);
 	}
-	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
+	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 		double scale = 1.0) override
 	{
 		SurgSim::Math::addSubMatrix(scale * m_D, m_nodeIds, 3, D);
 	}
-	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
+	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
 		double scale = 1.0) override
 	{
 		SurgSim::Math::addSubMatrix(scale * m_K, m_nodeIds, 3, K);
 	}
-	virtual void addFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* f,
+	virtual void addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* f,
 		SurgSim::Math::Matrix* M, SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override
 	{
 		addForce(state, f);
@@ -365,7 +364,7 @@ public:
 		addDamping(state, D);
 		addStiffness(state, K);
 	}
-	virtual void addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD, double alphaK,
+	virtual void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override
 	{
 		Vector xLocal(3 * m_nodeIds.size()), fLocal;
@@ -375,11 +374,11 @@ public:
 	}
 	virtual bool isValidCoordinate(const SurgSim::Math::Vector &naturalCoordinate) const override
 	{ return true; }
-	virtual SurgSim::Math::Vector computeCartesianCoordinate(const DeformableRepresentationState& state,
+	virtual SurgSim::Math::Vector computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector &barycentricCoordinate) const override
 	{ return SurgSim::Math::Vector3d::Zero(); }
 
-	virtual void initialize(const DeformableRepresentationState& state) override
+	virtual void initialize(const SurgSim::Math::OdeState& state) override
 	{
 		FemElement::initialize(state);
 		const int numDof = 3 * m_nodeIds.size();
@@ -422,7 +421,7 @@ public:
 		return REPRESENTATION_TYPE_INVALID;
 	}
 
-	std::shared_ptr<OdeSolver<DeformableRepresentationState>> getOdeSolver() const
+	std::shared_ptr<OdeSolver> getOdeSolver() const
 	{
 		return this->m_odeSolver;
 	}
@@ -436,7 +435,7 @@ protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
-	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
+	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 		const SurgSim::Math::RigidTransform3d& transform) override
 	{
 	}
@@ -449,7 +448,7 @@ public:
 		: SurgSim::Physics::Fem1DRepresentation(name)
 	{}
 
-	const std::shared_ptr<SurgSim::Math::OdeSolver<DeformableRepresentationState>> getOdeSolver() const
+	const std::shared_ptr<SurgSim::Math::OdeSolver> getOdeSolver() const
 	{
 		return this->m_odeSolver;
 	}

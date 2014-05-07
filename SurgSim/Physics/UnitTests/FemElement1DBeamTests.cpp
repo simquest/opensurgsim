@@ -22,14 +22,12 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/FemElement1DBeam.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::FemElement1DBeam;
 
 namespace
@@ -115,7 +113,7 @@ public:
 	static const int m_numberNodes = 5;
 
 	std::array<unsigned int, 2> m_nodeIds;
-	DeformableRepresentationState m_restState;
+	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
 	double m_rho, m_E, m_nu, m_L;
 	double m_radius;

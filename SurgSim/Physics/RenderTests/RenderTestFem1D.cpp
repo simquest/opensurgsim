@@ -31,7 +31,6 @@ using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem1DRepresentation;
 using SurgSim::Physics::FemElement1DBeam;
 
@@ -40,7 +39,7 @@ namespace
 
 void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, unsigned int numNodes)
 {
-	std::shared_ptr<DeformableRepresentationState> restState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> restState = std::make_shared<SurgSim::Math::OdeState>();
 	restState->setNumDof(physicsRepresentation->getNumDofPerNode(), numNodes);
 
 	// Sets the initial state (node positions and boundary conditions)

@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"
@@ -126,7 +125,7 @@ void Fem3DRepresentationPlyReaderDelegate::startParseFile()
 	SURGSIM_ASSERT(m_fem->getInitialState() == nullptr)
 		<< "The Representation's initial state must be uninitialized.";
 
-	m_state = std::make_shared<DeformableRepresentationState>();
+	m_state = std::make_shared<SurgSim::Math::OdeState>();
 }
 
 void Fem3DRepresentationPlyReaderDelegate::endParseFile()

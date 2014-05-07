@@ -13,8 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_ODESOLVEREULEREXPLICIT_INL_H
-#define SURGSIM_MATH_ODESOLVEREULEREXPLICIT_INL_H
+#include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
 
 namespace SurgSim
 {
@@ -22,44 +21,39 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State>
-OdeSolverEulerExplicit<State>::OdeSolverEulerExplicit(OdeEquation<State>* equation)
-	: OdeSolver<State>(equation)
+OdeSolverEulerExplicitModified::OdeSolverEulerExplicitModified(OdeEquation* equation)
+	: OdeSolver(equation)
 {
-	m_name = "Ode Solver Euler Explicit";
+	m_name = "Ode Solver Euler Explicit Modified";
 }
 
-template <class State>
-void OdeSolverEulerExplicit<State>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverEulerExplicitModified::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	// General equation to solve:
 	//   M.a(t) = f(t, x(t), v(t))
 	// System on the velocity level:
 	//   (M/dt).deltaV = f(t, x(t), v(t))
 
-	// Computes f(t, x(t), v(t))
-	const Vector& f = m_equation.computeF(currentState);
-
-	// Computes M
+	// Computes f(t, x(t), v(t)) and M
+	Vector& f = m_equation.computeF(currentState);
 	const Matrix& M = m_equation.computeM(currentState);
 
 	// Computes the system matrix (left-hand-side matrix)
-	m_systemMatrix = M * (1.0 / dt);
+	m_systemMatrix = M / dt;
+
+	// Apply boundary conditions to the linear system
+	currentState.applyBoundaryConditionsToVector(&f);
+	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
-	Vector& deltaV = newState->getAccelerations();
+	Vector& deltaV = newState->getVelocities();
 	(*m_linearSolver)(m_systemMatrix, f, &deltaV, &m_compliance);
 
-	// Compute the new state using the Euler Explicit scheme:
-	newState->getPositions()  = currentState.getPositions()  + dt * currentState.getVelocities();
+	// Compute the new state using the Modified Euler Explicit scheme:
 	newState->getVelocities() = currentState.getVelocities() + deltaV;
-
-	// Adjust the acceleration variable to contain accelerations: a = deltaV/dt
-	newState->getAccelerations() /= dt;
+	newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();
 }
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#endif // SURGSIM_MATH_ODESOLVEREULEREXPLICIT_INL_H

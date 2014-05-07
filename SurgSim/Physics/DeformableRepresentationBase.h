@@ -22,10 +22,14 @@
 
 namespace SurgSim
 {
+
+namespace Math
+{
+class OdeState;
+}; // namespace Math
+
 namespace Physics
 {
-
-class DeformableRepresentationState;
 
 class DeformableRepresentationBase : public Representation
 {
@@ -49,22 +53,23 @@ public:
 	/// \note   so after this call, do not expect 'initialState' to be unchanged.
 	/// \note All internal states are initialized with the transformed initialState to make the simulation ready.
 	/// \note This method also sets the number of dof for this Representation
-	virtual void setInitialState(std::shared_ptr<DeformableRepresentationState> initialState) = 0;
+	virtual void setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState) = 0;
 
 	/// Get the current state (in the global frame), this is for use inside the physics calculation only
 	/// \return The current state of this deformable representation
-	virtual const std::shared_ptr<DeformableRepresentationState> getCurrentState() const = 0;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getCurrentState() const = 0;
 
 	/// Get the previous state (in the global frame), this is for use inside the physics calculation only
 	/// \return The previous state of this deformable representation
-	virtual const std::shared_ptr<DeformableRepresentationState> getPreviousState() const = 0;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getPreviousState() const = 0;
 
 	/// Get the final state (in the global frame), this is for use inside the physics calculation only
 	/// \return The final state of this deformable representation
-	virtual const std::shared_ptr<DeformableRepresentationState> getFinalState() const = 0;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getFinalState() const = 0;
 };
 
-}
-}
+}; // namespace Physics
 
-#endif
+}; // namespace SurgSim
+
+#endif // SURGSIM_PHYSICS_DEFORMABLEREPRESENTATIONBASE_H

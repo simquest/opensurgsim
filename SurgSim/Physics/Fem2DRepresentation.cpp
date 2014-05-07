@@ -59,12 +59,11 @@ RepresentationType Fem2DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM2D;
 }
 
-void Fem2DRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,
+void Fem2DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 										 const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-	transformVectorByBlockOf3(transform, &state->getAccelerations(), true);
 }
 
 } // namespace Physics

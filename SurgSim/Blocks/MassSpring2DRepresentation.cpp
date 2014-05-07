@@ -18,7 +18,6 @@
 
 #include "SurgSim/Physics/LinearSpring.h"
 
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Mass;
 using SurgSim::Math::Vector3d;
 
@@ -28,7 +27,7 @@ namespace SurgSim
 namespace Blocks
 {
 
-void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<DeformableRepresentationState> state,
+void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int numNodesPerDim[2], double stiffness, double damping)
 {
 	const int rowOffset = numNodesPerDim[0];
@@ -58,7 +57,7 @@ void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<D
 	}
 }
 
-void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<DeformableRepresentationState> state,
+void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int numNodesPerDim[2], double stiffness, double damping)
 {
 	const int rowOffset = numNodesPerDim[0];
@@ -88,7 +87,7 @@ void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<Defo
 	}
 }
 
-void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr<DeformableRepresentationState> state,
+void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int numNodesPerDim[2], double stiffness, double damping)
 {
 	const int rowOffset = numNodesPerDim[0];
@@ -118,8 +117,8 @@ void MassSpring2DRepresentation::init2D(
 	double stiffnessBending, double dampingBending,
 	double stiffnessFaceDiagonal, double dampingFaceDiagonal)
 {
-	std::shared_ptr<DeformableRepresentationState> state;
-	state = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> state;
+	state = std::make_shared<SurgSim::Math::OdeState>();
 	state->setNumDof(getNumDofPerNode(), numNodesPerDim[0] * numNodesPerDim[1]);
 
 	SURGSIM_ASSERT(numNodesPerDim[0] > 0) << "Number of nodes for dimension 1 is incorrect: " << numNodesPerDim[0];

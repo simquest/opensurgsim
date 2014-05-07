@@ -31,6 +31,7 @@ set(UNIT_TEST_SOURCES
 	OdeSolverEulerImplicitTests.cpp
 	OdeSolverStaticTests.cpp
 	OdeSolverTests.cpp
+	OdeStateTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
 	TriangleTriangleContactCalculationTests.cpp

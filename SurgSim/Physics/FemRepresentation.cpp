@@ -127,7 +127,7 @@ void FemRepresentation::beforeUpdate(double dt)
 			<<	"State has not been initialized yet, call setInitialState() prior to running the simulation";
 }
 
-SurgSim::Math::Vector& FemRepresentation::computeF(const DeformableRepresentationState& state)
+SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
 	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
@@ -136,18 +136,10 @@ SurgSim::Math::Vector& FemRepresentation::computeF(const DeformableRepresentatio
 	addRayleighDampingForce(&m_f, state);
 	addFemElementsForce(&m_f, state);
 
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_f[*boundaryCondition] = 0.0;
-	}
-
 	return m_f;
 }
 
-const SurgSim::Math::Matrix& FemRepresentation::computeM(const DeformableRepresentationState& state)
+const SurgSim::Math::Matrix& FemRepresentation::computeM(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the mass matrix has been properly allocated and zeroed out
 	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), true);
@@ -157,20 +149,10 @@ const SurgSim::Math::Matrix& FemRepresentation::computeM(const DeformableReprese
 		(*femElement)->addMass(state, &m_M);
 	}
 
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_M.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_M.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_M(*boundaryCondition, *boundaryCondition) = 1e9;
-	}
-
 	return m_M;
 }
 
-const SurgSim::Math::Matrix& FemRepresentation::computeD(const DeformableRepresentationState& state)
+const SurgSim::Math::Matrix& FemRepresentation::computeD(const SurgSim::Math::OdeState& state)
 {
 	const double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
@@ -202,20 +184,10 @@ const SurgSim::Math::Matrix& FemRepresentation::computeD(const DeformableReprese
 		(*femElement)->addDamping(state, &m_D);
 	}
 
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
-	}
-
 	return m_D;
 }
 
-const SurgSim::Math::Matrix& FemRepresentation::computeK(const DeformableRepresentationState& state)
+const SurgSim::Math::Matrix& FemRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
 	SurgSim::Math::resizeMatrix(&m_K, state.getNumDof(), state.getNumDof(), true);
@@ -225,20 +197,10 @@ const SurgSim::Math::Matrix& FemRepresentation::computeK(const DeformableReprese
 		(*femElement)->addStiffness(state, &m_K);
 	}
 
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
-	}
-
 	return m_K;
 }
 
-void FemRepresentation::computeFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector** f,
+void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
 									SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
@@ -275,26 +237,6 @@ void FemRepresentation::computeFMDK(const DeformableRepresentationState& state, 
 	// Add the Rayleigh damping force to m_f
 	addRayleighDampingForce(&m_f, state, true, true);
 
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_M.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_M.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_M(*boundaryCondition, *boundaryCondition) = 1e9;
-
-		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
-
-		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
-
-		m_f[*boundaryCondition] = 0.0;
-	}
-
 	*f = &m_f;
 	*M = &m_M;
 	*D = &m_D;
@@ -302,7 +244,7 @@ void FemRepresentation::computeFMDK(const DeformableRepresentationState& state, 
 }
 
 void FemRepresentation::addRayleighDampingForce(
-	SurgSim::Math::Vector* force, const DeformableRepresentationState& state,
+	SurgSim::Math::Vector* force, const SurgSim::Math::OdeState& state,
 	bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
 {
 	// Temporary variables for convenience
@@ -348,7 +290,7 @@ void FemRepresentation::addRayleighDampingForce(
 }
 
 void FemRepresentation::addFemElementsForce(SurgSim::Math::Vector* force,
-		const DeformableRepresentationState& state,
+		const SurgSim::Math::OdeState& state,
 		double scale)
 {
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
@@ -358,7 +300,7 @@ void FemRepresentation::addFemElementsForce(SurgSim::Math::Vector* force,
 }
 
 void FemRepresentation::addGravityForce(SurgSim::Math::Vector* f,
-		const DeformableRepresentationState& state,
+		const SurgSim::Math::OdeState& state,
 		double scale)
 {
 	using SurgSim::Math::addSubVector;

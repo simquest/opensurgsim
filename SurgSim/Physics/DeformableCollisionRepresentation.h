@@ -36,7 +36,6 @@ class MeshShape;
 
 namespace Physics
 {
-class DeformableRepresentationState;
 class DeformableRepresentationBase;
 
 /// A collision representation that can be attached to a deformable, when this contains a mesh with the same number

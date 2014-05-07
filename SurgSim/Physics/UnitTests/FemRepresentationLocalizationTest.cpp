@@ -39,7 +39,7 @@ namespace Physics
 {
 
 void addTetraheadron(Fem3DRepresentation *fem, std::array<unsigned int, 4> nodes,
-	const DeformableRepresentationState& state, double massDensity = 1.0,
+	const SurgSim::Math::OdeState& state, double massDensity = 1.0,
 	double poissonRatio = 0.1, double youngModulus = 1.0)
 {
 	auto element = std::make_shared<FemElement3DTetrahedron>(nodes);
@@ -58,7 +58,7 @@ public:
 		using SurgSim::Math::Vector3d;
 
 		m_fem = std::make_shared<Fem3DRepresentation>("Fem3dRepresentation");
-		auto state = std::make_shared<DeformableRepresentationState>();
+		auto state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(3, 6);
 
 		auto& x = state->getPositions();
@@ -90,7 +90,7 @@ public:
 
 		// FEMRepresentation for FemElement3DCube
 		m_fem3DCube = std::make_shared<Fem3DRepresentation>("Fem3dCubeRepresentation");
-		auto restState = std::make_shared<DeformableRepresentationState>();
+		auto restState = std::make_shared<SurgSim::Math::OdeState>();
 		restState->setNumDof(3, 8);
 
 		auto& x0 = restState->getPositions();

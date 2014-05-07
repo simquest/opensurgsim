@@ -162,7 +162,7 @@ void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlo
 	}
 }
 
-Vector& MassSpringRepresentation::computeF(const DeformableRepresentationState& state)
+Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
 	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
@@ -182,7 +182,7 @@ Vector& MassSpringRepresentation::computeF(const DeformableRepresentationState& 
 	return m_f;
 }
 
-const Matrix& MassSpringRepresentation::computeM(const DeformableRepresentationState& state)
+const Matrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::setSubVector;
@@ -208,7 +208,7 @@ const Matrix& MassSpringRepresentation::computeM(const DeformableRepresentationS
 	return m_M;
 }
 
-const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationState& state)
+const Matrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::setSubVector;
@@ -259,7 +259,7 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 	return m_D;
 }
 
-const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationState& state)
+const Matrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::addSubMatrix;
 
@@ -284,7 +284,7 @@ const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationS
 	return m_K;
 }
 
-void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& state,
+void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 	Vector** f, Matrix** M, Matrix** D, Matrix** K)
 {
 	using SurgSim::Math::addSubVector;
@@ -353,7 +353,7 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 	*K = &m_K;
 }
 
-void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const DeformableRepresentationState& state,
+void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const SurgSim::Math::OdeState& state,
 	bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
 {
 	using SurgSim::Math::getSubVector;
@@ -403,7 +403,7 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Defo
 	}
 }
 
-void MassSpringRepresentation::addSpringsForce(Vector *force, const DeformableRepresentationState& state, double scale)
+void MassSpringRepresentation::addSpringsForce(Vector *force, const SurgSim::Math::OdeState& state, double scale)
 {
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
@@ -411,7 +411,7 @@ void MassSpringRepresentation::addSpringsForce(Vector *force, const DeformableRe
 	}
 }
 
-void MassSpringRepresentation::addGravityForce(Vector *f, const DeformableRepresentationState& state, double scale)
+void MassSpringRepresentation::addGravityForce(Vector *f, const SurgSim::Math::OdeState& state, double scale)
 {
 	using SurgSim::Math::addSubVector;
 
@@ -447,15 +447,14 @@ static void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& tra
 	}
 }
 
-void MassSpringRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,
+void MassSpringRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 	const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-	transformVectorByBlockOf3(transform, &state->getAccelerations(), true);
 }
 
-bool MassSpringRepresentation::isValidState(const DeformableRepresentationState &state) const
+bool MassSpringRepresentation::isValidState(const SurgSim::Math::OdeState& state) const
 {
 	return SurgSim::Math::isValid(state.getPositions())
 		&& SurgSim::Math::isValid(state.getVelocities());
@@ -466,8 +465,7 @@ void MassSpringRepresentation::deactivateAndReset(void)
 	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
 		<< getName() << " deactivated and reset:" << std::endl
 		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
-		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl
-		<< "acceleration=(" << m_currentState->getAccelerations() << ")" << std::endl;
+		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
 
 	resetState();
 	setIsActive(false);

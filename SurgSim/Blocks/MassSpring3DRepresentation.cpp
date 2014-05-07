@@ -18,7 +18,6 @@
 
 #include "SurgSim/Physics/LinearSpring.h"
 
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Mass;
 using SurgSim::Math::Vector3d;
 
@@ -28,7 +27,7 @@ namespace SurgSim
 namespace Blocks
 {
 
-void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<DeformableRepresentationState> state,
+void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int numNodesPerDim[3], double stiffness, double damping)
 {
 	const int depthOffset = numNodesPerDim[0] * numNodesPerDim[1];
@@ -77,7 +76,7 @@ void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<D
 	}
 }
 
-void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<DeformableRepresentationState> state,
+void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int numNodesPerDim[3], double stiffness, double damping)
 {
 	const int depthOffset = numNodesPerDim[0] * numNodesPerDim[1];
@@ -126,7 +125,7 @@ void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<Defo
 	}
 }
 
-void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr<DeformableRepresentationState> state,
+void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int numNodesPerDim[3], double stiffness, double damping)
 {
 	const int depthOffset = numNodesPerDim[0] * numNodesPerDim[1];
@@ -178,7 +177,7 @@ void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr
 	}
 }
 
-void MassSpring3DRepresentation::init3DVolumeDiagonalSprings(const std::shared_ptr<DeformableRepresentationState> state,
+void MassSpring3DRepresentation::init3DVolumeDiagonalSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int numNodesPerDim[3], double stiffness, double damping)
 {
 	const int depthOffset = numNodesPerDim[0] * numNodesPerDim[1];
@@ -219,8 +218,8 @@ void MassSpring3DRepresentation::init3D(
 	double stiffnessFaceDiagonal, double dampingFaceDiagonal,
 	double stiffnessVolumeDiagonal, double dampingVolumeDiagonal)
 {
-	std::shared_ptr<DeformableRepresentationState> state;
-	state = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> state;
+	state = std::make_shared<SurgSim::Math::OdeState>();
 	state->setNumDof(getNumDofPerNode(), numNodesPerDim[0] * numNodesPerDim[1] * numNodesPerDim[2]);
 
 	// Nodes distribution is done by column 1st, row 2nd, depth 3rd

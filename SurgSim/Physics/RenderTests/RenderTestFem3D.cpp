@@ -31,7 +31,6 @@
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::FemElement;
 using SurgSim::Physics::FemElement3DCube;
@@ -77,7 +76,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 
 	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
 
-	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
 
 	for (size_t i = 0; i != vertices.size(); i++)
@@ -147,7 +146,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	std::array<unsigned int, 8> cube = {{0, 1, 3, 2, 4, 5, 7, 6}};
 	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
 
-	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
 
 	for (size_t i = 0; i != vertices.size(); i++)

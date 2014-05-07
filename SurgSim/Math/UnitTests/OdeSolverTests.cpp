@@ -35,12 +35,12 @@ namespace
 	const std::string name = "MockOdeSolver";
 };
 
-class MockOdeSolver : public OdeSolver<MassPointState>
+class MockOdeSolver : public OdeSolver
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit MockOdeSolver(OdeEquation<MassPointState>* equation) : OdeSolver(equation)
+	explicit MockOdeSolver(OdeEquation* equation) : OdeSolver(equation)
 	{
 		this->m_name = name;
 	}
@@ -54,7 +54,7 @@ public:
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	virtual void solve(double dt, const MassPointState& currentState, MassPointState* newState)
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState)
 	{
 		this->m_systemMatrix.setIdentity();
 		this->m_compliance.setIdentity();

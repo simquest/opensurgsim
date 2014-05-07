@@ -18,16 +18,16 @@
 
 #include <vector>
 
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
+
 
 namespace SurgSim
 {
 
 namespace Physics
 {
-
-class DeformableRepresentationState;
 
 /// Base class for all Fem Element (1D, 2D, 3D)
 /// It handles the node ids to which it is connected and requires all derived classes to compute the element
@@ -47,7 +47,7 @@ public:
 
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
-	virtual void initialize(const DeformableRepresentationState& state);
+	virtual void initialize(const SurgSim::Math::OdeState& state);
 
 	/// Gets the number of degree of freedom per node
 	/// \return The number of dof per node
@@ -87,14 +87,14 @@ public:
 	double getMassDensity() const;
 
 	/// Gets the element mass based on the input state (in Kg)
-	/// \param state The deformable state to compute the mass with
+	/// \param state The state to compute the mass with
 	/// \return The mass of this element (in Kg)
-	double getMass(const DeformableRepresentationState& state) const;
+	double getMass(const SurgSim::Math::OdeState& state) const;
 
 	/// Gets the element volume based on the input state (in m-3)
-	/// \param state The deformable state to compute the volume with
+	/// \param state The state to compute the volume with
 	/// \return The volume of this element (in m-3)
-	virtual double getVolume(const DeformableRepresentationState& state) const = 0;
+	virtual double getVolume(const SurgSim::Math::OdeState& state) const = 0;
 
 	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
 	/// \param state The state to compute the force with
@@ -103,7 +103,7 @@ public:
 	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale = 1.0) = 0;
+	virtual void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) = 0;
 
 	/// Adds the element mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
 	/// \param state The state to compute the mass matrix with
@@ -112,7 +112,7 @@ public:
 	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M, double scale = 1.0) = 0;
+	virtual void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale = 1.0) = 0;
 
 	/// Adds the element damping matrix D (= -df/dv) (comuted for a given state)
 	/// to a complete system damping matrix D (assembly)
@@ -122,7 +122,7 @@ public:
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
+	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 		double scale = 1.0) = 0;
 
 	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
@@ -133,7 +133,7 @@ public:
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
+	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
 		double scale = 1.0) = 0;
 
 	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
@@ -145,7 +145,7 @@ public:
 	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addFMDK(const DeformableRepresentationState& state,
+	virtual void addFMDK(const SurgSim::Math::OdeState& state,
 		SurgSim::Math::Vector* F,
 		SurgSim::Math::Matrix* M,
 		SurgSim::Math::Matrix* D,
@@ -161,7 +161,7 @@ public:
 	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD, double alphaK,
+	virtual void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) = 0;
 
 	/// Determines whether a given natural coordinate is valid
@@ -174,7 +174,7 @@ public:
 	/// \param naturalCoordinate The coordinates to transform
 	/// \return The resultant cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
-		const DeformableRepresentationState& state,
+		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const = 0;
 
 protected:

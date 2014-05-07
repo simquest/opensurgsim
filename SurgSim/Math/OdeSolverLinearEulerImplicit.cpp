@@ -13,8 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_ODESOLVERLINEAREULEREXPLICITMODIFIED_INL_H
-#define SURGSIM_MATH_ODESOLVERLINEAREULEREXPLICITMODIFIED_INL_H
+#include "SurgSim/Math/OdeSolverLinearEulerImplicit.h"
 
 namespace SurgSim
 {
@@ -22,35 +21,32 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State>
-OdeSolverLinearEulerExplicitModified<State>::OdeSolverLinearEulerExplicitModified(OdeEquation<State>* equation)
-	: OdeSolverEulerExplicitModified<State>(equation),
-	m_initialized(false)
+OdeSolverLinearEulerImplicit::OdeSolverLinearEulerImplicit(OdeEquation* equation)
+	: OdeSolverEulerImplicit(equation), m_initialized(false)
 {
-	m_name = "Ode Solver Linear Euler Explicit Modified";
+	m_name = "Ode Solver Linear Euler Implicit";
 }
 
-template <class State>
-void OdeSolverLinearEulerExplicitModified<State>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverLinearEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	if (!m_initialized)
 	{
-		OdeSolverEulerExplicitModified<State>::solve(dt, currentState, newState);
+		OdeSolverEulerImplicit::solve(dt, currentState, newState);
+		m_constantK = m_equation.computeK(currentState);
 		m_initialized = true;
 	}
 	else
 	{
-		const Vector& f = m_equation.computeF(currentState);
-		Vector deltaV = m_compliance * (f);
+		Vector& f = m_equation.computeF(currentState);
+		f -= m_constantK * currentState.getVelocities() * dt;
+		currentState.applyBoundaryConditionsToVector(&f);
+		Vector deltaV = m_compliance * f;
 
 		newState->getVelocities() = currentState.getVelocities() + deltaV;
 		newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();
-		newState->getAccelerations() =  deltaV / dt;
 	}
 }
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#endif // SURGSIM_MATH_ODESOLVERLINEAREULEREXPLICITMODIFIED_INL_H

@@ -64,22 +64,19 @@ TEST(Fem3DRepresentationTests, TransformInitialStateTest)
 	initialPose = SurgSim::Math::makeRigidTransform(q, t);
 	fem->setLocalPose(initialPose);
 
-	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(numDofPerNode, numNodes);
 	Vector x = Vector::LinSpaced(numDof, 1.0, static_cast<double>(numDof));
 	Vector v = Vector::Ones(numDof);
-	Vector a = Vector::Ones(numDof) * 2.0;
 	initialState->getPositions() = x;
 	initialState->getVelocities() = v;
-	initialState->getAccelerations() = a;
 	fem->setInitialState(initialState);
 
-	Vector expectedX = x, expectedV = v, expectedA = a;
+	Vector expectedX = x, expectedV = v;
 	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
 	{
 		expectedX.segment<3>(numDofPerNode * nodeId) = initialPose * x.segment<3>(numDofPerNode * nodeId);
 		expectedV.segment<3>(numDofPerNode * nodeId) = initialPose.linear() * v.segment<3>(numDofPerNode * nodeId);
-		expectedA.segment<3>(numDofPerNode * nodeId) = initialPose.linear() * a.segment<3>(numDofPerNode * nodeId);
 	}
 
 	// Initialize the component
@@ -89,7 +86,6 @@ TEST(Fem3DRepresentationTests, TransformInitialStateTest)
 
 	EXPECT_TRUE(fem->getInitialState()->getPositions().isApprox(expectedX));
 	EXPECT_TRUE(fem->getInitialState()->getVelocities().isApprox(expectedV));
-	EXPECT_TRUE(fem->getInitialState()->getAccelerations().isApprox(expectedA));
 }
 
 TEST(Fem3DRepresentationTests, SetGetFilenameAndLoadFileTest)
@@ -173,7 +169,7 @@ TEST(Fem3DRepresentationTests, ApplyCorrectionTest)
 	double dt = 1e-3;
 
 	auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-	auto initialState = std::make_shared<DeformableRepresentationState>();
+	auto initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(fem->getNumDofPerNode(), 4);
 	fem->setInitialState(initialState);
 

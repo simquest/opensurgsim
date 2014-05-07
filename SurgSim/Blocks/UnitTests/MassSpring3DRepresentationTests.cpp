@@ -284,7 +284,6 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 
 	// States should contains expected values
 	EXPECT_TRUE(m.getFinalState()->getVelocities().isZero());
-	EXPECT_TRUE(m.getFinalState()->getAccelerations().isZero());
 	EXPECT_FALSE(m.getFinalState()->getPositions().isZero());
 	Vector3d depthExtremitiesDelta[2][2] =
 	{{(extremities[0][0][1] - extremities[0][0][0]) / static_cast<double>(numNodesPerDim[2] - 1) ,

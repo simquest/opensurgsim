@@ -65,7 +65,7 @@ static std::shared_ptr<Fem3DRepresentation> getTestingFem3d(const std::string &n
 															double youngModulus = 1.0)
 {
 	auto fem = std::make_shared<Fem3DRepresentation>(name);
-	auto state = std::make_shared<DeformableRepresentationState>();
+	auto state = std::make_shared<SurgSim::Math::OdeState>();
 	state->setNumDof(3, 6);
 
 	// Place coordinates at

@@ -20,7 +20,6 @@
 
 #include "SurgSim/Physics/LinearSpring.h"
 
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Mass;
 using SurgSim::Math::Vector3d;
 
@@ -38,8 +37,8 @@ void MassSpring1DRepresentation::init1D(
 	double stiffnessStretching, double dampingStretching,
 	double stiffnessBending, double dampingBending)
 {
-	std::shared_ptr<DeformableRepresentationState> state;
-	state = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> state;
+	state = std::make_shared<SurgSim::Math::OdeState>();
 	state->setNumDof(getNumDofPerNode(), numNodesPerDim[0]);
 
 	SURGSIM_ASSERT(numNodesPerDim[0] > 0) << "Number of nodes incorrect: " << numNodesPerDim[0];

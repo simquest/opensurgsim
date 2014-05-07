@@ -42,39 +42,67 @@ TEST(OdeSolverEulerExplicit, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("EulerExplicit");
-		doConstructorTest<OdeSolverEulerExplicit<MassPointState>>();
+		doConstructorTest<OdeSolverEulerExplicit>();
 	}
 	{
 		SCOPED_TRACE("LinearEulerExplicit");
-		doConstructorTest<OdeSolverLinearEulerExplicit<MassPointState>>();
+		doConstructorTest<OdeSolverLinearEulerExplicit>();
 	}
 }
 
 template<class T>
 void doSolveTest()
 {
+	// Test 2 iterations because Linear solvers have a different algorithm on the 1st pass from the following passes.
+
 	{
 		MassPoint m;
-		MassPointState defaultState, currentState, newState;
-
+		MassPointState defaultState, state0, state1, state2;
 		T solver(&m);
-		ASSERT_NO_THROW({solver.solve(1e-3, currentState, &newState);});
-		EXPECT_EQ(defaultState, currentState);
-		EXPECT_NE(defaultState, newState);
-		EXPECT_TRUE(newState.getVelocities().isApprox(m.m_gravity * 1e-3));
-		EXPECT_TRUE(newState.getPositions().isZero());
+
+		// ma = mg <=> a = g
+		// v(1) = g.dt + v(0)
+		// x(1) = v(0).dt + x(0)
+		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1);});
+		EXPECT_EQ(defaultState, state0);
+		EXPECT_NE(defaultState, state1);
+		EXPECT_TRUE(state1.getVelocities().isApprox(m.m_gravity * 1e-3 + state0.getVelocities()));
+		EXPECT_TRUE(state1.getPositions().isApprox(state0.getVelocities() * 1e-3 + state0.getPositions()));
+
+		// v(2) = g.dt + v(1)
+		// x(2) = v(1).dt + x(1)
+		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2);});
+		EXPECT_NE(defaultState, state1);
+		EXPECT_NE(defaultState, state2);
+		EXPECT_NE(state2, state1);
+		EXPECT_TRUE(state2.getVelocities().isApprox(m.m_gravity * 1e-3 + state1.getVelocities()));
+		EXPECT_TRUE(state2.getPositions().isApprox(state1.getVelocities() * 1e-3 + state1.getPositions()));
 	}
 
 	{
 		MassPoint m(0.1);
-		MassPointState defaultState, currentState, newState;
-
+		MassPointState defaultState, state0, state1, state2;
 		T solver(&m);
-		ASSERT_NO_THROW({solver.solve(1e-3, currentState, &newState);});
-		EXPECT_EQ(defaultState, currentState);
-		EXPECT_NE(defaultState, newState);
-		EXPECT_TRUE(newState.getVelocities().isApprox((m.m_gravity - 0.1 * currentState.getVelocities()) * 1e-3));
-		EXPECT_TRUE(newState.getPositions().isZero());
+
+		// ma = mg - c.v <=> a = g - c/m.v
+		// v(1) = (g - c/m.v).dt + v(0)
+		// x(1) = v(0).dt + x(0)
+		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1);});
+		EXPECT_EQ(defaultState, state0);
+		EXPECT_NE(defaultState, state1);
+		Vector3d acceleration0 = m.m_gravity - 0.1 * state0.getVelocities() / m.m_mass;
+		EXPECT_TRUE(state1.getVelocities().isApprox(acceleration0 * 1e-3 + state0.getVelocities()));
+		EXPECT_TRUE(state1.getPositions().isApprox(state0.getVelocities() * 1e-3  + state0.getPositions()));
+
+		// v(2) = (g - c/m.v).dt + v(1)
+		// x(2) = v(1).dt + x(1)
+		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2);});
+		EXPECT_NE(defaultState, state1);
+		EXPECT_NE(defaultState, state2);
+		EXPECT_NE(state1, state2);
+		Vector3d acceleration1 = m.m_gravity - 0.1 * state1.getVelocities() / m.m_mass;
+		EXPECT_TRUE(state2.getVelocities().isApprox(acceleration1 * 1e-3 + state1.getVelocities()));
+		EXPECT_TRUE(state2.getPositions().isApprox(state1.getVelocities() * 1e-3 + state1.getPositions()));
 	}
 }
 
@@ -82,11 +110,11 @@ TEST(OdeSolverEulerExplicit, SolveTest)
 {
 	{
 		SCOPED_TRACE("EulerExplicit");
-		doSolveTest<OdeSolverEulerExplicit<MassPointState>>();
+		doSolveTest<OdeSolverEulerExplicit>();
 	}
 	{
 		SCOPED_TRACE("LinearEulerExplicit");
-		doSolveTest<OdeSolverLinearEulerExplicit<MassPointState>>();
+		doSolveTest<OdeSolverLinearEulerExplicit>();
 	}
 }
 

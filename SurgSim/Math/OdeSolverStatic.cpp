@@ -13,8 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_ODESOLVERSTATIC_INL_H
-#define SURGSIM_MATH_ODESOLVERSTATIC_INL_H
+#include "SurgSim/Math/OdeSolverStatic.h"
 
 namespace SurgSim
 {
@@ -22,15 +21,13 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State>
-OdeSolverStatic<State>::OdeSolverStatic(OdeEquation<State>* equation)
-	: OdeSolver<State>(equation)
+OdeSolverStatic::OdeSolverStatic(OdeEquation* equation)
+	: OdeSolver(equation)
 {
 	m_name = "Ode Solver Static";
 }
 
-template <class State>
-void OdeSolverStatic<State>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	// General equation to solve:
 	//   K.deltaX = Fext + Fint(t)
@@ -40,23 +37,23 @@ void OdeSolverStatic<State>::solve(double dt, const State& currentState, State* 
 
 	// Computes f(t, x(t), v(t)) and K
 	const Matrix& K = m_equation.computeK(currentState);
-	const Vector& f = m_equation.computeF(currentState);
+	Vector& f = m_equation.computeF(currentState);
 
 	m_systemMatrix = K;
 
-	Vector& deltaX = newState->getVelocities();
+	// Apply boundary conditions to the linear system
+	currentState.applyBoundaryConditionsToVector(&f);
+	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
+
+	Vector& deltaX = newState->getPositions();
 	(*m_linearSolver)(m_systemMatrix, f, &deltaX, &m_compliance);
 
 	// Compute the new state using the static scheme:
 	newState->getPositions()  = currentState.getPositions()  + deltaX;
 	// Velocities are null in static mode (no time dependency)
 	newState->getVelocities().setZero();
-	// Accelerations are null in static mode (no time dependency)
-	newState->getAccelerations().setZero();
 }
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#endif // SURGSIM_MATH_ODESOLVERSTATIC_INL_H
