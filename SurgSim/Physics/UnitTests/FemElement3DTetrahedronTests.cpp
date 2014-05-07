@@ -310,6 +310,35 @@ TEST_F(FemElement3DTetrahedronTests, CoordinateTests)
 	EXPECT_TRUE(ptC.isApprox(expectedC));
 	EXPECT_TRUE(ptD.isApprox(expectedD));
 	EXPECT_TRUE(ptMiddle.isApprox((expectedA + expectedB + expectedC + expectedD) / 4.0));
+
+	// Test computeNaturalCoordinate.
+	SurgSim::Math::Vector2d cartesian2d(1, 0);
+	SurgSim::Math::Vector4d cartesian4d(1, 0, 0, 0);
+	EXPECT_THROW(element.computeNaturalCoordinate(m_restState, cartesian2d), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(element.computeNaturalCoordinate(m_restState, cartesian4d), SurgSim::Framework::AssertionFailure);
+
+	std::vector<SurgSim::Math::Vector4d> listOfNaturalCoordinates;
+	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(1, 0, 0, 0));
+	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(0, 1, 0, 0));
+	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(0, 0, 1, 0));
+	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(0, 0, 0, 1));
+	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(0.354623, 0.768423, 0.12457, 0.327683));
+	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(1.354623, 2.768423, 3.12457, 4.327683));
+	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(0.546323, 2.435323, -69.3422, 345.423));
+	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(0.352346, 3.3424, 9.325324, 5.32432));
+	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(0.623543, 9.2345, 2.45346, 1.645745));
+	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(0.356234, 435.234, 32545.234, 9534.2123));
+
+	SurgSim::Math::Vector4d input, calculated;
+	Vector cartesian;
+	for (auto testCase = listOfNaturalCoordinates.begin(); testCase != listOfNaturalCoordinates.end(); ++testCase)
+	{
+		input = (*testCase).cwiseAbs();
+		input /= input.sum();
+		EXPECT_NO_THROW(cartesian = element.computeCartesianCoordinate(m_restState, input));
+		EXPECT_NO_THROW(calculated = element.computeNaturalCoordinate(m_restState, cartesian););
+		EXPECT_TRUE(input.isApprox(calculated));
+	}
 }
 
 TEST_F(FemElement3DTetrahedronTests, ShapeFunctionsTest)

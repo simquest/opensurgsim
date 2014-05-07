@@ -772,6 +772,14 @@ TEST_F(FemElement3DCubeTests, ComputeCartesianCoordinate)
 	}
 }
 
+TEST_F(FemElement3DCubeTests, ComputeNaturalCoordinate)
+{
+	MockFemElement3DCube cube(m_nodeIds, m_restState);
+
+	EXPECT_THROW(cube.computeNaturalCoordinate(m_restState, SurgSim::Math::Vector3d(0.0, 0.0, 0.0)),
+				 SurgSim::Framework::AssertionFailure);
+}
+
 TEST_F(FemElement3DCubeTests, ForceAndMatricesTest)
 {
 	using SurgSim::Math::getSubVector;

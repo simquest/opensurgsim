@@ -400,6 +400,14 @@ SurgSim::Math::Vector FemElement2DTriangle::computeCartesianCoordinate(const Def
 	return cartesianCoordinate;
 }
 
+SurgSim::Math::Vector FemElement2DTriangle::computeNaturalCoordinate(
+	const DeformableRepresentationState& state,
+	const SurgSim::Math::Vector& globalCoordinate) const
+{
+	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
+	return SurgSim::Math::Vector3d::Zero();
+}
+
 void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepresentationState& restState)
 {
 	SURGSIM_ASSERT(m_nodeIds[0] < restState.getNumNodes()) << "Invalid nodeId[0] = " << m_nodeIds[0] <<

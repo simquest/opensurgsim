@@ -750,6 +750,9 @@ TEST_F(FemElement2DTriangleTests, CoordinateTests)
 	EXPECT_TRUE(ptB.isApprox(m_rotation._transformVector(Vector3d(1.0, 0.0, 0.0))));
 	EXPECT_TRUE(ptC.isApprox(m_rotation._transformVector(Vector3d(0.0, 1.0, 0.0))));
 	EXPECT_TRUE(ptMiddle.isApprox(m_rotation._transformVector(Vector3d(1.0 / 3.0, 1.0 / 3.0, 0.0))));
+
+	Vector3d cartesian = m_rotation._transformVector(Vector3d(0.0, 0.0, 0.0));
+	EXPECT_THROW(element.computeNaturalCoordinate(m_restState, cartesian), SurgSim::Framework::AssertionFailure);
 }
 
 TEST_F(FemElement2DTriangleTests, RestAreaTest)

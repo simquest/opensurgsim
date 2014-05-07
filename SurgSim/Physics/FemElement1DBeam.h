@@ -148,6 +148,10 @@ public:
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(const DeformableRepresentationState& state,
 															 const SurgSim::Math::Vector& naturalCoordinate) const;
 
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const DeformableRepresentationState& state,
+		const SurgSim::Math::Vector& globalCoordinate) const override;
+
 protected:
 	/// Computes the beam element's initial rotation
 	/// \param state The deformable state to compute the rotation from

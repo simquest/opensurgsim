@@ -144,10 +144,24 @@ public:
 		const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const override;
 
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const DeformableRepresentationState& state,
+		const SurgSim::Math::Vector& globalCoordinate) const override;
+
 protected:
-	/// Computes the tetrahdron shape functions
+	/// Computes the tetrahedron shape functions
 	/// \param restState The deformable rest state to compute the shape function from
-	void computeShapeFunctions(const DeformableRepresentationState& restState);
+	/// \param[out] volume the volume calculated with the given state
+	/// \param[out] ai parameter for the shape function
+	/// \param[out] bi parameter for the shape function
+	/// \param[out] ci parameter for the shape function
+	/// \param[out] di parameter for the shape function
+	void computeShapeFunctions(const DeformableRepresentationState& state,
+		double *volume,
+		std::array<double, 4> *ai,
+		std::array<double, 4> *bi,
+		std::array<double, 4> *ci,
+		std::array<double, 4> *di) const;
 
 	/// Computes the tetrahedron stiffness matrix
 	/// \param state The deformable state to compute the stiffness matrix from

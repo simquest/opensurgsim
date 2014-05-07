@@ -177,6 +177,14 @@ public:
 		const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const = 0;
 
+	/// Computes a natural coordinate given a global coordinate
+	/// \param state The state at which to transform coordinates
+	/// \param globalCoordinate The coordinates to transform
+	/// \return The resultant natural coordinates
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const DeformableRepresentationState& state,
+		const SurgSim::Math::Vector& globalCoordinate) const = 0;
+
 protected:
 	/// Sets the number of degrees of freedom per node
 	/// \param numDofPerNode The number of dof per node

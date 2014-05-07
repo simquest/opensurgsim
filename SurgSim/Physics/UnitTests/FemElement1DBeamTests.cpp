@@ -536,6 +536,9 @@ TEST_F(FemElement1DBeamTests, CoordinateTests)
 	EXPECT_TRUE(ptA.isApprox(expectedA));
 	EXPECT_TRUE(ptB.isApprox(expectedB));
 	EXPECT_TRUE(ptMiddle.isApprox((expectedA + expectedB) * 0.5));
+
+	Vector3d cartesian(0.1, 1.2, 2.3);
+	EXPECT_THROW(element.computeNaturalCoordinate(m_restState, cartesian), SurgSim::Framework::AssertionFailure);
 }
 
 TEST_F(FemElement1DBeamTests, ForceAndMatricesTest)

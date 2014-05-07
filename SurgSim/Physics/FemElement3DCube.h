@@ -147,6 +147,10 @@ public:
 		const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const override;
 
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const DeformableRepresentationState& state,
+		const SurgSim::Math::Vector& globalCoordinate) const override;
+
 protected:
 	/// Build the constitutive material 6x6 matrix
 	/// \param[out] constitutiveMatrix The 6x6 constitutive material matrix

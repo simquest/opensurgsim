@@ -478,6 +478,13 @@ SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 	return cartesianCoordinate;
 }
 
+SurgSim::Math::Vector FemElement3DCube::computeNaturalCoordinate(
+	const DeformableRepresentationState& state,
+	const SurgSim::Math::Vector& globalCoordinate) const
+{
+	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
+	return SurgSim::Math::Vector3d::Zero();
+}
 
 } // namespace Physics
 

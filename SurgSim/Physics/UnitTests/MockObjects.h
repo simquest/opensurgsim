@@ -378,6 +378,10 @@ public:
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector &barycentricCoordinate) const override
 	{ return SurgSim::Math::Vector3d::Zero(); }
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const DeformableRepresentationState& state,
+		const SurgSim::Math::Vector &globalCoordinate) const override
+	{ return SurgSim::Math::Vector3d::Zero(); }
 
 	virtual void initialize(const DeformableRepresentationState& state) override
 	{
