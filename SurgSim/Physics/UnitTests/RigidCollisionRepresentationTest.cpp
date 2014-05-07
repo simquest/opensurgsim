@@ -63,7 +63,7 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(
 		Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5), Vector3d(8.7, -4.7, -3.1));
 
-	physicsRepresentation->setPose(transform);
+	physicsRepresentation->setLocalPose(transform);
 	collisionRepresentation->update(dt);
 
 	expectedMesh->copyWithTransform(transform, *originalMesh);
