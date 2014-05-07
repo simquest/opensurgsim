@@ -55,11 +55,11 @@ void TriangleMesh::doUpdate()
 void TriangleMesh::copyWithTransform(const SurgSim::Math::RigidTransform3d &pose, const TriangleMesh& source)
 {
 	SURGSIM_ASSERT(getNumVertices() == source.getNumVertices())
-		<< "The similar mesh must have the same number of vertices.";
+		<< "The source mesh must have the same number of vertices.";
 	SURGSIM_ASSERT(getNumEdges() == source.getNumEdges())
-		<< "The similar mesh must have the same number of edges";
+		<< "The source mesh must have the same number of edges";
 	SURGSIM_ASSERT(getNumTriangles() == source.getNumTriangles())
-		<< "The similar mesh must have the same number of triangles";
+		<< "The source mesh must have the same number of triangles";
 
 	auto targetVertex = getVertices().begin();
 	auto const& vertices = source.getVertices();

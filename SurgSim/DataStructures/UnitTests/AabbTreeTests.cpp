@@ -273,12 +273,12 @@ TEST(AabbTreeTests, SpatialJoinTest)
 		// Sets A and B are equal if and only if A is a subset of B and B is a subset of A.
 		for (auto it = actualIntersection.begin(); it != actualIntersection.end(); ++it)
 		{
-			EXPECT_TRUE(getEquivalentPair(expectedIntersection, *it) != expectedIntersection.cend());
+			EXPECT_FALSE(getEquivalentPair(expectedIntersection, *it) == expectedIntersection.cend());
 		}
 
 		for (auto it = expectedIntersection.begin(); it != expectedIntersection.end(); ++it)
 		{
-			EXPECT_TRUE(getEquivalentPair(actualIntersection, *it) != actualIntersection.cend());
+			EXPECT_FALSE(getEquivalentPair(actualIntersection, *it) == actualIntersection.cend());
 		}
 	}
 
@@ -295,8 +295,8 @@ TEST(AabbTreeTests, SpatialJoinTest)
 		ASSERT_GT(expectedIntersection.size(), 0u);
 		ASSERT_EQ(expectedIntersection.size(), actualIntersection.size());
 
-		EXPECT_FALSE(getEquivalentPair(expectedIntersection, actualIntersection.back()) != expectedIntersection.cend());
-		EXPECT_FALSE(getEquivalentPair(actualIntersection, expectedIntersection.back()) != actualIntersection.cend());
+		EXPECT_TRUE(getEquivalentPair(expectedIntersection, actualIntersection.back()) == expectedIntersection.cend());
+		EXPECT_TRUE(getEquivalentPair(actualIntersection, expectedIntersection.back()) == actualIntersection.cend());
 	}
 }
 

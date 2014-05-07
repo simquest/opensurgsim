@@ -94,7 +94,7 @@ TEST(TriangleMeshTest, NormalTest)
 	EXPECT_EQ(expectedXNormal, meshWithNormal->getNormal(0));
 }
 
-TEST(TriangleMeshTest, SetTransformedFromTest)
+TEST(TriangleMeshTest, CopyWithTransformTest)
 {
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto originalMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*loadTriangleMesh(fileName));
