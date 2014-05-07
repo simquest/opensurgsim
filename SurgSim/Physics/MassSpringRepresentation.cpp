@@ -20,7 +20,6 @@
 
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/Valid.h"
 
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
@@ -140,7 +139,7 @@ void MassSpringRepresentation::afterUpdate(double dt)
 		return;
 	}
 
-	if ( !isValidState(*m_currentState))
+	if (!m_currentState->isValid())
 	{
 		deactivateAndReset();
 	}
@@ -156,7 +155,7 @@ void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlo
 	m_currentState->getPositions() += deltaVelocity * dt;
 	m_currentState->getVelocities() += deltaVelocity;
 
-	if ( !isValidState(*m_currentState))
+	if (!m_currentState->isValid())
 	{
 		deactivateAndReset();
 	}
@@ -452,12 +451,6 @@ void MassSpringRepresentation::transformState(std::shared_ptr<SurgSim::Math::Ode
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-}
-
-bool MassSpringRepresentation::isValidState(const SurgSim::Math::OdeState& state) const
-{
-	return SurgSim::Math::isValid(state.getPositions())
-		&& SurgSim::Math::isValid(state.getVelocities());
 }
 
 void MassSpringRepresentation::deactivateAndReset(void)

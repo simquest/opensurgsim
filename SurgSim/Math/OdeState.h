@@ -123,6 +123,10 @@ public:
 	/// \param matrix The matrix to apply the boundary conditions on
 	void applyBoundaryConditionsToMatrix(Matrix* matrix) const;
 
+	/// Check if this state is numerically valid
+	/// \return True if all positions and velocities are valid numerical values, False otherwise
+	bool isValid() const;
+
 private:
 	/// Default public copy constructor and assignment operator are being used on purpose
 

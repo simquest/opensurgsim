@@ -339,3 +339,44 @@ TEST(OdeStateTest, ApplyBoundaryConditionsToMatrixTest)
 	EXPECT_FALSE(M.isApprox(initialM));
 	EXPECT_TRUE(M.isApprox(expectedM));
 }
+
+namespace
+{
+void testIsValidWith(double invalidNumber)
+{
+	OdeState invalidStateInfinityOnPosition;
+	invalidStateInfinityOnPosition.setNumDof(3u, 3u);
+	invalidStateInfinityOnPosition.getPositions().setOnes();
+	invalidStateInfinityOnPosition.getPositions()[2] = invalidNumber;
+	EXPECT_FALSE(invalidStateInfinityOnPosition.isValid());
+
+	OdeState invalidStateInfinityOnVelocity;
+	invalidStateInfinityOnVelocity.setNumDof(3u, 3u);
+	invalidStateInfinityOnVelocity.getVelocities().setOnes();
+	invalidStateInfinityOnVelocity.getVelocities()[2] = invalidNumber;
+	EXPECT_FALSE(invalidStateInfinityOnVelocity.isValid());
+}
+}; // anonymous namespace
+
+TEST(OdeStateTest, IsValidTest)
+{
+	OdeState validState;
+	validState.setNumDof(3u, 3u);
+	validState.getPositions().setOnes();
+	EXPECT_TRUE(validState.isValid());
+
+	{
+		SCOPED_TRACE("Test with invalid INF");
+		testIsValidWith(std::numeric_limits<double>::infinity());
+	}
+
+	{
+		SCOPED_TRACE("Test with invalid QuietNaN");
+		testIsValidWith(std::numeric_limits<double>::quiet_NaN());
+	}
+
+	{
+		SCOPED_TRACE("Test with invalid SignalingNaN");
+		testIsValidWith(std::numeric_limits<double>::signaling_NaN());
+	}
+}

@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Valid.h"
 
 namespace SurgSim
 {
@@ -156,6 +157,11 @@ void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix) const
 		(*matrix).middleCols(*it, 1).setZero();
 		(*matrix)(*it, *it) = 1.0;
 	}
+}
+
+bool OdeState::isValid() const
+{
+	return SurgSim::Math::isValid(getPositions()) && SurgSim::Math::isValid(getVelocities());
 }
 
 }; // namespace Math

@@ -18,7 +18,6 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 
 using SurgSim::Framework::Logger;
@@ -85,7 +84,7 @@ void Fem3DRepresentation::applyCorrection(double dt,
 	m_currentState->getPositions() += deltaVelocity * dt;
 	m_currentState->getVelocities() += deltaVelocity;
 
-	if (!isValidState(*m_currentState))
+	if (!m_currentState->isValid())
 	{
 		deactivateAndReset();
 	}
@@ -156,12 +155,6 @@ void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-}
-
-bool Fem3DRepresentation::isValidState(const SurgSim::Math::OdeState& state) const
-{
-	return SurgSim::Math::isValid(state.getPositions())
-		&& SurgSim::Math::isValid(state.getVelocities());
 }
 
 void Fem3DRepresentation::deactivateAndReset(void)

@@ -76,11 +76,6 @@ protected:
 	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 		const SurgSim::Math::RigidTransform3d& transform) override;
 
-	/// Determine whether a given state is valid or not
-	/// \param state The state to check
-	/// \result True if valid
-	bool isValidState(const SurgSim::Math::OdeState& state) const;
-
 	/// Deactivate and call resetState
 	void deactivateAndReset(void);
 
