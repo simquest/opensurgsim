@@ -44,13 +44,13 @@ namespace Physics
 /// \note The element is considered to have a constant thickness.
 class FemElement2DTriangle : public FemElement
 {
-	typedef Eigen::Matrix<double, 3, 3, Eigen::DontAlign> Matrix33Type;
+	typedef Eigen::Matrix<double, 3, 3> Matrix33Type;
 
-	typedef Eigen::Matrix<double, 3, 6, Eigen::DontAlign> Matrix36Type;
-	typedef Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Matrix66Type;
+	typedef Eigen::Matrix<double, 3, 6> Matrix36Type;
+	typedef Eigen::Matrix<double, 6, 6> Matrix66Type;
 
-	typedef Eigen::Matrix<double, 3, 9, Eigen::DontAlign> Matrix39Type;
-	typedef Eigen::Matrix<double, 9, 9, Eigen::DontAlign> Matrix99Type;
+	typedef Eigen::Matrix<double, 3, 9> Matrix39Type;
+	typedef Eigen::Matrix<double, 9, 9> Matrix99Type;
 
 public:
 	/// Constructor
@@ -166,27 +166,27 @@ protected:
 	/// \param state The deformable state to compute the stiffness matrix from
 	/// \param[out] k The stiffness matrix to store the result into
 	void computeStiffness(const DeformableRepresentationState& state,
-		Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* k);
+		Eigen::Matrix<double, 18, 18>* k);
 
 	/// Computes the triangle's mass matrix
 	/// \param state The deformable state to compute the stiffness matrix from
 	/// \param[out] m The mass matrix to store the result into
-	void computeMass(const DeformableRepresentationState& state, Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* m);
+	void computeMass(const DeformableRepresentationState& state, Eigen::Matrix<double, 18, 18>* m);
 
 	/// The element's rest state
-	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> m_x0;
+	Eigen::Matrix<double, 18, 1> m_x0;
 
 	/// Initial rotation matrix for the element
 	SurgSim::Math::Matrix33d m_initialRotation;
 
 	/// Mass matrix (in global coordinate frame)
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_M;
+	Eigen::Matrix<double, 18, 18> m_M;
 	/// Stiffness matrix (in local coordinate frame)
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_MLocal;
+	Eigen::Matrix<double, 18, 18> m_MLocal;
 	/// Stiffness matrix (in global coordinate frame)
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_K;
+	Eigen::Matrix<double, 18, 18> m_K;
 	/// Stiffness matrix (in local coordinate frame)
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_KLocal;
+	Eigen::Matrix<double, 18, 18> m_KLocal;
 
 	/// The triangle rest area
 	double m_restArea;

@@ -214,7 +214,7 @@ TYPED_TEST(RigidTransformTest, Accessible)
 	typedef typename TestFixture::Scalar Scalar;
 	typedef typename TestFixture::RigidTransform RigidTransform;
 	typedef Eigen::Quaternion<Scalar> Quaternion;
-	typedef Eigen::Matrix<Scalar, 3, 1, Eigen::DontAlign>  Vector3;
+	typedef Eigen::Matrix<Scalar, 3, 1>  Vector3;
 
 	typename RigidTransform::MatrixType initialMatrix;
 	typename RigidTransform::MatrixType newMatrix;

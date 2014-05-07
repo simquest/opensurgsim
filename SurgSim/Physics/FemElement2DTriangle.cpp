@@ -96,7 +96,7 @@ void FemElement2DTriangle::initialize(const DeformableRepresentationState& state
 
 void FemElement2DTriangle::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale)
 {
-	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> x, f;
+	Eigen::Matrix<double, 18, 1> x, f;
 
 	// K.U = F_ext
 	// K.(x - x0) = F_ext
@@ -148,7 +148,7 @@ void FemElement2DTriangle::addMatVec(const DeformableRepresentationState& state,
 		return;
 	}
 
-	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> extractedX, extractedResult;
+	Eigen::Matrix<double, 18, 1> extractedX, extractedResult;
 	getSubVector(x, m_nodeIds, 6, &extractedX);
 
 	// Adds the mass contribution
@@ -169,7 +169,7 @@ void FemElement2DTriangle::addMatVec(const DeformableRepresentationState& state,
 }
 
 void FemElement2DTriangle::computeMass(const DeformableRepresentationState& state,
-								   Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* M)
+								   Eigen::Matrix<double, 18, 18>* M)
 {
 	double mass = m_rho * m_restArea * m_thickness;
 
@@ -257,7 +257,7 @@ void FemElement2DTriangle::computeMass(const DeformableRepresentationState& stat
 }
 
 void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState& state,
-										Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* k)
+										Eigen::Matrix<double, 18, 18>* k)
 {
 	// Membrane part from "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
 	// Compute the membrane local strain-displacement matrix

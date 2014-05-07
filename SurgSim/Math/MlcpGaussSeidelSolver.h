@@ -172,8 +172,8 @@ private:
 									   bool signorini_verified, int nbLoop);
 
 
-	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign> Matrix;
-	typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
 
 
 	double       m_epsilonConvergence;

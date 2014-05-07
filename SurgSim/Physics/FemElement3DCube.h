@@ -150,21 +150,21 @@ public:
 protected:
 	/// Build the constitutive material 6x6 matrix
 	/// \param[out] constitutiveMatrix The 6x6 constitutive material matrix
-	void buildConstitutiveMaterialMatrix(Eigen::Matrix<double, 6, 6, Eigen::DontAlign>* constitutiveMatrix);
+	void buildConstitutiveMaterialMatrix(Eigen::Matrix<double, 6, 6>* constitutiveMatrix);
 
 	/// Computes the cube stiffness matrix along with the strain and stress matrices
 	/// \param state The deformable state to compute the stiffness matrix from
 	/// \param[out] strain, stress, k The strain, stress and stiffness matrices to store the result into
 	void computeStiffness(const DeformableRepresentationState& state,
-		Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* strain,
-		Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* stress,
-		Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* k);
+		Eigen::Matrix<double, 6, 24>* strain,
+		Eigen::Matrix<double, 6, 24>* stress,
+		Eigen::Matrix<double, 24, 24>* k);
 
 	/// Computes the cube mass matrix
 	/// \param state The deformable state to compute the mass matrix from
 	/// \param[out] m The mass matrix to store the result into
 	void computeMass(const DeformableRepresentationState& state,
-		Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* m);
+		Eigen::Matrix<double, 24, 24>* m);
 
 	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
 	/// This method relies on a given stiffness matrix and does not evaluate it from the state
@@ -187,9 +187,9 @@ protected:
 		const SurgSim::Math::gaussQuadraturePoint& epsilon,
 		const SurgSim::Math::gaussQuadraturePoint& eta,
 		const SurgSim::Math::gaussQuadraturePoint& mu,
-		Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* strain,
-		Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* stress,
-		Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* k);
+		Eigen::Matrix<double, 6, 24>* strain,
+		Eigen::Matrix<double, 6, 24>* stress,
+		Eigen::Matrix<double, 24, 24>* k);
 
 	/// Helper method to evaluate mass integral terms with a discrete sum using a Gauss quadrature rule
 	/// \param state The state to compute the evaluation with
@@ -199,7 +199,7 @@ protected:
 		const SurgSim::Math::gaussQuadraturePoint& epsilon,
 		const SurgSim::Math::gaussQuadraturePoint& eta,
 		const SurgSim::Math::gaussQuadraturePoint& mu,
-		Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* m);
+		Eigen::Matrix<double, 24, 24>* m);
 
 	/// Helper method to evaluate matrix J = d(x,y,z)/d(epsilon,eta,mu) at a given 3D parametric location
 	/// J expresses the 3D space coordinate frames variation w.r.t. parametric coordinates
@@ -217,7 +217,7 @@ protected:
 	/// \param Jinv The inverse of matrix J (3D global coords to 3D parametric coords)
 	/// \param[out] B The strain-displacement matrix
 	void evaluateStrainDisplacement(double epsilon, double eta, double mu, const SurgSim::Math::Matrix33d& Jinv,
-		Eigen::Matrix<double, 6, 24, Eigen::DontAlign> *B) const;
+		Eigen::Matrix<double, 6, 24> *B) const;
 
 	/// Cube rest volume
 	double m_restVolume;
@@ -288,19 +288,19 @@ protected:
 	double dShapeFunctiondmu(size_t i, double epsilon, double eta, double mu) const;
 
 	/// The cube rest state (nodes ordered by m_nodeIds)
-	Eigen::Matrix<double, 24, 1, Eigen::DontAlign> m_elementRestPosition;
+	Eigen::Matrix<double, 24, 1> m_elementRestPosition;
 
 	/// Strain matrix (usually noted \f$\epsilon\f$)
-	Eigen::Matrix<double, 6, 24, Eigen::DontAlign> m_strain;
+	Eigen::Matrix<double, 6, 24> m_strain;
 	/// Stress matrix (usually noted \f$\sigma\f$)
-	Eigen::Matrix<double, 6, 24, Eigen::DontAlign> m_stress;
+	Eigen::Matrix<double, 6, 24> m_stress;
 	/// Constitutive material matrix (Hooke's law in this case) defines the relationship between stress and strain
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> m_constitutiveMaterial;
+	Eigen::Matrix<double, 6, 6> m_constitutiveMaterial;
 
 	/// %Mass matrix (usually noted \f$M\f$)
-	Eigen::Matrix<double, 24, 24, Eigen::DontAlign> m_mass;
+	Eigen::Matrix<double, 24, 24> m_mass;
 	/// Stiffness matrix (usually noted \f$K\f$)
-	Eigen::Matrix<double, 24, 24, Eigen::DontAlign> m_stiffness;
+	Eigen::Matrix<double, 24, 24> m_stiffness;
 };
 
 } // namespace Physics

@@ -31,11 +31,11 @@ namespace Math
 
 /// A quaternion of floats.
 /// This type (and any structs that contain it) can be safely allocated via new.
-typedef Eigen::Quaternion<float,  Eigen::DontAlign>  Quaternionf;
+typedef Eigen::Quaternion<float>  Quaternionf;
 
 /// A quaternion of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
-typedef Eigen::Quaternion<double, Eigen::DontAlign>  Quaterniond;
+typedef Eigen::Quaternion<double>  Quaterniond;
 
 
 
@@ -126,8 +126,8 @@ void computeRotationVector(const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& 
 						   const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& start,
 						   Eigen::Matrix<T, 3, 1, VOpt>* rotationVector)
 {
-	Eigen::Quaternion<T, Eigen::DontAlign> q1(end.linear());
-	Eigen::Quaternion<T, Eigen::DontAlign> q2(start.linear());
+	Eigen::Quaternion<T> q1(end.linear());
+	Eigen::Quaternion<T> q2(start.linear());
 	double angle;
 	Eigen::Matrix<T, 3, 1, VOpt> axis;
 	computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);

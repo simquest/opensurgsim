@@ -1069,7 +1069,7 @@ T distanceTrianglePlane(
 	Eigen::Matrix<T, 3, 1, MOpt>* closestPointTriangle,
 	Eigen::Matrix<T, 3, 1, MOpt>* planeProjectionPoint)
 {
-	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> distances(n.dot(tv0) + d, n.dot(tv1) + d, n.dot(tv2) + d);
+	Eigen::Matrix<T, 3, 1, MOpt> distances(n.dot(tv0) + d, n.dot(tv1) + d, n.dot(tv2) + d);
 	Eigen::Matrix<T, 3, 1, MOpt> t01 = tv1-tv0;
 	Eigen::Matrix<T, 3, 1, MOpt> t02 = tv2-tv0;
 	Eigen::Matrix<T, 3, 1, MOpt> t12 = tv2-tv1;

@@ -153,13 +153,13 @@ protected:
 	/// \param state The deformable state to compute the stiffness matrix from
 	/// \param[out] k The stiffness matrix to store the result into
 	void computeStiffness(const DeformableRepresentationState& state,
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* k);
+		Eigen::Matrix<double, 12, 12>* k);
 
 	/// Computes the tetrahedron mass matrix
 	/// \param state The deformable state to compute the mass matrix from
 	/// \param[out] m The mass matrix to store the result into
 	void computeMass(const DeformableRepresentationState& state,
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* m);
+		Eigen::Matrix<double, 12, 12>* m);
 
 	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
 	/// This method relies on a given stiffness matrix and does not evaluate it from the state
@@ -179,19 +179,19 @@ protected:
 	std::array<double, 4> m_ai, m_bi, m_ci, m_di;
 
 	/// The tetrahedon rest state
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_x0;
+	Eigen::Matrix<double, 12, 1> m_x0;
 
 	/// Elasticity material matrix (contains the elastic properties of the material)
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> m_Em;
+	Eigen::Matrix<double, 6, 6> m_Em;
 	/// Strain matrix
-	Eigen::Matrix<double, 6, 12, Eigen::DontAlign> m_strain;
+	Eigen::Matrix<double, 6, 12> m_strain;
 	/// Stress matrix
-	Eigen::Matrix<double, 6, 12, Eigen::DontAlign> m_stress;
+	Eigen::Matrix<double, 6, 12> m_stress;
 
 	/// Mass matrix
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_M;
+	Eigen::Matrix<double, 12, 12> m_M;
 	/// Stiffness matrix
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_K;
+	Eigen::Matrix<double, 12, 12> m_K;
 };
 
 } // namespace Physics

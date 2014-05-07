@@ -200,7 +200,7 @@ void LinearSpring::addMatVec(const DeformableRepresentationState& state, double 
 	}
 
 	// Shared data: the 6D vector to multiply the 6x6 matrix with
-	Eigen::Matrix<double, 6, 1, Eigen::DontAlign> vector6D;
+	Eigen::Matrix<double, 6, 1> vector6D;
 	getSubVector(vector, m_nodeIds, 3, &vector6D);
 
 	// Shared data: spring direction and length

@@ -142,14 +142,14 @@ TYPED_TEST(ValidTests, MatrixChecks)
 	typedef typename TestFixture::Scalar Scalar;
 
 	{
-		Eigen::Matrix<Scalar, 2, 2, Eigen::DontAlign | Eigen::RowMajor> matrix;
+		Eigen::Matrix<Scalar, 2, 2, Eigen::RowMajor> matrix;
 		matrix.setIdentity();
 		matrixCheckHelper(matrix);
 		matrix.setZero();
 		matrixCheckHelper(matrix);
 	}
 	{
-		Eigen::Matrix<Scalar, 3, 3, Eigen::DontAlign | Eigen::ColMajor> matrix;
+		Eigen::Matrix<Scalar, 3, 3, Eigen::ColMajor> matrix;
 		matrix.setIdentity();
 		matrixCheckHelper(matrix);
 	}
@@ -224,19 +224,19 @@ TYPED_TEST(ValidTests, VectorChecks)
 	typedef typename TestFixture::Scalar Scalar;
 
 	{
-		Eigen::Matrix<Scalar, 2, 1, Eigen::DontAlign> vector;
+		Eigen::Matrix<Scalar, 2, 1> vector;
 		vector.setZero();
 		vectorCheckHelper(vector);
 		vector.setZero();
 		vectorCheckHelper(vector);
 	}
 	{
-		Eigen::Matrix<Scalar, 3, 1, Eigen::DontAlign> vector;
+		Eigen::Matrix<Scalar, 3, 1> vector;
 		vector.setZero();
 		vectorCheckHelper(vector);
 	}
 	{
-		Eigen::Matrix<Scalar, 4, 1, Eigen::DontAlign> vector;
+		Eigen::Matrix<Scalar, 4, 1> vector;
 		vector.setZero();
 		vectorCheckHelper(vector);
 	}
@@ -370,9 +370,9 @@ TYPED_TEST(ValidTests, TransformChecks)
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::isSubnormal;
 
-	transformCheckHelper<Eigen::Transform<Scalar, 2, Eigen::Isometry, Eigen::DontAlign>>();
-	transformCheckHelper<Eigen::Transform<Scalar, 3, Eigen::Isometry, Eigen::DontAlign>>();
-	transformCheckHelper<Eigen::Transform<Scalar, 4, Eigen::Isometry, Eigen::DontAlign>>();
+	transformCheckHelper<Eigen::Transform<Scalar, 2, Eigen::Isometry>>();
+	transformCheckHelper<Eigen::Transform<Scalar, 3, Eigen::Isometry>>();
+	transformCheckHelper<Eigen::Transform<Scalar, 4, Eigen::Isometry>>();
 	transformCheckHelper<Eigen::Transform<Scalar, 4, Eigen::Isometry>>();
 	transformCheckHelper<Eigen::Transform<Scalar, 4, Eigen::Affine>>();
 	transformCheckHelper<Eigen::Transform<Scalar, 4, Eigen::AffineCompact>>();
@@ -493,14 +493,14 @@ TYPED_TEST(ValidTests, ClearSubnormalMatrix)
 	typedef typename TestFixture::Scalar Scalar;
 
 	{
-		Eigen::Matrix<Scalar, 2, 2, Eigen::DontAlign | Eigen::RowMajor> matrix;
+		Eigen::Matrix<Scalar, 2, 2, Eigen::RowMajor> matrix;
 		matrix.setConstant(123);
 		matrixSetSubnormalHelper(matrix);
 		matrix.setZero();
 		matrixSetSubnormalHelper(matrix);
 	}
 	{
-		Eigen::Matrix<Scalar, 3, 3, Eigen::DontAlign | Eigen::ColMajor> matrix;
+		Eigen::Matrix<Scalar, 3, 3, Eigen::ColMajor> matrix;
 		matrix.setConstant(123);
 		matrixSetSubnormalHelper(matrix);
 	}
@@ -573,19 +573,19 @@ TYPED_TEST(ValidTests, ClearSubnormalVector)
 	typedef typename TestFixture::Scalar Scalar;
 
 	{
-		Eigen::Matrix<Scalar, 2, 1, Eigen::DontAlign> vector;
+		Eigen::Matrix<Scalar, 2, 1> vector;
 		vector.setConstant(543);
 		vectorSetSubnormalHelper(vector);
 		vector.setZero();
 		vectorSetSubnormalHelper(vector);
 	}
 	{
-		Eigen::Matrix<Scalar, 3, 1, Eigen::DontAlign> vector;
+		Eigen::Matrix<Scalar, 3, 1> vector;
 		vector.setConstant(543);
 		vectorSetSubnormalHelper(vector);
 	}
 	{
-		Eigen::Matrix<Scalar, 4, 1, Eigen::DontAlign> vector;
+		Eigen::Matrix<Scalar, 4, 1> vector;
 		vector.setConstant(543);
 		vectorSetSubnormalHelper(vector);
 	}
@@ -741,9 +741,9 @@ TYPED_TEST(ValidTests, ClearSubnormalTransform)
 {
 	typedef typename TestFixture::Scalar Scalar;
 
-	transformSetSubnormalHelper<Eigen::Transform<Scalar, 2, Eigen::Isometry, Eigen::DontAlign>>();
-	transformSetSubnormalHelper<Eigen::Transform<Scalar, 3, Eigen::Isometry, Eigen::DontAlign>>();
-	transformSetSubnormalHelper<Eigen::Transform<Scalar, 4, Eigen::Isometry, Eigen::DontAlign>>();
+	transformSetSubnormalHelper<Eigen::Transform<Scalar, 2, Eigen::Isometry>>();
+	transformSetSubnormalHelper<Eigen::Transform<Scalar, 3, Eigen::Isometry>>();
+	transformSetSubnormalHelper<Eigen::Transform<Scalar, 4, Eigen::Isometry>>();
 	transformSetSubnormalHelper<Eigen::Transform<Scalar, 4, Eigen::Isometry>>();
 	transformSetSubnormalHelper<Eigen::Transform<Scalar, 4, Eigen::Affine>>();
 	transformSetSubnormalHelper<Eigen::Transform<Scalar, 4, Eigen::AffineCompact>>();
@@ -757,7 +757,7 @@ TYPED_TEST(ValidTests, Blocks)
 	using SurgSim::Math::setSubnormalToZero;
 
 	{
-		Eigen::Matrix<Scalar, 4, 4, Eigen::DontAlign | Eigen::RowMajor> matrix;
+		Eigen::Matrix<Scalar, 4, 4, Eigen::RowMajor> matrix;
 		matrix.setConstant(123);
 		EXPECT_TRUE(isValid(matrix.template block<2, 2>(1, 1)));
 		EXPECT_FALSE(isSubnormal(matrix.template block<2, 2>(1, 1)));

@@ -33,7 +33,7 @@ namespace Math
 {
 
 typedef double SizeType;
-typedef Eigen::Matrix<SizeType, 3, 1, Eigen::DontAlign> VectorType;
+typedef Eigen::Matrix<SizeType, 3, 1> VectorType;
 
 ::std::ostream& operator <<(std::ostream& stream, const VectorType& vector)
 {
@@ -684,16 +684,16 @@ TEST_F(GeometryTest, DistancePointTriangle)
 
 	// Degenerate Edges
 	// Edge v0v1
-	distance = distancePointTriangle<double, Eigen::DontAlign>(inputPoint,
-			   tri.v0, tri.v0 + tri.v0v1 * epsilon * 0.01, tri.v2,
+	distance = distancePointTriangle(inputPoint,
+			   tri.v0, Vector3d(tri.v0 + tri.v0v1 * epsilon * 0.01), tri.v2,
 			   &result);
 	expectedDistance = distancePointSegment(inputPoint, tri.v0, tri.v2, &closestPoint);
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint, result));
 
 	// Edge v0v2
-	distance = distancePointTriangle<double, Eigen::DontAlign>(inputPoint,
-			   tri.v2 - tri.v0v2 * epsilon * 0.01, tri.v1 , tri.v2,
+	distance = distancePointTriangle(inputPoint,
+			   Vector3d(tri.v2 - tri.v0v2 * epsilon * 0.01), tri.v1 , tri.v2,
 			   &result);
 	expectedDistance = distancePointSegment(inputPoint, tri.v1, tri.v2, &closestPoint);
 	EXPECT_NEAR(expectedDistance, distance, epsilon);

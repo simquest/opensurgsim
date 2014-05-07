@@ -108,7 +108,7 @@ void FemElement3DTetrahedron::addForce(const DeformableRepresentationState& stat
 }
 
 void FemElement3DTetrahedron::computeMass(const DeformableRepresentationState& state,
-										  Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* M)
+										  Eigen::Matrix<double, 12, 12>* M)
 {
 	// From Przemieniecki book
 	// -> section 11 "Inertia properties of structural elements
@@ -165,7 +165,7 @@ void FemElement3DTetrahedron::addDamping(const DeformableRepresentationState& st
 }
 
 void FemElement3DTetrahedron::computeStiffness(const DeformableRepresentationState& state,
-											   Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* k)
+											   Eigen::Matrix<double, 12, 12>* k)
 {
 	m_Em.setZero();
 	m_strain.setZero();
@@ -239,7 +239,7 @@ void FemElement3DTetrahedron::addMatVec(const DeformableRepresentationState& sta
 		return;
 	}
 
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> xLoc, resLoc;
+	Eigen::Matrix<double, 12, 1> xLoc, resLoc;
 	getSubVector(x, m_nodeIds, 3, &xLoc);
 
 	// Adds the mass contribution

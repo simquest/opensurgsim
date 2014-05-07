@@ -71,7 +71,7 @@ public:
 	/// The type used for vectors.
 	typedef SurgSim::Math::Vector3d VectorType;
 	/// The type used for matrices.
-	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor> DynamicMatrixType;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DynamicMatrixType;
 	/// The type used for scalars.
 	typedef double ScalarType;
 	/// The type used for integers.

@@ -68,7 +68,7 @@ public:
 		return dShapeFunctiondmu(i, epsilon, eta, mu);
 	}
 
-	const Eigen::Matrix<double, 24, 1, Eigen::DontAlign>& getInitialPosition() const
+	const Eigen::Matrix<double, 24, 1>& getInitialPosition() const
 	{
 		return m_elementRestPosition;
 	}
@@ -80,7 +80,7 @@ public:
 	std::array<unsigned int, 8> m_nodeIds;
 	DeformableRepresentationState m_restState;
 	double m_expectedVolume;
-	Eigen::Matrix<double, 24, 1, Eigen::DontAlign> m_expectedX0;
+	Eigen::Matrix<double, 24, 1> m_expectedX0;
 	double m_rho, m_E, m_nu;
 	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix, m_expectedStiffnessMatrix;
 	SurgSim::Math::Vector m_vectorOnes;
@@ -90,7 +90,7 @@ public:
 		using SurgSim::Math::getSubMatrix;
 		using SurgSim::Math::addSubMatrix;
 
-		Eigen::Matrix<double, 24, 24, Eigen::DontAlign> K;
+		Eigen::Matrix<double, 24, 24> K;
 		K.setZero();
 		{
 			// Expected stiffness matrix given in
@@ -362,7 +362,7 @@ public:
 	{
 		using SurgSim::Math::addSubMatrix;
 
-		Eigen::Matrix<double, 24, 24, Eigen::DontAlign> M;
+		Eigen::Matrix<double, 24, 24> M;
 		M.setZero();
 
 		// "Physically-Based Simulation of Objects Represented by Surface Meshes"
