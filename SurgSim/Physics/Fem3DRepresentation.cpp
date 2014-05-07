@@ -16,17 +16,22 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 
 #include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/Collision/Location.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Valid.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
+#include "SurgSim/Physics/FemElement.h"
 
 using SurgSim::Framework::Logger;
 
 namespace
 {
 void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
-										SurgSim::Math::Vector* x, bool rotationOnly = false)
+							   SurgSim::Math::Vector* x, bool rotationOnly = false)
 {
 	typedef SurgSim::Math::Vector::Index IndexType;
 
@@ -138,6 +143,95 @@ bool Fem3DRepresentation::loadFile()
 
 	m_doLoadFile = false;
 	return true;
+}
+
+std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElementIdMap(
+	const SurgSim::DataStructures::TriangleMesh& mesh)
+{
+	std::unordered_map<size_t, size_t> result;
+
+	// An Fem3DElementCube/Fem3DElementTetrahedron element has 8/4 nodes.
+	// A triangle has 3 nodes.
+	// If all the nodes of a triangle are present in a Fem3DElement*** node, then a row in the map is created.
+	// The nodes are identified using their ids.
+	// std::includes(...) is used to find whether a given list of triangle node ids are present in the supplied list
+	// of femElement node ids. This function requires the lists of node ids to be sorted.
+
+	// Get the list of fem elements with their node ids.
+	std::vector<std::vector<size_t>> femElements;
+	femElements.reserve(getNumFemElements());
+	for (unsigned int i = 0; i < getNumFemElements(); i++)
+	{
+		femElements.push_back(getFemElement(i)->getNodeIds());
+		// Sort the node ids for this femElement.
+		std::sort(femElements.back().begin(), femElements.back().end());
+	}
+
+	// Iterate over the list of triangles.
+	const auto& meshTriangles = mesh.getTriangles();
+	for (auto triangle = meshTriangles.cbegin(); triangle != meshTriangles.cend(); ++triangle)
+	{
+		// Get the node ids of the triangle and sort them.
+		std::array<unsigned int, 3> triangleWithSortedNodeIds = triangle->verticesId;
+		std::sort(triangleWithSortedNodeIds.begin(), triangleWithSortedNodeIds.end());
+
+		// Find the femElement that contains all the node ids of this triangle.
+		std::vector<std::vector<size_t>>::iterator foundFemElement =
+		std::find_if(femElements.begin(), femElements.end(),
+					 [triangleWithSortedNodeIds](std::vector<size_t> femElementWithSortedNodeIds)
+					 { return std::includes(femElementWithSortedNodeIds.begin(), femElementWithSortedNodeIds.end(),
+											triangleWithSortedNodeIds.begin(), triangleWithSortedNodeIds.end()); });
+
+		// Assert to make sure that a triangle doesn't end up not having a femElement mapped to it.
+		SURGSIM_ASSERT(foundFemElement != femElements.end())
+			<< "A triangle in the given mesh of an Fem3DRepresentation does not have a corresponding"
+			<< " femElement.";
+
+		// Add a row to the mapping (triangleId, elementId).
+		// std::distance gives the index of the iterator within the container (by finding the distance
+		// from the beginning of the container).
+		result[std::distance(meshTriangles.begin(), triangle)] = std::distance(femElements.begin(), foundFemElement);
+	}
+
+	return result;
+}
+
+bool Fem3DRepresentation::doWakeUp()
+{
+	FemRepresentation::doWakeUp();
+
+	auto deformableCollisionRepresentation
+		= std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
+
+	if (deformableCollisionRepresentation != nullptr)
+	{
+		m_triangleIdToElementIdMap = createTriangleIdToElementIdMap(*deformableCollisionRepresentation->getMesh());
+	}
+
+	return true;
+}
+
+std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::Collision::Location& location)
+{
+	size_t triangleId = location.triangleId.getValue();
+	SurgSim::Math::Vector globalPosition = location.globalPosition.getValue();
+
+	// Get FemElement id from the triangle id.
+	SURGSIM_ASSERT(m_triangleIdToElementIdMap.count(triangleId) == 1) << "Triangle must be mapped to an fem element.";
+
+	unsigned int elementId = static_cast<unsigned int>(m_triangleIdToElementIdMap[triangleId]);
+	std::shared_ptr<FemElement> element = getFemElement(elementId);
+
+	FemRepresentationCoordinate coordinate;
+	coordinate.elementId = elementId;
+	coordinate.naturalCoordinate = element->computeNaturalCoordinate(*m_currentState, globalPosition);
+
+	// Fem3DRepresentationLocalization::setLocalPosition verifies argument based on its Representation.
+	auto result = std::make_shared<Fem3DRepresentationLocalization>();
+	result->setRepresentation(std::static_pointer_cast<SurgSim::Physics::Representation>(Component::getSharedPtr()));
+	result->setLocalPosition(coordinate);
+
+	return result;
 }
 
 bool Fem3DRepresentation::doInitialize()
