@@ -18,9 +18,9 @@
 
 #include <string>
 
-#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 
-class StapleElement : public SurgSim::Framework::SceneElement
+class StapleElement : public SurgSim::Framework::BasicSceneElement
 {
 public:
 	/// Constructor
