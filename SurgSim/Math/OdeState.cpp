@@ -134,7 +134,8 @@ bool OdeState::isBoundaryCondition(unsigned int dof) const
 
 void OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 {
-	SURGSIM_ASSERT(vector->size() == getNumDof()) << "Invalid vector to apply boundary conditions on";
+	SURGSIM_ASSERT(static_cast<unsigned int>(vector->size()) == getNumDof()) <<
+		"Invalid vector to apply boundary conditions on";
 
 	for (std::vector<unsigned int>::const_iterator it = getBoundaryConditions().cbegin();
 		it != getBoundaryConditions().cend();
@@ -146,8 +147,8 @@ void OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 
 void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix) const
 {
-	SURGSIM_ASSERT(matrix->rows() == getNumDof() && matrix->cols() == getNumDof()) <<
-		"Invalid matrix to apply boundary conditions on";
+	SURGSIM_ASSERT(static_cast<unsigned int>(matrix->rows()) == getNumDof() &&
+		static_cast<unsigned int>(matrix->cols()) == getNumDof()) << "Invalid matrix to apply boundary conditions on";
 
 	for (std::vector<unsigned int>::const_iterator it = getBoundaryConditions().cbegin();
 		it != getBoundaryConditions().cend();
