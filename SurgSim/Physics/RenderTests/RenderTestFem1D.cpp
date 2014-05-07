@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -27,7 +27,7 @@
 #include "SurgSim/Physics/FemElement1DBeam.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
+using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -103,7 +103,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 	femSceneElement->addComponent(graphicsRepresentation);
 
 	femSceneElement->addComponent(
-		std::make_shared<TransferDeformableStateToVerticesBehavior<void>>("Transfer from Physics to Graphics: " + name,
+		std::make_shared<TransferOdeStateToVerticesBehavior<void>>("Transfer from Physics to Graphics: " + name,
 				physicsRepresentation->getFinalState(),
 				graphicsRepresentation->getVertices()));
 

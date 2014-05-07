@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
@@ -28,7 +28,7 @@
 #include "SurgSim/Physics/FemElement2DTriangle.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
+using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -176,7 +176,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	femSceneElement->addComponent(
-		std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
+		std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
 			"physics to triangle mesh",
 			physicsRepresentation->getFinalState(),
 			graphicsTriangleMeshRepresentation->getMesh()));
@@ -189,7 +189,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 	graphicsPointCloudRepresentation->setVisible(true);
 	femSceneElement->addComponent(graphicsPointCloudRepresentation);
 
-	femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
+	femSceneElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>(
 		"Transfer from Physics to Graphics point cloud",
 		physicsRepresentation->getFinalState(),
 		graphicsPointCloudRepresentation->getVertices()));

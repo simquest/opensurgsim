@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -28,7 +28,7 @@
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
+using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Physics::Fem3DRepresentation;
@@ -113,7 +113,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 	femSceneElement->addComponent(graphicsRepresentation);
-	femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
+	femSceneElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>(
 		"Physics to Graphics deformable points",
 		physicsRepresentation->getFinalState(),
 		graphicsRepresentation->getVertices()));
@@ -180,7 +180,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 	femSceneElement->addComponent(graphicsRepresentation);
-	femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
+	femSceneElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>(
 		"Physics to Graphics deformable points",
 		physicsRepresentation->getFinalState(),
 		graphicsRepresentation->getVertices()));

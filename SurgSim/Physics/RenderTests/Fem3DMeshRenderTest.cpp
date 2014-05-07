@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
@@ -140,7 +140,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	auto femToMesh =
-		std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
+		std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
 			name + " physics to triangle mesh",
 			fem->getFinalState(),
 			graphics->getMesh());
@@ -178,7 +178,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	sceneElement->addComponent(pointCloud);
 
 	// The behavior which transfers the position of the vertices in the FEM to locations in the point cloud
-	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<EmptyData>>(
+	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<EmptyData>>(
 						  "fem to point cloud",
 						  fem->getFinalState(),
 						  pointCloud->getVertices());
