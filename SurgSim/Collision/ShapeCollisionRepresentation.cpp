@@ -31,6 +31,7 @@ ShapeCollisionRepresentation::ShapeCollisionRepresentation(
 	m_shape(shape)
 {
 	setLocalPose(pose);
+	update(0.0);
 }
 
 ShapeCollisionRepresentation::~ShapeCollisionRepresentation()
