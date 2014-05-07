@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Simple Test for FreeMotion calculation
+/// \file FreeMotionTests.cpp
+/// Simple Test for FreeMotion calculation
 
 #include <gtest/gtest.h>
 
@@ -48,13 +49,9 @@ TEST(FreeMotionTest, RunTest)
 
 	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood
-
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.01); // 1cm Sphere
 	params.setShapeUsedForMassInertia(shape);
-
 	representation->setInitialParameters(params);
-	representation->setInitialPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0)));
 
 	representations.push_back(representation);
 
@@ -64,17 +61,11 @@ TEST(FreeMotionTest, RunTest)
 	FreeMotion computation;
 
 	representation->setIsGravityEnabled(false);
-	EXPECT_TRUE(representation->getPose().translation().isZero());
+	EXPECT_TRUE(representation->getCurrentState().getPose().translation().isZero());
 	state = computation.update(1.0,state);
-	EXPECT_TRUE(representation->getPose().translation().isZero());
-
-	// Computation.update calls update on all representations, but DOES NOT CALL beforeUpdate/afterUpdate
-	// Therefore the finalState is never set...only previous/current are handled in update
+	EXPECT_TRUE(representation->getCurrentState().getPose().translation().isZero());
 
 	representation->setIsGravityEnabled(true);
-	EXPECT_TRUE(representation->getPose().translation().isZero());
-	state = computation.update(1.0,state); // previous==(0 0 0) current !=(0 0 0)
-	EXPECT_TRUE(representation->getPreviousPose().translation().isZero());
-	state = computation.update(1.0,state); // previous!=(0 0 0) current !=(0 0 0)
-	EXPECT_FALSE(representation->getPreviousPose().translation().isZero());
+	state = computation.update(1.0,state);
+	EXPECT_FALSE(representation->getCurrentState().getPose().translation().isZero());
 }

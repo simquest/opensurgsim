@@ -137,6 +137,7 @@ void testUniformFloat(FloatType min, FloatType max)
 /// \tparam	FloatType	Floating point type (float, double, ...)
 /// \param	min	Minimum random value
 /// \param	max	Maximum random value
+/// \param	numElements	Number of elements
 template <class FloatType>
 void testUniformElementsFloat(FloatType min, FloatType max, unsigned int numElements)
 {
@@ -183,6 +184,7 @@ void testUniformInt(IntType min, IntType max)
 /// \tparam	IntType	Integer type (int, unsigned int, ...)
 /// \param	min	Minimum random value
 /// \param	max	Maximum random value
+/// \param	numElements	Number of elements
 template <class IntType>
 void testUniformElementsInt(IntType min, IntType max, unsigned int numElements)
 {

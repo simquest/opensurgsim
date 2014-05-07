@@ -116,6 +116,18 @@ const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& PhysicsMa
 	return m_collisionPairs;
 }
 
+void PhysicsManagerState::setExcludedCollisionPairs(
+	const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& val)
+{
+	m_excludedCollisionPairs = val;
+}
+
+const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>&
+	PhysicsManagerState::getExcludedCollisionPairs() const
+{
+	return m_excludedCollisionPairs;
+}
+
 void PhysicsManagerState::setConstraintGroup(
 	ConstraintGroupType type,
 	const std::vector<std::shared_ptr<Constraint>>& constraints)

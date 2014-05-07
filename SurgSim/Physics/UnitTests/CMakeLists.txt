@@ -28,6 +28,7 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
+	Fem1DMechanicalValidationTests.cpp
 	Fem1DRepresentationTests.cpp
 	Fem2DMechanicalValidationTests.cpp
 	Fem2DRepresentationTests.cpp
@@ -49,6 +50,7 @@ set(UNIT_TEST_SOURCES
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
+	MassSpringMechanicalValidationTests.cpp
 	MassSpringRepresentationContactTest.cpp
 	MassSpringRepresentationLocalizationTest.cpp
 	MassSpringRepresentationTests.cpp

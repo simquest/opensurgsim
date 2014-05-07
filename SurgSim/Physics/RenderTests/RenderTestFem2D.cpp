@@ -157,7 +157,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("TriangleMesh Representation");
-	graphicsTriangleMeshRepresentation->setInitialPose(gfxPose);
+	graphicsTriangleMeshRepresentation->setLocalPose(gfxPose);
 	auto mesh = graphicsTriangleMeshRepresentation->getMesh();
 	// Create vertices
 	for (size_t vertexId = 0; vertexId < physicsRepresentation->getInitialState()->getNumNodes(); vertexId++)
@@ -184,7 +184,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 
 	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsPointCloudRepresentation
 			= std::make_shared<OsgPointCloudRepresentation<void>>("PointCloud Representation");
-	graphicsPointCloudRepresentation->setInitialPose(gfxPose);
+	graphicsPointCloudRepresentation->setLocalPose(gfxPose);
 	graphicsPointCloudRepresentation->setColor(color);
 	graphicsPointCloudRepresentation->setPointSize(3.0f);
 	graphicsPointCloudRepresentation->setVisible(true);

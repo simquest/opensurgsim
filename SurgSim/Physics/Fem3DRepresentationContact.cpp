@@ -17,6 +17,7 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationContact.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
+#include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
 

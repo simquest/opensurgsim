@@ -31,9 +31,7 @@ namespace Physics
 /// Finite Element Model 1D is a fem built with 1D FemElement
 ///
 /// The structure of a 1D model derives into a matrix structure of tri-diagonal block.
-/// This class should switch to using tri-diagonal block matrices when available.
-class Fem1DRepresentation : public FemRepresentation<SurgSim::Math::Matrix, SurgSim::Math::Matrix,
-													 SurgSim::Math::Matrix, SurgSim::Math::Matrix>
+class Fem1DRepresentation : public FemRepresentation
 {
 public:
 	/// Constructor
@@ -48,6 +46,8 @@ public:
 	virtual RepresentationType getType() const override;
 
 protected:
+	virtual bool doWakeUp() override;
+
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply

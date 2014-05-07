@@ -13,12 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMREPRESENTATION_INL_H
-#define SURGSIM_PHYSICS_FEMREPRESENTATION_INL_H
-
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/FemRepresentationCoordinate.h"
 
 namespace SurgSim
@@ -27,21 +25,18 @@ namespace SurgSim
 namespace Physics
 {
 
-template <class MT, class DT, class KT, class ST>
-FemRepresentation<MT, DT, KT, ST>::FemRepresentation(const std::string& name) :
-	DeformableRepresentation<MT, DT, KT, ST>(name)
+FemRepresentation::FemRepresentation(const std::string& name) :
+	DeformableRepresentation(name)
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
 }
 
-template <class MT, class DT, class KT, class ST>
-FemRepresentation<MT, DT, KT, ST>::~FemRepresentation()
+FemRepresentation::~FemRepresentation()
 {
 }
 
-template <class MT, class DT, class KT, class ST>
-bool FemRepresentation<MT, DT, KT, ST>::doInitialize()
+bool FemRepresentation::doInitialize()
 {
 	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
 
@@ -70,34 +65,29 @@ bool FemRepresentation<MT, DT, KT, ST>::doInitialize()
 	return true;
 }
 
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::addFemElement(const std::shared_ptr<FemElement> femElement)
+void FemRepresentation::addFemElement(const std::shared_ptr<FemElement> femElement)
 {
 	m_femElements.push_back(femElement);
 }
 
-template <class MT, class DT, class KT, class ST>
-unsigned int FemRepresentation<MT, DT, KT, ST>::getNumFemElements() const
+unsigned int FemRepresentation::getNumFemElements() const
 {
 	return m_femElements.size();
 }
 
-template <class MT, class DT, class KT, class ST>
-std::shared_ptr<FemElement> FemRepresentation<MT, DT, KT, ST>::getFemElement(unsigned int femElementId)
+std::shared_ptr<FemElement> FemRepresentation::getFemElement(unsigned int femElementId)
 {
 	SURGSIM_ASSERT(femElementId < getNumFemElements()) << "Invalid femElement id";
 	return m_femElements[femElementId];
 }
 
-template <class MT, class DT, class KT, class ST>
-bool FemRepresentation<MT, DT, KT, ST>::isValidCoordinate(const FemRepresentationCoordinate& coordinate) const
+bool FemRepresentation::isValidCoordinate(const FemRepresentationCoordinate& coordinate) const
 {
 	return (coordinate.elementId < m_femElements.size())
 		   && m_femElements[coordinate.elementId]->isValidCoordinate(coordinate.naturalCoordinate);
 }
 
-template <class MT, class DT, class KT, class ST>
-double FemRepresentation<MT, DT, KT, ST>::getTotalMass() const
+double FemRepresentation::getTotalMass() const
 {
 	double mass = 0.0;
 	for (auto it = std::begin(m_femElements); it != std::end(m_femElements); it++)
@@ -107,92 +97,37 @@ double FemRepresentation<MT, DT, KT, ST>::getTotalMass() const
 	return mass;
 }
 
-template <class MT, class DT, class KT, class ST>
-double FemRepresentation<MT, DT, KT, ST>::getRayleighDampingStiffness() const
+double FemRepresentation::getRayleighDampingStiffness() const
 {
 	return m_rayleighDamping.stiffnessCoefficient;
 }
 
-template <class MT, class DT, class KT, class ST>
-double FemRepresentation<MT, DT, KT, ST>::getRayleighDampingMass() const
+double FemRepresentation::getRayleighDampingMass() const
 {
 	return m_rayleighDamping.massCoefficient;
 }
 
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::setRayleighDampingStiffness(double stiffnessCoef)
+void FemRepresentation::setRayleighDampingStiffness(double stiffnessCoef)
 {
 	m_rayleighDamping.stiffnessCoefficient = stiffnessCoef;
 }
 
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::setRayleighDampingMass(double massCoef)
+void FemRepresentation::setRayleighDampingMass(double massCoef)
 {
 	m_rayleighDamping.massCoefficient = massCoef;
 }
 
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::beforeUpdate(double dt)
+void FemRepresentation::beforeUpdate(double dt)
 {
-	if (! isActive())
-	{
-		return;
-	}
+	DeformableRepresentation::beforeUpdate(dt);
 
 	SURGSIM_ASSERT(getNumFemElements())
 			<< "No fem element specified yet, call addFemElement() prior to running the simulation";
 	SURGSIM_ASSERT(getNumDof())
 			<<	"State has not been initialized yet, call setInitialState() prior to running the simulation";
-
-	// Call the DeformableRepresentation implementation to take care of the OdeSolver setup
-	DeformableRepresentation<MT, DT, KT, ST>::beforeUpdate(dt);
 }
 
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::update(double dt)
-{
-	if (! isActive())
-	{
-		return;
-	}
-
-	SURGSIM_ASSERT(m_odeSolver != nullptr) <<
-										   "Ode solver has not been set yet. Did you call beforeUpdate() ?";
-	SURGSIM_ASSERT(m_initialState != nullptr) <<
-			"Initial state has not been set yet. Did you call setInitialState() ?";
-
-	// Solve the ode
-	m_odeSolver->solve(dt, *m_currentState, m_newState.get());
-
-	// Back up the current state into the previous state (by swapping)
-	m_currentState.swap(m_previousState);
-	// Make the new state, the current state (by swapping)
-	m_currentState.swap(m_newState);
-}
-
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::afterUpdate(double dt)
-{
-	if (! isActive())
-	{
-		return;
-	}
-
-	SURGSIM_ASSERT(m_initialState != nullptr) <<
-			"Initial state has not been set yet. Did you call setInitialState() ?";
-
-	// Back up the current state into the final state
-	*m_finalState = *m_currentState;
-}
-
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::applyCorrection(double dt,
-		const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
-{
-}
-
-template <class MT, class DT, class KT, class ST>
-SurgSim::Math::Vector& FemRepresentation<MT, DT, KT, ST>::computeF(const DeformableRepresentationState& state)
+SurgSim::Math::Vector& FemRepresentation::computeF(const DeformableRepresentationState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
 	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
@@ -212,8 +147,7 @@ SurgSim::Math::Vector& FemRepresentation<MT, DT, KT, ST>::computeF(const Deforma
 	return m_f;
 }
 
-template <class MT, class DT, class KT, class ST>
-const MT& FemRepresentation<MT, DT, KT, ST>::computeM(const DeformableRepresentationState& state)
+const SurgSim::Math::Matrix& FemRepresentation::computeM(const DeformableRepresentationState& state)
 {
 	// Make sure the mass matrix has been properly allocated and zeroed out
 	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), true);
@@ -236,8 +170,7 @@ const MT& FemRepresentation<MT, DT, KT, ST>::computeM(const DeformableRepresenta
 	return m_M;
 }
 
-template <class MT, class DT, class KT, class ST>
-const DT& FemRepresentation<MT, DT, KT, ST>::computeD(const DeformableRepresentationState& state)
+const SurgSim::Math::Matrix& FemRepresentation::computeD(const DeformableRepresentationState& state)
 {
 	const double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
@@ -282,8 +215,7 @@ const DT& FemRepresentation<MT, DT, KT, ST>::computeD(const DeformableRepresenta
 	return m_D;
 }
 
-template <class MT, class DT, class KT, class ST>
-const KT& FemRepresentation<MT, DT, KT, ST>::computeK(const DeformableRepresentationState& state)
+const SurgSim::Math::Matrix& FemRepresentation::computeK(const DeformableRepresentationState& state)
 {
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
 	SurgSim::Math::resizeMatrix(&m_K, state.getNumDof(), state.getNumDof(), true);
@@ -306,9 +238,8 @@ const KT& FemRepresentation<MT, DT, KT, ST>::computeK(const DeformableRepresenta
 	return m_K;
 }
 
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::computeFMDK(const DeformableRepresentationState& state,
-		SurgSim::Math::Vector** f, MT** M, DT** D, KT** K)
+void FemRepresentation::computeFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector** f,
+									SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
 	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
@@ -342,7 +273,7 @@ void FemRepresentation<MT, DT, KT, ST>::computeFMDK(const DeformableRepresentati
 	addGravityForce(&m_f, state);
 
 	// Add the Rayleigh damping force to m_f
-	addRayleighDampingForce(&m_f, state, true);
+	addRayleighDampingForce(&m_f, state, true, true);
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
@@ -370,63 +301,53 @@ void FemRepresentation<MT, DT, KT, ST>::computeFMDK(const DeformableRepresentati
 	*K = &m_K;
 }
 
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::addRayleighDampingForce(
+void FemRepresentation::addRayleighDampingForce(
 	SurgSim::Math::Vector* force, const DeformableRepresentationState& state,
-	bool useGlobalDampingMatrix, bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
+	bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
 {
 	// Temporary variables for convenience
 	double& rayleighMass = m_rayleighDamping.massCoefficient;
 	double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const SurgSim::Math::Vector& v = state.getVelocities();
 
-	// If we have the damping matrix build (D = rayleighMass.M + rayleighStiffness.K), F = -D.v(t)
-	if (useGlobalDampingMatrix && (rayleighStiffness != 0.0 || rayleighMass != 0.0))
+	// Rayleigh damping mass: F = -rayleighMass.M.v(t)
+	if (rayleighMass != 0.0)
 	{
-		*force -= scale * (m_D * v);
-	}
-	else // Otherwise we unroll the calculation separately on the mass and stiffness components
-	{
-		// Rayleigh damping mass: F = -rayleighMass.M.v(t)
-		if (rayleighMass != 0.0)
+		// If we have the mass matrix, we can compute directly F = -rayleighMass.M.v(t)
+		if (useGlobalMassMatrix)
 		{
-			// If we have the mass matrix, we can compute directly F = -rayleighMass.M.v(t)
-			if (useGlobalMassMatrix)
+			*force -= (scale * rayleighMass) * (m_M * v);
+		}
+		else
+		{
+			// Otherwise, we loop through each fem element to compute its contribution
+			for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 			{
-				*force -= (scale * rayleighMass) * (m_M * v);
-			}
-			else
-			{
-				// Otherwise, we loop through each fem element to compute its contribution
-				for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
-				{
-					(*femElement)->addMatVec(state, - scale * rayleighMass, 0.0, 0.0, v, force);
-				}
+				(*femElement)->addMatVec(state, - scale * rayleighMass, 0.0, 0.0, v, force);
 			}
 		}
+	}
 
-		// Rayleigh damping stiffness: F = - rayleighStiffness.K.v(t)
-		// K is not diagonal and links all dof of the N connected nodes
-		if (rayleighStiffness != 0.0)
+	// Rayleigh damping stiffness: F = - rayleighStiffness.K.v(t)
+	// K is not diagonal and links all dof of the N connected nodes
+	if (rayleighStiffness != 0.0)
+	{
+		if (useGlobalStiffnessMatrix)
 		{
-			if (useGlobalStiffnessMatrix)
+			*force -= scale * rayleighStiffness * (m_K * v);
+		}
+		else
+		{
+			// Otherwise, we loop through each fem element to compute its contribution
+			for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 			{
-				*force -= scale * rayleighStiffness * (m_K * v);
-			}
-			else
-			{
-				// Otherwise, we loop through each fem element to compute its contribution
-				for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
-				{
-					(*femElement)->addMatVec(state, 0.0, 0.0, - scale * rayleighStiffness, v, force);
-				}
+				(*femElement)->addMatVec(state, 0.0, 0.0, - scale * rayleighStiffness, v, force);
 			}
 		}
 	}
 }
 
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::addFemElementsForce(SurgSim::Math::Vector* force,
+void FemRepresentation::addFemElementsForce(SurgSim::Math::Vector* force,
 		const DeformableRepresentationState& state,
 		double scale)
 {
@@ -436,8 +357,7 @@ void FemRepresentation<MT, DT, KT, ST>::addFemElementsForce(SurgSim::Math::Vecto
 	}
 }
 
-template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::addGravityForce(SurgSim::Math::Vector* f,
+void FemRepresentation::addGravityForce(SurgSim::Math::Vector* f,
 		const DeformableRepresentationState& state,
 		double scale)
 {
@@ -464,5 +384,3 @@ void FemRepresentation<MT, DT, KT, ST>::addGravityForce(SurgSim::Math::Vector* f
 } // namespace Physics
 
 } // namespace SurgSim
-
-#endif // SURGSIM_PHYSICS_FEMREPRESENTATION_INL_H

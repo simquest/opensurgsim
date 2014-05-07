@@ -139,7 +139,7 @@ TEST(OsgScreenSpaceQuadRepresentationTests, SetLocation)
 	EXPECT_DOUBLE_EQ(200.0, y);
 
 	Vector3d position(300.0, 400.0, 0.0);
-	quad->setPose(SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), position));
+	quad->setLocalPose(SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), position));
 
 	quad->getLocation(&x,&y);
 	EXPECT_DOUBLE_EQ(300.0, x);

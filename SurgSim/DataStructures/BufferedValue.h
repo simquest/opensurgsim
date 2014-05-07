@@ -16,7 +16,6 @@
 #ifndef SURGSIM_DATASTRUCTURES_BUFFEREDVALUE_H
 #define SURGSIM_DATASTRUCTURES_BUFFEREDVALUE_H
 
-
 #include <utility>
 #include <boost/thread.hpp>
 #include "SurgSim/Framework/Assert.h"
@@ -239,10 +238,9 @@ private:
 	T* m_directPointer;
 };
 
-#include "SurgSim/DataStructures/BufferedValue-inl.h"
-
 } // DataStructures
 } // SurgSim
 
+#include "SurgSim/DataStructures/BufferedValue-inl.h"
 
 #endif

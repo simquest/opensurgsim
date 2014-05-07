@@ -22,16 +22,15 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State, class MT, class DT, class KT, class ST>
-OdeSolverEulerExplicitModified<State, MT, DT, KT, ST>::OdeSolverEulerExplicitModified(
-	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	OdeSolver<State, MT, DT, KT, ST>(equation)
+template <class State>
+OdeSolverEulerExplicitModified<State>::OdeSolverEulerExplicitModified(OdeEquation<State>* equation)
+	: OdeSolver<State>(equation)
 {
 	m_name = "Ode Solver Euler Explicit Modified";
 }
 
-template <class State, class MT, class DT, class KT, class ST>
-void OdeSolverEulerExplicitModified<State, MT, DT, KT, ST>::solve(double dt, const State& currentState, State* newState)
+template <class State>
+void OdeSolverEulerExplicitModified<State>::solve(double dt, const State& currentState, State* newState)
 {
 	// General equation to solve:
 	//   M.a(t) = f(t, x(t), v(t))
@@ -42,15 +41,14 @@ void OdeSolverEulerExplicitModified<State, MT, DT, KT, ST>::solve(double dt, con
 	const Vector& f = m_equation.computeF(currentState);
 
 	// Compute M
-	const MT& M = m_equation.computeM(currentState);
+	const Matrix& M = m_equation.computeM(currentState);
 
 	// Computes the system matrix (left-hand-side matrix)
-	m_MsystemMatrix = M * (1.0 / dt);
-	m_systemMatrix = m_MsystemMatrix; // Type conversion
+	m_systemMatrix = M * (1.0 / dt);
 
 	// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
 	Vector& deltaV = newState->getAccelerations();
-	m_solveAndInverse(m_MsystemMatrix, f, &deltaV, &(m_compliance));
+	(*m_linearSolver)(m_systemMatrix, f, &deltaV, &m_compliance);
 
 	// Compute the new state using the Modified Euler Explicit scheme:
 	newState->getVelocities() = currentState.getVelocities() + deltaV;

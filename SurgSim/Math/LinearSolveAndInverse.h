@@ -22,7 +22,6 @@
 #include "SurgSim/Math/Matrix.h"
 
 #include <Eigen/Core>
-#include <Eigen/Sparse>
 
 namespace SurgSim
 {
@@ -30,83 +29,106 @@ namespace SurgSim
 namespace Math
 {
 
-/// SolveAndInverse aims at performing an efficient linear system resolution and
+/// LinearSolveAndInverse aims at performing an efficient linear system resolution and
 /// calculating its inverse matrix at the same time.
-/// The efficiency comes from specializing the linear system matrix type and use the best algorithm that fits this type
 /// This class is very useful in the OdeSolver resolution to improve performance.
 /// \sa SurgSim::Math::OdeSolver
-/// \tparam LSM Linear System Matrix type
-template <typename LSM>
-class SolveAndInverse
+class LinearSolveAndInverse
 {
 public:
+	virtual ~LinearSolveAndInverse(){}
 
 	/// Solve a linear system A.x=b and compute the matrix A^-1
 	/// \param A Linear system matrix
 	/// \param b Linear system right-hand-side
-	/// \param[out] x Linear system unknown
-	/// \param[out] Ainv Linear system matrix inverse = A^-1
-	/// \note Ainv is of generic type Matrix as in most cases, it will be a dense matrix (except for diagonal matrix)
-	void operator ()(const LSM& A, const Vector& b, Vector* x, Matrix* Ainv)
-	{
-		SURGSIM_ASSERT(false) << "Unknown matrix type for SolveAndInverse";
-	}
+	/// \param[out] x Linear system unknown (if requested)
+	/// \param[out] Ainv Linear system matrix inverse = A^-1 (if requested)
+	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) = 0;
 };
 
-/// Specialization for DiagonalMatrix type
-template <>
-class SolveAndInverse<DiagonalMatrix>
+/// Derivation for dense matrix type
+class LinearSolveAndInverseDenseMatrix : public LinearSolveAndInverse
 {
+public:
+	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+};
+
+/// Derivation for diagonal matrix type
+class LinearSolveAndInverseDiagonalMatrix : public LinearSolveAndInverse
+{
+public:
+	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+};
+
+/// Derivation for tri-diagonal block matrix type
+/// \tparam BlockSize Define the block size of the tri-diagonal block matrix
+template <int BlockSize>
+class LinearSolveAndInverseTriDiagonalBlockMatrix : public LinearSolveAndInverse
+{
+protected:
+	/// Computes the inverse matrix
+	/// \param A The matrix to inverse
+	/// \param[out] inv The inverse matrix
+	/// \param isSymmetric True if the matrix is symmetric, False otherwise
+	/// \note isSymmetric is only indicative and helps optimizing the computation when the matrix is symmetric.
+	/// \note On the other side, if the flag is true and the matrix is not symmetric, the result will be wrong.
+	/// \note Assert on inverse matrix pointer (inv), on the matrix being square and on
+	/// \note proper size matching between the matrix size and the blockSize
+	void inverseTriDiagonalBlock(const SurgSim::Math::Matrix& A, SurgSim::Math::Matrix* inv, bool isSymmetric = false);
+
+	/// Member variable to hold the inverse matrix in case only the solving is requested
+	Matrix m_inverse;
+
 private:
-	/// Temporary inverse matrix of type DiagonalMatrix to improve the performance of the system resolution
-	DiagonalMatrix m_Ainv;
+	static_assert(BlockSize > 0,
+		"Cannot define a tri-diagonal block matrix with block size 0 or negative");
+
+	typedef Eigen::Matrix<Matrix::Scalar, BlockSize, BlockSize, Matrix::Options> Block;
+
+	/// Gets a lower-diagonal block element (named -Ai in the algorithm)
+	/// \param A The matrix on which to retrieve the lower-diagonal block element
+	/// \param i The line index on which to retrieve the lower-diagonal block element
+	/// \return The lower-diagonal block element requested (i.e. block (i, i-1))
+	const Eigen::Block<const Matrix, BlockSize, BlockSize> minusAi(const SurgSim::Math::Matrix& A, size_t i) const;
+
+	/// Gets a diagonal block element (named Bi in the algorithm)
+	/// \param A The matrix on which to retrieve the diagonal block element
+	/// \param i The line index on which to retrieve the diagonal block element
+	/// \return The diagonal block element requested (i.e. block (i, i))
+	const Eigen::Block<const Matrix, BlockSize, BlockSize> Bi(const SurgSim::Math::Matrix& A, size_t i) const;
+
+	/// Gets a upper-diagonal block element (named -Ci in the algorithm)
+	/// \param A The matrix on which to retrieve the upper-diagonal block element
+	/// \param i The line index on which to retrieve the upper-diagonal block element
+	/// \return The upper-diagonal block element requested (i.e. block (i, i+1))
+	const Eigen::Block<const Matrix, BlockSize, BlockSize> minusCi(const SurgSim::Math::Matrix& A, size_t i) const;
+
+	///@{
+	/// Intermediate block matrices, helpful to construct the inverse matrix
+	std::vector<Block> m_Di, m_Ei, m_Bi_AiDiminus1_inv;
+	///@}
 
 public:
-	/// Solve a linear system A.x=b and compute the matrix A^-1
-	/// \param A Linear system matrix
-	/// \param b Linear system right-hand-side
-	/// \param[out] x Linear system unknown
-	/// \param[out] Ainv Linear system matrix inverse = A^-1
-	/// \note Ainv is of generic type Matrix as in most cases, it will be a dense matrix (except for diagonal matrix)
-	void operator ()(const DiagonalMatrix& A, const Vector& b, Vector* x, Matrix* Ainv);
+	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
 };
 
-/// Specialization for dense Matrix type
-template <>
-class SolveAndInverse<Matrix>
+/// Derivation for symmetric tri-diagonal block matrix type
+/// \tparam BlockSize Define the block size of the tri-diagonal block matrix
+template <int BlockSize>
+class LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix :
+	public LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>
 {
 public:
-	/// Solve a linear system A.x=b and compute the matrix A^-1
-	/// \param A Linear system matrix
-	/// \param b Linear system right-hand-side
-	/// \param[out] x Linear system unknown
-	/// \param[out] Ainv Linear system matrix inverse = A^-1
-	/// \note Ainv is of generic type Matrix as in most cases, it will be a dense matrix (except for diagonal matrix)
-	void operator ()(const Matrix& A, const Vector& b, Vector* x, Matrix* Ainv);
-};
+	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
 
-
-/// Specialization for SparseMatrix type
-template <>
-class SolveAndInverse<Eigen::SparseMatrix<double,Eigen::ColMajor>>
-{
-private:
-	/// Intermediate identity matrix useful to compute the inverse by solving A.X = I
-	/// \note This matrix will be allocated and initialized on 1st call, only reallocated if the system changes size
-	Matrix m_identity;
-
-public:
-	/// Solve a linear system A.x=b and compute the matrix A^-1
-	/// \param A Linear system matrix
-	/// \param b Linear system right-hand-side
-	/// \param[out] x Linear system unknown
-	/// \param[out] Ainv Linear system matrix inverse = A^-1
-	/// \note Ainv is of generic type Matrix as in most cases, it will be a dense matrix (except for diagonal matrix)
-	void operator ()(const Eigen::SparseMatrix<double,Eigen::ColMajor>& A, const Vector& b, Vector* x, Matrix* Ainv);
+	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalBlock;
+	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::m_inverse;
 };
 
 }; // namespace Math
 
 }; // namespace SurgSim
+
+#include "SurgSim/Math/LinearSolveAndInverse-inl.h"
 
 #endif // SURGSIM_MATH_LINEARSOLVEANDINVERSE_H

@@ -36,11 +36,7 @@ namespace Physics
 /// \note A MassSpring is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
 /// \note Therefore, it defines a dynamic system M.a=F(x,v) with the particularity that M is diagonal
 /// \note The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
-class MassSpringRepresentation : public DeformableRepresentation<
-	SurgSim::Math::DiagonalMatrix,
-	SurgSim::Math::Matrix,
-	SurgSim::Math::Matrix,
-	SurgSim::Math::Matrix>
+class MassSpringRepresentation : public DeformableRepresentation
 {
 public:
 	/// Constructor
@@ -110,10 +106,6 @@ public:
 	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt) override;
 
-	/// Update the representation state to the current time step
-	/// \param dt The time step (in seconds)
-	virtual void update(double dt) override;
-
 	/// Postprocessing done after the update call
 	/// \param dt The time step (in seconds)
 	virtual void afterUpdate(double dt) override;
@@ -137,7 +129,7 @@ public:
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
 	/// \return The matrix M(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	virtual const SurgSim::Math::DiagonalMatrix& computeM(const DeformableRepresentationState& state) override;
+	virtual const SurgSim::Math::Matrix& computeM(const DeformableRepresentationState& state) override;
 
 	/// Evaluation of D = -df/dv (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
@@ -161,28 +153,21 @@ public:
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
 	virtual void computeFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector** f,
-		SurgSim::Math::DiagonalMatrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
+		SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
 
 protected:
 	/// Add the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
 	/// \param state The state vector containing positions and velocities
-	/// \param useGlobalDampingMatrix True indicates that the global stiffness matrix D should be used (F = -D.v)
 	/// \param useGlobalMassMatrix, useGlobalStiffnessMatrix True indicates that the global mass and stiffness matrices
 	///        should be used (F = -c.M.v - d.K.v)
 	/// \param scale A scaling factor to apply on the damping force
 	/// \note Damping matrix D = c.M + d.K (Rayleigh damping definition)
-	/// \note F = - D.v
-	/// \note F = - (c.M.v + d.K.v)
-	/// \note If useGlobalDampingMatrix is True, D will be used
-	/// \note Otherwise, if {useGlobalMassMatrix | useGlobalStiffnessMatrix} is True, {M | K} will be used instead.
-	/// \note If useGlobalDampingMatrix is False and useGlobalMassMatrix      is False
-	/// \note    the mass      component will be computed FemElement by FemElement
-	/// \note If useGlobalDampingMatrix is False and useGlobalStiffnessMatrix is False
-	/// \note    the stiffness component will be computed FemElement by FemElement
+	/// \note F = - D.v = -c.M.v - d.K.v
+	/// \note If {useGlobalMassMatrix | useGlobalStiffnessMatrix} is True, {M | K} will be used, otherwise
+	/// \note    the {mass|stiffness} component will be computed FemElement by FemElement
 	void addRayleighDampingForce(SurgSim::Math::Vector* f, const DeformableRepresentationState& state,
-		bool useGlobalDampingMatrix = false, bool useGlobalStiffnessMatrix = false, bool useGlobalMassMatrix = false,
-		double scale = 1.0);
+		bool useGlobalStiffnessMatrix = false, bool useGlobalMassMatrix = false, double scale = 1.0);
 
 	/// Add the springs force to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the spring forces into

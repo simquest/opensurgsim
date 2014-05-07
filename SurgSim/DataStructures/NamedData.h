@@ -55,6 +55,11 @@ static const char* const SPRING_JACOBIAN = "springJacobian";
 static const char* const IS_HOMED = "isHomed";
 static const char* const IS_ORIENTATION_HOMED = "isOrientationHomed";
 static const char* const IS_POSITION_HOMED = "isPositionHomed";
+
+static const char* const DIGITAL_INPUT_PREFIX = "digitalInput";
+static const char* const DIGITAL_OUTPUT_PREFIX = "digitalOutput";
+static const char* const TIMER_INPUT_PREFIX = "timerInput";
+static const char* const TIMER_OUTPUT_PREFIX = "timerOutput";
 };
 
 /// A templated dictionary in which data can be accessed by name or index, with immutable names & indices.

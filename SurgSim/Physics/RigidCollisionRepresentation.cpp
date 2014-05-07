@@ -28,7 +28,6 @@ RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& na
 
 RigidCollisionRepresentation::~RigidCollisionRepresentation()
 {
-
 }
 
 void RigidCollisionRepresentation::update(const double& dt)
@@ -60,42 +59,28 @@ std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> RigidCollisionReprese
 
 int RigidCollisionRepresentation::getShapeType() const
 {
-	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
+	auto physicsRepresentation = m_physicsRepresentation.lock();
+	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
 			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
-	return m_physicsRepresentation.lock()->getCurrentParameters().getShapeUsedForMassInertia()->getType();
+	return physicsRepresentation->getCurrentParameters().getShapeUsedForMassInertia()->getType();
 }
 
 const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
 {
-	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
+	auto physicsRepresentation = m_physicsRepresentation.lock();
+	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
 			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
-	return m_physicsRepresentation.lock()->getCurrentParameters().getShapeUsedForMassInertia();
+	return physicsRepresentation->getCurrentParameters().getShapeUsedForMassInertia();
 }
 
-const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getPose() const
+SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
 {
-	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
+	auto physicsRepresentation = m_physicsRepresentation.lock();
+	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
 			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
-	return m_physicsRepresentation.lock()->getCurrentPose();
+	const SurgSim::Math::RigidTransform3d& physicsPose = physicsRepresentation->getCurrentState().getPose();
+	return physicsPose * physicsRepresentation->getLocalPose().inverse() * getLocalPose();
 }
-
-void RigidCollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_FAILURE() << "Cannot set the pose on a RigidCollisionRepresentation.";
-}
-
-void RigidCollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_FAILURE() << "Cannot set the intial pose on a RigidCollisionRepresentation.";
-}
-
-const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getInitialPose() const
-{
-	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
-			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
-	return m_physicsRepresentation.lock()->getInitialPose();
-}
-
 
 }; // namespace Collision
 }; // namespace SurgSim

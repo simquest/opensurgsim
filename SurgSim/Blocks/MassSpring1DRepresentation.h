@@ -53,6 +53,10 @@ public:
 		double totalMass,
 		double stiffnessStretching, double dampingStretching,
 		double stiffnessBending, double dampingBending);
+
+protected:
+
+	virtual bool doWakeUp() override;
 };
 
 };  // namespace Blocks

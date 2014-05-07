@@ -62,12 +62,17 @@ public:
 	/// \param octreeShape The OctreeShape from which the octree is retrieved.
 	virtual void setOctree(const SurgSim::Math::OctreeShape& octreeShape) override;
 
+	/// Mark the OctreeNode visible/invisible in the given a OctreePath (typedef-ed in OctreeNode.h).
+	/// \param path An OctreePath, giving the path leads to the OctreeNode whose visibility to be changed.
+	/// \param visibility Whether or not the OctreeNode specified by 'path' is visible or not.
+	virtual	void setNodeVisible(const SurgSim::DataStructures::OctreePath& path, bool visibility) override;
+
 private:
 	/// Draw the Octree associated with this OSG representation.
 	/// \param parentTransformNode The osg::PositionAttitudeTransform node under which either the octreeNode or its
 	///                            children will be drawn.
-	/// \param octreeNode The OctreeNode to be drawn.
-	void buildOctree(osg::ref_ptr<osg::Group> parentTransformNode,
+	/// \param octree The octree to be drawn.
+	void buildOctree(osg::ref_ptr<osg::PositionAttitudeTransform> parentTransformNode,
 					 std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree);
 
 	/// Shared unit box, so that the geometry can be instanced rather than having multiple copies.

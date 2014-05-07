@@ -20,6 +20,7 @@
 #include "SurgSim/Math/Matrix.h"
 
 #include "SurgSim/Math/OdeEquation.h"
+#include "SurgSim/Math/LinearSolveAndInverse.h"
 
 namespace SurgSim
 {
@@ -50,23 +51,19 @@ enum IntegrationScheme {
 /// \note K = -df/dx(x(t), v(t))
 /// \note D = -df/dv(x(t), v(t))
 /// \note Models wanting the use of implicit solvers will need to compute these Jacobian matrices.
-/// \note Also, the matrices types are all templatized to allow for optimization
+/// \note Matrices all have dense storage, but a specialized linear solver can be set per solver.
 /// \tparam State Type of the state y=(x v)
-/// \tparam MT Type of the matrix M
-/// \tparam DT Type of the matrix D
-/// \tparam KT Type of the matrix K
-/// \tparam ST Type of the system matrix (linear combination of M, D, K)
 /// \note State is expected to hold on to the dof derivatives and have the API:
 /// \note   Vector& getPositions();
 /// \note   Vector& getVelocities();
 /// \note   Vector& getAccelerations();
-template <class State, class MT, class DT, class KT, class ST>
+template <class State>
 class OdeSolver
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	OdeSolver(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolver(OdeEquation<State>* equation);
 
 	/// Virtual destructor
 	virtual ~OdeSolver()
@@ -76,6 +73,14 @@ public:
 	/// \return The solver name
 	const std::string getName() const;
 
+	/// Sets the specialized linear solver to use with this Ode solver
+	/// \param linearSolver the linear solver to use when solving the ode equation
+	void setLinearSolver(std::shared_ptr<LinearSolveAndInverse> linearSolver);
+
+	/// Gets the specialized linear solver used with this Ode solver
+	/// \return The linear solver used when solving the ode equation
+	std::shared_ptr<LinearSolveAndInverse> getLinearSolver() const;
+
 	/// Solves the equation
 	/// \param dt The time step
 	/// \param currentState State at time t
@@ -84,7 +89,7 @@ public:
 
 	/// Queries the current system matrix
 	/// \return The latest system matrix calculated
-	const ST& getSystemMatrix() const;
+	const Matrix& getSystemMatrix() const;
 
 	/// Queries the current compliance matrix
 	/// \return The latest compliance matrix calculated
@@ -100,13 +105,18 @@ protected:
 	void allocate(unsigned int size);
 
 	/// The ode equation (API providing the necessary evaluation methods and the initial state)
-	OdeEquation<State, MT, DT, KT, ST>& m_equation;
+	OdeEquation<State>& m_equation;
+
+	/// The specialized linear solver to use when solving the ode equation
+	std::shared_ptr<LinearSolveAndInverse> m_linearSolver;
 
 	/// System matrix (can be M, K, combination of MDK depending on the solver)
-	ST m_systemMatrix;
+	/// A static solver will have K for system matrix
+	/// A dynamic explicit solver will have M for system matrix
+	/// A dynamic implicit solver will have a combination of M, D and K for system matrix
+	Matrix m_systemMatrix;
 
 	/// Compliance matrix which is the inverse of the system matrix
-	/// Compliance is always a dense matrix (full matrix unless we have a diagonal matrix)
 	Matrix m_compliance;
 };
 

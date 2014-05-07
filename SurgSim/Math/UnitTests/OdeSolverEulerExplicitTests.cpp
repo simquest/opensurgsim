@@ -42,11 +42,11 @@ TEST(OdeSolverEulerExplicit, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("EulerExplicit");
-		doConstructorTest<OdeSolverEulerExplicit<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doConstructorTest<OdeSolverEulerExplicit<MassPointState>>();
 	}
 	{
 		SCOPED_TRACE("LinearEulerExplicit");
-		doConstructorTest<OdeSolverLinearEulerExplicit<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doConstructorTest<OdeSolverLinearEulerExplicit<MassPointState>>();
 	}
 }
 
@@ -82,11 +82,11 @@ TEST(OdeSolverEulerExplicit, SolveTest)
 {
 	{
 		SCOPED_TRACE("EulerExplicit");
-		doSolveTest<OdeSolverEulerExplicit<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doSolveTest<OdeSolverEulerExplicit<MassPointState>>();
 	}
 	{
 		SCOPED_TRACE("LinearEulerExplicit");
-		doSolveTest<OdeSolverLinearEulerExplicit<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doSolveTest<OdeSolverLinearEulerExplicit<MassPointState>>();
 	}
 }
 

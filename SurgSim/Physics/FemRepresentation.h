@@ -36,13 +36,7 @@ struct FemRepresentationCoordinate;
 /// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
 /// \note Therefore, it defines a dynamic system M.a=F(x,v)
 /// \note The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
-/// \note At this level, no assumption is made on the matrices type. The derived classes will specialize the type.
-/// \tparam MT Mass matrix type
-/// \tparam DT Damping matrix type
-/// \tparam KT Stiffness matrix type
-/// \tparam ST System matrix type (best type to store a combination of matrices of type MT, DT and KT)
-template <class MT, class DT, class KT, class ST>
-class FemRepresentation: public DeformableRepresentation<MT, DT, KT, ST>
+class FemRepresentation : public DeformableRepresentation
 {
 public:
 	/// Constructor
@@ -67,11 +61,6 @@ public:
 	/// \note Out of range femElementId will raise an exception
 	std::shared_ptr<FemElement> getFemElement(unsigned int femElementId);
 
-	/// Determines whether the associated coordinate is valid
-	/// \param coordinate Coordinate to check
-	/// \return True if coordinate is valid
-	bool isValidCoordinate(const FemRepresentationCoordinate &coordinate) const;
-
 	/// Gets the total mass of the fem
 	/// \return The total mass of the fem (in Kg)
 	double getTotalMass() const;
@@ -92,26 +81,14 @@ public:
 	/// \param massCoef The Rayleigh mass parameter
 	void setRayleighDampingMass(double massCoef);
 
+	/// Determines whether the associated coordinate is valid
+	/// \param coordinate Coordinate to check
+	/// \return True if coordinate is valid
+	bool isValidCoordinate(const FemRepresentationCoordinate &coordinate) const;
+
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt) override;
-
-	/// Updates the representation state to the current time step
-	/// \param dt The time step (in seconds)
-	virtual void update(double dt) override;
-
-	/// Postprocessing done after the update call
-	/// \param dt The time step (in seconds)
-	virtual void afterUpdate(double dt) override;
-
-	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
-	/// deltaVelocity.
-	///
-	/// This function typically is called in the physics pipeline (PhysicsManager::doUpdate) after solving the equations
-	/// that enforce constraints when collisions occur.  Specifically it is called in the PushResults::doUpdate step.
-	/// \param dt The time step
-	/// \param deltaVelocity The block of a vector containing the correction to be applied to the velocity
-	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
@@ -123,19 +100,19 @@ public:
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
 	/// \return The matrix M(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	virtual const MT& computeM(const DeformableRepresentationState& state) override;
+	virtual const SurgSim::Math::Matrix& computeM(const DeformableRepresentationState& state) override;
 
 	/// Evaluation of D = -df/dv (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix D = -df/dv(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	virtual const DT& computeD(const DeformableRepresentationState& state) override;
+	virtual const SurgSim::Math::Matrix& computeD(const DeformableRepresentationState& state) override;
 
 	/// Evaluation of K = -df/dx (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix K = -df/dx(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	virtual const KT& computeK(const DeformableRepresentationState& state) override;
+	virtual const SurgSim::Math::Matrix& computeK(const DeformableRepresentationState& state) override;
 
 	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
 	/// When all the terms are needed, this method can perform optimization in evaluating everything together
@@ -146,30 +123,23 @@ public:
 	/// \param[out] K The matrix K = -df/dx(x,v)
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const DeformableRepresentationState& state,
-		SurgSim::Math::Vector** f, MT** M, DT** D, KT** K) override;
+	virtual void computeFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector** f,
+		SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
 
 protected:
 	/// Adds the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
 	/// \param state The state vector containing positions and velocities
-	/// \param useGlobalDampingMatrix True indicates that the global stiffness matrix D should be used (F = -D.v)
 	/// \param useGlobalMassMatrix, useGlobalStiffnessMatrix True indicates that the global mass and stiffness matrices
 	///        should be used (F = -c.M.v - d.K.v)
 	/// \param scale A scaling factor to apply on the damping force
 	/// \note Damping matrix D = c.M + d.K (Rayleigh damping definition)
-	/// \note F = - D.v
-	/// \note F = - (c.M.v + d.K.v)
-	/// \note If useGlobalDampingMatrix is True, D will be used
-	/// \note Otherwise, if {useGlobalMassMatrix | useGlobalStiffnessMatrix} is True, {M | K} will be used instead.
-	/// \note If useGlobalDampingMatrix is False and useGlobalMassMatrix      is False
-	/// \note    the mass      component will be computed FemElement by FemElement
-	/// \note If useGlobalDampingMatrix is False and useGlobalStiffnessMatrix is False
-	/// \note    the stiffness component will be computed FemElement by FemElement
+	/// \note F = - D.v = -c.M.v - d.K.v
+	/// \note If {useGlobalMassMatrix | useGlobalStiffnessMatrix} is True, {M | K} will be used
+	/// \note If {useGlobalMassMatrix | useGlobalStiffnessMatrix} is False
+	/// \note    the {mass|stiffness} component will be computed FemElement by FemElement
 	void addRayleighDampingForce(SurgSim::Math::Vector* f, const DeformableRepresentationState& state,
-		bool useGlobalDampingMatrix = false,
-		bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false,
-		double scale = 1.0);
+		bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false, double scale = 1.0);
 
 	/// Adds the FemElements forces to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the FemElements forces into
@@ -184,16 +154,14 @@ protected:
 	/// \note This method does not do anything if gravity is disabled
 	void addGravityForce(SurgSim::Math::Vector *f, const DeformableRepresentationState& state, double scale = 1.0);
 
-	/// Interface to be implemented by derived classes
-	/// \return True if component is initialized successfully; otherwise, false.
 	virtual bool doInitialize() override;
+
+	/// Useful information per node
+	std::vector<double> m_massPerNode; //< Useful in setting up the gravity force F=mg
 
 private:
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;
-
-	/// Useful information per node
-	std::vector<double> m_massPerNode; //< Useful in setting up the gravity force F=mg
 
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)
 	/// D = massCoefficient.M + stiffnessCoefficient.K
@@ -202,35 +170,10 @@ private:
 		double massCoefficient;
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
-
-	// Dependent names resolution (need to be in public/protected to be accessible in derived classes)
-public:
-	// Used API from Physics::OdeEquation through Physics::DeformableRepresentation
-	using DeformableRepresentation<MT, DT, KT, ST>::m_initialState;
-
-	// Used API from Physics::DeformableRepresentation
-	using DeformableRepresentation<MT, DT, KT, ST>::m_previousState;
-	using DeformableRepresentation<MT, DT, KT, ST>::m_currentState;
-	using DeformableRepresentation<MT, DT, KT, ST>::m_newState;
-	using DeformableRepresentation<MT, DT, KT, ST>::m_finalState;
-	using DeformableRepresentation<MT, DT, KT, ST>::getNumDofPerNode;
-	using DeformableRepresentation<MT, DT, KT, ST>::m_odeSolver;
-	using DeformableRepresentation<MT, DT, KT, ST>::m_f;
-	using DeformableRepresentation<MT, DT, KT, ST>::m_M;
-	using DeformableRepresentation<MT, DT, KT, ST>::m_D;
-	using DeformableRepresentation<MT, DT, KT, ST>::m_K;
-
-	// Used API from Physics::Representation through Physics::DeformableRepresentation
-	using DeformableRepresentation<MT, DT, KT, ST>::isActive;
-	using DeformableRepresentation<MT, DT, KT, ST>::isGravityEnabled;
-	using DeformableRepresentation<MT, DT, KT, ST>::getNumDof;
-	using DeformableRepresentation<MT, DT, KT, ST>::getGravity;
 };
 
 } // namespace Physics
 
 } // namespace SurgSim
-
-#include "SurgSim/Physics/FemRepresentation-inl.h"
 
 #endif // SURGSIM_PHYSICS_FEMREPRESENTATION_H

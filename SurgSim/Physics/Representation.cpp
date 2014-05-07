@@ -29,7 +29,8 @@ Representation::Representation(const std::string& name) :
 	m_gravity(0.0, -9.81, 0.0),
 	m_numDof(0),
 	m_isGravityEnabled(true),
-	m_isActive(true)
+	m_isActive(true),
+	m_isDrivingSceneElementPose(true)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, size_t, NumDof, getNumDof, setNumDof);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, IsGravityEnabled, isGravityEnabled, setIsGravityEnabled);
@@ -71,6 +72,16 @@ void Representation::setIsGravityEnabled(bool isGravityEnabled)
 bool Representation::isGravityEnabled() const
 {
 	return m_isGravityEnabled;
+}
+
+void Representation::setIsDrivingSceneElementPose(bool isDrivingSceneElementPose)
+{
+	m_isDrivingSceneElementPose = isDrivingSceneElementPose;
+}
+
+bool Representation::isDrivingSceneElementPose()
+{
+	return m_isDrivingSceneElementPose;
 }
 
 void Representation::beforeUpdate(double dt)

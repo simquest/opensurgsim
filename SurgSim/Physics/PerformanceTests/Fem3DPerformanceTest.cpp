@@ -65,7 +65,7 @@ class DivisbleCubeRepresentation : public Fem3DRepresentation
 public:
 	/// Constructor
 	/// \param name	The name of the divisible cube representation.
-	/// \param corners The 8 corners of the divisible cube
+	/// \param nodesPerAxis	The number of nodes per axis
 	DivisbleCubeRepresentation(const std::string& name, size_t nodesPerAxis)
 		: Fem3DRepresentation(name), m_numNodesPerAxis(nodesPerAxis)
 	{
@@ -208,6 +208,7 @@ public:
 	void initializeRepresentation(std::shared_ptr<Fem3DRepresentation> fem)
 	{
 		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem->wakeUp();
 		m_physicsManager->executeAdditions(fem);
 	}
 

@@ -41,7 +41,7 @@ public:
 	AabbTree();
 
 	/// Constructor
-	/// \param maxObjectsPerNode, if the number of objects exceeds this a split of the node will be triggered
+	/// \param maxObjectsPerNode if the number of objects exceeds this a split of the node will be triggered
 	explicit AabbTree(size_t maxObjectsPerNode);
 
 	/// Destructor

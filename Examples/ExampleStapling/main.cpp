@@ -22,7 +22,6 @@
 
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
-#include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/DataStructures/EmptyData.h"
@@ -61,7 +60,6 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
-using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Blocks::VisualizeContactsBehavior;
 using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::EmptyData;
@@ -79,12 +77,10 @@ using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::Mesh;
 using SurgSim::Graphics::MeshRepresentation;
 using SurgSim::Graphics::SceneryRepresentation;
-using SurgSim::Graphics::ViewElement;
 using SurgSim::Graphics::OsgManager;
 using SurgSim::Graphics::OsgMeshRepresentation;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
-using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::MeshShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationMatrix;
@@ -119,8 +115,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
 	SurgSim::Math::IntegrationScheme integrationScheme,
-	bool displayPointCloud,
-	const SurgSim::Math::RigidTransform3d& pose)
+	bool displayPointCloud)
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
 	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement
@@ -135,14 +130,12 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// pointer to the Physics Representation's state, which is not created until the file is loaded and the internal
 	// structure is initialized.  Therefore we create the state now by calling loadFile.
 	physicsRepresentation->loadFile();
-	physicsRepresentation->setInitialPose(pose);
 	sceneElement->addComponent(physicsRepresentation);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
 	*graphicsTriangleMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*loadMesh(filename));
-	graphicsTriangleMeshRepresentation->setInitialPose(pose);
 	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
@@ -157,11 +150,9 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 		// Create a point-cloud for visualizing the nodes of the finite element model
 		std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>> graphicsPointCloudRepresentation
 			= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>(name + " point cloud");
-		graphicsPointCloudRepresentation->setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
 		graphicsPointCloudRepresentation->setColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
 		graphicsPointCloudRepresentation->setPointSize(3.0f);
 		graphicsPointCloudRepresentation->setVisible(true);
-		graphicsPointCloudRepresentation->setInitialPose(pose);
 		sceneElement->addComponent(graphicsPointCloudRepresentation);
 
 		// Create a behavior which transfers the position of the vertices in the FEM to locations in the point cloud
@@ -186,24 +177,9 @@ std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& na
 	return sceneryRepresentation;
 }
 
-std::shared_ptr<ViewElement> createView()
-{
-	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
-
-	view->enableManipulator(true);
-	view->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
-
-	view->enableKeyboardDevice(true);
-
-	return view;
-}
-
 std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName,
-														const std::string& deviceName,
-														const SurgSim::Math::RigidTransform3d& pose)
+														const std::string& deviceName)
 {
-	std::vector<std::shared_ptr<SurgSim::Framework::Representation>> recievesPhysicsPose;
-
 	std::vector<std::string> paths;
 	paths.push_back("Data/Geometry");
 	ApplicationData data(paths);
@@ -216,9 +192,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::shared_ptr<MeshRepresentation> osgMeshRepresentation =
 		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
 	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
-	osgMeshRepresentation->setInitialPose(pose);
 	osgMeshRepresentation->setDrawAsWireFrame(true);
-	recievesPhysicsPose.push_back(osgMeshRepresentation);
 
 	// Stapler collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
@@ -229,7 +203,6 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setIsGravityEnabled(false);
-	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
@@ -267,18 +240,10 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(visualizeContactsBehavior);
 
 	// Load the graphical parts of a stapler.
-	std::list<std::shared_ptr<SceneryRepresentation>> sceneryRepresentations;
-	sceneryRepresentations.push_back(createSceneryObject("Handle",    "Geometry/stapler_handle.obj"));
-	sceneryRepresentations.push_back(createSceneryObject("Indicator", "Geometry/stapler_indicator.obj"));
-	sceneryRepresentations.push_back(createSceneryObject("Markings",  "Geometry/stapler_markings.obj"));
-	sceneryRepresentations.push_back(createSceneryObject("Trigger",   "Geometry/stapler_trigger.obj"));
-	for (auto it = std::begin(sceneryRepresentations); it != std::end(sceneryRepresentations); ++it)
-	{
-		(*it)->setInitialPose(pose);
-
-		recievesPhysicsPose.push_back(*it);
-		sceneElement->addComponent(*it);
-	}
+	sceneElement->addComponent(createSceneryObject("Handle",    "Geometry/stapler_handle.obj"));
+	sceneElement->addComponent(createSceneryObject("Indicator", "Geometry/stapler_indicator.obj"));
+	sceneElement->addComponent(createSceneryObject("Markings",  "Geometry/stapler_markings.obj"));
+	sceneElement->addComponent(createSceneryObject("Trigger",   "Geometry/stapler_trigger.obj"));
 
 	std::vector<std::shared_ptr<MeshShape>> virtualTeethShapes;
 	virtualTeethShapes.push_back(std::make_shared<MeshShape>(*loadMesh("Data/Geometry/virtual_staple_1.ply")));
@@ -294,33 +259,21 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 		virtualTeeth[i] = virtualToothCollision;
 		sceneElement->addComponent(virtualToothCollision);
-		recievesPhysicsPose.push_back(virtualToothCollision);
 
 		std::shared_ptr<OsgMeshRepresentation> virtualToothMesh
 			= std::make_shared<OsgMeshRepresentation>("virtualToothMesh" + boost::to_string(i));
 		*virtualToothMesh->getMesh() = SurgSim::Graphics::Mesh(*(*it)->getMesh());
-		virtualToothMesh->setInitialPose(pose);
 		virtualToothMesh->setDrawAsWireFrame(true);
 
 		sceneElement->addComponent(virtualToothMesh);
-		recievesPhysicsPose.push_back(virtualToothMesh);
 	}
 
 	staplerBehavior->setVirtualStaple(virtualTeeth);
 
-	for (auto it = recievesPhysicsPose.begin(); it != recievesPhysicsPose.end(); ++it)
-	{
-		std::shared_ptr<TransferPoseBehavior> transferPose
-			= std::make_shared<TransferPoseBehavior>("Physics to " + (*it)->getName());
-		transferPose->setPoseSender(physicsRepresentation);
-		transferPose->setPoseReceiver(*it);
-		sceneElement->addComponent(transferPose);
-	}
-
 	return sceneElement;
 }
 
-std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, const RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 {
 	std::vector<std::string> paths;
 	paths.push_back("Data/Geometry");
@@ -334,16 +287,13 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 
 	std::shared_ptr<MeshRepresentation> osgMeshRepresentation = std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
 	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
-	osgMeshRepresentation->setInitialPose(pose);
 	osgMeshRepresentation->setDrawAsWireFrame(true);
 
 	// Graphic representation for arm
 	std::shared_ptr<SceneryRepresentation> forearmSceneryRepresentation =
 		createSceneryObject("forearm", "Geometry/forearm.osgb");
-	forearmSceneryRepresentation->setInitialPose(pose);
 	std::shared_ptr<SceneryRepresentation> upperarmSceneryRepresentation =
 		createSceneryObject("upperarm", "Geometry/upperarm.osgb");
-	upperarmSceneryRepresentation->setInitialPose(pose);
 
 	// Arm collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
@@ -352,7 +302,6 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 
 	std::shared_ptr<FixedRepresentation> physicsRepresentation = std::make_shared<FixedRepresentation>("Physics");
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
@@ -366,6 +315,19 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 	armSceneElement->addComponent(physicsRepresentation);
 
 	return armSceneElement;
+}
+
+template <typename Type>
+std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement,
+										  const std::string& name)
+{
+	std::shared_ptr<SurgSim::Framework::Component> component = sceneElement->getComponent(name);
+	SURGSIM_ASSERT(component != nullptr) << "Failed to get Component named '" << name << "'.";
+
+	std::shared_ptr<Type> result = std::dynamic_pointer_cast<Type>(component);
+	SURGSIM_ASSERT(result != nullptr) << "Failed to convert Component to requested type.";
+
+	return result;
 }
 
 int main(int argc, char* argv[])
@@ -394,24 +356,29 @@ int main(int argc, char* argv[])
 	}
 	inputManager->addDevice(device);
 
-	std::shared_ptr<ViewElement> view = createView();
+	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
+	view->enableManipulator(true);
+	view->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
+	view->enableKeyboardDevice(true);
 	inputManager->addDevice(view->getKeyboardDevice());
 
 	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
-	std::shared_ptr<SceneElement> armSceneElement = createArmSceneElement("arm", armPose);
-	std::shared_ptr<SceneElement> staplerSceneElement = createStaplerSceneElement(
-		"stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero()));
+	std::shared_ptr<SceneElement> arm = createArmSceneElement("arm");
+	arm->setPose(armPose);
+
+	std::shared_ptr<SceneElement> stapler = createStaplerSceneElement("stapler", deviceName);
+	stapler->setPose(RigidTransform3d::Identity());
 
 	// Load the FEM
 	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
 	// Dynamic Optical Coherence Elastography", IEEE Transactions on Biomedical Engineering, Vol 57, No 4.
-	std::shared_ptr<SceneElement> woundSceneElement =
+	std::shared_ptr<SceneElement> wound =
 		createFemSceneElement("wound",
 							  woundFilename,
 							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
-							  true,											   // Display point cloud
-							  armPose);										   // Pose of wound on arm
+							  true);										   // Display point cloud
+	wound->setPose(armPose);
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
 	keyboardComponent->setDeviceName("Keyboard"); // Name of device is case sensitive.
@@ -419,29 +386,38 @@ int main(int argc, char* argv[])
 		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardBehavior");
 	keyboardBehavior->setInputComponent(keyboardComponent);
 
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, staplerSceneElement->getComponent("Handle"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, staplerSceneElement->getComponent("Indicator"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, staplerSceneElement->getComponent("Markings"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, staplerSceneElement->getComponent("Trigger"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, staplerSceneElement->getComponent("StaplerOsgMesh"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, armSceneElement->getComponent("forearm"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, armSceneElement->getComponent("upperarm"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, armSceneElement->getComponent("ArmOsgMesh"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Handle"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Indicator"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Markings"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Trigger"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, stapler->getComponent("StaplerOsgMesh"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, arm->getComponent("forearm"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, arm->getComponent("upperarm"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, arm->getComponent("ArmOsgMesh"));
 	keyboardBehavior->registerKey(
-		SurgSim::Device::KeyCode::KEY_E, woundSceneElement->getComponent("wound triangle mesh"));
+		SurgSim::Device::KeyCode::KEY_E, wound->getComponent("wound triangle mesh"));
 	keyboardBehavior->registerKey(
-		SurgSim::Device::KeyCode::KEY_F, woundSceneElement->getComponent("wound point cloud"));
+		SurgSim::Device::KeyCode::KEY_F, wound->getComponent("wound point cloud"));
 
-	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>("SceneElement");
-	sceneElement->addComponent(keyboardComponent);
-	sceneElement->addComponent(keyboardBehavior);
+	std::shared_ptr<SceneElement> keyboard = std::make_shared<BasicSceneElement>("SceneElement");
+	keyboard->addComponent(keyboardComponent);
+	keyboard->addComponent(keyboardBehavior);
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(view);
-	scene->addSceneElement(armSceneElement);
-	scene->addSceneElement(staplerSceneElement);
-	scene->addSceneElement(woundSceneElement);
-	scene->addSceneElement(sceneElement);
+	scene->addSceneElement(arm);
+	scene->addSceneElement(stapler);
+	scene->addSceneElement(wound);
+	scene->addSceneElement(keyboard);
+
+	// Exclude collision between certain Collision::Representations
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision0"));
+
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision1"));
 
 	runtime->execute();
 	return 0;
