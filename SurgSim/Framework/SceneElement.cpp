@@ -106,7 +106,18 @@ std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) c
 bool SceneElement::initialize()
 {
 	SURGSIM_ASSERT(!m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
-	addComponent(m_pose);
+
+	// If m_components already has a PoseCompoent, don't use m_pose.
+	auto it = std::find_if(std::begin(m_components), std::end(m_components),
+						   [](const std::pair<std::string, std::shared_ptr<SurgSim::Framework::Component>>& pair)
+						   {
+								return pair.second->getClassName() == "SurgSim::Framework::PoseComponent";
+						   });
+	if (it == std::end(m_components))
+	{
+		addComponent(m_pose);
+	}
+
 	m_isInitialized = doInitialize();
 
 	if (m_isInitialized)
