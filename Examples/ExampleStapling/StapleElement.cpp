@@ -15,6 +15,8 @@
 
 #include "Examples/ExampleStapling/StapleElement.h"
 
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
@@ -42,7 +44,7 @@ void StapleElement::setHasCollisionRepresentation(bool flag)
 bool StapleElement::doInitialize()
 {
 	auto meshShape = std::make_shared<MeshShape>();
-	meshShape->setFileName("Data/Geometry/staple_collision.ply");
+	meshShape->setFileName(getRuntime()->getApplicationData()->findFile("/Geometry/staple_collision.ply"));
 
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
