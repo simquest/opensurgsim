@@ -115,12 +115,12 @@ const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::g
 }
 
 void DeformableCollisionRepresentation::setDeformableRepresentation(
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase>representation)
+	std::shared_ptr<SurgSim::Physics::DeformableRepresentation>representation)
 {
 	m_deformable = representation;
 }
 
-const std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase>
+const std::shared_ptr<SurgSim::Physics::DeformableRepresentation>
 	DeformableCollisionRepresentation::getDeformableRepresentation() const
 {
 	auto physicsRepresentation = m_deformable.lock();

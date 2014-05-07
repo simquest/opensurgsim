@@ -21,10 +21,9 @@
 
 #include <memory>
 
-#include "SurgSim/Physics/DeformableRepresentationBase.h"
-
 #include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {
@@ -43,7 +42,7 @@ namespace Physics
 /// \note Derived classes must implement the Representation API and the OdeEquation API, also set
 /// \note   m_numDofPerNode and call Representation::setNumDof()
 class DeformableRepresentation :
-	public DeformableRepresentationBase,
+	public Representation,
 	public SurgSim::Math::OdeEquation
 {
 public:
@@ -56,13 +55,13 @@ public:
 
 	virtual void resetState() override;
 
-	virtual void setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState) override;
+	virtual void setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState);
 
-	virtual const std::shared_ptr<SurgSim::Math::OdeState> getCurrentState() const override;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getCurrentState() const;
 
-	virtual const std::shared_ptr<SurgSim::Math::OdeState> getPreviousState() const override;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getPreviousState() const;
 
-	virtual const std::shared_ptr<SurgSim::Math::OdeState> getFinalState() const override;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getFinalState() const;
 
 	/// Gets the number of degrees of freedom per node
 	/// \return The number of degrees of freedom per node for this Deformable Representation

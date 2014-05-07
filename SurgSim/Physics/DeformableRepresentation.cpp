@@ -33,7 +33,7 @@ namespace Physics
 {
 
 DeformableRepresentation::DeformableRepresentation(const std::string& name) :
-	DeformableRepresentationBase(name),
+	Representation(name),
 	SurgSim::Math::OdeEquation(),
 	m_numDofPerNode(0),
 	m_integrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER)

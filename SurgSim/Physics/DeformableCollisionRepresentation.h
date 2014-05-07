@@ -36,7 +36,7 @@ class MeshShape;
 
 namespace Physics
 {
-class DeformableRepresentationBase;
+class DeformableRepresentation;
 
 /// A collision representation that can be attached to a deformable, when this contains a mesh with the same number
 /// of vertices as the deformable has nodes, the mesh vertices will move to match the positions of the nodes in
@@ -71,10 +71,10 @@ public:
 
 	/// Sets the deformable to which this collision representation is connected
 	/// \param representation The deformable that will be used to update the contained mesh
-	void setDeformableRepresentation(std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase> representation);
+	void setDeformableRepresentation(std::shared_ptr<SurgSim::Physics::DeformableRepresentation> representation);
 
 	/// \return The deformable that is used to update the contained mesh
-	const std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase> getDeformableRepresentation() const;
+	const std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getDeformableRepresentation() const;
 
 	virtual int getShapeType() const override;
 
@@ -91,7 +91,7 @@ private:
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
 
 	/// Reference to the deformable driving changes to this mesh
-	std::weak_ptr<SurgSim::Physics::DeformableRepresentationBase> m_deformable;
+	std::weak_ptr<SurgSim::Physics::DeformableRepresentation> m_deformable;
 };
 
 }

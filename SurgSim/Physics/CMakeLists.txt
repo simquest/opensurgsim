@@ -84,7 +84,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	DcdCollision.h
 	DeformableCollisionRepresentation.h
 	DeformableRepresentation.h
-	DeformableRepresentationBase.h
 	Fem1DRepresentation.h
 	Fem2DRepresentation.h
 	Fem3DRepresentation.h
