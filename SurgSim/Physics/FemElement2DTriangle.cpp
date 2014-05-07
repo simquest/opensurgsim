@@ -379,8 +379,9 @@ void FemElement2DTriangle::computeInitialRotation(const DeformableRepresentation
 bool FemElement2DTriangle::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		   && (naturalCoordinate.size() == 3)
-		   && (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
+		&& (naturalCoordinate.size() == 3)
+		&& (-SurgSim::Math::Geometry::ScalarEpsilon <= naturalCoordinate.minCoeff() &&
+			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
 }
 
 SurgSim::Math::Vector FemElement2DTriangle::computeCartesianCoordinate(const DeformableRepresentationState& state,

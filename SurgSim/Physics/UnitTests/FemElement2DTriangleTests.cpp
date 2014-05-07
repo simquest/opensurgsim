@@ -708,18 +708,21 @@ TEST_F(FemElement2DTriangleTests, CoordinateTests)
 	FemElement2DTriangle element(m_nodeIds);
 
 	Vector validNaturalCoordinate(3);
+	Vector validNaturalCoordinate2(3);
 	Vector invalidNaturalCoordinateSumNot1(3);
 	Vector invalidNaturalCoordinateNegativeValue(3);
 	Vector invalidNaturalCoordinateBiggerThan1Value(3);
 	Vector invalidNaturalCoordinateSize2(2), invalidNaturalCoordinateSize4(4);
 
 	validNaturalCoordinate << 0.4, 0.5, 0.1;
+	validNaturalCoordinate2 << -1e-11, 1.0 + 1e-11, 0.0;
 	invalidNaturalCoordinateSumNot1 << 0.4, 0.5, 0.3;
 	invalidNaturalCoordinateNegativeValue << 0.7, 0.7, -0.4;
 	invalidNaturalCoordinateBiggerThan1Value << 1.4, 0.6, -1.0;
 	invalidNaturalCoordinateSize2 << 0.4, 0.6;
 	invalidNaturalCoordinateSize4 << 0.2, 0.2, 0.2, 0.4;
 	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate));
+	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate2));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSumNot1));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateNegativeValue));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateBiggerThan1Value));

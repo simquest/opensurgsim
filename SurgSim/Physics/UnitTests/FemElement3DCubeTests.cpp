@@ -739,6 +739,14 @@ TEST_F(FemElement3DCubeTests, IsValidCoordinateTest)
 		nodePositions <<  1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 		EXPECT_FALSE(cube.isValidCoordinate(nodePositions));
 	}
+
+	{
+		// Node with some coordinates less than 0 but greater than epsilon and
+		// some greater than 1 and less than (1 + epsilon).
+		SurgSim::Math::Vector nodePositions(8);
+		nodePositions <<  -1e-11, 1.0 + 1e-11, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+		EXPECT_TRUE(cube.isValidCoordinate(nodePositions));
+	}
 }
 
 TEST_F(FemElement3DCubeTests, ComputeCartesianCoordinate)

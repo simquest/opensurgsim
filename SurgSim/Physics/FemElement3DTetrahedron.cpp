@@ -406,8 +406,8 @@ bool FemElement3DTetrahedron::isValidCoordinate(const SurgSim::Math::Vector& nat
 {
 	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
 		&& (naturalCoordinate.size() == 4)
-		&& (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
-
+		&& (-SurgSim::Math::Geometry::ScalarEpsilon <= naturalCoordinate.minCoeff() &&
+			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
 }
 
 SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(

@@ -264,18 +264,21 @@ TEST_F(FemElement3DTetrahedronTests, CoordinateTests)
 	Vector3d expectedD(0.1, 1.2, 3.3);
 
 	Vector validNaturalCoordinate(4);
+	Vector validNaturalCoordinate2(4);
 	Vector invalidNaturalCoordinateSumNot1(4);
 	Vector invalidNaturalCoordinateNegativeValue(4);
 	Vector invalidNaturalCoordinateBiggerThan1Value(4);
 	Vector invalidNaturalCoordinateSize3(3), invalidNaturalCoordinateSize5(5);
 
 	validNaturalCoordinate << 0.4, 0.3, 0.2, 0.1;
+	validNaturalCoordinate2 << -1e-11, 1.0 + 1e-11, 0.0, 0.0;
 	invalidNaturalCoordinateSumNot1 << 0.1, 0.1, 0.1, 0.1;
 	invalidNaturalCoordinateNegativeValue << 0.7, 0.7, -0.5, 0.1;
 	invalidNaturalCoordinateBiggerThan1Value << 1.4, 0.6, -1.2, 0.2;
 	invalidNaturalCoordinateSize3 << 0.4, 0.4, 0.2;
 	invalidNaturalCoordinateSize5 << 0.2, 0.2, 0.2, 0.2, 0.2;
 	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate));
+	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate2));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSumNot1));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateNegativeValue));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateBiggerThan1Value));

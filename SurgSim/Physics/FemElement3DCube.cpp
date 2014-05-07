@@ -451,12 +451,10 @@ double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta,
 
 bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
-	// Check for valid range of localization points
-	bool validLocalRange = (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
-
 	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
 		&& (naturalCoordinate.size() == 8)
-		&& (validLocalRange);
+		&& (-SurgSim::Math::Geometry::ScalarEpsilon <= naturalCoordinate.minCoeff() &&
+			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
 }
 
 SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
