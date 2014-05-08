@@ -2,7 +2,7 @@
 
 \page Novint Novint: Haptic Device
 
-The Novint Falcon (by Novint Technologies, Inc.) is a 3D force-feedback haptic device.  The user holds a grip that measures 3DOF positions (fixed orientation), and which can exert 3DOF forces on the user's hand.
+The Novint Falcon (by Novint Technologies, Inc.) is a 3D force-feedback haptic device.  The user holds a grip that measures the hand's position, and can exert forces on the hand.
 
 Novint Technologies, Inc., only provides Novint Falcon driver support for Windows.
 
