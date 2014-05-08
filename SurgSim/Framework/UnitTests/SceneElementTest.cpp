@@ -14,8 +14,9 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -23,6 +24,7 @@
 #include "MockObjects.h"  //NOLINT
 
 using SurgSim::Framework::Component;
+using SurgSim::Framework::PoseComponent;
 using SurgSim::Framework::SceneElement;
 
 TEST(SceneElementTest, Constructor)
@@ -165,16 +167,36 @@ TEST(SceneElementTest, GetTypedComponentsTests)
 
 TEST(SceneElementTest, InitComponentTest)
 {
-	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
-	std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));
-	std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
+	{
+		std::shared_ptr<MockSceneElement> element(new MockSceneElement());
+		std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));
+		std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
 
-	element->addComponent(component1);
-	element->addComponent(component2);
+		element->addComponent(component1);
+		element->addComponent(component2);
 
-	element->initialize();
+		element->initialize();
 
-	EXPECT_TRUE(element->didInit);
+		EXPECT_TRUE(element->didInit);
+	}
+
+	{
+		// Besides the 'built-in' Pose Component, one user defined PoseComponent can be used (not recommended though).
+		auto sceneElement = std::make_shared<MockSceneElement>();
+		auto poseComponent = std::make_shared<PoseComponent>("Pose");
+		sceneElement->addComponent(poseComponent);
+		EXPECT_NO_THROW(sceneElement->initialize());
+	}
+
+	{
+		// However, more than one user defined PoseComponent will case a failure.
+		auto sceneElement = std::make_shared<MockSceneElement>();
+		auto poseComponent = std::make_shared<PoseComponent>("Pose");
+		auto poseComponent2 = std::make_shared<PoseComponent>("Pose2");
+		sceneElement->addComponent(poseComponent);
+		sceneElement->addComponent(poseComponent2);
+		EXPECT_ANY_THROW(sceneElement->initialize());
+	}
 }
 
 TEST(SceneElementTest, DoubleInitTest)
