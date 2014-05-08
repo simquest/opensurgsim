@@ -107,19 +107,23 @@ bool SceneElement::initialize()
 {
 	SURGSIM_ASSERT(!m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
 
-	// If m_components already has a PoseCompoent, don't use m_pose.
-	auto it = std::find_if(std::begin(m_components), std::end(m_components),
-						   [](const std::pair<std::string, std::shared_ptr<SurgSim::Framework::Component>>& pair)
-						   {
-								return pair.second->getClassName() == "SurgSim::Framework::PoseComponent";
-						   });
-	if (it == std::end(m_components))
+	// If m_components already has a PoseCompoent, use that PoseComponent.
+	auto poseComponentList = getComponents<SurgSim::Framework::PoseComponent>();
+	SURGSIM_ASSERT(poseComponentList.size() <= 1) << m_name << " can not have more than one PoseComponent.";
+
+	if (poseComponentList.size() == 1)
+	{
+		SURGSIM_LOG_INFO(Logger::getLogger("runtime")) << m_name << " already contains a PoseComponent. " <<
+																"This user defined PoseComponent is going to be used.";
+		m_pose = poseComponentList.front();
+	}
+	else
 	{
 		addComponent(m_pose);
 	}
 
-	m_isInitialized = doInitialize();
 
+	m_isInitialized = doInitialize();
 	if (m_isInitialized)
 	{
 		// initialize all components
