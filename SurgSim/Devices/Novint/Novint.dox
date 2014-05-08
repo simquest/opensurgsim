@@ -12,4 +12,5 @@ Dependencies:
 	-# Install the Falcon drivers.
 	-# Install the SDK.
 	-# Run NDSSetter as administrator (executable provided with the HDAL SDK) to set an environment variable named NOVINT_DEVICE_SUPPORT to the directory where the SDK was installed.
+	-# Add the directory containing hd.dll to the environment path (e.g., <tt>C:\\Program Files (x86)\\novint\\HDAL_SDK_X.X.XX.XX\\bin</tt>).
 */
