@@ -271,7 +271,7 @@ public:
 	/// \param other The "from" NamedData.
 	/// \param map The map of indices.
 	template <typename N>
-	inline void copy(const NamedData<N>& other, const IndexDirectoryCopyMap& map);
+	void copy(const NamedData<N>& other, const IndexDirectoryCopyMap& map);
 
 private:
 	/// The mapping between names and indices.

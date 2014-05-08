@@ -202,13 +202,13 @@ public:
 	/// other's indices to this object's indices.
 	/// \param other The DataGroup with which to compare.
 	/// \return The matched indices.
-	inline DataGroupCopyMap findMap(const DataGroup& other) const;
+	DataGroupCopyMap findMap(const DataGroup& other) const;
 
 	/// Copy the data from another DataGroup, based on maps of indices.
 	/// \param other The "from" DataGroup.
 	/// \param maps The maps of indices.
 	/// \sa findMap
-	inline void copy(const DataGroup& other, const DataGroupCopyMap& map);
+	void copy(const DataGroup& other, const DataGroupCopyMap& map);
 
 private:
 	/// The pose values.
