@@ -146,7 +146,7 @@ public:
 
 protected:
 	/// Computes the tetrahdron shape functions
-	/// \param restState The deformable rest state to compute the shape function from
+	/// \param restState The rest state to compute the shape function from
 	void computeShapeFunctions(const SurgSim::Math::OdeState& restState);
 
 	/// Computes the tetrahedron stiffness matrix

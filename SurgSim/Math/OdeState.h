@@ -61,11 +61,11 @@ public:
 	void setNumDof(unsigned int numDofPerNode, unsigned int numNodes);
 
 	/// Retrieves the number of degrees of freedom
-	/// \return The number of DOF for this deformable representation
+	/// \return The number of DOF for this representation
 	unsigned int getNumDof() const;
 
 	/// Retrieves the number of nodes
-	/// \return The number of nodes for this deformable representation
+	/// \return The number of nodes for this representation
 	unsigned int getNumNodes() const;
 
 	/// Retrieves all degrees of freedom's position (non-const version)
@@ -138,9 +138,6 @@ private:
 
 	/// Degrees of freedom velocity (m_x 1st derivative w.r.t. time)
 	SurgSim::Math::Vector m_v;
-
-	///// Degrees of freedom acceleration (m_x 2nd derivative w.r.t. time)
-	//SurgSim::Math::Vector m_a;
 
 	/// Boundary conditions stored as a list of dof ids
 	std::vector<unsigned int> m_boundaryConditionsAsDofIds;

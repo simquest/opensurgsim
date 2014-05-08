@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/LinearSpring.h"
-#include "SurgSim/Math/Geometry.h"
 
-using SurgSim::Math::Matrix33d;
-using SurgSim::Math::Vector;
-using SurgSim::Math::Vector3d;
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
 using SurgSim::Math::getSubVector;
+using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Vector;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
