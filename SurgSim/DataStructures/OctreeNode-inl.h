@@ -101,6 +101,12 @@ bool OctreeNode<Data>::isActive() const
 }
 
 template<class Data>
+void OctreeNode<Data>::setIsActive(bool isActive)
+{
+	m_isActive = isActive;
+}
+
+template<class Data>
 bool OctreeNode<Data>::hasChildren() const
 {
 	return m_hasChildren;
