@@ -35,7 +35,7 @@ PoseInterpolator::PoseInterpolator(const std::string& name) :
 
 }
 
-void PoseInterpolator::setStartingPose(const SurgSim::Math::RigidTransform3d transform)
+void PoseInterpolator::setStartingPose(const SurgSim::Math::RigidTransform3d& transform)
 {
 	if (!isInitialized())
 	{
@@ -43,7 +43,7 @@ void PoseInterpolator::setStartingPose(const SurgSim::Math::RigidTransform3d tra
 	}
 }
 
-void PoseInterpolator::setEndingPose(const SurgSim::Math::RigidTransform3d transform)
+void PoseInterpolator::setEndingPose(const SurgSim::Math::RigidTransform3d& transform)
 {
 	if (!isInitialized())
 	{

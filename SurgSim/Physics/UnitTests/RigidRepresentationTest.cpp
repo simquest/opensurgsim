@@ -117,9 +117,9 @@ TEST_F(RigidRepresentationTest, ResetTest)
 	// isGravityEnable flag unchanged
 	EXPECT_FALSE(rigidBody->isGravityEnabled());
 	// current state = initial state
-	EXPECT_EQ(rigidBody->getInitialState(), rigidBody->getCurrentState());
+	EXPECT_TRUE(rigidBody->getInitialState() == rigidBody->getCurrentState());
 	// previous state = initial state
-	EXPECT_EQ(rigidBody->getInitialState(), rigidBody->getPreviousState());
+	EXPECT_TRUE(rigidBody->getInitialState() == rigidBody->getPreviousState());
 
 	// reset the representation parameters
 	rigidBody->resetParameters();
@@ -135,13 +135,13 @@ TEST_F(RigidRepresentationTest, SetGetAndDefaultValueTest)
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 
 	// Get state (current, initial)
-	EXPECT_EQ(m_defaultState, rigidBody->getCurrentState());
-	EXPECT_EQ(m_defaultState, rigidBody->getPreviousState());
-	EXPECT_EQ(m_defaultState, rigidBody->getInitialState());
+	EXPECT_TRUE(m_defaultState == rigidBody->getCurrentState());
+	EXPECT_TRUE(m_defaultState == rigidBody->getPreviousState());
+	EXPECT_TRUE(m_defaultState == rigidBody->getInitialState());
 	rigidBody->setInitialState(m_state);
-	EXPECT_EQ(m_state, rigidBody->getInitialState());
-	EXPECT_EQ(m_state, rigidBody->getCurrentState());
-	EXPECT_EQ(m_state, rigidBody->getPreviousState());
+	EXPECT_TRUE(m_state == rigidBody->getInitialState());
+	EXPECT_TRUE(m_state == rigidBody->getCurrentState());
+	EXPECT_TRUE(m_state == rigidBody->getPreviousState());
 
 	// Get parameters (current, initial)
 	EXPECT_EQ(m_defaultParameters, rigidBody->getCurrentParameters());
