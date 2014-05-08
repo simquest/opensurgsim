@@ -29,6 +29,11 @@
 
 namespace SurgSim
 {
+namespace DataStructures
+{
+class DataGroupCopier;
+};
+
 namespace Device
 {
 /// A device filter that integrates the pose, turning a relative device into an absolute one.
@@ -78,8 +83,8 @@ private:
 	/// true if the input DataGroup should be created.
 	bool m_firstInput;
 
-	/// The maps from the device's DataGroup to this object's input DataGroup.
-	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::DataGroupCopyMap> m_map;
+	/// A copier into the input DataGroup, if needed.
+	std::shared_ptr<SurgSim::DataStructures::DataGroupCopier> m_copier;
 
 	///@{
 	/// The indices into the DataGroups.

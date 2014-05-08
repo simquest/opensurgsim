@@ -18,6 +18,7 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/DataStructures/DataGroupCopier.h"
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -29,6 +30,7 @@
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
+using SurgSim::DataStructures::DataGroupCopier;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
@@ -402,6 +404,59 @@ TEST(DataGroupTests, Copying)
 
 	// Copy the entries' values (that are in the maps) from the fromData to the toData.
 	toData.copy(fromData, copyMap);
+
+	RigidTransform3d outTestPose;
+	ASSERT_TRUE(toData.poses().get("test", &outTestPose));
+
+	EXPECT_FALSE(toData.poses().hasData("test2"));
+
+	bool outTestBoolean;
+	ASSERT_TRUE(toData.booleans().get("test", &outTestBoolean));
+
+	bool outTestBoolean2;
+	ASSERT_TRUE(toData.booleans().get("test2", &outTestBoolean2));
+
+	EXPECT_TRUE(outTestPose.isApprox(testPose, EPSILON));
+	EXPECT_EQ(testBoolean, outTestBoolean);
+	EXPECT_EQ(testBoolean2, outTestBoolean2);
+}
+
+/// Non-assignment copying DataGroups with DataGroupCopier.
+TEST(DataGroupTests, DataGroupCopier)
+{
+	DataGroupBuilder fromBuilder;
+	fromBuilder.addPose("test");
+	fromBuilder.addBoolean("test");
+	fromBuilder.addBoolean("test2");
+	DataGroup fromData = fromBuilder.createData();
+
+	DataGroupBuilder toBuilder;
+	toBuilder.addPose("test2"); //different pose name
+	toBuilder.addBoolean("test2"); // same boolean name
+	toBuilder.addEntriesFrom(fromData);
+	DataGroup toData = toBuilder.createData();
+
+	ASSERT_TRUE(toData.poses().hasEntry("test"));
+	ASSERT_TRUE(toData.poses().hasEntry("test2"));
+	ASSERT_TRUE(toData.booleans().hasEntry("test"));
+	ASSERT_TRUE(toData.booleans().hasEntry("test2"));
+
+	DataGroupCopier copier(fromData, toData);
+
+	const RigidTransform3d testPose = SurgSim::Math::makeRigidTransform(Vector3d(1.0, 2.0, 3.0),
+		Vector3d(1.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
+	ASSERT_TRUE(fromData.poses().set("test", testPose));
+
+	const bool testBoolean = true;
+	ASSERT_TRUE(fromData.booleans().set("test", testBoolean));
+
+	const bool testBoolean2 = false;
+	ASSERT_TRUE(fromData.booleans().set("test2", testBoolean2));
+	// Setting the initial value for the toData's test2 boolean to the opposite value.
+	ASSERT_TRUE(toData.booleans().set("test2", !testBoolean2));
+
+	// Copy the entries' values (that are in the maps) from the fromData to the toData.
+	copier.copy();
 
 	RigidTransform3d outTestPose;
 	ASSERT_TRUE(toData.poses().get("test", &outTestPose));

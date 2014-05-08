@@ -16,6 +16,7 @@
 #include "SurgSim/Devices/DeviceFilters/PoseIntegrator.h"
 
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/DataStructures/DataGroupCopier.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -69,20 +70,19 @@ void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::D
 			builder.addVector(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
 			getInitialInputData() = builder.createData();
 			getInputData() = getInitialInputData();
-
-			m_map.setValue(getInputData().findMap(inputData));
+			m_copier = std::make_shared<SurgSim::DataStructures::DataGroupCopier>(inputData, getInputData());
 		}
 	}
 
-	if (m_map.hasValue())
+	if (m_copier == nullptr)
 	{
-		getInitialInputData().copy(inputData, m_map.getValue());
+		getInputData() = inputData;
 	}
 	else
 	{
-		getInitialInputData() = inputData;
+		m_copier->copy();
 	}
-	getInputData() = getInitialInputData();
+	getInitialInputData() = getInputData();
 
 	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::Names::POSE);
 	m_linearVelocityIndex = getInputData().vectors().getIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
@@ -97,13 +97,13 @@ void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::D
 
 void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
-	if (m_map.hasValue())
+	if (m_copier == nullptr)
 	{
-		getInputData().copy(inputData, m_map.getValue());
+		getInputData() = inputData;
 	}
 	else
 	{
-		getInputData() = inputData;
+		m_copier->copy();
 	}
 
 	if (m_poseIndex >= 0)

@@ -24,6 +24,7 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	AabbTreeIntersectionVisitor.cpp
 	AabbTreeNode.cpp
 	DataGroupBuilder.cpp
+	DataGroupCopier.cpp
 	IndexDirectory.cpp
 	OctreeNode.cpp
 	ply.c
@@ -46,6 +47,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataGroup.h
 	DataGroup-inl.h
 	DataGroupBuilder.h
+	DataGroupCopier.h
 	EmptyData.h
 	IndexDirectory.h
 	MeshElement.h
