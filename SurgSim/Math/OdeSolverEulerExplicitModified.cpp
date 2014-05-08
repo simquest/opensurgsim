@@ -45,7 +45,7 @@ void OdeSolverEulerExplicitModified::solve(double dt, const OdeState& currentSta
 	currentState.applyBoundaryConditionsToVector(&f);
 	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
-	// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
+	// Computes deltaV (stored in the velocities) and m_compliance = 1/m_systemMatrix
 	Vector& deltaV = newState->getVelocities();
 	(*m_linearSolver)(m_systemMatrix, f, &deltaV, &m_compliance);
 

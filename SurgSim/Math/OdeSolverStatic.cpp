@@ -45,6 +45,7 @@ void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* n
 	currentState.applyBoundaryConditionsToVector(&f);
 	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
+	// Computes deltaX (stored in the positions) and m_compliance = 1/m_systemMatrix
 	Vector& deltaX = newState->getPositions();
 	(*m_linearSolver)(m_systemMatrix, f, &deltaX, &m_compliance);
 
