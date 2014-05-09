@@ -17,6 +17,8 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/DataStructures/AabbTree.h"
+#include "SurgSim/DataStructures/AabbTreeNode.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Math/Geometry.h"
@@ -134,86 +136,76 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 
 void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	std::shared_ptr<Representation> representationMeshA = pair->getFirst();
-	std::shared_ptr<Representation> representationMeshB = pair->getSecond();
+	auto meshShapeA = std::static_pointer_cast<MeshShape>(pair->getFirst()->getShape());
+	auto meshShapeB = std::static_pointer_cast<MeshShape>(pair->getSecond()->getShape());
 
-	std::shared_ptr<TriangleMesh> collisionMeshA =
-		std::static_pointer_cast<MeshShape>(representationMeshA->getShape())->getMesh();
-	std::shared_ptr<TriangleMesh> collisionMeshB =
-		std::static_pointer_cast<MeshShape>(representationMeshB->getShape())->getMesh();
+	std::shared_ptr<TriangleMesh> collisionMeshA = meshShapeA->getMesh();
+	std::shared_ptr<TriangleMesh> collisionMeshB = meshShapeB->getMesh();
 
-	RigidTransform3d globalCoordinatesFromMeshACoordinates = representationMeshA->getPose();
-	RigidTransform3d globalCoordinatesFromMeshBCoordinates = representationMeshB->getPose();
-
-	RigidTransform3d meshBCoordinatesFromGlobalCoordinates = globalCoordinatesFromMeshBCoordinates.inverse();
-	RigidTransform3d meshBCoordinatesFromMeshACoordinates = meshBCoordinatesFromGlobalCoordinates
-															* globalCoordinatesFromMeshACoordinates;
+	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
+		= meshShapeA->getAabbTree()->spatialJoin(*meshShapeB->getAabbTree());
 
 	double depth = 0.0;
 	Vector3d normal;
 	Vector3d penetrationPointA, penetrationPointB;
 
-	for (size_t i = 0; i < collisionMeshA->getNumTriangles(); ++i)
+	for (auto intersection = intersectionList.begin(); intersection != intersectionList.end(); ++intersection)
 	{
-		// The triangleA vertices.
-		const Vector3d& triangleA0InLocalB = meshBCoordinatesFromMeshACoordinates *
-			collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[0]);
-		const Vector3d& triangleA1InLocalB = meshBCoordinatesFromMeshACoordinates *
-			collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[1]);
-		const Vector3d& triangleA2InLocalB = meshBCoordinatesFromMeshACoordinates *
-			collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[2]);
+		std::shared_ptr<SurgSim::DataStructures::AabbTreeNode> nodeA = intersection->first;
+		std::shared_ptr<SurgSim::DataStructures::AabbTreeNode> nodeB = intersection->second;
 
-		const Vector3d& normalAInLocalB = meshBCoordinatesFromMeshACoordinates.linear() * collisionMeshA->getNormal(i);
-		if (normalAInLocalB.isZero())
-		{
-			continue;
-		}
+		std::list<size_t> triangleListA;
+		std::list<size_t> triangleListB;
 
-		for (size_t j = 0; j < collisionMeshB->getNumTriangles(); ++j)
+		nodeA->getIntersections(nodeB->getAabb(), &triangleListA);
+		nodeB->getIntersections(nodeA->getAabb(), &triangleListB);
+
+		for (auto i = triangleListA.begin(); i != triangleListA.end(); ++i)
 		{
-			const Vector3d& normalB = collisionMeshB->getNormal(j);
-			if (normalB.isZero())
+			const Vector3d& normalA = collisionMeshA->getNormal(*i);
+			if (normalA.isZero())
 			{
 				continue;
 			}
 
-			// The triangleB vertices.
-			const Vector3d& triangleB0 =
-				collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(j).verticesId[0]);
-			const Vector3d& triangleB1 =
-				collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(j).verticesId[1]);
-			const Vector3d& triangleB2 =
-				collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(j).verticesId[2]);
+			auto verticesA = collisionMeshA->getTrianglePositions(*i);
 
-			// Check if the triangles intersect.
-			if (SurgSim::Math::calculateContactTriangleTriangle(triangleA0InLocalB, triangleA1InLocalB,
-																triangleA2InLocalB,
-																triangleB0, triangleB1, triangleB2,
-																normalAInLocalB, normalB, &depth,
-																&penetrationPointA, &penetrationPointB,
-																&normal))
+			for (auto j = triangleListB.begin(); j != triangleListB.end(); ++j)
 			{
+				const Vector3d& normalB = collisionMeshB->getNormal(*j);
+				if (normalB.isZero())
+				{
+					continue;
+				}
+
+				auto verticesB = collisionMeshB->getTrianglePositions(*j);
+
+				// Check if the triangles intersect.
+				if (SurgSim::Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],
+																	verticesB[0], verticesB[1], verticesB[2],
+																	normalA, normalB, &depth,
+																	&penetrationPointA, &penetrationPointB,
+																	&normal))
+				{
 #ifdef SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
-				assertIsCoplanar(triangleA0InLocalB, triangleA1InLocalB, triangleA2InLocalB, penetrationPointA);
-				assertIsCoplanar(triangleB0, triangleB1, triangleB2, penetrationPointB);
+					assertIsCoplanar(verticesA[0], verticesA[1], verticesA[2], penetrationPointA);
+					assertIsCoplanar(verticesB[0], verticesB[1], verticesB[2], penetrationPointB);
 
-				assertIsPointInsideTriangle(
-					penetrationPointA, triangleA0InLocalB, triangleA1InLocalB, triangleA2InLocalB, normalAInLocalB);
-				assertIsPointInsideTriangle(penetrationPointB, triangleB0, triangleB1, triangleB2, normalB);
+					assertIsPointInsideTriangle(
+						penetrationPointA, verticesA[0], verticesA[1], verticesA[2], normalA);
+					assertIsPointInsideTriangle(penetrationPointB, verticesB[0], verticesB[1], verticesB[2], normalB);
 
-				assertIsCorrectNormalAndDepth(normal, depth, triangleA0InLocalB, triangleA1InLocalB, triangleA2InLocalB,
-					triangleB0, triangleB1, triangleB2);
+					assertIsCorrectNormalAndDepth(normal, depth, verticesA[0], verticesA[1], verticesA[2],
+						verticesB[0], verticesB[1], verticesB[2]);
 #endif
 
-				// Create the contact.
-				std::pair<Location, Location> penetrationPoints;
-				penetrationPoints.first.globalPosition.setValue(globalCoordinatesFromMeshBCoordinates
-																* penetrationPointA);
-				penetrationPoints.second.globalPosition.setValue(globalCoordinatesFromMeshBCoordinates
-																 * penetrationPointB);
+					// Create the contact.
+					std::pair<Location, Location> penetrationPoints;
+					penetrationPoints.first.globalPosition.setValue(penetrationPointA);
+					penetrationPoints.second.globalPosition.setValue(penetrationPointB);
 
-				pair->addContact(std::abs(depth), globalCoordinatesFromMeshBCoordinates.linear() * normal,
-								 penetrationPoints);
+					pair->addContact(std::abs(depth), normal, penetrationPoints);
+				}
 			}
 		}
 	}

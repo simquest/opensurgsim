@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 #include "SurgSim/Framework/FrameworkConvert.h"
@@ -37,6 +38,21 @@ RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& na
 
 RigidCollisionRepresentation::~RigidCollisionRepresentation()
 {
+}
+
+void RigidCollisionRepresentation::update(const double& dt)
+{
+	auto physicsRepresentation = m_physicsRepresentation.lock();
+	SURGSIM_ASSERT(physicsRepresentation != nullptr)
+		<< "PhysicsRepresentation went out of scope for Collision Representation " << getName();
+
+	auto shape = physicsRepresentation->getCurrentParameters().getShapeUsedForMassInertia();
+
+	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
+	if (meshShape != nullptr)
+	{
+		meshShape->setPose(physicsRepresentation->getPose());
+	}
 }
 
 void RigidCollisionRepresentation::setRigidRepresentation(

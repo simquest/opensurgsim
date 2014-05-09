@@ -31,6 +31,7 @@ set(UNIT_TEST_SOURCES
 	OctreeContactCalculationTests.cpp
 	RepresentationTest.cpp
 	RepresentationUtilities.cpp
+	ShapeCollisionRepresentationTest.cpp
 	SphereDoubleSidedPlaneContactCalculationTests.cpp
 	SpherePlaneContactCalculationTests.cpp
 	SphereSphereContactCalculationTests.cpp
@@ -49,7 +50,8 @@ set(LIBS
 	SurgSimMath
 )
 
-surgsim_add_unit_tests(SurgSimCollisionTest)
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
+surgsim_add_unit_tests(SurgSimCollisionTest)
 
 set_target_properties(SurgSimCollisionTest PROPERTIES FOLDER "Collision") 

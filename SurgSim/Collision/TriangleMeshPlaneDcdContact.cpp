@@ -56,8 +56,7 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 	std::shared_ptr<PlaneShape> plane(std::static_pointer_cast<PlaneShape>(representationPlane->getShape()));
 
 	// Transform the plane normal to Mesh co-ordinate system.
-	SurgSim::Math::RigidTransform3d planeLocalToMeshLocal = representationTriangleMesh->getPose().inverse() *
-		representationPlane->getPose();
+	SurgSim::Math::RigidTransform3d planeLocalToMeshLocal = representationPlane->getPose();
 	SurgSim::Math::Vector3d planeNormal = planeLocalToMeshLocal.linear() * plane->getNormal();
 	SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
 	SurgSim::Math::Vector3d planePoint = planeLocalToMeshLocal * planeNormalScaled;
@@ -69,7 +68,6 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 	double d;
 	SurgSim::Math::Vector3d normal;
 	SurgSim::Math::Vector3d meshVertex;
-	SurgSim::Math::Vector3d meshVertexGlobal;
 
 	for (size_t i = 0; i < totalMeshVertices; ++i)
 	{
@@ -80,9 +78,8 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 			// Create the contact
 			normal = representationPlane->getPose().linear() * plane->getNormal();
 			std::pair<Location,Location> penetrationPoints;
-			meshVertexGlobal = representationTriangleMesh->getPose() * meshVertex;
-			penetrationPoints.first.globalPosition.setValue(meshVertexGlobal);
-			penetrationPoints.second.globalPosition.setValue(meshVertexGlobal - normal * d);
+			penetrationPoints.first.globalPosition.setValue(meshVertex);
+			penetrationPoints.second.globalPosition.setValue(meshVertex - normal * d);
 
 			pair->addContact(d, normal, penetrationPoints);
 		}

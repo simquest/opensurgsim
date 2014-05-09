@@ -41,6 +41,8 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::RigidCollisionRepresentation);
 
+	virtual void update(const double& dt) override;
+
 	/// Get the pose of the representation
 	/// \return The pose of this representation
 	virtual SurgSim::Math::RigidTransform3d getPose() const override;

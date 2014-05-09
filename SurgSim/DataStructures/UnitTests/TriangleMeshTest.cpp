@@ -17,6 +17,7 @@
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
 #include "SurgSim/DataStructures/EmptyData.h"
@@ -28,6 +29,7 @@
 
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMesh;
+using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
 namespace SurgSim
@@ -90,6 +92,32 @@ TEST(TriangleMeshTest, NormalTest)
 	meshWithNormal->calculateNormals();
 	Vector3d expectedXNormal(0.0, -1.0, 0.0);
 	EXPECT_EQ(expectedXNormal, meshWithNormal->getNormal(0));
+}
+
+TEST(TriangleMeshTest, CopyWithTransformTest)
+{
+	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	auto originalMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*loadTriangleMesh(fileName));
+	auto expectedMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*originalMesh);
+	auto actualMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*originalMesh);
+
+	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(
+		Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5), Vector3d(8.7, -4.7, -3.1));
+
+	for (auto it = expectedMesh->getVertices().begin(); it != expectedMesh->getVertices().end(); ++it)
+	{
+		it->position = transform * it->position;
+	}
+
+	for (auto it = expectedMesh->getTriangles().begin(); it != expectedMesh->getTriangles().end(); ++it)
+	{
+		it->data.normal = transform.linear() * it->data.normal;
+	}
+
+	actualMesh->copyWithTransform(transform, *originalMesh);
+
+	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
+	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
 }
 
 };
