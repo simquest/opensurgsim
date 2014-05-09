@@ -30,7 +30,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	DcdCollision.cpp
 	DeformableCollisionRepresentation.cpp
 	DeformableRepresentation.cpp
-	DeformableRepresentationState.cpp
 	Fem1DRepresentation.cpp
 	Fem2DRepresentation.cpp
 	Fem3DRepresentation.cpp
@@ -46,6 +45,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemRepresentation.cpp
 	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
+	FixedRepresentation.cpp
 	FixedRepresentationBilateral3D.cpp
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
@@ -55,6 +55,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	MassSpringRepresentationContact.cpp
 	MassSpringRepresentationLocalization.cpp
 	MlcpPhysicsProblem.cpp
+	PhysicsConvert.cpp
 	PhysicsManager.cpp
 	PhysicsManagerState.cpp
 	PostUpdate.cpp
@@ -64,9 +65,12 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
+	RigidRepresentationBaseState.cpp
 	RigidRepresentationBilateral3D.cpp
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
+	RigidRepresentationParameters.cpp
+	RigidRepresentationState.cpp
 	SolveMlcp.cpp
 	UpdateCollisionRepresentations.cpp
 	VirtualToolCoupler.cpp
@@ -85,8 +89,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	DcdCollision.h
 	DeformableCollisionRepresentation.h
 	DeformableRepresentation.h
-	DeformableRepresentationBase.h
-	DeformableRepresentationState.h
 	Fem1DRepresentation.h
 	Fem2DRepresentation.h
 	Fem3DRepresentation.h
@@ -117,6 +119,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	MlcpPhysicsProblem.h
 	MlcpPhysicsProblem-inl.h
 	MlcpPhysicsSolution.h
+	PhysicsConvert.h
 	PhysicsManager.h
 	PhysicsManagerState.h
 	PostUpdate.h

@@ -26,6 +26,7 @@
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/PointCloudRepresentation.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -122,7 +123,7 @@ bool parseTruthCubeData(std::shared_ptr<TruthCubeData> truthCubeData)
 /// This is necessary because the structure of the nodes in the state and in the truth cube is not necessarily matching
 /// The state is built with a structure aligned on +X +Y +Z, while the truth cube data are defined along +X +Y -Z and
 /// rotated (PI/2 along X) to match Y up, so 3d indices don't match.
-size_t searchForClosestNodeInState(std::shared_ptr<DeformableRepresentationState> state, Vector3d p)
+size_t searchForClosestNodeInState(std::shared_ptr<SurgSim::Math::OdeState> state, Vector3d p)
 {
 	size_t res = -1;
 	double minDistance = std::numeric_limits<double>::max();
@@ -201,10 +202,10 @@ public:
 		return m_boundaryConditionsDisplacement;
 	}
 
-	/// Fills up a given deformable state with the truth cube nodes
+	/// Fills up a given state with the truth cube nodes
 	/// border nodes and internal nodes (i.e. the beads)
-	/// \param[in,out] state	The deformable state to be filled up
-	void fillUpDeformableState(std::shared_ptr<DeformableRepresentationState> state)
+	/// \param[in,out] state	The state to be filled up
+	void fillUpDeformableState(std::shared_ptr<SurgSim::Math::OdeState> state)
 	{
 		state->setNumDof(getNumDofPerNode(), m_numNodesPerAxis * m_numNodesPerAxis * m_numNodesPerAxis);
 		SurgSim::Math::Vector& nodePositions = state->getPositions();
@@ -255,7 +256,7 @@ public:
 	/// \param beadsInitialPositions The vector of beads initial position
 	/// \note The ordering between the state and the beads vector might be different
 	/// \note The algorithm will not rely on a matching indexing
-	void adjustInitialBeadsPosition(std::shared_ptr<DeformableRepresentationState> state,
+	void adjustInitialBeadsPosition(std::shared_ptr<SurgSim::Math::OdeState> state,
 		std::vector<Vector3d> beadsInitialPositions)
 	{
 		SurgSim::Math::Vector& x = state->getPositions();
@@ -299,8 +300,8 @@ public:
 	}
 
 	/// Adds the Fem3D elements of small cubes
-	/// \param state	The deformable state for initialization.
-	void addFemCubes(std::shared_ptr<DeformableRepresentationState> state)
+	/// \param state	The state for initialization.
+	void addFemCubes(std::shared_ptr<SurgSim::Math::OdeState> state)
 	{
 		for (size_t i = 0; i < static_cast<size_t>(m_numNodesPerAxis - 1); i++)
 		{
@@ -454,7 +455,7 @@ void doSimulation(std::shared_ptr<TruthCubeData> truthCubeData,
 	// This would simply modify the global stiffness matrix, which is not sufficient for this test
 	// We prefer to keep the boundary conditions in a separate structure
 	// (internal to TruthCubeRepresentation and apply the Lagrange multiplier technique to solve them).
-	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	truthCubeRepresentation->fillUpDeformableState(initialState);
 	truthCubeRepresentation->adjustInitialBeadsPosition(initialState, truthCubeData->cubeData0);
 	truthCubeRepresentation->setInitialState(initialState);
@@ -517,7 +518,7 @@ void copyExperimentalBeadsIntoPointCloud(std::vector<SurgSim::Math::Vector3d> tr
 /// \param cubeData The vector of all experimental beads 3d position
 /// \param state The state of the simulated truth cube
 /// \return The maximum error measured on each bead (in meter)
-double analyzeError(std::vector<Vector3d> cubeData, std::shared_ptr<DeformableRepresentationState> state)
+double analyzeError(std::vector<Vector3d> cubeData, std::shared_ptr<SurgSim::Math::OdeState> state)
 {
 	double maxError = 0.0;
 	for (size_t cubeDataNodeId = 0; cubeDataNodeId < cubeData.size(); ++cubeDataNodeId)

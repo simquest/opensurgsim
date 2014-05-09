@@ -19,6 +19,7 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/MlcpConstraintType.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"
@@ -65,7 +66,7 @@ static std::shared_ptr<Fem3DRepresentation> getTestingFem3d(const std::string &n
 															double youngModulus = 1.0)
 {
 	auto fem = std::make_shared<Fem3DRepresentation>(name);
-	auto state = std::make_shared<DeformableRepresentationState>();
+	auto state = std::make_shared<SurgSim::Math::OdeState>();
 	state->setNumDof(3, 6);
 
 	// Place coordinates at

@@ -21,7 +21,6 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
@@ -30,7 +29,6 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::LinearSpring;
 using SurgSim::Physics::MassSpringRepresentation;
 using SurgSim::Physics::MockMassSpring;
@@ -54,9 +52,7 @@ public:
 		m_springDamping = 0.1;
 		m_rayleighDampingMass = 1e0;
 		m_rayleighDampingStiffness = 1e-3;
-		m_boundaryConditions.push_back(0);
-		m_boundaryConditions.push_back(1);
-		m_boundaryConditions.push_back(2);
+		m_nodeBoundaryConditions.push_back(0);
 
 		// Poses
 		m_poseIdentity.setIdentity();
@@ -83,12 +79,10 @@ public:
 		m_springDamping = 0.0;
 		m_rayleighDampingMass = 0.0;
 		m_rayleighDampingStiffness = 0.0;
-		m_boundaryConditions.clear();
-		m_boundaryConditions.push_back(0);
-		m_boundaryConditions.push_back(1);
-		m_boundaryConditions.push_back(2);
+		m_nodeBoundaryConditions.clear();
+		m_nodeBoundaryConditions.push_back(0);
 
-		MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_boundaryConditions, m_totalMass,
+		MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
 			m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
 			scheme);
 
@@ -146,8 +140,8 @@ protected:
 
 	/// Number of nodes
 	unsigned int m_numNodes;
-	/// Boundary conditions
-	std::vector<unsigned int> m_boundaryConditions;
+	/// NodeIds boundary conditions
+	std::vector<unsigned int> m_nodeBoundaryConditions;
 	/// Total mass (in Kg)
 	double m_totalMass;
 	/// Spring stiffness and damping
@@ -162,7 +156,7 @@ protected:
 TEST_F(MassSpringMechanicalValidationTests, NoGravityTest)
 {
 	// Note the use of identity pose to avoid small variation between the spring rest length and current length
-	MockMassSpring m("MassSpring", m_poseIdentity, m_numNodes, m_boundaryConditions, m_totalMass,
+	MockMassSpring m("MassSpring", m_poseIdentity, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
 		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
 
@@ -188,14 +182,12 @@ TEST_F(MassSpringMechanicalValidationTests, OneSpringFrequencyTest)
 	m_springDamping = 0.0;
 	m_rayleighDampingMass = 0.0;
 	m_rayleighDampingStiffness = 0.0;
-	m_boundaryConditions.clear();
-	m_boundaryConditions.push_back(0);
-	m_boundaryConditions.push_back(1);
-	m_boundaryConditions.push_back(2);
+	m_nodeBoundaryConditions.clear();
+	m_nodeBoundaryConditions.push_back(0);
 
 	// Only the Modified Euler Explicit integration conserves the energy exactly
 	// (explicit adds energy to the system, implicit removes energy to the system)
-	MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_boundaryConditions, m_totalMass,
+	MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
 		SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
 
@@ -269,9 +261,9 @@ TEST_F(MassSpringMechanicalValidationTests, OneSpringFrequencyTest)
 TEST_F(MassSpringMechanicalValidationTests, FallingTest)
 {
 	// No boundary conditions to let the model fall
-	m_boundaryConditions.clear();
+	m_nodeBoundaryConditions.clear();
 
-	MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_boundaryConditions, m_totalMass,
+	MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
 		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
 

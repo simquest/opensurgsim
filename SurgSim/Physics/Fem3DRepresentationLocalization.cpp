@@ -67,8 +67,8 @@ SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(dou
 		" initialized";
 
 	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.elementId);
-	const std::shared_ptr<DeformableRepresentationState> previousState = femRepresentation->getPreviousState();
-	const std::shared_ptr<DeformableRepresentationState> currentState = femRepresentation->getCurrentState();
+	const std::shared_ptr<SurgSim::Math::OdeState> previousState = femRepresentation->getPreviousState();
+	const std::shared_ptr<SurgSim::Math::OdeState> currentState = femRepresentation->getCurrentState();
 
 	if (time == 0.0)
 	{

@@ -67,7 +67,6 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
-using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::RigidRepresentationParameters;
 

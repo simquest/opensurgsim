@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/LinearSolveAndInverse.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 
 namespace
@@ -77,12 +78,11 @@ bool Fem1DRepresentation::doWakeUp()
 	return true;
 }
 
-void Fem1DRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,
+void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 										 const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-	transformVectorByBlockOf3(transform, &state->getAccelerations(), true);
 }
 
 } // namespace Physics

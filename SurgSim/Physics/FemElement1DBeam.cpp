@@ -15,7 +15,7 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/FemElement1DBeam.h"
 
 using SurgSim::Math::addSubMatrix;
@@ -76,7 +76,7 @@ void FemElement1DBeam::setShearingEnabled(bool enabled)
 	m_haveShear = enabled;
 }
 
-double FemElement1DBeam::getVolume(const DeformableRepresentationState& state) const
+double FemElement1DBeam::getVolume(const SurgSim::Math::OdeState& state) const
 {
 	const Vector3d A = state.getPosition(m_nodeIds[0]);
 	const Vector3d B = state.getPosition(m_nodeIds[1]);
@@ -84,7 +84,7 @@ double FemElement1DBeam::getVolume(const DeformableRepresentationState& state) c
 	return m_A * (B - A).norm();
 }
 
-void FemElement1DBeam::initialize(const DeformableRepresentationState& state)
+void FemElement1DBeam::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Test the validity of the physical parameters
 	FemElement::initialize(state);
@@ -110,7 +110,7 @@ void FemElement1DBeam::initialize(const DeformableRepresentationState& state)
 	computeStiffness(state, &m_K);
 }
 
-void FemElement1DBeam::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale)
+void FemElement1DBeam::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
 {
 	Eigen::Matrix<double, 12, 1> x, f;
 
@@ -122,21 +122,21 @@ void FemElement1DBeam::addForce(const DeformableRepresentationState& state, Surg
 	addSubVector(f, m_nodeIds, 6, F);
 }
 
-void FemElement1DBeam::addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M, double scale)
+void FemElement1DBeam::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
 {
 	addSubMatrix(m_M * scale, m_nodeIds, 6, M);
 }
 
-void FemElement1DBeam::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D, double scale)
+void FemElement1DBeam::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale)
 {
 }
 
-void FemElement1DBeam::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K, double scale)
+void FemElement1DBeam::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale)
 {
 	addSubMatrix(m_K * scale, getNodeIds(), 6, K);
 }
 
-void FemElement1DBeam::addFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+void FemElement1DBeam::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
 							   SurgSim::Math::Matrix* M, SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K)
 {
 	// Assemble the mass matrix
@@ -151,7 +151,7 @@ void FemElement1DBeam::addFMDK(const DeformableRepresentationState& state, SurgS
 	addForce(state, F);
 }
 
-void FemElement1DBeam::addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD,
+void FemElement1DBeam::addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD,
 								 double alphaK, const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
 {
 	using SurgSim::Math::addSubVector;
@@ -182,7 +182,7 @@ void FemElement1DBeam::addMatVec(const DeformableRepresentationState& state, dou
 	}
 }
 
-void FemElement1DBeam::computeMass(const DeformableRepresentationState& state,
+void FemElement1DBeam::computeMass(const SurgSim::Math::OdeState& state,
 								   Eigen::Matrix<double, 12, 12>* M)
 {
 	double& L = m_restLength;
@@ -251,7 +251,7 @@ void FemElement1DBeam::computeMass(const DeformableRepresentationState& state,
 	m_M = m_R0 * m_MLocal * m_R0.transpose();
 }
 
-void FemElement1DBeam::computeStiffness(const DeformableRepresentationState& state,
+void FemElement1DBeam::computeStiffness(const SurgSim::Math::OdeState& state,
 										Eigen::Matrix<double, 12, 12>* k)
 {
 	double& L = m_restLength;
@@ -334,7 +334,7 @@ void FemElement1DBeam::computeStiffness(const DeformableRepresentationState& sta
 	m_K = m_R0 * m_KLocal * m_R0.transpose();
 }
 
-void FemElement1DBeam::computeInitialRotation(const DeformableRepresentationState& state)
+void FemElement1DBeam::computeInitialRotation(const SurgSim::Math::OdeState& state)
 {
 	// Build (i, j, k) an orthonormal frame
 	const Vector3d A = state.getPosition(m_nodeIds[0]);
@@ -366,7 +366,7 @@ bool FemElement1DBeam::isValidCoordinate(const SurgSim::Math::Vector& naturalCoo
 		   && (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
 }
 
-SurgSim::Math::Vector FemElement1DBeam::computeCartesianCoordinate(const DeformableRepresentationState& state,
+SurgSim::Math::Vector FemElement1DBeam::computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
 																   const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate)) << "naturalCoordinate must be normalized and length 2.";

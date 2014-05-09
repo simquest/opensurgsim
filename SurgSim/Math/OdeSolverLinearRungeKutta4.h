@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_ODEEQUATION_INL_H
-#define SURGSIM_MATH_ODEEQUATION_INL_H
+#ifndef SURGSIM_MATH_ODESOLVERLINEARRUNGEKUTTA4_H
+#define SURGSIM_MATH_ODESOLVERLINEARRUNGEKUTTA4_H
 
-#include "SurgSim/Math/OdeEquation.h"
+#include "SurgSim/Math/OdeSolverRungeKutta4.h"
 
 namespace SurgSim
 {
@@ -24,14 +24,24 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State>
-const std::shared_ptr<State> OdeEquation<State>::getInitialState() const
+/// Linear Version of the Runge Kutta 4 ode solver
+/// This solver assumes that the system is linear
+/// ie that Mass, Damping, and Stiffness matrices do not change.
+class OdeSolverLinearRungeKutta4 : public OdeSolverRungeKutta4
 {
-	return m_initialState;
-}
+public:
+	/// Constructor
+	/// \param equation The ode equation to be solved
+	explicit OdeSolverLinearRungeKutta4(OdeEquation* equation);
+
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+
+private:
+	bool m_initialized;
+};
 
 }; // namespace Math
 
 }; // namespace SurgSim
 
-#endif // SURGSIM_MATH_ODEEQUATION_INL_H
+#endif // SURGSIM_MATH_ODESOLVERLINEARRUNGEKUTTA4_H

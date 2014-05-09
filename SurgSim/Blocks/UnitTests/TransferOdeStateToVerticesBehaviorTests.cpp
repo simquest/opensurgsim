@@ -14,22 +14,23 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the TransferDeformableStateToVerticesBehavior class.
+/// Tests for the TransferOdeStateToVerticesBehavior class.
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
 
-using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
+
+using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
 using SurgSim::DataStructures::Vertices;
 using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Physics::DeformableRepresentationState;
 
 namespace
 {
@@ -58,20 +59,20 @@ void testConstructor()
 	const unsigned int numDofPerNode = 3;
 	const unsigned int numNode = 10;
 
-	std::shared_ptr<DeformableRepresentationState> state;
-	state = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> state;
+	state = std::make_shared<SurgSim::Math::OdeState>();
 	state->setNumDof(numDofPerNode, numNode);
 	state->getPositions().setRandom();
 
 	std::shared_ptr<Vertices<T>> vertices;
 	vertices = std::make_shared<Vertices<T>>();
 
-	ASSERT_NO_THROW({TransferDeformableStateToVerticesBehavior<T> m("name", state, vertices);});
-	ASSERT_NO_THROW({TransferDeformableStateToVerticesBehavior<T>* m = \
-					 new TransferDeformableStateToVerticesBehavior<T>("name", state, vertices); delete m;
+	ASSERT_NO_THROW({TransferOdeStateToVerticesBehavior<T> m("name", state, vertices);});
+	ASSERT_NO_THROW({TransferOdeStateToVerticesBehavior<T>* m = \
+					 new TransferOdeStateToVerticesBehavior<T>("name", state, vertices); delete m;
 					});
-	ASSERT_NO_THROW({std::shared_ptr<TransferDeformableStateToVerticesBehavior<T>> m = \
-					 std::make_shared<TransferDeformableStateToVerticesBehavior<T>>("name", state, vertices);
+	ASSERT_NO_THROW({std::shared_ptr<TransferOdeStateToVerticesBehavior<T>> m = \
+					 std::make_shared<TransferOdeStateToVerticesBehavior<T>>("name", state, vertices);
 					});
 }
 
@@ -120,17 +121,17 @@ void testUpdate()
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	/// Add the representations and behavior to a scene element
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>("scene element");
-	std::shared_ptr<TransferDeformableStateToVerticesBehavior<T>> m;
+	std::shared_ptr<TransferOdeStateToVerticesBehavior<T>> m;
 	std::shared_ptr<Vertices<T>> vertices;
-	std::shared_ptr<DeformableRepresentationState> state;
+	std::shared_ptr<SurgSim::Math::OdeState> state;
 	{
-		state = std::make_shared<DeformableRepresentationState>();
+		state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(numDofPerNode, numNode);
 		state->getPositions().setRandom();
 
 		vertices = std::make_shared<Vertices<T>>();
 
-		m = std::make_shared<TransferDeformableStateToVerticesBehavior<T>>("Transfer Behavior", state, vertices);
+		m = std::make_shared<TransferOdeStateToVerticesBehavior<T>>("Transfer Behavior", state, vertices);
 	}
 	sceneElement->addComponent(m);
 	scene->addSceneElement(sceneElement);
@@ -175,17 +176,17 @@ void testUpdate<void>()
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	/// Add the representations and behavior to a scene element
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>("scene element");
-	std::shared_ptr<TransferDeformableStateToVerticesBehavior<void>> m;
+	std::shared_ptr<TransferOdeStateToVerticesBehavior<void>> m;
 	std::shared_ptr<Vertices<void>> vertices;
-	std::shared_ptr<DeformableRepresentationState> state;
+	std::shared_ptr<SurgSim::Math::OdeState> state;
 	{
-		state = std::make_shared<DeformableRepresentationState>();
+		state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(numDofPerNode, numNode);
-		state->getPositions().setRandom();
+		state->getPositions().setLinSpaced(0.453, 9.823);
 
 		vertices = std::make_shared<Vertices<void>>();
 
-		m = std::make_shared<TransferDeformableStateToVerticesBehavior<void>>("Transfer Behavior", state, vertices);
+		m = std::make_shared<TransferOdeStateToVerticesBehavior<void>>("Transfer Behavior", state, vertices);
 	}
 	sceneElement->addComponent(m);
 	scene->addSceneElement(sceneElement);

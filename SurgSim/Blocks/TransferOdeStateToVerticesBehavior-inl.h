@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_INL_H
-#define SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_INL_H
+#ifndef SURGSIM_BLOCKS_TRANSFERODESTATETOVERTICESBEHAVIOR_INL_H
+#define SURGSIM_BLOCKS_TRANSFERODESTATETOVERTICESBEHAVIOR_INL_H
 
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-#include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Math/OdeState.h"
 
 namespace SurgSim
 {
@@ -27,9 +27,9 @@ namespace Blocks
 {
 
 template <class VertexData>
-TransferDeformableStateToVerticesBehavior<VertexData>::TransferDeformableStateToVerticesBehavior(
+TransferOdeStateToVerticesBehavior<VertexData>::TransferOdeStateToVerticesBehavior(
 	const std::string& name,
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> from,
+	std::shared_ptr<SurgSim::Math::OdeState> from,
 	std::shared_ptr<SurgSim::DataStructures::Vertices<VertexData>> to) :
 	SurgSim::Framework::Behavior(name),
 	m_from(from),
@@ -38,7 +38,7 @@ TransferDeformableStateToVerticesBehavior<VertexData>::TransferDeformableStateTo
 }
 
 template <class VertexData>
-void TransferDeformableStateToVerticesBehavior<VertexData>::update(double dt)
+void TransferOdeStateToVerticesBehavior<VertexData>::update(double dt)
 {
 	// Note that transfer is called without initialization on
 	// This should have been done in doWakeUp already
@@ -46,13 +46,13 @@ void TransferDeformableStateToVerticesBehavior<VertexData>::update(double dt)
 }
 
 template <class VertexData>
-bool TransferDeformableStateToVerticesBehavior<VertexData>::doInitialize()
+bool TransferOdeStateToVerticesBehavior<VertexData>::doInitialize()
 {
 	return true;
 }
 
 template <class VertexData>
-bool TransferDeformableStateToVerticesBehavior<VertexData>::doWakeUp()
+bool TransferOdeStateToVerticesBehavior<VertexData>::doWakeUp()
 {
 	// Note that transfer is called with initialization on
 	// This is done in doWakeUp as an external data structure will be initialized (Vertices)
@@ -61,7 +61,7 @@ bool TransferDeformableStateToVerticesBehavior<VertexData>::doWakeUp()
 }
 
 template <class VertexData>
-void TransferDeformableStateToVerticesBehavior<VertexData>::transfer(bool doInitialization)
+void TransferOdeStateToVerticesBehavior<VertexData>::transfer(bool doInitialization)
 {
 	const unsigned int numNodes = m_from->getNumNodes();
 
@@ -87,4 +87,4 @@ void TransferDeformableStateToVerticesBehavior<VertexData>::transfer(bool doInit
 
 }; //namespace SurgSim
 
-#endif // SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_INL_H
+#endif // SURGSIM_BLOCKS_TRANSFERODESTATETOVERTICESBEHAVIOR_INL_H

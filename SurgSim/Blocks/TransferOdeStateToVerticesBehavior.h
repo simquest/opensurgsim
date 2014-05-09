@@ -13,17 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_H
-#define SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_TRANSFERODESTATETOVERTICESBEHAVIOR_H
+#define SURGSIM_BLOCKS_TRANSFERODESTATETOVERTICESBEHAVIOR_H
 
 #include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
 {
 
-namespace Physics
+namespace Math
 {
-class DeformableRepresentationState;
+class OdeState;
 }
 
 namespace DataStructures
@@ -35,18 +35,18 @@ class Vertices;
 namespace Blocks
 {
 
-/// Behavior to copy positions of a deformable state to a vertices based objects.
-/// For example, this behavior is used to send deformable state to a point cloud in graphics.
+/// Behavior to copy positions of an ode state to a vertices based objects.
+/// For example, this behavior is used to send a deformable representation state to a point cloud in graphics.
 template <class VertexData>
-class TransferDeformableStateToVerticesBehavior : public SurgSim::Framework::Behavior
+class TransferOdeStateToVerticesBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	/// \param	from	DeformableRepresentationState to get the positions from
+	/// \param	from	OdeState to get the positions from
 	/// \param	to	Vertices to set the positions into
-	TransferDeformableStateToVerticesBehavior(const std::string& name,
-		std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> from,
+	TransferOdeStateToVerticesBehavior(const std::string& name,
+		std::shared_ptr<SurgSim::Math::OdeState> from,
 		std::shared_ptr<SurgSim::DataStructures::Vertices<VertexData>> to);
 
 	/// Update the behavior
@@ -60,14 +60,14 @@ private:
 	/// Wakeup the behavior, which simply do a copy (same as update)
 	virtual bool doWakeUp() override;
 
-	/// Transfer the data from Deformable state m_from to Vertices m_to
+	/// Transfer the data from an OdeState m_from to Vertices m_to
 	/// \param doInitialization True if the recipient should be initialized if needed, False otherwise
 	/// \note if doInitialization is true and Vertices is empty, it will be filled accordingly
 	/// \note with a default vertex data instanciation (if VertexData type is not 'void')
 	void transfer(bool doInitialization = false);
 
-	/// Deformable representation state to get the positions from
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> m_from;
+	/// Ode state to get the positions from
+	std::shared_ptr<SurgSim::Math::OdeState> m_from;
 
 	/// Vertices to set the positions into
 	std::shared_ptr<SurgSim::DataStructures::Vertices<VertexData>> m_to;
@@ -77,6 +77,6 @@ private:
 
 };  // namespace SurgSim
 
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior-inl.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior-inl.h"
 
-#endif  // SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_H
+#endif  // SURGSIM_BLOCKS_TRANSFERODESTATETOVERTICESBEHAVIOR_H

@@ -43,7 +43,7 @@ public:
 	void setRoot(std::shared_ptr<TreeNode> root);
 
 	/// \return The root of the tree.
-	std::shared_ptr<TreeNode> getRoot();
+	std::shared_ptr<TreeNode> getRoot() const;
 
 	/// If the trees are not of the same type, returns false;
 	/// otherwise, compares with the implementation of isEqual(const Tree&).

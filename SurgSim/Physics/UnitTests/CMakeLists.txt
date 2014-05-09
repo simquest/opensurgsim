@@ -25,7 +25,6 @@ set(UNIT_TEST_SOURCES
 	ContactConstraintDataTests.cpp
 	ContactConstraintGenerationTests.cpp
 	DcdCollisionTests.cpp
-	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
 	Fem1DMechanicalValidationTests.cpp
@@ -61,6 +60,7 @@ set(UNIT_TEST_SOURCES
 	PreUpdateTests.cpp
 	PushResultsTests.cpp
 	RepresentationTest.cpp
+	RigidCollisionRepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
 	RigidRepresentationBilateral3DTests.cpp
 	RigidRepresentationContactTests.cpp

@@ -17,6 +17,7 @@
 #define SURGSIM_MATH_UNITTESTS_MOCKOBJECT_H
 
 #include "SurgSim/Math/OdeEquation.h"
+#include "SurgSim/Math/OdeState.h"
 
 namespace SurgSim
 {
@@ -24,46 +25,24 @@ namespace SurgSim
 namespace Math
 {
 
-class MassPointState
+class MassPointState : public OdeState
 {
 public:
-	MassPointState()
+	MassPointState() : OdeState()
 	{
-		m_x.resize(3); m_x.setZero();
-		m_v.resize(3); m_v.setZero();
-		m_a.resize(3); m_a.setZero();
+		setNumDof(3, 1);
+		getPositions().setLinSpaced(1.0, 1.3);
+		getVelocities().setLinSpaced(0.4, -0.3);
 	}
-
-	const Vector& getPositions() const { return m_x; }
-	Vector& getPositions() { return m_x; }
-
-	const Vector& getVelocities() const { return m_v; }
-	Vector& getVelocities() { return m_v; }
-
-	const Vector& getAccelerations() const { return m_a; }
-	Vector& getAccelerations() { return m_a; }
-
-	bool operator ==(const MassPointState& state) const
-	{
-		return m_x.isApprox(state.m_x) && m_v.isApprox(state.m_v) && m_a.isApprox(state.m_a);
-	}
-
-	bool operator !=(const MassPointState& state) const
-	{
-		return !((*this) == state);
-	}
-
-private:
-	Vector m_x, m_v, m_a;
 };
 
-class MassPoint : public SurgSim::Math::OdeEquation<MassPointState>
+class MassPoint : public OdeEquation
 {
 public:
 	/// Constructor
 	/// \param viscosity The mass viscosity
 	explicit MassPoint(double viscosity = 0.0) :
-		m_mass(1.0),
+		m_mass(0.456),
 		m_viscosity(viscosity),
 		m_gravity(0.0, -9.81, 0.0),
 		m_f(3),
@@ -83,7 +62,7 @@ public:
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
 	/// \return The vector containing f(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
-	Vector& computeF(const MassPointState& state) override
+	Vector& computeF(const OdeState& state) override
 	{
 		m_f = m_mass * m_gravity - m_viscosity * state.getVelocities();
 		return m_f;
@@ -93,7 +72,7 @@ public:
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
 	/// \return The matrix M(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	const Matrix& computeM(const MassPointState& state) override
+	const Matrix& computeM(const OdeState& state) override
 	{
 		m_M.setIdentity();
 		m_M *= m_mass;
@@ -104,7 +83,7 @@ public:
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix D = -df/dv(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	const Matrix& computeD(const MassPointState& state) override
+	const Matrix& computeD(const OdeState& state) override
 	{
 		m_D.setIdentity();
 		m_D *= m_viscosity;
@@ -115,7 +94,7 @@ public:
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix K = -df/dx(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	const Matrix& computeK(const MassPointState& state)
+	const Matrix& computeK(const OdeState& state)
 	{
 		m_K.setZero();
 		return m_K;
@@ -130,7 +109,7 @@ public:
 	/// \param[out] K The matrix K = -df/dx(x,v)
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	void computeFMDK(const MassPointState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override
+	void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override
 	{
 		m_M.setIdentity();
 		m_M *= m_mass;
@@ -155,43 +134,19 @@ public:
 
 /// State class for static resolution
 /// It contains 3 nodes with 3 dofs each, with positions (0 0 0) (1 0 0) (2 0 0) and null velocities/accelerations
-class MassPointsStateForStatic
+class MassPointsStateForStatic : public OdeState
 {
 public:
-	MassPointsStateForStatic()
+	MassPointsStateForStatic() : OdeState()
 	{
-		m_x.resize(9); m_x.setZero();
-		m_v.resize(9); m_v.setZero();
-		m_a.resize(9); m_a.setZero();
-		m_x.segment<3>(3) = Vector3d(1.0, 0.0, 0.0);
-		m_x.segment<3>(6) = Vector3d(2.0, 0.0, 0.0);
+		setNumDof(3, 3);
+		getPositions().segment<3>(3) = Vector3d(1.0, 0.0, 0.0);
+		getPositions().segment<3>(6) = Vector3d(2.0, 0.0, 0.0);
 	}
-
-	const Vector& getPositions() const { return m_x; }
-	Vector& getPositions() { return m_x; }
-
-	const Vector& getVelocities() const { return m_v; }
-	Vector& getVelocities() { return m_v; }
-
-	const Vector& getAccelerations() const { return m_a; }
-	Vector& getAccelerations() { return m_a; }
-
-	bool operator ==(const MassPointsStateForStatic& state) const
-	{
-		return m_x.isApprox(state.m_x) && m_v.isApprox(state.m_v) && m_a.isApprox(state.m_a);
-	}
-
-	bool operator !=(const MassPointsStateForStatic& state) const
-	{
-		return !((*this) == state);
-	}
-
-private:
-	Vector m_x, m_v, m_a;
 };
 
 // Model of 3 nodes connected by springs with the 1st node fixed (no mass, no damping, only deformations)
-class MassPointsForStatic : public SurgSim::Math::OdeEquation<MassPointsStateForStatic>
+class MassPointsForStatic : public SurgSim::Math::OdeEquation
 {
 public:
 	/// Constructor
@@ -214,7 +169,7 @@ public:
 		return m_gravityForce;
 	}
 
-	virtual Vector& computeF(const MassPointsStateForStatic& state) override
+	virtual Vector& computeF(const OdeState& state) override
 	{
 		// Internale deformation forces
 		m_f = -computeK(state) * (state.getPositions() - m_initialState->getPositions());
@@ -225,19 +180,19 @@ public:
 		return m_f;
 	}
 
-	virtual const Matrix& computeM(const MassPointsStateForStatic& state) override
+	virtual const Matrix& computeM(const OdeState& state) override
 	{
 		m_M.setZero();
 		return m_M;
 	}
 
-	virtual const Matrix& computeD(const MassPointsStateForStatic& state) override
+	virtual const Matrix& computeD(const OdeState& state) override
 	{
 		m_D.setZero();
 		return m_D;
 	}
 
-	virtual const Matrix& computeK(const MassPointsStateForStatic& state)
+	virtual const Matrix& computeK(const OdeState& state)
 	{
 		// A fake but valid stiffness matrix (node 0 fixed)
 		m_K.setIdentity();
@@ -246,7 +201,7 @@ public:
 		return m_K;
 	}
 
-	virtual void computeFMDK(const MassPointsStateForStatic& state, Vector** f, Matrix** M, Matrix** D, Matrix** K)
+	virtual void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K)
 		override
 	{
 		m_f = computeF(state);

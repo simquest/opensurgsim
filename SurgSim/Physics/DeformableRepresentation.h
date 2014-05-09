@@ -21,11 +21,9 @@
 
 #include <memory>
 
-#include "SurgSim/Physics/DeformableRepresentationBase.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-
 #include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {
@@ -40,12 +38,12 @@ namespace Physics
 /// \note It holds the initial pose, which should be set before setting the initial state so the states
 /// \note   can be properly transformed.
 /// \note The current pose is always identity and therefore cannot be set. Calling setPose will raise an exception.
-/// \note It holds the force vector; the mass, damping and stiffness matrices (templated type)
+/// \note It holds the force vector; the mass, damping and stiffness matrices
 /// \note Derived classes must implement the Representation API and the OdeEquation API, also set
 /// \note   m_numDofPerNode and call Representation::setNumDof()
 class DeformableRepresentation :
-	public DeformableRepresentationBase,
-	public SurgSim::Math::OdeEquation<DeformableRepresentationState>
+	public Representation,
+	public SurgSim::Math::OdeEquation
 {
 public:
 	/// Constructor
@@ -57,13 +55,13 @@ public:
 
 	virtual void resetState() override;
 
-	virtual void setInitialState(std::shared_ptr<DeformableRepresentationState> initialState) override;
+	virtual void setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState);
 
-	virtual const std::shared_ptr<DeformableRepresentationState> getCurrentState() const override;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getCurrentState() const;
 
-	virtual const std::shared_ptr<DeformableRepresentationState> getPreviousState() const override;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getPreviousState() const;
 
-	virtual const std::shared_ptr<DeformableRepresentationState> getFinalState() const override;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getFinalState() const;
 
 	/// Gets the number of degrees of freedom per node
 	/// \return The number of degrees of freedom per node for this Deformable Representation
@@ -101,22 +99,22 @@ protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
-	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
+	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 								const SurgSim::Math::RigidTransform3d& transform) = 0;
 
 	/// The previous state inside the calculation loop, this has no meaning outside of the loop
-	std::shared_ptr<DeformableRepresentationState> m_previousState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_previousState;
 
 	/// The currently calculated state inside the physics loop, after the whole calculation is done this will
 	/// become m_finalState
-	std::shared_ptr<DeformableRepresentationState> m_currentState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_currentState;
 
 	/// New state is a temporary variable to store the newly computed state
-	std::shared_ptr<DeformableRepresentationState> m_newState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_newState;
 
 	/// Last valid state (a.k.a final state)
 	/// \note Backup of the current state for thread-safety access while the current state is being recomputed.
-	std::shared_ptr<DeformableRepresentationState> m_finalState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_finalState;
 
 	/// Force applied on the deformable representation
 	SurgSim::Math::Vector m_f;
@@ -141,7 +139,7 @@ protected:
 	bool m_needToReloadOdeSolver;
 
 	/// Ode solver (its type depends on the numerical integration scheme)
-	std::shared_ptr<SurgSim::Math::OdeSolver<DeformableRepresentationState>> m_odeSolver;
+	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;
 
 private:
 	/// NO copy constructor

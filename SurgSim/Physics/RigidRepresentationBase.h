@@ -16,19 +16,22 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 
-#include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/RigidRepresentationState.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
-
 #include "SurgSim/Collision/Location.h"
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Physics/RigidRepresentationState.h"
 
 namespace SurgSim
 {
+
+namespace Collision
+{
+class Representation;
+}
+
 namespace Physics
 {
-
+class Localization;
 
 /// The RigidRepresentationBase class defines the base class for
 /// all rigid motion based representations (fixed, rigid body, rigid body + vtc,...)

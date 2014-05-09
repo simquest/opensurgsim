@@ -14,11 +14,9 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Log.h"
-
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-#include "SurgSim/Physics/FemElement3DCube.h"
-
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/FemElement3DCube.h"
 
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
@@ -32,8 +30,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemElement3DCube::FemElement3DCube(std::array<unsigned int, 8> nodeIds,
-												 const DeformableRepresentationState& restState)
+FemElement3DCube::FemElement3DCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState)
 {
 	using SurgSim::Framework::Logger;
 
@@ -64,7 +61,7 @@ FemElement3DCube::FemElement3DCube(std::array<unsigned int, 8> nodeIds,
 	m_restVolume = getVolume(restState);
 }
 
-void FemElement3DCube::initialize(const DeformableRepresentationState& state)
+void FemElement3DCube::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Test the validity of the physical parameters
 	FemElement::initialize(state);
@@ -74,7 +71,7 @@ void FemElement3DCube::initialize(const DeformableRepresentationState& state)
 	computeStiffness(state, &m_strain, &m_stress, &m_stiffness);
 }
 
-void FemElement3DCube::addForce(const DeformableRepresentationState& state,
+void FemElement3DCube::addForce(const SurgSim::Math::OdeState& state,
 									   const Eigen::Matrix<double, 24, 24>& k, SurgSim::Math::Vector* F, double scale)
 {
 	Eigen::Matrix<double, 24, 1> x, f;
@@ -87,14 +84,13 @@ void FemElement3DCube::addForce(const DeformableRepresentationState& state,
 	addSubVector(f, m_nodeIds, 3, F);
 }
 
-void FemElement3DCube::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
-									   double scale)
+void FemElement3DCube::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
 {
 	addForce(state, m_stiffness, F, scale);
 }
 
-void FemElement3DCube::computeMass(const DeformableRepresentationState& state,
-										  Eigen::Matrix<double, 24, 24>* M)
+void FemElement3DCube::computeMass(const SurgSim::Math::OdeState& state,
+								   Eigen::Matrix<double, 24, 24>* M)
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
@@ -124,21 +120,19 @@ void FemElement3DCube::computeMass(const DeformableRepresentationState& state,
 	}
 }
 
-void FemElement3DCube::addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M,
-									  double scale)
+void FemElement3DCube::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
 {
 	addSubMatrix(m_mass * scale, m_nodeIds, 3, M);
 }
 
-void FemElement3DCube::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
-										 double scale)
+void FemElement3DCube::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale)
 {
 }
 
-void FemElement3DCube::computeStiffness(const DeformableRepresentationState& state,
-											   Eigen::Matrix<double, 6, 24>* strain,
-											   Eigen::Matrix<double, 6, 24>* stress,
-											   Eigen::Matrix<double, 24, 24>* stiffness)
+void FemElement3DCube::computeStiffness(const SurgSim::Math::OdeState& state,
+										Eigen::Matrix<double, 6, 24>* strain,
+										Eigen::Matrix<double, 6, 24>* stress,
+										Eigen::Matrix<double, 24, 24>* stiffness)
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
@@ -160,7 +154,7 @@ void FemElement3DCube::computeStiffness(const DeformableRepresentationState& sta
 	}
 }
 
-void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, double epsilon, double eta, double mu,
+void FemElement3DCube::evaluateJ(const SurgSim::Math::OdeState& state, double epsilon, double eta, double mu,
 								 SurgSim::Math::Matrix33d *J,
 								 SurgSim::Math::Matrix33d *Jinv,
 								 double *detJ) const
@@ -258,7 +252,7 @@ void FemElement3DCube::buildConstitutiveMaterialMatrix(
 	(*constitutiveMatrix)(3, 3) = (*constitutiveMatrix)(4, 4) = (*constitutiveMatrix)(5, 5) = mu;
 }
 
-void FemElement3DCube::addStrainStressStiffnessAtPoint(const DeformableRepresentationState& state,
+void FemElement3DCube::addStrainStressStiffnessAtPoint(const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::gaussQuadraturePoint& epsilon,
 	const SurgSim::Math::gaussQuadraturePoint& eta,
 	const SurgSim::Math::gaussQuadraturePoint& mu,
@@ -281,7 +275,7 @@ void FemElement3DCube::addStrainStressStiffnessAtPoint(const DeformableRepresent
 	*k += (epsilon.weight * eta.weight * mu.weight * detJ) * B.transpose() * m_constitutiveMaterial * B;
 }
 
-void FemElement3DCube::addMassMatrixAtPoint(const DeformableRepresentationState& state,
+void FemElement3DCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::gaussQuadraturePoint& epsilon,
 	const SurgSim::Math::gaussQuadraturePoint& eta,
 	const SurgSim::Math::gaussQuadraturePoint& mu,
@@ -312,17 +306,16 @@ void FemElement3DCube::addMassMatrixAtPoint(const DeformableRepresentationState&
 	*m += (epsilon.weight * eta.weight * mu.weight * detJ * m_rho) * phi.transpose() * phi;
 }
 
-void FemElement3DCube::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
-										   double scale)
+void FemElement3DCube::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale)
 {
 	addSubMatrix(m_stiffness * scale, getNodeIds(), 3, K);
 }
 
-void FemElement3DCube::addFMDK(const DeformableRepresentationState& state,
-	SurgSim::Math::Vector* F,
-	SurgSim::Math::Matrix* M,
-	SurgSim::Math::Matrix* D,
-	SurgSim::Math::Matrix* K)
+void FemElement3DCube::addFMDK(const SurgSim::Math::OdeState& state,
+							   SurgSim::Math::Vector* F,
+							   SurgSim::Math::Matrix* M,
+							   SurgSim::Math::Matrix* D,
+							   SurgSim::Math::Matrix* K)
 {
 	// Assemble the mass matrix
 	addMass(state, M);
@@ -336,9 +329,9 @@ void FemElement3DCube::addFMDK(const DeformableRepresentationState& state,
 	addForce(state, F);
 }
 
-void FemElement3DCube::addMatVec(const DeformableRepresentationState& state,
-										double alphaM, double alphaD, double alphaK,
-										const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
+void FemElement3DCube::addMatVec(const SurgSim::Math::OdeState& state,
+								 double alphaM, double alphaD, double alphaK,
+								 const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
 {
 	using SurgSim::Math::addSubVector;
 	using SurgSim::Math::getSubVector;
@@ -368,7 +361,7 @@ void FemElement3DCube::addMatVec(const DeformableRepresentationState& state,
 	}
 }
 
-double FemElement3DCube::getVolume(const DeformableRepresentationState& state) const
+double FemElement3DCube::getVolume(const SurgSim::Math::OdeState& state) const
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
@@ -460,7 +453,7 @@ bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoo
 }
 
 SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
-	const DeformableRepresentationState& state,
+	const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))

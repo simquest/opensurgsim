@@ -21,6 +21,7 @@
 #include "SurgSim/Blocks/MassSpring2DRepresentation.h"
 #include "SurgSim/Blocks/UnitTests/SpringTestUtils.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
 using SurgSim::Math::Vector3d;
@@ -149,7 +150,6 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 
 	// States should contains expected values
 	EXPECT_TRUE(m.getFinalState()->getVelocities().isZero());
-	EXPECT_TRUE(m.getFinalState()->getAccelerations().isZero());
 	EXPECT_FALSE(m.getFinalState()->getPositions().isZero());
 	Vector3d rowExtremititiesDelta[2] =
 	{

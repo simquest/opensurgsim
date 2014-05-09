@@ -26,31 +26,22 @@ namespace Math
 
 /// Linear version of the static ode solver
 /// This solver assumes that the system is linear, ie that Stiffness matrix does not change.
-template <class State>
-class OdeSolverLinearStatic : public OdeSolverStatic<State>
+class OdeSolverLinearStatic : public OdeSolverStatic
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverLinearStatic(OdeEquation<State>* equation);
+	explicit OdeSolverLinearStatic(OdeEquation* equation);
 
-	virtual void solve(double dt, const State& currentState, State* newState) override;
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
 private:
 	/// Has the solver been initialized
 	bool m_initialized;
-
-public:
-	// Variables used from OdeSolver
-	using OdeSolver<State>::m_compliance;
-	using OdeSolver<State>::m_equation;
-	using OdeSolver<State>::m_name;
 };
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#include "SurgSim/Math/OdeSolverLinearStatic-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVERLINEARSTATIC_H

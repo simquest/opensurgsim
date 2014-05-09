@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
@@ -30,6 +31,7 @@ ShapeCollisionRepresentation::ShapeCollisionRepresentation(
 	m_shape(shape)
 {
 	setLocalPose(pose);
+	update(0.0);
 }
 
 ShapeCollisionRepresentation::~ShapeCollisionRepresentation()
@@ -44,6 +46,15 @@ int ShapeCollisionRepresentation::getShapeType() const
 const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getShape() const
 {
 	return m_shape;
+}
+
+void ShapeCollisionRepresentation::update(const double& dt)
+{
+	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
+	if (meshShape != nullptr)
+	{
+		meshShape->setPose(getPose());
+	}
 }
 
 }; // namespace Collision

@@ -17,17 +17,16 @@
 
 #include <string>
 
-#include "SurgSim/Physics/LinearSpring.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/LinearSpring.h"
 
-using SurgSim::Physics::LinearSpring;
-using SurgSim::Physics::DeformableRepresentationState;
-using SurgSim::Math::Vector;
-using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Vector;
+using SurgSim::Math::Vector3d;
+using SurgSim::Physics::LinearSpring;
 
 namespace
 {
@@ -220,7 +219,7 @@ TEST(LinearSpringTests, computeMethods)
 	ls.setRestLength(1.23);
 
 	// Setup the state
-	DeformableRepresentationState state;
+	SurgSim::Math::OdeState state;
 	state.setNumDof(3u, 2u);
 	setSubVector(Vector3d(0.0, 0.0, 0.0), 0, 3, &state.getPositions());
 	setSubVector(Vector3d(2.3, 4.1, 1.2), 1, 3, &state.getPositions());
@@ -377,7 +376,7 @@ TEST(LinearSpringTests, addStiffnessNumericalTest)
 	ls.setRestLength(restLength);
 
 	// Setup the state
-	DeformableRepresentationState state;
+	SurgSim::Math::OdeState state;
 	state.setNumDof(3, 2); // 2 nodes of 3DOF each
 	state.getPositions().segment(0, 3) = x0;
 	state.getPositions().segment(3, 3) = x1;
@@ -412,7 +411,7 @@ TEST(LinearSpringTests, addDampingNumericalTest)
 	ls.setRestLength(restLength);
 
 	// Setup the state
-	DeformableRepresentationState state;
+	SurgSim::Math::OdeState state;
 	state.setNumDof(3, 2); // 2 nodes of 3DOF each
 	state.getPositions().segment(0, 3) = x0;
 	state.getPositions().segment(3, 3) = x1;
@@ -447,7 +446,7 @@ TEST(LinearSpringTests, addFDKNumericalTest)
 	ls.setRestLength(restLength);
 
 	// Setup the state
-	DeformableRepresentationState state;
+	SurgSim::Math::OdeState state;
 	state.setNumDof(3, 2); // 2 nodes of 3DOF each
 	state.getPositions().segment(0, 3) = x0;
 	state.getPositions().segment(3, 3) = x1;

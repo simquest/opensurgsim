@@ -60,7 +60,7 @@ public:
 	/// \param state The state to compute the force with
 	/// \param[in,out] F The complete system force vector to add the spring force into
 	/// \param scale A factor to scale the added force with
-	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+	virtual void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
 						  double scale = 1.0) override;
 
 	/// Adds the spring damping matrix D (= -df/dv) (computed for a given state) to a complete system damping matrix
@@ -68,7 +68,7 @@ public:
 	/// \param state The state to compute the damping matrix with
 	/// \param[in,out] D The complete system damping matrix to add the spring damping matrix into
 	/// \param scale A factor to scale the added damping matrix with
-	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
+	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 							double scale = 1.0) override;
 
 	/// Adds the spring stiffness matrix K (= -df/dx) (computed for a given state) to a complete system stiffness
@@ -76,7 +76,7 @@ public:
 	/// \param state The state to compute the stiffness matrix with
 	/// \param[in,out] K The complete system stiffness matrix to add the spring stiffness matrix into
 	/// \param scale A factor to scale the added stiffness matrix with
-	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
+	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
 							  double scale = 1.0) override;
 
 	/// Adds the spring force vector, mass, stiffness and damping matrices (computed for a given state) into a
@@ -85,7 +85,7 @@ public:
 	/// \param[in,out] F The complete system force vector to add the spring force into
 	/// \param[in,out] D The complete system damping matrix to add the spring damping matrix into
 	/// \param[in,out] K The complete system stiffness matrix to add the spring stiffness matrix into
-	virtual void addFDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+	virtual void addFDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
 						 SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override;
 
 	/// Adds the spring matrix-vector contribution F += (alphaD.D + alphaK.K).x (computed for a given
@@ -95,7 +95,7 @@ public:
 	/// \param alphaK The scaling factor for the stiffness contribution
 	/// \param vector A complete system vector to use as the vector in the matrix-vector multiplication
 	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
-	virtual void addMatVec(const DeformableRepresentationState& state, double alphaD, double alphaK,
+	virtual void addMatVec(const SurgSim::Math::OdeState& state, double alphaD, double alphaK,
 						   const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* F) override;
 
 	/// Comparison operator (equality)

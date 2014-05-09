@@ -13,20 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include "SurgSim/Physics/RigidRepresentation.h"
 
-#include "SurgSim/Collision/Location.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
-#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
-using SurgSim::Collision::Location;
-using SurgSim::Math::Matrix66d;
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidRepresentation);
+}
 
 namespace SurgSim
 {
@@ -35,10 +34,15 @@ namespace Physics
 
 RigidRepresentation::RigidRepresentation(const std::string& name) :
 	RigidRepresentationBase(name),
+	m_globalInertia(SurgSim::Math::Matrix33d::Zero()),
+	m_invGlobalInertia(SurgSim::Math::Matrix33d::Zero()),
+	m_force(SurgSim::Math::Vector3d::Zero()),
+	m_torque(SurgSim::Math::Vector3d::Zero()),
+	m_C(SurgSim::Math::Matrix66d::Zero()),
 	m_externalForce(SurgSim::Math::Vector3d::Zero()),
 	m_externalTorque(SurgSim::Math::Vector3d::Zero()),
-	m_externalStiffnessMatrix(Matrix66d::Zero()),
-	m_externalDampingMatrix(Matrix66d::Zero())
+	m_externalStiffnessMatrix(SurgSim::Math::Matrix66d::Zero()),
+	m_externalDampingMatrix(SurgSim::Math::Matrix66d::Zero())
 {
 	// Initialize the number of degrees of freedom
 	// 6 for a rigid body velocity-based (linear and angular velocities are the Dof)
@@ -204,8 +208,8 @@ void RigidRepresentation::afterUpdate(double dt)
 
 	m_externalForce = SurgSim::Math::Vector3d::Zero();
 	m_externalTorque = SurgSim::Math::Vector3d::Zero();
-	m_externalStiffnessMatrix = Matrix66d::Zero();
-	m_externalDampingMatrix = Matrix66d::Zero();
+	m_externalStiffnessMatrix = SurgSim::Math::Matrix66d::Zero();
+	m_externalDampingMatrix = SurgSim::Math::Matrix66d::Zero();
 }
 
 void RigidRepresentation::applyCorrection(
@@ -302,7 +306,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 		return;
 	}
 
-	Matrix66d systemMatrix;
+	SurgSim::Math::Matrix66d systemMatrix;
 	RigidRepresentationParameters& parameters = m_currentParameters;
 	const SurgSim::Math::Matrix33d identity3x3 = SurgSim::Math::Matrix33d::Identity();
 	systemMatrix.block<3, 3>(0, 0) = identity3x3 * (parameters.getMass() / dt + parameters.getLinearDamping());
@@ -335,12 +339,10 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 bool RigidRepresentation::doInitialize()
 {
 	double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
-	SURGSIM_ASSERT(shapeVolume > SurgSim::Math::Geometry::ScalarEpsilon) <<
-			"Cannot use a shape with zero volume for RigidRepresentations";
+	SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
 
 	shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
-	SURGSIM_ASSERT(shapeVolume > SurgSim::Math::Geometry::ScalarEpsilon) <<
-			"Cannot use a shape with zero volume for RigidRepresentations";
+	SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
 
 	return true;
 }
@@ -355,6 +357,5 @@ void RigidRepresentation::setAngularVelocity(const SurgSim::Math::Vector3d& angu
 	m_currentState.setAngularVelocity(angularVelocity);
 }
 
-}; /// Physics
-
-}; /// SurgSim
+}; // Physics
+}; // SurgSim
