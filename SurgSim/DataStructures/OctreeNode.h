@@ -75,9 +75,12 @@ public:
 	const SurgSim::Math::Aabbd& getBoundingBox() const;
 
 	/// Is this node active
-	/// \return true if there is any data inside this node, including data held
-	/// by children, children's children, etc.
+	/// \return true if the octree node is active
 	bool isActive() const;
+
+	/// Set active flag for this octree node
+	/// \param isActive True if the octree node is being activated, False otherwise
+	void setIsActive(bool isActive);
 
 	/// Does this node have children
 	/// \return true if this node has children

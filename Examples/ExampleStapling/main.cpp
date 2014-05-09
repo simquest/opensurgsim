@@ -317,6 +317,19 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 	return armSceneElement;
 }
 
+template <typename Type>
+std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement,
+										  const std::string& name)
+{
+	std::shared_ptr<SurgSim::Framework::Component> component = sceneElement->getComponent(name);
+	SURGSIM_ASSERT(component != nullptr) << "Failed to get Component named '" << name << "'.";
+
+	std::shared_ptr<Type> result = std::dynamic_pointer_cast<Type>(component);
+	SURGSIM_ASSERT(result != nullptr) << "Failed to convert Component to requested type.";
+
+	return result;
+}
+
 int main(int argc, char* argv[])
 {
 	const std::string deviceName = "MultiAxisDevice";
@@ -396,6 +409,15 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(stapler);
 	scene->addSceneElement(wound);
 	scene->addSceneElement(keyboard);
+
+	// Exclude collision between certain Collision::Representations
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision0"));
+
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision1"));
 
 	runtime->execute();
 	return 0;

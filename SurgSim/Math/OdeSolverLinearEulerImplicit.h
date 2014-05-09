@@ -27,28 +27,28 @@ namespace Math
 /// Linear Version of the Euler Implicit ode solver
 /// This solver assumes that the system is linear, ie that Mass,
 /// Damping, and Stiffness matrices do not change.
-template <class State, class MT, class DT, class KT, class ST>
-class OdeSolverLinearEulerImplicit : public OdeSolverEulerImplicit<State, MT, DT, KT, ST>
+template <class State>
+class OdeSolverLinearEulerImplicit : public OdeSolverEulerImplicit<State>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverLinearEulerImplicit(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverLinearEulerImplicit(OdeEquation<State>* equation);
 
 	virtual void solve(double dt, const State& currentState, State* newState) override;
 
 private:
 	/// The constant stiffness matrix
-	KT m_constantK;
+	Matrix m_constantK;
 
 	/// Has the solver been initialized
 	bool m_initialized;
 
 public:
 	// Variables used from OdeSolver
-	using OdeSolver<State, MT, DT, KT, ST>::m_name;
-	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
-	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
+	using OdeSolver<State>::m_compliance;
+	using OdeSolver<State>::m_equation;
+	using OdeSolver<State>::m_name;
 };
 
 }; // namespace Math

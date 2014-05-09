@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
 	toolDevice->setPositionScale(toolDevice->getPositionScale() * 10.0);
 	toolDevice->setOrientationScale(toolDevice->getOrientationScale() * 3.0);
 	SURGSIM_ASSERT(toolDevice->initialize() == true) <<
-			"Could not initialize device '%s' for the tool.\n", toolDevice->getName().c_str();
+			"Could not initialize device '" << toolDevice->getName() << "' for the tool.";
 
 	inputManager->addDevice(toolDevice);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////

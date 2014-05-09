@@ -13,27 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
-#include "SurgSim/Physics/RenderTests/RenderTest.h"
-
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
-#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/Graphics/OsgAxesRepresentation.h"
-#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
-#include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
-#include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/Behavior.h"
-
-#include <memory>
+#include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::DataStructures::EmptyData;

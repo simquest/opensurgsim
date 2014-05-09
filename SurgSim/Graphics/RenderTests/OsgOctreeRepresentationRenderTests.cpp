@@ -17,13 +17,13 @@
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Graphics/OctreeRepresentation.h"
 #include "SurgSim/Graphics/OsgOctreeRepresentation.h"
-#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/OctreeShape.h"
 #include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Graphics::OsgOctreeRepresentation;
 using SurgSim::Graphics::OctreeRepresentation;
@@ -35,7 +35,6 @@ using SurgSim::Math::makeRotationQuaternion;
 struct OsgOctreeRepresentationRenderTests : public SurgSim::Graphics::RenderTest
 {
 };
-
 
 // An Octree(Node) is traversed in following order (the 2nd OctreeNode, i.e. OctreeNode with "1" is now shown):
 /*
@@ -53,40 +52,70 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 	SurgSim::DataStructures::EmptyData emptyData;
 
 	SurgSim::Math::OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox;
-	boundingBox.min() = Vector3d::Ones() * -2.0;
-	boundingBox.max() = Vector3d::Ones() * 2.0;
+	boundingBox.min() = Vector3d::Ones() * -0.2;
+	boundingBox.max() = Vector3d::Ones() * 0.2;
 
-	std::array<Vector3d, 8> secondLevelPositions = {{
-			Vector3d(-1.0, -1.0, -1.0),
-			Vector3d(1.0, -1.0, -1.0),
-			Vector3d(-1.0,  1.0, -1.0),
-			Vector3d(1.0,  1.0, -1.0),
-			Vector3d(-1.0, -1.0,  1.0),
-			Vector3d(1.0, -1.0,  1.0),
-			Vector3d(-1.0,  1.0,  1.0),
-			Vector3d(1.0,  1.0,  1.0)
-		}
-	};
+	std::array<Vector3d, 8> secondLevelPositions = {{ Vector3d(-0.1, -0.1, -0.1),
+													  Vector3d( 0.1, -0.1, -0.1),
+													  Vector3d(-0.1,  0.1, -0.1),
+													  Vector3d( 0.1,  0.1, -0.1),
+													  Vector3d(-0.1, -0.1,  0.1),
+													  Vector3d( 0.1, -0.1,  0.1),
+													  Vector3d(-0.1,  0.1,  0.1),
+													  Vector3d( 0.1,  0.1,  0.1)
+												   }};
 	auto octree = std::make_shared<OctreeShape::NodeType>(boundingBox);
 	octree->addData(secondLevelPositions[0], emptyData, 2);
 	octree->addData(secondLevelPositions[1], emptyData, 2);
 	octree->addData(secondLevelPositions[3], emptyData, 2);
 	octree->addData(secondLevelPositions[7], emptyData, 2);
+	octree->addData(Vector3d(0.2, 0.2, 0.01), emptyData, 3);
+	octree->addData(Vector3d(-0.2, -0.2, 0.2), emptyData, 3);
+	octree->addData(Vector3d(0.01, 0.01, 0.11), emptyData, 3);
+	octree->addData(Vector3d(0.01, 0.01, 0.11), emptyData, 4);
 
 	OctreeShape octreeShape;
 	octreeShape.setRootNode(octree);
 
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Octree Representation");
 	octreeRepresentation->setLocalPose(makeRigidTransform(
-										   makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
-										   Vector3d(0.0, 0.0, -20.0))
-									  );
+											makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
+											Vector3d(0.0, 0.0, -1.0))
+										);
 	viewElement->addComponent(octreeRepresentation);
 	octreeRepresentation->setOctree(octreeShape);
+
+	// Path to a leaf node
+	SurgSim::DataStructures::OctreePath path0;
+	path0.push_back(2);
+
+	// Path to a leaf node
+	SurgSim::DataStructures::OctreePath path1;
+	path1.push_back(7);
+	path1.push_back(3);
+
+	// Path to a internal OctreeNode
+	SurgSim::DataStructures::OctreePath path2;
+	path2.push_back(4);
+
+	SurgSim::DataStructures::OctreePath invalidPath;
+	invalidPath.push_back(0);
+	invalidPath.push_back(1);
 
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+
+	octreeRepresentation->setNodeVisible(path0, true);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+
+	octreeRepresentation->setNodeVisible(path1, false);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+
+	octreeRepresentation->setNodeVisible(path2, false);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+
+	EXPECT_ANY_THROW(octreeRepresentation->setNodeVisible(invalidPath, true));
 }

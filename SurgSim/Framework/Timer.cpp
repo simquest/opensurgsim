@@ -58,7 +58,7 @@ void Timer::markFrame()
 double Timer::getCumulativeTime() const
 {
 	SURGSIM_ASSERT(m_frameDurations.size() > 0) <<
-		"Attempted to access the frames for a Timer with no frames.\n";
+		"Attempted to access the frames for a Timer with no frames.";
 	TimerDuration cumulativeTime = std::accumulate(std::begin(m_frameDurations), std::end(m_frameDurations),
 		TimerDuration());
 	return cumulativeTime.count();
@@ -77,7 +77,7 @@ double Timer::getAverageFrameRate() const
 double Timer::getLastFramePeriod() const
 {
 	SURGSIM_ASSERT(m_frameDurations.size() > 0) <<
-		"Attempted to access the last frame period for a Timer with no frames.\n";
+		"Attempted to access the last frame period for a Timer with no frames.";
 	return m_frameDurations.back().count();
 }
 

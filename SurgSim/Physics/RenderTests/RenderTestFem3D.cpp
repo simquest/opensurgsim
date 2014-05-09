@@ -31,8 +31,6 @@
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
-using SurgSim::Graphics::OsgViewElement;
-using SurgSim::Graphics::ViewElement;
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::FemElement;

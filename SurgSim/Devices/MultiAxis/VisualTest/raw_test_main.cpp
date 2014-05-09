@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 					  //2345678901234567890123456789012345678901234567890123456789012345678901234567890
 					  "Move the multi-axis device (e.g. 3DConnexion) to move the sphere tool.");
 
-	printf("\nExiting.\n");
+	std::cout << std::endl << "Exiting." << std::endl;
 	// Cleanup and shutdown will happen automatically as objects go out of scope.
 
 	return 0;
