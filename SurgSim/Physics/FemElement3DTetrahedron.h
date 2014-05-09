@@ -131,37 +131,28 @@ public:
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
-	/// Determines whether a given natural coordinate is valid
-	/// \param naturalCoordinate Coordinate to check
-	/// \return True if valid
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const override;
-
-	/// Computes a given natural coordinate in cartesian coordinates
-	/// \param state The state at which to transform coordinates
-	/// \param naturalCoordinate The coordinates to transform
-	/// \return The resultant cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
 		const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const override;
 
 	virtual SurgSim::Math::Vector computeNaturalCoordinate(
 		const DeformableRepresentationState& state,
-		const SurgSim::Math::Vector& globalCoordinate) const override;
+		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
 	/// Computes the tetrahedron shape functions
-	/// \param restState The deformable rest state to compute the shape function from
+	/// \param state The deformable rest state to compute the shape function from
 	/// \param[out] volume the volume calculated with the given state
-	/// \param[out] ai parameter for the shape function
-	/// \param[out] bi parameter for the shape function
-	/// \param[out] ci parameter for the shape function
-	/// \param[out] di parameter for the shape function
+	/// \param[out] ai from the shape function, Ni(x, y, z) = 1/6*volume (ai + bi.x + ci.y + di.z)
+	/// \param[out] bi from the shape function, Ni(x, y, z) = 1/6*volume (ai + bi.x + ci.y + di.z)
+	/// \param[out] ci from the shape function, Ni(x, y, z) = 1/6*volume (ai + bi.x + ci.y + di.z)
+	/// \param[out] di from the shape function, Ni(x, y, z) = 1/6*volume (ai + bi.x + ci.y + di.z)
 	void computeShapeFunctions(const DeformableRepresentationState& state,
-		double *volume,
-		std::array<double, 4> *ai,
-		std::array<double, 4> *bi,
-		std::array<double, 4> *ci,
-		std::array<double, 4> *di) const;
+		double* volume,
+		std::array<double, 4>* ai,
+		std::array<double, 4>* bi,
+		std::array<double, 4>* ci,
+		std::array<double, 4>* di) const;
 
 	/// Computes the tetrahedron stiffness matrix
 	/// \param state The deformable state to compute the stiffness matrix from

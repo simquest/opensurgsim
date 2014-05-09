@@ -135,6 +135,84 @@ TEST(FemElementTests, InitializeMethods)
 	ASSERT_NO_THROW(femElement.initialize(fakeState));
 }
 
+void checkValidCoordinate(const MockFemElement& femElement, double v0, bool expected)
+{
+	Vector naturalCoordinate(1);
+	naturalCoordinate << v0;
+	EXPECT_EQ(expected, femElement.isValidCoordinate(naturalCoordinate));
+}
+
+void checkValidCoordinate(const MockFemElement& femElement, double v0, double v1, bool expected)
+{
+	Vector naturalCoordinate(2);
+	naturalCoordinate << v0, v1;
+	EXPECT_EQ(expected, femElement.isValidCoordinate(naturalCoordinate));
+}
+
+void checkValidCoordinate(const MockFemElement& femElement, double v0, double v1, double v2, bool expected)
+{
+	Vector naturalCoordinate(3);
+	naturalCoordinate << v0, v1, v2;
+	EXPECT_EQ(expected, femElement.isValidCoordinate(naturalCoordinate));
+}
+
+void checkValidCoordinate(const MockFemElement& femElement, double v0, double v1, double v2, double v3, bool expected)
+{
+	Vector naturalCoordinate(4);
+	naturalCoordinate << v0, v1, v2, v3;
+	EXPECT_EQ(expected, femElement.isValidCoordinate(naturalCoordinate));
+}
+
+TEST(FemElementTests, IsValidCoordinate)
+{
+	MockFemElement femElement;
+	femElement.addNode(0);
+	double e = 1e-11;
+
+	checkValidCoordinate(femElement, 1.0, true);
+	checkValidCoordinate(femElement, 1.0 + e, true);
+	checkValidCoordinate(femElement, 1.0 - e, true);
+	checkValidCoordinate(femElement, 1.01, false);
+	checkValidCoordinate(femElement, -1.01, false);
+	checkValidCoordinate(femElement, 0.7, false);
+
+	femElement.addNode(1);
+
+	checkValidCoordinate(femElement, 1.0, 0.0, true);
+	checkValidCoordinate(femElement, 1.0 + e, 0.0, true);
+	checkValidCoordinate(femElement, 1.0 + e, 0.0 - e, true);
+	checkValidCoordinate(femElement, 1.0 - e, 0.0 + e, true);
+	checkValidCoordinate(femElement, 0.5, 0.5, true);
+	checkValidCoordinate(femElement, 0.5 + e, 0.5 + e, true);
+	checkValidCoordinate(femElement, 0.5, 0.51, false);
+	checkValidCoordinate(femElement, 1.0, false);
+	checkValidCoordinate(femElement, -0.01, 1.01, false);
+
+	femElement.addNode(2);
+
+	checkValidCoordinate(femElement, 1.0, 0.0, 0.0, true);
+	checkValidCoordinate(femElement, 1.0 + e, 0.0, 0.0, true);
+	checkValidCoordinate(femElement, 1.0 + e, 0.0 - e, 0.0, true);
+	checkValidCoordinate(femElement, 1.0 - e, 0.0 + e, e, true);
+	checkValidCoordinate(femElement, 0.5, 0.5, e, true);
+	checkValidCoordinate(femElement, 0.5 + e, 0.5 + e, -e, true);
+	checkValidCoordinate(femElement, 0.5, 0.41, 0.1, false);
+	checkValidCoordinate(femElement, 1.0, 0.0, false);
+	checkValidCoordinate(femElement, -0.01, 1.01, e, false);
+
+	femElement.addNode(3);
+
+	checkValidCoordinate(femElement, 1.0, 0.0, 0.0, 0.0, true);
+	checkValidCoordinate(femElement, 1.0 + e, 0.0, 0.0, 0.0, true);
+	checkValidCoordinate(femElement, 1.0 + e, 0.0 - e, 0.0, 0.0, true);
+	checkValidCoordinate(femElement, 1.0 - e, 0.0 + e, e, 0.0, true);
+	checkValidCoordinate(femElement, 0.5, 0.5, e, 0.0, true);
+	checkValidCoordinate(femElement, 0.5 + e, 0.5 + e, 0.0, -e, true);
+	checkValidCoordinate(femElement, 0.5, 0.0, 0.41, 0.1, false);
+	checkValidCoordinate(femElement, 0.0, 1.0, 0.0, false);
+	checkValidCoordinate(femElement, -0.01, 0.0, 1.01, e, false);
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

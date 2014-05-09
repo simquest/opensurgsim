@@ -141,11 +141,10 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
 
 	// Load the surface triangle mesh of the finite element model
-	std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> meshSurface = loadMesh(filename);
+	auto meshSurface = loadMesh(filename);
 
 	// Create the collision mesh for the surface of the finite element model
-	std::shared_ptr<DeformableCollisionRepresentation> collisionRepresentation
-		= std::make_shared<DeformableCollisionRepresentation>("Collision");
+	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
 	collisionRepresentation->setMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>(*meshSurface));
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 	sceneElement->addComponent(collisionRepresentation);

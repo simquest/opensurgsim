@@ -449,14 +449,6 @@ double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta,
 		m_shapeFunctionsMuSign[i];
 }
 
-bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
-{
-	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		&& (naturalCoordinate.size() == 8)
-		&& (-SurgSim::Math::Geometry::ScalarEpsilon <= naturalCoordinate.minCoeff() &&
-			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
-}
-
 SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 	const DeformableRepresentationState& state,
 	const SurgSim::Math::Vector& naturalCoordinate) const
@@ -478,7 +470,7 @@ SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 
 SurgSim::Math::Vector FemElement3DCube::computeNaturalCoordinate(
 	const DeformableRepresentationState& state,
-	const SurgSim::Math::Vector& globalCoordinate) const
+	const SurgSim::Math::Vector& cartesianCoordinate) const
 {
 	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
 	return SurgSim::Math::Vector3d::Zero();

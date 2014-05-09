@@ -131,25 +131,13 @@ public:
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
-	/// Determines whether a given natural coordinate is valid
-	/// \param naturalCoordinate Coordinate to check
-	/// \return True if valid
-	/// \note The naturalCoordinate is a vector of 8 scalar values being the barycentric coordinate that are used
-	/// \note to represent localization. The range of naturalCoordinate is in [0, 1]. Otherwise, the corresponding
-	/// \note Cartesian point is outside the cube.
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const override;
-
-	/// Computes a given natural coordinate in Cartesian coordinates
-	/// \param state The state at which to transform coordinates
-	/// \param naturalCoordinate The coordinates to transform
-	/// \return The resultant Cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
 		const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const override;
 
 	virtual SurgSim::Math::Vector computeNaturalCoordinate(
 		const DeformableRepresentationState& state,
-		const SurgSim::Math::Vector& globalCoordinate) const override;
+		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
 	/// Build the constitutive material 6x6 matrix

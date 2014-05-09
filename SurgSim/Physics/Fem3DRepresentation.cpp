@@ -160,27 +160,26 @@ std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElemen
 	// Get the list of fem elements with their node ids.
 	std::vector<std::vector<size_t>> femElements;
 	femElements.reserve(getNumFemElements());
-	for (unsigned int i = 0; i < getNumFemElements(); i++)
+	for (unsigned int i = 0; i < getNumFemElements(); ++i)
 	{
-		femElements.push_back(getFemElement(i)->getNodeIds());
-		// Sort the node ids for this femElement.
-		std::sort(femElements.back().begin(), femElements.back().end());
+		auto elementNodeIds = getFemElement(i)->getNodeIds();
+		std::sort(elementNodeIds.begin(), elementNodeIds.end());
+		femElements.push_back(elementNodeIds);
 	}
 
-	// Iterate over the list of triangles.
+	std::array<unsigned int, 3> triangleSorted;
+	auto doesIncludeTriangle = [&triangleSorted](std::vector<size_t>& femElementSorted)
+							   { return std::includes(femElementSorted.begin(), femElementSorted.end(),
+													  triangleSorted.begin(), triangleSorted.end()); };
 	const auto& meshTriangles = mesh.getTriangles();
 	for (auto triangle = meshTriangles.cbegin(); triangle != meshTriangles.cend(); ++triangle)
 	{
-		// Get the node ids of the triangle and sort them.
-		std::array<unsigned int, 3> triangleWithSortedNodeIds = triangle->verticesId;
-		std::sort(triangleWithSortedNodeIds.begin(), triangleWithSortedNodeIds.end());
+		triangleSorted = triangle->verticesId;
+		std::sort(triangleSorted.begin(), triangleSorted.end());
 
 		// Find the femElement that contains all the node ids of this triangle.
 		std::vector<std::vector<size_t>>::iterator foundFemElement =
-		std::find_if(femElements.begin(), femElements.end(),
-					 [triangleWithSortedNodeIds](std::vector<size_t> femElementWithSortedNodeIds)
-					 { return std::includes(femElementWithSortedNodeIds.begin(), femElementWithSortedNodeIds.end(),
-											triangleWithSortedNodeIds.begin(), triangleWithSortedNodeIds.end()); });
+			std::find_if(femElements.begin(), femElements.end(), doesIncludeTriangle);
 
 		// Assert to make sure that a triangle doesn't end up not having a femElement mapped to it.
 		SURGSIM_ASSERT(foundFemElement != femElements.end())
@@ -198,7 +197,10 @@ std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElemen
 
 bool Fem3DRepresentation::doWakeUp()
 {
-	FemRepresentation::doWakeUp();
+	if (!FemRepresentation::doWakeUp())
+	{
+		return false;
+	}
 
 	auto deformableCollisionRepresentation
 		= std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
@@ -213,6 +215,9 @@ bool Fem3DRepresentation::doWakeUp()
 
 std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::Collision::Location& location)
 {
+	SURGSIM_ASSERT(location.triangleId.hasValue())
+		<< "Localization cannot be created if the triangle ID is not available.";
+
 	size_t triangleId = location.triangleId.getValue();
 	SurgSim::Math::Vector globalPosition = location.globalPosition.getValue();
 
@@ -228,7 +233,7 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 
 	// Fem3DRepresentationLocalization::setLocalPosition verifies argument based on its Representation.
 	auto result = std::make_shared<Fem3DRepresentationLocalization>();
-	result->setRepresentation(std::static_pointer_cast<SurgSim::Physics::Representation>(Component::getSharedPtr()));
+	result->setRepresentation(std::static_pointer_cast<SurgSim::Physics::Representation>(getSharedPtr()));
 	result->setLocalPosition(coordinate);
 
 	return result;

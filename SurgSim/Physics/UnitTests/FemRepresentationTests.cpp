@@ -176,11 +176,17 @@ TEST_F(FemRepresentationTests, IsValidCoordinateTest)
 	element->setYoungModulus(m_E);
 	ASSERT_NO_THROW(fem.addFemElement(element));
 
-	// Only the elementId is tested, the validation on the vector part is done by
-	// each FemElement, which should be tested in their respective UnitTest.
-	FemRepresentationCoordinate invalidCoordinates(1, Vector::Ones(3));
+	// Set up the fem element to have a valid natural coordinate.
+	element->addNode(0);
+	element->addNode(1);
+	Vector validNaturalCoordinate(2);
+	validNaturalCoordinate << 1.0, 0.0;
+
+	// Only the elementId is tested (by passing a valid natural coordinate).
+	// The validation of the natural coordinate is tested in the respective FemElement's UnitTest.
+	FemRepresentationCoordinate invalidCoordinates(1, validNaturalCoordinate);
 	EXPECT_FALSE(fem.isValidCoordinate(invalidCoordinates));
-	FemRepresentationCoordinate validCoordinates(0, Vector::Ones(3));
+	FemRepresentationCoordinate validCoordinates(0, validNaturalCoordinate);
 	EXPECT_TRUE(fem.isValidCoordinate(validCoordinates));
 }
 

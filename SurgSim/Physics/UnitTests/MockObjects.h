@@ -373,8 +373,6 @@ public:
 		fLocal = (alphaM * m_M + alphaD * m_D + alphaK * m_K) * xLocal;
 		SurgSim::Math::addSubVector(fLocal, m_nodeIds, 3, F);
 	}
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector &naturalCoordinate) const override
-	{ return true; }
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector &barycentricCoordinate) const override
 	{ return SurgSim::Math::Vector3d::Zero(); }

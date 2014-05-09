@@ -279,11 +279,11 @@ double FemElement3DTetrahedron::getVolume(const DeformableRepresentationState& s
 }
 
 void FemElement3DTetrahedron::computeShapeFunctions(const DeformableRepresentationState& state,
-													double *volume,
-													std::array<double, 4> *ai,
-													std::array<double, 4> *bi,
-													std::array<double, 4> *ci,
-													std::array<double, 4> *di) const
+													double* volume,
+													std::array<double, 4>* ai,
+													std::array<double, 4>* bi,
+													std::array<double, 4>* ci,
+													std::array<double, 4>* di) const
 {
 	// The tetrahedron nodes 3D position {a,b,c,d}
 	Vector3d a = getSubVector(state.getPositions(), m_nodeIds[0], 3);
@@ -402,14 +402,6 @@ void FemElement3DTetrahedron::computeShapeFunctions(const DeformableRepresentati
 	}
 }
 
-bool FemElement3DTetrahedron::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
-{
-	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		&& (naturalCoordinate.size() == 4)
-		&& (-SurgSim::Math::Geometry::ScalarEpsilon <= naturalCoordinate.minCoeff() &&
-			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
-}
-
 SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(
 	const DeformableRepresentationState& state,
 	const SurgSim::Math::Vector& naturalCoordinate) const
@@ -430,9 +422,9 @@ SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(
 }
 
 SurgSim::Math::Vector FemElement3DTetrahedron::computeNaturalCoordinate(
-	const DeformableRepresentationState& state, const SurgSim::Math::Vector& globalCoordinate) const
+	const DeformableRepresentationState& state, const SurgSim::Math::Vector& cartesianCoordinate) const
 {
-	SURGSIM_ASSERT(globalCoordinate.size() == 3) << "globalCoordinate must be length 3.";
+	SURGSIM_ASSERT(cartesianCoordinate.size() == 3) << "globalCoordinate must be length 3.";
 
 	double volume;
 	std::array<double, 4> ai;
@@ -443,11 +435,11 @@ SurgSim::Math::Vector FemElement3DTetrahedron::computeNaturalCoordinate(
 
 	SurgSim::Math::Vector4d result;
 
-	for (size_t i = 0; i < 4; i++)
+	for (size_t i = 0; i < 4; ++i)
 	{
-		result[i] = ai[i] + bi[i] * globalCoordinate[0]
-						  + ci[i] * globalCoordinate[1]
-						  + di[i] * globalCoordinate[2];
+		result[i] = ai[i] + bi[i] * cartesianCoordinate[0]
+						  + ci[i] * cartesianCoordinate[1]
+						  + di[i] * cartesianCoordinate[2];
 	}
 	result /= 6.0 * volume;
 

@@ -713,7 +713,7 @@ TEST_F(FemElement3DCubeTests, ShapeFunctionsTest)
 	}
 }
 
-TEST_F(FemElement3DCubeTests, IsValidCoordinateTest)
+TEST_F(FemElement3DCubeTests, CoordinateTests)
 {
 	MockFemElement3DCube cube(m_nodeIds, m_restState);
 
@@ -747,12 +747,8 @@ TEST_F(FemElement3DCubeTests, IsValidCoordinateTest)
 		nodePositions <<  -1e-11, 1.0 + 1e-11, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 		EXPECT_TRUE(cube.isValidCoordinate(nodePositions));
 	}
-}
 
-TEST_F(FemElement3DCubeTests, ComputeCartesianCoordinate)
-{
-	MockFemElement3DCube cube(m_nodeIds, m_restState);
-
+	// Test computeCartesianCoordinate.
 	{
 		// Compute central point of the cube
 		SurgSim::Math::Vector nodePositions(8);
@@ -778,12 +774,8 @@ TEST_F(FemElement3DCubeTests, ComputeCartesianCoordinate)
 		// 0.4  * (-0.5, 0.5, 0.5) => (-0.20,   0.20,   0.20)
 		//                          = ( 0.04,   0.19,   0.26)
 	}
-}
 
-TEST_F(FemElement3DCubeTests, ComputeNaturalCoordinate)
-{
-	MockFemElement3DCube cube(m_nodeIds, m_restState);
-
+	// Test computeNaturalCoordinate.
 	EXPECT_THROW(cube.computeNaturalCoordinate(m_restState, SurgSim::Math::Vector3d(0.0, 0.0, 0.0)),
 				 SurgSim::Framework::AssertionFailure);
 }

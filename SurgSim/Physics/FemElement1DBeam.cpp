@@ -359,14 +359,6 @@ void FemElement1DBeam::computeInitialRotation(const DeformableRepresentationStat
 	setSubMatrix(rotation3x3, 3, 3, 3, 3, &m_R0);
 }
 
-bool FemElement1DBeam::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
-{
-	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		&& (naturalCoordinate.size() == 2)
-		&& (-SurgSim::Math::Geometry::ScalarEpsilon <= naturalCoordinate.minCoeff() &&
-			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
-}
-
 SurgSim::Math::Vector FemElement1DBeam::computeCartesianCoordinate(const DeformableRepresentationState& state,
 																   const SurgSim::Math::Vector& naturalCoordinate) const
 {
@@ -386,7 +378,7 @@ SurgSim::Math::Vector FemElement1DBeam::computeCartesianCoordinate(const Deforma
 
 SurgSim::Math::Vector FemElement1DBeam::computeNaturalCoordinate(
 	const DeformableRepresentationState& state,
-	const SurgSim::Math::Vector& globalCoordinate) const
+	const SurgSim::Math::Vector& cartesianCoordinate) const
 {
 	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
 	return SurgSim::Math::Vector3d::Zero();
