@@ -123,8 +123,13 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	add_definitions( -D_POSIX_C_SOURCE=200809L )  # request POSIX APIs
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
-option(EIGEN3_DONT_ALIGN "Disable alignment of vectors in Eigen " ON)
-mark_as_advanced(EIGEN3_DONT_ALIGN)
-if(EIGEN3_DONT_ALIGN)
+# Eigen Alignment, enabled on Linux by default
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	option(EIGEN_DONT_ALIGN "Disable alignment of vectors in Eigen" OFF)
+else(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	option(EIGEN_DONT_ALIGN "Disable alignment of vectors in Eigen" ON)
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+mark_as_advanced(EIGEN_DONT_ALIGN)
+if(EIGEN_DONT_ALIGN)
 	add_definitions( -DEIGEN_DONT_ALIGN )
-endif(EIGEN3_DONT_ALIGN)
+endif(EIGEN_DONT_ALIGN)
