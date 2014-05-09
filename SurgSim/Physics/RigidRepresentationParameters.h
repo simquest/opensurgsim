@@ -21,11 +21,6 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
-namespace YAML
-{
-class Node;
-}
-
 namespace SurgSim
 {
 
@@ -70,12 +65,12 @@ public:
 	/// Comparison operator
 	/// \param rhs A RigidRepresentationParameters to compare it to
 	/// \return True if the 2 parameters set are equals, False otherwise
-	bool operator==(const RigidRepresentationParameters &rhs) const;
+	bool operator==(const RigidRepresentationParameters& rhs) const;
 
 	/// Comparison operator (for difference)
 	/// \param rhs A RigidRepresentationParameters to compare it to
 	/// \return False if the 2 parameters set are equals, True otherwise
-	bool operator!=(const RigidRepresentationParameters &rhs) const;
+	bool operator!=(const RigidRepresentationParameters& rhs) const;
 
 	/// Set the mass density of the rigid representation
 	/// There is 2 ways to define a rigid representation mass/inertia:
@@ -168,23 +163,29 @@ private:
 	/// when density and/or shape used for mass inertia is updated.
 	void updateProperties();
 
+	/// Register accessors of serializable properties
+	void addSerializableProperty();
+
+	/// Validity of the set of parameters
+	bool m_isValid;
+
 	/// Density of the object (in Kg.m-3)
 	double m_rho;
 
 	/// Total mass of the object (in Kg)
 	double m_mass;
 
-	/// Mass-center of the object
-	SurgSim::Math::Vector3d m_massCenter;
-
-	/// Inertia matrix in local coordinates
-	SurgSim::Math::Matrix33d m_localInertia;
-
 	/// Linear damping parameter (in N.s.m-1 or Kg.s-1)
 	double m_linearDamping;
 
 	/// Angular damping parameter (in N.m.s.rad-1)
 	double m_angularDamping;
+
+	/// Mass-center of the object
+	SurgSim::Math::Vector3d m_massCenter;
+
+	/// Inertia matrix in local coordinates
+	SurgSim::Math::Matrix33d m_localInertia;
 
 	/// Shapes associated with this rigid representation.
 	/// Different shape representations could be used for different purposes.
@@ -193,9 +194,6 @@ private:
 
 	/// Shape to be used for the mass/inertia calculation
 	std::shared_ptr<SurgSim::Math::Shape> m_shapeForMassInertia;
-
-	/// Validity of the set of parameters
-	bool m_isValid;
 };
 
 }; // namespace Physics

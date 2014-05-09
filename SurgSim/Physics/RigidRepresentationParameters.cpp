@@ -25,43 +25,46 @@ namespace Physics
 {
 
 RigidRepresentationParameters::RigidRepresentationParameters() :
-	m_rho(0.0), m_linearDamping(0.0), m_angularDamping(0.0), m_isValid(false)
+	m_isValid(false),
+	m_rho(0.0),
+	m_linearDamping(0.0),
+	m_angularDamping(0.0),
+	m_massCenter(SurgSim::Math::Vector3d::Zero())
 {
-	m_massCenter.setZero();
-
 	// Only mass and inertia are initialized with qNaN because they are
 	// the only 2 variables on which the validity test relies on.
 	m_mass = std::numeric_limits<double>::quiet_NaN();
 	m_localInertia.setConstant(std::numeric_limits<double>::quiet_NaN());
 
+	addSerializableProperty();
+}
+
+RigidRepresentationParameters::RigidRepresentationParameters(const RigidRepresentationParameters& rhs) :
+	m_isValid(rhs.m_isValid),
+	m_rho(rhs.m_rho),
+	m_mass(rhs.m_mass),
+	m_linearDamping(rhs.m_linearDamping),
+	m_angularDamping(rhs.m_angularDamping),
+	m_massCenter(rhs.m_massCenter),
+	m_localInertia(rhs.m_localInertia),
+	m_shapes(rhs.m_shapes),
+	m_shapeForMassInertia(rhs.m_shapeForMassInertia)
+{
+	addSerializableProperty();
+}
+
+
+void RigidRepresentationParameters::addSerializableProperty()
+{
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double, Density, getDensity, setDensity);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double,
-									  LinearDamping, getLinearDamping, setLinearDamping);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double,
-									  AngularDamping, getAngularDamping, setAngularDamping);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double, LinearDamping,
+									  getLinearDamping, setLinearDamping);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double, AngularDamping,
+									  getAngularDamping, setAngularDamping);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, std::shared_ptr<SurgSim::Math::Shape>,
 									  ShapeUsedForMassInertia, getShapeUsedForMassInertia, setShapeUsedForMassInertia);
 }
 
-RigidRepresentationParameters::RigidRepresentationParameters(const RigidRepresentationParameters& rhs) :
-	m_rho(rhs.m_rho),
-	m_mass(rhs.m_mass),
-	m_massCenter(rhs.m_massCenter),
-	m_localInertia(rhs.m_localInertia),
-	m_linearDamping(rhs.m_linearDamping),
-	m_angularDamping(rhs.m_angularDamping),
-	m_shapes(rhs.m_shapes),
-	m_shapeForMassInertia(rhs.m_shapeForMassInertia),
-	m_isValid(rhs.m_isValid)
-{
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double, Density, getDensity, setDensity);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double,
-		LinearDamping, getLinearDamping, setLinearDamping);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, double,
-		AngularDamping, getAngularDamping, setAngularDamping);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationParameters, std::shared_ptr<SurgSim::Math::Shape>,
-		ShapeUsedForMassInertia, getShapeUsedForMassInertia, setShapeUsedForMassInertia);
-}
 
 RigidRepresentationParameters& RigidRepresentationParameters::operator=(const RigidRepresentationParameters& rhs)
 {
@@ -82,14 +85,14 @@ RigidRepresentationParameters::~RigidRepresentationParameters()
 {
 }
 
-bool RigidRepresentationParameters::operator==(const RigidRepresentationParameters &rhs) const
+bool RigidRepresentationParameters::operator==(const RigidRepresentationParameters& rhs) const
 {
 	using SurgSim::Math::isValid;
 
-	bool isMassEqual = m_mass == rhs.m_mass;
+	bool isMassEqual = (m_mass == rhs.m_mass);
 	isMassEqual |= !isValid(m_mass) && !isValid(rhs.m_mass);
 
-	bool isInertiaEqual = m_localInertia == rhs.m_localInertia;
+	bool isInertiaEqual = (m_localInertia == rhs.m_localInertia);
 	isInertiaEqual |= !isValid(m_localInertia) && !isValid(rhs.m_localInertia);
 
 	return (m_isValid == rhs.m_isValid &&
@@ -103,7 +106,7 @@ bool RigidRepresentationParameters::operator==(const RigidRepresentationParamete
 			m_shapes == rhs.m_shapes);
 }
 
-bool RigidRepresentationParameters::operator!=(const RigidRepresentationParameters &rhs) const
+bool RigidRepresentationParameters::operator!=(const RigidRepresentationParameters& rhs) const
 {
 	return !((*this) == rhs);
 }
@@ -138,7 +141,6 @@ const SurgSim::Math::Vector3d& RigidRepresentationParameters::getMassCenter() co
 {
 	return m_massCenter;
 }
-
 
 void RigidRepresentationParameters::setLocalInertia(const SurgSim::Math::Matrix33d& localInertia)
 {
@@ -225,12 +227,11 @@ bool RigidRepresentationParameters::isValid() const
 bool RigidRepresentationParameters::checkValidity() const
 {
 	using SurgSim::Math::isValid;
-	if (isValid(m_localInertia) && ! m_localInertia.isZero() && m_localInertia.diagonal().minCoeff() > 0.0 &&
-		isValid(m_mass) && m_mass > 0.0)
-	{
-		return true;
-	}
-	return false;
+
+	return (isValid(m_localInertia) &&
+			!m_localInertia.isZero() &&
+			m_localInertia.diagonal().minCoeff() > 0.0 &&
+			isValid(m_mass) && m_mass > 0.0);
 }
 
 void RigidRepresentationParameters::updateProperties()
