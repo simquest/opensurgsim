@@ -192,25 +192,25 @@ TEST(DataGroupTests, GetName)
 	{
 		SurgSim::Math::RigidTransform3d value = SurgSim::Math::RigidTransform3d::Identity();
 		EXPECT_TRUE(data.poses().get("pose", &value));
-		EXPECT_NEAR(0, (value.linear() - quat.matrix()).norm(), 1e-9);
-		EXPECT_NEAR(0, (value.translation() - vector).norm(), 1e-9);
+		EXPECT_NEAR(0, (value.linear() - quat.matrix()).norm(), EPSILON);
+		EXPECT_NEAR(0, (value.translation() - vector).norm(), EPSILON);
 	}
 	{
 		SurgSim::Math::Vector3d value(0, 0, 0);
 		EXPECT_TRUE(data.vectors().get("vector", &value));
-		EXPECT_NEAR(0, (value - vector).norm(), 1e-9);
+		EXPECT_NEAR(0, (value - vector).norm(), EPSILON);
 	}
 	{
 		DataGroup::DynamicMatrixType value;
 		EXPECT_TRUE(data.matrices().get("matrix", &value));
 		EXPECT_EQ(matrix.cols(), value.cols());
 		EXPECT_EQ(matrix.rows(), value.rows());
-		EXPECT_NEAR(0, (value - matrix).norm(), 1e-9);
+		EXPECT_NEAR(0, (value - matrix).norm(), EPSILON);
 	}
 	{
 		double value = 0;
 		EXPECT_TRUE(data.scalars().get("scalar", &value));
-		EXPECT_NEAR(1.23, value, 1e-9);
+		EXPECT_NEAR(1.23, value, EPSILON);
 	}
 	{
 		int value = 0;
@@ -230,8 +230,8 @@ TEST(DataGroupTests, GetName)
 	{
 		Mock3DData<double> value;
 		EXPECT_TRUE(data.customData().get("mock_data", &value));
-		EXPECT_NEAR(1.23, value.get(5, 5, 5), 1e-9);
-		EXPECT_NEAR(4.56, value.get(1, 2, 3), 1e-9);
+		EXPECT_NEAR(1.23, value.get(5, 5, 5), EPSILON);
+		EXPECT_NEAR(4.56, value.get(1, 2, 3), EPSILON);
 	}
 }
 
