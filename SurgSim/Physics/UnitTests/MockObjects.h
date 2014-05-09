@@ -20,6 +20,7 @@
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Constraint.h"

@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
-
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
 namespace SurgSim

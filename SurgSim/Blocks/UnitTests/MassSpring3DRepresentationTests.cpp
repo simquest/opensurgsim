@@ -21,6 +21,7 @@
 #include "SurgSim/Blocks/MassSpring3DRepresentation.h"
 #include "SurgSim/Blocks/UnitTests/SpringTestUtils.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
 using SurgSim::Math::Vector3d;

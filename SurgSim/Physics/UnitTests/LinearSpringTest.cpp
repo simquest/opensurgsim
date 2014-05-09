@@ -17,15 +17,16 @@
 
 #include <string>
 
-#include "SurgSim/Physics/LinearSpring.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/LinearSpring.h"
 
-using SurgSim::Physics::LinearSpring;
-using SurgSim::Math::Vector;
-using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Vector;
+using SurgSim::Math::Vector3d;
+using SurgSim::Physics::LinearSpring;
 
 namespace
 {

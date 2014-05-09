@@ -19,8 +19,9 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Blocks/UnitTests/SpringTestUtils.h"
-#include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/LinearSpring.h"
 
 namespace SurgSim
 {

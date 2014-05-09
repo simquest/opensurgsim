@@ -15,11 +15,11 @@
 
 #include "SurgSim/Blocks/MassSpring2DRepresentation.h"
 #include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
-
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
-using SurgSim::Physics::Mass;
 using SurgSim::Math::Vector3d;
+using SurgSim::Physics::Mass;
 
 namespace SurgSim
 {
