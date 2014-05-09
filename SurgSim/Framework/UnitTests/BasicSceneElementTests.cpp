@@ -76,7 +76,7 @@ TEST(BasicSceneElementTests, InitComponentTest)
 
 }
 
-TEST(BasicSceneElementTests, YamlTest)
+TEST(BasicSceneElementTests, SerializationTest)
 {
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>("SceneElement");
 
@@ -86,9 +86,12 @@ TEST(BasicSceneElementTests, YamlTest)
 	sceneElement->addComponent(representation1);
 	sceneElement->addComponent(representation2);
 
-	YAML::Node node;
+	RigidTransform3d pose(makeRigidTransform(Quaterniond(0.0, 1.0, 0.0, 0.0), Vector3d(1.0, 2.0, 3.0)));
+	sceneElement->setPose(pose);
 
-	ASSERT_NO_THROW(node = sceneElement) << "Failed to serialize SceneElement";
+	YAML::Node node;
+	ASSERT_NO_THROW(sceneElement->encode(false)) << "Failed to serialize a SceneElement";;
+	ASSERT_NO_THROW(node = sceneElement->encode(true)) << "Failed to serialize a SceneElement";
 
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ("SurgSim::Framework::BasicSceneElement", node.begin()->first.as<std::string>());
@@ -98,6 +101,7 @@ TEST(BasicSceneElementTests, YamlTest)
 	ASSERT_NO_THROW(result = node.as<std::shared_ptr<SceneElement>>()) << "Failed to restore SceneElement.";
 	EXPECT_EQ("SceneElement", result->getName());
 	EXPECT_EQ(2u, result->getComponents().size());
+	EXPECT_TRUE(pose.isApprox(result->getPose()));
 }
 
 };  // namespace Blocks

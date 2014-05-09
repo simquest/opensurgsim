@@ -45,6 +45,12 @@ TEST(SceneElementTest, Pose)
 	RigidTransform3d pose(makeRigidTransform(Quaterniond(0.0, 1.0, 0.0, 0.0), Vector3d(1.0, 2.0, 3.0)));
 	element.setPose(pose);
 	EXPECT_TRUE(element.getPose().isApprox(pose));
+	EXPECT_TRUE(element.getPoseComponent()->getPose().isApprox(pose));
+	
+	// One should not try to add a PoseComponent to a SceneElement.
+	// Use SceneElment::setPose() instead.
+	auto poseComponent = std::make_shared<SurgSim::Framework::PoseComponent>("TestPoseComponent");
+	EXPECT_ANY_THROW(element.addComponent(poseComponent));
 }
 
 TEST(SceneElementTest, UpdateFunctions)
@@ -109,7 +115,6 @@ TEST(SceneElementTest, RemoveComponents)
 	EXPECT_TRUE(element->addComponent(component1));
 	EXPECT_TRUE(element->addComponent(component2));
 
-
 	EXPECT_TRUE(element->removeComponent("TestComponent2"));
 	EXPECT_EQ(nullptr, element->getComponent("TestComponent2"));
 
@@ -118,6 +123,9 @@ TEST(SceneElementTest, RemoveComponents)
 
 	EXPECT_TRUE(element->removeComponent(component1));
 	EXPECT_EQ(nullptr, element->getComponent("TestComponent1"));
+
+	// One should not try to remove the built-in PoseComponent.
+	EXPECT_ANY_THROW(element->removeComponent("Pose"));
 }
 
 TEST(SceneElementTest, GetComponentsTest)
@@ -167,36 +175,16 @@ TEST(SceneElementTest, GetTypedComponentsTests)
 
 TEST(SceneElementTest, InitComponentTest)
 {
-	{
-		std::shared_ptr<MockSceneElement> element(new MockSceneElement());
-		std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));
-		std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
+	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
+	std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));
+	std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
 
-		element->addComponent(component1);
-		element->addComponent(component2);
+	element->addComponent(component1);
+	element->addComponent(component2);
 
-		element->initialize();
+	element->initialize();
 
-		EXPECT_TRUE(element->didInit);
-	}
-
-	{
-		// Besides the 'built-in' Pose Component, one user defined PoseComponent can be used (not recommended though).
-		auto sceneElement = std::make_shared<MockSceneElement>();
-		auto poseComponent = std::make_shared<PoseComponent>("Pose");
-		sceneElement->addComponent(poseComponent);
-		EXPECT_NO_THROW(sceneElement->initialize());
-	}
-
-	{
-		// However, more than one user defined PoseComponent will case a failure.
-		auto sceneElement = std::make_shared<MockSceneElement>();
-		auto poseComponent = std::make_shared<PoseComponent>("Pose");
-		auto poseComponent2 = std::make_shared<PoseComponent>("Pose2");
-		sceneElement->addComponent(poseComponent);
-		sceneElement->addComponent(poseComponent2);
-		EXPECT_ANY_THROW(sceneElement->initialize());
-	}
+	EXPECT_TRUE(element->didInit);
 }
 
 TEST(SceneElementTest, DoubleInitTest)
