@@ -54,6 +54,11 @@ std::string MeshShape::getFileName() const
 	return m_fileName;
 }
 
+std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getInitialMesh()
+{
+	return m_initialMesh;
+}
+
 std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh()
 {
 	return m_mesh;

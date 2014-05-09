@@ -68,20 +68,27 @@ public:
 	/// \return the type of the shape
 	virtual int getType() override;
 
+	/// Gets the initial mesh
+	/// \return The collision mesh associated to this MeshShape
+	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getInitialMesh();
+
 	/// Get mesh
 	/// \return The collision mesh associated to this MeshShape
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh();
 
 	/// Get the volume of the shape
+	/// \note this parameter is valid with respect to the initial mesh
 	/// \return The volume of the shape (in m-3)
 	virtual double getVolume() const override;
 
 	/// Get the volumetric center of the shape
+	/// \note this parameter is valid with respect to the initial mesh
 	/// \return The center of the shape
 	virtual Vector3d getCenter() const override;
 
 	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
+	/// \note this parameter is valid with respect to the initial mesh
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
