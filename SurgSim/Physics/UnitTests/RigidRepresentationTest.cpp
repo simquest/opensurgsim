@@ -486,7 +486,7 @@ TEST_F(RigidRepresentationTest, SerializationTest)
 	}
 
 	{
-		SCOPED_TRACE("Encode a RigidRepresentation object with valid RigidCollisionRepresentation and shape, no thorw");
+		SCOPED_TRACE("Encode a RigidRepresentation object with valid RigidCollisionRepresentation and shape, no throw");
 		auto rigidRepresentation = std::make_shared<RigidRepresentation>("TestRigidRepresentation");
 		auto rigidCollisionRepresentation =
 			std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");

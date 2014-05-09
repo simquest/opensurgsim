@@ -34,7 +34,6 @@ struct RigidRepresentationStateTest : public ::testing::Test
 		linearVelocity = SurgSim::Math::Vector3d(2, -3.1, -2.75);
 		angularVelocity = SurgSim::Math::Vector3d (5, -10, 21.5);
 		id4x4 = SurgSim::Math::RigidTransform3d::Identity();
-		nullVector = SurgSim::Math::Vector3d::Zero();
 	}
 
 	SurgSim::Math::Quaterniond quaterniond;
@@ -45,7 +44,6 @@ struct RigidRepresentationStateTest : public ::testing::Test
 	SurgSim::Math::Vector3d angularVelocity;
 
 	SurgSim::Math::RigidTransform3d id4x4;
-	SurgSim::Math::Vector3d nullVector;
 };
 
 TEST_F(RigidRepresentationStateTest, ConstructorTest)
@@ -60,9 +58,9 @@ TEST_F(RigidRepresentationStateTest, DefaultValueTest)
 	rigidRepresentationState = std::make_shared<SurgSim::Physics::RigidRepresentationState>();
 
 	// Linear velocity [default = (0 0 0)]
-	EXPECT_TRUE(nullVector.isApprox(rigidRepresentationState->getLinearVelocity()));
+	EXPECT_TRUE(rigidRepresentationState->getLinearVelocity().isZero());
 	// Angular velocity [default = (0 0 0)]
-	EXPECT_TRUE(nullVector.isApprox(rigidRepresentationState->getAngularVelocity()));
+	EXPECT_TRUE(rigidRepresentationState->getAngularVelocity().isZero());
 	// Pose [default = Identity]
 	EXPECT_TRUE(rigidRepresentationState->getPose().isApprox(id4x4));
 }
@@ -81,9 +79,9 @@ TEST_F(RigidRepresentationStateTest, ResetTest)
 	rigidRepresentationState->reset();
 
 	// Test Linear velocity has been reset to (0 0 0)
-	EXPECT_TRUE(nullVector.isApprox(rigidRepresentationState->getLinearVelocity()));
+	EXPECT_TRUE(rigidRepresentationState->getLinearVelocity().isZero());
 	// Test Angular velocity has been reset to (0 0 0)
-	EXPECT_TRUE(nullVector.isApprox(rigidRepresentationState->getAngularVelocity()));
+	EXPECT_TRUE(rigidRepresentationState->getAngularVelocity().isZero());
 	// Test pose has been reset to Identity
 	EXPECT_TRUE(rigidRepresentationState->getPose().isApprox(id4x4));
 }
@@ -97,14 +95,14 @@ TEST_F(RigidRepresentationStateTest, SetGetTest)
 	// Get/Set linear velocity
 	rigidRepresentationState->setLinearVelocity(linearVelocity);
 	EXPECT_TRUE(linearVelocity.isApprox(rigidRepresentationState->getLinearVelocity()));
-	rigidRepresentationState->setLinearVelocity(nullVector);
-	EXPECT_TRUE(nullVector.isApprox(rigidRepresentationState->getLinearVelocity()));
+	rigidRepresentationState->setLinearVelocity(SurgSim::Math::Vector3d::Zero());
+	EXPECT_TRUE(rigidRepresentationState->getLinearVelocity().isZero());
 
 	// Get/Set angular velocity
 	rigidRepresentationState->setAngularVelocity(angularVelocity);
 	EXPECT_TRUE(angularVelocity.isApprox(rigidRepresentationState->getAngularVelocity()));
-	rigidRepresentationState->setAngularVelocity(nullVector);
-	EXPECT_TRUE(nullVector.isApprox(rigidRepresentationState->getAngularVelocity()));
+	rigidRepresentationState->setAngularVelocity(SurgSim::Math::Vector3d::Zero());
+	EXPECT_TRUE(rigidRepresentationState->getAngularVelocity().isZero());
 
 	// Get/Set pose
 	rigidRepresentationState->setPose(pose);
