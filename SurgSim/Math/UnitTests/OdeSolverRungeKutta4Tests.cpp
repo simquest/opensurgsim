@@ -157,7 +157,7 @@ void doSolveTest()
 		k4.acceleration = m.m_gravity;
 
 		yn_plus_1.position = yn.position + dt / 6.0 * (k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
-		yn_plus_1.velocity = yn.velocity + dt / 6.0 * (k1.acceleration + k4.acceleration + 
+		yn_plus_1.velocity = yn.velocity + dt / 6.0 * (k1.acceleration + k4.acceleration +
 													   2.0 * (k2.acceleration + k3.acceleration));
 
 		T solver(&m);
@@ -212,7 +212,7 @@ void doSolveTest()
 		k4.acceleration = m.m_gravity - 0.1 * (yn.velocity + k3.acceleration * dt) / m.m_mass;
 
 		yn_plus_1.position = yn.position + dt / 6.0 * (k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
-		yn_plus_1.velocity = yn.velocity + dt / 6.0 * (k1.acceleration + k4.acceleration + 
+		yn_plus_1.velocity = yn.velocity + dt / 6.0 * (k1.acceleration + k4.acceleration +
 													   2.0 * (k2.acceleration + k3.acceleration));
 
 		T solver(&m);
