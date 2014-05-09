@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 namespace SurgSim
@@ -21,15 +22,12 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidRepresentationState::RigidRepresentationState() : RigidRepresentationBaseState()
+RigidRepresentationState::RigidRepresentationState() :
+	RigidRepresentationBaseState(),
+	m_v(SurgSim::Math::Vector3d::Zero()),
+	m_w(SurgSim::Math::Vector3d::Zero())
 {
-	m_v.setZero();
-	m_w.setZero();
-
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationState, SurgSim::Math::Vector3d,
-		LinearVelocity, getLinearVelocity, setLinearVelocity);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationState, SurgSim::Math::Vector3d,
-		AngularVelocity, getAngularVelocity, setAngularVelocity);
+	addSerializableProperty();
 }
 
 RigidRepresentationState::RigidRepresentationState(const RigidRepresentationState& rhs) :
@@ -37,24 +35,29 @@ RigidRepresentationState::RigidRepresentationState(const RigidRepresentationStat
 	m_v(rhs.m_v),
 	m_w(rhs.m_w)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationState, SurgSim::Math::Vector3d,
-		LinearVelocity, getLinearVelocity, setLinearVelocity);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationState, SurgSim::Math::Vector3d,
-		AngularVelocity, getAngularVelocity, setAngularVelocity);
+	addSerializableProperty();
+}
+
+void RigidRepresentationState::addSerializableProperty()
+{
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationState, SurgSim::Math::Vector3d, LinearVelocity,
+									  getLinearVelocity, setLinearVelocity);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationState, SurgSim::Math::Vector3d, AngularVelocity,
+									  getAngularVelocity, setAngularVelocity);
 }
 
 RigidRepresentationState::~RigidRepresentationState()
 {
 }
 
-bool RigidRepresentationState::operator==(const RigidRepresentationState &s) const
+bool RigidRepresentationState::operator==(const RigidRepresentationState& rhs) const
 {
-	return (RigidRepresentationBaseState::operator ==(s) && m_v == s.m_v && m_w == s.m_w);
+	return (RigidRepresentationBaseState::operator==(rhs) && m_v == rhs.m_v && m_w == rhs.m_w);
 }
 
-bool RigidRepresentationState::operator!=(const RigidRepresentationState &s) const
+bool RigidRepresentationState::operator!=(const RigidRepresentationState& rhs) const
 {
-	return ! ((*this) == s);
+	return !((*this) == rhs);
 }
 
 void RigidRepresentationState::reset()
@@ -84,7 +87,6 @@ void RigidRepresentationState::setAngularVelocity(const SurgSim::Math::Vector3d 
 {
 	m_w = w;
 }
-
 
 }; // Physics
 }; // SurgSim

@@ -16,11 +16,9 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
 
-#include "SurgSim/Physics/RigidRepresentationBaseState.h"
-
 #include "SurgSim/Framework/Macros.h"
-#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidRepresentationBaseState.h"
 
 namespace SurgSim
 {
@@ -46,14 +44,14 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentationState);
 
 	/// Comparison operator
-	/// \param s A RigidRepresentationState to compare it to
+	/// \param rhs A RigidRepresentationState to compare it to
 	/// \return True if the 2 states are equals, False otherwise
-	bool operator==(const RigidRepresentationState &s) const;
+	bool operator==(const RigidRepresentationState& rhs) const;
 
 	/// Comparison operator
-	/// \param s A RigidRepresentationState to compare it to
+	/// \param rhs A RigidRepresentationState to compare it to
 	/// \return False if the 2 states are equals, True otherwise
-	bool operator!=(const RigidRepresentationState &s) const;
+	bool operator!=(const RigidRepresentationState& rhs) const;
 
 	/// Reset the state to default values
 	/// Vectors will be filled with 0
@@ -79,6 +77,9 @@ public:
 	void setAngularVelocity(const SurgSim::Math::Vector3d &w);
 
 private:
+	/// Register accessors of serializable properties
+	void addSerializableProperty();
+
 	/// Linear velocity
 	SurgSim::Math::Vector3d m_v;
 
