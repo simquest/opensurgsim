@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Physics/RigidRepresentationBaseState.h"
 
 namespace SurgSim
@@ -21,18 +22,22 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidRepresentationBaseState::RigidRepresentationBaseState()
+RigidRepresentationBaseState::RigidRepresentationBaseState() :
+	m_pose(SurgSim::Math::RigidTransform3d::Identity())
 {
-	m_pose.setIdentity();
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBaseState, SurgSim::Math::RigidTransform3d,
-		Pose, getPose, setPose);
+	addSerializableProperty();
 }
 
 RigidRepresentationBaseState::RigidRepresentationBaseState(const RigidRepresentationBaseState& rhs) :
 	m_pose(rhs.m_pose)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBaseState, SurgSim::Math::RigidTransform3d,
-		Pose, getPose, setPose);
+	addSerializableProperty();
+}
+
+void RigidRepresentationBaseState::addSerializableProperty()
+{
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBaseState, SurgSim::Math::RigidTransform3d, Pose,
+									  getPose, setPose);
 }
 
 RigidRepresentationBaseState& RigidRepresentationBaseState::operator=(const RigidRepresentationBaseState& rhs)
@@ -45,10 +50,14 @@ RigidRepresentationBaseState::~RigidRepresentationBaseState()
 {
 }
 
-
-bool RigidRepresentationBaseState::operator==(const RigidRepresentationBaseState& state) const
+bool RigidRepresentationBaseState::operator==(const RigidRepresentationBaseState& rhs) const
 {
-	return m_pose.isApprox(state.m_pose);
+	return m_pose.isApprox(rhs.m_pose);
+}
+
+bool RigidRepresentationBaseState::operator!=( const RigidRepresentationBaseState &rhs ) const
+{
+	return !((*this) == rhs);
 }
 
 void RigidRepresentationBaseState::reset()

@@ -17,8 +17,8 @@
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASESTATE_H
 
 #include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/MathConvert.h"
 
 namespace SurgSim
 {
@@ -49,9 +49,14 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentationBaseState);
 
 	/// Comparison operator
-	/// \param state A RigidRepresentationBaseState to compare it to
+	/// \param rhs A RigidRepresentationBaseState to compare it to
 	/// \return True if the 2 states are equals, False otherwise
-	bool operator==(const RigidRepresentationBaseState& state) const;
+	bool operator==(const RigidRepresentationBaseState& rhs) const;
+
+	/// Comparison operator
+	/// \param rhs A RigidRepresentationBaseState to compare it to
+	/// \return False if the 2 states are equals, True otherwise
+	bool operator!=(const RigidRepresentationBaseState& rhs) const;
 
 	/// Reset the state to default values
 	/// Pose is being set to identity (no translation, no rotation)
@@ -66,6 +71,9 @@ public:
 	const SurgSim::Math::RigidTransform3d& getPose() const;
 
 private:
+	/// Register accessors of serializable properties
+	void addSerializableProperty();
+
 	/// Rigid representation pose (translation + rotation)
 	SurgSim::Math::RigidTransform3d m_pose;
 };
