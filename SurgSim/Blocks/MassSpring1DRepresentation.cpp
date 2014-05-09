@@ -15,14 +15,12 @@
 
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
-
 #include "SurgSim/Math/LinearSolveAndInverse.h"
-
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
-using SurgSim::Physics::DeformableRepresentationState;
-using SurgSim::Physics::Mass;
 using SurgSim::Math::Vector3d;
+using SurgSim::Physics::Mass;
 
 namespace SurgSim
 {
@@ -33,13 +31,13 @@ namespace Blocks
 void MassSpring1DRepresentation::init1D(
 	const std::array<Vector3d, 2> extremities,
 	unsigned int numNodesPerDim[1],
-	std::vector<unsigned int> boundaryConditions,
+	std::vector<unsigned int> nodeBoundaryConditions,
 	double totalMass,
 	double stiffnessStretching, double dampingStretching,
 	double stiffnessBending, double dampingBending)
 {
-	std::shared_ptr<DeformableRepresentationState> state;
-	state = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> state;
+	state = std::make_shared<SurgSim::Math::OdeState>();
 	state->setNumDof(getNumDofPerNode(), numNodesPerDim[0]);
 
 	SURGSIM_ASSERT(numNodesPerDim[0] > 0) << "Number of nodes incorrect: " << numNodesPerDim[0];
@@ -74,8 +72,8 @@ void MassSpring1DRepresentation::init1D(
 	}
 
 	// Sets the boundary conditions
-	for (auto boundaryCondition = std::begin(boundaryConditions);
-		boundaryCondition != std::end(boundaryConditions);
+	for (auto boundaryCondition = std::begin(nodeBoundaryConditions);
+		boundaryCondition != std::end(nodeBoundaryConditions);
 		boundaryCondition++)
 	{
 		state->addBoundaryCondition(*boundaryCondition);

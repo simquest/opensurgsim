@@ -17,6 +17,7 @@
 
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"

@@ -16,11 +16,9 @@
 #ifndef SURGSIM_MATH_ODESOLVER_H
 #define SURGSIM_MATH_ODESOLVER_H
 
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Matrix.h"
-
-#include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/LinearSolveAndInverse.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeEquation.h"
 
 namespace SurgSim
 {
@@ -54,18 +52,12 @@ enum IntegrationScheme {
 /// \note D = -df/dv(x(t), v(t))
 /// \note Models wanting the use of implicit solvers will need to compute these Jacobian matrices.
 /// \note Matrices all have dense storage, but a specialized linear solver can be set per solver.
-/// \tparam State Type of the state y=(x v)
-/// \note State is expected to hold on to the dof derivatives and have the API:
-/// \note   Vector& getPositions();
-/// \note   Vector& getVelocities();
-/// \note   Vector& getAccelerations();
-template <class State>
 class OdeSolver
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolver(OdeEquation<State>* equation);
+	explicit OdeSolver(OdeEquation* equation);
 
 	/// Virtual destructor
 	virtual ~OdeSolver()
@@ -87,7 +79,7 @@ public:
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	virtual void solve(double dt, const State& currentState, State* newState) = 0;
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) = 0;
 
 	/// Queries the current system matrix
 	/// \return The latest system matrix calculated
@@ -98,16 +90,16 @@ public:
 	const Matrix& getCompliance() const;
 
 protected:
-	/// Name for this solver
-	/// \note MUST be set by the derived classes
-	std::string m_name;
-
 	/// Allocates the system and compliance matrices
 	/// \param size The size to account for in the data structure
 	void allocate(unsigned int size);
 
+	/// Name for this solver
+	/// \note MUST be set by the derived classes
+	std::string m_name;
+
 	/// The ode equation (API providing the necessary evaluation methods and the initial state)
-	OdeEquation<State>& m_equation;
+	OdeEquation& m_equation;
 
 	/// The specialized linear solver to use when solving the ode equation
 	std::shared_ptr<LinearSolveAndInverse> m_linearSolver;
@@ -125,7 +117,5 @@ protected:
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#include "SurgSim/Math/OdeSolver-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVER_H

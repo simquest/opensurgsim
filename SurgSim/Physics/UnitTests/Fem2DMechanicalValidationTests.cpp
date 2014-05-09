@@ -20,6 +20,7 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -92,7 +93,7 @@ public:
 	void setNodePositions(const std::vector<Vector3d>& nodes, const std::vector<size_t>& fixedNodes)
 	{
 		const size_t numDofPerNode = m_fem->getNumDofPerNode();
-		std::shared_ptr<DeformableRepresentationState> state = std::make_shared<DeformableRepresentationState>();
+		std::shared_ptr<SurgSim::Math::OdeState> state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(numDofPerNode, nodes.size());
 		for (size_t nodeId = 0; nodeId < nodes.size(); nodeId++)
 		{
@@ -100,10 +101,7 @@ public:
 		}
 		for (auto fixedNodeId = fixedNodes.begin(); fixedNodeId != fixedNodes.end(); fixedNodeId++)
 		{
-			for (size_t dofId = 0; dofId < numDofPerNode; dofId++)
-			{
-				state->addBoundaryCondition(numDofPerNode * (*fixedNodeId) + dofId);
-			}
+			state->addBoundaryCondition(*fixedNodeId);
 		}
 		m_fem->setInitialState(state);
 	}
@@ -170,7 +168,9 @@ public:
 	void solve()
 	{
 		m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
-		const Matrix& K = m_fem->computeK(*(m_fem->getCurrentState()));
+		Matrix K = m_fem->computeK(*(m_fem->getCurrentState()));
+		m_fem->getCurrentState()->applyBoundaryConditionsToMatrix(&K);
+		m_fem->getCurrentState()->applyBoundaryConditionsToVector(&m_F);
 		m_U = K.inverse() * m_F;
 	}
 

@@ -30,7 +30,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	DcdCollision.cpp
 	DeformableCollisionRepresentation.cpp
 	DeformableRepresentation.cpp
-	DeformableRepresentationState.cpp
 	Fem1DRepresentation.cpp
 	Fem2DRepresentation.cpp
 	Fem3DRepresentation.cpp
@@ -90,8 +89,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	DcdCollision.h
 	DeformableCollisionRepresentation.h
 	DeformableRepresentation.h
-	DeformableRepresentationBase.h
-	DeformableRepresentationState.h
 	Fem1DRepresentation.h
 	Fem2DRepresentation.h
 	Fem3DRepresentation.h

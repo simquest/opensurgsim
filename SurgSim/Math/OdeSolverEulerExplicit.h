@@ -35,34 +35,18 @@ namespace Math
 /// \note which leads to the integration scheme:
 /// \note { x(t+dt) = x(t) + dt.v(t)
 /// \note { v(t+dt) = v(t) + dt.a(t)
-/// \tparam State Type of the state y=(x v)
-/// \note State is expected to hold on to the dof derivatives and have the API:
-/// \note   Vector& getPositions();
-/// \note   Vector& getVelocities();
-/// \note   Vector& getAccelerations();
-template <class State>
-class OdeSolverEulerExplicit : public OdeSolver<State>
+class OdeSolverEulerExplicit : public OdeSolver
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverEulerExplicit(OdeEquation<State>* equation);
+	explicit OdeSolverEulerExplicit(OdeEquation* equation);
 
-	virtual void solve(double dt, const State& currentState, State* newState) override;
-
-public:
-	// Variables used from OdeSolver
-	using OdeSolver<State>::m_compliance;
-	using OdeSolver<State>::m_equation;
-	using OdeSolver<State>::m_linearSolver;
-	using OdeSolver<State>::m_name;
-	using OdeSolver<State>::m_systemMatrix;
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 };
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#include "SurgSim/Math/OdeSolverEulerExplicit-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVEREULEREXPLICIT_H

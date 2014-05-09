@@ -42,7 +42,7 @@ public:
 	virtual RepresentationType getType() const override;
 
 protected:
-	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
+	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 								const SurgSim::Math::RigidTransform3d& transform) override;
 };
 

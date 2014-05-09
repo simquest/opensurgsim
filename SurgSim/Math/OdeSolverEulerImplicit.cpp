@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_ODESOLVEREULERIMPLICIT_INL_H
-#define SURGSIM_MATH_ODESOLVEREULERIMPLICIT_INL_H
+#include "SurgSim/Math/OdeSolverEulerImplicit.h"
+#include "SurgSim/Math/OdeState.h"
 
 namespace SurgSim
 {
@@ -22,15 +22,13 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State>
-OdeSolverEulerImplicit<State>::OdeSolverEulerImplicit(OdeEquation<State>* equation)
-	: OdeSolver<State>(equation)
+OdeSolverEulerImplicit::OdeSolverEulerImplicit(OdeEquation* equation)
+	: OdeSolver(equation)
 {
 	m_name = "Ode Solver Euler Implicit";
 }
 
-template <class State>
-void OdeSolverEulerImplicit<State>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	// General equation to solve:
 	//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
@@ -55,20 +53,19 @@ void OdeSolverEulerImplicit<State>::solve(double dt, const State& currentState, 
 	m_systemMatrix += (*D);
 	m_systemMatrix += (*K) * dt;
 
-	// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
-	Vector& deltaV = newState->getAccelerations();
+	// Apply boundary conditions to the linear system
+	currentState.applyBoundaryConditionsToVector(f);
+	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
+
+	// Computes deltaV (stored in the velocities) and m_compliance = 1/m_systemMatrix
+	Vector& deltaV = newState->getVelocities();
 	(*m_linearSolver)(m_systemMatrix, *f, &deltaV, &m_compliance);
 
 	// Compute the new state using the Euler Implicit scheme:
 	newState->getVelocities() = currentState.getVelocities() + deltaV;
 	newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();
-
-	// Adjust the acceleration variable to contain accelerations: a = deltaV/dt
-	newState->getAccelerations() /= dt;
 }
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#endif // SURGSIM_MATH_ODESOLVEREULERIMPLICIT_INL_H

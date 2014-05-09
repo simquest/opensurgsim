@@ -18,9 +18,9 @@
 
 #include <memory>
 
-#include "SurgSim/Physics/DeformableRepresentation.h"
-
 #include "SurgSim/Math/Vector.h"
+
+#include "SurgSim/Physics/DeformableRepresentation.h"
 
 namespace SurgSim
 {
@@ -28,7 +28,6 @@ namespace SurgSim
 namespace Physics
 {
 
-class DeformableRepresentationState;
 class FemElement;
 struct FemRepresentationCoordinate;
 
@@ -94,25 +93,25 @@ public:
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
 	/// \return The vector containing f(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
-	virtual SurgSim::Math::Vector& computeF(const DeformableRepresentationState& state) override;
+	virtual SurgSim::Math::Vector& computeF(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of the LHS matrix M(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
 	/// \return The matrix M(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	virtual const SurgSim::Math::Matrix& computeM(const DeformableRepresentationState& state) override;
+	virtual const SurgSim::Math::Matrix& computeM(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of D = -df/dv (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix D = -df/dv(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	virtual const SurgSim::Math::Matrix& computeD(const DeformableRepresentationState& state) override;
+	virtual const SurgSim::Math::Matrix& computeD(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of K = -df/dx (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix K = -df/dx(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	virtual const SurgSim::Math::Matrix& computeK(const DeformableRepresentationState& state) override;
+	virtual const SurgSim::Math::Matrix& computeK(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
 	/// When all the terms are needed, this method can perform optimization in evaluating everything together
@@ -123,7 +122,7 @@ public:
 	/// \param[out] K The matrix K = -df/dx(x,v)
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector** f,
+	virtual void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
 		SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
 
 protected:
@@ -138,21 +137,21 @@ protected:
 	/// \note If {useGlobalMassMatrix | useGlobalStiffnessMatrix} is True, {M | K} will be used
 	/// \note If {useGlobalMassMatrix | useGlobalStiffnessMatrix} is False
 	/// \note    the {mass|stiffness} component will be computed FemElement by FemElement
-	void addRayleighDampingForce(SurgSim::Math::Vector* f, const DeformableRepresentationState& state,
+	void addRayleighDampingForce(SurgSim::Math::Vector* f, const SurgSim::Math::OdeState& state,
 		bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false, double scale = 1.0);
 
 	/// Adds the FemElements forces to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the FemElements forces into
 	/// \param state The state vector containing positions and velocities
 	/// \param scale A scaling factor to scale the FemElements forces with
-	void addFemElementsForce(SurgSim::Math::Vector* f, const DeformableRepresentationState& state, double scale = 1.0);
+	void addFemElementsForce(SurgSim::Math::Vector* f, const SurgSim::Math::OdeState& state, double scale = 1.0);
 
 	/// Adds the gravity force to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the gravity force into
 	/// \param state The state vector containing positions and velocities
 	/// \param scale A scaling factor to scale the gravity force with
 	/// \note This method does not do anything if gravity is disabled
-	void addGravityForce(SurgSim::Math::Vector *f, const DeformableRepresentationState& state, double scale = 1.0);
+	void addGravityForce(SurgSim::Math::Vector *f, const SurgSim::Math::OdeState& state, double scale = 1.0);
 
 	virtual bool doInitialize() override;
 

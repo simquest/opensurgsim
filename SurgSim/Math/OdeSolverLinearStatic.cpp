@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_ODESOLVERLINEARSTATIC_INL_H
-#define SURGSIM_MATH_ODESOLVERLINEARSTATIC_INL_H
+#include "SurgSim/Math/OdeSolverLinearStatic.h"
+#include "SurgSim/Math/OdeState.h"
 
 namespace SurgSim
 {
@@ -22,38 +22,32 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State>
-OdeSolverLinearStatic<State>::OdeSolverLinearStatic(OdeEquation<State>* equation)
-	: OdeSolverStatic<State>(equation),
-	m_initialized(false)
+OdeSolverLinearStatic::OdeSolverLinearStatic(OdeEquation* equation)
+	: OdeSolverStatic(equation), m_initialized(false)
 {
 	m_name = "Ode Solver Linear Static";
 }
 
-template <class State>
-void OdeSolverLinearStatic<State>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverLinearStatic::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	if (!m_initialized)
 	{
-		OdeSolverStatic<State>::solve(dt, currentState, newState);
+		OdeSolverStatic::solve(dt, currentState, newState);
 		m_initialized = true;
 	}
 	else
 	{
 		Vector& f = m_equation.computeF(currentState);
+		currentState.applyBoundaryConditionsToVector(&f);
 		Vector deltaX = m_compliance * f;
 
 		// Compute the new state using the static scheme:
 		newState->getPositions() = currentState.getPositions()  + deltaX;
 		// Velocities are null in static mode (no time dependency)
 		newState->getVelocities().setZero();
-		// Accelerations are null in static mode (no time dependency)
-		newState->getAccelerations().setZero();
 	}
 }
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#endif // SURGSIM_MATH_ODESOLVERLINEARSTATIC_INL_H

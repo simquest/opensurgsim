@@ -32,6 +32,7 @@ set(UNIT_TEST_SOURCES
 	OdeSolverRungeKutta4Tests.cpp
 	OdeSolverStaticTests.cpp
 	OdeSolverTests.cpp
+	OdeStateTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
 	TriangleTriangleContactCalculationTests.cpp

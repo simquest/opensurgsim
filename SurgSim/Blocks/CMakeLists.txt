@@ -41,8 +41,8 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpringNDRepresentationUtils.h
 	PoseInterpolator.h
 	SphereElement.h
-	TransferDeformableStateToVerticesBehavior.h
-	TransferDeformableStateToVerticesBehavior-inl.h
+	TransferOdeStateToVerticesBehavior.h
+	TransferOdeStateToVerticesBehavior-inl.h
 	VisualizeContactsBehavior.h
 )
 

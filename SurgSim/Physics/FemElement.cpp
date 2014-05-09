@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/FemElement.h"
-
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/FemElement.h"
 
 namespace SurgSim
 {
@@ -29,7 +29,7 @@ FemElement::FemElement() : m_numDofPerNode(0), m_rho(0.0), m_E(0.0), m_nu(0.0)
 FemElement::~FemElement()
 {}
 
-void FemElement::initialize(const DeformableRepresentationState& state)
+void FemElement::initialize(const SurgSim::Math::OdeState& state)
 {
 	SURGSIM_ASSERT(m_rho != 0.0) << "Mass density is not set. Did you call setMassDensity() ?";
 	SURGSIM_ASSERT(m_nu != 0.0) << "Poisson ratio is not set. Did you call setPoissonRatio() ?";
@@ -94,7 +94,7 @@ double FemElement::getMassDensity() const
 	return m_rho;
 }
 
-double FemElement::getMass(const DeformableRepresentationState& state) const
+double FemElement::getMass(const SurgSim::Math::OdeState& state) const
 {
 	return getVolume(state) * m_rho;
 }
