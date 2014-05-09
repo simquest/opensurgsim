@@ -22,6 +22,7 @@
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Timer.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"

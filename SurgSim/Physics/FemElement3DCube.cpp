@@ -14,10 +14,9 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Log.h"
-
-#include "SurgSim/Physics/FemElement3DCube.h"
-
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/FemElement3DCube.h"
 
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;

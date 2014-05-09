@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"

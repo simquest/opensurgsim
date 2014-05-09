@@ -19,6 +19,7 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/MlcpConstraintType.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"

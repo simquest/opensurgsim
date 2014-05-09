@@ -18,9 +18,10 @@
 #include <memory>
 #include <array>
 
-#include "SurgSim/Physics/FemElement3DCube.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/FemElement3DCube.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Vector;

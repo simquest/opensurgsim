@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/FemElement2DTriangle.h"
 

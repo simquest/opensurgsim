@@ -19,12 +19,15 @@
 #include <vector>
 
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-
 
 namespace SurgSim
 {
+
+namespace Math
+{
+class OdeState;
+};
 
 namespace Physics
 {

@@ -18,15 +18,16 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
-#include "SurgSim/Physics/FemElement3DCube.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
+#include "SurgSim/Physics/FemElement3DCube.h"
+#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+
+using SurgSim::Math::getSubVector;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::Fem3DRepresentationLocalization;
-using SurgSim::Math::getSubVector;
-
-#include "SurgSim/Math/Vector.h"
 
 namespace
 {

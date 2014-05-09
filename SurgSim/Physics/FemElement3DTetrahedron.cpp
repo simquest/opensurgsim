@@ -14,10 +14,9 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Log.h"
-
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
-
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/FemElement3DTetrahedron.h"
 
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::getSubMatrix;

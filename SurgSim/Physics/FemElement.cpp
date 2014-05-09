@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/FemElement.h"
-
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/FemElement.h"
 
 namespace SurgSim
 {

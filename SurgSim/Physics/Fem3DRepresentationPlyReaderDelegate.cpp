@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"

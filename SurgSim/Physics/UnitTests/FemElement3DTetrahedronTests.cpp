@@ -18,9 +18,10 @@
 #include <memory>
 #include <array>
 
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/FemElement3DTetrahedron.h"
 
 using SurgSim::Physics::FemElement3DTetrahedron;
 using SurgSim::Math::Vector3d;
