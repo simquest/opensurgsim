@@ -20,16 +20,16 @@ namespace SurgSim
 namespace DataStructures
 {
 
-DataGroupCopier::DataGroupCopier(const DataGroup& from, DataGroup& to) :
-	m_from(from),
-	m_to(to)
+DataGroupCopier::DataGroupCopier(const DataGroup& source, DataGroup& target) :
+	m_source(source),
+	m_target(target)
 {
-	m_map = m_to.findMap(m_from);
+	m_map = m_target.findMap(m_source);
 }
 
 void DataGroupCopier::copy()
 {
-	m_to.copy(m_from, m_map);
+	m_target.copy(m_source, m_map);
 }
 
 };  // namespace DataStructures

@@ -29,19 +29,19 @@ class DataGroupCopier
 public:
 
 	/// Construct a copier.
-	/// \param from The source DataGroup.
-	/// \param to The target DataGroup.
-	DataGroupCopier(const DataGroup& from, DataGroup& to);
+	/// \param source The source DataGroup.
+	/// \param target The target DataGroup.
+	DataGroupCopier(const DataGroup& source, DataGroup& target);
 
 	/// Copies the NamedData entries with the same names.  Resets entries in the target that are reset in the source.
 	void copy();
 
 private:
 	/// The source DataGroup.
-	const DataGroup& m_from;
+	const DataGroup& m_source;
 
 	/// The target DataGroup.
-	DataGroup& m_to;
+	DataGroup& m_target;
 
 	/// The map from source to target.
 	SurgSim::DataStructures::DataGroupCopyMap m_map;
