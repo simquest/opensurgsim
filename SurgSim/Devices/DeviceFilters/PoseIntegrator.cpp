@@ -17,6 +17,7 @@
 
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/DataGroupCopier.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -117,6 +118,9 @@ void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataS
 			{
 				m_timer.start();
 				rate = 0.0;
+				SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Devices/Filters/PoseIntegrator")) <<
+					"The Timer used by " << getName() <<
+					" had a clock fail.  The calculated velocities will be zero this update.";
 			}
 
 			// Before updating the current pose, use it to calculate the angular velocity.
