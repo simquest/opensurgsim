@@ -64,15 +64,15 @@ protected:
 	Vector m_force;
 
 	/// Internal structure to hold the 4 temporary evaluations
-	struct RungeKuttaState
+	struct RungeKuttaDerivedState
 	{
-		RungeKuttaState(){}
-		RungeKuttaState(const Vector& p, const Vector& v) : position(p), velocity(v) {}
-		Vector position;
+		RungeKuttaDerivedState(){}
+		RungeKuttaDerivedState(const Vector& v, const Vector& a) : velocity(v), acceleration(a) {}
 		Vector velocity;
+		Vector acceleration;
 	};
 	/// Runge kutta 4 intermediate system evaluations
-	RungeKuttaState m_k1, m_k2, m_k3, m_k4;
+	RungeKuttaDerivedState m_k1, m_k2, m_k3, m_k4;
 
 public:
 	using OdeSolver<State>::m_compliance;

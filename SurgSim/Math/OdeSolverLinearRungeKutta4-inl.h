@@ -54,32 +54,32 @@ void OdeSolverLinearRungeKutta4<State>::solve(double dt, const State& currentSta
 		// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
 
 		// 1st evaluate k1 (note that y(n) is currentState)
-		m_k1.position = currentState.getVelocities();
-		m_k1.velocity = m_compliance * m_equation.computeF(currentState);
+		m_k1.velocity = currentState.getVelocities();
+		m_k1.acceleration = m_compliance * m_equation.computeF(currentState);
 
 		// 2nd evaluate k2
-		newState->getPositions()  = currentState.getPositions()  + m_k1.position * dt / 2.0;
-		newState->getVelocities() = currentState.getVelocities() + m_k1.velocity * dt / 2.0;
-		m_k2.position = newState->getVelocities();
-		m_k2.velocity = m_compliance * m_equation.computeF(*newState);
+		newState->getPositions()  = currentState.getPositions()  + m_k1.velocity * dt / 2.0;
+		newState->getVelocities() = currentState.getVelocities() + m_k1.acceleration * dt / 2.0;
+		m_k2.velocity = newState->getVelocities();
+		m_k2.acceleration = m_compliance * m_equation.computeF(*newState);
 
 		// 3rd evaluate k3
-		newState->getPositions()  = currentState.getPositions()  + m_k2.position * dt / 2.0;
-		newState->getVelocities() = currentState.getVelocities() + m_k2.velocity * dt / 2.0;
-		m_k3.position = newState->getVelocities();
-		m_k3.velocity = m_compliance * m_equation.computeF(*newState);
+		newState->getPositions()  = currentState.getPositions()  + m_k2.velocity * dt / 2.0;
+		newState->getVelocities() = currentState.getVelocities() + m_k2.acceleration * dt / 2.0;
+		m_k3.velocity = newState->getVelocities();
+		m_k3.acceleration = m_compliance * m_equation.computeF(*newState);
 
 		// 4th evaluate k4
-		newState->getPositions()  = currentState.getPositions()  + m_k3.position * dt;
-		newState->getVelocities() = currentState.getVelocities() + m_k3.velocity * dt;
-		m_k4.position = newState->getVelocities();
-		m_k4.velocity = m_compliance * m_equation.computeF(*newState);
+		newState->getPositions()  = currentState.getPositions()  + m_k3.velocity * dt;
+		newState->getVelocities() = currentState.getVelocities() + m_k3.acceleration * dt;
+		m_k4.velocity = newState->getVelocities();
+		m_k4.acceleration = m_compliance * m_equation.computeF(*newState);
 
 		// Compute the new state using Runge Kutta 4 integration scheme:
 		newState->getPositions()  = currentState.getPositions();
-		newState->getPositions() += (m_k1.position + m_k4.position + 2.0 * (m_k2.position + m_k3.position)) * dt / 6.0;
+		newState->getPositions() += (m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
 		newState->getVelocities() = currentState.getVelocities();
-		newState->getVelocities() += (m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
+		newState->getVelocities() += (m_k1.acceleration + m_k4.acceleration + 2.0 * (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
 	}
 }
 

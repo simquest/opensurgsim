@@ -109,6 +109,13 @@ void doSolveTest()
 		Vector position;
 		Vector velocity;
 	};
+	struct RungeKuttaDerivedState
+	{
+		RungeKuttaDerivedState(){}
+		RungeKuttaDerivedState(const Vector& v, const Vector& a) : velocity(v), acceleration(a){}
+		Vector velocity;
+		Vector acceleration;
+	};
 	// Test Runge Kutta 4 algorithm itself (without viscosity)
 	{
 		MassPoint m;
@@ -130,27 +137,27 @@ void doSolveTest()
 		// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
 
 		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
-		RungeKuttaState k1, k2, k3, k4;
+		RungeKuttaDerivedState k1, k2, k3, k4;
 		RungeKuttaState yn_plus_1;
 
 		// 1st evaluation k1 = f(t(n)       , y(n)            )
-		k1.position = yn.velocity;
-		k1.velocity = m.m_gravity;
+		k1.velocity = yn.velocity;
+		k1.acceleration = m.m_gravity;
 
 		// 2nd evaluation k2 = f(t(n) + dt/2, y(n) + k1 * dt/2)
-		k2.position = yn.velocity + k1.velocity * dt / 2.0;
-		k2.velocity = m.m_gravity;
+		k2.velocity = yn.velocity + k1.acceleration * dt / 2.0;
+		k2.acceleration = m.m_gravity;
 
 		// 3rd evaluation k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
-		k3.position = yn.velocity + k2.velocity * dt / 2.0;
-		k3.velocity = m.m_gravity;
+		k3.velocity = yn.velocity + k2.acceleration * dt / 2.0;
+		k3.acceleration = m.m_gravity;
 
 		// 4th evaluation k4 = f(t(n) + dt  , y(n) + k3 * dt  )
-		k4.position = yn.velocity + k3.velocity * dt;
-		k4.velocity = m.m_gravity;
+		k4.velocity = yn.velocity + k3.acceleration * dt;
+		k4.acceleration = m.m_gravity;
 
-		yn_plus_1.position = yn.position + dt / 6.0 * (k1.position + k4.position + 2.0 * (k2.position + k3.position));
-		yn_plus_1.velocity = yn.velocity + dt / 6.0 * (k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
+		yn_plus_1.position = yn.position + dt / 6.0 * (k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
+		yn_plus_1.velocity = yn.velocity + dt / 6.0 * (k1.acceleration + k4.acceleration + 2.0 * (k2.acceleration + k3.acceleration));
 
 		T solver(&m);
 
@@ -184,27 +191,27 @@ void doSolveTest()
 		// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
 
 		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
-		RungeKuttaState k1, k2, k3, k4;
+		RungeKuttaDerivedState k1, k2, k3, k4;
 		RungeKuttaState yn_plus_1;
 
 		// 1st evaluation k1 = f(t(n)       , y(n)            )
-		k1.position = yn.velocity;
-		k1.velocity = m.m_gravity - 0.1 * yn.velocity / m.m_mass;
+		k1.velocity = yn.velocity;
+		k1.acceleration = m.m_gravity - 0.1 * yn.velocity / m.m_mass;
 
 		// 2nd evaluation k2 = f(t(n) + dt/2, y(n) + k1 * dt/2)
-		k2.position = yn.velocity + k1.velocity * dt / 2.0;
-		k2.velocity = m.m_gravity - 0.1 * (yn.velocity + k1.velocity * dt / 2.0) / m.m_mass;
+		k2.velocity = yn.velocity + k1.acceleration * dt / 2.0;
+		k2.acceleration = m.m_gravity - 0.1 * (yn.velocity + k1.acceleration * dt / 2.0) / m.m_mass;
 
 		// 3rd evaluation k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
-		k3.position = yn.velocity + k2.velocity * dt / 2.0;
-		k3.velocity = m.m_gravity - 0.1 * (yn.velocity + k2.velocity * dt / 2.0) / m.m_mass;
+		k3.velocity = yn.velocity + k2.acceleration * dt / 2.0;
+		k3.acceleration = m.m_gravity - 0.1 * (yn.velocity + k2.acceleration * dt / 2.0) / m.m_mass;
 
 		// 4th evaluation k4 = f(t(n) + dt  , y(n) + k3 * dt  )
-		k4.position = yn.velocity + k3.velocity * dt;
-		k4.velocity = m.m_gravity - 0.1 * (yn.velocity + k3.velocity * dt) / m.m_mass;
+		k4.velocity = yn.velocity + k3.acceleration * dt;
+		k4.acceleration = m.m_gravity - 0.1 * (yn.velocity + k3.acceleration * dt) / m.m_mass;
 
-		yn_plus_1.position = yn.position + dt / 6.0 * (k1.position + k4.position + 2.0 * (k2.position + k3.position));
-		yn_plus_1.velocity = yn.velocity + dt / 6.0 * (k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
+		yn_plus_1.position = yn.position + dt / 6.0 * (k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
+		yn_plus_1.velocity = yn.velocity + dt / 6.0 * (k1.acceleration + k4.acceleration + 2.0 * (k2.acceleration + k3.acceleration));
 
 		T solver(&m);
 
