@@ -44,6 +44,7 @@ public:
 	{
 		setView(std::make_shared<MockView>(name + " View"));
 		setCamera(std::make_shared<MockCamera>(name + " Camera"));
+		getCamera()->setRenderGroupReference("Test");
 	}
 
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override

@@ -77,7 +77,10 @@ std::vector<std::string> Representation::getGroupReferences()
 
 void Representation::clearGroupReferences()
 {
-	m_groups.clear();
+	if (!checkAwake("clearGroupReference"))
+	{
+		m_groups.clear();
+	}
 }
 
 bool Representation::removeGroupReference(const std::string& name)
@@ -92,8 +95,11 @@ bool Representation::removeGroupReference(const std::string& name)
 
 void Representation::setGroupReference(const std::string& group)
 {
-	clearGroupReferences();
-	m_groups.insert(group);
+	if (!checkAwake("setGroupReference"))
+	{
+		clearGroupReferences();
+		m_groups.insert(group);
+	}
 }
 
 bool Representation::checkAwake(const std::string& functionName)
@@ -105,6 +111,11 @@ bool Representation::checkAwake(const std::string& functionName)
 				"was already awake for component " << getName() << " this has no effect and should be avoided.";
 	}
 	return isAwake();
+}
+
+Representation::~Representation()
+{
+
 }
 
 }

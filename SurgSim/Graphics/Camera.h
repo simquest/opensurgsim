@@ -38,6 +38,8 @@ class RenderTarget;
 /// A disabled (invisible) camera does not produce an image.
 ///
 /// Graphics::Camera is used with Graphics::View to provide the visualization of the virtual scene to the user.
+/// Cameras refer to a group that contain all the elements that they render, they may also parts of other group that
+/// determine whether they are rendered.
 class Camera : public virtual Representation
 {
 public:
@@ -55,15 +57,17 @@ public:
 	explicit Camera(const std::string& name);
 
 	/// Set the group reference that this camera wants to use as the group for rendering. Objects that, reference
-	/// the same group will be rendered by this camera.
+	/// the same group will be rendered by this camera. The manager will do the actual creation of the group.
 	/// \param name Name of the group to be used for rendering
 	void setRenderGroupReference(const std::string& name);
 
-	/// \return The render group reference for this camera
+	/// Gets the name of the rendergroup used for rendering
+	/// \return The name of the group to be used for rendering
 	std::string getRenderGroupReference() const;
 
 	/// Sets the group of representations that will be seen by this camera.
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
+	/// \note The camera can not be part of the group that it is rendering
 	/// \param	group	Group of representations
 	/// \return	True if it succeeded, false if it failed
 	virtual bool setRenderGroup(std::shared_ptr<Group> group);
@@ -108,6 +112,9 @@ public:
 	virtual bool addGroupReference(const std::string& name) override;
 
 private:
+
+	virtual bool doInitialize() override;
+
 	/// Group of representations that this camera sees
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
 	std::shared_ptr<Group> m_group;

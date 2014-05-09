@@ -62,13 +62,13 @@ public:
 	/// \return	True if all representations are added successfully, false if failure
 	virtual bool append(std::shared_ptr<Group> group);
 
-	/// Removes an representation
+	/// Removes an representation.
 	/// \param	representation	Representation to remove from this group
 	/// \return	True if the representation is removed successfully, false if representation is not in this group or
-	/// other failure
+	/// other failure.
 	virtual bool remove(std::shared_ptr<Representation> representation);
 
-	/// Returns the representations in this group
+	/// \return a container with all the representations in this group.
 	const std::vector<std::shared_ptr<Representation>>& getMembers() const;
 
 	/// Removes all representations.

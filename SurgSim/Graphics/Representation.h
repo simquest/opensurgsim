@@ -19,7 +19,6 @@
 #include "SurgSim/Framework/Representation.h"
 
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Vector.h"
 
 #include <unordered_set>
 
@@ -48,10 +47,8 @@ public:
 	/// \param	name	Name of the representation
 	explicit Representation(const std::string& name);
 
-	virtual ~Representation()
-	{
-
-	}
+	/// Destructor
+	virtual ~Representation();
 
 	/// Sets whether the representation is currently visible
 	/// \param	visible	True for visible, false for invisible

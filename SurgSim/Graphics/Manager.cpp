@@ -76,19 +76,20 @@ bool Manager::addRepresentation(std::shared_ptr<Representation> representation)
 	{
 		m_representations.push_back(representation);
 
-		auto camera = std::dynamic_pointer_cast<Camera>(representation);
-		// If we have a camera we need to find, and set the group that is is rendering
-		if (camera != nullptr)
-		{
-			camera->setRenderGroup(getOrCreateGroup(camera->getRenderGroupReference()));
-		}
-
-		// Add the component to all the groups that it wants to be in
+		// Check all the groups that are requested for this representation, fetch them and
+		// add this representation
 		std::vector<std::string> requestedGroups = representation->getGroupReferences();
 		for (auto groupName = std::begin(requestedGroups); groupName != std::end(requestedGroups); ++groupName)
 		{
 			auto group = getOrCreateGroup(*groupName);
 			group->add(representation);
+		}
+
+		// Additionally for a camera create or fetch the RenderGroup
+		auto camera = std::dynamic_pointer_cast<Camera>(representation);
+		if (camera != nullptr)
+		{
+			camera->setRenderGroup(getOrCreateGroup(camera->getRenderGroupReference()));
 		}
 
 		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added representation " << representation->getName();

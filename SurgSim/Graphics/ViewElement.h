@@ -31,7 +31,6 @@ namespace Graphics
 
 class Camera;
 class View;
-class Camera;
 
 /// Basic SceneElement that wraps a View so that it can be added to the Scene.
 ///

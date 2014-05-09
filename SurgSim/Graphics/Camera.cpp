@@ -66,6 +66,13 @@ bool Camera::addGroupReference(const std::string& name)
 	return result;
 }
 
+bool Camera::doInitialize()
+{
+	SURGSIM_ASSERT(m_renderGroupReference != "")
+			<< "Can't have a camera without a RenderGroupReference.";
+	return true;
+}
+
 }
 }
 

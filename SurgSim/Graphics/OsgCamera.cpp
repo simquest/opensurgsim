@@ -95,7 +95,7 @@ bool OsgCamera::setRenderGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 {
 
 	SURGSIM_ASSERT(group->getName() == Camera::getRenderGroupReference())
-			<< "Trying to set the wrong group in the camera getRenderGroupName() returns <"
+			<< "Trying to set the wrong group in the camera. getRenderGroupName() returns <"
 			<< Camera::getRenderGroupReference() << "> group->getName() is <" << group->getName() << ">.";
 
 	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);

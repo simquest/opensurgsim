@@ -92,7 +92,7 @@ bool OsgManager::addView(std::shared_ptr<SurgSim::Graphics::View> view)
 	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(view);
 
 	bool result = true;
-	if (osgView == nullptr || !Manager::addView(view))
+	if (osgView == nullptr)
 	{
 		SURGSIM_LOG_WARNING(getLogger()) << __FUNCTION__ << " View is not a subclass of OsgView " << view->getName();
 		result = false;
@@ -100,8 +100,12 @@ bool OsgManager::addView(std::shared_ptr<SurgSim::Graphics::View> view)
 	else
 	{
 		SURGSIM_ASSERT(view->getCamera() != nullptr) << "View should have a camera when added to the manager.";
-		m_viewer->addView(osgView->getOsgView());
+		if (Manager::addView(view))
+		{
+			m_viewer->addView(osgView->getOsgView());
+		}
 	}
+
 	return result;
 }
 
@@ -120,7 +124,6 @@ bool OsgManager::removeView(std::shared_ptr<SurgSim::Graphics::View> view)
 bool OsgManager::doInitialize()
 {
 	m_hudElement = std::make_shared<OsgScreenSpacePass>(Representation::DefaultHudGroupName);
-	m_hudElement->getCamera()->setGroupReference(Representation::DefaultGroupName);
 	return true;
 }
 

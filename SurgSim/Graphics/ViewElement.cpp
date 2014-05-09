@@ -16,7 +16,6 @@
 #include "SurgSim/Graphics/ViewElement.h"
 
 #include "SurgSim/Graphics/Camera.h"
-#include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Graphics/View.h"
 
 namespace SurgSim

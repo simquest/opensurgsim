@@ -135,7 +135,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	// Move the camera from left to right over along the scene
 	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator_2");
 	RigidTransform3d from = makeRigidTransform(
-								Vector3d(4.0, 2.0, -4.0),
+								Vector3d(-4.0, 2.0, -4.0),
 								Vector3d(0.0, 0.0, 0.0),
 								Vector3d(0.0, 1.0, 0.0));
 	RigidTransform3d to = makeRigidTransform(

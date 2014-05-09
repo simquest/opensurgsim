@@ -137,6 +137,7 @@ TEST(OsgCameraTests, PoseTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
+	camera->setRenderGroupReference("Test");
 	std::shared_ptr<BasicSceneElement> element = std::make_shared<BasicSceneElement>("element");
 	element->addComponent(camera);
 	element->initialize();
