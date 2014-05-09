@@ -23,6 +23,7 @@
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Framework/Runtime.h" //< Used to initialize the Component Fem3DRepresentation
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -230,7 +231,8 @@ TEST(Fem3DRepresentationTests, DoInitializeTest)
 
 TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 {
-	std::string fileName = "Data/Fem3DCreateLocalizationTest/wound_deformable.ply";
+	SurgSim::Framework::ApplicationData data("config.txt");
+	std::string fileName = data.findFile("Geometry/wound_deformable.ply");
 
 	auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
 

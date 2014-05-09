@@ -190,8 +190,8 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 TEST_F(RenderTests, MeshRenderTest)
 {
-	auto data = runtime->getApplicationData();
-	auto filename = data->findFile("Fem3DMeshRenderTest/wound_deformable.ply");
+	SurgSim::Framework::ApplicationData data("config.txt");
+	auto filename = data.findFile("Geometry/wound_deformable.ply");
 
 	auto fem = createFemSceneElement("Fem", filename, SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
