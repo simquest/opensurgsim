@@ -49,7 +49,7 @@ void SurgSim::DataStructures::Tree::setRoot(std::shared_ptr<TreeNode> root)
 	m_root = root;
 }
 
-std::shared_ptr<TreeNode> SurgSim::DataStructures::Tree::getRoot()
+std::shared_ptr<TreeNode> SurgSim::DataStructures::Tree::getRoot() const
 {
 	return m_root;
 }

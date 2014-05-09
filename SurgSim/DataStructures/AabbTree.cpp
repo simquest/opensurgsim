@@ -57,6 +57,61 @@ const SurgSim::Math::Aabbd& AabbTree::getAabb() const
 	return m_typedRoot->getAabb();
 }
 
+std::list<AabbTree::TreeNodePairType> AabbTree::spatialJoin(const AabbTree& otherTree) const
+{
+	std::list<TreeNodePairType> result;
+
+	spatialJoin(std::static_pointer_cast<AabbTreeNode>(getRoot()),
+				std::static_pointer_cast<AabbTreeNode>(otherTree.getRoot()),
+				&result);
+
+	return result;
+}
+
+void AabbTree::spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
+						   std::shared_ptr<AabbTreeNode> rhsParent,
+						   std::list<TreeNodePairType>* result) const
+{
+	if (!SurgSim::Math::doAabbIntersect(lhsParent->getAabb(), rhsParent->getAabb()))
+	{
+		return;
+	}
+
+	if ((lhsParent->getNumChildren() == 0) && (rhsParent->getNumChildren() == 0))
+	{
+		result->emplace_back(lhsParent, rhsParent);
+	}
+	else if (lhsParent->getNumChildren() == 0)
+	{
+		for (size_t j = 0; j < rhsParent->getNumChildren(); j++)
+		{
+			auto rhs = std::static_pointer_cast<AabbTreeNode>(rhsParent->getChild(j));
+			spatialJoin(lhsParent, rhs, result);
+		}
+	}
+	else if (rhsParent->getNumChildren() == 0)
+	{
+		for (size_t i = 0; i < lhsParent->getNumChildren(); i++)
+		{
+			auto lhs = std::static_pointer_cast<AabbTreeNode>(lhsParent->getChild(i));
+			spatialJoin(lhs, rhsParent, result);
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < lhsParent->getNumChildren(); i++)
+		{
+			auto lhs = std::static_pointer_cast<AabbTreeNode>(lhsParent->getChild(i));
+
+			for (size_t j = 0; j < rhsParent->getNumChildren(); j++)
+			{
+				auto rhs = std::static_pointer_cast<AabbTreeNode>(rhsParent->getChild(j));
+				spatialJoin(lhs, rhs, result);
+			}
+		}
+	}
+}
+
 }
 }
 

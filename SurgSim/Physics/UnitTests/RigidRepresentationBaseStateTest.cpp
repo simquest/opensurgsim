@@ -13,20 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-
 #include <string>
 #include <memory>
 
-#include "SurgSim/Physics/RigidRepresentationBaseState.h"
-using SurgSim::Physics::RigidRepresentationBaseState;
+#include <gtest/gtest.h>
 
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
-using SurgSim::Math::Vector3d;
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidRepresentationBaseState.h"
+#include "SurgSim/Physics/PhysicsConvert.h"
+
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
+using SurgSim::Physics::RigidRepresentationBaseState;
 
 class RigidRepresentationBaseStateTest : public ::testing::Test
 {
@@ -57,7 +58,7 @@ public:
 
 TEST_F(RigidRepresentationBaseStateTest, ConstructorTest)
 {
-	ASSERT_NO_THROW( {RigidRepresentationBaseState rigidRepresentationBaseState;});
+	ASSERT_NO_THROW(RigidRepresentationBaseState rigidRepresentationBaseState);
 }
 
 TEST_F(RigidRepresentationBaseStateTest, DefaultValueTest)
@@ -81,4 +82,21 @@ TEST_F(RigidRepresentationBaseStateTest, ResetTest)
 	// Reset should reset the pose to identity
 	rigidRepresentationBaseState->reset();
 	EXPECT_TRUE(rigidRepresentationBaseState->getPose().isApprox(m_identityTransformation));
+}
+
+TEST_F(RigidRepresentationBaseStateTest, SerializationTest)
+{
+	RigidRepresentationBaseState rigidRepresentationBaseState;
+	rigidRepresentationBaseState.setValue("Pose", m_currentTransformation);
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node =
+		YAML::convert<SurgSim::Physics::RigidRepresentationBaseState>::encode(rigidRepresentationBaseState));
+	EXPECT_EQ(1u, node.size());
+
+	RigidRepresentationBaseState newRigidRepresentationBaseState =
+		node.as<SurgSim::Physics::RigidRepresentationBaseState>();
+
+	EXPECT_TRUE(m_currentTransformation.isApprox(
+		newRigidRepresentationBaseState.getValue<SurgSim::Math::RigidTransform3d>("Pose")));
 }

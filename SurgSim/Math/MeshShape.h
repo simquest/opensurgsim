@@ -24,10 +24,16 @@
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+class AabbTree;
+}
 
 namespace Math
 {
@@ -62,20 +68,27 @@ public:
 	/// \return the type of the shape
 	virtual int getType() override;
 
+	/// Gets the initial mesh
+	/// \return The collision mesh associated to this MeshShape
+	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getInitialMesh();
+
 	/// Get mesh
 	/// \return The collision mesh associated to this MeshShape
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh();
 
 	/// Get the volume of the shape
+	/// \note this parameter is valid with respect to the initial mesh
 	/// \return The volume of the shape (in m-3)
 	virtual double getVolume() const override;
 
 	/// Get the volumetric center of the shape
+	/// \note this parameter is valid with respect to the initial mesh
 	/// \return The center of the shape
 	virtual Vector3d getCenter() const override;
 
 	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
+	/// \note this parameter is valid with respect to the initial mesh
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
@@ -90,6 +103,17 @@ public:
 	/// Get the file name of the external file which contains the triangle mesh.
 	/// \return File name of the external file which contains the triangle mesh.
 	std::string getFileName() const;
+
+	/// Set the object's global pose
+	/// \param pose the rigid transform to apply
+	void setPose(const SurgSim::Math::RigidTransform3d &pose);
+
+	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void updateAabbTree();
+
+	/// Get the AabbTree
+	/// \return The object's associated AabbTree
+	std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree();
 
 private:
 	/// Compute useful volume integrals based on the triangle mesh, which
@@ -107,6 +131,12 @@ private:
 
 	/// The triangle mesh contained by this shape.
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
+
+	/// The initial triangle mesh contained by this shape.
+	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_initialMesh;
+
+	/// The aabb tree used to accelerate collision detection against the mesh
+	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
 
 	/// File name of the external file which contains the triangle mesh.
 	std::string m_fileName;

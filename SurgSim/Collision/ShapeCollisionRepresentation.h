@@ -47,6 +47,8 @@ public:
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
+	virtual void update(const double& dt) override;
+
 private:
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
 };

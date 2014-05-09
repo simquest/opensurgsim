@@ -159,6 +159,20 @@ bool isPointInsideTriangle(
 			baryCoords[2] >= -Geometry::ScalarEpsilon);
 }
 
+/// Check whether the points are coplanar.
+/// \tparam T			Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt		Eigen Matrix options, can usually be inferred.
+/// \param a, b, c, d	Points to check for coplanarity.
+/// \return true if the points are coplanar.
+template <class T, int MOpt> inline
+bool isCoplanar(
+	const Eigen::Matrix<T, 3, 1, MOpt>& a,
+	const Eigen::Matrix<T, 3, 1, MOpt>& b,
+	const Eigen::Matrix<T, 3, 1, MOpt>& c,
+	const Eigen::Matrix<T, 3, 1, MOpt>& d)
+{
+	return std::abs((c - a).dot((b - a).cross(d - c))) < Geometry::ScalarEpsilon;
+}
 
 /// Calculate the normal distance between a point and a line.
 /// \param pt		The input point.

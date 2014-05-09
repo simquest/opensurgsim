@@ -16,9 +16,9 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
 
-#include "SurgSim/Physics/RigidRepresentationBaseState.h"
-
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidRepresentationBaseState.h"
 
 namespace SurgSim
 {
@@ -33,76 +33,53 @@ class RigidRepresentationState : public RigidRepresentationBaseState
 {
 public:
 	/// Default constructor
-	RigidRepresentationState()
-		: RigidRepresentationBaseState()
-	{
-		m_v.setZero();
-		m_w.setZero();
-	}
+	RigidRepresentationState();
+
+	/// Default constructor
+	RigidRepresentationState(const RigidRepresentationState& rhs);
 
 	/// Destructor
-	virtual ~RigidRepresentationState()
-	{
-	}
+	virtual ~RigidRepresentationState();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentationState);
 
 	/// Comparison operator
-	/// \param s A RigidRepresentationState to compare it to
+	/// \param rhs A RigidRepresentationState to compare it to
 	/// \return True if the 2 states are equals, False otherwise
-	bool operator ==(const RigidRepresentationState &s) const
-	{
-		return (RigidRepresentationBaseState::operator ==(s) && m_v == s.m_v && m_w == s.m_w);
-	}
+	bool operator==(const RigidRepresentationState& rhs) const;
 
 	/// Comparison operator
-	/// \param s A RigidRepresentationState to compare it to
+	/// \param rhs A RigidRepresentationState to compare it to
 	/// \return False if the 2 states are equals, True otherwise
-	bool operator !=(const RigidRepresentationState &s) const
-	{
-		return ! ((*this) == s);
-	}
+	bool operator!=(const RigidRepresentationState& rhs) const;
 
 	/// Reset the state to default values
 	/// Vectors will be filled with 0
 	/// Rotations will be set to identity (quaternion or matrix type)
 	/// If you want to reset to initial values, you need to save them separately
 	/// in another RigidRepresentationState and assign it to this instance.
-	virtual void reset()
-	{
-		RigidRepresentationBaseState::reset();
-
-		m_v.setZero();
-		m_w.setZero();
-	}
+	virtual void reset();
 
 	/// Get the linear velocity
 	/// \return the linear velocity
-	const SurgSim::Math::Vector3d& getLinearVelocity() const
-	{
-		return m_v;
-	}
+	const SurgSim::Math::Vector3d& getLinearVelocity() const;
 
 	/// Get the angular velocity
 	/// \return the angular velocity
-	const SurgSim::Math::Vector3d& getAngularVelocity() const
-	{
-		return m_w;
-	}
+	const SurgSim::Math::Vector3d& getAngularVelocity() const;
 
 	/// Set the linear velocity
 	/// \param v The linear velocity
-	void setLinearVelocity(const SurgSim::Math::Vector3d &v)
-	{
-		m_v = v;
-	}
+	void setLinearVelocity(const SurgSim::Math::Vector3d &v);
 
 	/// Set the angular velocity
 	/// \param w The angular velocity
-	void setAngularVelocity(const SurgSim::Math::Vector3d &w)
-	{
-		m_w = w;
-	}
+	void setAngularVelocity(const SurgSim::Math::Vector3d &w);
 
 private:
+	/// Register accessors of serializable properties
+	void addSerializableProperty();
+
 	/// Linear velocity
 	SurgSim::Math::Vector3d m_v;
 
@@ -111,7 +88,6 @@ private:
 };
 
 }; // Physics
-
 }; // SurgSim
 
 #endif // SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
