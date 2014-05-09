@@ -13,19 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_DATAGROUP_INL_H
-#define SURGSIM_DATASTRUCTURES_DATAGROUP_INL_H
+#include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
 {
 namespace DataStructures
 {
 
-inline DataGroup::DataGroup()
+DataGroup::DataGroup()
 {
 }
 
-inline DataGroup::DataGroup(const DataGroup& dataGroup) :
+DataGroup::DataGroup(const DataGroup& dataGroup) :
 	m_poses(dataGroup.m_poses),
 	m_vectors(dataGroup.m_vectors),
 	m_matrices(dataGroup.m_matrices),
@@ -37,7 +36,7 @@ inline DataGroup::DataGroup(const DataGroup& dataGroup) :
 {
 }
 
-inline DataGroup& DataGroup::operator=(const DataGroup& dataGroup)
+DataGroup& DataGroup::operator=(const DataGroup& dataGroup)
 {
 	m_poses = dataGroup.m_poses;
 	m_vectors = dataGroup.m_vectors;
@@ -51,7 +50,7 @@ inline DataGroup& DataGroup::operator=(const DataGroup& dataGroup)
 	return *this;
 }
 
-inline DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
+DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
 {
 	m_poses = std::move(dataGroup.m_poses);
 	m_vectors = std::move(dataGroup.m_vectors);
@@ -65,88 +64,88 @@ inline DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
 	return *this;
 }
 
-inline NamedData<DataGroup::PoseType>& DataGroup::poses()
+NamedData<DataGroup::PoseType>& DataGroup::poses()
 {
 	return m_poses;
 }
 
-inline const NamedData<DataGroup::PoseType>& DataGroup::poses() const
+const NamedData<DataGroup::PoseType>& DataGroup::poses() const
 {
 	return m_poses;
 }
 
-inline NamedData<DataGroup::VectorType>& DataGroup::vectors()
+NamedData<DataGroup::VectorType>& DataGroup::vectors()
 {
 	return m_vectors;
 }
 
-inline const NamedData<DataGroup::VectorType>& DataGroup::vectors() const
+const NamedData<DataGroup::VectorType>& DataGroup::vectors() const
 {
 	return m_vectors;
 }
 
-inline NamedData<DataGroup::DynamicMatrixType>& DataGroup::matrices()
+NamedData<DataGroup::DynamicMatrixType>& DataGroup::matrices()
 {
 	return m_matrices;
 }
 
-inline const NamedData<DataGroup::DynamicMatrixType>& DataGroup::matrices() const
+const NamedData<DataGroup::DynamicMatrixType>& DataGroup::matrices() const
 {
 	return m_matrices;
 }
 
 
-inline NamedData<DataGroup::ScalarType>& DataGroup::scalars()
+NamedData<DataGroup::ScalarType>& DataGroup::scalars()
 {
 	return m_scalars;
 }
 
-inline const NamedData<DataGroup::ScalarType>& DataGroup::scalars() const
+const NamedData<DataGroup::ScalarType>& DataGroup::scalars() const
 {
 	return m_scalars;
 }
 
-inline NamedData<DataGroup::IntegerType>& DataGroup::integers()
+NamedData<DataGroup::IntegerType>& DataGroup::integers()
 {
 	return m_integers;
 }
 
-inline const NamedData<DataGroup::IntegerType>& DataGroup::integers() const
+const NamedData<DataGroup::IntegerType>& DataGroup::integers() const
 {
 	return m_integers;
 }
 
-inline NamedData<DataGroup::BooleanType>& DataGroup::booleans()
+NamedData<DataGroup::BooleanType>& DataGroup::booleans()
 {
 	return m_booleans;
 }
 
-inline const NamedData<DataGroup::BooleanType>& DataGroup::booleans() const
+const NamedData<DataGroup::BooleanType>& DataGroup::booleans() const
 {
 	return m_booleans;
 }
 
-inline NamedData<DataGroup::StringType>& DataGroup::strings()
+NamedData<DataGroup::StringType>& DataGroup::strings()
 {
 	return m_strings;
 }
 
-inline const NamedData<DataGroup::StringType>& DataGroup::strings() const
+const NamedData<DataGroup::StringType>& DataGroup::strings() const
 {
 	return m_strings;
 }
 
-inline NamedVariantData& DataGroup::customData()
+NamedVariantData& DataGroup::customData()
 {
 	return m_customData;
 }
 
-inline const NamedVariantData& DataGroup::customData() const
+const NamedVariantData& DataGroup::customData() const
 {
 	return m_customData;
 }
 
-inline void DataGroup::resetAll()
+void DataGroup::resetAll()
 {
 	m_poses.resetAll();
 	m_vectors.resetAll();
@@ -158,7 +157,5 @@ inline void DataGroup::resetAll()
 	m_customData.resetAll();
 }
 
-};  // namespace Input
+};  // namespace DataStructures
 };  // namespace SurgSim
-
-#endif  // SURGSIM_DATASTRUCTURES_DATAGROUP_INL_H
