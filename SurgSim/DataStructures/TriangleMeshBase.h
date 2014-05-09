@@ -134,7 +134,7 @@ public:
 	/// Returns an array of the triangle's vertices' positions
 	/// \param id the id of the triangle
 	/// \return an array of the triangle's vertices' positions
-	std::array<SurgSim::Math::Vector3d, 3> getTriangleVerticesPositions(unsigned int id) const;
+	std::array<SurgSim::Math::Vector3d, 3> getTrianglePositions(size_t id) const;
 
 	/// Test if the TriangleMeshBase is valid (valid vertex Ids used in all MeshElements)
 	/// \return True if the TriangleMeshBase is valid, False otherwise (the topology is then broken)

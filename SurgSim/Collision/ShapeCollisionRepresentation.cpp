@@ -53,8 +53,7 @@ void ShapeCollisionRepresentation::update(const double& dt)
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
 	if (meshShape != nullptr)
 	{
-		meshShape->setGlobalPose(getPose());
-		meshShape->updateAabbTree();
+		meshShape->setPose(getPose());
 	}
 }
 

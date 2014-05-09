@@ -70,7 +70,7 @@ std::list<AabbTree::TreeNodePairType> AabbTree::spatialJoin(const AabbTree& othe
 
 void AabbTree::spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
 						   std::shared_ptr<AabbTreeNode> rhsParent,
-						   std::list<TreeNodePairType>* result)
+						   std::list<TreeNodePairType>* result) const
 {
 	if (!SurgSim::Math::doAabbIntersect(lhsParent->getAabb(), rhsParent->getAabb()))
 	{

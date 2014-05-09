@@ -52,7 +52,7 @@ void TriangleMesh::doUpdate()
 	calculateNormals();
 }
 
-void TriangleMesh::copyWithTransform(const SurgSim::Math::RigidTransform3d &pose, const TriangleMesh& source)
+void TriangleMesh::copyWithTransform(const SurgSim::Math::RigidTransform3d& pose, const TriangleMesh& source)
 {
 	SURGSIM_ASSERT(getNumVertices() == source.getNumVertices())
 		<< "The source mesh must have the same number of vertices.";

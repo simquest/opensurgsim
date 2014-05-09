@@ -79,7 +79,7 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 				continue;
 			}
 
-			auto verticesA = collisionMeshA->getTriangleVerticesPositions(*i);
+			auto verticesA = collisionMeshA->getTrianglePositions(*i);
 
 			for (auto j = triangleListB.begin(); j != triangleListB.end(); ++j)
 			{
@@ -89,7 +89,7 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 					continue;
 				}
 
-				auto verticesB = collisionMeshB->getTriangleVerticesPositions(*j);
+				auto verticesB = collisionMeshB->getTrianglePositions(*j);
 
 				// Check if the triangles intersect.
 				if (SurgSim::Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],

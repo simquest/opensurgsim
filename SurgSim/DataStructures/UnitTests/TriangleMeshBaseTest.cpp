@@ -559,7 +559,7 @@ TEST_F(TriangleMeshBaseTest, loadTriangleMeshTest)
 	EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);
 }
 
-TEST_F(TriangleMeshBaseTest, GetTriangleVerticesPositions)
+TEST_F(TriangleMeshBaseTest, GetTrianglePositions)
 {
 	MockTriangleMeshBase mesh;
 
@@ -577,11 +577,11 @@ TEST_F(TriangleMeshBaseTest, GetTriangleVerticesPositions)
 	}
 
 	// Testing
-	for (unsigned int id = 0; id < mesh.getTriangles().size(); ++id)
+	for (size_t id = 0; id < mesh.getTriangles().size(); ++id)
 	{
-		auto verticesPositions = mesh.getTriangleVerticesPositions(id);
+		auto verticesPositions = mesh.getTrianglePositions(id);
 
-		auto &vertexIds = mesh.getTriangle(id).verticesId;
+		auto &vertexIds = mesh.getTriangle(static_cast<unsigned int>(id)).verticesId;
 
 		EXPECT_TRUE(mesh.getVertex(vertexIds[0]).position.isApprox(verticesPositions[0]));
 		EXPECT_TRUE(mesh.getVertex(vertexIds[1]).position.isApprox(verticesPositions[1]));

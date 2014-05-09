@@ -71,9 +71,9 @@ public:
 	/// \param lhsParent root node of the first tree
 	/// \param rhsParent root node of the second tree
 	/// \param result the list of all pairs of intersecting nodes
-	static void spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
-							std::shared_ptr<AabbTreeNode> rhsParent,
-							std::list<TreeNodePairType>* result);
+	void spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
+					 std::shared_ptr<AabbTreeNode> rhsParent,
+					 std::list<TreeNodePairType>* result) const;
 
 private:
 

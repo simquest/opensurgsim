@@ -99,7 +99,7 @@ public:
 
 	/// Set the object's global pose
 	/// \param pose the rigid transform to apply
-	void setGlobalPose(const SurgSim::Math::RigidTransform3d &pose);
+	void setPose(const SurgSim::Math::RigidTransform3d &pose);
 
 	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
 	void updateAabbTree();

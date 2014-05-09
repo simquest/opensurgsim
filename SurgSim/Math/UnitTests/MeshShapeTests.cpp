@@ -229,7 +229,6 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 	meshShape->setFileName(fileName);
 
-	meshShape->updateAabbTree();
 	auto tree = meshShape->getAabbTree();
 
 	auto triangles = meshShape->getMesh()->getTriangles();

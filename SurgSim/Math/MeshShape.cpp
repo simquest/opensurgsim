@@ -175,9 +175,10 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
 
-void MeshShape::setGlobalPose(const SurgSim::Math::RigidTransform3d &pose)
+void MeshShape::setPose(const SurgSim::Math::RigidTransform3d &pose)
 {
 	m_mesh->copyWithTransform(pose, *m_initialMesh);
+	updateAabbTree();
 }
 
 std::shared_ptr<SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree()
@@ -189,9 +190,9 @@ void MeshShape::updateAabbTree()
 {
 	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
 
-	for (unsigned int id = 0; id < m_mesh->getNumTriangles(); ++id)
+	for (size_t id = 0; id < m_mesh->getNumTriangles(); ++id)
 	{
-		auto vertices = m_mesh->getTriangleVerticesPositions(id);
+		auto vertices = m_mesh->getTrianglePositions(id);
 		m_aabbTree->add(SurgSim::Math::makeAabb(vertices[0], vertices[1], vertices[2]), id);
 	}
 }

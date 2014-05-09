@@ -80,7 +80,7 @@ public:
 	/// of vertices, edges, and triangles.
 	/// \param pose the transformation to be applied to the vertices and norms
 	/// \param source the mesh suppling the vertices and norms
-	void copyWithTransform(const SurgSim::Math::RigidTransform3d &pose, const TriangleMesh& source);
+	void copyWithTransform(const SurgSim::Math::RigidTransform3d& pose, const TriangleMesh& source);
 
 protected:
 	virtual void doUpdate() override;
