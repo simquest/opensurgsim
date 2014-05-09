@@ -16,11 +16,10 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 
-#include "SurgSim/Physics/RigidRepresentationBase.h"
-
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/RigidRepresentationBase.h"
 
 namespace SurgSim
 {
@@ -35,13 +34,14 @@ class RigidRepresentationState;
 class RigidRepresentation : public RigidRepresentationBase
 {
 public:
-
 	/// Constructor
 	/// \param name The rigid representation's name
 	explicit RigidRepresentation(const std::string& name);
 
 	/// Destructor
 	virtual ~RigidRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentation);
 
 	virtual RepresentationType getType() const override;
 
@@ -114,12 +114,9 @@ private:
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
 	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
-
-
 };
 
 }; // Physics
-
 }; // SurgSim
 
 #endif // SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
