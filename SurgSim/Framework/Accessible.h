@@ -102,6 +102,10 @@ public:
 	/// \param	setter	The setter.
 	void setAccessors(const std::string& name, GetterType getter, SetterType setter);
 
+	/// Removes all the accessors (getter and setter) for a given property
+	/// \param name The name of the property
+	void removeAccessors(const std::string& name);
+
 	/// Sets the functions used to convert data from and to a YAML::Node. Will throw and exception
 	/// if the data type that is passed to YAML cannot be converted into a YAML::Node
 	/// \param name The name of the property.

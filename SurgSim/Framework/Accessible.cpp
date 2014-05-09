@@ -71,6 +71,18 @@ void Accessible::setAccessors(const std::string& name, GetterType getter, Setter
 	setSetter(name, setter);
 }
 
+
+void Accessible::removeAccessors(const std::string& name)
+{
+	auto functors = m_functors.find(name);
+	if (functors != std::end(m_functors))
+	{
+		functors->second.setter = nullptr;
+		functors->second.getter = nullptr;
+	}
+}
+
+
 bool Accessible::isReadable(const std::string& name) const
 {
 	auto functors = m_functors.find(name);

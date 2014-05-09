@@ -240,6 +240,19 @@ TEST(AccessibleTest, SharedPointer)
 	EXPECT_EQ(5, *y);
 }
 
+TEST(AccessibleTest, RemoveAccessors)
+{
+	TestClass a;
+
+	EXPECT_NO_THROW(a.getValue("readWrite"));
+	EXPECT_NO_THROW(a.setValue("readWrite", 2));
+
+	a.removeAccessors("readWrite");
+
+	EXPECT_ANY_THROW(a.getValue("readWrite"));
+	EXPECT_ANY_THROW(a.setValue("readWrite", 2));
+}
+
 TEST(AccessibleTest, ConvertDoubleToFloat)
 {
 	// Values don't matter only care for them to be filled
