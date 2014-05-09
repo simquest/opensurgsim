@@ -61,7 +61,6 @@ set(UNIT_TEST_SOURCES
 	PushResultsTests.cpp
 	RepresentationTest.cpp
 	RigidCollisionRepresentationTest.cpp
-	RigidRepresentationBaseStateTest.cpp
 	RigidRepresentationBilateral3DTests.cpp
 	RigidRepresentationContactTests.cpp
 	RigidRepresentationLocalizationTest.cpp
