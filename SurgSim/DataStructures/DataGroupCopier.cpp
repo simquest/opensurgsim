@@ -30,7 +30,6 @@ DataGroupCopier::DataGroupCopier(const DataGroup& source, DataGroup& target) :
 	m_target(target)
 {
 	findMap();
-	m_source.poses().getDirectory();
 }
 
 void DataGroupCopier::copy()

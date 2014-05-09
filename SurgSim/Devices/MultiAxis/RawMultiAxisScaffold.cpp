@@ -429,10 +429,6 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	// TODO(bert): this code should cache the access indices.
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 	inputData.poses().set(SurgSim::DataStructures::Names::POSE, pose);
-	// The LINEAR_VELOCITY and ANGULAR_VELOCITY entries are set by PoseIntegrator if the device object is a
-	// MultiAxisDevice.
-	inputData.vectors().set(SurgSim::DataStructures::Names::LINEAR_VELOCITY, Vector3d::Zero());
-	inputData.vectors().set(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, Vector3d::Zero());
 	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_1, info->buttonStates[0]);
 	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_2, info->buttonStates[1]);
 	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_3, info->buttonStates[2]);
