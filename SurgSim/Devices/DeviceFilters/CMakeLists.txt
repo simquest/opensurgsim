@@ -14,7 +14,13 @@
 # limitations under the License.
 
 link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} SurgSimFramework SurgSimInput)
+set(LIBS
+	${LIBS}
+	${Boost_LIBRARIES}
+	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimInput
+)
 
 include_directories(
 	${Boost_INCLUDE_DIR}
@@ -39,6 +45,9 @@ surgsim_add_library(
 	"${DEVICE_FILTERS_SOURCES}" "${DEVICE_FILTERS_HEADERS}"
 	SurgSim/Devices/DeviceFilters
 )
+
+target_link_libraries(SurgSimDeviceFilters ${LIBS})
+
 if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
