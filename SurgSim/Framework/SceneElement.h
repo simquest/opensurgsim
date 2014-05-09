@@ -145,6 +145,8 @@ public:
 	virtual bool decode(const YAML::Node& node);
 
 private:
+	YAML::Node encodeComponent(std::shared_ptr<SurgSim::Framework::Component> component, bool standalone) const;
+
 	/// Name of this SceneElement
 	std::string m_name;
 
