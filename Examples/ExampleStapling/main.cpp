@@ -430,6 +430,10 @@ int main(int argc, char* argv[])
 		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
 		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision1"));
 
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(wound, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(arm, "Collision"));
+
 	runtime->execute();
 	return 0;
 }
