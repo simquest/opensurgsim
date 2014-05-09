@@ -19,6 +19,7 @@
 
 
 #include <gtest/gtest.h>
+#include <array>
 #include <numeric>
 #include <cmath>
 
@@ -743,6 +744,49 @@ TEST_F(GeometryTest, PointInsideTriangleWithoutNormal)
 
 	inputPoint = tri.v0 + tri.v0v2 * 2 + tri.v0v1 * 2;
 	EXPECT_FALSE(isPointInsideTriangle(inputPoint, tri.v0, tri.v1, tri.v2));
+}
+
+TEST_F(GeometryTest, Coplanarity)
+{
+	struct CoplanarityTestCandidate
+	{
+		bool expected;
+		std::array<Vector3d, 4> points;
+	};
+
+	CoplanarityTestCandidate candidates[] =
+	{
+		{true, Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0)},
+		{true, Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), Vector3d(3.7, 0.0, 0.0)},
+		{true, Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), Vector3d(2.3, 0.0, 0.0), Vector3d(3.7, 0.0, 0.0)},
+		{true, Vector3d(0.0, 0.0, 0.0), Vector3d(1.1, 0.0, 0.0), Vector3d(2.3, 0.0, 0.0), Vector3d(3.7, 0.0, 0.0)},
+		{true, Vector3d(0.0, 0.0, 0.0), Vector3d(1.1, 1.5, 0.0), Vector3d(2.3, 0.0, 0.0), Vector3d(3.7, 0.0, 0.0)},
+		{true, Vector3d(0.0, 0.0, 0.0), Vector3d(1.1, 1.5, 0.0), Vector3d(2.3, 0.0, 0.0), Vector3d(3.7, 3.0, 0.0)},
+		{false, Vector3d(0.0, 0.0, 1.0), Vector3d(1.1, 1.5, 0.0), Vector3d(2.3, 0.0, 0.0), Vector3d(3.7, 3.0, 0.0)},
+		{false, Vector3d(0.0, 0.0, 0.0), Vector3d(1.1, 1.5, 1.1), Vector3d(2.3, 0.0, 0.0), Vector3d(3.7, 3.0, 0.0)},
+		{false, Vector3d(0.0, 0.0, 0.0), Vector3d(1.1, 1.5, 0.0), Vector3d(2.3, 0.0, 7.7), Vector3d(3.7, 3.0, 0.0)},
+		{false, Vector3d(0.0, 0.0, 0.0), Vector3d(1.1, 1.5, 0.0), Vector3d(2.3, 0.0, 0.0), Vector3d(3.7, 3.0, -9.6)},
+
+		{true, Vector3d(0.0, 0.0, 0.0), Vector3d(1.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), Vector3d(12.3, -41.3, 0.0)},
+		{false, Vector3d(0.0, 0.0, 0.0), Vector3d(1.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), Vector3d(12.3, -41.3, 4.0)},
+
+		{false, Vector3d(10932.645, 43.1987, -0.009874245),
+				Vector3d(53432.4, -9.87243, 654.31),
+				Vector3d(28.71, 0.005483927, 2.34515),
+				Vector3d(5897.1, -5.432, 512152.7654)}
+	};
+
+	for (auto candidate = std::begin(candidates); candidate != std::end(candidates); ++candidate)
+	{
+		EXPECT_EQ(candidate->expected, isCoplanar(candidate->points[0],
+												  candidate->points[1],
+												  candidate->points[2],
+												  candidate->points[3]))
+			<< "Candidate points were [" << candidate->points[0].transpose() << "], ["
+										 << candidate->points[1].transpose() << "], ["
+										 << candidate->points[2].transpose() << "], ["
+										 << candidate->points[3].transpose() << "]";
+	}
 }
 
 typedef std::tuple<Segment, MockTriangle, VectorType, bool> SegTriIntersectionData;

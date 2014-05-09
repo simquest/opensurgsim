@@ -27,6 +27,8 @@
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Collision::ContactCalculation;

@@ -40,7 +40,9 @@ set(SURGSIM_MATH_SOURCES
 	OdeSolverLinearEulerExplicit.cpp
 	OdeSolverLinearEulerExplicitModified.cpp
 	OdeSolverLinearEulerImplicit.cpp
+	OdeSolverLinearRungeKutta4.cpp
 	OdeSolverLinearStatic.cpp
+	OdeSolverRungeKutta4.cpp
 	OdeSolverStatic.cpp
 	OdeState.cpp
 	PlaneShape.cpp
@@ -80,7 +82,9 @@ set(SURGSIM_MATH_HEADERS
 	OdeSolverLinearEulerExplicit.h
 	OdeSolverLinearEulerExplicitModified.h
 	OdeSolverLinearEulerImplicit.h
+	OdeSolverLinearRungeKutta4.h
 	OdeSolverLinearStatic.h
+	OdeSolverRungeKutta4.h
 	OdeSolverStatic.h
 	OdeState.h
 	PlaneShape.h

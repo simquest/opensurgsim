@@ -12,31 +12,36 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
-#ifndef SURGSIM_MATH_MESHSHAPE_INL_H
-#define SURGSIM_MATH_MESHSHAPE_INL_H
+#ifndef SURGSIM_MATH_ODESOLVERLINEARRUNGEKUTTA4_H
+#define SURGSIM_MATH_ODESOLVERLINEARRUNGEKUTTA4_H
+
+#include "SurgSim/Math/OdeSolverRungeKutta4.h"
 
 namespace SurgSim
 {
+
 namespace Math
 {
 
-template <class VertexData, class EdgeData, class TriangleData>
-MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh) :
-	m_volume(0.0), m_fileName()
+/// Linear Version of the Runge Kutta 4 ode solver
+/// This solver assumes that the system is linear
+/// ie that Mass, Damping, and Stiffness matrices do not change.
+class OdeSolverLinearRungeKutta4 : public OdeSolverRungeKutta4
 {
-	SURGSIM_ASSERT(mesh.isValid()) << "Invalid mesh";
+public:
+	/// Constructor
+	/// \param equation The ode equation to be solved
+	explicit OdeSolverLinearRungeKutta4(OdeEquation* equation);
 
-	m_initialMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
-	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*m_initialMesh);
-	updateAabbTree();
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
-	// Computes the geometric properties for the initial mesh
-	computeVolumeIntegrals();
-}
+private:
+	bool m_initialized;
+};
 
 }; // namespace Math
+
 }; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_MATH_ODESOLVERLINEARRUNGEKUTTA4_H

@@ -19,14 +19,12 @@
 #include <memory>
 
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
+class RigidRepresentationBase;
 
 /// Collision Representation class that wraps a RigidRepresentation, this can be used to strictly tie the
 /// Collision Representation to the Rigid, so even if the shape of the rigid changes, the collision representation
@@ -34,17 +32,16 @@ namespace Physics
 class RigidCollisionRepresentation : public SurgSim::Collision::Representation
 {
 public:
-
 	/// Constructor
 	/// \param	name	The name of rigid collision representation
 	explicit RigidCollisionRepresentation(const std::string& name);
 
-	/// Set rigid representation
-	/// \param	representation	The rigid representation
-	void setRigidRepresentation(std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation);
-
 	/// Destructor
 	virtual ~RigidCollisionRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::RigidCollisionRepresentation);
+
+	virtual void update(const double& dt) override;
 
 	/// Get the pose of the representation
 	/// \return The pose of this representation
@@ -58,6 +55,10 @@ public:
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
+	/// Set rigid representation
+	/// \param	representation	The rigid representation
+	void setRigidRepresentation(std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation);
+
 	/// Gets physics representation.
 	/// \return	The physics representation.
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> getRigidRepresentation();
@@ -69,4 +70,4 @@ private:
 }; // namespace Collision
 }; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_PHYSICS_RIGIDCOLLISIONREPRESENTATION_H

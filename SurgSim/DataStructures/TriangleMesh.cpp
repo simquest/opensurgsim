@@ -52,5 +52,31 @@ void TriangleMesh::doUpdate()
 	calculateNormals();
 }
 
+void TriangleMesh::copyWithTransform(const SurgSim::Math::RigidTransform3d& pose, const TriangleMesh& source)
+{
+	SURGSIM_ASSERT(getNumVertices() == source.getNumVertices())
+		<< "The source mesh must have the same number of vertices.";
+	SURGSIM_ASSERT(getNumEdges() == source.getNumEdges())
+		<< "The source mesh must have the same number of edges";
+	SURGSIM_ASSERT(getNumTriangles() == source.getNumTriangles())
+		<< "The source mesh must have the same number of triangles";
+
+	auto targetVertex = getVertices().begin();
+	auto const& vertices = source.getVertices();
+	for (auto it = vertices.cbegin(); it != vertices.cend(); ++it)
+	{
+		targetVertex->position = pose * it->position;
+		++targetVertex;
+	}
+
+	auto targetTriangle = getTriangles().begin();
+	auto const& triangles = source.getTriangles();
+	for (auto it = triangles.cbegin(); it != triangles.cend(); ++it)
+	{
+		targetTriangle->data.normal = pose.linear() * it->data.normal;
+		++targetTriangle;
+	}
+}
+
 }; // namespace DataStructures
 }; // namespace SurgSim

@@ -75,6 +75,7 @@ void DeformableCollisionRepresentation::update(const double& dt)
 		m_mesh->setVertexPosition(nodeId, state->getPosition(nodeId));
 	}
 	m_mesh->update();
+	m_shape->updateAabbTree();
 }
 
 bool DeformableCollisionRepresentation::doInitialize()

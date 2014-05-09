@@ -17,13 +17,14 @@
 #define SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
 
 #include "SurgSim/Physics/RigidRepresentationBase.h"
-#include "SurgSim/Physics/RigidRepresentationBaseState.h"
 
 namespace SurgSim
 {
 
 namespace Physics
 {
+
+class RigidRepresentationState;
 
 /// The FixedRepresentation class represents a physics entity without any motion nor
 /// compliance against which others physics entities can interact
@@ -32,34 +33,21 @@ class FixedRepresentation : public RigidRepresentationBase
 public:
 	/// Constructor
 	/// \param name The fixed representation's name
-	explicit FixedRepresentation(const std::string& name)
-		: RigidRepresentationBase(name)
-	{
-	}
+	explicit FixedRepresentation(const std::string& name);
 
 	/// Destructor
-	virtual ~FixedRepresentation()
-	{
-	}
+	virtual ~FixedRepresentation();
 
-	virtual RepresentationType getType() const override
-	{
-		return REPRESENTATION_TYPE_FIXED;
-	}
+	SURGSIM_CLASSNAME(SurgSim::Physics::FixedRepresentation);
 
-	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state)
-	{
-		// Do Nothing it is a fixed object
-	}
+	virtual RepresentationType getType() const override;
 
-	virtual void update(double dt) override
-	{
-		m_currentState.setPose(getPose());
-	}
+	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
+
+	virtual void update(double dt) override;
 };
 
 }; // Physics
-
 }; // SurgSim
 
 #endif  // SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
