@@ -46,6 +46,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemRepresentation.cpp
 	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
+	FixedRepresentation.cpp
 	FixedRepresentationBilateral3D.cpp
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
