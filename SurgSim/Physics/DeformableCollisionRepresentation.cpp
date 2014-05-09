@@ -17,6 +17,7 @@
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"

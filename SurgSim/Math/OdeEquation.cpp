@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/OdeEquation.h"
+#include "SurgSim/Math/OdeState.h"
 
 namespace SurgSim
 {

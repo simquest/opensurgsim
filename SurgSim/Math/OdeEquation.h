@@ -19,7 +19,6 @@
 #include <memory>
 
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -27,6 +26,8 @@ namespace SurgSim
 
 namespace Math
 {
+
+class OdeState;
 
 /// Ode equation of 2nd order of the form M(x,v).a = F(x, v) with (x0, v0) for initial conditions
 /// and a set of boundary conditions. The problem is called a Boundary Value Problem (BVP).

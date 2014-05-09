@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/LinearSolveAndInverse.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 
 namespace

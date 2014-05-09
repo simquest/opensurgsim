@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/Fem3DRepresentation.h"
-
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 
 using SurgSim::Framework::Logger;

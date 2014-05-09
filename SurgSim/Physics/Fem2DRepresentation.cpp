@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 
 namespace

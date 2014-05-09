@@ -23,6 +23,7 @@
 #include "SurgSim/Math/OdeSolverLinearEulerImplicit.h"
 #include "SurgSim/Math/OdeSolverLinearStatic.h"
 #include "SurgSim/Math/OdeSolverStatic.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
