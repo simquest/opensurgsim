@@ -34,13 +34,13 @@ namespace Physics
 
 RigidRepresentation::RigidRepresentation(const std::string& name) :
 	RigidRepresentationBase(name),
-	m_force(SurgSim::Math::Vector3d::Zero()),
-	m_torque(SurgSim::Math::Vector3d::Zero()),
-	m_externalForce(SurgSim::Math::Vector3d::Zero()),
-	m_externalTorque(SurgSim::Math::Vector3d::Zero()),
 	m_globalInertia(SurgSim::Math::Matrix33d::Zero()),
 	m_invGlobalInertia(SurgSim::Math::Matrix33d::Zero()),
+	m_force(SurgSim::Math::Vector3d::Zero()),
+	m_torque(SurgSim::Math::Vector3d::Zero()),
 	m_C(SurgSim::Math::Matrix66d::Zero()),
+	m_externalForce(SurgSim::Math::Vector3d::Zero()),
+	m_externalTorque(SurgSim::Math::Vector3d::Zero()),
 	m_externalStiffnessMatrix(SurgSim::Math::Matrix66d::Zero()),
 	m_externalDampingMatrix(SurgSim::Math::Matrix66d::Zero())
 {
