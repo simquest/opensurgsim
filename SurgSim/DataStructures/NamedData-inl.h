@@ -314,7 +314,7 @@ inline int NamedData<T>::getNumEntries() const
 
 template <typename T>
 template <typename N>
-inline void NamedData<T>::copy(const NamedData<N>& other, const IndexDirectoryCopyMap& map)
+inline void NamedData<T>::copy(const NamedData<N>& other, const NamedDataCopyMap& map)
 {
 	static_assert(std::is_same<T, N>::value, "NamedData<T>::copy can only copy from another NamedData<T>.");
 	for (auto it = map.cbegin(); it != map.cend(); ++it)

@@ -16,9 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_DATAGROUP_H
 #define SURGSIM_DATASTRUCTURES_DATAGROUP_H
 
-#include <array>
 #include <Eigen/Core>
-#include <unordered_map>
 
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/DataStructures/NamedVariantData.h"
@@ -29,9 +27,6 @@ namespace SurgSim
 {
 namespace DataStructures
 {
-
-/// The type used for copying values between two DataGroups that cannot assign to each other.  /sa findMap copy.
-typedef std::array<IndexDirectoryCopyMap, 8> DataGroupCopyMap;
 
 /// A collection of \ref NamedData objects.
 ///
@@ -197,18 +192,6 @@ public:
 
 	/// Mark all data as not current.
 	inline void resetAll();
-
-	/// Find the entries (by name) in this DataGroup that are in another DataGroup, and returns the map from the
-	/// other's indices to this object's indices.
-	/// \param other The DataGroup with which to compare.
-	/// \return The matched indices.
-	DataGroupCopyMap findMap(const DataGroup& other) const;
-
-	/// Copy the data from another DataGroup, based on maps of indices.
-	/// \param other The "from" DataGroup.
-	/// \param maps The maps of indices.
-	/// \sa findMap
-	void copy(const DataGroup& other, const DataGroupCopyMap& map);
 
 private:
 	/// The pose values.

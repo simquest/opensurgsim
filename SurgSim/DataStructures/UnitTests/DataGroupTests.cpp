@@ -368,109 +368,57 @@ TEST(DataGroupTests, Assignment)
 	EXPECT_NO_THROW(data4 = data);
 }
 
-/// Non-assignment copying DataGroups.
-TEST(DataGroupTests, Copying)
-{
-	DataGroupBuilder fromBuilder;
-	fromBuilder.addPose("test");
-	fromBuilder.addBoolean("test");
-	fromBuilder.addBoolean("test2");
-	DataGroup fromData = fromBuilder.createData();
-
-	DataGroupBuilder toBuilder;
-	toBuilder.addPose("test2"); //different pose name
-	toBuilder.addBoolean("test2"); // same boolean name
-	toBuilder.addEntriesFrom(fromData);
-	DataGroup toData = toBuilder.createData();
-
-	ASSERT_TRUE(toData.poses().hasEntry("test"));
-	ASSERT_TRUE(toData.poses().hasEntry("test2"));
-	ASSERT_TRUE(toData.booleans().hasEntry("test"));
-	ASSERT_TRUE(toData.booleans().hasEntry("test2"));
-
-	SurgSim::DataStructures::DataGroupCopyMap copyMap = toData.findMap(fromData);
-
-	const RigidTransform3d testPose = SurgSim::Math::makeRigidTransform(Vector3d(1.0, 2.0, 3.0),
-		Vector3d(1.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
-	ASSERT_TRUE(fromData.poses().set("test", testPose));
-
-	const bool testBoolean = true;
-	ASSERT_TRUE(fromData.booleans().set("test", testBoolean));
-
-	const bool testBoolean2 = false;
-	ASSERT_TRUE(fromData.booleans().set("test2", testBoolean2));
-	// Setting the initial value for the toData's test2 boolean to the opposite value.
-	ASSERT_TRUE(toData.booleans().set("test2", !testBoolean2));
-
-	// Copy the entries' values (that are in the maps) from the fromData to the toData.
-	toData.copy(fromData, copyMap);
-
-	RigidTransform3d outTestPose;
-	ASSERT_TRUE(toData.poses().get("test", &outTestPose));
-
-	EXPECT_FALSE(toData.poses().hasData("test2"));
-
-	bool outTestBoolean;
-	ASSERT_TRUE(toData.booleans().get("test", &outTestBoolean));
-
-	bool outTestBoolean2;
-	ASSERT_TRUE(toData.booleans().get("test2", &outTestBoolean2));
-
-	EXPECT_TRUE(outTestPose.isApprox(testPose, EPSILON));
-	EXPECT_EQ(testBoolean, outTestBoolean);
-	EXPECT_EQ(testBoolean2, outTestBoolean2);
-}
-
 /// Non-assignment copying DataGroups with DataGroupCopier.
 TEST(DataGroupTests, DataGroupCopier)
 {
-	DataGroupBuilder fromBuilder;
-	fromBuilder.addPose("test");
-	fromBuilder.addBoolean("test");
-	fromBuilder.addBoolean("test2");
-	DataGroup fromData = fromBuilder.createData();
+	DataGroupBuilder sourceBuilder;
+	sourceBuilder.addPose("test");
+	sourceBuilder.addBoolean("test");
+	sourceBuilder.addBoolean("test2");
+	DataGroup sourceData = sourceBuilder.createData();
 
-	DataGroupBuilder toBuilder;
-	toBuilder.addPose("test2"); //different pose name
-	toBuilder.addBoolean("test2"); // same boolean name
-	toBuilder.addEntriesFrom(fromData);
-	DataGroup toData = toBuilder.createData();
+	DataGroupBuilder targetBuilder;
+	targetBuilder.addPose("test2"); //different pose name
+	targetBuilder.addBoolean("test2"); // same boolean name
+	targetBuilder.addEntriesFrom(sourceData);
+	DataGroup targetData = targetBuilder.createData();
 
-	ASSERT_TRUE(toData.poses().hasEntry("test"));
-	ASSERT_TRUE(toData.poses().hasEntry("test2"));
-	ASSERT_TRUE(toData.booleans().hasEntry("test"));
-	ASSERT_TRUE(toData.booleans().hasEntry("test2"));
+	ASSERT_TRUE(targetData.poses().hasEntry("test"));
+	ASSERT_TRUE(targetData.poses().hasEntry("test2"));
+	ASSERT_TRUE(targetData.booleans().hasEntry("test"));
+	ASSERT_TRUE(targetData.booleans().hasEntry("test2"));
 
-	DataGroupCopier copier(fromData, toData);
+	ASSERT_THROW(targetData = sourceData, SurgSim::Framework::AssertionFailure);
+
+	DataGroupCopier copier(sourceData, targetData);
 
 	const RigidTransform3d testPose = SurgSim::Math::makeRigidTransform(Vector3d(1.0, 2.0, 3.0),
 		Vector3d(1.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
-	ASSERT_TRUE(fromData.poses().set("test", testPose));
+	ASSERT_TRUE(sourceData.poses().set("test", testPose));
 
 	const bool testBoolean = true;
-	ASSERT_TRUE(fromData.booleans().set("test", testBoolean));
+	ASSERT_TRUE(sourceData.booleans().set("test", testBoolean));
 
 	const bool testBoolean2 = false;
-	ASSERT_TRUE(fromData.booleans().set("test2", testBoolean2));
-	// Setting the initial value for the toData's test2 boolean to the opposite value.
-	ASSERT_TRUE(toData.booleans().set("test2", !testBoolean2));
+	ASSERT_TRUE(sourceData.booleans().set("test2", testBoolean2));
+	// Setting the initial value for the targetData's test2 boolean to the opposite value.
+	ASSERT_TRUE(targetData.booleans().set("test2", !testBoolean2));
 
-	// Copy the entries' values (that are in the maps) from the fromData to the toData.
+	// Copy the data.
 	copier.copy();
 
 	RigidTransform3d outTestPose;
-	ASSERT_TRUE(toData.poses().get("test", &outTestPose));
+	ASSERT_TRUE(targetData.poses().get("test", &outTestPose));
+	EXPECT_TRUE(outTestPose.isApprox(testPose, EPSILON));
 
-	EXPECT_FALSE(toData.poses().hasData("test2"));
+	EXPECT_FALSE(targetData.poses().hasData("test2"));
 
 	bool outTestBoolean;
-	ASSERT_TRUE(toData.booleans().get("test", &outTestBoolean));
+	ASSERT_TRUE(targetData.booleans().get("test", &outTestBoolean));
+	EXPECT_EQ(testBoolean, outTestBoolean);
 
 	bool outTestBoolean2;
-	ASSERT_TRUE(toData.booleans().get("test2", &outTestBoolean2));
-
-	EXPECT_TRUE(outTestPose.isApprox(testPose, EPSILON));
-	EXPECT_EQ(testBoolean, outTestBoolean);
+	ASSERT_TRUE(targetData.booleans().get("test2", &outTestBoolean2));
 	EXPECT_EQ(testBoolean2, outTestBoolean2);
 }
 

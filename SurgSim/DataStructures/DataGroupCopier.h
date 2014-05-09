@@ -16,18 +16,27 @@
 #ifndef SURGSIM_DATASTRUCTURES_DATAGROUPCOPIER_H
 #define SURGSIM_DATASTRUCTURES_DATAGROUPCOPIER_H
 
-#include "SurgSim/DataStructures/DataGroup.h"
+#include <array>
+#include <memory>
+#include <unordered_map>
+
+#include "SurgSim/DataStructures/NamedData.h"
 
 namespace SurgSim
 {
 namespace DataStructures
 {
+class DataGroup;
+class IndexDirectory;
+
+/// The type used for copying values between two DataGroups that cannot assign to each other.
+typedef std::array<NamedDataCopyMap, 8> DataGroupCopyMap;
+
 /// A class that assists in copying from one DataGroup to another, when assignment is not possible.
 /// \sa SurgSim::DataStructures::DataGroup
 class DataGroupCopier
 {
 public:
-
 	/// Construct a copier.
 	/// \param source The source DataGroup.
 	/// \param target The target DataGroup.
@@ -37,6 +46,16 @@ public:
 	void copy();
 
 private:
+	/// Find the entries (by name) from the source to target DataGroups.
+	void findMap();
+
+	/// Find the entries (by name) from the source to target IndexDirectories, and return the matching entries.
+	/// \param source The source IndexDirectory.
+	/// \param target The target IndexDirectory.
+	/// \return The map from source to target indices.
+	NamedDataCopyMap findMap(std::shared_ptr<const IndexDirectory> source,
+		std::shared_ptr<const IndexDirectory> target) const;
+
 	/// The source DataGroup.
 	const DataGroup& m_source;
 
@@ -44,7 +63,7 @@ private:
 	DataGroup& m_target;
 
 	/// The map from source to target.
-	SurgSim::DataStructures::DataGroupCopyMap m_map;
+	DataGroupCopyMap m_map;
 };
 
 };  // namespace DataStructures

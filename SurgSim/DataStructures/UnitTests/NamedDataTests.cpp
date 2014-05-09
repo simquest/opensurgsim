@@ -242,28 +242,29 @@ TEST(NamedDataTests, Put)
 /// Copying data between NamedData, when they cannot assign to each other.
 TEST(NamedDataTests, Copy)
 {
-	NamedDataBuilder<float> fromBuilder;
-	fromBuilder.addEntry("first");
-	fromBuilder.addEntry("second");
-	NamedData<float> fromData = fromBuilder.createData();
+	NamedDataBuilder<float> sourceBuilder;
+	sourceBuilder.addEntry("first");
+	sourceBuilder.addEntry("second");
+	NamedData<float> sourceData = sourceBuilder.createData();
 
-	NamedDataBuilder<float> toBuilder;
-	toBuilder.addEntry("second");
-	toBuilder.addEntry("third");
-	NamedData<float> toData = toBuilder.createData();
+	NamedDataBuilder<float> targetBuilder;
+	targetBuilder.addEntry("second");
+	targetBuilder.addEntry("third");
+	NamedData<float> targetData = targetBuilder.createData();
 
 	const float secondFloat = 1.23f;
-	fromData.set("second", secondFloat);
-	SurgSim::DataStructures::IndexDirectoryCopyMap map = toData.getDirectory()->findMap(fromData.getDirectory());
-	toData.copy(fromData, map);
+	sourceData.set("second", secondFloat);
+	SurgSim::DataStructures::NamedDataCopyMap map;
+	map[sourceData.getIndex("second")] = targetData.getIndex("second");
+	targetData.copy(sourceData, map);
 
-	EXPECT_FALSE(toData.hasEntry("first"));
+	EXPECT_FALSE(targetData.hasEntry("first"));
 
 	float outSecondFloat;
-	ASSERT_TRUE(toData.get("second", &outSecondFloat));
+	ASSERT_TRUE(targetData.get("second", &outSecondFloat));
 	EXPECT_NEAR(secondFloat, outSecondFloat, EPSILON);
 
-	EXPECT_FALSE(toData.hasData("third"));
+	EXPECT_FALSE(targetData.hasData("third"));
 }
 
 /// Getting data into the container.
