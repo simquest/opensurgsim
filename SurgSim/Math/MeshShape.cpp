@@ -16,6 +16,7 @@
 
 #include "SurgSim/Math/MeshShape.h"
 
+#include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
@@ -43,14 +44,20 @@ void MeshShape::setFileName(const std::string& fileName)
 {
 	using SurgSim::DataStructures::TriangleMesh;
 	m_fileName = fileName;
-
-	m_mesh = std::make_shared<TriangleMesh>(*SurgSim::DataStructures::loadTriangleMesh(fileName));
+	m_initialMesh = std::make_shared<TriangleMesh>(*SurgSim::DataStructures::loadTriangleMesh(fileName));
+	m_mesh = std::make_shared<TriangleMesh>(*m_initialMesh);
+	updateAabbTree();
 	computeVolumeIntegrals();
 }
 
 std::string MeshShape::getFileName() const
 {
 	return m_fileName;
+}
+
+std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getInitialMesh()
+{
+	return m_initialMesh;
 }
 
 std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh()
@@ -174,5 +181,26 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
 
+void MeshShape::setPose(const SurgSim::Math::RigidTransform3d &pose)
+{
+	m_mesh->copyWithTransform(pose, *m_initialMesh);
+	updateAabbTree();
+}
+
+std::shared_ptr<SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree()
+{
+	return m_aabbTree;
+}
+
+void MeshShape::updateAabbTree()
+{
+	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
+
+	for (size_t id = 0; id < m_mesh->getNumTriangles(); ++id)
+	{
+		auto vertices = m_mesh->getTrianglePositions(id);
+		m_aabbTree->add(SurgSim::Math::makeAabb(vertices[0], vertices[1], vertices[2]), id);
+	}
+}
 }; // namespace Math
 }; // namespace SurgSim

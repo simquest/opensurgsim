@@ -18,9 +18,11 @@
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverRungeKutta4.h"
 #include "SurgSim/Math/OdeSolverLinearEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverLinearEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverLinearEulerImplicit.h"
+#include "SurgSim/Math/OdeSolverLinearRungeKutta4.h"
 #include "SurgSim/Math/OdeSolverLinearStatic.h"
 #include "SurgSim/Math/OdeSolverStatic.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
@@ -179,11 +181,13 @@ bool DeformableRepresentation::doWakeUp()
 	using SurgSim::Math::OdeSolverEulerExplicit;
 	using SurgSim::Math::OdeSolverEulerExplicitModified;
 	using SurgSim::Math::OdeSolverEulerImplicit;
+	using SurgSim::Math::OdeSolverRungeKutta4;
+	using SurgSim::Math::OdeSolverStatic;
 	using SurgSim::Math::OdeSolverLinearEulerExplicit;
 	using SurgSim::Math::OdeSolverLinearEulerExplicitModified;
 	using SurgSim::Math::OdeSolverLinearEulerImplicit;
+	using SurgSim::Math::OdeSolverLinearRungeKutta4;
 	using SurgSim::Math::OdeSolverLinearStatic;
-	using SurgSim::Math::OdeSolverStatic;
 
 	using SurgSim::Math::LinearSolveAndInverseDenseMatrix;
 
@@ -217,6 +221,9 @@ bool DeformableRepresentation::doWakeUp()
 	case SurgSim::Math::INTEGRATIONSCHEME_STATIC:
 		m_odeSolver = std::make_shared<OdeSolverStatic<DeformableRepresentationState>>(this);
 		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4:
+		m_odeSolver = std::make_shared<OdeSolverRungeKutta4<DeformableRepresentationState>>(this);
+		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER:
 		m_odeSolver = std::make_shared<OdeSolverLinearEulerExplicit<DeformableRepresentationState>>(this);
 		break;
@@ -228,6 +235,9 @@ bool DeformableRepresentation::doWakeUp()
 		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC:
 		m_odeSolver = std::make_shared<OdeSolverLinearStatic<DeformableRepresentationState>>(this);
+		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4:
+		m_odeSolver = std::make_shared<OdeSolverLinearRungeKutta4<DeformableRepresentationState>>(this);
 		break;
 	default:
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())

@@ -171,7 +171,7 @@ bool isCoplanar(
 	const Eigen::Matrix<T, 3, 1, MOpt>& c,
 	const Eigen::Matrix<T, 3, 1, MOpt>& d)
 {
-	return abs((c - a).dot((b - a).cross(d - c))) < Geometry::ScalarEpsilon;
+	return std::abs((c - a).dot((b - a).cross(d - c))) < Geometry::ScalarEpsilon;
 }
 
 /// Calculate the normal distance between a point and a line.

@@ -46,7 +46,7 @@ TEST(SceneElementTest, Pose)
 	element.setPose(pose);
 	EXPECT_TRUE(element.getPose().isApprox(pose));
 	EXPECT_TRUE(element.getPoseComponent()->getPose().isApprox(pose));
-	
+
 	// One should not try to add a PoseComponent to a SceneElement.
 	// Use SceneElment::setPose() instead.
 	auto poseComponent = std::make_shared<SurgSim::Framework::PoseComponent>("TestPoseComponent");
