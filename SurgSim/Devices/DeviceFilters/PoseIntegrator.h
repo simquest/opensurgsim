@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include "Surgsim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Input/CommonDevice.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
