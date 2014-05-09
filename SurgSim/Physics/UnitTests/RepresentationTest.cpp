@@ -91,7 +91,7 @@ TEST(RepresentationTest, SerializationTest)
 		EXPECT_EQ(1u, node.size());
 
 		YAML::Node data = node["SurgSim::Physics::MockRepresentation"];
-		EXPECT_EQ(6u, data.size());
+		EXPECT_EQ(7u, data.size());
 
 		std::shared_ptr<MockRepresentation> newRepresentation;
 		ASSERT_NO_THROW(newRepresentation =
@@ -101,6 +101,7 @@ TEST(RepresentationTest, SerializationTest)
 		EXPECT_EQ("SurgSim::Physics::MockRepresentation", newRepresentation->getClassName());
 		EXPECT_TRUE(newRepresentation->getValue<bool>("IsActive"));
 		EXPECT_TRUE(newRepresentation->getValue<bool>("IsGravityEnabled"));
+		EXPECT_TRUE(newRepresentation->getValue<bool>("IsDrivingSceneElementPose"));
 		EXPECT_EQ(1u, newRepresentation->getValue<size_t>("NumDof"));
 	}
 
@@ -125,26 +126,29 @@ TEST(RepresentationTest, SerializationTest)
 
 	{
 		SCOPED_TRACE("Test serialization for accesible boolean properties");
-		std::shared_ptr<Representation> representation = std::make_shared<MockRepresentation>("MockRepresentation");
+		std::shared_ptr<Representation> representation1 = std::make_shared<MockRepresentation>("MockRepresentation1");
 		std::shared_ptr<Representation> representation2 = std::make_shared<MockRepresentation>("MockRepresentation2");
 		std::shared_ptr<Representation> representation3 = std::make_shared<MockRepresentation>("MockRepresentation3");
 		std::shared_ptr<Representation> representation4 = std::make_shared<MockRepresentation>("MockRepresentation4");
 
-		representation2->setValue("IsActive", false);
+		representation1->setValue("IsActive", false);
 
-		representation3->setValue("IsGravityEnabled", false);
+		representation2->setValue("IsGravityEnabled", false);
+
+		representation3->setValue("IsDrivingSceneElementPose", false);
 
 		representation4->setValue("IsActive", false);
 		representation4->setValue("IsGravityEnabled", false);
+		representation4->setValue("IsDrivingSceneElementPose", false);
 
 		YAML::Node node;
-		ASSERT_NO_THROW(node.push_back(YAML::convert<SurgSim::Framework::Component>::encode(*representation)));
+		ASSERT_NO_THROW(node.push_back(YAML::convert<SurgSim::Framework::Component>::encode(*representation1)));
 		ASSERT_NO_THROW(node.push_back(YAML::convert<SurgSim::Framework::Component>::encode(*representation2)));
 		ASSERT_NO_THROW(node.push_back(YAML::convert<SurgSim::Framework::Component>::encode(*representation3)));
 		ASSERT_NO_THROW(node.push_back(YAML::convert<SurgSim::Framework::Component>::encode(*representation4)));
 
-		std::shared_ptr<MockRepresentation> newRepresentation;
-		ASSERT_NO_THROW(newRepresentation =
+		std::shared_ptr<MockRepresentation> newRepresentation1;
+		ASSERT_NO_THROW(newRepresentation1 =
 		  std::dynamic_pointer_cast<MockRepresentation>(node[0].as<std::shared_ptr<SurgSim::Framework::Component>>()));
 		std::shared_ptr<MockRepresentation> newRepresentation2;
 		ASSERT_NO_THROW(newRepresentation2 =
@@ -156,21 +160,25 @@ TEST(RepresentationTest, SerializationTest)
 		ASSERT_NO_THROW(newRepresentation4 =
 		  std::dynamic_pointer_cast<MockRepresentation>(node[3].as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
-		EXPECT_EQ(representation->getName(), newRepresentation->getName());
+		EXPECT_EQ(representation1->getName(), newRepresentation1->getName());
 		EXPECT_EQ(representation2->getName(), newRepresentation2->getName());
 		EXPECT_EQ(representation3->getName(), newRepresentation3->getName());
 		EXPECT_EQ(representation4->getName(), newRepresentation4->getName());
 
-		EXPECT_TRUE(newRepresentation->getValue<bool>("IsActive"));
-		EXPECT_TRUE(newRepresentation->getValue<bool>("IsGravityEnabled"));
+		EXPECT_FALSE(newRepresentation1->getValue<bool>("IsActive"));
+		EXPECT_TRUE(newRepresentation1->getValue<bool>("IsGravityEnabled"));
+		EXPECT_TRUE(newRepresentation1->getValue<bool>("IsDrivingSceneElementPose"));
 
-		EXPECT_FALSE(newRepresentation2->getValue<bool>("IsActive"));
-		EXPECT_TRUE(newRepresentation2->getValue<bool>("IsGravityEnabled"));
+		EXPECT_TRUE(newRepresentation2->getValue<bool>("IsActive"));
+		EXPECT_FALSE(newRepresentation2->getValue<bool>("IsGravityEnabled"));
+		EXPECT_TRUE(newRepresentation2->getValue<bool>("IsDrivingSceneElementPose"));
 
 		EXPECT_TRUE(newRepresentation3->getValue<bool>("IsActive"));
-		EXPECT_FALSE(newRepresentation3->getValue<bool>("IsGravityEnabled"));
+		EXPECT_TRUE(newRepresentation3->getValue<bool>("IsGravityEnabled"));
+		EXPECT_FALSE(newRepresentation3->getValue<bool>("IsDrivingSceneElementPose"));
 
 		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsActive"));
 		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsGravityEnabled"));
+		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsDrivingSceneElementPose"));
 	}
 }

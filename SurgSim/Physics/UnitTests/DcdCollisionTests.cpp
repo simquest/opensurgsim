@@ -16,20 +16,20 @@
 /// \file DcdCollisionTests.cpp
 /// Tests for the DcdCollision Class
 
-#include <gtest/gtest.h>
-
 #include <memory>
 #include <vector>
 
-#include "SurgSim/Collision/CollisionPair.h"
-#include "SurgSim/Physics/DcdCollision.h"
-#include "SurgSim/Physics/RigidCollisionRepresentation.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/PhysicsManagerState.h"
+#include <gtest/gtest.h>
 
+#include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Physics/DcdCollision.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Math::DoubleSidedPlaneShape;
