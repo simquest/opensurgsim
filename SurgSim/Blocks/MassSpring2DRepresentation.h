@@ -41,7 +41,7 @@ public:
 	/// Initializes a 2D MassSpring
 	/// \param extremities 4 positions forming the extremities of the 2D regular model (4 corners)
 	/// \param numNodesPerDim The number of nodes to be created for each dimension (here 2)
-	/// \param boundaryConditions The list of all boundary conditions (fixed dof)
+	/// \param nodeBoundaryConditions The list of all nodeId being boundary conditions (fixed node)
 	/// \param totalMass The total mass of the mass spring (evenly spread out on the masses)
 	/// \param stiffnessStretching, dampingStretching The spring param for all stretching springs (edges)
 	/// \param stiffnessBending, dampingBending The spring param for all bending springs (edges)
@@ -55,7 +55,7 @@ public:
 	/// \note   [0][0] *---* [1][0]
 	void init2D(const std::array<std::array<SurgSim::Math::Vector3d, 2>, 2> extremities,
 		unsigned int numNodesPerDim[2],
-		std::vector<unsigned int> boundaryConditions,
+		std::vector<unsigned int> nodeBoundaryConditions,
 		double totalMass,
 		double stiffnessStretching, double dampingStretching,
 		double stiffnessBending, double dampingBending,

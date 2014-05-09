@@ -96,10 +96,14 @@ public:
 	/// \note Behavior undefined if the nodeId is not in the correct range [0 getNumNodes()-1]
 	const SurgSim::Math::Vector3d getVelocity(unsigned int nodeId) const;
 
-	/// Adds a boundary condition on a given dof
-	/// \param dof The dof to set as a boundary condition
-	/// \note No test is performed on dof, the behavior is undefined when dof is out of range
-	void addBoundaryCondition(unsigned int dof);
+	/// Adds boundary conditions for a given node (fixes all the dof for this node)
+	/// \param nodeId The node to set the boundary conditions on
+	void addBoundaryCondition(unsigned int nodeId);
+
+	/// Adds a boundary condition on a given dof of a given node (only 1 dof is fixed)
+	/// \param nodeId The node on which the boundary condition needs to be set
+	/// \param nodeDofId The dof of the node to set as boundary condition
+	void addBoundaryCondition(unsigned int nodeId, unsigned int nodeDofId);
 
 	/// Retrieves the number of boundary conditions
 	/// \return The number of boundary conditions

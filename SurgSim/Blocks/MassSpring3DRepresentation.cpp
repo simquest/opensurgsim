@@ -211,7 +211,7 @@ void MassSpring3DRepresentation::init3DVolumeDiagonalSprings(const std::shared_p
 void MassSpring3DRepresentation::init3D(
 	const std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities,
 	unsigned int numNodesPerDim[3],
-	std::vector<unsigned int> boundaryConditions,
+	std::vector<unsigned int> nodeBoundaryConditions,
 	double totalMass,
 	double stiffnessStretching, double dampingStretching,
 	double stiffnessBending, double dampingBending,
@@ -286,8 +286,8 @@ void MassSpring3DRepresentation::init3D(
 	init3DVolumeDiagonalSprings(state, numNodesPerDim, stiffnessVolumeDiagonal, dampingVolumeDiagonal);
 
 	// Sets the boundary conditions
-	for (auto boundaryCondition = std::begin(boundaryConditions);
-		boundaryCondition != std::end(boundaryConditions);
+	for (auto boundaryCondition = std::begin(nodeBoundaryConditions);
+		boundaryCondition != std::end(nodeBoundaryConditions);
 		boundaryCondition++)
 	{
 		state->addBoundaryCondition(*boundaryCondition);

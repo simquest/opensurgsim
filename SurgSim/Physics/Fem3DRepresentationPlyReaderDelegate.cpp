@@ -193,9 +193,7 @@ void* Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions(const std::s
 
 void Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
 {
-	m_state->addBoundaryCondition(3 * m_boundaryConditionData);
-	m_state->addBoundaryCondition(3 * m_boundaryConditionData + 1);
-	m_state->addBoundaryCondition(3 * m_boundaryConditionData + 2);
+	m_state->addBoundaryCondition(m_boundaryConditionData);
 }
 
 } // namespace SurgSim

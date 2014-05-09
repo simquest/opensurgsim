@@ -86,9 +86,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 
 	for (auto index = boundaryConditionsNodeIdx.cbegin(); index != boundaryConditionsNodeIdx.cend(); ++index)
 	{
-		initialState->addBoundaryCondition((*index) * 3 + 0);
-		initialState->addBoundaryCondition((*index) * 3 + 1);
-		initialState->addBoundaryCondition((*index) * 3 + 2);
+		initialState->addBoundaryCondition(*index);
 	}
 	physicsRepresentation->setInitialState(initialState);
 
@@ -156,9 +154,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 
 	for (auto index = boundaryConditionsNodeIdx.cbegin(); index != boundaryConditionsNodeIdx.cend(); ++index)
 	{
-		initialState->addBoundaryCondition((*index) * 3 + 0);
-		initialState->addBoundaryCondition((*index) * 3 + 1);
-		initialState->addBoundaryCondition((*index) * 3 + 2);
+		initialState->addBoundaryCondition(*index);
 	}
 	physicsRepresentation->setInitialState(initialState);
 

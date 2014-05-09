@@ -75,7 +75,7 @@ public:
 		for (auto boundaryCondition = std::begin(boundaryConditions); boundaryCondition != std::end(boundaryConditions);
 			 ++boundaryCondition)
 		{
-			state->addBoundaryCondition(*boundaryCondition);
+			state->addBoundaryCondition(boundaryCondition->first, boundaryCondition->second);
 		}
 
 		std::array<unsigned int, 2> nodeEnds;
@@ -106,13 +106,13 @@ public:
 	{
 		for (int i = 0; i < dof; i++)
 		{
-			boundaryConditions.push_back(node * 6 + i);
+			boundaryConditions.push_back(std::make_pair(node, i));
 		}
 	}
 
 public:
 	std::array<Vector3d, 2> extremities;
-	std::vector<unsigned int> boundaryConditions;
+	std::vector<std::pair<unsigned int, unsigned int>> boundaryConditions; // <nodeId, dofId>
 	std::array<unsigned int, 1> nodesPerDimension;
 	double massDensity;
 	double youngModulus;

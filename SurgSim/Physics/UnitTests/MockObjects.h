@@ -272,7 +272,7 @@ class MockMassSpring : public SurgSim::Physics::MassSpringRepresentation
 public:
 	explicit MockMassSpring(const std::string& name,
 		const SurgSim::Math::RigidTransform3d& pose,
-		unsigned int numNodes, std::vector<unsigned int> boundaryConditions,
+		unsigned int numNodes, std::vector<unsigned int> nodeBoundaryConditions,
 		double totalMass,
 		double rayleighDampingMass, double rayleighDampingStiffness,
 		double springStiffness, double springDamping,
@@ -296,7 +296,7 @@ public:
 			setSubVector(p, i, 3, &state->getPositions());
 			addMass(std::make_shared<Mass>(totalMass / numNodes));
 		}
-		for (auto bc = std::begin(boundaryConditions); bc != std::end(boundaryConditions); bc++)
+		for (auto bc = std::begin(nodeBoundaryConditions); bc != std::end(nodeBoundaryConditions); bc++)
 		{
 			state->addBoundaryCondition(*bc);
 		}

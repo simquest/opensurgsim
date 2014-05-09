@@ -31,7 +31,7 @@ namespace Blocks
 void MassSpring1DRepresentation::init1D(
 	const std::array<Vector3d, 2> extremities,
 	unsigned int numNodesPerDim[1],
-	std::vector<unsigned int> boundaryConditions,
+	std::vector<unsigned int> nodeBoundaryConditions,
 	double totalMass,
 	double stiffnessStretching, double dampingStretching,
 	double stiffnessBending, double dampingBending)
@@ -72,8 +72,8 @@ void MassSpring1DRepresentation::init1D(
 	}
 
 	// Sets the boundary conditions
-	for (auto boundaryCondition = std::begin(boundaryConditions);
-		boundaryCondition != std::end(boundaryConditions);
+	for (auto boundaryCondition = std::begin(nodeBoundaryConditions);
+		boundaryCondition != std::end(nodeBoundaryConditions);
 		boundaryCondition++)
 	{
 		state->addBoundaryCondition(*boundaryCondition);

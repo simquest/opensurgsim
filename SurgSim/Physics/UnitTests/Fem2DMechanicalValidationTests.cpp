@@ -101,10 +101,7 @@ public:
 		}
 		for (auto fixedNodeId = fixedNodes.begin(); fixedNodeId != fixedNodes.end(); fixedNodeId++)
 		{
-			for (size_t dofId = 0; dofId < numDofPerNode; dofId++)
-			{
-				state->addBoundaryCondition(numDofPerNode * (*fixedNodeId) + dofId);
-			}
+			state->addBoundaryCondition(*fixedNodeId);
 		}
 		m_fem->setInitialState(state);
 	}

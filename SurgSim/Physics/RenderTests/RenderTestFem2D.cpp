@@ -83,11 +83,8 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 	const size_t section1 = numSections - 1;
 	for (size_t nodeId = 0; nodeId < numNodesOnSection; nodeId++)
 	{
-		for (size_t dofId = 0; dofId < numDofPerNode; dofId++)
-		{
-			restState->addBoundaryCondition((nodeId + numNodesOnSection * section0) * numDofPerNode + dofId);
-			restState->addBoundaryCondition((nodeId + numNodesOnSection * section1) * numDofPerNode + dofId);
-		}
+		restState->addBoundaryCondition(nodeId + numNodesOnSection * section0);
+		restState->addBoundaryCondition(nodeId + numNodesOnSection * section1);
 	}
 	physicsRepresentation->setInitialState(restState);
 

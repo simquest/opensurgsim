@@ -108,12 +108,30 @@ const SurgSim::Math::Vector3d OdeState::getVelocity(unsigned int nodeId) const
 	return SurgSim::Math::getSubVector(m_v, nodeId, m_numDofPerNode).segment(0, 3);
 }
 
-void OdeState::addBoundaryCondition(unsigned int dof)
+void OdeState::addBoundaryCondition(unsigned int nodeId)
 {
-	if (! m_boundaryConditionsPerDof[dof])
+	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
+		"Number of dof per node = 0. Make sure to call setNumDof() prior to adding boundary conditions.";
+
+	for (unsigned int nodeDofId = 0; nodeDofId < m_numDofPerNode; ++nodeDofId)
 	{
-		m_boundaryConditionsPerDof[dof] = true;
-		m_boundaryConditionsAsDofIds.push_back(dof);
+		addBoundaryCondition(nodeId, nodeDofId);
+	}
+}
+
+void OdeState::addBoundaryCondition(unsigned int nodeId, unsigned int nodeDofId)
+{
+	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
+		"Number of dof per node = 0. Make sure to call setNumDof() prior to adding boundary conditions.";
+	SURGSIM_ASSERT(nodeId < m_numNodes) << "Invalid nodeId " << nodeId << " number of nodes is " << m_numNodes;
+	SURGSIM_ASSERT(nodeDofId < m_numDofPerNode) <<
+		"Invalid nodeDofId " << nodeDofId << " number of dof per node is " << m_numDofPerNode;
+
+	unsigned int globalDofId = nodeId * m_numDofPerNode + nodeDofId;
+	if (! m_boundaryConditionsPerDof[globalDofId])
+	{
+		m_boundaryConditionsPerDof[globalDofId] = true;
+		m_boundaryConditionsAsDofIds.push_back(globalDofId);
 	}
 }
 

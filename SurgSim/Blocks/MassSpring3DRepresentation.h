@@ -41,7 +41,7 @@ public:
 	/// Initializes a 3D model
 	/// \param extremities 8 positions forming the extremities of the 3D regular model (8 corners)
 	/// \param numNodesPerDim The number of nodes to be created for each dimension (here 3)
-	/// \param boundaryConditions The list of all boundary conditions (fixed dof)
+	/// \param nodeBoundaryConditions The list of all nodeId being boundary conditions (fixed node)
 	/// \param totalMass The total mass of the mass spring (evenly spread out on the masses)
 	/// \param stiffnessStretching, dampingStretching The spring param for all stretching springs (edges)
 	/// \param stiffnessBending, dampingBending The spring param for all bending springs (edges)
@@ -59,7 +59,7 @@ public:
 	void init3D(
 		const std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities,
 		unsigned int numNodesPerDim[3],
-		std::vector<unsigned int> boundaryConditions,
+		std::vector<unsigned int> nodeBoundaryConditions,
 		double totalMass,
 		double stiffnessStretching, double dampingStretching,
 		double stiffnessBending, double dampingBending,

@@ -51,12 +51,12 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 	}
 
 	// Fix the start and end nodes
-	restState->addBoundaryCondition(0 + 0);
-	restState->addBoundaryCondition(0 + 1);
-	restState->addBoundaryCondition(0 + 2);
-	restState->addBoundaryCondition((numNodes - 1) * physicsRepresentation->getNumDofPerNode() + 0);
-	restState->addBoundaryCondition((numNodes - 1) * physicsRepresentation->getNumDofPerNode() + 1);
-	restState->addBoundaryCondition((numNodes - 1) * physicsRepresentation->getNumDofPerNode() + 2);
+	restState->addBoundaryCondition(0, 0);
+	restState->addBoundaryCondition(0, 1);
+	restState->addBoundaryCondition(0, 2);
+	restState->addBoundaryCondition(numNodes - 1, 0);
+	restState->addBoundaryCondition(numNodes - 1, 1);
+	restState->addBoundaryCondition(numNodes - 1, 2);
 
 	physicsRepresentation->setInitialState(restState);
 
