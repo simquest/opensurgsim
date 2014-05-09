@@ -76,10 +76,10 @@ void OdeSolverLinearRungeKutta4<State>::solve(double dt, const State& currentSta
 		m_k4.acceleration = m_compliance * m_equation.computeF(*newState);
 
 		// Compute the new state using Runge Kutta 4 integration scheme:
-		newState->getPositions()  = currentState.getPositions();
-		newState->getPositions() += (m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
-		newState->getVelocities() = currentState.getVelocities();
-		newState->getVelocities() += (m_k1.acceleration + m_k4.acceleration + 2.0 * (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
+		newState->getPositions()  = currentState.getPositions() +
+			(m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
+		newState->getVelocities() = currentState.getVelocities() +
+			(m_k1.acceleration + m_k4.acceleration + 2.0 * (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
 	}
 }
 
