@@ -164,14 +164,23 @@ std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElemen
 	{
 		auto elementNodeIds = getFemElement(i)->getNodeIds();
 		std::sort(elementNodeIds.begin(), elementNodeIds.end());
-		femElements.push_back(elementNodeIds);
+		// TODO(gsathyaseelan) 12th May 2014
+		// Currently, converting the unsigned int from elementNodeIds to size_t explicitly.
+		// Remove these when Physics API uses size_t instead of unsigned int.
+		std::vector<size_t> elementNodeIdsConverted;
+		for (auto it = elementNodeIds.cbegin(); it != elementNodeIds.cend(); ++it)
+		{
+			elementNodeIdsConverted.push_back(static_cast<size_t>(*it));
+		}
+		femElements.push_back(elementNodeIdsConverted);
 	}
 
 	std::array<unsigned int, 3> triangleSorted;
-	auto doesIncludeTriangle = [&triangleSorted](std::vector<size_t>& femElementSorted)
+	auto doesIncludeTriangle = [&triangleSorted](const std::vector<size_t>& femElementSorted)
 							   { return std::includes(femElementSorted.begin(), femElementSorted.end(),
 													  triangleSorted.begin(), triangleSorted.end()); };
-	const auto& meshTriangles = mesh.getTriangles();
+
+	auto& meshTriangles = mesh.getTriangles();
 	for (auto triangle = meshTriangles.cbegin(); triangle != meshTriangles.cend(); ++triangle)
 	{
 		triangleSorted = triangle->verticesId;

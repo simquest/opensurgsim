@@ -262,7 +262,7 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 	EXPECT_NO_THROW(wokeUp = fem->wakeUp(););
 	EXPECT_TRUE(wokeUp);
 
-	const auto& meshTriangles = triangleMesh->getTriangles();
+	auto& meshTriangles = triangleMesh->getTriangles();
 	size_t triangleId = 0;
 	SurgSim::Math::Vector3d centroid;
 	for (auto triangle = meshTriangles.cbegin(); triangle != meshTriangles.cend(); ++triangle, ++triangleId)

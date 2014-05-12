@@ -331,7 +331,7 @@ TEST_F(FemElement3DTetrahedronTests, CoordinateTests)
 	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(0.623543, 9.2345, 2.45346, 1.645745));
 	listOfNaturalCoordinates.push_back(SurgSim::Math::Vector4d(0.356234, 435.234, 32545.234, 9534.2123));
 
-	SurgSim::Math::Vector4d input, calculated;
+	SurgSim::Math::Vector4d input, calculated(0, 0, 0, 0);
 	Vector cartesian;
 	for (auto testCase = listOfNaturalCoordinates.begin(); testCase != listOfNaturalCoordinates.end(); ++testCase)
 	{
