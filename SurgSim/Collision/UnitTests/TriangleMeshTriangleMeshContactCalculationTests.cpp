@@ -281,28 +281,31 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 
 		std::list<std::shared_ptr<Contact>> expectedContacts;
 		double expectedDepth;
+		double zOffset = 0.5 / numTriangles;
+		double zValue;
 		std::pair<Location, Location> expectedPenetrationPoints;
 		Vector3d expectedPoint0, expectedPoint1;
 		Vector3d expectedNormal, expectedContact;
-		for (int i = 0; i < numTriangles; i++)
+		for (int i = 0; i < numTriangles - 1; i++)
 		{
+			zValue = static_cast<double>(i) / numTriangles + zOffset;
 			addNewTriangle(baseTriangles,
-						   Vector3d(0.5, 0.5, static_cast<double>(i) / numTriangles),
-						   Vector3d(-0.5, 0.5, static_cast<double>(i) / numTriangles),
-						   Vector3d(0.0, -0.5, static_cast<double>(i) / numTriangles));
-			expectedDepth = static_cast<double>(i) / numTriangles;
+						   Vector3d(0.5, 0.5, zValue),
+						   Vector3d(-0.5, 0.5, zValue),
+						   Vector3d(0.0, -0.5, zValue));
+			expectedDepth = zValue;
 			if (expectedDepth >= 0.5)
 			{
 				expectedDepth = 0.5;
-				expectedNormal = pose.linear() * Vector3d(0,1,0);
-				expectedPoint0 = pose * Vector3d(0,-0.5,static_cast<double>(i) / numTriangles);
-				expectedPoint1 = pose * Vector3d(0,0,static_cast<double>(i) / numTriangles);
+				expectedNormal = pose.linear() * Vector3d(0, 1, 0);
+				expectedPoint0 = pose * Vector3d(0, -0.5, zValue);
+				expectedPoint1 = pose * Vector3d(0, 0, zValue);
 			}
 			else
 			{
-				expectedNormal = pose.linear() * Vector3d(0,0,-1);
-				expectedPoint0 = pose * Vector3d(0,0,static_cast<double>(i) / numTriangles);
-				expectedPoint1 = pose * Vector3d(0,0,0);
+				expectedNormal = pose.linear() * Vector3d(0, 0, -1);
+				expectedPoint0 = pose * Vector3d(0, 0, zValue);
+				expectedPoint1 = pose * Vector3d(0, 0, 0);
 			}
 			if (expectedDepth > 0.0)
 			{
