@@ -499,6 +499,7 @@ TEST_F(FemElement1DBeamTests, CoordinateTests)
 	FemElement1DBeam element(m_nodeIds);
 
 	Vector validNaturalCoordinate(2);
+	Vector validNaturalCoordinate2(2);
 	Vector invalidNaturalCoordinateSumNot1(2);
 	Vector invalidNaturalCoordinateNegativeValue(2);
 	Vector invalidNaturalCoordinateSize1(1), invalidNaturalCoordinateSize3(3);
@@ -506,11 +507,13 @@ TEST_F(FemElement1DBeamTests, CoordinateTests)
 	Vector3d expectedB = expectedA + m_orientation._transformVector(Vector3d(m_L, 0.0, 0.0));
 
 	validNaturalCoordinate << 0.4, 0.6;
+	validNaturalCoordinate2 << -1e-11, 1 + 1e-11;
 	invalidNaturalCoordinateSumNot1 << 0.5, 0.6;
 	invalidNaturalCoordinateNegativeValue << 1.4, -0.4;
 	invalidNaturalCoordinateSize1 << 1.0;
 	invalidNaturalCoordinateSize3 << 0.2, 0.2, 0.6;
 	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate));
+	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate2));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSumNot1));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateNegativeValue));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSize1));
@@ -535,6 +538,9 @@ TEST_F(FemElement1DBeamTests, CoordinateTests)
 	EXPECT_TRUE(ptA.isApprox(expectedA));
 	EXPECT_TRUE(ptB.isApprox(expectedB));
 	EXPECT_TRUE(ptMiddle.isApprox((expectedA + expectedB) * 0.5));
+
+	Vector3d cartesian(0.1, 1.2, 2.3);
+	EXPECT_THROW(element.computeNaturalCoordinate(m_restState, cartesian), SurgSim::Framework::AssertionFailure);
 }
 
 TEST_F(FemElement1DBeamTests, ForceAndMatricesTest)

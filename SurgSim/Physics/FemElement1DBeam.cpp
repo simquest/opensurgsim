@@ -359,15 +359,9 @@ void FemElement1DBeam::computeInitialRotation(const SurgSim::Math::OdeState& sta
 	setSubMatrix(rotation3x3, 3, 3, 3, 3, &m_R0);
 }
 
-bool FemElement1DBeam::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
-{
-	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		   && (naturalCoordinate.size() == 2)
-		   && (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
-}
-
-SurgSim::Math::Vector FemElement1DBeam::computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
-																   const SurgSim::Math::Vector& naturalCoordinate) const
+SurgSim::Math::Vector FemElement1DBeam::computeCartesianCoordinate(
+	const SurgSim::Math::OdeState& state,
+	const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate)) << "naturalCoordinate must be normalized and length 2.";
 
@@ -381,6 +375,14 @@ SurgSim::Math::Vector FemElement1DBeam::computeCartesianCoordinate(const SurgSim
 	}
 
 	return cartesianCoordinate;
+}
+
+SurgSim::Math::Vector FemElement1DBeam::computeNaturalCoordinate(
+	const SurgSim::Math::OdeState& state,
+	const SurgSim::Math::Vector& cartesianCoordinate) const
+{
+	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
+	return SurgSim::Math::Vector3d::Zero();
 }
 
 } // namespace Physics

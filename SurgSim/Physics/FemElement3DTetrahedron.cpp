@@ -64,7 +64,7 @@ void FemElement3DTetrahedron::initialize(const SurgSim::Math::OdeState& state)
 	}
 
 	// Compute the fem tetrahedron shape functions Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
-	computeShapeFunctions(state);
+	computeShapeFunctions(state, &m_restVolume, &m_ai, &m_bi, &m_ci, &m_di);
 
 	// Store the rest state for this tetrahedron in m_x0
 	getSubVector(state.getPositions(), m_nodeIds, 3, &m_x0);
@@ -274,15 +274,20 @@ double FemElement3DTetrahedron::getVolume(const SurgSim::Math::OdeState& state) 
 	return (det(p1, p2, p3) - det(p0, p2, p3) + det(p0, p1, p3) - det(p0, p1, p2)) / 6.0;
 }
 
-void FemElement3DTetrahedron::computeShapeFunctions(const SurgSim::Math::OdeState& restState)
+void FemElement3DTetrahedron::computeShapeFunctions(const SurgSim::Math::OdeState& state,
+													double* volume,
+													std::array<double, 4>* ai,
+													std::array<double, 4>* bi,
+													std::array<double, 4>* ci,
+													std::array<double, 4>* di) const
 {
 	// The tetrahedron nodes 3D position {a,b,c,d}
-	Vector3d a = getSubVector(restState.getPositions(), m_nodeIds[0], 3);
-	Vector3d b = getSubVector(restState.getPositions(), m_nodeIds[1], 3);
-	Vector3d c = getSubVector(restState.getPositions(), m_nodeIds[2], 3);
-	Vector3d d = getSubVector(restState.getPositions(), m_nodeIds[3], 3);
+	Vector3d a = getSubVector(state.getPositions(), m_nodeIds[0], 3);
+	Vector3d b = getSubVector(state.getPositions(), m_nodeIds[1], 3);
+	Vector3d c = getSubVector(state.getPositions(), m_nodeIds[2], 3);
+	Vector3d d = getSubVector(state.getPositions(), m_nodeIds[3], 3);
 
-	m_restVolume = getVolume(restState);
+	*volume = getVolume(state);
 
 	// See http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch09.d/AFEM.Ch09.pdf for more details.
 	// Relationship between the notations in this source code and the document mentioned above:
@@ -296,20 +301,20 @@ void FemElement3DTetrahedron::computeShapeFunctions(const SurgSim::Math::OdeStat
 	// (z)   (z1 z2 z3 z4) (sigma4)
 	//
 	// The shape functions Ni(x, y, z) are given by the inverse relationship:
-	// (sigma1)   ( 1  1  1  1)^-1 (1)        (m_a[0] m_b[0] m_c[0] m_d[0]) (1)       | 1  1  1  1|
-	// (sigma2) = (x1 x2 x3 x4)    (x) = 1/6V (m_a[1] m_b[1] m_c[1] m_d[1]) (x) where |x1 x2 x3 x4| = 6V
-	// (sigma3)   (y1 y2 y3 y4)    (y)        (m_a[2] m_b[2] m_c[2] m_d[2]) (y)       |y1 y2 y3 y4|
-	// (sigma4)   (z1 z2 z3 z4)    (z)        (m_a[3] m_b[3] m_c[3] m_d[3]) (z)       |z1 z2 z3 z4|
+	// (sigma1)   ( 1  1  1  1)^-1 (1)        (a[0] b[0] c[0] d[0]) (1)       | 1  1  1  1|
+	// (sigma2) = (x1 x2 x3 x4)    (x) = 1/6V (a[1] b[1] c[1] d[1]) (x) where |x1 x2 x3 x4| = 6V
+	// (sigma3)   (y1 y2 y3 y4)    (y)        (a[2] b[2] c[2] d[2]) (y)       |y1 y2 y3 y4|
+	// (sigma4)   (z1 z2 z3 z4)    (z)        (a[3] b[3] c[3] d[3]) (z)       |z1 z2 z3 z4|
 
 	// Computes the shape functions parameters m_ai (noted 6V0i in the document mentioned above, eq 9.12)
 	// m_ai[0] = 6V01 = 6V(origin,b,c,d) = x2(y3z4 - y4z3) + x3(y4z2 - y2z4) + x4(y2z3 - y3z2) =  |b c d|
 	// m_ai[1] = 6V02 = 6V(origin,c,d,a) = x1(y4z3 - y3z4) + x3(y1z4 - y4z1) + x4(y3z1 - y1z3) = -|a c d|
 	// m_ai[2] = 6V03 = 6V(origin,d,a,b) = x1(y2z4 - y4z2) + x2(y4z1 - y1z4) + x4(y1z2 - y2z1) =  |a b d|
 	// m_ai[3] = 6V04 = 6V(origin,a,b,c) = x1(y3z2 - y2z3) + x2(y1z3 - y3z1) + x3(y2z1 - y1z2) = -|a b c|
-	m_ai[0] =  det(b, c, d);
-	m_ai[1] = -det(a, c, d);
-	m_ai[2] =  det(a, b, d);
-	m_ai[3] = -det(a, b, c);
+	(*ai)[0] =  det(b, c, d);
+	(*ai)[1] = -det(a, c, d);
+	(*ai)[2] =  det(a, b, d);
+	(*ai)[3] = -det(a, b, c);
 
 	// Computes the shape function parameters m_bi (noted ai in the document mentioned above, eq 9.11)
 	// m_bi[0] = y42z32 - y32z42 = (y4-y2)(z3-z2) - (y3-y2)(z4-z2) = |1 y2 z2| = |1 by bz|
@@ -332,10 +337,10 @@ void FemElement3DTetrahedron::computeShapeFunctions(const SurgSim::Math::OdeStat
 		Vector3d btilde(1, b[1], b[2]);
 		Vector3d ctilde(1, c[1], c[2]);
 		Vector3d dtilde(1, d[1], d[2]);
-		m_bi[0] = -det(btilde, ctilde, dtilde);
-		m_bi[1] =  det(atilde, ctilde, dtilde);
-		m_bi[2] = -det(atilde, btilde, dtilde);
-		m_bi[3] =  det(atilde, btilde, ctilde);
+		(*bi)[0] = -det(btilde, ctilde, dtilde);
+		(*bi)[1] =  det(atilde, ctilde, dtilde);
+		(*bi)[2] = -det(atilde, btilde, dtilde);
+		(*bi)[3] =  det(atilde, btilde, ctilde);
 	}
 
 	// Computes the shape function parameters m_ci (noted bi in the document mentioned above, eq 9.11)
@@ -359,10 +364,10 @@ void FemElement3DTetrahedron::computeShapeFunctions(const SurgSim::Math::OdeStat
 		Vector3d btilde(1, b[0], b[2]);
 		Vector3d ctilde(1, c[0], c[2]);
 		Vector3d dtilde(1, d[0], d[2]);
-		m_ci[0] =  det(btilde, ctilde, dtilde);
-		m_ci[1] = -det(atilde, ctilde, dtilde);
-		m_ci[2] =  det(atilde, btilde, dtilde);
-		m_ci[3] = -det(atilde, btilde, ctilde);
+		(*ci)[0] =  det(btilde, ctilde, dtilde);
+		(*ci)[1] = -det(atilde, ctilde, dtilde);
+		(*ci)[2] =  det(atilde, btilde, dtilde);
+		(*ci)[3] = -det(atilde, btilde, ctilde);
 	}
 
 	// Computes the shape function parameters m_di (noted ci in the document mentioned above, eq 9.11)
@@ -386,19 +391,11 @@ void FemElement3DTetrahedron::computeShapeFunctions(const SurgSim::Math::OdeStat
 		Vector3d btilde(1, b[0], b[1]);
 		Vector3d ctilde(1, c[0], c[1]);
 		Vector3d dtilde(1, d[0], d[1]);
-		m_di[0] = -det(btilde, ctilde, dtilde);
-		m_di[1] =  det(atilde, ctilde, dtilde);
-		m_di[2] = -det(atilde, btilde, dtilde);
-		m_di[3] =  det(atilde, btilde, ctilde);
+		(*di)[0] = -det(btilde, ctilde, dtilde);
+		(*di)[1] =  det(atilde, ctilde, dtilde);
+		(*di)[2] = -det(atilde, btilde, dtilde);
+		(*di)[3] =  det(atilde, btilde, ctilde);
 	}
-}
-
-bool FemElement3DTetrahedron::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
-{
-	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		&& (naturalCoordinate.size() == 4)
-		&& (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
-
 }
 
 SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(
@@ -418,6 +415,31 @@ SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(
 		 + naturalCoordinate(1) * p1
 		 + naturalCoordinate(2) * p2
 		 + naturalCoordinate(3) * p3;
+}
+
+SurgSim::Math::Vector FemElement3DTetrahedron::computeNaturalCoordinate(
+	const SurgSim::Math::OdeState& state, const SurgSim::Math::Vector& cartesianCoordinate) const
+{
+	SURGSIM_ASSERT(cartesianCoordinate.size() == 3) << "globalCoordinate must be length 3.";
+
+	double volume;
+	std::array<double, 4> ai;
+	std::array<double, 4> bi;
+	std::array<double, 4> ci;
+	std::array<double, 4> di;
+	computeShapeFunctions(state, &volume, &ai, &bi, &ci, &di);
+
+	SurgSim::Math::Vector4d result;
+
+	for (size_t i = 0; i < 4; ++i)
+	{
+		result[i] = ai[i] + bi[i] * cartesianCoordinate[0]
+						  + ci[i] * cartesianCoordinate[1]
+						  + di[i] * cartesianCoordinate[2];
+	}
+	result /= 6.0 * volume;
+
+	return result;
 }
 
 } // namespace Physics

@@ -376,15 +376,9 @@ void FemElement2DTriangle::computeInitialRotation(const SurgSim::Math::OdeState&
 	m_initialRotation.col(2) = k;
 }
 
-bool FemElement2DTriangle::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
-{
-	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		   && (naturalCoordinate.size() == 3)
-		   && (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
-}
-
-SurgSim::Math::Vector FemElement2DTriangle::computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
-																   const SurgSim::Math::Vector& naturalCoordinate) const
+SurgSim::Math::Vector FemElement2DTriangle::computeCartesianCoordinate(
+	const SurgSim::Math::OdeState& state,
+	const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate)) << "naturalCoordinate must be normalized and length 3.";
 
@@ -398,6 +392,14 @@ SurgSim::Math::Vector FemElement2DTriangle::computeCartesianCoordinate(const Sur
 	}
 
 	return cartesianCoordinate;
+}
+
+SurgSim::Math::Vector FemElement2DTriangle::computeNaturalCoordinate(
+	const SurgSim::Math::OdeState& state,
+	const SurgSim::Math::Vector& cartesianCoordinate) const
+{
+	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
+	return SurgSim::Math::Vector3d::Zero();
 }
 
 void FemElement2DTriangle::computeShapeFunctionsParameters(const SurgSim::Math::OdeState& restState)

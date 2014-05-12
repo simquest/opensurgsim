@@ -201,6 +201,8 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
+					penetrationPoints.first.triangleId.setValue(*i);
+					penetrationPoints.second.triangleId.setValue(*j);
 					penetrationPoints.first.globalPosition.setValue(penetrationPointA);
 					penetrationPoints.second.globalPosition.setValue(penetrationPointB);
 

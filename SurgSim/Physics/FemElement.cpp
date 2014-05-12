@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/FemElement.h"
 
@@ -97,6 +98,14 @@ double FemElement::getMassDensity() const
 double FemElement::getMass(const SurgSim::Math::OdeState& state) const
 {
 	return getVolume(state) * m_rho;
+}
+
+bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
+{
+	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
+		&& (naturalCoordinate.size() == getNumNodes())
+		&& (-SurgSim::Math::Geometry::ScalarEpsilon <= naturalCoordinate.minCoeff() &&
+			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
 }
 
 } // namespace Physics

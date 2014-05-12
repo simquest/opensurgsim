@@ -18,12 +18,20 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Collision/Location.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h" //< Used to initialize the Component Fem3DRepresentation
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
+#include "SurgSim/Physics/FemElement3DTetrahedron.h"
 
 namespace SurgSim
 {
@@ -216,6 +224,82 @@ TEST(Fem3DRepresentationTests, DoInitializeTest)
 	EXPECT_EQ(3u, fem->getNumDofPerNode());
 	EXPECT_EQ(3u * 26u, fem->getNumDof());
 	EXPECT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
+}
+
+TEST(Fem3DRepresentationTests, CreateLocalizationTest)
+{
+	SurgSim::Framework::ApplicationData data("config.txt");
+	std::string fileName = data.findFile("Geometry/wound_deformable.ply");
+
+	auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+	ASSERT_NO_THROW(fem->setFilename(fileName));
+
+	SurgSim::DataStructures::PlyReader reader(fileName);
+	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate> triangleMeshDelegate
+		= std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
+
+	EXPECT_NO_THROW(reader.setDelegate(triangleMeshDelegate));
+	reader.parseFile();
+
+	std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<SurgSim::DataStructures::EmptyData,
+															  SurgSim::DataStructures::EmptyData,
+															  SurgSim::DataStructures::EmptyData>> triangleMesh
+																= triangleMeshDelegate->getMesh();
+
+	// Create the collision mesh for the surface of the finite element model
+	std::shared_ptr<DeformableCollisionRepresentation> collisionRepresentation
+		= std::make_shared<DeformableCollisionRepresentation>("Collision");
+	collisionRepresentation->setMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>(*triangleMesh));
+	fem->setCollisionRepresentation(collisionRepresentation);
+
+	bool loaded;
+	EXPECT_NO_THROW(loaded = fem->loadFile(););
+	EXPECT_TRUE(loaded);
+
+	bool wokeUp;
+	ASSERT_TRUE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>()));
+	EXPECT_NO_THROW(wokeUp = fem->wakeUp(););
+	EXPECT_TRUE(wokeUp);
+
+	const auto& meshTriangles = triangleMesh->getTriangles();
+	size_t triangleId = 0;
+	SurgSim::Math::Vector3d centroid;
+	for (auto triangle = meshTriangles.cbegin(); triangle != meshTriangles.cend(); ++triangle, ++triangleId)
+	{
+		std::array<unsigned int, 3> triangleNodeIds = triangle->verticesId;
+		centroid = triangleMesh->getVertexPosition(triangleNodeIds[0]);
+		centroid += triangleMesh->getVertexPosition(triangleNodeIds[1]);
+		centroid += triangleMesh->getVertexPosition(triangleNodeIds[2]);
+		centroid /= 3.0;
+
+		// Test the localization with each of the triangle vertices and the triangle centroid.
+		std::array<SurgSim::Math::Vector3d, 4> points = {centroid,
+														 triangleMesh->getVertexPosition(triangleNodeIds[0]),
+														 triangleMesh->getVertexPosition(triangleNodeIds[1]),
+														 triangleMesh->getVertexPosition(triangleNodeIds[2])};
+
+		for (auto point = points.cbegin(); point != points.cend(); ++point)
+		{
+			SurgSim::Collision::Location location;
+			std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
+
+			location.triangleId.setValue(triangleId);
+			location.globalPosition.setValue(*point);
+			EXPECT_NO_THROW(localization =
+				std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
+					fem->createLocalization(location)););
+			EXPECT_TRUE(localization != nullptr);
+
+			SurgSim::Math::Vector globalPosition;
+			SurgSim::Physics::FemRepresentationCoordinate coordinate = localization->getLocalPosition();
+			EXPECT_NO_THROW(globalPosition =
+				fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(*fem->getCurrentState(),
+																					 coordinate.naturalCoordinate););
+			EXPECT_EQ(3, globalPosition.size());
+			EXPECT_TRUE(globalPosition.isApprox(*point));
+		}
+	}
 }
 
 } // namespace Physics

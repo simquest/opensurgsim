@@ -50,6 +50,7 @@
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
@@ -91,6 +92,7 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Input::InputComponent;
 using SurgSim::Input::InputManager;
+using SurgSim::Physics::DeformableCollisionRepresentation;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::RigidRepresentationParameters;
@@ -137,6 +139,15 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
 	*graphicsTriangleMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*loadMesh(filename));
 	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
+
+	// Load the surface triangle mesh of the finite element model
+	auto meshSurface = loadMesh(filename);
+
+	// Create the collision mesh for the surface of the finite element model
+	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
+	collisionRepresentation->setMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>(*meshSurface));
+	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
+	sceneElement->addComponent(collisionRepresentation);
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	sceneElement->addComponent(
@@ -418,6 +429,10 @@ int main(int argc, char* argv[])
 	physicsManager->addExcludedCollisionPair(
 		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
 		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision1"));
+
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(wound, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(arm, "Collision"));
 
 	runtime->execute();
 	return 0;

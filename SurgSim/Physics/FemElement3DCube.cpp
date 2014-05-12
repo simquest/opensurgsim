@@ -442,16 +442,6 @@ double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta,
 		m_shapeFunctionsMuSign[i];
 }
 
-bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
-{
-	// Check for valid range of localization points
-	bool validLocalRange = (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
-
-	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		&& (naturalCoordinate.size() == 8)
-		&& (validLocalRange);
-}
-
 SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 	const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::Vector& naturalCoordinate) const
@@ -471,6 +461,13 @@ SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 	return cartesianCoordinate;
 }
 
+SurgSim::Math::Vector FemElement3DCube::computeNaturalCoordinate(
+	const SurgSim::Math::OdeState& state,
+	const SurgSim::Math::Vector& cartesianCoordinate) const
+{
+	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
+	return SurgSim::Math::Vector3d::Zero();
+}
 
 } // namespace Physics
 
