@@ -51,10 +51,9 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 		result = true;
 		if (isInitialized())
 		{
-			result = initializeComponent(component);
-
 			auto runtime = getRuntime();
 			SURGSIM_ASSERT(nullptr != runtime) << "Runtime cannot be expired when adding a component " << getName();
+			result = initializeComponent(component);
 			runtime->addComponent(component);
 		}
 
@@ -124,10 +123,7 @@ bool SceneElement::initializeComponent(std::shared_ptr<SurgSim::Framework::Compo
 	component->setSceneElement(getSharedPtr());
 	component->setScene(m_scene);
 
-	auto runtime = getRuntime();
-	SURGSIM_ASSERT(nullptr != runtime) << "Runtime cannot be expired when initializing a component " << getName();
-
-	return component->initialize(runtime);
+	return component->initialize(getRuntime());
 }
 
 std::string SceneElement::getName() const
