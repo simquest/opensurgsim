@@ -15,13 +15,13 @@
 
 #include "SurgSim/Framework/SceneElement.h"
 
+#include <yaml-cpp/yaml.h>
+
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
-
-#include <yaml-cpp/yaml.h>
 
 namespace SurgSim
 {
@@ -33,6 +33,7 @@ SceneElement::SceneElement(const std::string& name) :
 {
 	m_pose = std::make_shared<SurgSim::Framework::PoseComponent>("Pose");
 	m_pose->setPose(SurgSim::Math::RigidTransform3d::Identity());
+	addComponent(m_pose);
 }
 
 SceneElement::~SceneElement()
@@ -42,38 +43,32 @@ SceneElement::~SceneElement()
 
 bool SceneElement::addComponent(std::shared_ptr<Component> component)
 {
+	SURGSIM_ASSERT(nullptr != component) << "Cannot add a nullptr as a component";
+
 	bool result = false;
-
-	SURGSIM_ASSERT(component != nullptr) << "Cannot add a nullptr as a component";
-	SURGSIM_ASSERT("SurgSim::Framework::PoseComponent" != component->getClassName()) <<
-		"Can not add a PoseComponent to a SceneElement. Should use SceneElement::setPose() to set the pose.";
-	SURGSIM_ASSERT("Pose" != component->getName()) <<
-		"Can not add a Component named 'Pose' to a SceneElement, SceneElement already owns one.";
-
 	if (m_components.find(component->getName()) == m_components.end())
 	{
-		component->setSceneElement(getSharedPtr());
-		component->setScene(m_scene);
 		result = true;
 		if (isInitialized())
 		{
+			result = initializeComponent(component);
+
 			auto runtime = getRuntime();
-			SURGSIM_ASSERT(runtime != nullptr) << "Runtime cannot be expired when adding a component " << getName();
-			result = component->initialize(runtime);
+			SURGSIM_ASSERT(nullptr != runtime) << "Runtime cannot be expired when adding a component " << getName();
 			runtime->addComponent(component);
+		}
+
+		if (result)
+		{
+			m_components[component->getName()] = component;
 		}
 	}
 	else
 	{
 		SURGSIM_LOG_WARNING(Logger::getLogger("runtime")) <<
-				"Component with name " << component->getName() <<
-				" already exists on SceneElement " << getName() <<
-				", did not add component";
-	}
-
-	if (result)
-	{
-		m_components[component->getName()] = component;
+			"Component with name " << component->getName() <<
+			" already exists on SceneElement " << getName() <<
+			", did not add component";
 	}
 
 	return result;
@@ -87,10 +82,6 @@ bool SceneElement::removeComponent(std::shared_ptr<Component> component)
 bool SceneElement::removeComponent(const std::string& name)
 {
 	bool result = false;
-
-	SURGSIM_ASSERT("Pose" != name) << "The built-in PoseComponent in SceneElment can not be removed." <<
-		"Maybe SceneElement::setPose(SurgSim::Math::RigidTransform::Identity() will do the work.";
-
 	if (m_components.find(name) != m_components.end())
 	{
 		size_t count = m_components.erase(name);
@@ -114,26 +105,29 @@ std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) c
 bool SceneElement::initialize()
 {
 	SURGSIM_ASSERT(!m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
-
-	m_pose->setSceneElement(getSharedPtr());
-	m_pose->setScene(m_scene);
-	m_components[m_pose->getName()] = m_pose;
-
 	m_isInitialized = doInitialize();
 
 	if (m_isInitialized)
 	{
 		// initialize all components
-		std::shared_ptr<Runtime> runtime = getRuntime();
-		auto component = std::begin(m_components);
-		while (m_isInitialized && component != std::end(m_components))
+		for (auto pair = std::begin(m_components); m_isInitialized && pair != std::end(m_components); ++pair)
 		{
-			m_isInitialized = component->second->initialize(runtime);
-			++component;
+			m_isInitialized = initializeComponent(pair->second);
 		}
 	}
 
 	return m_isInitialized;
+}
+
+bool SceneElement::initializeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+{
+	component->setSceneElement(getSharedPtr());
+	component->setScene(m_scene);
+
+	auto runtime = getRuntime();
+	SURGSIM_ASSERT(nullptr != runtime) << "Runtime cannot be expired when initializing a component " << getName();
+
+	return component->initialize(runtime);
 }
 
 std::string SceneElement::getName() const

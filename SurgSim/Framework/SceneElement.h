@@ -145,7 +145,17 @@ public:
 	virtual bool decode(const YAML::Node& node);
 
 private:
+	/// Encode a component as full component or as a reference, based on the value of standalone.
+	/// \param component The component to be encoded as YAML node.
+	/// \param standalone If true, the components will be encoded as a full component;
+	///					  Or it will be encoded as reference.
+	/// \return A node with all the public data of this instance
 	YAML::Node encodeComponent(std::shared_ptr<SurgSim::Framework::Component> component, bool standalone) const;
+
+	/// Initialize the given component
+	/// \param component The component to be initialized.
+	/// \return True if initialization succeeded, false otherwise.
+	bool initializeComponent(std::shared_ptr<SurgSim::Framework::Component> component);
 
 	/// Name of this SceneElement
 	std::string m_name;
@@ -171,7 +181,6 @@ private:
 
 	/// Indicates if this SceneElement has been initialized or not.
 	bool m_isInitialized;
-
 };
 
 }; // namespace Framework
