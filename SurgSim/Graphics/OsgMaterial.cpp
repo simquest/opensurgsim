@@ -19,6 +19,7 @@
 #include "SurgSim/Graphics/OsgUniformBase.h"
 
 #include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/Log.h"
 
 #include <algorithm>
 #include <functional>
@@ -46,8 +47,8 @@ bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 	{
 		osgUniform->addToStateSet(m_stateSet);
 		m_uniforms.push_back(osgUniform);
-		didSucceed = true;
 		// All the uniforms should adhere to the accessible protocol
+		// This make the uniform available on the
 		std::shared_ptr<Accessible> accessible = std::dynamic_pointer_cast<Accessible>(uniform);
 		if (accessible != nullptr)
 		{
@@ -57,6 +58,13 @@ bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 				std::bind(&SurgSim::Framework::Accessible::getValue, accessible.get(), "Value");
 
 			setAccessors(osgUniform->getName(), getter, setter);
+			didSucceed = true;
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics/Material"))
+					<< "Uniform is correct type but does not support 'Accessible', the uniform won't "
+					<< "be available through the Accessible interface of this Material: " << getName();
 		}
 	}
 	return didSucceed;

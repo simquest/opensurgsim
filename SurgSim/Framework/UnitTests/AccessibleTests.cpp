@@ -245,12 +245,12 @@ TEST(AccessibleTest, RemoveAccessors)
 	TestClass a;
 
 	EXPECT_NO_THROW(a.getValue("readWrite"));
-	EXPECT_NO_THROW(a.setValue("readWrite", 2));
+	EXPECT_NO_THROW(a.setValue("readWrite", 2.0));
 
 	a.removeAccessors("readWrite");
 
 	EXPECT_ANY_THROW(a.getValue("readWrite"));
-	EXPECT_ANY_THROW(a.setValue("readWrite", 2));
+	EXPECT_ANY_THROW(a.setValue("readWrite", 2.0));
 }
 
 TEST(AccessibleTest, ConvertDoubleToFloat)
