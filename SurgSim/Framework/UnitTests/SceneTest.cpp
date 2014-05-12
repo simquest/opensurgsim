@@ -110,7 +110,6 @@ TEST(SceneTest, YamlTest)
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(1u, node.size());
 
-	std::cout << node;
 	std::shared_ptr<Scene> newScene = std::make_shared<Scene>(runtime);
 
 	ASSERT_NO_THROW(newScene->decode(node));

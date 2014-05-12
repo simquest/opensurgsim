@@ -19,6 +19,8 @@
 #include "SurgSim/Graphics/ViewElement.h"
 #include "SurgSim/Math/Vector.h"
 
+#include <osg/ref_ptr>
+
 namespace SurgSim
 {
 

@@ -91,6 +91,12 @@ public:
 private:
 	/// Camera whose image will be shown in this view
 	std::shared_ptr<Camera> m_camera;
+
+	virtual bool doInitialize() override
+	{
+		SURGSIM_ASSERT(m_camera != nullptr) << "View cannot be created without a camera.";
+		return true;
+	}
 };
 
 };  // namespace Graphics

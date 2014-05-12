@@ -13,12 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/Fem3DRepresentation.h"
-
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Math/Valid.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 
 using SurgSim::Framework::Logger;
@@ -85,7 +84,7 @@ void Fem3DRepresentation::applyCorrection(double dt,
 	m_currentState->getPositions() += deltaVelocity * dt;
 	m_currentState->getVelocities() += deltaVelocity;
 
-	if (!isValidState(*m_currentState))
+	if (!m_currentState->isValid())
 	{
 		deactivateAndReset();
 	}
@@ -151,18 +150,11 @@ bool Fem3DRepresentation::doInitialize()
 	return FemRepresentation::doInitialize();
 }
 
-void Fem3DRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,
+void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 	const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-	transformVectorByBlockOf3(transform, &state->getAccelerations(), true);
-}
-
-bool Fem3DRepresentation::isValidState(const DeformableRepresentationState &state) const
-{
-	return SurgSim::Math::isValid(state.getPositions())
-		&& SurgSim::Math::isValid(state.getVelocities());
 }
 
 void Fem3DRepresentation::deactivateAndReset(void)
@@ -170,8 +162,7 @@ void Fem3DRepresentation::deactivateAndReset(void)
 	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
 		<< getName() << " deactivated and reset:" << std::endl
 		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
-		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl
-		<< "acceleration=(" << m_currentState->getAccelerations() << ")" << std::endl;
+		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
 
 	resetState();
 	setIsActive(false);

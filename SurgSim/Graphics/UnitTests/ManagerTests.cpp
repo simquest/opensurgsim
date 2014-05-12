@@ -108,10 +108,10 @@ TEST_F(GraphicsManagerTest, AddRemoveTest)
 
 	std::shared_ptr<Representation> representation1 = std::make_shared<MockRepresentation>("test representation 1");
 	std::shared_ptr<Representation> representation2 = std::make_shared<MockRepresentation>("test representation 2");
-	std::shared_ptr<MockGroup> group1 = std::make_shared<MockGroup>("test group 1");
-	std::shared_ptr<MockGroup> group2 = std::make_shared<MockGroup>("test group 2");
+	representation2->addGroupReference("other_group");
 	std::shared_ptr<MockView> view1 = std::make_shared<MockView>("test view 1");
 	std::shared_ptr<MockView> view2 = std::make_shared<MockView>("test view 2");
+
 	std::shared_ptr<SurgSim::Framework::Representation> nonGraphicsComponent =
 		std::make_shared<NonGraphicsRepresentation>("non-graphics component");
 
@@ -123,40 +123,34 @@ TEST_F(GraphicsManagerTest, AddRemoveTest)
 	EXPECT_TRUE(testDoAddComponent(representation1));
 	EXPECT_EQ(1u, graphicsManager->getRepresentations().size());
 	EXPECT_NE(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
-		graphicsManager->getRepresentations().end(), representation1));
+			  graphicsManager->getRepresentations().end(), representation1));
 
-	/// Add a group
-	EXPECT_TRUE(testDoAddComponent(group1));
-
+	// Should have added the default group
 	EXPECT_EQ(1u, graphicsManager->getGroups().size());
-	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
-		graphicsManager->getGroups().end(), group1));
+	EXPECT_NE(std::end(graphicsManager->getGroups()),
+			  graphicsManager->getGroups().find(Representation::DefaultGroupName));
 
 	/// Add a view
 	EXPECT_TRUE(testDoAddComponent(view1));
 	EXPECT_EQ(1u, graphicsManager->getViews().size());
 	EXPECT_NE(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
-		graphicsManager->getViews().end(), view1));
+			  graphicsManager->getViews().end(), view1));
 
 
 	/// Add another view
 	EXPECT_TRUE(testDoAddComponent(view2));
 	EXPECT_EQ(2u, graphicsManager->getViews().size());
 	EXPECT_NE(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
-		graphicsManager->getViews().end(), view2));
-
-	/// Add another group
-	EXPECT_TRUE(testDoAddComponent(group2));
-	EXPECT_EQ(2u, graphicsManager->getGroups().size());
-	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
-		graphicsManager->getGroups().end(), group2));
+			  graphicsManager->getViews().end(), view2));
 
 	/// Add another representation
 	EXPECT_TRUE(testDoAddComponent(representation2));
 	EXPECT_EQ(2u, graphicsManager->getRepresentations().size());
 	EXPECT_NE(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
-		graphicsManager->getRepresentations().end(), representation2));
+			  graphicsManager->getRepresentations().end(), representation2));
 
+	/// There should be another group in there now
+	EXPECT_EQ(2u, graphicsManager->getGroups().size());
 
 	/// Try to add a duplicate representation
 	/// the public interface functions addComponent and removeComponent always return true when the allocation
@@ -165,11 +159,6 @@ TEST_F(GraphicsManagerTest, AddRemoveTest)
 	doProcessComponents();
 	EXPECT_EQ(2u, graphicsManager->getRepresentations().size());
 
-	/// Try to add a duplicate group
-	EXPECT_TRUE(componentManager->enqueueAddComponent(group2));
-	doProcessComponents();
-	EXPECT_EQ(2u, graphicsManager->getGroups().size());
-
 	/// Try to add a duplicate view
 	EXPECT_TRUE(componentManager->enqueueAddComponent(view1));
 	doProcessComponents();
@@ -177,50 +166,36 @@ TEST_F(GraphicsManagerTest, AddRemoveTest)
 
 	/// Try to add a component that is not graphics-related
 	EXPECT_TRUE(componentManager->enqueueAddComponent(nonGraphicsComponent)) <<
-		"Adding a component that this manager is not concerned with should return false";
-
-
-	/// Remove a group
-	EXPECT_TRUE(componentManager->enqueueRemoveComponent(group2));
-	doProcessComponents();
-
-	EXPECT_EQ(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
-		graphicsManager->getGroups().end(), group2));
+			"Adding a component that this manager is not concerned with should return false";
 
 	/// Remove a view
 	EXPECT_TRUE(componentManager->enqueueRemoveComponent(view2));
 	doProcessComponents();
 	EXPECT_EQ(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
-		graphicsManager->getViews().end(), view2));
+			  graphicsManager->getViews().end(), view2));
 
 	/// Remove an representation
 	EXPECT_TRUE(componentManager->enqueueRemoveComponent(representation1));
 	doProcessComponents();
 	EXPECT_EQ(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
-		graphicsManager->getRepresentations().end(), representation1));
-
-	/// Try to remove a group that is not in the manager
-	EXPECT_TRUE(componentManager->enqueueRemoveComponent(group2));
-	doProcessComponents();
-	EXPECT_EQ(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
-		graphicsManager->getGroups().end(), group2));
+			  graphicsManager->getRepresentations().end(), representation1));
 
 	/// Try to remove an representation that is not in the manager
 	EXPECT_TRUE(componentManager->enqueueRemoveComponent(representation1));
 	doProcessComponents();
 	EXPECT_EQ(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
-		graphicsManager->getRepresentations().end(), representation1));
+			  graphicsManager->getRepresentations().end(), representation1));
 
 	/// Try to remove a view that is not in the manager
 	EXPECT_TRUE(componentManager->enqueueRemoveComponent(view2));
 	doProcessComponents();
 	EXPECT_EQ(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
-		graphicsManager->getViews().end(), view2));
+			  graphicsManager->getViews().end(), view2));
 
 
 	/// Try to remove a component that is not graphics-related
 	EXPECT_TRUE(componentManager->enqueueRemoveComponent(nonGraphicsComponent)) <<
-		"Removing a component that this manager is not concerned with should return true";
+			"Removing a component that this manager is not concerned with should return true";
 }
 
 };  // namespace Graphics

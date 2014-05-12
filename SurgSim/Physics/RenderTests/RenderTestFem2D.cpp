@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
@@ -28,11 +28,10 @@
 #include "SurgSim/Physics/FemElement2DTriangle.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
+using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem2DRepresentation;
 using SurgSim::Physics::FemElement2DTriangle;
 
@@ -64,7 +63,7 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 	// Angle between 2 consecutive nodes on a cross-section
 	const double deltaAngle = 2.0 * M_PI / numNodesOnSection;
 
-	std::shared_ptr<DeformableRepresentationState> restState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> restState = std::make_shared<SurgSim::Math::OdeState>();
 	restState->setNumDof(physicsRepresentation->getNumDofPerNode(), numNodes);
 
 	// Sets the initial state (node positions and boundary conditions)
@@ -84,11 +83,8 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 	const size_t section1 = numSections - 1;
 	for (size_t nodeId = 0; nodeId < numNodesOnSection; nodeId++)
 	{
-		for (size_t dofId = 0; dofId < numDofPerNode; dofId++)
-		{
-			restState->addBoundaryCondition((nodeId + numNodesOnSection * section0) * numDofPerNode + dofId);
-			restState->addBoundaryCondition((nodeId + numNodesOnSection * section1) * numDofPerNode + dofId);
-		}
+		restState->addBoundaryCondition(nodeId + numNodesOnSection * section0);
+		restState->addBoundaryCondition(nodeId + numNodesOnSection * section1);
 	}
 	physicsRepresentation->setInitialState(restState);
 
@@ -177,7 +173,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	femSceneElement->addComponent(
-		std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
+		std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
 			"physics to triangle mesh",
 			physicsRepresentation->getFinalState(),
 			graphicsTriangleMeshRepresentation->getMesh()));
@@ -190,7 +186,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 	graphicsPointCloudRepresentation->setVisible(true);
 	femSceneElement->addComponent(graphicsPointCloudRepresentation);
 
-	femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
+	femSceneElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>(
 		"Transfer from Physics to Graphics point cloud",
 		physicsRepresentation->getFinalState(),
 		graphicsPointCloudRepresentation->getVertices()));

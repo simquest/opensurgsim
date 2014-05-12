@@ -17,6 +17,7 @@
 #define SURGSIM_GRAPHICS_CAPSULEREPRESENTATION_H
 
 #include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

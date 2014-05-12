@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_ODESOLVERLINEARRUNGEKUTTA4_INL_H
-#define SURGSIM_MATH_ODESOLVERLINEARRUNGEKUTTA4_INL_H
+#include "SurgSim/Math/OdeSolverLinearRungeKutta4.h"
+#include "SurgSim/Math/OdeState.h"
 
 namespace SurgSim
 {
@@ -22,20 +22,18 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State>
-OdeSolverLinearRungeKutta4<State>::OdeSolverLinearRungeKutta4(OdeEquation<State>* equation)
-	: OdeSolverRungeKutta4<State>(equation),
+OdeSolverLinearRungeKutta4::OdeSolverLinearRungeKutta4(OdeEquation* equation)
+	: OdeSolverRungeKutta4(equation),
 	m_initialized(false)
 {
 	m_name = "Ode Solver Linear Runge Kutta 4";
 }
 
-template <class State>
-void OdeSolverLinearRungeKutta4<State>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	if (!m_initialized)
 	{
-		OdeSolverRungeKutta4<State>::solve(dt, currentState, newState);
+		OdeSolverRungeKutta4::solve(dt, currentState, newState);
 		m_initialized = true;
 	}
 	else
@@ -86,5 +84,3 @@ void OdeSolverLinearRungeKutta4<State>::solve(double dt, const State& currentSta
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#endif // SURGSIM_MATH_ODESOLVERLINEARRUNGEKUTTA4_INL_H

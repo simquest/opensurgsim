@@ -15,8 +15,8 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/FemElement2DTriangle.h"
 
 using SurgSim::Math::addSubMatrix;
@@ -62,7 +62,7 @@ double FemElement2DTriangle::getThickness() const
 	return m_thickness;
 }
 
-double FemElement2DTriangle::getVolume(const DeformableRepresentationState& state) const
+double FemElement2DTriangle::getVolume(const SurgSim::Math::OdeState& state) const
 {
 	const Vector3d A = state.getPosition(m_nodeIds[0]);
 	const Vector3d B = state.getPosition(m_nodeIds[1]);
@@ -71,7 +71,7 @@ double FemElement2DTriangle::getVolume(const DeformableRepresentationState& stat
 	return m_thickness * (B - A).cross(C - A).norm() / 2.0;
 }
 
-void FemElement2DTriangle::initialize(const DeformableRepresentationState& state)
+void FemElement2DTriangle::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Test the validity of the physical parameters
 	FemElement::initialize(state);
@@ -94,7 +94,7 @@ void FemElement2DTriangle::initialize(const DeformableRepresentationState& state
 	computeStiffness(state, &m_K);
 }
 
-void FemElement2DTriangle::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale)
+void FemElement2DTriangle::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
 {
 	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> x, f;
 
@@ -106,23 +106,23 @@ void FemElement2DTriangle::addForce(const DeformableRepresentationState& state, 
 	addSubVector(f, m_nodeIds, 6, F);
 }
 
-void FemElement2DTriangle::addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M, double scale)
+void FemElement2DTriangle::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
 {
 	addSubMatrix(m_M * scale, m_nodeIds, 6, M);
 }
 
-void FemElement2DTriangle::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
+void FemElement2DTriangle::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 									  double scale)
 {
 }
 
-void FemElement2DTriangle::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
+void FemElement2DTriangle::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
 										double scale)
 {
 	addSubMatrix(m_K * scale, getNodeIds(), 6, K);
 }
 
-void FemElement2DTriangle::addFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+void FemElement2DTriangle::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
 							   SurgSim::Math::Matrix* M, SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K)
 {
 	// Assemble the mass matrix
@@ -137,7 +137,7 @@ void FemElement2DTriangle::addFMDK(const DeformableRepresentationState& state, S
 	addForce(state, F);
 }
 
-void FemElement2DTriangle::addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD,
+void FemElement2DTriangle::addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD,
 								 double alphaK, const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
 {
 	using SurgSim::Math::addSubVector;
@@ -168,7 +168,7 @@ void FemElement2DTriangle::addMatVec(const DeformableRepresentationState& state,
 	}
 }
 
-void FemElement2DTriangle::computeMass(const DeformableRepresentationState& state,
+void FemElement2DTriangle::computeMass(const SurgSim::Math::OdeState& state,
 								   Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* M)
 {
 	double mass = m_rho * m_restArea * m_thickness;
@@ -256,7 +256,7 @@ void FemElement2DTriangle::computeMass(const DeformableRepresentationState& stat
 	}
 }
 
-void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState& state,
+void FemElement2DTriangle::computeStiffness(const SurgSim::Math::OdeState& state,
 										Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* k)
 {
 	// Membrane part from "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
@@ -344,7 +344,7 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 	}
 }
 
-void FemElement2DTriangle::computeInitialRotation(const DeformableRepresentationState& state)
+void FemElement2DTriangle::computeInitialRotation(const SurgSim::Math::OdeState& state)
 {
 	// Build (A; i, j, k) an orthonormal frame
 	// such that in the local frame, we have:
@@ -383,7 +383,7 @@ bool FemElement2DTriangle::isValidCoordinate(const SurgSim::Math::Vector& natura
 		   && (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
 }
 
-SurgSim::Math::Vector FemElement2DTriangle::computeCartesianCoordinate(const DeformableRepresentationState& state,
+SurgSim::Math::Vector FemElement2DTriangle::computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
 																   const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate)) << "naturalCoordinate must be normalized and length 3.";
@@ -400,7 +400,7 @@ SurgSim::Math::Vector FemElement2DTriangle::computeCartesianCoordinate(const Def
 	return cartesianCoordinate;
 }
 
-void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepresentationState& restState)
+void FemElement2DTriangle::computeShapeFunctionsParameters(const SurgSim::Math::OdeState& restState)
 {
 	SURGSIM_ASSERT(m_nodeIds[0] < restState.getNumNodes()) << "Invalid nodeId[0] = " << m_nodeIds[0] <<
 		", the number of nodes is " << restState.getNumNodes();

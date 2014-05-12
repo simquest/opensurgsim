@@ -404,3 +404,27 @@ TEST(ComponentTests, MockComponent)
 	EXPECT_EQ("SerializationMockComponent", roundtripComponent->getClassName());
 	EXPECT_EQ("othercomponent", roundtripComponent->getName());
 }
+
+#include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Math/RigidTransform.h"
+
+TEST(ComponentTests, PoseComponentTest)
+{
+	std::shared_ptr<SurgSim::Framework::Component> component;
+	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
+									"SurgSim::Framework::PoseComponent",
+									"pose"));
+
+	EXPECT_EQ("SurgSim::Framework::PoseComponent", component->getClassName());
+
+	SurgSim::Math::RigidTransform3d pose(SurgSim::Math::RigidTransform3d::Identity());
+
+	component->setValue("Pose", pose);
+	YAML::Node node(YAML::convert<SurgSim::Framework::Component>::encode(*component));
+
+	auto decoded = std::dynamic_pointer_cast<SurgSim::Framework::PoseComponent>(
+					   node.as<std::shared_ptr<SurgSim::Framework::Component>>());
+
+	EXPECT_NE(nullptr, decoded);
+	EXPECT_TRUE(pose.isApprox(decoded->getValue<SurgSim::Math::RigidTransform3d>("Pose")));
+}

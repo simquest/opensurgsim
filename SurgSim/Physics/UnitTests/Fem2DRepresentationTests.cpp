@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -64,14 +65,13 @@ TEST(Fem2DRepresentationTests, TransformInitialStateTest)
 	initialPose = SurgSim::Math::makeRigidTransform(q, t);
 	fem->setLocalPose(initialPose);
 
-	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(numDofPerNode, numNodes);
 	Vector x = Vector::LinSpaced(numDof, 1.0, static_cast<double>(numDof));
 	Vector v = Vector::Ones(numDof);
 	Vector a = Vector::Ones(numDof) * 2.0;
 	initialState->getPositions() = x;
 	initialState->getVelocities() = v;
-	initialState->getAccelerations() = a;
 	fem->setInitialState(initialState);
 
 	Vector expectedX = x, expectedV = v, expectedA = a;
@@ -89,7 +89,6 @@ TEST(Fem2DRepresentationTests, TransformInitialStateTest)
 
 	EXPECT_TRUE(fem->getInitialState()->getPositions().isApprox(expectedX));
 	EXPECT_TRUE(fem->getInitialState()->getVelocities().isApprox(expectedV));
-	EXPECT_TRUE(fem->getInitialState()->getAccelerations().isApprox(expectedA));
 }
 
 } // namespace Physics

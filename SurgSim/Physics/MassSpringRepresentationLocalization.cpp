@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim

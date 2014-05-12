@@ -13,47 +13,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_DEFORMABLEREPRESENTATIONSTATE_H
-#define SURGSIM_PHYSICS_DEFORMABLEREPRESENTATIONSTATE_H
+#ifndef SURGSIM_MATH_ODESTATE_H
+#define SURGSIM_MATH_ODESTATE_H
 
-#include <vector>
+#include <memory>
 
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
 
-namespace Physics
+namespace Math
 {
 
-/// Defines the state for all deformable representations.
-/// It contains collections of position, velocity and acceleration for all degrees of freedom
-/// It also contains the boundary conditions (per degree of freedom) associated to this state
-/// A Degree of freedom (DOF) is a SINGLE INDEPENDENT parameter for defining the configuration of the model.
-/// Example 1: A mass in 3D space has 3DOF (independent coordinates along axis X, Y and Z).
-/// Example 2: A beam element model is a 6DOF model (independent coordinates along axis X, Y and Z,
-///                                           and independent rotation parameters along X, Y and Z).
-class DeformableRepresentationState
+/// OdeState defines the state y of an ode of 2nd order of the form M(x,v).a = F(x, v) with boundary conditions
+/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
+/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
+/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.F(x, v) )
+class OdeState
 {
 public:
 	/// Default constructor
-	DeformableRepresentationState();
+	OdeState();
 
 	/// Destructor
-	~DeformableRepresentationState();
+	~OdeState();
 
 	/// Comparison operator (equality test)
 	/// \param state The state to compare it to
 	/// \return True if the 2 states are equal, False otherwise
-	bool operator ==(const DeformableRepresentationState& state) const;
+	bool operator ==(const OdeState& state) const;
 
 	/// Comparison operator (difference test)
 	/// \param state The state to compare it to
 	/// \return False if the 2 states are equal, True otherwise
-	bool operator !=(const DeformableRepresentationState& state) const;
+	bool operator !=(const OdeState& state) const;
 
 	/// Resets the state
-	/// \note Simply set all positions/velocities/accelerations to 0 and remove all boundary conditions
+	/// \note Simply set all positions/velocities to 0 and remove all boundary conditions
 	void reset();
 
 	/// Allocates the state for a given number of degrees of freedom
@@ -63,11 +61,11 @@ public:
 	void setNumDof(unsigned int numDofPerNode, unsigned int numNodes);
 
 	/// Retrieves the number of degrees of freedom
-	/// \return The number of DOF for this deformable representation
+	/// \return The number of DOF for this representation
 	unsigned int getNumDof() const;
 
 	/// Retrieves the number of nodes
-	/// \return The number of nodes for this deformable representation
+	/// \return The number of nodes for this representation
 	unsigned int getNumNodes() const;
 
 	/// Retrieves all degrees of freedom's position (non-const version)
@@ -98,24 +96,14 @@ public:
 	/// \note Behavior undefined if the nodeId is not in the correct range [0 getNumNodes()-1]
 	const SurgSim::Math::Vector3d getVelocity(unsigned int nodeId) const;
 
-	/// Retrieves all degrees of freedom's acceleration (non-const version)
-	/// \return Vector of collected DOF's acceleration
-	SurgSim::Math::Vector& getAccelerations();
+	/// Adds boundary conditions for a given node (fixes all the dof for this node)
+	/// \param nodeId The node to set the boundary conditions on
+	void addBoundaryCondition(unsigned int nodeId);
 
-	/// Retrieves all degrees of freedom's acceleration (const version)
-	/// \return Vector of collected DOF's acceleration
-	const SurgSim::Math::Vector& getAccelerations() const;
-
-	/// Retrieves the acceleration of a given node (const version)
-	/// \param nodeId The desired node id for which the acceleration is requested (must be a valid id)
-	/// \return The acceleration of the node nodeId
-	/// \note Behavior undefined if the nodeId is not in the correct range [0 getNumNodes()-1]
-	const SurgSim::Math::Vector3d getAcceleration(unsigned int nodeId) const;
-
-	/// Adds a boundary condition on a given dof
-	/// \param dof The dof to set as a boundary condition
-	/// \note No test is performed on dof, the behavior is undefined when dof is out of range
-	void addBoundaryCondition(unsigned int dof);
+	/// Adds a boundary condition on a given dof of a given node (only 1 dof is fixed)
+	/// \param nodeId The node on which the boundary condition needs to be set
+	/// \param nodeDofId The dof of the node to set as boundary condition
+	void addBoundaryCondition(unsigned int nodeId, unsigned int nodeDofId);
 
 	/// Retrieves the number of boundary conditions
 	/// \return The number of boundary conditions
@@ -131,6 +119,18 @@ public:
 	/// \note The behavior is undefined when dof is out of range [0 getNumBoundaryConditions()-1]
 	bool isBoundaryCondition(unsigned int dof) const;
 
+	/// Apply boundary conditions to a given vector
+	/// \param vector The vector to apply the boundary conditions on
+	void applyBoundaryConditionsToVector(Vector* vector) const;
+
+	/// Apply boundary conditions to a given matrix
+	/// \param matrix The matrix to apply the boundary conditions on
+	void applyBoundaryConditionsToMatrix(Matrix* matrix) const;
+
+	/// Check if this state is numerically valid
+	/// \return True if all positions and velocities are valid numerical values, False otherwise
+	bool isValid() const;
+
 private:
 	/// Default public copy constructor and assignment operator are being used on purpose
 
@@ -143,9 +143,6 @@ private:
 	/// Degrees of freedom velocity (m_x 1st derivative w.r.t. time)
 	SurgSim::Math::Vector m_v;
 
-	/// Degrees of freedom acceleration (m_x 2nd derivative w.r.t. time)
-	SurgSim::Math::Vector m_a;
-
 	/// Boundary conditions stored as a list of dof ids
 	std::vector<unsigned int> m_boundaryConditionsAsDofIds;
 
@@ -153,8 +150,8 @@ private:
 	Eigen::Matrix<bool, Eigen::Dynamic, 1> m_boundaryConditionsPerDof;
 };
 
-}; // namespace Physics
+}; // namespace Math
 
 }; // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_DEFORMABLEREPRESENTATIONSTATE_H
+#endif // SURGSIM_MATH_ODESTATE_H

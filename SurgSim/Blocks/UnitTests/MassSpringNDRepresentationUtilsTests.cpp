@@ -20,11 +20,9 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
-
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::LinearSpring;
 
 TEST(MassSpringNDRepresentationUtilsTests, CreateLinearSpring)
@@ -36,8 +34,8 @@ TEST(MassSpringNDRepresentationUtilsTests, CreateLinearSpring)
 
 	{
 		SCOPED_TRACE("Create linear spring with 0 rest-length");
-		std::shared_ptr<DeformableRepresentationState> state;
-		state = std::make_shared<DeformableRepresentationState>();
+		std::shared_ptr<SurgSim::Math::OdeState> state;
+		state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(numDofPerNode, numNodes);
 
 		std::shared_ptr<LinearSpring> linearSpring;
@@ -55,8 +53,8 @@ TEST(MassSpringNDRepresentationUtilsTests, CreateLinearSpring)
 
 	{
 		SCOPED_TRACE("Create linear spring with non 0 rest-length");
-		std::shared_ptr<DeformableRepresentationState> state;
-		state = std::make_shared<DeformableRepresentationState>();
+		std::shared_ptr<SurgSim::Math::OdeState> state;
+		state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(numDofPerNode, numNodes);
 		for (int nodeId = 0; nodeId < numNodes; nodeId++)
 		{

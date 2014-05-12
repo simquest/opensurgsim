@@ -21,7 +21,7 @@
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/DataStructures/EmptyData.h"
@@ -126,7 +126,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 		= std::make_shared<SurgSim::Physics::Fem3DRepresentation>(name + " physics");
 	physicsRepresentation->setFilename(filename);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
-	// Note: Directly calling loadFile is a workaround.  The TransferDeformableStateToVerticesBehavior requires a
+	// Note: Directly calling loadFile is a workaround.  The TransferOdeStateToVerticesBehavior requires a
 	// pointer to the Physics Representation's state, which is not created until the file is loaded and the internal
 	// structure is initialized.  Therefore we create the state now by calling loadFile.
 	physicsRepresentation->loadFile();
@@ -140,7 +140,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	sceneElement->addComponent(
-		std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
+		std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
 			name + " physics to triangle mesh",
 			physicsRepresentation->getFinalState(),
 			graphicsTriangleMeshRepresentation->getMesh()));
@@ -149,7 +149,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	{
 		// Create a point-cloud for visualizing the nodes of the finite element model
 		std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>> graphicsPointCloudRepresentation
-			= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>(name + " point cloud");
+				= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>(name + " point cloud");
 		graphicsPointCloudRepresentation->setColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
 		graphicsPointCloudRepresentation->setPointSize(3.0f);
 		graphicsPointCloudRepresentation->setVisible(true);
@@ -157,7 +157,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 		// Create a behavior which transfers the position of the vertices in the FEM to locations in the point cloud
 		sceneElement->addComponent(
-			std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<EmptyData>>(
+			std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<EmptyData>>(
 				name + " physics to point cloud",
 				physicsRepresentation->getFinalState(),
 				graphicsPointCloudRepresentation->getVertices()));
@@ -255,7 +255,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	{
 		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision
 			= std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
-				"VirtualToothCollision" + boost::to_string(i), *it, RigidTransform3d::Identity());
+				  "VirtualToothCollision" + boost::to_string(i), *it, RigidTransform3d::Identity());
 
 		virtualTeeth[i] = virtualToothCollision;
 		sceneElement->addComponent(virtualToothCollision);
@@ -350,7 +350,7 @@ int main(int argc, char* argv[])
 	if (!device->initialize())
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "Could not initialize device " << device->getName() << " for the tool.";
+				<< "Could not initialize device " << device->getName() << " for the tool.";
 
 		device = std::make_shared<IdentityPoseDevice>(deviceName);
 	}

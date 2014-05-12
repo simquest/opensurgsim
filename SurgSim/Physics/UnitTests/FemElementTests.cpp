@@ -18,13 +18,11 @@
 #include <string>
 
 #include "SurgSim/Physics/FemElement.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Physics::FemElement;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
 
@@ -76,7 +74,7 @@ TEST(FemElementTests, GetSetAddMethods)
 	EXPECT_DOUBLE_EQ(0.0, femElement.getMassDensity());
 
 	// Test GetMass
-	DeformableRepresentationState fakeState;
+	SurgSim::Math::OdeState fakeState;
 	femElement.setMassDensity(0.0);
 	EXPECT_DOUBLE_EQ(0.0, femElement.getMass(fakeState));
 	femElement.setMassDensity(1.14);
@@ -106,7 +104,7 @@ TEST(FemElementTests, GetSetAddMethods)
 TEST(FemElementTests, InitializeMethods)
 {
 	MockFemElement femElement;
-	DeformableRepresentationState fakeState;
+	SurgSim::Math::OdeState fakeState;
 
 	// Mass density not set
 	ASSERT_ANY_THROW(femElement.initialize(fakeState));

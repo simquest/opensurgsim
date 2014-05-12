@@ -34,7 +34,7 @@ namespace Physics
 /// Fem3DRepresentationLocalization stores a pointer to a Fem3DRepresentation in an abstract Representation object.  It
 /// holds an FemRepresentationCoordinate, which contains a barycentric coordinate and the ID of an FemElement associated
 /// with an Fem3DRepresentation, and it provides a helper function Fem3DRepresentationLocalization::calculatePosition to
-/// find the FemRepresentationCoordinate in coordinates in the current DeformableRepresentationState.
+/// find the FemRepresentationCoordinate in coordinates in the current OdeState.
 class Fem3DRepresentationLocalization : public Localization
 {
 public:

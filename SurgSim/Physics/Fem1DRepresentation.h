@@ -51,7 +51,7 @@ protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
-	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
+	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 								const SurgSim::Math::RigidTransform3d& transform) override;
 };
 

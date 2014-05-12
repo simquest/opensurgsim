@@ -40,24 +40,18 @@ namespace Math
 /// \note k2 = f(t+dt/2, y(n) + k1.dt/2)
 /// \note k3 = f(t+dt/2, y(n) + k2.dt/2)
 /// \note k4 = f(t+dt  , y(n) + k3.dt)
-/// \tparam State Type of the state y=(x v)
-/// \note State is expected to hold on to the dof derivatives and have the API:
-/// \note   Vector& getPositions();
-/// \note   Vector& getVelocities();
-/// \note   Vector& getAccelerations();
-template <class State>
-class OdeSolverRungeKutta4 : public OdeSolver<State>
+class OdeSolverRungeKutta4 : public OdeSolver
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverRungeKutta4(OdeEquation<State>* equation);
+	explicit OdeSolverRungeKutta4(OdeEquation* equation);
 
 	/// Solves the equation
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	void solve(double dt, const State& currentState, State* newState) override;
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
 protected:
 	/// Temporary vectors to store the 4 intermediates evaluations
@@ -73,19 +67,10 @@ protected:
 	};
 	/// Runge kutta 4 intermediate system evaluations
 	RungeKuttaDerivedState m_k1, m_k2, m_k3, m_k4;
-
-public:
-	using OdeSolver<State>::m_compliance;
-	using OdeSolver<State>::m_equation;
-	using OdeSolver<State>::m_linearSolver;
-	using OdeSolver<State>::m_name;
-	using OdeSolver<State>::m_systemMatrix;
 };
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#include "SurgSim/Math/OdeSolverRungeKutta4-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVERRUNGEKUTTA4_H

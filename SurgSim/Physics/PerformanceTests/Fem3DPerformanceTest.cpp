@@ -22,6 +22,7 @@
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Timer.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
@@ -90,7 +91,7 @@ public:
 		m_cubeNodes[6] = center - halfLength * X + halfLength * Y + halfLength * Z;
 		m_cubeNodes[7] = center + halfLength * X + halfLength * Y + halfLength * Z;
 
-		auto initialState = std::make_shared<DeformableRepresentationState>();
+		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
 		fillUpDeformableState(initialState);
 		setInitialState(initialState);
 		addFemCubes(initialState);
@@ -105,9 +106,9 @@ protected:
 		return m_numNodesPerAxis * m_numNodesPerAxis * i + m_numNodesPerAxis * j + k;
 	}
 
-	/// Fills up a given deformable state with the cube's nodes, border nodes, and internal nodes
-	/// \param[in,out] state	The deformable state to be filled up
-	void fillUpDeformableState(std::shared_ptr<DeformableRepresentationState> state)
+	/// Fills up a given state with the cube's nodes, border nodes, and internal nodes
+	/// \param[in,out] state	The state to be filled up
+	void fillUpDeformableState(std::shared_ptr<SurgSim::Math::OdeState> state)
 	{
 		state->setNumDof(getNumDofPerNode(), m_numNodesPerAxis * m_numNodesPerAxis * m_numNodesPerAxis);
 		SurgSim::Math::Vector& nodePositions = state->getPositions();
@@ -155,8 +156,8 @@ protected:
 	}
 
 	/// Adds the Fem3D elements of small cubes
-	/// \param state	The deformable state for initialization.
-	void addFemCubes(std::shared_ptr<DeformableRepresentationState> state)
+	/// \param state	The state for initialization.
+	void addFemCubes(std::shared_ptr<SurgSim::Math::OdeState> state)
 	{
 		for (size_t i = 0; i < m_numNodesPerAxis - 1; i++)
 		{

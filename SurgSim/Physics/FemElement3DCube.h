@@ -48,16 +48,16 @@ public:
 	/// \note In order to do so (looking at the cube from the exterior, face normal 'n' pointing outward),
 	/// \note   the 1st  4 nodeIds (ABCD) should define any face CW            i.e. (AB^AC or AB^AD or AC^AD).n < 0
 	/// \note   the last 4 nodeIds (EFGH) should define the opposite face CCW  i.e. (EF^EG or EF^EH or EG^EH).n > 0
-	FemElement3DCube(std::array<unsigned int, 8> nodeIds, const DeformableRepresentationState& restState);
+	FemElement3DCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState);
 
 	/// Initializes the element once everything has been set
 	/// \param state The state to initialize the FemElement with
 	/// \note We use the theory of linear elasticity, so this method precomputes the stiffness and mass matrices
-	virtual void initialize(const DeformableRepresentationState& state) override;
+	virtual void initialize(const SurgSim::Math::OdeState& state) override;
 
 	/// Gets the element volume based on the input state
-	/// \param state The deformable state to compute the volume with
-	virtual double getVolume(const DeformableRepresentationState& state) const override;
+	/// \param state The state to compute the volume with
+	virtual double getVolume(const SurgSim::Math::OdeState& state) const override;
 
 	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
 	/// \param state The state to compute the force with
@@ -66,7 +66,7 @@ public:
 	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+	virtual void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
 		double scale = 1.0) override;
 
 	/// Adds the element mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
@@ -76,7 +76,7 @@ public:
 	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M,
+	virtual void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M,
 		double scale = 1.0) override;
 
 	/// Adds the element damping matrix D (= -df/dv) (computed for a given state)
@@ -88,7 +88,7 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
 	/// \note FemElement3DCube uses linear elasticity (not visco-elasticity), so it does not give any damping.
-	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
+	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 		double scale = 1.0) override;
 
 	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
@@ -99,7 +99,7 @@ public:
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
+	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
 		double scale = 1.0) override;
 
 	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
@@ -111,7 +111,7 @@ public:
 	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addFMDK(const DeformableRepresentationState& state,
+	virtual void addFMDK(const SurgSim::Math::OdeState& state,
 		SurgSim::Math::Vector* F,
 		SurgSim::Math::Matrix* M,
 		SurgSim::Math::Matrix* D,
@@ -127,7 +127,7 @@ public:
 	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addMatVec(const DeformableRepresentationState& state,
+	virtual void addMatVec(const SurgSim::Math::OdeState& state,
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
@@ -144,7 +144,7 @@ public:
 	/// \param naturalCoordinate The coordinates to transform
 	/// \return The resultant Cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
-		const DeformableRepresentationState& state,
+		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const override;
 
 protected:
@@ -153,18 +153,17 @@ protected:
 	void buildConstitutiveMaterialMatrix(Eigen::Matrix<double, 6, 6, Eigen::DontAlign>* constitutiveMatrix);
 
 	/// Computes the cube stiffness matrix along with the strain and stress matrices
-	/// \param state The deformable state to compute the stiffness matrix from
+	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] strain, stress, k The strain, stress and stiffness matrices to store the result into
-	void computeStiffness(const DeformableRepresentationState& state,
+	void computeStiffness(const SurgSim::Math::OdeState& state,
 		Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* strain,
 		Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* stress,
 		Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* k);
 
 	/// Computes the cube mass matrix
-	/// \param state The deformable state to compute the mass matrix from
+	/// \param state The state to compute the mass matrix from
 	/// \param[out] m The mass matrix to store the result into
-	void computeMass(const DeformableRepresentationState& state,
-		Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* m);
+	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* m);
 
 	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
 	/// This method relies on a given stiffness matrix and does not evaluate it from the state
@@ -175,7 +174,7 @@ protected:
 	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	void addForce(const DeformableRepresentationState& state, const Eigen::Matrix<double, 24, 24>& k,
+	void addForce(const SurgSim::Math::OdeState& state, const Eigen::Matrix<double, 24, 24>& k,
 		SurgSim::Math::Vector* F, double scale = 1.0);
 
 	/// Helper method to evaluate strain-stress and stiffness integral terms with a discrete sum using
@@ -183,7 +182,7 @@ protected:
 	/// \param state The state to compute the evaluation with
 	/// \param epsilon, eta, mu The Gauss quadrature points to evaluate the data at
 	/// \param[out] strain, stress, k The matrices in which to add the evaluations
-	void addStrainStressStiffnessAtPoint(const DeformableRepresentationState& state,
+	void addStrainStressStiffnessAtPoint(const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::gaussQuadraturePoint& epsilon,
 		const SurgSim::Math::gaussQuadraturePoint& eta,
 		const SurgSim::Math::gaussQuadraturePoint& mu,
@@ -195,7 +194,7 @@ protected:
 	/// \param state The state to compute the evaluation with
 	/// \param epsilon, eta, mu The Gauss quadrature points to evaluate the data at
 	/// \param[out] m The matrix in which to add the evaluations
-	void addMassMatrixAtPoint(const DeformableRepresentationState& state,
+	void addMassMatrixAtPoint(const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::gaussQuadraturePoint& epsilon,
 		const SurgSim::Math::gaussQuadraturePoint& eta,
 		const SurgSim::Math::gaussQuadraturePoint& mu,
@@ -206,7 +205,7 @@ protected:
 	/// \param state The state to compute the evaluation with
 	/// \param epsilon, eta, mu The 3D parametric coordinates to evaluate the data at (within \f$[-1 +1]\f$)
 	/// \param[out] J, Jinv, detJ The J matrix with its inverse and determinant evaluated at (epsilon, eta, mu)
-	void evaluateJ(const DeformableRepresentationState& state, double epsilon, double eta, double mu,
+	void evaluateJ(const SurgSim::Math::OdeState& state, double epsilon, double eta, double mu,
 		SurgSim::Math::Matrix33d *J,
 		SurgSim::Math::Matrix33d *Jinv,
 		double *detJ) const;

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_ODESOLVERRUNGEKUTTA4_INL_H
-#define SURGSIM_MATH_ODESOLVERRUNGEKUTTA4_INL_H
+#include "SurgSim/Math/OdeSolverRungeKutta4.h"
+#include "SurgSim/Math/OdeState.h"
 
 namespace SurgSim
 {
@@ -22,15 +22,13 @@ namespace SurgSim
 namespace Math
 {
 
-template <class State>
-OdeSolverRungeKutta4<State>::OdeSolverRungeKutta4(OdeEquation<State>* equation)
-	: OdeSolver<State>(equation)
+OdeSolverRungeKutta4::OdeSolverRungeKutta4(OdeEquation* equation)
+	: OdeSolver(equation)
 {
 	m_name = "Ode Solver Runge Kutta 4";
 }
 
-template <class State>
-void OdeSolverRungeKutta4<State>::solve(double dt, const State& currentState, State* newState)
+void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	// General equation to solve:
 	//   M.a(t) = F(t, x(t), v(t)), which is an ode of order 2 that can be reduced to an ode of order 1:
@@ -84,5 +82,3 @@ void OdeSolverRungeKutta4<State>::solve(double dt, const State& currentState, St
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#endif // SURGSIM_MATH_ODESOLVERRUNGEKUTTA4_INL_H
