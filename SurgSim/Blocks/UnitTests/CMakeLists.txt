@@ -24,7 +24,7 @@ set(UNIT_TEST_SOURCES
 	MassSpringNDRepresentationUtilsTests.cpp
 	PoseInterpolatorTests.cpp
 	SpringTestUtils.cpp
-	TransferDeformableStateToVerticesBehaviorTests.cpp
+	TransferOdeStateToVerticesBehaviorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

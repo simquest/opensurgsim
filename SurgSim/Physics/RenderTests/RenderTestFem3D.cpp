@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -28,10 +28,9 @@
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
+using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::FemElement;
 using SurgSim::Physics::FemElement3DCube;
@@ -77,7 +76,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 
 	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
 
-	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
 
 	for (size_t i = 0; i != vertices.size(); i++)
@@ -87,9 +86,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 
 	for (auto index = boundaryConditionsNodeIdx.cbegin(); index != boundaryConditionsNodeIdx.cend(); ++index)
 	{
-		initialState->addBoundaryCondition((*index) * 3 + 0);
-		initialState->addBoundaryCondition((*index) * 3 + 1);
-		initialState->addBoundaryCondition((*index) * 3 + 2);
+		initialState->addBoundaryCondition(*index);
 	}
 	physicsRepresentation->setInitialState(initialState);
 
@@ -114,7 +111,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 	femSceneElement->addComponent(graphicsRepresentation);
-	femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
+	femSceneElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>(
 		"Physics to Graphics deformable points",
 		physicsRepresentation->getFinalState(),
 		graphicsRepresentation->getVertices()));
@@ -147,7 +144,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	std::array<unsigned int, 8> cube = {{0, 1, 3, 2, 4, 5, 7, 6}};
 	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
 
-	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
 
 	for (size_t i = 0; i != vertices.size(); i++)
@@ -157,9 +154,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 
 	for (auto index = boundaryConditionsNodeIdx.cbegin(); index != boundaryConditionsNodeIdx.cend(); ++index)
 	{
-		initialState->addBoundaryCondition((*index) * 3 + 0);
-		initialState->addBoundaryCondition((*index) * 3 + 1);
-		initialState->addBoundaryCondition((*index) * 3 + 2);
+		initialState->addBoundaryCondition(*index);
 	}
 	physicsRepresentation->setInitialState(initialState);
 
@@ -181,7 +176,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 	femSceneElement->addComponent(graphicsRepresentation);
-	femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
+	femSceneElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>(
 		"Physics to Graphics deformable points",
 		physicsRepresentation->getFinalState(),
 		graphicsRepresentation->getVertices()));

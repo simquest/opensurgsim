@@ -20,9 +20,9 @@
 
 #include "SurgSim/Math/GaussLegendreQuadrature.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/FemElement2DTriangle.h"
 
 using SurgSim::Math::Matrix;
@@ -30,7 +30,6 @@ using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::FemElement2DTriangle;
 
 namespace
@@ -453,7 +452,7 @@ public:
 	static const int m_numberNodes = 6;
 
 	std::array<unsigned int, 3> m_nodeIds;
-	DeformableRepresentationState m_restState;
+	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
 	double m_rho, m_E, m_nu;
 	double m_A;         // area

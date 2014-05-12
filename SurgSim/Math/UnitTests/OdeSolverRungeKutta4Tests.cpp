@@ -41,11 +41,11 @@ TEST(OdeSolverRungeKutta4, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("OdeSolverRungeKutta4");
-		doConstructorTest<OdeSolverRungeKutta4<MassPointState>>();
+		doConstructorTest<OdeSolverRungeKutta4>();
 	}
 	{
 		SCOPED_TRACE("OdeSolverLinearRungeKutta4");
-		doConstructorTest<OdeSolverLinearRungeKutta4<MassPointState>>();
+		doConstructorTest<OdeSolverLinearRungeKutta4>();
 	}
 }
 
@@ -60,6 +60,10 @@ void doSolveTest()
 	{
 		MassPoint m;
 		MassPointState defaultState, currentState, newState;
+		defaultState.getVelocities().setZero();
+		defaultState.getPositions().setZero();
+		currentState = defaultState;
+		newState = defaultState;
 
 		T solver(&m);
 		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
@@ -82,6 +86,10 @@ void doSolveTest()
 	{
 		MassPoint m(0.1);
 		MassPointState defaultState, currentState, newState;
+		defaultState.getVelocities().setZero();
+		defaultState.getPositions().setZero();
+		currentState = defaultState;
+		newState = defaultState;
 
 		T solver(&m);
 		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
@@ -89,9 +97,11 @@ void doSolveTest()
 		EXPECT_NE(defaultState, newState);
 
 		EXPECT_FALSE(newState.getVelocities().isZero());
-		EXPECT_DOUBLE_EQ(0.0, newState.getVelocities().dot(Vector3d::UnitX()));
-		EXPECT_GT(0.0, newState.getVelocities().dot(Vector3d::UnitY()));
-		EXPECT_DOUBLE_EQ(0.0, newState.getVelocities().dot(Vector3d::UnitZ()));
+		EXPECT_FALSE(newState.getVelocities().isApprox(currentState.getVelocities()));
+		EXPECT_DOUBLE_EQ(currentState.getVelocities()[0], newState.getVelocities()[0]);
+		EXPECT_NE(currentState.getVelocities()[1], newState.getVelocities()[1]);
+		EXPECT_LT(newState.getVelocities()[1], currentState.getVelocities()[1]);
+		EXPECT_DOUBLE_EQ(currentState.getVelocities()[2], newState.getVelocities()[2]);
 
 		EXPECT_FALSE(newState.getPositions().isZero());
 		deltaWithViscosity = (newState.getPositions() - currentState.getPositions());
@@ -231,11 +241,11 @@ TEST(OdeSolverRungeKutta4, SolveTest)
 {
 	{
 		SCOPED_TRACE("OdeSolverRungeKutta4");
-		doSolveTest<OdeSolverRungeKutta4<MassPointState>>();
+		doSolveTest<OdeSolverRungeKutta4>();
 	}
 	{
 		SCOPED_TRACE("OdeSolverLinearRungeKutta4");
-		doSolveTest<OdeSolverLinearRungeKutta4<MassPointState>>();
+		doSolveTest<OdeSolverLinearRungeKutta4>();
 	}
 }
 

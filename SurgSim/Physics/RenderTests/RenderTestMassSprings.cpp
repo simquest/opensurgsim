@@ -20,7 +20,7 @@
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Blocks/MassSpring2DRepresentation.h"
 #include "SurgSim/Blocks/MassSpring3DRepresentation.h"
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -31,7 +31,7 @@
 using SurgSim::Blocks::MassSpring1DRepresentation;
 using SurgSim::Blocks::MassSpring2DRepresentation;
 using SurgSim::Blocks::MassSpring3DRepresentation;
-using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
+using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -50,15 +50,13 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 	// In this test, the physics representations are not transformed,
 	// only the graphics one will apply a transform
 
-	std::vector<unsigned int> boundaryConditions;
-	boundaryConditions.push_back(0);
-	boundaryConditions.push_back(1);
-	boundaryConditions.push_back(2);
+	std::vector<unsigned int> nodeBoundaryConditions;
+	nodeBoundaryConditions.push_back(0);
 	std::array<SurgSim::Math::Vector3d, 2> extremities = {{ Vector3d(0, 0, 0), Vector3d(1, 0, 0) }};
 	unsigned int numNodesPerDim[1] = {6};
 	physicsRepresentation->init1D(extremities,
 								  numNodesPerDim,
-								  boundaryConditions,
+								  nodeBoundaryConditions,
 								  0.1, // total mass (in Kg)
 								  5.0, // Stiffness stretching
 								  0.5, // Damping stretching
@@ -88,7 +86,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 		massSpringElement->addComponent(graphicsRepresentation);
 		ss.clear();
 		ss << "Physics to Graphics (" << gfxObjectId << ") deformable points";
-		massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
+		massSpringElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>
 										(ss.str(),
 										 physicsRepresentation->getFinalState(),
 										 graphicsRepresentation->getVertices()));
@@ -110,10 +108,8 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 	// In this test, the physics representations are not transformed,
 	// only the graphics one will apply a transform
 
-	std::vector<unsigned int> boundaryConditions;
-	boundaryConditions.push_back(0);
-	boundaryConditions.push_back(1);
-	boundaryConditions.push_back(2);
+	std::vector<unsigned int> nodeBoundaryConditions;
+	nodeBoundaryConditions.push_back(0);
 	std::array<std::array<SurgSim::Math::Vector3d, 2>, 2> extremities =
 	{
 		{
@@ -124,7 +120,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 	unsigned int numNodesPerDim[2] = {3, 3};
 	physicsRepresentation->init2D(extremities,
 								  numNodesPerDim,
-								  boundaryConditions,
+								  nodeBoundaryConditions,
 								  0.1, // total mass (in Kg)
 								  5.0, // Stiffness stretching
 								  0.5, // Damping stretching
@@ -156,7 +152,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 		massSpringElement->addComponent(graphicsRepresentation);
 		ss.clear();
 		ss << "Physics to Graphics (" << gfxObjectId << ") deformable points";
-		massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
+		massSpringElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>
 										(ss.str(),
 										 physicsRepresentation->getFinalState(),
 										 graphicsRepresentation->getVertices()));
@@ -177,10 +173,8 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	// In this test, the physics representations are not transformed,
 	// only the graphics one will apply a transform
 
-	std::vector<unsigned int> boundaryConditions;
-	boundaryConditions.push_back(0);
-	boundaryConditions.push_back(1);
-	boundaryConditions.push_back(2);
+	std::vector<unsigned int> nodeBoundaryConditions;
+	nodeBoundaryConditions.push_back(0);
 	std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities =
 	{
 		{
@@ -202,7 +196,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	unsigned int numNodesPerDim[3] = {3, 3, 3};
 	physicsRepresentation->init3D(extremities,
 								  numNodesPerDim,
-								  boundaryConditions,
+								  nodeBoundaryConditions,
 								  0.1, // total mass (in Kg)
 								  5.0, // Stiffness stretching
 								  0.5, // Damping stretching
@@ -236,7 +230,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 		massSpringElement->addComponent(graphicsRepresentation);
 		ss.clear();
 		ss << "Physics to Graphics (" << gfxObjectId << ") deformable points";
-		massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
+		massSpringElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>
 										(ss.str(),
 										 physicsRepresentation->getFinalState(),
 										 graphicsRepresentation->getVertices()));

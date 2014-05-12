@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
@@ -27,7 +28,6 @@
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Physics::ContactConstraintData;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::Fem3DRepresentationContact;
 using SurgSim::Physics::Fem3DRepresentationLocalization;
@@ -48,7 +48,7 @@ static void addTetraheadron(Fem3DRepresentation *fem,
 							unsigned int node1,
 							unsigned int node2,
 							unsigned int node3,
-							const DeformableRepresentationState &state,
+							const SurgSim::Math::OdeState& state,
 							double massDensity = 1.0,
 							double poissonRatio = 0.1,
 							double youngModulus = 1.0)
@@ -73,7 +73,7 @@ public:
 
 		// Create mock FEM
 		m_fem = std::make_shared<Fem3DRepresentation>("Fem3dRepresentation");
-		auto state = std::make_shared<DeformableRepresentationState>();
+		auto state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(3, 6);
 
 		// Place coordinates at

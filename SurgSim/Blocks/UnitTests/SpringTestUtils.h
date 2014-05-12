@@ -24,9 +24,13 @@
 namespace SurgSim
 {
 
+namespace Math
+{
+class OdeState;
+};
+
 namespace Physics
 {
-class DeformableRepresentationState;
 class LinearSpring;
 };
 
@@ -34,7 +38,7 @@ namespace Blocks
 {
 
 void springTest(std::shared_ptr<SurgSim::Physics::LinearSpring> spring,
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
+	std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int expectedNodeId0, unsigned int expectedNodeId1,
 	double expectedStiffness, double expectedDamping);
 

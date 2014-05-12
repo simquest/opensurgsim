@@ -34,6 +34,7 @@ namespace SurgSim
 namespace Graphics
 {
 
+// This does not acutally display anything
 TEST(OsgManagerRenderTests, StartUpTest)
 {
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();

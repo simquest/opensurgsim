@@ -36,7 +36,7 @@ void KeyboardTogglesGraphicsBehavior::setInputComponent(std::shared_ptr<SurgSim:
 }
 
 void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
-												  std::shared_ptr<SurgSim::Framework::Component> component)
+		std::shared_ptr<SurgSim::Framework::Component> component)
 {
 	auto graphicsRepresentation = std::dynamic_pointer_cast<SurgSim::Graphics::Representation>(component);
 	if (nullptr != graphicsRepresentation)
@@ -46,8 +46,8 @@ void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
 	else
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"KeyboardTogglesGraphicsBehavior::registerKey(): Can not register component " << component->getName() <<
-			". It's not a SurgSim::Graphics::Representation.\n";
+				"KeyboardTogglesGraphicsBehavior::registerKey(): Can not register component " << component->getName() <<
+				". It's not a SurgSim::Graphics::Representation.";
 	}
 }
 
@@ -81,7 +81,7 @@ bool KeyboardTogglesGraphicsBehavior::doWakeUp()
 	if (nullptr == m_inputComponent)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "KeyboardTogglesGraphicsBehavior " <<
-			getName() << " does not have an Input Component.";
+				getName() << " does not have an Input Component.";
 		return false;
 	}
 	return true;

@@ -31,12 +31,10 @@
 #include "SurgSim/Math/OdeSolverStatic.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Physics::DeformableCollisionRepresentation;
 using SurgSim::Physics::DeformableRepresentation;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::MockDeformableRepresentation;
 
 using SurgSim::Math::Vector3d;
@@ -64,7 +62,7 @@ public:
 	/// Setup the test case
 	void SetUp() override
 	{
-		m_localInitialState = std::make_shared<DeformableRepresentationState>();
+		m_localInitialState = std::make_shared<SurgSim::Math::OdeState>();
 		m_localInitialState->setNumDof(getNumDofPerNode(), numNodes);
 		m_localInitialState->getPositions().setLinSpaced(0.0, static_cast<double>(getNumDofPerNode() * numNodes- 1));
 		m_localInitialState->getVelocities().setOnes();
@@ -78,7 +76,7 @@ public:
 
 protected:
 	// Initial state
-	std::shared_ptr<DeformableRepresentationState> m_localInitialState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_localInitialState;
 
 	// Identity and nonIdentity (but still valid) transforms
 	SurgSim::Math::RigidTransform3d m_identityTransform;
@@ -333,43 +331,42 @@ TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 		(m_odeSolver->getLinearSolver());
 	ASSERT_NE(nullptr, expectedLinearSolverType);
 
-	typedef OdeSolverEulerExplicit<DeformableRepresentationState> EESolver;
+	typedef OdeSolverEulerExplicit EESolver;
 	EESolver* explicitEuler;
 	explicitEuler = dynamic_cast<EESolver*>(m_odeSolver.get());
 	ASSERT_NE(nullptr, explicitEuler);
 
-	typedef OdeSolverEulerExplicitModified<DeformableRepresentationState> MEESolver;
+	typedef OdeSolverEulerExplicitModified MEESolver;
 	MEESolver* modifiedExplicitEuler;
 	modifiedExplicitEuler = dynamic_cast<MEESolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, modifiedExplicitEuler);
 
-	typedef OdeSolverEulerImplicit<DeformableRepresentationState> IESolver;
+	typedef OdeSolverEulerImplicit IESolver;
 	IESolver* implicitEuler;
 	implicitEuler = dynamic_cast<IESolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, implicitEuler);
 
-	typedef OdeSolverStatic<DeformableRepresentationState> StaticSolver;
+	typedef OdeSolverStatic StaticSolver;
 	StaticSolver* staticSolver;
 	staticSolver = dynamic_cast<StaticSolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, staticSolver);
 
-	typedef OdeSolverLinearEulerExplicit<DeformableRepresentationState> EELinearSolver;
+	typedef OdeSolverLinearEulerExplicit EELinearSolver;
 	EELinearSolver* explicitEulerLinear;
 	explicitEulerLinear = dynamic_cast<EELinearSolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, explicitEulerLinear);
 
-	typedef OdeSolverLinearEulerExplicitModified<DeformableRepresentationState>
-		MEELinearSolver;
+	typedef OdeSolverLinearEulerExplicitModified MEELinearSolver;
 	MEELinearSolver* modifiedExplicitEulerLinear;
 	modifiedExplicitEulerLinear = dynamic_cast<MEELinearSolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, modifiedExplicitEulerLinear);
 
-	typedef OdeSolverLinearEulerImplicit<DeformableRepresentationState> IELinearSolver;
+	typedef OdeSolverLinearEulerImplicit IELinearSolver;
 	IELinearSolver* implicitEulerLinear;
 	implicitEulerLinear = dynamic_cast<IELinearSolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, implicitEulerLinear);
 
-	typedef OdeSolverLinearStatic<DeformableRepresentationState> StaticLinearSolver;
+	typedef OdeSolverLinearStatic StaticLinearSolver;
 	StaticLinearSolver* staticLinearSolver;
 	staticLinearSolver = dynamic_cast<StaticLinearSolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, staticLinearSolver);

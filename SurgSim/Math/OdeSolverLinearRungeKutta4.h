@@ -25,38 +25,23 @@ namespace Math
 {
 
 /// Linear Version of the Runge Kutta 4 ode solver
-/// This solver assumes that the system is linear, ie that Mass,
-/// Damping, and Stiffness matrices do not change.
-template <class State>
-class OdeSolverLinearRungeKutta4 : public OdeSolverRungeKutta4<State>
+/// This solver assumes that the system is linear
+/// ie that Mass, Damping, and Stiffness matrices do not change.
+class OdeSolverLinearRungeKutta4 : public OdeSolverRungeKutta4
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverLinearRungeKutta4(OdeEquation<State>* equation);
+	explicit OdeSolverLinearRungeKutta4(OdeEquation* equation);
 
-	virtual void solve(double dt, const State& currentState, State* newState) override;
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
 private:
 	bool m_initialized;
-
-public:
-	// Variables used from OdeSolver
-	using OdeSolver<State>::m_compliance;
-	using OdeSolver<State>::m_equation;
-	using OdeSolver<State>::m_name;
-
-	using OdeSolverRungeKutta4<State>::m_force;
-	using OdeSolverRungeKutta4<State>::m_k1;
-	using OdeSolverRungeKutta4<State>::m_k2;
-	using OdeSolverRungeKutta4<State>::m_k3;
-	using OdeSolverRungeKutta4<State>::m_k4;
 };
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#include "SurgSim/Math/OdeSolverLinearRungeKutta4-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVERLINEARRUNGEKUTTA4_H

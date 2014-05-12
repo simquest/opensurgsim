@@ -25,6 +25,7 @@
 #include "SurgSim/Math/OdeSolverLinearRungeKutta4.h"
 #include "SurgSim/Math/OdeSolverLinearStatic.h"
 #include "SurgSim/Math/OdeSolverStatic.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
@@ -35,8 +36,8 @@ namespace Physics
 {
 
 DeformableRepresentation::DeformableRepresentation(const std::string& name) :
-	DeformableRepresentationBase(name),
-	SurgSim::Math::OdeEquation<DeformableRepresentationState>(),
+	Representation(name),
+	SurgSim::Math::OdeEquation(),
 	m_numDofPerNode(0),
 	m_integrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER)
 {
@@ -57,31 +58,31 @@ void DeformableRepresentation::resetState()
 }
 
 void DeformableRepresentation::setInitialState(
-	std::shared_ptr<DeformableRepresentationState> initialState)
+	std::shared_ptr<SurgSim::Math::OdeState> initialState)
 {
 	// This initializes and allocates the m_initialState data member
 	m_initialState = initialState;
 
-	m_previousState = std::make_shared<DeformableRepresentationState>(*m_initialState);
-	m_currentState = std::make_shared<DeformableRepresentationState>(*m_initialState);
-	m_newState = std::make_shared<DeformableRepresentationState>(*m_initialState);
-	m_finalState = std::make_shared<DeformableRepresentationState>(*m_initialState);
+	m_previousState = std::make_shared<SurgSim::Math::OdeState>(*m_initialState);
+	m_currentState = std::make_shared<SurgSim::Math::OdeState>(*m_initialState);
+	m_newState = std::make_shared<SurgSim::Math::OdeState>(*m_initialState);
+	m_finalState = std::make_shared<SurgSim::Math::OdeState>(*m_initialState);
 
 	// Set the representation number of degree of freedom
 	setNumDof(m_initialState->getNumDof());
 }
 
-const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation::getCurrentState() const
+const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const
 {
 	return m_currentState;
 }
 
-const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation::getPreviousState() const
+const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getPreviousState() const
 {
 	return m_previousState;
 }
 
-const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation::getFinalState() const
+const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getFinalState() const
 {
 	return m_finalState;
 }
@@ -210,34 +211,34 @@ bool DeformableRepresentation::doWakeUp()
 	switch (m_integrationScheme)
 	{
 	case SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER:
-		m_odeSolver = std::make_shared<OdeSolverEulerExplicit<DeformableRepresentationState>>(this);
+		m_odeSolver = std::make_shared<OdeSolverEulerExplicit>(this);
 		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER:
-		m_odeSolver = std::make_shared<OdeSolverEulerExplicitModified<DeformableRepresentationState>>(this);
+		m_odeSolver = std::make_shared<OdeSolverEulerExplicitModified>(this);
 		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER:
-		m_odeSolver = std::make_shared<OdeSolverEulerImplicit<DeformableRepresentationState>>(this);
+		m_odeSolver = std::make_shared<OdeSolverEulerImplicit>(this);
 		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_STATIC:
-		m_odeSolver = std::make_shared<OdeSolverStatic<DeformableRepresentationState>>(this);
+		m_odeSolver = std::make_shared<OdeSolverStatic>(this);
 		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4:
-		m_odeSolver = std::make_shared<OdeSolverRungeKutta4<DeformableRepresentationState>>(this);
+		m_odeSolver = std::make_shared<OdeSolverRungeKutta4>(this);
 		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER:
-		m_odeSolver = std::make_shared<OdeSolverLinearEulerExplicit<DeformableRepresentationState>>(this);
+		m_odeSolver = std::make_shared<OdeSolverLinearEulerExplicit>(this);
 		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER:
-		m_odeSolver = std::make_shared<OdeSolverLinearEulerExplicitModified<DeformableRepresentationState>>(this);
+		m_odeSolver = std::make_shared<OdeSolverLinearEulerExplicitModified>(this);
 		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER:
-		m_odeSolver = std::make_shared<OdeSolverLinearEulerImplicit<DeformableRepresentationState>>(this);
+		m_odeSolver = std::make_shared<OdeSolverLinearEulerImplicit>(this);
 		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC:
-		m_odeSolver = std::make_shared<OdeSolverLinearStatic<DeformableRepresentationState>>(this);
+		m_odeSolver = std::make_shared<OdeSolverLinearStatic>(this);
 		break;
 	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4:
-		m_odeSolver = std::make_shared<OdeSolverLinearRungeKutta4<DeformableRepresentationState>>(this);
+		m_odeSolver = std::make_shared<OdeSolverLinearRungeKutta4>(this);
 		break;
 	default:
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())

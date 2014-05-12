@@ -29,7 +29,7 @@ namespace Framework
 
 PoseComponent::PoseComponent(const std::string& name) : Component(name)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PoseComponent, SurgSim::Math::RigidTransform3d, pose, getPose, setPose);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PoseComponent, SurgSim::Math::RigidTransform3d, Pose, getPose, setPose);
 }
 
 void PoseComponent::setPose(const SurgSim::Math::RigidTransform3d& pose)

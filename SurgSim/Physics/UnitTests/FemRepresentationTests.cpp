@@ -47,7 +47,7 @@ public:
 	Matrix m_expectedStiffness;
 
 	std::shared_ptr<MockFemRepresentation> m_fem;
-	std::shared_ptr<DeformableRepresentationState> m_initialState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
 
 protected:
 	virtual void SetUp() override
@@ -61,7 +61,7 @@ protected:
 
 		m_fem = std::make_shared<MockFemRepresentation>("MockFem");
 
-		m_initialState = std::make_shared<DeformableRepresentationState>();
+		m_initialState = std::make_shared<SurgSim::Math::OdeState>();
 		m_initialState->setNumDof(m_fem->getNumDofPerNode(), 3);
 		m_initialState->getVelocities().setOnes(); // v = (1...1) to test damping
 		m_fem->setInitialState(m_initialState);
@@ -206,7 +206,7 @@ TEST_F(FemRepresentationTests, BeforeUpdateTest)
 	// Throw exception (no initialState setup yet)
 	ASSERT_ANY_THROW(fem.beforeUpdate(m_dt));
 
-	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(fem.getNumDofPerNode(), 8);
 	fem.setInitialState(initialState);
 
@@ -329,7 +329,7 @@ TEST_F(FemRepresentationTests, DoInitializeTest)
 	MockFemRepresentation fem("name");
 
 	// Setup the initial state
-	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(fem.getNumDofPerNode(), 8);
 	fem.setInitialState(initialState);
 

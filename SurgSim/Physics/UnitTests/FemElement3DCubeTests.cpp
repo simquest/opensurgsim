@@ -18,15 +18,14 @@
 #include <memory>
 #include <array>
 
-#include "SurgSim/Physics/FemElement3DCube.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/FemElement3DCube.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::FemElement3DCube;
 
 namespace
@@ -38,7 +37,7 @@ const double epsilon = 2.6e-9;
 class MockFemElement3DCube : public FemElement3DCube
 {
 public:
-	MockFemElement3DCube(std::array<unsigned int, 8> nodeIds, const DeformableRepresentationState& restState) :
+	MockFemElement3DCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState) :
 		FemElement3DCube(nodeIds, restState)
 	{
 	}
@@ -78,7 +77,7 @@ class FemElement3DCubeTests : public ::testing::Test
 {
 public:
 	std::array<unsigned int, 8> m_nodeIds;
-	DeformableRepresentationState m_restState;
+	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
 	Eigen::Matrix<double, 24, 1, Eigen::DontAlign> m_expectedX0;
 	double m_rho, m_E, m_nu;
@@ -505,7 +504,7 @@ TEST_F(FemElement3DCubeTests, VolumeTest)
 
 // This function tests all node permutations for both face definition (2 groups of 4 indices)
 // keeping their ordering intact (CW or CCW)
-void testNodeOrderingAllPermutations(const DeformableRepresentationState& m_restState,
+void testNodeOrderingAllPermutations(const SurgSim::Math::OdeState& m_restState,
 					  size_t id0, size_t id1, size_t id2, size_t id3, size_t id4, size_t id5, size_t id6, size_t id7,
 					  bool expectThrow)
 {

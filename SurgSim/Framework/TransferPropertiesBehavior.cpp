@@ -60,7 +60,7 @@ bool TransferPropertiesBehavior::connect(
 	const std::string& targetPropertyName)
 {
 	SURGSIM_ASSERT(sourceAccessible != nullptr && targetAccessible != nullptr) <<
-		"Accessibles cannot be nullptr";
+			"Accessibles cannot be nullptr";
 
 	Property source = {sourceAccessible, sourcePropertyName};
 	Property target = {targetAccessible, targetPropertyName};
@@ -80,13 +80,13 @@ bool TransferPropertiesBehavior::connect(const Property& source, const Property&
 	auto sharedTarget = target.accessible.lock();
 
 	SURGSIM_ASSERT(sharedSource != sharedTarget || source.name != target.name)
-		<< "Cannot Read/Write with exactly the same property and object.";
+			<< "Cannot Read/Write with exactly the same property and object.";
 
 	SURGSIM_ASSERT(sharedSource->isReadable(source.name))
-		<< "Source does not have a readable property called <" << source.name << ">.";
+			<< "Source does not have a readable property called <" << source.name << ">.";
 
 	SURGSIM_ASSERT(sharedTarget->isWriteable(target.name))
-		<< "Target does not have a writeable property called <" << target.name << ">.";
+			<< "Target does not have a writeable property called <" << target.name << ">.";
 
 	// \note HS-2013-nov-26 should also that the type of the output can be converted to the input
 

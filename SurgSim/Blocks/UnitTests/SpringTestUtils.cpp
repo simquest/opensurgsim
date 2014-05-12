@@ -19,9 +19,9 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Blocks/UnitTests/SpringTestUtils.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-#include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/LinearSpring.h"
 
 namespace SurgSim
 {
@@ -30,7 +30,7 @@ namespace Blocks
 {
 
 void springTest(std::shared_ptr<SurgSim::Physics::LinearSpring> spring,
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
+	std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int expectedNodeId0, unsigned int expectedNodeId1,
 	double expectedStiffness, double expectedDamping)
 {

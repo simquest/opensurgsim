@@ -21,6 +21,7 @@ include_directories(
 )
 
 set(SURGSIM_GRAPHICS_SOURCES
+	Camera.cpp
 	Group.cpp
 	Manager.cpp
 	Mesh.cpp

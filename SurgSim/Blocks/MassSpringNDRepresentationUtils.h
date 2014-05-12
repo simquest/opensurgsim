@@ -21,10 +21,14 @@
 namespace SurgSim
 {
 
+namespace Math
+{
+class OdeState;
+}
+
 namespace Physics
 {
 class LinearSpring;
-class DeformableRepresentationState;
 }
 
 namespace Blocks
@@ -36,7 +40,7 @@ namespace Blocks
 /// \param stiffness, damping The spring parameters
 /// \return The newly create spring
 std::shared_ptr<SurgSim::Physics::LinearSpring> createLinearSpring(
-	const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
+	const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int nodeId0, unsigned int nodeId1,
 	double stiffness, double damping);
 

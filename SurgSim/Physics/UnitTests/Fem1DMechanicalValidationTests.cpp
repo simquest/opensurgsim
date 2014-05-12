@@ -20,6 +20,7 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -60,7 +61,7 @@ public:
 		SURGSIM_ASSERT(nodes > 0) << "Number of nodes incorrect: " << nodes;
 
 		auto fem = std::make_shared<Fem1DRepresentation>(name);
-		auto state = std::make_shared<DeformableRepresentationState>();
+		auto state = std::make_shared<SurgSim::Math::OdeState>();
 
 		state->setNumDof(fem->getNumDofPerNode(), nodes);
 
@@ -74,7 +75,7 @@ public:
 		for (auto boundaryCondition = std::begin(boundaryConditions); boundaryCondition != std::end(boundaryConditions);
 			 ++boundaryCondition)
 		{
-			state->addBoundaryCondition(*boundaryCondition);
+			state->addBoundaryCondition(boundaryCondition->first, boundaryCondition->second);
 		}
 
 		std::array<unsigned int, 2> nodeEnds;
@@ -105,13 +106,13 @@ public:
 	{
 		for (int i = 0; i < dof; i++)
 		{
-			boundaryConditions.push_back(node * 6 + i);
+			boundaryConditions.push_back(std::make_pair(node, i));
 		}
 	}
 
 public:
 	std::array<Vector3d, 2> extremities;
-	std::vector<unsigned int> boundaryConditions;
+	std::vector<std::pair<unsigned int, unsigned int>> boundaryConditions; // <nodeId, dofId>
 	std::array<unsigned int, 1> nodesPerDimension;
 	double massDensity;
 	double youngModulus;
@@ -126,7 +127,7 @@ class Fem1DMechanicalValidationTests : public ::testing::Test
 public:
 	std::shared_ptr<Fem1DRepresentation> m_fem;
 	SurgSim::Math::RigidTransform3d m_initialPose;
-	std::shared_ptr<DeformableRepresentationState> m_initialState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
 
 	// Physical properties
 	double m_rho;
@@ -140,7 +141,6 @@ public:
 
 	Vector m_expectedTransformedPositions;
 	Vector m_expectedTransformedVelocities;
-	Vector m_expectedTransformedAccelerations;
 
 	Fem1DBuilder m_fem1DBuilder;
 
@@ -169,7 +169,7 @@ protected:
 		m_fem = std::make_shared<Fem1DRepresentation>("name");
 
 		// Initial state
-		m_initialState = std::make_shared<DeformableRepresentationState>();
+		m_initialState = std::make_shared<SurgSim::Math::OdeState>();
 		m_initialState->setNumDof(m_fem->getNumDofPerNode(), 2);
 
 		Vector& x = m_initialState->getPositions();
@@ -178,14 +178,10 @@ protected:
 		Vector& v = m_initialState->getVelocities();
 		v << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 			 2.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-		Vector& a = m_initialState->getAccelerations();
-		a << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-			 3.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
 		// Expected transformed values
 		m_expectedTransformedPositions.resize(m_initialState->getNumDof());
 		m_expectedTransformedVelocities.resize(m_initialState->getNumDof());
-		m_expectedTransformedAccelerations.resize(m_initialState->getNumDof());
 
 		getSubVector(m_expectedTransformedPositions, 0, 3) = m_initialPose * Vector3d(getSubVector(x, 0, 3));
 		getSubVector(m_expectedTransformedPositions, 1, 3) = getSubVector(x, 1, 3);
@@ -196,11 +192,6 @@ protected:
 		getSubVector(m_expectedTransformedVelocities, 1, 3) = getSubVector(v, 1, 3);
 		getSubVector(m_expectedTransformedVelocities, 2, 3) = m_initialPose.linear() * getSubVector(v, 2, 3);
 		getSubVector(m_expectedTransformedVelocities, 3, 3) = getSubVector(v, 3, 3);
-
-		getSubVector(m_expectedTransformedAccelerations, 0, 3) = m_initialPose.linear() * getSubVector(a, 0, 3);
-		getSubVector(m_expectedTransformedAccelerations, 1, 3) = getSubVector(a, 1, 3);
-		getSubVector(m_expectedTransformedAccelerations, 2, 3) = m_initialPose.linear() * getSubVector(a, 2, 3);
-		getSubVector(m_expectedTransformedAccelerations, 3, 3) = getSubVector(a, 3, 3);
 
 		// Create FemElement1DBeam
 		std::array<unsigned int, 2> nodeIds = {0, 1};
@@ -241,8 +232,13 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverEndLoadedTest)
 
 	Vector applyForce = Vector::Zero(nodesPerDim * 6);
 	applyForce[applyIndex] = load;
-	Matrix stiffnessInverse = fem->computeK(*fem->getInitialState()).inverse();
-	Vector calculatedDeflection = stiffnessInverse * applyForce;
+	Matrix stiffness = fem->computeK(*fem->getInitialState());
+
+	// Apply boundary conditions
+	fem->getInitialState()->applyBoundaryConditionsToVector(&applyForce);
+	fem->getInitialState()->applyBoundaryConditionsToMatrix(&stiffness);
+
+	Vector calculatedDeflection = stiffness.inverse() * applyForce;
 
 	// Compare theoretical deflection with calculated deflection
 	unsigned int lookIndex = applyIndex;
@@ -269,8 +265,13 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverPunctualLoadAnywhereTest)
 
 		Vector applyForce = Vector::Zero(nodesPerDim * 6);
 		applyForce[applyIndex] = load;
-		Matrix stiffnessInverse = fem->computeK(*fem->getInitialState()).inverse();
-		Vector calculatedDeflection = stiffnessInverse * applyForce;
+		Matrix stiffness = fem->computeK(*fem->getInitialState());
+
+		// Apply boundary conditions
+		fem->getInitialState()->applyBoundaryConditionsToVector(&applyForce);
+		fem->getInitialState()->applyBoundaryConditionsToMatrix(&stiffness);
+
+		Vector calculatedDeflection = stiffness.inverse() * applyForce;
 
 		for (unsigned int lookNode = 0; lookNode < nodesPerDim; lookNode++)
 		{
@@ -302,8 +303,13 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverEndBentTest)
 
 	Vector applyForce = Vector::Zero(nodesPerDim * 6);
 	applyForce[applyIndex] = moment;
-	Matrix stiffnessInverse = fem->computeK(*fem->getInitialState()).inverse();
-	Vector calculatedDeflection = stiffnessInverse * applyForce;
+	Matrix stiffness = fem->computeK(*fem->getInitialState());
+
+	// Apply boundary conditions
+	fem->getInitialState()->applyBoundaryConditionsToVector(&applyForce);
+	fem->getInitialState()->applyBoundaryConditionsToMatrix(&stiffness);
+
+	Vector calculatedDeflection = stiffness.inverse() * applyForce;
 
 	for (unsigned int lookNode = 0; lookNode < nodesPerDim; lookNode++)
 	{
@@ -333,8 +339,13 @@ TEST_F(Fem1DMechanicalValidationTests, EndSupportedBeamCenterLoadedTest)
 
 	Vector applyForce = Vector::Zero(nodesPerDim * 6);
 	applyForce[applyIndex] = load;
-	Matrix stiffnessInverse = fem->computeK(*fem->getInitialState()).inverse();
-	Vector calculatedDeflection = stiffnessInverse * applyForce;
+	Matrix stiffness = fem->computeK(*fem->getInitialState());
+
+	// Apply boundary conditions
+	fem->getInitialState()->applyBoundaryConditionsToVector(&applyForce);
+	fem->getInitialState()->applyBoundaryConditionsToMatrix(&stiffness);
+
+	Vector calculatedDeflection = stiffness.inverse() * applyForce;
 
 	// Compare theoretical deflection with calculated deflection
 	unsigned int lookIndex = applyIndex;
@@ -362,8 +373,13 @@ TEST_F(Fem1DMechanicalValidationTests, EndSupportedBeamIntermediatelyLoadedTest)
 
 		Vector applyForce = Vector::Zero(nodesPerDim * 6);
 		applyForce[applyIndex] = load;
-		Matrix stiffnessInverse = fem->computeK(*fem->getInitialState()).inverse();
-		Vector calculatedDeflection = stiffnessInverse * applyForce;
+		Matrix stiffness = fem->computeK(*fem->getInitialState());
+
+		// Apply boundary conditions
+		fem->getInitialState()->applyBoundaryConditionsToVector(&applyForce);
+		fem->getInitialState()->applyBoundaryConditionsToMatrix(&stiffness);
+
+		Vector calculatedDeflection = stiffness.inverse() * applyForce;
 
 		// Compare theoretical deflection with calculated deflection
 		unsigned int lookIndex = applyIndex;
