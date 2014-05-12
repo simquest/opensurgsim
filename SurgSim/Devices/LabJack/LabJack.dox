@@ -1,0 +1,20 @@
+/*!
+
+\page LabJack LabJack: A Measurement and Automation Device
+
+LabJack Corporation produces measurement and automation devices (e.g., DAQs).  Currently OpenSurgSim supports only some devices (dependent on operating system, see below), and only some functionality on any device.
+
+Supported functionality: digital input, digital output, and timers (e.g., PWM, frequency output, and quadrature input).
+
+Supported models:
+- Linux (and Mac OS X): The LabJack U3 and U6 (including Pro version) are supported with limited functionality.
+- Windows: The LabJack U3, U6 (including Pro version), and UE9 are supported with limited functionality.
+
+Dependencies:
+- Linux (and Mac OS X): The exodriver (aka labjackusb) driver must be installed https://github.com/labjack/exodriver
+  - Follow the instructions in the INSTALL file; installation of libusb-1.0 library and development files is required.
+  - (Probably optional) An environment variable named LABJACK_SDK may be set to the directory containing <tt>(include/)LabJackUD.h</tt>
+- Windows: The LabJackUD driver must be installed from the company's website http://labjack.com/
+  - An environment variable named LABJACK_SDK must be set to the directory containing <tt>(include\\)LabJackUD.h</tt>
+
+*/

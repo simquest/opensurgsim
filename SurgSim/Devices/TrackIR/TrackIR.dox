@@ -1,0 +1,22 @@
+/*!
+
+\page TrackIR TrackIR: Optical Tracker
+
+NaturalPoint's product list contains various motion capture cameras/systems to measure position and orientation of tracked objects.
+
+Supported devices:
+- Linux:
+  - NaturalPoint's TrackIR is tested.  Other devices supported by linux-track (SmartNav, Wiimote, and some webcams) may work https://code.google.com/p/linux-track/wiki/InputDevices
+- Windows:
+  - NaturalPoint's TrackIR is tested.  All OptiTrack and SmartNav models are expected to work.
+
+Dependencies:
+  - Linux: Requires linuxtrack https://code.google.com/p/linux-track/
+	- Change file 51-TIR.rules to (replace the "simquest" with your group name): SUBSYSTEM=="usb", ATTRS{idVendor}=="131d", GROUP="simquest", MODE="0666"
+	  - Then move it to /lib/udev/rules.d/ and restart the udev service.
+	- Run ltr_gui (requires Wine).
+	- (Probably optional) An environment variable named NP_CAMERASDK may be set to the directory containing <tt>(include/)linuxtrack.h</tt>
+  - Windows: Requires NaturalPoint's Camera SDK https://www.naturalpoint.com/optitrack/downloads/developer-tools.html
+	- An environment variable named NP_CAMERASDK must be set to the directory containing <tt>(include\\)cameralibrary.h</tt>
+
+*/
