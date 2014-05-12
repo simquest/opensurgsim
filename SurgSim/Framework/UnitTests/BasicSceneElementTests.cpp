@@ -100,7 +100,7 @@ TEST(BasicSceneElementTests, SerializationTest)
 
 	ASSERT_NO_THROW(result = node.as<std::shared_ptr<SceneElement>>()) << "Failed to restore SceneElement.";
 	EXPECT_EQ("SceneElement", result->getName());
-	EXPECT_EQ(2u, result->getComponents().size());
+	EXPECT_EQ(3u, result->getComponents().size());
 	EXPECT_TRUE(pose.isApprox(result->getPose()));
 }
 

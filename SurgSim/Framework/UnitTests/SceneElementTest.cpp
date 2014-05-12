@@ -29,7 +29,7 @@ using SurgSim::Framework::SceneElement;
 
 TEST(SceneElementTest, Constructor)
 {
-	ASSERT_NO_THROW({MockSceneElement element;});
+	ASSERT_NO_THROW(MockSceneElement element);
 }
 
 TEST(SceneElementTest, Pose)
@@ -46,11 +46,6 @@ TEST(SceneElementTest, Pose)
 	element.setPose(pose);
 	EXPECT_TRUE(element.getPose().isApprox(pose));
 	EXPECT_TRUE(element.getPoseComponent()->getPose().isApprox(pose));
-
-	// One should not try to add a PoseComponent to a SceneElement.
-	// Use SceneElment::setPose() instead.
-	auto poseComponent = std::make_shared<SurgSim::Framework::PoseComponent>("TestPoseComponent");
-	EXPECT_ANY_THROW(element.addComponent(poseComponent));
 }
 
 TEST(SceneElementTest, UpdateFunctions)
@@ -74,10 +69,11 @@ TEST(SceneElementTest, AddAndTestComponents)
 
 	EXPECT_TRUE(element->addComponent(component));
 
-	EXPECT_EQ(component->getSceneElement(), element);
+	// SceneElment in Component will not be set until initialization.
+	EXPECT_NE(component->getSceneElement(), element);
 
-	// Should be able to get the same scene between element and component after addComponent
-	EXPECT_EQ(component->getScene(), element->getScene() );
+	// Scene in Component will not be set until initialization.
+	EXPECT_NE(component->getScene(), element->getScene() );
 }
 
 TEST(SceneElementTest, AddAndAccessComponents)
@@ -86,7 +82,6 @@ TEST(SceneElementTest, AddAndAccessComponents)
 
 	std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));
 	std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
-
 
 	EXPECT_TRUE(element->addComponent(component1));
 	EXPECT_TRUE(element->addComponent(component2));
@@ -123,9 +118,6 @@ TEST(SceneElementTest, RemoveComponents)
 
 	EXPECT_TRUE(element->removeComponent(component1));
 	EXPECT_EQ(nullptr, element->getComponent("TestComponent1"));
-
-	// One should not try to remove the built-in PoseComponent.
-	EXPECT_ANY_THROW(element->removeComponent("Pose"));
 }
 
 TEST(SceneElementTest, GetComponentsTest)
@@ -136,10 +128,10 @@ TEST(SceneElementTest, GetComponentsTest)
 	std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
 
 	element->addComponent(component1);
-	EXPECT_EQ(1u, element->getComponents().size());
+	EXPECT_EQ(2u, element->getComponents().size());
 
 	element->addComponent(component2);
-	EXPECT_EQ(2u, element->getComponents().size());
+	EXPECT_EQ(3u, element->getComponents().size());
 
 	std::vector<std::shared_ptr<Component>> components = element->getComponents();
 
@@ -148,7 +140,7 @@ TEST(SceneElementTest, GetComponentsTest)
 
 	element->removeComponent(component1);
 	components = element->getComponents();
-	EXPECT_EQ(1u, components.size());
+	EXPECT_EQ(2u, components.size());
 }
 
 TEST(SceneElementTest, GetTypedComponentsTests)
@@ -170,7 +162,6 @@ TEST(SceneElementTest, GetTypedComponentsTests)
 
 	element->removeComponent(component2);
 	EXPECT_EQ(0u, element->getComponents<MockComponent>().size());
-
 }
 
 TEST(SceneElementTest, InitComponentTest)
@@ -198,4 +189,3 @@ TEST(SceneElementTest, DoubleInitTest)
 
 	ASSERT_ANY_THROW(element->initialize());
 }
-
