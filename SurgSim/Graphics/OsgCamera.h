@@ -21,6 +21,8 @@
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/Texture.h"
+#include "SurgSim/Framework/Macros.h"
+
 
 #include <osg/Camera>
 #include <osg/Switch>
@@ -53,41 +55,23 @@ public:
 	/// Z Near of 0.01, and Z Far of 10.0.
 	explicit OsgCamera(const std::string& name);
 
-	/// Sets the group of representations that will be seen by this camera.
-	/// Only the representations in this group will be rendered when this camera's view is rendered.
-	/// \param	group	Group of representations
-	/// \return	True if it succeeded, false if it failed
-	virtual bool setGroup(std::shared_ptr<Group> group);
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgCamera);
 
-	/// Sets whether the camera is currently visible
-	/// When the camera is invisible, it does not produce an image.
-	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible);
+	virtual bool setRenderGroup(std::shared_ptr<Group> group) override;
 
-	/// Gets whether the camera is currently visible
-	/// When the camera is invisible, it does not produce an image.
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const;
+	virtual void setVisible(bool visible) override;
 
-	/// Gets the view matrix of the camera
-	/// \return	View matrix
+	virtual bool isVisible() const override;
+
 	virtual SurgSim::Math::Matrix44d getViewMatrix() const;
 
-	/// Gets the inverse view matrix of the camera
-	/// \return	Inverse view matrix
 	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const;
 
-	/// Sets the projection matrix of the camera
-	/// \param	matrix	Projection matrix
-	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
+	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) override;
 
-	/// Gets the projection matrix of the camera
-	/// \return	Projection matrix
-	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const;
+	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const override;
 
-	/// Updates the camera.
-	/// \param	dt	The time in seconds of the preceding timestep.
-	virtual void update(double dt);
+	virtual void update(double dt) override;
 
 	/// \return the OSG camera node
 	osg::ref_ptr<osg::Camera> getOsgCamera() const;
@@ -95,33 +79,16 @@ public:
 	/// \return the OSG parent node for this object
 	osg::ref_ptr<osg::Node> getOsgNode() const;
 
-	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
-	/// \param	renderTarget	The render target.
-	/// \return true if sucessful
 	virtual bool setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) override;
 
-	/// Gets RenderTarget that is currently being used by the camera.
-	/// \return	The RenderTarget.
 	virtual std::shared_ptr<RenderTarget> getRenderTarget() const override;
 
-	/// Sets a material on the group that has been attached to the camera.
-	/// \param	material	The material.
-	/// \return	true if it succeeds, false if there is no group or the material is not an OsgMaterial.
-	virtual bool setMaterial(std::shared_ptr<Material> material);
+	virtual bool setMaterial(std::shared_ptr<Material> material) override;
 
-	/// Gets the material if set.
-	/// \return	The material.
-	virtual std::shared_ptr<Material> getMaterial() const;
+	virtual std::shared_ptr<Material> getMaterial() const override;
 
-	/// Clears the material from the attached group
-	virtual void clearMaterial();
+	virtual void clearMaterial() override;
 
-	/// Determine when this camera will render. The main camera will render at (RENDER_ORDER_IN_ORDER,0)
-	/// In general all preprocessing should be done in RENDER_ORDER_PRE_ORDER, HUD Displaying usually
-	/// at RENDER_ORDER_POST_ORDER. Overridden from Camera
-	/// \param order The phase of rendering.
-	/// \param value The index within the phase, the order between two cameras of the same phase and index is not
-	/// 			 determined.
 	virtual void setRenderOrder(RenderOrder order, int value) override;
 
 private:

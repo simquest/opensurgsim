@@ -39,6 +39,7 @@ using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::makeRigidTransform;
 
 namespace SurgSim
 {
@@ -66,7 +67,7 @@ TEST(OsgCameraTests, InitTest)
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()))) <<
 			"Camera's projection matrix should be initialized to the osg::Camera's projection matrix!";
 
-	EXPECT_EQ(nullptr, camera->getGroup());
+	EXPECT_EQ(nullptr, camera->getRenderGroup());
 }
 
 TEST(OsgCameraTests, OsgNodesTest)
@@ -113,21 +114,21 @@ TEST(OsgCameraTests, GroupTest)
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
 
-	EXPECT_EQ(nullptr, camera->getGroup());
+	EXPECT_EQ(nullptr, camera->getRenderGroup());
 
 	/// Adding an OsgGroup should succeed
-	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test group");
+	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>(camera->getRenderGroupReference());
 	std::shared_ptr<Group> group = osgGroup;
-	EXPECT_TRUE(camera->setGroup(group));
-	EXPECT_EQ(group, camera->getGroup());
+	EXPECT_TRUE(camera->setRenderGroup(group));
+	EXPECT_EQ(group, camera->getRenderGroup());
 
 	/// Check that the OSG node of the group is added to the OSG camera correctly
 	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0)->asGroup()->getChild(0));
 
 	/// Adding a group that does not derive from OsgGroup should fail
-	std::shared_ptr<Group> mockGroup = std::make_shared<MockGroup>("non-osg group");
-	EXPECT_FALSE(camera->setGroup(mockGroup));
-	EXPECT_EQ(group, camera->getGroup());
+	std::shared_ptr<Group> mockGroup = std::make_shared<MockGroup>(camera->getRenderGroupReference());
+	EXPECT_FALSE(camera->setRenderGroup(mockGroup));
+	EXPECT_EQ(group, camera->getRenderGroup());
 	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0)->asGroup()->getChild(0));
 }
 
@@ -136,15 +137,16 @@ TEST(OsgCameraTests, PoseTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
+	camera->setRenderGroupReference("Test");
 	std::shared_ptr<BasicSceneElement> element = std::make_shared<BasicSceneElement>("element");
 	element->addComponent(camera);
 	element->initialize();
 	camera->wakeUp();
 
 	RigidTransform3d elementPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+									   Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 	RigidTransform3d localPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+									 Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 	RigidTransform3d pose = elementPose * localPose;
 
 	{
@@ -197,6 +199,29 @@ TEST(OsgCameraTests, RenderTargetTest)
 
 	EXPECT_NO_THROW(camera->setRenderTarget(renderTarget));
 	EXPECT_TRUE(osgCamera->getOsgCamera()->isRenderToTextureCamera());
+}
+
+TEST(OsgCameraTests, CameraGroupTest)
+{
+	std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("TestRepresentation");
+
+	camera->clearGroupReferences();
+	camera->addGroupReference("test1");
+	camera->addGroupReference("test2");
+
+	EXPECT_EQ(2u, camera->getGroupReferences().size());
+
+	camera->setRenderGroupReference("otherTest");
+	EXPECT_EQ(2u, camera->getGroupReferences().size());
+
+	// Setting the render group of a camera to the group that it is in should remove the group
+	// from the set
+	camera->setRenderGroupReference("test1");
+	EXPECT_EQ(1u, camera->getGroupReferences().size());
+
+	// Should not be able to set group reference to the current render group
+	EXPECT_FALSE(camera->addGroupReference("test1"));
+	EXPECT_EQ(1u, camera->getGroupReferences().size());
 }
 
 

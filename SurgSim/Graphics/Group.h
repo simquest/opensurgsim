@@ -33,7 +33,7 @@ class Representation;
 ///
 /// Graphics::Group allows the organization of Graphics::Representation objects so that different algorithms can
 /// operate on specific sub-sets rather than the entire scene.
-class Group : public SurgSim::Framework::Component
+class Group
 {
 public:
 	/// Constructor. The group is initially empty.
@@ -62,25 +62,24 @@ public:
 	/// \return	True if all representations are added successfully, false if failure
 	virtual bool append(std::shared_ptr<Group> group);
 
-	/// Removes an representation
+	/// Removes an representation.
 	/// \param	representation	Representation to remove from this group
 	/// \return	True if the representation is removed successfully, false if representation is not in this group or
-	/// other failure
+	/// other failure.
 	virtual bool remove(std::shared_ptr<Representation> representation);
 
-	/// Returns the representations in this group
+	/// \return a container with all the representations in this group.
 	const std::vector<std::shared_ptr<Representation>>& getMembers() const;
 
-	/// Removes all representations
+	/// Removes all representations.
 	virtual void clear();
 
+	/// \return The name of this group.
+	std::string getName() const;
+
 private:
-	/// Initialize the component
-	/// \return	True if initialization succeeded, false if failed
-	virtual bool doInitialize() override;
-	/// Wake up the component
-	/// \return	True if wake up succeeded, false if failed
-	virtual bool doWakeUp() override;
+
+	std::string m_name;
 
 	/// Representations in this group
 	std::vector<std::shared_ptr<Representation>> m_representations;

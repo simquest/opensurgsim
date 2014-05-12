@@ -27,7 +27,8 @@ Representation::Representation(const std::string& m_name) :
 	Component(m_name), m_localPose(SurgSim::Math::RigidTransform3d::Identity())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, LocalPose, getLocalPose,
-			setLocalPose);
+									  setLocalPose);
+	SURGSIM_ADD_RO_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, Pose, getPose);
 }
 
 Representation::~Representation()

@@ -38,18 +38,18 @@ struct OsgSceneryRepresentationRenderTests : public RenderTest
 TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 {
 	/// Initial position of object 1
-	Vector3d startPosition1(-5.0, 0.0, -10.0);
+	Vector3d startPosition1(-5.0, 0.0, -5.0);
 	/// Final position of object 1
-	Vector3d endPosition1(5.0, 0.0, -10.0);
+	Vector3d endPosition1(5.0, 0.0, -5.0);
 	/// Initial angles (X, Y, Z) of object 1
 	Vector3d startAngles1(0.0, 0.0, 0.0);
 	/// Final angles (X, Y, Z) of object 1
 	Vector3d endAngles1(-M_PI_4, -M_PI_4, -M_PI_4);
 
 	/// Initial position of object 2
-	Vector3d startPosition2(0.0, -5.0, -10.0);
+	Vector3d startPosition2(0.0, -5.0, -5.0);
 	/// Final position of object 2
-	Vector3d endPosition2(0.0, 5.0, -10.0);
+	Vector3d endPosition2(0.0, 5.0, -5.0);
 	/// Initial angles (X, Y, Z) of object 2
 	Vector3d startAngles2(-M_PI_2, -M_PI_2, -M_PI_2);
 	/// Final angles (X, Y, Z) of object 2
@@ -62,13 +62,13 @@ TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 	auto sceneryObject1 = std::make_shared<OsgSceneryRepresentation>("Torus1");
 	sceneryObject1->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
 	sceneryObject1->setLocalPose(SurgSim::Math::makeRigidTransform(
-									SurgSim::Math::Quaterniond::Identity(),	startPosition1));
+									 SurgSim::Math::Quaterniond::Identity(),	startPosition1));
 	viewElement->addComponent(sceneryObject1);
 
 	auto sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("Torus2");
 	sceneryObject2->setFileName("Data/OsgSceneryRepresentationTests/Torus.osgb");
 	sceneryObject2->setLocalPose(SurgSim::Math::makeRigidTransform(
-									SurgSim::Math::Quaterniond::Identity(),	startPosition2));
+									 SurgSim::Math::Quaterniond::Identity(),	startPosition2));
 	viewElement->addComponent(sceneryObject2);
 
 	runtime->start();

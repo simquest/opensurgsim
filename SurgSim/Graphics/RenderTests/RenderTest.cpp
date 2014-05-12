@@ -15,16 +15,16 @@
 
 #include "SurgSim/Graphics/RenderTests//RenderTest.h"
 
+#include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Framework/BehaviorManager.h"
-#include "SurgSim/Graphics/View.h"
+#include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgManager.h"
-#include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
-
-#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
@@ -47,8 +47,10 @@ void RenderTest::SetUp()
 	scene = runtime->getScene();
 
 	viewElement = std::make_shared<OsgViewElement>("view element");
-	viewElement->getView()->setPosition(100,100);
+
+	viewElement->getView()->setPosition(100, 100);
 	viewElement->getView()->setWindowBorderEnabled(true);
+
 	scene->addSceneElement(viewElement);
 }
 
@@ -66,7 +68,7 @@ std::shared_ptr<ScreenSpaceQuadRepresentation> RenderTest::makeQuad(
 {
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
 		std::make_shared<OsgScreenSpaceQuadRepresentation>(name);
-	quad->setSize(width,height);
+	quad->setSize(width, height);
 	Quaterniond quat;
 	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(0.0,Vector3d::UnitY());
 	quad->setLocalPose(SurgSim::Math::makeRigidTransform(quat, Vector3d(x,y,-0.2)));
