@@ -176,7 +176,7 @@ std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElemen
 	}
 
 	std::array<unsigned int, 3> triangleSorted;
-	auto doesIncludeTriangle = [&triangleSorted](std::vector<size_t>& femElementSorted)
+	auto doesIncludeTriangle = [&triangleSorted](const std::vector<size_t>& femElementSorted)
 							   { return std::includes(femElementSorted.begin(), femElementSorted.end(),
 													  triangleSorted.begin(), triangleSorted.end()); };
 
