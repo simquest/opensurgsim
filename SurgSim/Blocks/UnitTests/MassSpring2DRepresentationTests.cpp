@@ -173,5 +173,13 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 			nodeId++;
 		}
 	}
-	EXPECT_EQ(boundaryConditions, m.getFinalState()->getBoundaryConditions());
+
+	std::vector<unsigned int> dofBoundaryConditions;
+	for (auto it = boundaryConditions.begin(); it != boundaryConditions.end(); ++it)
+	{
+		dofBoundaryConditions.push_back((*it) * 3);
+		dofBoundaryConditions.push_back((*it) * 3 + 1);
+		dofBoundaryConditions.push_back((*it) * 3 + 2);
+	}
+	EXPECT_EQ(dofBoundaryConditions, m.getFinalState()->getBoundaryConditions());
 }
