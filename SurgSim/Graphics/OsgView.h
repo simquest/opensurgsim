@@ -20,6 +20,10 @@
 
 #include <osgViewer/Viewer>
 
+namespace osgViewer
+{
+class DisplaySettings;
+}
 
 namespace SurgSim
 {
@@ -53,6 +57,7 @@ public:
 
 	/// Destructor
 	~OsgView();
+
 
 	virtual bool setPosition(int x, int y) override;
 
@@ -104,7 +109,39 @@ public:
 	/// \return the OSG view which performs the actual work involved in setting up and rendering to a window
 	osg::ref_ptr<osgViewer::View> getOsgView() const;
 
+	virtual bool isStereo() override;
 
+	virtual void setStereoMode(StereoMode mode) override;
+
+	virtual StereoMode getStereoMode() const override;
+
+	virtual void setDisplayType(DisplayType type) override;
+
+	virtual DisplayType getDisplayType() const override;
+
+	virtual void setFullScreen(bool val) override;
+
+	virtual bool isFullScreen() const override;
+
+	virtual void setTargetScreen(int val) override;
+
+	virtual int getTargetScreen() const override;
+
+	virtual void setEyeSeparation(double val) override;
+
+	virtual double getEyeSeparation() const override;
+
+	virtual void setScreenDistance(double val) override;
+
+	virtual double getScreenDistance() const override;
+
+	virtual void setScreenWidth(double val) override;
+
+	virtual double getScreenWidth() const override;
+
+	virtual void setScreenHeight(double val) override;
+
+	virtual double getScreenHeight() const override;
 
 protected:
 	/// Initialize the view
@@ -113,7 +150,6 @@ protected:
 
 	/// Wake up the view
 	virtual bool doWakeUp() override;
-
 private:
 	/// Position of the view on the screen (in pixels)
 	int m_x, m_y;
@@ -139,6 +175,15 @@ private:
 	bool m_keyboardEnabled;
 	/// Indicate if a mouse device is enabled
 	bool m_mouseEnabled;
+
+	StereoMode m_stereoMode;
+	int m_targetScreen;
+	bool m_isFullscreen;
+	double m_eyeSeparation;
+	double m_screenDistance;
+	DisplayType m_displayType;
+	double m_screenWidth;
+	double m_screenHeight;
 };
 
 };  // namespace Graphics

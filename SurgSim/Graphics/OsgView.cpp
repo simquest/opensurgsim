@@ -25,6 +25,38 @@
 #include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
 
 #include <osgViewer/ViewerEventHandlers>
+#include <osg/DisplaySettings>
+#include <osgViewer/config/SingleScreen>
+#include <osgViewer/config/SingleWindow>
+
+namespace
+{
+
+// Mapping from OSS values to OSG values, the order here needs to match the numerical value in
+// SurgSim::Graphics::View::StereoMode
+const osg::DisplaySettings::StereoMode StereoModeEnums[SurgSim::Graphics::View::STEREO_MODE_COUNT] =
+{
+	osg::DisplaySettings::QUAD_BUFFER,
+	osg::DisplaySettings::ANAGLYPHIC,
+	osg::DisplaySettings::HORIZONTAL_SPLIT,
+	osg::DisplaySettings::VERTICAL_SPLIT,
+	osg::DisplaySettings::LEFT_EYE,
+	osg::DisplaySettings::RIGHT_EYE,
+	osg::DisplaySettings::HORIZONTAL_INTERLACE,
+	osg::DisplaySettings::VERTICAL_INTERLACE,
+	osg::DisplaySettings::CHECKERBOARD
+};
+
+// Mapping from OSS values to OSG values, the order here needs to match the numerical value in
+// SurgSim::Graphics::View::DisplayType
+const osg::DisplaySettings::DisplayType DisplayTypeEnums[SurgSim::Graphics::View::DISPLAY_TYPE_COUNT] =
+{
+	osg::DisplaySettings::MONITOR,
+	osg::DisplaySettings::HEAD_MOUNTED_DISPLAY
+};
+
+
+}
 
 namespace SurgSim
 {
@@ -37,10 +69,22 @@ OsgView::OsgView(const std::string& name) : View(name),
 	m_isWindowBorderEnabled(true),
 	m_isFirstUpdate(true),
 	m_areWindowSettingsDirty(false),
-	m_view(new osgViewer::View())
+	m_view(new osgViewer::View()),
+	m_stereoMode(STEREO_MODE_NONE),
+	m_displayType(DISPLAY_TYPE_MONITOR),
+	m_isFullscreen(false),
+	m_targetScreen(0)
 {
 	/// Don't allow the default camera here, let that be handled at a higher level.
 	m_view->setCamera(nullptr);
+}
+
+
+OsgView::~OsgView()
+{
+	// Clean up the handler callbacks
+	enableKeyboardDevice(false);
+	enableMouseDevice(false);
 }
 
 bool OsgView::setPosition(int x, int y)
@@ -128,17 +172,40 @@ bool OsgView::doInitialize()
 
 bool OsgView::doWakeUp()
 {
-	m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
+	osg::ref_ptr<osg::DisplaySettings> displaySettings = new osg::DisplaySettings;
+	displaySettings->setDefaults();
+
+	if (isStereo())
+	{
+		displaySettings->setStereo(isStereo());
+		displaySettings->setStereoMode(StereoModeEnums[m_stereoMode]);
+		displaySettings->setDisplayType(DisplayTypeEnums[m_displayType]);
+		displaySettings->setEyeSeparation(static_cast<float>(m_eyeSeparation));
+		displaySettings->setScreenDistance(static_cast<float>(m_screenDistance));
+		displaySettings->setScreenWidth(static_cast<float>(m_screenWidth));
+		displaySettings->setScreenHeight(static_cast<float>(m_screenHeight));
+	}
+
+
+	m_view->setDisplaySettings(displaySettings);
+
+	osg::ref_ptr<osgViewer::ViewConfig> viewConfig;
+
+	if (isFullScreen())
+	{
+		viewConfig = new osgViewer::SingleScreen(m_targetScreen);
+	}
+	else
+	{
+		viewConfig = new osgViewer::SingleWindow(m_x, m_y, m_width, m_height, m_targetScreen);
+	}
+	m_view->apply(viewConfig);
+
 	m_view->addEventHandler(new osgViewer::StatsHandler);
+
 	return true;
 }
 
-OsgView::~OsgView()
-{
-	// Clean up the handler callbacks
-	enableKeyboardDevice(false);
-	enableMouseDevice(false);
-}
 
 osg::ref_ptr<osgViewer::View> SurgSim::Graphics::OsgView::getOsgView() const
 {
@@ -251,6 +318,98 @@ void SurgSim::Graphics::OsgView::setManipulatorParameters(
 			osg::Vec3d(0.0f, 1.0f, 0.0f));
 	}
 }
+
+bool OsgView::isStereo()
+{
+	return m_stereoMode != STEREO_MODE_NONE;
+}
+
+
+void OsgView::setStereoMode(StereoMode mode)
+{
+	SURGSIM_ASSERT(mode < STEREO_MODE_COUNT) << "Invalid StereoMode " << mode;
+	m_stereoMode = mode;
+}
+
+View::StereoMode OsgView::getStereoMode() const
+{
+	return m_stereoMode;
+}
+
+void OsgView::setDisplayType(DisplayType type)
+{
+	SURGSIM_ASSERT(type < DISPLAY_TYPE_COUNT) << "Invalid DisplayType " << type;
+	m_displayType = type;
+}
+
+View::DisplayType OsgView::getDisplayType() const
+{
+	return m_displayType;
+}
+
+void OsgView::setFullScreen(bool val)
+{
+	m_isFullscreen = val;
+}
+
+bool OsgView::isFullScreen() const
+{
+	return m_isFullscreen;
+}
+
+void OsgView::setTargetScreen(int val)
+{
+	m_targetScreen = val;
+}
+
+int OsgView::getTargetScreen() const
+{
+	return m_targetScreen;
+}
+
+void OsgView::setScreenDistance(double val)
+{
+
+	m_screenDistance = val;
+}
+
+double OsgView::getScreenDistance() const
+{
+	return m_screenDistance;
+}
+
+void OsgView::setEyeSeparation(double val)
+{
+	m_eyeSeparation = val;
+}
+
+double OsgView::getEyeSeparation() const
+{
+	return m_eyeSeparation;
+}
+
+double OsgView::getScreenWidth() const
+{
+	return m_screenWidth;
+}
+
+void OsgView::setScreenWidth(double val)
+{
+	m_screenWidth = val;
+}
+
+double OsgView::getScreenHeight() const
+{
+	return m_screenHeight;
+}
+
+void OsgView::setScreenHeight(double val)
+{
+	m_screenHeight = val;
+}
+
+
+
 
 }
 }

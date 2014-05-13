@@ -13,18 +13,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gmock/gmock.h>
+#include "SurgSim/Graphics/View.h"
 
-#include "SurgSim/Framework/Logger.h"
-#include "SurgSim/Framework/LogOutput.h"
-
-int main(int argc, char** argv)
+namespace SurgSim
 {
-	//Disable logging during tests
-	std::shared_ptr<SurgSim::Framework::LoggerManager> loggerManager;
-	loggerManager = SurgSim::Framework::Logger::getLoggerManager();
-	//loggerManager->setDefaultOutput(std::make_shared<SurgSim::Framework::NullOutput>());
+namespace Graphics
+{
 
-	testing::InitGoogleMock(&argc, argv);
-	return RUN_ALL_TESTS();
+
+
+
+View::View(const std::string& name) :
+	SurgSim::Framework::Component(name)
+{
+
 }
+
+bool View::setCamera(std::shared_ptr<Camera> camera)
+{
+	m_camera = camera;
+	return true;
+}
+
+std::shared_ptr<Camera> View::getCamera() const
+{
+	return m_camera;
+}
+
+bool View::doInitialize()
+{
+	SURGSIM_ASSERT(m_camera != nullptr) << "View cannot be created without a camera.";
+	return true;
+}
+
+}
+}
+
