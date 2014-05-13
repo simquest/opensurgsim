@@ -21,6 +21,7 @@ namespace SurgSim
 namespace Framework
 {
 
+template <>
 boost::any Framework::Accessible::getValue(const std::string& name) const
 {
 	auto functors = m_functors.find(name);
@@ -35,6 +36,22 @@ boost::any Framework::Accessible::getValue(const std::string& name) const
 		return boost::any();
 	}
 }
+
+boost::any Framework::Accessible::getBoostValue(const std::string& name) const
+{
+	auto functors = m_functors.find(name);
+	if (functors != std::end(m_functors) && functors->second.getter != nullptr)
+	{
+		return functors->second.getter();
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "Can't get property: " << name << "." << ((functors == std::end(m_functors)) ?
+						  "Property not found." : "No getter defined for property.");
+		return boost::any();
+	}
+}
+
 
 void Framework::Accessible::setValue(const std::string& name, const boost::any& value)
 {

@@ -16,13 +16,15 @@
 #include "SurgSim/Graphics/OsgMaterial.h"
 
 #include "SurgSim/Graphics/OsgShader.h"
-#include "SurgSim/Graphics/OsgUniformBase.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/Log.h"
 
 #include <algorithm>
 #include <functional>
+
+#include <boost/any.hpp>
 
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgUniformBase;
@@ -52,9 +54,9 @@ bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 		std::shared_ptr<Accessible> accessible = std::dynamic_pointer_cast<Accessible>(uniform);
 		if (accessible != nullptr)
 		{
-			Accessible::SetterType setter =
+			Accessible::GetterType setter =
 				std::bind(&SurgSim::Framework::Accessible::setValue, accessible.get(), "Value", std::placeholders::_1);
-			Accessible::GetterType getter =
+			Accessible::SetterType getter =
 				std::bind(&SurgSim::Framework::Accessible::getValue, accessible.get(), "Value");
 
 			setAccessors(osgUniform->getName(), getter, setter);

@@ -43,11 +43,8 @@ public:
 	typedef std::function<YAML::Node(void)> EncoderType;
 	typedef std::function<void(const YAML::Node*)> DecoderType;
 
-	/// Retrieves the value with the name by executing the getter if it is found.
-	/// \throws SurgSim::Framework::AssertionFailure if the property cannot be found
-	/// \param	name	The name of the property.
-	/// \return	The value of the property if the getter was found
-	boost::any getValue(const std::string& name) const;
+
+	boost::any getBoostValue(const std::string& name) const;
 
 	/// Retrieves the value with the name by executing the getter if it is found and tries to convert
 	/// it to the given type.
@@ -57,6 +54,14 @@ public:
 	/// \return	The value of the property if the getter was found
 	template <class T>
 	T getValue(const std::string& name) const;
+
+	/// Retrieves the value with the name by executing the getter if it is found.
+	/// \throws SurgSim::Framework::AssertionFailure if the property cannot be found
+	/// \param	name	The name of the property.
+	/// \return	The value of the property if the getter was found
+	template <>
+	boost::any getValue(const std::string& name) const;
+
 
 	/// Retrieves the value with the name by executing the getter if it is found, and converts it to
 	/// the type of the output parameter. This does not throw.
