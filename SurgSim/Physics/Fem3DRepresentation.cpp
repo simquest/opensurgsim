@@ -18,6 +18,7 @@
 #include "SurgSim/Collision/Location.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
@@ -54,6 +55,8 @@ void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
 		SurgSim::Math::setSubVector(xiTransformed, nodeId, 3, x);
 	}
 }
+
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem3DRepresentation);
 }
 
 namespace SurgSim
@@ -68,6 +71,8 @@ Fem3DRepresentation::Fem3DRepresentation(const std::string& name) :
 	// Reminder: m_numDofPerNode is held by DeformableRepresentation
 	// but needs to be set by all concrete derived classes
 	m_numDofPerNode = 3;
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Fem3DRepresentation, std::string, Filename, getFilename, setFilename);
 }
 
 Fem3DRepresentation::~Fem3DRepresentation()
