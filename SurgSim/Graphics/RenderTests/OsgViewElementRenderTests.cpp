@@ -23,6 +23,7 @@
 #include "SurgSim/Blocks/PoseInterpolator.h"
 
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 
@@ -30,7 +31,6 @@
 #include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
-#include "../../Framework/BehaviorManager.h"
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
@@ -82,6 +82,7 @@ TEST(OsgViewElementRenderTests, MoveAndResizeWindowTest)
 	runtime->stop();
 }
 
+// Just an empty screen but it should be fullscreen
 TEST(OsgViewElementRenderTest, FullScreenView)
 {
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
@@ -147,6 +148,7 @@ TEST(OsgViewElementRenderTest, StereoView)
 	osgView->setScreenWidth(0.486918);
 	osgView->setScreenHeight(0.273812);
 	osgView->setScreenDistance(1.0);
+
 
 	runtime->start();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));

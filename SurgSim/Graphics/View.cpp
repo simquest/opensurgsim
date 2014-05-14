@@ -20,11 +20,16 @@ namespace SurgSim
 namespace Graphics
 {
 
-
-
-
 View::View(const std::string& name) :
-	SurgSim::Framework::Component(name)
+	SurgSim::Framework::Component(name),
+	m_stereoMode(STEREO_MODE_NONE),
+	m_displayType(DISPLAY_TYPE_MONITOR),
+	m_targetScreen(0),
+	m_isFullscreen(false),
+	m_eyeSeparation(0.06),
+	m_screenDistance(1.0),
+	m_screenWidth(0.0),
+	m_screenHeight(0.0)
 {
 
 }
@@ -44,6 +49,102 @@ bool View::doInitialize()
 {
 	SURGSIM_ASSERT(m_camera != nullptr) << "View cannot be created without a camera.";
 	return true;
+}
+
+bool View::isStereo()
+{
+	return m_stereoMode != STEREO_MODE_NONE;
+}
+
+
+void View::setStereoMode(StereoMode mode)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change the view settings once the view has been initialized.";
+	SURGSIM_ASSERT(mode < STEREO_MODE_COUNT) << "Invalid StereoMode " << mode;
+	m_stereoMode = mode;
+}
+
+View::StereoMode View::getStereoMode() const
+{
+	return m_stereoMode;
+}
+
+void View::setDisplayType(DisplayType type)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change the view settings once the view has been initialized.";
+	SURGSIM_ASSERT(type < DISPLAY_TYPE_COUNT) << "Invalid DisplayType " << type;
+	m_displayType = type;
+}
+
+View::DisplayType View::getDisplayType() const
+{
+	return m_displayType;
+}
+
+void View::setFullScreen(bool val)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change the view settings once the view has been initialized.";
+	m_isFullscreen = val;
+}
+
+bool View::isFullScreen() const
+{
+	return m_isFullscreen;
+}
+
+void View::setTargetScreen(int val)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change the view settings once the view has been initialized.";
+	m_targetScreen = val;
+}
+
+int View::getTargetScreen() const
+{
+	return m_targetScreen;
+}
+
+void View::setScreenDistance(double val)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change the view settings once the view has been initialized.";
+	m_screenDistance = val;
+}
+
+double View::getScreenDistance() const
+{
+	return m_screenDistance;
+}
+
+void View::setEyeSeparation(double val)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change the view settings once the view has been initialized.";
+	m_eyeSeparation = val;
+}
+
+double View::getEyeSeparation() const
+{
+	return m_eyeSeparation;
+}
+
+double View::getScreenWidth() const
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change the view settings once the view has been initialized.";
+	return m_screenWidth;
+}
+
+void View::setScreenWidth(double val)
+{
+	m_screenWidth = val;
+}
+
+double View::getScreenHeight() const
+{
+	return m_screenHeight;
+}
+
+void View::setScreenHeight(double val)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change the view settings once the view has been initialized.";
+	m_screenHeight = val;
 }
 
 }
