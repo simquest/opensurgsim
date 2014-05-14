@@ -22,12 +22,12 @@
 #include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Math/OdeSolver.h"
 
 namespace SurgSim
 {
 namespace Math
 {
-enum IntegrationScheme;
 class Shape;
 }
 }

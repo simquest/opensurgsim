@@ -17,7 +17,6 @@
 
 #include <algorithm>
 
-#include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace YAML
