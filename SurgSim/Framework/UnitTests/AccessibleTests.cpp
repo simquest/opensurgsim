@@ -128,10 +128,6 @@ private:
 	double privateProperty;
 };
 
-class NoConvertClass
-{
-
-};
 }
 
 namespace SurgSim

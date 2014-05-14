@@ -109,11 +109,6 @@ bool Scene::decode(const YAML::Node& node)
 	if (node.IsMap())
 	{
 		YAML::Node data = node["SurgSim::Framework::Scene"];
-		// Prime the cache in the reader, this should have created all the components
-		if (data["Components"].IsDefined())
-		{
-			data["Components"].as<std::vector<std::shared_ptr<Component>>>();
-		}
 
 		if (data["SceneElements"].IsDefined())
 		{
