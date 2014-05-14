@@ -27,6 +27,7 @@ namespace SurgSim
 {
 namespace Math
 {
+enum IntegrationScheme;
 class Shape;
 }
 }
@@ -82,6 +83,13 @@ namespace YAML
 	{
 		static Node encode(const std::shared_ptr<SurgSim::Math::Shape>& rhs);
 		static bool decode(const Node& node, std::shared_ptr<SurgSim::Math::Shape>& rhs);
+	};
+
+	template <>
+	struct convert<SurgSim::Math::IntegrationScheme>
+	{
+		static Node encode(const SurgSim::Math::IntegrationScheme& rhs);
+		static bool decode(const Node& node, SurgSim::Math::IntegrationScheme& rhs);
 	};
 };
 

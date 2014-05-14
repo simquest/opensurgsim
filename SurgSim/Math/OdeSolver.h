@@ -16,6 +16,10 @@
 #ifndef SURGSIM_MATH_ODESOLVER_H
 #define SURGSIM_MATH_ODESOLVER_H
 
+#include <unordered_map>
+
+#include <boost/assign/list_of.hpp> // for 'map_list_of()'
+
 #include "SurgSim/Math/LinearSolveAndInverse.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeEquation.h"
@@ -40,6 +44,19 @@ enum IntegrationScheme {
 	INTEGRATIONSCHEME_RUNGE_KUTTA_4,
 	INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4
 };
+
+const std::unordered_map<std::string, IntegrationScheme> IntegrationSchemeNames = boost::assign::map_list_of
+	("INTEGRATIONSCHEME_STATICA", SurgSim::Math::INTEGRATIONSCHEME_STATIC)
+	("INTEGRATIONSCHEME_STATIC", SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC)
+	("INTEGRATIONSCHEME_LINEAR_STATIC", SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC)
+	("INTEGRATIONSCHEME_EXPLICIT_EULER", SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER)
+	("INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER", SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER)
+	("INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER", SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER)
+	("INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER",SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER)
+	("INTEGRATIONSCHEME_IMPLICIT_EULER", SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER)
+	("INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER", SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER)
+	("INTEGRATIONSCHEME_RUNGE_KUTTA_4", SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4)
+	("INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4", SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4);
 
 /// Base class for all solvers of ode equation of order 2 of the form M(x(t), v(t)).a(t) = f(t, x(t), v(t))
 /// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
