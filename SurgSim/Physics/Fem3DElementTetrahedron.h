@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENT3DTETRAHEDRON_H
-#define SURGSIM_PHYSICS_FEMELEMENT3DTETRAHEDRON_H
+#ifndef SURGSIM_PHYSICS_FEM3DELEMENTTETRAHEDRON_H
+#define SURGSIM_PHYSICS_FEM3DELEMENTTETRAHEDRON_H
 
 #include <array>
 
@@ -203,4 +203,4 @@ protected:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENT3DTETRAHEDRON_H
+#endif // SURGSIM_PHYSICS_FEM3DELEMENTTETRAHEDRON_H

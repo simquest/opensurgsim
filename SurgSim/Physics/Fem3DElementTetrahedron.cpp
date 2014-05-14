@@ -16,7 +16,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::getSubMatrix;

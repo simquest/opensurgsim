@@ -25,7 +25,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/FemElement2DTriangle.h"
+#include "SurgSim/Physics/Fem2DElementTriangle.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;

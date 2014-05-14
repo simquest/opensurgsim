@@ -26,7 +26,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
-#include "SurgSim/Physics/FemElement3DCube.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Testing/MockPhysicsManager.h"
 
 using SurgSim::Math::Vector3d;

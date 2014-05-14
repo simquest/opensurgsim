@@ -23,7 +23,7 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/FemElement1DBeam.h"
+#include "SurgSim/Physics/Fem1DElementBeam.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Quaterniond;

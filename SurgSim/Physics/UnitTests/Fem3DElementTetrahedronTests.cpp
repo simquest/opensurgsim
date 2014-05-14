@@ -21,7 +21,7 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 
 using SurgSim::Physics::FemElement3DTetrahedron;
 using SurgSim::Math::Vector3d;

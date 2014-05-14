@@ -23,7 +23,7 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/FemElement2DTriangle.h"
+#include "SurgSim/Physics/Fem2DElementTriangle.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;

@@ -16,7 +16,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
-#include "SurgSim/Physics/FemElement3DCube.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
 
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;

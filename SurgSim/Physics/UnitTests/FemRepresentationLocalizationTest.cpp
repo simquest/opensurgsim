@@ -22,8 +22,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
-#include "SurgSim/Physics/FemElement3DCube.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 
 using SurgSim::Math::getSubVector;
 using SurgSim::Physics::Fem3DRepresentation;

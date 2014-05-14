@@ -17,7 +17,7 @@
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Physics/FemElement2DTriangle.h"
+#include "SurgSim/Physics/Fem2DElementTriangle.h"
 
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;

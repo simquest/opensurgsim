@@ -25,7 +25,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/FemElement2DTriangle.h"
+#include "SurgSim/Physics/Fem2DElementTriangle.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Vector;

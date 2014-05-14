@@ -26,7 +26,7 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/FemRepresentationCoordinate.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 

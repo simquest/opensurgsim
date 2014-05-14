@@ -31,7 +31,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/FemElement3DCube.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
