@@ -44,7 +44,6 @@ public:
 	typedef std::function<void(const YAML::Node*)> DecoderType;
 
 
-	boost::any getValue(const std::string& name) const;
 
 	/// Retrieves the value with the name by executing the getter if it is found and tries to convert
 	/// it to the given type.
@@ -59,6 +58,7 @@ public:
 	/// \throws SurgSim::Framework::AssertionFailure if the property cannot be found
 	/// \param	name	The name of the property.
 	/// \return	The value of the property if the getter was found
+	boost::any getValue(const std::string& name) const;
 
 
 	/// Retrieves the value with the name by executing the getter if it is found, and converts it to

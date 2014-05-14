@@ -32,7 +32,8 @@ public:
 		readOnly(100),
 		sharedPtr(std::make_shared<int>(4)),
 		overloadedValue(200.0),
-		privateProperty(100)
+		virtualProperty(300),
+		privateProperty(100) // Don't forget to keep this last, otherwise there will be a gcc warning
 	{
 		setGetter("normal", std::bind(&TestClass::getNormal, this));
 		setSetter("normal", std::bind(&TestClass::setNormal, this, std::bind(SurgSim::Framework::convert<int>,
@@ -47,17 +48,24 @@ public:
 
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TestClass, float, serializableProperty,
 										  getSerializableProperty, setSerializableProperty);
+
+		SURGSIM_ADD_RO_PROPERTY(TestClass, int, virtualProperty, getVirtualProperty);
+		SURGSIM_ADD_RO_PROPERTY(TestClass, int, overriddenProperty, getReadWrite);
+
 	}
 
 	int normal;
 	double readWrite;
 	int readOnly;
 
+
 	std::shared_ptr<int> sharedPtr;
 
 	float serializableProperty;
 
 	double overloadedValue;
+
+	int virtualProperty;
 
 	int getNormal()
 	{
@@ -120,8 +128,42 @@ public:
 	{
 		overloadedValue = x;
 	}
+
+	virtual int getVirtualProperty()
+	{
+		return virtualProperty;
+	}
+
 private:
 	double privateProperty;
+};
+
+class DerivedTestClass : public TestClass
+{
+
+public:
+
+	DerivedTestClass() :
+		TestClass(),
+		otherValue(400)
+	{
+		// Override the accessor from the base class by changing the entry in the function table
+		SURGSIM_ADD_RO_PROPERTY(DerivedTestClass, int, overriddenProperty, getOtherValue);
+	}
+
+	int otherValue;
+
+	int getOtherValue()
+	{
+		return otherValue;
+	}
+
+	// Overrides the accessor, this tests if the virtual function resolution works on the function pointer
+	virtual int getVirtualProperty() override
+	{
+		return otherValue;
+	}
+
 };
 
 namespace SurgSim
@@ -268,6 +310,19 @@ TEST(AccessibleTest, RemoveAccessors)
 	EXPECT_ANY_THROW(a.setValue("readWrite", 2.0));
 }
 
+TEST(AccessibleTests, VirtualFunctionTest)
+{
+	std::shared_ptr<DerivedTestClass> derived = std::make_shared<DerivedTestClass>();
+	std::shared_ptr<TestClass> base = std::dynamic_pointer_cast<TestClass>(derived);
+
+	EXPECT_EQ(derived->otherValue, derived->getValue<int>("virtualProperty"));
+	EXPECT_EQ(derived->otherValue, derived->getValue<int>("overriddenProperty"));
+
+	EXPECT_EQ(derived->otherValue, base->getValue<int>("virtualProperty"));
+	EXPECT_EQ(derived->otherValue, base->getValue<int>("overriddenProperty"));
+
+}
+
 TEST(AccessibleTest, ConvertDoubleToFloat)
 {
 	// Values don't matter only care for them to be filled
@@ -372,8 +427,8 @@ TEST(AccessibleTests, MultipleValues)
 	EXPECT_EQ("a", encodedValues["a"].as<std::string>());
 	EXPECT_EQ("b", encodedValues["b"].as<std::string>());
 	EXPECT_EQ("invalid", encodedValues["c"].as<std::string>());
-
 }
+
 
 
 
