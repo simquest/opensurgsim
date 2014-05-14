@@ -153,6 +153,8 @@ public:
 		return SurgSim::Physics::REPRESENTATION_TYPE_INVALID;
 	}
 
+	SURGSIM_CLASSNAME(SurgSim::Physics::MockDeformableRepresentation);
+
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
 	Vector& computeF(const SurgSim::Math::OdeState& state) override
@@ -216,6 +218,11 @@ protected:
 	Vector m_F;
 	Matrix m_M, m_D, m_K;
 };
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::MockDeformableRepresentation);
+}
 
 class MockSpring : public SurgSim::Physics::Spring
 {
