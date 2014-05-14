@@ -129,8 +129,10 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	using SurgSim::Graphics::OsgViewElement;
 
 	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
-	viewElement->getView()->setPosition(x, y);
-	viewElement->getView()->setDimensions(width, height);
+	std::array<int, 2> position = {x, y};
+	std::array<int, 2> dimensions = {width, height};
+	viewElement->getView()->setPosition(position);
+	viewElement->getView()->setDimensions(dimensions);
 
 	// Move the camera from left to right over along the scene
 	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator_2");

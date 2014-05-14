@@ -47,8 +47,8 @@ void RenderTest::SetUp()
 	scene = runtime->getScene();
 
 	viewElement = std::make_shared<OsgViewElement>("view element");
-
-	viewElement->getView()->setPosition(100, 100);
+	std::array<int, 2> position = {100, 100};
+	viewElement->getView()->setPosition(position);
 	viewElement->getView()->setWindowBorderEnabled(true);
 
 	scene->addSceneElement(viewElement);
@@ -70,8 +70,8 @@ std::shared_ptr<ScreenSpaceQuadRepresentation> RenderTest::makeQuad(
 		std::make_shared<OsgScreenSpaceQuadRepresentation>(name);
 	quad->setSize(width, height);
 	Quaterniond quat;
-	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(0.0,Vector3d::UnitY());
-	quad->setLocalPose(SurgSim::Math::makeRigidTransform(quat, Vector3d(x,y,-0.2)));
+	quat = SurgSim::Math::makeRotationQuaternion<double, Eigen::DontAlign>(0.0, Vector3d::UnitY());
+	quad->setLocalPose(SurgSim::Math::makeRigidTransform(quat, Vector3d(x, y, -0.2)));
 	return quad;
 }
 

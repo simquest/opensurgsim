@@ -79,11 +79,9 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	renderPass->setRenderGroupReference("RenderPass");
 	renderPass->setGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
-	int width, height;
-	viewElement->getView()->getDimensions(&width, &height);
+	std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
 
-	std::shared_ptr<OsgRenderTarget2d> renderTargetOsg =
-		std::make_shared<OsgRenderTarget2d>(width, height, 1.0, 2, true);
+	auto renderTargetOsg = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 2, true);
 	renderPass->setRenderTarget(renderTargetOsg);
 	renderPass->setRenderOrder(Camera::RENDER_ORDER_PRE_RENDER, 0);
 
@@ -115,11 +113,11 @@ TEST_F(OsgCameraRenderTests, PassTest)
 
 	viewElement->addComponent(renderPass);
 
-	int screenWidth = 800;
-	int screenHeight = 600;
+	int screenWidth = dimensions[0];
+	int screenHeight = dimensions[1];
 
-	width = width / 3;
-	height = height / 3;
+	int width = dimensions[0] / 3;
+	int height = dimensions[1] / 3;
 
 	std::shared_ptr<ScreenSpaceQuadRepresentation> quad;
 	quad = makeQuad("Color1", width, height, screenWidth - width, screenHeight - height);

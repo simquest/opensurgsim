@@ -59,13 +59,13 @@ public:
 	~OsgView();
 
 
-	virtual bool setPosition(int x, int y) override;
+	virtual void setPosition(const std::array<int, 2>& position) override;
 
-	virtual void getPosition(int* x, int* y) const override;
+	virtual std::array<int, 2> getPosition() const override;
 
-	virtual bool setDimensions(int width, int height) override;
+	virtual void setDimensions(const std::array<int, 2>& dimensions) override;
 
-	virtual void getDimensions(int* width, int* height) const override;
+	virtual std::array<int, 2> getDimensions() const override;
 
 	virtual void setWindowBorderEnabled(bool enabled) override;
 
@@ -75,7 +75,7 @@ public:
 	/// Only allows OsgCamera components, any other will not be set and it will return false.
 	/// \param	camera	Camera whose image will be shown in this view
 	/// \return	True if it succeeded, false if it failed
-	virtual bool setCamera(std::shared_ptr<Camera> camera) override;
+	virtual void setCamera(std::shared_ptr<SurgSim::Framework::Component> camera) override;
 
 	/// Enables a camera manipulator, implemented via a trackball, this is a temporary solution as it uses
 	/// the OSG input events rather than reading from the OpenSurgSim input.
@@ -118,9 +118,9 @@ protected:
 	virtual bool doWakeUp() override;
 private:
 	/// Position of the view on the screen (in pixels)
-	int m_x, m_y;
+	std::array<int, 2> m_position;
 	/// Dimensions of the view on the screen (in pixels)
-	int m_width, m_height;
+	std::array<int, 2> m_dimensions;
 	/// Whether the view window has a border
 	bool m_isWindowBorderEnabled;
 

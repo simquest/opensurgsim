@@ -148,13 +148,11 @@ bool OsgManager::doUpdate(double dt)
 	if (Manager::doUpdate(dt))
 	{
 		m_viewer->frame();
-		int width;
-		int height;
 
 		// \note HS-2013-dec-12 This will work as long as we deal with one view, when we move to stereoscopic
 		//	     we might have to revise things. Or just assume that most views have the same size
-		getViews()[0]->getDimensions(&width, &height);
-		m_hudElement->setViewPort(width, height);
+		auto dimensions = getViews()[0]->getDimensions();
+		m_hudElement->setViewPort(dimensions[0], dimensions[1]);
 		return true;
 	}
 	else

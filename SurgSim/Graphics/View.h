@@ -21,6 +21,7 @@
 #include "SurgSim/Math/Vector.h"
 
 #include <memory>
+#include <array>
 
 namespace SurgSim
 {
@@ -65,22 +66,21 @@ public:
 	};
 
 	/// Set the position of this view
-	/// \param	x,y	Position on the screen (in pixels)
+	/// \param	position	Position on the screen (in pixels)
 	/// \return	True if it succeeded, false if it failed
-	virtual bool setPosition(int x, int y) = 0;
+	virtual void setPosition(const std::array<int, 2>& position) = 0;
 
 	/// Get the position of this view
-	/// \param[out]	x,y	Position on the screen (in pixels)
-	virtual void getPosition(int* x, int* y) const = 0;
+	/// \return Position on the screen (in pixels)
+	virtual std::array<int, 2> getPosition() const = 0;
 
 	/// Set the dimensions of this view
-	/// \param	width,height	Dimensions on the screen (in pixels)
-	/// \return	True if it succeeded, false if it failed
-	virtual bool setDimensions(int width, int height) = 0;
+	/// \param	dimensions Dimensions on the screen (in pixels)
+	virtual void setDimensions(const std::array<int, 2>& dimensions) = 0;
 
-	/// Set the dimensions of this view
-	/// \param[out]	width,height	Dimensions on the screen (in pixels)
-	virtual void getDimensions(int* width, int* height) const = 0;
+	/// Get the dimensions of this view
+	/// \return Dimensions on the screen (in pixels)
+	virtual std::array<int, 2> getDimensions() const = 0;
 
 	/// Sets whether the view window has a border
 	/// \param	enabled	True to enable the border around the window; false for no border
@@ -93,7 +93,7 @@ public:
 	/// Sets the camera which provides the viewpoint in the scene
 	/// \param	camera	Camera whose image will be shown in this view
 	/// \return	True if it succeeded, false if it failed
-	virtual bool setCamera(std::shared_ptr<Camera> camera);
+	virtual void setCamera(std::shared_ptr<SurgSim::Framework::Component> camera);
 
 	/// Gets the camera which provides the viewpoint in the scene
 	/// \return	camera	Camera whose image will be shown in this view
@@ -109,18 +109,18 @@ public:
 	/// Set the mode that this view should use for stereo display, see StereMode for all the modes.
 	/// \throws SurgSim::Framework::AssertionFailure if used after initialize has been called.
 	/// \param val The actual mode.
-	virtual void setStereoMode(StereoMode val);
+	virtual void setStereoMode(int val);
 
 	/// \return What kind of stereo rendering is being used for this view.
-	StereoMode getStereoMode() const;
+	int getStereoMode() const;
 
 	/// Set the kind of display.
 	/// \throws SurgSim::Framework::AssertionFailure if used after initialize has been called
 	/// \param type The type of display
-	void setDisplayType(DisplayType type);
+	void setDisplayType(int type);
 
 	/// \return The type of display that the view is on
-	DisplayType getDisplayType() const;
+	int getDisplayType() const;
 
 	/// Request the display to use the whole screen.
 	/// \throws SurgSim::Framework::AssertionFailure if used after initialize has been called.
@@ -180,13 +180,23 @@ public:
 	double getScreenHeight() const;
 
 private:
+
+// 	virtual void setPosition(const std::array<int, 2>& position);
+//
+// 	virtual const std::array<int, 2> getPosition();
+//
+// 	virtual void setDimensions(const std::array<int, 2>& dimensions);
+//
+// 	virtual const std::array<int, 2> getDimensions();
+
+
 	virtual bool doInitialize() override;
 
 	/// Camera whose image will be shown in this view
 	std::shared_ptr<Camera> m_camera;
 
-	StereoMode m_stereoMode; ///< The stereo mode, that is being used.
-	DisplayType m_displayType; ///< The requested display type.
+	int m_stereoMode; ///< The stereo mode, that is being used.
+	int m_displayType; ///< The requested display type.
 	int m_targetScreen; ///< Index of the screen to be used
 	bool m_isFullscreen; ///< Whether to go fullscreen
 	double m_eyeSeparation; ///< Distance between eypoints in m.

@@ -61,8 +61,12 @@ TEST(OsgViewElementRenderTests, MoveAndResizeWindowTest)
 	scene->addSceneElement(viewElement);
 
 	/// Set initial position to (50, 60), dimensions to 200 x 100 and disable the window border
-	viewElement->getView()->setPosition(50, 60);
-	viewElement->getView()->setDimensions(200, 100);
+
+	std::array<int, 2> position = {50, 60};
+	std::array<int, 2> dimensions = {200, 100};
+
+	viewElement->getView()->setPosition(position);
+	viewElement->getView()->setDimensions(dimensions);
 	viewElement->getView()->setWindowBorderEnabled(false);
 
 	/// Run the thread
@@ -71,12 +75,17 @@ TEST(OsgViewElementRenderTests, MoveAndResizeWindowTest)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	/// Move the window to (100, 200)
-	viewElement->getView()->setPosition(100, 200);
+	position[0] = 100;
+	position[1] = 200;
+
+	viewElement->getView()->setPosition(position);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	/// Enable the window border and resize the window to 400 x 500
 	viewElement->getView()->setWindowBorderEnabled(true);
-	viewElement->getView()->setDimensions(400, 500);
+	dimensions[0] = 400;
+	dimensions[1] = 500;
+	viewElement->getView()->setDimensions(dimensions);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	runtime->stop();
@@ -119,7 +128,8 @@ TEST(OsgViewElementRenderTest, StereoView)
 
 	auto boxElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("box");
 
-	RigidTransform3d pose = makeRigidTransform(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
+	RigidTransform3d pose =
+		makeRigidTransform(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
 	viewElement->setPose(pose);
 	scene->addSceneElement(viewElement);
 
@@ -127,8 +137,10 @@ TEST(OsgViewElementRenderTest, StereoView)
 	box->setSizeXYZ(0.1, 0.1, 0.2);
 	boxElement->addComponent(box);
 
-	RigidTransform3d from = makeRigidTransform(Vector3d(0.2, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
-	RigidTransform3d to = makeRigidTransform(Vector3d(-0.2, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
+	RigidTransform3d from =
+		makeRigidTransform(Vector3d(0.2, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
+	RigidTransform3d to =
+		makeRigidTransform(Vector3d(-0.2, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
 	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("interpolator");
 
 	interpolator->setDuration(2.0);

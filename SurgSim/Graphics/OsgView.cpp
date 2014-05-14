@@ -26,8 +26,6 @@
 
 #include <osgViewer/ViewerEventHandlers>
 #include <osg/DisplaySettings>
-#include <osgViewer/config/SingleScreen>
-#include <osgViewer/config/SingleWindow>
 
 namespace
 {
@@ -64,15 +62,20 @@ namespace Graphics
 {
 
 OsgView::OsgView(const std::string& name) : View(name),
-	m_x(0), m_y(0),
-	m_width(800), m_height(600),
 	m_isWindowBorderEnabled(true),
 	m_isFirstUpdate(true),
 	m_areWindowSettingsDirty(false),
 	m_view(new osgViewer::View())
 {
-	/// Don't allow the default camera here, let that be handled at a higher level.
+	m_position[0] = 0;
+	m_position[1] = 0;
+	m_dimensions[0] = 1024;
+	m_dimensions[1] = 768;
+
+	/// Clear the OSG default camera, let that be handled at a higher level.
 	m_view->setCamera(nullptr);
+
+
 }
 
 
@@ -83,38 +86,32 @@ OsgView::~OsgView()
 	enableMouseDevice(false);
 }
 
-bool OsgView::setPosition(int x, int y)
+void OsgView::setPosition(const std::array<int, 2>& position)
 {
-	if (x != m_x || y != m_y)
+	if (position != m_position)
 	{
+		m_position = position;
 		m_areWindowSettingsDirty = true;
 	}
-	m_x = x;
-	m_y = y;
-	return true;
 }
 
-void OsgView::getPosition(int* x, int* y) const
+std::array<int, 2> OsgView::getPosition() const
 {
-	*x = m_x;
-	*y = m_y;
+	return m_position;
 }
 
-bool OsgView::setDimensions(int width, int height)
+void OsgView::setDimensions(const std::array<int, 2>& dimensions)
 {
-	if (width != m_width || height != m_height)
+	if (m_dimensions != dimensions)
 	{
 		m_areWindowSettingsDirty = true;
+		m_dimensions = dimensions;
 	}
-	m_width = width;
-	m_height = height;
-	return true;
 }
 
-void OsgView::getDimensions(int* width, int* height) const
+std::array<int, 2> OsgView::getDimensions() const
 {
-	*width = m_width;
-	*height = m_height;
+	return m_dimensions;
 }
 
 void OsgView::setWindowBorderEnabled(bool enabled)
@@ -128,18 +125,13 @@ bool OsgView::isWindowBorderEnabled() const
 	return m_isWindowBorderEnabled;
 }
 
-bool OsgView::setCamera(std::shared_ptr<SurgSim::Graphics::Camera> camera)
+void OsgView::setCamera(std::shared_ptr<SurgSim::Framework::Component> camera)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::dynamic_pointer_cast<OsgCamera>(camera);
-	if (osgCamera != nullptr && View::setCamera(camera))
-	{
-		m_view->setCamera(osgCamera->getOsgCamera());
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	SURGSIM_ASSERT(osgCamera != nullptr) << "OsgView can only take an OsgCamera.";
+
+	View::setCamera(camera);
+	m_view->setCamera(osgCamera->getOsgCamera());
 }
 
 void OsgView::update(double dt)
@@ -154,7 +146,7 @@ void OsgView::update(double dt)
 			if (window)
 			{
 				window->setWindowDecoration(m_isWindowBorderEnabled);
-				window->setWindowRectangle(m_x, m_y, m_width, m_height);
+				window->setWindowRectangle(m_position[0], m_position[1], m_dimensions[0], m_dimensions[1]);
 				m_areWindowSettingsDirty = false;
 			}
 		}
@@ -187,16 +179,27 @@ bool OsgView::doWakeUp()
 
 	osg::ref_ptr<osgViewer::ViewConfig> viewConfig;
 
+//  #refactor
+//  HS-2014-may-14 Linux is stuck at OSG 3.2.0-rc1, this is not implemented there, they are waiting for
+//  3.2.1 to move forward, implement this once linux has caught up
+// 	if (isFullScreen())
+// 	{
+// 		viewConfig = new osgViewer::SingleScreen(getTargetScreen());
+// 	}
+// 	else
+// 	{
+// 		viewConfig = new osgViewer::SingleWindow(m_x, m_y, m_width, m_height, getTargetScreen());
+// 	}
+//	m_view->apply(viewConfig);
+
 	if (isFullScreen())
 	{
-		viewConfig = new osgViewer::SingleScreen(getTargetScreen());
+		m_view->setUpViewOnSingleScreen(getTargetScreen());
 	}
 	else
 	{
-		viewConfig = new osgViewer::SingleWindow(m_x, m_y, m_width, m_height, getTargetScreen());
+		m_view->setUpViewInWindow(m_position[0], m_position[1], m_dimensions[0], m_dimensions[1], getTargetScreen());
 	}
-
-	m_view->apply(viewConfig);
 
 	m_view->addEventHandler(new osgViewer::StatsHandler);
 
