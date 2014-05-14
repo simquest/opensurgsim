@@ -43,12 +43,23 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	// with k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
 	// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
 
-	// Computes M
-	const Matrix& M = m_equation.computeM(currentState);
+	// Computes M (stores it in m_systemMatrix to avoid dynamic re-allocation)
+	Matrix &M = (m_systemMatrix = m_equation.computeM(currentState));
+
+	// Apply the boundary conditions to the mass matrix
+	currentState.applyBoundaryConditionsToMatrix(&M);
 
 	// 1st evaluate k1 (note that y(n) is currentState)
 	m_k1.velocity = currentState.getVelocities();
-	(*m_linearSolver)(M, m_equation.computeF(currentState), &m_k1.acceleration, &(m_compliance));
+	(*m_linearSolver)(M, *currentState.applyBoundaryConditionsToVector(&m_equation.computeF(currentState)),
+		&m_k1.acceleration, &(m_compliance));
+
+	// Remove the boundary conditions compliance from the compliance matrix
+	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
+	currentState.applyBoundaryConditionsToMatrix(&m_compliance, false);
+	// Note: no need to apply the boundary conditions to any computed forces as of now because m_compliance
+	// has entire lines of zero for all fixed dof. So m_compliance * F will produce the proper displacement
+	// without violating any boundary conditions.
 
 	// 2nd evaluate k2
 	newState->getPositions()  = currentState.getPositions()  + m_k1.velocity * dt / 2.0;
