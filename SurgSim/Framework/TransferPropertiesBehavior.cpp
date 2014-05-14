@@ -16,6 +16,7 @@
 #include "SurgSim/Framework/TransferPropertiesBehavior.h"
 
 #include <boost/thread/lock_guard.hpp>
+#include <boost/any.hpp>
 
 namespace SurgSim
 {
@@ -48,7 +49,7 @@ void TransferPropertiesBehavior::update(double dt)
 		{
 			auto source = it->first.accessible.lock();
 			auto target = it->second.accessible.lock();
-			target->setValue(it->second.name, source->getValue(it->first.name));
+			target->setValue(it->second.name, source->getValue<boost::any>(it->first.name));
 		}
 	}
 }

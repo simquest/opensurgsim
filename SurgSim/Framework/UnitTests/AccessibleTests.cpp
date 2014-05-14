@@ -240,6 +240,21 @@ TEST(AccessibleTest, SharedPointer)
 	EXPECT_EQ(5, *y);
 }
 
+// We want to check whether we can forward a setter and a getter from one class to the other,
+// i.e. a.setValue("Forwarded") should actually change a specific value in b via Properties
+TEST(AccessibleTest, Forwarding)
+{
+	TestClass a;
+	TestClass b;
+	b.normal = 543;
+
+	ASSERT_NO_THROW(a.forwardProperty("forwarded", b, "normal"));
+
+	EXPECT_EQ(543, a.getValue<int>("forwarded"));
+	ASSERT_NO_THROW(a.setValue("forwarded", 345));
+	EXPECT_EQ(345, b.normal);
+}
+
 TEST(AccessibleTest, RemoveAccessors)
 {
 	TestClass a;

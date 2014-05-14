@@ -54,12 +54,11 @@ bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 		std::shared_ptr<Accessible> accessible = std::dynamic_pointer_cast<Accessible>(uniform);
 		if (accessible != nullptr)
 		{
-			Accessible::GetterType setter =
-				std::bind(&SurgSim::Framework::Accessible::setValue, accessible.get(), "Value", std::placeholders::_1);
-			Accessible::SetterType getter =
-				std::bind(&SurgSim::Framework::Accessible::getValue, accessible.get(), "Value");
-
-			setAccessors(osgUniform->getName(), getter, setter);
+			// add a property to Material, that carries the uniform name and forwards to the value of the uniform
+			// This exposes the non-shared pointer to the uniform in the function table, the entry in the function
+			// table will be removed when the uniform is removed from the material. The material holds a shared
+			// pointer to the uniform, keeping the uniform alive during the lifetime of the material.
+			forwardProperty(osgUniform->getName(), *accessible.get(), "Value");
 			didSucceed = true;
 		}
 		else

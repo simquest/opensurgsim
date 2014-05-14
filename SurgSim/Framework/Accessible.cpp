@@ -37,19 +37,9 @@ boost::any Framework::Accessible::getValue(const std::string& name) const
 	}
 }
 
-boost::any Framework::Accessible::getBoostValue(const std::string& name) const
+boost::any Framework::Accessible::getValue(const std::string& name) const
 {
-	auto functors = m_functors.find(name);
-	if (functors != std::end(m_functors) && functors->second.getter != nullptr)
-	{
-		return functors->second.getter();
-	}
-	else
-	{
-		SURGSIM_FAILURE() << "Can't get property: " << name << "." << ((functors == std::end(m_functors)) ?
-						  "Property not found." : "No getter defined for property.");
-		return boost::any();
-	}
+	return getValue<boost::any>(name);
 }
 
 
@@ -156,6 +146,22 @@ void  Accessible::decode(const YAML::Node& node)
 				}
 			}
 		}
+	}
+}
+
+void Accessible::forwardProperty(const std::string& name, const Accessible& target, const std::string& targetValueName)
+{
+	Functors functors;
+	auto found = target.m_functors.find(targetValueName);
+	if (found != target.m_functors.end())
+	{
+		functors.getter = found->second.getter;
+		functors.setter = found->second.setter;
+		m_functors[name] = std::move(functors);
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "Target does not have any setters or getters on property " << targetValueName;
 	}
 }
 
