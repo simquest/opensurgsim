@@ -14,8 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Shape.h"
@@ -34,7 +34,8 @@ namespace Physics
 DeformableCollisionRepresentation::DeformableCollisionRepresentation(const std::string& name) :
 	SurgSim::Collision::Representation(name)
 {
-
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
+									  Shape, getShape, setShape);
 }
 
 DeformableCollisionRepresentation::~DeformableCollisionRepresentation()
@@ -63,16 +64,15 @@ void DeformableCollisionRepresentation::update(const double& dt)
 		<< "Failed to update.  The DeformableCollisionRepresentation either was not attached to a "
 		"Physics::Representation or the Physics::Representation has expired.";
 
-	auto state = physicsRepresentation->getCurrentState();
-
-	const size_t numNodes = state->getNumNodes();
+	auto odeState = physicsRepresentation->getCurrentState();
+	const size_t numNodes = odeState->getNumNodes();
 
 	SURGSIM_ASSERT(m_mesh->getNumVertices() == numNodes)
 		<< "The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 	{
-		m_mesh->setVertexPosition(nodeId, state->getPosition(nodeId));
+		m_mesh->setVertexPosition(nodeId, odeState->getPosition(nodeId));
 	}
 	m_mesh->update();
 	m_shape->updateAabbTree();
@@ -108,6 +108,7 @@ void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::
 		<< "Deformable collision shape has to be a mesh.  Currently " << m_shape->getType();
 
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
+	m_shape = meshShape;
 	m_mesh = meshShape->getMesh();
 }
 
@@ -133,6 +134,5 @@ const std::shared_ptr<SurgSim::Physics::DeformableRepresentation>
 	return physicsRepresentation;
 }
 
-}
-}
-
+} // namespace Physics
+} // namespace SurgSim

@@ -134,7 +134,8 @@ public:
 class MockDeformableRepresentation : public SurgSim::Physics::DeformableRepresentation
 {
 public:
-	MockDeformableRepresentation() : SurgSim::Physics::DeformableRepresentation("MockDeformableRepresentation")
+	explicit MockDeformableRepresentation(const std::string& name = "MockDeformableRepresentation") :
+		SurgSim::Physics::DeformableRepresentation(name)
 	{
 		this->m_numDofPerNode = 3;
 		m_F = Vector::LinSpaced(3, 1.0, 3.0);

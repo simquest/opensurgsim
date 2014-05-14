@@ -25,6 +25,7 @@ set(UNIT_TEST_SOURCES
 	ContactConstraintDataTests.cpp
 	ContactConstraintGenerationTests.cpp
 	DcdCollisionTests.cpp
+	DeformableCollisionRepresentationTest.cpp
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
 	Fem1DMechanicalValidationTests.cpp
@@ -88,6 +89,7 @@ set(LIBS
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 configure_file(

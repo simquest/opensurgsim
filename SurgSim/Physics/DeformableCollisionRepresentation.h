@@ -63,7 +63,7 @@ public:
 	/// \return The mesh that is part of this representation
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh() const;
 
-	/// Set the shape for this collision representation, has to me a meshShape
+	/// Set the shape for this collision representation, has to be a meshShape
 	/// \param shape The shape to be used.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);
 
