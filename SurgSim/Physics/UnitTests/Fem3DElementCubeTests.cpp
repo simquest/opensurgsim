@@ -26,7 +26,7 @@
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::FemElement3DCube;
+using SurgSim::Physics::Fem3DElementCube;
 
 namespace
 {
@@ -34,11 +34,11 @@ namespace
 const double epsilon = 2.6e-9;
 };
 
-class MockFemElement3DCube : public FemElement3DCube
+class MockFem3DElementCube : public Fem3DElementCube
 {
 public:
-	MockFemElement3DCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState) :
-		FemElement3DCube(nodeIds, restState)
+	MockFem3DElementCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState) :
+		Fem3DElementCube(nodeIds, restState)
 	{
 	}
 
@@ -73,7 +73,7 @@ public:
 	}
 };
 
-class FemElement3DCubeTests : public ::testing::Test
+class Fem3DElementCubeTests : public ::testing::Test
 {
 public:
 	std::array<unsigned int, 8> m_nodeIds;
@@ -475,17 +475,17 @@ public:
 extern void testSize(const Vector& v, int expectedSize);
 extern void testSize(const Matrix& m, int expectedRows, int expectedCols);
 
-TEST_F(FemElement3DCubeTests, ConstructorTest)
+TEST_F(Fem3DElementCubeTests, ConstructorTest)
 {
-	ASSERT_NO_THROW({MockFemElement3DCube cube(m_nodeIds, m_restState);});
-	ASSERT_NO_THROW({MockFemElement3DCube* cube = new MockFemElement3DCube(m_nodeIds, m_restState); delete cube;});
-	ASSERT_NO_THROW({std::shared_ptr<MockFemElement3DCube> cube =
-		std::make_shared<MockFemElement3DCube>(m_nodeIds, m_restState);});
+	ASSERT_NO_THROW({MockFem3DElementCube cube(m_nodeIds, m_restState);});
+	ASSERT_NO_THROW({MockFem3DElementCube* cube = new MockFem3DElementCube(m_nodeIds, m_restState); delete cube;});
+	ASSERT_NO_THROW({std::shared_ptr<MockFem3DElementCube> cube =
+		std::make_shared<MockFem3DElementCube>(m_nodeIds, m_restState);});
 }
 
-TEST_F(FemElement3DCubeTests, NodeIdsTest)
+TEST_F(Fem3DElementCubeTests, NodeIdsTest)
 {
-	FemElement3DCube cube(m_nodeIds, m_restState);
+	Fem3DElementCube cube(m_nodeIds, m_restState);
 	EXPECT_EQ(8u, cube.getNumNodes());
 	EXPECT_EQ(8u, cube.getNodeIds().size());
 	for (int i = 0; i < 8; i++)
@@ -495,9 +495,9 @@ TEST_F(FemElement3DCubeTests, NodeIdsTest)
 	}
 }
 
-TEST_F(FemElement3DCubeTests, VolumeTest)
+TEST_F(Fem3DElementCubeTests, VolumeTest)
 {
-	MockFemElement3DCube cube(m_nodeIds, m_restState);
+	MockFem3DElementCube cube(m_nodeIds, m_restState);
 	EXPECT_NEAR(cube.getRestVolume(), m_expectedVolume, 1e-10);
 	EXPECT_NEAR(cube.getVolume(m_restState), m_expectedVolume, 1e-10);
 }
@@ -526,17 +526,17 @@ void testNodeOrderingAllPermutations(const SurgSim::Math::OdeState& m_restState,
 			// Test this permutation
 			if (expectThrow)
 			{
-				EXPECT_ANY_THROW({MockFemElement3DCube cube(ids, m_restState);});
+				EXPECT_ANY_THROW({MockFem3DElementCube cube(ids, m_restState);});
 			}
 			else
 			{
-				EXPECT_NO_THROW({MockFemElement3DCube cube(ids, m_restState);});
+				EXPECT_NO_THROW({MockFem3DElementCube cube(ids, m_restState);});
 			}
 		}
 	}
 }
 
-TEST_F(FemElement3DCubeTests, NodeOrderingTest)
+TEST_F(Fem3DElementCubeTests, NodeOrderingTest)
 {
 	// Any definition starting with a 1st face defined CW
 	// followed by the opposite face defined CCW is valid.
@@ -596,11 +596,11 @@ TEST_F(FemElement3DCubeTests, NodeOrderingTest)
 	testNodeOrderingAllPermutations(m_restState, 0, 4, 6, 2, 1, 5, 7, 3, true);
 }
 
-TEST_F(FemElement3DCubeTests, ShapeFunctionsTest)
+TEST_F(Fem3DElementCubeTests, ShapeFunctionsTest)
 {
 	using SurgSim::Math::getSubVector;
 
-	MockFemElement3DCube cube(m_nodeIds, m_restState);
+	MockFem3DElementCube cube(m_nodeIds, m_restState);
 
 	EXPECT_TRUE(cube.getInitialPosition().isApprox(m_expectedX0)) <<
 		"x0 = " << cube.getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
@@ -712,9 +712,9 @@ TEST_F(FemElement3DCubeTests, ShapeFunctionsTest)
 	}
 }
 
-TEST_F(FemElement3DCubeTests, CoordinateTests)
+TEST_F(Fem3DElementCubeTests, CoordinateTests)
 {
-	MockFemElement3DCube cube(m_nodeIds, m_restState);
+	MockFem3DElementCube cube(m_nodeIds, m_restState);
 
 	{
 		// Non-normalize node
@@ -779,11 +779,11 @@ TEST_F(FemElement3DCubeTests, CoordinateTests)
 				 SurgSim::Framework::AssertionFailure);
 }
 
-TEST_F(FemElement3DCubeTests, ForceAndMatricesTest)
+TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 {
 	using SurgSim::Math::getSubVector;
 
-	MockFemElement3DCube cube(m_nodeIds, m_restState);
+	MockFem3DElementCube cube(m_nodeIds, m_restState);
 
 	// Test the various mode of failure related to the physical parameters
 	// This has been already tested in FemElementTests, but this is to make sure this method is called properly

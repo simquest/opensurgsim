@@ -42,7 +42,7 @@ namespace Physics
 /// \note have been derived from it.
 ///
 /// \note The element is considered to have a constant thickness.
-class FemElement2DTriangle : public FemElement
+class Fem2DElementTriangle : public FemElement
 {
 	typedef Eigen::Matrix<double, 3, 3, Eigen::DontAlign> Matrix33Type;
 
@@ -56,7 +56,7 @@ public:
 	/// Constructor
 	/// \param nodeIds An array of 3 node ids (A, B, C) defining this triangle element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
-	FemElement2DTriangle(std::array<unsigned int, 3> nodeIds);
+	Fem2DElementTriangle(std::array<unsigned int, 3> nodeIds);
 
 	/// Sets the triangle's thickness
 	/// \param thickness The thickness of the triangle

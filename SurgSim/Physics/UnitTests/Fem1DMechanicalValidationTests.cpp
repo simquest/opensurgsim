@@ -84,7 +84,7 @@ public:
 		{
 			nodeEnds[0] = nodeId;
 			nodeEnds[1] = nodeId + 1;
-			auto element = std::make_shared<FemElement1DBeam>(nodeEnds);
+			auto element = std::make_shared<Fem1DElementBeam>(nodeEnds);
 			element->setMassDensity(massDensity);
 			element->setYoungModulus(youngModulus);
 			element->setPoissonRatio(poissonRatio);
@@ -193,9 +193,9 @@ protected:
 		getSubVector(m_expectedTransformedVelocities, 2, 3) = m_initialPose.linear() * getSubVector(v, 2, 3);
 		getSubVector(m_expectedTransformedVelocities, 3, 3) = getSubVector(v, 3, 3);
 
-		// Create FemElement1DBeam
+		// Create Fem1DElementBeam
 		std::array<unsigned int, 2> nodeIds = {0, 1};
-		auto element = std::make_shared<FemElement1DBeam>(nodeIds);
+		auto element = std::make_shared<Fem1DElementBeam>(nodeIds);
 		element->setMassDensity(m_rho);
 		element->setYoungModulus(m_E);
 		element->setPoissonRatio(m_nu);

@@ -172,7 +172,7 @@ void Fem3DRepresentationPlyReaderDelegate::processPolyhedron(const std::string& 
 
 	std::array<unsigned int, 4> polyhedronVertices;
 	std::copy(m_polyhedronData.indicies, m_polyhedronData.indicies + 4, polyhedronVertices.begin());
-	m_fem->addFemElement(std::make_shared<FemElement3DTetrahedron>(polyhedronVertices));
+	m_fem->addFemElement(std::make_shared<Fem3DElementTetrahedron>(polyhedronVertices));
 }
 
 void Fem3DRepresentationPlyReaderDelegate::endPolyhedrons(const std::string& elementName)

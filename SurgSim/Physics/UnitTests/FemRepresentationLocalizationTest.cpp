@@ -43,7 +43,7 @@ void addTetraheadron(Fem3DRepresentation *fem, std::array<unsigned int, 4> nodes
 	const SurgSim::Math::OdeState& state, double massDensity = 1.0,
 	double poissonRatio = 0.1, double youngModulus = 1.0)
 {
-	auto element = std::make_shared<FemElement3DTetrahedron>(nodes);
+	auto element = std::make_shared<Fem3DElementTetrahedron>(nodes);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
 	element->setYoungModulus(youngModulus);
@@ -89,7 +89,7 @@ public:
 		m_fem->setInitialState(state);
 		m_fem->setIsActive(true);
 
-		// FEMRepresentation for FemElement3DCube
+		// FEMRepresentation for Fem3DElementCube
 		m_fem3DCube = std::make_shared<Fem3DRepresentation>("Fem3dCubeRepresentation");
 		auto restState = std::make_shared<SurgSim::Math::OdeState>();
 		restState->setNumDof(3, 8);
@@ -107,7 +107,7 @@ public:
 		// Define Cube
 		{
 			std::array<unsigned int, 8> node0 = {{0, 1, 3, 2, 4, 5, 7, 6}};
-			std::shared_ptr<FemElement3DCube> femElement = std::make_shared<FemElement3DCube>(node0, *restState);
+			std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(node0, *restState);
 			femElement->setMassDensity(1.0);
 			femElement->setPoissonRatio(0.1);
 			femElement->setYoungModulus(1.0);

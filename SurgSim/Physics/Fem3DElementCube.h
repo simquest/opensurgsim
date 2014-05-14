@@ -37,7 +37,7 @@ namespace Physics
 /// \note Note that this technique is accurate for any polynomial evaluation up to degree 3.
 /// \note In our case, the shape functions \f$N_i\f$ are linear (of degree 1). So for exmaple,
 /// \note in the mass matrix we have integral terms like \f$\int_V N_i.N_j dV\f$, which are of degree 2.
-class FemElement3DCube : public FemElement
+class Fem3DElementCube : public FemElement
 {
 public:
 	/// Constructor
@@ -48,7 +48,7 @@ public:
 	/// \note In order to do so (looking at the cube from the exterior, face normal 'n' pointing outward),
 	/// \note   the 1st  4 nodeIds (ABCD) should define any face CW            i.e. (AB^AC or AB^AD or AC^AD).n < 0
 	/// \note   the last 4 nodeIds (EFGH) should define the opposite face CCW  i.e. (EF^EG or EF^EH or EG^EH).n > 0
-	FemElement3DCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState);
+	Fem3DElementCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState);
 
 	/// Initializes the element once everything has been set
 	/// \param state The state to initialize the FemElement with
@@ -87,7 +87,7 @@ public:
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	/// \note FemElement3DCube uses linear elasticity (not visco-elasticity), so it does not give any damping.
+	/// \note Fem3DElementCube uses linear elasticity (not visco-elasticity), so it does not give any damping.
 	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 		double scale = 1.0) override;
 

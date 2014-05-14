@@ -325,8 +325,8 @@ public:
 						static_cast<unsigned int>(cubeNodeIds[4]), static_cast<unsigned int>(cubeNodeIds[5]),
 						static_cast<unsigned int>(cubeNodeIds[7]), static_cast<unsigned int>(cubeNodeIds[6])};
 
-					// Add FemElement3DCube for each cube
-					std::shared_ptr<FemElement3DCube> femElement = std::make_shared<FemElement3DCube>(cube, *state);
+					// Add Fem3DElementCube for each cube
+					std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(cube, *state);
 					femElement->setMassDensity(980.0);   // 0.98 g/cm^-3 (2-part silicone rubber a.k.a. RTV6166)
 					femElement->setPoissonRatio(0.499);  // From the paper (near 0.5)
 					femElement->setYoungModulus(15.3e3); // 15.3 kPa (From the paper)

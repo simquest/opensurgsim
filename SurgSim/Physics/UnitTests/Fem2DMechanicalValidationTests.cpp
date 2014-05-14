@@ -108,7 +108,7 @@ public:
 
 	void addTriangle(const std::array<unsigned int, 3>& t, double youngModulus, double poissonRatio, double thickness)
 	{
-		std::shared_ptr<FemElement2DTriangle> triangle = std::make_shared<FemElement2DTriangle>(t);
+		std::shared_ptr<Fem2DElementTriangle> triangle = std::make_shared<Fem2DElementTriangle>(t);
 		triangle->setYoungModulus(youngModulus);
 		triangle->setPoissonRatio(poissonRatio);
 		triangle->setMassDensity(1.0);  // In static mode, the mass density is not used, but it needs to be non null to
@@ -142,7 +142,7 @@ public:
 		}
 		for (size_t triangleId = 0; triangleId < m_fem->getNumFemElements(); triangleId++)
 		{
-			auto triangle = std::static_pointer_cast<FemElement2DTriangle>(m_fem->getFemElement(triangleId));
+			auto triangle = std::static_pointer_cast<Fem2DElementTriangle>(m_fem->getFemElement(triangleId));
 			unsigned int nodeId0 = triangle->getNodeId(0);
 			unsigned int nodeId1 = triangle->getNodeId(1);
 			unsigned int nodeId2 = triangle->getNodeId(2);

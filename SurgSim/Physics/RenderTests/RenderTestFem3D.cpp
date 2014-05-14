@@ -33,8 +33,8 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::FemElement;
-using SurgSim::Physics::FemElement3DCube;
-using SurgSim::Physics::FemElement3DTetrahedron;
+using SurgSim::Physics::Fem3DElementCube;
+using SurgSim::Physics::Fem3DElementTetrahedron;
 using SurgSim::Math::Vector3d;
 
 namespace
@@ -92,7 +92,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 
 	for (auto tetrahedron = tetrahedrons.cbegin(); tetrahedron != tetrahedrons.cend(); ++tetrahedron)
 	{
-		std::shared_ptr<FemElement> element = std::make_shared<FemElement3DTetrahedron>(*tetrahedron);
+		std::shared_ptr<FemElement> element = std::make_shared<Fem3DElementTetrahedron>(*tetrahedron);
 		element->setMassDensity(8000.0);
 		element->setPoissonRatio(0.45);
 		element->setYoungModulus(1.0e6);
@@ -158,7 +158,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	}
 	physicsRepresentation->setInitialState(initialState);
 
-	std::shared_ptr<FemElement> element = std::make_shared<FemElement3DCube>(cube, *initialState);
+	std::shared_ptr<FemElement> element = std::make_shared<Fem3DElementCube>(cube, *initialState);
 	element->setMassDensity(8000.0);
 	element->setPoissonRatio(0.45);
 	element->setYoungModulus(1.0e6);
