@@ -16,9 +16,10 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
 
+#include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/RigidRepresentationBaseState.h"
 
 namespace SurgSim
 {
@@ -26,10 +27,8 @@ namespace SurgSim
 namespace Physics
 {
 
-/// The RigidRepresentationState class describes a dynamic rigid body state
-/// (position + velocity information)
-/// Derives from RigidRepresentationBaseState which describes the position state only
-class RigidRepresentationState : public RigidRepresentationBaseState
+/// The RigidRepresentationState class describes a state (position and velocity information).
+class RigidRepresentationState : public SurgSim::Framework::Accessible
 {
 public:
 	/// Default constructor
@@ -37,6 +36,11 @@ public:
 
 	/// Default constructor
 	RigidRepresentationState(const RigidRepresentationState& rhs);
+
+	/// Copy assignment
+	/// \param rhs Right hand side RigidRepresentationState from which data are copied.
+	/// \note 'm_functors' in base class Accessible is NOT copied.
+	RigidRepresentationState& operator=(const RigidRepresentationState& rhs);
 
 	/// Destructor
 	virtual ~RigidRepresentationState();
@@ -58,7 +62,7 @@ public:
 	/// Rotations will be set to identity (quaternion or matrix type)
 	/// If you want to reset to initial values, you need to save them separately
 	/// in another RigidRepresentationState and assign it to this instance.
-	virtual void reset();
+	void reset();
 
 	/// Get the linear velocity
 	/// \return the linear velocity
@@ -76,6 +80,14 @@ public:
 	/// \param w The angular velocity
 	void setAngularVelocity(const SurgSim::Math::Vector3d &w);
 
+	/// Set the rigid representation pose
+	/// \param pose The pose to set the rigid representation to
+	void setPose(const SurgSim::Math::RigidTransform3d& pose);
+
+	/// Get the rigid representation pose
+	/// \return A constant reference to the pose (read only)
+	const SurgSim::Math::RigidTransform3d& getPose() const;
+
 private:
 	/// Register accessors of serializable properties
 	void addSerializableProperty();
@@ -85,6 +97,9 @@ private:
 
 	/// Angular velocity
 	SurgSim::Math::Vector3d m_w;
+
+	/// Rigid representation pose (translation + rotation)
+	SurgSim::Math::RigidTransform3d m_pose;
 };
 
 }; // Physics
