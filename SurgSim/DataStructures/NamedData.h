@@ -270,11 +270,12 @@ public:
 	/// \sa size()
 	inline int getNumEntries() const;
 
-	/// Copy the data from another NamedData, based on a map of indices.
-	/// \param other The "from" NamedData.
+	/// Copy the data from another NamedData, based on a map of indices. Resets entries that are reset in the other.
+	/// \param source The source NamedData.
 	/// \param map The map of indices.
+	/// \exception Asserts if the objects do not have the same template type.
 	template <typename N>
-	void copy(const NamedData<N>& other, const NamedDataCopyMap& map);
+	void copy(const NamedData<N>& source, const NamedDataCopyMap& map);
 
 private:
 	/// The mapping between names and indices.
