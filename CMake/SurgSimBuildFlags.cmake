@@ -123,10 +123,13 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	add_definitions( -D_POSIX_C_SOURCE=200809L )  # request POSIX APIs
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
-# TEMPORARILY work around problems with Eigen's alignment code on Linux.
-# We don't quite know when this happens (seems to be present in Debian
-# 32-bit, but we haven't seen it in Ubuntu or Debian 64-bit), so I'm
-# paranoidly disabling vectorization code on all Linux for now.
+# Eigen Alignment, enabled on Linux by default
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	add_definitions( -DEIGEN_DONT_ALIGN )
+	option(EIGEN_DONT_ALIGN "Disable alignment of vectors in Eigen" OFF)
+else(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	option(EIGEN_DONT_ALIGN "Disable alignment of vectors in Eigen" ON)
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+mark_as_advanced(EIGEN_DONT_ALIGN)
+if(EIGEN_DONT_ALIGN)
+	add_definitions( -DEIGEN_DONT_ALIGN )
+endif(EIGEN_DONT_ALIGN)

@@ -308,6 +308,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			{
 				expectedPenetrationPoints.first.globalPosition.setValue(expectedPoint0);
 				expectedPenetrationPoints.second.globalPosition.setValue(expectedPoint1);
+				expectedPenetrationPoints.first.triangleId.setValue(i);
+				expectedPenetrationPoints.second.triangleId.setValue(0);
 				auto contact = std::make_shared<Contact>(expectedDepth, expectedContact, expectedNormal,
 														 expectedPenetrationPoints);
 				expectedContacts.push_back(contact);

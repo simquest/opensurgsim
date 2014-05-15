@@ -90,5 +90,13 @@ TEST(MassSpring1DRepresentationTests, init1DTest)
 		Eigen::VectorBlock<SurgSim::Math::Vector> pi = SurgSim::Math::getSubVector(x, nodeId, 3);
 		EXPECT_TRUE(pi.isApprox(piExpected));
 	}
-	EXPECT_EQ(boundaryConditions, m.getFinalState()->getBoundaryConditions());
+
+	std::vector<unsigned int> dofBoundaryConditions;
+	for (auto it = boundaryConditions.begin(); it != boundaryConditions.end(); ++it)
+	{
+		dofBoundaryConditions.push_back((*it) * 3);
+		dofBoundaryConditions.push_back((*it) * 3 + 1);
+		dofBoundaryConditions.push_back((*it) * 3 + 2);
+	}
+	EXPECT_EQ(dofBoundaryConditions, m.getFinalState()->getBoundaryConditions());
 }

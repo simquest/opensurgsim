@@ -71,7 +71,7 @@ public:
 	/// The type used for vectors.
 	typedef SurgSim::Math::Vector3d VectorType;
 	/// The type used for matrices.
-	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor> DynamicMatrixType;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> DynamicMatrixType;
 	/// The type used for scalars.
 	typedef double ScalarType;
 	/// The type used for integers.
@@ -82,11 +82,11 @@ public:
 	typedef std::string StringType;
 
 	/// Construct an empty object, with no associated names and indices yet.
-	inline DataGroup();
+	DataGroup();
 
 	/// Construct an object as a copy of the data from another object.
 	/// \param dataGroup The object to copy from.
-	inline DataGroup(const DataGroup& dataGroup);
+	DataGroup(const DataGroup& dataGroup);
 
 	/// Copy the data from another object.
 	///
@@ -115,7 +115,7 @@ public:
 	///
 	/// \param dataGroup The object to copy from.
 	/// \return The object that was assigned into.
-	inline DataGroup& operator=(const DataGroup& dataGroup);
+	DataGroup& operator=(const DataGroup& dataGroup);
 
 	/// Move the data from another object.
 	///
@@ -124,74 +124,74 @@ public:
 	///
 	/// \param [in,out] dataGroup The object to copy from, which will be left in an unusable state.
 	/// \return The object that was assigned into.
-	inline DataGroup& operator=(DataGroup&& dataGroup);
+	DataGroup& operator=(DataGroup&& dataGroup);
 
 	/// Return the pose data structure.
 	/// \return the mutable pose data.
-	inline NamedData<PoseType>& poses();
+	NamedData<PoseType>& poses();
 
 	/// Return the pose data structure.
 	/// \return the read-only pose data.
-	inline const NamedData<PoseType>& poses() const;
+	const NamedData<PoseType>& poses() const;
 
 	/// Return the vector data structure.
 	/// \return the mutable vector data.
-	inline NamedData<VectorType>& vectors();
+	NamedData<VectorType>& vectors();
 
 	/// Return the vector data structure.
 	/// \return the read-only vector data.
-	inline const NamedData<VectorType>& vectors() const;
+	const NamedData<VectorType>& vectors() const;
 
 	/// Return the matrix data structure.
 	/// \return the mutable matrix data.
-	inline NamedData<DynamicMatrixType>& matrices();
+	NamedData<DynamicMatrixType>& matrices();
 
 	/// Return the matrix data structure.
 	/// \return the read-only matrix data.
-	inline const NamedData<DynamicMatrixType>& matrices() const;
+	const NamedData<DynamicMatrixType>& matrices() const;
 
 	/// Return the scalar data structure.
 	/// \return the mutable scalar data.
-	inline NamedData<ScalarType>& scalars();
+	NamedData<ScalarType>& scalars();
 
 	/// Return the scalar data structure.
 	/// \return the read-only scalar data.
-	inline const NamedData<ScalarType>& scalars() const;
+	const NamedData<ScalarType>& scalars() const;
 
 	/// Return the integer data structure.
 	/// \return the mutable integer data.
-	inline NamedData<IntegerType>& integers();
+	NamedData<IntegerType>& integers();
 
 	/// Return the integer data structure.
 	/// \return the read-only integer data.
-	inline const NamedData<IntegerType>& integers() const;
+	const NamedData<IntegerType>& integers() const;
 
 	/// Return the boolean data structure.
 	/// \return the mutable Boolean data.
-	inline NamedData<BooleanType>& booleans();
+	NamedData<BooleanType>& booleans();
 
 	/// Return the boolean data structure.
 	/// \return the read-only Boolean data.
-	inline const NamedData<BooleanType>& booleans() const;
+	const NamedData<BooleanType>& booleans() const;
 
 	/// Return the string data structure.
 	/// \return the mutable string data.
-	inline NamedData<StringType>& strings();
+	NamedData<StringType>& strings();
 
 	/// Return the string data structure.
 	/// \return the read-only string data.
-	inline const NamedData<StringType>& strings() const;
+	const NamedData<StringType>& strings() const;
 
 	/// Return the custom data structure.
 	/// \return the mutable data.
-	inline NamedVariantData& customData();
+	NamedVariantData& customData();
 
 	/// Return the custom data structure.
 	/// \return the read-only data.
-	inline const NamedVariantData& customData() const;
+	const NamedVariantData& customData() const;
 
 	/// Mark all data as not current.
-	inline void resetAll();
+	void resetAll();
 
 private:
 	/// The pose values.
@@ -219,11 +219,7 @@ private:
 	NamedVariantData m_customData;
 };
 
-};  // namespace Input
+};  // namespace DataStructures
 };  // namespace SurgSim
-
-
-#include "SurgSim/DataStructures/DataGroup-inl.h"
-
 
 #endif  // SURGSIM_DATASTRUCTURES_DATAGROUP_H

@@ -33,6 +33,7 @@ public:
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> globalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::OctreePath> octreeNodePath;
+	SurgSim::DataStructures::OptionalValue<size_t> triangleId;
 };
 
 }; // namespace Collision

@@ -23,17 +23,17 @@ namespace Physics
 {
 
 RigidRepresentationState::RigidRepresentationState() :
-	RigidRepresentationBaseState(),
 	m_v(SurgSim::Math::Vector3d::Zero()),
-	m_w(SurgSim::Math::Vector3d::Zero())
+	m_w(SurgSim::Math::Vector3d::Zero()),
+	m_pose(SurgSim::Math::RigidTransform3d::Identity())
 {
 	addSerializableProperty();
 }
 
 RigidRepresentationState::RigidRepresentationState(const RigidRepresentationState& rhs) :
-	RigidRepresentationBaseState(rhs),
 	m_v(rhs.m_v),
-	m_w(rhs.m_w)
+	m_w(rhs.m_w),
+	m_pose(rhs.m_pose)
 {
 	addSerializableProperty();
 }
@@ -44,7 +44,20 @@ void RigidRepresentationState::addSerializableProperty()
 									  getLinearVelocity, setLinearVelocity);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationState, SurgSim::Math::Vector3d, AngularVelocity,
 									  getAngularVelocity, setAngularVelocity);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationState, SurgSim::Math::RigidTransform3d, Pose,
+									  getPose, setPose);
 }
+
+
+RigidRepresentationState& RigidRepresentationState::operator=(const RigidRepresentationState& rhs)
+{
+	m_v = rhs.m_v;
+	m_w = rhs.m_w;
+	m_pose = rhs.m_pose;
+
+	return *this;
+}
+
 
 RigidRepresentationState::~RigidRepresentationState()
 {
@@ -52,7 +65,7 @@ RigidRepresentationState::~RigidRepresentationState()
 
 bool RigidRepresentationState::operator==(const RigidRepresentationState& rhs) const
 {
-	return (RigidRepresentationBaseState::operator==(rhs) && m_v == rhs.m_v && m_w == rhs.m_w);
+	return (m_pose.isApprox(rhs.m_pose) && m_v == rhs.m_v && m_w == rhs.m_w);
 }
 
 bool RigidRepresentationState::operator!=(const RigidRepresentationState& rhs) const
@@ -62,10 +75,9 @@ bool RigidRepresentationState::operator!=(const RigidRepresentationState& rhs) c
 
 void RigidRepresentationState::reset()
 {
-	RigidRepresentationBaseState::reset();
-
 	m_v.setZero();
 	m_w.setZero();
+	m_pose.setIdentity();
 }
 
 const SurgSim::Math::Vector3d& RigidRepresentationState::getLinearVelocity() const
@@ -86,6 +98,16 @@ void RigidRepresentationState::setLinearVelocity(const SurgSim::Math::Vector3d &
 void RigidRepresentationState::setAngularVelocity(const SurgSim::Math::Vector3d &w)
 {
 	m_w = w;
+}
+
+void RigidRepresentationState::setPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	m_pose = pose;
+}
+
+const SurgSim::Math::RigidTransform3d& RigidRepresentationState::getPose() const
+{
+	return m_pose;
 }
 
 }; // Physics

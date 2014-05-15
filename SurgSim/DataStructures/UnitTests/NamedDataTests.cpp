@@ -24,6 +24,10 @@
 using SurgSim::DataStructures::NamedData;
 using SurgSim::DataStructures::NamedDataBuilder;
 
+namespace
+{
+const double EPSILON = 1e-9;
+};
 
 /// Creating a named data object.
 TEST(NamedDataTests, CanConstruct)
@@ -233,6 +237,34 @@ TEST(NamedDataTests, Put)
 	EXPECT_FALSE(data.hasData("third"));
 	EXPECT_EQ(2, data.getIndex("third"));
 	EXPECT_EQ("third", data.getName(2));
+}
+
+/// Copying data between NamedData, when they cannot assign to each other.
+TEST(NamedDataTests, Copy)
+{
+	NamedDataBuilder<float> sourceBuilder;
+	sourceBuilder.addEntry("first");
+	sourceBuilder.addEntry("second");
+	NamedData<float> sourceData = sourceBuilder.createData();
+
+	NamedDataBuilder<float> targetBuilder;
+	targetBuilder.addEntry("second");
+	targetBuilder.addEntry("third");
+	NamedData<float> targetData = targetBuilder.createData();
+
+	const float secondFloat = 1.23f;
+	sourceData.set("second", secondFloat);
+	SurgSim::DataStructures::NamedDataCopyMap map;
+	map[sourceData.getIndex("second")] = targetData.getIndex("second");
+	targetData.copy(sourceData, map);
+
+	EXPECT_FALSE(targetData.hasEntry("first"));
+
+	float outSecondFloat;
+	ASSERT_TRUE(targetData.get("second", &outSecondFloat));
+	EXPECT_NEAR(secondFloat, outSecondFloat, EPSILON);
+
+	EXPECT_FALSE(targetData.hasData("third"));
 }
 
 /// Getting data into the container.

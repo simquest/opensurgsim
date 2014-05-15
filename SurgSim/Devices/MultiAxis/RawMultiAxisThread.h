@@ -33,13 +33,7 @@ namespace Device
 class RawMultiAxisThread : public SurgSim::Framework::BasicThread
 {
 public:
-	explicit RawMultiAxisThread(RawMultiAxisScaffold* scaffold, RawMultiAxisScaffold::DeviceData* deviceData) :
-		BasicThread("RawMultiAxis thread"),
-		m_scaffold(scaffold),
-		m_deviceData(deviceData)
-	{
-		setRate(100.0);
-	}
+	explicit RawMultiAxisThread(RawMultiAxisScaffold* scaffold, RawMultiAxisScaffold::DeviceData* deviceData);
 
 	virtual ~RawMultiAxisThread();
 

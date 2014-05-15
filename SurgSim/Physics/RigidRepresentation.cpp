@@ -287,7 +287,7 @@ void SurgSim::Physics::RigidRepresentation::resetParameters()
 	updateGlobalInertiaMatrices(m_currentState);
 }
 
-const Eigen::Matrix < double, 6, 6, Eigen::DontAlign | Eigen::RowMajor > &
+const Eigen::Matrix < double, 6, 6, Eigen::RowMajor > &
 SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
 {
 	return m_C;

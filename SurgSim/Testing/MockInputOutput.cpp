@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Testing/DevicesUtilities.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::DataStructures::DataGroup;
 
@@ -32,7 +32,13 @@ MockInputOutput::MockInputOutput() :
 bool MockInputOutput::requestOutput(const std::string& device, DataGroup* outputData)
 {
 	++m_numTimesRequestedOutput;
-	return false;
+	bool result = false;
+	if (m_output.hasValue())
+	{
+		*outputData = m_output.getValue();
+		result = true;
+	}
+	return result;
 }
 
 void MockInputOutput::handleInput(const std::string& device, const DataGroup& inputData)

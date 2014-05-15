@@ -47,7 +47,6 @@ endif(WDK_FOUND)
 
 set(MULTIAXIS_DEVICE_SOURCES
 	MultiAxisDevice.cpp
-	PoseIntegrator.cpp
 	RawMultiAxisDevice.cpp
 	RawMultiAxisScaffold.cpp
 	RawMultiAxisThread.cpp
@@ -58,7 +57,6 @@ set(MULTIAXIS_DEVICE_HEADERS
 	CreateInputDeviceHandle.h
 	GetSystemError.h
 	MultiAxisDevice.h
-	PoseIntegrator.h
 	RawMultiAxisDevice.h
 	RawMultiAxisScaffold.h
 	RawMultiAxisThread.h
@@ -106,6 +104,7 @@ surgsim_add_library(
 )
 
 set(LIBS  
+	SurgSimDeviceFilters
 	SurgSimInput 
 	SurgSimFramework 
 )

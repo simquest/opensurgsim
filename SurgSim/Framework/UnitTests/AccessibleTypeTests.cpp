@@ -99,7 +99,7 @@ public:
 
 	T property;
 
-	void setProperty(T value)
+	void setProperty(const T& value)
 	{
 		property = value;
 	}
@@ -110,7 +110,7 @@ public:
 };
 
 template <typename T>
-std::pair<T, T> testProperty(T a, T b)
+std::pair<T, T> testProperty(const T& a, const T& b)
 {
 	Testable<T> test;
 	std::pair<T, T> result;
@@ -125,7 +125,7 @@ std::pair<T, T> testProperty(T a, T b)
 }
 
 template <typename T>
-std::pair<T, T> testEncodeDecode(T a, T b)
+std::pair<T, T> testEncodeDecode(const T& a, const T& b)
 {
 	Testable<T> test;
 	std::pair<T, T> result;
@@ -214,7 +214,7 @@ TYPED_TEST(RigidTransformTest, Accessible)
 	typedef typename TestFixture::Scalar Scalar;
 	typedef typename TestFixture::RigidTransform RigidTransform;
 	typedef Eigen::Quaternion<Scalar> Quaternion;
-	typedef Eigen::Matrix<Scalar, 3, 1, Eigen::DontAlign>  Vector3;
+	typedef Eigen::Matrix<Scalar, 3, 1>  Vector3;
 
 	typename RigidTransform::MatrixType initialMatrix;
 	typename RigidTransform::MatrixType newMatrix;

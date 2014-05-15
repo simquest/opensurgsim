@@ -113,6 +113,9 @@ public:
 	/// \param dt The time step (in seconds)
 	virtual void afterUpdate(double dt);
 
+	/// Computes a localized coordinate w.r.t this representation, given a Location object.
+	/// \param location A location in 3d space.
+	/// \return A localization object for the given location.
 	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location);
 
 	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,

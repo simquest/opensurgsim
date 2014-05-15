@@ -24,8 +24,6 @@
 #include "SurgSim/Devices/Sixense/SixenseDevice.h"
 #include "SurgSim/Devices/Sixense/SixenseScaffold.h"
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
 

@@ -25,7 +25,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/FemElement2DTriangle.h"
+#include "SurgSim/Physics/Fem2DElementTriangle.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
@@ -33,7 +33,7 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem2DRepresentation;
-using SurgSim::Physics::FemElement2DTriangle;
+using SurgSim::Physics::Fem2DElementTriangle;
 
 namespace
 {
@@ -42,7 +42,7 @@ namespace
 /// \note This is defining a cylinder based on cylindrical coordinates M(length, angle)
 /// \note The cylinder is composed of cross-sections with nodes added radially to each cross-section.
 /// \note The nodes of 2 consecutives cross-sections are connected to form square-patches which in turn
-/// \note are decomposed into 2 FemElement2DTriangle.
+/// \note are decomposed into 2 Fem2DElementTriangle.
 void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentation)
 {
 	// Mechanical properties
@@ -112,7 +112,7 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 			}};
 			std::array<unsigned int, 3> triangle1NodeIds = {{static_cast<unsigned int>(nodeIds[0][0]),
 				static_cast<unsigned int>(nodeIds[0][1]), static_cast<unsigned int>(nodeIds[1][1])}};
-			std::shared_ptr<FemElement2DTriangle> triangle1 = std::make_shared<FemElement2DTriangle>(triangle1NodeIds);
+			std::shared_ptr<Fem2DElementTriangle> triangle1 = std::make_shared<Fem2DElementTriangle>(triangle1NodeIds);
 			triangle1->setThickness(thickness);
 			triangle1->setMassDensity(massDensity);
 			triangle1->setPoissonRatio(poissonRatio);
@@ -121,7 +121,7 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 
 			std::array<unsigned int, 3> triangle2NodeIds = {{static_cast<unsigned int>(nodeIds[0][0]),
 				static_cast<unsigned int>(nodeIds[1][1]), static_cast<unsigned int>(nodeIds[1][0])}};
-			std::shared_ptr<FemElement2DTriangle> triangle2 = std::make_shared<FemElement2DTriangle>(triangle2NodeIds);
+			std::shared_ptr<Fem2DElementTriangle> triangle2 = std::make_shared<Fem2DElementTriangle>(triangle2NodeIds);
 			triangle2->setThickness(thickness);
 			triangle2->setMassDensity(massDensity);
 			triangle2->setPoissonRatio(poissonRatio);
