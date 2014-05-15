@@ -15,13 +15,13 @@
 
 #include "SurgSim/Framework/SceneElement.h"
 
+#include <yaml-cpp/yaml.h>
+
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
-
-#include <yaml-cpp/yaml.h>
 
 namespace SurgSim
 {
@@ -33,6 +33,7 @@ SceneElement::SceneElement(const std::string& name) :
 {
 	m_pose = std::make_shared<SurgSim::Framework::PoseComponent>("Pose");
 	m_pose->setPose(SurgSim::Math::RigidTransform3d::Identity());
+	addComponent(m_pose);
 }
 
 SceneElement::~SceneElement()
@@ -42,34 +43,34 @@ SceneElement::~SceneElement()
 
 bool SceneElement::addComponent(std::shared_ptr<Component> component)
 {
+	SURGSIM_ASSERT(nullptr != component) << "Cannot add a nullptr as a component";
+
 	bool result = false;
-
-	SURGSIM_ASSERT(component != nullptr) << "Cannot add a nullptr as a component";
-
 	if (m_components.find(component->getName()) == m_components.end())
 	{
-		component->setSceneElement(getSharedPtr());
-		component->setScene(m_scene);
 		result = true;
 		if (isInitialized())
 		{
 			auto runtime = getRuntime();
-			SURGSIM_ASSERT(runtime != nullptr) << "Runtime cannot be expired when adding a component " << getName();
-			result = component->initialize(runtime);
-			runtime->addComponent(component);
+			SURGSIM_ASSERT(nullptr != runtime) << "Runtime cannot be expired when adding a component " << getName();
+			result = initializeComponent(component);
+			if (result)
+			{
+				runtime->addComponent(component);
+			}
+		}
+
+		if (result)
+		{
+			m_components[component->getName()] = component;
 		}
 	}
 	else
 	{
 		SURGSIM_LOG_WARNING(Logger::getLogger("runtime")) <<
-				"Component with name " << component->getName() <<
-				" already exists on SceneElement " << getName() <<
-				", did not add component";
-	}
-
-	if (result)
-	{
-		m_components[component->getName()] = component;
+			"Component with name " << component->getName() <<
+			" already exists on SceneElement " << getName() <<
+			", did not add component";
 	}
 
 	return result;
@@ -106,22 +107,26 @@ std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) c
 bool SceneElement::initialize()
 {
 	SURGSIM_ASSERT(!m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
-	addComponent(m_pose);
 	m_isInitialized = doInitialize();
 
 	if (m_isInitialized)
 	{
 		// initialize all components
-		std::shared_ptr<Runtime> runtime = getRuntime();
-		auto component = std::begin(m_components);
-		while (m_isInitialized && component != std::end(m_components))
+		for (auto pair = std::begin(m_components); m_isInitialized && pair != std::end(m_components); ++pair)
 		{
-			m_isInitialized = component->second->initialize(runtime);
-			++component;
+			m_isInitialized = initializeComponent(pair->second);
 		}
 	}
 
 	return m_isInitialized;
+}
+
+bool SceneElement::initializeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+{
+	component->setSceneElement(getSharedPtr());
+	component->setScene(m_scene);
+
+	return component->initialize(getRuntime());
 }
 
 std::string SceneElement::getName() const
@@ -158,15 +163,10 @@ std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
 void SceneElement::setScene(std::weak_ptr<Scene> scene)
 {
 	m_scene = scene;
-
-	auto it = std::begin(m_components);
-	auto endIt = std::end(m_components);
-
-	for (;  it != endIt;  ++it)
+	for (auto it = std::begin(m_components); it != std::end(m_components);  ++it)
 	{
 		(it->second)->setScene(scene);
 	}
-
 }
 
 std::shared_ptr<Scene> SceneElement::getScene()
@@ -247,7 +247,14 @@ bool SceneElement::decode(const YAML::Node& node)
 		{
 			for (auto nodeIt = data["Components"].begin(); nodeIt != data["Components"].end(); ++nodeIt)
 			{
-				addComponent(nodeIt->as<std::shared_ptr<SurgSim::Framework::Component>>());
+				if ("SurgSim::Framework::PoseComponent" == nodeIt->begin()->first.as<std::string>())
+				{
+					m_pose = nodeIt->as<std::shared_ptr<SurgSim::Framework::PoseComponent>>();
+				}
+				else
+				{
+					addComponent(nodeIt->as<std::shared_ptr<SurgSim::Framework::Component>>());
+				}
 			}
 			result = true;
 		}
@@ -261,10 +268,5 @@ std::string SceneElement::getClassName() const
 	return "SurgSim::Framework::SceneElement";
 }
 
-
 }; // namespace Framework
 }; // namespace SurgSim
-
-
-
-

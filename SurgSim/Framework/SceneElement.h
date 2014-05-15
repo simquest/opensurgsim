@@ -145,6 +145,11 @@ public:
 	virtual bool decode(const YAML::Node& node);
 
 private:
+	/// Initialize the given component
+	/// \param component The component to be initialized.
+	/// \return True if initialization succeeded, false otherwise.
+	bool initializeComponent(std::shared_ptr<SurgSim::Framework::Component> component);
+
 	/// Name of this SceneElement
 	std::string m_name;
 
@@ -169,7 +174,6 @@ private:
 
 	/// Indicates if this SceneElement has been initialized or not.
 	bool m_isInitialized;
-
 };
 
 }; // namespace Framework

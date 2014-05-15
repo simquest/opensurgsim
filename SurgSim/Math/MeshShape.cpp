@@ -47,6 +47,7 @@ void MeshShape::setFileName(const std::string& fileName)
 	m_initialMesh = std::make_shared<TriangleMesh>(*SurgSim::DataStructures::loadTriangleMesh(fileName));
 	m_mesh = std::make_shared<TriangleMesh>(*m_initialMesh);
 	updateAabbTree();
+	computeVolumeIntegrals();
 }
 
 std::string MeshShape::getFileName() const
