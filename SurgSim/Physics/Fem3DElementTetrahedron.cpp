@@ -106,7 +106,7 @@ void Fem3DElementTetrahedron::addForce(const SurgSim::Math::OdeState& state, Sur
 }
 
 void Fem3DElementTetrahedron::computeMass(const SurgSim::Math::OdeState& state,
-										  Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* M)
+										  Eigen::Matrix<double, 12, 12>* M)
 {
 	// From Przemieniecki book
 	// -> section 11 "Inertia properties of structural elements
@@ -161,7 +161,7 @@ void Fem3DElementTetrahedron::addDamping(const SurgSim::Math::OdeState& state, S
 }
 
 void Fem3DElementTetrahedron::computeStiffness(const SurgSim::Math::OdeState& state,
-											   Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* k)
+											   Eigen::Matrix<double, 12, 12>* k)
 {
 	m_Em.setZero();
 	m_strain.setZero();
@@ -235,7 +235,7 @@ void Fem3DElementTetrahedron::addMatVec(const SurgSim::Math::OdeState& state,
 		return;
 	}
 
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> xLoc, resLoc;
+	Eigen::Matrix<double, 12, 1> xLoc, resLoc;
 	getSubVector(x, m_nodeIds, 3, &xLoc);
 
 	// Adds the mass contribution

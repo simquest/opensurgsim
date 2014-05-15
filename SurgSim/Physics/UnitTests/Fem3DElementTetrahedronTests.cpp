@@ -64,7 +64,7 @@ public:
 		*di = m_di[i];
 	}
 
-	const Eigen::Matrix<double, 12, 1, Eigen::DontAlign>& getInitialPosition() const
+	const Eigen::Matrix<double, 12, 1>& getInitialPosition() const
 	{
 		return m_x0;
 	}
@@ -87,7 +87,7 @@ public:
 	std::array<unsigned int, 4> m_nodeIds;
 	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_expectedX0;
+	Eigen::Matrix<double, 12, 1> m_expectedX0;
 	double m_rho, m_E, m_nu;
 	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix;
 	SurgSim::Math::Matrix m_expectedStiffnessMatrix, m_expectedStiffnessMatrix2;
@@ -135,7 +135,7 @@ public:
 		m_vectorOnes.resize(3*15);
 		m_vectorOnes.setConstant(1.0);
 
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign> M;
+		Eigen::Matrix<double, 12, 12> M;
 		M.setZero();
 		{
 			M.diagonal().setConstant(2.0);
@@ -151,7 +151,7 @@ public:
 
 		m_expectedDampingMatrix.setZero();
 
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign> K;
+		Eigen::Matrix<double, 12, 12> K;
 		K.setZero();
 		{
 			// Calculation done by hand from
@@ -160,8 +160,8 @@ public:
 			// bi = {-1 1 0 0}
 			// ci = {-1 0 1 0}
 			// di = {-1 0 0 1}
-			Eigen::Matrix<double, 6, 12, Eigen::DontAlign> B;
-			Eigen::Matrix<double, 6, 6, Eigen::DontAlign> E;
+			Eigen::Matrix<double, 6, 12> B;
+			Eigen::Matrix<double, 6, 6> E;
 
 			B.setZero();
 			B(0, 0) = -1; B(0, 3) = 1;

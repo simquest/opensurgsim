@@ -44,7 +44,7 @@ public:
 	{
 	}
 
-	const Eigen::Matrix<double, 12, 12, Eigen::DontAlign>& getInitialRotation() const
+	const Eigen::Matrix<double, 12, 12>& getInitialRotation() const
 	{
 		return m_R0;
 	}
@@ -310,7 +310,7 @@ public:
 		double phi_y = 12.0 * m_E * Iz / (G * asy * L2);
 		double phi_z = 12.0 * m_E * Iy / (G * asz * L2);
 
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign> untransformedStiffness;
+		Eigen::Matrix<double, 12, 12> untransformedStiffness;
 
 		untransformedStiffness.col(0) <<
 			 m_E * A / L, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -370,7 +370,7 @@ public:
 
 		// Transform into correct coordinates and correct place in matrix
 		std::shared_ptr<MockFem1DElement> beam = getBeam();
-		const Eigen::Matrix<double, 12, 12, Eigen::DontAlign>& r = beam->getInitialRotation();
+		const Eigen::Matrix<double, 12, 12>& r = beam->getInitialRotation();
 
 		SurgSim::Math::addSubMatrix(r * in * r.transpose(), nodeIdsVectorForm, 6, &out);
 	}

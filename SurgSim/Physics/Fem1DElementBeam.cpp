@@ -162,7 +162,7 @@ void Fem1DElementBeam::addMatVec(const SurgSim::Math::OdeState& state, double al
 		return;
 	}
 
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> extractedX, extractedResult;
+	Eigen::Matrix<double, 12, 1> extractedX, extractedResult;
 	getSubVector(x, m_nodeIds, 6, &extractedX);
 
 	// Adds the mass contribution
@@ -183,7 +183,7 @@ void Fem1DElementBeam::addMatVec(const SurgSim::Math::OdeState& state, double al
 }
 
 void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state,
-								   Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* M)
+								   Eigen::Matrix<double, 12, 12>* M)
 {
 	double& L = m_restLength;
 	double L2 = L * L;
@@ -252,7 +252,7 @@ void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state,
 }
 
 void Fem1DElementBeam::computeStiffness(const SurgSim::Math::OdeState& state,
-										Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* k)
+										Eigen::Matrix<double, 12, 12>* k)
 {
 	double& L = m_restLength;
 	double L2 = L * L;

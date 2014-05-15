@@ -154,27 +154,27 @@ protected:
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] k The stiffness matrix to store the result into
 	void computeStiffness(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* k);
+		Eigen::Matrix<double, 12, 12>* k);
 
 	/// Computes the beam's mass matrix
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] m The mass matrix to store the result into
-	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* m);
+	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 12, 12>* m);
 
 	/// The element's rest state
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_x0;
+	Eigen::Matrix<double, 12, 1> m_x0;
 
 	/// Initial rotation matrix for the element
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_R0;
+	Eigen::Matrix<double, 12, 12> m_R0;
 
 	/// Mass matrix (in global coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_M;
+	Eigen::Matrix<double, 12, 12> m_M;
 	/// Stiffness matrix (in local coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_MLocal;
+	Eigen::Matrix<double, 12, 12> m_MLocal;
 	/// Stiffness matrix (in global coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_K;
+	Eigen::Matrix<double, 12, 12> m_K;
 	/// Stiffness matrix (in local coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_KLocal;
+	Eigen::Matrix<double, 12, 12> m_KLocal;
 
 	/// Physical shear modulus G = E/( 2(1+mu) )
 	double m_G;

@@ -50,7 +50,7 @@ public:
 		return m_initialRotation;
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getInitialRotationTimes6()
+	const Eigen::Matrix<double, 18, 18>& getInitialRotationTimes6()
 	{
 		const Matrix33d& R0 = getInitialRotation();
 
@@ -66,27 +66,27 @@ public:
 		return m_initialRotationTimes6;
 	}
 
-	const Eigen::Matrix<double, 3, 9, Eigen::DontAlign> getBatozStrainDisplacement(double xi, double neta) const
+	const Eigen::Matrix<double, 3, 9> getBatozStrainDisplacement(double xi, double neta) const
 	{
 		return batozStrainDisplacement(xi, neta);
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getLocalStiffnessMatrix() const
+	const Eigen::Matrix<double, 18, 18>& getLocalStiffnessMatrix() const
 	{
 		return m_KLocal;
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getGlobalStiffnessMatrix() const
+	const Eigen::Matrix<double, 18, 18>& getGlobalStiffnessMatrix() const
 	{
 		return m_K;
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getLocalMassMatrix() const
+	const Eigen::Matrix<double, 18, 18>& getLocalMassMatrix() const
 	{
 		return m_MLocal;
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getGlobalMassMatrix() const
+	const Eigen::Matrix<double, 18, 18>& getGlobalMassMatrix() const
 	{
 		return m_M;
 	}
@@ -96,7 +96,7 @@ public:
 		return m_restArea;
 	}
 
-	const Eigen::Matrix<double, 18, 1, Eigen::DontAlign>& getInitialPosition() const
+	const Eigen::Matrix<double, 18, 1>& getInitialPosition() const
 	{
 		return m_x0;
 	}
@@ -316,9 +316,9 @@ public:
 		return res;
 	}
 
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> batozStrainDisplacementAlternativeDerivative(double xi, double neta)
+	Eigen::Matrix<double, 3, 9> batozStrainDisplacementAlternativeDerivative(double xi, double neta)
 	{
-		Eigen::Matrix<double, 3, 9, Eigen::DontAlign> res;
+		Eigen::Matrix<double, 3, 9> res;
 		std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
 		double coefficient = 1.0 / (2.0 * m_restArea);
 
@@ -409,9 +409,9 @@ public:
 		return res;
 	}
 
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> batozStrainDisplacementNumericalDerivation(double xi, double neta)
+	Eigen::Matrix<double, 3, 9> batozStrainDisplacementNumericalDerivation(double xi, double neta)
 	{
-		Eigen::Matrix<double, 3, 9, Eigen::DontAlign> res;
+		Eigen::Matrix<double, 3, 9> res;
 		std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
 		double coefficient = 1.0 / (2.0 * m_restArea);
 
@@ -443,7 +443,7 @@ public:
 	}
 
 private:
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_initialRotationTimes6;
+	Eigen::Matrix<double, 18, 18> m_initialRotationTimes6;
 };
 
 class Fem2DElementTriangleTests : public ::testing::Test
@@ -458,7 +458,7 @@ public:
 	double m_A;         // area
 	double m_thickness; // thickness
 	Quaterniond m_rotation, m_expectedRotation;
-	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> m_expectedX0;
+	Eigen::Matrix<double, 18, 1> m_expectedX0;
 
 	virtual void SetUp() override
 	{
@@ -514,8 +514,8 @@ public:
 
 	void getExpectedLocalStiffnessMatrix(Eigen::Ref<SurgSim::Math::Matrix> stiffness)
 	{
-		typedef Eigen::Matrix<double, 9, 9, Eigen::DontAlign> Matrix99Type;
-		typedef Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Matrix66Type;
+		typedef Eigen::Matrix<double, 9, 9> Matrix99Type;
+		typedef Eigen::Matrix<double, 6, 6> Matrix66Type;
 
 		Matrix66Type membraneStiffness = getMembraneLocalStiffnessMatrix();
 		Matrix99Type plateStiffness = getPlateLocalStiffnessMatrix();
@@ -535,9 +535,9 @@ public:
 		}
 	}
 
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> getMembraneLocalStiffnessMatrix()
+	Eigen::Matrix<double, 6, 6> getMembraneLocalStiffnessMatrix()
 	{
-		typedef Eigen::Matrix<double, 3, 6, Eigen::DontAlign> Matrix36Type;
+		typedef Eigen::Matrix<double, 3, 6> Matrix36Type;
 
 		std::shared_ptr<MockFem2DElement> element = getElement();
 
@@ -592,11 +592,11 @@ public:
 		return (m_thickness * m_A) * b.transpose() * Emembrane * b;
 	}
 
-	Eigen::Matrix<double, 9, 9, Eigen::DontAlign> getPlateLocalStiffnessMatrix()
+	Eigen::Matrix<double, 9, 9> getPlateLocalStiffnessMatrix()
 	{
-		typedef Eigen::Matrix<double, 3, 9, Eigen::DontAlign> Matrix39Type;
+		typedef Eigen::Matrix<double, 3, 9> Matrix39Type;
 
-		Eigen::Matrix<double, 9, 9, Eigen::DontAlign> stiffness;
+		Eigen::Matrix<double, 9, 9> stiffness;
 		std::shared_ptr<MockFem2DElement> element = getElement();
 
 		// Thin-plate theory (Batoz)
@@ -790,16 +790,16 @@ TEST_F(Fem2DElementTriangleTests, StrainDisplacementPlateAtGaussPointTest)
 {
 	std::shared_ptr<MockFem2DElement> element = getElement();
 
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> strainDisplacement[3];
+	Eigen::Matrix<double, 3, 9> strainDisplacement[3];
 	strainDisplacement[0] = element->getBatozStrainDisplacement(0.0, 0.5);
 	strainDisplacement[1] = element->getBatozStrainDisplacement(0.5, 0.0);
 	strainDisplacement[2] = element->getBatozStrainDisplacement(0.5, 0.5);
 
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> strainDisplacementExpected1[3];
+	Eigen::Matrix<double, 3, 9> strainDisplacementExpected1[3];
 	strainDisplacementExpected1[0] = element->batozStrainDisplacementAlternativeDerivative(0.0, 0.5);
 	strainDisplacementExpected1[1] = element->batozStrainDisplacementAlternativeDerivative(0.5, 0.0);
 	strainDisplacementExpected1[2] = element->batozStrainDisplacementAlternativeDerivative(0.5, 0.5);
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> strainDisplacementExpected2[3];
+	Eigen::Matrix<double, 3, 9> strainDisplacementExpected2[3];
 	strainDisplacementExpected2[0] = element->batozStrainDisplacementNumericalDerivation(0.0, 0.5);
 	strainDisplacementExpected2[1] = element->batozStrainDisplacementNumericalDerivation(0.5, 0.0);
 	strainDisplacementExpected2[2] = element->batozStrainDisplacementNumericalDerivation(0.5, 0.5);
@@ -996,13 +996,13 @@ TEST_F(Fem2DElementTriangleTests, StiffnessMatrixTest)
 {
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> expectedLocalStiffness;
+	Eigen::Matrix<double, 18 ,18> expectedLocalStiffness;
 	getExpectedLocalStiffnessMatrix(expectedLocalStiffness);
 	EXPECT_TRUE(tri->getLocalStiffnessMatrix().isApprox(expectedLocalStiffness)) <<
 		"KLocal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
 		"KLocal expected = " << std::endl << expectedLocalStiffness << std::endl;
 
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
+	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalStiffnessMatrix().isApprox(R0 * expectedLocalStiffness * R0.transpose())) <<
 		"R0 = " << std::endl << R0 << std::endl <<
 		"KGlobal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
@@ -1024,10 +1024,10 @@ TEST_F(Fem2DElementTriangleTests, MassMatrixTest)
 	EXPECT_TRUE(tri->getLocalMassMatrix().block(0,0,3,3).isApprox(M));
 
 	// And use a hard-coded mass matrix for expected matrix
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> expectedMassMatrix;
+	Eigen::Matrix<double, 18, 18> expectedMassMatrix;
 	getExpectedLocalMassMatrix(expectedMassMatrix);
 	EXPECT_TRUE(tri->getLocalMassMatrix().isApprox(expectedMassMatrix));
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
+	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalMassMatrix().isApprox(R0 * expectedMassMatrix * R0.transpose()));
 }
 
@@ -1048,14 +1048,14 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	SurgSim::Math::Matrix expectedStiffnessMatrix(numDof, numDof);
 
 	// Assemble manually the expectedStiffnessMatrix
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> expected18x18StiffnessMatrix;
+	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
+	Eigen::Matrix<double, 18, 18> expected18x18StiffnessMatrix;
 	getExpectedLocalStiffnessMatrix(expected18x18StiffnessMatrix);
 	expectedStiffnessMatrix.setZero();
 	addSubMatrix(R0 * expected18x18StiffnessMatrix * R0.transpose(), tri->getNodeIds(), 6, &expectedStiffnessMatrix);
 
 	// Assemble manually the expectedMassMatrix
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> expected18x18MassMatrix;
+	Eigen::Matrix<double, 18, 18> expected18x18MassMatrix;
 	getExpectedLocalMassMatrix(expected18x18MassMatrix);
 	expectedMassMatrix.setZero();
 	addSubMatrix(R0 * expected18x18MassMatrix * R0.transpose(), tri->getNodeIds(), 6, &expectedMassMatrix);

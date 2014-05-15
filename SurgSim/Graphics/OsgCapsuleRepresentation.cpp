@@ -94,7 +94,7 @@ void OsgCapsuleRepresentation::getSize(double* radius, double* height)
 	*height = m_scale.y();
 }
 
-void OsgCapsuleRepresentation::setSize(SurgSim::Math::Vector2d size)
+void OsgCapsuleRepresentation::setSize(const SurgSim::Math::Vector2d& size)
 {
 	m_scale.set(size.x(), size.y());
 

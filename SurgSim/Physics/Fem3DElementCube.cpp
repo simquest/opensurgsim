@@ -90,7 +90,7 @@ void Fem3DElementCube::addForce(const SurgSim::Math::OdeState& state, SurgSim::M
 }
 
 void Fem3DElementCube::computeMass(const SurgSim::Math::OdeState& state,
-								   Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* M)
+								   Eigen::Matrix<double, 24, 24>* M)
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
@@ -130,9 +130,9 @@ void Fem3DElementCube::addDamping(const SurgSim::Math::OdeState& state, SurgSim:
 }
 
 void Fem3DElementCube::computeStiffness(const SurgSim::Math::OdeState& state,
-										Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* strain,
-										Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* stress,
-										Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* stiffness)
+										Eigen::Matrix<double, 6, 24>* strain,
+										Eigen::Matrix<double, 6, 24>* stress,
+										Eigen::Matrix<double, 24, 24>* stiffness)
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
@@ -200,7 +200,7 @@ void Fem3DElementCube::evaluateJ(const SurgSim::Math::OdeState& state, double ep
 
 void Fem3DElementCube::evaluateStrainDisplacement(double epsilon, double eta, double mu,
 												  const SurgSim::Math::Matrix33d& Jinv,
-												  Eigen::Matrix<double, 6, 24, Eigen::DontAlign> *B) const
+												  Eigen::Matrix<double, 6, 24> *B) const
 {
 	SURGSIM_ASSERT(B != nullptr) << "Trying to evaluate the strain-displacmenet with a nullptr";
 
@@ -239,7 +239,7 @@ void Fem3DElementCube::evaluateStrainDisplacement(double epsilon, double eta, do
 }
 
 void Fem3DElementCube::buildConstitutiveMaterialMatrix(
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign>* constitutiveMatrix)
+	Eigen::Matrix<double, 6, 6>* constitutiveMatrix)
 {
 	// Compute the elasticity material matrix
 	// which is commonly based on the Lame coefficients (1st = lambda, 2nd = mu = shear modulus):
@@ -256,13 +256,13 @@ void Fem3DElementCube::addStrainStressStiffnessAtPoint(const SurgSim::Math::OdeS
 	const SurgSim::Math::gaussQuadraturePoint& epsilon,
 	const SurgSim::Math::gaussQuadraturePoint& eta,
 	const SurgSim::Math::gaussQuadraturePoint& mu,
-	Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* strain,
-	Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* stress,
-	Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* k)
+	Eigen::Matrix<double, 6, 24>* strain,
+	Eigen::Matrix<double, 6, 24>* stress,
+	Eigen::Matrix<double, 24, 24>* k)
 {
 	SurgSim::Math::Matrix33d J, Jinv;
 	double detJ;
-	Eigen::Matrix<double, 6, 24, Eigen::DontAlign> B;
+	Eigen::Matrix<double, 6, 24> B;
 
 	evaluateJ(state, epsilon.point, eta.point, mu.point, &J, &Jinv, &detJ);
 
@@ -279,7 +279,7 @@ void Fem3DElementCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state
 	const SurgSim::Math::gaussQuadraturePoint& epsilon,
 	const SurgSim::Math::gaussQuadraturePoint& eta,
 	const SurgSim::Math::gaussQuadraturePoint& mu,
-	Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* m)
+	Eigen::Matrix<double, 24, 24>* m)
 {
 	// This helper method hels to compute:
 	// M = rho * integration{over volume} {phi^T.phi} dV
@@ -341,7 +341,7 @@ void Fem3DElementCube::addMatVec(const SurgSim::Math::OdeState& state,
 		return;
 	}
 
-	Eigen::Matrix<double, 24, 1, Eigen::DontAlign> xElement, fElement;
+	Eigen::Matrix<double, 24, 1> xElement, fElement;
 	getSubVector(x, m_nodeIds, 3, &xElement);
 
 	// Adds the mass contribution
