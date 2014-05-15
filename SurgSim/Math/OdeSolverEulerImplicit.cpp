@@ -61,6 +61,10 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 	Vector& deltaV = newState->getVelocities();
 	(*m_linearSolver)(m_systemMatrix, *f, &deltaV, &m_compliance);
 
+	// Remove the boundary conditions compliance from the compliance matrix
+	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
+	currentState.applyBoundaryConditionsToMatrix(&m_compliance, false);
+
 	// Compute the new state using the Euler Implicit scheme:
 	newState->getVelocities() = currentState.getVelocities() + deltaV;
 	newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();
