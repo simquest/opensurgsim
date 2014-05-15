@@ -73,16 +73,11 @@ Node convert<SurgSim::Math::IntegrationScheme>::encode(
 {
 	Node result;
 
-	auto it = std::find_if(std::begin(SurgSim::Math::IntegrationSchemeNames),
-						   std::end(SurgSim::Math::IntegrationSchemeNames),
-							[&rhs](const std::pair<std::string, SurgSim::Math::IntegrationScheme>& pair){
-							return pair.second == rhs;}
-						  );
-
+	auto it = SurgSim::Math::IntegrationSchemeNames.find(rhs);
 	SURGSIM_ASSERT(it != std::end(SurgSim::Math::IntegrationSchemeNames)) << "Can not find the enum value in " <<
 		"SurgSim::Math::IntegrationSchemeNames. Is the enum value registered?";
 
-	result["SurgSim::Math::IntegrationScheme"] = it->first;
+	result["SurgSim::Math::IntegrationScheme"] = it->second;
 
 	return result;
 }
@@ -101,11 +96,18 @@ bool convert<SurgSim::Math::IntegrationScheme>::decode(
 		std::string schemeName = node.begin()->second.as<std::string>();
 		std::transform(schemeName.begin(), schemeName.end(), schemeName.begin(), ::toupper);
 
-		auto it = SurgSim::Math::IntegrationSchemeNames.find(schemeName);
+		auto it = std::find_if(std::begin(SurgSim::Math::IntegrationSchemeNames),
+							   std::end(SurgSim::Math::IntegrationSchemeNames),
+							   [&schemeName](const std::pair<SurgSim::Math::IntegrationScheme, std::string>& pair)
+							   {
+									return pair.second == schemeName;
+							   }
+							  );
+
 		SURGSIM_ASSERT (it != std::end(SurgSim::Math::IntegrationSchemeNames)) <<
 			"Unknown IntegrationScheme " << schemeName;
 
-		rhs = it->second;
+		rhs = it->first;
 		result = true;
 	}
 
