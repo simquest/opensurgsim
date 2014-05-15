@@ -13,34 +13,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include <gtest/gtest.h>
-#include "SurgSim/Graphics/RenderTests/RenderTest.h"
-#include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/RigidTransform.h"
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Graphics/OsgUniform.h"
+
 #include "SurgSim/Graphics/Material.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgGroup.h"
 #include "SurgSim/Graphics/OsgManager.h"
-#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
 #include "SurgSim/Graphics/OsgTexture.h"
 #include "SurgSim/Graphics/OsgTexture2d.h"
 #include "SurgSim/Graphics/OsgTextureRectangle.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Graphics/View.h"
-#include "SurgSim/Graphics/OsgBoxRepresentation.h"
-#include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgRenderTarget.h"
+
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 #include "SurgSim/Testing/MathUtilities.h"
-
-#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
 
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Vector3d;
@@ -69,7 +69,7 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
-	quad->setSize(100,100);
+	quad->setSize(100, 100);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	int width;
@@ -77,11 +77,11 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 
 	viewElement->getView()->getDimensions(&width, &height);
 
-	SurgSim::Math::Vector3d startPosition(0.0,0.0,0.0);
-	SurgSim::Math::Vector3d endPosition(width,height,0.0);
+	SurgSim::Math::Vector3d startPosition(0.0, 0.0, 0.0);
+	SurgSim::Math::Vector3d endPosition(width, height, 0.0);
 
-	SurgSim::Math::Vector2d startSize(0.0,0.0);
-	SurgSim::Math::Vector2d endSize(200,200);
+	SurgSim::Math::Vector2d startSize(0.0, 0.0);
+	SurgSim::Math::Vector2d endSize(200, 200);
 
 	int numSteps = 100;
 	for (int i = 0; i < numSteps; ++i)
@@ -89,12 +89,12 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		RigidTransform3d currentPose = SurgSim::Testing::interpolatePose(
-			Vector3d::Zero(), Vector3d::Zero(),
-			startPosition, endPosition, t);
+										   Vector3d::Identity(), Vector3d::Identity(),
+										   startPosition, endPosition, t);
 
 		quad->setLocalPose(currentPose);
 
-		SurgSim::Math::Vector2d size = SurgSim::Testing::interpolate(startSize,endSize,t);
+		SurgSim::Math::Vector2d size = SurgSim::Testing::interpolate(startSize, endSize, t);
 		quad->setSize(size.x(), size.y());
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
@@ -124,10 +124,10 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad1 =
 		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad 1");
 
-	quad1->setSize(256,256);
+	quad1->setSize(256, 256);
 	quad1->setLocalPose(SurgSim::Math::makeRigidTransform(
-		Quaterniond::Identity(),
-		Vector3d(800-256,600-256,-0.2)));
+							Quaterniond::Identity(),
+							Vector3d(800 - 256, 600 - 256, -0.2)));
 	EXPECT_TRUE(quad1->setTexture(checkerTexture));
 	viewElement->addComponent(quad1);
 
@@ -138,7 +138,7 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 	int width, height;
 	rectTexture->getSize(&width, &height);
 	EXPECT_TRUE(quad2->setTexture(rectTexture));
-	quad2->setSize(width,height);
+	quad2->setSize(width, height);
 	viewElement->addComponent(quad2);
 
 	/// Run the thread
@@ -157,15 +157,16 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 {
 
 	auto defaultCamera = viewElement->getCamera();
-	auto camera = std::make_shared<OsgCamera>("Texture");
+	auto camera = std::make_shared<OsgCamera>("RenderPass");
 	camera->setProjectionMatrix(defaultCamera->getProjectionMatrix());
+	camera->setRenderGroupReference("RenderPass");
+	camera->setGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
 	int width, height;
-	viewElement->getView()->getDimensions(&width,&height);
+	viewElement->getView()->getDimensions(&width, &height);
 
 	std::shared_ptr<OsgRenderTarget2d> renderTargetOsg =
-		std::make_shared<OsgRenderTarget2d>(width,height, 1.0, 2, true);
-
+		std::make_shared<OsgRenderTarget2d>(width, height, 1.0, 2, true);
 	camera->setRenderTarget(renderTargetOsg);
 
 	viewElement->addComponent(camera);
@@ -173,15 +174,15 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 	int screenWidth = 800;
 	int screenHeight = 600;
 
-	width = width/3;
-	height = height/3;
+	width = width / 3;
+	height = height / 3;
 
 	std::shared_ptr<ScreenSpaceQuadRepresentation> quad;
 	quad = makeQuad("Color1", width, height, screenWidth - width, screenHeight - height);
 	quad->setTexture(renderTargetOsg->getColorTargetOsg(0));
 	viewElement->addComponent(quad);
 
-	quad = makeQuad("Color2", width, height, screenWidth - width, screenHeight - height*2);
+	quad = makeQuad("Color2", width, height, screenWidth - width, screenHeight - height * 2);
 	quad->setTexture(renderTargetOsg->getColorTargetOsg(1));
 	viewElement->addComponent(quad);
 
@@ -189,37 +190,31 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 	quad->setTexture(renderTargetOsg->getDepthTargetOsg());
 	viewElement->addComponent(quad);
 
-
-
 	Quaterniond quat = Quaterniond::Identity();
-	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat,Vector3d(0.0, 0.0, -0.2));
+	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0, 0.0, -0.2));
 	quat = SurgSim::Math::makeRotationQuaternion(M_PI, Vector3d::UnitY().eval());
 	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0, 0.0, -0.2));
 
-	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("Box Representation 1");
-	boxRepresentation1->setSizeXYZ(0.05, 0.05, 0.05);
-	auto boxElement1 = std::make_shared<BasicSceneElement>("Box Element 1");
-	boxElement1->addComponent(boxRepresentation1);
+	auto box = std::make_shared<OsgBoxRepresentation>("Graphics");
+	box->setSizeXYZ(0.05, 0.05, 0.05);
+	box->setGroupReference("RenderPass");
+	auto boxElement1 = std::make_shared<BasicSceneElement>("Box 1");
+	boxElement1->addComponent(box);
 	boxElement1->setPose(startPose);
 	scene->addSceneElement(boxElement1);
 
-	auto group = std::make_shared<OsgGroup>("RenderPass");
-	group->add(boxRepresentation1);
-	camera->setGroup(group);
-	viewElement->addComponent(group);
-
-	auto boxRepresentation2 = std::make_shared<OsgBoxRepresentation>("Box Representation 2");
-	boxRepresentation2->setSizeXYZ(0.05, 0.05, 0.05);
-	auto boxElement2 = std::make_shared<BasicSceneElement>("Box Element 2");
-	boxElement2->addComponent(boxRepresentation2);
+	box = std::make_shared<OsgBoxRepresentation>("Graphics");
+	box->setSizeXYZ(0.05, 0.05, 0.05);
+	auto boxElement2 = std::make_shared<BasicSceneElement>("Box 2");
+	boxElement2->addComponent(box);
 	boxElement2->setPose(startPose);
 	scene->addSceneElement(boxElement2);
 
 	/// Run the thread
 	runtime->start();
 
-	int numSteps = 1000;
-	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+	int numSteps = 100;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	for (int i = 0; i < numSteps; ++i)
 	{
 		double t = static_cast<double>(i) / numSteps;
@@ -227,6 +222,8 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 		boxElement2->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(endPose, startPose, t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / 100));
 	}
+
+	graphicsManager->dumpDebugInfo();
 }
 
 }; // namespace Graphics

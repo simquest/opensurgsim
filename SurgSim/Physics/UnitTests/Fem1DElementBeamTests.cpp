@@ -23,24 +23,24 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/FemElement1DBeam.h"
+#include "SurgSim/Physics/Fem1DElementBeam.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::FemElement1DBeam;
+using SurgSim::Physics::Fem1DElementBeam;
 
 namespace
 {
 const double epsilon = 1e-9;
 };
 
-class MockFemElement1D : public FemElement1DBeam
+class MockFem1DElement : public Fem1DElementBeam
 {
 public:
-	MockFemElement1D(std::array<unsigned int, 2> nodeIds)
-		: FemElement1DBeam(nodeIds)
+	MockFem1DElement(std::array<unsigned int, 2> nodeIds)
+		: Fem1DElementBeam(nodeIds)
 	{
 	}
 
@@ -108,7 +108,7 @@ void computeShapeFunction(double xi, double eta, double zeta, double L, Eigen::R
 	N(2, 6 + 5) = 0.0;
 }
 
-class FemElement1DBeamTests : public ::testing::Test
+class Fem1DElementBeamTests : public ::testing::Test
 {
 public:
 	static const int m_numberNodes = 5;
@@ -369,15 +369,15 @@ public:
 		std::vector<unsigned int> nodeIdsVectorForm(m_nodeIds.begin(), m_nodeIds.end());
 
 		// Transform into correct coordinates and correct place in matrix
-		std::shared_ptr<MockFemElement1D> beam = getBeam();
+		std::shared_ptr<MockFem1DElement> beam = getBeam();
 		const Eigen::Matrix<double, 12, 12>& r = beam->getInitialRotation();
 
 		SurgSim::Math::addSubMatrix(r * in * r.transpose(), nodeIdsVectorForm, 6, &out);
 	}
 
-	std::shared_ptr<MockFemElement1D> getBeam()
+	std::shared_ptr<MockFem1DElement> getBeam()
 	{
-		auto beam = std::make_shared<MockFemElement1D>(m_nodeIds);
+		auto beam = std::make_shared<MockFem1DElement>(m_nodeIds);
 		beam->setRadius(m_radius);
 		beam->setMassDensity(m_rho);
 		beam->setPoissonRatio(m_nu);
@@ -387,15 +387,15 @@ public:
 	}
 };
 
-TEST_F(FemElement1DBeamTests, ConstructorTest)
+TEST_F(Fem1DElementBeamTests, ConstructorTest)
 {
 	ASSERT_NO_THROW(
-		{ MockFemElement1D beam(m_nodeIds); });
+		{ MockFem1DElement beam(m_nodeIds); });
 }
 
-TEST_F(FemElement1DBeamTests, NodeIdsTest)
+TEST_F(Fem1DElementBeamTests, NodeIdsTest)
 {
-	FemElement1DBeam beam(m_nodeIds);
+	Fem1DElementBeam beam(m_nodeIds);
 	EXPECT_EQ(2u, beam.getNumNodes());
 	EXPECT_EQ(2u, beam.getNodeIds().size());
 	for (int i = 0; i < 2; i++)
@@ -405,9 +405,9 @@ TEST_F(FemElement1DBeamTests, NodeIdsTest)
 	}
 }
 
-TEST_F(FemElement1DBeamTests, setGetRadiusTest)
+TEST_F(Fem1DElementBeamTests, setGetRadiusTest)
 {
-	FemElement1DBeam beam(m_nodeIds);
+	Fem1DElementBeam beam(m_nodeIds);
 
 	// Default radius = 0
 	EXPECT_DOUBLE_EQ(0.0, beam.getRadius());
@@ -419,9 +419,9 @@ TEST_F(FemElement1DBeamTests, setGetRadiusTest)
 	EXPECT_ANY_THROW(beam.setRadius(-9.4));
 }
 
-TEST_F(FemElement1DBeamTests, MaterialParameterTest)
+TEST_F(Fem1DElementBeamTests, MaterialParameterTest)
 {
-	FemElement1DBeam beam(m_nodeIds);
+	Fem1DElementBeam beam(m_nodeIds);
 	beam.setRadius(m_radius);
 
 	// Test the various mode of failure related to the physical parameters
@@ -456,21 +456,21 @@ TEST_F(FemElement1DBeamTests, MaterialParameterTest)
 	}
 }
 
-TEST_F(FemElement1DBeamTests, VolumeTest)
+TEST_F(Fem1DElementBeamTests, VolumeTest)
 {
-	std::shared_ptr<MockFemElement1D> beam = getBeam();
+	std::shared_ptr<MockFem1DElement> beam = getBeam();
 	EXPECT_NEAR(beam->getVolume(m_restState), m_expectedVolume, 1e-10);
 }
 
-TEST_F(FemElement1DBeamTests, RestLengthTest)
+TEST_F(Fem1DElementBeamTests, RestLengthTest)
 {
-	std::shared_ptr<MockFemElement1D> beam = getBeam();
+	std::shared_ptr<MockFem1DElement> beam = getBeam();
 	EXPECT_NEAR(beam->getRestLength(), m_L, 1e-10);
 }
 
-TEST_F(FemElement1DBeamTests, InitialRotationTest)
+TEST_F(Fem1DElementBeamTests, InitialRotationTest)
 {
-	std::shared_ptr<MockFemElement1D> beam = getBeam();
+	std::shared_ptr<MockFem1DElement> beam = getBeam();
 
 	// Use a mask to test the structure of the rotation matrix R0 (4 digonal block 3x3 matrix and 0 elsewhere)
 	Eigen::Matrix<double, 12, 12> mask;
@@ -494,11 +494,12 @@ TEST_F(FemElement1DBeamTests, InitialRotationTest)
 	EXPECT_TRUE(i_3.isApprox(expected_i));
 }
 
-TEST_F(FemElement1DBeamTests, CoordinateTests)
+TEST_F(Fem1DElementBeamTests, CoordinateTests)
 {
-	FemElement1DBeam element(m_nodeIds);
+	Fem1DElementBeam element(m_nodeIds);
 
 	Vector validNaturalCoordinate(2);
+	Vector validNaturalCoordinate2(2);
 	Vector invalidNaturalCoordinateSumNot1(2);
 	Vector invalidNaturalCoordinateNegativeValue(2);
 	Vector invalidNaturalCoordinateSize1(1), invalidNaturalCoordinateSize3(3);
@@ -506,11 +507,13 @@ TEST_F(FemElement1DBeamTests, CoordinateTests)
 	Vector3d expectedB = expectedA + m_orientation._transformVector(Vector3d(m_L, 0.0, 0.0));
 
 	validNaturalCoordinate << 0.4, 0.6;
+	validNaturalCoordinate2 << -1e-11, 1 + 1e-11;
 	invalidNaturalCoordinateSumNot1 << 0.5, 0.6;
 	invalidNaturalCoordinateNegativeValue << 1.4, -0.4;
 	invalidNaturalCoordinateSize1 << 1.0;
 	invalidNaturalCoordinateSize3 << 0.2, 0.2, 0.6;
 	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate));
+	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate2));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSumNot1));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateNegativeValue));
 	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSize1));
@@ -535,15 +538,18 @@ TEST_F(FemElement1DBeamTests, CoordinateTests)
 	EXPECT_TRUE(ptA.isApprox(expectedA));
 	EXPECT_TRUE(ptB.isApprox(expectedB));
 	EXPECT_TRUE(ptMiddle.isApprox((expectedA + expectedB) * 0.5));
+
+	Vector3d cartesian(0.1, 1.2, 2.3);
+	EXPECT_THROW(element.computeNaturalCoordinate(m_restState, cartesian), SurgSim::Framework::AssertionFailure);
 }
 
-TEST_F(FemElement1DBeamTests, ForceAndMatricesTest)
+TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 {
 	using SurgSim::Math::Matrix;
 	using SurgSim::Math::Vector;
 	using SurgSim::Math::getSubVector;
 
-	std::shared_ptr<MockFemElement1D> beam = getBeam();
+	std::shared_ptr<MockFem1DElement> beam = getBeam();
 
 	Vector vectorOnes = Vector::Ones(6 * m_numberNodes);
 

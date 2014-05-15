@@ -24,6 +24,7 @@
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/TransferPropertiesBehavior.h"
@@ -47,6 +48,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
 
 using SurgSim::Framework::Logger;
 using SurgSim::Graphics::OsgTextureUniform;
@@ -130,33 +132,58 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
 
-	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Main Light");
-	light->setAmbientColor(Vector4d(0.5, 0.5, 0.5, 1.0));
-	light->setDiffuseColor(Vector4d(0.5, 0.5, 0.5, 1.0));
-	light->setSpecularColor(Vector4d(0.8, 0.8, 0.8, 1.0));
-	light->setInitialPose(makeRigidTransform(Vector3d(-4.0, 2.0, -4.0),
-											 Vector3d(0.0, 0.0, 0.0),
-											 Vector3d(0.0, 1.0, 0.0)));
-
-	viewElement->addComponent(light);
-
-	// Move the light from left to right over along the scene
-	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator");
-	RigidTransform3d from = makeRigidTransform(Vector3d(5.0, 3.0, -5.0),
-											   Vector3d(0.0, 0.0, 0.0),
-											   Vector3d(0.0, 1.0, 0.0));
-	RigidTransform3d to = makeRigidTransform(Vector3d(-5.0, 3.0, -5.0),
-											 Vector3d(0.0, 0.0, 0.0),
-											 Vector3d(0.0, 1.0, 0.0));
-	interpolator->setTarget(light);
+	// Move the camera from left to right over along the scene
+	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator_2");
+	RigidTransform3d from = makeRigidTransform(
+								Vector3d(-4.0, 2.0, -4.0),
+								Vector3d(0.0, 0.0, 0.0),
+								Vector3d(0.0, 1.0, 0.0));
+	RigidTransform3d to = makeRigidTransform(
+							  Vector3d(4.0, 2.0, -4.0),
+							  Vector3d(0.0, 0.0, 0.0),
+							  Vector3d(0.0, 1.0, 0.0));
+	interpolator->setTarget(viewElement);
 	interpolator->setStartingPose(from);
 	interpolator->setDuration(10.0);
 	interpolator->setEndingPose(to);
 	interpolator->setPingPong(true);
 
+	viewElement->setPose(from);
+
 	viewElement->addComponent(interpolator);
 
 	return viewElement;
+}
+
+std::shared_ptr<SurgSim::Framework::SceneElement> createLight()
+{
+	auto result = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
+
+	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
+	light->setAmbientColor(Vector4d(0.5, 0.5, 0.5, 1.0));
+	light->setDiffuseColor(Vector4d(0.5, 0.5, 0.5, 1.0));
+	light->setSpecularColor(Vector4d(0.8, 0.8, 0.8, 1.0));
+	result->addComponent(light);
+
+	// Move the light from left to right over along the scene
+	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator");
+	RigidTransform3d from = makeRigidTransform(Vector3d(5.0, 3.0, -5.0),
+							Vector3d(0.0, 0.0, 0.0),
+							Vector3d(0.0, 1.0, 0.0));
+	RigidTransform3d to = makeRigidTransform(Vector3d(-5.0, 3.0, -5.0),
+						  Vector3d(0.0, 0.0, 0.0),
+						  Vector3d(0.0, 1.0, 0.0));
+	interpolator->setTarget(result);
+	interpolator->setStartingPose(from);
+	interpolator->setDuration(10.0);
+	interpolator->setEndingPose(to);
+	interpolator->setPingPong(true);
+
+	result->setPose(from);
+
+	result->addComponent(interpolator);
+
+	return result;
 }
 
 /// Create the pass that renders the scene from the view of the light source
@@ -195,7 +222,6 @@ public:
 	explicit SimpleBox(const std::string& name) : BasicSceneElement(name)
 	{
 		m_box = std::make_shared<SurgSim::Graphics::OsgBoxRepresentation>(getName() + " Graphics");
-		m_box->setInitialPose(RigidTransform3d::Identity());
 
 		// The material that this object uses
 		m_box->setMaterial(materials["basicShadowed"]);
@@ -218,11 +244,6 @@ public:
 		m_box->setSizeXYZ(width, height, length);
 	}
 
-	void setPose(const RigidTransform3d& pose)
-	{
-		m_box->setPose(pose);
-	}
-
 private:
 	std::shared_ptr<SurgSim::Graphics::OsgBoxRepresentation> m_box;
 };
@@ -234,7 +255,6 @@ public:
 	explicit SimpleSphere(const std::string& name) : BasicSceneElement(name)
 	{
 		m_sphere = std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>(getName() + " Graphics");
-		m_sphere->setInitialPose(RigidTransform3d::Identity());
 		m_sphere->setMaterial(materials["basicShadowed"]);
 		m_sphere->addGroupReference("shadowing");
 		m_sphere->addGroupReference("shadowed");
@@ -249,11 +269,6 @@ public:
 	void setRadius(double radius)
 	{
 		m_sphere->setRadius(radius);
-	}
-
-	void setPose(const RigidTransform3d& pose)
-	{
-		m_sphere->setPose(pose);
 	}
 
 private:
@@ -285,9 +300,20 @@ void addSpheres(std::shared_ptr<SurgSim::Framework::Scene> scene)
 
 }
 
+std::shared_ptr<SurgSim::Graphics::ScreenSpaceQuadRepresentation> makeDebugQuad(
+	const std::string& name,
+	std::shared_ptr<SurgSim::Graphics::Texture> texture,
+	double x, double y, double width, double height)
+{
+	auto result = std::make_shared<SurgSim::Graphics::OsgScreenSpaceQuadRepresentation>(name);
+	result->setTexture(texture);
+	result->setSize(width, height);
+	result->setLocation(x, y);
+	return result;
+}
 
-void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime,
-				 std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager)
+
+void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 {
 	auto scene = runtime->getScene();
 	auto box = std::make_shared<SimpleBox>("Plane");
@@ -304,26 +330,29 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime,
 
 	std::shared_ptr<SurgSim::Graphics::ViewElement> viewElement = createView("View", 0, 0, 1024, 768);
 	scene->addSceneElement(viewElement);
+	auto mainCamera = viewElement->getCamera();
 
 	// This behavior is responsible to keep all values updated, in this example most targets
 	// will be uniforms that are used in shaders
 	auto copier =  std::make_shared<SurgSim::Framework::TransferPropertiesBehavior>("Copier");
+	copier->setTargetManagerType(SurgSim::Framework::MANAGER_TYPE_GRAPHICS);
 	viewElement->addComponent(copier);
 
+	auto lightElement = createLight();
+	scene->addSceneElement(lightElement);
+
 	auto lightMapPass = createLightMapPass();
-	lightMapPass->showColorTarget(0, 0, 256, 256);
-
-	auto shadowMapPass = createShadowMapPass();
-	shadowMapPass->showColorTarget(1024 - 256, 0, 256, 256);
-
-	auto light = viewElement->getComponents<SurgSim::Graphics::Light>()[0];
-	auto camera = lightMapPass->getCamera();
+	scene->addSceneElement(lightMapPass);
 
 	// connect the light pose and the light map camera pose, so when the light moves,
 	// this camera will move as well
-	copier->connect(light, "Pose", camera, "Pose");
+	copier->connect(lightElement->getPoseComponent(), "Pose", lightMapPass->getPoseComponent(), "Pose");
 
-	// The following three uniforms in the shadowMapPass, are carry the information from the
+	auto shadowMapPass = createShadowMapPass();
+	scene->addSceneElement(shadowMapPass);
+
+
+	// The following three uniforms in the shadowMapPass, carry the information from the
 	// lightMapPass. They are used to project the incoming point into the space of the lightMap
 	// The view matrix of the camera used to render the light map
 	auto lightViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightViewMatrix");
@@ -348,12 +377,10 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime,
 
 	// Make the camera in the shadowMapPass follow the main camera that is being used to render the
 	// whole scene
-	copier->connect(graphicsManager->getDefaultCamera(), "Pose", shadowMapPass->getCamera(), "Pose");
-	copier->connect(graphicsManager->getDefaultCamera(), "ProjectionMatrix",
-					shadowMapPass->getCamera() , "ProjectionMatrix");
+	copier->connect(viewElement->getPoseComponent(), "Pose", shadowMapPass->getPoseComponent(), "Pose");
+	copier->connect(mainCamera, "ProjectionMatrix", shadowMapPass->getCamera() , "ProjectionMatrix");
 
-	scene->addSceneElement(lightMapPass);
-	scene->addSceneElement(shadowMapPass);
+
 
 	// Put the result of the last pass into the main camera to make it accessible
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
@@ -361,31 +388,15 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime,
 		std::make_shared<OsgTextureUniform<OsgTexture2d>>("oss_shadowmap");
 	shadowMapTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(shadowMapPass->getRenderTarget()->getColorTarget(0)));
 	material->addUniform(shadowMapTexture);
+	mainCamera->setMaterial(material);
 
-	// Set up the main camera
-	camera = graphicsManager->getDefaultCamera();
-	RigidTransform3d pose =
-		makeRigidTransform(Vector3d(-4.0, 3.0, 4.0), Vector3d(-0.0, 0.0, -0.0), Vector3d(0.0, 1.0, 0.0));
-	camera->setPose(pose);
-	camera->setMaterial(material);
+	auto debug = std::make_shared<SurgSim::Framework::BasicSceneElement>("debug");
+	debug->addComponent(makeDebugQuad("light",
+									  lightMapPass->getRenderTarget()->getColorTarget(0), 0, 0, 256, 256));
+	debug->addComponent(makeDebugQuad("shadow",
+									  shadowMapPass->getRenderTarget()->getColorTarget(0), 1024 - 256, 0, 256, 256));
+	scene->addSceneElement(debug);
 
-	// Move the camera from left to right over along the scene
-	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator_2");
-	RigidTransform3d from = makeRigidTransform(
-		Vector3d(-4.0, 2.0, -4.0),
-		Vector3d(0.0, 0.0, 0.0),
-		Vector3d(0.0, 1.0, 0.0));
-	RigidTransform3d to = makeRigidTransform(
-		Vector3d(4.0, 2.0, -4.0),
-		Vector3d(0.0, 0.0, 0.0),
-		Vector3d(0.0, 1.0, 0.0));
-	interpolator->setTarget(camera);
-	interpolator->setStartingPose(from);
-	interpolator->setDuration(10.0);
-	interpolator->setEndingPose(to);
-	interpolator->setPingPong(true);
-
-	viewElement->addComponent(interpolator);
 
 }
 
@@ -402,15 +413,11 @@ int main(int argc, char* argv[])
 	materials["default"] = materials["basic_lit"];
 
 	auto runtime(std::make_shared<SurgSim::Framework::Runtime>());
-	auto graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
-	graphicsManager->getDefaultCamera()->setInitialPose(
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.5, 0.5, 0.5)));
-
-	runtime->addManager(graphicsManager);
+	runtime->addManager(std::make_shared<SurgSim::Graphics::OsgManager>());
 	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
 
-	createScene(runtime, graphicsManager);
+	createScene(runtime);
 
 	YAML::Node root;
 	root["Scene"] = runtime->getScene();

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENT3DTETRAHEDRON_H
-#define SURGSIM_PHYSICS_FEMELEMENT3DTETRAHEDRON_H
+#ifndef SURGSIM_PHYSICS_FEM3DELEMENTTETRAHEDRON_H
+#define SURGSIM_PHYSICS_FEM3DELEMENTTETRAHEDRON_H
 
 #include <array>
 
@@ -35,7 +35,7 @@ namespace Physics
 /// \note    http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch09.d/AFEM.Ch09.pdf
 /// \note The deformation is based on the linear elasticity theory and not on the visco-elasticity theory.
 /// \note Therefore the element does not have any damping component.
-class FemElement3DTetrahedron : public FemElement
+class Fem3DElementTetrahedron : public FemElement
 {
 public:
 	/// Constructor
@@ -44,7 +44,7 @@ public:
 	/// \note This is required from the signed volume calculation method getVolume()
 	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
 	/// simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
-	FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds);
+	Fem3DElementTetrahedron(std::array<unsigned int, 4> nodeIds);
 
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
@@ -87,7 +87,7 @@ public:
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	/// \note FemElement3DTetrahedron uses linear elasticity (not visco-elasticity), so it does not give any damping.
+	/// \note Fem3DElementTetrahedron uses linear elasticity (not visco-elasticity), so it does not give any damping.
 	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 		double scale = 1.0) override;
 
@@ -131,23 +131,28 @@ public:
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
-	/// Determines whether a given natural coordinate is valid
-	/// \param naturalCoordinate Coordinate to check
-	/// \return True if valid
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const override;
-
-	/// Computes a given natural coordinate in cartesian coordinates
-	/// \param state The state at which to transform coordinates
-	/// \param naturalCoordinate The coordinates to transform
-	/// \return The resultant cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
 		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const override;
 
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& cartesianCoordinate) const override;
+
 protected:
-	/// Computes the tetrahdron shape functions
-	/// \param restState The rest state to compute the shape function from
-	void computeShapeFunctions(const SurgSim::Math::OdeState& restState);
+	/// Computes the tetrahedron shape functions
+	/// \param state The deformable rest state to compute the shape function from
+	/// \param[out] volume the volume calculated with the given state
+	/// \param[out] ai from the shape function, Ni(x, y, z) = 1/6*volume (ai + bi.x + ci.y + di.z)
+	/// \param[out] bi from the shape function, Ni(x, y, z) = 1/6*volume (ai + bi.x + ci.y + di.z)
+	/// \param[out] ci from the shape function, Ni(x, y, z) = 1/6*volume (ai + bi.x + ci.y + di.z)
+	/// \param[out] di from the shape function, Ni(x, y, z) = 1/6*volume (ai + bi.x + ci.y + di.z)
+	void computeShapeFunctions(const SurgSim::Math::OdeState& state,
+		double* volume,
+		std::array<double, 4>* ai,
+		std::array<double, 4>* bi,
+		std::array<double, 4>* ci,
+		std::array<double, 4>* di) const;
 
 	/// Computes the tetrahedron stiffness matrix
 	/// \param state The state to compute the stiffness matrix from
@@ -198,4 +203,4 @@ protected:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENT3DTETRAHEDRON_H
+#endif // SURGSIM_PHYSICS_FEM3DELEMENTTETRAHEDRON_H

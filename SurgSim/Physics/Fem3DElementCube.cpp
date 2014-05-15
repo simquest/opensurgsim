@@ -16,7 +16,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
-#include "SurgSim/Physics/FemElement3DCube.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
 
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
@@ -30,7 +30,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemElement3DCube::FemElement3DCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState)
+Fem3DElementCube::Fem3DElementCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState)
 {
 	using SurgSim::Framework::Logger;
 
@@ -61,7 +61,7 @@ FemElement3DCube::FemElement3DCube(std::array<unsigned int, 8> nodeIds, const Su
 	m_restVolume = getVolume(restState);
 }
 
-void FemElement3DCube::initialize(const SurgSim::Math::OdeState& state)
+void Fem3DElementCube::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Test the validity of the physical parameters
 	FemElement::initialize(state);
@@ -71,7 +71,7 @@ void FemElement3DCube::initialize(const SurgSim::Math::OdeState& state)
 	computeStiffness(state, &m_strain, &m_stress, &m_stiffness);
 }
 
-void FemElement3DCube::addForce(const SurgSim::Math::OdeState& state,
+void Fem3DElementCube::addForce(const SurgSim::Math::OdeState& state,
 									   const Eigen::Matrix<double, 24, 24>& k, SurgSim::Math::Vector* F, double scale)
 {
 	Eigen::Matrix<double, 24, 1> x, f;
@@ -84,12 +84,12 @@ void FemElement3DCube::addForce(const SurgSim::Math::OdeState& state,
 	addSubVector(f, m_nodeIds, 3, F);
 }
 
-void FemElement3DCube::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
+void Fem3DElementCube::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
 {
 	addForce(state, m_stiffness, F, scale);
 }
 
-void FemElement3DCube::computeMass(const SurgSim::Math::OdeState& state,
+void Fem3DElementCube::computeMass(const SurgSim::Math::OdeState& state,
 								   Eigen::Matrix<double, 24, 24>* M)
 {
 	using SurgSim::Math::gaussQuadrature2Points;
@@ -120,16 +120,16 @@ void FemElement3DCube::computeMass(const SurgSim::Math::OdeState& state,
 	}
 }
 
-void FemElement3DCube::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
+void Fem3DElementCube::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
 {
 	addSubMatrix(m_mass * scale, m_nodeIds, 3, M);
 }
 
-void FemElement3DCube::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale)
+void Fem3DElementCube::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale)
 {
 }
 
-void FemElement3DCube::computeStiffness(const SurgSim::Math::OdeState& state,
+void Fem3DElementCube::computeStiffness(const SurgSim::Math::OdeState& state,
 										Eigen::Matrix<double, 6, 24>* strain,
 										Eigen::Matrix<double, 6, 24>* stress,
 										Eigen::Matrix<double, 24, 24>* stiffness)
@@ -154,7 +154,7 @@ void FemElement3DCube::computeStiffness(const SurgSim::Math::OdeState& state,
 	}
 }
 
-void FemElement3DCube::evaluateJ(const SurgSim::Math::OdeState& state, double epsilon, double eta, double mu,
+void Fem3DElementCube::evaluateJ(const SurgSim::Math::OdeState& state, double epsilon, double eta, double mu,
 								 SurgSim::Math::Matrix33d *J,
 								 SurgSim::Math::Matrix33d *Jinv,
 								 double *detJ) const
@@ -191,14 +191,14 @@ void FemElement3DCube::evaluateJ(const SurgSim::Math::OdeState& state, double ep
 
 		SURGSIM_ASSERT(invertible) <<
 			"Found a non invertible matrix J\n" << *J << "\ndet(J)=" << *detJ <<
-			") while computing FemElement3DCube stiffness matrix\n";
+			") while computing Fem3DElementCube stiffness matrix\n";
 		SURGSIM_LOG_IF(*detJ <= 1e-8 && *detJ >= -1e-8, Logger::getLogger("Physics"), WARNING) <<
 			"Found an invalid matrix J\n" << *J << "\ninvertible, but det(J)=" << *detJ <<
-			") while computing FemElement3DCube stiffness matrix\n";
+			") while computing Fem3DElementCube stiffness matrix\n";
 	}
 }
 
-void FemElement3DCube::evaluateStrainDisplacement(double epsilon, double eta, double mu,
+void Fem3DElementCube::evaluateStrainDisplacement(double epsilon, double eta, double mu,
 												  const SurgSim::Math::Matrix33d& Jinv,
 												  Eigen::Matrix<double, 6, 24> *B) const
 {
@@ -238,7 +238,7 @@ void FemElement3DCube::evaluateStrainDisplacement(double epsilon, double eta, do
 	}
 }
 
-void FemElement3DCube::buildConstitutiveMaterialMatrix(
+void Fem3DElementCube::buildConstitutiveMaterialMatrix(
 	Eigen::Matrix<double, 6, 6>* constitutiveMatrix)
 {
 	// Compute the elasticity material matrix
@@ -252,7 +252,7 @@ void FemElement3DCube::buildConstitutiveMaterialMatrix(
 	(*constitutiveMatrix)(3, 3) = (*constitutiveMatrix)(4, 4) = (*constitutiveMatrix)(5, 5) = mu;
 }
 
-void FemElement3DCube::addStrainStressStiffnessAtPoint(const SurgSim::Math::OdeState& state,
+void Fem3DElementCube::addStrainStressStiffnessAtPoint(const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::gaussQuadraturePoint& epsilon,
 	const SurgSim::Math::gaussQuadraturePoint& eta,
 	const SurgSim::Math::gaussQuadraturePoint& mu,
@@ -275,7 +275,7 @@ void FemElement3DCube::addStrainStressStiffnessAtPoint(const SurgSim::Math::OdeS
 	*k += (epsilon.weight * eta.weight * mu.weight * detJ) * B.transpose() * m_constitutiveMaterial * B;
 }
 
-void FemElement3DCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state,
+void Fem3DElementCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::gaussQuadraturePoint& epsilon,
 	const SurgSim::Math::gaussQuadraturePoint& eta,
 	const SurgSim::Math::gaussQuadraturePoint& mu,
@@ -306,12 +306,12 @@ void FemElement3DCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state
 	*m += (epsilon.weight * eta.weight * mu.weight * detJ * m_rho) * phi.transpose() * phi;
 }
 
-void FemElement3DCube::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale)
+void Fem3DElementCube::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale)
 {
 	addSubMatrix(m_stiffness * scale, getNodeIds(), 3, K);
 }
 
-void FemElement3DCube::addFMDK(const SurgSim::Math::OdeState& state,
+void Fem3DElementCube::addFMDK(const SurgSim::Math::OdeState& state,
 							   SurgSim::Math::Vector* F,
 							   SurgSim::Math::Matrix* M,
 							   SurgSim::Math::Matrix* D,
@@ -329,7 +329,7 @@ void FemElement3DCube::addFMDK(const SurgSim::Math::OdeState& state,
 	addForce(state, F);
 }
 
-void FemElement3DCube::addMatVec(const SurgSim::Math::OdeState& state,
+void Fem3DElementCube::addMatVec(const SurgSim::Math::OdeState& state,
 								 double alphaM, double alphaD, double alphaK,
 								 const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
 {
@@ -361,7 +361,7 @@ void FemElement3DCube::addMatVec(const SurgSim::Math::OdeState& state,
 	}
 }
 
-double FemElement3DCube::getVolume(const SurgSim::Math::OdeState& state) const
+double Fem3DElementCube::getVolume(const SurgSim::Math::OdeState& state) const
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
@@ -397,12 +397,12 @@ double FemElement3DCube::getVolume(const SurgSim::Math::OdeState& state) const
 		}
 	}
 
-	SURGSIM_ASSERT(v >= 0) << "FemElement3DCube ill-defined, its volume is " << v << std::endl <<
+	SURGSIM_ASSERT(v >= 0) << "Fem3DElementCube ill-defined, its volume is " << v << std::endl <<
 		"Please check the node ordering of your element formed by node ids " <<
 		m_nodeIds[0]<<" "<<m_nodeIds[1]<<" "<<m_nodeIds[2]<<" "<<m_nodeIds[3]<<" "<<
 		m_nodeIds[4]<<" "<<m_nodeIds[5]<<" "<<m_nodeIds[6]<<" "<<m_nodeIds[7]<<std::endl;
 
-	SURGSIM_ASSERT(v > 1e-12) << "FemElement3DCube ill-defined, its volume is " << v << std::endl <<
+	SURGSIM_ASSERT(v > 1e-12) << "Fem3DElementCube ill-defined, its volume is " << v << std::endl <<
 		"Please check the node ordering of your element formed by node ids " <<
 		m_nodeIds[0]<<" "<<m_nodeIds[1]<<" "<<m_nodeIds[2]<<" "<<m_nodeIds[3]<<" "<<
 		m_nodeIds[4]<<" "<<m_nodeIds[5]<<" "<<m_nodeIds[6]<<" "<<m_nodeIds[7]<<std::endl;
@@ -410,7 +410,7 @@ double FemElement3DCube::getVolume(const SurgSim::Math::OdeState& state) const
 	return v;
 }
 
-double FemElement3DCube::shapeFunction(size_t i, double epsilon, double eta, double mu) const
+double Fem3DElementCube::shapeFunction(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
 		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
@@ -418,7 +418,7 @@ double FemElement3DCube::shapeFunction(size_t i, double epsilon, double eta, dou
 		(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
-double FemElement3DCube::dShapeFunctiondepsilon(size_t i, double epsilon, double eta, double mu) const
+double Fem3DElementCube::dShapeFunctiondepsilon(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
 		m_shapeFunctionsEpsilonSign[i] *
@@ -426,7 +426,7 @@ double FemElement3DCube::dShapeFunctiondepsilon(size_t i, double epsilon, double
 		(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
-double FemElement3DCube::dShapeFunctiondeta(size_t i, double epsilon, double eta, double mu) const
+double Fem3DElementCube::dShapeFunctiondeta(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
 		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
@@ -434,7 +434,7 @@ double FemElement3DCube::dShapeFunctiondeta(size_t i, double epsilon, double eta
 		(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
-double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta, double mu) const
+double Fem3DElementCube::dShapeFunctiondmu(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
 		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
@@ -442,17 +442,7 @@ double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta,
 		m_shapeFunctionsMuSign[i];
 }
 
-bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
-{
-	// Check for valid range of localization points
-	bool validLocalRange = (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
-
-	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		&& (naturalCoordinate.size() == 8)
-		&& (validLocalRange);
-}
-
-SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
+SurgSim::Math::Vector Fem3DElementCube::computeCartesianCoordinate(
 	const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::Vector& naturalCoordinate) const
 {
@@ -471,6 +461,13 @@ SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 	return cartesianCoordinate;
 }
 
+SurgSim::Math::Vector Fem3DElementCube::computeNaturalCoordinate(
+	const SurgSim::Math::OdeState& state,
+	const SurgSim::Math::Vector& cartesianCoordinate) const
+{
+	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
+	return SurgSim::Math::Vector3d::Zero();
+}
 
 } // namespace Physics
 

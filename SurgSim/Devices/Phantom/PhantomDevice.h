@@ -32,7 +32,7 @@ class PhantomScaffold;
 ///
 /// This should support any device that can communicate using the OpenHaptics 3.x toolkit, such as the
 /// PHANTOM Omni (a.k.a. Geomagic Touch), PHANTOM Desktop (a.k.a. Geomagic Touch X), and the PHANTOM Premium
-/// series devices.  The implementation is currently limited to 3DoF haptic output (forces only, no torques).
+/// series devices.
 ///
 /// \par Application input provided by the device:
 ///   | type       | name        |                                                                |
@@ -51,7 +51,7 @@ class PhantomScaffold;
 ///   | type       | name        |                                                                |
 ///   | ----       | ----        | ---                                                            |
 ///   | vector     | "force"     | %Device output force (units are newtons).                      |
-///   | vector     | "torque"    | %Device output torque (units are Nm).  NOT YET SUPPORTED.      |
+///   | vector     | "torque"    | %Device output torque (units are Nm).                          |
 ///
 /// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class PhantomDevice : public SurgSim::Input::CommonDevice

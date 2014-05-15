@@ -49,7 +49,7 @@ public:
 	}
 
 	/// Returns the groups assigned to the manager
-	const std::vector<std::shared_ptr<Group>>& getGroups() const
+	const std::unordered_map<std::string, std::shared_ptr<Group>>& getGroups() const
 	{
 		return m_groups;
 	}
@@ -82,13 +82,6 @@ protected:
 	/// \return	True if the representation was not in this manager and has been successfully added, false if it fails.
 	virtual bool addRepresentation(std::shared_ptr<Representation> representation);
 
-	/// Adds a group to the manager, this will also add all representations whose groupreferences include this
-	/// group to the group.
-	/// \param	group	The group to be added.
-	/// \return	True if the group was not in this manager and has been successfully added, it will return false
-	///				when a group with the same name already exists in the manager.
-	virtual bool addGroup(std::shared_ptr<Group> group);
-
 	/// Adds a view to the manager
 	/// \param	view	The view to be added.
 	/// \return	True if the view was not in this manager and has been successfully added, false if it fails.
@@ -99,16 +92,10 @@ protected:
 	/// \return	True if the representation was in this manager and has been successfully removed, false if it fails.
 	virtual bool removeRepresentation(std::shared_ptr<Representation> representation);
 
-	/// Removes a group from the manager
-	/// \param	group	The group to be removed.
-	/// \return	True if the group was in this manager and has been successfully removed, false if it fails.
-	virtual bool removeGroup(std::shared_ptr<Group> group);
-
 	/// Removes a view from the manager
 	/// \param	view	The view to be removed.
 	/// \return	True if the view was in this manager and has been successfully removed, false if it fails.
 	virtual bool removeView(std::shared_ptr<View> view);
-
 
 	/// Performs an update for a single timestep
 	/// \param	dt	The time in seconds of the preceding timestep.
@@ -117,7 +104,21 @@ protected:
 	/// Overrides ComponentManager::getType()
 	virtual int getType() const override;
 
+	/// Fetch a group with a given name, if the group does not exist, create it.
+	/// \param name Name of the group to be fetched.
+	/// \return group with the given name.
+	virtual std::shared_ptr<Group> getOrCreateGroup(const std::string& name) = 0;
+
+protected:
+	/// Adds a group to the manager, override for manager specific behavior when adding
+	/// \param group The group to be added.
+	virtual void addGroup(std::shared_ptr<Group> group);
+
+
 private:
+
+
+
 	/// Initializes the manager
 	/// \return True if it succeeds, false if it fails
 	virtual bool doInitialize();
@@ -126,13 +127,10 @@ private:
 	/// \return True if it succeeds, false if it fails
 	virtual bool doStartUp();
 
-
-
-
 	/// Representations assigned to the manager
 	std::vector<std::shared_ptr<Representation>> m_representations;
 	/// Groups assigned to the manager
-	std::vector<std::shared_ptr<Group>> m_groups;
+	std::unordered_map<std::string, std::shared_ptr<Group>> m_groups;
 	/// Views assigned to the manager
 	std::vector<std::shared_ptr<View>> m_views;
 };

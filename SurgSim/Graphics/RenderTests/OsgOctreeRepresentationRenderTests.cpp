@@ -55,15 +55,17 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 	boundingBox.min() = Vector3d::Ones() * -0.2;
 	boundingBox.max() = Vector3d::Ones() * 0.2;
 
-	std::array<Vector3d, 8> secondLevelPositions = {{ Vector3d(-0.1, -0.1, -0.1),
-													  Vector3d( 0.1, -0.1, -0.1),
-													  Vector3d(-0.1,  0.1, -0.1),
-													  Vector3d( 0.1,  0.1, -0.1),
-													  Vector3d(-0.1, -0.1,  0.1),
-													  Vector3d( 0.1, -0.1,  0.1),
-													  Vector3d(-0.1,  0.1,  0.1),
-													  Vector3d( 0.1,  0.1,  0.1)
-												   }};
+	std::array<Vector3d, 8> secondLevelPositions = {{
+			Vector3d(-0.1, -0.1, -0.1),
+			Vector3d(0.1, -0.1, -0.1),
+			Vector3d(-0.1,  0.1, -0.1),
+			Vector3d(0.1,  0.1, -0.1),
+			Vector3d(-0.1, -0.1,  0.1),
+			Vector3d(0.1, -0.1,  0.1),
+			Vector3d(-0.1,  0.1,  0.1),
+			Vector3d(0.1,  0.1,  0.1)
+		}
+	};
 	auto octree = std::make_shared<OctreeShape::NodeType>(boundingBox);
 	octree->addData(secondLevelPositions[0], emptyData, 2);
 	octree->addData(secondLevelPositions[1], emptyData, 2);
@@ -79,9 +81,9 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Octree Representation");
 	octreeRepresentation->setLocalPose(makeRigidTransform(
-											makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
-											Vector3d(0.0, 0.0, -1.0))
-										);
+										   makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
+										   Vector3d(0.0, 0.0, -1.0))
+									  );
 	viewElement->addComponent(octreeRepresentation);
 	octreeRepresentation->setOctree(octreeShape);
 
@@ -106,16 +108,16 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	octreeRepresentation->setNodeVisible(path0, true);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 
 	octreeRepresentation->setNodeVisible(path1, false);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 
 	octreeRepresentation->setNodeVisible(path2, false);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 
 	EXPECT_ANY_THROW(octreeRepresentation->setNodeVisible(invalidPath, true));
 }

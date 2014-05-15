@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENT2DTRIANGLE_H
-#define SURGSIM_PHYSICS_FEMELEMENT2DTRIANGLE_H
+#ifndef SURGSIM_PHYSICS_FEM2DELEMENTTRIANGLE_H
+#define SURGSIM_PHYSICS_FEM2DELEMENTTRIANGLE_H
 
 #include <array>
 
@@ -42,7 +42,7 @@ namespace Physics
 /// \note have been derived from it.
 ///
 /// \note The element is considered to have a constant thickness.
-class FemElement2DTriangle : public FemElement
+class Fem2DElementTriangle : public FemElement
 {
 	typedef Eigen::Matrix<double, 3, 3> Matrix33Type;
 
@@ -56,7 +56,7 @@ public:
 	/// Constructor
 	/// \param nodeIds An array of 3 node ids (A, B, C) defining this triangle element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
-	FemElement2DTriangle(std::array<unsigned int, 3> nodeIds);
+	Fem2DElementTriangle(std::array<unsigned int, 3> nodeIds);
 
 	/// Sets the triangle's thickness
 	/// \param thickness The thickness of the triangle
@@ -144,17 +144,13 @@ public:
 	virtual void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
 						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F);
 
-	/// Determines whether a given natural coordinate is valid
-	/// \param naturalCoordinate Coordinate to check
-	/// \return True if valid
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const;
+	virtual SurgSim::Math::Vector computeCartesianCoordinate(
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& naturalCoordinate) const;
 
-	/// Computes a given natural coordinate in cartesian coordinates
-	/// \param state The state at which to transform coordinates
-	/// \param naturalCoordinate The coordinates to transform
-	/// \return The resultant cartesian coordinates
-	virtual SurgSim::Math::Vector computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
-															 const SurgSim::Math::Vector& naturalCoordinate) const;
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
 	/// Computes the triangle element's initial rotation
@@ -250,4 +246,4 @@ protected:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENT2DTRIANGLE_H
+#endif // SURGSIM_PHYSICS_FEM2DELEMENTTRIANGLE_H

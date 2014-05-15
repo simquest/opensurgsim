@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENT1DBEAM_H
-#define SURGSIM_PHYSICS_FEMELEMENT1DBEAM_H
+#ifndef SURGSIM_PHYSICS_FEM1DELEMENTBEAM_H
+#define SURGSIM_PHYSICS_FEM1DELEMENTBEAM_H
 
 #include <array>
 
@@ -32,13 +32,13 @@ namespace Physics
 /// J.S. Przemieniecki.  The deformation is based on linear elasticity theory and not on visco-elasticity theory;
 /// therefore, the element does not have any damping components.
 /// \note The element is considered to have a circular cross section.
-class FemElement1DBeam : public FemElement
+class Fem1DElementBeam : public FemElement
 {
 public:
 	/// Constructor
 	/// \param nodeIds An array of 2 node ids (A, B) defining this beam element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
-	FemElement1DBeam(std::array<unsigned int, 2> nodeIds);
+	Fem1DElementBeam(std::array<unsigned int, 2> nodeIds);
 
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam
@@ -136,17 +136,13 @@ public:
 	virtual void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
 						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F);
 
-	/// Determines whether a given natural coordinate is valid
-	/// \param naturalCoordinate Coordinate to check
-	/// \return True if valid
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const;
+	virtual SurgSim::Math::Vector computeCartesianCoordinate(
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& naturalCoordinate) const;
 
-	/// Computes a given natural coordinate in cartesian coordinates
-	/// \param state The state at which to transform coordinates
-	/// \param naturalCoordinate The coordinates to transform
-	/// \return The resultant cartesian coordinates
-	virtual SurgSim::Math::Vector computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
-															 const SurgSim::Math::Vector& naturalCoordinate) const;
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
 	/// Computes the beam element's initial rotation
@@ -209,4 +205,4 @@ protected:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENT1DBEAM_H
+#endif // SURGSIM_PHYSICS_FEM1DELEMENTBEAM_H

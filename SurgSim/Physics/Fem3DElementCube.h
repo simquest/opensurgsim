@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENT3DCUBE_H
-#define SURGSIM_PHYSICS_FEMELEMENT3DCUBE_H
+#ifndef SURGSIM_PHYSICS_FEM3DELEMENTCUBE_H
+#define SURGSIM_PHYSICS_FEM3DELEMENTCUBE_H
 
 #include <array>
 
@@ -37,7 +37,7 @@ namespace Physics
 /// \note Note that this technique is accurate for any polynomial evaluation up to degree 3.
 /// \note In our case, the shape functions \f$N_i\f$ are linear (of degree 1). So for exmaple,
 /// \note in the mass matrix we have integral terms like \f$\int_V N_i.N_j dV\f$, which are of degree 2.
-class FemElement3DCube : public FemElement
+class Fem3DElementCube : public FemElement
 {
 public:
 	/// Constructor
@@ -48,7 +48,7 @@ public:
 	/// \note In order to do so (looking at the cube from the exterior, face normal 'n' pointing outward),
 	/// \note   the 1st  4 nodeIds (ABCD) should define any face CW            i.e. (AB^AC or AB^AD or AC^AD).n < 0
 	/// \note   the last 4 nodeIds (EFGH) should define the opposite face CCW  i.e. (EF^EG or EF^EH or EG^EH).n > 0
-	FemElement3DCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState);
+	Fem3DElementCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState);
 
 	/// Initializes the element once everything has been set
 	/// \param state The state to initialize the FemElement with
@@ -87,7 +87,7 @@ public:
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	/// \note FemElement3DCube uses linear elasticity (not visco-elasticity), so it does not give any damping.
+	/// \note Fem3DElementCube uses linear elasticity (not visco-elasticity), so it does not give any damping.
 	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 		double scale = 1.0) override;
 
@@ -131,21 +131,13 @@ public:
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
-	/// Determines whether a given natural coordinate is valid
-	/// \param naturalCoordinate Coordinate to check
-	/// \return True if valid
-	/// \note The naturalCoordinate is a vector of 8 scalar values being the barycentric coordinate that are used
-	/// \note to represent localization. The range of naturalCoordinate is in [0, 1]. Otherwise, the corresponding
-	/// \note Cartesian point is outside the cube.
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const override;
-
-	/// Computes a given natural coordinate in Cartesian coordinates
-	/// \param state The state at which to transform coordinates
-	/// \param naturalCoordinate The coordinates to transform
-	/// \return The resultant Cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
 		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const override;
+
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
 	/// Build the constitutive material 6x6 matrix
@@ -306,4 +298,4 @@ protected:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENT3DCUBE_H
+#endif // SURGSIM_PHYSICS_FEM3DELEMENTCUBE_H

@@ -26,7 +26,7 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/FemRepresentationCoordinate.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
@@ -44,7 +44,7 @@ namespace SurgSim
 namespace Physics
 {
 
-static std::shared_ptr<FemElement3DTetrahedron> makeTetrahedron(unsigned int node0,
+static std::shared_ptr<Fem3DElementTetrahedron> makeTetrahedron(unsigned int node0,
 																unsigned int node1,
 																unsigned int node2,
 																unsigned int node3,
@@ -53,7 +53,7 @@ static std::shared_ptr<FemElement3DTetrahedron> makeTetrahedron(unsigned int nod
 																double youngModulus)
 {
 	std::array<unsigned int, 4> nodes = {node0, node1, node2, node3};
-	auto element = std::make_shared<FemElement3DTetrahedron>(nodes);
+	auto element = std::make_shared<Fem3DElementTetrahedron>(nodes);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
 	element->setYoungModulus(youngModulus);
