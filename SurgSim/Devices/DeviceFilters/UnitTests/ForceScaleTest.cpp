@@ -23,18 +23,16 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/DeviceFilters/ForceScale.h"
 #include "SurgSim/Input/CommonDevice.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 using SurgSim::Device::ForceScale;
 using SurgSim::Input::CommonDevice;
-using SurgSim::Input::InputConsumerInterface;
-using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::Matrix66d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Testing::MockInputOutput;
 
 namespace
 {
@@ -58,22 +56,6 @@ public:
 	{
 		return getInputData();
 	}
-};
-
-class TestOutputProducerInterface : public OutputProducerInterface
-{
-public:
-	TestOutputProducerInterface()
-	{
-	}
-
-	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override
-	{
-		*outputData = m_data;
-		return true;
-	}
-
-	DataGroup m_data;
 };
 
 TEST(ForceScaleDeviceFilterTest, InputDataFilter)
@@ -146,11 +128,11 @@ TEST(ForceScaleDeviceFilterTest, OutputDataFilterDefaultScaling)
 
 	// Normally the data would be set by a behavior, then the output device scaffold would call requestOutput on the
 	// filter, which would call requestOutput on the OutputComponent.
-	auto testOutputProducer = std::make_shared<TestOutputProducerInterface>();
-	testOutputProducer->m_data = data;
+	auto producer = std::make_shared<MockInputOutput>();
+	producer->m_output.setValue(data);
 
 	// The OutputProducer sends data out to the filter, which sends data out to the device.
-	forceScaler->setOutputProducer(testOutputProducer);
+	forceScaler->setOutputProducer(producer);
 
 	DataGroup actualData;
 	ASSERT_TRUE(forceScaler->requestOutput("device", &actualData));
@@ -216,13 +198,13 @@ TEST(ForceScaleDeviceFilterTest, OutputDataFilter)
 
 	// Normally the data would be set by a behavior, then the output device scaffold would call requestOutput on the
 	// filter, which would call requestOutput on the OutputComponent.
-	auto testOutputProducer = std::make_shared<TestOutputProducerInterface>();
-	testOutputProducer->m_data = data;
+	auto producer = std::make_shared<MockInputOutput>();
+	producer->m_output.setValue(data);
 
 	// The OutputProducer sends data out to the filter, which sends data out to the device.
 	forceScaler->setForceScale(10.0);
 	forceScaler->setTorqueScale(0.1);
-	forceScaler->setOutputProducer(testOutputProducer);
+	forceScaler->setOutputProducer(producer);
 
 	DataGroup actualData;
 	ASSERT_TRUE(forceScaler->requestOutput("device", &actualData));

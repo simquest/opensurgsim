@@ -16,7 +16,7 @@
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
-#include "SurgSim/Devices/MultiAxis/PoseIntegrator.h"
+#include "SurgSim/Devices/DeviceFilters/PoseIntegrator.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Assert.h"
 
@@ -31,7 +31,7 @@ MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
 	m_name(uniqueName),
 	m_rawDevice(new RawMultiAxisDevice(uniqueName + "_RawBase"))
 {
-	m_filter = std::make_shared<PoseIntegrator>(uniqueName + "_Integrator", m_rawDevice->getInitialInputData());
+	m_filter = std::make_shared<PoseIntegrator>(uniqueName + "_Integrator");
 	m_filter->setNameForCallback(uniqueName);  // the filter should make callbacks as the entire device
 
 	m_rawDevice->addInputConsumer(m_filter);
@@ -72,7 +72,7 @@ bool MultiAxisDevice::finalize()
 
 bool MultiAxisDevice::isInitialized() const
 {
-	return m_rawDevice->isInitialized() && m_filter->isInitialized();
+	return m_rawDevice->isInitialized();
 }
 
 bool MultiAxisDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer)
@@ -143,7 +143,6 @@ double MultiAxisDevice::defaultOrientationScale()
 {
 	return 0.0001; // The default rotation scale, in radians per tick.
 }
-
 
 };  // namespace Device
 };  // namespace SurgSim

@@ -24,8 +24,6 @@
 #include "SurgSim/Devices/Novint/NovintDevice.h"
 #include "SurgSim/Devices/Novint/NovintScaffold.h"
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
 

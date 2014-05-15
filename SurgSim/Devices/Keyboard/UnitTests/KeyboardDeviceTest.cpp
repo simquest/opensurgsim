@@ -21,7 +21,7 @@
 #include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
 #include "SurgSim/Devices/Keyboard/KeyboardScaffold.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Testing/DevicesUtilities.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 namespace SurgSim
 {

@@ -27,6 +27,9 @@ namespace SurgSim
 {
 namespace DataStructures
 {
+/// The type used for copying values between two NamedData objects that cannot assign to each other. The keys are
+/// the source indices.  The values are the target indices.
+typedef std::unordered_map<int, int> NamedDataCopyMap;
 
 /// Common strings for NamedData.
 
@@ -266,6 +269,13 @@ public:
 	/// \return the size of the data collection.
 	/// \sa size()
 	inline int getNumEntries() const;
+
+	/// Copy the data from another NamedData, based on a map of indices. Resets entries that are reset in the other.
+	/// \param source The source NamedData.
+	/// \param map The map of indices.
+	/// \exception Asserts if the objects do not have the same template type.
+	template <typename N>
+	void copy(const NamedData<N>& source, const NamedDataCopyMap& map);
 
 private:
 	/// The mapping between names and indices.
