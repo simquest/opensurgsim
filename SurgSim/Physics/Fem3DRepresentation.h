@@ -20,8 +20,9 @@
 #include <string>
 #include <unordered_map>
 
-#include "SurgSim/Physics/FemRepresentation.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
 {
@@ -44,6 +45,8 @@ public:
 
 	/// Destructor
 	virtual ~Fem3DRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
 
 	/// Sets the name of the file to be loaded
 	/// \param filename The name of the file to be loaded

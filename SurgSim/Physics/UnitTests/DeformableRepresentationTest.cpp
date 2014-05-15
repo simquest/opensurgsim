@@ -17,7 +17,9 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/OdeSolver.h" // Need access to the enum IntegrationScheme
@@ -33,13 +35,12 @@
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
+using SurgSim::Math::Matrix;
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector;
 using SurgSim::Physics::DeformableCollisionRepresentation;
 using SurgSim::Physics::DeformableRepresentation;
 using SurgSim::Physics::MockDeformableRepresentation;
-
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Vector;
-using SurgSim::Math::Matrix;
 
 namespace
 {
@@ -370,4 +371,48 @@ TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 	StaticLinearSolver* staticLinearSolver;
 	staticLinearSolver = dynamic_cast<StaticLinearSolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, staticLinearSolver);
+}
+
+
+TEST_F(DeformableRepresentationTest, SerializationTest)
+{
+	{
+		SCOPED_TRACE("Encode a DeformableRepresentation object without DeformableCollisionRepresentation, throw.");
+		auto deformableRepresentation = std::make_shared<MockDeformableRepresentation>("TestRigidRepresentation");
+		EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*deformableRepresentation));
+	}
+
+	{
+		SCOPED_TRACE("Encode a DeformableRepresentation object with valid DeformableCollisionRepresentation, no throw");
+		auto deformableRepresentation = std::make_shared<MockDeformableRepresentation>("TestRigidRepresentation");
+		deformableRepresentation->setValue("IntegrationScheme", SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC);
+
+		std::shared_ptr<SurgSim::Collision::Representation> deformableCollisionRepresentation =
+			std::make_shared<DeformableCollisionRepresentation>("DeformableCollisionRepresentation");
+		deformableRepresentation->setValue("CollisionRepresentation", deformableCollisionRepresentation);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*deformableRepresentation));
+		EXPECT_TRUE(node.IsMap());
+		EXPECT_EQ(1u, node.size());
+
+		YAML::Node data = node["SurgSim::Physics::MockDeformableRepresentation"];
+		EXPECT_EQ(9u, data.size());
+
+		std::shared_ptr<MockDeformableRepresentation> newRepresentation;
+		newRepresentation = std::dynamic_pointer_cast<MockDeformableRepresentation>
+							(node.as<std::shared_ptr<SurgSim::Framework::Component>>());
+		EXPECT_NE(nullptr, newRepresentation->getCollisionRepresentation());
+
+		auto collisionRepresentation =
+			newRepresentation->getValue<std::shared_ptr<SurgSim::Collision::Representation>>("CollisionRepresentation");
+		auto newDeformableCollisionRepresentation =
+			std::dynamic_pointer_cast<DeformableCollisionRepresentation>(collisionRepresentation);
+		EXPECT_NE(nullptr, newDeformableCollisionRepresentation);
+
+		EXPECT_EQ("SurgSim::Physics::MockDeformableRepresentation", newRepresentation->getClassName());
+		EXPECT_EQ(newRepresentation, newDeformableCollisionRepresentation->getDeformableRepresentation());
+		EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
+				  newRepresentation->getValue<SurgSim::Math::IntegrationScheme>("IntegrationScheme"));
+	}
 }
