@@ -73,6 +73,14 @@ public:
 
 	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
+	/// Sets the string name of the boolean entry that will reset the pose to its initial value.  Such a reset can be
+	/// useful if the integrated pose is used to position an object and the integration takes the object out of view.
+	/// \param name The name of the NamedData<bool> entry.
+	/// \warning A pose reset may generate high velocities, and if the pose is the input to a VirtualToolCoupler then
+	///		large forces will likely be generated.
+	/// \exception Asserts if called after initialize.
+	void setReset(const std::string& name);
+
 private:
 	/// The result of integrating the input poses.
 	PoseType m_poseResult;
@@ -86,11 +94,15 @@ private:
 	/// A copier into the input DataGroup, if needed.
 	std::shared_ptr<SurgSim::DataStructures::DataGroupCopier> m_copier;
 
+	/// The name of the reset boolean (if any).
+	std::string m_resetName;
+
 	///@{
 	/// The indices into the DataGroups.
 	int m_poseIndex;
 	int m_linearVelocityIndex;
 	int m_angularVelocityIndex;
+	int m_resetIndex;
 	///@}
 };
 
