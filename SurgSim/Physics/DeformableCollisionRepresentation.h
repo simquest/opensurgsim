@@ -16,10 +16,10 @@
 #ifndef SURGSIM_PHYSICS_DEFORMABLECOLLISIONREPRESENTATION_H
 #define SURGSIM_PHYSICS_DEFORMABLECOLLISIONREPRESENTATION_H
 
-#include "SurgSim/Collision/Representation.h"
-
-#include <string>
 #include <memory>
+#include <string>
+
+#include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
 {
@@ -55,16 +55,17 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Physics::DeformableCollisionRepresentation);
 
 	/// Set the mesh to be used in this collision representation
-	/// the vertices in the mesh need to be the same number as the vertices in the
-	/// deformable representation
+	/// the vertices in the mesh need to be the same number as the vertices in the deformable representation.
 	/// \param mesh The mesh to be used for the collision calculation and updates
+	/// \note The shape held by this deformable collision representation will be updated as well.
 	void setMesh(std::shared_ptr<SurgSim::DataStructures::TriangleMesh> mesh);
 
 	/// \return The mesh that is part of this representation
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh() const;
 
-	/// Set the shape for this collision representation, has to be a meshShape
+	/// Set the shape for this collision representation, has to be a SurgSim::Math::MeshShape.
 	/// \param shape The shape to be used.
+	/// \note The mesh held by this deformable collision representation will be updated as well.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);
 
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
@@ -83,7 +84,6 @@ public:
 	virtual bool doInitialize() override;
 
 private:
-
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::MeshShape> m_shape;
 
@@ -94,7 +94,7 @@ private:
 	std::weak_ptr<SurgSim::Physics::DeformableRepresentation> m_deformable;
 };
 
-}
-}
+} // namespace Physics
+} // namespace SurgSim
 
 #endif

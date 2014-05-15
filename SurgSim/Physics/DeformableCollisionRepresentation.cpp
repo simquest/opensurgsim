@@ -105,7 +105,7 @@ int DeformableCollisionRepresentation::getShapeType() const
 void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
 	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
-		<< "Deformable collision shape has to be a mesh.  Currently " << m_shape->getType();
+		<< "Deformable collision shape has to be a mesh.  But what passed in is " << shape->getType();
 
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
 	m_shape = meshShape;
