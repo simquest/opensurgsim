@@ -42,44 +42,66 @@ TEST(OdeSolverEulerImplicit, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("EulerImplicit");
-		doConstructorTest<OdeSolverEulerImplicit<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doConstructorTest<OdeSolverEulerImplicit>();
 	}
 	{
 		SCOPED_TRACE("LinearEulerImplicit");
-		doConstructorTest<OdeSolverLinearEulerImplicit<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doConstructorTest<OdeSolverLinearEulerImplicit>();
 	}
 }
 
 template<class T>
 void doSolveTest()
 {
+	// Test 2 iterations because Linear solvers have a different algorithm on the 1st pass from the following passes.
+
 	{
 		MassPoint m;
-		MassPointState defaultState, currentState, newState;
-
+		MassPointState defaultState, state0, state1, state2;
 		T solver(&m);
-		ASSERT_NO_THROW({solver.solve(1e-3, currentState, &newState);});
-		EXPECT_EQ(defaultState, currentState);
-		EXPECT_NE(defaultState, newState);
-		EXPECT_TRUE(newState.getVelocities().isApprox(m.m_gravity * 1e-3));
-		EXPECT_TRUE(newState.getPositions().isApprox(m.m_gravity * 1e-3 * 1e-3));
+
+		// ma = mg <=> a = g
+		// v(1) = g.dt + v(0)
+		// x(1) = v(1).dt + x(0)
+		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1);});
+		EXPECT_EQ(defaultState, state0);
+		EXPECT_NE(defaultState, state1);
+		EXPECT_TRUE(state1.getVelocities().isApprox(m.m_gravity * 1e-3 + state0.getVelocities()));
+		EXPECT_TRUE(state1.getPositions().isApprox(state1.getVelocities() * 1e-3 + state0.getPositions()));
+
+		// v(2) = g.dt + v(1)
+		// x(2) = v(2).dt + x(1)
+		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2);});
+		EXPECT_NE(defaultState, state1);
+		EXPECT_NE(defaultState, state2);
+		EXPECT_NE(state2, state1);
+		EXPECT_TRUE(state2.getVelocities().isApprox(m.m_gravity * 1e-3 + state1.getVelocities()));
+		EXPECT_TRUE(state2.getPositions().isApprox(state2.getVelocities() * 1e-3 + state1.getPositions()));
 	}
 
 	{
-		const double dt = 1e-3;
-		const double viscosity = 0.1;
-		MassPoint m(viscosity);
-		MassPointState defaultState, currentState, newState;
-
-		double coef = m.m_mass / (m.m_mass/dt + viscosity);
-
+		MassPoint m(0.1);
+		MassPointState defaultState, state0, state1, state2;
 		T solver(&m);
-		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
-		EXPECT_EQ(defaultState, currentState);
-		EXPECT_NE(defaultState, newState);
-		Vector3d newVelocity = (m.m_gravity + currentState.getVelocities()/dt) * coef;
-		EXPECT_TRUE(newState.getVelocities().isApprox(newVelocity));
-		EXPECT_TRUE(newState.getPositions().isApprox(currentState.getPositions() + dt * newVelocity));
+
+		// ma = mg - c.v <=> a = g - c/m.v
+		// v(1) = (g - c/m.v(1)).dt + v(0) <=> v(1) = I.(1.0 + dt.c/m)^-1.(g.dt + v(0))
+		// x(1) = v(1).dt + x(0)
+		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1);});
+		EXPECT_EQ(defaultState, state0);
+		EXPECT_NE(defaultState, state1);
+		Matrix33d systemInverse = Matrix33d::Identity() * 1.0 / (1.0 + 1e-3 * 0.1 / m.m_mass);
+		EXPECT_TRUE(state1.getVelocities().isApprox(systemInverse * (m.m_gravity * 1e-3 + state0.getVelocities())));
+		EXPECT_TRUE(state1.getPositions().isApprox(state1.getVelocities() * 1e-3  + state0.getPositions()));
+
+		// v(2) = (g - c/m.v(2)).dt + v(1) <=> v(2) = I.(1.0 + dt.c/m)^-1.(g.dt + v(1))
+		// x(2) = v(2).dt + x(1)
+		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2);});
+		EXPECT_NE(defaultState, state1);
+		EXPECT_NE(defaultState, state2);
+		EXPECT_NE(state1, state2);
+		EXPECT_TRUE(state2.getVelocities().isApprox(systemInverse * (m.m_gravity * 1e-3 + state1.getVelocities())));
+		EXPECT_TRUE(state2.getPositions().isApprox(state2.getVelocities() * 1e-3 + state1.getPositions()));
 	}
 }
 
@@ -87,11 +109,11 @@ TEST(OdeSolverEulerImplicit, SolveTest)
 {
 	{
 		SCOPED_TRACE("EulerImplicit");
-		doSolveTest<OdeSolverEulerImplicit<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doSolveTest<OdeSolverEulerImplicit>();
 	}
 	{
 		SCOPED_TRACE("LinearEulerImplicit");
-		doSolveTest<OdeSolverLinearEulerImplicit<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
+		doSolveTest<OdeSolverLinearEulerImplicit>();
 	}
 }
 

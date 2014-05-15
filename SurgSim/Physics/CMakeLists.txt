@@ -29,21 +29,23 @@ set(SURGSIM_PHYSICS_SOURCES
 	ContactConstraintGeneration.cpp
 	DcdCollision.cpp
 	DeformableCollisionRepresentation.cpp
-	DeformableRepresentationState.cpp
+	DeformableRepresentation.cpp
+	Fem1DElementBeam.cpp
 	Fem1DRepresentation.cpp
+	Fem2DElementTriangle.cpp
 	Fem2DRepresentation.cpp
+	Fem3DElementCube.cpp
+	Fem3DElementTetrahedron.cpp
 	Fem3DRepresentation.cpp
 	Fem3DRepresentationBilateral3D.cpp
 	Fem3DRepresentationContact.cpp
 	Fem3DRepresentationLocalization.cpp
 	Fem3DRepresentationPlyReaderDelegate.cpp
 	FemElement.cpp
-	FemElement1DBeam.cpp
-	FemElement2DTriangle.cpp
-	FemElement3DCube.cpp
-	FemElement3DTetrahedron.cpp
+	FemRepresentation.cpp
 	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
+	FixedRepresentation.cpp
 	FixedRepresentationBilateral3D.cpp
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
@@ -53,6 +55,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	MassSpringRepresentationContact.cpp
 	MassSpringRepresentationLocalization.cpp
 	MlcpPhysicsProblem.cpp
+	PhysicsConvert.cpp
 	PhysicsManager.cpp
 	PhysicsManagerState.cpp
 	PostUpdate.cpp
@@ -62,9 +65,12 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
+	RigidRepresentationBaseState.cpp
 	RigidRepresentationBilateral3D.cpp
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
+	RigidRepresentationParameters.cpp
+	RigidRepresentationState.cpp
 	SolveMlcp.cpp
 	UpdateCollisionRepresentations.cpp
 	VirtualToolCoupler.cpp
@@ -83,23 +89,19 @@ set(SURGSIM_PHYSICS_HEADERS
 	DcdCollision.h
 	DeformableCollisionRepresentation.h
 	DeformableRepresentation.h
-	DeformableRepresentation-inl.h
-	DeformableRepresentationBase.h
-	DeformableRepresentationState.h
+	Fem1DElementBeam.h
 	Fem1DRepresentation.h
+	Fem2DElementTriangle.h
 	Fem2DRepresentation.h
+	Fem3DElementCube.h
+	Fem3DElementTetrahedron.h
 	Fem3DRepresentation.h
 	Fem3DRepresentationBilateral3D.h
 	Fem3DRepresentationContact.h
 	Fem3DRepresentationLocalization.h
 	Fem3DRepresentationPlyReaderDelegate.h
 	FemElement.h
-	FemElement1DBeam.h
-	FemElement2DTriangle.h
-	FemElement3DCube.h
-	FemElement3DTetrahedron.h
 	FemRepresentation.h
-	FemRepresentation-inl.h
 	FemRepresentationCoordinate.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
@@ -117,6 +119,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	MlcpPhysicsProblem.h
 	MlcpPhysicsProblem-inl.h
 	MlcpPhysicsSolution.h
+	PhysicsConvert.h
 	PhysicsManager.h
 	PhysicsManagerState.h
 	PostUpdate.h

@@ -21,6 +21,7 @@
 #include "SurgSim/Blocks/MassSpring3DRepresentation.h"
 #include "SurgSim/Blocks/UnitTests/SpringTestUtils.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
 using SurgSim::Math::Vector3d;
@@ -284,7 +285,6 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 
 	// States should contains expected values
 	EXPECT_TRUE(m.getFinalState()->getVelocities().isZero());
-	EXPECT_TRUE(m.getFinalState()->getAccelerations().isZero());
 	EXPECT_FALSE(m.getFinalState()->getPositions().isZero());
 	Vector3d depthExtremitiesDelta[2][2] =
 	{{(extremities[0][0][1] - extremities[0][0][0]) / static_cast<double>(numNodesPerDim[2] - 1) ,
@@ -322,5 +322,13 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 			}
 		}
 	}
-	EXPECT_EQ(boundaryConditions, m.getFinalState()->getBoundaryConditions());
+
+	std::vector<unsigned int> dofBoundaryConditions;
+	for (auto it = boundaryConditions.begin(); it != boundaryConditions.end(); ++it)
+	{
+		dofBoundaryConditions.push_back((*it) * 3);
+		dofBoundaryConditions.push_back((*it) * 3 + 1);
+		dofBoundaryConditions.push_back((*it) * 3 + 2);
+	}
+	EXPECT_EQ(dofBoundaryConditions, m.getFinalState()->getBoundaryConditions());
 }

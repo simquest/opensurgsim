@@ -42,11 +42,11 @@ TEST(OdeSolverStatic, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("Static");
-		doConstructorTest<OdeSolverStatic<MassPointsStateForStatic, Matrix, Matrix, Matrix, Matrix>>();
+		doConstructorTest<OdeSolverStatic>();
 	}
 	{
 		SCOPED_TRACE("LinearStatic");
-		doConstructorTest<OdeSolverLinearStatic<MassPointsStateForStatic, Matrix, Matrix, Matrix, Matrix>>();
+		doConstructorTest<OdeSolverLinearStatic>();
 	}
 }
 
@@ -72,11 +72,11 @@ TEST(OdeSolverStatic, SolveTest)
 {
 	{
 		SCOPED_TRACE("Static");
-		doSolveTest<OdeSolverStatic<MassPointsStateForStatic, Matrix, Matrix, Matrix, Matrix>>();
+		doSolveTest<OdeSolverStatic>();
 	}
 	{
 		SCOPED_TRACE("LinearStatic");
-		doSolveTest<OdeSolverLinearStatic<MassPointsStateForStatic, Matrix, Matrix, Matrix, Matrix>>();
+		doSolveTest<OdeSolverLinearStatic>();
 	}
 }
 

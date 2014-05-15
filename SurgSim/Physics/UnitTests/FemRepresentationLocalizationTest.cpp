@@ -18,14 +18,13 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
-#include "SurgSim/Physics/FemElement3DCube.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 
-using SurgSim::Framework::Runtime;
 using SurgSim::Math::getSubVector;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::Fem3DRepresentationLocalization;
@@ -41,10 +40,10 @@ namespace Physics
 {
 
 void addTetraheadron(Fem3DRepresentation *fem, std::array<unsigned int, 4> nodes,
-	const DeformableRepresentationState& state, double massDensity = 1.0,
+	const SurgSim::Math::OdeState& state, double massDensity = 1.0,
 	double poissonRatio = 0.1, double youngModulus = 1.0)
 {
-	auto element = std::make_shared<FemElement3DTetrahedron>(nodes);
+	auto element = std::make_shared<Fem3DElementTetrahedron>(nodes);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
 	element->setYoungModulus(youngModulus);
@@ -59,10 +58,8 @@ public:
 	{
 		using SurgSim::Math::Vector3d;
 
-		m_runtime = std::make_shared<Runtime>();
-
 		m_fem = std::make_shared<Fem3DRepresentation>("Fem3dRepresentation");
-		auto state = std::make_shared<DeformableRepresentationState>();
+		auto state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(3, 6);
 
 		auto& x = state->getPositions();
@@ -91,12 +88,10 @@ public:
 
 		m_fem->setInitialState(state);
 		m_fem->setIsActive(true);
-		m_fem->initialize(m_runtime);
-		m_fem->wakeUp();
 
-		// FEMRepresentation for FemElement3DCube
+		// FEMRepresentation for Fem3DElementCube
 		m_fem3DCube = std::make_shared<Fem3DRepresentation>("Fem3dCubeRepresentation");
-		auto restState = std::make_shared<DeformableRepresentationState>();
+		auto restState = std::make_shared<SurgSim::Math::OdeState>();
 		restState->setNumDof(3, 8);
 
 		auto& x0 = restState->getPositions();
@@ -112,7 +107,7 @@ public:
 		// Define Cube
 		{
 			std::array<unsigned int, 8> node0 = {{0, 1, 3, 2, 4, 5, 7, 6}};
-			std::shared_ptr<FemElement3DCube> femElement = std::make_shared<FemElement3DCube>(node0, *restState);
+			std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(node0, *restState);
 			femElement->setMassDensity(1.0);
 			femElement->setPoissonRatio(0.1);
 			femElement->setYoungModulus(1.0);
@@ -121,15 +116,12 @@ public:
 		}
 		m_fem3DCube->setInitialState(restState);
 		m_fem3DCube->setIsActive(true);
-		m_fem3DCube->initialize(m_runtime);
-		m_fem3DCube->wakeUp();
 	}
 
 	void TearDown()
 	{
 	}
 
-	std::shared_ptr<Runtime> m_runtime;
 	std::shared_ptr<Fem3DRepresentation> m_fem;
 	std::shared_ptr<Fem3DRepresentation> m_fem3DCube;
 };

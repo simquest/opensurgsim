@@ -21,7 +21,17 @@ namespace SurgSim
 namespace Framework
 {
 
-boost::any Framework::Accessible::getValue(const std::string& name) const
+Accessible::Accessible()
+{
+
+}
+
+Accessible::~Accessible()
+{
+
+}
+
+boost::any Accessible::getValue(const std::string& name) const
 {
 	auto functors = m_functors.find(name);
 	if (functors != std::end(m_functors) && functors->second.getter != nullptr)
@@ -36,7 +46,7 @@ boost::any Framework::Accessible::getValue(const std::string& name) const
 	}
 }
 
-void Framework::Accessible::setValue(const std::string& name, const boost::any& value)
+void Accessible::setValue(const std::string& name, const boost::any& value)
 {
 	auto functors = m_functors.find(name);
 	if (functors != std::end(m_functors) && functors->second.setter != nullptr)

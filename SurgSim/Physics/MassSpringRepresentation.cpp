@@ -15,15 +15,12 @@
 
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
-
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/Valid.h"
-
 using SurgSim::Math::Vector;
-using SurgSim::Math::DiagonalMatrix;
 using SurgSim::Math::Matrix;
 
 namespace SurgSim
@@ -116,6 +113,9 @@ RepresentationType MassSpringRepresentation::getType() const
 
 void MassSpringRepresentation::beforeUpdate(double dt)
 {
+	// Call the DeformableRepresentation implementation
+	DeformableRepresentation::beforeUpdate(dt);
+
 	if (! isActive())
 	{
 		return;
@@ -127,49 +127,21 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 	SURGSIM_ASSERT(getNumSprings()) << "No springs specified yet, call addSpring() prior to running the simulation";
 	SURGSIM_ASSERT(getNumDof()) <<
 		"State has not been initialized yet, call setInitialState() prior to running the simulation";
-
-	// Call the DeformableRepresentation implementation to take care of the OdeSolver setup
-	DeformableRepresentation::beforeUpdate(dt);
-}
-
-void MassSpringRepresentation::update(double dt)
-{
-	if (! isActive())
-	{
-		return;
-	}
-
-	SURGSIM_ASSERT(m_odeSolver != nullptr) <<
-		"Ode solver has not been set yet. Did you call beforeUpdate() ?";
-	SURGSIM_ASSERT(m_initialState != nullptr) <<
-		"Initial state has not been set yet. Did you call setInitialState() ?";
-
-	// Solve the ode
-	m_odeSolver->solve(dt, *m_currentState, m_newState.get());
-
-	// Back up the current state into the previous state (by swapping)
-	m_currentState.swap(m_previousState);
-	// Make the new state, the current state (by swapping)
-	m_currentState.swap(m_newState);
 }
 
 void MassSpringRepresentation::afterUpdate(double dt)
 {
+	DeformableRepresentation::afterUpdate(dt);
+
 	if (! isActive())
 	{
 		return;
 	}
 
-	if ( !isValidState(*m_currentState))
+	if (!m_currentState->isValid())
 	{
 		deactivateAndReset();
-		return;
 	}
-
-	// Back up the current state into the final state
-	*m_finalState = *m_currentState;
-
-	DeformableRepresentation::afterUpdate(dt);
 }
 
 void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlock<Vector>& deltaVelocity)
@@ -182,13 +154,13 @@ void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlo
 	m_currentState->getPositions() += deltaVelocity * dt;
 	m_currentState->getVelocities() += deltaVelocity;
 
-	if ( !isValidState(*m_currentState))
+	if (!m_currentState->isValid())
 	{
 		deactivateAndReset();
 	}
 }
 
-Vector& MassSpringRepresentation::computeF(const DeformableRepresentationState& state)
+Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
 	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
@@ -208,16 +180,15 @@ Vector& MassSpringRepresentation::computeF(const DeformableRepresentationState& 
 	return m_f;
 }
 
-const DiagonalMatrix& MassSpringRepresentation::computeM(const DeformableRepresentationState& state)
+const Matrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::setSubVector;
 
 	// Make sure the mass matrix has been properly allocated
-	// It does not need to be zeroed out, as it will be directly set
-	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), false);
+	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), true);
 
-	DiagonalMatrix::DiagonalVectorType& diagonal = m_M.diagonal();
+	Eigen::MatrixBase<Matrix>::DiagonalReturnType diagonal = m_M.diagonal();
 
 	for (unsigned int massId = 0; massId < getNumMasses(); massId++)
 	{
@@ -235,7 +206,7 @@ const DiagonalMatrix& MassSpringRepresentation::computeM(const DeformableReprese
 	return m_M;
 }
 
-const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationState& state)
+const Matrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::setSubVector;
@@ -253,7 +224,7 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 		for (unsigned int massId = 0; massId < getNumMasses(); massId++)
 		{
 			double coef = rayleighMass * getMass(massId)->getMass();
-			Matrix::DiagonalReturnType Ddiagonal = m_D.diagonal();
+			Eigen::MatrixBase<Matrix>::DiagonalReturnType Ddiagonal = m_D.diagonal();
 			setSubVector(Vector3d::Ones() * coef, massId, 3, &Ddiagonal);
 		}
 	}
@@ -286,7 +257,7 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 	return m_D;
 }
 
-const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationState& state)
+const Matrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::addSubMatrix;
 
@@ -311,8 +282,8 @@ const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationS
 	return m_K;
 }
 
-void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& state,
-	Vector** f, DiagonalMatrix** M, Matrix** D, Matrix** K)
+void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
+	Vector** f, Matrix** M, Matrix** D, Matrix** K)
 {
 	using SurgSim::Math::addSubVector;
 	using SurgSim::Math::addSubMatrix;
@@ -321,8 +292,7 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
 
 	// Make sure the mass matrix has been properly allocated
-	// It does not need to be zeroed out, as it will be directly set
-	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), false);
+	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), true);
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
 	SurgSim::Math::resizeMatrix(&m_D, state.getNumDof(), state.getNumDof(), true);
@@ -355,7 +325,7 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 	addGravityForce(&m_f, state);
 
 	// Add the Rayleigh damping force to m_f (using the damping matrix)
-	addRayleighDampingForce(&m_f, state, true);
+	addRayleighDampingForce(&m_f, state, true, true);
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
@@ -381,8 +351,8 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 	*K = &m_K;
 }
 
-void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const DeformableRepresentationState& state,
-	bool useGlobalDampingMatrix, bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
+void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const SurgSim::Math::OdeState& state,
+	bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
 {
 	using SurgSim::Math::getSubVector;
 	using SurgSim::Math::addSubVector;
@@ -393,53 +363,45 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Defo
 	double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const Vector& v = state.getVelocities();
 
-	// If we have the damping matrix build (D = rayleighMass.M + rayleighStiffness.K), F = -D.v(t)
-	if (useGlobalDampingMatrix && (rayleighStiffness != 0.0 || rayleighMass != 0.0))
+	// Rayleigh damping mass: F = - rayleighMass.M.v(t)
+	if (rayleighMass != 0.0)
 	{
-		*force -= scale * (m_D * v);
-	}
-	else // Otherwise we unroll the calculation separately on the mass and stiffness components
-	{
-		// Rayleigh damping mass: F = - rayleighMass.M.v(t)
-		if (rayleighMass != 0.0)
+		// If we have the mass matrix, we can compute directly F = -rayleighMass.M.v(t)
+		if (useGlobalMassMatrix)
 		{
-			// If we have the mass matrix, we can compute directly F = -rayleighMass.M.v(t)
-			if (useGlobalMassMatrix)
+			// M is diagonal, take advantage of it...
+			*force -= (scale * rayleighMass) * (m_M.diagonal().cwiseProduct(v));
+		}
+		else
+		{
+			for (unsigned int nodeID = 0; nodeID < getNumMasses(); nodeID++)
 			{
-				// M is diagonal, take advantage of it...
-				*force -= (scale * rayleighMass) * (m_M.diagonal().cwiseProduct(v));
-			}
-			else
-			{
-				for (unsigned int nodeID = 0; nodeID < getNumMasses(); nodeID++)
-				{
-					double mass = getMass(nodeID)->getMass();
-					SurgSim::Math::Vector3d f = - scale * rayleighMass * mass * getSubVector(v, nodeID, 3);
-					addSubVector(f, nodeID, 3, force);
-				}
+				double mass = getMass(nodeID)->getMass();
+				SurgSim::Math::Vector3d f = - scale * rayleighMass * mass * getSubVector(v, nodeID, 3);
+				addSubVector(f, nodeID, 3, force);
 			}
 		}
+	}
 
-		// Rayleigh damping stiffness: F = - rayleighStiffness.K.v(t)
-		if (rayleighStiffness != 0.0)
+	// Rayleigh damping stiffness: F = - rayleighStiffness.K.v(t)
+	if (rayleighStiffness != 0.0)
+	{
+		if (useGlobalStiffnessMatrix)
 		{
-			if (useGlobalStiffnessMatrix)
+			*force -= scale * rayleighStiffness * (m_K * v);
+		}
+		else
+		{
+			// Otherwise, we loop through each fem element to compute its contribution
+			for (auto spring = std::begin(m_springs); spring != std::end(m_springs); ++spring)
 			{
-				*force -= scale * rayleighStiffness * (m_K * v);
-			}
-			else
-			{
-				// Otherwise, we loop through each fem element to compute its contribution
-				for (auto spring = std::begin(m_springs); spring != std::end(m_springs); ++spring)
-				{
-					(*spring)->addMatVec(state, 0.0, - scale * rayleighStiffness, v, force);
-				}
+				(*spring)->addMatVec(state, 0.0, - scale * rayleighStiffness, v, force);
 			}
 		}
 	}
 }
 
-void MassSpringRepresentation::addSpringsForce(Vector *force, const DeformableRepresentationState& state, double scale)
+void MassSpringRepresentation::addSpringsForce(Vector *force, const SurgSim::Math::OdeState& state, double scale)
 {
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
@@ -447,7 +409,7 @@ void MassSpringRepresentation::addSpringsForce(Vector *force, const DeformableRe
 	}
 }
 
-void MassSpringRepresentation::addGravityForce(Vector *f, const DeformableRepresentationState& state, double scale)
+void MassSpringRepresentation::addGravityForce(Vector *f, const SurgSim::Math::OdeState& state, double scale)
 {
 	using SurgSim::Math::addSubVector;
 
@@ -483,18 +445,11 @@ static void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& tra
 	}
 }
 
-void MassSpringRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,
+void MassSpringRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 	const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-	transformVectorByBlockOf3(transform, &state->getAccelerations(), true);
-}
-
-bool MassSpringRepresentation::isValidState(const DeformableRepresentationState &state) const
-{
-	return SurgSim::Math::isValid(state.getPositions())
-		&& SurgSim::Math::isValid(state.getVelocities());
 }
 
 void MassSpringRepresentation::deactivateAndReset(void)
@@ -502,8 +457,7 @@ void MassSpringRepresentation::deactivateAndReset(void)
 	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
 		<< getName() << " deactivated and reset:" << std::endl
 		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
-		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl
-		<< "acceleration=(" << m_currentState->getAccelerations() << ")" << std::endl;
+		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
 
 	resetState();
 	setIsActive(false);

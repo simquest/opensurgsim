@@ -15,12 +15,11 @@
 
 #include "SurgSim/Blocks/MassSpring2DRepresentation.h"
 #include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
-
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
-using SurgSim::Physics::DeformableRepresentationState;
-using SurgSim::Physics::Mass;
 using SurgSim::Math::Vector3d;
+using SurgSim::Physics::Mass;
 
 namespace SurgSim
 {
@@ -28,7 +27,7 @@ namespace SurgSim
 namespace Blocks
 {
 
-void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<DeformableRepresentationState> state,
+void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int numNodesPerDim[2], double stiffness, double damping)
 {
 	const int rowOffset = numNodesPerDim[0];
@@ -58,7 +57,7 @@ void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<D
 	}
 }
 
-void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<DeformableRepresentationState> state,
+void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int numNodesPerDim[2], double stiffness, double damping)
 {
 	const int rowOffset = numNodesPerDim[0];
@@ -88,7 +87,7 @@ void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<Defo
 	}
 }
 
-void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr<DeformableRepresentationState> state,
+void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
 	unsigned int numNodesPerDim[2], double stiffness, double damping)
 {
 	const int rowOffset = numNodesPerDim[0];
@@ -112,14 +111,14 @@ void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr
 void MassSpring2DRepresentation::init2D(
 	const std::array<std::array<Vector3d, 2>, 2> extremities,
 	unsigned int numNodesPerDim[2],
-	std::vector<unsigned int> boundaryConditions,
+	std::vector<unsigned int> nodeBoundaryConditions,
 	double totalMass,
 	double stiffnessStretching, double dampingStretching,
 	double stiffnessBending, double dampingBending,
 	double stiffnessFaceDiagonal, double dampingFaceDiagonal)
 {
-	std::shared_ptr<DeformableRepresentationState> state;
-	state = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Math::OdeState> state;
+	state = std::make_shared<SurgSim::Math::OdeState>();
 	state->setNumDof(getNumDofPerNode(), numNodesPerDim[0] * numNodesPerDim[1]);
 
 	SURGSIM_ASSERT(numNodesPerDim[0] > 0) << "Number of nodes for dimension 1 is incorrect: " << numNodesPerDim[0];
@@ -161,8 +160,8 @@ void MassSpring2DRepresentation::init2D(
 	init2DFaceDiagonalSprings(state, numNodesPerDim, stiffnessFaceDiagonal, dampingFaceDiagonal);
 
 	// Sets the boundary conditions
-	for (auto boundaryCondition = std::begin(boundaryConditions);
-		boundaryCondition != std::end(boundaryConditions);
+	for (auto boundaryCondition = std::begin(nodeBoundaryConditions);
+		boundaryCondition != std::end(nodeBoundaryConditions);
 		boundaryCondition++)
 	{
 		state->addBoundaryCondition(*boundaryCondition);

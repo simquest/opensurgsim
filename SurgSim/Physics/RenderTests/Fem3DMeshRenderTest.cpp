@@ -13,27 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
-#include "SurgSim/Physics/RenderTests/RenderTest.h"
-
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/OdeSolver.h"
-#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
-#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/Graphics/OsgAxesRepresentation.h"
-#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
-#include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
-#include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/Behavior.h"
-
-#include <memory>
+#include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::DataStructures::EmptyData;
@@ -140,7 +140,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	auto femToMesh =
-		std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
+		std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
 			name + " physics to triangle mesh",
 			fem->getFinalState(),
 			graphics->getMesh());
@@ -178,7 +178,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	sceneElement->addComponent(pointCloud);
 
 	// The behavior which transfers the position of the vertices in the FEM to locations in the point cloud
-	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<EmptyData>>(
+	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<EmptyData>>(
 						  "fem to point cloud",
 						  fem->getFinalState(),
 						  pointCloud->getVertices());
@@ -190,8 +190,8 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 TEST_F(RenderTests, MeshRenderTest)
 {
-	auto data = runtime->getApplicationData();
-	auto filename = data->findFile("Fem3DMeshRenderTest/wound_deformable.ply");
+	SurgSim::Framework::ApplicationData data("config.txt");
+	auto filename = data.findFile("Geometry/wound_deformable.ply");
 
 	auto fem = createFemSceneElement("Fem", filename, SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 

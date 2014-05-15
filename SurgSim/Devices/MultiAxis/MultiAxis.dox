@@ -1,0 +1,23 @@
+/*!
+
+\page MultiAxis MultiAxis: 3D Mouse Device (e.g, 3Dconnexion SpaceNavigator)
+
+3D mice (aka 3D motion controllers, 3D navigation devices, or 6 DOF devices) are input devices similar to typical computer mice, but enabling control of position and orientation.  They are commonly used to operate CAD, 3D modeling, and animation applications.
+
+Supported devices:
+- 3Dconnexion
+  - The SpaceNavigator is tested, other models are expected to work.
+
+Dependencies:
+  - Linux: No requirements.
+    - If experiencing difficulties:
+	  -# check the udev rules
+	    - By default, regular users on most Linux systems DO NOT have the permissions necessary to access the multi-axis controller devices on their system.  Fortunately, the permissions that are set on those devices are usually relatively easy to configure using udev rules.
+		- To allow all users direct access to various 3DConnexion devices, you can simply copy the rules file from the udev-rules directory into the system directory <tt>/etc/udev/rules.d</tt>.  (You will need administrative privileges to do so.)  For example, on many systems you can run: <tt>sudo cp SurgSim/Devices/MultiAxis/udev-rules/90-3dconnexion.rules /etc/udev/rules.d</tt>
+		- For other devices, or to set up the privileges differently, you will need to set up your own rules file.
+	  -# try the drivers provided by 3Dconnexion http://www.3dconnexion.com/service/drivers.html
+  - Windows: Drivers from 3Dconnexion http://www.3dconnexion.com/service/drivers.html
+    - Visual Studio 2012+: No further requirements.
+	- Other build tools: May require Windows Driver Kit (WDK), available from http://www.microsoft.com/en-us/default.aspx
+
+*/

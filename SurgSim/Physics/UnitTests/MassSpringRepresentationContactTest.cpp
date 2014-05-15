@@ -16,15 +16,15 @@
 #include <memory>
 
 #include <gtest/gtest.h>
+
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/MassSpringRepresentationContact.h"
 #include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
-
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Vector.h"
 
 namespace
 {
@@ -42,7 +42,7 @@ class MassSpringRepresentationContactTest : public ::testing::Test
 {
 public:
 	void SetUp() {
-		// Define plane with positive y component.
+		// Define plane normal
 		m_n = Vector3d(0.8539, 0.6289, -0.9978);
 		m_n.normalize();
 
@@ -69,7 +69,6 @@ public:
 		// Forward euler for velocity, backward euler for position
 		m_massSpring->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
 
-		m_massSpring->setIsActive(true);
 		m_massSpring->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		m_massSpring->wakeUp();
 

@@ -17,7 +17,6 @@
 #define SURGSIM_MATH_ODESOLVEREULEREXPLICITMODIFIED_H
 
 #include "SurgSim/Math/OdeSolver.h"
-#include "SurgSim/Math/LinearSolveAndInverse.h"
 
 namespace SurgSim
 {
@@ -33,45 +32,18 @@ namespace Math
 /// \note By simply using the newly computed velocity in the position update, the method gains in stability:
 /// \note { x(t+dt) = x(t) + dt.v(t+dt)
 /// \note { v(t+dt) = v(t) + dt.a(t)
-/// \tparam State Type of the state y=(x v)
-/// \tparam MT Type of the matrix M
-/// \tparam DT Type of the matrix D
-/// \tparam KT Type of the matrix K
-/// \tparam ST Type of the system matrix (linear combination of M, D, K)
-/// \note State is expected to hold on to the dof derivatives and have the API:
-/// \note   Vector& getPositions();
-/// \note   Vector& getVelocities();
-/// \note   Vector& getAccelerations();
-template <class State, class MT, class DT, class KT, class ST>
-class OdeSolverEulerExplicitModified : public OdeSolver<State, MT, DT, KT, ST>
+class OdeSolverEulerExplicitModified : public OdeSolver
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverEulerExplicitModified(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverEulerExplicitModified(OdeEquation* equation);
 
-	virtual void solve(double dt, const State& currentState, State* newState) override;
-
-private:
-	/// Helper class to solve and inverse a system of linear equations
-	/// Optimized with the matrix type
-	SolveAndInverse<MT> m_solveAndInverse;
-
-	/// Temporary matrix to modify the mass matrix into the system matrix while keeping the proper type
-	MT m_MsystemMatrix;
-
-public:
-	// Variables used from OdeSolver
-	using OdeSolver<State, MT, DT, KT, ST>::m_name;
-	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
-	using OdeSolver<State, MT, DT, KT, ST>::m_systemMatrix;
-	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 };
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#include "SurgSim/Math/OdeSolverEulerExplicitModified-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVEREULEREXPLICITMODIFIED_H

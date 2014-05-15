@@ -16,11 +16,18 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
 
-#include "SurgSim/Math/Shape.h"
-#include "SurgSim/Math/Valid.h"
+#include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
+
+namespace Math
+{
+class Shape;
+}
 
 namespace Physics
 {
@@ -35,57 +42,35 @@ namespace Physics
 /// \note At any moment, you can always overwrite mass/inertia with values
 /// \note of your own.
 /// \note Setting the mass directly will discard the mass density (reset to 0).
-class RigidRepresentationParameters
+class RigidRepresentationParameters : public SurgSim::Framework::Accessible
 {
 public:
 	/// Default constructor
-	RigidRepresentationParameters()
-		: m_rho(0.0), m_linearDamping(0.0), m_angularDamping(0.0), m_isValid(false)
-	{
-		m_massCenter.setZero();
+	RigidRepresentationParameters();
 
-		// Only mass and inertia are initialized with qNaN because they are
-		// the only 2 variables on which the validity test relies on.
-		m_mass = std::numeric_limits<double>::quiet_NaN();
-		m_localInertia.setConstant(std::numeric_limits<double>::quiet_NaN());
-	}
+	/// Copy Constructor
+	/// \param rhs Right hand side RigidRepresentationParameters used to initialize a new RigidRepresentationParameters
+	RigidRepresentationParameters(const RigidRepresentationParameters& rhs);
+
+	/// Copy assignment
+	/// \param rhs Right hand side RigidRepresentationParameters from which data are copied.
+	/// \note 'm_functors' in base class Accessible is NOT copied.
+	RigidRepresentationParameters& operator=(const RigidRepresentationParameters& rhs);
 
 	/// Destructor
-	virtual ~RigidRepresentationParameters()
-	{
-	}
+	virtual ~RigidRepresentationParameters();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentationParameters);
 
 	/// Comparison operator
-	/// \param c A RigidRepresentationParameters to compare it to
+	/// \param rhs A RigidRepresentationParameters to compare it to
 	/// \return True if the 2 parameters set are equals, False otherwise
-	bool operator ==(const RigidRepresentationParameters &c) const
-	{
-		using SurgSim::Math::isValid;
-
-		bool isMassEqual = m_mass == c.m_mass;
-		isMassEqual |= ! isValid(m_mass) && ! isValid(c.m_mass);
-
-		bool isInertiaEqual = m_localInertia == c.m_localInertia;
-		isInertiaEqual |= ! isValid(m_localInertia) && ! isValid(c.m_localInertia);
-
-		return (m_isValid == c.m_isValid &&
-			m_rho == c.m_rho &&
-			isMassEqual &&
-			m_linearDamping == c.m_linearDamping &&
-			m_angularDamping == c.m_angularDamping &&
-			m_massCenter == c.m_massCenter &&
-			isInertiaEqual &&
-			m_shapeForMassInertia == c.m_shapeForMassInertia &&
-			m_shapes == c.m_shapes);
-	}
+	bool operator==(const RigidRepresentationParameters& rhs) const;
 
 	/// Comparison operator (for difference)
-	/// \param c A RigidRepresentationParameters to compare it to
+	/// \param rhs A RigidRepresentationParameters to compare it to
 	/// \return False if the 2 parameters set are equals, True otherwise
-	bool operator !=(const RigidRepresentationParameters &c) const
-	{
-		return ! ((*this) == c);
-	}
+	bool operator!=(const RigidRepresentationParameters& rhs) const;
 
 	/// Set the mass density of the rigid representation
 	/// There is 2 ways to define a rigid representation mass/inertia:
@@ -95,28 +80,11 @@ public:
 	/// \note rho = 0, resets the density and keeps the mass/inertia as is.
 	/// \note rho != 0 will overwrite mass/inertia using the given mesh/shape
 	/// \note if any.
-	void setDensity(double rho)
-	{
-		m_rho = rho;
-
-		/// Lets update the mass, mass-center and inertia if possible
-		if (m_rho && m_shapeForMassInertia)
-		{
-			// If a shape overwrite a mesh, the shape should be used !
-			m_mass         = m_rho * m_shapeForMassInertia->getVolume();
-			m_massCenter   = m_shapeForMassInertia->getCenter();
-			m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentOfVolume();
-
-			m_isValid = checkValidity();
-		}
-	}
+	void setDensity(double rho);
 
 	/// Get the mass density of the rigid representation
 	/// \return The density if it has been provided, 0 otherwise (in Kg.m-3)
-	double getDensity() const
-	{
-		return m_rho;
-	}
+	double getDensity() const;
 
 	/// Set the mass of the rigid body
 	/// There is 2 ways to define a rigid representation mass/inertia:
@@ -124,161 +92,82 @@ public:
 	/// * Set the mass/inertia directly
 	/// \param mass The mass (in Kg)
 	/// This reset the density to 0 (unknown)
-	void setMass(double mass)
-	{
-		m_mass = mass;
-
-		m_rho = 0.0; // Invalidate the density information
-					 // Density is not automcatically computed, only set
-
-		m_isValid = checkValidity();
-	}
+	void setMass(double mass);
 
 	/// Get the mass of the rigid body
 	/// \return The mass (in Kg)
-	double getMass() const
-	{
-		return m_mass;
-	}
+	double getMass() const;
 
 	/// Get the mass center of the rigid body
 	/// \return The mass center (in local coordinate)
-	const SurgSim::Math::Vector3d& getMassCenter() const
-	{
-		return m_massCenter;
-	}
+	const SurgSim::Math::Vector3d& getMassCenter() const;
 
 	/// Set the local inertia of the rigid body
-	/// \param localInertia The inertia 3x3 symetric matrix of the object
+	/// \param localInertia The inertia 3x3 symmetric matrix of the object
 	/// This overwrites any previously computed/set local inertia
-	void setLocalInertia(const SurgSim::Math::Matrix33d& localInertia)
-	{
-		m_localInertia = localInertia;
-
-		m_isValid = checkValidity();
-	}
+	void setLocalInertia(const SurgSim::Math::Matrix33d& localInertia);
 
 	/// Get the local inertia 3x3 matrix of the rigid body
 	/// \return The inertia 3x3 matrix of the object
-	const SurgSim::Math::Matrix33d& getLocalInertia() const
-	{
-		return m_localInertia;
-	}
+	const SurgSim::Math::Matrix33d& getLocalInertia() const;
 
 	/// Set the linear damping parameter
 	/// \param linearDamping The linear damping parameter (in N.s.m-1)
-	void setLinearDamping(double linearDamping)
-	{
-		m_linearDamping = linearDamping;
-	}
+	void setLinearDamping(double linearDamping);
 
 	/// Get the linear damping parameter
 	/// \return The linear damping parameter (in N.s.m-1)
-	double getLinearDamping() const
-	{
-		return m_linearDamping;
-	}
+	double getLinearDamping() const;
 
 	/// Set the angular damping parameter
 	/// \param angularDamping The angular damping parameter (in N.m.s.rad-1)
-	void setAngularDamping(double angularDamping)
-	{
-		m_angularDamping = angularDamping;
-	}
+	void setAngularDamping(double angularDamping);
 
 	/// Get the angular damping parameter
 	/// \return The angular damping parameter (in N.m.s.rad-1)
-	double getAngularDamping() const
-	{
-		return m_angularDamping;
-	}
+	double getAngularDamping() const;
 
 	/// Add a shape to this rigid representation
 	/// \param shape A shape to add to this rigid representation
-	void addShape(const std::shared_ptr<SurgSim::Math::Shape> shape)
-	{
-		m_shapes.push_back(shape);
-	}
+	void addShape(const std::shared_ptr<SurgSim::Math::Shape> shape);
 
 	/// Remove a shape from this rigid representation
 	/// \param shape The shape to be detached from this rigid representation
 	/// \note Does nothing if the shape is not found
-	void removeShape(const std::shared_ptr<SurgSim::Math::Shape> shape)
-	{
-		auto it = std::find(m_shapes.begin(), m_shapes.end(), shape);
-		if (it != m_shapes.end())
-		{
-			m_shapes.erase(it);
-		}
-
-		if (m_shapeForMassInertia == shape)
-		{
-			m_shapeForMassInertia = nullptr;
-		}
-	}
+	void removeShape(const std::shared_ptr<SurgSim::Math::Shape> shape);
 
 	/// Get all the shapes associated to this rigid representation
 	/// \return The vector containing all the shapes
-	std::vector<std::shared_ptr<SurgSim::Math::Shape>> getShapes() const
-	{
-		return m_shapes;
-	}
+	std::vector<std::shared_ptr<SurgSim::Math::Shape>> getShapes() const;
 
 	/// Set the shape to use internally for physical parameters computation
 	/// \param shape The shape to use for the mass/inertia calculation
 	/// \note Also add the shape to the shape list if it has not been added yet
-	void setShapeUsedForMassInertia(const std::shared_ptr<SurgSim::Math::Shape> shape)
-	{
-		m_shapeForMassInertia = shape;
-
-		if (shape == nullptr)
-		{
-			return;
-		}
-
-		if (std::find(m_shapes.begin(), m_shapes.end(), shape) == m_shapes.end())
-		{
-			addShape(shape);
-		}
-
-		if (m_rho && m_shapeForMassInertia)
-		{
-			m_mass         = m_rho * m_shapeForMassInertia->getVolume();
-			m_massCenter   = m_shapeForMassInertia->getCenter();
-			m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentOfVolume();
-
-			m_isValid = checkValidity();
-		}
-	}
+	void setShapeUsedForMassInertia(const std::shared_ptr<SurgSim::Math::Shape> shape);
 
 	/// Get the shape used internally for physical parameters computation
 	/// \return The shape used for calculation, nullptr if none exist
-	const std::shared_ptr<SurgSim::Math::Shape> getShapeUsedForMassInertia() const
-	{
-		return m_shapeForMassInertia;
-	}
+	const std::shared_ptr<SurgSim::Math::Shape> getShapeUsedForMassInertia() const;
 
-		/// Test if the the parameters are fully set and ready
+	/// Test if the the parameters are fully set and ready
 	/// \return True if mass and inertia are defined, False otherwise
 	/// A rigid body simulation needs these 2 parameters to be defined
-	bool isValid() const
-	{
-		return m_isValid;
-	}
+	bool isValid() const;
 
 private:
 	/// Check the validity of the parameters
 	/// \return True if mass/inertia are valid and non null, False otherwise
-	bool checkValidity() const
-	{
-		using SurgSim::Math::isValid;
-		if (isValid(m_localInertia) && ! m_localInertia.isZero() && m_localInertia.diagonal().minCoeff() > 0.0 &&
-			isValid(m_mass) && m_mass > 0.0)
-		{
-			return true;
-		}
-		return false;
-	}
+	bool checkValidity() const;
+
+	/// Internal helper functions to update the mass, mass-center and inertia
+	/// when density and/or shape used for mass inertia is updated.
+	void updateProperties();
+
+	/// Register accessors of serializable properties
+	void addSerializableProperty();
+
+	/// Validity of the set of parameters
+	bool m_isValid;
 
 	/// Density of the object (in Kg.m-3)
 	double m_rho;
@@ -286,30 +175,28 @@ private:
 	/// Total mass of the object (in Kg)
 	double m_mass;
 
-	/// Mass-center of the object
-	SurgSim::Math::Vector3d m_massCenter;
-
-	/// Inertia matrix in local coordinates
-	SurgSim::Math::Matrix33d m_localInertia;
-
 	/// Linear damping parameter (in N.s.m-1 or Kg.s-1)
 	double m_linearDamping;
 
 	/// Angular damping parameter (in N.m.s.rad-1)
 	double m_angularDamping;
 
-	/// Shapes associated to this rigid representation
+	/// Mass-center of the object
+	SurgSim::Math::Vector3d m_massCenter;
+
+	/// Inertia matrix in local coordinates
+	SurgSim::Math::Matrix33d m_localInertia;
+
+	/// Shapes associated with this rigid representation.
+	/// Different shape representations could be used for different purposes.
+	/// For example, one shape for rigid inertia and another shape for collision detection.
 	std::vector<std::shared_ptr<SurgSim::Math::Shape>>  m_shapes;
 
 	/// Shape to be used for the mass/inertia calculation
 	std::shared_ptr<SurgSim::Math::Shape> m_shapeForMassInertia;
-
-	/// Validity of the set of parameters
-	bool m_isValid;
 };
 
-}; // Physics
-
-}; // SurgSim
+}; // namespace Physics
+}; // namespace SurgSim
 
 #endif // SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H

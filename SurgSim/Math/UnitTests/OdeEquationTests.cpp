@@ -41,10 +41,10 @@ TEST(OdeEquationTests, GetInitialStateTest)
 	ASSERT_NE(nullptr, m.getInitialState());
 	EXPECT_EQ(3, m.getInitialState()->getPositions().size());
 	EXPECT_EQ(3, m.getInitialState()->getVelocities().size());
-	EXPECT_EQ(3, m.getInitialState()->getAccelerations().size());
-	EXPECT_TRUE(m.getInitialState()->getPositions().isZero());
-	EXPECT_TRUE(m.getInitialState()->getVelocities().isZero());
-	EXPECT_TRUE(m.getInitialState()->getAccelerations().isZero());
+	SurgSim::Math::Vector3d expectedX = SurgSim::Math::Vector3d::LinSpaced(1.0, 1.3);
+	EXPECT_TRUE(m.getInitialState()->getPositions().isApprox(expectedX));
+	SurgSim::Math::Vector3d expectedV = SurgSim::Math::Vector3d::LinSpaced(0.4, -0.3);
+	EXPECT_TRUE(m.getInitialState()->getVelocities().isApprox(expectedV));
 }
 
 TEST(OdeEquationTests, ComputesTest)

@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/LinearSolveAndInverse.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 
 namespace
@@ -61,12 +63,26 @@ RepresentationType Fem1DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM1D;
 }
 
-void Fem1DRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,
+bool Fem1DRepresentation::doWakeUp()
+{
+	using SurgSim::Math::LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix;
+
+	if (!FemRepresentation::doWakeUp())
+	{
+		return false;
+	}
+
+	// Make use of a specialized linear solver for symmetric tri-diagonal block matrix of block size 6
+	m_odeSolver->setLinearSolver(std::make_shared<LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<6>>());
+
+	return true;
+}
+
+void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 										 const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-	transformVectorByBlockOf3(transform, &state->getAccelerations(), true);
 }
 
 } // namespace Physics

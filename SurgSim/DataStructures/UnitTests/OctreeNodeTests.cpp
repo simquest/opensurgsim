@@ -67,6 +67,18 @@ TEST(OctreeNodeTests, InitialValues)
 	}
 }
 
+TEST(OctreeNodeTests, SetIsActive)
+{
+	SurgSim::Math::Aabbd expectedBoundingBox(Vector3d::Zero(), Vector3d::Ones());
+	OctreeNodeType octree(expectedBoundingBox);
+
+	octree.setIsActive(true);
+	EXPECT_TRUE(octree.isActive());
+
+	octree.setIsActive(false);
+	EXPECT_FALSE(octree.isActive());
+}
+
 TEST(OctreeNodeTests, Subdivide)
 {
 	SurgSim::Math::Aabbd boundingBox(Vector3d::Zero(), Vector3d::Ones() * 16.0);

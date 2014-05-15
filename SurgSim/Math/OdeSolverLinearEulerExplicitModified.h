@@ -25,34 +25,25 @@ namespace Math
 {
 
 /// Linear Version of the Modified Euler Explicit ode solver
-/// This solver assumes that the system is linear, ie that Mass,
-/// Damping, and Stiffness matrices do not change.
-template <class State, class MT, class DT, class KT, class ST>
-class OdeSolverLinearEulerExplicitModified : public OdeSolverEulerExplicitModified<State, MT, DT, KT, ST>
+/// This solver assumes that the system is linear,
+/// ie that Mass, Damping, and Stiffness matrices do not change.
+class OdeSolverLinearEulerExplicitModified : public OdeSolverEulerExplicitModified
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverLinearEulerExplicitModified(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverLinearEulerExplicitModified(OdeEquation* equation);
 
-	virtual void solve(double dt, const State& currentState, State* newState) override;
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
 private:
 	/// Has the solver been initialized
 	bool m_initialized;
-
-public:
-	// Variables used from OdeSolver
-	using OdeSolver<State, MT, DT, KT, ST>::m_name;
-	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
-	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
 };
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#include "SurgSim/Math/OdeSolverLinearEulerExplicitModified-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVERLINEAREULEREXPLICITMODIFIED_H
 

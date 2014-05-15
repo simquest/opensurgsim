@@ -291,7 +291,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 						   Vector3d(-0.5, 0.5, static_cast<double>(i) / numTriangles),
 						   Vector3d(0.0, -0.5, static_cast<double>(i) / numTriangles));
 			expectedDepth = static_cast<double>(i) / numTriangles;
-			if (expectedDepth > 0.5)
+			if (expectedDepth >= 0.5)
 			{
 				expectedDepth = 0.5;
 				expectedNormal = pose.linear() * Vector3d(0,1,0);
@@ -308,6 +308,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			{
 				expectedPenetrationPoints.first.globalPosition.setValue(expectedPoint0);
 				expectedPenetrationPoints.second.globalPosition.setValue(expectedPoint1);
+				expectedPenetrationPoints.first.triangleId.setValue(i);
+				expectedPenetrationPoints.second.triangleId.setValue(0);
 				auto contact = std::make_shared<Contact>(expectedDepth, expectedContact, expectedNormal,
 														 expectedPenetrationPoints);
 				expectedContacts.push_back(contact);

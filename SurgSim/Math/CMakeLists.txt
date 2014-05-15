@@ -32,6 +32,19 @@ set(SURGSIM_MATH_SOURCES
 	MlcpGaussSeidelSolver.cpp
 	MlcpProblem.cpp
 	OctreeShape.cpp
+	OdeEquation.cpp
+	OdeSolver.cpp
+	OdeSolverEulerExplicit.cpp
+	OdeSolverEulerExplicitModified.cpp
+	OdeSolverEulerImplicit.cpp
+	OdeSolverLinearEulerExplicit.cpp
+	OdeSolverLinearEulerExplicitModified.cpp
+	OdeSolverLinearEulerImplicit.cpp
+	OdeSolverLinearRungeKutta4.cpp
+	OdeSolverLinearStatic.cpp
+	OdeSolverRungeKutta4.cpp
+	OdeSolverStatic.cpp
+	OdeState.cpp
 	PlaneShape.cpp
 	Shape.cpp
 	SphereShape.cpp
@@ -47,6 +60,7 @@ set(SURGSIM_MATH_HEADERS
 	GaussLegendreQuadrature.h
 	Geometry.h
 	LinearSolveAndInverse.h
+	LinearSolveAndInverse-inl.h
 	MathConvert.h
 	MathConvert-inl.h
 	Matrix.h
@@ -61,25 +75,18 @@ set(SURGSIM_MATH_HEADERS
 	OctreeShape.h
 	OctreeShape-inl.h
 	OdeEquation.h
-	OdeEquation-inl.h
 	OdeSolver.h
-	OdeSolver-inl.h
 	OdeSolverEulerExplicit.h
-	OdeSolverEulerExplicit-inl.h
 	OdeSolverEulerExplicitModified.h
-	OdeSolverEulerExplicitModified-inl.h
 	OdeSolverEulerImplicit.h
-	OdeSolverEulerImplicit-inl.h
 	OdeSolverLinearEulerExplicit.h
-	OdeSolverLinearEulerExplicit-inl.h
 	OdeSolverLinearEulerExplicitModified.h
-	OdeSolverLinearEulerExplicitModified-inl.h
 	OdeSolverLinearEulerImplicit.h
-	OdeSolverLinearEulerImplicit-inl.h
+	OdeSolverLinearRungeKutta4.h
 	OdeSolverLinearStatic.h
-	OdeSolverLinearStatic-inl.h
+	OdeSolverRungeKutta4.h
 	OdeSolverStatic.h
-	OdeSolverStatic-inl.h
+	OdeState.h
 	PlaneShape.h
 	Quaternion.h
 	RigidTransform.h
@@ -88,6 +95,8 @@ set(SURGSIM_MATH_HEADERS
 	SphereShape.h
 	SurfaceMeshShape.h
 	SurfaceMeshShape-inl.h
+	TriangleTriangleContactCalculation-inl.h
+	TriangleTriangleIntersection-inl.h
 	Valid.h
 	Valid-inl.h
 	Vector.h

@@ -26,7 +26,6 @@ namespace SurgSim
 namespace Physics
 {
 
-class DeformableRepresentationState;
 class Fem3DRepresentation;
 
 /// Implementation of PlyReaderDelegate for polyhedral Fem3DRepresentation
@@ -128,7 +127,7 @@ private:
 	std::shared_ptr<Fem3DRepresentation> m_fem;
 
 	/// The state that will be created by loading
-	std::shared_ptr<DeformableRepresentationState> m_state;
+	std::shared_ptr<SurgSim::Math::OdeState> m_state;
 
 	/// Flag indicating whether the associated file has boundary conditions
 	bool m_hasBoundaryConditions;

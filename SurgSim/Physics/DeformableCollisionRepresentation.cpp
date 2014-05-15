@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
-
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/DeformableRepresentation.h"
 
 namespace
 {
@@ -75,6 +75,7 @@ void DeformableCollisionRepresentation::update(const double& dt)
 		m_mesh->setVertexPosition(nodeId, state->getPosition(nodeId));
 	}
 	m_mesh->update();
+	m_shape->updateAabbTree();
 }
 
 bool DeformableCollisionRepresentation::doInitialize()
@@ -116,12 +117,12 @@ const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::g
 }
 
 void DeformableCollisionRepresentation::setDeformableRepresentation(
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase>representation)
+	std::shared_ptr<SurgSim::Physics::DeformableRepresentation>representation)
 {
 	m_deformable = representation;
 }
 
-const std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase>
+const std::shared_ptr<SurgSim::Physics::DeformableRepresentation>
 	DeformableCollisionRepresentation::getDeformableRepresentation() const
 {
 	auto physicsRepresentation = m_deformable.lock();

@@ -17,7 +17,6 @@
 #define SURGSIM_MATH_ODESOLVEREULERIMPLICIT_H
 
 #include "SurgSim/Math/OdeSolver.h"
-#include "SurgSim/Math/LinearSolveAndInverse.h"
 
 namespace SurgSim
 {
@@ -36,42 +35,18 @@ namespace Math
 /// \note which leads to the integration scheme:
 /// \note { x(t+dt) = x(t) + dt.v(t+dt)
 /// \note { v(t+dt) = v(t) + dt.a(t+dt)
-/// \tparam State Type of the state y=(x v)
-/// \tparam MT Type of the matrix M
-/// \tparam DT Type of the matrix D
-/// \tparam KT Type of the matrix K
-/// \tparam ST Type of the system matrix (linear combination of M, D, K)
-/// \note State is expected to hold on to the dof derivatives and have the API:
-/// \note   Vector& getPositions();
-/// \note   Vector& getVelocities();
-/// \note   Vector& getAccelerations();
-template <class State, class MT, class DT, class KT, class ST>
-class OdeSolverEulerImplicit : public OdeSolver<State, MT, DT, KT, ST>
+class OdeSolverEulerImplicit : public OdeSolver
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	explicit OdeSolverEulerImplicit(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit OdeSolverEulerImplicit(OdeEquation* equation);
 
-	virtual void solve(double dt, const State& currentState, State* newState) override;
-
-private:
-	/// Helper variable to solve and inverse a system of linear equations
-	/// Optimized for the system matrix type
-	SolveAndInverse<ST> m_solveAndInverse;
-
-public:
-	// Variables used from OdeSolver
-	using OdeSolver<State, MT, DT, KT, ST>::m_name;
-	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
-	using OdeSolver<State, MT, DT, KT, ST>::m_systemMatrix;
-	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 };
 
 }; // namespace Math
 
 }; // namespace SurgSim
-
-#include "SurgSim/Math/OdeSolverEulerImplicit-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVEREULERIMPLICIT_H

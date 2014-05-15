@@ -29,8 +29,7 @@ namespace Physics
 {
 
 /// Finite Element Model 2D is a fem built with 2D FemElement
-class Fem2DRepresentation : public FemRepresentation<SurgSim::Math::Matrix, SurgSim::Math::Matrix,
-													 SurgSim::Math::Matrix, SurgSim::Math::Matrix>
+class Fem2DRepresentation : public FemRepresentation
 {
 public:
 	/// Constructor
@@ -43,7 +42,7 @@ public:
 	virtual RepresentationType getType() const override;
 
 protected:
-	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
+	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 								const SurgSim::Math::RigidTransform3d& transform) override;
 };
 

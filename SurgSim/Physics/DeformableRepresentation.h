@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file
+/// \file DeformableRepresentation.h
 /// Base class for all deformable representations (abstract class)
 
 #ifndef SURGSIM_PHYSICS_DEFORMABLEREPRESENTATION_H
@@ -21,11 +21,9 @@
 
 #include <memory>
 
-#include "SurgSim/Physics/DeformableRepresentationBase.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-
 #include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {
@@ -40,13 +38,12 @@ namespace Physics
 /// \note It holds the initial pose, which should be set before setting the initial state so the states
 /// \note   can be properly transformed.
 /// \note The current pose is always identity and therefore cannot be set. Calling setPose will raise an exception.
-/// \note It holds the force vector; the mass, damping and stiffness matrices (templated type)
+/// \note It holds the force vector; the mass, damping and stiffness matrices
 /// \note Derived classes must implement the Representation API and the OdeEquation API, also set
 /// \note   m_numDofPerNode and call Representation::setNumDof()
-template <class MType, class DType, class KType, class SType>
 class DeformableRepresentation :
-	public DeformableRepresentationBase,
-	public SurgSim::Math::OdeEquation<DeformableRepresentationState, MType, DType, KType, SType>
+	public Representation,
+	public SurgSim::Math::OdeEquation
 {
 public:
 	/// Constructor
@@ -58,13 +55,13 @@ public:
 
 	virtual void resetState() override;
 
-	virtual void setInitialState(std::shared_ptr<DeformableRepresentationState> initialState) override;
+	virtual void setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState);
 
-	virtual const std::shared_ptr<DeformableRepresentationState> getCurrentState() const override;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getCurrentState() const;
 
-	virtual const std::shared_ptr<DeformableRepresentationState> getPreviousState() const override;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getPreviousState() const;
 
-	virtual const std::shared_ptr<DeformableRepresentationState> getFinalState() const override;
+	virtual const std::shared_ptr<SurgSim::Math::OdeState> getFinalState() const;
 
 	/// Gets the number of degrees of freedom per node
 	/// \return The number of degrees of freedom per node for this Deformable Representation
@@ -72,6 +69,7 @@ public:
 
 	/// Sets the numerical integration scheme
 	/// \param integrationScheme The integration scheme to use
+	/// \note Calling setIntegrationScheme after the component has been awoken will raise an assert
 	void setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme);
 
 	/// Gets the numerical integration scheme
@@ -80,9 +78,11 @@ public:
 
 	/// Gets the compliance matrix associated with motion
 	/// \return The compliance matrix
+	/// \note The compliance matrix is computed automatically by the ode solver in the method 'update'
+	/// \note So one iteration needs to happen before retrieving a compliance matrix
 	const SurgSim::Math::Matrix& getComplianceMatrix() const;
 
-	virtual void beforeUpdate(double dt) override;
+	virtual void update(double dt) override;
 
 	virtual void afterUpdate(double dt) override;
 
@@ -94,39 +94,39 @@ public:
 		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
 protected:
-	bool doWakeUp() override;
+	virtual bool doWakeUp() override;
 
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
-	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
+	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 								const SurgSim::Math::RigidTransform3d& transform) = 0;
 
 	/// The previous state inside the calculation loop, this has no meaning outside of the loop
-	std::shared_ptr<DeformableRepresentationState> m_previousState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_previousState;
 
 	/// The currently calculated state inside the physics loop, after the whole calculation is done this will
 	/// become m_finalState
-	std::shared_ptr<DeformableRepresentationState> m_currentState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_currentState;
 
 	/// New state is a temporary variable to store the newly computed state
-	std::shared_ptr<DeformableRepresentationState> m_newState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_newState;
 
 	/// Last valid state (a.k.a final state)
 	/// \note Backup of the current state for thread-safety access while the current state is being recomputed.
-	std::shared_ptr<DeformableRepresentationState> m_finalState;
+	std::shared_ptr<SurgSim::Math::OdeState> m_finalState;
 
 	/// Force applied on the deformable representation
 	SurgSim::Math::Vector m_f;
 
 	/// Mass matrix (templated type for performance reason)
-	MType m_M;
+	SurgSim::Math::Matrix m_M;
 
 	/// Damping matrix (templated type for performance reason)
-	DType m_D;
+	SurgSim::Math::Matrix m_D;
 
 	/// Stiffness matrix (templated type for performance reason)
-	KType m_K;
+	SurgSim::Math::Matrix m_K;
 
 	/// Number of degrees of freedom per node (varies per deformable model)
 	/// \note MUST be set by the derived classes
@@ -139,25 +139,19 @@ protected:
 	bool m_needToReloadOdeSolver;
 
 	/// Ode solver (its type depends on the numerical integration scheme)
-	std::shared_ptr<SurgSim::Math::OdeSolver<DeformableRepresentationState, MType, DType, KType, SType>> m_odeSolver;
+	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;
 
 private:
 	/// NO copy constructor
-	DeformableRepresentation(const DeformableRepresentation& a);
+	DeformableRepresentation(const DeformableRepresentation&);
 
 	/// NO assignment operator
-	DeformableRepresentation& operator =(const DeformableRepresentation& a);
-
-	// Dependent names resolution (need to be in public/protected to be accessible in derived classes)
-public:
-	using SurgSim::Math::OdeEquation<DeformableRepresentationState, MType, DType, KType, SType>::m_initialState;
+	DeformableRepresentation& operator =(const DeformableRepresentation&);
 };
 
 }; // namespace Physics
 
 }; // namespace SurgSim
-
-#include "SurgSim/Physics/DeformableRepresentation-inl.h"
 
 #endif // SURGSIM_PHYSICS_DEFORMABLEREPRESENTATION_H
 

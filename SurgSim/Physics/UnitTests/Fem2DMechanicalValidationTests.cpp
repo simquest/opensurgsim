@@ -20,11 +20,12 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/FemElement2DTriangle.h"
+#include "SurgSim/Physics/Fem2DElementTriangle.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Vector;
@@ -92,7 +93,7 @@ public:
 	void setNodePositions(const std::vector<Vector3d>& nodes, const std::vector<size_t>& fixedNodes)
 	{
 		const size_t numDofPerNode = m_fem->getNumDofPerNode();
-		std::shared_ptr<DeformableRepresentationState> state = std::make_shared<DeformableRepresentationState>();
+		std::shared_ptr<SurgSim::Math::OdeState> state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(numDofPerNode, nodes.size());
 		for (size_t nodeId = 0; nodeId < nodes.size(); nodeId++)
 		{
@@ -100,17 +101,14 @@ public:
 		}
 		for (auto fixedNodeId = fixedNodes.begin(); fixedNodeId != fixedNodes.end(); fixedNodeId++)
 		{
-			for (size_t dofId = 0; dofId < numDofPerNode; dofId++)
-			{
-				state->addBoundaryCondition(numDofPerNode * (*fixedNodeId) + dofId);
-			}
+			state->addBoundaryCondition(*fixedNodeId);
 		}
 		m_fem->setInitialState(state);
 	}
 
 	void addTriangle(const std::array<unsigned int, 3>& t, double youngModulus, double poissonRatio, double thickness)
 	{
-		std::shared_ptr<FemElement2DTriangle> triangle = std::make_shared<FemElement2DTriangle>(t);
+		std::shared_ptr<Fem2DElementTriangle> triangle = std::make_shared<Fem2DElementTriangle>(t);
 		triangle->setYoungModulus(youngModulus);
 		triangle->setPoissonRatio(poissonRatio);
 		triangle->setMassDensity(1.0);  // In static mode, the mass density is not used, but it needs to be non null to
@@ -144,7 +142,7 @@ public:
 		}
 		for (size_t triangleId = 0; triangleId < m_fem->getNumFemElements(); triangleId++)
 		{
-			auto triangle = std::static_pointer_cast<FemElement2DTriangle>(m_fem->getFemElement(triangleId));
+			auto triangle = std::static_pointer_cast<Fem2DElementTriangle>(m_fem->getFemElement(triangleId));
 			unsigned int nodeId0 = triangle->getNodeId(0);
 			unsigned int nodeId1 = triangle->getNodeId(1);
 			unsigned int nodeId2 = triangle->getNodeId(2);
@@ -170,7 +168,9 @@ public:
 	void solve()
 	{
 		m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
-		const Matrix& K = m_fem->computeK(*(m_fem->getCurrentState()));
+		Matrix K = m_fem->computeK(*(m_fem->getCurrentState()));
+		m_fem->getCurrentState()->applyBoundaryConditionsToMatrix(&K);
+		m_fem->getCurrentState()->applyBoundaryConditionsToVector(&m_F);
 		m_U = K.inverse() * m_F;
 	}
 

@@ -16,22 +16,22 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationContact.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Physics::ContactConstraintData;
-using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::Fem3DRepresentationContact;
 using SurgSim::Physics::Fem3DRepresentationLocalization;
-using SurgSim::Physics::FemElement3DTetrahedron;
+using SurgSim::Physics::Fem3DElementTetrahedron;
 using SurgSim::Physics::FemRepresentationCoordinate;
 using SurgSim::Physics::MlcpPhysicsProblem;
 using SurgSim::Math::Vector3d;
@@ -48,13 +48,13 @@ static void addTetraheadron(Fem3DRepresentation *fem,
 							unsigned int node1,
 							unsigned int node2,
 							unsigned int node3,
-							const DeformableRepresentationState &state,
+							const SurgSim::Math::OdeState& state,
 							double massDensity = 1.0,
 							double poissonRatio = 0.1,
 							double youngModulus = 1.0)
 {
 	std::array<unsigned int, 4> nodes = {node0, node1, node2, node3};
-	auto element = std::make_shared<FemElement3DTetrahedron>(nodes);
+	auto element = std::make_shared<Fem3DElementTetrahedron>(nodes);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
 	element->setYoungModulus(youngModulus);
@@ -73,7 +73,7 @@ public:
 
 		// Create mock FEM
 		m_fem = std::make_shared<Fem3DRepresentation>("Fem3dRepresentation");
-		auto state = std::make_shared<DeformableRepresentationState>();
+		auto state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(3, 6);
 
 		// Place coordinates at
@@ -96,11 +96,11 @@ public:
 		addTetraheadron(m_fem.get(), 0, 1, 4, 5, *state);
 
 		m_fem->setInitialState(state);
-		m_fem->initialize(std::make_shared<Runtime>());
-		m_fem->wakeUp();
-
 		m_fem->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
 		m_fem->setIsActive(true);
+
+		m_fem->initialize(std::make_shared<Runtime>());
+		m_fem->wakeUp();
 
 		// Update model by one timestep
 		m_fem->beforeUpdate(dt);

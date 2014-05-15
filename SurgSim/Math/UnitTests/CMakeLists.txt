@@ -29,15 +29,21 @@ set(UNIT_TEST_SOURCES
 	OdeSolverEulerExplicitModifiedTests.cpp
 	OdeSolverEulerExplicitTests.cpp
 	OdeSolverEulerImplicitTests.cpp
+	OdeSolverRungeKutta4Tests.cpp
 	OdeSolverStaticTests.cpp
 	OdeSolverTests.cpp
+	OdeStateTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
+	TriangleTriangleContactCalculationTests.cpp
+	TriangleTriangleIntersectionTests.cpp
 	ValidTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
 	MockObject.h
+	MockTriangle.h
+	TriangleTriangleTestParameters.h
 )
 
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
