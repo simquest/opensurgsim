@@ -35,8 +35,8 @@ const double epsilonNumericalEvaluation = 1e-8;
 const double epsilonTestAgainstNumericalApproximation = 1e-7;
 
 Eigen::Matrix<double, 6, 6> KFormal(const Vector3d p0, const Vector3d p1,
-								    const Vector3d v0, const Vector3d v1,
-								    double l0, double stiffness, double damping)
+									const Vector3d v0, const Vector3d v1,
+									double l0, double stiffness, double damping)
 {
 	Vector3d u = p1 - p0;
 	double m_l = u.norm();
