@@ -65,7 +65,7 @@ public:
 
 	/// Sets the size of the cylinder
 	/// \param size Size of the cylinder
-	virtual void setSize(SurgSim::Math::Vector2d size) = 0;
+	virtual void setSize(const SurgSim::Math::Vector2d& size) = 0;
 	/// Returns the size of the cylinder
 	/// \return Size of the cylinder
 	virtual SurgSim::Math::Vector2d getSize() const = 0;

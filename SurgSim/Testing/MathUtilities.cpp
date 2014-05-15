@@ -39,9 +39,9 @@ SurgSim::Math::RigidTransform3d interpolatePose(
 	Vector3d angles = interpolate(startAngles, endAngles, t);
 	Vector3d position = interpolate(startPosition, endPosition, t);
 	return makeRigidTransform<Quaterniond,Vector3d>(
-		Quaterniond(makeRotationQuaternion<double,Eigen::DontAlign>(angles.x(), Vector3d::UnitX()) *
-		makeRotationQuaternion<double,Eigen::DontAlign>(angles.y(), Vector3d::UnitY()) *
-		makeRotationQuaternion<double,Eigen::DontAlign>(angles.z(), Vector3d::UnitZ())),
+		Quaterniond(makeRotationQuaternion(angles.x(), Vector3d::UnitX().eval()) *
+		makeRotationQuaternion(angles.y(), Vector3d::UnitY().eval()) *
+		makeRotationQuaternion(angles.z(), Vector3d::UnitZ().eval())),
 		position);
 }
 

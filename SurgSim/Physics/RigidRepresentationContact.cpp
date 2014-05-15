@@ -55,7 +55,7 @@ void RigidRepresentationContact::doBuild(double dt,
 	}
 
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE ? 1.0 : -1.0);
-	const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>& C = rigid->getComplianceMatrix();
+	const Eigen::Matrix<double, 6,6, Eigen::RowMajor>& C = rigid->getComplianceMatrix();
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
 	const double d = contactData.getDistance();

@@ -59,8 +59,8 @@ struct MlcpProblem
 	/// Destructor
 	virtual ~MlcpProblem();
 
-	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign> Matrix;
-	typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
 
 	/// Matrix \f$\mathbf{A}\f$ used to describe the mixed LCP problem.
 	Matrix A;

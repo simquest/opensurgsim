@@ -26,7 +26,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
-#include "SurgSim/Physics/FemElement3DCube.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Testing/MockPhysicsManager.h"
 
 using SurgSim::Math::Vector3d;
@@ -179,8 +179,8 @@ protected:
 						cubeNodeIds[0], cubeNodeIds[1], cubeNodeIds[3], cubeNodeIds[2],
 						cubeNodeIds[4], cubeNodeIds[5], cubeNodeIds[7], cubeNodeIds[6]};
 
-					// Add FemElement3DCube for each cube
-					std::shared_ptr<FemElement3DCube> femElement = std::make_shared<FemElement3DCube>(cube, *state);
+					// Add Fem3DElementCube for each cube
+					std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(cube, *state);
 					femElement->setMassDensity(980.0);   // 0.98 g/cm^-3 (2-part silicone rubber a.k.a. RTV6166)
 					femElement->setPoissonRatio(0.499);  // From the paper (near 0.5)
 					femElement->setYoungModulus(15.3e3); // 15.3 kPa (From the paper)

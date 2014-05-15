@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENT1DBEAM_H
-#define SURGSIM_PHYSICS_FEMELEMENT1DBEAM_H
+#ifndef SURGSIM_PHYSICS_FEM1DELEMENTBEAM_H
+#define SURGSIM_PHYSICS_FEM1DELEMENTBEAM_H
 
 #include <array>
 
@@ -32,13 +32,13 @@ namespace Physics
 /// J.S. Przemieniecki.  The deformation is based on linear elasticity theory and not on visco-elasticity theory;
 /// therefore, the element does not have any damping components.
 /// \note The element is considered to have a circular cross section.
-class FemElement1DBeam : public FemElement
+class Fem1DElementBeam : public FemElement
 {
 public:
 	/// Constructor
 	/// \param nodeIds An array of 2 node ids (A, B) defining this beam element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
-	FemElement1DBeam(std::array<unsigned int, 2> nodeIds);
+	Fem1DElementBeam(std::array<unsigned int, 2> nodeIds);
 
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam
@@ -154,27 +154,27 @@ protected:
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] k The stiffness matrix to store the result into
 	void computeStiffness(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* k);
+		Eigen::Matrix<double, 12, 12>* k);
 
 	/// Computes the beam's mass matrix
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] m The mass matrix to store the result into
-	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* m);
+	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 12, 12>* m);
 
 	/// The element's rest state
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_x0;
+	Eigen::Matrix<double, 12, 1> m_x0;
 
 	/// Initial rotation matrix for the element
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_R0;
+	Eigen::Matrix<double, 12, 12> m_R0;
 
 	/// Mass matrix (in global coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_M;
+	Eigen::Matrix<double, 12, 12> m_M;
 	/// Stiffness matrix (in local coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_MLocal;
+	Eigen::Matrix<double, 12, 12> m_MLocal;
 	/// Stiffness matrix (in global coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_K;
+	Eigen::Matrix<double, 12, 12> m_K;
 	/// Stiffness matrix (in local coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_KLocal;
+	Eigen::Matrix<double, 12, 12> m_KLocal;
 
 	/// Physical shear modulus G = E/( 2(1+mu) )
 	double m_G;
@@ -205,4 +205,4 @@ protected:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENT1DBEAM_H
+#endif // SURGSIM_PHYSICS_FEM1DELEMENTBEAM_H

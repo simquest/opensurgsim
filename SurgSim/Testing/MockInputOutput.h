@@ -13,10 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_TESTING_DEVICESUTILITIES_H
-#define SURGSIM_TESTING_DEVICESUTILITIES_H
+#ifndef SURGSIM_TESTING_MOCKINPUTOUTPUT_H
+#define SURGSIM_TESTING_MOCKINPUTOUTPUT_H
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Input/OutputProducerInterface.h"
 
@@ -38,8 +39,9 @@ public:
 	int m_numTimesReceivedInput;
 	int m_numTimesRequestedOutput;
 	SurgSim::DataStructures::DataGroup m_lastReceivedInput;
+	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::DataGroup> m_output;
 };
 
 };
 };
-#endif // SURGSIM_TESTING_DEVICESUTILITIES_H
+#endif // SURGSIM_TESTING_MOCKINPUTOUTPUT_H

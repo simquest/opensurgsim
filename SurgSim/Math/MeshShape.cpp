@@ -48,6 +48,7 @@ void MeshShape::setFileName(const std::string& fileName)
 	m_mesh = std::make_shared<TriangleMesh>(*m_initialMesh);
 	computeVolumeIntegrals();
 	updateAabbTree();
+	computeVolumeIntegrals();
 }
 
 std::string MeshShape::getFileName() const

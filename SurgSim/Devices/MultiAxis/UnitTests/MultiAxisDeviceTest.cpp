@@ -23,16 +23,12 @@
 #include <gtest/gtest.h>
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Testing/DevicesUtilities.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::Device::MultiAxisDevice;
 using SurgSim::DataStructures::DataGroup;
-using SurgSim::Input::InputConsumerInterface;
-using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Testing::MockInputOutput;
@@ -159,7 +155,7 @@ TEST(MultiAxisDeviceTest, InputConsumer)
 	EXPECT_FALSE(device->addInputConsumer(consumer));
 
 	// Sleep for a second, to see how many times the consumer is invoked.
-	// (A MultiAxis device updates internally at 60Hz, but our code currently runs at 120Hz to reduce latency.)
+	// (A MultiAxis device updates internally at 60Hz, but our code currently runs at 100Hz to reduce latency.)
 	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));

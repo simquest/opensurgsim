@@ -31,19 +31,19 @@ namespace Math
 
 /// A 2D rigid (isometric) transform, represented as floats.
 /// This type (and any struct that contain it) can be safely allocated via new.
-typedef Eigen::Transform<float,  2, Eigen::Isometry, Eigen::DontAlign>  RigidTransform2f;
+typedef Eigen::Transform<float,  2, Eigen::Isometry>  RigidTransform2f;
 
 /// A 3D rigid (isometric) transform, represented as floats.
 /// This type (and any struct that contain it) can be safely allocated via new.
-typedef Eigen::Transform<float,  3, Eigen::Isometry, Eigen::DontAlign>  RigidTransform3f;
+typedef Eigen::Transform<float,  3, Eigen::Isometry>  RigidTransform3f;
 
 /// A 2D rigid (isometric) transform, represented as doubles.
 /// This type (and any struct that contain it) can be safely allocated via new.
-typedef Eigen::Transform<double, 2, Eigen::Isometry, Eigen::DontAlign>  RigidTransform2d;
+typedef Eigen::Transform<double, 2, Eigen::Isometry>  RigidTransform2d;
 
 /// A 3D rigid (isometric) transform, represented as doubles.
 /// This type (and any struct that contain it) can be safely allocated via new.
-typedef Eigen::Transform<double, 3, Eigen::Isometry, Eigen::DontAlign>  RigidTransform3d;
+typedef Eigen::Transform<double, 3, Eigen::Isometry>  RigidTransform3d;
 
 
 /// Create a rigid transform using the specified rotation matrix and translation.

@@ -34,9 +34,9 @@ const double epsilon = 1e-10;
 const double epsilonNumericalEvaluation = 1e-8;
 const double epsilonTestAgainstNumericalApproximation = 1e-7;
 
-Eigen::Matrix<double, 6, 6, Eigen::DontAlign> KFormal(const Vector3d p0, const Vector3d p1,
-													  const Vector3d v0, const Vector3d v1,
-													  double l0, double stiffness, double damping)
+Eigen::Matrix<double, 6, 6> KFormal(const Vector3d p0, const Vector3d p1,
+									const Vector3d v0, const Vector3d v1,
+									double l0, double stiffness, double damping)
 {
 	Vector3d u = p1 - p0;
 	double m_l = u.norm();
@@ -48,7 +48,7 @@ Eigen::Matrix<double, 6, 6, Eigen::DontAlign> KFormal(const Vector3d p0, const V
 	K00 -= (u * u.transpose()) * (stiffness * (lRatio - 1.0) + 2.0 * damping * vRatio);
 	K00 += damping * (u * (v1 -v0).transpose()) / m_l;
 
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> K;
+	Eigen::Matrix<double, 6, 6> K;
 	K.setZero();
 
 	// Assembly stage in K
@@ -60,7 +60,7 @@ Eigen::Matrix<double, 6, 6, Eigen::DontAlign> KFormal(const Vector3d p0, const V
 	return K;
 }
 
-Eigen::Matrix<double, 6, 6, Eigen::DontAlign> DFormal(const Vector3d p0, const Vector3d p1,
+Eigen::Matrix<double, 6, 6> DFormal(const Vector3d p0, const Vector3d p1,
 			   const Vector3d v0, const Vector3d v1,
 			   double l0, double stiffness, double damping)
 {
@@ -69,7 +69,7 @@ Eigen::Matrix<double, 6, 6, Eigen::DontAlign> DFormal(const Vector3d p0, const V
 	Matrix33d D00 = damping * (u * u.transpose());
 
 	// Assembly stage in D
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> D;
+	Eigen::Matrix<double, 6, 6> D;
 	D.setZero();
 	SurgSim::Math::addSubMatrix( D00, 0, 0, 3, 3, &D);
 	SurgSim::Math::addSubMatrix(-D00, 0, 1, 3, 3, &D);
@@ -98,11 +98,11 @@ double f(int axis, const Vector3d p0, const Vector3d p1,
 	}
 }
 
-Eigen::Matrix<double, 6, 6, Eigen::DontAlign> KNumerical(const Vector3d p0, const Vector3d p1,
+Eigen::Matrix<double, 6, 6> KNumerical(const Vector3d p0, const Vector3d p1,
 			   const Vector3d v0, const Vector3d v1,
 			   double l0, double stiffness, double damping)
 {
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> dfdx;
+	Eigen::Matrix<double, 6, 6> dfdx;
 
 	for (size_t row = 0; row < 6; row++)
 	{
@@ -127,11 +127,11 @@ Eigen::Matrix<double, 6, 6, Eigen::DontAlign> KNumerical(const Vector3d p0, cons
 	return - dfdx;
 }
 
-Eigen::Matrix<double, 6, 6, Eigen::DontAlign> DNumerical(const Vector3d p0, const Vector3d p1,
+Eigen::Matrix<double, 6, 6> DNumerical(const Vector3d p0, const Vector3d p1,
 			   const Vector3d v0, const Vector3d v1,
 			   double l0, double stiffness, double damping)
 {
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> dfdv;
+	Eigen::Matrix<double, 6, 6> dfdv;
 
 	for (size_t row = 0; row < 6; row++)
 	{
@@ -387,8 +387,8 @@ TEST(LinearSpringTests, addStiffnessNumericalTest)
 	K.setZero();
 	ls.addStiffness(state, &K);
 
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Kformal = KFormal(x0, x1, v0, v1, restLength, stiffness, damping);
+	Eigen::Matrix<double, 6, 6> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
+	Eigen::Matrix<double, 6, 6> Kformal = KFormal(x0, x1, v0, v1, restLength, stiffness, damping);
 	EXPECT_TRUE(Kformal.isApprox(Knumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
 		"Kformal = " << std::endl << Kformal << std::endl <<
 		"Knumeric = " << std::endl << Knumeric << std::endl <<
@@ -422,8 +422,8 @@ TEST(LinearSpringTests, addDampingNumericalTest)
 	D.setZero();
 	ls.addDamping(state, &D);
 
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Dnumeric = DNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Dformal = DFormal(x0, x1, v0, v1, restLength, stiffness, damping);
+	Eigen::Matrix<double, 6, 6> Dnumeric = DNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
+	Eigen::Matrix<double, 6, 6> Dformal = DFormal(x0, x1, v0, v1, restLength, stiffness, damping);
 	EXPECT_TRUE(Dformal.isApprox(Dnumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
 		"Dformal = " << std::endl << Dformal << std::endl <<
 		"Dnumeric = " << std::endl << Dnumeric << std::endl <<
@@ -461,8 +461,8 @@ TEST(LinearSpringTests, addFDKNumericalTest)
 	D.setZero();
 	ls.addFDK(state, &F, &D, &K);
 
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Kformal = KFormal(x0, x1, v0, v1, restLength, stiffness, damping);
+	Eigen::Matrix<double, 6, 6> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
+	Eigen::Matrix<double, 6, 6> Kformal = KFormal(x0, x1, v0, v1, restLength, stiffness, damping);
 	EXPECT_TRUE(Kformal.isApprox(Knumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
 		"Kformal = " << std::endl << Kformal << std::endl <<
 		"Knumeric = " << std::endl << Knumeric << std::endl <<
@@ -472,8 +472,8 @@ TEST(LinearSpringTests, addFDKNumericalTest)
 		"Knumeric = " << std::endl << Knumeric << std::endl <<
 		"K - Knumeric= " << std::endl << K - Knumeric << std::endl;
 
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Dnumeric = DNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Dformal = DFormal(x0, x1, v0, v1, restLength, stiffness, damping);
+	Eigen::Matrix<double, 6, 6> Dnumeric = DNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
+	Eigen::Matrix<double, 6, 6> Dformal = DFormal(x0, x1, v0, v1, restLength, stiffness, damping);
 	EXPECT_TRUE(Dformal.isApprox(Dnumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
 		"Dformal = " << std::endl << Dformal << std::endl <<
 		"Dnumeric = " << std::endl << Dnumeric << std::endl <<

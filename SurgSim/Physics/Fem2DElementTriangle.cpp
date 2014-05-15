@@ -17,7 +17,7 @@
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Physics/FemElement2DTriangle.h"
+#include "SurgSim/Physics/Fem2DElementTriangle.h"
 
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
@@ -39,7 +39,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemElement2DTriangle::FemElement2DTriangle(std::array<unsigned int, 3> nodeIds)
+Fem2DElementTriangle::Fem2DElementTriangle(std::array<unsigned int, 3> nodeIds)
 	: m_restArea(0.0),
 	  m_thickness(0.0)
 {
@@ -49,7 +49,7 @@ FemElement2DTriangle::FemElement2DTriangle(std::array<unsigned int, 3> nodeIds)
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-void FemElement2DTriangle::setThickness(double thickness)
+void Fem2DElementTriangle::setThickness(double thickness)
 {
 	SURGSIM_ASSERT(thickness != 0.0) << "The thickness cannot be set to 0";
 	SURGSIM_ASSERT(thickness > 0.0) << "The thickness cannot be negative (trying to set it to " << thickness << ")";
@@ -57,12 +57,12 @@ void FemElement2DTriangle::setThickness(double thickness)
 	m_thickness = thickness;
 }
 
-double FemElement2DTriangle::getThickness() const
+double Fem2DElementTriangle::getThickness() const
 {
 	return m_thickness;
 }
 
-double FemElement2DTriangle::getVolume(const SurgSim::Math::OdeState& state) const
+double Fem2DElementTriangle::getVolume(const SurgSim::Math::OdeState& state) const
 {
 	const Vector3d A = state.getPosition(m_nodeIds[0]);
 	const Vector3d B = state.getPosition(m_nodeIds[1]);
@@ -71,12 +71,12 @@ double FemElement2DTriangle::getVolume(const SurgSim::Math::OdeState& state) con
 	return m_thickness * (B - A).cross(C - A).norm() / 2.0;
 }
 
-void FemElement2DTriangle::initialize(const SurgSim::Math::OdeState& state)
+void Fem2DElementTriangle::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Test the validity of the physical parameters
 	FemElement::initialize(state);
 
-	SURGSIM_ASSERT(m_thickness > 0.0) << "FemElement2DTriangle thickness should be positive and non-zero. " <<
+	SURGSIM_ASSERT(m_thickness > 0.0) << "Fem2DElementTriangle thickness should be positive and non-zero. " <<
 		"Did you call setThickness(thickness) ?";
 
 	// Store the rest state for this beam in m_x0
@@ -94,9 +94,9 @@ void FemElement2DTriangle::initialize(const SurgSim::Math::OdeState& state)
 	computeStiffness(state, &m_K);
 }
 
-void FemElement2DTriangle::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
+void Fem2DElementTriangle::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
 {
-	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> x, f;
+	Eigen::Matrix<double, 18, 1> x, f;
 
 	// K.U = F_ext
 	// K.(x - x0) = F_ext
@@ -106,23 +106,23 @@ void FemElement2DTriangle::addForce(const SurgSim::Math::OdeState& state, SurgSi
 	addSubVector(f, m_nodeIds, 6, F);
 }
 
-void FemElement2DTriangle::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
+void Fem2DElementTriangle::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
 {
 	addSubMatrix(m_M * scale, m_nodeIds, 6, M);
 }
 
-void FemElement2DTriangle::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
+void Fem2DElementTriangle::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 									  double scale)
 {
 }
 
-void FemElement2DTriangle::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
+void Fem2DElementTriangle::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
 										double scale)
 {
 	addSubMatrix(m_K * scale, getNodeIds(), 6, K);
 }
 
-void FemElement2DTriangle::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
+void Fem2DElementTriangle::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
 							   SurgSim::Math::Matrix* M, SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K)
 {
 	// Assemble the mass matrix
@@ -137,7 +137,7 @@ void FemElement2DTriangle::addFMDK(const SurgSim::Math::OdeState& state, SurgSim
 	addForce(state, F);
 }
 
-void FemElement2DTriangle::addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD,
+void Fem2DElementTriangle::addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD,
 								 double alphaK, const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
 {
 	using SurgSim::Math::addSubVector;
@@ -148,7 +148,7 @@ void FemElement2DTriangle::addMatVec(const SurgSim::Math::OdeState& state, doubl
 		return;
 	}
 
-	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> extractedX, extractedResult;
+	Eigen::Matrix<double, 18, 1> extractedX, extractedResult;
 	getSubVector(x, m_nodeIds, 6, &extractedX);
 
 	// Adds the mass contribution
@@ -168,8 +168,8 @@ void FemElement2DTriangle::addMatVec(const SurgSim::Math::OdeState& state, doubl
 	}
 }
 
-void FemElement2DTriangle::computeMass(const SurgSim::Math::OdeState& state,
-								   Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* M)
+void Fem2DElementTriangle::computeMass(const SurgSim::Math::OdeState& state,
+								   Eigen::Matrix<double, 18, 18>* M)
 {
 	double mass = m_rho * m_restArea * m_thickness;
 
@@ -256,8 +256,8 @@ void FemElement2DTriangle::computeMass(const SurgSim::Math::OdeState& state,
 	}
 }
 
-void FemElement2DTriangle::computeStiffness(const SurgSim::Math::OdeState& state,
-										Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* k)
+void Fem2DElementTriangle::computeStiffness(const SurgSim::Math::OdeState& state,
+										Eigen::Matrix<double, 18, 18>* k)
 {
 	// Membrane part from "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
 	// Compute the membrane local strain-displacement matrix
@@ -344,7 +344,7 @@ void FemElement2DTriangle::computeStiffness(const SurgSim::Math::OdeState& state
 	}
 }
 
-void FemElement2DTriangle::computeInitialRotation(const SurgSim::Math::OdeState& state)
+void Fem2DElementTriangle::computeInitialRotation(const SurgSim::Math::OdeState& state)
 {
 	// Build (A; i, j, k) an orthonormal frame
 	// such that in the local frame, we have:
@@ -376,7 +376,7 @@ void FemElement2DTriangle::computeInitialRotation(const SurgSim::Math::OdeState&
 	m_initialRotation.col(2) = k;
 }
 
-SurgSim::Math::Vector FemElement2DTriangle::computeCartesianCoordinate(
+SurgSim::Math::Vector Fem2DElementTriangle::computeCartesianCoordinate(
 	const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::Vector& naturalCoordinate) const
 {
@@ -394,7 +394,7 @@ SurgSim::Math::Vector FemElement2DTriangle::computeCartesianCoordinate(
 	return cartesianCoordinate;
 }
 
-SurgSim::Math::Vector FemElement2DTriangle::computeNaturalCoordinate(
+SurgSim::Math::Vector Fem2DElementTriangle::computeNaturalCoordinate(
 	const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::Vector& cartesianCoordinate) const
 {
@@ -402,7 +402,7 @@ SurgSim::Math::Vector FemElement2DTriangle::computeNaturalCoordinate(
 	return SurgSim::Math::Vector3d::Zero();
 }
 
-void FemElement2DTriangle::computeShapeFunctionsParameters(const SurgSim::Math::OdeState& restState)
+void Fem2DElementTriangle::computeShapeFunctionsParameters(const SurgSim::Math::OdeState& restState)
 {
 	SURGSIM_ASSERT(m_nodeIds[0] < restState.getNumNodes()) << "Invalid nodeId[0] = " << m_nodeIds[0] <<
 		", the number of nodes is " << restState.getNumNodes();
@@ -513,7 +513,7 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const SurgSim::Math::
 	}
 }
 
-std::array<double, 9> FemElement2DTriangle::batozDhxDxi(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhxDxi(double xi, double neta) const
 {
 	std::array<double, 9> res;
 
@@ -534,7 +534,7 @@ std::array<double, 9> FemElement2DTriangle::batozDhxDxi(double xi, double neta) 
 	return res;
 }
 
-std::array<double, 9> FemElement2DTriangle::batozDhxDneta(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhxDneta(double xi, double neta) const
 {
 	std::array<double, 9> res;
 	double a = 1.0 - 2.0 * neta;
@@ -554,7 +554,7 @@ std::array<double, 9> FemElement2DTriangle::batozDhxDneta(double xi, double neta
 	return res;
 }
 
-std::array<double, 9> FemElement2DTriangle::batozDhyDxi(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhyDxi(double xi, double neta) const
 {
 	std::array<double, 9> res;
 	double a = 1.0 - 2.0 * xi;
@@ -574,7 +574,7 @@ std::array<double, 9> FemElement2DTriangle::batozDhyDxi(double xi, double neta) 
 	return res;
 }
 
-std::array<double, 9> FemElement2DTriangle::batozDhyDneta(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhyDneta(double xi, double neta) const
 {
 	std::array<double, 9> res;
 	double a = 1.0 - 2.0 * neta;
@@ -594,7 +594,7 @@ std::array<double, 9> FemElement2DTriangle::batozDhyDneta(double xi, double neta
 	return res;
 }
 
-FemElement2DTriangle::Matrix39Type FemElement2DTriangle::batozStrainDisplacement(double xi, double neta)const
+Fem2DElementTriangle::Matrix39Type Fem2DElementTriangle::batozStrainDisplacement(double xi, double neta)const
 {
 	Matrix39Type res;
 	std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;

@@ -21,9 +21,9 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 
-using SurgSim::Physics::FemElement3DTetrahedron;
+using SurgSim::Physics::Fem3DElementTetrahedron;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
@@ -44,10 +44,10 @@ double N(unsigned int i, double V, double *ai, double *bi, double *ci, double *d
 const double epsilon = 1e-9;
 };
 
-class MockFemElement3DTet : public FemElement3DTetrahedron
+class MockFem3DElementTet : public Fem3DElementTetrahedron
 {
 public:
-	MockFemElement3DTet(std::array<unsigned int, 4> nodeIds) : FemElement3DTetrahedron(nodeIds)
+	MockFem3DElementTet(std::array<unsigned int, 4> nodeIds) : Fem3DElementTetrahedron(nodeIds)
 	{
 	}
 
@@ -64,7 +64,7 @@ public:
 		*di = m_di[i];
 	}
 
-	const Eigen::Matrix<double, 12, 1, Eigen::DontAlign>& getInitialPosition() const
+	const Eigen::Matrix<double, 12, 1>& getInitialPosition() const
 	{
 		return m_x0;
 	}
@@ -81,13 +81,13 @@ public:
 	}
 };
 
-class FemElement3DTetrahedronTests : public ::testing::Test
+class Fem3DElementTetrahedronTests : public ::testing::Test
 {
 public:
 	std::array<unsigned int, 4> m_nodeIds;
 	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_expectedX0;
+	Eigen::Matrix<double, 12, 1> m_expectedX0;
 	double m_rho, m_E, m_nu;
 	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix;
 	SurgSim::Math::Matrix m_expectedStiffnessMatrix, m_expectedStiffnessMatrix2;
@@ -135,7 +135,7 @@ public:
 		m_vectorOnes.resize(3*15);
 		m_vectorOnes.setConstant(1.0);
 
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign> M;
+		Eigen::Matrix<double, 12, 12> M;
 		M.setZero();
 		{
 			M.diagonal().setConstant(2.0);
@@ -151,7 +151,7 @@ public:
 
 		m_expectedDampingMatrix.setZero();
 
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign> K;
+		Eigen::Matrix<double, 12, 12> K;
 		K.setZero();
 		{
 			// Calculation done by hand from
@@ -160,8 +160,8 @@ public:
 			// bi = {-1 1 0 0}
 			// ci = {-1 0 1 0}
 			// di = {-1 0 0 1}
-			Eigen::Matrix<double, 6, 12, Eigen::DontAlign> B;
-			Eigen::Matrix<double, 6, 6, Eigen::DontAlign> E;
+			Eigen::Matrix<double, 6, 12> B;
+			Eigen::Matrix<double, 6, 6> E;
 
 			B.setZero();
 			B(0, 0) = -1; B(0, 3) = 1;
@@ -225,17 +225,17 @@ public:
 extern void testSize(const Vector& v, int expectedSize);
 extern void testSize(const Matrix& m, int expectedRows, int expectedCols);
 
-TEST_F(FemElement3DTetrahedronTests, ConstructorTest)
+TEST_F(Fem3DElementTetrahedronTests, ConstructorTest)
 {
-	ASSERT_NO_THROW({MockFemElement3DTet tet(m_nodeIds);});
-	ASSERT_NO_THROW({MockFemElement3DTet* tet = new MockFemElement3DTet(m_nodeIds); delete tet;});
-	ASSERT_NO_THROW({std::shared_ptr<MockFemElement3DTet> tet =
-		std::make_shared<MockFemElement3DTet>(m_nodeIds);});
+	ASSERT_NO_THROW({MockFem3DElementTet tet(m_nodeIds);});
+	ASSERT_NO_THROW({MockFem3DElementTet* tet = new MockFem3DElementTet(m_nodeIds); delete tet;});
+	ASSERT_NO_THROW({std::shared_ptr<MockFem3DElementTet> tet =
+		std::make_shared<MockFem3DElementTet>(m_nodeIds);});
 }
 
-TEST_F(FemElement3DTetrahedronTests, NodeIdsTest)
+TEST_F(Fem3DElementTetrahedronTests, NodeIdsTest)
 {
-	FemElement3DTetrahedron tet(m_nodeIds);
+	Fem3DElementTetrahedron tet(m_nodeIds);
 	EXPECT_EQ(4u, tet.getNumNodes());
 	EXPECT_EQ(4u, tet.getNodeIds().size());
 	for (int i = 0; i < 4; i++)
@@ -245,18 +245,18 @@ TEST_F(FemElement3DTetrahedronTests, NodeIdsTest)
 	}
 }
 
-TEST_F(FemElement3DTetrahedronTests, VolumeTest)
+TEST_F(Fem3DElementTetrahedronTests, VolumeTest)
 {
-	MockFemElement3DTet tet(m_nodeIds);
+	MockFem3DElementTet tet(m_nodeIds);
 	tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
 	EXPECT_NEAR(tet.getRestVolume(), m_expectedVolume, 1e-10);
 	EXPECT_NEAR(tet.getVolume(m_restState), m_expectedVolume, 1e-10);
 }
 
-TEST_F(FemElement3DTetrahedronTests, CoordinateTests)
+TEST_F(Fem3DElementTetrahedronTests, CoordinateTests)
 {
-	FemElement3DTetrahedron element(m_nodeIds);
+	Fem3DElementTetrahedron element(m_nodeIds);
 	Vector3d expectedA(0.1, 1.2, 2.3);
 	Vector3d expectedB(1.1, 1.2, 2.3);
 	Vector3d expectedC(0.1, 2.2, 2.3);
@@ -343,11 +343,11 @@ TEST_F(FemElement3DTetrahedronTests, CoordinateTests)
 	}
 }
 
-TEST_F(FemElement3DTetrahedronTests, ShapeFunctionsTest)
+TEST_F(Fem3DElementTetrahedronTests, ShapeFunctionsTest)
 {
 	using SurgSim::Math::getSubVector;
 
-	MockFemElement3DTet tet(m_nodeIds);
+	MockFem3DElementTet tet(m_nodeIds);
 	tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
 	EXPECT_TRUE(tet.getInitialPosition().isApprox(m_expectedX0)) <<
@@ -424,11 +424,11 @@ TEST_F(FemElement3DTetrahedronTests, ShapeFunctionsTest)
 	}
 }
 
-TEST_F(FemElement3DTetrahedronTests, ForceAndMatricesTest)
+TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 {
 	using SurgSim::Math::getSubVector;
 
-	MockFemElement3DTet tet(m_nodeIds);
+	MockFem3DElementTet tet(m_nodeIds);
 
 	// Test the various mode of failure related to the physical parameters
 	// This has been already tested in FemElementTests, but this is to make sure this method is called properly

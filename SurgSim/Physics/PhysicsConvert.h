@@ -18,12 +18,10 @@
 
 #include <yaml-cpp/yaml.h>
 
-
 namespace SurgSim
 {
 namespace Physics
 {
-class RigidRepresentationBaseState;
 class RigidRepresentationParameters;
 class RigidRepresentationState;
 }
@@ -31,13 +29,6 @@ class RigidRepresentationState;
 
 namespace YAML
 {
-template <>
-struct convert<SurgSim::Physics::RigidRepresentationBaseState>
-{
-	static Node encode(const SurgSim::Physics::RigidRepresentationBaseState& rhs);
-	static bool decode(const Node& node, SurgSim::Physics::RigidRepresentationBaseState& rhs);
-};
-
 
 template <>
 struct convert<SurgSim::Physics::RigidRepresentationState>
@@ -54,6 +45,6 @@ struct convert<SurgSim::Physics::RigidRepresentationParameters>
 	static bool decode(const Node& node, SurgSim::Physics::RigidRepresentationParameters& rhs);
 };
 
-};
+}; // namespace YAML
 
 #endif // SURGSIM_PHYSICS_PHYSICSCONVERT_H
