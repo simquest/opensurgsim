@@ -54,7 +54,10 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 			auto runtime = getRuntime();
 			SURGSIM_ASSERT(nullptr != runtime) << "Runtime cannot be expired when adding a component " << getName();
 			result = initializeComponent(component);
-			runtime->addComponent(component);
+			if (result)
+			{
+				runtime->addComponent(component);
+			}
 		}
 
 		if (result)
@@ -210,33 +213,20 @@ YAML::Node SceneElement::encode(bool standalone) const
 	YAML::Node data(YAML::NodeType::Map);
 	data["Name"] = getName();
 
-	data["Components"].push_back(encodeComponent(m_pose, standalone));
-
 	for (auto component = std::begin(m_components); component != std::end(m_components); ++component)
 	{
-		if ("SurgSim::Framework::PoseComponent" != component->second->getClassName())
+		if (standalone)
 		{
-			data["Components"].push_back(encodeComponent(component->second, standalone));
+			data["Components"].push_back(*component->second);
+		}
+		else
+		{
+			data["Components"].push_back(component->second);
 		}
 	}
 	YAML::Node node(YAML::NodeType::Map);
 	node[getClassName()] = data;
 	return node;
-}
-
-YAML::Node SceneElement::encodeComponent(std::shared_ptr<SurgSim::Framework::Component> component,
-										 bool standalone) const
-{
-	YAML::Node result;
-	if (standalone)
-	{
-		result = YAML::convert<SurgSim::Framework::Component>::encode(*component);
-	}
-	else
-	{
-		result = YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(component);
-	}
-	return result;
 }
 
 bool SceneElement::decode(const YAML::Node& node)
