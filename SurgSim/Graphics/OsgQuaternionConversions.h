@@ -49,9 +49,9 @@ inline osg::Quat toOsg(const SurgSim::Math::Quaterniond& quaternion)
 /// Convert from OSG to either quaternion of floats or doubles
 /// \tparam	T	Value type (float or double)
 template <typename T> inline
-Eigen::Quaternion<T,  Eigen::DontAlign> fromOsg(const osg::Quat& quaternion)
+Eigen::Quaternion<T> fromOsg(const osg::Quat& quaternion)
 {
-	return Eigen::Quaternion<T,  Eigen::DontAlign>(quaternion.w(), quaternion.x(), quaternion.y(), quaternion.z());
+	return Eigen::Quaternion<T>(quaternion.w(), quaternion.x(), quaternion.y(), quaternion.z());
 }
 
 };  // namespace Graphics

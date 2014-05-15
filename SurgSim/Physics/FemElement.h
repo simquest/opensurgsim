@@ -170,7 +170,7 @@ public:
 	/// Determines whether a given natural coordinate is valid
 	/// \param naturalCoordinate Coordinate to check
 	/// \return True if valid
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const = 0;
+	bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const;
 
 	/// Computes a given natural coordinate in cartesian coordinates
 	/// \param state The state at which to transform coordinates
@@ -179,6 +179,14 @@ public:
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
 		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const = 0;
+
+	/// Computes a natural coordinate given a global coordinate
+	/// \param state The state at which to transform coordinates
+	/// \param cartesianCoordinate The coordinates to transform
+	/// \return The resultant natural coordinates
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& cartesianCoordinate) const = 0;
 
 protected:
 	/// Sets the number of degrees of freedom per node

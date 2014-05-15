@@ -65,6 +65,19 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 									 it->get()->penetrationPoints.second.globalPosition.getValue());
 		// Compare the depth.
 		contactPresent &= std::abs(expected->depth - it->get()->depth) <= ScalarEpsilon;
+		// Check if the optional 'triangleId' is present in expected contact.
+		if (expected->penetrationPoints.first.triangleId.hasValue())
+		{
+			EXPECT_TRUE(it->get()->penetrationPoints.first.triangleId.hasValue());
+			contactPresent &= expected->penetrationPoints.first.triangleId.getValue() ==
+							  it->get()->penetrationPoints.first.triangleId.getValue();
+		}
+		if (expected->penetrationPoints.second.triangleId.hasValue())
+		{
+			EXPECT_TRUE(it->get()->penetrationPoints.second.triangleId.hasValue());
+			contactPresent &= expected->penetrationPoints.second.triangleId.getValue() ==
+							  it->get()->penetrationPoints.second.triangleId.getValue();
+		}
 	}
 
 	if (contactPresent)

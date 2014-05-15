@@ -716,7 +716,7 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 
 void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 {
-	typedef Eigen::Matrix<double, 6, 1, Eigen::DontAlign> Vector6d;
+	typedef Eigen::Matrix<double, 6, 1> Vector6d;
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
 	// Set the DeviceData's force to the nominal force, if provided.

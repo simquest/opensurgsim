@@ -49,14 +49,14 @@ OsgLight::OsgLight(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
 	Light(name),
-	m_ambientColor(0.2,0.2,0.2,1.0),
-	m_diffuseColor(1.0,1.0,1.0,1.0),
-	m_specularColor(1.0,1.0,1.0,1.0),
+	m_ambientColor(0.2, 0.2, 0.2, 1.0),
+	m_diffuseColor(1.0, 1.0, 1.0, 1.0),
+	m_specularColor(1.0, 1.0, 1.0, 1.0),
 	m_constantAttenuation(1.0),
 	m_linearAttenuation(0.0),
 	m_quadraticAttenuation(0.0)
 {
-	std::string prefix = "oss_LightSource.";
+	std::string prefix = "ossLightSource.";
 
 	m_light = new osg::Light();
 	m_light->setName(name);
@@ -66,7 +66,7 @@ OsgLight::OsgLight(const std::string& name) :
 
 	m_switch->addChild(m_lightSource);
 
-	m_uniforms[POSITION] = new osg::Uniform(Uniform::FLOAT_VEC4,prefix + "position");
+	m_uniforms[POSITION] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "position");
 
 	m_uniforms[AMBIENT_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "ambient");
 	setAmbientColor(m_ambientColor);
@@ -99,7 +99,7 @@ bool OsgLight::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	if (group != nullptr && newGroup == nullptr)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
-			<< "OsgLight::setGroup() called with a group that is not an OsgGroup.";
+				<< "OsgLight::setGroup() called with a group that is not an OsgGroup.";
 	}
 
 	bool clearGroup = m_group != nullptr && (newGroup != nullptr || group == nullptr);
@@ -209,7 +209,7 @@ double OsgLight::getQuadraticAttenuation()
 void OsgLight::doUpdate(double dt)
 {
 	SurgSim::Math::Vector3f position = getPose().translation().cast<float>();
-	osg::Vec4f osgVec(osg::Vec4f(toOsg(position),1.0));
+	osg::Vec4f osgVec(osg::Vec4f(toOsg(position), 1.0));
 	m_uniforms[POSITION]->set(osgVec);
 	m_light->setPosition(osgVec);
 }

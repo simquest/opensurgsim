@@ -32,7 +32,7 @@ namespace Math
 /// \sa SurgSim::Physics::MlcpPhysicsSolution, MlcpProblem, MlcpSolver
 struct MlcpSolution
 {
-	typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
 
 	/// Vector \f$x\f$ specifying a solution to the specified mixed LCP problem.
 	Vector x;

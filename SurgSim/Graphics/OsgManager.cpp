@@ -15,6 +15,8 @@
 
 #include "SurgSim/Graphics/OsgManager.h"
 
+#include <vector>
+
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -33,128 +35,78 @@ using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgGroup;
 using SurgSim::Graphics::OsgManager;
 
-OsgManager::OsgManager() : SurgSim::Graphics::Manager(),
-	m_viewer(new osgViewer::CompositeViewer()),
-	m_defaultGroup(std::make_shared<OsgGroup>("Default Group"))
+namespace SurgSim
 {
-	m_defaultCamera = std::make_shared<OsgCamera>("Default Camera");
-	m_defaultCamera->setGroup(m_defaultGroup);
-	m_defaultGroup->getOsgGroup()->
-		getOrCreateStateSet()->setGlobalDefaults();
+namespace Graphics
+{
+OsgManager::OsgManager() : SurgSim::Graphics::Manager(),
+	m_viewer(new osgViewer::CompositeViewer())
+{
 }
 
 OsgManager::~OsgManager()
 {
 }
 
-bool OsgManager::setDefaultCamera(std::shared_ptr<OsgCamera> camera)
+std::shared_ptr<Group> OsgManager::getOrCreateGroup(const std::string& name)
 {
-	m_defaultCamera = camera;
-	return true;
-}
-std::shared_ptr<OsgCamera> OsgManager::getDefaultCamera() const
-{
-	return m_defaultCamera;
-}
-bool OsgManager::setDefaultGroup(std::shared_ptr<OsgGroup> group)
-{
-	m_defaultGroup = group;
-	return true;
-}
-std::shared_ptr<OsgGroup> OsgManager::getDefaultGroup() const
-{
-	return m_defaultGroup;
+	std::shared_ptr<Group> result;
+	auto groups = getGroups();
+
+	auto group = groups.find(name);
+
+	if (group == std::end(groups))
+	{
+		auto newGroup = std::make_shared<OsgGroup>(name);
+		addGroup(newGroup);
+		result = newGroup;
+	}
+	else
+	{
+		result = group->second;
+	}
+
+	return result;
 }
 
 bool OsgManager::addRepresentation(std::shared_ptr<SurgSim::Graphics::Representation> representation)
 {
 	std::shared_ptr<OsgRepresentation> osgRepresentation = std::dynamic_pointer_cast<OsgRepresentation>(representation);
-	if (osgRepresentation && Manager::addRepresentation(osgRepresentation))
+	bool result;
+	if (osgRepresentation)
 	{
-		auto camera = std::dynamic_pointer_cast<Camera>(representation);
-		if (camera == nullptr || camera->getGroup() != m_defaultGroup)
-		{
-		   SURGSIM_ASSERT(m_defaultGroup->add(osgRepresentation)) << "Failed to add representation to default group!";
-		}
-
-		// Add the component to all the groups that it wants to be in
-		std::vector<std::string> requestedGroups = representation->getGroupReferences();
-		std::vector<std::shared_ptr<Group>> groups = getGroups();
-		for (auto it = std::begin(requestedGroups); it != std::end(requestedGroups); ++it)
-		{
-			auto groupIt = std::find_if(
-				std::begin(groups),
-				std::end(groups),
-				[it](std::shared_ptr<Group> group){return *it == group->getName();});
-			if (groupIt != std::end(groups))
-			{
-				(*groupIt)->add(representation);
-			}
-			else
-			{
-				SURGSIM_LOG_INFO(getLogger()) << "OsgManager::addRepresentation: " <<
-					"The component <" << representation->getName() << "> requested a group <" << *it << "> that could"<<
-					" not be found yet.";
-			}
-		}
-
-		return true;
+		result = Manager::addRepresentation(osgRepresentation);
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(getLogger()) << __FUNCTION__ << " Representation is not a subclass of OsgRepresentation " <<
-			representation->getName();
-		return false;
+		SURGSIM_LOG_INFO(getLogger())
+				<< __FUNCTION__ << " Representation is not a subclass of OsgRepresentation "
+				<< representation->getName();
+		result = false;
 	}
+	return result;
 }
-bool OsgManager::addGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
-{
-	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
-	if (osgGroup && Manager::addGroup(osgGroup))
-	{
-		// Check if there are any representations that might want to be included
-		// in this group
-		std::string name = group->getName();
-		auto representations = getRepresentations();
-		for (auto it = std::begin(representations); it != std::end(representations); ++it)
-		{
-			auto requested = (*it)->getGroupReferences();
-			if (std::find(std::begin(requested), std::end(requested), name) != std::end(requested))
-			{
-				group->add(*it);
-			}
-		}
 
-		return true;
-	}
-	else
-	{
-		SURGSIM_LOG_INFO(getLogger()) << __FUNCTION__ << " Group is not a subclass of OsgGroup " << group->getName();
-		return false;
-	}
-}
 bool OsgManager::addView(std::shared_ptr<SurgSim::Graphics::View> view)
 {
 	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(view);
-	if (osgView && Manager::addView(osgView))
+
+	bool result = true;
+	if (osgView == nullptr)
 	{
-		if (! osgView->getCamera())
-		{
-			osgView->setCamera(m_defaultCamera);
-		}
-		else if (! osgView->getCamera()->getGroup())
-		{
-			m_defaultGroup->remove(osgView->getCamera());
-			osgView->getCamera()->setGroup(m_defaultGroup);
-		}
-		m_viewer->addView(osgView->getOsgView());
-		return true;
+		SURGSIM_LOG_WARNING(getLogger()) << __FUNCTION__ << " View is not a subclass of OsgView " << view->getName();
+		result = false;
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(getLogger()) << __FUNCTION__ << " View is not a subclass of OsgView " << view->getName();
-		return false;
+		SURGSIM_ASSERT(view->getCamera() != nullptr) << "View should have a camera when added to the manager.";
+		if (Manager::addView(view))
+		{
+			m_viewer->addView(osgView->getOsgView());
+		}
 	}
+
+	return result;
 }
 
 bool OsgManager::removeView(std::shared_ptr<SurgSim::Graphics::View> view)
@@ -168,9 +120,10 @@ bool OsgManager::removeView(std::shared_ptr<SurgSim::Graphics::View> view)
 	return Manager::removeView(view);
 }
 
+
 bool OsgManager::doInitialize()
 {
-	m_hudElement = std::make_shared<OsgScreenSpacePass>("ossHud");
+	m_hudElement = std::make_shared<OsgScreenSpacePass>(Representation::DefaultHudGroupName);
 	return true;
 }
 
@@ -191,7 +144,6 @@ bool OsgManager::doUpdate(double dt)
 		getRuntime()->getScene()->addSceneElement(m_hudElement);
 	}
 
-	m_defaultCamera->update(dt);
 
 	if (Manager::doUpdate(dt))
 	{
@@ -218,8 +170,17 @@ void OsgManager::doBeforeStop()
 	m_viewer = nullptr;
 }
 
+osg::ref_ptr<osgViewer::CompositeViewer> OsgManager::getOsgCompositeViewer() const
+{
+	return m_viewer;
+}
+
 void SurgSim::Graphics::OsgManager::dumpDebugInfo() const
 {
-	osgDB::writeNodeFile(*(m_defaultCamera->getOsgCamera()), "default_camera.osgt");
+	osgDB::writeNodeFile(*m_viewer->getView(0)->getCamera(), "viewer_zero_camera.osgt");
 }
+
+}
+}
+
 

@@ -155,7 +155,7 @@ class MockBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	MockBehavior(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
-	Behavior(name),
+		Behavior(name),
 		succeedWithInit(succeedInit),
 		succeedWithWakeUp(succeedWakeUp),
 		updateCount(0)

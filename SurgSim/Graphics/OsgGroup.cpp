@@ -25,6 +25,7 @@ OsgGroup::OsgGroup(const std::string& name) : SurgSim::Graphics::Group(name),
 	m_isVisible(true),
 	m_switch(new osg::Switch())
 {
+	m_switch->getOrCreateStateSet()->setGlobalDefaults();
 	m_switch->setName(name + " Switch");
 };
 
@@ -98,7 +99,7 @@ void OsgGroup::clear()
 	{
 		std::shared_ptr<Representation> representation = getMembers().front();
 		SURGSIM_ASSERT(remove(representation)) << "Removal of representation " << representation->getName() <<
-			" failed while attempting to clear group " << getName() << "!";
+											   " failed while attempting to clear group " << getName() << "!";
 	}
 }
 

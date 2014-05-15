@@ -33,30 +33,30 @@ namespace Math
 
 /// A 2D vector of floats.
 /// This type (and any structs that contain it) can be safely allocated via new.
-typedef Eigen::Matrix<float,  2, 1, Eigen::DontAlign>  Vector2f;
+typedef Eigen::Matrix<float,  2, 1>  Vector2f;
 
 /// A 3D vector of floats.
 /// This type (and any structs that contain it) can be safely allocated via new.
-typedef Eigen::Matrix<float,  3, 1, Eigen::DontAlign>  Vector3f;
+typedef Eigen::Matrix<float,  3, 1>  Vector3f;
 
 /// A 4D vector of floats.
 /// This type (and any structs that contain it) can be safely allocated via new.
-typedef Eigen::Matrix<float,  4, 1, Eigen::DontAlign>  Vector4f;
+typedef Eigen::Matrix<float,  4, 1>  Vector4f;
 
 /// A 2D vector of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
-typedef Eigen::Matrix<double, 2, 1, Eigen::DontAlign>  Vector2d;
+typedef Eigen::Matrix<double, 2, 1>  Vector2d;
 
 /// A 3D vector of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
-typedef Eigen::Matrix<double, 3, 1, Eigen::DontAlign>  Vector3d;
+typedef Eigen::Matrix<double, 3, 1>  Vector3d;
 
 /// A 4D vector of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
-typedef Eigen::Matrix<double, 4, 1, Eigen::DontAlign>  Vector4d;
+typedef Eigen::Matrix<double, 4, 1>  Vector4d;
 
 /// A dynamic size column vector
-typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
+typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
 
 /// Helper method to add a sub-vector into a vector, for the sake of clarity
 /// \tparam Vector The vector type

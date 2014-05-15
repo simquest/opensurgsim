@@ -72,16 +72,18 @@ struct OsgCameraRenderTests: public RenderTest
 
 TEST_F(OsgCameraRenderTests, PassTest)
 {
-	auto camera = viewElement->getCamera();
-	auto renderPass = std::make_shared<SurgSim::Graphics::OsgCamera>("RenderPass");
-	renderPass->setGroup(std::make_shared<SurgSim::Graphics::OsgGroup>("RenderPass Group"));
-	renderPass ->setProjectionMatrix(camera->getProjectionMatrix());
+	auto defaultCamera = viewElement->getCamera();
+	auto renderPass = std::make_shared<OsgCamera>("RenderPass");
+
+	renderPass->setProjectionMatrix(defaultCamera->getProjectionMatrix());
+	renderPass->setRenderGroupReference("RenderPass");
+	renderPass->setGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
 	int width, height;
-	viewElement->getView()->getDimensions(&width,&height);
+	viewElement->getView()->getDimensions(&width, &height);
 
 	std::shared_ptr<OsgRenderTarget2d> renderTargetOsg =
-		std::make_shared<OsgRenderTarget2d>(width,height, 1.0, 2, true);
+		std::make_shared<OsgRenderTarget2d>(width, height, 1.0, 2, true);
 	renderPass->setRenderTarget(renderTargetOsg);
 	renderPass->setRenderOrder(Camera::RENDER_ORDER_PRE_RENDER, 0);
 
@@ -99,15 +101,15 @@ TEST_F(OsgCameraRenderTests, PassTest)
 
 
 	auto uniform = std::make_shared<OsgUniform<Vector3f>>("ambientColor");
-	uniform->set(Vector3f(0.2,0.2,0.2));
+	uniform->set(Vector3f(0.2, 0.2, 0.2));
 	material1->addUniform(uniform);
 
 	uniform = std::make_shared<OsgUniform<Vector3f>>("otherColor");
-	uniform->set(Vector3f(1.0,0.0,0.0));
+	uniform->set(Vector3f(1.0, 0.0, 0.0));
 	material1->addUniform(uniform);
 
 	uniform = std::make_shared<OsgUniform<Vector3f>>("otherColor");
-	uniform->set(Vector3f(0.0,1.0,0.0));
+	uniform->set(Vector3f(0.0, 1.0, 0.0));
 	material2->addUniform(uniform);
 
 
@@ -116,15 +118,15 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	int screenWidth = 800;
 	int screenHeight = 600;
 
-	width = width/3;
-	height = height/3;
+	width = width / 3;
+	height = height / 3;
 
 	std::shared_ptr<ScreenSpaceQuadRepresentation> quad;
 	quad = makeQuad("Color1", width, height, screenWidth - width, screenHeight - height);
 	quad->setTexture(renderTargetOsg->getColorTargetOsg(0));
 	viewElement->addComponent(quad);
 
-	quad = makeQuad("Color2", width, height, screenWidth - width, screenHeight - height*2);
+	quad = makeQuad("Color2", width, height, screenWidth - width, screenHeight - height * 2);
 	quad->setTexture(renderTargetOsg->getColorTargetOsg(1));
 	viewElement->addComponent(quad);
 
@@ -134,30 +136,32 @@ TEST_F(OsgCameraRenderTests, PassTest)
 
 	Quaterniond quat = Quaterniond::Identity();
 	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat,Vector3d(0.0, 0.0, -0.2));
-	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(M_PI,Vector3d::UnitY());
+	quat = SurgSim::Math::makeRotationQuaternion(M_PI, Vector3d::UnitY().eval());
 	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0, 0.0, -0.2));
 
-	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("Box Representation 1");
-	boxRepresentation1->setSizeXYZ(0.05, 0.05, 0.05);
-	renderPass->getGroup()->add(boxRepresentation1);
-	auto boxElement1 = std::make_shared<BasicSceneElement>("Box Element 1");
-	boxElement1->addComponent(boxRepresentation1);
+	auto box = std::make_shared<OsgBoxRepresentation>("Graphics");
+	box->setSizeXYZ(0.05, 0.05, 0.05);
+	box->setGroupReference("RenderPass");
+
+	auto boxElement1 = std::make_shared<BasicSceneElement>("Box 1");
+	boxElement1->addComponent(box);
 	boxElement1->setPose(startPose);
 	scene->addSceneElement(boxElement1);
 
-	auto boxRepresentation2 = std::make_shared<OsgBoxRepresentation>("Box Representation 2");
-	boxRepresentation2->setSizeXYZ(0.05, 0.05, 0.05);
-	boxRepresentation2->setMaterial(material1);
-	auto boxElement2 = std::make_shared<BasicSceneElement>("Box Element 2");
-	boxElement2->addComponent(boxRepresentation2);
+	box = std::make_shared<OsgBoxRepresentation>("Graphics");
+	box->setSizeXYZ(0.05, 0.05, 0.05);
+	box->setMaterial(material1);
+
+	auto boxElement2 = std::make_shared<BasicSceneElement>("Box 2");
+	boxElement2->addComponent(box);
 	boxElement2->setPose(startPose);
 	scene->addSceneElement(boxElement2);
 
 	/// Run the thread
 	runtime->start();
 
-	int numSteps = 1000;
-	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+	int numSteps = 100;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	for (int i = 0; i < numSteps; ++i)
 	{
 		double t = static_cast<double>(i) / numSteps;

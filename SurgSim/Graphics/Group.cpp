@@ -17,10 +17,13 @@
 
 #include "SurgSim/Graphics/Representation.h"
 
-using SurgSim::Graphics::Representation;
-using SurgSim::Graphics::Group;
+namespace SurgSim
+{
+namespace Graphics
+{
 
-Group::Group(const std::string& name) : SurgSim::Framework::Component(name)
+Group::Group(const std::string& name) :
+	m_name(name)
 {
 }
 
@@ -75,12 +78,11 @@ void Group::clear()
 	m_representations.clear();
 }
 
-bool Group::doInitialize()
+std::string Group::getName() const
 {
-	return true;
+	return m_name;
 }
 
-bool Group::doWakeUp()
-{
-	return true;
 }
+}
+

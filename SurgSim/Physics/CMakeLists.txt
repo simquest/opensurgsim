@@ -30,18 +30,18 @@ set(SURGSIM_PHYSICS_SOURCES
 	DcdCollision.cpp
 	DeformableCollisionRepresentation.cpp
 	DeformableRepresentation.cpp
+	Fem1DElementBeam.cpp
 	Fem1DRepresentation.cpp
+	Fem2DElementTriangle.cpp
 	Fem2DRepresentation.cpp
+	Fem3DElementCube.cpp
+	Fem3DElementTetrahedron.cpp
 	Fem3DRepresentation.cpp
 	Fem3DRepresentationBilateral3D.cpp
 	Fem3DRepresentationContact.cpp
 	Fem3DRepresentationLocalization.cpp
 	Fem3DRepresentationPlyReaderDelegate.cpp
 	FemElement.cpp
-	FemElement1DBeam.cpp
-	FemElement2DTriangle.cpp
-	FemElement3DCube.cpp
-	FemElement3DTetrahedron.cpp
 	FemRepresentation.cpp
 	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
@@ -88,18 +88,18 @@ set(SURGSIM_PHYSICS_HEADERS
 	DcdCollision.h
 	DeformableCollisionRepresentation.h
 	DeformableRepresentation.h
+	Fem1DElementBeam.h
 	Fem1DRepresentation.h
+	Fem2DElementTriangle.h
 	Fem2DRepresentation.h
+	Fem3DElementCube.h
+	Fem3DElementTetrahedron.h
 	Fem3DRepresentation.h
 	Fem3DRepresentationBilateral3D.h
 	Fem3DRepresentationContact.h
 	Fem3DRepresentationLocalization.h
 	Fem3DRepresentationPlyReaderDelegate.h
 	FemElement.h
-	FemElement1DBeam.h
-	FemElement2DTriangle.h
-	FemElement3DCube.h
-	FemElement3DTetrahedron.h
 	FemRepresentation.h
 	FemRepresentationCoordinate.h
 	FemRepresentationParameters.h

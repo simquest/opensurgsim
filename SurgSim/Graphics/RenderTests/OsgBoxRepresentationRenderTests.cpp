@@ -15,15 +15,20 @@
 
 /// \file
 /// Render Tests for the OsgBoxRepresentation class.
-
-#include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
-#include "SurgSim/Graphics/OsgViewElement.h"
+
+#include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Testing/MathUtilities.h"
 
 #include <gtest/gtest.h>
 
@@ -37,6 +42,7 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
+using SurgSim::Testing::interpolatePose;
 
 namespace SurgSim
 {
@@ -44,13 +50,17 @@ namespace SurgSim
 namespace Graphics
 {
 
-
-TEST(OsgBoxRepresentationRenderTests, MovingBoxesTest)
+struct OsgBoxRepresentationRenderTests : public RenderTest
 {
-	/// Initial box 1 position
-	Vector3d startPosition1(-0.1, 0.0, -0.2);
-	/// Final box 1 position
-	Vector3d endPosition1(0.1, 0.0, -0.2);
+
+};
+
+TEST_F(OsgBoxRepresentationRenderTests, MovingBoxesTest)
+{
+	/// Initial and final position (X, Y, Z) of box 1
+	Vector3d startPosition1(-0.1, 0.0, -0.2), finalPosition1(0.1, 0.0, -0.2);
+	/// Initial angles (X, Y, Z) and final of the cylinder 1
+	Vector3d startAngles1(0.0, 0.0, 0.0), finalAngles1(-M_PI_4, -M_PI_4, -M_PI_4);
 	/// Initial box 1 sizeX;
 	double startSizeX1 = 0.001;
 	/// Final box 1 sizeX;
@@ -63,22 +73,11 @@ TEST(OsgBoxRepresentationRenderTests, MovingBoxesTest)
 	double startSizeZ1 = 0.021;
 	/// Final box 1 sizeZ;
 	double endSizeZ1 = 0.03;
-	/// Initial box 1 angleX;
-	double startAngleX1 = 0.0;
-	/// Final box 1 angleX;
-	double endAngleX1 = - M_PI / 4.0;
-	/// Initial box 1 angleY;
-	double startAngleY1 = 0.0;
-	/// Final box 1 angleY;
-	double endAngleY1 = - M_PI / 4.0;
-	/// Initial box 1 angleZ;
-	double startAngleZ1 = 0.0;
-	/// Final box 1 angleZ;
-	double endAngleZ1 = - M_PI / 4.0;
-	/// Initial box 2 position
-	Vector3d startPosition2(0.0, -0.1, -0.2);
-	/// Final box 2 position
-	Vector3d endPosition2(0.0, 0.1, -0.2);
+
+	/// Initial and final position (X, Y, Z) box 2
+	Vector3d startPosition2(0.0, -0.1, -0.2), finalPosition2(0.0, 0.1, -0.2);
+	/// Initial and final angles (X, Y, Z) of the box 2
+	Vector3d startAngles2(-M_PI_2, -M_PI_2, -M_PI_2), finalAngles2(M_PI, M_PI, M_PI);
 	/// Initial box 2 sizeX;
 	double startSizeX2 = 0.001;
 	/// Final box 2 sizeX;
@@ -92,52 +91,37 @@ TEST(OsgBoxRepresentationRenderTests, MovingBoxesTest)
 	/// Final box 2 sizeX;
 	double endSizeZ2 = 0.03;
 	/// Initial box 2 angleX;
-	double startAngleX2 = -M_PI / 2.0;;
-	/// Final box 2 angleX;
-	double endAngleX2 = M_PI;
-	/// Initial box 2 angleY;
-	double startAngleY2 = -M_PI / 2.0;;
-	/// Final box 2 angleY;
-	double endAngleY2 = M_PI;
-	/// Initial box 2 angleZ;
-	double startAngleZ2 = -M_PI / 2.0;;
-	/// Final box 2 angleZ;
-	double endAngleZ2 = M_PI;
+
+
+
 
 	/// Number of times to step the box position and radius from start to end.
 	/// This number of steps will be done in 1 second.
 	int numSteps = 100;
 
-	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
-	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
-
-	runtime->addManager(manager);
-
 	std::shared_ptr<Scene> scene = runtime->getScene();
 
-	/// Add a graphics view element to the scene
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view element");
-	scene->addSceneElement(viewElement);
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Box 1");
+	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("Graphics");
+	sceneElement->addComponent(boxRepresentation1);
+	scene->addSceneElement(sceneElement);
 
-	/// Add the two box representation to the view element so we don't need to make another concrete scene element
-	/// \todo	DK-2013-june-03	Use the BasicSceneElement when it gets moved into Framework.
-	std::shared_ptr<BoxRepresentation> boxRepresentation1 =
-		std::make_shared<OsgBoxRepresentation>("box representation 1");
-	viewElement->addComponent(boxRepresentation1);
-	std::shared_ptr<BoxRepresentation> boxRepresentation2 =
-		std::make_shared<OsgBoxRepresentation>("box representation 2");
-	viewElement->addComponent(boxRepresentation2);
+	sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Box 2");
+	auto boxRepresentation2 = std::make_shared<OsgBoxRepresentation>("Graphics");
+	sceneElement->addComponent(boxRepresentation2);
+	scene->addSceneElement(sceneElement);
 
 	/// Run the thread
 	runtime->start();
-	EXPECT_TRUE(manager->isInitialized());
+	EXPECT_TRUE(graphicsManager->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	enum BoxSetterType {BoxSetterTypeIndividual,
 						BoxSetterTypeTogether,
 						BoxSetterTypeVector3d,
 						// Add more setter types above this line.
-						BoxSetterTypeCount};
+						BoxSetterTypeCount
+					   };
 	int boxSetterType = 0;
 	Vector3d box1Size, box2Size;
 
@@ -145,18 +129,13 @@ TEST(OsgBoxRepresentationRenderTests, MovingBoxesTest)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
-		/// Interpolate position and radius
-		boxRepresentation1->setLocalPose(makeRigidTransform(
-			makeRotationQuaternion((1.0 - t) * startAngleX1 + t * endAngleX1, Vector3d(1.0, 0.0, 0.0)) *
-			makeRotationQuaternion((1.0 - t) * startAngleY1 + t * endAngleY1, Vector3d(0.0, 1.0, 0.0)) *
-			makeRotationQuaternion((1.0 - t) * startAngleZ1 + t * endAngleZ1, Vector3d(0.0, 0.0, 1.0)),
-			(1.0 - t) * startPosition1 + t * endPosition1));
-		boxRepresentation2->setLocalPose(makeRigidTransform(
-			makeRotationQuaternion((1.0 - t) * startAngleX2 + t * endAngleX2, Vector3d(1.0, 0.0, 0.0)) *
-			makeRotationQuaternion((1.0 - t) * startAngleY2 + t * endAngleY2, Vector3d(0.0, 1.0, 0.0)) *
-			makeRotationQuaternion((1.0 - t) * startAngleZ2 + t * endAngleZ2, Vector3d(0.0, 0.0, 1.0)),
-			(1.0 - t) * startPosition2 + t * endPosition2));
-		if(boxSetterType == static_cast<int>(BoxSetterTypeIndividual))
+		/// Interpolate position and orientation
+		boxRepresentation1->getSceneElement()->setPose(
+			interpolatePose(startAngles1, finalAngles1, startPosition1, finalPosition1, t));
+		boxRepresentation2->getSceneElement()->setPose(
+			interpolatePose(startAngles2, finalAngles2, startPosition1, finalPosition2, t));
+
+		if (boxSetterType == static_cast<int>(BoxSetterTypeIndividual))
 		{
 			boxRepresentation1->setSizeX((1 - t) * startSizeX1 + t * endSizeX1);
 			boxRepresentation1->setSizeY((1 - t) * startSizeY1 + t * endSizeY1);

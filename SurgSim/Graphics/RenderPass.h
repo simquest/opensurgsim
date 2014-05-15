@@ -78,10 +78,6 @@ public:
 	/// \return	The camera.
 	std::shared_ptr<Camera> getCamera();
 
-	/// Gets the group.
-	/// \return	The group.
-	std::shared_ptr<Group> getGroup();
-
 	/// Sets the material used for rendering.
 	/// \param	material	The material.
 	/// \return	true if it succeeds, false if it fails.
