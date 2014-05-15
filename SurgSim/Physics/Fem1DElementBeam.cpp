@@ -16,7 +16,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
-#include "SurgSim/Physics/FemElement1DBeam.h"
+#include "SurgSim/Physics/Fem1DElementBeam.h"
 
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
@@ -32,7 +32,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemElement1DBeam::FemElement1DBeam(std::array<unsigned int, 2> nodeIds)
+Fem1DElementBeam::Fem1DElementBeam(std::array<unsigned int, 2> nodeIds)
 	: m_G(0.0),
 	  m_restLength(0.0),
 	  m_radius(0.0),
@@ -53,7 +53,7 @@ FemElement1DBeam::FemElement1DBeam(std::array<unsigned int, 2> nodeIds)
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-void FemElement1DBeam::setRadius(double radius)
+void Fem1DElementBeam::setRadius(double radius)
 {
 	SURGSIM_ASSERT(radius != 0.0) << "The beam radius cannot be set to 0";
 	SURGSIM_ASSERT(radius > 0.0) << "The beam radius cannot be negative (trying to set it to " << radius << ")";
@@ -61,22 +61,22 @@ void FemElement1DBeam::setRadius(double radius)
 	m_radius = radius;
 }
 
-double FemElement1DBeam::getRadius() const
+double Fem1DElementBeam::getRadius() const
 {
 	return m_radius;
 }
 
-bool FemElement1DBeam::getShearingEnabled() const
+bool Fem1DElementBeam::getShearingEnabled() const
 {
 	return m_haveShear;
 }
 
-void FemElement1DBeam::setShearingEnabled(bool enabled)
+void Fem1DElementBeam::setShearingEnabled(bool enabled)
 {
 	m_haveShear = enabled;
 }
 
-double FemElement1DBeam::getVolume(const SurgSim::Math::OdeState& state) const
+double Fem1DElementBeam::getVolume(const SurgSim::Math::OdeState& state) const
 {
 	const Vector3d A = state.getPosition(m_nodeIds[0]);
 	const Vector3d B = state.getPosition(m_nodeIds[1]);
@@ -84,12 +84,12 @@ double FemElement1DBeam::getVolume(const SurgSim::Math::OdeState& state) const
 	return m_A * (B - A).norm();
 }
 
-void FemElement1DBeam::initialize(const SurgSim::Math::OdeState& state)
+void Fem1DElementBeam::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Test the validity of the physical parameters
 	FemElement::initialize(state);
 
-	SURGSIM_ASSERT(m_radius > 0) << "FemElement1DBeam radius should be positive and non-zero.  Did you call "
+	SURGSIM_ASSERT(m_radius > 0) << "Fem1DElementBeam radius should be positive and non-zero.  Did you call "
 									"setCrossSectionCircular(radius) ?";
 
 	m_A = M_PI * (m_radius * m_radius);
@@ -101,7 +101,7 @@ void FemElement1DBeam::initialize(const SurgSim::Math::OdeState& state)
 	getSubVector(state.getPositions(), m_nodeIds, 6, &m_x0);
 
 	m_restLength = (m_x0.segment<3>(6) - m_x0.segment<3>(0)).norm();
-	SURGSIM_ASSERT(m_restLength > 0) << "FemElement1DBeam rest length is zero (degenerate beam)";
+	SURGSIM_ASSERT(m_restLength > 0) << "Fem1DElementBeam rest length is zero (degenerate beam)";
 
 	computeInitialRotation(state);
 
@@ -110,7 +110,7 @@ void FemElement1DBeam::initialize(const SurgSim::Math::OdeState& state)
 	computeStiffness(state, &m_K);
 }
 
-void FemElement1DBeam::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
+void Fem1DElementBeam::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
 {
 	Eigen::Matrix<double, 12, 1> x, f;
 
@@ -122,21 +122,21 @@ void FemElement1DBeam::addForce(const SurgSim::Math::OdeState& state, SurgSim::M
 	addSubVector(f, m_nodeIds, 6, F);
 }
 
-void FemElement1DBeam::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
+void Fem1DElementBeam::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
 {
 	addSubMatrix(m_M * scale, m_nodeIds, 6, M);
 }
 
-void FemElement1DBeam::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale)
+void Fem1DElementBeam::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale)
 {
 }
 
-void FemElement1DBeam::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale)
+void Fem1DElementBeam::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale)
 {
 	addSubMatrix(m_K * scale, getNodeIds(), 6, K);
 }
 
-void FemElement1DBeam::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
+void Fem1DElementBeam::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
 							   SurgSim::Math::Matrix* M, SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K)
 {
 	// Assemble the mass matrix
@@ -151,7 +151,7 @@ void FemElement1DBeam::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Ma
 	addForce(state, F);
 }
 
-void FemElement1DBeam::addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD,
+void Fem1DElementBeam::addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD,
 								 double alphaK, const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
 {
 	using SurgSim::Math::addSubVector;
@@ -182,7 +182,7 @@ void FemElement1DBeam::addMatVec(const SurgSim::Math::OdeState& state, double al
 	}
 }
 
-void FemElement1DBeam::computeMass(const SurgSim::Math::OdeState& state,
+void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state,
 								   Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* M)
 {
 	double& L = m_restLength;
@@ -251,7 +251,7 @@ void FemElement1DBeam::computeMass(const SurgSim::Math::OdeState& state,
 	m_M = m_R0 * m_MLocal * m_R0.transpose();
 }
 
-void FemElement1DBeam::computeStiffness(const SurgSim::Math::OdeState& state,
+void Fem1DElementBeam::computeStiffness(const SurgSim::Math::OdeState& state,
 										Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* k)
 {
 	double& L = m_restLength;
@@ -334,7 +334,7 @@ void FemElement1DBeam::computeStiffness(const SurgSim::Math::OdeState& state,
 	m_K = m_R0 * m_KLocal * m_R0.transpose();
 }
 
-void FemElement1DBeam::computeInitialRotation(const SurgSim::Math::OdeState& state)
+void Fem1DElementBeam::computeInitialRotation(const SurgSim::Math::OdeState& state)
 {
 	// Build (i, j, k) an orthonormal frame
 	const Vector3d A = state.getPosition(m_nodeIds[0]);
@@ -359,7 +359,7 @@ void FemElement1DBeam::computeInitialRotation(const SurgSim::Math::OdeState& sta
 	setSubMatrix(rotation3x3, 3, 3, 3, 3, &m_R0);
 }
 
-SurgSim::Math::Vector FemElement1DBeam::computeCartesianCoordinate(
+SurgSim::Math::Vector Fem1DElementBeam::computeCartesianCoordinate(
 	const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::Vector& naturalCoordinate) const
 {
@@ -377,7 +377,7 @@ SurgSim::Math::Vector FemElement1DBeam::computeCartesianCoordinate(
 	return cartesianCoordinate;
 }
 
-SurgSim::Math::Vector FemElement1DBeam::computeNaturalCoordinate(
+SurgSim::Math::Vector Fem1DElementBeam::computeNaturalCoordinate(
 	const SurgSim::Math::OdeState& state,
 	const SurgSim::Math::Vector& cartesianCoordinate) const
 {

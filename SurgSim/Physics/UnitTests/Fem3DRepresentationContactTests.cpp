@@ -22,7 +22,7 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationContact.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
@@ -31,7 +31,7 @@ using SurgSim::Physics::ContactConstraintData;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::Fem3DRepresentationContact;
 using SurgSim::Physics::Fem3DRepresentationLocalization;
-using SurgSim::Physics::FemElement3DTetrahedron;
+using SurgSim::Physics::Fem3DElementTetrahedron;
 using SurgSim::Physics::FemRepresentationCoordinate;
 using SurgSim::Physics::MlcpPhysicsProblem;
 using SurgSim::Math::Vector3d;
@@ -54,7 +54,7 @@ static void addTetraheadron(Fem3DRepresentation *fem,
 							double youngModulus = 1.0)
 {
 	std::array<unsigned int, 4> nodes = {node0, node1, node2, node3};
-	auto element = std::make_shared<FemElement3DTetrahedron>(nodes);
+	auto element = std::make_shared<Fem3DElementTetrahedron>(nodes);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
 	element->setYoungModulus(youngModulus);

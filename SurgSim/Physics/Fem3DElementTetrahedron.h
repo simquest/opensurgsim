@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENT3DTETRAHEDRON_H
-#define SURGSIM_PHYSICS_FEMELEMENT3DTETRAHEDRON_H
+#ifndef SURGSIM_PHYSICS_FEM3DELEMENTTETRAHEDRON_H
+#define SURGSIM_PHYSICS_FEM3DELEMENTTETRAHEDRON_H
 
 #include <array>
 
@@ -35,7 +35,7 @@ namespace Physics
 /// \note    http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch09.d/AFEM.Ch09.pdf
 /// \note The deformation is based on the linear elasticity theory and not on the visco-elasticity theory.
 /// \note Therefore the element does not have any damping component.
-class FemElement3DTetrahedron : public FemElement
+class Fem3DElementTetrahedron : public FemElement
 {
 public:
 	/// Constructor
@@ -44,7 +44,7 @@ public:
 	/// \note This is required from the signed volume calculation method getVolume()
 	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
 	/// simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
-	FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds);
+	Fem3DElementTetrahedron(std::array<unsigned int, 4> nodeIds);
 
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
@@ -87,7 +87,7 @@ public:
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	/// \note FemElement3DTetrahedron uses linear elasticity (not visco-elasticity), so it does not give any damping.
+	/// \note Fem3DElementTetrahedron uses linear elasticity (not visco-elasticity), so it does not give any damping.
 	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
 		double scale = 1.0) override;
 
@@ -203,4 +203,4 @@ protected:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENT3DTETRAHEDRON_H
+#endif // SURGSIM_PHYSICS_FEM3DELEMENTTETRAHEDRON_H

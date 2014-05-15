@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENT1DBEAM_H
-#define SURGSIM_PHYSICS_FEMELEMENT1DBEAM_H
+#ifndef SURGSIM_PHYSICS_FEM2DELEMENTTRIANGLE_H
+#define SURGSIM_PHYSICS_FEM2DELEMENTTRIANGLE_H
 
 #include <array>
 
@@ -26,27 +26,45 @@ namespace SurgSim
 namespace Physics
 {
 
-/// 1D FemElement based on a beam volume discretization with a fixed cross section
+/// 2D FemElement based on a triangle with a constant thickness
 ///
-/// The inertia property (mass) and the stiffness matrices are derived from "Theory of Matrix Structural Analysis" from
-/// J.S. Przemieniecki.  The deformation is based on linear elasticity theory and not on visco-elasticity theory;
-/// therefore, the element does not have any damping components.
-/// \note The element is considered to have a circular cross section.
-class FemElement1DBeam : public FemElement
+/// The triangle is modelled as a shell (6DOF) which is decomposed into a membrane (in-plane 2DOF (X,Y)) and
+/// a plate (bending/twisting 3DOF (Z, ThetaX,ThetaY)). The thin-plate assumption does not consider the drilling
+/// dof (ThetaZ). The system includes the DOF for completeness but does not assign any mass or stiffness to it.
+///
+/// The membrane (in-plane) equations (mass and stiffness) are following
+/// "Theory of Matrix Structural Analysis" from J.S. Przemieniecki.
+///
+/// The thin-plate (bending) equations (mass and stiffness) are following
+/// "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
+/// Numerical Methods in Engineering, vol 15, 1771-1812 (1980)
+/// \note The plate mass matrix is not detailed in the above paper, but the analytical equations
+/// \note have been derived from it.
+///
+/// \note The element is considered to have a constant thickness.
+class Fem2DElementTriangle : public FemElement
 {
+	typedef Eigen::Matrix<double, 3, 3, Eigen::DontAlign> Matrix33Type;
+
+	typedef Eigen::Matrix<double, 3, 6, Eigen::DontAlign> Matrix36Type;
+	typedef Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Matrix66Type;
+
+	typedef Eigen::Matrix<double, 3, 9, Eigen::DontAlign> Matrix39Type;
+	typedef Eigen::Matrix<double, 9, 9, Eigen::DontAlign> Matrix99Type;
+
 public:
 	/// Constructor
-	/// \param nodeIds An array of 2 node ids (A, B) defining this beam element with respect to a
+	/// \param nodeIds An array of 3 node ids (A, B, C) defining this triangle element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
-	FemElement1DBeam(std::array<unsigned int, 2> nodeIds);
+	Fem2DElementTriangle(std::array<unsigned int, 3> nodeIds);
 
-	/// Sets the beam's circular cross-section radius
-	/// \param radius The radius of the beam
-	void setRadius(double radius);
+	/// Sets the triangle's thickness
+	/// \param thickness The thickness of the triangle
+	void setThickness(double thickness);
 
-	/// Gets the beam's circular cross-section radius
-	/// \return The radius of the beam
-	double getRadius() const;
+	/// Gets the triangle's thickness
+	/// \return The thickness of the triangle
+	double getThickness() const;
 
 	/// Initializes the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
@@ -57,16 +75,6 @@ public:
 	/// \param state The state to compute the volume with
 	/// \return The element's volume
 	virtual double getVolume(const SurgSim::Math::OdeState& state) const override;
-
-	/// Gets whether shearing is enabled for the element
-	/// \return True if shearing is enabled
-	bool getShearingEnabled() const;
-
-	/// Enables or disables shearing for the element
-	///
-	/// Shearing can only be meaningfully enabled or disabled before the element has had initialize called.
-	/// \param enabled Boolean determining whether shearing is enabled
-	void setShearingEnabled(bool enabled);
 
 	/// Adds the element's force (computed for a given state) to a complete system force vector F (assembly)
 	/// \param state The state to compute the force with
@@ -145,64 +153,97 @@ public:
 		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
-	/// Computes the beam element's initial rotation
+	/// Computes the triangle element's initial rotation
 	/// \param state The state to compute the rotation from
-	/// \note This method stores the result in m_R0
+	/// \note This method stores the result in m_initialRotation
 	void computeInitialRotation(const SurgSim::Math::OdeState& state);
 
-	/// Computes the beam's stiffness matrix
+	/// Computes the triangle's stiffness matrix
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] k The stiffness matrix to store the result into
 	void computeStiffness(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* k);
+		Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* k);
 
-	/// Computes the beam's mass matrix
+	/// Computes the triangle's mass matrix
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] m The mass matrix to store the result into
-	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* m);
+	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* m);
 
 	/// The element's rest state
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_x0;
+	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> m_x0;
 
 	/// Initial rotation matrix for the element
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_R0;
+	SurgSim::Math::Matrix33d m_initialRotation;
 
 	/// Mass matrix (in global coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_M;
+	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_M;
 	/// Stiffness matrix (in local coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_MLocal;
+	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_MLocal;
 	/// Stiffness matrix (in global coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_K;
+	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_K;
 	/// Stiffness matrix (in local coordinate frame)
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_KLocal;
+	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_KLocal;
 
-	/// Physical shear modulus G = E/( 2(1+mu) )
-	double m_G;
+	/// The triangle rest area
+	double m_restArea;
 
-	/// Rest length
-	double m_restLength;
-	/// radius for a circular Beam
-	double m_radius;
-	/// Cross sectional area = PI.radius.radius if circular
-	double m_A;
-	/// Does this beam element have shear
-	bool m_haveShear;
-	/// Shear factor (usually 5/8)
-	double m_shearFactor;
-	/// The shear area in the y and z directions (=0 => no shear) http://en.wikipedia.org/wiki/Timoshenko_beam_theory
-	double m_Asy, m_Asz;
-	/// Shear deformation parameters
-	/// Phi_y=12.E.Iz/(G.Asy.L^2) or 0 if As?=0
-	/// Phi_z=12.E.Iy/(G.Asz.L^2) or 0 if As?=0
-	double m_Phi_y, m_Phi_z;
-	/// Cross sectional moment of inertia
-	double m_Iy, m_Iz;
-	/// Polar moment of inertia
-	double m_J;
+	/// Thickness of the element
+	double m_thickness;
+
+	/// Compute the various shape functions (membrane and plate deformations) parameters
+	/// \param restState the rest state to compute the shape functions paramters from
+	void computeShapeFunctionsParameters(const SurgSim::Math::OdeState& restState);
+
+	/// Membrane (in-plane) deformation. DOF simulated: (x, y)
+	/// "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
+	/// Shape functions fi(x, y) = ai + bi.x + ci.y
+	SurgSim::Math::Matrix33d m_membraneShapeFunctionsParameters; //< Stores (ai, bi, ci) on each row
+
+	/// Thin-plate (bending/twisting) specific data structure
+	/// DOF simulated: (z, thetaX, thetaY)
+	/// "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
+	/// Numerical Methods in Engineering, vol 15, 1771-1812 (1980)
+	/// Indices are as follow:
+	/// 0 1 2 denotes triangle's points ABC:
+	/// 4 (mid-edge 12) 5 (mid-edge 20) 6 (mid-edge 01) denotes mid-edge points
+	/// Data structures having only mid-edge information are 0 based (0->4 (mid-egde 12) ; 1->5 ; 2->6)
+	SurgSim::Math::Vector3d m_xij;     //< xi - xj
+	SurgSim::Math::Vector3d m_yij;     //< yi - yj
+	SurgSim::Math::Vector3d m_lij_sqr; //< xij^2 + yij^2
+	SurgSim::Math::Vector3d m_ak;      //< -xij/li^2
+	SurgSim::Math::Vector3d m_bk;      //< 3/4 xij yij/lij2
+	SurgSim::Math::Vector3d m_ck;      //< (1/4 xij^2 - 1/2 yij^2)/lij^2
+	SurgSim::Math::Vector3d m_dk;      //< -yij/lij^2
+	SurgSim::Math::Vector3d m_ek;      //< (1/4 yij^2 - 1/2 xij^2)/lij^2
+	//...and more variables for the derivatives
+	SurgSim::Math::Vector3d m_Pk;      //< -6xij/lij^2    = 6 m_ak
+	SurgSim::Math::Vector3d m_qk;      //< 3xijyij/lij^2  = 4 m_bk
+	SurgSim::Math::Vector3d m_tk;      //< -6yij/lij^2    = 6 m_dk
+	SurgSim::Math::Vector3d m_rk;      //< 3yij^2/lij^2
+	/// Batoz derivative dHx/dxi
+	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
+	/// \return The vector dHx/dxi evaluated at (xi, neta)
+	std::array<double, 9> batozDhxDxi(double xi, double neta) const;
+	/// Batoz derivative dHx/dneta
+	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
+	/// \return The vector dHx/dneta evaluated at (xi, neta)
+	std::array<double, 9> batozDhxDneta(double xi, double neta) const;
+	/// Batoz derivative dHy/dxi
+	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
+	/// \return The vector dHy/dxi evaluated at (xi, neta)
+	std::array<double, 9> batozDhyDxi(double xi, double neta) const;
+	/// Batoz derivative dHy/dneta
+	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
+	/// \return The vector dHy/dneta evaluated at (xi, neta)
+	std::array<double, 9> batozDhyDneta(double xi, double neta) const;
+	/// Batoz strain displacement matrix evaluated at a given point
+	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
+	/// \return The 3x9 strain displacement matrix evaluated at (xi, neta)
+	Matrix39Type batozStrainDisplacement(double xi, double neta) const;
 };
 
 } // namespace Physics
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENT1DBEAM_H
+#endif // SURGSIM_PHYSICS_FEM2DELEMENTTRIANGLE_H
