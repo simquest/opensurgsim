@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENT2DTRIANGLE_H
-#define SURGSIM_PHYSICS_FEMELEMENT2DTRIANGLE_H
+#ifndef SURGSIM_PHYSICS_FEM2DELEMENTTRIANGLE_H
+#define SURGSIM_PHYSICS_FEM2DELEMENTTRIANGLE_H
 
 #include <array>
 
@@ -42,21 +42,21 @@ namespace Physics
 /// \note have been derived from it.
 ///
 /// \note The element is considered to have a constant thickness.
-class FemElement2DTriangle : public FemElement
+class Fem2DElementTriangle : public FemElement
 {
-	typedef Eigen::Matrix<double, 3, 3, Eigen::DontAlign> Matrix33Type;
+	typedef Eigen::Matrix<double, 3, 3> Matrix33Type;
 
-	typedef Eigen::Matrix<double, 3, 6, Eigen::DontAlign> Matrix36Type;
-	typedef Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Matrix66Type;
+	typedef Eigen::Matrix<double, 3, 6> Matrix36Type;
+	typedef Eigen::Matrix<double, 6, 6> Matrix66Type;
 
-	typedef Eigen::Matrix<double, 3, 9, Eigen::DontAlign> Matrix39Type;
-	typedef Eigen::Matrix<double, 9, 9, Eigen::DontAlign> Matrix99Type;
+	typedef Eigen::Matrix<double, 3, 9> Matrix39Type;
+	typedef Eigen::Matrix<double, 9, 9> Matrix99Type;
 
 public:
 	/// Constructor
 	/// \param nodeIds An array of 3 node ids (A, B, C) defining this triangle element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
-	FemElement2DTriangle(std::array<unsigned int, 3> nodeIds);
+	Fem2DElementTriangle(std::array<unsigned int, 3> nodeIds);
 
 	/// Sets the triangle's thickness
 	/// \param thickness The thickness of the triangle
@@ -162,27 +162,27 @@ protected:
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] k The stiffness matrix to store the result into
 	void computeStiffness(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* k);
+		Eigen::Matrix<double, 18, 18>* k);
 
 	/// Computes the triangle's mass matrix
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] m The mass matrix to store the result into
-	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 18, 18, Eigen::DontAlign>* m);
+	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 18, 18>* m);
 
 	/// The element's rest state
-	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> m_x0;
+	Eigen::Matrix<double, 18, 1> m_x0;
 
 	/// Initial rotation matrix for the element
 	SurgSim::Math::Matrix33d m_initialRotation;
 
 	/// Mass matrix (in global coordinate frame)
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_M;
+	Eigen::Matrix<double, 18, 18> m_M;
 	/// Stiffness matrix (in local coordinate frame)
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_MLocal;
+	Eigen::Matrix<double, 18, 18> m_MLocal;
 	/// Stiffness matrix (in global coordinate frame)
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_K;
+	Eigen::Matrix<double, 18, 18> m_K;
 	/// Stiffness matrix (in local coordinate frame)
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_KLocal;
+	Eigen::Matrix<double, 18, 18> m_KLocal;
 
 	/// The triangle rest area
 	double m_restArea;
@@ -246,4 +246,4 @@ protected:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENT2DTRIANGLE_H
+#endif // SURGSIM_PHYSICS_FEM2DELEMENTTRIANGLE_H

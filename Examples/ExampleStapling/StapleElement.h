@@ -18,18 +18,9 @@
 
 #include <string>
 
-#include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 
-namespace SurgSim
-{
-namespace Physics
-{
-class RigidRepresentation;
-}
-}
-
-class StapleElement : public SurgSim::Framework::SceneElement
+class StapleElement : public SurgSim::Framework::BasicSceneElement
 {
 public:
 	/// Constructor
@@ -40,18 +31,12 @@ public:
 	/// \param flag Flag to specify whether the staple was created with a collision representation.
 	void setHasCollisionRepresentation(bool flag);
 
-	/// Destructor
-	~StapleElement();
-
 protected:
 	/// Initialize this scene element
 	/// \return True on success, otherwise false.
 	virtual bool doInitialize() override;
 
 private:
-	/// The pose of this scene element
-	SurgSim::Math::RigidTransform3d m_pose;
-
 	/// Flag to specify if the stapleElement was created with a collision representation.
 	bool m_hasCollisionRepresentation;
 };

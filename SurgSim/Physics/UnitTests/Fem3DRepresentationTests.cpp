@@ -31,7 +31,7 @@
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
-#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 
 namespace SurgSim
 {
@@ -302,6 +302,29 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 	}
 }
 
-} // namespace Physics
+TEST(Fem3DRepresentationTests, SerializationTest)
+{
+	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Test-Fem3D");
+	const std::string filename = "TestFilename";
+	fem3DRepresentation->setFilename(filename);
+	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
+	fem3DRepresentation->setCollisionRepresentation(collisionRepresentation);
 
+	YAML::Node node;
+	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*fem3DRepresentation));
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(1u, node.size());
+
+	YAML::Node data = node["SurgSim::Physics::Fem3DRepresentation"];
+	EXPECT_EQ(10u, data.size());
+
+	std::shared_ptr<Fem3DRepresentation> newRepresentation;
+	ASSERT_NO_THROW(newRepresentation =
+		std::dynamic_pointer_cast<Fem3DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+
+	EXPECT_EQ("SurgSim::Physics::Fem3DRepresentation", newRepresentation->getClassName());
+	EXPECT_EQ(filename, newRepresentation->getValue<std::string>("Filename"));
+}
+
+} // namespace Physics
 } // namespace SurgSim

@@ -65,8 +65,8 @@ TEST_F(MeshTests, MakeMeshTestWorking)
 
 	for (size_t i=0; i< cubeVertices.size(); ++i)
 	{
-		EXPECT_EQ(cubeColors[i], mesh->getVertex(i).data.color.getValue());
-		EXPECT_EQ(cubeTextures[i], mesh->getVertex(i).data.texture.getValue());
+		EXPECT_TRUE(cubeColors[i] == mesh->getVertex(i).data.color.getValue());
+		EXPECT_TRUE(cubeTextures[i] == mesh->getVertex(i).data.texture.getValue());
 	}
 }
 

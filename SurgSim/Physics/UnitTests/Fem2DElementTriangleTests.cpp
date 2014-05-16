@@ -23,25 +23,25 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/FemElement2DTriangle.h"
+#include "SurgSim/Physics/Fem2DElementTriangle.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
-using SurgSim::Physics::FemElement2DTriangle;
+using SurgSim::Physics::Fem2DElementTriangle;
 
 namespace
 {
 const double epsilon = 1e-8;
 };
 
-class MockFemElement2D : public FemElement2DTriangle
+class MockFem2DElement : public Fem2DElementTriangle
 {
 public:
-	MockFemElement2D(std::array<unsigned int, 3> nodeIds)
-		: FemElement2DTriangle(nodeIds)
+	MockFem2DElement(std::array<unsigned int, 3> nodeIds)
+		: Fem2DElementTriangle(nodeIds)
 	{
 	}
 
@@ -50,7 +50,7 @@ public:
 		return m_initialRotation;
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getInitialRotationTimes6()
+	const Eigen::Matrix<double, 18, 18>& getInitialRotationTimes6()
 	{
 		const Matrix33d& R0 = getInitialRotation();
 
@@ -66,27 +66,27 @@ public:
 		return m_initialRotationTimes6;
 	}
 
-	const Eigen::Matrix<double, 3, 9, Eigen::DontAlign> getBatozStrainDisplacement(double xi, double neta) const
+	const Eigen::Matrix<double, 3, 9> getBatozStrainDisplacement(double xi, double neta) const
 	{
 		return batozStrainDisplacement(xi, neta);
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getLocalStiffnessMatrix() const
+	const Eigen::Matrix<double, 18, 18>& getLocalStiffnessMatrix() const
 	{
 		return m_KLocal;
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getGlobalStiffnessMatrix() const
+	const Eigen::Matrix<double, 18, 18>& getGlobalStiffnessMatrix() const
 	{
 		return m_K;
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getLocalMassMatrix() const
+	const Eigen::Matrix<double, 18, 18>& getLocalMassMatrix() const
 	{
 		return m_MLocal;
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getGlobalMassMatrix() const
+	const Eigen::Matrix<double, 18, 18>& getGlobalMassMatrix() const
 	{
 		return m_M;
 	}
@@ -96,7 +96,7 @@ public:
 		return m_restArea;
 	}
 
-	const Eigen::Matrix<double, 18, 1, Eigen::DontAlign>& getInitialPosition() const
+	const Eigen::Matrix<double, 18, 1>& getInitialPosition() const
 	{
 		return m_x0;
 	}
@@ -316,9 +316,9 @@ public:
 		return res;
 	}
 
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> batozStrainDisplacementAlternativeDerivative(double xi, double neta)
+	Eigen::Matrix<double, 3, 9> batozStrainDisplacementAlternativeDerivative(double xi, double neta)
 	{
-		Eigen::Matrix<double, 3, 9, Eigen::DontAlign> res;
+		Eigen::Matrix<double, 3, 9> res;
 		std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
 		double coefficient = 1.0 / (2.0 * m_restArea);
 
@@ -342,12 +342,12 @@ public:
 	}
 
 	std::array<double, 9> batozFx(double xi, double neta,
-		double (MockFemElement2D::*f1)(double,double) const,
-		double (MockFemElement2D::*f2)(double,double) const,
-		double (MockFemElement2D::*f3)(double,double) const,
-		double (MockFemElement2D::*f4)(double,double) const,
-		double (MockFemElement2D::*f5)(double,double) const,
-		double (MockFemElement2D::*f6)(double,double) const)
+		double (MockFem2DElement::*f1)(double,double) const,
+		double (MockFem2DElement::*f2)(double,double) const,
+		double (MockFem2DElement::*f3)(double,double) const,
+		double (MockFem2DElement::*f4)(double,double) const,
+		double (MockFem2DElement::*f5)(double,double) const,
+		double (MockFem2DElement::*f6)(double,double) const)
 	{
 		std::array<double, 9> res;
 
@@ -376,12 +376,12 @@ public:
 	}
 
 	std::array<double, 9> batozFy(double xi, double neta,
-		double (MockFemElement2D::*f1)(double,double) const,
-		double (MockFemElement2D::*f2)(double,double) const,
-		double (MockFemElement2D::*f3)(double,double) const,
-		double (MockFemElement2D::*f4)(double,double) const,
-		double (MockFemElement2D::*f5)(double,double) const,
-		double (MockFemElement2D::*f6)(double,double) const)
+		double (MockFem2DElement::*f1)(double,double) const,
+		double (MockFem2DElement::*f2)(double,double) const,
+		double (MockFem2DElement::*f3)(double,double) const,
+		double (MockFem2DElement::*f4)(double,double) const,
+		double (MockFem2DElement::*f5)(double,double) const,
+		double (MockFem2DElement::*f6)(double,double) const)
 	{
 		std::array<double, 9> res;
 
@@ -409,24 +409,24 @@ public:
 		return res;
 	}
 
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> batozStrainDisplacementNumericalDerivation(double xi, double neta)
+	Eigen::Matrix<double, 3, 9> batozStrainDisplacementNumericalDerivation(double xi, double neta)
 	{
-		Eigen::Matrix<double, 3, 9, Eigen::DontAlign> res;
+		Eigen::Matrix<double, 3, 9> res;
 		std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
 		double coefficient = 1.0 / (2.0 * m_restArea);
 
-		dHx_dxi = batozFx(xi, neta, &MockFemElement2D::batozDN1Dxi , &MockFemElement2D::batozDN2Dxi ,
-			&MockFemElement2D::batozDN3Dxi , &MockFemElement2D::batozDN4Dxi , &MockFemElement2D::batozDN5Dxi ,
-			&MockFemElement2D::batozDN6Dxi);
-		dHx_dneta = batozFx(xi, neta, &MockFemElement2D::batozDN1Dneta, &MockFemElement2D::batozDN2Dneta,
-			&MockFemElement2D::batozDN3Dneta, &MockFemElement2D::batozDN4Dneta, &MockFemElement2D::batozDN5Dneta,
-			&MockFemElement2D::batozDN6Dneta);
-		dHy_dxi = batozFy(xi, neta, &MockFemElement2D::batozDN1Dxi, &MockFemElement2D::batozDN2Dxi ,
-			&MockFemElement2D::batozDN3Dxi, &MockFemElement2D::batozDN4Dxi, &MockFemElement2D::batozDN5Dxi,
-			&MockFemElement2D::batozDN6Dxi);
-		dHy_dneta = batozFy(xi, neta, &MockFemElement2D::batozDN1Dneta, &MockFemElement2D::batozDN2Dneta,
-			&MockFemElement2D::batozDN3Dneta, &MockFemElement2D::batozDN4Dneta, &MockFemElement2D::batozDN5Dneta,
-			&MockFemElement2D::batozDN6Dneta);
+		dHx_dxi = batozFx(xi, neta, &MockFem2DElement::batozDN1Dxi , &MockFem2DElement::batozDN2Dxi ,
+			&MockFem2DElement::batozDN3Dxi , &MockFem2DElement::batozDN4Dxi , &MockFem2DElement::batozDN5Dxi ,
+			&MockFem2DElement::batozDN6Dxi);
+		dHx_dneta = batozFx(xi, neta, &MockFem2DElement::batozDN1Dneta, &MockFem2DElement::batozDN2Dneta,
+			&MockFem2DElement::batozDN3Dneta, &MockFem2DElement::batozDN4Dneta, &MockFem2DElement::batozDN5Dneta,
+			&MockFem2DElement::batozDN6Dneta);
+		dHy_dxi = batozFy(xi, neta, &MockFem2DElement::batozDN1Dxi, &MockFem2DElement::batozDN2Dxi ,
+			&MockFem2DElement::batozDN3Dxi, &MockFem2DElement::batozDN4Dxi, &MockFem2DElement::batozDN5Dxi,
+			&MockFem2DElement::batozDN6Dxi);
+		dHy_dneta = batozFy(xi, neta, &MockFem2DElement::batozDN1Dneta, &MockFem2DElement::batozDN2Dneta,
+			&MockFem2DElement::batozDN3Dneta, &MockFem2DElement::batozDN4Dneta, &MockFem2DElement::batozDN5Dneta,
+			&MockFem2DElement::batozDN6Dneta);
 
 		for(size_t i = 0; i < 9; ++i)
 		{
@@ -443,10 +443,10 @@ public:
 	}
 
 private:
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_initialRotationTimes6;
+	Eigen::Matrix<double, 18, 18> m_initialRotationTimes6;
 };
 
-class FemElement2DTriangleTests : public ::testing::Test
+class Fem2DElementTriangleTests : public ::testing::Test
 {
 public:
 	static const int m_numberNodes = 6;
@@ -458,7 +458,7 @@ public:
 	double m_A;         // area
 	double m_thickness; // thickness
 	Quaterniond m_rotation, m_expectedRotation;
-	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> m_expectedX0;
+	Eigen::Matrix<double, 18, 1> m_expectedX0;
 
 	virtual void SetUp() override
 	{
@@ -514,8 +514,8 @@ public:
 
 	void getExpectedLocalStiffnessMatrix(Eigen::Ref<SurgSim::Math::Matrix> stiffness)
 	{
-		typedef Eigen::Matrix<double, 9, 9, Eigen::DontAlign> Matrix99Type;
-		typedef Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Matrix66Type;
+		typedef Eigen::Matrix<double, 9, 9> Matrix99Type;
+		typedef Eigen::Matrix<double, 6, 6> Matrix66Type;
 
 		Matrix66Type membraneStiffness = getMembraneLocalStiffnessMatrix();
 		Matrix99Type plateStiffness = getPlateLocalStiffnessMatrix();
@@ -535,11 +535,11 @@ public:
 		}
 	}
 
-	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> getMembraneLocalStiffnessMatrix()
+	Eigen::Matrix<double, 6, 6> getMembraneLocalStiffnessMatrix()
 	{
-		typedef Eigen::Matrix<double, 3, 6, Eigen::DontAlign> Matrix36Type;
+		typedef Eigen::Matrix<double, 3, 6> Matrix36Type;
 
-		std::shared_ptr<MockFemElement2D> element = getElement();
+		std::shared_ptr<MockFem2DElement> element = getElement();
 
 		// Membrane theory (using "Theory of Matrix Structural Analysis" - Przemieniecki)
 		// ux = c1.x + c2.y + c3
@@ -592,12 +592,12 @@ public:
 		return (m_thickness * m_A) * b.transpose() * Emembrane * b;
 	}
 
-	Eigen::Matrix<double, 9, 9, Eigen::DontAlign> getPlateLocalStiffnessMatrix()
+	Eigen::Matrix<double, 9, 9> getPlateLocalStiffnessMatrix()
 	{
-		typedef Eigen::Matrix<double, 3, 9, Eigen::DontAlign> Matrix39Type;
+		typedef Eigen::Matrix<double, 3, 9> Matrix39Type;
 
-		Eigen::Matrix<double, 9, 9, Eigen::DontAlign> stiffness;
-		std::shared_ptr<MockFemElement2D> element = getElement();
+		Eigen::Matrix<double, 9, 9> stiffness;
+		std::shared_ptr<MockFem2DElement> element = getElement();
 
 		// Thin-plate theory (Batoz)
 		Matrix39Type B0 = element->batozStrainDisplacementNumericalDerivation(0.5, 0.0);
@@ -616,9 +616,9 @@ public:
 		return stiffness;
 	}
 
-	std::shared_ptr<MockFemElement2D> getElement()
+	std::shared_ptr<MockFem2DElement> getElement()
 	{
-		auto element = std::make_shared<MockFemElement2D>(m_nodeIds);
+		auto element = std::make_shared<MockFem2DElement>(m_nodeIds);
 		element->setThickness(m_thickness);
 		element->setMassDensity(m_rho);
 		element->setPoissonRatio(m_nu);
@@ -628,14 +628,14 @@ public:
 	}
 };
 
-TEST_F(FemElement2DTriangleTests, ConstructorTest)
+TEST_F(Fem2DElementTriangleTests, ConstructorTest)
 {
-	ASSERT_NO_THROW({ MockFemElement2D triangle(m_nodeIds); });
+	ASSERT_NO_THROW({ MockFem2DElement triangle(m_nodeIds); });
 }
 
-TEST_F(FemElement2DTriangleTests, NodeIdsTest)
+TEST_F(Fem2DElementTriangleTests, NodeIdsTest)
 {
-	FemElement2DTriangle element(m_nodeIds);
+	Fem2DElementTriangle element(m_nodeIds);
 	EXPECT_EQ(3u, element.getNumNodes());
 	EXPECT_EQ(3u, element.getNodeIds().size());
 	for (int i = 0; i < 3; i++)
@@ -645,9 +645,9 @@ TEST_F(FemElement2DTriangleTests, NodeIdsTest)
 	}
 }
 
-TEST_F(FemElement2DTriangleTests, setGetThicknessTest)
+TEST_F(Fem2DElementTriangleTests, setGetThicknessTest)
 {
-	FemElement2DTriangle element(m_nodeIds);
+	Fem2DElementTriangle element(m_nodeIds);
 
 	// Default thickness = 0.0
 	EXPECT_DOUBLE_EQ(0.0, element.getThickness());
@@ -659,9 +659,9 @@ TEST_F(FemElement2DTriangleTests, setGetThicknessTest)
 	EXPECT_ANY_THROW(element.setThickness(-9.4));
 }
 
-TEST_F(FemElement2DTriangleTests, MaterialParameterTest)
+TEST_F(Fem2DElementTriangleTests, MaterialParameterTest)
 {
-	FemElement2DTriangle element(m_nodeIds);
+	Fem2DElementTriangle element(m_nodeIds);
 	element.setThickness(m_thickness);
 
 	// Test the various mode of failure related to the physical parameters
@@ -696,15 +696,15 @@ TEST_F(FemElement2DTriangleTests, MaterialParameterTest)
 	}
 }
 
-TEST_F(FemElement2DTriangleTests, VolumeTest)
+TEST_F(Fem2DElementTriangleTests, VolumeTest)
 {
-	std::shared_ptr<MockFemElement2D> element = getElement();
+	std::shared_ptr<MockFem2DElement> element = getElement();
 	EXPECT_NEAR(element->getVolume(m_restState), m_expectedVolume, 1e-10);
 }
 
-TEST_F(FemElement2DTriangleTests, CoordinateTests)
+TEST_F(Fem2DElementTriangleTests, CoordinateTests)
 {
-	FemElement2DTriangle element(m_nodeIds);
+	Fem2DElementTriangle element(m_nodeIds);
 
 	Vector validNaturalCoordinate(3);
 	Vector validNaturalCoordinate2(3);
@@ -757,15 +757,15 @@ TEST_F(FemElement2DTriangleTests, CoordinateTests)
 	EXPECT_THROW(element.computeNaturalCoordinate(m_restState, cartesian), SurgSim::Framework::AssertionFailure);
 }
 
-TEST_F(FemElement2DTriangleTests, RestAreaTest)
+TEST_F(Fem2DElementTriangleTests, RestAreaTest)
 {
-	std::shared_ptr<MockFemElement2D> element = getElement();
+	std::shared_ptr<MockFem2DElement> element = getElement();
 	EXPECT_NEAR(element->getRestArea(), m_A, 1e-10);
 }
 
-TEST_F(FemElement2DTriangleTests, InitialRotationTest)
+TEST_F(Fem2DElementTriangleTests, InitialRotationTest)
 {
-	std::shared_ptr<MockFemElement2D> element = getElement();
+	std::shared_ptr<MockFem2DElement> element = getElement();
 
 	// Use a mask to test the structure of the rotation matrix R0 (6 digonal block 3x3 matrix and 0 elsewhere)
 	Eigen::Matrix<double, 18, 18> mask;
@@ -786,20 +786,20 @@ TEST_F(FemElement2DTriangleTests, InitialRotationTest)
 	EXPECT_TRUE(element->getInitialRotationTimes6().block(15, 15, 3, 3).isApprox(m_expectedRotation.matrix()));
 }
 
-TEST_F(FemElement2DTriangleTests, StrainDisplacementPlateAtGaussPointTest)
+TEST_F(Fem2DElementTriangleTests, StrainDisplacementPlateAtGaussPointTest)
 {
-	std::shared_ptr<MockFemElement2D> element = getElement();
+	std::shared_ptr<MockFem2DElement> element = getElement();
 
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> strainDisplacement[3];
+	Eigen::Matrix<double, 3, 9> strainDisplacement[3];
 	strainDisplacement[0] = element->getBatozStrainDisplacement(0.0, 0.5);
 	strainDisplacement[1] = element->getBatozStrainDisplacement(0.5, 0.0);
 	strainDisplacement[2] = element->getBatozStrainDisplacement(0.5, 0.5);
 
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> strainDisplacementExpected1[3];
+	Eigen::Matrix<double, 3, 9> strainDisplacementExpected1[3];
 	strainDisplacementExpected1[0] = element->batozStrainDisplacementAlternativeDerivative(0.0, 0.5);
 	strainDisplacementExpected1[1] = element->batozStrainDisplacementAlternativeDerivative(0.5, 0.0);
 	strainDisplacementExpected1[2] = element->batozStrainDisplacementAlternativeDerivative(0.5, 0.5);
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> strainDisplacementExpected2[3];
+	Eigen::Matrix<double, 3, 9> strainDisplacementExpected2[3];
 	strainDisplacementExpected2[0] = element->batozStrainDisplacementNumericalDerivation(0.0, 0.5);
 	strainDisplacementExpected2[1] = element->batozStrainDisplacementNumericalDerivation(0.5, 0.0);
 	strainDisplacementExpected2[2] = element->batozStrainDisplacementNumericalDerivation(0.5, 0.5);
@@ -815,7 +815,7 @@ TEST_F(FemElement2DTriangleTests, StrainDisplacementPlateAtGaussPointTest)
 		strainDisplacementExpected1[2] << std::endl <<
 		strainDisplacementExpected2[2] << std::endl;
 
-	// Validate the FemElement2DTriangle internal calculation against both technique
+	// Validate the Fem2DElementTriangle internal calculation against both technique
 	EXPECT_TRUE(strainDisplacement[0].isApprox(strainDisplacementExpected1[0])) <<
 		strainDisplacement[0] << std::endl <<
 		strainDisplacementExpected1[0] << std::endl;
@@ -853,11 +853,11 @@ double N(size_t i,
 }
 };
 
-TEST_F(FemElement2DTriangleTests, MembraneShapeFunctionsTest)
+TEST_F(Fem2DElementTriangleTests, MembraneShapeFunctionsTest)
 {
 	using SurgSim::Math::getSubVector;
 
-	std::shared_ptr<MockFemElement2D> tri = getElement();
+	std::shared_ptr<MockFem2DElement> tri = getElement();
 
 	EXPECT_TRUE(tri->getInitialPosition().isApprox(m_expectedX0)) <<
 		"x0 = " << tri->getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
@@ -919,9 +919,9 @@ TEST_F(FemElement2DTriangleTests, MembraneShapeFunctionsTest)
 	}
 }
 
-TEST_F(FemElement2DTriangleTests, PlateShapeFunctionsTest)
+TEST_F(Fem2DElementTriangleTests, PlateShapeFunctionsTest)
 {
-	std::shared_ptr<MockFemElement2D> tri = getElement();
+	std::shared_ptr<MockFem2DElement> tri = getElement();
 
 	// Shape function N1 weigth point 0 (parametric coordinate 0 0)
 	EXPECT_DOUBLE_EQ(1.0, tri->batozN1(0.0, 0.0));
@@ -992,26 +992,26 @@ TEST_F(FemElement2DTriangleTests, PlateShapeFunctionsTest)
 	}
 }
 
-TEST_F(FemElement2DTriangleTests, StiffnessMatrixTest)
+TEST_F(Fem2DElementTriangleTests, StiffnessMatrixTest)
 {
-	std::shared_ptr<MockFemElement2D> tri = getElement();
+	std::shared_ptr<MockFem2DElement> tri = getElement();
 
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> expectedLocalStiffness;
+	Eigen::Matrix<double, 18 ,18> expectedLocalStiffness;
 	getExpectedLocalStiffnessMatrix(expectedLocalStiffness);
 	EXPECT_TRUE(tri->getLocalStiffnessMatrix().isApprox(expectedLocalStiffness)) <<
 		"KLocal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
 		"KLocal expected = " << std::endl << expectedLocalStiffness << std::endl;
 
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
+	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalStiffnessMatrix().isApprox(R0 * expectedLocalStiffness * R0.transpose())) <<
 		"R0 = " << std::endl << R0 << std::endl <<
 		"KGlobal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
 		"KGlobal expected = " << std::endl << expectedLocalStiffness << std::endl;
 }
 
-TEST_F(FemElement2DTriangleTests, MassMatrixTest)
+TEST_F(Fem2DElementTriangleTests, MassMatrixTest)
 {
-	std::shared_ptr<MockFemElement2D> tri = getElement();
+	std::shared_ptr<MockFem2DElement> tri = getElement();
 
 	// We analytically test the 3x3 (x y z) component
 	// m = rho.A(123).t/12.0.[2 1 1]
@@ -1024,18 +1024,18 @@ TEST_F(FemElement2DTriangleTests, MassMatrixTest)
 	EXPECT_TRUE(tri->getLocalMassMatrix().block(0,0,3,3).isApprox(M));
 
 	// And use a hard-coded mass matrix for expected matrix
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> expectedMassMatrix;
+	Eigen::Matrix<double, 18, 18> expectedMassMatrix;
 	getExpectedLocalMassMatrix(expectedMassMatrix);
 	EXPECT_TRUE(tri->getLocalMassMatrix().isApprox(expectedMassMatrix));
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
+	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalMassMatrix().isApprox(R0 * expectedMassMatrix * R0.transpose()));
 }
 
-TEST_F(FemElement2DTriangleTests, ForceAndMatricesAPITest)
+TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 {
 	using SurgSim::Math::addSubMatrix;
 
-	std::shared_ptr<MockFemElement2D> tri = getElement();
+	std::shared_ptr<MockFem2DElement> tri = getElement();
 
 	const int numDof = 6 * m_restState.getNumNodes();
 	SurgSim::Math::Vector forceVector(numDof);
@@ -1048,14 +1048,14 @@ TEST_F(FemElement2DTriangleTests, ForceAndMatricesAPITest)
 	SurgSim::Math::Matrix expectedStiffnessMatrix(numDof, numDof);
 
 	// Assemble manually the expectedStiffnessMatrix
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> expected18x18StiffnessMatrix;
+	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
+	Eigen::Matrix<double, 18, 18> expected18x18StiffnessMatrix;
 	getExpectedLocalStiffnessMatrix(expected18x18StiffnessMatrix);
 	expectedStiffnessMatrix.setZero();
 	addSubMatrix(R0 * expected18x18StiffnessMatrix * R0.transpose(), tri->getNodeIds(), 6, &expectedStiffnessMatrix);
 
 	// Assemble manually the expectedMassMatrix
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> expected18x18MassMatrix;
+	Eigen::Matrix<double, 18, 18> expected18x18MassMatrix;
 	getExpectedLocalMassMatrix(expected18x18MassMatrix);
 	expectedMassMatrix.setZero();
 	addSubMatrix(R0 * expected18x18MassMatrix * R0.transpose(), tri->getNodeIds(), 6, &expectedMassMatrix);

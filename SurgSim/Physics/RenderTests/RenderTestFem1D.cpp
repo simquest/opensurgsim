@@ -24,7 +24,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
-#include "SurgSim/Physics/FemElement1DBeam.h"
+#include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
@@ -32,7 +32,7 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem1DRepresentation;
-using SurgSim::Physics::FemElement1DBeam;
+using SurgSim::Physics::Fem1DElementBeam;
 
 namespace
 {
@@ -64,7 +64,7 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 	for (unsigned int beamId = 0; beamId < numNodes - 1; beamId++)
 	{
 		std::array<unsigned int, 2> beamNodeIds = {{beamId, beamId + 1}};
-		std::shared_ptr<FemElement1DBeam> beam = std::make_shared<FemElement1DBeam>(beamNodeIds);
+		std::shared_ptr<Fem1DElementBeam> beam = std::make_shared<Fem1DElementBeam>(beamNodeIds);
 		beam->setRadius(0.10);
 		beam->setMassDensity(3000.0);
 		beam->setPoissonRatio(0.45);

@@ -15,7 +15,6 @@
 
 #include "SurgSim/Physics/PhysicsConvert.h"
 
-#include "SurgSim/Physics/RigidRepresentationBaseState.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
@@ -36,32 +35,6 @@ Node convert<SurgSim::Physics::RigidRepresentationParameters>::encode(
 bool convert<SurgSim::Physics::RigidRepresentationParameters>::decode(
 			const Node& node,
 			SurgSim::Physics::RigidRepresentationParameters& rhs)
-{
-	bool result = false;
-	if (node[rhs.getClassName()].IsDefined())
-	{
-		YAML::Node data;
-		data = node[rhs.getClassName()];
-		rhs.decode(data);
-		result = true;
-	}
-	return result;
-}
-
-Node convert<SurgSim::Physics::RigidRepresentationBaseState>::encode(
-	const SurgSim::Physics::RigidRepresentationBaseState& rhs)
-{
-	YAML::Node data(rhs.encode());
-
-	YAML::Node result;
-	result[rhs.getClassName()] = data;
-
-	return result;
-}
-
-bool convert<SurgSim::Physics::RigidRepresentationBaseState>::decode(
-	const Node& node,
-	SurgSim::Physics::RigidRepresentationBaseState& rhs)
 {
 	bool result = false;
 	if (node[rhs.getClassName()].IsDefined())

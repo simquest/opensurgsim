@@ -72,7 +72,7 @@ public:
 
 	/// Sets the size of the capsule
 	/// \param size Size of the capsule
-	virtual void setSize(SurgSim::Math::Vector2d size) override;
+	virtual void setSize(const SurgSim::Math::Vector2d& size) override;
 	/// Returns the radius of the capsule
 	/// \return Size of the capsule
 	virtual SurgSim::Math::Vector2d getSize() const override;

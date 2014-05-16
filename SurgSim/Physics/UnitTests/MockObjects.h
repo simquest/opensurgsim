@@ -134,7 +134,8 @@ public:
 class MockDeformableRepresentation : public SurgSim::Physics::DeformableRepresentation
 {
 public:
-	MockDeformableRepresentation() : SurgSim::Physics::DeformableRepresentation("MockDeformableRepresentation")
+	explicit MockDeformableRepresentation(const std::string& name = "MockDeformableRepresentation") :
+		SurgSim::Physics::DeformableRepresentation(name)
 	{
 		this->m_numDofPerNode = 3;
 		m_F = Vector::LinSpaced(3, 1.0, 3.0);
@@ -151,6 +152,8 @@ public:
 	{
 		return SurgSim::Physics::REPRESENTATION_TYPE_INVALID;
 	}
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::MockDeformableRepresentation);
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
@@ -215,6 +218,11 @@ protected:
 	Vector m_F;
 	Matrix m_M, m_D, m_K;
 };
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::MockDeformableRepresentation);
+}
 
 class MockSpring : public SurgSim::Physics::Spring
 {

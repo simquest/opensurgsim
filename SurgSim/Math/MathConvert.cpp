@@ -15,6 +15,8 @@
 
 #include "SurgSim/Math/MathConvert.h"
 
+#include <algorithm>
+
 #include "SurgSim/Math/Shape.h"
 
 namespace YAML
@@ -59,6 +61,53 @@ bool convert<std::shared_ptr<SurgSim::Math::Shape>>::decode(
 			rhs->decode(data);
 		}
 
+		result = true;
+	}
+
+	return result;
+}
+
+
+Node convert<SurgSim::Math::IntegrationScheme>::encode(
+	const SurgSim::Math::IntegrationScheme& rhs)
+{
+	Node result;
+
+	auto it = SurgSim::Math::IntegrationSchemeNames.find(rhs);
+	SURGSIM_ASSERT(it != std::end(SurgSim::Math::IntegrationSchemeNames)) << "Can not find the enum value in " <<
+		"SurgSim::Math::IntegrationSchemeNames. Is the enum value registered?";
+
+	result["SurgSim::Math::IntegrationScheme"] = it->second;
+
+	return result;
+}
+
+bool convert<SurgSim::Math::IntegrationScheme>::decode(
+	const Node& node,
+	SurgSim::Math::IntegrationScheme& rhs)
+{
+	bool result = false;
+
+	if (node.IsMap())
+	{
+		std::string className = node.begin()->first.as<std::string>();
+		SURGSIM_ASSERT("SurgSim::Math::IntegrationScheme" == className);
+
+		std::string schemeName = node.begin()->second.as<std::string>();
+		std::transform(schemeName.begin(), schemeName.end(), schemeName.begin(), ::toupper);
+
+		auto it = std::find_if(std::begin(SurgSim::Math::IntegrationSchemeNames),
+							   std::end(SurgSim::Math::IntegrationSchemeNames),
+							   [&schemeName](const std::pair<SurgSim::Math::IntegrationScheme, std::string>& pair)
+							   {
+									return pair.second == schemeName;
+							   }
+							  );
+
+		SURGSIM_ASSERT (it != std::end(SurgSim::Math::IntegrationSchemeNames)) <<
+			"Unknown IntegrationScheme " << schemeName;
+
+		rhs = it->first;
 		result = true;
 	}
 

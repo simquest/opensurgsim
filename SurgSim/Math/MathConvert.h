@@ -22,6 +22,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Math/OdeSolver.h"
 
 namespace SurgSim
 {
@@ -82,6 +83,13 @@ namespace YAML
 	{
 		static Node encode(const std::shared_ptr<SurgSim::Math::Shape>& rhs);
 		static bool decode(const Node& node, std::shared_ptr<SurgSim::Math::Shape>& rhs);
+	};
+
+	template <>
+	struct convert<SurgSim::Math::IntegrationScheme>
+	{
+		static Node encode(const SurgSim::Math::IntegrationScheme& rhs);
+		static bool decode(const Node& node, SurgSim::Math::IntegrationScheme& rhs);
 	};
 };
 

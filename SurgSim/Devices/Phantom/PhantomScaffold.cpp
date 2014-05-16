@@ -516,7 +516,7 @@ bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 
 void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 {
-	typedef Eigen::Matrix<double, 6, 1, Eigen::DontAlign> Vector6d;
+	typedef Eigen::Matrix<double, 6, 1> Vector6d;
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
 	// Get the nominal force and torque, if provided.

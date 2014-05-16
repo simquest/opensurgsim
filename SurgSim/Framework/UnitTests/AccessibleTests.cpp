@@ -23,6 +23,9 @@
 
 #include "SurgSim/Math/Matrix.h"
 
+namespace
+{
+
 class TestClass : public SurgSim::Framework::Accessible
 {
 public:
@@ -135,6 +138,7 @@ public:
 	}
 
 private:
+
 	double privateProperty;
 };
 
@@ -165,6 +169,7 @@ public:
 	}
 
 };
+}
 
 namespace SurgSim
 {
@@ -191,8 +196,9 @@ TEST(AccessibleTest, GetterTest)
 	EXPECT_EQ(-1, receiver);
 
 	/// Response to trying to fetch an type that can't be converted
-	EXPECT_ANY_THROW(t.getValue<TestClass>("normal"));
-	EXPECT_FALSE(t.getValue<TestClass>("normal", &t));
+	std::string string;
+	EXPECT_ANY_THROW(t.getValue<std::string>("normal"));
+	EXPECT_FALSE(t.getValue<std::string>("normal", &string));
 
 }
 

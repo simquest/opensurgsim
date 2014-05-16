@@ -46,11 +46,11 @@ public:
 	/// Set the starting pose. This is optional, if not set the target's pose
 	/// will be used as the starting pose.
 	/// \param transform The starting pose.
-	void setStartingPose(const SurgSim::Math::RigidTransform3d transform);
+	void setStartingPose(const SurgSim::Math::RigidTransform3d& transform);
 
 	/// Set the end pose.
 	/// \param transform The end pose.
-	void setEndingPose(const SurgSim::Math::RigidTransform3d transform);
+	void setEndingPose(const SurgSim::Math::RigidTransform3d& transform);
 
 	/// Set the target of the interpolation, this is where the interpolated transform
 	/// will be applied to. If this value is not set, the Scene Element that contains
