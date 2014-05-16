@@ -41,16 +41,14 @@ void edgeIntersection(T dStart, T dEnd, T pvStart, T pvEnd, T* parametricInterse
 					  size_t* parametricIntersectionIndex)
 {
 	// Epsilon used in this function.
-	static const T EPSILON = T(Geometry::DistanceEpsilon);
+	static const T EPSILON = T(1e-12);
 
-	bool startIsUnder = dStart < -EPSILON && dEnd >= -EPSILON;
-	bool startIsOver = dStart > EPSILON && dEnd <= EPSILON;
+	bool startIsUnder = dStart < 0.0 && dEnd >= 0.0;
+	bool startIsOver = dStart > 0.0 && dEnd <= 0.0;
 
 	if (startIsUnder || startIsOver)
 	{
-		bool isEndOnPlane = startIsUnder ? dEnd < EPSILON : dEnd > -EPSILON;
-
-		if (isEndOnPlane)
+		if (dEnd == 0.0)
 		{
 			// The intersection of the edge and the plane is the end.
 			parametricIntersection[(*parametricIntersectionIndex)++] = pvEnd;
@@ -58,8 +56,17 @@ void edgeIntersection(T dStart, T dEnd, T pvStart, T pvEnd, T* parametricInterse
 		else
 		{
 			// The intersection of the edge and the plane is got by clipping the edge onto the plane.
-			parametricIntersection[(*parametricIntersectionIndex)++] =
-				pvStart + (pvEnd - pvStart) * (dStart / (dStart - dEnd));
+			if (std::abs(dStart - dEnd) < EPSILON)
+			{
+				// Start and End are really close. Pick start.
+				parametricIntersection[(*parametricIntersectionIndex)++] = pvStart;
+			}
+			else
+			{
+				// Clip to the point in the intersection of Start->End and plane of the colliding triangle.
+				parametricIntersection[(*parametricIntersectionIndex)++] =
+					pvStart + (pvEnd - pvStart) * (dStart / (dStart - dEnd));
+			}
 		}
 	}
 }
@@ -82,9 +89,6 @@ bool doesIntersectTriangleTriangle(
 		// Degenerate triangle(s) passed to checkTriangleTriangleIntersection.
 		return false;
 	}
-
-	// Epsilon used in this function.
-	static const T EPSILON = T(Geometry::DistanceEpsilon);
 
 	// Variable names mentioned here are the notations used in the paper:
 	// T1		- Triangle with vertices (t0v0, t0v1, t0v2).
@@ -110,7 +114,7 @@ bool doesIntersectTriangleTriangle(
 	// Distance of first vertex of T2 from the plane of T1 is: DotProduct(t0n, t1v0 - t0v0)
 	Vector3 d2(t0n.dot(t1v0 - t0v0), t0n.dot(t1v1 - t0v0), t0n.dot(t1v2 - t0v0));
 
-	if ((d2.array() <= EPSILON).all() || (d2.array() >= -EPSILON).all())
+	if ((d2.array() <= 0.0).all() || (d2.array() >= 0.0).all())
 	{
 		return false;
 	}
@@ -118,7 +122,7 @@ bool doesIntersectTriangleTriangle(
 	// Check if all the vertices of T1 are on one side of p2.
 	Vector3 d1(t1n.dot(t0v0 - t1v0), t1n.dot(t0v1 - t1v0), t1n.dot(t0v2 - t1v0));
 
-	if ((d1.array() <= EPSILON).all() || (d1.array() >= -EPSILON).all())
+	if ((d1.array() <= 0.0).all() || (d1.array() >= 0.0).all())
 	{
 		return false;
 	}
