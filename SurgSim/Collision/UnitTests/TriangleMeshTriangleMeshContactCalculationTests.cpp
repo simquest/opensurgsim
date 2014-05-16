@@ -285,7 +285,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 		double zValue;
 		std::pair<Location, Location> expectedPenetrationPoints;
 		Vector3d expectedPoint0, expectedPoint1;
-		Vector3d expectedNormal, expectedContact;
+		Vector3d expectedNormal, expectedContact(0, 0, 0);
 		for (int i = 0; i < numTriangles - 1; i++)
 		{
 			zValue = static_cast<double>(i) / numTriangles + zOffset;
@@ -394,7 +394,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 		double coordinate;
 		std::pair<Location, Location> expectedPenetrationPoints;
 		Vector3d expectedPoint0, expectedPoint1;
-		Vector3d expectedNormal, expectedContact;
+		Vector3d expectedNormal, expectedContact(0, 0, 0);
 		for (int i = 0; i < numTriangles; i++)
 		{
 			coordinate = interval * (i + 1);
@@ -407,6 +407,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 			{
 				expectedPenetrationPoints.first.globalPosition.setValue(pose * Vector3d(0, 0, coordinate));
 				expectedPenetrationPoints.second.globalPosition.setValue(pose * Vector3d(0, 0, 0));
+				expectedPenetrationPoints.first.triangleId.setValue(i);
+				expectedPenetrationPoints.second.triangleId.setValue(0);
 				expectedContacts.push_back(std::make_shared<Contact>(expectedDepth, expectedContact,
 																	 pose.linear() * Vector3d(0, 0, -1),
 																	 expectedPenetrationPoints));
@@ -414,6 +416,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 			{
 				expectedPenetrationPoints.first.globalPosition.setValue(pose * Vector3d(0, -coordinate, coordinate));
 				expectedPenetrationPoints.second.globalPosition.setValue(pose * Vector3d(0, 0, coordinate));
+				expectedPenetrationPoints.first.triangleId.setValue(i);
+				expectedPenetrationPoints.second.triangleId.setValue(0);
 				expectedContacts.push_back(std::make_shared<Contact>(expectedDepth, expectedContact,
 																	 pose.linear() * Vector3d(0, 1, 0),
 																	 expectedPenetrationPoints));
