@@ -357,17 +357,20 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	// The view matrix of the camera used to render the light map
 	auto lightViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightViewMatrix");
 	shadowMapPass->getMaterial()->addUniform(lightViewMatrix);
-	copier->connect(lightMapPass->getCamera(), "FloatViewMatrix", lightViewMatrix, "Value");
+	copier->connect(lightMapPass->getCamera(), "FloatViewMatrix",
+					shadowMapPass->getMaterial(), "oss_lightViewMatrix");
 
 	// The projection matrix of the camera used to render the light map
 	auto lightProjectionMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightProjectionMatrix");
 	shadowMapPass->getMaterial()->addUniform(lightProjectionMatrix);
-	copier->connect(lightMapPass->getCamera(), "FloatProjectionMatrix", lightProjectionMatrix, "Value");
+	copier->connect(lightMapPass->getCamera(), "FloatProjectionMatrix",
+					shadowMapPass->getMaterial(), "oss_lightProjectionMatrix");
 
 	// The inverse view matrix of the camera used to render the light map
 	auto inverseViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_inverseViewMatrix");
 	shadowMapPass->getMaterial()->addUniform(inverseViewMatrix);
-	copier->connect(shadowMapPass->getCamera(), "FloatInverseViewMatrix", inverseViewMatrix , "Value");
+	copier->connect(shadowMapPass->getCamera(), "FloatInverseViewMatrix",
+					shadowMapPass->getMaterial() , "oss_inverseViewMatrix");
 
 	// Get the result of the lightMapPass and pass it on to the shadowMapPass
 	auto lightDepthTexture =

@@ -19,6 +19,8 @@
 #include <memory>
 #include <set>
 
+#include "SurgSim/Framework/Component.h"
+
 namespace SurgSim
 {
 
@@ -34,9 +36,13 @@ class Shader;
 /// shaders applied used when rendering the geometry.
 /// \sa	UniformBase
 /// \sa Shader
-class Material
+class Material : public SurgSim::Framework::Component
 {
 public:
+
+	/// Constructor
+	Material() : Component("Material") {}
+
 	/// Destructor.
 	//  (Note that Visual Studio does not support "= default" yet.)
 	virtual ~Material()

@@ -35,7 +35,8 @@ public:
 		readOnly(100),
 		sharedPtr(std::make_shared<int>(4)),
 		overloadedValue(200.0),
-		privateProperty(100)
+		virtualProperty(300),
+		privateProperty(100) // Don't forget to keep this last, otherwise there will be a gcc warning
 	{
 		setGetter("normal", std::bind(&TestClass::getNormal, this));
 		setSetter("normal", std::bind(&TestClass::setNormal, this, std::bind(SurgSim::Framework::convert<int>,
@@ -50,17 +51,24 @@ public:
 
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TestClass, float, serializableProperty,
 										  getSerializableProperty, setSerializableProperty);
+
+		SURGSIM_ADD_RO_PROPERTY(TestClass, int, virtualProperty, getVirtualProperty);
+		SURGSIM_ADD_RO_PROPERTY(TestClass, int, overriddenProperty, getReadWrite);
+
 	}
 
 	int normal;
 	double readWrite;
 	int readOnly;
 
+
 	std::shared_ptr<int> sharedPtr;
 
 	float serializableProperty;
 
 	double overloadedValue;
+
+	int virtualProperty;
 
 	int getNormal()
 	{
@@ -123,11 +131,44 @@ public:
 	{
 		overloadedValue = x;
 	}
+
+	virtual int getVirtualProperty()
+	{
+		return virtualProperty;
+	}
+
 private:
 
 	double privateProperty;
 };
 
+class DerivedTestClass : public TestClass
+{
+
+public:
+
+	DerivedTestClass() :
+		TestClass(),
+		otherValue(400)
+	{
+		// Override the accessor from the base class by changing the entry in the function table
+		SURGSIM_ADD_RO_PROPERTY(DerivedTestClass, int, overriddenProperty, getOtherValue);
+	}
+
+	int otherValue;
+
+	int getOtherValue()
+	{
+		return otherValue;
+	}
+
+	// Overrides the accessor, this tests if the virtual function resolution works on the function pointer
+	virtual int getVirtualProperty() override
+	{
+		return otherValue;
+	}
+
+};
 }
 
 namespace SurgSim
@@ -247,6 +288,47 @@ TEST(AccessibleTest, SharedPointer)
 	EXPECT_EQ(5, *y);
 }
 
+// We want to check whether we can forward a setter and a getter from one class to the other,
+// i.e. a.setValue("Forwarded") should actually change a specific value in b via Properties
+TEST(AccessibleTest, Forwarding)
+{
+	TestClass a;
+	TestClass b;
+	b.normal = 543;
+
+	ASSERT_NO_THROW(a.forwardProperty("forwarded", b, "normal"));
+
+	EXPECT_EQ(543, a.getValue<int>("forwarded"));
+	ASSERT_NO_THROW(a.setValue("forwarded", 345));
+	EXPECT_EQ(345, b.normal);
+}
+
+TEST(AccessibleTest, RemoveAccessors)
+{
+	TestClass a;
+
+	EXPECT_NO_THROW(a.getValue("readWrite"));
+	EXPECT_NO_THROW(a.setValue("readWrite", 2.0));
+
+	a.removeAccessors("readWrite");
+
+	EXPECT_ANY_THROW(a.getValue("readWrite"));
+	EXPECT_ANY_THROW(a.setValue("readWrite", 2.0));
+}
+
+TEST(AccessibleTests, VirtualFunctionTest)
+{
+	std::shared_ptr<DerivedTestClass> derived = std::make_shared<DerivedTestClass>();
+	std::shared_ptr<TestClass> base = std::dynamic_pointer_cast<TestClass>(derived);
+
+	EXPECT_EQ(derived->otherValue, derived->getValue<int>("virtualProperty"));
+	EXPECT_EQ(derived->otherValue, derived->getValue<int>("overriddenProperty"));
+
+	EXPECT_EQ(derived->otherValue, base->getValue<int>("virtualProperty"));
+	EXPECT_EQ(derived->otherValue, base->getValue<int>("overriddenProperty"));
+
+}
+
 TEST(AccessibleTest, ConvertDoubleToFloat)
 {
 	// Values don't matter only care for them to be filled
@@ -351,8 +433,8 @@ TEST(AccessibleTests, MultipleValues)
 	EXPECT_EQ("a", encodedValues["a"].as<std::string>());
 	EXPECT_EQ("b", encodedValues["b"].as<std::string>());
 	EXPECT_EQ("invalid", encodedValues["c"].as<std::string>());
-
 }
+
 
 
 

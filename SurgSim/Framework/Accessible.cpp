@@ -31,6 +31,7 @@ Accessible::~Accessible()
 
 }
 
+template <>
 boost::any Accessible::getValue(const std::string& name) const
 {
 	auto functors = m_functors.find(name);
@@ -46,7 +47,14 @@ boost::any Accessible::getValue(const std::string& name) const
 	}
 }
 
+boost::any Accessible::getValue(const std::string& name) const
+{
+	return getValue<boost::any>(name);
+}
+
+
 void Accessible::setValue(const std::string& name, const boost::any& value)
+
 {
 	auto functors = m_functors.find(name);
 	if (functors != std::end(m_functors) && functors->second.setter != nullptr)
@@ -80,6 +88,18 @@ void Accessible::setAccessors(const std::string& name, GetterType getter, Setter
 	setGetter(name, getter);
 	setSetter(name, setter);
 }
+
+
+void Accessible::removeAccessors(const std::string& name)
+{
+	auto functors = m_functors.find(name);
+	if (functors != std::end(m_functors))
+	{
+		functors->second.setter = nullptr;
+		functors->second.getter = nullptr;
+	}
+}
+
 
 bool Accessible::isReadable(const std::string& name) const
 {
@@ -137,6 +157,22 @@ void  Accessible::decode(const YAML::Node& node)
 				}
 			}
 		}
+	}
+}
+
+void Accessible::forwardProperty(const std::string& name, const Accessible& target, const std::string& targetValueName)
+{
+	Functors functors;
+	auto found = target.m_functors.find(targetValueName);
+	if (found != target.m_functors.end())
+	{
+		functors.getter = found->second.getter;
+		functors.setter = found->second.setter;
+		m_functors[name] = std::move(functors);
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "Target does not have any setters or getters on property " << targetValueName;
 	}
 }
 
