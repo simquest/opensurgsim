@@ -56,8 +56,7 @@ bool ForceScale::finalize()
 
 void ForceScale::initializeInput(const std::string& device, const DataGroup& inputData)
 {
-	getInitialInputData() = inputData;
-	getInputData() = getInitialInputData();
+	getInputData() = inputData;
 }
 
 void ForceScale::handleInput(const std::string& device, const DataGroup& inputData)
