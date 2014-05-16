@@ -365,6 +365,91 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 	}
 }
 
+TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdenticalDepth)
+{
+	using SurgSim::Math::MeshShape;
+	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::RigidTransform3d;
+
+	RigidTransform3d pose;
+	pose = SurgSim::Math::makeRigidTransform(
+			SurgSim::Math::makeRotationQuaternion(0.4638, Vector3d(0.5727, 0.2485, 1.532).normalized()),
+			Vector3d(210.34, 675.23, -283.84));
+	pose = SurgSim::Math::makeRigidTransform(
+			SurgSim::Math::makeRotationQuaternion(0.0, Vector3d(0.5727, 0.2485, 1.532).normalized()),
+			Vector3d(0, 0, 0));
+
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
+
+	{
+		auto baseTriangles = std::make_shared<TriangleMesh>();
+		static const int numTriangles = 100;
+		const double e = 8e-11;
+
+		std::list<std::shared_ptr<Contact>> expectedContacts;
+		double expectedDepth;
+		double interval = 1.0 / (numTriangles + 1);
+		double coordinate;
+		std::pair<Location, Location> expectedPenetrationPoints;
+		Vector3d expectedPoint0, expectedPoint1;
+		Vector3d expectedNormal, expectedContact;
+		for (int i = 0; i < numTriangles; i++)
+		{
+			coordinate = interval * (i + 1);
+
+			addNewTriangle(baseTriangles,
+						   Vector3d(-e, -coordinate, coordinate),
+						   Vector3d(0.5, 1.0 - coordinate, coordinate),
+						   Vector3d(-e, 1.0 - coordinate, coordinate));
+			expectedDepth = coordinate;
+			{
+				expectedPenetrationPoints.first.globalPosition.setValue(pose * Vector3d(0, 0, coordinate));
+				expectedPenetrationPoints.second.globalPosition.setValue(pose * Vector3d(0, 0, 0));
+				expectedContacts.push_back(std::make_shared<Contact>(expectedDepth, expectedContact,
+																	 pose.linear() * Vector3d(0, 0, -1),
+																	 expectedPenetrationPoints));
+			}
+			{
+				expectedPenetrationPoints.first.globalPosition.setValue(pose * Vector3d(0, -coordinate, coordinate));
+				expectedPenetrationPoints.second.globalPosition.setValue(pose * Vector3d(0, 0, coordinate));
+				expectedContacts.push_back(std::make_shared<Contact>(expectedDepth, expectedContact,
+																	 pose.linear() * Vector3d(0, 1, 0),
+																	 expectedPenetrationPoints));
+			}
+		}
+		auto baseMesh = std::make_shared<MeshShape>(*baseTriangles);
+
+		auto intersectingTriangle = std::make_shared<TriangleMesh>();
+		addNewTriangle(intersectingTriangle,
+					   Vector3d(e, 0.0, 0.0),
+					   Vector3d(-0.5, 0.0, 1.0),
+					   Vector3d(e, 0.0, 1.0));
+		auto triangleMesh = std::make_shared<MeshShape>(*intersectingTriangle);
+
+		std::shared_ptr<Representation> meshARep = std::make_shared<ShapeCollisionRepresentation>(
+													   "Collision Mesh 0",
+													   baseMesh,
+													   pose);
+		std::shared_ptr<Representation> meshBRep = std::make_shared<ShapeCollisionRepresentation>(
+													   "Collision Mesh 1",
+													   triangleMesh,
+													   pose);
+
+		// Perform collision detection.
+		TriangleMeshTriangleMeshDcdContact calcContact;
+		std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshARep, meshBRep);
+		calcContact.calculateContact(pair);
+
+		auto& calculatedContacts = pair->getContacts();
+		EXPECT_EQ(numTriangles, static_cast<int>(calculatedContacts.size()));
+
+		for (auto it = calculatedContacts.begin(); it != calculatedContacts.end(); ++it)
+		{
+			EXPECT_TRUE(isContactPresentInList(*it, expectedContacts));
+		}
+	}
+}
+
 
 }; // namespace Collision
 }; // namespace Surgsim
