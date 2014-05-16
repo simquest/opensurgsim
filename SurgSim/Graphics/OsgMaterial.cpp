@@ -49,24 +49,13 @@ bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 	{
 		osgUniform->addToStateSet(m_stateSet);
 		m_uniforms.push_back(osgUniform);
-		// All the uniforms should adhere to the accessible protocol
-		// This make the uniform available on the
-		std::shared_ptr<Accessible> accessible = std::dynamic_pointer_cast<Accessible>(uniform);
-		if (accessible != nullptr)
-		{
-			// add a property to Material, that carries the uniform name and forwards to the value of the uniform
-			// This exposes the non-shared pointer to the uniform in the function table, the entry in the function
-			// table will be removed when the uniform is removed from the material. The material holds a shared
-			// pointer to the uniform, keeping the uniform alive during the lifetime of the material.
-			forwardProperty(osgUniform->getName(), *accessible.get(), "Value");
-			didSucceed = true;
-		}
-		else
-		{
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics/Material"))
-					<< "Uniform is correct type but does not support 'Accessible', the uniform won't "
-					<< "be available through the Accessible interface of this Material: " << getName();
-		}
+
+		// add a property to Material, that carries the uniform name and forwards to the value of the uniform
+		// This exposes the non-shared pointer to the uniform in the function table, the entry in the function
+		// table will be removed when the uniform is removed from the material. The material holds a shared
+		// pointer to the uniform, keeping the uniform alive during the lifetime of the material.
+		forwardProperty(osgUniform->getName(), *osgUniform.get(), "Value");
+		didSucceed = true;
 	}
 	return didSucceed;
 }
@@ -87,11 +76,9 @@ bool OsgMaterial::removeUniform(std::shared_ptr<UniformBase> uniform)
 			m_uniforms.erase(it);
 			didSucceed = true;
 		}
-		std::shared_ptr<Accessible> accessible = std::dynamic_pointer_cast<Accessible>(uniform);
-		if (accessible != nullptr)
-		{
-			removeAccessors(osgUniform->getName());
-		}
+
+		removeAccessors(osgUniform->getName());
+
 	}
 
 	return didSucceed;
