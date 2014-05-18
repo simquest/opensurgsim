@@ -201,9 +201,6 @@ TEST_F(RenderTests, VisualTestFallingRigidBodies)
 {
 	using SurgSim::Math::makeRigidTransform;
 
-	const double radiusSphereMesh = 0.05;
-	const Vector3d size(0.1, 0.1, 0.1);
-
 	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
 
 	// Mesh-base objects
