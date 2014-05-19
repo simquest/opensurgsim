@@ -51,7 +51,7 @@ void RigidCollisionRepresentation::update(const double& dt)
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
 	if (meshShape != nullptr)
 	{
-		meshShape->setPose(physicsRepresentation->getPose());
+		meshShape->setPose(getPose());
 	}
 }
 
