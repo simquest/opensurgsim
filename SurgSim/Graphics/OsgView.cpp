@@ -65,7 +65,9 @@ OsgView::OsgView(const std::string& name) : View(name),
 	m_isWindowBorderEnabled(true),
 	m_isFirstUpdate(true),
 	m_areWindowSettingsDirty(false),
-	m_view(new osgViewer::View())
+	m_view(new osgViewer::View()),
+	m_keyboardEnabled(false),
+	m_mouseEnabled(false)
 {
 	m_position[0] = 0;
 	m_position[1] = 0;
@@ -260,12 +262,15 @@ void SurgSim::Graphics::OsgView::enableKeyboardDevice(bool val)
 
 std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getKeyboardDevice()
 {
-	static auto keyboardDevice = std::make_shared<SurgSim::Device::KeyboardDevice>("Keyboard");
-	if (!keyboardDevice->isInitialized())
+	if (m_keyboardDevice == nullptr)
 	{
-		keyboardDevice->initialize();
+		m_keyboardDevice = std::make_shared<SurgSim::Device::KeyboardDevice>("Keyboard");
+		if (!m_keyboardDevice->isInitialized())
+		{
+			m_keyboardDevice->initialize();
+		}
 	}
-	return keyboardDevice;
+	return m_keyboardDevice;
 }
 
 void SurgSim::Graphics::OsgView::enableMouseDevice(bool val)
@@ -294,12 +299,15 @@ void SurgSim::Graphics::OsgView::enableMouseDevice(bool val)
 
 std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getMouseDevice()
 {
-	static auto mouseDevice = std::make_shared<SurgSim::Device::MouseDevice>("Mouse");
-	if (!mouseDevice->isInitialized())
+	if (m_mouseDevice == nullptr)
 	{
-		mouseDevice->initialize();
+		m_mouseDevice = std::make_shared<SurgSim::Device::MouseDevice>("Mouse");
+		if (!m_mouseDevice->isInitialized())
+		{
+			m_mouseDevice->initialize();
+		}
 	}
-	return mouseDevice;
+	return m_mouseDevice;
 }
 
 

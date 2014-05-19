@@ -163,7 +163,32 @@ TEST(OsgViewElementRenderTest, StereoView)
 
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	runtime->stop();
+}
+
+// Verify a bug fix on the OsgView that had to do with the deallocation of the mouse and
+// keyboard handler.
+TEST(OsgViewElementRenderTest, KeyBoardMouseTest)
+{
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
+
+	runtime->addManager(manager);
+	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
+
+	std::shared_ptr<Scene> scene = runtime->getScene();
+
+	/// Add a graphics component to the scene
+	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view");
+	scene->addSceneElement(viewElement);
+
+	auto osgView = std::static_pointer_cast<OsgView>(viewElement->getView());
+	osgView->enableKeyboardDevice(true);
+	osgView->enableMouseDevice(true);
+
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	runtime->stop();
 }
 
