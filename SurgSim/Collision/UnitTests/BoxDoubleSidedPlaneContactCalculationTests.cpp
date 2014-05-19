@@ -34,10 +34,15 @@ void doBoxDoubleSidedPlaneTest(std::shared_ptr<BoxShape> box,
 							   const int* expectedBoxIndicesInContacts,
 							   const bool collisionNormalIsPlaneNormal)
 {
-	std::shared_ptr<Representation> boxRep = std::make_shared<ShapeCollisionRepresentation>(
-		"Collision Box 0", box, SurgSim::Math::makeRigidTransform(boxQuat, boxTrans));
-	std::shared_ptr<Representation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
-		"Collision Plane 0", plane, SurgSim::Math::makeRigidTransform(planeQuat, planeTrans));
+	std::shared_ptr<ShapeCollisionRepresentation> boxRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Box 0");
+	boxRep->setShape(box);
+	boxRep->setLocalPose(SurgSim::Math::makeRigidTransform(boxQuat, boxTrans));
+
+	std::shared_ptr<ShapeCollisionRepresentation> planeRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Plane 0");
+	planeRep->setShape(plane);
+	planeRep->setLocalPose(SurgSim::Math::makeRigidTransform(planeQuat, planeTrans));
 
 	// First calculate the expected contact info.
 	std::list<std::shared_ptr<Contact>> expectedContacts;

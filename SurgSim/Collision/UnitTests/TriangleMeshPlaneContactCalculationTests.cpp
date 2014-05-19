@@ -118,10 +118,15 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape> mesh,
 					const int expectedNumberOfContacts,
 					const int* expectedMeshIndicesInContacts)
 {
-	std::shared_ptr<Representation> meshRep = std::make_shared<ShapeCollisionRepresentation>(
-		"Collision Mesh 0", mesh, SurgSim::Math::makeRigidTransform(meshQuat, meshTrans));
-	std::shared_ptr<Representation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
-		"Collision Plane 0", plane, SurgSim::Math::makeRigidTransform(planeQuat, planeTrans));
+	std::shared_ptr<ShapeCollisionRepresentation> meshRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 0");
+	meshRep->setShape(mesh);
+	meshRep->setLocalPose(SurgSim::Math::makeRigidTransform(meshQuat, meshTrans));
+
+	std::shared_ptr<ShapeCollisionRepresentation> planeRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Plane 0");
+	planeRep->setShape(plane);
+	planeRep->setLocalPose(SurgSim::Math::makeRigidTransform(planeQuat, planeTrans));
 
 	// First calculate the expected contact info.
 	std::list<std::shared_ptr<Contact>> expectedContacts;
