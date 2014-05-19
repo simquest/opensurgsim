@@ -44,6 +44,8 @@ public:
 
 	virtual int getShapeType() const override;
 
+	virtual void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
+
 	// Set the shape to be used in this representation
 	// \param shape Shape to be used in this representation.
 	void setShape(const std::shared_ptr<SurgSim::Math::Shape>& shape);

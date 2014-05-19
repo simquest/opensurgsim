@@ -45,6 +45,13 @@ int ShapeCollisionRepresentation::getShapeType() const
 	return m_shape->getType();
 }
 
+
+void ShapeCollisionRepresentation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	Representation::setLocalPose(pose);
+	update(0.0);
+}
+
 void ShapeCollisionRepresentation::setShape(const std::shared_ptr<SurgSim::Math::Shape>& shape)
 {
 	SURGSIM_ASSERT(nullptr != shape) << "Can not shape a empty shape.";
