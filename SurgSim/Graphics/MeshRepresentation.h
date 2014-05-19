@@ -17,15 +17,12 @@
 #define SURGSIM_GRAPHICS_MESHREPRESENTATION_H
 
 #include "SurgSim/Graphics/Representation.h"
-#include "SurgSim/Graphics/Mesh.h"
 
 namespace SurgSim
 {
 namespace Graphics
 {
-
-class Texture;
-
+class Mesh;
 
 /// Graphics representation of a mesh, can be initialized from a Mesh structure
 class MeshRepresentation : public virtual Representation
@@ -45,16 +42,39 @@ public:
 
 	/// Constructor.
 	/// \param	name	The name of the representation.
-	explicit MeshRepresentation(const std::string& name) : Representation(name) {}
+	explicit MeshRepresentation(const std::string& name) : Representation(name)
+	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, std::string, Filename, getFilename, setFilename);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, bool, DrawAsWireFrame,
+										  drawAsWireFrame, setDrawAsWireFrame);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, int, UpdateOptions, getUpdateOptions, setUpdateOptions);
+	}
+
 	virtual ~MeshRepresentation() {}
 
 	/// Gets the mesh.
 	/// \return	The mesh.
 	virtual std::shared_ptr<Mesh> getMesh() = 0;
 
+	/// Set loading filename
+	/// \param filename	The filename to load
+	/// \note The mesh will be loaded right after the file name is set,
+	///       if 'filename' indicates a file containing a valid mesh.
+	/// \note If the valid file contains an empty mesh, i.e. no vertex is specified in that file,
+	///       an empty mesh will be held.
+	virtual void setFilename(std::string filename) = 0;
+
+	/// Get the file name of the external file which contains the triangle mesh.
+	/// \return File name of the external file which contains the triangle mesh.
+	virtual std::string getFilename() const = 0;
+
 	/// Sets the mesh to render as a wire frame.
 	/// \param	val	true if this mesh should be rendered as a wireframe.
 	virtual void setDrawAsWireFrame(bool val) = 0;
+
+	/// Return if the mesh is rendered as a wire frame.
+	/// \return	True if this mesh is rendered as a wireframe; false if not.
+	virtual bool drawAsWireFrame() const = 0;
 
 	/// Sets the structures that are expected to change during the lifetime of the mesh, these will be updated
 	/// every frame, independent of a structural change in the mesh. UPDATE_OPTION_VERTICES is set in the constructor
@@ -70,5 +90,4 @@ public:
 }; // Graphics
 }; // SurgSim
 
-#endif
-
+#endif // SURGSIM_GRAPHICS_MESHREPRESENTATION_H

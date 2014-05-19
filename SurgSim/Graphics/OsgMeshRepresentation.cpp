@@ -15,22 +15,24 @@
 
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 
-#include "SurgSim/Graphics/OsgConversions.h"
-#include "SurgSim/Graphics/OsgTexture.h"
-#include "SurgSim/Graphics/Texture.h"
-#include "SurgSim/Graphics/TriangleNormalGenerator.h"
-
 #include <osg/Array>
 #include <osg/Geode>
 #include <osg/Geometry>
+#include <osg/PolygonMode>
+#include <osg/PositionAttitudeTransform>
 #include <osg/Switch>
 #include <osg/Vec3f>
-#include <osg/PolygonMode>
-#include <osg/TriangleIndexFunctor>
-#include <osg/PositionAttitudeTransform>
-
 #include <osgUtil/SmoothingVisitor>
 
+#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Graphics/OsgConversions.h"
+#include "SurgSim/Graphics/TriangleNormalGenerator.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgMeshRepresentation);
+}
 
 namespace SurgSim
 {
@@ -41,12 +43,13 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
 	MeshRepresentation(name),
+	m_drawAsWireFrame(false),
+	m_updateOptions(UPDATE_OPTION_VERTICES),
 	m_mesh(std::make_shared<Mesh>()),
-	m_updateOptions(UPDATE_OPTION_VERTICES)
+	m_filename()
 {
 	// The actual size of the mesh is not known at this time, just allocate the
 	// osg structures that are needed and add them to the geometry, and the node
-
 	m_geometry = new osg::Geometry();
 
 	// Set up vertices array
@@ -56,15 +59,13 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 
 	// Set up color array with default color
 	m_colors = new osg::Vec4Array(1);
-	(*m_colors)[0]= osg::Vec4(1.0f,1.0f,1.0f,1.0f);
+	(*m_colors)[0]= osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_geometry->setColorArray(m_colors, osg::Array::BIND_OVERALL);
-
 
 	// Set up textureCoordinates array, texture coords are optional, don't add them to the
 	// geometry yet
 	m_textureCoordinates = new osg::Vec2Array(0);
 	m_textureCoordinates->setDataVariance(osg::Object::DYNAMIC);
-
 
 	// Set up primitive set for triangles
 	m_triangles = new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES);
@@ -93,6 +94,7 @@ std::shared_ptr<Mesh> OsgMeshRepresentation::getMesh()
 
 void OsgMeshRepresentation::setDrawAsWireFrame(bool val)
 {
+	m_drawAsWireFrame = val;
 	osg::StateSet* state = m_switch->getOrCreateStateSet();
 
 	osg::ref_ptr<osg::PolygonMode> polygonMode;
@@ -106,6 +108,11 @@ void OsgMeshRepresentation::setDrawAsWireFrame(bool val)
 	}
 
 	state->setAttributeAndModes(polygonMode, osg::StateAttribute::ON);
+}
+
+bool OsgMeshRepresentation::drawAsWireFrame() const
+{
+	return m_drawAsWireFrame;
 }
 
 void OsgMeshRepresentation::doUpdate(double dt)
@@ -139,7 +146,7 @@ void OsgMeshRepresentation::updateVertices(int updateOptions)
 	bool updateVertices = (updateOptions & UPDATE_OPTION_VERTICES) != 0;
 	size_t vertexCount = m_mesh->getNumVertices();
 
-	for (size_t i=0; i < vertexCount; ++i)
+	for (size_t i = 0; i < vertexCount; ++i)
 	{
 		Mesh::VertexType vertex = m_mesh->getVertex(i);
 		if (updateVertices)
@@ -148,8 +155,7 @@ void OsgMeshRepresentation::updateVertices(int updateOptions)
 		}
 		if (updateColors)
 		{
-			(*m_colors)[i] =
-				(vertex.data.color.hasValue()) ? toOsg(vertex.data.color.getValue()) : defaultColor;
+			(*m_colors)[i] = (vertex.data.color.hasValue()) ? toOsg(vertex.data.color.getValue()) : defaultColor;
 		}
 		if (updateTextures)
 		{
@@ -259,9 +265,16 @@ osg::Object::DataVariance OsgMeshRepresentation::getDataVariance(int updateOptio
 	return ((m_updateOptions & updateOption) != 0) ? osg::Object::DYNAMIC : osg::Object::STATIC;
 }
 
+void OsgMeshRepresentation::setFilename(std::string filename)
+{
+	m_filename = filename;
+	m_mesh = std::make_shared<Mesh>(*SurgSim::DataStructures::loadTriangleMesh(filename));
+}
 
-
+std::string OsgMeshRepresentation::getFilename() const
+{
+	return m_filename;
+}
 
 }; // Graphics
-
 }; // SurgSim
