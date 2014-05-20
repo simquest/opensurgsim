@@ -20,6 +20,11 @@
 
 #include <osgViewer/Viewer>
 
+namespace osgViewer
+{
+class StatsHandler;
+}
+
 namespace SurgSim
 {
 
@@ -87,6 +92,14 @@ public:
 		return m_view;
 	}
 
+	/// Enable osg modelview uniforms mapping, in this mode osg replaces the gl builtins with osg_* names, for
+	/// uniforms and vertex attributes
+	void setOsgMapsUniforms(bool val);
+
+	/// \return the state of the osg modelview mapping mode.
+	bool getOsgMapsUniforms();
+
+
 protected:
 	/// Initialize the view
 	/// \post The view's window is setup.
@@ -96,6 +109,10 @@ protected:
 	virtual bool doWakeUp() override;
 
 private:
+
+	/// Patch the StatsHandler rendering
+	void fixupStatsHandler(osgViewer::StatsHandler* statsHandler);
+
 	/// Position of the view on the screen (in pixels)
 	int m_x, m_y;
 	/// Dimensions of the view on the screen (in pixels)
@@ -111,6 +128,8 @@ private:
 
 	/// OSG view which performs the actual work involved in setting up and rendering to a window
 	osg::ref_ptr<osgViewer::View> m_view;
+
+	bool m_osgMapUniforms;
 };
 
 };  // namespace Graphics

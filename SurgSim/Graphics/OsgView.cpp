@@ -16,7 +16,13 @@
 #include "SurgSim/Graphics/OsgView.h"
 
 #include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
+
 #include <osgViewer/ViewerEventHandlers>
+
 
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
@@ -27,7 +33,8 @@ OsgView::OsgView(const std::string& name) : View(name),
 	m_isWindowBorderEnabled(true),
 	m_isFirstUpdate(true),
 	m_areWindowSettingsDirty(false),
-	m_view(new osgViewer::View())
+	m_view(new osgViewer::View()),
+	m_osgMapUniforms(false)
 {
 	/// Don't allow the default camera here, let that be handled at a higher level.
 	m_view->setCamera(nullptr);
@@ -119,6 +126,80 @@ bool OsgView::doInitialize()
 bool OsgView::doWakeUp()
 {
 	m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
-	m_view->addEventHandler(new osgViewer::StatsHandler);
+
+	auto statsHandler = new osgViewer::StatsHandler;
+	m_view->addEventHandler(statsHandler);
+
+	if (m_osgMapUniforms)
+	{
+		fixupStatsHandler(statsHandler);
+
+		m_view->getCamera()->getGraphicsContext()->getState()->setUseModelViewAndProjectionUniforms(true);
+		m_view->getCamera()->getGraphicsContext()->getState()->setUseVertexAttributeAliasing(true);
+	}
+
 	return true;
 }
+
+void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
+{
+	auto state = statsHandler->getCamera()->getOrCreateStateSet();
+
+	// use ref_ptr in case loading fails we don't have to clean up
+	osg::ref_ptr<osg::Shader> vertexShader = new osg::Shader(osg::Shader::VERTEX);
+	osg::ref_ptr<osg::Shader> fragmentShader = new osg::Shader(osg::Shader::FRAGMENT);
+
+	bool success = true;
+	std::string fileName;
+	if (getRuntime()->getApplicationData()->tryFindFile("Shaders/osg_statshandler.vert", &fileName))
+	{
+		success = vertexShader->loadShaderSourceFromFile(fileName);
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "Could not find Shaders/osg_statshandler.vert, the osg stats "
+				<< "display will probably not work correctly.";
+		success = false;
+	}
+
+	if (getRuntime()->getApplicationData()->tryFindFile("Shaders/osg_statshandler.frag", &fileName))
+	{
+		success = fragmentShader->loadShaderSourceFromFile(fileName);
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "Could not find Shaders/osg_statshandler.frag, the osg stats "
+				<< "display will probably not work correctly.";
+		success = false;
+	}
+
+	if (success)
+	{
+		osg::ref_ptr<osg::Program> program = new osg::Program;
+		program->addShader(fragmentShader);
+		program->addShader(vertexShader);
+
+		auto state = statsHandler->getCamera()->getOrCreateStateSet();
+
+		auto texture = new osg::Texture2D();
+		texture->setTextureSize(256, 256);
+
+		state->setAttributeAndModes(program);
+		state->setTextureAttributeAndModes(0, texture);
+		state->addUniform(new osg::Uniform("osg_TextTexture", (int) 0));
+	}
+}
+
+void SurgSim::Graphics::OsgView::setOsgMapsUniforms(bool val)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change mapping mode after initialization.";
+	m_osgMapUniforms = val;
+}
+
+bool SurgSim::Graphics::OsgView::getOsgMapsUniforms()
+{
+	return m_osgMapUniforms;
+}
+
