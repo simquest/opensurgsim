@@ -249,7 +249,7 @@ bool SceneElement::decode(const YAML::Node& node)
 			{
 				if ("SurgSim::Framework::PoseComponent" == nodeIt->begin()->first.as<std::string>())
 				{
-					m_pose = nodeIt->as<std::shared_ptr<SurgSim::Framework::PoseComponent>>();
+					m_pose->setPose((nodeIt->as<std::shared_ptr<SurgSim::Framework::PoseComponent>>())->getPose());
 				}
 				else
 				{
