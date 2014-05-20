@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
@@ -450,17 +449,6 @@ void MassSpringRepresentation::transformState(std::shared_ptr<SurgSim::Math::Ode
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-}
-
-void MassSpringRepresentation::deactivateAndReset(void)
-{
-	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-		<< getName() << " deactivated and reset:" << std::endl
-		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
-		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
-
-	resetState();
-	setIsActive(false);
 }
 
 } // namespace Physics

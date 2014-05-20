@@ -86,6 +86,9 @@ public:
 
 	virtual void afterUpdate(double dt) override;
 
+	/// Deactivate and call resetState
+	void deactivateAndReset(void);
+
 	/// Set the collision representation for this physics representation, when the collision object
 	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
 	/// Specializes for discarding anything besides a rigid collision representation.
