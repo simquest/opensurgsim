@@ -122,13 +122,13 @@ protected:
 	/// Force applied on the deformable representation
 	SurgSim::Math::Vector m_f;
 
-	/// Mass matrix (templated type for performance reason)
+	/// Mass matrix
 	SurgSim::Math::Matrix m_M;
 
-	/// Damping matrix (templated type for performance reason)
+	/// Damping matrix
 	SurgSim::Math::Matrix m_D;
 
-	/// Stiffness matrix (templated type for performance reason)
+	/// Stiffness matrix
 	SurgSim::Math::Matrix m_K;
 
 	/// Number of degrees of freedom per node (varies per deformable model)
