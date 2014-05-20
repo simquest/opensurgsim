@@ -48,17 +48,29 @@ public:
 
 	~VirtualToolCoupler();
 
+	/// \return Input Component to get the pose from
+	const std::shared_ptr<SurgSim::Input::InputComponent> getInput();
+
 	/// Set the Input Component
 	/// \param input Input Component to get the pose from
 	void setInput(const std::shared_ptr<SurgSim::Input::InputComponent> input);
+
+	/// \return Output Component to send forces and torques
+	const std::shared_ptr<SurgSim::Input::OutputComponent> getOutput();
 
 	/// Set the Output Component (if any)
 	/// \param output Output Component to send forces and torques
 	void setOutput(const std::shared_ptr<SurgSim::Input::OutputComponent> output);
 
+	/// \return Rigid Representation that provides state and receives external forces and torques
+	const std::shared_ptr<SurgSim::Physics::RigidRepresentation> getRepresentation();
+
 	/// Set the Physics Representation which follows the input
 	/// \param rigid Rigid Representation that provides state and receives external forces and torques
 	void setRepresentation(const std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid);
+
+	/// \return Name of the pose data in the input to transfer
+	const std::string& getPoseName();
 
 	/// Set the name of the pose entry in the input DataGroup
 	/// \param    poseName Name of the pose data in the input to transfer
@@ -90,9 +102,50 @@ public:
 	/// \param angularDamping The damping of the vtc in angular mode (in N·m·s·rad-1)
 	void setAngularDamping(double angularDamping);
 
+	/// Used for Serialization.
+	/// \param linearStiffness The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
+	void setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& linearStiffness);
+
+	/// Used for Serialization.
+	/// \return The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearStiffness();
+
+	/// Used for Serialization.
+	/// \param linearDamping The OptionalValue object containing the damping of the vtc in linear
+	/// mode (in N·s·m-1 or Kg·s-1)
+	void setOptionalLinearDamping(const SurgSim::DataStructures::OptionalValue<double>& linearDamping);
+
+	/// Used for Serialization.
+	/// \return The OptionalValue object containing the damping of the vtc in linear mode (in N·s·m-1 or Kg·s-1)
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearDamping();
+
+	/// Used for Serialization.
+	/// \param angularStiffness The OptionalValue object containing the stiffness of the vtc in angular
+	/// mode (in N·m rad-1)
+	void setOptionalAngularStiffness(const SurgSim::DataStructures::OptionalValue<double>& angularStiffness);
+
+	/// Used for Serialization.
+	/// \return The OptionalValue object containing the stiffness of the vtc in angular mode (in N·m rad-1)
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularStiffness();
+
+	/// Used for Serialization.
+	/// \param angularDamping The OptionalValue object containing the damping of the vtc in angular
+	/// mode (in N·m·s·rad-1)
+	void setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& angularDamping);
+
+	/// Used for Serialization.
+	/// \return The OptionalValue object containing the damping of the vtc in angular mode (in N·m·s·rad-1)
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularDamping();
+
+	/// \return The factor to multiply the forces.
+	double getOutputForceScaling();
+
 	/// Set the scaling term for the force sent to the output component.
 	/// \param forceScaling The factor to multiply the forces.
 	void setOutputForceScaling(double forceScaling);
+
+	/// \return The factor to multiply the torque.
+	double getOutputTorqueScaling();
 
 	/// Set the scaling term for the torque sent to the output component.
 	/// \param torqueScaling The factor to multiply the torque.

@@ -60,9 +60,19 @@ VirtualToolCoupler::~VirtualToolCoupler()
 {
 }
 
+const std::shared_ptr<SurgSim::Input::InputComponent> VirtualToolCoupler::getInput()
+{
+	return m_input;
+}
+
 void VirtualToolCoupler::setInput(const std::shared_ptr<SurgSim::Input::InputComponent> input)
 {
 	m_input = input;
+}
+
+const std::shared_ptr<SurgSim::Input::OutputComponent> VirtualToolCoupler::getOutput()
+{
+	return m_output;
 }
 
 void VirtualToolCoupler::setOutput(const std::shared_ptr<SurgSim::Input::OutputComponent> output)
@@ -70,9 +80,19 @@ void VirtualToolCoupler::setOutput(const std::shared_ptr<SurgSim::Input::OutputC
 	m_output = output;
 }
 
+const std::shared_ptr<SurgSim::Physics::RigidRepresentation> VirtualToolCoupler::getRepresentation()
+{
+	return m_rigid;
+}
+
 void VirtualToolCoupler::setRepresentation(const std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid)
 {
 	m_rigid = rigid;
+}
+
+const std::string& VirtualToolCoupler::getPoseName()
+{
+	return m_poseName;
 }
 
 void VirtualToolCoupler::setPoseName(const std::string& poseName)
@@ -233,9 +253,62 @@ void VirtualToolCoupler::setAngularDamping(double angularDamping)
 	m_angularDamping.setValue(angularDamping);
 }
 
+void VirtualToolCoupler::setOptionalLinearStiffness(
+	const SurgSim::DataStructures::OptionalValue<double>& linearStiffness)
+{
+	m_linearStiffness = linearStiffness;
+}
+
+const SurgSim::DataStructures::OptionalValue<double>& VirtualToolCoupler::getOptionalLinearStiffness()
+{
+	return m_linearStiffness;
+}
+
+void VirtualToolCoupler::setOptionalLinearDamping(const SurgSim::DataStructures::OptionalValue<double>& linearDamping)
+{
+	m_linearDamping = linearDamping;
+}
+
+const SurgSim::DataStructures::OptionalValue<double>& VirtualToolCoupler::getOptionalLinearDamping()
+{
+	return m_linearDamping;
+}
+
+void VirtualToolCoupler::setOptionalAngularStiffness(
+	const SurgSim::DataStructures::OptionalValue<double>& angularStiffness)
+{
+	m_angularStiffness = angularStiffness;
+}
+
+const SurgSim::DataStructures::OptionalValue<double>& VirtualToolCoupler::getOptionalAngularStiffness()
+{
+	return m_angularStiffness;
+}
+
+void VirtualToolCoupler::setOptionalAngularDamping(
+	const SurgSim::DataStructures::OptionalValue<double>& angularDamping)
+{
+	m_angularDamping = angularDamping;
+}
+
+const SurgSim::DataStructures::OptionalValue<double>& VirtualToolCoupler::getOptionalAngularDamping()
+{
+	return m_angularDamping;
+}
+
+double VirtualToolCoupler::getOutputForceScaling()
+{
+	return m_outputForceScaling;
+}
+
 void VirtualToolCoupler::setOutputForceScaling(double forceScaling)
 {
 	m_outputForceScaling = forceScaling;
+}
+
+double VirtualToolCoupler::getOutputTorqueScaling()
+{
+	return m_outputTorqueScaling;
 }
 
 void VirtualToolCoupler::setOutputTorqueScaling(double torqueScaling)

@@ -307,5 +307,88 @@ TEST_F(VirtualToolCouplerTest, SetAngularDamping)
 	checkAngularIsCriticallyDamped();
 }
 
+TEST_F(VirtualToolCouplerTest, GetInput)
+{
+	EXPECT_EQ(input, virtualToolCoupler->getInput());
+}
+
+TEST_F(VirtualToolCouplerTest, GetPoseName)
+{
+	EXPECT_EQ(SurgSim::DataStructures::Names::POSE, virtualToolCoupler->getPoseName());
+}
+
+TEST_F(VirtualToolCouplerTest, GetRigid)
+{
+	EXPECT_EQ(rigidBody, virtualToolCoupler->getRepresentation());
+}
+
+typedef SurgSim::DataStructures::OptionalValue<double> OptionalValued;
+
+TEST_F(VirtualToolCouplerTest, OptionalParams)
+{
+	double num = 2.56527676;
+	{
+		SCOPED_TRACE("Getters");
+		virtualToolCoupler->setLinearStiffness(num);
+		virtualToolCoupler->setLinearDamping(num);
+		virtualToolCoupler->setAngularStiffness(num);
+		virtualToolCoupler->setAngularDamping(num);
+
+		const OptionalValued& linearStiffness = virtualToolCoupler->getOptionalLinearStiffness();
+		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
+		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
+		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
+
+		EXPECT_TRUE(linearStiffness.hasValue());
+		EXPECT_TRUE(linearDamping.hasValue());
+		EXPECT_TRUE(angularStiffness.hasValue());
+		EXPECT_TRUE(angularDamping.hasValue());
+
+		EXPECT_EQ(num, linearStiffness.getValue());
+		EXPECT_EQ(num, linearDamping.getValue());
+		EXPECT_EQ(num, angularStiffness.getValue());
+		EXPECT_EQ(num, angularDamping.getValue());
+	}
+	{
+		SCOPED_TRACE("Setters");
+		virtualToolCoupler->setLinearStiffness(0.0);
+		virtualToolCoupler->setLinearDamping(0.0);
+		virtualToolCoupler->setAngularStiffness(0.0);
+		virtualToolCoupler->setAngularDamping(0.0);
+
+		OptionalValued optionalNum;
+		optionalNum.setValue(num);
+
+		virtualToolCoupler->setOptionalLinearStiffness(optionalNum);
+		virtualToolCoupler->setOptionalLinearDamping(optionalNum);
+		virtualToolCoupler->setOptionalAngularStiffness(optionalNum);
+		virtualToolCoupler->setOptionalAngularDamping(optionalNum);
+
+		const OptionalValued& linearStiffness = virtualToolCoupler->getOptionalLinearStiffness();
+		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
+		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
+		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
+
+		EXPECT_TRUE(linearStiffness.hasValue());
+		EXPECT_TRUE(linearDamping.hasValue());
+		EXPECT_TRUE(angularStiffness.hasValue());
+		EXPECT_TRUE(angularDamping.hasValue());
+
+		EXPECT_EQ(num, linearStiffness.getValue());
+		EXPECT_EQ(num, linearDamping.getValue());
+		EXPECT_EQ(num, angularStiffness.getValue());
+		EXPECT_EQ(num, angularDamping.getValue());
+	}
+}
+
+TEST_F(VirtualToolCouplerTest, OutputScaling)
+{
+	double num = 2.56527676;
+	virtualToolCoupler->setOutputForceScaling(num);
+	virtualToolCoupler->setOutputTorqueScaling(num);
+	EXPECT_EQ(num, virtualToolCoupler->getOutputForceScaling());
+	EXPECT_EQ(num, virtualToolCoupler->getOutputTorqueScaling());
+}
+
 }; // namespace Physics
 }; // namespace SurgSim
