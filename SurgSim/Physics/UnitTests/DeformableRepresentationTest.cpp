@@ -377,12 +377,6 @@ TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 TEST_F(DeformableRepresentationTest, SerializationTest)
 {
 	{
-		SCOPED_TRACE("Encode a DeformableRepresentation object without DeformableCollisionRepresentation, throw.");
-		auto deformableRepresentation = std::make_shared<MockDeformableRepresentation>("TestRigidRepresentation");
-		EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*deformableRepresentation));
-	}
-
-	{
 		SCOPED_TRACE("Encode a DeformableRepresentation object with valid DeformableCollisionRepresentation, no throw");
 		auto deformableRepresentation = std::make_shared<MockDeformableRepresentation>("TestRigidRepresentation");
 		deformableRepresentation->setValue("IntegrationScheme", SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC);
