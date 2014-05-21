@@ -133,12 +133,17 @@ TEST_F(RepresentationTest, CollisionTest)
 		std::make_shared<Contact>(0.0, Vector3d::Zero(), Vector3d::Zero(), std::make_pair(Location(), Location()));
 	EXPECT_NO_THROW(sphereRep->addCollisionWith(planeRep, dummyContact));
 
+	sphereRep->update(0.0);
+	planeRep->update(0.0);
+
 	EXPECT_TRUE(sphereRep->hasCollision());
 	EXPECT_TRUE(sphereRep->isCollidingWith(planeRep));
 	// Collision is only added to 'sphereRep', thus the following check should return 'false'.
 	EXPECT_FALSE(planeRep->isCollidingWith(sphereRep));
 
 	EXPECT_NO_THROW(planeRep->addCollisionWith(sphereRep, dummyContact));
+	sphereRep->update(0.0);
+	planeRep->update(0.0);
 	EXPECT_TRUE(planeRep->hasCollision());
 	EXPECT_TRUE(planeRep->isCollidingWith(sphereRep));
 
@@ -165,6 +170,7 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_EQ(planeCollisionContacts.front(), sphereCollisionContacts.front());
 
 	sphereRep->clearCollisions();
+	sphereRep->update(0.0);
 	EXPECT_FALSE(sphereRep->hasCollision());
 }
 

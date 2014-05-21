@@ -22,9 +22,11 @@ namespace Collision
 {
 
 Representation::Representation(const std::string& name) :
-	SurgSim::Framework::Representation(name)
+	SurgSim::Framework::Representation(name),
+	m_collisions(std::make_shared<SurgSim::DataStructures::BufferedValue<ContactMapType>>()),
+	m_readCollisions(m_collisions),
+	m_writeCollisions(m_collisions)
 {
-
 }
 
 Representation::~Representation()
@@ -35,11 +37,8 @@ Representation::~Representation()
 std::list<std::shared_ptr<SurgSim::Collision::Contact>> Representation::getCollisionsWith(
 			const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const
 {
-	ContactMapType collisions;
-	m_collisions.get(&collisions);
-
-	auto result = collisions.find(collisionRepresentation);
-	if (std::end(collisions) == result)
+	auto result = m_readCollisions->find(collisionRepresentation);
+	if (std::end(*m_readCollisions) == result)
 	{
 		static std::list<std::shared_ptr<SurgSim::Collision::Contact>> emptyList;
 		return emptyList;
@@ -52,50 +51,35 @@ std::list<std::shared_ptr<SurgSim::Collision::Contact>> Representation::getColli
 
 Representation::ContactMapType Representation::getCollisions() const
 {
-	ContactMapType collisions;
-	m_collisions.get(&collisions);
-
-	return collisions;
+	return *m_readCollisions;
 }
 
 void Representation::addCollisionWith(
 	const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation,
 	const std::shared_ptr<SurgSim::Collision::Contact>& contact)
 {
-	ContactMapType collisions;
-	m_collisions.get(&collisions);
-
-	collisions[collisionRepresentation].push_back(contact);
-	m_collisions.set(collisions);
+	(*m_writeCollisions)[collisionRepresentation].push_back(contact);
 }
 
 bool Representation::isCollidingWith(
 	const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const
 {
-	ContactMapType collisions;
-	m_collisions.get(&collisions);
-
-	auto result = collisions.find(collisionRepresentation);
-	return std::end(collisions) != result;
+	return std::end(*m_readCollisions) != m_readCollisions->find(collisionRepresentation);
 }
 
 bool Representation::hasCollision() const
 {
-	ContactMapType collisions;
-	m_collisions.get(&collisions);
-
-	return !collisions.empty();
+	return !m_readCollisions->empty();
 }
 
 void Representation::clearCollisions()
 {
-	static ContactMapType emptyCollision;
-	m_collisions.set(emptyCollision);
+	m_writeCollisions->clear();
 }
 
 void Representation::update(const double& dt)
 {
-
+	m_writeCollisions.publish();
 }
 
 }; // namespace Collision

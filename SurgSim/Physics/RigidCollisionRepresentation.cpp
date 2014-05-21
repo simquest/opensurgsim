@@ -42,6 +42,8 @@ RigidCollisionRepresentation::~RigidCollisionRepresentation()
 
 void RigidCollisionRepresentation::update(const double& dt)
 {
+	Representation::update(dt);
+
 	auto physicsRepresentation = m_physicsRepresentation.lock();
 	SURGSIM_ASSERT(physicsRepresentation != nullptr)
 		<< "PhysicsRepresentation went out of scope for Collision Representation " << getName();

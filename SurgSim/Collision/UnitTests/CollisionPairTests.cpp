@@ -121,6 +121,9 @@ TEST(CollisionPairTests, addContactTest)
 	CollisionPair pair(rep0, rep1);
 	pair.addContact(1.0, Vector3d::UnitY(), penetrationPoints);
 
+	rep0->update(0.0);
+	rep1->update(0.0);
+
 	EXPECT_TRUE(rep0->hasCollision());
 	EXPECT_TRUE(rep1->hasCollision());
 

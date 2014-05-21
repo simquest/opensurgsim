@@ -20,7 +20,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "SurgSim/Framework/LockedContainer.h"
+#include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Representation.h"
 
 namespace SurgSim
@@ -98,15 +98,21 @@ public:
 	/// Clear all the collisions.
 	void clearCollisions();
 
-	/// Update the representation, implement for your subclass, default do nothing
-	/// \param dt the time passed from the last update;
+	/// Update the representation, publishes the buffered contacts.
+	/// \param dt the time passed from the last update.
 	virtual void update(const double& dt);
 
 protected:
 	/// A map which associates a list of contacts with each collision representation.
 	/// Every contact added to this map follows the convention of pointing the contact normal toward this
 	/// representation. And the first penetration point is on this representation.
-	SurgSim::Framework::LockedContainer<ContactMapType> m_collisions;
+	std::shared_ptr<SurgSim::DataStructures::BufferedValue<ContactMapType>> m_collisions;
+
+	/// The thread-safe read accessor to the collisions.
+	mutable SurgSim::DataStructures::SafeReadAccessor<ContactMapType> m_readCollisions;
+
+	/// The write accessor to the collisions.
+	SurgSim::DataStructures::ReadWriteAccessor<ContactMapType> m_writeCollisions;
 };
 
 

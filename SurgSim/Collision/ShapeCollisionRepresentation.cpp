@@ -50,6 +50,8 @@ const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getSha
 
 void ShapeCollisionRepresentation::update(const double& dt)
 {
+	Representation::update(dt);
+
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
 	if (meshShape != nullptr)
 	{
