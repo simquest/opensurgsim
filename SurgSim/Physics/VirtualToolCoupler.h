@@ -48,6 +48,8 @@ public:
 
 	~VirtualToolCoupler();
 
+	SURGSIM_CLASSNAME(SurgSim::Physics::VirtualToolCoupler);
+
 	/// \return Input Component to get the pose from
 	const std::shared_ptr<SurgSim::Input::InputComponent> getInput();
 

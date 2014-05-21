@@ -14,11 +14,13 @@
 //// limitations under the License.
 
 #include <gtest/gtest.h>
+#include <yaml-cpp/yaml.h>
 
 #include <math.h>
 
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -51,7 +53,10 @@ struct VirtualToolCouplerTest : public ::testing::Test
 {
 	virtual void SetUp()
 	{
-		rigidBody = std::make_shared<RigidRepresentation>("Rigid Representation");
+		representationName = "Rigid Representation";
+		inputDeviceName = "Device";
+
+		rigidBody = std::make_shared<RigidRepresentation>(representationName);
 
 		RigidRepresentationParameters parameters;
 		parameters.setDensity(700.0);
@@ -67,8 +72,8 @@ struct VirtualToolCouplerTest : public ::testing::Test
 		rigidBody->setInitialState(state);
 
 		input = std::make_shared<InputComponent>("Input");
-		input->setDeviceName("Device");
-		device = std::make_shared<IdentityPoseDevice>("Device");
+		input->setDeviceName(inputDeviceName);
+		device = std::make_shared<IdentityPoseDevice>(inputDeviceName);
 		input->connectDevice(device);
 
 		virtualToolCoupler = std::make_shared<MockVirtualToolCoupler>();
@@ -179,6 +184,9 @@ protected:
 		}
 		EXPECT_GT(0.051 * initialAngle, currentAngle);
 	}
+
+	std::string representationName;
+	std::string inputDeviceName;
 };
 
 TEST_F(VirtualToolCouplerTest, LinearDisplacement)
@@ -388,6 +396,56 @@ TEST_F(VirtualToolCouplerTest, OutputScaling)
 	virtualToolCoupler->setOutputTorqueScaling(num);
 	EXPECT_EQ(num, virtualToolCoupler->getOutputForceScaling());
 	EXPECT_EQ(num, virtualToolCoupler->getOutputTorqueScaling());
+}
+
+TEST_F(VirtualToolCouplerTest, Serialization)
+{
+	double num = 3.6415;
+
+	OptionalValued optionalNum;
+	optionalNum.setValue(num);
+	virtualToolCoupler->setOptionalLinearStiffness(optionalNum);
+	virtualToolCoupler->setOptionalLinearDamping(optionalNum);
+	virtualToolCoupler->setOptionalAngularStiffness(optionalNum);
+	virtualToolCoupler->setOptionalAngularDamping(optionalNum);
+	virtualToolCoupler->setOutputForceScaling(num);
+	virtualToolCoupler->setOutputTorqueScaling(num);
+
+	// Encode
+	YAML::Node node;
+	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*virtualToolCoupler););
+
+	// Decode
+	std::shared_ptr<SurgSim::Physics::VirtualToolCoupler> newVirtualToolCoupler;
+	EXPECT_NO_THROW(newVirtualToolCoupler = std::dynamic_pointer_cast<VirtualToolCoupler>(
+		node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+
+	// Verify
+	EXPECT_TRUE(newVirtualToolCoupler->getOptionalLinearStiffness().hasValue());
+	EXPECT_TRUE(newVirtualToolCoupler->getOptionalLinearDamping().hasValue());
+	EXPECT_TRUE(newVirtualToolCoupler->getOptionalAngularStiffness().hasValue());
+	EXPECT_TRUE(newVirtualToolCoupler->getOptionalAngularDamping().hasValue());
+
+	EXPECT_EQ(num, newVirtualToolCoupler->getOptionalLinearStiffness().getValue());
+	EXPECT_EQ(num, newVirtualToolCoupler->getOptionalLinearDamping().getValue());
+	EXPECT_EQ(num, newVirtualToolCoupler->getOptionalAngularStiffness().getValue());
+	EXPECT_EQ(num, newVirtualToolCoupler->getOptionalAngularDamping().getValue());
+
+	EXPECT_EQ(num, newVirtualToolCoupler->getOutputForceScaling());
+	EXPECT_EQ(num, newVirtualToolCoupler->getOutputTorqueScaling());
+
+	EXPECT_NE(nullptr, newVirtualToolCoupler->getInput());
+	EXPECT_NE(nullptr, newVirtualToolCoupler->getRepresentation());
+	EXPECT_EQ(nullptr, newVirtualToolCoupler->getOutput());
+
+	YAML::Node inputNode;
+	EXPECT_NO_THROW(inputNode = YAML::convert<SurgSim::Framework::Component>::encode(*input););
+
+	YAML::Node representationNode;
+	EXPECT_NO_THROW(representationNode = YAML::convert<SurgSim::Framework::Component>::encode(*rigidBody););
+
+	EXPECT_EQ(inputNode[input->getClassName()]["Id"].as<std::string>(),
+		node[virtualToolCoupler->getClassName()][input->getName()][input->getClassName()]["Id"].as<std::string>());
 }
 
 }; // namespace Physics

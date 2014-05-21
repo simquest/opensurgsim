@@ -16,6 +16,8 @@
 #include <Eigen/Eigenvalues>
 
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/LogMacros.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/OutputComponent.h"
@@ -32,6 +34,11 @@ using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Quaterniond;
 
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::VirtualToolCoupler);
+}
 
 namespace SurgSim
 {
@@ -54,6 +61,27 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	builder.addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
 	builder.addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
 	m_outputData = builder.createData();
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
+		LinearStiffness, getOptionalLinearStiffness, setOptionalLinearStiffness);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
+		LinearDamping, getOptionalLinearDamping, setOptionalLinearDamping);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
+		AngularStiffness, getOptionalAngularStiffness, setOptionalAngularStiffness);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
+		AngularDamping, getOptionalAngularDamping, setOptionalAngularDamping);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Input::InputComponent>,
+		Input, getInput, setInput);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Input::OutputComponent>,
+		Output, getOutput, setOutput);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Physics::RigidRepresentation>,
+		Representation, getRepresentation, setRepresentation);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, double, OutputForceScaling,
+		getOutputForceScaling, setOutputForceScaling);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, double, OutputTorqueScaling,
+		getOutputTorqueScaling, setOutputTorqueScaling);
 }
 
 VirtualToolCoupler::~VirtualToolCoupler()
