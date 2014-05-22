@@ -31,7 +31,7 @@ TEST(RuntimeTest, Constructor)
 
 	EXPECT_NO_THROW(std::make_shared<Runtime>());
 	EXPECT_NO_THROW(std::make_shared<Runtime>("config.txt"));
-	EXPECT_ANY_THROW(std::make_shared<Runtime>("Non-exist-file"));
+	EXPECT_THROW(std::make_shared<Runtime>("Non-exist-file"), SurgSim::Framework::AssertionFailure);
 }
 
 TEST(RuntimeTest, AddManager)
