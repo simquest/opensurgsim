@@ -264,9 +264,11 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> virtualTeeth;
 	for (auto it = virtualTeethShapes.begin(); it != virtualTeethShapes.end(); ++it, ++i)
 	{
-		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision
-			= std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
-				  "VirtualToothCollision" + boost::to_string(i), *it, RigidTransform3d::Identity());
+		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision =
+			std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
+			"VirtualToothCollision" + boost::to_string(i));
+		virtualToothCollision->setShape(*it);
+		virtualToothCollision->setLocalPose(RigidTransform3d::Identity());
 
 		virtualTeeth[i] = virtualToothCollision;
 		sceneElement->addComponent(virtualToothCollision);

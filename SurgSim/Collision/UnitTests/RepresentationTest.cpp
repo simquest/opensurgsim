@@ -53,8 +53,14 @@ struct RepresentationTest : public ::testing::Test
 		element = std::make_shared<BasicSceneElement>("Element");
 		plane = std::make_shared<PlaneShape>();
 		sphere = std::make_shared<SphereShape>(1.0);
-		planeRep = std::make_shared<ShapeCollisionRepresentation>("PlaneShape", plane, RigidTransform3d::Identity());
-		sphereRep = std::make_shared<ShapeCollisionRepresentation>("SphereShape", sphere, RigidTransform3d::Identity());
+		planeRep = std::make_shared<ShapeCollisionRepresentation>("PlaneShape");
+		sphereRep = std::make_shared<ShapeCollisionRepresentation>("SphereShape");
+
+		planeRep->setShape(plane);
+		planeRep->setLocalPose(RigidTransform3d::Identity());
+
+		sphereRep->setShape(sphere);
+		sphereRep->setLocalPose(RigidTransform3d::Identity());
 
 		element->addComponent(planeRep);
 		element->addComponent(sphereRep);
@@ -70,15 +76,13 @@ struct RepresentationTest : public ::testing::Test
 	std::shared_ptr<BasicSceneElement> element;
 	std::shared_ptr<PlaneShape> plane;
 	std::shared_ptr<SphereShape> sphere;
-	std::shared_ptr<Representation> planeRep;
-	std::shared_ptr<Representation> sphereRep;
+	std::shared_ptr<ShapeCollisionRepresentation> planeRep;
+	std::shared_ptr<ShapeCollisionRepresentation> sphereRep;
 };
 
 TEST_F(RepresentationTest, InitTest)
 {
-	EXPECT_NO_THROW(
-		{ShapeCollisionRepresentation("Plane", plane, RigidTransform3d::Identity());}
-	);
+	EXPECT_NO_THROW(ShapeCollisionRepresentation("Plane"));
 }
 
 TEST_F(RepresentationTest, PoseTest)
