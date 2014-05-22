@@ -199,47 +199,45 @@ namespace Physics
 
 TEST_F(RenderTests, VisualTestFallingRigidBodies)
 {
-	using SurgSim::Math::makeRigidTransform;
-
-	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
+	using SurgSim::Math::makeRigidTranslation;
 
 	// Mesh-base objects
 	std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
 		createRigidMeshSceneElement("boxMesh1", "box.ply", 1.0);
 	scene->addSceneElement(boxMesh);
-	boxMesh->setPose(makeRigidTransform(qIdentity, Vector3d(-0.35, 0.3, 0.0)));
+	boxMesh->setPose(makeRigidTranslation(Vector3d(-0.35, 0.3, 0.0)));
 
 	boxMesh = createRigidMeshSceneElement("boxMesh2", "box.ply", 0.5);
 	scene->addSceneElement(boxMesh);
-	boxMesh->setPose(makeRigidTransform(qIdentity, Vector3d(-0.25, 0.3, 0.0)));
+	boxMesh->setPose(makeRigidTranslation(Vector3d(-0.25, 0.3, 0.0)));
 
 	std::shared_ptr<SurgSim::Framework::SceneElement> sphereMesh =
 		createRigidMeshSceneElement("sphereMesh1", "sphere.ply", 1.0);
 	scene->addSceneElement(sphereMesh);
-	sphereMesh->setPose(makeRigidTransform(qIdentity, Vector3d(-0.15, 0.3, 0.0)));
+	sphereMesh->setPose(makeRigidTranslation(Vector3d(-0.15, 0.3, 0.0)));
 
 	sphereMesh = createRigidMeshSceneElement("sphereMesh2", "sphere.ply", 0.5);
 	scene->addSceneElement(sphereMesh);
-	sphereMesh->setPose(makeRigidTransform(qIdentity, Vector3d(-0.05, 0.3, 0.0)));
+	sphereMesh->setPose(makeRigidTranslation(Vector3d(-0.05, 0.3, 0.0)));
 
 	// Shape-base objects
 	std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
 		createRigidSphereSceneElement("sphereShape1", 0.05 * 0.5);
 	scene->addSceneElement(sphereShape);
-	sphereShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.05, 0.3, 0.0)));
+	sphereShape->setPose(makeRigidTranslation(Vector3d(0.05, 0.3, 0.0)));
 
 	sphereShape = createRigidSphereSceneElement("sphereShape2", 0.05 * 1.0);
 	scene->addSceneElement(sphereShape);
-	sphereShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.15, 0.3, 0.0)));
+	sphereShape->setPose(makeRigidTranslation(Vector3d(0.15, 0.3, 0.0)));
 
 	std::shared_ptr<SurgSim::Framework::SceneElement> boxShape =
 		createRigidBoxSceneElement("boxShape1", Vector3d(0.1, 0.1, 0.1) * 0.5);
 	scene->addSceneElement(boxShape);
-	boxShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.25, 0.3, 0.0)));
+	boxShape->setPose(makeRigidTranslation(Vector3d(0.25, 0.3, 0.0)));
 
 	boxShape = createRigidBoxSceneElement("boxShape2", Vector3d(0.1, 0.1, 0.1) * 1.0);
 	scene->addSceneElement(boxShape);
-	boxShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.35, 0.3, 0.0)));
+	boxShape->setPose(makeRigidTranslation(Vector3d(0.35, 0.3, 0.0)));
 
 	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 2500.0);
 }
@@ -247,8 +245,8 @@ TEST_F(RenderTests, VisualTestFallingRigidBodies)
 TEST_F(RenderTests, VisualTestRigidBodiesSlidingOnPlanes)
 {
 	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::makeRigidTranslation;
 
-	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
 	Eigen::AngleAxisd aaTiltForward(0.15, Vector3d(1.0, 0.0, 0.0));
 	Eigen::AngleAxisd aaTiltBackward(-0.15, Vector3d(1.0, 0.0, 0.0));
 
@@ -256,23 +254,23 @@ TEST_F(RenderTests, VisualTestRigidBodiesSlidingOnPlanes)
 	std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
 		createRigidMeshSceneElement("boxMesh", "box.ply");
 	scene->addSceneElement(boxMesh);
-	boxMesh->setPose(makeRigidTransform(qIdentity, Vector3d(-0.3, 0.3, 0.0)));
+	boxMesh->setPose(makeRigidTranslation(Vector3d(-0.3, 0.3, 0.0)));
 
 	std::shared_ptr<SurgSim::Framework::SceneElement> sphereMesh =
 		createRigidMeshSceneElement("sphereMesh", "sphere.ply");
 	scene->addSceneElement(sphereMesh);
-	sphereMesh->setPose(makeRigidTransform(qIdentity, Vector3d(-0.15, 0.3, 0.0)));
+	sphereMesh->setPose(makeRigidTranslation(Vector3d(-0.15, 0.3, 0.0)));
 
 	// Shape-base objects
 	std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
 		createRigidSphereSceneElement("sphereShape", 0.05);
 	scene->addSceneElement(sphereShape);
-	sphereShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.15, 0.3, 0.0)));
+	sphereShape->setPose(makeRigidTranslation(Vector3d(0.15, 0.3, 0.0)));
 
 	std::shared_ptr<SurgSim::Framework::SceneElement> boxShape =
 		createRigidBoxSceneElement("boxShape", Vector3d(0.1, 0.1, 0.1));
 	scene->addSceneElement(boxShape);
-	boxShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.3, 0.3, 0.0)));
+	boxShape->setPose(makeRigidTranslation(Vector3d(0.3, 0.3, 0.0)));
 
 	// Floors on which the objects are falling (both tilted)
 	std::shared_ptr<SurgSim::Framework::SceneElement> floor1 = createFixedPlaneSceneElement("floor1");
@@ -289,9 +287,9 @@ TEST_F(RenderTests, VisualTestRigidBodiesSlidingOnPlanes)
 TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 {
 	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::makeRigidTranslation;
 
 	const size_t numBodiesStacked = 3;
-	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
 
 	// Mesh-base objects
 	for (size_t i = 0; i < numBodiesStacked; ++i)
@@ -302,7 +300,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 		std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
 			createRigidMeshSceneElement(ss.str(), "box.ply", scale);
 		scene->addSceneElement(boxMesh);
-		Eigen::AngleAxisd aa(0.05 * i, Vector3d(0.0, 1.0, 0.0));
+		Eigen::AngleAxisd aa(0.15 * i, Vector3d(0.0, 1.0, 0.0));
 		boxMesh->setPose(makeRigidTransform(SurgSim::Math::Quaterniond(aa), Vector3d(-0.3, 0.3 + 0.15 * i, 0.0)));
 	}
 
@@ -314,7 +312,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 		std::shared_ptr<SurgSim::Framework::SceneElement> sphereMesh =
 			createRigidMeshSceneElement(ss.str(), "sphere.ply", scale);
 		scene->addSceneElement(sphereMesh);
-		sphereMesh->setPose(makeRigidTransform(qIdentity, Vector3d(-0.15, 0.3 + 0.15 * i, 0.0)));
+		sphereMesh->setPose(makeRigidTranslation(Vector3d(-0.15, 0.3 + 0.15 * i, 0.0)));
 	}
 
 	// Shape-base objects
@@ -326,7 +324,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 		std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
 			createRigidSphereSceneElement(ss.str(), 0.05 * scale);
 		scene->addSceneElement(sphereShape);
-		sphereShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.15, 0.3 + 0.15 * i, 0.0)));
+		sphereShape->setPose(makeRigidTranslation(Vector3d(0.15, 0.3 + 0.15 * i, 0.0)));
 	}
 
 	for (size_t i = 0; i < numBodiesStacked; ++i)
@@ -337,13 +335,13 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 		std::shared_ptr<SurgSim::Framework::SceneElement> boxShape =
 			createRigidBoxSceneElement(ss.str(), Vector3d::Ones() * 0.1 * scale);
 		scene->addSceneElement(boxShape);
-		boxShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.3, 0.3 + 0.15 * i, 0.0)));
+		boxShape->setPose(makeRigidTranslation(Vector3d(0.3, 0.3 + 0.15 * i, 0.0)));
 	}
 
 	// Floor on which the objects are falling
 	std::shared_ptr<SurgSim::Framework::SceneElement> floor = createFixedPlaneSceneElement("floor");
 	scene->addSceneElement(floor);
-	floor->setPose(makeRigidTransform(qIdentity, Vector3d(0.0, -0.2, 0.0)));
+	floor->setPose(makeRigidTranslation(Vector3d(0.0, -0.2, 0.0)));
 
 	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 10000.0);
 }
@@ -351,9 +349,9 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 {
 	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::makeRigidTranslation;
 
 	const size_t numBodiesStacked = 3;
-	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
 
 	// Mesh-base objects
 	for (size_t i = 0; i < numBodiesStacked; ++i)
@@ -365,7 +363,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 		std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
 			createRigidMeshSceneElement(ss.str(), "box.ply", scale);
 		scene->addSceneElement(boxMesh);
-		Eigen::AngleAxisd aa(0.05 * i, Vector3d(0.0, 1.0, 0.0));
+		Eigen::AngleAxisd aa(0.15 * i, Vector3d(0.0, 1.0, 0.0));
 		boxMesh->setPose(makeRigidTransform(SurgSim::Math::Quaterniond(aa), Vector3d(-0.3, 0.3 + 0.15 * i, 0.0)));
 	}
 
@@ -378,7 +376,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 		std::shared_ptr<SurgSim::Framework::SceneElement> sphereMesh =
 			createRigidMeshSceneElement(ss.str(), "sphere.ply", scale);
 		scene->addSceneElement(sphereMesh);
-		sphereMesh->setPose(makeRigidTransform(qIdentity, Vector3d(-0.15, 0.3 + 0.15 * i, 0.0)));
+		sphereMesh->setPose(makeRigidTranslation(Vector3d(-0.15, 0.3 + 0.15 * i, 0.0)));
 	}
 
 	// Shape-base objects
@@ -391,7 +389,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 		std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
 			createRigidSphereSceneElement(ss.str(), 0.05 * scale);
 		scene->addSceneElement(sphereShape);
-		sphereShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.15, 0.3 + 0.15 * i, 0.0)));
+		sphereShape->setPose(makeRigidTranslation(Vector3d(0.15, 0.3 + 0.15 * i, 0.0)));
 	}
 
 	for (size_t i = 0; i < numBodiesStacked; ++i)
@@ -403,13 +401,13 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 		std::shared_ptr<SurgSim::Framework::SceneElement> boxShape =
 			createRigidBoxSceneElement(ss.str(), Vector3d::Ones() * 0.1 * scale);
 		scene->addSceneElement(boxShape);
-		boxShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.3, 0.3 + 0.15 * i, 0.0)));
+		boxShape->setPose(makeRigidTranslation(Vector3d(0.3, 0.3 + 0.15 * i, 0.0)));
 	}
 
 	// Floor on which the objects are falling
 	std::shared_ptr<SurgSim::Framework::SceneElement> floor = createFixedPlaneSceneElement("floor");
 	scene->addSceneElement(floor);
-	floor->setPose(makeRigidTransform(qIdentity, Vector3d(0.0, -0.2, 0.0)));
+	floor->setPose(makeRigidTranslation(Vector3d(0.0, -0.2, 0.0)));
 
 	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 10000.0);
 }
