@@ -13,21 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-
-#include <algorithm>
 #include <memory>
-#include <utility>
 #include <vector>
+
+#include <gtest/gtest.h>
 
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/Behavior.h"
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
-#include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
@@ -41,17 +35,14 @@
 #include "SurgSim/Testing/MathUtilities.h"
 #include "SurgSim/Testing/TestCube.h"
 
+using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
-using SurgSim::Math::Vector2d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
-
 using SurgSim::Testing::interpolate;
-using SurgSim::Testing::interpolatePose;
-
 
 namespace SurgSim
 {
@@ -62,7 +53,6 @@ struct OsgMeshRepresentationRenderTests : public RenderTest
 {
 
 protected:
-
 	std::vector<Vector3d> cubeVertices;
 	std::vector<unsigned int> cubeTriangles;
 	std::vector<Vector4d> cubeColors;
@@ -78,8 +68,7 @@ protected:
 
 TEST_F(OsgMeshRepresentationRenderTests, StaticRotateDynamicScale)
 {
-	std::shared_ptr<SurgSim::Framework::BasicSceneElement> element =
-		std::make_shared<SurgSim::Framework::BasicSceneElement>("Scene");
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Scene");
 	scene->addSceneElement(element);
 
 	SurgSim::Testing::Cube::makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
