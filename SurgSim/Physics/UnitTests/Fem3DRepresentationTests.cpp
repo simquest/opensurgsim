@@ -41,7 +41,7 @@ namespace Physics
 
 TEST(Fem3DRepresentationTests, ConstructorTest)
 {
-	ASSERT_NO_THROW({std::shared_ptr<Fem3DRepresentation> fem = std::make_shared<Fem3DRepresentation>("Fem3D");});
+	ASSERT_NO_THROW(std::shared_ptr<Fem3DRepresentation> fem = std::make_shared<Fem3DRepresentation>("Fem3D"));
 }
 
 TEST(Fem3DRepresentationTests, GetTypeTest)
@@ -97,16 +97,24 @@ TEST(Fem3DRepresentationTests, TransformInitialStateTest)
 	EXPECT_TRUE(fem->getInitialState()->getVelocities().isApprox(expectedV));
 }
 
-TEST(Fem3DRepresentationTests, SetGetFilenameAndLoadFileTest)
+TEST(Fem3DRepresentationTests, SetGetFilenameTest)
+{
+	auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+	ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
+	ASSERT_NO_THROW(fem->getFilename());
+	ASSERT_EQ("Data/PlyReaderTests/Tetrahedron.ply", fem->getFilename());
+}
+
+TEST(Fem3DRepresentationTests, DoInitializeTest)
 {
 	{
-		SCOPED_TRACE("Calling setFileName with real file");
+		SCOPED_TRACE("Initialize with a valid file name");
 		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+		fem->setFilename("PlyReaderTests/Tetrahedron.ply");
 
-		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
-		ASSERT_NO_THROW(fem->getFilename());
-		ASSERT_EQ("Data/PlyReaderTests/Tetrahedron.ply", fem->getFilename());
-		ASSERT_TRUE(fem->loadFile());
+		// Fem3DRepresentation::initialize() will call Fem3DRepresentation::doInitialize(), which should load the file.
+		ASSERT_NO_THROW(ASSERT_TRUE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt"))));
 
 		EXPECT_EQ(3u, fem->getNumDofPerNode());
 		EXPECT_EQ(3u * 26u, fem->getNumDof());
@@ -114,111 +122,64 @@ TEST(Fem3DRepresentationTests, SetGetFilenameAndLoadFileTest)
 	}
 
 	{
-		SCOPED_TRACE("Calling setFileName with bad name");
+		SCOPED_TRACE("Initialize with an invalid file name");
 		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-
-		ASSERT_NO_THROW(fem->setFilename("Non existent fake name"));
-		ASSERT_NO_THROW(fem->getFilename());
-		ASSERT_EQ("Non existent fake name", fem->getFilename());
-		EXPECT_FALSE(fem->loadFile());
+		fem->setFilename("Non existent fake name");
+		EXPECT_ANY_THROW(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
 	{
-		SCOPED_TRACE("Loading file with no filename");
+		SCOPED_TRACE("Initialize with file name not set");
 		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-
-		EXPECT_FALSE(fem->loadFile());
+		EXPECT_ANY_THROW(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
 	{
-		SCOPED_TRACE("Loading twice");
-		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-
-		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
-		ASSERT_NO_THROW(fem->getFilename());
-		ASSERT_EQ("Data/PlyReaderTests/Tetrahedron.ply", fem->getFilename());
-		ASSERT_TRUE(fem->loadFile());
-		ASSERT_FALSE(fem->loadFile());
-	}
-
-	{
-		SCOPED_TRACE("Loading with non-shared ptr");
+		SCOPED_TRACE("Initialization called on object instance");
 		Fem3DRepresentation fem("fem3d");
 
-		ASSERT_NO_THROW(fem.setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
-		ASSERT_NO_THROW(fem.getFilename());
-		ASSERT_EQ("Data/PlyReaderTests/Tetrahedron.ply", fem.getFilename());
-		EXPECT_THROW(fem.loadFile(), SurgSim::Framework::AssertionFailure);
+		fem.setFilename("PlyReaderTests/Tetrahedron.ply");
+		// It throws because within doInitialize(), 'this' Fem3DRepresentation will be passed as a shared_ptr<> to
+		// the Fem3DRepresentationPlyReaderDelegate.
+		EXPECT_ANY_THROW(fem.initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
 	{
 		SCOPED_TRACE("Loading file with incorrect PLY format");
 		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
 
-		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/WrongPlyTetrahedron.ply"));
-		ASSERT_NO_THROW(fem->getFilename());
-		ASSERT_EQ("Data/PlyReaderTests/WrongPlyTetrahedron.ply", fem->getFilename());
-		EXPECT_FALSE(fem->loadFile());
+		fem->setFilename("PlyReaderTests/WrongPlyTetrahedron.ply");
+		EXPECT_FALSE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
 	{
 		SCOPED_TRACE("Loading file with incorrect data");
 		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
 
-		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/WrongDataTetrahedron.ply"));
-		ASSERT_NO_THROW(fem->getFilename());
-		ASSERT_EQ("Data/PlyReaderTests/WrongDataTetrahedron.ply", fem->getFilename());
-		EXPECT_THROW(fem->loadFile(), SurgSim::Framework::AssertionFailure);
+		fem->setFilename("PlyReaderTests/WrongDataTetrahedron.ply");
+		EXPECT_ANY_THROW(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
-}
-
-TEST(Fem3DRepresentationTests, DoInitializeTest)
-{
-	auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-
-	ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
-
-	// Call to initialize should call doInitialize, which should load the file
-	ASSERT_NO_THROW(ASSERT_TRUE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>())));
-
-	EXPECT_EQ(3u, fem->getNumDofPerNode());
-	EXPECT_EQ(3u * 26u, fem->getNumDof());
-	EXPECT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
 }
 
 TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 {
-	SurgSim::Framework::ApplicationData data("config.txt");
-	std::string fileName = data.findFile("Geometry/wound_deformable.ply");
+	using SurgSim::DataStructures::EmptyData;
 
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+	ASSERT_NO_THROW(fem->setFilename("Geometry/wound_deformable.ply"));
 
-	ASSERT_NO_THROW(fem->setFilename(fileName));
-
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate> triangleMeshDelegate
-		= std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
-
-	EXPECT_NO_THROW(reader.setDelegate(triangleMeshDelegate));
-	reader.parseFile();
-
-	std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<SurgSim::DataStructures::EmptyData,
-															  SurgSim::DataStructures::EmptyData,
-															  SurgSim::DataStructures::EmptyData>> triangleMesh
-																= triangleMeshDelegate->getMesh();
+	std::string path = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
+	std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData>> triangleMesh =
+		SurgSim::DataStructures::loadTriangleMesh(path);
 
 	// Create the collision mesh for the surface of the finite element model
-	std::shared_ptr<DeformableCollisionRepresentation> collisionRepresentation
-		= std::make_shared<DeformableCollisionRepresentation>("Collision");
+	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
 	collisionRepresentation->setMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>(*triangleMesh));
 	fem->setCollisionRepresentation(collisionRepresentation);
 
-	bool loaded;
-	EXPECT_NO_THROW(loaded = fem->loadFile(););
-	EXPECT_TRUE(loaded);
-
-	bool wokeUp;
-	ASSERT_TRUE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>()));
+	bool wokeUp = false;
+	ASSERT_TRUE(fem->initialize(runtime));
 	EXPECT_NO_THROW(wokeUp = fem->wakeUp(););
 	EXPECT_TRUE(wokeUp);
 

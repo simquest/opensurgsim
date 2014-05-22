@@ -26,9 +26,7 @@
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
-#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
@@ -65,9 +63,7 @@ using SurgSim::Blocks::VisualizeContactsBehavior;
 using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::Device::IdentityPoseDevice;
-using SurgSim::DataStructures::PlyReader;
 using SurgSim::DataStructures::TriangleMeshBase;
-using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Device::MultiAxisDevice;
 using SurgSim::Framework::ApplicationData;
 using SurgSim::Framework::BasicSceneElement;
@@ -100,19 +96,6 @@ using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
 
-static std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadMesh(const std::string& fileName)
-{
-	// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate> triangleMeshDelegate
-		= std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
-
-	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
-
-	return triangleMeshDelegate->getMesh();
-}
-
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
@@ -128,24 +111,20 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 		= std::make_shared<SurgSim::Physics::Fem3DRepresentation>(name + " physics");
 	physicsRepresentation->setFilename(filename);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
-	// Note: Directly calling loadFile is a workaround.  The TransferOdeStateToVerticesBehavior requires a
-	// pointer to the Physics Representation's state, which is not created until the file is loaded and the internal
-	// structure is initialized.  Therefore we create the state now by calling loadFile.
-	physicsRepresentation->loadFile();
 	sceneElement->addComponent(physicsRepresentation);
 
-	// Create a triangle mesh for visualizing the surface of the finite element model
-	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
-		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
-	*graphicsTriangleMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*loadMesh(filename));
-	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
-
 	// Load the surface triangle mesh of the finite element model
-	auto meshSurface = loadMesh(filename);
+	auto meshShape = std::make_shared<MeshShape>();
+	meshShape->setFileName(filename);
+
+	// Create a triangle mesh for visualizing the surface of the finite element model
+	auto graphicsTriangleMeshRepresentation	= std::make_shared<OsgMeshRepresentation>(name + " triangle mesh");
+	*graphicsTriangleMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*(meshShape->getMesh()));
+	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
 
 	// Create the collision mesh for the surface of the finite element model
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
-	collisionRepresentation->setMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>(*meshSurface));
+	collisionRepresentation->setShape(meshShape);
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
 
@@ -191,10 +170,11 @@ std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& na
 std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName, const std::string& deviceName)
 {
 	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	const std::string filename = std::string("Geometry/stapler_collision.ply");
 
 	// Stapler collision mesh
-	std::shared_ptr<MeshShape> meshShapeForCollision = std::make_shared<MeshShape>();
-	meshShapeForCollision->setFileName("Geometry/stapler_collision.ply");
+	auto meshShapeForCollision = std::make_shared<MeshShape>();
+	meshShapeForCollision->setFileName(filename);
 	meshShapeForCollision->initialize(data);
 
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
@@ -292,6 +272,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 {
 	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	const std::string filename = std::string("Geometry/arm_collision.ply");
 
 	// Graphic representation for arm
 	std::shared_ptr<SceneryRepresentation> forearmSceneryRepresentation =
@@ -301,7 +282,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 
 	// Arm collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>();
-	meshShape->setFileName("Geometry/arm_collision.ply");
+	meshShape->setFileName(filename);
 	meshShape->initialize(data);
 
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization = std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
@@ -381,7 +362,7 @@ int main(int argc, char* argv[])
 	stapler->setPose(RigidTransform3d::Identity());
 
 	// Load the FEM
-	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
+	std::string woundFilename = std::string("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
 	// Dynamic Optical Coherence Elastography", IEEE Transactions on Biomedical Engineering, Vol 57, No 4.
 	std::shared_ptr<SceneElement> wound =

@@ -19,6 +19,7 @@
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
@@ -94,43 +95,6 @@ void Fem3DRepresentation::setFilename(const std::string& filename)
 const std::string& Fem3DRepresentation::getFilename() const
 {
 	return m_filename;
-}
-
-bool Fem3DRepresentation::loadFile()
-{
-	if (m_filename.empty())
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Filename not set.";
-		return false;
-	}
-
-	if (!m_doLoadFile)
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File already loaded.";
-		return false;
-	}
-
-	SurgSim::DataStructures::PlyReader reader(m_filename);
-	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
-	auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
-
-	if (!reader.isValid())
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is not valid.";
-		return false;
-	}
-
-	if (!reader.setDelegate(readerDelegate))
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is not acceptable an PLY.";
-		return false;
-	}
-
-	// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
-	reader.parseFile();
-
-	m_doLoadFile = false;
-	return true;
 }
 
 std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElementIdMap(
@@ -238,13 +202,43 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 
 bool Fem3DRepresentation::doInitialize()
 {
-	if (m_doLoadFile && !loadFile())
+	bool result = true;
+	if (m_doLoadFile)
 	{
-		SURGSIM_LOG_SEVERE(Logger::getDefaultLogger()) << "Failed to initialize from file " << m_filename;
-		return false;
+		if (m_filename.empty())
+		{
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Filename not set.";
+			result = false;
+		}
+
+		auto applicationData = getRuntime()->getApplicationData();
+		std::string filePath = applicationData->findFile(m_filename);
+
+		SurgSim::DataStructures::PlyReader reader(filePath);
+		auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
+		auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
+
+		if (!reader.isValid())
+		{
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << filePath << " is not valid.";
+			result = false;
+		}
+
+		if (!reader.setDelegate(readerDelegate))
+		{
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << filePath << " is not an acceptable PLY.";
+			result = false;
+		}
+
+		if (result)
+		{
+			// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
+			reader.parseFile();
+			m_doLoadFile = false;
+		}
 	}
 
-	return FemRepresentation::doInitialize();
+	return result && FemRepresentation::doInitialize();
 }
 
 void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,

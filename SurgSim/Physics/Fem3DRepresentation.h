@@ -56,11 +56,6 @@ public:
 	/// \return filename The name of the file to be loaded
 	const std::string& getFilename() const;
 
-	/// Loads the file
-	/// \return true if successful
-	/// \note This function is a temporary workaround and its usage is discouraged.
-	bool loadFile();
-
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;

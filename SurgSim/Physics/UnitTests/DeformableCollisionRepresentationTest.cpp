@@ -19,6 +19,7 @@
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/Vector.h"
@@ -49,11 +50,13 @@ struct DeformableCollisionRepresentationTest : public ::testing::Test
 		m_deformableRepresentation = std::make_shared<MockDeformableRepresentation>("DeformableRepresentation");
 		m_deformableCollisionRepresentation =
 			std::make_shared<DeformableCollisionRepresentation>("DeformableCollisionRepresentation");
+		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	}
 
 	std::string m_filename;
 	std::shared_ptr<SurgSim::Framework::ApplicationData> m_applicationData;
 	std::shared_ptr<SurgSim::Math::MeshShape> m_meshShape;
+	std::shared_ptr<SurgSim::Framework::Runtime> m_runtime;
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_deformableRepresentation;
 	std::shared_ptr<SurgSim::Physics::DeformableCollisionRepresentation> m_deformableCollisionRepresentation;
 };
@@ -124,11 +127,11 @@ TEST_F(DeformableCollisionRepresentationTest, UpdateTest)
 	EXPECT_ANY_THROW(m_deformableCollisionRepresentation->update(0.0));
 
 	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Fem3DRepresentation");
-	fem3DRepresentation->setFilename("Data/Geometry/wound_deformable.ply");
+	fem3DRepresentation->setFilename(m_filename);
 	fem3DRepresentation->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
 
-	// Note: Directly calling loadFile is a workaround. Member data 'odeState' will be created while loading.
-	ASSERT_TRUE(fem3DRepresentation->loadFile());
+	// Member data 'odeState' will be created while loading.
+	ASSERT_TRUE(fem3DRepresentation->initialize(m_runtime));
 
 	// Connect Physics representation with Collision representation.
 	fem3DRepresentation->setCollisionRepresentation(m_deformableCollisionRepresentation);
@@ -143,11 +146,11 @@ TEST_F(DeformableCollisionRepresentationTest, DoInitializationTest)
 	EXPECT_ANY_THROW(m_deformableCollisionRepresentation->doInitialize());
 
 	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Fem3DRepresentation");
-	fem3DRepresentation->setFilename("Data/Geometry/wound_deformable.ply");
+	fem3DRepresentation->setFilename(m_filename);
 	fem3DRepresentation->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
 
-	// Note: Directly calling loadFile is a workaround. Member data 'odeState' will be created while loading.
-	ASSERT_TRUE(fem3DRepresentation->loadFile());
+	// Note: Member data 'odeState' will be created while loading.
+	ASSERT_TRUE(fem3DRepresentation->initialize(m_runtime));
 
 	// Connect Physics representation with Collision representation.
 	fem3DRepresentation->setCollisionRepresentation(m_deformableCollisionRepresentation);
