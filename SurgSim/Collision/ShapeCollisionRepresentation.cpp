@@ -14,24 +14,26 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Collision::ShapeCollisionRepresentation);
+}
 
 namespace SurgSim
 {
 namespace Collision
 {
 
-
-ShapeCollisionRepresentation::ShapeCollisionRepresentation(
-		const std::string& name,
-		std::shared_ptr<SurgSim::Math::Shape> shape,
-		const SurgSim::Math::RigidTransform3d& pose) :
-	Representation(name),
-	m_shape(shape)
+ShapeCollisionRepresentation::ShapeCollisionRepresentation(const std::string& name) :
+	Representation(name)
 {
-	setLocalPose(pose);
-	update(0.0);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ShapeCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>, Shape,
+									  getShape, setShape);
 }
 
 ShapeCollisionRepresentation::~ShapeCollisionRepresentation()
@@ -43,6 +45,20 @@ int ShapeCollisionRepresentation::getShapeType() const
 	return m_shape->getType();
 }
 
+
+void ShapeCollisionRepresentation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	Representation::setLocalPose(pose);
+	update(0.0);
+}
+
+void ShapeCollisionRepresentation::setShape(const std::shared_ptr<SurgSim::Math::Shape>& shape)
+{
+	SURGSIM_ASSERT(nullptr != shape) << "Can not shape a empty shape.";
+	m_shape = shape;
+	update(0.0);
+}
+
 const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getShape() const
 {
 	return m_shape;
@@ -51,7 +67,7 @@ const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getSha
 void ShapeCollisionRepresentation::update(const double& dt)
 {
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
-	if (meshShape != nullptr)
+	if (nullptr != meshShape)
 	{
 		meshShape->setPose(getPose());
 	}
