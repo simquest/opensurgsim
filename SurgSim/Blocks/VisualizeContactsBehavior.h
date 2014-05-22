@@ -48,12 +48,13 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Blocks::VisualizeContactsBehavior);
 
+	/// Used for serialization.
 	/// \return The collision representation whose contacts will be visualized.
-	std::shared_ptr<SurgSim::Collision::Representation> getCollisionRepresentation();
+	std::shared_ptr<SurgSim::Framework::Component> getCollisionRepresentation();
 
-	/// Set the collision representation whose contacts, if any, will be visualized.
+	/// Used for serialization.
 	/// \param	collisionRepresentation The collision representation whose contacts will be visualized.
-	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation);
+	void setCollisionRepresentation(std::shared_ptr<SurgSim::Framework::Component> collisionRepresentation);
 
 	/// Update the behavior, show vector field for contacts if there is any.
 	/// \param dt	The length of time (seconds) between update calls.

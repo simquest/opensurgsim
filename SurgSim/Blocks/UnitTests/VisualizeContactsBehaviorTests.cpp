@@ -17,10 +17,10 @@
 /// Tests for the VisualizeContactsBehavior class.
 
 #include <gtest/gtest.h>
+#include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
-#include "yaml-cpp/yaml.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 
 using SurgSim::Blocks::VisualizeContactsBehavior;

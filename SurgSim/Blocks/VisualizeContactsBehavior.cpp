@@ -47,20 +47,21 @@ VisualizeContactsBehavior::VisualizeContactsBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),
 	m_vectorField(std::make_shared<OsgVectorFieldRepresentation>("VisualizeContacts"))
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VisualizeContactsBehavior, std::shared_ptr<SurgSim::Collision::Representation>,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VisualizeContactsBehavior, std::shared_ptr<SurgSim::Framework::Component>,
 		CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VisualizeContactsBehavior, double, VectorFieldScale,
 		getVectorFieldScale, setVectorFieldScale);
 }
 
-std::shared_ptr<SurgSim::Collision::Representation> VisualizeContactsBehavior::getCollisionRepresentation()
+std::shared_ptr<SurgSim::Framework::Component> VisualizeContactsBehavior::getCollisionRepresentation()
 {
 	return m_collisionRepresentation;
 }
 
-void VisualizeContactsBehavior::setCollisionRepresentation(std::shared_ptr<Representation> collisionRepresentation)
+void VisualizeContactsBehavior::setCollisionRepresentation(
+	std::shared_ptr<SurgSim::Framework::Component> collisionRepresentation)
 {
-	m_collisionRepresentation = collisionRepresentation;
+	m_collisionRepresentation = std::dynamic_pointer_cast<Representation>(collisionRepresentation);
 }
 
 void VisualizeContactsBehavior::update(double dt)
