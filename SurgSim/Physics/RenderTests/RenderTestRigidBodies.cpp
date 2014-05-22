@@ -298,7 +298,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 	{
 		std::stringstream ss;
 		ss << "boxMesh" << i;
-		double scale = 1.0 - static_cast<double>(i)/static_cast<double>(numBodiesStacked);
+		double scale = 1.0 - static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
 			createRigidMeshSceneElement(ss.str(), "box.ply", scale);
 		scene->addSceneElement(boxMesh);
@@ -310,7 +310,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 	{
 		std::stringstream ss;
 		ss << "sphereMesh" << i;
-		double scale = 1.0 - static_cast<double>(i)/static_cast<double>(numBodiesStacked);
+		double scale = 1.0 - static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> sphereMesh =
 			createRigidMeshSceneElement(ss.str(), "sphere.ply", scale);
 		scene->addSceneElement(sphereMesh);
@@ -322,7 +322,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 	{
 		std::stringstream ss;
 		ss << "sphereShape" << i;
-		double scale = 1.0 - static_cast<double>(i)/static_cast<double>(numBodiesStacked);
+		double scale = 1.0 - static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
 			createRigidSphereSceneElement(ss.str(), 0.05 * scale);
 		scene->addSceneElement(sphereShape);
@@ -333,7 +333,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 	{
 		std::stringstream ss;
 		ss << "boxShape" << i;
-		double scale = 1.0 - static_cast<double>(i)/static_cast<double>(numBodiesStacked);
+		double scale = 1.0 - static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> boxShape =
 			createRigidBoxSceneElement(ss.str(), Vector3d::Ones() * 0.1 * scale);
 		scene->addSceneElement(boxShape);
@@ -361,7 +361,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 		std::stringstream ss;
 		ss << "boxMesh" << i;
 		double scale = 1.0 / static_cast<double>(numBodiesStacked) +
-			static_cast<double>(i)/static_cast<double>(numBodiesStacked);
+			static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
 			createRigidMeshSceneElement(ss.str(), "box.ply", scale);
 		scene->addSceneElement(boxMesh);
@@ -374,7 +374,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 		std::stringstream ss;
 		ss << "sphereMesh" << i;
 		double scale = 1.0 / static_cast<double>(numBodiesStacked) +
-			static_cast<double>(i)/static_cast<double>(numBodiesStacked);
+			static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> sphereMesh =
 			createRigidMeshSceneElement(ss.str(), "sphere.ply", scale);
 		scene->addSceneElement(sphereMesh);
@@ -387,7 +387,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 		std::stringstream ss;
 		ss << "sphereShape" << i;
 		double scale = 1.0 / static_cast<double>(numBodiesStacked) +
-			static_cast<double>(i)/static_cast<double>(numBodiesStacked);
+			static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
 			createRigidSphereSceneElement(ss.str(), 0.05 * scale);
 		scene->addSceneElement(sphereShape);
@@ -399,7 +399,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 		std::stringstream ss;
 		ss << "boxShape" << i;
 		double scale = 1.0 / static_cast<double>(numBodiesStacked) +
-			static_cast<double>(i)/static_cast<double>(numBodiesStacked);
+			static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> boxShape =
 			createRigidBoxSceneElement(ss.str(), Vector3d::Ones() * 0.1 * scale);
 		scene->addSceneElement(boxShape);
