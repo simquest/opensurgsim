@@ -281,7 +281,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesSlidingOnPlanes)
 	scene->addSceneElement(floor2);
 	floor2->setPose(makeRigidTransform(SurgSim::Math::Quaterniond(aaTiltBackward), Vector3d(0.0, -0.2, -0.1)));
 
-	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 10000.0);
+	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 13000.0);
 }
 
 TEST_F(RenderTests, VisualTestRigidBodiesStacking)
