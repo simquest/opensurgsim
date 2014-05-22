@@ -48,7 +48,6 @@ struct CommonDevice::State
 CommonDevice::CommonDevice(const std::string& name) :
 	m_name(name),
 	m_nameForCallback(name),
-	m_initialInputData(SurgSim::DataStructures::DataGroup()),
 	m_inputData(SurgSim::DataStructures::DataGroup()),
 	m_state(new State)
 {
@@ -57,7 +56,6 @@ CommonDevice::CommonDevice(const std::string& name) :
 CommonDevice::CommonDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
 	m_name(name),
 	m_nameForCallback(name),
-	m_initialInputData(inputData),
 	m_inputData(inputData),
 	m_state(new State)
 {
@@ -66,7 +64,6 @@ CommonDevice::CommonDevice(const std::string& name, const SurgSim::DataStructure
 CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData) :
 	m_name(name),
 	m_nameForCallback(name),
-	m_initialInputData(inputData),
 	m_inputData(std::move(inputData)),
 	m_state(new State)
 {
@@ -107,7 +104,7 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 
 	// NB: callbacks are called with the local m_nameForCallback.
 	// This allows e.g. filters to call their callbacks with a name different from their "real" name.
-	inputConsumer->initializeInput(m_nameForCallback, m_initialInputData);
+	inputConsumer->initializeInput(m_nameForCallback, m_inputData);
 	m_state->inputConsumerList.emplace_back(std::move(inputConsumer));
 	return true;
 }
@@ -201,11 +198,6 @@ bool CommonDevice::pullOutput()
 	m_outputData.resetAll();
 
 	return false;
-}
-
-SurgSim::DataStructures::DataGroup& CommonDevice::getInitialInputData()
-{
-	return m_initialInputData;
 }
 
 SurgSim::DataStructures::DataGroup& CommonDevice::getInputData()
