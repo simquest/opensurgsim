@@ -114,20 +114,22 @@ void Fem3DElementCorotationalTetrahedron::addMatVec(const SurgSim::Math::OdeStat
 
 bool Fem3DElementCorotationalTetrahedron::update(const SurgSim::Math::OdeState& state)
 {
-	// Matrix P is the matrix of the deformed tetrahedron points in homogenous coordinates.
-	// Matrix V is the matrix of the undeformed tetrahedron points in homogenous coordinates.
-	// F = P.V^1 measures the transformation between the undeformed and deformed configurations.
-	// Matrices R and S measures the rotation part and stretching part of the transformation F.
-	SurgSim::Math::Matrix44d P, F;
-	SurgSim::Math::Matrix33d R, S;
+	// The update does two things:
+	// 1) Recompute the element's rotation
+	// 2) Update the element's stiffness matrix based on the new rotation
 
+	// Matrix P is the matrix of the deformed tetrahedron points in homogenous coordinates.
+	SurgSim::Math::Matrix44d P;
 	P.col(0).segment<3>(0) = state.getPosition(m_nodeIds[0]);
 	P.col(1).segment<3>(0) = state.getPosition(m_nodeIds[1]);
 	P.col(2).segment<3>(0) = state.getPosition(m_nodeIds[2]);
 	P.col(3).segment<3>(0) = state.getPosition(m_nodeIds[3]);
 	P.row(3).setOnes();
 
-	F = P * m_Vinverse;
+	// Matrix V is the matrix of the undeformed tetrahedron points in homogenous coordinates.
+	// F = P.V^1 is an affine transformation (deformation gradient) measuring the transformation
+	// between the undeformed and deformed configurations.
+	Eigen::Transform<double, 3, Eigen::Affine> F(P * m_Vinverse);
 	// F is of the form (B t) where t contains the translation part and B the rotation and stretching.
 	//                  (0 1)
 	// c.f. "Interactive Virtual Materials", Muller, Gross. Graphics Interface 2004
@@ -136,28 +138,29 @@ bool Fem3DElementCorotationalTetrahedron::update(const SurgSim::Math::OdeState& 
 	// The polar decomposition of F (=RS) gives R an orthonormal matrix and S a symmetric matrix.
 	// The polar decomposition of F extracts a rotation R and a stretching (or scaling) S.
 	// The polar decomposition always exists, moreover is unique if F is invertible.
-	// The polar decomposition can be deduced from the SVD decomposition:
-	// If A = U.D.V^t is the singular value decomposition of the matrix A
-	// Then R = U.V^t
-	// and  S = V.D.V^t
-	Eigen::JacobiSVD<SurgSim::Math::Matrix33d> svd(F.topLeftCorner<3, 3>(), Eigen::ComputeFullU | Eigen::ComputeFullV);
-	m_rotation = svd.matrixU() * svd.matrixV().transpose();
-	double determinant = m_rotation.determinant();
-	if (std::abs(determinant - 1.0) > 1e-8)
+	// The polar decomposition can be deduced from the SVD decomposition F = U.D.V^t => R = U.V^t and S = V.D.V^t
+	SurgSim::Math::Matrix33d scaling;
+	F.computeRotationScaling(&m_rotation, &scaling);
+
+	SURGSIM_ASSERT(F.linear().isApprox(m_rotation * scaling)) <<
+		"Deformation gradient polar decomposition failed F != Rotation.Scaling";
+
+	if (std::abs(m_rotation.determinant() - 1.0) > 1e-8)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"Rotation has an invalida determinant of " << determinant;
+			"Rotation has an invalida determinant of " << m_rotation.determinant();
 		return false;
 	}
 
-	// Rotate the element stiffness matrix
+	// Build a 12x12 rotation matrix, useful of the stiffness matrix computation
 	Eigen::Matrix<double, 12, 12> R12x12 = Eigen::Matrix<double, 12, 12>::Zero();
-
 	for (size_t nodeId = 0; nodeId < 4; ++nodeId)
 	{
 		R12x12.block<3, 3>(3 * nodeId, 3 * nodeId) = m_rotation;
 	}
 
+	// Compute the rotated stiffness matrix K = R.Ke.R^t
+	// c.f. "Interactive Virtual Materials", Muller, Gross. Graphics Interface 2004
 	m_corotationalStiffnessMatrix = R12x12 * m_K * R12x12.transpose();
 
 	return true;
