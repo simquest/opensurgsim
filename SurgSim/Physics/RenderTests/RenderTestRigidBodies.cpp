@@ -56,7 +56,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidSphereSceneElement(
 {
 	// Physics representation
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(name + "Physics");
+		std::make_shared<RigidRepresentation>("Physics");
 	RigidRepresentationParameters params;
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(radius);
 	params.setDensity(750.0); // Average mass density of
@@ -68,15 +68,15 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidSphereSceneElement(
 
 	// Collision representation
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<RigidCollisionRepresentation>(name + "Collision");
+		std::make_shared<RigidCollisionRepresentation>("Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	// Graphic model
 	std::shared_ptr<OsgSphereRepresentation> osgRepresentation =
-		std::make_shared<OsgSphereRepresentation>(name + "OsgRepresentation");
+		std::make_shared<OsgSphereRepresentation>("OsgRepresentation");
 	osgRepresentation->setRadius(radius);
 
-	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name + "SceneElement");
+	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);
 	sceneElement->addComponent(osgRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
 	sceneElement->addComponent(physicsRepresentation);
@@ -88,7 +88,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidBoxSceneElement(con
 {
 	// Physics representation
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(name + "Physics");
+		std::make_shared<RigidRepresentation>("Physics");
 	RigidRepresentationParameters params;
 	std::shared_ptr<BoxShape> shape = std::make_shared<BoxShape>(size[0], size[1], size[2]);
 	params.setDensity(750.0); // Average mass density of
@@ -100,15 +100,15 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidBoxSceneElement(con
 
 	// Collision representation
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<RigidCollisionRepresentation>(name + "Collision");
+		std::make_shared<RigidCollisionRepresentation>("Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	// Graphic model
 	std::shared_ptr<OsgBoxRepresentation> osgRepresentation =
-		std::make_shared<OsgBoxRepresentation>(name + "OsgRepresentation");
+		std::make_shared<OsgBoxRepresentation>("OsgRepresentation");
 	osgRepresentation->setSize(size);
 
-	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name + "SceneElement");
+	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);
 	sceneElement->addComponent(osgRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
 	sceneElement->addComponent(physicsRepresentation);
@@ -120,7 +120,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedPlaneSceneElement(c
 {
 	// Physics representation
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
-		std::make_shared<FixedRepresentation>(name + "Physics");
+		std::make_shared<FixedRepresentation>("Physics");
 	RigidRepresentationParameters params;
 	std::shared_ptr<PlaneShape> shape = std::make_shared<PlaneShape>();
 	params.setShapeUsedForMassInertia(shape);
@@ -128,14 +128,14 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedPlaneSceneElement(c
 
 	// Collision representation
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<RigidCollisionRepresentation>(name + "Collision");
+		std::make_shared<RigidCollisionRepresentation>("Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	// Graphic model
 	std::shared_ptr<OsgPlaneRepresentation> osgRepresentation =
-		std::make_shared<OsgPlaneRepresentation>(name + "OsgRepresentation");
+		std::make_shared<OsgPlaneRepresentation>("OsgRepresentation");
 
-	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name + "SceneElement");
+	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);
 	sceneElement->addComponent(osgRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
 	sceneElement->addComponent(physicsRepresentation);
@@ -160,7 +160,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 
 	// Physics representation
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(name + "Physics");
+		std::make_shared<RigidRepresentation>("Physics");
 	RigidRepresentationParameters params;
 	std::shared_ptr<MeshShape> shape = std::make_shared<MeshShape>(*mesh);
 	params.setDensity(750.0); // Average mass density of
@@ -172,16 +172,16 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 
 	// Collision representation
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<RigidCollisionRepresentation>(name + "Collision");
+		std::make_shared<RigidCollisionRepresentation>("Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	// Graphic representation of the physics model
 	std::shared_ptr<OsgMeshRepresentation> osgRepresentation =
-		std::make_shared<OsgMeshRepresentation>(name + "OsgRepresentation");
+		std::make_shared<OsgMeshRepresentation>("OsgRepresentation");
 	*osgRepresentation->getMesh() = SurgSim::Graphics::Mesh(*mesh);
 	osgRepresentation->setDrawAsWireFrame(true);
 
-	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name + "SceneElement");
+	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);
 	sceneElement->addComponent(osgRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
 	sceneElement->addComponent(physicsRepresentation);
