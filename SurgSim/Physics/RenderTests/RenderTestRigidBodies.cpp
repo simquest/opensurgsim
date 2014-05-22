@@ -249,8 +249,8 @@ TEST_F(RenderTests, VisualTestRigidBodiesSlidingOnPlanes)
 	using SurgSim::Math::makeRigidTransform;
 
 	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
-	Eigen::AngleAxisd aaTildForward(0.15, Vector3d(1.0, 0.0, 0.0));
-	Eigen::AngleAxisd aaTildBackward(-0.15, Vector3d(1.0, 0.0, 0.0));
+	Eigen::AngleAxisd aaTiltForward(0.15, Vector3d(1.0, 0.0, 0.0));
+	Eigen::AngleAxisd aaTiltBackward(-0.15, Vector3d(1.0, 0.0, 0.0));
 
 	// Mesh-base objects
 	std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
@@ -274,14 +274,14 @@ TEST_F(RenderTests, VisualTestRigidBodiesSlidingOnPlanes)
 	scene->addSceneElement(boxShape);
 	boxShape->setPose(makeRigidTransform(qIdentity, Vector3d(0.3, 0.3, 0.0)));
 
-	// Floors on which the objects are falling (both tilded)
+	// Floors on which the objects are falling (both tilted)
 	std::shared_ptr<SurgSim::Framework::SceneElement> floor1 = createFixedPlaneSceneElement("floor1");
 	scene->addSceneElement(floor1);
-	floor1->setPose(makeRigidTransform(SurgSim::Math::Quaterniond(aaTildForward), Vector3d(0.0, -0.2, -0.1)));
+	floor1->setPose(makeRigidTransform(SurgSim::Math::Quaterniond(aaTiltForward), Vector3d(0.0, -0.2, -0.1)));
 
 	std::shared_ptr<SurgSim::Framework::SceneElement> floor2 = createFixedPlaneSceneElement("floor2");
 	scene->addSceneElement(floor2);
-	floor2->setPose(makeRigidTransform(SurgSim::Math::Quaterniond(aaTildBackward), Vector3d(0.0, -0.2, -0.1)));
+	floor2->setPose(makeRigidTransform(SurgSim::Math::Quaterniond(aaTiltBackward), Vector3d(0.0, -0.2, -0.1)));
 
 	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 10000.0);
 }
