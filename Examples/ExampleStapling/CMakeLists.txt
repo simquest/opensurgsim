@@ -23,9 +23,9 @@ include_directories(
 )
 
 set(EXAMPLESTAPLING_SOURCES
-	main.cpp
 	StapleElement.cpp
 	StaplerBehavior.cpp
+	StaplingExample.cpp
 )
 
 set(EXAMPLESTAPLING_HEADERS
