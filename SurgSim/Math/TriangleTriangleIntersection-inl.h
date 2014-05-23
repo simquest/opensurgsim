@@ -17,6 +17,11 @@
 #define SURGSIM_MATH_TRIANGLETRIANGLEINTERSECTION_INL_H
 
 
+namespace
+{
+static const double EPSILOND = 1e-12;
+}
+
 namespace SurgSim
 {
 
@@ -41,32 +46,23 @@ void edgeIntersection(T dStart, T dEnd, T pvStart, T pvEnd, T* parametricInterse
 					  size_t* parametricIntersectionIndex)
 {
 	// Epsilon used in this function.
-	static const T EPSILON = T(1e-12);
+	static const T EPSILON = static_cast<T>(EPSILOND);
 
-	bool startIsUnder = dStart < 0.0 && dEnd >= 0.0;
-	bool startIsOver = dStart > 0.0 && dEnd <= 0.0;
+	bool edgeFromUnderToAbove = dStart < 0.0 && dEnd >= 0.0;
+	bool edgeFromAboveToUnder = dStart > 0.0 && dEnd <= 0.0;
 
-	if (startIsUnder || startIsOver)
+	if (edgeFromUnderToAbove || edgeFromAboveToUnder)
 	{
-		if (dEnd == 0.0)
+		if (std::abs(dStart - dEnd) < EPSILON)
 		{
-			// The intersection of the edge and the plane is the end.
-			parametricIntersection[(*parametricIntersectionIndex)++] = pvEnd;
+			// Start and End are really close. Pick start.
+			parametricIntersection[(*parametricIntersectionIndex)++] = pvStart;
 		}
 		else
 		{
-			// The intersection of the edge and the plane is got by clipping the edge onto the plane.
-			if (std::abs(dStart - dEnd) < EPSILON)
-			{
-				// Start and End are really close. Pick start.
-				parametricIntersection[(*parametricIntersectionIndex)++] = pvStart;
-			}
-			else
-			{
-				// Clip to the point in the intersection of Start->End and plane of the colliding triangle.
-				parametricIntersection[(*parametricIntersectionIndex)++] =
-					pvStart + (pvEnd - pvStart) * (dStart / (dStart - dEnd));
-			}
+			// Clip to the point in the intersection of Start->End and plane of the colliding triangle.
+			parametricIntersection[(*parametricIntersectionIndex)++] =
+				pvStart + (pvEnd - pvStart) * (dStart / (dStart - dEnd));
 		}
 	}
 }
