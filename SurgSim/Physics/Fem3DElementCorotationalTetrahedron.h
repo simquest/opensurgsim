@@ -43,7 +43,7 @@ public:
 	/// \note This is required from the signed volume calculation method getVolume()
 	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
 	/// simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
-	Fem3DElementCorotationalTetrahedron(std::array<unsigned int, 4> nodeIds);
+	explicit Fem3DElementCorotationalTetrahedron(std::array<unsigned int, 4> nodeIds);
 
 	virtual void initialize(const SurgSim::Math::OdeState& state) override;
 
@@ -54,7 +54,7 @@ public:
 
 	virtual void addMatVec(const SurgSim::Math::OdeState& state,
 		double alphaM, double alphaD, double alphaK,
-		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
+		const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result) override;
 
 	/// Update the element co-rotational frame. Updating as well the stiffness matrix.
 	/// \param state The state from which the element rigid transformation needs to be computed

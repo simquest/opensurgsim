@@ -86,30 +86,28 @@ void Fem3DElementCorotationalTetrahedron::addStiffness(const SurgSim::Math::OdeS
 
 void Fem3DElementCorotationalTetrahedron::addMatVec(const SurgSim::Math::OdeState& state,
 										double alphaM, double alphaD, double alphaK,
-										const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
+										const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result)
 {
 	if (alphaM == 0.0 && alphaK == 0.0)
 	{
 		return;
 	}
 
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> xLoc, resLoc;
-	getSubVector(x, m_nodeIds, 3, &xLoc);
+	Eigen::Matrix<double, 12, 1> vectorLocal, resultLocal;
+	getSubVector(vector, m_nodeIds, 3, &vectorLocal);
 
 	// Adds the mass contribution
-	if (alphaM)
+	if (alphaM != 0.0)
 	{
-		resLoc = alphaM * (m_M * xLoc);
-		addSubVector(resLoc, m_nodeIds, 3, F);
+		resultLocal = alphaM * (m_M * vectorLocal);
+		addSubVector(resultLocal, m_nodeIds, 3, result);
 	}
 
-	// Adds the damping contribution (No damping)
-
 	// Adds the stiffness contribution
-	if (alphaK)
+	if (alphaK != 0.0)
 	{
-		resLoc = alphaK * (m_corotationalStiffnessMatrix * xLoc);
-		addSubVector(resLoc, m_nodeIds, 3, F);
+		resultLocal = alphaK * (m_corotationalStiffnessMatrix * vectorLocal);
+		addSubVector(resultLocal, m_nodeIds, 3, result);
 	}
 }
 
