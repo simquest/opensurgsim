@@ -30,9 +30,7 @@ namespace
 {
 std::string findFile(std::string filename)
 {
-	std::vector<std::string> paths;
-	paths.push_back("Data/PlyReaderTests");
-	SurgSim::Framework::ApplicationData data(paths);
+	const SurgSim::Framework::ApplicationData data("config.txt");
 
 	return data.findFile(filename);
 }
