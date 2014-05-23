@@ -249,88 +249,6 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, UpdateTest)
 	}
 }
 
-TEST_F(Fem3DElementCorotationalTetrahedronTests, AddStiffnessTest)
-{
-	MockFem3DElementCorotationalTet tet(m_nodeIds);
-	tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
-
-	{
-		SCOPED_TRACE("Without rotation, scale 1.0");
-		SurgSim::Math::Matrix expectedK;
-		expectedK.resize(m_restState.getNumDof(), m_restState.getNumDof());
-		expectedK.setZero();
-		SurgSim::Math::addSubMatrix(tet.getNonRotatedStiffness(), m_nodeIdsAsVector, 3, &expectedK);
-
-		SurgSim::Math::Matrix K;
-		K.resize(m_restState.getNumDof(), m_restState.getNumDof());
-		K.setZero();
-		tet.addStiffness(m_restState, &K);
-		EXPECT_TRUE(K.isApprox(expectedK));
-	}
-
-	{
-		SCOPED_TRACE("Without rotation, scale 0.4");
-		SurgSim::Math::Matrix expectedK;
-		expectedK.resize(m_restState.getNumDof(), m_restState.getNumDof());
-		expectedK.setZero();
-		SurgSim::Math::addSubMatrix(tet.getNonRotatedStiffness() * 0.4, m_nodeIdsAsVector, 3, &expectedK);
-
-		SurgSim::Math::Matrix K;
-		K.resize(m_restState.getNumDof(), m_restState.getNumDof());
-		K.setZero();
-		tet.addStiffness(m_restState, &K, 0.4);
-		EXPECT_TRUE(K.isApprox(expectedK));
-	}
-
-	{
-		SCOPED_TRACE("With rotation, scale 1.0");
-
-		m_state = m_restState;
-		for (size_t nodeId = 0; nodeId < m_restState.getNumNodes(); ++nodeId)
-		{
-			SurgSim::Math::setSubVector(m_rotation * m_restState.getPosition(nodeId),
-				nodeId, 3, &m_state.getPositions());
-		}
-		ASSERT_NO_THROW(tet.update(m_state));
-
-		SurgSim::Math::Matrix expectedK;
-		expectedK.resize(m_restState.getNumDof(), m_restState.getNumDof());
-		expectedK.setZero();
-		SurgSim::Math::addSubMatrix(m_R12x12 * tet.getNonRotatedStiffness() * m_R12x12.transpose(),
-			m_nodeIdsAsVector, 3, &expectedK);
-
-		SurgSim::Math::Matrix K;
-		K.resize(m_restState.getNumDof(), m_restState.getNumDof());
-		K.setZero();
-		tet.addStiffness(m_restState, &K);
-		EXPECT_TRUE(K.isApprox(expectedK));
-	}
-
-	{
-		SCOPED_TRACE("With rotation, scale 0.4");
-
-		m_state = m_restState;
-		for (size_t nodeId = 0; nodeId < m_restState.getNumNodes(); ++nodeId)
-		{
-			SurgSim::Math::setSubVector(m_rotation * m_restState.getPosition(nodeId),
-				nodeId, 3, &m_state.getPositions());
-		}
-		ASSERT_NO_THROW(tet.update(m_state));
-
-		SurgSim::Math::Matrix expectedK;
-		expectedK.resize(m_restState.getNumDof(), m_restState.getNumDof());
-		expectedK.setZero();
-		SurgSim::Math::addSubMatrix(0.4 * m_R12x12 * tet.getNonRotatedStiffness() * m_R12x12.transpose(),
-			m_nodeIdsAsVector, 3, &expectedK);
-
-		SurgSim::Math::Matrix K;
-		K.resize(m_restState.getNumDof(), m_restState.getNumDof());
-		K.setZero();
-		tet.addStiffness(m_restState, &K, 0.4);
-		EXPECT_TRUE(K.isApprox(expectedK));
-	}
-}
-
 namespace
 {
 void defineCurrentState(const SurgSim::Math::OdeState& x0, SurgSim::Math::OdeState* x,
@@ -349,7 +267,76 @@ void defineCurrentState(const SurgSim::Math::OdeState& x0, SurgSim::Math::OdeSta
 		}
 	}
 }
+}; // anonymous namespace
 
+TEST_F(Fem3DElementCorotationalTetrahedronTests, AddStiffnessTest)
+{
+	using SurgSim::Math::makeRigidTransform;
+
+	MockFem3DElementCorotationalTet tet(m_nodeIds);
+	tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
+
+	unsigned int numDof = m_restState.getNumDof();
+
+	{
+		SCOPED_TRACE("Without rotation, scale 1.0");
+
+		Matrix expectedK = Matrix::Zero(numDof, numDof);
+		SurgSim::Math::addSubMatrix(tet.getNonRotatedStiffness(), m_nodeIdsAsVector, 3, &expectedK);
+
+		Matrix K = Matrix::Zero(numDof, numDof);
+		tet.addStiffness(m_restState, &K);
+
+		EXPECT_TRUE(K.isApprox(expectedK));
+	}
+
+	{
+		SCOPED_TRACE("Without rotation, scale 0.4");
+
+		Matrix expectedK = Matrix::Zero(numDof, numDof);
+		SurgSim::Math::addSubMatrix(tet.getNonRotatedStiffness() * 0.4, m_nodeIdsAsVector, 3, &expectedK);
+
+		Matrix K = Matrix::Zero(numDof, numDof);
+		tet.addStiffness(m_restState, &K, 0.4);
+
+		EXPECT_TRUE(K.isApprox(expectedK));
+	}
+
+	{
+		SCOPED_TRACE("With rotation, scale 1.0");
+
+		defineCurrentState(m_restState, &m_state, makeRigidTransform(m_rotation, Vector3d::Zero()), false);
+		ASSERT_NO_THROW(tet.update(m_state));
+
+		Matrix expectedK = Matrix::Zero(numDof, numDof);
+		SurgSim::Math::addSubMatrix(m_R12x12 * tet.getNonRotatedStiffness() * m_R12x12.transpose(),
+			m_nodeIdsAsVector, 3, &expectedK);
+
+		Matrix K = Matrix::Zero(numDof, numDof);
+		tet.addStiffness(m_restState, &K);
+
+		EXPECT_TRUE(K.isApprox(expectedK));
+	}
+
+	{
+		SCOPED_TRACE("With rotation, scale 0.4");
+
+		defineCurrentState(m_restState, &m_state, makeRigidTransform(m_rotation, Vector3d::Zero()), false);
+		ASSERT_NO_THROW(tet.update(m_state));
+
+		Matrix expectedK = Matrix::Zero(numDof, numDof);
+		SurgSim::Math::addSubMatrix(0.4 * m_R12x12 * tet.getNonRotatedStiffness() * m_R12x12.transpose(),
+			m_nodeIdsAsVector, 3, &expectedK);
+
+		Matrix K = Matrix::Zero(numDof, numDof);
+		tet.addStiffness(m_restState, &K, 0.4);
+
+		EXPECT_TRUE(K.isApprox(expectedK));
+	}
+}
+
+namespace
+{
 void testAddForce(MockFem3DElementCorotationalTet* tet,
 				  const SurgSim::Math::OdeState& state0,
 				  const SurgSim::Math::RigidTransform3d& t,
