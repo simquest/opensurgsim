@@ -36,10 +36,15 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
 					   const double& expectedDepth = 0,
 					   const Vector3d& expectedNorm = Vector3d::Zero())
 {
-	std::shared_ptr<Representation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
-			"Plane Shape", plane, SurgSim::Math::makeRigidTransform(planeQuat,planeTrans));
-	std::shared_ptr<Representation> sphereRep = std::make_shared<ShapeCollisionRepresentation>(
-			"Sphere Shape", sphere, SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
+	std::shared_ptr<ShapeCollisionRepresentation> planeRep =
+		std::make_shared<ShapeCollisionRepresentation>("Plane Shape");
+	planeRep->setShape(plane);
+	planeRep->setLocalPose(SurgSim::Math::makeRigidTransform(planeQuat,planeTrans));
+
+	std::shared_ptr<ShapeCollisionRepresentation> sphereRep =
+		std::make_shared<ShapeCollisionRepresentation>("Sphere Shape");
+	sphereRep->setShape(sphere);
+	sphereRep->setLocalPose(SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
 
 	SpherePlaneDcdContact calcNormal;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);

@@ -40,10 +40,15 @@ void doBoxCapsuleTest(std::shared_ptr<BoxShape> box,
 					  const SurgSim::Math::Vector3d& capsuleTrans,
 					  const bool expectedInContact)
 {
-	std::shared_ptr<Representation> boxRep = std::make_shared<ShapeCollisionRepresentation>(
-		"Collision Box 0", box, SurgSim::Math::makeRigidTransform(boxQuat, boxTrans));
-	std::shared_ptr<Representation> capsuleRep = std::make_shared<ShapeCollisionRepresentation>(
-		"Collision Capsule 0", capsule, SurgSim::Math::makeRigidTransform(capsuleQuat, capsuleTrans));
+	std::shared_ptr<ShapeCollisionRepresentation> boxRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Box 0");
+	boxRep->setShape(box);
+	boxRep->setLocalPose(SurgSim::Math::makeRigidTransform(boxQuat, boxTrans));
+
+	std::shared_ptr<ShapeCollisionRepresentation> capsuleRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Capsule 0");
+	capsuleRep->setShape(capsule);
+	capsuleRep->setLocalPose(SurgSim::Math::makeRigidTransform(capsuleQuat, capsuleTrans));
 
 	// Perform collision detection.
 	BoxCapsuleDcdContact calcContact;

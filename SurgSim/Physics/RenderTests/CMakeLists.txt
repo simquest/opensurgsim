@@ -29,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	RenderTestFem3D.cpp
 	RenderTestFem3DCorotational.cpp
 	RenderTestMassSprings.cpp
+	RenderTestRigidBodies.cpp
 )
 
 set(UNIT_TEST_HEADERS
