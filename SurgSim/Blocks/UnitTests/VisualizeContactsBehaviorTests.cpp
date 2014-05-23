@@ -46,7 +46,7 @@ TEST(VisualizeContactsBehaviorTests, SettersGetters)
 
 	// Test vector field scale.
 	EXPECT_ANY_THROW(visualizeContactsBehavior->setVectorFieldScale(-1.023));
-	
+
 	double scale = 1.234;
 	EXPECT_NO_THROW(visualizeContactsBehavior->setVectorFieldScale(scale));
 	EXPECT_EQ(scale, visualizeContactsBehavior->getVectorFieldScale());
@@ -56,15 +56,18 @@ TEST(VisualizeContactsBehaviorTests, Serialization)
 {
 	auto visualizeContactsBehavior = std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");
 	std::string name = "CollisionRepresentation";
-	auto collisionRepresentaiton = std::make_shared<RigidCollisionRepresentation>(name);
-	EXPECT_NO_THROW(visualizeContactsBehavior->setCollisionRepresentation(collisionRepresentaiton));
+	auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>(name);
+	EXPECT_NO_THROW(visualizeContactsBehavior->setValue("CollisionRepresentation",
+		std::static_pointer_cast<SurgSim::Framework::Component>(collisionRepresentation)););
 	double scale = 1.234;
-	EXPECT_NO_THROW(visualizeContactsBehavior->setVectorFieldScale(scale));
+	EXPECT_NO_THROW(visualizeContactsBehavior->setValue("VectorFieldScale", scale));
+	EXPECT_EQ("SurgSim::Blocks::VisualizeContactsBehavior", visualizeContactsBehavior->getClassName());
 
 	// Encode
 	Node node;
 	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*visualizeContactsBehavior));
 	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(4, node[visualizeContactsBehavior->getClassName()].size());
 
 	// Decode
 	std::shared_ptr<VisualizeContactsBehavior> newVisualizeContactsBehavior;
@@ -72,6 +75,7 @@ TEST(VisualizeContactsBehaviorTests, Serialization)
 		node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	// Verify
-	EXPECT_EQ(name, newVisualizeContactsBehavior->getCollisionRepresentation()->getName());
-	EXPECT_EQ(scale, newVisualizeContactsBehavior->getVectorFieldScale());
+	EXPECT_EQ(name, SurgSim::Framework::convert<std::shared_ptr<SurgSim::Framework::Component>>(
+					newVisualizeContactsBehavior->getValue("CollisionRepresentation"))->getName());
+	EXPECT_EQ(scale, SurgSim::Framework::convert<double>(newVisualizeContactsBehavior->getValue("VectorFieldScale")));
 }
