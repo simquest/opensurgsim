@@ -102,10 +102,7 @@ public:
 		m_nodeIds[1] = 1;
 		m_nodeIds[2] = 14;
 		m_nodeIds[3] = 9;
-		for (size_t nodeId = 0; nodeId < 4; ++nodeId)
-		{
-			m_nodeIdsAsVector.push_back(m_nodeIds[nodeId]);
-		}
+		m_nodeIdsAsVector.assign(m_nodeIds.cbegin(), m_nodeIds.cend());
 
 		m_restState.setNumDof(3, 15);
 		Vector& x0 = m_restState.getPositions();
