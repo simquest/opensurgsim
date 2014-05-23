@@ -58,7 +58,7 @@ public:
 	/// Set the shape
 	/// The default is to use the shape of the Rigid Representation, this
 	/// will override that shape.
-	/// \param shape The actual shape used for collision
+	/// \param shape The actual shape used for collision, if nullptr the Rigid Representation shape will be used.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);
 
 	/// Set rigid representation

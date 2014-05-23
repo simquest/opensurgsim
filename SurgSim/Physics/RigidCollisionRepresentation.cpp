@@ -71,6 +71,7 @@ const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getSha
 	{
 		return m_shape;
 	}
+	else
 	{
 		auto physicsRepresentation = m_physicsRepresentation.lock();
 		SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
