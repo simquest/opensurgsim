@@ -98,6 +98,8 @@ bool DeformableCollisionRepresentation::doWakeUp()
 		"The Physics::Representation referred by this DeformableCollisionRepresentation has expired.";
 
 	auto state = physicsRepresentation->getCurrentState();
+	SURGSIM_ASSERT(nullptr != state) << "DeformableRepresentation " << physicsRepresentation->getName() <<
+		" holds an empty OdeState.";
 	SURGSIM_ASSERT(m_mesh->getNumVertices() == state->getNumNodes())
 		<< "The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
