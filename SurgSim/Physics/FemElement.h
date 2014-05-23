@@ -171,7 +171,6 @@ public:
 	/// \param state The state to compute the update from
 	/// \return True if the update is successful, False otherwise, in which case the element behavior
 	/// becomes undefined. The representation should get deactivated/reset in this case.
-	/// \note This method is useful in co-rotational mode to compute the element's rigid transformation.
 	virtual bool update(const SurgSim::Math::OdeState& state);
 
 	/// Determines whether a given natural coordinate is valid
