@@ -101,6 +101,10 @@ SET(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
+if(SURGSIM_PRECOMPILED_HEADERS)
+	SET(LIBS ${LIBS} PrecompiledHeader)
+endif()
+
 target_link_libraries(SurgSimFramework ${LIBS})
 
 if(BUILD_TESTING)

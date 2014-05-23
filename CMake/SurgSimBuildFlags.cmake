@@ -95,6 +95,7 @@ if(MSVC)
 	endif(SURGSIM_WARNINGS_AS_ERRORS)
 	
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")  # is this needed?
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Y-")  # disable precompiled headers for C
 	set(CMAKE_DEBUG_POSTFIX "d")
 
 	# Work around a stupid template argument limitation in VS 2012
@@ -133,3 +134,7 @@ mark_as_advanced(EIGEN_DONT_ALIGN)
 if(EIGEN_DONT_ALIGN)
 	add_definitions( -DEIGEN_DONT_ALIGN )
 endif(EIGEN_DONT_ALIGN)
+
+if(MSVC)
+	option(SURGSIM_PRECOMPILED_HEADERS "Enable precompiled headers for build" ON)
+endif()
