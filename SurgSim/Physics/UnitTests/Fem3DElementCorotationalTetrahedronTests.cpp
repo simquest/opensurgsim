@@ -463,38 +463,49 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, AddMatVecTest)
 
 	{
 		SCOPED_TRACE("Mass only");
+
 		SurgSim::Math::Vector result = SurgSim::Math::Vector::Zero(state.getNumDof());
-		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		tet.addMatVec(state, 1.4, 0.0, 0.0, ones, &result);
+
+		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		Eigen::Matrix<double, 12, 1> f = 1.4 * M * SurgSim::Math::Vector::Ones(12);
 		SurgSim::Math::addSubVector(f, m_nodeIdsAsVector, 3, &expectedResult);
+
 		EXPECT_TRUE(result.isApprox(expectedResult));
 	}
 
 	{
 		SCOPED_TRACE("Damping only");
+
 		SurgSim::Math::Vector result = SurgSim::Math::Vector::Zero(state.getNumDof());
 		tet.addMatVec(state, 0.0, 1.5, 0.0, ones, &result);
+
 		EXPECT_TRUE(result.isZero());
 	}
 
 	{
 		SCOPED_TRACE("Stiffness only");
+
 		SurgSim::Math::Vector result = SurgSim::Math::Vector::Zero(state.getNumDof());
-		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		tet.addMatVec(state, 0.0, 0.0, 1.6, ones, &result);
+
+		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		Eigen::Matrix<double, 12, 1> f = 1.6 * K * SurgSim::Math::Vector::Ones(12);
 		SurgSim::Math::addSubVector(f, m_nodeIdsAsVector, 3, &expectedResult);
+
 		EXPECT_TRUE(result.isApprox(expectedResult));
 	}
 
 	{
 		SCOPED_TRACE("Mass/Damping/Stiffness");
+
 		SurgSim::Math::Vector result = SurgSim::Math::Vector::Zero(state.getNumDof());
-		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		tet.addMatVec(state, 1.4, 1.5, 1.6, ones, &result);
+
+		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		Eigen::Matrix<double, 12, 1> f = (1.4 * M + 1.6 * K) * SurgSim::Math::Vector::Ones(12);
 		SurgSim::Math::addSubVector(f, m_nodeIdsAsVector, 3, &expectedResult);
+
 		EXPECT_TRUE(result.isApprox(expectedResult, epsilonAddMatVec));
 	}
 }
