@@ -25,18 +25,33 @@ void testOptionalValueConvert(Type value)
 	OptionalValue<Type> optionalValue;
 	optionalValue.setValue(value);
 
-	// Encode
-	YAML::Node node;
-	EXPECT_NO_THROW(node = optionalValue;);
+	{
+		// Encode
+		YAML::Node node;
+		EXPECT_NO_THROW(node = optionalValue;);
 
-	// Decode
-	OptionalValue<Type> newOptionalValue;
-	EXPECT_NO_THROW(newOptionalValue = node.as<OptionalValue<Type>>());
+		// Decode
+		OptionalValue<Type> newOptionalValue;
+		EXPECT_NO_THROW(newOptionalValue = node.as<OptionalValue<Type>>());
 
-	// Verify
-	EXPECT_EQ(true, newOptionalValue.hasValue());
-	EXPECT_NO_THROW(newOptionalValue.getValue());
-	EXPECT_EQ(optionalValue.getValue(), newOptionalValue.getValue());
+		// Verify
+		EXPECT_EQ(true, newOptionalValue.hasValue());
+		EXPECT_NO_THROW(newOptionalValue.getValue());
+		EXPECT_EQ(optionalValue.getValue(), newOptionalValue.getValue());
+	}
+
+	// Test for an empty node
+	{
+		// Encode
+		YAML::Node node;
+
+		// Decode
+		OptionalValue<Type> newOptionalValue;
+		EXPECT_FALSE(YAML::convert<OptionalValue<Type>>::decode(node, newOptionalValue));
+
+		// Verify
+		EXPECT_FALSE(newOptionalValue.hasValue());
+	}
 }
 
 TEST(DataStructuresConvertTests, OptionalValue)
