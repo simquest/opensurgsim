@@ -34,7 +34,7 @@ Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::ar
 
 void Fem3DElementCorotationalTetrahedron::initialize(const SurgSim::Math::OdeState& state)
 {
-	// Initialize the linear tetrahedrom element (this computes the linear stiffness matrix)
+	// Initialize the linear tetrahedron element (this computes the linear stiffness matrix)
 	Fem3DElementTetrahedron::initialize(state);
 
 	// The co-rotational frame is set to identity at first
@@ -43,18 +43,19 @@ void Fem3DElementCorotationalTetrahedron::initialize(const SurgSim::Math::OdeSta
 	// The initial co-rotated stiffness matrix is equal to the local stiffness matrix
 	m_corotationalStiffnessMatrix = m_K;
 
-	// Pre-compute the matrix V^-1 with V the matrix of the undeformed tetrahedron points in homogenous coordinates
-	SurgSim::Math::Matrix44d m_V = SurgSim::Math::Matrix44d::Ones();
+	// Pre-compute the matrix V^-1 with V the matrix of the undeformed tetrahedron points in homogeneous coordinates
+	SurgSim::Math::Matrix44d m_V;
 	m_V.col(0).segment<3>(0) = state.getPosition(m_nodeIds[0]);
 	m_V.col(1).segment<3>(0) = state.getPosition(m_nodeIds[1]);
 	m_V.col(2).segment<3>(0) = state.getPosition(m_nodeIds[2]);
 	m_V.col(3).segment<3>(0) = state.getPosition(m_nodeIds[3]);
+	m_V.row(3).setOnes();
 	double determinant;
 	bool invertible;
 	m_V.computeInverseAndDetWithCheck(m_Vinverse, determinant, invertible);
 	SURGSIM_ASSERT(invertible) << "Trying to initialize an invalid co-rotational tetrahedron." <<
 		" Matrix V not invertible." << std::endl <<
-		"More likely the tetrahderon is degenerated:" << std::endl <<
+		"More likely the tetrahedron is degenerated:" << std::endl <<
 		"  A = (" << state.getPosition(m_nodeIds[0]).transpose() << ")" << std::endl <<
 		"  B = (" << state.getPosition(m_nodeIds[1]).transpose() << ")" << std::endl <<
 		"  C = (" << state.getPosition(m_nodeIds[2]).transpose() << ")" << std::endl <<
@@ -135,20 +136,14 @@ bool Fem3DElementCorotationalTetrahedron::update(const SurgSim::Math::OdeState& 
 	// c.f. "Interactive Virtual Materials", Muller, Gross. Graphics Interface 2004
 
 	// http://en.wikipedia.org/wiki/Polar_decomposition
-	// The polar decomposition of F (=RS) gives R an orthonormal matrix and S a symmetric matrix.
-	// The polar decomposition of F extracts a rotation R and a stretching (or scaling) S.
-	// The polar decomposition always exists, moreover is unique if F is invertible.
-	// The polar decomposition can be deduced from the SVD decomposition F = U.D.V^t => R = U.V^t and S = V.D.V^t
+	// Compute the polar decomposition of F to extract the rotation and the scaling parts.
 	SurgSim::Math::Matrix33d scaling;
 	F.computeRotationScaling(&m_rotation, &scaling);
-
-	SURGSIM_ASSERT(F.linear().isApprox(m_rotation * scaling)) <<
-		"Deformation gradient polar decomposition failed F != Rotation.Scaling";
 
 	if (std::abs(m_rotation.determinant() - 1.0) > 1e-8)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"Rotation has an invalida determinant of " << m_rotation.determinant();
+			"Rotation has an invalid determinant of " << m_rotation.determinant();
 		return false;
 	}
 
