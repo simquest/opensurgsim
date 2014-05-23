@@ -127,28 +127,26 @@ namespace Physics
 
 TEST_F(RenderTests, VisualTestFem3DCorotatioal)
 {
-	using SurgSim::Math::makeRigidTransform;
-
-	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
+	using SurgSim::Math::makeRigidTranslation;
 
 	// Cube with corotational tetrahedron FemElement
 	scene->addSceneElement(createTetrahedronFem3D("CorotationalTetrahedronElement Euler Explicit",
-						   makeRigidTransform(qIdentity, Vector3d(-3.0, 1.0, -1.0)),
+						   makeRigidTranslation(Vector3d(-3.0, 1.0, -1.0)),
 						   SurgSim::Math::Vector4d(1, 0, 0, 1),
 						   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 	scene->addSceneElement(createTetrahedronFem3D("CorotatinoalTetrahedronElement Modified Euler Explicit",
-						   makeRigidTransform(qIdentity, Vector3d(-1.0, 1.0, -1.0)),
+						   makeRigidTranslation(Vector3d(-1.0, 1.0, -1.0)),
 						   SurgSim::Math::Vector4d(0, 1, 0, 1),
 						   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 	scene->addSceneElement(createTetrahedronFem3D("CorotatinoalTetrahedronElement Runge Kutta 4",
-						   makeRigidTransform(qIdentity, Vector3d(1.0, 1.0, -1.0)),
+						   makeRigidTranslation(Vector3d(1.0, 1.0, -1.0)),
 						   SurgSim::Math::Vector4d(0, 0, 1, 1),
 						   SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4));
 
 	scene->addSceneElement(createTetrahedronFem3D("CorotatinoalTetrahedronElement Fem 3D Euler Implicit",
-						   makeRigidTransform(qIdentity, Vector3d(3.0, 1.0, -1.0)),
+						   makeRigidTranslation(Vector3d(3.0, 1.0, -1.0)),
 						   SurgSim::Math::Vector4d(1, 1, 1, 1),
 						   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 
