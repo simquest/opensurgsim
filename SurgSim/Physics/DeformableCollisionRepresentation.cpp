@@ -87,6 +87,16 @@ bool DeformableCollisionRepresentation::doInitialize()
 		<< "Failed to initialize.  The DeformableCollisionRepresentation either was not attached to a "
 		   "Physics::Representation or the Physics::Representation has expired.";
 
+	return true;
+}
+
+bool DeformableCollisionRepresentation::doWakeUp()
+{
+	auto physicsRepresentation = m_deformable.lock();
+	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+		"DeformableCollisionRepresentation::doWakeUp(): " <<
+		"The Physics::Representation referred by this DeformableCollisionRepresentation has expired.";
+
 	auto state = physicsRepresentation->getCurrentState();
 	SURGSIM_ASSERT(m_mesh->getNumVertices() == state->getNumNodes())
 		<< "The number of nodes in the deformable does not match the number of vertices in the mesh.";

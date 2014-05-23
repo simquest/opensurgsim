@@ -83,6 +83,8 @@ public:
 
 	virtual bool doInitialize() override;
 
+	virtual bool doWakeUp() override;
+
 private:
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::MeshShape> m_shape;
