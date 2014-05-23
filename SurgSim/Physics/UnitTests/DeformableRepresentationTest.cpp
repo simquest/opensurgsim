@@ -215,6 +215,34 @@ TEST_F(DeformableRepresentationTest, ResetStateTest)
 	EXPECT_TRUE(*m_localInitialState == *getFinalState());
 }
 
+TEST_F(DeformableRepresentationTest, DeactivateAndResetTest)
+{
+	// setInitialState sets all 4 states (tested in method above !)
+	setInitialState(m_localInitialState);
+
+	// Initialize and wake-up the deformable component
+	EXPECT_NO_THROW(EXPECT_TRUE(initialize(std::make_shared<SurgSim::Framework::Runtime>())));
+	EXPECT_NO_THROW(EXPECT_TRUE(wakeUp()));
+
+	// 1st time step
+	ASSERT_TRUE(isActive());
+	beforeUpdate(1e-3);
+	update(1e-3);
+	afterUpdate(1e-3);
+	ASSERT_TRUE(isActive());
+
+	deactivateAndReset();
+	ASSERT_FALSE(isActive());
+	EXPECT_TRUE(*m_localInitialState == *m_initialState);
+	EXPECT_TRUE(*m_localInitialState == *m_previousState);
+	EXPECT_TRUE(*m_localInitialState == *m_currentState);
+	EXPECT_TRUE(*m_localInitialState == *m_finalState);
+	EXPECT_TRUE(*m_localInitialState == *getInitialState());
+	EXPECT_TRUE(*m_localInitialState == *getPreviousState());
+	EXPECT_TRUE(*m_localInitialState == *getCurrentState());
+	EXPECT_TRUE(*m_localInitialState == *getFinalState());
+}
+
 TEST_F(DeformableRepresentationTest, UpdateTest)
 {
 	// update assert on m_odeSolver (wakeUp) and m_initialState (setInitialState)
@@ -372,7 +400,6 @@ TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 	staticLinearSolver = dynamic_cast<StaticLinearSolver*>(m_odeSolver.get());
 	ASSERT_EQ(nullptr, staticLinearSolver);
 }
-
 
 TEST_F(DeformableRepresentationTest, SerializationTest)
 {

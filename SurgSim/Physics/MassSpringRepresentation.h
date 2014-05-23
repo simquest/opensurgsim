@@ -187,9 +187,6 @@ protected:
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 		const SurgSim::Math::RigidTransform3d& transform);
 
-	/// Deactivate and call resetState
-	void deactivateAndReset(void);
-
 private:
 	/// Masses
 	std::vector<std::shared_ptr<Mass>> m_masses;
