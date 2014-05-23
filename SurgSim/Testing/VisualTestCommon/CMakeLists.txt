@@ -41,6 +41,7 @@ set(VISUAL_TEST_COMMON_HEADERS
 )
 
 set(LIBS
+	SurgSimFramework
 	glut
 )
 
@@ -49,6 +50,8 @@ set(LIBS
 # surgsim_add_library here.
 add_library(VisualTestCommon
 	${VISUAL_TEST_COMMON_SOURCES} ${VISUAL_TEST_COMMON_HEADERS})
+	
+target_link_libraries(VisualTestCommon ${LIBS})
 
 surgsim_show_ide_folders(
 	"${VISUAL_TEST_COMMON_SOURCES}" "${VISUAL_TEST_COMMON_HEADERS}")
