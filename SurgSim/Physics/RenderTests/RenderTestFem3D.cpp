@@ -158,7 +158,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	}
 	physicsRepresentation->setInitialState(initialState);
 
-	std::shared_ptr<FemElement> element = std::make_shared<Fem3DElementCube>(cube, *initialState);
+	std::shared_ptr<FemElement> element = std::make_shared<Fem3DElementCube>(cube);
 	element->setMassDensity(8000.0);
 	element->setPoissonRatio(0.45);
 	element->setYoungModulus(1.0e6);
