@@ -18,6 +18,7 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -26,8 +27,10 @@
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::Collision::Contact;
+using SurgSim::Collision::ContactMapType;
 using SurgSim::Collision::Location;
 using SurgSim::Collision::ShapeCollisionRepresentation;
+using SurgSim::DataStructures::ReadAccessor;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::PlaneShape;
@@ -106,28 +109,20 @@ TEST_F(RepresentationTest, ShapeTest)
 
 TEST_F(RepresentationTest, EmptyCollisionTest)
 {
-	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> planeCollisions = planeRep->getCollisions();
-	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-		std::list<std::shared_ptr<SurgSim::Collision::Contact>>>  sphereCollisions = sphereRep->getCollisions();
-	EXPECT_EQ(0u, planeCollisions.size());
-	EXPECT_EQ(0u, sphereCollisions.size());
+	ReadAccessor<ContactMapType> planeCollisions(planeRep->getCollisions());
+	ReadAccessor<ContactMapType> sphereCollisions(sphereRep->getCollisions());
 
-	EXPECT_FALSE(planeRep->isCollidingWith(sphereRep));
-	EXPECT_FALSE(sphereRep->isCollidingWith(planeRep));
-
-	std::list<std::shared_ptr<SurgSim::Collision::Contact>> sphereCollisionContacts =
-		sphereRep->getCollisionsWith(planeRep);
-	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeCollisionContacts =
-		planeRep->getCollisionsWith(sphereRep);
-	EXPECT_EQ(0u, sphereCollisionContacts.size());
-	EXPECT_EQ(0u, planeCollisionContacts.size());
+	EXPECT_TRUE(planeCollisions->empty());
+	EXPECT_TRUE(sphereCollisions->empty());
 }
 
 TEST_F(RepresentationTest, CollisionTest)
 {
-	EXPECT_FALSE(sphereRep->hasCollision());
-	EXPECT_FALSE(planeRep->hasCollision());
+	ReadAccessor<ContactMapType> planeCollisions(planeRep->getCollisions());
+	ReadAccessor<ContactMapType> sphereCollisions(sphereRep->getCollisions());
+
+	EXPECT_TRUE(planeCollisions->empty());
+	EXPECT_TRUE(sphereCollisions->empty());
 
 	std::shared_ptr<Contact> dummyContact =
 		std::make_shared<Contact>(0.0, Vector3d::Zero(), Vector3d::Zero(), std::make_pair(Location(), Location()));
@@ -136,42 +131,27 @@ TEST_F(RepresentationTest, CollisionTest)
 	sphereRep->update(0.0);
 	planeRep->update(0.0);
 
-	EXPECT_TRUE(sphereRep->hasCollision());
-	EXPECT_TRUE(sphereRep->isCollidingWith(planeRep));
-	// Collision is only added to 'sphereRep', thus the following check should return 'false'.
-	EXPECT_FALSE(planeRep->isCollidingWith(sphereRep));
+	EXPECT_EQ(1u, sphereCollisions->size());
+	auto spherePlanePair = sphereCollisions->find(planeRep);
+	EXPECT_NE(sphereCollisions->end(), spherePlanePair);
+	std::list<std::shared_ptr<SurgSim::Collision::Contact>> spherePlaneContacts = spherePlanePair->second;
+	EXPECT_EQ(dummyContact, spherePlaneContacts.front());
+
+	// Collision is only added to 'sphereRep', thus the plane should have no collisions.
+	EXPECT_TRUE(planeCollisions->empty());
 
 	EXPECT_NO_THROW(planeRep->addCollisionWith(sphereRep, dummyContact));
 	sphereRep->update(0.0);
 	planeRep->update(0.0);
-	EXPECT_TRUE(planeRep->hasCollision());
-	EXPECT_TRUE(planeRep->isCollidingWith(sphereRep));
-
-	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-		std::list<std::shared_ptr<SurgSim::Collision::Contact>>>  sphereCollisions = sphereRep->getCollisions();
-	EXPECT_EQ(1u, sphereCollisions.size());
-	EXPECT_NE(std::end(sphereCollisions), sphereCollisions.find(planeRep));
-
-	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> planeCollisions = planeRep->getCollisions();
-	EXPECT_EQ(1u, planeCollisions.size());
-	EXPECT_NE(std::end(planeCollisions), planeCollisions.find(sphereRep));
-
-	std::list<std::shared_ptr<SurgSim::Collision::Contact>> sphereCollisionContacts =
-		sphereRep->getCollisionsWith(planeRep);
-	EXPECT_EQ(1u, sphereCollisionContacts.size());
-	EXPECT_EQ(dummyContact, sphereCollisionContacts.front());
-
-	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeCollisionContacts =
-		planeRep->getCollisionsWith(sphereRep);
-	EXPECT_EQ(1u, planeCollisionContacts.size());
-	EXPECT_EQ(dummyContact, planeCollisionContacts.front());
-
-	EXPECT_EQ(planeCollisionContacts.front(), sphereCollisionContacts.front());
+	EXPECT_EQ(1u, planeCollisions->size());
+	auto planeSpherePair = planeCollisions->find(sphereRep);
+	EXPECT_NE(planeCollisions->end(), planeSpherePair);
+	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeSphereContacts = planeSpherePair->second;
+	EXPECT_EQ(dummyContact, planeSphereContacts.front());
 
 	sphereRep->clearCollisions();
 	sphereRep->update(0.0);
-	EXPECT_FALSE(sphereRep->hasCollision());
+	EXPECT_TRUE(sphereCollisions->empty());
 }
 
 

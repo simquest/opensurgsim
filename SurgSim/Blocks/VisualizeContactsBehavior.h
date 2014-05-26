@@ -19,19 +19,21 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
 {
 
+namespace DataStructures
+{
+template<class T>
+class SafeReadAccessor;
+}
+
 namespace Graphics
 {
 class VectorFieldRepresentation;
-}
-
-namespace Collision
-{
-class Representation;
 }
 
 namespace Blocks
@@ -76,6 +78,9 @@ protected:
 private:
 	/// The collision representation to get contacts for visualizing.
 	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
+
+	/// The collision map for the representation.
+	std::unique_ptr<SurgSim::DataStructures::SafeReadAccessor<SurgSim::Collision::ContactMapType>> m_collisions;
 
 	/// The osg vector field for visualizing contacts on collision representation
 	std::shared_ptr<SurgSim::Graphics::VectorFieldRepresentation> m_vectorField;

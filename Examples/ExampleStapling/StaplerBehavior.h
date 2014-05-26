@@ -42,6 +42,12 @@ namespace Collision
 struct Location;
 }
 
+namespace DataStructures
+{
+template<class T>
+class SafeReadAccessor;
+}
+
 namespace Graphics
 {
 class SceneryRepresentation;
@@ -103,8 +109,7 @@ private:
 	/// Given a collision map, remove entries whose representations are not part of
 	/// enabled scene element lists.
 	/// \param [in,out] collisionsMap The collision map to be filtered.
-	void filterCollisionMapForStapleEnabledRepresentations(
-		SurgSim::Collision::Representation::ContactMapType *collisionsMap);
+	void filterCollisionMapForStapleEnabledRepresentations(SurgSim::Collision::ContactMapType *collisionsMap);
 
 	/// Given a Collision::Representation, get the corresponding Physics::Representation.
 	/// \param collisionRepresentation shared_ptr to the collision representation.
@@ -114,12 +119,11 @@ private:
 
 	/// Given a collision map, remove entries whose representations are not supported to be stapled to.
 	/// \param [in,out] collisionsMap The collision map to be filtered.
-	void filterCollisionMapForSupportedRepresentationTypes(
-		SurgSim::Collision::Representation::ContactMapType* collisionsMap);
+	void filterCollisionMapForSupportedRepresentationTypes(SurgSim::Collision::ContactMapType* collisionsMap);
 
 	/// Create a bilateral constraint given two Physics::Representation and a constraint (global) location.
 	/// \param stapleRep The physics representation of the staple element. This is known to be RigidRepresentation.
-	/// \param otherRep The physics representaiton of the object stapled to. This could be Rigid, Fixed or Fem3D.
+	/// \param otherRep The physics representation of the object stapled to. This could be Rigid, Fixed or Fem3D.
 	/// \param constraintLocation The global location where the constraint is created.
 	/// \return The shared_ptr of the constraint created.
 	std::shared_ptr<SurgSim::Physics::Constraint> createBilateral3DConstraint(
@@ -152,6 +156,10 @@ private:
 
 	/// Contains the teeth for detecting collisions
 	std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> m_virtualTeeth;
+
+	/// The read accessors for the collision maps of the teeth.
+	std::array<std::unique_ptr<
+		SurgSim::DataStructures::SafeReadAccessor<SurgSim::Collision::ContactMapType>>, 2> m_collisions;
 
 	/// The list of scene element names that this behaviour can staple.
 	std::list<std::string> m_stapleEnabledSceneElements;

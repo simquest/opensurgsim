@@ -39,6 +39,10 @@ class Representation;
 namespace Collision
 {
 struct Contact;
+class Representation;
+
+typedef std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+							std::list<std::shared_ptr<SurgSim::Collision::Contact>>> ContactMapType;
 
 /// Wrapper class to use for the collision operation, handles its enclosed shaped
 /// and a possible local to global coordinate system transform, if the physics representation
@@ -48,9 +52,6 @@ struct Contact;
 class Representation : public SurgSim::Framework::Representation
 {
 public:
-	typedef std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-							   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> ContactMapType;
-
 	/// Constructor
 	/// \param name Name of this collision representation
 	explicit Representation(const std::string& name);
@@ -68,14 +69,11 @@ public:
 
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
+	/// The map is stored in a BufferedValue.  If accessing from the PhysicsManager thread, use a ReadAccessor,
+	/// otherwise use a SafeReadAccessor.  Write access is not provided, instead use addCollisionWith and
+	/// clearCollisions.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
-	ContactMapType getCollisions() const;
-
-	/// Return the list of contacts between the given collision representation and this collision representation.
-	/// \param collisionRepresentation The collision representation with which this collision representation collides.
-	/// \return A list of contact points.
-	std::list<std::shared_ptr<SurgSim::Collision::Contact>>
-			getCollisionsWith(const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const;
+	std::shared_ptr<SurgSim::DataStructures::BufferedValue<ContactMapType>> getCollisions() const;
 
 	/// Add a contact against a given collision representation.
 	/// \param collisionRepresentation The collision representation to which this collision representation collides.
@@ -85,15 +83,6 @@ public:
 	/// collisionRepresentation.
 	void addCollisionWith(const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation,
 						  const std::shared_ptr<SurgSim::Collision::Contact>& contact);
-
-	/// Check if this collision representation is colliding with the given collision representation.
-	/// \param collisionRepresentation The collision representation to be checked against.
-	/// \return True if the two representations are colliding; otherwise, false.
-	bool isCollidingWith(const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const;
-
-	/// Check if this collision representation has collisions.
-	/// \return True if there is a collision; otherwise false.
-	bool hasCollision() const;
 
 	/// Clear all the collisions.
 	void clearCollisions();
@@ -107,9 +96,6 @@ protected:
 	/// Every contact added to this map follows the convention of pointing the contact normal toward this
 	/// representation. And the first penetration point is on this representation.
 	std::shared_ptr<SurgSim::DataStructures::BufferedValue<ContactMapType>> m_collisions;
-
-	/// The thread-safe read accessor to the collisions.
-	mutable SurgSim::DataStructures::SafeReadAccessor<ContactMapType> m_readCollisions;
 
 	/// The write accessor to the collisions.
 	SurgSim::DataStructures::ReadWriteAccessor<ContactMapType> m_writeCollisions;
