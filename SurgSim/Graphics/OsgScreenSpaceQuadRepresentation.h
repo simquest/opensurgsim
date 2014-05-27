@@ -16,9 +16,12 @@
 #ifndef SURGSIM_GRAPHICS_OSGSCREENSPACEQUADREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGSCREENSPACEQUADREPRESENTATION_H
 
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Graphics/ScreenSpaceQuadRepresentation.h"
+
 #include <osg/Vec3>
 
 #if defined(_MSC_VER)
@@ -43,6 +46,8 @@ class Texture;
 class OsgTexture2d;
 class OsgTextureRectangle;
 
+
+/// Implements the ScreenSpaceQuadRepresentation, provides uniforms 'texture' and 'rectangleTexture'
 class OsgScreenSpaceQuadRepresentation : public OsgRepresentation, public ScreenSpaceQuadRepresentation
 {
 public:
@@ -70,7 +75,7 @@ public:
 	virtual void getSize(double* width, double* height) const override;
 
 	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
-	/// this will use the uniform name "diffuseMap" for the uniform in this operation. This can be accomplished
+	/// this will use the uniform name "texture" for the uniform in this operation. This can be accomplished
 	/// from the outside as well by using the material.
 	/// \param	texture	The texture to be set on the quad.
 	/// \return	true if it succeeds, false if it fails.
@@ -91,6 +96,8 @@ public:
 
 protected:
 	virtual void doUpdate(double dt) override;
+
+	virtual bool doInitialize() override;
 
 private:
 
@@ -122,7 +129,14 @@ private:
 	/// \return	true if it succeeds, false if it fails.
 	bool replaceUniform(const std::string& name, std::shared_ptr<SurgSim::Graphics::UniformBase> newUniform);
 
+	std::shared_ptr<OsgUniform<std::shared_ptr<OsgTexture2d>>> m_textureUniform;
+	std::shared_ptr<OsgUniform<std::shared_ptr<OsgTextureRectangle>>> m_rectangleTextureUniform;
 
+	SurgSim::DataStructures::OptionalValue<int> m_texureType;
+
+	std::shared_ptr<OsgMaterial> buildMaterial(
+		const std::string& vertexShaderName,
+		const std::string& fragmentShaderName);
 };
 
 }; // Graphics

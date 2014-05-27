@@ -101,12 +101,8 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 
 TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 {
-	std::vector<std::string> paths;
-	paths.push_back("Data/OsgScreenSpaceQuadRenderTests");
-	SurgSim::Framework::ApplicationData data(paths);
-
-	std::string checkerTexturePath = data.findFile("CheckerBoard.png");
-	std::string rectangleTexturePath = data.findFile("Rectangle.png");
+	std::string checkerTexturePath = applicationData->findFile("OsgScreenSpaceQuadRenderTests/CheckerBoard.png");
+	std::string rectangleTexturePath = applicationData->findFile("OsgScreenSpaceQuadRenderTests/Rectangle.png");
 
 	EXPECT_NE("", checkerTexturePath) << "Could not find checker texture shader!";
 	EXPECT_NE("", rectangleTexturePath) << "Could not find rectangle texture!";
@@ -145,7 +141,7 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 }
 
 

@@ -15,14 +15,19 @@
 
 #include <memory>
 
-#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgRigidTransformConversions.h"
-#include "SurgSim/Graphics/View.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
+#include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgUniformBase.h"
-#include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/Texture2d.h"
 #include "SurgSim/Graphics/TextureRectangle.h"
+#include "SurgSim/Graphics/View.h"
+
 
 #include <osg/Array>
 #include <osg/Geode>
@@ -33,10 +38,20 @@
 #include <osg/StateAttribute>
 #include <osg/Switch>
 
+namespace
+{
+enum TextureType
+{
+	TEXTURE_TYPE_RECTANGLE,
+	TEXTURE_TYPE_POWER_OF_TWO
+};
+}
+
 namespace SurgSim
 {
 namespace Graphics
 {
+
 
 OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(const std::string& name) :
 	Representation(name),
@@ -73,6 +88,9 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(const std::st
 	m_transform->addChild(m_geode);
 
 	m_switch->addChild(m_transform);
+
+	m_textureUniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("texture");
+	m_rectangleTextureUniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTextureRectangle>>>("texture");
 
 	removeGroupReference(Representation::DefaultGroupName);
 	addGroupReference(Representation::DefaultHudGroupName);
@@ -118,59 +136,42 @@ bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<Texture> textu
 
 bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<OsgTexture2d> osgTexture)
 {
-	bool result = false;
-	auto newUniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("diffuseMap");
-	newUniform->set(osgTexture);
-	if (replaceUniform("diffuseMap", newUniform))
+	m_textureUniform->set(osgTexture);
+
+	if (m_texureType.hasValue() && m_texureType.getValue() == TEXTURE_TYPE_RECTANGLE)
 	{
-		setTextureCoordinates(0.0, 0.0, 1.0, 1.0);
-		result = true;
+		m_rectangleTextureUniform->removeFromStateSet(m_switch->getOrCreateStateSet());
 	}
-	return result;
+	else
+	{
+		m_textureUniform->addToStateSet(m_switch->getOrCreateStateSet());
+		m_texureType.setValue(TEXTURE_TYPE_POWER_OF_TWO);
+	}
+
+	setTextureCoordinates(0.0, 0.0, 1.0, 1.0);
+
+	return true;
 }
 
 bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<OsgTextureRectangle> osgTexture)
 {
-	bool result = false;
-	auto newUniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTextureRectangle>>>("diffuseMap");
-	newUniform->set(osgTexture);
-	if (replaceUniform("diffuseMap", newUniform))
+	m_rectangleTextureUniform->set(osgTexture);
+
+	if (m_texureType.hasValue() && m_texureType.getValue() == TEXTURE_TYPE_POWER_OF_TWO)
 	{
-		int width, height;
-		osgTexture->getSize(&width, &height);
-		setTextureCoordinates(0.0, 0.0, static_cast<float>(width), static_cast<float>(height));
-		result = true;
+		m_textureUniform->removeFromStateSet(m_switch->getOrCreateStateSet());
 	}
-	return result;
-}
-
-
-
-bool OsgScreenSpaceQuadRepresentation::replaceUniform(const std::string& name, std::shared_ptr<UniformBase> newUniform)
-{
-	std::shared_ptr<OsgMaterial> material = std::dynamic_pointer_cast<OsgMaterial>(getMaterial());
-	if (material == nullptr)
+	else
 	{
-		material = std::make_shared<OsgMaterial>();
-		setMaterial(material);
+		m_rectangleTextureUniform->addToStateSet(m_switch->getOrCreateStateSet());
+		m_texureType.setValue(TEXTURE_TYPE_RECTANGLE);
 	}
 
-	std::shared_ptr<UniformBase> oldUniform = material->getUniform(name);
+	int width, height;
+	osgTexture->getSize(&width, &height);
+	setTextureCoordinates(0.0, 0.0, static_cast<float>(width), static_cast<float>(height));
 
-	if (oldUniform != nullptr)
-	{
-		material->removeUniform(oldUniform);
-	}
-
-	bool result = material->addUniform(newUniform);
-
-	// if the add failed try to add the old one back on but report failure
-	if (! result && oldUniform != nullptr)
-	{
-		material->addUniform(oldUniform);
-	}
-
-	return result;
+	return true;
 }
 
 void OsgScreenSpaceQuadRepresentation::setTextureCoordinates(float left, float bottom, float right, float top)
@@ -204,6 +205,82 @@ void OsgScreenSpaceQuadRepresentation::doUpdate(double dt)
 {
 	m_transform->setAttitude(osg::Quat(0.0, 0.0, 0.0, 1.0));
 }
+
+
+bool OsgScreenSpaceQuadRepresentation::doInitialize()
+{
+	bool result = true;
+
+	// if the material was preassigned, don't create a default one
+	if (getMaterial() == nullptr && m_texureType.hasValue())
+	{
+		result = false;
+		std::shared_ptr<OsgMaterial> material;
+		switch (m_texureType.getValue())
+		{
+			case TEXTURE_TYPE_POWER_OF_TWO:
+				material = buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_texture.frag");
+				break;
+			case TEXTURE_TYPE_RECTANGLE:
+				material = buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_texture_rectangle.frag");
+				break;
+			default:
+				break;
+		}
+
+
+		if (material != nullptr)
+		{
+			setMaterial(material);
+			result = true;
+		}
+	}
+
+	return result;
+}
+
+std::shared_ptr<OsgMaterial> OsgScreenSpaceQuadRepresentation::buildMaterial(
+	const std::string& vertexShaderName,
+	const std::string& fragmentShaderName)
+{
+	bool result = true;
+
+	std::shared_ptr<OsgMaterial> material;
+
+	auto shader = std::make_shared<OsgShader>();
+	std::string fileName;
+	fileName = getRuntime()->getApplicationData()->findFile(vertexShaderName);
+	if (!shader->loadVertexShaderSource(fileName))
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
+				<< "Shader " << vertexShaderName << ", could not "
+				<< ((fileName == "") ? "find shader file" : "compile " + fileName) << "."
+				<< " The quad " << getName() << " might not show on the screen.";
+		result = false;
+	}
+
+	fileName = getRuntime()->getApplicationData()->findFile(fragmentShaderName);
+	if (!shader->loadFragmentShaderSource(fileName))
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
+				<< "Shader " << fragmentShaderName << " , could not "
+				<< ((fileName == "") ? "find shader file" : "compile " + fileName) << "."
+				<< " THe quad " << getName() << " might not show on the screen.";
+		result = false;
+	}
+
+	if (result)
+	{
+		material = std::make_shared<OsgMaterial>();
+		material->setShader(shader);
+	}
+
+	return material;
+}
+
+
+
+
 
 }; // Graphics
 }; // SurgSim

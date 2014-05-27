@@ -60,6 +60,7 @@ bool OsgShader::loadVertexShaderSource(const std::string& filePath)
 	if (! m_vertexShader.valid())
 	{
 		m_vertexShader = new osg::Shader(osg::Shader::VERTEX);
+		m_vertexShader->setName(filePath);
 		m_program->addShader(m_vertexShader);
 	}
 	return m_vertexShader->loadShaderSourceFromFile(filePath);
@@ -108,6 +109,7 @@ bool OsgShader::loadGeometryShaderSource(const std::string& filePath)
 	if (! m_geometryShader.valid())
 	{
 		m_geometryShader = new osg::Shader(osg::Shader::GEOMETRY);
+		m_geometryShader->setName(filePath);
 		m_program->addShader(m_geometryShader);
 	}
 	return m_geometryShader->loadShaderSourceFromFile(filePath);
@@ -156,6 +158,7 @@ bool OsgShader::loadFragmentShaderSource(const std::string& filePath)
 	if (! m_fragmentShader.valid())
 	{
 		m_fragmentShader = new osg::Shader(osg::Shader::FRAGMENT);
+		m_fragmentShader->setName(filePath);
 		m_program->addShader(m_fragmentShader);
 	}
 	return m_fragmentShader->loadShaderSourceFromFile(filePath);
