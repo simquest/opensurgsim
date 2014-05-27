@@ -143,8 +143,6 @@ bool OsgView::doWakeUp()
 
 void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
 {
-	auto state = statsHandler->getCamera()->getOrCreateStateSet();
-
 	// use ref_ptr in case loading fails we don't have to clean up
 	osg::ref_ptr<osg::Shader> vertexShader = new osg::Shader(osg::Shader::VERTEX);
 	osg::ref_ptr<osg::Shader> fragmentShader = new osg::Shader(osg::Shader::FRAGMENT);
@@ -201,5 +199,10 @@ void SurgSim::Graphics::OsgView::setOsgMapsUniforms(bool val)
 bool SurgSim::Graphics::OsgView::getOsgMapsUniforms()
 {
 	return m_osgMapUniforms;
+}
+
+osg::ref_ptr<osgViewer::View> SurgSim::Graphics::OsgView::getOsgView() const
+{
+	return m_view;
 }
 

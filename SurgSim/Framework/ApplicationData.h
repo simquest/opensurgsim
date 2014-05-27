@@ -68,7 +68,7 @@ public:
 	std::string findFile(const std::string& fileName) const;
 
 	/// Searches for the first occurrence of fileName amongst the given paths, see findFile() for details.
-	/// If the file is found the full pathName well be sent in target and true returned. If the file is
+	/// If the file is found the full pathName will be sent in target and true returned. If the file is
 	/// not found the result will be false and the content of target will not change.
 	/// \param fileName Filename of the file.
 	/// \param target The location for the converted filename if it was found.

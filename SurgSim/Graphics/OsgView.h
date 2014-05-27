@@ -87,13 +87,11 @@ public:
 	virtual void update(double dt);
 
 	/// Returns the OSG view which performs the actual work involved in setting up and rendering to a window
-	osg::ref_ptr<osgViewer::View> getOsgView() const
-	{
-		return m_view;
-	}
+	osg::ref_ptr<osgViewer::View> getOsgView() const;
 
 	/// Enable osg modelview uniforms mapping, in this mode osg replaces the gl builtins with osg_* names, for
 	/// uniforms and vertex attributes
+	/// \param bool Whether to enable osg uniform mapping, default false
 	void setOsgMapsUniforms(bool val);
 
 	/// \return the state of the osg modelview mapping mode.
@@ -111,6 +109,7 @@ protected:
 private:
 
 	/// Patch the StatsHandler rendering
+	/// \param statsHandler The statshandler that will be patched.
 	void fixupStatsHandler(osgViewer::StatsHandler* statsHandler);
 
 	/// Position of the view on the screen (in pixels)
@@ -129,6 +128,7 @@ private:
 	/// OSG view which performs the actual work involved in setting up and rendering to a window
 	osg::ref_ptr<osgViewer::View> m_view;
 
+	/// Wether to enable osg uniform mapping
 	bool m_osgMapUniforms;
 };
 
