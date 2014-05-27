@@ -27,6 +27,7 @@ namespace Collision
 {
 
 class CollisionPair;
+class ShapeCollisionRepresentation;
 
 /// Class to calculate intersections between an Octree and other shapes
 class OctreeDcdContact : public ContactCalculation
@@ -63,6 +64,9 @@ private:
 
 	/// The shape types that this contact caculation handles
 	std::pair<int, int> m_shapeTypes;
+
+	/// Collision Representation used to detect contacts with each octree node
+	std::shared_ptr<ShapeCollisionRepresentation> m_nodeCollisionRepresentation;
 };
 
 };
