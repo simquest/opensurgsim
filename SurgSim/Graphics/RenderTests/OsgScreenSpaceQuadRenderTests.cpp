@@ -72,13 +72,10 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 	quad->setSize(100, 100);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
-	int width;
-	int height;
-
-	viewElement->getView()->getDimensions(&width, &height);
+	auto dimensions = viewElement->getView()->getDimensions();
 
 	SurgSim::Math::Vector3d startPosition(0.0, 0.0, 0.0);
-	SurgSim::Math::Vector3d endPosition(width, height, 0.0);
+	SurgSim::Math::Vector3d endPosition(dimensions[0], dimensions[1], 0.0);
 
 	SurgSim::Math::Vector2d startSize(0.0, 0.0);
 	SurgSim::Math::Vector2d endSize(200, 200);
@@ -124,10 +121,12 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad1 =
 		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad 1");
 
+	auto dimensions = viewElement->getView()->getDimensions();
+
 	quad1->setSize(256, 256);
 	quad1->setLocalPose(SurgSim::Math::makeRigidTransform(
 							Quaterniond::Identity(),
-							Vector3d(800 - 256, 600 - 256, -0.2)));
+							Vector3d(dimensions[0] - 256, dimensions[1] - 256, -0.2)));
 	EXPECT_TRUE(quad1->setTexture(checkerTexture));
 	viewElement->addComponent(quad1);
 
@@ -162,20 +161,19 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 	camera->setRenderGroupReference("RenderPass");
 	camera->setGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
-	int width, height;
-	viewElement->getView()->getDimensions(&width, &height);
+	auto dimensions = viewElement->getView()->getDimensions();
 
 	std::shared_ptr<OsgRenderTarget2d> renderTargetOsg =
-		std::make_shared<OsgRenderTarget2d>(width, height, 1.0, 2, true);
+		std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 2, true);
 	camera->setRenderTarget(renderTargetOsg);
 
 	viewElement->addComponent(camera);
 
-	int screenWidth = 800;
-	int screenHeight = 600;
+	int screenWidth = dimensions[0];
+	int screenHeight = dimensions[1];
 
-	width = width / 3;
-	height = height / 3;
+	int width = dimensions[0] / 3;
+	int height = dimensions[1] / 3;
 
 	std::shared_ptr<ScreenSpaceQuadRepresentation> quad;
 	quad = makeQuad("Color1", width, height, screenWidth - width, screenHeight - height);

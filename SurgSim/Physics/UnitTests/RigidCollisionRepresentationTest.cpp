@@ -19,6 +19,7 @@
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -81,6 +82,11 @@ TEST_F(RigidCollisionRepresentationTest, ShapeTest)
 
 	EXPECT_EQ(m_sphereShape, m_rigidCollisionRepresentation->getShape());
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_SPHERE, m_rigidCollisionRepresentation->getShapeType());
+
+	std::shared_ptr<SurgSim::Math::BoxShape> boxShape = std::make_shared<SurgSim::Math::BoxShape>(1.0, 1.0, 1.0);
+	m_rigidCollisionRepresentation->setShape(boxShape);
+	EXPECT_EQ(boxShape, m_rigidCollisionRepresentation->getShape());
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_BOX, m_rigidCollisionRepresentation->getShapeType());
 }
 
 TEST_F(RigidCollisionRepresentationTest, PoseTest)

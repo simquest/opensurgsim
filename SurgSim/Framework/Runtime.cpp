@@ -41,7 +41,7 @@ Runtime::Runtime() :
 
 Runtime::Runtime(const std::string& configFilePath) :
 	m_isRunning(false),
-	m_scene(nullptr)
+	m_isPaused(false)
 {
 	initSearchPaths(configFilePath);
 }

@@ -102,11 +102,6 @@ protected:
 	/// Pull application output from a producer.
 	virtual bool pullOutput();
 
-	/// Getter for the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function may be
-	/// called to provide initial data to input consumers (e.g., passed to the consumer's constructor).
-	/// \return A reference to the initial input data.
-	SurgSim::DataStructures::DataGroup& getInitialInputData();
-
 	/// Getter for the input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is typically
 	/// called by friend scaffolds, to get a DataGroup they can modify then set back to the device to send to the
 	/// device's input consumers.
@@ -127,9 +122,6 @@ private:
 
 	/// The name used for the callbacks, defaults to the device name.
 	std::string m_nameForCallback;
-
-	/// Data used to initialize the input to an InputConsumerInterface when it is added to this device.
-	SurgSim::DataStructures::DataGroup m_initialInputData;
 
 	/// The data the device is providing to its input consumers.
 	SurgSim::DataStructures::DataGroup m_inputData;

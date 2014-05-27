@@ -52,11 +52,6 @@ public:
 	{
 	}
 
-	SurgSim::DataStructures::DataGroup& doGetInitialInputData()
-	{
-		return getInitialInputData();
-	}
-
 	SurgSim::DataStructures::DataGroup& doGetInputData()
 	{
 		return getInputData();
@@ -115,14 +110,7 @@ TEST(PoseTransformDeviceFilterTest, InputDataFilter)
 	// initializeInput would be called in addInputConsumer.
 	poseTransformer->initializeInput("device", data);
 
-	// After initialization, before the first handleInput, the initial and current input data should be the same.
-	// There is no DataGroup::operator==, so we just test both DataGroups.
-	{
-		SCOPED_TRACE("Testing Initial Input Data, no transform or scaling.");
-		DataGroup actualInitialInputData = poseTransformer->doGetInitialInputData();
-		// The PoseTransform should be using identity transform and scaling if they have not been set.
-		TestInputDataGroup(actualInitialInputData, data);
-	}
+	// After initialization, before the first handleInput, the input data should be unchanged.
 	{
 		SCOPED_TRACE("Testing Input Data, no transform or scaling.");
 		// Normally the InputComponent (or another device filter) would have its handleInput called with the
@@ -165,19 +153,12 @@ TEST(PoseTransformDeviceFilterTest, InputDataFilter)
 		TestInputDataGroup(actualTransformedInputData, expectedData);
 	}
 
-	// handleInput should not change the initial input data.
-	{
-		SCOPED_TRACE("Testing Initial Input Data, after handleInput, expecting no transform or scaling.");
-		DataGroup actualInitialInputData = poseTransformer->doGetInitialInputData();
-		TestInputDataGroup(actualInitialInputData, data);
-	}
-
-	// A new initializeInput should run the new initial input data through the filter with the new parameters.
+	// A new initializeInput should run the new input data through the filter with the new parameters.
 	poseTransformer->initializeInput("device", data);
 	{
-		SCOPED_TRACE("Testing Initial Input Data, with transform or scaling.");
-		DataGroup actualInitialInputData = poseTransformer->doGetInitialInputData();
-		TestInputDataGroup(actualInitialInputData, expectedData);
+		SCOPED_TRACE("Testing Input Data after initializeInput, with transform or scaling.");
+		DataGroup actualInputData = poseTransformer->doGetInputData();
+		TestInputDataGroup(actualInputData, expectedData);
 	}
 }
 

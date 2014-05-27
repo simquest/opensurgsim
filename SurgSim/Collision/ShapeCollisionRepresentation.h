@@ -17,11 +17,15 @@
 #define SURGSIM_COLLISION_SHAPECOLLISIONREPRESENTATION_H
 
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Math/Shape.h"
-
+#include "SurgSim/Framework/Macros.h"
 
 namespace SurgSim
 {
+namespace Math
+{
+class Shape;
+}
+
 namespace Collision
 {
 
@@ -31,30 +35,30 @@ class ShapeCollisionRepresentation : public Representation
 {
 public:
 	/// Constructor
-	ShapeCollisionRepresentation(
-		const std::string& name,
-		std::shared_ptr<SurgSim::Math::Shape> shape,
-		const SurgSim::Math::RigidTransform3d& pose);
+	explicit ShapeCollisionRepresentation(const std::string& name);
 
 	/// Destructor
 	virtual ~ShapeCollisionRepresentation();
 
-	/// Get the shape type id
-	/// \return The unique type of the shape, used to determine which calculation to use.
+	SURGSIM_CLASSNAME(SurgSim::Collision::ShapeCollisionRepresentation);
+
 	virtual int getShapeType() const override;
 
-	/// Get the shape
-	/// \return The actual shape used for collision.
+	virtual void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
+
+	// Set the shape to be used in this representation
+	// \param shape Shape to be used in this representation.
+	void setShape(const std::shared_ptr<SurgSim::Math::Shape>& shape);
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
 	virtual void update(const double& dt) override;
 
 private:
+	// Shape used by this representation
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
 };
-
 
 }; // namespace Collision
 }; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_COLLISION_SHAPECOLLISIONREPRESENTATION_H

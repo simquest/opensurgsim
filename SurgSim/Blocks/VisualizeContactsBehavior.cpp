@@ -19,6 +19,7 @@
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgVectorFieldRepresentation.h"
 #include "SurgSim/Graphics/VectorField.h"
@@ -33,6 +34,11 @@ using SurgSim::Graphics::OsgVectorFieldRepresentation;
 using SurgSim::Graphics::VectorField;
 using SurgSim::Graphics::VectorFieldData;
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::VisualizeContactsBehavior);
+}
+
 namespace SurgSim
 {
 
@@ -43,14 +49,26 @@ VisualizeContactsBehavior::VisualizeContactsBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),
 	m_vectorField(std::make_shared<OsgVectorFieldRepresentation>("VisualizeContacts"))
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VisualizeContactsBehavior, std::shared_ptr<SurgSim::Framework::Component>,
+		CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VisualizeContactsBehavior, double, VectorFieldScale,
+		getVectorFieldScale, setVectorFieldScale);
+}
+
+std::shared_ptr<SurgSim::Framework::Component> VisualizeContactsBehavior::getCollisionRepresentation()
+{
+	return m_collisionRepresentation;
 }
 
 void VisualizeContactsBehavior::setCollisionRepresentation(
-	std::shared_ptr<Representation> collisionRepresentation)
+	std::shared_ptr<SurgSim::Framework::Component> collisionRepresentation)
 {
-	m_collisionRepresentation = collisionRepresentation;
-	m_collisions = std::unique_ptr<SafeReadAccessor<ContactMapType>>(
+	m_collisionRepresentation = std::dynamic_pointer_cast<Representation>(collisionRepresentation);
+	if (m_collisionRepresentation != nullptr)
+	{
+		m_collisions = std::unique_ptr<SafeReadAccessor<ContactMapType>>(
 		new SafeReadAccessor<ContactMapType>(m_collisionRepresentation->getCollisions()));
+	}
 }
 
 void VisualizeContactsBehavior::update(double dt)
@@ -112,6 +130,11 @@ bool VisualizeContactsBehavior::doWakeUp()
 {
 	getSceneElement()->addComponent(m_vectorField);
 	return true;
+}
+
+double VisualizeContactsBehavior::getVectorFieldScale()
+{
+	return m_vectorField->getScale();
 }
 
 void VisualizeContactsBehavior::setVectorFieldScale(double scale)

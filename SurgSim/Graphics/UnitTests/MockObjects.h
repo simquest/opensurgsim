@@ -29,6 +29,8 @@
 #include "SurgSim/Graphics/ViewElement.h"
 #include "SurgSim/Graphics/Texture.h"
 
+#include <array>
+
 class MockGroup : public SurgSim::Graphics::Group
 {
 public:
@@ -440,47 +442,45 @@ public:
 
 	/// Set the position of this view
 	/// \param	x,y	Position on the screen (in pixels)
-	virtual bool setPosition(int x, int y)
+	virtual void setPosition(const std::array<int, 2>& position) override
 	{
-		m_x = x;
-		m_y = y;
-		return true;
+		m_x = position[0];
+		m_y = position[1];
 	}
 
 	/// Get the position of this view
 	/// \param[out]	x,y	Position on the screen (in pixels)
-	virtual void getPosition(int* x, int* y) const
+	virtual std::array<int, 2> getPosition() const override
 	{
-		*x = m_x;
-		*y = m_y;
+		std::array<int, 2> result = {m_x, m_y};
+		return std::move(result);
 	}
 
 	/// Set the dimensions of this view
 	/// \param	width,height	Dimensions on the screen (in pixels)
-	virtual bool setDimensions(int width, int height)
+	virtual void setDimensions(const std::array<int, 2>& dimensions) override
 	{
-		m_width = width;
-		m_height = height;
-		return true;
+		m_width = dimensions[0];
+		m_height = dimensions[1];
 	}
 
 	/// Set the dimensions of this view
 	/// \param[out]	width,height	Dimensions on the screen (in pixels)
-	virtual void getDimensions(int* width, int* height) const
+	virtual std::array<int, 2> getDimensions() const override
 	{
-		*width = m_width;
-		*height = m_height;
+		std::array<int, 2> result = {m_width, m_height};
+		return std::move(result);
 	}
 
 	/// Sets whether the view window has a border
 	/// \param	enabled	True to enable the border around the window; false for no border
-	virtual void setWindowBorderEnabled(bool enabled)
+	virtual void setWindowBorderEnabled(bool enabled) override
 	{
 		m_isWindowBorderEnabled = enabled;
 	}
 	/// Returns whether the view window has a border
 	/// \return	True to enable the border around the window; false for no border
-	virtual bool isWindowBorderEnabled() const
+	virtual bool isWindowBorderEnabled() const override
 	{
 		return m_isWindowBorderEnabled;
 	}

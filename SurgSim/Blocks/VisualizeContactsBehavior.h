@@ -48,9 +48,15 @@ public:
 	/// \param	name	Name of the behavior
 	explicit VisualizeContactsBehavior(const std::string& name);
 
-	/// Set the collision representation whose contacts, if any, will be visualized.
-	/// \param	collisionRepresentation The collision representation of a stapler.
-	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation);
+	SURGSIM_CLASSNAME(SurgSim::Blocks::VisualizeContactsBehavior);
+
+	/// Used for serialization.
+	/// \return The collision representation whose contacts will be visualized.
+	std::shared_ptr<SurgSim::Framework::Component> getCollisionRepresentation();
+
+	/// Used for serialization.
+	/// \param	collisionRepresentation The collision representation whose contacts will be visualized.
+	void setCollisionRepresentation(std::shared_ptr<SurgSim::Framework::Component> collisionRepresentation);
 
 	/// Update the behavior, show vector field for contacts if there is any.
 	/// \param dt	The length of time (seconds) between update calls.
@@ -59,6 +65,9 @@ public:
 	/// Return the type of manager that should be responsible for this behavior
 	/// \return An integer indicating which manger should be responsible for this behavior.
 	virtual int getTargetManagerType() const override;
+
+	/// \return The scale of the vector field.
+	double getVectorFieldScale();
 
 	/// Set the scale of vector field, default 1.0.
 	// \param scale The scale of the vector field.

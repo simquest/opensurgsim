@@ -75,14 +75,15 @@ void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
 									const RigidTransform3d& meshBTransform,
 									const std::list<std::shared_ptr<Contact>> expectedContacts)
 {
-	std::shared_ptr<Representation> meshARep = std::make_shared<ShapeCollisionRepresentation>(
-												   "Collision Mesh 0",
-												   meshA,
-												   meshATransform);
-	std::shared_ptr<Representation> meshBRep = std::make_shared<ShapeCollisionRepresentation>(
-												   "Collision Mesh 1",
-												   meshB,
-												   meshBTransform);
+	std::shared_ptr<ShapeCollisionRepresentation> meshARep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 0");
+	meshARep->setShape(meshA);
+	meshARep->setLocalPose(meshATransform);
+
+	std::shared_ptr<ShapeCollisionRepresentation> meshBRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 1");
+	meshBRep->setShape(meshB);
+	meshBRep->setLocalPose(meshBTransform);
 
 	// Perform collision detection.
 	TriangleMeshTriangleMeshDcdContact calcContact;
@@ -432,14 +433,15 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 					   Vector3d(e, 0.0, 1.0));
 		auto triangleMesh = std::make_shared<MeshShape>(*intersectingTriangle);
 
-		std::shared_ptr<Representation> meshARep = std::make_shared<ShapeCollisionRepresentation>(
-													   "Collision Mesh 0",
-													   baseMesh,
-													   pose);
-		std::shared_ptr<Representation> meshBRep = std::make_shared<ShapeCollisionRepresentation>(
-													   "Collision Mesh 1",
-													   triangleMesh,
-													   pose);
+		std::shared_ptr<ShapeCollisionRepresentation> meshARep =
+			std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 0");
+		meshARep->setShape(baseMesh);
+		meshARep->setLocalPose(pose);
+
+		std::shared_ptr<ShapeCollisionRepresentation> meshBRep =
+			std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 1");
+		meshBRep->setShape(triangleMesh);
+		meshBRep->setLocalPose(pose);
 
 		// Perform collision detection.
 		TriangleMeshTriangleMeshDcdContact calcContact;
