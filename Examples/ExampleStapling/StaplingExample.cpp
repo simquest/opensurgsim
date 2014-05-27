@@ -191,12 +191,10 @@ std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& na
 std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName,
 														const std::string& deviceName)
 {
-	std::vector<std::string> paths;
-	paths.push_back("Data/Geometry");
-	ApplicationData data(paths);
+	ApplicationData data("config.txt");
 
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader(data.findFile("stapler_collision.ply"));
+	PlyReader reader(data.findFile("Geometry/stapler_collision.ply"));
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
@@ -264,9 +262,11 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> virtualTeeth;
 	for (auto it = virtualTeethShapes.begin(); it != virtualTeethShapes.end(); ++it, ++i)
 	{
-		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision
-			= std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
-				  "VirtualToothCollision" + boost::to_string(i), *it, RigidTransform3d::Identity());
+		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision =
+			std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
+			"VirtualToothCollision" + boost::to_string(i));
+		virtualToothCollision->setShape(*it);
+		virtualToothCollision->setLocalPose(RigidTransform3d::Identity());
 
 		virtualTeeth[i] = virtualToothCollision;
 		sceneElement->addComponent(virtualToothCollision);
@@ -286,13 +286,11 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 {
-	std::vector<std::string> paths;
-	paths.push_back("Data/Geometry");
-	ApplicationData data(paths);
+	ApplicationData data("config.txt");
 
 	// File "arm_collision.ply" contains collision meshes for both upper arm and forearm.
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader(data.findFile("arm_collision.ply"));
+	PlyReader reader(data.findFile("Geometry/arm_collision.ply"));
 	reader.setDelegate(delegate);
 	reader.parseFile();
 

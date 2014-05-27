@@ -41,10 +41,15 @@ void doBoxSphereTest(std::shared_ptr<BoxShape> box,
 	using SurgSim::Math::Geometry::DistanceEpsilon;
 	using SurgSim::Math::Geometry::ScalarEpsilon;
 
-	std::shared_ptr<Representation> boxRep = std::make_shared<ShapeCollisionRepresentation>(
-		"Collision Box 0", box, SurgSim::Math::makeRigidTransform(boxQuat, boxTrans));
-	std::shared_ptr<Representation> sphereRep = std::make_shared<ShapeCollisionRepresentation>(
-		"Collision Sphere 0", sphere, SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
+	std::shared_ptr<ShapeCollisionRepresentation> boxRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Box 0");
+	boxRep->setShape(box);
+	boxRep->setLocalPose(SurgSim::Math::makeRigidTransform(boxQuat, boxTrans));
+
+	std::shared_ptr<ShapeCollisionRepresentation> sphereRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Sphere 0");
+	sphereRep->setShape(sphere);
+	sphereRep->setLocalPose(SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
 
 	// Perform collision detection.
 	BoxSphereDcdContact calcContact;

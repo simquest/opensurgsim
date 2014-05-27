@@ -42,13 +42,7 @@ RigidCollisionRepresentation::~RigidCollisionRepresentation()
 
 void RigidCollisionRepresentation::update(const double& dt)
 {
-	auto physicsRepresentation = m_physicsRepresentation.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr)
-		<< "PhysicsRepresentation went out of scope for Collision Representation " << getName();
-
-	auto shape = physicsRepresentation->getCurrentParameters().getShapeUsedForMassInertia();
-
-	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
+	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getShape());
 	if (meshShape != nullptr)
 	{
 		meshShape->setPose(getPose());
@@ -68,18 +62,27 @@ std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> RigidCollisionReprese
 
 int RigidCollisionRepresentation::getShapeType() const
 {
-	auto physicsRepresentation = m_physicsRepresentation.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
-			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
-	return physicsRepresentation->getCurrentParameters().getShapeUsedForMassInertia()->getType();
+	return getShape()->getType();
 }
 
 const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
 {
-	auto physicsRepresentation = m_physicsRepresentation.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
-			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
-	return physicsRepresentation->getCurrentParameters().getShapeUsedForMassInertia();
+	if (m_shape != nullptr)
+	{
+		return m_shape;
+	}
+	else
+	{
+		auto physicsRepresentation = m_physicsRepresentation.lock();
+		SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+				"PhysicsRepresentation went out of scope for Collision Representation " << getName();
+		return physicsRepresentation->getCurrentParameters().getShapeUsedForMassInertia();
+	}
+}
+
+void RigidCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape)
+{
+	m_shape = shape;
 }
 
 SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const

@@ -65,8 +65,9 @@ void OctreeDcdContact::calculateContactWithNode(
 	SurgSim::Math::RigidTransform3d boxPose = pair->getFirst()->getPose();
 	boxPose.translation() += boxPose.linear() * node->getBoundingBox().center();
 
-	std::shared_ptr<Representation> box =
-		std::make_shared<ShapeCollisionRepresentation>("Octree Node", boxShape, boxPose);
+	std::shared_ptr<ShapeCollisionRepresentation> box = std::make_shared<ShapeCollisionRepresentation>("Octree Node");
+	box->setShape(boxShape);
+	box->setLocalPose(boxPose);
 
 	std::shared_ptr<CollisionPair> localPair = std::make_shared<CollisionPair>(box, pair->getSecond());
 	m_calculator->calculateContact(localPair);

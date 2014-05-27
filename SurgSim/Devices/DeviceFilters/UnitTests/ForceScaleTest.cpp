@@ -47,11 +47,6 @@ public:
 	{
 	}
 
-	SurgSim::DataStructures::DataGroup& doGetInitialInputData()
-	{
-		return getInitialInputData();
-	}
-
 	SurgSim::DataStructures::DataGroup& doGetInputData()
 	{
 		return getInputData();
@@ -74,15 +69,9 @@ TEST(ForceScaleDeviceFilterTest, InputDataFilter)
 	forceScaler->initializeInput("device", data);
 
 	// The ForceScale device filter should pass through the input data unchanged.
-	DataGroup actualInitialInputData = forceScaler->doGetInitialInputData();
-	Vector3d actualInitialLinearVelocity;
-	ASSERT_TRUE(actualInitialInputData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY,
-		&actualInitialLinearVelocity));
-	EXPECT_TRUE(actualInitialLinearVelocity.isApprox(Vector3d(5.0, 6.0, 7.0), ERROR_EPSILON));
-
 	DataGroup actualInputData = forceScaler->doGetInputData();
 	Vector3d actualLinearVelocity;
-	ASSERT_TRUE(actualInitialInputData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY,
+	ASSERT_TRUE(actualInputData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY,
 		&actualLinearVelocity));
 	EXPECT_TRUE(actualLinearVelocity.isApprox(Vector3d(5.0, 6.0, 7.0), ERROR_EPSILON));
 }

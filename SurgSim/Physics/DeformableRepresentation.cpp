@@ -157,7 +157,18 @@ void DeformableRepresentation::afterUpdate(double dt)
 	*m_finalState = *m_currentState;
 }
 
-void  DeformableRepresentation::setCollisionRepresentation(
+void DeformableRepresentation::deactivateAndReset(void)
+{
+	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
+		<< getName() << " deactivated and reset:" << std::endl
+		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
+		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
+
+	resetState();
+	setIsActive(false);
+}
+
+void DeformableRepresentation::setCollisionRepresentation(
 	std::shared_ptr<SurgSim::Collision::Representation> representation)
 {
 	if (m_collisionRepresentation != representation)
