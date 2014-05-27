@@ -97,7 +97,7 @@ public:
 
 	/// Enable osg modelview uniforms mapping, in this mode osg replaces the gl builtins with osg_* names, for
 	/// uniforms and vertex attributes
-	/// \param bool Whether to enable osg uniform mapping, default false
+	/// \param val Whether to enable osg uniform mapping, default false
 	void setOsgMapsUniforms(bool val);
 
 	/// \return the state of the osg modelview mapping mode.

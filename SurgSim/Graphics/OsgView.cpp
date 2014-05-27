@@ -272,7 +272,7 @@ void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
 
 		state->setAttributeAndModes(program);
 		state->setTextureAttributeAndModes(0, texture);
-		state->addUniform(new osg::Uniform("osg_TextTexture", (int) 0));
+		state->addUniform(new osg::Uniform("osg_TextTexture", static_cast<int>(0)));
 	}
 }
 
