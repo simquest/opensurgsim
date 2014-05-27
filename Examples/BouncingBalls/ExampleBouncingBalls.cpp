@@ -284,7 +284,6 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(plane);
 
 	std::shared_ptr<ViewElement> view = std::make_shared<OsgViewElement>("view");
-	view->getView()->setDimensions(963, 707);
 	view->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 	scene->addSceneElement(view);
 
