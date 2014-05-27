@@ -93,9 +93,7 @@ if(MSVC)
 	if (SURGSIM_WARNINGS_AS_ERRORS)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
 	endif(SURGSIM_WARNINGS_AS_ERRORS)
-	
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")  # is this needed?
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Y-")  # disable precompiled headers for C
+
 	set(CMAKE_DEBUG_POSTFIX "d")
 
 	# Work around a stupid template argument limitation in VS 2012

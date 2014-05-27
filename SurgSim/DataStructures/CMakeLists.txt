@@ -94,6 +94,12 @@ set(LIBS
 target_link_libraries(SurgSimDataStructures ${LIBS}
 )
 
+if(SURGSIM_PRECOMPILED_HEADERS)
+	if(MSVC)
+		set_source_files_properties(ply.c PROPERTIES COMPILE_FLAGS "/Y-")
+	endif()
+endif()
+
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()

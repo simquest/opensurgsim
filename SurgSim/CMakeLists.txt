@@ -32,9 +32,9 @@ if(SURGSIM_PRECOMPILED_HEADERS)
 	
 	if(MSVC)
 		if(${CMAKE_MAKE_PROGRAM} MATCHES "ninja\\.exe")
-			set(COMPILE_DIR "/CMakeFiles/PrecompiledHeader.dir")
+			set(COMPILE_DIR "CMakeFiles/PrecompiledHeader.dir")
 		else()
-			set(COMPILE_DIR "/$(Configuration)")
+			set(COMPILE_DIR "$(Configuration)")
 		endif()
 
 		# On every following target
@@ -47,7 +47,7 @@ if(SURGSIM_PRECOMPILED_HEADERS)
 			"/YuPrecompiledHeader.h"
 			"/Fp${CMAKE_BINARY_DIR}/SurgSim/PrecompiledHeader/${COMPILE_DIR}/PrecompiledHeader.pch"
 			"/FIPrecompiledHeader.h"
-			"/Zm331"
+			"/Zm348"
 		)
 		add_compile_options($<$<CONFIG:Debug>:/Z7>)
 		add_compile_options($<$<CONFIG:RelWithDebInfo>:/Z7>)
