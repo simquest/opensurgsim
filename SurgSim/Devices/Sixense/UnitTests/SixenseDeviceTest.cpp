@@ -24,17 +24,13 @@
 #include "SurgSim/Devices/Sixense/SixenseDevice.h"
 //#include "SurgSim/Devices/Sixense/SixenseScaffold.h"  // only needed if calling SixenseScaffold::setDefaultLogLevel()
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Testing/DevicesUtilities.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::Device::SixenseDevice;
 using SurgSim::Device::SixenseScaffold;
 using SurgSim::DataStructures::DataGroup;
-using SurgSim::Input::InputConsumerInterface;
-using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Testing::MockInputOutput;

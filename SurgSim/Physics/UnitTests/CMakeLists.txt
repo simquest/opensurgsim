@@ -25,20 +25,22 @@ set(UNIT_TEST_SOURCES
 	ContactConstraintDataTests.cpp
 	ContactConstraintGenerationTests.cpp
 	DcdCollisionTests.cpp
+	DeformableCollisionRepresentationTest.cpp
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
+	Fem1DElementBeamTests.cpp
 	Fem1DMechanicalValidationTests.cpp
 	Fem1DRepresentationTests.cpp
+	Fem2DElementTriangleTests.cpp
 	Fem2DMechanicalValidationTests.cpp
 	Fem2DRepresentationTests.cpp
+	Fem3DElementCorotationalTetrahedronTests.cpp
+	Fem3DElementCubeTests.cpp
+	Fem3DElementTetrahedronTests.cpp
 	Fem3DRepresentationBilateral3DTests.cpp
 	Fem3DRepresentationContactTests.cpp
 	Fem3DRepresentationReaderTests.cpp
 	Fem3DRepresentationTests.cpp
-	FemElement1DBeamTests.cpp
-	FemElement2DTriangleTests.cpp
-	FemElement3DCubeTests.cpp
-	FemElement3DTetrahedronTests.cpp
 	FemElementTests.cpp
 	FemRepresentationLocalizationTest.cpp
 	FemRepresentationParametersTest.cpp
@@ -61,7 +63,6 @@ set(UNIT_TEST_SOURCES
 	PushResultsTests.cpp
 	RepresentationTest.cpp
 	RigidCollisionRepresentationTest.cpp
-	RigidRepresentationBaseStateTest.cpp
 	RigidRepresentationBilateral3DTests.cpp
 	RigidRepresentationContactTests.cpp
 	RigidRepresentationLocalizationTest.cpp
@@ -88,7 +89,13 @@ set(LIBS
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
 
 surgsim_add_unit_tests(SurgSimPhysicsTest)
 

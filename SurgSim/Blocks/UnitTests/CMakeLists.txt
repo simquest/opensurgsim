@@ -25,6 +25,7 @@ set(UNIT_TEST_SOURCES
 	PoseInterpolatorTests.cpp
 	SpringTestUtils.cpp
 	TransferOdeStateToVerticesBehaviorTests.cpp
+	VisualizeContactsBehaviorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -33,7 +34,7 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS
 	SurgSimBlocks
-
+	SurgSimGraphics
 )
 
 surgsim_add_unit_tests(SurgSimBlocksTest)

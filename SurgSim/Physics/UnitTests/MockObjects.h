@@ -134,7 +134,8 @@ public:
 class MockDeformableRepresentation : public SurgSim::Physics::DeformableRepresentation
 {
 public:
-	MockDeformableRepresentation() : SurgSim::Physics::DeformableRepresentation("MockDeformableRepresentation")
+	explicit MockDeformableRepresentation(const std::string& name = "MockDeformableRepresentation") :
+		SurgSim::Physics::DeformableRepresentation(name)
 	{
 		this->m_numDofPerNode = 3;
 		m_F = Vector::LinSpaced(3, 1.0, 3.0);
@@ -151,6 +152,8 @@ public:
 	{
 		return SurgSim::Physics::REPRESENTATION_TYPE_INVALID;
 	}
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::MockDeformableRepresentation);
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
@@ -215,6 +218,11 @@ protected:
 	Vector m_F;
 	Matrix m_M, m_D, m_K;
 };
+
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::MockDeformableRepresentation);
+}
 
 class MockSpring : public SurgSim::Physics::Spring
 {
@@ -373,10 +381,12 @@ public:
 		fLocal = (alphaM * m_M + alphaD * m_D + alphaK * m_K) * xLocal;
 		SurgSim::Math::addSubVector(fLocal, m_nodeIds, 3, F);
 	}
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector &naturalCoordinate) const override
-	{ return true; }
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector &barycentricCoordinate) const override
+	{ return SurgSim::Math::Vector3d::Zero(); }
+	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector &globalCoordinate) const override
 	{ return SurgSim::Math::Vector3d::Zero(); }
 
 	virtual void initialize(const SurgSim::Math::OdeState& state) override
@@ -399,6 +409,15 @@ private:
 	Vector m_F;
 	Matrix m_M, m_D, m_K;
 	bool m_isInitialized;
+};
+
+class InvalidMockFemElement : public MockFemElement
+{
+public:
+	virtual bool update(const SurgSim::Math::OdeState& state) override
+	{
+		return false;
+	}
 };
 
 // Concrete class for testing

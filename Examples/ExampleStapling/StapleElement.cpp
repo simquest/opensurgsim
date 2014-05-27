@@ -15,33 +15,24 @@
 
 #include "Examples/ExampleStapling/StapleElement.h"
 
-#include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-using SurgSim::DataStructures::PlyReader;
-using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
-using SurgSim::Framework::ApplicationData;
 using SurgSim::Graphics::SceneryRepresentation;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Math::MeshShape;
-using SurgSim::Math::RigidTransform3d;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 
 StapleElement::StapleElement(const std::string& name) :
-	SurgSim::Framework::SceneElement(name),
+	SurgSim::Framework::BasicSceneElement(name),
 	m_hasCollisionRepresentation(true)
-{
-}
-
-StapleElement::~StapleElement()
 {
 }
 
@@ -52,21 +43,12 @@ void StapleElement::setHasCollisionRepresentation(bool flag)
 
 bool StapleElement::doInitialize()
 {
-	std::vector<std::string> paths;
-	paths.push_back("Data/Geometry");
-	ApplicationData data(paths);
+	auto meshShape = std::make_shared<MeshShape>();
+	meshShape->setFileName(getRuntime()->getApplicationData()->findFile("/Geometry/staple_collision.ply"));
 
-	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader(data.findFile("staple_collision.ply"));
-	reader.setDelegate(delegate);
-	reader.parseFile();
-
-	// Stapler collision mesh
-	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
-
 	params.setLinearDamping(1e-2);
 	params.setAngularDamping(1e-4);
 
@@ -82,8 +64,7 @@ bool StapleElement::doInitialize()
 
 	if (m_hasCollisionRepresentation)
 	{
-		std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-			std::make_shared<RigidCollisionRepresentation>("Collision");
+		auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>("Collision");
 		physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 		addComponent(collisionRepresentation);

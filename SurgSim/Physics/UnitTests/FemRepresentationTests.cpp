@@ -176,11 +176,17 @@ TEST_F(FemRepresentationTests, IsValidCoordinateTest)
 	element->setYoungModulus(m_E);
 	ASSERT_NO_THROW(fem.addFemElement(element));
 
-	// Only the elementId is tested, the validation on the vector part is done by
-	// each FemElement, which should be tested in their respective UnitTest.
-	FemRepresentationCoordinate invalidCoordinates(1, Vector::Ones(3));
+	// Set up the fem element to have a valid natural coordinate.
+	element->addNode(0);
+	element->addNode(1);
+	Vector validNaturalCoordinate(2);
+	validNaturalCoordinate << 1.0, 0.0;
+
+	// Only the elementId is tested (by passing a valid natural coordinate).
+	// The validation of the natural coordinate is tested in the respective FemElement's UnitTest.
+	FemRepresentationCoordinate invalidCoordinates(1, validNaturalCoordinate);
 	EXPECT_FALSE(fem.isValidCoordinate(invalidCoordinates));
-	FemRepresentationCoordinate validCoordinates(0, Vector::Ones(3));
+	FemRepresentationCoordinate validCoordinates(0, validNaturalCoordinate);
 	EXPECT_TRUE(fem.isValidCoordinate(validCoordinates));
 }
 
@@ -205,6 +211,56 @@ TEST_F(FemRepresentationTests, BeforeUpdateTest)
 	fem.setInitialState(initialState);
 
 	ASSERT_NO_THROW(fem.beforeUpdate(m_dt));
+}
+
+TEST_F(FemRepresentationTests, AfterUpdateTest)
+{
+	{
+		SCOPED_TRACE("Valid FemElements");
+		MockFemRepresentation fem("name");
+		std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		fem.addFemElement(element);
+
+		std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
+		initialState->setNumDof(fem.getNumDofPerNode(), 8);
+		fem.setInitialState(initialState);
+
+		fem.initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem.wakeUp();
+
+		ASSERT_NO_THROW(fem.beforeUpdate(m_dt));
+		ASSERT_NO_THROW(fem.update(m_dt));
+		// After update should backup the currentState into finalState and update all FemElement
+		ASSERT_NO_THROW(fem.afterUpdate(m_dt));
+		ASSERT_FALSE(*fem.getFinalState() == *fem.getInitialState());
+		ASSERT_TRUE(fem.isActive());
+	}
+	{
+		SCOPED_TRACE("Invalid FemElements");
+		MockFemRepresentation fem("name");
+		std::shared_ptr<InvalidMockFemElement> element = std::make_shared<InvalidMockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		fem.addFemElement(element);
+
+		std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
+		initialState->setNumDof(fem.getNumDofPerNode(), 8);
+		fem.setInitialState(initialState);
+
+		fem.initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem.wakeUp();
+
+		ASSERT_NO_THROW(fem.beforeUpdate(m_dt));
+		ASSERT_NO_THROW(fem.update(m_dt));
+		// After update should backup the currentState into finalState and update all FemElement
+		ASSERT_NO_THROW(fem.afterUpdate(m_dt));
+		ASSERT_TRUE(*fem.getFinalState() == *fem.getInitialState());
+		ASSERT_FALSE(fem.isActive());
+	}
 }
 
 TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)

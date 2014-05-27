@@ -18,6 +18,7 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/DataStructures/DataGroupCopier.h"
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -29,7 +30,14 @@
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
+using SurgSim::DataStructures::DataGroupCopier;
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
 
+namespace
+{
+const double EPSILON = 1e-9;
+};
 
 /// Creating a named data object.
 TEST(DataGroupTests, CanConstruct)
@@ -184,25 +192,25 @@ TEST(DataGroupTests, GetName)
 	{
 		SurgSim::Math::RigidTransform3d value = SurgSim::Math::RigidTransform3d::Identity();
 		EXPECT_TRUE(data.poses().get("pose", &value));
-		EXPECT_NEAR(0, (value.linear() - quat.matrix()).norm(), 1e-9);
-		EXPECT_NEAR(0, (value.translation() - vector).norm(), 1e-9);
+		EXPECT_NEAR(0, (value.linear() - quat.matrix()).norm(), EPSILON);
+		EXPECT_NEAR(0, (value.translation() - vector).norm(), EPSILON);
 	}
 	{
 		SurgSim::Math::Vector3d value(0, 0, 0);
 		EXPECT_TRUE(data.vectors().get("vector", &value));
-		EXPECT_NEAR(0, (value - vector).norm(), 1e-9);
+		EXPECT_NEAR(0, (value - vector).norm(), EPSILON);
 	}
 	{
 		DataGroup::DynamicMatrixType value;
 		EXPECT_TRUE(data.matrices().get("matrix", &value));
 		EXPECT_EQ(matrix.cols(), value.cols());
 		EXPECT_EQ(matrix.rows(), value.rows());
-		EXPECT_NEAR(0, (value - matrix).norm(), 1e-9);
+		EXPECT_NEAR(0, (value - matrix).norm(), EPSILON);
 	}
 	{
 		double value = 0;
 		EXPECT_TRUE(data.scalars().get("scalar", &value));
-		EXPECT_NEAR(1.23, value, 1e-9);
+		EXPECT_NEAR(1.23, value, EPSILON);
 	}
 	{
 		int value = 0;
@@ -222,8 +230,8 @@ TEST(DataGroupTests, GetName)
 	{
 		Mock3DData<double> value;
 		EXPECT_TRUE(data.customData().get("mock_data", &value));
-		EXPECT_NEAR(1.23, value.get(5, 5, 5), 1e-9);
-		EXPECT_NEAR(4.56, value.get(1, 2, 3), 1e-9);
+		EXPECT_NEAR(1.23, value.get(5, 5, 5), EPSILON);
+		EXPECT_NEAR(4.56, value.get(1, 2, 3), EPSILON);
 	}
 }
 
@@ -358,6 +366,60 @@ TEST(DataGroupTests, Assignment)
 	data4.booleans().set("test2", !trueBool);
 	EXPECT_NO_THROW(data = data4); // data4 can assign to data because data4 was copy-constructed from data
 	EXPECT_NO_THROW(data4 = data);
+}
+
+/// Non-assignment copying DataGroups with DataGroupCopier.
+TEST(DataGroupTests, DataGroupCopier)
+{
+	DataGroupBuilder sourceBuilder;
+	sourceBuilder.addPose("test");
+	sourceBuilder.addBoolean("test");
+	sourceBuilder.addBoolean("test2");
+	DataGroup sourceData = sourceBuilder.createData();
+
+	DataGroupBuilder targetBuilder;
+	targetBuilder.addPose("test2"); //different pose name
+	targetBuilder.addBoolean("test2"); // same boolean name
+	targetBuilder.addEntriesFrom(sourceData);
+	DataGroup targetData = targetBuilder.createData();
+
+	ASSERT_TRUE(targetData.poses().hasEntry("test"));
+	ASSERT_TRUE(targetData.poses().hasEntry("test2"));
+	ASSERT_TRUE(targetData.booleans().hasEntry("test"));
+	ASSERT_TRUE(targetData.booleans().hasEntry("test2"));
+
+	ASSERT_THROW(targetData = sourceData, SurgSim::Framework::AssertionFailure);
+
+	DataGroupCopier copier(sourceData, targetData);
+
+	const RigidTransform3d testPose = SurgSim::Math::makeRigidTransform(Vector3d(1.0, 2.0, 3.0),
+		Vector3d(1.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
+	ASSERT_TRUE(sourceData.poses().set("test", testPose));
+
+	const bool testBoolean = true;
+	ASSERT_TRUE(sourceData.booleans().set("test", testBoolean));
+
+	const bool testBoolean2 = false;
+	ASSERT_TRUE(sourceData.booleans().set("test2", testBoolean2));
+	// Setting the initial value for the targetData's test2 boolean to the opposite value.
+	ASSERT_TRUE(targetData.booleans().set("test2", !testBoolean2));
+
+	// Copy the data.
+	copier.copy();
+
+	RigidTransform3d outTestPose;
+	ASSERT_TRUE(targetData.poses().get("test", &outTestPose));
+	EXPECT_TRUE(outTestPose.isApprox(testPose, EPSILON));
+
+	EXPECT_FALSE(targetData.poses().hasData("test2"));
+
+	bool outTestBoolean;
+	ASSERT_TRUE(targetData.booleans().get("test", &outTestBoolean));
+	EXPECT_EQ(testBoolean, outTestBoolean);
+
+	bool outTestBoolean2;
+	ASSERT_TRUE(targetData.booleans().get("test2", &outTestBoolean2));
+	EXPECT_EQ(testBoolean2, outTestBoolean2);
 }
 
 TEST(DataGroupTests, DataGroupInLockedContainer)

@@ -24,19 +24,15 @@
 #include "SurgSim/Devices/Novint/NovintDevice.h"
 //#include "SurgSim/Devices/Novint/NovintScaffold.h"  // only needed if calling setDefaultLogLevel()
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Framework/Clock.h"
-#include "SurgSim/Testing/DevicesUtilities.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::Device::NovintDevice;
 using SurgSim::Device::NovintScaffold;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Framework::Clock;
-using SurgSim::Input::InputConsumerInterface;
-using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Testing::MockInputOutput;

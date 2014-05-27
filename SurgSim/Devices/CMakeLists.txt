@@ -27,11 +27,18 @@ set(DEVICES
 	TrackIR
 )
 
+set(SURGSIM_DEVICES_DOCUMENTATION
+	devices.dox
+)
+
 foreach(DEVICE ${DEVICES})
 	string(TOUPPER ${DEVICE} DEVICE_UPPER_CASE)
 	option(BUILD_DEVICE_${DEVICE_UPPER_CASE} "Build ${DEVICE} device." OFF)
 	if(BUILD_DEVICE_${DEVICE_UPPER_CASE})
 		add_subdirectory(${DEVICE})
+		list(APPEND SURGSIM_DEVICES_DOCUMENTATION ${DEVICE}/${DEVICE}.dox)
 	endif(BUILD_DEVICE_${DEVICE_UPPER_CASE})
 endforeach(DEVICE)
 
+add_custom_target(SurgSimDevicesDocumentation SOURCES ${SURGSIM_DEVICES_DOCUMENTATION})
+set_target_properties(SurgSimDevicesDocumentation PROPERTIES FOLDER "Devices")

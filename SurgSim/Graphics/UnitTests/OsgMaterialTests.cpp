@@ -124,12 +124,12 @@ TEST(OsgMaterialTests, AddAndRemoveUniformsTest)
 	/// Try adding a non-OSG Uniform
 	std::shared_ptr<MockUniform> nonOsgUniform = std::make_shared<MockUniform>();
 	EXPECT_FALSE(material->addUniform(nonOsgUniform)) <<
-		"Should not be able to add a uniform that is not a subclass of OsgUniformBase!";
+			"Should not be able to add a uniform that is not a subclass of OsgUniformBase!";
 	EXPECT_EQ(1u, material->getNumUniforms());
 
 	/// Try removing a non-OSG Uniform
 	EXPECT_FALSE(material->removeUniform(nonOsgUniform)) <<
-		"Should not be able to remove a uniform that is not a subclass of OsgUniformBase!";
+			"Should not be able to remove a uniform that is not a subclass of OsgUniformBase!";
 	EXPECT_EQ(1u, material->getNumUniforms());
 }
 
@@ -151,13 +151,13 @@ TEST(OsgMaterialTests, SetAndClearShaderTest)
 
 	EXPECT_EQ(1u, attributes.size());
 	EXPECT_EQ(osgShader->getOsgProgram(), attributes.at(osg::StateAttribute::TypeMemberPair(
-		osg::StateAttribute::PROGRAM, 0)).first) <<
-		"Shader should have been added to the material's state attributes!";
+				  osg::StateAttribute::PROGRAM, 0)).first) <<
+						  "Shader should have been added to the material's state attributes!";
 
 	/// Try setting a non-OSG Shader
 	std::shared_ptr<MockShader> nonOsgShader = std::make_shared<MockShader>();
 	EXPECT_FALSE(material->setShader(nonOsgShader)) <<
-		"Should not be able to set a shader that is not a subclass of OsgShader!";
+			"Should not be able to set a shader that is not a subclass of OsgShader!";
 	EXPECT_NE(nonOsgShader, material->getShader());
 
 	/// Clear the shader
@@ -193,6 +193,43 @@ TEST(OsgMaterialTests, NamedAccessTest)
 
 	EXPECT_TRUE(material->removeUniform(uniform1Name));
 	EXPECT_FALSE(material->hasUniform(uniform1Name));
+}
+
+TEST(OsgMaterialTests, AccessibleUniformTest)
+{
+	auto material = std::make_shared<OsgMaterial>();
+
+	std::string uniform1Name = "ossFloatUniform";
+	auto uniform1 = std::make_shared<OsgUniform<float>>(uniform1Name);
+
+
+	std::string uniform2Name = "ossVector2fUniform";
+	auto uniform2 = std::make_shared<OsgUniform<Vector2f>>(uniform2Name);
+
+	material->addUniform(uniform1);
+	material->addUniform(uniform2);
+
+	material->setValue(uniform1Name, 2.0f);
+
+	EXPECT_FLOAT_EQ(2.0, uniform1->get());
+
+	uniform1->set(4.0f);
+	EXPECT_FLOAT_EQ(4.0f, material->getValue<float>(uniform1Name));
+
+	Vector2f vector1(1.0f, 2.0f);
+	Vector2f vector2(3.0f, 4.0f);
+
+	material->setValue(uniform2Name, vector1);
+
+	EXPECT_TRUE(vector1.isApprox(uniform2->get()));
+
+	uniform2->set(vector2);
+	EXPECT_TRUE(vector2.isApprox(material->getValue<Vector2f>(uniform2Name)));
+
+	material->removeUniform(uniform1);
+
+	EXPECT_ANY_THROW(material->setValue(uniform1Name, 1.0f));
+
 }
 
 

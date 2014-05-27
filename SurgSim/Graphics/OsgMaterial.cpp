@@ -16,9 +16,15 @@
 #include "SurgSim/Graphics/OsgMaterial.h"
 
 #include "SurgSim/Graphics/OsgShader.h"
-#include "SurgSim/Graphics/OsgUniformBase.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+
+#include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/Log.h"
 
 #include <algorithm>
+#include <functional>
+
+#include <boost/any.hpp>
 
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgUniformBase;
@@ -39,13 +45,18 @@ bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 	bool didSucceed = false;
 
 	std::shared_ptr<OsgUniformBase> osgUniform = std::dynamic_pointer_cast<OsgUniformBase>(uniform);
-	if (osgUniform)
+	if (osgUniform != nullptr)
 	{
 		osgUniform->addToStateSet(m_stateSet);
 		m_uniforms.push_back(osgUniform);
+
+		// add a property to Material, that carries the uniform name and forwards to the value of the uniform
+		// This exposes the non-shared pointer to the uniform in the function table, the entry in the function
+		// table will be removed when the uniform is removed from the material. The material holds a shared
+		// pointer to the uniform, keeping the uniform alive during the lifetime of the material.
+		forwardProperty(osgUniform->getName(), *osgUniform.get(), "Value");
 		didSucceed = true;
 	}
-
 	return didSucceed;
 }
 
@@ -65,6 +76,9 @@ bool OsgMaterial::removeUniform(std::shared_ptr<UniformBase> uniform)
 			m_uniforms.erase(it);
 			didSucceed = true;
 		}
+
+		removeAccessors(osgUniform->getName());
+
 	}
 
 	return didSucceed;
@@ -80,14 +94,19 @@ std::shared_ptr<UniformBase> OsgMaterial::getUniform(unsigned int index) const
 	return m_uniforms[index];
 }
 
+
+
 std::shared_ptr<UniformBase>
 OsgMaterial::getUniform(const std::string& name) const
 {
 	std::shared_ptr<UniformBase> result;
 	auto it = std::find_if(
-		std::begin(m_uniforms),
-		std::end(m_uniforms),
-		[&name] (const std::shared_ptr<OsgUniformBase>& uniform) {return uniform->getName() == name;});
+				  std::begin(m_uniforms),
+				  std::end(m_uniforms),
+				  [&name](const std::shared_ptr<OsgUniformBase>& uniform)
+	{
+		return uniform->getName() == name;
+	});
 	if (it != std::end(m_uniforms))
 	{
 		result = *it;
@@ -99,9 +118,12 @@ bool OsgMaterial::removeUniform(const std::string& name)
 {
 	bool result = false;
 	auto it = std::find_if(
-		std::begin(m_uniforms),
-		std::end(m_uniforms),
-		[&name] (const std::shared_ptr<OsgUniformBase>& uniform) {return uniform->getName() == name;});
+				  std::begin(m_uniforms),
+				  std::end(m_uniforms),
+				  [&name](const std::shared_ptr<OsgUniformBase>& uniform)
+	{
+		return uniform->getName() == name;
+	});
 	if (it != std::end(m_uniforms))
 	{
 		result = removeUniform(*it);
@@ -145,6 +167,16 @@ void OsgMaterial::clearShader()
 		m_shader->removeFromStateSet(m_stateSet.get());
 	}
 	m_shader = nullptr;
+}
+
+bool OsgMaterial::doInitialize()
+{
+	throw std::logic_error("The method or operation is not implemented.");
+}
+
+bool OsgMaterial::doWakeUp()
+{
+	throw std::logic_error("The method or operation is not implemented.");
 }
 
 }; // namespace Graphics

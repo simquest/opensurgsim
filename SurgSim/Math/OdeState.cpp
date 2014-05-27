@@ -150,7 +150,7 @@ bool OdeState::isBoundaryCondition(unsigned int dof) const
 	return m_boundaryConditionsPerDof[dof];
 }
 
-void OdeState::applyBoundaryConditionsToVector(Vector* vector) const
+Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 {
 	SURGSIM_ASSERT(static_cast<unsigned int>(vector->size()) == getNumDof()) <<
 		"Invalid vector to apply boundary conditions on";
@@ -161,12 +161,21 @@ void OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 	{
 		(*vector)[*it] = 0.0;
 	}
+
+	return vector;
 }
 
-void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix) const
+void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasCompliance) const
 {
 	SURGSIM_ASSERT(static_cast<unsigned int>(matrix->rows()) == getNumDof() &&
 		static_cast<unsigned int>(matrix->cols()) == getNumDof()) << "Invalid matrix to apply boundary conditions on";
+
+	double complianceValue  = 0.0;
+
+	if (hasCompliance)
+	{
+		complianceValue = 1.0;
+	}
 
 	for (std::vector<unsigned int>::const_iterator it = getBoundaryConditions().cbegin();
 		it != getBoundaryConditions().cend();
@@ -174,7 +183,7 @@ void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix) const
 	{
 		(*matrix).middleRows(*it, 1).setZero();
 		(*matrix).middleCols(*it, 1).setZero();
-		(*matrix)(*it, *it) = 1.0;
+		(*matrix)(*it, *it) = complianceValue;
 	}
 }
 

@@ -13,8 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
 #include "SurgSim/Math/OdeSolverEulerImplicit.h"
@@ -41,6 +43,10 @@ DeformableRepresentation::DeformableRepresentation(const std::string& name) :
 	m_numDofPerNode(0),
 	m_integrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableRepresentation, SurgSim::Math::IntegrationScheme, IntegrationScheme,
+									  getIntegrationScheme, setIntegrationScheme);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableRepresentation, std::shared_ptr<SurgSim::Collision::Representation>,
+			 CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
 }
 
 DeformableRepresentation::~DeformableRepresentation()
@@ -151,7 +157,18 @@ void DeformableRepresentation::afterUpdate(double dt)
 	*m_finalState = *m_currentState;
 }
 
-void  DeformableRepresentation::setCollisionRepresentation(
+void DeformableRepresentation::deactivateAndReset(void)
+{
+	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
+		<< getName() << " deactivated and reset:" << std::endl
+		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
+		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
+
+	resetState();
+	setIsActive(false);
+}
+
+void DeformableRepresentation::setCollisionRepresentation(
 	std::shared_ptr<SurgSim::Collision::Representation> representation)
 {
 	if (m_collisionRepresentation != representation)

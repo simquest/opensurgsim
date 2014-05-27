@@ -1,0 +1,15 @@
+/*!
+
+\page Devices Devices
+
+The 'Devices' namespace contains classes that add physical devices (e.g., mice, keyboards, data acquisition, and robots) to simulations. Some devices are always built, while others require specific cmake options to be set (e.g., BUILD_DEVICE_SIXENSE) due to required dependencies that may not exist in all build environments.
+
+Devices with Dependencies:
+- \subpage LabJack
+- \subpage MultiAxis
+- \subpage Novint
+- \subpage Phantom
+- \subpage Sixense
+- \subpage TrackIR
+
+*/

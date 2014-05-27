@@ -1,0 +1,14 @@
+/*!
+
+\page Phantom Phantom: Haptic Devices
+
+The Geomagic haptic devices measure 6DOF positions and orientations, and can exert forces on the user's hand (some models exert 3DOF forces, others 6DOF).
+
+Supported models: Geomagic Touch is tested. Any model/configuration allowed by the OpenHaptics library (for Linux http://www.geomagic.com/en/products/open-haptics/specifications-2/specifications-2-21/  ) is expected to work.
+
+Dependencies:
+- Device drivers
+- OpenHaptics http://www.geomagic.com/en/products/open-haptics/overview/
+  - An environment variable named 3DTOUCH_BASE or OH_SDK_BASE must be set to the directory containing <tt>(include\\)HD\hd.h</tt>
+
+*/

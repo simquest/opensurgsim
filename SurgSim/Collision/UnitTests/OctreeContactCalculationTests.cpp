@@ -58,10 +58,15 @@ std::list<std::shared_ptr<Contact>> doCollision(std::shared_ptr<Shape> octree,
 		const Vector3d& shapeTrans,
 		ContactCalculation& calculator)
 {
-	std::shared_ptr<Representation> octreeRep = std::make_shared<ShapeCollisionRepresentation>(
-		"Collision Octree 0", octree, makeRigidTransform(octreeQuat, octreeTrans));
-	std::shared_ptr<Representation> shapeRep = std::make_shared<ShapeCollisionRepresentation>(
-		"Collision Capsule 0", shape, makeRigidTransform(shapeQuat, shapeTrans));
+	std::shared_ptr<ShapeCollisionRepresentation> octreeRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Octree 0");
+	octreeRep->setShape(octree);
+	octreeRep->setLocalPose(makeRigidTransform(octreeQuat, octreeTrans));
+
+	std::shared_ptr<ShapeCollisionRepresentation> shapeRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Capsule 0");
+	shapeRep->setShape(shape);
+	shapeRep->setLocalPose(makeRigidTransform(shapeQuat, shapeTrans));
 
 	// Perform collision detection.
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(octreeRep, shapeRep);

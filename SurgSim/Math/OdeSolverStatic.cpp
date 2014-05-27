@@ -50,6 +50,10 @@ void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* n
 	Vector& deltaX = newState->getPositions();
 	(*m_linearSolver)(m_systemMatrix, f, &deltaX, &m_compliance);
 
+	// Remove the boundary conditions compliance from the compliance matrix
+	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
+	currentState.applyBoundaryConditionsToMatrix(&m_compliance, false);
+
 	// Compute the new state using the static scheme:
 	newState->getPositions()  = currentState.getPositions()  + deltaX;
 	// Velocities are null in static mode (no time dependency)

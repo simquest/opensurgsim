@@ -16,6 +16,7 @@
 #include "SurgSim/Framework/TransferPropertiesBehavior.h"
 
 #include <boost/thread/lock_guard.hpp>
+#include <boost/any.hpp>
 
 namespace SurgSim
 {

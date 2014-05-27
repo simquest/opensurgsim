@@ -107,7 +107,7 @@ void RigidRepresentation::update(double dt)
 
 	// For convenience
 	RigidRepresentationParameters& p = m_currentParameters;
-	Vector3d         G = m_currentState.getPose().translation();
+	Vector3d         G = m_currentState.getPose() * p.getMassCenter();
 	Vector3d        dG = m_currentState.getLinearVelocity();
 	Matrix33d        R = m_currentState.getPose().linear();
 	Quaterniond      q = Quaterniond(R);
@@ -162,7 +162,8 @@ void RigidRepresentation::update(double dt)
 		// Normalize the quaternion to make sure we do have a rotation
 		q.normalize();
 	}
-	m_currentState.setPose(SurgSim::Math::makeRigidTransform(q, G));
+	R = q.matrix();
+	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*p.getMassCenter()));
 
 	// Compute the global inertia matrix with the current state
 	updateGlobalInertiaMatrices(m_currentState);
@@ -230,7 +231,8 @@ void RigidRepresentation::applyCorrection(
 		return;
 	}
 
-	Vector3d          G = m_currentState.getPose().translation();
+	RigidRepresentationParameters& p = m_currentParameters;
+	Vector3d          G = m_currentState.getPose() * p.getMassCenter();
 	Vector3d         dG = m_currentState.getLinearVelocity();
 	Matrix33d         R = m_currentState.getPose().linear();
 	Quaterniond       q = Quaterniond(R);
@@ -255,7 +257,8 @@ void RigidRepresentation::applyCorrection(
 		// Normalize the quaternion to make sure we do have a rotation
 		q.normalize();
 	}
-	m_currentState.setPose(SurgSim::Math::makeRigidTransform(q, G));
+	R = q.matrix();
+	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*p.getMassCenter()));
 
 	// Compute the global inertia matrix with the current state
 	updateGlobalInertiaMatrices(m_currentState);
@@ -287,7 +290,7 @@ void SurgSim::Physics::RigidRepresentation::resetParameters()
 	updateGlobalInertiaMatrices(m_currentState);
 }
 
-const Eigen::Matrix < double, 6, 6, Eigen::DontAlign | Eigen::RowMajor > &
+const Eigen::Matrix < double, 6, 6, Eigen::RowMajor > &
 SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
 {
 	return m_C;

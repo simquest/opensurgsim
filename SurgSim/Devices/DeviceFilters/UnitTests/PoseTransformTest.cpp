@@ -23,23 +23,21 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/DeviceFilters/PoseTransform.h"
 #include "SurgSim/Input/CommonDevice.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 using SurgSim::Device::PoseTransform;
 using SurgSim::Input::CommonDevice;
-using SurgSim::Input::InputConsumerInterface;
-using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Testing::MockInputOutput;
 
 namespace
 {
@@ -54,31 +52,10 @@ public:
 	{
 	}
 
-	SurgSim::DataStructures::DataGroup& doGetInitialInputData()
-	{
-		return getInitialInputData();
-	}
-
 	SurgSim::DataStructures::DataGroup& doGetInputData()
 	{
 		return getInputData();
 	}
-};
-
-class TestOutputProducerInterface : public OutputProducerInterface
-{
-public:
-	TestOutputProducerInterface()
-	{
-	}
-
-	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override
-	{
-		*outputData = m_data;
-		return true;
-	}
-
-	DataGroup m_data;
 };
 
 void TestInputDataGroup(const DataGroup& actualData, const DataGroup& expectedData)
@@ -133,14 +110,7 @@ TEST(PoseTransformDeviceFilterTest, InputDataFilter)
 	// initializeInput would be called in addInputConsumer.
 	poseTransformer->initializeInput("device", data);
 
-	// After initialization, before the first handleInput, the initial and current input data should be the same.
-	// There is no DataGroup::operator==, so we just test both DataGroups.
-	{
-		SCOPED_TRACE("Testing Initial Input Data, no transform or scaling.");
-		DataGroup actualInitialInputData = poseTransformer->doGetInitialInputData();
-		// The PoseTransform should be using identity transform and scaling if they have not been set.
-		TestInputDataGroup(actualInitialInputData, data);
-	}
+	// After initialization, before the first handleInput, the input data should be unchanged.
 	{
 		SCOPED_TRACE("Testing Input Data, no transform or scaling.");
 		// Normally the InputComponent (or another device filter) would have its handleInput called with the
@@ -183,19 +153,12 @@ TEST(PoseTransformDeviceFilterTest, InputDataFilter)
 		TestInputDataGroup(actualTransformedInputData, expectedData);
 	}
 
-	// handleInput should not change the initial input data.
-	{
-		SCOPED_TRACE("Testing Initial Input Data, after handleInput, expecting no transform or scaling.");
-		DataGroup actualInitialInputData = poseTransformer->doGetInitialInputData();
-		TestInputDataGroup(actualInitialInputData, data);
-	}
-
-	// A new initializeInput should run the new initial input data through the filter with the new parameters.
+	// A new initializeInput should run the new input data through the filter with the new parameters.
 	poseTransformer->initializeInput("device", data);
 	{
-		SCOPED_TRACE("Testing Initial Input Data, with transform or scaling.");
-		DataGroup actualInitialInputData = poseTransformer->doGetInitialInputData();
-		TestInputDataGroup(actualInitialInputData, expectedData);
+		SCOPED_TRACE("Testing Input Data after initializeInput, with transform or scaling.");
+		DataGroup actualInputData = poseTransformer->doGetInputData();
+		TestInputDataGroup(actualInputData, expectedData);
 	}
 }
 
@@ -246,9 +209,9 @@ TEST(PoseTransformDeviceFilterTest, OutputDataFilter)
 
 	// Normally the data would be set by a behavior, then the output device scaffold would call requestOutput on the
 	// filter, which would call requestOutput on the OutputComponent.
-	auto testOutputProducer = std::make_shared<TestOutputProducerInterface>();
-	testOutputProducer->m_data = data;
-	poseTransformer->setOutputProducer(testOutputProducer);
+	auto producer = std::make_shared<MockInputOutput>();
+	producer->m_output.setValue(data);
+	poseTransformer->setOutputProducer(producer);
 
 	RigidTransform3d transform = makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d::UnitY().eval()),
 		Vector3d(11.0, 12.0, 13.0));

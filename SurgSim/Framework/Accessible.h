@@ -37,17 +37,19 @@ class Accessible
 {
 public:
 
+	/// Default Constructor
+	Accessible();
+
+	/// Destructor
+	~Accessible();
+
 	typedef std::function<boost::any(void)> GetterType;
 	typedef std::function<void (boost::any)> SetterType;
 
 	typedef std::function<YAML::Node(void)> EncoderType;
 	typedef std::function<void(const YAML::Node*)> DecoderType;
 
-	/// Retrieves the value with the name by executing the getter if it is found.
-	/// \throws SurgSim::Framework::AssertionFailure if the property cannot be found
-	/// \param	name	The name of the property.
-	/// \return	The value of the property if the getter was found
-	boost::any getValue(const std::string& name) const;
+
 
 	/// Retrieves the value with the name by executing the getter if it is found and tries to convert
 	/// it to the given type.
@@ -57,6 +59,13 @@ public:
 	/// \return	The value of the property if the getter was found
 	template <class T>
 	T getValue(const std::string& name) const;
+
+	/// Retrieves the value with the name by executing the getter if it is found.
+	/// \throws SurgSim::Framework::AssertionFailure if the property cannot be found
+	/// \param	name	The name of the property.
+	/// \return	The value of the property if the getter was found
+	boost::any getValue(const std::string& name) const;
+
 
 	/// Retrieves the value with the name by executing the getter if it is found, and converts it to
 	/// the type of the output parameter. This does not throw.
@@ -102,6 +111,20 @@ public:
 	/// \param	setter	The setter.
 	void setAccessors(const std::string& name, GetterType getter, SetterType setter);
 
+	/// Removes all the accessors (getter and setter) for a given property
+	/// \param name The name of the property
+	void removeAccessors(const std::string& name);
+
+	/// Adds a property with the given name that uses the targets accessors, in effect forwarding the value
+	/// to the target
+	/// \note This will copy the appropriate calls into the local function table of this accessible, in effect
+	///       exposing a pointer to the target, if the target goes out of scope, the behavior is undefined
+	/// \throws SurgSim::Framework::AssertionFailure if the target does not contain the property named in this call.
+	/// \param name The name of the new property
+	/// \param target The instance that provides the actual property
+	/// \param targetProperty The name of the property that should be used.
+	void forwardProperty(const std::string& name, const Accessible& target, const std::string& targetProperty);
+
 	/// Sets the functions used to convert data from and to a YAML::Node. Will throw and exception
 	/// if the data type that is passed to YAML cannot be converted into a YAML::Node
 	/// \param name The name of the property.
@@ -123,6 +146,12 @@ public:
 
 private:
 
+	/// @{
+	/// Prevent default copy construction and default assignment
+	Accessible(const Accessible& other) /*= delete*/;
+	Accessible& operator=(const Accessible& other) /*= delete*/;
+	/// @}
+
 	/// Private struct to keep the map under control
 	struct Functors
 	{
@@ -142,6 +171,10 @@ struct Property
 	std::weak_ptr<Accessible> accessible;
 	std::string name;
 };
+
+template <>
+boost::any Accessible::getValue(const std::string& name) const;
+
 
 /// Wrap boost::any_cast to use in std::bind, for some reason it does not work by itself. This function will
 /// throw an exception if the cast does not work, this usually means that the types do not match up at all.

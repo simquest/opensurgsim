@@ -17,8 +17,8 @@
 #define SURGSIM_DATASTRUCTURES_INDEXDIRECTORY_H
 
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 namespace SurgSim
 {

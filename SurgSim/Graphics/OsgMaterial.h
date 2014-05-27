@@ -97,6 +97,10 @@ public:
 		return m_stateSet;
 	}
 
+	virtual bool doInitialize();
+
+	virtual bool doWakeUp();
+
 
 
 private:

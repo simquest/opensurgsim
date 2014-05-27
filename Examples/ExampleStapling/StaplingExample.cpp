@@ -50,6 +50,7 @@
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
@@ -91,6 +92,7 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Input::InputComponent;
 using SurgSim::Input::InputManager;
+using SurgSim::Physics::DeformableCollisionRepresentation;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::RigidRepresentationParameters;
@@ -138,6 +140,15 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	*graphicsTriangleMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*loadMesh(filename));
 	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
 
+	// Load the surface triangle mesh of the finite element model
+	auto meshSurface = loadMesh(filename);
+
+	// Create the collision mesh for the surface of the finite element model
+	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
+	collisionRepresentation->setMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>(*meshSurface));
+	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
+	sceneElement->addComponent(collisionRepresentation);
+
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	sceneElement->addComponent(
 		std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
@@ -180,12 +191,10 @@ std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& na
 std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName,
 														const std::string& deviceName)
 {
-	std::vector<std::string> paths;
-	paths.push_back("Data/Geometry");
-	ApplicationData data(paths);
+	ApplicationData data("config.txt");
 
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader(data.findFile("stapler_collision.ply"));
+	PlyReader reader(data.findFile("Geometry/stapler_collision.ply"));
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
@@ -253,9 +262,11 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> virtualTeeth;
 	for (auto it = virtualTeethShapes.begin(); it != virtualTeethShapes.end(); ++it, ++i)
 	{
-		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision
-			= std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
-				  "VirtualToothCollision" + boost::to_string(i), *it, RigidTransform3d::Identity());
+		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision =
+			std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
+			"VirtualToothCollision" + boost::to_string(i));
+		virtualToothCollision->setShape(*it);
+		virtualToothCollision->setLocalPose(RigidTransform3d::Identity());
 
 		virtualTeeth[i] = virtualToothCollision;
 		sceneElement->addComponent(virtualToothCollision);
@@ -275,13 +286,11 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 {
-	std::vector<std::string> paths;
-	paths.push_back("Data/Geometry");
-	ApplicationData data(paths);
+	ApplicationData data("config.txt");
 
 	// File "arm_collision.ply" contains collision meshes for both upper arm and forearm.
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader(data.findFile("arm_collision.ply"));
+	PlyReader reader(data.findFile("Geometry/arm_collision.ply"));
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
@@ -418,6 +427,10 @@ int main(int argc, char* argv[])
 	physicsManager->addExcludedCollisionPair(
 		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
 		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision1"));
+
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(wound, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(arm, "Collision"));
 
 	runtime->execute();
 	return 0;

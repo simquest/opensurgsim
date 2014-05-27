@@ -18,12 +18,19 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
-#include "SurgSim/Physics/FemRepresentation.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+class TriangleMesh;
+}
 
 namespace Physics
 {
@@ -38,6 +45,8 @@ public:
 
 	/// Destructor
 	virtual ~Fem3DRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
 
 	/// Sets the name of the file to be loaded
 	/// \param filename The name of the file to be loaded
@@ -65,7 +74,11 @@ public:
 	/// \param deltaVelocity The block of a vector containing the correction to be applied to the velocity
 	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
+	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location) override;
+
 protected:
+	virtual bool doWakeUp() override;
+
 	/// Interface to be implemented by derived classes
 	/// \return True if component is initialized successfully; otherwise, false.
 	virtual bool doInitialize() override;
@@ -76,15 +89,22 @@ protected:
 	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 		const SurgSim::Math::RigidTransform3d& transform) override;
 
-	/// Deactivate and call resetState
-	void deactivateAndReset(void);
-
 private:
+	/// Produces a mapping from the provided mesh's triangle ids to this object's fem element ids. The mesh's vertices
+	/// must be identical to this object's fem element nodes.
+	/// \param mesh The mesh used to produce the mapping.
+	/// \return A map from the mesh's triangle ids to this object's fem elements.
+	std::unordered_map<size_t, size_t> createTriangleIdToElementIdMap(
+		const SurgSim::DataStructures::TriangleMesh& mesh);
+
 	/// Filename for loading the fem3d representation.
 	std::string m_filename;
 
 	/// Whether the file should be loaded or not.
 	bool m_doLoadFile;
+
+	/// Mapping from collision triangle's id to fem element id.
+	std::unordered_map<size_t, size_t> m_triangleIdToElementIdMap;
 };
 
 } // namespace Physics
