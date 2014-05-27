@@ -17,9 +17,10 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem3DElementCorotationalTetrahedron.h"
 
-using SurgSim::Math::getSubVector;
-using SurgSim::Math::addSubVector;
 using SurgSim::Math::addSubMatrix;
+using SurgSim::Math::addSubVector;
+using SurgSim::Math::getSubMatrix;
+using SurgSim::Math::getSubVector;
 
 namespace SurgSim
 {
@@ -85,8 +86,8 @@ void Fem3DElementCorotationalTetrahedron::addStiffness(const SurgSim::Math::OdeS
 }
 
 void Fem3DElementCorotationalTetrahedron::addMatVec(const SurgSim::Math::OdeState& state,
-										double alphaM, double alphaD, double alphaK,
-										const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result)
+													double alphaM, double alphaD, double alphaK,
+													const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result)
 {
 	if (alphaM == 0.0 && alphaK == 0.0)
 	{
@@ -113,16 +114,24 @@ void Fem3DElementCorotationalTetrahedron::addMatVec(const SurgSim::Math::OdeStat
 
 bool Fem3DElementCorotationalTetrahedron::update(const SurgSim::Math::OdeState& state)
 {
+	using SurgSim::Math::makeSkewSymmetricMatrix;
+	using SurgSim::Math::skew;
+	using SurgSim::Math::Vector3d;
+
 	// The update does two things:
 	// 1) Recompute the element's rotation
 	// 2) Update the element's stiffness matrix based on the new rotation
 
+	// 1) Recompute the element's rotation
+	Eigen::Matrix<double, 12, 1> x;
+	getSubVector(state.getPositions(), m_nodeIds, 3, &x);
+
 	// Matrix P is the matrix of the deformed tetrahedron points in homogenous coordinates.
 	SurgSim::Math::Matrix44d P;
-	P.col(0).segment<3>(0) = state.getPosition(m_nodeIds[0]);
-	P.col(1).segment<3>(0) = state.getPosition(m_nodeIds[1]);
-	P.col(2).segment<3>(0) = state.getPosition(m_nodeIds[2]);
-	P.col(3).segment<3>(0) = state.getPosition(m_nodeIds[3]);
+	P.col(0).segment<3>(0) = getSubVector(x, 0, 3);
+	P.col(1).segment<3>(0) = getSubVector(x, 1, 3);
+	P.col(2).segment<3>(0) = getSubVector(x, 2, 3);
+	P.col(3).segment<3>(0) = getSubVector(x, 3, 3);
 	P.row(3).setOnes();
 
 	// Matrix V is the matrix of the undeformed tetrahedron points in homogenous coordinates.
@@ -145,20 +154,107 @@ bool Fem3DElementCorotationalTetrahedron::update(const SurgSim::Math::OdeState& 
 		return false;
 	}
 
-	// Build a 12x12 rotation matrix, useful of the stiffness matrix computation
+	// Build a 12x12 rotation matrix, duplicating the 3x3 rotation on the diagonal blocks
 	Eigen::Matrix<double, 12, 12> R12x12 = Eigen::Matrix<double, 12, 12>::Zero();
 	for (size_t nodeId = 0; nodeId < 4; ++nodeId)
 	{
-		R12x12.block<3, 3>(3 * nodeId, 3 * nodeId) = m_rotation;
+		getSubMatrix(R12x12, nodeId, nodeId, 3, 3) = m_rotation;
 	}
 
-	// Compute the rotated stiffness matrix K = R.Ke.R^t
-	// c.f. "Interactive Virtual Materials", Muller, Gross. Graphics Interface 2004
-	m_corotationalStiffnessMatrix = R12x12 * m_K * R12x12.transpose();
+	// 2) Update the element's stiffness matrix based on the new rotation
+	// Compute the exact stiffness matrix K = R.Ke.R^t + [dR/dxl.Ke.(R^t.x-x0]_l + [R.Ke.(dR/dxl)^T.x]_l
+	// c.f. "Exact Corotational Linear FEM Stiffness Matrix", Jernej Barbic. Technical Report USC 2012.
+	// with
+	//   xl the l^th component of the dof vector x
+	//   [v]_l the l^th column of a 12x12 matrix defined by the column vector v
+
+	// Here is the rotated element stiffness matrix part
+	Eigen::Matrix<double, 12, 12> RK = R12x12 * m_K;
+	m_corotationalStiffnessMatrix = RK * R12x12.transpose();
+
+	// Now we compute some useful matrices for the next step
+	double determinant;
+	bool invertible;
+	SurgSim::Math::Matrix33d G, Ginv;
+	G = (scaling.trace() * SurgSim::Math::Matrix33d::Identity() - scaling) * m_rotation.transpose();
+	G.computeInverseAndDetWithCheck(Ginv, determinant, invertible);
+	if (!invertible)
+	{
+		SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
+			"Corotational element has a singular G matrix";
+		return false;
+	}
+
+	// dR/dx = dR/dF . dF/dx with dF/dx constant over time.
+	// Here, we compute the various dR/d(F[i][j]).
+	std::array<Vector3d, 3> e = {{Vector3d::UnitX(), Vector3d::UnitY(), Vector3d::UnitZ()}};
+	std::array<std::array<SurgSim::Math::Matrix33d, 3>, 3> dRdF;
+	for (size_t i = 0; i < 3; ++i)
+	{
+		for (size_t j = 0; j < 3; ++j)
+		{
+			// Compute wij by solving G.wij = 2.skew(R^t.ei.ej^t)
+			Vector3d wij = Ginv * 2.0 * skew((m_rotation.transpose() * (e[i] * e[j].transpose())).eval());
+
+			// Compute dR/dFij = [wij].R
+			dRdF[i][j] = makeSkewSymmetricMatrix(wij) * m_rotation;
+		}
+	}
+
+	// dR/dx = dR/dF . dF/dx
+	// Let define the following notation to follow the construction in the paper:
+	// A3x3 being a 3x3 matrix, aLaBarbic(A3x3) = (A00 A01 A02 A10 A11 A12 A20 A21 A22)
+	// dR/dF becomes a single 9x9 matrix where the 3x3 matrix dR/dFij is stored aLaBarbic as the (3*i+j)th row
+	// dF/dx becomes a single 9x12 matrix of the form (n1 0 0 n2 0 0 n3 0 0 n4 0 0)
+	//                                                (0 n1 0 0 n2 0 0 n3 0 0 n4 0)
+	//                                                (0 0 n1 0 0 n2 0 0 n3 0 0 n4)
+	// ni being the first 3 entries of the i^th row of V^1 (m_Vinverse)
+	//
+	// dR/dx = (aLaBarbic(dRdF00)).(n1x 0 0 n2x 0 0 n3x 0 0 n4x 0 0)
+	//         (aLaBarbic(dRdF01)) (n1y 0 0 n2y 0 0 n3y 0 0 n4y 0 0)
+	//         (       ...       ) (              ...              )
+	//         (aLaBarbic(dRdF22)) (0 0 n1z 0 0 n2z 0 0 n3z 0 0 n4z)
+	// dR/dxl is a 3x3 matrix stored as the l^th column of the above resulting matrix
+	std::array<SurgSim::Math::Matrix33d, 12> dRdX;
+	for(int nodeId = 0; nodeId < 4; ++nodeId)
+	{
+		Vector3d ni(m_Vinverse.row(nodeId).segment<3>(0));
+
+		for(int axis = 0; axis < 3; ++axis)
+		{
+			size_t dofId = 3 * nodeId + axis;
+
+			// Let's define the 3x3 matrix dR/d(x[dofId])
+			for (int i = 0; i < 3; ++i)
+			{
+				for (int j = 0; j < 3; ++j)
+				{
+					dRdX[dofId](i, j) = dRdF[i][j].row(axis).dot(ni);
+				}
+			}
+		}
+	}
+
+	// Now that we have dR/dx, we can add the 2 extra terms to the stiffness matrix:
+	// K += [dR/dxl.Ke.(R^t.x-x0]_l + [R.Ke.(dR/dxl)^T.x]_l
+	// with
+	//   xl the l^th component of the dof vector x
+	//   [v]_l the l^th column of a 12x12 matrix defined by the column vector v
+	Eigen::Matrix<double, 12, 1> KTimesRx_x0 = m_K * (R12x12.transpose() * x - m_x0);
+	Eigen::Matrix<double, 12, 12> dRdxl12x12 = Eigen::Matrix<double, 12, 12>::Zero();
+	for (size_t dofId = 0; dofId < 12; ++dofId)
+	{
+		for (size_t nodeId = 0; nodeId < 4; ++nodeId)
+		{
+			getSubMatrix(dRdxl12x12, nodeId, nodeId, 3, 3) = dRdX[dofId];
+		}
+
+		m_corotationalStiffnessMatrix.col(dofId) += dRdxl12x12 * KTimesRx_x0 + (RK * dRdxl12x12.transpose()) * x;
+	}
 
 	return true;
 }
 
-} // namespace Physics
+}; // namespace Physics
 
-} // namespace SurgSim
+}; // namespace SurgSim
