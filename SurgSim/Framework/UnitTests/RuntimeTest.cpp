@@ -28,6 +28,10 @@ TEST(RuntimeTest, Constructor)
 	EXPECT_NO_THROW({std::shared_ptr<Runtime> runtime(new Runtime());});
 	std::shared_ptr<Runtime> runtime(new Runtime());
 	EXPECT_NE(nullptr, runtime->getScene());
+
+	EXPECT_NO_THROW(std::make_shared<Runtime>());
+	EXPECT_NO_THROW(std::make_shared<Runtime>("config.txt"));
+	EXPECT_THROW(std::make_shared<Runtime>("Non-exist-file"), SurgSim::Framework::AssertionFailure);
 }
 
 TEST(RuntimeTest, AddManager)

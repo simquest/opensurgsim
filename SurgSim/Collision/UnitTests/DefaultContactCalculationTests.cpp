@@ -26,12 +26,13 @@ TEST(DefaultContactCalculationTests, UnitTests)
 {
 	std::shared_ptr<SurgSim::Math::Shape> sphereShape = std::make_shared<SurgSim::Math::SphereShape>(1.0);
 
-	std::shared_ptr<Representation> rep0 = std::make_shared<ShapeCollisionRepresentation>(
-			"TestSphere 1", sphereShape,
-			SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), Vector3d(3.0,0.0,0.0)));
-	std::shared_ptr<Representation> rep1 = std::make_shared<ShapeCollisionRepresentation>(
-			"TestSphere 2", sphereShape,
-			SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), Vector3d(0.5,0.0,0.0)));
+	std::shared_ptr<ShapeCollisionRepresentation> rep0 = std::make_shared<ShapeCollisionRepresentation>("TestSphere 1");
+	rep0->setShape(sphereShape);
+	rep0->setLocalPose(SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), Vector3d(3.0,0.0,0.0)));
+
+	std::shared_ptr<ShapeCollisionRepresentation> rep1 = std::make_shared<ShapeCollisionRepresentation>("TestSphere 2");
+	rep1->setShape(sphereShape);
+	rep1->setLocalPose(SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), Vector3d(0.5,0.0,0.0)));
 
 	std::shared_ptr<CollisionPair> pair01 = std::make_shared<CollisionPair>(rep0, rep1);
 

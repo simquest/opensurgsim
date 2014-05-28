@@ -68,8 +68,7 @@ void PoseTransform::initializeInput(const std::string& device, const DataGroup& 
 	m_linearVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
 	m_angularVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
 
-	inputFilter(inputData, &getInitialInputData());
-	getInputData() = getInitialInputData();
+	inputFilter(inputData, &getInputData());
 }
 
 void PoseTransform::handleInput(const std::string& device, const DataGroup& inputData)

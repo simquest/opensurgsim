@@ -213,6 +213,56 @@ TEST_F(FemRepresentationTests, BeforeUpdateTest)
 	ASSERT_NO_THROW(fem.beforeUpdate(m_dt));
 }
 
+TEST_F(FemRepresentationTests, AfterUpdateTest)
+{
+	{
+		SCOPED_TRACE("Valid FemElements");
+		MockFemRepresentation fem("name");
+		std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		fem.addFemElement(element);
+
+		std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
+		initialState->setNumDof(fem.getNumDofPerNode(), 8);
+		fem.setInitialState(initialState);
+
+		fem.initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem.wakeUp();
+
+		ASSERT_NO_THROW(fem.beforeUpdate(m_dt));
+		ASSERT_NO_THROW(fem.update(m_dt));
+		// After update should backup the currentState into finalState and update all FemElement
+		ASSERT_NO_THROW(fem.afterUpdate(m_dt));
+		ASSERT_FALSE(*fem.getFinalState() == *fem.getInitialState());
+		ASSERT_TRUE(fem.isActive());
+	}
+	{
+		SCOPED_TRACE("Invalid FemElements");
+		MockFemRepresentation fem("name");
+		std::shared_ptr<InvalidMockFemElement> element = std::make_shared<InvalidMockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		fem.addFemElement(element);
+
+		std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
+		initialState->setNumDof(fem.getNumDofPerNode(), 8);
+		fem.setInitialState(initialState);
+
+		fem.initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem.wakeUp();
+
+		ASSERT_NO_THROW(fem.beforeUpdate(m_dt));
+		ASSERT_NO_THROW(fem.update(m_dt));
+		// After update should backup the currentState into finalState and update all FemElement
+		ASSERT_NO_THROW(fem.afterUpdate(m_dt));
+		ASSERT_TRUE(*fem.getFinalState() == *fem.getInitialState());
+		ASSERT_FALSE(fem.isActive());
+	}
+}
+
 TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 {
 	using SurgSim::Math::Vector3d;

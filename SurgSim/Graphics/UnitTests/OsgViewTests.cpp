@@ -41,15 +41,13 @@ TEST(OsgViewTests, InitTest)
 
 	EXPECT_EQ(nullptr, view->getCamera());
 
-	int x, y;
-	view->getPosition(&x, &y);
-	EXPECT_EQ(0, x);
-	EXPECT_EQ(0, y);
+	std::array<int, 2> position = view->getPosition();
+	EXPECT_EQ(0, position[0]);
+	EXPECT_EQ(0, position[1]);
 
-	int width, height;
-	view->getDimensions(&width, &height);
-	EXPECT_EQ(800, width);
-	EXPECT_EQ(600, height);
+	std::array<int, 2> dimensions = view->getDimensions();
+	EXPECT_EQ(1024, dimensions[0]);
+	EXPECT_EQ(768, dimensions[1]);
 
 	EXPECT_TRUE(view->isWindowBorderEnabled());
 }
@@ -62,28 +60,22 @@ TEST(OsgViewTests, PositionAndDimensionsTest)
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> distribution(0, 1000);
 
-	int x = distribution(generator);
-	int y = distribution(generator);
-	int width = distribution(generator);
-	int height = distribution(generator);
+	std::array<int, 2> position = {distribution(generator), distribution(generator)};
+	std::array<int, 2> dimensions = {distribution(generator), distribution(generator)};
 
 	/// Set position and check that it set correctly
-	EXPECT_TRUE(view->setPosition(x, y));
+	view->setPosition(position);
 
-	int testX, testY;
-	view->getPosition(&testX, &testY);
+	auto test = view->getPosition();
 
-	EXPECT_EQ(x, testX);
-	EXPECT_EQ(y, testY);
+	EXPECT_EQ(position, test);
 
 	/// Set dimensions and check that it set correctly
-	EXPECT_TRUE(view->setDimensions(width, height));
+	view->setDimensions(dimensions);
 
-	int testWidth, testHeight;
-	view->getDimensions(&testWidth, &testHeight);
+	test = view->getDimensions();
 
-	EXPECT_EQ(width, testWidth);
-	EXPECT_EQ(height, testHeight);
+	EXPECT_EQ(dimensions, test);
 
 	/// The window border should be enabled initially
 	EXPECT_TRUE(view->isWindowBorderEnabled());
@@ -99,13 +91,13 @@ TEST(OsgViewTests, CameraTest)
 	std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("test camera");
 
 	/// Set the camera and check that it set correctly
-	EXPECT_TRUE(view->setCamera(camera));
+	EXPECT_NO_THROW(view->setCamera(camera));
 	EXPECT_EQ(camera, view->getCamera());
 
 	std::shared_ptr<Camera> mockCamera = std::make_shared<MockCamera>("non-osg camera");
 
 	/// Try to set a camera that does not derive from OsgCamera
-	EXPECT_FALSE(view->setCamera(mockCamera));
+	EXPECT_ANY_THROW(view->setCamera(mockCamera));
 	EXPECT_EQ(camera, view->getCamera());
 }
 

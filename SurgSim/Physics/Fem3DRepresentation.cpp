@@ -271,17 +271,6 @@ void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
 }
 
-void Fem3DRepresentation::deactivateAndReset(void)
-{
-	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-		<< getName() << " deactivated and reset:" << std::endl
-		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
-		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
-
-	resetState();
-	setIsActive(false);
-}
-
 } // namespace Physics
 
 } // namespace SurgSim
