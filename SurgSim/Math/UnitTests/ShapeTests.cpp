@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Shape.h"
@@ -402,6 +403,7 @@ TEST_F(ShapeTest, DoubleSidedPlaneShape)
 
 TEST_F(ShapeTest, OctreeSerializationTest)
 {
+	auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 	const std::string fileName = "OctreeShapeData/staple.vox";
 
 	{
@@ -433,6 +435,7 @@ TEST_F(ShapeTest, OctreeSerializationTest)
 		ASSERT_NO_THROW(newOctreeShape = std::dynamic_pointer_cast<OctreeShape>(node.as<std::shared_ptr<Shape>>()));
 		EXPECT_EQ("SurgSim::Math::OctreeShape", newOctreeShape->getClassName());
 		EXPECT_EQ(fileName, newOctreeShape->getFileName());
+		EXPECT_TRUE(newOctreeShape->initialize(applicationData));
 	}
 }
 
@@ -454,10 +457,12 @@ TEST_F(ShapeTest, OctreeShape)
 	}
 
 	{
+		auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 		const std::string fileName = "OctreeShapeData/staple.vox";
 		OctreeShape octree;
 		EXPECT_NO_THROW(octree.setRootNode(node));
 		EXPECT_NO_THROW(octree.setFileName(fileName));
+		EXPECT_TRUE(octree.initialize(data));
 
 		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
 		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, octree.getType());
