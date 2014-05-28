@@ -55,6 +55,15 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 			calculateContact(*it);
 		++it;
 	}
+
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> representations =
+		state->getCollisionRepresentations();
+	for (auto representation = std::begin(representations); representation != std::end(representations);
+		++representation)
+	{
+		(*representation)->publishCollisions();
+	}
+
 	return result;
 }
 
@@ -97,7 +106,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 
 	if (representations.size() > 1)
 	{
-		for(auto it = std::begin(representations); it != std::end(representations); ++it)
+		for (auto it = std::begin(representations); it != std::end(representations); ++it)
 		{
 			(*it)->clearCollisions();
 		}
@@ -140,7 +149,7 @@ void DcdCollision::setDcdContactInTable(std::shared_ptr<SurgSim::Collision::Cont
 {
 	std::pair<int,int> shapeTypes = dcdContact->getShapeTypes();
 	m_contactCalculations[shapeTypes.first][shapeTypes.second] = dcdContact;
-	if(shapeTypes.first != shapeTypes.second)
+	if (shapeTypes.first != shapeTypes.second)
 	{
 		m_contactCalculations[shapeTypes.second][shapeTypes.first] = dcdContact;
 	}

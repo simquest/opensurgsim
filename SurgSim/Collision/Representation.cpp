@@ -52,6 +52,10 @@ void Representation::clearCollisions()
 
 void Representation::update(const double& dt)
 {
+}
+
+void Representation::publishCollisions()
+{
 	m_writeCollisions.publish();
 }
 

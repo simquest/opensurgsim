@@ -31,6 +31,7 @@ using SurgSim::Collision::ContactMapType;
 using SurgSim::Collision::Location;
 using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::ReadAccessor;
+using SurgSim::DataStructures::SafeReadAccessor;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::PlaneShape;
@@ -124,9 +125,11 @@ TEST_F(RepresentationTest, CollisionTest)
 {
 	ReadAccessor<ContactMapType> planeCollisions(planeRep->getCollisions());
 	ReadAccessor<ContactMapType> sphereCollisions(sphereRep->getCollisions());
+	SafeReadAccessor<ContactMapType> threadSafeCollisions(planeRep->getCollisions());
 
 	EXPECT_TRUE(planeCollisions->empty());
 	EXPECT_TRUE(sphereCollisions->empty());
+	EXPECT_TRUE(threadSafeCollisions->empty());
 
 	std::shared_ptr<Contact> dummyContact =
 		std::make_shared<Contact>(0.0, Vector3d::Zero(), Vector3d::Zero(), std::make_pair(Location(), Location()));
@@ -152,6 +155,13 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_NE(planeCollisions->end(), planeSpherePair);
 	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeSphereContacts = planeSpherePair->second;
 	EXPECT_EQ(dummyContact, planeSphereContacts.front());
+
+	// The SafeReadAccessor to the collision map is buffered, so it should still be empty before the publish.
+	EXPECT_TRUE(threadSafeCollisions->empty());
+
+	// After the publish the threadsafe collision map should be the same as from the ReadAccessor.
+	planeRep->publishCollisions();
+	EXPECT_EQ(*planeCollisions, *threadSafeCollisions);
 
 	sphereRep->clearCollisions();
 	sphereRep->update(0.0);

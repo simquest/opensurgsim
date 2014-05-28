@@ -87,9 +87,12 @@ public:
 	/// Clear all the collisions.
 	void clearCollisions();
 
-	/// Update the representation, publishes the buffered contacts.
+	/// Update the representation.
 	/// \param dt the time passed from the last update.
 	virtual void update(const double& dt);
+
+	/// Publish the buffered collision map.
+	virtual void publishCollisions();
 
 protected:
 	/// A map which associates a list of contacts with each collision representation.
