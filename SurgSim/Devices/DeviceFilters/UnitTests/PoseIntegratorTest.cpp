@@ -157,6 +157,7 @@ TEST(PoseIntegratorDeviceFilterTest, AddVelocityDataEntries)
 TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 {
 	auto integrator = std::make_shared<MockPoseIntegrator>("PoseIntegratorFilter");
+	EXPECT_NO_THROW(integrator->setReset(SurgSim::DataStructures::Names::BUTTON_1));
 	ASSERT_TRUE(integrator->initialize());
 
 	DataGroupBuilder builder;
@@ -164,6 +165,7 @@ TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 	builder.addVector(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
 	builder.addVector(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
 	builder.addBoolean("extraData");
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_1);
 
 	DataGroup data = builder.createData();
 	const double rotationAngle = 0.1;
@@ -178,6 +180,8 @@ TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 	// Normally the input device's initial input data would be set by the constructor or scaffold, then
 	// initializeInput would be called in addInputConsumer.
 	integrator->initializeInput("device", data);
+
+	EXPECT_ANY_THROW(integrator->setReset(SurgSim::DataStructures::Names::BUTTON_2));
 
 	// After initialization, before the first handleInput, the initial and current input data should be the same.
 	// There is no DataGroup::operator==, so we just test both DataGroups.
@@ -233,6 +237,14 @@ TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 		SCOPED_TRACE("Testing Input Data, after HandleInput.");
 		TestInputDataGroup(actualTransformedInputData, expectedData);
 	}
+
+	// Reset the pose
+	data.booleans().set(SurgSim::DataStructures::Names::BUTTON_1, true);
+	integrator->handleInput("device", data);
+	const DataGroup resetInputData = integrator->doGetInputData();
+	RigidTransform3d actualPose;
+	ASSERT_TRUE(resetInputData.poses().get(SurgSim::DataStructures::Names::POSE, &actualPose));
+	EXPECT_TRUE(actualPose.isApprox(RigidTransform3d::Identity(), ERROR_EPSILON));
 }
 
 TEST(PoseIntegratorDeviceFilterTest, OutputDataFilter)
