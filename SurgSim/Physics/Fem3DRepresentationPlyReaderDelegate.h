@@ -23,6 +23,12 @@
 
 namespace SurgSim
 {
+
+namespace Math
+{
+class OdeState;
+};
+
 namespace Physics
 {
 
