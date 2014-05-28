@@ -17,8 +17,6 @@
 #include "SurgSim/Framework/Log.h"
 
 #include <algorithm>
-#include <iostream>
-#include <regex>
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -138,6 +136,12 @@ std::vector<std::string> ApplicationData::getPaths() const
 bool ApplicationData::isValidFilename(const std::string& fileName) const
 {
 	bool result = true;
+
+	if (fileName.empty())
+	{
+		result = false;
+	}
+
 	size_t index = fileName.find("\\");
 	if (index != std::string::npos)
 	{
@@ -145,18 +149,6 @@ bool ApplicationData::isValidFilename(const std::string& fileName) const
 			" Backslashes encountered in the path, this path cannot be used " << fileName <<
 			" to be useful it needs to be rewritten using '/'.";
 		result = false;
-	}
-	return result;
-}
-
-std::string ApplicationData::makeValid(const std::string& fileName) const
-{
-	std::string result = fileName;
-	size_t index = result.find("\\");
-	while (index != std::string::npos)
-	{
-		result.replace(index,1, "/");
-		index = result.find("\\");
 	}
 	return result;
 }
