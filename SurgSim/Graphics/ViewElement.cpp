@@ -36,7 +36,10 @@ ViewElement::~ViewElement()
 bool ViewElement::setView(std::shared_ptr<View> view)
 {
 	m_view = view;
-	m_view->setCamera(m_camera);
+	if (m_camera != nullptr)
+	{
+		m_view->setCamera(m_camera);
+	}
 	return true;
 }
 

@@ -146,9 +146,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedPlaneSceneElement(c
 std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	const std::string& name, std::string plyFilename, double scale = 1.0)
 {
-	std::vector<std::string> paths;
-	paths.push_back("Data");
-	SurgSim::Framework::ApplicationData data(paths);
+	const SurgSim::Framework::ApplicationData data("config.txt");
 
 	std::string foundFilename = data.findFile(plyFilename);
 	SURGSIM_ASSERT(!foundFilename.empty()) << "Ply file '" << plyFilename << "' could not be located";

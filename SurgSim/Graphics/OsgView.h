@@ -20,13 +20,30 @@
 
 #include <osgViewer/Viewer>
 
+namespace osgViewer
+{
+class DisplaySettings;
+}
+
 namespace SurgSim
 {
+
+namespace Input
+{
+class CommonDevice;
+}
+
+namespace Device
+{
+class KeyboardDevice;
+class MouseDevice;
+}
 
 namespace Graphics
 {
 
 class OsgCamera;
+class OsgTrackballZoomManipulator;
 
 /// OSG-based implementation of graphics view class.
 ///
@@ -44,48 +61,59 @@ public:
 	/// \param	name	Name of the view
 	explicit OsgView(const std::string& name);
 
-	/// Set the position of this view
-	/// \param	x,y	Position on the screen (in pixels)
-	/// \return	True if it succeeded, false if it failed
-	virtual bool setPosition(int x, int y);
+	/// Destructor
+	~OsgView();
 
-	/// Get the position of this view
-	/// \param[out]	x,y	Position on the screen (in pixels)
-	virtual void getPosition(int* x, int* y) const;
 
-	/// Set the dimensions of this view
-	/// \param	width,height	Dimensions on the screen (in pixels)
-	/// \return	True if it succeeded, false if it failed
-	virtual bool setDimensions(int width, int height);
+	virtual void setPosition(const std::array<int, 2>& position) override;
 
-	/// Set the dimensions of this view
-	/// \param[out]	width,height	Dimensions on the screen (in pixels)
-	virtual void getDimensions(int* width, int* height) const;
+	virtual std::array<int, 2> getPosition() const override;
 
-	/// Sets whether the view window has a border
-	/// \param	enabled	True to enable the border around the window; false for no border
-	virtual void setWindowBorderEnabled(bool enabled);
-	/// Returns whether the view window has a border
-	/// \return	True to enable the border around the window; false for no border
-	virtual bool isWindowBorderEnabled() const;
+	virtual void setDimensions(const std::array<int, 2>& dimensions) override;
+
+	virtual std::array<int, 2> getDimensions() const override;
+
+	virtual void setWindowBorderEnabled(bool enabled) override;
+
+	virtual bool isWindowBorderEnabled() const override;
 
 	/// Sets the camera which provides the viewpoint in the scene
 	/// Only allows OsgCamera components, any other will not be set and it will return false.
 	/// \param	camera	Camera whose image will be shown in this view
 	/// \return	True if it succeeded, false if it failed
-	virtual bool setCamera(std::shared_ptr<Camera> camera);
+	virtual void setCamera(std::shared_ptr<SurgSim::Framework::Component> camera) override;
 
-	/// Updates the view
-	/// On the first update, the view window is setup.
-	/// If the position or dimensions have changed, the window rectangle is updated.
-	/// \param	dt	The time in seconds of the preceding timestep.
-	virtual void update(double dt);
+	/// Enables a camera manipulator, implemented via a trackball, this is a temporary solution as it uses
+	/// the OSG input events rather than reading from the OpenSurgSim input.
+	/// \param val whether to enable the manipulator or not.
+	void enableManipulator(bool val);
 
-	/// Returns the OSG view which performs the actual work involved in setting up and rendering to a window
-	osg::ref_ptr<osgViewer::View> getOsgView() const
-	{
-		return m_view;
-	}
+	/// As the camera is not accessible from here and as it cannot be controlled from the outside
+	/// any more we let the user set the parameters from here.
+	/// \param	position	The position of the camera.
+	/// \param	lookat  	The location the camera looks at.
+	void setManipulatorParameters(SurgSim::Math::Vector3d position, SurgSim::Math::Vector3d lookat);
+
+	/// Return the keyboard to be used with this view.
+	/// \return A keyboard device
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice();
+
+	/// Turn on/off the keyboard device to be used.
+	/// \param val Indicate whether or not to use keyboard device
+	virtual void enableKeyboardDevice(bool val);
+
+	/// Return the mouse to be used with this view.
+	/// \return A mouse device
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice();
+
+	/// Turn on/off the mouse device to be used.
+	/// \param val Indicate whether or not to use mouse device
+	virtual	void enableMouseDevice(bool val);
+
+	virtual void update(double dt) override;
+
+	/// \return the OSG view which performs the actual work involved in setting up and rendering to a window
+	osg::ref_ptr<osgViewer::View> getOsgView() const;
 
 protected:
 	/// Initialize the view
@@ -94,12 +122,11 @@ protected:
 
 	/// Wake up the view
 	virtual bool doWakeUp() override;
-
 private:
 	/// Position of the view on the screen (in pixels)
-	int m_x, m_y;
+	std::array<int, 2> m_position;
 	/// Dimensions of the view on the screen (in pixels)
-	int m_width, m_height;
+	std::array<int, 2> m_dimensions;
 	/// Whether the view window has a border
 	bool m_isWindowBorderEnabled;
 
@@ -111,6 +138,18 @@ private:
 
 	/// OSG view which performs the actual work involved in setting up and rendering to a window
 	osg::ref_ptr<osgViewer::View> m_view;
+
+	osg::ref_ptr<OsgTrackballZoomManipulator> m_manipulator;
+	SurgSim::Math::Vector3d m_manipulatorPosition;
+	SurgSim::Math::Vector3d m_manipulatorLookat;
+
+	/// Indicate if a keyboard device is enabled
+	bool m_keyboardEnabled;
+	std::shared_ptr<SurgSim::Device::KeyboardDevice> m_keyboardDevice;
+
+	/// Indicate if a mouse device is enabled
+	bool m_mouseEnabled;
+	std::shared_ptr<SurgSim::Device::MouseDevice> m_mouseDevice;
 };
 
 };  // namespace Graphics
