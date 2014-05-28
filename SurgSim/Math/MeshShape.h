@@ -21,9 +21,9 @@
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
-#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
 
@@ -51,7 +51,7 @@ namespace Math
 /// \note * Deformable  object, the mesh will be updated, but the geometric properties will not be used.
 ///
 /// \sa SurfaceMeshShape
-class MeshShape : public Shape
+class MeshShape : public Shape, public SurgSim::Framework::Asset
 {
 public:
 	/// Constructor
@@ -92,18 +92,6 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
-	/// Set loading filename
-	/// \param fileName	The filename to load
-	/// \note The mesh will be loaded right after the file name is set,
-	///       if 'fileName' indicates a file containing a valid mesh.
-	/// \note If the valid file contains an empty mesh, i.e. no vertex is specified in that file,
-	///       an empty mesh will be held by this mesh shape.
-	void setFileName(const std::string& fileName);
-
-	/// Get the file name of the external file which contains the triangle mesh.
-	/// \return File name of the external file which contains the triangle mesh.
-	std::string getFileName() const;
-
 	/// Set the object's global pose
 	/// \param pose the rigid transform to apply
 	void setPose(const SurgSim::Math::RigidTransform3d &pose);
@@ -114,6 +102,8 @@ public:
 	/// Get the AabbTree
 	/// \return The object's associated AabbTree
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree();
+
+	virtual bool doInitialize(const std::string& fileName) override;
 
 private:
 	/// Compute useful volume integrals based on the triangle mesh, which
@@ -137,9 +127,6 @@ private:
 
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
-
-	/// File name of the external file which contains the triangle mesh.
-	std::string m_fileName;
 };
 
 }; // Math
