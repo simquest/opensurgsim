@@ -157,6 +157,23 @@ void DeformableRepresentation::afterUpdate(double dt)
 	*m_finalState = *m_currentState;
 }
 
+void DeformableRepresentation::applyCorrection(double dt,
+											   const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
+{
+	if (!isActive())
+	{
+		return;
+	}
+
+	m_currentState->getPositions() += deltaVelocity * dt;
+	m_currentState->getVelocities() += deltaVelocity;
+
+	if (!m_currentState->isValid())
+	{
+		deactivateAndReset();
+	}
+}
+
 void DeformableRepresentation::deactivateAndReset(void)
 {
 	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)

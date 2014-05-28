@@ -86,6 +86,8 @@ public:
 
 	virtual void afterUpdate(double dt) override;
 
+	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
+
 	/// Deactivate and call resetState
 	void deactivateAndReset(void);
 

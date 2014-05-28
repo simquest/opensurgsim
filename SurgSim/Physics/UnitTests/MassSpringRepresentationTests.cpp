@@ -253,40 +253,6 @@ TEST_F(MassSpringRepresentationTests, AfterUpdateTest)
 	}
 }
 
-TEST_F(MassSpringRepresentationTests, ApplyCorrectionTest)
-{
-	const double dt = 1e-3;
-
-	MassSpringRepresentation m("MassSpring");
-	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
-	initialState->setNumDof(m.getNumDofPerNode(), 3);
-	m.setInitialState(initialState);
-
-	SurgSim::Math::Vector dv;
-	dv.resize(m.getNumDof());
-	for (unsigned int i = 0; i < m.getNumDof(); i++)
-	{
-		dv(i) = static_cast<double>(i);
-	}
-
-	Eigen::VectorXd previousX = m.getCurrentState()->getPositions();
-	Eigen::VectorXd previousV = m.getCurrentState()->getVelocities();
-
-	// Test with a valid state
-	m.applyCorrection(dt, dv.segment(0, m.getNumDof()));
-	Eigen::VectorXd nextX = m.getCurrentState()->getPositions();
-	Eigen::VectorXd nextV = m.getCurrentState()->getVelocities();
-
-	EXPECT_TRUE(nextX.isApprox(previousX + dv * dt, epsilon));
-	EXPECT_TRUE(nextV.isApprox(previousV + dv, epsilon));
-
-	// Test with an invalid state
-	dv(0) = std::numeric_limits<double>::infinity();
-	EXPECT_TRUE(m.isActive());
-	m.applyCorrection(dt, dv.segment(0, m.getNumDof()));
-	EXPECT_FALSE(m.isActive());
-}
-
 TEST_F(MassSpringRepresentationTests, TransformInitialStateTest)
 {
 	using SurgSim::Math::Vector;

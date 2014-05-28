@@ -301,6 +301,40 @@ TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 	EXPECT_TRUE(*getCurrentState()    == *getFinalState());
 }
 
+TEST_F(DeformableRepresentationTest, ApplyCorrectionTest)
+{
+	const double dt = 1e-3;
+
+	MockDeformableRepresentation object;
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
+	initialState->setNumDof(object.getNumDofPerNode(), 3);
+	object.setInitialState(initialState);
+
+	SurgSim::Math::Vector dv;
+	dv.resize(object.getNumDof());
+	for (unsigned int i = 0; i < object.getNumDof(); i++)
+	{
+		dv(i) = static_cast<double>(i);
+	}
+
+	Eigen::VectorXd previousX = object.getCurrentState()->getPositions();
+	Eigen::VectorXd previousV = object.getCurrentState()->getVelocities();
+
+	// Test with a valid state
+	object.applyCorrection(dt, dv.segment(0, object.getNumDof()));
+	Eigen::VectorXd nextX = object.getCurrentState()->getPositions();
+	Eigen::VectorXd nextV = object.getCurrentState()->getVelocities();
+
+	EXPECT_TRUE(nextX.isApprox(previousX + dv * dt, epsilon));
+	EXPECT_TRUE(nextV.isApprox(previousV + dv, epsilon));
+
+	// Test with an invalid state
+	dv(0) = std::numeric_limits<double>::infinity();
+	EXPECT_TRUE(object.isActive());
+	object.applyCorrection(dt, dv.segment(0, object.getNumDof()));
+	EXPECT_FALSE(object.isActive());
+}
+
 TEST_F(DeformableRepresentationTest, SetCollisionRepresentationTest)
 {
 	// setCollisionRepresentation requires the object to be a shared_ptr (using getShared())
