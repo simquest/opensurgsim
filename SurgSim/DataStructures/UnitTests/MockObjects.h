@@ -16,9 +16,9 @@
 #ifndef SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
 
-#include "SurgSim/DataStructures/Vertices.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/TetrahedronMesh.h"
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Math/Vector.h"
 
 #include <array>
