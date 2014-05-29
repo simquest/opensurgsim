@@ -51,7 +51,7 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 	const double massDensity = 5000.0;
 	// Geometrical properties
 	const double length = 1.0;
-	const double radius = 0.8e-1;
+	const double radius = 8e-2;
 	const double thickness = 3e-2;
 	// Number of cross-sections and their discretization in nodes
 	const size_t numSections = 7;

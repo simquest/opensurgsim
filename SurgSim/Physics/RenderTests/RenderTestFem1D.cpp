@@ -125,7 +125,7 @@ TEST_F(RenderTests, VisualTestFem1D)
 
 	scene->addSceneElement(
 		createFem1D("Euler Explicit",                                           // name
-					makeRigidTranslation(Vector3d(0.0, 0.5, 0.0)),              // graphics pose (rot., trans.)
+					makeRigidTranslation(Vector3d(0.0, 0.5, 0.0)),              // graphics pose
 					Vector4d(1, 0, 0, 1),                                       // color (r, g, b, a)
 					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER));   // technique to update object
 
