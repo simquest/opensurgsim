@@ -22,6 +22,8 @@
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
+using SurgSim::Math::Vector3d;
+
 namespace SurgSim
 {
 
@@ -57,7 +59,7 @@ void RigidRepresentationContact::doBuild(double dt,
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE ? 1.0 : -1.0);
 	const Eigen::Matrix<double, 6,6, Eigen::RowMajor>& C = rigid->getComplianceMatrix();
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
-	const SurgSim::Math::Vector3d& n = contactData.getNormal();
+	const Vector3d& n = contactData.getNormal();
 	const double d = contactData.getDistance();
 
 	// FRICTIONLESS CONTACT in a LCP
@@ -73,8 +75,8 @@ void RigidRepresentationContact::doBuild(double dt,
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
 	// b = n.P(t) + d             -> P(t) evaluated after free motion
 
-	SurgSim::Math::Vector3d globalPosition = localization->calculatePosition();
-	SurgSim::Math::Vector3d GP = globalPosition - rigid->getCurrentState().getPose().translation();
+	Vector3d globalPosition = localization->calculatePosition();
+	Vector3d GP = globalPosition - rigid->getCurrentState().getPose() * rigid->getCurrentParameters().getMassCenter();
 
 	// Fill up b with the constraint equation...
 	double violation = n.dot(globalPosition) + d;
