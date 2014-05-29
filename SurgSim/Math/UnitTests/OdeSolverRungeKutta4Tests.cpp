@@ -49,6 +49,64 @@ TEST(OdeSolverRungeKutta4, ConstructorTest)
 	}
 }
 
+namespace
+{
+struct RungeKuttaState
+{
+	RungeKuttaState(){}
+	RungeKuttaState(const Vector& p, const Vector& v) : position(p), velocity(v){}
+	Vector position;
+	Vector velocity;
+};
+
+struct RungeKuttaDerivedState
+{
+	RungeKuttaDerivedState(){}
+	RungeKuttaDerivedState(const Vector& v, const Vector& a) : velocity(v), acceleration(a){}
+	Vector velocity;
+	Vector acceleration;
+};
+
+void integrateRK4(double dt, const MassPoint& m, const RungeKuttaState& yn, RungeKuttaState* yn_plus_1)
+{
+	RungeKuttaDerivedState k1, k2, k3, k4;
+
+	// Problem to solve is
+	// m.a = m.g - c.v which is an ode of order 2 that can be reduced to order 1 as following:
+	// y' = (x)' = (  v  ) = f(t, y)
+	//      (v)  = (m.g/m - c.v/m)
+	// In terms of (x), f(t, (x)) = (v)
+	//             (v)       (v)    (g - c.v/m)
+
+	// Runge Kutta 4 computes y(n+1) = y(n) + 1/6.dt.(k1 + 2 * k2 + 2 * k3 + k4)
+	// with k1 = f(t(n)       , y(n)            )
+	// with k2 = f(t(n) + dt/2, y(n) + k1 * dt/2)
+	// with k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
+	// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
+
+	// 1st evaluation k1 = f(t(n)       , y(n)            )
+	k1.velocity = yn.velocity;
+	k1.acceleration = m.m_gravity - m.m_viscosity * yn.velocity / m.m_mass;
+
+	// 2nd evaluation k2 = f(t(n) + dt/2, y(n) + k1 * dt/2)
+	k2.velocity = yn.velocity + k1.acceleration * dt / 2.0;
+	k2.acceleration = m.m_gravity - m.m_viscosity * (yn.velocity + k1.acceleration * dt / 2.0) / m.m_mass;
+
+	// 3rd evaluation k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
+	k3.velocity = yn.velocity + k2.acceleration * dt / 2.0;
+	k3.acceleration = m.m_gravity - m.m_viscosity * (yn.velocity + k2.acceleration * dt / 2.0) / m.m_mass;
+
+	// 4th evaluation k4 = f(t(n) + dt  , y(n) + k3 * dt  )
+	k4.velocity = yn.velocity + k3.acceleration * dt;
+	k4.acceleration = m.m_gravity - m.m_viscosity * (yn.velocity + k3.acceleration * dt) / m.m_mass;
+
+	yn_plus_1->position = yn.position + dt / 6.0 *
+		(k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
+	yn_plus_1->velocity = yn.velocity + dt / 6.0 *
+		(k1.acceleration + k4.acceleration + 2.0 * (k2.acceleration + k3.acceleration));
+}
+};
+
 template<class T>
 void doSolveTest()
 {
@@ -112,128 +170,68 @@ void doSolveTest()
 
 	EXPECT_GT(deltaWithoutViscosity.norm(), deltaWithViscosity.norm());
 
-	struct RungeKuttaState
-	{
-		RungeKuttaState(){}
-		RungeKuttaState(const Vector& p, const Vector& v) : position(p), velocity(v){}
-		Vector position;
-		Vector velocity;
-	};
-	struct RungeKuttaDerivedState
-	{
-		RungeKuttaDerivedState(){}
-		RungeKuttaDerivedState(const Vector& v, const Vector& a) : velocity(v), acceleration(a){}
-		Vector velocity;
-		Vector acceleration;
-	};
 	// Test Runge Kutta 4 algorithm itself (without viscosity)
+	// Test 2 iterations because Linear solvers have a different algorithm on the 1st pass from the following passes.
 	{
-		MassPoint m;
-		MassPointState currentState, newState;
+		SCOPED_TRACE("RK4 without viscosity");
+
+		MassPoint m(0.0);
+		MassPointState currentState, newState, newState2;
 		currentState.getPositions().setLinSpaced(1.0, 3.0);
 		currentState.getVelocities().setConstant(1.0);
 
-		// Problem to solve is
-		// m.a = m.g which is an ode of order 2 that can be reduced to order 1 as following:
-		// y' = (x)' = (  v  ) = f(t, y)
-		//      (v)  = (m.g/m)
-		// In terms of (x), f(t, (x)) = (v)
-		//             (v)       (v)    (g = constant)
-
-		// Runge Kutta 4 computes y(n+1) = y(n) + 1/6.dt.(k1 + 2 * k2 + 2 * k3 + k4)
-		// with k1 = f(t(n)       , y(n)            )
-		// with k2 = f(t(n) + dt/2, y(n) + k1 * dt/2)
-		// with k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
-		// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
-
-		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
-		RungeKuttaDerivedState k1, k2, k3, k4;
-		RungeKuttaState yn_plus_1;
-
-		// 1st evaluation k1 = f(t(n)       , y(n)            )
-		k1.velocity = yn.velocity;
-		k1.acceleration = m.m_gravity;
-
-		// 2nd evaluation k2 = f(t(n) + dt/2, y(n) + k1 * dt/2)
-		k2.velocity = yn.velocity + k1.acceleration * dt / 2.0;
-		k2.acceleration = m.m_gravity;
-
-		// 3rd evaluation k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
-		k3.velocity = yn.velocity + k2.acceleration * dt / 2.0;
-		k3.acceleration = m.m_gravity;
-
-		// 4th evaluation k4 = f(t(n) + dt  , y(n) + k3 * dt  )
-		k4.velocity = yn.velocity + k3.acceleration * dt;
-		k4.acceleration = m.m_gravity;
-
-		yn_plus_1.position = yn.position + dt / 6.0 * (k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
-		yn_plus_1.velocity = yn.velocity + dt / 6.0 * (k1.acceleration + k4.acceleration +
-													   2.0 * (k2.acceleration + k3.acceleration));
-
 		T solver(&m);
 
-		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
+		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
+		RungeKuttaState yn_plus_1, yn_plus_2;
 
 		EXPECT_TRUE(currentState.getPositions().isApprox(yn.position));
 		EXPECT_TRUE(currentState.getVelocities().isApprox(yn.velocity));
 
+		// 1st time step
+		integrateRK4(dt, m, yn, &yn_plus_1);
+		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
+
 		EXPECT_TRUE(newState.getPositions().isApprox(yn_plus_1.position));
 		EXPECT_TRUE(newState.getVelocities().isApprox(yn_plus_1.velocity));
+
+		// 2nd time step
+		integrateRK4(dt, m, yn_plus_1, &yn_plus_2);
+		ASSERT_NO_THROW({solver.solve(dt, newState, &newState2);});
+
+		EXPECT_TRUE(newState2.getPositions().isApprox(yn_plus_2.position));
+		EXPECT_TRUE(newState2.getVelocities().isApprox(yn_plus_2.velocity));
 	}
 
 	// Test Runge Kutta 4 algorithm itself (with viscosity)
+	// Test 2 iterations because Linear solvers have a different algorithm on the 1st pass from the following passes.
 	{
+		SCOPED_TRACE("RK4 with viscosityof 0.1");
+
 		MassPoint m(0.1);
-		MassPointState currentState, newState;
+		MassPointState currentState, newState, newState2;
 		currentState.getPositions().setLinSpaced(1.0, 3.0);
 		currentState.getVelocities().setConstant(1.0);
 
-		// Problem to solve is
-		// m.a = m.g which is an ode of order 2 that can be reduced to order 1 as following:
-		// y' = (x)' = (  v  ) = f(t, y)
-		//      (v)  = (m.g/m - 0.1.v/m)
-		// In terms of (x), f(t, (x)) = (v)
-		//             (v)       (v)    (g - 0.1.v/m)
-
-		// Runge Kutta 4 computes y(n+1) = y(n) + 1/6.dt.(k1 + 2 * k2 + 2 * k3 + k4)
-		// with k1 = f(t(n)       , y(n)            )
-		// with k2 = f(t(n) + dt/2, y(n) + k1 * dt/2)
-		// with k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
-		// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
-
-		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
-		RungeKuttaDerivedState k1, k2, k3, k4;
-		RungeKuttaState yn_plus_1;
-
-		// 1st evaluation k1 = f(t(n)       , y(n)            )
-		k1.velocity = yn.velocity;
-		k1.acceleration = m.m_gravity - 0.1 * yn.velocity / m.m_mass;
-
-		// 2nd evaluation k2 = f(t(n) + dt/2, y(n) + k1 * dt/2)
-		k2.velocity = yn.velocity + k1.acceleration * dt / 2.0;
-		k2.acceleration = m.m_gravity - 0.1 * (yn.velocity + k1.acceleration * dt / 2.0) / m.m_mass;
-
-		// 3rd evaluation k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
-		k3.velocity = yn.velocity + k2.acceleration * dt / 2.0;
-		k3.acceleration = m.m_gravity - 0.1 * (yn.velocity + k2.acceleration * dt / 2.0) / m.m_mass;
-
-		// 4th evaluation k4 = f(t(n) + dt  , y(n) + k3 * dt  )
-		k4.velocity = yn.velocity + k3.acceleration * dt;
-		k4.acceleration = m.m_gravity - 0.1 * (yn.velocity + k3.acceleration * dt) / m.m_mass;
-
-		yn_plus_1.position = yn.position + dt / 6.0 * (k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
-		yn_plus_1.velocity = yn.velocity + dt / 6.0 * (k1.acceleration + k4.acceleration +
-													   2.0 * (k2.acceleration + k3.acceleration));
-
 		T solver(&m);
 
-		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
+		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
+		RungeKuttaState yn_plus_1, yn_plus_2;
 
 		EXPECT_TRUE(currentState.getPositions().isApprox(yn.position));
 		EXPECT_TRUE(currentState.getVelocities().isApprox(yn.velocity));
 
+		// 1st time step
+		integrateRK4(dt, m, yn, &yn_plus_1);
+		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
 		EXPECT_TRUE(newState.getPositions().isApprox(yn_plus_1.position));
 		EXPECT_TRUE(newState.getVelocities().isApprox(yn_plus_1.velocity));
+
+		// 2nd time step
+		integrateRK4(dt, m, yn_plus_1, &yn_plus_2);
+		ASSERT_NO_THROW({solver.solve(dt, newState, &newState2);});
+		EXPECT_TRUE(newState2.getPositions().isApprox(yn_plus_2.position));
+		EXPECT_TRUE(newState2.getVelocities().isApprox(yn_plus_2.velocity));
 	}
 }
 

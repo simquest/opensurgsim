@@ -146,9 +146,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedPlaneSceneElement(c
 std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	const std::string& name, std::string plyFilename, double scale = 1.0)
 {
-	std::vector<std::string> paths;
-	paths.push_back("Data");
-	SurgSim::Framework::ApplicationData data(paths);
+	const SurgSim::Framework::ApplicationData data("config.txt");
 
 	std::string foundFilename = data.findFile(plyFilename);
 	SURGSIM_ASSERT(!foundFilename.empty()) << "Ply file '" << plyFilename << "' could not be located";
@@ -178,7 +176,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	// Graphic representation of the physics model
 	std::shared_ptr<OsgMeshRepresentation> osgRepresentation =
 		std::make_shared<OsgMeshRepresentation>("OsgRepresentation");
-	*osgRepresentation->getMesh() = SurgSim::Graphics::Mesh(*mesh);
+	osgRepresentation->setFilename(foundFilename);
 	osgRepresentation->setDrawAsWireFrame(true);
 
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);

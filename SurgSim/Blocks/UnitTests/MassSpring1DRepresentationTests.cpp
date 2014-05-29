@@ -35,6 +35,14 @@ TEST(MassSpring1DRepresentationTests, init1DTest)
 
 	std::array<Vector3d, 2> extremities = {{ Vector3d(1.1, 1.2, 1.3), Vector3d(2.2, 2.3, 2.4) }};
 	unsigned int numNodesPerDim[1] = {10};
+
+	std::vector<Vector3d> nodes;
+	for (unsigned int nodeId = 0; nodeId < numNodesPerDim[0]; ++nodeId)
+	{
+		double abscissa = static_cast<double>(nodeId) / static_cast<double>(numNodesPerDim[0] - 1);
+		nodes.push_back(extremities[0] + abscissa * (extremities[1] - extremities[0]));
+	}
+
 	std::vector<unsigned int> boundaryConditions;
 	double totalMass = 1.1;
 	double stiffnessStretching = 2.2;
@@ -43,7 +51,7 @@ TEST(MassSpring1DRepresentationTests, init1DTest)
 	double dampingBending = 5.5;
 	boundaryConditions.push_back(0);
 	boundaryConditions.push_back(numNodesPerDim[0] - 1);
-	m.init1D(extremities, numNodesPerDim, boundaryConditions,
+	m.init1D(nodes, boundaryConditions,
 		totalMass, stiffnessStretching, dampingStretching, stiffnessBending, dampingBending);
 	m.initialize(std::make_shared<SurgSim::Framework::Runtime>());
 	m.wakeUp();

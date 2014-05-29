@@ -15,56 +15,105 @@
 
 #include "SurgSim/Graphics/OsgView.h"
 
-#include "SurgSim/Graphics/OsgCamera.h"
-#include <osgViewer/ViewerEventHandlers>
 
-using SurgSim::Graphics::OsgCamera;
-using SurgSim::Graphics::OsgView;
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+#include "SurgSim/Devices/Keyboard/OsgKeyboardHandler.h"
+#include "SurgSim/Devices/Mouse/MouseDevice.h"
+#include "SurgSim/Devices/Mouse/OsgMouseHandler.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgConversions.h"
+#include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
+
+#include <osgViewer/ViewerEventHandlers>
+#include <osg/DisplaySettings>
+
+namespace
+{
+
+// Mapping from OSS values to OSG values, the order here needs to match the numerical value in
+// SurgSim::Graphics::View::StereoMode
+const osg::DisplaySettings::StereoMode StereoModeEnums[SurgSim::Graphics::View::STEREO_MODE_COUNT] =
+{
+	osg::DisplaySettings::QUAD_BUFFER,
+	osg::DisplaySettings::ANAGLYPHIC,
+	osg::DisplaySettings::HORIZONTAL_SPLIT,
+	osg::DisplaySettings::VERTICAL_SPLIT,
+	osg::DisplaySettings::LEFT_EYE,
+	osg::DisplaySettings::RIGHT_EYE,
+	osg::DisplaySettings::HORIZONTAL_INTERLACE,
+	osg::DisplaySettings::VERTICAL_INTERLACE,
+	osg::DisplaySettings::CHECKERBOARD
+};
+
+// Mapping from OSS values to OSG values, the order here needs to match the numerical value in
+// SurgSim::Graphics::View::DisplayType
+const osg::DisplaySettings::DisplayType DisplayTypeEnums[SurgSim::Graphics::View::DISPLAY_TYPE_COUNT] =
+{
+	osg::DisplaySettings::MONITOR,
+	osg::DisplaySettings::HEAD_MOUNTED_DISPLAY
+};
+
+
+}
+
+namespace SurgSim
+{
+namespace Graphics
+{
 
 OsgView::OsgView(const std::string& name) : View(name),
-	m_x(0), m_y(0),
-	m_width(800), m_height(600),
 	m_isWindowBorderEnabled(true),
 	m_isFirstUpdate(true),
 	m_areWindowSettingsDirty(false),
-	m_view(new osgViewer::View())
+	m_view(new osgViewer::View()),
+	m_keyboardEnabled(false),
+	m_mouseEnabled(false)
 {
-	/// Don't allow the default camera here, let that be handled at a higher level.
+	m_position[0] = 0;
+	m_position[1] = 0;
+	m_dimensions[0] = 1024;
+	m_dimensions[1] = 768;
+
+	/// Clear the OSG default camera, let that be handled at a higher level.
 	m_view->setCamera(nullptr);
+
+
 }
 
-bool OsgView::setPosition(int x, int y)
+
+OsgView::~OsgView()
 {
-	if (x != m_x || y != m_y)
+	// Clean up the handler callbacks
+	enableKeyboardDevice(false);
+	enableMouseDevice(false);
+}
+
+void OsgView::setPosition(const std::array<int, 2>& position)
+{
+	if (position != m_position)
 	{
+		m_position = position;
 		m_areWindowSettingsDirty = true;
 	}
-	m_x = x;
-	m_y = y;
-	return true;
 }
 
-void OsgView::getPosition(int* x, int* y) const
+std::array<int, 2> OsgView::getPosition() const
 {
-	*x = m_x;
-	*y = m_y;
+	return m_position;
 }
 
-bool OsgView::setDimensions(int width, int height)
+void OsgView::setDimensions(const std::array<int, 2>& dimensions)
 {
-	if (width != m_width || height != m_height)
+	if (m_dimensions != dimensions)
 	{
 		m_areWindowSettingsDirty = true;
+		m_dimensions = dimensions;
 	}
-	m_width = width;
-	m_height = height;
-	return true;
 }
 
-void OsgView::getDimensions(int* width, int* height) const
+std::array<int, 2> OsgView::getDimensions() const
 {
-	*width = m_width;
-	*height = m_height;
+	return m_dimensions;
 }
 
 void OsgView::setWindowBorderEnabled(bool enabled)
@@ -78,18 +127,13 @@ bool OsgView::isWindowBorderEnabled() const
 	return m_isWindowBorderEnabled;
 }
 
-bool OsgView::setCamera(std::shared_ptr<SurgSim::Graphics::Camera> camera)
+void OsgView::setCamera(std::shared_ptr<SurgSim::Framework::Component> camera)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::dynamic_pointer_cast<OsgCamera>(camera);
-	if (osgCamera != nullptr && View::setCamera(camera))
-	{
-		m_view->setCamera(osgCamera->getOsgCamera());
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	SURGSIM_ASSERT(osgCamera != nullptr) << "OsgView can only take an OsgCamera.";
+
+	View::setCamera(camera);
+	m_view->setCamera(osgCamera->getOsgCamera());
 }
 
 void OsgView::update(double dt)
@@ -104,7 +148,7 @@ void OsgView::update(double dt)
 			if (window)
 			{
 				window->setWindowDecoration(m_isWindowBorderEnabled);
-				window->setWindowRectangle(m_x, m_y, m_width, m_height);
+				window->setWindowRectangle(m_position[0], m_position[1], m_dimensions[0], m_dimensions[1]);
 				m_areWindowSettingsDirty = false;
 			}
 		}
@@ -118,7 +162,170 @@ bool OsgView::doInitialize()
 
 bool OsgView::doWakeUp()
 {
-	m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
+	osg::ref_ptr<osg::DisplaySettings> displaySettings = new osg::DisplaySettings;
+	displaySettings->setDefaults();
+
+	if (isStereo())
+	{
+		displaySettings->setStereo(isStereo());
+		displaySettings->setStereoMode(StereoModeEnums[getStereoMode()]);
+		displaySettings->setDisplayType(DisplayTypeEnums[getDisplayType()]);
+		displaySettings->setEyeSeparation(static_cast<float>(getEyeSeparation()));
+		displaySettings->setScreenDistance(static_cast<float>(getScreenDistance()));
+		displaySettings->setScreenWidth(static_cast<float>(getScreenWidth()));
+		displaySettings->setScreenHeight(static_cast<float>(getScreenHeight()));
+	}
+
+
+	m_view->setDisplaySettings(displaySettings);
+
+	osg::ref_ptr<osgViewer::ViewConfig> viewConfig;
+
+//  #refactor
+//  HS-2014-may-14 Linux is stuck at OSG 3.2.0-rc1, this is not implemented there, they are waiting for
+//  3.2.1 to move forward, implement this once linux has caught up
+// 	if (isFullScreen())
+// 	{
+// 		viewConfig = new osgViewer::SingleScreen(getTargetScreen());
+// 	}
+// 	else
+// 	{
+// 		viewConfig = new osgViewer::SingleWindow(m_x, m_y, m_width, m_height, getTargetScreen());
+// 	}
+//	m_view->apply(viewConfig);
+
+	if (isFullScreen())
+	{
+		m_view->setUpViewOnSingleScreen(getTargetScreen());
+	}
+	else
+	{
+		m_view->setUpViewInWindow(m_position[0], m_position[1], m_dimensions[0], m_dimensions[1], getTargetScreen());
+	}
+
 	m_view->addEventHandler(new osgViewer::StatsHandler);
+
 	return true;
+}
+
+
+osg::ref_ptr<osgViewer::View> SurgSim::Graphics::OsgView::getOsgView() const
+{
+	return m_view;
+}
+
+void SurgSim::Graphics::OsgView::enableManipulator(bool val)
+{
+	if (m_manipulator == nullptr)
+	{
+		m_manipulator = new SurgSim::Graphics::OsgTrackballZoomManipulator();
+		// Set a default position
+		m_manipulator->setTransformation(
+			SurgSim::Graphics::toOsg(m_manipulatorPosition),
+			SurgSim::Graphics::toOsg(m_manipulatorLookat),
+			osg::Vec3d(0.0f, 1.0f, 0.0f));
+	}
+
+	if (val)
+	{
+		getOsgView()->setCameraManipulator(m_manipulator);
+	}
+	else
+	{
+		getOsgView()->setCameraManipulator(nullptr);
+	}
+}
+
+void SurgSim::Graphics::OsgView::enableKeyboardDevice(bool val)
+{
+	// Early return if device is already turned on/off.
+	if (val == m_keyboardEnabled)
+	{
+		return;
+	}
+
+	std::shared_ptr<SurgSim::Input::CommonDevice> keyboardDevice = getKeyboardDevice();
+	osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandle =
+		std::static_pointer_cast<SurgSim::Device::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
+	if (val)
+	{
+		getOsgView()->addEventHandler(keyboardHandle);
+		m_keyboardEnabled = true;
+	}
+	else
+	{
+		getOsgView()->removeEventHandler(keyboardHandle);
+		m_keyboardEnabled = false;
+	}
+}
+
+
+std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getKeyboardDevice()
+{
+	if (m_keyboardDevice == nullptr)
+	{
+		m_keyboardDevice = std::make_shared<SurgSim::Device::KeyboardDevice>("Keyboard");
+		if (!m_keyboardDevice->isInitialized())
+		{
+			m_keyboardDevice->initialize();
+		}
+	}
+	return m_keyboardDevice;
+}
+
+void SurgSim::Graphics::OsgView::enableMouseDevice(bool val)
+{
+	// Early return if device is already turned on/off.
+	if (val == m_mouseEnabled)
+	{
+		return;
+	}
+
+	std::shared_ptr<SurgSim::Input::CommonDevice> mouseDevice = getMouseDevice();
+	osg::ref_ptr<osgGA::GUIEventHandler> mouseHandler =
+		std::static_pointer_cast<SurgSim::Device::MouseDevice>(mouseDevice)->getMouseHandler();
+	if (val)
+	{
+		getOsgView()->addEventHandler(mouseHandler);
+		m_mouseEnabled = true;
+	}
+	else
+	{
+		getOsgView()->removeEventHandler(mouseHandler);
+		m_mouseEnabled = false;
+	}
+}
+
+
+std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getMouseDevice()
+{
+	if (m_mouseDevice == nullptr)
+	{
+		m_mouseDevice = std::make_shared<SurgSim::Device::MouseDevice>("Mouse");
+		if (!m_mouseDevice->isInitialized())
+		{
+			m_mouseDevice->initialize();
+		}
+	}
+	return m_mouseDevice;
+}
+
+
+void SurgSim::Graphics::OsgView::setManipulatorParameters(
+	SurgSim::Math::Vector3d position,
+	SurgSim::Math::Vector3d lookat)
+{
+	m_manipulatorPosition = position;
+	m_manipulatorLookat = lookat;
+
+	if (m_manipulator != nullptr)
+	{
+		m_manipulator->setTransformation(
+			SurgSim::Graphics::toOsg(m_manipulatorPosition),
+			SurgSim::Graphics::toOsg(m_manipulatorLookat),
+			osg::Vec3d(0.0f, 1.0f, 0.0f));
+	}
+}
+
+}
 }

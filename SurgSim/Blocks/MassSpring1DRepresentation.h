@@ -38,17 +38,15 @@ public:
 	{
 	}
 
-	/// Initializes a 1D model
-	/// \param extremities Array of 2 positions forming the extremities of the 1D model
-	/// \param numNodesPerDim The number of nodes to be created for each dimension (here 1)
+	/// Initializes a 1D model from a given list of nodes
+	/// \param nodes List of nodes to define the 1D model with
 	/// \param nodeBoundaryConditions The list of all nodeId being boundary conditions (fixed node)
 	/// \param totalMass The total mass of the mass spring (evenly spread out on the masses)
 	/// \param stiffnessStretching, dampingStretching The spring param  for all stretching springs (edges)
 	/// \param stiffnessBending, dampingBending The spring param for all bending springs (edges)
 	/// \note Stretching springs are connecting neighbors, bending springs are connecting 1 node
 	/// \note to its 2nd degree neighbors, creating a bending force around the middle node.
-	void init1D(const std::array<SurgSim::Math::Vector3d, 2> extremities,
-		unsigned int numNodesPerDim[1],
+	void init1D(const std::vector<SurgSim::Math::Vector3d> nodes,
 		std::vector<unsigned int> nodeBoundaryConditions,
 		double totalMass,
 		double stiffnessStretching, double dampingStretching,

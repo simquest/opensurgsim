@@ -53,21 +53,10 @@ bool OsgViewElement::setView(std::shared_ptr<SurgSim::Graphics::View> view)
 	}
 	else
 	{
-		// Disable keyboard and mouse of current view
-		enableKeyboardDevice(false);
-		enableMouseDevice(false);
-
 		std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(view);
-		if (osgView && ViewElement::setView(view))
+		if (osgView)
 		{
-			// Enable keyboard/mouse of the new view if they were enabled.
-			enableKeyboardDevice(m_keyboardEnabled);
-			enableMouseDevice(m_mouseEnabled);
-			result = true;
-		}
-		else
-		{
-			result = false;
+			result = ViewElement::setView(view);
 		}
 	}
 
@@ -76,105 +65,36 @@ bool OsgViewElement::setView(std::shared_ptr<SurgSim::Graphics::View> view)
 
 void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
 {
-	if (m_manipulator == nullptr)
-	{
-		m_manipulator = new OsgTrackballZoomManipulator();
-		// Set a default position
-		m_manipulator->setTransformation(
-			SurgSim::Graphics::toOsg(m_manipulatorPosition),
-			SurgSim::Graphics::toOsg(m_manipulatorLookat),
-			osg::Vec3d(0.0f, 1.0f, 0.0f));
-	}
 
-	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
-	if (view != nullptr)
-	{
-		if (val)
-		{
-			view->getOsgView()->setCameraManipulator(m_manipulator);
+	std::shared_ptr<OsgView> osgView = std::static_pointer_cast<OsgView>(getView());
+	osgView->enableManipulator(val);
 
-		}
-		else
-		{
-			view->getOsgView()->setCameraManipulator(nullptr);
-		}
-	}
 }
 
 void SurgSim::Graphics::OsgViewElement::enableKeyboardDevice(bool val)
 {
-	// Early return if device is already turned on/off.
-	if (val == m_keyboardEnabled)
-	{
-		return;
-	}
-
-	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
-	if (view)
-	{
-		std::shared_ptr<SurgSim::Input::CommonDevice> keyboardDevice = getKeyboardDevice();
-		osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandle =
-			std::static_pointer_cast<SurgSim::Device::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
-		if (val)
-		{
-			view->getOsgView()->addEventHandler(keyboardHandle);
-			m_keyboardEnabled = true;
-		}
-		else
-		{
-			view->getOsgView()->removeEventHandler(keyboardHandle);
-			m_keyboardEnabled = false;
-		}
-	}
+	std::shared_ptr<OsgView> osgView = std::static_pointer_cast<OsgView>(getView());
+	osgView->enableKeyboardDevice(val);
 }
 
 
 std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgViewElement::getKeyboardDevice()
 {
-	static auto keyboardDevice = std::make_shared<SurgSim::Device::KeyboardDevice>("Keyboard");
-	if (!keyboardDevice->isInitialized())
-	{
-		keyboardDevice->initialize();
-	}
-	return keyboardDevice;
+	std::shared_ptr<OsgView> osgView = std::static_pointer_cast<OsgView>(getView());
+	return osgView->getKeyboardDevice();
 }
 
 void SurgSim::Graphics::OsgViewElement::enableMouseDevice(bool val)
 {
-	// Early return if device is already turned on/off.
-	if (val == m_mouseEnabled)
-	{
-		return;
-	}
-
-	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
-	if (view)
-	{
-		std::shared_ptr<SurgSim::Input::CommonDevice> mouseDevice = getMouseDevice();
-		osg::ref_ptr<osgGA::GUIEventHandler> mouseHandler =
-			std::static_pointer_cast<SurgSim::Device::MouseDevice>(mouseDevice)->getMouseHandler();
-		if (val)
-		{
-			view->getOsgView()->addEventHandler(mouseHandler);
-			m_mouseEnabled = true;
-		}
-		else
-		{
-			view->getOsgView()->removeEventHandler(mouseHandler);
-			m_mouseEnabled = false;
-		}
-	}
+	std::shared_ptr<OsgView> osgView = std::static_pointer_cast<OsgView>(getView());
+	osgView->enableMouseDevice(val);
 }
 
 
 std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgViewElement::getMouseDevice()
 {
-	static auto mouseDevice = std::make_shared<SurgSim::Device::MouseDevice>("Mouse");
-	if (!mouseDevice->isInitialized())
-	{
-		mouseDevice->initialize();
-	}
-	return mouseDevice;
+	std::shared_ptr<OsgView> osgView = std::static_pointer_cast<OsgView>(getView());
+	return osgView->getMouseDevice();
 }
 
 
@@ -182,14 +102,6 @@ void SurgSim::Graphics::OsgViewElement::setManipulatorParameters(
 	SurgSim::Math::Vector3d position,
 	SurgSim::Math::Vector3d lookat)
 {
-	m_manipulatorPosition = position;
-	m_manipulatorLookat = lookat;
-
-	if (m_manipulator != nullptr)
-	{
-		m_manipulator->setTransformation(
-			SurgSim::Graphics::toOsg(m_manipulatorPosition),
-			SurgSim::Graphics::toOsg(m_manipulatorLookat),
-			osg::Vec3d(0.0f, 1.0f, 0.0f));
-	}
+	std::shared_ptr<OsgView> osgView = std::static_pointer_cast<OsgView>(getView());
+	osgView->setManipulatorParameters(position, lookat);
 }

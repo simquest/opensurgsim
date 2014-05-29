@@ -16,18 +16,17 @@
 #ifndef SURGSIM_GRAPHICS_OSGREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGREPRESENTATION_H
 
-
-#include "SurgSim/Graphics/Representation.h"
-
 #include <memory>
 
 #include <osg/ref_ptr>
 
+#include "SurgSim/Graphics/Representation.h"
+
 namespace osg
 {
-class Switch;
 class Node;
 class PositionAttitudeTransform;
+class Switch;
 }
 
 namespace SurgSim
@@ -43,7 +42,6 @@ class OsgMaterial;
 class OsgRepresentation : public virtual Representation
 {
 public:
-
 	/// Constructor
 	explicit OsgRepresentation(const std::string& name);
 	/// Destructor
@@ -80,7 +78,6 @@ public:
 protected:
 	virtual void doUpdate(double dt);
 
-
 	/// Switch used to toggle the visibility of the representation
 	osg::ref_ptr<osg::Switch> m_switch;
 	/// Transform used to pose the representation
@@ -88,10 +85,9 @@ protected:
 
 	/// Material defining the visual appearance of the representation
 	std::shared_ptr<OsgMaterial> m_material;
-
 };
 
 }; // Graphics
 }; // SurgSim
 
-#endif
+#endif // SURGSIM_GRAPHICS_OSGREPRESENTATION_H

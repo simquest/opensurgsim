@@ -34,7 +34,8 @@ PoseIntegrator::PoseIntegrator(const std::string& name) :
 	m_firstInput(true),
 	m_poseIndex(-1),
 	m_linearVelocityIndex(-1),
-	m_angularVelocityIndex(-1)
+	m_angularVelocityIndex(-1),
+	m_resetIndex(-1)
 {
 }
 
@@ -86,6 +87,7 @@ void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::D
 	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::Names::POSE);
 	m_linearVelocityIndex = getInputData().vectors().getIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
 	m_angularVelocityIndex = getInputData().vectors().getIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
+	m_resetIndex = inputData.booleans().getIndex(m_resetName);
 
 	SurgSim::Math::RigidTransform3d pose;
 	if (inputData.poses().get(SurgSim::DataStructures::Names::POSE, &pose))
@@ -121,6 +123,17 @@ void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataS
 					" had a clock fail.  The calculated velocities will be zero this update.";
 			}
 
+			if (m_resetIndex >= 0)
+			{
+				bool reset = false;
+				inputData.booleans().get(m_resetName, &reset);
+				if (reset)
+				{
+					pose.translation() = -m_poseResult.translation();
+					pose.linear() = m_poseResult.linear().transpose();
+				}
+			}
+
 			// Before updating the current pose, use it to calculate the angular velocity.
 			Vector3d rotationAxis;
 			double angle;
@@ -145,6 +158,13 @@ bool PoseIntegrator::requestOutput(const std::string& device, SurgSim::DataStruc
 		*outputData = getOutputData();
 	}
 	return state;
+}
+
+void PoseIntegrator::setReset(const std::string& name)
+{
+	SURGSIM_ASSERT(m_firstInput) <<
+		"PoseIntegrator::setReset cannot be called after the first call to initializeInput.";
+	m_resetName = name;
 }
 
 };  // namespace Device

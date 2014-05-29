@@ -59,6 +59,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	RenderPass.cpp
 	Representation.cpp
 	TriangleNormalGenerator.cpp
+	View.cpp
 	ViewElement.cpp
 )
 

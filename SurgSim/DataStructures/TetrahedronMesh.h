@@ -16,6 +16,11 @@
 #ifndef SURGSIM_DATASTRUCTURES_TETRAHEDRONMESH_H
 #define SURGSIM_DATASTRUCTURES_TETRAHEDRONMESH_H
 
+#include <vector>
+
+#include "SurgSim/DataStructures/MeshElement.h"
+#include "SurgSim/DataStructures/Vertices.h"
+
 namespace SurgSim
 {
 

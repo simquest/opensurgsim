@@ -34,9 +34,6 @@ MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
 	m_filter = std::make_shared<PoseIntegrator>(uniqueName + "_Integrator");
 	m_filter->setNameForCallback(uniqueName);  // the filter should make callbacks as the entire device
 
-	m_rawDevice->addInputConsumer(m_filter);
-	m_rawDevice->setOutputProducer(m_filter);
-
 	m_rawDevice->setPositionScale(defaultPositionScale());
 	m_rawDevice->setOrientationScale(defaultOrientationScale());
 	m_rawDevice->setAxisDominance(true);
@@ -56,6 +53,9 @@ std::string MultiAxisDevice::getName() const
 
 bool MultiAxisDevice::initialize()
 {
+	m_rawDevice->addInputConsumer(m_filter);
+	m_rawDevice->setOutputProducer(m_filter);
+
 	// Elements need to be initialized, in proper order.
 	return m_filter->initialize() && m_rawDevice->initialize();
 }
@@ -142,6 +142,11 @@ double MultiAxisDevice::defaultPositionScale()
 double MultiAxisDevice::defaultOrientationScale()
 {
 	return 0.0001; // The default rotation scale, in radians per tick.
+}
+
+void MultiAxisDevice::setReset(const std::string& name)
+{
+	m_filter->setReset(name);
 }
 
 };  // namespace Device
