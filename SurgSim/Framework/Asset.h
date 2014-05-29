@@ -40,7 +40,7 @@ public:
 	virtual ~Asset();
 
 	/// Set the file name to be loaded.
-	/// \param filename Name of the file to be loaded.
+	/// \param fileName Name of the file to be loaded.
 	void setFileName(const std::string& fileName);
 
 	/// Return the name of file loaded by this class.
