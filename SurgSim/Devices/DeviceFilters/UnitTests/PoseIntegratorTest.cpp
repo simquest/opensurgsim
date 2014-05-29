@@ -50,11 +50,6 @@ public:
 	{
 	}
 
-	SurgSim::DataStructures::DataGroup& doGetInitialInputData()
-	{
-		return getInitialInputData();
-	}
-
 	SurgSim::DataStructures::DataGroup& doGetInputData()
 	{
 		return getInputData();
@@ -237,13 +232,6 @@ TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 	{
 		SCOPED_TRACE("Testing Input Data, after HandleInput.");
 		TestInputDataGroup(actualTransformedInputData, expectedData);
-	}
-
-	// handleInput should not change the initial input data.
-	{
-		SCOPED_TRACE("Testing Initial Input Data, after HandleInput, expecting no change.");
-		const DataGroup actualInitialInputData = integrator->doGetInitialInputData();
-		TestInputDataGroup(actualInitialInputData, data);
 	}
 }
 

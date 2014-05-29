@@ -48,28 +48,22 @@ TEST(ViewTests, WindowSettingsTests)
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> distribution(0, 1000);
 
-	int x = distribution(generator);
-	int y = distribution(generator);
-	int width = distribution(generator);
-	int height = distribution(generator);
+	std::array<int, 2> position = {distribution(generator), distribution(generator)};
+	std::array<int, 2> dimensions = {distribution(generator), distribution(generator)};
 
 	/// Set position and check that it set correctly
-	EXPECT_TRUE(view->setPosition(x, y));
+	view->setPosition(position);
 
-	int testX, testY;
-	view->getPosition(&testX, &testY);
+	auto test = view->getPosition();
 
-	EXPECT_EQ(x, testX);
-	EXPECT_EQ(y, testY);
+	EXPECT_EQ(position, test);
 
 	/// Set dimensions and check that it set correctly
-	EXPECT_TRUE(view->setDimensions(width, height));
+	view->setDimensions(dimensions);
 
-	int testWidth, testHeight;
-	view->getDimensions(&testWidth, &testHeight);
+	test = view->getDimensions();
 
-	EXPECT_EQ(width, testWidth);
-	EXPECT_EQ(height, testHeight);
+	EXPECT_EQ(dimensions, test);
 
 	/// The window border should be enabled initially
 	EXPECT_TRUE(view->isWindowBorderEnabled());
@@ -85,7 +79,7 @@ TEST(ViewTests, CameraTest)
 	std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("test camera");
 
 	/// Set the camera and check that it set correctly
-	EXPECT_TRUE(view->setCamera(camera));
+	EXPECT_NO_THROW(view->setCamera(camera));
 
 	EXPECT_EQ(camera, view->getCamera());
 }
