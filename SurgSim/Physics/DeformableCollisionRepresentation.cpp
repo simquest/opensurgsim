@@ -59,8 +59,6 @@ std::shared_ptr<SurgSim::DataStructures::TriangleMesh> DeformableCollisionRepres
 
 void DeformableCollisionRepresentation::update(const double& dt)
 {
-	Representation::update(dt);
-
 	auto physicsRepresentation = m_deformable.lock();
 	SURGSIM_ASSERT(physicsRepresentation != nullptr)
 		<< "Failed to update.  The DeformableCollisionRepresentation either was not attached to a "
