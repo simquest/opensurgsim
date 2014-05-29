@@ -89,9 +89,6 @@ protected:
 	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 		const SurgSim::Math::RigidTransform3d& transform) override;
 
-	/// Deactivate and call resetState
-	void deactivateAndReset(void);
-
 private:
 	/// Produces a mapping from the provided mesh's triangle ids to this object's fem element ids. The mesh's vertices
 	/// must be identical to this object's fem element nodes.
