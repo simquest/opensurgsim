@@ -49,7 +49,7 @@ bool Asset::initialize(const std::shared_ptr<ApplicationData>& data)
 	std::string path = data->findFile(m_fileName);
 	SURGSIM_ASSERT(!path.empty()) << "Can not locate file " << m_fileName;
 
-	m_isInitialized = doInitialize(m_fileName);
+	m_isInitialized = doInitialize(path);
 
 	return m_isInitialized;
 }

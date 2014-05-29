@@ -45,7 +45,9 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 {
 	auto fem = std::make_shared<Fem3DRepresentation>("Representation");
 
-	PlyReader reader(findFile("Tetrahedron.ply"));
+	std::string path = findFile("PlyReaderTests/Tetrahedron.ply");
+	ASSERT_TRUE(!path.empty());
+	PlyReader reader(path);
 	auto delegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(fem);
 
 	ASSERT_TRUE(reader.setDelegate(delegate));
