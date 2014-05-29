@@ -134,6 +134,11 @@ public:
 	/// \return True if using axis dominance.
 	bool isUsingAxisDominance() const;
 
+	/// Sets the string name of the boolean entry that will reset the pose to its initial value.
+	/// \param name The name of the NamedData<bool> entry, e.g., SurgSim::DataStructures::Names::BUTTON_1.
+	/// \sa PoseIntegrator::setReset
+	void setReset(const std::string& name);
+
 private:
 	/// Get the default position scale from device ticks to meters.
 	/// \return The default position scale, in meters per tick.
