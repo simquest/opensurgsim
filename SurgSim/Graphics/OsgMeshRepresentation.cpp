@@ -110,7 +110,7 @@ void OsgMeshRepresentation::setDrawAsWireFrame(bool val)
 	state->setAttributeAndModes(polygonMode, osg::StateAttribute::ON);
 }
 
-bool OsgMeshRepresentation::drawAsWireFrame() const
+bool OsgMeshRepresentation::getDrawAsWireFrame() const
 {
 	return m_drawAsWireFrame;
 }
@@ -268,7 +268,12 @@ osg::Object::DataVariance OsgMeshRepresentation::getDataVariance(int updateOptio
 void OsgMeshRepresentation::setFilename(std::string filename)
 {
 	m_filename = filename;
-	m_mesh = std::make_shared<Mesh>(*SurgSim::DataStructures::loadTriangleMesh(filename));
+
+	auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(filename);
+	SURGSIM_ASSERT(nullptr != triangleMesh) <<
+		"SurgSim::DataStructures::loadTriangleMesh() returned an empty TriangleMesh after reading file " << filename;
+
+	m_mesh = std::make_shared<Mesh>(*triangleMesh);
 }
 
 std::string OsgMeshRepresentation::getFilename() const

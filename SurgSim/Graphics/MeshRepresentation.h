@@ -46,7 +46,7 @@ public:
 	{
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, std::string, Filename, getFilename, setFilename);
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, bool, DrawAsWireFrame,
-										  drawAsWireFrame, setDrawAsWireFrame);
+										  getDrawAsWireFrame, setDrawAsWireFrame);
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, int, UpdateOptions, getUpdateOptions, setUpdateOptions);
 	}
 
@@ -74,7 +74,7 @@ public:
 
 	/// Return if the mesh is rendered as a wire frame.
 	/// \return	True if this mesh is rendered as a wireframe; false if not.
-	virtual bool drawAsWireFrame() const = 0;
+	virtual bool getDrawAsWireFrame() const = 0;
 
 	/// Sets the structures that are expected to change during the lifetime of the mesh, these will be updated
 	/// every frame, independent of a structural change in the mesh. UPDATE_OPTION_VERTICES is set in the constructor

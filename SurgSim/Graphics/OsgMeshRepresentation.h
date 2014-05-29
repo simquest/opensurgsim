@@ -58,7 +58,7 @@ public:
 	virtual std::shared_ptr<Mesh> getMesh() override;
 
 	virtual void setDrawAsWireFrame(bool val) override;
-	virtual bool drawAsWireFrame() const override;
+	virtual bool getDrawAsWireFrame() const override;
 
 	virtual void setUpdateOptions(int val) override;
 	virtual int getUpdateOptions() const override;
