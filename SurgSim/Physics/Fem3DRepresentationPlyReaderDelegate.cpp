@@ -15,9 +15,9 @@
 
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
-#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 
 using SurgSim::DataStructures::PlyReader;
 
