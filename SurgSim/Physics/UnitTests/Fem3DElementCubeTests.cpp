@@ -37,8 +37,7 @@ const double epsilon = 2.6e-9;
 class MockFem3DElementCube : public Fem3DElementCube
 {
 public:
-	MockFem3DElementCube(std::array<unsigned int, 8> nodeIds) :
-		Fem3DElementCube(nodeIds)
+	MockFem3DElementCube(std::array<unsigned int, 8> nodeIds) : Fem3DElementCube(nodeIds)
 	{
 	}
 
