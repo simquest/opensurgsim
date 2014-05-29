@@ -101,7 +101,7 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 								   const Vector3d& triangleB1,
 								   const Vector3d& triangleB2)
 {
-	Vector3d correction = normal * (penetrationDepth - 2.0 * SurgSim::Math::Geometry::DistanceEpsilon);
+	Vector3d correction = normal * (penetrationDepth - SurgSim::Math::Geometry::DistanceEpsilon);
 
 	SURGSIM_ASSERT(SurgSim::Math::doesIntersectTriangleTriangle(
 		(Vector3d)(triangleA0 + correction), (Vector3d)(triangleA1 + correction), (Vector3d)(triangleA2 + correction),
