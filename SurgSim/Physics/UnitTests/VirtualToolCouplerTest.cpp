@@ -192,10 +192,10 @@ protected:
 TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 {
 	const double mass = rigidBody->getCurrentParameters().getMass();
-	virtualToolCoupler->setAngularDamping(mass * 1.0 );
-	virtualToolCoupler->setAngularStiffness(mass * 200);
-	virtualToolCoupler->setLinearDamping(mass * 50);
-	virtualToolCoupler->setLinearStiffness(mass * 200);
+	virtualToolCoupler->overrideAngularDamping(mass * 1.0 );
+	virtualToolCoupler->overrideAngularStiffness(mass * 200);
+	virtualToolCoupler->overrideLinearDamping(mass * 50);
+	virtualToolCoupler->overrideLinearStiffness(mass * 200);
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.translation() = Vector3d(0.1, 0.0, 0.0);
@@ -218,10 +218,10 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 {
 	const double mass = rigidBody->getCurrentParameters().getMass();
-	virtualToolCoupler->setAngularDamping(mass * 1.0 );
-	virtualToolCoupler->setAngularStiffness(mass * 200);
-	virtualToolCoupler->setLinearDamping(mass * 50);
-	virtualToolCoupler->setLinearStiffness(mass * 200);
+	virtualToolCoupler->overrideAngularDamping(mass * 1.0 );
+	virtualToolCoupler->overrideAngularStiffness(mass * 200);
+	virtualToolCoupler->overrideLinearDamping(mass * 50);
+	virtualToolCoupler->overrideLinearStiffness(mass * 200);
 
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
@@ -245,10 +245,10 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 TEST_F(VirtualToolCouplerTest, WithGravity)
 {
 	const double mass = rigidBody->getCurrentParameters().getMass();
-	virtualToolCoupler->setAngularDamping(mass * 1.0 );
-	virtualToolCoupler->setAngularStiffness(mass * 200);
-	virtualToolCoupler->setLinearDamping(mass * 50);
-	virtualToolCoupler->setLinearStiffness(mass * 200);
+	virtualToolCoupler->overrideAngularDamping(mass * 1.0 );
+	virtualToolCoupler->overrideAngularStiffness(mass * 200);
+	virtualToolCoupler->overrideLinearDamping(mass * 50);
+	virtualToolCoupler->overrideLinearStiffness(mass * 200);
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.translation() = Vector3d(0.0, 0.0, 0.0);
@@ -256,7 +256,7 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 	rigidBody->setIsGravityEnabled(true);
 
 	const double stiffness = 1000;
-	virtualToolCoupler->setLinearStiffness(stiffness);
+	virtualToolCoupler->overrideLinearStiffness(stiffness);
 
 	EXPECT_TRUE(rigidBody->isActive());
 	runSystem(2000);
@@ -284,14 +284,14 @@ TEST_F(VirtualToolCouplerTest, DefaultLinearParameters)
 TEST_F(VirtualToolCouplerTest, SetLinearStiffness)
 {
 	SCOPED_TRACE("Set Linear Stiffness");
-	virtualToolCoupler->setLinearStiffness(1.234);
+	virtualToolCoupler->overrideLinearStiffness(1.234);
 	checkLinearIsCriticallyDamped();
 }
 
 TEST_F(VirtualToolCouplerTest, SetLinearDamping)
 {
 	SCOPED_TRACE("Set Linear Damping");
-	virtualToolCoupler->setLinearDamping(500.2);
+	virtualToolCoupler->overrideLinearDamping(500.2);
 	checkLinearIsCriticallyDamped();
 }
 
@@ -304,14 +304,14 @@ TEST_F(VirtualToolCouplerTest, DefaultAngularParameters)
 TEST_F(VirtualToolCouplerTest, SetAngularStiffness)
 {
 	SCOPED_TRACE("Set Angular Stiffness");
-	virtualToolCoupler->setAngularStiffness(1234.6);
+	virtualToolCoupler->overrideAngularStiffness(1234.6);
 	checkAngularIsCriticallyDamped();
 }
 
 TEST_F(VirtualToolCouplerTest, SetAngularDamping)
 {
 	SCOPED_TRACE("Set Angular Damping");
-	virtualToolCoupler->setAngularDamping(0.1235);
+	virtualToolCoupler->overrideAngularDamping(0.1235);
 	checkAngularIsCriticallyDamped();
 }
 
@@ -337,10 +337,10 @@ TEST_F(VirtualToolCouplerTest, OptionalParams)
 	double num = 2.56527676;
 	{
 		SCOPED_TRACE("Getters");
-		virtualToolCoupler->setLinearStiffness(num);
-		virtualToolCoupler->setLinearDamping(num);
-		virtualToolCoupler->setAngularStiffness(num);
-		virtualToolCoupler->setAngularDamping(num);
+		virtualToolCoupler->overrideLinearStiffness(num);
+		virtualToolCoupler->overrideLinearDamping(num);
+		virtualToolCoupler->overrideAngularStiffness(num);
+		virtualToolCoupler->overrideAngularDamping(num);
 
 		const OptionalValued& linearStiffness = virtualToolCoupler->getOptionalLinearStiffness();
 		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
@@ -359,10 +359,10 @@ TEST_F(VirtualToolCouplerTest, OptionalParams)
 	}
 	{
 		SCOPED_TRACE("Setters");
-		virtualToolCoupler->setLinearStiffness(0.0);
-		virtualToolCoupler->setLinearDamping(0.0);
-		virtualToolCoupler->setAngularStiffness(0.0);
-		virtualToolCoupler->setAngularDamping(0.0);
+		virtualToolCoupler->overrideLinearStiffness(0.0);
+		virtualToolCoupler->overrideLinearDamping(0.0);
+		virtualToolCoupler->overrideAngularStiffness(0.0);
+		virtualToolCoupler->overrideAngularDamping(0.0);
 
 		OptionalValued optionalNum;
 		optionalNum.setValue(num);
@@ -421,15 +421,13 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 		node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	// Verify
-	EXPECT_TRUE(newVirtualToolCoupler->getOptionalLinearStiffness().hasValue());
-	EXPECT_TRUE(newVirtualToolCoupler->getOptionalLinearDamping().hasValue());
-	EXPECT_TRUE(newVirtualToolCoupler->getOptionalAngularStiffness().hasValue());
-	EXPECT_TRUE(newVirtualToolCoupler->getOptionalAngularDamping().hasValue());
+	newVirtualToolCoupler->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	newVirtualToolCoupler->wakeUp();
 
-	EXPECT_EQ(num, newVirtualToolCoupler->getOptionalLinearStiffness().getValue());
-	EXPECT_EQ(num, newVirtualToolCoupler->getOptionalLinearDamping().getValue());
-	EXPECT_EQ(num, newVirtualToolCoupler->getOptionalAngularStiffness().getValue());
-	EXPECT_EQ(num, newVirtualToolCoupler->getOptionalAngularDamping().getValue());
+	EXPECT_EQ(num, newVirtualToolCoupler->getLinearStiffness());
+	EXPECT_EQ(num, newVirtualToolCoupler->getLinearDamping());
+	EXPECT_EQ(num, newVirtualToolCoupler->getAngularStiffness());
+	EXPECT_EQ(num, newVirtualToolCoupler->getAngularDamping());
 
 	EXPECT_EQ(num, newVirtualToolCoupler->getOutputForceScaling());
 	EXPECT_EQ(num, newVirtualToolCoupler->getOutputTorqueScaling());

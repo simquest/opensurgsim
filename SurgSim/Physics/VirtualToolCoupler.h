@@ -80,64 +80,41 @@ public:
 
 	virtual void update(double dt) override;
 
-	/// Set linear stiffness connecting the input device and the physics representation
+	/// Override the linear stiffness connecting the input device and the physics representation
 	/// If this value is not provided, the stiffness will be automatically tuned using
 	/// the properties of the Representation
 	/// \param linearStiffness The stiffness of the vtc in linear mode (in N·m-1)
-	void setLinearStiffness(double linearStiffness);
+	void overrideLinearStiffness(double linearStiffness);
 
-	/// Set linear damping connecting the input device and the physics representation
+	/// \return The stiffness of the vtc in linear mode (in N·m-1)
+	double getLinearStiffness();
+
+	/// Override the linear damping connecting the input device and the physics representation
 	/// If this value is not provided, the damping will be automatically tuned using
 	/// the properties of the Representation
 	/// \param linearDamping The damping of the vtc in linear mode (in N·s·m-1 or Kg·s-1)
-	void setLinearDamping(double linearDamping);
+	void overrideLinearDamping(double linearDamping);
 
-	/// Set angular stiffness connecting the input device and the physics representation
+	/// \return The damping of the vtc in linear mode (in N·s·m-1 or Kg·s-1)
+	double getLinearDamping();
+
+	/// Override the angular stiffness connecting the input device and the physics representation
 	/// If this value is not provided, the stiffness will be automatically tuned using
 	/// the properties of the Representation
 	/// \param angularStiffness The stiffness of the vtc in angular mode (in N·m rad-1)
-	void setAngularStiffness(double angularStiffness);
+	void overrideAngularStiffness(double angularStiffness);
 
-	/// Set angular damping connecting the input device and the physics representation
+	/// \return The stiffness of the vtc in angular mode (in N·m rad-1)
+	double getAngularStiffness();
+
+	/// Override the angular damping connecting the input device and the physics representation
 	/// If this value is not provided, the damping will be automatically tuned using
 	/// the properties of the Representation
 	/// \param angularDamping The damping of the vtc in angular mode (in N·m·s·rad-1)
-	void setAngularDamping(double angularDamping);
+	void overrideAngularDamping(double angularDamping);
 
-	/// Used for Serialization.
-	/// \param linearStiffness The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
-	void setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& linearStiffness);
-
-	/// Used for Serialization.
-	/// \return The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
-	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearStiffness();
-
-	/// Used for Serialization.
-	/// \param linearDamping The OptionalValue object containing the damping of the vtc in linear
-	/// mode (in N·s·m-1 or Kg·s-1)
-	void setOptionalLinearDamping(const SurgSim::DataStructures::OptionalValue<double>& linearDamping);
-
-	/// Used for Serialization.
-	/// \return The OptionalValue object containing the damping of the vtc in linear mode (in N·s·m-1 or Kg·s-1)
-	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearDamping();
-
-	/// Used for Serialization.
-	/// \param angularStiffness The OptionalValue object containing the stiffness of the vtc in angular
-	/// mode (in N·m rad-1)
-	void setOptionalAngularStiffness(const SurgSim::DataStructures::OptionalValue<double>& angularStiffness);
-
-	/// Used for Serialization.
-	/// \return The OptionalValue object containing the stiffness of the vtc in angular mode (in N·m rad-1)
-	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularStiffness();
-
-	/// Used for Serialization.
-	/// \param angularDamping The OptionalValue object containing the damping of the vtc in angular
-	/// mode (in N·m·s·rad-1)
-	void setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& angularDamping);
-
-	/// Used for Serialization.
-	/// \return The OptionalValue object containing the damping of the vtc in angular mode (in N·m·s·rad-1)
-	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularDamping();
+	/// \return The damping of the vtc in angular mode (in N·m·s·rad-1)
+	double getAngularDamping();
 
 	/// \return The factor to multiply the forces.
 	double getOutputForceScaling();
@@ -158,23 +135,70 @@ protected:
 	virtual bool doWakeUp() override;
 	virtual int getTargetManagerType() const override;
 
-	/// Vtc stiffness parameter in linear mode (in N·m-1)
-	SurgSim::DataStructures::OptionalValue<double> m_linearStiffness;
+	/// Used for Serialization.
+	/// \param linearStiffness The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
+	void setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& linearStiffness);
 
-	/// Vtc damping parameter in linear mode (in N·s·m-1 or Kg·s-1)
-	SurgSim::DataStructures::OptionalValue<double> m_linearDamping;
+	/// Used for Serialization.
+	/// \return The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearStiffness() const;
 
-	/// Vtc stiffness parameter in angular mode (in N·m rad-1)
-	SurgSim::DataStructures::OptionalValue<double> m_angularStiffness;
+	/// Used for Serialization.
+	/// \param linearDamping The OptionalValue object containing the damping of the vtc in linear
+	/// mode (in N·s·m-1 or Kg·s-1)
+	void setOptionalLinearDamping(const SurgSim::DataStructures::OptionalValue<double>& linearDamping);
 
-	/// Vtc damping parameter in angular mode (in N·m·s·rad-1)
-	SurgSim::DataStructures::OptionalValue<double> m_angularDamping;
+	/// Used for Serialization.
+	/// \return The OptionalValue object containing the damping of the vtc in linear mode (in N·s·m-1 or Kg·s-1)
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearDamping() const;
+
+	/// Used for Serialization.
+	/// \param angularStiffness The OptionalValue object containing the stiffness of the vtc in angular
+	/// mode (in N·m rad-1)
+	void setOptionalAngularStiffness(const SurgSim::DataStructures::OptionalValue<double>& angularStiffness);
+
+	/// Used for Serialization.
+	/// \return The OptionalValue object containing the stiffness of the vtc in angular mode (in N·m rad-1)
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularStiffness() const;
+
+	/// Used for Serialization.
+	/// \param angularDamping The OptionalValue object containing the damping of the vtc in angular
+	/// mode (in N·m·s·rad-1)
+	void setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& angularDamping);
+
+	/// Used for Serialization.
+	/// \return The OptionalValue object containing the damping of the vtc in angular mode (in N·m·s·rad-1)
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularDamping() const;
+
+	/// User supplied Vtc stiffness parameter in linear mode (in N·m-1)
+	SurgSim::DataStructures::OptionalValue<double> m_optionalLinearStiffness;
+
+	/// User supplied Vtc damping parameter in linear mode (in N·s·m-1 or Kg·s-1)
+	SurgSim::DataStructures::OptionalValue<double> m_optionalLinearDamping;
+
+	/// User supplied Vtc stiffness parameter in angular mode (in N·m rad-1)
+	SurgSim::DataStructures::OptionalValue<double> m_optionalAngularStiffness;
+
+	/// User supplied Vtc damping parameter in angular mode (in N·m·s·rad-1)
+	SurgSim::DataStructures::OptionalValue<double> m_optionalAngularDamping;
 
 private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_input;
 	std::shared_ptr<SurgSim::Input::OutputComponent> m_output;
 	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
 	std::string m_poseName;
+
+	/// Used Vtc stiffness parameter in linear mode (in N·m-1)
+	double m_linearStiffness;
+
+	/// Used Vtc damping parameter in linear mode (in N·s·m-1 or Kg·s-1)
+	double m_linearDamping;
+
+	/// Used Vtc stiffness parameter in angular mode (in N·m rad-1)
+	double m_angularStiffness;
+
+	/// Used Vtc damping parameter in angular mode (in N·m·s·rad-1)
+	double m_angularDamping;
 
 	/// Scaling factor for the forces sent to the OutputComponent
 	double m_outputForceScaling;
