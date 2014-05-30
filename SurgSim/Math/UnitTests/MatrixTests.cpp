@@ -597,6 +597,35 @@ TYPED_TEST(Matrix33Tests, ToAngleAxis)
 	EXPECT_NEAR(-angle, computeAngle(matrix), 1e-6) << "angle wasn't properly computed by computeAngle().";
 }
 
+/// Test building a skew symmetric matrix from a vector
+TYPED_TEST(Matrix33Tests, MakeSkewSymmetricMatrixTest)
+{
+	typedef typename TestFixture::Matrix33 Matrix33;
+	typedef typename TestFixture::Scalar T;
+	typedef Eigen::Matrix<T, 3, 1> Vector3;
+
+	Vector3 v(static_cast<T>(0.3), static_cast<T>(-1.4), static_cast<T>(8.3));
+	Matrix33 matrix = SurgSim::Math::makeSkewSymmetricMatrix(v);
+	EXPECT_TRUE(matrix.diagonal().isZero());
+	EXPECT_NEAR(static_cast<T>(0.3) , matrix(2, 1), std::numeric_limits<T>::epsilon());
+	EXPECT_NEAR(static_cast<T>(-0.3), matrix(1, 2), std::numeric_limits<T>::epsilon());
+	EXPECT_NEAR(static_cast<T>(-1.4), matrix(0, 2), std::numeric_limits<T>::epsilon());
+	EXPECT_NEAR(static_cast<T>(1.4) , matrix(2, 0), std::numeric_limits<T>::epsilon());
+	EXPECT_NEAR(static_cast<T>(8.3) , matrix(1, 0), std::numeric_limits<T>::epsilon());
+	EXPECT_NEAR(static_cast<T>(-8.3), matrix(0, 1), std::numeric_limits<T>::epsilon());
+}
+
+/// Test extracting a vector from a skew symmetric part of a matrix
+TYPED_TEST(Matrix33Tests, SkewTest)
+{
+	typedef typename TestFixture::Scalar T;
+	typedef Eigen::Matrix<T, 3, 1> Vector3;
+
+	Vector3 vExpected(static_cast<T>(0.3), static_cast<T>(-1.4), static_cast<T>(8.3));
+	Vector3 v = SurgSim::Math::skew(SurgSim::Math::makeSkewSymmetricMatrix(vExpected));
+	EXPECT_TRUE(v.isApprox(vExpected));
+}
+
 // ==================== ARITHMETIC ====================
 
 /// Negation (unary minus).

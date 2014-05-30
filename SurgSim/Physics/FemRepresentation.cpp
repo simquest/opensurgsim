@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/FemElement.h"
@@ -138,7 +139,12 @@ void FemRepresentation::afterUpdate(double dt)
 		{
 			if (!element->update(*m_finalState))
 			{
-				deactivateAndReset();
+				SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
+					<< getName() << " deactivated :" << std::endl
+					<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
+					<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
+
+				setIsActive(false);
 				return;
 			}
 		}

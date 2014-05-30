@@ -107,7 +107,7 @@ public:
 		// Define Cube
 		{
 			std::array<unsigned int, 8> node0 = {{0, 1, 3, 2, 4, 5, 7, 6}};
-			std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(node0, *restState);
+			std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(node0);
 			femElement->setMassDensity(1.0);
 			femElement->setPoissonRatio(0.1);
 			femElement->setYoungModulus(1.0);

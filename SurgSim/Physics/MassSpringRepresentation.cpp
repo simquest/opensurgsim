@@ -128,37 +128,6 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 		"State has not been initialized yet, call setInitialState() prior to running the simulation";
 }
 
-void MassSpringRepresentation::afterUpdate(double dt)
-{
-	DeformableRepresentation::afterUpdate(dt);
-
-	if (! isActive())
-	{
-		return;
-	}
-
-	if (!m_currentState->isValid())
-	{
-		deactivateAndReset();
-	}
-}
-
-void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlock<Vector>& deltaVelocity)
-{
-	if ( !isActive())
-	{
-		return;
-	}
-
-	m_currentState->getPositions() += deltaVelocity * dt;
-	m_currentState->getVelocities() += deltaVelocity;
-
-	if (!m_currentState->isValid())
-	{
-		deactivateAndReset();
-	}
-}
-
 Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out

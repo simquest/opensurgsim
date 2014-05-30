@@ -176,7 +176,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	// Graphic representation of the physics model
 	std::shared_ptr<OsgMeshRepresentation> osgRepresentation =
 		std::make_shared<OsgMeshRepresentation>("OsgRepresentation");
-	*osgRepresentation->getMesh() = SurgSim::Graphics::Mesh(*mesh);
+	osgRepresentation->setFilename(foundFilename);
 	osgRepresentation->setDrawAsWireFrame(true);
 
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);

@@ -37,8 +37,8 @@ ApplicationData::ApplicationData(const std::string& configurationFileName)
 {
 	path filePath(configurationFileName);
 	SURGSIM_ASSERT(boost::filesystem::exists(filePath)) <<
-		"ApplicationdData could not find configuration file " << configurationFileName << " " <<
-		"the application is probably not going to be able to find it's data files";
+			"ApplicationdData could not find configuration file " << configurationFileName << " " <<
+			"the application is probably not going to be able to find it's data files";
 
 	std::vector<std::string> paths;
 	boost::filesystem::ifstream in(filePath);
@@ -80,6 +80,20 @@ std::string ApplicationData::findFile(const std::string& fileName) const
 	return result;
 }
 
+
+bool ApplicationData::tryFindFile(const std::string& fileName, std::string* target) const
+{
+	bool result = false;
+	std::string resultName = findFile(fileName);
+	if (resultName != "")
+	{
+		*target = std::move(resultName);
+		result = true;
+	}
+	return result;
+}
+
+
 bool ApplicationData::setPaths(const std::vector<std::string>& paths)
 {
 	bool result = true;
@@ -111,14 +125,14 @@ bool ApplicationData::addPath(const std::string& pathName)
 		}
 		else
 		{
-			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) <<
-				"ApplicationData, trying to add nonexistent or non directory path to search list " << newPath;
+			SURGSIM_LOG_INFO(Logger::getDefaultLogger()) <<
+					"ApplicationsData::addPath: Trying to add duplicate path " << pathName;
 		}
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) <<
-			"ApplicationsData::addPath: Trying to add duplicate path " << pathName;
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) <<
+				"ApplicationData, trying to add nonexistent or non directory path to search list " << newPath;
 	}
 	return result;
 }
@@ -146,8 +160,8 @@ bool ApplicationData::isValidFilename(const std::string& fileName) const
 	if (index != std::string::npos)
 	{
 		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
-			" Backslashes encountered in the path, this path cannot be used " << fileName <<
-			" to be useful it needs to be rewritten using '/'.";
+				" Backslashes encountered in the path, this path cannot be used " << fileName <<
+				" to be useful it needs to be rewritten using '/'.";
 		result = false;
 	}
 	return result;
