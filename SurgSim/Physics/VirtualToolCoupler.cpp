@@ -225,29 +225,54 @@ bool VirtualToolCoupler::doWakeUp()
 	double mass = m_rigid->getCurrentParameters().getMass();
 	if (!m_optionalLinearDamping.hasValue())
 	{
-		m_linearStiffness = m_optionalLinearStiffness.hasValue() ? m_optionalLinearStiffness.getValue() : mass * 800.0;
+		if (m_optionalLinearStiffness.hasValue())
+		{
+			m_linearStiffness = m_optionalLinearStiffness.getValue();
+		}
+		else
+		{
+			m_linearStiffness = mass * 800.0;
+		}
 		m_linearDamping = 2.0 * dampingRatio * sqrt(mass * m_linearStiffness);
 	}
 	else
 	{
 		m_linearDamping = m_optionalLinearDamping.getValue();
-		m_linearStiffness = m_optionalLinearStiffness.hasValue() ? m_optionalLinearStiffness.getValue() :
-			pow(m_linearDamping / dampingRatio, 2) / (4.0 * mass);
+		if (m_optionalLinearStiffness.hasValue())
+		{
+			m_linearStiffness = m_optionalLinearStiffness.getValue();
+		}
+		else
+		{
+			m_linearStiffness = pow(m_linearDamping / dampingRatio, 2) / (4.0 * mass);
+		}
 	}
 
 	const Matrix33d& inertia = m_rigid->getCurrentParameters().getLocalInertia();
 	double maxInertia = inertia.eigenvalues().real().maxCoeff();
 	if (!m_optionalAngularDamping.hasValue())
 	{
-		m_angularStiffness = m_optionalAngularStiffness.hasValue() ? m_optionalAngularStiffness.getValue() :
-			maxInertia * 1000.0;
+		if (m_optionalAngularStiffness.hasValue())
+		{
+			m_angularStiffness = m_optionalAngularStiffness.getValue();
+		}
+		else
+		{
+			m_angularStiffness = maxInertia * 1000.0;
+		}
 		m_angularDamping = 2.0 * dampingRatio * sqrt(maxInertia * m_angularStiffness);
 	}
 	else
 	{
 		m_angularDamping = m_optionalAngularDamping.getValue();
-		m_angularStiffness = m_optionalAngularStiffness.hasValue() ? m_optionalAngularStiffness.getValue() :
-			pow(m_angularDamping / dampingRatio, 2) / (4.0 * maxInertia);
+		if (m_optionalAngularStiffness.hasValue())
+		{
+			m_angularStiffness = m_optionalAngularStiffness.getValue();
+		}
+		else
+		{
+			m_angularStiffness = pow(m_angularDamping / dampingRatio, 2) / (4.0 * maxInertia);
+		}
 	}
 
 	return true;
