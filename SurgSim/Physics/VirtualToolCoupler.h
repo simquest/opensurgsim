@@ -51,25 +51,25 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Physics::VirtualToolCoupler);
 
 	/// \return Input Component to get the pose from
-	const std::shared_ptr<SurgSim::Input::InputComponent> getInput();
+	const std::shared_ptr<SurgSim::Framework::Component> getInput();
 
 	/// Set the Input Component
 	/// \param input Input Component to get the pose from
-	void setInput(const std::shared_ptr<SurgSim::Input::InputComponent> input);
+	void setInput(const std::shared_ptr<SurgSim::Framework::Component> input);
 
 	/// \return Output Component to send forces and torques
-	const std::shared_ptr<SurgSim::Input::OutputComponent> getOutput();
+	const std::shared_ptr<SurgSim::Framework::Component> getOutput();
 
 	/// Set the Output Component (if any)
 	/// \param output Output Component to send forces and torques
-	void setOutput(const std::shared_ptr<SurgSim::Input::OutputComponent> output);
+	void setOutput(const std::shared_ptr<SurgSim::Framework::Component> output);
 
 	/// \return Rigid Representation that provides state and receives external forces and torques
-	const std::shared_ptr<SurgSim::Physics::RigidRepresentation> getRepresentation();
+	const std::shared_ptr<SurgSim::Framework::Component> getRepresentation();
 
 	/// Set the Physics Representation which follows the input
 	/// \param rigid Rigid Representation that provides state and receives external forces and torques
-	void setRepresentation(const std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid);
+	void setRepresentation(const std::shared_ptr<SurgSim::Framework::Component> rigid);
 
 	/// \return Name of the pose data in the input to transfer
 	const std::string& getPoseName();

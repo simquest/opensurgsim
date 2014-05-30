@@ -75,11 +75,11 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
 		AngularDamping, getOptionalAngularDamping, setOptionalAngularDamping);
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Input::InputComponent>,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 		Input, getInput, setInput);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Input::OutputComponent>,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 		Output, getOutput, setOutput);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Physics::RigidRepresentation>,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 		Representation, getRepresentation, setRepresentation);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, double, OutputForceScaling,
@@ -92,34 +92,34 @@ VirtualToolCoupler::~VirtualToolCoupler()
 {
 }
 
-const std::shared_ptr<SurgSim::Input::InputComponent> VirtualToolCoupler::getInput()
+const std::shared_ptr<SurgSim::Framework::Component> VirtualToolCoupler::getInput()
 {
 	return m_input;
 }
 
-void VirtualToolCoupler::setInput(const std::shared_ptr<SurgSim::Input::InputComponent> input)
+void VirtualToolCoupler::setInput(const std::shared_ptr<SurgSim::Framework::Component> input)
 {
-	m_input = input;
+	m_input = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(input);
 }
 
-const std::shared_ptr<SurgSim::Input::OutputComponent> VirtualToolCoupler::getOutput()
+const std::shared_ptr<SurgSim::Framework::Component> VirtualToolCoupler::getOutput()
 {
 	return m_output;
 }
 
-void VirtualToolCoupler::setOutput(const std::shared_ptr<SurgSim::Input::OutputComponent> output)
+void VirtualToolCoupler::setOutput(const std::shared_ptr<SurgSim::Framework::Component> output)
 {
-	m_output = output;
+	m_output = std::dynamic_pointer_cast<SurgSim::Input::OutputComponent>(output);
 }
 
-const std::shared_ptr<SurgSim::Physics::RigidRepresentation> VirtualToolCoupler::getRepresentation()
+const std::shared_ptr<SurgSim::Framework::Component> VirtualToolCoupler::getRepresentation()
 {
 	return m_rigid;
 }
 
-void VirtualToolCoupler::setRepresentation(const std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid)
+void VirtualToolCoupler::setRepresentation(const std::shared_ptr<SurgSim::Framework::Component> rigid)
 {
-	m_rigid = rigid;
+	m_rigid = std::dynamic_pointer_cast<SurgSim::Physics::RigidRepresentation>(rigid);
 }
 
 const std::string& VirtualToolCoupler::getPoseName()
