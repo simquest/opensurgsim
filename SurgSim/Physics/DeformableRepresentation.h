@@ -86,6 +86,11 @@ public:
 
 	virtual void afterUpdate(double dt) override;
 
+	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
+
+	/// Deactivate and call resetState
+	void deactivateAndReset(void);
+
 	/// Set the collision representation for this physics representation, when the collision object
 	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
 	/// Specializes for discarding anything besides a rigid collision representation.
@@ -119,13 +124,13 @@ protected:
 	/// Force applied on the deformable representation
 	SurgSim::Math::Vector m_f;
 
-	/// Mass matrix (templated type for performance reason)
+	/// Mass matrix
 	SurgSim::Math::Matrix m_M;
 
-	/// Damping matrix (templated type for performance reason)
+	/// Damping matrix
 	SurgSim::Math::Matrix m_D;
 
-	/// Stiffness matrix (templated type for performance reason)
+	/// Stiffness matrix
 	SurgSim::Math::Matrix m_K;
 
 	/// Number of degrees of freedom per node (varies per deformable model)

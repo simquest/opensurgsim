@@ -411,6 +411,15 @@ private:
 	bool m_isInitialized;
 };
 
+class InvalidMockFemElement : public MockFemElement
+{
+public:
+	virtual bool update(const SurgSim::Math::OdeState& state) override
+	{
+		return false;
+	}
+};
+
 // Concrete class for testing
 class MockFemRepresentation : public FemRepresentation
 {

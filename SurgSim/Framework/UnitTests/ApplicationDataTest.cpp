@@ -70,7 +70,7 @@ namespace std
 	if (! filePath.is_absolute())
 	{
 		return ::testing::AssertionFailure() << "Result not absolute path <" << fileName <<
-			"> expected " << boost::filesystem::canonical(filePath);
+			   "> expected " << boost::filesystem::canonical(filePath);
 	}
 	if (! boost::filesystem::exists(filePath))
 	{
@@ -79,17 +79,17 @@ namespace std
 	if (fileName != filePath.make_preferred().string())
 	{
 		return ::testing::AssertionFailure() << "Result not system format path " << fileName <<
-			" expected " << filePath.make_preferred().string();
+			   " expected " << filePath.make_preferred().string();
 	}
-	if (boost::filesystem::path(searchFileName).filename() != filePath.filename() )
+	if (boost::filesystem::path(searchFileName).filename() != filePath.filename())
 	{
 		return ::testing::AssertionFailure() << "Expected " << searchFileName <<
-			" Result " << filePath.filename();
+			   " Result " << filePath.filename();
 	}
-	if ( fileName.find(expectedDirectoryName) == std::string::npos)
+	if (fileName.find(expectedDirectoryName) == std::string::npos)
 	{
 		return ::testing::AssertionFailure() << "Expected the file to be in subdirectory " <<
-			expectedDirectoryName << " but is not " << fileName;
+			   expectedDirectoryName << " but is not " << fileName;
 	}
 	return ::testing::AssertionSuccess();
 }
@@ -130,53 +130,77 @@ TEST(ApplicationDataTest, GetPathsTest)
 	std::string path2 = "Data/ApplicationDataTest/Directory2";
 	paths.push_back(path1);
 	paths.push_back(path2);
-	ApplicationData data (paths);
+	ApplicationData data(paths);
 
 	ASSERT_EQ(2u, data.getPaths().size());
 
 	paths = data.getPaths();
 
 	EXPECT_TRUE(boost::filesystem::equivalent(
-		path(path1),
-		path(paths[0]))) << path1 << " not considered equivalent to " << paths[0];
+					path(path1),
+					path(paths[0]))) << path1 << " not considered equivalent to " << paths[0];
 	EXPECT_TRUE(boost::filesystem::equivalent(
-		path(path2),
-		path(paths[1]))) << path2 << " not considered equivalent to " << paths[1];
+					path(path2),
+					path(paths[1]))) << path2 << " not considered equivalent to " << paths[1];
 }
 
-TEST (ApplicationDataTest, FindFileTest)
+TEST(ApplicationDataTest, FindFileTest)
 {
 	ASSERT_TRUE(boost::filesystem::exists("Data"));
 
 	std::vector<std::string> paths;
 	paths.push_back("Data/ApplicationDataTest/Directory1");
 	paths.push_back("Data/ApplicationDataTest/Directory2");
-	ApplicationData data (paths);
+	ApplicationData data(paths);
 
 	std::string fileName;
 	boost::filesystem::path filePath;
 
 	ASSERT_EQ(2u, data.getPaths().size());
-	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile1.txt","Directory1"));
-	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile2.txt","Directory2"));
-	EXPECT_TRUE(fileIsFoundCorrectly(data,"duplicatedFile.txt","Directory1"));
+	EXPECT_TRUE(fileIsFoundCorrectly(data, "uniqueFile1.txt", "Directory1"));
+	EXPECT_TRUE(fileIsFoundCorrectly(data, "uniqueFile2.txt", "Directory2"));
+	EXPECT_TRUE(fileIsFoundCorrectly(data, "duplicatedFile.txt", "Directory1"));
 
 	EXPECT_EQ("", data.findFile("missingFile.txt"));
 }
 
+TEST(ApplicationDataTest, TryFindFileTest)
+{
+	ASSERT_TRUE(boost::filesystem::exists("Data"));
 
-TEST (ApplicationDataTest, DirectorywithSpaceTest)
+	std::vector<std::string> paths;
+	paths.push_back("Data/ApplicationDataTest/Directory1");
+	paths.push_back("Data/ApplicationDataTest/Directory2");
+	ApplicationData data(paths);
+
+	std::string fileName;
+	boost::filesystem::path filePath;
+
+	EXPECT_TRUE(data.tryFindFile("uniqueFile1.txt", &fileName));
+	EXPECT_EQ(data.findFile("uniqueFile1.txt"), fileName);
+
+	EXPECT_TRUE(data.tryFindFile("duplicatedFile.txt", &fileName));
+	EXPECT_EQ(data.findFile("duplicatedFile.txt"), fileName);
+
+	fileName = "Should Not Change";
+
+	EXPECT_FALSE(data.tryFindFile("missingFile.txt", &fileName));
+	EXPECT_EQ("Should Not Change", fileName);
+}
+
+
+TEST(ApplicationDataTest, DirectorywithSpaceTest)
 {
 	ASSERT_TRUE(boost::filesystem::exists("Data"));
 
 	std::string path = "Data/ApplicationDataTest/Test Directory/uniqueFile.txt";
-	ApplicationData data (path);
+	ApplicationData data(path);
 
-	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile.txt","Test Directory"));
+	EXPECT_TRUE(fileIsFoundCorrectly(data, "uniqueFile.txt", "Test Directory"));
 }
 
 // We don't accept anything that contains backslashes ...
-TEST (ApplicationDataTest, MessedUpSlashesTest)
+TEST(ApplicationDataTest, MessedUpSlashesTest)
 {
 	ASSERT_TRUE(boost::filesystem::exists("Data"));
 
@@ -188,7 +212,7 @@ TEST (ApplicationDataTest, MessedUpSlashesTest)
 	ASSERT_EQ(0u, data.getPaths().size());
 }
 
-TEST (ApplicationDataTest, DeepPathTest)
+TEST(ApplicationDataTest, DeepPathTest)
 {
 	ASSERT_TRUE(boost::filesystem::exists("Data"));
 
@@ -196,11 +220,11 @@ TEST (ApplicationDataTest, DeepPathTest)
 	paths.push_back("Data/ApplicationDataTest");
 	ApplicationData data(paths);
 
-	EXPECT_TRUE(fileIsFoundCorrectly(data,"Directory1/uniqueFile1.txt","Directory1"));
-	EXPECT_TRUE(fileIsFoundCorrectly(data,"Directory2/uniqueFile2.txt","Directory2"));
+	EXPECT_TRUE(fileIsFoundCorrectly(data, "Directory1/uniqueFile1.txt", "Directory1"));
+	EXPECT_TRUE(fileIsFoundCorrectly(data, "Directory2/uniqueFile2.txt", "Directory2"));
 }
 
-TEST (ApplicationDataTest, InitFromFile)
+TEST(ApplicationDataTest, InitFromFile)
 {
 	ASSERT_TRUE(boost::filesystem::exists("Data"));
 
@@ -210,8 +234,8 @@ TEST (ApplicationDataTest, InitFromFile)
 	ApplicationData data("Data/ApplicationDataTest/testFile1.txt");
 
 	ASSERT_EQ(2u, data.getPaths().size());
-	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile1.txt","Directory1"));
-	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile2.txt","Directory2"));
-	EXPECT_TRUE(fileIsFoundCorrectly(data,"duplicatedFile.txt","Directory1"));
+	EXPECT_TRUE(fileIsFoundCorrectly(data, "uniqueFile1.txt", "Directory1"));
+	EXPECT_TRUE(fileIsFoundCorrectly(data, "uniqueFile2.txt", "Directory2"));
+	EXPECT_TRUE(fileIsFoundCorrectly(data, "duplicatedFile.txt", "Directory1"));
 	EXPECT_EQ("", data.findFile("missingFile.txt"));
 }

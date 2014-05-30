@@ -47,6 +47,9 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // line 2378 'item'
 // line 1717 'other_data'
 
+// JL-2014-may-23 Upgrade get_words() to handle Windows line ending properly.
+// Minimal changes as been made from lines 1843 to 1846 and comment updated on line 1830.
+
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable:4996)
@@ -1825,7 +1828,7 @@ char **get_words(FILE *fp, int *nwords, char **orig_line)
 
   words = (char **) myalloc (sizeof (char *) * max_words);
 
-  /* convert line-feed and tabs into spaces */
+  /* convert carriage-return, line-feed and tabs into spaces */
   /* (this guarentees that there will be a space before the */
   /*  null character at the end of the string) */
 
@@ -1838,8 +1841,10 @@ char **get_words(FILE *fp, int *nwords, char **orig_line)
       *ptr = ' ';
       *ptr2 = ' ';
     }
-    else if (*ptr == '\n') {
-      *ptr = ' ';
+    else if (*ptr == '\r' || *ptr == '\n') {
+      // In Linux line ending, the line would end by "\n\0", which originally was changed into " \0".
+      // In Windows line ending, the line would end by "\r\n\0", which needs to change into " \0" as well.
+      *ptr++ = ' '; *ptr = '\0';
       *ptr2 = '\0';
       break;
     }

@@ -37,8 +37,11 @@ std::shared_ptr<SurgSim::Collision::Representation> makeSphereRepresentation(
 {
 
 	std::shared_ptr<SurgSim::Math::Shape> sphere = std::make_shared<SurgSim::Math::SphereShape>(radius);
-	return 	std::make_shared<ShapeCollisionRepresentation>(
-		"TestSphereShapeCollisionRep", sphere, SurgSim::Math::makeRigidTransform(rotation, position));
+	auto result = std::make_shared<ShapeCollisionRepresentation>("TestSphereShapeCollisionRep");
+	result->setShape(sphere);
+	result->setLocalPose(SurgSim::Math::makeRigidTransform(rotation, position));
+
+	return result;
 }
 
 std::shared_ptr<SurgSim::Collision::Representation> makeDoubleSidedPlaneRepresentation(
@@ -46,8 +49,11 @@ std::shared_ptr<SurgSim::Collision::Representation> makeDoubleSidedPlaneRepresen
 	const Vector3d& position)
 {
 	std::shared_ptr<SurgSim::Math::Shape> plane = std::make_shared<SurgSim::Math::DoubleSidedPlaneShape>();
-	return 	std::make_shared<ShapeCollisionRepresentation>(
-		"TestDoubleSidedPlaneCollisionRep", plane, SurgSim::Math::makeRigidTransform(rotation, position));
+	auto result = std::make_shared<ShapeCollisionRepresentation>("TestDoubleSidedPlaneCollisionRep");
+	result->setShape(plane);
+	result->setLocalPose(SurgSim::Math::makeRigidTransform(rotation, position));
+
+	return result;
 }
 
 std::shared_ptr<SurgSim::Collision::Representation> makePlaneRepresentation(
@@ -55,8 +61,11 @@ std::shared_ptr<SurgSim::Collision::Representation> makePlaneRepresentation(
 	const Vector3d& position)
 {
 	std::shared_ptr<SurgSim::Math::Shape> plane = std::make_shared<SurgSim::Math::PlaneShape>();
-	return  std::make_shared<ShapeCollisionRepresentation>(
-		"TestPlaneRepresentation", plane, SurgSim::Math::makeRigidTransform(rotation, position));
+	auto result = std::make_shared<ShapeCollisionRepresentation>("TestPlaneRepresentation");
+	result->setShape(plane);
+	result->setLocalPose(SurgSim::Math::makeRigidTransform(rotation, position));
+
+	return result;
 }
 
 std::shared_ptr<SurgSim::Collision::Representation> makeCapsuleRepresentation(
@@ -67,8 +76,11 @@ std::shared_ptr<SurgSim::Collision::Representation> makeCapsuleRepresentation(
 {
 
 	std::shared_ptr<SurgSim::Math::Shape> capsule = std::make_shared<SurgSim::Math::CapsuleShape>(length, radius);
-	return 	std::make_shared<ShapeCollisionRepresentation>(
-		"TestCapsuleShapeCollisionRep", capsule, SurgSim::Math::makeRigidTransform(rotation, position));
+	auto result = std::make_shared<ShapeCollisionRepresentation>("TestCapsuleShapeCollisionRep");
+	result->setShape(capsule);
+	result->setLocalPose(SurgSim::Math::makeRigidTransform(rotation, position));
+
+	return result;
 }
 
 }; // Collision

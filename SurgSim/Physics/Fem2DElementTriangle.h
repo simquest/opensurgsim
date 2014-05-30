@@ -56,7 +56,7 @@ public:
 	/// Constructor
 	/// \param nodeIds An array of 3 node ids (A, B, C) defining this triangle element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
-	Fem2DElementTriangle(std::array<unsigned int, 3> nodeIds);
+	explicit Fem2DElementTriangle(std::array<unsigned int, 3> nodeIds);
 
 	/// Sets the triangle's thickness
 	/// \param thickness The thickness of the triangle

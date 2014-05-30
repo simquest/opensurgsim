@@ -129,8 +129,13 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	using SurgSim::Graphics::OsgViewElement;
 
 	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
-	viewElement->getView()->setPosition(x, y);
-	viewElement->getView()->setDimensions(width, height);
+	std::array<int, 2> position = {x, y};
+	std::array<int, 2> dimensions = {width, height};
+	viewElement->getView()->setPosition(position);
+	viewElement->getView()->setDimensions(dimensions);
+
+	/// It's an OsgViewElement, we have an OsgView, turn on mapping of uniform and attribute values
+	std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->setOsgMapsUniforms(true);
 
 	// Move the camera from left to right over along the scene
 	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator_2");
@@ -406,16 +411,16 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 
 int main(int argc, char* argv[])
 {
-	const SurgSim::Framework::ApplicationData data("config.txt");
+	auto runtime(std::make_shared<SurgSim::Framework::Runtime>("config.txt"));
+	auto data = runtime->getApplicationData();
 
-	materials["basicLit"] = loadMaterial(data, "Shaders/basic_lit");
-	materials["basicUnlit"] = loadMaterial(data, "Shaders/basic_unlit");
-	materials["basicShadowed"] = loadMaterial(data, "Shaders/shadowmap_vertexcolor");
-	materials["depthMap"] = loadMaterial(data, "Shaders/depth_map");
-	materials["shadowMap"] = loadMaterial(data, "Shaders/shadow_map");
+	materials["basicLit"] = loadMaterial(*data, "Shaders/basic_lit");
+	materials["basicUnlit"] = loadMaterial(*data, "Shaders/basic_unlit");
+	materials["basicShadowed"] = loadMaterial(*data, "Shaders/shadowmap_vertexcolor");
+	materials["depthMap"] = loadMaterial(*data, "Shaders/depth_map");
+	materials["shadowMap"] = loadMaterial(*data, "Shaders/shadow_map");
 	materials["default"] = materials["basic_lit"];
 
-	auto runtime(std::make_shared<SurgSim::Framework::Runtime>());
 
 	runtime->addManager(std::make_shared<SurgSim::Graphics::OsgManager>());
 	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());

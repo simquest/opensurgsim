@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
@@ -127,37 +126,6 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 	SURGSIM_ASSERT(getNumSprings()) << "No springs specified yet, call addSpring() prior to running the simulation";
 	SURGSIM_ASSERT(getNumDof()) <<
 		"State has not been initialized yet, call setInitialState() prior to running the simulation";
-}
-
-void MassSpringRepresentation::afterUpdate(double dt)
-{
-	DeformableRepresentation::afterUpdate(dt);
-
-	if (! isActive())
-	{
-		return;
-	}
-
-	if (!m_currentState->isValid())
-	{
-		deactivateAndReset();
-	}
-}
-
-void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlock<Vector>& deltaVelocity)
-{
-	if ( !isActive())
-	{
-		return;
-	}
-
-	m_currentState->getPositions() += deltaVelocity * dt;
-	m_currentState->getVelocities() += deltaVelocity;
-
-	if (!m_currentState->isValid())
-	{
-		deactivateAndReset();
-	}
 }
 
 Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
@@ -450,17 +418,6 @@ void MassSpringRepresentation::transformState(std::shared_ptr<SurgSim::Math::Ode
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-}
-
-void MassSpringRepresentation::deactivateAndReset(void)
-{
-	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-		<< getName() << " deactivated and reset:" << std::endl
-		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
-		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
-
-	resetState();
-	setIsActive(false);
 }
 
 } // namespace Physics

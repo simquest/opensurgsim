@@ -34,6 +34,7 @@ set(UNIT_TEST_SOURCES
 	Fem2DElementTriangleTests.cpp
 	Fem2DMechanicalValidationTests.cpp
 	Fem2DRepresentationTests.cpp
+	Fem3DElementCorotationalTetrahedronTests.cpp
 	Fem3DElementCubeTests.cpp
 	Fem3DElementTetrahedronTests.cpp
 	Fem3DRepresentationBilateral3DTests.cpp

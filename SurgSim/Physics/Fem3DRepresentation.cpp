@@ -84,23 +84,6 @@ RepresentationType Fem3DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM3D;
 }
 
-void Fem3DRepresentation::applyCorrection(double dt,
-										  const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
-{
-	if (!isActive())
-	{
-		return;
-	}
-
-	m_currentState->getPositions() += deltaVelocity * dt;
-	m_currentState->getVelocities() += deltaVelocity;
-
-	if (!m_currentState->isValid())
-	{
-		deactivateAndReset();
-	}
-}
-
 void Fem3DRepresentation::setFilename(const std::string& filename)
 {
 	m_filename = filename;
@@ -269,17 +252,6 @@ void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
-}
-
-void Fem3DRepresentation::deactivateAndReset(void)
-{
-	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-		<< getName() << " deactivated and reset:" << std::endl
-		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
-		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
-
-	resetState();
-	setIsActive(false);
 }
 
 } // namespace Physics

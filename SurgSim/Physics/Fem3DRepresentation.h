@@ -65,15 +65,6 @@ public:
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
 
-	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
-	/// deltaVelocity.
-	///
-	/// This function typically is called in the physics pipeline (PhysicsManager::doUpdate) after solving the equations
-	/// that enforce constraints when collisions occur.  Specifically it is called in the PushResults::doUpdate step.
-	/// \param dt The time step
-	/// \param deltaVelocity The block of a vector containing the correction to be applied to the velocity
-	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
-
 	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location) override;
 
 protected:
@@ -88,9 +79,6 @@ protected:
 	/// \param transform The transformation to apply
 	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 		const SurgSim::Math::RigidTransform3d& transform) override;
-
-	/// Deactivate and call resetState
-	void deactivateAndReset(void);
 
 private:
 	/// Produces a mapping from the provided mesh's triangle ids to this object's fem element ids. The mesh's vertices

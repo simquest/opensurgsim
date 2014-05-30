@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/FemElement.h"
@@ -126,6 +127,28 @@ void FemRepresentation::beforeUpdate(double dt)
 			<< "No fem element specified yet, call addFemElement() prior to running the simulation";
 	SURGSIM_ASSERT(getNumDof())
 			<<	"State has not been initialized yet, call setInitialState() prior to running the simulation";
+}
+
+void FemRepresentation::afterUpdate(double dt)
+{
+	DeformableRepresentation::afterUpdate(dt);
+
+	// Update the elements with the final state
+	std::for_each(m_femElements.begin(), m_femElements.end(),
+		[this](std::shared_ptr<FemElement> element)
+		{
+			if (!element->update(*m_finalState))
+			{
+				SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
+					<< getName() << " deactivated :" << std::endl
+					<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
+					<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
+
+				setIsActive(false);
+				return;
+			}
+		}
+	);
 }
 
 SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
