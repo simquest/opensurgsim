@@ -531,8 +531,7 @@ TYPED_TEST(AllMatrixTests, Diagonal)
 
 	Matrix b = Matrix::Identity();
 	{
-		Vector diagonalVector = b.diagonal();
-		EXPECT_NEAR(1.f * SIZE, diagonalVector.sum(), 1e-6);
+		EXPECT_NEAR(1.f * SIZE, b.diagonal().sum(), 1e-6);
 	}
 }
 

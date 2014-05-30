@@ -16,6 +16,7 @@
 /// \file
 /// Tests for the PoseIntegrator class.
 
+#include <boost/thread.hpp>
 #include <memory>
 #include <string>
 #include <gtest/gtest.h>
@@ -201,6 +202,7 @@ TEST(PoseIntegratorDeviceFilterTest, InputDataFilter)
 
 	// Now test integration and velocity calculation.
 	// Normally the input device would PushInput, which would call the filter's handleInput.
+	boost::this_thread::sleep(boost::posix_time::millisec(100));
 	integrator->handleInput("device", data);
 
 	DataGroup expectedData = builder.createData();
