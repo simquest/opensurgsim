@@ -151,7 +151,7 @@ void VirtualToolCoupler::update(double dt)
 		RigidTransform3d objectPose(objectState.getPose());
 		Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
 
-		Vector3d force = m_linearStiffness * (inputPose.translation() - objectPose.translation());
+		Vector3d force = m_linearStiffness * (inputPose.translation() - objectPosition);
 		force += m_linearDamping * (inputLinearVelocity - objectState.getLinearVelocity());
 
 		Vector3d rotationVector;
