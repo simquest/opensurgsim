@@ -188,7 +188,6 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 
 		EXPECT_TRUE(meshShape->isValid());
 	}
-	
 }
 
 TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
