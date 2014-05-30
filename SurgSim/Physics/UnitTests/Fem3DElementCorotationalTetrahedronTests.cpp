@@ -119,9 +119,9 @@ public:
 		m_E = 1e6;
 		m_nu = 0.45;
 
-		Vector3d axis(1.1, 2.2, 3.3);
+		Vector3d axis(1.1,-2.2,-3.3);
 		axis.normalize();
-		m_rotation = SurgSim::Math::makeRotationMatrix(1.45, axis);
+		m_rotation = SurgSim::Math::makeRotationMatrix(3.1415, axis);
 		m_R12x12 = Eigen::Matrix<double, 12, 12>::Zero();
 		for (size_t nodeId = 0; nodeId < 4; ++nodeId)
 		{
@@ -130,6 +130,42 @@ public:
 		m_translation = Vector3d(1.2, 2.3, 3.4);
 	}
 };
+
+namespace
+{
+template <class T, int MOpt>
+void defineCurrentState(const SurgSim::Math::OdeState& x0, SurgSim::Math::OdeState* x,
+						const Eigen::Transform<T, 3, MOpt>& t, bool addSmallDeformation)
+{
+	std::array<Vector3d, 3> delta = {{Vector3d(0.01, -0.02, 0.005),
+		Vector3d(-0.01, -0.01, -0.03), Vector3d(0.0, -0.015, 0.03)}};
+
+	*x = x0;
+	for (size_t nodeId = 0; nodeId < x0.getNumNodes(); ++nodeId)
+	{
+		(*x).getPositions().segment<3>(3 * nodeId) = t * x0.getPositions().segment<3>(3 * nodeId);
+		if (addSmallDeformation)
+		{
+			(*x).getPositions().segment<3>(3 * nodeId) += delta[nodeId % 3];
+		}
+	}
+}
+// Duplicates 4 times a 3x3 matrix on the diagonal blocks
+Eigen::Matrix<double, 12, 12> make12x12(const Eigen::Matrix<double, 3, 3>& R)
+{
+	Eigen::Matrix<double, 12, 12> res = Eigen::Matrix<double, 12, 12>::Zero();
+	for (size_t nodeId = 0; nodeId < 4; nodeId++)
+	{
+		res.block<3, 3>(3 * nodeId, 3 * nodeId) = R;
+	}
+	return res;
+}
+// Duplicates 4 times a 3x3 matrix on the diagonal blocks, with the 3x3 row-major matrix stored in a vector
+Eigen::Matrix<double, 12, 12> make12x12(const Eigen::Matrix<double, 9, 1>& R)
+{
+	return make12x12(Eigen::Matrix<double, 3, 3>(R.data()));
+}
+}; // anonymous namespace
 
 TEST_F(Fem3DElementCorotationalTetrahedronTests, ConstructorTest)
 {
@@ -164,22 +200,19 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, InitializeTest)
 
 TEST_F(Fem3DElementCorotationalTetrahedronTests, UpdateTest)
 {
-	SurgSim::Math::RigidTransform3d transformation;
+	using SurgSim::Math::skew;
+	using SurgSim::Math::makeSkewSymmetricMatrix;
+
+	Eigen::Transform<double, 3, Eigen::Affine> transformation;
 
 	{
 		SCOPED_TRACE("No rotation, no translation");
 		transformation.linear().setIdentity();
 		transformation.translation().setZero();
+		defineCurrentState(m_restState, &m_state, transformation, false);
 
 		MockFem3DElementCorotationalTet tet(m_nodeIds);
 		tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
-
-		m_state = m_restState;
-		for (size_t nodeId = 0; nodeId < m_restState.getNumNodes(); ++nodeId)
-		{
-			SurgSim::Math::setSubVector(transformation * m_restState.getPosition(nodeId),
-				nodeId, 3, &m_state.getPositions());
-		}
 
 		ASSERT_NO_THROW(tet.update(m_state));
 		EXPECT_TRUE(tet.getRotation().isIdentity());
@@ -190,16 +223,10 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, UpdateTest)
 		SCOPED_TRACE("Pure translation");
 		transformation.linear().setIdentity();
 		transformation.translation() = m_translation;
+		defineCurrentState(m_restState, &m_state, transformation, false);
 
 		MockFem3DElementCorotationalTet tet(m_nodeIds);
 		tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
-
-		m_state = m_restState;
-		for (size_t nodeId = 0; nodeId < m_restState.getNumNodes(); ++nodeId)
-		{
-			SurgSim::Math::setSubVector(transformation * m_restState.getPosition(nodeId),
-				nodeId, 3, &m_state.getPositions());
-		}
 
 		ASSERT_NO_THROW(tet.update(m_state));
 		EXPECT_TRUE(tet.getRotation().isIdentity());
@@ -210,16 +237,10 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, UpdateTest)
 		SCOPED_TRACE("Pure rotation");
 		transformation.linear() = m_rotation;
 		transformation.translation().setZero();
+		defineCurrentState(m_restState, &m_state, transformation, false);
 
 		MockFem3DElementCorotationalTet tet(m_nodeIds);
 		tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
-
-		m_state = m_restState;
-		for (size_t nodeId = 0; nodeId < m_restState.getNumNodes(); ++nodeId)
-		{
-			SurgSim::Math::setSubVector(transformation * m_restState.getPosition(nodeId),
-				nodeId, 3, &m_state.getPositions());
-		}
 
 		ASSERT_NO_THROW(tet.update(m_state));
 		EXPECT_TRUE(tet.getRotation().isApprox(m_rotation));
@@ -228,110 +249,124 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, UpdateTest)
 	}
 
 	{
-		SCOPED_TRACE("Translation + Rotation");
+		SCOPED_TRACE("Translation + Pure Rotation");
 		transformation.linear() = m_rotation;
 		transformation.translation() = m_translation;
+		defineCurrentState(m_restState, &m_state, transformation, false);
 
 		MockFem3DElementCorotationalTet tet(m_nodeIds);
 		tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
-
-		m_state = m_restState;
-		for (size_t nodeId = 0; nodeId < m_restState.getNumNodes(); ++nodeId)
-		{
-			SurgSim::Math::setSubVector(transformation * m_restState.getPosition(nodeId),
-				nodeId, 3, &m_state.getPositions());
-		}
 
 		ASSERT_NO_THROW(tet.update(m_state));
 		EXPECT_TRUE(tet.getRotation().isApprox(m_rotation));
 		EXPECT_TRUE(tet.getRotatedStiffness().isApprox(
 			m_R12x12 * tet.getNonRotatedStiffness() * m_R12x12.transpose()));
+	}
+
+	{
+		SCOPED_TRACE("Affine transform : Translation + rotation * scaling");
+		Eigen::Matrix<double, 3, 3> R = m_rotation;
+		Eigen::Matrix<double, 12, 12> R12x12 = make12x12(R);
+		Eigen::UniformScaling<double> S = Eigen::Scaling(45.3);
+		transformation.linear() = R * S;
+		transformation.translation() = m_translation;
+		defineCurrentState(m_restState, &m_state, transformation, false);
+
+		MockFem3DElementCorotationalTet tet(m_nodeIds);
+		tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
+
+		ASSERT_NO_THROW(tet.update(m_state));
+		EXPECT_TRUE(tet.getRotation().isApprox(m_rotation));
+
+		// Extra stiffness terms
+		Eigen::Matrix<double, 9, 12> dFdX = Eigen::Matrix<double, 9, 12>::Zero();
+		for (size_t nodeId = 0; nodeId < 4; ++nodeId)
+		{
+			Vector3d ni(tet.getVinverse().row(nodeId).segment<3>(0));
+			dFdX.col(3 * nodeId + 0).segment<3>(0) = ni;
+			dFdX.col(3 * nodeId + 1).segment<3>(3) = ni;
+			dFdX.col(3 * nodeId + 2).segment<3>(6) = ni;
+		}
+
+		Eigen::Matrix<double, 9, 9> dRdF = Eigen::Matrix<double, 9, 9>::Zero();
+		SurgSim::Math::Matrix33d G = (2.0 * S.factor() * SurgSim::Math::Matrix33d::Identity()) * R.transpose();
+		Vector3d e[3] = {Vector3d::UnitX(), Vector3d::UnitY(), Vector3d::UnitZ()};
+		for (size_t i = 0; i < 3; ++i)
+		{
+			for (size_t j = 0; j < 3; ++j)
+			{
+				Vector3d wij = G.inverse() * 2.0 * skew((R.transpose() * e[i] * e[j].transpose()).eval());
+				SurgSim::Math::Matrix33d dRdFij = makeSkewSymmetricMatrix(wij) * R;
+				dRdF.col(3 * i + j).segment<3>(0) = dRdFij.col(0);
+				dRdF.col(3 * i + j).segment<3>(3) = dRdFij.col(1);
+				dRdF.col(3 * i + j).segment<3>(6) = dRdFij.col(2);
+			}
+		}
+
+		Eigen::Matrix<double, 9, 12> dRdX = dRdF * dFdX;
+
+		Eigen::Matrix<double, 12, 12> expectedStiffness = R12x12 * tet.getNonRotatedStiffness() * R12x12.transpose();
+		const Eigen::Matrix<double, 12, 12>& Krest = tet.getNonRotatedStiffness();
+		Eigen::Matrix<double, 12, 1> x;
+		SurgSim::Math::getSubVector(m_state.getPositions(), tet.getNodeIds(), 3, &x);
+		for (size_t dofId = 0; dofId < 12; ++dofId)
+		{
+			const Eigen::Matrix<double, 12, 12> dRdxl12x12 = make12x12(Eigen::Matrix<double, 9, 1>(dRdX.col(dofId)));
+			expectedStiffness.col(dofId) += dRdxl12x12 * Krest * (R12x12.transpose() * x - tet.getInitialPosition());
+			expectedStiffness.col(dofId) += R12x12 * Krest * dRdxl12x12.transpose() * x;
+		}
+		EXPECT_TRUE(tet.getRotatedStiffness().isApprox(expectedStiffness));
 	}
 }
 
 namespace
 {
-void defineCurrentState(const SurgSim::Math::OdeState& x0, SurgSim::Math::OdeState* x,
-						const SurgSim::Math::RigidTransform3d& t, bool addSmallDeformation)
+void testAddStiffness(MockFem3DElementCorotationalTet* tet,
+				  const SurgSim::Math::OdeState& state0,
+				  const SurgSim::Math::RigidTransform3d& t,
+				  double scale)
 {
-	std::array<Vector3d, 3> delta = {{Vector3d(0.01, -0.02, 0.005),
-		Vector3d(-0.01, -0.01, -0.03), Vector3d(0.0, -0.015, 0.03)}};
+	SurgSim::Math::OdeState state;
 
-	*x = x0;
-	for (size_t nodeId = 0; nodeId < x0.getNumNodes(); ++nodeId)
-	{
-		(*x).getPositions().segment<3>(3 * nodeId) = t * x0.getPositions().segment<3>(3 * nodeId);
-		if (addSmallDeformation)
-		{
-			(*x).getPositions().segment<3>(3 * nodeId) += delta[nodeId % 3];
-		}
-	}
+	defineCurrentState(state0, &state, t, false);
+	ASSERT_NO_THROW(tet->update(state));
+
+	Matrix expectedK = Matrix::Zero(state0.getNumDof(), state0.getNumDof());
+	SurgSim::Math::addSubMatrix(scale * tet->getRotatedStiffness(), tet->getNodeIds(), 3, &expectedK);
+
+	Matrix K = Matrix::Zero(state0.getNumDof(), state0.getNumDof());
+	tet->addStiffness(state, &K, scale);
+
+	EXPECT_TRUE(K.isApprox(expectedK));
 }
 }; // anonymous namespace
 
 TEST_F(Fem3DElementCorotationalTetrahedronTests, AddStiffnessTest)
 {
 	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::RigidTransform3d;
 
 	MockFem3DElementCorotationalTet tet(m_nodeIds);
 	tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
-	unsigned int numDof = m_restState.getNumDof();
-
 	{
 		SCOPED_TRACE("Without rotation, scale 1.0");
-
-		Matrix expectedK = Matrix::Zero(numDof, numDof);
-		SurgSim::Math::addSubMatrix(tet.getNonRotatedStiffness(), m_nodeIdsAsVector, 3, &expectedK);
-
-		Matrix K = Matrix::Zero(numDof, numDof);
-		tet.addStiffness(m_restState, &K);
-
-		EXPECT_TRUE(K.isApprox(expectedK));
+		testAddStiffness(&tet, m_restState, RigidTransform3d::Identity(), 1.0);
 	}
 
 	{
 		SCOPED_TRACE("Without rotation, scale 0.4");
-
-		Matrix expectedK = Matrix::Zero(numDof, numDof);
-		SurgSim::Math::addSubMatrix(tet.getNonRotatedStiffness() * 0.4, m_nodeIdsAsVector, 3, &expectedK);
-
-		Matrix K = Matrix::Zero(numDof, numDof);
-		tet.addStiffness(m_restState, &K, 0.4);
-
-		EXPECT_TRUE(K.isApprox(expectedK));
+		testAddStiffness(&tet, m_restState, RigidTransform3d::Identity(), 0.4);
 	}
 
 	{
 		SCOPED_TRACE("With rotation, scale 1.0");
-
-		defineCurrentState(m_restState, &m_state, makeRigidTransform(m_rotation, Vector3d::Zero()), false);
-		ASSERT_NO_THROW(tet.update(m_state));
-
-		Matrix expectedK = Matrix::Zero(numDof, numDof);
-		SurgSim::Math::addSubMatrix(m_R12x12 * tet.getNonRotatedStiffness() * m_R12x12.transpose(),
-			m_nodeIdsAsVector, 3, &expectedK);
-
-		Matrix K = Matrix::Zero(numDof, numDof);
-		tet.addStiffness(m_restState, &K);
-
-		EXPECT_TRUE(K.isApprox(expectedK));
+		testAddStiffness(&tet, m_restState, makeRigidTransform(m_rotation, Vector3d::Zero()), 1.0);
 	}
 
 	{
 		SCOPED_TRACE("With rotation, scale 0.4");
-
-		defineCurrentState(m_restState, &m_state, makeRigidTransform(m_rotation, Vector3d::Zero()), false);
-		ASSERT_NO_THROW(tet.update(m_state));
-
-		Matrix expectedK = Matrix::Zero(numDof, numDof);
-		SurgSim::Math::addSubMatrix(0.4 * m_R12x12 * tet.getNonRotatedStiffness() * m_R12x12.transpose(),
-			m_nodeIdsAsVector, 3, &expectedK);
-
-		Matrix K = Matrix::Zero(numDof, numDof);
-		tet.addStiffness(m_restState, &K, 0.4);
-
-		EXPECT_TRUE(K.isApprox(expectedK));
+		testAddStiffness(&tet, m_restState, makeRigidTransform(m_rotation, Vector3d::Zero()), 0.4);
 	}
 }
 
@@ -369,7 +404,6 @@ void testAddForce(MockFem3DElementCorotationalTet* tet,
 
 	EXPECT_TRUE(tet->getRotation().isApprox(R));
 	EXPECT_TRUE(tet->getNonRotatedStiffness().isApprox(K));
-	EXPECT_TRUE(tet->getRotatedStiffness().isApprox(R12x12 * K * R12x12.transpose()));
 	EXPECT_TRUE(tet->getInitialPosition().isApprox(x0));
 	{
 		SCOPED_TRACE("Scale 1.0");
@@ -397,8 +431,7 @@ void testAddForce(MockFem3DElementCorotationalTet* tet,
 		}
 	}
 }
-
-};
+}; // anonymous namespace
 
 TEST_F(Fem3DElementCorotationalTetrahedronTests, AddForceTest)
 {

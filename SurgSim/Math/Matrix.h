@@ -104,6 +104,20 @@ inline Eigen::Matrix<T, 3, 3> makeSkewSymmetricMatrix(const Eigen::Matrix<T, 3, 
 	return result;
 }
 
+/// Extract the unique vector from the skew-symmetric part of a given matrix.
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam MOpt the option flags (alignment etc.) used for the matrix argument.  Can be deduced.
+/// \param matrix the matrix to compute the skew symmetric part from.
+/// \returns the unique vector defining the skew-symmetric part of the matrix.
+/// \note For any vector u, skew(makeSkewSymmetricMatrix(u)) = u
+/// \note In general, returns the vector of the skew symmetric part of matrix: (matrix - matrix^T)/2
+template <typename T, int MOpt>
+inline Eigen::Matrix<T, 3, 1> skew(const Eigen::Matrix<T, 3, 3, MOpt>& matrix)
+{
+	Eigen::Matrix<T, 3, 3, MOpt> skewSymmetricPart = (matrix - matrix.transpose()) / 2.0;
+	return Eigen::Matrix<T, 3, 1>(skewSymmetricPart(2, 1), skewSymmetricPart(0, 2), skewSymmetricPart(1, 0));
+}
+
 /// Get the angle (in radians) and axis corresponding to a rotation matrix.
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
 /// \tparam MOpt the option flags (alignment etc.) used for the rotation matrix argument.  Can be deduced.
