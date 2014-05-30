@@ -162,11 +162,16 @@ bool Fem3DElementCorotationalTetrahedron::update(const SurgSim::Math::OdeState& 
 	}
 
 	// 2) Update the element's stiffness matrix based on the new rotation
-	// Compute the exact stiffness matrix K = R.Ke.R^t + [dR/dxl.Ke.(R^t.x-x0]_l + [R.Ke.(dR/dxl)^T.x]_l
+	// F = -RKe(R^t.x - x0)   with Ke the element linear stiffness matrix, R the 12x12 rotation matrix
+	// K = -dF/dx
+	// K = sum[dR/dxl.Ke.(R^t.x-x0)]_l + R.Ke.R^t + [R.Ke.(dR/dxl)^T.x]_l
 	// c.f. "Exact Corotational Linear FEM Stiffness Matrix", Jernej Barbic. Technical Report USC 2012.
 	// with
 	//   xl the l^th component of the dof vector x
-	//   [v]_l the l^th column of a 12x12 matrix defined by the column vector v
+	//   [v(l)]_l is a 12x12 matrix whose l^th column is defined by the column vector v(l)
+	// Each column of the 2 matrices [dR/dxl.Ke.(R^t.x-x0)]_l + [R.Ke.(dR/dxl)^T.x]_l
+	// can be calculated independently by differentiating R with respect to x, so the entire matrices are defined
+	// with a sum over the 12 degrees of freedom, to define each column one by one.
 
 	// Here is the rotated element stiffness matrix part
 	Eigen::Matrix<double, 12, 12> RK = R12x12 * m_K;
@@ -187,14 +192,15 @@ bool Fem3DElementCorotationalTetrahedron::update(const SurgSim::Math::OdeState& 
 
 	// dR/dx = dR/dF . dF/dx with dF/dx constant over time.
 	// Here, we compute the various dR/d(F[i][j]).
-	std::array<Vector3d, 3> e = {{Vector3d::UnitX(), Vector3d::UnitY(), Vector3d::UnitZ()}};
 	std::array<std::array<SurgSim::Math::Matrix33d, 3>, 3> dRdF;
 	for (size_t i = 0; i < 3; ++i)
 	{
 		for (size_t j = 0; j < 3; ++j)
 		{
-			// Compute wij by solving G.wij = 2.skew(R^t.ei.ej^t)
-			Vector3d wij = Ginv * 2.0 * skew((m_rotation.transpose() * (e[i] * e[j].transpose())).eval());
+			// Compute wij, the vector solution of G.wij = 2.skew(R^t.ei.ej^t)
+			// wij is a rotation vector by nature
+			Vector3d wij = Ginv * 2.0 * skew((m_rotation.transpose() *
+				(Vector3d::Unit(i) * Vector3d::Unit(j).transpose())).eval());
 
 			// Compute dR/dFij = [wij].R
 			dRdF[i][j] = makeSkewSymmetricMatrix(wij) * m_rotation;
@@ -202,19 +208,21 @@ bool Fem3DElementCorotationalTetrahedron::update(const SurgSim::Math::OdeState& 
 	}
 
 	// dR/dx = dR/dF . dF/dx
-	// Let define the following notation to follow the construction in the paper:
-	// A3x3 being a 3x3 matrix, aLaBarbic(A3x3) = (A00 A01 A02 A10 A11 A12 A20 A21 A22)
-	// dR/dF becomes a single 9x9 matrix where the 3x3 matrix dR/dFij is stored aLaBarbic as the (3*i+j)th row
+	// dF/dx is block sparse and constant over time, so we develop the matrix multiplication to avoid unecessary
+	// calculation. Nevertheless, to allow the user to follow this calculation, we relate it to the notation in
+	// the paper:
+	// A3x3 being a 3x3 matrix, asVector(A3x3) = (A00 A01 A02 A10 A11 A12 A20 A21 A22)
+	// dR/dF becomes a single 9x9 matrix where the 3x3 matrix dR/dFij is stored asVector in the (3*i+j)th row
 	// dF/dx becomes a single 9x12 matrix of the form (n1 0 0 n2 0 0 n3 0 0 n4 0 0)
 	//                                                (0 n1 0 0 n2 0 0 n3 0 0 n4 0)
 	//                                                (0 0 n1 0 0 n2 0 0 n3 0 0 n4)
 	// ni being the first 3 entries of the i^th row of V^1 (m_Vinverse)
 	//
-	// dR/dx = (aLaBarbic(dRdF00)).(n1x 0 0 n2x 0 0 n3x 0 0 n4x 0 0)
-	//         (aLaBarbic(dRdF01)) (n1y 0 0 n2y 0 0 n3y 0 0 n4y 0 0)
+	// dR/dx = (asVector(dRdF00)).(n1x 0 0 n2x 0 0 n3x 0 0 n4x 0 0)
+	//         (asVector(dRdF01)) (n1y 0 0 n2y 0 0 n3y 0 0 n4y 0 0)
 	//         (       ...       ) (              ...              )
-	//         (aLaBarbic(dRdF22)) (0 0 n1z 0 0 n2z 0 0 n3z 0 0 n4z)
-	// dR/dxl is a 3x3 matrix stored as the l^th column of the above resulting matrix
+	//         (asVector(dRdF22)) (0 0 n1z 0 0 n2z 0 0 n3z 0 0 n4z)
+	// dR/dxl is a 3x3 matrix stored asVector in the l^th column of the above resulting matrix
 	std::array<SurgSim::Math::Matrix33d, 12> dRdX;
 	for(int nodeId = 0; nodeId < 4; ++nodeId)
 	{
@@ -239,7 +247,7 @@ bool Fem3DElementCorotationalTetrahedron::update(const SurgSim::Math::OdeState& 
 	// K += [dR/dxl.Ke.(R^t.x-x0]_l + [R.Ke.(dR/dxl)^T.x]_l
 	// with
 	//   xl the l^th component of the dof vector x
-	//   [v]_l the l^th column of a 12x12 matrix defined by the column vector v
+	//   [v(l)]_l a 12x12 matrix whose l^th column is defined by the column vector v(l)
 	Eigen::Matrix<double, 12, 1> KTimesRx_x0 = m_K * (R12x12.transpose() * x - m_x0);
 	Eigen::Matrix<double, 12, 12> dRdxl12x12 = Eigen::Matrix<double, 12, 12>::Zero();
 	for (size_t dofId = 0; dofId < 12; ++dofId)
