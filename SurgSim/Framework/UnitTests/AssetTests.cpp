@@ -54,22 +54,20 @@ TEST(AssetTest, InitializationTest)
 {
 	{
 		MockAsset test;
-
 		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
 		// Call 'initialize()' without setting file name will fail.
-		EXPECT_ANY_THROW(test.initialize(applicationData));
+		EXPECT_FALSE(test.initialize(applicationData));
 		EXPECT_FALSE(test.isInitialized());
 	}
 
 	{
 		MockAsset test;
-
 		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
 		// Loading non-exist file will fail.
 		test.setFileName("Non-exist-file");
-		EXPECT_ANY_THROW(test.initialize(applicationData));
+		EXPECT_FALSE(test.initialize(applicationData));
 		EXPECT_FALSE(test.isInitialized());
 
 		// 'initialize()' can only be called once (no matter what the result the first time was).
@@ -80,7 +78,6 @@ TEST(AssetTest, InitializationTest)
 
 	{
 		MockAsset test;
-
 		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
 		test.setFileName("AssetTestData/DummyFile.txt");

@@ -143,6 +143,52 @@ TEST_F(MeshShapeTest, EmptyMeshTest)
 	EXPECT_NEAR(0.0, meshShape.getVolume(), 1e-8);
 	EXPECT_TRUE(meshShape.getCenter().isZero());
 	EXPECT_TRUE(meshShape.getSecondMomentOfVolume().isZero());
+	EXPECT_TRUE(meshShape.isValid()); // An empty mesh is regard as valid.
+
+	SurgSim::Math::MeshShape emptyMeshShape;
+	EXPECT_FALSE(emptyMeshShape.isValid());
+}
+
+TEST_F(MeshShapeTest, ValidMeshTest)
+{
+	{
+		SCOPED_TRACE("MeshShapeTest.ValidMeshTest.Invalid Mesh");
+		auto emptyMesh = std::make_shared<TriangleMeshBase>();
+		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>(*emptyMesh);
+		auto mesh = meshShape->getMesh();
+
+		for (int i = 0; i < cubeNumEdges; ++i)
+		{
+			std::array<unsigned int,2> edgePoints;
+			for (int j = 0; j < 2; j++)
+			{
+				edgePoints[j] = cubeEdges[i][j];
+			}
+			EdgeElement edgeElement(edgePoints);
+			TriangleMeshBase::EdgeType e(edgeElement);
+			mesh->addEdge(e);
+		}
+
+		EXPECT_FALSE(meshShape->isValid());
+	}
+
+	{
+		SCOPED_TRACE("MeshShapeTest.ValidMeshTest.Valid Mesh");
+		auto emptyMesh = std::make_shared<TriangleMeshBase>();
+		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>(*emptyMesh);
+		auto mesh = meshShape->getMesh();
+
+		std::shared_ptr<TriangleMeshBase> invalidTriMesh = std::make_shared<TriangleMeshBase>();
+		for (int i = 0; i < cubeNumPoints; i++)
+		{
+			SurgSim::Math::Vector3d point(cubePoints[i][0], cubePoints[i][1], cubePoints[i][2]);
+			TriangleMeshBase::VertexType vertex(point);
+			mesh->addVertex(vertex);
+		}
+
+		EXPECT_TRUE(meshShape->isValid());
+	}
+	
 }
 
 TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
@@ -251,5 +297,29 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 		auto ids = it->verticesId;
 		EXPECT_TRUE(tree->getAabb().contains(
 			SurgSim::Math::makeAabb(vertices[ids[0]].position, vertices[ids[1]].position, vertices[ids[2]].position)));
+	}
+}
+
+TEST_F(MeshShapeTest, DoInitializeTest)
+{
+	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	{
+		auto fileName = std::string("MeshShapeData/staple_collision.ply");
+		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
+
+		meshShape->setFileName(fileName);
+		auto path = data->findFile(fileName);
+		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
+		EXPECT_NO_THROW(EXPECT_TRUE(meshShape->doInitialize(path)));
+	}
+
+	{
+		auto fileName = std::string("MeshShapeData/InvalidMesh.ply");
+		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
+
+		meshShape->setFileName(fileName);
+		auto path = data->findFile(fileName);
+		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
+		EXPECT_ANY_THROW(meshShape->doInitialize(path));
 	}
 }
