@@ -37,8 +37,7 @@ const double epsilon = 2.6e-9;
 class MockFem3DElementCube : public Fem3DElementCube
 {
 public:
-	MockFem3DElementCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState) :
-		Fem3DElementCube(nodeIds, restState)
+	MockFem3DElementCube(std::array<unsigned int, 8> nodeIds) : Fem3DElementCube(nodeIds)
 	{
 	}
 
@@ -83,6 +82,18 @@ public:
 	double m_rho, m_E, m_nu;
 	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix, m_expectedStiffnessMatrix;
 	SurgSim::Math::Vector m_vectorOnes;
+
+	std::shared_ptr<MockFem3DElementCube> getCubeElement(const std::array<unsigned int, 8>& nodeIds)
+	{
+		std::shared_ptr<MockFem3DElementCube> element;
+
+		element = std::make_shared<MockFem3DElementCube>(nodeIds);
+		element->setYoungModulus(m_E);
+		element->setPoissonRatio(m_nu);
+		element->setMassDensity(m_rho);
+
+		return element;
+	}
 
 	void computeExpectedStiffnessMatrix(std::vector<unsigned int> nodeIdsVectorForm)
 	{
@@ -470,6 +481,41 @@ public:
 		m_expectedDampingMatrix.setZero();
 		computeExpectedStiffnessMatrix(nodeIdsVectorForm);
 	}
+
+	// This method tests all node permutations for both face definition (2 groups of 4 indices)
+	// keeping their ordering intact (CW or CCW)
+	void testNodeOrderingAllPermutations(const SurgSim::Math::OdeState& m_restState,
+		size_t id0, size_t id1, size_t id2, size_t id3,
+		size_t id4, size_t id5, size_t id6, size_t id7,
+		bool expectThrow)
+	{
+		std::array<size_t, 4> face1 = {{id0, id1, id2, id3}};
+		std::array<size_t, 4> face2 = {{id4, id5, id6, id7}};
+
+		// Shuffle the faces to create all the possible permutations
+		for (size_t face1Permutation = 0; face1Permutation < 4; face1Permutation++)
+		{
+			for (size_t face2Permutation = 0; face2Permutation < 4; face2Permutation++)
+			{
+				std::array<unsigned int, 8> ids;
+				for (size_t index = 0; index < 4; index++)
+				{
+					ids[    index] = face1[(index + face1Permutation) % 4];
+					ids[4 + index] = face2[(index + face2Permutation) % 4];
+				}
+
+				// Test this permutation
+				if (expectThrow)
+				{
+					EXPECT_ANY_THROW({auto cube = getCubeElement(ids); cube->initialize(m_restState);});
+				}
+				else
+				{
+					EXPECT_NO_THROW({auto cube = getCubeElement(ids); cube->initialize(m_restState);});
+				}
+			}
+		}
+	}
 };
 
 extern void testSize(const Vector& v, int expectedSize);
@@ -477,15 +523,35 @@ extern void testSize(const Matrix& m, int expectedRows, int expectedCols);
 
 TEST_F(Fem3DElementCubeTests, ConstructorTest)
 {
-	ASSERT_NO_THROW({MockFem3DElementCube cube(m_nodeIds, m_restState);});
-	ASSERT_NO_THROW({MockFem3DElementCube* cube = new MockFem3DElementCube(m_nodeIds, m_restState); delete cube;});
+	ASSERT_NO_THROW({MockFem3DElementCube cube(m_nodeIds);});
+	ASSERT_NO_THROW({MockFem3DElementCube* cube = new MockFem3DElementCube(m_nodeIds); delete cube;});
 	ASSERT_NO_THROW({std::shared_ptr<MockFem3DElementCube> cube =
-		std::make_shared<MockFem3DElementCube>(m_nodeIds, m_restState);});
+		std::make_shared<MockFem3DElementCube>(m_nodeIds);});
+}
+
+TEST_F(Fem3DElementCubeTests, InitializeTest)
+{
+	{
+		SCOPED_TRACE("Invalid node ids");
+
+		std::array<unsigned int, 8> invalidNodeIds = {{0, 1, 2, 3, 4, 10, 9, 8}};
+		ASSERT_NO_THROW({auto cube = getCubeElement(invalidNodeIds);});
+		auto cube = getCubeElement(invalidNodeIds);
+		ASSERT_THROW(cube->initialize(m_restState), SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		SCOPED_TRACE("Valid node ids");
+
+		ASSERT_NO_THROW({auto cube = getCubeElement(m_nodeIds);});
+		auto cube = getCubeElement(m_nodeIds);
+		ASSERT_NO_THROW(cube->initialize(m_restState));
+	}
 }
 
 TEST_F(Fem3DElementCubeTests, NodeIdsTest)
 {
-	Fem3DElementCube cube(m_nodeIds, m_restState);
+	Fem3DElementCube cube(m_nodeIds);
 	EXPECT_EQ(8u, cube.getNumNodes());
 	EXPECT_EQ(8u, cube.getNodeIds().size());
 	for (int i = 0; i < 8; i++)
@@ -497,42 +563,30 @@ TEST_F(Fem3DElementCubeTests, NodeIdsTest)
 
 TEST_F(Fem3DElementCubeTests, VolumeTest)
 {
-	MockFem3DElementCube cube(m_nodeIds, m_restState);
-	EXPECT_NEAR(cube.getRestVolume(), m_expectedVolume, 1e-10);
-	EXPECT_NEAR(cube.getVolume(m_restState), m_expectedVolume, 1e-10);
-}
-
-// This function tests all node permutations for both face definition (2 groups of 4 indices)
-// keeping their ordering intact (CW or CCW)
-void testNodeOrderingAllPermutations(const SurgSim::Math::OdeState& m_restState,
-					  size_t id0, size_t id1, size_t id2, size_t id3, size_t id4, size_t id5, size_t id6, size_t id7,
-					  bool expectThrow)
-{
-	std::array<size_t, 4> face1 = {{id0, id1, id2, id3}};
-	std::array<size_t, 4> face2 = {{id4, id5, id6, id7}};
-
-	// Shuffle the faces to create all the possible permutations
-	for (size_t face1Permutation = 0; face1Permutation < 4; face1Permutation++)
 	{
-		for (size_t face2Permutation = 0; face2Permutation < 4; face2Permutation++)
-		{
-			std::array<unsigned int, 8> ids;
-			for (size_t index = 0; index < 4; index++)
-			{
-				ids[    index] = face1[(index + face1Permutation) % 4];
-				ids[4 + index] = face2[(index + face2Permutation) % 4];
-			}
+		SCOPED_TRACE("Volume valid and positive");
 
-			// Test this permutation
-			if (expectThrow)
-			{
-				EXPECT_ANY_THROW({MockFem3DElementCube cube(ids, m_restState);});
-			}
-			else
-			{
-				EXPECT_NO_THROW({MockFem3DElementCube cube(ids, m_restState);});
-			}
-		}
+		auto cube = getCubeElement(m_nodeIds);
+		cube->initialize(m_restState); // rest volume is computed by the initialize method
+		EXPECT_NEAR(cube->getRestVolume(), m_expectedVolume, 1e-10);
+		EXPECT_NEAR(cube->getVolume(m_restState), m_expectedVolume, 1e-10);
+	}
+
+	{
+		SCOPED_TRACE("Volume valid but negative");
+
+		std::array<unsigned int, 8> nodeIds = {{0, 1, 3, 2, 4, 6, 7, 5}};
+		auto cube = getCubeElement(nodeIds);
+		ASSERT_THROW(cube->getVolume(m_restState), SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		SCOPED_TRACE("Volume invalid, degenerated cube");
+
+		// Copy the 1st 4 points over the 4 following points, so the cube degenerate to a square
+		m_restState.getPositions().segment<3 * 4>(12) = m_restState.getPositions().segment<3 * 4>(0);
+		auto cube = getCubeElement(m_nodeIds);
+		ASSERT_THROW(cube->getVolume(m_restState), SurgSim::Framework::AssertionFailure);
 	}
 }
 
@@ -600,10 +654,11 @@ TEST_F(Fem3DElementCubeTests, ShapeFunctionsTest)
 {
 	using SurgSim::Math::getSubVector;
 
-	MockFem3DElementCube cube(m_nodeIds, m_restState);
+	auto cube = getCubeElement(m_nodeIds);
+	cube->initialize(m_restState);
 
-	EXPECT_TRUE(cube.getInitialPosition().isApprox(m_expectedX0)) <<
-		"x0 = " << cube.getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
+	EXPECT_TRUE(cube->getInitialPosition().isApprox(m_expectedX0)) <<
+		"x0 = " << cube->getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
 
 	// We should have by construction:
 	// { N0(p0) = 1    N1(p0)=N2(p0)=N3(p0)=0
@@ -621,14 +676,14 @@ TEST_F(Fem3DElementCubeTests, ShapeFunctionsTest)
 	double Ni_p0[8], Ni_p1[8], Ni_p2[8], Ni_p3[8], Ni_p4[8], Ni_p5[8], Ni_p6[8], Ni_p7[8];
 	for (int i = 0; i < 8; i++)
 	{
-		Ni_p0[i] = cube.evaluateN(i, -1.0, -1.0, -1.0);
-		Ni_p1[i] = cube.evaluateN(i, +1.0, -1.0, -1.0);
-		Ni_p2[i] = cube.evaluateN(i, +1.0, +1.0, -1.0);
-		Ni_p3[i] = cube.evaluateN(i, -1.0, +1.0, -1.0);
-		Ni_p4[i] = cube.evaluateN(i, -1.0, -1.0, +1.0);
-		Ni_p5[i] = cube.evaluateN(i, +1.0, -1.0, +1.0);
-		Ni_p6[i] = cube.evaluateN(i, +1.0, +1.0, +1.0);
-		Ni_p7[i] = cube.evaluateN(i, -1.0, +1.0, +1.0);
+		Ni_p0[i] = cube->evaluateN(i, -1.0, -1.0, -1.0);
+		Ni_p1[i] = cube->evaluateN(i, +1.0, -1.0, -1.0);
+		Ni_p2[i] = cube->evaluateN(i, +1.0, +1.0, -1.0);
+		Ni_p3[i] = cube->evaluateN(i, -1.0, +1.0, -1.0);
+		Ni_p4[i] = cube->evaluateN(i, -1.0, -1.0, +1.0);
+		Ni_p5[i] = cube->evaluateN(i, +1.0, -1.0, +1.0);
+		Ni_p6[i] = cube->evaluateN(i, +1.0, +1.0, +1.0);
+		Ni_p7[i] = cube->evaluateN(i, -1.0, +1.0, +1.0);
 	}
 	EXPECT_NEAR(Ni_p0[0], 1.0, 1e-12);
 	for (size_t i = 0; i < 8; ++i)
@@ -698,7 +753,7 @@ TEST_F(Fem3DElementCubeTests, ShapeFunctionsTest)
 				double sum = 0.0;
 				for (int i = 0; i < 8; i++)
 				{
-					Ni_p[i] = cube.evaluateN(i, epsilon, eta, mu);
+					Ni_p[i] = cube->evaluateN(i, epsilon, eta, mu);
 					sum += Ni_p[i];
 				}
 				EXPECT_NEAR(sum, 1.0, 1e-10) <<
@@ -714,21 +769,22 @@ TEST_F(Fem3DElementCubeTests, ShapeFunctionsTest)
 
 TEST_F(Fem3DElementCubeTests, CoordinateTests)
 {
-	MockFem3DElementCube cube(m_nodeIds, m_restState);
+	auto cube = getCubeElement(m_nodeIds);
+	cube->initialize(m_restState);
 
 	{
 		// Non-normalize node
 		SurgSim::Math::Vector nodePositions(8);
 		nodePositions <<  0.7, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-		EXPECT_FALSE(cube.isValidCoordinate(nodePositions));
+		EXPECT_FALSE(cube->isValidCoordinate(nodePositions));
 
 		// Node with point which is outside of the cube
 		nodePositions <<  1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-		EXPECT_FALSE(cube.isValidCoordinate(nodePositions));
+		EXPECT_FALSE(cube->isValidCoordinate(nodePositions));
 
 		// Normal node
 		nodePositions <<  0.5, 0.25, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0;
-		EXPECT_TRUE(cube.isValidCoordinate(nodePositions));
+		EXPECT_TRUE(cube->isValidCoordinate(nodePositions));
 
 	}
 
@@ -736,7 +792,7 @@ TEST_F(Fem3DElementCubeTests, CoordinateTests)
 		// Node with more than 8 coordinate points
 		SurgSim::Math::Vector nodePositions(9);
 		nodePositions <<  1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-		EXPECT_FALSE(cube.isValidCoordinate(nodePositions));
+		EXPECT_FALSE(cube->isValidCoordinate(nodePositions));
 	}
 
 	{
@@ -744,7 +800,7 @@ TEST_F(Fem3DElementCubeTests, CoordinateTests)
 		// some greater than 1 and less than (1 + epsilon).
 		SurgSim::Math::Vector nodePositions(8);
 		nodePositions <<  -1e-11, 1.0 + 1e-11, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-		EXPECT_TRUE(cube.isValidCoordinate(nodePositions));
+		EXPECT_TRUE(cube->isValidCoordinate(nodePositions));
 	}
 
 	// Test computeCartesianCoordinate.
@@ -752,17 +808,17 @@ TEST_F(Fem3DElementCubeTests, CoordinateTests)
 		// Compute central point of the cube
 		SurgSim::Math::Vector nodePositions(8);
 		nodePositions << 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
-		EXPECT_TRUE(cube.isValidCoordinate(nodePositions));
+		EXPECT_TRUE(cube->isValidCoordinate(nodePositions));
 		EXPECT_TRUE(SurgSim::Math::Vector3d(0.0, 0.0, 0.0).isApprox(
-					cube.computeCartesianCoordinate(m_restState, nodePositions), epsilon));
+					cube->computeCartesianCoordinate(m_restState, nodePositions), epsilon));
 	}
 
 	{
 		SurgSim::Math::Vector nodePositions(8);
 		nodePositions << 0.01, 0.07, 0.11, 0.05, 0.0, 0.23, 0.13, 0.4;
-		EXPECT_TRUE(cube.isValidCoordinate(nodePositions));
+		EXPECT_TRUE(cube->isValidCoordinate(nodePositions));
 		EXPECT_TRUE(SurgSim::Math::Vector3d(0.04, 0.19, 0.26).isApprox(
-					cube.computeCartesianCoordinate(m_restState, nodePositions), epsilon));
+					cube->computeCartesianCoordinate(m_restState, nodePositions), epsilon));
 		// 0.01 * (-0.5,-0.5,-0.5) => (-0.005, -0.005, -0.005)
 		// 0.07 * ( 0.5,-0.5,-0.5) => ( 0.035, -0.035, -0.035)
 		// 0.11 * ( 0.5, 0.5,-0.5) => ( 0.055,  0.055, -0.055)
@@ -775,7 +831,7 @@ TEST_F(Fem3DElementCubeTests, CoordinateTests)
 	}
 
 	// Test computeNaturalCoordinate.
-	EXPECT_THROW(cube.computeNaturalCoordinate(m_restState, SurgSim::Math::Vector3d(0.0, 0.0, 0.0)),
+	EXPECT_THROW(cube->computeNaturalCoordinate(m_restState, SurgSim::Math::Vector3d(0.0, 0.0, 0.0)),
 				 SurgSim::Framework::AssertionFailure);
 }
 
@@ -783,38 +839,8 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 {
 	using SurgSim::Math::getSubVector;
 
-	MockFem3DElementCube cube(m_nodeIds, m_restState);
-
-	// Test the various mode of failure related to the physical parameters
-	// This has been already tested in FemElementTests, but this is to make sure this method is called properly
-	// So the same behavior should be expected
-	{
-		// Mass density not set
-		ASSERT_ANY_THROW(cube.initialize(m_restState));
-
-		// Poisson Ratio not set
-		cube.setMassDensity(-1234.56);
-		ASSERT_ANY_THROW(cube.initialize(m_restState));
-
-		// Young modulus not set
-		cube.setPoissonRatio(0.55);
-		ASSERT_ANY_THROW(cube.initialize(m_restState));
-
-		// Invalid mass density
-		cube.setYoungModulus(-4321.33);
-		ASSERT_ANY_THROW(cube.initialize(m_restState));
-
-		// Invalid Poisson ratio
-		cube.setMassDensity(m_rho);
-		ASSERT_ANY_THROW(cube.initialize(m_restState));
-
-		// Invalid Young modulus
-		cube.setPoissonRatio(m_nu);
-		ASSERT_ANY_THROW(cube.initialize(m_restState));
-
-		cube.setYoungModulus(m_E);
-		ASSERT_NO_THROW(cube.initialize(m_restState));
-	}
+	auto cube = getCubeElement(m_nodeIds);
+	cube->initialize(m_restState);
 
 	SurgSim::Math::Vector forceVector(3*8);
 	SurgSim::Math::Matrix massMatrix(3*8, 3*8);
@@ -827,19 +853,19 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	stiffnessMatrix.setZero();
 
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
-	cube.addForce(m_restState, &forceVector);
+	cube->addForce(m_restState, &forceVector);
 	EXPECT_TRUE(forceVector.isZero());
 
-	cube.addMass(m_restState, &massMatrix);
+	cube->addMass(m_restState, &massMatrix);
 	EXPECT_TRUE(massMatrix.isApprox(m_expectedMassMatrix)) <<
 		"Expected mass matrix :" << std::endl << m_expectedMassMatrix  << std::endl << std::endl <<
 		"Mass matrix :"  << std::endl << massMatrix << std::endl << std::endl <<
 		"Error on the mass matrix is "  << std::endl << m_expectedMassMatrix - massMatrix << std::endl;
 
-	cube.addDamping(m_restState, &dampingMatrix);
+	cube->addDamping(m_restState, &dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
 
-	cube.addStiffness(m_restState, &stiffnessMatrix);
+	cube->addStiffness(m_restState, &stiffnessMatrix);
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix)) <<
 		"Error on the stiffness matrix is " << std::endl << m_expectedStiffnessMatrix - stiffnessMatrix << std::endl;
 
@@ -848,7 +874,7 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	dampingMatrix.setZero();
 	stiffnessMatrix.setZero();
 
-	cube.addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
+	cube->addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());
 	EXPECT_TRUE(massMatrix.isApprox(m_expectedMassMatrix));
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
@@ -856,28 +882,28 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 
 	// Test addMatVec API with Mass component only
 	forceVector.setZero();
-	cube.addMatVec(m_restState, 1.0, 0.0, 0.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(m_restState, 1.0, 0.0, 0.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedMassMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
-	cube.addMatVec(m_restState, 0.0, 1.0, 0.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(m_restState, 0.0, 1.0, 0.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedDampingMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
-	cube.addMatVec(m_restState, 0.0, 0.0, 1.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(m_restState, 0.0, 0.0, 1.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedStiffnessMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
-	cube.addMatVec(m_restState, 1.0, 2.0, 3.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(m_restState, 1.0, 2.0, 3.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		double expectedCoef = 1.0 * m_expectedMassMatrix.row(rowId).sum() +
