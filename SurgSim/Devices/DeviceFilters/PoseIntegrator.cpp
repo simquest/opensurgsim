@@ -15,6 +15,8 @@
 
 #include "SurgSim/Devices/DeviceFilters/PoseIntegrator.h"
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/DataGroupCopier.h"
 #include "SurgSim/Framework/Log.h"
@@ -121,6 +123,11 @@ void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataS
 				SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Devices/Filters/PoseIntegrator")) <<
 					"The Timer used by " << getName() <<
 					" had a clock fail.  The calculated velocities will be zero this update.";
+			}
+
+			if (!boost::math::isnormal(rate))
+			{
+				rate = 0.0;
 			}
 
 			if (m_resetIndex >= 0)
