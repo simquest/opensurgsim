@@ -23,6 +23,8 @@
 namespace
 {
 const std::string serializeLogger = "Serialization";
+const std::string HasValueName = "HasValue";
+const std::string ValueName = "Value";
 };
 
 template <class T>
@@ -30,9 +32,14 @@ YAML::Node YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::encode(
 	const SurgSim::DataStructures::OptionalValue<T>& rhs)
 {
 	Node node;
+	node[HasValueName] = rhs.hasValue();
 	if (rhs.hasValue())
 	{
-		node = rhs.getValue();
+		node[ValueName] = rhs.getValue();
+	}
+	else
+	{
+		node[ValueName] = "Not set";
 	}
 	return node;
 }
@@ -41,16 +48,23 @@ template <class T>
 bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
 	const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs)
 {
-	bool result = false;
-	try
+	bool result = true;
+	if (node[HasValueName].as<bool>())
 	{
-		rhs.setValue(node.as<T>());
-		result = true;
+		try
+		{
+			rhs.setValue(node[ValueName].as<T>());
+		}
+		catch (YAML::RepresentationException)
+		{
+			result = false;
+			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
+			SURGSIM_LOG(logger, WARNING) << "Bad conversion";
+		}
 	}
-	catch (YAML::RepresentationException)
+	else
 	{
-		auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
-		SURGSIM_LOG(logger, WARNING) << "Bad conversion";
+		rhs.invalidate();
 	}
 	return result;
 }

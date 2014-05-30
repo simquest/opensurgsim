@@ -23,7 +23,6 @@ set(UNIT_TEST_SOURCES
 	AabbTreeTests.cpp
 	BufferedValueTests.cpp
 	DataGroupTests.cpp
-	DataStructuresConvertTests.cpp
 	IndexDirectoryTests.cpp
 	MeshElementTest.cpp
 	MeshTest.cpp
