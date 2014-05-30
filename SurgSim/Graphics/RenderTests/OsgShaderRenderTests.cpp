@@ -16,16 +16,18 @@
 /// \file
 /// Render Tests for the OsgShader class.
 
-#include "SurgSim/Graphics/OsgUniform.h"
+
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
-#include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -50,17 +52,13 @@ namespace SurgSim
 namespace Graphics
 {
 
-std::shared_ptr<Shader> loadExampleShader()
+std::shared_ptr<Shader> loadExampleShader(const SurgSim::Framework::ApplicationData& data)
 {
 	std::shared_ptr<Shader> shader = std::make_shared<OsgShader>();
 
-	std::vector<std::string> paths;
-	paths.push_back("Data/OsgShaderRenderTests");
-	SurgSim::Framework::ApplicationData data(paths);
-
-	std::string vertexShaderPath = data.findFile("shader.vert");
-	std::string geometryShaderPath = data.findFile("shader.geom");
-	std::string fragmentShaderPath = data.findFile("shader.frag");
+	std::string vertexShaderPath = data.findFile("OsgShaderRenderTests/shader.vert");
+	std::string geometryShaderPath = data.findFile("OsgShaderRenderTests/shader.geom");
+	std::string fragmentShaderPath = data.findFile("OsgShaderRenderTests/shader.frag");
 
 	EXPECT_NE("", vertexShaderPath) << "Could not find vertex shader!";
 	EXPECT_NE("", geometryShaderPath) << "Could not find geometry shader!";
@@ -73,27 +71,15 @@ std::shared_ptr<Shader> loadExampleShader()
 	return shader;
 }
 
+struct OsgShaderRenderTests : public RenderTest
+{
+
+};
+
 /// Pops up a window with a sphere colored by its normals and its mirror along the x-axis is also drawn using the
 /// geometry shader
-TEST(OsgShaderRenderTests, SphereShaderTest)
+TEST_F(OsgShaderRenderTests, SphereShaderTest)
 {
-	ASSERT_TRUE(boost::filesystem::exists("Data"));
-
-	/// Enable OSG info notifications to see the shader compilation results
-	osg::NotifySeverity previousNotifyLevel = osg::getNotifyLevel();
-	osg::setNotifyLevel(osg::INFO);
-
-	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
-	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
-
-	runtime->addManager(manager);
-
-	std::shared_ptr<Scene> scene = runtime->getScene();
-
-	/// Add a graphics view element to the scene
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view element");
-	scene->addSceneElement(viewElement);
-
 	/// Add the sphere representation to the view element, no need to make another scene element
 	std::shared_ptr<SphereRepresentation> sphereRepresentation =
 		std::make_shared<OsgSphereRepresentation>("sphere representation");
@@ -102,7 +88,7 @@ TEST(OsgShaderRenderTests, SphereShaderTest)
 
 	/// Add a shader to the sphere
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
-	std::shared_ptr<Shader> shader = loadExampleShader();
+	std::shared_ptr<Shader> shader = loadExampleShader(*applicationData);
 
 	material->setShader(shader);
 	sphereRepresentation->setMaterial(material);
@@ -111,13 +97,9 @@ TEST(OsgShaderRenderTests, SphereShaderTest)
 
 	/// Run the thread
 	runtime->start();
-	EXPECT_TRUE(manager->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
 	runtime->stop();
 
-	/// Reset notify level
-	osg::setNotifyLevel(previousNotifyLevel);
 }
 
 };  // namespace Graphics

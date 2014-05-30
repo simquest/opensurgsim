@@ -37,8 +37,8 @@ namespace Graphics
 
 void RenderTest::SetUp()
 {
-	applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
-	runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	applicationData = runtime->getApplicationData();
 	graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
 	runtime->addManager(graphicsManager);
