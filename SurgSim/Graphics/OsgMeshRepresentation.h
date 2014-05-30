@@ -18,12 +18,12 @@
 
 #include <memory>
 
+#include <osg/Array>
+#include <osg/ref_ptr>
+
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/MeshRepresentation.h"
-#include "SurgSim/Graphics/Mesh.h"
-
-#include <osg/ref_ptr>
-#include <osg/Array>
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -40,15 +40,12 @@ namespace SurgSim
 {
 namespace Graphics
 {
-
-class OsgTexture;
-class Texture;
+class Mesh;
 
 /// Implementation of a MeshRepresentation for rendering under osg.
 class OsgMeshRepresentation : public OsgRepresentation, public MeshRepresentation
 {
 public:
-
 	/// Constructor.
 	/// \param	name	The name.
 	explicit OsgMeshRepresentation(const std::string& name);
@@ -56,32 +53,36 @@ public:
 	/// Destructor
 	~OsgMeshRepresentation();
 
-	/// Get the mesh that is used by this representation.
-	/// \return The mesh structure;
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgMeshRepresentation);
+
 	virtual std::shared_ptr<Mesh> getMesh() override;
 
-	/// Sets the mesh to render as a wire frame.
-	/// \param	val	true if this mesh should be rendered as a wire-frame.
 	virtual void setDrawAsWireFrame(bool val) override;
+	virtual bool getDrawAsWireFrame() const override;
 
-	/// Sets the structures that are expected to change during the lifetime of the mesh, these will be updated
-	/// every frame, independent of a structural change in the mesh. UPDATE_OPTION_VERTICES is set in the constructor
-	/// as a default value.
-	/// \param	val	Boolean or expression of UpdateOption enum.
 	virtual void setUpdateOptions(int val) override;
-
-	/// Gets update options for this mesh.
-	/// \return	The update options.
 	virtual int getUpdateOptions() const override;
 
 	osg::ref_ptr<osg::Geometry> getOsgGeometry();
+
+	virtual void setFilename(std::string filename) override;
+	virtual std::string getFilename() const override;
 
 protected:
 	virtual void doUpdate(double dt) override;
 
 private:
+	/// Indicates if the mesh is rendered as a wireframe.
+	bool m_drawAsWireFrame;
+
+	/// Indicates which elements of the mesh should be updated on every frame
+	int m_updateOptions;
+
 	/// The mesh.
 	std::shared_ptr<Mesh> m_mesh;
+
+	/// File name of the external file which contains the mesh to be used by this class.
+	std::string m_filename;
 
 	///@{
 	/// Osg structures
@@ -109,9 +110,6 @@ private:
 	/// Updates the triangles.
 	void updateTriangles();
 
-	/// Indicates which elements of the mesh should be updated on every frame
-	int m_updateOptions;
-
 	/// Gets data variance for a given update option.
 	/// \param	updateOption	The update option.
 	/// \return	The data variance.
@@ -125,4 +123,4 @@ private:
 }; // Graphics
 }; // SurgSim
 
-#endif
+#endif // SURGSIM_GRAPHICS_OSGMESHREPRESENTATION_H
