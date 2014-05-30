@@ -102,6 +102,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	SurgSim::Math::IntegrationScheme integrationScheme,
 	bool displayPointCloud)
 {
+	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 	// Create a SceneElement that bundles the pieces associated with the finite element model
 	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement
 		= std::make_shared<SurgSim::Framework::BasicSceneElement>(name);
@@ -116,6 +117,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// Load the surface triangle mesh of the finite element model
 	auto meshShape = std::make_shared<MeshShape>();
 	meshShape->setFileName(filename);
+	meshShape->initialize(data);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	auto graphicsTriangleMeshRepresentation	= std::make_shared<OsgMeshRepresentation>(name + " triangle mesh");
