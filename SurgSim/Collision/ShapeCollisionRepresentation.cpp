@@ -67,7 +67,7 @@ const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getSha
 void ShapeCollisionRepresentation::update(const double& dt)
 {
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
-	if (nullptr != meshShape && nullptr != meshShape->getMesh() && meshShape->getMesh()->isValid())
+	if (nullptr != meshShape && meshShape->isValid())
 	{
 		meshShape->setPose(getPose());
 	}

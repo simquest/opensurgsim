@@ -40,6 +40,11 @@ int MeshShape::getType()
 	return SHAPE_TYPE_MESH;
 }
 
+bool MeshShape::isValid() const
+{
+	return (nullptr != m_mesh) && (m_mesh->isValid());
+}
+
 bool MeshShape::doInitialize(const std::string& fileName)
 {
 	using SurgSim::DataStructures::TriangleMesh;
