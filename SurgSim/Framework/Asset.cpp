@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {
@@ -46,12 +47,20 @@ bool Asset::initialize(const std::shared_ptr<ApplicationData>& data)
 	SURGSIM_ASSERT(!m_hasBeenInitialized) << "Initialization has been called before";
 	m_hasBeenInitialized = true;
 
+	bool result = false;
 	std::string path = data->findFile(m_fileName);
-	SURGSIM_ASSERT(!path.empty()) << "Can not locate file " << m_fileName;
 
-	m_isInitialized = doInitialize(path);
+	if (path.empty())
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << "Can not locate file " << m_fileName;
+	}
+	else
+	{
+		m_isInitialized = doInitialize(path);
+		result = m_isInitialized;
+	}
 
-	return m_isInitialized;
+	return result;
 }
 
 bool Asset::isInitialized() const

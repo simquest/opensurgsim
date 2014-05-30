@@ -47,21 +47,23 @@ public:
 	/// \return Name of the file loaded by this class.
 	std::string getFileName() const;
 
-	/// Check for existence of the resolved filename, return false if not found
-	/// Will fail on double calls.
+	/// Check for existence of the resolved filename, return false if not found.
+	/// If found, it then calls 'doInitialize()' to load the file. Return 'false' if 'doInitialize()' fails.
+	/// It asserts on double calls.
 	/// \param data Gives the locations to search for the file.
-	/// \return true if load succesffuly; false otherwise.
+	/// \return true if file is found and loaded succesffuly; false otherwise.
 	bool initialize(const std::shared_ptr<ApplicationData>& data);
 
 	/// Check to see if an attempt has been made to load the file.
 	/// \return true if initialization succeeded, false otherwise
 	bool isInitialized() const;
 
-private:
 	/// Derived classes will overwrite this method to do actual loading.
+	/// \note This method is not required to do any check on the validity or the existence of the file.
 	/// \return false if loading failed, assume filename != ""
 	virtual bool doInitialize(const std::string& fileName) = 0;
 
+private:
 	/// Indicates if an attempt to load the file has been made.
 	bool m_hasBeenInitialized;
 
