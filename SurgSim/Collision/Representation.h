@@ -70,32 +70,17 @@ public:
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
-	std::shared_ptr<SurgSim::DataStructures::BufferedValue<ContactMapType>> getCollisions();
-
-	/// Add a contact against a given collision representation.
-	/// \param collisionRepresentation The collision representation to which this collision representation collides.
-	/// \param contact The contact information.
-	/// \note The Contact object added to the map follows the convention of pointing the contact normal toward
-	/// this representation. And the first penetration point is on this representation and the second is on
-	/// collisionRepresentation.
-	void addCollisionWith(const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation,
-						  const std::shared_ptr<SurgSim::Collision::Contact>& contact);
-
-	/// Clear all the collisions.
-	void clearCollisions();
+	SurgSim::DataStructures::BufferedValue<ContactMapType>& getCollisions();
 
 	/// Update the representation.
 	/// \param dt the time passed from the last update.
 	virtual void update(const double& dt);
 
-	/// Publish the buffered collision map.
-	virtual void publishCollisions();
-
 protected:
 	/// A map which associates a list of contacts with each collision representation.
 	/// Every contact added to this map follows the convention of pointing the contact normal toward this
 	/// representation. And the first penetration point is on this representation.
-	std::shared_ptr<SurgSim::DataStructures::BufferedValue<ContactMapType>> m_collisions;
+	SurgSim::DataStructures::BufferedValue<ContactMapType> m_collisions;
 };
 
 

@@ -22,8 +22,7 @@ namespace Collision
 {
 
 Representation::Representation(const std::string& name) :
-	SurgSim::Framework::Representation(name),
-	m_collisions(std::make_shared<SurgSim::DataStructures::BufferedValue<ContactMapType>>())
+	SurgSim::Framework::Representation(name)
 {
 }
 
@@ -32,30 +31,13 @@ Representation::~Representation()
 
 }
 
-std::shared_ptr<SurgSim::DataStructures::BufferedValue<ContactMapType>> Representation::getCollisions()
+SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getCollisions()
 {
 	return m_collisions;
 }
 
-void Representation::addCollisionWith(
-	const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation,
-	const std::shared_ptr<SurgSim::Collision::Contact>& contact)
-{
-	m_collisions->unsafeGet()[collisionRepresentation].push_back(contact);
-}
-
-void Representation::clearCollisions()
-{
-	m_collisions->unsafeGet().clear();
-}
-
 void Representation::update(const double& dt)
 {
-}
-
-void Representation::publishCollisions()
-{
-	m_collisions->publish();
 }
 
 }; // namespace Collision

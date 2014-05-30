@@ -61,7 +61,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	for (auto representation = std::begin(representations); representation != std::end(representations);
 		++representation)
 	{
-		(*representation)->publishCollisions();
+		(*representation)->getCollisions().publish();
 	}
 
 	return result;
@@ -108,7 +108,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 	{
 		for (auto it = std::begin(representations); it != std::end(representations); ++it)
 		{
-			(*it)->clearCollisions();
+			(*it)->getCollisions().unsafeGet().clear();
 		}
 
 		std::vector<std::shared_ptr<CollisionPair>> pairs;

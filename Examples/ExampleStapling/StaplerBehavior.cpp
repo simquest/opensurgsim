@@ -38,7 +38,6 @@
 #include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
 
 using SurgSim::Collision::ContactMapType;
-using SurgSim::DataStructures::SafeReadAccessor;
 using SurgSim::Physics::ConstraintImplementation;
 using SurgSim::Physics::FixedRepresentationBilateral3D;
 using SurgSim::Physics::RigidRepresentationBilateral3D;
@@ -207,7 +206,7 @@ void StaplerBehavior::createStaple()
 	{
 		// The virtual tooth could be in contact with any number of objects in the scene.
 		// Get its collisionMap.
-		ContactMapType collisionsMap = *((*virtualTooth)->getCollisions()->safeGet());
+		ContactMapType collisionsMap = *((*virtualTooth)->getCollisions().safeGet());
 
 		// If the virtualTooth has no collision, continue to next loop iteration.
 		if (collisionsMap.empty())

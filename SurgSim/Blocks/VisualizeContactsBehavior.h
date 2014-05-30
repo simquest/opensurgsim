@@ -25,12 +25,6 @@
 namespace SurgSim
 {
 
-namespace DataStructures
-{
-template<class T>
-class SafeReadAccessor;
-}
-
 namespace Graphics
 {
 class VectorFieldRepresentation;

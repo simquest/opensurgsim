@@ -28,7 +28,6 @@
 using SurgSim::Collision::Contact;
 using SurgSim::Collision::ContactMapType;
 using SurgSim::Collision::Representation;
-using SurgSim::DataStructures::SafeReadAccessor;
 using SurgSim::DataStructures::Vertex;
 using SurgSim::Graphics::OsgVectorFieldRepresentation;
 using SurgSim::Graphics::VectorField;
@@ -69,7 +68,7 @@ void VisualizeContactsBehavior::setCollisionRepresentation(
 void VisualizeContactsBehavior::update(double dt)
 {
 	std::shared_ptr<const SurgSim::Collision::ContactMapType> collisions =
-		m_collisionRepresentation->getCollisions()->safeGet();
+		m_collisionRepresentation->getCollisions().safeGet();
 	if (!collisions->empty())
 	{
 		size_t totalContacts = 0;

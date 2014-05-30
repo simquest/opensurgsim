@@ -113,8 +113,8 @@ TEST(CollisionPairTests, addContactTest)
 	std::shared_ptr<Representation> rep0 = makeSphereRepresentation(1.0);
 	std::shared_ptr<Representation> rep1 = makeSphereRepresentation(2.0);
 
-	ContactMapType& rep0Collisions = rep0->getCollisions()->unsafeGet();
-	ContactMapType& rep1Collisions = rep1->getCollisions()->unsafeGet();
+	ContactMapType& rep0Collisions = rep0->getCollisions().unsafeGet();
+	ContactMapType& rep1Collisions = rep1->getCollisions().unsafeGet();
 
 	EXPECT_TRUE(rep0Collisions.empty());
 	EXPECT_TRUE(rep1Collisions.empty());
