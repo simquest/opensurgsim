@@ -19,7 +19,6 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
@@ -28,6 +27,11 @@ namespace SurgSim
 namespace Graphics
 {
 class VectorFieldRepresentation;
+}
+
+namespace Collision
+{
+class Representation;
 }
 
 namespace Blocks

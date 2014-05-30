@@ -17,6 +17,7 @@
 
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
@@ -26,7 +27,6 @@
 #include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Collision::Contact;
-using SurgSim::Collision::ContactMapType;
 using SurgSim::Collision::Representation;
 using SurgSim::DataStructures::Vertex;
 using SurgSim::Graphics::OsgVectorFieldRepresentation;

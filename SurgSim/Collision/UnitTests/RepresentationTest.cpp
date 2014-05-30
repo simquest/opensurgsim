@@ -139,7 +139,7 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_TRUE(unsafePlaneCollisions.empty());
 
 	// The thread-safe collision map is buffered, so it should still be empty before the publish.
-	EXPECT_TRUE(safePlaneCollisions->empty());
+	EXPECT_TRUE(planeRep->getCollisions().safeGet()->empty());
 
 	// After the publish the thread-safe collision map should be up-to-date.
 	planeRep->getCollisions().publish();

@@ -44,7 +44,7 @@ public:
 	/// Destructor
 	~BufferedValue();
 
-	/// Stores the current value to be returned by calls to safeGet.
+	/// Make the current value the one returned by calls to safeGet.
 	void publish();
 
 	/// Get the value
