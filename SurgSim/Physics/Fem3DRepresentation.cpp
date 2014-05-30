@@ -84,23 +84,6 @@ RepresentationType Fem3DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM3D;
 }
 
-void Fem3DRepresentation::applyCorrection(double dt,
-										  const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
-{
-	if (!isActive())
-	{
-		return;
-	}
-
-	m_currentState->getPositions() += deltaVelocity * dt;
-	m_currentState->getVelocities() += deltaVelocity;
-
-	if (!m_currentState->isValid())
-	{
-		deactivateAndReset();
-	}
-}
-
 void Fem3DRepresentation::setFilename(const std::string& filename)
 {
 	m_filename = filename;

@@ -19,15 +19,14 @@
 
 #include <boost/thread/locks.hpp>
 
-#include "SurgSim/Framework/Log.h"
-
-#include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgRigidTransformConversions.h"
-#include "SurgSim/Graphics/OsgUnitBox.h"
-
 #include <osg/Geode>
 #include <osg/Switch>
 #include <osg/PositionAttitudeTransform>
+
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgRigidTransformConversions.h"
+#include "SurgSim/Graphics/OsgUnitBox.h"
 
 namespace SurgSim
 {

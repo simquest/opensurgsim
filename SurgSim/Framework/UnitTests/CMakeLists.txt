@@ -22,6 +22,7 @@ set(UNIT_TEST_SOURCES
 	AccessibleTypeTests.cpp
 	ApplicationDataTest.cpp
 	AssertTest.cpp
+	AssetTests.cpp
 	BarrierTest.cpp
 	BasicSceneElementTests.cpp
 	BasicThreadTests.cpp

@@ -273,6 +273,21 @@ TEST_F(DeformableRepresentationTest, UpdateTest)
 	EXPECT_FALSE(*getCurrentState()   == *getPreviousState());
 }
 
+TEST_F(DeformableRepresentationTest, UpdateResetTest)
+{
+	m_localInitialState->getVelocities()[0] = std::numeric_limits<double>::infinity();
+	setInitialState(m_localInitialState);
+
+	// Initialize and wake-up the deformable component
+	EXPECT_NO_THROW(EXPECT_TRUE(initialize(std::make_shared<SurgSim::Framework::Runtime>())));
+	EXPECT_NO_THROW(EXPECT_TRUE(wakeUp()));
+
+	// update should backup current into previous and change current
+	EXPECT_TRUE(isActive());
+	EXPECT_NO_THROW(update(1e-3));
+	EXPECT_FALSE(isActive());
+}
+
 TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 {
 	// setInitialState sets all 4 states (tested in method above !)
@@ -299,6 +314,40 @@ TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 	EXPECT_TRUE(*m_currentState       == *m_finalState);
 	EXPECT_FALSE(*getCurrentState()   == *getPreviousState());
 	EXPECT_TRUE(*getCurrentState()    == *getFinalState());
+}
+
+TEST_F(DeformableRepresentationTest, ApplyCorrectionTest)
+{
+	const double dt = 1e-3;
+
+	MockDeformableRepresentation object;
+	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
+	initialState->setNumDof(object.getNumDofPerNode(), 3);
+	object.setInitialState(initialState);
+
+	SurgSim::Math::Vector dv;
+	dv.resize(object.getNumDof());
+	for (unsigned int i = 0; i < object.getNumDof(); i++)
+	{
+		dv(i) = static_cast<double>(i);
+	}
+
+	Eigen::VectorXd previousX = object.getCurrentState()->getPositions();
+	Eigen::VectorXd previousV = object.getCurrentState()->getVelocities();
+
+	// Test with a valid state
+	object.applyCorrection(dt, dv.segment(0, object.getNumDof()));
+	Eigen::VectorXd nextX = object.getCurrentState()->getPositions();
+	Eigen::VectorXd nextV = object.getCurrentState()->getVelocities();
+
+	EXPECT_TRUE(nextX.isApprox(previousX + dv * dt, epsilon));
+	EXPECT_TRUE(nextV.isApprox(previousV + dv, epsilon));
+
+	// Test with an invalid state
+	dv(0) = std::numeric_limits<double>::infinity();
+	EXPECT_TRUE(object.isActive());
+	object.applyCorrection(dt, dv.segment(0, object.getNumDof()));
+	EXPECT_FALSE(object.isActive());
 }
 
 TEST_F(DeformableRepresentationTest, SetCollisionRepresentationTest)

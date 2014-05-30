@@ -34,6 +34,8 @@ namespace Physics
 /// \note Only the force and stiffness calculation are different, involving some changes as well in addMatVec
 /// \note (it uses the updated stiffness matrix).
 /// \note The update method takes care of extracting the rigid motion of the element.
+/// \note This element is updating its stiffness matrix at each new time step, which means that it cannot
+/// \note be used with any OdeSolverLinearXXX, it needs an ode solver that recomputes the data at each iteration.
 class Fem3DElementCorotationalTetrahedron : public Fem3DElementTetrahedron
 {
 public:
