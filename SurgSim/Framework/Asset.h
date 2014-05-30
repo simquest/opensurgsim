@@ -27,7 +27,7 @@ namespace Framework
 class ApplicationData;
 
 /// This class stores a relative file name and during initialization it will try to load
-/// the file based on the ApplicationcData passed in.
+/// the file based on the ApplicationData passed in.
 /// Classes not in the Framework::Component hierarchy should inherit this class in
 /// order to load a file.
 class Asset
@@ -51,7 +51,7 @@ public:
 	/// If found, it then calls 'doInitialize()' to load the file. Return 'false' if 'doInitialize()' fails.
 	/// It asserts on double calls.
 	/// \param data Gives the locations to search for the file.
-	/// \return true if file is found and loaded succesffuly; false otherwise.
+	/// \return true if file is found and loaded successfully; false otherwise.
 	bool initialize(const std::shared_ptr<ApplicationData>& data);
 
 	/// Check to see if an attempt has been made to load the file.
@@ -65,7 +65,7 @@ public:
 
 private:
 	/// Indicates if an attempt to load the file has been made.
-	bool m_hasBeenInitialized;
+	bool m_didInit;
 
 	/// Indicates if load is successful.
 	bool m_isInitialized;
