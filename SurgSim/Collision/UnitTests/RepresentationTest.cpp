@@ -30,8 +30,6 @@ using SurgSim::Collision::Contact;
 using SurgSim::Collision::ContactMapType;
 using SurgSim::Collision::Location;
 using SurgSim::Collision::ShapeCollisionRepresentation;
-using SurgSim::DataStructures::ReadAccessor;
-using SurgSim::DataStructures::SafeReadAccessor;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::PlaneShape;
@@ -114,58 +112,50 @@ TEST_F(RepresentationTest, ShapeTest)
 
 TEST_F(RepresentationTest, EmptyCollisionTest)
 {
-	ReadAccessor<ContactMapType> planeCollisions(planeRep->getCollisions());
-	ReadAccessor<ContactMapType> sphereCollisions(sphereRep->getCollisions());
-
-	EXPECT_TRUE(planeCollisions->empty());
-	EXPECT_TRUE(sphereCollisions->empty());
+	EXPECT_TRUE(planeRep->getCollisions()->unsafeGet().empty());
+	EXPECT_TRUE(sphereRep->getCollisions()->unsafeGet().empty());
 }
 
 TEST_F(RepresentationTest, CollisionTest)
 {
-	ReadAccessor<ContactMapType> planeCollisions(planeRep->getCollisions());
-	ReadAccessor<ContactMapType> sphereCollisions(sphereRep->getCollisions());
-	SafeReadAccessor<ContactMapType> threadSafeCollisions(planeRep->getCollisions());
+	ContactMapType& unsafePlaneCollisions = planeRep->getCollisions()->unsafeGet();
+	ContactMapType& unsafeSphereCollisions = sphereRep->getCollisions()->unsafeGet();
+	std::shared_ptr<const ContactMapType> safePlaneCollisions = planeRep->getCollisions()->safeGet();
 
-	EXPECT_TRUE(planeCollisions->empty());
-	EXPECT_TRUE(sphereCollisions->empty());
-	EXPECT_TRUE(threadSafeCollisions->empty());
+	EXPECT_TRUE(unsafePlaneCollisions.empty());
+	EXPECT_TRUE(unsafeSphereCollisions.empty());
+	EXPECT_TRUE(safePlaneCollisions->empty());
 
 	std::shared_ptr<Contact> dummyContact =
 		std::make_shared<Contact>(0.0, Vector3d::Zero(), Vector3d::Zero(), std::make_pair(Location(), Location()));
 	EXPECT_NO_THROW(sphereRep->addCollisionWith(planeRep, dummyContact));
 
-	sphereRep->update(0.0);
-	planeRep->update(0.0);
-
-	EXPECT_EQ(1u, sphereCollisions->size());
-	auto spherePlanePair = sphereCollisions->find(planeRep);
-	EXPECT_NE(sphereCollisions->end(), spherePlanePair);
+	EXPECT_EQ(1u, unsafeSphereCollisions.size());
+	auto spherePlanePair = unsafeSphereCollisions.find(planeRep);
+	EXPECT_NE(unsafeSphereCollisions.end(), spherePlanePair);
 	std::list<std::shared_ptr<SurgSim::Collision::Contact>> spherePlaneContacts = spherePlanePair->second;
 	EXPECT_EQ(dummyContact, spherePlaneContacts.front());
 
 	// Collision is only added to 'sphereRep', thus the plane should have no collisions.
-	EXPECT_TRUE(planeCollisions->empty());
+	EXPECT_TRUE(unsafePlaneCollisions.empty());
 
 	EXPECT_NO_THROW(planeRep->addCollisionWith(sphereRep, dummyContact));
-	sphereRep->update(0.0);
-	planeRep->update(0.0);
-	EXPECT_EQ(1u, planeCollisions->size());
-	auto planeSpherePair = planeCollisions->find(sphereRep);
-	EXPECT_NE(planeCollisions->end(), planeSpherePair);
+	EXPECT_EQ(1u, unsafePlaneCollisions.size());
+	auto planeSpherePair = unsafePlaneCollisions.find(sphereRep);
+	EXPECT_NE(unsafePlaneCollisions.end(), planeSpherePair);
 	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeSphereContacts = planeSpherePair->second;
 	EXPECT_EQ(dummyContact, planeSphereContacts.front());
 
-	// The SafeReadAccessor to the collision map is buffered, so it should still be empty before the publish.
-	EXPECT_TRUE(threadSafeCollisions->empty());
+	// The thread-safe collision map is buffered, so it should still be empty before the publish.
+	EXPECT_TRUE(safePlaneCollisions->empty());
 
-	// After the publish the threadsafe collision map should be the same as from the ReadAccessor.
+	// After the publish the thread-safe collision map should be up-to-date.
 	planeRep->publishCollisions();
-	EXPECT_EQ(*planeCollisions, *threadSafeCollisions);
+	EXPECT_EQ(unsafePlaneCollisions, *planeRep->getCollisions()->safeGet());
 
 	sphereRep->clearCollisions();
 	sphereRep->update(0.0);
-	EXPECT_TRUE(sphereCollisions->empty());
+	EXPECT_TRUE(unsafeSphereCollisions.empty());
 }
 
 

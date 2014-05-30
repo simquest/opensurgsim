@@ -88,14 +88,11 @@ private:
 	/// The collision representation to get contacts for visualizing.
 	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 
-	/// The collision map for the representation.
-	std::unique_ptr<SurgSim::DataStructures::SafeReadAccessor<SurgSim::Collision::ContactMapType>> m_collisions;
-
 	/// The osg vector field for visualizing contacts on collision representation
 	std::shared_ptr<SurgSim::Graphics::VectorFieldRepresentation> m_vectorField;
 };
 
-} // namesapce Blocks
+} // namespace Blocks
 } // namespace SurgSim
 
 #endif  // SURGSIM_BLOCKS_VISUALIZECONTACTSBEHAVIOR_H

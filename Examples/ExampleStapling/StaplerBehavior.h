@@ -157,10 +157,6 @@ private:
 	/// Contains the teeth for detecting collisions
 	std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> m_virtualTeeth;
 
-	/// The read accessors for the collision maps of the teeth.
-	std::array<std::unique_ptr<
-		SurgSim::DataStructures::SafeReadAccessor<SurgSim::Collision::ContactMapType>>, 2> m_collisions;
-
 	/// The list of scene element names that this behaviour can staple.
 	std::list<std::string> m_stapleEnabledSceneElements;
 };

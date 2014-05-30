@@ -29,7 +29,6 @@
 #include "SurgSim/DataStructures/BufferedValue.h"
 
 using SurgSim::Collision::ContactMapType;
-using SurgSim::DataStructures::ReadAccessor;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -114,11 +113,11 @@ TEST(CollisionPairTests, addContactTest)
 	std::shared_ptr<Representation> rep0 = makeSphereRepresentation(1.0);
 	std::shared_ptr<Representation> rep1 = makeSphereRepresentation(2.0);
 
-	ReadAccessor<ContactMapType> rep0Collisions(rep0->getCollisions());
-	ReadAccessor<ContactMapType> rep1Collisions(rep1->getCollisions());
+	ContactMapType& rep0Collisions = rep0->getCollisions()->unsafeGet();
+	ContactMapType& rep1Collisions = rep1->getCollisions()->unsafeGet();
 
-	EXPECT_TRUE(rep0Collisions->empty());
-	EXPECT_TRUE(rep1Collisions->empty());
+	EXPECT_TRUE(rep0Collisions.empty());
+	EXPECT_TRUE(rep1Collisions.empty());
 
 	std::pair<Location,Location> penetrationPoints;
 	penetrationPoints.first.globalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
@@ -130,9 +129,9 @@ TEST(CollisionPairTests, addContactTest)
 	rep0->update(0.0);
 	rep1->update(0.0);
 
-	EXPECT_EQ(1u, rep0Collisions->size());
-	auto rep0CollisionContacts = rep0Collisions->find(rep1);
-	EXPECT_NE(rep0Collisions->end(), rep0CollisionContacts);
+	EXPECT_EQ(1u, rep0Collisions.size());
+	auto rep0CollisionContacts = rep0Collisions.find(rep1);
+	EXPECT_NE(rep0Collisions.end(), rep0CollisionContacts);
 	EXPECT_EQ(rep1, rep0CollisionContacts->first);
 	std::shared_ptr<SurgSim::Collision::Contact> rep0FirstContact = rep0CollisionContacts->second.front();
 	EXPECT_EQ(rep0FirstContact->depth, 1.0);
@@ -142,9 +141,9 @@ TEST(CollisionPairTests, addContactTest)
 	EXPECT_TRUE(rep0FirstContact->penetrationPoints.second.globalPosition.getValue().isApprox(
 		Vector3d(0.4, 0.5, 0.6)));
 
-	EXPECT_EQ(1u, rep1Collisions->size());
-	auto rep1CollisionContacts = rep1Collisions->find(rep0);
-	EXPECT_NE(rep1Collisions->end(), rep1CollisionContacts);
+	EXPECT_EQ(1u, rep1Collisions.size());
+	auto rep1CollisionContacts = rep1Collisions.find(rep0);
+	EXPECT_NE(rep1Collisions.end(), rep1CollisionContacts);
 	EXPECT_EQ(rep0, rep1CollisionContacts->first);
 	std::shared_ptr<SurgSim::Collision::Contact> rep1FirstContact = rep1CollisionContacts->second.front();
 	EXPECT_EQ(rep1FirstContact->depth, 1.0);

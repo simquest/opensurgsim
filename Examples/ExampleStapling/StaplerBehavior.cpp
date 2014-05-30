@@ -69,11 +69,6 @@ void StaplerBehavior::setVirtualStaple(
 	const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& virtualTeeth)
 {
 	m_virtualTeeth = virtualTeeth;
-	for (size_t i = 0; i < m_virtualTeeth.size(); ++i)
-	{
-		m_collisions[i] = std::unique_ptr<SafeReadAccessor<ContactMapType>>(
-			new SafeReadAccessor<ContactMapType>(m_virtualTeeth[i]->getCollisions()));
-	}
 }
 
 void StaplerBehavior::enableStaplingForSceneElement(std::string sceneElementName)
@@ -208,11 +203,11 @@ void StaplerBehavior::createStaple()
 
 	int toothId = 0;
 	bool stapleAdded = false;
-	for (auto virtualTooth = m_collisions.cbegin(); virtualTooth != m_collisions.cend(); ++virtualTooth)
+	for (auto virtualTooth = m_virtualTeeth.cbegin(); virtualTooth != m_virtualTeeth.cend(); ++virtualTooth)
 	{
 		// The virtual tooth could be in contact with any number of objects in the scene.
 		// Get its collisionMap.
-		ContactMapType collisionsMap = *(*(*virtualTooth));
+		ContactMapType collisionsMap = *((*virtualTooth)->getCollisions()->safeGet());
 
 		// If the virtualTooth has no collision, continue to next loop iteration.
 		if (collisionsMap.empty())

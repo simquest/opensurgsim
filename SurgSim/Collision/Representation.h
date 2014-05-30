@@ -69,11 +69,8 @@ public:
 
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
-	/// The map is stored in a BufferedValue.  If accessing from the PhysicsManager thread, use a ReadAccessor,
-	/// otherwise use a SafeReadAccessor.  Write access is not provided, instead use addCollisionWith and
-	/// clearCollisions.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
-	std::shared_ptr<SurgSim::DataStructures::BufferedValue<ContactMapType>> getCollisions() const;
+	std::shared_ptr<SurgSim::DataStructures::BufferedValue<ContactMapType>> getCollisions();
 
 	/// Add a contact against a given collision representation.
 	/// \param collisionRepresentation The collision representation to which this collision representation collides.
@@ -99,9 +96,6 @@ protected:
 	/// Every contact added to this map follows the convention of pointing the contact normal toward this
 	/// representation. And the first penetration point is on this representation.
 	std::shared_ptr<SurgSim::DataStructures::BufferedValue<ContactMapType>> m_collisions;
-
-	/// The write accessor to the collisions.
-	SurgSim::DataStructures::ReadWriteAccessor<ContactMapType> m_writeCollisions;
 };
 
 

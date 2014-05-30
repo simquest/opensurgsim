@@ -64,20 +64,16 @@ void VisualizeContactsBehavior::setCollisionRepresentation(
 	std::shared_ptr<SurgSim::Framework::Component> collisionRepresentation)
 {
 	m_collisionRepresentation = std::dynamic_pointer_cast<Representation>(collisionRepresentation);
-	if (m_collisionRepresentation != nullptr)
-	{
-		m_collisions = std::unique_ptr<SafeReadAccessor<ContactMapType>>(
-		new SafeReadAccessor<ContactMapType>(m_collisionRepresentation->getCollisions()));
-	}
 }
 
 void VisualizeContactsBehavior::update(double dt)
 {
-	const SurgSim::Collision::ContactMapType& collisions = *(*m_collisions);
-	if (!collisions.empty())
+	std::shared_ptr<const SurgSim::Collision::ContactMapType> collisions =
+		m_collisionRepresentation->getCollisions()->safeGet();
+	if (!collisions->empty())
 	{
 		size_t totalContacts = 0;
-		for (auto collision = collisions.cbegin(); collision != collisions.cend(); ++collision)
+		for (auto collision = collisions->cbegin(); collision != collisions->cend(); ++collision)
 		{
 			totalContacts += collision->second.size();
 		}
@@ -87,7 +83,7 @@ void VisualizeContactsBehavior::update(double dt)
 		vectorField->getVertices().reserve(2 * totalContacts);
 
 		SurgSim::Math::RigidTransform3d inverseElementPose = getSceneElement()->getPose().inverse();
-		for (auto it = collisions.cbegin(); it != collisions.cend(); ++it)
+		for (auto it = collisions->cbegin(); it != collisions->cend(); ++it)
 		{
 			for (auto iter = (*it).second.cbegin(); iter != (*it).second.cend(); ++iter)
 			{
