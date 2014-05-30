@@ -188,25 +188,19 @@ std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& na
 	return sceneryRepresentation;
 }
 
-std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName,
-														const std::string& deviceName)
+std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName, const std::string& deviceName)
 {
 	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
-
-	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader(data->findFile("Geometry/stapler_collision.ply"));
-	reader.setDelegate(delegate);
-	reader.parseFile();
-
-	std::shared_ptr<MeshRepresentation> osgMeshRepresentation =
-		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
-	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
-	osgMeshRepresentation->setDrawAsWireFrame(true);
 
 	// Stapler collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>();
 	meshShape->setFileName("Geometry/stapler_collision.ply");
 	meshShape->initialize(data);
+
+	std::shared_ptr<MeshRepresentation> osgMeshRepresentation =
+		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
+	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*(meshShape->getMesh()));
+	osgMeshRepresentation->setDrawAsWireFrame(true);
 
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
@@ -299,16 +293,6 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 {
 	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
-	// File "arm_collision.ply" contains collision meshes for both upper arm and forearm.
-	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader(data->findFile("Geometry/arm_collision.ply"));
-	reader.setDelegate(delegate);
-	reader.parseFile();
-
-	std::shared_ptr<MeshRepresentation> osgMeshRepresentation = std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
-	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
-	osgMeshRepresentation->setDrawAsWireFrame(true);
-
 	// Graphic representation for arm
 	std::shared_ptr<SceneryRepresentation> forearmSceneryRepresentation =
 		createSceneryObject("forearm", "Geometry/forearm.osgb");
@@ -319,6 +303,10 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>();
 	meshShape->setFileName("Geometry/arm_collision.ply");
 	meshShape->initialize(data);
+
+	std::shared_ptr<MeshRepresentation> osgMeshRepresentation = std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
+	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*(meshShape->getMesh()));
+	osgMeshRepresentation->setDrawAsWireFrame(true);
 
 	RigidRepresentationParameters params;
 	params.setShapeUsedForMassInertia(meshShape);
