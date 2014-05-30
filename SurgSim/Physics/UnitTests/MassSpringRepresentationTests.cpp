@@ -215,44 +215,6 @@ TEST_F(MassSpringRepresentationTests, BeforeUpdateTest)
 	EXPECT_NO_THROW(m.beforeUpdate(dt));
 }
 
-TEST_F(MassSpringRepresentationTests, AfterUpdateTest)
-{
-	const double dt = 1e-3;
-
-	{
-		SCOPED_TRACE("Valid state");
-		MassSpringRepresentation m("MassSpring");
-		std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
-		initialState->setNumDof(m.getNumDofPerNode(), 2);
-		m.setInitialState(initialState);
-
-		m.addSpring(std::make_shared<SurgSim::Physics::LinearSpring>(0, 1));
-		m.addMass(std::make_shared<SurgSim::Physics::Mass>(1.2));
-		m.addMass(std::make_shared<SurgSim::Physics::Mass>(1.2));
-
-		EXPECT_TRUE(m.isActive());
-		EXPECT_NO_THROW(m.afterUpdate(dt));
-		EXPECT_TRUE(m.isActive());
-	}
-
-	{
-		SCOPED_TRACE("Invalid state");
-		MassSpringRepresentation m("MassSpring");
-		std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
-		initialState->setNumDof(m.getNumDofPerNode(), 2);
-		initialState->getPositions()[0] = std::numeric_limits<double>::infinity();
-		m.setInitialState(initialState);
-
-		m.addSpring(std::make_shared<SurgSim::Physics::LinearSpring>(0, 1));
-		m.addMass(std::make_shared<SurgSim::Physics::Mass>(1.2));
-		m.addMass(std::make_shared<SurgSim::Physics::Mass>(1.2));
-
-		EXPECT_TRUE(m.isActive());
-		EXPECT_NO_THROW(m.afterUpdate(dt));
-		EXPECT_FALSE(m.isActive());
-	}
-}
-
 TEST_F(MassSpringRepresentationTests, TransformInitialStateTest)
 {
 	using SurgSim::Math::Vector;

@@ -273,6 +273,21 @@ TEST_F(DeformableRepresentationTest, UpdateTest)
 	EXPECT_FALSE(*getCurrentState()   == *getPreviousState());
 }
 
+TEST_F(DeformableRepresentationTest, UpdateResetTest)
+{
+	m_localInitialState->getVelocities()[0] = std::numeric_limits<double>::infinity();
+	setInitialState(m_localInitialState);
+
+	// Initialize and wake-up the deformable component
+	EXPECT_NO_THROW(EXPECT_TRUE(initialize(std::make_shared<SurgSim::Framework::Runtime>())));
+	EXPECT_NO_THROW(EXPECT_TRUE(wakeUp()));
+
+	// update should backup current into previous and change current
+	EXPECT_TRUE(isActive());
+	EXPECT_NO_THROW(update(1e-3));
+	EXPECT_FALSE(isActive());
+}
+
 TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 {
 	// setInitialState sets all 4 states (tested in method above !)

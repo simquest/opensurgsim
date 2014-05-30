@@ -105,10 +105,6 @@ public:
 	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt) override;
 
-	/// Postprocessing done after the update call
-	/// \param dt The time step (in seconds)
-	virtual void afterUpdate(double dt) override;
-
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
 	/// \return The vector containing f(x,v)
