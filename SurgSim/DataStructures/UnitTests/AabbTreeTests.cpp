@@ -18,16 +18,16 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/DataStructures/AabbTree.h"
+#include "SurgSim/DataStructures/AabbTreeIntersectionVisitor.h"
 #include "SurgSim/DataStructures/AabbTreeNode.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
-#include "SurgSim/DataStructures/AabbTreeIntersectionVisitor.h"
-#include "SurgSim/Math/Aabb.h"
-#include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Timer.h"
+#include "SurgSim/Math/Aabb.h"
+#include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Testing/MathUtilities.h"
 
 using SurgSim::Math::Aabbd;
@@ -226,12 +226,17 @@ static typename std::list<PairTypeLhs>::const_iterator getEquivalentPair(const s
 
 TEST(AabbTreeTests, SpatialJoinTest)
 {
+	auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
+
 	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
 	meshA->setFileName(fileName);
+	ASSERT_TRUE(meshA->initialize(applicationData));
 
 	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();
 	meshB->setFileName(fileName);
+	ASSERT_TRUE(meshB->initialize(applicationData));
+
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
 	meshB->getMesh()->copyWithTransform(rhsPose, *meshA->getMesh());
 
@@ -300,5 +305,5 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	}
 }
 
-}
-}
+} // namespace DataStructure
+} // namespace SurgSim

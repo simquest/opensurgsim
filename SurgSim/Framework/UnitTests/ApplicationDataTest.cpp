@@ -153,7 +153,6 @@ TEST(ApplicationDataTest, FindFileTest)
 	paths.push_back("Data/ApplicationDataTest/Directory2");
 	ApplicationData data(paths);
 
-	std::string fileName;
 	boost::filesystem::path filePath;
 
 	ASSERT_EQ(2u, data.getPaths().size());
@@ -162,6 +161,7 @@ TEST(ApplicationDataTest, FindFileTest)
 	EXPECT_TRUE(fileIsFoundCorrectly(data, "duplicatedFile.txt", "Directory1"));
 
 	EXPECT_EQ("", data.findFile("missingFile.txt"));
+	EXPECT_EQ("", data.findFile(""));
 }
 
 TEST(ApplicationDataTest, TryFindFileTest)
@@ -238,4 +238,17 @@ TEST(ApplicationDataTest, InitFromFile)
 	EXPECT_TRUE(fileIsFoundCorrectly(data, "uniqueFile2.txt", "Directory2"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data, "duplicatedFile.txt", "Directory1"));
 	EXPECT_EQ("", data.findFile("missingFile.txt"));
+}
+
+TEST(ApplicationDataTest, IsValidFilenameTest)
+{
+	ApplicationData data("Data/ApplicationDataTest/testFile1.txt");
+
+	std::string validFileName("123.txt");
+	std::string invalidFileName1("");
+	std::string invalidFileName2("\\invalid\\123.txt");
+
+	EXPECT_TRUE(data.isValidFilename(validFileName));
+	EXPECT_FALSE(data.isValidFilename(invalidFileName1));
+	EXPECT_FALSE(data.isValidFilename(invalidFileName2));
 }

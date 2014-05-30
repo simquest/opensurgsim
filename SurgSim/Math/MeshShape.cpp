@@ -30,7 +30,7 @@ namespace SurgSim
 namespace Math
 {
 
-MeshShape::MeshShape() : m_volume(0.0), m_fileName()
+MeshShape::MeshShape() : m_volume(0.0)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshShape, std::string, FileName, getFileName, setFileName);
 }
@@ -40,20 +40,26 @@ int MeshShape::getType()
 	return SHAPE_TYPE_MESH;
 }
 
-void MeshShape::setFileName(const std::string& fileName)
+bool MeshShape::isValid() const
 {
-	using SurgSim::DataStructures::TriangleMesh;
-	m_fileName = fileName;
-	m_initialMesh = std::make_shared<TriangleMesh>(*SurgSim::DataStructures::loadTriangleMesh(fileName));
-	m_mesh = std::make_shared<TriangleMesh>(*m_initialMesh);
-
-	computeVolumeIntegrals();
-	updateAabbTree();
+	return (nullptr != m_mesh) && (m_mesh->isValid());
 }
 
-std::string MeshShape::getFileName() const
+bool MeshShape::doInitialize(const std::string& fileName)
 {
-	return m_fileName;
+	using SurgSim::DataStructures::TriangleMesh;
+
+	auto mesh = SurgSim::DataStructures::loadTriangleMesh(fileName);
+	SURGSIM_ASSERT(nullptr != mesh && mesh->isValid()) << "MeshShape::doInitialize(): " <<
+		"SurgSim::DataStructures::loadTriangleMesh returned an invalid mesh";
+
+	m_initialMesh = std::make_shared<TriangleMesh>(*mesh);
+	m_mesh = std::make_shared<TriangleMesh>(*m_initialMesh);
+
+	updateAabbTree();
+	computeVolumeIntegrals();
+
+	return true;
 }
 
 std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getInitialMesh()

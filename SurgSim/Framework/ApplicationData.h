@@ -80,13 +80,7 @@ public:
 	/// \return true if the name is valid, false otherwise.
 	bool isValidFilename(const std::string& fileName) const;
 
-	/// Remove all occurances of '\' and replace them with '/'
-	/// \param fileName	The file name to be changed.
-	/// \return A useable file name
-	std::string makeValid(const std::string& fileName) const;
-
 private:
-
 	/// Adds a single path to the list of search paths.
 	/// \param	pathName Full pathname.
 	/// \return	true if it succeeds, false if the given path does not exist or if it is
