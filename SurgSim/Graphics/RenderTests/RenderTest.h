@@ -60,7 +60,7 @@ public:
 	std::shared_ptr<OsgManager> graphicsManager;
 	std::shared_ptr<SurgSim::Framework::Scene> scene;
 	std::shared_ptr<OsgViewElement> viewElement;
-	std::shared_ptr<SurgSim::Framework::ApplicationData> applicationData;
+	std::shared_ptr<const SurgSim::Framework::ApplicationData> applicationData;
 
 };
 
