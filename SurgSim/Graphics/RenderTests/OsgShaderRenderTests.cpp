@@ -76,15 +76,10 @@ struct OsgShaderRenderTests : public RenderTest
 
 };
 
-
 /// Pops up a window with a sphere colored by its normals and its mirror along the x-axis is also drawn using the
 /// geometry shader
 TEST_F(OsgShaderRenderTests, SphereShaderTest)
 {
-	/// Enable OSG info notifications to see the shader compilation results
-	osg::NotifySeverity previousNotifyLevel = osg::getNotifyLevel();
-	osg::setNotifyLevel(osg::INFO);
-
 	/// Add the sphere representation to the view element, no need to make another scene element
 	std::shared_ptr<SphereRepresentation> sphereRepresentation =
 		std::make_shared<OsgSphereRepresentation>("sphere representation");
@@ -105,8 +100,6 @@ TEST_F(OsgShaderRenderTests, SphereShaderTest)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	runtime->stop();
 
-	/// Reset notify level
-	osg::setNotifyLevel(previousNotifyLevel);
 }
 
 };  // namespace Graphics

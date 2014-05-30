@@ -68,10 +68,10 @@ TEST_F(OsgSceneryRepresentationTest, FileNameTest)
 
 TEST_F(OsgSceneryRepresentationTest, InitTest)
 {
-	sceneryObject->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
+	sceneryObject->setFileName("OsgSceneryRepresentationTests/Torus.obj");
 	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject));
 
-	sceneryObject2->setFileName("Data/OsgSceneryRepresentationTests/Torus.osgb");
+	sceneryObject2->setFileName("OsgSceneryRepresentationTests/Torus.osgb");
 	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject2));
 }
 
@@ -79,8 +79,8 @@ TEST_F(OsgSceneryRepresentationTest, AccessibleTest)
 {
 	std::shared_ptr<SurgSim::Framework::Component> component;
 	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
-		"SurgSim::Graphics::OsgSceneryRepresentation",
-		"scenery"));
+									"SurgSim::Graphics::OsgSceneryRepresentation",
+									"scenery"));
 
 	std::string fileName("TestFileName");
 	component->setValue("FileName", fileName);

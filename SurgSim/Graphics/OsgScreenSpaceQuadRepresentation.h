@@ -47,7 +47,8 @@ class OsgTexture2d;
 class OsgTextureRectangle;
 
 
-/// Implements the ScreenSpaceQuadRepresentation, provides uniforms 'texture' and 'rectangleTexture'
+/// Implements the ScreenSpaceQuadRepresentation, provides the uniform 'texture' for the texture that
+/// it carries.
 class OsgScreenSpaceQuadRepresentation : public OsgRepresentation, public ScreenSpaceQuadRepresentation
 {
 public:
@@ -82,14 +83,15 @@ public:
 	virtual bool setTexture(std::shared_ptr<Texture> texture) override;
 
 	/// Sets a Texture2d for this quad, this should replace a current texture, this is a convenience function and
-	/// this will use the uniform name "diffuseMap" for the uniform in this operation. This can be accomplished
+	/// this will use the uniform name "texture" for the uniform in this operation. This can be accomplished
 	/// from the outside as well by using the material.
 	/// \param	texture	The texture to be set on the quad.
 	/// \return	true if it succeeds, false if it fails.
 	bool setTexture(std::shared_ptr<OsgTexture2d> texture);
 
 	/// Sets a rectangular texture for this quad, this should replace a current texture,
-	/// this is a convenience function and will use the uniform name "diffuseMap" for the uniform in this operation.
+	/// this is a convenience function and will use the uniform name "texture" for the uniform in this operation.
+	/// \throws SurgSim::Framework::AssertionFailure if the type of the texture is changed during runtime.
 	/// \param	texture	The texture to be set on the quad.
 	/// \return	true if it succeeds, false if it fails.
 	bool setTexture(std::shared_ptr<OsgTextureRectangle> texture);
@@ -129,11 +131,19 @@ private:
 	/// \return	true if it succeeds, false if it fails.
 	bool replaceUniform(const std::string& name, std::shared_ptr<SurgSim::Graphics::UniformBase> newUniform);
 
+	/// Uniform to carry the power of two texture, "texture"
 	std::shared_ptr<OsgUniform<std::shared_ptr<OsgTexture2d>>> m_textureUniform;
+
+	/// Uniform to carry the rectangle texture "texture"
 	std::shared_ptr<OsgUniform<std::shared_ptr<OsgTextureRectangle>>> m_rectangleTextureUniform;
 
+	/// Indicate which type of texture is currently being used
 	SurgSim::DataStructures::OptionalValue<int> m_texureType;
 
+	/// Utility function to build the material.
+	/// \param vertexShaderName name of the vertex shader to be used, needs to be available on the path.
+	/// \param fragmentShaderName name of the fragmen shader to be used, needs to be available on the path.
+	/// \return a valid material if all the shaders are found
 	std::shared_ptr<OsgMaterial> buildMaterial(
 		const std::string& vertexShaderName,
 		const std::string& fragmentShaderName);

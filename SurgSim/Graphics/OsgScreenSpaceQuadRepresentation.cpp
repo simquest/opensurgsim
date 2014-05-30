@@ -140,6 +140,7 @@ bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<OsgTexture2d> 
 
 	if (m_texureType.hasValue() && m_texureType.getValue() == TEXTURE_TYPE_RECTANGLE)
 	{
+		SURGSIM_ASSERT(!isInitialized()) << "Cannot change the type of texture once the quad has been initialized.";
 		m_rectangleTextureUniform->removeFromStateSet(m_switch->getOrCreateStateSet());
 	}
 	else
@@ -159,6 +160,7 @@ bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<OsgTextureRect
 
 	if (m_texureType.hasValue() && m_texureType.getValue() == TEXTURE_TYPE_POWER_OF_TWO)
 	{
+		SURGSIM_ASSERT(!isInitialized()) << "Cannot change the type of texture once the quad has been initialized.";
 		m_textureUniform->removeFromStateSet(m_switch->getOrCreateStateSet());
 	}
 	else
@@ -265,7 +267,7 @@ std::shared_ptr<OsgMaterial> OsgScreenSpaceQuadRepresentation::buildMaterial(
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
 				<< "Shader " << fragmentShaderName << " , could not "
 				<< ((fileName == "") ? "find shader file" : "compile " + fileName) << "."
-				<< " THe quad " << getName() << " might not show on the screen.";
+				<< " The quad " << getName() << " might not show on the screen.";
 		result = false;
 	}
 
