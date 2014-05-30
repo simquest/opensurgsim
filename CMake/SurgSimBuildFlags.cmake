@@ -134,7 +134,7 @@ if(${CMAKE_CL_64})
 	set(DEFAULT_EIGEN_ALIGNMENT ON)
 endif()
 
-option(EIGEN_ALIGNMENT "Enable alignment of vectors in Eigen" ${DEFAULT_EIGEN_ALIGNMENT})
+option(EIGEN_ALIGNMENT "Enable alignment in Eigen" ${DEFAULT_EIGEN_ALIGNMENT})
 mark_as_advanced(EIGEN_ALIGNMENT)
 if(NOT EIGEN_ALIGNMENT)
 	add_definitions( -DEIGEN_DONT_ALIGN )
