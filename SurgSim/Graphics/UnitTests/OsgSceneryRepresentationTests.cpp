@@ -38,7 +38,7 @@ public:
 	{
 		sceneryObject = std::make_shared<OsgSceneryRepresentation>("test");
 		sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("test2");
-		runtime = std::make_shared<SurgSim::Framework::Runtime>();
+		runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		manager = std::make_shared<SurgSim::Graphics::OsgManager>();
 		scene = runtime->getScene();
 		viewElement = std::make_shared<OsgViewElement>("view element");
@@ -62,8 +62,8 @@ public:
 
 TEST_F(OsgSceneryRepresentationTest, FileNameTest)
 {
-	sceneryObject->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
-	EXPECT_EQ("Data/OsgSceneryRepresentationTests/Torus.obj", sceneryObject->getFileName());
+	sceneryObject->setFileName("OsgSceneryRepresentationTests/Torus.obj");
+	EXPECT_EQ("OsgSceneryRepresentationTests/Torus.obj", sceneryObject->getFileName());
 }
 
 TEST_F(OsgSceneryRepresentationTest, InitTest)
