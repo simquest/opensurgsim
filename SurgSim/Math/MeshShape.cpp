@@ -49,10 +49,11 @@ bool MeshShape::doInitialize(const std::string& fileName)
 {
 	using SurgSim::DataStructures::TriangleMesh;
 
-	m_initialMesh = std::make_shared<TriangleMesh>(*SurgSim::DataStructures::loadTriangleMesh(fileName));
-	SURGSIM_ASSERT(m_initialMesh->isValid()) <<
-		"MeshShape::doInitialize(): An invalid mesh is returned by SurgSim::DataStructures::loadTriangleMesh()";
+	auto mesh = SurgSim::DataStructures::loadTriangleMesh(fileName);
+	SURGSIM_ASSERT(nullptr != mesh && mesh->isValid()) << "MeshShape::doInitialize(): " <<
+		"SurgSim::DataStructures::loadTriangleMesh returned an invalid mesh";
 
+	m_initialMesh = std::make_shared<TriangleMesh>(*mesh);
 	m_mesh = std::make_shared<TriangleMesh>(*m_initialMesh);
 
 	updateAabbTree();
