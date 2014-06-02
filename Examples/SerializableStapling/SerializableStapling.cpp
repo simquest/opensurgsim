@@ -28,7 +28,7 @@
 #include "SurgSim/Input/CommonDevice.h"
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSIm/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 
