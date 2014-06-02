@@ -70,6 +70,7 @@ public:
 
 protected:
 	virtual void doUpdate(double dt) override;
+	virtual bool doInitialize() override;
 
 private:
 	/// Indicates if the mesh is rendered as a wireframe.

@@ -15,6 +15,8 @@
 
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 
+#include <boost/filesystem.hpp>
+
 #include <osg/Array>
 #include <osg/Geode>
 #include <osg/Geometry>
@@ -24,7 +26,9 @@
 #include <osg/Vec3f>
 #include <osgUtil/SmoothingVisitor>
 
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/TriangleNormalGenerator.h"
@@ -134,6 +138,20 @@ void OsgMeshRepresentation::doUpdate(double dt)
 		updateTriangles();
 		m_triangles->dirty();
 	}
+}
+
+bool OsgMeshRepresentation::doInitialize()
+{
+	auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>(*getRuntime()->getApplicationData());
+	std::string path = applicationData->findFile(m_filename);
+
+	auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(path);
+	SURGSIM_ASSERT(nullptr != triangleMesh && triangleMesh->isValid()) <<
+		"SurgSim::DataStructures::loadTriangleMesh() returned an empty TriangleMesh after reading file " << m_filename;
+
+	m_mesh = std::make_shared<Mesh>(*triangleMesh);
+
+	return true;
 }
 
 void OsgMeshRepresentation::updateVertices(int updateOptions)
@@ -268,12 +286,6 @@ osg::Object::DataVariance OsgMeshRepresentation::getDataVariance(int updateOptio
 void OsgMeshRepresentation::setFilename(std::string filename)
 {
 	m_filename = filename;
-
-	auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(filename);
-	SURGSIM_ASSERT(nullptr != triangleMesh) <<
-		"SurgSim::DataStructures::loadTriangleMesh() returned an empty TriangleMesh after reading file " << filename;
-
-	m_mesh = std::make_shared<Mesh>(*triangleMesh);
 }
 
 std::string OsgMeshRepresentation::getFilename() const

@@ -1,0 +1,76 @@
+SurgSim::Framework::BasicSceneElement:
+  Name: armSceneElement
+  Components:
+    - SurgSim::Framework::PoseComponent:
+        Pose:
+          Quaternion: [0, 0, 0, 1]
+          Translation: [0, 0, 0]
+        Id: b718c795-78de-46cd-9a8b-64a7dd762162
+        Name: Pose
+    - SurgSim::Physics::RigidCollisionRepresentation:
+        Id: f16caa02-0a25-4ee8-aae5-88185b9e14cc
+        LocalPose:
+          Quaternion: [0, 0, 0, 1]
+          Translation: [0, 0, 0]
+        Name: Collision
+    - SurgSim::Graphics::OsgSceneryRepresentation:
+        LocalPose:
+          Quaternion: [0, 0, 0, 1]
+          Translation: [0, 0, 0]
+        Visible: true
+        GroupReferences:
+          - __OssDefault__
+        FileName: Geometry/upperarm.osgb
+        Id: 7a92a4fc-4591-4229-ac5f-7cd39673c9a5
+        Name: upperarm
+    - SurgSim::Graphics::OsgSceneryRepresentation:
+        LocalPose:
+          Quaternion: [0, 0, 0, 1]
+          Translation: [0, 0, 0]
+        Visible: true
+        GroupReferences:
+          - __OssDefault__
+        FileName: Geometry/forearm.osgb
+        Id: e13192f3-2e3b-44ad-86e4-75d307de8ee3
+        Name: forearm
+    - SurgSim::Graphics::OsgMeshRepresentation:
+        Filename: Geometry/arm_collision.ply
+        LocalPose:
+          Quaternion: [0, 0, 0, 1]
+          Translation: [0, 0, 0]
+        Visible: true
+        GroupReferences:
+          - __OssDefault__
+        DrawAsWireFrame: true
+        UpdateOptions: 1
+        Id: 1c879a5f-dbc0-4dee-a126-4719dab21e98
+        Name: ArmOsgMesh
+    - SurgSim::Physics::FixedRepresentation:
+        RigidRepresentationParameters:
+          SurgSim::Physics::RigidRepresentationParameters:
+            Density: 0
+            LinearDamping: 0
+            AngularDamping: 0
+            ShapeUsedForMassInertia:
+              SurgSim::Math::MeshShape:
+                FileName: Geometry/arm_collision.ply
+        IsDrivingSceneElementPose: true
+        IsGravityEnabled: true
+        LocalPose:
+          Quaternion: [0, 0, 0, 1]
+          Translation: [0, 0, 0]
+        NumDof: 0
+        IsActive: true
+        CollisionRepresentation:
+          SurgSim::Physics::RigidCollisionRepresentation:
+            Id: f16caa02-0a25-4ee8-aae5-88185b9e14cc
+            Name: Collision
+        Id: 5a4152d6-13a3-4014-b909-34fda990e52c
+        RigidRepresentationState:
+          SurgSim::Physics::RigidRepresentationState:
+            LinearVelocity: [0, 0, 0]
+            AngularVelocity: [0, 0, 0]
+            Pose:
+              Quaternion: [0, 0, 0, 1]
+              Translation: [0, 0, 0]
+        Name: Physics
