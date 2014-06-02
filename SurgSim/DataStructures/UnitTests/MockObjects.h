@@ -73,7 +73,7 @@ public:
 	/// Constructor
 	/// \param	id	Unique ID of the vertex in its mesh
 	/// \param	normal	Surface normal of the vertex
-	MockVertexData(unsigned int id, const SurgSim::Math::Vector3d& normal) :
+	MockVertexData(size_t id, const SurgSim::Math::Vector3d& normal) :
 		m_id(id),
 		m_normal(normal)
 	{
@@ -84,7 +84,7 @@ public:
 	}
 
 	/// Gets the vertex's unique ID in its mesh.
-	unsigned int getId() const
+	size_t getId() const
 	{
 		return m_id;
 	}
@@ -104,7 +104,7 @@ public:
 	}
 private:
 	/// Vertex's unique ID in its mesh
-	unsigned int m_id;
+	size_t m_id;
 	/// Vertex surface normal
 	SurgSim::Math::Vector3d m_normal;
 };
@@ -115,7 +115,7 @@ class MockEdgeData
 public:
 	/// Constructor
 	/// \param	id	Unique ID of the edge in its mesh
-	explicit MockEdgeData(unsigned int id) :
+	explicit MockEdgeData(size_t id) :
 		m_id(id)
 	{
 	}
@@ -125,7 +125,7 @@ public:
 	}
 
 	/// Gets the edge's unique ID in its mesh.
-	unsigned int getId() const
+	size_t getId() const
 	{
 		return m_id;
 	}
@@ -139,7 +139,7 @@ public:
 	}
 private:
 	/// Edge's unique ID in its mesh
-	unsigned int m_id;
+	size_t m_id;
 };
 
 /// Triangle data for testing, storing ID and edge IDs
@@ -149,7 +149,7 @@ public:
 	/// Constructor
 	/// \param	id	Unique ID of the triangle in its mesh
 	/// \param	edges	IDs of the triangle's edges in its mesh
-	MockTriangleData(unsigned int id, const std::array<unsigned int, 3>& edges) :
+	MockTriangleData(size_t id, const std::array<size_t, 3>& edges) :
 		m_id(id),
 		m_edges(edges)
 	{
@@ -160,13 +160,13 @@ public:
 	}
 
 	/// Gets the triangle's unique ID in its mesh.
-	unsigned int getId() const
+	size_t getId() const
 	{
 		return m_id;
 	}
 
 	/// Gets the IDs of the triangle's edges in its mesh.
-	const std::array<unsigned int, 3>& getEdges() const
+	const std::array<size_t, 3>& getEdges() const
 	{
 		return m_edges;
 	}
@@ -180,9 +180,9 @@ public:
 	}
 private:
 	/// Triangle's unique ID in its mesh
-	unsigned int m_id;
+	size_t m_id;
 	/// The IDs of the triangle's edges in its mesh, in order: {vertex0->vertex1, vertex1->vertex2, vertex2->vertex3}
-	std::array<unsigned int, 3> m_edges;
+	std::array<size_t, 3> m_edges;
 };
 
 /// Tetrahedron data for testing, storing ID and edge IDs, triangle IDs
@@ -193,9 +193,9 @@ public:
 	/// \param	id	Unique ID of the tetrahedron in its mesh
 	/// \param	edges	IDs of the tetrahedron's edges in its mesh (6 edges)
 	/// \param	triangles	IDs of the tetrahedron's triangles in its mesh (4 triangles)
-	MockTetrahedronData(unsigned int id,
-		const std::array<unsigned int, 6>& edges,
-		const std::array<unsigned int, 4>& triangles) :
+	MockTetrahedronData(size_t id,
+		const std::array<size_t, 6>& edges,
+		const std::array<size_t, 4>& triangles) :
 	  m_id(id), m_edges(edges), m_triangles(triangles)
 	{
 	}
@@ -206,19 +206,19 @@ public:
 	}
 
 	/// Gets the tetrahedron's unique ID in its mesh.
-	unsigned int getId() const
+	size_t getId() const
 	{
 		return m_id;
 	}
 
 	/// Gets the IDs of the tetrahedron's edges in its mesh.
-	const std::array<unsigned int, 6>& getEdges() const
+	const std::array<size_t, 6>& getEdges() const
 	{
 		return m_edges;
 	}
 
 	/// Gets the IDs of the tetrahedron's triangles in its mesh.
-	const std::array<unsigned int, 4>& getTriangles() const
+	const std::array<size_t, 4>& getTriangles() const
 	{
 		return m_triangles;
 	}
@@ -232,14 +232,14 @@ public:
 	}
 private:
 	/// Tetrahedron's unique ID in its mesh
-	unsigned int m_id;
+	size_t m_id;
 
 	/// The IDs of the tetrahedron's edges in its mesh, in order:
 	/// {vertex0->vertex1, vertex0->vertex2, vertex0->vertex3, vertex1->vertex2, vertex1->vertex3, vertex2->vertex3}
-	std::array<unsigned int, 6> m_edges;
+	std::array<size_t, 6> m_edges;
 
 	/// The IDs of the tetrahedron's triangles in its mesh, in order: {vertex012, vertex123, vertex230, vertex301}
-	std::array<unsigned int, 4> m_triangles;
+	std::array<size_t, 4> m_triangles;
 };
 
 /// Mesh for testing using MockVertexData
@@ -263,7 +263,7 @@ public:
 	/// \param	position	Position of the vertex
 	/// \param	normal	Normal of the vertex
 	/// \return	Unique ID of vertex in the mesh
-	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
+	size_t createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
 	{
 		VertexType vertex(position, MockVertexData(getNumVertices(), normal));
 
@@ -271,7 +271,7 @@ public:
 	}
 
 	/// Returns the normal of a vertex
-	const SurgSim::Math::Vector3d& getVertexNormal(unsigned int id) const
+	const SurgSim::Math::Vector3d& getVertexNormal(size_t id) const
 	{
 		return getVertex(id).data.getNormal();
 	}
@@ -320,7 +320,7 @@ public:
 	/// \param	position	Position of the vertex
 	/// \param	normal	Normal of the vertex
 	/// \return	Unique ID of vertex in the mesh
-	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
+	size_t createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
 	{
 		VertexType vertex(position, MockVertexData(getNumVertices(), normal));
 
@@ -330,7 +330,7 @@ public:
 	/// Create a new edge in the mesh
 	/// \param	vertices	Edge vertices
 	/// \return	Unique ID of vertex in the mesh
-	unsigned int createEdge(const std::array<unsigned int, 2>& vertices)
+	size_t createEdge(const std::array<size_t, 2>& vertices)
 	{
 		EdgeType edge(vertices, MockEdgeData(getNumEdges()));
 
@@ -341,7 +341,7 @@ public:
 	/// \param	vertices	The triangle vertices
 	/// \param	edges	The triangle edges
 	/// \return	Unique ID of vertex in the mesh
-	unsigned int createTriangle(const std::array<unsigned int, 3>& vertices, const std::array<unsigned int, 3>& edges)
+	size_t createTriangle(const std::array<size_t, 3>& vertices, const std::array<size_t, 3>& edges)
 	{
 		TriangleType triangle(vertices, MockTriangleData(getNumTriangles(), edges));
 
@@ -349,7 +349,7 @@ public:
 	}
 
 	/// Returns the normal of a vertex
-	const SurgSim::Math::Vector3d& getVertexNormal(unsigned int id) const
+	const SurgSim::Math::Vector3d& getVertexNormal(size_t id) const
 	{
 		return getVertex(id).data.getNormal();
 	}
@@ -404,7 +404,7 @@ public:
 	/// \param	position	Position of the vertex
 	/// \param	normal	Normal of the vertex
 	/// \return	Unique ID of vertex in the mesh
-	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
+	size_t createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
 	{
 		VertexType vertex(position, MockVertexData(getNumVertices(), normal));
 
@@ -414,7 +414,7 @@ public:
 	/// Create a new edge in the mesh
 	/// \param	vertices	Edge vertices (x2)
 	/// \return	Unique ID of vertex in the mesh
-	unsigned int createEdge(const std::array<unsigned int, 2>& vertices)
+	size_t createEdge(const std::array<size_t, 2>& vertices)
 	{
 		EdgeType edge(vertices, MockEdgeData(getNumEdges()));
 
@@ -425,7 +425,7 @@ public:
 	/// \param	vertices (x3)
 	/// \param edges (x3)
 	/// \return	Unique ID of vertex in the mesh
-	unsigned int createTriangle(const std::array<unsigned int, 3>& vertices, const std::array<unsigned int, 3>& edges)
+	size_t createTriangle(const std::array<size_t, 3>& vertices, const std::array<size_t, 3>& edges)
 	{
 		TriangleType triangle(vertices, MockTriangleData(getNumTriangles(), edges));
 
@@ -437,9 +437,9 @@ public:
 	/// \param	edges connectivity (x6)
 	/// \param	triangles connectivity (x4)
 	/// \return	Unique ID of vertex in the mesh
-	unsigned int createTetrahedron(const std::array<unsigned int, 4>& vertices,
-		const std::array<unsigned int, 6>& edges,
-		const std::array<unsigned int, 4>& triangles)
+	size_t createTetrahedron(const std::array<size_t, 4>& vertices,
+		const std::array<size_t, 6>& edges,
+		const std::array<size_t, 4>& triangles)
 	{
 		TetrahedronType tetrahedron(vertices, MockTetrahedronData(getNumTetrahedrons(), edges, triangles));
 
@@ -447,7 +447,7 @@ public:
 	}
 
 	/// Returns the normal of a vertex
-	const SurgSim::Math::Vector3d& getVertexNormal(unsigned int id) const
+	const SurgSim::Math::Vector3d& getVertexNormal(size_t id) const
 	{
 		return getVertex(id).data.getNormal();
 	}

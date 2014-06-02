@@ -26,15 +26,15 @@ using SurgSim::Physics::FemElement;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
 
-void testSize(const Vector& v, int expectedSize)
+void testSize(const Vector& v, size_t expectedSize)
 {
-	EXPECT_EQ(expectedSize, static_cast<int>(v.size()));
+	EXPECT_EQ(expectedSize, v.size());
 }
 
-void testSize(const Matrix& m, int expectedRows, int expectedCols)
+void testSize(const Matrix& m, size_t expectedRows, size_t expectedCols)
 {
-	EXPECT_EQ(expectedRows, static_cast<int>(m.rows()));
-	EXPECT_EQ(expectedCols, static_cast<int>(m.cols()));
+	EXPECT_EQ(expectedRows, m.rows());
+	EXPECT_EQ(expectedCols, m.cols());
 }
 
 namespace SurgSim

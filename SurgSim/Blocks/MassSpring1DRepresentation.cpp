@@ -30,7 +30,7 @@ namespace Blocks
 
 void MassSpring1DRepresentation::init1D(
 	const std::vector<Vector3d> nodes,
-	std::vector<unsigned int> nodeBoundaryConditions,
+	std::vector<size_t> nodeBoundaryConditions,
 	double totalMass,
 	double stiffnessStretching, double dampingStretching,
 	double stiffnessBending, double dampingBending)
@@ -43,7 +43,7 @@ void MassSpring1DRepresentation::init1D(
 
 	// Initialize the nodes position, velocity and mass
 	// Note: no need to apply the initialPose here, initialize will take care of it !
-	for (unsigned int massId = 0; massId < nodes.size(); massId++)
+	for (size_t massId = 0; massId < nodes.size(); massId++)
 	{
 		addMass(std::make_shared<Mass>(totalMass / static_cast<double>(nodes.size())));
 
@@ -53,7 +53,7 @@ void MassSpring1DRepresentation::init1D(
 	// Initialize the stretching springs
 	if (stiffnessStretching || dampingStretching)
 	{
-		for (unsigned int massId = 0; massId < nodes.size() - 1; massId++)
+		for (size_t massId = 0; massId < nodes.size() - 1; massId++)
 		{
 			addSpring(createLinearSpring(state, massId, massId + 1, stiffnessStretching, dampingStretching));
 		}
@@ -62,7 +62,7 @@ void MassSpring1DRepresentation::init1D(
 	// Initialize the bending springs
 	if (stiffnessBending || dampingBending)
 	{
-		for (unsigned int massId = 0; massId < nodes.size() - 2; massId++)
+		for (size_t massId = 0; massId < nodes.size() - 2; massId++)
 		{
 			addSpring(createLinearSpring(state, massId, massId + 2, stiffnessBending, dampingBending));
 		}

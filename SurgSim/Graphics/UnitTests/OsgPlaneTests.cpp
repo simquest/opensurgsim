@@ -63,7 +63,7 @@ TEST(OsgPlaneTests, InitTest)
 	EXPECT_NEAR(0.0, vertices->at(3) * normal, 1.0e-10) << "All vertices should be co-planar!";
 
 	osg::Vec3 sum(0.0, 0.0, 0.0);
-	for (unsigned int i = 0; i < vertices->size(); ++i)
+	for (size_t i = 0; i < vertices->size(); ++i)
 	{
 		sum += vertices->at(i);
 	}

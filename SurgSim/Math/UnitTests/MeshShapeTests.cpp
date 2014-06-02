@@ -108,7 +108,7 @@ TEST_F(MeshShapeTest, InvalidMeshCubeTest)
 	}
 	for (int i = 0; i < cubeNumEdges; i++)
 	{
-		std::array<unsigned int,2> edgePoints;
+		std::array<size_t,2> edgePoints;
 		for (int j = 0; j < 2; j++)
 		{
 			edgePoints[j] = cubeEdges[i][j];
@@ -119,7 +119,7 @@ TEST_F(MeshShapeTest, InvalidMeshCubeTest)
 	}
 	for (int i = 0; i < cubeNumTriangles; i++)
 	{
-		std::array<unsigned int,3> trianglePoints;
+		std::array<size_t,3> trianglePoints;
 		for (int j = 0; j < 3; j++)
 		{
 			// Add an offset of 3 to the indices (=> some of them will be invalid)
@@ -159,7 +159,7 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 
 		for (int i = 0; i < cubeNumEdges; ++i)
 		{
-			std::array<unsigned int,2> edgePoints;
+			std::array<size_t,2> edgePoints;
 			for (int j = 0; j < 2; j++)
 			{
 				edgePoints[j] = cubeEdges[i][j];
@@ -211,7 +211,7 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 		}
 		for (int i = 0; i < cubeNumEdges; i++)
 		{
-			std::array<unsigned int,2> edgePoints;
+			std::array<size_t,2> edgePoints;
 			for (int j = 0; j < 2; j++)
 			{
 				edgePoints[j] = cubeEdges[i][j];
@@ -222,7 +222,7 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 		}
 		for (int i = 0; i < cubeNumTriangles; i++)
 		{
-			std::array<unsigned int,3> trianglePoints;
+			std::array<size_t,3> trianglePoints;
 			for (int j = 0; j < 3; j++)
 			{
 				trianglePoints[j] = cubeTrianglesCCW[i][j];

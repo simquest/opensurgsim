@@ -46,9 +46,9 @@ namespace Math
 */
 bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solution)
 {
-	int n = problem.getSize();
+	int n = static_cast<int>(problem.getSize());
 	const MlcpProblem::Matrix& A = problem.A;
-	const int nbColumnInA = A.cols();
+	const int nbColumnInA = static_cast<int>(A.cols());
 	const MlcpProblem::Vector& b = problem.b;
 	MlcpSolution::Vector& initialGuess_and_solution = solution->x;
 	const MlcpProblem::Vector& frictionCoefs = problem.mu;

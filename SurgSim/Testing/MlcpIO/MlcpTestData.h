@@ -65,7 +65,7 @@ public:
 		return *this;
 	}
 
-	int getSize() const
+	ptrdiff_t getSize() const
 	{
 		return problem.b.rows();
 	}

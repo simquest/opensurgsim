@@ -115,7 +115,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	}
 	for (int i = 0; i < cubeNumEdges; ++i)
 	{
-		std::array<unsigned int, 2> edgePoints;
+		std::array<size_t, 2> edgePoints;
 		for (int j = 0; j < 2; j++)
 		{
 			edgePoints[j] = cubeEdges[i][j];
@@ -126,7 +126,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	}
 	for (int i = 0; i < cubeNumTriangles; ++i)
 	{
-		std::array<unsigned int, 3> trianglePoints;
+		std::array<size_t, 3> trianglePoints;
 		for (int j = 0; j < 3; j++)
 		{
 			trianglePoints[j] = cubeTrianglesCCW[i][j];
@@ -230,16 +230,16 @@ void addNewTriangle(std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<Em
 	TriangleMesh::VertexType vertexMesh(Vector3d::Zero());
 
 	vertexMesh = TriangleMesh::VertexType(point0);
-	unsigned int index0 = mesh->addVertex(vertexMesh);
+	size_t index0 = mesh->addVertex(vertexMesh);
 
 	vertexMesh = TriangleMesh::VertexType(point1);
-	unsigned int index1 = mesh->addVertex(vertexMesh);
+	size_t index1 = mesh->addVertex(vertexMesh);
 
 	vertexMesh = TriangleMesh::VertexType(point2);
-	unsigned int index2 = mesh->addVertex(vertexMesh);
+	size_t index2 = mesh->addVertex(vertexMesh);
 
 	// Add edges
-	std::array<unsigned int, 2> edge;
+	std::array<size_t, 2> edge;
 	TriangleMesh::EdgeType meshEdge(edge);
 
 	edge[0] = index0;
@@ -258,7 +258,7 @@ void addNewTriangle(std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<Em
 	mesh->addEdge(meshEdge);
 
 	// Add triangle
-	std::array<unsigned int, 3> triangle = {index0, index1, index2};
+	std::array<size_t, 3> triangle = {index0, index1, index2};
 	TriangleMesh::TriangleType meshTriangle(triangle);
 	mesh->addTriangle(meshTriangle);
 }
@@ -386,19 +386,19 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 
 	{
 		auto baseTriangles = std::make_shared<TriangleMesh>();
-		static const int numTriangles = 100;
+		static const size_t numTriangles = 100;
 		const double e = 8e-11;
 
 		std::list<std::shared_ptr<Contact>> expectedContacts;
 		double expectedDepth;
-		double interval = 1.0 / (numTriangles + 1);
+		double interval = 1.0 / (static_cast<double>(numTriangles) + 1);
 		double coordinate;
 		std::pair<Location, Location> expectedPenetrationPoints;
 		Vector3d expectedPoint0, expectedPoint1;
 		Vector3d expectedNormal, expectedContact(0, 0, 0);
-		for (int i = 0; i < numTriangles; i++)
+		for (size_t i = 0; i < numTriangles; i++)
 		{
-			coordinate = interval * (i + 1);
+			coordinate = interval * (static_cast<double>(i) + 1);
 
 			addNewTriangle(baseTriangles,
 						   Vector3d(-e, -coordinate, coordinate),
@@ -449,7 +449,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 		calcContact.calculateContact(pair);
 
 		auto& calculatedContacts = pair->getContacts();
-		EXPECT_EQ(numTriangles, static_cast<int>(calculatedContacts.size()));
+		EXPECT_EQ(numTriangles, calculatedContacts.size());
 
 		for (auto it = calculatedContacts.begin(); it != calculatedContacts.end(); ++it)
 		{

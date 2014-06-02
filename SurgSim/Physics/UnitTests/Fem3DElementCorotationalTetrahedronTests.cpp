@@ -37,7 +37,7 @@ const double epsilonAddMatVec = 1e-10;
 class MockFem3DElementCorotationalTet : public Fem3DElementCorotationalTetrahedron
 {
 public:
-	MockFem3DElementCorotationalTet(std::array<unsigned int, 4> nodeIds)
+	MockFem3DElementCorotationalTet(std::array<size_t, 4> nodeIds)
 		: Fem3DElementCorotationalTetrahedron(nodeIds)
 	{
 	}
@@ -87,8 +87,8 @@ public:
 class Fem3DElementCorotationalTetrahedronTests : public ::testing::Test
 {
 public:
-	std::array<unsigned int, 4> m_nodeIds;
-	std::vector<unsigned int> m_nodeIdsAsVector;
+	std::array<size_t, 4> m_nodeIds;
+	std::vector<size_t> m_nodeIdsAsVector;
 	SurgSim::Math::OdeState m_restState, m_state;
 	double m_rho, m_E, m_nu;
 

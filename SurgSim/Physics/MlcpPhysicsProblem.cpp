@@ -25,7 +25,7 @@ MlcpPhysicsProblem::~MlcpPhysicsProblem()
 {
 }
 
-void MlcpPhysicsProblem::setZero(int numDof, int numConstraintDof, int numConstraints)
+void MlcpPhysicsProblem::setZero(size_t numDof, size_t numConstraintDof, size_t numConstraints)
 {
 	MlcpProblem::setZero(numDof, numConstraintDof, numConstraints);
 
@@ -35,7 +35,7 @@ void MlcpPhysicsProblem::setZero(int numDof, int numConstraintDof, int numConstr
 	CHt.setZero();
 }
 
-MlcpPhysicsProblem MlcpPhysicsProblem::Zero(int numDof, int numConstraintDof, int numConstraints)
+MlcpPhysicsProblem MlcpPhysicsProblem::Zero(size_t numDof, size_t numConstraintDof, size_t numConstraints)
 {
 	MlcpPhysicsProblem result;
 	result.setZero(numDof, numConstraintDof, numConstraints);

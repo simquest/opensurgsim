@@ -66,7 +66,7 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
 /// \param blockSize The block size
 /// \param[out] vector The vector to add the sub-vector into
 template <class Vector, class SubVector>
-void addSubVector(const SubVector& subVector,unsigned int blockId, unsigned int blockSize, Vector* vector)
+void addSubVector(const SubVector& subVector, size_t blockId, size_t blockSize, Vector* vector)
 {
 	vector->segment(blockSize * blockId, blockSize) += subVector;
 }
@@ -79,14 +79,13 @@ void addSubVector(const SubVector& subVector,unsigned int blockId, unsigned int 
 /// \param blockSize The block size
 /// \param[out] vector The vector to add the sub-vector blocks into
 template <class Vector, class SubVector>
-void addSubVector(const SubVector& subVector, const std::vector<unsigned int> blockIds,
-	unsigned int blockSize, Vector* vector)
+void addSubVector(const SubVector& subVector, const std::vector<size_t> blockIds, size_t blockSize, Vector* vector)
 {
-	const unsigned int numBlocks = blockIds.size();
+	const size_t numBlocks = blockIds.size();
 
-	for (unsigned int block = 0; block < numBlocks; block++)
+	for (size_t block = 0; block < numBlocks; block++)
 	{
-		unsigned int blockId = blockIds[block];
+		size_t blockId = blockIds[block];
 
 		vector->segment(blockSize * blockId, blockSize) += subVector.segment(blockSize * block, blockSize);
 	}
@@ -100,7 +99,7 @@ void addSubVector(const SubVector& subVector, const std::vector<unsigned int> bl
 /// \param blockSize The size of the sub-vector
 /// \param[out] vector The vector to set the sub-vector into
 template <class Vector, class SubVector>
-void setSubVector(const SubVector& subVector,unsigned int blockId, unsigned int blockSize, Vector* vector)
+void setSubVector(const SubVector& subVector, size_t blockId, size_t blockSize, Vector* vector)
 {
 	vector->segment(blockSize * blockId, blockSize) = subVector;
 }
@@ -115,7 +114,7 @@ void setSubVector(const SubVector& subVector,unsigned int blockId, unsigned int 
 /// \note Eigen has a specific type for VectorBlock that we want to return with read/write access
 /// \note therefore the Vector from which the VectorBlock is built from must not be const
 template <class Vector>
-Eigen::VectorBlock<Vector> getSubVector(Vector& vector, unsigned int blockId, unsigned int blockSize) // NOLINT
+Eigen::VectorBlock<Vector> getSubVector(Vector& vector, size_t blockId, size_t blockSize) // NOLINT
 {
 	return vector.segment(blockSize * blockId, blockSize);
 }
@@ -128,14 +127,13 @@ Eigen::VectorBlock<Vector> getSubVector(Vector& vector, unsigned int blockId, un
 /// \param blockSize The block size
 /// \param[out] subVector The sub-vector to store the requested blocks (blockIds) from vector into
 template <class Vector, class SubVector>
-void getSubVector(const Vector& vector, const std::vector<unsigned int> blockIds,
-	unsigned int blockSize, SubVector* subVector)
+void getSubVector(const Vector& vector, const std::vector<size_t> blockIds, size_t blockSize, SubVector* subVector)
 {
-	const unsigned int numBlocks = blockIds.size();
+	const size_t numBlocks = blockIds.size();
 
-	for (unsigned int block = 0; block < numBlocks; block++)
+	for (size_t block = 0; block < numBlocks; block++)
 	{
-		unsigned int blockId = blockIds[block];
+		size_t blockId = blockIds[block];
 
 		subVector->segment(blockSize * block, blockSize) = vector.segment(blockSize * blockId, blockSize);
 	}
@@ -147,15 +145,15 @@ void getSubVector(const Vector& vector, const std::vector<unsigned int> blockIds
 /// \param size The size to resize the vector v to
 /// \param zeroOut True if the vector v should be filled up with 0 after having been resized, False if not
 template <class Vector>
-void resizeVector(Vector *v, unsigned int size, bool zeroOut = false)
+void resizeVector(Vector *v, size_t size, bool zeroOut = false)
 {
 	if (v == nullptr)
 	{
 		return;
 	}
-	if (v->size() != static_cast<int>(size))
+	if (v->size() != static_cast<ptrdiff_t>(size))
 	{
-		v->resize(static_cast<int>(size));
+		v->resize(size);
 	}
 	if (zeroOut)
 	{

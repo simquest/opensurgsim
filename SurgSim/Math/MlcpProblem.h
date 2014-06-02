@@ -84,7 +84,7 @@ struct MlcpProblem
 
 	/// Gets the size of the system.
 	/// \return the number of degrees of freedom of the system.
-	int getSize() const
+	ptrdiff_t getSize() const
 	{
 		return b.rows();
 	}
@@ -93,23 +93,23 @@ struct MlcpProblem
 	/// \return true if consistent, false otherwise.
 	bool isConsistent() const
 	{
-		int numConstraintTypes = constraintTypes.size();
+		size_t numConstraintTypes = constraintTypes.size();
 		return ((b.rows() >= 0) && (b.cols() == 1) && (A.rows() == b.rows()) && (A.cols() == A.rows()) &&
-				(numConstraintTypes <= b.rows()) && (mu.size() == numConstraintTypes));
+				(numConstraintTypes <= static_cast<size_t>(b.rows())) && (mu.size() == numConstraintTypes));
 	}
 
 	/// Resize an MlcpProblem and set to zero.
 	/// \param numDof the total degrees of freedom.
 	/// \param numConstraintDof the total constrained degrees of freedom.
 	/// \param numConstraints the number of constraints.
-	virtual void setZero(int numDof, int numConstraintDof, int numConstraints);
+	virtual void setZero(size_t numDof, size_t numConstraintDof, size_t numConstraints);
 
 	/// Initialize an MlcpProblem with zero values.
 	/// \param numDof the total degrees of freedom for the MlcpProblem to be constructed.
 	/// \param numConstraintDof the total constrained degrees of freedom for the MlcpProblem to be constructed.
 	/// \param numConstraints the number of constraints for the MlcpProblem to be constructed.
 	/// \return An MlcpProblem appropriately sized and initialized to zero.
-	static MlcpProblem Zero(int numDof, int numConstraintDof, int numConstraints);
+	static MlcpProblem Zero(size_t numDof, size_t numConstraintDof, size_t numConstraints);
 };
 
 };  // namespace Math

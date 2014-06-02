@@ -57,7 +57,7 @@ public:
 
 	std::shared_ptr<Fem1DRepresentation> build(const std::string& name)
 	{
-		unsigned int& nodes = nodesPerDimension[0];
+		size_t& nodes = nodesPerDimension[0];
 		SURGSIM_ASSERT(nodes > 0) << "Number of nodes incorrect: " << nodes;
 
 		auto fem = std::make_shared<Fem1DRepresentation>(name);
@@ -67,9 +67,9 @@ public:
 
 		Vector3d delta = (extremities[1] - extremities[0]) / static_cast<double>(nodes - 1);
 
-		for (unsigned int nodeId = 0; nodeId < nodes; nodeId++)
+		for (size_t nodeId = 0; nodeId < nodes; nodeId++)
 		{
-			state->getPositions().segment<3>(6 * nodeId) = extremities[0] + nodeId * delta;
+			state->getPositions().segment<3>(6 * nodeId) = extremities[0] + static_cast<double>(nodeId) * delta;
 		}
 
 		for (auto boundaryCondition = std::begin(boundaryConditions); boundaryCondition != std::end(boundaryConditions);
@@ -78,9 +78,9 @@ public:
 			state->addBoundaryCondition(boundaryCondition->first, boundaryCondition->second);
 		}
 
-		std::array<unsigned int, 2> nodeEnds;
+		std::array<size_t, 2> nodeEnds;
 
-		for (unsigned int nodeId = 0; nodeId < nodes - 1; nodeId++)
+		for (size_t nodeId = 0; nodeId < nodes - 1; nodeId++)
 		{
 			nodeEnds[0] = nodeId;
 			nodeEnds[1] = nodeId + 1;
@@ -102,7 +102,7 @@ public:
 		return fem;
 	}
 
-	void addBoundaryCondition(int node, int dof)
+	void addBoundaryCondition(size_t node, size_t dof)
 	{
 		for (int i = 0; i < dof; i++)
 		{
@@ -112,8 +112,8 @@ public:
 
 public:
 	std::array<Vector3d, 2> extremities;
-	std::vector<std::pair<unsigned int, unsigned int>> boundaryConditions; // <nodeId, dofId>
-	std::array<unsigned int, 1> nodesPerDimension;
+	std::vector<std::pair<size_t, size_t>> boundaryConditions; // <nodeId, dofId>
+	std::array<size_t, 1> nodesPerDimension;
 	double massDensity;
 	double youngModulus;
 	double poissonRatio;
@@ -194,7 +194,7 @@ protected:
 		getSubVector(m_expectedTransformedVelocities, 3, 3) = getSubVector(v, 3, 3);
 
 		// Create Fem1DElementBeam
-		std::array<unsigned int, 2> nodeIds = {0, 1};
+		std::array<size_t, 2> nodeIds = {0, 1};
 		auto element = std::make_shared<Fem1DElementBeam>(nodeIds);
 		element->setMassDensity(m_rho);
 		element->setYoungModulus(m_E);
@@ -220,7 +220,7 @@ protected:
 TEST_F(Fem1DMechanicalValidationTests, CantileverEndLoadedTest)
 {
 	// Setup FEM
-	unsigned int nodesPerDim = 2;
+	size_t nodesPerDim = 2;
 
 	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
 	m_fem1DBuilder.addBoundaryCondition(0, 6);
@@ -228,7 +228,7 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverEndLoadedTest)
 
 	// For last node, apply load to y-direction and calculate deflection
 	double load = 0.7;
-	unsigned int applyIndex = (nodesPerDim - 1) * 6 + 1;
+	size_t applyIndex = (nodesPerDim - 1) * 6 + 1;
 
 	Vector applyForce = Vector::Zero(nodesPerDim * 6);
 	applyForce[applyIndex] = load;
@@ -241,7 +241,7 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverEndLoadedTest)
 	Vector calculatedDeflection = stiffness.inverse() * applyForce;
 
 	// Compare theoretical deflection with calculated deflection
-	unsigned int lookIndex = applyIndex;
+	size_t lookIndex = applyIndex;
 
 	double deflection = load * (m_L * m_L * m_L) / (3.0 * m_E * m_Iz);
 
@@ -251,7 +251,7 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverEndLoadedTest)
 TEST_F(Fem1DMechanicalValidationTests, CantileverPunctualLoadAnywhereTest)
 {
 	// Setup FEM
-	unsigned int nodesPerDim = 10;
+	size_t nodesPerDim = 10;
 
 	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
 	m_fem1DBuilder.addBoundaryCondition(0, 6);
@@ -261,7 +261,7 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverPunctualLoadAnywhereTest)
 	{
 		// For each node, apply load to y-direction and calculate deflection
 		double load = 0.7;
-		unsigned int applyIndex = applyNode * 6 + 1;
+		size_t applyIndex = applyNode * 6 + 1;
 
 		Vector applyForce = Vector::Zero(nodesPerDim * 6);
 		applyForce[applyIndex] = load;
@@ -273,10 +273,10 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverPunctualLoadAnywhereTest)
 
 		Vector calculatedDeflection = stiffness.inverse() * applyForce;
 
-		for (unsigned int lookNode = 0; lookNode < nodesPerDim; lookNode++)
+		for (size_t lookNode = 0; lookNode < nodesPerDim; lookNode++)
 		{
 			// For each node, compare theoretical deflection with calculated deflection
-			unsigned int lookIndex = lookNode * 6 + 1;
+			size_t lookIndex = lookNode * 6 + 1;
 
 			double a = m_L * applyNode / (nodesPerDim - 1);
 			double x = m_L * lookNode / (nodesPerDim - 1);
@@ -291,7 +291,7 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverPunctualLoadAnywhereTest)
 TEST_F(Fem1DMechanicalValidationTests, CantileverEndBentTest)
 {
 	// Setup FEM
-	unsigned int nodesPerDim = 5;
+	size_t nodesPerDim = 5;
 
 	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
 	m_fem1DBuilder.addBoundaryCondition(0, 6);
@@ -299,7 +299,7 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverEndBentTest)
 
 	// For last node, apply moment to z-rotational direction and calculate deflection
 	double moment = 0.7;
-	unsigned int applyIndex = (nodesPerDim - 1) * 6 + 5;
+	size_t applyIndex = (nodesPerDim - 1) * 6 + 5;
 
 	Vector applyForce = Vector::Zero(nodesPerDim * 6);
 	applyForce[applyIndex] = moment;
@@ -311,10 +311,10 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverEndBentTest)
 
 	Vector calculatedDeflection = stiffness.inverse() * applyForce;
 
-	for (unsigned int lookNode = 0; lookNode < nodesPerDim; lookNode++)
+	for (size_t lookNode = 0; lookNode < nodesPerDim; lookNode++)
 	{
 		// For each node, compare theoretical deflection with calculated deflection
-		unsigned int lookIndex = lookNode * 6 + 1;
+		size_t lookIndex = lookNode * 6 + 1;
 
 		double x = m_L * lookNode / (nodesPerDim - 1);
 		double deflection = moment * x * x / (2 * m_E * m_Iz);
@@ -326,7 +326,7 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverEndBentTest)
 TEST_F(Fem1DMechanicalValidationTests, EndSupportedBeamCenterLoadedTest)
 {
 	// Setup FEM
-	unsigned int nodesPerDim = 5;
+	size_t nodesPerDim = 5;
 
 	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
 	m_fem1DBuilder.addBoundaryCondition(0, 3);
@@ -335,7 +335,7 @@ TEST_F(Fem1DMechanicalValidationTests, EndSupportedBeamCenterLoadedTest)
 
 	// For middle node, apply load to y-direction and calculate deflection
 	double load = 0.7;
-	unsigned int applyIndex = (nodesPerDim / 2) * 6 + 1;
+	size_t applyIndex = (nodesPerDim / 2) * 6 + 1;
 
 	Vector applyForce = Vector::Zero(nodesPerDim * 6);
 	applyForce[applyIndex] = load;
@@ -348,7 +348,7 @@ TEST_F(Fem1DMechanicalValidationTests, EndSupportedBeamCenterLoadedTest)
 	Vector calculatedDeflection = stiffness.inverse() * applyForce;
 
 	// Compare theoretical deflection with calculated deflection
-	unsigned int lookIndex = applyIndex;
+	size_t lookIndex = applyIndex;
 
 	double deflection = load * (m_L * m_L * m_L) / (48.0 * m_E * m_Iz);
 
@@ -358,18 +358,18 @@ TEST_F(Fem1DMechanicalValidationTests, EndSupportedBeamCenterLoadedTest)
 TEST_F(Fem1DMechanicalValidationTests, EndSupportedBeamIntermediatelyLoadedTest)
 {
 	// Setup FEM
-	unsigned int nodesPerDim = 5;
+	size_t nodesPerDim = 5;
 
 	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
 	m_fem1DBuilder.addBoundaryCondition(0, 3);
 	m_fem1DBuilder.addBoundaryCondition(nodesPerDim - 1, 3);
 	std::shared_ptr<Fem1DRepresentation> fem = m_fem1DBuilder.build("EndSupportedBeamIntermediatelyLoadedTest");
 
-	for (unsigned int node = 0; node < nodesPerDim; node++)
+	for (size_t node = 0; node < nodesPerDim; node++)
 	{
 		// For each node, apply load to y-direction and calculate deflection
 		double load = 0.7;
-		unsigned int applyIndex = node * 6 + 1;
+		size_t applyIndex = node * 6 + 1;
 
 		Vector applyForce = Vector::Zero(nodesPerDim * 6);
 		applyForce[applyIndex] = load;
@@ -382,7 +382,7 @@ TEST_F(Fem1DMechanicalValidationTests, EndSupportedBeamIntermediatelyLoadedTest)
 		Vector calculatedDeflection = stiffness.inverse() * applyForce;
 
 		// Compare theoretical deflection with calculated deflection
-		unsigned int lookIndex = applyIndex;
+		size_t lookIndex = applyIndex;
 
 		double a = static_cast<double>(node) / static_cast<double>(nodesPerDim - 1) * m_L;
 		double b = m_L - a;

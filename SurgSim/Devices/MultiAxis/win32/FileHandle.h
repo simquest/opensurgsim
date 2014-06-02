@@ -71,7 +71,7 @@ public:
 	/// \param	bytesToRead	The number of bytes to try reading.  Actual number of bytes received may be smaller.
 	/// \param [out]	bytesActuallyRead	The number of bytes that were actually read into the buffer.
 	/// \return	true if it succeeds, false if it fails.
-	bool readBytes(void* dataBuffer, size_t bytesToRead, size_t* bytesActuallyRead);
+	bool readBytes(void* dataBuffer, unsigned int bytesToRead, unsigned int* bytesActuallyRead);
 
 	/// Gets the raw underlying OS file handle.
 	/// \return	The raw file handle.

@@ -76,14 +76,14 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 	/// \param numDof the total degrees of freedom.
 	/// \param numConstraintDof the total constrained degrees of freedom.
 	/// \param numConstraints the number of constraints.
-	virtual void setZero(int numDof, int numConstraintDof, int numConstraints) override;
+	virtual void setZero(size_t numDof, size_t numConstraintDof, size_t numConstraints) override;
 
 	/// Initialize an MlcpPhysicsProblem with zero values.
 	/// \param numDof the total degrees of freedom for the MlcpPhysicsProblem to be constructed.
 	/// \param numConstraintDof the total constrained degrees of freedom for the MlcpPhysicsProblem to be constructed.
 	/// \param numConstraints the number of constraints for the MlcpPhysicsProblem to be constructed.
 	/// \return An MlcpPhysicsProblem appropriately sized and initialized to zero.
-	static MlcpPhysicsProblem Zero(int numDof, int numConstraintDof, int numConstraints);
+	static MlcpPhysicsProblem Zero(size_t numDof, size_t numConstraintDof, size_t numConstraints);
 };
 
 };  // namespace Physics

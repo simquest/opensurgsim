@@ -36,22 +36,22 @@ typedef SurgSim::DataStructures::MeshElement<4, EmptyData> MockTetrahedron;
 
 TEST(MeshElementTest, InitTest)
 {
-	std::array<unsigned int, 2> edgeVertices = {{0, 1}};
+	std::array<size_t, 2> edgeVertices = {{0, 1}};
 	MockEdgeData edgeData(0);
 	ASSERT_NO_THROW({MockEdge edge(edgeVertices, edgeData);});
 
-	std::array<unsigned int, 3> triangleVertices = {{0, 1, 2}};
-	std::array<unsigned int, 3> triangleEdges = {{0, 1, 2}};
+	std::array<size_t, 3> triangleVertices = {{0, 1, 2}};
+	std::array<size_t, 3> triangleEdges = {{0, 1, 2}};
 	MockTriangleData triangleData(0, triangleEdges);
 	ASSERT_NO_THROW({MockTriangle triangle(triangleVertices, triangleData);});
 
-	std::array<unsigned int, 4> tetrahedronVertices = {{0, 1, 2, 3}};
+	std::array<size_t, 4> tetrahedronVertices = {{0, 1, 2, 3}};
 	ASSERT_NO_THROW({MockTetrahedron triangle(tetrahedronVertices);});
 }
 
 TEST(MeshElementTest, EdgeTest)
 {
-	std::array<unsigned int, 2> edgeVertices = {{2, 10}};
+	std::array<size_t, 2> edgeVertices = {{2, 10}};
 	MockEdgeData edgeData(5);
 	MockEdge edge(edgeVertices, edgeData);
 
@@ -69,7 +69,7 @@ TEST(MeshElementTest, EdgeTest)
 	EXPECT_TRUE(edge == sameEdge);
 	EXPECT_FALSE(edge != sameEdge);
 
-	std::array<unsigned int, 2> differentEdgeVertices = {{10, 5}};
+	std::array<size_t, 2> differentEdgeVertices = {{10, 5}};
 	MockEdgeData differentEdgeData(7);
 
 	MockEdge edgeWithDifferentVertices(differentEdgeVertices, edgeData);
@@ -87,8 +87,8 @@ TEST(MeshElementTest, EdgeTest)
 
 TEST(MeshElementTest, TriangleTest)
 {
-	std::array<unsigned int, 3> triangleVertices = {{5, 2, 10}};
-	std::array<unsigned int, 3> triangleEdges = {{0, 1, 2}};
+	std::array<size_t, 3> triangleVertices = {{5, 2, 10}};
+	std::array<size_t, 3> triangleEdges = {{0, 1, 2}};
 	MockTriangleData triangleData(4, triangleEdges);
 	MockTriangle triangle(triangleVertices, triangleData);
 
@@ -107,8 +107,8 @@ TEST(MeshElementTest, TriangleTest)
 	EXPECT_TRUE(triangle == sameTriangle);
 	EXPECT_FALSE(triangle != sameTriangle);
 
-	std::array<unsigned int, 3> differentTriangleVertices = {{10, 5, 7}};
-	std::array<unsigned int, 3> differentTriangleEdges = {{2, 1, 3}};
+	std::array<size_t, 3> differentTriangleVertices = {{10, 5, 7}};
+	std::array<size_t, 3> differentTriangleEdges = {{2, 1, 3}};
 	MockTriangleData differentTriangleData(4, differentTriangleEdges);
 
 	MockTriangle triangleWithDifferentVertices(differentTriangleVertices, triangleData);
@@ -126,7 +126,7 @@ TEST(MeshElementTest, TriangleTest)
 
 TEST(MeshElementTest, TetrahedronTest)
 {
-	std::array<unsigned int, 4> tetrahedronVertices = {{5, 2, 10, 6}};
+	std::array<size_t, 4> tetrahedronVertices = {{5, 2, 10, 6}};
 	MockTetrahedron tetrahedron(tetrahedronVertices);
 
 	EXPECT_EQ(tetrahedronVertices, tetrahedron.verticesId);
@@ -137,7 +137,7 @@ TEST(MeshElementTest, TetrahedronTest)
 	EXPECT_TRUE(tetrahedron == sameTetrahedron);
 	EXPECT_FALSE(tetrahedron != sameTetrahedron);
 
-	std::array<unsigned int, 4> differentTetrahedronVertices = {{10, 5, 7, 3}};
+	std::array<size_t, 4> differentTetrahedronVertices = {{10, 5, 7, 3}};
 
 	MockTetrahedron tetrahedronWithDifferentVertices(differentTetrahedronVertices);
 	EXPECT_FALSE(tetrahedron == tetrahedronWithDifferentVertices);

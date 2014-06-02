@@ -54,7 +54,7 @@ static void solveAndCompareResult(const std::string& fileName,
 	Eigen::VectorXd mu = data->problem.mu;
 	std::vector<SurgSim::Math::MlcpConstraintType> constraintTypes = data->problem.constraintTypes;
 
-	const int size = data->getSize();
+	const ptrdiff_t size = data->getSize();
 	SurgSim::Math::MlcpSolution solution;
 	solution.x.resize(size);
 
@@ -144,7 +144,7 @@ static void solveRepeatedly(const MlcpTestData& data,
 	SurgSim::Math::MlcpSolution solution;
 	std::vector<SurgSim::Math::MlcpConstraintType> constraintTypes;
 
-	const int size = data.getSize();
+	const ptrdiff_t size = data.getSize();
 	solution.x.resize(size);
 
 	for (int i = repetitions;  i > 0;  --i)

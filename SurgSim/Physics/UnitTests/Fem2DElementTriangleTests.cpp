@@ -40,7 +40,7 @@ const double epsilon = 1e-8;
 class MockFem2DElement : public Fem2DElementTriangle
 {
 public:
-	MockFem2DElement(std::array<unsigned int, 3> nodeIds)
+	MockFem2DElement(std::array<size_t, 3> nodeIds)
 		: Fem2DElementTriangle(nodeIds)
 	{
 	}
@@ -451,7 +451,7 @@ class Fem2DElementTriangleTests : public ::testing::Test
 public:
 	static const int m_numberNodes = 6;
 
-	std::array<unsigned int, 3> m_nodeIds;
+	std::array<size_t, 3> m_nodeIds;
 	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
 	double m_rho, m_E, m_nu;
@@ -1037,7 +1037,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
-	const int numDof = 6 * m_restState.getNumNodes();
+	const size_t numDof = 6 * m_restState.getNumNodes();
 	SurgSim::Math::Vector forceVector(numDof);
 	SurgSim::Math::Vector ones(numDof);
 	SurgSim::Math::Matrix massMatrix(numDof, numDof);

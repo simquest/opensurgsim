@@ -73,7 +73,7 @@ public:
 	/// Gets a uniform in this material
 	/// \param	index	Index of the uniform in the material's list of uniforms
 	/// \return	Uniform at the index
-	virtual std::shared_ptr<UniformBase> getUniform(unsigned int index) const = 0;
+	virtual std::shared_ptr<UniformBase> getUniform(size_t index) const = 0;
 
 	/// Checks if this material has a uniform with the given name.
 	/// \param	name	The name of the Uniform to check.
@@ -81,7 +81,7 @@ public:
 	virtual bool hasUniform(const std::string& name) const = 0;
 
 	/// Returns the number of uniforms in this material.
-	virtual unsigned int getNumUniforms() const = 0;
+	virtual size_t getNumUniforms() const = 0;
 
 
 	/// Sets the shader used by this material.

@@ -51,7 +51,7 @@ public:
 	/// \param vertexIndex1 First triangle vertex index
 	/// \param vertexIndex2 Second triangle vertex index
 	/// \param vertexIndex3 Third triangle vertex index
-	void operator() (unsigned int vertexIndex1, unsigned int vertexIndex2, unsigned int vertexIndex3);
+	void operator() (size_t vertexIndex1, size_t vertexIndex2, size_t vertexIndex3);
 
 protected:
 	/// Constructor

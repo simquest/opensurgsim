@@ -75,7 +75,7 @@ public:
 
 	/// Gets the number of degree of freedom for this constraint.
 	/// \return The number of degree of freedom for this constraint.
-	unsigned int getNumDof() const;
+	size_t getNumDof() const;
 
 	/// Gets the ConstraintType for this constraint.
 	/// \return	The type.
@@ -89,9 +89,9 @@ public:
 	/// \param indexOfConstraint The index of this constraint in the Mlcp.
 	void build(double dt,
 		MlcpPhysicsProblem* mlcpPhysicsProblem,
-		unsigned int indexOfRepresentation0,
-		unsigned int indexOfRepresentation1,
-		unsigned int indexOfConstraint);
+		size_t indexOfRepresentation0,
+		size_t indexOfRepresentation1,
+		size_t indexOfConstraint);
 
 private:
 	/// Specific data associated to this constraint
@@ -102,7 +102,7 @@ private:
 	std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>> m_localizations;
 
 	/// The degrees of freedom that this constraint has
-	unsigned int m_numDof;
+	size_t m_numDof;
 
 	/// The type of this constraint
 	SurgSim::Math::MlcpConstraintType m_constraintType;
@@ -117,9 +117,9 @@ private:
 	virtual void doBuild(double dt,
 		const ConstraintData& data,
 		MlcpPhysicsProblem* mlcpPhysicsProblem,
-		unsigned int indexOfRepresentation0,
-		unsigned int indexOfRepresentation1,
-		unsigned int indexOfConstraint);
+		size_t indexOfRepresentation0,
+		size_t indexOfRepresentation1,
+		size_t indexOfConstraint);
 };
 
 };  // namespace Physics

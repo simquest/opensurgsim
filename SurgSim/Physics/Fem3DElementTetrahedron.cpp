@@ -45,7 +45,7 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::array<unsigned int, 4> nodeIds)
+Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds)
 {
 	setNumDofPerNode(3); // 3 dof per node (x, y, z)
 

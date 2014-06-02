@@ -69,7 +69,7 @@ TEST (MassSpringRepresentationLocalizationTest, GetPositionTest)
 	std::vector<Vector3d> extremities;
 	extremities.push_back(Vector3d(0,0,0));
 	extremities.push_back(Vector3d(1,0,0));
-	std::vector<unsigned int> boundaryConditions;
+	std::vector<size_t> boundaryConditions;
 	massSpring->init1D(
 		extremities,
 		boundaryConditions,

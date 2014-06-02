@@ -67,12 +67,12 @@ public:
 	virtual bool removeUniform(const std::string& name);
 
 	/// Returns the number of uniforms in this material
-	virtual unsigned int getNumUniforms() const;
+	virtual size_t getNumUniforms() const;
 
 	/// Gets a uniform in this material
 	/// \param	index	Index of the uniform in the material's list of uniforms
 	/// \return	Uniform at the index
-	virtual std::shared_ptr<UniformBase> getUniform(unsigned int index) const;
+	virtual std::shared_ptr<UniformBase> getUniform(size_t index) const;
 
 	virtual std::shared_ptr<UniformBase> getUniform(const std::string& name) const;
 

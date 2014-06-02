@@ -93,7 +93,7 @@ const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getFina
 	return m_finalState;
 }
 
-unsigned int DeformableRepresentation::getNumDofPerNode() const
+size_t DeformableRepresentation::getNumDofPerNode() const
 {
 	return m_numDofPerNode;
 }

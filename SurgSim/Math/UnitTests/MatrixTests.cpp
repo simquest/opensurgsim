@@ -201,7 +201,7 @@ TYPED_TEST(UnalignedMatrixTests, DefaultConstructorInitialization)
 	// Allocate a buffer for the matrix type on stack, based on the size
 	// of the object we're testing.  The object will be allocated inside
 	// the buffer using the placement syntax for the new() operator.
-	unsigned char buffer[sizeof(Matrix)];
+	unsigned char buffer[sizeof(Matrix) + 64];
 
 	{
 		// Please don't write production (non-test) code that looks like this. =)
@@ -1284,7 +1284,7 @@ TYPED_TEST(AllDynamicMatrixTests, addSubMatrixBlocks)
 	typedef typename TestFixture::Matrix Matrix;
 
 	Matrix m, mInit, m2, m2Init;
-	std::vector<unsigned int> nodeIds;
+	std::vector<size_t> nodeIds;
 	SurgSim::Math::resizeMatrix(&m, 18, 18);   m.setRandom();   mInit = m;
 	SurgSim::Math::resizeMatrix(&m2, 18, 18);  m2.setRandom();  m2Init = m2;
 	nodeIds.push_back(1);

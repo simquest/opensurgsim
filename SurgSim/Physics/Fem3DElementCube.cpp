@@ -30,7 +30,7 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DElementCube::Fem3DElementCube(std::array<unsigned int, 8> nodeIds)
+Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 {
 	// Set the number of dof per node (3 in this case)
 	setNumDofPerNode(3);

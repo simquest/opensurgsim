@@ -32,7 +32,7 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem1DElementBeam::Fem1DElementBeam(std::array<unsigned int, 2> nodeIds)
+Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds)
 	: m_G(0.0),
 	  m_restLength(0.0),
 	  m_radius(0.0),
