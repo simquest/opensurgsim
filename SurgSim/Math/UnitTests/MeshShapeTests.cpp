@@ -249,7 +249,7 @@ TEST_F(MeshShapeTest, SerializationTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 	meshShape->setFileName(fileName);
-	EXPECT_TRUE(meshShape->initialize(data));
+	EXPECT_TRUE(meshShape->initialize(*data));
 
 	// We chose to let YAML serialization only works with base class pointer.
 	// i.e. We need to serialize 'meshShape' via a SurgSim::Math::Shape pointer.
@@ -268,7 +268,7 @@ TEST_F(MeshShapeTest, SerializationTest)
 	EXPECT_EQ("SurgSim::Math::MeshShape", newMeshShape->getClassName());
 	EXPECT_EQ(fileName, newMeshShape->getFileName());
 
-	EXPECT_TRUE(newMeshShape->initialize(data));
+	EXPECT_TRUE(newMeshShape->initialize(*data));
 	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), newMeshShape->getMesh()->getNumVertices());
 	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), newMeshShape->getMesh()->getNumEdges());
 	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), newMeshShape->getMesh()->getNumTriangles());
@@ -281,7 +281,7 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 	meshShape->setFileName(fileName);
-	EXPECT_TRUE(meshShape->initialize(data));
+	EXPECT_TRUE(meshShape->initialize(*data));
 
 	auto tree = meshShape->getAabbTree();
 

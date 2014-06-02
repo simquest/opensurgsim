@@ -46,7 +46,7 @@ bool StapleElement::doInitialize()
 	auto meshShape = std::make_shared<MeshShape>();
 	const std::string file = "/Geometry/staple_collision.ply";
 	meshShape->setFileName(file);
-	SURGSIM_ASSERT(meshShape->initialize(getRuntime()->getApplicationData())) <<
+	SURGSIM_ASSERT(meshShape->initialize(*getRuntime()->getApplicationData())) <<
 		"StapleElement::doInitialize failed to load '" << file << "'.";
 
 	RigidRepresentationParameters params;
