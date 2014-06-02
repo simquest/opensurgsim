@@ -42,7 +42,7 @@ std::string Asset::getFileName() const
 	return m_fileName;
 }
 
-bool Asset::initialize(const std::shared_ptr<ApplicationData>& data)
+bool Asset::initialize(const std::shared_ptr<const ApplicationData>& data)
 {
 	SURGSIM_ASSERT(!m_didInit) << "Initialization has been called before";
 	m_didInit = true;

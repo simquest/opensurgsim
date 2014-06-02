@@ -44,7 +44,10 @@ void StapleElement::setHasCollisionRepresentation(bool flag)
 bool StapleElement::doInitialize()
 {
 	auto meshShape = std::make_shared<MeshShape>();
-	meshShape->setFileName(getRuntime()->getApplicationData()->findFile("/Geometry/staple_collision.ply"));
+	const std::string file = "/Geometry/staple_collision.ply";
+	meshShape->setFileName(file);
+	SURGSIM_ASSERT(meshShape->initialize(getRuntime()->getApplicationData())) <<
+		"StapleElement::doInitialize failed to load '" << file << "'.";
 
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
