@@ -606,24 +606,44 @@ public:
 	{
 	}
 
-	double getLinearStiffness() const
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearStiffness() const
 	{
-		return m_linearStiffness.getValue();
+		return VirtualToolCoupler::getOptionalLinearStiffness();
 	}
 
-	double getLinearDamping() const
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearDamping() const
 	{
-		return m_linearDamping.getValue();
+		return VirtualToolCoupler::getOptionalLinearDamping();
 	}
 
-	double getAngularStiffness() const
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularStiffness() const
 	{
-		return m_angularStiffness.getValue();
+		return VirtualToolCoupler::getOptionalAngularStiffness();
 	}
 
-	double getAngularDamping() const
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularDamping() const
 	{
-		return m_angularDamping.getValue();
+		return VirtualToolCoupler::getOptionalAngularDamping();
+	}
+
+	void setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& val)
+	{
+		VirtualToolCoupler::setOptionalLinearStiffness(val);
+	}
+
+	void setOptionalLinearDamping(const SurgSim::DataStructures::OptionalValue<double>& val)
+	{
+		VirtualToolCoupler::setOptionalLinearDamping(val);
+	}
+
+	void setOptionalAngularStiffness(const SurgSim::DataStructures::OptionalValue<double>& val)
+	{
+		VirtualToolCoupler::setOptionalAngularStiffness(val);
+	}
+
+	void setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& val)
+	{
+		VirtualToolCoupler::setOptionalAngularDamping(val);
 	}
 
 };

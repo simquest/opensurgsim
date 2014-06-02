@@ -16,6 +16,8 @@
 #include <Eigen/Eigenvalues>
 
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/LogMacros.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/OutputComponent.h"
@@ -33,6 +35,11 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Quaterniond;
 
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::VirtualToolCoupler);
+}
+
 namespace SurgSim
 {
 
@@ -42,6 +49,10 @@ namespace Physics
 VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
 	m_poseName(SurgSim::DataStructures::Names::POSE),
+	m_linearStiffness(std::numeric_limits<double>::quiet_NaN()),
+	m_linearDamping(std::numeric_limits<double>::quiet_NaN()),
+	m_angularStiffness(std::numeric_limits<double>::quiet_NaN()),
+	m_angularDamping(std::numeric_limits<double>::quiet_NaN()),
 	m_outputForceScaling(1.0),
 	m_outputTorqueScaling(1.0)
 {
@@ -54,25 +65,66 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	builder.addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
 	builder.addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
 	m_outputData = builder.createData();
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
+		LinearStiffness, getOptionalLinearStiffness, setOptionalLinearStiffness);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
+		LinearDamping, getOptionalLinearDamping, setOptionalLinearDamping);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
+		AngularStiffness, getOptionalAngularStiffness, setOptionalAngularStiffness);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
+		AngularDamping, getOptionalAngularDamping, setOptionalAngularDamping);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
+		Input, getInput, setInput);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
+		Output, getOutput, setOutput);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
+		Representation, getRepresentation, setRepresentation);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, double, OutputForceScaling,
+		getOutputForceScaling, setOutputForceScaling);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, double, OutputTorqueScaling,
+		getOutputTorqueScaling, setOutputTorqueScaling);
 }
 
 VirtualToolCoupler::~VirtualToolCoupler()
 {
 }
 
-void VirtualToolCoupler::setInput(const std::shared_ptr<SurgSim::Input::InputComponent> input)
+const std::shared_ptr<SurgSim::Framework::Component> VirtualToolCoupler::getInput()
 {
-	m_input = input;
+	return m_input;
 }
 
-void VirtualToolCoupler::setOutput(const std::shared_ptr<SurgSim::Input::OutputComponent> output)
+void VirtualToolCoupler::setInput(const std::shared_ptr<SurgSim::Framework::Component> input)
 {
-	m_output = output;
+	m_input = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(input);
 }
 
-void VirtualToolCoupler::setRepresentation(const std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid)
+const std::shared_ptr<SurgSim::Framework::Component> VirtualToolCoupler::getOutput()
 {
-	m_rigid = rigid;
+	return m_output;
+}
+
+void VirtualToolCoupler::setOutput(const std::shared_ptr<SurgSim::Framework::Component> output)
+{
+	m_output = std::dynamic_pointer_cast<SurgSim::Input::OutputComponent>(output);
+}
+
+const std::shared_ptr<SurgSim::Framework::Component> VirtualToolCoupler::getRepresentation()
+{
+	return m_rigid;
+}
+
+void VirtualToolCoupler::setRepresentation(const std::shared_ptr<SurgSim::Framework::Component> rigid)
+{
+	m_rigid = std::dynamic_pointer_cast<SurgSim::Physics::RigidRepresentation>(rigid);
+}
+
+const std::string& VirtualToolCoupler::getPoseName()
+{
+	return m_poseName;
 }
 
 void VirtualToolCoupler::setPoseName(const std::string& poseName)
@@ -99,19 +151,19 @@ void VirtualToolCoupler::update(double dt)
 		RigidTransform3d objectPose(objectState.getPose());
 		Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
 
-		Vector3d force = m_linearStiffness.getValue() * (inputPose.translation() - objectPosition);
-		force += m_linearDamping.getValue() * (inputLinearVelocity - objectState.getLinearVelocity());
+		Vector3d force = m_linearStiffness * (inputPose.translation() - objectPosition);
+		force += m_linearDamping * (inputLinearVelocity - objectState.getLinearVelocity());
 
 		Vector3d rotationVector;
 		SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationVector);
-		Vector3d torque = m_angularStiffness.getValue() * rotationVector;
-		torque += m_angularDamping.getValue() * (inputAngularVelocity - objectState.getAngularVelocity());
+		Vector3d torque = m_angularStiffness * rotationVector;
+		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
-		const Matrix33d linearStiffnessMatrix = m_linearStiffness.getValue() * identity3x3;
-		const Matrix33d linearDampingMatrix = m_linearDamping.getValue() * identity3x3;
-		const Matrix33d angularStiffnessMatrix = m_angularStiffness.getValue() * identity3x3;
-		const Matrix33d angularDampingMatrix = m_angularDamping.getValue() * identity3x3;
+		const Matrix33d linearStiffnessMatrix = m_linearStiffness * identity3x3;
+		const Matrix33d linearDampingMatrix = m_linearDamping * identity3x3;
+		const Matrix33d angularStiffnessMatrix = m_angularStiffness * identity3x3;
+		const Matrix33d angularDampingMatrix = m_angularDamping * identity3x3;
 		m_rigid->addExternalForce(force, linearStiffnessMatrix, linearDampingMatrix);
 		m_rigid->addExternalTorque(torque, angularStiffnessMatrix, angularDampingMatrix);
 
@@ -172,37 +224,55 @@ bool VirtualToolCoupler::doWakeUp()
 	//
 	double dampingRatio = 1.0;
 	double mass = m_rigid->getCurrentParameters().getMass();
-	if (!m_linearDamping.hasValue())
+	if (!m_optionalLinearDamping.hasValue())
 	{
-		if (!m_linearStiffness.hasValue())
+		if (m_optionalLinearStiffness.hasValue())
 		{
-			m_linearStiffness.setValue(mass * 800.0);
+			m_linearStiffness = m_optionalLinearStiffness.getValue();
 		}
-		m_linearDamping.setValue(2.0 * dampingRatio * sqrt(mass * m_linearStiffness.getValue()));
+		else
+		{
+			m_linearStiffness = mass * 800.0;
+		}
+		m_linearDamping = 2.0 * dampingRatio * sqrt(mass * m_linearStiffness);
 	}
 	else
 	{
-		if (!m_linearStiffness.hasValue())
+		m_linearDamping = m_optionalLinearDamping.getValue();
+		if (m_optionalLinearStiffness.hasValue())
 		{
-			m_linearStiffness.setValue(pow(m_linearDamping.getValue() / dampingRatio, 2) / (4.0 * mass));
+			m_linearStiffness = m_optionalLinearStiffness.getValue();
+		}
+		else
+		{
+			m_linearStiffness = pow(m_linearDamping / dampingRatio, 2) / (4.0 * mass);
 		}
 	}
 
 	const Matrix33d& inertia = m_rigid->getCurrentParameters().getLocalInertia();
 	double maxInertia = inertia.eigenvalues().real().maxCoeff();
-	if (!m_angularDamping.hasValue())
+	if (!m_optionalAngularDamping.hasValue())
 	{
-		if (!m_angularStiffness.hasValue())
+		if (m_optionalAngularStiffness.hasValue())
 		{
-			m_angularStiffness.setValue(maxInertia * 1000.0);
+			m_angularStiffness = m_optionalAngularStiffness.getValue();
 		}
-		m_angularDamping.setValue(2.0 * dampingRatio * sqrt(maxInertia * m_angularStiffness.getValue()));
+		else
+		{
+			m_angularStiffness = maxInertia * 1000.0;
+		}
+		m_angularDamping = 2.0 * dampingRatio * sqrt(maxInertia * m_angularStiffness);
 	}
 	else
 	{
-		if (!m_angularStiffness.hasValue())
+		m_angularDamping = m_optionalAngularDamping.getValue();
+		if (m_optionalAngularStiffness.hasValue())
 		{
-			m_angularStiffness.setValue(pow(m_angularDamping.getValue() / dampingRatio, 2) / (4.0 * maxInertia));
+			m_angularStiffness = m_optionalAngularStiffness.getValue();
+		}
+		else
+		{
+			m_angularStiffness = pow(m_angularDamping / dampingRatio, 2) / (4.0 * maxInertia);
 		}
 	}
 
@@ -214,24 +284,9 @@ int VirtualToolCoupler::getTargetManagerType() const
 	return SurgSim::Framework::MANAGER_TYPE_PHYSICS;
 }
 
-void VirtualToolCoupler::setLinearStiffness(double linearStiffness)
+double VirtualToolCoupler::getOutputForceScaling()
 {
-	m_linearStiffness.setValue(linearStiffness);
-}
-
-void VirtualToolCoupler::setLinearDamping(double linearDamping)
-{
-	m_linearDamping.setValue(linearDamping);
-}
-
-void VirtualToolCoupler::setAngularStiffness(double angularStiffness)
-{
-	m_angularStiffness.setValue(angularStiffness);
-}
-
-void VirtualToolCoupler::setAngularDamping(double angularDamping)
-{
-	m_angularDamping.setValue(angularDamping);
+	return m_outputForceScaling;
 }
 
 void VirtualToolCoupler::setOutputForceScaling(double forceScaling)
@@ -239,9 +294,121 @@ void VirtualToolCoupler::setOutputForceScaling(double forceScaling)
 	m_outputForceScaling = forceScaling;
 }
 
+double VirtualToolCoupler::getOutputTorqueScaling()
+{
+	return m_outputTorqueScaling;
+}
+
 void VirtualToolCoupler::setOutputTorqueScaling(double torqueScaling)
 {
 	m_outputTorqueScaling = torqueScaling;
+}
+
+void VirtualToolCoupler::overrideLinearStiffness(double linearStiffness)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot override vtc parameter after it has initialized";
+
+	m_optionalLinearStiffness.setValue(linearStiffness);
+	m_linearStiffness = linearStiffness;
+}
+
+double VirtualToolCoupler::getLinearStiffness()
+{
+	SURGSIM_ASSERT(isAwake() || m_optionalLinearStiffness.hasValue())
+		<< "Vtc parameter has not been initialized";
+
+	return m_linearStiffness;
+}
+
+void VirtualToolCoupler::overrideLinearDamping(double linearDamping)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot override vtc parameter after it has initialized";
+
+	m_optionalLinearDamping.setValue(linearDamping);
+	m_linearDamping = linearDamping;
+}
+
+double VirtualToolCoupler::getLinearDamping()
+{
+	SURGSIM_ASSERT(isAwake() || m_optionalLinearDamping.hasValue())
+		<< "Vtc parameter has not been initialized";
+
+	return m_linearDamping;
+}
+
+void VirtualToolCoupler::overrideAngularStiffness(double angularStiffness)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot override vtc parameter after it has initialized";
+
+	m_optionalAngularStiffness.setValue(angularStiffness);
+	m_angularStiffness = angularStiffness;
+}
+
+double VirtualToolCoupler::getAngularStiffness()
+{
+	SURGSIM_ASSERT(isAwake() || m_optionalAngularStiffness.hasValue())
+		<< "Vtc parameter has not been initialized";
+
+	return m_angularStiffness;
+}
+
+void VirtualToolCoupler::overrideAngularDamping(double angularDamping)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot override vtc parameter after it has initialized";
+
+	m_optionalAngularDamping.setValue(angularDamping);
+	m_angularDamping = angularDamping;
+}
+
+double VirtualToolCoupler::getAngularDamping()
+{
+	SURGSIM_ASSERT(isAwake() || m_optionalAngularDamping.hasValue())
+		<< "Vtc parameter has not been initialized";
+
+	return m_angularDamping;
+}
+
+void VirtualToolCoupler::setOptionalLinearStiffness(
+	const SurgSim::DataStructures::OptionalValue<double>& linearStiffness)
+{
+	m_optionalLinearStiffness = linearStiffness;
+}
+
+const SurgSim::DataStructures::OptionalValue<double>& VirtualToolCoupler::getOptionalLinearStiffness() const
+{
+	return m_optionalLinearStiffness;
+}
+
+void VirtualToolCoupler::setOptionalLinearDamping(const SurgSim::DataStructures::OptionalValue<double>& linearDamping)
+{
+	m_optionalLinearDamping = linearDamping;
+}
+
+const SurgSim::DataStructures::OptionalValue<double>& VirtualToolCoupler::getOptionalLinearDamping() const
+{
+	return m_optionalLinearDamping;
+}
+
+void VirtualToolCoupler::setOptionalAngularStiffness(
+	const SurgSim::DataStructures::OptionalValue<double>& angularStiffness)
+{
+	m_optionalAngularStiffness = angularStiffness;
+}
+
+const SurgSim::DataStructures::OptionalValue<double>& VirtualToolCoupler::getOptionalAngularStiffness() const
+{
+	return m_optionalAngularStiffness;
+}
+
+void VirtualToolCoupler::setOptionalAngularDamping(
+	const SurgSim::DataStructures::OptionalValue<double>& angularDamping)
+{
+	m_optionalAngularDamping = angularDamping;
+}
+
+const SurgSim::DataStructures::OptionalValue<double>& VirtualToolCoupler::getOptionalAngularDamping() const
+{
+	return m_optionalAngularDamping;
 }
 
 }; /// Physics

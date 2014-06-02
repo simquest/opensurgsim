@@ -21,6 +21,11 @@
 #include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Input::InputComponent);
+};
+
 namespace SurgSim
 {
 namespace Input
@@ -75,6 +80,8 @@ InputComponent::InputComponent(const std::string& name) :
 	m_deviceConnected(false),
 	m_input(std::make_shared<InputConsumer>())
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(InputComponent, std::string, DeviceName,
+		getDeviceName, setDeviceName);
 }
 
 InputComponent::~InputComponent()
