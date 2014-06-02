@@ -144,6 +144,7 @@ void testOptionalValueSerialization(Type value)
 
 		// Decode
 		OptionalValue<Type> newOptionalValue;
+		newOptionalValue.setValue(value);
 		EXPECT_NO_THROW(newOptionalValue = node.as<OptionalValue<Type>>());
 
 		// Verify
