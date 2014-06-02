@@ -155,7 +155,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 
 	viewElement->setPose(from);
 
-	viewElement->addComponent(interpolator);
+	//viewElement->addComponent(interpolator);
 
 	return viewElement;
 }
@@ -168,6 +168,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createLight()
 	light->setAmbientColor(Vector4d(0.5, 0.5, 0.5, 1.0));
 	light->setDiffuseColor(Vector4d(0.5, 0.5, 0.5, 1.0));
 	light->setSpecularColor(Vector4d(0.8, 0.8, 0.8, 1.0));
+	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 	result->addComponent(light);
 
 	// Move the light from left to right over along the scene

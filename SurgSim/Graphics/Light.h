@@ -109,6 +109,13 @@ public:
 	/// Gets quadratic attenuation.
 	/// \return	The quadratic attenuation.
 	virtual double getQuadraticAttenuation() = 0;
+
+	/// Sets the name of the group that this light should work on
+	virtual void setLightGroupReference(const std::string& name) = 0;
+
+	/// Gets the name of the group this light should operate on
+	/// \return the name of the group for this light
+	virtual std::string getLightGroupReference() = 0;
 };
 
 }; // Graphics

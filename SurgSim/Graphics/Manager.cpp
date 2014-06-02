@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Graphics/Camera.h"
+#include "SurgSim/Graphics/Light.h"
 #include "SurgSim/Graphics/Group.h"
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Graphics/View.h"
@@ -90,6 +91,12 @@ bool Manager::addRepresentation(std::shared_ptr<Representation> representation)
 		if (camera != nullptr)
 		{
 			camera->setRenderGroup(getOrCreateGroup(camera->getRenderGroupReference()));
+		}
+
+		auto light = std::dynamic_pointer_cast<Light>(representation);
+		if (light != nullptr)
+		{
+			light->setGroup(getOrCreateGroup(light->getLightGroupReference()));
 		}
 
 		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added representation " << representation->getName();
