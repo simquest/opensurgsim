@@ -108,7 +108,8 @@ bool FemElement::update(const SurgSim::Math::OdeState& state)
 bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		&& (naturalCoordinate.size() == getNumNodes())
+		&& (naturalCoordinate.size() >= 0)
+		&& (static_cast<size_t>(naturalCoordinate.size()) == getNumNodes())
 		&& (-SurgSim::Math::Geometry::ScalarEpsilon <= naturalCoordinate.minCoeff() &&
 			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
 }

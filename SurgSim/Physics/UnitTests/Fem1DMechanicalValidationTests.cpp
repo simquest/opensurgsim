@@ -104,7 +104,7 @@ public:
 
 	void addBoundaryCondition(size_t node, size_t dof)
 	{
-		for (int i = 0; i < dof; i++)
+		for (size_t i = 0; i < dof; i++)
 		{
 			boundaryConditions.push_back(std::make_pair(node, i));
 		}

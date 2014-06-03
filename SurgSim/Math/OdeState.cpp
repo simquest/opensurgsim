@@ -67,8 +67,8 @@ size_t OdeState::getNumDof() const
 {
 	const size_t numDof = m_numDofPerNode * m_numNodes;
 
-	SURGSIM_ASSERT(m_x.size() == m_v.size() &&
-		m_x.size() == m_boundaryConditionsPerDof.size() && m_x.size() == numDof);
+	SURGSIM_ASSERT(m_x.size() == m_v.size() && m_x.size() == m_boundaryConditionsPerDof.size() && m_x.size() >= 0
+				   && static_cast<size_t>(m_x.size()) == numDof);
 
 	return numDof;
 }
@@ -152,8 +152,8 @@ bool OdeState::isBoundaryCondition(size_t dof) const
 
 Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 {
-	SURGSIM_ASSERT(vector->size() == getNumDof()) <<
-		"Invalid vector to apply boundary conditions on";
+	SURGSIM_ASSERT(vector != nullptr && vector->size() >= 0 && static_cast<size_t>(vector->size()) == getNumDof())
+		<< "Invalid vector to apply boundary conditions on";
 
 	for (std::vector<size_t>::const_iterator it = getBoundaryConditions().cbegin();
 		it != getBoundaryConditions().cend();
@@ -167,8 +167,10 @@ Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 
 void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasCompliance) const
 {
-	SURGSIM_ASSERT(matrix->rows() == getNumDof() &&
-		matrix->cols() == getNumDof()) << "Invalid matrix to apply boundary conditions on";
+	SURGSIM_ASSERT(matrix != nullptr && matrix->rows() >= 0 && matrix->cols() >= 0
+				   && static_cast<size_t>(matrix->rows()) == getNumDof()
+				   && static_cast<size_t>(matrix->cols()) == getNumDof())
+		<< "Invalid matrix to apply boundary conditions on";
 
 	double complianceValue  = 0.0;
 
