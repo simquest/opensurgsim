@@ -20,7 +20,9 @@
 #include "Examples/ExampleStapling/StapleElement.h"
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
@@ -43,6 +45,11 @@ using SurgSim::Physics::RigidRepresentationBilateral3D;
 using SurgSim::Physics::Fem3DRepresentationBilateral3D;
 using SurgSim::Physics::Localization;
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, StaplerBehavior);
+}
+
 StaplerBehavior::StaplerBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),
 	m_numElements(0),
@@ -50,17 +57,35 @@ StaplerBehavior::StaplerBehavior(const std::string& name):
 	m_button1IndexCached(false),
 	m_buttonPreviouslyPressed(false)
 {
+	typedef std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> VirtualTeethArray;
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::shared_ptr<SurgSim::Framework::Component>,
+		InputComponent, getInputComponent, setInputComponent);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::shared_ptr<SurgSim::Framework::Component>,
+		Representation, getRepresentation, setRepresentation);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, VirtualTeethArray, VirtualStaple,
+		getVirtualStaple, setVirtualStaple);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::list<std::string>, StapleEnabledSceneElements,
+		getStapleEnabledSceneElements, setStapleEnabledSceneElements);
 }
 
-void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent)
+void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent)
 {
-	m_from = inputComponent;
+	m_from = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(inputComponent);
 }
 
-void StaplerBehavior::setRepresentation(
-	 std::shared_ptr<SurgSim::Framework::Representation> staplerRepresentation)
+std::shared_ptr<SurgSim::Framework::Component> StaplerBehavior::getInputComponent()
 {
-	m_representation = staplerRepresentation;
+	return m_from;
+}
+
+void StaplerBehavior::setRepresentation(std::shared_ptr<SurgSim::Framework::Component> staplerRepresentation)
+{
+	m_representation = std::dynamic_pointer_cast<SurgSim::Framework::Representation>(staplerRepresentation);
+}
+
+std::shared_ptr<SurgSim::Framework::Component> StaplerBehavior::getRepresentation()
+{
+	return m_representation;
 }
 
 void StaplerBehavior::setVirtualStaple(
@@ -69,9 +94,24 @@ void StaplerBehavior::setVirtualStaple(
 	m_virtualTeeth = virtualTeeth;
 }
 
+const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& StaplerBehavior::getVirtualStaple()
+{
+	return m_virtualTeeth;
+}
+
 void StaplerBehavior::enableStaplingForSceneElement(std::string sceneElementName)
 {
 	m_stapleEnabledSceneElements.push_back(sceneElementName);
+}
+
+void StaplerBehavior::setStapleEnabledSceneElements(const std::list<std::string>& stapleEnabledSceneElements)
+{
+	m_stapleEnabledSceneElements = stapleEnabledSceneElements;
+}
+
+const std::list<std::string>& StaplerBehavior::getStapleEnabledSceneElements()
+{
+	return m_stapleEnabledSceneElements;
 }
 
 void StaplerBehavior::filterCollisionMapForStapleEnabledRepresentations(
