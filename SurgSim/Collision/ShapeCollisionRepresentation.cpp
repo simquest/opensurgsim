@@ -13,8 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/filesystem.hpp>
+
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
@@ -71,6 +75,20 @@ void ShapeCollisionRepresentation::update(const double& dt)
 	{
 		meshShape->setPose(getPose());
 	}
+}
+
+bool ShapeCollisionRepresentation::doInitialize()
+{
+	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
+	if (nullptr != meshShape)
+	{
+		auto data = std::make_shared<SurgSim::Framework::ApplicationData>(*(getRuntime()->getApplicationData()));
+		SURGSIM_ASSERT(meshShape->initialize(data)) << "DeformableCollisionRepresentation::doInitialize(): "
+			"m_shape initialization failed.";
+		update(0.0);
+	}
+
+	return true;
 }
 
 }; // namespace Collision
