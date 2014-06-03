@@ -107,7 +107,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement
 		= std::make_shared<SurgSim::Framework::BasicSceneElement>(name);
 
-	// Load the tetrahedral mesh and initialize the finite element model
+	// Set the file name which contains the tetrahedral mesh. File will be loaded by 'doInitialize()' call.
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> physicsRepresentation
 		= std::make_shared<SurgSim::Physics::Fem3DRepresentation>(name + " physics");
 	physicsRepresentation->setFilename(filename);
@@ -120,8 +120,8 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	meshShape->initialize(data);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
-	auto graphicalFem	= std::make_shared<OsgMeshRepresentation>(name + " triangle mesh");
-	*graphicalFem->getMesh() = SurgSim::Graphics::Mesh(*(meshShape->getMesh()));
+	auto graphicalFem = std::make_shared<OsgMeshRepresentation>(name + " triangle mesh");
+	graphicalFem->setFilename(meshShape->getFileName());
 	sceneElement->addComponent(graphicalFem);
 
 	// Create the collision mesh for the surface of the finite element model
@@ -139,7 +139,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// WireFrame of the finite element model
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> wireFrameFem
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " wire frame");
-	*wireFrameFem->getMesh() = SurgSim::Graphics::Mesh(*(meshShape->getMesh()));
+	wireFrameFem->setFilename(meshShape->getFileName());
 	wireFrameFem->setDrawAsWireFrame(true);
 	sceneElement->addComponent(wireFrameFem);
 
@@ -175,7 +175,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
 		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
-	*meshShapeVisualization->getMesh() = SurgSim::Graphics::Mesh(*(meshShapeForCollision->getMesh()));
+	meshShapeVisualization->setFilename(meshShapeForCollision->getFileName());
 	meshShapeVisualization->setDrawAsWireFrame(true);
 
 	RigidRepresentationParameters params;
@@ -254,7 +254,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 		std::shared_ptr<OsgMeshRepresentation> virtualToothMesh
 			= std::make_shared<OsgMeshRepresentation>("virtualToothMesh" + boost::to_string(i));
-		*virtualToothMesh->getMesh() = SurgSim::Graphics::Mesh(*(*it)->getMesh());
+		virtualToothMesh->setFilename((*it)->getFileName());
 		virtualToothMesh->setDrawAsWireFrame(true);
 
 		sceneElement->addComponent(virtualToothMesh);
@@ -281,8 +281,9 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 	meshShape->setFileName(filename);
 	meshShape->initialize(data);
 
+	// Visualization of arm collision mesh
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization = std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
-	*meshShapeVisualization->getMesh() = SurgSim::Graphics::Mesh(*(meshShape->getMesh()));
+	meshShapeVisualization->setFilename(meshShape->getFileName());
 	meshShapeVisualization->setDrawAsWireFrame(true);
 
 	RigidRepresentationParameters params;
@@ -351,13 +352,13 @@ int main(int argc, char* argv[])
 	inputManager->addDevice(view->getKeyboardDevice());
 
 	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
+
 	std::shared_ptr<SceneElement> arm = createArmSceneElement("arm");
 	arm->setPose(armPose);
 
 	std::shared_ptr<SceneElement> stapler = createStaplerSceneElement("stapler", deviceName);
 	stapler->setPose(RigidTransform3d::Identity());
 
-	// Load the FEM
 	std::string woundFilename = std::string("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
 	// Dynamic Optical Coherence Elastography", IEEE Transactions on Biomedical Engineering, Vol 57, No 4.
