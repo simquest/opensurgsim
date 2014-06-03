@@ -16,11 +16,25 @@
 /// \file shadowmap_vertexcolor.vert
 /// Vertex shader for simple default material, lighting from a single light source, per vertex
 
+uniform mat4 viewMatrix;
+
 /// outgoing calculated color for this vertex
 varying vec4 color;
 
 /// outgoing calculated projected coordinates for this vertex
 varying vec4 clipCoord;
+
+struct LightSource {
+	vec4 ambient; 
+	vec4 diffuse; 
+	vec4 specular; 
+	vec4 position; 
+	float constantAttenuation; 
+	float linearAttenuation; 
+	float quadraticAttenuation;	
+};
+
+uniform LightSource lightSource;
 
 void main(void) 
 {
@@ -30,15 +44,15 @@ void main(void)
 	vec4 eyeDir4 = gl_ModelViewMatrix * gl_Vertex;
 	vec3 eyeDir = normalize(eyeDir4.xyz);
 
-	vec3 lightDir = gl_LightSource[0].position.xyz - eyeDir4.xyz;
+	vec3 lightDir = (viewMatrix * lightSource.position).xyz - eyeDir4.xyz;
 	float lightDistance = length(lightDir);
     lightDir = normalize(lightDir);
 	
 	vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
     
-    float attenuation = 1.0 / (gl_LightSource[0].constantAttenuation + gl_LightSource[0].linearAttenuation*lightDistance + 
-		gl_LightSource[0].quadraticAttenuation*lightDistance*lightDistance);
+    float attenuation = 1.0 / (lightSource.constantAttenuation + lightSource.linearAttenuation*lightDistance + 
+		lightSource.quadraticAttenuation*lightDistance*lightDistance);
     
-    color.rgb = attenuation * dot(lightDir, normal) * gl_Color.rgb * gl_LightSource[0].diffuse.rgb;
+    color.rgb = attenuation * dot(lightDir, normal) * gl_Color.rgb * lightSource.diffuse.rgb;
 	color.a = gl_Color.a;
 } 

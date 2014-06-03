@@ -62,6 +62,7 @@ OsgLight::OsgLight(const std::string& name) :
 	m_light->setName(name);
 	m_light->setLightNum(0);
 	m_lightSource = new osg::LightSource();
+	m_lightSource->setDataVariance(osg::Object::DYNAMIC);
 	m_lightSource->setLight(m_light);
 
 	m_switch->addChild(m_lightSource);

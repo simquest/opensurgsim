@@ -155,7 +155,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 
 	viewElement->setPose(from);
 
-	//viewElement->addComponent(interpolator);
+	viewElement->addComponent(interpolator);
 
 	return viewElement;
 }
@@ -334,7 +334,7 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 
 	addSpheres(scene);
 
-	std::shared_ptr<SurgSim::Graphics::ViewElement> viewElement = createView("View", 0, 0, 1024, 768);
+	std::shared_ptr<SurgSim::Graphics::ViewElement> viewElement = createView("View", 40, 40, 1024, 768);
 	scene->addSceneElement(viewElement);
 	auto mainCamera = viewElement->getCamera();
 
@@ -357,7 +357,6 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	auto shadowMapPass = createShadowMapPass();
 	scene->addSceneElement(shadowMapPass);
 
-
 	// The following three uniforms in the shadowMapPass, carry the information from the
 	// lightMapPass. They are used to project the incoming point into the space of the lightMap
 	// The view matrix of the camera used to render the light map
@@ -372,11 +371,14 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	copier->connect(lightMapPass->getCamera(), "FloatProjectionMatrix",
 					shadowMapPass->getMaterial(), "lightProjectionMatrix");
 
-	// The inverse view matrix of the camera used to render the light map
-	auto inverseViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix");
-	shadowMapPass->getMaterial()->addUniform(inverseViewMatrix);
-	copier->connect(shadowMapPass->getCamera(), "FloatInverseViewMatrix",
-					shadowMapPass->getMaterial() , "inverseViewMatrix");
+// The inverse view matrix of the camera used to render the light map
+// HS-2016-jun-04 Leave commented for now, this exposes a bug in terms of timing with the
+// copy behaviors, while the inverseViewMatrix uniform is now available from the camera, using this
+// form causes rendering artifacts, possibly due to a mismatch between the viewMatrix and the inverse
+// 	auto inverseViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix");
+// 	shadowMapPass->getMaterial()->addUniform(inverseViewMatrix);
+// 	copier->connect(shadowMapPass->getCamera(), "FloatInverseViewMatrix",
+// 					shadowMapPass->getMaterial() , "inverseViewMatrix");
 
 	// Get the result of the lightMapPass and pass it on to the shadowMapPass
 	auto lightDepthTexture =
@@ -388,7 +390,6 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	// whole scene
 	copier->connect(viewElement->getPoseComponent(), "Pose", shadowMapPass->getPoseComponent(), "Pose");
 	copier->connect(mainCamera, "ProjectionMatrix", shadowMapPass->getCamera() , "ProjectionMatrix");
-
 
 
 	// Put the result of the last pass into the main camera to make it accessible
@@ -405,8 +406,6 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	debug->addComponent(makeDebugQuad("shadow",
 									  shadowMapPass->getRenderTarget()->getColorTarget(0), 1024 - 256, 0, 256, 256));
 	scene->addSceneElement(debug);
-
-
 }
 
 
@@ -417,26 +416,17 @@ int main(int argc, char* argv[])
 
 	materials["basicLit"] = loadMaterial(*data, "Shaders/basic_lit");
 	materials["basicUnlit"] = loadMaterial(*data, "Shaders/basic_unlit");
-	materials["basicShadowed"] = loadMaterial(*data, "Shaders/shadowmap_vertexcolor");
+	materials["basicShadowed"] = loadMaterial(*data, "Shaders/s_mapping");
 	materials["depthMap"] = loadMaterial(*data, "Shaders/depth_map");
 	materials["shadowMap"] = loadMaterial(*data, "Shaders/shadow_map");
 	materials["default"] = materials["basic_lit"];
-
 
 	runtime->addManager(std::make_shared<SurgSim::Graphics::OsgManager>());
 	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
 
 	createScene(runtime);
 
-	YAML::Node root;
-	root["Scene"] = runtime->getScene();
-
-	std::ofstream out("scene.yaml", std::ios::out);
-	out << root;
-	out.close();
-
 	runtime->execute();
-
 
 	return 0;
 }
