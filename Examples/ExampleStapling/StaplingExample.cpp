@@ -21,7 +21,7 @@
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
-#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/DataStructures/EmptyData.h"
@@ -61,6 +61,7 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
+using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
 using SurgSim::Blocks::VisualizeContactsBehavior;
 using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::EmptyData;
@@ -113,11 +114,21 @@ static std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadMe
 	return triangleMeshDelegate->getMesh();
 }
 
+/// Load scenery object from file
+/// \param name Name of this scenery representation.
+/// \param fileName Name of the file from which the scenery representation will be loaded.
+/// \return A scenery representation.
+std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& name, const std::string& fileName)
+{
+	std::shared_ptr<SceneryRepresentation> sceneryRepresentation = std::make_shared<OsgSceneryRepresentation>(name);
+	sceneryRepresentation->setFileName(fileName);
+	return sceneryRepresentation;
+}
+
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
-	SurgSim::Math::IntegrationScheme integrationScheme,
-	bool displayPointCloud)
+	SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
 	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement
@@ -134,11 +145,11 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	physicsRepresentation->loadFile();
 	sceneElement->addComponent(physicsRepresentation);
 
-	// Create a triangle mesh for visualizing the surface of the finite element model
-	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
+	// Visualization of the surface of the finite element model
+	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicalFem
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
-	*graphicsTriangleMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*loadMesh(filename));
-	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
+	*graphicalFem->getMesh() = SurgSim::Graphics::Mesh(*loadMesh(filename));
+	sceneElement->addComponent(graphicalFem);
 
 	// Load the surface triangle mesh of the finite element model
 	auto meshSurface = loadMesh(filename);
@@ -150,42 +161,25 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	sceneElement->addComponent(collisionRepresentation);
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
-	sceneElement->addComponent(
-		std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
-			name + " physics to triangle mesh",
-			physicsRepresentation->getFinalState(),
-			graphicsTriangleMeshRepresentation->getMesh()));
+	auto physicsToGraphicalFem = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("PhysicsToGraphicalFem");
+	physicsToGraphicalFem->setSource(physicsRepresentation);
+	physicsToGraphicalFem->setTarget(graphicalFem);
+	sceneElement->addComponent(physicsToGraphicalFem);
 
-	if (displayPointCloud)
-	{
-		// Create a point-cloud for visualizing the nodes of the finite element model
-		std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>> graphicsPointCloudRepresentation
-				= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>(name + " point cloud");
-		graphicsPointCloudRepresentation->setColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
-		graphicsPointCloudRepresentation->setPointSize(3.0f);
-		graphicsPointCloudRepresentation->setVisible(true);
-		sceneElement->addComponent(graphicsPointCloudRepresentation);
+	// WireFrame of the finite element model
+	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> wireFrameFem
+		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " wire frame");
+	*wireFrameFem->getMesh() = SurgSim::Graphics::Mesh(*loadMesh(filename));
+	graphicalFem->setDrawAsWireFrame(true);
+	sceneElement->addComponent(wireFrameFem);
 
-		// Create a behavior which transfers the position of the vertices in the FEM to locations in the point cloud
-		sceneElement->addComponent(
-			std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<EmptyData>>(
-				name + " physics to point cloud",
-				physicsRepresentation->getFinalState(),
-				graphicsPointCloudRepresentation->getVertices()));
-	}
+	// Behavior transfers the position of the physics representation to wire frame representation of the fem.
+	auto physicsToWireFrameFem = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("PhysicsToWireFrameFem");
+	physicsToWireFrameFem->setSource(physicsRepresentation);
+	physicsToWireFrameFem->setTarget(wireFrameFem);
+	sceneElement->addComponent(physicsToWireFrameFem);
 
 	return sceneElement;
-}
-
-/// Load scenery object from file
-/// \param name Name of this scenery representation.
-/// \param fileName Name of the file from which the scenery representation will be loaded.
-/// \return A scenery representation.
-std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& name, const std::string& fileName)
-{
-	std::shared_ptr<SceneryRepresentation> sceneryRepresentation = std::make_shared<OsgSceneryRepresentation>(name);
-	sceneryRepresentation->setFileName(fileName);
-	return sceneryRepresentation;
 }
 
 std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName, const std::string& deviceName)
@@ -387,8 +381,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SceneElement> wound =
 		createFemSceneElement("wound",
 							  woundFilename,
-							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
-							  true);										   // Display point cloud
+							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER);
 	wound->setPose(armPose);
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
@@ -408,7 +401,7 @@ int main(int argc, char* argv[])
 	keyboardBehavior->registerKey(
 		SurgSim::Device::KeyCode::KEY_E, wound->getComponent("wound triangle mesh"));
 	keyboardBehavior->registerKey(
-		SurgSim::Device::KeyCode::KEY_F, wound->getComponent("wound point cloud"));
+		SurgSim::Device::KeyCode::KEY_F, wound->getComponent("wound wire frame"));
 
 	std::shared_ptr<SceneElement> keyboard = std::make_shared<BasicSceneElement>("SceneElement");
 	keyboard->addComponent(keyboardComponent);
