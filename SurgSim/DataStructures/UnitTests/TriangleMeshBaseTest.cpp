@@ -66,7 +66,7 @@ public:
 
 			if (printPositions)
 			{
-				printf("\t%d: (%g, %g, %g)\n", i, position.x(), position.y(), position.z());
+				printf("\t%zd: (%g, %g, %g)\n", i, position.x(), position.y(), position.z());
 			}
 		}
 
@@ -85,7 +85,7 @@ public:
 
 			if (printNormals)
 			{
-				printf("\t%d: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
+				printf("\t%zd: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
 			}
 		}
 
@@ -114,7 +114,7 @@ public:
 
 			if (printTriangles)
 			{
-				printf("\t%d: Vertices (%d, %d, %d), Edges (%d, %d, %d)\n", i,
+				printf("\t%zd: Vertices (%zd, %zd, %zd), Edges (%zd, %zd, %zd)\n", i,
 					triangleVertices[0], triangleVertices[1], triangleVertices[2],
 					triangleEdges[0], triangleEdges[1], triangleEdges[2]);
 			}
@@ -127,7 +127,7 @@ public:
 			for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 			{
 				const std::array<size_t, 2>& edgeVertices = testEdgeVertices[i];
-				printf("\t%d: (%d, %d)\n", i, edgeVertices[0], edgeVertices[1]);
+				printf("\t%zd: (%zd, %zd)\n", i, edgeVertices[0], edgeVertices[1]);
 			}
 		}
 	}

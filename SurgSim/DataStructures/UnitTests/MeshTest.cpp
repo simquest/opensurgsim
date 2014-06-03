@@ -58,7 +58,7 @@ public:
 
 			if (printPositions)
 			{
-				printf("\t%d: (%g, %g, %g)\n", i, position.x(), position.y(), position.z());
+				printf("\t%zd: (%g, %g, %g)\n", i, position.x(), position.y(), position.z());
 			}
 		}
 
@@ -77,7 +77,7 @@ public:
 
 			if (printNormals)
 			{
-				printf("\t%d: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
+				printf("\t%zd: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
 			}
 		}
 
