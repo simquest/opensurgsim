@@ -20,6 +20,11 @@
 #include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Framework/LockedContainer.h"
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Input::OutputComponent);
+};
+
 namespace SurgSim
 {
 namespace Input
@@ -76,6 +81,8 @@ OutputComponent::OutputComponent(const std::string& name) :
 	m_deviceConnected(false),
 	m_output(std::make_shared<OutputProducer>())
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OutputComponent, std::string, DeviceName,
+		getDeviceName, setDeviceName);
 }
 
 OutputComponent::~OutputComponent()
