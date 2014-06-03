@@ -126,5 +126,102 @@ TEST(DataStructuresConvertTests, StdArray)
 	}
 }
 
+template <typename Type>
+void testStdListSerialization(const std::list<Type>& value)
+{
+	{
+		// Encode
+		YAML::Node node;
+		EXPECT_NO_THROW(node = value;);
+
+		// Decode
+		std::list<Type> newValue;
+		newValue = node.as<std::list<Type>>();
+
+		// Verify
+		EXPECT_EQ(value.size(), newValue.size());
+		for (auto it = value.cbegin(), it2 = newValue.cbegin(); it != value.cend(); ++it, ++it2)
+		{
+			EXPECT_EQ(*it, *it2);
+		}
+	}
+
+	// Test for an empty node
+	{
+		std::list<Type> emptyValue;
+
+		// Encode
+		YAML::Node node;
+		EXPECT_NO_THROW(node = emptyValue;);
+
+		// Decode
+		std::list<Type> receiver = value;
+		receiver = node.as<std::list<Type>>();
+
+		// Verify
+		EXPECT_TRUE(receiver.empty());
+	}
+}
+
+TEST(DataStructuresConvertTests, StdList)
+{
+	{
+		SCOPED_TRACE("std::list<bool> serialization.");
+		std::list<bool> boolList;
+		boolList.push_back(true);
+		boolList.push_back(false);
+		boolList.push_back(true);
+		testStdListSerialization(boolList);
+	}
+	{
+		SCOPED_TRACE("std::list<int> serialization.");
+		std::list<int> intList;
+		intList.push_back(534);
+		intList.push_back(84);
+		intList.push_back(-567);
+		testStdListSerialization(intList);
+	}
+	{
+		SCOPED_TRACE("std::list<unsigned int> serialization.");
+		std::list<unsigned int> uintList;
+		uintList.push_back(53434);
+		uintList.push_back(8435);
+		uintList.push_back(567543);
+		testStdListSerialization(uintList);
+	}
+	{
+		SCOPED_TRACE("std::list<float> serialization.");
+		std::list<float> floatList;
+		floatList.push_back(534.34f);
+		floatList.push_back(0.845f);
+		floatList.push_back(-56754.3f);
+		testStdListSerialization(floatList);
+	}
+	{
+		SCOPED_TRACE("std::list<double> serialization.");
+		std::list<double> doubleList;
+		doubleList.push_back(534.34);
+		doubleList.push_back(0.8435e56);
+		doubleList.push_back(-56754.3);
+		testStdListSerialization(doubleList);
+	}
+	{
+		SCOPED_TRACE("std::list<char> serialization.");
+		std::list<char> charList;
+		charList.push_back('a');
+		charList.push_back('b');
+		charList.push_back('c');
+		testStdListSerialization(charList);
+	}
+	{
+		SCOPED_TRACE("std::list<std::string> serialization.");
+		std::list<std::string> stringList;
+		stringList.push_back("TestStringOne");
+		stringList.push_back("TestStringTwo");
+		stringList.push_back("TestStringThree");
+		testStdListSerialization(stringList);
+	}
+}
+
 }; // namespace DataStructures
 }; // namespace SurgSim
