@@ -46,7 +46,7 @@ public:
 
 		if (printPositions)
 		{
-			printf("Test Positions:\n");
+			std::cout << "Test Positions:\n";
 		}
 
 		/// Generate random positions for each vertex
@@ -58,13 +58,14 @@ public:
 
 			if (printPositions)
 			{
-				printf("\t%zd: (%g, %g, %g)\n", i, position.x(), position.y(), position.z());
+				std::cout << "\t" << i << ": (" << position.x() << ", " << position.y() << ", " << position.z()
+						  << ")\n";
 			}
 		}
 
 		if (printNormals)
 		{
-			printf("Test Normals:\n");
+			std::cout << "Test Normals:\n";
 		}
 
 		/// Generate random normals for each vertex
@@ -77,7 +78,7 @@ public:
 
 			if (printNormals)
 			{
-				printf("\t%zd: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
+				std::cout << "\t" << i << ": (" << normal.x() << ", " << normal.y() << ", " << normal.z() << ")\n";
 			}
 		}
 

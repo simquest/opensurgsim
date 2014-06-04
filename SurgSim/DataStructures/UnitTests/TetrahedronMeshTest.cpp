@@ -56,7 +56,7 @@ public:
 
 		if (printPositions)
 		{
-			printf("Test Vertex Positions:\n");
+			std::cout << "Test Vertex Positions:\n";
 		}
 
 		/// Generate random positions for each vertex
@@ -68,13 +68,14 @@ public:
 
 			if (printPositions)
 			{
-				printf("\t%zd: (%g, %g, %g)\n", i, position.x(), position.y(), position.z());
+				std::cout << "\t" << i << ": (" << position.x() << ", " << position.y() << ", " << position.z()
+						  << ")\n";
 			}
 		}
 
 		if (printNormals)
 		{
-			printf("Test Vertex Normals:\n");
+			std::cout << "Test Vertex Normals:\n";
 		}
 
 		/// Generate random normals for each vertex
@@ -87,13 +88,13 @@ public:
 
 			if (printNormals)
 			{
-				printf("\t%zd: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
+				std::cout << "\t" << i << ": (" << normal.x() << ", " << normal.y() << ", " << normal.z() << ")\n";
 			}
 		}
 
 		if (printTetrahedrons)
 		{
-			printf("Test Tetrahedrons:\n");
+			std::cout << "Test Tetrahedrons:\n";
 		}
 
 		/// Generate random vertex IDs within [0, numVertices) in quadruplets for mesh tetrahedrons
@@ -150,39 +151,35 @@ public:
 
 			if (printTetrahedrons)
 			{
-				printf("\t%zd: Vertices (%zd, %zd, %zd, %zd), Edges (%zd, %zd, %zd, %zd, %zd, %zd), "
-					"Triangles (%zd %zd %zd %zd)\n",
-					i,
-					tetrahedronVertices[0], tetrahedronVertices[1], tetrahedronVertices[2], tetrahedronVertices[3],
-					tetrahedronEdges[0], tetrahedronEdges[1], tetrahedronEdges[2],
-					tetrahedronEdges[3], tetrahedronEdges[4], tetrahedronEdges[5],
-					tetrahedronTriangles[0], tetrahedronTriangles[1],
-					tetrahedronTriangles[2], tetrahedronTriangles[3]);
+				std::cout << "\t" << i
+						  << ": Vertices (" << formatIterator(tetrahedronVertices, ", ")
+						  << "), Edges (" << formatIterator(tetrahedronEdges, ", ")
+						  << "), Triangles (" << formatIterator(tetrahedronTriangles, ", ") << ")\n";
 			}
 		}
 
 		if (printTriangles)
 		{
-			printf("Test Triangles:\n");
+			std::cout << "Test Triangles:\n";
 
 			for (size_t i = 0; i < testTrianglesVerticesId.size(); ++i)
 			{
 				const std::array<size_t, 3>& triangleVertices = testTrianglesVerticesId[i];
 				const std::array<size_t, 3>& triangleEdges = testTrianglesEdgesId[i];
-				printf("\t%zd: Vertices (%zd, %zd, %zd) - Edges (%zd %zd %zd)\n", i,
-					triangleVertices[0], triangleVertices[1], triangleVertices[2],
-					triangleEdges[0], triangleEdges[1], triangleEdges[2]);
+
+				std::cout << "\t" << i << ": Vertices (" << formatIterator(triangleVertices, ", ")
+						  << ") - Edges (" << formatIterator(triangleEdges, ", ") << ")\n";
 			}
 		}
 
 		if (printEdges)
 		{
-			printf("Test Edges:\n");
+			std::cout << "Test Edges:\n";
 
 			for (size_t i = 0; i < testEdgesVerticesId.size(); ++i)
 			{
 				const std::array<size_t, 2>& edgeVertices = testEdgesVerticesId[i];
-				printf("\t%zd: (%zd, %zd)\n", i, edgeVertices[0], edgeVertices[1]);
+				std::cout << "\t" << i << ": (" << formatIterator(edgeVertices, ", ") << ")\n";
 			}
 		}
 	}

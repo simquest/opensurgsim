@@ -469,4 +469,56 @@ private:
 	int m_numUpdates;
 };
 
+namespace wrappers
+{
+template <typename IteratorType>
+class formatIterator
+{
+public:
+	formatIterator(IteratorType begin, IteratorType end, const std::string& separator)
+		: m_begin(begin), m_end(end), m_separator(separator)
+	{
+	}
+
+	friend std::ostream& operator<<(std::ostream& stream, const formatIterator& formatIterator)
+	{
+		if (formatIterator.m_begin == formatIterator.m_end)
+		{
+			return stream;
+		}
+
+		IteratorType start = formatIterator.m_begin;
+		IteratorType penultimate = formatIterator.m_end - 1;
+		while (start != penultimate)
+		{
+			stream << *start++ << formatIterator.m_separator;
+		}
+		stream << *start;
+
+		return stream;
+	}
+
+private:
+	IteratorType m_begin;
+	IteratorType m_end;
+	const std::string& m_separator;
+};
+}
+
+template <typename IterableType>
+wrappers::formatIterator<typename IterableType::const_iterator> formatIterator(const IterableType& iterable,
+																			   const std::string& separator)
+{
+	return wrappers::formatIterator<typename IterableType::const_iterator>(
+		iterable.cbegin(), iterable.cend(), separator);
+}
+
+template <typename IteratorType>
+wrappers::formatIterator<IteratorType> formatIterator(IteratorType begin,
+													  IteratorType end,
+													  const std::string& separator)
+{
+	return wrappers::formatIterator<IteratorType>(begin, end, separator);
+}
+
 #endif  // SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H

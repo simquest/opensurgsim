@@ -267,8 +267,8 @@ static bool readEigenMatrix(const std::string& fileName, FILE* in, const char* l
 			ptrdiff_t newNumRows = matrix->rows() + 1;
 			if (rowVector.cols() != numCols)
 			{
-				fprintf(stderr, "Inconsistent number of columns for Eigen matrix (%td vs %td)\n  in file '%s'\n",
-						numCols, rowVector.cols(), fileName.c_str());
+				fprintf(stderr, "Inconsistent number of columns for Eigen matrix (%lld vs %lld)\n  in file '%s'\n",
+						static_cast<int64_t>(numCols), static_cast<int64_t>(rowVector.cols()), fileName.c_str());
 				return false;
 			}
 			matrix->conservativeResize(newNumRows, numCols);

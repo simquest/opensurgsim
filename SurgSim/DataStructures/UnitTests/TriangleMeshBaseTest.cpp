@@ -54,7 +54,7 @@ public:
 
 		if (printPositions)
 		{
-			printf("Test Vertex Positions:\n");
+			std::cout << "Test Vertex Positions:\n";
 		}
 
 		/// Generate random positions for each vertex
@@ -66,13 +66,14 @@ public:
 
 			if (printPositions)
 			{
-				printf("\t%zd: (%g, %g, %g)\n", i, position.x(), position.y(), position.z());
+				std::cout << "\t" << i << ": (" << position.x() << ", " << position.y() << ", " << position.z()
+						  << ")\n";
 			}
 		}
 
 		if (printNormals)
 		{
-			printf("Test Vertex Normals:\n");
+			std::cout << "Test Vertex Normals:\n";
 		}
 
 		/// Generate random normals for each vertex
@@ -85,13 +86,13 @@ public:
 
 			if (printNormals)
 			{
-				printf("\t%zd: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
+				std::cout << "\t" << i << ": (" << normal.x() << ", " << normal.y() << ", " << normal.z() << ")\n";
 			}
 		}
 
 		if (printTriangles)
 		{
-			printf("Test Triangles:\n");
+			std::cout << "Test Triangles:\n";
 		}
 
 		/// Generate random vertex IDs within [0, numVertices) in triplets for mesh triangles
@@ -114,20 +115,19 @@ public:
 
 			if (printTriangles)
 			{
-				printf("\t%zd: Vertices (%zd, %zd, %zd), Edges (%zd, %zd, %zd)\n", i,
-					triangleVertices[0], triangleVertices[1], triangleVertices[2],
-					triangleEdges[0], triangleEdges[1], triangleEdges[2]);
+				std::cout << "\t" << i << ": Vertices (" << formatIterator(triangleVertices, ", ") 
+						  << "), Edges (" << formatIterator(triangleEdges, ", ") << ")\n";
 			}
 		}
 
 		if (printEdges)
 		{
-			printf("Test Edges:\n");
+			std::cout << "Test Edges:\n";
 
 			for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 			{
 				const std::array<size_t, 2>& edgeVertices = testEdgeVertices[i];
-				printf("\t%zd: (%zd, %zd)\n", i, edgeVertices[0], edgeVertices[1]);
+				std::cout << "\t" << i << ": (" << formatIterator(edgeVertices, ", ") << ")\n";
 			}
 		}
 	}
