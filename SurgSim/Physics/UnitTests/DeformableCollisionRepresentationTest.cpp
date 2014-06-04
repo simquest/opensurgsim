@@ -74,6 +74,7 @@ TEST_F(DeformableCollisionRepresentationTest, SetGetDeformableRepresentationTest
 TEST_F(DeformableCollisionRepresentationTest, ShapeTest)
 {
 	EXPECT_ANY_THROW(m_deformableCollisionRepresentation->getShapeType());
+	m_meshShape->initialize(m_applicationData);
 	m_deformableCollisionRepresentation->setShape(m_meshShape);
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_MESH, m_deformableCollisionRepresentation->getShapeType());
 
