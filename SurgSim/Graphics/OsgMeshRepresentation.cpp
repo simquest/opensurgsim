@@ -27,6 +27,7 @@
 #include <osgUtil/SmoothingVisitor>
 
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/Mesh.h"
@@ -142,16 +143,30 @@ void OsgMeshRepresentation::doUpdate(double dt)
 
 bool OsgMeshRepresentation::doInitialize()
 {
-	auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>(*getRuntime()->getApplicationData());
-	std::string path = applicationData->findFile(m_filename);
+	bool result = true;
 
-	auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(path);
-	SURGSIM_ASSERT(nullptr != triangleMesh && triangleMesh->isValid()) <<
-		"SurgSim::DataStructures::loadTriangleMesh() returned an empty TriangleMesh after reading file " << m_filename;
+	if (!m_filename.empty())
+	{
+		std::string filePath = getRuntime()->getApplicationData()->findFile(m_filename);
 
-	m_mesh = std::make_shared<Mesh>(*triangleMesh);
+		if (filePath.empty())
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+				"OsgMeshRepresentation::doInitialize(): file " << m_filename << " can not be found.";
+			result = false;
+		}
+		else
+		{
+			auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(filePath);
+			SURGSIM_ASSERT(nullptr != triangleMesh && triangleMesh->isValid()) <<
+				"OsgMeshRepresentation::doInitialize(): SurgSim::DataStructures::loadTriangleMesh() returned a "
+				"null mesh or invalid mesh from file " << m_filename;
 
-	return true;
+			m_mesh = std::make_shared<Mesh>(*triangleMesh);
+		}
+	}
+
+	return result;
 }
 
 void OsgMeshRepresentation::updateVertices(int updateOptions)
