@@ -15,6 +15,7 @@
 
 #include <memory>
 
+#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
@@ -61,9 +62,10 @@ std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::Sc
 int main(int argc, char* argv[])
 {
 	{
+		SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior temporaryBehavior("TemporaryBehavior");
 		SurgSim::Graphics::OsgMeshRepresentation temporaryOsgMesh("TemporaryOsgMesh");
-		SurgSim::Physics::Fem3DRepresentation temporaryFem3D("TemporaryFem3D");
 		SurgSim::Graphics::OsgSceneryRepresentation temporaryOsgScenery("TemporaryOsgScenery");
+		SurgSim::Physics::Fem3DRepresentation temporaryFem3D("TemporaryFem3D");
 		SurgSim::Physics::FixedRepresentation temporaryFixedRepresentation("TemporaryFixedRepresentation");
 	}
 
@@ -84,15 +86,24 @@ int main(int argc, char* argv[])
 	view->enableKeyboardDevice(true);
 	inputManager->addDevice(view->getKeyboardDevice());
 
+	YAML::Node node = YAML::LoadFile("Data/FemWound.yaml");
+	std::shared_ptr<SceneElement> wound = node.as<std::shared_ptr<SceneElement>>();
+
 	YAML::Node node2 = YAML::LoadFile("Data/ArmSceneElement.yaml");
 	std::shared_ptr<SceneElement> arm = node2.as<std::shared_ptr<SceneElement>>();
 
 	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
+	wound->setPose(armPose);
 	arm->setPose(armPose);
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(view);
+	scene->addSceneElement(wound);
 	scene->addSceneElement(arm);
+
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(wound, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(arm, "Collision"));
 
 	runtime->execute();
 
