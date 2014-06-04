@@ -125,12 +125,13 @@ TEST(Fem3DRepresentationTests, DoInitializeTest)
 		SCOPED_TRACE("Initialize with an invalid file name");
 		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
 		fem->setFilename("Non existent fake name");
-		EXPECT_ANY_THROW(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		EXPECT_FALSE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
 	{
 		SCOPED_TRACE("Initialize with file name not set");
 		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+		// Fem3DRepresentation will not try to load file, but FemRepresentation::doInitialize() will throw.
 		EXPECT_ANY_THROW(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
