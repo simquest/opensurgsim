@@ -54,7 +54,6 @@ public:
 		DataGroupBuilder inputBuilder;
 		inputBuilder.addPose(SurgSim::DataStructures::Names::POSE);
 		getInputData() = inputBuilder.createData();
-		getInitialInputData() = getInputData();
 		m_poseIndex = getInputData().poses().getIndex(SurgSim::DataStructures::Names::POSE);
 	}
 
@@ -82,8 +81,7 @@ public:
 		m_timerInputIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
 			std::to_string(m_firstTimerForQuadrature));
 
-		inputFilter(inputData, &getInitialInputData());
-		getInputData() = getInitialInputData();
+		inputFilter(inputData, &getInputData());
 	}
 
 	void handleInput(const std::string& device, const DataGroup& inputData)
