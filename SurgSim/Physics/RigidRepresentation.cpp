@@ -15,8 +15,13 @@
 
 #include "SurgSim/Physics/RigidRepresentation.h"
 
+#include <boost/filesystem.hpp>
+
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
@@ -341,11 +346,25 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 
 bool RigidRepresentation::doInitialize()
 {
+	auto meshShape =
+		std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getInitialParameters().getShapeUsedForMassInertia());
+	if (nullptr != meshShape)
+	{
+		auto data = std::make_shared<SurgSim::Framework::ApplicationData>(*(getRuntime()->getApplicationData()));
+		SURGSIM_ASSERT(meshShape->initialize(data)) << "RigidRepresentationBase::doInitialize(): "
+			"initialization for the mesh shape in this representation failed.";
+		m_initialParameters.removeShape(meshShape);
+		m_initialParameters.setShapeUsedForMassInertia(meshShape);
+		setCurrentParameters(m_initialParameters);
+	}
+
 	double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
-	SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
+	SURGSIM_ASSERT(shapeVolume > 0.0) << "RigidRepresentation::doInitialize()" <<
+		"Cannot use a shape with zero volume for RigidRepresentations";
 
 	shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
-	SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
+	SURGSIM_ASSERT(shapeVolume > 0.0) << "RigidRepresentation::doInitialize()" <<
+		"Cannot use a shape with zero volume for RigidRepresentations";
 
 	return true;
 }
