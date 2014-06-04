@@ -114,8 +114,7 @@ void TriangleMeshPlyReaderDelegate::processFace(const std::string& elementName)
 	SURGSIM_ASSERT(m_faceData.edgeCount == 3) << "Can only process triangle meshes.";
 	std::copy(m_faceData.indices, m_faceData.indices + 3, m_indices.begin());
 
-	std::array<size_t, 3> indicesAsSizeT = {{m_indices[0], m_indices[1], m_indices[2]}};
-	TriangleMeshBase<EmptyData, EmptyData, EmptyData>::TriangleType triangle(indicesAsSizeT);
+	TriangleMeshBase<EmptyData, EmptyData, EmptyData>::TriangleType triangle(m_indices);
 	m_mesh->addTriangle(triangle);
 }
 

@@ -132,9 +132,9 @@ void Fem3DElementTetrahedron::computeMass(const SurgSim::Math::OdeState& state,
 	//     y4 (    1        1        1        2    )
 	//     z4 (       1        1        1        2 )
 	double coef = getVolume(state) * m_rho / 20.0;
-	for (unsigned int rowNodeId = 0; rowNodeId < 4; rowNodeId++)
+	for (size_t rowNodeId = 0; rowNodeId < 4; rowNodeId++)
 	{
-		for (unsigned int colNodeId = 0; colNodeId < 4; colNodeId++)
+		for (size_t colNodeId = 0; colNodeId < 4; colNodeId++)
 		{
 			auto Mii = getSubMatrix(*M, rowNodeId, colNodeId, 3, 3);
 
