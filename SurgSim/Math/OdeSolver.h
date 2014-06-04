@@ -110,7 +110,7 @@ public:
 protected:
 	/// Allocates the system and compliance matrices
 	/// \param size The size to account for in the data structure
-	void allocate(unsigned int size);
+	void allocate(size_t size);
 
 	/// Name for this solver
 	/// \note MUST be set by the derived classes

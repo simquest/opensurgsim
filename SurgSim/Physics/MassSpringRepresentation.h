@@ -57,25 +57,25 @@ public:
 
 	/// Gets the number of masses
 	/// \return the number of masses
-	unsigned int getNumMasses() const;
+	size_t getNumMasses() const;
 
 	/// Gets the number of springs
 	/// \return the number of springs
-	unsigned int getNumSprings() const;
+	size_t getNumSprings() const;
 
 	/// Retrieves the mass of a given node
 	/// \param nodeId The node id for which the mass is requested
 	/// \return the mass attribute of a node
 	/// \note The mass is returned with read/write access
 	/// \note Out of range nodeId will raise an exception
-	std::shared_ptr<Mass> getMass(unsigned int nodeId);
+	std::shared_ptr<Mass> getMass(size_t nodeId);
 
 	/// Retrieves a given spring from its id
 	/// \param springId The spring id for which the spring is requested
 	/// \return the spring for the given springId
 	/// \note The spring is returned with read/write access
 	/// \note Out of range springId will raise an exception
-	std::shared_ptr<Spring> getSpring(unsigned int springId);
+	std::shared_ptr<Spring> getSpring(size_t springId);
 
 	/// Gets the total mass of the mass spring
 	/// \return The total mass of the mass spring (in Kg)

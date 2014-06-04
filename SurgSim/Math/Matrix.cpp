@@ -23,16 +23,16 @@ namespace Math
 {
 
 template <>
-void resizeMatrix<DiagonalMatrix>(DiagonalMatrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut)
+void resizeMatrix<DiagonalMatrix>(DiagonalMatrix* A, size_t numRow, size_t numCol, bool zeroOut)
 {
 	SURGSIM_ASSERT(numRow == numCol) << "Trying to create a diagonal matrix non-square";
 	if (A == nullptr)
 	{
 		return;
 	}
-	if (A->rows() != static_cast<int>(numRow) || A->cols() != static_cast<int>(numCol))
+	if (A->rows() != static_cast<ptrdiff_t>(numRow) || A->cols() != static_cast<ptrdiff_t>(numCol))
 	{
-		A->resize(static_cast<int>(numCol));
+		A->resize(numCol);
 	}
 	if (zeroOut)
 	{

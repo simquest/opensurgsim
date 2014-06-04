@@ -26,7 +26,7 @@ TriangleMesh::TriangleMesh()
 }
 
 
-const SurgSim::Math::Vector3d& TriangleMesh::getNormal(int triangleId)
+const SurgSim::Math::Vector3d& TriangleMesh::getNormal(size_t triangleId)
 {
 	return getTriangle(triangleId).data.normal;
 }

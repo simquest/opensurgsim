@@ -166,7 +166,7 @@ bool FileHandle::hasDataToRead() const
 	return (status == WAIT_OBJECT_0);
 }
 
-bool FileHandle::readBytes(void* dataBuffer, size_t bytesToRead, size_t* bytesActuallyRead)
+bool FileHandle::readBytes(void* dataBuffer, unsigned int bytesToRead, unsigned int* bytesActuallyRead)
 {
 	SURGSIM_ASSERT(canRead());
 	DWORD numBytesRead = 0;

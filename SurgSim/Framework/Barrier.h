@@ -47,7 +47,7 @@ class Barrier
 public:
 	/// Construct the barrier.
 	/// \param count Number of threads to synchronize, can't be 0.
-	explicit Barrier(unsigned int count);
+	explicit Barrier(size_t count);
 
 	/// Waits until all \a count threads have called wait.
 	///
@@ -63,9 +63,9 @@ public:
 private:
 	boost::mutex m_mutex;
 	boost::condition_variable m_cond;
-	unsigned int m_threshold;
-	unsigned int m_count;
-	unsigned int m_generation;
+	size_t m_threshold;
+	size_t m_count;
+	size_t m_generation;
 	bool m_success;
 	bool m_successResult;
 };

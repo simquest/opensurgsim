@@ -62,11 +62,11 @@ protected:
 	/// Simulation time step
 	double m_dt;
 	/// Mlcp index of the sphere representation
-	unsigned int m_indexSphereRepresentation;
+	size_t m_indexSphereRepresentation;
 	/// Mlcp index of the plane representation
-	unsigned int m_indexPlaneRepresentation;
+	size_t m_indexPlaneRepresentation;
 	/// Mlcp index of the constraint (frictionless contact)
-	unsigned int m_indexConstraint;
+	size_t m_indexConstraint;
 	/// Contact location on the plane (point on the plane with the most penetration)
 	Vector3d m_contactPositionPlane;
 	/// Contact location on the sphere (point on the sphere with the most penetration)
@@ -93,9 +93,9 @@ protected:
 	std::shared_ptr<ConstraintImplementation> m_implementationRigidSphere;
 
 	/// Total number of degrees of freedom in the system (plane + sphere)
-	unsigned int m_numDof;
+	size_t m_numDof;
 	/// Total number of atomic constraint in the system (1 for a frictionless contact)
-	unsigned int m_numConstraint;
+	size_t m_numConstraint;
 
 	/// Setup the test case by creating all object
 	void SetUp()
@@ -155,7 +155,7 @@ protected:
 	/// Allocate and clear the Mlcp
 	/// \param numDof The number of degrees of freedom in the system
 	/// \param numConstraint The number of atomic constraints in the system
-	void clearMlcpPhysicsProblem(int numDof, int numConstraint)
+	void clearMlcpPhysicsProblem(size_t numDof, size_t numConstraint)
 	{
 		// Resize and zero all Eigen types
 		m_mlcpPhysicsProblem.A.resize(numConstraint, numConstraint);

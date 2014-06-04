@@ -65,7 +65,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 
 	// Cube decomposition into 5 tetrahedrons
 	// https://www.math.ucdavis.edu/~deloera/CURRENT_INTERESTS/cube.html
-	std::array< std::array<unsigned int, 4>, 5> tetrahedrons = {{
+	std::array< std::array<size_t, 4>, 5> tetrahedrons = {{
 			{{4, 7, 1, 2}}, // CCW (47)cross(41) . (42) > 0
 			{{4, 1, 7, 5}}, // CCW (41)cross(47) . (45) > 0
 			{{4, 2, 1, 0}}, // CCW (42)cross(41) . (40) > 0
@@ -74,7 +74,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 		}
 	};
 
-	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
+	std::array<size_t, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
 
 	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
@@ -141,8 +141,8 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 			Vector3d(0.5,  0.5,  0.5)
 		}
 	};
-	std::array<unsigned int, 8> cube = {{0, 1, 3, 2, 4, 5, 7, 6}};
-	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
+	std::array<size_t, 8> cube = {{0, 1, 3, 2, 4, 5, 7, 6}};
+	std::array<size_t, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
 
 	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);

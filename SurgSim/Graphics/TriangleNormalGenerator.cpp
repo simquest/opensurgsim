@@ -63,9 +63,9 @@ void TriangleNormalGenerator::reset()
 
 }
 
-void TriangleNormalGenerator::operator() (unsigned int vertexIndex1,
-										  unsigned int vertexIndex2,
-										  unsigned int vertexIndex3)
+void TriangleNormalGenerator::operator() (size_t vertexIndex1,
+										  size_t vertexIndex2,
+										  size_t vertexIndex3)
 {
 	if (vertexIndex1 == vertexIndex2 || vertexIndex2 == vertexIndex3 || vertexIndex1 == vertexIndex3)
 	{

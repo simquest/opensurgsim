@@ -156,8 +156,8 @@ inline T computeAngle(const Eigen::Matrix<T, 3, 3, MOpt>& matrix)
 /// \param blockSizeRow, blockSizeCol The block size (size of the sub-matrix)
 /// \param[out] matrix The matrix to add the sub-matrix into
 template <class Matrix, class SubMatrix>
-void addSubMatrix(const SubMatrix& subMatrix, unsigned int blockIdRow, unsigned int blockIdCol,
-	unsigned int blockSizeRow, unsigned int blockSizeCol, Matrix* matrix)
+void addSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdCol,
+	size_t blockSizeRow, size_t blockSizeCol, Matrix* matrix)
 {
 	matrix->block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol) += subMatrix;
 }
@@ -170,18 +170,17 @@ void addSubMatrix(const SubMatrix& subMatrix, unsigned int blockIdRow, unsigned 
 /// \param blockSize The blocks size
 /// \param[out] matrix The matrix to add the sub-matrix blocks into
 template <class Matrix, class SubMatrix>
-void addSubMatrix(const SubMatrix& subMatrix, const std::vector<unsigned int> blockIds,
-	unsigned int blockSize, Matrix* matrix)
+void addSubMatrix(const SubMatrix& subMatrix, const std::vector<size_t> blockIds, size_t blockSize, Matrix* matrix)
 {
-	const unsigned int numBlocks = blockIds.size();
+	const size_t numBlocks = blockIds.size();
 
-	for (unsigned int block0 = 0; block0 < numBlocks; block0++)
+	for (size_t block0 = 0; block0 < numBlocks; block0++)
 	{
-		unsigned int blockId0 = blockIds[block0];
+		size_t blockId0 = blockIds[block0];
 
-		for (unsigned int block1 = 0; block1 < numBlocks; block1++)
+		for (size_t block1 = 0; block1 < numBlocks; block1++)
 		{
-			unsigned int blockId1 = blockIds[block1];
+			size_t blockId1 = blockIds[block1];
 
 			matrix->block(blockSize * blockId0, blockSize * blockId1, blockSize, blockSize)
 				+= subMatrix.block(blockSize * block0, blockSize * block1, blockSize, blockSize);
@@ -197,8 +196,8 @@ void addSubMatrix(const SubMatrix& subMatrix, const std::vector<unsigned int> bl
 /// \param blockSizeRow, blockSizeCol The size of the sub-matrix
 /// \param[out] matrix The matrix to set the sub-matrix into
 template <class Matrix, class SubMatrix>
-void setSubMatrix(const SubMatrix& subMatrix, unsigned int blockIdRow, unsigned int blockIdCol,
-	unsigned int blockSizeRow, unsigned int blockSizeCol, Matrix* matrix)
+void setSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdCol,
+	size_t blockSizeRow, size_t blockSizeCol, Matrix* matrix)
 {
 	matrix->block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol,
 		blockSizeRow, blockSizeCol) = subMatrix;
@@ -214,8 +213,8 @@ void setSubMatrix(const SubMatrix& subMatrix, unsigned int blockIdRow, unsigned 
 /// \note Eigen has a specific type for Block that we want to return with read/write access
 /// \note therefore the Matrix from which the Block is built from must not be const
 template <class Matrix>
-Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, unsigned int blockIdRow, unsigned int blockIdCol,  // NOLINT
-	unsigned int blockSizeRow, unsigned int blockSizeCol)
+Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, size_t blockIdRow, size_t blockIdCol,  // NOLINT
+	size_t blockSizeRow, size_t blockSizeCol)
 {
 	return matrix.block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol);
 }
@@ -226,15 +225,15 @@ Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, unsigned int blockIdRow, unsig
 /// \param zeroOut True if the vector v should be filled up with 0, False if not
 /// \note This template method is useful to account for different matrix class having different API
 template <class Matrix>
-void resizeMatrix(Matrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut = false)
+void resizeMatrix(Matrix* A, size_t numRow, size_t numCol, bool zeroOut = false)
 {
 	if (A == nullptr)
 	{
 		return;
 	}
-	if (A->rows() != static_cast<int>(numRow) || A->cols() != static_cast<int>(numCol))
+	if (A->rows() != static_cast<ptrdiff_t>(numRow) || A->cols() != static_cast<ptrdiff_t>(numCol))
 	{
-		A->resize(static_cast<int>(numRow), static_cast<int>(numCol));
+		A->resize(numRow, numCol);
 	}
 	if (zeroOut)
 	{
@@ -243,7 +242,7 @@ void resizeMatrix(Matrix* A, unsigned int numRow, unsigned int numCol, bool zero
 }
 
 template <>
-void resizeMatrix<DiagonalMatrix>(DiagonalMatrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut);
+void resizeMatrix<DiagonalMatrix>(DiagonalMatrix* A, size_t numRow, size_t numCol, bool zeroOut);
 
 };  // namespace Math
 };  // namespace SurgSim

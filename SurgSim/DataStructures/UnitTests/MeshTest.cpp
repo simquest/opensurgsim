@@ -38,7 +38,7 @@ public:
 		// Set to true to print the test normals.
 		bool printNormals = false;
 		// Set the number of test vertices
-		unsigned int numVertices = 10;
+		size_t numVertices = 10;
 
 		std::default_random_engine generator;
 		std::uniform_real_distribution<double> positionDistribution(-10.0, 10.0);
@@ -46,11 +46,11 @@ public:
 
 		if (printPositions)
 		{
-			printf("Test Positions:\n");
+			std::cout << "Test Positions:\n";
 		}
 
 		/// Generate random positions for each vertex
-		for (unsigned int i = 0; i < numVertices; ++i)
+		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d position(positionDistribution(generator), positionDistribution(generator),
 				positionDistribution(generator));
@@ -58,17 +58,18 @@ public:
 
 			if (printPositions)
 			{
-				printf("\t%d: (%g, %g, %g)\n", i, position.x(), position.y(), position.z());
+				std::cout << "\t" << i << ": (" << position.x() << ", " << position.y() << ", " << position.z()
+						  << ")\n";
 			}
 		}
 
 		if (printNormals)
 		{
-			printf("Test Normals:\n");
+			std::cout << "Test Normals:\n";
 		}
 
 		/// Generate random normals for each vertex
-		for (unsigned int i = 0; i < numVertices; ++i)
+		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d normal(normalDistribution(generator), normalDistribution(generator),
 				normalDistribution(generator));
@@ -77,7 +78,7 @@ public:
 
 			if (printNormals)
 			{
-				printf("\t%d: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
+				std::cout << "\t" << i << ": (" << normal.x() << ", " << normal.y() << ", " << normal.z() << ")\n";
 			}
 		}
 
@@ -111,7 +112,7 @@ TEST_F(MeshTest, CreateVerticesTest)
 	EXPECT_EQ(0u, mesh.getVertices().size());
 
 	/// Create the test vertices
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
@@ -120,7 +121,7 @@ TEST_F(MeshTest, CreateVerticesTest)
 		EXPECT_EQ(i + 1, vertices.size());
 
 		/// Make sure each vertex is set properly
-		for (unsigned int j = 0; j < mesh.getNumVertices(); ++j)
+		for (size_t j = 0; j < mesh.getNumVertices(); ++j)
 		{
 			EXPECT_EQ(testPositions[j], vertices[j].position);
 
@@ -136,7 +137,7 @@ TEST_F(MeshTest, SetVertexPositionsTest)
 	MockMesh mesh;
 
 	/// Create vertices with test normals, but all positions at (0,0,0)
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(Vector3d(0.0, 0.0, 0.0), testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
@@ -151,7 +152,7 @@ TEST_F(MeshTest, SetVertexPositionsTest)
 	EXPECT_EQ(testPositions.size(), vertices.size());
 
 	/// Make sure each vertex is set properly
-	for (unsigned int i = 0; i < mesh.getNumVertices(); ++i)
+	for (size_t i = 0; i < mesh.getNumVertices(); ++i)
 	{
 		EXPECT_EQ(testPositions[i], vertices[i].position);
 
@@ -175,7 +176,7 @@ TEST_F(MeshTest, SetVertexPositionsTest)
 	mesh.setVertexPosition(5, Vector3d(0.0, 0.0, 0.0));
 
 	/// Make sure each vertex is set properly
-	for (unsigned int i = 0; i < mesh.getNumVertices(); ++i)
+	for (size_t i = 0; i < mesh.getNumVertices(); ++i)
 	{
 		if (i == 5)
 		{
@@ -204,7 +205,7 @@ TEST_F(MeshTest, ClearTest)
 	EXPECT_EQ(0u, mesh.getVertices().size());
 
 	/// Create vertices
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0)));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
@@ -238,7 +239,7 @@ TEST_F(MeshTest, ComparisonTest)
 	MockMesh mesh;
 
 	/// Create vertices using test positions and normals
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 	}
@@ -246,7 +247,7 @@ TEST_F(MeshTest, ComparisonTest)
 	MockMesh sameMesh;
 
 	/// Create same mesh again
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, sameMesh.createVertex(testPositions[i], testNormals[i]));
 	}
@@ -254,7 +255,7 @@ TEST_F(MeshTest, ComparisonTest)
 	MockMesh differentMesh;
 
 	/// Create vertices, each with position and normal of (0,0,0)
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, differentMesh.createVertex(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0)));
 	}

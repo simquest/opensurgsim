@@ -57,7 +57,7 @@ std::shared_ptr<ConstraintData> Constraint::getData() const
 	return m_data;
 }
 
-unsigned int Constraint::getNumDof() const
+size_t Constraint::getNumDof() const
 {
 	return m_numDof;
 }
@@ -69,9 +69,9 @@ SurgSim::Math::MlcpConstraintType Constraint::getType()
 
 void Constraint::build(double dt,
 	MlcpPhysicsProblem* mlcp,
-	unsigned int indexOfRepresentation0,
-	unsigned int indexOfRepresentation1,
-	unsigned int indexOfConstraint)
+	size_t indexOfRepresentation0,
+	size_t indexOfRepresentation1,
+	size_t indexOfConstraint)
 {
 	doBuild(dt, *m_data.get(), mlcp, indexOfRepresentation0, indexOfRepresentation1, indexOfConstraint);
 
@@ -99,9 +99,9 @@ void Constraint::build(double dt,
 void Constraint::doBuild(double dt,
 	const ConstraintData& data,
 	MlcpPhysicsProblem* mlcp,
-	unsigned int indexOfRepresentation0,
-	unsigned int indexOfRepresentation1,
-	unsigned int indexOfConstraint)
+	size_t indexOfRepresentation0,
+	size_t indexOfRepresentation1,
+	size_t indexOfConstraint)
 {
 }
 
