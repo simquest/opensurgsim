@@ -84,9 +84,9 @@ struct MlcpProblem
 
 	/// Gets the size of the system.
 	/// \return the number of degrees of freedom of the system.
-	ptrdiff_t getSize() const
+	size_t getSize() const
 	{
-		return b.rows();
+		return (b.rows() >= 0) ? static_cast<size_t>(b.rows()) : 0;
 	}
 
 	/// Checks if the sizes of various elements of the system are consistent with each other.

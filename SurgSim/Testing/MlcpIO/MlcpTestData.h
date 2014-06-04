@@ -65,9 +65,9 @@ public:
 		return *this;
 	}
 
-	ptrdiff_t getSize() const
+	size_t getSize() const
 	{
-		return problem.b.rows();
+		return (problem.b.rows() >= 0) ? static_cast<size_t>(problem.b.rows()) : 0;
 	}
 };
 
