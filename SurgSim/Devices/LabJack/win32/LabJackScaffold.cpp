@@ -119,8 +119,7 @@ public:
 		}
 
 		const LJ_ERROR error = OpenLabJack(m_type, m_connection, m_address.c_str(), firstFound, &m_deviceHandle);
-		bool result = isOk(error);
-		SURGSIM_LOG_IF(!result, m_scaffold->getLogger(), SEVERE) <<
+		SURGSIM_LOG_IF(!isOk(error), m_scaffold->getLogger(), SEVERE) <<
 			"Failed to initialize a device. Type: " << m_type << ". Connection: " << m_connection << ". Address: '" <<
 			m_address << "'." << std::endl << formatErrorMessage(error);
 	}
@@ -624,7 +623,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			double value;
 			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_DIGITAL_BIT, *input, &value);
 			result = isOk(error);
-			SURGSIM_LOG_IF(!result, m_logger, WARNING) <<
+			SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
 				"Failed to get digital input for a device named '" << info->deviceObject->getName() <<
 				"', line number " << *input << "." << std::endl << formatErrorMessage(error);
 			if (result)
@@ -643,7 +642,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			double value;
 			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_TIMER, *timer, &value);
 			result = isOk(error);
-			SURGSIM_LOG_IF(!result, m_logger, WARNING) <<
+			SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
 				"Failed to get timer input for a device named '" << info->deviceObject->getName() <<
 				"', channel number " << *timer << "." << std::endl << formatErrorMessage(error);
 			if (result)
@@ -721,7 +720,7 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 		const int enable = 0; // Disable both counters.
 		const LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_COUNTER_ENABLE, channel, enable, 0);
 		result = result && isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 			"Failed to enable/disable counter for a device named '" << device->getName() << "." <<
 			std::endl << formatErrorMessage(error);
 	}
@@ -733,7 +732,7 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_COUNTER_PIN_OFFSET,
 			device->getTimerCounterPinOffset(), 0);
 		result = result && isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 			"Failed to configure timer/counter pin offset for a device named '" << device->getName() <<
 			"', with offset " << device->getTimerCounterPinOffset() << "." << std::endl << formatErrorMessage(error);
 
@@ -745,19 +744,19 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 		}
 		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_BASE, base, 0);
 		result = result && isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 			"Failed to configure the timer base rate for a device named '" << device->getName() <<
 			"', with timer base " << device->getTimerBase() << "." << std::endl << formatErrorMessage(error);
 
 		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_DIVISOR, device->getTimerClockDivisor(), 0);
 		result = result && isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 			"Failed to configure the timer/clock divisor for a device named '" << device->getName() <<
 			"', with divisor " << device->getTimerClockDivisor() << "." << std::endl << formatErrorMessage(error);
 
 		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, timers.size(), 0);
 		result = result && isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 			"Failed to configure number of enabled timers for a device named '" << device->getName() <<
 			"', with number of timers " << timers.size() << "." << std::endl << formatErrorMessage(error);
 
@@ -767,7 +766,7 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 			{
 				error = ePut(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, timer->second, 0);
 				result = result && isOk(error);
-				SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 					"Failed to configure a timer for a device named '" << device->getName() <<
 					"', timer number " << timer->first << ", with mode code " << timer->second << "." <<
 					std::endl << formatErrorMessage(error);
