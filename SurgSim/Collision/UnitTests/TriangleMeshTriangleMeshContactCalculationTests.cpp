@@ -391,14 +391,14 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 
 		std::list<std::shared_ptr<Contact>> expectedContacts;
 		double expectedDepth;
-		double interval = 1.0 / (static_cast<double>(numTriangles) + 1);
+		double interval = 1.0 / static_cast<double>(numTriangles + 1);
 		double coordinate;
 		std::pair<Location, Location> expectedPenetrationPoints;
 		Vector3d expectedPoint0, expectedPoint1;
 		Vector3d expectedNormal, expectedContact(0, 0, 0);
 		for (size_t i = 0; i < numTriangles; i++)
 		{
-			coordinate = interval * (static_cast<double>(i) + 1);
+			coordinate = interval * static_cast<double>(i + 1);
 
 			addNewTriangle(baseTriangles,
 						   Vector3d(-e, -coordinate, coordinate),
