@@ -105,7 +105,7 @@ const SurgSim::Math::Vector& OdeState::getVelocities() const
 
 const SurgSim::Math::Vector3d OdeState::getVelocity(size_t nodeId) const
 {
-	return m_v.segment<3>(nodeId * m_numDofPerNode);
+	return SurgSim::Math::getSubVector(m_v, nodeId, m_numDofPerNode).segment(0, 3);
 }
 
 void OdeState::addBoundaryCondition(size_t nodeId)

@@ -201,6 +201,8 @@ TYPED_TEST(UnalignedMatrixTests, DefaultConstructorInitialization)
 	// Allocate a buffer for the matrix type on stack, based on the size
 	// of the object we're testing.  The object will be allocated inside
 	// the buffer using the placement syntax for the new() operator.
+	// Eigen's new operatore will attempt to align returned value on word sized
+	// boundaries, so add 64 bytes to guarantee enough size.
 	unsigned char buffer[sizeof(Matrix) + 64];
 
 	{

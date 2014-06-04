@@ -46,6 +46,7 @@ namespace Math
 */
 bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solution)
 {
+	// TODO(wschoen) 2014-06-04: Modify to word-sized types
 	int n = static_cast<int>(problem.getSize());
 	const MlcpProblem::Matrix& A = problem.A;
 	const int nbColumnInA = static_cast<int>(A.cols());

@@ -242,6 +242,8 @@ TYPED_TEST(UnalignedVectorTests, DefaultConstructorInitialization)
 	// Allocate a buffer for various vector types on stack, based on the size
 	// of the largest object we're testing.  Objects will be allocated inside
 	// the buffer using the placement syntax for the new() operator.
+	// Eigen's new operatore will attempt to align returned value on word sized
+	// boundaries, so add 64 bytes to guarantee enough size.
 	unsigned char buffer[sizeof(Vector) + 64];
 
 	{
