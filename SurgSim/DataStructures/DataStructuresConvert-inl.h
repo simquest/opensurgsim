@@ -72,10 +72,10 @@ bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
 template <class T, size_t N>
 YAML::Node YAML::convert<std::array<T, N>>::encode(const std::array<T, N>& rhs)
 {
-	Node node;
-	for (int i = 0; i < N; ++i)
+	Node node(NodeType::Sequence);
+	for (size_t i = 0; i < N; ++i)
 	{
-		node[i] = rhs[i];
+		node.push_back(rhs[i]);
 	}
 	return node;
 }
@@ -83,18 +83,24 @@ YAML::Node YAML::convert<std::array<T, N>>::encode(const std::array<T, N>& rhs)
 template <class T, size_t N>
 bool YAML::convert<std::array<T, N>>::decode(const Node& node, std::array<T, N>& rhs)
 {
+	if (!node.IsSequence() || node.size() != N)
+	{
+		return false;
+	}
+
 	bool result = true;
-	for (int i = 0; i < N; ++i)
+	size_t i = 0;
+	for (YAML::const_iterator it = node.begin(); it != node.end(); ++it, ++i)
 	{
 		try
 		{
-			rhs[i] = node[i].as<T>();
+			rhs[i] = it->as<T>();
 		}
 		catch (YAML::RepresentationException)
 		{
 			result = false;
 			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
-			SURGSIM_LOG(logger, WARNING) << "Bad conversion";
+			SURGSIM_LOG(logger, WARNING) << __FUNCTION__ << ": Bad conversion";
 		}
 	}
 	return result;
