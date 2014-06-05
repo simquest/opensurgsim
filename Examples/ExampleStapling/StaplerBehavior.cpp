@@ -70,7 +70,11 @@ StaplerBehavior::StaplerBehavior(const std::string& name):
 
 void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent)
 {
+	SURGSIM_ASSERT(nullptr != inputComponent) << "Cannot set nullptr to InputComponent";
+
 	m_from = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(inputComponent);
+
+	SURGSIM_ASSERT(nullptr != m_from) << "Cannot set other than SurgSim::Input::InputComponent to InputComponent";
 }
 
 std::shared_ptr<SurgSim::Framework::Component> StaplerBehavior::getInputComponent()
@@ -80,7 +84,12 @@ std::shared_ptr<SurgSim::Framework::Component> StaplerBehavior::getInputComponen
 
 void StaplerBehavior::setRepresentation(std::shared_ptr<SurgSim::Framework::Component> staplerRepresentation)
 {
+	SURGSIM_ASSERT(nullptr != staplerRepresentation) << "Cannot set nullptr to Representation";
+
 	m_representation = std::dynamic_pointer_cast<SurgSim::Framework::Representation>(staplerRepresentation);
+
+	SURGSIM_ASSERT(nullptr != m_representation)
+		<< "Cannot set other than SurgSim::Framework::Representation to StaplerRepresentation";
 }
 
 std::shared_ptr<SurgSim::Framework::Component> StaplerBehavior::getRepresentation()
