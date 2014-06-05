@@ -46,6 +46,8 @@ public:
 	/// Destructor
 	virtual ~InputComponent();
 
+	SURGSIM_CLASSNAME(SurgSim::Input::InputComponent);
+
 	/// Set name of the device this input component connects to.
 	/// \param deviceName Name of the device this input component connects
 	void setDeviceName(const std::string& deviceName);

@@ -108,7 +108,7 @@ TEST_F(MeshShapeTest, InvalidMeshCubeTest)
 	}
 	for (int i = 0; i < cubeNumEdges; i++)
 	{
-		std::array<unsigned int,2> edgePoints;
+		std::array<size_t,2> edgePoints;
 		for (int j = 0; j < 2; j++)
 		{
 			edgePoints[j] = cubeEdges[i][j];
@@ -119,7 +119,7 @@ TEST_F(MeshShapeTest, InvalidMeshCubeTest)
 	}
 	for (int i = 0; i < cubeNumTriangles; i++)
 	{
-		std::array<unsigned int,3> trianglePoints;
+		std::array<size_t,3> trianglePoints;
 		for (int j = 0; j < 3; j++)
 		{
 			// Add an offset of 3 to the indices (=> some of them will be invalid)
@@ -159,7 +159,7 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 
 		for (int i = 0; i < cubeNumEdges; ++i)
 		{
-			std::array<unsigned int,2> edgePoints;
+			std::array<size_t,2> edgePoints;
 			for (int j = 0; j < 2; j++)
 			{
 				edgePoints[j] = cubeEdges[i][j];
@@ -211,7 +211,7 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 		}
 		for (int i = 0; i < cubeNumEdges; i++)
 		{
-			std::array<unsigned int,2> edgePoints;
+			std::array<size_t,2> edgePoints;
 			for (int j = 0; j < 2; j++)
 			{
 				edgePoints[j] = cubeEdges[i][j];
@@ -222,7 +222,7 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 		}
 		for (int i = 0; i < cubeNumTriangles; i++)
 		{
-			std::array<unsigned int,3> trianglePoints;
+			std::array<size_t,3> trianglePoints;
 			for (int j = 0; j < 3; j++)
 			{
 				trianglePoints[j] = cubeTrianglesCCW[i][j];
@@ -249,7 +249,7 @@ TEST_F(MeshShapeTest, SerializationTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 	meshShape->setFileName(fileName);
-	EXPECT_TRUE(meshShape->initialize(data));
+	EXPECT_TRUE(meshShape->initialize(*data));
 
 	// We chose to let YAML serialization only works with base class pointer.
 	// i.e. We need to serialize 'meshShape' via a SurgSim::Math::Shape pointer.
@@ -268,7 +268,7 @@ TEST_F(MeshShapeTest, SerializationTest)
 	EXPECT_EQ("SurgSim::Math::MeshShape", newMeshShape->getClassName());
 	EXPECT_EQ(fileName, newMeshShape->getFileName());
 
-	EXPECT_TRUE(newMeshShape->initialize(data));
+	EXPECT_TRUE(newMeshShape->initialize(*data));
 	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), newMeshShape->getMesh()->getNumVertices());
 	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), newMeshShape->getMesh()->getNumEdges());
 	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), newMeshShape->getMesh()->getNumTriangles());
@@ -281,7 +281,7 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 	meshShape->setFileName(fileName);
-	EXPECT_TRUE(meshShape->initialize(data));
+	EXPECT_TRUE(meshShape->initialize(*data));
 
 	auto tree = meshShape->getAabbTree();
 

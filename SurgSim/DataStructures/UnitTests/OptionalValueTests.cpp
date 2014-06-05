@@ -14,10 +14,12 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+#include <yaml-cpp/yaml.h>
 
 #include <memory>
 
 #include "SurgSim/DataStructures/OptionalValue.h"
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
 
 namespace SurgSim
 {
@@ -111,6 +113,56 @@ TEST(OptionalValueTests, AssignmentOperatorTest)
 	EXPECT_EQ(two, target);
 }
 
+template <typename Type>
+void testOptionalValueSerialization(Type value)
+{
+	{
+		OptionalValue<Type> optionalValue;
+		optionalValue.setValue(value);
+
+		// Encode
+		YAML::Node node;
+		EXPECT_NO_THROW(node = optionalValue;);
+
+		// Decode
+		OptionalValue<Type> newOptionalValue;
+		EXPECT_NO_THROW(newOptionalValue = node.as<OptionalValue<Type>>());
+
+		// Verify
+		EXPECT_TRUE(newOptionalValue.hasValue());
+		EXPECT_NO_THROW(newOptionalValue.getValue());
+		EXPECT_EQ(optionalValue.getValue(), newOptionalValue.getValue());
+	}
+
+	// Test for an empty node
+	{
+		OptionalValue<Type> optionalValue;
+
+		// Encode
+		YAML::Node node;
+		EXPECT_NO_THROW(node = optionalValue;);
+
+		// Decode
+		OptionalValue<Type> newOptionalValue;
+		newOptionalValue.setValue(value);
+		EXPECT_NO_THROW(newOptionalValue = node.as<OptionalValue<Type>>());
+
+		// Verify
+		EXPECT_FALSE(newOptionalValue.hasValue());
+	}
+}
+
+TEST(OptionalValueTests, OptionalValue)
+{
+	testOptionalValueSerialization<bool>(true);
+	testOptionalValueSerialization<bool>(false);
+	testOptionalValueSerialization<unsigned int>(144);
+	testOptionalValueSerialization<int>(37451);
+	testOptionalValueSerialization<float>(921.457f);
+	testOptionalValueSerialization<double>(3.1415);
+	testOptionalValueSerialization<char>('f');
+	testOptionalValueSerialization<std::string>("TestString");
+}
 
 }; // namespace DataStructures
 }; // namespace SurgSim

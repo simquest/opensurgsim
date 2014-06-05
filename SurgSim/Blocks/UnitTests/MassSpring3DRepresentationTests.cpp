@@ -44,8 +44,8 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 			{{Vector3d(-0.4,  0.3,  0.5), Vector3d( 0.4,  0.3,  0.5)}}
 		}}
 	}};
-	unsigned int numNodesPerDim[3] = {10, 5, 3};
-	std::vector<unsigned int> boundaryConditions;
+	size_t numNodesPerDim[3] = {10, 5, 3};
+	std::vector<size_t> boundaryConditions;
 	double totalMass = 1.1;
 	double stiffnessStretching = 2.2;
 	double dampingStretching = 3.3;
@@ -66,10 +66,10 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 	m.initialize(std::make_shared<SurgSim::Framework::Runtime>());
 	m.wakeUp();
 
-	const unsigned int numNodes = numNodesPerDim[0] * numNodesPerDim[1] * numNodesPerDim[2];
+	const size_t numNodes = numNodesPerDim[0] * numNodesPerDim[1] * numNodesPerDim[2];
 	EXPECT_EQ(numNodes * 3, m.getNumDof());
 	EXPECT_EQ(numNodes, m.getNumMasses());
-	unsigned int numSpringsExpected = 0;
+	size_t numSpringsExpected = 0;
 	// Stretching springs
 	numSpringsExpected += numNodesPerDim[0] * numNodesPerDim[2] * (numNodesPerDim[1] - 1); // along X
 	numSpringsExpected += numNodesPerDim[1] * numNodesPerDim[2] * (numNodesPerDim[0] - 1); // along Y
@@ -86,24 +86,24 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 	numSpringsExpected += (numNodesPerDim[0] - 1) * (numNodesPerDim[1] - 1) * (numNodesPerDim[2] - 1) * 4;
 	EXPECT_EQ(numSpringsExpected, m.getNumSprings());
 
-	for (unsigned int massId = 0; massId < m.getNumMasses(); massId++)
+	for (size_t massId = 0; massId < m.getNumMasses(); massId++)
 	{
 		EXPECT_DOUBLE_EQ(totalMass/numNodes, m.getMass(massId)->getMass());
 	}
 
-	const int depthOffset = numNodesPerDim[0] * numNodesPerDim[1];
-	const int rowOffset = numNodesPerDim[0];
-	const int colOffset = 1;
+	const size_t depthOffset = numNodesPerDim[0] * numNodesPerDim[1];
+	const size_t rowOffset = numNodesPerDim[0];
+	const size_t colOffset = 1;
 
-	unsigned int springId = 0;
+	size_t springId = 0;
 	// The 1st springs are the stretching springs along X
-	for (unsigned int depth = 0; depth < numNodesPerDim[2]; depth++)
+	for (size_t depth = 0; depth < numNodesPerDim[2]; depth++)
 	{
-		for (unsigned int row = 0; row < numNodesPerDim[1]; row++)
+		for (size_t row = 0; row < numNodesPerDim[1]; row++)
 		{
-			for (unsigned int col = 0; col < numNodesPerDim[0] - 1; col++)
+			for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 			{
-				unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
+				size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
 
 				springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 					nodeId, nodeId + colOffset, stiffnessStretching, dampingStretching);
@@ -112,13 +112,13 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 		}
 	}
 	// Followed by stretching springs along Y
-	for (unsigned int depth = 0; depth < numNodesPerDim[2]; depth++)
+	for (size_t depth = 0; depth < numNodesPerDim[2]; depth++)
 	{
-		for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
+		for (size_t col = 0; col < numNodesPerDim[0]; col++)
 		{
-			for (unsigned int row = 0; row < numNodesPerDim[1] - 1; row++)
+			for (size_t row = 0; row < numNodesPerDim[1] - 1; row++)
 			{
-				unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
+				size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
 
 				springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 					nodeId, nodeId + rowOffset, stiffnessStretching, dampingStretching);
@@ -127,13 +127,13 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 		}
 	}
 	// Followed by stretching springs along Z
-	for (unsigned int row = 0; row < numNodesPerDim[1]; row++)
+	for (size_t row = 0; row < numNodesPerDim[1]; row++)
 	{
-		for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
+		for (size_t col = 0; col < numNodesPerDim[0]; col++)
 		{
-			for (unsigned int depth = 0; depth < numNodesPerDim[2] - 1; depth++)
+			for (size_t depth = 0; depth < numNodesPerDim[2] - 1; depth++)
 			{
-				unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
+				size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
 
 				springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 					nodeId, nodeId + depthOffset, stiffnessStretching, dampingStretching);
@@ -143,13 +143,13 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 	}
 
 	// Followed by bending springs along X
-	for (unsigned int depth = 0; depth < numNodesPerDim[2]; depth++)
+	for (size_t depth = 0; depth < numNodesPerDim[2]; depth++)
 	{
-		for (unsigned int row = 0; row < numNodesPerDim[1]; row++)
+		for (size_t row = 0; row < numNodesPerDim[1]; row++)
 		{
-			for (unsigned int col = 0; col < numNodesPerDim[0] - 2; col++)
+			for (size_t col = 0; col < numNodesPerDim[0] - 2; col++)
 			{
-				unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
+				size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
 
 				springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 					nodeId, nodeId + 2 * colOffset, stiffnessBending, dampingBending);
@@ -158,13 +158,13 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 		}
 	}
 	// Followed by bending springs along Y
-	for (unsigned int depth = 0; depth < numNodesPerDim[2]; depth++)
+	for (size_t depth = 0; depth < numNodesPerDim[2]; depth++)
 	{
-		for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
+		for (size_t col = 0; col < numNodesPerDim[0]; col++)
 		{
-			for (unsigned int row = 0; row < numNodesPerDim[1] - 2; row++)
+			for (size_t row = 0; row < numNodesPerDim[1] - 2; row++)
 			{
-				unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
+				size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
 
 				springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 					nodeId, nodeId + 2 * rowOffset, stiffnessBending, dampingBending);
@@ -173,13 +173,13 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 		}
 	}
 	// Followed by bending springs along Z
-	for (unsigned int row = 0; row < numNodesPerDim[1]; row++)
+	for (size_t row = 0; row < numNodesPerDim[1]; row++)
 	{
-		for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
+		for (size_t col = 0; col < numNodesPerDim[0]; col++)
 		{
-			for (unsigned int depth = 0; depth < numNodesPerDim[2] - 2; depth++)
+			for (size_t depth = 0; depth < numNodesPerDim[2] - 2; depth++)
 			{
-				unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
+				size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
 
 				springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 					nodeId, nodeId + 2 * depthOffset, stiffnessBending, dampingBending);
@@ -189,13 +189,13 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 	}
 
 	// Followed by face diagonal springs orthogonal to Z
-	for (unsigned int depth = 0; depth < numNodesPerDim[2]; depth++)
+	for (size_t depth = 0; depth < numNodesPerDim[2]; depth++)
 	{
-		for (unsigned int row = 0; row < numNodesPerDim[1] - 1; row++)
+		for (size_t row = 0; row < numNodesPerDim[1] - 1; row++)
 		{
-			for (unsigned int col = 0; col < numNodesPerDim[0] - 1; col++)
+			for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 			{
-				unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
+				size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
 
 				springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 					nodeId, nodeId + rowOffset + colOffset, stiffnessFaceDiagonal, dampingFaceDiagonal);
@@ -208,13 +208,13 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 		}
 	}
 	// Followed by face diagonal springs orthogonal to Y
-	for (unsigned int row = 0; row < numNodesPerDim[1]; row++)
+	for (size_t row = 0; row < numNodesPerDim[1]; row++)
 	{
-		for (unsigned int depth = 0; depth < numNodesPerDim[2] - 1; depth++)
+		for (size_t depth = 0; depth < numNodesPerDim[2] - 1; depth++)
 		{
-			for (unsigned int col = 0; col < numNodesPerDim[0] - 1; col++)
+			for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 			{
-				unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
+				size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
 
 				springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 					nodeId, nodeId + depthOffset + colOffset, stiffnessFaceDiagonal, dampingFaceDiagonal);
@@ -227,13 +227,13 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 		}
 	}
 	// Followed by face diagonal springs orthogonal to X
-	for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
+	for (size_t col = 0; col < numNodesPerDim[0]; col++)
 	{
-		for (unsigned int row = 0; row < numNodesPerDim[1] - 1; row++)
+		for (size_t row = 0; row < numNodesPerDim[1] - 1; row++)
 		{
-			for (unsigned int depth = 0; depth < numNodesPerDim[2] - 1; depth++)
+			for (size_t depth = 0; depth < numNodesPerDim[2] - 1; depth++)
 			{
-				unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
+				size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
 
 				springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 					nodeId, nodeId + depthOffset + rowOffset, stiffnessFaceDiagonal, dampingFaceDiagonal);
@@ -247,13 +247,13 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 	}
 
 	// Followed by volume diagonal springs
-	for (unsigned int col = 0; col < numNodesPerDim[0] - 1; col++)
+	for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 	{
-		for (unsigned int row = 0; row < numNodesPerDim[1] - 1; row++)
+		for (size_t row = 0; row < numNodesPerDim[1] - 1; row++)
 		{
-			for (unsigned int depth = 0; depth < numNodesPerDim[2] - 1; depth++)
+			for (size_t depth = 0; depth < numNodesPerDim[2] - 1; depth++)
 			{
-				unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
+				size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
 
 				springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 					nodeId, nodeId + depthOffset + rowOffset + colOffset,
@@ -293,8 +293,8 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 	{(extremities[0][1][1] - extremities[0][1][0]) / static_cast<double>(numNodesPerDim[2] - 1) ,
 	(extremities[1][1][1] - extremities[1][1][0]) / static_cast<double>(numNodesPerDim[2] - 1)}};
 
-	unsigned int nodeId = 0;
-	for (unsigned int depth = 0; depth < numNodesPerDim[2]; depth++)
+	size_t nodeId = 0;
+	for (size_t depth = 0; depth < numNodesPerDim[2]; depth++)
 	{
 		Vector3d depthExtremities[2][2];
 		depthExtremities[0][0] = extremities[0][0][0] + depthExtremitiesDelta[0][0] * static_cast<double>(depth);
@@ -305,16 +305,16 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 		Vector3d rowExtremitiesDelta[2] =
 		{(depthExtremities[0][1] - depthExtremities[0][0]) / static_cast<double>(numNodesPerDim[1] - 1) ,
 		(depthExtremities[1][1] - depthExtremities[1][0]) / static_cast<double>(numNodesPerDim[1] - 1)};
-		for (unsigned int row = 0; row < numNodesPerDim[1]; row++)
+		for (size_t row = 0; row < numNodesPerDim[1]; row++)
 		{
 			Vector3d rowExtremities[2];
 			rowExtremities[0] = depthExtremities[0][0] + rowExtremitiesDelta[0] * static_cast<double>(row);
 			rowExtremities[1] = depthExtremities[1][0] + rowExtremitiesDelta[1] * static_cast<double>(row);
 
 			Vector3d delta = (rowExtremities[1] - rowExtremities[0]) / static_cast<double>(numNodesPerDim[0] - 1);
-			for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
+			for (size_t col = 0; col < numNodesPerDim[0]; col++)
 			{
-				Vector3d xiExpected(rowExtremities[0] + col * delta);
+				Vector3d xiExpected(rowExtremities[0] + static_cast<double>(col) * delta);
 				SurgSim::Math::Vector& x = m.getFinalState()->getPositions();
 				Eigen::VectorBlock<SurgSim::Math::Vector> xi = SurgSim::Math::getSubVector(x, nodeId, 3);
 				EXPECT_TRUE(xi.isApprox(xiExpected));
@@ -323,7 +323,7 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 		}
 	}
 
-	std::vector<unsigned int> dofBoundaryConditions;
+	std::vector<size_t> dofBoundaryConditions;
 	for (auto it = boundaryConditions.begin(); it != boundaryConditions.end(); ++it)
 	{
 		dofBoundaryConditions.push_back((*it) * 3);

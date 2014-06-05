@@ -37,7 +37,7 @@ const double epsilon = 2.6e-9;
 class MockFem3DElementCube : public Fem3DElementCube
 {
 public:
-	MockFem3DElementCube(std::array<unsigned int, 8> nodeIds) : Fem3DElementCube(nodeIds)
+	MockFem3DElementCube(std::array<size_t, 8> nodeIds) : Fem3DElementCube(nodeIds)
 	{
 	}
 
@@ -75,7 +75,7 @@ public:
 class Fem3DElementCubeTests : public ::testing::Test
 {
 public:
-	std::array<unsigned int, 8> m_nodeIds;
+	std::array<size_t, 8> m_nodeIds;
 	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
 	Eigen::Matrix<double, 24, 1> m_expectedX0;
@@ -83,7 +83,7 @@ public:
 	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix, m_expectedStiffnessMatrix;
 	SurgSim::Math::Vector m_vectorOnes;
 
-	std::shared_ptr<MockFem3DElementCube> getCubeElement(const std::array<unsigned int, 8>& nodeIds)
+	std::shared_ptr<MockFem3DElementCube> getCubeElement(const std::array<size_t, 8>& nodeIds)
 	{
 		std::shared_ptr<MockFem3DElementCube> element;
 
@@ -95,7 +95,7 @@ public:
 		return element;
 	}
 
-	void computeExpectedStiffnessMatrix(std::vector<unsigned int> nodeIdsVectorForm)
+	void computeExpectedStiffnessMatrix(std::vector<size_t> nodeIdsVectorForm)
 	{
 		using SurgSim::Math::getSubMatrix;
 		using SurgSim::Math::addSubMatrix;
@@ -368,7 +368,7 @@ public:
 		addSubMatrix(K, nodeIdsVectorForm, 3 , &m_expectedStiffnessMatrix);
 	}
 
-	void computeExpectedMassMatrix(std::vector<unsigned int> nodeIdsVectorForm)
+	void computeExpectedMassMatrix(std::vector<size_t> nodeIdsVectorForm)
 	{
 		using SurgSim::Math::addSubMatrix;
 
@@ -449,11 +449,11 @@ public:
 		// Ordering following the description in
 		// "Physically-Based Simulation of Objects Represented by Surface Meshes"
 		// Muller, Techner, Gross, CGI 2004
-		std::array<unsigned int, 8> tmpNodeIds = {{0, 1, 3, 2, 4, 5, 7, 6}};
+		std::array<size_t, 8> tmpNodeIds = {{0, 1, 3, 2, 4, 5, 7, 6}};
 		m_nodeIds = tmpNodeIds;
 
 		// Useful for assembly helper function
-		std::vector<unsigned int> nodeIdsVectorForm(tmpNodeIds.begin(), tmpNodeIds.end());
+		std::vector<size_t> nodeIdsVectorForm(tmpNodeIds.begin(), tmpNodeIds.end());
 
 		// Build the expected x0 vector
 		for (size_t i = 0; i < 8; i++)
@@ -497,7 +497,7 @@ public:
 		{
 			for (size_t face2Permutation = 0; face2Permutation < 4; face2Permutation++)
 			{
-				std::array<unsigned int, 8> ids;
+				std::array<size_t, 8> ids;
 				for (size_t index = 0; index < 4; index++)
 				{
 					ids[    index] = face1[(index + face1Permutation) % 4];
@@ -534,7 +534,7 @@ TEST_F(Fem3DElementCubeTests, InitializeTest)
 	{
 		SCOPED_TRACE("Invalid node ids");
 
-		std::array<unsigned int, 8> invalidNodeIds = {{0, 1, 2, 3, 4, 10, 9, 8}};
+		std::array<size_t, 8> invalidNodeIds = {{0, 1, 2, 3, 4, 10, 9, 8}};
 		ASSERT_NO_THROW({auto cube = getCubeElement(invalidNodeIds);});
 		auto cube = getCubeElement(invalidNodeIds);
 		ASSERT_THROW(cube->initialize(m_restState), SurgSim::Framework::AssertionFailure);
@@ -575,7 +575,7 @@ TEST_F(Fem3DElementCubeTests, VolumeTest)
 	{
 		SCOPED_TRACE("Volume valid but negative");
 
-		std::array<unsigned int, 8> nodeIds = {{0, 1, 3, 2, 4, 6, 7, 5}};
+		std::array<size_t, 8> nodeIds = {{0, 1, 3, 2, 4, 6, 7, 5}};
 		auto cube = getCubeElement(nodeIds);
 		ASSERT_THROW(cube->getVolume(m_restState), SurgSim::Framework::AssertionFailure);
 	}

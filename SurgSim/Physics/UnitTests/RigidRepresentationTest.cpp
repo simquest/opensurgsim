@@ -475,17 +475,6 @@ TEST_F(RigidRepresentationTest, SerializationTest)
 	}
 
 	{
-		SCOPED_TRACE("Encode a RigidRepresentation object without RigidCollisionRepresentation should throw.");
-		auto rigidRepresentation = std::make_shared<RigidRepresentation>("TestRigidRepresentation");
-		auto rigidCollisionRepresentation =
-			std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
-
-		rigidRepresentation->setInitialParameters(m_param);
-
-		EXPECT_ANY_THROW(YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
-	}
-
-	{
 		SCOPED_TRACE("Encode a RigidRepresentation object with valid RigidCollisionRepresentation and shape, no throw");
 		auto rigidRepresentation = std::make_shared<RigidRepresentation>("TestRigidRepresentation");
 		auto rigidCollisionRepresentation =

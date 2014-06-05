@@ -32,7 +32,7 @@ void Mesh::initialize(
 	const std::vector<SurgSim::Math::Vector3d>& vertices,
 	const std::vector<SurgSim::Math::Vector4d>& colors,
 	const std::vector<SurgSim::Math::Vector2d>& textures,
-	const std::vector<unsigned int>& triangles)
+	const std::vector<size_t>& triangles)
 {
 	SURGSIM_ASSERT(textures.empty() || textures.size() >= vertices.size()) <<
 		"To make a mesh you need to either provide at least the same amount" <<

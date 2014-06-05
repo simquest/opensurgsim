@@ -242,7 +242,9 @@ TYPED_TEST(UnalignedVectorTests, DefaultConstructorInitialization)
 	// Allocate a buffer for various vector types on stack, based on the size
 	// of the largest object we're testing.  Objects will be allocated inside
 	// the buffer using the placement syntax for the new() operator.
-	unsigned char buffer[sizeof(Vector)];
+	// Eigen's new operatore will attempt to align returned value on word sized
+	// boundaries, so add 64 bytes to guarantee enough size.
+	unsigned char buffer[sizeof(Vector) + 64];
 
 	{
 		// Please don't write production (non-test) code that looks like this. =)
@@ -1123,7 +1125,7 @@ TYPED_TEST(AllDynamicVectorTests, addSubVectorBlocks)
 	typedef typename TestFixture::Vector Vector;
 
 	Vector v, vInit, v2, v2Init;
-	std::vector<unsigned int> nodeIds;
+	std::vector<size_t> nodeIds;
 	v.resize(18);   v.setRandom();   vInit = v;
 	v2.resize(18);  v2.setRandom();  v2Init = v2;
 	nodeIds.push_back(1);
@@ -1206,7 +1208,7 @@ TYPED_TEST(AllDynamicVectorTests, getSubVectorBlocks)
 	typedef typename TestFixture::Vector Vector;
 
 	Vector v, vInit, v2;
-	std::vector<unsigned int> nodeIds;
+	std::vector<size_t> nodeIds;
 	v.resize(18);   v.setRandom();   vInit = v;
 	v2.resize(9);  v2.setZero();
 	nodeIds.push_back(1);
@@ -1243,10 +1245,10 @@ TYPED_TEST(AllDynamicVectorTests, resizeVector)
 	Vector v;
 
 	ASSERT_NO_THROW(SurgSim::Math::resizeVector(&v, 10, false););
-	EXPECT_EQ(10, static_cast<int>(v.size()));
+	EXPECT_EQ(10, v.size());
 
 	ASSERT_NO_THROW(SurgSim::Math::resizeVector(&v, 13, true););
-	EXPECT_EQ(13, static_cast<int>(v.size()));
+	EXPECT_EQ(13, v.size());
 	EXPECT_TRUE(v.isZero());
 }
 

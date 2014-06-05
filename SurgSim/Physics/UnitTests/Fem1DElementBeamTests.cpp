@@ -39,7 +39,7 @@ const double epsilon = 1e-9;
 class MockFem1DElement : public Fem1DElementBeam
 {
 public:
-	MockFem1DElement(std::array<unsigned int, 2> nodeIds)
+	MockFem1DElement(std::array<size_t, 2> nodeIds)
 		: Fem1DElementBeam(nodeIds)
 	{
 	}
@@ -113,7 +113,7 @@ class Fem1DElementBeamTests : public ::testing::Test
 public:
 	static const int m_numberNodes = 5;
 
-	std::array<unsigned int, 2> m_nodeIds;
+	std::array<size_t, 2> m_nodeIds;
 	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
 	double m_rho, m_E, m_nu, m_L;
@@ -366,7 +366,7 @@ public:
 
 	void placeIntoAssembly(const Eigen::Ref<SurgSim::Math::Matrix>& in, Eigen::Ref<SurgSim::Math::Matrix> out)
 	{
-		std::vector<unsigned int> nodeIdsVectorForm(m_nodeIds.begin(), m_nodeIds.end());
+		std::vector<size_t> nodeIdsVectorForm(m_nodeIds.begin(), m_nodeIds.end());
 
 		// Transform into correct coordinates and correct place in matrix
 		std::shared_ptr<MockFem1DElement> beam = getBeam();
