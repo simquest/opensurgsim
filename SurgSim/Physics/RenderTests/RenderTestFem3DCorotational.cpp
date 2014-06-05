@@ -63,7 +63,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 
 	// Cube decomposition into 5 tetrahedrons
 	// https://www.math.ucdavis.edu/~deloera/CURRENT_INTERESTS/cube.html
-	std::array< std::array<unsigned int, 4>, 5> tetrahedrons = {{
+	std::array< std::array<size_t, 4>, 5> tetrahedrons = {{
 			{{4, 7, 1, 2}}, // CCW (47)cross(41) . (42) > 0
 			{{4, 1, 7, 5}}, // CCW (41)cross(47) . (45) > 0
 			{{4, 2, 1, 0}}, // CCW (42)cross(41) . (40) > 0
@@ -72,7 +72,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 		}
 	};
 
-	std::array<unsigned int, 2> boundaryConditionsNodeIdx = {{0, 1}};
+	std::array<size_t, 2> boundaryConditionsNodeIdx = {{0, 1}};
 
 	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
 	initialState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);

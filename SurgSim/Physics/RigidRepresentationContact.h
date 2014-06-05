@@ -49,7 +49,7 @@ public:
 private:
 	/// Gets the number of degree of freedom for a frictionless contact.
 	/// \return 1 as a frictionless contact only has 1 equation of constraint (along the normal direction).
-	unsigned int doGetNumDof() const override;
+	size_t doGetNumDof() const override;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation.
 	/// \param dt The time step.
@@ -63,8 +63,8 @@ private:
 		const ConstraintData& data,
 		const std::shared_ptr<Localization>& localization,
 		MlcpPhysicsProblem* mlcp,
-		unsigned int indexOfRepresentation,
-		unsigned int indexOfConstraint,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
 		ConstraintSideSign sign) override;
 };
 

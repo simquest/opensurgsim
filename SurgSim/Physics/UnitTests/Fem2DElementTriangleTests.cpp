@@ -40,7 +40,7 @@ const double epsilon = 1e-8;
 class MockFem2DElement : public Fem2DElementTriangle
 {
 public:
-	MockFem2DElement(std::array<unsigned int, 3> nodeIds)
+	MockFem2DElement(std::array<size_t, 3> nodeIds)
 		: Fem2DElementTriangle(nodeIds)
 	{
 	}
@@ -451,7 +451,7 @@ class Fem2DElementTriangleTests : public ::testing::Test
 public:
 	static const int m_numberNodes = 6;
 
-	std::array<unsigned int, 3> m_nodeIds;
+	std::array<size_t, 3> m_nodeIds;
 	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
 	double m_rho, m_E, m_nu;
@@ -1037,7 +1037,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
-	const int numDof = 6 * m_restState.getNumNodes();
+	const size_t numDof = 6 * m_restState.getNumNodes();
 	SurgSim::Math::Vector forceVector(numDof);
 	SurgSim::Math::Vector ones(numDof);
 	SurgSim::Math::Matrix massMatrix(numDof, numDof);
@@ -1093,7 +1093,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	forceVector.setZero();
 	ones.setOnes();
 	tri->addMatVec(m_restState, 1.0, 0.0, 0.0, ones, &forceVector);
-	for (int rowId = 0; rowId < numDof; rowId++)
+	for (size_t rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Mass component only");
 		EXPECT_NEAR(expectedMassMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
@@ -1101,7 +1101,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
 	tri->addMatVec(m_restState, 0.0, 1.0, 0.0, ones, &forceVector);
-	for (int rowId = 0; rowId < numDof; rowId++)
+	for (size_t rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Damping component only");
 		EXPECT_NEAR(0.0, forceVector[rowId], epsilon);
@@ -1109,7 +1109,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
 	tri->addMatVec(m_restState, 0.0, 0.0, 1.0, ones, &forceVector);
-	for (int rowId = 0; rowId < numDof; rowId++)
+	for (size_t rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Stiffness component only");
 		EXPECT_NEAR(expectedStiffnessMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
@@ -1117,7 +1117,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
 	tri->addMatVec(m_restState, 1.0, 2.0, 3.0, ones, &forceVector);
-	for (int rowId = 0; rowId < numDof; rowId++)
+	for (size_t rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with mix Mass/Damping/Stiffness components");
 		double expectedCoef = 1.0 * expectedMassMatrix.row(rowId).sum() +

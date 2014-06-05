@@ -106,7 +106,7 @@ public:
 		m_fem->setInitialState(state);
 	}
 
-	void addTriangle(const std::array<unsigned int, 3>& t, double youngModulus, double poissonRatio, double thickness)
+	void addTriangle(const std::array<size_t, 3>& t, double youngModulus, double poissonRatio, double thickness)
 	{
 		std::shared_ptr<Fem2DElementTriangle> triangle = std::make_shared<Fem2DElementTriangle>(t);
 		triangle->setYoungModulus(youngModulus);
@@ -143,9 +143,9 @@ public:
 		for (size_t triangleId = 0; triangleId < m_fem->getNumFemElements(); triangleId++)
 		{
 			auto triangle = std::static_pointer_cast<Fem2DElementTriangle>(m_fem->getFemElement(triangleId));
-			unsigned int nodeId0 = triangle->getNodeId(0);
-			unsigned int nodeId1 = triangle->getNodeId(1);
-			unsigned int nodeId2 = triangle->getNodeId(2);
+			size_t nodeId0 = triangle->getNodeId(0);
+			size_t nodeId1 = triangle->getNodeId(1);
+			size_t nodeId2 = triangle->getNodeId(2);
 			const Vector3d A = m_fem->getInitialState()->getPosition(nodeId0);
 			const Vector3d B = m_fem->getInitialState()->getPosition(nodeId1);
 			const Vector3d C = m_fem->getInitialState()->getPosition(nodeId2);
@@ -217,7 +217,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest1)
 	setNodePositions(nodes, fixedNodes);
 
 	const int numTriangles = 8;
-	const std::array<std::array<unsigned int, 3>, numTriangles> trianglesNodeIds =
+	const std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds =
 	{{
 		{{0, 6, 5}}, {{0, 1, 6}}, {{1, 7, 6}}, {{1, 2, 7}},
 		{{2, 8, 7}}, {{2, 3, 8}}, {{3, 9, 8}}, {{3, 4, 9}}
@@ -286,7 +286,7 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 	setNodePositions(nodes, fixedNodes);
 
 	const int numTriangles = 32;
-	const std::array<std::array<unsigned int, 3>, numTriangles> trianglesNodeIds =
+	const std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds =
 	{{
 		{{0, 10, 12}}, {{10, 11, 12}}, {{12, 11, 13}}, {{12, 13, 5}},
 		{{10, 1, 11}}, {{1, 14, 11}}, {{11, 14, 6}}, {{11, 6, 13}},
@@ -323,14 +323,12 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 /// beginIndex1
 template <size_t M>
 void defineTriangleStrips(size_t beginIndex1, size_t beginIndex2, size_t number,
-						  std::array<std::array<unsigned int, 3>, M>* triangleLists, size_t* triangleId)
+						  std::array<std::array<size_t, 3>, M>* triangleLists, size_t* triangleId)
 {
 	for (size_t i = 0; i < number - 1; i++)
 	{
-		std::array<unsigned int, 3> triangle1 = {{static_cast<unsigned int>(beginIndex1 + i),
-			static_cast<unsigned int>(beginIndex1 + i + 1), static_cast<unsigned int>(beginIndex2 + i)}};
-		std::array<unsigned int, 3> triangle2 = {{ static_cast<unsigned int>(beginIndex1 + i + 1),
-			static_cast<unsigned int>(beginIndex2 + i + 1), static_cast<unsigned int>(beginIndex2 + i)}};
+		std::array<size_t, 3> triangle1 = {{beginIndex1 + i, beginIndex1 + i + 1, beginIndex2 + i}};
+		std::array<size_t, 3> triangle2 = {{beginIndex1 + i + 1, beginIndex2 + i + 1, beginIndex2 + i}};
 		(*triangleLists)[(*triangleId)++] = triangle1;
 		(*triangleLists)[(*triangleId)++] = triangle2;
 	}
@@ -465,41 +463,41 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 	setNodePositions(nodes, fixedNodes);
 
 	const int numTriangles = 110;
-	std::array<std::array<unsigned int, 3>, numTriangles> trianglesNodeIds;
+	std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
 	defineTriangleStrips(0, 6, 6, &trianglesNodeIds, &triangleId);
 	defineTriangleStrips(6, 12, 6, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 3> triangle = {{11, 18, 17}};
+		std::array<size_t, 3> triangle = {{11, 18, 17}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
 	defineTriangleStrips(12, 19, 7, &trianglesNodeIds, &triangleId);
 	defineTriangleStrips(19, 26, 5, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 3> triangle = {{23, 24, 30}};
+		std::array<size_t, 3> triangle = {{23, 24, 30}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
 	defineTriangleStrips(26, 31, 4, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 3> triangle = {{29, 30, 34}};
+		std::array<size_t, 3> triangle = {{29, 30, 34}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
 	defineTriangleStrips(31, 35, 4, &trianglesNodeIds, &triangleId);
 	defineTriangleStrips(35, 39, 4, &trianglesNodeIds, &triangleId);
 	defineTriangleStrips(39, 43, 4, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 3> triangle = {{42, 47, 46}};
+		std::array<size_t, 3> triangle = {{42, 47, 46}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
 	defineTriangleStrips(43, 48, 5, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 3> triangle = {{47, 53, 52}};
+		std::array<size_t, 3> triangle = {{47, 53, 52}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
 	defineTriangleStrips(48, 55, 7, &trianglesNodeIds, &triangleId);
 	defineTriangleStrips(55, 62, 6, &trianglesNodeIds, &triangleId);
 	{
-		std::array<unsigned int, 3> triangle = {{60, 61, 67}};
+		std::array<size_t, 3> triangle = {{60, 61, 67}};
 		trianglesNodeIds[triangleId++] = triangle;
 	}
 	defineTriangleStrips(62, 68, 6, &trianglesNodeIds, &triangleId);
@@ -556,15 +554,15 @@ TEST_F(Fem2DMechanicalValidationTests, PlateBendingSquarePlateMeshPatternATest)
 	setNodePositions(nodes, fixedNodes);
 
 	const int numTriangles = 128;
-	std::array<std::array<unsigned int, 3>, numTriangles> trianglesNodeIds;
+	std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
-	for(unsigned int Y = 0; Y < 8; Y++)
+	for(size_t Y = 0; Y < 8; Y++)
 	{
-		for(unsigned int X = 0; X < 8; X++)
+		for(size_t X = 0; X < 8; X++)
 		{
-			std::array<unsigned int, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + (X + 1)}};
+			std::array<size_t, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + (X + 1)}};
 			trianglesNodeIds[triangleId++] = triangle1;
-			std::array<unsigned int, 3> triangle2 = {{Y * 9 + X, (Y + 1) * 9 + (X + 1), (Y + 1) * 9 + X}};
+			std::array<size_t, 3> triangle2 = {{Y * 9 + X, (Y + 1) * 9 + (X + 1), (Y + 1) * 9 + X}};
 			trianglesNodeIds[triangleId++] = triangle2;
 		}
 	}
@@ -615,15 +613,15 @@ TEST_F(Fem2DMechanicalValidationTests, PlateBendingSquarePlateMeshPatternBTest)
 	setNodePositions(nodes, fixedNodes);
 
 	const int numTriangles = 128;
-	std::array<std::array<unsigned int, 3>, numTriangles> trianglesNodeIds;
+	std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
-	for(unsigned int Y = 0; Y < 8; Y++)
+	for(size_t Y = 0; Y < 8; Y++)
 	{
-		for(unsigned int X = 0; X < 8; X++)
+		for(size_t X = 0; X < 8; X++)
 		{
-			std::array<unsigned int, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + X}};
+			std::array<size_t, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + X}};
 			trianglesNodeIds[triangleId++] = triangle1;
-			std::array<unsigned int, 3> triangle2 = {{Y * 9 + (X + 1), (Y + 1) * 9 + (X + 1), (Y + 1) * 9 + X}};
+			std::array<size_t, 3> triangle2 = {{Y * 9 + (X + 1), (Y + 1) * 9 + (X + 1), (Y + 1) * 9 + X}};
 			trianglesNodeIds[triangleId++] = triangle2;
 		}
 	}
@@ -665,15 +663,15 @@ TEST_F(Fem2DMechanicalValidationTests, CantileverPlateTest)
 	setNodePositions(nodes, fixedNodes);
 
 	const int numTriangles = 128;
-	std::array<std::array<unsigned int, 3>, numTriangles> trianglesNodeIds;
+	std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
-	for(unsigned int Y = 0; Y < 8; Y++)
+	for(size_t Y = 0; Y < 8; Y++)
 	{
-		for(unsigned int X = 0; X < 8; X++)
+		for(size_t X = 0; X < 8; X++)
 		{
-			std::array<unsigned int, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + X}};
+			std::array<size_t, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + X}};
 			trianglesNodeIds[triangleId++] = triangle1;
-			std::array<unsigned int, 3> triangle2 = {{Y * 9 + (X + 1), (Y + 1) * 9 + (X + 1), (Y + 1) * 9 + X}};
+			std::array<size_t, 3> triangle2 = {{Y * 9 + (X + 1), (Y + 1) * 9 + (X + 1), (Y + 1) * 9 + X}};
 			trianglesNodeIds[triangleId++] = triangle2;
 		}
 	}

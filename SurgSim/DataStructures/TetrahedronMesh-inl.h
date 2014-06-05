@@ -35,7 +35,7 @@ TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
-unsigned int
+size_t
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	addEdge(const EdgeType& edge)
 {
@@ -44,7 +44,7 @@ unsigned int
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
-unsigned int
+size_t
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	addTriangle(const TriangleType& triangle)
 {
@@ -53,7 +53,7 @@ unsigned int
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
-unsigned int
+size_t
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	addTetrahedron(const TetrahedronType& tetrahedron)
 {
@@ -62,7 +62,7 @@ unsigned int
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
-unsigned int
+size_t
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	getNumEdges() const
 {
@@ -70,7 +70,7 @@ unsigned int
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
-unsigned int
+size_t
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	getNumTriangles() const
 {
@@ -78,7 +78,7 @@ unsigned int
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
-unsigned int
+size_t
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	getNumTetrahedrons() const
 {
@@ -136,7 +136,7 @@ std::vector<typename TetrahedronMesh<VertexData, EdgeData, TriangleData, Tetrahe
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::EdgeType&
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
-	getEdge(unsigned int id) const
+	getEdge(size_t id) const
 {
 	return m_edges[id];
 }
@@ -144,7 +144,7 @@ const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronDa
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::EdgeType&
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
-	getEdge(unsigned int id)
+	getEdge(size_t id)
 {
 	return m_edges[id];
 }
@@ -152,7 +152,7 @@ typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::E
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TriangleType&
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
-	getTriangle(unsigned int id) const
+	getTriangle(size_t id) const
 {
 	return m_triangles[id];
 }
@@ -160,7 +160,7 @@ const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronDa
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TriangleType&
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
-	getTriangle(unsigned int id)
+	getTriangle(size_t id)
 {
 	return m_triangles[id];
 }
@@ -168,7 +168,7 @@ typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::T
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TetrahedronType&
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
-	getTetrahedron(unsigned int id) const
+	getTetrahedron(size_t id) const
 {
 	return m_tetrahedrons[id];
 }
@@ -176,7 +176,7 @@ const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronDa
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TetrahedronType&
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
-	getTetrahedron(unsigned int id)
+	getTetrahedron(size_t id)
 {
 	return m_tetrahedrons[id];
 }
@@ -193,14 +193,14 @@ bool
 	typedef typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TetrahedronType
 		TetrahedronType;
 
-	unsigned int numVertices = Vertices<VertexData>::getNumVertices();
+	size_t numVertices = Vertices<VertexData>::getNumVertices();
 
 	// Test edges validity
 	for (typename std::vector<EdgeType>::const_iterator it = m_edges.begin();
 		it != m_edges.end();
 		it++)
 	{
-		for (int vertexId = 0; vertexId < 2; vertexId++)
+		for (size_t vertexId = 0; vertexId < 2; vertexId++)
 		{
 			if (it->verticesId[vertexId] >= numVertices)
 			{
@@ -214,7 +214,7 @@ bool
 		it != m_triangles.end();
 		it++)
 	{
-		for (int vertexId = 0; vertexId < 3; vertexId++)
+		for (size_t vertexId = 0; vertexId < 3; vertexId++)
 		{
 			if (it->verticesId[vertexId] >= numVertices)
 			{
@@ -228,7 +228,7 @@ bool
 		it != m_tetrahedrons.end();
 		it++)
 	{
-		for (int vertexId = 0; vertexId < 4; vertexId++)
+		for (size_t vertexId = 0; vertexId < 4; vertexId++)
 		{
 			if (it->verticesId[vertexId] >= numVertices)
 			{

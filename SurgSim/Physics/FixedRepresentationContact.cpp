@@ -38,8 +38,8 @@ void FixedRepresentationContact::doBuild(double dt,
 	const ConstraintData& data,
 	const std::shared_ptr<Localization>& localization,
 	MlcpPhysicsProblem* mlcp,
-	unsigned int indexOfRepresentation,
-	unsigned int indexOfConstraint,
+	size_t indexOfRepresentation,
+	size_t indexOfConstraint,
 	ConstraintSideSign sign)
 {
 	MlcpPhysicsProblem::Vector& b = mlcp->b;
@@ -74,7 +74,7 @@ SurgSim::Physics::RepresentationType FixedRepresentationContact::getRepresentati
 	return REPRESENTATION_TYPE_FIXED;
 }
 
-unsigned int FixedRepresentationContact::doGetNumDof() const
+size_t FixedRepresentationContact::doGetNumDof() const
 {
 	return 1;
 }

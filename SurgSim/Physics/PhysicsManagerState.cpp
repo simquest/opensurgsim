@@ -40,7 +40,7 @@ void PhysicsManagerState::setRepresentations(const std::vector<std::shared_ptr<R
 {
 	m_representations = val;
 
-	int index = 0;
+	ptrdiff_t index = 0;
 	m_representationsIndexMapping.clear();
 	m_collisionsToPhysicsMap.clear();
 	for (auto it = m_representations.begin(); it != m_representations.end(); it++)
@@ -135,7 +135,7 @@ void PhysicsManagerState::setConstraintGroup(
 	m_constraints[type] = constraints;
 
 	// As of now, the mapping is redone entirely each time we call setConstraints
-	int index = 0;
+	ptrdiff_t index = 0;
 	m_constraintsIndexMapping.clear();
 	int constraintTypeEnd   = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);
 	for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)

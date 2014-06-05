@@ -35,7 +35,7 @@ namespace
 /// \param ai, bi, ci, di The shape functions parameters
 /// \param p The point to evaluate the shape function at
 /// \return Ni(p) = 1/6V . (ai + bi.px + ci.py + di.pz)
-double N(unsigned int i, double V, double *ai, double *bi, double *ci, double *di, const Vector3d& p)
+double N(size_t i, double V, double *ai, double *bi, double *ci, double *di, const Vector3d& p)
 {
 	double inv6V = 1.0 / (6.0 * V);
 	return inv6V * (ai[i] + bi[i] * p[0] + ci[i] * p[1] + di[i] * p[2]);
@@ -47,7 +47,7 @@ const double epsilon = 1e-9;
 class MockFem3DElementTet : public Fem3DElementTetrahedron
 {
 public:
-	MockFem3DElementTet(std::array<unsigned int, 4> nodeIds) : Fem3DElementTetrahedron(nodeIds)
+	MockFem3DElementTet(std::array<size_t, 4> nodeIds) : Fem3DElementTetrahedron(nodeIds)
 	{
 	}
 
@@ -84,7 +84,7 @@ public:
 class Fem3DElementTetrahedronTests : public ::testing::Test
 {
 public:
-	std::array<unsigned int, 4> m_nodeIds;
+	std::array<size_t, 4> m_nodeIds;
 	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
 	Eigen::Matrix<double, 12, 1> m_expectedX0;
@@ -103,7 +103,7 @@ public:
 		m_nodeIds[1] = 1;
 		m_nodeIds[2] = 14;
 		m_nodeIds[3] = 9;
-		std::vector<unsigned int> m_nodeIdsVectorForm; // Useful for assembly helper function
+		std::vector<size_t> m_nodeIdsVectorForm; // Useful for assembly helper function
 		m_nodeIdsVectorForm.push_back(m_nodeIds[0]);
 		m_nodeIdsVectorForm.push_back(m_nodeIds[1]);
 		m_nodeIdsVectorForm.push_back(m_nodeIds[2]);

@@ -47,7 +47,7 @@ public:
 	/// \note Stretching springs are connecting neighbors, bending springs are connecting 1 node
 	/// \note to its 2nd degree neighbors, creating a bending force around the middle node.
 	void init1D(const std::vector<SurgSim::Math::Vector3d> nodes,
-		std::vector<unsigned int> nodeBoundaryConditions,
+		std::vector<size_t> nodeBoundaryConditions,
 		double totalMass,
 		double stiffnessStretching, double dampingStretching,
 		double stiffnessBending, double dampingBending);

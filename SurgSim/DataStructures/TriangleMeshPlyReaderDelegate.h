@@ -108,7 +108,7 @@ private:
 	std::shared_ptr<MeshType> m_mesh;
 
 	// Preallocated index array to receive data for the faces
-	std::array<unsigned int, 3> m_indices;
+	std::array<size_t, 3> m_indices;
 };
 
 }

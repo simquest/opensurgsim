@@ -54,19 +54,19 @@ public:
 
 	/// Gets the number of degree of freedom per node
 	/// \return The number of dof per node
-	unsigned int getNumDofPerNode() const;
+	size_t getNumDofPerNode() const;
 
 	/// Gets the number of nodes connected by this element
 	/// \return The number of nodes
-	unsigned int getNumNodes() const;
+	size_t getNumNodes() const;
 
 	/// Gets the elementNodeId-th node id
 	/// \return The requested node id
-	unsigned int getNodeId(unsigned int elementNodeId) const;
+	size_t getNodeId(size_t elementNodeId) const;
 
 	/// Gets the node ids for this element
 	/// \return A vector containing the node ids on which the element is defined
-	const std::vector<unsigned int>& getNodeIds() const;
+	const std::vector<size_t>& getNodeIds() const;
 
 	/// Sets the Young modulus (in N.m-2)
 	/// \param E The Young modulus
@@ -199,13 +199,13 @@ protected:
 	/// \param numDofPerNode The number of dof per node
 	/// \note Protected to be accessible only to derived classes which should be the only
 	/// \note ones able to set this parameter
-	void setNumDofPerNode(unsigned int numDofPerNode);
+	void setNumDofPerNode(size_t numDofPerNode);
 
 	/// Number of degree of freedom per node for this element
-	unsigned int m_numDofPerNode;
+	size_t m_numDofPerNode;
 
 	/// Node ids connected by this element
-	std::vector<unsigned int> m_nodeIds;
+	std::vector<size_t> m_nodeIds;
 
 	/// Mass density (in Kg.m-3)
 	double m_rho;

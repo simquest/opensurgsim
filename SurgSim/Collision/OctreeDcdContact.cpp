@@ -35,6 +35,8 @@ OctreeDcdContact::OctreeDcdContact(std::shared_ptr<ContactCalculation> calculato
 		"OctreeDcdContact needs a contact calculator that works with Boxes";
 	m_shapeTypes = m_calculator->getShapeTypes();
 	m_shapeTypes.first = SurgSim::Math::SHAPE_TYPE_OCTREE;
+
+	m_nodeCollisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Octree Node");
 }
 
 std::pair<int, int> OctreeDcdContact::getShapeTypes()
@@ -59,18 +61,19 @@ void OctreeDcdContact::calculateContactWithNode(
 		return;
 	}
 
-	SurgSim::Math::Vector3d boxSize = node->getBoundingBox().sizes();
-	std::shared_ptr<SurgSim::Math::Shape> boxShape =
-		std::make_shared<SurgSim::Math::BoxShape>(boxSize.x(), boxSize.y(), boxSize.z());
-	SurgSim::Math::RigidTransform3d boxPose = pair->getFirst()->getPose();
-	boxPose.translation() += boxPose.linear() * node->getBoundingBox().center();
+	SurgSim::Math::Vector3d nodeSize = node->getBoundingBox().sizes();
+	std::shared_ptr<SurgSim::Math::Shape> nodeShape;
+	nodeShape = std::make_shared<SurgSim::Math::BoxShape>(nodeSize.x(), nodeSize.y(), nodeSize.z());
+	SurgSim::Math::RigidTransform3d nodePose = pair->getFirst()->getPose();
+	nodePose.translation() += nodePose.linear() * node->getBoundingBox().center();
 
-	std::shared_ptr<ShapeCollisionRepresentation> box = std::make_shared<ShapeCollisionRepresentation>("Octree Node");
-	box->setShape(boxShape);
-	box->setLocalPose(boxPose);
+	m_nodeCollisionRepresentation->setShape(nodeShape);
+	m_nodeCollisionRepresentation->setLocalPose(nodePose);
 
-	std::shared_ptr<CollisionPair> localPair = std::make_shared<CollisionPair>(box, pair->getSecond());
+	std::shared_ptr<CollisionPair> localPair = std::make_shared<CollisionPair>(m_nodeCollisionRepresentation,
+			pair->getSecond());
 	m_calculator->calculateContact(localPair);
+
 	if (localPair->hasContacts())
 	{
 		if (node->hasChildren())

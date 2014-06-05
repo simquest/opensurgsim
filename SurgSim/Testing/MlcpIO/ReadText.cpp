@@ -263,12 +263,13 @@ static bool readEigenMatrix(const std::string& fileName, FILE* in, const char* l
 		}
 		else
 		{
-			int numCols = matrix->cols();
-			int newNumRows = matrix->rows() + 1;
+			ptrdiff_t numCols = matrix->cols();
+			ptrdiff_t newNumRows = matrix->rows() + 1;
 			if (rowVector.cols() != numCols)
 			{
-				fprintf(stderr, "Inconsistent number of columns for Eigen matrix (%d vs %d)\n  in file '%s'\n",
-						numCols, static_cast<int>(rowVector.cols()), fileName.c_str());
+				fprintf(stderr, "Inconsistent number of columns for Eigen matrix (%lld vs %lld)\n  in file '%s'\n",
+						static_cast<long long int>(numCols), static_cast<long long int>(rowVector.cols()),
+						fileName.c_str());
 				return false;
 			}
 			matrix->conservativeResize(newNumRows, numCols);
