@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 	view->enableKeyboardDevice(true);
 	inputManager->addDevice(view->getKeyboardDevice());
 
-	YAML::Node node = YAML::LoadFile("Data/StaplingDemo.yaml");
+	YAML::Node node = YAML::LoadFile("Data/Stapling/StaplingDemo.yaml");
 
 	runtime->getScene()->decode(node);
 	runtime->getScene()->addSceneElement(view);

@@ -50,7 +50,7 @@ set(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/Examples/Data/Stapling DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 # Configure the path for the data files
 configure_file(
