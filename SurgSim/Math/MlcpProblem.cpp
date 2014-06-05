@@ -24,7 +24,7 @@ MlcpProblem::~MlcpProblem()
 {
 }
 
-void MlcpProblem::setZero(int numDof, int numConstraintDof, int numConstraints)
+void MlcpProblem::setZero(size_t numDof, size_t numConstraintDof, size_t numConstraints)
 {
 	A.resize(numConstraintDof, numConstraintDof);
 	A.setZero();
@@ -36,7 +36,7 @@ void MlcpProblem::setZero(int numDof, int numConstraintDof, int numConstraints)
 	constraintTypes.clear();
 }
 
-MlcpProblem MlcpProblem::Zero(int numDof, int numConstraintDof, int numConstraints)
+MlcpProblem MlcpProblem::Zero(size_t numDof, size_t numConstraintDof, size_t numConstraints)
 {
 	MlcpProblem result;
 	result.setZero(numDof, numConstraintDof, numConstraints);

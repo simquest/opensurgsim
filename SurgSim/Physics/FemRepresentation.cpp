@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/FemElement.h"
@@ -71,12 +72,12 @@ void FemRepresentation::addFemElement(const std::shared_ptr<FemElement> femEleme
 	m_femElements.push_back(femElement);
 }
 
-unsigned int FemRepresentation::getNumFemElements() const
+size_t FemRepresentation::getNumFemElements() const
 {
 	return m_femElements.size();
 }
 
-std::shared_ptr<FemElement> FemRepresentation::getFemElement(unsigned int femElementId)
+std::shared_ptr<FemElement> FemRepresentation::getFemElement(size_t femElementId)
 {
 	SURGSIM_ASSERT(femElementId < getNumFemElements()) << "Invalid femElement id";
 	return m_femElements[femElementId];
@@ -138,7 +139,12 @@ void FemRepresentation::afterUpdate(double dt)
 		{
 			if (!element->update(*m_finalState))
 			{
-				deactivateAndReset();
+				SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
+					<< getName() << " deactivated :" << std::endl
+					<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
+					<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
+
+				setIsActive(false);
 				return;
 			}
 		}
@@ -333,7 +339,7 @@ void FemRepresentation::addGravityForce(SurgSim::Math::Vector* f,
 
 	if (isGravityEnabled())
 	{
-		for (unsigned int nodeId = 0; nodeId < state.getNumNodes(); nodeId++)
+		for (size_t nodeId = 0; nodeId < state.getNumNodes(); nodeId++)
 		{
 			// F = mg
 			addSubVector(gravitynD * (scale * m_massPerNode[nodeId]), nodeId, getNumDofPerNode(), f);

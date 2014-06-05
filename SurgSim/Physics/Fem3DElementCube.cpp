@@ -30,10 +30,8 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DElementCube::Fem3DElementCube(std::array<unsigned int, 8> nodeIds, const SurgSim::Math::OdeState& restState)
+Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 {
-	using SurgSim::Framework::Logger;
-
 	// Set the number of dof per node (3 in this case)
 	setNumDofPerNode(3);
 
@@ -46,25 +44,26 @@ Fem3DElementCube::Fem3DElementCube(std::array<unsigned int, 8> nodeIds, const Su
 	m_shapeFunctionsEtaSign     = tmpEta;
 	m_shapeFunctionsMuSign      = tmpMu;
 
-	// Store the 8 nodeIds in order
-	for (auto nodeId = nodeIds.cbegin(); nodeId != nodeIds.cend(); nodeId++)
-	{
-		SURGSIM_ASSERT(*nodeId >= 0 && *nodeId < restState.getNumNodes()) <<
-			"Invalid nodeId " << *nodeId << " expected in range [0.." << restState.getNumNodes()-1 << "]";
-		m_nodeIds.push_back(*nodeId);
-	}
-
-	// Store the rest state for this cube in m_elementRestPosition
-	getSubVector(restState.getPositions(), m_nodeIds, 3, &m_elementRestPosition);
-
-	// Compute the cube rest volume
-	m_restVolume = getVolume(restState);
+	m_nodeIds.assign( nodeIds.cbegin(), nodeIds.cend());
 }
 
 void Fem3DElementCube::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Test the validity of the physical parameters
 	FemElement::initialize(state);
+
+	// Store the 8 nodeIds in order
+	for (auto nodeId = m_nodeIds.cbegin(); nodeId != m_nodeIds.cend(); ++nodeId)
+	{
+		SURGSIM_ASSERT(*nodeId >= 0 && *nodeId < state.getNumNodes()) <<
+			"Invalid nodeId " << *nodeId << " expected in range [0.." << state.getNumNodes()-1 << "]";
+	}
+
+	// Store the rest state for this cube in m_elementRestPosition
+	getSubVector(state.getPositions(), m_nodeIds, 3, &m_elementRestPosition);
+
+	// Compute the cube rest volume
+	m_restVolume = getVolume(state);
 
 	// Pre-compute the mass and stiffness matrix
 	computeMass(state, &m_mass);
@@ -397,15 +396,11 @@ double Fem3DElementCube::getVolume(const SurgSim::Math::OdeState& state) const
 		}
 	}
 
-	SURGSIM_ASSERT(v >= 0) << "Fem3DElementCube ill-defined, its volume is " << v << std::endl <<
-		"Please check the node ordering of your element formed by node ids " <<
-		m_nodeIds[0]<<" "<<m_nodeIds[1]<<" "<<m_nodeIds[2]<<" "<<m_nodeIds[3]<<" "<<
-		m_nodeIds[4]<<" "<<m_nodeIds[5]<<" "<<m_nodeIds[6]<<" "<<m_nodeIds[7]<<std::endl;
-
 	SURGSIM_ASSERT(v > 1e-12) << "Fem3DElementCube ill-defined, its volume is " << v << std::endl <<
-		"Please check the node ordering of your element formed by node ids " <<
-		m_nodeIds[0]<<" "<<m_nodeIds[1]<<" "<<m_nodeIds[2]<<" "<<m_nodeIds[3]<<" "<<
-		m_nodeIds[4]<<" "<<m_nodeIds[5]<<" "<<m_nodeIds[6]<<" "<<m_nodeIds[7]<<std::endl;
+		"Please make sure the element is not degenerate and " <<
+		"check the node ordering of your element formed by node ids " <<
+		m_nodeIds[0] << " " << m_nodeIds[1] << " " << m_nodeIds[2] << " " << m_nodeIds[3] << " " <<
+		m_nodeIds[4] << " " << m_nodeIds[5] << " " << m_nodeIds[6] << " " << m_nodeIds[7] << std::endl;
 
 	return v;
 }

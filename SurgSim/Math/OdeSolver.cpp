@@ -55,10 +55,10 @@ const Matrix& OdeSolver::getCompliance() const
 	return m_compliance;
 }
 
-void OdeSolver::allocate(unsigned int size)
+void OdeSolver::allocate(size_t size)
 {
-	resizeMatrix(&m_systemMatrix, size, size);
-	resizeMatrix(&m_compliance, size, size);
+	m_systemMatrix.resize(size, size);
+	m_compliance.resize(size, size);
 }
 
 }; // namespace Math

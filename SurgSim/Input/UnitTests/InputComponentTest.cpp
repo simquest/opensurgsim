@@ -22,6 +22,8 @@
 #include <gtest/gtest.h>
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "yaml-cpp/yaml.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 using SurgSim::Input::InputComponent;
 using SurgSim::DataStructures::DataGroup;
@@ -46,5 +48,23 @@ TEST(InputComponentTest, NotConnected)
 	DataGroup dataGroup;
 	EXPECT_THROW(input.getData(&dataGroup), SurgSim::Framework::AssertionFailure);
 	EXPECT_FALSE(input.isDeviceConnected());
+}
+
+TEST(InputComponentTest, Serialization)
+{
+	auto input = std::make_shared<InputComponent>("Input");
+	input->setDeviceName("InputDevice");
+
+	// Encode
+	YAML::Node node;
+	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*input););
+
+	// Decode
+	std::shared_ptr<InputComponent> newInput;
+	EXPECT_NO_THROW(newInput = std::dynamic_pointer_cast<InputComponent>(
+									node.as<std::shared_ptr<SurgSim::Framework::Component>>()););
+
+	// Verify
+	EXPECT_EQ(input->getDeviceName(), newInput->getDeviceName());
 }
 

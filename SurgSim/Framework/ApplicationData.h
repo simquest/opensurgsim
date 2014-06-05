@@ -67,18 +67,20 @@ public:
 	/// 		returned if the file cannot be found.
 	std::string findFile(const std::string& fileName) const;
 
+	/// Searches for the first occurrence of fileName amongst the given paths, see findFile() for details.
+	/// If the file is found the full pathName will be sent in target and true returned. If the file is
+	/// not found the result will be false and the content of target will not change.
+	/// \param fileName Filename of the file.
+	/// \param target The location for the converted filename if it was found.
+	/// \return true if the file is found, false otherwise.
+	bool tryFindFile(const std::string& fileName, std::string* target) const;
+
 	/// Checks if the filename is acceptable
 	/// \param fileName		Filename to be checked.
 	/// \return true if the name is valid, false otherwise.
 	bool isValidFilename(const std::string& fileName) const;
 
-	/// Remove all occurances of '\' and replace them with '/'
-	/// \param fileName	The file name to be changed.
-	/// \return A useable file name
-	std::string makeValid(const std::string& fileName) const;
-
 private:
-
 	/// Adds a single path to the list of search paths.
 	/// \param	pathName Full pathname.
 	/// \return	true if it succeeds, false if the given path does not exist or if it is

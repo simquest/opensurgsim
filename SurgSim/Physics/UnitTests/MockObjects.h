@@ -203,7 +203,7 @@ protected:
 
 		Vector& x = state->getPositions();
 		Vector& v = state->getVelocities();
-		for (unsigned int nodeId = 0; nodeId < state->getNumNodes(); nodeId++)
+		for (size_t nodeId = 0; nodeId < state->getNumNodes(); nodeId++)
 		{
 			Vector3d xi = getSubVector(x, nodeId, 3);
 			Vector3d xiTransformed = transform * xi;
@@ -234,7 +234,7 @@ public:
 		m_K = Matrix::Identity(6, 6) * 3.0;
 	}
 
-	void addNode(unsigned int nodeId)
+	void addNode(size_t nodeId)
 	{
 		this->m_nodeIds.push_back(nodeId);
 	}
@@ -280,7 +280,7 @@ class MockMassSpring : public SurgSim::Physics::MassSpringRepresentation
 public:
 	explicit MockMassSpring(const std::string& name,
 		const SurgSim::Math::RigidTransform3d& pose,
-		unsigned int numNodes, std::vector<unsigned int> nodeBoundaryConditions,
+		size_t numNodes, std::vector<size_t> nodeBoundaryConditions,
 		double totalMass,
 		double rayleighDampingMass, double rayleighDampingStiffness,
 		double springStiffness, double springDamping,
@@ -298,7 +298,7 @@ public:
 		std::shared_ptr<SurgSim::Math::OdeState> state;
 		state = std::make_shared<SurgSim::Math::OdeState>();
 		state->setNumDof(3, numNodes);
-		for (unsigned int i = 0; i < numNodes; i++)
+		for (size_t i = 0; i < numNodes; i++)
 		{
 			Vector3d p(static_cast<double>(i)/static_cast<double>(numNodes), 0, 0);
 			setSubVector(p, i, 3, &state->getPositions());
@@ -308,7 +308,7 @@ public:
 		{
 			state->addBoundaryCondition(*bc);
 		}
-		for (unsigned int i = 0; i < numNodes - 1; i++)
+		for (size_t i = 0; i < numNodes - 1; i++)
 		{
 			std::shared_ptr<LinearSpring> spring = std::make_shared<LinearSpring>(i, i+1);
 			spring->setDamping(springDamping);
@@ -338,7 +338,7 @@ public:
 		setNumDofPerNode(3);
 	}
 
-	void addNode(unsigned int nodeId)
+	void addNode(size_t nodeId)
 	{
 		this->m_nodeIds.push_back(nodeId);
 	}
@@ -392,7 +392,7 @@ public:
 	virtual void initialize(const SurgSim::Math::OdeState& state) override
 	{
 		FemElement::initialize(state);
-		const int numDof = 3 * m_nodeIds.size();
+		const size_t numDof = 3 * m_nodeIds.size();
 		m_F = Vector::LinSpaced(numDof, 1.0, static_cast<double>(numDof));
 		m_M = Matrix::Identity(numDof, numDof) * 1.0;
 		m_D = Matrix::Identity(numDof, numDof) * 2.0;
@@ -491,7 +491,7 @@ public:
 	}
 
 private:
-	virtual unsigned int doGetNumDof() const override
+	virtual size_t doGetNumDof() const override
 	{
 		return 3;
 	}
@@ -500,8 +500,8 @@ private:
 				const ConstraintData& data,
 				const std::shared_ptr<Localization>& localization,
 				MlcpPhysicsProblem* mlcp,
-				unsigned int indexOfRepresentation,
-				unsigned int indexOfConstraint,
+				size_t indexOfRepresentation,
+				size_t indexOfConstraint,
 				ConstraintSideSign sign) override
 	{}
 };
@@ -523,7 +523,7 @@ public:
 	}
 
 private:
-	virtual unsigned int doGetNumDof() const override
+	virtual size_t doGetNumDof() const override
 	{
 		return 3;
 	}
@@ -532,8 +532,8 @@ private:
 				const ConstraintData& data,
 				const std::shared_ptr<Localization>& localization,
 				MlcpPhysicsProblem* mlcp,
-				unsigned int indexOfRepresentation,
-				unsigned int indexOfConstraint,
+				size_t indexOfRepresentation,
+				size_t indexOfConstraint,
 				ConstraintSideSign sign) override
 	{}
 };
@@ -582,7 +582,7 @@ public:
 	}
 
 private:
-	virtual unsigned int doGetNumDof() const
+	virtual size_t doGetNumDof() const
 	{
 		return 1;
 	}
@@ -591,8 +591,8 @@ private:
 						 const ConstraintData& data,
 						 const std::shared_ptr<Localization>& localization,
 						 MlcpPhysicsProblem* mlcp,
-						 unsigned int indexOfRepresentation,
-						 unsigned int indexOfConstraint,
+						 size_t indexOfRepresentation,
+						 size_t indexOfConstraint,
 						 ConstraintSideSign sign)
 	{
 	}
@@ -606,24 +606,44 @@ public:
 	{
 	}
 
-	double getLinearStiffness() const
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearStiffness() const
 	{
-		return m_linearStiffness.getValue();
+		return VirtualToolCoupler::getOptionalLinearStiffness();
 	}
 
-	double getLinearDamping() const
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearDamping() const
 	{
-		return m_linearDamping.getValue();
+		return VirtualToolCoupler::getOptionalLinearDamping();
 	}
 
-	double getAngularStiffness() const
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularStiffness() const
 	{
-		return m_angularStiffness.getValue();
+		return VirtualToolCoupler::getOptionalAngularStiffness();
 	}
 
-	double getAngularDamping() const
+	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularDamping() const
 	{
-		return m_angularDamping.getValue();
+		return VirtualToolCoupler::getOptionalAngularDamping();
+	}
+
+	void setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& val)
+	{
+		VirtualToolCoupler::setOptionalLinearStiffness(val);
+	}
+
+	void setOptionalLinearDamping(const SurgSim::DataStructures::OptionalValue<double>& val)
+	{
+		VirtualToolCoupler::setOptionalLinearDamping(val);
+	}
+
+	void setOptionalAngularStiffness(const SurgSim::DataStructures::OptionalValue<double>& val)
+	{
+		VirtualToolCoupler::setOptionalAngularStiffness(val);
+	}
+
+	void setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& val)
+	{
+		VirtualToolCoupler::setOptionalAngularDamping(val);
 	}
 
 };

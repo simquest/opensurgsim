@@ -39,8 +39,8 @@ void Fem3DRepresentationBilateral3D::doBuild(double dt,
 											 const ConstraintData& data,
 											 const std::shared_ptr<Localization>& localization,
 											 MlcpPhysicsProblem* mlcp,
-											 unsigned int indexOfRepresentation,
-											 unsigned int indexOfConstraint,
+											 size_t indexOfRepresentation,
+											 size_t indexOfConstraint,
 											 ConstraintSideSign sign)
 {
 	std::shared_ptr<Fem3DRepresentation> fem3d
@@ -100,7 +100,7 @@ void Fem3DRepresentationBilateral3D::doBuild(double dt,
 		{
 			if (coord.naturalCoordinate[index] != 0.0)
 			{
-				unsigned int nodeIndex = femElement->getNodeId(index);
+				size_t nodeIndex = femElement->getNodeId(index);
 				m_newH.insert(3 * nodeIndex + axis) = coord.naturalCoordinate[index] * (dt * scale);
 			}
 		}
@@ -118,7 +118,7 @@ SurgSim::Physics::RepresentationType Fem3DRepresentationBilateral3D::getRepresen
 	return REPRESENTATION_TYPE_FEM3D;
 }
 
-unsigned int Fem3DRepresentationBilateral3D::doGetNumDof() const
+size_t Fem3DRepresentationBilateral3D::doGetNumDof() const
 {
 	return 3;
 }

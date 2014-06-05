@@ -39,7 +39,7 @@ namespace SurgSim
 namespace Physics
 {
 
-void addTetraheadron(Fem3DRepresentation *fem, std::array<unsigned int, 4> nodes,
+void addTetraheadron(Fem3DRepresentation *fem, std::array<size_t, 4> nodes,
 	const SurgSim::Math::OdeState& state, double massDensity = 1.0,
 	double poissonRatio = 0.1, double youngModulus = 1.0)
 {
@@ -72,17 +72,17 @@ public:
 
 		// Define Tetrahedrons
 		{
-			std::array<unsigned int, 4> nodes = {{0, 1, 2, 3}};
+			std::array<size_t, 4> nodes = {{0, 1, 2, 3}};
 			addTetraheadron(m_fem.get(), nodes, *state);
 		}
 
 		{
-			std::array<unsigned int, 4> nodes = {{0, 1, 3, 4}};
+			std::array<size_t, 4> nodes = {{0, 1, 3, 4}};
 			addTetraheadron(m_fem.get(), nodes, *state);
 		}
 
 		{
-			std::array<unsigned int, 4> nodes = {{0, 1, 4, 5}};
+			std::array<size_t, 4> nodes = {{0, 1, 4, 5}};
 			addTetraheadron(m_fem.get(), nodes, *state);
 		}
 
@@ -106,8 +106,8 @@ public:
 
 		// Define Cube
 		{
-			std::array<unsigned int, 8> node0 = {{0, 1, 3, 2, 4, 5, 7, 6}};
-			std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(node0, *restState);
+			std::array<size_t, 8> node0 = {{0, 1, 3, 2, 4, 5, 7, 6}};
+			std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(node0);
 			femElement->setMassDensity(1.0);
 			femElement->setPoissonRatio(0.1);
 			femElement->setYoungModulus(1.0);

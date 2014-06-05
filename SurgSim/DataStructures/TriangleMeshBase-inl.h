@@ -109,28 +109,28 @@ std::vector<typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::Trian
 
 template <class VertexData, class EdgeData, class TriangleData>
 const typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdge(unsigned int id) const
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdge(size_t id) const
 {
 	return m_edges[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdge(unsigned int id)
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdge(size_t id)
 {
 	return m_edges[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 const typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(unsigned int id) const
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(size_t id) const
 {
 	return m_triangles[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(unsigned int id)
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(size_t id)
 {
 	return m_triangles[id];
 }
@@ -139,7 +139,7 @@ template <class VertexData, class EdgeData, class TriangleData>
 std::array<SurgSim::Math::Vector3d, 3>
 	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTrianglePositions(size_t id) const
 {
-	auto& ids = getTriangle(static_cast<unsigned int>(id)).verticesId;
+	auto& ids = getTriangle(id).verticesId;
 	std::array<SurgSim::Math::Vector3d, 3> result
 		= {{
 				Vertices<VertexData>::getVertex(ids[0]).position,

@@ -139,9 +139,9 @@ protected:
 	double m_dt;
 
 	/// Number of nodes
-	unsigned int m_numNodes;
+	size_t m_numNodes;
 	/// NodeIds boundary conditions
-	std::vector<unsigned int> m_nodeBoundaryConditions;
+	std::vector<size_t> m_nodeBoundaryConditions;
 	/// Total mass (in Kg)
 	double m_totalMass;
 	/// Spring stiffness and damping
@@ -281,7 +281,7 @@ TEST_F(MassSpringMechanicalValidationTests, FallingTest)
 
 		// Making sure that each mass has a velocity directed toward the gravity vector direction
 		// with no orthogonal components
-		for (unsigned int nodeId = 0; nodeId < m.getNumMasses(); nodeId++)
+		for (size_t nodeId = 0; nodeId < m.getNumMasses(); nodeId++)
 		{
 			const Vector3d& vi = SurgSim::Math::getSubVector(v, nodeId, 3);
 			double vi_dot_g = vi.dot(m.getGravityVector());

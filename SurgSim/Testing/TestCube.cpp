@@ -134,7 +134,7 @@ unsigned int triangleData[] =
 void makeCube(std::vector<Vector3d>* vertices,
 			std::vector<Vector4d>* colors,
 			std::vector<Vector2d>* textures,
-			std::vector<unsigned int>* triangles)
+			std::vector<size_t>* triangles)
 {
 vertices->resize(numVertices);
 colors->resize(numVertices);

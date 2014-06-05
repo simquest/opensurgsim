@@ -141,12 +141,12 @@ public:
 	};
 
 	VertexData vertexData;
-	int vertexInitCount;
+	size_t vertexInitCount;
 	int vertexRunningCount;
 	bool endVerticesCalled;
 
 	FaceData faceData;
-	int faceInitCount;
+	size_t faceInitCount;
 	int faceRunningCount;
 
 	std::vector<Vector3d> vertices;
@@ -255,8 +255,8 @@ TEST(PlyReaderTests, TriangleMeshDelegateTest)
 	EXPECT_TRUE(vertex0.isApprox(mesh->getVertex(0).position));
 	EXPECT_TRUE(vertex25.isApprox(mesh->getVertex(25).position));
 
-	std::array<unsigned int, 3> triangle0 = {0, 1, 2};
-	std::array<unsigned int, 3> triangle11 = {10, 25, 11};
+	std::array<size_t, 3> triangle0 = {0, 1, 2};
+	std::array<size_t, 3> triangle11 = {10, 25, 11};
 
 	EXPECT_EQ(triangle0, mesh->getTriangle(0).verticesId);
 	EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);

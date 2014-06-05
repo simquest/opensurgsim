@@ -210,9 +210,6 @@ TEST(ComponentTests, SetAndGetSceneTest)
 
 TEST(ComponentTests, PointerEncode)
 {
-	std::shared_ptr<Component> emptyComponent;
-	EXPECT_ANY_THROW(YAML::convert<std::shared_ptr<Component>>::encode(emptyComponent));
-
 	auto component = std::make_shared<TestComponent1>("TestComponent");
 	YAML::Node node = YAML::convert<std::shared_ptr<Component>>::encode(component);
 
@@ -226,7 +223,35 @@ TEST(ComponentTests, PointerEncode)
 	EXPECT_EQ("TestComponent1", className);
 	EXPECT_EQ("TestComponent", data["Name"].as<std::string>());
 	EXPECT_EQ(to_string(component->getUuid()), data["Id"].as<std::string>());
+}
 
+TEST(ComponentTests, NullPointerSerialization)
+{
+	// Encode a nullptr
+	std::shared_ptr<Component> emptyComponent;
+	EXPECT_NO_THROW(YAML::convert<std::shared_ptr<Component>>::encode(emptyComponent));
+	YAML::Node node = YAML::convert<std::shared_ptr<Component>>::encode(emptyComponent);
+	EXPECT_FALSE(node.IsMap());
+
+	// Decode an empty node onto an empty receiver
+	std::shared_ptr<Component> emptyComponentReceiver;
+	EXPECT_NO_THROW(YAML::convert<std::shared_ptr<Component>>::decode(node, emptyComponentReceiver););
+	EXPECT_EQ(nullptr, emptyComponentReceiver);
+
+	// Decode an empty node onto a non-empty receiver.
+	std::shared_ptr<Component> component = std::make_shared<MockComponent>("TestMockComponent");
+	EXPECT_NO_THROW(YAML::convert<std::shared_ptr<Component>>::decode(node, component););
+	EXPECT_NE(nullptr, component);
+	EXPECT_EQ("TestMockComponent", component->getName());
+
+	// A derived class of component having empty components.
+	auto container = std::make_shared<TestComponent3>("TestComponent3");
+	YAML::Node containerNode = YAML::convert<Component>::encode(*container);
+	std::shared_ptr<TestComponent3> newContainer = std::dynamic_pointer_cast<TestComponent3>(
+		containerNode.as<std::shared_ptr<Component>>());
+	EXPECT_EQ(nullptr, newContainer->getComponentOne());
+	EXPECT_EQ(nullptr, newContainer->getComponentTwo());
+	EXPECT_EQ(container->getName(), newContainer->getName());
 }
 
 TEST(ComponentTests, ConvertFactoryTest)

@@ -71,7 +71,7 @@ TYPED_TEST(AllRigidTransformTests, Interpolation)
 	typedef Eigen::Transform<T, 3, Eigen::Isometry> Transform;
 	typedef Eigen::Matrix<T, 3, 1> Vector3;
 
-	for (unsigned int numLoop = 0; numLoop < 100; numLoop++)
+	for (size_t numLoop = 0; numLoop < 100; numLoop++)
 	{
 		Quaternion q0(Eigen::Matrix<T, 4, 1>::Random());
 		Quaternion q1(Eigen::Matrix<T, 4, 1>::Random());

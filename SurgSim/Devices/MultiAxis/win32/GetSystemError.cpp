@@ -47,10 +47,10 @@ std::string getSystemErrorText(int64_t errorCode)
 
 	// Strip terminal whitespace, if any.
 	// Note that this approach only works for fixed-width characters, which is why we use the ASCII API above.
-	const int end = strnlen(errorBuffer, BUFFER_SIZE-1);
+	const size_t end = strnlen(errorBuffer, BUFFER_SIZE-1);
 	if ((end > 0) && isspace(errorBuffer[end-1]))
 	{
-		int lastWhitespace = end - 1;
+		size_t lastWhitespace = end - 1;
 		while ((lastWhitespace > 0) && isspace(errorBuffer[lastWhitespace-1]))
 		{
 			--lastWhitespace;

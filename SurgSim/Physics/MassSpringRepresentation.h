@@ -57,25 +57,25 @@ public:
 
 	/// Gets the number of masses
 	/// \return the number of masses
-	unsigned int getNumMasses() const;
+	size_t getNumMasses() const;
 
 	/// Gets the number of springs
 	/// \return the number of springs
-	unsigned int getNumSprings() const;
+	size_t getNumSprings() const;
 
 	/// Retrieves the mass of a given node
 	/// \param nodeId The node id for which the mass is requested
 	/// \return the mass attribute of a node
 	/// \note The mass is returned with read/write access
 	/// \note Out of range nodeId will raise an exception
-	std::shared_ptr<Mass> getMass(unsigned int nodeId);
+	std::shared_ptr<Mass> getMass(size_t nodeId);
 
 	/// Retrieves a given spring from its id
 	/// \param springId The spring id for which the spring is requested
 	/// \return the spring for the given springId
 	/// \note The spring is returned with read/write access
 	/// \note Out of range springId will raise an exception
-	std::shared_ptr<Spring> getSpring(unsigned int springId);
+	std::shared_ptr<Spring> getSpring(size_t springId);
 
 	/// Gets the total mass of the mass spring
 	/// \return The total mass of the mass spring (in Kg)
@@ -104,19 +104,6 @@ public:
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt) override;
-
-	/// Postprocessing done after the update call
-	/// \param dt The time step (in seconds)
-	virtual void afterUpdate(double dt) override;
-
-	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
-	/// deltaVelocity.
-	///
-	/// This function typically is called in the physics pipeline (PhysicsManager::doUpdate) after solving the equations
-	/// that enforce constraints when collisions occur.  Specifically it is called in the PushResults::doUpdate step.
-	/// \param dt The time step
-	/// \param deltaVelocity The block of a vector containing the correction to be applied to the velocity
-	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with

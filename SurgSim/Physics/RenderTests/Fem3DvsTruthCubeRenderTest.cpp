@@ -319,14 +319,11 @@ public:
 					cubeNodeIds[6] = get1DIndexFrom3D(i  , j+1, k+1);
 					cubeNodeIds[7] = get1DIndexFrom3D(i+1, j+1, k+1);
 
-					std::array<unsigned int, 8> cube = {
-						static_cast<unsigned int>(cubeNodeIds[0]), static_cast<unsigned int>(cubeNodeIds[1]),
-						static_cast<unsigned int>(cubeNodeIds[3]), static_cast<unsigned int>(cubeNodeIds[2]),
-						static_cast<unsigned int>(cubeNodeIds[4]), static_cast<unsigned int>(cubeNodeIds[5]),
-						static_cast<unsigned int>(cubeNodeIds[7]), static_cast<unsigned int>(cubeNodeIds[6])};
+					std::array<size_t, 8> cube = {cubeNodeIds[0], cubeNodeIds[1], cubeNodeIds[3], cubeNodeIds[2],
+												  cubeNodeIds[4], cubeNodeIds[5], cubeNodeIds[7], cubeNodeIds[6]};
 
 					// Add Fem3DElementCube for each cube
-					std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(cube, *state);
+					std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(cube);
 					femElement->setMassDensity(980.0);   // 0.98 g/cm^-3 (2-part silicone rubber a.k.a. RTV6166)
 					femElement->setPoissonRatio(0.499);  // From the paper (near 0.5)
 					femElement->setYoungModulus(15.3e3); // 15.3 kPa (From the paper)
@@ -487,11 +484,11 @@ void copySimulationBeadsIntoPointCloud(std::shared_ptr<TruthCubeRepresentation> 
 	auto pointCloud = representation->getVertices();
 
 	// Add deform to pointCloud
-	for (unsigned int i = 0; i < beads.size(); i++)
+	for (size_t i = 0; i < beads.size(); i++)
 	{
-		for (unsigned int j = 0; j < beads[i].size(); j++)
+		for (size_t j = 0; j < beads[i].size(); j++)
 		{
-			for (unsigned int k = 0; k < beads[i][j].size(); k++)
+			for (size_t k = 0; k < beads[i][j].size(); k++)
 			{
 				pointCloud->addVertex(Vertices<void>::VertexType(beads[i][j][k]));
 			}

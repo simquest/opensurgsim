@@ -44,16 +44,16 @@ namespace
 };
 
 static void addTetraheadron(Fem3DRepresentation *fem,
-							unsigned int node0,
-							unsigned int node1,
-							unsigned int node2,
-							unsigned int node3,
+							size_t node0,
+							size_t node1,
+							size_t node2,
+							size_t node3,
 							const SurgSim::Math::OdeState& state,
 							double massDensity = 1.0,
 							double poissonRatio = 0.1,
 							double youngModulus = 1.0)
 {
-	std::array<unsigned int, 4> nodes = {node0, node1, node2, node3};
+	std::array<size_t, 4> nodes = {node0, node1, node2, node3};
 	auto element = std::make_shared<Fem3DElementTetrahedron>(nodes);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
@@ -244,8 +244,8 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpIndiciesTest)
 	mlcpPhysicsProblem.b.block<1, 1>(0, 0)[0] = 0.6991;
 
 	// Place mass-spring at 5th dof and 1th constraint.
-	unsigned int indexOfRepresentation = 5;
-	unsigned int indexOfConstraint = 1;
+	size_t indexOfRepresentation = 5;
+	size_t indexOfConstraint = 1;
 
 	// Apply constraint to all nodes of an fem.
 	FemRepresentationCoordinate coord(1, Vector4d(0.25, 0.33, 0.28, 0.14));

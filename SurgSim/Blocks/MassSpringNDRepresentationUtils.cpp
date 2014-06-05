@@ -25,7 +25,7 @@ namespace Blocks
 
 std::shared_ptr<SurgSim::Physics::LinearSpring> createLinearSpring(
 	const std::shared_ptr<SurgSim::Math::OdeState> state,
-	unsigned int nodeId0, unsigned int nodeId1,
+	size_t nodeId0, size_t nodeId1,
 	double stiffness, double damping)
 {
 	using SurgSim::Math::Vector3d;

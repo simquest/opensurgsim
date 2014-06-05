@@ -93,7 +93,7 @@ const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getFina
 	return m_finalState;
 }
 
-unsigned int DeformableRepresentation::getNumDofPerNode() const
+size_t DeformableRepresentation::getNumDofPerNode() const
 {
 	return m_numDofPerNode;
 }
@@ -135,6 +135,16 @@ void DeformableRepresentation::update(double dt)
 	m_currentState.swap(m_previousState);
 	// Make the new state, the current state (by swapping)
 	m_currentState.swap(m_newState);
+
+	if (!m_currentState->isValid())
+	{
+		SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
+			<< getName() << " deactivated :" << std::endl
+			<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
+			<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
+
+		setIsActive(false);
+	}
 }
 
 void DeformableRepresentation::afterUpdate(double dt)
@@ -155,6 +165,28 @@ void DeformableRepresentation::afterUpdate(double dt)
 
 	// Back up the current state into the final state
 	*m_finalState = *m_currentState;
+}
+
+void DeformableRepresentation::applyCorrection(double dt,
+											   const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
+{
+	if (!isActive())
+	{
+		return;
+	}
+
+	m_currentState->getPositions() += deltaVelocity * dt;
+	m_currentState->getVelocities() += deltaVelocity;
+
+	if (!m_currentState->isValid())
+	{
+		SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
+			<< getName() << " deactivated :" << std::endl
+			<< "position=(" << m_currentState->getPositions() << ")" << std::endl
+			<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
+
+		setIsActive(false);
+	}
 }
 
 void DeformableRepresentation::deactivateAndReset(void)
