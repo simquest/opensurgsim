@@ -80,7 +80,7 @@ using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
-#include <fstream>
+
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
@@ -90,8 +90,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);
 
 	// Set the file name which contains the tetrahedral mesh. File will be loaded by 'doInitialize()' call.
-	std::shared_ptr<Fem3DRepresentation> physicsRepresentation
-		= std::make_shared<Fem3DRepresentation>(name + " physics");
+	std::shared_ptr<Fem3DRepresentation> physicsRepresentation = std::make_shared<Fem3DRepresentation>("Physics");
 	physicsRepresentation->setFilename(filename);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	sceneElement->addComponent(physicsRepresentation);
@@ -102,8 +101,8 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> graphicalFem =
-		std::make_shared<OsgMeshRepresentation>(name + " triangle mesh");
-	graphicalFem->setFilename(meshShape->getFileName());
+		std::make_shared<OsgMeshRepresentation>("Triangle mesh");
+	graphicalFem->setFilename(filename);
 	sceneElement->addComponent(graphicalFem);
 
 	// Create the collision mesh for the surface of the finite element model
@@ -120,8 +119,8 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// WireFrame of the finite element model
 	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> wireFrameFem
-		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " wire frame");
-	wireFrameFem->setFilename(meshShape->getFileName());
+		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Wire frame");
+	wireFrameFem->setFilename(filename);
 	wireFrameFem->setDrawAsWireFrame(true);
 	sceneElement->addComponent(wireFrameFem);
 
@@ -131,11 +130,6 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	physicsToWireFrameFem->setTarget(wireFrameFem);
 	sceneElement->addComponent(physicsToWireFrameFem);
 
-	YAML::Node node;
-	node = *sceneElement;
-	std::ofstream ou("FemWound.yaml");
-	ou << node;
-	ou.close();
 	return sceneElement;
 }
 
@@ -161,7 +155,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	// Visualization of stapler collision mesh
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
 		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
-	meshShapeVisualization->setFilename(meshShapeForCollision->getFileName());
+	meshShapeVisualization->setFilename(filename);
 	meshShapeVisualization->setDrawAsWireFrame(true);
 
 	RigidRepresentationParameters params;
@@ -263,7 +257,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 
 	// Visualization of arm collision mesh
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization = std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
-	meshShapeVisualization->setFilename(meshShape->getFileName());
+	meshShapeVisualization->setFilename(filename);
 	meshShapeVisualization->setDrawAsWireFrame(true);
 
 	RigidRepresentationParameters params;
@@ -282,11 +276,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 	armSceneElement->addComponent(upperarmSceneryRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
 	armSceneElement->addComponent(physicsRepresentation);
-	YAML::Node node;
-	node = *armSceneElement;
-	std::ofstream ou("ArmSceneElement.yaml");
-	ou << node;
-	ou.close();
+
 	return armSceneElement;
 }
 
@@ -367,9 +357,9 @@ int main(int argc, char* argv[])
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, arm->getComponent("upperarm"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, arm->getComponent("ArmOsgMesh"));
 	keyboardBehavior->registerKey(
-		SurgSim::Device::KeyCode::KEY_E, wound->getComponent("wound triangle mesh"));
+		SurgSim::Device::KeyCode::KEY_E, wound->getComponent("Triangle mesh"));
 	keyboardBehavior->registerKey(
-		SurgSim::Device::KeyCode::KEY_F, wound->getComponent("wound wire frame"));
+		SurgSim::Device::KeyCode::KEY_F, wound->getComponent("Wire frame"));
 
 	std::shared_ptr<SceneElement> keyboard = std::make_shared<BasicSceneElement>("SceneElement");
 	keyboard->addComponent(keyboardComponent);
