@@ -91,6 +91,24 @@ int main(int argc, char* argv[])
 	runtime->getScene()->decode(node);
 	runtime->getScene()->addSceneElement(view);
 
+	std::shared_ptr<SceneElement> arm;
+	std::shared_ptr<SceneElement> wound;
+	auto sceneElements = runtime->getScene()->getSceneElements();
+	for (auto it = std::begin(sceneElements); it != std::end(sceneElements); ++it)
+	{
+		if ((*it)->getName() == "armSceneElement")
+		{
+			arm = (*it);
+		}
+		if ((*it)->getName() == "wound")
+		{
+			wound = (*it);
+		}
+	}
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(wound, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(arm, "Collision"));
+
 	runtime->execute();
 
 	return 0;
