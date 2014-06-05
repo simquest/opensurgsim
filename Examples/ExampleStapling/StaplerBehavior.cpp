@@ -75,8 +75,7 @@ void StaplerBehavior::enableStaplingForSceneElement(std::string sceneElementName
 	m_stapleEnabledSceneElements.push_back(sceneElementName);
 }
 
-void StaplerBehavior::filterCollisionMapForStapleEnabledRepresentations(
-	SurgSim::Collision::ContactMapType* collisionsMap)
+void StaplerBehavior::filterCollisionMapForStapleEnabledRepresentations(ContactMapType* collisionsMap)
 {
 	for (auto it = collisionsMap->begin(); it != collisionsMap->end();)
 	{
@@ -122,8 +121,7 @@ std::shared_ptr<SurgSim::Physics::Representation> StaplerBehavior::findCorrespon
 	return physicsRepresentation;
 }
 
-void StaplerBehavior::filterCollisionMapForSupportedRepresentationTypes(
-	SurgSim::Collision::ContactMapType* collisionsMap)
+void StaplerBehavior::filterCollisionMapForSupportedRepresentationTypes(ContactMapType* collisionsMap)
 {
 	for (auto it = collisionsMap->begin(); it != collisionsMap->end();)
 	{
@@ -234,10 +232,9 @@ void StaplerBehavior::createStaple()
 
 		// Find the row (representation, list of contacts) in the map that the virtualTooth has most
 		// collision pairs with.
-		SurgSim::Collision::ContactMapType::value_type targetRepresentationContacts
+		ContactMapType::value_type targetRepresentationContacts
 			= *std::max_element(collisionsMap.begin(), collisionsMap.end(),
-								[](const SurgSim::Collision::ContactMapType::value_type& lhs,
-								   const SurgSim::Collision::ContactMapType::value_type& rhs)
+								[](const ContactMapType::value_type& lhs, const ContactMapType::value_type& rhs)
 								{ return lhs.second.size() < rhs.second.size(); });
 
 		// Iterate through the list of collision pairs to find a contact with the deepest penetration.
