@@ -90,7 +90,7 @@ private:
 	std::shared_ptr<SurgSim::Graphics::VectorFieldRepresentation> m_vectorField;
 };
 
-} // namesapce Blocks
+} // namespace Blocks
 } // namespace SurgSim
 
 #endif  // SURGSIM_BLOCKS_VISUALIZECONTACTSBEHAVIOR_H
