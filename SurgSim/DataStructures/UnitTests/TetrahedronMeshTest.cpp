@@ -45,22 +45,22 @@ public:
 		// Set to true to print the test tetrahedrons.
 		bool printTetrahedrons = false;
 		// Set the number of test vertices
-		unsigned int numVertices = 10;
+		size_t numVertices = 10;
 		// Set the number of test tetrahedrons
-		unsigned int numTetrahedrons = 15;
+		size_t numTetrahedrons = 15;
 
 		std::default_random_engine generator;
 		std::uniform_real_distribution<double> positionDistribution(-10.0, 10.0);
 		std::uniform_real_distribution<double> normalDistribution(-1.0, 1.0);
-		std::uniform_int_distribution<unsigned int> vertexIdDistribution(0, numVertices-1);
+		std::uniform_int_distribution<size_t> vertexIdDistribution(0, numVertices-1);
 
 		if (printPositions)
 		{
-			printf("Test Vertex Positions:\n");
+			std::cout << "Test Vertex Positions:\n";
 		}
 
 		/// Generate random positions for each vertex
-		for (unsigned int i = 0; i < numVertices; ++i)
+		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d position(positionDistribution(generator), positionDistribution(generator),
 				positionDistribution(generator));
@@ -68,17 +68,18 @@ public:
 
 			if (printPositions)
 			{
-				printf("\t%d: (%g, %g, %g)\n", i, position.x(), position.y(), position.z());
+				std::cout << "\t" << i << ": (" << position.x() << ", " << position.y() << ", " << position.z()
+						  << ")\n";
 			}
 		}
 
 		if (printNormals)
 		{
-			printf("Test Vertex Normals:\n");
+			std::cout << "Test Vertex Normals:\n";
 		}
 
 		/// Generate random normals for each vertex
-		for (unsigned int i = 0; i < numVertices; ++i)
+		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d normal(normalDistribution(generator), normalDistribution(generator),
 				normalDistribution(generator));
@@ -87,28 +88,28 @@ public:
 
 			if (printNormals)
 			{
-				printf("\t%d: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
+				std::cout << "\t" << i << ": (" << normal.x() << ", " << normal.y() << ", " << normal.z() << ")\n";
 			}
 		}
 
 		if (printTetrahedrons)
 		{
-			printf("Test Tetrahedrons:\n");
+			std::cout << "Test Tetrahedrons:\n";
 		}
 
 		/// Generate random vertex IDs within [0, numVertices) in quadruplets for mesh tetrahedrons
-		for (unsigned int i = 0; i < numTetrahedrons; ++i)
+		for (size_t i = 0; i < numTetrahedrons; ++i)
 		{
-			std::array<unsigned int, 4> tetrahedronVertices = {{ vertexIdDistribution(generator),
+			std::array<size_t, 4> tetrahedronVertices = {{ vertexIdDistribution(generator),
 				vertexIdDistribution(generator), vertexIdDistribution(generator), vertexIdDistribution(generator) }};
 			testTetrahedronsVerticesId.push_back(tetrahedronVertices);
 
 			/// Create 6 vertex ID pairs for each tetrahedron edge (not worrying about duplicates for these tests)
-			std::array<unsigned int, 6> tetrahedronEdges;
+			std::array<size_t, 6> tetrahedronEdges;
 			int edgeIDs[6][2] = { {0, 1}, {0, 2}, {0, 3}, {1, 2}, {1, 3}, {2, 3} };
 			for (int j = 0; j < 6; ++j)
 			{
-				std::array<unsigned int, 2> edgeVertices =
+				std::array<size_t, 2> edgeVertices =
 				{
 					{
 						tetrahedronVertices[edgeIDs[j][0]],
@@ -124,10 +125,10 @@ public:
 			/// Create 4 vertex ID pairs for each tetrahedron triangle (not worrying about duplicates for these tests)
 			int vertexIDs[4][3] = { {0, 1, 2}, {0, 1, 3}, {0, 2, 3}, {1, 2, 3} };
 			int tetTriangleEdgeIds[4][3] = { {0, 1, 3}, {0, 2, 4}, {1, 2, 5}, {3, 4, 5} };
-			std::array<unsigned int, 4> tetrahedronTriangles;
+			std::array<size_t, 4> tetrahedronTriangles;
 			for (int j = 0; j < 4; ++j)
 			{
-				std::array<unsigned int, 3> triangleVertices =
+				std::array<size_t, 3> triangleVertices =
 				{
 					{
 						tetrahedronVertices[vertexIDs[j][0]],
@@ -139,7 +140,7 @@ public:
 
 				tetrahedronTriangles[j] = testTrianglesVerticesId.size() - 1;
 
-				std::array<unsigned int, 3> triangleEdges;
+				std::array<size_t, 3> triangleEdges;
 				for (int k = 0; k < 3; k++)
 				{
 					triangleEdges[k] = tetrahedronEdges[tetTriangleEdgeIds[j][k]];
@@ -150,38 +151,35 @@ public:
 
 			if (printTetrahedrons)
 			{
-				printf("\t%d: Vertices (%d, %d, %d, %d), Edges (%d, %d, %d, %d, %d, %d), Triangles (%d %d %d %d)\n",
-					i,
-					tetrahedronVertices[0], tetrahedronVertices[1], tetrahedronVertices[2], tetrahedronVertices[3],
-					tetrahedronEdges[0], tetrahedronEdges[1], tetrahedronEdges[2],
-					tetrahedronEdges[3], tetrahedronEdges[4], tetrahedronEdges[5],
-					tetrahedronTriangles[0], tetrahedronTriangles[1],
-					tetrahedronTriangles[2], tetrahedronTriangles[3]);
+				std::cout << "\t" << i
+						  << ": Vertices (" << formatIterator(tetrahedronVertices, ", ")
+						  << "), Edges (" << formatIterator(tetrahedronEdges, ", ")
+						  << "), Triangles (" << formatIterator(tetrahedronTriangles, ", ") << ")\n";
 			}
 		}
 
 		if (printTriangles)
 		{
-			printf("Test Triangles:\n");
+			std::cout << "Test Triangles:\n";
 
-			for (unsigned int i = 0; i < testTrianglesVerticesId.size(); ++i)
+			for (size_t i = 0; i < testTrianglesVerticesId.size(); ++i)
 			{
-				const std::array<unsigned int, 3>& triangleVertices = testTrianglesVerticesId[i];
-				const std::array<unsigned int, 3>& triangleEdges = testTrianglesEdgesId[i];
-				printf("\t%d: Vertices (%d, %d, %d) - Edges (%d %d %d)\n", i,
-					triangleVertices[0], triangleVertices[1], triangleVertices[2],
-					triangleEdges[0], triangleEdges[1], triangleEdges[2]);
+				const std::array<size_t, 3>& triangleVertices = testTrianglesVerticesId[i];
+				const std::array<size_t, 3>& triangleEdges = testTrianglesEdgesId[i];
+
+				std::cout << "\t" << i << ": Vertices (" << formatIterator(triangleVertices, ", ")
+						  << ") - Edges (" << formatIterator(triangleEdges, ", ") << ")\n";
 			}
 		}
 
 		if (printEdges)
 		{
-			printf("Test Edges:\n");
+			std::cout << "Test Edges:\n";
 
-			for (unsigned int i = 0; i < testEdgesVerticesId.size(); ++i)
+			for (size_t i = 0; i < testEdgesVerticesId.size(); ++i)
 			{
-				const std::array<unsigned int, 2>& edgeVertices = testEdgesVerticesId[i];
-				printf("\t%d: (%d, %d)\n", i, edgeVertices[0], edgeVertices[1]);
+				const std::array<size_t, 2>& edgeVertices = testEdgesVerticesId[i];
+				std::cout << "\t" << i << ": (" << formatIterator(edgeVertices, ", ") << ")\n";
 			}
 		}
 	}
@@ -197,19 +195,19 @@ public:
 	std::vector<Vector3d> testNormals;
 
 	/// Vertices Id for all edges
-	std::vector<std::array<unsigned int, 2>> testEdgesVerticesId;
+	std::vector<std::array<size_t, 2>> testEdgesVerticesId;
 
 	/// Vertices Id for all triangles
-	std::vector<std::array<unsigned int, 3>> testTrianglesVerticesId;
+	std::vector<std::array<size_t, 3>> testTrianglesVerticesId;
 	/// Edges Id for all triangles
-	std::vector<std::array<unsigned int, 3>> testTrianglesEdgesId;
+	std::vector<std::array<size_t, 3>> testTrianglesEdgesId;
 
 	/// Vertices Id for all tetrahedrons
-	std::vector<std::array<unsigned int, 4>> testTetrahedronsVerticesId;
+	std::vector<std::array<size_t, 4>> testTetrahedronsVerticesId;
 	/// Edges Id for all tetrahedrons
-	std::vector<std::array<unsigned int, 6>> testTetrahedronsEdgesId;
+	std::vector<std::array<size_t, 6>> testTetrahedronsEdgesId;
 	/// Triangles Id for all tetrahedrons
-	std::vector<std::array<unsigned int, 4>> testTetrahedronsTrianglesId;
+	std::vector<std::array<size_t, 4>> testTetrahedronsTrianglesId;
 };
 
 
@@ -279,7 +277,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 	EXPECT_EQ(0, mesh.getNumUpdates());
 
 	/// Create the test vertices
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
@@ -288,7 +286,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i + 1, vertices.size());
 
 		/// Make sure each vertex is set properly
-		for (unsigned int j = 0; j < mesh.getNumVertices(); ++j)
+		for (size_t j = 0; j < mesh.getNumVertices(); ++j)
 		{
 			EXPECT_EQ(testPositions[j], vertices[j].position);
 
@@ -299,7 +297,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 	}
 
 	/// Create the test edges
-	for (unsigned int i = 0; i < testEdgesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testEdgesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createEdge(testEdgesVerticesId[i]));
 		EXPECT_EQ(i + 1, mesh.getNumEdges());
@@ -308,7 +306,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i + 1, edges.size());
 
 		/// Make sure each vertex is set properly
-		for (unsigned int j = 0; j < mesh.getNumEdges(); ++j)
+		for (size_t j = 0; j < mesh.getNumEdges(); ++j)
 		{
 			EXPECT_EQ(testEdgesVerticesId[j], edges[j].verticesId);
 
@@ -318,7 +316,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 	}
 
 	/// Create the test triangles
-	for (unsigned int i = 0; i < testTrianglesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTrianglesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
@@ -327,7 +325,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i + 1, triangles.size());
 
 		/// Make sure each vertex is set properly
-		for (unsigned int j = 0; j < mesh.getNumTriangles(); ++j)
+		for (size_t j = 0; j < mesh.getNumTriangles(); ++j)
 		{
 			EXPECT_EQ(testTrianglesVerticesId[j], triangles[j].verticesId);
 
@@ -338,7 +336,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 	}
 
 	/// Create the test tetrahedrons
-	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
 		 EXPECT_EQ(i, mesh.createTetrahedron(testTetrahedronsVerticesId[i], \
 			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
@@ -348,7 +346,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i + 1, tetrahedrons.size());
 
 		/// Make sure each tetrahedron is set properly
-		for (unsigned int j = 0; j < mesh.getNumTetrahedrons(); ++j)
+		for (size_t j = 0; j < mesh.getNumTetrahedrons(); ++j)
 		{
 			EXPECT_EQ(testTetrahedronsVerticesId[j], tetrahedrons[j].verticesId);
 
@@ -367,7 +365,7 @@ TEST_F(TetrahedronMeshTest, isValidTest)
 	EXPECT_TRUE(mesh.isValid());
 
 	/// Create the edges (no vertices yet => the mesh is NOT valid)
-	for (unsigned int i = 0; i < testEdgesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testEdgesVerticesId.size(); ++i)
 	{
 		mesh.createEdge(testEdgesVerticesId[i]);
 	}
@@ -375,7 +373,7 @@ TEST_F(TetrahedronMeshTest, isValidTest)
 	EXPECT_FALSE(mesh.isValid());
 
 	/// Create the triangles (no vertices yet => the mesh is NOT valid)
-	for (unsigned int i = 0; i < testTrianglesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTrianglesVerticesId.size(); ++i)
 	{
 		mesh.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]);
 	}
@@ -383,7 +381,7 @@ TEST_F(TetrahedronMeshTest, isValidTest)
 	EXPECT_FALSE(mesh.isValid());
 
 	/// Create the tetrahedrons (no vertices yet => the mesh is NOT valid)
-	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
 		mesh.createTetrahedron(testTetrahedronsVerticesId[i], testTetrahedronsEdgesId[i], \
 			testTetrahedronsTrianglesId[i]);
@@ -392,7 +390,7 @@ TEST_F(TetrahedronMeshTest, isValidTest)
 	EXPECT_FALSE(mesh.isValid());
 
 	/// Create the vertices
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		mesh.createVertex(testPositions[i], testNormals[i]);
 	}
@@ -405,7 +403,7 @@ TEST_F(TetrahedronMeshTest, SetVertexPositionsTest)
 	MockTetrahedronMesh mesh;
 
 	/// Create vertices with test normals, but all positions at (0,0,0)
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(Vector3d(0.0, 0.0, 0.0), testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
@@ -420,7 +418,7 @@ TEST_F(TetrahedronMeshTest, SetVertexPositionsTest)
 	EXPECT_EQ(testPositions.size(), vertices.size());
 
 	/// Make sure each vertex is set properly
-	for (unsigned int i = 0; i < mesh.getNumVertices(); ++i)
+	for (size_t i = 0; i < mesh.getNumVertices(); ++i)
 	{
 		EXPECT_EQ(testPositions[i], vertices[i].position);
 
@@ -444,7 +442,7 @@ TEST_F(TetrahedronMeshTest, SetVertexPositionsTest)
 	mesh.setVertexPosition(5, Vector3d(0.0, 0.0, 0.0));
 
 	/// Make sure each vertex is set properly
-	for (unsigned int i = 0; i < mesh.getNumVertices(); ++i)
+	for (size_t i = 0; i < mesh.getNumVertices(); ++i)
 	{
 		if (i == 5)
 		{
@@ -483,22 +481,22 @@ TEST_F(TetrahedronMeshTest, ClearTest)
 	EXPECT_EQ(0u, mesh.getTetrahedrons().size());
 
 	/// Create mesh using test data
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0)));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
 	}
-	for (unsigned int i = 0; i < testEdgesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testEdgesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createEdge(testEdgesVerticesId[i]));
 		EXPECT_EQ(i + 1, mesh.getNumEdges());
 	}
-	for (unsigned int i = 0; i < testTrianglesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTrianglesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
 	}
-	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createTetrahedron(testTetrahedronsVerticesId[i], \
 			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
@@ -550,19 +548,19 @@ TEST_F(TetrahedronMeshTest, ComparisonTest)
 {
 	/// Create mesh using test data
 	MockTetrahedronMesh mesh;
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 	}
-	for (unsigned int i = 0; i < testEdgesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testEdgesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createEdge(testEdgesVerticesId[i]));
 	}
-	for (unsigned int i = 0; i < testTrianglesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTrianglesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]));
 	}
-	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createTetrahedron(testTetrahedronsVerticesId[i], \
 			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
@@ -571,19 +569,19 @@ TEST_F(TetrahedronMeshTest, ComparisonTest)
 	/// Create same mesh again
 	MockTetrahedronMesh sameMesh;
 
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, sameMesh.createVertex(testPositions[i], testNormals[i]));
 	}
-	for (unsigned int i = 0; i < testEdgesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testEdgesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, sameMesh.createEdge(testEdgesVerticesId[i]));
 	}
-	for (unsigned int i = 0; i < testTrianglesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTrianglesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, sameMesh.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]));
 	}
-	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, sameMesh.createTetrahedron(testTetrahedronsVerticesId[i], \
 			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
@@ -591,19 +589,19 @@ TEST_F(TetrahedronMeshTest, ComparisonTest)
 
 	/// Create mesh with test data, but each vertex has position and normal of (0,0,0) to make them different
 	MockTetrahedronMesh meshWithDifferentVertices;
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentVertices.createVertex(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0)));
 	}
-	for (unsigned int i = 0; i < testEdgesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testEdgesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentVertices.createEdge(testEdgesVerticesId[i]));
 	}
-	for (unsigned int i = 0; i < testTrianglesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTrianglesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentVertices.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]));
 	}
-	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentVertices.createTetrahedron(testTetrahedronsVerticesId[i], \
 			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
@@ -611,20 +609,20 @@ TEST_F(TetrahedronMeshTest, ComparisonTest)
 
 	/// Create mesh with test data, but reverse each edge's vertex order to make them different
 	MockTetrahedronMesh meshWithDifferentEdges;
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentEdges.createVertex(testPositions[i], testNormals[i]));
 	}
-	for (unsigned int i = 0; i < testEdgesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testEdgesVerticesId.size(); ++i)
 	{
-		std::array<unsigned int, 2> edge = {{ testEdgesVerticesId[i][1], testEdgesVerticesId[i][0] }};
+		std::array<size_t, 2> edge = {{ testEdgesVerticesId[i][1], testEdgesVerticesId[i][0] }};
 		EXPECT_EQ(i, meshWithDifferentEdges.createEdge(edge));
 	}
-	for (unsigned int i = 0; i < testTrianglesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTrianglesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentEdges.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]));
 	}
-	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentEdges.createTetrahedron(testTetrahedronsVerticesId[i], \
 			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
@@ -632,19 +630,19 @@ TEST_F(TetrahedronMeshTest, ComparisonTest)
 
 	/// Create mesh with test data, but only create half of the triangles to make the list different.
 	MockTetrahedronMesh meshWithDifferentTriangles;
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentTriangles.createVertex(testPositions[i], testNormals[i]));
 	}
-	for (unsigned int i = 0; i < testEdgesVerticesId.size(); ++i)
+	for (size_t i = 0; i < testEdgesVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentTriangles.createEdge(testEdgesVerticesId[i]));
 	}
-	for (unsigned int i = 0; i < testTrianglesVerticesId.size() / 2; ++i)
+	for (size_t i = 0; i < testTrianglesVerticesId.size() / 2; ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentTriangles.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]));
 	}
-	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
+	for (size_t i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentTriangles.createTetrahedron(testTetrahedronsVerticesId[i], \
 			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));

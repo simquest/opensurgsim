@@ -39,7 +39,7 @@ namespace Blocks
 
 void springTest(std::shared_ptr<SurgSim::Physics::LinearSpring> spring,
 	std::shared_ptr<SurgSim::Math::OdeState> state,
-	unsigned int expectedNodeId0, unsigned int expectedNodeId1,
+	size_t expectedNodeId0, size_t expectedNodeId1,
 	double expectedStiffness, double expectedDamping);
 
 }; // namespace Blocks

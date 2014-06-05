@@ -80,7 +80,7 @@ public:
 	/// on the vertices and other parameters.
 	/// \param	edge	Edge to add to the mesh
 	/// \return	Unique ID of the new edge.
-	unsigned int addEdge(const EdgeType& edge);
+	size_t addEdge(const EdgeType& edge);
 
 	/// Adds a triangle to the mesh.
 	/// \param	triangle	Triangle to add to the mesh
@@ -88,7 +88,7 @@ public:
 	/// createTriangle(vertices, other data...) method which performs any checking desired and sets up the triangle data
 	/// based on the vertices and other parameters.
 	/// \return	Unique ID of the new triangle.
-	unsigned int addTriangle(const TriangleType& triangle);
+	size_t addTriangle(const TriangleType& triangle);
 
 	/// Adds a tetrahedron to the mesh.
 	/// \param	tetrahedron	Tetrahedron to add to the mesh
@@ -96,19 +96,19 @@ public:
 	/// createTetrahedron(vertices, other data...) method which performs any checking desired and sets up the
 	/// tetrahedron data based on the vertices and other parameters.
 	/// \return	Unique ID of the new tetrahedron.
-	unsigned int addTetrahedron(const TetrahedronType& tetrahedron);
+	size_t addTetrahedron(const TetrahedronType& tetrahedron);
 
 	/// Returns the number of edges in this mesh.
 	/// \return The number of edges
-	unsigned int getNumEdges() const;
+	size_t getNumEdges() const;
 
 	/// Returns the number of triangles in this mesh.
 	/// \return The number of triangles
-	unsigned int getNumTriangles() const;
+	size_t getNumTriangles() const;
 
 	/// Returns the number of tetrahedrons in this mesh.
 	/// \return The number of tetrahedrons
-	unsigned int getNumTetrahedrons() const;
+	size_t getNumTetrahedrons() const;
 
 	/// Returns a vector containing the position of each edge.
 	/// \return The vector containing all edges
@@ -135,34 +135,34 @@ public:
 	/// \param id The edge's id
 	/// \return The edge id
 	/// \note No check is performed on the id
-	const EdgeType& getEdge(unsigned int id) const;
+	const EdgeType& getEdge(size_t id) const;
 	/// Returns the specified edge (non const version).
 	/// \param id The edge's id
 	/// \return The edge id
 	/// \note No check is performed on the id
-	EdgeType& getEdge(unsigned int id);
+	EdgeType& getEdge(size_t id);
 
 	/// Returns the specified triangle.
 	/// \param id The triangle's id
 	/// \return The triangle id
 	/// \note No check is performed on the id
-	const TriangleType& getTriangle(unsigned int id) const;
+	const TriangleType& getTriangle(size_t id) const;
 	/// Returns the specified triangle (non const version).
 	/// \param id The triangle's id
 	/// \return The triangle id
 	/// \note No check is performed on the id
-	TriangleType& getTriangle(unsigned int id);
+	TriangleType& getTriangle(size_t id);
 
 	/// Returns the specified tetrahedron.
 	/// \param id The tetrahedron's id
 	/// \return The tetrahedron id
 	/// \note No check is performed on the id
-	const TetrahedronType& getTetrahedron(unsigned int id) const;
+	const TetrahedronType& getTetrahedron(size_t id) const;
 	/// Returns the specified tetrahedron (non const version).
 	/// \param id The tetrahedron's id
 	/// \return The tetrahedron id
 	/// \note No check is performed on the id
-	TetrahedronType& getTetrahedron(unsigned int id);
+	TetrahedronType& getTetrahedron(size_t id);
 
 	/// Test if the TetrahedronMesh is valid (valid vertex Ids used in all MeshElements)
 	/// \return True if the TetrahedronMesh is valid, False otherwise (the topology is then broken)

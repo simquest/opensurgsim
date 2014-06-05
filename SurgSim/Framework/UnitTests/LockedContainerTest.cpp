@@ -582,7 +582,7 @@ void testReaderAndWriters(int numWriters)
 	for (size_t i = 0;  i < writers.size();  ++i)
 	{
 		// The step has been chosen so two writers can't ever produce the same value
-		writers[i] = new DataWriter(data, i, numWriters, NUM_TOTAL_WRITES/numWriters);
+		writers[i] = new DataWriter(data, static_cast<int>(i), numWriters, NUM_TOTAL_WRITES/numWriters);
 	}
 	{
 		BigData value;

@@ -48,7 +48,7 @@ public:
 	/// \note   the last 4 nodeIds (EFGH) should define the opposite face CCW  i.e. (EF^EG or EF^EH or EG^EH).n > 0
 	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
 	/// \note simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
-	explicit Fem3DElementCube(std::array<unsigned int, 8> nodeIds);
+	explicit Fem3DElementCube(std::array<size_t, 8> nodeIds);
 
 	/// Initializes the element once everything has been set
 	/// \param state The state to initialize the FemElement with

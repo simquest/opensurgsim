@@ -20,51 +20,51 @@
 #include <memory>
 #include <string>
 #include <gtest/gtest.h>
-#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/OutputComponent.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "yaml-cpp/yaml.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 
-using SurgSim::Input::InputComponent;
+using SurgSim::Input::OutputComponent;
 using SurgSim::DataStructures::DataGroup;
 
-TEST(InputComponentTest, CanConstruct)
+TEST(OutputComponentTest, CanConstruct)
 {
-	EXPECT_NO_THROW(InputComponent input("Input"); input.setDeviceName("InputDevice"));
+	EXPECT_NO_THROW(OutputComponent output("Output"); output.setDeviceName("OutputDevice"));
 }
 
-TEST(InputComponentTest, Accessors)
+TEST(OutputComponentTest, Accessors)
 {
-	InputComponent input("Input");
-	input.setDeviceName("InputDevice");
-	EXPECT_EQ("Input", input.getName());
-	EXPECT_EQ("InputDevice", input.getDeviceName());
+	OutputComponent output("Output");
+	output.setDeviceName("OutputDevice");
+	EXPECT_EQ("Output", output.getName());
+	EXPECT_EQ("OutputDevice", output.getDeviceName());
 }
 
-TEST(InputComponentTest, NotConnected)
+TEST(OutputComponentTest, NotConnected)
 {
-	InputComponent input("Input");
-	input.setDeviceName("InputDevice");
+	OutputComponent output("Output");
+	output.setDeviceName("OutputDevice");
 	DataGroup dataGroup;
-	EXPECT_THROW(input.getData(&dataGroup), SurgSim::Framework::AssertionFailure);
-	EXPECT_FALSE(input.isDeviceConnected());
+	EXPECT_THROW(output.setData(dataGroup), SurgSim::Framework::AssertionFailure);
+	EXPECT_FALSE(output.isDeviceConnected());
 }
 
-TEST(InputComponentTest, Serialization)
+TEST(OutputComponentTest, Serialization)
 {
-	auto input = std::make_shared<InputComponent>("Input");
-	input->setDeviceName("InputDevice");
+	auto output = std::make_shared<OutputComponent>("Output");
+	output->setDeviceName("OutputDevice");
 
 	// Encode
 	YAML::Node node;
-	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*input););
+	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*output););
 
 	// Decode
-	std::shared_ptr<InputComponent> newInput;
-	EXPECT_NO_THROW(newInput = std::dynamic_pointer_cast<InputComponent>(
+	std::shared_ptr<OutputComponent> newOutput;
+	EXPECT_NO_THROW(newOutput = std::dynamic_pointer_cast<OutputComponent>(
 									node.as<std::shared_ptr<SurgSim::Framework::Component>>()););
 
 	// Verify
-	EXPECT_EQ(input->getDeviceName(), newInput->getDeviceName());
+	EXPECT_EQ(output->getDeviceName(), newOutput->getDeviceName());
 }
 

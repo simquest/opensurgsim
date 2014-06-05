@@ -151,12 +151,12 @@ TYPED_TEST(ScalarTest, Accessible)
 	Scalar newValue = static_cast<Scalar>(2);
 
 	std::pair<Scalar, Scalar> result = testProperty(initialValue, newValue);
-	EXPECT_NEAR(newValue, result.first, 1e-6);
-	EXPECT_NEAR(newValue, result.second, 1e-6);
+	EXPECT_NEAR(static_cast<double>(newValue), static_cast<double>(result.first), 1e-6);
+	EXPECT_NEAR(static_cast<double>(newValue), static_cast<double>(result.second), 1e-6);
 
 	result = testEncodeDecode(initialValue, newValue);
-	EXPECT_NEAR(newValue, result.first, 1e-6);
-	EXPECT_NEAR(newValue, result.second, 1e-6);
+	EXPECT_NEAR(static_cast<double>(newValue), static_cast<double>(result.first), 1e-6);
+	EXPECT_NEAR(static_cast<double>(newValue), static_cast<double>(result.second), 1e-6);
 }
 
 

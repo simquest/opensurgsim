@@ -42,8 +42,8 @@ void MassSpringRepresentationContact::doBuild(double dt,
 			const ConstraintData& data,
 			const std::shared_ptr<Localization>& localization,
 			MlcpPhysicsProblem* mlcp,
-			unsigned int indexOfRepresentation,
-			unsigned int indexOfConstraint,
+			size_t indexOfRepresentation,
+			size_t indexOfConstraint,
 			ConstraintSideSign sign)
 {
 	using SurgSim::Math::Vector3d;
@@ -55,7 +55,7 @@ void MassSpringRepresentationContact::doBuild(double dt,
 		return;
 	}
 
-	unsigned int nodeId = std::static_pointer_cast<MassSpringRepresentationLocalization>(localization)->getLocalNode();
+	size_t nodeId = std::static_pointer_cast<MassSpringRepresentationLocalization>(localization)->getLocalNode();
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
 
 	auto& contactData = static_cast<const ContactConstraintData&>(data);
@@ -99,7 +99,7 @@ SurgSim::Physics::RepresentationType MassSpringRepresentationContact::getReprese
 	return REPRESENTATION_TYPE_MASSSPRING;
 }
 
-unsigned int MassSpringRepresentationContact::doGetNumDof() const
+size_t MassSpringRepresentationContact::doGetNumDof() const
 {
 	return 1;
 }

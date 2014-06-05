@@ -48,24 +48,24 @@ public:
 	/// Add a boundary condition
 	/// \param nodeId The nodeId of the Fem to be fixed
 	/// \return True if the boundary condition has been added, False otherwise
-	bool addBoundaryCondition(unsigned int nodeId);
+	bool addBoundaryCondition(size_t nodeId);
 
 	/// Remove a boundary condition
 	/// \param nodeId The nodeId of the Fem to be removed from the boundary conditions list
 	/// \return True if the boundary condition has been removed, False otherwise
-	bool removeBoundaryCondition(unsigned int nodeId);
+	bool removeBoundaryCondition(size_t nodeId);
 
 	/// Add boundary conditions
 	/// \param boundaryConditions The vector of all boundary conditions to be added (nodeIdx)
 	/// \return The number of boundary conditions actually added
-	unsigned int addBoundaryConditions(const std::vector<unsigned int>& boundaryConditions);
+	size_t addBoundaryConditions(const std::vector<size_t>& boundaryConditions);
 
 	/// Remove all boundary conditions
 	void clearBoundaryConditions();
 
 	/// Get all boundary conditions
 	/// \return The vector of all boundary conditions (nodeIds)
-	const std::vector<unsigned int>& getBoundaryConditions() const;
+	const std::vector<size_t>& getBoundaryConditions() const;
 
 	/// Set the boundary condition mass property
 	/// \param mass The mass to be assigned to boundary condition nodes
@@ -134,7 +134,7 @@ private:
 	void checkValidity();
 
 	/// Boundary conditions (vector of node indices to fix)
-	std::vector<unsigned int> m_boundaryConditions;
+	std::vector<size_t> m_boundaryConditions;
 
 	/// Boundary conditions mass property (useful to build the system matrix)
 	double m_boundaryConditionsMass;

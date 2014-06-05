@@ -40,27 +40,27 @@ void FemElement::initialize(const SurgSim::Math::OdeState& state)
 	SURGSIM_ASSERT(m_E > 0.0) << "Young modulus ("<<m_E<<") is invalid, it should be positive";
 }
 
-unsigned int FemElement::getNumDofPerNode() const
+size_t FemElement::getNumDofPerNode() const
 {
 	return m_numDofPerNode;
 }
 
-void FemElement::setNumDofPerNode(unsigned int numDofPerNode)
+void FemElement::setNumDofPerNode(size_t numDofPerNode)
 {
 	m_numDofPerNode = numDofPerNode;
 }
 
-unsigned int FemElement::getNumNodes() const
+size_t FemElement::getNumNodes() const
 {
 	return m_nodeIds.size();
 }
 
-unsigned int FemElement::getNodeId(unsigned int elementNodeId) const
+size_t FemElement::getNodeId(size_t elementNodeId) const
 {
 	return m_nodeIds[elementNodeId];
 }
 
-const std::vector<unsigned int>& FemElement::getNodeIds() const
+const std::vector<size_t>& FemElement::getNodeIds() const
 {
 	return m_nodeIds;
 }
@@ -108,7 +108,8 @@ bool FemElement::update(const SurgSim::Math::OdeState& state)
 bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		&& (static_cast<unsigned int>(naturalCoordinate.size()) == getNumNodes())
+		&& (naturalCoordinate.size() >= 0)
+		&& (static_cast<size_t>(naturalCoordinate.size()) == getNumNodes())
 		&& (-SurgSim::Math::Geometry::ScalarEpsilon <= naturalCoordinate.minCoeff() &&
 			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
 }

@@ -93,8 +93,8 @@ bool writeMlcpTestDataAsText(const std::string& fileName, const MlcpTestData& te
 		return false;
 	}
 
-	int numConstraints = testData.problem.constraintTypes.size();
-	int numAtomicConstraints = testData.problem.b.rows();
+	size_t numConstraints = testData.problem.constraintTypes.size();
+	ptrdiff_t numAtomicConstraints = testData.problem.b.rows();
 	if (testData.problem.b.rows() != numAtomicConstraints ||
 		testData.problem.A.rows() != numAtomicConstraints || testData.problem.A.cols() != numAtomicConstraints ||
 		testData.expectedLambda.rows() != numAtomicConstraints)
@@ -115,8 +115,8 @@ bool writeMlcpTestDataAsText(const std::string& fileName, const MlcpTestData& te
 
 
 	fprintf(out, "%s %d\n", TEXT_LABEL_NUM_DEGREES_OF_FREEDOM, testData.numDegreesOfFreedom);
-	fprintf(out, "%s %d\n", TEXT_LABEL_NUM_CONSTRAINTS, numConstraints);
-	fprintf(out, "%s %d\n", TEXT_LABEL_NUM_ATOMIC_CONSTRAINTS, numAtomicConstraints);
+	fprintf(out, "%s %llu\n", TEXT_LABEL_NUM_CONSTRAINTS, static_cast<unsigned long long int>(numConstraints));
+	fprintf(out, "%s %lld\n", TEXT_LABEL_NUM_ATOMIC_CONSTRAINTS, static_cast<long long int>(numAtomicConstraints));
 
 	fprintf(out, "%s", TEXT_LABEL_CONSTRAINT_TYPES_LIST);
 	for (auto it = testData.problem.constraintTypes.begin();  it != testData.problem.constraintTypes.end();  ++it)

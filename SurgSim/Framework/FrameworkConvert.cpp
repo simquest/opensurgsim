@@ -32,13 +32,14 @@ namespace YAML
 Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(
 			const std::shared_ptr<SurgSim::Framework::Component> rhs)
 {
-	SURGSIM_ASSERT(nullptr != rhs) << "Trying to encode nullptr Component";
-	Node data;
-	data[IdPropertyName] = to_string(rhs->getUuid());
-	data[NamePropertyName] = rhs->getName();
 	Node result;
-	result[rhs->getClassName()] = data;
-
+	if (nullptr != rhs)
+	{
+		Node data;
+		data[IdPropertyName] = to_string(rhs->getUuid());
+		data[NamePropertyName] = rhs->getName();
+		result[rhs->getClassName()] = data;
+	}
 	return result;
 }
 

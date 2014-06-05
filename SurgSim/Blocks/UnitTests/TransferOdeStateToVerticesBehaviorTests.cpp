@@ -56,8 +56,8 @@ public:
 template <class T>
 void testConstructor()
 {
-	const unsigned int numDofPerNode = 3;
-	const unsigned int numNode = 10;
+	const size_t numDofPerNode = 3;
+	const size_t numNode = 10;
 
 	std::shared_ptr<SurgSim::Math::OdeState> state;
 	state = std::make_shared<SurgSim::Math::OdeState>();
@@ -109,8 +109,8 @@ void testUpdate()
 {
 	using SurgSim::Math::getSubVector;
 
-	const unsigned int numDofPerNode = 3;
-	const unsigned int numNode = 10;
+	const size_t numDofPerNode = 3;
+	const size_t numNode = 10;
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
@@ -149,7 +149,7 @@ void testUpdate()
 
 	m->update(1.0);
 	ASSERT_EQ(numNode, vertices->getNumVertices());
-	for (unsigned int nodeId = 0; nodeId < numNode; nodeId++)
+	for (size_t nodeId = 0; nodeId < numNode; nodeId++)
 	{
 		ASSERT_EQ(getSubVector(state->getPositions(), nodeId, numDofPerNode), vertices->getVertexPosition(nodeId));
 		//ASSERT_EQ(T(), vertices->getVertex(nodeId).data);
@@ -164,8 +164,8 @@ void testUpdate<void>()
 {
 	using SurgSim::Math::getSubVector;
 
-	const unsigned int numDofPerNode = 3;
-	const unsigned int numNode = 10;
+	const size_t numDofPerNode = 3;
+	const size_t numNode = 10;
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
@@ -204,7 +204,7 @@ void testUpdate<void>()
 
 	m->update(1.0);
 	ASSERT_EQ(numNode, vertices->getNumVertices());
-	for (unsigned int nodeId = 0; nodeId < numNode; nodeId++)
+	for (size_t nodeId = 0; nodeId < numNode; nodeId++)
 	{
 		ASSERT_EQ(getSubVector(state->getPositions(), nodeId, numDofPerNode), vertices->getVertexPosition(nodeId));
 	}

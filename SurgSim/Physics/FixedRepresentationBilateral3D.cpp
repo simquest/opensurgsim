@@ -38,8 +38,8 @@ void FixedRepresentationBilateral3D::doBuild(double dt,
 											 const ConstraintData& data,
 											 const std::shared_ptr<Localization>& localization,
 											 MlcpPhysicsProblem* mlcp,
-											 unsigned int indexOfRepresentation,
-											 unsigned int indexOfConstraint,
+											 size_t indexOfRepresentation,
+											 size_t indexOfConstraint,
 											 ConstraintSideSign sign)
 {
 	std::shared_ptr<Representation> representation = localization->getRepresentation();
@@ -67,7 +67,7 @@ SurgSim::Physics::RepresentationType FixedRepresentationBilateral3D::getRepresen
 	return REPRESENTATION_TYPE_FIXED;
 }
 
-unsigned int FixedRepresentationBilateral3D::doGetNumDof() const
+size_t FixedRepresentationBilateral3D::doGetNumDof() const
 {
 	return 3;
 }

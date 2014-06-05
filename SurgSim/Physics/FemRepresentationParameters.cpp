@@ -50,7 +50,7 @@ bool FemRepresentationParameters::operator !=(const FemRepresentationParameters 
 	return ! ((*this) == p);
 }
 
-bool FemRepresentationParameters::addBoundaryCondition(unsigned int nodeId)
+bool FemRepresentationParameters::addBoundaryCondition(size_t nodeId)
 {
 	auto found = std::find(m_boundaryConditions.begin(), m_boundaryConditions.end(), nodeId);
 	if (found == m_boundaryConditions.end())
@@ -61,7 +61,7 @@ bool FemRepresentationParameters::addBoundaryCondition(unsigned int nodeId)
 	return false;
 }
 
-bool FemRepresentationParameters::removeBoundaryCondition(unsigned int nodeId)
+bool FemRepresentationParameters::removeBoundaryCondition(size_t nodeId)
 {
 	auto found = std::find(m_boundaryConditions.begin(), m_boundaryConditions.end(), nodeId);
 	if (found != m_boundaryConditions.end())
@@ -72,9 +72,9 @@ bool FemRepresentationParameters::removeBoundaryCondition(unsigned int nodeId)
 	return false;
 }
 
-unsigned int FemRepresentationParameters::addBoundaryConditions(const std::vector<unsigned int>& boundaryConditions)
+size_t FemRepresentationParameters::addBoundaryConditions(const std::vector<size_t>& boundaryConditions)
 {
-	unsigned int count = 0u;
+	size_t count = 0u;
 
 	for(auto it = boundaryConditions.begin(); it != boundaryConditions.end(); it++)
 	{
@@ -93,7 +93,7 @@ void FemRepresentationParameters::clearBoundaryConditions()
 	m_boundaryConditions.clear();
 }
 
-const std::vector<unsigned int>& FemRepresentationParameters::getBoundaryConditions() const
+const std::vector<size_t>& FemRepresentationParameters::getBoundaryConditions() const
 {
 	return m_boundaryConditions;
 }

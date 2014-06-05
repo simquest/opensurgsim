@@ -81,25 +81,25 @@ public:
 	/// based on the other parameters.
 	/// \param	vertex	Vertex to add to the mesh
 	/// \return	Unique ID of the new vertex.
-	unsigned int addVertex(const VertexType& vertex)
+	size_t addVertex(const VertexType& vertex)
 	{
 		m_vertices.push_back(vertex);
 		return m_vertices.size() - 1;
 	}
 
 	/// Returns the number of vertices in this mesh.
-	unsigned int getNumVertices() const
+	size_t getNumVertices() const
 	{
 		return m_vertices.size();
 	}
 
 	/// Returns the specified vertex.
-	const VertexType& getVertex(unsigned int id) const
+	const VertexType& getVertex(size_t id) const
 	{
 		return m_vertices[id];
 	}
 	/// Returns the specified vertex (non const version).
-	VertexType& getVertex(unsigned int id)
+	VertexType& getVertex(size_t id)
 	{
 		return m_vertices[id];
 	}
@@ -118,14 +118,14 @@ public:
 	/// Sets the position of a vertex.
 	/// \param	id	Unique ID of the vertex
 	/// \param	position	Position of the vertex
-	void setVertexPosition(unsigned int id, const SurgSim::Math::Vector3d& position)
+	void setVertexPosition(size_t id, const SurgSim::Math::Vector3d& position)
 	{
 		m_vertices[id].position = position;
 	}
 	/// Returns the position of a vertex.
 	/// \param	id	Unique ID of the vertex
 	/// \return	Position of the vertex
-	const SurgSim::Math::Vector3d& getVertexPosition(unsigned int id) const
+	const SurgSim::Math::Vector3d& getVertexPosition(size_t id) const
 	{
 		return m_vertices[id].position;
 	}
@@ -137,7 +137,7 @@ public:
 	{
 		SURGSIM_ASSERT(m_vertices.size() == positions.size()) << "Number of positions must match number of vertices.";
 
-		for (unsigned int i = 0; i < m_vertices.size(); ++i)
+		for (size_t i = 0; i < m_vertices.size(); ++i)
 		{
 			m_vertices[i].position = positions[i];
 		}

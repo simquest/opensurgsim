@@ -62,7 +62,7 @@ const T& OsgUniform<T>::get() const
 }
 
 template <class T>
-OsgUniform<std::vector<T>>::OsgUniform(const std::string& name, unsigned int numElements) :
+OsgUniform<std::vector<T>>::OsgUniform(const std::string& name, size_t numElements) :
 	UniformBase(), Uniform<std::vector<T>>(), OsgUniformBase(name)
 {
 	osg::Uniform::Type osgUniformType = getOsgUniformType<T>();
@@ -73,13 +73,13 @@ OsgUniform<std::vector<T>>::OsgUniform(const std::string& name, unsigned int num
 }
 
 template <class T>
-unsigned int OsgUniform<std::vector<T>>::getNumElements() const
+size_t OsgUniform<std::vector<T>>::getNumElements() const
 {
 	return m_uniform->getNumElements();
 }
 
 template <class T>
-void OsgUniform<std::vector<T>>::setElement(unsigned int index, const T& value)
+void OsgUniform<std::vector<T>>::setElement(size_t index, const T& value)
 {
 	SURGSIM_ASSERT(m_uniform->setElement(index, toOsg(value))) << "Failed to set OSG uniform value!" <<
 		" Uniform: " << getName() << " index: " << index << " value: " << value;
@@ -92,14 +92,14 @@ void OsgUniform<std::vector<T>>::set(const std::vector<T>& value)
 	SURGSIM_ASSERT(value.size() == m_uniform->getNumElements()) <<
 		"Number of elements (" << value.size() << ") must match uniform's number of elements (" <<
 		m_uniform->getNumElements() << ")! Uniform: " << getName();
-	for (unsigned int i = 0; i < value.size(); ++i)
+	for (size_t i = 0; i < value.size(); ++i)
 	{
 		setElement(i, value[i]);
 	}
 }
 
 template <class T>
-typename std::vector<T>::const_reference OsgUniform<std::vector<T>>::getElement(unsigned int index) const
+typename std::vector<T>::const_reference OsgUniform<std::vector<T>>::getElement(size_t index) const
 {
 	return m_value[index];
 }
