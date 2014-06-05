@@ -1,0 +1,159 @@
+SurgSim::Framework::Scene:
+  SceneElements:
+    - SurgSim::Framework::BasicSceneElement:
+        Name: armSceneElement
+        Components:
+          - SurgSim::Framework::PoseComponent:
+              Pose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, -0.2, 0]
+              Name: Pose
+              Id: e44fe784-802b-4270-aefe-911fbb4584d8
+          - SurgSim::Physics::RigidCollisionRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Name: Collision
+              Id: c9cd619f-bcb0-4a6c-b40f-39d4991711db
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              FileName: Geometry/upperarm.osgb
+              Id: ee5d2c6d-fc4a-45cb-ba92-8e119ad8597a
+              Name: upperarm
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              FileName: Geometry/forearm.osgb
+              Id: a82078ec-2f31-4e43-90ba-89326281a384
+              Name: forearm
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              Filename: Geometry/arm_collision.ply
+              DrawAsWireFrame: true
+              UpdateOptions: 1
+              Id: d745a7f1-29f0-4939-ae43-214c2c92ff06
+              Name: ArmOsgMesh
+          - SurgSim::Physics::FixedRepresentation:
+              RigidRepresentationState:
+                SurgSim::Physics::RigidRepresentationState:
+                  Pose:
+                    Translation: [0, 0, 0]
+                    Quaternion: [0, 0, 0, 1]
+                  LinearVelocity: [0, 0, 0]
+                  AngularVelocity: [0, 0, 0]
+              Name: Physics
+              RigidRepresentationParameters:
+                SurgSim::Physics::RigidRepresentationParameters:
+                  Density: 0
+                  LinearDamping: 0
+                  AngularDamping: 0
+                  ShapeUsedForMassInertia:
+                    SurgSim::Math::MeshShape:
+                      FileName: Geometry/arm_collision.ply
+              IsDrivingSceneElementPose: true
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              NumDof: 0
+              IsGravityEnabled: true
+              IsActive: true
+              CollisionRepresentation:
+                SurgSim::Physics::RigidCollisionRepresentation:
+                  Id: c9cd619f-bcb0-4a6c-b40f-39d4991711db
+                  Name: Collision
+              Id: dcffa07f-7338-4259-846d-c09dc2a02be4
+    - SurgSim::Framework::BasicSceneElement:
+        Name: wound
+        Components:
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              Filename: Geometry/wound_deformable.ply
+              DrawAsWireFrame: true
+              UpdateOptions: 1
+              Id: 1aa724f9-8300-4f14-9c46-dce849534413
+              Name: wound wire frame
+          - SurgSim::Framework::PoseComponent:
+              Pose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, -0.2, 0]
+              Id: 841da98e-f689-4efa-b0d5-61e248a85119
+              Name: Pose
+          - SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior:
+              Target:
+                SurgSim::Graphics::OsgMeshRepresentation:
+                  Id: 1aa724f9-8300-4f14-9c46-dce849534413
+                  Name: wound wire frame
+              Source:
+                SurgSim::Physics::Fem3DRepresentation:
+                  Id: f290e750-69e7-4059-bf15-ea0962a150f9
+                  Name: wound physics
+              Id: aec543f7-1192-423a-83e8-229af894886f
+              Name: PhysicsToWireFrameFem
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              Filename: Geometry/wound_deformable.ply
+              DrawAsWireFrame: false
+              UpdateOptions: 1
+              Id: 35d14ea2-391d-4647-a31d-34bd8faf3df9
+              Name: wound triangle mesh
+          - SurgSim::Physics::Fem3DRepresentation:
+              IsDrivingSceneElementPose: true
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Filename: Geometry/wound_deformable.ply
+              NumDof: 1173
+              IsGravityEnabled: true
+              IsActive: true
+              CollisionRepresentation:
+                SurgSim::Physics::DeformableCollisionRepresentation:
+                  Id: 807d12b1-b4ea-4177-a398-79a823cc27c5
+                  Name: Collision
+              IntegrationScheme:
+                SurgSim::Math::IntegrationScheme: INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER
+              Id: f290e750-69e7-4059-bf15-ea0962a150f9
+              Name: wound physics
+          - SurgSim::Physics::DeformableCollisionRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Shape:
+                SurgSim::Math::MeshShape:
+                  FileName: Geometry/wound_deformable.ply
+              Id: 807d12b1-b4ea-4177-a398-79a823cc27c5
+              Name: Collision
+          - SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior:
+              Target:
+                SurgSim::Graphics::OsgMeshRepresentation:
+                  Id: 35d14ea2-391d-4647-a31d-34bd8faf3df9
+                  Name: wound triangle mesh
+              Source:
+                SurgSim::Physics::Fem3DRepresentation:
+                  Id: f290e750-69e7-4059-bf15-ea0962a150f9
+                  Name: wound physics
+              Id: 3602234f-9730-43ed-b7ca-fe41a8145efb
+              Name: PhysicsToGraphicalFem
