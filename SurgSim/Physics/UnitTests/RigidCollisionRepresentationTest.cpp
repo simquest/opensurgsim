@@ -124,7 +124,7 @@ TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 
 	meshShape->setFileName(fileName);
-	meshShape->initialize(applicationData);
+	meshShape->initialize(*applicationData);
 
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)

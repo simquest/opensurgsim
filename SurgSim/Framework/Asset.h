@@ -52,7 +52,7 @@ public:
 	/// It asserts on double calls.
 	/// \param data Gives the locations to search for the file.
 	/// \return true if file is found and loaded successfully; false otherwise.
-	bool initialize(const std::shared_ptr<ApplicationData>& data);
+	bool initialize(const ApplicationData& data);
 
 	/// Check to see if an attempt has been made to load the file.
 	/// \return true if initialization succeeded, false otherwise
