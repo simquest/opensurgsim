@@ -95,7 +95,7 @@ YAML::Node Scene::encode() const
 	YAML::Node data(YAML::NodeType::Map);
 	for (auto sceneElement = m_elements.begin(); sceneElement != m_elements.end(); ++sceneElement)
 	{
-		data["SceneElements"].push_back(*sceneElement);
+		data["SceneElements"].push_back(*(*sceneElement));
 	}
 
 	result["SurgSim::Framework::Scene"] = data;
