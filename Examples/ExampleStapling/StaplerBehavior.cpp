@@ -62,7 +62,7 @@ StaplerBehavior::StaplerBehavior(const std::string& name):
 		InputComponent, getInputComponent, setInputComponent);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::shared_ptr<SurgSim::Framework::Component>,
 		Representation, getRepresentation, setRepresentation);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, VirtualTeethArray, VirtualStaple,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, VirtualTeethArray, VirtualTeeth,
 		getVirtualTeeth, setVirtualTeeth);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::list<std::string>, StapleEnabledSceneElements,
 		getStapleEnabledSceneElements, setStapleEnabledSceneElements);
@@ -70,11 +70,11 @@ StaplerBehavior::StaplerBehavior(const std::string& name):
 
 void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent)
 {
-	SURGSIM_ASSERT(nullptr != inputComponent) << "Cannot set nullptr to InputComponent";
+	SURGSIM_ASSERT(nullptr != inputComponent) << "'inputComponent' cannot be set to 'nullptr'";
 
 	m_from = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(inputComponent);
 
-	SURGSIM_ASSERT(nullptr != m_from) << "Cannot set other than SurgSim::Input::InputComponent to InputComponent";
+	SURGSIM_ASSERT(nullptr != m_from) << "'inputComponent' must derive from SurgSim::Input::InputComponent";
 }
 
 std::shared_ptr<SurgSim::Input::InputComponent> StaplerBehavior::getInputComponent()
@@ -84,12 +84,12 @@ std::shared_ptr<SurgSim::Input::InputComponent> StaplerBehavior::getInputCompone
 
 void StaplerBehavior::setRepresentation(std::shared_ptr<SurgSim::Framework::Component> staplerRepresentation)
 {
-	SURGSIM_ASSERT(nullptr != staplerRepresentation) << "Cannot set nullptr to Representation";
+	SURGSIM_ASSERT(nullptr != staplerRepresentation) << "'staplerRepresentation' cannot be set to 'nullptr'";
 
 	m_representation = std::dynamic_pointer_cast<SurgSim::Framework::Representation>(staplerRepresentation);
 
 	SURGSIM_ASSERT(nullptr != m_representation)
-		<< "Cannot set other than SurgSim::Framework::Representation to StaplerRepresentation";
+		<< "'staplerRepresentation' must derive from SurgSim::Framework::Representation";
 }
 
 std::shared_ptr<SurgSim::Framework::Representation> StaplerBehavior::getRepresentation()
