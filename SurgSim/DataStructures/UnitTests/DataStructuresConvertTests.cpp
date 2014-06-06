@@ -73,28 +73,6 @@ void testStdArraySerialization(const std::array<Type, Size>& value)
 		LargerArray largerNewValue;
 		EXPECT_ANY_THROW(largerNewValue = node.as<LargerArray>());
 	}
-
-	{
-		SCOPED_TRACE("Serialize empty node");
-
-		std::array<Type, Size> emptyValue;
-
-		// Encode
-		YAML::Node node;
-		EXPECT_NO_THROW(node = emptyValue;);
-
-		// Decode
-		std::array<Type, Size> receiver = value;
-		receiver = node.as<std::array<Type, Size>>();
-
-		// Verify
-		bool identicalValues = true;
-		for (int i = 0; i < Size; ++i)
-		{
-			identicalValues &= value[i] == receiver[i];
-		}
-		EXPECT_FALSE(identicalValues);
-	}
 }
 
 TEST(DataStructuresConvertTests, StdArray)
@@ -111,15 +89,17 @@ TEST(DataStructuresConvertTests, StdArray)
 	{
 		SCOPED_TRACE("Serialization of std::array of size 0");
 
-		std::array<double, 0> doubleEmptyArray;
+		typedef std::array<double, 0> ZeroSizeArray;
+
+		ZeroSizeArray doubleEmptyArray;
 
 		// Encode
 		YAML::Node node;
 		EXPECT_NO_THROW(node = doubleEmptyArray;);
 
 		// Decode
-		std::array<double, 0> newValue;
-		newValue = node.as<std::array<double, 0>>();
+		ZeroSizeArray newValue;
+		EXPECT_NO_THROW(newValue = node.as<ZeroSizeArray>(););
 	}
 }
 
