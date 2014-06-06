@@ -89,11 +89,11 @@ public:
 	virtual int getTargetManagerType() const override;
 
 	/// Sets the virtual teeth for the virtual staple
-	/// \param virtualTeeth Array of collision representations for the virtual staple teeth.
-	void setVirtualStaple(const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& virtualTeeth);
+	/// \param virtualTeeth Array of collision representations for the virtual stapler teeth.
+	void setVirtualTeeth(const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& virtualTeeth);
 
-	/// \return Array of collision representations for the virtual staple teeth.
-	const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& getVirtualStaple();
+	/// \return Array of collision representations for the virtual stapler teeth.
+	const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& getVirtualTeeth();
 
 	/// Add a scene element (name) for which stapling is enabled within this behaviour.
 	/// \param sceneElementName The name of the scene element that this behaviour can staple.

@@ -63,7 +63,7 @@ StaplerBehavior::StaplerBehavior(const std::string& name):
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::shared_ptr<SurgSim::Framework::Component>,
 		Representation, getRepresentation, setRepresentation);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, VirtualTeethArray, VirtualStaple,
-		getVirtualStaple, setVirtualStaple);
+		getVirtualTeeth, setVirtualTeeth);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::list<std::string>, StapleEnabledSceneElements,
 		getStapleEnabledSceneElements, setStapleEnabledSceneElements);
 }
@@ -97,13 +97,13 @@ std::shared_ptr<SurgSim::Framework::Representation> StaplerBehavior::getRepresen
 	return m_representation;
 }
 
-void StaplerBehavior::setVirtualStaple(
+void StaplerBehavior::setVirtualTeeth(
 	const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& virtualTeeth)
 {
 	m_virtualTeeth = virtualTeeth;
 }
 
-const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& StaplerBehavior::getVirtualStaple()
+const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& StaplerBehavior::getVirtualTeeth()
 {
 	return m_virtualTeeth;
 }
