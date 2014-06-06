@@ -39,7 +39,7 @@ DeformableCollisionRepresentation::DeformableCollisionRepresentation(const std::
 	SurgSim::Collision::Representation(name)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
-		Shape, getShape, setShape);
+									  Shape, getShape, setShape);
 }
 
 DeformableCollisionRepresentation::~DeformableCollisionRepresentation()
@@ -64,15 +64,15 @@ std::shared_ptr<SurgSim::DataStructures::TriangleMesh> DeformableCollisionRepres
 void DeformableCollisionRepresentation::update(const double& dt)
 {
 	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(nullptr != physicsRepresentation) << "DeformableCollisionRepresentation::update(): "
-		<< "Failed to update.  The DeformableCollisionRepresentation either was not attached to a "
+	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
+		"Failed to update.  The DeformableCollisionRepresentation either was not attached to a "
 		"Physics::Representation or the Physics::Representation has expired.";
 
 	auto odeState = physicsRepresentation->getCurrentState();
 	const size_t numNodes = odeState->getNumNodes();
 
-	SURGSIM_ASSERT(m_mesh->getNumVertices() == numNodes) << "DeformableCollisionRepresentation::update(): "
-		<< "The number of nodes in the deformable does not match the number of vertices in the mesh.";
+	SURGSIM_ASSERT(m_mesh->getNumVertices() == numNodes) <<
+		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 	{
@@ -85,14 +85,12 @@ void DeformableCollisionRepresentation::update(const double& dt)
 bool DeformableCollisionRepresentation::doInitialize()
 {
 	auto data = std::make_shared<SurgSim::Framework::ApplicationData>(*(getRuntime()->getApplicationData()));
-	SURGSIM_ASSERT(m_shape->initialize(data)) << "DeformableCollisionRepresentation::doInitialize(): "
-		"m_shape initialization failed.";
+	if (!m_shape->initialize(data))
+	{
+		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"No mesh loaded for m_shape ";
+	}
 	m_mesh = m_shape->getMesh();
-
-	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr) << "DeformableCollisionRepresentation::doInitialize(): "
-		<< "Failed to initialize.  The DeformableCollisionRepresentation either was not attached to a "
-		"Physics::Representation or the Physics::Representation has expired.";
 
 	return true;
 }
@@ -100,15 +98,15 @@ bool DeformableCollisionRepresentation::doInitialize()
 bool DeformableCollisionRepresentation::doWakeUp()
 {
 	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr) << "DeformableCollisionRepresentation::doWakeUp(): " <<
+	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
 		"The Physics::Representation referred by this DeformableCollisionRepresentation has expired.";
 
 	auto state = physicsRepresentation->getCurrentState();
-	SURGSIM_ASSERT(nullptr != state) << "DeformableCollisionRepresentation::doWakeUp(): " <<
+	SURGSIM_ASSERT(nullptr != state) <<
 		"DeformableRepresentation " << physicsRepresentation->getName() << " holds an empty OdeState.";
-	SURGSIM_ASSERT(nullptr != m_mesh) << "DeformableCollisionRepresentation::doWakeUp(): m_mesh is empty.";
-	SURGSIM_ASSERT(m_mesh->getNumVertices() == state->getNumNodes()) << "DeformableCollisionRepresentation::doWakeUp():"
-		<< " The number of nodes in the deformable does not match the number of vertices in the mesh.";
+	SURGSIM_ASSERT(nullptr != m_mesh) << "m_mesh is empty.";
+	SURGSIM_ASSERT(m_mesh->getNumVertices() == state->getNumNodes()) <<
+		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	update(0.0);
 	return true;
@@ -116,8 +114,7 @@ bool DeformableCollisionRepresentation::doWakeUp()
 
 int DeformableCollisionRepresentation::getShapeType() const
 {
-	SURGSIM_ASSERT(m_shape != nullptr) << "No mesh or shape assigned to DeformableCollisionRepresentation "
-		<< getName();
+	SURGSIM_ASSERT(nullptr != m_shape) << "No mesh/shape assigned to DeformableCollisionRepresentation " << getName();
 	return m_shape->getType();
 }
 
@@ -146,8 +143,8 @@ const std::shared_ptr<SurgSim::Physics::DeformableRepresentation>
 	DeformableCollisionRepresentation::getDeformableRepresentation() const
 {
 	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr)
-		<< "Failed to get the deformable representation.  The DeformableCollisionRepresentation either was not "
+	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+		"Failed to get the deformable representation.  The DeformableCollisionRepresentation either was not "
 		"attached to a Physics::Representation or the Physics::Representation has expired.";
 
 	return physicsRepresentation;
