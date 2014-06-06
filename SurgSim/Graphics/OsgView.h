@@ -22,6 +22,7 @@
 
 namespace osgViewer
 {
+class StatsHandler;
 class DisplaySettings;
 }
 
@@ -94,6 +95,15 @@ public:
 	/// \param	lookat  	The location the camera looks at.
 	void setManipulatorParameters(SurgSim::Math::Vector3d position, SurgSim::Math::Vector3d lookat);
 
+	/// Enable osg modelview uniforms mapping, in this mode osg replaces the gl builtins with osg_* names, for
+	/// uniforms and vertex attributes
+	/// \param val Whether to enable osg uniform mapping, default false
+	void setOsgMapsUniforms(bool val);
+
+	/// \return the state of the osg modelview mapping mode.
+	bool getOsgMapsUniforms();
+
+
 	/// Return the keyboard to be used with this view.
 	/// \return A keyboard device
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice();
@@ -123,6 +133,11 @@ protected:
 	/// Wake up the view
 	virtual bool doWakeUp() override;
 private:
+
+	/// Patch the StatsHandler rendering
+	/// \param statsHandler The statshandler that will be patched.
+	void fixupStatsHandler(osgViewer::StatsHandler* statsHandler);
+
 	/// Position of the view on the screen (in pixels)
 	std::array<int, 2> m_position;
 	/// Dimensions of the view on the screen (in pixels)
@@ -138,6 +153,9 @@ private:
 
 	/// OSG view which performs the actual work involved in setting up and rendering to a window
 	osg::ref_ptr<osgViewer::View> m_view;
+
+	/// Wether to enable osg uniform mapping
+	bool m_osgMapUniforms;
 
 	osg::ref_ptr<OsgTrackballZoomManipulator> m_manipulator;
 	SurgSim::Math::Vector3d m_manipulatorPosition;

@@ -43,9 +43,9 @@ std::shared_ptr<PhysicsManagerState>
 	std::shared_ptr<PhysicsManagerState> result = state;
 	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
 
-	unsigned int numAtomicConstraint = 0;
-	unsigned int numConstraint = 0;
-	unsigned int numDof = 0;
+	size_t numAtomicConstraint = 0;
+	size_t numConstraint = 0;
+	size_t numDof = 0;
 
 	// Calculate numAtomicConstraint and numConstraint
 	for (int constraintType = 0;
@@ -89,7 +89,7 @@ std::shared_ptr<PhysicsManagerState>
 	result->getMlcpSolution().x.setZero();
 
 	// Fill up the Mlcp problem
-	unsigned int constraintId = 0;
+	size_t constraintId = 0;
 	for (int constraintType = 0;
 		constraintType < CONSTRAINT_GROUP_TYPE_COUNT;
 		constraintType++)
@@ -98,7 +98,7 @@ std::shared_ptr<PhysicsManagerState>
 		auto const constraints = result->getConstraintGroup(constraintGroupType);
 		for (auto it = constraints.begin(); it != constraints.end(); it++)
 		{
-			int indexConstraint = result->getConstraintsMapping().getValue((*it).get());
+			ptrdiff_t indexConstraint = result->getConstraintsMapping().getValue((*it).get());
 			SURGSIM_ASSERT(indexConstraint >= 0) << "Index for constraint is invalid: " << indexConstraint << std::endl;
 
 			std::shared_ptr<ConstraintImplementation> side0 = (*it)->getImplementations().first;
@@ -110,8 +110,8 @@ std::shared_ptr<PhysicsManagerState>
 			SURGSIM_ASSERT(localization0) << "ConstraintImplementation does not have a localization on side[0]";
 			SURGSIM_ASSERT(localization1) << "ConstraintImplementation does not have a localization on side[1]";
 			const MlcpMapping<Representation>& mapping = result->getRepresentationsMapping();
-			int indexRepresentation0 = mapping.getValue(localization0->getRepresentation().get());
-			int indexRepresentation1 = mapping.getValue(localization1->getRepresentation().get());
+			ptrdiff_t indexRepresentation0 = mapping.getValue(localization0->getRepresentation().get());
+			ptrdiff_t indexRepresentation1 = mapping.getValue(localization1->getRepresentation().get());
 			SURGSIM_ASSERT(indexRepresentation0 >= 0) << "Index for representation 0 is invalid: " <<
 				indexRepresentation0;
 			SURGSIM_ASSERT(indexRepresentation1 >= 0) << "Index for representation 0 is invalid: " <<

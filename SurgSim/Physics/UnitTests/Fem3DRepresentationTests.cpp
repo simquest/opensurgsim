@@ -172,46 +172,6 @@ TEST(Fem3DRepresentationTests, SetGetFilenameAndLoadFileTest)
 	}
 }
 
-TEST(Fem3DRepresentationTests, ApplyCorrectionTest)
-{
-	double epsilon = 1e-12;
-	double dt = 1e-3;
-
-	auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-	auto initialState = std::make_shared<SurgSim::Math::OdeState>();
-	initialState->setNumDof(fem->getNumDofPerNode(), 4);
-	fem->setInitialState(initialState);
-
-	SurgSim::Math::Vector dv;
-	dv.resize(fem->getNumDof());
-	for (unsigned int i = 0; i < fem->getNumDof(); i++)
-	{
-		dv(i) = static_cast<double>(i);
-	}
-
-	ASSERT_LE(3u, fem->getNumDof());
-	ASSERT_NEAR(2.0, dv(2), epsilon);
-
-	Eigen::VectorXd previousX = fem->getCurrentState()->getPositions();
-	Eigen::VectorXd previousV = fem->getCurrentState()->getVelocities();
-
-	// Test with a valid correction
-	EXPECT_TRUE(fem->isActive());
-	fem->applyCorrection(dt, dv.segment(0, fem->getNumDof()));
-	EXPECT_TRUE(fem->isActive());
-	Eigen::VectorXd nextX = fem->getCurrentState()->getPositions();
-	Eigen::VectorXd nextV = fem->getCurrentState()->getVelocities();
-
-	EXPECT_TRUE(nextX.isApprox(previousX + dv * dt, epsilon));
-	EXPECT_TRUE(nextV.isApprox(previousV + dv, epsilon));
-
-	// Test with an invalid correction
-	dv(0) = std::numeric_limits<double>::infinity();
-	EXPECT_TRUE(fem->isActive());
-	fem->applyCorrection(dt, dv.segment(0, fem->getNumDof()));
-	EXPECT_FALSE(fem->isActive());
-}
-
 TEST(Fem3DRepresentationTests, DoInitializeTest)
 {
 	auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
@@ -267,7 +227,7 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 	SurgSim::Math::Vector3d centroid;
 	for (auto triangle = meshTriangles.cbegin(); triangle != meshTriangles.cend(); ++triangle, ++triangleId)
 	{
-		std::array<unsigned int, 3> triangleNodeIds = triangle->verticesId;
+		std::array<size_t, 3> triangleNodeIds = triangle->verticesId;
 		centroid = triangleMesh->getVertexPosition(triangleNodeIds[0]);
 		centroid += triangleMesh->getVertexPosition(triangleNodeIds[1]);
 		centroid += triangleMesh->getVertexPosition(triangleNodeIds[2]);

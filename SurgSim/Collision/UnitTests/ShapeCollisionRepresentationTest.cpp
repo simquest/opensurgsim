@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -36,9 +37,11 @@ namespace Collision
 
 TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 {
+	auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 	meshShape->setFileName(fileName);
+	EXPECT_TRUE(meshShape->initialize(*applicationData));
 
 	auto collisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Collision");
 	collisionRepresentation->setShape(meshShape);
@@ -67,10 +70,12 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 
 TEST(ShapeCollisionRepresentationTest, SerializationTest)
 {
+	auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SurgSim::Math::MeshShape>();
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
 	meshShape->setFileName(fileName);
+	EXPECT_TRUE(meshShape->initialize(*applicationData));
 
 	auto collisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Collision");
 	collisionRepresentation->setValue("Shape", shape);
@@ -94,6 +99,7 @@ TEST(ShapeCollisionRepresentationTest, SerializationTest)
 	auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(
 				newShapeCollisionRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
 	ASSERT_TRUE(nullptr != mesh);
+	EXPECT_TRUE(mesh->initialize(*applicationData));
 	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), mesh->getMesh()->getNumEdges());
 	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), mesh->getMesh()->getNumTriangles());
 	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), mesh->getMesh()->getNumVertices());

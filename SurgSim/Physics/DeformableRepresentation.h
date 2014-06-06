@@ -65,7 +65,7 @@ public:
 
 	/// Gets the number of degrees of freedom per node
 	/// \return The number of degrees of freedom per node for this Deformable Representation
-	unsigned int getNumDofPerNode() const;
+	size_t getNumDofPerNode() const;
 
 	/// Sets the numerical integration scheme
 	/// \param integrationScheme The integration scheme to use
@@ -85,6 +85,8 @@ public:
 	virtual void update(double dt) override;
 
 	virtual void afterUpdate(double dt) override;
+
+	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
 	/// Deactivate and call resetState
 	void deactivateAndReset(void);
@@ -133,7 +135,7 @@ protected:
 
 	/// Number of degrees of freedom per node (varies per deformable model)
 	/// \note MUST be set by the derived classes
-	unsigned int m_numDofPerNode;
+	size_t m_numDofPerNode;
 
 	/// Numerical Integration scheme (dynamic explicit/implicit solver)
 	SurgSim::Math::IntegrationScheme m_integrationScheme;

@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeSolver.h"
@@ -40,16 +41,18 @@ struct DeformableCollisionRepresentationTest : public ::testing::Test
 {
 	void SetUp()
 	{
-		m_filename = std::string("Data/Geometry/wound_deformable.ply");
-
+		m_filename = std::string("Geometry/wound_deformable.ply");
+		m_applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 		m_meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 		m_meshShape->setFileName(m_filename);
+		m_meshShape->initialize(*m_applicationData);
 		m_deformableRepresentation = std::make_shared<MockDeformableRepresentation>("DeformableRepresentation");
 		m_deformableCollisionRepresentation =
 			std::make_shared<DeformableCollisionRepresentation>("DeformableCollisionRepresentation");
 	}
 
 	std::string m_filename;
+	std::shared_ptr<SurgSim::Framework::ApplicationData> m_applicationData;
 	std::shared_ptr<SurgSim::Math::MeshShape> m_meshShape;
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_deformableRepresentation;
 	std::shared_ptr<SurgSim::Physics::DeformableCollisionRepresentation> m_deformableCollisionRepresentation;
@@ -106,6 +109,7 @@ TEST_F(DeformableCollisionRepresentationTest, SerializationTest)
 		);
 
 	auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(newDeformableCollisionRepresentation->getShape());
+	mesh->initialize(*m_applicationData);
 	EXPECT_NEAR(m_meshShape->getVolume(), mesh->getVolume(), epsilon);
 	EXPECT_TRUE(m_meshShape->getCenter().isApprox(mesh->getCenter()));
 	EXPECT_TRUE(m_meshShape->getSecondMomentOfVolume().isApprox(mesh->getSecondMomentOfVolume()));

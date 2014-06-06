@@ -37,17 +37,17 @@ using SurgSim::Physics::Fem1DElementBeam;
 namespace
 {
 
-void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, unsigned int numNodes)
+void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, size_t numNodes)
 {
 	std::shared_ptr<SurgSim::Math::OdeState> restState = std::make_shared<SurgSim::Math::OdeState>();
 	restState->setNumDof(physicsRepresentation->getNumDofPerNode(), numNodes);
 
 	// Sets the initial state (node positions and boundary conditions)
 	SurgSim::Math::Vector& x = restState->getPositions();
-	for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
+	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
 	{
 		SurgSim::Math::getSubVector(x, nodeId, physicsRepresentation->getNumDofPerNode()).segment<3>(0)
-			= Vector3d(static_cast<double>(nodeId) / static_cast<double>(numNodes), 0.0, 0.0);
+			= Vector3d(static_cast<double>(nodeId) / static_cast<double>(numNodes - 1) - 0.5, 0.0, 0.0);
 	}
 
 	// Fix the start and end nodes
@@ -61,9 +61,9 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 	physicsRepresentation->setInitialState(restState);
 
 	// Adds all the FemElements
-	for (unsigned int beamId = 0; beamId < numNodes - 1; beamId++)
+	for (size_t beamId = 0; beamId < numNodes - 1; beamId++)
 	{
-		std::array<unsigned int, 2> beamNodeIds = {{beamId, beamId + 1}};
+		std::array<size_t, 2> beamNodeIds = {{beamId, beamId + 1}};
 		std::shared_ptr<Fem1DElementBeam> beam = std::make_shared<Fem1DElementBeam>(beamNodeIds);
 		beam->setRadius(0.10);
 		beam->setMassDensity(3000.0);
@@ -120,30 +120,40 @@ namespace Physics
 
 TEST_F(RenderTests, VisualTestFem1D)
 {
-	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::makeRigidTranslation;
 	using SurgSim::Math::Vector4d;
 
-	const SurgSim::Math::Quaterniond quaternionIdentity = SurgSim::Math::Quaterniond::Identity();
-
 	scene->addSceneElement(
-		createFem1D("Euler Explicit",                                                  // name
-					makeRigidTransform(quaternionIdentity, Vector3d(-2.0, 0.5, 0.0)), // graphics pose (rot., trans.)
-					Vector4d(1, 0, 0, 1),                                              // color (r, g, b, a)
-					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER));          // technique to update object
+		createFem1D("Euler Explicit",                                           // name
+					makeRigidTranslation(Vector3d(0.0, 0.5, 0.0)),              // graphics pose
+					Vector4d(1, 0, 0, 1),                                       // color (r, g, b, a)
+					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER));   // technique to update object
 
 	scene->addSceneElement(
 		createFem1D("Modified Euler Explicit",
-					makeRigidTransform(quaternionIdentity, Vector3d(-0.5, 0.5, 0.0)),
-					Vector4d(0, 1, 0, 1),
+					makeRigidTranslation(Vector3d(0.0, 0.25, 0.0)),
+					Vector4d(0.5, 0, 0, 1),
 					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER));
 
 	scene->addSceneElement(
+		createFem1D("Runge Kutta 4",
+					makeRigidTranslation(Vector3d(0.0, 0.0, 0.0)),
+					Vector4d(0, 1, 0, 1),
+					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4));
+
+	scene->addSceneElement(
 		createFem1D("Euler Implicit",
-					makeRigidTransform(quaternionIdentity, Vector3d(1.0, 0.5, 0.0)),
+					makeRigidTranslation(Vector3d(0.0, -0.25, 0.0)),
 					Vector4d(0, 0, 1, 1),
 					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
 
-	runTest(Vector3d(0.0, 0.0, 5.0), Vector3d::Zero(), 5000.0);
+	scene->addSceneElement(
+		createFem1D("Static",
+					makeRigidTranslation(Vector3d(0.0, -0.5, 0.0)),
+					Vector4d(1, 1, 1, 1),
+					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC));
+
+	runTest(Vector3d(0.0, 0.0, 2.0), Vector3d::Zero(), 5000.0);
 }
 
 }; // namespace Physics

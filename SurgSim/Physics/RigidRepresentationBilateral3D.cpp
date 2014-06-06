@@ -38,8 +38,8 @@ void RigidRepresentationBilateral3D::doBuild(double dt,
 											 const ConstraintData& data,
 											 const std::shared_ptr<Localization>& localization,
 											 MlcpPhysicsProblem* mlcp,
-											 unsigned int indexOfRepresentation,
-											 unsigned int indexOfConstraint,
+											 size_t indexOfRepresentation,
+											 size_t indexOfConstraint,
 											 ConstraintSideSign sign)
 {
 	std::shared_ptr<RigidRepresentation> rigid
@@ -126,7 +126,7 @@ SurgSim::Physics::RepresentationType RigidRepresentationBilateral3D::getRepresen
 	return REPRESENTATION_TYPE_RIGID;
 }
 
-unsigned int RigidRepresentationBilateral3D::doGetNumDof() const
+size_t RigidRepresentationBilateral3D::doGetNumDof() const
 {
 	return 3;
 }

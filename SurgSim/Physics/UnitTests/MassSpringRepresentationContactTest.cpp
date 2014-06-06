@@ -47,17 +47,16 @@ public:
 		m_n.normalize();
 
 		// Place spring at random location.
-		m_extremities[0] = Vector3d(0.8799, -0.0871, 0.7468);
-		m_extremities[1] = Vector3d(0.9040, -0.7074, 0.6783);
+		m_extremities.push_back(Vector3d(0.8799, -0.0871, 0.7468));
+		m_extremities.push_back(Vector3d(0.9040, -0.7074, 0.6783));
 
 		// Define physics representation of mass-spring using 1d helper function.
 		m_massSpring = std::make_shared<SurgSim::Blocks::MassSpring1DRepresentation>("MassSpring");
-		unsigned int numNodesPerDim[1] = {2};
+		size_t numNodesPerDim[1] = {2};
 		m_massPerNode = 0.137;
-		std::vector<unsigned int> boundaryConditions;
+		std::vector<size_t> boundaryConditions;
 		m_massSpring->init1D(
 			m_extremities,
-			numNodesPerDim,
 			boundaryConditions,
 			numNodesPerDim[0] * m_massPerNode, // total mass (in Kg)
 			100.0, // Stiffness stretching
@@ -96,7 +95,7 @@ public:
 
 	std::shared_ptr<SurgSim::Blocks::MassSpring1DRepresentation> m_massSpring;
 	double m_massPerNode;
-	std::array<Vector3d, 2> m_extremities;
+	std::vector<Vector3d> m_extremities;
 
 	std::shared_ptr<MassSpringRepresentationLocalization> m_localization;
 };
@@ -226,8 +225,8 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
 	mlcpPhysicsProblem.b.block<1, 1>(0, 0)[0] = 0.6991;
 
 	// Place mass-spring at 5th dof and 1th constraint.
-	unsigned int indexOfRepresentation = 5;
-	unsigned int indexOfConstraint = 1;
+	size_t indexOfRepresentation = 5;
+	size_t indexOfConstraint = 1;
 
 	setContactAtNode(1);
 

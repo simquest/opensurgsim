@@ -21,6 +21,7 @@ set(UNIT_TEST_SOURCES
 	CommonDeviceTests.cpp
 	InputComponentTest.cpp
 	InputManagerTest.cpp
+	OutputComponentTest.cpp
 	TestDevice.cpp
 )
 

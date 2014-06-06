@@ -58,8 +58,8 @@ public:
 	/// \note        [0][0][1] *---* [1][0][1]
 	void init3D(
 		const std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities,
-		unsigned int numNodesPerDim[3],
-		std::vector<unsigned int> nodeBoundaryConditions,
+		size_t numNodesPerDim[3],
+		std::vector<size_t> nodeBoundaryConditions,
 		double totalMass,
 		double stiffnessStretching, double dampingStretching,
 		double stiffnessBending, double dampingBending,
@@ -72,25 +72,25 @@ private:
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
 	void init3DStretchingSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
-		unsigned int numNodesPerDim[3], double stiffness, double damping);
+		size_t numNodesPerDim[3], double stiffness, double damping);
 	/// Helper method to initialize/add all bending springs on a 3D structure
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
 	void init3DBendingSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
-		unsigned int numNodesPerDim[3], double stiffness, double damping);
+		size_t numNodesPerDim[3], double stiffness, double damping);
 	/// Helper method to initialize/add all face diagonal springs on a 3D structure
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
 	void init3DFaceDiagonalSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
-		unsigned int numNodesPerDim[3], double stiffness, double damping);
+		size_t numNodesPerDim[3], double stiffness, double damping);
 	/// Helper method to initialize/add all volume diagonal springs on a 3D structure
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
 	void init3DVolumeDiagonalSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
-		unsigned int numNodesPerDim[3], double stiffness, double damping);
+		size_t numNodesPerDim[3], double stiffness, double damping);
 };
 
 };  // namespace Blocks

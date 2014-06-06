@@ -19,10 +19,9 @@
 #include <vector>
 
 #include "SurgSim/DataStructures/EmptyData.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Math/Vector.h"
-
 
 namespace SurgSim
 {
@@ -46,7 +45,7 @@ struct VertexData {
 	/// Inequality operator.
 	/// \param	rhs	The right hand side.
 	/// \return	true if the parameters are not considered equivalent.
-	bool operator !=(const SurgSim::Graphics::VertexData& rhs) const
+	bool operator!=(const SurgSim::Graphics::VertexData& rhs) const
 	{
 		return !((*this) == rhs);
 	}
@@ -76,11 +75,10 @@ public:
 	/// 					there have to be at least as many texture coordinates as there are vertices.
 	/// \param	triangles	The triangles, a plain array of triplets of triangle indices, the indices should be
 	/// 					points in the vertices array.
-	void initialize(
-		const std::vector<SurgSim::Math::Vector3d>& vertices,
-		const std::vector<SurgSim::Math::Vector4d>& colors,
-		const std::vector<SurgSim::Math::Vector2d>& textures,
-		const std::vector<unsigned int>& triangles);
+	void initialize(const std::vector<SurgSim::Math::Vector3d>& vertices,
+					const std::vector<SurgSim::Math::Vector4d>& colors,
+					const std::vector<SurgSim::Math::Vector2d>& textures,
+					const std::vector<size_t>& triangles);
 };
 
 }; // Graphics
@@ -88,4 +86,4 @@ public:
 
 #include "SurgSim/Graphics/Mesh-inl.h"
 
-#endif
+#endif // SURGSIM_GRAPHICS_MESH_H

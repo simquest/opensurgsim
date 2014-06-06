@@ -26,140 +26,34 @@ namespace SurgSim
 namespace DataStructures
 {
 
-void wrongThreadWriterLock(std::shared_ptr<BufferedValue<int>> value, bool* exceptionOccured)
-{
-	*exceptionOccured = false;
-	try
-	{
-		ReadWriteAccessor<int> writer(value);
-	}
-	catch (std::exception e)
-	{
-		*exceptionOccured = true;
-	}
-}
-
-struct TestStruct
-{
-	int a;
-	double b;
-};
-
-void functionTest(int value, int* testpointer)
-{
-	*testpointer = value;
-}
-
-
-
 TEST(BufferedValueTests, InitTest)
 {
-
+	EXPECT_NO_THROW({BufferedValue<int> value(3);});
 	EXPECT_NO_THROW({BufferedValue<int> value;});
 }
 
-TEST(BufferedValueTests, WriterLockTest)
+TEST(BufferedValueTests, SafeAndUnsafeGettersTest)
 {
 	auto buffer = std::make_shared<BufferedValue<int>>(10);
+	int& value = buffer->unsafeGet();
+	std::shared_ptr<const int> initialBufferedValue = buffer->safeGet();
 
-	std::unique_ptr<ReadWriteAccessor<int>> accessor0;
-	std::unique_ptr<ReadWriteAccessor<int>> accessor1;
+	EXPECT_EQ(10, value);
+	EXPECT_EQ(10, *initialBufferedValue);
 
-	// First accessor, no writer, this should succeed
-	EXPECT_NO_THROW(accessor0.reset(new ReadWriteAccessor<int>(buffer)));
+	value = 20;
+	EXPECT_EQ(20, value);
+	EXPECT_EQ(10, *initialBufferedValue);
 
-	// Second accessor, should throw as there is another writer
-	EXPECT_ANY_THROW(accessor1.reset(new ReadWriteAccessor<int>(buffer)));
+	std::shared_ptr<const int> postAssignBufferedValue = buffer->safeGet();
+	EXPECT_EQ(initialBufferedValue, postAssignBufferedValue);
 
-	// Release accessor
-	EXPECT_NO_THROW(accessor0.reset());
+	buffer->publish();
 
-	bool hadException = false;
-	boost::thread(wrongThreadWriterLock, buffer, &hadException);
-	// Buffer was allocated in this thread, this should fail
-	boost::this_thread::sleep(boost::posix_time::millisec(100));
-	EXPECT_TRUE(hadException);
+	EXPECT_EQ(10, *initialBufferedValue);
 
-	// Should succeed again, if the previous release was correct
-	EXPECT_NO_THROW(accessor0.reset(new ReadWriteAccessor<int>(buffer)));
-
-}
-
-TEST(BufferedValueTests, ReadWriteSimpleAccessorTest)
-{
-	auto buffer = std::make_shared<BufferedValue<int>>(10);
-	ReadWriteAccessor<int> accessor(buffer);
-
-	EXPECT_EQ(10, *accessor);
-
-	*accessor = 20;
-
-	EXPECT_EQ(20, *accessor);
-}
-
-TEST(BufferedValueTests, ReadWriteFunctionTest)
-{
-	auto buffer = std::make_shared<BufferedValue<int>>(10);
-	ReadWriteAccessor<int> accessor(buffer);
-
-	functionTest(20, accessor.get());
-
-	EXPECT_EQ(20, *accessor);
-}
-
-
-TEST(BufferedValueTests, ReadWriteStructAccessorTest)
-{
-	auto buffer = std::make_shared<BufferedValue<TestStruct>>();
-	ReadWriteAccessor<TestStruct> accessor(buffer);
-
-	accessor->a = 10;
-	accessor->b = 20.0;
-
-	EXPECT_EQ(10, (*accessor).a);
-	EXPECT_EQ(20.0, (*accessor).b);
-
-	(*accessor).a = 5;
-	(*accessor).b = 10.0;
-
-	EXPECT_EQ(5, accessor->a);
-	EXPECT_EQ(10.0, accessor->b);
-}
-
-TEST(BufferedValueTests, ReadAccessorTest)
-{
-	auto buffer = std::make_shared<BufferedValue<int>>(10);
-	ReadWriteAccessor<int> readWriteValue(buffer);
-	ReadAccessor<int> unsafeValue(buffer);
-	SafeReadAccessor<int> safeValue(buffer);
-
-	EXPECT_EQ(10, *unsafeValue);
-	EXPECT_EQ(10, *safeValue);
-
-	*readWriteValue = 20;
-
-	EXPECT_EQ(20, *unsafeValue);
-	EXPECT_EQ(10, *safeValue);
-
-	EXPECT_NO_THROW(readWriteValue.publish());
-
-	EXPECT_EQ(20, *unsafeValue);
-	EXPECT_EQ(20, *safeValue);
-
-	*readWriteValue = 30;
-	readWriteValue.publish();
-
-	bool didRead = false;
-
-	EXPECT_TRUE(safeValue.isStale());
-	safeValue.updateIfNew(&didRead);
-	EXPECT_TRUE(didRead);
-	EXPECT_FALSE(safeValue.isStale());
-
-	safeValue.updateIfNew(&didRead);
-	EXPECT_FALSE(didRead);
-	EXPECT_FALSE(safeValue.isStale());
-
+	std::shared_ptr<const int> postPublishBufferedValue = buffer->safeGet();
+	EXPECT_EQ(20, *postPublishBufferedValue);
 }
 
 

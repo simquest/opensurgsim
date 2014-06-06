@@ -54,7 +54,7 @@ void ShapeCollisionRepresentation::setLocalPose(const SurgSim::Math::RigidTransf
 
 void ShapeCollisionRepresentation::setShape(const std::shared_ptr<SurgSim::Math::Shape>& shape)
 {
-	SURGSIM_ASSERT(nullptr != shape) << "Can not shape a empty shape.";
+	SURGSIM_ASSERT(nullptr != shape) << "Can not set a empty shape.";
 	m_shape = shape;
 	update(0.0);
 }
@@ -67,7 +67,7 @@ const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getSha
 void ShapeCollisionRepresentation::update(const double& dt)
 {
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
-	if (nullptr != meshShape)
+	if (nullptr != meshShape && meshShape->isValid())
 	{
 		meshShape->setPose(getPose());
 	}

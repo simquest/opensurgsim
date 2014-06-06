@@ -18,6 +18,7 @@
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/SceneElement.h"
@@ -25,9 +26,9 @@
 #include "SurgSim/Graphics/VectorField.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-using SurgSim::DataStructures::Vertex;
 using SurgSim::Collision::Contact;
 using SurgSim::Collision::Representation;
+using SurgSim::DataStructures::Vertex;
 using SurgSim::Graphics::OsgVectorFieldRepresentation;
 using SurgSim::Graphics::VectorField;
 using SurgSim::Graphics::VectorFieldData;
@@ -66,12 +67,12 @@ void VisualizeContactsBehavior::setCollisionRepresentation(
 
 void VisualizeContactsBehavior::update(double dt)
 {
-	if (m_collisionRepresentation->hasCollision())
+	std::shared_ptr<const SurgSim::Collision::ContactMapType> collisions =
+		m_collisionRepresentation->getCollisions().safeGet();
+	if (!collisions->empty())
 	{
-		Representation::ContactMapType collisions = m_collisionRepresentation->getCollisions();
-
 		size_t totalContacts = 0;
-		for (auto collision = collisions.cbegin(); collision != collisions.cend(); ++collision)
+		for (auto collision = collisions->cbegin(); collision != collisions->cend(); ++collision)
 		{
 			totalContacts += collision->second.size();
 		}
@@ -81,9 +82,9 @@ void VisualizeContactsBehavior::update(double dt)
 		vectorField->getVertices().reserve(2 * totalContacts);
 
 		SurgSim::Math::RigidTransform3d inverseElementPose = getSceneElement()->getPose().inverse();
-		for (auto it = std::begin(collisions); it != std::end(collisions); ++it)
+		for (auto it = collisions->cbegin(); it != collisions->cend(); ++it)
 		{
-			for (auto iter = std::begin((*it).second); iter != std::end((*it).second); ++iter)
+			for (auto iter = (*it).second.cbegin(); iter != (*it).second.cend(); ++iter)
 			{
 				VectorFieldData vectorData1;
 				VectorFieldData vectorData2;

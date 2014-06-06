@@ -26,7 +26,7 @@ FemRepresentationCoordinate::FemRepresentationCoordinate() : elementId(0)
 
 }
 
-FemRepresentationCoordinate::FemRepresentationCoordinate(unsigned int elementId,
+FemRepresentationCoordinate::FemRepresentationCoordinate(size_t elementId,
 														 SurgSim::Math::Vector naturalCoordinate) :
 	elementId(elementId), naturalCoordinate(naturalCoordinate)
 {

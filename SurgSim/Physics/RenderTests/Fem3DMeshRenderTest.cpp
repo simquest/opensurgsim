@@ -20,6 +20,7 @@
 #include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
@@ -134,7 +135,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// The mesh for visualizing the surface of the finite element model
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("fem graphics");
-	*graphics->getMesh() = *(std::make_shared<SurgSim::Graphics::Mesh>(*loadMesh(filename)));
+	graphics->setFilename(filename);
 	graphics->setDrawAsWireFrame(true);
 	sceneElement->addComponent(graphics);
 
@@ -153,7 +154,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// The mesh for visualizing the collision mesh
 	graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("collision graphics");
-	*graphics->getMesh() = *(std::make_shared<SurgSim::Graphics::Mesh>(*loadMesh(filename)));
+	graphics->setFilename(filename);
 	auto mesh = graphics->getMesh();
 	for (size_t i = 0; i < mesh->getNumVertices(); ++i)
 	{
@@ -200,6 +201,5 @@ TEST_F(RenderTests, MeshRenderTest)
 	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 5000.0);
 }
 
-}
-}
-
+} // namespace Physics
+} // namespace SurgSim

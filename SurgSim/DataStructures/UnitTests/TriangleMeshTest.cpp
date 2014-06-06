@@ -55,9 +55,9 @@ TEST(TriangleMeshTest, NormalTest)
 	mesh->addVertex(v2);
 
 	// Add edges
-	std::array<unsigned int, 2> edgePoints01;
-	std::array<unsigned int, 2> edgePoints02;
-	std::array<unsigned int, 2> edgePoints12;
+	std::array<size_t, 2> edgePoints01;
+	std::array<size_t, 2> edgePoints02;
+	std::array<size_t, 2> edgePoints12;
 
 	EdgeElement element01(edgePoints01);
 	EdgeElement element02(edgePoints02);
@@ -72,7 +72,7 @@ TEST(TriangleMeshTest, NormalTest)
 	mesh->addEdge(e12);
 
 	// Add triangle
-	std::array<unsigned int, 3> trianglePoints = {0, 1, 2};
+	std::array<size_t, 3> trianglePoints = {0, 1, 2};
 
 	TriangleElement triangleElement(trianglePoints);
 	TriangleMeshBase::TriangleType t(triangleElement);

@@ -29,34 +29,31 @@ namespace Blocks
 {
 
 void MassSpring1DRepresentation::init1D(
-	const std::array<Vector3d, 2> extremities,
-	unsigned int numNodesPerDim[1],
-	std::vector<unsigned int> nodeBoundaryConditions,
+	const std::vector<Vector3d> nodes,
+	std::vector<size_t> nodeBoundaryConditions,
 	double totalMass,
 	double stiffnessStretching, double dampingStretching,
 	double stiffnessBending, double dampingBending)
 {
 	std::shared_ptr<SurgSim::Math::OdeState> state;
 	state = std::make_shared<SurgSim::Math::OdeState>();
-	state->setNumDof(getNumDofPerNode(), numNodesPerDim[0]);
+	state->setNumDof(getNumDofPerNode(), nodes.size());
 
-	SURGSIM_ASSERT(numNodesPerDim[0] > 0) << "Number of nodes incorrect: " << numNodesPerDim[0];
+	SURGSIM_ASSERT(nodes.size() > 0) << "Number of nodes incorrect: " << nodes.size();
 
 	// Initialize the nodes position, velocity and mass
 	// Note: no need to apply the initialPose here, initialize will take care of it !
-	Vector3d delta = (extremities[1] - extremities[0]) / static_cast<double>(numNodesPerDim[0] - 1);
-	for (unsigned int massId = 0; massId < numNodesPerDim[0]; massId++)
+	for (size_t massId = 0; massId < nodes.size(); massId++)
 	{
-		addMass(std::make_shared<Mass>(totalMass / static_cast<double>(numNodesPerDim[0])));
+		addMass(std::make_shared<Mass>(totalMass / static_cast<double>(nodes.size())));
 
-		Vector3d position(extremities[0] + massId * delta);
-		SurgSim::Math::setSubVector(position, massId, 3, &state->getPositions());
+		SurgSim::Math::setSubVector(nodes[massId], massId, 3, &state->getPositions());
 	}
 
 	// Initialize the stretching springs
 	if (stiffnessStretching || dampingStretching)
 	{
-		for (unsigned int massId = 0; massId < numNodesPerDim[0] - 1; massId++)
+		for (size_t massId = 0; massId < nodes.size() - 1; massId++)
 		{
 			addSpring(createLinearSpring(state, massId, massId + 1, stiffnessStretching, dampingStretching));
 		}
@@ -65,7 +62,7 @@ void MassSpring1DRepresentation::init1D(
 	// Initialize the bending springs
 	if (stiffnessBending || dampingBending)
 	{
-		for (unsigned int massId = 0; massId < numNodesPerDim[0] - 2; massId++)
+		for (size_t massId = 0; massId < nodes.size() - 2; massId++)
 		{
 			addSpring(createLinearSpring(state, massId, massId + 2, stiffnessBending, dampingBending));
 		}

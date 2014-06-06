@@ -15,9 +15,9 @@
 
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
-#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 
 using SurgSim::DataStructures::PlyReader;
 
@@ -170,7 +170,7 @@ void Fem3DRepresentationPlyReaderDelegate::processPolyhedron(const std::string& 
 	SURGSIM_ASSERT(m_polyhedronData.vertexCount == 4) << "Cannot process polyhedron with "
 			<< m_polyhedronData.vertexCount << " vertices.";
 
-	std::array<unsigned int, 4> polyhedronVertices;
+	std::array<size_t, 4> polyhedronVertices;
 	std::copy(m_polyhedronData.indicies, m_polyhedronData.indicies + 4, polyhedronVertices.begin());
 	m_fem->addFemElement(std::make_shared<Fem3DElementTetrahedron>(polyhedronVertices));
 }

@@ -55,15 +55,15 @@ public:
 	/// Constructor
 	/// \param	name	Name used in shader code to access this uniform
 	/// \param	numElements	Number of elements
-	OsgUniform(const std::string& name, unsigned int numElements);
+	OsgUniform(const std::string& name, size_t numElements);
 
 	/// Returns the number of elements
-	virtual unsigned int getNumElements() const;
+	virtual size_t getNumElements() const;
 
 	/// Sets the value of one of the uniform's elements
 	/// \param	index	Index of the element
 	/// \param	value	Value to set
-	virtual void setElement(unsigned int index, const T& value);
+	virtual void setElement(size_t index, const T& value);
 
 	/// Sets the value of all of the uniform's elements
 	/// \param	value	Array of values
@@ -72,7 +72,7 @@ public:
 	/// Gets the value of one of the uniform's elements
 	/// \param	index	Index of the element
 	/// \return	Value of the element
-	virtual typename std::vector<T>::const_reference getElement(unsigned int index) const;
+	virtual typename std::vector<T>::const_reference getElement(size_t index) const;
 
 	/// Gets the value of all of the uniform's elements
 	/// \return	Vector of values

@@ -70,8 +70,15 @@ set(UNIT_TEST_HEADERS
 	MockOsgObjects.h
 )
 
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
+
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/Data/Geometry DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 
 set(LIBS 

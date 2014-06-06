@@ -24,7 +24,7 @@ namespace Math
 
 template <class VertexData, class EdgeData, class TriangleData>
 MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh) :
-	m_volume(0.0), m_fileName()
+	m_volume(0.0)
 {
 	SURGSIM_ASSERT(mesh.isValid()) << "Invalid mesh";
 

@@ -66,12 +66,12 @@ TEST (MassSpringRepresentationLocalizationTest, GetPositionTest)
 
 	// Create the mass spring
 	auto massSpring = std::make_shared<SurgSim::Blocks::MassSpring1DRepresentation>("MassSpring");
-	std::array<Vector3d, 2> extremities = {{ Vector3d(0,0,0), Vector3d(1,0,0) }};
-	unsigned int numNodesPerDim[1] = {2};
-	std::vector<unsigned int> boundaryConditions;
+	std::vector<Vector3d> extremities;
+	extremities.push_back(Vector3d(0,0,0));
+	extremities.push_back(Vector3d(1,0,0));
+	std::vector<size_t> boundaryConditions;
 	massSpring->init1D(
 		extremities,
-		numNodesPerDim,
 		boundaryConditions,
 		0.1, // total mass (in Kg)
 		100.0, // Stiffness stretching

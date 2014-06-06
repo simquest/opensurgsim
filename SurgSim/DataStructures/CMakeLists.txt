@@ -49,6 +49,8 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataGroup.h
 	DataGroupBuilder.h
 	DataGroupCopier.h
+	DataStructuresConvert.h
+	DataStructuresConvert-inl.h
 	EmptyData.h
 	IndexDirectory.h
 	MeshElement.h

@@ -38,7 +38,7 @@ public:
 	{
 		sceneryObject = std::make_shared<OsgSceneryRepresentation>("test");
 		sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("test2");
-		runtime = std::make_shared<SurgSim::Framework::Runtime>();
+		runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		manager = std::make_shared<SurgSim::Graphics::OsgManager>();
 		scene = runtime->getScene();
 		viewElement = std::make_shared<OsgViewElement>("view element");
@@ -62,16 +62,16 @@ public:
 
 TEST_F(OsgSceneryRepresentationTest, FileNameTest)
 {
-	sceneryObject->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
-	EXPECT_EQ("Data/OsgSceneryRepresentationTests/Torus.obj", sceneryObject->getFileName());
+	sceneryObject->setFileName("OsgSceneryRepresentationTests/Torus.obj");
+	EXPECT_EQ("OsgSceneryRepresentationTests/Torus.obj", sceneryObject->getFileName());
 }
 
 TEST_F(OsgSceneryRepresentationTest, InitTest)
 {
-	sceneryObject->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
+	sceneryObject->setFileName("OsgSceneryRepresentationTests/Torus.obj");
 	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject));
 
-	sceneryObject2->setFileName("Data/OsgSceneryRepresentationTests/Torus.osgb");
+	sceneryObject2->setFileName("OsgSceneryRepresentationTests/Torus.osgb");
 	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject2));
 }
 
@@ -79,8 +79,8 @@ TEST_F(OsgSceneryRepresentationTest, AccessibleTest)
 {
 	std::shared_ptr<SurgSim::Framework::Component> component;
 	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
-		"SurgSim::Graphics::OsgSceneryRepresentation",
-		"scenery"));
+									"SurgSim::Graphics::OsgSceneryRepresentation",
+									"scenery"));
 
 	std::string fileName("TestFileName");
 	component->setValue("FileName", fileName);

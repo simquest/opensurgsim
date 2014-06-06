@@ -46,7 +46,7 @@ TEST(MassSpringNDRepresentationUtilsTests, CreateLinearSpring)
 		EXPECT_EQ(2u, linearSpring->getNumNodes());
 		EXPECT_EQ(3u, linearSpring->getNodeId(0));
 		EXPECT_EQ(7u, linearSpring->getNodeId(1));
-		EXPECT_EQ(2, static_cast<int>(linearSpring->getNodeIds().size()));
+		EXPECT_EQ(2, linearSpring->getNodeIds().size());
 		EXPECT_EQ(3u, linearSpring->getNodeIds()[0]);
 		EXPECT_EQ(7u, linearSpring->getNodeIds()[1]);
 	}
@@ -72,7 +72,7 @@ TEST(MassSpringNDRepresentationUtilsTests, CreateLinearSpring)
 		EXPECT_EQ(2u, linearSpring->getNumNodes());
 		EXPECT_EQ(3u, linearSpring->getNodeId(0));
 		EXPECT_EQ(7u, linearSpring->getNodeId(1));
-		EXPECT_EQ(2, static_cast<int>(linearSpring->getNodeIds().size()));
+		EXPECT_EQ(2, linearSpring->getNodeIds().size());
 		EXPECT_EQ(3u, linearSpring->getNodeIds()[0]);
 		EXPECT_EQ(7u, linearSpring->getNodeIds()[1]);
 	}

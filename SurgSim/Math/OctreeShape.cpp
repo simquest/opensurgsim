@@ -44,15 +44,10 @@ int OctreeShape::getType()
 	return SHAPE_TYPE_OCTREE;
 }
 
-void OctreeShape::setFileName(const std::string& fileName)
+bool OctreeShape::doInitialize(const std::string& fileName)
 {
-	m_fileName = fileName;
 	m_rootNode = std::make_shared<NodeType>(*SurgSim::DataStructures::loadOctree(fileName));
-}
-
-std::string OctreeShape::getFileName() const
-{
-	return m_fileName;
+	return true;
 }
 
 double OctreeShape::getVolume() const
@@ -88,6 +83,4 @@ void OctreeShape::setRootNode(std::shared_ptr<OctreeShape::NodeType> node)
 }
 
 }; // namespace Math
-
 }; // namespace SurgSim
-

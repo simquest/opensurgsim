@@ -53,23 +53,23 @@ void MassSpringRepresentation::addSpring(const std::shared_ptr<Spring> spring)
 	m_springs.push_back(spring);
 }
 
-unsigned int MassSpringRepresentation::getNumMasses() const
+size_t MassSpringRepresentation::getNumMasses() const
 {
 	return m_masses.size();
 }
 
-unsigned int MassSpringRepresentation::getNumSprings() const
+size_t MassSpringRepresentation::getNumSprings() const
 {
 	return m_springs.size();
 }
 
-std::shared_ptr<Mass> MassSpringRepresentation::getMass(unsigned int nodeId)
+std::shared_ptr<Mass> MassSpringRepresentation::getMass(size_t nodeId)
 {
 	SURGSIM_ASSERT(nodeId < getNumMasses()) << "Invalid node id to request a mass from";
 	return m_masses[nodeId];
 }
 
-std::shared_ptr<Spring> MassSpringRepresentation::getSpring(unsigned int springId)
+std::shared_ptr<Spring> MassSpringRepresentation::getSpring(size_t springId)
 {
 	SURGSIM_ASSERT(springId < getNumSprings()) << "Invalid spring id";
 	return m_springs[springId];
@@ -128,37 +128,6 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 		"State has not been initialized yet, call setInitialState() prior to running the simulation";
 }
 
-void MassSpringRepresentation::afterUpdate(double dt)
-{
-	DeformableRepresentation::afterUpdate(dt);
-
-	if (! isActive())
-	{
-		return;
-	}
-
-	if (!m_currentState->isValid())
-	{
-		deactivateAndReset();
-	}
-}
-
-void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlock<Vector>& deltaVelocity)
-{
-	if ( !isActive())
-	{
-		return;
-	}
-
-	m_currentState->getPositions() += deltaVelocity * dt;
-	m_currentState->getVelocities() += deltaVelocity;
-
-	if (!m_currentState->isValid())
-	{
-		deactivateAndReset();
-	}
-}
-
 Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
@@ -189,7 +158,7 @@ const Matrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& 
 
 	Eigen::MatrixBase<Matrix>::DiagonalReturnType diagonal = m_M.diagonal();
 
-	for (unsigned int massId = 0; massId < getNumMasses(); massId++)
+	for (size_t massId = 0; massId < getNumMasses(); massId++)
 	{
 		setSubVector(Vector3d::Ones() * getMass(massId)->getMass(), massId, 3, &diagonal);
 	}
@@ -220,7 +189,7 @@ const Matrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& 
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
 	{
-		for (unsigned int massId = 0; massId < getNumMasses(); massId++)
+		for (size_t massId = 0; massId < getNumMasses(); massId++)
 		{
 			double coef = rayleighMass * getMass(massId)->getMass();
 			Eigen::MatrixBase<Matrix>::DiagonalReturnType Ddiagonal = m_D.diagonal();
@@ -373,7 +342,7 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Surg
 		}
 		else
 		{
-			for (unsigned int nodeID = 0; nodeID < getNumMasses(); nodeID++)
+			for (size_t nodeID = 0; nodeID < getNumMasses(); nodeID++)
 			{
 				double mass = getMass(nodeID)->getMass();
 				SurgSim::Math::Vector3d f = - scale * rayleighMass * mass * getSubVector(v, nodeID, 3);
@@ -414,7 +383,7 @@ void MassSpringRepresentation::addGravityForce(Vector *f, const SurgSim::Math::O
 
 	if (isGravityEnabled())
 	{
-		for (unsigned int massId = 0; massId < getNumMasses(); massId++)
+		for (size_t massId = 0; massId < getNumMasses(); massId++)
 		{
 			addSubVector(getGravity() * getMass(massId)->getMass(), massId, 3, f);
 		}
@@ -424,11 +393,11 @@ void MassSpringRepresentation::addGravityForce(Vector *f, const SurgSim::Math::O
 static void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
 									  Vector* x, bool rotationOnly = false)
 {
-	unsigned int numNodes = x->size() / 3;
-	SURGSIM_ASSERT(static_cast<int>(numNodes * 3) == x->size()) <<
+	size_t numNodes = x->size() / 3;
+	SURGSIM_ASSERT(static_cast<ptrdiff_t>(numNodes * 3) == x->size()) <<
 		"Unexpected number of dof in a MassSpring state vector (not a multiple of 3)";
 
-	for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
+	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
 	{
 		SurgSim::Math::Vector3d xi = SurgSim::Math::getSubVector(*x, nodeId, 3);
 		SurgSim::Math::Vector3d xiTransformed;
