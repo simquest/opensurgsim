@@ -115,7 +115,8 @@ public:
 				}
 			}
 		}
-		if (m_digitalInputPlusXIndex >= 0)
+
+		if (m_digitalInputMinusXIndex >= 0)
 		{
 			double value;
 			if (dataToFilter.scalars().get(m_digitalInputMinusXIndex, &value))
@@ -170,7 +171,8 @@ int main(int argc, char** argv)
 	digitalInputChannels.insert(lineForMinusX);
 	toolDevice->setDigitalInputChannels(digitalInputChannels);
 
-	toolDevice->setTimerCounterPinOffset(4); // the U3 requires the offset to be 4+.
+	const int offset = 4;
+	toolDevice->setTimerCounterPinOffset(offset); // the U3 requires the offset to be 4+.
 
 	const int firstTimerForQuadrature = 0;
 	std::unordered_map<int,SurgSim::Device::LabJackTimerMode> timers;
@@ -191,9 +193,14 @@ int main(int argc, char** argv)
 		// a pretend device that doesn't actually move.
 		std::shared_ptr<DeviceInterface> squareDevice = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
 
-		std::string text = "Set FIO0 low to move the sphere tool in positive x-direction. ";
-		text += "Set FIO1 low to move in negative x. ";
-		text += "Spin a quadrature encoder attached to FIO4 and FIO5 to move the sphere +/- y-direction.";
+		std::string text = "Set FIO" + std::to_string(lineForPlusX);
+		text += " low to move the sphere tool in positive x-direction.  ";
+		text += "Set FIO" + std::to_string(lineForMinusX);
+		text += " low to move in negative x.  ";
+
+		text += "Spin a quadrature encoder attached to FIO" + std::to_string(firstTimerForQuadrature + offset);
+		text += " and FIO" + std::to_string(firstTimerForQuadrature + offset + 1);
+		text += " to move the sphere +/- y-direction.  ";
 
 		runToolSquareTest(filter, squareDevice,
 			//2345678901234567890123456789012345678901234567890123456789012345678901234567890
