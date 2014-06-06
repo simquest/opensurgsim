@@ -64,13 +64,21 @@ public:
 	/// \param	name	Name of the behavior
 	explicit StaplerBehavior(const std::string& name);
 
+	SURGSIM_CLASSNAME(StaplerBehavior);
+
 	/// Set the input component from which to get the pose
 	/// \param	inputComponent	The input component which sends the pose.
-	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent);
+	void setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent);
+
+	/// \return	The input component which sends the pose.
+	std::shared_ptr<SurgSim::Input::InputComponent> getInputComponent();
 
 	/// Set the representation of the stapler
 	/// \param	staplerRepresentation The representation of a stapler
-	void setRepresentation(std::shared_ptr<SurgSim::Framework::Representation> staplerRepresentation);
+	void setRepresentation(std::shared_ptr<SurgSim::Framework::Component> staplerRepresentation);
+
+	/// \return The representation of a stapler
+	std::shared_ptr<SurgSim::Framework::Representation> getRepresentation();
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -81,12 +89,22 @@ public:
 	virtual int getTargetManagerType() const override;
 
 	/// Sets the virtual teeth for the virtual staple
-	/// \param virtualTeeth Array of collision representations for the virtual staple teeth.
-	void setVirtualStaple(const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& virtualTeeth);
+	/// \param virtualTeeth Array of collision representations for the virtual stapler teeth.
+	void setVirtualTeeth(const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& virtualTeeth);
+
+	/// \return Array of collision representations for the virtual stapler teeth.
+	const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& getVirtualTeeth();
 
 	/// Add a scene element (name) for which stapling is enabled within this behaviour.
 	/// \param sceneElementName The name of the scene element that this behaviour can staple.
 	void enableStaplingForSceneElement(std::string sceneElementName);
+
+	/// Sets the list of scene element names that this behaviour can staple
+	/// \param stapleEnabledSceneElements List of scene element names that this behaviour can staple.
+	void setStapleEnabledSceneElements(const std::list<std::string>& stapleEnabledSceneElements);
+
+	/// \return List of scene element names that this behaviour can staple.
+	const std::list<std::string>& getStapleEnabledSceneElements();
 
 protected:
 	/// Initialize this behavior
