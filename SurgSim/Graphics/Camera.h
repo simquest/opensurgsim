@@ -40,6 +40,11 @@ class RenderTarget;
 /// Graphics::Camera is used with Graphics::View to provide the visualization of the virtual scene to the user.
 /// Cameras refer to a group that contain all the elements that they render, they may also parts of other group that
 /// determine whether they are rendered.
+/// It should provide the following Uniforms:
+/// \code
+/// uniform mat4 viewMatrix;
+/// uniform mat4 inverseViewMatrix;
+/// \endcode
 class Camera : public virtual Representation
 {
 public:

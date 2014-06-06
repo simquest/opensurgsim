@@ -15,19 +15,22 @@
 
 #include "SurgSim/Graphics/OsgCamera.h"
 
-#include "SurgSim/Graphics/Material.h"
 #include "SurgSim/Graphics/Manager.h"
+#include "SurgSim/Graphics/Material.h"
 #include "SurgSim/Graphics/OsgGroup.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMatrixConversions.h"
 #include "SurgSim/Graphics/OsgQuaternionConversions.h"
-#include "SurgSim/Graphics/OsgVectorConversions.h"
 #include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgVectorConversions.h"
+#include "SurgSim/Math/Matrix.h"
 
 #include <osgUtil/CullVisitor>
 
 
 using SurgSim::Math::makeRigidTransform;
+using SurgSim::Math::Matrix44f;
 
 namespace
 {
@@ -73,7 +76,9 @@ OsgCamera::OsgCamera(const std::string& name) :
 	OsgRepresentation(name),
 	Camera(name),
 	m_camera(new osg::Camera()),
-	m_materialProxy(new osg::Group())
+	m_materialProxy(new osg::Group()),
+	m_viewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("viewMatrix")),
+	m_inverseViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix"))
 {
 	m_switch->removeChildren(0, m_switch->getNumChildren());
 	m_camera->setName(name + " Camera");
@@ -144,7 +149,10 @@ void OsgCamera::update(double dt)
 	// every frame
 	// #workaround
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+
 	m_camera->setViewMatrix(toOsg(getViewMatrix()));
+	m_viewMatrixUniform->set(getViewMatrix().cast<float>());
+	m_inverseViewMatrixUniform->set(getInverseViewMatrix().cast<float>());
 }
 
 bool OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)
@@ -202,6 +210,8 @@ bool OsgCamera::setMaterial(std::shared_ptr<Material> material)
 	bool result = false;
 	if (osgMaterial != nullptr)
 	{
+		osgMaterial->addUniform(m_viewMatrixUniform);
+		osgMaterial->addUniform(m_inverseViewMatrixUniform);
 		m_materialProxy->setStateSet(osgMaterial->getOsgStateSet());
 		result = true;
 		m_material = osgMaterial;
