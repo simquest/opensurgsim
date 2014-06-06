@@ -71,14 +71,14 @@ public:
 	void setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent);
 
 	/// \return	The input component which sends the pose.
-	std::shared_ptr<SurgSim::Framework::Component> getInputComponent();
+	std::shared_ptr<SurgSim::Input::InputComponent> getInputComponent();
 
 	/// Set the representation of the stapler
 	/// \param	staplerRepresentation The representation of a stapler
 	void setRepresentation(std::shared_ptr<SurgSim::Framework::Component> staplerRepresentation);
 
 	/// \return The representation of a stapler
-	std::shared_ptr<SurgSim::Framework::Component> getRepresentation();
+	std::shared_ptr<SurgSim::Framework::Representation> getRepresentation();
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.

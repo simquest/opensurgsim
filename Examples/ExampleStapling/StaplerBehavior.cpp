@@ -77,7 +77,7 @@ void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Framework::Comp
 	SURGSIM_ASSERT(nullptr != m_from) << "Cannot set other than SurgSim::Input::InputComponent to InputComponent";
 }
 
-std::shared_ptr<SurgSim::Framework::Component> StaplerBehavior::getInputComponent()
+std::shared_ptr<SurgSim::Input::InputComponent> StaplerBehavior::getInputComponent()
 {
 	return m_from;
 }
@@ -92,7 +92,7 @@ void StaplerBehavior::setRepresentation(std::shared_ptr<SurgSim::Framework::Comp
 		<< "Cannot set other than SurgSim::Framework::Representation to StaplerRepresentation";
 }
 
-std::shared_ptr<SurgSim::Framework::Component> StaplerBehavior::getRepresentation()
+std::shared_ptr<SurgSim::Framework::Representation> StaplerBehavior::getRepresentation()
 {
 	return m_representation;
 }
