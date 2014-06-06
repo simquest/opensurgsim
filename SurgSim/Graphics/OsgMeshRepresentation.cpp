@@ -15,8 +15,6 @@
 
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 
-#include <boost/filesystem.hpp>
-
 #include <osg/Array>
 #include <osg/Geode>
 #include <osg/Geometry>

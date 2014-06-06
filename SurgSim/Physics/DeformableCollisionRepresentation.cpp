@@ -13,10 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/filesystem.hpp>
-
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/MathConvert.h"
@@ -59,7 +56,6 @@ std::shared_ptr<SurgSim::DataStructures::TriangleMesh> DeformableCollisionRepres
 {
 	return m_mesh;
 }
-
 
 void DeformableCollisionRepresentation::update(const double& dt)
 {
