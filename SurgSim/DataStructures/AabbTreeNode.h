@@ -68,7 +68,7 @@ private:
 	SurgSim::Math::Aabbd m_aabb;
 
 	/// Cache for the index of the longest axis on this node
-	unsigned int m_axis;
+	size_t m_axis;
 };
 
 }

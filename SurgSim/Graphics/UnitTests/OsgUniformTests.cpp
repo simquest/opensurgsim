@@ -88,7 +88,7 @@ std::pair<Type, boost::any> testAccessible(const Type& value)
 /// \tparam	OsgType	Type stored in the osg::Uniform
 template <class Type, class OsgType>
 std::pair<std::vector<Type>, std::vector<OsgType>> testUniformElementsConstruction(
-			const std::vector<Type>& value, unsigned int numElements)
+			const std::vector<Type>& value, size_t numElements)
 {
 	std::shared_ptr<OsgUniform<std::vector<Type>>> osgUniform =
 		std::make_shared<OsgUniform<std::vector<Type>>>("test name", numElements);
@@ -139,11 +139,11 @@ void testUniformFloat(FloatType min, FloatType max)
 /// \param	max	Maximum random value
 /// \param	numElements	Number of elements
 template <class FloatType>
-void testUniformElementsFloat(FloatType min, FloatType max, unsigned int numElements)
+void testUniformElementsFloat(FloatType min, FloatType max, size_t numElements)
 {
 	std::uniform_real_distribution<FloatType> distribution(min, max);
 	std::vector<FloatType> elements;
-	for (unsigned int i = 0; i < numElements; ++i)
+	for (size_t i = 0; i < numElements; ++i)
 	{
 		elements.push_back(distribution(generator));
 	}
@@ -154,7 +154,7 @@ void testUniformElementsFloat(FloatType min, FloatType max, unsigned int numElem
 	EXPECT_EQ(elements.size(), result.first.size()) << "Number of resulting float-type elements does not match input";
 	EXPECT_EQ(elements.size(), result.second.size()) << "Number of resulting OSG-type elements does not match input";
 
-	for (unsigned int i = 0; i < elements.size(); ++i)
+	for (size_t i = 0; i < elements.size(); ++i)
 	{
 		EXPECT_NEAR(elements[i], result.first[i], Eigen::NumTraits<FloatType>::dummy_precision());
 		EXPECT_NEAR(elements[i], result.second[i], Eigen::NumTraits<FloatType>::dummy_precision());
@@ -186,11 +186,11 @@ void testUniformInt(IntType min, IntType max)
 /// \param	max	Maximum random value
 /// \param	numElements	Number of elements
 template <class IntType>
-void testUniformElementsInt(IntType min, IntType max, unsigned int numElements)
+void testUniformElementsInt(IntType min, IntType max, size_t numElements)
 {
 	std::uniform_int_distribution<IntType> distribution(min, max);
 	std::vector<IntType> elements;
-	for (unsigned int i = 0; i < numElements; ++i)
+	for (size_t i = 0; i < numElements; ++i)
 	{
 		elements.push_back(distribution(generator));
 	}
@@ -201,7 +201,7 @@ void testUniformElementsInt(IntType min, IntType max, unsigned int numElements)
 	EXPECT_EQ(elements.size(), result.first.size()) << "Number of resulting int-type elements does not match input";
 	EXPECT_EQ(elements.size(), result.second.size()) << "Number of resulting OSG-type elements does not match input";
 
-	for (unsigned int i = 0; i < elements.size(); ++i)
+	for (size_t i = 0; i < elements.size(); ++i)
 	{
 		EXPECT_EQ(elements[i], result.first[i]);
 		EXPECT_EQ(elements[i], result.second[i]);
@@ -230,10 +230,10 @@ void testUniformEigen()
 /// \tparam	Type	Eigen type (Vector2f, Matrix44d, ...)
 /// \tparam	OsgType	OSG type which corresponds with the Eigen type (must have a fromOsg() defined for this type)
 template <class Type, class OsgType>
-void testUniformElementsEigen(unsigned int numElements)
+void testUniformElementsEigen(size_t numElements)
 {
 	std::vector<Type> elements;
-	for (unsigned int i = 0; i < numElements; ++i)
+	for (size_t i = 0; i < numElements; ++i)
 	{
 		elements.push_back(Type::Random());
 	}
@@ -244,7 +244,7 @@ void testUniformElementsEigen(unsigned int numElements)
 	EXPECT_EQ(elements.size(), result.first.size()) << "Number of resulting Eigen-type elements does not match input";
 	EXPECT_EQ(elements.size(), result.second.size()) << "Number of resulting OSG-type elements does not match input";
 
-	for (unsigned int i = 0; i < elements.size(); ++i)
+	for (size_t i = 0; i < elements.size(); ++i)
 	{
 		const Type& eigenInput = elements[i];
 		const Type& eigenOutput = result.first[i];
@@ -356,7 +356,7 @@ TEST(OsgUniformTests, UnsignedIntElementsTest)
 TEST(OsgUniformTests, BoolElementsTest)
 {
 	std::vector<bool> elements;
-	for (unsigned int i = 0; i < 10; ++i)
+	for (size_t i = 0; i < 10; ++i)
 	{
 		elements.push_back(i % 2 == 0);
 	}
@@ -367,7 +367,7 @@ TEST(OsgUniformTests, BoolElementsTest)
 	EXPECT_EQ(elements.size(), result.first.size()) << "Number of resulting bool-type elements does not match input";
 	EXPECT_EQ(elements.size(), result.second.size()) << "Number of resulting OSG-type elements does not match input";
 
-	for (unsigned int i = 0; i < elements.size(); ++i)
+	for (size_t i = 0; i < elements.size(); ++i)
 	{
 		EXPECT_EQ(elements[i], result.first[i]);
 		EXPECT_EQ(elements[i], result.second[i]);

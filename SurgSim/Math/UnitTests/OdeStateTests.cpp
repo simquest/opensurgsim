@@ -53,7 +53,7 @@ TEST(OdeStateTest, AllocateTest)
 	EXPECT_EQ(0u, state.getNumDof());
 	EXPECT_EQ(0u, state.getNumNodes());
 	EXPECT_EQ(0u, state.getNumBoundaryConditions());
-	EXPECT_EQ(static_cast<std::vector<unsigned int>::size_type>(0), state.getBoundaryConditions().size());
+	EXPECT_EQ(0, state.getBoundaryConditions().size());
 	EXPECT_EQ(0, state.getPositions().size());
 	EXPECT_EQ(0, state.getVelocities().size());
 
@@ -63,7 +63,7 @@ TEST(OdeStateTest, AllocateTest)
 	EXPECT_EQ(9, state.getPositions().size());
 	EXPECT_EQ(9, state.getVelocities().size());
 	EXPECT_EQ(0u , state.getNumBoundaryConditions());
-	EXPECT_EQ(static_cast<std::vector<unsigned int>::size_type>(0) , state.getBoundaryConditions().size());
+	EXPECT_EQ(0 , state.getBoundaryConditions().size());
 }
 
 TEST(OdeStateTest, GetPositionsTest)
@@ -71,7 +71,7 @@ TEST(OdeStateTest, GetPositionsTest)
 	OdeState state1, state2;
 	state1.setNumDof(3u, 3u);
 	state2.setNumDof(3u, 3u);
-	for(unsigned int i = 0; i < state1.getNumDof(); i++)
+	for(size_t i = 0; i < state1.getNumDof(); i++)
 	{
 		state1.getPositions()[i] = static_cast<double>(i);
 		state2.getPositions()[i] = 0.0;
@@ -84,7 +84,7 @@ TEST(OdeStateTest, GetPositionsTest)
 
 	state1.reset();
 	// state1.m_x contains (0 0 0 0 0 0 0 0 0 0 0) & state2.m_x contains (0 1 2 3 4 5 6 7 8 9 10)
-	for(unsigned int i = 0; i < state1.getNumDof(); i++)
+	for(size_t i = 0; i < state1.getNumDof(); i++)
 	{
 		EXPECT_EQ(0.0, state1.getPositions()[i]);
 		EXPECT_EQ(static_cast<double>(i), state2.getPositions()[i]);
@@ -100,7 +100,7 @@ TEST(OdeStateTest, GetVelocitiesTest)
 	OdeState state1, state2;
 	state1.setNumDof(3u, 3u);
 	state2.setNumDof(3u, 3u);
-	for(unsigned int i = 0; i < state1.getNumDof(); i++)
+	for(size_t i = 0; i < state1.getNumDof(); i++)
 	{
 		state1.getVelocities()[i] = static_cast<double>(i);
 		state2.getVelocities()[i] = 0.0;
@@ -113,7 +113,7 @@ TEST(OdeStateTest, GetVelocitiesTest)
 
 	state1.reset();
 	// state1.m_v contains (0 0 0 0 0 0 0 0 0 0 0) & state2.m_v contains (0 1 2 3 4 5 6 7 8 9 10)
-	for(unsigned int i = 0; i < state1.getNumDof(); i++)
+	for(size_t i = 0; i < state1.getNumDof(); i++)
 	{
 		EXPECT_EQ(0.0, state1.getVelocities()[i]);
 		EXPECT_EQ(static_cast<double>(i), state2.getVelocities()[i]);
@@ -126,7 +126,7 @@ TEST(OdeStateTest, GetVelocitiesTest)
 
 namespace
 {
-void testBoundaryConditions(const SurgSim::Math::OdeState& state, std::vector<unsigned int> expectedDofIds)
+void testBoundaryConditions(const SurgSim::Math::OdeState& state, std::vector<size_t> expectedDofIds)
 {
 	EXPECT_EQ(6u, state.getNumDof());
 	EXPECT_EQ(expectedDofIds.size(), state.getNumBoundaryConditions());
@@ -135,7 +135,7 @@ void testBoundaryConditions(const SurgSim::Math::OdeState& state, std::vector<un
 	{
 		EXPECT_EQ(expectedDofIds[index], state.getBoundaryConditions()[index]);
 	}
-	for (unsigned int dofId = 0; dofId < 6; dofId++)
+	for (size_t dofId = 0; dofId < 6; dofId++)
 	{
 		if (std::find(expectedDofIds.begin(), expectedDofIds.end(), dofId) != expectedDofIds.end())
 		{
@@ -157,14 +157,14 @@ TEST(OdeStateTest, AddGetIsBoundaryConditionsTest)
 {
 	{
 		OdeState state;
-		std::vector<unsigned int> expectedDofIdsBoundaryConditions;
+		std::vector<size_t> expectedDofIdsBoundaryConditions;
 
 		// Assert trying to add a boundary condition before setting the number of node and dof per node
 		ASSERT_THROW(state.addBoundaryCondition(0u, 0u), SurgSim::Framework::AssertionFailure);
 
 		state.setNumDof(3u, 2u); // Number of dof per node is 3
 
-		SCOPED_TRACE("Testing addBoundaryCondition(unsigned int nodeId, unsigned int dofId)");
+		SCOPED_TRACE("Testing addBoundaryCondition(size_t nodeId, size_t dofId)");
 
 		state.addBoundaryCondition(0u, 0u);
 		expectedDofIdsBoundaryConditions.push_back((0u * 3u + 0u)); // (node 0, dof 0)
@@ -187,14 +187,14 @@ TEST(OdeStateTest, AddGetIsBoundaryConditionsTest)
 
 	{
 		OdeState state;
-		std::vector<unsigned int> expectedDofIdsBoundaryConditions;
+		std::vector<size_t> expectedDofIdsBoundaryConditions;
 
 		// Assert trying to add a boundary condition before setting the number of node and dof per node
 		ASSERT_THROW(state.addBoundaryCondition(0u), SurgSim::Framework::AssertionFailure);
 
 		state.setNumDof(3u, 2u); // Number of dof per node is 3
 
-		SCOPED_TRACE("Testing addBoundaryCondition(unsigned int nodeId)");
+		SCOPED_TRACE("Testing addBoundaryCondition(size_t nodeId)");
 
 		state.addBoundaryCondition(0u);
 		expectedDofIdsBoundaryConditions.push_back((0u * 3u + 0u)); // (node 0, dof 0)
@@ -218,7 +218,7 @@ TEST(OdeStateTest, ResetTest)
 	OdeState state1, state2;
 	state1.setNumDof(3u, 3u);
 	state2.setNumDof(3u, 3u);
-	for(unsigned int i = 0; i < state1.getNumDof(); i++)
+	for(size_t i = 0; i < state1.getNumDof(); i++)
 	{
 		state1.getPositions()[i] = static_cast<double>(i);
 		state1.getVelocities()[i] = 2.0*static_cast<double>(i);
@@ -234,14 +234,14 @@ TEST(OdeStateTest, ResetTest)
 	EXPECT_TRUE(state1.getPositions().isZero());
 	EXPECT_TRUE(state1.getVelocities().isZero());
 	EXPECT_EQ(0u, state1.getNumBoundaryConditions());
-	EXPECT_EQ(static_cast<std::vector<unsigned int>::size_type>(0), state1.getBoundaryConditions().size());
+	EXPECT_EQ(0, state1.getBoundaryConditions().size());
 }
 
 TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 {
 	OdeState state, stateAssigned;
 	state.setNumDof(3u, 3u);
-	for(unsigned int i = 0; i < state.getNumDof(); i++)
+	for(size_t i = 0; i < state.getNumDof(); i++)
 	{
 		state.getPositions()[i] = static_cast<double>(i);
 		state.getVelocities()[i] = 2.0*static_cast<double>(i);
@@ -259,7 +259,7 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 		ASSERT_EQ(9, stateCopied.getVelocities().size());
 		ASSERT_EQ(state.getVelocities().size(), stateCopied.getVelocities().size());
 
-		for(unsigned int i = 0; i < stateCopied.getNumDof(); i++)
+		for(size_t i = 0; i < stateCopied.getNumDof(); i++)
 		{
 			EXPECT_NEAR(state.getPositions()[i], stateCopied.getPositions()[i], epsilon);
 			EXPECT_NEAR(static_cast<double>(i), stateCopied.getPositions()[i], epsilon);
@@ -269,7 +269,7 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 
 		ASSERT_EQ(2u, stateCopied.getNumBoundaryConditions());
 		ASSERT_EQ(state.getNumBoundaryConditions(), stateCopied.getNumBoundaryConditions());
-		ASSERT_EQ(static_cast<std::vector<unsigned int>::size_type>(2), stateCopied.getBoundaryConditions().size());
+		ASSERT_EQ(2, stateCopied.getBoundaryConditions().size());
 		ASSERT_EQ(state.getBoundaryConditions().size(), stateCopied.getBoundaryConditions().size());
 		ASSERT_EQ(0u, stateCopied.getBoundaryConditions()[0]);
 		ASSERT_EQ(state.getBoundaryConditions()[0], stateCopied.getBoundaryConditions()[0]);
@@ -287,7 +287,7 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 		ASSERT_EQ(9, stateAssigned.getVelocities().size());
 		ASSERT_EQ(state.getVelocities().size(), stateAssigned.getVelocities().size());
 
-		for(unsigned int i = 0; i < stateAssigned.getNumDof(); i++)
+		for(size_t i = 0; i < stateAssigned.getNumDof(); i++)
 		{
 			EXPECT_NEAR(state.getPositions()[i], stateAssigned.getPositions()[i], epsilon);
 			EXPECT_NEAR(static_cast<double>(i), stateAssigned.getPositions()[i], epsilon);
@@ -297,7 +297,7 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 
 		ASSERT_EQ(2u, stateAssigned.getNumBoundaryConditions());
 		ASSERT_EQ(state.getNumBoundaryConditions(), stateAssigned.getNumBoundaryConditions());
-		ASSERT_EQ(static_cast<std::vector<unsigned int>::size_type>(2), stateAssigned.getBoundaryConditions().size());
+		ASSERT_EQ(2, stateAssigned.getBoundaryConditions().size());
 		ASSERT_EQ(state.getBoundaryConditions().size(), stateAssigned.getBoundaryConditions().size());
 		ASSERT_EQ(0u, stateAssigned.getBoundaryConditions()[0]);
 		ASSERT_EQ(state.getBoundaryConditions()[0], stateAssigned.getBoundaryConditions()[0]);
@@ -319,7 +319,7 @@ TEST(OdeStateTest, ApplyBoundaryConditionsToVectorTest)
 
 	state.applyBoundaryConditionsToVector(&F);
 	EXPECT_FALSE(F.isApprox(initialF));
-	for (unsigned int dofId = 0; dofId < state.getNumDof(); ++dofId)
+	for (size_t dofId = 0; dofId < state.getNumDof(); ++dofId)
 	{
 		if (dofId == 1u || dofId == state.getNumDof() - 1u)
 		{
@@ -340,13 +340,13 @@ TEST(OdeStateTest, ApplyBoundaryConditionsToMatrixTest)
 	state.addBoundaryCondition(0u, 1u);
 	state.addBoundaryCondition(state.getNumNodes() - 1u, 2u);
 
-	unsigned int numDof = state.getNumDof();
+	size_t numDof = state.getNumDof();
 	SurgSim::Math::Matrix M = 2.0 * SurgSim::Math::Matrix::Ones(numDof, numDof);
 	SurgSim::Math::Matrix initialM = M;
 	SurgSim::Math::Matrix expectedM = M;
 	for (int bcId = 0; bcId < 2; ++bcId)
 	{
-		unsigned int dofId = state.getBoundaryConditions()[bcId];
+		size_t dofId = state.getBoundaryConditions()[bcId];
 		expectedM.block<1, 9>(dofId, 0).setZero();
 		expectedM.block<9, 1>(0, dofId).setZero();
 		expectedM(dofId, dofId) = 1.0;

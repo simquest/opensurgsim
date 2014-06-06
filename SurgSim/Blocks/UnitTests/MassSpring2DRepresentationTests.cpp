@@ -38,8 +38,8 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 		{{Vector3d(0.1, 0.2, 0.3), Vector3d(1.1, 1.2, 1.3)}},
 		{{Vector3d(10.1, 10.2, 10.4), Vector3d(9.5, 9.6, 9.3)}}
 	}};
-	unsigned int numNodesPerDim[2] = {10, 5};
-	std::vector<unsigned int> boundaryConditions;
+	size_t numNodesPerDim[2] = {10, 5};
+	std::vector<size_t> boundaryConditions;
 	double totalMass = 1.1;
 	double stiffnessStretching = 2.2;
 	double dampingStretching = 3.3;
@@ -58,10 +58,10 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 	m.wakeUp();
 
 
-	const int numNodes = numNodesPerDim[0] * numNodesPerDim[1];
+	const size_t numNodes = numNodesPerDim[0] * numNodesPerDim[1];
 	EXPECT_EQ(numNodes * 3, m.getNumDof());
 	EXPECT_EQ(numNodes, m.getNumMasses());
-	unsigned int numSpringsExpected = 0;
+	size_t numSpringsExpected = 0;
 	numSpringsExpected += numNodesPerDim[1] * (numNodesPerDim[0] - 1); // Stretching along Y
 	numSpringsExpected += numNodesPerDim[0] * (numNodesPerDim[1] - 1); // Stretching along X
 	numSpringsExpected += numNodesPerDim[1] * (numNodesPerDim[0] - 2); // Bending along Y
@@ -69,21 +69,21 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 	numSpringsExpected += (numNodesPerDim[0] - 1) * (numNodesPerDim[1] - 1) * 2; // Face diagonal
 	EXPECT_EQ(numSpringsExpected, m.getNumSprings());
 
-	for (unsigned int massId = 0; massId < m.getNumMasses(); massId++)
+	for (size_t massId = 0; massId < m.getNumMasses(); massId++)
 	{
 		EXPECT_DOUBLE_EQ(totalMass/numNodes, m.getMass(massId)->getMass());
 	}
 
-	const int rowOffset = numNodesPerDim[0];
-	const int colOffset = 1;
+	const size_t rowOffset = numNodesPerDim[0];
+	const size_t colOffset = 1;
 
-	unsigned int springId = 0;
+	size_t springId = 0;
 	// The 1st springs are the stretching springs along X
-	for (unsigned int row = 0; row < numNodesPerDim[1]; row++)
+	for (size_t row = 0; row < numNodesPerDim[1]; row++)
 	{
-		for (unsigned int col = 0; col < numNodesPerDim[0] - 1; col++)
+		for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 		{
-			unsigned int nodeId = row * rowOffset + col * colOffset;
+			size_t nodeId = row * rowOffset + col * colOffset;
 
 			springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 				nodeId, nodeId + colOffset, stiffnessStretching, dampingStretching);
@@ -91,11 +91,11 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 		}
 	}
 	// Followed by stretching springs along Y
-	for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
+	for (size_t col = 0; col < numNodesPerDim[0]; col++)
 	{
-		for (unsigned int row = 0; row < numNodesPerDim[1] - 1; row++)
+		for (size_t row = 0; row < numNodesPerDim[1] - 1; row++)
 		{
-			unsigned int nodeId = row * rowOffset + col * colOffset;
+			size_t nodeId = row * rowOffset + col * colOffset;
 
 			springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 				nodeId, nodeId + rowOffset, stiffnessStretching, dampingStretching);
@@ -103,11 +103,11 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 		}
 	}
 	// Followed by bending springs along X
-	for (unsigned int row = 0; row < numNodesPerDim[1]; row++)
+	for (size_t row = 0; row < numNodesPerDim[1]; row++)
 	{
-		for (unsigned int col = 0; col < numNodesPerDim[0] - 2; col++)
+		for (size_t col = 0; col < numNodesPerDim[0] - 2; col++)
 		{
-			unsigned int nodeId = row * rowOffset + col * colOffset;
+			size_t nodeId = row * rowOffset + col * colOffset;
 
 			springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 				nodeId, nodeId + 2 * colOffset, stiffnessBending, dampingBending);
@@ -115,11 +115,11 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 		}
 	}
 	// Followed by bending springs along Y
-	for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
+	for (size_t col = 0; col < numNodesPerDim[0]; col++)
 	{
-		for (unsigned int row = 0; row < numNodesPerDim[1] - 2; row++)
+		for (size_t row = 0; row < numNodesPerDim[1] - 2; row++)
 		{
-			unsigned int nodeId = row * rowOffset + col * colOffset;
+			size_t nodeId = row * rowOffset + col * colOffset;
 
 			springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 				nodeId, nodeId + 2 * rowOffset, stiffnessBending, dampingBending);
@@ -127,11 +127,11 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 		}
 	}
 	// Followed by face diagonal springs
-	for (unsigned int row = 0; row < numNodesPerDim[1] - 1; row++)
+	for (size_t row = 0; row < numNodesPerDim[1] - 1; row++)
 	{
-		for (unsigned int col = 0; col < numNodesPerDim[0] - 1; col++)
+		for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 		{
-			unsigned int nodeId = row * rowOffset + col * colOffset;
+			size_t nodeId = row * rowOffset + col * colOffset;
 
 			springTest( std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 				nodeId, nodeId + rowOffset + colOffset, stiffnessFaceDiagonal, dampingFaceDiagonal);
@@ -156,17 +156,17 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 		(extremities[0][1] - extremities[0][0]) / static_cast<double>(numNodesPerDim[1] - 1) ,
 		(extremities[1][1] - extremities[1][0]) / static_cast<double>(numNodesPerDim[1] - 1)
 	};
-	unsigned int nodeId = 0;
-	for (unsigned int row = 0; row < numNodesPerDim[1]; row++)
+	size_t nodeId = 0;
+	for (size_t row = 0; row < numNodesPerDim[1]; row++)
 	{
 		Vector3d rowExtremities[2];
 		rowExtremities[0] = extremities[0][0] + rowExtremititiesDelta[0] * static_cast<double>(row);
 		rowExtremities[1] = extremities[1][0] + rowExtremititiesDelta[1] * static_cast<double>(row);
 
 		Vector3d delta = (rowExtremities[1] - rowExtremities[0]) / static_cast<double>(numNodesPerDim[0] - 1);
-		for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
+		for (size_t col = 0; col < numNodesPerDim[0]; col++)
 		{
-			SurgSim::Math::Vector3d piExpected(rowExtremities[0] + col * delta);
+			SurgSim::Math::Vector3d piExpected(rowExtremities[0] + static_cast<double>(col) * delta);
 			SurgSim::Math::Vector& x = m.getFinalState()->getPositions();
 			Eigen::VectorBlock<SurgSim::Math::Vector> pi = SurgSim::Math::getSubVector(x, nodeId, 3);
 			EXPECT_TRUE(pi.isApprox(piExpected));
@@ -174,7 +174,7 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 		}
 	}
 
-	std::vector<unsigned int> dofBoundaryConditions;
+	std::vector<size_t> dofBoundaryConditions;
 	for (auto it = boundaryConditions.begin(); it != boundaryConditions.end(); ++it)
 	{
 		dofBoundaryConditions.push_back((*it) * 3);

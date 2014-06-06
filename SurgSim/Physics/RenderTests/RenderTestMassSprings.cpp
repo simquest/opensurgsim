@@ -50,7 +50,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 	// In this test, the physics representations are not transformed,
 	// only the graphics one will apply a transform
 
-	std::vector<unsigned int> nodeBoundaryConditions;
+	std::vector<size_t> nodeBoundaryConditions;
 	nodeBoundaryConditions.push_back(0);
 
 	// MassSpring1D with a straight line would define springs only along 1 direction, which would result in
@@ -118,7 +118,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 	// The regular structure of the MassSpring2D (in X,Y plane) makes the stiffness matrix close to singular
 	// (Z axis aside) even with 1 fixed node. We run this test with 2 fixed nodes to ensure that a static resolution
 	// will be stable (OdeSolverStatic).
-	std::vector<unsigned int> nodeBoundaryConditions;
+	std::vector<size_t> nodeBoundaryConditions;
 	nodeBoundaryConditions.push_back(0);
 	nodeBoundaryConditions.push_back(1);
 	std::array<std::array<SurgSim::Math::Vector3d, 2>, 2> extremities =
@@ -128,7 +128,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 			{{ Vector3d(-0.5, -0.5, 0), Vector3d(0.5, -0.5, 0) }}
 		}
 	};
-	unsigned int numNodesPerDim[2] = {3, 3};
+	size_t numNodesPerDim[2] = {3, 3};
 	physicsRepresentation->init2D(extremities,
 								  numNodesPerDim,
 								  nodeBoundaryConditions,
@@ -182,7 +182,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	// In this test, the physics representations are not transformed,
 	// only the graphics one will apply a transform
 
-	std::vector<unsigned int> nodeBoundaryConditions;
+	std::vector<size_t> nodeBoundaryConditions;
 	nodeBoundaryConditions.push_back(0);
 	nodeBoundaryConditions.push_back(1);
 	std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities =
@@ -203,7 +203,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 			},
 		}
 	};
-	unsigned int numNodesPerDim[3] = {3, 3, 3};
+	size_t numNodesPerDim[3] = {3, 3, 3};
 	physicsRepresentation->init3D(extremities,
 								  numNodesPerDim,
 								  nodeBoundaryConditions,

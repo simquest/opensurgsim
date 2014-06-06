@@ -47,6 +47,7 @@ namespace Graphics
 
 class OsgGroup;
 
+/// OpenScenegraph implementation for the Light interface
 class OsgLight : public OsgRepresentation, public Light
 {
 public:
@@ -59,62 +60,38 @@ public:
 	explicit OsgLight(const std::string& name);
 	virtual ~OsgLight();
 
-	/// Sets the group for this light, setting nullptr here will remove the light from its current group
-	/// \param	group	The group.
-	/// \return	true if it succeeds, false if the group is not an OsgGroup.
 	virtual bool setGroup(std::shared_ptr<SurgSim::Graphics::Group> group) override;
 
-	/// Gets the group that this light has been assigned to.
-	/// \return	The group or nullptr if no group has been set.
+	virtual void setLightGroupReference(const std::string& name) override;
+
+	virtual std::string getLightGroupReference() override;
+
 	virtual std::shared_ptr<SurgSim::Graphics::Group> getGroup() override;
 
-	/// Sets ambient color of this light
-	/// \param	color	The color.
 	virtual void setAmbientColor(const SurgSim::Math::Vector4d& color) override;
 
-	/// Gets ambient color.
-	/// \return	The ambient color.
 	virtual SurgSim::Math::Vector4d getAmbientColor() override;
 
-	/// Sets diffuse color of this light.
-	/// \param	color	The color.
 	virtual void setDiffuseColor(const SurgSim::Math::Vector4d& color) override;
 
-	/// Gets diffuse color.
-	/// \return	The diffuse color.
 	virtual SurgSim::Math::Vector4d getDiffuseColor() override;
 
-	/// Sets specular color of this light.
-	/// \param	color	The color.
 	virtual void setSpecularColor(const SurgSim::Math::Vector4d& color) override;
 
-	/// Gets specular color.
-	/// \return	The specular color.
 	virtual SurgSim::Math::Vector4d getSpecularColor() override;
 
-	/// Sets constant attenuation.
-	/// \param	val	The value.
 	virtual void setConstantAttenuation(double val) override;
 
-	/// Gets constant attenuation.
-	/// \return	The constant attenuation.
 	virtual double getConstantAttenuation() override;
 
-	/// Sets linear attenuation.
-	/// \param	val	The value.
 	virtual void setLinearAttenuation(double val) override;
 
-	/// Gets linear attenuation.
-	/// \return	The linear attenuation.
 	virtual double getLinearAttenuation() override;
 
-	/// Sets quadratic attenuation.
-	/// \param	val	The value.
 	virtual void setQuadraticAttenuation(double val) override;
 
-	/// Gets quadratic attenuation.
-	/// \return	The quadratic attenuation.
 	virtual double getQuadraticAttenuation() override;
+
 
 private:
 	virtual void doUpdate(double dt) override;
@@ -153,9 +130,13 @@ private:
 	double m_linearAttenuation;					///< The actual linear attenuation value that was set
 	double m_quadraticAttenuation;				///< The actual quadratic attenuation value that was set
 
+	///@{
+	/// Osg instances to manage the light
 	osg::ref_ptr<osg::Light> m_light;
 	osg::ref_ptr<osg::LightSource> m_lightSource;
+	///@}
 
+	std::string m_groupReference; ///< Name of the group that this light should shine on...
 };
 
 #if defined(_MSC_VER)

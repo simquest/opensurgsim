@@ -45,7 +45,7 @@ public:
 	/// \note This is required from the signed volume calculation method getVolume()
 	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
 	/// simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
-	explicit Fem3DElementCorotationalTetrahedron(std::array<unsigned int, 4> nodeIds);
+	explicit Fem3DElementCorotationalTetrahedron(std::array<size_t, 4> nodeIds);
 
 	virtual void initialize(const SurgSim::Math::OdeState& state) override;
 

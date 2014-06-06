@@ -120,7 +120,7 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 
 	Vector3d penetration, intersectionGlobal, clampedIntersection, unusedResult;
 	double distance;
-	int dimensionsOutsideBox;
+	ptrdiff_t dimensionsOutsideBox;
 	for(auto intersection=intersections.cbegin(); intersection!=intersections.cend(); ++intersection)
 	{
 		dimensionsOutsideBox = (intersection->array() > box.max().array()).count();

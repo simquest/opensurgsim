@@ -23,7 +23,7 @@
 
 #include "SurgSim/Framework/Barrier.h"
 
-SurgSim::Framework::Barrier::Barrier(unsigned int count) :
+SurgSim::Framework::Barrier::Barrier(size_t count) :
 	m_threshold(count),
 	m_count(count),
 	m_generation(0),
@@ -35,7 +35,7 @@ SurgSim::Framework::Barrier::Barrier(unsigned int count) :
 bool SurgSim::Framework::Barrier::wait(bool success)
 {
 	boost::mutex::scoped_lock lock(m_mutex);
-	unsigned int gen = m_generation;
+	size_t gen = m_generation;
 	m_success = m_success && success;
 
 	--m_count;

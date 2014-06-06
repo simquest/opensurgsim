@@ -24,7 +24,6 @@ namespace Collision
 Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name)
 {
-
 }
 
 Representation::~Representation()
@@ -32,70 +31,13 @@ Representation::~Representation()
 
 }
 
-std::list<std::shared_ptr<SurgSim::Collision::Contact>> Representation::getCollisionsWith(
-			const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const
+SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getCollisions()
 {
-	ContactMapType collisions;
-	m_collisions.get(&collisions);
-
-	auto result = collisions.find(collisionRepresentation);
-	if (std::end(collisions) == result)
-	{
-		static std::list<std::shared_ptr<SurgSim::Collision::Contact>> emptyList;
-		return emptyList;
-	}
-	else
-	{
-		return (*result).second;
-	}
-}
-
-Representation::ContactMapType Representation::getCollisions() const
-{
-	ContactMapType collisions;
-	m_collisions.get(&collisions);
-
-	return collisions;
-}
-
-void Representation::addCollisionWith(
-	const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation,
-	const std::shared_ptr<SurgSim::Collision::Contact>& contact)
-{
-	ContactMapType collisions;
-	m_collisions.get(&collisions);
-
-	collisions[collisionRepresentation].push_back(contact);
-	m_collisions.set(collisions);
-}
-
-bool Representation::isCollidingWith(
-	const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const
-{
-	ContactMapType collisions;
-	m_collisions.get(&collisions);
-
-	auto result = collisions.find(collisionRepresentation);
-	return std::end(collisions) != result;
-}
-
-bool Representation::hasCollision() const
-{
-	ContactMapType collisions;
-	m_collisions.get(&collisions);
-
-	return !collisions.empty();
-}
-
-void Representation::clearCollisions()
-{
-	static ContactMapType emptyCollision;
-	m_collisions.set(emptyCollision);
+	return m_collisions;
 }
 
 void Representation::update(const double& dt)
 {
-
 }
 
 }; // namespace Collision

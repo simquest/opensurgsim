@@ -447,7 +447,7 @@ struct SegmentData
 };
 
 
-void testSegmentDistance(const SegmentData& segmentData, const std::string& info, int i)
+void testSegmentDistance(const SegmentData& segmentData, const std::string& info, size_t i)
 {
 	SizeType distance;
 	VectorType p0, p1;

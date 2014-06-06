@@ -39,6 +39,7 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
 
+using SurgSim::Collision::ContactMapType;
 using SurgSim::Physics::ConstraintImplementation;
 using SurgSim::Physics::FixedRepresentationBilateral3D;
 using SurgSim::Physics::RigidRepresentationBilateral3D;
@@ -123,8 +124,7 @@ const std::list<std::string>& StaplerBehavior::getStapleEnabledSceneElements()
 	return m_stapleEnabledSceneElements;
 }
 
-void StaplerBehavior::filterCollisionMapForStapleEnabledRepresentations(
-	SurgSim::Collision::Representation::ContactMapType* collisionsMap)
+void StaplerBehavior::filterCollisionMapForStapleEnabledRepresentations(ContactMapType* collisionsMap)
 {
 	for (auto it = collisionsMap->begin(); it != collisionsMap->end();)
 	{
@@ -170,8 +170,7 @@ std::shared_ptr<SurgSim::Physics::Representation> StaplerBehavior::findCorrespon
 	return physicsRepresentation;
 }
 
-void StaplerBehavior::filterCollisionMapForSupportedRepresentationTypes(
-	SurgSim::Collision::Representation::ContactMapType* collisionsMap)
+void StaplerBehavior::filterCollisionMapForSupportedRepresentationTypes(ContactMapType* collisionsMap)
 {
 	for (auto it = collisionsMap->begin(); it != collisionsMap->end();)
 	{
@@ -250,11 +249,11 @@ void StaplerBehavior::createStaple()
 
 	int toothId = 0;
 	bool stapleAdded = false;
-	for (auto virtualTooth = m_virtualTeeth.begin(); virtualTooth != m_virtualTeeth.end(); ++virtualTooth)
+	for (auto virtualTooth = m_virtualTeeth.cbegin(); virtualTooth != m_virtualTeeth.cend(); ++virtualTooth)
 	{
 		// The virtual tooth could be in contact with any number of objects in the scene.
 		// Get its collisionMap.
-		SurgSim::Collision::Representation::ContactMapType collisionsMap = (*virtualTooth)->getCollisions();
+		ContactMapType collisionsMap = *((*virtualTooth)->getCollisions().safeGet());
 
 		// If the virtualTooth has no collision, continue to next loop iteration.
 		if (collisionsMap.empty())
@@ -282,10 +281,9 @@ void StaplerBehavior::createStaple()
 
 		// Find the row (representation, list of contacts) in the map that the virtualTooth has most
 		// collision pairs with.
-		SurgSim::Collision::Representation::ContactMapType::value_type targetRepresentationContacts
+		ContactMapType::value_type targetRepresentationContacts
 			= *std::max_element(collisionsMap.begin(), collisionsMap.end(),
-								[](const SurgSim::Collision::Representation::ContactMapType::value_type& lhs,
-								   const SurgSim::Collision::Representation::ContactMapType::value_type& rhs)
+								[](const ContactMapType::value_type& lhs, const ContactMapType::value_type& rhs)
 								{ return lhs.second.size() < rhs.second.size(); });
 
 		// Iterate through the list of collision pairs to find a contact with the deepest penetration.
@@ -295,7 +293,7 @@ void StaplerBehavior::createStaple()
 								   const std::shared_ptr<SurgSim::Collision::Contact>& rhs)
 								{ return lhs->depth < rhs->depth; });
 
-		// Create the staple, before creating the constaint with the staple.
+		// Create the staple, before creating the constraint with the staple.
 		// The staple is created with no collision representation, because it is going to be constrained.
 		if (!stapleAdded)
 		{
@@ -324,7 +322,7 @@ void StaplerBehavior::createStaple()
 		if (constraint == nullptr)
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Failed to create constaint between staple and "
+				<< "Failed to create constraint between staple and "
 				<< targetRepresentationContacts.first->getSceneElement()->getName()
 				<< ". This might be because the createBilateral3DConstraint is not supporting the Physics Type: "
 				<< targetPhysicsRepresentation->getType();
@@ -380,6 +378,8 @@ int StaplerBehavior::getTargetManagerType() const
 bool StaplerBehavior::doInitialize()
 {
 	SURGSIM_ASSERT(m_from) << "StaplerBehavior: no InputComponent held.";
+	SURGSIM_ASSERT((m_virtualTeeth[0] != nullptr) && (m_virtualTeeth[1] != nullptr)) <<
+		"StaplerBehavior: setVirtualStaple was not called, or it was passed nullptr for a Collision Representation.";
 	return true;
 }
 

@@ -79,7 +79,7 @@ TEST(OsgTextureCubeMapTests, LoadAndClearImageTest)
 	EXPECT_EQ(256, width);
 	EXPECT_EQ(256, height);
 
-	for (unsigned int i = 0; i < 6; ++i)
+	for (size_t i = 0; i < 6; ++i)
 	{
 		osg::Image* image = osgTexture->getOsgTexture()->getImage(i);
 		ASSERT_NE(nullptr, image) << "The texture should have an image for each face!";
@@ -139,7 +139,7 @@ TEST(OsgTextureCubeMapTests, LoadImageFacesTest)
 	EXPECT_EQ(256, width);
 	EXPECT_EQ(256, height);
 
-	for (unsigned int i = 0; i < 6; ++i)
+	for (size_t i = 0; i < 6; ++i)
 	{
 		osg::Image* image = osgTexture->getOsgTexture()->getImage(i);
 		ASSERT_NE(nullptr, image) << "The texture should have an image for each face!";

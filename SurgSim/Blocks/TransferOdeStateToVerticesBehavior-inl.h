@@ -63,12 +63,12 @@ bool TransferOdeStateToVerticesBehavior<VertexData>::doWakeUp()
 template <class VertexData>
 void TransferOdeStateToVerticesBehavior<VertexData>::transfer(bool doInitialization)
 {
-	const unsigned int numNodes = m_from->getNumNodes();
+	const size_t numNodes = m_from->getNumNodes();
 
 	// If initialization is requested and vertices is empty, let's populate it properly
 	if (doInitialization == true && m_to->getNumVertices() == 0 && numNodes != 0)
 	{
-		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
+		for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
 		{
 			SurgSim::DataStructures::Vertex<VertexData> v(m_from->getPosition(nodeId));
 			m_to->addVertex(v);
@@ -76,7 +76,7 @@ void TransferOdeStateToVerticesBehavior<VertexData>::transfer(bool doInitializat
 	}
 	else if (m_to->getNumVertices() == numNodes)
 	{
-		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
+		for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
 		{
 			m_to->setVertexPosition(nodeId, m_from->getPosition(nodeId));
 		}

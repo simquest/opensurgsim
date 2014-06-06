@@ -69,8 +69,11 @@ TEST(TimerTest, Comparison)
 	}
 	// timer1's frames include timer2's frames and the for-loop operations, so timer1's frame period should be longer
 	// than timer2's frames (or at least no shorter).
-	EXPECT_GE(timer1->getAverageFramePeriod(), timer2->getAverageFramePeriod());
-	EXPECT_GT(timer1->getCumulativeTime(), timer1->getLastFramePeriod());
+	if ((timer1->getNumberOfClockFails() == 0) && (timer2->getNumberOfClockFails() == 0))
+	{
+		EXPECT_GE(timer1->getAverageFramePeriod(), timer2->getAverageFramePeriod());
+		EXPECT_GT(timer1->getCumulativeTime(), timer1->getLastFramePeriod());
+	}
 }
 
 

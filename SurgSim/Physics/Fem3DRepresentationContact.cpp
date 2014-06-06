@@ -39,8 +39,8 @@ void Fem3DRepresentationContact::doBuild(double dt,
 	const ConstraintData& data,
 	const std::shared_ptr<Localization>& localization,
 	MlcpPhysicsProblem* mlcp,
-	unsigned int indexOfRepresentation,
-	unsigned int indexOfConstraint,
+	size_t indexOfRepresentation,
+	size_t indexOfConstraint,
 	ConstraintSideSign sign)
 {
 	using SurgSim::Math::Vector3d;
@@ -100,7 +100,7 @@ void Fem3DRepresentationContact::doBuild(double dt,
 	{
 		if (coord.naturalCoordinate[index] != 0.0)
 		{
-			unsigned int nodeIndex = femElement->getNodeId(index);
+			size_t nodeIndex = femElement->getNodeId(index);
 			m_newH.insert(3 * nodeIndex + 0) = coord.naturalCoordinate[index] * n[0] * scale * dt;
 			m_newH.insert(3 * nodeIndex + 1) = coord.naturalCoordinate[index] * n[1] * scale * dt;
 			m_newH.insert(3 * nodeIndex + 2) = coord.naturalCoordinate[index] * n[2] * scale * dt;
@@ -120,7 +120,7 @@ SurgSim::Physics::RepresentationType Fem3DRepresentationContact::getRepresentati
 	return REPRESENTATION_TYPE_FEM3D;
 }
 
-unsigned int Fem3DRepresentationContact::doGetNumDof() const
+size_t Fem3DRepresentationContact::doGetNumDof() const
 {
 	return 1;
 }

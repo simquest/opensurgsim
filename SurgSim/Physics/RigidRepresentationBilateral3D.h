@@ -47,7 +47,7 @@ public:
 private:
 	/// Gets the number of degree of freedom.
 	/// \return 3 A bilateral 3d constraint enforces equality in the x, y, and z dimensions between 2 points.
-	unsigned int doGetNumDof() const override;
+	size_t doGetNumDof() const override;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation.
 	/// \param dt The time step.
@@ -62,8 +62,8 @@ private:
 				 const ConstraintData& data,
 				 const std::shared_ptr<Localization>& localization,
 				 MlcpPhysicsProblem* mlcp,
-				 unsigned int indexOfRepresentation,
-				 unsigned int indexOfConstraint,
+				 size_t indexOfRepresentation,
+				 size_t indexOfConstraint,
 				 ConstraintSideSign sign) override;
 };
 

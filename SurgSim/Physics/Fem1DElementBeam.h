@@ -38,7 +38,7 @@ public:
 	/// Constructor
 	/// \param nodeIds An array of 2 node ids (A, B) defining this beam element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
-	explicit Fem1DElementBeam(std::array<unsigned int, 2> nodeIds);
+	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
 
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam
