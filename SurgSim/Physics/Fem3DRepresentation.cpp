@@ -202,46 +202,54 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 
 bool Fem3DRepresentation::doInitialize()
 {
-	bool result = true;
-	if (m_doLoadFile)
+	if (m_doLoadFile && !loadFile())
 	{
-		std::string filePath = getRuntime()->getApplicationData()->findFile(m_filename);
-		if (m_filename.empty() || filePath.empty())
+		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Nothing loaded from file " << m_filename;
+	}
+
+	return FemRepresentation::doInitialize();
+}
+
+bool Fem3DRepresentation::loadFile()
+{
+	bool result = true;
+	std::string filePath = getRuntime()->getApplicationData()->findFile(m_filename);
+
+	if (m_filename.empty() || filePath.empty())
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) <<
+			"Fem3DRepresentation::doInitialize(): file " << m_filename << " can not be found.";
+		result = false;
+	}
+	else
+	{
+		SurgSim::DataStructures::PlyReader reader(filePath);
+		auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
+		auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
+
+		if (!reader.isValid())
 		{
-			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) <<
-				"Fem3DRepresentation::doInitialize(): file " << m_filename << " can not be found.";
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Fem3DRepresentation::doInitialize(): " <<
+				"File " << filePath << " is not valid.";
 			result = false;
 		}
-		else
+
+		if (result && !reader.setDelegate(readerDelegate))
 		{
-			SurgSim::DataStructures::PlyReader reader(filePath);
-			auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
-			auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Fem3DRepresentation::doInitialize(): " <<
+				"File " << filePath << " is not an acceptable PLY.";
+			result = false;
+		}
 
-			if (!reader.isValid())
-			{
-				SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Fem3DRepresentation::doInitialize(): " <<
-					"File " << filePath << " is not valid.";
-				result = false;
-			}
-
-			if (!reader.setDelegate(readerDelegate))
-			{
-				SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Fem3DRepresentation::doInitialize(): " <<
-					"File " << filePath << " is not an acceptable PLY.";
-				result = false;
-			}
-
-			if (result)
-			{
-				// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
-				reader.parseFile();
-				m_doLoadFile = false;
-			}
+		if (result)
+		{
+			// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
+			reader.parseFile();
+			m_doLoadFile = false;
 		}
 	}
 
-	return result && FemRepresentation::doInitialize();
+	return result;
 }
 
 void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,

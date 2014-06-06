@@ -63,10 +63,11 @@ public:
 	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location) override;
 
 protected:
-	virtual bool doWakeUp() override;
+	/// Loads the file
+	/// \return true if load is successful; false otherwise.
+	bool loadFile();
 
-	/// Interface to be implemented by derived classes
-	/// \return True if component is initialized successfully; otherwise, false.
+	virtual bool doWakeUp() override;
 	virtual bool doInitialize() override;
 
 	/// Transform a state using a given transformation
