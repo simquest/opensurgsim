@@ -148,8 +148,7 @@ protected:
 					// For a given index k, we intersect the line with a (X Y) plane, which defines a 3d point
 					double coefK = static_cast<double>(k) / (static_cast<double>(m_numNodesPerAxis) - 1.0);
 					Vector3d position3d = extremitiesYi[0] * (1.0 - coefK) + extremitiesYi[1] * coefK;
-					SurgSim::Math::setSubVector(
-						position3d, static_cast<unsigned int>(get1DIndexFrom3D(i, j, k)), 3, &nodePositions);
+					SurgSim::Math::setSubVector(position3d, get1DIndexFrom3D(i, j, k), 3, &nodePositions);
 				}
 			}
 		}
@@ -165,19 +164,18 @@ protected:
 			{
 				for (size_t k = 0; k < m_numNodesPerAxis - 1; k++)
 				{
-					std::array<unsigned int, 8> cubeNodeIds;
-					cubeNodeIds[0] = static_cast<unsigned int>(get1DIndexFrom3D(i  , j  , k  ));
-					cubeNodeIds[1] = static_cast<unsigned int>(get1DIndexFrom3D(i+1, j  , k  ));
-					cubeNodeIds[2] = static_cast<unsigned int>(get1DIndexFrom3D(i  , j+1, k  ));
-					cubeNodeIds[3] = static_cast<unsigned int>(get1DIndexFrom3D(i+1, j+1, k  ));
-					cubeNodeIds[4] = static_cast<unsigned int>(get1DIndexFrom3D(i  , j  , k+1));
-					cubeNodeIds[5] = static_cast<unsigned int>(get1DIndexFrom3D(i+1, j  , k+1));
-					cubeNodeIds[6] = static_cast<unsigned int>(get1DIndexFrom3D(i  , j+1, k+1));
-					cubeNodeIds[7] = static_cast<unsigned int>(get1DIndexFrom3D(i+1, j+1, k+1));
+					std::array<size_t, 8> cubeNodeIds;
+					cubeNodeIds[0] = get1DIndexFrom3D(i  , j  , k  );
+					cubeNodeIds[1] = get1DIndexFrom3D(i+1, j  , k  );
+					cubeNodeIds[2] = get1DIndexFrom3D(i  , j+1, k  );
+					cubeNodeIds[3] = get1DIndexFrom3D(i+1, j+1, k  );
+					cubeNodeIds[4] = get1DIndexFrom3D(i  , j  , k+1);
+					cubeNodeIds[5] = get1DIndexFrom3D(i+1, j  , k+1);
+					cubeNodeIds[6] = get1DIndexFrom3D(i  , j+1, k+1);
+					cubeNodeIds[7] = get1DIndexFrom3D(i+1, j+1, k+1);
 
-					std::array<unsigned int, 8> cube = {
-						cubeNodeIds[0], cubeNodeIds[1], cubeNodeIds[3], cubeNodeIds[2],
-						cubeNodeIds[4], cubeNodeIds[5], cubeNodeIds[7], cubeNodeIds[6]};
+					std::array<size_t, 8> cube = {cubeNodeIds[0], cubeNodeIds[1], cubeNodeIds[3], cubeNodeIds[2],
+												  cubeNodeIds[4], cubeNodeIds[5], cubeNodeIds[7], cubeNodeIds[6]};
 
 					// Add Fem3DElementCube for each cube
 					std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(cube);
