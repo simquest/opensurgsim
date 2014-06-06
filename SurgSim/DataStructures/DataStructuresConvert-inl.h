@@ -73,9 +73,9 @@ template <class T, size_t N>
 YAML::Node YAML::convert<std::array<T, N>>::encode(const std::array<T, N>& rhs)
 {
 	Node node(NodeType::Sequence);
-	for (size_t i = 0; i < N; ++i)
+	for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
 	{
-		node.push_back(rhs[i]);
+		node.push_back(*it);
 	}
 	return node;
 }
@@ -89,12 +89,12 @@ bool YAML::convert<std::array<T, N>>::decode(const Node& node, std::array<T, N>&
 	}
 
 	bool result = true;
-	size_t i = 0;
-	for (YAML::const_iterator it = node.begin(); it != node.end(); ++it, ++i)
+	auto rhsit = rhs.begin();
+	for (YAML::const_iterator it = node.begin(); it != node.end(); ++it, ++rhsit)
 	{
 		try
 		{
-			rhs[i] = it->as<T>();
+			(*rhsit) = it->as<T>();
 		}
 		catch (YAML::RepresentationException)
 		{
