@@ -19,12 +19,14 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
-#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 
 using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
@@ -32,6 +34,7 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Graphics::OsgMeshRepresentation;
+using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem3DRepresentation;
 
 TEST(TransferPhysicsToGraphicsMeshBehaviorTests, ConstructorTest)
@@ -79,9 +82,31 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
 	sceneElement->addComponent(graphics);
 	scene->addSceneElement(sceneElement);
 
-	// Test doInitialize(), doWakeUP() and update()
+	// Test doInitialize(), doWakeUP()
 	EXPECT_NO_THROW(runtime->start());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
+	auto finalState = physics->getFinalState();
+	auto numNodes = finalState->getNumNodes();
+	auto target = graphics->getMesh();
+	ASSERT_NE(0, target->getNumVertices());
+	ASSERT_NE(0, numNodes);
+	ASSERT_EQ(numNodes, target->getNumVertices());
+
+	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
+	{
+		EXPECT_TRUE(finalState->getPosition(nodeId).isApprox(target->getVertex(nodeId).position));
+	}
+
+	// Test TransferPhysicsToGraphicsMeshBehavior::update()
+	finalState->reset();
+	behavior->update(1.0);
+
+	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
+	{
+		EXPECT_TRUE(target->getVertex(nodeId).position.isApprox(Vector3d::Zero()));
+	}
+
 	runtime->stop();
 }
 

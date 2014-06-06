@@ -17,14 +17,12 @@
 
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/Mesh.h"
-#include "SurgSim/Graphics/MeshRepresentation.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
@@ -51,17 +49,21 @@ TransferPhysicsToGraphicsMeshBehavior::TransferPhysicsToGraphicsMeshBehavior(con
 void TransferPhysicsToGraphicsMeshBehavior::setSource(
 	const std::shared_ptr<SurgSim::Framework::Component>& source)
 {
+	SURGSIM_ASSERT(nullptr != source) << __FUNCTION__ << " 'source' can not be nullptr.";
 	auto deformable = std::dynamic_pointer_cast<SurgSim::Physics::DeformableRepresentation>(source);
-	SURGSIM_ASSERT(nullptr != deformable) << "TransferVerticesFromPhysicsToGraphicsBehavior can only take a " <<
-		"SurgSim::Physics::DeformableRepresentation as source.";
+	SURGSIM_ASSERT(nullptr != deformable) << __FUNCTION__ << " 'source' is not a " <<
+		"SurgSim::Physics::DeformableRepresentation.";
+
 	m_source = deformable;
 }
 
 void TransferPhysicsToGraphicsMeshBehavior::setTarget(
 	const std::shared_ptr<SurgSim::Framework::Component>& target)
 {
+	SURGSIM_ASSERT(nullptr != target) << __FUNCTION__ << " 'target' can not be nullptr.";
 	auto mesh = std::dynamic_pointer_cast<SurgSim::Graphics::MeshRepresentation>(target);
-	SURGSIM_ASSERT(nullptr != target) << "TransferVerticesFromPhysicsToGraphicsBehavior: 'target' can not be nullptr.";
+	SURGSIM_ASSERT(nullptr != mesh) << __FUNCTION__ << " 'target' is not a SurgSim::Graphics::MeshRepresentation.";
+
 	m_target = mesh;
 }
 
@@ -76,9 +78,23 @@ std::shared_ptr<SurgSim::Framework::Component> TransferPhysicsToGraphicsMeshBeha
 
 void TransferPhysicsToGraphicsMeshBehavior::update(double dt)
 {
-	// Note that transfer is called without initialization on
-	// This should have been done in doWakeUp already
-	transfer();
+	auto finalState = m_source->getFinalState();
+	auto numNodes = finalState->getNumNodes();
+	auto target = m_target->getMesh();
+
+	if (target->getNumVertices() == numNodes)
+	{
+		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
+		{
+			target->setVertexPosition(nodeId, finalState->getPosition(nodeId));
+		}
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"Number of vertices contained by " << m_source->getName() << " and " <<
+			m_target->getName() << " doesn't match. No vertex will be copied.";
+	}
 }
 
 bool TransferPhysicsToGraphicsMeshBehavior::doInitialize()
@@ -88,35 +104,25 @@ bool TransferPhysicsToGraphicsMeshBehavior::doInitialize()
 
 bool TransferPhysicsToGraphicsMeshBehavior::doWakeUp()
 {
-	// Note that transfer is called with initialization on
-	// This is done in doWakeUp as an external data structure will be initialized (Vertices)
-	transfer(true);
-	return true;
-}
-
-void TransferPhysicsToGraphicsMeshBehavior::transfer(bool doInitialization)
-{
 	auto finalState = m_source->getFinalState();
-	const unsigned int numNodes = finalState->getNumNodes();
-
+	auto numNodes = finalState->getNumNodes();
 	auto target = m_target->getMesh();
 
-	// If initialization is requested and vertices is empty, let's populate it properly
-	if (doInitialization == true && target->getNumVertices() == 0 && numNodes != 0)
+	if (target->getNumVertices() == 0)
 	{
-		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
+		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 		{
-			SurgSim::DataStructures::Vertex<SurgSim::Graphics::VertexData> v(finalState->getPosition(nodeId));
-			target->addVertex(v);
+			SurgSim::DataStructures::Vertex<SurgSim::Graphics::VertexData> vertex(finalState->getPosition(nodeId));
+			target->addVertex(vertex);
 		}
 	}
-	else if (target->getNumVertices() == numNodes)
+	else
 	{
-		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
-		{
-			target->setVertexPosition(nodeId, finalState->getPosition(nodeId));
-		}
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"Failed to copy vertices from " << m_source->getName() << " to " << m_target->getName();
 	}
+
+	return true;
 }
 
 }; //namespace Blocks

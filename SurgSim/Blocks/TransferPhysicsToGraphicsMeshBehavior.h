@@ -77,12 +77,6 @@ private:
 	/// Wakeup the behavior, which simply do a copy (same as update)
 	virtual bool doWakeUp() override;
 
-	/// Transfer the data from an OdeState m_from to Vertices m_to
-	/// \param doInitialization True if the recipient should be initialized if needed, False otherwise
-	/// \note if doInitialization is true and Vertices is empty, it will be filled accordingly
-	/// \note with a default vertex data instanciation (if VertexData type is not 'void')
-	void transfer(bool doInitialization = false);
-
 	/// The DeformableRepresentation from which the Ode state comes.
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_source;
 
