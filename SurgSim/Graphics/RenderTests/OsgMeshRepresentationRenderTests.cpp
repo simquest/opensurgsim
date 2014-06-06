@@ -54,7 +54,7 @@ struct OsgMeshRepresentationRenderTests : public RenderTest
 
 protected:
 	std::vector<Vector3d> cubeVertices;
-	std::vector<unsigned int> cubeTriangles;
+	std::vector<size_t> cubeTriangles;
 	std::vector<Vector4d> cubeColors;
 	std::vector<Vector2d> cubeTextures;
 

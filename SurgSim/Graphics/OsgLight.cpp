@@ -56,12 +56,13 @@ OsgLight::OsgLight(const std::string& name) :
 	m_linearAttenuation(0.0),
 	m_quadraticAttenuation(0.0)
 {
-	std::string prefix = "ossLightSource.";
+	std::string prefix = "lightSource.";
 
 	m_light = new osg::Light();
 	m_light->setName(name);
 	m_light->setLightNum(0);
 	m_lightSource = new osg::LightSource();
+	m_lightSource->setDataVariance(osg::Object::DYNAMIC);
 	m_lightSource->setLight(m_light);
 
 	m_switch->addChild(m_lightSource);
@@ -91,6 +92,8 @@ OsgLight::~OsgLight()
 {
 
 }
+
+
 
 bool OsgLight::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 {
@@ -228,6 +231,17 @@ void OsgLight::remove(osg::ref_ptr<osg::StateSet> stateSet)
 	{
 		stateSet->removeUniform(it->second);
 	}
+}
+
+void OsgLight::setLightGroupReference(const std::string& name)
+{
+	m_groupReference = name;
+	removeGroupReference(name);
+}
+
+std::string OsgLight::getLightGroupReference()
+{
+	return m_groupReference;
 }
 
 }; // Graphics

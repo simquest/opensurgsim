@@ -47,21 +47,21 @@ public:
 
 	/// Gets the number of nodes the spring is connecting
 	/// \return The number of nodes
-	unsigned int getNumNodes() const
+	size_t getNumNodes() const
 	{
 		return m_nodeIds.size();
 	}
 
 	/// Gets the springNodeId-th node id
 	/// \return The requested node id
-	unsigned int getNodeId(unsigned int springNodeId) const
+	size_t getNodeId(size_t springNodeId) const
 	{
 		return m_nodeIds[springNodeId];
 	}
 
 	/// Gets the node ids for this spring
 	/// \return A vector containing the node ids on which the spring is attached
-	const std::vector<unsigned int>& getNodeIds() const
+	const std::vector<size_t>& getNodeIds() const
 	{
 		return m_nodeIds;
 	}
@@ -110,7 +110,7 @@ public:
 
 protected:
 	/// Node ids connected by this spring
-	std::vector<unsigned int> m_nodeIds;
+	std::vector<size_t> m_nodeIds;
 };
 
 } // namespace Physics

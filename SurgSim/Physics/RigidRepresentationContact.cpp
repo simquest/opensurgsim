@@ -44,8 +44,8 @@ void RigidRepresentationContact::doBuild(double dt,
 			const ConstraintData& data,
 			const std::shared_ptr<Localization>& localization,
 			MlcpPhysicsProblem* mlcp,
-			unsigned int indexOfRepresentation,
-			unsigned int indexOfConstraint,
+			size_t indexOfRepresentation,
+			size_t indexOfConstraint,
 			ConstraintSideSign sign)
 {
 	std::shared_ptr<Representation> representation = localization->getRepresentation();
@@ -105,7 +105,7 @@ SurgSim::Physics::RepresentationType RigidRepresentationContact::getRepresentati
 	return REPRESENTATION_TYPE_RIGID;
 }
 
-unsigned int RigidRepresentationContact::doGetNumDof() const
+size_t RigidRepresentationContact::doGetNumDof() const
 {
 	return 1;
 }

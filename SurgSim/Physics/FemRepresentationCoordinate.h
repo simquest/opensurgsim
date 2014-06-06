@@ -33,10 +33,10 @@ struct FemRepresentationCoordinate {
 	/// \param elementId Numeric index of the FemElement contained in the FemRepresentation.
 	/// \param naturalCoordinate Natural coordinates with respect to element.
 	/// \note Constructor does not throw when given malformed parameters.
-	FemRepresentationCoordinate(unsigned int elementId, SurgSim::Math::Vector naturalCoordinate);
+	FemRepresentationCoordinate(size_t elementId, SurgSim::Math::Vector naturalCoordinate);
 
 	/// Numeric index of the FemElement contained in the FemRepresentation.
-	unsigned int elementId;
+	size_t elementId;
 
 	/// Barycentric Coordinate representing position with respect to the nodes of the FemElement.
 	SurgSim::Math::Vector naturalCoordinate;

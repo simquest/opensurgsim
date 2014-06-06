@@ -152,7 +152,6 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	auto meshShapeForCollision = std::make_shared<MeshShape>();
 	meshShapeForCollision->setFileName(filename);
 
-	// Visualization of stapler collision mesh
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
 		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
 	meshShapeVisualization->setFilename(filename);

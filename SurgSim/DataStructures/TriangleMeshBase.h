@@ -119,17 +119,17 @@ public:
 
 	/// Retrieve a specific edge
 	/// Returns the specified edge.
-	const EdgeType& getEdge(unsigned int id) const;
+	const EdgeType& getEdge(size_t id) const;
 	/// Retrieve a specific edge (non const version)
 	/// Returns the specified edge.
-	EdgeType& getEdge(unsigned int id);
+	EdgeType& getEdge(size_t id);
 
 	/// Retrieve a specific triangle
 	/// Returns the specified triangle.
-	const TriangleType& getTriangle(unsigned int id) const;
+	const TriangleType& getTriangle(size_t id) const;
 	/// Retrieve a specific triangle (non const version)
 	/// Returns the specified triangle.
-	TriangleType& getTriangle(unsigned int id);
+	TriangleType& getTriangle(size_t id);
 
 	/// Returns an array of the triangle's vertices' positions
 	/// \param id the id of the triangle

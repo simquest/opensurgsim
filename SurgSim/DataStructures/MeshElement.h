@@ -40,13 +40,13 @@ namespace DataStructures
 /// \tparam	N	Number of vertices in the element
 /// \tparam	Data	Type of extra data stored in the element (void for no data)
 /// \sa	Vertices
-template <unsigned int N, class Data>
+template <size_t N, class Data>
 struct MeshElement
 {
 	/// Constructor
 	/// \param	verticesId IDs of the N element vertices
 	/// \param	data	Extra data to be stored with the element
-	MeshElement(const std::array<unsigned int, N>& verticesId, const Data& data) :
+	MeshElement(const std::array<size_t, N>& verticesId, const Data& data) :
 		verticesId(verticesId),
 		data(data)
 	{
@@ -54,12 +54,12 @@ struct MeshElement
 
 	/// Constructor where the Data is constructed by its default constructor.
 	/// \param	verticesId IDs of the N element vertices
-	explicit MeshElement(const std::array<unsigned int, N>& verticesId) :
+	explicit MeshElement(const std::array<size_t, N>& verticesId) :
 		verticesId(verticesId)
 	{
 	}
 
-	typedef std::array<unsigned int, N> IdType;
+	typedef std::array<size_t, N> IdType;
 
 	/// Element vertices.
 	IdType verticesId;

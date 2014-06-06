@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file shadowmap_vertexcolor.frag
-/// Modulate the outgoing color by the amount fetched from the oss_shadowMap, intended for use
+/// \file s_mapping.frag
+/// Modulate the outgoing color by the amount fetched from the shadowMap, intended for use
 /// with simple vertex colors, does not do any texturing
 
 /// map for modulation, needs to be rendered with the same modelview and projection
 /// matrices as the ones that are used for this shader.
-uniform sampler2D oss_shadowMap;
+uniform sampler2D shadowMap;
 
 /// incoming color for this fragment
 varying vec4 color;
@@ -30,6 +30,6 @@ varying vec4 clipCoord;
 void main(void)
 {
 	vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
-	float shadowAmount = 1.0 - texture2D(oss_shadowMap, shadowCoord).r;
+	float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
 	gl_FragColor = color * shadowAmount;
 }

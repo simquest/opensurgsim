@@ -30,7 +30,7 @@ class LinearSpring : public Spring
 public:
 	/// Constructor
 	/// \param nodeId0, nodeId1 The node ids on which the spring is attached
-	LinearSpring(unsigned int nodeId0, unsigned int nodeId1);
+	LinearSpring(size_t nodeId0, size_t nodeId1);
 
 	/// Sets the spring stiffness parameter
 	/// \param stiffness The stiffness to assign to the spring (in N.m-1)

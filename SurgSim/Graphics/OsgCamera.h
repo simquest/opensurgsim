@@ -41,6 +41,9 @@ class Material;
 class Texture;
 class RenderTarget;
 
+template <class T>
+class OsgUniform;
+
 /// OSG implementation of a graphics camera.
 ///
 /// A Graphics::OsgCamera wraps a osg::Camera to provide camera functionality and a osg::Switch to allow enabling and
@@ -109,6 +112,12 @@ private:
 
 	/// Detach the current render target from the camera.
 	void detachCurrentRenderTarget();
+
+	/// Uniform to carry the view matrix
+	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_viewMatrixUniform;
+
+	/// Unfiorm to carry the inverse view matrix
+	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_inverseViewMatrixUniform;
 
 };
 

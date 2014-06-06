@@ -37,14 +37,14 @@ using SurgSim::Physics::Fem1DElementBeam;
 namespace
 {
 
-void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, unsigned int numNodes)
+void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, size_t numNodes)
 {
 	std::shared_ptr<SurgSim::Math::OdeState> restState = std::make_shared<SurgSim::Math::OdeState>();
 	restState->setNumDof(physicsRepresentation->getNumDofPerNode(), numNodes);
 
 	// Sets the initial state (node positions and boundary conditions)
 	SurgSim::Math::Vector& x = restState->getPositions();
-	for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
+	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
 	{
 		SurgSim::Math::getSubVector(x, nodeId, physicsRepresentation->getNumDofPerNode()).segment<3>(0)
 			= Vector3d(static_cast<double>(nodeId) / static_cast<double>(numNodes - 1) - 0.5, 0.0, 0.0);
@@ -61,9 +61,9 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 	physicsRepresentation->setInitialState(restState);
 
 	// Adds all the FemElements
-	for (unsigned int beamId = 0; beamId < numNodes - 1; beamId++)
+	for (size_t beamId = 0; beamId < numNodes - 1; beamId++)
 	{
-		std::array<unsigned int, 2> beamNodeIds = {{beamId, beamId + 1}};
+		std::array<size_t, 2> beamNodeIds = {{beamId, beamId + 1}};
 		std::shared_ptr<Fem1DElementBeam> beam = std::make_shared<Fem1DElementBeam>(beamNodeIds);
 		beam->setRadius(0.10);
 		beam->setMassDensity(3000.0);

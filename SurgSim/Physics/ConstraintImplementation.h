@@ -49,7 +49,7 @@ public:
 
 	/// Gets the number of degree of freedom for this implementation
 	/// \return The number of degree of freedom for this implementation
-	unsigned int getNumDof() const
+	size_t getNumDof() const
 	{
 		return doGetNumDof();
 	}
@@ -74,8 +74,8 @@ public:
 		const ConstraintData& data,
 		const std::shared_ptr<Localization>& localization,
 		MlcpPhysicsProblem* mlcp,
-		unsigned int indexOfRepresentation,
-		unsigned int indexOfConstraint,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
 		ConstraintSideSign sign)
 	{
 		doBuild(dt, data, localization, mlcp, indexOfRepresentation, indexOfConstraint, sign);
@@ -83,13 +83,13 @@ public:
 
 protected:
 	/// Preallocated variable for derived implementations of doBuild.
-	Eigen::SparseVector<double> m_newH;
+	Eigen::SparseVector<double, 0, ptrdiff_t> m_newH;
 
 private:
 
 	/// Does get number of degree of freedom
 	/// \return The number of degree of freedom associated to this implementation
-	virtual unsigned int doGetNumDof() const = 0;
+	virtual size_t doGetNumDof() const = 0;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step
@@ -103,8 +103,8 @@ private:
 				const ConstraintData& data,
 				const std::shared_ptr<Localization>& localization,
 				MlcpPhysicsProblem* mlcp,
-				unsigned int indexOfRepresentation,
-				unsigned int indexOfConstraint,
+				size_t indexOfRepresentation,
+				size_t indexOfConstraint,
 				ConstraintSideSign sign) = 0;
 
 };

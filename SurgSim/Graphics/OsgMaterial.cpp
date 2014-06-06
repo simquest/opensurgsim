@@ -84,12 +84,12 @@ bool OsgMaterial::removeUniform(std::shared_ptr<UniformBase> uniform)
 	return didSucceed;
 }
 
-unsigned int OsgMaterial::getNumUniforms() const
+size_t OsgMaterial::getNumUniforms() const
 {
 	return m_uniforms.size();
 }
 
-std::shared_ptr<UniformBase> OsgMaterial::getUniform(unsigned int index) const
+std::shared_ptr<UniformBase> OsgMaterial::getUniform(size_t index) const
 {
 	return m_uniforms[index];
 }

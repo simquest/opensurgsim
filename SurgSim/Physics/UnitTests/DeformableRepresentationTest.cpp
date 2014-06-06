@@ -44,7 +44,7 @@ using SurgSim::Physics::MockDeformableRepresentation;
 
 namespace
 {
-const unsigned int numNodes = 1;
+const size_t numNodes = 1;
 const double epsilon = 1e-10;
 }; // anonymous namespace
 
@@ -327,7 +327,7 @@ TEST_F(DeformableRepresentationTest, ApplyCorrectionTest)
 
 	SurgSim::Math::Vector dv;
 	dv.resize(object.getNumDof());
-	for (unsigned int i = 0; i < object.getNumDof(); i++)
+	for (size_t i = 0; i < object.getNumDof(); i++)
 	{
 		dv(i) = static_cast<double>(i);
 	}
@@ -392,7 +392,9 @@ TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 	// Test the initial transformation applied to all the states
 	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
 	{
-		Vector3d expectedPosition = m_nonIdentityTransform * Vector3d::LinSpaced(nodeId * 3, (nodeId + 1) * 3 - 1);
+		Vector3d expectedPosition
+			= m_nonIdentityTransform
+			  * Vector3d::LinSpaced(static_cast<double>(nodeId) * 3, (static_cast<double>(nodeId) + 1) * 3 - 1);
 		Vector3d expectedVelocity = m_nonIdentityTransform.rotation() * Vector3d::Ones();
 		EXPECT_TRUE(getInitialState()->getPosition(nodeId).isApprox(expectedPosition));
 		EXPECT_TRUE(getInitialState()->getVelocity(nodeId).isApprox(expectedVelocity));

@@ -57,7 +57,7 @@ TEST(AssetTest, InitializationTest)
 		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
 		// Call 'initialize()' without setting file name will fail.
-		EXPECT_FALSE(test.initialize(applicationData));
+		EXPECT_FALSE(test.initialize(*applicationData));
 		EXPECT_FALSE(test.isInitialized());
 	}
 
@@ -67,12 +67,12 @@ TEST(AssetTest, InitializationTest)
 
 		// Loading non-exist file will fail.
 		test.setFileName("Non-exist-file");
-		EXPECT_FALSE(test.initialize(applicationData));
+		EXPECT_FALSE(test.initialize(*applicationData));
 		EXPECT_FALSE(test.isInitialized());
 
 		// 'initialize()' can only be called once (no matter what the result the first time was).
 		test.setFileName("AssetTestData/DummyFile.txt");
-		EXPECT_ANY_THROW(test.initialize(applicationData));
+		EXPECT_ANY_THROW(test.initialize(*applicationData));
 		EXPECT_FALSE(test.isInitialized());
 	}
 
@@ -81,11 +81,11 @@ TEST(AssetTest, InitializationTest)
 		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
 		test.setFileName("AssetTestData/DummyFile.txt");
-		EXPECT_TRUE(test.initialize(applicationData));
+		EXPECT_TRUE(test.initialize(*applicationData));
 		EXPECT_TRUE(test.isInitialized());
 
 		// 'initialize()' can only be called once (no matter what the result the first time was).
-		EXPECT_ANY_THROW(test.initialize(applicationData));
+		EXPECT_ANY_THROW(test.initialize(*applicationData));
 		// However, 'isInitialzed()' won't be affected.
 		EXPECT_TRUE(test.isInitialized());
 	}

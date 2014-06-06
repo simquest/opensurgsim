@@ -51,14 +51,14 @@ public:
 
 	/// Gets the number of FemElement
 	/// \return the number of FemElement
-	unsigned int getNumFemElements() const;
+	size_t getNumFemElements() const;
 
 	/// Retrieves a given FemElement from its id
 	/// \param femElementId The FemElement id for which the FemElement is requested
 	/// \return The FemElement for the given femElementId
 	/// \note The FemElement is returned with read/write access
 	/// \note Out of range femElementId will raise an exception
-	std::shared_ptr<FemElement> getFemElement(unsigned int femElementId);
+	std::shared_ptr<FemElement> getFemElement(size_t femElementId);
 
 	/// Gets the total mass of the fem
 	/// \return The total mass of the fem (in Kg)

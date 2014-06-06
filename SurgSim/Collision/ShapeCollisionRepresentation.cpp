@@ -82,9 +82,8 @@ bool ShapeCollisionRepresentation::doInitialize()
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
 	if (nullptr != meshShape)
 	{
-		auto data = std::make_shared<SurgSim::Framework::ApplicationData>(*(getRuntime()->getApplicationData()));
-		SURGSIM_ASSERT(meshShape->initialize(data)) << "DeformableCollisionRepresentation::doInitialize(): "
-			"m_shape initialization failed.";
+		SURGSIM_ASSERT(meshShape->initialize(*(getRuntime()->getApplicationData()))) <<
+			"DeformableCollisionRepresentation::doInitialize(): m_shape initialization failed.";
 	}
 
 	return true;

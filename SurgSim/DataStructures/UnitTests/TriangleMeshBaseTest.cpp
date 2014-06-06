@@ -43,22 +43,22 @@ public:
 		// Set to true to print the test edges.
 		bool printEdges = false;
 		// Set the number of test vertices
-		unsigned int numVertices = 10;
+		size_t numVertices = 10;
 		// Set the number of test triangles
-		unsigned int numTriangles = 20;
+		size_t numTriangles = 20;
 
 		std::default_random_engine generator;
 		std::uniform_real_distribution<double> positionDistribution(-10.0, 10.0);
 		std::uniform_real_distribution<double> normalDistribution(-1.0, 1.0);
-		std::uniform_int_distribution<unsigned int> vertexIdDistribution(0, numVertices - 1);
+		std::uniform_int_distribution<size_t> vertexIdDistribution(0, numVertices - 1);
 
 		if (printPositions)
 		{
-			printf("Test Vertex Positions:\n");
+			std::cout << "Test Vertex Positions:\n";
 		}
 
 		/// Generate random positions for each vertex
-		for (unsigned int i = 0; i < numVertices; ++i)
+		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d position(positionDistribution(generator), positionDistribution(generator),
 				positionDistribution(generator));
@@ -66,17 +66,18 @@ public:
 
 			if (printPositions)
 			{
-				printf("\t%d: (%g, %g, %g)\n", i, position.x(), position.y(), position.z());
+				std::cout << "\t" << i << ": (" << position.x() << ", " << position.y() << ", " << position.z()
+						  << ")\n";
 			}
 		}
 
 		if (printNormals)
 		{
-			printf("Test Vertex Normals:\n");
+			std::cout << "Test Vertex Normals:\n";
 		}
 
 		/// Generate random normals for each vertex
-		for (unsigned int i = 0; i < numVertices; ++i)
+		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d normal(normalDistribution(generator), normalDistribution(generator),
 				normalDistribution(generator));
@@ -85,27 +86,27 @@ public:
 
 			if (printNormals)
 			{
-				printf("\t%d: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
+				std::cout << "\t" << i << ": (" << normal.x() << ", " << normal.y() << ", " << normal.z() << ")\n";
 			}
 		}
 
 		if (printTriangles)
 		{
-			printf("Test Triangles:\n");
+			std::cout << "Test Triangles:\n";
 		}
 
 		/// Generate random vertex IDs within [0, numVertices) in triplets for mesh triangles
-		for (unsigned int i = 0; i < numTriangles; ++i)
+		for (size_t i = 0; i < numTriangles; ++i)
 		{
-			std::array<unsigned int, 3> triangleVertices = {{ vertexIdDistribution(generator),
+			std::array<size_t, 3> triangleVertices = {{ vertexIdDistribution(generator),
 				vertexIdDistribution(generator), vertexIdDistribution(generator) }};
 			testTriangleVertices.push_back(triangleVertices);
 
 			/// Create 3 vertex ID pairs for each triangle edge (not worrying about duplicates for these tests)
-			std::array<unsigned int, 3> triangleEdges;
+			std::array<size_t, 3> triangleEdges;
 			for (int j = 0; j < 3; ++j)
 			{
-				std::array<unsigned int, 2> edgeVertices = {{ triangleVertices[0], triangleVertices[1] }};
+				std::array<size_t, 2> edgeVertices = {{ triangleVertices[0], triangleVertices[1] }};
 				testEdgeVertices.push_back(edgeVertices);
 
 				triangleEdges[j] = testEdgeVertices.size() - 1;
@@ -114,20 +115,19 @@ public:
 
 			if (printTriangles)
 			{
-				printf("\t%d: Vertices (%d, %d, %d), Edges (%d, %d, %d)\n", i,
-					triangleVertices[0], triangleVertices[1], triangleVertices[2],
-					triangleEdges[0], triangleEdges[1], triangleEdges[2]);
+				std::cout << "\t" << i << ": Vertices (" << formatIterator(triangleVertices, ", ")
+						  << "), Edges (" << formatIterator(triangleEdges, ", ") << ")\n";
 			}
 		}
 
 		if (printEdges)
 		{
-			printf("Test Edges:\n");
+			std::cout << "Test Edges:\n";
 
-			for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+			for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 			{
-				const std::array<unsigned int, 2>& edgeVertices = testEdgeVertices[i];
-				printf("\t%d: (%d, %d)\n", i, edgeVertices[0], edgeVertices[1]);
+				const std::array<size_t, 2>& edgeVertices = testEdgeVertices[i];
+				std::cout << "\t" << i << ": (" << formatIterator(edgeVertices, ", ") << ")\n";
 			}
 		}
 	}
@@ -143,12 +143,12 @@ public:
 	std::vector<Vector3d> testNormals;
 
 	/// Vertices of test edges
-	std::vector<std::array<unsigned int, 2>> testEdgeVertices;
+	std::vector<std::array<size_t, 2>> testEdgeVertices;
 
 	/// Vertices of test triangles
-	std::vector<std::array<unsigned int, 3>> testTriangleVertices;
+	std::vector<std::array<size_t, 3>> testTriangleVertices;
 	/// Edges of test triangles
-	std::vector<std::array<unsigned int, 3>> testTriangleEdges;
+	std::vector<std::array<size_t, 3>> testTriangleEdges;
 };
 
 
@@ -186,7 +186,7 @@ TEST_F(TriangleMeshBaseTest, CreateVerticesTest)
 	EXPECT_EQ(0u, mesh.getVertices().size());
 
 	/// Create the test vertices
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
@@ -195,7 +195,7 @@ TEST_F(TriangleMeshBaseTest, CreateVerticesTest)
 		EXPECT_EQ(i + 1, vertices.size());
 
 		/// Make sure each vertex is set properly
-		for (unsigned int j = 0; j < mesh.getNumVertices(); ++j)
+		for (size_t j = 0; j < mesh.getNumVertices(); ++j)
 		{
 			EXPECT_EQ(testPositions[j], vertices[j].position);
 
@@ -206,7 +206,7 @@ TEST_F(TriangleMeshBaseTest, CreateVerticesTest)
 	}
 
 	/// Create the test edges
-	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createEdge(testEdgeVertices[i]));
 		EXPECT_EQ(i + 1, mesh.getNumEdges());
@@ -215,7 +215,7 @@ TEST_F(TriangleMeshBaseTest, CreateVerticesTest)
 		EXPECT_EQ(i + 1, edges.size());
 
 		/// Make sure each vertex is set properly
-		for (unsigned int j = 0; j < mesh.getNumEdges(); ++j)
+		for (size_t j = 0; j < mesh.getNumEdges(); ++j)
 		{
 			EXPECT_EQ(testEdgeVertices[j], edges[j].verticesId);
 
@@ -225,7 +225,7 @@ TEST_F(TriangleMeshBaseTest, CreateVerticesTest)
 	}
 
 	/// Create the test triangles
-	for (unsigned int i = 0; i < testTriangleVertices.size(); ++i)
+	for (size_t i = 0; i < testTriangleVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
@@ -234,7 +234,7 @@ TEST_F(TriangleMeshBaseTest, CreateVerticesTest)
 		EXPECT_EQ(i + 1, triangles.size());
 
 		/// Make sure each vertex is set properly
-		for (unsigned int j = 0; j < mesh.getNumTriangles(); ++j)
+		for (size_t j = 0; j < mesh.getNumTriangles(); ++j)
 		{
 			EXPECT_EQ(testTriangleVertices[j], triangles[j].verticesId);
 
@@ -252,7 +252,7 @@ TEST_F(TriangleMeshBaseTest, isValidTest)
 	EXPECT_TRUE(mesh.isValid());
 
 	/// Create the edges (no vertices yet => the mesh is NOT valid)
-	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 	{
 		mesh.createEdge(testEdgeVertices[i]);
 	}
@@ -260,7 +260,7 @@ TEST_F(TriangleMeshBaseTest, isValidTest)
 	EXPECT_FALSE(mesh.isValid());
 
 	/// Create the triangles (no vertices yet => the mesh is NOT valid)
-	for (unsigned int i = 0; i < testTriangleVertices.size(); ++i)
+	for (size_t i = 0; i < testTriangleVertices.size(); ++i)
 	{
 		mesh.createTriangle(testTriangleVertices[i], testTriangleEdges[i]);
 	}
@@ -268,7 +268,7 @@ TEST_F(TriangleMeshBaseTest, isValidTest)
 	EXPECT_FALSE(mesh.isValid());
 
 	/// Create the vertices
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		mesh.createVertex(testPositions[i], testNormals[i]);
 	}
@@ -281,7 +281,7 @@ TEST_F(TriangleMeshBaseTest, SetVertexPositionsTest)
 	MockTriangleMeshBase mesh;
 
 	/// Create vertices with test normals, but all positions at (0,0,0)
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(Vector3d(0.0, 0.0, 0.0), testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
@@ -296,7 +296,7 @@ TEST_F(TriangleMeshBaseTest, SetVertexPositionsTest)
 	EXPECT_EQ(testPositions.size(), vertices.size());
 
 	/// Make sure each vertex is set properly
-	for (unsigned int i = 0; i < mesh.getNumVertices(); ++i)
+	for (size_t i = 0; i < mesh.getNumVertices(); ++i)
 	{
 		EXPECT_EQ(testPositions[i], vertices[i].position);
 
@@ -320,7 +320,7 @@ TEST_F(TriangleMeshBaseTest, SetVertexPositionsTest)
 	mesh.setVertexPosition(5, Vector3d(0.0, 0.0, 0.0));
 
 	/// Make sure each vertex is set properly
-	for (unsigned int i = 0; i < mesh.getNumVertices(); ++i)
+	for (size_t i = 0; i < mesh.getNumVertices(); ++i)
 	{
 		if (i == 5)
 		{
@@ -356,17 +356,17 @@ TEST_F(TriangleMeshBaseTest, ClearTest)
 	EXPECT_EQ(0u, mesh.getTriangles().size());
 
 	/// Create mesh using test data
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0)));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
 	}
-	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createEdge(testEdgeVertices[i]));
 		EXPECT_EQ(i + 1, mesh.getNumEdges());
 	}
-	for (unsigned int i = 0; i < testTriangleVertices.size(); ++i)
+	for (size_t i = 0; i < testTriangleVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
@@ -411,15 +411,15 @@ TEST_F(TriangleMeshBaseTest, ComparisonTest)
 {
 	/// Create mesh using test data
 	MockTriangleMeshBase mesh;
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 	}
-	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createEdge(testEdgeVertices[i]));
 	}
-	for (unsigned int i = 0; i < testTriangleVertices.size(); ++i)
+	for (size_t i = 0; i < testTriangleVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
 	}
@@ -427,61 +427,61 @@ TEST_F(TriangleMeshBaseTest, ComparisonTest)
 	/// Create same mesh again
 	MockTriangleMeshBase sameMesh;
 
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, sameMesh.createVertex(testPositions[i], testNormals[i]));
 	}
-	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, sameMesh.createEdge(testEdgeVertices[i]));
 	}
-	for (unsigned int i = 0; i < testTriangleVertices.size(); ++i)
+	for (size_t i = 0; i < testTriangleVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, sameMesh.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
 	}
 
 	/// Create mesh with test data, but each vertex has position and normal of (0,0,0) to make them different
 	MockTriangleMeshBase meshWithDifferentVertices;
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentVertices.createVertex(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0)));
 	}
-	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentVertices.createEdge(testEdgeVertices[i]));
 	}
-	for (unsigned int i = 0; i < testTriangleVertices.size(); ++i)
+	for (size_t i = 0; i < testTriangleVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentVertices.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
 	}
 
 	/// Create mesh with test data, but reverse each edge's vertex order to make them different
 	MockTriangleMeshBase meshWithDifferentEdges;
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentEdges.createVertex(testPositions[i], testNormals[i]));
 	}
-	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 	{
-		std::array<unsigned int, 2> edge = {{ testEdgeVertices[i][1], testEdgeVertices[i][0] }};
+		std::array<size_t, 2> edge = {{ testEdgeVertices[i][1], testEdgeVertices[i][0] }};
 		EXPECT_EQ(i, meshWithDifferentEdges.createEdge(edge));
 	}
-	for (unsigned int i = 0; i < testTriangleVertices.size(); ++i)
+	for (size_t i = 0; i < testTriangleVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentEdges.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
 	}
 
 	/// Create mesh with test data, but only create half of the triangles to make the list different.
 	MockTriangleMeshBase meshWithDifferentTriangles;
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentTriangles.createVertex(testPositions[i], testNormals[i]));
 	}
-	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentTriangles.createEdge(testEdgeVertices[i]));
 	}
-	for (unsigned int i = 0; i < testTriangleVertices.size() / 2; ++i)
+	for (size_t i = 0; i < testTriangleVertices.size() / 2; ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentTriangles.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
 	}
@@ -506,17 +506,17 @@ TEST_F(TriangleMeshBaseTest, CopyConstructorTest)
 	MockTriangleMeshBase mesh;
 
 	/// Create mesh using test data
-	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	for (size_t i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0)));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
 	}
-	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	for (size_t i = 0; i < testEdgeVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createEdge(testEdgeVertices[i]));
 		EXPECT_EQ(i + 1, mesh.getNumEdges());
 	}
-	for (unsigned int i = 0; i < testTriangleVertices.size(); ++i)
+	for (size_t i = 0; i < testTriangleVertices.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
@@ -524,15 +524,15 @@ TEST_F(TriangleMeshBaseTest, CopyConstructorTest)
 
 	TriangleMeshBase<EmptyData, EmptyData, EmptyData> mesh2(mesh);
 
-	for (unsigned int i = 0; i < mesh.getNumVertices(); ++i)
+	for (size_t i = 0; i < mesh.getNumVertices(); ++i)
 	{
 		EXPECT_EQ(mesh.getVertexPosition(i), mesh2.getVertexPosition(i));
 	}
-	for (unsigned int i = 0; i < mesh.getNumEdges(); ++i)
+	for (size_t i = 0; i < mesh.getNumEdges(); ++i)
 	{
 		EXPECT_EQ(mesh.getEdge(i).verticesId, mesh2.getEdge(i).verticesId);
 	}
-	for (unsigned int i = 0; i < mesh.getNumTriangles(); ++i)
+	for (size_t i = 0; i < mesh.getNumTriangles(); ++i)
 	{
 		EXPECT_EQ(mesh.getTriangle(i).verticesId, mesh2.getTriangle(i).verticesId);
 	}
@@ -552,8 +552,8 @@ TEST_F(TriangleMeshBaseTest, loadTriangleMeshTest)
 	EXPECT_TRUE(vertex0.isApprox(mesh->getVertex(0).position));
 	EXPECT_TRUE(vertex25.isApprox(mesh->getVertex(25).position));
 
-	std::array<unsigned int, 3> triangle0 = {0, 1, 2};
-	std::array<unsigned int, 3> triangle11 = {10, 25, 11};
+	std::array<size_t, 3> triangle0 = {0, 1, 2};
+	std::array<size_t, 3> triangle11 = {10, 25, 11};
 
 	EXPECT_EQ(triangle0, mesh->getTriangle(0).verticesId);
 	EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);
@@ -581,7 +581,7 @@ TEST_F(TriangleMeshBaseTest, GetTrianglePositions)
 	{
 		auto verticesPositions = mesh.getTrianglePositions(id);
 
-		auto &vertexIds = mesh.getTriangle(static_cast<unsigned int>(id)).verticesId;
+		auto &vertexIds = mesh.getTriangle(id).verticesId;
 
 		EXPECT_TRUE(mesh.getVertex(vertexIds[0]).position.isApprox(verticesPositions[0]));
 		EXPECT_TRUE(mesh.getVertex(vertexIds[1]).position.isApprox(verticesPositions[1]));

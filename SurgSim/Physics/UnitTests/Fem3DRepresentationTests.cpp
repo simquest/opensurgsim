@@ -189,7 +189,7 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 	SurgSim::Math::Vector3d centroid;
 	for (auto triangle = meshTriangles.cbegin(); triangle != meshTriangles.cend(); ++triangle, ++triangleId)
 	{
-		std::array<unsigned int, 3> triangleNodeIds = triangle->verticesId;
+		std::array<size_t, 3> triangleNodeIds = triangle->verticesId;
 		centroid = triangleMesh->getVertexPosition(triangleNodeIds[0]);
 		centroid += triangleMesh->getVertexPosition(triangleNodeIds[1]);
 		centroid += triangleMesh->getVertexPosition(triangleNodeIds[2]);

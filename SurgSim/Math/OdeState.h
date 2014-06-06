@@ -58,15 +58,15 @@ public:
 	/// \param numDofPerNode The number of degrees of freedom per node to account for
 	/// \param numNodes The number of nodes to account for
 	/// \note This method clears all the data structures and remove all existing boundary conditions
-	void setNumDof(unsigned int numDofPerNode, unsigned int numNodes);
+	void setNumDof(size_t numDofPerNode, size_t numNodes);
 
 	/// Retrieves the number of degrees of freedom
 	/// \return The number of DOF for this representation
-	unsigned int getNumDof() const;
+	size_t getNumDof() const;
 
 	/// Retrieves the number of nodes
 	/// \return The number of nodes for this representation
-	unsigned int getNumNodes() const;
+	size_t getNumNodes() const;
 
 	/// Retrieves all degrees of freedom's position (non-const version)
 	/// \return Vector of collected DOF's position
@@ -80,7 +80,7 @@ public:
 	/// \param nodeId The desired node id for which the position is requested (must be a valid id)
 	/// \return The position of the node nodeId
 	/// \note Behavior undefined if the nodeId is not in the correct range [0 getNumNodes()-1]
-	const SurgSim::Math::Vector3d getPosition(unsigned int nodeId) const;
+	const SurgSim::Math::Vector3d getPosition(size_t nodeId) const;
 
 	/// Retrieves all degrees of freedom's velocity (non-const version)
 	/// \return Vector of collected DOF's velocity
@@ -94,30 +94,30 @@ public:
 	/// \param nodeId The desired node id for which the velocity is requested (must be a valid id)
 	/// \return The velocity of the node nodeId
 	/// \note Behavior undefined if the nodeId is not in the correct range [0 getNumNodes()-1]
-	const SurgSim::Math::Vector3d getVelocity(unsigned int nodeId) const;
+	const SurgSim::Math::Vector3d getVelocity(size_t nodeId) const;
 
 	/// Adds boundary conditions for a given node (fixes all the dof for this node)
 	/// \param nodeId The node to set the boundary conditions on
-	void addBoundaryCondition(unsigned int nodeId);
+	void addBoundaryCondition(size_t nodeId);
 
 	/// Adds a boundary condition on a given dof of a given node (only 1 dof is fixed)
 	/// \param nodeId The node on which the boundary condition needs to be set
 	/// \param nodeDofId The dof of the node to set as boundary condition
-	void addBoundaryCondition(unsigned int nodeId, unsigned int nodeDofId);
+	void addBoundaryCondition(size_t nodeId, size_t nodeDofId);
 
 	/// Retrieves the number of boundary conditions
 	/// \return The number of boundary conditions
-	unsigned int getNumBoundaryConditions() const;
+	size_t getNumBoundaryConditions() const;
 
 	/// Retrieves all boundary conditions
 	/// \return All boundary conditions as a vector of dof ids
-	const std::vector<unsigned int>& getBoundaryConditions() const;
+	const std::vector<size_t>& getBoundaryConditions() const;
 
 	/// Queries if a specific dof is a boundary condition or not
 	/// \param dof The requested dof
 	/// \return True if dof is a boundary condition, False otherwise
 	/// \note The behavior is undefined when dof is out of range [0 getNumBoundaryConditions()-1]
-	bool isBoundaryCondition(unsigned int dof) const;
+	bool isBoundaryCondition(size_t dof) const;
 
 	/// Apply boundary conditions to a given vector
 	/// \param vector The vector to apply the boundary conditions on
@@ -140,7 +140,7 @@ private:
 	/// Default public copy constructor and assignment operator are being used on purpose
 
 	/// Keep track of the number of degrees of freedom per node and the number of nodes
-	unsigned int m_numDofPerNode, m_numNodes;
+	size_t m_numDofPerNode, m_numNodes;
 
 	/// Degrees of freedom position
 	SurgSim::Math::Vector m_x;
@@ -149,7 +149,7 @@ private:
 	SurgSim::Math::Vector m_v;
 
 	/// Boundary conditions stored as a list of dof ids
-	std::vector<unsigned int> m_boundaryConditionsAsDofIds;
+	std::vector<size_t> m_boundaryConditionsAsDofIds;
 
 	/// Boundary conditions stored per dof (True indicates a boundary condition, False does not)
 	Eigen::Matrix<bool, Eigen::Dynamic, 1> m_boundaryConditionsPerDof;

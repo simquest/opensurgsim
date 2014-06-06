@@ -66,8 +66,8 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	// Tetrahedrons
 	ASSERT_EQ(12u, fem->getNumFemElements());
 
-	std::array<unsigned int, 4> tetrahedron0 = {0, 1, 2, 3};
-	std::array<unsigned int, 4> tetrahedron11 = {10, 25, 11, 9};
+	std::array<size_t, 4> tetrahedron0 = {0, 1, 2, 3};
+	std::array<size_t, 4> tetrahedron11 = {10, 25, 11, 9};
 
 	EXPECT_TRUE(std::equal(
 					std::begin(tetrahedron0), std::end(tetrahedron0),
@@ -80,8 +80,8 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	ASSERT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
 
 	// Boundary condition 0 is on node 8, this
-	unsigned int boundaryNode0 = 8;
-	unsigned int boundaryNode7 = 11;
+	size_t boundaryNode0 = 8;
+	size_t boundaryNode7 = 11;
 
 	EXPECT_EQ(3 * boundaryNode0, fem->getInitialState()->getBoundaryConditions().at(0));
 	EXPECT_EQ(3 * boundaryNode0 + 1, fem->getInitialState()->getBoundaryConditions().at(1));

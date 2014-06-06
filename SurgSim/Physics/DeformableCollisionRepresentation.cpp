@@ -84,8 +84,7 @@ void DeformableCollisionRepresentation::update(const double& dt)
 
 bool DeformableCollisionRepresentation::doInitialize()
 {
-	auto data = std::make_shared<SurgSim::Framework::ApplicationData>(*(getRuntime()->getApplicationData()));
-	if (!m_shape->initialize(data))
+	if (!m_shape->initialize(*(getRuntime()->getApplicationData())))
 	{
 		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
 			"No mesh loaded for m_shape ";
