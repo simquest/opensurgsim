@@ -116,11 +116,6 @@ bool TransferPhysicsToGraphicsMeshBehavior::doWakeUp()
 			target->addVertex(vertex);
 		}
 	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"Failed to copy vertices from " << m_source->getName() << " to " << m_target->getName();
-	}
 
 	return true;
 }
