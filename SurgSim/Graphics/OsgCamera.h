@@ -48,9 +48,6 @@ class OsgUniform;
 ///
 /// A Graphics::OsgCamera wraps a osg::Camera to provide camera functionality and a osg::Switch to allow enabling and
 /// disabling of the camera.
-/// It provides:
-/// <tt>uniform mat4 viewMatrix;</tt>
-/// <tt>unifrom mat4 inverseViewMatrix;</tt>
 class OsgCamera : public OsgRepresentation, public Camera
 {
 public:

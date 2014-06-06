@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file shadowmap_vertexcolor.vert
-/// Vertex shader for simple default material, lighting from a single light source, per vertex
+/// \file s_mapping.vert
+/// Vertex shader for simple default material, lighting from a single light source, per vertex lighing
 
 uniform mat4 viewMatrix;
 

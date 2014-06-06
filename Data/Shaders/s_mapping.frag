@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file shadowmap_vertexcolor.frag
-/// Modulate the outgoing color by the amount fetched from the oss_shadowMap, intended for use
+/// \file s_mapping.frag
+/// Modulate the outgoing color by the amount fetched from the shadowMap, intended for use
 /// with simple vertex colors, does not do any texturing
 
 /// map for modulation, needs to be rendered with the same modelview and projection
