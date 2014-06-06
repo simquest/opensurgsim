@@ -351,20 +351,16 @@ bool RigidRepresentation::doInitialize()
 	if (nullptr != meshShape)
 	{
 		auto data = std::make_shared<SurgSim::Framework::ApplicationData>(*(getRuntime()->getApplicationData()));
-		SURGSIM_ASSERT(meshShape->initialize(data)) << "RigidRepresentationBase::doInitialize(): "
-			"initialization for the mesh shape in this representation failed.";
-		m_initialParameters.removeShape(meshShape);
-		m_initialParameters.setShapeUsedForMassInertia(meshShape);
+		SURGSIM_ASSERT(meshShape->initialize(data)) << "Failed to initialize the mesh shape in this representation.";
+		m_initialParameters.updateProperties();
 		setCurrentParameters(m_initialParameters);
 	}
 
 	double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
-	SURGSIM_ASSERT(shapeVolume > 0.0) << "RigidRepresentation::doInitialize()" <<
-		"Cannot use a shape with zero volume for RigidRepresentations";
+	SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
 
 	shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
-	SURGSIM_ASSERT(shapeVolume > 0.0) << "RigidRepresentation::doInitialize()" <<
-		"Cannot use a shape with zero volume for RigidRepresentations";
+	SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
 
 	return true;
 }
