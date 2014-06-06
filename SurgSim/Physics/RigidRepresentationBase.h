@@ -91,7 +91,8 @@ public:
 	virtual	void afterUpdate(double dt) override;
 
 protected:
-	bool doWakeUp() override;
+	virtual bool doInitialize() override;
+	virtual bool doWakeUp() override;
 
 	/// Initial rigid representation state (useful for reset)
 	RigidRepresentationState m_initialState;
@@ -119,7 +120,6 @@ private:
 };
 
 }; // Physics
-
 }; // SurgSim
 
 #include "SurgSim/Physics/RigidRepresentationBase-inl.h"
