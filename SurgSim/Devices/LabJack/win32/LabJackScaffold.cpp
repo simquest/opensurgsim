@@ -701,19 +701,44 @@ std::shared_ptr<LabJackScaffold> LabJackScaffold::getOrCreateSharedInstance()
 
 bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 {
-	bool result = true;
-
 	LabJackDevice* device = deviceData->deviceObject;
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
 	// Reset the configuration.
-	const LJ_ERROR error = ePut(rawHandle, LJ_ioPIN_CONFIGURATION_RESET, 0, 0, 0);
-	result = isOk(error);
+	LJ_ERROR error = ePut(rawHandle, LJ_ioPIN_CONFIGURATION_RESET, 0, 0, 0);
+	bool result = isOk(error);
 	SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
 		"Failed to reset configuration for a device named '" << device->getName() << "." <<
 		std::endl << formatErrorMessage(error);
 
-	// One-time configuration of counters.  Counters are not yet supported so they are explicitly disabled.
+	return result && configureClockAndTimers(deviceData) && configureDigital(deviceData);
+}
+
+bool LabJackScaffold::configureClockAndTimers(DeviceData* deviceData)
+{
+	bool result = configureNumberOfTimers(deviceData);
+
+	if (result && (deviceData->deviceObject->getTimers().size() > 0))
+	{
+		result = configureClock(deviceData) && configureTimers(deviceData);
+	}
+	return result;
+}
+
+bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
+{
+	LabJackDevice* device = deviceData->deviceObject;
+	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
+
+	const std::unordered_map<int,LabJackTimerMode>& timers = device->getTimers();
+
+	LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, timers.size(), 0);
+	bool result = isOk(error);
+	SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+		"Failed to configure number of enabled timers for a device named '" << device->getName() <<
+		"', with number of timers " << timers.size() << "." << std::endl << formatErrorMessage(error);
+
+	// Counters are not yet supported so they are explicitly disabled.
 	const int numberOfChannels = 2; // The LabJack U3, U6, and UE9 models each have two counters.
 	for (int channel = 0; channel < numberOfChannels; ++channel)
 	{
@@ -725,67 +750,77 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 			std::endl << formatErrorMessage(error);
 	}
 
-	// One-time configuration of timers
-	const std::unordered_map<int,LabJackTimerMode> timers = device->getTimers();
-	if (timers.size() > 0)
+	error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_COUNTER_PIN_OFFSET, device->getTimerCounterPinOffset(), 0);
+	result = result && isOk(error);
+	SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+		"Failed to configure timer/counter pin offset for a device named '" << device->getName() <<
+		"', with offset " << device->getTimerCounterPinOffset() << "." << std::endl << formatErrorMessage(error);
+
+	return result;
+}
+
+bool LabJackScaffold::configureClock(DeviceData* deviceData)
+{
+	LabJackDevice* device = deviceData->deviceObject;
+	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
+
+	LabJackTimerBase base = device->getTimerBase();
+	if (base == LABJACKTIMERBASE_DEFAULT)
 	{
-		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_COUNTER_PIN_OFFSET,
-			device->getTimerCounterPinOffset(), 0);
+		LabJackDefaults defaults;
+		base = defaults.timerBase[device->getType()];
+	}
+	LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_BASE, base, 0);
+	bool result = isOk(error);
+	SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+		"Failed to configure the timer base rate for a device named '" << device->getName() <<
+		"', with timer base " << device->getTimerBase() << "." << std::endl << formatErrorMessage(error);
+
+	error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_DIVISOR, device->getTimerClockDivisor(), 0);
+	result = result && isOk(error);
+	SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+		"Failed to configure the timer/clock divisor for a device named '" << device->getName() <<
+		"', with divisor " << device->getTimerClockDivisor() << "." << std::endl << formatErrorMessage(error);
+
+	return result;
+}
+
+bool LabJackScaffold::configureTimers(DeviceData* deviceData)
+{
+	LabJackDevice* device = deviceData->deviceObject;
+	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
+
+	bool result = true;
+
+	const std::unordered_map<int,LabJackTimerMode>& timers = device->getTimers();
+	for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
+	{
+		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, timer->second, 0);
 		result = result && isOk(error);
 		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
-			"Failed to configure timer/counter pin offset for a device named '" << device->getName() <<
-			"', with offset " << device->getTimerCounterPinOffset() << "." << std::endl << formatErrorMessage(error);
-
-		LabJackTimerBase base = device->getTimerBase();
-		if (base == LABJACKTIMERBASE_DEFAULT)
-		{
-			LabJackDefaults defaults;
-			base = defaults.timerBase[device->getType()];
-		}
-		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_BASE, base, 0);
-		result = result && isOk(error);
-		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
-			"Failed to configure the timer base rate for a device named '" << device->getName() <<
-			"', with timer base " << device->getTimerBase() << "." << std::endl << formatErrorMessage(error);
-
-		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_DIVISOR, device->getTimerClockDivisor(), 0);
-		result = result && isOk(error);
-		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
-			"Failed to configure the timer/clock divisor for a device named '" << device->getName() <<
-			"', with divisor " << device->getTimerClockDivisor() << "." << std::endl << formatErrorMessage(error);
-
-		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, timers.size(), 0);
-		result = result && isOk(error);
-		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
-			"Failed to configure number of enabled timers for a device named '" << device->getName() <<
-			"', with number of timers " << timers.size() << "." << std::endl << formatErrorMessage(error);
-
-		if (result)
-		{
-			for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
-			{
-				error = ePut(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, timer->second, 0);
-				result = result && isOk(error);
-				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
-					"Failed to configure a timer for a device named '" << device->getName() <<
-					"', timer number " << timer->first << ", with mode code " << timer->second << "." <<
-					std::endl << formatErrorMessage(error);
-				if (result &&
-					((timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM8) ||
-					 (timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM16)))
-				{  // Initialize PWMs to almost-always low.
-					const int value = 65535; // the value corresponding to a PWM that is low as much as possible.
-					error = ePut(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, value, 0);
-					result = result && isOk(error);
-					SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
-						"Failed to set the initial value for a PWM timer for a device named '" << device->getName() <<
-						"', timer number " << timer->first << ", with mode code " << timer->second <<
-						", and value " << value << "."  << std::endl << formatErrorMessage(error);
-				}
-			}
+			"Failed to configure a timer for a device named '" << device->getName() <<
+			"', timer number " << timer->first << ", with mode code " << timer->second << "." <<
+			std::endl << formatErrorMessage(error);
+		if (result &&
+			((timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM8) ||
+			(timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM16)))
+		{  // Initialize PWMs to almost-always low.
+			const int value = 65535; // the value corresponding to a PWM that is low as much as possible.
+			error = ePut(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, value, 0);
+			result = result && isOk(error);
+			SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+				"Failed to set the initial value for a PWM timer for a device named '" << device->getName() <<
+				"', timer number " << timer->first << ", with mode code " << timer->second <<
+				", and value " << value << "."  << std::endl << formatErrorMessage(error);
 		}
 	}
+
 	return result;
+}
+
+bool LabJackScaffold::configureDigital(DeviceData* deviceData)
+{
+	return true;
 }
 
 std::shared_ptr<SurgSim::Framework::Logger> LabJackScaffold::getLogger() const

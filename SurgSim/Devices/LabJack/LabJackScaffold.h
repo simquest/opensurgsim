@@ -102,6 +102,36 @@ private:
 	/// \return true on success.
 	bool destroyPerDeviceThread(DeviceData* data);
 
+	/// One-time configuration of the clock and timers.
+	/// \param device The device.
+	/// \return False if any errors.
+	bool configureClockAndTimers(DeviceData* deviceData);
+
+	/// One-time configuration of the number of timers.
+	/// \param device The device.
+	/// \return False if any errors.
+	bool configureNumberOfTimers(DeviceData* deviceData);
+
+	/// One-time configuration of the clock.
+	/// \param device The device.
+	/// \return False if any errors.
+	bool configureClock(DeviceData* deviceData);
+
+	/// One-time configuration of the timers.
+	/// \param device The device.
+	/// \return False if any errors.
+	bool configureTimers(DeviceData* deviceData);
+
+	/// One-time configuration of the digital inputs and outputs.
+	/// \param device The device.
+	/// \return False if any errors.
+	bool configureDigital(DeviceData* deviceData);
+
+	/// One-time configuration of the analog inputs.
+	/// \param device The device.
+	/// \return False if any errors.
+	bool configureAnalog(DeviceData* deviceData);
+
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
 
