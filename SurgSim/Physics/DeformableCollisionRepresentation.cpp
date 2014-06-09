@@ -85,9 +85,15 @@ bool DeformableCollisionRepresentation::doInitialize()
 		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
 			"No mesh loaded for m_shape ";
 	}
-	m_mesh = m_shape->getMesh();
 
-	return true;
+	bool result = false;
+	if (m_shape->getMesh()->isValid())
+	{
+		m_mesh = m_shape->getMesh();
+		result = true;
+	}
+
+	return result;
 }
 
 bool DeformableCollisionRepresentation::doWakeUp()

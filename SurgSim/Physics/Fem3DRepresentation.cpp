@@ -194,12 +194,17 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 
 bool Fem3DRepresentation::doInitialize()
 {
-	if (m_doLoadFile && !loadFile())
+	bool result = true;
+	if (m_doLoadFile)
 	{
-		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Nothing loaded from file " << m_filename;
+		if (!loadFile())
+		{
+			SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << __FUNCTION__ << "Nothing loaded from file " << m_filename;
+			result = false;
+		}
 	}
 
-	return FemRepresentation::doInitialize();
+	return result && FemRepresentation::doInitialize();
 }
 
 bool Fem3DRepresentation::loadFile()

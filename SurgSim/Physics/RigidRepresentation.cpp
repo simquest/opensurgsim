@@ -344,11 +344,14 @@ bool RigidRepresentation::doInitialize()
 {
 	bool result = RigidRepresentationBase::doInitialize();
 
-	double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
-	SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
+	if (result)
+	{
+		double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
+		SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
 
-	shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
-	SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
+		shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
+		SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
+	}
 
 	return result;
 }
