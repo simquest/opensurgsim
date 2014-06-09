@@ -130,23 +130,17 @@ TEST_F(OsgLightTests, ColorAccessorTests)
 	// We are using the indices directly from the enum, in a white box way, there are not really
 	// any good ways to do this better besides digging for the uniform by name ...
 	// make sure all the values are different from each other so not to get false positives
-	Vector4d ambient(3.0, 4.0, 5.0, 6.0);
 	osg::Vec4f osgColor;
-	light->setAmbientColor(ambient);
-	EXPECT_TRUE(ambient.isApprox(light->getAmbientColor()));
-	getUniform(light, 1)->get(osgColor);
-	EXPECT_TRUE(ambient.isApprox(fromOsg(osgColor).cast<double>()));
-
 	Vector4d diffuse(1.0, 2.0, 3.0, 4.0);
 	light->setDiffuseColor(diffuse);
 	EXPECT_TRUE(diffuse.isApprox(light->getDiffuseColor()));
-	getUniform(light, 2)->get(osgColor);
+	getUniform(light, 1)->get(osgColor);
 	EXPECT_TRUE(diffuse.isApprox(fromOsg(osgColor).cast<double>()));
 
 	Vector4d specular(2.0, 3.0, 4.0, 5.0);
 	light->setSpecularColor(specular);
 	EXPECT_TRUE(specular.isApprox(light->getSpecularColor()));
-	getUniform(light, 3)->get(osgColor);
+	getUniform(light, 2)->get(osgColor);
 	EXPECT_TRUE(specular.isApprox(fromOsg(osgColor).cast<double>()));
 }
 
@@ -160,19 +154,19 @@ TEST_F(OsgLightTests, AttenuationAccessorTests)
 	double constantAttenuation = 3.0;
 	light->setConstantAttenuation(constantAttenuation);
 	EXPECT_NEAR(constantAttenuation, light->getConstantAttenuation(), epsilon);
-	getUniform(light, 4)->get(osgValue);
+	getUniform(light, 3)->get(osgValue);
 	EXPECT_NEAR(constantAttenuation, static_cast<double>(osgValue), epsilon);
 
 	double linearAttenuation = 4.0;
 	light->setLinearAttenuation(linearAttenuation);
 	EXPECT_NEAR(linearAttenuation , light->getLinearAttenuation(), epsilon);
-	getUniform(light, 5)->get(osgValue);
+	getUniform(light, 4)->get(osgValue);
 	EXPECT_NEAR(linearAttenuation, static_cast<double>(osgValue), epsilon);
 
 	double quadraticAttenuation = 5.0;
 	light->setQuadraticAttenuation(quadraticAttenuation);
 	EXPECT_NEAR(quadraticAttenuation, light->getQuadraticAttenuation(), epsilon);
-	getUniform(light, 6)->get(osgValue);
+	getUniform(light, 5)->get(osgValue);
 	EXPECT_NEAR(quadraticAttenuation, static_cast<double>(osgValue), epsilon);
 }
 
