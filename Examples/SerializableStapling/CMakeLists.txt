@@ -43,6 +43,7 @@ set(LIBS
 	SurgSimBlocks
 	SurgSimFramework
 	SurgSimGraphics
+	SurgSimExampleStapling
 	${YAML_CPP_LIBRARIES}
 )
 

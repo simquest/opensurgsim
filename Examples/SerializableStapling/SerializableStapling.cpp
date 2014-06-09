@@ -15,23 +15,28 @@
 
 #include <memory>
 
+#include "Examples/ExampleStapling/StaplerBehavior.h"
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
+#include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Input/CommonDevice.h"
+#include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
@@ -62,12 +67,17 @@ std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::Sc
 int main(int argc, char* argv[])
 {
 	{
+		StaplerBehavior temporaryStaplerBehavior("TemporaryStaplerBehavior");
 		SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior temporaryBehavior("TemporaryBehavior");
+		SurgSim::Blocks::VisualizeContactsBehavior visualizeContactsBehavior("TemporaryVisualizeContactsBehavior");
 		SurgSim::Graphics::OsgMeshRepresentation temporaryOsgMesh("TemporaryOsgMesh");
 		SurgSim::Graphics::OsgSceneryRepresentation temporaryOsgScenery("TemporaryOsgScenery");
 		SurgSim::Physics::Fem3DRepresentation temporaryFem3D("TemporaryFem3D");
 		SurgSim::Physics::FixedRepresentation temporaryFixedRepresentation("TemporaryFixedRepresentation");
+		SurgSim::Physics::VirtualToolCoupler temporaryVirtualToolCoupler("TemporaryVirtualToolCoupler");
 	}
+
+	const std::string deviceName = "MultiAxisDevice";
 
 	std::shared_ptr<BehaviorManager> behaviorManager = std::make_shared<BehaviorManager>();
 	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
@@ -79,6 +89,10 @@ int main(int argc, char* argv[])
 	runtime->addManager(graphicsManager);
 	runtime->addManager(inputManager);
 	runtime->addManager(physicsManager);
+
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
+	device = std::make_shared<SurgSim::Device::IdentityPoseDevice>(deviceName);
+	inputManager->addDevice(device);
 
 	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
 	view->enableManipulator(true);

@@ -157,3 +157,198 @@ SurgSim::Framework::Scene:
                   Name: wound physics
               Id: 3602234f-9730-43ed-b7ca-fe41a8145efb
               Name: PhysicsToGraphicalFem
+    - SurgSim::Framework::BasicSceneElement:
+        Name: staplerSceneElement
+        Components:
+          - SurgSim::Physics::VirtualToolCoupler:
+              LinearStiffness:
+                HasValue: false
+                Value: Not set
+              LinearDamping:
+                HasValue: false
+                Value: Not set
+              AngularStiffness:
+                HasValue: false
+                Value: Not set
+              AngularDamping:
+                HasValue: false
+                Value: Not set
+              OutputTorqueScaling: 1
+              Input:
+                SurgSim::Input::InputComponent:
+                  Id: 49f05b70-0905-4938-b8e4-5ff26e7b3c67
+                  Name: InputComponent
+              OutputForceScaling: 1
+              Representation:
+                SurgSim::Physics::RigidRepresentation:
+                  Name: Physics
+                  Id: 6dbe385b-0769-419d-a5ef-fe04579a01b4
+              Id: 9b887185-25d4-4af6-b72d-6e60118bda12
+              Name: VTC
+          - SurgSim::Framework::PoseComponent:
+              Pose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Id: 671517ef-4f99-4d61-8f9b-f1e2519ea401
+              Name: Pose
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              Filename: Geometry/stapler_collision.ply
+              DrawAsWireFrame: true
+              UpdateOptions: 1
+              Id: fdbfc588-3e5d-4d76-834d-55968c9f2b22
+              Name: StaplerOsgMesh
+          - SurgSim::Physics::RigidRepresentation:
+              RigidRepresentationParameters:
+                SurgSim::Physics::RigidRepresentationParameters:
+                  Density: 8050
+                  LinearDamping: 0
+                  AngularDamping: 0
+                  ShapeUsedForMassInertia:
+                    SurgSim::Math::MeshShape:
+                      FileName: Geometry/stapler_collision.ply
+              IsDrivingSceneElementPose: true
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              NumDof: 6
+              IsGravityEnabled: false
+              IsActive: true
+              CollisionRepresentation:
+                SurgSim::Physics::RigidCollisionRepresentation:
+                  Id: fbc20cdd-f70d-4d32-8362-4b0806ec35e9
+                  Name: Collision
+              Id: 6dbe385b-0769-419d-a5ef-fe04579a01b4
+              RigidRepresentationState:
+                SurgSim::Physics::RigidRepresentationState:
+                  LinearVelocity: [0, 0, 0]
+                  AngularVelocity: [0, 0, 0]
+                  Pose:
+                    Quaternion: [0, 0, 0, 1]
+                    Translation: [0, 0, 0]
+              Name: Physics
+          - StaplerBehavior:
+              StapleEnabledSceneElements:
+                - armSceneElement
+              InputComponent:
+                SurgSim::Input::InputComponent:
+                  Id: 49f05b70-0905-4938-b8e4-5ff26e7b3c67
+                  Name: InputComponent
+              Representation:
+                SurgSim::Physics::RigidRepresentation:
+                  Id: 6dbe385b-0769-419d-a5ef-fe04579a01b4
+                  Name: Physics
+              VirtualTeeth:
+                - SurgSim::Collision::ShapeCollisionRepresentation:
+                    Id: 16eb08d8-d929-4f18-af0d-475f71a596fb
+                    Name: VirtualToothCollision0
+                - SurgSim::Collision::ShapeCollisionRepresentation:
+                    Id: c70d6696-0eef-47d1-a34a-b246ac24690d
+                    Name: VirtualToothCollision1
+              Id: 9e70c28d-ae4b-47da-bf5e-c303cd8a9bc5
+              Name: Behavior
+          - SurgSim::Physics::RigidCollisionRepresentation:
+              Id: fbc20cdd-f70d-4d32-8362-4b0806ec35e9
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Name: Collision
+          - SurgSim::Blocks::VisualizeContactsBehavior:
+              CollisionRepresentation:
+                SurgSim::Physics::RigidCollisionRepresentation:
+                  Id: fbc20cdd-f70d-4d32-8362-4b0806ec35e9
+                  Name: Collision
+              VectorFieldScale: 200
+              Id: 1bc63f75-9152-4b46-829f-3dabcbd3e593
+              Name: VisualizeContactsBehavior
+          - SurgSim::Input::InputComponent:
+              DeviceName: MultiAxisDevice
+              Id: 49f05b70-0905-4938-b8e4-5ff26e7b3c67
+              Name: InputComponent
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              FileName: Geometry/stapler_handle.obj
+              Id: 74ace54f-e852-46c2-9333-115944cb3d0c
+              Name: Handle
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              FileName: Geometry/stapler_indicator.obj
+              Id: 7eb35814-456d-4781-aa86-75de6adc3bcf
+              Name: Indicator
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              FileName: Geometry/stapler_markings.obj
+              Id: 9fccc07b-9854-4dba-a04d-a705b361d4b9
+              Name: Markings
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              FileName: Geometry/stapler_trigger.obj
+              Id: bad51a27-c79d-46c1-ad1b-66f0adf9c8e0
+              Name: Trigger
+          - SurgSim::Collision::ShapeCollisionRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Shape:
+                SurgSim::Math::MeshShape:
+                  FileName: Geometry/virtual_staple_1.ply
+              Id: 16eb08d8-d929-4f18-af0d-475f71a596fb
+              Name: VirtualToothCollision0
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              Filename: Geometry/virtual_staple_1.ply
+              DrawAsWireFrame: true
+              UpdateOptions: 1
+              Id: 2c4a3fca-3b7a-4ae1-8d5b-1d5f9d291924
+              Name: virtualToothMesh0
+          - SurgSim::Collision::ShapeCollisionRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Shape:
+                SurgSim::Math::MeshShape:
+                  FileName: Geometry/virtual_staple_2.ply
+              Id: c70d6696-0eef-47d1-a34a-b246ac24690d
+              Name: VirtualToothCollision1
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              Filename: Geometry/virtual_staple_2.ply
+              DrawAsWireFrame: true
+              UpdateOptions: 1
+              Id: d3df21a8-e6bd-4f2b-8ffb-4660840880c1
+              Name: virtualToothMesh1
