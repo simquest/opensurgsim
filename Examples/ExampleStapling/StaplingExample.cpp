@@ -235,7 +235,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 		sceneElement->addComponent(virtualToothMesh);
 	}
 
-	staplerBehavior->setVirtualStaple(virtualTeeth);
+	staplerBehavior->setVirtualTeeth(virtualTeeth);
 
 	return sceneElement;
 }

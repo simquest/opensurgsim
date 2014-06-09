@@ -17,8 +17,10 @@
 #define SURGSIM_GRAPHICS_POINTCLOUDREPRESENTATION_H
 
 #include <memory>
+
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -33,16 +35,14 @@ template <class Data>
 class PointCloudRepresentation : public virtual Representation
 {
 public:
-
 	/// Constructor
 	explicit PointCloudRepresentation(const std::string& name) : Representation(name)
 	{
-
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(PointCloudRepresentation, double, PointSize, getPointSize, setPointSize);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(PointCloudRepresentation, SurgSim::Math::Vector4d, Color, getColor, setColor);
 	}
 
-	~PointCloudRepresentation()
-	{
-	};
+	~PointCloudRepresentation()	{}
 
 	/// Pull the vertices.
 	/// \return	The mesh.
@@ -63,12 +63,9 @@ public:
 	/// Gets the color.
 	/// \return The current color.
 	virtual SurgSim::Math::Vector4d getColor() const = 0;
-
-private:
-
 };
 
 }; // Graphics
 }; // SurgSim
 
-#endif
+#endif // SURGSIM_GRAPHICS_POINTCLOUDREPRESENTATION_H

@@ -16,15 +16,14 @@
 #ifndef SURGSIM_GRAPHICS_OSGPOINTCLOUDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGPOINTCLOUDREPRESENTATION_H
 
+#include <osg/Array>
+#include <osg/Geometry>
+#include <osg/Point>
+
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Graphics/PointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/DataStructures/Vertices.h"
-
-#include <osg/PrimitiveSet>
-#include <osg/Geometry>
-#include <osg/Array>
-#include <osg/Point>
-#include <osg/Geode>
 
 namespace SurgSim
 {
@@ -41,13 +40,14 @@ template <class Data>
 class OsgPointCloudRepresentation : public PointCloudRepresentation<Data>, public OsgRepresentation
 {
 public:
-
 	/// Constructor
 	/// \param name The name of the Representation.
 	explicit OsgPointCloudRepresentation(const std::string& name);
 
 	/// Destructor
 	~OsgPointCloudRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>);
 
 	/// Gets the vertices.
 	/// \return	The vertices.
@@ -74,7 +74,6 @@ public:
 	virtual SurgSim::Math::Vector4d getColor() const override;
 
 private:
-
 	/// Local pointer to vertices with data
 	std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> m_vertices;
 
@@ -92,7 +91,6 @@ private:
 
 	/// Color backing variable
 	SurgSim::Math::Vector4d m_color;
-
 };
 
 #if defined(_MSC_VER)
@@ -104,4 +102,4 @@ private:
 
 #include "SurgSim/Graphics/OsgPointCloudRepresentation-inl.h"
 
-#endif
+#endif // SURGSIM_GRAPHICS_OSGPOINTCLOUDREPRESENTATION_H

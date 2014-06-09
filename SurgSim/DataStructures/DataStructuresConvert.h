@@ -16,6 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_DATASTRUCTURESCONVERT_H
 #define SURGSIM_DATASTRUCTURES_DATASTRUCTURESCONVERT_H
 
+#include <array>
 #include <memory>
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
@@ -33,6 +34,15 @@ struct convert<SurgSim::DataStructures::OptionalValue<T>>
 {
 	static Node encode(const SurgSim::DataStructures::OptionalValue<T>& rhs);
 	static bool decode(const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs);
+};
+
+/// YAML::convert specialization for std::array.
+SURGSIM_DOUBLE_SPECIALIZATION
+template <class T, size_t N>
+struct convert<std::array<T, N>>
+{
+	static Node encode(const std::array<T, N>& rhs);
+	static bool decode(const Node& node, std::array<T, N>& rhs);
 };
 
 } // namespace YAML
