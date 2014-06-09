@@ -99,7 +99,7 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 
 	// Set up uniforms
-	osg::ref_ptr<osg::StateSet> state = m_switch->getOrCreateStateSet();
+	osg::ref_ptr<osg::StateSet> state = m_camera->getOrCreateStateSet();
 	m_viewMatrixUniform->addToStateSet(state);
 	m_inverseViewMatrixUniform->addToStateSet(state);
 	m_ambientColorUniform->addToStateSet(state);
@@ -161,9 +161,11 @@ void OsgCamera::update(double dt)
 	// #workaround
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 
-	m_camera->setViewMatrix(toOsg(getViewMatrix()));
-	m_viewMatrixUniform->set(getViewMatrix().cast<float>());
-	m_inverseViewMatrixUniform->set(getInverseViewMatrix().cast<float>());
+	auto viewMatrix = getViewMatrix();
+	auto floatMatrix = viewMatrix.cast<float>();
+	m_camera->setViewMatrix(toOsg(viewMatrix));
+	m_viewMatrixUniform->set(floatMatrix);
+	m_inverseViewMatrixUniform->set(floatMatrix.inverse());
 }
 
 bool OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)
