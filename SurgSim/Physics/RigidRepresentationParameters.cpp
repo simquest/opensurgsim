@@ -212,12 +212,6 @@ void RigidRepresentationParameters::setShapeUsedForMassInertia(const std::shared
 		addShape(shape);
 	}
 
-	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
-	if (nullptr != meshShape && !meshShape->isValid())
-	{
-		return;
-	}
-
 	updateProperties();
 }
 
@@ -243,6 +237,12 @@ bool RigidRepresentationParameters::checkValidity() const
 
 void RigidRepresentationParameters::updateProperties()
 {
+	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shapeForMassInertia);
+	if (nullptr != meshShape && !meshShape->isValid())
+	{
+		return;
+	}
+
 	if (m_rho && m_shapeForMassInertia)
 	{
 		m_mass         = m_rho * m_shapeForMassInertia->getVolume();
