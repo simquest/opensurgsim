@@ -125,7 +125,7 @@ TEST(Fem3DRepresentationTests, DoInitializeTest)
 		SCOPED_TRACE("Initialize with an invalid file name");
 		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
 		fem->setFilename("Non existent fake name");
-		EXPECT_ANY_THROW(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		EXPECT_FALSE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
 	{
@@ -150,7 +150,7 @@ TEST(Fem3DRepresentationTests, DoInitializeTest)
 		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
 
 		fem->setFilename("PlyReaderTests/WrongPlyTetrahedron.ply");
-		EXPECT_ANY_THROW(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		EXPECT_FALSE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
 	{
