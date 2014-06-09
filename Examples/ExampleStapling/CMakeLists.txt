@@ -37,6 +37,13 @@ add_executable(ExampleStapling
 	${EXAMPLESTAPLING_SOURCES} ${EXAMPLESTAPLING_HEADERS}
 )
 
+surgsim_add_library(
+	SurgSimExampleStapling
+	StapleElement.cpp StaplerBehavior.cpp
+	StapleElement.h StaplerBehavior.h
+	"Examples/ExampleStapling"
+)
+
 surgsim_show_ide_folders(
 	"${EXAMPLESTAPLING_SOURCES}" "${EXAMPLESTAPLING_HEADERS}")
 
