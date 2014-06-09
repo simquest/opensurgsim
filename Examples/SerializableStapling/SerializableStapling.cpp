@@ -107,6 +107,7 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<SceneElement> arm;
 	std::shared_ptr<SceneElement> wound;
+	std::shared_ptr<SceneElement> stapler;
 	auto sceneElements = runtime->getScene()->getSceneElements();
 	for (auto it = std::begin(sceneElements); it != std::end(sceneElements); ++it)
 	{
@@ -118,7 +119,21 @@ int main(int argc, char* argv[])
 		{
 			wound = (*it);
 		}
+		if ((*it)->getName() == "staplerSceneElement")
+		{
+			stapler = (*it);
+		}
 	}
+
+	// Exclude collision between certain Collision::Representations
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision0"));
+
+	physicsManager->addExcludedCollisionPair(
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
+		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision1"));
+
 	physicsManager->addExcludedCollisionPair(
 		getComponentChecked<SurgSim::Collision::Representation>(wound, "Collision"),
 		getComponentChecked<SurgSim::Collision::Representation>(arm, "Collision"));
