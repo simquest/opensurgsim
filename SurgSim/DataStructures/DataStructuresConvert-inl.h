@@ -106,4 +106,76 @@ bool YAML::convert<std::array<T, N>>::decode(const Node& node, std::array<T, N>&
 	return result;
 }
 
+template <class Key, class T>
+YAML::Node YAML::convert<std::unordered_map<Key, T>>::encode(const std::unordered_map<Key, T>& rhs)
+{
+	Node node(NodeType::Map);
+	for (auto it = std::begin(rhs); it != std::end(rhs); ++it)
+	{
+		node[it->first] = it->second;
+	}
+	return node;
+}
+
+template <class Key, class T>
+bool YAML::convert<std::unordered_map<Key, T>>::decode(const Node& node, std::unordered_map<Key, T>& rhs)
+{
+	if (!node.IsMap())
+	{
+		return false;
+	}
+
+	bool result = true;
+	for (auto it = node.begin(); it != node.end(); ++it)
+	{
+		try
+		{
+			rhs.insert(std::unordered_map<Key, T>::value_type(it->first.as<Key>(), it->second.as<T>()));
+		}
+		catch (YAML::RepresentationException)
+		{
+			result = false;
+			SURGSIM_LOG(SurgSim::Framework::Logger::getLogger(serializeLogger), WARNING) << __FUNCTION__ <<
+																							": Bad conversion";
+		}
+	}
+	return result;
+}
+
+template <class Value>
+YAML::Node YAML::convert<std::unordered_set<Value>>::encode(const std::unordered_set<Value>& rhs)
+{
+	Node node(NodeType::Sequence);
+	for (auto it = std::begin(rhs); it != std::end(rhs); ++it)
+	{
+		node.push_back(*it);
+	}
+	return node;
+}
+
+template <class Value>
+bool YAML::convert<std::unordered_set<Value>>::decode(const Node& node, std::unordered_set<Value>& rhs)
+{
+	if (!node.IsSequence())
+	{
+		return false;
+	}
+
+	bool result = true;
+	for (auto it = node.begin(); it != node.end(); ++it)
+	{
+		try
+		{
+			rhs.insert(it->as<Value>());
+		}
+		catch (YAML::RepresentationException)
+		{
+			result = false;
+			SURGSIM_LOG(SurgSim::Framework::Logger::getLogger(serializeLogger), WARNING) << __FUNCTION__ <<
+																							": Bad conversion";
+		}
+	}
+	return result;
+}
+
 #endif // SURGSIM_DATASTRUCTURES_DATASTRUCTURESCONVERT_INL_H
