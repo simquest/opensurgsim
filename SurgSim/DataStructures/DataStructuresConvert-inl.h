@@ -130,7 +130,8 @@ bool YAML::convert<std::unordered_map<Key, T>>::decode(const Node& node, std::un
 	{
 		try
 		{
-			rhs.insert(std::unordered_map<Key, T>::value_type(it->first.as<Key>(), it->second.as<T>()));
+			typedef typename std::unordered_map<Key, T>::value_type MapValueType;
+			rhs.insert(MapValueType(it->first.as<Key>(), it->second.as<T>()));
 		}
 		catch (YAML::RepresentationException)
 		{

@@ -22,7 +22,7 @@
 
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
-#include "SurgSIm/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Graphics/Material.h"
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Input/InputComponent.h"

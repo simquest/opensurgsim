@@ -15,7 +15,7 @@
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSIm/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Graphics/Representation.h"
