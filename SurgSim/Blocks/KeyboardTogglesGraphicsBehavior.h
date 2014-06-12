@@ -49,7 +49,7 @@ class KeyboardTogglesGraphicsBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	typedef std::unordered_map<int, std::unordered_set<std::shared_ptr<SurgSim::Graphics::Representation>>>
-			KeyboardRegisterType;
+			KeyboardRegistryType;
 
 	/// Constructor
 	/// \param	name	Name of the behavior
@@ -74,11 +74,11 @@ public:
 
 	/// Set the register map of this behavior
 	/// \param map The register map.
-	void setKeyboardRegister(const KeyboardRegisterType& map);
+	void setKeyboardRegistry(const KeyboardRegistryType& map);
 
 	/// Get the register map of this behavior
 	/// \return The register map of this behavior
-	const KeyboardRegisterType& getKeyboardRegister() const;
+	const KeyboardRegistryType& getKeyboardRegistry() const;
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -103,7 +103,7 @@ private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_inputComponent;
 
 	/// A mapping between key and the graphical representation(s) it controls.
-	KeyboardRegisterType m_register;
+	KeyboardRegistryType m_registry;
 };
 
 }; // namespace Blocks

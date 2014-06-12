@@ -37,8 +37,8 @@ KeyboardTogglesGraphicsBehavior::KeyboardTogglesGraphicsBehavior(const std::stri
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardTogglesGraphicsBehavior, std::shared_ptr<SurgSim::Framework::Component>,
 									  InputComponent, getInputComponent, setInputComponent);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardTogglesGraphicsBehavior, KeyboardRegisterType,
-									  KeyboardRegister, getKeyboardRegister, setKeyboardRegister);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardTogglesGraphicsBehavior, KeyboardRegistryType,
+									  KeyboardRegistry, getKeyboardRegistry, setKeyboardRegistry);
 }
 
 void KeyboardTogglesGraphicsBehavior::setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent)
@@ -63,7 +63,7 @@ bool KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
 	bool result = true;
 	if (nullptr != graphicsRepresentation)
 	{
-		m_register[static_cast<int>(key)].insert(graphicsRepresentation);
+		m_registry[static_cast<int>(key)].insert(graphicsRepresentation);
 	}
 	else
 	{
@@ -84,8 +84,8 @@ void KeyboardTogglesGraphicsBehavior::update(double dt)
 	int key;
 	if (dataGroup.integers().get("key", &key))
 	{
-		auto match = m_register.find(key);
-		if (match != m_register.end() && !m_keyPressedLastUpdate)
+		auto match = m_registry.find(key);
+		if (match != m_registry.end() && !m_keyPressedLastUpdate)
 		{
 			for (auto it = std::begin(match->second); it != std::end(match->second); ++it)
 			{
@@ -113,15 +113,15 @@ bool KeyboardTogglesGraphicsBehavior::doWakeUp()
 	return result;
 }
 
-void KeyboardTogglesGraphicsBehavior::setKeyboardRegister(const KeyboardRegisterType& map)
+void KeyboardTogglesGraphicsBehavior::setKeyboardRegistry(const KeyboardRegistryType& map)
 {
-	m_register = map;
+	m_registry = map;
 }
 
-const KeyboardTogglesGraphicsBehavior::KeyboardRegisterType&
-		KeyboardTogglesGraphicsBehavior::getKeyboardRegister() const
+const KeyboardTogglesGraphicsBehavior::KeyboardRegistryType&
+		KeyboardTogglesGraphicsBehavior::getKeyboardRegistry() const
 {
-	return m_register;
+	return m_registry;
 }
 
 }; // namespace Blocks

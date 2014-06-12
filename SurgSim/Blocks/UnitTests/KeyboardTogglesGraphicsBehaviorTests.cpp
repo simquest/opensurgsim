@@ -95,7 +95,7 @@ TEST(KeyboardTogglesGraphicsBehavior, RegistrationTests)
 		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, mockGraphics2));
 		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, mockGraphics3));
 
-		auto keyMap = keyboardTogglesGraphicsBehavior->getKeyboardRegister();
+		auto keyMap = keyboardTogglesGraphicsBehavior->getKeyboardRegistry();
 		auto keyAPair = keyMap.find(SurgSim::Device::KeyCode::KEY_A);
 		auto keyBPair = keyMap.find(SurgSim::Device::KeyCode::KEY_B);
 
@@ -123,15 +123,15 @@ TEST(KeyboardTogglesGraphicsBehavior, SetAndGetKeyboardRegisterTypeTest)
 	set2.insert(mockGraphics2);
 	set2.insert(mockGraphics3);
 
-	KeyboardTogglesGraphicsBehavior::KeyboardRegisterType keyMap;
-	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegisterType::value_type(SurgSim::Device::KeyCode::KEY_A,
+	KeyboardTogglesGraphicsBehavior::KeyboardRegistryType keyMap;
+	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegistryType::value_type(SurgSim::Device::KeyCode::KEY_A,
 																					set1));
-	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegisterType::value_type(SurgSim::Device::KeyCode::KEY_B,
+	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegistryType::value_type(SurgSim::Device::KeyCode::KEY_B,
 																					set2));
 
-	EXPECT_NO_THROW(keyboardTogglesGraphicsBehavior->setKeyboardRegister(keyMap));
+	EXPECT_NO_THROW(keyboardTogglesGraphicsBehavior->setKeyboardRegistry(keyMap));
 
-	auto retrievedKeyMap = keyboardTogglesGraphicsBehavior->getKeyboardRegister();
+	auto retrievedKeyMap = keyboardTogglesGraphicsBehavior->getKeyboardRegistry();
 	EXPECT_EQ(keyMap.size(), retrievedKeyMap.size());
 	for (auto it = std::begin(keyMap); it != std::end(keyMap); ++it)
 	{
@@ -164,10 +164,10 @@ TEST(KeyboardTogglesGraphicsBehavior, Serialization)
 	set1.insert(mockGraphics1);
 	set2.insert(mockGraphics2);
 
-	KeyboardTogglesGraphicsBehavior::KeyboardRegisterType keyMap;
-	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegisterType::value_type(SurgSim::Device::KeyCode::KEY_A,
+	KeyboardTogglesGraphicsBehavior::KeyboardRegistryType keyMap;
+	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegistryType::value_type(SurgSim::Device::KeyCode::KEY_A,
 																					set1));
-	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegisterType::value_type(SurgSim::Device::KeyCode::KEY_B,
+	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegistryType::value_type(SurgSim::Device::KeyCode::KEY_B,
 																					set2));
 
 	keyboardTogglesGraphicsBehavior->setValue("KeyboardRegister", keyMap);
@@ -186,7 +186,7 @@ TEST(KeyboardTogglesGraphicsBehavior, Serialization)
 
 	// Make sure every registered representation in the original 'keyMap' is present in the de-serialized keyMap.
 	auto retrievedKeyMap = newKeyboardTogglesGraphicsBehavior->getValue<
-							KeyboardTogglesGraphicsBehavior::KeyboardRegisterType>("KeyboardRegister");
+							KeyboardTogglesGraphicsBehavior::KeyboardRegistryType>("KeyboardRegister");
 
 	EXPECT_EQ(keyMap.size(), retrievedKeyMap.size());
 	for (auto it = std::begin(keyMap); it != std::end(keyMap); ++it)
