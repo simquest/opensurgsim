@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file material.vert
-/// Blinn-Phong material, using per-vertex lighting
+///  Phong material, using material colors
 
 // These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform vec4 diffuseColor;

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file material.frag
-/// Blinn-Phong material, using per-vertex lighting
+/// \file material.vert
+///  Phong material, using material colors
 
 // These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform float shininess;

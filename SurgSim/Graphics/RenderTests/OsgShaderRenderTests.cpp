@@ -104,7 +104,7 @@ std::shared_ptr<Material> createShinyMaterial(const SurgSim::Framework::Applicat
 	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("specularColor");
 	material->addUniform(uniform);
 
-	uniform = std::make_shared<OsgUniform<float>>("shinyness");
+	uniform = std::make_shared<OsgUniform<float>>("shininess");
 	material->addUniform(uniform);
 
 	return material;
@@ -152,7 +152,7 @@ TEST_F(OsgShaderRenderTests, SpecificShaderTest)
 	auto material = createShinyMaterial(*runtime->getApplicationData());
 	material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.1, 1.0));
 	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 0.4, 1.0));
-	material->setValue("shininess", 1.0f);
+	material->setValue("shininess", 64.0f);
 	sphereRepresentation->setMaterial(material);
 	sceneElement->addComponent(sphereRepresentation);
 	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
@@ -168,13 +168,7 @@ TEST_F(OsgShaderRenderTests, SpecificShaderTest)
 	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
 	sceneElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-2.0, -2.0, -4.0)));
 
-	sphereRepresentation = std::make_shared<OsgSphereRepresentation>("debug");
-	sphereRepresentation->setRadius(0.01);
-	sceneElement->addComponent(sphereRepresentation);
-
 	scene->addSceneElement(sceneElement);
-
-	//viewElement->enableManipulator(true);
 
 	viewElement->setPose(
 		makeRigidTransform(Vector3d(0.0, 0.0, -2.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
@@ -182,10 +176,9 @@ TEST_F(OsgShaderRenderTests, SpecificShaderTest)
 
 
 	/// Run the thread
-// 	runtime->start();
-// 	boost::this_thread::sleep(boost::posix_time::milliseconds(10000));
-// 	runtime->stop();
-	runtime->execute();
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+	runtime->stop();
 
 }
 

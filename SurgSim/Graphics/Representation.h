@@ -19,7 +19,6 @@
 #include "SurgSim/Framework/Representation.h"
 
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Vector.h"
 
 #include <unordered_set>
 
