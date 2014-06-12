@@ -176,7 +176,8 @@ TEST_F(OsgShaderRenderTests, SpecificShaderTest)
 
 	//viewElement->enableManipulator(true);
 
-	viewElement->setPose(makeRigidTransform(Vector3d(0.0, 0.0, -2.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
+	viewElement->setPose(
+		makeRigidTransform(Vector3d(0.0, 0.0, -2.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
 	viewElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
 
 

@@ -395,12 +395,12 @@ public:
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-	void MockCamera::setAmbientColor(const SurgSim::Math::Vector4d& color)
+	void setAmbientColor(const SurgSim::Math::Vector4d& color)
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-	SurgSim::Math::Vector4d MockCamera::getAmbientColor()
+	SurgSim::Math::Vector4d getAmbientColor()
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
