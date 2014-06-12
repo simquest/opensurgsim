@@ -170,7 +170,7 @@ TEST(KeyboardTogglesGraphicsBehavior, Serialization)
 	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegistryType::value_type(SurgSim::Device::KeyCode::KEY_B,
 																					set2));
 
-	keyboardTogglesGraphicsBehavior->setValue("KeyboardRegister", keyMap);
+	keyboardTogglesGraphicsBehavior->setValue("KeyboardRegistry", keyMap);
 	keyboardTogglesGraphicsBehavior->setValue("InputComponent", inputComponent);
 
 	YAML::Node node;
@@ -186,7 +186,7 @@ TEST(KeyboardTogglesGraphicsBehavior, Serialization)
 
 	// Make sure every registered representation in the original 'keyMap' is present in the de-serialized keyMap.
 	auto retrievedKeyMap = newKeyboardTogglesGraphicsBehavior->getValue<
-							KeyboardTogglesGraphicsBehavior::KeyboardRegistryType>("KeyboardRegister");
+							KeyboardTogglesGraphicsBehavior::KeyboardRegistryType>("KeyboardRegistry");
 
 	EXPECT_EQ(keyMap.size(), retrievedKeyMap.size());
 	for (auto it = std::begin(keyMap); it != std::end(keyMap); ++it)
