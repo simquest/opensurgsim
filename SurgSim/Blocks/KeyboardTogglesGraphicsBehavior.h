@@ -78,7 +78,7 @@ public:
 
 	/// Get the register map of this behavior
 	/// \return The register map of this behavior
-	KeyboardRegisterType getKeyboardRegister() const;
+	const KeyboardRegisterType& getKeyboardRegister() const;
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.

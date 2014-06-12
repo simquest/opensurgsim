@@ -118,7 +118,8 @@ void KeyboardTogglesGraphicsBehavior::setKeyboardRegister(const KeyboardRegister
 	m_register = map;
 }
 
-KeyboardTogglesGraphicsBehavior::KeyboardRegisterType KeyboardTogglesGraphicsBehavior::getKeyboardRegister() const
+const KeyboardTogglesGraphicsBehavior::KeyboardRegisterType&
+		KeyboardTogglesGraphicsBehavior::getKeyboardRegister() const
 {
 	return m_register;
 }
