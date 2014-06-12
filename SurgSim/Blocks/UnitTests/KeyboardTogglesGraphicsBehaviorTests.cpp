@@ -65,13 +65,11 @@ TEST(KeyboardTogglesGraphicsBehavior, InputComponentTests)
 	auto keyboardTogglesGraphicsBehavior =
 		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardTogglesGraphicsBehavior");
 	{
-		SCOPED_TRACE("Set invalid input component");
 		auto mockComponent = std::make_shared<MockComponent>("MockComponent");
 		EXPECT_ANY_THROW(keyboardTogglesGraphicsBehavior->setInputComponent(mockComponent));
 	}
 
 	{
-		SCOPED_TRACE("Set valid input component");
 		auto inputComponent = std::make_shared<InputComponent>("InputComponent");
 
 		EXPECT_NO_THROW(keyboardTogglesGraphicsBehavior->setInputComponent(inputComponent));
@@ -84,13 +82,11 @@ TEST(KeyboardTogglesGraphicsBehavior, RegistrationTests)
 	auto keyboardTogglesGraphicsBehavior =
 		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardTogglesGraphicsBehavior");
 	{
-		SCOPED_TRACE("Register invalid graphics representaiton");
 		auto mockComponent = std::make_shared<MockComponent>("MockComponent");
 		EXPECT_FALSE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, mockComponent));
 	}
 
 	{
-		SCOPED_TRACE("Register valid graphics representation");
 		auto mockGraphics = std::make_shared<MockRepresentation>("MockGraphics");
 		auto mockGraphics2 = std::make_shared<MockRepresentation>("MockGraphics2");
 		auto mockGraphics3 = std::make_shared<MockRepresentation>("MockGraphics3");
@@ -98,6 +94,17 @@ TEST(KeyboardTogglesGraphicsBehavior, RegistrationTests)
 		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, mockGraphics));
 		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, mockGraphics2));
 		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, mockGraphics3));
+
+		auto keyMap = keyboardTogglesGraphicsBehavior->getKeyboardRegister();
+		auto keyAPair = keyMap.find(SurgSim::Device::KeyCode::KEY_A);
+		auto keyBPair = keyMap.find(SurgSim::Device::KeyCode::KEY_B);
+
+		EXPECT_EQ(2u, keyAPair->second.size());
+		EXPECT_EQ(1u, keyBPair->second.size());
+
+		EXPECT_NE(std::end(keyAPair->second), keyAPair->second.find(mockGraphics));
+		EXPECT_NE(std::end(keyAPair->second), keyAPair->second.find(mockGraphics2));
+		EXPECT_NE(std::end(keyBPair->second), keyBPair->second.find(mockGraphics3));
 	}
 }
 
@@ -123,7 +130,23 @@ TEST(KeyboardTogglesGraphicsBehavior, SetAndGetKeyboardRegisterTypeTest)
 																					set2));
 
 	EXPECT_NO_THROW(keyboardTogglesGraphicsBehavior->setKeyboardRegister(keyMap));
-	EXPECT_EQ(keyMap, keyboardTogglesGraphicsBehavior->getKeyboardRegister());
+
+	auto retrievedKeyMap = keyboardTogglesGraphicsBehavior->getKeyboardRegister();
+	EXPECT_EQ(keyMap.size(), retrievedKeyMap.size());
+	for (auto it = std::begin(keyMap); it != std::end(keyMap); ++it)
+	{
+		auto representationSet = retrievedKeyMap.find(it->first)->second;
+		EXPECT_EQ(it->second.size(), representationSet.size());
+		for (auto item = std::begin(it->second); item != std::end(it->second); ++item)
+		{
+			auto match = std::find_if(std::begin(representationSet), std::end(representationSet),
+				[&item](const std::shared_ptr<Representation> rep)
+			{
+				return rep->getName() == (*item)->getName();
+			});
+			EXPECT_NE(std::end(representationSet), match);
+		}
+	}
 }
 
 TEST(KeyboardTogglesGraphicsBehavior, Serialization)
@@ -158,7 +181,7 @@ TEST(KeyboardTogglesGraphicsBehavior, Serialization)
 	std::shared_ptr<KeyboardTogglesGraphicsBehavior> newKeyboardTogglesGraphicsBehavior;
 	EXPECT_NO_THROW(newKeyboardTogglesGraphicsBehavior = std::dynamic_pointer_cast<KeyboardTogglesGraphicsBehavior>(
 															node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
-
+	ASSERT_NE(nullptr, newKeyboardTogglesGraphicsBehavior);
 	EXPECT_NE(nullptr, newKeyboardTogglesGraphicsBehavior->getValue<std::shared_ptr<InputComponent>>("InputComponent"));
 
 	// Make sure every registered representation in the original 'keyMap' is present in the de-serialized keyMap.
@@ -169,6 +192,7 @@ TEST(KeyboardTogglesGraphicsBehavior, Serialization)
 	for (auto it = std::begin(keyMap); it != std::end(keyMap); ++it)
 	{
 		auto representationSet = retrievedKeyMap.find(it->first)->second;
+		EXPECT_EQ(it->second.size(), representationSet.size());
 		for (auto item = std::begin(it->second); item != std::end(it->second); ++item)
 		{
 			auto match = std::find_if(std::begin(representationSet), std::end(representationSet),

@@ -114,10 +114,10 @@ TEST(DataStructuresConvertTests, StdArray)
 	}
 }
 
-TEST(DataStructuresConvertTests, StdUnorderedMultiMapTests)
+TEST(DataStructuresConvertTests, StdUnorderedMapTests)
 {
 	{
-		SCOPED_TRACE("Serialization of std::unordered_multimap with double as key and integer as values");
+		SCOPED_TRACE("Serialization of std::unordered_map with double as key and integer as values");
 		typedef std::unordered_map<double, int> TestMapType;
 		TestMapType originalMap;
 
@@ -135,7 +135,7 @@ TEST(DataStructuresConvertTests, StdUnorderedMultiMapTests)
 	}
 
 	{
-		SCOPED_TRACE("Serialization of std::unordered_multimap with integer as key and std::shared_ptr<> as values");
+		SCOPED_TRACE("Serialization of std::unordered_map with integer as key and std::shared_ptr<> as values");
 		typedef std::unordered_map<int, std::shared_ptr<MockComponent>> TestMapType;
 		TestMapType originalMap;
 
@@ -165,7 +165,7 @@ TEST(DataStructuresConvertTests, StdUnorderedMultiMapTests)
 	}
 
 	{
-		SCOPED_TRACE("Serialization of std::unordered_multimap with integer as key and std::unordered_set<> as values");
+		SCOPED_TRACE("Serialization of std::unordered_map with integer as key and std::unordered_set<> as values");
 		typedef std::unordered_map<int, std::unordered_set<std::shared_ptr<MockComponent>>> TestMapType2;
 		TestMapType2 originalMap;
 
@@ -194,6 +194,7 @@ TEST(DataStructuresConvertTests, StdUnorderedMultiMapTests)
 		for (auto it = std::begin(originalMap); it != std::end(originalMap); ++it)
 		{
 			auto representationSet = newMap.find(it->first)->second;
+			EXPECT_EQ(it->second.size(), representationSet.size());
 			for (auto item = std::begin(it->second); item != std::end(it->second); ++item)
 			{
 				auto match = std::find_if(std::begin(representationSet), std::end(representationSet),
@@ -228,7 +229,7 @@ TEST(DataStructuresConvertTests, StdUnorderedSetTests)
 	}
 
 	{
-		SCOPED_TRACE("Serialization of std::unordered_set<> of integers");
+		SCOPED_TRACE("Serialization of std::unordered_set<> of std::shared_ptr<>");
 		typedef std::unordered_set<std::shared_ptr<MockComponent>> TestSetType;
 		TestSetType originalSet;
 

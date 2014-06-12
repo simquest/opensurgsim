@@ -46,7 +46,7 @@ struct convert<std::array<T, N>>
 	static bool decode(const Node& node, std::array<T, N>& rhs);
 };
 
-/// YAML::convert specialization for std::unordered_multimap.
+/// YAML::convert specialization for std::unordered_map.
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Key, class T>
 struct convert<std::unordered_map<Key, T>>
