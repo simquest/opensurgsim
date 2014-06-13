@@ -1,7 +1,7 @@
 SurgSim::Framework::Scene:
   SceneElements:
     - SurgSim::Framework::BasicSceneElement:
-        Name: armSceneElement
+        Name: arm
         Components:
           - SurgSim::Framework::PoseComponent:
               Pose:
@@ -158,7 +158,7 @@ SurgSim::Framework::Scene:
               Id: 3602234f-9730-43ed-b7ca-fe41a8145efb
               Name: PhysicsToGraphicalFem
     - SurgSim::Framework::BasicSceneElement:
-        Name: staplerSceneElement
+        Name: stapler
         Components:
           - SurgSim::Physics::VirtualToolCoupler:
               LinearStiffness:

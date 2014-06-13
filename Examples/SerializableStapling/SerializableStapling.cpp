@@ -26,29 +26,24 @@
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
-#include "SurgSim/Input/CommonDevice.h"
-#include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Input/InputManager.h"
-#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
+using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
-using SurgSim::Framework::Scene;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgManager;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Input::InputManager;
-using SurgSim::Math::makeRigidTransform;
-using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Input::DeviceInterface;
 using SurgSim::Physics::PhysicsManager;
 
 template <typename Type>
@@ -90,8 +85,8 @@ int main(int argc, char* argv[])
 	runtime->addManager(inputManager);
 	runtime->addManager(physicsManager);
 
-	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
-	device = std::make_shared<SurgSim::Device::IdentityPoseDevice>(deviceName);
+	std::shared_ptr<DeviceInterface> device;
+	device = std::make_shared<IdentityPoseDevice>(deviceName);
 	inputManager->addDevice(device);
 
 	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
@@ -105,25 +100,9 @@ int main(int argc, char* argv[])
 	runtime->getScene()->decode(node);
 	runtime->getScene()->addSceneElement(view);
 
-	std::shared_ptr<SceneElement> arm;
-	std::shared_ptr<SceneElement> wound;
-	std::shared_ptr<SceneElement> stapler;
-	auto sceneElements = runtime->getScene()->getSceneElements();
-	for (auto it = std::begin(sceneElements); it != std::end(sceneElements); ++it)
-	{
-		if ((*it)->getName() == "armSceneElement")
-		{
-			arm = (*it);
-		}
-		if ((*it)->getName() == "wound")
-		{
-			wound = (*it);
-		}
-		if ((*it)->getName() == "staplerSceneElement")
-		{
-			stapler = (*it);
-		}
-	}
+	std::shared_ptr<SceneElement> arm = runtime->getScene()->getSceneElement("arm");
+	std::shared_ptr<SceneElement> wound = runtime->getScene()->getSceneElement("wound");
+	std::shared_ptr<SceneElement> stapler = runtime->getScene()->getSceneElement("stapler");
 
 	// Exclude collision between certain Collision::Representations
 	physicsManager->addExcludedCollisionPair(
