@@ -239,6 +239,30 @@ void configureShinyMaterial()
 	material->setValue("shininess", 32.0f);
 }
 
+void configureTexturedMaterial(const std::string& filename)
+{
+	auto material = materials["texturedShadowed"];
+	std::shared_ptr<SurgSim::Graphics::UniformBase>
+	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
+	material->addUniform(uniform);
+	material->setValue("diffuseColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+
+	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("specularColor");
+	material->addUniform(uniform);
+	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+
+	uniform = std::make_shared<OsgUniform<float>>("shininess");
+	material->addUniform(uniform);
+	material->setValue("shininess", 32.0f);
+
+	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+	texture->loadImage(filename);
+	auto diffuseMapUniform =
+		std::make_shared<OsgTextureUniform<OsgTexture2d>>("diffuseMap");
+	diffuseMapUniform->set(texture);
+	material->addUniform(diffuseMapUniform);
+}
+
 /// A simple box as a scenelement
 class SimpleBox : public SurgSim::Framework::BasicSceneElement
 {
@@ -266,6 +290,11 @@ public:
 	void setSize(double width, double height, double length)
 	{
 		m_box->setSizeXYZ(width, height, length);
+	}
+
+	void setMaterial(const std::shared_ptr<SurgSim::Graphics::Material> material)
+	{
+		m_box->setMaterial(material);
 	}
 
 private:
@@ -344,10 +373,14 @@ std::shared_ptr<SurgSim::Graphics::ScreenSpaceQuadRepresentation> makeDebugQuad(
 
 void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 {
+	configureShinyMaterial();
+	configureTexturedMaterial(runtime->getApplicationData()->findFile("Textures/CheckerBoard.png"));
+
 	auto scene = runtime->getScene();
 	auto box = std::make_shared<SimpleBox>("Plane");
 	box->setSize(3.0, 0.01, 3.0);
 	box->setPose(RigidTransform3d::Identity());
+	box->setMaterial(materials["texturedShadowed"]);
 	scene->addSceneElement(box);
 
 	box = std::make_shared<SimpleBox>("Box 1");
@@ -357,10 +390,10 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 
 	addSpheres(scene);
 
-	configureShinyMaterial();
 	auto sphere = std::make_shared<SimpleSphere>("Shiny Sphere");
 	sphere->setRadius(0.25);
-	sphere->setMaterial(materials["shiny"]);
+	//sphere->setMaterial(materials["shiny"]);
+
 	scene->addSceneElement(sphere);
 
 	std::shared_ptr<SurgSim::Graphics::ViewElement> viewElement = createView("View", 40, 40, 1024, 768);
@@ -446,6 +479,7 @@ int main(int argc, char* argv[])
 	materials["basicLit"] = loadMaterial(*data, "Shaders/basic_lit");
 	materials["basicUnlit"] = loadMaterial(*data, "Shaders/basic_unlit");
 	materials["basicShadowed"] = loadMaterial(*data, "Shaders/s_mapping");
+	materials["texturedShadowed"] = loadMaterial(*data, "Shaders/ds_mapping_material");
 	materials["shiny"] = loadMaterial(*data, "Shaders/material");
 	materials["depthMap"] = loadMaterial(*data, "Shaders/depth_map");
 	materials["shadowMap"] = loadMaterial(*data, "Shaders/shadow_map");
