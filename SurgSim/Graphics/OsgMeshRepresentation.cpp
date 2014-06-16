@@ -24,20 +24,15 @@
 #include <osg/Vec3f>
 #include <osgUtil/SmoothingVisitor>
 
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/TriangleNormalGenerator.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgMeshRepresentation);
-}
 
 namespace SurgSim
 {
 namespace Graphics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgMeshRepresentation, OsgMeshRepresentation);
 
 OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	Representation(name),

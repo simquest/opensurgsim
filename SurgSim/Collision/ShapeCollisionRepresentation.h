@@ -18,6 +18,7 @@
 
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
@@ -28,6 +29,7 @@ class Shape;
 
 namespace Collision
 {
+SURGSIM_STATIC_REGISTRATION(ShapeCollisionRepresentation);
 
 /// Use a Shape as a Collision Representation, any SurgSim::Physics::Representation can
 /// be used as a backing representation

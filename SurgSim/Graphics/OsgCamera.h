@@ -18,10 +18,11 @@
 
 #include <unordered_map>
 
+#include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/Texture.h"
-#include "SurgSim/Framework/Macros.h"
 
 
 #include <osg/Camera>
@@ -43,6 +44,8 @@ class RenderTarget;
 
 template <class T>
 class OsgUniform;
+
+SURGSIM_STATIC_REGISTRATION(OsgCamera);
 
 /// OSG implementation of a graphics camera.
 ///

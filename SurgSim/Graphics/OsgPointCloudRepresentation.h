@@ -21,6 +21,7 @@
 #include <osg/Point>
 
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/PointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/DataStructures/Vertices.h"

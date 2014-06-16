@@ -38,7 +38,7 @@ using SurgSim::Math::makeRigidTransform;
 
 namespace
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, MockRepresentation)
+SURGSIM_REGISTER(SurgSim::Framework::Component, MockRepresentation, MockRepresentation);
 }
 
 namespace SurgSim

@@ -26,10 +26,11 @@
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgPlane;
 
-namespace
+namespace SurgSim
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgPlaneRepresentation);
-}
+namespace Graphics
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgPlaneRepresentation, OsgPlaneRepresentation);
 
 OsgPlaneRepresentation::OsgPlaneRepresentation(const std::string& name) :
 	Representation(name),
@@ -45,3 +46,6 @@ std::shared_ptr<OsgPlane> OsgPlaneRepresentation::getSharedPlane()
 	static SurgSim::Framework::SharedInstance<OsgPlane> shared;
 	return shared.get();
 }
+
+}; // Graphics
+}; // SurgSim

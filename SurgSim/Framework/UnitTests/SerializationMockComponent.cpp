@@ -15,9 +15,7 @@
 
 #include "SurgSim/Framework/UnitTests/SerializationMockComponent.h"
 
-namespace {
-	SURGSIM_REGISTER(SurgSim::Framework::Component, SerializationMockComponent)
-}
+SURGSIM_REGISTER(SurgSim::Framework::Component, SerializationMockComponent, SerializationMockComponent);
 
 SerializationMockComponent::SerializationMockComponent(
 	const std::string& name,

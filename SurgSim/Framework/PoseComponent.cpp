@@ -17,15 +17,11 @@
 
 #include "SurgSim/Math/MathConvert.h"
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Framework::PoseComponent);
-}
-
 namespace SurgSim
 {
 namespace Framework
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Framework::PoseComponent, PoseComponent);
 
 PoseComponent::PoseComponent(const std::string& name) : Component(name)
 {

@@ -122,11 +122,18 @@ private:
 /// Register a class with a factory that is in a base class, DerivedClass has to be of type BaseClass
 /// The assignment is used to enable the execution of registerClass during static initialization time.
 /// The variable will never be used, so the GCC warning is disabled
-#define SURGSIM_REGISTER(BaseClass, DerivedClass) \
+#define SURGSIM_REGISTER(BaseClass, DerivedClass, ClassName) \
 	SURGSIM_DO_PRAGMA (GCC diagnostic push); \
 	SURGSIM_DO_PRAGMA (GCC diagnostic ignored "-Wunused-variable"); \
-	static bool SURGSIM_MAKE_UNIQUE(registered) = \
+	bool SURGSIM_CONCATENATE(ClassName, Registered) = \
 		BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass); \
+	SURGSIM_DO_PRAGMA (GCC diagnostic pop)
+
+#define SURGSIM_STATIC_REGISTRATION(ClassName) \
+	SURGSIM_DO_PRAGMA (GCC diagnostic push); \
+	SURGSIM_DO_PRAGMA (GCC diagnostic ignored "-Wunused-variable"); \
+	extern bool SURGSIM_CONCATENATE(ClassName, Registered); \
+	static bool SURGSIM_CONCATENATE(ClassName, IsRegistered) = SURGSIM_CONCATENATE(ClassName, Registered); \
 	SURGSIM_DO_PRAGMA (GCC diagnostic pop)
 
 #endif // SURGSIM_FRAMEWORK_OBJECTFACTORY_H

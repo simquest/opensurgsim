@@ -18,7 +18,6 @@
 #include "SurgSim/Collision/Location.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
@@ -55,15 +54,13 @@ void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
 		SurgSim::Math::setSubVector(xiTransformed, nodeId, 3, x);
 	}
 }
-
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem3DRepresentation);
 }
 
 namespace SurgSim
 {
-
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem3DRepresentation, Fem3DRepresentation);
 
 Fem3DRepresentation::Fem3DRepresentation(const std::string& name) :
 	FemRepresentation(name), m_doLoadFile(false)

@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
@@ -22,15 +21,13 @@
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::DeformableCollisionRepresentation);
-}
-
 namespace SurgSim
 {
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::DeformableCollisionRepresentation,
+				 DeformableCollisionRepresentation);
+
 DeformableCollisionRepresentation::DeformableCollisionRepresentation(const std::string& name) :
 	SurgSim::Collision::Representation(name)
 {

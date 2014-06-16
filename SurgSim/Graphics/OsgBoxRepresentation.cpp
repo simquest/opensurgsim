@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 
 #include "SurgSim/Graphics/OsgMaterial.h"
@@ -28,10 +26,11 @@
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgUnitBox;
 
-namespace
+namespace SurgSim
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgBoxRepresentation);
-}
+namespace Graphics
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgBoxRepresentation, OsgBoxRepresentation);
 
 OsgBoxRepresentation::OsgBoxRepresentation(const std::string& name) :
 	Representation(name),
@@ -103,3 +102,6 @@ std::shared_ptr<OsgUnitBox> OsgBoxRepresentation::getSharedUnitBox()
 	static SurgSim::Framework::SharedInstance<OsgUnitBox> shared;
 	return shared.get();
 }
+
+}; // Graphics
+}; // SurgSim

@@ -173,11 +173,8 @@ private:
 	std::shared_ptr<TestComponent2> m_componentTwo;
 };
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent2);
-SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent3);
-}
+SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent2, TestComponent2);
+SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent3, TestComponent3);
 
 TEST(ComponentTests, Constructor)
 {

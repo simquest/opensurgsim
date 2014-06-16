@@ -19,6 +19,7 @@
 #include "SurgSim/Graphics/PlaneRepresentation.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Math/RigidTransform.h"
 
@@ -36,14 +37,14 @@ namespace SurgSim
 
 namespace Graphics
 {
-
 class OsgPlane;
+SURGSIM_STATIC_REGISTRATION(OsgPlaneRepresentation);
 
 /// OSG implementation of a graphics plane representation.
 class OsgPlaneRepresentation :  public OsgRepresentation, public PlaneRepresentation
 {
 public:
-	/// Constructor
+	/// Constructro
 	/// \param	name	Name of the representation
 	explicit OsgPlaneRepresentation(const std::string& name);
 

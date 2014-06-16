@@ -28,7 +28,6 @@
 
 #include <osgUtil/CullVisitor>
 
-
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Matrix44f;
 
@@ -61,7 +60,6 @@ const osg::Camera::RenderOrder RenderOrderEnums[3] =
 	osg::Camera::POST_RENDER
 };
 
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgCamera);
 
 };
 
@@ -70,6 +68,7 @@ namespace SurgSim
 {
 namespace Graphics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgCamera, OsgCamera);
 
 OsgCamera::OsgCamera(const std::string& name) :
 	Representation(name),

@@ -17,19 +17,15 @@
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 #include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidCollisionRepresentation);
-}
 
 namespace SurgSim
 {
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidCollisionRepresentation,
+				 RigidCollisionRepresentation);
 
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
 	Representation(name)

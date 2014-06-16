@@ -16,6 +16,7 @@
 #ifndef SURGSIM_MATH_PLANESHAPE_H
 #define SURGSIM_MATH_PLANESHAPE_H
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -23,6 +24,7 @@ namespace SurgSim
 
 namespace Math
 {
+SURGSIM_STATIC_REGISTRATION(PlaneShape);
 
 /// The XZ plane (d = 0) with normal pointing along positive Y axis.
 /// The difference between PlaneShape and DoubleSidedPlane shape is in the way the Physics scene

@@ -14,20 +14,16 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Collision::ShapeCollisionRepresentation);
-}
 
 namespace SurgSim
 {
 namespace Collision
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Collision::ShapeCollisionRepresentation,
+				 ShapeCollisionRepresentation);
 
 ShapeCollisionRepresentation::ShapeCollisionRepresentation(const std::string& name) :
 	Representation(name)

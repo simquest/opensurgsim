@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include "SurgSim/Graphics/OsgCapsuleRepresentation.h"
 #include "SurgSim/Graphics/OsgUnitCylinder.h"
 #include "SurgSim/Graphics/OsgUnitSphere.h"
@@ -22,10 +21,11 @@ using SurgSim::Graphics::OsgCapsuleRepresentation;
 using SurgSim::Graphics::OsgUnitCylinder;
 using SurgSim::Graphics::OsgUnitSphere;
 
-namespace
+namespace SurgSim
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgCapsuleRepresentation);
-}
+namespace Graphics
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgCapsuleRepresentation, OsgCapsuleRepresentation);
 
 OsgCapsuleRepresentation::OsgCapsuleRepresentation(const std::string& name) :
 	Representation(name),
@@ -121,3 +121,6 @@ std::shared_ptr<OsgUnitSphere> OsgCapsuleRepresentation::getSharedUnitSphere()
 	static SurgSim::Framework::SharedInstance<OsgUnitSphere> sharedSphere;
 	return sharedSphere.get();
 }
+
+}; // Graphaics
+}; // SurgSim

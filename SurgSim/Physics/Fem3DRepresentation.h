@@ -21,6 +21,7 @@
 #include <unordered_map>
 
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
@@ -34,6 +35,7 @@ class TriangleMesh;
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem3DRepresentation);
 
 /// Finite Element Model 3D is a fem built with 3D FemElement
 class Fem3DRepresentation : public FemRepresentation
