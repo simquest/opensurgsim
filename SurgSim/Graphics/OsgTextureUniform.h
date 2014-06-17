@@ -34,7 +34,16 @@ public:
 	/// \param	name	Name used in shader code to access this uniform
 	explicit OsgTextureUniform(const std::string& name);
 
+	/// This is the texture unit from where the search for a free texture unit will start
+	/// \param unit lowest texture unit to use, default is 0
+	void setMinimumTextureUnit(size_t unit);
+
+	/// \return the value of the lowest texture unit to use for this uniform
+	size_t getMinimumTextureUnit() const;
+
 	/// Sets the value of the uniform
+	/// \note using this directly might make the state of the uniform incosisten with
+	///       the texture that was used to create this uniform
 	virtual void set(const std::shared_ptr<T>& value);
 
 	/// Returns the value of the uniform
@@ -52,7 +61,9 @@ private:
 	/// Texture
 	std::shared_ptr<T> m_texture;
 	/// Texture unit
-	int m_unit;
+	size_t m_unit;
+
+	size_t m_minimumTextureUnit;
 };
 
 /// Specialization of OsgUniform for OsgTexture1d

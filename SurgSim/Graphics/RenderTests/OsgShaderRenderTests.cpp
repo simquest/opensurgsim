@@ -23,6 +23,7 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
@@ -141,7 +142,7 @@ TEST_F(OsgShaderRenderTests, SphereShaderTest)
 
 }
 
-TEST_F(OsgShaderRenderTests, SpecificShaderTest)
+TEST_F(OsgShaderRenderTests, ShinyShaderTest)
 {
 	/// Add the sphere representation to the view element, no need to make another scene element
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Sphere");
@@ -179,6 +180,79 @@ TEST_F(OsgShaderRenderTests, SpecificShaderTest)
 	runtime->start();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	runtime->stop();
+
+}
+
+TEST_F(OsgShaderRenderTests, TexturedShinyShaderTest)
+{
+	/// Add the sphere representation to the view element, no need to make another scene element
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Sphere");
+	std::shared_ptr<SphereRepresentation> sphereRepresentation =
+		std::make_shared<OsgSphereRepresentation>("sphere representation");
+	sphereRepresentation->setRadius(0.25);
+
+	viewElement->getCamera()->setAmbientColor(SurgSim::Math::Vector4d(0.2, 0.2, 0.2, 1.0));
+
+	auto material = loadMaterial(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	std::shared_ptr<SurgSim::Graphics::UniformBase>
+	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
+	material->addUniform(uniform);
+	material->setValue("diffuseColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+
+	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("specularColor");
+	material->addUniform(uniform);
+	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+
+	uniform = std::make_shared<OsgUniform<float>>("shininess");
+	material->addUniform(uniform);
+	material->setValue("shininess", 32.0f);
+
+	std::string filename;
+	EXPECT_TRUE(runtime->getApplicationData()->tryFindFile("Data/Textures/CheckerBoard.png", &filename));
+	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+	texture->loadImage(filename);
+	auto diffuseMapUniform =
+		std::make_shared<OsgTextureUniform<OsgTexture2d>>("diffuseMap");
+	diffuseMapUniform->set(texture);
+	material->addUniform(diffuseMapUniform);
+
+	material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.1, 1.0));
+	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 0.4, 1.0));
+	material->setValue("shininess", 1.0f);
+	sphereRepresentation->setMaterial(material);
+	sceneElement->addComponent(sphereRepresentation);
+	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+	scene->addSceneElement(sceneElement);
+
+
+	sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
+	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
+	light->setDiffuseColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
+	light->setSpecularColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
+	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
+	sceneElement->addComponent(light);
+	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+	sceneElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-2.0, -2.0, -4.0)));
+
+	sphereRepresentation = std::make_shared<OsgSphereRepresentation>("debug");
+	sphereRepresentation->setRadius(0.01);
+	sceneElement->addComponent(sphereRepresentation);
+
+	scene->addSceneElement(sceneElement);
+
+	//viewElement->enableManipulator(true);
+
+	viewElement->setPose(makeRigidTransform(Vector3d(0.0, 0.0, -2.0),
+											Vector3d(0.0, 0.0, 0.0),
+											Vector3d(0.0, 1.0, 0.0)));
+	viewElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+
+
+	/// Run the thread
+	// 	runtime->start();
+	// 	boost::this_thread::sleep(boost::posix_time::milliseconds(10000));
+	// 	runtime->stop();
+	runtime->execute();
 
 }
 
