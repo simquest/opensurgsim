@@ -23,37 +23,15 @@
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Graphics/Material.h"
-#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/OutputComponent.h"
 
 using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
+using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::Representation;
 using SurgSim::Input::InputComponent;
-
-class MockComponent : public SurgSim::Framework::Component
-{
-public:
-	explicit MockComponent(const std::string& name) : Component(name) {}
-	SURGSIM_CLASSNAME(MockComponent);
-	virtual bool doInitialize() override {return true;}
-	virtual bool doWakeUp() override {return true;}
-};
-SURGSIM_REGISTER(SurgSim::Framework::Component, MockComponent);
-
-class MockRepresentation : public SurgSim::Graphics::Representation
-{
-public:
-	explicit MockRepresentation(const std::string& name) : SurgSim::Graphics::Representation(name) {}
-	SURGSIM_CLASSNAME(MockRepresentation);
-	virtual void setVisible(bool visible) override {}
-	virtual bool isVisible() const override {return true;}
-	virtual void update(double dt) override {}
-	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material) override {return true;}
-	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const override {return nullptr;}
-	virtual void clearMaterial() override {}
-};
-SURGSIM_REGISTER(SurgSim::Framework::Component, MockRepresentation);
+using SurgSim::Input::OutputComponent;
 
 TEST(KeyboardTogglesGraphicsBehavior, Constructor)
 {
@@ -65,8 +43,8 @@ TEST(KeyboardTogglesGraphicsBehavior, InputComponentTests)
 	auto keyboardTogglesGraphicsBehavior =
 		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardTogglesGraphicsBehavior");
 	{
-		auto mockComponent = std::make_shared<MockComponent>("MockComponent");
-		EXPECT_ANY_THROW(keyboardTogglesGraphicsBehavior->setInputComponent(mockComponent));
+		auto invalidInputComponent = std::make_shared<OutputComponent>("InvalidInputComponent");
+		EXPECT_ANY_THROW(keyboardTogglesGraphicsBehavior->setInputComponent(invalidInputComponent));
 	}
 
 	{
@@ -82,18 +60,19 @@ TEST(KeyboardTogglesGraphicsBehavior, RegistrationTests)
 	auto keyboardTogglesGraphicsBehavior =
 		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardTogglesGraphicsBehavior");
 	{
-		auto mockComponent = std::make_shared<MockComponent>("MockComponent");
-		EXPECT_FALSE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, mockComponent));
+		auto invalidInputComponent = std::make_shared<OutputComponent>("InvalidInputComponent");
+		EXPECT_FALSE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A,
+																  invalidInputComponent));
 	}
 
 	{
-		auto mockGraphics = std::make_shared<MockRepresentation>("MockGraphics");
-		auto mockGraphics2 = std::make_shared<MockRepresentation>("MockGraphics2");
-		auto mockGraphics3 = std::make_shared<MockRepresentation>("MockGraphics3");
+		auto graphics = std::make_shared<OsgBoxRepresentation>("Graphics");
+		auto graphics2 = std::make_shared<OsgBoxRepresentation>("Graphics2");
+		auto graphics3 = std::make_shared<OsgBoxRepresentation>("Graphics3");
 
-		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, mockGraphics));
-		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, mockGraphics2));
-		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, mockGraphics3));
+		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, graphics));
+		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, graphics2));
+		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, graphics3));
 
 		auto keyMap = keyboardTogglesGraphicsBehavior->getKeyboardRegistry();
 		auto keyAPair = keyMap.find(SurgSim::Device::KeyCode::KEY_A);
@@ -102,9 +81,9 @@ TEST(KeyboardTogglesGraphicsBehavior, RegistrationTests)
 		EXPECT_EQ(2u, keyAPair->second.size());
 		EXPECT_EQ(1u, keyBPair->second.size());
 
-		EXPECT_NE(std::end(keyAPair->second), keyAPair->second.find(mockGraphics));
-		EXPECT_NE(std::end(keyAPair->second), keyAPair->second.find(mockGraphics2));
-		EXPECT_NE(std::end(keyBPair->second), keyBPair->second.find(mockGraphics3));
+		EXPECT_NE(std::end(keyAPair->second), keyAPair->second.find(graphics));
+		EXPECT_NE(std::end(keyAPair->second), keyAPair->second.find(graphics2));
+		EXPECT_NE(std::end(keyBPair->second), keyBPair->second.find(graphics3));
 	}
 }
 
@@ -112,22 +91,20 @@ TEST(KeyboardTogglesGraphicsBehavior, SetAndGetKeyboardRegisterTypeTest)
 {
 	auto keyboardTogglesGraphicsBehavior =
 		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardTogglesGraphicsBehavior");
-	std::shared_ptr<Representation> mockGraphics1 = std::make_shared<MockRepresentation>("MockGraphics1");
-	std::shared_ptr<Representation> mockGraphics2 = std::make_shared<MockRepresentation>("MockGraphics2");
-	std::shared_ptr<Representation> mockGraphics3 = std::make_shared<MockRepresentation>("MockGraphics3");
+	std::shared_ptr<Representation> graphics1 = std::make_shared<OsgBoxRepresentation>("graphics1");
+	std::shared_ptr<Representation> graphics2 = std::make_shared<OsgBoxRepresentation>("graphics2");
+	std::shared_ptr<Representation> graphics3 = std::make_shared<OsgBoxRepresentation>("graphics3");
 
 	std::unordered_set<std::shared_ptr<Representation>> set1;
 	std::unordered_set<std::shared_ptr<Representation>> set2;
 
-	set1.insert(mockGraphics1);
-	set2.insert(mockGraphics2);
-	set2.insert(mockGraphics3);
+	set1.insert(graphics1);
+	set2.insert(graphics2);
+	set2.insert(graphics3);
 
 	KeyboardTogglesGraphicsBehavior::KeyboardRegistryType keyMap;
-	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegistryType::value_type(SurgSim::Device::KeyCode::KEY_A,
-																					set1));
-	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegistryType::value_type(SurgSim::Device::KeyCode::KEY_B,
-																					set2));
+	keyMap[SurgSim::Device::KeyCode::KEY_A] = set1;
+	keyMap[SurgSim::Device::KeyCode::KEY_B] = set2;
 
 	EXPECT_NO_THROW(keyboardTogglesGraphicsBehavior->setKeyboardRegistry(keyMap));
 
@@ -155,20 +132,18 @@ TEST(KeyboardTogglesGraphicsBehavior, Serialization)
 		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardTogglesGraphicsBehavior");
 
 	std::shared_ptr<SurgSim::Framework::Component> inputComponent = std::make_shared<InputComponent>("InputComponent");
-	std::shared_ptr<Representation> mockGraphics1 = std::make_shared<MockRepresentation>("MockGraphics1");
-	std::shared_ptr<Representation> mockGraphics2 = std::make_shared<MockRepresentation>("MockGraphics2");
+	std::shared_ptr<Representation> graphics1 = std::make_shared<OsgBoxRepresentation>("graphics1");
+	std::shared_ptr<Representation> graphics2 = std::make_shared<OsgBoxRepresentation>("graphics2");
 
 	std::unordered_set<std::shared_ptr<Representation>> set1;
 	std::unordered_set<std::shared_ptr<Representation>> set2;
 
-	set1.insert(mockGraphics1);
-	set2.insert(mockGraphics2);
+	set1.insert(graphics1);
+	set2.insert(graphics2);
 
 	KeyboardTogglesGraphicsBehavior::KeyboardRegistryType keyMap;
-	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegistryType::value_type(SurgSim::Device::KeyCode::KEY_A,
-																					set1));
-	keyMap.insert(KeyboardTogglesGraphicsBehavior::KeyboardRegistryType::value_type(SurgSim::Device::KeyCode::KEY_B,
-																					set2));
+	keyMap[SurgSim::Device::KeyCode::KEY_A] = set1;
+	keyMap[SurgSim::Device::KeyCode::KEY_B] = set2;
 
 	keyboardTogglesGraphicsBehavior->setValue("KeyboardRegistry", keyMap);
 	keyboardTogglesGraphicsBehavior->setValue("InputComponent", inputComponent);
