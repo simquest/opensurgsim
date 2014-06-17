@@ -22,9 +22,9 @@
 
 namespace
 {
-const std::string serializeLogger = "Serialization";
-const std::string HasValueName = "HasValue";
-const std::string ValueName = "Value";
+const std::string loggerName = "Serialization";
+const std::string hasValueName = "HasValue";
+const std::string valueName = "Value";
 };
 
 template <class T>
@@ -32,14 +32,14 @@ YAML::Node YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::encode(
 	const SurgSim::DataStructures::OptionalValue<T>& rhs)
 {
 	Node node;
-	node[HasValueName] = rhs.hasValue();
+	node[hasValueName] = rhs.hasValue();
 	if (rhs.hasValue())
 	{
-		node[ValueName] = rhs.getValue();
+		node[valueName] = rhs.getValue();
 	}
 	else
 	{
-		node[ValueName] = "Not set";
+		node[valueName] = "Not set";
 	}
 	return node;
 }
@@ -49,16 +49,16 @@ bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
 	const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs)
 {
 	bool result = true;
-	if (node[HasValueName].as<bool>())
+	if (node[hasValueName].as<bool>())
 	{
 		try
 		{
-			rhs.setValue(node[ValueName].as<T>());
+			rhs.setValue(node[valueName].as<T>());
 		}
 		catch (YAML::RepresentationException)
 		{
 			result = false;
-			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
+			auto logger = SurgSim::Framework::Logger::getLogger(loggerName);
 			SURGSIM_LOG(logger, WARNING) << "Bad conversion";
 		}
 	}
@@ -99,7 +99,7 @@ bool YAML::convert<std::array<T, N>>::decode(const Node& node, std::array<T, N>&
 		catch (YAML::RepresentationException)
 		{
 			result = false;
-			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
+			auto logger = SurgSim::Framework::Logger::getLogger(loggerName);
 			SURGSIM_LOG(logger, WARNING) << __FUNCTION__ << ": Bad conversion";
 		}
 	}
@@ -135,8 +135,8 @@ bool YAML::convert<std::unordered_map<Key, T>>::decode(const Node& node, std::un
 		catch (YAML::RepresentationException)
 		{
 			result = false;
-			SURGSIM_LOG(SurgSim::Framework::Logger::getLogger(serializeLogger), WARNING) << __FUNCTION__ <<
-																							": Bad conversion";
+			SURGSIM_LOG(SurgSim::Framework::Logger::getLogger(loggerName), WARNING) << __FUNCTION__ <<
+																					   ": Bad conversion";
 		}
 	}
 	return result;
@@ -171,8 +171,8 @@ bool YAML::convert<std::unordered_set<Value>>::decode(const Node& node, std::uno
 		catch (YAML::RepresentationException)
 		{
 			result = false;
-			SURGSIM_LOG(SurgSim::Framework::Logger::getLogger(serializeLogger), WARNING) << __FUNCTION__ <<
-																							": Bad conversion";
+			SURGSIM_LOG(SurgSim::Framework::Logger::getLogger(loggerName), WARNING) << __FUNCTION__ <<
+																					   ": Bad conversion";
 		}
 	}
 	return result;
