@@ -109,6 +109,7 @@ private:
 
 	/// Uniforms used by this material
 	std::vector<std::shared_ptr<OsgUniformBase>> m_uniforms;
+
 	/// Shader used by this material
 	std::shared_ptr<OsgShader> m_shader;
 };

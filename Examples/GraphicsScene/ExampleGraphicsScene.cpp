@@ -165,7 +165,6 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createLight()
 	auto result = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
 
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
-	light->setAmbientColor(Vector4d(0.5, 0.5, 0.5, 1.0));
 	light->setDiffuseColor(Vector4d(0.5, 0.5, 0.5, 1.0));
 	light->setSpecularColor(Vector4d(0.8, 0.8, 0.8, 1.0));
 	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
@@ -219,6 +218,25 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> createShadowMapPass()
 	materials["shadowMap"]->getShader()->setGlobalScope(true);
 	pass->setMaterial(materials["shadowMap"]);
 	return pass;
+}
+
+void configureShinyMaterial()
+{
+	// This will change the shared material
+	auto material = materials["shiny"];
+
+	std::shared_ptr<SurgSim::Graphics::UniformBase>
+	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
+	material->addUniform(uniform);
+	material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.1, 1.0));
+
+	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("specularColor");
+	material->addUniform(uniform);
+	material->setValue("specularColor", SurgSim::Math::Vector4f(0.9, 0.9, 0.1, 1.0));
+
+	uniform = std::make_shared<OsgUniform<float>>("shininess");
+	material->addUniform(uniform);
+	material->setValue("shininess", 32.0f);
 }
 
 /// A simple box as a scenelement
@@ -277,6 +295,11 @@ public:
 		m_sphere->setRadius(radius);
 	}
 
+	void setMaterial(const std::shared_ptr<SurgSim::Graphics::Material> material)
+	{
+		m_sphere->setMaterial(material);
+	}
+
 private:
 	std::shared_ptr<SurgSim::Graphics::OsgSphereRepresentation> m_sphere;
 };
@@ -333,6 +356,12 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	scene->addSceneElement(box);
 
 	addSpheres(scene);
+
+	configureShinyMaterial();
+	auto sphere = std::make_shared<SimpleSphere>("Shiny Sphere");
+	sphere->setRadius(0.25);
+	sphere->setMaterial(materials["shiny"]);
+	scene->addSceneElement(sphere);
 
 	std::shared_ptr<SurgSim::Graphics::ViewElement> viewElement = createView("View", 40, 40, 1024, 768);
 	scene->addSceneElement(viewElement);
@@ -417,6 +446,7 @@ int main(int argc, char* argv[])
 	materials["basicLit"] = loadMaterial(*data, "Shaders/basic_lit");
 	materials["basicUnlit"] = loadMaterial(*data, "Shaders/basic_unlit");
 	materials["basicShadowed"] = loadMaterial(*data, "Shaders/s_mapping");
+	materials["shiny"] = loadMaterial(*data, "Shaders/material");
 	materials["depthMap"] = loadMaterial(*data, "Shaders/depth_map");
 	materials["shadowMap"] = loadMaterial(*data, "Shaders/shadow_map");
 	materials["default"] = materials["basic_lit"];

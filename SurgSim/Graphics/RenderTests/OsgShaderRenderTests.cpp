@@ -18,9 +18,12 @@
 
 
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgShader.h"
@@ -71,6 +74,42 @@ std::shared_ptr<Shader> loadExampleShader(const SurgSim::Framework::ApplicationD
 	return shader;
 }
 
+std::shared_ptr<Material> loadMaterial(const SurgSim::Framework::ApplicationData& data,
+									   const std::string& shaderName)
+{
+	SCOPED_TRACE("Load Material");
+
+	auto shader = std::make_shared<SurgSim::Graphics::OsgShader>();
+
+	std::string filename;
+	EXPECT_TRUE(data.tryFindFile(shaderName + ".vert", &filename));
+	shader->loadVertexShaderSource(filename);
+
+	EXPECT_TRUE(data.tryFindFile(shaderName + ".frag", &filename));
+	shader->loadFragmentShaderSource(filename);
+
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+	material->setShader(shader);
+
+	return material;
+}
+
+std::shared_ptr<Material> createShinyMaterial(const SurgSim::Framework::ApplicationData& data)
+{
+	auto material = loadMaterial(data, "Shaders/material");
+	std::shared_ptr<SurgSim::Graphics::UniformBase>
+	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
+	material->addUniform(uniform);
+
+	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("specularColor");
+	material->addUniform(uniform);
+
+	uniform = std::make_shared<OsgUniform<float>>("shininess");
+	material->addUniform(uniform);
+
+	return material;
+}
+
 struct OsgShaderRenderTests : public RenderTest
 {
 
@@ -98,6 +137,47 @@ TEST_F(OsgShaderRenderTests, SphereShaderTest)
 	/// Run the thread
 	runtime->start();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	runtime->stop();
+
+}
+
+TEST_F(OsgShaderRenderTests, SpecificShaderTest)
+{
+	/// Add the sphere representation to the view element, no need to make another scene element
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Sphere");
+	std::shared_ptr<SphereRepresentation> sphereRepresentation =
+		std::make_shared<OsgSphereRepresentation>("sphere representation");
+	sphereRepresentation->setRadius(0.25);
+
+	auto material = createShinyMaterial(*runtime->getApplicationData());
+	material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.1, 1.0));
+	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 0.4, 1.0));
+	material->setValue("shininess", 64.0f);
+	sphereRepresentation->setMaterial(material);
+	sceneElement->addComponent(sphereRepresentation);
+	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+	scene->addSceneElement(sceneElement);
+
+
+	sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
+	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
+	light->setDiffuseColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
+	light->setSpecularColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
+	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
+	sceneElement->addComponent(light);
+	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+	sceneElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-2.0, -2.0, -4.0)));
+
+	scene->addSceneElement(sceneElement);
+
+	viewElement->setPose(
+		makeRigidTransform(Vector3d(0.0, 0.0, -2.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
+	viewElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+
+
+	/// Run the thread
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	runtime->stop();
 
 }

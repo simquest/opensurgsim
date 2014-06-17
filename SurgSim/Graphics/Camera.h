@@ -19,6 +19,7 @@
 #include "SurgSim/Graphics/Representation.h"
 
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
@@ -115,6 +116,14 @@ public:
 	virtual void setRenderOrder(RenderOrder order, int value) = 0;
 
 	virtual bool addGroupReference(const std::string& name) override;
+
+	/// Sets a value for the ambient lighting term, this can add light to the scene when there is no lighting
+	/// \param color value for the light that should get added to the scene
+	virtual void setAmbientColor(const SurgSim::Math::Vector4d& color) = 0;
+
+	/// \return the ambient light that gets added to the scene
+	virtual SurgSim::Math::Vector4d getAmbientColor() = 0;
+
 
 private:
 

@@ -353,7 +353,6 @@ public:
 		return false;
 	}
 
-
 	/// Gets the material that defines the visual appearance of the representation
 	/// \return	Graphics material
 	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
@@ -395,6 +394,17 @@ public:
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
+
+	void setAmbientColor(const SurgSim::Math::Vector4d& color)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	SurgSim::Math::Vector4d getAmbientColor()
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
 
 private:
 	/// Number of times the camera has been updated
