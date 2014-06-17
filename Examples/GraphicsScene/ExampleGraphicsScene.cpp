@@ -261,6 +261,7 @@ void configureTexturedMaterial(const std::string& filename)
 		std::make_shared<OsgTextureUniform<OsgTexture2d>>("diffuseMap");
 	diffuseMapUniform->set(texture);
 	material->addUniform(diffuseMapUniform);
+
 }
 
 /// A simple box as a scenelement
@@ -442,10 +443,13 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 // 	copier->connect(shadowMapPass->getCamera(), "FloatInverseViewMatrix",
 // 					shadowMapPass->getMaterial() , "inverseViewMatrix");
 
-	// Get the result of the lightMapPass and pass it on to the shadowMapPass
+	// Get the result of the lightMapPass and pass it on to the shadowMapPass, because it is used
+	// in a pass we ask the system to use a higher than normal texture unit (in this case 8) for
+	// this texture, this prevents the texture from being overwritten by other textures
 	auto lightDepthTexture =
 		std::make_shared<OsgTextureUniform<OsgTexture2d>>("encodedLightDepthMap");
 	lightDepthTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(lightMapPass->getRenderTarget()->getColorTarget(0)));
+	lightDepthTexture->setMinimumTextureUnit(8);
 	shadowMapPass->getMaterial()->addUniform(lightDepthTexture);
 
 	// Make the camera in the shadowMapPass follow the main camera that is being used to render the
@@ -459,6 +463,7 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	auto shadowMapTexture =
 		std::make_shared<OsgTextureUniform<OsgTexture2d>>("shadowMap");
 	shadowMapTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(shadowMapPass->getRenderTarget()->getColorTarget(0)));
+	shadowMapTexture->setMinimumTextureUnit(8);
 	material->addUniform(shadowMapTexture);
 	mainCamera->setMaterial(material);
 

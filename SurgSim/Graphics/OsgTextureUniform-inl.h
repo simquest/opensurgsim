@@ -33,8 +33,7 @@ namespace Graphics
 
 template <class T>
 OsgTextureUniform<T>::OsgTextureUniform(const std::string& name) :
-UniformBase(), Uniform<std::shared_ptr<T>>(), OsgUniformBase(name),
-	m_unit(0)
+	UniformBase(), Uniform<std::shared_ptr<T>>(), OsgUniformBase(name), m_unit(0), m_minimumTextureUnit(0)
 {
 	osg::Uniform::Type osgUniformType = getOsgUniformType<std::shared_ptr<T>>();
 	SURGSIM_ASSERT(osgUniformType != osg::Uniform::UNDEFINED) << "Failed to get OSG uniform type!";
@@ -58,22 +57,26 @@ template <class T>
 void OsgTextureUniform<T>::addToStateSet(osg::StateSet* stateSet)
 {
 	const osg::StateSet::TextureAttributeList& textures = stateSet->getTextureAttributeList();
-	int availableUnit = 0;
-	for (auto it = textures.begin(); it != textures.end(); ++it)
+	int availableUnit = m_minimumTextureUnit;
+	if (textures.size() > m_minimumTextureUnit)
 	{
-		if (it->empty())
+		for (auto it = textures.begin() + m_minimumTextureUnit; it != textures.end(); ++it)
 		{
-			break;
+			if (it->empty())
+			{
+				break;
+			}
+			availableUnit++;
 		}
-		availableUnit++;
 	}
 
 	m_unit = availableUnit;
 
 	SURGSIM_ASSERT(m_texture != nullptr) << "Tried to add this uniform without a valid Texture";
-	stateSet->setTextureAttributeAndModes(m_unit, m_texture->getOsgTexture(), osg::StateAttribute::ON);
-	SURGSIM_ASSERT(m_uniform->set(m_unit)) << "Failed to set OSG texture uniform unit!" <<
-		" Uniform: " << getName() << " unit: " << m_unit;
+	stateSet->setTextureAttributeAndModes(m_unit, m_texture->getOsgTexture(),
+										  osg::StateAttribute::ON);
+	SURGSIM_ASSERT(m_uniform->set(static_cast<int>(m_unit))) << "Failed to set OSG texture uniform unit!" <<
+			" Uniform: " << getName() << " unit: " << m_unit;
 	stateSet->addUniform(m_uniform);
 }
 
@@ -84,6 +87,17 @@ void OsgTextureUniform<T>::removeFromStateSet(osg::StateSet* stateSet)
 	stateSet->removeUniform(m_uniform);
 }
 
+template <class T>
+void OsgTextureUniform<T>::setMinimumTextureUnit(size_t unit)
+{
+	m_minimumTextureUnit = unit;
+}
+
+template <class T>
+size_t OsgTextureUniform<T>::getMinimumTextureUnit() const
+{
+	return m_minimumTextureUnit;
+}
 };  // namespace Graphics
 
 };  // namespace SurgSim

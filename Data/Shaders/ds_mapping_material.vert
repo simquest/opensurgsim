@@ -14,8 +14,7 @@
 // limitations under the License.
 
 /// \file ds_mapping.frag
-/// Blinn-Phong material with diffuse and shadow map, using per-vertex lighting
-
+/// Blinn-Phong material with diffuse and shadow map
 
 // These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform vec4 diffuseColor;
