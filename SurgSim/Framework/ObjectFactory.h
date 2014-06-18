@@ -121,18 +121,27 @@ private:
 
 /// Register a class with a factory that is in a base class, DerivedClass has to be of type BaseClass.
 /// The assignment is used to enable the execution of registerClass during static initialization time.
-/// The variable will never be used, so the GCC warning is disabled.
 /// This macro should be put under the same namespace in which 'ClassName' is, to avoid symbol clashes.
 /// 'BaseClass' should be the full name of the base class with namespace prefix,
 /// 'DerivedClass' is 'ClassName' with namespace prefixes,
 /// and 'ClassName' is the name of the class without namespace prefix.
 #define SURGSIM_REGISTER(BaseClass, DerivedClass, ClassName) \
-	SURGSIM_DO_PRAGMA (GCC diagnostic push); \
-	SURGSIM_DO_PRAGMA (GCC diagnostic ignored "-Wunused-variable"); \
 	bool SURGSIM_CONCATENATE(ClassName, Registered) = \
 		BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass); \
-	SURGSIM_DO_PRAGMA (GCC diagnostic pop)
 
+/// Force compilation of the boolean symbol SURGSIM_CONCATENATE(ClassName, Registered) in SURGSIM_REGISTER macro, 
+/// which in turn registers DerivedClass into BaseClass's ObjectFactory. 
+/// After that, DerivedClass is linked to any code which includes its header.
+///
+/// Boolean symbol SURGSIM_CONCATENATE(ClassName, Registered) in SURGSIM_REGISTER macro is exposed as an 
+/// extern variable in DerivedClass's header, and is referenced to initialize the static global variable 
+/// SURGSIM_CONCATENATE(ClassName, IsRegistered) in the header. 
+///
+/// This forces the compiler to include the definition of SURGSIM_CONCATENATE(ClassName, Registered)
+/// (defined most likely in the cpp file).
+/// The variable SURGSIM_CONCATENATE(ClassName, IsRegistered) will never be used, so the GCC warning is disabled.
+/// This macro should be put in the DerivedClass's header file, under the same namespace in which the DerivedClass is.
+/// 'ClassName' should be the name of the class without any prefix.
 #define SURGSIM_STATIC_REGISTRATION(ClassName) \
 	SURGSIM_DO_PRAGMA (GCC diagnostic push); \
 	SURGSIM_DO_PRAGMA (GCC diagnostic ignored "-Wunused-variable"); \
