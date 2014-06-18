@@ -119,9 +119,13 @@ private:
 
 #include "SurgSim/Framework/ObjectFactory-inl.h"
 
-/// Register a class with a factory that is in a base class, DerivedClass has to be of type BaseClass
+/// Register a class with a factory that is in a base class, DerivedClass has to be of type BaseClass.
 /// The assignment is used to enable the execution of registerClass during static initialization time.
-/// The variable will never be used, so the GCC warning is disabled
+/// The variable will never be used, so the GCC warning is disabled.
+/// This macro should be put under the same namespace in which 'ClassName' is, to avoid symbol clashes.
+/// 'BaseClass' should be the full name of the base class with namespace prefix,
+/// 'DerivedClass' is 'ClassName' with namespace prefixes,
+/// and 'ClassName' is the name of the class without namespace prefix.
 #define SURGSIM_REGISTER(BaseClass, DerivedClass, ClassName) \
 	SURGSIM_DO_PRAGMA (GCC diagnostic push); \
 	SURGSIM_DO_PRAGMA (GCC diagnostic ignored "-Wunused-variable"); \
