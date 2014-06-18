@@ -129,13 +129,13 @@ private:
 	bool SURGSIM_CONCATENATE(ClassName, Registered) = \
 		BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass); \
 
-/// Force compilation of the boolean symbol SURGSIM_CONCATENATE(ClassName, Registered) in SURGSIM_REGISTER macro, 
-/// which in turn registers DerivedClass into BaseClass's ObjectFactory. 
+/// Force compilation of the boolean symbol SURGSIM_CONCATENATE(ClassName, Registered) in SURGSIM_REGISTER macro,
+/// which in turn registers DerivedClass into BaseClass's ObjectFactory.
 /// After that, DerivedClass is linked to any code which includes its header.
 ///
-/// Boolean symbol SURGSIM_CONCATENATE(ClassName, Registered) in SURGSIM_REGISTER macro is exposed as an 
-/// extern variable in DerivedClass's header, and is referenced to initialize the static global variable 
-/// SURGSIM_CONCATENATE(ClassName, IsRegistered) in the header. 
+/// Boolean symbol SURGSIM_CONCATENATE(ClassName, Registered) in SURGSIM_REGISTER macro is exposed as an
+/// extern variable in DerivedClass's header, and is referenced to initialize the static global variable
+/// SURGSIM_CONCATENATE(ClassName, IsRegistered) in the header.
 ///
 /// This forces the compiler to include the definition of SURGSIM_CONCATENATE(ClassName, Registered)
 /// (defined most likely in the cpp file).
