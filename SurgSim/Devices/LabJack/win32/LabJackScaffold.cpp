@@ -438,24 +438,22 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 				input != info->digitalInputChannels.cend();
 				++input)
 			{
-				info->digitalInputIndices[*input] =
-					inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
-					std::to_string(*input));
+				const std::string name = SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(*input);
+				info->digitalInputIndices[*input] = inputData.scalars().getIndex(name);
 				SURGSIM_ASSERT(info->digitalInputIndices[*input] >= 0) << "LabJackScaffold::DeviceData " <<
 					"failed to get a valid NamedData index for the digital input for line " << *input <<
-					".  Make sure that is a valid line number.";
+					".  Make sure that is a valid line number.  Expected an entry named " << name << ".";
 			}
 
 			for (auto timer = info->timerInputChannels.cbegin();
 				timer != info->timerInputChannels.cend();
 				++timer)
 			{
-				info->timerInputIndices[*timer] =
-					inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
-					std::to_string(*timer));
+				const std::string name = SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX + std::to_string(*timer);
+				info->timerInputIndices[*timer] = inputData.scalars().getIndex(name);
 				SURGSIM_ASSERT(info->timerInputIndices[*timer] >= 0) << "LabJackScaffold::DeviceData " <<
 					"failed to get a valid NamedData index for the timer for channel " << *timer <<
-					".  Make sure that is a valid timer number.";
+					".  Make sure that is a valid timer number.  Expected an entry named " << name << ".";
 			}
 
 			std::unique_ptr<LabJackThread> thread(new LabJackThread(this, info.get()));
@@ -608,30 +606,25 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 
 	// GoOne, telling this specific LabJack to perform the requests.
 	const LJ_ERROR error = GoOne(rawHandle);
-	bool result = isOk(error);
-	SURGSIM_LOG_IF(!result, m_logger, WARNING) <<
-		"Failed to submit requests for a device named '" << info->deviceObject->getName() << "." <<
-		std::endl << formatErrorMessage(error);
 
 	// Finally we get the results.
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	if (result)
+	if (isOk(error))
 	{
 		// Digital inputs.
 		for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 		{
 			double value;
 			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_DIGITAL_BIT, *input, &value);
-			result = isOk(error);
-			SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
-				"Failed to get digital input for a device named '" << info->deviceObject->getName() <<
-				"', line number " << *input << "." << std::endl << formatErrorMessage(error);
-			if (result)
+			if (isOk(error))
 			{
 				inputData.scalars().set(info->digitalInputIndices[*input], value);
 			}
 			else
 			{
+				SURGSIM_LOG_WARNING(m_logger) << "Failed to get digital input for a device named '" <<
+					info->deviceObject->getName() << "', line number " << *input << "." << std::endl <<
+					formatErrorMessage(error);
 				inputData.scalars().reset(info->digitalInputIndices[*input]);
 			}
 		}
@@ -641,22 +634,23 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		{
 			double value;
 			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_TIMER, *timer, &value);
-			result = isOk(error);
-			SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
-				"Failed to get timer input for a device named '" << info->deviceObject->getName() <<
-				"', channel number " << *timer << "." << std::endl << formatErrorMessage(error);
-			if (result)
+			if (isOk(error))
 			{
 				inputData.scalars().set(info->timerInputIndices[*timer], value);
 			}
 			else
 			{
+				SURGSIM_LOG_WARNING(m_logger) << "Failed to get timer input for a device named '" <<
+					info->deviceObject->getName() << "', channel number " << *timer << "." << std::endl <<
+					formatErrorMessage(error);
 				inputData.scalars().reset(info->timerInputIndices[*timer]);
 			}
 		}
 	}
 	else
 	{
+		SURGSIM_LOG_WARNING(m_logger) << "Failed to submit requests for a device named '" <<
+			info->deviceObject->getName() << "." << std::endl << formatErrorMessage(error);
 		inputData.resetAll();
 	}
 
