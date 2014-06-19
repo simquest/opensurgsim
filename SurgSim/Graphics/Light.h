@@ -66,14 +66,6 @@ public:
 	/// \return	The group or nullptr if no group has been set.
 	virtual std::shared_ptr<SurgSim::Graphics::Group> getGroup() = 0;
 
-	/// Sets ambient color of this light
-	/// \param	color	The color.
-	virtual void setAmbientColor(const SurgSim::Math::Vector4d& color) = 0;
-
-	/// Gets ambient color.
-	/// \return	The ambient color.
-	virtual SurgSim::Math::Vector4d getAmbientColor() = 0;
-
 	/// Sets diffuse color of this light.
 	/// \param	color	The color.
 	virtual void setDiffuseColor(const SurgSim::Math::Vector4d& color) = 0;

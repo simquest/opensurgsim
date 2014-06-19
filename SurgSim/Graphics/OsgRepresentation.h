@@ -75,6 +75,8 @@ public:
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt);
 
+
+
 protected:
 	virtual void doUpdate(double dt);
 
@@ -85,6 +87,7 @@ protected:
 
 	/// Material defining the visual appearance of the representation
 	std::shared_ptr<OsgMaterial> m_material;
+
 };
 
 }; // Graphics
