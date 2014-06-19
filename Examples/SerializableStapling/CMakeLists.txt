@@ -22,41 +22,19 @@ include_directories(
 	${YAML_CPP_INCLUDE_DIR}
 )
 
-set(EXAMPLESTAPLING_SOURCES
-	StapleElement.cpp
-	StaplerBehavior.cpp
-	StaplingExample.cpp
+set(SERIALIZABLESTAPLING_SOURCES
+	SerializableStapling.cpp
 )
 
-set(EXAMPLESTAPLING_HEADERS
-	StapleElement.h
-	StaplerBehavior.h
+set(SERIALIZABLESTAPLING_HEADERS
 )
 
-add_executable(ExampleStapling
-	${EXAMPLESTAPLING_SOURCES} ${EXAMPLESTAPLING_HEADERS}
-)
-
-set(SURGSIMEXAMPLESTAPLING_SOURCES
-	StapleElement.cpp
-	StaplerBehavior.cpp
-	StaplingExample.cpp
-)
-
-set(SURGSIMEXAMPLESTAPLING_HEADERS
-	StapleElement.h
-	StaplerBehavior.h
-)
-
-surgsim_add_library(
-	SurgSimExampleStapling
-	${SURGSIMEXAMPLESTAPLING_SOURCES}
-	${SURGSIMEXAMPLESTAPLING_HEADERS}
-	"Examples/ExampleStapling"
+add_executable(ExampleSerializableStapling
+	${SERIALIZABLESTAPLING_SOURCES} ${SERIALIZABLESTAPLING_SOURCES}
 )
 
 surgsim_show_ide_folders(
-	"${EXAMPLESTAPLING_SOURCES}" "${EXAMPLESTAPLING_HEADERS}")
+	"${SERIALIZABLESTAPLING_SOURCES}" "${SERIALIZABLESTAPLING_SOURCES}")
 
 set(LIBS 
 	${LIBS}
@@ -65,6 +43,7 @@ set(LIBS
 	SurgSimBlocks
 	SurgSimFramework
 	SurgSimGraphics
+	SurgSimExampleStapling
 	${YAML_CPP_LIBRARIES}
 )
 
@@ -76,7 +55,7 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-target_link_libraries(ExampleStapling ${LIBS})
+target_link_libraries(ExampleSerializableStapling ${LIBS})
 
-# Put ExampleStapling into folder "Examples"
-set_target_properties(ExampleStapling PROPERTIES FOLDER "Examples") 
+# Put ExampleSerializableStapling into folder "Examples"
+set_target_properties(ExampleSerializableStapling PROPERTIES FOLDER "Examples") 

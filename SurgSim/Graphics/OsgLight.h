@@ -68,10 +68,6 @@ public:
 
 	virtual std::shared_ptr<SurgSim::Graphics::Group> getGroup() override;
 
-	virtual void setAmbientColor(const SurgSim::Math::Vector4d& color) override;
-
-	virtual SurgSim::Math::Vector4d getAmbientColor() override;
-
 	virtual void setDiffuseColor(const SurgSim::Math::Vector4d& color) override;
 
 	virtual SurgSim::Math::Vector4d getDiffuseColor() override;
@@ -106,7 +102,6 @@ private:
 	enum UniformType
 	{
 		POSITION = 0,
-		AMBIENT_COLOR,
 		DIFFUSE_COLOR,
 		SPECULAR_COLOR,
 		CONSTANT_ATTENUATION,
@@ -114,15 +109,12 @@ private:
 		QUADRATIC_ATTENUATION
 	};
 
-
 	/// The group for this light
 	std::shared_ptr<OsgGroup> m_group;
 
 	/// Map for managing all uniforms that this object owns
 	std::unordered_map<int, osg::ref_ptr<osg::Uniform>> m_uniforms;
 
-
-	SurgSim::Math::Vector4d m_ambientColor;		///< The actual ambient color that was set
 	SurgSim::Math::Vector4d m_diffuseColor;		///< The actual diffuse color that was set
 	SurgSim::Math::Vector4d m_specularColor;	///< The actual specular color that was set
 

@@ -54,6 +54,7 @@ public:
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
 	virtual void update(const double& dt) override;
+	virtual bool doInitialize() override;
 
 private:
 	// Shape used by this representation

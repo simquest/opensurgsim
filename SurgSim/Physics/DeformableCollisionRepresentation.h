@@ -84,9 +84,10 @@ public:
 
 	virtual void update(const double& dt) override;
 
-	virtual bool doInitialize() override;
-
 private:
+	virtual bool doInitialize() override;
+	virtual bool doWakeUp() override;
+
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::MeshShape> m_shape;
 

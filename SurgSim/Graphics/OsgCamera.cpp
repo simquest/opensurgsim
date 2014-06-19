@@ -30,6 +30,8 @@
 
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Matrix44f;
+using SurgSim::Math::Vector4d;
+using SurgSim::Math::Vector4f;
 
 namespace
 {
@@ -77,7 +79,8 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_camera(new osg::Camera()),
 	m_materialProxy(new osg::Group()),
 	m_viewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("viewMatrix")),
-	m_inverseViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix"))
+	m_inverseViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix")),
+	m_ambientColorUniform(std::make_shared<OsgUniform<Vector4f>>("ambientColor"))
 {
 	m_switch->removeChildren(0, m_switch->getNumChildren());
 	m_camera->setName(name + " Camera");
@@ -93,6 +96,14 @@ OsgCamera::OsgCamera(const std::string& name) :
 
 	/// Update storage of view and projection matrices
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+
+	// Set up uniforms
+	osg::ref_ptr<osg::StateSet> state = m_camera->getOrCreateStateSet();
+	m_viewMatrixUniform->addToStateSet(state);
+	m_inverseViewMatrixUniform->addToStateSet(state);
+	m_ambientColorUniform->addToStateSet(state);
+
+	setAmbientColor(Vector4d(0.0, 0.0, 0.0, 0.0));
 }
 
 bool OsgCamera::setRenderGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
@@ -149,9 +160,11 @@ void OsgCamera::update(double dt)
 	// #workaround
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 
-	m_camera->setViewMatrix(toOsg(getViewMatrix()));
-	m_viewMatrixUniform->set(getViewMatrix().cast<float>());
-	m_inverseViewMatrixUniform->set(getInverseViewMatrix().cast<float>());
+	auto viewMatrix = getViewMatrix();
+	auto floatMatrix = viewMatrix.cast<float>();
+	m_camera->setViewMatrix(toOsg(viewMatrix));
+	m_viewMatrixUniform->set(floatMatrix);
+	m_inverseViewMatrixUniform->set(floatMatrix.inverse());
 }
 
 bool OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)
@@ -209,8 +222,6 @@ bool OsgCamera::setMaterial(std::shared_ptr<Material> material)
 	bool result = false;
 	if (osgMaterial != nullptr)
 	{
-		osgMaterial->addUniform(m_viewMatrixUniform);
-		osgMaterial->addUniform(m_inverseViewMatrixUniform);
 		m_materialProxy->setStateSet(osgMaterial->getOsgStateSet());
 		result = true;
 		m_material = osgMaterial;
@@ -284,6 +295,19 @@ SurgSim::Math::Matrix44d OsgCamera::getInverseViewMatrix() const
 {
 	return getPose().matrix();
 }
+
+void OsgCamera::setAmbientColor(const SurgSim::Math::Vector4d& color)
+{
+	m_ambientColor = color;
+	m_ambientColorUniform->set(color.cast<float>());
+}
+
+SurgSim::Math::Vector4d OsgCamera::getAmbientColor()
+{
+	return m_ambientColor;
+}
+
+
 
 }; // namespace Graphics
 }; // namespace SurgSim

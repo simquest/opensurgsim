@@ -49,7 +49,6 @@ OsgLight::OsgLight(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
 	Light(name),
-	m_ambientColor(0.2, 0.2, 0.2, 1.0),
 	m_diffuseColor(1.0, 1.0, 1.0, 1.0),
 	m_specularColor(1.0, 1.0, 1.0, 1.0),
 	m_constantAttenuation(1.0),
@@ -68,9 +67,6 @@ OsgLight::OsgLight(const std::string& name) :
 	m_switch->addChild(m_lightSource);
 
 	m_uniforms[POSITION] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "position");
-
-	m_uniforms[AMBIENT_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "ambient");
-	setAmbientColor(m_ambientColor);
 
 	m_uniforms[DIFFUSE_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "diffuse");
 	setDiffuseColor(m_diffuseColor);
@@ -129,20 +125,6 @@ bool OsgLight::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 std::shared_ptr<SurgSim::Graphics::Group> OsgLight::getGroup()
 {
 	return m_group;
-}
-
-void OsgLight::setAmbientColor(const SurgSim::Math::Vector4d& color)
-{
-	m_ambientColor = color;
-	SurgSim::Math::Vector4f floatColor = color.cast<float>();
-	osg::Vec4f osgVec = toOsg(floatColor);
-	m_uniforms[AMBIENT_COLOR]->set(osgVec);
-	m_light->setAmbient(osgVec);
-}
-
-SurgSim::Math::Vector4d OsgLight::getAmbientColor()
-{
-	return m_ambientColor;
 }
 
 void OsgLight::setDiffuseColor(const SurgSim::Math::Vector4d& color)

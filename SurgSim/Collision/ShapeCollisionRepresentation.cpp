@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
@@ -67,6 +68,23 @@ void ShapeCollisionRepresentation::update(const double& dt)
 	{
 		meshShape->setPose(getPose());
 	}
+}
+
+bool ShapeCollisionRepresentation::doInitialize()
+{
+	bool result = true;
+	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
+	if (nullptr != meshShape)
+	{
+		if (!meshShape->initialize(*(getRuntime()->getApplicationData())))
+		{
+			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+				"No mesh loaded for m_shape ";
+			result = false;
+		}
+	}
+
+	return result;
 }
 
 }; // namespace Collision
