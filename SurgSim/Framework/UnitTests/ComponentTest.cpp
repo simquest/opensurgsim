@@ -18,22 +18,19 @@
 ///		 mostly through a mock manager that exposes the private interface and implements
 ///		 the simplest version of the abstract interface.
 
+#include <boost/uuid/uuid_io.hpp>
 #include <gtest/gtest.h>
 
-#include <boost/uuid/uuid_io.hpp>
-
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
-
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/UnitTests/MockObjects.h"
-#include "SurgSim/Framework/UnitTests/SerializationMockComponent.h"
-
+#include "SurgSim/Testing/SerializationMockComponent.h"
 
 using SurgSim::Framework::Component;
-using SurgSim::Framework::Scene;
 using SurgSim::Framework::Runtime;
+using SurgSim::Framework::Scene;
 
 /// Simple component class, no additional features
 class TestComponent1 : public Component
@@ -173,8 +170,11 @@ private:
 	std::shared_ptr<TestComponent2> m_componentTwo;
 };
 
+namespace
+{
 SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent2, TestComponent2);
 SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent3, TestComponent3);
+}
 
 TEST(ComponentTests, Constructor)
 {
