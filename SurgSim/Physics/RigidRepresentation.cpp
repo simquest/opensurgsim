@@ -58,16 +58,18 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 	return REPRESENTATION_TYPE_RIGID;
 }
 
-void RigidRepresentation::addExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& K,
-		const SurgSim::Math::Matrix33d& D)
+void RigidRepresentation::addExternalForce(const SurgSim::Math::Vector3d& force,
+										   const SurgSim::Math::Matrix33d& K,
+										   const SurgSim::Math::Matrix33d& D)
 {
 	m_externalForce = force;
 	m_externalStiffnessMatrix.block<3, 3>(0, 0) = K;
 	m_externalDampingMatrix.block<3, 3>(0, 0) = D;
 }
 
-void RigidRepresentation::addExternalTorque(const SurgSim::Math::Vector3d& torque, const SurgSim::Math::Matrix33d& K,
-		const SurgSim::Math::Matrix33d& D)
+void RigidRepresentation::addExternalTorque(const SurgSim::Math::Vector3d& torque,
+											const SurgSim::Math::Matrix33d& K,
+											const SurgSim::Math::Matrix33d& D)
 {
 	m_externalTorque = torque;
 	m_externalStiffnessMatrix.block<3, 3>(3, 3) = K;
@@ -213,9 +215,8 @@ void RigidRepresentation::afterUpdate(double dt)
 	m_externalDampingMatrix = SurgSim::Math::Matrix66d::Zero();
 }
 
-void RigidRepresentation::applyCorrection(
-	double dt,
-	const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
+void RigidRepresentation::applyCorrection(double dt,
+										  const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Matrix33d;
@@ -341,13 +342,18 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 
 bool RigidRepresentation::doInitialize()
 {
-	double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
-	SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
+	bool result = RigidRepresentationBase::doInitialize();
 
-	shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
-	SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
+	if (result)
+	{
+		double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
+		SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
 
-	return true;
+		shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
+		SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
+	}
+
+	return result;
 }
 
 void RigidRepresentation::setLinearVelocity(const SurgSim::Math::Vector3d& linearVelocity)

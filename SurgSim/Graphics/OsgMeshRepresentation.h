@@ -71,6 +71,9 @@ public:
 protected:
 	virtual void doUpdate(double dt) override;
 
+	/// \note If m_filename is set, m_mesh will be overwritten with the mesh loaded from the external file.
+	virtual bool doInitialize() override;
+
 private:
 	/// Indicates if the mesh is rendered as a wireframe.
 	bool m_drawAsWireFrame;

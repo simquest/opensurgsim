@@ -15,6 +15,7 @@
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
@@ -56,19 +57,18 @@ std::shared_ptr<SurgSim::DataStructures::TriangleMesh> DeformableCollisionRepres
 	return m_mesh;
 }
 
-
 void DeformableCollisionRepresentation::update(const double& dt)
 {
 	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr)
-		<< "Failed to update.  The DeformableCollisionRepresentation either was not attached to a "
+	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
+		"Failed to update.  The DeformableCollisionRepresentation either was not attached to a "
 		"Physics::Representation or the Physics::Representation has expired.";
 
 	auto odeState = physicsRepresentation->getCurrentState();
 	const size_t numNodes = odeState->getNumNodes();
 
-	SURGSIM_ASSERT(m_mesh->getNumVertices() == numNodes)
-		<< "The number of nodes in the deformable does not match the number of vertices in the mesh.";
+	SURGSIM_ASSERT(m_mesh->getNumVertices() == numNodes) <<
+		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 	{
@@ -80,16 +80,34 @@ void DeformableCollisionRepresentation::update(const double& dt)
 
 bool DeformableCollisionRepresentation::doInitialize()
 {
-	SURGSIM_ASSERT(m_mesh != nullptr) << "Mesh was not set.";
+	if (!m_shape->initialize(*(getRuntime()->getApplicationData())))
+	{
+		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"No mesh loaded for m_shape ";
+	}
 
+	bool result = false;
+	if (m_shape->getMesh()->isValid())
+	{
+		m_mesh = m_shape->getMesh();
+		result = true;
+	}
+
+	return result;
+}
+
+bool DeformableCollisionRepresentation::doWakeUp()
+{
 	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr)
-		<< "Failed to initialize.  The DeformableCollisionRepresentation either was not attached to a "
-		   "Physics::Representation or the Physics::Representation has expired.";
+	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
+		"The Physics::Representation referred by this DeformableCollisionRepresentation has expired.";
 
 	auto state = physicsRepresentation->getCurrentState();
-	SURGSIM_ASSERT(m_mesh->getNumVertices() == state->getNumNodes())
-		<< "The number of nodes in the deformable does not match the number of vertices in the mesh.";
+	SURGSIM_ASSERT(nullptr != state) <<
+		"DeformableRepresentation " << physicsRepresentation->getName() << " holds an empty OdeState.";
+	SURGSIM_ASSERT(nullptr != m_mesh) << "m_mesh is empty.";
+	SURGSIM_ASSERT(m_mesh->getNumVertices() == state->getNumNodes()) <<
+		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	update(0.0);
 	return true;
@@ -97,8 +115,7 @@ bool DeformableCollisionRepresentation::doInitialize()
 
 int DeformableCollisionRepresentation::getShapeType() const
 {
-	SURGSIM_ASSERT(m_shape != nullptr) << "No mesh or shape assigned to DeformableCollisionRepresentation "
-									   << getName();
+	SURGSIM_ASSERT(nullptr != m_shape) << "No mesh/shape assigned to DeformableCollisionRepresentation " << getName();
 	return m_shape->getType();
 }
 
@@ -127,9 +144,9 @@ const std::shared_ptr<SurgSim::Physics::DeformableRepresentation>
 	DeformableCollisionRepresentation::getDeformableRepresentation() const
 {
 	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(physicsRepresentation != nullptr)
-		<< "Failed to get the deformable representation.  The DeformableCollisionRepresentation either was not "
-		   "attached to a Physics::Representation or the Physics::Representation has expired.";
+	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+		"Failed to get the deformable representation.  The DeformableCollisionRepresentation either was not "
+		"attached to a Physics::Representation or the Physics::Representation has expired.";
 
 	return physicsRepresentation;
 }

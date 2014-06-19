@@ -29,6 +29,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpringNDRepresentationUtils.cpp
 	PoseInterpolator.cpp
 	SphereElement.cpp
+	TransferPhysicsToGraphicsMeshBehavior.cpp
 	VisualizeContactsBehavior.cpp
 )
 
@@ -43,6 +44,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	SphereElement.h
 	TransferOdeStateToVerticesBehavior.h
 	TransferOdeStateToVerticesBehavior-inl.h
+	TransferPhysicsToGraphicsMeshBehavior.h
 	VisualizeContactsBehavior.h
 )
 

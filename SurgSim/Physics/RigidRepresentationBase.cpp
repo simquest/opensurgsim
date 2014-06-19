@@ -13,8 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
@@ -38,6 +41,21 @@ RigidRepresentationBase::RigidRepresentationBase(const std::string& name) : Repr
 
 RigidRepresentationBase::~RigidRepresentationBase()
 {
+}
+
+bool RigidRepresentationBase::doInitialize()
+{
+	auto meshShape =
+		std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getInitialParameters().getShapeUsedForMassInertia());
+	if (nullptr != meshShape)
+	{
+		SURGSIM_ASSERT(meshShape->initialize(*(getRuntime()->getApplicationData()))) <<
+			"Failed to initialize the mesh shape in this representation.";
+		m_initialParameters.updateProperties();
+		setCurrentParameters(m_initialParameters);
+	}
+
+	return true;
 }
 
 bool RigidRepresentationBase::doWakeUp()
