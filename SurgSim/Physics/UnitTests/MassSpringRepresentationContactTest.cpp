@@ -52,9 +52,9 @@ public:
 
 		// Define physics representation of mass-spring using 1d helper function.
 		m_massSpring = std::make_shared<SurgSim::Blocks::MassSpring1DRepresentation>("MassSpring");
-		unsigned int numNodesPerDim[1] = {2};
+		size_t numNodesPerDim[1] = {2};
 		m_massPerNode = 0.137;
-		std::vector<unsigned int> boundaryConditions;
+		std::vector<size_t> boundaryConditions;
 		m_massSpring->init1D(
 			m_extremities,
 			boundaryConditions,
@@ -225,8 +225,8 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
 	mlcpPhysicsProblem.b.block<1, 1>(0, 0)[0] = 0.6991;
 
 	// Place mass-spring at 5th dof and 1th constraint.
-	unsigned int indexOfRepresentation = 5;
-	unsigned int indexOfConstraint = 1;
+	size_t indexOfRepresentation = 5;
+	size_t indexOfConstraint = 1;
 
 	setContactAtNode(1);
 

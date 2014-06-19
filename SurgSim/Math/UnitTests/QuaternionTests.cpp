@@ -597,7 +597,7 @@ TYPED_TEST(QuaternionTests, Negate)
 	typedef Eigen::Quaternion<T> Quaternion;
 
 	// Test that 2 quaternions are opposite if they are not equal but give the same rotation
-	for (unsigned int numLoop = 0; numLoop < 100; numLoop++)
+	for (size_t numLoop = 0; numLoop < 100; numLoop++)
 	{
 		Quaternion q(Eigen::Matrix<T, 4, 1>::Random());
 		q.normalize();
@@ -620,7 +620,7 @@ TYPED_TEST(QuaternionTests, SlerpInterpolation)
 	typedef typename TestFixture::Scalar T;
 	typedef Eigen::Quaternion<T> Quaternion;
 
-	for (unsigned int numLoop = 0; numLoop < 100; numLoop++)
+	for (size_t numLoop = 0; numLoop < 100; numLoop++)
 	{
 		Quaternion q;
 		Quaternion q0(Eigen::Matrix<T, 4, 1>::Random());

@@ -69,4 +69,41 @@ bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
 	return result;
 }
 
+template <class T, size_t N>
+YAML::Node YAML::convert<std::array<T, N>>::encode(const std::array<T, N>& rhs)
+{
+	Node node(NodeType::Sequence);
+	for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
+	{
+		node.push_back(*it);
+	}
+	return node;
+}
+
+template <class T, size_t N>
+bool YAML::convert<std::array<T, N>>::decode(const Node& node, std::array<T, N>& rhs)
+{
+	if (!node.IsSequence() || node.size() != N)
+	{
+		return false;
+	}
+
+	bool result = true;
+	auto rhsit = rhs.begin();
+	for (YAML::const_iterator it = node.begin(); it != node.end(); ++it, ++rhsit)
+	{
+		try
+		{
+			(*rhsit) = it->as<T>();
+		}
+		catch (YAML::RepresentationException)
+		{
+			result = false;
+			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
+			SURGSIM_LOG(logger, WARNING) << __FUNCTION__ << ": Bad conversion";
+		}
+	}
+	return result;
+}
+
 #endif // SURGSIM_DATASTRUCTURES_DATASTRUCTURESCONVERT_INL_H

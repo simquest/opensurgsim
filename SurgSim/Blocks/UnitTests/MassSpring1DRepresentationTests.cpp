@@ -34,16 +34,16 @@ TEST(MassSpring1DRepresentationTests, init1DTest)
 	MassSpring1DRepresentation m("MassSpring1D");
 
 	std::array<Vector3d, 2> extremities = {{ Vector3d(1.1, 1.2, 1.3), Vector3d(2.2, 2.3, 2.4) }};
-	unsigned int numNodesPerDim[1] = {10};
+	size_t numNodesPerDim[1] = {10};
 
 	std::vector<Vector3d> nodes;
-	for (unsigned int nodeId = 0; nodeId < numNodesPerDim[0]; ++nodeId)
+	for (size_t nodeId = 0; nodeId < numNodesPerDim[0]; ++nodeId)
 	{
 		double abscissa = static_cast<double>(nodeId) / static_cast<double>(numNodesPerDim[0] - 1);
 		nodes.push_back(extremities[0] + abscissa * (extremities[1] - extremities[0]));
 	}
 
-	std::vector<unsigned int> boundaryConditions;
+	std::vector<size_t> boundaryConditions;
 	double totalMass = 1.1;
 	double stiffnessStretching = 2.2;
 	double dampingStretching = 3.3;
@@ -60,14 +60,14 @@ TEST(MassSpring1DRepresentationTests, init1DTest)
 	EXPECT_EQ(numNodesPerDim[0], m.getNumMasses());
 	EXPECT_EQ(numNodesPerDim[0] - 1 + numNodesPerDim[0] - 2, m.getNumSprings());
 
-	for (unsigned int massId = 0; massId < m.getNumMasses(); massId++)
+	for (size_t massId = 0; massId < m.getNumMasses(); massId++)
 	{
 		EXPECT_DOUBLE_EQ(totalMass/numNodesPerDim[0], m.getMass(massId)->getMass());
 	}
 
 	// The 1st springs are the stretching springs
-	unsigned int springId = 0;
-	for (unsigned int nodeId = 0; nodeId < m.getNumMasses() - 1; nodeId++)
+	size_t springId = 0;
+	for (size_t nodeId = 0; nodeId < m.getNumMasses() - 1; nodeId++)
 	{
 		springTest(std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 			nodeId, nodeId + 1, stiffnessStretching, dampingStretching);
@@ -75,7 +75,7 @@ TEST(MassSpring1DRepresentationTests, init1DTest)
 	}
 
 	// Followed by bending springs
-	for (unsigned int nodeId = 0; nodeId < m.getNumMasses() - 2; nodeId++)
+	for (size_t nodeId = 0; nodeId < m.getNumMasses() - 2; nodeId++)
 	{
 		springTest(std::dynamic_pointer_cast<LinearSpring>(m.getSpring(springId)), m.getFinalState(),
 			nodeId, nodeId + 2, stiffnessBending, dampingBending);
@@ -88,18 +88,18 @@ TEST(MassSpring1DRepresentationTests, init1DTest)
 	EXPECT_EQ(*m.getInitialState(), *m.getFinalState());
 
 	// States should contains expected values
-	Vector3d delta = (extremities[1] - extremities[0]) / (numNodesPerDim[0] - 1);
+	Vector3d delta = (extremities[1] - extremities[0]) / static_cast<double>(numNodesPerDim[0] - 1);
 	EXPECT_TRUE(m.getFinalState()->getVelocities().isZero());
 	EXPECT_FALSE(m.getFinalState()->getPositions().isZero());
-	for (unsigned int nodeId = 0; nodeId < numNodesPerDim[0]; nodeId++)
+	for (size_t nodeId = 0; nodeId < numNodesPerDim[0]; nodeId++)
 	{
-		Vector3d piExpected = extremities[0] + delta * nodeId;
+		Vector3d piExpected = extremities[0] + delta * static_cast<double>(nodeId);
 		SurgSim::Math::Vector& x = m.getFinalState()->getPositions();
 		Eigen::VectorBlock<SurgSim::Math::Vector> pi = SurgSim::Math::getSubVector(x, nodeId, 3);
 		EXPECT_TRUE(pi.isApprox(piExpected));
 	}
 
-	std::vector<unsigned int> dofBoundaryConditions;
+	std::vector<size_t> dofBoundaryConditions;
 	for (auto it = boundaryConditions.begin(); it != boundaryConditions.end(); ++it)
 	{
 		dofBoundaryConditions.push_back((*it) * 3);

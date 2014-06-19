@@ -16,13 +16,19 @@
 #ifndef SURGSIM_GRAPHICS_OSGPOINTCLOUDREPRESENTATION_INL_H
 #define SURGSIM_GRAPHICS_OSGPOINTCLOUDREPRESENTATION_INL_H
 
+#include <osg/Geode>
 #include <osg/PositionAttitudeTransform>
-#include <osg/Point>
 #include <osg/StateAttribute>
 
+#include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 
-
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component,
+				 SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>);
+}
 namespace SurgSim
 {
 namespace Graphics
@@ -33,7 +39,7 @@ OsgPointCloudRepresentation<Data>::OsgPointCloudRepresentation(const std::string
 	Representation(name),
 	PointCloudRepresentation<Data>(name),
 	OsgRepresentation(name),
-	m_color(1.0,1.0,1.0,1.0)
+	m_color(1.0, 1.0, 1.0, 1.0)
 {
 	m_vertices = std::make_shared<SurgSim::DataStructures::Vertices<Data>>();
 
@@ -64,7 +70,6 @@ OsgPointCloudRepresentation<Data>::OsgPointCloudRepresentation(const std::string
 template <class Data>
 OsgPointCloudRepresentation<Data>::~OsgPointCloudRepresentation()
 {
-
 }
 
 template <class Data>
@@ -140,4 +145,4 @@ SurgSim::Math::Vector4d OsgPointCloudRepresentation<Data>::getColor() const
 }; // Graphics
 }; // SurgSim
 
-#endif
+#endif // SURGSIM_GRAPHICS_OSGPOINTCLOUDREPRESENTATION_INL_H

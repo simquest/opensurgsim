@@ -195,7 +195,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	// Stapler collision mesh
 	std::shared_ptr<MeshShape> meshShapeForCollision = std::make_shared<MeshShape>();
 	meshShapeForCollision->setFileName("Geometry/stapler_collision.ply");
-	meshShapeForCollision->initialize(data);
+	meshShapeForCollision->initialize(*data);
 
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
 		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
@@ -253,11 +253,11 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	auto meshShapeForVirtualStaple1 = std::make_shared<MeshShape>();
 	meshShapeForVirtualStaple1->setFileName("Geometry/virtual_staple_1.ply");
-	meshShapeForVirtualStaple1->initialize(data);
+	meshShapeForVirtualStaple1->initialize(*data);
 
 	auto meshShapeForVirtualStaple2 = std::make_shared<MeshShape>();
 	meshShapeForVirtualStaple2->setFileName("Geometry/virtual_staple_2.ply");
-	meshShapeForVirtualStaple2->initialize(data);
+	meshShapeForVirtualStaple2->initialize(*data);
 
 	std::vector<std::shared_ptr<MeshShape>> virtualTeethShapes;
 	virtualTeethShapes.push_back(meshShapeForVirtualStaple1);
@@ -284,7 +284,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 		sceneElement->addComponent(virtualToothMesh);
 	}
 
-	staplerBehavior->setVirtualStaple(virtualTeeth);
+	staplerBehavior->setVirtualTeeth(virtualTeeth);
 
 	return sceneElement;
 }
@@ -302,7 +302,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 	// Arm collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>();
 	meshShape->setFileName("Geometry/arm_collision.ply");
-	meshShape->initialize(data);
+	meshShape->initialize(*data);
 
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization = std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
 	*meshShapeVisualization->getMesh() = SurgSim::Graphics::Mesh(*(meshShape->getMesh()));

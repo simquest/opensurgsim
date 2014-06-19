@@ -29,15 +29,19 @@ class Group;
 /// Abstract interface for a light, a light needs to be assigned to a group to be active, only the members of this
 /// group will be considered to be lit by this light. Currently this light implements a pointlight. It will have to
 /// be extended for a directional and spot lights. The class should provide the following uniform values. The position
-/// is set by using the representations setPose() call
+/// is set by using the representations setPose() call.
 /// \code
-/// uniform vec3 ossLightPosition
-/// uniform vec4 ossLightAmbientColor
-/// uniform vec4 ossLightDiffuseColor
-/// uniform vec4 ossLightSpecularColor
-/// uniform float ossLightConstantAttenuation
-/// uniform float ossLightLinearAttenuation
-/// uniform float ossLightQuadraticAttenuation
+/// struct LightSource {
+/// 	vec4 ambient;
+/// 	vec4 diffuse;
+/// 	vec4 specular;
+/// 	vec4 position;
+/// 	float constantAttenuation;
+/// 	float linearAttenuation;
+/// 	float quadraticAttenuation;
+/// };
+///
+/// uniform LightSource lightSource;
 /// \endcode
 ///
 class Light : public virtual Representation
@@ -61,14 +65,6 @@ public:
 	/// Gets the group that this light has been assigned to.
 	/// \return	The group or nullptr if no group has been set.
 	virtual std::shared_ptr<SurgSim::Graphics::Group> getGroup() = 0;
-
-	/// Sets ambient color of this light
-	/// \param	color	The color.
-	virtual void setAmbientColor(const SurgSim::Math::Vector4d& color) = 0;
-
-	/// Gets ambient color.
-	/// \return	The ambient color.
-	virtual SurgSim::Math::Vector4d getAmbientColor() = 0;
 
 	/// Sets diffuse color of this light.
 	/// \param	color	The color.
@@ -109,6 +105,14 @@ public:
 	/// Gets quadratic attenuation.
 	/// \return	The quadratic attenuation.
 	virtual double getQuadraticAttenuation() = 0;
+
+	/// Sets the name of the group that this light should work on
+	/// \param name The name of the group to light
+	virtual void setLightGroupReference(const std::string& name) = 0;
+
+	/// Gets the name of the group this light should operate on
+	/// \return the name of the group for this light
+	virtual std::string getLightGroupReference() = 0;
 };
 
 }; // Graphics

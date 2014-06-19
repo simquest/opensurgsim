@@ -48,9 +48,9 @@ void OdeState::reset()
 	m_boundaryConditionsAsDofIds.clear();
 }
 
-void OdeState::setNumDof(unsigned int numDofPerNode, unsigned int numNodes)
+void OdeState::setNumDof(size_t numDofPerNode, size_t numNodes)
 {
-	const unsigned int numDof = numDofPerNode * numNodes;
+	const size_t numDof = numDofPerNode * numNodes;
 
 	m_numDofPerNode = numDofPerNode;
 	m_numNodes = numNodes;
@@ -63,17 +63,17 @@ void OdeState::setNumDof(unsigned int numDofPerNode, unsigned int numNodes)
 	reset();
 }
 
-unsigned int OdeState::getNumDof() const
+size_t OdeState::getNumDof() const
 {
-	const unsigned int numDof = m_numDofPerNode * m_numNodes;
+	const size_t numDof = m_numDofPerNode * m_numNodes;
 
-	SURGSIM_ASSERT(m_x.size() == m_v.size() &&
-		m_x.size() == m_boundaryConditionsPerDof.size() && m_x.size() == static_cast<int>(numDof));
+	SURGSIM_ASSERT(m_x.size() == m_v.size() && m_x.size() == m_boundaryConditionsPerDof.size() && m_x.size() >= 0
+				   && static_cast<size_t>(m_x.size()) == numDof);
 
 	return numDof;
 }
 
-unsigned int OdeState::getNumNodes() const
+size_t OdeState::getNumNodes() const
 {
 	return m_numNodes;
 }
@@ -88,7 +88,7 @@ const SurgSim::Math::Vector& OdeState::getPositions() const
 	return m_x;
 }
 
-const SurgSim::Math::Vector3d OdeState::getPosition(unsigned int nodeId) const
+const SurgSim::Math::Vector3d OdeState::getPosition(size_t nodeId) const
 {
 	return SurgSim::Math::getSubVector(m_x, nodeId, m_numDofPerNode).segment(0, 3);
 }
@@ -103,23 +103,23 @@ const SurgSim::Math::Vector& OdeState::getVelocities() const
 	return m_v;
 }
 
-const SurgSim::Math::Vector3d OdeState::getVelocity(unsigned int nodeId) const
+const SurgSim::Math::Vector3d OdeState::getVelocity(size_t nodeId) const
 {
 	return SurgSim::Math::getSubVector(m_v, nodeId, m_numDofPerNode).segment(0, 3);
 }
 
-void OdeState::addBoundaryCondition(unsigned int nodeId)
+void OdeState::addBoundaryCondition(size_t nodeId)
 {
 	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
 		"Number of dof per node = 0. Make sure to call setNumDof() prior to adding boundary conditions.";
 
-	for (unsigned int nodeDofId = 0; nodeDofId < m_numDofPerNode; ++nodeDofId)
+	for (size_t nodeDofId = 0; nodeDofId < m_numDofPerNode; ++nodeDofId)
 	{
 		addBoundaryCondition(nodeId, nodeDofId);
 	}
 }
 
-void OdeState::addBoundaryCondition(unsigned int nodeId, unsigned int nodeDofId)
+void OdeState::addBoundaryCondition(size_t nodeId, size_t nodeDofId)
 {
 	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
 		"Number of dof per node = 0. Make sure to call setNumDof() prior to adding boundary conditions.";
@@ -127,7 +127,7 @@ void OdeState::addBoundaryCondition(unsigned int nodeId, unsigned int nodeDofId)
 	SURGSIM_ASSERT(nodeDofId < m_numDofPerNode) <<
 		"Invalid nodeDofId " << nodeDofId << " number of dof per node is " << m_numDofPerNode;
 
-	unsigned int globalDofId = nodeId * m_numDofPerNode + nodeDofId;
+	size_t globalDofId = nodeId * m_numDofPerNode + nodeDofId;
 	if (! m_boundaryConditionsPerDof[globalDofId])
 	{
 		m_boundaryConditionsPerDof[globalDofId] = true;
@@ -135,27 +135,27 @@ void OdeState::addBoundaryCondition(unsigned int nodeId, unsigned int nodeDofId)
 	}
 }
 
-unsigned int OdeState::getNumBoundaryConditions() const
+size_t OdeState::getNumBoundaryConditions() const
 {
 	return m_boundaryConditionsAsDofIds.size();
 }
 
-const std::vector<unsigned int>& OdeState::getBoundaryConditions() const
+const std::vector<size_t>& OdeState::getBoundaryConditions() const
 {
 	return m_boundaryConditionsAsDofIds;
 }
 
-bool OdeState::isBoundaryCondition(unsigned int dof) const
+bool OdeState::isBoundaryCondition(size_t dof) const
 {
 	return m_boundaryConditionsPerDof[dof];
 }
 
 Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 {
-	SURGSIM_ASSERT(static_cast<unsigned int>(vector->size()) == getNumDof()) <<
-		"Invalid vector to apply boundary conditions on";
+	SURGSIM_ASSERT(vector != nullptr && vector->size() >= 0 && static_cast<size_t>(vector->size()) == getNumDof())
+		<< "Invalid vector to apply boundary conditions on";
 
-	for (std::vector<unsigned int>::const_iterator it = getBoundaryConditions().cbegin();
+	for (std::vector<size_t>::const_iterator it = getBoundaryConditions().cbegin();
 		it != getBoundaryConditions().cend();
 		++it)
 	{
@@ -167,8 +167,10 @@ Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 
 void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasCompliance) const
 {
-	SURGSIM_ASSERT(static_cast<unsigned int>(matrix->rows()) == getNumDof() &&
-		static_cast<unsigned int>(matrix->cols()) == getNumDof()) << "Invalid matrix to apply boundary conditions on";
+	SURGSIM_ASSERT(matrix != nullptr && matrix->rows() >= 0 && matrix->cols() >= 0
+				   && static_cast<size_t>(matrix->rows()) == getNumDof()
+				   && static_cast<size_t>(matrix->cols()) == getNumDof())
+		<< "Invalid matrix to apply boundary conditions on";
 
 	double complianceValue  = 0.0;
 
@@ -177,7 +179,7 @@ void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasComplianc
 		complianceValue = 1.0;
 	}
 
-	for (std::vector<unsigned int>::const_iterator it = getBoundaryConditions().cbegin();
+	for (std::vector<size_t>::const_iterator it = getBoundaryConditions().cbegin();
 		it != getBoundaryConditions().cend();
 		++it)
 	{

@@ -31,7 +31,7 @@ namespace SurgSim
 namespace Physics
 {
 
-LinearSpring::LinearSpring(unsigned int nodeId0, unsigned int nodeId1) :
+LinearSpring::LinearSpring(size_t nodeId0, size_t nodeId1) :
 	Spring(), m_restLength(0.0), m_stiffness(0.0), m_damping(0.0)
 {
 	m_nodeIds.push_back(nodeId0);

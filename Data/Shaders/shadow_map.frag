@@ -23,7 +23,7 @@
 /// from the light, the z value of the incoming fragment projected into 
 /// light space is close to the value in the texture map then the fragment is lit, otherwise 
 /// it is not
-uniform sampler2D oss_encodedLightDepthMap;
+uniform sampler2D encodedLightDepthMap;
 
 
 /// The coordinates of the fragment in the space of the projected depth map
@@ -39,7 +39,7 @@ void main(void)
 	// Calculate texture coordinates from incoming point
 	vec3 lightCoord3 = (lightCoord.xyz / lightCoord.w) * vec3(0.5) + vec3(0.5);
 
-	float depth = decodeDepth(texture2D(oss_encodedLightDepthMap, lightCoord3.xy));
+	float depth = decodeDepth(texture2D(encodedLightDepthMap, lightCoord3.xy));
 
 	gl_FragColor = vec4(depth + 0.00001 > lightCoord3.z ? 0.0 : 1.0);
 }

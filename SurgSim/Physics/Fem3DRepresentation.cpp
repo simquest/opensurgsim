@@ -148,22 +148,14 @@ std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElemen
 	// Get the list of fem elements with their node ids.
 	std::vector<std::vector<size_t>> femElements;
 	femElements.reserve(getNumFemElements());
-	for (unsigned int i = 0; i < getNumFemElements(); ++i)
+	for (size_t i = 0; i < getNumFemElements(); ++i)
 	{
 		auto elementNodeIds = getFemElement(i)->getNodeIds();
 		std::sort(elementNodeIds.begin(), elementNodeIds.end());
-		// TODO(gsathyaseelan) 12th May 2014
-		// Currently, converting the unsigned int from elementNodeIds to size_t explicitly.
-		// Remove these when Physics API uses size_t instead of unsigned int.
-		std::vector<size_t> elementNodeIdsConverted;
-		for (auto it = elementNodeIds.cbegin(); it != elementNodeIds.cend(); ++it)
-		{
-			elementNodeIdsConverted.push_back(static_cast<size_t>(*it));
-		}
-		femElements.push_back(elementNodeIdsConverted);
+		femElements.push_back(elementNodeIds);
 	}
 
-	std::array<unsigned int, 3> triangleSorted;
+	std::array<size_t, 3> triangleSorted;
 	auto doesIncludeTriangle = [&triangleSorted](const std::vector<size_t>& femElementSorted)
 							   { return std::includes(femElementSorted.begin(), femElementSorted.end(),
 													  triangleSorted.begin(), triangleSorted.end()); };
@@ -221,7 +213,7 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 	// Get FemElement id from the triangle id.
 	SURGSIM_ASSERT(m_triangleIdToElementIdMap.count(triangleId) == 1) << "Triangle must be mapped to an fem element.";
 
-	unsigned int elementId = static_cast<unsigned int>(m_triangleIdToElementIdMap[triangleId]);
+	size_t elementId = m_triangleIdToElementIdMap[triangleId];
 	std::shared_ptr<FemElement> element = getFemElement(elementId);
 
 	FemRepresentationCoordinate coordinate;

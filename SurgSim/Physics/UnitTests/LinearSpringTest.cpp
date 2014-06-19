@@ -79,7 +79,7 @@ Eigen::Matrix<double, 6, 6> DFormal(const Vector3d p0, const Vector3d p1,
 	return D;
 }
 
-double f(int axis, const Vector3d p0, const Vector3d p1,
+double f(size_t axis, const Vector3d p0, const Vector3d p1,
 		 const Vector3d v0, const Vector3d v1,
 		 double l0, double stiffness, double damping)
 {

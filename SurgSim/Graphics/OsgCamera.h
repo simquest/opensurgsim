@@ -41,6 +41,9 @@ class Material;
 class Texture;
 class RenderTarget;
 
+template <class T>
+class OsgUniform;
+
 /// OSG implementation of a graphics camera.
 ///
 /// A Graphics::OsgCamera wraps a osg::Camera to provide camera functionality and a osg::Switch to allow enabling and
@@ -91,6 +94,10 @@ public:
 
 	virtual void setRenderOrder(RenderOrder order, int value) override;
 
+	virtual void setAmbientColor(const SurgSim::Math::Vector4d& color) override;
+
+	virtual SurgSim::Math::Vector4d getAmbientColor() override;
+
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
@@ -109,6 +116,19 @@ private:
 
 	/// Detach the current render target from the camera.
 	void detachCurrentRenderTarget();
+
+	/// Uniform to carry the view matrix
+	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_viewMatrixUniform;
+
+	/// Uniform to carry the inverse view matrix
+	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_inverseViewMatrixUniform;
+
+	/// Uniform to carry the ambient color
+	std::shared_ptr<OsgUniform<SurgSim::Math::Vector4f>> m_ambientColorUniform;
+
+	/// Value for ambient color
+	SurgSim::Math::Vector4d m_ambientColor;
+
 
 };
 

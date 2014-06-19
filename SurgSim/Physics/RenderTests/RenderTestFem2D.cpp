@@ -111,8 +111,7 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 					(sectionId + 1) * numNodesOnSection + (nodeIdOnSection + 1) % numNodesOnSection
 				}}
 			}};
-			std::array<unsigned int, 3> triangle1NodeIds = {{static_cast<unsigned int>(nodeIds[0][0]),
-				static_cast<unsigned int>(nodeIds[0][1]), static_cast<unsigned int>(nodeIds[1][1])}};
+			std::array<size_t, 3> triangle1NodeIds = {{nodeIds[0][0], nodeIds[0][1], nodeIds[1][1]}};
 			std::shared_ptr<Fem2DElementTriangle> triangle1 = std::make_shared<Fem2DElementTriangle>(triangle1NodeIds);
 			triangle1->setThickness(thickness);
 			triangle1->setMassDensity(massDensity);
@@ -120,8 +119,7 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 			triangle1->setYoungModulus(youngModulus);
 			physicsRepresentation->addFemElement(triangle1);
 
-			std::array<unsigned int, 3> triangle2NodeIds = {{static_cast<unsigned int>(nodeIds[0][0]),
-				static_cast<unsigned int>(nodeIds[1][1]), static_cast<unsigned int>(nodeIds[1][0])}};
+			std::array<size_t, 3> triangle2NodeIds = {{nodeIds[0][0], nodeIds[1][1], nodeIds[1][0]}};
 			std::shared_ptr<Fem2DElementTriangle> triangle2 = std::make_shared<Fem2DElementTriangle>(triangle2NodeIds);
 			triangle2->setThickness(thickness);
 			triangle2->setMassDensity(massDensity);
@@ -166,7 +164,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 	for (size_t triangleId = 0; triangleId < physicsRepresentation->getNumFemElements(); triangleId++)
 	{
 		auto nodeIdsVector = physicsRepresentation->getFemElement(triangleId)->getNodeIds();
-		std::array<unsigned int, 3> nodeIds = {{nodeIdsVector[0], nodeIdsVector[1], nodeIdsVector[2]}};
+		std::array<size_t, 3> nodeIds = {{nodeIdsVector[0], nodeIdsVector[1], nodeIdsVector[2]}};
 		SurgSim::Graphics::Mesh::TriangleType t(nodeIds);
 		mesh->addTriangle(t);
 	}
