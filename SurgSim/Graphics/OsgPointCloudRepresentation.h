@@ -36,6 +36,8 @@ namespace Graphics
 #pragma warning(disable:4250)
 #endif
 
+SURGSIM_STATIC_REGISTRATION(OsgPointCloudRepresentation);
+
 /// Osg point cloud representation, implementation of a PointCloudRepresenation using OSG.
 template <class Data>
 class OsgPointCloudRepresentation : public PointCloudRepresentation<Data>, public OsgRepresentation

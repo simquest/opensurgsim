@@ -24,17 +24,13 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 
-SURGSIM_DO_PRAGMA (GCC diagnostic push); \
-SURGSIM_DO_PRAGMA (GCC diagnostic ignored "-Wunused-variable"); \
-static bool SURGSIM_MAKE_UNIQUE(registered) = SurgSim::Framework::Component::getFactory().registerClass
-	<SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>>
-	("SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>"); \
-SURGSIM_DO_PRAGMA (GCC diagnostic pop)
-
 namespace SurgSim
 {
 namespace Graphics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component,
+				 SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>,
+				 OsgPointCloudRepresentation);
 
 template <class Data>
 OsgPointCloudRepresentation<Data>::OsgPointCloudRepresentation(const std::string& name) :
