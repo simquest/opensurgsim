@@ -17,7 +17,7 @@
 #define SURGSIM_TESTING_SERIALIZATIONMOCKCOMPONENT_H
 
 #include "SurgSim/Framework/Component.h"
-#include "SurgSIm/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 SURGSIM_STATIC_REGISTRATION(SerializationMockComponent);
 
