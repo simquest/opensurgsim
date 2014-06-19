@@ -23,9 +23,6 @@
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 
-using SurgSim::Graphics::OsgSphereRepresentation;
-using SurgSim::Graphics::OsgUnitSphere;
-
 namespace SurgSim
 {
 namespace Graphics

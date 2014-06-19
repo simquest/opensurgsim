@@ -24,9 +24,6 @@
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 
-using SurgSim::Graphics::OsgCylinderRepresentation;
-using SurgSim::Graphics::OsgUnitCylinder;
-
 namespace SurgSim
 {
 namespace Graphics

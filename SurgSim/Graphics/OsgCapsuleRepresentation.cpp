@@ -17,10 +17,6 @@
 #include "SurgSim/Graphics/OsgUnitCylinder.h"
 #include "SurgSim/Graphics/OsgUnitSphere.h"
 
-using SurgSim::Graphics::OsgCapsuleRepresentation;
-using SurgSim::Graphics::OsgUnitCylinder;
-using SurgSim::Graphics::OsgUnitSphere;
-
 namespace SurgSim
 {
 namespace Graphics
