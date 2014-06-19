@@ -44,7 +44,7 @@ SURGSIM_STATIC_REGISTRATION(OsgPlaneRepresentation);
 class OsgPlaneRepresentation :  public OsgRepresentation, public PlaneRepresentation
 {
 public:
-	/// Constructro
+	/// Constructor
 	/// \param	name	Name of the representation
 	explicit OsgPlaneRepresentation(const std::string& name);
 

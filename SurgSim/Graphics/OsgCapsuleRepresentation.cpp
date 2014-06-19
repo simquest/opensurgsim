@@ -122,5 +122,5 @@ std::shared_ptr<OsgUnitSphere> OsgCapsuleRepresentation::getSharedUnitSphere()
 	return sharedSphere.get();
 }
 
-}; // Graphaics
+}; // Graphics
 }; // SurgSim
