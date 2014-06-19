@@ -63,6 +63,9 @@ static const char* const DIGITAL_INPUT_PREFIX = "digitalInput";
 static const char* const DIGITAL_OUTPUT_PREFIX = "digitalOutput";
 static const char* const TIMER_INPUT_PREFIX = "timerInput";
 static const char* const TIMER_OUTPUT_PREFIX = "timerOutput";
+static const char* const ANALOG_INPUT_DIFFERENTIAL_PREFIX = "analogInputDifferential";
+static const char* const ANALOG_INPUT_SINGLE_ENDED_PREFIX = "analogInputSingleEnded";
+static const char* const ANALOG_OUTPUT_PREFIX = "analogOutput";
 };
 
 /// A templated dictionary in which data can be accessed by name or index, with immutable names & indices.

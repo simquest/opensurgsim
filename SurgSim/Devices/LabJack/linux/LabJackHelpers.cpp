@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/LabJack/linux/LabJackChecksums.h"
+#include "SurgSim/Devices/LabJack/linux/LabJackHelpers.h"
 
 namespace SurgSim
 {
 namespace Device
 {
-namespace LabJackChecksums
+namespace LabJackHelpers
 {
 
 unsigned char normalChecksum8(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes, int count)
@@ -72,6 +72,21 @@ void extendedChecksum(std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>* bytes, 
 	(*bytes)[0] = extendedChecksum8(*bytes);
 }
 
-};  // namespace LabJackChecksums
+double doubleFromChars(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes, int startIndex)
+{
+	uint32_t decimal = static_cast<uint32_t>(bytes.at(startIndex)) |
+		(static_cast<uint32_t>(bytes.at(startIndex + 1)) << 8) |
+		(static_cast<uint32_t>(bytes.at(startIndex + 2)) << 16) |
+		(static_cast<uint32_t>(bytes.at(startIndex + 3)) << 24);
+
+	uint32_t whole = static_cast<uint32_t>(bytes[startIndex + 4]) |
+		(static_cast<uint32_t>(bytes.at(startIndex + 5)) << 8) |
+		(static_cast<uint32_t>(bytes.at(startIndex + 6)) << 16) |
+		(static_cast<uint32_t>(bytes.at(startIndex + 7)) << 24);
+
+	return static_cast<double>(static_cast<int>(whole)) + static_cast<double>(decimal)/4294967296.0;
+}
+
+};  // namespace LabJackHelpers
 };  // namespace Device
 };  // namespace SurgSim

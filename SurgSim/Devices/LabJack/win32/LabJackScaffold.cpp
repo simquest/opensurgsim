@@ -179,6 +179,9 @@ public:
 		digitalOutputChannels(device->getDigitalOutputChannels()),
 		timerInputChannels(getTimerInputChannels(device->getTimers())),
 		timerOutputChannels(getTimerOutputChannels(device->getTimers())),
+		analogInputsDifferential(device->getAnalogInputsDifferential()),
+		analogInputsSingleEnded(device->getAnalogInputsSingleEnded()),
+		analogOutputChannels(device->getAnalogOutputChannels()),
 		cachedOutputIndices(false)
 	{
 	}
@@ -202,6 +205,12 @@ public:
 	const std::unordered_set<int> timerInputChannels;
 	/// The timer channels set for timer outputs (e.g., PWM outputs).
 	const std::unordered_set<int> timerOutputChannels;
+	/// The differential analog inputs.
+	const std::unordered_map<int, std::pair<int, LabJackAnalogInputRange>> analogInputsDifferential;
+	/// The single-ended analog inputs.
+	const std::unordered_map<int, LabJackAnalogInputRange> analogInputsSingleEnded;
+	/// The channels set for analog outputs.
+	const std::unordered_set<int> analogOutputChannels;
 	/// The DataGroup indices for the digital outputs.
 	std::unordered_map<int, int> digitalOutputIndices;
 	/// The DataGroup indices for the digital inputs.
@@ -210,6 +219,12 @@ public:
 	std::unordered_map<int, int> timerOutputIndices;
 	/// The DataGroup indices for the timer inputs.
 	std::unordered_map<int, int> timerInputIndices;
+	/// The DataGroup indices for the analog outputs.
+	std::unordered_map<int, int> analogOutputIndices;
+	/// The DataGroup indices for the differential analog inputs.
+	std::unordered_map<int, int> analogInputDifferentialIndices;
+	/// The DataGroup indices for the single-ended analog inputs.
+	std::unordered_map<int, int> analogInputSingleEndedIndices;
 	/// True if the output indices have been cached.
 	bool cachedOutputIndices;
 
@@ -456,6 +471,30 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 					".  Make sure that is a valid timer number.  Expected an entry named " << name << ".";
 			}
 
+			for (auto input = info->analogInputsDifferential.cbegin();
+				input != info->analogInputsDifferential.cend(); ++input)
+			{
+				std::string name = SurgSim::DataStructures::Names::ANALOG_INPUT_DIFFERENTIAL_PREFIX +
+					std::to_string(input->first);
+				info->analogInputDifferentialIndices[input->first] = inputData.scalars().getIndex(name);
+				SURGSIM_ASSERT(info->analogInputDifferentialIndices[input->first] >= 0) <<
+					"LabJackScaffold::DeviceData failed to get a valid NamedData index for the differential " <<
+					"analog input for channel " << input->first << ".  Make sure that is a valid line number.  " <<
+					"Expected an entry named " << name << ".";
+			}
+
+			for (auto input = info->analogInputsSingleEnded.cbegin();
+				input != info->analogInputsSingleEnded.cend(); ++input)
+			{
+				const std::string name = SurgSim::DataStructures::Names::ANALOG_INPUT_SINGLE_ENDED_PREFIX +
+					std::to_string(input->first);
+				info->analogInputSingleEndedIndices[input->first] = inputData.scalars().getIndex(name);
+				SURGSIM_ASSERT(info->analogInputSingleEndedIndices[input->first] >= 0) <<
+					"LabJackScaffold::DeviceData failed to get a valid NamedData index for the single-ended " <<
+					"analog input for line " << input->first << ".  Make sure that is a valid line number.  " <<
+					"Expected an entry named " << name << ".";
+			}
+
 			std::unique_ptr<LabJackThread> thread(new LabJackThread(this, info.get()));
 			thread->setRate(device->getMaximumUpdateRate());
 			thread->start();
@@ -518,6 +557,14 @@ bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 			info->timerOutputIndices[*timer] =
 				initialOutputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_OUTPUT_PREFIX +
 				std::to_string(*timer));
+		}
+
+		const std::unordered_set<int>& analogOutputChannels = info->analogOutputChannels;
+		for (auto output = analogOutputChannels.cbegin(); output != analogOutputChannels.cend(); ++output)
+		{
+			info->analogOutputIndices[*output] =
+				initialOutputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_OUTPUT_PREFIX +
+				std::to_string(*output));
 		}
 
 		info->cachedOutputIndices = true;
@@ -604,6 +651,49 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			"', channel number " << *timer << "." << std::endl << formatErrorMessage(error);
 	}
 
+	// Request the values of analog inputs.
+	auto const& analogInputsDifferential = info->analogInputsDifferential;
+	for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
+	{
+		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_AIN_DIFF, input->first, 0, input->second.first, 0);
+		SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
+			"Failed to request differential analog input for a device named '" << info->deviceObject->getName() <<
+			"', positive channel " << input->first << ", negative channel " << input->second.first << "." <<
+			std::endl << formatErrorMessage(error);
+	}
+
+	auto const& analogInputsSingleEnded = info->analogInputsSingleEnded;
+	for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
+	{
+		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_AIN, input->first, 0, 0, 0);
+		SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
+			"Failed to request single-ended analog input for a device named '" << info->deviceObject->getName() <<
+			"', channel " << input->first << "." << std::endl << formatErrorMessage(error);
+	}
+
+	// Request to set analog outputs.
+	const std::unordered_set<int>& analogOutputChannels = info->analogOutputChannels;
+	for (auto output = analogOutputChannels.cbegin(); output != analogOutputChannels.cend(); ++output)
+	{
+		if (info->analogOutputIndices.count(*output) > 0)
+		{
+			const int index = info->analogOutputIndices[*output];
+			SURGSIM_ASSERT(index >= 0) << "LabJackScaffold: A LabJackDevice was configured with line " << *output <<
+				" set to analog output, but the scaffold does not know the correct index into the NamedData. " <<
+				" Make sure there is an entry in the scalars with the correct string key.";
+
+			double value;
+			if (outputData.scalars().get(index, &value))
+			{
+				const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_DAC, *output, value, 0, 0);
+				SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
+					"Failed to set analog output for a device named '" << info->deviceObject->getName() <<
+					"', line number " << *output << ", value " << value << "." <<
+					std::endl << formatErrorMessage(error);
+			}
+		}
+	}
+
 	// GoOne, telling this specific LabJack to perform the requests.
 	const LJ_ERROR error = GoOne(rawHandle);
 
@@ -646,6 +736,41 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 				inputData.scalars().reset(info->timerInputIndices[*timer]);
 			}
 		}
+
+		// Analog inputs.
+		for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
+		{
+			double value;
+			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_AIN_DIFF, input->first, &value);
+			if (isOk(error))
+			{
+				inputData.scalars().set(info->analogInputDifferentialIndices[input->first], value);
+			}
+			else
+			{
+				SURGSIM_LOG_WARNING(m_logger) << "Failed to get differential analog input for a device named '" <<
+					info->deviceObject->getName() << "', positive channel " << input->first << ", negative channel " <<
+					input->second.first << "." << std::endl << formatErrorMessage(error);
+				inputData.scalars().reset(info->analogInputDifferentialIndices[input->first]);
+			}
+		}
+
+		for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
+		{
+			double value;
+			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_AIN, input->first, &value);
+			if (isOk(error))
+			{
+				inputData.scalars().set(info->analogInputSingleEndedIndices[input->first], value);
+			}
+			else
+			{
+				SURGSIM_LOG_WARNING(m_logger) << "Failed to get single-ended analog input for a device named '" <<
+					info->deviceObject->getName() << "', channel " << input->first << "." << std::endl <<
+					formatErrorMessage(error);
+				inputData.scalars().reset(info->analogInputSingleEndedIndices[input->first]);
+			}
+		}
 	}
 	else
 	{
@@ -684,6 +809,13 @@ SurgSim::DataStructures::DataGroup LabJackScaffold::buildDeviceInputData()
 	{
 		builder.addScalar(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX + std::to_string(i));
 	}
+
+	const int maxAnalogInputs = 16; // The U3 can have 16 analog inputs.
+	for (int i = 0; i < maxAnalogInputs; ++i)
+	{
+		builder.addScalar(SurgSim::DataStructures::Names::ANALOG_INPUT_DIFFERENTIAL_PREFIX + std::to_string(i));
+		builder.addScalar(SurgSim::DataStructures::Names::ANALOG_INPUT_SINGLE_ENDED_PREFIX + std::to_string(i));
+	}
 	return builder.createData();
 }
 
@@ -705,7 +837,7 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 		"Failed to reset configuration for a device named '" << device->getName() << "." <<
 		std::endl << formatErrorMessage(error);
 
-	return result && configureClockAndTimers(deviceData) && configureDigital(deviceData);
+	return result && configureClockAndTimers(deviceData) && configureDigital(deviceData) && configureAnalog(deviceData);
 }
 
 bool LabJackScaffold::configureClockAndTimers(DeviceData* deviceData)
@@ -806,6 +938,80 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 				"Failed to set the initial value for a PWM timer for a device named '" << device->getName() <<
 				"', timer number " << timer->first << ", with mode code " << timer->second <<
 				", and value " << value << "."  << std::endl << formatErrorMessage(error);
+		}
+	}
+
+	return result;
+}
+
+bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
+{
+	LabJackDevice* device = deviceData->deviceObject;
+	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
+
+	bool result = true;
+
+	const std::unordered_set<int>& analogOutputs = device->getAnalogOutputChannels();
+	for (auto output = analogOutputs.cbegin(); output != analogOutputs.cend(); ++output)
+	{
+		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_DAC_ENABLE, *output, 1, 0);
+		result = result && isOk(error);
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+			"Failed to enable analog output for a device named '" << device->getName() <<
+			"', channel " << *output << "." << std::endl << formatErrorMessage(error);
+	}
+
+	auto const& analogInputsDifferential = device->getAnalogInputsDifferential();
+	auto const& analogInputsSingleEnded = device->getAnalogInputsSingleEnded();
+	if ((analogInputsDifferential.size() > 0) || (analogInputsSingleEnded.size() > 0))
+	{
+		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chAIN_RESOLUTION, device->getAnalogInputResolution(), 0);
+		result = isOk(error);
+		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+			"Failed to configure analog input resolution for a device named '" << device->getName() <<
+			"', with resolution code " << device->getAnalogInputResolution() << "." << std::endl <<
+			formatErrorMessage(error);
+
+		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chAIN_SETTLING_TIME, device->getAnalogInputSettling(), 0);
+		result = result && isOk(error);
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+			"Failed to configure analog input settling time for a device named '" << device->getName() <<
+			"', with settling time code " << device->getAnalogInputSettling() << "." << std::endl <<
+			formatErrorMessage(error);
+
+		if (result)
+		{
+			for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
+			{
+				error = ePut(rawHandle, LJ_ioPUT_ANALOG_ENABLE_BIT, input->first, 1, 0);
+				result = result && isOk(error);
+				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+					"Failed to enable analog input for a device named '" << device->getName() <<
+					"', channel " << input->first << "." << std::endl << formatErrorMessage(error);
+
+				error = ePut(rawHandle, LJ_ioPUT_AIN_RANGE, input->first, input->second.second, 0);
+				result = result && isOk(error);
+				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+					"Failed to set the range for an analog input for a device named '" << device->getName() <<
+					"', channel " << input->first << ", with range code " << input->second.second << "." <<
+					std::endl << formatErrorMessage(error);
+			}
+
+			for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
+			{
+				error = ePut(rawHandle, LJ_ioPUT_ANALOG_ENABLE_BIT, input->first, 1, 0);
+				result = result && isOk(error);
+				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+					"Failed to enable analog input for a device named '" << device->getName() <<
+					"', channel " << input->first << "." << std::endl << formatErrorMessage(error);
+
+				error = ePut(rawHandle, LJ_ioPUT_AIN_RANGE, input->first, input->second, 0);
+				result = result && isOk(error);
+				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+					"Failed to set the range for an analog input for a device named '" << device->getName() <<
+					"', channel " << input->first << ", with range code " << input->second << "." <<
+					std::endl << formatErrorMessage(error);
+			}
 		}
 	}
 

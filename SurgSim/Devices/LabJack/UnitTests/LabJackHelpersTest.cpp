@@ -14,12 +14,17 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the LabJackChecksums class.
+/// Tests for the LabJackHelpers class.
 
 #include <gtest/gtest.h>
-#include "SurgSim/Devices/LabJack/linux/LabJackChecksums.h"
+#include "SurgSim/Devices/LabJack/linux/LabJackHelpers.h"
 
-TEST(LabJackChecksumsTest, NormalChecksum)
+namespace
+{
+	const double EPSILON = 1e-9;
+}
+
+TEST(LabJackHelpersTest, NormalChecksum)
 {
 	// Sum less than 256
 	std::array<unsigned char, SurgSim::Device::LABJACK_MAXIMUM_BUFFER> bytes;
@@ -27,8 +32,8 @@ TEST(LabJackChecksumsTest, NormalChecksum)
 	bytes.fill(fillValue);
 	int count = 10;
 	int expectedValue = fillValue * (count - 1);
-	EXPECT_EQ(expectedValue, SurgSim::Device::LabJackChecksums::normalChecksum8(bytes, count));
-	SurgSim::Device::LabJackChecksums::normalChecksum(&bytes, count);
+	EXPECT_EQ(expectedValue, SurgSim::Device::LabJackHelpers::normalChecksum8(bytes, count));
+	SurgSim::Device::LabJackHelpers::normalChecksum(&bytes, count);
 	EXPECT_EQ(expectedValue, bytes[0]);
 
 	// Sum greater than 256, quotient + remainder < 256
@@ -39,8 +44,8 @@ TEST(LabJackChecksumsTest, NormalChecksum)
 	int quotient = sum / 256; // 1
 	int remainder = sum % 256; // 44
 	expectedValue = quotient + remainder;
-	EXPECT_EQ(expectedValue, SurgSim::Device::LabJackChecksums::normalChecksum8(bytes, count));
-	SurgSim::Device::LabJackChecksums::normalChecksum(&bytes, count);
+	EXPECT_EQ(expectedValue, SurgSim::Device::LabJackHelpers::normalChecksum8(bytes, count));
+	SurgSim::Device::LabJackHelpers::normalChecksum(&bytes, count);
 	EXPECT_EQ(expectedValue, bytes[0]);
 
 	// Sum greater than 256, quotient + remainder > 256
@@ -51,13 +56,13 @@ TEST(LabJackChecksumsTest, NormalChecksum)
 	// sum = 767, quotient = 2, remainder = 255, quotient + remainder = 257
 	// second_quotient = 1, second_remainder = 1, second_quotient + second_remainder = 2
 	expectedValue = 2;
-	EXPECT_EQ(expectedValue, SurgSim::Device::LabJackChecksums::normalChecksum8(bytes, count));
-	SurgSim::Device::LabJackChecksums::normalChecksum(&bytes, count);
+	EXPECT_EQ(expectedValue, SurgSim::Device::LabJackHelpers::normalChecksum8(bytes, count));
+	SurgSim::Device::LabJackHelpers::normalChecksum(&bytes, count);
 	EXPECT_EQ(expectedValue, bytes[0]);
 }
 
 
-TEST(LabJackChecksumsTest, ExtendedChecksum)
+TEST(LabJackHelpersTest, ExtendedChecksum)
 {
 	// Sums less than 256
 	std::array<unsigned char, SurgSim::Device::LABJACK_MAXIMUM_BUFFER> bytes;
@@ -65,11 +70,11 @@ TEST(LabJackChecksumsTest, ExtendedChecksum)
 	bytes.fill(fillValue);
 	int count = 10;
 	int expectedValue16 = (count - 6) * fillValue; // 4 * 2 = 8
-	EXPECT_EQ(expectedValue16, SurgSim::Device::LabJackChecksums::extendedChecksum16(bytes, count));
+	EXPECT_EQ(expectedValue16, SurgSim::Device::LabJackHelpers::extendedChecksum16(bytes, count));
 	int expectedValue8 = (6 - 1) * fillValue; // 5 * 2 = 10
-	EXPECT_EQ(expectedValue8, SurgSim::Device::LabJackChecksums::extendedChecksum8(bytes));
+	EXPECT_EQ(expectedValue8, SurgSim::Device::LabJackHelpers::extendedChecksum8(bytes));
 
-	SurgSim::Device::LabJackChecksums::extendedChecksum(&bytes, count);
+	SurgSim::Device::LabJackHelpers::extendedChecksum(&bytes, count);
 	EXPECT_EQ(expectedValue16, bytes[4]);
 	EXPECT_EQ(0, bytes[5]);
 	// extendedChecksum alters the buffer before setting bytes[0] to the return value of extendedChecksum8.
@@ -80,14 +85,34 @@ TEST(LabJackChecksumsTest, ExtendedChecksum)
 	bytes.fill(fillValue);
 	count = 20;
 	expectedValue16 = (count - 6) * fillValue; // 14 * 100 = 1400
-	EXPECT_EQ(expectedValue16, SurgSim::Device::LabJackChecksums::extendedChecksum16(bytes, count));
+	EXPECT_EQ(expectedValue16, SurgSim::Device::LabJackHelpers::extendedChecksum16(bytes, count));
 	expectedValue8 = 245; // sum = 5 * 100 = 500, quotient = 1, remainder = 244, quotient + remainder = 245
-	EXPECT_EQ(expectedValue8, SurgSim::Device::LabJackChecksums::extendedChecksum8(bytes));
+	EXPECT_EQ(expectedValue8, SurgSim::Device::LabJackHelpers::extendedChecksum8(bytes));
 
-	SurgSim::Device::LabJackChecksums::extendedChecksum(&bytes, count);
+	SurgSim::Device::LabJackHelpers::extendedChecksum(&bytes, count);
 	EXPECT_EQ(120, bytes[4]);
 	EXPECT_EQ(5, bytes[5]);
 	// extendedChecksum alters the buffer before setting bytes[0] to the return value of extendedChecksum8.
 	// sum = 100 + 100 + 100 + 120 + 5 = 425, quotient = 1, remainder = 169, quotient + remainder = 170
 	EXPECT_EQ(170, bytes[0]);
+}
+
+TEST(LabJackHelpersTest, DoubleFromChars)
+{
+	std::array<unsigned char, SurgSim::Device::LABJACK_MAXIMUM_BUFFER> bytes;
+	for (int i = 0; i < 24; ++i)
+	{
+		bytes[i] = 0;
+	}
+
+	EXPECT_NEAR(0.0, SurgSim::Device::LabJackHelpers::doubleFromChars(bytes, 0), EPSILON);
+
+	bytes[13] = 1;
+	EXPECT_NEAR(2.0, SurgSim::Device::LabJackHelpers::doubleFromChars(bytes, 8), EPSILON);
+
+	bytes[20] = 255;
+	bytes[21] = 255;
+	bytes[22] = 255;
+	bytes[23] = 255;
+	EXPECT_NEAR(-1.0, SurgSim::Device::LabJackHelpers::doubleFromChars(bytes, 16), EPSILON);
 }

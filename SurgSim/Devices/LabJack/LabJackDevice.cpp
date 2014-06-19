@@ -32,7 +32,9 @@ LabJackDevice::LabJackDevice(const std::string& uniqueName) :
 	m_timerBase(LABJACKTIMERBASE_DEFAULT),
 	m_timerClockDivisor(1),
 	m_timerCounterPinOffset(0),
-	m_threadRate(1000.0)
+	m_threadRate(1000.0),
+	m_analogInputResolution(0),
+	m_analogInputSettling(0)
 {
 }
 
@@ -185,6 +187,67 @@ void LabJackDevice::setMaximumUpdateRate(double rate)
 double LabJackDevice::getMaximumUpdateRate() const
 {
 	return m_threadRate;
+}
+
+void LabJackDevice::setAnalogInputsDifferential(std::unordered_map<int,
+	std::pair<int, LabJackAnalogInputRange>> analogInputs)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Differential analog inputs cannot be set for a LabJackDevice after it is initialized.";
+	m_analogInputsDifferential = analogInputs;
+}
+
+const std::unordered_map<int, std::pair<int, LabJackAnalogInputRange>>&
+	LabJackDevice::getAnalogInputsDifferential() const
+{
+	return m_analogInputsDifferential;
+}
+
+void LabJackDevice::setAnalogInputsSingleEnded(std::unordered_map<int, LabJackAnalogInputRange> analogInputs)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Single-ended analog inputs cannot be set for a LabJackDevice after it is initialized.";
+	m_analogInputsSingleEnded = analogInputs;
+}
+
+const std::unordered_map<int, LabJackAnalogInputRange>& LabJackDevice::getAnalogInputsSingleEnded() const
+{
+	return m_analogInputsSingleEnded;
+}
+
+void LabJackDevice::setAnalogOutputChannels(const std::unordered_set<int>& analogOutputChannels)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Analog outputs cannot be set for a LabJackDevice after it is initialized.";
+	m_analogOutputChannels = analogOutputChannels;
+}
+
+const std::unordered_set<int>& LabJackDevice::getAnalogOutputChannels() const
+{
+	return m_analogOutputChannels;
+}
+
+void LabJackDevice::setAnalogInputResolution(int resolution)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Analog input resolution cannot be set for a LabJackDevice after it is initialized.";
+	m_analogInputResolution = resolution;
+}
+
+int LabJackDevice::getAnalogInputResolution() const
+{
+	return m_analogInputResolution;
+}
+
+void LabJackDevice::setAnalogInputSettling(int settling)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Analog input settling time cannot be set for a LabJackDevice after it is initialized.";
+	m_analogInputSettling = settling;
+}
+
+int LabJackDevice::getAnalogInputSettling() const
+{
+	return m_analogInputSettling;
 }
 
 };  // namespace Device

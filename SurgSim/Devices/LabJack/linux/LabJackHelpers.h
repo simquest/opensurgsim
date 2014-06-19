@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_LABJACK_LINUX_LABJACKCHECKSUMS_H
-#define SURGSIM_DEVICES_LABJACK_LINUX_LABJACKCHECKSUMS_H
+#ifndef SURGSIM_DEVICES_LABJACK_LINUX_LABJACKHELPERS_H
+#define SURGSIM_DEVICES_LABJACK_LINUX_LABJACKHELPERS_H
 
 #include <array>
 
@@ -25,9 +25,9 @@ namespace Device
 /// The maximum size of a read or write buffer for labjackusb driver.
 static const int LABJACK_MAXIMUM_BUFFER = 64;
 
-/// A collection of checksum functions specifically tailored for the labjackusb driver.  These functions are based off
+/// A collection of helper functions specifically tailored for the labjackusb driver.  These functions are based off
 /// the description in the LabJack User's Guide, and the examples provided with labjackusb.
-namespace LabJackChecksums
+namespace LabJackHelpers
 {
 /// Calculates an 8-bit 1's complement unsigned checksum specifically for normal command communication with the
 /// low-level LabJack driver.
@@ -62,8 +62,13 @@ void normalChecksum(std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>* bytes, in
 /// \param [in,out] bytes The buffer of bytes.
 /// \param count The number of bytes to check.
 void extendedChecksum(std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>* bytes, int count);
-};  // namespace LabJackChecksums
+
+/// Converts a fixed point byte array to a floating point double value.
+/// \param bytes The array.
+/// \param startIndex The index of the first element.
+double doubleFromChars(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes, int startIndex);
+};  // namespace LabJackHelpers
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_LABJACK_LINUX_LABJACKCHECKSUMS_H
+#endif  // SURGSIM_DEVICES_LABJACK_LINUX_LABJACKHELPERS_H

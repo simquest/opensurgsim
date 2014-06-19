@@ -92,10 +92,27 @@ enum LabJackTimerMode
 	LABJACKTIMERMODE_LINETOLINE = 14 // Line to Line measurement
 };
 
+/// The analog input ranges.  Equivalent to gain.  Ignored for Linux scaffold, which auto-ranges.
+enum LabJackAnalogInputRange
+{
+	LABJACKANALOGINPUTRANGE_20 = 1, // -20V to +20V, LJ_rgBIP20V
+	LABJACKANALOGINPUTRANGE_10 = 2, // -10V to +10V, LJ_rgBIP10V
+	LABJACKANALOGINPUTRANGE_5 = 3, // -5V to +5V, LJ_rgBIP5V
+	LABJACKANALOGINPUTRANGE_4 = 4, // -4V to +4V, LJ_rgBIP4V
+	LABJACKANALOGINPUTRANGE_2p5 = 5, // -2.5V to +2.5V, LJ_rgBIP2P5V
+	LABJACKANALOGINPUTRANGE_2 = 6, // -2V to +2V, LJ_rgBIP2V
+	LABJACKANALOGINPUTRANGE_1p25 = 7, // -1.25V to +1.25V, LJ_rgBIP1P25V
+	LABJACKANALOGINPUTRANGE_1 = 8, // -1V to +1V, LJ_rgBIP1V
+	LABJACKANALOGINPUTRANGE_0p625 = 9, // -0.625V to +0.625V, LJ_rgBIPP625V
+	LABJACKANALOGINPUTRANGE_0p1 = 10, // -0.1V to +0.1V, LJ_rgBIPP1V
+	LABJACKANALOGINPUTRANGE_0p01 = 11 // -0.01V to +0.01V, LJ_rgBIPP01V
+};
+
 /// A class implementing the communication with a LabJack data acquisition (DAQ) device.  Should work for the U3, U6,
 /// and U9 models at least. See the manual(s) for your LabJack device(s) to understand the input and output data, the
 /// configuration parameters, timing limitations, etc.  Currently timers and digital input/output are supported.
-/// Other functionality (e.g., analog input/output, and counters) are not yet supported.
+/// Counters are not yet supported.  Using the same channel as the positive input for multiple differential analog
+/// measurements is also not supported.
 /// \warning The LabJack device is configurable to such a degree that neither this class nor LabJackScaffold are able
 ///		to do significant error-checking.  If the output DataGroup and the calls (e.g., addTimer) to this class
 ///		are not in agreement, the requests to the LabJack device driver will not be correct.
@@ -234,6 +251,48 @@ public:
 	/// \return The maximum update rate for the LabJackThread.
 	double getMaximumUpdateRate() const;
 
+	/// Set the differential analog inputs.
+	/// \param analogInputs The inputs. The key is the positive channel.  The first element of the pair is the
+	///		negative channel.  The second element of the pair is the range.
+	/// \exception Asserts if already initialized.
+	/// \note On Linux, does not correctly handle negative channels 31 or 32 for U3 model.
+	void setAnalogInputsDifferential(std::unordered_map<int, std::pair<int, LabJackAnalogInputRange>> analogInputs);
+
+	/// Set the single-ended analog inputs.
+	/// \param analogInputs The inputs. The key is the channel.  The value is the range.
+	/// \exception Asserts if already initialized.
+	void setAnalogInputsSingleEnded(std::unordered_map<int, LabJackAnalogInputRange> analogInputs);
+
+	/// \return The enabled differential analog inputs.
+	const std::unordered_map<int, std::pair<int, LabJackAnalogInputRange>>& getAnalogInputsDifferential() const;
+
+	/// \return The enabled single-ended analog inputs.
+	const std::unordered_map<int, LabJackAnalogInputRange>& getAnalogInputsSingleEnded() const;
+
+	/// Enable analog output lines.
+	/// \param analogOutputChannels The set of channel numbers.
+	/// \exception Asserts if already initialized.
+	void setAnalogOutputChannels(const std::unordered_set<int>& analogOutputChannels);
+
+	/// \return The enabled analog output lines.
+	const std::unordered_set<int>& getAnalogOutputChannels() const;
+
+	/// Set the resolution for all the analog inputs.
+	/// \param resolution The resolution code.
+	/// \exception Asserts if already initialized.
+	void setAnalogInputResolution(int resolution);
+
+	/// \return The resolution code for all the analog inputs.
+	int getAnalogInputResolution() const;
+
+	/// Set the settling time for all the analog inputs.
+	/// \param settling The settling time code.
+	/// \exception Asserts if already initialized.
+	void setAnalogInputSettling(int settling);
+
+	/// \return The settling time code for all the analog inputs.
+	int getAnalogInputSettling() const;
+
 private:
 	/// Finalize (de-initialize) the device.
 	/// \return True if device was successfully un-registered.
@@ -257,8 +316,18 @@ private:
 	/// The line numbers for the digital inputs.
 	std::unordered_set<int> m_digitalInputChannels;
 
+	/// The single-ended analog inputs.  The key is the channel.  The value is the range (i.e., gain).
+	std::unordered_map<int, LabJackAnalogInputRange> m_analogInputsSingleEnded;
+
+	/// The differential analog inputs. The key is the positive channel.  The first element of the pair is the
+	/// negative channel.  The second element of the pair is the range (i.e., gain).
+	std::unordered_map<int, std::pair<int, LabJackAnalogInputRange>> m_analogInputsDifferential;
+
 	/// The line numbers for the digital outputs.
 	std::unordered_set<int> m_digitalOutputChannels;
+
+	/// The line numbers for the analog outputs.
+	std::unordered_set<int> m_analogOutputChannels;
 
 	/// The timer base, which is the frequency of all the output timers unless it ends in "_DIV",
 	/// in which case the frequency is the base divided by the divisor.  See section 2.10 - Timers/Counters in the
@@ -276,6 +345,12 @@ private:
 
 	/// The maximum update rate for the LabJackThread.
 	double m_threadRate;
+
+	/// The resolution for all the analog inputs.
+	int m_analogInputResolution;
+
+	/// The settling time for all the analog inputs.
+	int m_analogInputSettling;
 };
 
 };  // namespace Device

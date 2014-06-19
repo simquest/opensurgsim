@@ -32,7 +32,7 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/LabJack/LabJackDevice.h"
 #include "SurgSim/Devices/LabJack/LabJackThread.h"
-#include "SurgSim/Devices/LabJack/linux/LabJackChecksums.h"
+#include "SurgSim/Devices/LabJack/linux/LabJackHelpers.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
 
@@ -62,6 +62,62 @@ struct LabJackDefaults
 	/// The default timer base rate.
 	std::unordered_map<LabJackType, LabJackTimerBase, std::hash<int>> timerBase;
 };
+
+
+/// A struct containing various parameters that depend on the type of LabJack.
+struct LabJackParameters
+{
+	LabJackParameters()
+	{
+		configBlocks[LabJackType::LABJACKTYPE_U3] = 16; // hardware version 1.30 & 1.21
+		configBlocks[LabJackType::LABJACKTYPE_U6] = 10;
+		configBlocks[LabJackType::LABJACKTYPE_UE9] = 4;
+
+		calibrationCommand[LabJackType::LABJACKTYPE_U3] = 0x2D;
+		calibrationCommand[LabJackType::LABJACKTYPE_U6] = 0x2D;
+		calibrationCommand[LabJackType::LABJACKTYPE_UE9] = 0x2A;
+
+		calibrationThirdByte[LabJackType::LABJACKTYPE_U3] = 0x11;
+		calibrationThirdByte[LabJackType::LABJACKTYPE_U6] = 0x11;
+		calibrationThirdByte[LabJackType::LABJACKTYPE_UE9] = 0x41;
+
+		calibrationReadBytes[LabJackType::LABJACKTYPE_U3] = 40;
+		calibrationReadBytes[LabJackType::LABJACKTYPE_U6] = 40;
+		calibrationReadBytes[LabJackType::LABJACKTYPE_UE9] = 136;
+	}
+
+	/// The number of config memory blocks.
+	std::unordered_map<LabJackType, int, std::hash<int>> configBlocks;
+	/// The extended command for reading the calibration data.
+	std::unordered_map<LabJackType, BYTE, std::hash<int>> calibrationCommand;
+	/// The expected read third byte for the read calibration command.
+	std::unordered_map<LabJackType, BYTE, std::hash<int>> calibrationThirdByte;
+	/// The number of bytes read per calibration read.
+	std::unordered_map<LabJackType, int, std::hash<int>> calibrationReadBytes;
+};
+
+int getGain(LabJackAnalogInputRange range)
+{
+	int gain;
+	switch (range)
+	{
+	case LABJACKANALOGINPUTRANGE_10:
+		gain = 0;
+		break;
+	case LABJACKANALOGINPUTRANGE_1:
+		gain = 1;
+		break;
+	case LABJACKANALOGINPUTRANGE_0p1:
+		gain = 2;
+		break;
+	case LABJACKANALOGINPUTRANGE_0p01:
+		gain = 3;
+		break;
+	default:
+		gain = 15;
+	}
+	return gain;
+}
 };
 
 class LabJackScaffold::Handle
@@ -206,6 +262,9 @@ public:
 		digitalOutputChannels(device->getDigitalOutputChannels()),
 		timerInputChannels(getTimerInputChannels(device->getTimers())),
 		timerOutputChannels(getTimerOutputChannels(device->getTimers())),
+		analogInputsDifferential(device->getAnalogInputsDifferential()),
+		analogInputsSingleEnded(device->getAnalogInputsSingleEnded()),
+		analogOutputChannels(device->getAnalogOutputChannels()),
 		cachedOutputIndices(false)
 	{
 	}
@@ -229,6 +288,12 @@ public:
 	const std::unordered_set<int> timerInputChannels;
 	/// The timer channels set for timer outputs (e.g., PWM outputs).
 	const std::unordered_set<int> timerOutputChannels;
+	/// The differential analog inputs.
+	const std::unordered_map<int, std::pair<int, LabJackAnalogInputRange>> analogInputsDifferential;
+	/// The single-ended analog inputs.
+	const std::unordered_map<int, LabJackAnalogInputRange> analogInputsSingleEnded;
+	/// The channels set for analog outputs.
+	const std::unordered_set<int> analogOutputChannels;
 	/// The DataGroup indices for the digital outputs.
 	std::unordered_map<int, int> digitalOutputIndices;
 	/// The DataGroup indices for the digital inputs.
@@ -237,8 +302,16 @@ public:
 	std::unordered_map<int, int> timerOutputIndices;
 	/// The DataGroup indices for the timer inputs.
 	std::unordered_map<int, int> timerInputIndices;
+	/// The DataGroup indices for the analog outputs.
+	std::unordered_map<int, int> analogOutputIndices;
+	/// The DataGroup indices for the differential analog inputs.
+	std::unordered_map<int, int> analogInputDifferentialIndices;
+	/// The DataGroup indices for the single-ended analog inputs.
+	std::unordered_map<int, int> analogInputSingleEndedIndices;
 	/// True if the output indices have been cached.
 	bool cachedOutputIndices;
+	// Calibration constants.  The meaning of each entry is specific to the model (i.e., LabJackType).
+	double calibration[40];
 
 private:
 	/// Given all the timers, return just the ones that provide inputs.
@@ -473,6 +546,30 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 					".  Make sure that is a valid timer number.";
 			}
 
+			for (auto input = info->analogInputsDifferential.cbegin();
+				input != info->analogInputsDifferential.cend(); ++input)
+			{
+				std::string name = SurgSim::DataStructures::Names::ANALOG_INPUT_DIFFERENTIAL_PREFIX +
+					std::to_string(input->first);
+				info->analogInputDifferentialIndices[input->first] = inputData.scalars().getIndex(name);
+				SURGSIM_ASSERT(info->analogInputDifferentialIndices[input->first] >= 0) <<
+					"LabJackScaffold::DeviceData failed to get a valid NamedData index for the differential " <<
+					"analog input for channel " << input->first << ".  Make sure that is a valid line number.  " <<
+					"Expected an entry named " << name << ".";
+			}
+
+			for (auto input = info->analogInputsSingleEnded.cbegin();
+				input != info->analogInputsSingleEnded.cend(); ++input)
+			{
+				const std::string name = SurgSim::DataStructures::Names::ANALOG_INPUT_SINGLE_ENDED_PREFIX +
+					std::to_string(input->first);
+				info->analogInputSingleEndedIndices[input->first] = inputData.scalars().getIndex(name);
+				SURGSIM_ASSERT(info->analogInputSingleEndedIndices[input->first] >= 0) <<
+					"LabJackScaffold::DeviceData failed to get a valid NamedData index for the single-ended " <<
+					"analog input for line " << input->first << ".  Make sure that is a valid line number.  " <<
+					"Expected an entry named " << name << ".";
+			}
+
 			std::unique_ptr<LabJackThread> thread(new LabJackThread(this, info.get()));
 			thread->setRate(device->getMaximumUpdateRate());
 			thread->start();
@@ -537,6 +634,14 @@ bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 				std::to_string(*timer));
 		}
 
+		const std::unordered_set<int>& analogOutputChannels = info->analogOutputChannels;
+		for (auto output = analogOutputChannels.cbegin(); output != analogOutputChannels.cend(); ++output)
+		{
+			info->analogOutputIndices[*output] =
+				initialOutputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_OUTPUT_PREFIX +
+				std::to_string(*output));
+		}
+
 		info->cachedOutputIndices = true;
 	}
 
@@ -555,12 +660,10 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	const LabJackDevice* device = info->deviceObject;
 	bool result = true;
 
-	// Use one Feedback command for all the digital/timer inputs and outputs.
-	// According to the Users Guide, the Feedback command has a max size of 64 bytes.  With 7 command bytes, a max of
-	// 4 timers (4 bytes each), and 2 bytes per digital input/output, the user would have to read/write 21+ digital
-	// channels to trigger this assertion.  That setup is not possible on the U6 or U3, but to be safe the
-	// std::array::at function is used for any access to a non-constant index, and will throw an out_of_range exception
-	// if the index is too large.
+	// Use one Feedback command for all the inputs and outputs.
+	// According to the Users Guide, the Feedback command has a max size of 64 bytes. Currently only a single command is
+	// used, and we try to add all the input/output information. To be safe the std::array::at function is used for any
+	// access to a non-constant index, and will throw an out_of_range exception if the index is too large.
 	std::array<BYTE, LABJACK_MAXIMUM_BUFFER> sendBytes;
 	sendBytes[1] = 0xF8;  //Command byte, Feedback
 	sendBytes[3] = 0x00;  //Extended command number
@@ -639,6 +742,83 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		}
 	}
 
+	// Request the values of analog inputs.
+	auto const& analogInputsDifferential = info->analogInputsDifferential;
+	for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
+	{
+		if (device->getType() == LABJACKTYPE_U3)
+		{
+			sendBytes.at(sendBytesSize++) = 1;
+			sendBytes.at(sendBytesSize++) = input->first;
+			sendBytes.at(sendBytesSize++) = input->second.first;
+			readBytesSize += 2;
+		}
+		else
+		{
+			sendBytes.at(sendBytesSize++) = 3;
+			sendBytes.at(sendBytesSize++) = input->first;
+			sendBytes.at(sendBytesSize++) = device->getAnalogInputResolution() + getGain(input->second.second) * 16;
+			sendBytes.at(sendBytesSize++) = device->getAnalogInputSettling() + 128;
+			readBytesSize += 5;
+		}
+	}
+
+	auto const& analogInputsSingleEnded = info->analogInputsSingleEnded;
+	for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
+	{
+		if (device->getType() == LABJACKTYPE_U3)
+		{
+			sendBytes.at(sendBytesSize++) = 1;
+			sendBytes.at(sendBytesSize++) = input->first;
+			sendBytes.at(sendBytesSize++) = 31;
+			readBytesSize += 2;
+		}
+		else
+		{
+			sendBytes.at(sendBytesSize++) = 3;
+			sendBytes.at(sendBytesSize++) = input->first;
+			sendBytes.at(sendBytesSize++) = device->getAnalogInputResolution() + getGain(input->second) * 16;
+			sendBytes.at(sendBytesSize++) = device->getAnalogInputSettling();
+			readBytesSize += 5;
+		}
+	}
+
+	// Set analog outputs.
+	const std::unordered_set<int>& analogOutputs = device->getAnalogOutputChannels();
+	for (auto output = analogOutputs.cbegin(); output != analogOutputs.cend(); ++output)
+	{
+		if (info->analogOutputIndices.count(*output) > 0)
+		{
+			const int index = info->analogOutputIndices[*output];
+			if (index >= 0)
+			{
+				double value;
+				if (outputData.scalars().get(index, &value))
+				{
+					const BYTE dacConfigCode = *output + 38;
+					sendBytes.at(sendBytesSize++) = dacConfigCode;
+
+					int bytes;
+					if (device->getType() == LABJACKTYPE_U3)
+					{
+						const int calibrationIndex = *output * 2 + 4;
+						bytes = value * info->calibration[calibrationIndex] * 256 +
+							info->calibration[calibrationIndex + 1] * 256;
+					}
+					else
+					{
+						const int calibrationIndex = *output * 2 + 16;
+						bytes = value * info->calibration[calibrationIndex] + info->calibration[calibrationIndex + 1];
+					}
+					bytes = std::min(bytes, 65535);
+					bytes = std::max(bytes, 0);
+					sendBytes.at(sendBytesSize++) = bytes & 255;
+					sendBytes.at(sendBytesSize++) = bytes / 256;
+				}
+			}
+		}
+	}
+
 	// Write the Feedback command.
 	// Must send an even number of bytes.
 	if (sendBytesSize % 2 == 1)
@@ -672,7 +852,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		const BYTE sendCommandBytes = 6;
 		const BYTE dataWords = (sendBytesSize - sendCommandBytes) / 2;
 		sendBytes[2] = dataWords;
-		LabJackChecksums::extendedChecksum(&sendBytes, sendBytesSize);
+		LabJackHelpers::extendedChecksum(&sendBytes, sendBytesSize);
 
 		const int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
@@ -696,7 +876,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		const BYTE dataWords = (readBytesSize - readCommandBytes) / 2;
 
 		const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-		const uint16_t checksumTotal = LabJackChecksums::extendedChecksum16(readBytes, readBytesSize);
+		const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
 		if (read < readBytesSize)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
@@ -707,7 +887,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		}
 		else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
 			((checksumTotal & 0xff) != readBytes[4]) ||
-			(LabJackChecksums::extendedChecksum8(readBytes) != readBytes[0]))
+			(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
 				"Failed to read response of feedback command to update a device named '" <<
@@ -791,6 +971,99 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 				inputData.scalars().set(info->timerInputIndices[*timer], value);
 			}
 		}
+
+		for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
+		{
+			if (device->getType() == LABJACKTYPE_U3)
+			{
+				uint16_t value = readBytes.at(currentByte + 1);
+				value = value << 8;
+				value += readBytes.at(currentByte);
+				currentByte += 2;
+				const double volts = info->calibration[2] * static_cast<double>(value) + info->calibration[3];
+				inputData.scalars().set(info->analogInputDifferentialIndices[input->first], volts);
+			}
+			else
+			{
+				uint32_t value = readBytes.at(currentByte + 2);
+				value = value << 8;
+				value += readBytes.at(currentByte + 1);
+				value = value << 8;
+				value += readBytes.at(currentByte);
+
+				double bits = value;
+				bits /= 256.0;
+
+				const int gain = readBytes.at(currentByte + 3) / 16;
+				int index = gain * 2 + 8;
+
+				const int resolution = readBytes.at(currentByte + 3) & 15;
+				if (resolution > 8)
+				{
+					index += 24;
+				}
+
+				currentByte += 5;
+
+				double volts;
+				const double center = info->calibration[index + 1];
+				if (bits < center)
+				{
+					volts = (center - bits) * info->calibration[index];
+				}
+				else
+				{
+					volts = (bits - center) * info->calibration[index - 8];
+				}
+				inputData.scalars().set(info->analogInputDifferentialIndices[input->first], volts);
+			}
+		}
+
+		for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
+		{
+			if (device->getType() == LABJACKTYPE_U3)
+			{
+				uint16_t value = readBytes.at(currentByte + 1);
+				value = value << 8;
+				value += readBytes.at(currentByte);
+				currentByte += 2;
+				const double volts = info->calibration[2] * static_cast<double>(value) + info->calibration[3];
+				inputData.scalars().set(info->analogInputSingleEndedIndices[input->first], volts);
+			}
+			else
+			{
+				uint32_t value = readBytes.at(currentByte + 2);
+				value = value << 8;
+				value += readBytes.at(currentByte + 1);
+				value = value << 8;
+				value += readBytes.at(currentByte);
+
+				double bits = value;
+				bits /= 256.0;
+
+				const int gain = readBytes.at(currentByte + 3) / 16;
+				int index = gain * 2 + 8;
+
+				const int resolution = readBytes.at(currentByte + 3) & 15;
+				if (resolution > 8)
+				{
+					index += 24;
+				}
+
+				currentByte += 5;
+
+				double volts;
+				if (bits < info->calibration[index + 1] )
+				{
+					volts = (info->calibration[index + 1] - bits) * info->calibration[index];
+				}
+				else
+				{
+					volts = (bits - info->calibration[index + 1]) * info->calibration[index - 8];
+				}
+				inputData.scalars().set(info->analogInputSingleEndedIndices[input->first], volts);
+			}
+		}
 	}
 	else
 	{
@@ -828,6 +1101,13 @@ SurgSim::DataStructures::DataGroup LabJackScaffold::buildDeviceInputData()
 	{
 		builder.addScalar(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX + std::to_string(i));
 	}
+
+	const int maxAnalogInputs = 16; // The U3 can have 16 analog inputs.
+	for (int i = 0; i < maxAnalogInputs; ++i)
+	{
+		builder.addScalar(SurgSim::DataStructures::Names::ANALOG_INPUT_DIFFERENTIAL_PREFIX + std::to_string(i));
+		builder.addScalar(SurgSim::DataStructures::Names::ANALOG_INPUT_SINGLE_ENDED_PREFIX + std::to_string(i));
+	}
 	return builder.createData();
 }
 
@@ -839,7 +1119,7 @@ std::shared_ptr<LabJackScaffold> LabJackScaffold::getOrCreateSharedInstance()
 
 bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 {
-	return configureClockAndTimers(deviceData) && configureDigital(deviceData);
+	return configureClockAndTimers(deviceData) && configureDigital(deviceData) && configureAnalog(deviceData);
 }
 
 bool LabJackScaffold::configureClockAndTimers(DeviceData* deviceData)
@@ -880,7 +1160,7 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 	{
 		sendBytes[i] = 0;  //Reserved
 	}
-	LabJackChecksums::extendedChecksum(&sendBytes, 16);
+	LabJackHelpers::extendedChecksum(&sendBytes, 16);
 
 	int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
@@ -900,7 +1180,7 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 		const int readBytesSize = 16; // timerCounterConfig replies with 16 bytes.
 		std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes;
 		const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-		const uint16_t checksumTotal = LabJackChecksums::extendedChecksum16(readBytes, readBytesSize);
+		const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
 		if (read < readBytesSize)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
@@ -911,7 +1191,7 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 		}
 		else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
 			((checksumTotal & 0xff) != readBytes[4]) ||
-			(LabJackChecksums::extendedChecksum8(readBytes) != readBytes[0]))
+			(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
 				"Failed to read response of timer/counter configuration for a device named '" << device->getName() <<
@@ -982,7 +1262,7 @@ bool LabJackScaffold::configureClock(DeviceData* deviceData)
 	sendBytes[9] = divisor;  //TimerClockDivisor
 
 	int sendBytesSize = 10; // ConfigTimerClock sends 10 bytes
-	LabJackChecksums::extendedChecksum(&sendBytes, sendBytesSize);
+	LabJackHelpers::extendedChecksum(&sendBytes, sendBytesSize);
 
 	int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
@@ -1004,7 +1284,7 @@ bool LabJackScaffold::configureClock(DeviceData* deviceData)
 		const int readBytesSize = 10; // ConfigTimerClock replies with 10 bytes.
 		std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes;
 		const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-		const uint16_t checksumTotal = LabJackChecksums::extendedChecksum16(readBytes, readBytesSize);
+		const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
 		if (read < readBytesSize)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
@@ -1015,7 +1295,7 @@ bool LabJackScaffold::configureClock(DeviceData* deviceData)
 		}
 		else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
 			((checksumTotal & 0xff) != readBytes[4]) ||
-			(LabJackChecksums::extendedChecksum8(readBytes) != readBytes[0]))
+			(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
 				"Failed to read response of clock configuration for a device named '" <<
@@ -1108,7 +1388,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 		const BYTE sendCommandBytes = 6;
 		const BYTE dataWords = (sendBytesSize - sendCommandBytes) / 2;
 		sendBytes[2] = dataWords;
-		LabJackChecksums::extendedChecksum(&sendBytes, sendBytesSize);
+		LabJackHelpers::extendedChecksum(&sendBytes, sendBytesSize);
 
 		int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
@@ -1136,7 +1416,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 
 		std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes;
 		const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-		const uint16_t checksumTotal = LabJackChecksums::extendedChecksum16(readBytes, readBytesSize);
+		const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
 		if (read < readBytesSize)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
@@ -1147,7 +1427,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 		}
 		else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
 			((checksumTotal & 0xff) != readBytes[4]) ||
-			(LabJackChecksums::extendedChecksum8(readBytes) != readBytes[0]))
+			(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
 				"Failed to read response of timer mode feedback command for a device named '" <<
@@ -1188,8 +1468,139 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 	return result;
 }
 
-/// Helper function to configure the input/output direction for digital lines.  Does not set the value for outputs.
-/// \return true if successful.
+bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
+{
+	LabJackDevice* device = deviceData->deviceObject;
+	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
+
+	bool result = true;
+
+	const std::unordered_set<int>& analogOutputs = device->getAnalogOutputChannels();
+	for (auto output = analogOutputs.cbegin(); output != analogOutputs.cend(); ++output)
+	{
+		const int minimumDac = 0;
+		const int maximumDac = 1;
+		if ((*output < minimumDac) || (*output > maximumDac))
+		{
+			SURGSIM_LOG_SEVERE(m_logger) << "Failed to configure an analog output (DAC) for a device named '" <<
+				device->getName() << "'. DAC number " << *output << " is outside of the valid range " <<
+				minimumDac << "-" << maximumDac << "." << std::endl;
+			result = false;
+		}
+	}
+
+	if (device->getType() == LABJACKTYPE_U6)
+	{
+		auto const& analogInputs = device->getAnalogInputsDifferential();
+		for (auto input = analogInputs.cbegin(); input != analogInputs.cend(); ++input)
+		{
+			if (input->second.first != input->first + 1)
+			{
+				SURGSIM_LOG_SEVERE(m_logger) <<
+					"Failed to configure a differential analog input for a device named '" <<
+					device->getName() << "'. For a model U6(-PRO), with the low-level driver, "<<
+					"the negative channel number must be one greater than the positive channel number, " <<
+					"but positive channel " << input->first << " is paired with negative channel " <<
+					input->second.first << ".";
+				result = false;
+			}
+		}
+	}
+
+	LabJackParameters parameters;
+	const int blocks = parameters.configBlocks[device->getType()];
+	std::array<BYTE, LABJACK_MAXIMUM_BUFFER> sendBytes;
+	sendBytes[1] = 0xF8; //command byte
+	sendBytes[2] = 0x01; //number of data words
+	sendBytes[3] = parameters.calibrationCommand[device->getType()];
+	sendBytes[6] = 0;
+	const int sendBytesSize = 8;
+	const int readBytesSize = parameters.calibrationReadBytes[device->getType()];
+
+	for (int i = 0; i < blocks; ++i)
+	{
+		if (result)
+		{
+			sendBytes[7] = i;
+			LabJackHelpers::extendedChecksum(&sendBytes, sendBytesSize);
+
+			const int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
+			if (sent < sendBytesSize)
+			{
+				SURGSIM_LOG_SEVERE(m_logger) <<
+					"Failed to write a feedback command to read the calibration data for a device named '" <<
+					device->getName() << "'.  " << sendBytesSize << " bytes should have been sent, but only " <<
+					sent << " were actually sent." << std::endl <<
+					"  labjackusb error code: " << errno << "." << std::endl;
+				result = false;
+			}
+		}
+
+		if (result)
+		{
+			std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes;
+			const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
+			const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
+			if (read < readBytesSize)
+			{
+				SURGSIM_LOG_SEVERE(m_logger) <<
+					"Failed to read response of feedback command to read the calibration data for a device named '" <<
+					device->getName() << "'. " << readBytesSize << " bytes were expected, but only " << read <<
+					" were received." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+				result = false;
+			}
+			else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
+				((checksumTotal & 0xff) != readBytes[4]) ||
+				(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
+			{
+				SURGSIM_LOG_SEVERE(m_logger) <<
+					"Failed to read response of feedback command to read the calibration data for a device named '" <<
+					device->getName() << "'.  The checksums are bad." << std::endl <<
+					"  labjackusb error code: " << errno << "." << std::endl;
+				result = false;
+			}
+			else if ((readBytes[1] != sendBytes[1]) || (readBytes[3] != sendBytes[3]))
+			{
+				SURGSIM_LOG_SEVERE(m_logger) <<
+					"Failed to read response of feedback command to read the calibration data for a device named '" <<
+					device->getName() << "'.  The command bytes are wrong.  Expected bytes 1 & 3: " <<
+					static_cast<int>(sendBytes[1]) << ", " << static_cast<int>(sendBytes[3]) <<
+					".  Received bytes 1 & 3: " << static_cast<int>(readBytes[1]) << ", " <<
+					static_cast<int>(readBytes[3]) << "." << std::endl <<
+					"  labjackusb error code: " << errno << "." << std::endl;
+				result = false;
+			}
+			else if (readBytes[2] != parameters.calibrationThirdByte[device->getType()])
+			{
+				SURGSIM_LOG_SEVERE(m_logger) <<
+					"Failed to read response of feedback command to read the calibration data for a device named '" <<
+					device->getName() << "'.  The command bytes are wrong.  Expected byte 2: " <<
+					static_cast<int>(parameters.calibrationThirdByte[device->getType()]) << ".  Received: " <<
+					readBytes[2] << "." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+				result = false;
+			}
+			else if (readBytes[6] != 0)
+			{
+				SURGSIM_LOG_SEVERE(m_logger) <<
+					"Failed to read response of feedback command to read the calibration data for a device named '" <<
+					device->getName() << "'.  The device library returned an error code: " << readBytes[6] <<
+					"." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+				result = false;
+			}
+			else
+			{
+				const int offset = i * 4;
+				deviceData->calibration[offset] = LabJackHelpers::doubleFromChars(readBytes, 8);
+				deviceData->calibration[offset + 1] = LabJackHelpers::doubleFromChars(readBytes, 16);
+				deviceData->calibration[offset + 2] = LabJackHelpers::doubleFromChars(readBytes, 24);
+				deviceData->calibration[offset + 3] = LabJackHelpers::doubleFromChars(readBytes, 32);
+			}
+		}
+	}
+
+	return result;
+}
+
 bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 {
 	LabJackDevice* device = deviceData->deviceObject;
@@ -1232,7 +1643,7 @@ bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 		const BYTE sendCommandBytes = 6;
 		const BYTE dataWords = (sendBytesSize - sendCommandBytes) / 2;
 		sendBytes[2] = dataWords;
-		LabJackChecksums::extendedChecksum(&sendBytes, sendBytesSize);
+		LabJackHelpers::extendedChecksum(&sendBytes, sendBytesSize);
 
 		int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
@@ -1259,7 +1670,7 @@ bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 
 			std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes;
 			const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-			const uint16_t checksumTotal = LabJackChecksums::extendedChecksum16(readBytes, readBytesSize);
+			const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
 			if (read < readBytesSize)
 			{
 				SURGSIM_LOG_SEVERE(m_logger) <<
@@ -1270,7 +1681,7 @@ bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 			}
 			else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
 				((checksumTotal & 0xff) != readBytes[4]) ||
-				(LabJackChecksums::extendedChecksum8(readBytes) != readBytes[0]))
+				(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
 			{
 				SURGSIM_LOG_SEVERE(m_logger) <<
 					"Failed to read response of digital line direction configuration for a device named '" <<
