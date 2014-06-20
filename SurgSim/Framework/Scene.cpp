@@ -62,7 +62,11 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 		}
 		runtime->addSceneElement(element);
 	}
-
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"Element " << element->getName() << " initialization failed. Not added to the scene.";
+	}
 }
 
 std::shared_ptr<Runtime> Scene::getRuntime()
