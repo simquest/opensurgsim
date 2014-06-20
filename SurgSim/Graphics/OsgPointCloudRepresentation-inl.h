@@ -28,9 +28,6 @@ namespace SurgSim
 {
 namespace Graphics
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component,
-				 SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>,
-				 OsgPointCloudRepresentation);
 
 template <class Data>
 OsgPointCloudRepresentation<Data>::OsgPointCloudRepresentation(const std::string& name) :
