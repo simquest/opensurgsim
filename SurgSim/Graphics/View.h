@@ -181,15 +181,6 @@ public:
 
 private:
 
-// 	virtual void setPosition(const std::array<int, 2>& position);
-//
-// 	virtual const std::array<int, 2> getPosition();
-//
-// 	virtual void setDimensions(const std::array<int, 2>& dimensions);
-//
-// 	virtual const std::array<int, 2> getDimensions();
-
-
 	virtual bool doInitialize() override;
 
 	/// Camera whose image will be shown in this view

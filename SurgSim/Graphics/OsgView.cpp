@@ -21,20 +21,21 @@
 #include "SurgSim/Devices/Mouse/MouseDevice.h"
 #include "SurgSim/Devices/Mouse/OsgMouseHandler.h"
 #include "SurgSim/Graphics/OsgCamera.h"
-#include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/Runtime.h"
-
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/MathConvert.h"
 
 #include <osgViewer/ViewerEventHandlers>
 #include <osg/DisplaySettings>
 
-
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
+
 namespace
 {
 
@@ -61,6 +62,7 @@ const osg::DisplaySettings::DisplayType DisplayTypeEnums[SurgSim::Graphics::View
 	osg::DisplaySettings::HEAD_MOUNTED_DISPLAY
 };
 
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgView);
 
 }
 
@@ -86,7 +88,17 @@ OsgView::OsgView(const std::string& name) : View(name),
 	/// Clear the OSG default camera, let that be handled at a higher level.
 	m_view->setCamera(nullptr);
 
-
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, CameraManipulatorEnabled,
+		isManipulatorEnabled, enableManipulator);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, SurgSim::Math::Vector3d, CameraPosition,
+		getManipulatorPosition, setManipulatorPosition);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, SurgSim::Math::Vector3d, CameraLookAt,
+		getManipulatorLookAt, setManipulatorLookAt);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, OsgMapUniforms, getOsgMapsUniforms, setOsgMapsUniforms);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, KeyboardDeviceEnabled,
+		isKeyboardDeviceEnabled, enableKeyboardDevice);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, MouseDeviceEnabled,
+		isMouseDeviceEnabled, enableMouseDevice);
 }
 
 OsgView::~OsgView()
@@ -314,6 +326,11 @@ void SurgSim::Graphics::OsgView::enableManipulator(bool val)
 	}
 }
 
+bool SurgSim::Graphics::OsgView::isManipulatorEnabled()
+{
+	return getOsgView()->getCameraManipulator() != nullptr;
+}
+
 void SurgSim::Graphics::OsgView::enableKeyboardDevice(bool val)
 {
 	// Early return if device is already turned on/off.
@@ -337,6 +354,10 @@ void SurgSim::Graphics::OsgView::enableKeyboardDevice(bool val)
 	}
 }
 
+bool SurgSim::Graphics::OsgView::isKeyboardDeviceEnabled()
+{
+	return m_keyboardEnabled;
+}
 
 std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getKeyboardDevice()
 {
@@ -374,6 +395,10 @@ void SurgSim::Graphics::OsgView::enableMouseDevice(bool val)
 	}
 }
 
+bool SurgSim::Graphics::OsgView::isMouseDeviceEnabled()
+{
+	return m_mouseEnabled;
+}
 
 std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getMouseDevice()
 {
@@ -403,6 +428,26 @@ void SurgSim::Graphics::OsgView::setManipulatorParameters(
 			SurgSim::Graphics::toOsg(m_manipulatorLookat),
 			osg::Vec3d(0.0f, 1.0f, 0.0f));
 	}
+}
+
+void SurgSim::Graphics::OsgView::setManipulatorPosition(SurgSim::Math::Vector3d position)
+{
+	setManipulatorParameters(position, m_manipulatorLookat);
+}
+
+SurgSim::Math::Vector3d SurgSim::Graphics::OsgView::getManipulatorPosition()
+{
+	return m_manipulatorPosition;
+}
+
+void SurgSim::Graphics::OsgView::setManipulatorLookAt(SurgSim::Math::Vector3d lookAt)
+{
+	setManipulatorParameters(m_manipulatorPosition, lookAt);
+}
+
+SurgSim::Math::Vector3d SurgSim::Graphics::OsgView::getManipulatorLookAt()
+{
+	return m_manipulatorLookat;
 }
 
 }
