@@ -20,11 +20,17 @@
 
 #include "SurgSim/Framework/Log.h"
 
-namespace
+namespace SurgSim
+{
+namespace DataStructures
+{
+namespace Convert
 {
 const std::string serializeLogger = "Serialization";
-const std::string HasValueName = "HasValue";
-const std::string ValueName = "Value";
+const std::string hasValueName = "HasValue";
+const std::string valueName = "Value";
+};
+};
 };
 
 template <class T>
@@ -32,14 +38,14 @@ YAML::Node YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::encode(
 	const SurgSim::DataStructures::OptionalValue<T>& rhs)
 {
 	Node node;
-	node[HasValueName] = rhs.hasValue();
+	node[SurgSim::DataStructures::Convert::hasValueName] = rhs.hasValue();
 	if (rhs.hasValue())
 	{
-		node[ValueName] = rhs.getValue();
+		node[SurgSim::DataStructures::Convert::valueName] = rhs.getValue();
 	}
 	else
 	{
-		node[ValueName] = "Not set";
+		node[SurgSim::DataStructures::Convert::valueName] = "Not set";
 	}
 	return node;
 }
@@ -49,16 +55,16 @@ bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
 	const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs)
 {
 	bool result = true;
-	if (node[HasValueName].as<bool>())
+	if (node[SurgSim::DataStructures::Convert::hasValueName].as<bool>())
 	{
 		try
 		{
-			rhs.setValue(node[ValueName].as<T>());
+			rhs.setValue(node[SurgSim::DataStructures::Convert::valueName].as<T>());
 		}
 		catch (YAML::RepresentationException)
 		{
 			result = false;
-			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
+			auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::DataStructures::Convert::serializeLogger);
 			SURGSIM_LOG(logger, WARNING) << "Bad conversion";
 		}
 	}
@@ -99,7 +105,7 @@ bool YAML::convert<std::array<T, N>>::decode(const Node& node, std::array<T, N>&
 		catch (YAML::RepresentationException)
 		{
 			result = false;
-			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
+			auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::DataStructures::Convert::serializeLogger);
 			SURGSIM_LOG(logger, WARNING) << __FUNCTION__ << ": Bad conversion";
 		}
 	}
