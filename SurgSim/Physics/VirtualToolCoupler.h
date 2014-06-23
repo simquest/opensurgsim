@@ -133,6 +133,17 @@ public:
 	/// \param torqueScaling The factor to multiply the torque.
 	void setOutputTorqueScaling(double torqueScaling);
 
+	/// Set the vector from the center of mass to the input's point of attachment. For example, if the input device
+	/// gives the position at the tip of a stylus, which should correspond to the tip of the tool, then the attachment
+	/// would be the vector from the tool's center of mass to its tip.  If the attachment is not set, it defaults to the
+	/// center of mass.
+	/// \param attachment The attachment.
+	void setAttachment(const SurgSim::Math::Vector3d& attachment);
+
+	/// Get the vector from the tool's center of mass to the input's point of attachment.
+	/// \return The offset.
+	const SurgSim::Math::Vector3d& getAttachment();
+
 protected:
 	virtual bool doInitialize() override;
 	virtual bool doWakeUp() override;
@@ -211,6 +222,9 @@ private:
 
 	/// The DataGroup to output
 	SurgSim::DataStructures::DataGroup m_outputData;
+
+	/// The local-space vector from the tool's center of mass to the input's point of attachment.
+	SurgSim::Math::Vector3d m_attachment;
 };
 
 }; // Physics
