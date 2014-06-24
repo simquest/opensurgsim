@@ -21,6 +21,7 @@
 #include <osg/Point>
 
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/PointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/DataStructures/Vertices.h"
@@ -34,6 +35,7 @@ namespace Graphics
 #pragma warning(push)
 #pragma warning(disable:4250)
 #endif
+SURGSIM_STATIC_REGISTRATION(OsgPointCloudRepresentation);
 
 /// Osg point cloud representation, implementation of a PointCloudRepresenation using OSG.
 template <class Data>

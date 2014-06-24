@@ -33,16 +33,13 @@ using SurgSim::Graphics::OsgVectorFieldRepresentation;
 using SurgSim::Graphics::VectorField;
 using SurgSim::Graphics::VectorFieldData;
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::VisualizeContactsBehavior);
-}
-
 namespace SurgSim
 {
 
 namespace Blocks
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::VisualizeContactsBehavior,
+				 VisualizeContactsBehavior);
 
 VisualizeContactsBehavior::VisualizeContactsBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),

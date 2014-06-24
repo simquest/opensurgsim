@@ -24,11 +24,6 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component,
-				 SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>);
-}
 namespace SurgSim
 {
 namespace Graphics

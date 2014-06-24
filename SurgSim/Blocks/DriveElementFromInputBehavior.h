@@ -17,7 +17,7 @@
 #define SURGSIM_BLOCKS_DRIVEELEMENTFROMINPUTBEHAVIOR_H
 
 #include "SurgSim/Framework/Behavior.h"
-
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
@@ -29,6 +29,8 @@ class InputComponent;
 
 namespace Blocks
 {
+
+SURGSIM_STATIC_REGISTRATION(DriveElementFromInputBehavior);
 
 /// Behavior to copy a pose from an input component to a SceneElement
 /// By adding this behavior to a SceneElement, that SceneElement will be moved

@@ -56,15 +56,13 @@ void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
 		SurgSim::Math::setSubVector(xiTransformed, nodeId, 3, x);
 	}
 }
-
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem3DRepresentation);
 }
 
 namespace SurgSim
 {
-
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem3DRepresentation, Fem3DRepresentation);
 
 Fem3DRepresentation::Fem3DRepresentation(const std::string& name) :
 	FemRepresentation(name), m_doLoadFile(false)

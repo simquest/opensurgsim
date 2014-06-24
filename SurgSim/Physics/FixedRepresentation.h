@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
 #define SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 
 namespace SurgSim
@@ -23,8 +24,9 @@ namespace SurgSim
 
 namespace Physics
 {
-
 class RigidRepresentationState;
+
+SURGSIM_STATIC_REGISTRATION(FixedRepresentation);
 
 /// The FixedRepresentation class represents a physics entity without any motion nor
 /// compliance against which others physics entities can interact

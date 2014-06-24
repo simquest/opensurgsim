@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
@@ -27,6 +28,8 @@ namespace SurgSim
 namespace Physics
 {
 class RigidRepresentationState;
+
+SURGSIM_STATIC_REGISTRATION(RigidRepresentation);
 
 /// The RigidRepresentation class defines the dynamic rigid body representation
 /// Note that the rigid representation is velocity-based, therefore its degrees of
