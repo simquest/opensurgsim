@@ -46,6 +46,8 @@
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/MeshShape.h"
@@ -59,6 +61,10 @@
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
+#include "SurgSim/Graphics/GraphicsMeshPlyReaderDelegate.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgLight.h"
+
 
 using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
 using SurgSim::Blocks::VisualizeContactsBehavior;
@@ -89,6 +95,7 @@ using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Input::InputComponent;
 using SurgSim::Input::InputManager;
@@ -113,9 +120,21 @@ static std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadMe
 	return triangleMeshDelegate->getMesh();
 }
 
+static std::shared_ptr<SurgSim::Graphics::Mesh> loadGraphicsMesh(const std::string& fileName)
+{
+	// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
+	SurgSim::DataStructures::PlyReader reader(fileName);
+	auto delegate = std::make_shared<SurgSim::Graphics::GraphicsMeshPlyReaderDelegate>();
+	SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
+	reader.parseFile();
+
+	return delegate->getMesh();
+}
+
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
+	const std::string& texturefilename,
 	SurgSim::Math::IntegrationScheme integrationScheme,
 	bool displayPointCloud)
 {
@@ -137,8 +156,18 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
-	*graphicsTriangleMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*loadMesh(filename));
+	*graphicsTriangleMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*loadGraphicsMesh(filename));
 	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
+
+	// Create material to transport the Textures
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+	texture->loadImage(texturefilename);
+	auto diffuseMapUniform =
+		std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("diffuseMap");
+	diffuseMapUniform->set(texture);
+	material->addUniform(diffuseMapUniform);
+	graphicsTriangleMeshRepresentation->setMaterial(material);
 
 	// Load the surface triangle mesh of the finite element model
 	auto meshSurface = loadMesh(filename);
@@ -201,6 +230,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
 	*meshShapeVisualization->getMesh() = SurgSim::Graphics::Mesh(*(meshShapeForCollision->getMesh()));
 	meshShapeVisualization->setDrawAsWireFrame(true);
+	meshShapeVisualization->setVisible(false);
 
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
@@ -269,7 +299,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	{
 		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision =
 			std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
-			"VirtualToothCollision" + boost::to_string(i));
+				"VirtualToothCollision" + boost::to_string(i));
 		virtualToothCollision->setShape(*it);
 		virtualToothCollision->setLocalPose(RigidTransform3d::Identity());
 
@@ -307,6 +337,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization = std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
 	*meshShapeVisualization->getMesh() = SurgSim::Graphics::Mesh(*(meshShape->getMesh()));
 	meshShapeVisualization->setDrawAsWireFrame(true);
+	meshShapeVisualization->setVisible(false);
 
 	RigidRepresentationParameters params;
 	params.setShapeUsedForMassInertia(meshShape);
@@ -330,13 +361,27 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 
 template <typename Type>
 std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement,
-										  const std::string& name)
+		const std::string& name)
 {
 	std::shared_ptr<SurgSim::Framework::Component> component = sceneElement->getComponent(name);
 	SURGSIM_ASSERT(component != nullptr) << "Failed to get Component named '" << name << "'.";
 
 	std::shared_ptr<Type> result = std::dynamic_pointer_cast<Type>(component);
 	SURGSIM_ASSERT(result != nullptr) << "Failed to convert Component to requested type.";
+
+	return result;
+}
+
+std::shared_ptr<OsgViewElement> createViewElement()
+{
+	auto result = std::make_shared<OsgViewElement>("StaplingDemoView");
+	result->enableManipulator(true);
+	result->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
+	result->enableKeyboardDevice(true);
+
+	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
+	result->addComponent(light);
+	light->setDiffuseColor(Vector4d(0.8, 0.8, 0.0, 1.0));
 
 	return result;
 }
@@ -367,10 +412,7 @@ int main(int argc, char* argv[])
 	}
 	inputManager->addDevice(device);
 
-	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
-	view->enableManipulator(true);
-	view->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
-	view->enableKeyboardDevice(true);
+	std::shared_ptr<OsgViewElement> view = createViewElement();
 	inputManager->addDevice(view->getKeyboardDevice());
 
 	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
@@ -384,11 +426,16 @@ int main(int argc, char* argv[])
 	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
 	// Dynamic Optical Coherence Elastography", IEEE Transactions on Biomedical Engineering, Vol 57, No 4.
+
+	std::string textureFilename = runtime->getApplicationData()->findFile("Geometry/wound.png");
+
+	bool doPointCloud = false;
 	std::shared_ptr<SceneElement> wound =
 		createFemSceneElement("wound",
 							  woundFilename,
+							  textureFilename,
 							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
-							  true);										   // Display point cloud
+							  false);										   // Display point cloud
 	wound->setPose(armPose);
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
@@ -407,8 +454,12 @@ int main(int argc, char* argv[])
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, arm->getComponent("ArmOsgMesh"));
 	keyboardBehavior->registerKey(
 		SurgSim::Device::KeyCode::KEY_E, wound->getComponent("wound triangle mesh"));
-	keyboardBehavior->registerKey(
-		SurgSim::Device::KeyCode::KEY_F, wound->getComponent("wound point cloud"));
+
+	if (doPointCloud)
+	{
+		keyboardBehavior->registerKey(
+			SurgSim::Device::KeyCode::KEY_F, wound->getComponent("wound point cloud"));
+	}
 
 	std::shared_ptr<SceneElement> keyboard = std::make_shared<BasicSceneElement>("SceneElement");
 	keyboard->addComponent(keyboardComponent);
