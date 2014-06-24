@@ -54,6 +54,7 @@ using SurgSim::Framework::Logger;
 using SurgSim::Graphics::OsgTextureUniform;
 using SurgSim::Graphics::OsgTexture2d;
 using SurgSim::Graphics::OsgUniform;
+using SurgSim::Graphics::createMaterialWithShaders;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -76,53 +77,6 @@ namespace
 {
 
 std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> materials;
-
-std::shared_ptr<SurgSim::Graphics::OsgMaterial> loadMaterial(
-	const SurgSim::Framework::ApplicationData& data,
-	const std::string& name)
-{
-	std::string vertexShaderName = name + ".vert";
-	std::string fragmentShaderName = name + ".frag";
-
-	std::string filename;
-
-	auto shader(std::make_shared<SurgSim::Graphics::OsgShader>());
-	bool success = true;
-	filename = data.findFile(vertexShaderName);
-	if (filename == "")
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Could not find vertex shader " << vertexShaderName;
-		success = false;
-	}
-	else if (! shader->loadVertexShaderSource(filename))
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Could not load vertex shader " << vertexShaderName;
-		success = false;
-	}
-
-
-	filename = data.findFile(fragmentShaderName);
-	if (filename == "")
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Could not find fragment shader " << fragmentShaderName;
-		success = false;
-	}
-	if (! shader->loadFragmentShaderSource(filename))
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Could not load fragment shader " << fragmentShaderName;
-		success = false;
-	}
-
-	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material;
-	if (success)
-	{
-		material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
-		material->setShader(shader);
-	}
-
-	return material;
-
-}
 
 std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
 {
@@ -481,13 +435,13 @@ int main(int argc, char* argv[])
 	auto runtime(std::make_shared<SurgSim::Framework::Runtime>("config.txt"));
 	auto data = runtime->getApplicationData();
 
-	materials["basicLit"] = loadMaterial(*data, "Shaders/basic_lit");
-	materials["basicUnlit"] = loadMaterial(*data, "Shaders/basic_unlit");
-	materials["basicShadowed"] = loadMaterial(*data, "Shaders/s_mapping");
-	materials["texturedShadowed"] = loadMaterial(*data, "Shaders/ds_mapping_material");
-	materials["shiny"] = loadMaterial(*data, "Shaders/material");
-	materials["depthMap"] = loadMaterial(*data, "Shaders/depth_map");
-	materials["shadowMap"] = loadMaterial(*data, "Shaders/shadow_map");
+	materials["basicLit"] = createMaterialWithShaders(*data, "Shaders/basic_lit");
+	materials["basicUnlit"] = createMaterialWithShaders(*data, "Shaders/basic_unlit");
+	materials["basicShadowed"] = createMaterialWithShaders(*data, "Shaders/s_mapping");
+	materials["texturedShadowed"] = createMaterialWithShaders(*data, "Shaders/ds_mapping_material");
+	materials["shiny"] = createMaterialWithShaders(*data, "Shaders/material");
+	materials["depthMap"] = createMaterialWithShaders(*data, "Shaders/depth_map");
+	materials["shadowMap"] = createMaterialWithShaders(*data, "Shaders/shadow_map");
 	materials["default"] = materials["basic_lit"];
 
 	runtime->addManager(std::make_shared<SurgSim::Graphics::OsgManager>());
