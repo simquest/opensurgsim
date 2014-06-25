@@ -56,8 +56,11 @@ std::shared_ptr<PhysicsManagerState>
 		auto const constraints = result->getConstraintGroup(constraintGroupType);
 		for (auto it = constraints.begin(); it != constraints.end(); it++)
 		{
-			numAtomicConstraint += (*it)->getNumDof();
-			numConstraint++;
+			if ((*it)->isActive())
+			{
+				numAtomicConstraint += (*it)->getNumDof();
+				numConstraint++;
+			}
 		}
 	}
 
@@ -66,7 +69,10 @@ std::shared_ptr<PhysicsManagerState>
 		it != result->getRepresentations().end();
 		it++)
 	{
-		numDof += (*it)->getNumDof();
+		if ((*it)->isActive())
+		{
+			numDof += (*it)->getNumDof();
+		}
 	}
 
 	// Resize the Mlcp problem
@@ -98,6 +104,11 @@ std::shared_ptr<PhysicsManagerState>
 		auto const constraints = result->getConstraintGroup(constraintGroupType);
 		for (auto it = constraints.begin(); it != constraints.end(); it++)
 		{
+			if (!(*it)->isActive())
+			{
+				continue;
+			}
+
 			ptrdiff_t indexConstraint = result->getConstraintsMapping().getValue((*it).get());
 			SURGSIM_ASSERT(indexConstraint >= 0) << "Index for constraint is invalid: " << indexConstraint << std::endl;
 
