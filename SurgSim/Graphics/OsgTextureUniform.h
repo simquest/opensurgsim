@@ -42,7 +42,7 @@ public:
 	size_t getMinimumTextureUnit() const;
 
 	/// Sets the value of the uniform
-	/// \note using this directly might make the state of the uniform incosisten with
+	/// \note using this directly might make the state of the uniform incosistent with
 	///       the texture that was used to create this uniform
 	virtual void set(const std::shared_ptr<T>& value);
 
@@ -60,9 +60,11 @@ public:
 private:
 	/// Texture
 	std::shared_ptr<T> m_texture;
+
 	/// Texture unit
 	size_t m_unit;
 
+	/// The smallest unit to be used
 	size_t m_minimumTextureUnit;
 };
 

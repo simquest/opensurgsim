@@ -347,7 +347,7 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 
 	auto sphere = std::make_shared<SimpleSphere>("Shiny Sphere");
 	sphere->setRadius(0.25);
-	//sphere->setMaterial(materials["shiny"]);
+	sphere->setMaterial(materials["shiny"]);
 
 	scene->addSceneElement(sphere);
 
