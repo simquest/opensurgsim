@@ -15,8 +15,6 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
@@ -34,14 +32,10 @@ using SurgSim::DataStructures::PlyReader;
 TEST(Fem1DRepresentationReaderTests, DelegateTest)
 {
 	auto femRepresentation = std::make_shared<Fem1DRepresentation>("Representation");
-	const SurgSim::Framework::ApplicationData data("config.txt");
-	std::string path = data.findFile("PlyReaderTests/Fem1D.ply");
-	ASSERT_TRUE(!path.empty());
-	PlyReader reader(path);
-	auto delegate = std::make_shared<Fem1DRepresentationPlyReaderDelegate>(femRepresentation);
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
-	ASSERT_TRUE(reader.setDelegate(delegate));
-	ASSERT_NO_THROW(reader.parseFile());
+	femRepresentation->setFilename("PlyReaderTests/Fem1D.ply");
+	ASSERT_TRUE(femRepresentation->initialize(runtime));
 
 	// Vertices
 	ASSERT_EQ(6u, femRepresentation->getNumDofPerNode());

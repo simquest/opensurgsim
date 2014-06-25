@@ -13,10 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/LinearSolveAndInverse.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/Fem1DRepresentationPlyReaderDelegate.h"
 
 namespace
 {
@@ -87,8 +90,25 @@ void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 
 bool Fem1DRepresentation::doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader)
 {
-	return false;
+	auto thisAsSharedPtr = std::static_pointer_cast<Fem1DRepresentation>(getSharedPtr());
+	auto readerDelegate = std::make_shared<Fem1DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
+
+	bool result = true;
+	if (reader->setDelegate(readerDelegate))
+	{
+		// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
+		reader->parseFile();
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"File " << m_filename << " is not an acceptable PLY.";
+		result = false;
+	}
+
+	return result;
 }
+
 } // namespace Physics
 
 } // namespace SurgSim
