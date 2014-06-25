@@ -243,12 +243,12 @@ int main(int argc, char** argv)
 	analogInputsSingleEnded[singleEndedAnalog] = SurgSim::Device::LabJackAnalogInputRange::LABJACKANALOGINPUTRANGE_10;
 	toolDevice->setAnalogInputsSingleEnded(analogInputsSingleEnded);
 
-	std::unordered_map<int, std::pair<int, SurgSim::Device::LabJackAnalogInputRange>> analogInputsDifferential;
+	std::unordered_map<int, SurgSim::Device::LabJackAnalogInputsDifferentialData> analogInputsDifferential;
 	const int positiveAnalogDifferential = 2;
 	const int negativeAnalogDifferential = 3;
-	analogInputsDifferential[positiveAnalogDifferential] =
-		std::pair<int, SurgSim::Device::LabJackAnalogInputRange>(negativeAnalogDifferential,
-		SurgSim::Device::LabJackAnalogInputRange::LABJACKANALOGINPUTRANGE_10);
+	const SurgSim::Device::LabJackAnalogInputsDifferentialData data = {negativeAnalogDifferential,
+		SurgSim::Device::LabJackAnalogInputRange::LABJACKANALOGINPUTRANGE_10};
+	analogInputsDifferential[positiveAnalogDifferential] = data;
 	toolDevice->setAnalogInputsDifferential(analogInputsDifferential);
 
 	std::unordered_set<int> analogOutputs;

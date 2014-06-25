@@ -190,15 +190,14 @@ double LabJackDevice::getMaximumUpdateRate() const
 }
 
 void LabJackDevice::setAnalogInputsDifferential(std::unordered_map<int,
-	std::pair<int, LabJackAnalogInputRange>> analogInputs)
+	LabJackAnalogInputsDifferentialData> analogInputs)
 {
 	SURGSIM_ASSERT(!isInitialized()) <<
 		"Differential analog inputs cannot be set for a LabJackDevice after it is initialized.";
 	m_analogInputsDifferential = analogInputs;
 }
 
-const std::unordered_map<int, std::pair<int, LabJackAnalogInputRange>>&
-	LabJackDevice::getAnalogInputsDifferential() const
+const std::unordered_map<int, LabJackAnalogInputsDifferentialData>& LabJackDevice::getAnalogInputsDifferential() const
 {
 	return m_analogInputsDifferential;
 }

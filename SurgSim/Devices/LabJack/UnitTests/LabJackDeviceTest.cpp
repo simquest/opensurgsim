@@ -241,9 +241,10 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	EXPECT_NO_THROW(device->setMaximumUpdateRate(rate));
 	EXPECT_NEAR(rate, device->getMaximumUpdateRate(), 1e-9);
 
-	std::unordered_map<int, std::pair<int, SurgSim::Device::LabJackAnalogInputRange>> analogInputsDifferential;
-	analogInputsDifferential[2] = std::pair<int, SurgSim::Device::LabJackAnalogInputRange>(1,
-		SurgSim::Device::LabJackAnalogInputRange::LABJACKANALOGINPUTRANGE_10);
+	std::unordered_map<int, SurgSim::Device::LabJackAnalogInputsDifferentialData> analogInputsDifferential;
+	const SurgSim::Device::LabJackAnalogInputsDifferentialData data = {1,
+		SurgSim::Device::LabJackAnalogInputRange::LABJACKANALOGINPUTRANGE_10};
+	analogInputsDifferential[2] = data;
 	EXPECT_NO_THROW(device->setAnalogInputsDifferential(analogInputsDifferential));
 	EXPECT_EQ(analogInputsDifferential, device->getAnalogInputsDifferential());
 
@@ -306,9 +307,10 @@ TEST(LabJackDeviceTest, NoSettingAfterInitialization)
 	const double rate = 300.0;
 	EXPECT_THROW(device->setMaximumUpdateRate(rate), SurgSim::Framework::AssertionFailure);
 
-	std::unordered_map<int, std::pair<int, SurgSim::Device::LabJackAnalogInputRange>> analogInputsDifferential;
-	analogInputsDifferential[2] = std::pair<int, SurgSim::Device::LabJackAnalogInputRange>(1,
-		SurgSim::Device::LabJackAnalogInputRange::LABJACKANALOGINPUTRANGE_10);
+	std::unordered_map<int, SurgSim::Device::LabJackAnalogInputsDifferentialData> analogInputsDifferential;
+	const SurgSim::Device::LabJackAnalogInputsDifferentialData data = {1,
+		SurgSim::Device::LabJackAnalogInputRange::LABJACKANALOGINPUTRANGE_10};
+	analogInputsDifferential[2] = data;
 	EXPECT_THROW(device->setAnalogInputsDifferential(analogInputsDifferential), SurgSim::Framework::AssertionFailure);
 
 	std::unordered_map<int, SurgSim::Device::LabJackAnalogInputRange> analogInputsSingleEnded;

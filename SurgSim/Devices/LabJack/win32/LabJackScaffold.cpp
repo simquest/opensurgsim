@@ -206,7 +206,7 @@ public:
 	/// The timer channels set for timer outputs (e.g., PWM outputs).
 	const std::unordered_set<int> timerOutputChannels;
 	/// The differential analog inputs.
-	const std::unordered_map<int, std::pair<int, LabJackAnalogInputRange>> analogInputsDifferential;
+	const std::unordered_map<int, LabJackAnalogInputsDifferentialData> analogInputsDifferential;
 	/// The single-ended analog inputs.
 	const std::unordered_map<int, LabJackAnalogInputRange> analogInputsSingleEnded;
 	/// The channels set for analog outputs.
@@ -655,10 +655,11 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	auto const& analogInputsDifferential = info->analogInputsDifferential;
 	for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
 	{
-		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_AIN_DIFF, input->first, 0, input->second.first, 0);
+		const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_AIN_DIFF, input->first, 0, input->second.negativeChannel,
+			0);
 		SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
 			"Failed to request differential analog input for a device named '" << info->deviceObject->getName() <<
-			"', positive channel " << input->first << ", negative channel " << input->second.first << "." <<
+			"', positive channel " << input->first << ", negative channel " << input->second.negativeChannel << "." <<
 			std::endl << formatErrorMessage(error);
 	}
 
@@ -750,7 +751,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			{
 				SURGSIM_LOG_WARNING(m_logger) << "Failed to get differential analog input for a device named '" <<
 					info->deviceObject->getName() << "', positive channel " << input->first << ", negative channel " <<
-					input->second.first << "." << std::endl << formatErrorMessage(error);
+					input->second.negativeChannel << "." << std::endl << formatErrorMessage(error);
 				inputData.scalars().reset(info->analogInputDifferentialIndices[input->first]);
 			}
 		}
@@ -827,14 +828,13 @@ std::shared_ptr<LabJackScaffold> LabJackScaffold::getOrCreateSharedInstance()
 
 bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 {
-	LabJackDevice* device = deviceData->deviceObject;
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
 	// Reset the configuration.
 	LJ_ERROR error = ePut(rawHandle, LJ_ioPIN_CONFIGURATION_RESET, 0, 0, 0);
 	bool result = isOk(error);
 	SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
-		"Failed to reset configuration for a device named '" << device->getName() << "." <<
+		"Failed to reset configuration for a device named '" << deviceData->deviceObject->getName() << "." <<
 		std::endl << formatErrorMessage(error);
 
 	return result && configureClockAndTimers(deviceData) && configureDigital(deviceData) && configureAnalog(deviceData);
@@ -966,8 +966,8 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 	if ((analogInputsDifferential.size() > 0) || (analogInputsSingleEnded.size() > 0))
 	{
 		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chAIN_RESOLUTION, device->getAnalogInputResolution(), 0);
-		result = isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+		result = result && isOk(error);
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 			"Failed to configure analog input resolution for a device named '" << device->getName() <<
 			"', with resolution code " << device->getAnalogInputResolution() << "." << std::endl <<
 			formatErrorMessage(error);
@@ -979,39 +979,36 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 			"', with settling time code " << device->getAnalogInputSettling() << "." << std::endl <<
 			formatErrorMessage(error);
 
-		if (result)
+		for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
 		{
-			for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
-			{
-				error = ePut(rawHandle, LJ_ioPUT_ANALOG_ENABLE_BIT, input->first, 1, 0);
-				result = result && isOk(error);
-				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
-					"Failed to enable analog input for a device named '" << device->getName() <<
-					"', channel " << input->first << "." << std::endl << formatErrorMessage(error);
+			error = ePut(rawHandle, LJ_ioPUT_ANALOG_ENABLE_BIT, input->first, 1, 0);
+			result = result && isOk(error);
+			SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+				"Failed to enable analog input for a device named '" << device->getName() <<
+				"', channel " << input->first << "." << std::endl << formatErrorMessage(error);
 
-				error = ePut(rawHandle, LJ_ioPUT_AIN_RANGE, input->first, input->second.second, 0);
-				result = result && isOk(error);
-				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
-					"Failed to set the range for an analog input for a device named '" << device->getName() <<
-					"', channel " << input->first << ", with range code " << input->second.second << "." <<
-					std::endl << formatErrorMessage(error);
-			}
+			error = ePut(rawHandle, LJ_ioPUT_AIN_RANGE, input->first, input->second.range, 0);
+			result = result && isOk(error);
+			SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+				"Failed to set the range for an analog input for a device named '" << device->getName() <<
+				"', channel " << input->first << ", with range code " << input->second.range << "." <<
+				std::endl << formatErrorMessage(error);
+		}
 
-			for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
-			{
-				error = ePut(rawHandle, LJ_ioPUT_ANALOG_ENABLE_BIT, input->first, 1, 0);
-				result = result && isOk(error);
-				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
-					"Failed to enable analog input for a device named '" << device->getName() <<
-					"', channel " << input->first << "." << std::endl << formatErrorMessage(error);
+		for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
+		{
+			error = ePut(rawHandle, LJ_ioPUT_ANALOG_ENABLE_BIT, input->first, 1, 0);
+			result = result && isOk(error);
+			SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+				"Failed to enable analog input for a device named '" << device->getName() <<
+				"', channel " << input->first << "." << std::endl << formatErrorMessage(error);
 
-				error = ePut(rawHandle, LJ_ioPUT_AIN_RANGE, input->first, input->second, 0);
-				result = result && isOk(error);
-				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
-					"Failed to set the range for an analog input for a device named '" << device->getName() <<
-					"', channel " << input->first << ", with range code " << input->second << "." <<
-					std::endl << formatErrorMessage(error);
-			}
+			error = ePut(rawHandle, LJ_ioPUT_AIN_RANGE, input->first, input->second, 0);
+			result = result && isOk(error);
+			SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+				"Failed to set the range for an analog input for a device named '" << device->getName() <<
+				"', channel " << input->first << ", with range code " << input->second << "." <<
+				std::endl << formatErrorMessage(error);
 		}
 	}
 

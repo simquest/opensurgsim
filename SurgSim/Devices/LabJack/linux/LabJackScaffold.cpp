@@ -96,6 +96,9 @@ struct LabJackParameters
 	std::unordered_map<LabJackType, int, std::hash<int>> calibrationReadBytes;
 };
 
+/// Convert the LabJackAnalogInputRange to the gain code expected by the low level driver.
+/// \param range The LabJackAnalogInputRange.
+/// \return The gain code.
 int getGain(LabJackAnalogInputRange range)
 {
 	int gain;
@@ -289,7 +292,7 @@ public:
 	/// The timer channels set for timer outputs (e.g., PWM outputs).
 	const std::unordered_set<int> timerOutputChannels;
 	/// The differential analog inputs.
-	const std::unordered_map<int, std::pair<int, LabJackAnalogInputRange>> analogInputsDifferential;
+	const std::unordered_map<int, LabJackAnalogInputsDifferentialData> analogInputsDifferential;
 	/// The single-ended analog inputs.
 	const std::unordered_map<int, LabJackAnalogInputRange> analogInputsSingleEnded;
 	/// The channels set for analog outputs.
@@ -750,15 +753,16 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		{
 			sendBytes.at(sendBytesSize++) = 1;
 			sendBytes.at(sendBytesSize++) = input->first;
-			sendBytes.at(sendBytesSize++) = input->second.first;
+			sendBytes.at(sendBytesSize++) = input->second.negativeChannel;
 			readBytesSize += 2;
 		}
 		else
 		{
+			const BYTE differential = 1 << 7;
 			sendBytes.at(sendBytesSize++) = 3;
 			sendBytes.at(sendBytesSize++) = input->first;
-			sendBytes.at(sendBytesSize++) = device->getAnalogInputResolution() + getGain(input->second.second) * 16;
-			sendBytes.at(sendBytesSize++) = device->getAnalogInputSettling() + 128;
+			sendBytes.at(sendBytesSize++) = device->getAnalogInputResolution() | (getGain(input->second.range) << 4);
+			sendBytes.at(sendBytesSize++) = device->getAnalogInputSettling() | differential;
 			readBytesSize += 5;
 		}
 	}
@@ -1494,14 +1498,14 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 		auto const& analogInputs = device->getAnalogInputsDifferential();
 		for (auto input = analogInputs.cbegin(); input != analogInputs.cend(); ++input)
 		{
-			if (input->second.first != input->first + 1)
+			if (input->second.negativeChannel != input->first + 1)
 			{
 				SURGSIM_LOG_SEVERE(m_logger) <<
 					"Failed to configure a differential analog input for a device named '" <<
 					device->getName() << "'. For a model U6(-PRO), with the low-level driver, "<<
 					"the negative channel number must be one greater than the positive channel number, " <<
 					"but positive channel " << input->first << " is paired with negative channel " <<
-					input->second.first << ".";
+					input->second.negativeChannel << ".";
 				result = false;
 			}
 		}
