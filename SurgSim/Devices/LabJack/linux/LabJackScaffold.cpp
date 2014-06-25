@@ -699,9 +699,10 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			double value;
 			if (outputData.scalars().get(index, &value))
 			{
-				const BYTE valueAsByte = value + 0.5; // value is non-negative. The conversion will truncate.
+				const BYTE valueAsByte = static_cast<BYTE>(value + 0.5); // value is >=0. Conversion will truncate.
 				sendBytes.at(sendBytesSize++) = 11;  //IOType, BitStateWrite
-				sendBytes.at(sendBytesSize++) = (*output) + 128 * valueAsByte;  //Bits 0-4: IO Number, Bit 7: State
+				sendBytes.at(sendBytesSize++) = (*output) | ((valueAsByte & 0xF) << 7);  //Bits 0-4: IO Number,
+																						//Bit 7: State
 			}
 		}
 	}
@@ -781,7 +782,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		{
 			sendBytes.at(sendBytesSize++) = 3;
 			sendBytes.at(sendBytesSize++) = input->first;
-			sendBytes.at(sendBytesSize++) = device->getAnalogInputResolution() + getGain(input->second) * 16;
+			sendBytes.at(sendBytesSize++) = device->getAnalogInputResolution() | (getGain(input->second) << 4);
 			sendBytes.at(sendBytesSize++) = device->getAnalogInputSettling();
 			readBytesSize += 5;
 		}
@@ -1262,7 +1263,8 @@ bool LabJackScaffold::configureClock(DeviceData* deviceData)
 	sendBytes[7] = 0;  //Reserved
 
 	//TimerClockConfig : Configuring the clock (bit 7) and setting the TimerClockBase (bits 0-2)
-	sendBytes[8] = timerBase + 128;
+	const BYTE configureClockCode = 1 << 7;
+	sendBytes[8] = timerBase | configureClockCode;
 	sendBytes[9] = divisor;  //TimerClockDivisor
 
 	int sendBytesSize = 10; // ConfigTimerClock sends 10 bytes
@@ -1634,8 +1636,10 @@ bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 		}
 		for (auto output = digitalOutputChannels.cbegin(); output != digitalOutputChannels.cend(); ++output)
 		{
+			const BYTE direction = 1 << 7;
 			sendBytes.at(sendBytesSize++) = 13;  //IOType, BitDirWrite
-			sendBytes.at(sendBytesSize++) = *output + 128;  //Bits 0-4: IO Number, Bit 7: Direction (1=output, 0=input)
+			sendBytes.at(sendBytesSize++) = *output | direction;  //Bits 0-4: IO Number,
+																	// Bit 7: Direction (1=output, 0=input)
 		}
 
 		// Write the digital input/output Feedback command.
