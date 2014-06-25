@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
+
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
-
-#include "SurgSim/Graphics/GraphicsMeshPlyReaderDelegate.h"
 
 using SurgSim::DataStructures::PlyReader;
 
@@ -25,7 +25,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-GraphicsMeshPlyReaderDelegate::GraphicsMeshPlyReaderDelegate() :
+MeshPlyReaderDelegate::MeshPlyReaderDelegate() :
 	m_mesh(std::make_shared<MeshType>()),
 	m_hasNormals(false)
 {
@@ -33,20 +33,20 @@ GraphicsMeshPlyReaderDelegate::GraphicsMeshPlyReaderDelegate() :
 }
 
 
-GraphicsMeshPlyReaderDelegate::GraphicsMeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh) :
+MeshPlyReaderDelegate::MeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh) :
 	m_mesh(mesh)
 {
 	SURGSIM_ASSERT(mesh != nullptr) << "The mesh cannot be null.";
 	mesh->clear();
 }
 
-bool GraphicsMeshPlyReaderDelegate::registerDelegate(SurgSim::DataStructures::PlyReader* reader)
+bool MeshPlyReaderDelegate::registerDelegate(SurgSim::DataStructures::PlyReader* reader)
 {
 	// Vertex processing
-	reader->requestElement("vertex",
-						   std::bind(&GraphicsMeshPlyReaderDelegate::beginVertices, this, std::placeholders::_1, std::placeholders::_2),
-						   std::bind(&GraphicsMeshPlyReaderDelegate::processVertex, this, std::placeholders::_1),
-						   std::bind(&GraphicsMeshPlyReaderDelegate::endVertices, this, std::placeholders::_1));
+	reader->requestElement("vertex", std::bind(&MeshPlyReaderDelegate::beginVertices, this,
+						   std::placeholders::_1, std::placeholders::_2),
+						   std::bind(&MeshPlyReaderDelegate::processVertex, this, std::placeholders::_1),
+						   std::bind(&MeshPlyReaderDelegate::endVertices, this, std::placeholders::_1));
 	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(VertexData, x));
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(VertexData, y));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(VertexData, z));
@@ -61,10 +61,10 @@ bool GraphicsMeshPlyReaderDelegate::registerDelegate(SurgSim::DataStructures::Pl
 	}
 
 	// Face Processing
-	reader->requestElement("face",
-						   std::bind(&GraphicsMeshPlyReaderDelegate::beginFaces, this, std::placeholders::_1, std::placeholders::_2),
-						   std::bind(&GraphicsMeshPlyReaderDelegate::processFace, this, std::placeholders::_1),
-						   std::bind(&GraphicsMeshPlyReaderDelegate::endFaces, this, std::placeholders::_1));
+	reader->requestElement("face", std::bind(&MeshPlyReaderDelegate::beginFaces,
+						   this, std::placeholders::_1, std::placeholders::_2),
+						   std::bind(&MeshPlyReaderDelegate::processFace, this, std::placeholders::_1),
+						   std::bind(&MeshPlyReaderDelegate::endFaces, this, std::placeholders::_1));
 	reader->requestListProperty("face", "vertex_indices",
 								PlyReader::TYPE_UNSIGNED_INT,
 								offsetof(FaceData, indices),
@@ -74,7 +74,7 @@ bool GraphicsMeshPlyReaderDelegate::registerDelegate(SurgSim::DataStructures::Pl
 	return true;
 }
 
-bool GraphicsMeshPlyReaderDelegate::fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader)
+bool MeshPlyReaderDelegate::fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader)
 {
 	bool result = true;
 
@@ -88,21 +88,21 @@ bool GraphicsMeshPlyReaderDelegate::fileIsAcceptable(const SurgSim::DataStructur
 	return result;
 }
 
-std::shared_ptr<GraphicsMeshPlyReaderDelegate::MeshType> GraphicsMeshPlyReaderDelegate::getMesh()
+std::shared_ptr<MeshPlyReaderDelegate::MeshType> MeshPlyReaderDelegate::getMesh()
 {
 	return m_mesh;
 }
 
 
 
-void* GraphicsMeshPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
+void* MeshPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
 {
 	m_vertexData.overrun1 = 0l;
 	m_vertexData.overrun2 = 0l;
 	return &m_vertexData;
 }
 
-void GraphicsMeshPlyReaderDelegate::processVertex(const std::string& elementName)
+void MeshPlyReaderDelegate::processVertex(const std::string& elementName)
 {
 	MeshType::VertexType vertex(SurgSim::Math::Vector3d(m_vertexData.x, m_vertexData.y, m_vertexData.z));
 
@@ -114,20 +114,20 @@ void GraphicsMeshPlyReaderDelegate::processVertex(const std::string& elementName
 	m_mesh->addVertex(vertex);
 }
 
-void GraphicsMeshPlyReaderDelegate::endVertices(const std::string& elementName)
+void MeshPlyReaderDelegate::endVertices(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_vertexData.overrun1 == 0 && m_vertexData.overrun2 == 0) <<
 			"There was an overrun while reading the vertex structures, it is likely that data " <<
 			"has become corrupted.";
 }
 
-void* GraphicsMeshPlyReaderDelegate::beginFaces(const std::string& elementName, size_t faceCount)
+void* MeshPlyReaderDelegate::beginFaces(const std::string& elementName, size_t faceCount)
 {
 	m_faceData.overrun = 0l;
 	return &m_faceData;
 }
 
-void GraphicsMeshPlyReaderDelegate::processFace(const std::string& elementName)
+void MeshPlyReaderDelegate::processFace(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_faceData.edgeCount == 3) << "Can only process triangle meshes.";
 	std::copy(m_faceData.indices, m_faceData.indices + 3, m_indices.begin());
@@ -136,7 +136,7 @@ void GraphicsMeshPlyReaderDelegate::processFace(const std::string& elementName)
 	m_mesh->addTriangle(triangle);
 }
 
-void GraphicsMeshPlyReaderDelegate::endFaces(const std::string& elementName)
+void MeshPlyReaderDelegate::endFaces(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_faceData.overrun == 0)
 			<< "There was an overrun while reading the face structures, it is likely that data "

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_GRAPHICSMESHPLYREADERDELEGATE_H
-#define SURGSIM_GRAPHICS_GRAPHICSMESHPLYREADERDELEGATE_H
+#ifndef SURGSIM_GRAPHICS_MESHPLYREADERDELEGATE_H
+#define SURGSIM_GRAPHICS_MESHPLYREADERDELEGATE_H
 
 #include <array>
 #include <memory>
@@ -28,8 +28,8 @@ namespace SurgSim
 namespace Graphics
 {
 
-/// Implementation of PlyReaderDelegate for simple triangle meshes
-class GraphicsMeshPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
+/// Implementation of PlyReaderDelegate for graphicsmeshes
+class MeshPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
 
@@ -37,11 +37,11 @@ public:
 	typedef SurgSim::Graphics::Mesh MeshType;
 
 	/// Default constructor.
-	GraphicsMeshPlyReaderDelegate();
+	MeshPlyReaderDelegate();
 
 	/// Constructor.
 	/// \param mesh The mesh to be used, it will be cleared by the constructor.
-	explicit GraphicsMeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh);
+	explicit MeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh);
 
 	/// Gets the mesh.
 	/// \return The mesh.

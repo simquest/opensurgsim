@@ -61,7 +61,7 @@
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
-#include "SurgSim/Graphics/GraphicsMeshPlyReaderDelegate.h"
+#include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgLight.h"
 
@@ -124,7 +124,7 @@ static std::shared_ptr<SurgSim::Graphics::Mesh> loadGraphicsMesh(const std::stri
 {
 	// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
 	SurgSim::DataStructures::PlyReader reader(fileName);
-	auto delegate = std::make_shared<SurgSim::Graphics::GraphicsMeshPlyReaderDelegate>();
+	auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
 	SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
 	reader.parseFile();
 

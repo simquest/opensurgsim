@@ -22,10 +22,10 @@ include_directories(
 
 set(SURGSIM_GRAPHICS_SOURCES
 	Camera.cpp
-	GraphicsMeshPlyReaderDelegate.cpp
 	Group.cpp
 	Manager.cpp
 	Mesh.cpp
+	MeshPlyReaderDelegate.cpp
 	OsgAxesRepresentation.cpp
 	OsgBoxRepresentation.cpp
 	OsgCamera.cpp
@@ -70,13 +70,13 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Camera.h
 	CapsuleRepresentation.h
 	CylinderRepresentation.h
-	GraphicsMeshPlyReaderDelegate.h
 	Group.h
 	Light.h
 	Manager.h
 	Material.h
 	Mesh.h
 	Mesh-inl.h
+	MeshPlyReaderDelegate.h
 	MeshRepresentation.h
 	OctreeRepresentation.h
 	OsgAxesRepresentation.h

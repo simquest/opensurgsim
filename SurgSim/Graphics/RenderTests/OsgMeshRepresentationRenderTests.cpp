@@ -18,9 +18,11 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
@@ -34,9 +36,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Testing/MathUtilities.h"
 #include "SurgSim/Testing/TestCube.h"
+
 #include <string>
-#include "../GraphicsMeshPlyReaderDelegate.h"
-#include "../../DataStructures/PlyReader.h"
 
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
@@ -72,7 +73,7 @@ protected:
 	{
 		// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
 		SurgSim::DataStructures::PlyReader reader(fileName);
-		auto delegate = std::make_shared<SurgSim::Graphics::GraphicsMeshPlyReaderDelegate>();
+		auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
 		SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
 		reader.parseFile();
 
@@ -214,10 +215,14 @@ TEST_F(OsgMeshRepresentationRenderTests, DeformableMeshRenderTest)
 	sceneElement->addComponent(graphics);
 
 	scene->addSceneElement(sceneElement);
+	viewElement->setPose(SurgSim::Math::makeRigidTransform(
+							 Vector3d(-0.1, 0.1, -0.1),
+							 Vector3d(0.0, 0.0, 0.0),
+							 Vector3d(0.0, 0.0, 1.0)));
 
-	viewElement->enableManipulator(true);
-
-	runtime->execute();
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+	runtime->stop();
 
 }
 
