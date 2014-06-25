@@ -38,12 +38,15 @@ set(LABJACK_DEVICE_HEADERS
 )
 
 set(LABJACK_DEVICE_LINUX_SOURCES
-	linux/LabJackHelpers.cpp
+	linux/LabJackChecksums.cpp
 	linux/LabJackScaffold.cpp
+	linux/LabJackTypeConverters.cpp
 )
 
 set(LABJACK_DEVICE_LINUX_HEADERS
-	linux/LabJackHelpers.h
+	linux/LabJackChecksums.h
+	linux/LabJackConstants.h
+	linux/LabJackTypeConverters.h
 )
 
 set(LABJACK_DEVICE_WIN_SOURCES

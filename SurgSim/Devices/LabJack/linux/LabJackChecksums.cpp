@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/LabJack/linux/LabJackHelpers.h"
+#include "SurgSim/Devices/LabJack/linux/LabJackChecksums.h"
 
 namespace SurgSim
 {
 namespace Device
 {
-namespace LabJackHelpers
+namespace LabJack
 {
 
-unsigned char normalChecksum8(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes, int count)
+unsigned char normalChecksum8(const std::array<unsigned char, MAXIMUM_BUFFER>& bytes, int count)
 {
 	uint16_t accumulator = 0;
 
@@ -41,7 +41,7 @@ unsigned char normalChecksum8(const std::array<unsigned char, LABJACK_MAXIMUM_BU
 	return static_cast<unsigned char>((accumulator - 256 * quotient) + quotient);
 }
 
-uint16_t extendedChecksum16(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes, int count)
+uint16_t extendedChecksum16(const std::array<unsigned char, MAXIMUM_BUFFER>& bytes, int count)
 {
 	uint16_t accumulator = 0;
 
@@ -54,17 +54,17 @@ uint16_t extendedChecksum16(const std::array<unsigned char, LABJACK_MAXIMUM_BUFF
 	return accumulator;
 }
 
-unsigned char extendedChecksum8(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes)
+unsigned char extendedChecksum8(const std::array<unsigned char, MAXIMUM_BUFFER>& bytes)
 {
 	return normalChecksum8(bytes, 6);
 }
 
-void normalChecksum(std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>* bytes, int count)
+void normalChecksum(std::array<unsigned char, MAXIMUM_BUFFER>* bytes, int count)
 {
 	(*bytes)[0] = normalChecksum8(*bytes, count);
 }
 
-void extendedChecksum(std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>* bytes, int count)
+void extendedChecksum(std::array<unsigned char, MAXIMUM_BUFFER>* bytes, int count)
 {
 	uint16_t accumulator = extendedChecksum16(*bytes, count);
 	(*bytes)[4] = static_cast<unsigned char>(accumulator & 0xff);
@@ -72,21 +72,6 @@ void extendedChecksum(std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>* bytes, 
 	(*bytes)[0] = extendedChecksum8(*bytes);
 }
 
-double doubleFromChars(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes, int startIndex)
-{
-	uint32_t decimal = static_cast<uint32_t>(bytes.at(startIndex)) |
-		(static_cast<uint32_t>(bytes.at(startIndex + 1)) << 8) |
-		(static_cast<uint32_t>(bytes.at(startIndex + 2)) << 16) |
-		(static_cast<uint32_t>(bytes.at(startIndex + 3)) << 24);
-
-	uint32_t whole = static_cast<uint32_t>(bytes[startIndex + 4]) |
-		(static_cast<uint32_t>(bytes.at(startIndex + 5)) << 8) |
-		(static_cast<uint32_t>(bytes.at(startIndex + 6)) << 16) |
-		(static_cast<uint32_t>(bytes.at(startIndex + 7)) << 24);
-
-	return static_cast<double>(static_cast<int>(whole)) + static_cast<double>(decimal)/4294967296.0;
-}
-
-};  // namespace LabJackHelpers
+};  // namespace LabJack
 };  // namespace Device
 };  // namespace SurgSim

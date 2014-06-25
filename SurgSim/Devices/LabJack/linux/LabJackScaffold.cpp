@@ -32,7 +32,9 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/LabJack/LabJackDevice.h"
 #include "SurgSim/Devices/LabJack/LabJackThread.h"
-#include "SurgSim/Devices/LabJack/linux/LabJackHelpers.h"
+#include "SurgSim/Devices/LabJack/linux/LabJackChecksums.h"
+#include "SurgSim/Devices/LabJack/linux/LabJackConstants.h"
+#include "SurgSim/Devices/LabJack/linux/LabJackTypeConverters.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
 
@@ -121,6 +123,61 @@ int getGain(LabJackAnalogInputRange range)
 	}
 	return gain;
 }
+
+/// Read from the LabJack and do most of the checksum tests.  This function does not test readBytes[2] because its
+/// expected value varies.
+/// \param rawHandle The handle.
+/// \param readBytes The array of bytes.
+/// \param readBytesSize The number of bytes that should be read.
+/// \param name The name of the device being read.
+/// \param sendBytes The bytes that were sent.
+/// \param text The text explaining what the read is for, used in error log messages.
+/// \param logger The logger for error messages.
+/// \return true if no errors.
+bool readAndCheck(const LJ_HANDLE rawHandle, std::array<BYTE, LabJack::MAXIMUM_BUFFER>* readBytes,
+				  int readBytesSize, const std::string& name,
+				  const std::array<BYTE, LabJack::MAXIMUM_BUFFER>& sendBytes, const std::string& text,
+				  std::shared_ptr<SurgSim::Framework::Logger> logger)
+{
+	bool result = true;
+
+	const int read = LJUSB_Read(rawHandle, &((*readBytes)[0]), readBytesSize);
+	const uint16_t checksumTotal = LabJack::extendedChecksum16(*readBytes, readBytesSize);
+	if (read < readBytesSize)
+	{
+		SURGSIM_LOG_SEVERE(logger) << "Failed to read response of " << text << " a device named '" << name << "'. "
+			<< readBytesSize << " bytes were expected, but only " << read << " were received." << std::endl <<
+			"  labjackusb error code: " << errno << "." << std::endl;
+		result = false;
+	}
+	else if ((((checksumTotal / 256 ) & 0xff) != (*readBytes)[5]) ||
+		((checksumTotal & 0xff) != (*readBytes)[4]) ||
+		(LabJack::extendedChecksum8(*readBytes) != (*readBytes)[0]))
+	{
+		SURGSIM_LOG_SEVERE(logger) << "Failed to read response of " << text << " a device named '" << name <<
+			"'.  The checksums are bad." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+		result = false;
+	}
+	else if (((*readBytes)[1] != sendBytes[1]) || ((*readBytes)[3] != sendBytes[3]))
+	{
+		SURGSIM_LOG_SEVERE(logger) << "Failed to read response of " << text << " a device named '" << name <<
+			"'.  The command bytes are wrong.  Expected bytes 1 & 3: " << static_cast<int>(sendBytes[1]) << ","
+			<< static_cast<int>(sendBytes[3]) << ".  Received bytes 1 & 3: " << static_cast<int>((*readBytes)[1]) <<
+			", " << static_cast<int>((*readBytes)[3]) << "." << std::endl <<
+			"  labjackusb error code: " << errno << "." << std::endl;
+		result = false;
+	}
+	else if ((*readBytes)[6] != 0)
+	{
+		SURGSIM_LOG_SEVERE(logger) << "Failed to read response of " << text << " a device named '" << name <<
+			"'.  The device library returned an error code: " << (*readBytes)[6] << ", for frame: " <<
+			(*readBytes)[7] << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+		result = false;
+	}
+
+	return result;
+}
+
 };
 
 class LabJackScaffold::Handle
@@ -667,7 +724,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	// According to the Users Guide, the Feedback command has a max size of 64 bytes. Currently only a single command is
 	// used, and we try to add all the input/output information. To be safe the std::array::at function is used for any
 	// access to a non-constant index, and will throw an out_of_range exception if the index is too large.
-	std::array<BYTE, LABJACK_MAXIMUM_BUFFER> sendBytes;
+	std::array<BYTE, LabJack::MAXIMUM_BUFFER> sendBytes;
 	sendBytes[1] = 0xF8;  //Command byte, Feedback
 	sendBytes[3] = 0x00;  //Extended command number
 
@@ -844,11 +901,11 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	// supported, but some IOTypes do Read more than they Write. Thus, this assertion should never be triggered, and
 	// to make sure the access indices into the buffer are being correctly calculated, the std::array::at function is
 	// used for any access to a non-constant index, and will throw an out_of_range exception if the index is too large.
-	if (readBytesSize > LABJACK_MAXIMUM_BUFFER)
+	if (readBytesSize > LabJack::MAXIMUM_BUFFER)
 	{
 		SURGSIM_LOG_SEVERE(m_logger) << "Failed to update device named '" << device->getName() <<
 		"'. The low-level LabJack communication function 'Feedback' has a max Response size of " <<
-		std::to_string(LABJACK_MAXIMUM_BUFFER) << " bytes. " <<
+		std::to_string(LabJack::MAXIMUM_BUFFER) << " bytes. " <<
 		"The current configuration and output DataGroup would cause a size of " << readBytesSize << " bytes." <<
 		std::endl;
 		result = false;
@@ -859,7 +916,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		const BYTE sendCommandBytes = 6;
 		const BYTE dataWords = (sendBytesSize - sendCommandBytes) / 2;
 		sendBytes[2] = dataWords;
-		LabJackHelpers::extendedChecksum(&sendBytes, sendBytesSize);
+		LabJack::extendedChecksum(&sendBytes, sendBytesSize);
 
 		const int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
@@ -875,60 +932,21 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	}
 
 	const BYTE readCommandBytes = 6;
-	std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes; // Feedback commands respond with a max of 64 bytes
+	std::array<BYTE, LabJack::MAXIMUM_BUFFER> readBytes; // Feedback commands respond with a max of 64 bytes
 
 	// Read the response for the feedback command.
 	if (result)
 	{
-		const BYTE dataWords = (readBytesSize - readCommandBytes) / 2;
+		const std::string errorText = "feedback command to update";
+		result = readAndCheck(rawHandle, &readBytes, readBytesSize, device->getName(), sendBytes, errorText, m_logger);
 
-		const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-		const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
-		if (read < readBytesSize)
+		const BYTE dataWords = (readBytesSize - readCommandBytes) / 2;
+		if (readBytes[2] != dataWords)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of feedback command to update a device named '" <<
-				device->getName() << "'. " << readBytesSize << " bytes were expected, but only " << read <<
-				" were received." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
-			((checksumTotal & 0xff) != readBytes[4]) ||
-			(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of feedback command to update a device named '" <<
-				device->getName() << "'.  The checksums are bad." << std::endl <<
-				"  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if ((readBytes[1] != sendBytes[1]) || (readBytes[3] != sendBytes[3]))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of feedback command to update a device named '" <<
-				device->getName() << "'.  The command bytes are wrong.  Expected bytes 1 & 3: " <<
-				static_cast<int>(sendBytes[1]) << ", " << static_cast<int>(sendBytes[3]) <<
-				".  Received bytes 1 & 3: " << static_cast<int>(readBytes[1]) << ", " <<
-				static_cast<int>(readBytes[3]) << "." << std::endl <<
-				"  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if (readBytes[2] != dataWords)
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of feedback command to update a device named '" <<
-				device->getName() << "'.  The number of bytes in the response is wrong.  Expected: " <<
-				dataWords << ".  Received: " << readBytes[2] << "." << std::endl <<
-				"  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if (readBytes[6] != 0)
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of feedback command to update a device named '" <<
-				device->getName() << "'.  The device library returned an error code: " << readBytes[6] <<
-				", for frame: " << readBytes[7] << std::endl <<
-				"  labjackusb error code: " << errno << "." << std::endl;
+				"Failed to read response of " << errorText << " a device named '" <<	device->getName() <<
+				"'.  The number of words in the response is wrong.  Expected: " << dataWords << ".  Received: " <<
+				readBytes[2] << "." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
 			result = false;
 		}
 	}
@@ -949,30 +967,18 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		// Read from the timers in the same order as above.
 		for (auto timer = timerOutputChannels.cbegin(); timer != timerOutputChannels.cend(); ++timer)
 		{
-			// Collect the 4 bytes into a single variable.
-			uint32_t value = readBytes.at(currentByte + 3);
-			value = value << 8;
-			value += readBytes.at(currentByte + 2);
-			value = value << 8;
-			value += readBytes.at(currentByte + 1);
-			value = value << 8;
-			value += readBytes.at(currentByte);
-			currentByte += 4;
+			const int count = 4;
+			const uint32_t value = LabJack::uint32FromChars(readBytes, currentByte, count);
 			inputData.scalars().set(info->timerInputIndices[*timer], value);
+			currentByte += 4;
 		}
 
 		for (auto timer = timerInputChannels.cbegin(); timer != timerInputChannels.cend(); ++timer)
 		{
 			if (timerOutputChannels.count(*timer) == 0)
 			{
-				// Collect the 4 bytes into a single variable.
-				uint32_t value = readBytes.at(currentByte + 3);
-				value = value << 8;
-				value += readBytes.at(currentByte + 2);
-				value = value << 8;
-				value += readBytes.at(currentByte + 1);
-				value = value << 8;
-				value += readBytes.at(currentByte);
+				const int count = 4;
+				const uint32_t value = LabJack::uint32FromChars(readBytes, currentByte, count);
 				currentByte += 4;
 				// Interpret the value as signed.
 				inputData.scalars().set(info->timerInputIndices[*timer], value);
@@ -983,21 +989,16 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		{
 			if (device->getType() == LABJACKTYPE_U3)
 			{
-				uint16_t value = readBytes.at(currentByte + 1);
-				value = value << 8;
-				value += readBytes.at(currentByte);
+				const int count = 2;
+				const uint16_t value = LabJack::uint16FromChars(readBytes, currentByte, count);
 				currentByte += 2;
 				const double volts = info->calibration[2] * static_cast<double>(value) + info->calibration[3];
 				inputData.scalars().set(info->analogInputDifferentialIndices[input->first], volts);
 			}
 			else
 			{
-				uint32_t value = readBytes.at(currentByte + 2);
-				value = value << 8;
-				value += readBytes.at(currentByte + 1);
-				value = value << 8;
-				value += readBytes.at(currentByte);
-
+				const int count = 3;
+				const uint32_t value = LabJack::uint32FromChars(readBytes, currentByte, count);
 				double bits = value;
 				bits /= 256.0;
 
@@ -1030,20 +1031,16 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		{
 			if (device->getType() == LABJACKTYPE_U3)
 			{
-				uint16_t value = readBytes.at(currentByte + 1);
-				value = value << 8;
-				value += readBytes.at(currentByte);
+				const int count = 2;
+				const uint16_t value = LabJack::uint16FromChars(readBytes, currentByte, count);
 				currentByte += 2;
 				const double volts = info->calibration[2] * static_cast<double>(value) + info->calibration[3];
 				inputData.scalars().set(info->analogInputSingleEndedIndices[input->first], volts);
 			}
 			else
 			{
-				uint32_t value = readBytes.at(currentByte + 2);
-				value = value << 8;
-				value += readBytes.at(currentByte + 1);
-				value = value << 8;
-				value += readBytes.at(currentByte);
+				const int count = 3;
+				const uint32_t value = LabJack::uint32FromChars(readBytes, currentByte, count);
 
 				double bits = value;
 				bits /= 256.0;
@@ -1151,7 +1148,7 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 	const BYTE pinOffset = device->getTimerCounterPinOffset();
 
 	// First, configure the number of timers and counters
-	std::array<BYTE, LABJACK_MAXIMUM_BUFFER> sendBytes;
+	std::array<BYTE, LabJack::MAXIMUM_BUFFER> sendBytes;
 	sendBytes[1] = 0xF8;  //Command byte, ConfigIO
 	sendBytes[2] = 0x05;  //Number of data words
 	sendBytes[3] = 0x0B;  //Extended command number
@@ -1167,7 +1164,7 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 	{
 		sendBytes[i] = 0;  //Reserved
 	}
-	LabJackHelpers::extendedChecksum(&sendBytes, 16);
+	LabJack::extendedChecksum(&sendBytes, 16);
 
 	int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
@@ -1185,43 +1182,18 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 	if (result)
 	{
 		const int readBytesSize = 16; // timerCounterConfig replies with 16 bytes.
-		std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes;
-		const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-		const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
-		if (read < readBytesSize)
+		std::array<BYTE, LabJack::MAXIMUM_BUFFER> readBytes;
+
+		const std::string errorText = "timer/counter configuration for";
+		result = readAndCheck(rawHandle, &readBytes, readBytesSize, device->getName(), sendBytes, errorText, m_logger);
+
+		if (readBytes[2] != sendBytes[2])
 		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of timer/counter configuration for a device named '" << device->getName() <<
-				"'.  " << readBytesSize << " bytes were expected, but only " << read << " were received." <<
-				std::endl << "  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
-			((checksumTotal & 0xff) != readBytes[4]) ||
-			(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of timer/counter configuration for a device named '" << device->getName() <<
-				"'.  The checksums are bad." << std::endl <<
-				"  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if ((readBytes[1] != sendBytes[1]) || (readBytes[2] != sendBytes[2]) || (readBytes[3] != sendBytes[3]))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of timer/counter configuration for a device named '" << device->getName() <<
-				"'.  The command bytes are wrong.  Expected: " << static_cast<int>(sendBytes[1]) << ", " <<
-				static_cast<int>(sendBytes[2]) << ", " << static_cast<int>(sendBytes[3]) << ".  Received: " <<
+			SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
+				device->getName() << "'.  The command bytes are wrong.  Expected: " << static_cast<int>(sendBytes[1]) <<
+				", " << static_cast<int>(sendBytes[2]) << ", " << static_cast<int>(sendBytes[3]) << ".  Received: " <<
 				static_cast<int>(readBytes[1]) << ", " << static_cast<int>(readBytes[2]) << ", " <<
 				static_cast<int>(readBytes[3]) << "." << std::endl <<
-				"  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if (readBytes[6] != 0)
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of timer/counter configuration for a device named '" << device->getName() <<
-				"'.  The device library returned an error code: " << readBytes[6] << std::endl <<
 				"  labjackusb error code: " << errno << "." << std::endl;
 			result = false;
 		}
@@ -1256,7 +1228,7 @@ bool LabJackScaffold::configureClock(DeviceData* deviceData)
 	const BYTE divisor = device->getTimerClockDivisor();
 
 	// Write the clock configuration.
-	std::array<BYTE, LABJACK_MAXIMUM_BUFFER> sendBytes;
+	std::array<BYTE, LabJack::MAXIMUM_BUFFER> sendBytes;
 	sendBytes[1] = 0xF8;  //Command byte, ConfigTimerClock
 	sendBytes[2] = 0x02;  //Number of data words
 	sendBytes[3] = 0x0A;  //Extended command number
@@ -1270,7 +1242,7 @@ bool LabJackScaffold::configureClock(DeviceData* deviceData)
 	sendBytes[9] = divisor;  //TimerClockDivisor
 
 	int sendBytesSize = 10; // ConfigTimerClock sends 10 bytes
-	LabJackHelpers::extendedChecksum(&sendBytes, sendBytesSize);
+	LabJack::extendedChecksum(&sendBytes, sendBytesSize);
 
 	int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
@@ -1290,44 +1262,19 @@ bool LabJackScaffold::configureClock(DeviceData* deviceData)
 	{
 		// Read the response for the clock configuration.
 		const int readBytesSize = 10; // ConfigTimerClock replies with 10 bytes.
-		std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes;
-		const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-		const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
-		if (read < readBytesSize)
+		std::array<BYTE, LabJack::MAXIMUM_BUFFER> readBytes;
+
+		const std::string errorText = "clock configuration for";
+		result = readAndCheck(rawHandle, &readBytes, readBytesSize, device->getName(), sendBytes, errorText, m_logger);
+
+		if (readBytes[2] != sendBytes[2])
 		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of clock configuration for a device named '" <<
-				device->getName() << "'. " << readBytesSize << " bytes were expected, but only " << read <<
-				" were received." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
-			((checksumTotal & 0xff) != readBytes[4]) ||
-			(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of clock configuration for a device named '" <<
-				device->getName() << "'.  The checksums are bad." << std::endl <<
+			SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
+				device->getName() << "'.  The command bytes are wrong.  Expected: " << static_cast<int>(sendBytes[1]) <<
+				", " << static_cast<int>(sendBytes[2]) << ", " << static_cast<int>(sendBytes[3]) << ".  Received: " <<
+				static_cast<int>(readBytes[1]) << ", " << static_cast<int>(readBytes[2]) << ", " <<
+				static_cast<int>(readBytes[3]) << "." << std::endl <<
 				"  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if ((readBytes[1] != sendBytes[1]) || (readBytes[2] != sendBytes[2]) || (readBytes[3] != sendBytes[3]))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of clock configuration for a device named '" <<
-				device->getName() << "'.  The command bytes are wrong.  Expected: " <<
-				static_cast<int>(sendBytes[1]) << ", " << static_cast<int>(sendBytes[2]) << ", " <<
-				static_cast<int>(sendBytes[3]) << ".  Received: " << static_cast<int>(readBytes[1]) << ", " <<
-				static_cast<int>(readBytes[2]) << ", " << static_cast<int>(readBytes[3]) << "." << std::endl <<
-				"  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if (readBytes[6] != 0)
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of clock configuration for a device named '" <<
-				device->getName() << "'.  The device library returned an error code: " << readBytes[6] <<
-				std::endl << "  labjackusb error code: " << errno << "." << std::endl;
 			result = false;
 		}
 	}
@@ -1342,7 +1289,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 	bool result = true;
 
 	// Configure each timer's mode via a Feedback command.
-	std::array<BYTE, LABJACK_MAXIMUM_BUFFER> sendBytes;
+	std::array<BYTE, LabJack::MAXIMUM_BUFFER> sendBytes;
 	sendBytes[1] = 0xF8;  //Command byte, Feedback
 	sendBytes[3] = 0x00;  //Extended command number
 
@@ -1396,7 +1343,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 		const BYTE sendCommandBytes = 6;
 		const BYTE dataWords = (sendBytesSize - sendCommandBytes) / 2;
 		sendBytes[2] = dataWords;
-		LabJackHelpers::extendedChecksum(&sendBytes, sendBytesSize);
+		LabJack::extendedChecksum(&sendBytes, sendBytesSize);
 
 		int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
@@ -1419,56 +1366,18 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 		{
 			++readBytesSize;
 		}
+
+		std::array<BYTE, LabJack::MAXIMUM_BUFFER> readBytes;
+		const std::string errorText = "timer mode feedback command for";
+		result = readAndCheck(rawHandle, &readBytes, readBytesSize, device->getName(), sendBytes, errorText, m_logger);
+
 		const BYTE readCommandBytes = 6;
 		const BYTE dataWords = (readBytesSize - readCommandBytes) / 2;
-
-		std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes;
-		const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-		const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
-		if (read < readBytesSize)
+		if (readBytes[2] != dataWords)
 		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of timer mode feedback command for a device named '" <<
-				device->getName() << "'. " << readBytesSize << " bytes were expected, but only " << read <<
-				" were received." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
-			((checksumTotal & 0xff) != readBytes[4]) ||
-			(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of timer mode feedback command for a device named '" <<
-				device->getName() << "'.  The checksums are bad." << std::endl <<
-				"  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if ((readBytes[1] != sendBytes[1]) || (readBytes[3] != sendBytes[3]))
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of timer mode feedback command for a device named '" <<
-				device->getName() << "'.  The command bytes are wrong.  Expected bytes 1 & 3: " <<
-				static_cast<int>(sendBytes[1]) << ", " << static_cast<int>(sendBytes[3]) <<
-				".  Received bytes 1 & 3: " << static_cast<int>(readBytes[1]) << ", " <<
-				static_cast<int>(readBytes[3]) << "." << std::endl <<
-				"  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if (readBytes[2] != dataWords)
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of timer mode feedback command for a device named '" <<
-				device->getName() << "'.  The number of bytes in the response is wrong.  Expected: " <<
+			SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
+				device->getName() << "'.  The number of words in the response is wrong.  Expected: " <<
 				dataWords << ".  Received: " << readBytes[2] << "." << std::endl <<
-				"  labjackusb error code: " << errno << "." << std::endl;
-			result = false;
-		}
-		else if (readBytes[6] != 0)
-		{
-			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to read response of timer mode feedback command for a device named '" <<
-				device->getName() << "'.  The device library returned an error code: " << readBytes[6] <<
-				", for frame: " << readBytes[7] << std::endl <<
 				"  labjackusb error code: " << errno << "." << std::endl;
 			result = false;
 		}
@@ -1517,7 +1426,7 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 
 	LabJackParameters parameters;
 	const int blocks = parameters.configBlocks[device->getType()];
-	std::array<BYTE, LABJACK_MAXIMUM_BUFFER> sendBytes;
+	std::array<BYTE, LabJack::MAXIMUM_BUFFER> sendBytes;
 	sendBytes[1] = 0xF8; //command byte
 	sendBytes[2] = 0x01; //number of data words
 	sendBytes[3] = parameters.calibrationCommand[device->getType()];
@@ -1530,7 +1439,7 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 		if (result)
 		{
 			sendBytes[7] = i;
-			LabJackHelpers::extendedChecksum(&sendBytes, sendBytesSize);
+			LabJack::extendedChecksum(&sendBytes, sendBytesSize);
 
 			const int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 			if (sent < sendBytesSize)
@@ -1546,62 +1455,27 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 
 		if (result)
 		{
-			std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes;
-			const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-			const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
-			if (read < readBytesSize)
+			std::array<BYTE, LabJack::MAXIMUM_BUFFER> readBytes;
+			const std::string errorText = "feedback command to read the calibration data for";
+			result = readAndCheck(rawHandle, &readBytes, readBytesSize, device->getName(), sendBytes, errorText,
+				m_logger);
+
+			if (readBytes[2] != parameters.calibrationThirdByte[device->getType()])
 			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"Failed to read response of feedback command to read the calibration data for a device named '" <<
-					device->getName() << "'. " << readBytesSize << " bytes were expected, but only " << read <<
-					" were received." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
-				result = false;
-			}
-			else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
-				((checksumTotal & 0xff) != readBytes[4]) ||
-				(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
-			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"Failed to read response of feedback command to read the calibration data for a device named '" <<
-					device->getName() << "'.  The checksums are bad." << std::endl <<
-					"  labjackusb error code: " << errno << "." << std::endl;
-				result = false;
-			}
-			else if ((readBytes[1] != sendBytes[1]) || (readBytes[3] != sendBytes[3]))
-			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"Failed to read response of feedback command to read the calibration data for a device named '" <<
-					device->getName() << "'.  The command bytes are wrong.  Expected bytes 1 & 3: " <<
-					static_cast<int>(sendBytes[1]) << ", " << static_cast<int>(sendBytes[3]) <<
-					".  Received bytes 1 & 3: " << static_cast<int>(readBytes[1]) << ", " <<
-					static_cast<int>(readBytes[3]) << "." << std::endl <<
-					"  labjackusb error code: " << errno << "." << std::endl;
-				result = false;
-			}
-			else if (readBytes[2] != parameters.calibrationThirdByte[device->getType()])
-			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"Failed to read response of feedback command to read the calibration data for a device named '" <<
+				SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
 					device->getName() << "'.  The command bytes are wrong.  Expected byte 2: " <<
 					static_cast<int>(parameters.calibrationThirdByte[device->getType()]) << ".  Received: " <<
 					readBytes[2] << "." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
 				result = false;
 			}
-			else if (readBytes[6] != 0)
-			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"Failed to read response of feedback command to read the calibration data for a device named '" <<
-					device->getName() << "'.  The device library returned an error code: " << readBytes[6] <<
-					"." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
-				result = false;
-			}
-			else
+
+			if (result)
 			{
 				const int offset = i * 4;
-				deviceData->calibration[offset] = LabJackHelpers::doubleFromChars(readBytes, 8);
-				deviceData->calibration[offset + 1] = LabJackHelpers::doubleFromChars(readBytes, 16);
-				deviceData->calibration[offset + 2] = LabJackHelpers::doubleFromChars(readBytes, 24);
-				deviceData->calibration[offset + 3] = LabJackHelpers::doubleFromChars(readBytes, 32);
+				deviceData->calibration[offset] = LabJack::doubleFromChars(readBytes, 8);
+				deviceData->calibration[offset + 1] = LabJack::doubleFromChars(readBytes, 16);
+				deviceData->calibration[offset + 2] = LabJack::doubleFromChars(readBytes, 24);
+				deviceData->calibration[offset + 3] = LabJack::doubleFromChars(readBytes, 32);
 			}
 		}
 	}
@@ -1623,7 +1497,7 @@ bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 		// Configure each digital line's direction via a Feedback command.  The output lines will automatically be
 		// forced high when we write their states in updateDevice, but we must explicitly set the direction on
 		// input lines so we just do both here.
-		std::array<BYTE, LABJACK_MAXIMUM_BUFFER> sendBytes;
+		std::array<BYTE, LabJack::MAXIMUM_BUFFER> sendBytes;
 		sendBytes[1] = 0xF8;  //Command byte, Feedback
 		sendBytes[3] = 0x00;  //Extended command number
 
@@ -1653,7 +1527,7 @@ bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 		const BYTE sendCommandBytes = 6;
 		const BYTE dataWords = (sendBytesSize - sendCommandBytes) / 2;
 		sendBytes[2] = dataWords;
-		LabJackHelpers::extendedChecksum(&sendBytes, sendBytesSize);
+		LabJack::extendedChecksum(&sendBytes, sendBytesSize);
 
 		int sent = LJUSB_Write(rawHandle, &(sendBytes[0]), sendBytesSize);
 
@@ -1675,56 +1549,19 @@ bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 			{
 				++readBytesSize;
 			}
+
+			std::array<BYTE, LabJack::MAXIMUM_BUFFER> readBytes;
+			const std::string errorText = "digital line direction configuration for";
+			result = readAndCheck(rawHandle, &readBytes, readBytesSize, device->getName(), sendBytes, errorText,
+				m_logger);
+
 			const BYTE readCommandBytes = 6;
 			const BYTE dataWords = (readBytesSize - readCommandBytes) / 2;
-
-			std::array<BYTE, LABJACK_MAXIMUM_BUFFER> readBytes;
-			const int read = LJUSB_Read(rawHandle, &(readBytes[0]), readBytesSize);
-			const uint16_t checksumTotal = LabJackHelpers::extendedChecksum16(readBytes, readBytesSize);
-			if (read < readBytesSize)
+			if (readBytes[2] != dataWords)
 			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"Failed to read response of digital line direction configuration for a device named '" <<
-					device->getName() << "'. " << readBytesSize << " bytes were expected, but only " << read <<
-					" were received." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
-				result = false;
-			}
-			else if ((((checksumTotal / 256 ) & 0xff) != readBytes[5]) ||
-				((checksumTotal & 0xff) != readBytes[4]) ||
-				(LabJackHelpers::extendedChecksum8(readBytes) != readBytes[0]))
-			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"Failed to read response of digital line direction configuration for a device named '" <<
-					device->getName() << "'.  The checksums are bad." << std::endl <<
-					"  labjackusb error code: " << errno << "." << std::endl;
-				result = false;
-			}
-			else if ((readBytes[1] != sendBytes[1]) || (readBytes[3] != sendBytes[3]))
-			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"Failed to read response of digital line direction configuration for a device named '" <<
-					device->getName() << "'.  The command bytes are wrong.  Expected bytes 1 & 3: " <<
-					static_cast<int>(sendBytes[1]) << ", " << static_cast<int>(sendBytes[3]) <<
-					".  Received bytes 1 & 3: " << static_cast<int>(readBytes[1]) << ", " <<
-					static_cast<int>(readBytes[3]) << "." << std::endl <<
-					"  labjackusb error code: " << errno << "." << std::endl;
-				result = false;
-			}
-			else if (readBytes[2] != dataWords)
-			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"Failed to read response of digital line direction configuration for a device named '" <<
-					device->getName() << "'.  The number of bytes in the response is wrong.  Expected: " <<
+				SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
+					device->getName() << "'.  The number of words in the response is wrong.  Expected: " <<
 					dataWords << ".  Received: " << readBytes[2] << "." << std::endl <<
-					"  labjackusb error code: " << errno << "." << std::endl;
-				result = false;
-			}
-			else if (readBytes[6] != 0)
-			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"Failed to read response of digital line direction configuration for a device named '" <<
-					device->getName() << "'.  The device library returned an error code: " << readBytes[6] <<
-					", for frame: " << readBytes[7] << std::endl <<
 					"  labjackusb error code: " << errno << "." << std::endl;
 				result = false;
 			}

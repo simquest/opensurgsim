@@ -24,7 +24,8 @@ set(UNIT_TEST_SOURCES
 )
 
 set(UNIT_TEST_LINUX_SOURCES
-	LabJackHelpersTest.cpp
+	LabJackChecksumsTest.cpp
+	LabJackTypeConvertersTest.cpp
 )
 
 if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
