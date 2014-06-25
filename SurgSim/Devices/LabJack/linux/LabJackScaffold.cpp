@@ -752,8 +752,10 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	{
 		if (device->getType() == LABJACKTYPE_U3)
 		{
+			const BYTE longSettling = (device->getAnalogInputSettling() > 0 ? (1 << 6) : 0);
+			const BYTE quickSample = (device->getAnalogInputResolution() > 0 ? (1 << 7) : 0);
 			sendBytes.at(sendBytesSize++) = 1;
-			sendBytes.at(sendBytesSize++) = input->first;
+			sendBytes.at(sendBytesSize++) = input->first | longSettling | quickSample;
 			sendBytes.at(sendBytesSize++) = input->second.negativeChannel;
 			readBytesSize += 2;
 		}
