@@ -30,6 +30,7 @@ set(UNIT_TEST_SOURCES
 	EigenGtestAsserts.cpp
 	Fem1DElementBeamTests.cpp
 	Fem1DMechanicalValidationTests.cpp
+	Fem1DRepresentationReaderTests.cpp
 	Fem1DRepresentationTests.cpp
 	Fem2DElementTriangleTests.cpp
 	Fem2DMechanicalValidationTests.cpp

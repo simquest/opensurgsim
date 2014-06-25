@@ -32,6 +32,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	DeformableRepresentation.cpp
 	Fem1DElementBeam.cpp
 	Fem1DRepresentation.cpp
+	Fem1DRepresentationPlyReaderDelegate.cpp
 	Fem2DElementTriangle.cpp
 	Fem2DRepresentation.cpp
 	Fem2DRepresentationPlyReaderDelegate.cpp
@@ -93,6 +94,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableRepresentation.h
 	Fem1DElementBeam.h
 	Fem1DRepresentation.h
+	Fem1DRepresentationPlyReaderDelegate.h
 	Fem2DElementTriangle.h
 	Fem2DRepresentation.h
 	Fem2DRepresentationPlyReaderDelegate.h
