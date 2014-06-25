@@ -13,25 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <array>
+
 #include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
-
-using SurgSim::DataStructures::PlyReader;
 
 namespace SurgSim
 {
 namespace Physics
 {
+using SurgSim::DataStructures::PlyReader;
 
 Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem)
-	: vertexIterator(nullptr), m_fem(fem), m_hasBoundaryConditions(false)
-{
-}
-
-Fem3DRepresentationPlyReaderDelegate::PolyhedronData::PolyhedronData() : indicies(nullptr), vertexCount(0)
+	: FemRepresentationPlyReaderDelegate(fem)
 {
 }
 
@@ -72,18 +68,18 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	// Polyhedron Processing
 	reader->requestElement(
 		"3DElement",
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::beginPolyhedrons,
+		std::bind(&Fem3DRepresentationPlyReaderDelegate::beginFemElements,
 				  this,
 				  std::placeholders::_1,
 				  std::placeholders::_2),
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::processPolyhedron, this, std::placeholders::_1),
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::endPolyhedrons, this, std::placeholders::_1));
+		std::bind(&Fem3DRepresentationPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
+		std::bind(&Fem3DRepresentationPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
 	reader->requestListProperty("3DElement",
 								"vertex_indices",
 								PlyReader::TYPE_UNSIGNED_INT,
-								offsetof(PolyhedronData, indicies),
+								offsetof(ElementData, indicies),
 								PlyReader::TYPE_UNSIGNED_INT,
-								offsetof(PolyhedronData, vertexCount));
+								offsetof(ElementData, vertexCount));
 
 	reader->requestElement(
 		"material",
@@ -118,83 +114,15 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	return true;
 }
 
-void Fem3DRepresentationPlyReaderDelegate::startParseFile()
+void Fem3DRepresentationPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_fem != nullptr) << "The Representation cannot be nullptr.";
-	SURGSIM_ASSERT(m_fem->getNumFemElements() == 0)
-		<< "The Representation already contains fem elements, so it cannot be initialized.";
-	SURGSIM_ASSERT(m_fem->getInitialState() == nullptr)
-		<< "The Representation's initial state must be uninitialized.";
-
-	m_state = std::make_shared<SurgSim::Math::OdeState>();
-}
-
-void Fem3DRepresentationPlyReaderDelegate::endParseFile()
-{
-	for (size_t i = 0; i < m_fem->getNumFemElements(); i++)
-	{
-		m_fem->getFemElement(i)->setMassDensity(m_materialData.massDensity);
-		m_fem->getFemElement(i)->setPoissonRatio(m_materialData.poissonRatio);
-		m_fem->getFemElement(i)->setYoungModulus(m_materialData.youngModulus);
-	}
-
-	m_fem->setInitialState(m_state);
-}
-
-void* Fem3DRepresentationPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
-{
-	m_state->setNumDof(3, vertexCount);
-	vertexIterator = m_state->getPositions().data();
-
-	return m_vertexData.data();
-}
-
-void Fem3DRepresentationPlyReaderDelegate::processVertex(const std::string& elementName)
-{
-	std::copy(std::begin(m_vertexData), std::end(m_vertexData), vertexIterator);
-	vertexIterator += 3;
-}
-
-void Fem3DRepresentationPlyReaderDelegate::endVertices(const std::string& elementName)
-{
-	vertexIterator = nullptr;
-}
-
-void* Fem3DRepresentationPlyReaderDelegate::beginPolyhedrons(const std::string& elementName, size_t polyhedronCount)
-{
-	return &m_polyhedronData;
-}
-
-void Fem3DRepresentationPlyReaderDelegate::processPolyhedron(const std::string& elementName)
-{
-	SURGSIM_ASSERT(m_polyhedronData.vertexCount == 4) << "Cannot process polyhedron with "
-			<< m_polyhedronData.vertexCount << " vertices.";
+	SURGSIM_ASSERT(m_femData.vertexCount == 4) << "Cannot process polyhedron with "
+											   << m_femData.vertexCount << " vertices.";
 
 	std::array<size_t, 4> polyhedronVertices;
-	std::copy(m_polyhedronData.indicies, m_polyhedronData.indicies + 4, polyhedronVertices.begin());
+	std::copy(m_femData.indicies, m_femData.indicies + 4, polyhedronVertices.begin());
 	m_fem->addFemElement(std::make_shared<Fem3DElementTetrahedron>(polyhedronVertices));
 }
 
-void Fem3DRepresentationPlyReaderDelegate::endPolyhedrons(const std::string& elementName)
-{
-	m_polyhedronData.indicies = nullptr;
-}
-
-void* Fem3DRepresentationPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)
-{
-	return &m_materialData;
-}
-
-void* Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
-		size_t boundaryConditionCount)
-{
-	return &m_boundaryConditionData;
-}
-
-void Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
-{
-	m_state->addBoundaryCondition(m_boundaryConditionData);
-}
-
-} // namespace SurgSim
-} // namespace DataStructures
+}; // namespace Physics
+}; // namespace SurgSim

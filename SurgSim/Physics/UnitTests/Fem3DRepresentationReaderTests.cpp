@@ -96,9 +96,9 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	EXPECT_EQ(0.472, fem2->getYoungModulus());
 
 	auto fem8 = fem->getFemElement(8);
-	EXPECT_EQ(0.1432, fem2->getMassDensity());
-	EXPECT_EQ(0.224, fem2->getPoissonRatio());
-	EXPECT_EQ(0.472, fem2->getYoungModulus());
+	EXPECT_EQ(0.1432, fem8->getMassDensity());
+	EXPECT_EQ(0.224, fem8->getPoissonRatio());
+	EXPECT_EQ(0.472, fem8->getYoungModulus());
 }
 
 }
