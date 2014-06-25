@@ -25,6 +25,11 @@
 namespace SurgSim
 {
 
+namespace DataStructures
+{
+class PlyReader;
+}
+
 namespace Physics
 {
 
@@ -53,6 +58,9 @@ protected:
 	/// \param transform The transformation to apply
 	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 								const SurgSim::Math::RigidTransform3d& transform) override;
+
+private:
+	virtual bool doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader) override;
 };
 
 } // namespace Physics

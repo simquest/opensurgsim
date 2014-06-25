@@ -85,6 +85,10 @@ void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
 }
 
+bool Fem1DRepresentation::doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader)
+{
+	return false;
+}
 } // namespace Physics
 
 } // namespace SurgSim

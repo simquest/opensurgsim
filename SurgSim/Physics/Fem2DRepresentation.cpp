@@ -60,6 +60,10 @@ RepresentationType Fem2DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM2D;
 }
 
+bool Fem2DRepresentation::doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader)
+{
+	return false;
+}
 void Fem2DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 										 const SurgSim::Math::RigidTransform3d& transform)
 {

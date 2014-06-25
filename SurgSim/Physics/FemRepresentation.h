@@ -25,6 +25,11 @@
 namespace SurgSim
 {
 
+namespace DataStructures
+{
+class PlyReader;
+}
+
 namespace Physics
 {
 
@@ -44,6 +49,18 @@ public:
 
 	/// Destructor
 	virtual ~FemRepresentation();
+
+	/// Sets the name of the file to be loaded
+	/// \param filename The name of the file to be loaded
+	void setFilename(const std::string& filename);
+
+	/// Gets the name of the file to be loaded
+	/// \return filename The name of the file to be loaded
+	const std::string& getFilename() const;
+
+	/// Loads the file
+	/// \return true if successful
+	bool loadFile();
 
 	/// Adds a FemElement
 	/// \param element The FemElement to add to the representation
@@ -164,7 +181,17 @@ protected:
 	/// Useful information per node
 	std::vector<double> m_massPerNode; //< Useful in setting up the gravity force F=mg
 
+	/// Whether the file should be loaded or not.
+	bool m_doLoadFile;
+
+	/// Filename for loading the fem3d representation.
+	std::string m_filename;
+
 private:
+	/// To be implemented by derived classes. Doing the actual loading work.
+	/// \return True if load is successful; false otherwise.
+	virtual bool doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader) = 0;
+
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;
 
@@ -178,7 +205,6 @@ private:
 };
 
 } // namespace Physics
-
 } // namespace SurgSim
 
 #endif // SURGSIM_PHYSICS_FEMREPRESENTATION_H

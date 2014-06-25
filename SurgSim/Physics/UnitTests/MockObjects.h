@@ -217,6 +217,11 @@ public:
 	/// Destructor
 	virtual ~MockFemRepresentation();
 
+	virtual bool doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader) override
+	{
+		return false;
+	}
+
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
