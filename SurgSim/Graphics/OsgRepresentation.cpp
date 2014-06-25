@@ -21,6 +21,7 @@
 
 #include <osg/Geode>
 #include <osg/Switch>
+#include <osg/PolygonMode>
 #include <osg/PositionAttitudeTransform>
 
 #include "SurgSim/Framework/Log.h"
@@ -34,7 +35,8 @@ namespace Graphics
 {
 
 OsgRepresentation::OsgRepresentation(const std::string& name) :
-	Representation(name)
+	Representation(name),
+	m_drawAsWireFrame(false)
 {
 	m_switch = new osg::Switch;
 	m_switch->setName(name + " Representation Switch");
@@ -105,6 +107,32 @@ void OsgRepresentation::doUpdate(double dt)
 {
 
 }
+
+void OsgRepresentation::setDrawAsWireFrame(bool val)
+{
+	m_drawAsWireFrame = val;
+	osg::StateSet* state = m_switch->getOrCreateStateSet();
+
+	osg::ref_ptr<osg::PolygonMode> polygonMode;
+	if (val)
+	{
+		 polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE);
+	}
+	else
+	{
+		polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT, osg::PolygonMode::FILL);
+	}
+
+	state->setAttributeAndModes(polygonMode, osg::StateAttribute::ON);
+}
+
+bool OsgRepresentation::getDrawAsWireFrame() const
+{
+	return m_drawAsWireFrame;
+}
+
+
+
 
 }; // Graphics
 }; // SurgSim

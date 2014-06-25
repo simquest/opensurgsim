@@ -60,9 +60,6 @@ public:
 
 	virtual std::shared_ptr<Mesh> getMesh() override;
 
-	virtual void setDrawAsWireFrame(bool val) override;
-	virtual bool getDrawAsWireFrame() const override;
-
 	virtual void setUpdateOptions(int val) override;
 	virtual int getUpdateOptions() const override;
 
@@ -78,9 +75,6 @@ protected:
 	virtual bool doInitialize() override;
 
 private:
-	/// Indicates if the mesh is rendered as a wireframe.
-	bool m_drawAsWireFrame;
-
 	/// Indicates which elements of the mesh should be updated on every frame
 	int m_updateOptions;
 
