@@ -54,7 +54,7 @@ TEST(LabJackTypeConvertersTest, Uint32FromChars)
 		bytes[i] = 0;
 	}
 	bytes[4] = 1;
-	
+
 	EXPECT_ANY_THROW(SurgSim::Device::LabJack::uint32FromChars(bytes, 0, 5));
 	EXPECT_EQ(0, SurgSim::Device::LabJack::uint32FromChars(bytes, 0, 4));
 	EXPECT_EQ(1 << 24, SurgSim::Device::LabJack::uint32FromChars(bytes, 1, 4));

@@ -30,7 +30,7 @@ namespace LabJack
 /// Converts a fixed point byte array to a floating point double value.
 /// \param bytes The array.
 /// \param startIndex The index of the first element.
-/// \return 
+/// \return The double.
 double doubleFromChars(const std::array<unsigned char, MAXIMUM_BUFFER>& bytes, int startIndex);
 
 /// Converts an array of bytes to a uint32_t, with the least significant byte at startIndex, and the most significant
@@ -40,7 +40,7 @@ double doubleFromChars(const std::array<unsigned char, MAXIMUM_BUFFER>& bytes, i
 /// \param count The number of bytes to convert.
 /// \return A uint32_t.
 /// \exception Asserts if byteCount is greater than 4, or it attempts to access beyond the end of the byte array.
-uint32_t uint32FromChars(std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &bytes, int startIndex, int count);
+uint32_t uint32FromChars(const std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &bytes, int startIndex, int count);
 
 /// Converts an array of bytes to a uint16_t, with the least significant byte at startIndex.
 /// \param bytes The array.
@@ -48,7 +48,7 @@ uint32_t uint32FromChars(std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &byt
 /// \param count The number of bytes to convert.
 /// \return A uint16_t.
 /// \exception Asserts if byteCount is greater than 2, or it attempts to access beyond the end of the byte array.
-uint16_t uint16FromChars(std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &bytes, int startIndex, int count);
+uint16_t uint16FromChars(const std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &bytes, int startIndex, int count);
 
 };  // namespace LabJack
 };  // namespace Device

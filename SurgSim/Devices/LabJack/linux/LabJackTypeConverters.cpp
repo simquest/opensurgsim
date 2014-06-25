@@ -38,7 +38,7 @@ double doubleFromChars(const std::array<unsigned char, MAXIMUM_BUFFER>& bytes, i
 	return static_cast<double>(static_cast<int>(whole)) + static_cast<double>(decimal)/4294967296.0;
 }
 
-uint32_t uint32FromChars(std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &bytes, int startIndex, int count)
+uint32_t uint32FromChars(const std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &bytes, int startIndex, int count)
 {
 	SURGSIM_ASSERT(count <= 4) << __FUNCTION__ << " got a count of " << count << "; that is too large.";
 
@@ -52,7 +52,7 @@ uint32_t uint32FromChars(std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &byt
 	return value;
 }
 
-uint16_t uint16FromChars(std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &bytes, int startIndex, int count)
+uint16_t uint16FromChars(const std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &bytes, int startIndex, int count)
 {
 	SURGSIM_ASSERT(count <= 2) << __FUNCTION__ << " got a count of " << count << "; that is too large.";
 
