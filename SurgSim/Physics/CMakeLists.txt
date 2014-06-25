@@ -34,6 +34,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem1DRepresentation.cpp
 	Fem2DElementTriangle.cpp
 	Fem2DRepresentation.cpp
+	Fem2DRepresentationPlyReaderDelegate.cpp
 	Fem3DElementCorotationalTetrahedron.cpp
 	Fem3DElementCube.cpp
 	Fem3DElementTetrahedron.cpp
@@ -94,6 +95,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem1DRepresentation.h
 	Fem2DElementTriangle.h
 	Fem2DRepresentation.h
+	Fem2DRepresentationPlyReaderDelegate.h
 	Fem3DElementCorotationalTetrahedron.h
 	Fem3DElementCube.h
 	Fem3DElementTetrahedron.h
