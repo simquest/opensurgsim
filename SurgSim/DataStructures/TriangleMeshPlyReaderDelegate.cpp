@@ -50,11 +50,11 @@ bool TriangleMeshPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(VertexData, z));
 
 	// Face Processing
-	reader->requestElement("face",
+	reader->requestElement("2DElement",
 		std::bind(&TriangleMeshPlyReaderDelegate::beginFaces, this, std::placeholders::_1, std::placeholders::_2),
 		std::bind(&TriangleMeshPlyReaderDelegate::processFace, this, std::placeholders::_1),
 		std::bind(&TriangleMeshPlyReaderDelegate::endFaces, this, std::placeholders::_1));
-	reader->requestListProperty("face", "vertex_indices",
+	reader->requestListProperty("2DElement", "vertex_indices",
 		PlyReader::TYPE_UNSIGNED_INT,
 		offsetof(FaceData, indices),
 		PlyReader::TYPE_UNSIGNED_INT,
@@ -71,8 +71,8 @@ bool TriangleMeshPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 	result = result && reader.hasProperty("vertex", "x");
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
-	result = result && reader.hasProperty("face", "vertex_indices");
-	result = result && !reader.isScalar("face", "vertex_indices");
+	result = result && reader.hasProperty("2DElement", "vertex_indices");
+	result = result && !reader.isScalar("2DElement", "vertex_indices");
 
 	return result;
 }
@@ -121,7 +121,7 @@ void TriangleMeshPlyReaderDelegate::processFace(const std::string& elementName)
 void TriangleMeshPlyReaderDelegate::endFaces(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_faceData.overrun == 0) <<
-		"There was an overrun while reading the face structures, it is likely that data " <<
+		"There was an overrun while reading the 2DElement structures, it is likely that data " <<
 		"has become corrupted.";
 }
 

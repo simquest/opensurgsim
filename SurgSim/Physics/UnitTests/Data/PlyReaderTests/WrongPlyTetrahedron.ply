@@ -5,7 +5,7 @@ element vertex 26
 property double x
 property double y
 property double zi
-element polyhedron 12
+element 3DElement 12
 property list uint uint vertex_indices
 element boundary_condition 8
 property uint vertex_index

@@ -8,7 +8,7 @@ property float z
 property float nx
 property float ny
 property float nz
-element face 12
+element 2DElement 12
 property list uchar uint vertex_indices
 end_header
 1.000000 1.000000 -1.000000 0.000000 0.000000 -1.000000

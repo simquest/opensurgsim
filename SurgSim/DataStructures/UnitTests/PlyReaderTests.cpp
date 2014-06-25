@@ -55,12 +55,12 @@ TEST(PlyReaderTests, FindElementsAndProperties)
 	PlyReader reader(findFile("Cube.ply"));
 
 	EXPECT_TRUE(reader.hasElement("vertex"));
-	EXPECT_TRUE(reader.hasElement("face"));
+	EXPECT_TRUE(reader.hasElement("2DElement"));
 	EXPECT_FALSE(reader.hasElement("xxx"));
 
 	EXPECT_TRUE(reader.hasProperty("vertex", "x"));
 	EXPECT_TRUE(reader.hasProperty("vertex", "y"));
-	EXPECT_TRUE(reader.hasProperty("face", "vertex_indices"));
+	EXPECT_TRUE(reader.hasProperty("2DElement", "vertex_indices"));
 	EXPECT_FALSE(reader.hasProperty("xxx", "vertex_indices"));
 	EXPECT_FALSE(reader.hasProperty("vertex", "vertex_indices"));
 }
@@ -70,12 +70,12 @@ TEST(PlyReaderTests, IsScalar)
 	PlyReader reader(findFile("Testdata.ply"));
 
 	EXPECT_TRUE(reader.isScalar("vertex", "x"));
-	EXPECT_FALSE(reader.isScalar("face", "vertex_indices"));
-	EXPECT_TRUE(reader.isScalar("face", "extra"));
+	EXPECT_FALSE(reader.isScalar("2DElement", "vertex_indices"));
+	EXPECT_TRUE(reader.isScalar("2DElement", "extra"));
 
 	EXPECT_FALSE(reader.isScalar("xxx", "xxx"));
 	EXPECT_FALSE(reader.isScalar("vertex", "xxx"));
-	EXPECT_FALSE(reader.isScalar("face", "xxx"));
+	EXPECT_FALSE(reader.isScalar("2DElement", "xxx"));
 }
 
 class TestData
@@ -201,17 +201,17 @@ TEST(PlyReaderTests, ListReadTest)
 {
 	TestData testData;
 	PlyReader reader(findFile("Testdata.ply"));
-	EXPECT_TRUE(reader.requestElement("face",
+	EXPECT_TRUE(reader.requestElement("2DElement",
 		std::bind(&TestData::beginFaces, &testData, std::placeholders::_1, std::placeholders::_2),
 		std::bind(&TestData::newFace, &testData, std::placeholders::_1),
 		nullptr));
-	EXPECT_TRUE(reader.requestListProperty("face", "vertex_indices",
+	EXPECT_TRUE(reader.requestListProperty("2DElement", "vertex_indices",
 										PlyReader::TYPE_UNSIGNED_INT,
 										offsetof(TestData::FaceData, faces),
 										PlyReader::TYPE_UNSIGNED_INT,
 										offsetof(TestData::FaceData, faceCount)));
 	EXPECT_TRUE(reader.requestScalarProperty(
-		"face", "extra", PlyReader::TYPE_INT, offsetof(TestData::FaceData, extra)));
+		"2DElement", "extra", PlyReader::TYPE_INT, offsetof(TestData::FaceData, extra)));
 
 	ASSERT_NO_THROW(reader.parseFile());
 	EXPECT_EQ(0L, testData.faceData.overrun);
@@ -225,7 +225,7 @@ TEST(PlyReaderTests, ListReadTest)
 	for (size_t i = 0; i < testData.faces.size(); ++i)
 	{
 		std::vector<unsigned int> face = testData.faces[i];
-		EXPECT_EQ(i+1, face.size());
+		EXPECT_EQ(i + 1, face.size());
 		EXPECT_EQ(-static_cast<int>(i), testData.extras[i]);
 
 		for (size_t j = 0; j < face.size(); ++j)

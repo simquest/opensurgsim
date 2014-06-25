@@ -44,8 +44,8 @@ bool Fem3DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& rea
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
 
-	result = result && reader.hasProperty("polyhedron", "vertex_indices");
-	result = result && !reader.isScalar("polyhedron", "vertex_indices");
+	result = result && reader.hasProperty("3DElement", "vertex_indices");
+	result = result && !reader.isScalar("3DElement", "vertex_indices");
 
 	result = result && reader.hasProperty("material", "mass_density");
 	result = result && reader.hasProperty("material", "poisson_ratio");
@@ -71,14 +71,14 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 
 	// Polyhedron Processing
 	reader->requestElement(
-		"polyhedron",
+		"3DElement",
 		std::bind(&Fem3DRepresentationPlyReaderDelegate::beginPolyhedrons,
 				  this,
 				  std::placeholders::_1,
 				  std::placeholders::_2),
 		std::bind(&Fem3DRepresentationPlyReaderDelegate::processPolyhedron, this, std::placeholders::_1),
 		std::bind(&Fem3DRepresentationPlyReaderDelegate::endPolyhedrons, this, std::placeholders::_1));
-	reader->requestListProperty("polyhedron",
+	reader->requestListProperty("3DElement",
 								"vertex_indices",
 								PlyReader::TYPE_UNSIGNED_INT,
 								offsetof(PolyhedronData, indicies),
