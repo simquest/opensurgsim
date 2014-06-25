@@ -256,14 +256,15 @@ int main(int argc, char** argv)
 	analogOutputs.insert(rotationOut);
 	toolDevice->setAnalogOutputChannels(analogOutputs);
 
+	const double translationPerUpdate = 0.001; // Millimeter per update.
+	auto filter = std::make_shared<LabJackToPoseFilter>("LabJack to Pose filter", firstTimerForQuadrature,
+		lineForPlusX, lineForMinusX, translationPerUpdate, positiveAnalogDifferential, singleEndedAnalog,
+		rotationOut);
+	toolDevice->setOutputProducer(filter);
+	toolDevice->addInputConsumer(filter);
+
 	if (toolDevice->initialize())
 	{
-		const double translationPerUpdate = 0.001; // Millimeter per update.
-		auto filter = std::make_shared<LabJackToPoseFilter>("LabJack to Pose filter", firstTimerForQuadrature,
-			lineForPlusX, lineForMinusX, translationPerUpdate, positiveAnalogDifferential, singleEndedAnalog,
-			rotationOut);
-		toolDevice->setOutputProducer(filter);
-		toolDevice->addInputConsumer(filter);
 		filter->initialize();
 
 		// The square is controlled by a second device.  For a simple test, we're using an IdentityPoseDevice--

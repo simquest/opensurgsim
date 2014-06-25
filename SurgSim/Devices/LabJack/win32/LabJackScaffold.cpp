@@ -537,9 +537,7 @@ bool LabJackScaffold::unregisterDevice(const LabJackDevice* const device)
 
 bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 {
-	info->deviceObject->pullOutput();
-
-	if (!info->cachedOutputIndices)
+	if (info->deviceObject->pullOutput() && !info->cachedOutputIndices)
 	{
 		const SurgSim::DataStructures::DataGroup& initialOutputData = info->deviceObject->getOutputData();
 
@@ -570,11 +568,14 @@ bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 		info->cachedOutputIndices = true;
 	}
 
-	if (!updateDevice(info))
+	if (!info->deviceObject->hasOutputProducer() || info->cachedOutputIndices)
 	{
-		return false;
+		if (!updateDevice(info))
+		{
+			return false;
+		}
+		info->deviceObject->pushInput();
 	}
-	info->deviceObject->pushInput();
 	return true;
 }
 

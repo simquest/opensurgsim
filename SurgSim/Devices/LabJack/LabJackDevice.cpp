@@ -49,6 +49,25 @@ LabJackDevice::~LabJackDevice()
 bool LabJackDevice::initialize()
 {
 	SURGSIM_ASSERT(!isInitialized()) << "LabJackDevice already initialized.";
+
+	if (getDigitalOutputChannels().size() > 0)
+	{
+		SURGSIM_ASSERT(hasOutputProducer()) << "LabJackDevice named " << getName() <<
+			" has digital output channels. An output producer is required, call setOutputProducer.";
+	}
+
+	if (getAnalogOutputChannels().size() > 0)
+	{
+		SURGSIM_ASSERT(hasOutputProducer()) << "LabJackDevice named " << getName() <<
+			" has analog output channels. An output producer is required, call setOutputProducer.";
+	}
+
+	if (getTimers().size() > 0)
+	{
+		SURGSIM_ASSERT(hasOutputProducer()) << "LabJackDevice named " << getName() <<
+			" has timers. An output producer is required, call setOutputProducer.";
+	}
+
 	std::shared_ptr<LabJackScaffold> scaffold = LabJackScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold) << "LabJackDevice failed to get a LabJackScaffold.";
 
