@@ -18,9 +18,7 @@
 #include <osg/Array>
 #include <osg/Geode>
 #include <osg/Geometry>
-#include <osg/PolygonMode>
 #include <osg/PositionAttitudeTransform>
-#include <osg/Switch>
 #include <osg/Vec3f>
 #include <osgUtil/SmoothingVisitor>
 
@@ -42,7 +40,6 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
 	MeshRepresentation(name),
-	m_drawAsWireFrame(false),
 	m_updateOptions(UPDATE_OPTION_VERTICES),
 	m_mesh(std::make_shared<Mesh>()),
 	m_filename()
@@ -89,29 +86,6 @@ OsgMeshRepresentation::~OsgMeshRepresentation()
 std::shared_ptr<Mesh> OsgMeshRepresentation::getMesh()
 {
 	return m_mesh;
-}
-
-void OsgMeshRepresentation::setDrawAsWireFrame(bool val)
-{
-	m_drawAsWireFrame = val;
-	osg::StateSet* state = m_switch->getOrCreateStateSet();
-
-	osg::ref_ptr<osg::PolygonMode> polygonMode;
-	if (val)
-	{
-		 polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE);
-	}
-	else
-	{
-		polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT, osg::PolygonMode::FILL);
-	}
-
-	state->setAttributeAndModes(polygonMode, osg::StateAttribute::ON);
-}
-
-bool OsgMeshRepresentation::getDrawAsWireFrame() const
-{
-	return m_drawAsWireFrame;
 }
 
 void OsgMeshRepresentation::doUpdate(double dt)
