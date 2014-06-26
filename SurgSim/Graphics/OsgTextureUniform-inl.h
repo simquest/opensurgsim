@@ -58,7 +58,7 @@ void OsgTextureUniform<T>::addToStateSet(osg::StateSet* stateSet)
 {
 	const osg::StateSet::TextureAttributeList& textures = stateSet->getTextureAttributeList();
 
-	// Grab the smallest unit that is equal or hight than m_minimumTextureUnit
+	// Grab the smallest unit that is equal or higher than m_minimumTextureUnit
 	// and search through allocated units for free ones
 	int availableUnit = m_minimumTextureUnit;
 	if (textures.size() > m_minimumTextureUnit)
