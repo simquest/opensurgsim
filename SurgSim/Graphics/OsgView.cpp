@@ -62,14 +62,13 @@ const osg::DisplaySettings::DisplayType DisplayTypeEnums[SurgSim::Graphics::View
 	osg::DisplaySettings::HEAD_MOUNTED_DISPLAY
 };
 
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgView);
-
 }
 
 namespace SurgSim
 {
 namespace Graphics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgView, OsgView);
 
 OsgView::OsgView(const std::string& name) : View(name),
 	m_isWindowBorderEnabled(true),

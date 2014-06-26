@@ -46,6 +46,8 @@ namespace Graphics
 class OsgCamera;
 class OsgTrackballZoomManipulator;
 
+SURGSIM_STATIC_REGISTRATION(OsgView);
+
 /// OSG-based implementation of graphics view class.
 ///
 /// A Graphics::OsgView wraps a osgViewer::View to provide a visualization of the scene to the user.
