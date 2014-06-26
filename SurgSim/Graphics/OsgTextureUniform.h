@@ -61,6 +61,8 @@ private:
 	/// Texture
 	std::shared_ptr<T> m_texture;
 
+	osg::ref_ptr<osg::StateSet> m_stateset;
+
 	/// Texture unit
 	size_t m_unit;
 

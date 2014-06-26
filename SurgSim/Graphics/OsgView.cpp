@@ -278,7 +278,7 @@ void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
 
 void SurgSim::Graphics::OsgView::setOsgMapsUniforms(bool val)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "Can't change mapping mode after initialization.";
+	SURGSIM_ASSERT(!isAwake()) << "Can't change mapping mode after waking up.";
 	m_osgMapUniforms = val;
 }
 
