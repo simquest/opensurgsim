@@ -16,6 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGCAPSULEREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGCAPSULEREPRESENTATION_H
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/CapsuleRepresentation.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 
@@ -36,6 +37,8 @@ namespace Graphics
 
 class OsgUnitCylinder;
 class OsgUnitSphere;
+
+SURGSIM_STATIC_REGISTRATION(OsgCapsuleRepresentation);
 
 /// OSG implementation of a graphics capsule representation.
 class OsgCapsuleRepresentation : public OsgRepresentation, public CapsuleRepresentation

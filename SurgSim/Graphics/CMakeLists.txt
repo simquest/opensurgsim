@@ -38,6 +38,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgMeshRepresentation.cpp
 	OsgOctreeRepresentation.cpp
 	OsgPlaneRepresentation.cpp
+	OsgPointCloudRepresentation.cpp
 	OsgRepresentation.cpp
 	OsgSceneryRepresentation.cpp
 	OsgScreenSpacePass.cpp

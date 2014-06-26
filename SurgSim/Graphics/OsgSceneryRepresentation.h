@@ -30,6 +30,7 @@ namespace SurgSim
 {
 namespace Graphics
 {
+SURGSIM_STATIC_REGISTRATION(OsgSceneryRepresentation);
 
 /// A OsgSceneryRepresentation is used to load osg object/node from file
 class OsgSceneryRepresentation:	public OsgRepresentation, public SceneryRepresentation

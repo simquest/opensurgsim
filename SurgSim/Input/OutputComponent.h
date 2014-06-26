@@ -33,6 +33,8 @@ namespace Input
 class DeviceInterface;
 class OutputProducer;
 
+SURGSIM_STATIC_REGISTRATION(OutputComponent);
+
 /// OutputComponent is a Component that has an OutputProducer, a concrete instance of OutputProducerInterface, so that
 /// output devices can receive data through the normal component interface to SceneElements.
 class OutputComponent : public SurgSim::Framework::Component

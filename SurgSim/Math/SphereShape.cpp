@@ -13,18 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/SphereShape.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SphereShape);
-}
 
 namespace SurgSim
 {
 namespace Math
 {
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SphereShape, SphereShape);
 
 SphereShape::SphereShape(double radius) : m_radius(radius)
 {

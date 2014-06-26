@@ -37,6 +37,24 @@ add_executable(ExampleStapling
 	${EXAMPLESTAPLING_SOURCES} ${EXAMPLESTAPLING_HEADERS}
 )
 
+set(SURGSIMEXAMPLESTAPLING_SOURCES
+	StapleElement.cpp
+	StaplerBehavior.cpp
+	StaplingExample.cpp
+)
+
+set(SURGSIMEXAMPLESTAPLING_HEADERS
+	StapleElement.h
+	StaplerBehavior.h
+)
+
+surgsim_add_library(
+	SurgSimExampleStapling
+	${SURGSIMEXAMPLESTAPLING_SOURCES}
+	${SURGSIMEXAMPLESTAPLING_HEADERS}
+	"Examples/ExampleStapling"
+)
+
 surgsim_show_ide_folders(
 	"${EXAMPLESTAPLING_SOURCES}" "${EXAMPLESTAPLING_HEADERS}")
 
@@ -50,7 +68,7 @@ set(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/Examples/Data/Stapling DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 # Configure the path for the data files
 configure_file(

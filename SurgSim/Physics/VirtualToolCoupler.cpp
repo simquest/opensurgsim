@@ -34,17 +34,12 @@ using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Quaterniond;
 
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::VirtualToolCoupler);
-}
-
 namespace SurgSim
 {
 
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::VirtualToolCoupler, VirtualToolCoupler);
 
 VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	SurgSim::Framework::Behavior(name),

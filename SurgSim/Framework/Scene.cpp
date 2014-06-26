@@ -75,6 +75,21 @@ const std::vector <std::shared_ptr<SceneElement>>& Scene::getSceneElements() con
 	return m_elements;
 }
 
+const std::shared_ptr<SceneElement> Scene::getSceneElement(const std::string& name) const
+{
+	std::shared_ptr<SceneElement> result = nullptr;
+	for (auto it = std::begin(m_elements); it != std::end(m_elements); ++it)
+	{
+		if ((*it)->getName() == name)
+		{
+			result = *it;
+			break;
+		}
+	}
+
+	return result;
+}
+
 std::shared_ptr<Scene> Scene::getSharedPtr()
 {
 	std::shared_ptr<Scene> result;
@@ -95,7 +110,7 @@ YAML::Node Scene::encode() const
 	YAML::Node data(YAML::NodeType::Map);
 	for (auto sceneElement = m_elements.begin(); sceneElement != m_elements.end(); ++sceneElement)
 	{
-		data["SceneElements"].push_back(*sceneElement);
+		data["SceneElements"].push_back(*(*sceneElement));
 	}
 
 	result["SurgSim::Framework::Scene"] = data;

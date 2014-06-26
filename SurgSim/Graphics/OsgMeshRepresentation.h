@@ -22,6 +22,7 @@
 #include <osg/ref_ptr>
 
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/MeshRepresentation.h"
 
@@ -41,6 +42,8 @@ namespace SurgSim
 namespace Graphics
 {
 class Mesh;
+
+SURGSIM_STATIC_REGISTRATION(OsgMeshRepresentation);
 
 /// Implementation of a MeshRepresentation for rendering under osg.
 class OsgMeshRepresentation : public OsgRepresentation, public MeshRepresentation
@@ -70,6 +73,9 @@ public:
 
 protected:
 	virtual void doUpdate(double dt) override;
+
+	/// \note If m_filename is set, m_mesh will be overwritten with the mesh loaded from the external file.
+	virtual bool doInitialize() override;
 
 private:
 	/// Indicates if the mesh is rendered as a wireframe.

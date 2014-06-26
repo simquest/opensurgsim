@@ -13,18 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/BoxShape.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::BoxShape);
-}
 
 namespace SurgSim
 {
 namespace Math
 {
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::BoxShape, BoxShape);
 
 BoxShape::BoxShape(double sizeX, double sizeY, double sizeZ) :
 	m_size(Vector3d(sizeX, sizeY, sizeZ))

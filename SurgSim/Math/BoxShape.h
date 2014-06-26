@@ -18,6 +18,7 @@
 
 #include <array>
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -25,6 +26,7 @@ namespace SurgSim
 
 namespace Math
 {
+SURGSIM_STATIC_REGISTRATION(BoxShape);
 
 /// Box shape: box centered on (0 0 0), aligned with the axis
 /// with different sizes along X, Y and Z
