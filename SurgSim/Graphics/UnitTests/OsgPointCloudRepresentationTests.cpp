@@ -148,7 +148,7 @@ TEST(OsgPointCloudRepresentationTests, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 	YAML::Node data;
 	data = node["SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>"];
-	EXPECT_EQ(7u, data.size());
+	EXPECT_EQ(8u, data.size());
 
 	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>> newOsgPointCloud;
 	ASSERT_NO_THROW(newOsgPointCloud = std::dynamic_pointer_cast<OsgPointCloudRepresentation<EmptyData>>
