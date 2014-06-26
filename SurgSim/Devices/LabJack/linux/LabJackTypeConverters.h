@@ -27,7 +27,10 @@ namespace Device
 namespace LabJack
 {
 
-/// Converts a fixed point byte array to a floating point double value.
+/// Converts an eight byte array to a floating point double value. This function is necessary for
+/// communication with the low-level driver for the LabJack, which passes all data via unsigned char. The expected
+/// format is: the first four bytes store the truncated absolute value of the decimal portion times 4294967296,
+/// the last four bytes store the signed whole-number portion, and the bytes are stored in little endian order.
 /// \param bytes The array.
 /// \param startIndex The index of the first element.
 /// \return The double.
