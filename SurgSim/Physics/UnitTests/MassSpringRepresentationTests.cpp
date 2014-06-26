@@ -24,6 +24,8 @@
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
+using SurgSim::Math::Vector;
+using SurgSim::Math::Matrix;
 using SurgSim::Physics::MassSpringRepresentation;
 using SurgSim::Physics::MockSpring;
 

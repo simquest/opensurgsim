@@ -13,11 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/UnitTests/SerializationMockComponent.h"
+#include "SurgSim/Testing/SerializationMockComponent.h"
 
-namespace {
-	SURGSIM_REGISTER(SurgSim::Framework::Component, SerializationMockComponent)
-}
+SURGSIM_REGISTER(SurgSim::Framework::Component, SerializationMockComponent, SerializationMockComponent);
 
 SerializationMockComponent::SerializationMockComponent(
 	const std::string& name,

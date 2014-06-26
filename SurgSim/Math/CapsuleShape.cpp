@@ -13,18 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/CapsuleShape.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::CapsuleShape);
-}
 
 namespace SurgSim
 {
 namespace Math
 {
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::CapsuleShape, CapsuleShape);
 
 CapsuleShape::CapsuleShape(double length, double radius) : m_length(length), m_radius(radius)
 {

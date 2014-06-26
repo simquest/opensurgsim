@@ -20,6 +20,7 @@
 #include <string>
 
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
@@ -37,6 +38,8 @@ class MeshShape;
 namespace Physics
 {
 class DeformableRepresentation;
+
+SURGSIM_STATIC_REGISTRATION(DeformableCollisionRepresentation);
 
 /// A collision representation that can be attached to a deformable, when this contains a mesh with the same number
 /// of vertices as the deformable has nodes, the mesh vertices will move to match the positions of the nodes in
@@ -81,9 +84,10 @@ public:
 
 	virtual void update(const double& dt) override;
 
-	virtual bool doInitialize() override;
-
 private:
+	virtual bool doInitialize() override;
+	virtual bool doWakeUp() override;
+
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::MeshShape> m_shape;
 

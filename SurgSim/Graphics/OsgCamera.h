@@ -18,10 +18,11 @@
 
 #include <unordered_map>
 
+#include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/Texture.h"
-#include "SurgSim/Framework/Macros.h"
 
 
 #include <osg/Camera>
@@ -43,6 +44,8 @@ class RenderTarget;
 
 template <class T>
 class OsgUniform;
+
+SURGSIM_STATIC_REGISTRATION(OsgCamera);
 
 /// OSG implementation of a graphics camera.
 ///
@@ -94,6 +97,10 @@ public:
 
 	virtual void setRenderOrder(RenderOrder order, int value) override;
 
+	virtual void setAmbientColor(const SurgSim::Math::Vector4d& color) override;
+
+	virtual SurgSim::Math::Vector4d getAmbientColor() override;
+
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
@@ -116,8 +123,15 @@ private:
 	/// Uniform to carry the view matrix
 	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_viewMatrixUniform;
 
-	/// Unfiorm to carry the inverse view matrix
+	/// Uniform to carry the inverse view matrix
 	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_inverseViewMatrixUniform;
+
+	/// Uniform to carry the ambient color
+	std::shared_ptr<OsgUniform<SurgSim::Math::Vector4f>> m_ambientColorUniform;
+
+	/// Value for ambient color
+	SurgSim::Math::Vector4d m_ambientColor;
+
 
 };
 

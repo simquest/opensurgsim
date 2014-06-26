@@ -17,11 +17,13 @@ include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${gmock_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}/include
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_TESTING_SOURCES
 	MathUtilities.cpp
 	MockInputOutput.cpp
+	SerializationMockComponent.cpp
 	TestCube.cpp
 	TestingMain.cpp
 )
@@ -30,6 +32,7 @@ set(SURGSIM_TESTING_HEADERS
 	MathUtilities.h
 	MockInputOutput.h
 	MockPhysicsManager.h
+	SerializationMockComponent.h
 	TestCube.h
 )
 

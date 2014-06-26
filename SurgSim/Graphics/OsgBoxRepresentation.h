@@ -16,10 +16,10 @@
 #ifndef SURGSIM_GRAPHICS_OSGBOXREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGBOXREPRESENTATION_H
 
+#include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/BoxRepresentation.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
-
-#include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Math/RigidTransform.h"
 
 #include <osg/PositionAttitudeTransform>
@@ -35,8 +35,9 @@ namespace SurgSim
 
 namespace Graphics
 {
-
 class OsgUnitBox;
+
+SURGSIM_STATIC_REGISTRATION(OsgBoxRepresentation);
 
 /// OSG implementation of a graphics box representation.
 class OsgBoxRepresentation : public OsgRepresentation, public BoxRepresentation

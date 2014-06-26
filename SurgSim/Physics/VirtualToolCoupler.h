@@ -21,20 +21,23 @@
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
 
 namespace Input
 {
-	class InputComponent;
-	class OutputComponent;
+class InputComponent;
+class OutputComponent;
 }
 
 namespace Physics
 {
 
 class RigidRepresentation;
+
+SURGSIM_STATIC_REGISTRATION(VirtualToolCoupler);
 
 /// The VirtualToolCoupler couples a rigid object to an input/output device through a spring and damper.  If the device
 /// will output forces and/or torques, we pass it a force (and/or torque) as well as the derivatives (Jacobians) of

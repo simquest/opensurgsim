@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
@@ -236,6 +237,12 @@ bool RigidRepresentationParameters::checkValidity() const
 
 void RigidRepresentationParameters::updateProperties()
 {
+	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shapeForMassInertia);
+	if (nullptr != meshShape && !meshShape->isValid())
+	{
+		return;
+	}
+
 	if (m_rho && m_shapeForMassInertia)
 	{
 		m_mass         = m_rho * m_shapeForMassInertia->getVolume();

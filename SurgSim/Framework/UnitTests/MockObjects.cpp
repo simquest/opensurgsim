@@ -15,7 +15,7 @@
 
 #include "SurgSim/Framework/UnitTests/MockObjects.h"
 
-SURGSIM_REGISTER(SurgSim::Framework::Component, MockComponent)
+SURGSIM_REGISTER(SurgSim::Framework::Component, MockComponent, MockComponent);
 
 MockComponent::MockComponent(const std::string& name, bool succeedInit, bool succeedWakeUp) :
 	Component(name),

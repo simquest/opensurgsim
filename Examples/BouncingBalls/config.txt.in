@@ -1,1 +1,1 @@
-${CMAKE_CURRENT_SOURCE_DIR}/Data/
+${CMAKE_SOURCE_DIR}/Examples/Data/BouncingBalls

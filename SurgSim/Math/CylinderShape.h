@@ -16,6 +16,7 @@
 #ifndef SURGSIM_MATH_CYLINDERSHAPE_H
 #define SURGSIM_MATH_CYLINDERSHAPE_H
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -23,6 +24,7 @@ namespace SurgSim
 
 namespace Math
 {
+SURGSIM_STATIC_REGISTRATION(CylinderShape);
 
 /// Cylinder shape: centered on (0 0 0), aligned along Y,
 /// defined with length and radius.

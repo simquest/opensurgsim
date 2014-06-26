@@ -13,18 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::DoubleSidedPlaneShape);
-}
 
 namespace SurgSim
 {
 namespace Math
 {
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::DoubleSidedPlaneShape, DoubleSidedPlaneShape);
 
 DoubleSidedPlaneShape::DoubleSidedPlaneShape()
 {

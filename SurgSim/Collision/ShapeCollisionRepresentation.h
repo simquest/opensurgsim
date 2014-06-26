@@ -18,6 +18,7 @@
 
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
@@ -28,6 +29,7 @@ class Shape;
 
 namespace Collision
 {
+SURGSIM_STATIC_REGISTRATION(ShapeCollisionRepresentation);
 
 /// Use a Shape as a Collision Representation, any SurgSim::Physics::Representation can
 /// be used as a backing representation
@@ -52,6 +54,7 @@ public:
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
 	virtual void update(const double& dt) override;
+	virtual bool doInitialize() override;
 
 private:
 	// Shape used by this representation

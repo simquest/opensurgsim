@@ -13,18 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/PlaneShape.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::PlaneShape);
-}
 
 namespace SurgSim
 {
 namespace Math
 {
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::PlaneShape, PlaneShape);
 
 PlaneShape::PlaneShape()
 {

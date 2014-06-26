@@ -55,6 +55,10 @@ public:
 	/// \return	The scene elements.
 	const std::vector<std::shared_ptr<SceneElement>>& getSceneElements() const;
 
+	/// Retrieve a SceneElement for this scene with the given name.
+	/// \return A SceneElement with given name; Empty share_ptr<> will be returned if no such SceneElement found.
+	const std::shared_ptr<SceneElement> getSceneElement(const std::string& name) const;
+
 	/// Gets the runtime.
 	/// \return runtime The runtime for this scene.
 	std::shared_ptr<Runtime> getRuntime();

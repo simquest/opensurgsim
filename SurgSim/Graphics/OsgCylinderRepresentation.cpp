@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-
 #include "SurgSim/Graphics/OsgCylinderRepresentation.h"
 
 #include "SurgSim/Graphics/OsgRigidTransformConversions.h"
@@ -26,13 +24,12 @@
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 
-using SurgSim::Graphics::OsgCylinderRepresentation;
-using SurgSim::Graphics::OsgUnitCylinder;
-
-namespace
+namespace SurgSim
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgCylinderRepresentation);
-}
+namespace Graphics
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgCylinderRepresentation,
+				 OsgCylinderRepresentation);
 
 OsgCylinderRepresentation::OsgCylinderRepresentation(const std::string& name) :
 	Representation(name),
@@ -95,3 +92,6 @@ std::shared_ptr<OsgUnitCylinder> OsgCylinderRepresentation::getSharedUnitCylinde
 	static SurgSim::Framework::SharedInstance<OsgUnitCylinder> shared;
 	return shared.get();
 }
+
+}; // Graphics
+}; // SurgSim

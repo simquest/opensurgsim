@@ -20,16 +20,11 @@
 #include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Framework/LockedContainer.h"
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Input::OutputComponent);
-};
-
 namespace SurgSim
 {
 namespace Input
 {
-
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Input::OutputComponent, OutputComponent);
 /// An output producer sends data to a device
 class OutputProducer: public OutputProducerInterface
 {

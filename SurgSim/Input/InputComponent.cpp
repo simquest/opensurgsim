@@ -21,15 +21,11 @@
 #include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Input::InputComponent);
-};
-
 namespace SurgSim
 {
 namespace Input
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Input::InputComponent, InputComponent);
 
 /// An input consumer monitors device and signal state update
 class InputConsumer: public InputConsumerInterface

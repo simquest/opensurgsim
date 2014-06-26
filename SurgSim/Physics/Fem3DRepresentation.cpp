@@ -19,6 +19,7 @@
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
@@ -55,15 +56,13 @@ void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
 		SurgSim::Math::setSubVector(xiTransformed, nodeId, 3, x);
 	}
 }
-
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem3DRepresentation);
 }
 
 namespace SurgSim
 {
-
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem3DRepresentation, Fem3DRepresentation);
 
 Fem3DRepresentation::Fem3DRepresentation(const std::string& name) :
 	FemRepresentation(name), m_doLoadFile(false)
@@ -94,43 +93,6 @@ void Fem3DRepresentation::setFilename(const std::string& filename)
 const std::string& Fem3DRepresentation::getFilename() const
 {
 	return m_filename;
-}
-
-bool Fem3DRepresentation::loadFile()
-{
-	if (m_filename.empty())
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Filename not set.";
-		return false;
-	}
-
-	if (!m_doLoadFile)
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File already loaded.";
-		return false;
-	}
-
-	SurgSim::DataStructures::PlyReader reader(m_filename);
-	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
-	auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
-
-	if (!reader.isValid())
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is not valid.";
-		return false;
-	}
-
-	if (!reader.setDelegate(readerDelegate))
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is not acceptable an PLY.";
-		return false;
-	}
-
-	// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
-	reader.parseFile();
-
-	m_doLoadFile = false;
-	return true;
 }
 
 std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElementIdMap(
@@ -230,13 +192,59 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 
 bool Fem3DRepresentation::doInitialize()
 {
-	if (m_doLoadFile && !loadFile())
+	bool result = true;
+	if (m_doLoadFile)
 	{
-		SURGSIM_LOG_SEVERE(Logger::getDefaultLogger()) << "Failed to initialize from file " << m_filename;
-		return false;
+		if (!loadFile())
+		{
+			SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << __FUNCTION__ << "Nothing loaded from file " << m_filename;
+			result = false;
+		}
 	}
 
-	return FemRepresentation::doInitialize();
+	return result && FemRepresentation::doInitialize();
+}
+
+bool Fem3DRepresentation::loadFile()
+{
+	bool result = true;
+	std::string filePath = getRuntime()->getApplicationData()->findFile(m_filename);
+
+	if (m_filename.empty() || filePath.empty())
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) <<
+			"Fem3DRepresentation::doInitialize(): file " << m_filename << " can not be found.";
+		result = false;
+	}
+	else
+	{
+		SurgSim::DataStructures::PlyReader reader(filePath);
+		auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
+		auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
+
+		if (!reader.isValid())
+		{
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Fem3DRepresentation::doInitialize(): " <<
+				"File " << filePath << " is not valid.";
+			result = false;
+		}
+
+		if (result && !reader.setDelegate(readerDelegate))
+		{
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Fem3DRepresentation::doInitialize(): " <<
+				"File " << filePath << " is not an acceptable PLY.";
+			result = false;
+		}
+
+		if (result)
+		{
+			// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
+			reader.parseFile();
+			m_doLoadFile = false;
+		}
+	}
+
+	return result;
 }
 
 void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
@@ -247,5 +255,4 @@ void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 }
 
 } // namespace Physics
-
 } // namespace SurgSim
