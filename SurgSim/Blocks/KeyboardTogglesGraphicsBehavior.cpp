@@ -21,15 +21,12 @@
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::KeyboardTogglesGraphicsBehavior);
-}
-
 namespace SurgSim
 {
 namespace Blocks
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::KeyboardTogglesGraphicsBehavior,
+				 KeyboardTogglesGraphicsBehavior);
 
 KeyboardTogglesGraphicsBehavior::KeyboardTogglesGraphicsBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
@@ -106,8 +103,8 @@ bool KeyboardTogglesGraphicsBehavior::doWakeUp()
 	bool result = true;
 	if (nullptr == m_inputComponent)
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "KeyboardTogglesGraphicsBehavior " <<
-																	getName() << " does not have an Input Component.";
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"KeyboardTogglesGraphicsBehavior " << getName() << " does not have an Input Component.";
 		result = false;
 	}
 	return result;

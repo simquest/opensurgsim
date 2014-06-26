@@ -20,21 +20,15 @@
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
-
-class MockComponent : public SurgSim::Framework::Component
-{
-public:
-	explicit MockComponent(const std::string& name) : Component(name) {}
-	SURGSIM_CLASSNAME(MockComponent);
-	virtual bool doInitialize() override {return true;}
-	virtual bool doWakeUp() override {return true;}
-};
-SURGSIM_REGISTER(SurgSim::Framework::Component, MockComponent);
+#include "SurgSim/Graphics/OsgBoxRepresentation.h" // Used as a mock component
 
 namespace SurgSim
 {
+
 namespace DataStructures
 {
+
+using SurgSim::Graphics::OsgBoxRepresentation;
 
 template <typename Type, size_t Size>
 void testStdArraySerialization(const std::array<Type, Size>& value)
@@ -136,11 +130,11 @@ TEST(DataStructuresConvertTests, StdUnorderedMapTests)
 
 	{
 		SCOPED_TRACE("Serialization of std::unordered_map with integer as key and std::shared_ptr<> as values");
-		typedef std::unordered_map<int, std::shared_ptr<MockComponent>> TestMapType;
+		typedef std::unordered_map<int, std::shared_ptr<OsgBoxRepresentation>> TestMapType;
 		TestMapType originalMap;
 
-		auto mockComponent = std::make_shared<MockComponent>("MockComponent");
-		auto mockComponent2 = std::make_shared<MockComponent>("MockComponent2");
+		auto mockComponent = std::make_shared<OsgBoxRepresentation>("OsgBoxRepresentation");
+		auto mockComponent2 = std::make_shared<OsgBoxRepresentation>("MockComponent2");
 
 		originalMap.insert(TestMapType::value_type(1, mockComponent));
 		originalMap.insert(TestMapType::value_type(2, mockComponent2));
@@ -156,7 +150,7 @@ TEST(DataStructuresConvertTests, StdUnorderedMapTests)
 		for (auto it = std::begin(originalMap); it != std::end(originalMap); ++it)
 		{
 			auto result = std::find_if(std::begin(newMap), std::end(newMap),
-									   [&it](const std::pair<int, std::shared_ptr<MockComponent>>& pair)
+									   [&it](const std::pair<int, std::shared_ptr<OsgBoxRepresentation>>& pair)
 									   {
 										return it->second->getName() == pair.second->getName();
 									   });
@@ -166,15 +160,15 @@ TEST(DataStructuresConvertTests, StdUnorderedMapTests)
 
 	{
 		SCOPED_TRACE("Serialization of std::unordered_map with integer as key and std::unordered_set<> as values");
-		typedef std::unordered_map<int, std::unordered_set<std::shared_ptr<MockComponent>>> TestMapType2;
+		typedef std::unordered_map<int, std::unordered_set<std::shared_ptr<OsgBoxRepresentation>>> TestMapType2;
 		TestMapType2 originalMap;
 
-		std::unordered_set<std::shared_ptr<MockComponent>> set1;
-		std::unordered_set<std::shared_ptr<MockComponent>> set2;
+		std::unordered_set<std::shared_ptr<OsgBoxRepresentation>> set1;
+		std::unordered_set<std::shared_ptr<OsgBoxRepresentation>> set2;
 
-		auto mockComponent = std::make_shared<MockComponent>("MockComponent");
-		auto mockComponent2 = std::make_shared<MockComponent>("MockComponent2");
-		auto mockComponent3 = std::make_shared<MockComponent>("MockComponent3");
+		auto mockComponent = std::make_shared<OsgBoxRepresentation>("OsgBoxRepresentation");
+		auto mockComponent2 = std::make_shared<OsgBoxRepresentation>("MockComponent2");
+		auto mockComponent3 = std::make_shared<OsgBoxRepresentation>("MockComponent3");
 
 		set1.insert(mockComponent);
 		set2.insert(mockComponent2);
@@ -198,7 +192,7 @@ TEST(DataStructuresConvertTests, StdUnorderedMapTests)
 			for (auto item = std::begin(it->second); item != std::end(it->second); ++item)
 			{
 				auto match = std::find_if(std::begin(representationSet), std::end(representationSet),
-										  [&item](const std::shared_ptr<MockComponent> rep)
+										  [&item](const std::shared_ptr<OsgBoxRepresentation> rep)
 										  {
 											return rep->getName() == (*item)->getName();
 										  });
@@ -230,11 +224,11 @@ TEST(DataStructuresConvertTests, StdUnorderedSetTests)
 
 	{
 		SCOPED_TRACE("Serialization of std::unordered_set<> of std::shared_ptr<>");
-		typedef std::unordered_set<std::shared_ptr<MockComponent>> TestSetType;
+		typedef std::unordered_set<std::shared_ptr<OsgBoxRepresentation>> TestSetType;
 		TestSetType originalSet;
 
-		auto mockComponent = std::make_shared<MockComponent>("MockComponent");
-		auto mockComponent2 = std::make_shared<MockComponent>("MockComponent2");
+		auto mockComponent = std::make_shared<OsgBoxRepresentation>("OsgBoxRepresentation");
+		auto mockComponent2 = std::make_shared<OsgBoxRepresentation>("MockComponent2");
 
 		originalSet.insert(mockComponent);
 		originalSet.insert(mockComponent2);
@@ -250,7 +244,7 @@ TEST(DataStructuresConvertTests, StdUnorderedSetTests)
 		for (auto it = std::begin(originalSet); it != std::end(originalSet); ++it)
 		{
 			auto result = std::find_if(std::begin(newSet), std::end(newSet),
-									   [&it](const std::shared_ptr<MockComponent>& item)
+									   [&it](const std::shared_ptr<OsgBoxRepresentation>& item)
 									   {
 										return (*it)->getName() == item->getName();
 									   });

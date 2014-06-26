@@ -43,6 +43,7 @@ class InputComponent;
 
 namespace Blocks
 {
+SURGSIM_STATIC_REGISTRATION(KeyboardTogglesGraphicsBehavior);
 
 /// This behavior is used to control the visibility of registered graphical representation(s)
 class KeyboardTogglesGraphicsBehavior : public SurgSim::Framework::Behavior
