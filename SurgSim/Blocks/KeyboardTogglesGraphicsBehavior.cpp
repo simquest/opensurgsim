@@ -13,8 +13,10 @@
 // limitations under the License.
 
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Devices/Keyboard/KeyCode.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
@@ -23,32 +25,52 @@ namespace SurgSim
 {
 namespace Blocks
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::KeyboardTogglesGraphicsBehavior,
+				 KeyboardTogglesGraphicsBehavior);
 
 KeyboardTogglesGraphicsBehavior::KeyboardTogglesGraphicsBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
 	m_keyPressedLastUpdate(false)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardTogglesGraphicsBehavior, std::shared_ptr<SurgSim::Framework::Component>,
+									  InputComponent, getInputComponent, setInputComponent);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardTogglesGraphicsBehavior, KeyboardRegistryType,
+									  KeyboardRegistry, getKeyboardRegistry, setKeyboardRegistry);
 }
 
-void KeyboardTogglesGraphicsBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent)
+void KeyboardTogglesGraphicsBehavior::setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent)
 {
-	m_inputComponent = inputComponent;
+	SURGSIM_ASSERT(nullptr != inputComponent) << "'inputComponent' cannot be 'nullptr'";
+
+	m_inputComponent = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(inputComponent);
+
+	SURGSIM_ASSERT(nullptr != m_inputComponent)	<< "'inputComponent' must derive from SurgSim::Input::InputComponent";
 }
 
-void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
-		std::shared_ptr<SurgSim::Framework::Component> component)
+std::shared_ptr<SurgSim::Input::InputComponent> KeyboardTogglesGraphicsBehavior::getInputComponent() const
+{
+	return m_inputComponent;
+}
+
+bool KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
+												  std::shared_ptr<SurgSim::Framework::Component> component)
 {
 	auto graphicsRepresentation = std::dynamic_pointer_cast<SurgSim::Graphics::Representation>(component);
+
+	bool result = true;
 	if (nullptr != graphicsRepresentation)
 	{
-		m_register[static_cast<int>(key)].insert(graphicsRepresentation);
+		m_registry[static_cast<int>(key)].insert(graphicsRepresentation);
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-				"KeyboardTogglesGraphicsBehavior::registerKey(): Can not register component " << component->getName() <<
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+				"Can not register component " << component->getName() <<
 				". It's not a SurgSim::Graphics::Representation.";
+		result = false;
 	}
+
+	return result;
 }
 
 void KeyboardTogglesGraphicsBehavior::update(double dt)
@@ -59,8 +81,8 @@ void KeyboardTogglesGraphicsBehavior::update(double dt)
 	int key;
 	if (dataGroup.integers().get("key", &key))
 	{
-		auto match = m_register.find(key);
-		if (match != m_register.end() && !m_keyPressedLastUpdate)
+		auto match = m_registry.find(key);
+		if (match != m_registry.end() && !m_keyPressedLastUpdate)
 		{
 			for (auto it = std::begin(match->second); it != std::end(match->second); ++it)
 			{
@@ -78,15 +100,26 @@ bool KeyboardTogglesGraphicsBehavior::doInitialize()
 
 bool KeyboardTogglesGraphicsBehavior::doWakeUp()
 {
+	bool result = true;
 	if (nullptr == m_inputComponent)
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "KeyboardTogglesGraphicsBehavior " <<
-				getName() << " does not have an Input Component.";
-		return false;
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"KeyboardTogglesGraphicsBehavior " << getName() << " does not have an Input Component.";
+		result = false;
 	}
-	return true;
+	return result;
+}
+
+void KeyboardTogglesGraphicsBehavior::setKeyboardRegistry(const KeyboardRegistryType& map)
+{
+	m_registry = map;
+}
+
+const KeyboardTogglesGraphicsBehavior::KeyboardRegistryType&
+		KeyboardTogglesGraphicsBehavior::getKeyboardRegistry() const
+{
+	return m_registry;
 }
 
 }; // namespace Blocks
-
 }; // namespace SurgSim

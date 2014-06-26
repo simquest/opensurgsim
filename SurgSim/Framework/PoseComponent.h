@@ -27,6 +27,7 @@ namespace SurgSim
 
 namespace Framework
 {
+SURGSIM_STATIC_REGISTRATION(PoseComponent);
 
 /// The PoseComponent holds a pose. It is used to group Representations that
 /// share a common pose, in a SceneElement for example.

@@ -22,6 +22,7 @@
 #include <osg/ref_ptr>
 
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/MeshRepresentation.h"
 
@@ -42,6 +43,8 @@ namespace Graphics
 {
 class Mesh;
 
+SURGSIM_STATIC_REGISTRATION(OsgMeshRepresentation);
+
 /// Implementation of a MeshRepresentation for rendering under osg.
 class OsgMeshRepresentation : public OsgRepresentation, public MeshRepresentation
 {
@@ -57,9 +60,6 @@ public:
 
 	virtual std::shared_ptr<Mesh> getMesh() override;
 
-	virtual void setDrawAsWireFrame(bool val) override;
-	virtual bool getDrawAsWireFrame() const override;
-
 	virtual void setUpdateOptions(int val) override;
 	virtual int getUpdateOptions() const override;
 
@@ -71,10 +71,10 @@ public:
 protected:
 	virtual void doUpdate(double dt) override;
 
-private:
-	/// Indicates if the mesh is rendered as a wireframe.
-	bool m_drawAsWireFrame;
+	/// \note If m_filename is set, m_mesh will be overwritten with the mesh loaded from the external file.
+	virtual bool doInitialize() override;
 
+private:
 	/// Indicates which elements of the mesh should be updated on every frame
 	int m_updateOptions;
 

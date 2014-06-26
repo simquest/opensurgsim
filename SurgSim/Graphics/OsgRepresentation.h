@@ -71,11 +71,12 @@ public:
 	/// Removes the material from the representation
 	virtual void clearMaterial();
 
+	virtual void setDrawAsWireFrame(bool val) override;
+	virtual bool getDrawAsWireFrame() const override;
+
 	/// Updates the representation.
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt);
-
-
 
 protected:
 	virtual void doUpdate(double dt);
@@ -88,6 +89,8 @@ protected:
 	/// Material defining the visual appearance of the representation
 	std::shared_ptr<OsgMaterial> m_material;
 
+	/// Indicates if the representation is rendered as a wireframe.
+	bool m_drawAsWireFrame;
 };
 
 }; // Graphics

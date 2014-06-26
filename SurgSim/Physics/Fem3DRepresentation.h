@@ -21,6 +21,7 @@
 #include <unordered_map>
 
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
@@ -34,6 +35,7 @@ class TriangleMesh;
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem3DRepresentation);
 
 /// Finite Element Model 3D is a fem built with 3D FemElement
 class Fem3DRepresentation : public FemRepresentation
@@ -56,11 +58,6 @@ public:
 	/// \return filename The name of the file to be loaded
 	const std::string& getFilename() const;
 
-	/// Loads the file
-	/// \return true if successful
-	/// \note This function is a temporary workaround and its usage is discouraged.
-	bool loadFile();
-
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
@@ -68,10 +65,11 @@ public:
 	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location) override;
 
 protected:
-	virtual bool doWakeUp() override;
+	/// Loads the file
+	/// \return true if load is successful; false otherwise.
+	bool loadFile();
 
-	/// Interface to be implemented by derived classes
-	/// \return True if component is initialized successfully; otherwise, false.
+	virtual bool doWakeUp() override;
 	virtual bool doInitialize() override;
 
 	/// Transform a state using a given transformation

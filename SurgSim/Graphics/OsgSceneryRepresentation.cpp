@@ -20,16 +20,12 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgSceneryRepresentation);
-}
-
 namespace SurgSim
 {
 
 namespace Graphics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgSceneryRepresentation, OsgSceneryRepresentation);
 
 OsgSceneryRepresentation::OsgSceneryRepresentation(const std::string& name) :
 	Representation(name),

@@ -154,14 +154,13 @@ public:
 	/// A rigid body simulation needs these 2 parameters to be defined
 	bool isValid() const;
 
+	/// Updates mass, mass center and inertia when density and/or shape used for mass inertia is updated.
+	void updateProperties();
+
 private:
 	/// Check the validity of the parameters
 	/// \return True if mass/inertia are valid and non null, False otherwise
 	bool checkValidity() const;
-
-	/// Internal helper functions to update the mass, mass-center and inertia
-	/// when density and/or shape used for mass inertia is updated.
-	void updateProperties();
 
 	/// Register accessors of serializable properties
 	void addSerializableProperty();

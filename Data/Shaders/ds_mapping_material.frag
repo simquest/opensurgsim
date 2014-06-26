@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file ds_mapping.frag
+/// \file ds_mapping_material.frag
 /// Phong material with diffuse and shadow map
 
 // These are 'free' uniforms to be set for this shader, they won't be provided by OSS
@@ -43,9 +43,6 @@ void main(void)
 	vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
 	float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
     
-	// Disable shadows for now
-	// shadowAmount = 1.0;
-	
 	float diffuse = max(dot(lightDir, normalDir), 0.0);
 	vec3 vDiffuse = vertexDiffuseColor * diffuse * shadowAmount;	
     

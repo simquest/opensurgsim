@@ -70,6 +70,14 @@ public:
 	/// Removes the material from the representation
 	virtual void clearMaterial() = 0;
 
+	/// Sets the representation to render as a wire frame.
+	/// \param	val	true if this representation should be rendered as a wireframe.
+	virtual void setDrawAsWireFrame(bool val) = 0;
+
+	/// Return if the representation is rendered as a wire frame.
+	/// \return	True if this representation is rendered as a wireframe; false if not.
+	virtual bool getDrawAsWireFrame() const = 0;
+
 	/// Updates the representation
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt) = 0;

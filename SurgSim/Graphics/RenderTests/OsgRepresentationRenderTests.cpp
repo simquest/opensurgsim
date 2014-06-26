@@ -148,7 +148,14 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 
 	axesRepresentation->setSize(0.01);
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1500));
+
+	boxRepresentation->setDrawAsWireFrame(true);
+	capsuleRepresentation->setDrawAsWireFrame(true);
+	cylinderRepresentation->setDrawAsWireFrame(true);
+	sphereRepresentation->setDrawAsWireFrame(true);
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1500));
 }
 
 };  // namespace Graphics

@@ -19,6 +19,7 @@
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/Vector.h"
@@ -45,15 +46,16 @@ struct DeformableCollisionRepresentationTest : public ::testing::Test
 		m_applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 		m_meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 		m_meshShape->setFileName(m_filename);
-		m_meshShape->initialize(*m_applicationData);
 		m_deformableRepresentation = std::make_shared<MockDeformableRepresentation>("DeformableRepresentation");
 		m_deformableCollisionRepresentation =
 			std::make_shared<DeformableCollisionRepresentation>("DeformableCollisionRepresentation");
+		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	}
 
 	std::string m_filename;
 	std::shared_ptr<SurgSim::Framework::ApplicationData> m_applicationData;
 	std::shared_ptr<SurgSim::Math::MeshShape> m_meshShape;
+	std::shared_ptr<SurgSim::Framework::Runtime> m_runtime;
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_deformableRepresentation;
 	std::shared_ptr<SurgSim::Physics::DeformableCollisionRepresentation> m_deformableCollisionRepresentation;
 };
@@ -61,7 +63,6 @@ struct DeformableCollisionRepresentationTest : public ::testing::Test
 TEST_F(DeformableCollisionRepresentationTest, InitTest)
 {
 	EXPECT_NO_THROW(DeformableCollisionRepresentation("TestDeformableCollisionRepresentation"));
-	EXPECT_NO_THROW(std::make_shared<DeformableCollisionRepresentation>("DeformableCollisionRepresentation"));
 }
 
 TEST_F(DeformableCollisionRepresentationTest, SetGetDeformableRepresentationTest)
@@ -73,6 +74,7 @@ TEST_F(DeformableCollisionRepresentationTest, SetGetDeformableRepresentationTest
 TEST_F(DeformableCollisionRepresentationTest, ShapeTest)
 {
 	EXPECT_ANY_THROW(m_deformableCollisionRepresentation->getShapeType());
+	m_meshShape->initialize(*m_applicationData);
 	m_deformableCollisionRepresentation->setShape(m_meshShape);
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_MESH, m_deformableCollisionRepresentation->getShapeType());
 
@@ -85,6 +87,8 @@ TEST_F(DeformableCollisionRepresentationTest, ShapeTest)
 
 TEST_F(DeformableCollisionRepresentationTest, MeshTest)
 {
+	m_meshShape->initialize(*m_applicationData);
+
 	m_deformableCollisionRepresentation->setMesh(m_meshShape->getMesh());
 	EXPECT_EQ(m_meshShape->getMesh()->getNumVertices(),
 		m_deformableCollisionRepresentation->getMesh()->getNumVertices());
@@ -108,8 +112,12 @@ TEST_F(DeformableCollisionRepresentationTest, SerializationTest)
 			(node.as<std::shared_ptr<SurgSim::Framework::Component>>())
 		);
 
+	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Fem3DRepresentation");
+	fem3DRepresentation->setCollisionRepresentation(newDeformableCollisionRepresentation);
+	newDeformableCollisionRepresentation->initialize(m_runtime);
+
 	auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(newDeformableCollisionRepresentation->getShape());
-	mesh->initialize(*m_applicationData);
+	m_meshShape->initialize(*m_applicationData);
 	EXPECT_NEAR(m_meshShape->getVolume(), mesh->getVolume(), epsilon);
 	EXPECT_TRUE(m_meshShape->getCenter().isApprox(mesh->getCenter()));
 	EXPECT_TRUE(m_meshShape->getSecondMomentOfVolume().isApprox(mesh->getSecondMomentOfVolume()));
@@ -119,42 +127,23 @@ TEST_F(DeformableCollisionRepresentationTest, SerializationTest)
 	EXPECT_EQ(m_meshShape->getMesh()->getNumTriangles(), mesh->getMesh()->getNumTriangles());
 }
 
-TEST_F(DeformableCollisionRepresentationTest, UpdateTest)
+TEST_F(DeformableCollisionRepresentationTest, UpdateAndInitializationTest)
 {
 	EXPECT_ANY_THROW(m_deformableCollisionRepresentation->update(0.0));
 
 	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Fem3DRepresentation");
-	fem3DRepresentation->setFilename("Data/Geometry/wound_deformable.ply");
-	fem3DRepresentation->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
+	fem3DRepresentation->setFilename(m_filename);
 
-	// Note: Directly calling loadFile is a workaround. Member data 'odeState' will be created while loading.
-	ASSERT_TRUE(fem3DRepresentation->loadFile());
+	// Member data 'odeState' will be created while loading.
+	ASSERT_TRUE(fem3DRepresentation->initialize(m_runtime));
 
 	// Connect Physics representation with Collision representation.
 	fem3DRepresentation->setCollisionRepresentation(m_deformableCollisionRepresentation);
 
 	// Set the shape used by Collision representation.
 	m_deformableCollisionRepresentation->setShape(m_meshShape);
+	EXPECT_NO_THROW(m_deformableCollisionRepresentation->initialize(m_runtime));
 	EXPECT_NO_THROW(m_deformableCollisionRepresentation->update(0.0));
-}
-
-TEST_F(DeformableCollisionRepresentationTest, DoInitializationTest)
-{
-	EXPECT_ANY_THROW(m_deformableCollisionRepresentation->doInitialize());
-
-	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Fem3DRepresentation");
-	fem3DRepresentation->setFilename("Data/Geometry/wound_deformable.ply");
-	fem3DRepresentation->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
-
-	// Note: Directly calling loadFile is a workaround. Member data 'odeState' will be created while loading.
-	ASSERT_TRUE(fem3DRepresentation->loadFile());
-
-	// Connect Physics representation with Collision representation.
-	fem3DRepresentation->setCollisionRepresentation(m_deformableCollisionRepresentation);
-
-	// Set the shape used by Collision representation.
-	m_deformableCollisionRepresentation->setShape(m_meshShape);
-	EXPECT_NO_THROW(m_deformableCollisionRepresentation->doInitialize());
 }
 
 } // namespace Physics
