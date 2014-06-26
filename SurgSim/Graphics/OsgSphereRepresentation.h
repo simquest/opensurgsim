@@ -32,11 +32,11 @@
 
 namespace SurgSim
 {
-
 namespace Graphics
 {
-
 class OsgUnitSphere;
+
+SURGSIM_STATIC_REGISTRATION(OsgSphereRepresentation);
 
 /// OSG implementation of a graphics sphere representation.
 class OsgSphereRepresentation : public OsgRepresentation, public SphereRepresentation

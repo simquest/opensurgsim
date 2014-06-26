@@ -20,6 +20,7 @@
 #include <string>
 
 #include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
@@ -36,6 +37,8 @@ class Representation;
 
 namespace Blocks
 {
+
+SURGSIM_STATIC_REGISTRATION(VisualizeContactsBehavior);
 
 /// This behavior is used to visualize the contacts
 /// on collision representation through vector field

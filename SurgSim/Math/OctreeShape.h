@@ -19,6 +19,7 @@
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
 #include "SurgSim/Framework/Asset.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -26,6 +27,7 @@ namespace SurgSim
 
 namespace Math
 {
+SURGSIM_STATIC_REGISTRATION(OctreeShape);
 
 /// Octree Shape
 /// A defined by an octree data structure

@@ -33,6 +33,8 @@ namespace Input
 class DeviceInterface;
 class InputConsumer;
 
+SURGSIM_STATIC_REGISTRATION(InputComponent);
+
 /// InputComponent combines the Component interface and the InputConsumerInterface so that input devices can
 /// provide input through the normal component interface. Multiple InputComponents can be added to
 /// the same device.

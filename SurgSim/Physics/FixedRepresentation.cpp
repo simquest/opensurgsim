@@ -15,18 +15,11 @@
 
 #include "SurgSim/Physics/FixedRepresentation.h"
 
-#include "SurgSim/Framework/ObjectFactory.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::FixedRepresentation);
-}
-
 namespace SurgSim
 {
-
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::FixedRepresentation, FixedRepresentation);
 
 FixedRepresentation::FixedRepresentation(const std::string& name) :
 	RigidRepresentationBase(name)
