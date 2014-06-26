@@ -428,14 +428,15 @@ TEST_F(RigidRepresentationTest, InvalidShapes)
 TEST_F(RigidRepresentationTest, WithMeshShape)
 {
 	std::shared_ptr<SurgSim::Math::MeshShape> shape = std::make_shared<SurgSim::Math::MeshShape>();
-	const std::string fileName = "MeshShapeData/staple_collision.ply";
-	shape->setFileName(fileName);
+	shape->setFileName("MeshShapeData/staple_collision.ply");
 
 	SurgSim::Physics::RigidRepresentationParameters params;
 	params.setShapeUsedForMassInertia(shape);
 
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 	rigidBody->setInitialParameters(params);
+
+	EXPECT_FALSE(shape->isInitialized());
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	EXPECT_NO_THROW(rigidBody->initialize(runtime));
