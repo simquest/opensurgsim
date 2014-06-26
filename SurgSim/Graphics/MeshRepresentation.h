@@ -45,8 +45,6 @@ public:
 	explicit MeshRepresentation(const std::string& name) : Representation(name)
 	{
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, std::string, Filename, getFilename, setFilename);
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, bool, DrawAsWireFrame,
-										  getDrawAsWireFrame, setDrawAsWireFrame);
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, int, UpdateOptions, getUpdateOptions, setUpdateOptions);
 	}
 
