@@ -22,6 +22,7 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/PlaneShape.h"
@@ -422,6 +423,28 @@ TEST_F(RigidRepresentationTest, InvalidShapes)
 		std::shared_ptr<Component> component = rigidBody;
 		EXPECT_THROW(component->initialize(runtime), SurgSim::Framework::AssertionFailure);
 	}
+}
+
+TEST_F(RigidRepresentationTest, WithMeshShape)
+{
+	std::shared_ptr<SurgSim::Math::MeshShape> shape = std::make_shared<SurgSim::Math::MeshShape>();
+	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	shape->setFileName(fileName);
+
+	SurgSim::Physics::RigidRepresentationParameters params;
+	params.setShapeUsedForMassInertia(shape);
+
+	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+	rigidBody->setInitialParameters(params);
+
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
+	EXPECT_NO_THROW(rigidBody->initialize(runtime));
+
+	EXPECT_TRUE(shape->isInitialized());
+
+	std::shared_ptr<RigidRepresentation> rigidBody2 = std::make_shared<RigidRepresentation>("Rigid2");
+	rigidBody2->setInitialParameters(params);
+	EXPECT_NO_THROW(rigidBody2->initialize(runtime));
 }
 
 TEST_F(RigidRepresentationTest, CollisionRepresentationTest)
