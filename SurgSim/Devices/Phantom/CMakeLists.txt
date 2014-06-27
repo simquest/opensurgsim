@@ -17,7 +17,13 @@
 find_package(OpenHaptics REQUIRED)
 
 link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES} SurgSimFramework SurgSimInput)
+
+set(LIBS
+	${Boost_LIBRARIES}
+	${OPENHAPTICS_LIBRARIES}
+	SurgSimFramework
+	SurgSimInput
+)
 
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"
