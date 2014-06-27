@@ -21,11 +21,6 @@
 #include "SurgSim/Devices/LabJack/linux/LabJackConstants.h"
 #include "SurgSim/Devices/LabJack/linux/LabJackChecksums.h"
 
-namespace
-{
-	const double EPSILON = 1e-9;
-}
-
 TEST(LabJackChecksumsTest, NormalChecksum)
 {
 	// Sum less than 256
