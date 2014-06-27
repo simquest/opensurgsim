@@ -369,7 +369,7 @@ void StaplerBehavior::update(double dt)
 
 int StaplerBehavior::getTargetManagerType() const
 {
-	return SurgSim::Framework::MANAGER_TYPE_INPUT;
+	return SurgSim::Framework::MANAGER_TYPE_PHYSICS;
 }
 
 bool StaplerBehavior::doInitialize()
