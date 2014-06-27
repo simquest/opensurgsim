@@ -48,6 +48,9 @@ surgsim_add_library(
 	"${SIXENSE_DEVICE_SOURCES}" "${SIXENSE_DEVICE_HEADERS}"
 	SurgSim/Devices/Sixense
 )
+
+target_link_libraries(SixenseDevice ${LIBS})
+
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 

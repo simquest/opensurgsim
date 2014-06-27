@@ -49,6 +49,9 @@ surgsim_add_library(
 	"${PHANTOM_DEVICE_SOURCES}" "${PHANTOM_DEVICE_HEADERS}"
 	SurgSim/Devices/Phantom
 )
+
+target_link_libraries(PhantomDevice ${LIBS})
+
 if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
