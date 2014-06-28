@@ -201,15 +201,21 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 														 triangleMesh->getVertexPosition(triangleNodeIds[1]),
 														 triangleMesh->getVertexPosition(triangleNodeIds[2])};
 
-		for (auto point = points.cbegin(); point != points.cend(); ++point)
+		std::array<SurgSim::Math::Vector3d, 4> barycentricCoordinates = {SurgSim::Math::Vector3d::Ones() / 3.0,
+																		 SurgSim::Math::Vector3d::UnitX(),
+																		 SurgSim::Math::Vector3d::UnitY(),
+																		 SurgSim::Math::Vector3d::UnitZ()};
+
+		auto barycentricCoordinate = barycentricCoordinates.cbegin();
+		for (auto point = points.cbegin(); point != points.cend(); ++point, ++barycentricCoordinate)
 		{
 			SurgSim::Collision::Location location;
 			std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 
 			std::pair<size_t, SurgSim::Math::Vector3d> triangleLocalPosition;
 			triangleLocalPosition.first = triangleId;
+			triangleLocalPosition.second = (*barycentricCoordinate);
 			location.triangleLocalPosition.setValue(triangleLocalPosition);
-			location.globalPosition.setValue(*point);
 			EXPECT_NO_THROW(localization =
 				std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
 					fem->createLocalization(location)););

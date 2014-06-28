@@ -169,18 +169,52 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 	SURGSIM_ASSERT(location.triangleLocalPosition.hasValue())
 		<< "Localization cannot be created if the triangle ID is not available.";
 
+	// Find the vertex ids of the triangle.
 	size_t triangleId = location.triangleLocalPosition.getValue().first;
-	SurgSim::Math::Vector globalPosition = location.globalPosition.getValue();
+	const SurgSim::Math::Vector3d& triangleBarycentricCoordinate = location.triangleLocalPosition.getValue().second;
+	SurgSim::Math::Vector4d triangleBarycentricCoordinate4(triangleBarycentricCoordinate[0],
+														   triangleBarycentricCoordinate[1],
+														   triangleBarycentricCoordinate[2],
+														   0.0);
+	auto deformableCollisionRepresentation
+		= std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
 
+	SURGSIM_ASSERT(deformableCollisionRepresentation != nullptr)
+		<< "Localization cannot be created if the DeformableCollisionRepresentation is not correctly set.";
+
+	auto triangleVertexIds = deformableCollisionRepresentation->getMesh()->getTriangle(triangleId).verticesId;
+
+	// Find the vertex ids of the corresponding FemNode.
 	// Get FemElement id from the triangle id.
 	SURGSIM_ASSERT(m_triangleIdToElementIdMap.count(triangleId) == 1) << "Triangle must be mapped to an fem element.";
 
 	size_t elementId = m_triangleIdToElementIdMap[triangleId];
 	std::shared_ptr<FemElement> element = getFemElement(elementId);
 
+	auto elementVertexIds = element->getNodeIds();
+
+	// Find the mapping between triangleVertexIds and elementVertexIds.
+	std::array<int, 4> indices;
+	for (int i = 0; i < 4; ++i)
+	{
+		indices[i] = 3;
+		for (int j = 0; j < 3; ++j)
+		{
+			if (triangleVertexIds[j] == elementVertexIds[i])
+			{
+				indices[i] = j;
+				break;
+			}
+		}
+	}
+
+	// Create the natual coordinate.
 	FemRepresentationCoordinate coordinate;
 	coordinate.elementId = elementId;
-	coordinate.naturalCoordinate = element->computeNaturalCoordinate(*m_currentState, globalPosition);
+	coordinate.naturalCoordinate = SurgSim::Math::Vector4d(triangleBarycentricCoordinate4[indices[0]],
+														   triangleBarycentricCoordinate4[indices[1]],
+														   triangleBarycentricCoordinate4[indices[2]],
+														   triangleBarycentricCoordinate4[indices[3]]);
 
 	// Fem3DRepresentationLocalization::setLocalPosition verifies argument based on its Representation.
 	auto result = std::make_shared<Fem3DRepresentationLocalization>();
