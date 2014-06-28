@@ -64,6 +64,24 @@ const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getRepr
 	return m_representations;
 }
 
+void PhysicsManagerState::filterActiveRepresentations()
+{
+	m_activeRepresentations.clear();
+	m_activeRepresentations.reserve(m_representations.size());
+	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
+	{
+		if ((*it)->isActive())
+		{
+			m_activeRepresentations.push_back(*it);
+		}
+	}
+}
+
+const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getActiveRepresentations() const
+{
+	return m_activeRepresentations;
+}
+
 const std::unordered_map<
 	std::shared_ptr<SurgSim::Collision::Representation>,
 	std::shared_ptr<SurgSim::Physics::Representation>>&

@@ -92,6 +92,43 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	EXPECT_EQ(rigid2, actualCollisionsToPhysicsMap[collisionRepresentation]);
 }
 
+TEST(PhysicsManagerStateTest, FilterGetActiveRepresentations)
+{
+	auto physicsState = std::make_shared<PhysicsManagerState>();
+	std::vector<std::shared_ptr<Representation>> expectedRepresentations;
+	std::vector<std::shared_ptr<Representation>> actualRepresentations;
+
+	// Add a representation.
+	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
+	expectedRepresentations.push_back(rigid1);
+	physicsState->setRepresentations(expectedRepresentations);
+
+	// Filter the active representations and test.
+	physicsState->filterActiveRepresentations();
+	actualRepresentations = physicsState->getActiveRepresentations();
+	ASSERT_EQ(1, actualRepresentations.size());
+	EXPECT_EQ(rigid1, actualRepresentations.back());
+
+	// Disable the rigid1.
+	rigid1->setIsActive(false);
+	physicsState->filterActiveRepresentations();
+	actualRepresentations = physicsState->getActiveRepresentations();
+	ASSERT_EQ(0, actualRepresentations.size());
+
+	// Add a second representation.  This one has a collision representation.
+	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
+	auto collisionRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("rigid2 collision");
+	rigid2->setCollisionRepresentation(collisionRepresentation);
+	expectedRepresentations.push_back(rigid2);
+	physicsState->setRepresentations(expectedRepresentations);
+
+	// Filter the active representations and test.
+	physicsState->filterActiveRepresentations();
+	actualRepresentations = physicsState->getActiveRepresentations();
+	ASSERT_EQ(1, actualRepresentations.size());
+	EXPECT_EQ(rigid2, actualRepresentations.back());
+}
+
 TEST(PhysicsManagerStateTest, SetGetCollisionRepresentations)
 {
 	auto physicsState = std::make_shared<PhysicsManagerState>();

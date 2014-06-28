@@ -60,6 +60,13 @@ public:
 	/// \return	The physics representations that are known to the state.
 	const std::vector<std::shared_ptr<Representation>>& getRepresentations();
 
+	/// Filter the list of representations into the active representations list.
+	void filterActiveRepresentations();
+
+	/// Gets the active physics representations.
+	/// \return	The active physics representations that are known to the state.
+	const std::vector<std::shared_ptr<Representation>>& getActiveRepresentations() const;
+
 	/// Sets the collision representations for the state.
 	/// \param val collection of all collision representations.
 	void setCollisionRepresentations(const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val);
@@ -143,6 +150,9 @@ private:
 	/// not get copied themselves.
 	/// The local list of representations
 	std::vector<std::shared_ptr<Representation>> m_representations;
+
+	/// The list of active representations.
+	std::vector<std::shared_ptr<Representation>> m_activeRepresentations;
 
 	/// List of all the collision representations know to the state
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
