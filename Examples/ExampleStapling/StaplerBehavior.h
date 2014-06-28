@@ -24,6 +24,9 @@
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Collision/Location.h"
+
+class StapleElement;
 
 namespace SurgSim
 {
@@ -36,11 +39,6 @@ class Representation;
 namespace Physics
 {
 class Constraint;
-}
-
-namespace Collision
-{
-struct Location;
 }
 
 namespace Graphics
@@ -174,6 +172,23 @@ private:
 
 	/// The list of scene element names that this behaviour can staple.
 	std::list<std::string> m_stapleEnabledSceneElements;
+
+	/// Struct to store all the info necessary to create the constraint between the stpale and
+	/// the stapled object.
+	/// The constraint cannot be created in the same simulation step as creating the staple, because
+	/// the staple will not be awake yet. So the constraint to be created are maintained in a list,
+	/// and created when the staple is awake.
+	struct ConstraintInfo
+	{
+		std::shared_ptr<StapleElement> m_staple;
+		std::shared_ptr<SurgSim::Physics::Representation> m_stapleRepresentation;
+		std::shared_ptr<SurgSim::Physics::Representation> m_targetPhysicsRepresentation;
+		SurgSim::Collision::Location m_location;
+		std::string m_name;
+	};
+
+	/// The list of constraints to be created.
+	std::vector<ConstraintInfo> m_constraintsToBeCreated;
 };
 
 #endif  // EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H

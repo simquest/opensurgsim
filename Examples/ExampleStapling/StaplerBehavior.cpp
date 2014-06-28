@@ -310,29 +310,17 @@ void StaplerBehavior::createStaple()
 		std::shared_ptr<SurgSim::Physics::Representation> targetPhysicsRepresentation =
 			findCorrespondingPhysicsRepresentation(targetRepresentationContacts.first);
 
-		// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
-		std::shared_ptr<SurgSim::Physics::Constraint> constraint =
-			createBilateral3DConstraint(staple->getComponents<SurgSim::Physics::Representation>()[0],
-										targetPhysicsRepresentation,
-										targetContact->penetrationPoints.first);
+		// Store all the necessary info to create the constraint.
+		ConstraintInfo constraintInfo;
 
-		if (constraint == nullptr)
-		{
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Failed to create constraint between staple and "
-				<< targetRepresentationContacts.first->getSceneElement()->getName()
-				<< ". This might be because the createBilateral3DConstraint is not supporting the Physics Type: "
-				<< targetPhysicsRepresentation->getType();
-			continue;
-		}
+		constraintInfo.m_staple = staple;
+		constraintInfo.m_stapleRepresentation = staple->getComponents<SurgSim::Physics::Representation>()[0];
+		constraintInfo.m_targetPhysicsRepresentation = targetPhysicsRepresentation;
+		constraintInfo.m_location = targetContact->penetrationPoints.second;
+		constraintInfo.m_name = "Bilateral3DConstraint" + boost::to_string(toothId++);
 
-		// Create a component to store this constraint.
-		std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
-			std::make_shared<SurgSim::Physics::ConstraintComponent>(
-				"Bilateral3DConstraint" + boost::to_string(toothId++));
-
-		constraintComponent->setConstraint(constraint);
-		staple->addComponent(constraintComponent);
+		// Add this to the list of constraints to be created.
+		m_constraintsToBeCreated.push_back(constraintInfo);
 	}
 
 	if (!stapleAdded)
@@ -345,6 +333,41 @@ void StaplerBehavior::createStaple()
 
 void StaplerBehavior::update(double dt)
 {
+	// Create the constraints that are waiting to be created.
+	for (auto it = m_constraintsToBeCreated.begin(); it != m_constraintsToBeCreated.end();)
+	{
+		if (it->m_stapleRepresentation->isAwake())
+		{
+			// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
+			std::shared_ptr<SurgSim::Physics::Constraint> constraint =
+				createBilateral3DConstraint(it->m_stapleRepresentation,
+											it->m_targetPhysicsRepresentation,
+											it->m_location);
+
+			if (constraint == nullptr)
+			{
+				auto rep = it->m_targetPhysicsRepresentation;
+				SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+					<< "Failed to create constraint between staple and "
+					<< rep->getSceneElement()->getName()
+					<< ". This might be because the createBilateral3DConstraint is not supporting the Physics Type: "
+					<< rep->getType();
+			}
+			else
+			{
+				// Create a component to store this constraint.
+				std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
+					std::make_shared<SurgSim::Physics::ConstraintComponent>(
+						it->m_name);
+
+				constraintComponent->setConstraint(constraint);
+				it->m_staple->addComponent(constraintComponent);
+			}
+
+			it = m_constraintsToBeCreated.erase(it);
+		}
+	}
+
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_from->getData(&dataGroup);
 
