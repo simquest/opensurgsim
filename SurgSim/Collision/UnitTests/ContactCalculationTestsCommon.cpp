@@ -65,18 +65,38 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 									 it->get()->penetrationPoints.second.globalPosition.getValue());
 		// Compare the depth.
 		contactPresent &= std::abs(expected->depth - it->get()->depth) <= ScalarEpsilon;
-		// Check if the optional 'triangleId' is present in expected contact.
-		if (expected->penetrationPoints.first.triangleId.hasValue())
+		// Check if the optional 'triangleLocalPosition' is present in expected contact.
+		if (expected->penetrationPoints.first.triangleLocalPosition.hasValue())
 		{
-			EXPECT_TRUE(it->get()->penetrationPoints.first.triangleId.hasValue());
-			contactPresent &= expected->penetrationPoints.first.triangleId.getValue() ==
-							  it->get()->penetrationPoints.first.triangleId.getValue();
+			EXPECT_TRUE(it->get()->penetrationPoints.first.triangleLocalPosition.hasValue());
+			contactPresent &= expected->penetrationPoints.first.triangleLocalPosition.getValue().first ==
+							  it->get()->penetrationPoints.first.triangleLocalPosition.getValue().first;
+			auto triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(*it);
+			if (triangleContact != nullptr)
+			{
+				Vector3d barycentricCoordinates =
+					it->get()->penetrationPoints.first.triangleLocalPosition.getValue().second;
+				eigenEqual(expected->penetrationPoints.first.globalPosition.getValue(),
+					barycentricCoordinates[0] * triangleContact->firstVertices[0] +
+					barycentricCoordinates[1] * triangleContact->firstVertices[1] +
+					barycentricCoordinates[2] * triangleContact->firstVertices[2]);
+			}
 		}
-		if (expected->penetrationPoints.second.triangleId.hasValue())
+		if (expected->penetrationPoints.second.triangleLocalPosition.hasValue())
 		{
-			EXPECT_TRUE(it->get()->penetrationPoints.second.triangleId.hasValue());
-			contactPresent &= expected->penetrationPoints.second.triangleId.getValue() ==
-							  it->get()->penetrationPoints.second.triangleId.getValue();
+			EXPECT_TRUE(it->get()->penetrationPoints.second.triangleLocalPosition.hasValue());
+			contactPresent &= expected->penetrationPoints.second.triangleLocalPosition.getValue().first ==
+							  it->get()->penetrationPoints.second.triangleLocalPosition.getValue().first;
+			auto triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(*it);
+			if (triangleContact != nullptr)
+			{
+				Vector3d barycentricCoordinates =
+					it->get()->penetrationPoints.second.triangleLocalPosition.getValue().second;
+				eigenEqual(expected->penetrationPoints.second.globalPosition.getValue(),
+					barycentricCoordinates[0] * triangleContact->secondVertices[0] +
+					barycentricCoordinates[1] * triangleContact->secondVertices[1] +
+					barycentricCoordinates[2] * triangleContact->secondVertices[2]);
+			}
 		}
 	}
 

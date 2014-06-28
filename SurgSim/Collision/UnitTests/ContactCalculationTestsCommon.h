@@ -52,6 +52,21 @@ namespace SurgSim
 namespace Collision
 {
 
+/// Struct to store the triangle vertices along with the Contact struct.
+struct TriangleContact : public Contact
+{
+	TriangleContact(const double& newDepth,
+			const SurgSim::Math::Vector3d& newContact,
+			const SurgSim::Math::Vector3d& newNormal,
+			const std::pair<Location, Location>& newPenetrationPoints)
+			: Contact(newDepth, newContact, newNormal, newPenetrationPoints)
+	{
+	}
+
+	std::array<SurgSim::Math::Vector3d, 3> firstVertices;
+	std::array<SurgSim::Math::Vector3d, 3> secondVertices;
+};
+
 /// Function that compares two 3d vectors and asserts that they are equal.
 /// The tolerance for the numerical values is SurgSim::Math::Geometry::DistanceEpsilon.
 /// \param left First vector.

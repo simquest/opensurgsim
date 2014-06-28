@@ -166,10 +166,10 @@ bool Fem3DRepresentation::doWakeUp()
 
 std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::Collision::Location& location)
 {
-	SURGSIM_ASSERT(location.triangleId.hasValue())
+	SURGSIM_ASSERT(location.triangleLocalPosition.hasValue())
 		<< "Localization cannot be created if the triangle ID is not available.";
 
-	size_t triangleId = location.triangleId.getValue();
+	size_t triangleId = location.triangleLocalPosition.getValue().first;
 	SurgSim::Math::Vector globalPosition = location.globalPosition.getValue();
 
 	// Get FemElement id from the triangle id.

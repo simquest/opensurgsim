@@ -206,7 +206,9 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 			SurgSim::Collision::Location location;
 			std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 
-			location.triangleId.setValue(triangleId);
+			std::pair<size_t, SurgSim::Math::Vector3d> triangleLocalPosition;
+			triangleLocalPosition.first = triangleId;
+			location.triangleLocalPosition.setValue(triangleLocalPosition);
 			location.globalPosition.setValue(*point);
 			EXPECT_NO_THROW(localization =
 				std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(

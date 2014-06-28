@@ -201,8 +201,16 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
-					penetrationPoints.first.triangleId.setValue(*i);
-					penetrationPoints.second.triangleId.setValue(*j);
+					std::pair<size_t, Vector3d> triangleLocalPositionFirst;
+					triangleLocalPositionFirst.first = *i;
+					SurgSim::Math::barycentricCoordinates(penetrationPointA, verticesA[0], verticesA[1], verticesA[2],
+						normalA, &triangleLocalPositionFirst.second);
+					penetrationPoints.first.triangleLocalPosition.setValue(triangleLocalPositionFirst);
+					std::pair<size_t, Vector3d> triangleLocalPositionSecond;
+					triangleLocalPositionSecond.first = *j;
+					SurgSim::Math::barycentricCoordinates(penetrationPointB, verticesB[0], verticesB[1], verticesB[2],
+						normalB, &triangleLocalPositionSecond.second);
+					penetrationPoints.second.triangleLocalPosition.setValue(triangleLocalPositionSecond);
 					penetrationPoints.first.globalPosition.setValue(penetrationPointA);
 					penetrationPoints.second.globalPosition.setValue(penetrationPointB);
 
