@@ -27,6 +27,8 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem1DRepresentation);
+
 class FemRepresentationPlyReaderDelegate;
 
 /// Finite Element Model 1D is a fem built with 1D FemElement
@@ -41,6 +43,8 @@ public:
 
 	/// Destructor
 	virtual ~Fem1DRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DRepresentation);
 
 	/// Query the representation type
 	/// \return the RepresentationType for this representation

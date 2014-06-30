@@ -69,8 +69,6 @@ Fem3DRepresentation::Fem3DRepresentation(const std::string& name) :
 	// Reminder: m_numDofPerNode is held by DeformableRepresentation
 	// but needs to be set by all concrete derived classes
 	m_numDofPerNode = 3;
-
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Fem3DRepresentation, std::string, Filename, getFilename, setFilename);
 }
 
 Fem3DRepresentation::~Fem3DRepresentation()

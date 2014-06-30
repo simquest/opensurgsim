@@ -50,6 +50,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem1DRepresentation, Fem1DRepresentation);
 
 Fem1DRepresentation::Fem1DRepresentation(const std::string& name) : FemRepresentation(name)
 {

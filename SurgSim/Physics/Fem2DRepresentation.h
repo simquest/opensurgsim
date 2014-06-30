@@ -19,6 +19,8 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
@@ -27,6 +29,8 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem2DRepresentation);
+
 class Fem2DRepresentationPlyReaderDelegate;
 
 /// Finite Element Model 2D is a fem built with 2D FemElement
@@ -39,6 +43,8 @@ public:
 
 	/// Destructor
 	virtual ~Fem2DRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DRepresentation);
 
 	virtual RepresentationType getType() const override;
 

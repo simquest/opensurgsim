@@ -36,6 +36,8 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, Filename, getFilename, setFilename);
 }
 
 FemRepresentation::~FemRepresentation()
