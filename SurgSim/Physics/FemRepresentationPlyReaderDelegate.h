@@ -94,7 +94,7 @@ public:
 	void processBoundaryCondition(const std::string& elementName);
 
 protected:
-	/// Flag indicating whether the associated file has boundary conditions
+	/// Flag indicating if the associated file has boundary conditions
 	bool m_hasBoundaryConditions;
 
 	/// Internal data to receive the "boundary_condition" element
@@ -125,7 +125,7 @@ protected:
 	{
 		ElementData();
 
-		unsigned int* indicies;
+		unsigned int* indices;
 		unsigned int vertexCount;
 	} m_femData;
 };

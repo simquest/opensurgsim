@@ -184,7 +184,7 @@ protected:
 	/// Whether the file should be loaded or not.
 	bool m_doLoadFile;
 
-	/// Filename for loading the fem3d representation.
+	/// Filename for loading the fem representation.
 	std::string m_filename;
 
 private:

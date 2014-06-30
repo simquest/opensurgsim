@@ -30,7 +30,7 @@ FemRepresentationPlyReaderDelegate::FemRepresentationPlyReaderDelegate(std::shar
 {
 }
 
-FemRepresentationPlyReaderDelegate::ElementData::ElementData() : indicies(nullptr), vertexCount(0)
+FemRepresentationPlyReaderDelegate::ElementData::ElementData() : indices(nullptr), vertexCount(0)
 {
 }
 
@@ -82,7 +82,7 @@ void* FemRepresentationPlyReaderDelegate::beginFemElements(const std::string& el
 
 void FemRepresentationPlyReaderDelegate::endFemElements(const std::string& elementName)
 {
-	m_femData.indicies = nullptr;
+	m_femData.indices = nullptr;
 }
 
 void* FemRepresentationPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)

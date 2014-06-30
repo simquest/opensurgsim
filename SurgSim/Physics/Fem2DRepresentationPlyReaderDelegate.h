@@ -42,7 +42,7 @@ public:
 
 	/// Callback function, begin the processing of thickness.
 	/// \param elementName Name of the element.
-	/// \param thicknessCount Number of thickness.
+	/// \param thicknessCount Number of thicknesses.
 	/// \return memory for thickness data to the reader.
 	void* beginThickness(const std::string& elementName, size_t thicknessCount);
 

@@ -42,7 +42,7 @@ public:
 
 	/// Callback function, begin the processing of radius.
 	/// \param elementName Name of the element.
-	/// \param radiusCount Number of radius.
+	/// \param radiusCount Number of radii.
 	/// \return memory for radius data to the reader.
 	void* beginRadius(const std::string& elementName, size_t radiusCount);
 
