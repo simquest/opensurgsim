@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Input/CommonDevice.h"
 
 namespace SurgSim
@@ -29,101 +30,105 @@ namespace Device
 {
 class LabJackScaffold;
 
-/// The types of LabJack devices.  Numbers come from LabJackUD.h.
-enum LabJackType
+namespace LabJack
 {
-	LABJACKTYPE_SEARCH = -1,
-	LABJACKTYPE_UE9 = 9,
-	LABJACKTYPE_U3 = 3,
-	LABJACKTYPE_U6 = 6
+
+/// The models of LabJack devices.  Numbers come from LabJackUD.h.
+enum Model
+{
+	MODEL_SEARCH = -1,
+	MODEL_UE9 = 9,
+	MODEL_U3 = 3,
+	MODEL_U6 = 6
 };
 
 /// The connection (i.e., communication media) for LabJacks.  Numbers come from LabJackUD.h.
-enum LabJackConnection
+enum Connection
 {
-	LABJACKCONNECTION_SEARCH = -1,
-	LABJACKCONNECTION_USB = 1,
-	LABJACKCONNECTION_ETHERNET = 2,
-	LABJACKCONNECTION_ETHERNET_MB = 3,
-	LABJACKCONNECTION_ETHERNET_DATA_ONLY = 4
+	CONNECTION_SEARCH = -1,
+	CONNECTION_USB = 1,
+	CONNECTION_ETHERNET = 2,
+	CONNECTION_ETHERNET_MB = 3,
+	CONNECTION_ETHERNET_DATA_ONLY = 4
 };
 
 /// The timer base frequencies for LabJacks.  A given value can correspond to different clock frequencies for different
 /// LabJack models.  The same clock frequency corresponds to different values depending on whether the
 /// high- or low-level driver is used.  See section 2.10 - Timers/Counters in the respective model's User's Guide.
-enum LabJackTimerBase
+enum TimerBase
 {
-	LABJACKTIMERBASE_DEFAULT = -1,
-	LABJACKTIMERBASE_0 = 0,
-	LABJACKTIMERBASE_1 = 1,
-	LABJACKTIMERBASE_2 = 2,
-	LABJACKTIMERBASE_3 = 3,
-	LABJACKTIMERBASE_4 = 4,
-	LABJACKTIMERBASE_5 = 5,
-	LABJACKTIMERBASE_6 = 6,
-	LABJACKTIMERBASE_20 = 20,
-	LABJACKTIMERBASE_21 = 21,
-	LABJACKTIMERBASE_22 = 22,
-	LABJACKTIMERBASE_23 = 23,
-	LABJACKTIMERBASE_24 = 24,
-	LABJACKTIMERBASE_25 = 25,
-	LABJACKTIMERBASE_26 = 26
+	TIMERBASE_DEFAULT = -1,
+	TIMERBASE_0 = 0,
+	TIMERBASE_1 = 1,
+	TIMERBASE_2 = 2,
+	TIMERBASE_3 = 3,
+	TIMERBASE_4 = 4,
+	TIMERBASE_5 = 5,
+	TIMERBASE_6 = 6,
+	TIMERBASE_20 = 20,
+	TIMERBASE_21 = 21,
+	TIMERBASE_22 = 22,
+	TIMERBASE_23 = 23,
+	TIMERBASE_24 = 24,
+	TIMERBASE_25 = 25,
+	TIMERBASE_26 = 26
 };
 
 /// The timer modes.  Numbers come from LabJackUD.h.  Note that edge-counting modes require processing time: see the
 /// LabJack manual for restrictions on number of edges counted per second over all timers
 /// (e.g., 30,000/second for U3 or U6).
-enum LabJackTimerMode
+enum TimerMode
 {
-	LABJACKTIMERMODE_PWM16 = 0, // 16 bit PWM
-	LABJACKTIMERMODE_PWM8 = 1, // 8 bit PWM
-	LABJACKTIMERMODE_RISINGEDGES32 = 2, // 32-bit rising to rising edge measurement
-	LABJACKTIMERMODE_FALLINGEDGES32 = 3, // 32-bit falling to falling edge measurement
-	LABJACKTIMERMODE_DUTYCYCLE = 4, // duty cycle measurement
-	LABJACKTIMERMODE_FIRMCOUNTER = 5, // firmware based rising edge counter
-	LABJACKTIMERMODE_FIRMCOUNTERDEBOUNCE = 6, // firmware counter with debounce
-	LABJACKTIMERMODE_FREQOUT = 7, // frequency output
-	LABJACKTIMERMODE_QUAD = 8, // Quadrature
-	LABJACKTIMERMODE_TIMERSTOP = 9, // stops another timer after n pulses
-	LABJACKTIMERMODE_SYSTIMERLOW = 10, // read lower 32-bits of system timer
-	LABJACKTIMERMODE_SYSTIMERHIGH = 11, // read upper 32-bits of system timer
-	LABJACKTIMERMODE_RISINGEDGES16 = 12, // 16-bit rising to rising edge measurement
-	LABJACKTIMERMODE_FALLINGEDGES16 = 13, // 16-bit falling to falling edge measurement
-	LABJACKTIMERMODE_LINETOLINE = 14 // Line to Line measurement
+	TIMERMODE_PWM_16BIT = 0, // 16 bit PWM
+	TIMERMODE_PWM_8BIT = 1, // 8 bit PWM
+	TIMERMODE_RISING_EDGES_32BIT = 2, // 32-bit rising to rising edge measurement
+	TIMERMODE_FALLING_EDGES_32BIT = 3, // 32-bit falling to falling edge measurement
+	TIMERMODE_DUTY_CYCLE = 4, // duty cycle measurement
+	TIMERMODE_FIRMWARE_COUNTER = 5, // firmware based rising edge counter
+	TIMERMODE_FIRMWARE_COUNTER_DEBOUNCED = 6, // firmware counter with debounce
+	TIMERMODE_FREQUENCY_OUTPUT = 7, // frequency output
+	TIMERMODE_QUADRATURE = 8, // Quadrature
+	TIMERMODE_TIMER_STOP = 9, // stops another timer after n pulses
+	TIMERMODE_SYSTEM_TIMER_LOWER_32BITS = 10, // read lower 32-bits of system timer
+	TIMERMODE_SYSTEM_TIMER_UPPR_32BITS = 11, // read upper 32-bits of system timer
+	TIMERMODE_RISING_EDGES_16BIT = 12, // 16-bit rising to rising edge measurement
+	TIMERMODE_FALLING_EDGES_16BIT = 13, // 16-bit falling to falling edge measurement
+	TIMERMODE_LINE_TO_LINE = 14 // Line to Line measurement
 };
 
 /// The analog input ranges.  Equivalent to gain.  Ignored for Linux scaffold, which auto-ranges.
-enum LabJackAnalogInputRange
+enum Range
 {
-	LABJACKANALOGINPUTRANGE_20 = 1, // -20V to +20V, LJ_rgBIP20V
-	LABJACKANALOGINPUTRANGE_10 = 2, // -10V to +10V, LJ_rgBIP10V
-	LABJACKANALOGINPUTRANGE_5 = 3, // -5V to +5V, LJ_rgBIP5V
-	LABJACKANALOGINPUTRANGE_4 = 4, // -4V to +4V, LJ_rgBIP4V
-	LABJACKANALOGINPUTRANGE_2p5 = 5, // -2.5V to +2.5V, LJ_rgBIP2P5V
-	LABJACKANALOGINPUTRANGE_2 = 6, // -2V to +2V, LJ_rgBIP2V
-	LABJACKANALOGINPUTRANGE_1p25 = 7, // -1.25V to +1.25V, LJ_rgBIP1P25V
-	LABJACKANALOGINPUTRANGE_1 = 8, // -1V to +1V, LJ_rgBIP1V
-	LABJACKANALOGINPUTRANGE_0p625 = 9, // -0.625V to +0.625V, LJ_rgBIPP625V
-	LABJACKANALOGINPUTRANGE_0p1 = 10, // -0.1V to +0.1V, LJ_rgBIPP1V
-	LABJACKANALOGINPUTRANGE_0p01 = 11 // -0.01V to +0.01V, LJ_rgBIPP01V
+	RANGE_20 = 1, // -20V to +20V, LJ_rgBIP20V
+	RANGE_10 = 2, // -10V to +10V, LJ_rgBIP10V
+	RANGE_5 = 3, // -5V to +5V, LJ_rgBIP5V
+	RANGE_4 = 4, // -4V to +4V, LJ_rgBIP4V
+	RANGE_2_POINT_5 = 5, // -2.5V to +2.5V, LJ_rgBIP2P5V
+	RANGE_2 = 6, // -2V to +2V, LJ_rgBIP2V
+	RANGE_1_POINT_25 = 7, // -1.25V to +1.25V, LJ_rgBIP1P25V
+	RANGE_1 = 8, // -1V to +1V, LJ_rgBIP1V
+	RANGE_0_POINT_625 = 9, // -0.625V to +0.625V, LJ_rgBIPP625V
+	RANGE_0_POINT_1 = 10, // -0.1V to +0.1V, LJ_rgBIPP1V
+	RANGE_0_POINT_01 = 11 // -0.01V to +0.01V, LJ_rgBIPP01V
 };
 
-/// A struct holding the data to be associated with the positive channel for a differential analog input.
-struct LabJackAnalogInputsDifferentialData
+/// A struct holding the data to be associated with the positive channel for an analog input.
+struct RangeAndOptionalNegativeChannel
 {
 	/// Equality comparison.
 	/// \param other The object with which to compare.
 	/// \return true if equivalent.
-	bool operator==(const LabJackAnalogInputsDifferentialData& other) const
+	bool operator==(const RangeAndOptionalNegativeChannel& other) const
 	{
 		return (negativeChannel == other.negativeChannel) && (range == other.range);
 	}
 
 	/// The negative channel.
-	int negativeChannel;
+	SurgSim::DataStructures::OptionalValue<int> negativeChannel;
 
 	/// The range.
-	LabJackAnalogInputRange range;
+	Range range;
+};
 };
 
 /// A class implementing the communication with a LabJack data acquisition (DAQ) device.  Should work for the U3, U6,
@@ -193,21 +198,21 @@ public:
 	/// Check whether this device is initialized.
 	bool isInitialized() const;
 
-	/// Set the type of the LabJack, e.g., U6.
-	/// \param deviceType The device type.
+	/// Set the model, e.g., U6.
+	/// \param model The model.
 	/// \exception Asserts if already initialized.
-	void setType(LabJackType deviceType);
+	void setModel(LabJack::Model model);
 
-	/// \return The type of the LabJack, e.g., U6.
-	LabJackType getType() const;
+	/// \return The model, e.g., U6.
+	LabJack::Model getModel() const;
 
 	/// Set the connection type of the LabJack, e.g., USB.
 	/// \param connection The communication medium.
 	/// \exception Asserts if already initialized.
-	void setConnection(LabJackConnection connection);
+	void setConnection(LabJack::Connection connection);
 
 	/// \return The connection type of the LabJack, e.g., USB.
-	LabJackConnection getConnection() const;
+	LabJack::Connection getConnection() const;
 
 	/// Set the address of the LabJack, e.g., "1" or "192.168.7.23".  If the address is zero-length, attempt to open the
 	/// first-found device of the specified type on the specified connection.
@@ -238,10 +243,10 @@ public:
 	/// frequency.  See section 2.10 - Timers/Counters in the respective LabJack model's User's Guide.
 	/// \param base The timer base rate.
 	/// \exception Asserts if already initialized.
-	void setTimerBase(LabJackTimerBase base);
+	void setTimerBase(LabJack::TimerBase base);
 
 	/// \return The timer base rate.
-	LabJackTimerBase getTimerBase() const;
+	LabJack::TimerBase getTimerBase() const;
 
 	/// If the Timer type ends in "_DIV", then the actual timer frequency is divided by the divisor.
 	/// \param divisor The amount by which to divide the frequency.  Values from 1-255 are used directly, while 0 means
@@ -267,10 +272,10 @@ public:
 	/// \param timers A map from the index of the timer (not the line number, see setTimerCounterPinOffset) to the
 	///		type of timer to enable.
 	/// \exception Asserts if already initialized.
-	void setTimers(const std::unordered_map<int, LabJackTimerMode>& timers);
+	void setTimers(const std::unordered_map<int, LabJack::TimerMode>& timers);
 
 	/// \return The enabled timers.
-	const std::unordered_map<int, LabJackTimerMode>& getTimers() const;
+	const std::unordered_map<int, LabJack::TimerMode>& getTimers() const;
 
 	/// Set the maximum update rate for the LabJackThread.  Since the device driver blocks thread execution
 	/// while acquiring new data, update rates have a definite upper-bound that is dependent on the requested
@@ -284,18 +289,18 @@ public:
 	/// \param analogInputs The inputs. The key is the positive channel.
 	/// \exception Asserts if already initialized.
 	/// \note On Linux, does not correctly handle negative channels 31 or 32 for U3 model.
-	void setAnalogInputsDifferential(std::unordered_map<int, LabJackAnalogInputsDifferentialData> analogInputs);
+	void setAnalogInputsDifferential(std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputs);
 
 	/// Set the single-ended analog inputs.
 	/// \param analogInputs The inputs. The key is the channel.  The value is the range.
 	/// \exception Asserts if already initialized.
-	void setAnalogInputsSingleEnded(std::unordered_map<int, LabJackAnalogInputRange> analogInputs);
+	void setAnalogInputsSingleEnded(std::unordered_map<int, LabJack::Range> analogInputs);
 
 	/// \return The enabled differential analog inputs.
-	const std::unordered_map<int, LabJackAnalogInputsDifferentialData>& getAnalogInputsDifferential() const;
+	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel>& getAnalogInputsDifferential() const;
 
 	/// \return The enabled single-ended analog inputs.
-	const std::unordered_map<int, LabJackAnalogInputRange>& getAnalogInputsSingleEnded() const;
+	const std::unordered_map<int, LabJack::Range>& getAnalogInputsSingleEnded() const;
 
 	/// Enable analog output lines.
 	/// \param analogOutputChannels The set of channel numbers.
@@ -336,11 +341,11 @@ private:
 	/// The single scaffold object that handles communications with all instances of LabJackDevice.
 	std::shared_ptr<LabJackScaffold> m_scaffold;
 
-	/// The type of LabJack, e.g., U6.
-	LabJackType m_type;
+	/// The model, e.g., U6.
+	LabJack::Model m_model;
 
-	/// The type of connection, e.g., USB.
-	LabJackConnection m_connection;
+	/// The type of communication connection, e.g., USB.
+	LabJack::Connection m_connection;
 
 	/// The address, or a zero-length string to indicate the first-found device of this type on this connection.
 	std::string m_address;
@@ -349,10 +354,10 @@ private:
 	std::unordered_set<int> m_digitalInputChannels;
 
 	/// The single-ended analog inputs.  The key is the channel.  The value is the range (i.e., gain).
-	std::unordered_map<int, LabJackAnalogInputRange> m_analogInputsSingleEnded;
+	std::unordered_map<int, LabJack::Range> m_analogInputsSingleEnded;
 
 	/// The differential analog inputs. The key is the positive channel.
-	std::unordered_map<int, LabJackAnalogInputsDifferentialData> m_analogInputsDifferential;
+	std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> m_analogInputsDifferential;
 
 	/// The line numbers for the digital outputs.
 	std::unordered_set<int> m_digitalOutputChannels;
@@ -363,7 +368,7 @@ private:
 	/// The timer base, which is the frequency of all the output timers unless it ends in "_DIV",
 	/// in which case the frequency is the base divided by the divisor.  See section 2.10 - Timers/Counters in the
 	/// respective LabJack model's User's Guide.
-	LabJackTimerBase m_timerBase;
+	LabJack::TimerBase m_timerBase;
 
 	/// The timer clock's divisor, see m_timerBase.
 	int m_timerClockDivisor;
@@ -372,7 +377,7 @@ private:
 	int m_timerCounterPinOffset;
 
 	/// A map from the timers' line numbers to their modes.
-	std::unordered_map<int, LabJackTimerMode> m_timers;
+	std::unordered_map<int, LabJack::TimerMode> m_timers;
 
 	/// The maximum update rate for the LabJackThread.
 	double m_threadRate;

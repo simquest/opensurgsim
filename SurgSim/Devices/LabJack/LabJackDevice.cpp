@@ -18,7 +18,6 @@
 #include "SurgSim/Devices/LabJack/LabJackScaffold.h"
 #include "SurgSim/Framework/Log.h"
 
-
 namespace SurgSim
 {
 namespace Device
@@ -26,10 +25,10 @@ namespace Device
 
 LabJackDevice::LabJackDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, LabJackScaffold::buildDeviceInputData()),
-	m_type(LABJACKTYPE_SEARCH),
-	m_connection(LABJACKCONNECTION_SEARCH),
+	m_model(LabJack::MODEL_SEARCH),
+	m_connection(LabJack::CONNECTION_SEARCH),
 	m_address(""),
-	m_timerBase(LABJACKTIMERBASE_DEFAULT),
+	m_timerBase(LabJack::TIMERBASE_DEFAULT),
 	m_timerClockDivisor(1),
 	m_timerCounterPinOffset(0),
 	m_threadRate(1000.0),
@@ -96,24 +95,24 @@ bool LabJackDevice::isInitialized() const
 	return (m_scaffold != nullptr);
 }
 
-void LabJackDevice::setType(LabJackType deviceType)
+void LabJackDevice::setModel(LabJack::Model model)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "LabJackDevice's type cannot be set after it is initialized.";
-	m_type = deviceType;
+	SURGSIM_ASSERT(!isInitialized()) << "LabJackDevice's model cannot be set after it is initialized.";
+	m_model = model;
 }
 
-LabJackType LabJackDevice::getType() const
+LabJack::Model LabJackDevice::getModel() const
 {
-	return m_type;
+	return m_model;
 }
 
-void LabJackDevice::setConnection(LabJackConnection connection)
+void LabJackDevice::setConnection(LabJack::Connection connection)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "LabJackDevice's connection cannot be set after it is initialized.";
 	m_connection = connection;
 }
 
-SurgSim::Device::LabJackConnection LabJackDevice::getConnection() const
+LabJack::Connection LabJackDevice::getConnection() const
 {
 	return m_connection;
 }
@@ -151,13 +150,13 @@ const std::unordered_set<int>& LabJackDevice::getDigitalOutputChannels() const
 	return m_digitalOutputChannels;
 }
 
-void LabJackDevice::setTimerBase(LabJackTimerBase base)
+void LabJackDevice::setTimerBase(LabJack::TimerBase base)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "LabJackDevice's timer base cannot be set after it is initialized.";
 	m_timerBase = base;
 }
 
-SurgSim::Device::LabJackTimerBase LabJackDevice::getTimerBase() const
+LabJack::TimerBase LabJackDevice::getTimerBase() const
 {
 	return m_timerBase;
 }
@@ -185,13 +184,13 @@ int LabJackDevice::getTimerCounterPinOffset() const
 	return m_timerCounterPinOffset;
 }
 
-void LabJackDevice::setTimers(const std::unordered_map<int,LabJackTimerMode>& timers)
+void LabJackDevice::setTimers(const std::unordered_map<int, LabJack::TimerMode>& timers)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Timers cannot be added to a LabJackDevice after it is initialized.";
 	m_timers = timers;
 }
 
-const std::unordered_map<int,LabJackTimerMode>& LabJackDevice::getTimers() const
+const std::unordered_map<int, LabJack::TimerMode>& LabJackDevice::getTimers() const
 {
 	return m_timers;
 }
@@ -209,26 +208,26 @@ double LabJackDevice::getMaximumUpdateRate() const
 }
 
 void LabJackDevice::setAnalogInputsDifferential(std::unordered_map<int,
-	LabJackAnalogInputsDifferentialData> analogInputs)
+	LabJack::RangeAndOptionalNegativeChannel> analogInputs)
 {
 	SURGSIM_ASSERT(!isInitialized()) <<
 		"Differential analog inputs cannot be set for a LabJackDevice after it is initialized.";
 	m_analogInputsDifferential = analogInputs;
 }
 
-const std::unordered_map<int, LabJackAnalogInputsDifferentialData>& LabJackDevice::getAnalogInputsDifferential() const
+const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel>& LabJackDevice::getAnalogInputsDifferential() const
 {
 	return m_analogInputsDifferential;
 }
 
-void LabJackDevice::setAnalogInputsSingleEnded(std::unordered_map<int, LabJackAnalogInputRange> analogInputs)
+void LabJackDevice::setAnalogInputsSingleEnded(std::unordered_map<int, LabJack::Range> analogInputs)
 {
 	SURGSIM_ASSERT(!isInitialized()) <<
 		"Single-ended analog inputs cannot be set for a LabJackDevice after it is initialized.";
 	m_analogInputsSingleEnded = analogInputs;
 }
 
-const std::unordered_map<int, LabJackAnalogInputRange>& LabJackDevice::getAnalogInputsSingleEnded() const
+const std::unordered_map<int, LabJack::Range>& LabJackDevice::getAnalogInputsSingleEnded() const
 {
 	return m_analogInputsSingleEnded;
 }

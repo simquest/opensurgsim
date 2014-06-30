@@ -51,71 +51,71 @@ typedef HANDLE LJ_HANDLE;
 /// The low-level LabJack library returns a NULL handle when failing to open a new device.
 static const LJ_HANDLE LABJACK_INVALID_HANDLE = NULL;
 
-/// A struct containing the default settings that depend on the type of LabJack.
+/// A struct containing the default settings that depend on the model of LabJack.
 struct LabJackDefaults
 {
 	LabJackDefaults()
 	{
-		timerBase[LabJackType::LABJACKTYPE_U3] = LabJackTimerBase::LABJACKTIMERBASE_2;
-		timerBase[LabJackType::LABJACKTYPE_U6] = LabJackTimerBase::LABJACKTIMERBASE_2;
-		timerBase[LabJackType::LABJACKTYPE_UE9] = LabJackTimerBase::LABJACKTIMERBASE_1;
+		timerBase[LabJack::MODEL_U3] = LabJack::TIMERBASE_2;
+		timerBase[LabJack::MODEL_U6] = LabJack::TIMERBASE_2;
+		timerBase[LabJack::MODEL_UE9] = LabJack::TIMERBASE_1;
 	}
 
 	/// The default timer base rate.
-	std::unordered_map<LabJackType, LabJackTimerBase, std::hash<int>> timerBase;
+	std::unordered_map<LabJack::Model, LabJack::TimerBase, std::hash<int>> timerBase;
 };
 
 
-/// A struct containing various parameters that depend on the type of LabJack.
+/// A struct containing various parameters that depend on the model of LabJack.
 struct LabJackParameters
 {
 	LabJackParameters()
 	{
-		configBlocks[LabJackType::LABJACKTYPE_U3] = 16; // hardware version 1.30 & 1.21
-		configBlocks[LabJackType::LABJACKTYPE_U6] = 10;
-		configBlocks[LabJackType::LABJACKTYPE_UE9] = 4;
+		configBlocks[LabJack::MODEL_U3] = 16; // hardware version 1.30 & 1.21
+		configBlocks[LabJack::MODEL_U6] = 10;
+		configBlocks[LabJack::MODEL_UE9] = 4;
 
-		calibrationCommand[LabJackType::LABJACKTYPE_U3] = 0x2D;
-		calibrationCommand[LabJackType::LABJACKTYPE_U6] = 0x2D;
-		calibrationCommand[LabJackType::LABJACKTYPE_UE9] = 0x2A;
+		calibrationCommand[LabJack::MODEL_U3] = 0x2D;
+		calibrationCommand[LabJack::MODEL_U6] = 0x2D;
+		calibrationCommand[LabJack::MODEL_UE9] = 0x2A;
 
-		calibrationThirdByte[LabJackType::LABJACKTYPE_U3] = 0x11;
-		calibrationThirdByte[LabJackType::LABJACKTYPE_U6] = 0x11;
-		calibrationThirdByte[LabJackType::LABJACKTYPE_UE9] = 0x41;
+		calibrationThirdByte[LabJack::MODEL_U3] = 0x11;
+		calibrationThirdByte[LabJack::MODEL_U6] = 0x11;
+		calibrationThirdByte[LabJack::MODEL_UE9] = 0x41;
 
-		calibrationReadBytes[LabJackType::LABJACKTYPE_U3] = 40;
-		calibrationReadBytes[LabJackType::LABJACKTYPE_U6] = 40;
-		calibrationReadBytes[LabJackType::LABJACKTYPE_UE9] = 136;
+		calibrationReadBytes[LabJack::MODEL_U3] = 40;
+		calibrationReadBytes[LabJack::MODEL_U6] = 40;
+		calibrationReadBytes[LabJack::MODEL_UE9] = 136;
 	}
 
 	/// The number of config memory blocks.
-	std::unordered_map<LabJackType, int, std::hash<int>> configBlocks;
+	std::unordered_map<LabJack::Model, int, std::hash<int>> configBlocks;
 	/// The extended command for reading the calibration data.
-	std::unordered_map<LabJackType, BYTE, std::hash<int>> calibrationCommand;
+	std::unordered_map<LabJack::Model, BYTE, std::hash<int>> calibrationCommand;
 	/// The expected read third byte for the read calibration command.
-	std::unordered_map<LabJackType, BYTE, std::hash<int>> calibrationThirdByte;
+	std::unordered_map<LabJack::Model, BYTE, std::hash<int>> calibrationThirdByte;
 	/// The number of bytes read per calibration read.
-	std::unordered_map<LabJackType, int, std::hash<int>> calibrationReadBytes;
+	std::unordered_map<LabJack::Model, int, std::hash<int>> calibrationReadBytes;
 };
 
-/// Convert the LabJackAnalogInputRange to the gain code expected by the low level driver.
-/// \param range The LabJackAnalogInputRange.
+/// Convert the LabJack::Range to the gain code expected by the low level driver.
+/// \param range The LabJack::Range code.
 /// \return The gain code.
-int getGain(LabJackAnalogInputRange range)
+int getGain(LabJack::Range range)
 {
 	int gain;
 	switch (range)
 	{
-	case LABJACKANALOGINPUTRANGE_10:
+	case LabJack::RANGE_10:
 		gain = 0;
 		break;
-	case LABJACKANALOGINPUTRANGE_1:
+	case LabJack::RANGE_1:
 		gain = 1;
 		break;
-	case LABJACKANALOGINPUTRANGE_0p1:
+	case LabJack::RANGE_0_POINT_1:
 		gain = 2;
 		break;
-	case LABJACKANALOGINPUTRANGE_0p01:
+	case LabJack::RANGE_0_POINT_01:
 		gain = 3;
 		break;
 	default:
@@ -184,15 +184,15 @@ class LabJackScaffold::Handle
 {
 public:
 	/// Constructor that attempts to open a device.
-	/// \param deviceType The type of LabJack device to open (see strings in LabJackUD.h).
-	/// \param connectionType How to connect to the device (e.g., USB) (see strings in LabJackUD.h).
+	/// \param model The model of LabJack device to open (see strings in LabJackUD.h).
+	/// \param connection How to connect to the device (e.g., USB) (see strings in LabJackUD.h).
 	/// \param address Either the ID or serial number (if USB), or the IP address.
-	Handle(SurgSim::Device::LabJackType deviceType, SurgSim::Device::LabJackConnection connectionType,
+	Handle(SurgSim::Device::LabJack::Model model, SurgSim::Device::LabJack::Connection connection,
 		const std::string& address) :
 		m_deviceHandle(LABJACK_INVALID_HANDLE),
 		m_address(address),
-		m_type(deviceType),
-		m_connection(connectionType),
+		m_model(model),
+		m_connection(connection),
 		m_scaffold(LabJackScaffold::getOrCreateSharedInstance())
 	{
 		create();
@@ -218,28 +218,28 @@ public:
 
 		bool result = true;
 
-		if (m_type == LABJACKTYPE_UE9)
+		if (m_model == LabJack::MODEL_UE9)
 		{
 			SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Failed to open a device. " <<
 				"The UE9 model LabJack is not supported for the low-level driver used on Linux & Mac. " <<
 				"The commands for the UE9 have a different structure, which is not currently implemented." <<
 				std::endl <<
-				"  Type: '" << m_type << "'.  Connection: '" << m_connection << "'.  Address: '" <<
+				"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
 				m_address << "'." << std::endl;
 			result = false;
 		}
 
-		if (m_connection != LABJACKCONNECTION_USB)
+		if (m_connection != LabJack::CONNECTION_USB)
 		{
 			SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Failed to open a device. " <<
 				"The LabJackDevice connection must be set to USB for the low-level driver used on Linux & Mac." <<
 				std::endl <<
-				"  Type: '" << m_type << "'.  Connection: '" << m_connection << "'.  Address: '" <<
+				"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
 				m_address << "'." << std::endl;
 			result = false;
 		}
 
-		unsigned int deviceNumber = 1; // If no address is specified, grab the first device found of this type.
+		unsigned int deviceNumber = 1; // If no address is specified, grab the first device found of this model.
 		if (m_address.length() > 0)
 		{
 			try
@@ -252,7 +252,7 @@ public:
 					"The LabJackDevice address should be a string representation of an unsigned integer " <<
 					"corresponding to the device number (or the empty string to get the first device), " <<
 					"but the conversion from string to integer failed." << std::endl <<
-					"  Type: '" << m_type << "'.  Connection: '" << m_connection << "'.  Address: '" <<
+					"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
 					m_address << "'." << std::endl;
 				result = false;
 			}
@@ -261,12 +261,12 @@ public:
 		if (result)
 		{
 			const unsigned int dwReserved = 0; // Not used, set to 0.
-			m_deviceHandle = LJUSB_OpenDevice(deviceNumber, dwReserved, m_type);
+			m_deviceHandle = LJUSB_OpenDevice(deviceNumber, dwReserved, m_model);
 			if (m_deviceHandle == LABJACK_INVALID_HANDLE)
 			{
 				SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Failed to open a device." <<
 					std::endl <<
-					"  Type: '" << m_type << "'.  Connection: '" << m_connection << "'.  Address: '" <<
+					"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
 					m_address << "'." << std::endl <<
 					"  labjackusb error code: " << errno << "." << std::endl;
 				result = false;
@@ -301,10 +301,10 @@ private:
 	LJ_HANDLE m_deviceHandle;
 	/// The address used to open the device.  Can be the empty string if the first-found device was opened.
 	std::string m_address;
-	/// The type of the device.
-	SurgSim::Device::LabJackType m_type;
+	/// The model of the device.
+	SurgSim::Device::LabJack::Model m_model;
 	/// The connection to the device.
-	SurgSim::Device::LabJackConnection m_connection;
+	SurgSim::Device::LabJack::Connection m_connection;
 	/// The scaffold.
 	std::shared_ptr<LabJackScaffold> m_scaffold;
 };
@@ -349,9 +349,9 @@ public:
 	/// The timer channels set for timer outputs (e.g., PWM outputs).
 	const std::unordered_set<int> timerOutputChannels;
 	/// The differential analog inputs.
-	const std::unordered_map<int, LabJackAnalogInputsDifferentialData> analogInputsDifferential;
+	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputsDifferential;
 	/// The single-ended analog inputs.
-	const std::unordered_map<int, LabJackAnalogInputRange> analogInputsSingleEnded;
+	const std::unordered_map<int, LabJack::Range> analogInputsSingleEnded;
 	/// The channels set for analog outputs.
 	const std::unordered_set<int> analogOutputChannels;
 	/// The DataGroup indices for the digital outputs.
@@ -370,21 +370,21 @@ public:
 	std::unordered_map<int, int> analogInputSingleEndedIndices;
 	/// True if the output indices have been cached.
 	bool cachedOutputIndices;
-	// Calibration constants.  The meaning of each entry is specific to the model (i.e., LabJackType).
+	// Calibration constants.  The meaning of each entry is specific to the model (i.e., LabJack::Model).
 	double calibration[40];
 
 private:
 	/// Given all the timers, return just the ones that provide inputs.
 	/// \param timers The timers.
 	/// \return The timers that provide inputs.
-	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int,LabJackTimerMode>& timers) const
+	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int, LabJack::TimerMode>& timers) const
 	{
 		std::unordered_set<int> timersWithInputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 		{
-			if ((timer->second != LABJACKTIMERMODE_PWM16) &&
-				(timer->second != LABJACKTIMERMODE_PWM8) &&
-				(timer->second != LABJACKTIMERMODE_FREQOUT))
+			if ((timer->second != LabJack::TIMERMODE_PWM_16BIT) &&
+				(timer->second != LabJack::TIMERMODE_PWM_8BIT) &&
+				(timer->second != LabJack::TIMERMODE_FREQUENCY_OUTPUT))
 			{
 				timersWithInputs.insert(timer->first);
 			}
@@ -395,23 +395,24 @@ private:
 	/// Given all the timers, return just the ones that take outputs.
 	/// \param timers The timers.
 	/// \return The timers that take outputs.
-	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int, LabJackTimerMode>& timers) const
+	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int,
+		LabJack::TimerMode>& timers) const
 	{
 		std::unordered_set<int> timersWithOutputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 		{
-			if ((timer->second != LABJACKTIMERMODE_PWM16) &&
-				(timer->second != LABJACKTIMERMODE_PWM8) &&
-				(timer->second != LABJACKTIMERMODE_RISINGEDGES32) &&
-				(timer->second != LABJACKTIMERMODE_FALLINGEDGES32) &&
-				(timer->second != LABJACKTIMERMODE_DUTYCYCLE) &&
-				(timer->second != LABJACKTIMERMODE_FIRMCOUNTER) &&
-				(timer->second != LABJACKTIMERMODE_FIRMCOUNTERDEBOUNCE) &&
-				(timer->second != LABJACKTIMERMODE_FREQOUT) &&
-				(timer->second != LABJACKTIMERMODE_QUAD) &&
-				(timer->second != LABJACKTIMERMODE_RISINGEDGES16) &&
-				(timer->second != LABJACKTIMERMODE_FALLINGEDGES16) &&
-				(timer->second != LABJACKTIMERMODE_LINETOLINE))
+			if ((timer->second != LabJack::TIMERMODE_PWM_16BIT) &&
+				(timer->second != LabJack::TIMERMODE_PWM_8BIT) &&
+				(timer->second != LabJack::TIMERMODE_RISING_EDGES_32BIT) &&
+				(timer->second != LabJack::TIMERMODE_FALLING_EDGES_32BIT) &&
+				(timer->second != LabJack::TIMERMODE_DUTY_CYCLE) &&
+				(timer->second != LabJack::TIMERMODE_FIRMWARE_COUNTER) &&
+				(timer->second != LabJack::TIMERMODE_FIRMWARE_COUNTER_DEBOUNCED) &&
+				(timer->second != LabJack::TIMERMODE_FREQUENCY_OUTPUT) &&
+				(timer->second != LabJack::TIMERMODE_QUADRATURE) &&
+				(timer->second != LabJack::TIMERMODE_RISING_EDGES_16BIT) &&
+				(timer->second != LabJack::TIMERMODE_FALLING_EDGES_16BIT) &&
+				(timer->second != LabJack::TIMERMODE_LINE_TO_LINE))
 			{
 				timersWithOutputs.insert(timer->first);
 			}
@@ -497,25 +498,25 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 	}
 
 	// Make sure the combination of connection and address is unique, unless the address is zero-length, in which
-	// case the first-found device of this type on this connection will be opened.
+	// case the first-found device of this model on this connection will be opened.
 	const std::string& address = device->getAddress();
 
 	if (result && (address.length() > 0))
 	{
-		const SurgSim::Device::LabJackType deviceType = device->getType();
-		const SurgSim::Device::LabJackConnection connectionType = device->getConnection();
+		const SurgSim::Device::LabJack::Model model = device->getModel();
+		const SurgSim::Device::LabJack::Connection connection = device->getConnection();
 
 		auto const sameInitialization = std::find_if(m_state->activeDeviceList.cbegin(),
 			m_state->activeDeviceList.cend(),
-			[&address, connectionType, deviceType](const std::unique_ptr<DeviceData>& info)
+			[&address, connection, model](const std::unique_ptr<DeviceData>& info)
 		{ return (info->deviceObject->getAddress() == address) &&
-				(info->deviceObject->getConnection() == connectionType) &&
-				(info->deviceObject->getType() == deviceType); });
+				(info->deviceObject->getConnection() == connection) &&
+				(info->deviceObject->getModel() == model); });
 
 		if (sameInitialization != m_state->activeDeviceList.cend())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Tried to register a device named '" << device->getName() <<
-				"', but a device with the same type (" << deviceType << "), connection (" << connectionType <<
+				"', but a device with the same model (" << model << "), connection (" << connection <<
 				"), and address ('" << address << "') is already present!";
 			result = false;
 		}
@@ -524,34 +525,34 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 	if (result)
 	{
 		// Create a handle, opening communications.
-		// If the device's type is SEARCH, iterate over the options.
-		std::vector<LabJackType> typesToSearch;
-		if (device->getType() == LABJACKTYPE_SEARCH)
+		// If the device's model is SEARCH, iterate over the options.
+		std::vector<LabJack::Model> modelsToSearch;
+		if (device->getModel() == LabJack::MODEL_SEARCH)
 		{
-			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": searching for types U3 and U6.";
-			typesToSearch.push_back(LABJACKTYPE_U6);
-			typesToSearch.push_back(LABJACKTYPE_U3);
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": searching for models U3 and U6.";
+			modelsToSearch.push_back(LabJack::MODEL_U6);
+			modelsToSearch.push_back(LabJack::MODEL_U3);
 		}
 		else
 		{
-			typesToSearch.push_back(device->getType());
+			modelsToSearch.push_back(device->getModel());
 		}
 
 		// If the device's connection is search, set it to USB since that is all we currently support for the
 		// low-level driver.
-		if (device->getConnection() == LABJACKCONNECTION_SEARCH)
+		if (device->getConnection() == LabJack::CONNECTION_SEARCH)
 		{
 			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": searching for connection. " <<
 				"The low-level driver currently only supports USB as the medium.";
-			device->setConnection(LABJACKCONNECTION_USB);
+			device->setConnection(LabJack::CONNECTION_USB);
 		}
 
 		std::unique_ptr<Handle> handle;
-		for (auto type = typesToSearch.cbegin(); type != typesToSearch.cend(); ++type)
+		for (auto model = modelsToSearch.cbegin(); model != modelsToSearch.cend(); ++model)
 		{
-			device->setType(*type);
+			device->setModel(*model);
 
-			handle = std::unique_ptr<Handle>(new Handle(*type, device->getConnection(), address));
+			handle = std::unique_ptr<Handle>(new Handle(*model, device->getConnection(), address));
 			result = handle->isValid();
 			if (result)
 			{
@@ -808,13 +809,13 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	auto const& analogInputsDifferential = info->analogInputsDifferential;
 	for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
 	{
-		if (device->getType() == LABJACKTYPE_U3)
+		if (device->getModel() == LabJack::MODEL_U3)
 		{
 			const BYTE longSettling = (device->getAnalogInputSettling() > 0 ? (1 << 6) : 0);
 			const BYTE quickSample = (device->getAnalogInputResolution() > 0 ? (1 << 7) : 0);
 			sendBytes.at(sendBytesSize++) = 1;
 			sendBytes.at(sendBytesSize++) = input->first | longSettling | quickSample;
-			sendBytes.at(sendBytesSize++) = input->second.negativeChannel;
+			sendBytes.at(sendBytesSize++) = input->second.negativeChannel.getValue();
 			readBytesSize += 2;
 		}
 		else
@@ -831,7 +832,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	auto const& analogInputsSingleEnded = info->analogInputsSingleEnded;
 	for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
 	{
-		if (device->getType() == LABJACKTYPE_U3)
+		if (device->getModel() == LabJack::MODEL_U3)
 		{
 			sendBytes.at(sendBytesSize++) = 1;
 			sendBytes.at(sendBytesSize++) = input->first;
@@ -864,7 +865,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 					sendBytes.at(sendBytesSize++) = dacConfigCode;
 
 					int bytes;
-					if (device->getType() == LABJACKTYPE_U3)
+					if (device->getModel() == LabJack::MODEL_U3)
 					{
 						const int calibrationIndex = *output * 2 + 4;
 						bytes = value * info->calibration[calibrationIndex] * 256 +
@@ -988,7 +989,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 
 		for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
 		{
-			if (device->getType() == LABJACKTYPE_U3)
+			if (device->getModel() == LabJack::MODEL_U3)
 			{
 				const int count = 2;
 				const uint16_t value = LabJack::uint16FromChars(readBytes, currentByte, count);
@@ -1030,7 +1031,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 
 		for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
 		{
-			if (device->getType() == LABJACKTYPE_U3)
+			if (device->getModel() == LabJack::MODEL_U3)
 			{
 				const int count = 2;
 				const uint16_t value = LabJack::uint16FromChars(readBytes, currentByte, count);
@@ -1207,11 +1208,11 @@ bool LabJackScaffold::configureClock(DeviceData* deviceData)
 	LabJackDevice* device = deviceData->deviceObject;
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
-	LabJackTimerBase base = device->getTimerBase();
-	if (base == LABJACKTIMERBASE_DEFAULT)
+	LabJack::TimerBase base = device->getTimerBase();
+	if (base == LabJack::TimerBase::TIMERBASE_DEFAULT)
 	{
 		LabJackDefaults defaults;
-		base = defaults.timerBase[device->getType()];
+		base = defaults.timerBase[device->getModel()];
 	}
 
 	// Second, set the clock base and divisor
@@ -1298,7 +1299,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 	int sendBytesSize = 7; // the first IOType goes here
 
 	int readBytesSize = 9; // Reading after a Feedback command provides 9+ bytes.
-	const std::unordered_map<int, LabJackTimerMode> timers = device->getTimers();
+	const std::unordered_map<int, LabJack::TimerMode> timers = device->getTimers();
 	for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 	{
 		const int minimumTimer = 0;
@@ -1320,8 +1321,8 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 			sendBytes.at(sendBytesSize++) = 0;  //Value LSB
 			sendBytes.at(sendBytesSize++) = 0;  //Value MSB
 
-			if ((timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM8) ||
-				(timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM16))
+			if ((timer->second == LabJack::TIMERMODE_PWM_8BIT) ||
+				(timer->second == LabJack::TIMERMODE_PWM_16BIT))
 			{  // Initialize PWMs to almost-always low.
 				const BYTE timerCode = timerConfigCode - 1;
 				sendBytes.at(sendBytesSize++) = timerCode;   //IOType, Timer# (e.g., Timer0)
@@ -1407,33 +1408,33 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 		}
 	}
 
-	if (device->getType() == LABJACKTYPE_U6)
+	if (device->getModel() == LabJack::MODEL_U6)
 	{
 		auto const& analogInputs = device->getAnalogInputsDifferential();
 		for (auto input = analogInputs.cbegin(); input != analogInputs.cend(); ++input)
 		{
-			if (input->second.negativeChannel != input->first + 1)
+			if (input->second.negativeChannel.getValue() != input->first + 1)
 			{
 				SURGSIM_LOG_SEVERE(m_logger) <<
 					"Failed to configure a differential analog input for a device named '" <<
 					device->getName() << "'. For a model U6(-PRO), with the low-level driver, "<<
 					"the negative channel number must be one greater than the positive channel number, " <<
 					"but positive channel " << input->first << " is paired with negative channel " <<
-					input->second.negativeChannel << ".";
+					input->second.negativeChannel.getValue() << ".";
 				result = false;
 			}
 		}
 	}
 
 	LabJackParameters parameters;
-	const int blocks = parameters.configBlocks[device->getType()];
+	const int blocks = parameters.configBlocks[device->getModel()];
 	std::array<BYTE, LabJack::MAXIMUM_BUFFER> sendBytes;
 	sendBytes[1] = 0xF8; //command byte
 	sendBytes[2] = 0x01; //number of data words
-	sendBytes[3] = parameters.calibrationCommand[device->getType()];
+	sendBytes[3] = parameters.calibrationCommand[device->getModel()];
 	sendBytes[6] = 0;
 	const int sendBytesSize = 8;
-	const int readBytesSize = parameters.calibrationReadBytes[device->getType()];
+	const int readBytesSize = parameters.calibrationReadBytes[device->getModel()];
 
 	for (int i = 0; i < blocks; ++i)
 	{
@@ -1461,11 +1462,11 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 			result = readAndCheck(rawHandle, &readBytes, readBytesSize, device->getName(), sendBytes, errorText,
 				m_logger);
 
-			if (readBytes[2] != parameters.calibrationThirdByte[device->getType()])
+			if (readBytes[2] != parameters.calibrationThirdByte[device->getModel()])
 			{
 				SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
 					device->getName() << "'.  The command bytes are wrong.  Expected byte 2: " <<
-					static_cast<int>(parameters.calibrationThirdByte[device->getType()]) << ".  Received: " <<
+					static_cast<int>(parameters.calibrationThirdByte[device->getModel()]) << ".  Received: " <<
 					readBytes[2] << "." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
 				result = false;
 			}

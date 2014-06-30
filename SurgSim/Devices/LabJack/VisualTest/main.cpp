@@ -233,21 +233,22 @@ int main(int argc, char** argv)
 	toolDevice->setTimerCounterPinOffset(offset); // the U3 requires the offset to be 4+.
 
 	const int firstTimerForQuadrature = 0;
-	std::unordered_map<int,SurgSim::Device::LabJackTimerMode> timers;
-	timers[firstTimerForQuadrature] = SurgSim::Device::LABJACKTIMERMODE_QUAD;
-	timers[firstTimerForQuadrature + 1] = SurgSim::Device::LABJACKTIMERMODE_QUAD;
+	std::unordered_map<int, SurgSim::Device::LabJack::TimerMode> timers;
+	timers[firstTimerForQuadrature] = SurgSim::Device::LabJack::TIMERMODE_QUADRATURE;
+	timers[firstTimerForQuadrature + 1] = SurgSim::Device::LabJack::TIMERMODE_QUADRATURE;
 	toolDevice->setTimers(timers);
 
-	std::unordered_map<int, SurgSim::Device::LabJackAnalogInputRange> analogInputsSingleEnded;
+	std::unordered_map<int, SurgSim::Device::LabJack::Range> analogInputsSingleEnded;
 	const int singleEndedAnalog = 1;
-	analogInputsSingleEnded[singleEndedAnalog] = SurgSim::Device::LabJackAnalogInputRange::LABJACKANALOGINPUTRANGE_10;
+	analogInputsSingleEnded[singleEndedAnalog] = SurgSim::Device::LabJack::Range::RANGE_10;
 	toolDevice->setAnalogInputsSingleEnded(analogInputsSingleEnded);
 
-	std::unordered_map<int, SurgSim::Device::LabJackAnalogInputsDifferentialData> analogInputsDifferential;
+	std::unordered_map<int, SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel> analogInputsDifferential;
 	const int positiveAnalogDifferential = 2;
 	const int negativeAnalogDifferential = 3;
-	const SurgSim::Device::LabJackAnalogInputsDifferentialData data = {negativeAnalogDifferential,
-		SurgSim::Device::LabJackAnalogInputRange::LABJACKANALOGINPUTRANGE_10};
+	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel data =
+		{SurgSim::DataStructures::OptionalValue<int>(negativeAnalogDifferential),
+		SurgSim::Device::LabJack::Range::RANGE_10};
 	analogInputsDifferential[positiveAnalogDifferential] = data;
 	toolDevice->setAnalogInputsDifferential(analogInputsDifferential);
 
