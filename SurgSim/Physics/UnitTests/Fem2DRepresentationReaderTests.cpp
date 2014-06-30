@@ -79,13 +79,13 @@ TEST(Fem2DRepresentationReaderTests, DelegateTest)
 	for (size_t i = 0; i < femRepresentation->getNumFemElements(); ++i)
 	{
 		auto fem = femRepresentation->getFemElement(i);
-		EXPECT_EQ(0.2, fem->getMassDensity());
-		EXPECT_EQ(0.3, fem->getPoissonRatio());
-		EXPECT_EQ(0.4, fem->getYoungModulus());
+		EXPECT_DOUBLE_EQ(0.2, fem->getMassDensity());
+		EXPECT_DOUBLE_EQ(0.3, fem->getPoissonRatio());
+		EXPECT_DOUBLE_EQ(0.4, fem->getYoungModulus());
 
 		auto fem2DTriganle = std::dynamic_pointer_cast<SurgSim::Physics::Fem2DElementTriangle>(fem);
 		ASSERT_NE(nullptr, fem2DTriganle);
-		EXPECT_EQ(0.1, fem2DTriganle->getThickness());
+		EXPECT_DOUBLE_EQ(0.1, fem2DTriganle->getThickness());
 	}
 }
 

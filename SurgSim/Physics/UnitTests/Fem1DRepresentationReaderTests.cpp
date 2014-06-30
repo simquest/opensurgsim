@@ -78,13 +78,13 @@ TEST(Fem1DRepresentationReaderTests, DelegateTest)
 	for (size_t i = 0; i < femRepresentation->getNumFemElements(); ++i)
 	{
 		auto fem = femRepresentation->getFemElement(i);
-		EXPECT_EQ(0.21, fem->getMassDensity());
-		EXPECT_EQ(0.31, fem->getPoissonRatio());
-		EXPECT_EQ(0.41, fem->getYoungModulus());
+		EXPECT_DOUBLE_EQ(0.21, fem->getMassDensity());
+		EXPECT_DOUBLE_EQ(0.31, fem->getPoissonRatio());
+		EXPECT_DOUBLE_EQ(0.41, fem->getYoungModulus());
 
 		auto fem1DBeam = std::dynamic_pointer_cast<SurgSim::Physics::Fem1DElementBeam>(fem);
 		ASSERT_NE(nullptr, fem1DBeam);
-		EXPECT_EQ(0.11, fem1DBeam->getRadius());
+		EXPECT_DOUBLE_EQ(0.11, fem1DBeam->getRadius());
 	}
 }
 
