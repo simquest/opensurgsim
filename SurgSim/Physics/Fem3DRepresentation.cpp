@@ -82,25 +82,12 @@ RepresentationType Fem3DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM3D;
 }
 
-bool Fem3DRepresentation::doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader)
+std::shared_ptr<FemRepresentationPlyReaderDelegate> Fem3DRepresentation::getDelegate()
 {
 	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
 	auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
 
-	bool result = true;
-	if (reader->setDelegate(readerDelegate))
-	{
-		// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
-		reader->parseFile();
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"File " << m_filename << " is not an acceptable PLY.";
-		result = false;
-	}
-
-	return result;
+	return readerDelegate;
 }
 
 std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElementIdMap(

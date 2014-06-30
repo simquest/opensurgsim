@@ -37,6 +37,8 @@ namespace Physics
 {
 SURGSIM_STATIC_REGISTRATION(Fem3DRepresentation);
 
+class FemRepresentationPlyReaderDelegate;
+
 /// Finite Element Model 3D is a fem built with 3D FemElement
 class Fem3DRepresentation : public FemRepresentation
 {
@@ -66,7 +68,7 @@ protected:
 		const SurgSim::Math::RigidTransform3d& transform) override;
 
 private:
-	virtual bool doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader) override;
+	virtual std::shared_ptr<FemRepresentationPlyReaderDelegate> getDelegate() override;
 
 	/// Produces a mapping from the provided mesh's triangle ids to this object's fem element ids. The mesh's vertices
 	/// must be identical to this object's fem element nodes.

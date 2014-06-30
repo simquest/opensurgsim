@@ -19,22 +19,17 @@
 #include <memory>
 
 #include "SurgSim/Math/Vector.h"
-
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
 namespace SurgSim
 {
-
-namespace DataStructures
-{
-class PlyReader;
-}
 
 namespace Physics
 {
 
 class FemElement;
 struct FemRepresentationCoordinate;
+class FemRepresentationPlyReaderDelegate;
 
 /// Finite Element Model (a.k.a. fem) is a deformable model (a set of nodes connected by FemElement).
 /// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
@@ -146,7 +141,7 @@ public:
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
 	virtual void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
-		SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
+							 SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
 
 protected:
 	/// Adds the Rayleigh damping forces
@@ -188,9 +183,9 @@ protected:
 	std::string m_filename;
 
 private:
-	/// To be implemented by derived classes. Doing the actual loading work.
-	/// \return True if load is successful; false otherwise.
-	virtual bool doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader) = 0;
+	/// To be implemented by derived classes.
+	/// \return The delegate to load the corresponding derived class.
+	virtual std::shared_ptr<FemRepresentationPlyReaderDelegate> getDelegate() = 0;
 
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;

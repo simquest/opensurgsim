@@ -88,25 +88,12 @@ void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
 }
 
-bool Fem1DRepresentation::doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader)
+std::shared_ptr<FemRepresentationPlyReaderDelegate> Fem1DRepresentation::getDelegate()
 {
 	auto thisAsSharedPtr = std::static_pointer_cast<Fem1DRepresentation>(getSharedPtr());
 	auto readerDelegate = std::make_shared<Fem1DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
 
-	bool result = true;
-	if (reader->setDelegate(readerDelegate))
-	{
-		// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
-		reader->parseFile();
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"File " << m_filename << " is not an acceptable PLY.";
-		result = false;
-	}
-
-	return result;
+	return readerDelegate;
 }
 
 } // namespace Physics

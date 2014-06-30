@@ -25,13 +25,9 @@
 namespace SurgSim
 {
 
-namespace DataStructures
-{
-class PlyReader;
-}
-
 namespace Physics
 {
+class FemRepresentationPlyReaderDelegate;
 
 /// Finite Element Model 1D is a fem built with 1D FemElement
 ///
@@ -60,7 +56,7 @@ protected:
 								const SurgSim::Math::RigidTransform3d& transform) override;
 
 private:
-	virtual bool doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader) override;
+	virtual std::shared_ptr<FemRepresentationPlyReaderDelegate> getDelegate() override;
 };
 
 } // namespace Physics

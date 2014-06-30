@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
+#include "SurgSim/Physics/FemRepresentationPlyReaderDelegate.h"
 
 namespace SurgSim
 {
@@ -349,6 +350,11 @@ MockFemRepresentation::~MockFemRepresentation()
 {
 }
 
+std::shared_ptr<FemRepresentationPlyReaderDelegate> MockFemRepresentation::getDelegate()
+{
+	return nullptr;
+}
+
 RepresentationType MockFemRepresentation::getType() const
 {
 	return REPRESENTATION_TYPE_INVALID;
@@ -367,7 +373,6 @@ const std::vector<double>& MockFemRepresentation::getMassPerNode() const
 void MockFemRepresentation::transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform)
 {
 }
-
 
 MockFem1DRepresentation::MockFem1DRepresentation(const std::string& name) : SurgSim::Physics::Fem1DRepresentation(name)
 {

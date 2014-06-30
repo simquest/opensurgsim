@@ -63,25 +63,12 @@ RepresentationType Fem2DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM2D;
 }
 
-bool Fem2DRepresentation::doLoadFile(std::shared_ptr<SurgSim::DataStructures::PlyReader> reader)
+std::shared_ptr<FemRepresentationPlyReaderDelegate> Fem2DRepresentation::getDelegate()
 {
 	auto thisAsSharedPtr = std::static_pointer_cast<Fem2DRepresentation>(getSharedPtr());
 	auto readerDelegate = std::make_shared<Fem2DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
 
-	bool result = true;
-	if (reader->setDelegate(readerDelegate))
-	{
-		// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
-		reader->parseFile();
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"File " << m_filename << " is not an acceptable PLY.";
-		result = false;
-	}
-
-	return result;
+	return readerDelegate;
 }
 
 void Fem2DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,

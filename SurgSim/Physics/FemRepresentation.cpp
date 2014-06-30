@@ -23,6 +23,7 @@
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/FemRepresentationCoordinate.h"
+#include "SurgSim/Physics/FemRepresentationPlyReaderDelegate.h"
 
 namespace SurgSim
 {
@@ -82,10 +83,19 @@ bool FemRepresentation::loadFile()
 			result = false;
 		}
 
-		if (result && !doLoadFile(reader))
+		if (result)
 		{
-			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Failed to load file " << m_filename;
-			result = false;
+			auto delegate = getDelegate();
+			if (reader->setDelegate(delegate))
+			{
+				// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
+				reader->parseFile();
+			}
+			else
+			{
+				SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Failed to load file " << m_filename;
+				result = false;
+			}
 		}
 		m_doLoadFile = false;
 	}
