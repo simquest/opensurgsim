@@ -14,11 +14,11 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the TransferPhysicsToGraphicsMeshBehavior class.
+/// Tests for the TransferPhysicsToGraphicsBehavior class.
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToGraphicsBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -29,7 +29,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 
-using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
+using SurgSim::Blocks::TransferPhysicsToGraphicsBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
@@ -39,13 +39,13 @@ using SurgSim::Physics::Fem3DRepresentation;
 
 TEST(TransferPhysicsToGraphicsMeshBehaviorTests, ConstructorTest)
 {
-	ASSERT_NO_THROW(TransferPhysicsToGraphicsMeshBehavior("TestBehavior"));
+	ASSERT_NO_THROW(TransferPhysicsToGraphicsBehavior("TestBehavior"));
 }
 
 TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetSourceTest)
 {
 	auto physics = std::make_shared<Fem3DRepresentation>("PhysicsDeformable");
-	auto behavior = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Behavior");
+	auto behavior = std::make_shared<TransferPhysicsToGraphicsBehavior>("Behavior");
 
 	EXPECT_NO_THROW(behavior->setSource(physics));
 	EXPECT_EQ(physics, behavior->getSource());
@@ -54,7 +54,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetSourceTest)
 TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetTargetTest)
 {
 	auto graphics = std::make_shared<OsgMeshRepresentation>("OsgMesh");
-	auto behavior = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Behavior");
+	auto behavior = std::make_shared<TransferPhysicsToGraphicsBehavior>("Behavior");
 
 	EXPECT_NO_THROW(behavior->setTarget(graphics));
 	EXPECT_EQ(graphics, behavior->getTarget());
@@ -73,7 +73,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
 	physics->setFilename("Geometry/wound_deformable.ply");
 
 	auto graphics = std::make_shared<OsgMeshRepresentation>("GraphicsMesh");
-	auto behavior = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Behavior");
+	auto behavior = std::make_shared<TransferPhysicsToGraphicsBehavior>("Behavior");
 	behavior->setSource(physics);
 	behavior->setTarget(graphics);
 
@@ -98,7 +98,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
 		EXPECT_TRUE(finalState->getPosition(nodeId).isApprox(target->getVertex(nodeId).position));
 	}
 
-	// Test TransferPhysicsToGraphicsMeshBehavior::update()
+	// Test TransferPhysicsToGraphicsBehavior::update()
 	finalState->reset();
 	behavior->update(1.0);
 
@@ -120,7 +120,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SerializationTest)
 
 	std::shared_ptr<SurgSim::Framework::Component> graphics =
 		std::make_shared<OsgMeshRepresentation>("GraphicsMesh");
-	auto behavior = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Behavior");
+	auto behavior = std::make_shared<TransferPhysicsToGraphicsBehavior>("Behavior");
 
 	EXPECT_NO_THROW(behavior->setValue("Source", physics));
 	EXPECT_NO_THROW(behavior->setValue("Target", graphics));
@@ -129,14 +129,14 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SerializationTest)
 	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*behavior));
 	EXPECT_EQ(1u, node.size());
 
-	YAML::Node data = node["SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior"];
+	YAML::Node data = node["SurgSim::Blocks::TransferPhysicsToGraphicsBehavior"];
 	EXPECT_EQ(4u, data.size());
 
-	std::shared_ptr<TransferPhysicsToGraphicsMeshBehavior> newBehavior;
-	ASSERT_NO_THROW(newBehavior = std::dynamic_pointer_cast<TransferPhysicsToGraphicsMeshBehavior>(
+	std::shared_ptr<TransferPhysicsToGraphicsBehavior> newBehavior;
+	ASSERT_NO_THROW(newBehavior = std::dynamic_pointer_cast<TransferPhysicsToGraphicsBehavior>(
 									node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
-	EXPECT_EQ("SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior", newBehavior->getClassName());
+	EXPECT_EQ("SurgSim::Blocks::TransferPhysicsToGraphicsBehavior", newBehavior->getClassName());
 	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<SurgSim::Framework::Component>>("Source"));
 	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<SurgSim::Framework::Component>>("Target"));
 }

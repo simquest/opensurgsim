@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSMESHBEHAVIOR_H
-#define SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSMESHBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSBEHAVIOR_H
+#define SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSBEHAVIOR_H
 
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Macros.h"
@@ -29,7 +29,7 @@ class Component;
 
 namespace Graphics
 {
-class MeshRepresentation;
+class Representation;
 }
 
 namespace Physics
@@ -39,16 +39,18 @@ class DeformableRepresentation;
 
 namespace Blocks
 {
+SURGSIM_STATIC_REGISTRATION(TransferPhysicsToGraphicsBehavior);
 
-/// Behavior to copy positions of a Physics Representation to a Graphics Mesh
-class TransferPhysicsToGraphicsMeshBehavior : public SurgSim::Framework::Behavior
+/// Behavior to copy positions of a PhysicsRepresentation to a Graphics Mesh or PointCloud.
+/// \note Currently only supports the transfer to Graphics::MeshRepresentation and Graphics::PointCloudRepresentation
+class TransferPhysicsToGraphicsBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	explicit TransferPhysicsToGraphicsMeshBehavior(const std::string& name);
+	explicit TransferPhysicsToGraphicsBehavior(const std::string& name);
 
-	SURGSIM_CLASSNAME(SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior);
+	SURGSIM_CLASSNAME(SurgSim::Blocks::TransferPhysicsToGraphicsBehavior);
 
 	/// Set the representation from which the positions are from
 	/// \param source The physics representation
@@ -66,25 +68,20 @@ public:
 	/// \return The Graphics representation which receives positions.
 	std::shared_ptr<SurgSim::Framework::Component> getTarget() const;
 
-	/// Update the behavior
-	/// \param dt	The length of time (seconds) between update calls.
-	virtual void update(double dt);
+	virtual void update(double dt) override;
 
 private:
-	/// Initialize the behavior
 	virtual bool doInitialize() override;
-
-	/// Wakeup the behavior, which simply do a copy (same as update)
 	virtual bool doWakeUp() override;
 
 	/// The DeformableRepresentation from which the Ode state comes.
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_source;
 
-	/// The MeshRepresentation to which the vertices' positions are set.
-	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> m_target;
+	/// The Graphics Representation to which the vertices' positions are set.
+	std::shared_ptr<SurgSim::Graphics::Representation> m_target;
 };
 
 };  // namespace Blocks
 };  // namespace SurgSim
 
-#endif  // SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSMESHBEHAVIOR_H
+#endif  // SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSBEHAVIOR_H
