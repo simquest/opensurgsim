@@ -116,6 +116,12 @@ public:
 	/// \return	The constraint group.
 	const std::vector<std::shared_ptr<Constraint>>& getConstraintGroup(int type) const;
 
+	/// Filter the map of constraints into the active constraints list.
+	void filterActiveConstraints();
+
+	/// \return	The list of all active constraints.
+	const std::vector<std::shared_ptr<Constraint>>& getActiveConstraints() const;
+
 	/// Gets the Mlcp problem
 	/// \return	The Mlcp problem for this physics manager state (read/write access).
 	MlcpPhysicsProblem& getMlcpProblem();
@@ -172,6 +178,9 @@ private:
 
 	/// The local map of constraints.
 	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;
+
+	/// The list of active constraints.
+	std::vector<std::shared_ptr<Constraint>> m_activeConstraints;
 
 	/// Representation mapping
 	MlcpMapping<Representation> m_representationsIndexMapping;

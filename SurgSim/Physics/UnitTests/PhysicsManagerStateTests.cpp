@@ -235,6 +235,68 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	EXPECT_EQ(expectedMapValue, actualConstraintsIndexMapping.getValue(constraint2.get()));
 }
 
+TEST(PhysicsManagerStateTest, FilterGetConstraintGroup)
+{
+	auto physicsState = std::make_shared<PhysicsManagerState>();
+	std::vector<std::shared_ptr<Constraint>> expectedConstraints;
+	std::vector<std::shared_ptr<Constraint>> actualConstraints;
+
+	// Create first side of a constraint.
+	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
+	std::shared_ptr<RigidRepresentationLocalization> rigid1LocalizationTyped =
+		std::make_shared<RigidRepresentationLocalization>();
+	rigid1LocalizationTyped->setRepresentation(rigid1);
+	std::shared_ptr<Localization> rigid1Localization = rigid1LocalizationTyped;
+	auto rigid1Contact = std::make_shared<RigidRepresentationContact>();
+
+	// Create second side of a constraint.
+	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
+	std::shared_ptr<RigidRepresentationLocalization> rigid2LocalizationTyped =
+		std::make_shared<RigidRepresentationLocalization>();
+	rigid2LocalizationTyped->setRepresentation(rigid2);
+	std::shared_ptr<Localization> rigid2Localization = rigid2LocalizationTyped;
+	auto rigid2Contact = std::make_shared<RigidRepresentationContact>();
+
+	// Create the constraint specific data.
+	std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
+
+	// Create the constraint.
+	auto constraint1 = std::make_shared<Constraint>(data, rigid1Contact, rigid1Localization,
+		rigid2Contact, rigid2Localization);
+
+	// Check the active constraints.
+	expectedConstraints.push_back(constraint1);
+	physicsState->setConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT, expectedConstraints);
+	physicsState->filterActiveConstraints();
+	actualConstraints = physicsState->getActiveConstraints();
+	ASSERT_EQ(1, actualConstraints.size());
+	EXPECT_EQ(constraint1, actualConstraints.back());
+
+	// Deactivate rigid1.
+	rigid1->setIsActive(false);
+	physicsState->filterActiveConstraints();
+	actualConstraints = physicsState->getActiveConstraints();
+	ASSERT_EQ(0, actualConstraints.size());
+
+	// Create a second constraint.
+	auto constraint2 = std::make_shared<Constraint>(data, rigid1Contact, rigid1Localization,
+		rigid2Contact, rigid2Localization);
+
+	// Check the constraintGroup.
+	expectedConstraints.push_back(constraint2);
+	physicsState->setConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT, expectedConstraints);
+	actualConstraints = physicsState->getActiveConstraints();
+	ASSERT_EQ(0, actualConstraints.size());
+
+	// Activate rigid1.
+	rigid1->setIsActive(true);
+	physicsState->filterActiveConstraints();
+	actualConstraints = physicsState->getActiveConstraints();
+	ASSERT_EQ(2, actualConstraints.size());
+	EXPECT_EQ(constraint1, actualConstraints.front());
+	EXPECT_EQ(constraint2, actualConstraints.back());
+}
+
 TEST(PhysicsManagerStateTest, GetMlcpProblem)
 {
 	auto physicsState = std::make_shared<PhysicsManagerState>();

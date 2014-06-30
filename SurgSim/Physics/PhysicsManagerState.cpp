@@ -182,6 +182,34 @@ const std::vector<std::shared_ptr<Constraint>>& PhysicsManagerState::getConstrai
 	return emptyVector;
 }
 
+void PhysicsManagerState::filterActiveConstraints()
+{
+	m_activeConstraints.clear();
+	size_t size = 0;
+	int constraintTypeEnd = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);
+	for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
+	{
+		size += m_constraints[constraintType].size();
+	}
+	m_activeConstraints.reserve(size);
+
+	for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
+	{
+		for (auto it = m_constraints[constraintType].begin(); it != m_constraints[constraintType].end(); it++)
+		{
+			if ((*it)->isActive())
+			{
+				m_activeConstraints.push_back(*it);
+			}
+		}
+	}
+}
+
+const std::vector<std::shared_ptr<Constraint>>& PhysicsManagerState::getActiveConstraints() const
+{
+	return m_activeConstraints;
+}
+
 MlcpPhysicsProblem& PhysicsManagerState::getMlcpProblem()
 {
 	return m_mlcpPhysicsProblem;
