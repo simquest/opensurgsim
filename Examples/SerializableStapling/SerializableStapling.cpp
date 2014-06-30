@@ -16,7 +16,7 @@
 #include <memory>
 
 #include "Examples/ExampleStapling/StaplerBehavior.h"
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToGraphicsBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 {
 	{
 		StaplerBehavior temporaryStaplerBehavior("TemporaryStaplerBehavior");
-		SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior temporaryBehavior("TemporaryBehavior");
+		SurgSim::Blocks::TransferPhysicsToGraphicsBehavior temporaryBehavior("TemporaryBehavior");
 		SurgSim::Blocks::VisualizeContactsBehavior visualizeContactsBehavior("TemporaryVisualizeContactsBehavior");
 		SurgSim::Graphics::OsgMeshRepresentation temporaryOsgMesh("TemporaryOsgMesh");
 		SurgSim::Graphics::OsgSceneryRepresentation temporaryOsgScenery("TemporaryOsgScenery");

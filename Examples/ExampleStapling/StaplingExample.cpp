@@ -18,7 +18,7 @@
 
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToGraphicsBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
@@ -47,7 +47,7 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
-using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
+using SurgSim::Blocks::TransferPhysicsToGraphicsBehavior;
 using SurgSim::Blocks::VisualizeContactsBehavior;
 using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::Device::IdentityPoseDevice;
@@ -112,7 +112,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	sceneElement->addComponent(collisionRepresentation);
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
-	auto physicsToGraphicalFem = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("PhysicsToGraphicalFem");
+	auto physicsToGraphicalFem = std::make_shared<TransferPhysicsToGraphicsBehavior>("PhysicsToGraphicalFem");
 	physicsToGraphicalFem->setSource(physicsRepresentation);
 	physicsToGraphicalFem->setTarget(graphicalFem);
 	sceneElement->addComponent(physicsToGraphicalFem);
@@ -125,7 +125,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	sceneElement->addComponent(wireFrameFem);
 
 	// Behavior transfers the position of the physics representation to wire frame representation of the fem.
-	auto physicsToWireFrameFem = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("PhysicsToWireFrameFem");
+	auto physicsToWireFrameFem = std::make_shared<TransferPhysicsToGraphicsBehavior>("PhysicsToWireFrameFem");
 	physicsToWireFrameFem->setSource(physicsRepresentation);
 	physicsToWireFrameFem->setTarget(wireFrameFem);
 	sceneElement->addComponent(physicsToWireFrameFem);

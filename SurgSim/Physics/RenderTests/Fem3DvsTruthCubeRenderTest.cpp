@@ -39,6 +39,7 @@
 
 using SurgSim::DataStructures::Vertices;
 using SurgSim::Framework::SceneElement;
+using SurgSim::Graphics::PointCloudRepresentation;
 using SurgSim::Graphics::OsgAxesRepresentation;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::makeRigidTransform;
@@ -478,7 +479,7 @@ void doSimulation(std::shared_ptr<TruthCubeData> truthCubeData,
 /// \param truthCubeRepresentation	The simulated truth cube
 /// \param representation	The representation of point cloud
 void copySimulationBeadsIntoPointCloud(std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation,
-							 std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> representation)
+									   std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation> representation)
 {
 	std::vector<std::vector<std::vector<Vector3d>>> beads = truthCubeRepresentation->getBeadsLocation();
 	auto pointCloud = representation->getVertices();
@@ -490,7 +491,7 @@ void copySimulationBeadsIntoPointCloud(std::shared_ptr<TruthCubeRepresentation> 
 		{
 			for (size_t k = 0; k < beads[i][j].size(); k++)
 			{
-				pointCloud->addVertex(Vertices<void>::VertexType(beads[i][j][k]));
+				pointCloud->addVertex(PointCloudRepresentation::ValueType::VertexType(beads[i][j][k]));
 			}
 		}
 	}
@@ -500,14 +501,14 @@ void copySimulationBeadsIntoPointCloud(std::shared_ptr<TruthCubeRepresentation> 
 /// \param truthCube	The experimental data for the truth cube
 /// \param representation	The representation of point cloud
 void copyExperimentalBeadsIntoPointCloud(std::vector<SurgSim::Math::Vector3d> truthCube,
-							 std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> representation)
+							 std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation> representation)
 {
 	auto pointCloudCompressed = representation->getVertices();
 
 	/// Loading the Truth Cube data into point cloud
 	for (size_t i = 0; i < truthCube.size(); ++i)
 	{
-		pointCloudCompressed->addVertex(Vertices<void>::VertexType(truthCube[i]));
+		pointCloudCompressed->addVertex(PointCloudRepresentation::ValueType::VertexType(truthCube[i]));
 	}
 }
 
@@ -582,25 +583,25 @@ TEST_F(Fem3DVSTruthCubeRenderTests, rawDataTest)
 	std::shared_ptr<TruthCubeData> truthCubeData = std::make_shared<TruthCubeData>();
 	parseTruthCubeData(truthCubeData);
 
-	auto points0 = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>("Data0");
+	auto points0 = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("Data0");
 	points0->setPointSize(4.0);
 	points0->setColor(Vector4d(1.0, 1.0, 1.0, 1.0));
 	copyExperimentalBeadsIntoPointCloud(truthCubeData->cubeData0, points0);
 	addComponent(points0);
 
-	auto points1 = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>("Data1");
+	auto points1 = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("Data1");
 	points1->setPointSize(4.0);
 	points1->setColor(Vector4d(1.0, 0.0, 0.0, 1.0));
 	copyExperimentalBeadsIntoPointCloud(truthCubeData->cubeData1, points1);
 	addComponent(points1);
 
-	auto points2 = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>("Data2");
+	auto points2 = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("Data2");
 	points2->setPointSize(4.0);
 	points2->setColor(Vector4d(0.0, 1.0, 0.0, 1.0));
 	copyExperimentalBeadsIntoPointCloud(truthCubeData->cubeData2, points2);
 	addComponent(points2);
 
-	auto points3 = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>("Data3");
+	auto points3 = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("Data3");
 	points3->setPointSize(4.0);
 	points3->setColor(Vector4d(0.0, 0.0, 1.0, 1.0));
 	copyExperimentalBeadsIntoPointCloud(truthCubeData->cubeData3, points3);
@@ -620,15 +621,15 @@ TEST_F(Fem3DVSTruthCubeRenderTests, Test5percentsStrain)
 	truthCubeRepresentation = std::make_shared<TruthCubeRepresentation> ("TruthCube", cubeCorners);
 	doSimulation(truthCubeData, truthCubeRepresentation, displacement);
 
-	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> simulatedPoints;
-	simulatedPoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>("SimulatedPoints");
+	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation> simulatedPoints;
+	simulatedPoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("SimulatedPoints");
 	copySimulationBeadsIntoPointCloud(truthCubeRepresentation, simulatedPoints);
 	simulatedPoints->setPointSize(4.0);
 	simulatedPoints->setColor(Vector4d(1.0, 0.0, 0.0, 1.0));
 	addComponent(simulatedPoints);
 
-	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> experimentalpoints;
-	experimentalpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>("ExperimentalPoints");
+	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation> experimentalpoints;
+	experimentalpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("ExperimentalPoints");
 	copyExperimentalBeadsIntoPointCloud(truthCubeData->cubeData1, experimentalpoints);
 	experimentalpoints->setPointSize(4.0);
 	experimentalpoints->setColor(Vector4d(1.0, 1.0, 1.0, 1.0));
@@ -652,15 +653,15 @@ TEST_F(Fem3DVSTruthCubeRenderTests, Test12percentsAndHalfStrain)
 	truthCubeRepresentation = std::make_shared<TruthCubeRepresentation> ("TruthCube", cubeCorners);
 	doSimulation(truthCubeData, truthCubeRepresentation, displacement);
 
-	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> simulatedPoints;
-	simulatedPoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>("SimulatedPoints");
+	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation> simulatedPoints;
+	simulatedPoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("SimulatedPoints");
 	copySimulationBeadsIntoPointCloud(truthCubeRepresentation, simulatedPoints);
 	simulatedPoints->setPointSize(4.0);
 	simulatedPoints->setColor(Vector4d(1.0, 0.0, 0.0, 1.0));
 	addComponent(simulatedPoints);
 
-	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> experimentalpoints;
-	experimentalpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>("ExperimentalPoints");
+	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation> experimentalpoints;
+	experimentalpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("ExperimentalPoints");
 	copyExperimentalBeadsIntoPointCloud(truthCubeData->cubeData2, experimentalpoints);
 	experimentalpoints->setPointSize(4.0);
 	experimentalpoints->setColor(Vector4d(1.0, 1.0, 1.0, 1.0));
@@ -684,15 +685,15 @@ TEST_F(Fem3DVSTruthCubeRenderTests, Test18percentsAndQuarterStrain)
 	truthCubeRepresentation = std::make_shared<TruthCubeRepresentation> ("TruthCube", cubeCorners);
 	doSimulation(truthCubeData, truthCubeRepresentation, displacement);
 
-	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> simulatedPoints;
-	simulatedPoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>("SimulatedPoints");
+	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation> simulatedPoints;
+	simulatedPoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("SimulatedPoints");
 	copySimulationBeadsIntoPointCloud(truthCubeRepresentation, simulatedPoints);
 	simulatedPoints->setPointSize(4.0);
 	simulatedPoints->setColor(Vector4d(1.0, 0.0, 0.0, 1.0));
 	addComponent(simulatedPoints);
 
-	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> experimentalpoints;
-	experimentalpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>("ExperimentalPoints");
+	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation> experimentalpoints;
+	experimentalpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("ExperimentalPoints");
 	copyExperimentalBeadsIntoPointCloud(truthCubeData->cubeData3, experimentalpoints);
 	experimentalpoints->setPointSize(4.0);
 	experimentalpoints->setColor(Vector4d(1.0, 1.0, 1.0, 1.0));
