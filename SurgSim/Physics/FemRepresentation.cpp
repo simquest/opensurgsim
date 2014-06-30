@@ -58,18 +58,19 @@ bool FemRepresentation::loadFile()
 	using SurgSim::Framework::Logger;
 
 	bool result = true;
-	if (!m_doLoadFile)
+	if (m_filename.empty() || !m_doLoadFile)
 	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "File already loaded.";
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"Filename is empty or file: " << m_filename << " has already been loaded.";
 		result = false;
 	}
 	else
 	{
 		std::string filePath = getRuntime()->getApplicationData()->findFile(m_filename);
-		if (m_filename.empty() || filePath.empty())
+		if (filePath.empty())
 		{
 			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
-															   "File " << m_filename << " can not be found.";
+				"File " << m_filename << " can not be found.";
 			result = false;
 		}
 
@@ -77,16 +78,16 @@ bool FemRepresentation::loadFile()
 		if (result && !reader->isValid())
 		{
 			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
-															   "File " << m_filename << " is invalid.";
+				"File " << m_filename << " is invalid.";
 			result = false;
 		}
 
 		if (result && !doLoadFile(reader))
 		{
 			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Failed to load file " << m_filename;
-			m_doLoadFile = false;
 			result = false;
 		}
+		m_doLoadFile = false;
 	}
 
 	return result;
