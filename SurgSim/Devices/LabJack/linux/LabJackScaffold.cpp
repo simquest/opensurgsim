@@ -318,12 +318,12 @@ public:
 		deviceObject(device),
 		thread(),
 		deviceHandle(std::move(handle)),
-		digitalInputChannels(device->getDigitalInputChannels()),
-		digitalOutputChannels(device->getDigitalOutputChannels()),
+		digitalInputChannels(device->getDigitalInputs()),
+		digitalOutputChannels(device->getDigitalOutputs()),
 		timerInputChannels(getTimerInputChannels(device->getTimers())),
 		timerOutputChannels(getTimerOutputChannels(device->getTimers())),
 		analogInputs(device->getAnalogInputs()),
-		analogOutputChannels(device->getAnalogOutputChannels()),
+		analogOutputChannels(device->getAnalogOutputs()),
 		cachedOutputIndices(false)
 	{
 	}
@@ -718,7 +718,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	int readBytesSize = 9; // Reading after a Feedback command provides 9+ bytes.
 
 	// Read digital inputs
-	const std::unordered_set<int>& digitalInputChannels = device->getDigitalInputChannels();
+	const std::unordered_set<int>& digitalInputChannels = info->digitalInputChannels;
 	for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 	{
 		sendBytes.at(sendBytesSize++) = 10;  //IOType, BitStateRead
@@ -727,7 +727,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	}
 
 	// Write digital outputs
-	const std::unordered_set<int>& digitalOutputChannels = device->getDigitalOutputChannels();
+	const std::unordered_set<int>& digitalOutputChannels = info->digitalOutputChannels;
 	for (auto output = digitalOutputChannels.cbegin(); output != digitalOutputChannels.cend(); ++output)
 	{
 		if (info->digitalOutputIndices.count(*output) > 0)
@@ -816,7 +816,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	}
 
 	// Set analog outputs.
-	const std::unordered_set<int>& analogOutputs = device->getAnalogOutputChannels();
+	const std::unordered_set<int>& analogOutputs = info->analogOutputChannels;
 	for (auto output = analogOutputs.cbegin(); output != analogOutputs.cend(); ++output)
 	{
 		if (info->analogOutputIndices.count(*output) > 0)
@@ -1317,7 +1317,7 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 
 	bool result = true;
 
-	const std::unordered_set<int>& analogOutputs = device->getAnalogOutputChannels();
+	const std::unordered_set<int>& analogOutputs = deviceData->analogOutputChannels;
 	for (auto output = analogOutputs.cbegin(); output != analogOutputs.cend(); ++output)
 	{
 		const int minimumDac = 0;
@@ -1333,7 +1333,7 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 
 	if (device->getModel() == LabJack::MODEL_U6)
 	{
-		auto const& analogInputs = device->getAnalogInputs();
+		auto const& analogInputs = deviceData->analogInputs;
 		for (auto input = analogInputs.cbegin(); input != analogInputs.cend(); ++input)
 		{
 			if ((input->second.negativeChannel.hasValue()) &&
@@ -1416,8 +1416,8 @@ bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 
 	bool result = true;
 
-	const std::unordered_set<int>& digitalInputChannels = device->getDigitalInputChannels();
-	const std::unordered_set<int>& digitalOutputChannels = device->getDigitalOutputChannels();
+	const std::unordered_set<int>& digitalInputChannels = deviceData->digitalInputChannels;
+	const std::unordered_set<int>& digitalOutputChannels = deviceData->digitalOutputChannels;
 	if ((digitalInputChannels.size() > 0) || (digitalOutputChannels.size() > 0))
 	{
 		// Configure each digital line's direction via a Feedback command.  The output lines will automatically be

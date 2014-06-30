@@ -123,11 +123,11 @@ struct RangeAndOptionalNegativeChannel
 		return (negativeChannel == other.negativeChannel) && (range == other.range);
 	}
 
-	/// The negative channel.
-	SurgSim::DataStructures::OptionalValue<int> negativeChannel;
-
 	/// The range.
 	Range range;
+
+	/// The negative channel.
+	SurgSim::DataStructures::OptionalValue<int> negativeChannel;
 };
 };
 
@@ -219,21 +219,21 @@ public:
 	/// \return The address of the LabJack, e.g., "1" or "192.168.7.23".
 	const std::string& getAddress() const;
 
-	/// Enable digital input lines.
-	/// \param digitalInputChannels The set of channel numbers.
+	/// Enable digital input line.
+	/// \param channel The channel number.
 	/// \exception Asserts if already initialized.
-	void setDigitalInputChannels(const std::unordered_set<int>& digitalInputChannels);
+	void enableDigitalInput(int channel);
 
 	/// \return The enabled digital input lines.
-	const std::unordered_set<int>& getDigitalInputChannels() const;
+	const std::unordered_set<int>& getDigitalInputs() const;
 
-	/// Enable digital output lines.
-	/// \param digitalOutputChannels The set of channel numbers.
+	/// Enable digital output line.
+	/// \param channel The channel number.
 	/// \exception Asserts if already initialized.
-	void setDigitalOutputChannels(const std::unordered_set<int>& digitalOutputChannels);
+	void enableDigitalOutput(int channel);
 
 	/// \return The enabled digital output lines.
-	const std::unordered_set<int>& getDigitalOutputChannels() const;
+	const std::unordered_set<int>& getDigitalOutputs() const;
 
 	/// Set the timer base rate.  Timer base rates that end in "_DIV" are divided by the divisor to get the actual timer
 	/// frequency.  See section 2.10 - Timers/Counters in the respective LabJack model's User's Guide.
@@ -261,14 +261,14 @@ public:
 	/// \return The channel number of the first timer/counter.
 	int getTimerCounterPinOffset() const;
 
-	/// Enable timers.  The key is the index of the timer, while the value is the mode.
+	/// Enable timer.
 	/// Since quadrature requires two lines, to measure a single quadrature encoder this function
 	/// must be called twice on consecutive timerNumbers.  All output timers use the same clock (see setTimerBase and
 	/// setTimerClockDivisor).
-	/// \param timers A map from the index of the timer (not the line number, see setTimerCounterPinOffset) to the
-	///		type of timer to enable.
+	/// \param index The index of the timer (not the line number, see setTimerCounterPinOffset).
+	/// \param mode The type of timer.
 	/// \exception Asserts if already initialized.
-	void setTimers(const std::unordered_map<int, LabJack::TimerMode>& timers);
+	void enableTimer(int index, LabJack::TimerMode mode);
 
 	/// \return The enabled timers.
 	const std::unordered_map<int, LabJack::TimerMode>& getTimers() const;
@@ -281,22 +281,30 @@ public:
 	/// \return The maximum update rate for the LabJackThread.
 	double getMaximumUpdateRate() const;
 
-	/// Set the analog inputs.
-	/// \param analogInputs The inputs. The key is the positive channel.
+	/// Enable differential analog input.
+	/// \param positiveChannel The positive channel.
+	/// \param range The voltage range.
+	/// \param negativeChannel The negative channel.
 	/// \exception Asserts if already initialized.
 	/// \note On Linux, does not correctly handle negative channels 31 or 32 for U3 model.
-	void setAnalogInputs(std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputs);
+	void enableAnalogInput(int positiveChannel, LabJack::Range range, int negativeChannel);
+
+	/// Enable single-ended analog input.
+	/// \param channel The channel.
+	/// \param range The voltage range.
+	/// \exception Asserts if already initialized.
+	void enableAnalogInput(int channel, LabJack::Range range);
 
 	/// \return The enabled analog inputs.
 	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel>& getAnalogInputs() const;
 
-	/// Enable analog output lines.
-	/// \param analogOutputChannels The set of channel numbers.
+	/// Enable analog output.
+	/// \param channel The channel.
 	/// \exception Asserts if already initialized.
-	void setAnalogOutputChannels(const std::unordered_set<int>& analogOutputChannels);
+	void enableAnalogOutput(int channel);
 
-	/// \return The enabled analog output lines.
-	const std::unordered_set<int>& getAnalogOutputChannels() const;
+	/// \return The enabled analog output channels.
+	const std::unordered_set<int>& getAnalogOutputs() const;
 
 	/// Set the resolution for all the analog inputs. The resolution parameter is a model-dependent code. Refer to the
 	/// User's Guide for the specific model to determine behavior for different codes.  For example, for the U6 see

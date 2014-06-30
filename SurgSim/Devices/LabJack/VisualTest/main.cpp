@@ -219,39 +219,27 @@ int main(int argc, char** argv)
 	toolDevice->setAddress(""); // Get the first-found of the specified type and connection.
 
 	const int lineForPlusX = 0;
+	toolDevice->enableDigitalInput(lineForPlusX);
 	const int lineForMinusX = 1;
-	std::unordered_set<int> digitalInputChannels;
-	digitalInputChannels.insert(lineForPlusX);
-	digitalInputChannels.insert(lineForMinusX);
-	toolDevice->setDigitalInputChannels(digitalInputChannels);
+	toolDevice->enableDigitalInput(lineForMinusX);
 
 	const int offset = 4;
 	toolDevice->setTimerCounterPinOffset(offset); // the U3 requires the offset to be 4+.
 
 	const int firstTimerForQuadrature = 0;
-	std::unordered_map<int, SurgSim::Device::LabJack::TimerMode> timers;
-	timers[firstTimerForQuadrature] = SurgSim::Device::LabJack::TIMERMODE_QUADRATURE;
-	timers[firstTimerForQuadrature + 1] = SurgSim::Device::LabJack::TIMERMODE_QUADRATURE;
-	toolDevice->setTimers(timers);
+	toolDevice->enableTimer(firstTimerForQuadrature, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE);
+	toolDevice->enableTimer(firstTimerForQuadrature + 1, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE);
 
-	std::unordered_map<int, SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel> analogInputs;
 	const int singleEndedAnalog = 1;
+	toolDevice->enableAnalogInput(singleEndedAnalog, SurgSim::Device::LabJack::Range::RANGE_10);
+
 	const int positiveAnalogDifferential = 2;
 	const int negativeAnalogDifferential = 3;
-	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel differentialRangeAndChannel =
-		{SurgSim::DataStructures::OptionalValue<int>(negativeAnalogDifferential),
-		SurgSim::Device::LabJack::Range::RANGE_10};
-	analogInputs[positiveAnalogDifferential] = differentialRangeAndChannel;
-	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel singleEndedRange =
-		{SurgSim::DataStructures::OptionalValue<int>(),
-		SurgSim::Device::LabJack::Range::RANGE_10};
-	analogInputs[singleEndedAnalog] = singleEndedRange;
-	toolDevice->setAnalogInputs(analogInputs);
+	toolDevice->enableAnalogInput(positiveAnalogDifferential, SurgSim::Device::LabJack::Range::RANGE_10,
+		negativeAnalogDifferential);
 
-	std::unordered_set<int> analogOutputs;
 	const int rotationOut = 1;
-	analogOutputs.insert(rotationOut);
-	toolDevice->setAnalogOutputChannels(analogOutputs);
+	toolDevice->enableAnalogOutput(rotationOut);
 
 	const double translationPerUpdate = 0.001; // Millimeter per update.
 	auto filter = std::make_shared<LabJackToPoseFilter>("LabJack to Pose filter", firstTimerForQuadrature,

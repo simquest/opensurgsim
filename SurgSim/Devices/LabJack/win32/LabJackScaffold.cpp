@@ -175,12 +175,12 @@ public:
 		deviceObject(device),
 		deviceHandle(std::move(handle)),
 		thread(),
-		digitalInputChannels(device->getDigitalInputChannels()),
-		digitalOutputChannels(device->getDigitalOutputChannels()),
+		digitalInputChannels(device->getDigitalInputs()),
+		digitalOutputChannels(device->getDigitalOutputs()),
 		timerInputChannels(getTimerInputChannels(device->getTimers())),
 		timerOutputChannels(getTimerOutputChannels(device->getTimers())),
 		analogInputs(device->getAnalogInputs()),
-		analogOutputChannels(device->getAnalogOutputChannels()),
+		analogOutputChannels(device->getAnalogOutputs()),
 		cachedOutputIndices(false)
 	{
 	}
@@ -935,7 +935,7 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 
 	bool result = true;
 
-	const std::unordered_set<int>& analogOutputs = device->getAnalogOutputChannels();
+	const std::unordered_set<int>& analogOutputs = deviceData->analogOutputChannels;
 	for (auto output = analogOutputs.cbegin(); output != analogOutputs.cend(); ++output)
 	{
 		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_DAC_ENABLE, *output, 1, 0);
@@ -945,7 +945,7 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 			"', channel " << *output << "." << std::endl << formatErrorMessage(error);
 	}
 
-	auto const& analogInputs = device->getAnalogInputs();
+	auto const& analogInputs = deviceData->analogInputs;
 	if (analogInputs.size() > 0)
 	{
 		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chAIN_RESOLUTION, device->getAnalogInputResolution(), 0);
