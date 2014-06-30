@@ -55,16 +55,7 @@ bool Fem3DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& rea
 
 bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 {
-	// Vertex processing
-	reader->requestElement(
-		"vertex",
-		std::bind(
-			&Fem3DRepresentationPlyReaderDelegate::beginVertices, this, std::placeholders::_1, std::placeholders::_2),
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::processVertex, this, std::placeholders::_1),
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::endVertices, this, std::placeholders::_1));
-	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, 0 * sizeof(m_vertexData[0]));
-	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, 1 * sizeof(m_vertexData[0]));
-	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, 2 * sizeof(m_vertexData[0]));
+	FemRepresentationPlyReaderDelegate::registerDelegate(reader);
 
 	// 3D Element Processing
 	reader->requestElement(
@@ -81,37 +72,6 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 								offsetof(ElementData, indices),
 								PlyReader::TYPE_UNSIGNED_INT,
 								offsetof(ElementData, vertexCount));
-
-	// Material Processing
-	reader->requestElement(
-		"material",
-		std::bind(
-			&Fem3DRepresentationPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
-		nullptr,
-		nullptr);
-	reader->requestScalarProperty(
-		"material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, massDensity));
-	reader->requestScalarProperty(
-		"material", "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, poissonRatio));
-	reader->requestScalarProperty(
-		"material", "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, youngModulus));
-
-	// Boundary Condition Processing
-	if (m_hasBoundaryConditions)
-	{
-		reader->requestElement(
-			"boundary_condition",
-			std::bind(&Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions,
-					  this,
-					  std::placeholders::_1,
-					  std::placeholders::_2),
-			std::bind(&Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
-			nullptr);
-		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
-	}
-
-	reader->setStartParseFileCallback(std::bind(&Fem3DRepresentationPlyReaderDelegate::startParseFile, this));
-	reader->setEndParseFileCallback(std::bind(&Fem3DRepresentationPlyReaderDelegate::endParseFile, this));
 
 	return true;
 }

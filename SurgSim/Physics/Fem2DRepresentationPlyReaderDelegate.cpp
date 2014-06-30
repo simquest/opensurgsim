@@ -33,16 +33,7 @@ Fem2DRepresentationPlyReaderDelegate::Fem2DRepresentationPlyReaderDelegate(std::
 
 bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 {
-	// Vertex processing
-	reader->requestElement(
-		"vertex",
-		std::bind(
-			&Fem2DRepresentationPlyReaderDelegate::beginVertices, this, std::placeholders::_1, std::placeholders::_2),
-		std::bind(&Fem2DRepresentationPlyReaderDelegate::processVertex, this, std::placeholders::_1),
-		std::bind(&Fem2DRepresentationPlyReaderDelegate::endVertices, this, std::placeholders::_1));
-	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, 0 * sizeof(m_vertexData[0]));
-	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, 1 * sizeof(m_vertexData[0]));
-	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, 2 * sizeof(m_vertexData[0]));
+	FemRepresentationPlyReaderDelegate::registerDelegate(reader);
 
 	// 2D Element Processing
 	reader->requestElement(
@@ -60,20 +51,6 @@ bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		PlyReader::TYPE_UNSIGNED_INT,
 		offsetof(ElementData, vertexCount));
 
-	// Boundary Condition Processing
-	if (m_hasBoundaryConditions)
-	{
-		reader->requestElement(
-			"boundary_condition",
-			std::bind(&Fem2DRepresentationPlyReaderDelegate::beginBoundaryConditions,
-			this,
-			std::placeholders::_1,
-			std::placeholders::_2),
-			std::bind(&Fem2DRepresentationPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
-			nullptr);
-		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
-	}
-
 	// Thickness Processing
 	reader->requestElement(
 		"thickness",
@@ -82,23 +59,6 @@ bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		nullptr,
 		nullptr);
 	reader->requestScalarProperty("thickness", "thickness", PlyReader::TYPE_DOUBLE, 0);
-
-	// Material Processing
-	reader->requestElement(
-		"material",
-		std::bind(
-			&Fem2DRepresentationPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
-		nullptr,
-		nullptr);
-	reader->requestScalarProperty(
-		"material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, massDensity));
-	reader->requestScalarProperty(
-		"material", "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, poissonRatio));
-	reader->requestScalarProperty(
-		"material", "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, youngModulus));
-
-	reader->setStartParseFileCallback(std::bind(&Fem2DRepresentationPlyReaderDelegate::startParseFile, this));
-	reader->setEndParseFileCallback(std::bind(&Fem2DRepresentationPlyReaderDelegate::endParseFile, this));
 
 	return true;
 }

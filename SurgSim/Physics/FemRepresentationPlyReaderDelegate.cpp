@@ -13,10 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/FemRepresentationPlyReaderDelegate.h"
+
+using SurgSim::DataStructures::PlyReader;
 
 namespace SurgSim
 {
@@ -32,6 +35,53 @@ FemRepresentationPlyReaderDelegate::FemRepresentationPlyReaderDelegate(std::shar
 
 FemRepresentationPlyReaderDelegate::ElementData::ElementData() : indices(nullptr), vertexCount(0)
 {
+}
+
+bool FemRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
+{
+	// Vertex processing
+	reader->requestElement(
+		"vertex",
+		std::bind(
+		&FemRepresentationPlyReaderDelegate::beginVertices, this, std::placeholders::_1, std::placeholders::_2),
+		std::bind(&FemRepresentationPlyReaderDelegate::processVertex, this, std::placeholders::_1),
+		std::bind(&FemRepresentationPlyReaderDelegate::endVertices, this, std::placeholders::_1));
+	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, 0 * sizeof(m_vertexData[0]));
+	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, 1 * sizeof(m_vertexData[0]));
+	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, 2 * sizeof(m_vertexData[0]));
+
+	// Boundary Condition Processing
+	if (m_hasBoundaryConditions)
+	{
+		reader->requestElement(
+			"boundary_condition",
+			std::bind(&FemRepresentationPlyReaderDelegate::beginBoundaryConditions,
+			this,
+			std::placeholders::_1,
+			std::placeholders::_2),
+			std::bind(&FemRepresentationPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
+			nullptr);
+		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
+	}
+
+	// Material Processing
+	reader->requestElement(
+		"material",
+		std::bind(
+		&FemRepresentationPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
+		nullptr,
+		nullptr);
+	reader->requestScalarProperty(
+		"material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, massDensity));
+	reader->requestScalarProperty(
+		"material", "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, poissonRatio));
+	reader->requestScalarProperty(
+		"material", "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, youngModulus));
+
+	reader->setStartParseFileCallback(std::bind(&FemRepresentationPlyReaderDelegate::startParseFile, this));
+	reader->setEndParseFileCallback(std::bind(&FemRepresentationPlyReaderDelegate::endParseFile, this));
+
+	return true;
 }
 
 void FemRepresentationPlyReaderDelegate::startParseFile()
