@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Math/MathConvert.h"
@@ -27,26 +28,20 @@ namespace SurgSim
 {
 namespace Graphics
 {
-/// Graphic representation of a point cloud, hase a very basic interface and is intentionally kept generic. It takes
-/// a Mesh<Data> as a template parameter, this will probably have to be subclassed for different kinds of data, e.g.
-/// particles, depth data, etc ... .
-/// \tparam	Data Type of the data.
-template <class Data>
+/// Graphic representation of a point cloud, hase a very basic interface and is intentionally kept generic.
 class PointCloudRepresentation : public virtual Representation
 {
 public:
-	/// Constructor
-	explicit PointCloudRepresentation(const std::string& name) : Representation(name)
-	{
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(PointCloudRepresentation, double, PointSize, getPointSize, setPointSize);
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(PointCloudRepresentation, SurgSim::Math::Vector4d, Color, getColor, setColor);
-	}
+	typedef SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData> ValueType;
 
-	~PointCloudRepresentation()	{}
+	/// Constructor
+	explicit PointCloudRepresentation(const std::string& name);
+
+	virtual ~PointCloudRepresentation();
 
 	/// Pull the vertices.
 	/// \return	The mesh.
-	virtual std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> getVertices() const = 0;
+	virtual std::shared_ptr<ValueType>	getVertices() const = 0;
 
 	/// Sets point size for the point elements.
 	/// \param	val	The value.

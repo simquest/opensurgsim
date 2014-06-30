@@ -48,7 +48,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-typedef SurgSim::DataStructures::Vertices<void> CloudMesh;
+typedef SurgSim::Graphics::PointCloudRepresentation::ValueType CloudMesh;
 
 struct OsgPointCloudRepresentationRenderTests : public RenderTest
 {
@@ -71,15 +71,15 @@ protected:
 		return result;
 	}
 
-	std::shared_ptr<PointCloudRepresentation<void>> makeCloud(std::vector<Vector3d> vertices)
+	std::shared_ptr<PointCloudRepresentation> makeCloud(std::vector<Vector3d> vertices)
 	{
-		std::shared_ptr<PointCloudRepresentation<void>> cloud =
-					std::make_shared<OsgPointCloudRepresentation<void>>("cloud representation");
+		std::shared_ptr<PointCloudRepresentation> cloud =
+					std::make_shared<OsgPointCloudRepresentation>("cloud representation");
 
 		cloud->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -0.2)));
 		for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
 		{
-			cloud->getVertices()->addVertex(SurgSim::DataStructures::Vertices<void>::VertexType(*it));
+			cloud->getVertices()->addVertex(SurgSim::Graphics::PointCloudRepresentation::ValueType::VertexType(*it));
 		}
 
 		viewElement->addComponent(cloud);
@@ -92,7 +92,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointAdd)
 {
 	std::vector<Vector3d> vertices = makeCube();
 
-	auto representation = std::make_shared<OsgPointCloudRepresentation<void>>("pointcloud representation");
+	auto representation = std::make_shared<OsgPointCloudRepresentation>("pointcloud representation");
 	auto pointCloud = representation->getVertices();
 	representation->setPointSize(2.0);
 
@@ -118,7 +118,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointAdd)
 
 TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
 {
-	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeCube());
+	std::shared_ptr<PointCloudRepresentation> cloud = makeCloud(makeCube());
 
 	/// Run the thread
 	runtime->start();
@@ -145,7 +145,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
 TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
 {
 	std::vector<Vector3d> startVertices = makeCube();
-	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(startVertices);
+	std::shared_ptr<PointCloudRepresentation> cloud = makeCloud(startVertices);
 	std::shared_ptr<CloudMesh> mesh = cloud->getVertices();
 
 	/// Run the thread
@@ -180,7 +180,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
 
 TEST_F(OsgPointCloudRepresentationRenderTests, PointSizeAndColor)
 {
-	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeCube());
+	std::shared_ptr<PointCloudRepresentation> cloud = makeCloud(makeCube());
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
