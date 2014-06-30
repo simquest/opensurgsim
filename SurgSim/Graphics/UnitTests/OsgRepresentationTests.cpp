@@ -74,6 +74,16 @@ TEST(OsgRepresentationTests, VisibilityTest)
 	EXPECT_FALSE(representation->isVisible());
 }
 
+TEST(OsgRepresentationTests, WireFrameTest)
+{
+	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
+
+	EXPECT_FALSE(representation->getDrawAsWireFrame());
+
+	representation->setDrawAsWireFrame(true);
+	EXPECT_TRUE(representation->getDrawAsWireFrame());
+}
+
 TEST(OsgRepresentationTests, PoseTest)
 {
 	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");

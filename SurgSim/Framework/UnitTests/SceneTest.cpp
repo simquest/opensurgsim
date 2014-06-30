@@ -47,6 +47,9 @@ TEST(SceneTest, ElementManagement)
 
 	EXPECT_ANY_THROW(scene->addSceneElement(element1));
 	EXPECT_EQ(2u, scene->getSceneElements().size());
+
+	EXPECT_EQ(element1, scene->getSceneElement("one"));
+	EXPECT_EQ(nullptr, scene->getSceneElement("three"));
 }
 
 TEST(SceneTest, AddAndTestScene)

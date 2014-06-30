@@ -24,6 +24,7 @@
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Framework/Asset.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
 
@@ -37,6 +38,8 @@ class AabbTree;
 
 namespace Math
 {
+SURGSIM_STATIC_REGISTRATION(MeshShape);
+
 
 /// Mesh shape: shape made of a triangle mesh
 /// The triangle mesh needs to be watertight to produce valid volume, center and second moment of

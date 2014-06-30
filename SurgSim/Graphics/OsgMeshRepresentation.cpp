@@ -18,32 +18,28 @@
 #include <osg/Array>
 #include <osg/Geode>
 #include <osg/Geometry>
-#include <osg/PolygonMode>
 #include <osg/PositionAttitudeTransform>
-#include <osg/Switch>
 #include <osg/Vec3f>
 #include <osgUtil/SmoothingVisitor>
 
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/TriangleNormalGenerator.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgMeshRepresentation);
-}
 
 namespace SurgSim
 {
 namespace Graphics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgMeshRepresentation, OsgMeshRepresentation);
 
 OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
 	MeshRepresentation(name),
-	m_drawAsWireFrame(false),
 	m_updateOptions(UPDATE_OPTION_VERTICES),
 	m_mesh(std::make_shared<Mesh>()),
 	m_filename()
@@ -92,29 +88,6 @@ std::shared_ptr<Mesh> OsgMeshRepresentation::getMesh()
 	return m_mesh;
 }
 
-void OsgMeshRepresentation::setDrawAsWireFrame(bool val)
-{
-	m_drawAsWireFrame = val;
-	osg::StateSet* state = m_switch->getOrCreateStateSet();
-
-	osg::ref_ptr<osg::PolygonMode> polygonMode;
-	if (val)
-	{
-		 polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE);
-	}
-	else
-	{
-		polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT, osg::PolygonMode::FILL);
-	}
-
-	state->setAttributeAndModes(polygonMode, osg::StateAttribute::ON);
-}
-
-bool OsgMeshRepresentation::getDrawAsWireFrame() const
-{
-	return m_drawAsWireFrame;
-}
-
 void OsgMeshRepresentation::doUpdate(double dt)
 {
 	SURGSIM_ASSERT(m_mesh->isValid()) << "The mesh in the OsgMeshRepresentation " << getName() << " is invalid.";
@@ -134,6 +107,34 @@ void OsgMeshRepresentation::doUpdate(double dt)
 		updateTriangles();
 		m_triangles->dirty();
 	}
+}
+
+bool OsgMeshRepresentation::doInitialize()
+{
+	bool result = true;
+
+	if (!m_filename.empty())
+	{
+		std::string filePath = getRuntime()->getApplicationData()->findFile(m_filename);
+
+		if (filePath.empty())
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+				"OsgMeshRepresentation::doInitialize(): file " << m_filename << " can not be found.";
+			result = false;
+		}
+		else
+		{
+			auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(filePath);
+			SURGSIM_ASSERT(nullptr != triangleMesh && triangleMesh->isValid()) <<
+				"OsgMeshRepresentation::doInitialize(): SurgSim::DataStructures::loadTriangleMesh() returned a "
+				"null mesh or invalid mesh from file " << m_filename;
+
+			m_mesh = std::make_shared<Mesh>(*triangleMesh);
+		}
+	}
+
+	return result;
 }
 
 void OsgMeshRepresentation::updateVertices(int updateOptions)
@@ -268,12 +269,6 @@ osg::Object::DataVariance OsgMeshRepresentation::getDataVariance(int updateOptio
 void OsgMeshRepresentation::setFilename(std::string filename)
 {
 	m_filename = filename;
-
-	auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(filename);
-	SURGSIM_ASSERT(nullptr != triangleMesh) <<
-		"SurgSim::DataStructures::loadTriangleMesh() returned an empty TriangleMesh after reading file " << filename;
-
-	m_mesh = std::make_shared<Mesh>(*triangleMesh);
 }
 
 std::string OsgMeshRepresentation::getFilename() const

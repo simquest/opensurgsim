@@ -45,13 +45,16 @@ void PhysicsManagerState::setRepresentations(const std::vector<std::shared_ptr<R
 	m_collisionsToPhysicsMap.clear();
 	for (auto it = m_representations.begin(); it != m_representations.end(); it++)
 	{
-		m_representationsIndexMapping.setValue((*it).get(), index);
-		index += (*it)->getNumDof();
-
-		auto collision = (*it)->getCollisionRepresentation();
-		if (collision != nullptr)
+		if ((*it)->isActive())
 		{
-			m_collisionsToPhysicsMap[collision] = (*it);
+			m_representationsIndexMapping.setValue((*it).get(), index);
+			index += (*it)->getNumDof();
+
+			auto collision = (*it)->getCollisionRepresentation();
+			if (collision != nullptr)
+			{
+				m_collisionsToPhysicsMap[collision] = (*it);
+			}
 		}
 	}
 }
@@ -83,10 +86,6 @@ PhysicsManagerState::getCollisionRepresentations()
 
 void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_ptr<ConstraintComponent>>& val)
 {
-	if (m_constraintComponents == val)
-	{
-		return;
-	}
 	m_constraintComponents = val;
 
 	std::vector<std::shared_ptr<Constraint>>& constraints = m_constraints[CONSTRAINT_GROUP_TYPE_SCENE];
@@ -95,7 +94,10 @@ void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_
 	constraints.clear();
 	for (auto it = m_constraintComponents.cbegin(); it != m_constraintComponents.cend(); ++it)
 	{
-		constraints.push_back((*it)->getConstraint());
+		if ((*it)->getConstraint()->isActive())
+		{
+			constraints.push_back((*it)->getConstraint());
+		}
 	}
 
 	setConstraintGroup(CONSTRAINT_GROUP_TYPE_SCENE, constraints);
@@ -143,8 +145,11 @@ void PhysicsManagerState::setConstraintGroup(
 		//ConstraintGroupType type = static_cast<ConstraintGroupType>(constraintType);
 		for (auto it = m_constraints[constraintType].begin(); it != m_constraints[constraintType].end(); it++)
 		{
-			m_constraintsIndexMapping.setValue((*it).get(), index);
-			index += (*it)->getNumDof();
+			if ((*it)->isActive())
+			{
+				m_constraintsIndexMapping.setValue((*it).get(), index);
+				index += (*it)->getNumDof();
+			}
 		}
 	}
 }

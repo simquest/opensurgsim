@@ -50,6 +50,9 @@ std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
 	{
 		(*it)->update(dt);
 	}
+
+	result->setRepresentations(representations);
+
 	return result;
 }
 

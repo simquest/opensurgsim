@@ -46,10 +46,7 @@ using SurgSim::Physics::RigidRepresentationBilateral3D;
 using SurgSim::Physics::Fem3DRepresentationBilateral3D;
 using SurgSim::Physics::Localization;
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, StaplerBehavior);
-}
+SURGSIM_REGISTER(SurgSim::Framework::Component, StaplerBehavior, StaplerBehavior);
 
 StaplerBehavior::StaplerBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),

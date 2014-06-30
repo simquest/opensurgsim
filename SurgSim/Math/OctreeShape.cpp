@@ -13,22 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include "SurgSim/Math/OctreeShape.h"
 
 #include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/ObjectFactory.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::OctreeShape);
-}
 
 namespace SurgSim
 {
 
 namespace Math
 {
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::OctreeShape, OctreeShape);
 
 OctreeShape::OctreeShape()
 {

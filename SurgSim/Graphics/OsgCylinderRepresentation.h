@@ -16,6 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGCYLINDERREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGCYLINDERREPRESENTATION_H
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/CylinderRepresentation.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 
@@ -31,8 +32,9 @@ namespace SurgSim
 
 namespace Graphics
 {
-
 class OsgUnitCylinder;
+
+SURGSIM_STATIC_REGISTRATION(OsgCylinderRepresentation);
 
 /// OSG implementation of a graphics Cylinder representation.
 class OsgCylinderRepresentation : public OsgRepresentation, public CylinderRepresentation

@@ -19,21 +19,17 @@
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::RigidTransform3d;
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::DriveElementFromInputBehavior);
-}
-
 namespace SurgSim
 {
 namespace Blocks
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::DriveElementFromInputBehavior,
+				 DriveElementFromInputBehavior);
 
 DriveElementFromInputBehavior::DriveElementFromInputBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),

@@ -115,7 +115,7 @@ public:
 
 			if (printTriangles)
 			{
-				std::cout << "\t" << i << ": Vertices (" << formatIterator(triangleVertices, ", ") 
+				std::cout << "\t" << i << ": Vertices (" << formatIterator(triangleVertices, ", ")
 						  << "), Edges (" << formatIterator(triangleEdges, ", ") << ")\n";
 			}
 		}

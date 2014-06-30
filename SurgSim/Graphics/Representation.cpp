@@ -32,6 +32,8 @@ Representation::Representation(const std::string& name) : SurgSim::Framework::Re
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, Visible, isVisible, setVisible);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>,
 									  GroupReferences, getGroupReferences, setGroupReferences);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, DrawAsWireFrame,
+									  getDrawAsWireFrame, setDrawAsWireFrame);
 
 	addGroupReference(DefaultGroupName);
 }

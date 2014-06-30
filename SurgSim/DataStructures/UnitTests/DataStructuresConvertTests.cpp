@@ -13,17 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
 #include <gtest/gtest.h>
 #include <yaml-cpp/yaml.h>
 
-#include <memory>
-
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h" // Used as a mock component
 
 namespace SurgSim
 {
+
 namespace DataStructures
 {
+
+using SurgSim::Graphics::OsgBoxRepresentation;
 
 template <typename Type, size_t Size>
 void testStdArraySerialization(const std::array<Type, Size>& value)
@@ -100,6 +105,151 @@ TEST(DataStructuresConvertTests, StdArray)
 		// Decode
 		ZeroSizeArray newValue;
 		EXPECT_NO_THROW(newValue = node.as<ZeroSizeArray>(););
+	}
+}
+
+TEST(DataStructuresConvertTests, StdUnorderedMapTests)
+{
+	{
+		SCOPED_TRACE("Serialization of std::unordered_map with double as key and integer as values");
+		typedef std::unordered_map<double, int> TestMapType;
+		TestMapType originalMap;
+
+		originalMap.insert(TestMapType::value_type(1.0, 2));
+		originalMap.insert(TestMapType::value_type(3.0, 4));
+
+		YAML::Node node;
+		EXPECT_NO_THROW(node = originalMap);
+		EXPECT_EQ(2u, node.size());
+
+		TestMapType newMap;
+		EXPECT_NO_THROW(newMap = node.as<TestMapType>());
+
+		EXPECT_EQ(originalMap, newMap);
+	}
+
+	{
+		SCOPED_TRACE("Serialization of std::unordered_map with integer as key and std::shared_ptr<> as values");
+		typedef std::unordered_map<int, std::shared_ptr<OsgBoxRepresentation>> TestMapType;
+		TestMapType originalMap;
+
+		auto mockComponent = std::make_shared<OsgBoxRepresentation>("OsgBoxRepresentation");
+		auto mockComponent2 = std::make_shared<OsgBoxRepresentation>("MockComponent2");
+
+		originalMap.insert(TestMapType::value_type(1, mockComponent));
+		originalMap.insert(TestMapType::value_type(2, mockComponent2));
+
+		YAML::Node node;
+		EXPECT_NO_THROW(node = originalMap);
+		EXPECT_EQ(2u, node.size());
+
+		TestMapType newMap;
+		EXPECT_NO_THROW(newMap = node.as<TestMapType>());
+
+		EXPECT_EQ(originalMap.size(), newMap.size());
+		for (auto it = std::begin(originalMap); it != std::end(originalMap); ++it)
+		{
+			auto result = std::find_if(std::begin(newMap), std::end(newMap),
+									   [&it](const std::pair<int, std::shared_ptr<OsgBoxRepresentation>>& pair)
+									   {
+										return it->second->getName() == pair.second->getName();
+									   });
+			EXPECT_NE(std::end(newMap), result);
+		}
+	}
+
+	{
+		SCOPED_TRACE("Serialization of std::unordered_map with integer as key and std::unordered_set<> as values");
+		typedef std::unordered_map<int, std::unordered_set<std::shared_ptr<OsgBoxRepresentation>>> TestMapType2;
+		TestMapType2 originalMap;
+
+		std::unordered_set<std::shared_ptr<OsgBoxRepresentation>> set1;
+		std::unordered_set<std::shared_ptr<OsgBoxRepresentation>> set2;
+
+		auto mockComponent = std::make_shared<OsgBoxRepresentation>("OsgBoxRepresentation");
+		auto mockComponent2 = std::make_shared<OsgBoxRepresentation>("MockComponent2");
+		auto mockComponent3 = std::make_shared<OsgBoxRepresentation>("MockComponent3");
+
+		set1.insert(mockComponent);
+		set2.insert(mockComponent2);
+		set2.insert(mockComponent3);
+
+		originalMap.insert(TestMapType2::value_type(1, set1));
+		originalMap.insert(TestMapType2::value_type(2, set2));
+
+		YAML::Node node;
+		EXPECT_NO_THROW(node = originalMap);
+		EXPECT_EQ(2u, node.size());
+
+		TestMapType2 newMap;
+		EXPECT_NO_THROW(newMap = node.as<TestMapType2>());
+
+		EXPECT_EQ(originalMap.size(), newMap.size());
+		for (auto it = std::begin(originalMap); it != std::end(originalMap); ++it)
+		{
+			auto representationSet = newMap.find(it->first)->second;
+			EXPECT_EQ(it->second.size(), representationSet.size());
+			for (auto item = std::begin(it->second); item != std::end(it->second); ++item)
+			{
+				auto match = std::find_if(std::begin(representationSet), std::end(representationSet),
+										  [&item](const std::shared_ptr<OsgBoxRepresentation> rep)
+										  {
+											return rep->getName() == (*item)->getName();
+										  });
+				EXPECT_NE(std::end(representationSet), match);
+			}
+		}
+	}
+}
+
+
+TEST(DataStructuresConvertTests, StdUnorderedSetTests)
+{
+	{
+		SCOPED_TRACE("Serialization of std::unordered_set<> of integers");
+		typedef std::unordered_set<int> TestSetType;
+		TestSetType originalSet;
+		originalSet.insert(1);
+		originalSet.insert(2);
+
+		YAML::Node node;
+		EXPECT_NO_THROW(node = originalSet);
+		EXPECT_EQ(2u, node.size());
+
+		TestSetType newSet;
+		EXPECT_NO_THROW(newSet = node.as<TestSetType>());
+
+		EXPECT_EQ(originalSet, newSet);
+	}
+
+	{
+		SCOPED_TRACE("Serialization of std::unordered_set<> of std::shared_ptr<>");
+		typedef std::unordered_set<std::shared_ptr<OsgBoxRepresentation>> TestSetType;
+		TestSetType originalSet;
+
+		auto mockComponent = std::make_shared<OsgBoxRepresentation>("OsgBoxRepresentation");
+		auto mockComponent2 = std::make_shared<OsgBoxRepresentation>("MockComponent2");
+
+		originalSet.insert(mockComponent);
+		originalSet.insert(mockComponent2);
+
+		YAML::Node node;
+		EXPECT_NO_THROW(node = originalSet);
+		EXPECT_EQ(2u, node.size());
+
+		TestSetType newSet;
+		EXPECT_NO_THROW(newSet = node.as<TestSetType>());
+
+		EXPECT_EQ(originalSet.size(), newSet.size());
+		for (auto it = std::begin(originalSet); it != std::end(originalSet); ++it)
+		{
+			auto result = std::find_if(std::begin(newSet), std::end(newSet),
+									   [&it](const std::shared_ptr<OsgBoxRepresentation>& item)
+									   {
+										return (*it)->getName() == item->getName();
+									   });
+			EXPECT_NE(std::end(newSet), result);
+		}
 	}
 }
 
