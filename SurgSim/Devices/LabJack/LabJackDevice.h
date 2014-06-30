@@ -187,8 +187,7 @@ public:
 	/// When the manager object creates the device, the internal state of the device usually isn't fully
 	/// initialized yet.  This method performs any needed initialization.
 	/// \return True on success.
-	/// \exception Asserts if already initialized, if unable to get a scaffold, or if it does not have an outputProducer
-	///		and one is needed to provide outputs.
+	/// \exception Asserts if already initialized, or if unable to get a scaffold.
 	virtual bool initialize() override;
 
 	/// Check whether this device is initialized.
