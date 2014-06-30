@@ -49,26 +49,20 @@ bool LabJackDevice::initialize()
 {
 	SURGSIM_ASSERT(!isInitialized()) << "LabJackDevice already initialized.";
 
+	std::shared_ptr<LabJackScaffold> scaffold = LabJackScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold) << "LabJackDevice failed to get a LabJackScaffold.";
+
 	if (getDigitalOutputs().size() > 0)
 	{
-		SURGSIM_ASSERT(hasOutputProducer()) << "LabJackDevice named " << getName() <<
-			" has digital output channels. An output producer is required, call setOutputProducer.";
+		SURGSIM_LOG_IF(!hasOutputProducer(), scaffold->getLogger(), WARNING) << "LabJackDevice named " << getName() <<
+			" has digital output channels but no output producer to provide the output data. Call setOutputProducer.";
 	}
 
 	if (getAnalogOutputs().size() > 0)
 	{
-		SURGSIM_ASSERT(hasOutputProducer()) << "LabJackDevice named " << getName() <<
-			" has analog output channels. An output producer is required, call setOutputProducer.";
+		SURGSIM_LOG_IF(!hasOutputProducer(), scaffold->getLogger(), WARNING) << "LabJackDevice named " << getName() <<
+			" has analog output channels but no output producer to provide the output data. Call setOutputProducer.";
 	}
-
-	if (getTimers().size() > 0)
-	{
-		SURGSIM_ASSERT(hasOutputProducer()) << "LabJackDevice named " << getName() <<
-			" has timers. An output producer is required, call setOutputProducer.";
-	}
-
-	std::shared_ptr<LabJackScaffold> scaffold = LabJackScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(scaffold) << "LabJackDevice failed to get a LabJackScaffold.";
 
 	bool found = false;
 	// registerDevice will set this object's type and/or connection, if they are currently set to SEARCH.
