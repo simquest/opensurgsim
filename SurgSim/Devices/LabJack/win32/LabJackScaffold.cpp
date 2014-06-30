@@ -133,8 +133,8 @@ public:
 			const LJ_ERROR error = ePut(m_deviceHandle, LJ_ioPIN_CONFIGURATION_RESET, 0, 0, 0);
 			result = isOk(error);
 			SURGSIM_LOG_IF(!result, m_scaffold->getLogger(), SEVERE) <<
-				"Failed to reset a device's pin configuration. Model: " << m_model << ". Connection: " << m_connection <<
-				". Address: '" << m_address << "'." << std::endl << formatErrorMessage(error);
+				"Failed to reset a device's pin configuration. Model: " << m_model << ". Connection: " <<
+				m_connection << ". Address: '" << m_address << "'." << std::endl << formatErrorMessage(error);
 			if (result)
 			{
 				m_deviceHandle = LABJACK_INVALID_HANDLE;
@@ -245,7 +245,8 @@ private:
 	/// Given all the timers, return just the ones that take outputs.
 	/// \param timers The timers.
 	/// \return The timers that take outputs.
-	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int, LabJack::TimerMode>& timers) const
+	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int,
+		LabJack::TimerMode>& timers) const
 	{
 		std::unordered_set<int> timersWithOutputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)

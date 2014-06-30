@@ -96,7 +96,7 @@ public:
 			std::to_string(m_lineForMinusX));
 		m_timerInputIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
 			std::to_string(m_firstTimerForQuadrature));
-		m_analogInputDifferentialIndex = 
+		m_analogInputDifferentialIndex =
 			inputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_INPUT_PREFIX +
 			std::to_string(m_analogInputDifferentialPositive));
 		m_analogInputSingleEndedIndex =
