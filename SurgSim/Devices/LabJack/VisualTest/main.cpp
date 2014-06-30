@@ -54,7 +54,7 @@ public:
 		m_translationPerUpdate(translationPerUpdate),
 		m_analogInputDifferentialPositive(positiveAnalogDifferential),
 		m_analogInputSingleEnded(analogSingleEnded),
-		m_analogInputDifferentialPositiveIndex(-1),
+		m_analogInputDifferentialIndex(-1),
 		m_analogInputSingleEndedIndex(-1),
 		m_analogOutput(rotationOut),
 		m_analogOutputIndex(-1),
@@ -96,14 +96,11 @@ public:
 			std::to_string(m_lineForMinusX));
 		m_timerInputIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
 			std::to_string(m_firstTimerForQuadrature));
-		m_analogInputDifferentialPositiveIndex =
-			inputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_INPUT_DIFFERENTIAL_PREFIX +
+		m_analogInputDifferentialIndex = 
+			inputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_INPUT_PREFIX +
 			std::to_string(m_analogInputDifferentialPositive));
-		m_analogInputDifferentialNegativeIndex =
-			inputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_INPUT_DIFFERENTIAL_PREFIX +
-			std::to_string(m_analogInputDifferentialNegative));
 		m_analogInputSingleEndedIndex =
-			inputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_INPUT_SINGLE_ENDED_PREFIX +
+			inputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_INPUT_PREFIX +
 			std::to_string(m_analogInputSingleEnded));
 
 		inputFilter(inputData, &getInputData());
@@ -165,10 +162,10 @@ public:
 		}
 
 		const double rotationScaling = 0.0001 * 180.0 / M_PI;
-		if (m_analogInputDifferentialPositiveIndex >= 0)
+		if (m_analogInputDifferentialIndex >= 0)
 		{
 			double value;
-			if (dataToFilter.scalars().get(m_analogInputDifferentialPositiveIndex, &value))
+			if (dataToFilter.scalars().get(m_analogInputDifferentialIndex, &value))
 			{
 				m_pose.rotate(SurgSim::Math::makeRotationQuaternion(value * rotationScaling, Vector3d::UnitX().eval()));
 			}
@@ -208,8 +205,7 @@ private:
 	int m_analogInputDifferentialPositive;
 	int m_analogInputDifferentialNegative;
 	int m_analogInputSingleEnded;
-	int m_analogInputDifferentialPositiveIndex;
-	int m_analogInputDifferentialNegativeIndex;
+	int m_analogInputDifferentialIndex;
 	int m_analogInputSingleEndedIndex;
 	int m_analogOutput;
 	int m_analogOutputIndex;
@@ -238,19 +234,19 @@ int main(int argc, char** argv)
 	timers[firstTimerForQuadrature + 1] = SurgSim::Device::LabJack::TIMERMODE_QUADRATURE;
 	toolDevice->setTimers(timers);
 
-	std::unordered_map<int, SurgSim::Device::LabJack::Range> analogInputsSingleEnded;
+	std::unordered_map<int, SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel> analogInputs;
 	const int singleEndedAnalog = 1;
-	analogInputsSingleEnded[singleEndedAnalog] = SurgSim::Device::LabJack::Range::RANGE_10;
-	toolDevice->setAnalogInputsSingleEnded(analogInputsSingleEnded);
-
-	std::unordered_map<int, SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel> analogInputsDifferential;
 	const int positiveAnalogDifferential = 2;
 	const int negativeAnalogDifferential = 3;
-	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel data =
+	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel differentialRangeAndChannel =
 		{SurgSim::DataStructures::OptionalValue<int>(negativeAnalogDifferential),
 		SurgSim::Device::LabJack::Range::RANGE_10};
-	analogInputsDifferential[positiveAnalogDifferential] = data;
-	toolDevice->setAnalogInputsDifferential(analogInputsDifferential);
+	analogInputs[positiveAnalogDifferential] = differentialRangeAndChannel;
+	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel singleEndedRange =
+		{SurgSim::DataStructures::OptionalValue<int>(),
+		SurgSim::Device::LabJack::Range::RANGE_10};
+	analogInputs[singleEndedAnalog] = singleEndedRange;
+	toolDevice->setAnalogInputs(analogInputs);
 
 	std::unordered_set<int> analogOutputs;
 	const int rotationOut = 1;

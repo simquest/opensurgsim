@@ -241,18 +241,17 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	EXPECT_NO_THROW(device->setMaximumUpdateRate(rate));
 	EXPECT_NEAR(rate, device->getMaximumUpdateRate(), 1e-9);
 
-	std::unordered_map<int, SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel> analogInputsDifferential;
-	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel data =
+	std::unordered_map<int, SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel> analogInputs;
+	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel differentialRangeAndChannel =
 		{SurgSim::DataStructures::OptionalValue<int>(1),
 		SurgSim::Device::LabJack::Range::RANGE_10};
-	analogInputsDifferential[2] = data;
-	EXPECT_NO_THROW(device->setAnalogInputsDifferential(analogInputsDifferential));
-	EXPECT_EQ(analogInputsDifferential, device->getAnalogInputsDifferential());
-
-	std::unordered_map<int, SurgSim::Device::LabJack::Range> analogInputsSingleEnded;
-	analogInputsSingleEnded[3] = SurgSim::Device::LabJack::Range::RANGE_0_POINT_1;
-	EXPECT_NO_THROW(device->setAnalogInputsSingleEnded(analogInputsSingleEnded));
-	EXPECT_EQ(analogInputsSingleEnded, device->getAnalogInputsSingleEnded());
+	analogInputs[2] = differentialRangeAndChannel;
+	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel singleEndedRange =
+		{SurgSim::DataStructures::OptionalValue<int>(),
+		SurgSim::Device::LabJack::Range::RANGE_0_POINT_1};
+	analogInputs[5] = singleEndedRange;
+	EXPECT_NO_THROW(device->setAnalogInputs(analogInputs));
+	EXPECT_EQ(analogInputs, device->getAnalogInputs());
 
 	const int resolution = 3;
 	EXPECT_NO_THROW(device->setAnalogInputResolution(resolution));
@@ -308,16 +307,16 @@ TEST(LabJackDeviceTest, NoSettingAfterInitialization)
 	const double rate = 300.0;
 	EXPECT_THROW(device->setMaximumUpdateRate(rate), SurgSim::Framework::AssertionFailure);
 
-	std::unordered_map<int, SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel> analogInputsDifferential;
-	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel data =
+	std::unordered_map<int, SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel> analogInputs;
+	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel differentialRangeAndChannel =
 		{SurgSim::DataStructures::OptionalValue<int>(1),
 		SurgSim::Device::LabJack::Range::RANGE_10};
-	analogInputsDifferential[2] = data;
-	EXPECT_THROW(device->setAnalogInputsDifferential(analogInputsDifferential), SurgSim::Framework::AssertionFailure);
-
-	std::unordered_map<int, SurgSim::Device::LabJack::Range> analogInputsSingleEnded;
-	analogInputsSingleEnded[3] = SurgSim::Device::LabJack::Range::RANGE_0_POINT_1;
-	EXPECT_THROW(device->setAnalogInputsSingleEnded(analogInputsSingleEnded), SurgSim::Framework::AssertionFailure);
+	analogInputs[2] = differentialRangeAndChannel;
+	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel singleEndedRange =
+		{SurgSim::DataStructures::OptionalValue<int>(),
+		SurgSim::Device::LabJack::Range::RANGE_0_POINT_1};
+	analogInputs[5] = singleEndedRange;
+	EXPECT_THROW(device->setAnalogInputs(analogInputs), SurgSim::Framework::AssertionFailure);
 
 	const int resolution = 3;
 	EXPECT_THROW(device->setAnalogInputResolution(resolution), SurgSim::Framework::AssertionFailure);

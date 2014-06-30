@@ -207,29 +207,16 @@ double LabJackDevice::getMaximumUpdateRate() const
 	return m_threadRate;
 }
 
-void LabJackDevice::setAnalogInputsDifferential(std::unordered_map<int,
-	LabJack::RangeAndOptionalNegativeChannel> analogInputs)
+void LabJackDevice::setAnalogInputs(std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputs)
 {
 	SURGSIM_ASSERT(!isInitialized()) <<
-		"Differential analog inputs cannot be set for a LabJackDevice after it is initialized.";
-	m_analogInputsDifferential = analogInputs;
+		"Analog inputs cannot be set for a LabJackDevice after it is initialized.";
+	m_analogInputs = analogInputs;
 }
 
-const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel>& LabJackDevice::getAnalogInputsDifferential() const
+const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel>& LabJackDevice::getAnalogInputs() const
 {
-	return m_analogInputsDifferential;
-}
-
-void LabJackDevice::setAnalogInputsSingleEnded(std::unordered_map<int, LabJack::Range> analogInputs)
-{
-	SURGSIM_ASSERT(!isInitialized()) <<
-		"Single-ended analog inputs cannot be set for a LabJackDevice after it is initialized.";
-	m_analogInputsSingleEnded = analogInputs;
-}
-
-const std::unordered_map<int, LabJack::Range>& LabJackDevice::getAnalogInputsSingleEnded() const
-{
-	return m_analogInputsSingleEnded;
+	return m_analogInputs;
 }
 
 void LabJackDevice::setAnalogOutputChannels(const std::unordered_set<int>& analogOutputChannels)

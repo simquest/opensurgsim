@@ -322,8 +322,7 @@ public:
 		digitalOutputChannels(device->getDigitalOutputChannels()),
 		timerInputChannels(getTimerInputChannels(device->getTimers())),
 		timerOutputChannels(getTimerOutputChannels(device->getTimers())),
-		analogInputsDifferential(device->getAnalogInputsDifferential()),
-		analogInputsSingleEnded(device->getAnalogInputsSingleEnded()),
+		analogInputs(device->getAnalogInputs()),
 		analogOutputChannels(device->getAnalogOutputChannels()),
 		cachedOutputIndices(false)
 	{
@@ -348,10 +347,8 @@ public:
 	const std::unordered_set<int> timerInputChannels;
 	/// The timer channels set for timer outputs (e.g., PWM outputs).
 	const std::unordered_set<int> timerOutputChannels;
-	/// The differential analog inputs.
-	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputsDifferential;
-	/// The single-ended analog inputs.
-	const std::unordered_map<int, LabJack::Range> analogInputsSingleEnded;
+	/// The analog inputs.
+	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputs;
 	/// The channels set for analog outputs.
 	const std::unordered_set<int> analogOutputChannels;
 	/// The DataGroup indices for the digital outputs.
@@ -364,10 +361,8 @@ public:
 	std::unordered_map<int, int> timerInputIndices;
 	/// The DataGroup indices for the analog outputs.
 	std::unordered_map<int, int> analogOutputIndices;
-	/// The DataGroup indices for the differential analog inputs.
-	std::unordered_map<int, int> analogInputDifferentialIndices;
-	/// The DataGroup indices for the single-ended analog inputs.
-	std::unordered_map<int, int> analogInputSingleEndedIndices;
+	/// The DataGroup indices for the analog inputs.
+	std::unordered_map<int, int> analogInputIndices;
 	/// True if the output indices have been cached.
 	bool cachedOutputIndices;
 	// Calibration constants.  The meaning of each entry is specific to the model (i.e., LabJack::Model).
@@ -607,27 +602,14 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 					".  Make sure that is a valid timer number.";
 			}
 
-			for (auto input = info->analogInputsDifferential.cbegin();
-				input != info->analogInputsDifferential.cend(); ++input)
+			for (auto input = info->analogInputs.cbegin();
+				input != info->analogInputs.cend(); ++input)
 			{
-				std::string name = SurgSim::DataStructures::Names::ANALOG_INPUT_DIFFERENTIAL_PREFIX +
-					std::to_string(input->first);
-				info->analogInputDifferentialIndices[input->first] = inputData.scalars().getIndex(name);
-				SURGSIM_ASSERT(info->analogInputDifferentialIndices[input->first] >= 0) <<
-					"LabJackScaffold::DeviceData failed to get a valid NamedData index for the differential " <<
+				std::string name = SurgSim::DataStructures::Names::ANALOG_INPUT_PREFIX + std::to_string(input->first);
+				info->analogInputIndices[input->first] = inputData.scalars().getIndex(name);
+				SURGSIM_ASSERT(info->analogInputIndices[input->first] >= 0) <<
+					"LabJackScaffold::DeviceData failed to get a valid NamedData index for the " <<
 					"analog input for channel " << input->first << ".  Make sure that is a valid line number.  " <<
-					"Expected an entry named " << name << ".";
-			}
-
-			for (auto input = info->analogInputsSingleEnded.cbegin();
-				input != info->analogInputsSingleEnded.cend(); ++input)
-			{
-				const std::string name = SurgSim::DataStructures::Names::ANALOG_INPUT_SINGLE_ENDED_PREFIX +
-					std::to_string(input->first);
-				info->analogInputSingleEndedIndices[input->first] = inputData.scalars().getIndex(name);
-				SURGSIM_ASSERT(info->analogInputSingleEndedIndices[input->first] >= 0) <<
-					"LabJackScaffold::DeviceData failed to get a valid NamedData index for the single-ended " <<
-					"analog input for line " << input->first << ".  Make sure that is a valid line number.  " <<
 					"Expected an entry named " << name << ".";
 			}
 
@@ -806,45 +788,29 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	}
 
 	// Request the values of analog inputs.
-	auto const& analogInputsDifferential = info->analogInputsDifferential;
-	for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
+	auto const& analogInputs = info->analogInputs;
+	for (auto input = analogInputs.cbegin(); input != analogInputs.cend(); ++input)
 	{
 		if (device->getModel() == LabJack::MODEL_U3)
 		{
 			const BYTE longSettling = (device->getAnalogInputSettling() > 0 ? (1 << 6) : 0);
 			const BYTE quickSample = (device->getAnalogInputResolution() > 0 ? (1 << 7) : 0);
+			// Third byte is the negative channel for differential input, or 31 for single-ended input.
+			const BYTE negativeChannel = input->second.negativeChannel.hasValue() ?
+				input->second.negativeChannel.getValue() : 31;
 			sendBytes.at(sendBytesSize++) = 1;
 			sendBytes.at(sendBytesSize++) = input->first | longSettling | quickSample;
-			sendBytes.at(sendBytesSize++) = input->second.negativeChannel.getValue();
+			sendBytes.at(sendBytesSize++) = negativeChannel;
 			readBytesSize += 2;
 		}
 		else
 		{
-			const BYTE differential = 1 << 7;
+			// The U6 can only do consecutive channels for a differential read, so the actual channel is not sent.
+			const BYTE differential = input->second.negativeChannel.hasValue() ? 1 << 7 : 0;
 			sendBytes.at(sendBytesSize++) = 3;
 			sendBytes.at(sendBytesSize++) = input->first;
 			sendBytes.at(sendBytesSize++) = device->getAnalogInputResolution() | (getGain(input->second.range) << 4);
 			sendBytes.at(sendBytesSize++) = device->getAnalogInputSettling() | differential;
-			readBytesSize += 5;
-		}
-	}
-
-	auto const& analogInputsSingleEnded = info->analogInputsSingleEnded;
-	for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
-	{
-		if (device->getModel() == LabJack::MODEL_U3)
-		{
-			sendBytes.at(sendBytesSize++) = 1;
-			sendBytes.at(sendBytesSize++) = input->first;
-			sendBytes.at(sendBytesSize++) = 31;
-			readBytesSize += 2;
-		}
-		else
-		{
-			sendBytes.at(sendBytesSize++) = 3;
-			sendBytes.at(sendBytesSize++) = input->first;
-			sendBytes.at(sendBytesSize++) = device->getAnalogInputResolution() | (getGain(input->second) << 4);
-			sendBytes.at(sendBytesSize++) = device->getAnalogInputSettling();
 			readBytesSize += 5;
 		}
 	}
@@ -987,7 +953,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			}
 		}
 
-		for (auto input = analogInputsDifferential.cbegin(); input != analogInputsDifferential.cend(); ++input)
+		for (auto input = analogInputs.cbegin(); input != analogInputs.cend(); ++input)
 		{
 			if (device->getModel() == LabJack::MODEL_U3)
 			{
@@ -995,7 +961,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 				const uint16_t value = LabJack::uint16FromChars(readBytes, currentByte, count);
 				currentByte += 2;
 				const double volts = info->calibration[2] * static_cast<double>(value) + info->calibration[3];
-				inputData.scalars().set(info->analogInputDifferentialIndices[input->first], volts);
+				inputData.scalars().set(info->analogInputIndices[input->first], volts);
 			}
 			else
 			{
@@ -1025,49 +991,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 				{
 					volts = (bits - center) * info->calibration[index - 8];
 				}
-				inputData.scalars().set(info->analogInputDifferentialIndices[input->first], volts);
-			}
-		}
-
-		for (auto input = analogInputsSingleEnded.cbegin(); input != analogInputsSingleEnded.cend(); ++input)
-		{
-			if (device->getModel() == LabJack::MODEL_U3)
-			{
-				const int count = 2;
-				const uint16_t value = LabJack::uint16FromChars(readBytes, currentByte, count);
-				currentByte += 2;
-				const double volts = info->calibration[2] * static_cast<double>(value) + info->calibration[3];
-				inputData.scalars().set(info->analogInputSingleEndedIndices[input->first], volts);
-			}
-			else
-			{
-				const int count = 3;
-				const uint32_t value = LabJack::uint32FromChars(readBytes, currentByte, count);
-
-				double bits = value;
-				bits /= 256.0;
-
-				const int gain = readBytes.at(currentByte + 3) / 16;
-				int index = gain * 2 + 8;
-
-				const int resolution = readBytes.at(currentByte + 3) & 15;
-				if (resolution > 8)
-				{
-					index += 24;
-				}
-
-				currentByte += 5;
-
-				double volts;
-				if (bits < info->calibration[index + 1] )
-				{
-					volts = (info->calibration[index + 1] - bits) * info->calibration[index];
-				}
-				else
-				{
-					volts = (bits - info->calibration[index + 1]) * info->calibration[index - 8];
-				}
-				inputData.scalars().set(info->analogInputSingleEndedIndices[input->first], volts);
+				inputData.scalars().set(info->analogInputIndices[input->first], volts);
 			}
 		}
 	}
@@ -1111,8 +1035,7 @@ SurgSim::DataStructures::DataGroup LabJackScaffold::buildDeviceInputData()
 	const int maxAnalogInputs = 16; // The U3 can have 16 analog inputs.
 	for (int i = 0; i < maxAnalogInputs; ++i)
 	{
-		builder.addScalar(SurgSim::DataStructures::Names::ANALOG_INPUT_DIFFERENTIAL_PREFIX + std::to_string(i));
-		builder.addScalar(SurgSim::DataStructures::Names::ANALOG_INPUT_SINGLE_ENDED_PREFIX + std::to_string(i));
+		builder.addScalar(SurgSim::DataStructures::Names::ANALOG_INPUT_PREFIX + std::to_string(i));
 	}
 	return builder.createData();
 }
@@ -1410,10 +1333,11 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 
 	if (device->getModel() == LabJack::MODEL_U6)
 	{
-		auto const& analogInputs = device->getAnalogInputsDifferential();
+		auto const& analogInputs = device->getAnalogInputs();
 		for (auto input = analogInputs.cbegin(); input != analogInputs.cend(); ++input)
 		{
-			if (input->second.negativeChannel.getValue() != input->first + 1)
+			if ((input->second.negativeChannel.hasValue()) &&
+				(input->second.negativeChannel.getValue() != input->first + 1))
 			{
 				SURGSIM_LOG_SEVERE(m_logger) <<
 					"Failed to configure a differential analog input for a device named '" <<

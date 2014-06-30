@@ -134,9 +134,9 @@ struct RangeAndOptionalNegativeChannel
 /// A class implementing the communication with a LabJack data acquisition (DAQ) device.  Should work for the U3, U6,
 /// and U9 models on Windows and the U3 and U6 on Linux. See the manual(s) for your LabJack device(s) to understand
 /// the input and output data, the configuration parameters, timing limitations, etc. The various parameters and
-/// inputs are almost always passed through unchanged to the device driver. Currently timers, digital
-/// input/output, and analog input/output are supported. Counters are not yet supported. Using the same channel as
-/// the positive input for multiple differential analog measurements is also not supported.
+/// inputs are almost always passed through unchanged to the device driver. Timers, digital input/output, and
+/// analog input/output are supported. Currently not supported are counters, using the same channel as
+/// the positive channel for multiple analog inputs, and reconfiguring the device after initialization.
 /// \warning The LabJack device is configurable to such a degree that neither this class nor LabJackScaffold are able
 ///		to do significant error-checking.  If the output DataGroup and the calls (e.g., addTimer) to this class
 ///		are not in agreement, the requests to the LabJack device driver will not be correct.
@@ -144,14 +144,10 @@ struct RangeAndOptionalNegativeChannel
 /// \par Application input provided by the device:
 ///   | type   | name                        |                                                                 |
 ///   | ----   | ----                        | ---                                                             |
-///   | scalar | "analogInputDifferential0"  | %Differential analog input with AIN0 as the positive channel    |
-///   | scalar | "analogInputDifferential1"  | %Differential analog input with AIN1 as the positive channel    |
+///   | scalar | "analogInput0"              | %Analog input with AIN0 as the positive channel                 |
+///   | scalar | "analogInput"               | %Analog input with AIN1 as the positive channel                 |
 ///   | ...    |  ...                        | ...                                                             |
-///   | scalar | "analogInputDifferential16" | %Differential analog input with AIN16 as the positive channel   |
-///   | scalar | "analogInputSingleEnded0"   | %Single-ended analog input, AIN0                                |
-///   | scalar | "analogInputSingleEnded"    | %Single-ended analog input, AIN1                                |
-///   | ...    |  ...                        | ...                                                             |
-///   | scalar | "analogInputSingleEnded16"  | %Single-ended analog input, AIN16                               |
+///   | scalar | "analogInput16"             | %Analog input with AIN16 as the positive channel                |
 ///   | scalar | "digitalInput0"             | %Digital input, line #0                                         |
 ///   | scalar | "digitalInput1"             | %Digital input, line #1                                         |
 ///   | ...    |  ...                        | ...                                                             |
@@ -285,22 +281,14 @@ public:
 	/// \return The maximum update rate for the LabJackThread.
 	double getMaximumUpdateRate() const;
 
-	/// Set the differential analog inputs.
+	/// Set the analog inputs.
 	/// \param analogInputs The inputs. The key is the positive channel.
 	/// \exception Asserts if already initialized.
 	/// \note On Linux, does not correctly handle negative channels 31 or 32 for U3 model.
-	void setAnalogInputsDifferential(std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputs);
+	void setAnalogInputs(std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputs);
 
-	/// Set the single-ended analog inputs.
-	/// \param analogInputs The inputs. The key is the channel.  The value is the range.
-	/// \exception Asserts if already initialized.
-	void setAnalogInputsSingleEnded(std::unordered_map<int, LabJack::Range> analogInputs);
-
-	/// \return The enabled differential analog inputs.
-	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel>& getAnalogInputsDifferential() const;
-
-	/// \return The enabled single-ended analog inputs.
-	const std::unordered_map<int, LabJack::Range>& getAnalogInputsSingleEnded() const;
+	/// \return The enabled analog inputs.
+	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel>& getAnalogInputs() const;
 
 	/// Enable analog output lines.
 	/// \param analogOutputChannels The set of channel numbers.
@@ -353,11 +341,8 @@ private:
 	/// The line numbers for the digital inputs.
 	std::unordered_set<int> m_digitalInputChannels;
 
-	/// The single-ended analog inputs.  The key is the channel.  The value is the range (i.e., gain).
-	std::unordered_map<int, LabJack::Range> m_analogInputsSingleEnded;
-
-	/// The differential analog inputs. The key is the positive channel.
-	std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> m_analogInputsDifferential;
+	/// The analog inputs. The key is the positive channel.
+	std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> m_analogInputs;
 
 	/// The line numbers for the digital outputs.
 	std::unordered_set<int> m_digitalOutputChannels;
