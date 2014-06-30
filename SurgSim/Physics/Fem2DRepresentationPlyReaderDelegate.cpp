@@ -44,19 +44,19 @@ bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, 1 * sizeof(m_vertexData[0]));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, 2 * sizeof(m_vertexData[0]));
 
-	// Polyhedron Processing
+	// 2D Element Processing
 	reader->requestElement(
-		"2DElement",
+		"2d_element",
 		std::bind(&Fem2DRepresentationPlyReaderDelegate::beginFemElements,
 		this,
 		std::placeholders::_1,
 		std::placeholders::_2),
 		std::bind(&Fem2DRepresentationPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
 		std::bind(&Fem2DRepresentationPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
-	reader->requestListProperty("2DElement",
+	reader->requestListProperty("2d_element",
 		"vertex_indices",
 		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(ElementData, indicies),
+		offsetof(ElementData, indices),
 		PlyReader::TYPE_UNSIGNED_INT,
 		offsetof(ElementData, vertexCount));
 
@@ -74,6 +74,7 @@ bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
 	}
 
+	// Thickness Processing
 	reader->requestElement(
 		"thickness",
 		std::bind(
@@ -82,6 +83,7 @@ bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		nullptr);
 	reader->requestScalarProperty("thickness", "thickness", PlyReader::TYPE_DOUBLE, 0);
 
+	// Material Processing
 	reader->requestElement(
 		"material",
 		std::bind(
@@ -110,8 +112,8 @@ bool Fem2DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& rea
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
 
-	result = result && reader.hasProperty("2DElement", "vertex_indices");
-	result = result && !reader.isScalar("2DElement", "vertex_indices");
+	result = result && reader.hasProperty("2d_element", "vertex_indices");
+	result = result && !reader.isScalar("2d_element", "vertex_indices");
 
 	result = result && reader.hasProperty("thickness", "thickness");
 
@@ -126,11 +128,11 @@ bool Fem2DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& rea
 
 void Fem2DRepresentationPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_femData.vertexCount == 3) << "Cannot process trianle with "
+	SURGSIM_ASSERT(m_femData.vertexCount == 3) << "Cannot process triangle with "
 											   << m_femData.vertexCount << " vertices.";
 
 	std::array<size_t, 3> triangleVertices;
-	std::copy(m_femData.indicies, m_femData.indicies + 3, triangleVertices.begin());
+	std::copy(m_femData.indices, m_femData.indices + 3, triangleVertices.begin());
 	m_fem->addFemElement(std::make_shared<Fem2DElementTriangle>(triangleVertices));
 }
 

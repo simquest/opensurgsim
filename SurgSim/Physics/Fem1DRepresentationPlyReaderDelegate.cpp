@@ -44,19 +44,19 @@ bool Fem1DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, 1 * sizeof(m_vertexData[0]));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, 2 * sizeof(m_vertexData[0]));
 
-	// Polyhedron Processing
+	// 1D Element Processing
 	reader->requestElement(
-		"1DElement",
+		"1d_element",
 		std::bind(&Fem1DRepresentationPlyReaderDelegate::beginFemElements,
 		this,
 		std::placeholders::_1,
 		std::placeholders::_2),
 		std::bind(&Fem1DRepresentationPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
 		std::bind(&Fem1DRepresentationPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
-	reader->requestListProperty("1DElement",
+	reader->requestListProperty("1d_element",
 		"vertex_indices",
 		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(ElementData, indicies),
+		offsetof(ElementData, indices),
 		PlyReader::TYPE_UNSIGNED_INT,
 		offsetof(ElementData, vertexCount));
 
@@ -74,6 +74,7 @@ bool Fem1DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
 	}
 
+	// Radius Processing
 	reader->requestElement(
 		"radius",
 		std::bind(
@@ -82,6 +83,7 @@ bool Fem1DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		nullptr);
 	reader->requestScalarProperty("radius", "radius", PlyReader::TYPE_DOUBLE, 0);
 
+	// Material Processing
 	reader->requestElement(
 		"material",
 		std::bind(
@@ -110,8 +112,8 @@ bool Fem1DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& rea
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
 
-	result = result && reader.hasProperty("1DElement", "vertex_indices");
-	result = result && !reader.isScalar("1DElement", "vertex_indices");
+	result = result && reader.hasProperty("1d_element", "vertex_indices");
+	result = result && !reader.isScalar("1d_element", "vertex_indices");
 
 	result = result && reader.hasProperty("radius", "radius");
 
@@ -130,11 +132,11 @@ void Fem1DRepresentationPlyReaderDelegate::processFemElement(const std::string& 
 											   << m_femData.vertexCount << " vertices.";
 
 	std::array<size_t, 2> triangleVertices;
-	std::copy(m_femData.indicies, m_femData.indicies + 2, triangleVertices.begin());
+	std::copy(m_femData.indices, m_femData.indices + 2, triangleVertices.begin());
 	m_fem->addFemElement(std::make_shared<Fem1DElementBeam>(triangleVertices));
 }
 
-void* Fem1DRepresentationPlyReaderDelegate::beginRadius(const std::string& elementName, size_t thicknessCount)
+void* Fem1DRepresentationPlyReaderDelegate::beginRadius(const std::string& elementName, size_t raidusCount)
 {
 	return &m_radius;
 }

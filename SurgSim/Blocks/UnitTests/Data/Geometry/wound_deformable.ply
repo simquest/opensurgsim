@@ -22,9 +22,9 @@ element vertex 391
 property double x
 property double y
 property double z
-element 2DElement 407
+element face 407
 property list uint uint vertex_indices
-element 3DElement 1476
+element 3d_element 1476
 property list uint uint vertex_indices
 element boundary_condition 79
 property uint vertex_index

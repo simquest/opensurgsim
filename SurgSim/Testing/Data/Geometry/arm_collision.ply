@@ -10,7 +10,7 @@ property float ny
 property float nz
 property float s
 property float t
-element 2DElement 528
+element face 528
 property list uchar uint vertex_indices
 end_header
 -0.034406 -0.085027 -0.138728 0.463145 -0.829541 -0.312024 0.135340 0.509730

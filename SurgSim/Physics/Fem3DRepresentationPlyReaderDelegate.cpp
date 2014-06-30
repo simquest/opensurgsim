@@ -20,11 +20,12 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 
+using SurgSim::DataStructures::PlyReader;
+
 namespace SurgSim
 {
 namespace Physics
 {
-using SurgSim::DataStructures::PlyReader;
 
 Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem)
 	: FemRepresentationPlyReaderDelegate(fem)
@@ -40,8 +41,8 @@ bool Fem3DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& rea
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
 
-	result = result && reader.hasProperty("3DElement", "vertex_indices");
-	result = result && !reader.isScalar("3DElement", "vertex_indices");
+	result = result && reader.hasProperty("3d_element", "vertex_indices");
+	result = result && !reader.isScalar("3d_element", "vertex_indices");
 
 	result = result && reader.hasProperty("material", "mass_density");
 	result = result && reader.hasProperty("material", "poisson_ratio");
@@ -65,22 +66,23 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, 1 * sizeof(m_vertexData[0]));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, 2 * sizeof(m_vertexData[0]));
 
-	// Polyhedron Processing
+	// 3D Element Processing
 	reader->requestElement(
-		"3DElement",
+		"3d_element",
 		std::bind(&Fem3DRepresentationPlyReaderDelegate::beginFemElements,
 				  this,
 				  std::placeholders::_1,
 				  std::placeholders::_2),
 		std::bind(&Fem3DRepresentationPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
 		std::bind(&Fem3DRepresentationPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
-	reader->requestListProperty("3DElement",
+	reader->requestListProperty("3d_element",
 								"vertex_indices",
 								PlyReader::TYPE_UNSIGNED_INT,
-								offsetof(ElementData, indicies),
+								offsetof(ElementData, indices),
 								PlyReader::TYPE_UNSIGNED_INT,
 								offsetof(ElementData, vertexCount));
 
+	// Material Processing
 	reader->requestElement(
 		"material",
 		std::bind(
@@ -120,7 +122,7 @@ void Fem3DRepresentationPlyReaderDelegate::processFemElement(const std::string& 
 											   << m_femData.vertexCount << " vertices.";
 
 	std::array<size_t, 4> polyhedronVertices;
-	std::copy(m_femData.indicies, m_femData.indicies + 4, polyhedronVertices.begin());
+	std::copy(m_femData.indices, m_femData.indices + 4, polyhedronVertices.begin());
 	m_fem->addFemElement(std::make_shared<Fem3DElementTetrahedron>(polyhedronVertices));
 }
 

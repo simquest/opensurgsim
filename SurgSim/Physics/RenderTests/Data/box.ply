@@ -5,7 +5,7 @@ element vertex 8
 property float x
 property float y
 property float z
-element 2DElement 12
+element face 12
 property list uchar uint vertex_indices
 end_header
 -0.050000 -0.050000 0.050000
