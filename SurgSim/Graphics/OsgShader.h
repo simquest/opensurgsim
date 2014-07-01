@@ -22,9 +22,14 @@
 #include <osg/StateSet>
 
 #include <string>
+#include <memory>
 
 namespace SurgSim
 {
+namespace Framework
+{
+class ApplicationData;
+}
 
 namespace Graphics
 {
@@ -133,6 +138,10 @@ private:
 	/// Is the shader supposed to be used globally
 	bool m_globalScope;
 };
+
+std::shared_ptr<SurgSim::Graphics::OsgShader> loadShader(const SurgSim::Framework::ApplicationData& data,
+		const std::string& name);
+
 
 };  // namespace Graphics
 
