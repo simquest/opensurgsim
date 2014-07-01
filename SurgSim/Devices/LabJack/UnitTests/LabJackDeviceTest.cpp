@@ -215,7 +215,7 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 
 	std::unordered_set<int> digitalOutputChannels;
 	digitalOutputChannels.insert(3);
-	digitalOutputChannels.insert(13);
+	digitalOutputChannels.insert(17);
 	EXPECT_NO_THROW(device->enableDigitalOutput(3));
 	EXPECT_NO_THROW(device->enableDigitalOutput(17));
 	EXPECT_EQ(digitalOutputChannels, device->getDigitalOutputs());
