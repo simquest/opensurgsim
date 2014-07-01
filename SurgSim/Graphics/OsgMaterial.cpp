@@ -181,55 +181,7 @@ bool OsgMaterial::doWakeUp()
 	throw std::logic_error("The method or operation is not implemented.");
 }
 
-std::shared_ptr<SurgSim::Graphics::OsgMaterial> createMaterialWithShaders(
-	const SurgSim::Framework::ApplicationData& data,
-	const std::string& name)
-{
-	std::string vertexShaderName = name + ".vert";
-	std::string fragmentShaderName = name + ".frag";
 
-	std::string filename;
-
-	auto shader(std::make_shared<SurgSim::Graphics::OsgShader>());
-	bool success = true;
-	filename = data.findFile(vertexShaderName);
-	if (filename == "")
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Could not find vertex shader " << vertexShaderName;
-		success = false;
-	}
-	else if (! shader->loadVertexShaderSource(filename))
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Could not load vertex shader " << vertexShaderName;
-		success = false;
-	}
-
-
-	filename = data.findFile(fragmentShaderName);
-	if (filename == "")
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Could not find fragment shader " << fragmentShaderName;
-		success = false;
-	}
-	if (! shader->loadFragmentShaderSource(filename))
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Could not load fragment shader " << fragmentShaderName;
-		success = false;
-	}
-
-	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material;
-	if (success)
-	{
-		material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
-		material->setShader(shader);
-	}
-
-	return material;
-}
 
 }; // namespace Graphics
 

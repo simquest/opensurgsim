@@ -246,8 +246,11 @@ TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
 
 
 	// Create material to transport the Textures
-	auto material = SurgSim::Graphics::createMaterialWithShaders(*runtime->getApplicationData(),
-					"Shaders/ds_mapping_material");
+
+	auto material = std::make_shared<OsgMaterial>();
+	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	ASSERT_TRUE(shader != nullptr);
+	material->setShader(shader);
 	{
 		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
 		material->addUniform(uniform);
@@ -309,13 +312,12 @@ TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
 	viewElement->addComponent(light);
 
 	std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->setOsgMapsUniforms(true);
-	std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->enableManipulator(true);
 
-// 	runtime->start();
-// 	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
-// 	runtime->stop();
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+	runtime->stop();
 
-	runtime->execute();
+
 
 }
 
