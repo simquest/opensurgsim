@@ -143,6 +143,9 @@ public:
 	/// Each representation has an index in the mlcp. This mapping is about this index.
 	const MlcpMapping<Representation>& getRepresentationsMapping() const;
 
+	/// Update the representations mapping
+	void updateRepresentationsMapping();
+
 	/// Gets the constraints mapping
 	/// \return	The constraints mapping (mapping between the constraints and the mlcp)
 	/// Each constraint has an index in the mlcp. This mapping is about this index.

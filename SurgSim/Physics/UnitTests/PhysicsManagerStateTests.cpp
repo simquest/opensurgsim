@@ -61,6 +61,8 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	actualRepresentations = physicsState->getRepresentations();
 	ASSERT_EQ(1, actualRepresentations.size());
 	EXPECT_EQ(rigid1, actualRepresentations.back());
+	physicsState->filterActiveRepresentations();
+	physicsState->updateRepresentationsMapping();
 	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
 	int expectedMapValue = 0;
 	std::shared_ptr<Representation> rigid1AsRepresentation = rigid1;
@@ -79,6 +81,8 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	EXPECT_EQ(rigid2, actualRepresentations.back());
 
 	// check the representationsIndexMapping
+	physicsState->filterActiveRepresentations();
+	physicsState->updateRepresentationsMapping();
 	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
 	EXPECT_EQ(expectedMapValue, actualRepresentationsIndexMapping.getValue(rigid1AsRepresentation.get()));
 	EXPECT_EQ(6, rigid1AsRepresentation->getNumDof()); // make sure the rigid representation is 6 DOF

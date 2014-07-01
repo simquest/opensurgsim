@@ -40,16 +40,11 @@ void PhysicsManagerState::setRepresentations(const std::vector<std::shared_ptr<R
 {
 	m_representations = val;
 
-	ptrdiff_t index = 0;
-	m_representationsIndexMapping.clear();
 	m_collisionsToPhysicsMap.clear();
 	for (auto it = m_representations.begin(); it != m_representations.end(); it++)
 	{
 		if ((*it)->isActive())
 		{
-			m_representationsIndexMapping.setValue((*it).get(), index);
-			index += (*it)->getNumDof();
-
 			auto collision = (*it)->getCollisionRepresentation();
 			if (collision != nullptr)
 			{
@@ -233,6 +228,17 @@ const MlcpPhysicsSolution& PhysicsManagerState::getMlcpSolution() const
 const MlcpMapping<Representation>& PhysicsManagerState::getRepresentationsMapping() const
 {
 	return m_representationsIndexMapping;
+}
+
+void PhysicsManagerState::updateRepresentationsMapping()
+{
+	m_representationsIndexMapping.clear();
+	ptrdiff_t index = 0;
+	for (auto it = m_activeRepresentations.begin(); it != m_activeRepresentations.end(); it++)
+	{
+		m_representationsIndexMapping.setValue((*it).get(), index);
+		index += (*it)->getNumDof();
+	}
 }
 
 const MlcpMapping<Constraint>& PhysicsManagerState::getConstraintsMapping() const

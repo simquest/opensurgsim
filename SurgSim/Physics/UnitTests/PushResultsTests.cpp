@@ -121,6 +121,10 @@ TEST_F(PushResultsTests, OneRepresentationOneConstraintTest)
 	// Set the constraint list in the Physics Manager State
 	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
 
+	// Update the Representations mapping.
+	m_physicsManagerState->filterActiveRepresentations(); // Usually this is called in preparePhysicsState.
+	m_physicsManagerState->updateRepresentationsMapping();
+
 	// Fill up the Mlcp problem and clear up the Mlcp solution
 	resetMlcpProblem(6, 1);
 	MlcpPhysicsProblem& mlcpProblem = m_physicsManagerState->getMlcpProblem();
@@ -247,6 +251,10 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 
 	// Set the constraint list in the Physics Manager State
 	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
+
+	// Update the Representations mapping.
+	m_physicsManagerState->filterActiveRepresentations(); // Usually this is called in preparePhysicsState.
+	m_physicsManagerState->updateRepresentationsMapping();
 
 	// Fill up the Mlcp problem and clear up the Mlcp solution
 	resetMlcpProblem(6, 2);
@@ -386,6 +394,10 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 
 	// Set the constraint list in the Physics Manager State
 	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
+
+	// Update the Representations mapping.
+	m_physicsManagerState->filterActiveRepresentations(); // Usually this is called in preparePhysicsState.
+	m_physicsManagerState->updateRepresentationsMapping();
 
 	// Fill up the Mlcp problem and clear up the Mlcp solution
 	resetMlcpProblem(12, 2);
