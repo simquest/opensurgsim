@@ -96,6 +96,24 @@ enum TimerMode
 	TIMERMODE_LINE_TO_LINE = 14 // Line to Line measurement
 };
 
+/// A struct holding the data to be associated with a Timer.
+struct TimerModeAndOptionalInitialValue
+{
+	/// Equality comparison.
+	/// \param other The object with which to compare.
+	/// \return true if equivalent.
+	bool operator==(const TimerModeAndOptionalInitialValue& other) const
+	{
+		return (mode == other.mode) && (initialValue == other.initialValue);
+	}
+
+	/// The mode.
+	TimerMode mode;
+
+	/// The initial value.
+	SurgSim::DataStructures::OptionalValue<int> initialValue;
+};
+
 /// The analog input ranges.  Equivalent to gain.  Ignored for Linux scaffold, which auto-ranges.
 enum Range
 {
@@ -279,14 +297,25 @@ public:
 	/// \exception Asserts if already initialized.
 	void enableTimer(int index, LabJack::TimerMode mode);
 
+	/// Enable timer with an initial value.
+	/// Since quadrature requires two lines, to measure a single quadrature encoder this function
+	/// must be called twice on consecutive timerNumbers.  For example, to enable z-phase support for a quadrature
+	/// timer, with the Z (aka index) signal on digital channel FIO4 (channel 4), set initialValue for both timer
+	/// channels to ((1 << 15) | 4).  All output timers use the same clock (see setTimerBase and setTimerClockDivisor).
+	/// \param index The index of the timer (not the line number, see setTimerCounterPinOffset).
+	/// \param mode The type of timer.
+	/// \param initialValue The initial value.
+	/// \exception Asserts if already initialized.
+	void enableTimer(int index, LabJack::TimerMode mode, int initialValue);
+
 	/// Set which timers are enabled.
 	/// \sa enableTimer
-	/// \param timers The map from timer index (not line number) to mode.
+	/// \param timers The map from timer index (not line number) to mode and optional initial value.
 	/// \exception Asserts if already initialized.
-	void setTimers(const std::unordered_map<int, LabJack::TimerMode>& timers);
+	void setTimers(const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue>& timers);
 
 	/// \return The enabled timers.
-	const std::unordered_map<int, LabJack::TimerMode>& getTimers() const;
+	const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue>& getTimers() const;
 
 	/// Set the maximum update rate for the LabJackThread.  Since the device driver blocks thread execution
 	/// while acquiring new data, update rates have a definite upper-bound that is dependent on the requested
@@ -397,8 +426,8 @@ private:
 	/// The number of the lowest FIO pin that is a timer or counter.
 	int m_timerCounterPinOffset;
 
-	/// A map from the timers' line numbers to their modes.
-	std::unordered_map<int, LabJack::TimerMode> m_timers;
+	/// A map from the timers' line numbers to their mode and optional initial value.
+	std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue> m_timers;
 
 	/// The maximum update rate for the LabJackThread.
 	double m_threadRate;

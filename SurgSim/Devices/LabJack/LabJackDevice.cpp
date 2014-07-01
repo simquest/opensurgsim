@@ -194,16 +194,26 @@ int LabJackDevice::getTimerCounterPinOffset() const
 void LabJackDevice::enableTimer(int index, LabJack::TimerMode mode)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Timers cannot be enabled for a LabJackDevice after it is initialized.";
-	m_timers[index] = mode;
+	LabJack::TimerModeAndOptionalInitialValue timerModeAndOptionalInitialValue = {mode,
+		SurgSim::DataStructures::OptionalValue<int>()};
+	m_timers[index] = std::move(timerModeAndOptionalInitialValue);
 }
 
-void LabJackDevice::setTimers(const std::unordered_map<int, LabJack::TimerMode>& timers)
+void LabJackDevice::enableTimer(int index, LabJack::TimerMode mode, int initialValue)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Timers cannot be enabled for a LabJackDevice after it is initialized.";
+	LabJack::TimerModeAndOptionalInitialValue timerModeAndOptionalInitialValue = {mode,
+		SurgSim::DataStructures::OptionalValue<int>(initialValue)};
+	m_timers[index] = std::move(timerModeAndOptionalInitialValue);
+}
+
+void LabJackDevice::setTimers(const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue>& timers)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Timers cannot be enabled for a LabJackDevice after it is initialized.";
 	m_timers = timers;
 }
 
-const std::unordered_map<int, LabJack::TimerMode>& LabJackDevice::getTimers() const
+const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue>& LabJackDevice::getTimers() const
 {
 	return m_timers;
 }

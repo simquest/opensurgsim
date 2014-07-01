@@ -227,14 +227,15 @@ private:
 	/// Given all the timers, return just the ones that provide inputs.
 	/// \param timers The timers.
 	/// \return The timers that provide inputs.
-	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int, LabJack::TimerMode>& timers) const
+	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int,
+		LabJack::TimerModeAndOptionalInitialValue>& timers) const
 	{
 		std::unordered_set<int> timersWithInputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 		{
-			if ((timer->second != LabJack::TIMERMODE_PWM_16BIT) &&
-				(timer->second != LabJack::TIMERMODE_PWM_8BIT) &&
-				(timer->second != LabJack::TIMERMODE_FREQUENCY_OUTPUT))
+			if ((timer->second.mode != LabJack::TIMERMODE_PWM_16BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_PWM_8BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_FREQUENCY_OUTPUT))
 			{
 				timersWithInputs.insert(timer->first);
 			}
@@ -246,23 +247,23 @@ private:
 	/// \param timers The timers.
 	/// \return The timers that take outputs.
 	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int,
-		LabJack::TimerMode>& timers) const
+		LabJack::TimerModeAndOptionalInitialValue>& timers) const
 	{
 		std::unordered_set<int> timersWithOutputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 		{
-			if ((timer->second != LabJack::TIMERMODE_PWM_16BIT) &&
-				(timer->second != LabJack::TIMERMODE_PWM_8BIT) &&
-				(timer->second != LabJack::TIMERMODE_RISING_EDGES_32BIT) &&
-				(timer->second != LabJack::TIMERMODE_FALLING_EDGES_32BIT) &&
-				(timer->second != LabJack::TIMERMODE_DUTY_CYCLE) &&
-				(timer->second != LabJack::TIMERMODE_FIRMWARE_COUNTER) &&
-				(timer->second != LabJack::TIMERMODE_FIRMWARE_COUNTER_DEBOUNCED) &&
-				(timer->second != LabJack::TIMERMODE_FREQUENCY_OUTPUT) &&
-				(timer->second != LabJack::TIMERMODE_QUADRATURE) &&
-				(timer->second != LabJack::TIMERMODE_RISING_EDGES_16BIT) &&
-				(timer->second != LabJack::TIMERMODE_FALLING_EDGES_16BIT) &&
-				(timer->second != LabJack::TIMERMODE_LINE_TO_LINE))
+			if ((timer->second.mode != LabJack::TIMERMODE_PWM_16BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_PWM_8BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_RISING_EDGES_32BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_FALLING_EDGES_32BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_DUTY_CYCLE) &&
+				(timer->second.mode != LabJack::TIMERMODE_FIRMWARE_COUNTER) &&
+				(timer->second.mode != LabJack::TIMERMODE_FIRMWARE_COUNTER_DEBOUNCED) &&
+				(timer->second.mode != LabJack::TIMERMODE_FREQUENCY_OUTPUT) &&
+				(timer->second.mode != LabJack::TIMERMODE_QUADRATURE) &&
+				(timer->second.mode != LabJack::TIMERMODE_RISING_EDGES_16BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_FALLING_EDGES_16BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_LINE_TO_LINE))
 			{
 				timersWithOutputs.insert(timer->first);
 			}
@@ -841,7 +842,7 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 	LabJackDevice* device = deviceData->deviceObject;
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
-	const std::unordered_map<int, LabJack::TimerMode>& timers = device->getTimers();
+	const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue>& timers = device->getTimers();
 
 	LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, timers.size(), 0);
 	bool result = isOk(error);
@@ -903,26 +904,42 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 
 	bool result = true;
 
-	const std::unordered_map<int, LabJack::TimerMode>& timers = device->getTimers();
+	const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue>& timers = device->getTimers();
 	for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 	{
-		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, timer->second, 0);
+		LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, timer->second.mode, 0, 0);
 		result = result && isOk(error);
 		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 			"Failed to configure a timer for a device named '" << device->getName() <<
-			"', timer number " << timer->first << ", with mode code " << timer->second << "." <<
+			"', timer number " << timer->first << ", with mode code " << timer->second.mode << "." <<
 			std::endl << formatErrorMessage(error);
-		if (result &&
-			((timer->second == LabJack::TimerMode::TIMERMODE_PWM_8BIT) ||
-			(timer->second == LabJack::TimerMode::TIMERMODE_PWM_16BIT)))
-		{  // Initialize PWMs to almost-always low.
-			const int value = 65535; // the value corresponding to a PWM that is low as much as possible.
-			error = ePut(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, value, 0);
+		if (result && (timer->second.initialValue.hasValue()))
+		{
+			error = AddRequest(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, timer->second.initialValue.getValue(), 0,
+				0);
 			result = result && isOk(error);
 			SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
-				"Failed to set the initial value for a PWM timer for a device named '" << device->getName() <<
-				"', timer number " << timer->first << ", with mode code " << timer->second <<
-				", and value " << value << "."  << std::endl << formatErrorMessage(error);
+				"Failed to set the initial value for a timer for a device named '" << device->getName() <<
+				"', timer number " << timer->first << ", with mode code " << timer->second.mode <<
+				", and value " << timer->second.initialValue.getValue() << "."  << std::endl <<
+				formatErrorMessage(error);
+		}
+
+		if (result)
+		{
+			error = GoOne(rawHandle);
+			result = result && isOk(error);
+
+			double value;
+			error = GetResult(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, &value);
+			result = result && isOk(error);
+			error = GetResult(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, &value);
+			result = result && isOk(error);
+
+			SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+				"Failed to configure timer for a device named '" << device->getName() <<
+				"', timer number " << timer->first << ", with mode code " << timer->second.mode <<
+				"."  << std::endl << formatErrorMessage(error);
 		}
 	}
 

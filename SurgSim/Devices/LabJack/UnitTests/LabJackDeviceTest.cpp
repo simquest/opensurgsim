@@ -240,14 +240,20 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	EXPECT_NO_THROW(device->setTimerCounterPinOffset(pinOffset));
 	EXPECT_EQ(pinOffset, device->getTimerCounterPinOffset());
 
-	std::unordered_map<int, SurgSim::Device::LabJack::TimerMode> timers;
-	timers[0] = SurgSim::Device::LabJack::TIMERMODE_QUADRATURE;
-	timers[3] = SurgSim::Device::LabJack::TIMERMODE_FREQUENCY_OUTPUT;
+	std::unordered_map<int, SurgSim::Device::LabJack::TimerModeAndOptionalInitialValue> timers;
+	SurgSim::Device::LabJack::TimerModeAndOptionalInitialValue quadrature =
+		{SurgSim::Device::LabJack::TIMERMODE_QUADRATURE, SurgSim::DataStructures::OptionalValue<int>()};
+	timers[0] = quadrature;
+	SurgSim::Device::LabJack::TimerModeAndOptionalInitialValue frequencyOutput =
+		{SurgSim::Device::LabJack::TIMERMODE_FREQUENCY_OUTPUT, SurgSim::DataStructures::OptionalValue<int>(234)};
+	timers[3] = frequencyOutput;
 	EXPECT_NO_THROW(device->enableTimer(0, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE));
-	EXPECT_NO_THROW(device->enableTimer(3, SurgSim::Device::LabJack::TIMERMODE_FREQUENCY_OUTPUT));
+	EXPECT_NO_THROW(device->enableTimer(3, SurgSim::Device::LabJack::TIMERMODE_FREQUENCY_OUTPUT, 234));
 	EXPECT_EQ(timers, device->getTimers());
 
-	timers[4] = SurgSim::Device::LabJack::TIMERMODE_DUTY_CYCLE;
+	SurgSim::Device::LabJack::TimerModeAndOptionalInitialValue dutyCycle =
+		{SurgSim::Device::LabJack::TIMERMODE_DUTY_CYCLE, SurgSim::DataStructures::OptionalValue<int>()};
+	timers[4] = dutyCycle;
 	EXPECT_NO_THROW(device->setTimers(timers));
 	EXPECT_EQ(timers, device->getTimers());
 
@@ -327,7 +333,8 @@ TEST(LabJackDeviceTest, NoSettingAfterInitialization)
 	EXPECT_THROW(device->enableTimer(0, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE),
 		SurgSim::Framework::AssertionFailure);
 
-	EXPECT_THROW(device->setTimers(std::unordered_map<int, SurgSim::Device::LabJack::TimerMode>()),
+	EXPECT_THROW(device->setTimers(std::unordered_map<int,
+		SurgSim::Device::LabJack::TimerModeAndOptionalInitialValue>()),
 		SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->setMaximumUpdateRate(300.0), SurgSim::Framework::AssertionFailure);
