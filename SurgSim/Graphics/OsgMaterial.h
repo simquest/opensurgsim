@@ -26,11 +26,6 @@
 namespace SurgSim
 {
 
-namespace Framework
-{
-class ApplicationData;
-}
-
 namespace Graphics
 {
 

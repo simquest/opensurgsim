@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file ds_mapping.frag
+/// \file ds_mapping_material.frag
 /// Phong material with diffuse and shadow map
 
 // These are 'free' uniforms to be set for this shader, they won't be provided by OSS

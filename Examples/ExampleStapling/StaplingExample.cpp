@@ -24,6 +24,7 @@
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -31,7 +32,9 @@
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/MeshRepresentation.h"
+#include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
@@ -51,6 +54,8 @@
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 
 using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
 using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
@@ -75,6 +80,7 @@ using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
 using SurgSim::Math::Vector4f;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Input::InputComponent;
@@ -87,22 +93,6 @@ using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
-
-namespace
-{
-std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgShader>> shaders;
-}
-
-static std::shared_ptr<SurgSim::Graphics::Mesh> loadGraphicsMesh(const std::string& fileName)
-{
-	// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
-	SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
-
-	return delegate->getMesh();
-}
 
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
@@ -125,16 +115,12 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	meshShape->setFileName(filename);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
-	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> graphicalFem =
-		std::make_shared<OsgMeshRepresentation>("Triangle mesh");
+	auto graphicalFem = std::make_shared<OsgMeshRepresentation>("Triangle mesh");
 	graphicalFem->setFilename(filename);
 	sceneElement->addComponent(graphicalFem);
 
 	// Create material to transport the Textures
-	graphicsTriangleMeshRepresentation->setMaterial(material);
-
-	// Load the surface triangle mesh of the finite element model
-	auto meshSurface = loadMesh(filename);
+	graphicalFem->setMaterial(material);
 
 	// Create the collision mesh for the surface of the finite element model
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
@@ -316,7 +302,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 
 template <typename Type>
 std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement,
-										  const std::string& name)
+		const std::string& name)
 {
 	std::shared_ptr<SurgSim::Framework::Component> component = sceneElement->getComponent(name);
 	SURGSIM_ASSERT(component != nullptr) << "Failed to get Component named '" << name << "'.";
@@ -327,7 +313,7 @@ std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::Sc
 	return result;
 }
 
-std::shared_ptr<OsgViewElement> createViewElement(const ApplicationData& data)
+std::shared_ptr<OsgViewElement> createViewElement()
 {
 	auto result = std::make_shared<OsgViewElement>("StaplingDemoView");
 	result->enableManipulator(true);
@@ -346,12 +332,13 @@ std::shared_ptr<OsgViewElement> createViewElement(const ApplicationData& data)
 
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
 	const SurgSim::Framework::ApplicationData& data,
+	std::shared_ptr<SurgSim::Graphics::OsgShader> shader,
 	std::string defaultTextureName = "Textures/checkered.png")
 {
 	// Default Material with shader
 	// using scopes to keep from having to introduce new variables with different types
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
-	material->setShader(shaders["shinytextured"]);
+	material->setShader(shader);
 
 	SURGSIM_ASSERT(material != nullptr) << "Material could not be loaded !";
 	{
@@ -428,15 +415,15 @@ int main(int argc, char* argv[])
 	}
 	inputManager->addDevice(device);
 
-	std::shared_ptr<OsgViewElement> view = createViewElement(*runtime->getApplicationData());
+	std::shared_ptr<OsgViewElement> view = createViewElement();
 	inputManager->addDevice(view->getKeyboardDevice());
 
 	// Shader should be shared between all materials using the same shader
 	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	SURGSIM_ASSERT(shader != nullptr) << "Shader could not be loaded.";
 
 	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
-	auto material = createShinyMaterial(*runtime->getApplicationData());
-	material->setShader(shader);
+	auto material = createShinyMaterial(*runtime->getApplicationData(), shader);
 	std::shared_ptr<SceneElement> arm = createArmSceneElement("arm", material);
 	arm->setPose(armPose);
 
@@ -449,8 +436,7 @@ int main(int argc, char* argv[])
 
 
 	// Material for the wound
-	material = createShinyMaterial(*runtime->getApplicationData(), "Geometry/wound.png");
-	material->setShader(shader);
+	material = createShinyMaterial(*runtime->getApplicationData(), shader, "Geometry/wound.png");
 
 	bool doPointCloud = false;
 	std::shared_ptr<SceneElement> wound =

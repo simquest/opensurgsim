@@ -15,11 +15,8 @@
 
 #include "SurgSim/Graphics/OsgMaterial.h"
 
-
 #include "SurgSim/Framework/Accessible.h"
-#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 
@@ -173,15 +170,13 @@ void OsgMaterial::clearShader()
 
 bool OsgMaterial::doInitialize()
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	return true;
 }
 
 bool OsgMaterial::doWakeUp()
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	return true;
 }
-
-
 
 }; // namespace Graphics
 
