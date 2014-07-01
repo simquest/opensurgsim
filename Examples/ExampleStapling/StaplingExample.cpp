@@ -438,7 +438,6 @@ int main(int argc, char* argv[])
 	// Material for the wound
 	material = createShinyMaterial(*runtime->getApplicationData(), shader, "Geometry/wound.png");
 
-	bool doPointCloud = false;
 	std::shared_ptr<SceneElement> wound =
 		createFemSceneElement("wound",
 							  woundFilename,
