@@ -55,7 +55,7 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 
 	// Set up color array with default color
 	m_colors = new osg::Vec4Array(1);
-	(*m_colors)[0]= osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	(*m_colors)[0] = osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_geometry->setColorArray(m_colors, osg::Array::BIND_OVERALL);
 
 	// Set up textureCoordinates array, texture coords are optional, don't add them to the
@@ -71,7 +71,7 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	// Create normals, currently per triangle
 	m_normals = new osg::Vec3Array();
 	m_normals->setDataVariance(osg::Object::DYNAMIC);
-	m_geometry->setNormalArray(m_normals,osg::Array::BIND_PER_VERTEX);
+	m_geometry->setNormalArray(m_normals, osg::Array::BIND_PER_VERTEX);
 
 	osg::ref_ptr<osg::Geode> geode = new osg::Geode();
 	geode->addDrawable(m_geometry);
@@ -234,9 +234,9 @@ int OsgMeshRepresentation::updateOsgArrays()
 		result |= UPDATE_OPTION_TEXTURES;
 	}
 
-	if (m_mesh->getNumTriangles()*3 > m_triangles->size())
+	if (m_mesh->getNumTriangles() * 3 > m_triangles->size())
 	{
-		m_triangles->resize(m_mesh->getNumTriangles()*3);
+		m_triangles->resize(m_mesh->getNumTriangles() * 3);
 		m_triangles->setDataVariance(getDataVariance(UPDATE_OPTION_TRIANGLES));
 		result |= UPDATE_OPTION_TRIANGLES;
 	}
@@ -269,6 +269,13 @@ osg::Object::DataVariance OsgMeshRepresentation::getDataVariance(int updateOptio
 void OsgMeshRepresentation::setFilename(std::string filename)
 {
 	m_filename = filename;
+
+	auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(filename);
+	SURGSIM_ASSERT(nullptr != triangleMesh)
+			<< "SurgSim::DataStructures::loadTriangleMesh() returned an empty TriangleMesh after reading file "
+			<< filename;
+
+	m_mesh = std::make_shared<Mesh>(*triangleMesh);
 }
 
 std::string OsgMeshRepresentation::getFilename() const
