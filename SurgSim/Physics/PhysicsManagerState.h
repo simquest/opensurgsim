@@ -151,6 +151,9 @@ public:
 	/// Each constraint has an index in the mlcp. This mapping is about this index.
 	const MlcpMapping<Constraint>& getConstraintsMapping() const;
 
+	/// Update the constraints mapping
+	void updateConstraintsMapping();
+
 private:
 
 	///@{

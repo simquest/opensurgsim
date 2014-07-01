@@ -43,6 +43,7 @@ std::shared_ptr<PhysicsManagerState>
 	std::shared_ptr<PhysicsManagerState> result = state;
 	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
 	result->updateRepresentationsMapping();
+	result->updateConstraintsMapping();
 
 	size_t numAtomicConstraint = 0;
 	size_t numConstraint = 0;

@@ -231,6 +231,8 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	EXPECT_EQ(constraint2, actualConstraints.back());
 
 	// Check the constraintsIndexMapping.
+	physicsState->filterActiveConstraints();
+	physicsState->updateConstraintsMapping();
 	MlcpMapping<Constraint> actualConstraintsIndexMapping = physicsState->getConstraintsMapping();
 	int expectedMapValue = 0;
 	EXPECT_EQ(expectedMapValue, actualConstraintsIndexMapping.getValue(constraint1.get()));

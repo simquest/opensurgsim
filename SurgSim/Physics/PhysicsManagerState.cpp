@@ -148,23 +148,6 @@ void PhysicsManagerState::setConstraintGroup(
 	const std::vector<std::shared_ptr<Constraint>>& constraints)
 {
 	m_constraints[type] = constraints;
-
-	// As of now, the mapping is redone entirely each time we call setConstraints
-	ptrdiff_t index = 0;
-	m_constraintsIndexMapping.clear();
-	int constraintTypeEnd   = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);
-	for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
-	{
-		//ConstraintGroupType type = static_cast<ConstraintGroupType>(constraintType);
-		for (auto it = m_constraints[constraintType].begin(); it != m_constraints[constraintType].end(); it++)
-		{
-			if ((*it)->isActive())
-			{
-				m_constraintsIndexMapping.setValue((*it).get(), index);
-				index += (*it)->getNumDof();
-			}
-		}
-	}
 }
 
 const std::vector<std::shared_ptr<Constraint>>& PhysicsManagerState::getConstraintGroup(int type) const
@@ -244,6 +227,17 @@ void PhysicsManagerState::updateRepresentationsMapping()
 const MlcpMapping<Constraint>& PhysicsManagerState::getConstraintsMapping() const
 {
 	return m_constraintsIndexMapping;
+}
+
+void PhysicsManagerState::updateConstraintsMapping()
+{
+	m_constraintsIndexMapping.clear();
+	ptrdiff_t index = 0;
+	for (auto it = m_activeConstraints.begin(); it != m_activeConstraints.end(); it++)
+	{
+		m_constraintsIndexMapping.setValue((*it).get(), index);
+		index += (*it)->getNumDof();
+	}
 }
 
 }; // Physics
