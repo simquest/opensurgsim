@@ -101,9 +101,9 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("No intersection, box in front of capsule");
-		boxQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		boxQuat = Quaterniond::Identity();
 		boxTrans = Vector3d(10.6, 0.0, 0.0);
-		capsuleQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		capsuleQuat = Quaterniond::Identity();
 		capsuleTrans = Vector3d::Zero();
 		bool expectedInContact = false;
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
@@ -111,9 +111,9 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("No intersection, capsule beyond corner of box");
-		boxQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		boxQuat = Quaterniond::Identity();
 		boxTrans = Vector3d::Zero();
-		capsuleQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		capsuleQuat = Quaterniond::Identity();
 		bool expectedInContact = false;
 		capsuleTrans = Vector3d(1.5, 0.0, 1.5);
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
@@ -127,9 +127,9 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("No intersection, box below capsule");
-		boxQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		boxQuat = Quaterniond::Identity();
 		boxTrans = Vector3d(0.0, -3.6, 0.0);
-		capsuleQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		capsuleQuat = Quaterniond::Identity();
 		capsuleTrans = Vector3d::Zero();
 		bool expectedInContact = false;
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
@@ -137,9 +137,9 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("Intersection, box intersection with capsule side");
-		boxQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		boxQuat = Quaterniond::Identity();
 		boxTrans = Vector3d(1.0 , 0.0, 0.0);
-		capsuleQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		capsuleQuat = Quaterniond::Identity();
 		capsuleTrans = Vector3d::Zero();
 		bool expectedInContact = true;
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
@@ -147,7 +147,7 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("Intersection, box intersection with upside down capsule");
-		boxQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		boxQuat = Quaterniond::Identity();
 		boxTrans = Vector3d(1.0 , 0.0, 0.0);
 		capsuleQuat = makeRotationQuaternion(M_PI, Vector3d(0.0, 0.0, 1.0));
 		capsuleTrans = Vector3d::Zero();
@@ -157,7 +157,7 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("Intersection, box intersection with z-axis capsule");
-		boxQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		boxQuat = Quaterniond::Identity();
 		boxTrans = Vector3d(1.0 , 0.0, 0.0);
 		capsuleQuat = makeRotationQuaternion(M_PI_2, Vector3d(1.0, 0.0, 0.0));
 		capsuleTrans = Vector3d::Zero();
@@ -179,7 +179,7 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 		SCOPED_TRACE("Intersection, box intersection with capsule cap");
 		boxQuat = makeRotationQuaternion(M_PI_2, Vector3d(0.0, 0.0, 1.0));
 		boxTrans = Vector3d(0.1 , 0.0, 0.1);
-		capsuleQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		capsuleQuat = Quaterniond::Identity();
 		capsuleTrans = Vector3d(0.0 , 2.6, 0.0);
 		bool expectedInContact = true;
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
@@ -187,9 +187,9 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("No intersection, capsule near box corner, but not intersecting");
-		boxQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		boxQuat = Quaterniond::Identity();
 		boxTrans = Vector3d(0.0 , 0.0, 0.0);
-		capsuleQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		capsuleQuat = Quaterniond::Identity();
 		capsuleTrans = Vector3d(1.3 , 0.0, 1.3);
 		bool expectedInContact = false;
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
@@ -197,9 +197,9 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("Intersection, capsule intersecting with box corner");
-		boxQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		boxQuat = Quaterniond::Identity();
 		boxTrans = Vector3d(0.0 , 0.0, 0.0);
-		capsuleQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		capsuleQuat = Quaterniond::Identity();
 		capsuleTrans = Vector3d(1.2 , 0.0, 1.2);
 		bool expectedInContact = true;
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
@@ -208,9 +208,9 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("Intersection, box inside capsule");
-		boxQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		boxQuat = Quaterniond::Identity();
 		boxTrans = Vector3d::Zero();
-		capsuleQuat = makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+		capsuleQuat = Quaterniond::Identity();
 		capsuleTrans = Vector3d::Zero();
 		bool expectedInContact = true;
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
@@ -225,6 +225,26 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 		capsuleTrans = Vector3d(0.0, 0.0, 0.0);
 		bool expectedInContact = true;
 		doBoxCapsuleTest(bigBox, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+	}
+
+	{
+		SCOPED_TRACE("Intersection, capsule bottom at box center");
+		boxQuat = Quaterniond::Identity();
+		boxTrans = Vector3d::Zero();
+		capsuleQuat = Quaterniond::Identity();
+		capsuleTrans = Vector3d(0.0, -2.0, 0.0);
+		bool expectedInContact = true;
+		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+	}
+
+	{
+		SCOPED_TRACE("Intersection, capsule top at box center");
+		boxQuat = Quaterniond::Identity();
+		boxTrans = Vector3d::Zero();
+		capsuleQuat = Quaterniond::Identity();
+		capsuleTrans = Vector3d(0.0, 2.0, 0.0);
+		bool expectedInContact = true;
+		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
 	}
 }
 

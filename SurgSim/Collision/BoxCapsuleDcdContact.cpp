@@ -29,31 +29,16 @@ using SurgSim::Math::BoxShape;
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::doesIntersectBoxCapsule;
 using SurgSim::Math::distancePointSegment;
 using SurgSim::Math::intersectionsSegmentBox;
 using SurgSim::Math::Geometry::DistanceEpsilon;
+
 
 namespace SurgSim
 {
 namespace Collision
 {
-
-Vector3d clamp(const Vector3d& vector, const Vector3d& min, const Vector3d& max)
-{
-	Vector3d clampedVector = vector;
-	for (int i = 0; i < 3; i++)
-	{
-		if (vector[i] > max[i])
-		{
-			clampedVector[i] = max[i];
-		}
-		else if (vector[i] < min[i])
-		{
-			clampedVector[i] = min[i];
-		}
-	}
-	return clampedVector;
-}
 
 BoxCapsuleDcdContact::BoxCapsuleDcdContact()
 {
@@ -82,95 +67,61 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 	Vector3d boxRadii = boxShape->getSize() / 2.0;
 	Eigen::AlignedBox<double, 3> box(-boxRadii, boxRadii);
 
-	Vector3d dilatedBoxRadii = boxRadii + Vector3d::Constant(capsuleRadius);
-	Eigen::AlignedBox<double, 3> dilatedBox(-dilatedBoxRadii, dilatedBoxRadii);
-
-	std::vector<Vector3d> candidates;
-	intersectionsSegmentBox(capsuleBottom, capsuleTop, dilatedBox, &candidates);
-
-	if (dilatedBox.contains(capsuleBottom))
+	if (doesIntersectBoxCapsule(capsuleBottom, capsuleTop, capsuleRadius, box))
 	{
-		candidates.push_back(capsuleBottom);
-	}
-
-	if (dilatedBox.contains(capsuleTop))
-	{
-		candidates.push_back(capsuleTop);
-	}
-
-	bool doesIntersect = false;
-	ptrdiff_t dimensionsOutsideBox;
-	Vector3d clampedPosition, segmentPoint;
-	for(auto candidate=candidates.cbegin(); candidate!=candidates.cend(); ++candidate)
-	{
-		// Collisions between a capulse and a box are the same as a segment and a dilated
-		// box with rounded corners. If the intersection occurs outside the original box
-		// in two dimensions (collision with an edge of the dilated box) or three
-		// dimensions (collision with the corner of the dilated box) dimensions, we need
-		// to check if it is inside these rounded corners.
-		dimensionsOutsideBox = (candidate->array() > box.max().array()).count();
-		dimensionsOutsideBox += (candidate->array() < box.min().array()).count();
-		if ((dimensionsOutsideBox >= 2))
-		{
-			clampedPosition = clamp(*candidate, box.min(), box.max());
-			if (distancePointSegment(clampedPosition, capsuleBottom, capsuleTop, &segmentPoint) > capsuleRadius)
-			{
-				// Doesn't intersect, try the next candidate.
-				continue;
-			}
-		}
-		doesIntersect = true;
-		break;
-	}
-
-	if (doesIntersect)
-	{
+		Vector3d normal, segmentPoint, deepestBoxPoint, deepestCapsulePoint;
+		double distance;
 		distancePointSegment(Vector3d::Zero().eval(), capsuleBottom, capsuleTop, &segmentPoint);
-		Vector3d normal;
-		if (segmentPoint.isZero(DistanceEpsilon))
+		if(! segmentPoint.isZero(DistanceEpsilon))
 		{
-			Vector3d capsuleCenter = (capsuleTop + capsuleBottom) / 2.0;
-			if (capsuleCenter.isZero(DistanceEpsilon))
+			if (box.contains(segmentPoint))
 			{
-				if (capsuleTop.isZero(DistanceEpsilon))
-				{
-					Vector3d::Index closestFace;
-					dilatedBoxRadii.minCoeff(&closestFace);
-					normal = Vector3d::Unit(closestFace).array() * dilatedBoxRadii.array();
-				}
-				else
-				{
-					normal =  capsuleTop.normalized();
-				}
+				Vector3d::Index closestFace;
+				(boxRadii - segmentPoint.cwiseAbs()).minCoeff(&closestFace);
+				normal.setZero();
+				normal[closestFace] = -segmentPoint[closestFace];
 			}
 			else
 			{
-				normal = capsuleCenter.normalized();
+				Vector3d clampedSegmentPoint = segmentPoint.array().min(box.max().array()).max(box.min().array());
+				normal = clampedSegmentPoint - segmentPoint;
 			}
+			normal.normalize();
+			deepestBoxPoint = boxRadii.array() * (1 - 2 * (segmentPoint.array() < 0).cast<double>());
+			deepestCapsulePoint = segmentPoint - capsuleRadius * segmentPoint.normalized();
 		}
 		else
 		{
-			normal = segmentPoint.normalized();
+			if (capsuleTop.isZero(DistanceEpsilon) && capsuleBottom.isZero(DistanceEpsilon))
+			{
+				Vector3d::Index closestFace;
+				boxRadii.minCoeff(&closestFace);
+				normal.setZero();
+				normal[closestFace] = -boxRadii[closestFace];
+				normal.normalize();
+			}
+			else
+			{
+				if (capsuleTop.squaredNorm() < capsuleBottom.squaredNorm())
+				{
+					segmentPoint = capsuleTop;
+					normal = -capsuleBottom.normalized();
+				}
+				else
+				{
+					segmentPoint = capsuleBottom;
+					normal = -capsuleTop.normalized();
+				}
+			}
+			deepestBoxPoint = boxRadii.array() * (1 - 2 * (normal.array() > 0).cast<double>());
+			deepestCapsulePoint = segmentPoint + capsuleRadius * normal;
 		}
 
-		Vector3d deepestPoint = Vector3d::Zero();
-		for (int i=0; i<3; i++)
-		{
-			if (normal[i] > DistanceEpsilon)
-			{
-				deepestPoint[i] = dilatedBoxRadii[i];
-			}
-			else if (normal[i] < -DistanceEpsilon)
-			{
-				deepestPoint[i] = -dilatedBoxRadii[i];
-			}
-		}
-		double distance = (deepestPoint - segmentPoint).dot(normal);
-
+		distance = (deepestCapsulePoint - deepestBoxPoint).dot(normal);
 		std::pair<Location, Location> penetrationPoints;
-		penetrationPoints.first.globalPosition.setValue(boxPose * clamp(deepestPoint, box.min(), box.max()));
-		penetrationPoints.second.globalPosition.setValue(boxPose * (segmentPoint - capsuleRadius*normal));
-		pair->addContact(distance, boxPose.linear() * (-normal), penetrationPoints);
+		penetrationPoints.first.globalPosition.setValue(boxPose * deepestBoxPoint);
+		penetrationPoints.second.globalPosition.setValue(boxPose * deepestCapsulePoint);
+		pair->addContact(distance, boxPose.linear() * normal, penetrationPoints);
 	}
 }
 
