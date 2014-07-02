@@ -16,7 +16,13 @@
 find_package(LabJack REQUIRED)
 
 link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} SurgSimFramework SurgSimInput ${LABJACK_LIBRARY})
+
+set(LIBS
+	${Boost_LIBRARIES}
+	SurgSimFramework
+	SurgSimInput
+	${LABJACK_LIBRARY}
+)
 
 include_directories(
 	${SURGSIM_TOP_INCLUDE_DIR}
