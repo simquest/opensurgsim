@@ -120,15 +120,15 @@ bool OsgMeshRepresentation::doInitialize()
 		if (filePath.empty())
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-				"OsgMeshRepresentation::doInitialize(): file " << m_filename << " can not be found.";
+					"OsgMeshRepresentation::doInitialize(): file " << m_filename << " can not be found.";
 			result = false;
 		}
 		else
 		{
 			auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(filePath);
 			SURGSIM_ASSERT(nullptr != triangleMesh && triangleMesh->isValid()) <<
-				"OsgMeshRepresentation::doInitialize(): SurgSim::DataStructures::loadTriangleMesh() returned a "
-				"null mesh or invalid mesh from file " << m_filename;
+					"OsgMeshRepresentation::doInitialize(): SurgSim::DataStructures::loadTriangleMesh() returned a "
+					"null mesh or invalid mesh from file " << m_filename;
 
 			m_mesh = std::make_shared<Mesh>(*triangleMesh);
 		}
@@ -269,13 +269,6 @@ osg::Object::DataVariance OsgMeshRepresentation::getDataVariance(int updateOptio
 void OsgMeshRepresentation::setFilename(std::string filename)
 {
 	m_filename = filename;
-
-	auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(filename);
-	SURGSIM_ASSERT(nullptr != triangleMesh)
-			<< "SurgSim::DataStructures::loadTriangleMesh() returned an empty TriangleMesh after reading file "
-			<< filename;
-
-	m_mesh = std::make_shared<Mesh>(*triangleMesh);
 }
 
 std::string OsgMeshRepresentation::getFilename() const

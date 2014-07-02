@@ -19,7 +19,6 @@
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 

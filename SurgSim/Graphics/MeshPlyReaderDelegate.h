@@ -110,10 +110,10 @@ private:
 	/// The mesh that will be created
 	std::shared_ptr<MeshType> m_mesh;
 
-	// Preallocated index array to receive data for the faces
+	// Statically allocated index array to receive data for the faces
 	std::array<size_t, 3> m_indices;
 
-	bool m_hasNormals;
+	bool m_hasTextureCoordinates;
 };
 
 }
