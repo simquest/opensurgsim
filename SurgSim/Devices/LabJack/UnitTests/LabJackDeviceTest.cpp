@@ -263,6 +263,13 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	const int settling = 2;
 	EXPECT_NO_THROW(device->setAnalogInputSettling(settling));
 	EXPECT_EQ(settling, device->getAnalogInputSettling());
+
+	std::unordered_set<int> analogOutputChannels;
+	analogOutputChannels.insert(2);
+	analogOutputChannels.insert(11);
+	EXPECT_NO_THROW(device->enableAnalogOutput(2));
+	EXPECT_NO_THROW(device->enableAnalogOutput(11));
+	EXPECT_EQ(analogOutputChannels, device->getAnalogOutputs());
 }
 
 
@@ -304,4 +311,6 @@ TEST(LabJackDeviceTest, NoSettingAfterInitialization)
 	EXPECT_THROW(device->setAnalogInputResolution(3), SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->setAnalogInputSettling(2), SurgSim::Framework::AssertionFailure);
+
+	EXPECT_THROW(device->enableAnalogOutput(2), SurgSim::Framework::AssertionFailure);
 }
