@@ -25,19 +25,18 @@ This can be used to add information to a .ply file where the order of the vertic
 is already established
 E.g. 
 
-vertex file 
-
+vertex file (fragment from .ply file)
 1.0 1.0 1.0
 2.0 2.0 2.0 
 3.0 3.0 3.0
 
-obj file
+obj file (fragment from .obj file)
 v 1.0 1.0 -1.0
 v 2.0 2.0 -2.0
 vt 1.0 1.0
 vt 0.5 0.5
 
-outpup
+output (fragment, paste this into the vertex section of the .ply file)
 1.0 1.0 1.0 1.0 1.0
 2.0 2.0 2.0 0.5 0.5
 3.0 3.0 3.0 0.0 0.0

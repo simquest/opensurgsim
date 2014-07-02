@@ -27,14 +27,15 @@ namespace Graphics
 
 MeshPlyReaderDelegate::MeshPlyReaderDelegate() :
 	m_mesh(std::make_shared<MeshType>()),
-	m_hasNormals(false)
+	m_hasTextureCoordinates(false)
 {
 
 }
 
 
 MeshPlyReaderDelegate::MeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh) :
-	m_mesh(mesh)
+	m_mesh(mesh),
+	m_hasTextureCoordinates(false)
 {
 	SURGSIM_ASSERT(mesh != nullptr) << "The mesh cannot be null.";
 	mesh->clear();
@@ -52,9 +53,9 @@ bool MeshPlyReaderDelegate::registerDelegate(SurgSim::DataStructures::PlyReader*
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(VertexData, z));
 
 	// Normal processing
-	m_hasNormals = reader->hasProperty("vertex", "s") && reader->hasProperty("vertex", "t");
+	m_hasTextureCoordinates = reader->hasProperty("vertex", "s") && reader->hasProperty("vertex", "t");
 
-	if (m_hasNormals)
+	if (m_hasTextureCoordinates)
 	{
 		reader->requestScalarProperty("vertex", "s", PlyReader::TYPE_DOUBLE, offsetof(VertexData, s));
 		reader->requestScalarProperty("vertex", "t", PlyReader::TYPE_DOUBLE, offsetof(VertexData, t));
@@ -106,7 +107,7 @@ void MeshPlyReaderDelegate::processVertex(const std::string& elementName)
 {
 	MeshType::VertexType vertex(SurgSim::Math::Vector3d(m_vertexData.x, m_vertexData.y, m_vertexData.z));
 
-	if (m_hasNormals)
+	if (m_hasTextureCoordinates)
 	{
 		vertex.data.texture.setValue(SurgSim::Math::Vector2d(m_vertexData.s, m_vertexData.t));
 	}

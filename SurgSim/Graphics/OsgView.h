@@ -109,7 +109,7 @@ public:
 	SurgSim::Math::Vector3d getManipulatorPosition();
 
 	/// Set the camera manipulator lookAt.
-	/// \param lookat The location the camera looks at.
+	/// \param lookAt The location the camera looks at.
 	void setManipulatorLookAt(SurgSim::Math::Vector3d lookAt);
 
 	/// \return The location the camera looks at.
