@@ -213,11 +213,19 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	EXPECT_NO_THROW(device->enableDigitalInput(11));
 	EXPECT_EQ(digitalInputChannels, device->getDigitalInputs());
 
+	digitalInputChannels.insert(14);
+	EXPECT_NO_THROW(device->setDigitalInputs(digitalInputChannels));
+	EXPECT_EQ(digitalInputChannels, device->getDigitalInputs());
+
 	std::unordered_set<int> digitalOutputChannels;
 	digitalOutputChannels.insert(3);
 	digitalOutputChannels.insert(17);
 	EXPECT_NO_THROW(device->enableDigitalOutput(3));
 	EXPECT_NO_THROW(device->enableDigitalOutput(17));
+	EXPECT_EQ(digitalOutputChannels, device->getDigitalOutputs());
+
+	digitalOutputChannels.insert(5);
+	EXPECT_NO_THROW(device->setDigitalOutputs(digitalOutputChannels));
 	EXPECT_EQ(digitalOutputChannels, device->getDigitalOutputs());
 
 	const SurgSim::Device::LabJack::TimerBase timerBase = SurgSim::Device::LabJack::TIMERBASE_DEFAULT;
@@ -239,6 +247,10 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	EXPECT_NO_THROW(device->enableTimer(3, SurgSim::Device::LabJack::TIMERMODE_FREQUENCY_OUTPUT));
 	EXPECT_EQ(timers, device->getTimers());
 
+	timers[4] = SurgSim::Device::LabJack::TIMERMODE_DUTY_CYCLE;
+	EXPECT_NO_THROW(device->setTimers(timers));
+	EXPECT_EQ(timers, device->getTimers());
+
 	const double rate = 300.0;
 	EXPECT_NO_THROW(device->setMaximumUpdateRate(rate));
 	EXPECT_NEAR(rate, device->getMaximumUpdateRate(), 1e-9);
@@ -256,6 +268,13 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	EXPECT_NO_THROW(device->enableAnalogInput(5, SurgSim::Device::LabJack::Range::RANGE_0_POINT_1));
 	EXPECT_EQ(analogInputs, device->getAnalogInputs());
 
+	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel anotherRange =
+	{SurgSim::Device::LabJack::Range::RANGE_0_POINT_01,
+	SurgSim::DataStructures::OptionalValue<int>()};
+	analogInputs[6] = anotherRange;
+	EXPECT_NO_THROW(device->setAnalogInputs(analogInputs));
+	EXPECT_EQ(analogInputs, device->getAnalogInputs());
+
 	const int resolution = 3;
 	EXPECT_NO_THROW(device->setAnalogInputResolution(resolution));
 	EXPECT_EQ(resolution, device->getAnalogInputResolution());
@@ -269,6 +288,10 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	analogOutputChannels.insert(11);
 	EXPECT_NO_THROW(device->enableAnalogOutput(2));
 	EXPECT_NO_THROW(device->enableAnalogOutput(11));
+	EXPECT_EQ(analogOutputChannels, device->getAnalogOutputs());
+
+	analogOutputChannels.insert(14);
+	EXPECT_NO_THROW(device->setAnalogOutputs(analogOutputChannels));
 	EXPECT_EQ(analogOutputChannels, device->getAnalogOutputs());
 }
 
@@ -288,7 +311,11 @@ TEST(LabJackDeviceTest, NoSettingAfterInitialization)
 
 	EXPECT_THROW(device->enableDigitalInput(2), SurgSim::Framework::AssertionFailure);
 
+	EXPECT_THROW(device->setDigitalInputs(std::unordered_set<int>()), SurgSim::Framework::AssertionFailure);
+
 	EXPECT_THROW(device->enableDigitalOutput(3), SurgSim::Framework::AssertionFailure);
+
+	EXPECT_THROW(device->setDigitalOutputs(std::unordered_set<int>()), SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->setTimerBase(SurgSim::Device::LabJack::TIMERBASE_DEFAULT),
 		SurgSim::Framework::AssertionFailure);
@@ -300,12 +327,16 @@ TEST(LabJackDeviceTest, NoSettingAfterInitialization)
 	EXPECT_THROW(device->enableTimer(0, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE),
 		SurgSim::Framework::AssertionFailure);
 
+	EXPECT_THROW(device->setTimers(std::unordered_map<int, SurgSim::Device::LabJack::TimerMode>()),
+		SurgSim::Framework::AssertionFailure);
+
 	EXPECT_THROW(device->setMaximumUpdateRate(300.0), SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->enableAnalogInput(2, SurgSim::Device::LabJack::Range::RANGE_10, 1),
 		SurgSim::Framework::AssertionFailure);
 
-	EXPECT_THROW(device->enableAnalogInput(4, SurgSim::Device::LabJack::Range::RANGE_0_POINT_1),
+	EXPECT_THROW(device->setAnalogInputs(std::unordered_map<int,
+		SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel>()),
 		SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->setAnalogInputResolution(3), SurgSim::Framework::AssertionFailure);
@@ -313,4 +344,6 @@ TEST(LabJackDeviceTest, NoSettingAfterInitialization)
 	EXPECT_THROW(device->setAnalogInputSettling(2), SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->enableAnalogOutput(2), SurgSim::Framework::AssertionFailure);
+
+	EXPECT_THROW(device->setAnalogOutputs(std::unordered_set<int>()), SurgSim::Framework::AssertionFailure);
 }

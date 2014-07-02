@@ -223,6 +223,11 @@ public:
 	/// \exception Asserts if already initialized.
 	void enableDigitalInput(int channel);
 
+	/// Set which digital input lines are enabled.
+	/// \param digitalInputChannels The line numbers for the digital inputs.
+	/// \exception Asserts if already initialized.
+	void setDigitalInputs(const std::unordered_set<int>& digitalInputChannels);
+
 	/// \return The enabled digital input lines.
 	const std::unordered_set<int>& getDigitalInputs() const;
 
@@ -230,6 +235,11 @@ public:
 	/// \param channel The channel number.
 	/// \exception Asserts if already initialized.
 	void enableDigitalOutput(int channel);
+
+	/// Set which digital output lines are enabled.
+	/// \param digitalOutputChannels The line numbers for the digital outputs.
+	/// \exception Asserts if already initialized.
+	void setDigitalOutputs(const std::unordered_set<int>& digitalOutputChannels);
 
 	/// \return The enabled digital output lines.
 	const std::unordered_set<int>& getDigitalOutputs() const;
@@ -269,6 +279,12 @@ public:
 	/// \exception Asserts if already initialized.
 	void enableTimer(int index, LabJack::TimerMode mode);
 
+	/// Set which timers are enabled.
+	/// \sa enableTimer
+	/// \param timers The map from timer index (not line number) to mode.
+	/// \exception Asserts if already initialized.
+	void setTimers(const std::unordered_map<int, LabJack::TimerMode>& timers);
+
 	/// \return The enabled timers.
 	const std::unordered_map<int, LabJack::TimerMode>& getTimers() const;
 
@@ -294,6 +310,13 @@ public:
 	/// \exception Asserts if already initialized.
 	void enableAnalogInput(int channel, LabJack::Range range);
 
+	/// Set which analog inputs are enabled.
+	/// \sa enableAnalogInput
+	/// \param analogInputs The map from the line number of the positive channel to the range and
+	///		(for differential readings only) the line number of the negative channel.
+	/// \exception Asserts if already initialized.
+	void setAnalogInputs(const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel>& analogInputs);
+
 	/// \return The enabled analog inputs.
 	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel>& getAnalogInputs() const;
 
@@ -301,6 +324,12 @@ public:
 	/// \param channel The channel.
 	/// \exception Asserts if already initialized.
 	void enableAnalogOutput(int channel);
+
+	/// Set which analog outputs are enabled.
+	/// \sa enableAnalogOutput
+	/// \param analogOutputChannels The line numbers for the analog outputs.
+	/// \exception Asserts if already initialized.
+	void setAnalogOutputs(const std::unordered_set<int>& analogOutputChannels);
 
 	/// \return The enabled analog output channels.
 	const std::unordered_set<int>& getAnalogOutputs() const;
