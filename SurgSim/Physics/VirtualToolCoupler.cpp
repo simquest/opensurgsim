@@ -51,7 +51,7 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_angularDamping(std::numeric_limits<double>::quiet_NaN()),
 	m_outputForceScaling(1.0),
 	m_outputTorqueScaling(1.0),
-	m_attachment(SurgSim::Math::Vector3d::Zero())
+	m_attachmentPoint(SurgSim::Math::Vector3d::Zero())
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addVector(SurgSim::DataStructures::Names::FORCE);
@@ -84,8 +84,8 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, double, OutputTorqueScaling,
 		getOutputTorqueScaling, setOutputTorqueScaling);
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::Math::Vector3d, Attachment, getAttachment,
-		setAttachment);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::Math::Vector3d, Attachment, getAttachmentPoint,
+		setAttachmentPoint);
 }
 
 VirtualToolCoupler::~VirtualToolCoupler()
@@ -150,7 +150,7 @@ void VirtualToolCoupler::update(double dt)
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
 		Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
-		const Vector3d inputMassCenter = inputPose * -m_attachment;
+		const Vector3d inputMassCenter = inputPose * -m_attachmentPoint;
 
 		Vector3d force = m_linearStiffness * (inputMassCenter - objectPosition);
 		force += m_linearDamping * (inputLinearVelocity - objectState.getLinearVelocity());
@@ -170,7 +170,7 @@ void VirtualToolCoupler::update(double dt)
 
 		if (m_output != nullptr)
 		{
-			const Vector3d orientedAttachment = inputPose.rotation() * -m_attachment;
+			const Vector3d orientedAttachment = inputPose.rotation() * -m_attachmentPoint;
 			const Vector3d outputTorque = -torque - force.cross(orientedAttachment);
 
 			m_outputData.vectors().set(SurgSim::DataStructures::Names::FORCE, -force * m_outputForceScaling);
@@ -420,14 +420,14 @@ const SurgSim::DataStructures::OptionalValue<double>& VirtualToolCoupler::getOpt
 	return m_optionalAngularDamping;
 }
 
-void VirtualToolCoupler::setAttachment(const SurgSim::Math::Vector3d& attachment)
+void VirtualToolCoupler::setAttachmentPoint(const SurgSim::Math::Vector3d& attachment)
 {
-	m_attachment = attachment;
+	m_attachmentPoint = attachment;
 }
 
-const SurgSim::Math::Vector3d& VirtualToolCoupler::getAttachment()
+const SurgSim::Math::Vector3d& VirtualToolCoupler::getAttachmentPoint()
 {
-	return m_attachment;
+	return m_attachmentPoint;
 }
 
 }; /// Physics

@@ -398,17 +398,17 @@ TEST_F(VirtualToolCouplerTest, OutputScaling)
 	EXPECT_EQ(num, virtualToolCoupler->getOutputTorqueScaling());
 }
 
-TEST_F(VirtualToolCouplerTest, Attachment)
+TEST_F(VirtualToolCouplerTest, AttachmentPoint)
 {
-	Vector3d attachment(28.4, -37.2, 91.8);
-	virtualToolCoupler->setAttachment(attachment);
-	EXPECT_TRUE(attachment.isApprox(virtualToolCoupler->getAttachment()));
+	Vector3d attachmentPoint(28.4, -37.2, 91.8);
+	virtualToolCoupler->setAttachmentPoint(attachmentPoint);
+	EXPECT_TRUE(attachmentPoint.isApprox(virtualToolCoupler->getAttachmentPoint()));
 }
 
 TEST_F(VirtualToolCouplerTest, Serialization)
 {
 	double num = 3.6415;
-	Vector3d attachment(28.4, -37.2, 91.8);
+	Vector3d attachmentPoint(28.4, -37.2, 91.8);
 
 	OptionalValued optionalNum;
 	optionalNum.setValue(num);
@@ -418,7 +418,7 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	virtualToolCoupler->setOptionalAngularDamping(optionalNum);
 	virtualToolCoupler->setOutputForceScaling(num);
 	virtualToolCoupler->setOutputTorqueScaling(num);
-	virtualToolCoupler->setAttachment(attachment);
+	virtualToolCoupler->setAttachmentPoint(attachmentPoint);
 
 	// Encode
 	YAML::Node node;
@@ -445,7 +445,7 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getRepresentation());
 	EXPECT_EQ(nullptr, newVirtualToolCoupler->getOutput());
 
-	EXPECT_TRUE(attachment.isApprox(newVirtualToolCoupler->getAttachment()));
+	EXPECT_TRUE(attachmentPoint.isApprox(newVirtualToolCoupler->getAttachmentPoint()));
 
 	YAML::Node inputNode;
 	EXPECT_NO_THROW(inputNode = YAML::convert<SurgSim::Framework::Component>::encode(*input););
