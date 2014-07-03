@@ -121,10 +121,10 @@ void TriangleMeshPlyReaderDelegate::processFace(const std::string& elementName)
 void TriangleMeshPlyReaderDelegate::endFaces(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_faceData.overrun == 0) <<
-		"There was an overrun while reading the 2DElement structures, it is likely that data " <<
+		"There was an overrun while reading the face structures, it is likely that data " <<
 		"has become corrupted.";
 }
 
-}
-}
+} // Datastructures
+} // SurgSim
 
