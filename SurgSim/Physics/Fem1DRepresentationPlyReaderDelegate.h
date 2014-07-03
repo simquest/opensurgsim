@@ -50,6 +50,10 @@ protected:
 	/// \return memory for radius data to the reader.
 	void* beginRadius(const std::string& elementName, size_t radiusCount);
 
+	/// Callback function, end the processing of radius.
+	/// \param elementName Name of the element.
+	void endRadius(const std::string& elementName);
+
 private:
 	double m_radius;
 };

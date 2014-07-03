@@ -29,6 +29,7 @@ namespace Physics
 FemRepresentationPlyReaderDelegate::FemRepresentationPlyReaderDelegate(std::shared_ptr<FemRepresentation> fem) :
 	m_hasBoundaryConditions(false),
 	m_vertexIterator(nullptr),
+	m_boundaryConditionData(std::numeric_limits<size_t>::quiet_NaN()),
 	m_fem(fem)
 {
 }

@@ -49,6 +49,10 @@ protected:
 	/// \return memory for thickness data to the reader.
 	void* beginThickness(const std::string& elementName, size_t thicknessCount);
 
+	/// Callback function, end the processing of thickness.
+	/// \param elementName Name of the element.
+	void endThickness(const std::string& elementName);
+
 private:
 	double m_thickness;
 };

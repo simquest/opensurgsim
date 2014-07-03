@@ -16,6 +16,7 @@
 #include <array>
 
 #include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/Fem2DRepresentationPlyReaderDelegate.h"
@@ -26,8 +27,9 @@ namespace Physics
 {
 using SurgSim::DataStructures::PlyReader;
 
-Fem2DRepresentationPlyReaderDelegate::Fem2DRepresentationPlyReaderDelegate(std::shared_ptr<Fem2DRepresentation> fem)
-	: FemRepresentationPlyReaderDelegate(fem)
+Fem2DRepresentationPlyReaderDelegate::Fem2DRepresentationPlyReaderDelegate(std::shared_ptr<Fem2DRepresentation> fem) :
+	FemRepresentationPlyReaderDelegate(fem),
+	m_thickness(std::numeric_limits<double>::quiet_NaN())
 {
 }
 
@@ -46,7 +48,7 @@ bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		std::bind(
 		&Fem2DRepresentationPlyReaderDelegate::beginThickness, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
-		nullptr);
+		std::bind(&Fem2DRepresentationPlyReaderDelegate::endThickness, this, std::placeholders::_1));
 	reader->requestScalarProperty("thickness", "value", PlyReader::TYPE_DOUBLE, 0);
 
 	return true;
@@ -55,7 +57,6 @@ bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 bool Fem2DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
 	bool result = FemRepresentationPlyReaderDelegate::fileIsAcceptable(reader);
-
 	result = result && reader.hasProperty("thickness", "value");
 
 	return result;
@@ -74,6 +75,11 @@ void Fem2DRepresentationPlyReaderDelegate::processFemElement(const std::string& 
 void* Fem2DRepresentationPlyReaderDelegate::beginThickness(const std::string& elementName, size_t thicknessCount)
 {
 	return &m_thickness;
+}
+
+void Fem2DRepresentationPlyReaderDelegate::endThickness(const std::string& elementName)
+{
+	SURGSIM_ASSERT(SurgSim::Math::isValid(m_thickness)) << "No radius information processed.";
 }
 
 void Fem2DRepresentationPlyReaderDelegate::endParseFile()

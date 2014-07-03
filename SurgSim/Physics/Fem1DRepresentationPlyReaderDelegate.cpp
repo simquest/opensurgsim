@@ -16,6 +16,7 @@
 #include <array>
 
 #include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem1DRepresentationPlyReaderDelegate.h"
@@ -26,8 +27,9 @@ namespace Physics
 {
 using SurgSim::DataStructures::PlyReader;
 
-Fem1DRepresentationPlyReaderDelegate::Fem1DRepresentationPlyReaderDelegate(std::shared_ptr<Fem1DRepresentation> fem)
-	: FemRepresentationPlyReaderDelegate(fem)
+Fem1DRepresentationPlyReaderDelegate::Fem1DRepresentationPlyReaderDelegate(std::shared_ptr<Fem1DRepresentation> fem) :
+	FemRepresentationPlyReaderDelegate(fem),
+	m_radius(std::numeric_limits<double>::quiet_NaN())
 {
 }
 
@@ -46,7 +48,7 @@ bool Fem1DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		std::bind(
 		&Fem1DRepresentationPlyReaderDelegate::beginRadius, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
-		nullptr);
+		std::bind(&Fem1DRepresentationPlyReaderDelegate::endRadius, this, std::placeholders::_1));
 	reader->requestScalarProperty("radius", "value", PlyReader::TYPE_DOUBLE, 0);
 
 	return true;
@@ -55,7 +57,6 @@ bool Fem1DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 bool Fem1DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
 	bool result = FemRepresentationPlyReaderDelegate::fileIsAcceptable(reader);
-
 	result = result && reader.hasProperty("radius", "value");
 
 	return result;
@@ -74,6 +75,11 @@ void Fem1DRepresentationPlyReaderDelegate::processFemElement(const std::string& 
 void* Fem1DRepresentationPlyReaderDelegate::beginRadius(const std::string& elementName, size_t radiusCount)
 {
 	return &m_radius;
+}
+
+void Fem1DRepresentationPlyReaderDelegate::endRadius(const std::string& elementName)
+{
+	SURGSIM_ASSERT(SurgSim::Math::isValid(m_radius)) << "No radius information processed.";
 }
 
 void Fem1DRepresentationPlyReaderDelegate::endParseFile()
