@@ -29,7 +29,7 @@ namespace Physics
 
 class FemElement;
 struct FemRepresentationCoordinate;
-class FemRepresentationPlyReaderDelegate;
+class FemPlyReaderDelegate;
 
 /// Finite Element Model (a.k.a. fem) is a deformable model (a set of nodes connected by FemElement).
 /// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
@@ -185,7 +185,7 @@ protected:
 private:
 	/// To be implemented by derived classes.
 	/// \return The delegate to load the corresponding derived class.
-	virtual std::shared_ptr<FemRepresentationPlyReaderDelegate> getDelegate() = 0;
+	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() = 0;
 
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMREPRESENTATIONPLYREADERDELEGATE_H
-#define SURGSIM_PHYSICS_FEMREPRESENTATIONPLYREADERDELEGATE_H
+#ifndef SURGSIM_PHYSICS_FEMPLYREADERDELEGATE_H
+#define SURGSIM_PHYSICS_FEMPLYREADERDELEGATE_H
 
 #include <array>
 #include <memory>
@@ -36,12 +36,12 @@ class FemRepresentation;
 /// Common part of implementation of PlyReaderDelegate for FemRepresentations.
 /// This is an abstract class and needs to be inherited.
 /// Methods 'registerDelegate()' and 'fileIsAcceptable()' need to be overridden.
-class FemRepresentationPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
+class FemPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
 	/// Constructor
 	/// \param fem The object that is updated when PlyReader::parseFile is called.
-	explicit FemRepresentationPlyReaderDelegate(std::shared_ptr<FemRepresentation> fem);
+	explicit FemPlyReaderDelegate(std::shared_ptr<FemRepresentation> fem);
 
 protected:
 	// \return Name of the element (1/2/3D), which this delegate processes.
@@ -140,4 +140,4 @@ protected:
 } // namespace Physics
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMREPRESENTATIONPLYREADERDELEGATE_H
+#endif // SURGSIM_PHYSICS_FEMPLYREADERDELEGATE_H

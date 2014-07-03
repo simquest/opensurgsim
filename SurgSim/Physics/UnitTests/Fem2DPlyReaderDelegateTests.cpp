@@ -19,7 +19,7 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/FemElement.h"
-#include "SurgSim/Physics/Fem2DRepresentationPlyReaderDelegate.h"
+#include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 
@@ -54,12 +54,10 @@ TEST(Fem2DRepresentationReaderTests, DelegateTest)
 	std::array<size_t, 3> triangle0 = {0, 1, 2};
 	std::array<size_t, 3> triangle2 = {3, 4, 5};
 
-	EXPECT_TRUE(std::equal(
-					std::begin(triangle0), std::end(triangle0),
-					std::begin(femRepresentation->getFemElement(0)->getNodeIds())));
-	EXPECT_TRUE(std::equal(
-					std::begin(triangle2), std::end(triangle2),
-					std::begin(femRepresentation->getFemElement(2)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(triangle0), std::end(triangle0),
+						   std::begin(femRepresentation->getFemElement(0)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(triangle2), std::end(triangle2),
+						   std::begin(femRepresentation->getFemElement(2)->getNodeIds())));
 
 	// Boundary conditions
 	ASSERT_EQ(2u * 6u, femRepresentation->getInitialState()->getNumBoundaryConditions());

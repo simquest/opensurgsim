@@ -18,8 +18,8 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
+#include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 
 using SurgSim::DataStructures::PlyReader;
 
@@ -28,17 +28,17 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem)
-	: FemRepresentationPlyReaderDelegate(fem)
+Fem3DPlyReaderDelegate::Fem3DPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem)
+	: FemPlyReaderDelegate(fem)
 {
 }
 
-std::string Fem3DRepresentationPlyReaderDelegate::getElementName() const
+std::string Fem3DPlyReaderDelegate::getElementName() const
 {
 	return "3d_element";
 }
 
-void Fem3DRepresentationPlyReaderDelegate::processFemElement(const std::string& elementName)
+void Fem3DPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
 	SURGSIM_ASSERT(4== m_femData.vertexCount || 8 == m_femData.vertexCount) <<
 		"Cannot process 3D element with " << m_femData.vertexCount << " vertices.";

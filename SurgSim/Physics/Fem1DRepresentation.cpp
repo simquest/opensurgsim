@@ -18,8 +18,8 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/LinearSolveAndInverse.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
-#include "SurgSim/Physics/Fem1DRepresentationPlyReaderDelegate.h"
 
 namespace
 {
@@ -89,10 +89,10 @@ void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
 }
 
-std::shared_ptr<FemRepresentationPlyReaderDelegate> Fem1DRepresentation::getDelegate()
+std::shared_ptr<FemPlyReaderDelegate> Fem1DRepresentation::getDelegate()
 {
 	auto thisAsSharedPtr = std::static_pointer_cast<Fem1DRepresentation>(shared_from_this());
-	auto readerDelegate = std::make_shared<Fem1DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
+	auto readerDelegate = std::make_shared<Fem1DPlyReaderDelegate>(thisAsSharedPtr);
 
 	return readerDelegate;
 }

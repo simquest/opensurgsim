@@ -22,9 +22,9 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
-#include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemElement.h"
 
 using SurgSim::Framework::Logger;
@@ -80,10 +80,10 @@ RepresentationType Fem3DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM3D;
 }
 
-std::shared_ptr<FemRepresentationPlyReaderDelegate> Fem3DRepresentation::getDelegate()
+std::shared_ptr<FemPlyReaderDelegate> Fem3DRepresentation::getDelegate()
 {
 	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(shared_from_this());
-	auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
+	auto readerDelegate = std::make_shared<Fem3DPlyReaderDelegate>(thisAsSharedPtr);
 
 	return readerDelegate;
 }

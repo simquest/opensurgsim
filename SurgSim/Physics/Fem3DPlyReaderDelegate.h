@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEM3DREPRESENTATIONPLYREADERDELEGATE_H
-#define SURGSIM_PHYSICS_FEM3DREPRESENTATIONPLYREADERDELEGATE_H
+#ifndef SURGSIM_PHYSICS_FEM3DPLYREADERDELEGATE_H
+#define SURGSIM_PHYSICS_FEM3DPLYREADERDELEGATE_H
 
 #include <memory>
 
-#include "SurgSim/Physics/FemRepresentationPlyReaderDelegate.h"
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 
 namespace SurgSim
 {
@@ -27,12 +27,12 @@ namespace Physics
 class Fem3DRepresentation;
 
 /// Implementation of PlyReaderDelegate for Fem3DRepresentation
-class Fem3DRepresentationPlyReaderDelegate : public SurgSim::Physics::FemRepresentationPlyReaderDelegate
+class Fem3DPlyReaderDelegate : public SurgSim::Physics::FemPlyReaderDelegate
 {
 public:
 	/// Constructor
 	/// \param fem The object that is updated when PlyReader::parseFile is called.
-	explicit Fem3DRepresentationPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem);
+	explicit Fem3DPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem);
 
 protected:
 	virtual std::string getElementName() const override;
@@ -43,4 +43,4 @@ protected:
 } // namespace Physics
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEM3DREPRESENTATIONPLYREADERDELEGATE_H
+#endif // SURGSIM_PHYSICS_FEM3DPLYREADERDELEGATE_H

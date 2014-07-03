@@ -18,8 +18,8 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
+#include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
-#include "SurgSim/Physics/Fem1DRepresentationPlyReaderDelegate.h"
 
 namespace SurgSim
 {
@@ -27,42 +27,42 @@ namespace Physics
 {
 using SurgSim::DataStructures::PlyReader;
 
-Fem1DRepresentationPlyReaderDelegate::Fem1DRepresentationPlyReaderDelegate(std::shared_ptr<Fem1DRepresentation> fem) :
-	FemRepresentationPlyReaderDelegate(fem),
+Fem1DPlyReaderDelegate::Fem1DPlyReaderDelegate(std::shared_ptr<Fem1DRepresentation> fem) :
+	FemPlyReaderDelegate(fem),
 	m_radius(std::numeric_limits<double>::quiet_NaN())
 {
 }
 
-std::string Fem1DRepresentationPlyReaderDelegate::getElementName() const
+std::string Fem1DPlyReaderDelegate::getElementName() const
 {
 	return "1d_element";
 }
 
-bool Fem1DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
+bool Fem1DPlyReaderDelegate::registerDelegate(PlyReader* reader)
 {
-	FemRepresentationPlyReaderDelegate::registerDelegate(reader);
+	FemPlyReaderDelegate::registerDelegate(reader);
 
 	// Radius Processing
 	reader->requestElement(
 		"radius",
 		std::bind(
-		&Fem1DRepresentationPlyReaderDelegate::beginRadius, this, std::placeholders::_1, std::placeholders::_2),
+		&Fem1DPlyReaderDelegate::beginRadius, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
-		std::bind(&Fem1DRepresentationPlyReaderDelegate::endRadius, this, std::placeholders::_1));
+		std::bind(&Fem1DPlyReaderDelegate::endRadius, this, std::placeholders::_1));
 	reader->requestScalarProperty("radius", "value", PlyReader::TYPE_DOUBLE, 0);
 
 	return true;
 }
 
-bool Fem1DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
+bool Fem1DPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
-	bool result = FemRepresentationPlyReaderDelegate::fileIsAcceptable(reader);
+	bool result = FemPlyReaderDelegate::fileIsAcceptable(reader);
 	result = result && reader.hasProperty("radius", "value");
 
 	return result;
 }
 
-void Fem1DRepresentationPlyReaderDelegate::processFemElement(const std::string& elementName)
+void Fem1DPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_femData.vertexCount == 2) << "Cannot process 1D Element with "
 											   << m_femData.vertexCount << " vertices.";
@@ -72,24 +72,24 @@ void Fem1DRepresentationPlyReaderDelegate::processFemElement(const std::string& 
 	m_fem->addFemElement(std::make_shared<Fem1DElementBeam>(fem1DVertices));
 }
 
-void* Fem1DRepresentationPlyReaderDelegate::beginRadius(const std::string& elementName, size_t radiusCount)
+void* Fem1DPlyReaderDelegate::beginRadius(const std::string& elementName, size_t radiusCount)
 {
 	return &m_radius;
 }
 
-void Fem1DRepresentationPlyReaderDelegate::endRadius(const std::string& elementName)
+void Fem1DPlyReaderDelegate::endRadius(const std::string& elementName)
 {
 	SURGSIM_ASSERT(SurgSim::Math::isValid(m_radius)) << "No radius information processed.";
 }
 
-void Fem1DRepresentationPlyReaderDelegate::endParseFile()
+void Fem1DPlyReaderDelegate::endParseFile()
 {
 	for (size_t i = 0; i < m_fem->getNumFemElements(); ++i)
 	{
 		std::static_pointer_cast<Fem1DElementBeam>(m_fem->getFemElement(i))->setRadius(m_radius);
 	}
 
-	FemRepresentationPlyReaderDelegate::endParseFile();
+	FemPlyReaderDelegate::endParseFile();
 }
 
 }; // namespace Physics

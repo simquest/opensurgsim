@@ -31,24 +31,24 @@ set(SURGSIM_PHYSICS_SOURCES
 	DeformableCollisionRepresentation.cpp
 	DeformableRepresentation.cpp
 	Fem1DElementBeam.cpp
+	Fem1DPlyReaderDelegate.cpp
 	Fem1DRepresentation.cpp
-	Fem1DRepresentationPlyReaderDelegate.cpp
 	Fem2DElementTriangle.cpp
+	Fem2DPlyReaderDelegate.cpp
 	Fem2DRepresentation.cpp
-	Fem2DRepresentationPlyReaderDelegate.cpp
 	Fem3DElementCorotationalTetrahedron.cpp
 	Fem3DElementCube.cpp
 	Fem3DElementTetrahedron.cpp
+	Fem3DPlyReaderDelegate.cpp
 	Fem3DRepresentation.cpp
 	Fem3DRepresentationBilateral3D.cpp
 	Fem3DRepresentationContact.cpp
 	Fem3DRepresentationLocalization.cpp
-	Fem3DRepresentationPlyReaderDelegate.cpp
 	FemElement.cpp
+	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
 	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
-	FemRepresentationPlyReaderDelegate.cpp
 	FixedRepresentation.cpp
 	FixedRepresentationBilateral3D.cpp
 	FixedRepresentationContact.cpp
@@ -93,24 +93,24 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableCollisionRepresentation.h
 	DeformableRepresentation.h
 	Fem1DElementBeam.h
+	Fem1DPlyReaderDelegate.h
 	Fem1DRepresentation.h
-	Fem1DRepresentationPlyReaderDelegate.h
 	Fem2DElementTriangle.h
+	Fem2DPlyReaderDelegate.h
 	Fem2DRepresentation.h
-	Fem2DRepresentationPlyReaderDelegate.h
 	Fem3DElementCorotationalTetrahedron.h
 	Fem3DElementCube.h
 	Fem3DElementTetrahedron.h
+	Fem3DPlyReaderDelegate.h
 	Fem3DRepresentation.h
 	Fem3DRepresentationBilateral3D.h
 	Fem3DRepresentationContact.h
 	Fem3DRepresentationLocalization.h
-	Fem3DRepresentationPlyReaderDelegate.h
 	FemElement.h
+	FemPlyReaderDelegate.h
 	FemRepresentation.h
 	FemRepresentationCoordinate.h
 	FemRepresentationParameters.h
-	FemRepresentationPlyReaderDelegate.h
 	FixedRepresentation.h
 	FixedRepresentationBilateral3D.h
 	FixedRepresentationContact.h

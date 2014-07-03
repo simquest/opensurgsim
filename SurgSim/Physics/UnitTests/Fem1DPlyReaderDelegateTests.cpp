@@ -18,7 +18,7 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/Fem1DRepresentationPlyReaderDelegate.h"
+#include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 
@@ -53,12 +53,10 @@ TEST(Fem1DRepresentationReaderTests, DelegateTest)
 	std::array<size_t, 2> beam0 = {0, 1};
 	std::array<size_t, 2> beam2 = {3, 5};
 
-	EXPECT_TRUE(std::equal(
-					std::begin(beam0), std::end(beam0),
-					std::begin(femRepresentation->getFemElement(0)->getNodeIds())));
-	EXPECT_TRUE(std::equal(
-					std::begin(beam2), std::end(beam2),
-					std::begin(femRepresentation->getFemElement(2)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(beam0), std::end(beam0),
+						   std::begin(femRepresentation->getFemElement(0)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(beam2), std::end(beam2),
+						   std::begin(femRepresentation->getFemElement(2)->getNodeIds())));
 
 	// Boundary conditions
 	ASSERT_EQ(3u * 6u, femRepresentation->getInitialState()->getNumBoundaryConditions());

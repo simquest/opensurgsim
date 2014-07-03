@@ -29,7 +29,7 @@ namespace Physics
 {
 SURGSIM_STATIC_REGISTRATION(Fem1DRepresentation);
 
-class FemRepresentationPlyReaderDelegate;
+class FemPlyReaderDelegate;
 
 /// Finite Element Model 1D is a fem built with 1D FemElement
 ///
@@ -60,7 +60,7 @@ protected:
 								const SurgSim::Math::RigidTransform3d& transform) override;
 
 private:
-	virtual std::shared_ptr<FemRepresentationPlyReaderDelegate> getDelegate() override;
+	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
 };
 
 } // namespace Physics

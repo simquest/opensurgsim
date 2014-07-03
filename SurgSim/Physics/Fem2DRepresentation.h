@@ -31,7 +31,7 @@ namespace Physics
 {
 SURGSIM_STATIC_REGISTRATION(Fem2DRepresentation);
 
-class Fem2DRepresentationPlyReaderDelegate;
+class Fem2DPlyReaderDelegate;
 
 /// Finite Element Model 2D is a fem built with 2D FemElement
 class Fem2DRepresentation : public FemRepresentation
@@ -53,7 +53,7 @@ protected:
 								const SurgSim::Math::RigidTransform3d& transform) override;
 
 private:
-	virtual std::shared_ptr<FemRepresentationPlyReaderDelegate> getDelegate() override;
+	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
 };
 
 } // namespace Physics

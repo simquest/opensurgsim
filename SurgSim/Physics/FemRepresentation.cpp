@@ -21,9 +21,9 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/FemRepresentationCoordinate.h"
-#include "SurgSim/Physics/FemRepresentationPlyReaderDelegate.h"
 
 namespace SurgSim
 {

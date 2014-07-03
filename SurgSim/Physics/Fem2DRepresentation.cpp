@@ -17,8 +17,8 @@
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/Fem2DRepresentationPlyReaderDelegate.h"
 
 namespace
 {
@@ -64,10 +64,10 @@ RepresentationType Fem2DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM2D;
 }
 
-std::shared_ptr<FemRepresentationPlyReaderDelegate> Fem2DRepresentation::getDelegate()
+std::shared_ptr<FemPlyReaderDelegate> Fem2DRepresentation::getDelegate()
 {
 	auto thisAsSharedPtr = std::static_pointer_cast<Fem2DRepresentation>(shared_from_this());
-	auto readerDelegate = std::make_shared<Fem2DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
+	auto readerDelegate = std::make_shared<Fem2DPlyReaderDelegate>(thisAsSharedPtr);
 
 	return readerDelegate;
 }

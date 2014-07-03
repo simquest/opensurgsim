@@ -16,8 +16,8 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemRepresentation.h"
-#include "SurgSim/Physics/FemRepresentationPlyReaderDelegate.h"
 
 using SurgSim::DataStructures::PlyReader;
 
@@ -26,7 +26,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemRepresentationPlyReaderDelegate::FemRepresentationPlyReaderDelegate(std::shared_ptr<FemRepresentation> fem) :
+FemPlyReaderDelegate::FemPlyReaderDelegate(std::shared_ptr<FemRepresentation> fem) :
 	m_hasBoundaryConditions(false),
 	m_vertexIterator(nullptr),
 	m_boundaryConditionData(std::numeric_limits<size_t>::quiet_NaN()),
@@ -34,19 +34,19 @@ FemRepresentationPlyReaderDelegate::FemRepresentationPlyReaderDelegate(std::shar
 {
 }
 
-FemRepresentationPlyReaderDelegate::ElementData::ElementData() : indices(nullptr), vertexCount(0)
+FemPlyReaderDelegate::ElementData::ElementData() : indices(nullptr), vertexCount(0)
 {
 }
 
-bool FemRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
+bool FemPlyReaderDelegate::registerDelegate(PlyReader* reader)
 {
 	// Vertex processing
 	reader->requestElement(
 		"vertex",
 		std::bind(
-		&FemRepresentationPlyReaderDelegate::beginVertices, this, std::placeholders::_1, std::placeholders::_2),
-		std::bind(&FemRepresentationPlyReaderDelegate::processVertex, this, std::placeholders::_1),
-		std::bind(&FemRepresentationPlyReaderDelegate::endVertices, this, std::placeholders::_1));
+		&FemPlyReaderDelegate::beginVertices, this, std::placeholders::_1, std::placeholders::_2),
+		std::bind(&FemPlyReaderDelegate::processVertex, this, std::placeholders::_1),
+		std::bind(&FemPlyReaderDelegate::endVertices, this, std::placeholders::_1));
 	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, 0 * sizeof(m_vertexData[0]));
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, 1 * sizeof(m_vertexData[0]));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, 2 * sizeof(m_vertexData[0]));
@@ -54,12 +54,12 @@ bool FemRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	// Element Processing
 	reader->requestElement(
 		getElementName(),
-		std::bind(&FemRepresentationPlyReaderDelegate::beginFemElements,
+		std::bind(&FemPlyReaderDelegate::beginFemElements,
 		this,
 		std::placeholders::_1,
 		std::placeholders::_2),
-		std::bind(&FemRepresentationPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
-		std::bind(&FemRepresentationPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
+		std::bind(&FemPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
+		std::bind(&FemPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
 	reader->requestListProperty(getElementName(),
 		"vertex_indices",
 		PlyReader::TYPE_UNSIGNED_INT,
@@ -72,11 +72,11 @@ bool FemRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	{
 		reader->requestElement(
 			"boundary_condition",
-			std::bind(&FemRepresentationPlyReaderDelegate::beginBoundaryConditions,
+			std::bind(&FemPlyReaderDelegate::beginBoundaryConditions,
 			this,
 			std::placeholders::_1,
 			std::placeholders::_2),
-			std::bind(&FemRepresentationPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
+			std::bind(&FemPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
 			nullptr);
 		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
 	}
@@ -85,7 +85,7 @@ bool FemRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestElement(
 		"material",
 		std::bind(
-		&FemRepresentationPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
+		&FemPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
 		nullptr);
 	reader->requestScalarProperty(
@@ -95,13 +95,13 @@ bool FemRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty(
 		"material", "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, youngModulus));
 
-	reader->setStartParseFileCallback(std::bind(&FemRepresentationPlyReaderDelegate::startParseFile, this));
-	reader->setEndParseFileCallback(std::bind(&FemRepresentationPlyReaderDelegate::endParseFile, this));
+	reader->setStartParseFileCallback(std::bind(&FemPlyReaderDelegate::startParseFile, this));
+	reader->setEndParseFileCallback(std::bind(&FemPlyReaderDelegate::endParseFile, this));
 
 	return true;
 }
 
-bool FemRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
+bool FemPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
 	bool result = true;
 
@@ -122,7 +122,7 @@ bool FemRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reade
 	return result;
 }
 
-void FemRepresentationPlyReaderDelegate::startParseFile()
+void FemPlyReaderDelegate::startParseFile()
 {
 	SURGSIM_ASSERT(nullptr != m_fem) << "The FemRepresentation cannot be nullptr.";
 	SURGSIM_ASSERT(0 == m_fem->getNumFemElements()) <<
@@ -132,7 +132,7 @@ void FemRepresentationPlyReaderDelegate::startParseFile()
 	m_state = std::make_shared<SurgSim::Math::OdeState>();
 }
 
-void FemRepresentationPlyReaderDelegate::endParseFile()
+void FemPlyReaderDelegate::endParseFile()
 {
 	for (size_t i = 0; i < m_fem->getNumFemElements(); ++i)
 	{
@@ -144,7 +144,7 @@ void FemRepresentationPlyReaderDelegate::endParseFile()
 	m_fem->setInitialState(m_state);
 }
 
-void* FemRepresentationPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
+void* FemPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
 {
 	m_state->setNumDof(m_fem->getNumDofPerNode(), vertexCount);
 	m_vertexIterator = m_state->getPositions().data();
@@ -152,39 +152,39 @@ void* FemRepresentationPlyReaderDelegate::beginVertices(const std::string& eleme
 	return m_vertexData.data();
 }
 
-void FemRepresentationPlyReaderDelegate::processVertex(const std::string& elementName)
+void FemPlyReaderDelegate::processVertex(const std::string& elementName)
 {
 	std::copy(std::begin(m_vertexData), std::end(m_vertexData), m_vertexIterator);
 	m_vertexIterator += m_fem->getNumDofPerNode();
 }
 
-void FemRepresentationPlyReaderDelegate::endVertices(const std::string& elementName)
+void FemPlyReaderDelegate::endVertices(const std::string& elementName)
 {
 	m_vertexIterator = nullptr;
 }
 
-void* FemRepresentationPlyReaderDelegate::beginFemElements(const std::string& elementName, size_t elementCount)
+void* FemPlyReaderDelegate::beginFemElements(const std::string& elementName, size_t elementCount)
 {
 	return &m_femData;
 }
 
-void FemRepresentationPlyReaderDelegate::endFemElements(const std::string& elementName)
+void FemPlyReaderDelegate::endFemElements(const std::string& elementName)
 {
 	m_femData.indices = nullptr;
 }
 
-void* FemRepresentationPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)
+void* FemPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)
 {
 	return &m_materialData;
 }
 
-void* FemRepresentationPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
+void* FemPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
 																  size_t boundaryConditionCount)
 {
 	return &m_boundaryConditionData;
 }
 
-void FemRepresentationPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
+void FemPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
 {
 	m_state->addBoundaryCondition(m_boundaryConditionData);
 }

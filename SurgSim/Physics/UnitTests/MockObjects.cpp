@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
-#include "SurgSim/Physics/FemRepresentationPlyReaderDelegate.h"
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 
 namespace SurgSim
 {
@@ -350,7 +350,7 @@ MockFemRepresentation::~MockFemRepresentation()
 {
 }
 
-std::shared_ptr<FemRepresentationPlyReaderDelegate> MockFemRepresentation::getDelegate()
+std::shared_ptr<FemPlyReaderDelegate> MockFemRepresentation::getDelegate()
 {
 	return nullptr;
 }

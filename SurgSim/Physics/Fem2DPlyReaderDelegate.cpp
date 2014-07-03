@@ -18,8 +18,8 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
+#include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/Fem2DRepresentationPlyReaderDelegate.h"
 
 namespace SurgSim
 {
@@ -27,42 +27,42 @@ namespace Physics
 {
 using SurgSim::DataStructures::PlyReader;
 
-Fem2DRepresentationPlyReaderDelegate::Fem2DRepresentationPlyReaderDelegate(std::shared_ptr<Fem2DRepresentation> fem) :
-	FemRepresentationPlyReaderDelegate(fem),
+Fem2DPlyReaderDelegate::Fem2DPlyReaderDelegate(std::shared_ptr<Fem2DRepresentation> fem) :
+	FemPlyReaderDelegate(fem),
 	m_thickness(std::numeric_limits<double>::quiet_NaN())
 {
 }
 
-std::string Fem2DRepresentationPlyReaderDelegate::getElementName() const
+std::string Fem2DPlyReaderDelegate::getElementName() const
 {
 	return "2d_element";
 }
 
-bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
+bool Fem2DPlyReaderDelegate::registerDelegate(PlyReader* reader)
 {
-	FemRepresentationPlyReaderDelegate::registerDelegate(reader);
+	FemPlyReaderDelegate::registerDelegate(reader);
 
 	// Thickness Processing
 	reader->requestElement(
 		"thickness",
 		std::bind(
-		&Fem2DRepresentationPlyReaderDelegate::beginThickness, this, std::placeholders::_1, std::placeholders::_2),
+		&Fem2DPlyReaderDelegate::beginThickness, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
-		std::bind(&Fem2DRepresentationPlyReaderDelegate::endThickness, this, std::placeholders::_1));
+		std::bind(&Fem2DPlyReaderDelegate::endThickness, this, std::placeholders::_1));
 	reader->requestScalarProperty("thickness", "value", PlyReader::TYPE_DOUBLE, 0);
 
 	return true;
 }
 
-bool Fem2DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
+bool Fem2DPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
-	bool result = FemRepresentationPlyReaderDelegate::fileIsAcceptable(reader);
+	bool result = FemPlyReaderDelegate::fileIsAcceptable(reader);
 	result = result && reader.hasProperty("thickness", "value");
 
 	return result;
 }
 
-void Fem2DRepresentationPlyReaderDelegate::processFemElement(const std::string& elementName)
+void Fem2DPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_femData.vertexCount == 3) << "Cannot process 2D Element with "
 											   << m_femData.vertexCount << " vertices.";
@@ -72,24 +72,24 @@ void Fem2DRepresentationPlyReaderDelegate::processFemElement(const std::string& 
 	m_fem->addFemElement(std::make_shared<Fem2DElementTriangle>(fem2DVertices));
 }
 
-void* Fem2DRepresentationPlyReaderDelegate::beginThickness(const std::string& elementName, size_t thicknessCount)
+void* Fem2DPlyReaderDelegate::beginThickness(const std::string& elementName, size_t thicknessCount)
 {
 	return &m_thickness;
 }
 
-void Fem2DRepresentationPlyReaderDelegate::endThickness(const std::string& elementName)
+void Fem2DPlyReaderDelegate::endThickness(const std::string& elementName)
 {
 	SURGSIM_ASSERT(SurgSim::Math::isValid(m_thickness)) << "No radius information processed.";
 }
 
-void Fem2DRepresentationPlyReaderDelegate::endParseFile()
+void Fem2DPlyReaderDelegate::endParseFile()
 {
 	for (size_t i = 0; i < m_fem->getNumFemElements(); ++i)
 	{
 		std::static_pointer_cast<Fem2DElementTriangle>(m_fem->getFemElement(i))->setThickness(m_thickness);
 	}
 
-	FemRepresentationPlyReaderDelegate::endParseFile();
+	FemPlyReaderDelegate::endParseFile();
 }
 
 }; // namespace Physics

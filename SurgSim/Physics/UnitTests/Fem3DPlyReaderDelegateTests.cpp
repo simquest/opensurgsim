@@ -20,7 +20,7 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/FemElement.h"
-#include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
+#include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 
 using SurgSim::Math::Vector3d;
@@ -48,7 +48,7 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	std::string path = findFile("PlyReaderTests/Tetrahedron.ply");
 	ASSERT_TRUE(!path.empty());
 	PlyReader reader(path);
-	auto delegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(fem);
+	auto delegate = std::make_shared<Fem3DPlyReaderDelegate>(fem);
 
 	ASSERT_TRUE(reader.parseWithDelegate(delegate));
 
@@ -105,7 +105,7 @@ TEST(Fem3DRepresentationReaderTests, Fem3DCubePlyReadTest)
 	std::string path = findFile("PlyReaderTests/Fem3DCube.ply");
 	ASSERT_TRUE(!path.empty());
 	PlyReader reader(path);
-	auto delegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(fem);
+	auto delegate = std::make_shared<Fem3DPlyReaderDelegate>(fem);
 
 	ASSERT_TRUE(reader.parseWithDelegate(delegate));
 

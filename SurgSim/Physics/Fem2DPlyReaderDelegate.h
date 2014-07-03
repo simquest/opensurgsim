@@ -13,27 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEM1DREPRESENTATIONPLYREADERDELEGATE_H
-#define SURGSIM_PHYSICS_FEM1DREPRESENTATIONPLYREADERDELEGATE_H
+#ifndef SURGSIM_PHYSICS_FEM2DPLYREADERDELEGATE_H
+#define SURGSIM_PHYSICS_FEM2DPLYREADERDELEGATE_H
 
 #include <memory>
-#include <string>
 
-#include "SurgSim/Physics/FemRepresentationPlyReaderDelegate.h"
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
-class Fem1DRepresentation;
+class Fem2DRepresentation;
 
-/// Implementation of PlyReaderDelegate for Fem1DRepresentation
-class Fem1DRepresentationPlyReaderDelegate : public SurgSim::Physics::FemRepresentationPlyReaderDelegate
+/// Implementation of PlyReaderDelegate for Fem2DRepresentation
+class Fem2DPlyReaderDelegate : public SurgSim::Physics::FemPlyReaderDelegate
 {
 public:
 	/// Constructor
 	/// \param fem The object that is updated when PlyReader::parseFile is called.
-	explicit Fem1DRepresentationPlyReaderDelegate(std::shared_ptr<Fem1DRepresentation> fem);
+	explicit Fem2DPlyReaderDelegate(std::shared_ptr<Fem2DRepresentation> fem);
 
 protected:
 	virtual std::string getElementName() const override;
@@ -44,21 +43,21 @@ protected:
 	virtual void endParseFile() override;
 	virtual void processFemElement(const std::string& elementName) override;
 
-	/// Callback function, begin the processing of radius.
+	/// Callback function, begin the processing of thickness.
 	/// \param elementName Name of the element.
-	/// \param radiusCount Number of radii.
-	/// \return memory for radius data to the reader.
-	void* beginRadius(const std::string& elementName, size_t radiusCount);
+	/// \param thicknessCount Number of thicknesses.
+	/// \return memory for thickness data to the reader.
+	void* beginThickness(const std::string& elementName, size_t thicknessCount);
 
-	/// Callback function, end the processing of radius.
+	/// Callback function, end the processing of thickness.
 	/// \param elementName Name of the element.
-	void endRadius(const std::string& elementName);
+	void endThickness(const std::string& elementName);
 
 private:
-	double m_radius;
+	double m_thickness;
 };
 
 } // namespace Physics
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEM1DREPRESENTATIONPLYREADERDELEGATE_H
+#endif // SURGSIM_PHYSICS_FEM2DPLYREADERDELEGATE_H
