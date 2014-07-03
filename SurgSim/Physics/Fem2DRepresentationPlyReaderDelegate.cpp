@@ -31,25 +31,14 @@ Fem2DRepresentationPlyReaderDelegate::Fem2DRepresentationPlyReaderDelegate(std::
 {
 }
 
+std::string Fem2DRepresentationPlyReaderDelegate::getElementName() const
+{
+	return "2d_element";
+}
+
 bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 {
 	FemRepresentationPlyReaderDelegate::registerDelegate(reader);
-
-	// 2D Element Processing
-	reader->requestElement(
-		"2d_element",
-		std::bind(&Fem2DRepresentationPlyReaderDelegate::beginFemElements,
-		this,
-		std::placeholders::_1,
-		std::placeholders::_2),
-		std::bind(&Fem2DRepresentationPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
-		std::bind(&Fem2DRepresentationPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
-	reader->requestListProperty("2d_element",
-		"vertex_indices",
-		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(ElementData, indices),
-		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(ElementData, vertexCount));
 
 	// Thickness Processing
 	reader->requestElement(
@@ -58,42 +47,28 @@ bool Fem2DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		&Fem2DRepresentationPlyReaderDelegate::beginThickness, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
 		nullptr);
-	reader->requestScalarProperty("thickness", "thickness", PlyReader::TYPE_DOUBLE, 0);
+	reader->requestScalarProperty("thickness", "value", PlyReader::TYPE_DOUBLE, 0);
 
 	return true;
 }
 
 bool Fem2DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
-	bool result = true;
+	bool result = FemRepresentationPlyReaderDelegate::fileIsAcceptable(reader);
 
-	// Shortcut test if one fails ...
-	result = result && reader.hasProperty("vertex", "x");
-	result = result && reader.hasProperty("vertex", "y");
-	result = result && reader.hasProperty("vertex", "z");
-
-	result = result && reader.hasProperty("2d_element", "vertex_indices");
-	result = result && !reader.isScalar("2d_element", "vertex_indices");
-
-	result = result && reader.hasProperty("thickness", "thickness");
-
-	result = result && reader.hasProperty("material", "mass_density");
-	result = result && reader.hasProperty("material", "poisson_ratio");
-	result = result && reader.hasProperty("material", "young_modulus");
-
-	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
+	result = result && reader.hasProperty("thickness", "value");
 
 	return result;
 }
 
 void Fem2DRepresentationPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_femData.vertexCount == 3) << "Cannot process triangle with "
+	SURGSIM_ASSERT(m_femData.vertexCount == 3) << "Cannot process 2D Element with "
 											   << m_femData.vertexCount << " vertices.";
 
-	std::array<size_t, 3> triangleVertices;
-	std::copy(m_femData.indices, m_femData.indices + 3, triangleVertices.begin());
-	m_fem->addFemElement(std::make_shared<Fem2DElementTriangle>(triangleVertices));
+	std::array<size_t, 3> fem2DVertices;
+	std::copy(m_femData.indices, m_femData.indices + 3, fem2DVertices.begin());
+	m_fem->addFemElement(std::make_shared<Fem2DElementTriangle>(fem2DVertices));
 }
 
 void* Fem2DRepresentationPlyReaderDelegate::beginThickness(const std::string& elementName, size_t thicknessCount)

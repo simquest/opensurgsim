@@ -32,58 +32,19 @@ Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate(std::
 {
 }
 
-bool Fem3DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
+std::string Fem3DRepresentationPlyReaderDelegate::getElementName() const
 {
-	bool result = true;
-
-	// Shortcut test if one fails ...
-	result = result && reader.hasProperty("vertex", "x");
-	result = result && reader.hasProperty("vertex", "y");
-	result = result && reader.hasProperty("vertex", "z");
-
-	result = result && reader.hasProperty("3d_element", "vertex_indices");
-	result = result && !reader.isScalar("3d_element", "vertex_indices");
-
-	result = result && reader.hasProperty("material", "mass_density");
-	result = result && reader.hasProperty("material", "poisson_ratio");
-	result = result && reader.hasProperty("material", "young_modulus");
-
-	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
-
-	return result;
-}
-
-bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
-{
-	FemRepresentationPlyReaderDelegate::registerDelegate(reader);
-
-	// 3D Element Processing
-	reader->requestElement(
-		"3d_element",
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::beginFemElements,
-				  this,
-				  std::placeholders::_1,
-				  std::placeholders::_2),
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
-	reader->requestListProperty("3d_element",
-								"vertex_indices",
-								PlyReader::TYPE_UNSIGNED_INT,
-								offsetof(ElementData, indices),
-								PlyReader::TYPE_UNSIGNED_INT,
-								offsetof(ElementData, vertexCount));
-
-	return true;
+	return "3d_element";
 }
 
 void Fem3DRepresentationPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_femData.vertexCount == 4) << "Cannot process polyhedron with "
+	SURGSIM_ASSERT(m_femData.vertexCount == 4) << "Cannot process 3D element with "
 											   << m_femData.vertexCount << " vertices.";
 
-	std::array<size_t, 4> polyhedronVertices;
-	std::copy(m_femData.indices, m_femData.indices + 4, polyhedronVertices.begin());
-	m_fem->addFemElement(std::make_shared<Fem3DElementTetrahedron>(polyhedronVertices));
+	std::array<size_t, 4> fem3DVertices;
+	std::copy(m_femData.indices, m_femData.indices + 4, fem3DVertices.begin());
+	m_fem->addFemElement(std::make_shared<Fem3DElementTetrahedron>(fem3DVertices));
 }
 
 }; // namespace Physics

@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_FEM1DREPRESENTATIONPLYREADERDELEGATE_H
 
 #include <memory>
+#include <string>
 
 #include "SurgSim/Physics/FemRepresentationPlyReaderDelegate.h"
 
@@ -33,6 +34,9 @@ public:
 	/// Constructor
 	/// \param fem The object that is updated when PlyReader::parseFile is called.
 	explicit Fem1DRepresentationPlyReaderDelegate(std::shared_ptr<Fem1DRepresentation> fem);
+
+protected:
+	virtual std::string getElementName() const override;
 
 	virtual bool registerDelegate(SurgSim::DataStructures::PlyReader* reader) override;
 	virtual bool fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader) override;

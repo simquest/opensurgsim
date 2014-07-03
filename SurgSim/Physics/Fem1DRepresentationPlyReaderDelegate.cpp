@@ -31,25 +31,14 @@ Fem1DRepresentationPlyReaderDelegate::Fem1DRepresentationPlyReaderDelegate(std::
 {
 }
 
+std::string Fem1DRepresentationPlyReaderDelegate::getElementName() const
+{
+	return "1d_element";
+}
+
 bool Fem1DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 {
 	FemRepresentationPlyReaderDelegate::registerDelegate(reader);
-
-	// 1D Element Processing
-	reader->requestElement(
-		"1d_element",
-		std::bind(&Fem1DRepresentationPlyReaderDelegate::beginFemElements,
-		this,
-		std::placeholders::_1,
-		std::placeholders::_2),
-		std::bind(&Fem1DRepresentationPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
-		std::bind(&Fem1DRepresentationPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
-	reader->requestListProperty("1d_element",
-		"vertex_indices",
-		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(ElementData, indices),
-		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(ElementData, vertexCount));
 
 	// Radius Processing
 	reader->requestElement(
@@ -58,45 +47,31 @@ bool Fem1DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		&Fem1DRepresentationPlyReaderDelegate::beginRadius, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
 		nullptr);
-	reader->requestScalarProperty("radius", "radius", PlyReader::TYPE_DOUBLE, 0);
+	reader->requestScalarProperty("radius", "value", PlyReader::TYPE_DOUBLE, 0);
 
 	return true;
 }
 
 bool Fem1DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
-	bool result = true;
+	bool result = FemRepresentationPlyReaderDelegate::fileIsAcceptable(reader);
 
-	// Shortcut test if one fails ...
-	result = result && reader.hasProperty("vertex", "x");
-	result = result && reader.hasProperty("vertex", "y");
-	result = result && reader.hasProperty("vertex", "z");
-
-	result = result && reader.hasProperty("1d_element", "vertex_indices");
-	result = result && !reader.isScalar("1d_element", "vertex_indices");
-
-	result = result && reader.hasProperty("radius", "radius");
-
-	result = result && reader.hasProperty("material", "mass_density");
-	result = result && reader.hasProperty("material", "poisson_ratio");
-	result = result && reader.hasProperty("material", "young_modulus");
-
-	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
+	result = result && reader.hasProperty("radius", "value");
 
 	return result;
 }
 
 void Fem1DRepresentationPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_femData.vertexCount == 2) << "Cannot process 1DElement with "
+	SURGSIM_ASSERT(m_femData.vertexCount == 2) << "Cannot process 1D Element with "
 											   << m_femData.vertexCount << " vertices.";
 
-	std::array<size_t, 2> triangleVertices;
-	std::copy(m_femData.indices, m_femData.indices + 2, triangleVertices.begin());
-	m_fem->addFemElement(std::make_shared<Fem1DElementBeam>(triangleVertices));
+	std::array<size_t, 2> fem1DVertices;
+	std::copy(m_femData.indices, m_femData.indices + 2, fem1DVertices.begin());
+	m_fem->addFemElement(std::make_shared<Fem1DElementBeam>(fem1DVertices));
 }
 
-void* Fem1DRepresentationPlyReaderDelegate::beginRadius(const std::string& elementName, size_t raidusCount)
+void* Fem1DRepresentationPlyReaderDelegate::beginRadius(const std::string& elementName, size_t radiusCount)
 {
 	return &m_radius;
 }

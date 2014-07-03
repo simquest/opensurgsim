@@ -50,6 +50,22 @@ bool FemRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, 1 * sizeof(m_vertexData[0]));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, 2 * sizeof(m_vertexData[0]));
 
+	// Element Processing
+	reader->requestElement(
+		getElementName(),
+		std::bind(&FemRepresentationPlyReaderDelegate::beginFemElements,
+		this,
+		std::placeholders::_1,
+		std::placeholders::_2),
+		std::bind(&FemRepresentationPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
+		std::bind(&FemRepresentationPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
+	reader->requestListProperty(getElementName(),
+		"vertex_indices",
+		PlyReader::TYPE_UNSIGNED_INT,
+		offsetof(ElementData, indices),
+		PlyReader::TYPE_UNSIGNED_INT,
+		offsetof(ElementData, vertexCount));
+
 	// Boundary Condition Processing
 	if (m_hasBoundaryConditions)
 	{
@@ -84,12 +100,33 @@ bool FemRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	return true;
 }
 
+bool FemRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
+{
+	bool result = true;
+
+	// Shortcut test if one fails ...
+	result = result && reader.hasProperty("vertex", "x");
+	result = result && reader.hasProperty("vertex", "y");
+	result = result && reader.hasProperty("vertex", "z");
+
+	result = result && reader.hasProperty(getElementName(), "vertex_indices");
+	result = result && !reader.isScalar(getElementName(), "vertex_indices");
+
+	result = result && reader.hasProperty("material", "mass_density");
+	result = result && reader.hasProperty("material", "poisson_ratio");
+	result = result && reader.hasProperty("material", "young_modulus");
+
+	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
+
+	return result;
+}
+
 void FemRepresentationPlyReaderDelegate::startParseFile()
 {
-	SURGSIM_ASSERT(nullptr != m_fem) << "The Representation cannot be nullptr.";
-	SURGSIM_ASSERT(0 == m_fem->getNumFemElements())
-		<< "The Representation already contains fem elements, so it cannot be initialized.";
-	SURGSIM_ASSERT(nullptr == m_fem->getInitialState()) << "The Representation's initial state must be uninitialized.";
+	SURGSIM_ASSERT(nullptr != m_fem) << "The FemRepresentation cannot be nullptr.";
+	SURGSIM_ASSERT(0 == m_fem->getNumFemElements()) <<
+		"The FemRepresentation already contains fem elements, so it cannot be initialized.";
+	SURGSIM_ASSERT(nullptr == m_fem->getInitialState()) << "The FemRepresentation already has an initial state";
 
 	m_state = std::make_shared<SurgSim::Math::OdeState>();
 }

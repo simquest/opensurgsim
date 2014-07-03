@@ -10,7 +10,7 @@ property list uint uint vertex_indices
 element boundary_condition 2
 property uint vertex_index
 element thickness 1
-property double thickness
+property double value
 element material 1
 property double mass_density
 property double poisson_ratio

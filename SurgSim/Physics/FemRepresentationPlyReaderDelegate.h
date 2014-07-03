@@ -43,7 +43,12 @@ public:
 	/// \param fem The object that is updated when PlyReader::parseFile is called.
 	explicit FemRepresentationPlyReaderDelegate(std::shared_ptr<FemRepresentation> fem);
 
+protected:
+	// \return Name of the element (1/2/3D), which this delegate processes.
+	virtual std::string getElementName() const = 0;
+
 	virtual bool registerDelegate(SurgSim::DataStructures::PlyReader* reader) override;
+	virtual bool fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader) override;
 
 	/// Callback for beginning of PlyReader::parseFile.
 	void startParseFile();
