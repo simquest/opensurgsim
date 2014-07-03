@@ -150,9 +150,9 @@ void VirtualToolCoupler::update(double dt)
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
 		Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
-		const Vector3d inputMassCenter = inputPose * -m_attachmentPoint;
+		const Vector3d inputPosition = inputPose * -m_attachmentPoint;
 
-		Vector3d force = m_linearStiffness * (inputMassCenter - objectPosition);
+		Vector3d force = m_linearStiffness * (inputPosition - objectPosition);
 		force += m_linearDamping * (inputLinearVelocity - objectState.getLinearVelocity());
 
 		Vector3d rotationVector;
@@ -170,8 +170,8 @@ void VirtualToolCoupler::update(double dt)
 
 		if (m_output != nullptr)
 		{
-			const Vector3d orientedAttachment = inputPose.rotation() * -m_attachmentPoint;
-			const Vector3d outputTorque = -torque - force.cross(orientedAttachment);
+			const Vector3d leverArm = inputPose.rotation() * -m_attachmentPoint;
+			const Vector3d outputTorque = -torque - force.cross(leverArm);
 
 			m_outputData.vectors().set(SurgSim::DataStructures::Names::FORCE, -force * m_outputForceScaling);
 			m_outputData.vectors().set(SurgSim::DataStructures::Names::TORQUE, outputTorque * m_outputTorqueScaling);
@@ -183,8 +183,8 @@ void VirtualToolCoupler::update(double dt)
 			Matrix66d springJacobian = Matrix66d::Zero();
 			Matrix33d outputLinearStiffnessMatrix = -linearStiffnessMatrix * m_outputForceScaling;
 			SurgSim::Math::setSubMatrix(outputLinearStiffnessMatrix, 0, 0, 3, 3, &springJacobian);
-			const Matrix33d skewAttachment = SurgSim::Math::makeSkewSymmetricMatrix(orientedAttachment);
-			const Matrix33d dTorqueDposition = -m_linearStiffness * m_outputTorqueScaling * skewAttachment;
+			const Matrix33d skewLeverArm = SurgSim::Math::makeSkewSymmetricMatrix(leverArm);
+			const Matrix33d dTorqueDposition = -m_linearStiffness * m_outputTorqueScaling * skewLeverArm;
 			SurgSim::Math::setSubMatrix(dTorqueDposition, 0, 1, 3, 3, &springJacobian);
 			Matrix33d outputAngularStiffnessMatrix = -angularStiffnessMatrix * m_outputTorqueScaling;
 			SurgSim::Math::setSubMatrix(outputAngularStiffnessMatrix, 1, 1, 3, 3, &springJacobian);
@@ -193,7 +193,7 @@ void VirtualToolCoupler::update(double dt)
 			Matrix66d damperJacobian = Matrix66d::Zero();
 			Matrix33d outputLinearDampingMatrix = -linearDampingMatrix * m_outputForceScaling;
 			SurgSim::Math::setSubMatrix(outputLinearDampingMatrix, 0, 0, 3, 3, &damperJacobian);
-			const Matrix33d dTorqueDvelocity = -m_linearDamping * m_outputTorqueScaling * skewAttachment;
+			const Matrix33d dTorqueDvelocity = -m_linearDamping * m_outputTorqueScaling * skewLeverArm;
 			SurgSim::Math::setSubMatrix(dTorqueDvelocity, 0, 1, 3, 3, &damperJacobian);
 			Matrix33d outputAngularDampingMatrix = -angularDampingMatrix * m_outputTorqueScaling;
 			SurgSim::Math::setSubMatrix(outputAngularDampingMatrix, 1, 1, 3, 3, &damperJacobian);
