@@ -32,8 +32,8 @@
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 using SurgSim::Math::Vector3d;
@@ -112,8 +112,7 @@ loadMesh(const std::string& fileName)
 	SurgSim::DataStructures::PlyReader reader(fileName);
 	auto delegate = std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
 
-	SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
+	SURGSIM_ASSERT(reader.parseWithDelegate(delegate)) << "The input file " << fileName << " is malformed.";
 
 	return delegate->getMesh();
 }
