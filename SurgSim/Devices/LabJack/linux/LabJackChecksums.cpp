@@ -19,10 +19,10 @@ namespace SurgSim
 {
 namespace Device
 {
-namespace LabJackChecksums
+namespace LabJack
 {
 
-unsigned char normalChecksum8(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes, int count)
+unsigned char normalChecksum8(const std::array<unsigned char, MAXIMUM_BUFFER>& bytes, int count)
 {
 	uint16_t accumulator = 0;
 
@@ -41,7 +41,7 @@ unsigned char normalChecksum8(const std::array<unsigned char, LABJACK_MAXIMUM_BU
 	return static_cast<unsigned char>((accumulator - 256 * quotient) + quotient);
 }
 
-uint16_t extendedChecksum16(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes, int count)
+uint16_t extendedChecksum16(const std::array<unsigned char, MAXIMUM_BUFFER>& bytes, int count)
 {
 	uint16_t accumulator = 0;
 
@@ -54,17 +54,17 @@ uint16_t extendedChecksum16(const std::array<unsigned char, LABJACK_MAXIMUM_BUFF
 	return accumulator;
 }
 
-unsigned char extendedChecksum8(const std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>& bytes)
+unsigned char extendedChecksum8(const std::array<unsigned char, MAXIMUM_BUFFER>& bytes)
 {
 	return normalChecksum8(bytes, 6);
 }
 
-void normalChecksum(std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>* bytes, int count)
+void normalChecksum(std::array<unsigned char, MAXIMUM_BUFFER>* bytes, int count)
 {
 	(*bytes)[0] = normalChecksum8(*bytes, count);
 }
 
-void extendedChecksum(std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>* bytes, int count)
+void extendedChecksum(std::array<unsigned char, MAXIMUM_BUFFER>* bytes, int count)
 {
 	uint16_t accumulator = extendedChecksum16(*bytes, count);
 	(*bytes)[4] = static_cast<unsigned char>(accumulator & 0xff);
@@ -72,6 +72,6 @@ void extendedChecksum(std::array<unsigned char, LABJACK_MAXIMUM_BUFFER>* bytes, 
 	(*bytes)[0] = extendedChecksum8(*bytes);
 }
 
-};  // namespace LabJackChecksums
+};  // namespace LabJack
 };  // namespace Device
 };  // namespace SurgSim
