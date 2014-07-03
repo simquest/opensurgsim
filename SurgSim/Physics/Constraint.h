@@ -93,6 +93,9 @@ public:
 		size_t indexOfRepresentation1,
 		size_t indexOfConstraint);
 
+	/// \return Whether this constraint is active.
+	bool isActive();
+
 private:
 	/// Specific data associated to this constraint
 	std::shared_ptr<ConstraintData> m_data;

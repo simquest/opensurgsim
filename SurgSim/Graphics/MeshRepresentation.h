@@ -45,8 +45,6 @@ public:
 	explicit MeshRepresentation(const std::string& name) : Representation(name)
 	{
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, std::string, Filename, getFilename, setFilename);
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, bool, DrawAsWireFrame,
-										  getDrawAsWireFrame, setDrawAsWireFrame);
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, int, UpdateOptions, getUpdateOptions, setUpdateOptions);
 	}
 
@@ -67,14 +65,6 @@ public:
 	/// Get the file name of the external file which contains the triangle mesh.
 	/// \return File name of the external file which contains the triangle mesh.
 	virtual std::string getFilename() const = 0;
-
-	/// Sets the mesh to render as a wire frame.
-	/// \param	val	true if this mesh should be rendered as a wireframe.
-	virtual void setDrawAsWireFrame(bool val) = 0;
-
-	/// Return if the mesh is rendered as a wire frame.
-	/// \return	True if this mesh is rendered as a wireframe; false if not.
-	virtual bool getDrawAsWireFrame() const = 0;
 
 	/// Sets the structures that are expected to change during the lifetime of the mesh, these will be updated
 	/// every frame, independent of a structural change in the mesh. UPDATE_OPTION_VERTICES is set in the constructor

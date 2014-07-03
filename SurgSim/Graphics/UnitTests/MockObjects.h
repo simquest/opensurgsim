@@ -143,7 +143,8 @@ public:
 		m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isInitialized(false),
-		m_isAwoken(false)
+		m_isAwoken(false),
+		m_drawAsWireFrame(false)
 	{
 		m_transform.setIdentity();
 	}
@@ -213,6 +214,16 @@ public:
 	{
 	}
 
+	virtual void setDrawAsWireFrame(bool val)
+	{
+		m_drawAsWireFrame = val;
+	}
+
+	virtual bool getDrawAsWireFrame() const
+	{
+		return m_drawAsWireFrame;
+	}
+
 private:
 	/// Initializes the representation
 	/// \post m_isInitialized is set to true
@@ -241,6 +252,9 @@ private:
 	bool m_isInitialized;
 	/// Whether the representation has been awoken
 	bool m_isAwoken;
+
+	/// Indicates if the representation is rendered as a wireframe.
+	bool m_drawAsWireFrame;
 
 	/// Rigid transform describing pose of the representation
 	SurgSim::Math::RigidTransform3d m_transform;
@@ -363,6 +377,15 @@ public:
 	/// Removes the material from the representation
 	virtual void clearMaterial()
 	{
+	}
+
+	virtual void setDrawAsWireFrame(bool val)
+	{
+	}
+
+	virtual bool getDrawAsWireFrame() const
+	{
+		return false;
 	}
 
 	virtual bool setColorRenderTexture(std::shared_ptr<SurgSim::Graphics::Texture> texture)

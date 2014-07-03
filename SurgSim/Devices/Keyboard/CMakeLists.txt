@@ -39,9 +39,9 @@ surgsim_add_library(
 	SurgSim/Devices/Keyboard
 )
 
-set(LIBS ${LIBS} 
-		 SurgSimInput
-		 ${Boost_LIBRARIES}
+set(LIBS
+	SurgSimInput
+	${Boost_LIBRARIES}
 )
 
 target_link_libraries(KeyboardDevice ${LIBS}

@@ -46,6 +46,8 @@ namespace Graphics
 class OsgCamera;
 class OsgTrackballZoomManipulator;
 
+SURGSIM_STATIC_REGISTRATION(OsgView);
+
 /// OSG-based implementation of graphics view class.
 ///
 /// A Graphics::OsgView wraps a osgViewer::View to provide a visualization of the scene to the user.
@@ -65,6 +67,7 @@ public:
 	/// Destructor
 	~OsgView();
 
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgView);
 
 	virtual void setPosition(const std::array<int, 2>& position) override;
 
@@ -89,11 +92,28 @@ public:
 	/// \param val whether to enable the manipulator or not.
 	void enableManipulator(bool val);
 
+	/// \return whether the manipulator is enabled or not.
+	bool isManipulatorEnabled();
+
 	/// As the camera is not accessible from here and as it cannot be controlled from the outside
 	/// any more we let the user set the parameters from here.
 	/// \param	position	The position of the camera.
 	/// \param	lookat  	The location the camera looks at.
 	void setManipulatorParameters(SurgSim::Math::Vector3d position, SurgSim::Math::Vector3d lookat);
+
+	/// Set the camera manipulator position.
+	/// \param position The position of the camera.
+	void setManipulatorPosition(SurgSim::Math::Vector3d position);
+
+	/// \return The position of the camera.
+	SurgSim::Math::Vector3d getManipulatorPosition();
+
+	/// Set the camera manipulator lookAt.
+	/// \param lookAt The location the camera looks at.
+	void setManipulatorLookAt(SurgSim::Math::Vector3d lookAt);
+
+	/// \return The location the camera looks at.
+	SurgSim::Math::Vector3d getManipulatorLookAt();
 
 	/// Enable osg modelview uniforms mapping, in this mode osg replaces the gl builtins with osg_* names, for
 	/// uniforms and vertex attributes
@@ -103,7 +123,6 @@ public:
 	/// \return the state of the osg modelview mapping mode.
 	bool getOsgMapsUniforms();
 
-
 	/// Return the keyboard to be used with this view.
 	/// \return A keyboard device
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice();
@@ -112,6 +131,9 @@ public:
 	/// \param val Indicate whether or not to use keyboard device
 	virtual void enableKeyboardDevice(bool val);
 
+	/// \return Whether the keyboard device is enabled.
+	bool isKeyboardDeviceEnabled();
+
 	/// Return the mouse to be used with this view.
 	/// \return A mouse device
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice();
@@ -119,6 +141,9 @@ public:
 	/// Turn on/off the mouse device to be used.
 	/// \param val Indicate whether or not to use mouse device
 	virtual	void enableMouseDevice(bool val);
+
+	/// \return Whether the mouse device is enabled.
+	bool isMouseDeviceEnabled();
 
 	virtual void update(double dt) override;
 
