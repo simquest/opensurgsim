@@ -172,7 +172,7 @@ void VirtualToolCoupler::update(double dt)
 
 		if (m_output != nullptr)
 		{
-			const Vector3d leverArm = inputPose.rotation() * attachmentPointToMassCenter;
+			const Vector3d leverArm = inputPose.linear() * attachmentPointToMassCenter;
 			const Vector3d outputTorque = -torque - force.cross(leverArm);
 
 			m_outputData.vectors().set(SurgSim::DataStructures::Names::FORCE, -force * m_outputForceScaling);
