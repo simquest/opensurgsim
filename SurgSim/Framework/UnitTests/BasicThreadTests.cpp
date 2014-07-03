@@ -151,6 +151,68 @@ TEST(BasicThreadTest, SynchronousThread)
 	m.stop();
 }
 
+TEST(BasicThreadTest, PauseResumeUpdateTest)
+{
+	MockThread m(100000000);
+	int previousCount = m.count;
+	std::shared_ptr<Barrier> barrier = std::make_shared<Barrier>(2);
+
+	EXPECT_EQ(100000000, m.count);
+	EXPECT_FALSE(m.didInitialize);
+	EXPECT_FALSE(m.didStartUp);
+	EXPECT_FALSE(m.isRunning());
+	EXPECT_FALSE(m.isSynchronous());
+	EXPECT_TRUE(m.isCallingUpdate());
+
+	m.start(barrier, true);
+
+	// Run through the initialization
+	barrier->wait(true);
+	barrier->wait(true);
+	barrier->wait(true);
+
+	EXPECT_TRUE(m.isRunning());
+	EXPECT_TRUE(m.isSynchronous());
+	EXPECT_TRUE(m.isCallingUpdate());
+
+	for (int i = 0; i < 10; i++)
+	{
+		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+		EXPECT_LT(m.count, previousCount);
+		previousCount = m.count;
+		barrier->wait(true);
+	}
+
+	m.pauseUpdateCall();
+
+	EXPECT_FALSE(m.isCallingUpdate());
+
+	barrier->wait(true);
+	previousCount = m.count;
+
+	for (int i = 0; i < 10; i++)
+	{
+		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+		EXPECT_EQ(previousCount, m.count);
+		previousCount = m.count;
+		barrier->wait(true);
+	}
+
+	m.resumeUpdateCall();
+
+	for (int i = 0; i < 10; i++)
+	{
+		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+		EXPECT_LT(m.count, previousCount);
+		previousCount = m.count;
+		barrier->wait(true);
+	}
+
+	barrier->wait(false);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+	m.stop();
+}
+
 TEST(BasicThreadTest, SwitchSyncOnThread)
 {
 	MockThread m(-1);

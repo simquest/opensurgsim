@@ -31,6 +31,7 @@ namespace Framework
 BasicThread::BasicThread(const std::string& name) :
 	m_name(name),
 	m_period(1.0 / 30),
+	m_isCallingUpdate(true),
 	m_isInitialized(false),
 	m_isRunning(false),
 	m_stopExecution(false),
@@ -118,7 +119,10 @@ void BasicThread::operator()()
 				boost::this_thread::sleep_until(Clock::now() + sleepTime);
 			}
 			start = Clock::now();
-			m_isRunning = doUpdate(m_period.count());
+			if (m_isCallingUpdate)
+			{
+				m_isRunning = doUpdate(m_period.count());
+			}
 			frameTime = Clock::now() - start;
 		}
 		else
@@ -128,7 +132,7 @@ void BasicThread::operator()()
 			// all the threads that are waiting to indefinitely wait as there is one less thread on the barrier
 			// #threadsafety
 			bool success = waitForBarrier(true);
-			if (success)
+			if (success && m_isCallingUpdate)
 			{
 				m_isRunning = doUpdate(m_period.count());
 			}
@@ -167,6 +171,21 @@ void BasicThread::stop()
 		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Thread " << getName() <<
 				" is in synchronouse mode, stop with a barrier->wait(false).";
 	}
+}
+
+void BasicThread::pauseUpdateCall()
+{
+	m_isCallingUpdate = false;
+}
+
+void BasicThread::resumeUpdateCall()
+{
+	m_isCallingUpdate = true;
+}
+
+bool BasicThread::isCallingUpdate()
+{
+	return m_isCallingUpdate;
 }
 
 std::string BasicThread::getName() const

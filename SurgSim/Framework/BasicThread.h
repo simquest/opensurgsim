@@ -72,6 +72,16 @@ public:
 	/// 	  by going back to asynchronous mode and then calling stop
 	void stop();
 
+	/// Pause the doUpdate calls.
+	void pauseUpdateCall();
+
+	/// Resume the doUpdate calls.
+	void resumeUpdateCall();
+
+	/// Query if this object is calling the doUpdate method or not in its loop.
+	/// \return	true if the method doUpdate is being called, false otherwise.
+	bool isCallingUpdate();
+
 	/// Query if this object is initialized.
 	/// \return	true if initialized, false if not.
 	bool isInitialized();
@@ -135,6 +145,7 @@ private:
 	boost::chrono::duration<double> m_period;
 	std::shared_ptr<Barrier> m_startupBarrier;
 
+	bool m_isCallingUpdate;
 	bool m_isInitialized;
 	bool m_isRunning;
 	bool m_stopExecution;
