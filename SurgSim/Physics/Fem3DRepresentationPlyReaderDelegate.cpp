@@ -16,6 +16,7 @@
 #include <array>
 
 #include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
@@ -39,12 +40,21 @@ std::string Fem3DRepresentationPlyReaderDelegate::getElementName() const
 
 void Fem3DRepresentationPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_femData.vertexCount == 4) << "Cannot process 3D element with "
-											   << m_femData.vertexCount << " vertices.";
+	SURGSIM_ASSERT(4== m_femData.vertexCount || 8 == m_femData.vertexCount) <<
+		"Cannot process 3D element with " << m_femData.vertexCount << " vertices.";
 
-	std::array<size_t, 4> fem3DVertices;
-	std::copy(m_femData.indices, m_femData.indices + 4, fem3DVertices.begin());
-	m_fem->addFemElement(std::make_shared<Fem3DElementTetrahedron>(fem3DVertices));
+	if (4 == m_femData.vertexCount)
+	{
+		std::array<size_t, 4> fem3DVertices;
+		std::copy(m_femData.indices, m_femData.indices + 4, fem3DVertices.begin());
+		m_fem->addFemElement(std::make_shared<Fem3DElementTetrahedron>(fem3DVertices));
+	}
+	else
+	{
+		std::array<size_t, 8> fem3DVertices;
+		std::copy(m_femData.indices, m_femData.indices + 8, fem3DVertices.begin());
+		m_fem->addFemElement(std::make_shared<Fem3DElementCube>(fem3DVertices));
+	}
 }
 
 }; // namespace Physics

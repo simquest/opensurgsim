@@ -50,8 +50,7 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	PlyReader reader(path);
 	auto delegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(fem);
 
-	ASSERT_TRUE(reader.setDelegate(delegate));
-	ASSERT_NO_THROW(reader.parseFile());
+	ASSERT_TRUE(reader.parseWithDelegate(delegate));
 
 	// Vertices
 	ASSERT_EQ(3u, fem->getNumDofPerNode());
@@ -67,19 +66,17 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	ASSERT_EQ(12u, fem->getNumFemElements());
 
 	std::array<size_t, 4> tetrahedron0 = {0, 1, 2, 3};
-	std::array<size_t, 4> tetrahedron11 = {10, 25, 11, 9};
+	std::array<size_t, 4> tetrahedron2 = {10, 25, 11, 9};
 
-	EXPECT_TRUE(std::equal(
-					std::begin(tetrahedron0), std::end(tetrahedron0),
-					std::begin(fem->getFemElement(0)->getNodeIds())));
-	EXPECT_TRUE(std::equal(
-					std::begin(tetrahedron11), std::end(tetrahedron11),
-					std::begin(fem->getFemElement(11)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(tetrahedron0), std::end(tetrahedron0),
+						   std::begin(fem->getFemElement(0)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(tetrahedron2), std::end(tetrahedron2),
+						   std::begin(fem->getFemElement(11)->getNodeIds())));
 
 	// Boundary conditions
 	ASSERT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
 
-	// Boundary condition 0 is on node 8, this
+	// Boundary condition 0 is on node 8
 	size_t boundaryNode0 = 8;
 	size_t boundaryNode7 = 11;
 
@@ -101,6 +98,61 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	EXPECT_DOUBLE_EQ(0.472, fem8->getYoungModulus());
 }
 
-}
+TEST(Fem3DRepresentationReaderTests, Fem3DCubePlyReadTest)
+{
+	auto fem = std::make_shared<Fem3DRepresentation>("Representation");
+
+	std::string path = findFile("PlyReaderTests/Fem3DCube.ply");
+	ASSERT_TRUE(!path.empty());
+	PlyReader reader(path);
+	auto delegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(fem);
+
+	ASSERT_TRUE(reader.parseWithDelegate(delegate));
+
+	// Vertices
+	ASSERT_EQ(3u, fem->getNumDofPerNode());
+	ASSERT_EQ(3u * 10u, fem->getNumDof());
+
+	Vector3d vertex0(1.0, 1.0, 1.0);
+	Vector3d vertex5(2.0, 2.0, 2.0);
+
+	EXPECT_TRUE(vertex0.isApprox(fem->getInitialState()->getPosition(0)));
+	EXPECT_TRUE(vertex5.isApprox(fem->getInitialState()->getPosition(5)));
+
+	// Cubes
+	ASSERT_EQ(3u, fem->getNumFemElements());
+
+	std::array<size_t, 8> cube0 = {0, 1, 2, 3, 4, 5, 6, 7};
+	std::array<size_t, 8> cube2 = {3, 4, 5, 0, 2, 6, 8, 7};
+
+	EXPECT_TRUE(std::equal(std::begin(cube0), std::end(cube0), std::begin(fem->getFemElement(0)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(cube2), std::end(cube2), std::begin(fem->getFemElement(2)->getNodeIds())));
+
+	// Boundary conditions
+	ASSERT_EQ(3u* 2u, fem->getInitialState()->getNumBoundaryConditions());
+
+	// Boundary condition 0 is on node 9
+	size_t boundaryNode0 = 9;
+	size_t boundaryNode1 = 5;
+
+	EXPECT_EQ(3 * boundaryNode0, fem->getInitialState()->getBoundaryConditions().at(0));
+	EXPECT_EQ(3 * boundaryNode0 + 1, fem->getInitialState()->getBoundaryConditions().at(1));
+	EXPECT_EQ(3 * boundaryNode0 + 2, fem->getInitialState()->getBoundaryConditions().at(2));
+	EXPECT_EQ(3 * boundaryNode1, fem->getInitialState()->getBoundaryConditions().at(3));
+	EXPECT_EQ(3 * boundaryNode1 + 1, fem->getInitialState()->getBoundaryConditions().at(4));
+	EXPECT_EQ(3 * boundaryNode1 + 2, fem->getInitialState()->getBoundaryConditions().at(5));
+
+	// Material
+	auto fem2 = fem->getFemElement(2);
+	EXPECT_DOUBLE_EQ(0.2, fem2->getMassDensity());
+	EXPECT_DOUBLE_EQ(0.3, fem2->getPoissonRatio());
+	EXPECT_DOUBLE_EQ(0.4, fem2->getYoungModulus());
+
+	auto fem1 = fem->getFemElement(1);
+	EXPECT_DOUBLE_EQ(0.2, fem1->getMassDensity());
+	EXPECT_DOUBLE_EQ(0.3, fem1->getPoissonRatio());
+	EXPECT_DOUBLE_EQ(0.4, fem1->getYoungModulus());
 }
 
+} // Physics
+} // SurgSim
