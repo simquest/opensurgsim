@@ -85,19 +85,10 @@ bool FemRepresentation::loadFile()
 			result = false;
 		}
 
-		if (result)
+		if (result && !reader->parseWithDelegate(getDelegate()))
 		{
-			auto delegate = getDelegate();
-			if (reader->setDelegate(delegate))
-			{
-				// PlyReader::parseFile loads the fem into the shared_ptr passed to the readerDelegate constructor.
-				reader->parseFile();
-			}
-			else
-			{
-				SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Failed to load file " << m_filename;
-				result = false;
-			}
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Failed to load file " << m_filename;
+			result = false;
 		}
 		m_doLoadFile = false;
 	}

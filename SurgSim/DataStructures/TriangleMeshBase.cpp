@@ -31,9 +31,8 @@ std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadTriangleM
 	PlyReader reader(fileName);
 	if (reader.isValid())
 	{
-		SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) <<
+		SURGSIM_ASSERT(reader.parseWithDelegate(triangleMeshDelegate)) <<
 			"The input file " << fileName << " does not have the property required by triangle mesh.";
-		reader.parseFile();
 	}
 
 	return triangleMeshDelegate->getMesh();

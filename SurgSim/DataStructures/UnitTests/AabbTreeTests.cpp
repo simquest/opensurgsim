@@ -43,8 +43,7 @@ SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData, SurgSim:
 	auto triangleMeshDelegate = std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
 
 	SurgSim::DataStructures::PlyReader reader(fileName);
-	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
+	SURGSIM_ASSERT(reader.parseWithDelegate(triangleMeshDelegate)) << "The input file " << fileName << " is malformed.";
 
 	return triangleMeshDelegate->getMesh();
 }

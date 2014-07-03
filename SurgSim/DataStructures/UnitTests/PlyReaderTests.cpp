@@ -23,14 +23,14 @@
 using SurgSim::Math::Vector3d;
 
 namespace {
-	std::string findFile(std::string filename)
-	{
-		std::vector<std::string> paths;
-		paths.push_back("Data/PlyReaderTests");
-		SurgSim::Framework::ApplicationData data(paths);
+std::string findFile(std::string filename)
+{
+	std::vector<std::string> paths;
+	paths.push_back("Data/PlyReaderTests");
+	SurgSim::Framework::ApplicationData data(paths);
 
-		return data.findFile(filename);
-	}
+	return data.findFile(filename);
+}
 }
 
 namespace SurgSim
@@ -38,7 +38,21 @@ namespace SurgSim
 namespace DataStructures
 {
 
-TEST(PlyReaderTests, InitTest)
+class PlyReaderTests : public ::testing::Test
+{
+public:
+	bool setDelegate(PlyReader* reader, std::shared_ptr<PlyReaderDelegate> delegate)
+	{
+		return reader->setDelegate(delegate);
+	}
+
+	void parseFile(PlyReader* reader)
+	{
+		reader->parseFile();
+	}
+};
+
+TEST_F(PlyReaderTests, InitTest)
 {
 	ASSERT_NO_THROW(PlyReader("xxx"));
 	ASSERT_NO_THROW(PlyReader(findFile("Cube.ply")));
@@ -50,7 +64,7 @@ TEST(PlyReaderTests, InitTest)
 	EXPECT_FALSE(reader2.isValid());
 }
 
-TEST(PlyReaderTests, FindElementsAndProperties)
+TEST_F(PlyReaderTests, FindElementsAndProperties)
 {
 	PlyReader reader(findFile("Cube.ply"));
 
@@ -65,7 +79,7 @@ TEST(PlyReaderTests, FindElementsAndProperties)
 	EXPECT_FALSE(reader.hasProperty("vertex", "vertex_indices"));
 }
 
-TEST(PlyReaderTests, IsScalar)
+TEST_F(PlyReaderTests, IsScalar)
 {
 	PlyReader reader(findFile("Testdata.ply"));
 
@@ -155,7 +169,7 @@ public:
 
 };
 
-TEST(PlyReaderTests, ScalarReadTest)
+TEST_F(PlyReaderTests, ScalarReadTest)
 {
 	TestData testData;
 	PlyReader reader(findFile("Testdata.ply"));
@@ -180,7 +194,7 @@ TEST(PlyReaderTests, ScalarReadTest)
 	EXPECT_TRUE(reader.requestScalarProperty(
 		"vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, z)));
 
-	ASSERT_NO_THROW(reader.parseFile());
+	ASSERT_NO_THROW(parseFile(&reader));
 	EXPECT_EQ(0L, testData.vertexData.overrun);
 	EXPECT_EQ(4, testData.vertexInitCount);
 	EXPECT_EQ(4, testData.vertexRunningCount);
@@ -197,7 +211,7 @@ TEST(PlyReaderTests, ScalarReadTest)
 }
 
 
-TEST(PlyReaderTests, ListReadTest)
+TEST_F(PlyReaderTests, ListReadTest)
 {
 	TestData testData;
 	PlyReader reader(findFile("Testdata.ply"));
@@ -213,7 +227,7 @@ TEST(PlyReaderTests, ListReadTest)
 	EXPECT_TRUE(reader.requestScalarProperty(
 		"face", "extra", PlyReader::TYPE_INT, offsetof(TestData::FaceData, extra)));
 
-	ASSERT_NO_THROW(reader.parseFile());
+	ASSERT_NO_THROW(parseFile(&reader));
 	EXPECT_EQ(0L, testData.faceData.overrun);
 	EXPECT_EQ(4, testData.faceInitCount);
 	EXPECT_EQ(4, testData.faceRunningCount);
@@ -236,33 +250,57 @@ TEST(PlyReaderTests, ListReadTest)
 	}
 }
 
-TEST(PlyReaderTests, TriangleMeshDelegateTest)
+TEST_F(PlyReaderTests, TriangleMeshDelegateTest)
 {
-	PlyReader reader(findFile("Cube.ply"));
-	auto delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
+	{
+		PlyReader reader(findFile("Cube.ply"));
+		auto delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
 
-	EXPECT_TRUE(reader.setDelegate(delegate));
-	EXPECT_NO_THROW(reader.parseFile());
+		EXPECT_TRUE(setDelegate(&reader, delegate));
+		EXPECT_NO_THROW(parseFile(&reader));
 
-	auto mesh = delegate->getMesh();
-	EXPECT_EQ(26u, mesh->getNumVertices());
-	EXPECT_EQ(12u, mesh->getNumTriangles());
+		auto mesh = delegate->getMesh();
+		EXPECT_EQ(26u, mesh->getNumVertices());
+		EXPECT_EQ(12u, mesh->getNumTriangles());
 
-	// The first and last vertices from the file
-	Vector3d vertex0(1.0, 1.0, -1.0);
-	Vector3d vertex25(-1.0, -1.0, 1.0);
+		// The first and last vertices from the file
+		Vector3d vertex0(1.0, 1.0, -1.0);
+		Vector3d vertex25(-1.0, -1.0, 1.0);
 
-	EXPECT_TRUE(vertex0.isApprox(mesh->getVertex(0).position));
-	EXPECT_TRUE(vertex25.isApprox(mesh->getVertex(25).position));
+		EXPECT_TRUE(vertex0.isApprox(mesh->getVertex(0).position));
+		EXPECT_TRUE(vertex25.isApprox(mesh->getVertex(25).position));
 
-	std::array<size_t, 3> triangle0 = {0, 1, 2};
-	std::array<size_t, 3> triangle11 = {10, 25, 11};
+		std::array<size_t, 3> triangle0 = {0, 1, 2};
+		std::array<size_t, 3> triangle11 = {10, 25, 11};
 
-	EXPECT_EQ(triangle0, mesh->getTriangle(0).verticesId);
-	EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);
+		EXPECT_EQ(triangle0, mesh->getTriangle(0).verticesId);
+		EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);
+	}
+
+	{
+		PlyReader reader(findFile("Cube.ply"));
+		auto delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
+
+		EXPECT_NO_THROW(EXPECT_TRUE(reader.parseWithDelegate(delegate)));
+
+		auto mesh = delegate->getMesh();
+		EXPECT_EQ(26u, mesh->getNumVertices());
+		EXPECT_EQ(12u, mesh->getNumTriangles());
+
+		// The first and last vertices from the file
+		Vector3d vertex0(1.0, 1.0, -1.0);
+		Vector3d vertex25(-1.0, -1.0, 1.0);
+
+		EXPECT_TRUE(vertex0.isApprox(mesh->getVertex(0).position));
+		EXPECT_TRUE(vertex25.isApprox(mesh->getVertex(25).position));
+
+		std::array<size_t, 3> triangle0 = {0, 1, 2};
+		std::array<size_t, 3> triangle11 = {10, 25, 11};
+
+		EXPECT_EQ(triangle0, mesh->getTriangle(0).verticesId);
+		EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);
+	}
 }
 
-
-}
-}
-
+} // DataStructures
+} // SurgSim
