@@ -91,7 +91,7 @@ void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 
 std::shared_ptr<FemRepresentationPlyReaderDelegate> Fem1DRepresentation::getDelegate()
 {
-	auto thisAsSharedPtr = std::static_pointer_cast<Fem1DRepresentation>(getSharedPtr());
+	auto thisAsSharedPtr = std::static_pointer_cast<Fem1DRepresentation>(shared_from_this());
 	auto readerDelegate = std::make_shared<Fem1DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
 
 	return readerDelegate;

@@ -82,7 +82,7 @@ RepresentationType Fem3DRepresentation::getType() const
 
 std::shared_ptr<FemRepresentationPlyReaderDelegate> Fem3DRepresentation::getDelegate()
 {
-	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
+	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(shared_from_this());
 	auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
 
 	return readerDelegate;
