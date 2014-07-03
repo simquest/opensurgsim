@@ -182,23 +182,25 @@ void VirtualToolCoupler::update(double dt)
 
 			m_outputData.poses().set(SurgSim::DataStructures::Names::INPUT_POSE, inputPose);
 
-			Matrix66d springJacobian = Matrix66d::Zero();
+			Matrix66d springJacobian;
 			Matrix33d outputLinearStiffnessMatrix = -linearStiffnessMatrix * m_outputForceScaling;
-			SurgSim::Math::setSubMatrix(outputLinearStiffnessMatrix, 0, 0, 3, 3, &springJacobian);
+			springJacobian.block<3, 3>(0, 0) = outputLinearStiffnessMatrix;
+			springJacobian.block<3, 3>(0, 3) = Matrix33d::Zero();
 			const Matrix33d skewLeverArm = SurgSim::Math::makeSkewSymmetricMatrix(leverArm);
 			const Matrix33d dTorqueDposition = -m_linearStiffness * m_outputTorqueScaling * skewLeverArm;
-			SurgSim::Math::setSubMatrix(dTorqueDposition, 0, 1, 3, 3, &springJacobian);
+			springJacobian.block<3, 3>(3, 0) = dTorqueDposition;
 			Matrix33d outputAngularStiffnessMatrix = -angularStiffnessMatrix * m_outputTorqueScaling;
-			SurgSim::Math::setSubMatrix(outputAngularStiffnessMatrix, 1, 1, 3, 3, &springJacobian);
+			springJacobian.block<3, 3>(3, 3) = outputAngularStiffnessMatrix;
 			m_outputData.matrices().set(SurgSim::DataStructures::Names::SPRING_JACOBIAN, springJacobian);
 
-			Matrix66d damperJacobian = Matrix66d::Zero();
+			Matrix66d damperJacobian;
 			Matrix33d outputLinearDampingMatrix = -linearDampingMatrix * m_outputForceScaling;
-			SurgSim::Math::setSubMatrix(outputLinearDampingMatrix, 0, 0, 3, 3, &damperJacobian);
+			damperJacobian.block<3, 3>(0, 0) = outputLinearDampingMatrix;
+			damperJacobian.block<3, 3>(0, 3) = Matrix33d::Zero();
 			const Matrix33d dTorqueDvelocity = -m_linearDamping * m_outputTorqueScaling * skewLeverArm;
-			SurgSim::Math::setSubMatrix(dTorqueDvelocity, 0, 1, 3, 3, &damperJacobian);
+			damperJacobian.block<3, 3>(3, 0) = dTorqueDvelocity;
 			Matrix33d outputAngularDampingMatrix = -angularDampingMatrix * m_outputTorqueScaling;
-			SurgSim::Math::setSubMatrix(outputAngularDampingMatrix, 1, 1, 3, 3, &damperJacobian);
+			damperJacobian.block<3, 3>(3, 3) = outputAngularDampingMatrix;
 			m_outputData.matrices().set(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, damperJacobian);
 
 			m_output->setData(m_outputData);
