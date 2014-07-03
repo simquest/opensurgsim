@@ -90,6 +90,10 @@ protected:
 	/// \return memory for material data to the reader.
 	void* beginMaterials(const std::string& elementName, size_t materialCount);
 
+	/// Callback function, end the processing of materials.
+	/// \param elementName Name of the element.
+	void endMaterials(const std::string& elementName);
+
 	/// Callback function, begin the processing of boundary conditions.
 	/// \param elementName Name of the element.
 	/// \param boundaryConditionCount Number of boundary conditions.
@@ -125,6 +129,7 @@ protected:
 		double massDensity;
 		double poissonRatio;
 		double youngModulus;
+		int64_t overrun; ///< Used to check for buffer overruns
 	} m_materialData;
 
 	/// Internal data to receive the fem element
@@ -134,6 +139,7 @@ protected:
 
 		unsigned int* indices;
 		unsigned int vertexCount;
+		int64_t overrun; ///< Used to check for buffer overruns
 	} m_femData;
 };
 

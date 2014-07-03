@@ -87,7 +87,7 @@ bool FemPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		std::bind(
 		&FemPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
-		nullptr);
+		std::bind(&FemPlyReaderDelegate::endMaterials, this, std::placeholders::_1));
 	reader->requestScalarProperty(
 		"material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, massDensity));
 	reader->requestScalarProperty(
@@ -165,17 +165,29 @@ void FemPlyReaderDelegate::endVertices(const std::string& elementName)
 
 void* FemPlyReaderDelegate::beginFemElements(const std::string& elementName, size_t elementCount)
 {
+	m_femData.overrun = 0l;
 	return &m_femData;
 }
 
 void FemPlyReaderDelegate::endFemElements(const std::string& elementName)
 {
+	SURGSIM_ASSERT(m_femData.overrun == 0) <<
+		"There was an overrun while reading the element structures, it is likely that data " <<
+		"has become corrupted.";
 	m_femData.indices = nullptr;
 }
 
 void* FemPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)
 {
+	m_materialData.overrun = 0l;
 	return &m_materialData;
+}
+
+void FemPlyReaderDelegate::endMaterials(const std::string& elementName)
+{
+	SURGSIM_ASSERT(m_materialData.overrun == 0) <<
+		"There was an overrun while reading the material structures, it is likely that data " <<
+		"has become corrupted.";
 }
 
 void* FemPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
