@@ -223,7 +223,7 @@ private:
 	/// The DataGroup to output
 	SurgSim::DataStructures::DataGroup m_outputData;
 
-	/// The local-space vector from the tool's center of mass to the input's point of attachment.
+	/// The input's point of attachment in the local frame, i.e., the same frame in which the mass center is defined.
 	SurgSim::Math::Vector3d m_attachmentPoint;
 };
 

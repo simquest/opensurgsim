@@ -149,8 +149,10 @@ void VirtualToolCoupler::update(double dt)
 
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
-		Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
-		const Vector3d inputPosition = inputPose * -m_attachmentPoint;
+		const Vector3d& massCenter = m_rigid->getCurrentParameters().getMassCenter();
+		const Vector3d objectPosition = objectPose * massCenter;
+		const Vector3d attachmentPointToMassCenter = massCenter - m_attachmentPoint;
+		const Vector3d inputPosition = inputPose * attachmentPointToMassCenter;
 
 		Vector3d force = m_linearStiffness * (inputPosition - objectPosition);
 		force += m_linearDamping * (inputLinearVelocity - objectState.getLinearVelocity());
@@ -170,7 +172,7 @@ void VirtualToolCoupler::update(double dt)
 
 		if (m_output != nullptr)
 		{
-			const Vector3d leverArm = inputPose.rotation() * -m_attachmentPoint;
+			const Vector3d leverArm = inputPose.rotation() * attachmentPointToMassCenter;
 			const Vector3d outputTorque = -torque - force.cross(leverArm);
 
 			m_outputData.vectors().set(SurgSim::DataStructures::Names::FORCE, -force * m_outputForceScaling);
