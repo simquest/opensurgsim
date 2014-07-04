@@ -331,31 +331,37 @@ TEST_F(VirtualToolCouplerTest, GetRigid)
 }
 
 typedef SurgSim::DataStructures::OptionalValue<double> OptionalValued;
+typedef SurgSim::DataStructures::OptionalValue<Vector3d> OptionalValueVec3;
 
 TEST_F(VirtualToolCouplerTest, OptionalParams)
 {
 	double num = 2.56527676;
+	Vector3d vec(1.0, 2.0, 3.0);
 	{
 		SCOPED_TRACE("Getters");
 		virtualToolCoupler->overrideLinearStiffness(num);
 		virtualToolCoupler->overrideLinearDamping(num);
 		virtualToolCoupler->overrideAngularStiffness(num);
 		virtualToolCoupler->overrideAngularDamping(num);
+		virtualToolCoupler->overrideAttachmentPoint(vec);
 
 		const OptionalValued& linearStiffness = virtualToolCoupler->getOptionalLinearStiffness();
 		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
 		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
 		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
+		const OptionalValueVec3& attachmentPoint = virtualToolCoupler->getOptionalAttachmentPoint();
 
 		EXPECT_TRUE(linearStiffness.hasValue());
 		EXPECT_TRUE(linearDamping.hasValue());
 		EXPECT_TRUE(angularStiffness.hasValue());
 		EXPECT_TRUE(angularDamping.hasValue());
+		EXPECT_TRUE(attachmentPoint.hasValue());
 
 		EXPECT_EQ(num, linearStiffness.getValue());
 		EXPECT_EQ(num, linearDamping.getValue());
 		EXPECT_EQ(num, angularStiffness.getValue());
 		EXPECT_EQ(num, angularDamping.getValue());
+		EXPECT_TRUE(vec.isApprox(attachmentPoint.getValue()));
 	}
 	{
 		SCOPED_TRACE("Setters");
@@ -363,62 +369,54 @@ TEST_F(VirtualToolCouplerTest, OptionalParams)
 		virtualToolCoupler->overrideLinearDamping(0.0);
 		virtualToolCoupler->overrideAngularStiffness(0.0);
 		virtualToolCoupler->overrideAngularDamping(0.0);
+		virtualToolCoupler->overrideAttachmentPoint(Vector3d::Zero());
 
 		OptionalValued optionalNum;
 		optionalNum.setValue(num);
+
+		OptionalValueVec3 optionalVec;
+		optionalVec.setValue(vec);
 
 		virtualToolCoupler->setOptionalLinearStiffness(optionalNum);
 		virtualToolCoupler->setOptionalLinearDamping(optionalNum);
 		virtualToolCoupler->setOptionalAngularStiffness(optionalNum);
 		virtualToolCoupler->setOptionalAngularDamping(optionalNum);
+		virtualToolCoupler->setOptionalAttachmentPoint(optionalVec);
 
 		const OptionalValued& linearStiffness = virtualToolCoupler->getOptionalLinearStiffness();
 		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
 		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
 		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
+		const OptionalValueVec3& attachmentPoint = virtualToolCoupler->getOptionalAttachmentPoint();
 
 		EXPECT_TRUE(linearStiffness.hasValue());
 		EXPECT_TRUE(linearDamping.hasValue());
 		EXPECT_TRUE(angularStiffness.hasValue());
 		EXPECT_TRUE(angularDamping.hasValue());
+		EXPECT_TRUE(attachmentPoint.hasValue());
 
 		EXPECT_EQ(num, linearStiffness.getValue());
 		EXPECT_EQ(num, linearDamping.getValue());
 		EXPECT_EQ(num, angularStiffness.getValue());
 		EXPECT_EQ(num, angularDamping.getValue());
+		EXPECT_TRUE(vec.isApprox(attachmentPoint.getValue()));
 	}
-}
-
-TEST_F(VirtualToolCouplerTest, OutputScaling)
-{
-	double num = 2.56527676;
-	virtualToolCoupler->setOutputForceScaling(num);
-	virtualToolCoupler->setOutputTorqueScaling(num);
-	EXPECT_EQ(num, virtualToolCoupler->getOutputForceScaling());
-	EXPECT_EQ(num, virtualToolCoupler->getOutputTorqueScaling());
-}
-
-TEST_F(VirtualToolCouplerTest, AttachmentPoint)
-{
-	Vector3d attachmentPoint(28.4, -37.2, 91.8);
-	virtualToolCoupler->setAttachmentPoint(attachmentPoint);
-	EXPECT_TRUE(attachmentPoint.isApprox(virtualToolCoupler->getAttachmentPoint()));
 }
 
 TEST_F(VirtualToolCouplerTest, Serialization)
 {
 	double num = 3.6415;
-	Vector3d attachmentPoint(28.4, -37.2, 91.8);
+	Vector3d vec(28.4, -37.2, 91.8);
 
 	OptionalValued optionalNum;
 	optionalNum.setValue(num);
+	OptionalValueVec3 optionalVec;
+	optionalVec.setValue(vec);
 	virtualToolCoupler->setOptionalLinearStiffness(optionalNum);
 	virtualToolCoupler->setOptionalLinearDamping(optionalNum);
 	virtualToolCoupler->setOptionalAngularStiffness(optionalNum);
 	virtualToolCoupler->setOptionalAngularDamping(optionalNum);
-	virtualToolCoupler->setOutputForceScaling(num);
-	virtualToolCoupler->setOutputTorqueScaling(num);
-	virtualToolCoupler->setAttachmentPoint(attachmentPoint);
+	virtualToolCoupler->setOptionalAttachmentPoint(optionalVec);
 
 	// Encode
 	YAML::Node node;
@@ -437,15 +435,11 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	EXPECT_EQ(num, newVirtualToolCoupler->getLinearDamping());
 	EXPECT_EQ(num, newVirtualToolCoupler->getAngularStiffness());
 	EXPECT_EQ(num, newVirtualToolCoupler->getAngularDamping());
-
-	EXPECT_EQ(num, newVirtualToolCoupler->getOutputForceScaling());
-	EXPECT_EQ(num, newVirtualToolCoupler->getOutputTorqueScaling());
+	EXPECT_TRUE(vec.isApprox(newVirtualToolCoupler->getAttachmentPoint()));
 
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getInput());
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getRepresentation());
 	EXPECT_EQ(nullptr, newVirtualToolCoupler->getOutput());
-
-	EXPECT_TRUE(attachmentPoint.isApprox(newVirtualToolCoupler->getAttachmentPoint()));
 
 	YAML::Node inputNode;
 	EXPECT_NO_THROW(inputNode = YAML::convert<SurgSim::Framework::Component>::encode(*input););

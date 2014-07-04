@@ -335,11 +335,13 @@ public:
 	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearDamping() const;
 	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularStiffness() const;
 	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularDamping() const;
+	const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& getOptionalAttachmentPoint() const;
 
 	void setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& val);
 	void setOptionalLinearDamping(const SurgSim::DataStructures::OptionalValue<double>& val);
 	void setOptionalAngularStiffness(const SurgSim::DataStructures::OptionalValue<double>& val);
 	void setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& val);
+	void setOptionalAttachmentPoint(const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& val);
 };
 
 inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepresentation> firstRepresentation,

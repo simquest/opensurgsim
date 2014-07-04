@@ -119,29 +119,14 @@ public:
 	/// \return The damping of the vtc in angular mode (in N·m·s·rad-1)
 	double getAngularDamping();
 
-	/// \return The factor to multiply the forces.
-	double getOutputForceScaling();
+	/// Override the point of attachment to the Representation
+	/// If this value is not provided, the point of attachment will be automatically
+	/// set to the Representation's center of mass.
+	/// \param attachment The attachment point in the Representations local coordinate frame
+	void overrideAttachmentPoint(const SurgSim::Math::Vector3d& attachment);
 
-	/// Set the scaling term for the force sent to the output component.
-	/// \param forceScaling The factor to multiply the forces.
-	void setOutputForceScaling(double forceScaling);
-
-	/// \return The factor to multiply the torque.
-	double getOutputTorqueScaling();
-
-	/// Set the scaling term for the torque sent to the output component.
-	/// \param torqueScaling The factor to multiply the torque.
-	void setOutputTorqueScaling(double torqueScaling);
-
-	/// Set the vector from the center of mass to the input's point of attachment. For example, if the input device
-	/// gives the position at the tip of a stylus, which should correspond to the tip of the tool, then the attachment
-	/// would be the vector from the tool's center of mass to its tip.  If the attachment is not set, it defaults to the
-	/// center of mass.
-	/// \param attachment The attachment.
-	void setAttachmentPoint(const SurgSim::Math::Vector3d& attachment);
-
-	/// Get the vector from the tool's center of mass to the input's point of attachment.
-	/// \return The offset.
+	/// Get the point of attachment on the Representation
+	/// \return The attachment point in the Representations local coordinate frame
 	const SurgSim::Math::Vector3d& getAttachmentPoint();
 
 protected:
@@ -184,6 +169,15 @@ protected:
 	/// \return The OptionalValue object containing the damping of the vtc in angular mode (in N·m·s·rad-1)
 	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularDamping() const;
 
+	/// Used for Serialization.
+	/// \param attachmentPoint The OptionalValue object containing the attachment point.
+	void setOptionalAttachmentPoint(
+			const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& attachmentPoint);
+
+	/// Used for Serialization.
+	/// \return The OptionalValue object containing the attachment point.
+	const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& getOptionalAttachmentPoint() const;
+
 	/// User supplied Vtc stiffness parameter in linear mode (in N·m-1)
 	SurgSim::DataStructures::OptionalValue<double> m_optionalLinearStiffness;
 
@@ -195,6 +189,9 @@ protected:
 
 	/// User supplied Vtc damping parameter in angular mode (in N·m·s·rad-1)
 	SurgSim::DataStructures::OptionalValue<double> m_optionalAngularDamping;
+
+	/// User supplied attachment point
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> m_optionalAttachmentPoint;
 
 private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_input;
@@ -224,7 +221,7 @@ private:
 	SurgSim::DataStructures::DataGroup m_outputData;
 
 	/// The input's point of attachment in the local frame, i.e., the same frame in which the mass center is defined.
-	SurgSim::Math::Vector3d m_attachmentPoint;
+	SurgSim::Math::Vector3d m_localAttachmentPoint;
 };
 
 }; // Physics
