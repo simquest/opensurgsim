@@ -60,8 +60,8 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 
 	RigidTransform3d boxPose = boxRepresentation->getPose();
 	RigidTransform3d capsuleToBoxTransform = boxPose.inverse() * capsuleRepresentation->getPose();
-	Vector3d capsuleBottom = capsuleToBoxTransform * capsuleShape->bottomCentre();
-	Vector3d capsuleTop = capsuleToBoxTransform * capsuleShape->topCentre();
+	Vector3d capsuleBottom = capsuleToBoxTransform * capsuleShape->bottomCenter();
+	Vector3d capsuleTop = capsuleToBoxTransform * capsuleShape->topCenter();
 	double capsuleRadius = capsuleShape->getRadius();
 
 	Vector3d boxRadii = boxShape->getSize() / 2.0;
