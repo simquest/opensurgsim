@@ -27,16 +27,16 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS ${LIBS}
-		 TrackIRDevice 
-		 SurgSimInput 
-		 SurgSimFramework 
-		 SurgSimDataStructures
-		 gmock
-		 gtest 
-		 ${Boost_LIBRARIES} 
-		 ${OPTITRACK_LIBRARY}
-	)
+set(LIBS
+	TrackIRDevice 
+	SurgSimInput 
+	SurgSimFramework 
+	SurgSimDataStructures
+	gmock
+	gtest
+	${Boost_LIBRARIES} 
+	${OPTITRACK_LIBRARY}
+)
 
 # The unit tests will be built whenever the library is built, but
 # running them at build time requires hardware and is disabled by

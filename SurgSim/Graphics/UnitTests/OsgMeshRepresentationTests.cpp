@@ -20,10 +20,13 @@
 #include <osg/Geometry>
 #include <osg/Array>
 
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Testing/TestCube.h"
 
@@ -35,10 +38,10 @@ using SurgSim::Framework::Runtime;
 
 namespace
 {
-	std::vector<Vector3d> cubeVertices;
-	std::vector<size_t> cubeTriangles;
-	std::vector<Vector4d> cubeColors;
-	std::vector<Vector2d> cubeTextures;
+std::vector<Vector3d> cubeVertices;
+std::vector<size_t> cubeTriangles;
+std::vector<Vector4d> cubeColors;
+std::vector<Vector2d> cubeTextures;
 }
 
 namespace SurgSim
@@ -120,12 +123,45 @@ TEST(OsgMeshRepresentationTests, SerializationTest)
 
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> newOsgMesh;
 	ASSERT_NO_THROW(newOsgMesh =
-		std::dynamic_pointer_cast<OsgMeshRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+						std::dynamic_pointer_cast<OsgMeshRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	EXPECT_EQ("SurgSim::Graphics::OsgMeshRepresentation", newOsgMesh->getClassName());
 	EXPECT_EQ(filename, newOsgMesh->getValue<std::string>("Filename"));
 	EXPECT_EQ(2u, newOsgMesh->getValue<int>("UpdateOptions"));
 	EXPECT_TRUE(newOsgMesh->getValue<bool>("DrawAsWireFrame"));
+}
+
+TEST(OsgMeshRepresentationTests, MeshDelegateTest)
+{
+	SurgSim::Framework::ApplicationData data("config.txt");
+	SurgSim::DataStructures::PlyReader reader(data.findFile("OsgMeshRepresentationTests/Cube.ply"));
+	auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
+
+	EXPECT_TRUE(reader.setDelegate(delegate));
+	EXPECT_NO_THROW(reader.parseFile());
+
+	auto mesh = delegate->getMesh();
+	EXPECT_EQ(26u, mesh->getNumVertices());
+	EXPECT_EQ(12u, mesh->getNumTriangles());
+
+	// The first and last vertices from the file
+	Vector3d vertex0(1.0, 1.0, -1.0);
+	Vector3d vertex25(-1.0, -1.0, 1.0);
+	Vector2d texture0(0.00, 0.50);
+	Vector2d texture25(0.25, 0.75);
+
+
+	EXPECT_TRUE(vertex0.isApprox(mesh->getVertex(0).position));
+	EXPECT_TRUE(vertex25.isApprox(mesh->getVertex(25).position));
+
+	EXPECT_TRUE(texture0.isApprox(mesh->getVertex(0).data.texture.getValue()));
+	EXPECT_TRUE(texture25.isApprox(mesh->getVertex(25).data.texture.getValue()));
+
+	std::array<size_t, 3> triangle0 = {0, 1, 2};
+	std::array<size_t, 3> triangle11 = {10, 25, 11};
+
+	EXPECT_EQ(triangle0, mesh->getTriangle(0).verticesId);
+	EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);
 }
 
 }; // namespace Graphics

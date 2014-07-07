@@ -18,9 +18,11 @@
 
 #include "gtest/gtest.h"
 
-#include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/DataStructures/MeshElement.h"
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
+#include "SurgSim/DataStructures/Vertex.h"
+
 
 #include <random>
 
@@ -28,7 +30,8 @@ using SurgSim::DataStructures::Vertices;
 using SurgSim::DataStructures::Vertex;
 using SurgSim::Math::Vector3d;
 
-class MeshTest : public ::testing::Test
+
+class MeshTests : public ::testing::Test
 {
 public:
 	void SetUp()
@@ -53,7 +56,7 @@ public:
 		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d position(positionDistribution(generator), positionDistribution(generator),
-				positionDistribution(generator));
+							  positionDistribution(generator));
 			testPositions.push_back(position);
 
 			if (printPositions)
@@ -72,7 +75,7 @@ public:
 		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d normal(normalDistribution(generator), normalDistribution(generator),
-				normalDistribution(generator));
+							normalDistribution(generator));
 			normal.normalize();
 			testNormals.push_back(normal);
 
@@ -96,7 +99,7 @@ public:
 };
 
 
-TEST_F(MeshTest, InitTest)
+TEST_F(MeshTests, InitTest)
 {
 	ASSERT_NO_THROW({MockMesh mesh;});
 
@@ -104,7 +107,7 @@ TEST_F(MeshTest, InitTest)
 	ASSERT_NO_THROW({Vertices<void> mesh;});
 }
 
-TEST_F(MeshTest, CreateVerticesTest)
+TEST_F(MeshTests, CreateVerticesTest)
 {
 	MockMesh mesh;
 
@@ -132,7 +135,7 @@ TEST_F(MeshTest, CreateVerticesTest)
 	}
 }
 
-TEST_F(MeshTest, SetVertexPositionsTest)
+TEST_F(MeshTests, SetVertexPositionsTest)
 {
 	MockMesh mesh;
 
@@ -196,7 +199,7 @@ TEST_F(MeshTest, SetVertexPositionsTest)
 	EXPECT_ANY_THROW(mesh.setVertexPositions(testPositions));
 }
 
-TEST_F(MeshTest, ClearTest)
+TEST_F(MeshTests, ClearTest)
 {
 	MockMesh mesh;
 
@@ -221,7 +224,7 @@ TEST_F(MeshTest, ClearTest)
 	EXPECT_EQ(0u, mesh.getVertices().size());
 }
 
-TEST_F(MeshTest, UpdateTest)
+TEST_F(MeshTests, UpdateTest)
 {
 	MockMesh mesh;
 
@@ -234,7 +237,7 @@ TEST_F(MeshTest, UpdateTest)
 	}
 }
 
-TEST_F(MeshTest, ComparisonTest)
+TEST_F(MeshTests, ComparisonTest)
 {
 	MockMesh mesh;
 
@@ -267,3 +270,5 @@ TEST_F(MeshTest, ComparisonTest)
 	EXPECT_FALSE(mesh == differentMesh);
 	EXPECT_TRUE(mesh != differentMesh);
 }
+
+

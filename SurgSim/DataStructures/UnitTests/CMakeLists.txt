@@ -15,6 +15,7 @@
 
 include_directories (
 	${gtest_SOURCE_DIR}/include
+	${OSG_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -44,6 +45,7 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS
 	SurgSimDataStructures
+	SurgSimGraphics
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
