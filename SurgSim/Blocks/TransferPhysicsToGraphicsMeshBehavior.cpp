@@ -28,7 +28,8 @@
 
 namespace
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior);
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior,
+				 TransferPhysicsToGraphicsMeshBehavior);
 }
 
 namespace SurgSim

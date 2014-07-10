@@ -22,6 +22,7 @@
 #include <unordered_map>
 
 #include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
@@ -53,6 +54,8 @@ class InputComponent;
 }
 
 }
+
+SURGSIM_STATIC_REGISTRATION(StaplerBehavior);
 
 /// This behavior is used to add staples.
 /// The stapler is controlled by an input device and when

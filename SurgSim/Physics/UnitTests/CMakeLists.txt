@@ -56,6 +56,7 @@ set(UNIT_TEST_SOURCES
 	MassSpringRepresentationLocalizationTest.cpp
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
+	MockObjects.cpp
 	PhysicsManagerStateTests.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp

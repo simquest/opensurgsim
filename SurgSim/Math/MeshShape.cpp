@@ -18,17 +18,12 @@
 
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/ObjectFactory.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::MeshShape);
-}
 
 namespace SurgSim
 {
 namespace Math
 {
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::MeshShape, MeshShape);
 
 MeshShape::MeshShape() : m_volume(0.0)
 {

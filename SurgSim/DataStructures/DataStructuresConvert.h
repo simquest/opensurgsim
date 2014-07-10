@@ -19,6 +19,7 @@
 #include <array>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 #include <yaml-cpp/yaml.h>
 
 #include "SurgSim/DataStructures/OptionalValue.h"
@@ -43,6 +44,24 @@ struct convert<std::array<T, N>>
 {
 	static Node encode(const std::array<T, N>& rhs);
 	static bool decode(const Node& node, std::array<T, N>& rhs);
+};
+
+/// YAML::convert specialization for std::unordered_map.
+SURGSIM_DOUBLE_SPECIALIZATION
+template <class Key, class T>
+struct convert<std::unordered_map<Key, T>>
+{
+	static Node encode(const std::unordered_map<Key, T>& rhs);
+	static bool decode(const Node& node, std::unordered_map<Key, T>& rhs);
+};
+
+/// YAML::convert specialization for std::unordered_set.
+SURGSIM_DOUBLE_SPECIALIZATION
+template <class Value>
+struct convert<std::unordered_set<Value>>
+{
+	static Node encode(const std::unordered_set<Value>& rhs);
+	static bool decode(const Node& node, std::unordered_set<Value>& rhs);
 };
 
 } // namespace YAML

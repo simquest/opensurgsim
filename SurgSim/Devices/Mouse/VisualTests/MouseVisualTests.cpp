@@ -43,21 +43,37 @@ struct TestListener : public SurgSim::Input::InputConsumerInterface
 		bool button1, button2, button3;
 		double x, y;
 		int scrollDeltaX, scrollDeltaY;
-		inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_1, &button1);
-		inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_2, &button2);
-		inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_3, &button3);
-		inputData.scalars().get("x", &x);
-		inputData.scalars().get("y", &y);
-		inputData.integers().get("scrollDeltaX", &scrollDeltaX);
-		inputData.integers().get("scrollDeltaY", &scrollDeltaY);
 
-		std::cerr << "button1 = " << button1 << std::endl
-				  << "button2 = " << button2 << std::endl
-				  << "button3 = " << button3 << std::endl
-				  << "x = " << x << std::endl
-				  << "y = " << y << std::endl
-				  << "scrollDeltaX = " << scrollDeltaX << std::endl
-				  << "scrollDeltaY = " << scrollDeltaY << std::endl << std::endl;
+		if (inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_1, &button1))
+		{
+			std::cerr << "button1 = " << button1 << std::endl;
+		}
+		if (inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_2, &button2))
+		{
+			std::cerr << "button2 = " << button2 << std::endl;
+		}
+		if (inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_3, &button3))
+		{
+			std::cerr << "button3 = " << button3 << std::endl;
+		}
+		if (inputData.scalars().get("x", &x))
+		{
+			std::cerr << "x = " << x << std::endl;
+		}
+		if (inputData.scalars().get("y", &y))
+		{
+			std::cerr << "y = " << y << std::endl;
+		}
+		if (inputData.integers().get("scrollDeltaX", &scrollDeltaX))
+		{
+			std::cerr << "scrollDeltaX = " << scrollDeltaX << std::endl;
+		}
+		if (inputData.integers().get("scrollDeltaY", &scrollDeltaY))
+		{
+			std::cerr << "scrollDeltaY = " << scrollDeltaY << std::endl;
+		}
+
+		std::cerr << std::endl;
 	}
 };
 

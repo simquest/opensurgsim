@@ -70,7 +70,8 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 		return;
 	}
 
-	if (inverse->rows() != size || inverse->cols() != size)
+	if (inverse->rows() < 0 || static_cast<size_t>(inverse->rows()) != size 
+		|| inverse->cols() < 0 || static_cast<size_t>(inverse->cols()) != size)
 	{
 		inverse->resize(size, size);
 	}

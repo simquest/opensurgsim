@@ -38,7 +38,6 @@ set(UNIT_TEST_SOURCES
 	RuntimeTest.cpp
 	SceneElementTest.cpp
 	SceneTest.cpp
-	SerializationMockComponent.cpp
 	SharedInstanceTest.cpp
 	TimerTest.cpp
 	TransferPropertiesBehaviorTests.cpp
@@ -46,7 +45,6 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	MockObjects.h
-	SerializationMockComponent.h
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -20,6 +20,7 @@
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPlaneRepresentation.h"
@@ -176,7 +177,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	// Graphic representation of the physics model
 	std::shared_ptr<OsgMeshRepresentation> osgRepresentation =
 		std::make_shared<OsgMeshRepresentation>("OsgRepresentation");
-	osgRepresentation->setFilename(plyFilename);
+	*osgRepresentation->getMesh() = *(std::make_shared<SurgSim::Graphics::Mesh>(*mesh));
 	osgRepresentation->setDrawAsWireFrame(true);
 
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);

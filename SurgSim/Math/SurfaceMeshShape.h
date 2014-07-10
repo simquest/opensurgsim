@@ -18,6 +18,7 @@
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -25,6 +26,7 @@ namespace SurgSim
 
 namespace Math
 {
+SURGSIM_STATIC_REGISTRATION(SurfaceMeshShape);
 
 /// SurfaceMeshShape defines a shape based on a mesh, like MeshShape.
 /// But, unlike MeshShape, the mesh does not need to be watertight to produce valid volume, center and second moment of

@@ -26,6 +26,11 @@
 namespace SurgSim
 {
 
+namespace Framework
+{
+class ApplicationData;
+}
+
 namespace Graphics
 {
 
@@ -113,6 +118,12 @@ private:
 	/// Shader used by this material
 	std::shared_ptr<OsgShader> m_shader;
 };
+
+
+std::shared_ptr<SurgSim::Graphics::OsgMaterial> createMaterialWithShaders(
+	const SurgSim::Framework::ApplicationData& data,
+	const std::string& name);
+
 
 };  // namespace Graphics
 

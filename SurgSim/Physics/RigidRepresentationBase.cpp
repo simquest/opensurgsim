@@ -49,8 +49,11 @@ bool RigidRepresentationBase::doInitialize()
 		std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getInitialParameters().getShapeUsedForMassInertia());
 	if (nullptr != meshShape && !meshShape->getFileName().empty())
 	{
-		SURGSIM_ASSERT(meshShape->initialize(*(getRuntime()->getApplicationData()))) <<
-			"Failed to initialize the mesh shape in this representation.";
+		if (!meshShape->isInitialized())
+		{
+			SURGSIM_ASSERT(meshShape->initialize(*(getRuntime()->getApplicationData()))) <<
+				"Failed to initialize the mesh shape in this representation.";
+		}
 		m_initialParameters.updateProperties();
 		setCurrentParameters(m_initialParameters);
 	}

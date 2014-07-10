@@ -17,7 +17,10 @@
 find_package(SixenseSdk REQUIRED)
 
 link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
+
+set(LIBS
+	${Boost_LIBRARIES}
+)
 
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"
@@ -45,6 +48,9 @@ surgsim_add_library(
 	"${SIXENSE_DEVICE_SOURCES}" "${SIXENSE_DEVICE_HEADERS}"
 	SurgSim/Devices/Sixense
 )
+
+target_link_libraries(SixenseDevice ${LIBS})
+
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 

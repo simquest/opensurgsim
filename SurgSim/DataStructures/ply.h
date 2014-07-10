@@ -35,6 +35,8 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #define SURGSIM_DATASTRUCTURES_PLY_H
 
 #ifdef __cplusplus
+#include <cstddef>
+
 namespace SurgSim {
 namespace DataStructures {
 extern "C" {

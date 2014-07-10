@@ -52,9 +52,12 @@ std::shared_ptr<PhysicsManagerState>
 	auto const itEnd = representations.end();
 	for (auto it = representations.begin(); it != itEnd; ++it)
 	{
-		ptrdiff_t index = result->getRepresentationsMapping().getValue((*it).get());
-		SURGSIM_ASSERT(index >= 0) << "Bad index found for representation " << (*it)->getName() << std::endl;
-		(*it)->applyCorrection(dt, dofCorrection.segment(index, (*it)->getNumDof()));
+		if ((*it)->isActive())
+		{
+			ptrdiff_t index = result->getRepresentationsMapping().getValue((*it).get());
+			SURGSIM_ASSERT(index >= 0) << "Bad index found for representation " << (*it)->getName() << std::endl;
+			(*it)->applyCorrection(dt, dofCorrection.segment(index, (*it)->getNumDof()));
+		}
 	}
 
 	return result;

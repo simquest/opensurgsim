@@ -23,13 +23,11 @@
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 
-using SurgSim::Graphics::OsgSphereRepresentation;
-using SurgSim::Graphics::OsgUnitSphere;
-
-namespace
+namespace SurgSim
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgSphereRepresentation);
-}
+namespace Graphics
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgSphereRepresentation, OsgSphereRepresentation);
 
 OsgSphereRepresentation::OsgSphereRepresentation(const std::string& name) :
 	Representation(name),
@@ -58,3 +56,6 @@ std::shared_ptr<OsgUnitSphere> OsgSphereRepresentation::getSharedUnitSphere()
 	static SurgSim::Framework::SharedInstance<OsgUnitSphere> shared;
 	return shared.get();
 }
+
+}; // Graphics
+}; // SurgSim

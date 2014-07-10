@@ -16,21 +16,16 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidRepresentation);
-}
-
 namespace SurgSim
 {
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidRepresentation, RigidRepresentation);
 
 RigidRepresentation::RigidRepresentation(const std::string& name) :
 	RigidRepresentationBase(name),

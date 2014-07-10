@@ -17,12 +17,6 @@
 #include "SurgSim/Math/SurfaceMeshShape.h"
 
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/ObjectFactory.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SurfaceMeshShape);
-}
 
 namespace
 {
@@ -33,6 +27,7 @@ namespace SurgSim
 {
 namespace Math
 {
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SurfaceMeshShape, SurfaceMeshShape);
 
 SurfaceMeshShape::SurfaceMeshShape() : m_volume(0.0), m_thickness(1e-2)
 {
