@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
@@ -29,7 +29,7 @@
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
+using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Physics::Fem3DRepresentation;
@@ -114,7 +114,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 	femSceneElement->addComponent(graphicsRepresentation);
 
 	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Physics to Graphics deformable points");
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
 	physicsToGraphics->setSource(physicsRepresentation);
 	physicsToGraphics->setTarget(graphicsRepresentation);
 	femSceneElement->addComponent(physicsToGraphics);
@@ -181,7 +181,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	femSceneElement->addComponent(graphicsRepresentation);
 
 	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Physics to Graphics deformable points");
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
 	physicsToGraphics->setSource(physicsRepresentation);
 	physicsToGraphics->setTarget(graphicsRepresentation);
 	femSceneElement->addComponent(physicsToGraphics);

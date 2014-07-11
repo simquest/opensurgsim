@@ -17,7 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
@@ -178,7 +179,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	sceneElement->addComponent(pointCloud);
 
 	// The behavior which transfers the position of the vertices in the FEM to locations in the point cloud
-	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior>("fem to point cloud");
+	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferPhysicsToPointCloudBehavior>("fem to point cloud");
 	femToCloud->setSource(fem);
 	femToCloud->setTarget(pointCloud);
 	sceneElement->addComponent(femToCloud);

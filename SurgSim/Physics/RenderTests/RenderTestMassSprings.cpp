@@ -20,7 +20,7 @@
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Blocks/MassSpring2DRepresentation.h"
 #include "SurgSim/Blocks/MassSpring3DRepresentation.h"
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
@@ -32,7 +32,7 @@
 using SurgSim::Blocks::MassSpring1DRepresentation;
 using SurgSim::Blocks::MassSpring2DRepresentation;
 using SurgSim::Blocks::MassSpring3DRepresentation;
-using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
+using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -99,7 +99,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 	massSpringElement->addComponent(graphicsRepresentation);
 
 	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Physics to Graphics deformable points");
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
 	physicsToGraphics->setSource(physicsRepresentation);
 	physicsToGraphics->setTarget(graphicsRepresentation);
 
@@ -168,7 +168,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 	graphicsRepresentation->setVisible(true);
 	massSpringElement->addComponent(graphicsRepresentation);
 	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Physics to Graphics deformable points");
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
 	physicsToGraphics->setSource(physicsRepresentation);
 	physicsToGraphics->setTarget(graphicsRepresentation);
 	massSpringElement->addComponent(physicsToGraphics);
@@ -241,7 +241,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	massSpringElement->addComponent(graphicsRepresentation);
 
 	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Physics to Graphics deformable points");
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
 	physicsToGraphics->setSource(physicsRepresentation);
 	physicsToGraphics->setTarget(graphicsRepresentation);
 	massSpringElement->addComponent(physicsToGraphics);

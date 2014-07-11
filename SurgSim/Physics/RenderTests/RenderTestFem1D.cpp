@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
@@ -28,7 +28,7 @@
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
+using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -104,7 +104,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 	femSceneElement->addComponent(graphicsRepresentation);
 
 	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Transfer from Physics to Graphics");
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Transfer from Physics to Graphics");
 	physicsToGraphics->setSource(physicsRepresentation);
 	physicsToGraphics->setTarget(graphicsRepresentation);
 	femSceneElement->addComponent(physicsToGraphics);
