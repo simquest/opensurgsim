@@ -141,7 +141,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	auto femToMesh =
-		std::make_shared<SurgSim::Blocks::TransferPhysicsToGraphicsBehavior>("physics to triangle mesh");
+		std::make_shared<SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior>("physics to triangle mesh");
 	femToMesh->setSource(fem);
 	femToMesh->setTarget(graphics);
 	sceneElement->addComponent(femToMesh);
@@ -178,7 +178,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	sceneElement->addComponent(pointCloud);
 
 	// The behavior which transfers the position of the vertices in the FEM to locations in the point cloud
-	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferPhysicsToGraphicsBehavior>("fem to point cloud");
+	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior>("fem to point cloud");
 	femToCloud->setSource(fem);
 	femToCloud->setTarget(pointCloud);
 	sceneElement->addComponent(femToCloud);

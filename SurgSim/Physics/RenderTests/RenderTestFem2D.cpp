@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
@@ -30,7 +30,7 @@
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferPhysicsToGraphicsBehavior;
+using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -173,7 +173,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	auto physicsToMesh =
-		std::make_shared<SurgSim::Blocks::TransferPhysicsToGraphicsBehavior>("physics to triangle mesh");
+		std::make_shared<SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior>("physics to triangle mesh");
 	physicsToMesh->setSource(physicsRepresentation);
 	physicsToMesh->setTarget(graphicsTriangleMeshRepresentation);
 	femSceneElement->addComponent(physicsToMesh);
@@ -187,7 +187,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 	femSceneElement->addComponent(graphicsPointCloudRepresentation);
 
 	auto physicsToPointCloud =
-		std::make_shared<TransferPhysicsToGraphicsBehavior>("Transfer from Physics to Graphics point cloud");
+		std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Transfer from Physics to Graphics point cloud");
 	physicsToPointCloud->setSource(physicsRepresentation);
 	physicsToPointCloud->setTarget(graphicsPointCloudRepresentation);
 	femSceneElement->addComponent(physicsToPointCloud);

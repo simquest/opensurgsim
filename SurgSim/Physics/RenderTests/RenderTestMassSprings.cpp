@@ -32,7 +32,7 @@
 using SurgSim::Blocks::MassSpring1DRepresentation;
 using SurgSim::Blocks::MassSpring2DRepresentation;
 using SurgSim::Blocks::MassSpring3DRepresentation;
-using SurgSim::Blocks::TransferPhysicsToGraphicsBehavior;
+using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -99,7 +99,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 	massSpringElement->addComponent(graphicsRepresentation);
 
 	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToGraphicsBehavior>("Physics to Graphics deformable points");
+		std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Physics to Graphics deformable points");
 	physicsToGraphics->setSource(physicsRepresentation);
 	physicsToGraphics->setTarget(graphicsRepresentation);
 
@@ -168,7 +168,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 	graphicsRepresentation->setVisible(true);
 	massSpringElement->addComponent(graphicsRepresentation);
 	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToGraphicsBehavior>("Physics to Graphics deformable points");
+		std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Physics to Graphics deformable points");
 	physicsToGraphics->setSource(physicsRepresentation);
 	physicsToGraphics->setTarget(graphicsRepresentation);
 	massSpringElement->addComponent(physicsToGraphics);
@@ -241,7 +241,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	massSpringElement->addComponent(graphicsRepresentation);
 
 	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToGraphicsBehavior>("Physics to Graphics deformable points");
+		std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Physics to Graphics deformable points");
 	physicsToGraphics->setSource(physicsRepresentation);
 	physicsToGraphics->setTarget(graphicsRepresentation);
 	massSpringElement->addComponent(physicsToGraphics);
