@@ -39,9 +39,7 @@ add_executable(SixenseVisualTest
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-target_link_libraries(
-	SixenseVisualTest
-	${LIBS}
+set(LIBS
 	SixenseDevice
 	IdentityPoseDevice
 	VisualTestCommon
@@ -53,6 +51,9 @@ target_link_libraries(
 	${GLUT_LIBRARIES}
 	${OPENGL_LIBRARIES}
 )
+
+target_link_libraries(SixenseVisualTest ${LIBS})
+
 
 # Copy the device DLLs into the build directory
 surgsim_copy_to_target_directory_for_release(SixenseVisualTest

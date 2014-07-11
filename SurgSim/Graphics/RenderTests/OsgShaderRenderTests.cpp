@@ -75,29 +75,10 @@ std::shared_ptr<Shader> loadExampleShader(const SurgSim::Framework::ApplicationD
 	return shader;
 }
 
-std::shared_ptr<Material> loadMaterial(const SurgSim::Framework::ApplicationData& data,
-									   const std::string& shaderName)
-{
-	SCOPED_TRACE("Load Material");
-
-	auto shader = std::make_shared<SurgSim::Graphics::OsgShader>();
-
-	std::string filename;
-	EXPECT_TRUE(data.tryFindFile(shaderName + ".vert", &filename));
-	shader->loadVertexShaderSource(filename);
-
-	EXPECT_TRUE(data.tryFindFile(shaderName + ".frag", &filename));
-	shader->loadFragmentShaderSource(filename);
-
-	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
-	material->setShader(shader);
-
-	return material;
-}
 
 std::shared_ptr<Material> createShinyMaterial(const SurgSim::Framework::ApplicationData& data)
 {
-	auto material = loadMaterial(data, "Shaders/material");
+	auto material = createMaterialWithShaders(data, "Shaders/material");
 	std::shared_ptr<SurgSim::Graphics::UniformBase>
 	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
 	material->addUniform(uniform);
@@ -190,7 +171,7 @@ TEST_F(OsgShaderRenderTests, TexturedShinyShaderTest)
 		std::make_shared<OsgSphereRepresentation>("sphere representation");
 	sphereRepresentation->setRadius(0.25);
 
-	auto material = loadMaterial(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	auto material = createMaterialWithShaders(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
 	std::shared_ptr<SurgSim::Graphics::UniformBase>
 	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
 	material->addUniform(uniform);
