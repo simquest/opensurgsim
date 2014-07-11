@@ -61,17 +61,6 @@ std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::Sc
 
 int main(int argc, char* argv[])
 {
-	{
-		StaplerBehavior temporaryStaplerBehavior("TemporaryStaplerBehavior");
-		SurgSim::Blocks::TransferPhysicsToGraphicsBehavior temporaryBehavior("TemporaryBehavior");
-		SurgSim::Blocks::VisualizeContactsBehavior visualizeContactsBehavior("TemporaryVisualizeContactsBehavior");
-		SurgSim::Graphics::OsgMeshRepresentation temporaryOsgMesh("TemporaryOsgMesh");
-		SurgSim::Graphics::OsgSceneryRepresentation temporaryOsgScenery("TemporaryOsgScenery");
-		SurgSim::Physics::Fem3DRepresentation temporaryFem3D("TemporaryFem3D");
-		SurgSim::Physics::FixedRepresentation temporaryFixedRepresentation("TemporaryFixedRepresentation");
-		SurgSim::Physics::VirtualToolCoupler temporaryVirtualToolCoupler("TemporaryVirtualToolCoupler");
-	}
-
 	const std::string deviceName = "MultiAxisDevice";
 
 	std::shared_ptr<BehaviorManager> behaviorManager = std::make_shared<BehaviorManager>();

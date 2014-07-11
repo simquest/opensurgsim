@@ -97,7 +97,7 @@ SurgSim::Framework::Scene:
                 Translation: [0, -0.2, 0]
               Id: 841da98e-f689-4efa-b0d5-61e248a85119
               Name: Pose
-          - SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior:
+          - SurgSim::Blocks::TransferPhysicsToGraphicsBehavior:
               Target:
                 SurgSim::Graphics::OsgMeshRepresentation:
                   Id: 1aa724f9-8300-4f14-9c46-dce849534413
@@ -146,7 +146,7 @@ SurgSim::Framework::Scene:
                   FileName: Geometry/wound_deformable.ply
               Id: 807d12b1-b4ea-4177-a398-79a823cc27c5
               Name: Collision
-          - SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior:
+          - SurgSim::Blocks::TransferPhysicsToGraphicsBehavior:
               Target:
                 SurgSim::Graphics::OsgMeshRepresentation:
                   Id: 35d14ea2-391d-4647-a31d-34bd8faf3df9
