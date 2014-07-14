@@ -76,12 +76,8 @@ bool ShapeCollisionRepresentation::doInitialize()
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
 	if (nullptr != meshShape)
 	{
-		if (!meshShape->initialize(*(getRuntime()->getApplicationData())))
-		{
-			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-				"No mesh loaded for m_shape ";
-			result = false;
-		}
+		SURGSIM_ASSERT(meshShape->isValid()) <<
+			"An invalid MeshShape is used in this ShapeCollisionRepresentation.";
 	}
 
 	return result;
