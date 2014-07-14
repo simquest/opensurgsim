@@ -64,7 +64,7 @@ protected:
 	/// \note This method is not required to do any check on the validity or the existence of the file.
 	/// \return false if loading failed, assume filename != ""
 	virtual bool doInitialize(const std::string& fileName) = 0;
-	
+
 private:
 	/// Indicates if an attempt to load the file has been made.
 	bool m_didInit;

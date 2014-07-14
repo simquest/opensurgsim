@@ -82,7 +82,7 @@ TEST_F(AssetTest, InitializationTest)
 
 	{
 		MockAsset test;
-		
+
 		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
 		// Loading non-exist file will fail.
