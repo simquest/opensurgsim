@@ -109,7 +109,7 @@ public:
 
 	/// Gets application data for the runtime.
 	/// \return	The application data.
-	std::shared_ptr<const ApplicationData> getApplicationData() const;
+	static std::shared_ptr<const ApplicationData> getApplicationData();
 
 	/// Adds a component.
 	/// \param	component	The component.
@@ -142,7 +142,7 @@ private:
 	bool m_isRunning;
 	std::vector< std::shared_ptr<ComponentManager> > m_managers;
 	std::shared_ptr<Scene> m_scene;
-	std::shared_ptr<ApplicationData> m_applicationData;
+	static std::shared_ptr<ApplicationData> m_applicationData;
 
 	boost::mutex m_mutex;
 

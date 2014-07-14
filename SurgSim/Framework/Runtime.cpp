@@ -52,6 +52,8 @@ Runtime::~Runtime()
 	stop();
 }
 
+std::shared_ptr<ApplicationData> Runtime::m_applicationData;
+
 void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 {
 	SURGSIM_ASSERT(! m_isRunning) << "Cannot add a manager to the runtime once it is running";
@@ -277,8 +279,10 @@ void Runtime::initSearchPaths(const std::string& configFilePath)
 	}
 }
 
-std::shared_ptr<const ApplicationData> Runtime::getApplicationData() const
+std::shared_ptr<const ApplicationData> Runtime::getApplicationData()
 {
+	SURGSIM_ASSERT(nullptr != m_applicationData) <<
+			"Runtime::getApplicationData() should be called after the Runtime is created.";
 	return m_applicationData;
 }
 
