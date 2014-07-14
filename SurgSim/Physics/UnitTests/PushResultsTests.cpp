@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "SurgSim/Physics/UnitTests/CommonTests.h"
+#include "SurgSim/Physics/UnitTests/PhysicsManagerStateTestCommon.h"
 #include "SurgSim/Physics/PushResults.h"
 
 namespace SurgSim
@@ -122,7 +123,7 @@ TEST_F(PushResultsTests, OneRepresentationOneConstraintTest)
 	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
 
 	// Update the Representations mapping.
-	m_physicsManagerState->filterActiveRepresentations(); // Usually this is called in preparePhysicsState.
+	filterActiveRepresentations(m_physicsManagerState); // Usually this is called in preparePhysicsState.
 	m_physicsManagerState->updateRepresentationsMapping();
 
 	// Fill up the Mlcp problem and clear up the Mlcp solution
@@ -253,7 +254,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
 
 	// Update the Representations mapping.
-	m_physicsManagerState->filterActiveRepresentations(); // Usually this is called in preparePhysicsState.
+	filterActiveRepresentations(m_physicsManagerState); // Usually this is called in preparePhysicsState.
 	m_physicsManagerState->updateRepresentationsMapping();
 
 	// Fill up the Mlcp problem and clear up the Mlcp solution
@@ -396,7 +397,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
 
 	// Update the Representations mapping.
-	m_physicsManagerState->filterActiveRepresentations(); // Usually this is called in preparePhysicsState.
+	filterActiveRepresentations(m_physicsManagerState); // Usually this is called in preparePhysicsState.
 	m_physicsManagerState->updateRepresentationsMapping();
 
 	// Fill up the Mlcp problem and clear up the Mlcp solution

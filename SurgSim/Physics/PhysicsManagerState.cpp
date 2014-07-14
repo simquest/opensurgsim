@@ -59,17 +59,10 @@ const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getRepr
 	return m_representations;
 }
 
-void PhysicsManagerState::filterActiveRepresentations()
+void PhysicsManagerState::setActiveRepresentations(
+	const std::vector<std::shared_ptr<Representation>>& activeRepresentations)
 {
-	m_activeRepresentations.clear();
-	m_activeRepresentations.reserve(m_representations.size());
-	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
-	{
-		if ((*it)->isActive())
-		{
-			m_activeRepresentations.push_back(*it);
-		}
-	}
+	m_activeRepresentations = activeRepresentations;
 }
 
 const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getActiveRepresentations() const
@@ -160,27 +153,10 @@ const std::vector<std::shared_ptr<Constraint>>& PhysicsManagerState::getConstrai
 	return emptyVector;
 }
 
-void PhysicsManagerState::filterActiveConstraints()
+void PhysicsManagerState::setActiveConstraints(
+	const std::vector<std::shared_ptr<Constraint>>& activeConstraints)
 {
-	m_activeConstraints.clear();
-	size_t size = 0;
-	int constraintTypeEnd = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);
-	for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
-	{
-		size += m_constraints[constraintType].size();
-	}
-	m_activeConstraints.reserve(size);
-
-	for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
-	{
-		for (auto it = m_constraints[constraintType].begin(); it != m_constraints[constraintType].end(); it++)
-		{
-			if ((*it)->isActive())
-			{
-				m_activeConstraints.push_back(*it);
-			}
-		}
-	}
+	m_activeConstraints = activeConstraints;
 }
 
 const std::vector<std::shared_ptr<Constraint>>& PhysicsManagerState::getActiveConstraints() const

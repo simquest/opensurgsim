@@ -60,8 +60,9 @@ public:
 	/// \return	The physics representations that are known to the state.
 	const std::vector<std::shared_ptr<Representation>>& getRepresentations();
 
-	/// Filter the list of representations into the active representations list.
-	void filterActiveRepresentations();
+	/// Set the list of representations into the active representations list.
+	/// \param activeRepresentations The active physics representations that are known to the state.
+	void setActiveRepresentations(const std::vector<std::shared_ptr<Representation>>& activeRepresentations);
 
 	/// Gets the active physics representations.
 	/// \return	The active physics representations that are known to the state.
@@ -117,7 +118,8 @@ public:
 	const std::vector<std::shared_ptr<Constraint>>& getConstraintGroup(int type) const;
 
 	/// Filter the map of constraints into the active constraints list.
-	void filterActiveConstraints();
+	/// \param activeConstraints The list of active constraints.
+	void setActiveConstraints(const std::vector<std::shared_ptr<Constraint>>& activeConstraints);
 
 	/// \return	The list of all active constraints.
 	const std::vector<std::shared_ptr<Constraint>>& getActiveConstraints() const;

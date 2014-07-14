@@ -13,43 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/Computation.h"
+/// \file PhysicsManagerStateTestCommon.h
+/// Common utility functions for for PhysicsManagerState tests
 
+#ifndef SURGSIM_PHYSICS_UNITTESTS_PHYSICSMANAGERSTATETESTCOMMON_H
+#define SURGSIM_PHYSICS_UNITTESTS_PHYSICSMANAGERSTATETESTCOMMON_H
+
+#include <unordered_map>
+#include <vector>
+
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
-namespace SurgSim
-{
-namespace Physics
-{
+using SurgSim::Physics::Constraint;
+using SurgSim::Physics::PhysicsManagerState;
+using SurgSim::Physics::Representation;
 
-Computation::Computation(bool doCopyState) : m_copyState(doCopyState)
+namespace
 {
-
-}
-
-Computation::~Computation()
+void filterActiveRepresentations(std::shared_ptr<PhysicsManagerState> state)
 {
-
-}
-
-std::shared_ptr<PhysicsManagerState> Computation::update(double dt, const std::shared_ptr<PhysicsManagerState>& state)
-{
-	return std::move(doUpdate(dt,std::move(preparePhysicsState(state))));
-}
-
-void Computation::setDoCopyState(bool val)
-{
-	m_copyState = val;
-}
-
-bool Computation::isCopyingState()
-{
-	return m_copyState;
-}
-
-std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std::shared_ptr<PhysicsManagerState>& state)
-{
-	// Compile the list of active representations and set it on the state.
 	std::vector<std::shared_ptr<Representation>> activeRepresentations;
 	auto representations = state->getRepresentations();
 	activeRepresentations.reserve(representations.size());
@@ -61,11 +45,13 @@ std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std:
 		}
 	}
 	state->setActiveRepresentations(activeRepresentations);
+}
 
-	// Compile the list of active representations and set it on the state.
+void filterActiveConstraints(std::shared_ptr<PhysicsManagerState> state)
+{
 	std::vector<std::shared_ptr<Constraint>> activeConstraints;
 	size_t size = 0;
-	int constraintTypeEnd = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);
+	int constraintTypeEnd = static_cast<int>(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_COUNT);
 	for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
 	{
 		size += state->getConstraintGroup(constraintType).size();
@@ -84,16 +70,7 @@ std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std:
 		}
 	}
 	state->setActiveConstraints(activeConstraints);
-
-	if (m_copyState)
-	{
-		return std::move(std::make_shared<PhysicsManagerState>(*state));
-	}
-	else
-	{
-		return std::move(state);
-	}
+}
 }
 
-}; // Physics
-}; // SurgSim
+#endif // SURGSIM_PHYSICS_UNITTESTS_PHYSICSMANAGERSTATETESTCOMMON_H

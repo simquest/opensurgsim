@@ -33,6 +33,7 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
+#include "SurgSim/Physics/UnitTests/PhysicsManagerStateTestCommon.h"
 
 using SurgSim::Physics::Constraint;
 using SurgSim::Physics::ContactConstraintData;
@@ -61,7 +62,7 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	actualRepresentations = physicsState->getRepresentations();
 	ASSERT_EQ(1, actualRepresentations.size());
 	EXPECT_EQ(rigid1, actualRepresentations.back());
-	physicsState->filterActiveRepresentations();
+	filterActiveRepresentations(physicsState);
 	physicsState->updateRepresentationsMapping();
 	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
 	int expectedMapValue = 0;
@@ -81,7 +82,7 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	EXPECT_EQ(rigid2, actualRepresentations.back());
 
 	// check the representationsIndexMapping
-	physicsState->filterActiveRepresentations();
+	filterActiveRepresentations(physicsState);
 	physicsState->updateRepresentationsMapping();
 	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
 	EXPECT_EQ(expectedMapValue, actualRepresentationsIndexMapping.getValue(rigid1AsRepresentation.get()));
@@ -96,7 +97,7 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	EXPECT_EQ(rigid2, actualCollisionsToPhysicsMap[collisionRepresentation]);
 }
 
-TEST(PhysicsManagerStateTest, FilterGetActiveRepresentations)
+TEST(PhysicsManagerStateTest, SetGetActiveRepresentations)
 {
 	auto physicsState = std::make_shared<PhysicsManagerState>();
 	std::vector<std::shared_ptr<Representation>> expectedRepresentations;
@@ -105,31 +106,23 @@ TEST(PhysicsManagerStateTest, FilterGetActiveRepresentations)
 	// Add a representation.
 	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
 	expectedRepresentations.push_back(rigid1);
-	physicsState->setRepresentations(expectedRepresentations);
+	physicsState->setActiveRepresentations(expectedRepresentations);
 
 	// Filter the active representations and test.
-	physicsState->filterActiveRepresentations();
 	actualRepresentations = physicsState->getActiveRepresentations();
 	ASSERT_EQ(1, actualRepresentations.size());
 	EXPECT_EQ(rigid1, actualRepresentations.back());
-
-	// Disable the rigid1.
-	rigid1->setIsActive(false);
-	physicsState->filterActiveRepresentations();
-	actualRepresentations = physicsState->getActiveRepresentations();
-	ASSERT_EQ(0, actualRepresentations.size());
 
 	// Add a second representation.  This one has a collision representation.
 	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
 	auto collisionRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("rigid2 collision");
 	rigid2->setCollisionRepresentation(collisionRepresentation);
 	expectedRepresentations.push_back(rigid2);
-	physicsState->setRepresentations(expectedRepresentations);
+	physicsState->setActiveRepresentations(expectedRepresentations);
 
 	// Filter the active representations and test.
-	physicsState->filterActiveRepresentations();
 	actualRepresentations = physicsState->getActiveRepresentations();
-	ASSERT_EQ(1, actualRepresentations.size());
+	ASSERT_EQ(2, actualRepresentations.size());
 	EXPECT_EQ(rigid2, actualRepresentations.back());
 }
 
@@ -231,7 +224,7 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	EXPECT_EQ(constraint2, actualConstraints.back());
 
 	// Check the constraintsIndexMapping.
-	physicsState->filterActiveConstraints();
+	filterActiveConstraints(physicsState);
 	physicsState->updateConstraintsMapping();
 	MlcpMapping<Constraint> actualConstraintsIndexMapping = physicsState->getConstraintsMapping();
 	int expectedMapValue = 0;
@@ -241,7 +234,7 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	EXPECT_EQ(expectedMapValue, actualConstraintsIndexMapping.getValue(constraint2.get()));
 }
 
-TEST(PhysicsManagerStateTest, FilterGetConstraintGroup)
+TEST(PhysicsManagerStateTest, SetGetActiveConstraints)
 {
 	auto physicsState = std::make_shared<PhysicsManagerState>();
 	std::vector<std::shared_ptr<Constraint>> expectedConstraints;
@@ -272,31 +265,18 @@ TEST(PhysicsManagerStateTest, FilterGetConstraintGroup)
 
 	// Check the active constraints.
 	expectedConstraints.push_back(constraint1);
-	physicsState->setConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT, expectedConstraints);
-	physicsState->filterActiveConstraints();
+	physicsState->setActiveConstraints(expectedConstraints);
 	actualConstraints = physicsState->getActiveConstraints();
 	ASSERT_EQ(1, actualConstraints.size());
 	EXPECT_EQ(constraint1, actualConstraints.back());
-
-	// Deactivate rigid1.
-	rigid1->setIsActive(false);
-	physicsState->filterActiveConstraints();
-	actualConstraints = physicsState->getActiveConstraints();
-	ASSERT_EQ(0, actualConstraints.size());
 
 	// Create a second constraint.
 	auto constraint2 = std::make_shared<Constraint>(data, rigid1Contact, rigid1Localization,
 		rigid2Contact, rigid2Localization);
 
-	// Check the constraintGroup.
+	// Check the active constraints.
 	expectedConstraints.push_back(constraint2);
-	physicsState->setConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT, expectedConstraints);
-	actualConstraints = physicsState->getActiveConstraints();
-	ASSERT_EQ(0, actualConstraints.size());
-
-	// Activate rigid1.
-	rigid1->setIsActive(true);
-	physicsState->filterActiveConstraints();
+	physicsState->setActiveConstraints(expectedConstraints);
 	actualConstraints = physicsState->getActiveConstraints();
 	ASSERT_EQ(2, actualConstraints.size());
 	EXPECT_EQ(constraint1, actualConstraints.front());
