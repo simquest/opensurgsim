@@ -18,6 +18,7 @@
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
 
 namespace SurgSim
 {
@@ -35,6 +36,8 @@ Asset::~Asset()
 void Asset::setFileName(const std::string& fileName)
 {
 	m_fileName = fileName;
+
+	initialize(*SurgSim::Framework::Runtime::getApplicationData().get());
 }
 
 std::string Asset::getFileName() const
@@ -52,7 +55,8 @@ bool Asset::initialize(const ApplicationData& data)
 
 	if (path.empty())
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << "Can not locate file " << m_fileName;
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"Can not locate file " << m_fileName;
 	}
 	else
 	{

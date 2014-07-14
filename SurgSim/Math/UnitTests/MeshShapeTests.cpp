@@ -21,6 +21,7 @@
 #include "SurgSim/DataStructures/AabbTreeNode.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
@@ -244,12 +245,11 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 
 TEST_F(MeshShapeTest, SerializationTest)
 {
-	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	SurgSim::Framework::Runtime runtime("config.txt");
 
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	meshShape->setFileName(fileName);
-	EXPECT_TRUE(meshShape->initialize(*data));
+	EXPECT_NO_THROW(meshShape->setFileName(fileName));
 
 	// We chose to let YAML serialization only works with base class pointer.
 	// i.e. We need to serialize 'meshShape' via a SurgSim::Math::Shape pointer.
@@ -268,7 +268,6 @@ TEST_F(MeshShapeTest, SerializationTest)
 	EXPECT_EQ("SurgSim::Math::MeshShape", newMeshShape->getClassName());
 	EXPECT_EQ(fileName, newMeshShape->getFileName());
 
-	EXPECT_TRUE(newMeshShape->initialize(*data));
 	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), newMeshShape->getMesh()->getNumVertices());
 	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), newMeshShape->getMesh()->getNumEdges());
 	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), newMeshShape->getMesh()->getNumTriangles());
@@ -276,12 +275,11 @@ TEST_F(MeshShapeTest, SerializationTest)
 
 TEST_F(MeshShapeTest, CreateAabbTreeTest)
 {
-	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	SurgSim::Framework::Runtime runtime("config.txt");
 
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	meshShape->setFileName(fileName);
-	EXPECT_TRUE(meshShape->initialize(*data));
+	EXPECT_NO_THROW(meshShape->setFileName(fileName));
 
 	auto tree = meshShape->getAabbTree();
 
@@ -301,12 +299,13 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 
 TEST_F(MeshShapeTest, DoInitializeTest)
 {
+	SurgSim::Framework::Runtime runtime("config.txt");
 	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 	{
 		auto fileName = std::string("MeshShapeData/staple_collision.ply");
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 
-		meshShape->setFileName(fileName);
+		EXPECT_NO_THROW(meshShape->setFileName(fileName));
 		auto path = data->findFile(fileName);
 		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
 		EXPECT_NO_THROW(EXPECT_TRUE(meshShape->doInitialize(path)));
@@ -316,7 +315,7 @@ TEST_F(MeshShapeTest, DoInitializeTest)
 		auto fileName = std::string("MeshShapeData/InvalidMesh.ply");
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 
-		meshShape->setFileName(fileName);
+		EXPECT_ANY_THROW(meshShape->setFileName(fileName));
 		auto path = data->findFile(fileName);
 		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
 		EXPECT_ANY_THROW(meshShape->doInitialize(path));
