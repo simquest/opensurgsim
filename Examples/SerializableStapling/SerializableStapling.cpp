@@ -16,6 +16,7 @@
 #include <memory>
 
 #include "Examples/ExampleStapling/StaplerBehavior.h"
+#include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
@@ -27,6 +28,7 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/Vector.h"
@@ -40,6 +42,7 @@ using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgManager;
+using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Input::InputManager;
 using SurgSim::Math::Vector3d;
@@ -61,17 +64,6 @@ std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::Sc
 
 int main(int argc, char* argv[])
 {
-	{
-		StaplerBehavior temporaryStaplerBehavior("TemporaryStaplerBehavior");
-		SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior temporaryBehavior("TemporaryBehavior");
-		SurgSim::Blocks::VisualizeContactsBehavior visualizeContactsBehavior("TemporaryVisualizeContactsBehavior");
-		SurgSim::Graphics::OsgMeshRepresentation temporaryOsgMesh("TemporaryOsgMesh");
-		SurgSim::Graphics::OsgSceneryRepresentation temporaryOsgScenery("TemporaryOsgScenery");
-		SurgSim::Physics::Fem3DRepresentation temporaryFem3D("TemporaryFem3D");
-		SurgSim::Physics::FixedRepresentation temporaryFixedRepresentation("TemporaryFixedRepresentation");
-		SurgSim::Physics::VirtualToolCoupler temporaryVirtualToolCoupler("TemporaryVirtualToolCoupler");
-	}
-
 	const std::string deviceName = "MultiAxisDevice";
 
 	std::shared_ptr<BehaviorManager> behaviorManager = std::make_shared<BehaviorManager>();
@@ -89,20 +81,17 @@ int main(int argc, char* argv[])
 	device = std::make_shared<IdentityPoseDevice>(deviceName);
 	inputManager->addDevice(device);
 
-	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
-	view->enableManipulator(true);
-	view->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
-	view->enableKeyboardDevice(true);
-	inputManager->addDevice(view->getKeyboardDevice());
-
 	YAML::Node node = YAML::LoadFile("Data/Stapling/StaplingDemo.yaml");
 
 	runtime->getScene()->decode(node);
-	runtime->getScene()->addSceneElement(view);
 
 	std::shared_ptr<SceneElement> arm = runtime->getScene()->getSceneElement("arm");
 	std::shared_ptr<SceneElement> wound = runtime->getScene()->getSceneElement("wound");
 	std::shared_ptr<SceneElement> stapler = runtime->getScene()->getSceneElement("stapler");
+	std::shared_ptr<SceneElement> view = runtime->getScene()->getSceneElement("StaplingDemoView");
+	auto osgView = std::dynamic_pointer_cast<OsgView>(view->getComponent("StaplingDemoView View"));
+	SURGSIM_ASSERT(nullptr != osgView) << "No OsgView held by SceneElement StaplingDemoView.";
+	inputManager->addDevice(osgView->getKeyboardDevice());
 
 	// Exclude collision between certain Collision::Representations
 	physicsManager->addExcludedCollisionPair(
