@@ -39,6 +39,7 @@ class DeformableRepresentation;
 
 namespace Blocks
 {
+SURGSIM_STATIC_REGISTRATION(TransferPhysicsToGraphicsMeshBehavior);
 
 /// Behavior to copy positions of a Physics Representation to a Graphics Mesh
 class TransferPhysicsToGraphicsMeshBehavior : public SurgSim::Framework::Behavior

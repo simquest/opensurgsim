@@ -26,17 +26,13 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior,
-				 TransferPhysicsToGraphicsMeshBehavior);
-}
-
 namespace SurgSim
 {
 
 namespace Blocks
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior,
+				 TransferPhysicsToGraphicsMeshBehavior);
 
 TransferPhysicsToGraphicsMeshBehavior::TransferPhysicsToGraphicsMeshBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name)
