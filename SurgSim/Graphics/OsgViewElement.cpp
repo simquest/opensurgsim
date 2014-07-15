@@ -30,8 +30,6 @@ using SurgSim::Graphics::OsgViewElement;
 
 OsgViewElement::OsgViewElement(const std::string& name) :
 	SurgSim::Graphics::ViewElement(name),
-	m_manipulatorPosition(SurgSim::Math::Vector3d(3.0, 3.0, 3.0)),
-	m_manipulatorLookat(SurgSim::Math::Vector3d(0.0, 0.0, 0.0)),
 	m_keyboardEnabled(false),
 	m_mouseEnabled(false)
 {
@@ -98,9 +96,8 @@ std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgViewElement:
 }
 
 
-void SurgSim::Graphics::OsgViewElement::setManipulatorParameters(
-	SurgSim::Math::Vector3d position,
-	SurgSim::Math::Vector3d lookat)
+void SurgSim::Graphics::OsgViewElement::setManipulatorParameters(const SurgSim::Math::Vector3d& position,
+																 const SurgSim::Math::Vector3d& lookat)
 {
 	std::shared_ptr<OsgView> osgView = std::static_pointer_cast<OsgView>(getView());
 	osgView->setManipulatorParameters(position, lookat);
