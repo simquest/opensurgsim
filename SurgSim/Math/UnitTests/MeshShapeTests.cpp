@@ -308,7 +308,7 @@ TEST_F(MeshShapeTest, DoInitializeTest)
 		EXPECT_NO_THROW(meshShape->setFileName(fileName));
 		auto path = data->findFile(fileName);
 		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
-		EXPECT_NO_THROW(EXPECT_TRUE(meshShape->doInitialize(path)));
+		EXPECT_NO_THROW(EXPECT_TRUE(meshShape->doLoad(path)));
 	}
 
 	{
@@ -318,6 +318,6 @@ TEST_F(MeshShapeTest, DoInitializeTest)
 		EXPECT_ANY_THROW(meshShape->setFileName(fileName));
 		auto path = data->findFile(fileName);
 		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
-		EXPECT_ANY_THROW(meshShape->doInitialize(path));
+		EXPECT_ANY_THROW(meshShape->doLoad(path));
 	}
 }

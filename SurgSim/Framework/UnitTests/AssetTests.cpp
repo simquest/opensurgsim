@@ -30,7 +30,7 @@ public:
 	MockAsset() {}
 	~MockAsset() {}
 
-	virtual bool doInitialize(const std::string&) {return true;}
+	virtual bool doLoad(const std::string&) {return true;}
 };
 
 namespace SurgSim
@@ -41,9 +41,9 @@ namespace Framework
 class AssetTest : public ::testing::Test
 {
 public:
-	bool initialize(SurgSim::Framework::Asset& asset, const SurgSim::Framework::ApplicationData& appData)
+	bool load(SurgSim::Framework::Asset& asset, const std::string& fileName)
 	{
-		return asset.initialize(appData);
+		return asset.load(fileName);
 	}
 };
 
@@ -75,8 +75,8 @@ TEST_F(AssetTest, InitializationTest)
 		MockAsset test;
 		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
-		// Call 'initialize()' without setting file name will fail.
-		EXPECT_FALSE(initialize(test, *applicationData));
+		// Call 'load()' without setting file name will fail.
+		EXPECT_FALSE(load(test, ""));
 		EXPECT_FALSE(test.isInitialized());
 	}
 
@@ -86,18 +86,20 @@ TEST_F(AssetTest, InitializationTest)
 		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
 		// Loading non-exist file will fail.
-		test.setFileName("Non-exist-file");
+		std::string nonExistFile("Non-exist-file");
+		test.setFileName(nonExistFile);
 		EXPECT_FALSE(test.isInitialized());
 
-		// Asset::initialize() is implicitly called by Asset::setFileName()
-		// A second call to Asset::initialize() will throw.
-		EXPECT_ANY_THROW(initialize(test, *applicationData));
+		// Asset::load() is implicitly called by Asset::setFileName()
+		// A second call to Asset::load() will throw.
+		EXPECT_ANY_THROW(load(test, nonExistFile));
 
-		// Since setFileName() now calls Asset::initialize() internally which asserts on double calls,
+		// Since setFileName() now calls Asset::load() internally which asserts on double calls,
 		// this makes setFileName() can be called only once.
-		EXPECT_ANY_THROW(test.setFileName("AssetTestData/DummyFile.txt"));
-		// 'initialize()' can only be called once (no matter what the result the first time was).
-		EXPECT_ANY_THROW(initialize(test, *applicationData));
+		std::string dummyFile("AssetTestData/DummyFile.txt");
+		EXPECT_ANY_THROW(test.setFileName(dummyFile));
+		// 'load()' can only be called once (no matter what the result the first time was).
+		EXPECT_ANY_THROW(load(test, dummyFile));
 		EXPECT_FALSE(test.isInitialized());
 	}
 
@@ -105,14 +107,15 @@ TEST_F(AssetTest, InitializationTest)
 		MockAsset test;
 		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
-		test.setFileName("AssetTestData/DummyFile.txt");
-		// Asset::initialize() is implicitly called by Asset::setFileName()
+		std::string dummyFile("AssetTestData/DummyFile.txt");
+		test.setFileName(dummyFile);
+		// Asset::load() is implicitly called by Asset::setFileName()
 		// A second call will throw.
-		EXPECT_ANY_THROW(initialize(test, *applicationData));
+		EXPECT_ANY_THROW(load(test, dummyFile));
 		EXPECT_TRUE(test.isInitialized());
 
-		// 'initialize()' can only be called once (no matter what the result the first time was).
-		EXPECT_ANY_THROW(initialize(test, *applicationData));
+		// 'load()' can only be called once (no matter what the result the first time was).
+		EXPECT_ANY_THROW(load(test, dummyFile));
 		// However, 'isInitialzed()' won't be affected.
 		EXPECT_TRUE(test.isInitialized());
 	}

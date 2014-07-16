@@ -37,7 +37,7 @@ void Asset::setFileName(const std::string& fileName)
 {
 	m_fileName = fileName;
 
-	initialize(*SurgSim::Framework::Runtime::getApplicationData().get());
+	load(fileName);
 }
 
 std::string Asset::getFileName() const
@@ -45,13 +45,14 @@ std::string Asset::getFileName() const
 	return m_fileName;
 }
 
-bool Asset::initialize(const ApplicationData& data)
+bool Asset::load(const std::string& fileName)
 {
 	SURGSIM_ASSERT(!m_didInit) << "Initialization has been called before";
 	m_didInit = true;
 
 	bool result = false;
-	std::string path = data.findFile(m_fileName);
+	auto data = SurgSim::Framework::Runtime::getApplicationData().get();
+	std::string path = data->findFile(fileName);
 
 	if (path.empty())
 	{
@@ -60,7 +61,7 @@ bool Asset::initialize(const ApplicationData& data)
 	}
 	else
 	{
-		m_isInitialized = doInitialize(path);
+		m_isInitialized = doLoad(path);
 		result = m_isInitialized;
 	}
 

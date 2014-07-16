@@ -80,7 +80,7 @@ public:
 	/// \param node the octree root node of this shape
 	void setRootNode(std::shared_ptr<NodeType> node);
 
-	virtual bool doInitialize(const std::string& fileName) override;
+	virtual bool doLoad(const std::string& fileName) override;
 
 private:
 	/// Root node of the octree datastructure
