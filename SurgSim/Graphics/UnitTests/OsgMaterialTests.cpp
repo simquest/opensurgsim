@@ -16,6 +16,7 @@
 /// \file
 /// Tests for the OsgMaterial class.
 
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgUniform.h"
@@ -24,6 +25,11 @@
 #include <gmock/gmock.h>
 
 using SurgSim::Math::Vector2f;
+
+namespace
+{
+std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+}
 
 namespace SurgSim
 {
@@ -82,6 +88,7 @@ TEST(OsgMaterialTests, AddAndRemoveUniformsTest)
 {
 	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>();
 	std::shared_ptr<Material> material = osgMaterial;
+	material->initialize(runtime);
 
 	EXPECT_EQ(0u, material->getNumUniforms());
 

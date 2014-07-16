@@ -46,6 +46,7 @@ RenderPass::~RenderPass()
 bool RenderPass::doInitialize()
 {
 	addComponent(m_camera);
+	addComponent(m_material);
 	return true;
 }
 

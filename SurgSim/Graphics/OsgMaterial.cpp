@@ -21,11 +21,13 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgUniformFactory.h"
 
 #include <algorithm>
 #include <functional>
 
 #include <boost/any.hpp>
+
 
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgUniformBase;
@@ -41,6 +43,13 @@ OsgMaterial::OsgMaterial() : Material(),
 {
 }
 
+OsgMaterial::OsgMaterial(const std::string& name)  :
+	Material(name),
+	m_stateSet(new osg::StateSet())
+{
+
+}
+
 bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 {
 	bool didSucceed = false;
@@ -48,7 +57,10 @@ bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 	std::shared_ptr<OsgUniformBase> osgUniform = std::dynamic_pointer_cast<OsgUniformBase>(uniform);
 	if (osgUniform != nullptr)
 	{
-		osgUniform->addToStateSet(m_stateSet);
+		if (isInitialized())
+		{
+			osgUniform->addToStateSet(m_stateSet);
+		}
 		m_uniforms.push_back(osgUniform);
 
 		// add a property to Material, that carries the uniform name and forwards to the value of the uniform
@@ -59,6 +71,23 @@ bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 		didSucceed = true;
 	}
 	return didSucceed;
+}
+
+bool OsgMaterial::addUniform(const std::string& type, const std::string& name)
+{
+	OsgUniformFactory factory;
+
+	bool result = false;
+	if (factory.isRegistered(type))
+	{
+		result = addUniform(factory.create(type, name));
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "Type " << type << " not supported.";
+	}
+	return result;
 }
 
 bool OsgMaterial::removeUniform(std::shared_ptr<UniformBase> uniform)
@@ -73,7 +102,10 @@ bool OsgMaterial::removeUniform(std::shared_ptr<UniformBase> uniform)
 
 		if (it != m_uniforms.end())
 		{
-			osgUniform->removeFromStateSet(m_stateSet);
+			if (isInitialized())
+			{
+				osgUniform->removeFromStateSet(m_stateSet);
+			}
 			m_uniforms.erase(it);
 			didSucceed = true;
 		}
@@ -172,12 +204,16 @@ void OsgMaterial::clearShader()
 
 bool OsgMaterial::doInitialize()
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	for (auto it = m_uniforms.begin(); it != m_uniforms.end(); ++it)
+	{
+		(*it)->addToStateSet(m_stateSet);
+	}
+	return true;
 }
 
 bool OsgMaterial::doWakeUp()
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	return true;
 }
 
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> createMaterialWithShaders(
@@ -223,7 +259,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createMaterialWithShaders(
 	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material;
 	if (success)
 	{
-		material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+		material = std::make_shared<SurgSim::Graphics::OsgMaterial>(name);
 		material->setShader(shader);
 	}
 

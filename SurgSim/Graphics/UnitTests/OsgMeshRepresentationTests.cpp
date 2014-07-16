@@ -122,8 +122,8 @@ TEST(OsgMeshRepresentationTests, SerializationTest)
 	EXPECT_EQ(8u, data.size());
 
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> newOsgMesh;
-	ASSERT_NO_THROW(newOsgMesh =
-						std::dynamic_pointer_cast<OsgMeshRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	ASSERT_NO_THROW(newOsgMesh = std::dynamic_pointer_cast<OsgMeshRepresentation>
+								 (node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	EXPECT_EQ("SurgSim::Graphics::OsgMeshRepresentation", newOsgMesh->getClassName());
 	EXPECT_EQ(filename, newOsgMesh->getValue<std::string>("Filename"));

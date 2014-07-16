@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgTexture1d.h"
@@ -27,27 +28,49 @@
 
 #include <osg/StateSet>
 
+namespace
+{
+std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+}
+
 namespace SurgSim
 {
 namespace Graphics
 {
 
-TEST(OsgTextureUniformTest, AddUniformTest)
+TEST(OsgTextureUniformTest, AddUniformTests)
 {
 	auto uniform2d = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("TextureUniform");
 
-	EXPECT_ANY_THROW({ OsgMaterial material; material.addUniform(uniform2d);});
+	{
+		// Material not initialized, should be able to add Uniform without Texture
+		auto material = std::make_shared<OsgMaterial>("Material");
+		EXPECT_NO_THROW(material->addUniform(uniform2d));
+	}
 
-	auto texture2d = std::make_shared<OsgTexture2d>();
-	texture2d->setSize(256, 256);
-	uniform2d->set(texture2d);
-	EXPECT_NO_THROW({ OsgMaterial material; material.addUniform(uniform2d);});
+	{
+		// Material is initialized, should not be able to add Uniform without Texture
+		auto material = std::make_shared<OsgMaterial>("Material");
+		material->initialize(runtime);
+		EXPECT_ANY_THROW(material->addUniform(uniform2d));
+	}
+
+	{
+		// Material is initialized, should be able to add Uniform with Texture
+		auto material = std::make_shared<OsgMaterial>("Material");
+		material->initialize(runtime);
+		auto texture2d = std::make_shared<OsgTexture2d>();
+		texture2d->setSize(256, 256);
+		uniform2d->set(texture2d);
+		EXPECT_NO_THROW(material->addUniform(uniform2d));
+	}
 }
 
 // Check for correct assignment of uniforms to texture units
 TEST(OsgTextureUniformTests, TextureUnitAssignment)
 {
 	auto material = std::make_shared<OsgMaterial>();
+	material->initialize(runtime);
 	auto uniform2d0 = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("TextureUniform0");
 	auto uniform2d1 = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("TextureUniform1");
 	auto uniform2d2 = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("TextureUniform2");
@@ -90,6 +113,7 @@ TEST(OsgTextureUniformTests, TextureUnitAssignment)
 TEST(OsgTextureUniformTests, TextureUniformTemplateProblem)
 {
 	auto material = std::make_shared<OsgMaterial>();
+	material->initialize(runtime);
 	auto uniform2d = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("TextureUniform");
 	auto texture2d = std::make_shared<OsgTexture2d>();
 	texture2d->setSize(256, 256);

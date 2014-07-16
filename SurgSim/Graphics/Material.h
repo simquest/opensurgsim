@@ -43,6 +43,8 @@ public:
 	/// Constructor
 	Material() : Component("Material") {}
 
+	explicit Material(const std::string& name) : Component(name) {}
+
 	/// Destructor.
 	//  (Note that Visual Studio does not support "= default" yet.)
 	virtual ~Material()
@@ -53,6 +55,11 @@ public:
 	/// \param	uniform	Uniform to add.
 	/// \return	True if uniform was added successfully, otherwise false.
 	virtual bool addUniform(std::shared_ptr<UniformBase> uniform) = 0;
+
+	/// Adds a GLSL typed uniform to this material
+	/// \param type the type of the uniform
+	/// \param name the name that this uniform should have
+	virtual bool addUniform(const std::string& type, const std::string& name) = 0;
 
 	/// Removes a uniform from this material.
 	/// \param	uniform	Uniform to remove.

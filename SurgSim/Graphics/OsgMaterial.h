@@ -53,11 +53,15 @@ public:
 	/// \post	The material has no uniforms and no shader.
 	OsgMaterial();
 
+	explicit OsgMaterial(const std::string& name);
+
 	/// Adds a uniform to this material
 	/// \param	uniform	Uniform to add
 	/// \return	True if uniform was added successfully, otherwise false
 	/// \note	OsgMaterial only accepts subclasses of OsgUniformBase
 	virtual bool addUniform(std::shared_ptr<UniformBase> uniform);
+
+	virtual bool addUniform(const std::string& type, const std::string& name) override;
 
 	/// Removes a uniform from this material
 	/// \param	uniform	Uniform to remove
