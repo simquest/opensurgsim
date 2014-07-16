@@ -25,7 +25,7 @@ namespace SurgSim
 namespace Framework
 {
 
-Asset::Asset() : m_didInit(false), m_isInitialized(false), m_fileName()
+Asset::Asset() : m_fileName()
 {
 }
 
@@ -33,27 +33,13 @@ Asset::~Asset()
 {
 }
 
-void Asset::setFileName(const std::string& fileName)
-{
-	m_fileName = fileName;
-
-	load(fileName);
-}
-
-std::string Asset::getFileName() const
-{
-	return m_fileName;
-}
-
 bool Asset::load(const std::string& fileName)
 {
-	SURGSIM_ASSERT(!m_didInit) << "Initialization has been called before";
-	m_didInit = true;
-
 	bool result = false;
 	m_fileName = fileName;
+
 	auto data = SurgSim::Framework::Runtime::getApplicationData().get();
-	std::string path = data->findFile(fileName);
+	std::string path = data->findFile(m_fileName);
 
 	if (path.empty())
 	{
@@ -62,16 +48,21 @@ bool Asset::load(const std::string& fileName)
 	}
 	else
 	{
-		m_isInitialized = doLoad(path);
-		result = m_isInitialized;
+		result = doLoad(path);
 	}
 
 	return result;
 }
 
-bool Asset::isInitialized() const
+void Asset::setFileName(const std::string& fileName)
 {
-	return m_isInitialized;
+	m_fileName = fileName;
+	load(m_fileName);
+}
+
+std::string Asset::getFileName() const
+{
+	return m_fileName;
 }
 
 }; // Framework

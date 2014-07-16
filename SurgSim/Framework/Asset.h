@@ -23,10 +23,9 @@ namespace SurgSim
 namespace Framework
 {
 class AssetTest;
-class ApplicationData;
 
-/// This class stores a relative file name and once a file name is set, it will try to load
-/// the file using the static ApplicationData in SurgSim::Framework::Runtime.
+/// This class is used to facilitate file loading. It uses the static ApplicationData
+/// in SurgSim::Framework::Runtime to load file.
 /// Classes not in SurgSim::Framework::Component hierarchy should inherit this class in
 /// order to load a file.
 class Asset
@@ -39,41 +38,32 @@ public:
 	/// Destructor
 	virtual ~Asset();
 
-	/// Check for existence of the resolved filename, return false if not found.
-	/// If found, it then calls 'doLoad()' to load the file. Return 'false' if 'doLoad()' fails.
-	/// It asserts on double calls.
+	/// Check for existence of the resolved file name and if file is found,
+	/// it then calls 'doLoad()' to load the file.
 	/// \note As a side effect, the name of the file will be recorded in
 	/// \note Asset::m_fileName and can be retrieved by Asset::getFileName().
 	/// \param fileName Name of the file to be loaded.
-	/// \return True if file is found and loaded successfully; false otherwise.
+	/// \return True if load is succesful; Otherwise, false.
 	bool load(const std::string& fileName);
 
 	/// Return the name of file loaded by this class.
 	/// \return Name of the file loaded by this class.
 	std::string getFileName() const;
 
-	/// Check to see if an attempt has been made to load the file.
-	/// \return true if initialization succeeded, false otherwise
-	bool isInitialized() const;
-
 protected:
-	/// Set the file name to be loaded.
-	/// \note Asset::setFileName() will try to load the file right after the file name is set.
-	/// \param fileName Name of the file to be loaded.
-	void setFileName(const std::string& fileName);
-
 	/// Derived classes will overwrite this method to do actual loading.
 	/// \note This method is not required to do any check on the validity or the existence of the file.
-	/// \return false if loading failed, assume filename != ""
+	/// \param filePath Absolute path to the file.
+	/// \return True if loading is successful; Otherwise, false.
 	virtual bool doLoad(const std::string& filePath) = 0;
 
+	/// Set the name of file to be loaded by this class
+	/// \param fileName Name of file to be loaded.
+	/// \note This method will call Asset::load() after the name is set.
+	/// \note This method is for serialization purpose only, clients should not call this method.
+	void setFileName(const std::string& fileName);
+
 private:
-	/// Indicates if an attempt to load the file has been made.
-	bool m_didInit;
-
-	/// Indicates if load is successful.
-	bool m_isInitialized;
-
 	/// Name of the file to be loaded.
 	std::string m_fileName;
 };

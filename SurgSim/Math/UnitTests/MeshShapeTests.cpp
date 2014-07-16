@@ -82,16 +82,13 @@ public:
 	void SetUp()
 	{
 		m_numIterations = 100;
-
+		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		srand((unsigned int)time(nullptr));
-	}
-
-	void TearDown()
-	{
 	}
 
 	/// Number of iterations to test
 	int m_numIterations;
+	std::shared_ptr<SurgSim::Framework::Runtime> m_runtime;
 };
 
 TEST_F(MeshShapeTest, InvalidMeshCubeTest)
@@ -245,8 +242,6 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 
 TEST_F(MeshShapeTest, SerializationTest)
 {
-	SurgSim::Framework::Runtime runtime("config.txt");
-
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 	EXPECT_NO_THROW(EXPECT_TRUE(meshShape->load(fileName)));
@@ -275,8 +270,6 @@ TEST_F(MeshShapeTest, SerializationTest)
 
 TEST_F(MeshShapeTest, CreateAabbTreeTest)
 {
-	SurgSim::Framework::Runtime runtime("config.txt");
-
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 	EXPECT_NO_THROW(EXPECT_TRUE(meshShape->load(fileName)));
@@ -299,7 +292,6 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 
 TEST_F(MeshShapeTest, DoLoadTest)
 {
-	SurgSim::Framework::Runtime runtime("config.txt");
 	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 	{
 		auto fileName = std::string("MeshShapeData/staple_collision.ply");

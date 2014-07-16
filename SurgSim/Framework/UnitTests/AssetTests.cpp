@@ -16,9 +16,10 @@
 /// \file
 /// Tests for SURGSIM_ASSERT() and SURGSIM_FAILURE().
 
-#include <gtest/gtest.h>
-
+#include <fstream>
 #include <string>
+
+#include <gtest/gtest.h>
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Asset.h"
@@ -30,7 +31,17 @@ public:
 	MockAsset() {}
 	~MockAsset() {}
 
-	virtual bool doLoad(const std::string&) {return true;}
+	virtual bool doLoad(const std::string& fileName)
+	{
+		bool result = false;
+		std::ifstream in(fileName);
+
+		if (in.is_open())
+		{
+			result = true;
+		}
+		return result;
+	}
 };
 
 namespace SurgSim
@@ -41,18 +52,18 @@ namespace Framework
 class AssetTest : public ::testing::Test
 {
 public:
-	bool load(SurgSim::Framework::Asset& asset, const std::string& fileName)
+	void SetUp()
 	{
-		return asset.load(fileName);
+		runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	}
 
 	void setFileName(SurgSim::Framework::Asset& asset, const std::string& fileName)
 	{
 		asset.setFileName(fileName);
 	}
+
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
 };
-
-
 
 TEST_F(AssetTest, InitTest)
 {
@@ -60,70 +71,43 @@ TEST_F(AssetTest, InitTest)
 
 	MockAsset test;
 	EXPECT_EQ("", test.getFileName());
-	EXPECT_FALSE(test.isInitialized());
+	EXPECT_FALSE(test.load(""));
 }
 
 TEST_F(AssetTest, FileNameTest)
 {
 	MockAsset test;
-	SurgSim::Framework::Runtime runtime("config.txt");
-	std::string fileName = "TestFileName";
+	std::string fileName1 = "TestFileName1";
+	std::string fileName2 = "TestFileName2";
 
-	EXPECT_NO_THROW(setFileName(test, fileName));
-	EXPECT_EQ(fileName, test.getFileName());
+	EXPECT_NO_THROW(EXPECT_FALSE(test.load(fileName1)));
+	EXPECT_EQ(fileName1, test.getFileName());
+
+	EXPECT_NO_THROW(setFileName(test, fileName2));
+	EXPECT_EQ(fileName2, test.getFileName());
 }
 
-TEST_F(AssetTest, InitializationTest)
+TEST_F(AssetTest, LoadTest)
 {
-	SurgSim::Framework::Runtime runtime("config.txt");
-	{
-		MockAsset test;
-		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	MockAsset test;
 
-		// Call 'load()' without setting file name will fail.
-		EXPECT_FALSE(load(test, ""));
-		EXPECT_FALSE(test.isInitialized());
-	}
+	// Call 'Asset::load()' with empty file name will fail.
+	EXPECT_FALSE(test.load(""));
+	EXPECT_EQ("", test.getFileName());
 
-	{
-		MockAsset test;
+	// Loading non-exist file will fail, but the internal file name recorded by Asset will be updated.
+	std::string invalidFileName("Non-exist-file");
+	EXPECT_FALSE(test.load(invalidFileName));
+	EXPECT_EQ(invalidFileName, test.getFileName());
 
-		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	// Loading existing file should success and internal file name recorded by Asset will be updated.
+	std::string validDummyFile("AssetTestData/DummyFile.txt");
+	EXPECT_TRUE(test.load(validDummyFile));
+	EXPECT_EQ(validDummyFile, test.getFileName());
 
-		// Loading non-exist file will fail.
-		std::string nonExistFile("Non-exist-file");
-		setFileName(test, nonExistFile);
-		EXPECT_FALSE(test.isInitialized());
-
-		// Asset::load() is implicitly called by Asset::setFileName()
-		// A second call to Asset::load() will throw.
-		EXPECT_ANY_THROW(load(test, nonExistFile));
-
-		// Since setFileName() now calls Asset::load() internally which asserts on double calls,
-		// this makes setFileName() can be called only once.
-		std::string dummyFile("AssetTestData/DummyFile.txt");
-		EXPECT_ANY_THROW(setFileName(test, dummyFile));
-		// 'load()' can only be called once (no matter what the result the first time was).
-		EXPECT_ANY_THROW(load(test, dummyFile));
-		EXPECT_FALSE(test.isInitialized());
-	}
-
-	{
-		MockAsset test;
-		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
-
-		std::string dummyFile("AssetTestData/DummyFile.txt");
-		setFileName(test, dummyFile);
-		// Asset::load() is implicitly called by Asset::setFileName()
-		// A second call will throw.
-		EXPECT_ANY_THROW(load(test, dummyFile));
-		EXPECT_TRUE(test.isInitialized());
-
-		// 'load()' can only be called once (no matter what the result the first time was).
-		EXPECT_ANY_THROW(load(test, dummyFile));
-		// However, 'isInitialzed()' won't be affected.
-		EXPECT_TRUE(test.isInitialized());
-	}
+	// Loading same existing file again should success and internal file name will be the same.
+	EXPECT_TRUE(test.load(validDummyFile));
+	EXPECT_EQ(validDummyFile, test.getFileName());
 }
 
 }; // Framework
