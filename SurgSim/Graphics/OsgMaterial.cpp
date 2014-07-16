@@ -216,6 +216,11 @@ bool OsgMaterial::doWakeUp()
 	return true;
 }
 
+osg::ref_ptr<osg::StateSet> OsgMaterial::getOsgStateSet() const
+{
+	return m_stateSet;
+}
+
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> createMaterialWithShaders(
 	const SurgSim::Framework::ApplicationData& data,
 	const std::string& name)

@@ -71,7 +71,6 @@ public:
 	/// \return True if uniform was removed successfully, otherwise false.
 	virtual bool removeUniform(const std::string& name) = 0;
 
-
 	/// Gets a uniform in this material.
 	/// \param	name	The name of the Uniform to fetch.
 	/// \return	The uniform, nullptr if the uniform does not exist.

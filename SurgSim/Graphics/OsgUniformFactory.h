@@ -26,6 +26,8 @@ namespace SurgSim
 namespace Graphics
 {
 
+/// This class can create the appropriate OsgUniform from an OpenGl glsl type, use the appropriate name
+/// from glsl in the create() function to recieve the correctly typed uniform
 class OsgUniformFactory : public SurgSim::Framework::ObjectFactory1<UniformBase, std::string>
 {
 public:

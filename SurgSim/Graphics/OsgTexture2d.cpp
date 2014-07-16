@@ -55,5 +55,10 @@ SurgSim::Framework::convert(boost::any val)
 	{
 		result = boost::any_cast<std::shared_ptr<SurgSim::Graphics::OsgTexture2d>>(val);
 	}
+
+	SURGSIM_ASSERT(result != nullptr)
+			<< "Conversion from the incoming type to OsgTexture2d failed, this probably means that the input value "
+			<< "was a texture but not an OsgTexture2d.";
+
 	return result;
 }

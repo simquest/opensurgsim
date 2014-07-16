@@ -69,6 +69,8 @@ public:
 
 namespace Framework
 {
+/// Template specialization for the convert<> function used in accessible, this one can convert an incoming
+/// SurgSim::Graphics::Texture to an outgoing OsgTexture2d
 template <>
 std::shared_ptr<SurgSim::Graphics::OsgTexture2d> convert(boost::any val);
 }

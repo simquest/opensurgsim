@@ -57,7 +57,6 @@ OsgUniformFactory::OsgUniformFactory()
 	registerClass<OsgUniform<SurgSim::Math::Matrix44d>>("dmat4");
 
 	// Sampler Types
-
 	registerClass<OsgTextureUniform<OsgTexture1d>>("sampler1D");
 	registerClass<OsgTextureUniform<OsgTexture2d>>("sampler2D");
 	registerClass<OsgTextureUniform<OsgTexture3d>>("sampler3D");
