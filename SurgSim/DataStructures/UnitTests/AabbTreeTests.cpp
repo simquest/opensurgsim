@@ -215,10 +215,10 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 
 	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshA->setFileName(fileName));
+	EXPECT_NO_THROW(EXPECT_TRUE(meshA->load(fileName)));
 
 	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshB->setFileName(fileName));
+	EXPECT_NO_THROW(EXPECT_TRUE(meshB->load(fileName)));
 
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
 	meshB->getMesh()->copyWithTransform(rhsPose, *meshA->getMesh());

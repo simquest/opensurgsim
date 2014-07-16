@@ -124,7 +124,7 @@ TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->setFileName(fileName));
+	EXPECT_NO_THROW(EXPECT_TRUE(meshShape->load(fileName)));
 
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)

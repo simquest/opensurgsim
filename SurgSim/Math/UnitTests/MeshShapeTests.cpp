@@ -249,7 +249,7 @@ TEST_F(MeshShapeTest, SerializationTest)
 
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->setFileName(fileName));
+	EXPECT_NO_THROW(EXPECT_TRUE(meshShape->load(fileName)));
 
 	// We chose to let YAML serialization only works with base class pointer.
 	// i.e. We need to serialize 'meshShape' via a SurgSim::Math::Shape pointer.
@@ -279,7 +279,7 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->setFileName(fileName));
+	EXPECT_NO_THROW(EXPECT_TRUE(meshShape->load(fileName)));
 
 	auto tree = meshShape->getAabbTree();
 
@@ -297,27 +297,25 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 	}
 }
 
-TEST_F(MeshShapeTest, DoInitializeTest)
+TEST_F(MeshShapeTest, DoLoadTest)
 {
 	SurgSim::Framework::Runtime runtime("config.txt");
 	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 	{
 		auto fileName = std::string("MeshShapeData/staple_collision.ply");
-		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-
-		EXPECT_NO_THROW(meshShape->setFileName(fileName));
 		auto path = data->findFile(fileName);
 		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
+
+		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 		EXPECT_NO_THROW(EXPECT_TRUE(meshShape->doLoad(path)));
 	}
 
 	{
 		auto fileName = std::string("MeshShapeData/InvalidMesh.ply");
-		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-
-		EXPECT_ANY_THROW(meshShape->setFileName(fileName));
 		auto path = data->findFile(fileName);
 		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
+
+		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 		EXPECT_ANY_THROW(meshShape->doLoad(path));
 	}
 }

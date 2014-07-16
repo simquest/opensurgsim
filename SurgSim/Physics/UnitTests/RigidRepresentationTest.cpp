@@ -430,7 +430,7 @@ TEST_F(RigidRepresentationTest, WithMeshShape)
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 
 	std::shared_ptr<SurgSim::Math::MeshShape> shape = std::make_shared<SurgSim::Math::MeshShape>();
-	shape->setFileName("MeshShapeData/staple_collision.ply");
+	shape->load("MeshShapeData/staple_collision.ply");
 	EXPECT_TRUE(shape->isValid());
 
 	SurgSim::Physics::RigidRepresentationParameters params;

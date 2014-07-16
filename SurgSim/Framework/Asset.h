@@ -39,10 +39,14 @@ public:
 	/// Destructor
 	virtual ~Asset();
 
-	/// Set the file name to be loaded.
-	/// \note Asset::setFileName() will try to load the file right after the file name is set.
+	/// Check for existence of the resolved filename, return false if not found.
+	/// If found, it then calls 'doLoad()' to load the file. Return 'false' if 'doLoad()' fails.
+	/// It asserts on double calls.
+	/// \note As a side effect, the name of the file will be recorded in
+	/// \note Asset::m_fileName and can be retrieved by Asset::getFileName().
 	/// \param fileName Name of the file to be loaded.
-	void setFileName(const std::string& fileName);
+	/// \return True if file is found and loaded successfully; false otherwise.
+	bool load(const std::string& fileName);
 
 	/// Return the name of file loaded by this class.
 	/// \return Name of the file loaded by this class.
@@ -53,12 +57,10 @@ public:
 	bool isInitialized() const;
 
 protected:
-	/// Check for existence of the resolved filename, return false if not found.
-	/// If found, it then calls 'doLoad()' to load the file. Return 'false' if 'doLoad()' fails.
-	/// It asserts on double calls.
+	/// Set the file name to be loaded.
+	/// \note Asset::setFileName() will try to load the file right after the file name is set.
 	/// \param fileName Name of the file to be loaded.
-	/// \return True if file is found and loaded successfully; false otherwise.
-	bool load(const std::string& fileName);
+	void setFileName(const std::string& fileName);
 
 	/// Derived classes will overwrite this method to do actual loading.
 	/// \note This method is not required to do any check on the validity or the existence of the file.

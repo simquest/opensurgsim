@@ -45,6 +45,11 @@ public:
 	{
 		return asset.load(fileName);
 	}
+
+	void setFileName(SurgSim::Framework::Asset& asset, const std::string& fileName)
+	{
+		asset.setFileName(fileName);
+	}
 };
 
 
@@ -64,7 +69,7 @@ TEST_F(AssetTest, FileNameTest)
 	SurgSim::Framework::Runtime runtime("config.txt");
 	std::string fileName = "TestFileName";
 
-	EXPECT_NO_THROW(test.setFileName(fileName));
+	EXPECT_NO_THROW(setFileName(test, fileName));
 	EXPECT_EQ(fileName, test.getFileName());
 }
 
@@ -87,7 +92,7 @@ TEST_F(AssetTest, InitializationTest)
 
 		// Loading non-exist file will fail.
 		std::string nonExistFile("Non-exist-file");
-		test.setFileName(nonExistFile);
+		setFileName(test, nonExistFile);
 		EXPECT_FALSE(test.isInitialized());
 
 		// Asset::load() is implicitly called by Asset::setFileName()
@@ -97,7 +102,7 @@ TEST_F(AssetTest, InitializationTest)
 		// Since setFileName() now calls Asset::load() internally which asserts on double calls,
 		// this makes setFileName() can be called only once.
 		std::string dummyFile("AssetTestData/DummyFile.txt");
-		EXPECT_ANY_THROW(test.setFileName(dummyFile));
+		EXPECT_ANY_THROW(setFileName(test, dummyFile));
 		// 'load()' can only be called once (no matter what the result the first time was).
 		EXPECT_ANY_THROW(load(test, dummyFile));
 		EXPECT_FALSE(test.isInitialized());
@@ -108,7 +113,7 @@ TEST_F(AssetTest, InitializationTest)
 		auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 
 		std::string dummyFile("AssetTestData/DummyFile.txt");
-		test.setFileName(dummyFile);
+		setFileName(test, dummyFile);
 		// Asset::load() is implicitly called by Asset::setFileName()
 		// A second call will throw.
 		EXPECT_ANY_THROW(load(test, dummyFile));

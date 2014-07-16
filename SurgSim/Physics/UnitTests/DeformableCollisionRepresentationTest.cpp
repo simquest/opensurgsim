@@ -46,7 +46,7 @@ struct DeformableCollisionRepresentationTest : public ::testing::Test
 		m_filename = std::string("Geometry/wound_deformable.ply");
 		m_applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 		m_meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-		m_meshShape->setFileName(m_filename);
+		m_meshShape->load(m_filename);
 		m_deformableRepresentation = std::make_shared<MockDeformableRepresentation>("DeformableRepresentation");
 		m_deformableCollisionRepresentation =
 			std::make_shared<DeformableCollisionRepresentation>("DeformableCollisionRepresentation");

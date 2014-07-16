@@ -461,7 +461,7 @@ TEST_F(ShapeTest, OctreeShape)
 		const std::string fileName = "OctreeShapeData/staple.vox";
 		OctreeShape octree;
 		EXPECT_NO_THROW(octree.setRootNode(node));
-		EXPECT_NO_THROW(octree.setFileName(fileName));
+		EXPECT_NO_THROW(EXPECT_TRUE(octree.load(fileName)));
 
 		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
 		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, octree.getType());

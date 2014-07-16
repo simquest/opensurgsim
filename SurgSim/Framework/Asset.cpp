@@ -51,6 +51,7 @@ bool Asset::load(const std::string& fileName)
 	m_didInit = true;
 
 	bool result = false;
+	m_fileName = fileName;
 	auto data = SurgSim::Framework::Runtime::getApplicationData().get();
 	std::string path = data->findFile(fileName);
 
