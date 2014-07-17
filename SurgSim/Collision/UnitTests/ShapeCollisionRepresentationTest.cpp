@@ -42,7 +42,7 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(EXPECT_TRUE(meshShape->load(fileName)));
+	EXPECT_NO_THROW(meshShape->load(fileName));
 
 	auto collisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Collision");
 	collisionRepresentation->setShape(meshShape);
@@ -76,7 +76,7 @@ TEST(ShapeCollisionRepresentationTest, SerializationTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SurgSim::Math::MeshShape>();
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
-	EXPECT_NO_THROW(EXPECT_TRUE(meshShape->load(fileName)));
+	EXPECT_NO_THROW(meshShape->load(fileName));
 
 	auto collisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Collision");
 	collisionRepresentation->setValue("Shape", shape);

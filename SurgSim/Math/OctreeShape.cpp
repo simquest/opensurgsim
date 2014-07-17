@@ -26,7 +26,18 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::OctreeShape, OctreeShape);
 
 OctreeShape::OctreeShape()
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OctreeShape, std::string, FileName, getFileName, setFileName);
+	// Special treatment to let std::bind() deal with overloaded function.
+	auto resolvedOverloadFunction = static_cast<void(Asset::*)(const std::string&)>(&Asset::load);
+
+	setAccessors("FileName",
+				 std::bind(&Asset::getFileName, this),													 // Getter
+				 std::bind(resolvedOverloadFunction, this,
+						   std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1))); // Setter
+
+	setSerializable("FileName",
+					std::bind(&YAML::convert<std::string>::encode, std::bind(&Asset::getFileName, this)),// Encoder
+					std::bind(resolvedOverloadFunction, this,
+							  std::bind(&YAML::Node::as<std::string>, std::placeholders::_1)));			 // Decoder
 }
 
 OctreeShape::~OctreeShape()

@@ -57,11 +57,6 @@ public:
 		runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	}
 
-	void setFileName(SurgSim::Framework::Asset& asset, const std::string& fileName)
-	{
-		asset.setFileName(fileName);
-	}
-
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
 };
 
@@ -71,42 +66,34 @@ TEST_F(AssetTest, InitTest)
 
 	MockAsset test;
 	EXPECT_EQ("", test.getFileName());
-	EXPECT_FALSE(test.load(""));
 }
 
-TEST_F(AssetTest, FileNameTest)
+TEST_F(AssetTest, LoadAndFileNameTest)
 {
 	MockAsset test;
-	std::string fileName1 = "TestFileName1";
-	std::string fileName2 = "TestFileName2";
 
-	EXPECT_NO_THROW(EXPECT_FALSE(test.load(fileName1)));
-	EXPECT_EQ(fileName1, test.getFileName());
-
-	EXPECT_NO_THROW(setFileName(test, fileName2));
-	EXPECT_EQ(fileName2, test.getFileName());
-}
-
-TEST_F(AssetTest, LoadTest)
-{
-	MockAsset test;
+	// HW-JULY-16, 2014
+	// Since Asset::load(const std::string&) simplely delegates all calls to its overloading conterpart with
+	// ApplicationData from SurgSim::Framwork::Runtime,
+	// tests below actually test Asset::load(const std::string& fileName, const ApplicationData& data);
+	// No need to duplicate tests. Update when those two functions diverge.
 
 	// Call 'Asset::load()' with empty file name will fail.
-	EXPECT_FALSE(test.load(""));
+	EXPECT_ANY_THROW(test.load(""));
 	EXPECT_EQ("", test.getFileName());
 
 	// Loading non-exist file will fail, but the internal file name recorded by Asset will be updated.
 	std::string invalidFileName("Non-exist-file");
-	EXPECT_FALSE(test.load(invalidFileName));
+	EXPECT_ANY_THROW(test.load(invalidFileName));
 	EXPECT_EQ(invalidFileName, test.getFileName());
 
 	// Loading existing file should success and internal file name recorded by Asset will be updated.
 	std::string validDummyFile("AssetTestData/DummyFile.txt");
-	EXPECT_TRUE(test.load(validDummyFile));
+	EXPECT_NO_THROW(test.load(validDummyFile));
 	EXPECT_EQ(validDummyFile, test.getFileName());
 
 	// Loading same existing file again should success and internal file name will be the same.
-	EXPECT_TRUE(test.load(validDummyFile));
+	EXPECT_NO_THROW(test.load(validDummyFile));
 	EXPECT_EQ(validDummyFile, test.getFileName());
 }
 

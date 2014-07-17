@@ -22,6 +22,7 @@ namespace SurgSim
 {
 namespace Framework
 {
+class ApplicationData;
 class AssetTest;
 
 /// This class is used to facilitate file loading. It uses the static ApplicationData
@@ -38,13 +39,18 @@ public:
 	/// Destructor
 	virtual ~Asset();
 
-	/// Check for existence of the resolved file name and if file is found,
-	/// it then calls 'doLoad()' to load the file.
+	/// Check the existence of file 'fileName' using 'data'.
+	/// If 'fileName' exists, this method calls 'doLoad()' to load the file.
+	/// It asserts on loading the file successfully.
 	/// \note As a side effect, the name of the file will be recorded in
 	/// \note Asset::m_fileName and can be retrieved by Asset::getFileName().
 	/// \param fileName Name of the file to be loaded.
-	/// \return True if load is succesful; Otherwise, false.
-	bool load(const std::string& fileName);
+	/// \param data ApplicationData which provides the runtime look up path(s).
+	void load(const std::string& fileName, const ApplicationData& data);
+
+	/// Overloaded function using SurgSim::Framework::Runtime::getApplicationData() as look up path(s).
+	/// \param fileName Name of the file to be loaded.
+	void load(const std::string& fileName);
 
 	/// Return the name of file loaded by this class.
 	/// \return Name of the file loaded by this class.
@@ -56,12 +62,6 @@ protected:
 	/// \param filePath Absolute path to the file.
 	/// \return True if loading is successful; Otherwise, false.
 	virtual bool doLoad(const std::string& filePath) = 0;
-
-	/// Set the name of file to be loaded by this class
-	/// \param fileName Name of file to be loaded.
-	/// \note This method will call Asset::load() after the name is set.
-	/// \note This method is for serialization purpose only, clients should not call this method.
-	void setFileName(const std::string& fileName);
 
 private:
 	/// Name of the file to be loaded.
