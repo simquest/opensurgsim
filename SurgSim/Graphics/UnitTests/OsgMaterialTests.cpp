@@ -26,11 +26,6 @@
 
 using SurgSim::Math::Vector2f;
 
-namespace
-{
-std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
-}
-
 namespace SurgSim
 {
 namespace Graphics
@@ -76,18 +71,19 @@ public:
 
 TEST(OsgMaterialTests, InitTest)
 {
-	OsgMaterial material;
+	auto material = std::make_shared<OsgMaterial>("material");
 
-	EXPECT_EQ(0u, material.getNumUniforms());
-	EXPECT_EQ(nullptr, material.getShader());
+	EXPECT_EQ(0u, material->getNumUniforms());
+	EXPECT_EQ(nullptr, material->getShader());
 
-	EXPECT_NE(nullptr, material.getOsgStateSet());
+	EXPECT_NE(nullptr, material->getOsgStateSet());
 }
 
 TEST(OsgMaterialTests, AddAndRemoveUniformsTest)
 {
-	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<Material> material = osgMaterial;
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	material->initialize(runtime);
 
 	EXPECT_EQ(0u, material->getNumUniforms());
@@ -142,7 +138,7 @@ TEST(OsgMaterialTests, AddAndRemoveUniformsTest)
 
 TEST(OsgMaterialTests, SetAndClearShaderTest)
 {
-	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<Material> material = osgMaterial;
 
 	EXPECT_EQ(nullptr, material->getShader());
@@ -175,7 +171,7 @@ TEST(OsgMaterialTests, SetAndClearShaderTest)
 
 TEST(OsgMaterialTests, NamedAccessTest)
 {
-	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<Material> material = osgMaterial;
 
 	std::string uniform1Name = "float uniform";
@@ -204,7 +200,7 @@ TEST(OsgMaterialTests, NamedAccessTest)
 
 TEST(OsgMaterialTests, AccessibleUniformTest)
 {
-	auto material = std::make_shared<OsgMaterial>();
+	auto material = std::make_shared<OsgMaterial>("material");
 
 	std::string uniform1Name = "ossFloatUniform";
 	auto uniform1 = std::make_shared<OsgUniform<float>>(uniform1Name);

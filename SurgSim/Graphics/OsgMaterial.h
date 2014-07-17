@@ -51,8 +51,6 @@ class OsgMaterial : public Material
 public:
 	/// Constructor
 	/// \post	The material has no uniforms and no shader.
-	OsgMaterial();
-
 	explicit OsgMaterial(const std::string& name);
 
 	/// Adds a uniform to this material

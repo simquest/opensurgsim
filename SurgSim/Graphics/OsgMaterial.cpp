@@ -37,12 +37,6 @@ namespace SurgSim
 
 namespace Graphics
 {
-
-OsgMaterial::OsgMaterial() : Material(),
-	m_stateSet(new osg::StateSet())
-{
-}
-
 OsgMaterial::OsgMaterial(const std::string& name)  :
 	Material(name),
 	m_stateSet(new osg::StateSet())

@@ -405,7 +405,7 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 
 
 	// Put the result of the last pass into the main camera to make it accessible
-	material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+	material = std::make_shared<SurgSim::Graphics::OsgMaterial>("material");
 
 	material->addUniform("sampler2D", "shadowMap");
 	material->setValue("shadowMap", shadowMapPass->getRenderTarget()->getColorTarget(0));

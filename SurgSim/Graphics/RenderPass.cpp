@@ -34,7 +34,7 @@ RenderPass::RenderPass(const std::string& name) :
 	m_camera = std::make_shared<OsgCamera>(getName() + " camera");
 	m_camera->setRenderGroupReference(name);
 
-	m_material = std::make_shared<OsgMaterial>();
+	m_material = std::make_shared<OsgMaterial>("material");
 	m_camera->setMaterial(m_material);
 }
 

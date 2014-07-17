@@ -41,8 +41,6 @@ class Material : public SurgSim::Framework::Component
 public:
 
 	/// Constructor
-	Material() : Component("Material") {}
-
 	explicit Material(const std::string& name) : Component(name) {}
 
 	/// Destructor.
