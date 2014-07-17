@@ -34,7 +34,6 @@ Asset::~Asset()
 
 void Asset::load(const std::string& fileName, const SurgSim::Framework::ApplicationData& data)
 {
-	bool result = false;
 	m_fileName = fileName;
 
 	std::string path = data.findFile(m_fileName);
