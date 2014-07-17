@@ -205,7 +205,7 @@ public:
 	/// The timer channels set for timer outputs (e.g., PWM outputs).
 	const std::unordered_set<int> timerOutputChannels;
 	/// The analog inputs.
-	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputs;
+	const std::unordered_map<int, LabJack::AnalogInputSettings> analogInputs;
 	/// The channels set for analog outputs.
 	const std::unordered_set<int> analogOutputChannels;
 	/// The DataGroup indices for the digital outputs.
@@ -228,7 +228,7 @@ private:
 	/// \param timers The timers.
 	/// \return The timers that provide inputs.
 	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int,
-		LabJack::TimerModeAndOptionalInitialValue>& timers) const
+		LabJack::TimerSettings>& timers) const
 	{
 		std::unordered_set<int> timersWithInputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
@@ -247,7 +247,7 @@ private:
 	/// \param timers The timers.
 	/// \return The timers that take outputs.
 	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int,
-		LabJack::TimerModeAndOptionalInitialValue>& timers) const
+		LabJack::TimerSettings>& timers) const
 	{
 		std::unordered_set<int> timersWithOutputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
@@ -842,7 +842,7 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 	LabJackDevice* device = deviceData->deviceObject;
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
-	const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue>& timers = device->getTimers();
+	const std::unordered_map<int, LabJack::TimerSettings>& timers = device->getTimers();
 
 	LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, timers.size(), 0);
 	bool result = isOk(error);
@@ -904,7 +904,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 
 	bool result = true;
 
-	const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue>& timers = device->getTimers();
+	const std::unordered_map<int, LabJack::TimerSettings>& timers = device->getTimers();
 	for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 	{
 		LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, timer->second.mode, 0, 0);

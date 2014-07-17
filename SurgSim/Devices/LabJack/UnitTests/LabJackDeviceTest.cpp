@@ -240,18 +240,18 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	EXPECT_NO_THROW(device->setTimerCounterPinOffset(pinOffset));
 	EXPECT_EQ(pinOffset, device->getTimerCounterPinOffset());
 
-	std::unordered_map<int, SurgSim::Device::LabJack::TimerModeAndOptionalInitialValue> timers;
-	SurgSim::Device::LabJack::TimerModeAndOptionalInitialValue quadrature =
+	std::unordered_map<int, SurgSim::Device::LabJack::TimerSettings> timers;
+	SurgSim::Device::LabJack::TimerSettings quadrature =
 		{SurgSim::Device::LabJack::TIMERMODE_QUADRATURE, SurgSim::DataStructures::OptionalValue<int>()};
 	timers[0] = quadrature;
-	SurgSim::Device::LabJack::TimerModeAndOptionalInitialValue frequencyOutput =
+	SurgSim::Device::LabJack::TimerSettings frequencyOutput =
 		{SurgSim::Device::LabJack::TIMERMODE_FREQUENCY_OUTPUT, SurgSim::DataStructures::OptionalValue<int>(234)};
 	timers[3] = frequencyOutput;
 	EXPECT_NO_THROW(device->enableTimer(0, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE));
 	EXPECT_NO_THROW(device->enableTimer(3, SurgSim::Device::LabJack::TIMERMODE_FREQUENCY_OUTPUT, 234));
 	EXPECT_EQ(timers, device->getTimers());
 
-	SurgSim::Device::LabJack::TimerModeAndOptionalInitialValue dutyCycle =
+	SurgSim::Device::LabJack::TimerSettings dutyCycle =
 		{SurgSim::Device::LabJack::TIMERMODE_DUTY_CYCLE, SurgSim::DataStructures::OptionalValue<int>()};
 	timers[4] = dutyCycle;
 	EXPECT_NO_THROW(device->setTimers(timers));
@@ -261,12 +261,12 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	EXPECT_NO_THROW(device->setMaximumUpdateRate(rate));
 	EXPECT_NEAR(rate, device->getMaximumUpdateRate(), 1e-9);
 
-	std::unordered_map<int, SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel> analogInputs;
-	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel differentialRangeAndChannel =
+	std::unordered_map<int, SurgSim::Device::LabJack::AnalogInputSettings> analogInputs;
+	const SurgSim::Device::LabJack::AnalogInputSettings differentialRangeAndChannel =
 		{SurgSim::Device::LabJack::Range::RANGE_10,
 		SurgSim::DataStructures::OptionalValue<int>(1)};
 	analogInputs[2] = differentialRangeAndChannel;
-	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel singleEndedRange =
+	const SurgSim::Device::LabJack::AnalogInputSettings singleEndedRange =
 		{SurgSim::Device::LabJack::Range::RANGE_0_POINT_1,
 		SurgSim::DataStructures::OptionalValue<int>()};
 	analogInputs[5] = singleEndedRange;
@@ -274,7 +274,7 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	EXPECT_NO_THROW(device->enableAnalogInput(5, SurgSim::Device::LabJack::Range::RANGE_0_POINT_1));
 	EXPECT_EQ(analogInputs, device->getAnalogInputs());
 
-	const SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel anotherRange =
+	const SurgSim::Device::LabJack::AnalogInputSettings anotherRange =
 	{SurgSim::Device::LabJack::Range::RANGE_0_POINT_01,
 	SurgSim::DataStructures::OptionalValue<int>()};
 	analogInputs[6] = anotherRange;
@@ -334,7 +334,7 @@ TEST(LabJackDeviceTest, NoSettingAfterInitialization)
 		SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->setTimers(std::unordered_map<int,
-		SurgSim::Device::LabJack::TimerModeAndOptionalInitialValue>()),
+		SurgSim::Device::LabJack::TimerSettings>()),
 		SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->setMaximumUpdateRate(300.0), SurgSim::Framework::AssertionFailure);
@@ -343,7 +343,7 @@ TEST(LabJackDeviceTest, NoSettingAfterInitialization)
 		SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->setAnalogInputs(std::unordered_map<int,
-		SurgSim::Device::LabJack::RangeAndOptionalNegativeChannel>()),
+		SurgSim::Device::LabJack::AnalogInputSettings>()),
 		SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->setAnalogInputResolution(3), SurgSim::Framework::AssertionFailure);

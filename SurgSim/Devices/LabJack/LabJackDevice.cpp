@@ -194,7 +194,7 @@ int LabJackDevice::getTimerCounterPinOffset() const
 void LabJackDevice::enableTimer(int index, LabJack::TimerMode mode)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Timers cannot be enabled for a LabJackDevice after it is initialized.";
-	LabJack::TimerModeAndOptionalInitialValue timerModeAndOptionalInitialValue = {mode,
+	LabJack::TimerSettings timerModeAndOptionalInitialValue = {mode,
 		SurgSim::DataStructures::OptionalValue<int>()};
 	m_timers[index] = std::move(timerModeAndOptionalInitialValue);
 }
@@ -202,18 +202,18 @@ void LabJackDevice::enableTimer(int index, LabJack::TimerMode mode)
 void LabJackDevice::enableTimer(int index, LabJack::TimerMode mode, int initialValue)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Timers cannot be enabled for a LabJackDevice after it is initialized.";
-	LabJack::TimerModeAndOptionalInitialValue timerModeAndOptionalInitialValue = {mode,
+	LabJack::TimerSettings timerModeAndOptionalInitialValue = {mode,
 		SurgSim::DataStructures::OptionalValue<int>(initialValue)};
 	m_timers[index] = std::move(timerModeAndOptionalInitialValue);
 }
 
-void LabJackDevice::setTimers(const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue>& timers)
+void LabJackDevice::setTimers(const std::unordered_map<int, LabJack::TimerSettings>& timers)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Timers cannot be enabled for a LabJackDevice after it is initialized.";
 	m_timers = timers;
 }
 
-const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue>& LabJackDevice::getTimers() const
+const std::unordered_map<int, LabJack::TimerSettings>& LabJackDevice::getTimers() const
 {
 	return m_timers;
 }
@@ -234,7 +234,7 @@ void LabJackDevice::enableAnalogInput(int positiveChannel, LabJack::Range range,
 {
 	SURGSIM_ASSERT(!isInitialized()) <<
 		"Analog inputs cannot be enabled for a LabJackDevice after it is initialized.";
-	LabJack::RangeAndOptionalNegativeChannel rangeAndOptionalNegativeChannel = {range,
+	LabJack::AnalogInputSettings rangeAndOptionalNegativeChannel = {range,
 		SurgSim::DataStructures::OptionalValue<int>(negativeChannel)};
 	m_analogInputs[positiveChannel] = std::move(rangeAndOptionalNegativeChannel);
 }
@@ -243,20 +243,20 @@ void LabJackDevice::enableAnalogInput(int channel, LabJack::Range range)
 {
 	SURGSIM_ASSERT(!isInitialized()) <<
 		"Analog inputs cannot be enabled for a LabJackDevice after it is initialized.";
-	LabJack::RangeAndOptionalNegativeChannel rangeAndOptionalNegativeChannel = {range,
+	LabJack::AnalogInputSettings rangeAndOptionalNegativeChannel = {range,
 		SurgSim::DataStructures::OptionalValue<int>()};
 	m_analogInputs[channel] = std::move(rangeAndOptionalNegativeChannel);
 }
 
 void LabJackDevice::setAnalogInputs(const std::unordered_map<int,
-	LabJack::RangeAndOptionalNegativeChannel>& analogInputs)
+	LabJack::AnalogInputSettings>& analogInputs)
 {
 	SURGSIM_ASSERT(!isInitialized()) <<
 		"Analog inputs cannot be enabled for a LabJackDevice after it is initialized.";
 	m_analogInputs = analogInputs;
 }
 
-const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel>& LabJackDevice::getAnalogInputs() const
+const std::unordered_map<int, LabJack::AnalogInputSettings>& LabJackDevice::getAnalogInputs() const
 {
 	return m_analogInputs;
 }
