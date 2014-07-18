@@ -19,24 +19,18 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
-#include "SurgSim/DataStructures/Vertex.h"
-#include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
-
-namespace
-{
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior,
-				 TransferPhysicsToGraphicsMeshBehavior);
-}
 
 namespace SurgSim
 {
 
 namespace Blocks
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior,
+				 TransferPhysicsToGraphicsMeshBehavior);
 
 TransferPhysicsToGraphicsMeshBehavior::TransferPhysicsToGraphicsMeshBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name)
@@ -47,54 +41,43 @@ TransferPhysicsToGraphicsMeshBehavior::TransferPhysicsToGraphicsMeshBehavior(con
 		std::shared_ptr<SurgSim::Framework::Component>, Target, getTarget, setTarget);
 }
 
-void TransferPhysicsToGraphicsMeshBehavior::setSource(
-	const std::shared_ptr<SurgSim::Framework::Component>& source)
+void TransferPhysicsToGraphicsMeshBehavior::setSource(const std::shared_ptr<SurgSim::Framework::Component>& source)
 {
-	SURGSIM_ASSERT(nullptr != source) << __FUNCTION__ << " 'source' can not be nullptr.";
+	SURGSIM_ASSERT(nullptr != source) << " 'source' can not be nullptr.";
+
 	auto deformable = std::dynamic_pointer_cast<SurgSim::Physics::DeformableRepresentation>(source);
-	SURGSIM_ASSERT(nullptr != deformable) << __FUNCTION__ << " 'source' is not a " <<
-		"SurgSim::Physics::DeformableRepresentation.";
+	SURGSIM_ASSERT(nullptr != deformable) << " 'source' is not a SurgSim::Physics::DeformableRepresentation.";
 
 	m_source = deformable;
 }
 
-void TransferPhysicsToGraphicsMeshBehavior::setTarget(
-	const std::shared_ptr<SurgSim::Framework::Component>& target)
+void TransferPhysicsToGraphicsMeshBehavior::setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target)
 {
-	SURGSIM_ASSERT(nullptr != target) << __FUNCTION__ << " 'target' can not be nullptr.";
+	SURGSIM_ASSERT(nullptr != target) << " 'target' can not be nullptr.";
+
 	auto mesh = std::dynamic_pointer_cast<SurgSim::Graphics::MeshRepresentation>(target);
-	SURGSIM_ASSERT(nullptr != mesh) << __FUNCTION__ << " 'target' is not a SurgSim::Graphics::MeshRepresentation.";
+	SURGSIM_ASSERT(nullptr != mesh) << " 'target' is not a SurgSim::Graphics::MeshRepresentation.";
 
 	m_target = mesh;
 }
 
-std::shared_ptr<SurgSim::Framework::Component> TransferPhysicsToGraphicsMeshBehavior::getSource() const
+std::shared_ptr<SurgSim::Physics::DeformableRepresentation> TransferPhysicsToGraphicsMeshBehavior::getSource() const
 {
 	return m_source;
 }
-std::shared_ptr<SurgSim::Framework::Component> TransferPhysicsToGraphicsMeshBehavior::getTarget() const
+
+std::shared_ptr<SurgSim::Graphics::MeshRepresentation> TransferPhysicsToGraphicsMeshBehavior::getTarget() const
 {
 	return m_target;
 }
 
 void TransferPhysicsToGraphicsMeshBehavior::update(double dt)
 {
-	auto finalState = m_source->getFinalState();
-	auto numNodes = finalState->getNumNodes();
-	auto target = m_target->getMesh();
+	auto state = m_source->getFinalState();
 
-	if (target->getNumVertices() == numNodes)
+	for (size_t nodeId = 0; nodeId < state->getNumNodes(); ++nodeId)
 	{
-		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
-		{
-			target->setVertexPosition(nodeId, finalState->getPosition(nodeId));
-		}
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"Number of vertices contained by " << m_source->getName() << " and " <<
-			m_target->getName() << " doesn't match. No vertex will be copied.";
+		m_target->getMesh()->setVertexPosition(nodeId, state->getPosition(nodeId));
 	}
 }
 
@@ -105,15 +88,14 @@ bool TransferPhysicsToGraphicsMeshBehavior::doInitialize()
 
 bool TransferPhysicsToGraphicsMeshBehavior::doWakeUp()
 {
-	auto finalState = m_source->getFinalState();
-	auto numNodes = finalState->getNumNodes();
+	auto state = m_source->getFinalState();
 	auto target = m_target->getMesh();
 
 	if (target->getNumVertices() == 0)
 	{
-		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
+		for (size_t nodeId = 0; nodeId < state->getNumNodes(); ++nodeId)
 		{
-			SurgSim::DataStructures::Vertex<SurgSim::Graphics::VertexData> vertex(finalState->getPosition(nodeId));
+			SurgSim::Graphics::Mesh::VertexType vertex(state->getPosition(nodeId));
 			target->addVertex(vertex);
 		}
 	}

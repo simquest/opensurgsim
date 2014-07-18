@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSMESHBEHAVIOR_H
-#define SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSMESHBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_TRANSFERPHYSICSTOPOINTCLOUDBEHAVIOR_H
+#define SURGSIM_BLOCKS_TRANSFERPHYSICSTOPOINTCLOUDBEHAVIOR_H
 
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Macros.h"
@@ -29,7 +29,7 @@ class Component;
 
 namespace Graphics
 {
-class MeshRepresentation;
+class PointCloudRepresentation;
 }
 
 namespace Physics
@@ -39,33 +39,33 @@ class DeformableRepresentation;
 
 namespace Blocks
 {
-SURGSIM_STATIC_REGISTRATION(TransferPhysicsToGraphicsMeshBehavior);
+SURGSIM_STATIC_REGISTRATION(TransferPhysicsToPointCloudBehavior);
 
-/// Behavior to copy positions of a PhysicsRepresentation to a GraphicsMesh.
-class TransferPhysicsToGraphicsMeshBehavior : public SurgSim::Framework::Behavior
+/// Behavior to copy positions of a PhysicsRepresentation to a PointCloud.
+class TransferPhysicsToPointCloudBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	explicit TransferPhysicsToGraphicsMeshBehavior(const std::string& name);
+	explicit TransferPhysicsToPointCloudBehavior(const std::string& name);
 
-	SURGSIM_CLASSNAME(SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior);
+	SURGSIM_CLASSNAME(SurgSim::Blocks::TransferPhysicsToPointCloudBehavior);
 
 	/// Set the representation from which the positions are from
 	/// \param source The physics representation
 	void setSource(const std::shared_ptr<SurgSim::Framework::Component>& source);
 
-	/// Set the representation which will receive the positions
-	/// \param target The Graphics Mesh representation
+	/// Set the point cloud representation which will receive the positions
+	/// \param target The Graphics PointCloud representation
 	void setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target);
 
 	/// Get the Physics representation which sends the positions
 	/// \return The Physics representation which produces positions.
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getSource() const;
 
-	/// Get the Graphics representation which receives the positions
-	/// \return The Graphics Mesh representation which receives positions.
-	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> getTarget() const;
+	/// Get the point cloud representation which receives the positions
+	/// \return The Graphics PointCloud representation which receives positions.
+	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation> getTarget() const;
 
 	virtual void update(double dt) override;
 
@@ -76,11 +76,11 @@ private:
 	/// The DeformableRepresentation from which the Ode state comes.
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_source;
 
-	/// The Graphics Mesh Representation to which the vertices' positions are set.
-	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> m_target;
+	/// The Graphics PointCloud Representation to which the vertices' positions are set.
+	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation> m_target;
 };
 
 };  // namespace Blocks
 };  // namespace SurgSim
 
-#endif  // SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSMESHBEHAVIOR_H
+#endif  // SURGSIM_BLOCKS_TRANSFERPHYSICSTOPOINTCLOUDBEHAVIOR_H
