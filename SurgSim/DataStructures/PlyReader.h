@@ -196,9 +196,6 @@ public:
 	/// Register callback to be called at the end of parseFile.
 	void setEndParseFileCallback(std::function<void (void)> endParseFileCallback);
 
-private:
-	friend class PlyReaderTests;
-
 	/// Sets a delegate for parsing.
 	/// \param delegate The delegate.
 	/// \return true if it succeeds and the properties in the ply file satisfy the delegates fileIsAcceptable().
@@ -206,6 +203,9 @@ private:
 
 	/// Parse the file.
 	void parseFile();
+
+private:
+	friend class PlyReaderTests;
 
 	/// Generic Internal function to handle list and scalar properties, see requestScalarProperty() and
 	/// requestListProperty() for full documentation.
