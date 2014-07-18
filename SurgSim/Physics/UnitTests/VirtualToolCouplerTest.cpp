@@ -197,6 +197,9 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
 	virtualToolCoupler->overrideLinearStiffness(mass * 200);
 
+	virtualToolCoupler->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	virtualToolCoupler->wakeUp();
+
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.translation() = Vector3d(0.1, 0.0, 0.0);
 	rigidBody->setLocalPose(initialPose);
@@ -223,6 +226,8 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
 	virtualToolCoupler->overrideLinearStiffness(mass * 200);
 
+	virtualToolCoupler->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	virtualToolCoupler->wakeUp();
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.linear() = Matrix33d(Eigen::AngleAxisd(M_PI/4.0, Vector3d::UnitY()));
@@ -257,6 +262,9 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 
 	const double stiffness = 1000;
 	virtualToolCoupler->overrideLinearStiffness(stiffness);
+
+	virtualToolCoupler->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	virtualToolCoupler->wakeUp();
 
 	EXPECT_TRUE(rigidBody->isActive());
 	runSystem(2000);
