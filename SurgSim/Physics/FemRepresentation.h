@@ -176,9 +176,6 @@ protected:
 	/// Useful information per node
 	std::vector<double> m_massPerNode; //< Useful in setting up the gravity force F=mg
 
-	/// Whether the file should be loaded or not.
-	bool m_doLoadFile;
-
 	/// Filename for loading the fem representation.
 	std::string m_filename;
 

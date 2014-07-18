@@ -32,7 +32,7 @@ namespace Physics
 {
 
 FemRepresentation::FemRepresentation(const std::string& name) :
-	DeformableRepresentation(name), m_doLoadFile(false)
+	DeformableRepresentation(name)
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
@@ -47,8 +47,6 @@ FemRepresentation::~FemRepresentation()
 void FemRepresentation::setFilename(const std::string& filename)
 {
 	m_filename = filename;
-
-	m_doLoadFile = !m_filename.empty();
 }
 
 const std::string& FemRepresentation::getFilename() const
@@ -61,10 +59,9 @@ bool FemRepresentation::loadFile()
 	using SurgSim::Framework::Logger;
 
 	bool result = true;
-	if (m_filename.empty() || !m_doLoadFile)
+	if (m_filename.empty())
 	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"Filename is empty or file: " << m_filename << " has already been loaded.";
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Filename is empty";
 		result = false;
 	}
 	else
@@ -90,7 +87,6 @@ bool FemRepresentation::loadFile()
 			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Failed to load file " << m_filename;
 			result = false;
 		}
-		m_doLoadFile = false;
 	}
 
 	return result;
@@ -98,7 +94,7 @@ bool FemRepresentation::loadFile()
 
 bool FemRepresentation::doInitialize()
 {
-	if (m_doLoadFile && !loadFile())
+	if (!m_filename.empty() && !loadFile())
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
 			"Failed to initialize from file " << m_filename;
