@@ -48,7 +48,7 @@ bool RigidRepresentationBase::doInitialize()
 {
 	auto meshShape =
 		std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getInitialParameters().getShapeUsedForMassInertia());
-	if (nullptr != meshShape)
+	if (nullptr != meshShape && !meshShape->getFileName().empty())
 	{
 		if (!meshShape->isInitialized())
 		{
