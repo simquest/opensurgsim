@@ -19,7 +19,6 @@
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -120,11 +119,11 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 
 TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 {
-	SurgSim::Framework::Runtime runtime("config.txt");
+	SurgSim::Framework::ApplicationData applicationData("config.txt");
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->load(fileName));
+	EXPECT_NO_THROW(meshShape->load(fileName, applicationData));
 
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)

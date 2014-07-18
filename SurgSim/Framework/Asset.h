@@ -64,7 +64,7 @@ protected:
 	/// \return True if loading is successful; Otherwise, false.
 	virtual bool doLoad(const std::string& filePath) = 0;
 
-	/// Derived classes (which also inherit from SurgSim::Framework::Accessible) should call this function 
+	/// Derived classes (which also inherit from SurgSim::Framework::Accessible) should call this function
 	/// with 'this' pointer as the parameter in their constructors to register file name property for serialization.
 	/// \param accessible 'this' pointer of derived class.
 	void serializeFileName(SurgSim::Framework::Accessible* accesible);

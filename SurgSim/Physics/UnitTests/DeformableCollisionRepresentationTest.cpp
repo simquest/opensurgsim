@@ -44,7 +44,6 @@ struct DeformableCollisionRepresentationTest : public ::testing::Test
 	{
 		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		m_filename = std::string("Geometry/wound_deformable.ply");
-		m_applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 		m_meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 		m_meshShape->load(m_filename);
 		m_deformableRepresentation = std::make_shared<MockDeformableRepresentation>("DeformableRepresentation");
@@ -54,7 +53,6 @@ struct DeformableCollisionRepresentationTest : public ::testing::Test
 
 	std::shared_ptr<SurgSim::Framework::Runtime> m_runtime;
 	std::string m_filename;
-	std::shared_ptr<SurgSim::Framework::ApplicationData> m_applicationData;
 	std::shared_ptr<SurgSim::Math::MeshShape> m_meshShape;
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_deformableRepresentation;
 	std::shared_ptr<SurgSim::Physics::DeformableCollisionRepresentation> m_deformableCollisionRepresentation;
@@ -97,9 +95,6 @@ TEST_F(DeformableCollisionRepresentationTest, MeshTest)
 
 TEST_F(DeformableCollisionRepresentationTest, SerializationTest)
 {
-	// To offer the static ApplicationData in Runtime
-	SurgSim::Framework::Runtime runtime("config.txt");
-
 	auto shape = std::dynamic_pointer_cast<SurgSim::Math::Shape>(m_meshShape);
 	m_deformableCollisionRepresentation->setValue("Shape", shape);
 
