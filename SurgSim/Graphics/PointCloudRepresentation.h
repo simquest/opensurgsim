@@ -28,11 +28,13 @@ namespace SurgSim
 {
 namespace Graphics
 {
+
+typedef SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData> PointCloud;
+
 /// Graphic representation of a point cloud, hase a very basic interface and is intentionally kept generic.
 class PointCloudRepresentation : public virtual Representation
 {
 public:
-	typedef SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData> ValueType;
 
 	/// Constructor
 	explicit PointCloudRepresentation(const std::string& name);
@@ -41,7 +43,7 @@ public:
 
 	/// Pull the vertices.
 	/// \return	The mesh.
-	virtual std::shared_ptr<ValueType>	getVertices() const = 0;
+	virtual std::shared_ptr<PointCloud>	getVertices() const = 0;
 
 	/// Sets point size for the point elements.
 	/// \param	val	The value.

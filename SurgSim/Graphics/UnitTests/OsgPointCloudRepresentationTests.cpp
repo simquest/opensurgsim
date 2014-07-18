@@ -76,7 +76,7 @@ TEST(OsgPointCloudRepresentationTests, VertexTest)
 
 	for (auto it = std::begin(vertexList); it != std::end(vertexList); ++it)
 	{
-		vertices->addVertex(SurgSim::Graphics::PointCloudRepresentation::ValueType::VertexType(*it));
+		vertices->addVertex(SurgSim::Graphics::PointCloud::VertexType(*it));
 	}
 
 	auto updatedVertices = pointCloud->getVertices();

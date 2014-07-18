@@ -97,7 +97,7 @@ bool TransferPhysicsToPointCloudBehavior::doWakeUp()
 	{
 		for (size_t nodeId = 0; nodeId < state->getNumNodes(); ++nodeId)
 		{
-			SurgSim::Graphics::PointCloudRepresentation::ValueType::VertexType vertex(state->getPosition(nodeId));
+			SurgSim::Graphics::PointCloud::VertexType vertex(state->getPosition(nodeId));
 			target->addVertex(vertex);
 		}
 	}

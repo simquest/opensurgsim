@@ -59,7 +59,7 @@ public:
 
 	/// Gets the vertices.
 	/// \return	The vertices.
-	virtual std::shared_ptr<PointCloudRepresentation::ValueType> getVertices() const override;
+	virtual std::shared_ptr<PointCloud> getVertices() const override;
 
 	/// Sets point size.
 	/// \param	val	The value.
@@ -83,7 +83,7 @@ public:
 
 private:
 	/// Local pointer to vertices with data
-	std::shared_ptr<PointCloudRepresentation::ValueType> m_vertices;
+	std::shared_ptr<PointCloud> m_vertices;
 
 	/// OSG vertex data for updating
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;

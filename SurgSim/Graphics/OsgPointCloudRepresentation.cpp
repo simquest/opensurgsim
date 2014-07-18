@@ -36,7 +36,7 @@ OsgPointCloudRepresentation::OsgPointCloudRepresentation(const std::string& name
 	OsgRepresentation(name),
 	m_color(1.0, 1.0, 1.0, 1.0)
 {
-	m_vertices = std::make_shared<ValueType>();
+	m_vertices = std::make_shared<PointCloud>();
 
 	osg::Geode* geode = new osg::Geode();
 	m_geometry = new osg::Geometry();
@@ -95,7 +95,7 @@ void OsgPointCloudRepresentation::doUpdate(double dt)
 	m_geometry->dirtyDisplayList();
 }
 
-std::shared_ptr<PointCloudRepresentation::ValueType> OsgPointCloudRepresentation::getVertices() const
+std::shared_ptr<PointCloud> OsgPointCloudRepresentation::getVertices() const
 {
 	return m_vertices;
 }

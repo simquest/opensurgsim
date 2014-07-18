@@ -39,6 +39,7 @@
 
 using SurgSim::DataStructures::Vertices;
 using SurgSim::Framework::SceneElement;
+using SurgSim::Graphics::PointCloud;
 using SurgSim::Graphics::PointCloudRepresentation;
 using SurgSim::Graphics::OsgAxesRepresentation;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
@@ -491,7 +492,7 @@ void copySimulationBeadsIntoPointCloud(std::shared_ptr<TruthCubeRepresentation> 
 		{
 			for (size_t k = 0; k < beads[i][j].size(); k++)
 			{
-				pointCloud->addVertex(PointCloudRepresentation::ValueType::VertexType(beads[i][j][k]));
+				pointCloud->addVertex(PointCloud::VertexType(beads[i][j][k]));
 			}
 		}
 	}
@@ -508,7 +509,7 @@ void copyExperimentalBeadsIntoPointCloud(std::vector<SurgSim::Math::Vector3d> tr
 	/// Loading the Truth Cube data into point cloud
 	for (size_t i = 0; i < truthCube.size(); ++i)
 	{
-		pointCloudCompressed->addVertex(PointCloudRepresentation::ValueType::VertexType(truthCube[i]));
+		pointCloudCompressed->addVertex(PointCloud::VertexType(truthCube[i]));
 	}
 }
 
