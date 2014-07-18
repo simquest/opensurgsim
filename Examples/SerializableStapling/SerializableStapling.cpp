@@ -16,8 +16,10 @@
 #include <memory>
 
 #include "Examples/ExampleStapling/StaplerBehavior.h"
+#include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
+#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
@@ -27,6 +29,7 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/Vector.h"
@@ -36,10 +39,12 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Device::IdentityPoseDevice;
+using SurgSim::Device::MultiAxisDevice;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgManager;
+using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Input::InputManager;
 using SurgSim::Math::Vector3d;
@@ -75,23 +80,27 @@ int main(int argc, char* argv[])
 	runtime->addManager(physicsManager);
 
 	std::shared_ptr<DeviceInterface> device;
-	device = std::make_shared<IdentityPoseDevice>(deviceName);
-	inputManager->addDevice(device);
+	device = std::make_shared<MultiAxisDevice>(deviceName);
+	if (!device->initialize())
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "Could not initialize device " << device->getName() << " for the tool.";
 
-	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
-	view->enableManipulator(true);
-	view->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
-	view->enableKeyboardDevice(true);
-	inputManager->addDevice(view->getKeyboardDevice());
+		device = std::make_shared<IdentityPoseDevice>(deviceName);
+	}
+	inputManager->addDevice(device);
 
 	YAML::Node node = YAML::LoadFile("Data/Stapling/StaplingDemo.yaml");
 
 	runtime->getScene()->decode(node);
-	runtime->getScene()->addSceneElement(view);
 
 	std::shared_ptr<SceneElement> arm = runtime->getScene()->getSceneElement("arm");
 	std::shared_ptr<SceneElement> wound = runtime->getScene()->getSceneElement("wound");
 	std::shared_ptr<SceneElement> stapler = runtime->getScene()->getSceneElement("stapler");
+	std::shared_ptr<SceneElement> view = runtime->getScene()->getSceneElement("StaplingDemoView");
+	auto osgView = std::dynamic_pointer_cast<OsgView>(view->getComponent("StaplingDemoView View"));
+	SURGSIM_ASSERT(nullptr != osgView) << "No OsgView held by SceneElement StaplingDemoView.";
+	inputManager->addDevice(osgView->getKeyboardDevice());
 
 	// Exclude collision between certain Collision::Representations
 	physicsManager->addExcludedCollisionPair(
