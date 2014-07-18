@@ -51,9 +51,6 @@ bool RigidRepresentationBase::doInitialize()
 	{
 		SURGSIM_ASSERT(meshShape->isValid()) <<
 			"An invalid MeshShape is used in this RigidRepresentationBase.";
-
-		m_initialParameters.updateProperties();
-		setCurrentParameters(m_initialParameters);
 	}
 
 	return true;
