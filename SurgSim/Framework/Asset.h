@@ -22,6 +22,7 @@ namespace SurgSim
 {
 namespace Framework
 {
+class Accessible;
 class ApplicationData;
 class AssetTest;
 
@@ -46,7 +47,7 @@ public:
 	/// \note Asset::m_fileName and can be retrieved by Asset::getFileName().
 	/// \param fileName Name of the file to be loaded.
 	/// \param data ApplicationData which provides the runtime look up path(s).
-	void load(const std::string& fileName, const ApplicationData& data);
+	void load(const std::string& fileName, const SurgSim::Framework::ApplicationData& data);
 
 	/// Overloaded function using SurgSim::Framework::Runtime::getApplicationData() as look up path(s).
 	/// \param fileName Name of the file to be loaded.
@@ -62,6 +63,11 @@ protected:
 	/// \param filePath Absolute path to the file.
 	/// \return True if loading is successful; Otherwise, false.
 	virtual bool doLoad(const std::string& filePath) = 0;
+
+	/// Derived classes (which also inherit from SurgSim::Framework::Accessible) should call this function 
+	/// with 'this' pointer as the parameter in their constructors to register file name property for serialization.
+	/// \param accessible 'this' pointer of derived class.
+	void serializeFileName(SurgSim::Framework::Accessible* accesible);
 
 private:
 	/// Name of the file to be loaded.

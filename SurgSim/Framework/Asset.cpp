@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/Asset.h"
 
+#include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -50,6 +51,22 @@ void Asset::load(const std::string& fileName)
 std::string Asset::getFileName() const
 {
 	return m_fileName;
+}
+
+void Asset::serializeFileName(SurgSim::Framework::Accessible* accesible)
+{
+	// Special treatment to let std::bind() deal with overloaded function.
+	auto resolvedOverloadFunction = static_cast<void(Asset::*)(const std::string&)>(&Asset::load);
+
+	accesible->setAccessors("FileName",
+			   std::bind(&Asset::getFileName, this),													// Getter
+			   std::bind(resolvedOverloadFunction, this,
+						 std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1)));	// Setter
+
+	accesible->setSerializable("FileName",
+			   std::bind(&YAML::convert<std::string>::encode, std::bind(&Asset::getFileName, this)),	// Encoder
+			   std::bind(resolvedOverloadFunction, this,
+						 std::bind(&YAML::Node::as<std::string>, std::placeholders::_1)));				// Decoder
 }
 
 }; // Framework
