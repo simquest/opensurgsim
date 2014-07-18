@@ -17,7 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
@@ -140,10 +141,9 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	auto femToMesh =
-		std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
-			name + " physics to triangle mesh",
-			fem->getFinalState(),
-			graphics->getMesh());
+		std::make_shared<SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior>("physics to triangle mesh");
+	femToMesh->setSource(fem);
+	femToMesh->setTarget(graphics);
 	sceneElement->addComponent(femToMesh);
 
 	auto collision = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("collision");
@@ -171,19 +171,17 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// The point-cloud for visualizing the nodes of the finite element model
 	auto pointCloud
-		= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>("point cloud");
+		= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("point cloud");
 	pointCloud->setColor(SurgSim::Math::Vector4d(0.2, 0.2, 1.0, 1.0));
 	pointCloud->setPointSize(3.0f);
 	pointCloud->setVisible(true);
 	sceneElement->addComponent(pointCloud);
 
 	// The behavior which transfers the position of the vertices in the FEM to locations in the point cloud
-	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<EmptyData>>(
-						  "fem to point cloud",
-						  fem->getFinalState(),
-						  pointCloud->getVertices());
+	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferPhysicsToPointCloudBehavior>("fem to point cloud");
+	femToCloud->setSource(fem);
+	femToCloud->setTarget(pointCloud);
 	sceneElement->addComponent(femToCloud);
-
 
 	return sceneElement;
 }

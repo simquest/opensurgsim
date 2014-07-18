@@ -33,7 +33,7 @@ SceneElement::SceneElement(const std::string& name) :
 {
 	m_pose = std::make_shared<SurgSim::Framework::PoseComponent>("Pose");
 	m_pose->setPose(SurgSim::Math::RigidTransform3d::Identity());
-	addComponent(m_pose);
+	m_components[m_pose->getName()] = m_pose;
 }
 
 SceneElement::~SceneElement()
@@ -62,15 +62,16 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 
 		if (result)
 		{
+			component->setSceneElement(getSharedPtr());
 			m_components[component->getName()] = component;
 		}
 	}
 	else
 	{
 		SURGSIM_LOG_WARNING(Logger::getLogger("runtime")) <<
-			"Component with name " << component->getName() <<
-			" already exists on SceneElement " << getName() <<
-			", did not add component";
+				"Component with name " << component->getName() <<
+				" already exists on SceneElement " << getName() <<
+				", did not add component";
 	}
 
 	return result;
@@ -109,6 +110,9 @@ bool SceneElement::initialize()
 	SURGSIM_ASSERT(!m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
 	m_isInitialized = doInitialize();
 
+	// For completeness
+	m_pose->setSceneElement(getSharedPtr()); 
+
 	if (m_isInitialized)
 	{
 		// initialize all components
@@ -123,9 +127,7 @@ bool SceneElement::initialize()
 
 bool SceneElement::initializeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	component->setSceneElement(getSharedPtr());
 	component->setScene(m_scene);
-
 	return component->initialize(getRuntime());
 }
 
