@@ -19,6 +19,7 @@
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
+#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
@@ -38,6 +39,7 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Device::IdentityPoseDevice;
+using SurgSim::Device::MultiAxisDevice;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::SceneElement;
@@ -78,7 +80,14 @@ int main(int argc, char* argv[])
 	runtime->addManager(physicsManager);
 
 	std::shared_ptr<DeviceInterface> device;
-	device = std::make_shared<IdentityPoseDevice>(deviceName);
+	device = std::make_shared<MultiAxisDevice>(deviceName);
+	if (!device->initialize())
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "Could not initialize device " << device->getName() << " for the tool.";
+
+		device = std::make_shared<IdentityPoseDevice>(deviceName);
+	}
 	inputManager->addDevice(device);
 
 	YAML::Node node = YAML::LoadFile("Data/Stapling/StaplingDemo.yaml");
