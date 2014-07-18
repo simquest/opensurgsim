@@ -82,15 +82,6 @@ bool Component::wakeUp()
 	SURGSIM_ASSERT(m_didInit) << "Component " << getName() << " was awoken without being initialized.";
 	SURGSIM_ASSERT(m_isInitialized) << "Wakeup called even though initialization failed on component." << getName();
 
-	std::shared_ptr<SurgSim::Framework::SceneElement> element = getSceneElement();
-	if (element != nullptr)
-	{
-		auto poseComponents = element->getComponents<SurgSim::Framework::PoseComponent>();
-		SURGSIM_ASSERT(poseComponents.size() == 1) << " SceneElement " << element->getName()
-			<< " needs one and only one PoseComponent.";
-		m_poseComponent = poseComponents[0];
-	}
-
 	m_didWakeUp = true;
 	m_isAwake = doWakeUp();
 
@@ -129,12 +120,14 @@ std::shared_ptr<Runtime> Component::getRuntime() const
 
 std::shared_ptr<const PoseComponent> Component::getPoseComponent() const
 {
-	return m_poseComponent.lock();
+	SURGSIM_ASSERT(m_isInitialized) << "Can't access the pose component before initialization";
+	return m_sceneElement.lock()->getPoseComponent();
 }
 
 std::shared_ptr<PoseComponent> Component::getPoseComponent()
 {
-	return m_poseComponent.lock();
+	SURGSIM_ASSERT(m_isInitialized) << "Can't access the pose component before initialization";
+	return m_sceneElement.lock()->getPoseComponent();
 }
 
 boost::uuids::uuid Component::getUuid() const

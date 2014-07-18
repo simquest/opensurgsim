@@ -163,9 +163,6 @@ private:
 
 	/// Indicates if this component is awake
 	bool m_isAwake;
-
-	/// PoseComponent associated with this Component
-	std::weak_ptr<PoseComponent> m_poseComponent;
 };
 
 }; // namespace Framework
