@@ -58,6 +58,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgVectorFieldRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
+	PointCloudRepresentation.cpp
 	RenderPass.cpp
 	Representation.cpp
 	TriangleNormalGenerator.cpp
@@ -97,7 +98,6 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgPointCloudRepresentation.h
-	OsgPointCloudRepresentation-inl.h
 	OsgQuaternionConversions.h
 	OsgRenderTarget.h
 	OsgRenderTarget-inl.h

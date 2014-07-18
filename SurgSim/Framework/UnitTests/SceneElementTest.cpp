@@ -69,8 +69,8 @@ TEST(SceneElementTest, AddAndTestComponents)
 
 	EXPECT_TRUE(element->addComponent(component));
 
-	// SceneElment in Component will not be set until initialization.
-	EXPECT_NE(component->getSceneElement(), element);
+	// SceneElement should be set after add
+	EXPECT_EQ(component->getSceneElement(), element);
 
 	// Scene in Component will not be set until initialization.
 	EXPECT_NE(component->getScene(), element->getScene() );
