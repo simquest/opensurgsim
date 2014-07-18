@@ -347,66 +347,76 @@ TEST_F(VirtualToolCouplerTest, OptionalParams)
 	Vector3d vec(1.0, 2.0, 3.0);
 	{
 		SCOPED_TRACE("Getters");
+		EXPECT_FALSE(virtualToolCoupler->getOptionalLinearStiffness().hasValue());
 		virtualToolCoupler->overrideLinearStiffness(num);
-		virtualToolCoupler->overrideLinearDamping(num);
-		virtualToolCoupler->overrideAngularStiffness(num);
-		virtualToolCoupler->overrideAngularDamping(num);
-		virtualToolCoupler->overrideAttachmentPoint(vec);
-
 		const OptionalValued& linearStiffness = virtualToolCoupler->getOptionalLinearStiffness();
-		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
-		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
-		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
-		const OptionalValueVec3& attachmentPoint = virtualToolCoupler->getOptionalAttachmentPoint();
-
 		EXPECT_TRUE(linearStiffness.hasValue());
-		EXPECT_TRUE(linearDamping.hasValue());
-		EXPECT_TRUE(angularStiffness.hasValue());
-		EXPECT_TRUE(angularDamping.hasValue());
-		EXPECT_TRUE(attachmentPoint.hasValue());
-
 		EXPECT_EQ(num, linearStiffness.getValue());
+
+		EXPECT_FALSE(virtualToolCoupler->getOptionalLinearDamping().hasValue());
+		virtualToolCoupler->overrideLinearDamping(num);
+		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
+		EXPECT_TRUE(linearDamping.hasValue());
 		EXPECT_EQ(num, linearDamping.getValue());
+
+		EXPECT_FALSE(virtualToolCoupler->getOptionalAngularStiffness().hasValue());
+		virtualToolCoupler->overrideAngularStiffness(num);
+		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
+		EXPECT_TRUE(angularStiffness.hasValue());
 		EXPECT_EQ(num, angularStiffness.getValue());
+
+		EXPECT_FALSE(virtualToolCoupler->getOptionalAngularDamping().hasValue());
+		virtualToolCoupler->overrideAngularDamping(num);
+		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
+		EXPECT_TRUE(angularDamping.hasValue());
 		EXPECT_EQ(num, angularDamping.getValue());
+
+		EXPECT_FALSE(virtualToolCoupler->getOptionalAttachmentPoint().hasValue());
+		virtualToolCoupler->overrideAttachmentPoint(vec);
+		const OptionalValueVec3& attachmentPoint = virtualToolCoupler->getOptionalAttachmentPoint();
+		EXPECT_TRUE(attachmentPoint.hasValue());
 		EXPECT_TRUE(vec.isApprox(attachmentPoint.getValue()));
 	}
 	{
 		SCOPED_TRACE("Setters");
-		virtualToolCoupler->overrideLinearStiffness(0.0);
-		virtualToolCoupler->overrideLinearDamping(0.0);
-		virtualToolCoupler->overrideAngularStiffness(0.0);
-		virtualToolCoupler->overrideAngularDamping(0.0);
-		virtualToolCoupler->overrideAttachmentPoint(Vector3d::Zero());
-
 		OptionalValued optionalNum;
 		optionalNum.setValue(num);
 
 		OptionalValueVec3 optionalVec;
 		optionalVec.setValue(vec);
 
+		virtualToolCoupler->overrideLinearStiffness(0.0);
+		EXPECT_NEAR(0.0, virtualToolCoupler->getOptionalLinearStiffness().getValue(), 1e-9);
 		virtualToolCoupler->setOptionalLinearStiffness(optionalNum);
-		virtualToolCoupler->setOptionalLinearDamping(optionalNum);
-		virtualToolCoupler->setOptionalAngularStiffness(optionalNum);
-		virtualToolCoupler->setOptionalAngularDamping(optionalNum);
-		virtualToolCoupler->setOptionalAttachmentPoint(optionalVec);
-
 		const OptionalValued& linearStiffness = virtualToolCoupler->getOptionalLinearStiffness();
-		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
-		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
-		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
-		const OptionalValueVec3& attachmentPoint = virtualToolCoupler->getOptionalAttachmentPoint();
-
-		EXPECT_TRUE(linearStiffness.hasValue());
-		EXPECT_TRUE(linearDamping.hasValue());
-		EXPECT_TRUE(angularStiffness.hasValue());
-		EXPECT_TRUE(angularDamping.hasValue());
-		EXPECT_TRUE(attachmentPoint.hasValue());
-
 		EXPECT_EQ(num, linearStiffness.getValue());
+
+		virtualToolCoupler->overrideLinearDamping(0.0);
+		EXPECT_NEAR(0.0, virtualToolCoupler->getOptionalLinearDamping().getValue(), 1e-9);
+		virtualToolCoupler->setOptionalLinearDamping(optionalNum);
+		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
+		EXPECT_TRUE(linearDamping.hasValue());
 		EXPECT_EQ(num, linearDamping.getValue());
+
+		virtualToolCoupler->overrideAngularStiffness(0.0);
+		EXPECT_NEAR(0.0, virtualToolCoupler->getOptionalAngularStiffness().getValue(), 1e-9);
+		virtualToolCoupler->setOptionalAngularStiffness(optionalNum);
+		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
+		EXPECT_TRUE(angularStiffness.hasValue());
 		EXPECT_EQ(num, angularStiffness.getValue());
+
+		virtualToolCoupler->overrideAngularDamping(0.0);
+		EXPECT_NEAR(0.0, virtualToolCoupler->getOptionalAngularDamping().getValue(), 1e-9);
+		virtualToolCoupler->setOptionalAngularDamping(optionalNum);
+		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
+		EXPECT_TRUE(angularDamping.hasValue());
 		EXPECT_EQ(num, angularDamping.getValue());
+
+		virtualToolCoupler->overrideAttachmentPoint(Vector3d::Zero());
+		EXPECT_TRUE(virtualToolCoupler->getOptionalAttachmentPoint().getValue().isApprox(Vector3d::Zero()));
+		virtualToolCoupler->setOptionalAttachmentPoint(optionalVec);
+		const OptionalValueVec3& attachmentPoint = virtualToolCoupler->getOptionalAttachmentPoint();
+		EXPECT_TRUE(attachmentPoint.hasValue());
 		EXPECT_TRUE(vec.isApprox(attachmentPoint.getValue()));
 	}
 }
