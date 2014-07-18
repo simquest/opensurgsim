@@ -340,7 +340,6 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
 	material->setShader(shader);
 
-	SURGSIM_ASSERT(material != nullptr) << "Material could not be loaded !";
 	{
 		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
 		material->addUniform(uniform);
