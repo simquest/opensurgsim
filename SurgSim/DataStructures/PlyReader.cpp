@@ -205,7 +205,6 @@ bool PlyReader::setDelegate(std::shared_ptr<PlyReaderDelegate> delegate)
 		}
 	}
 	return result;
-
 }
 
 void PlyReader::parseFile()
@@ -310,6 +309,16 @@ void PlyReader::parseFile()
 	{
 		m_endParseFileCallback();
 	}
+}
+
+bool PlyReader::parseWithDelegate(std::shared_ptr<PlyReaderDelegate> delegate)
+{
+	bool result = setDelegate(delegate);
+	if (result)
+	{
+		parseFile();
+	}
+	return result;
 }
 
 bool PlyReader::hasElement(std::string elementName) const

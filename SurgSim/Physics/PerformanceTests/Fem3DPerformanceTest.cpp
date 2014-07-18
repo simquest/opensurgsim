@@ -24,8 +24,8 @@
 #include "SurgSim/Framework/Timer.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Testing/MockPhysicsManager.h"
 
