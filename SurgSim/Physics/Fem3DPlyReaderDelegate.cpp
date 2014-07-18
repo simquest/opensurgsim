@@ -40,7 +40,7 @@ std::string Fem3DPlyReaderDelegate::getElementName() const
 
 void Fem3DPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
-	SURGSIM_ASSERT(4== m_femData.vertexCount || 8 == m_femData.vertexCount) <<
+	SURGSIM_ASSERT(4 == m_femData.vertexCount || 8 == m_femData.vertexCount) <<
 		"Cannot process 3D element with " << m_femData.vertexCount << " vertices.";
 
 	if (4 == m_femData.vertexCount)

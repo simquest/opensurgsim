@@ -79,7 +79,7 @@ void* Fem2DPlyReaderDelegate::beginThickness(const std::string& elementName, siz
 
 void Fem2DPlyReaderDelegate::endThickness(const std::string& elementName)
 {
-	SURGSIM_ASSERT(SurgSim::Math::isValid(m_thickness)) << "No radius information processed.";
+	SURGSIM_ASSERT(SurgSim::Math::isValid(m_thickness)) << "No thickness information processed.";
 }
 
 void Fem2DPlyReaderDelegate::endParseFile()

@@ -27,7 +27,7 @@ namespace Physics
 class Fem3DRepresentation;
 
 /// Implementation of PlyReaderDelegate for Fem3DRepresentation
-class Fem3DPlyReaderDelegate : public SurgSim::Physics::FemPlyReaderDelegate
+class Fem3DPlyReaderDelegate : public FemPlyReaderDelegate
 {
 public:
 	/// Constructor
