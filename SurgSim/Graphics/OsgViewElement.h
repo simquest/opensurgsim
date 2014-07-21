@@ -16,10 +16,10 @@
 #ifndef SURGSIM_GRAPHICS_OSGVIEWELEMENT_H
 #define SURGSIM_GRAPHICS_OSGVIEWELEMENT_H
 
+#include <osg/ref_ptr>
+
 #include "SurgSim/Graphics/ViewElement.h"
 #include "SurgSim/Math/Vector.h"
-
-#include <osg/ref_ptr>
 
 namespace SurgSim
 {
@@ -31,8 +31,6 @@ class CommonDevice;
 
 namespace Graphics
 {
-
-class OsgTrackballZoomManipulator;
 
 /// OSG-based implementation of graphics view element.
 ///
@@ -54,7 +52,7 @@ public:
 	/// Only allows OsgView components, any other will not be set and it will return false.
 	/// \param view The view that should be used.
 	/// \return	True if it succeeds, false if it fails.
-	virtual bool setView(std::shared_ptr<View> view);
+	virtual bool setView(std::shared_ptr<View> view) override;
 
 	/// Enables a camera manipulator, implemented via a trackball, this is a temporary solution as it uses
 	/// the OSG input events rather than reading from the OpenSurgSim input.
@@ -65,7 +63,7 @@ public:
 	/// any more we let the user set the parameters from here.
 	/// \param	position	The position of the camera.
 	/// \param	lookat  	The location the camera looks at.
-	void setManipulatorParameters(SurgSim::Math::Vector3d position, SurgSim::Math::Vector3d lookat);
+	void setManipulatorParameters(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& lookat);
 
 	/// Return the keyboard to be used with this view.
 	/// \return A keyboard device
@@ -82,10 +80,6 @@ public:
 	virtual	void enableMouseDevice(bool val) override;
 
 private:
-	osg::ref_ptr<OsgTrackballZoomManipulator> m_manipulator;
-	SurgSim::Math::Vector3d m_manipulatorPosition;
-	SurgSim::Math::Vector3d m_manipulatorLookat;
-
 	/// Indicate if a keyboard device is enabled
 	bool m_keyboardEnabled;
 	/// Indicate if a mouse device is enabled

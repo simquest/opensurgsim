@@ -217,6 +217,8 @@ public:
 	/// Destructor
 	virtual ~MockFemRepresentation();
 
+	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
+
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;

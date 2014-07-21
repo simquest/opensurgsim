@@ -34,22 +34,6 @@ using SurgSim::Math::Aabbd;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
-namespace
-{
-std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<
-SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData>>
-		loadTriangleMesh(const std::string& fileName)
-{
-	auto triangleMeshDelegate = std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
-
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
-
-	return triangleMeshDelegate->getMesh();
-}
-}
-
 namespace SurgSim
 {
 namespace DataStructures

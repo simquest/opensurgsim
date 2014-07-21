@@ -61,7 +61,7 @@ public:
 
 	/// Does one-time configuration of the LabJack for timers, counters, and analog inputs.
 	/// Must be called by the LabJackThread because the LabJack separates all commands by the calling thread.
-	/// \param device The device.
+	/// \param device The internal device data.
 	/// \return False if any errors.
 	bool configureDevice(DeviceData* device);
 
@@ -95,12 +95,44 @@ private:
 	bool runInputFrame(DeviceData* info);
 
 	/// Updates the device information for a single device.
+	/// \param info The internal device data.
 	/// \return true on success.
 	bool updateDevice(DeviceData* info);
 
 	/// Destroys the input loop thread.
+	/// \param data The internal device data.
 	/// \return true on success.
 	bool destroyPerDeviceThread(DeviceData* data);
+
+	/// One-time configuration of the clock and timers.
+	/// \param deviceData The internal device data.
+	/// \return False if any errors.
+	bool configureClockAndTimers(DeviceData* deviceData);
+
+	/// One-time configuration of the number of timers.
+	/// \param deviceData The internal device data.
+	/// \return False if any errors.
+	bool configureNumberOfTimers(DeviceData* deviceData);
+
+	/// One-time configuration of the clock.
+	/// \param deviceData The internal device data.
+	/// \return False if any errors.
+	bool configureClock(DeviceData* deviceData);
+
+	/// One-time configuration of the timers.
+	/// \param deviceData The internal device data.
+	/// \return False if any errors.
+	bool configureTimers(DeviceData* deviceData);
+
+	/// One-time configuration of the digital inputs and outputs.
+	/// \param deviceData The internal device data.
+	/// \return False if any errors.
+	bool configureDigital(DeviceData* deviceData);
+
+	/// One-time configuration of the analog inputs.
+	/// \param deviceData The internal device data.
+	/// \return False if any errors.
+	bool configureAnalog(DeviceData* deviceData);
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();

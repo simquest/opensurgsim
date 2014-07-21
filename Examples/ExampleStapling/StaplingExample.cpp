@@ -207,7 +207,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	// Thus, we enlarge the vector field by 200 times.
 	visualizeContactsBehavior->setVectorFieldScale(200);
 
-	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(staplerName + "SceneElement");
+	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(staplerName);
 	sceneElement->addComponent(physicsRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
 	sceneElement->addComponent(meshShapeVisualization);
@@ -289,7 +289,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 		std::make_shared<RigidCollisionRepresentation>("Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
-	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>(armName + "SceneElement");
+	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>(armName);
 	armSceneElement->addComponent(forearmSceneryRepresentation);
 	armSceneElement->addComponent(meshShapeVisualization);
 	armSceneElement->addComponent(upperarmSceneryRepresentation);

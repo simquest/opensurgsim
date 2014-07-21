@@ -17,6 +17,7 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
@@ -32,11 +33,11 @@ namespace Physics
 RigidRepresentationBase::RigidRepresentationBase(const std::string& name) : Representation(name)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, RigidRepresentationState,
-		RigidRepresentationState, getInitialState, setInitialState);
+									  RigidRepresentationState, getInitialState, setInitialState);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, RigidRepresentationParameters,
-		RigidRepresentationParameters, getInitialParameters, setInitialParameters);
+									  RigidRepresentationParameters, getInitialParameters, setInitialParameters);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, std::shared_ptr<SurgSim::Collision::Representation>,
-		CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
+									  CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
 }
 
 RigidRepresentationBase::~RigidRepresentationBase()
@@ -47,12 +48,12 @@ bool RigidRepresentationBase::doInitialize()
 {
 	auto meshShape =
 		std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getInitialParameters().getShapeUsedForMassInertia());
-	if (nullptr != meshShape)
+	if (nullptr != meshShape && !meshShape->getFileName().empty())
 	{
 		if (!meshShape->isInitialized())
 		{
 			SURGSIM_ASSERT(meshShape->initialize(*(getRuntime()->getApplicationData()))) <<
-				"Failed to initialize the mesh shape in this representation.";
+					"Failed to initialize the mesh shape in this representation.";
 		}
 		m_initialParameters.updateProperties();
 		setCurrentParameters(m_initialParameters);
@@ -143,14 +144,7 @@ void SurgSim::Physics::RigidRepresentationBase::beforeUpdate(double dt)
 void SurgSim::Physics::RigidRepresentationBase::afterUpdate(double dt)
 {
 	m_finalState = m_currentState;
-	if (isDrivingSceneElementPose())
-	{
-		std::shared_ptr<SurgSim::Framework::PoseComponent> poseComponent = getPoseComponent();
-		if (poseComponent != nullptr)
-		{
-			poseComponent->setPose(m_finalState.getPose() * getLocalPose().inverse());
-		}
-	}
+	driveSceneElementPose(m_finalState.getPose() * getLocalPose().inverse());
 }
 
 void RigidRepresentationBase::setCollisionRepresentation(

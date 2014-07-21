@@ -19,7 +19,6 @@
 #include <memory>
 
 #include "SurgSim/Math/Vector.h"
-
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
 namespace SurgSim
@@ -30,6 +29,7 @@ namespace Physics
 
 class FemElement;
 struct FemRepresentationCoordinate;
+class FemPlyReaderDelegate;
 
 /// Finite Element Model (a.k.a. fem) is a deformable model (a set of nodes connected by FemElement).
 /// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
@@ -44,6 +44,18 @@ public:
 
 	/// Destructor
 	virtual ~FemRepresentation();
+
+	/// Sets the name of the file to be loaded
+	/// \param filename The name of the file to be loaded
+	void setFilename(const std::string& filename);
+
+	/// Gets the name of the file to be loaded
+	/// \return filename The name of the file to be loaded
+	const std::string& getFilename() const;
+
+	/// Loads the file
+	/// \return true if successful
+	bool loadFile();
 
 	/// Adds a FemElement
 	/// \param element The FemElement to add to the representation
@@ -129,7 +141,7 @@ public:
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
 	virtual void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
-		SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
+							 SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
 
 protected:
 	/// Adds the Rayleigh damping forces
@@ -164,7 +176,14 @@ protected:
 	/// Useful information per node
 	std::vector<double> m_massPerNode; //< Useful in setting up the gravity force F=mg
 
+	/// Filename for loading the fem representation.
+	std::string m_filename;
+
 private:
+	/// To be implemented by derived classes.
+	/// \return The delegate to load the corresponding derived class.
+	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() = 0;
+
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;
 
@@ -178,7 +197,6 @@ private:
 };
 
 } // namespace Physics
-
 } // namespace SurgSim
 
 #endif // SURGSIM_PHYSICS_FEMREPRESENTATION_H

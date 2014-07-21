@@ -25,8 +25,8 @@ set(UNIT_TEST_SOURCES
 	MassSpringNDRepresentationUtilsTests.cpp
 	PoseInterpolatorTests.cpp
 	SpringTestUtils.cpp
-	TransferOdeStateToVerticesBehaviorTests.cpp
-	TransferPhysicsToGraphicsMeshBehavior.cpp
+	TransferPhysicsToGraphicsMeshBehaviorTests.cpp
+	TransferPhysicsToPointCloudBehaviorTests.cpp
 	VisualizeContactsBehaviorTests.cpp
 )
 
