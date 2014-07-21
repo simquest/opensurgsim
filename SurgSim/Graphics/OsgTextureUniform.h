@@ -64,7 +64,7 @@ private:
 	osg::ref_ptr<osg::StateSet> m_stateset;
 
 	/// Texture unit
-	size_t m_unit;
+	ptrdiff_t m_unit;
 
 	/// The smallest unit to be used
 	size_t m_minimumTextureUnit;

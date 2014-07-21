@@ -98,7 +98,6 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
 	SurgSim::Math::IntegrationScheme integrationScheme,
-	bool displayPointCloud,
 	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material)
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
@@ -441,7 +440,6 @@ int main(int argc, char* argv[])
 		createFemSceneElement("wound",
 							  woundFilename,
 							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
-							  false,
 							  material);
 	wound->setPose(armPose);
 

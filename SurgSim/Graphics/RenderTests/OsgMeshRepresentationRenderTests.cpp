@@ -196,7 +196,7 @@ TEST_F(OsgMeshRepresentationRenderTests, TextureTest)
 				&woundFilename));
 
 	std::string textureFilename;
-	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("OsgMeshRepresentationRenderTests/CheckerBoard.png",
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/checkered.png",
 				&textureFilename));
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
