@@ -30,16 +30,18 @@ set(UNIT_TEST_SOURCES
 	EigenGtestAsserts.cpp
 	Fem1DElementBeamTests.cpp
 	Fem1DMechanicalValidationTests.cpp
+	Fem1DPlyReaderDelegateTests.cpp
 	Fem1DRepresentationTests.cpp
 	Fem2DElementTriangleTests.cpp
 	Fem2DMechanicalValidationTests.cpp
+	Fem2DPlyReaderDelegateTests.cpp
 	Fem2DRepresentationTests.cpp
 	Fem3DElementCorotationalTetrahedronTests.cpp
 	Fem3DElementCubeTests.cpp
 	Fem3DElementTetrahedronTests.cpp
+	Fem3DPlyReaderDelegateTests.cpp
 	Fem3DRepresentationBilateral3DTests.cpp
 	Fem3DRepresentationContactTests.cpp
-	Fem3DRepresentationReaderTests.cpp
 	Fem3DRepresentationTests.cpp
 	FemElementTests.cpp
 	FemRepresentationLocalizationTest.cpp

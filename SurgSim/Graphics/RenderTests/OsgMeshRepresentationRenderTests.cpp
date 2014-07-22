@@ -74,8 +74,7 @@ protected:
 		// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
 		SurgSim::DataStructures::PlyReader reader(fileName);
 		auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
-		SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
-		reader.parseFile();
+		SURGSIM_ASSERT(reader.parseWithDelegate(delegate)) << "The input file " << fileName << " is malformed.";
 
 		return delegate->getMesh();
 	}
