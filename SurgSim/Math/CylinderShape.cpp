@@ -79,5 +79,10 @@ SurgSim::Math::Matrix33d CylinderShape::getSecondMomentOfVolume() const
 	return secondMoment;
 }
 
+bool CylinderShape::isValid() const
+{
+	return (m_length >= 0) && (m_radius >= 0);
+}
+
 }; // namespace Math
 }; // namespace SurgSim

@@ -26,7 +26,7 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::OctreeShape, OctreeShape);
 
 OctreeShape::OctreeShape()
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OctreeShape, std::string, FileName, getFileName, setFileName);
+	serializeFileName(this);
 }
 
 OctreeShape::~OctreeShape()
@@ -38,9 +38,9 @@ int OctreeShape::getType()
 	return SHAPE_TYPE_OCTREE;
 }
 
-bool OctreeShape::doInitialize(const std::string& fileName)
+bool OctreeShape::doLoad(const std::string& filePath)
 {
-	m_rootNode = std::make_shared<NodeType>(*SurgSim::DataStructures::loadOctree(fileName));
+	m_rootNode = std::make_shared<NodeType>(*SurgSim::DataStructures::loadOctree(filePath));
 	return true;
 }
 
@@ -74,6 +74,11 @@ const std::shared_ptr<const OctreeShape::NodeType> OctreeShape::getRootNode() co
 void OctreeShape::setRootNode(std::shared_ptr<OctreeShape::NodeType> node)
 {
 	m_rootNode = node;
+}
+
+bool OctreeShape::isValid() const
+{
+	return (nullptr != m_rootNode) && (m_rootNode->getBoundingBox().sizes().minCoeff() >= 0);
 }
 
 }; // namespace Math

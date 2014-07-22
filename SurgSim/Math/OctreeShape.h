@@ -80,7 +80,11 @@ public:
 	/// \param node the octree root node of this shape
 	void setRootNode(std::shared_ptr<NodeType> node);
 
-	virtual bool doInitialize(const std::string& fileName) override;
+	/// Check if the bounding box of this OctreeShape is bigger than or equal to 0
+	/// \return True if the bounding box is bigger than or equal to 0; Otherwise, false.
+	virtual bool isValid() const override;
+
+	virtual bool doLoad(const std::string& filePath) override;
 
 private:
 	/// Root node of the octree datastructure
