@@ -1453,6 +1453,59 @@ void intersectionsSegmentBox(
 	}
 }
 
+/// Test if an axis aligned box intersects with a capsule
+/// \tparam T Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt Eigen Matrix options, can usually be inferred.
+/// \param capsuleBottom Position of the capsule bottom
+/// \param capsuleTop Position of the capsule top
+/// \param capsuleRadius The capsule radius
+/// \param box Axis aligned bounding box
+/// \return True, if intersection is detected.
+template <class T, int MOpt>
+bool doesIntersectBoxCapsule(
+	const Eigen::Matrix<T, 3, 1, MOpt>& capsuleBottom,
+	const Eigen::Matrix<T, 3, 1, MOpt>& capsuleTop,
+	const T capsuleRadius,
+	const Eigen::AlignedBox<T, 3>& box)
+{
+	Eigen::AlignedBox<double, 3> dilatedBox(box.min().array() - capsuleRadius, box.max().array() + capsuleRadius);
+	std::vector<Vector3d> candidates;
+	intersectionsSegmentBox(capsuleBottom, capsuleTop, dilatedBox, &candidates);
+	if (dilatedBox.contains(capsuleBottom))
+	{
+		candidates.push_back(capsuleBottom);
+	}
+	if (dilatedBox.contains(capsuleTop))
+	{
+		candidates.push_back(capsuleTop);
+	}
+
+	bool doesIntersect = false;
+	ptrdiff_t dimensionsOutsideBox;
+	Vector3d clampedPosition, segmentPoint;
+	for (auto candidate = candidates.cbegin(); candidate != candidates.cend(); ++candidate)
+	{
+		// Collisions between a capsule and a box are the same as a segment and a dilated
+		// box with rounded corners. If the intersection occurs outside the original box
+		// in two dimensions (collision with an edge of the dilated box) or three
+		// dimensions (collision with the corner of the dilated box) dimensions, we need
+		// to check if it is inside these rounded corners.
+		dimensionsOutsideBox = (candidate->array() > box.max().array()).count();
+		dimensionsOutsideBox += (candidate->array() < box.min().array()).count();
+		if (dimensionsOutsideBox >= 2)
+		{
+			clampedPosition = (*candidate).array().min(box.max().array()).max(box.min().array());
+			if (distancePointSegment(clampedPosition, capsuleBottom, capsuleTop, &segmentPoint) > capsuleRadius)
+			{
+				// Doesn't intersect, try the next candidate.
+				continue;
+			}
+		}
+		doesIntersect = true;
+		break;
+	}
+	return doesIntersect;
+}
 
 /// Check if the two triangles intersect using separating axis test.
 /// Algorithm is implemented from http://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tritri.pdf
