@@ -1483,7 +1483,7 @@ bool doesIntersectBoxCapsule(
 	bool doesIntersect = false;
 	ptrdiff_t dimensionsOutsideBox;
 	Vector3d clampedPosition, segmentPoint;
-	for(auto candidate = candidates.cbegin(); candidate != candidates.cend(); ++candidate)
+	for (auto candidate = candidates.cbegin(); candidate != candidates.cend(); ++candidate)
 	{
 		// Collisions between a capsule and a box are the same as a segment and a dilated
 		// box with rounded corners. If the intersection occurs outside the original box

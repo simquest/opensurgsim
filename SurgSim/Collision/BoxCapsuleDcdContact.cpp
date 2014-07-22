@@ -72,7 +72,7 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 		Vector3d normal, segmentPoint, deepestBoxPoint, deepestCapsulePoint;
 		double distance;
 		distancePointSegment(Vector3d::Zero().eval(), capsuleBottom, capsuleTop, &segmentPoint);
-		if(! segmentPoint.isZero(DistanceEpsilon))
+		if (!segmentPoint.isZero(DistanceEpsilon))
 		{
 			if (box.contains(segmentPoint))
 			{
