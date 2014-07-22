@@ -1,0 +1,9 @@
+This should be the result of doing either
+
+python ../merge.py testvertices.txt testobj.txt testout.txt
+python ../merge.py testvertices.txt testobj-indices.txt testout.txt
+
+4.1 4.2 4.3 4.4 4.5
+1.1 1.2 1.3 1.4 1.5
+2.1 2.2 2.3 0.0 0.0
+3.1 3.2 3.3 3.4 3.5

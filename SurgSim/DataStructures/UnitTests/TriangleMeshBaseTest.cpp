@@ -61,7 +61,7 @@ public:
 		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d position(positionDistribution(generator), positionDistribution(generator),
-				positionDistribution(generator));
+							  positionDistribution(generator));
 			testPositions.push_back(position);
 
 			if (printPositions)
@@ -80,7 +80,7 @@ public:
 		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d normal(normalDistribution(generator), normalDistribution(generator),
-				normalDistribution(generator));
+							normalDistribution(generator));
 			normal.normalize();
 			testNormals.push_back(normal);
 
@@ -98,8 +98,11 @@ public:
 		/// Generate random vertex IDs within [0, numVertices) in triplets for mesh triangles
 		for (size_t i = 0; i < numTriangles; ++i)
 		{
-			std::array<size_t, 3> triangleVertices = {{ vertexIdDistribution(generator),
-				vertexIdDistribution(generator), vertexIdDistribution(generator) }};
+			std::array<size_t, 3> triangleVertices = {{
+					vertexIdDistribution(generator),
+					vertexIdDistribution(generator), vertexIdDistribution(generator)
+				}
+			};
 			testTriangleVertices.push_back(triangleVertices);
 
 			/// Create 3 vertex ID pairs for each triangle edge (not worrying about duplicates for these tests)
@@ -581,7 +584,7 @@ TEST_F(TriangleMeshBaseTest, GetTrianglePositions)
 	{
 		auto verticesPositions = mesh.getTrianglePositions(id);
 
-		auto &vertexIds = mesh.getTriangle(id).verticesId;
+		auto& vertexIds = mesh.getTriangle(id).verticesId;
 
 		EXPECT_TRUE(mesh.getVertex(vertexIds[0]).position.isApprox(verticesPositions[0]));
 		EXPECT_TRUE(mesh.getVertex(vertexIds[1]).position.isApprox(verticesPositions[1]));

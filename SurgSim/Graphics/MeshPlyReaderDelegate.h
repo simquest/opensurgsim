@@ -13,49 +13,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESHPLYREADERDELEGATE_H
-#define SURGSIM_DATASTRUCTURES_TRIANGLEMESHPLYREADERDELEGATE_H
+#ifndef SURGSIM_GRAPHICS_MESHPLYREADERDELEGATE_H
+#define SURGSIM_GRAPHICS_MESHPLYREADERDELEGATE_H
 
 #include <array>
 #include <memory>
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReaderDelegate.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Graphics/Mesh.h"
 
 namespace SurgSim
 {
-namespace DataStructures
+namespace Graphics
 {
 
-/// Implementation of PlyReaderDelegate for simple triangle meshes
-class TriangleMeshPlyReaderDelegate : public PlyReaderDelegate
+/// Implementation of PlyReaderDelegate for graphicsmeshes
+class MeshPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
 
 	/// The Mesh Type
-	typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> MeshType;
+	typedef SurgSim::Graphics::Mesh MeshType;
 
 	/// Default constructor.
-	TriangleMeshPlyReaderDelegate();
+	MeshPlyReaderDelegate();
 
 	/// Constructor.
 	/// \param mesh The mesh to be used, it will be cleared by the constructor.
-	explicit TriangleMeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh);
+	explicit MeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh);
 
 	/// Gets the mesh.
 	/// \return The mesh.
-	std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> getMesh();
+	std::shared_ptr<Mesh> getMesh();
 
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
 	/// \return true if it succeeds, false otherwise.
-	virtual bool registerDelegate(PlyReader* reader) override;
+	virtual bool registerDelegate(SurgSim::DataStructures::PlyReader* reader) override;
 
 	/// Check whether this file is acceptable to the delegate, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
 	/// \return true if it succeeds, false otherwise.
-	virtual bool fileIsAcceptable(const PlyReader& reader) override;
+	virtual bool fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader) override;
 
 	/// Callback function, begin the processing of vertices.
 	/// \param elementName Name of the element.
@@ -93,7 +93,10 @@ private:
 		double x;
 		double y;
 		double z;
-		int64_t overrun; ///< Used to check for buffer overruns
+		int64_t overrun1; ///< Used to check for buffer overruns
+		double s;
+		double t;
+		int64_t overrun2; ///< Used to check for buffer overruns
 	} m_vertexData;
 
 	/// Internal structure, the received for data from the "face" element
@@ -109,6 +112,8 @@ private:
 
 	// Statically allocated index array to receive data for the faces
 	std::array<size_t, 3> m_indices;
+
+	bool m_hasTextureCoordinates;
 };
 
 }
