@@ -38,9 +38,9 @@ int OctreeShape::getType()
 	return SHAPE_TYPE_OCTREE;
 }
 
-bool OctreeShape::doLoad(const std::string& fileName)
+bool OctreeShape::doLoad(const std::string& filePath)
 {
-	m_rootNode = std::make_shared<NodeType>(*SurgSim::DataStructures::loadOctree(fileName));
+	m_rootNode = std::make_shared<NodeType>(*SurgSim::DataStructures::loadOctree(filePath));
 	return true;
 }
 
