@@ -31,6 +31,7 @@ namespace SurgSim
 namespace Framework
 {
 
+std::shared_ptr<ApplicationData> Runtime::m_applicationData;
 
 Runtime::Runtime() :
 	m_isRunning(false),
@@ -51,8 +52,6 @@ Runtime::~Runtime()
 	// Kill all threads
 	stop();
 }
-
-std::shared_ptr<ApplicationData> Runtime::m_applicationData;
 
 void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 {

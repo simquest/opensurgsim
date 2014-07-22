@@ -36,6 +36,7 @@ Asset::~Asset()
 void Asset::load(const std::string& fileName, const SurgSim::Framework::ApplicationData& data)
 {
 	m_fileName = fileName;
+	SURGSIM_ASSERT(!m_fileName.empty()) << "File name is empty";
 
 	std::string path = data.findFile(m_fileName);
 
@@ -59,14 +60,14 @@ void Asset::serializeFileName(SurgSim::Framework::Accessible* accesible)
 	auto resolvedOverloadFunction = static_cast<void(Asset::*)(const std::string&)>(&Asset::load);
 
 	accesible->setAccessors("FileName",
-			   std::bind(&Asset::getFileName, this),													// Getter
+			   std::bind(&Asset::getFileName, this),
 			   std::bind(resolvedOverloadFunction, this,
-						 std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1)));	// Setter
+						 std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1)));
 
 	accesible->setSerializable("FileName",
-			   std::bind(&YAML::convert<std::string>::encode, std::bind(&Asset::getFileName, this)),	// Encoder
+			   std::bind(&YAML::convert<std::string>::encode, std::bind(&Asset::getFileName, this)),
 			   std::bind(resolvedOverloadFunction, this,
-						 std::bind(&YAML::Node::as<std::string>, std::placeholders::_1)));				// Decoder
+						 std::bind(&YAML::Node::as<std::string>, std::placeholders::_1)));
 }
 
 }; // Framework

@@ -67,7 +67,7 @@ protected:
 	/// Derived classes (which also inherit from SurgSim::Framework::Accessible) should call this function
 	/// with 'this' pointer as the parameter in their constructors to register file name property for serialization.
 	/// \param accessible 'this' pointer of derived class.
-	void serializeFileName(SurgSim::Framework::Accessible* accesible);
+	void serializeFileName(SurgSim::Framework::Accessible* accessible);
 
 private:
 	/// Name of the file to be loaded.
