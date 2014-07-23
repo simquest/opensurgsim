@@ -51,7 +51,6 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	auto physicsState = std::make_shared<PhysicsManagerState>();
 	std::vector<std::shared_ptr<Representation>> expectedRepresentations;
 	std::vector<std::shared_ptr<Representation>> actualRepresentations;
-	MlcpMapping<Representation> actualRepresentationsIndexMapping;
 	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 		std::shared_ptr<Representation>> actualCollisionsToPhysicsMap;
 
@@ -62,12 +61,6 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	actualRepresentations = physicsState->getRepresentations();
 	ASSERT_EQ(1, actualRepresentations.size());
 	EXPECT_EQ(rigid1, actualRepresentations.back());
-	filterActiveRepresentations(physicsState);
-	physicsState->updateRepresentationsMapping();
-	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
-	int expectedMapValue = 0;
-	std::shared_ptr<Representation> rigid1AsRepresentation = rigid1;
-	EXPECT_EQ(expectedMapValue, actualRepresentationsIndexMapping.getValue(rigid1AsRepresentation.get()));
 	actualCollisionsToPhysicsMap = physicsState->getCollisionToPhysicsMap();
 	EXPECT_EQ(0, actualCollisionsToPhysicsMap.size());
 
@@ -81,20 +74,35 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	ASSERT_EQ(2, actualRepresentations.size());
 	EXPECT_EQ(rigid2, actualRepresentations.back());
 
-	// check the representationsIndexMapping
-	filterActiveRepresentations(physicsState);
-	physicsState->updateRepresentationsMapping();
-	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
-	EXPECT_EQ(expectedMapValue, actualRepresentationsIndexMapping.getValue(rigid1AsRepresentation.get()));
-	EXPECT_EQ(6, rigid1AsRepresentation->getNumDof()); // make sure the rigid representation is 6 DOF
-	expectedMapValue += 6; // the number of DOF for a rigid representation
-	std::shared_ptr<Representation> rigid2AsRepresentation = rigid2;
-	EXPECT_EQ(expectedMapValue, actualRepresentationsIndexMapping.getValue(rigid2AsRepresentation.get()));
-
 	// check the collisionsToPhysicsMap
 	actualCollisionsToPhysicsMap = physicsState->getCollisionToPhysicsMap();
 	ASSERT_EQ(1, actualCollisionsToPhysicsMap.size());
 	EXPECT_EQ(rigid2, actualCollisionsToPhysicsMap[collisionRepresentation]);
+}
+
+TEST(PhysicsManagerStateTest, SetGetRepresentationsMapping)
+{
+	auto physicsState = std::make_shared<PhysicsManagerState>();
+	MlcpMapping<Representation> expectedRepresentationsIndexMapping;
+	MlcpMapping<Representation> actualRepresentationsIndexMapping;
+
+	// Add a representation.
+	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
+	expectedRepresentationsIndexMapping.setValue(rigid1.get(), 13);
+	physicsState->setRepresentationsMapping(expectedRepresentationsIndexMapping);
+	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
+	std::shared_ptr<Representation> rigid1AsRepresentation = rigid1;
+	EXPECT_EQ(13, actualRepresentationsIndexMapping.getValue(rigid1AsRepresentation.get()));
+
+	// Add a second representation.  This one has a collision representation.
+	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
+	auto collisionRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("rigid2 collision");
+	rigid2->setCollisionRepresentation(collisionRepresentation);
+	expectedRepresentationsIndexMapping.setValue(rigid2.get(), 17);
+	physicsState->setRepresentationsMapping(expectedRepresentationsIndexMapping);
+	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
+	std::shared_ptr<Representation> rigid2AsRepresentation = rigid2;
+	EXPECT_EQ(17, actualRepresentationsIndexMapping.getValue(rigid2AsRepresentation.get()));
 }
 
 TEST(PhysicsManagerStateTest, SetGetActiveRepresentations)
@@ -222,16 +230,44 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	actualConstraints = physicsState->getConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT);
 	ASSERT_EQ(2, actualConstraints.size());
 	EXPECT_EQ(constraint2, actualConstraints.back());
+}
 
-	// Check the constraintsIndexMapping.
-	filterActiveConstraints(physicsState);
-	physicsState->updateConstraintsMapping();
-	MlcpMapping<Constraint> actualConstraintsIndexMapping = physicsState->getConstraintsMapping();
-	int expectedMapValue = 0;
-	EXPECT_EQ(expectedMapValue, actualConstraintsIndexMapping.getValue(constraint1.get()));
-	EXPECT_EQ(1, constraint1->getNumDof()); // Make sure the unilateral 3d frictionless constraint is 1 DOF.
-	expectedMapValue += 1; // The number of DOF for a MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT.
-	EXPECT_EQ(expectedMapValue, actualConstraintsIndexMapping.getValue(constraint2.get()));
+TEST(PhysicsManagerStateTest, SetGetConstraintsMapping)
+{
+	auto physicsState = std::make_shared<PhysicsManagerState>();
+	MlcpMapping<Constraint> expectedConstraintsIndexMapping;
+	MlcpMapping<Constraint> actualConstraintsIndexMapping;
+
+	// We need a populated constraint to check the constraintsIndexMapping.
+	// Create first side of a constraint.
+	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
+	std::shared_ptr<RigidRepresentationLocalization> rigid1LocalizationTyped =
+		std::make_shared<RigidRepresentationLocalization>();
+	rigid1LocalizationTyped->setRepresentation(rigid1);
+	std::shared_ptr<Localization> rigid1Localization = rigid1LocalizationTyped;
+	auto rigid1Contact = std::make_shared<RigidRepresentationContact>();
+
+	// Create second side of a constraint.
+	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
+	std::shared_ptr<RigidRepresentationLocalization> rigid2LocalizationTyped =
+		std::make_shared<RigidRepresentationLocalization>();
+	rigid2LocalizationTyped->setRepresentation(rigid2);
+	std::shared_ptr<Localization> rigid2Localization = rigid2LocalizationTyped;
+	auto rigid2Contact = std::make_shared<RigidRepresentationContact>();
+
+	// Create the constraint specific data.
+	std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
+
+	// Create the constraint.
+	auto constraint1 = std::make_shared<Constraint>(data, rigid1Contact, rigid1Localization,
+		rigid2Contact, rigid2Localization);
+
+	// Check the constraintGroup.
+	expectedConstraintsIndexMapping.setValue(constraint1.get(), 5);
+	physicsState->setConstraintsMapping(expectedConstraintsIndexMapping);
+	actualConstraintsIndexMapping = physicsState->getConstraintsMapping();
+	std::shared_ptr<Constraint> constraint1AsConstraint = constraint1;
+	ASSERT_EQ(5, actualConstraintsIndexMapping.getValue(constraint1AsConstraint.get()));
 }
 
 TEST(PhysicsManagerStateTest, SetGetActiveConstraints)

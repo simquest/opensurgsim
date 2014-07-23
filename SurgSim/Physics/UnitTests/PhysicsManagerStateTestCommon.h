@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Physics/BuildMlcp.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
@@ -70,6 +71,36 @@ void filterActiveConstraints(std::shared_ptr<PhysicsManagerState> state)
 		}
 	}
 	state->setActiveConstraints(activeConstraints);
+}
+
+void updateRepresentationsMapping(std::shared_ptr<PhysicsManagerState> state)
+{
+	SurgSim::Physics::MlcpMapping<Representation> representationsMapping;
+
+	ptrdiff_t index = 0;
+	filterActiveRepresentations(state); // This is usually done in preparePhysicsState
+	auto const activeRepresentations = state->getActiveRepresentations();
+	for (auto it = activeRepresentations.begin(); it != activeRepresentations.end(); it++)
+	{
+		representationsMapping.setValue((*it).get(), index);
+		index += (*it)->getNumDof();
+	}
+	state->setRepresentationsMapping(representationsMapping);
+}
+
+void updateConstraintsMapping(std::shared_ptr<PhysicsManagerState> state)
+{
+	SurgSim::Physics::MlcpMapping<Constraint> constraintsMapping;
+
+	ptrdiff_t index = 0;
+	filterActiveConstraints(state); // This is usually done in preparePhysicsState
+	auto const activeConstraints = state->getActiveConstraints();
+	for (auto it = activeConstraints.begin(); it != activeConstraints.end(); it++)
+	{
+		constraintsMapping.setValue((*it).get(), index);
+		index += (*it)->getNumDof();
+	}
+	state->setConstraintsMapping(constraintsMapping);
 }
 }
 

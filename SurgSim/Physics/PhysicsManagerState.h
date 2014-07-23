@@ -145,16 +145,18 @@ public:
 	/// Each representation has an index in the mlcp. This mapping is about this index.
 	const MlcpMapping<Representation>& getRepresentationsMapping() const;
 
-	/// Update the representations mapping
-	void updateRepresentationsMapping();
+	/// Set the representations mapping
+	/// \param representationsMapping	The representations mapping (mapping between the representation and the mlcp)
+	void setRepresentationsMapping(const MlcpMapping<Representation>& representationsMapping);
 
 	/// Gets the constraints mapping
 	/// \return	The constraints mapping (mapping between the constraints and the mlcp)
 	/// Each constraint has an index in the mlcp. This mapping is about this index.
 	const MlcpMapping<Constraint>& getConstraintsMapping() const;
 
-	/// Update the constraints mapping
-	void updateConstraintsMapping();
+	/// Set the constraints mapping
+	/// \param constraintsMapping The constraints mapping (mapping between the constraints and the mlcp)
+	void setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping);
 
 private:
 

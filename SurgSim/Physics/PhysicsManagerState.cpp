@@ -189,15 +189,9 @@ const MlcpMapping<Representation>& PhysicsManagerState::getRepresentationsMappin
 	return m_representationsIndexMapping;
 }
 
-void PhysicsManagerState::updateRepresentationsMapping()
+void PhysicsManagerState::setRepresentationsMapping(const MlcpMapping<Representation>& representationsMapping)
 {
-	m_representationsIndexMapping.clear();
-	ptrdiff_t index = 0;
-	for (auto it = m_activeRepresentations.begin(); it != m_activeRepresentations.end(); it++)
-	{
-		m_representationsIndexMapping.setValue((*it).get(), index);
-		index += (*it)->getNumDof();
-	}
+	m_representationsIndexMapping = representationsMapping;
 }
 
 const MlcpMapping<Constraint>& PhysicsManagerState::getConstraintsMapping() const
@@ -205,15 +199,9 @@ const MlcpMapping<Constraint>& PhysicsManagerState::getConstraintsMapping() cons
 	return m_constraintsIndexMapping;
 }
 
-void PhysicsManagerState::updateConstraintsMapping()
+void PhysicsManagerState::setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping)
 {
-	m_constraintsIndexMapping.clear();
-	ptrdiff_t index = 0;
-	for (auto it = m_activeConstraints.begin(); it != m_activeConstraints.end(); it++)
-	{
-		m_constraintsIndexMapping.setValue((*it).get(), index);
-		index += (*it)->getNumDof();
-	}
+	m_constraintsIndexMapping = constraintsMapping;
 }
 
 }; // Physics

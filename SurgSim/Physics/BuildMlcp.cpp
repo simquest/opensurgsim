@@ -41,9 +41,8 @@ std::shared_ptr<PhysicsManagerState>
 {
 	// Copy state to new state
 	std::shared_ptr<PhysicsManagerState> result = state;
-	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
-	result->updateRepresentationsMapping();
-	result->updateConstraintsMapping();
+	MlcpMapping<Representation> representationsMapping;
+	MlcpMapping<Constraint> constraintsMapping;
 
 	size_t numAtomicConstraint = 0;
 	size_t numConstraint = 0;
@@ -51,18 +50,22 @@ std::shared_ptr<PhysicsManagerState>
 
 	// Calculate numAtomicConstraint and numConstraint
 	auto const activeConstraints = result->getActiveConstraints();
-	for (auto it = activeConstraints.begin(); it != activeConstraints.end(); it++)
+	for (auto it = activeConstraints.cbegin(); it != activeConstraints.cend(); it++)
 	{
+		constraintsMapping.setValue((*it).get(), numAtomicConstraint);
 		numAtomicConstraint += (*it)->getNumDof();
 		numConstraint++;
 	}
+	result->setConstraintsMapping(constraintsMapping);
 
 	// Calculate numDof size
 	auto const activeRepresentations = result->getActiveRepresentations();
-	for (auto it = activeRepresentations.begin(); it != activeRepresentations.end(); it++)
+	for (auto it = activeRepresentations.cbegin(); it != activeRepresentations.cend(); it++)
 	{
+		representationsMapping.setValue((*it).get(), numDof);
 		numDof += (*it)->getNumDof();
 	}
+	result->setRepresentationsMapping(representationsMapping);
 
 	// Resize the Mlcp problem
 	result->getMlcpProblem().A.resize(numAtomicConstraint, numAtomicConstraint);
