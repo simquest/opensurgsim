@@ -171,10 +171,9 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 
 	// Find the vertex ids of the triangle.
 	size_t triangleId = location.triangleLocalPosition.getValue().first;
-	const SurgSim::Math::Vector3d& triangleBarycentricCoordinate = location.triangleLocalPosition.getValue().second;
-	SurgSim::Math::Vector4d triangleBarycentricCoordinate4(triangleBarycentricCoordinate[0],
-														   triangleBarycentricCoordinate[1],
-														   triangleBarycentricCoordinate[2],
+	SurgSim::Math::Vector4d triangleBarycentricCoordinate4(location.triangleLocalPosition.getValue().second[0],
+														   location.triangleLocalPosition.getValue().second[1],
+														   location.triangleLocalPosition.getValue().second[2],
 														   0.0);
 	auto deformableCollisionRepresentation
 		= std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
