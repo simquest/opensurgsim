@@ -13,31 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_LOCATION_H
-#define SURGSIM_COLLISION_LOCATION_H
-
-#include <vector>
-
 #include "SurgSim/DataStructures/MeshElementLocalCoordinate.h"
-#include "SurgSim/DataStructures/OctreeNode.h"
-#include "SurgSim/DataStructures/OptionalValue.h"
-#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
-namespace Collision
+
+namespace DataStructures
 {
 
-struct Location
+MeshElementLocalCoordinate::MeshElementLocalCoordinate() : elementId(0)
 {
-public:
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> globalPosition;
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
-	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::OctreePath> octreeNodePath;
-	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::MeshElementLocalCoordinate> meshLocalCoordinate;
-};
+}
 
-}; // namespace Collision
-}; // namespace SurgSim
+MeshElementLocalCoordinate::MeshElementLocalCoordinate(size_t elementId, SurgSim::Math::Vector naturalCoordinate)
+	: elementId(elementId), naturalCoordinate(naturalCoordinate)
+{
+}
 
-#endif
+} // namespace DataStructures
+
+} // namespace SurgSim

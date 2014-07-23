@@ -28,6 +28,7 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	DataGroupBuilder.cpp
 	DataGroupCopier.cpp
 	IndexDirectory.cpp
+	MeshElementLocalCoordinate.cpp
 	OctreeNode.cpp
 	ply.c
 	PlyReader.cpp
@@ -54,6 +55,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	EmptyData.h
 	IndexDirectory.h
 	MeshElement.h
+	MeshElementLocalCoordinate.h
 	NamedData.h
 	NamedData-inl.h
 	NamedDataBuilder.h

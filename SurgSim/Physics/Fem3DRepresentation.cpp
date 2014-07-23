@@ -166,14 +166,17 @@ bool Fem3DRepresentation::doWakeUp()
 
 std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::Collision::Location& location)
 {
-	SURGSIM_ASSERT(location.triangleLocalPosition.hasValue())
+	SURGSIM_ASSERT(location.meshLocalCoordinate.hasValue())
 		<< "Localization cannot be created if the triangle ID is not available.";
 
+	SURGSIM_ASSERT(location.meshLocalCoordinate.getValue().naturalCoordinate.size() == 3)
+		<< "Localization has incorrect size for the barycentric coordinates.";
+
 	// Find the vertex ids of the triangle.
-	size_t triangleId = location.triangleLocalPosition.getValue().first;
-	SurgSim::Math::Vector4d triangleBarycentricCoordinate4(location.triangleLocalPosition.getValue().second[0],
-														   location.triangleLocalPosition.getValue().second[1],
-														   location.triangleLocalPosition.getValue().second[2],
+	size_t triangleId = location.meshLocalCoordinate.getValue().elementId;
+	SurgSim::Math::Vector4d triangleBarycentricCoordinate4(location.meshLocalCoordinate.getValue().naturalCoordinate[0],
+														   location.meshLocalCoordinate.getValue().naturalCoordinate[1],
+														   location.meshLocalCoordinate.getValue().naturalCoordinate[2],
 														   0.0);
 	auto deformableCollisionRepresentation
 		= std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
