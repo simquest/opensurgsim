@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_VIEWELEMENT_H
 #define SURGSIM_GRAPHICS_VIEWELEMENT_H
 
-#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 
 namespace SurgSim
 {
@@ -36,7 +36,7 @@ class View;
 ///
 /// A Scene needs at least one Graphics::View component for any visualization of Graphics:Representation objects
 /// to be shown. A view needs a camera to do its' rendering, this component can connect all the pieces correctly.
-class ViewElement : public Framework::SceneElement
+class ViewElement : public Framework::BasicSceneElement
 {
 public:
 	/// Constructor

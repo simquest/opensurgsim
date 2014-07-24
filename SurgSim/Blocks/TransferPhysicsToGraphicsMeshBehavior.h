@@ -39,8 +39,9 @@ class DeformableRepresentation;
 
 namespace Blocks
 {
+SURGSIM_STATIC_REGISTRATION(TransferPhysicsToGraphicsMeshBehavior);
 
-/// Behavior to copy positions of a Physics Representation to a Graphics Mesh
+/// Behavior to copy positions of a PhysicsRepresentation to a GraphicsMesh.
 class TransferPhysicsToGraphicsMeshBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -60,27 +61,22 @@ public:
 
 	/// Get the Physics representation which sends the positions
 	/// \return The Physics representation which produces positions.
-	std::shared_ptr<SurgSim::Framework::Component> getSource() const;
+	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getSource() const;
 
 	/// Get the Graphics representation which receives the positions
-	/// \return The Graphics representation which receives positions.
-	std::shared_ptr<SurgSim::Framework::Component> getTarget() const;
+	/// \return The Graphics Mesh representation which receives positions.
+	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> getTarget() const;
 
-	/// Update the behavior
-	/// \param dt	The length of time (seconds) between update calls.
-	virtual void update(double dt);
+	virtual void update(double dt) override;
 
 private:
-	/// Initialize the behavior
 	virtual bool doInitialize() override;
-
-	/// Wakeup the behavior, which simply do a copy (same as update)
 	virtual bool doWakeUp() override;
 
 	/// The DeformableRepresentation from which the Ode state comes.
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_source;
 
-	/// The MeshRepresentation to which the vertices' positions are set.
+	/// The Graphics Mesh Representation to which the vertices' positions are set.
 	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> m_target;
 };
 

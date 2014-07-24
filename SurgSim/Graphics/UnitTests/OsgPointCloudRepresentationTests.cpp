@@ -33,18 +33,6 @@ namespace
 const double epsilon = 1e-5;
 }
 
-struct MockData
-{
-	explicit MockData(double val) : dummyData(val) {}
-
-	bool operator==(const MockData& rhs) const
-	{
-		return dummyData == rhs.dummyData;
-	}
-
-	double dummyData;
-};
-
 namespace SurgSim
 {
 namespace Graphics
@@ -52,13 +40,12 @@ namespace Graphics
 
 TEST(OsgPointCloudRepresentationTests, InitTest)
 {
-	ASSERT_NO_THROW(OsgPointCloudRepresentation<EmptyData>("TestPointCloud"));
-	ASSERT_NO_THROW(OsgPointCloudRepresentation<MockData>("TestPointCloud2"));
+	ASSERT_NO_THROW(OsgPointCloudRepresentation("TestPointCloud"));
 };
 
 TEST(OsgPointCloudRepresentationTests, PointSizeTest)
 {
-	auto pointCloud = std::make_shared<OsgPointCloudRepresentation<EmptyData>>("TestPointCloud");
+	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("TestPointCloud");
 
 	double pointSize = 1.234;
 	pointCloud->setPointSize(pointSize);
@@ -67,7 +54,7 @@ TEST(OsgPointCloudRepresentationTests, PointSizeTest)
 
 TEST(OsgPointCloudRepresentationTests, ColorTest)
 {
-	auto pointCloud = std::make_shared<OsgPointCloudRepresentation<EmptyData>>("TestPointCloud");
+	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("TestPointCloud");
 
 	Vector4d color = Vector4d(1.0, 2.0, 3.0, 4.0);
 	pointCloud->setColor(color);
@@ -76,65 +63,33 @@ TEST(OsgPointCloudRepresentationTests, ColorTest)
 
 TEST(OsgPointCloudRepresentationTests, VertexTest)
 {
+	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("TestPointCloud");
+	auto vertices = pointCloud->getVertices();
+	EXPECT_EQ(0u, vertices->getNumVertices());
+
+	std::vector<Vector3d> vertexList;
+	vertexList.push_back(Vector3d(0.01, -0.01, 0.01));
+	vertexList.push_back(Vector3d(0.01, -0.01, 0.01));
+	vertexList.push_back(Vector3d(-0.01, -0.01, 0.01));
+	vertexList.push_back(Vector3d(-0.01, -0.01, -0.01));
+	vertexList.push_back(Vector3d(0.01, -0.01, -0.01));
+
+	for (auto it = std::begin(vertexList); it != std::end(vertexList); ++it)
 	{
-		auto pointCloud = std::make_shared<OsgPointCloudRepresentation<EmptyData>>("TestPointCloud");
-		auto vertices = pointCloud->getVertices();
-		EXPECT_EQ(0u, vertices->getNumVertices());
-
-		std::vector<Vector3d> vertexList;
-		vertexList.push_back(Vector3d(0.01, -0.01, 0.01));
-		vertexList.push_back(Vector3d(0.01, -0.01, 0.01));
-		vertexList.push_back(Vector3d(-0.01, -0.01, 0.01));
-		vertexList.push_back(Vector3d(-0.01, -0.01, -0.01));
-		vertexList.push_back(Vector3d(0.01, -0.01, -0.01));
-
-		for (auto it = std::begin(vertexList); it != std::end(vertexList); ++it)
-		{
-			vertices->addVertex(SurgSim::DataStructures::Vertices<EmptyData>::VertexType(*it));
-		}
-
-		auto updatedVertices = pointCloud->getVertices();
-		ASSERT_EQ(vertexList.size(), updatedVertices->getNumVertices());
-		for (size_t i = 0; i < vertexList.size(); ++i)
-		{
-			EXPECT_TRUE(vertexList[i].isApprox(updatedVertices->getVertexPosition(i)));
-		}
+		vertices->addVertex(SurgSim::Graphics::PointCloud::VertexType(*it));
 	}
 
+	auto updatedVertices = pointCloud->getVertices();
+	ASSERT_EQ(vertexList.size(), updatedVertices->getNumVertices());
+	for (size_t i = 0; i < vertexList.size(); ++i)
 	{
-		auto pointCloud = std::make_shared<OsgPointCloudRepresentation<MockData>>("TestPointCloud2");
-		auto vertices = pointCloud->getVertices();
-		EXPECT_EQ(0u, vertices->getNumVertices());
-
-		std::vector<Vector3d> vertexList;
-		vertexList.push_back(Vector3d(0.01, -0.01, 0.01));
-		vertexList.push_back(Vector3d(0.02, -0.01, 0.01));
-		vertexList.push_back(Vector3d(0.03, -0.01, 0.01));
-		vertexList.push_back(Vector3d(0.04, -0.01, -0.01));
-		vertexList.push_back(Vector3d(0.05, -0.01, -0.01));
-
-		for (auto it = std::begin(vertexList); it != std::end(vertexList); ++it)
-		{
-			vertices->addVertex(SurgSim::DataStructures::Vertices<MockData>::VertexType(*it, MockData((*it)[0])));
-		}
-
-		auto updatedVertices = pointCloud->getVertices();
-		ASSERT_EQ(vertexList.size(), updatedVertices->getNumVertices());
-
-		for (size_t i = 0; i < vertexList.size(); ++i)
-		{
-			auto vertex = updatedVertices->getVertex(i);
-
-			EXPECT_TRUE(vertexList[i].isApprox(vertex.position));
-			EXPECT_NEAR(vertexList[i][0], vertex.data.dummyData, epsilon);
-		}
+		EXPECT_TRUE(vertexList[i].isApprox(updatedVertices->getVertexPosition(i)));
 	}
 }
 
-
 TEST(OsgPointCloudRepresentationTests, SerializationTest)
 {
-	auto pointCloud = std::make_shared<OsgPointCloudRepresentation<EmptyData>>("TestPointCloud");
+	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("TestPointCloud");
 
 	double pointSize = 1.234;
 	Vector4d color = Vector4d(1.0, 2.0, 3.0, 4.0);
@@ -147,15 +102,14 @@ TEST(OsgPointCloudRepresentationTests, SerializationTest)
 
 	EXPECT_EQ(1u, node.size());
 	YAML::Node data;
-	data = node["SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>"];
+	data = node["SurgSim::Graphics::OsgPointCloudRepresentation"];
 	EXPECT_EQ(8u, data.size());
 
-	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>> newOsgPointCloud;
-	ASSERT_NO_THROW(newOsgPointCloud = std::dynamic_pointer_cast<OsgPointCloudRepresentation<EmptyData>>
+	std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation> newOsgPointCloud;
+	ASSERT_NO_THROW(newOsgPointCloud = std::dynamic_pointer_cast<OsgPointCloudRepresentation>
 									   (node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
-	EXPECT_EQ("SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>",
-			  newOsgPointCloud->getClassName());
+	EXPECT_EQ("SurgSim::Graphics::OsgPointCloudRepresentation", newOsgPointCloud->getClassName());
 	EXPECT_NEAR(pointSize, newOsgPointCloud->getValue<double>("PointSize"), epsilon);
 	EXPECT_TRUE(color.isApprox(newOsgPointCloud->getValue<Vector4d>("Color")));
 }

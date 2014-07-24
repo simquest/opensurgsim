@@ -48,7 +48,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-typedef SurgSim::DataStructures::Vertices<void> CloudMesh;
+using SurgSim::Graphics::PointCloud;
 
 struct OsgPointCloudRepresentationRenderTests : public RenderTest
 {
@@ -71,20 +71,20 @@ protected:
 		return result;
 	}
 
-	std::shared_ptr<PointCloudRepresentation<void>> makeCloud(std::vector<Vector3d> vertices)
+	std::shared_ptr<PointCloudRepresentation> makeCloud(std::vector<Vector3d> vertices)
 	{
-		std::shared_ptr<PointCloudRepresentation<void>> cloud =
-					std::make_shared<OsgPointCloudRepresentation<void>>("cloud representation");
+		std::shared_ptr<PointCloudRepresentation> representation =
+					std::make_shared<OsgPointCloudRepresentation>("cloud representation");
 
-		cloud->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -0.2)));
+		representation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -0.2)));
 		for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
 		{
-			cloud->getVertices()->addVertex(SurgSim::DataStructures::Vertices<void>::VertexType(*it));
+			representation->getVertices()->addVertex(SurgSim::Graphics::PointCloud::VertexType(*it));
 		}
 
-		viewElement->addComponent(cloud);
+		viewElement->addComponent(representation);
 
-		return cloud;
+		return representation;
 	}
 };
 
@@ -92,7 +92,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointAdd)
 {
 	std::vector<Vector3d> vertices = makeCube();
 
-	auto representation = std::make_shared<OsgPointCloudRepresentation<void>>("pointcloud representation");
+	auto representation = std::make_shared<OsgPointCloudRepresentation>("pointcloud representation");
 	auto pointCloud = representation->getVertices();
 	representation->setPointSize(2.0);
 
@@ -111,14 +111,14 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointAdd)
 
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
-		pointCloud->addVertex(CloudMesh::VertexType(vertices[i]));
+		pointCloud->addVertex(PointCloud::VertexType(vertices[i]));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	}
 }
 
 TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
 {
-	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeCube());
+	std::shared_ptr<PointCloudRepresentation> representation = makeCloud(makeCube());
 
 	/// Run the thread
 	runtime->start();
@@ -137,7 +137,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
-		cloud->setLocalPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
+		representation->setLocalPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 }
@@ -145,8 +145,8 @@ TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
 TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
 {
 	std::vector<Vector3d> startVertices = makeCube();
-	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(startVertices);
-	std::shared_ptr<CloudMesh> mesh = cloud->getVertices();
+	std::shared_ptr<PointCloudRepresentation> representation = makeCloud(startVertices);
+	std::shared_ptr<PointCloud> pointCloud = representation->getVertices();
 
 	/// Run the thread
 	runtime->start();
@@ -171,7 +171,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
 		int id = 0;
 		for (auto it = std::begin(startVertices); it != std::end(startVertices); ++it, ++id)
 		{
-			mesh->setVertexPosition(id, currentPose * (*it));
+			pointCloud->setVertexPosition(id, currentPose * (*it));
 		}
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
@@ -180,7 +180,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
 
 TEST_F(OsgPointCloudRepresentationRenderTests, PointSizeAndColor)
 {
-	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeCube());
+	std::shared_ptr<PointCloudRepresentation> representation = makeCloud(makeCube());
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
@@ -196,8 +196,8 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointSizeAndColor)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
-		cloud->setPointSize(interpolate(size, t));
-		cloud->setColor(interpolate(color, t));
+		representation->setPointSize(interpolate(size, t));
+		representation->setColor(interpolate(color, t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 }

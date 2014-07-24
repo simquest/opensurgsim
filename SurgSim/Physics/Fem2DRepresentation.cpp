@@ -13,8 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 
 namespace
@@ -44,6 +47,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem2DRepresentation, Fem2DRepresentation);
 
 Fem2DRepresentation::Fem2DRepresentation(const std::string& name) : FemRepresentation(name)
 {
@@ -58,6 +62,14 @@ Fem2DRepresentation::~Fem2DRepresentation()
 RepresentationType Fem2DRepresentation::getType() const
 {
 	return REPRESENTATION_TYPE_FEM2D;
+}
+
+std::shared_ptr<FemPlyReaderDelegate> Fem2DRepresentation::getDelegate()
+{
+	auto thisAsSharedPtr = std::static_pointer_cast<Fem2DRepresentation>(shared_from_this());
+	auto readerDelegate = std::make_shared<Fem2DPlyReaderDelegate>(thisAsSharedPtr);
+
+	return readerDelegate;
 }
 
 void Fem2DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,

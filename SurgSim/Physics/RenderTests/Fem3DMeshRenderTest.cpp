@@ -17,7 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
@@ -32,8 +33,8 @@
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 using SurgSim::Math::Vector3d;
@@ -112,8 +113,7 @@ loadMesh(const std::string& fileName)
 	SurgSim::DataStructures::PlyReader reader(fileName);
 	auto delegate = std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
 
-	SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
+	SURGSIM_ASSERT(reader.parseWithDelegate(delegate)) << "The input file " << fileName << " is malformed.";
 
 	return delegate->getMesh();
 }
@@ -141,10 +141,9 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
 	auto femToMesh =
-		std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
-			name + " physics to triangle mesh",
-			fem->getFinalState(),
-			graphics->getMesh());
+		std::make_shared<SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior>("physics to triangle mesh");
+	femToMesh->setSource(fem);
+	femToMesh->setTarget(graphics);
 	sceneElement->addComponent(femToMesh);
 
 	auto collision = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("collision");
@@ -172,19 +171,17 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// The point-cloud for visualizing the nodes of the finite element model
 	auto pointCloud
-		= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>("point cloud");
+		= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("point cloud");
 	pointCloud->setColor(SurgSim::Math::Vector4d(0.2, 0.2, 1.0, 1.0));
 	pointCloud->setPointSize(3.0f);
 	pointCloud->setVisible(true);
 	sceneElement->addComponent(pointCloud);
 
 	// The behavior which transfers the position of the vertices in the FEM to locations in the point cloud
-	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<EmptyData>>(
-						  "fem to point cloud",
-						  fem->getFinalState(),
-						  pointCloud->getVertices());
+	auto femToCloud = std::make_shared<SurgSim::Blocks::TransferPhysicsToPointCloudBehavior>("fem to point cloud");
+	femToCloud->setSource(fem);
+	femToCloud->setTarget(pointCloud);
 	sceneElement->addComponent(femToCloud);
-
 
 	return sceneElement;
 }

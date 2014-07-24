@@ -16,9 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_OSGVIEW_H
 #define SURGSIM_GRAPHICS_OSGVIEW_H
 
-#include "SurgSim/Graphics/View.h"
-
 #include <osgViewer/Viewer>
+
+#include "SurgSim/Graphics/View.h"
 
 namespace osgViewer
 {
@@ -99,18 +99,18 @@ public:
 	/// any more we let the user set the parameters from here.
 	/// \param	position	The position of the camera.
 	/// \param	lookat  	The location the camera looks at.
-	void setManipulatorParameters(SurgSim::Math::Vector3d position, SurgSim::Math::Vector3d lookat);
+	void setManipulatorParameters(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& lookat);
 
 	/// Set the camera manipulator position.
 	/// \param position The position of the camera.
-	void setManipulatorPosition(SurgSim::Math::Vector3d position);
+	void setManipulatorPosition(const SurgSim::Math::Vector3d& position);
 
 	/// \return The position of the camera.
 	SurgSim::Math::Vector3d getManipulatorPosition();
 
 	/// Set the camera manipulator lookAt.
 	/// \param lookAt The location the camera looks at.
-	void setManipulatorLookAt(SurgSim::Math::Vector3d lookAt);
+	void setManipulatorLookAt(const SurgSim::Math::Vector3d& lookAt);
 
 	/// \return The location the camera looks at.
 	SurgSim::Math::Vector3d getManipulatorLookAt();
@@ -125,22 +125,22 @@ public:
 
 	/// Return the keyboard to be used with this view.
 	/// \return A keyboard device
-	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice();
+	std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice();
 
 	/// Turn on/off the keyboard device to be used.
 	/// \param val Indicate whether or not to use keyboard device
-	virtual void enableKeyboardDevice(bool val);
+	void enableKeyboardDevice(bool val);
 
 	/// \return Whether the keyboard device is enabled.
 	bool isKeyboardDeviceEnabled();
 
 	/// Return the mouse to be used with this view.
 	/// \return A mouse device
-	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice();
+	std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice();
 
 	/// Turn on/off the mouse device to be used.
 	/// \param val Indicate whether or not to use mouse device
-	virtual	void enableMouseDevice(bool val);
+	void enableMouseDevice(bool val);
 
 	/// \return Whether the mouse device is enabled.
 	bool isMouseDeviceEnabled();
