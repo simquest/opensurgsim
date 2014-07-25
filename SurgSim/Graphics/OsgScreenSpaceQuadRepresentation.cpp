@@ -273,7 +273,7 @@ std::shared_ptr<OsgMaterial> OsgScreenSpaceQuadRepresentation::buildMaterial(
 
 	if (result)
 	{
-		material = std::make_shared<OsgMaterial>();
+		material = std::make_shared<OsgMaterial>("material");
 		material->setShader(shader);
 	}
 

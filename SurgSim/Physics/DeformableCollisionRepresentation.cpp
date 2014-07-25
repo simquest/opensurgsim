@@ -78,14 +78,8 @@ void DeformableCollisionRepresentation::update(const double& dt)
 
 bool DeformableCollisionRepresentation::doInitialize()
 {
-	if (!m_shape->initialize(*(getRuntime()->getApplicationData())))
-	{
-		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"No mesh loaded for m_shape ";
-	}
-
 	bool result = false;
-	if (m_shape->getMesh()->isValid())
+	if (nullptr != m_shape && m_shape->isValid())
 	{
 		m_mesh = m_shape->getMesh();
 		result = true;

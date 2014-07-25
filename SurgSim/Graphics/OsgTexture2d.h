@@ -21,6 +21,10 @@
 
 #include <osg/Texture2D>
 
+#include "SurgSim/Framework/Accessible.h"
+#include <boost/any.hpp>
+#include <memory>
+
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable:4250)
@@ -61,6 +65,15 @@ public:
 };
 
 };  // namespace Graphics
+
+
+namespace Framework
+{
+/// Template specialization for the convert<> function used in accessible, this one can convert an incoming
+/// SurgSim::Graphics::Texture to an outgoing OsgTexture2d
+template <>
+std::shared_ptr<SurgSim::Graphics::OsgTexture2d> convert(boost::any val);
+}
 
 };  // namespace SurgSim
 

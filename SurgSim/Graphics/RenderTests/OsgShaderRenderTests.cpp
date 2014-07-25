@@ -108,13 +108,14 @@ TEST_F(OsgShaderRenderTests, SphereShaderTest)
 	sphereRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.25, 0.0, -1.0)));
 
 	/// Add a shader to the sphere
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<Shader> shader = loadExampleShader(*applicationData);
 
 	material->setShader(shader);
 	sphereRepresentation->setMaterial(material);
 
 	viewElement->addComponent(sphereRepresentation);
+	viewElement->addComponent(material);
 
 	/// Run the thread
 	runtime->start();
@@ -136,6 +137,7 @@ TEST_F(OsgShaderRenderTests, ShinyShaderTest)
 	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 0.4, 1.0));
 	material->setValue("shininess", 64.0f);
 	sphereRepresentation->setMaterial(material);
+	sceneElement->addComponent(material);
 	sceneElement->addComponent(sphereRepresentation);
 	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
 	scene->addSceneElement(sceneElement);
@@ -210,6 +212,7 @@ TEST_F(OsgShaderRenderTests, TexturedShinyShaderTest)
 
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Sphere");
 	sceneElement->addComponent(sphereRepresentation);
+	sceneElement->addComponent(material);
 	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
 
 	scene->addSceneElement(sceneElement);
