@@ -82,6 +82,10 @@ OsgLight::OsgLight(const std::string& name) :
 
 	m_uniforms[QUADRATIC_ATTENUATION] = new osg::Uniform(Uniform::FLOAT, prefix + "quadraticAttenuation");
 	setQuadraticAttenuation(m_quadraticAttenuation);
+
+	// By default light the main group
+	setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
+
 }
 
 OsgLight::~OsgLight()

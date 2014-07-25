@@ -78,7 +78,10 @@ std::shared_ptr<Shader> loadExampleShader(const SurgSim::Framework::ApplicationD
 
 std::shared_ptr<Material> createShinyMaterial(const SurgSim::Framework::ApplicationData& data)
 {
-	auto material = createMaterialWithShaders(data, "Shaders/material");
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+	auto shader = SurgSim::Graphics::loadShader(data, "Shaders/material");
+	material->setShader(shader);
+
 	std::shared_ptr<SurgSim::Graphics::UniformBase>
 	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
 	material->addUniform(uniform);
@@ -173,7 +176,11 @@ TEST_F(OsgShaderRenderTests, TexturedShinyShaderTest)
 		std::make_shared<OsgSphereRepresentation>("sphere representation");
 	sphereRepresentation->setRadius(0.25);
 
-	auto material = createMaterialWithShaders(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	auto material = std::make_shared<OsgMaterial>();
+	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	ASSERT_TRUE(shader != nullptr);
+	material->setShader(shader);
+
 	std::shared_ptr<SurgSim::Graphics::UniformBase>
 	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
 	material->addUniform(uniform);
@@ -190,7 +197,7 @@ TEST_F(OsgShaderRenderTests, TexturedShinyShaderTest)
 
 	// Provide a texture for the diffuse color
 	std::string filename;
-	EXPECT_TRUE(runtime->getApplicationData()->tryFindFile("Data/Textures/CheckerBoard.png", &filename));
+	EXPECT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/checkered.png", &filename));
 	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
 	texture->loadImage(filename);
 	auto textureUniform =
