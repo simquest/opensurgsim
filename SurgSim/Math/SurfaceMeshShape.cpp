@@ -180,5 +180,10 @@ void SurfaceMeshShape::computeVolumeIntegrals()
 	m_volume = (area * m_thickness);
 }
 
+bool SurfaceMeshShape::isValid() const
+{
+	return (nullptr != m_mesh) && (m_thickness > 1e-5) && (m_mesh->isValid());
+}
+
 }; // namespace Math
 }; // namespace SurgSim

@@ -106,7 +106,7 @@ public:
 	/// \return The object's associated AabbTree
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree();
 
-	/// Check to see if this shape contains a valid mesh.
+	/// Check if this shape contains a valid mesh.
 	/// Equals 'MeshShape::getMesh() != nullptr && MeshShape::getMesh()->isValid()'
 	/// \return true if this shape contains a valid mesh; otherwise, false.
 	bool isValid() const;

@@ -141,7 +141,7 @@ TEST_F(MeshShapeTest, EmptyMeshTest)
 	EXPECT_NEAR(0.0, meshShape.getVolume(), 1e-8);
 	EXPECT_TRUE(meshShape.getCenter().isZero());
 	EXPECT_TRUE(meshShape.getSecondMomentOfVolume().isZero());
-	EXPECT_TRUE(meshShape.isValid()); // An empty mesh is regard as valid.
+	EXPECT_TRUE(meshShape.isValid()); // An empty mesh is regarded as valid.
 
 	SurgSim::Math::MeshShape emptyMeshShape;
 	EXPECT_FALSE(emptyMeshShape.isValid());
@@ -150,7 +150,7 @@ TEST_F(MeshShapeTest, EmptyMeshTest)
 TEST_F(MeshShapeTest, ValidMeshTest)
 {
 	{
-		SCOPED_TRACE("MeshShapeTest.ValidMeshTest.Invalid Mesh");
+		SCOPED_TRACE("Invalid Mesh");
 		auto emptyMesh = std::make_shared<TriangleMeshBase>();
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>(*emptyMesh);
 		auto mesh = meshShape->getMesh();
@@ -171,7 +171,7 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 	}
 
 	{
-		SCOPED_TRACE("MeshShapeTest.ValidMeshTest.Valid Mesh");
+		SCOPED_TRACE("Valid Mesh");
 		auto emptyMesh = std::make_shared<TriangleMeshBase>();
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>(*emptyMesh);
 		auto mesh = meshShape->getMesh();
@@ -245,6 +245,7 @@ TEST_F(MeshShapeTest, SerializationTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 	EXPECT_NO_THROW(meshShape->load(fileName));
+	EXPECT_TRUE(meshShape->isValid());
 
 	// We chose to let YAML serialization only works with base class pointer.
 	// i.e. We need to serialize 'meshShape' via a SurgSim::Math::Shape pointer.
@@ -266,6 +267,7 @@ TEST_F(MeshShapeTest, SerializationTest)
 	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), newMeshShape->getMesh()->getNumVertices());
 	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), newMeshShape->getMesh()->getNumEdges());
 	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), newMeshShape->getMesh()->getNumTriangles());
+	EXPECT_TRUE(newMeshShape->isValid());
 }
 
 TEST_F(MeshShapeTest, CreateAabbTreeTest)
@@ -300,6 +302,7 @@ TEST_F(MeshShapeTest, DoLoadTest)
 
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 		EXPECT_NO_THROW(EXPECT_TRUE(meshShape->doLoad(path)));
+		EXPECT_TRUE(meshShape->isValid());
 	}
 
 	{
@@ -309,5 +312,6 @@ TEST_F(MeshShapeTest, DoLoadTest)
 
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 		EXPECT_ANY_THROW(meshShape->doLoad(path));
+		EXPECT_FALSE(meshShape->isValid());
 	}
 }
