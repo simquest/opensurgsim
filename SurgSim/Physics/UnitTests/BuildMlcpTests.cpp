@@ -98,6 +98,8 @@ TEST_F(BuildMlcpTests, OneRepresentationNoConstraintTest)
 
 	EXPECT_EQ(0, mlcpSolution.x.rows());
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
 }
 
 TEST_F(BuildMlcpTests, TwoRepresentationsNoConstraintTest)
@@ -128,6 +130,10 @@ TEST_F(BuildMlcpTests, TwoRepresentationsNoConstraintTest)
 
 	EXPECT_EQ(0, mlcpSolution.x.rows());
 	EXPECT_EQ(12, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
+	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+			  m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[1].get()));
 }
 
 TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
@@ -198,6 +204,11 @@ TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
 
 	EXPECT_EQ(1, mlcpSolution.x.rows());
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
+	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+			  m_physicsManagerState->getRepresentationsMapping().getValue(m_fixedWorldRepresentation.get()));
+	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
 }
 
 TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
@@ -267,6 +278,11 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 
 	EXPECT_EQ(3, mlcpSolution.x.rows());
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
+	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+			  m_physicsManagerState->getRepresentationsMapping().getValue(m_fixedWorldRepresentation.get()));
+	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
 }
 
 TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
@@ -372,6 +388,13 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 
 	EXPECT_EQ(2, mlcpSolution.x.rows());
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
+	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+			  m_physicsManagerState->getRepresentationsMapping().getValue(m_fixedWorldRepresentation.get()));
+	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
+	EXPECT_EQ(m_usedConstraints[0]->getNumDof(),
+			  m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[1].get()));
 }
 
 TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
@@ -487,6 +510,13 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 
 	EXPECT_EQ(2, mlcpSolution.x.rows());
 	EXPECT_EQ(12, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
+	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+			  m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[1].get()));
+	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
+	EXPECT_EQ(m_usedConstraints[0]->getNumDof(),
+			  m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[1].get()));
 }
 
 }; // namespace Physics
