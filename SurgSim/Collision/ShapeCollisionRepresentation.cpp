@@ -66,7 +66,7 @@ void ShapeCollisionRepresentation::update(const double& dt)
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
 	if (nullptr != meshShape)
 	{
-		SURGSIM_ASSERT(meshShape->isValid()) <<
+		SURGSIM_LOG_IF(!meshShape->isValid(), SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
 			"Try to update an invalid MeshShape.";
 		meshShape->setPose(getPose());
 	}
