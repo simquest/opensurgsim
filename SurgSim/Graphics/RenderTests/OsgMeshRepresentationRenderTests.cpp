@@ -248,7 +248,7 @@ TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
 
 	// Create material to transport the Textures
 
-	auto material = std::make_shared<OsgMaterial>();
+	auto material = std::make_shared<OsgMaterial>("material");
 	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
 	ASSERT_TRUE(shader != nullptr);
 	material->setShader(shader);
