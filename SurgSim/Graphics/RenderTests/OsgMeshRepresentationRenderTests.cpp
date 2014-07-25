@@ -25,6 +25,7 @@
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
@@ -39,7 +40,6 @@
 #include "SurgSim/Testing/TestCube.h"
 
 #include <string>
-#include "../OsgLight.h"
 
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
