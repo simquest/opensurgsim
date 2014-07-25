@@ -60,6 +60,14 @@ public:
 	/// \return	The physics representations that are known to the state.
 	const std::vector<std::shared_ptr<Representation>>& getRepresentations();
 
+	/// Set the list of representations into the active representations list.
+	/// \param activeRepresentations The active physics representations that are known to the state.
+	void setActiveRepresentations(const std::vector<std::shared_ptr<Representation>>& activeRepresentations);
+
+	/// Gets the active physics representations.
+	/// \return	The active physics representations that are known to the state.
+	const std::vector<std::shared_ptr<Representation>>& getActiveRepresentations() const;
+
 	/// Sets the collision representations for the state.
 	/// \param val collection of all collision representations.
 	void setCollisionRepresentations(const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val);
@@ -109,6 +117,13 @@ public:
 	/// \return	The constraint group.
 	const std::vector<std::shared_ptr<Constraint>>& getConstraintGroup(int type) const;
 
+	/// Filter the map of constraints into the active constraints list.
+	/// \param activeConstraints The list of active constraints.
+	void setActiveConstraints(const std::vector<std::shared_ptr<Constraint>>& activeConstraints);
+
+	/// \return	The list of all active constraints.
+	const std::vector<std::shared_ptr<Constraint>>& getActiveConstraints() const;
+
 	/// Gets the Mlcp problem
 	/// \return	The Mlcp problem for this physics manager state (read/write access).
 	MlcpPhysicsProblem& getMlcpProblem();
@@ -130,10 +145,18 @@ public:
 	/// Each representation has an index in the mlcp. This mapping is about this index.
 	const MlcpMapping<Representation>& getRepresentationsMapping() const;
 
+	/// Set the representations mapping
+	/// \param representationsMapping	The representations mapping (mapping between the representation and the mlcp)
+	void setRepresentationsMapping(const MlcpMapping<Representation>& representationsMapping);
+
 	/// Gets the constraints mapping
 	/// \return	The constraints mapping (mapping between the constraints and the mlcp)
 	/// Each constraint has an index in the mlcp. This mapping is about this index.
 	const MlcpMapping<Constraint>& getConstraintsMapping() const;
+
+	/// Set the constraints mapping
+	/// \param constraintsMapping The constraints mapping (mapping between the constraints and the mlcp)
+	void setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping);
 
 private:
 
@@ -143,6 +166,9 @@ private:
 	/// not get copied themselves.
 	/// The local list of representations
 	std::vector<std::shared_ptr<Representation>> m_representations;
+
+	/// The list of active representations.
+	std::vector<std::shared_ptr<Representation>> m_activeRepresentations;
 
 	/// List of all the collision representations know to the state
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
@@ -162,6 +188,9 @@ private:
 
 	/// The local map of constraints.
 	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;
+
+	/// The list of active constraints.
+	std::vector<std::shared_ptr<Constraint>> m_activeConstraints;
 
 	/// Representation mapping
 	MlcpMapping<Representation> m_representationsIndexMapping;
