@@ -66,12 +66,12 @@ SurgSim::Math::Vector3d CapsuleShape::getCenter() const
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Vector3d CapsuleShape::topCentre() const
+SurgSim::Math::Vector3d CapsuleShape::topCenter() const
 {
 	return Vector3d(0.0, m_length / 2.0, 0.0);
 }
 
-SurgSim::Math::Vector3d CapsuleShape::bottomCentre() const
+SurgSim::Math::Vector3d CapsuleShape::bottomCenter() const
 {
 	return Vector3d(0.0, -m_length / 2.0, 0.0);
 }

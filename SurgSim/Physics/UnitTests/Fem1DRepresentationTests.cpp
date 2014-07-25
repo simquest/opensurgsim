@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -115,6 +116,27 @@ TEST(Fem1DRepresentationTests, DoWakeUpTest)
 	std::shared_ptr<LinearSolveAndInverseTriDiagonalBlockMatrix<6>> expectedLinearSolverType;
 	expectedLinearSolverType = std::dynamic_pointer_cast<LinearSolveAndInverseTriDiagonalBlockMatrix<6>>(linearSolver);
 	EXPECT_NE(nullptr, expectedLinearSolverType);
+}
+
+TEST(Fem1DRepresentationTests, SerializationTest)
+{
+	auto fem1DRepresentation = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Test-Fem1D");
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*fem1DRepresentation));
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(1u, node.size());
+
+	YAML::Node data = node["SurgSim::Physics::Fem1DRepresentation"];
+	EXPECT_EQ(10u, data.size());
+
+	std::shared_ptr<Fem1DRepresentation> newRepresentation;
+	ASSERT_NO_THROW(newRepresentation =
+		std::dynamic_pointer_cast<Fem1DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	ASSERT_NE(nullptr, newRepresentation);
+
+	EXPECT_EQ("SurgSim::Physics::Fem1DRepresentation", newRepresentation->getClassName());
+	EXPECT_EQ(REPRESENTATION_TYPE_FEM1D, newRepresentation->getType());
 }
 
 } // namespace Physics

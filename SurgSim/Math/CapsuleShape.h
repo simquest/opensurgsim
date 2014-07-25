@@ -57,13 +57,13 @@ public:
 	/// \return The center of the shape
 	virtual Vector3d getCenter() const override;
 
-	/// Return the centre of the top sphere of the internal cylinder
-	/// \return The top centre of the sphere of the capsule
-	Vector3d topCentre() const;
+	/// Return the center of the top sphere of the internal cylinder
+	/// \return The top center of the sphere of the capsule
+	Vector3d topCenter() const;
 
-	/// Return the centre of the bottom sphere of the internal cylinder
-	/// \return The bottom centre of the sphere of the capsule
-	Vector3d bottomCentre() const;
+	/// Return the center of the bottom sphere of the internal cylinder
+	/// \return The bottom center of the sphere of the capsule
+	Vector3d bottomCenter() const;
 
 	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix

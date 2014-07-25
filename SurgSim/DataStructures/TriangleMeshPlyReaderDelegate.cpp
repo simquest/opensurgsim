@@ -125,6 +125,6 @@ void TriangleMeshPlyReaderDelegate::endFaces(const std::string& elementName)
 		"has become corrupted.";
 }
 
-}
-}
+} // Datastructures
+} // SurgSim
 

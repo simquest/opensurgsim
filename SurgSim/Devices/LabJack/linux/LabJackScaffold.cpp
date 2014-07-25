@@ -372,14 +372,15 @@ private:
 	/// Given all the timers, return just the ones that provide inputs.
 	/// \param timers The timers.
 	/// \return The timers that provide inputs.
-	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int, LabJack::TimerMode>& timers) const
+	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int,
+		LabJack::TimerModeAndOptionalInitialValue>& timers) const
 	{
 		std::unordered_set<int> timersWithInputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 		{
-			if ((timer->second != LabJack::TIMERMODE_PWM_16BIT) &&
-				(timer->second != LabJack::TIMERMODE_PWM_8BIT) &&
-				(timer->second != LabJack::TIMERMODE_FREQUENCY_OUTPUT))
+			if ((timer->second.mode != LabJack::TIMERMODE_PWM_16BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_PWM_8BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_FREQUENCY_OUTPUT))
 			{
 				timersWithInputs.insert(timer->first);
 			}
@@ -391,23 +392,23 @@ private:
 	/// \param timers The timers.
 	/// \return The timers that take outputs.
 	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int,
-		LabJack::TimerMode>& timers) const
+		LabJack::TimerModeAndOptionalInitialValue>& timers) const
 	{
 		std::unordered_set<int> timersWithOutputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 		{
-			if ((timer->second != LabJack::TIMERMODE_PWM_16BIT) &&
-				(timer->second != LabJack::TIMERMODE_PWM_8BIT) &&
-				(timer->second != LabJack::TIMERMODE_RISING_EDGES_32BIT) &&
-				(timer->second != LabJack::TIMERMODE_FALLING_EDGES_32BIT) &&
-				(timer->second != LabJack::TIMERMODE_DUTY_CYCLE) &&
-				(timer->second != LabJack::TIMERMODE_FIRMWARE_COUNTER) &&
-				(timer->second != LabJack::TIMERMODE_FIRMWARE_COUNTER_DEBOUNCED) &&
-				(timer->second != LabJack::TIMERMODE_FREQUENCY_OUTPUT) &&
-				(timer->second != LabJack::TIMERMODE_QUADRATURE) &&
-				(timer->second != LabJack::TIMERMODE_RISING_EDGES_16BIT) &&
-				(timer->second != LabJack::TIMERMODE_FALLING_EDGES_16BIT) &&
-				(timer->second != LabJack::TIMERMODE_LINE_TO_LINE))
+			if ((timer->second.mode != LabJack::TIMERMODE_PWM_16BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_PWM_8BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_RISING_EDGES_32BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_FALLING_EDGES_32BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_DUTY_CYCLE) &&
+				(timer->second.mode != LabJack::TIMERMODE_FIRMWARE_COUNTER) &&
+				(timer->second.mode != LabJack::TIMERMODE_FIRMWARE_COUNTER_DEBOUNCED) &&
+				(timer->second.mode != LabJack::TIMERMODE_FREQUENCY_OUTPUT) &&
+				(timer->second.mode != LabJack::TIMERMODE_QUADRATURE) &&
+				(timer->second.mode != LabJack::TIMERMODE_RISING_EDGES_16BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_FALLING_EDGES_16BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_LINE_TO_LINE))
 			{
 				timersWithOutputs.insert(timer->first);
 			}
@@ -1222,7 +1223,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 	int sendBytesSize = 7; // the first IOType goes here
 
 	int readBytesSize = 9; // Reading after a Feedback command provides 9+ bytes.
-	const std::unordered_map<int, LabJack::TimerMode> timers = device->getTimers();
+	const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue> timers = device->getTimers();
 	for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 	{
 		const int minimumTimer = 0;
@@ -1240,20 +1241,11 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 		{
 			const BYTE timerConfigCode = timer->first * 2 + 43; // The timer configs are 43, 45, 47, and 49.
 			sendBytes.at(sendBytesSize++) = timerConfigCode;  //IOType, Timer#Config (e.g., Timer0Config)
-			sendBytes.at(sendBytesSize++) = timer->second;  //TimerMode
-			sendBytes.at(sendBytesSize++) = 0;  //Value LSB
-			sendBytes.at(sendBytesSize++) = 0;  //Value MSB
+			sendBytes.at(sendBytesSize++) = timer->second.mode;  //TimerMode
 
-			if ((timer->second == LabJack::TIMERMODE_PWM_8BIT) ||
-				(timer->second == LabJack::TIMERMODE_PWM_16BIT))
-			{  // Initialize PWMs to almost-always low.
-				const BYTE timerCode = timerConfigCode - 1;
-				sendBytes.at(sendBytesSize++) = timerCode;   //IOType, Timer# (e.g., Timer0)
-				sendBytes.at(sendBytesSize++) = 1;    //UpdateReset
-				sendBytes.at(sendBytesSize++) = 255;  //Value LSB
-				sendBytes.at(sendBytesSize++) = 255;  //Value MSB
-				readBytesSize += 4; // A Timer# IOType causes 4 read bytes.
-			}
+			const int initialValue = timer->second.initialValue.hasValue() ? timer->second.initialValue.getValue() : 0;
+			sendBytes.at(sendBytesSize++) = static_cast<BYTE>(initialValue & 0xFF);  //Value LSB
+			sendBytes.at(sendBytesSize++) = static_cast<BYTE>((initialValue >> 8) & 0xFF);  //Value MSB
 		}
 	}
 

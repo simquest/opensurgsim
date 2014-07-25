@@ -17,9 +17,10 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -28,7 +29,7 @@
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
+using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Physics::Fem3DRepresentation;
@@ -100,8 +101,8 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 	}
 
 	// Graphics Representation
-	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation;
-	graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics object ");
+	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation;
+	graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation>(name + " Graphics object ");
 	graphicsRepresentation->setLocalPose(pose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
@@ -111,10 +112,12 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 	femSceneElement->addComponent(graphicsRepresentation);
-	femSceneElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>(
-		"Physics to Graphics deformable points",
-		physicsRepresentation->getFinalState(),
-		graphicsRepresentation->getVertices()));
+
+	auto physicsToGraphics =
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
+	physicsToGraphics->setSource(physicsRepresentation);
+	physicsToGraphics->setTarget(graphicsRepresentation);
+	femSceneElement->addComponent(physicsToGraphics);
 
 	return femSceneElement;
 }
@@ -165,8 +168,8 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	physicsRepresentation->addFemElement(element);
 
 	// Graphics Representation
-	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation;
-	graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics object ");
+	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation;
+	graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation>(name + " Graphics object ");
 	graphicsRepresentation->setLocalPose(pose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
@@ -176,10 +179,12 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 	femSceneElement->addComponent(graphicsRepresentation);
-	femSceneElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>(
-		"Physics to Graphics deformable points",
-		physicsRepresentation->getFinalState(),
-		graphicsRepresentation->getVertices()));
+
+	auto physicsToGraphics =
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
+	physicsToGraphics->setSource(physicsRepresentation);
+	physicsToGraphics->setTarget(graphicsRepresentation);
+	femSceneElement->addComponent(physicsToGraphics);
 
 	return femSceneElement;
 }
