@@ -70,8 +70,7 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
-	/// Check to see if length and radius of CapsuleShape are bigger than 0.
-	/// \return True if length and radius are bigger than 0; Otherwise, false.
+	/// \return True if length and radius are bigger than or equal to 0; Otherwise, false.
 	virtual bool isValid() const override;
 
 protected:

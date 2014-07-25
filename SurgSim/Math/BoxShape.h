@@ -80,8 +80,7 @@ public:
 	/// \return All eight vertices of the box
 	const std::array<Vector3d, 8>& getVertices() const;
 
-	/// Check to see if sizes of a box along X, Y, Z are bigger than 0.
-	/// \return True if sizes along X, Y, Z are bigger than 0; Otherwise, false.
+	/// \return True if size along X, Y, Z are bigger than or equal to 0; Otherwise, false.
 	virtual bool isValid() const override;
 
 protected:

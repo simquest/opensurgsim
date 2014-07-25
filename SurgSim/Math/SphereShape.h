@@ -56,8 +56,7 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
-	/// Check if radius of SphereShape is bigger than 0.
-	/// \return True if radius is bigger than 0; Otherwise, false.
+	/// \return True if radius is bigger than or equal to 0; Otherwise, false.
 	virtual bool isValid() const override;
 
 protected:
