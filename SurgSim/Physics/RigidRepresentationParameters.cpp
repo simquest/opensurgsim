@@ -240,15 +240,14 @@ void RigidRepresentationParameters::updateProperties()
 	if (nullptr != m_shapeForMassInertia)
 	{
 		SURGSIM_ASSERT(m_shapeForMassInertia->isValid()) << "Invalid shape used for mass inertia.";
-	}
+		if (m_rho > 0)
+		{
+			m_mass         = m_rho * m_shapeForMassInertia->getVolume();
+			m_massCenter   = m_shapeForMassInertia->getCenter();
+			m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentOfVolume();
 
-	if (m_rho && m_shapeForMassInertia)
-	{
-		m_mass         = m_rho * m_shapeForMassInertia->getVolume();
-		m_massCenter   = m_shapeForMassInertia->getCenter();
-		m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentOfVolume();
-
-		m_isValid = checkValidity();
+			m_isValid = checkValidity();
+		}
 	}
 }
 
