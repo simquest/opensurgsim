@@ -24,15 +24,24 @@
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/Camera.h"
+#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Graphics/MeshRepresentation.h"
+#include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/MeshShape.h"
@@ -45,6 +54,8 @@
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 
 using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
 using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
@@ -69,6 +80,8 @@ using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
+using SurgSim::Math::Vector4f;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Input::InputComponent;
 using SurgSim::Input::InputManager;
@@ -84,7 +97,8 @@ using SurgSim::Physics::VirtualToolCoupler;
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
-	SurgSim::Math::IntegrationScheme integrationScheme)
+	SurgSim::Math::IntegrationScheme integrationScheme,
+	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material)
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);
@@ -100,10 +114,12 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	meshShape->load(filename);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
-	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> graphicalFem =
-		std::make_shared<OsgMeshRepresentation>("Triangle mesh");
+	auto graphicalFem = std::make_shared<OsgMeshRepresentation>("Triangle mesh");
 	graphicalFem->setFilename(filename);
 	sceneElement->addComponent(graphicalFem);
+
+	// Create material to transport the Textures
+	graphicalFem->setMaterial(material);
 
 	// Create the collision mesh for the surface of the finite element model
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
@@ -240,15 +256,19 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	return sceneElement;
 }
 
-std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
+std::shared_ptr<SceneElement> createArmSceneElement(
+	const std::string& armName,
+	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material)
 {
 	const std::string filename = std::string("Geometry/arm_collision.ply");
 
 	// Graphic representation for arm
 	std::shared_ptr<SceneryRepresentation> forearmSceneryRepresentation =
 		createSceneryObject("forearm", "Geometry/forearm.osgb");
+	forearmSceneryRepresentation->setMaterial(material);
 	std::shared_ptr<SceneryRepresentation> upperarmSceneryRepresentation =
 		createSceneryObject("upperarm", "Geometry/upperarm.osgb");
+	upperarmSceneryRepresentation->setMaterial(material);
 
 	// Arm collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>();
@@ -281,7 +301,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 
 template <typename Type>
 std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement,
-										  const std::string& name)
+		const std::string& name)
 {
 	std::shared_ptr<SurgSim::Framework::Component> component = sceneElement->getComponent(name);
 	SURGSIM_ASSERT(component != nullptr) << "Failed to get Component named '" << name << "'.";
@@ -290,6 +310,81 @@ std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::Sc
 	SURGSIM_ASSERT(result != nullptr) << "Failed to convert Component to requested type.";
 
 	return result;
+}
+
+std::shared_ptr<OsgViewElement> createViewElement()
+{
+	auto result = std::make_shared<OsgViewElement>("StaplingDemoView");
+	result->enableManipulator(true);
+	result->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
+	result->enableKeyboardDevice(true);
+
+	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
+	light->setDiffuseColor(Vector4d(1.0, 1.0, 1.0, 1.0));
+	light->setSpecularColor(Vector4d(1.0, 1.0, 1.0, 1.0));
+	result->addComponent(light);
+
+	result->getCamera()->setAmbientColor(Vector4d(0.2, 0.2, 0.2, 1.0));
+
+	return result;
+}
+
+std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
+	const SurgSim::Framework::ApplicationData& data,
+	std::shared_ptr<SurgSim::Graphics::OsgShader> shader,
+	std::string defaultTextureName = "Textures/checkered.png")
+{
+	// Default Material with shader
+	// using scopes to keep from having to introduce new variables with different types
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+	material->setShader(shader);
+
+	{
+		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
+		material->addUniform(uniform);
+		material->setValue("diffuseColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	}
+
+	{
+		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("specularColor");
+		material->addUniform(uniform);
+		material->setValue("specularColor", SurgSim::Math::Vector4f(0.01, 0.01, 0.01, 1.0));
+	}
+
+	{
+		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<float>>("shininess");
+		material->addUniform(uniform);
+		material->setValue("shininess", 32.0f);
+	}
+
+	std::string blackTexture;
+	SURGSIM_ASSERT(data.tryFindFile("Textures/black.png", &blackTexture));
+
+	std::string defaultTexture;
+	SURGSIM_ASSERT(data.tryFindFile(defaultTextureName, &defaultTexture));
+
+	{
+		// As a default color for the texture map use white
+		auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+		texture->loadImage(defaultTexture);
+		auto uniform =
+			std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("diffuseMap");
+		uniform->set(texture);
+		material->addUniform(uniform);
+	}
+
+	{
+		// The neutral color for the shadow map is black
+		auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+		texture->loadImage(blackTexture);
+		auto uniform =
+			std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("shadowMap");
+		uniform->set(texture);
+		uniform->setMinimumTextureUnit(8);
+		material->addUniform(uniform);
+	}
+
+	return material;
 }
 
 int main(int argc, char* argv[])
@@ -318,15 +413,16 @@ int main(int argc, char* argv[])
 	}
 	inputManager->addDevice(device);
 
-	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
-	view->enableManipulator(true);
-	view->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
-	view->enableKeyboardDevice(true);
+	std::shared_ptr<OsgViewElement> view = createViewElement();
 	inputManager->addDevice(view->getKeyboardDevice());
 
-	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
+	// Shader should be shared between all materials using the same shader
+	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	SURGSIM_ASSERT(shader != nullptr) << "Shader could not be loaded.";
 
-	std::shared_ptr<SceneElement> arm = createArmSceneElement("arm");
+	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
+	auto material = createShinyMaterial(*runtime->getApplicationData(), shader);
+	std::shared_ptr<SceneElement> arm = createArmSceneElement("arm", material);
 	arm->setPose(armPose);
 
 	std::shared_ptr<SceneElement> stapler = createStaplerSceneElement("stapler", deviceName);
@@ -335,10 +431,16 @@ int main(int argc, char* argv[])
 	std::string woundFilename = std::string("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
 	// Dynamic Optical Coherence Elastography", IEEE Transactions on Biomedical Engineering, Vol 57, No 4.
+
+
+	// Material for the wound
+	material = createShinyMaterial(*runtime->getApplicationData(), shader, "Geometry/wound.png");
+
 	std::shared_ptr<SceneElement> wound =
 		createFemSceneElement("wound",
 							  woundFilename,
-							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER);
+							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
+							  material);
 	wound->setPose(armPose);
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");

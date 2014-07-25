@@ -21,9 +21,11 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
@@ -42,6 +44,7 @@
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
+using SurgSim::Math::Vector4f;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::makeRigidTransform;
@@ -80,7 +83,7 @@ protected:
 	}
 };
 
-TEST_F(OsgMeshRepresentationRenderTests, StaticRotateDynamicScale)
+TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 {
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Scene");
 	scene->addSceneElement(element);
@@ -184,7 +187,7 @@ TEST_F(OsgMeshRepresentationRenderTests, StaticRotateDynamicScale)
 	}
 }
 
-TEST_F(OsgMeshRepresentationRenderTests, DeformableMeshRenderTest)
+TEST_F(OsgMeshRepresentationRenderTests, TextureTest)
 {
 
 	std::string woundFilename;
@@ -192,7 +195,7 @@ TEST_F(OsgMeshRepresentationRenderTests, DeformableMeshRenderTest)
 				&woundFilename));
 
 	std::string textureFilename;
-	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("OsgMeshRepresentationRenderTests/CheckerBoard.png",
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/checkered.png",
 				&textureFilename));
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
@@ -222,6 +225,98 @@ TEST_F(OsgMeshRepresentationRenderTests, DeformableMeshRenderTest)
 	runtime->start();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	runtime->stop();
+
+}
+
+TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
+{
+
+	std::string woundFilename;
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("OsgMeshRepresentationRenderTests/wound_deformable.ply",
+				&woundFilename));
+
+	std::string textureFilename;
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("OsgMeshRepresentationRenderTests/wound.png",
+				&textureFilename));
+
+	// Create a triangle mesh for visualizing the surface of the finite element model
+	auto graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Mesh");
+	*graphics->getMesh() = SurgSim::Graphics::Mesh(*loadGraphicsMesh(woundFilename));
+
+
+	// Create material to transport the Textures
+
+	auto material = std::make_shared<OsgMaterial>();
+	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	ASSERT_TRUE(shader != nullptr);
+	material->setShader(shader);
+	{
+		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
+		material->addUniform(uniform);
+		material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.8, 1.0));
+	}
+
+	{
+		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("specularColor");
+		material->addUniform(uniform);
+		material->setValue("specularColor", SurgSim::Math::Vector4f(0.01, 0.01, 0.01, 1.0));
+	}
+
+	{
+		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<float>>("shininess");
+		material->addUniform(uniform);
+		material->setValue("shininess", 32.0f);
+	}
+
+	{
+		auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+		texture->loadImage(textureFilename);
+		auto uniform =
+			std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("diffuseMap");
+		uniform->set(texture);
+		material->addUniform(uniform);
+	}
+
+	{
+		auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+		std::string blackTexture;
+		ASSERT_TRUE(applicationData->tryFindFile("Textures/black.png", &blackTexture));
+
+		texture->loadImage(blackTexture);
+		auto uniform =
+			std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("shadowMap");
+		uniform->set(texture);
+		uniform->setMinimumTextureUnit(8);
+		material->addUniform(uniform);
+	}
+
+
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Wound");
+	sceneElement->addComponent(graphics);
+
+	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
+	light->setDiffuseColor(Vector4d(1.0, 1.0, 1.0, 1.0));
+	light->setSpecularColor(Vector4d(0.8, 0.8, 0.8, 1.0));
+	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
+
+	scene->addSceneElement(sceneElement);
+	viewElement->setPose(SurgSim::Math::makeRigidTransform(
+							 Vector3d(-0.1, 0.1, -0.1),
+							 Vector3d(0.0, 0.0, 0.0),
+							 Vector3d(0.0, 0.0, 1.0)));
+
+	viewElement->getCamera()->setAmbientColor(Vector4d(0.2, 0.2, 0.2, 1.0));
+	viewElement->getCamera()->setMaterial(material);
+
+	viewElement->addComponent(light);
+
+	std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->setOsgMapsUniforms(true);
+
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+	runtime->stop();
+
+
 
 }
 

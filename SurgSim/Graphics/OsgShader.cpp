@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Log.h"
 
 using SurgSim::Graphics::OsgShader;
 
@@ -206,4 +208,52 @@ void SurgSim::Graphics::OsgShader::setGlobalScope(bool val)
 bool SurgSim::Graphics::OsgShader::isGlobalScope() const
 {
 	return m_globalScope;
+}
+
+std::shared_ptr<SurgSim::Graphics::OsgShader> SurgSim::Graphics::loadShader(
+	const SurgSim::Framework::ApplicationData& data,
+	const std::string& name)
+{
+	std::string vertexShaderName = name + ".vert";
+	std::string fragmentShaderName = name + ".frag";
+
+	std::string filename;
+
+	auto shader(std::make_shared<SurgSim::Graphics::OsgShader>());
+	bool success = true;
+	filename = data.findFile(vertexShaderName);
+	if (filename == "")
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "Could not find vertex shader " << vertexShaderName;
+		success = false;
+	}
+	else if (! shader->loadVertexShaderSource(filename))
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "Could not load vertex shader " << vertexShaderName;
+		success = false;
+	}
+
+
+	filename = data.findFile(fragmentShaderName);
+	if (filename == "")
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "Could not find fragment shader " << fragmentShaderName;
+		success = false;
+	}
+	if (! shader->loadFragmentShaderSource(filename))
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "Could not load fragment shader " << fragmentShaderName;
+		success = false;
+	}
+
+	if (!success)
+	{
+		shader = nullptr;
+	}
+
+	return shader;
 }
