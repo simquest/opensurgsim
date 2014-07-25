@@ -16,7 +16,7 @@
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
 #include "SurgSim/DataStructures/EmptyData.h"
-#include "SurgSim/DataStructures/MeshElementLocalCoordinate.h"
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -322,7 +322,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			{
 				expectedPenetrationPoints.first.globalPosition.setValue(expectedPoint0);
 				expectedPenetrationPoints.second.globalPosition.setValue(expectedPoint1);
-				SurgSim::DataStructures::MeshElementLocalCoordinate triangleLocalPosition;
+				SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;
 				triangleLocalPosition.elementId = i;
 				expectedPenetrationPoints.first.meshLocalCoordinate.setValue(triangleLocalPosition);
 				triangleLocalPosition.elementId = 0;
@@ -405,7 +405,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 		// The first mesh.
 		auto baseTriangles = std::make_shared<TriangleMesh>();
 		static const size_t numTriangles = 100;
-		SurgSim::DataStructures::MeshElementLocalCoordinate triangleLocalPosition;
+		SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;
 
 		std::list<std::shared_ptr<Contact>> expectedContacts;
 		double expectedDepth;

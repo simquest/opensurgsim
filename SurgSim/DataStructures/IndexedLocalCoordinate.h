@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_MESHELEMENTLOCALCOORDINATE_H
-#define SURGSIM_DATASTRUCTURES_MESHELEMENTLOCALCOORDINATE_H
+#ifndef SURGSIM_DATASTRUCTURES_INDEXEDLOCALCOORDINATE_H
+#define SURGSIM_DATASTRUCTURES_INDEXEDLOCALCOORDINATE_H
 
 #include "SurgSim/Math/Vector.h"
 
@@ -25,26 +25,26 @@ namespace DataStructures
 {
 
 /// Structure which contains the elementId of an FemElement in an FemRepresentation and a coordinate in the FemElement.
-struct MeshElementLocalCoordinate
+struct IndexedLocalCoordinate
 {
 	/// Default constructor with no initialization.
-	MeshElementLocalCoordinate();
+	IndexedLocalCoordinate();
 
 	/// Constructor with initialization.
-	/// \param elementId Numeric index of the MeshElement.
-	/// \param naturalCoordinate Natural coordinates with respect to element.
+	/// \param elementId Numeric index.
+	/// \param barycentricCoordinate Barycentric coordinates with respect to element.
 	/// \note Constructor does not throw when given malformed parameters.
-	MeshElementLocalCoordinate(size_t elementId, SurgSim::Math::Vector naturalCoordinate);
+	IndexedLocalCoordinate(size_t elementId, const SurgSim::Math::Vector& barycentricCoordinate);
 
-	/// Numeric index of the MeshElement.
+	/// Numeric index to indicate the entity w.r.t which the barycentricCoordinate is defined.
 	size_t elementId;
 
 	/// Barycentric Coordinate representing position with respect to the nodes of the MeshElement.
-	SurgSim::Math::Vector naturalCoordinate;
+	SurgSim::Math::Vector barycentricCoordinate;
 };
 
 } // namespace DataStructures
 
 } // namespace SurgSim
 
-#endif // SURGSIM_DATASTRUCTURES_MESHELEMENTLOCALCOORDINATE_H
+#endif // SURGSIM_DATASTRUCTURES_INDEXEDLOCALCOORDINATE_H

@@ -47,10 +47,6 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 							contact->penetrationPoints.second.globalPosition.getValue()));
 }
 
-void isMeshLocalCoordinateCorrect(std::shared_ptr<Contact> contact1, std::shared_ptr<Contact> contact2)
-{
-
-}
 ::testing::AssertionResult isContactPresentInList(std::shared_ptr<Contact> expected,
 												  const std::list<std::shared_ptr<Contact>>& contactsList,
 												  bool expectedHasTriangleContactObject)
@@ -84,13 +80,13 @@ void isMeshLocalCoordinateCorrect(std::shared_ptr<Contact> contact1, std::shared
 			{
 				triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(expected);
 				barycentricCoordinates =
-					it->get()->penetrationPoints.first.meshLocalCoordinate.getValue().naturalCoordinate;
+					it->get()->penetrationPoints.first.meshLocalCoordinate.getValue().barycentricCoordinate;
 			}
 			else
 			{
 				triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(*it);
 				barycentricCoordinates =
-					expected.get()->penetrationPoints.first.meshLocalCoordinate.getValue().naturalCoordinate;
+					expected.get()->penetrationPoints.first.meshLocalCoordinate.getValue().barycentricCoordinate;
 			}
 			eigenEqual(expected->penetrationPoints.first.globalPosition.getValue(),
 				barycentricCoordinates[0] * triangleContact->firstVertices[0] +
@@ -110,13 +106,13 @@ void isMeshLocalCoordinateCorrect(std::shared_ptr<Contact> contact1, std::shared
 			{
 				triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(expected);
 				barycentricCoordinates =
-					it->get()->penetrationPoints.second.meshLocalCoordinate.getValue().naturalCoordinate;
+					it->get()->penetrationPoints.second.meshLocalCoordinate.getValue().barycentricCoordinate;
 			}
 			else
 			{
 				triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(*it);
 				barycentricCoordinates =
-					expected.get()->penetrationPoints.second.meshLocalCoordinate.getValue().naturalCoordinate;
+					expected.get()->penetrationPoints.second.meshLocalCoordinate.getValue().barycentricCoordinate;
 			}
 			eigenEqual(expected->penetrationPoints.second.globalPosition.getValue(),
 				barycentricCoordinates[0] * triangleContact->firstVertices[0] +
