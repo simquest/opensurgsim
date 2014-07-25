@@ -120,6 +120,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Create material to transport the Textures
 	graphicalFem->setMaterial(material);
+	sceneElement->addComponent(material);
 
 	// Create the collision mesh for the surface of the finite element model
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
@@ -295,6 +296,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 	armSceneElement->addComponent(upperarmSceneryRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
 	armSceneElement->addComponent(physicsRepresentation);
+	armSceneElement->addComponent(material);
 
 	return armSceneElement;
 }
@@ -336,7 +338,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
 {
 	// Default Material with shader
 	// using scopes to keep from having to introduce new variables with different types
-	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("shiny");
 	material->setShader(shader);
 
 	{
