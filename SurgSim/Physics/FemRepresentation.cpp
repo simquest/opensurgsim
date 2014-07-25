@@ -13,11 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/FemRepresentationCoordinate.h"
 
@@ -32,14 +36,71 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, Filename, getFilename, setFilename);
 }
 
 FemRepresentation::~FemRepresentation()
 {
 }
 
+void FemRepresentation::setFilename(const std::string& filename)
+{
+	m_filename = filename;
+}
+
+const std::string& FemRepresentation::getFilename() const
+{
+	return m_filename;
+}
+
+bool FemRepresentation::loadFile()
+{
+	using SurgSim::Framework::Logger;
+
+	bool result = true;
+	if (m_filename.empty())
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Filename is empty";
+		result = false;
+	}
+	else
+	{
+		std::string filePath = getRuntime()->getApplicationData()->findFile(m_filename);
+		if (filePath.empty())
+		{
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
+				"File " << m_filename << " can not be found.";
+			result = false;
+		}
+
+		auto reader = std::make_shared<SurgSim::DataStructures::PlyReader>(filePath);
+		if (result && !reader->isValid())
+		{
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
+				"File " << m_filename << " is invalid.";
+			result = false;
+		}
+
+		if (result && !reader->parseWithDelegate(getDelegate()))
+		{
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Failed to load file " << m_filename;
+			result = false;
+		}
+	}
+
+	return result;
+}
+
 bool FemRepresentation::doInitialize()
 {
+	if (!m_filename.empty() && !loadFile())
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
+			"Failed to initialize from file " << m_filename;
+		return false;
+	}
+
 	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
 
 	// Initialize the FemElements

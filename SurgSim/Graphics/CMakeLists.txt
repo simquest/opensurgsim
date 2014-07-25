@@ -25,6 +25,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	Group.cpp
 	Manager.cpp
 	Mesh.cpp
+	MeshPlyReaderDelegate.cpp
 	OsgAxesRepresentation.cpp
 	OsgBoxRepresentation.cpp
 	OsgCamera.cpp
@@ -57,6 +58,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgVectorFieldRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
+	PointCloudRepresentation.cpp
 	RenderPass.cpp
 	Representation.cpp
 	TriangleNormalGenerator.cpp
@@ -76,6 +78,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Material.h
 	Mesh.h
 	Mesh-inl.h
+	MeshPlyReaderDelegate.h
 	MeshRepresentation.h
 	OctreeRepresentation.h
 	OsgAxesRepresentation.h
@@ -95,7 +98,6 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgPointCloudRepresentation.h
-	OsgPointCloudRepresentation-inl.h
 	OsgQuaternionConversions.h
 	OsgRenderTarget.h
 	OsgRenderTarget-inl.h

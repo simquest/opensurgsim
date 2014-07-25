@@ -45,7 +45,7 @@ void testStdArraySerialization(const std::array<Type, Size>& value)
 		newValue = node.as<std::array<Type, Size>>();
 
 		// Verify
-		for (int i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			EXPECT_EQ(value[i], newValue[i]);
 		}

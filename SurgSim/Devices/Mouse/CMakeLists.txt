@@ -39,8 +39,8 @@ surgsim_add_library(
 	SurgSim/Devices/Mouse
 )
 
-set(LIBS ${LIBS}
-		 SurgSimInput
+set(LIBS
+	SurgSimInput
 )
 
 target_link_libraries(MouseDevice ${LIBS}
