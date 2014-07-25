@@ -62,7 +62,7 @@ std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std:
 	}
 	state->setActiveRepresentations(activeRepresentations);
 
-	// Compile the list of active representations and set it on the state.
+	// Compile the list of active constraints and set it on the state.
 	std::vector<std::shared_ptr<Constraint>> activeConstraints;
 	size_t size = 0;
 	int constraintTypeEnd = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);

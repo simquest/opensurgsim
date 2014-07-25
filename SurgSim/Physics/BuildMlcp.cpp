@@ -50,11 +50,11 @@ std::shared_ptr<PhysicsManagerState>
 
 	// Calculate numAtomicConstraint and numConstraint
 	auto const activeConstraints = result->getActiveConstraints();
+	numConstraint = activeConstraints.size();
 	for (auto it = activeConstraints.cbegin(); it != activeConstraints.cend(); it++)
 	{
-		constraintsMapping.setValue((*it).get(), numAtomicConstraint);
+		constraintsMapping.setValue((*it).get(), static_cast<ptrdiff_t>(numAtomicConstraint));
 		numAtomicConstraint += (*it)->getNumDof();
-		numConstraint++;
 	}
 	result->setConstraintsMapping(constraintsMapping);
 
@@ -94,18 +94,18 @@ std::shared_ptr<PhysicsManagerState>
 
 		std::shared_ptr<ConstraintImplementation> side0 = (*it)->getImplementations().first;
 		std::shared_ptr<ConstraintImplementation> side1 = (*it)->getImplementations().second;
-		SURGSIM_ASSERT(side0) << "Constraint does not have a side[0]" << std::endl;
-		SURGSIM_ASSERT(side1) << "Constraint does not have a side[1]" << std::endl;
+		SURGSIM_ASSERT(side0) << "Constraint does not have a side0" << std::endl;
+		SURGSIM_ASSERT(side1) << "Constraint does not have a side1" << std::endl;
 		std::shared_ptr<Localization> localization0 = (*it)->getLocalizations().first;
 		std::shared_ptr<Localization> localization1 = (*it)->getLocalizations().second;
-		SURGSIM_ASSERT(localization0) << "ConstraintImplementation does not have a localization on side[0]";
-		SURGSIM_ASSERT(localization1) << "ConstraintImplementation does not have a localization on side[1]";
+		SURGSIM_ASSERT(localization0) << "ConstraintImplementation does not have a localization on side0";
+		SURGSIM_ASSERT(localization1) << "ConstraintImplementation does not have a localization on side1";
 		const MlcpMapping<Representation>& mapping = result->getRepresentationsMapping();
 		ptrdiff_t indexRepresentation0 = mapping.getValue(localization0->getRepresentation().get());
 		ptrdiff_t indexRepresentation1 = mapping.getValue(localization1->getRepresentation().get());
 		SURGSIM_ASSERT(indexRepresentation0 >= 0) << "Index for representation 0 is invalid: " <<
 			indexRepresentation0;
-		SURGSIM_ASSERT(indexRepresentation1 >= 0) << "Index for representation 0 is invalid: " <<
+		SURGSIM_ASSERT(indexRepresentation1 >= 0) << "Index for representation 1 is invalid: " <<
 			indexRepresentation1;
 
 		(*it)->build(dt, &result->getMlcpProblem(), indexRepresentation0, indexRepresentation1, indexConstraint);
