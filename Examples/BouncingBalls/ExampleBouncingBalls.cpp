@@ -154,7 +154,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 
 	// A OsgMaterial is an OSG implementation of a Material.  Materials define visual appearance and contain Uniforms
 	// and a Shader.  Uniforms represent values that are relatively constant, e.g., textures or position of a light.
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
 	// An OsgShader is an OSG implementation of a Shader. Shaders are programs that determine how to render a geometry.
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
 
@@ -188,6 +188,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	element->addComponent(physics);
 	element->addComponent(collision);
 	element->addComponent(graphics);
+	element->addComponent(material);
 
 	// This Behavior will add balls to the Scene at random locations every few seconds.
 	element->addComponent(std::make_shared<AddRandomSphereBehavior>());
@@ -218,7 +219,7 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	std::shared_ptr<OsgSphereRepresentation> graphics = std::make_shared<OsgSphereRepresentation>("Graphics");
 	graphics->setRadius(shape->getRadius());
 
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<OsgTexture2d> texture = std::make_shared<OsgTexture2d>();
 
 	// findFile() will look in the folders specified by the ApplicationData.
@@ -240,6 +241,7 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	std::shared_ptr<SceneElement> element = std::make_shared<BasicSceneElement>(name);
 	element->addComponent(physics);
 	element->addComponent(graphics);
+	element->addComponent(material);
 	element->addComponent(printoutBehavior);
 
 	return element;
