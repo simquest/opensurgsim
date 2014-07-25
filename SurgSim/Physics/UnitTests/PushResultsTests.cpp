@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "SurgSim/Physics/UnitTests/CommonTests.h"
-#include "SurgSim/Physics/UnitTests/PhysicsManagerStateTestCommon.h"
+#include "SurgSim/Physics/BuildMlcp.h"
 #include "SurgSim/Physics/PushResults.h"
 
 namespace SurgSim
@@ -45,6 +45,13 @@ protected:
 	/// The Push Results computation
 	std::shared_ptr<PushResults> m_pushResultsComputation;
 };
+
+void updateRepresentationsMapping(std::shared_ptr<PhysicsManagerState> state)
+{
+	// The BuildMlcp computation build the representations mapping. So it is called.
+	auto buildMlcpComputation = std::make_shared<BuildMlcp>();
+	buildMlcpComputation->update(0.0, state);
+}
 
 TEST_F(PushResultsTests, NoRepresentationNoConstraint)
 {

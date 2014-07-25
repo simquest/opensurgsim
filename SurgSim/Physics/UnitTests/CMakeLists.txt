@@ -80,7 +80,6 @@ set(UNIT_TEST_HEADERS
 	CommonTests.h
 	EigenGtestAsserts.h
 	MockObjects.h
-	PhysicsManagerStateTestCommon.h
 )
 
 set(LIBS

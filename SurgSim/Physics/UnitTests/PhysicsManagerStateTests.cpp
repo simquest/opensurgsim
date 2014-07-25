@@ -33,7 +33,6 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
-#include "SurgSim/Physics/UnitTests/PhysicsManagerStateTestCommon.h"
 
 using SurgSim::Physics::Constraint;
 using SurgSim::Physics::ContactConstraintData;
