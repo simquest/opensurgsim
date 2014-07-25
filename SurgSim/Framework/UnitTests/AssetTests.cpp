@@ -73,7 +73,7 @@ TEST_F(AssetTest, LoadAndFileNameTest)
 	MockAsset test;
 
 	// HW-JULY-16, 2014
-	// Since Asset::load(const std::string&) simplely delegates all calls to its overloading conterpart with
+	// Since Asset::load(const std::string&) simply delegates all calls to its overloading counterpart with
 	// ApplicationData from SurgSim::Framwork::Runtime,
 	// tests below actually test Asset::load(const std::string& fileName, const ApplicationData& data);
 	// No need to duplicate tests. Update when those two functions diverge.
@@ -82,7 +82,7 @@ TEST_F(AssetTest, LoadAndFileNameTest)
 	EXPECT_ANY_THROW(test.load(""));
 	EXPECT_EQ("", test.getFileName());
 
-	// Loading non-exist file will fail, but the internal file name recorded by Asset will be updated.
+	// Loading nonexist file will fail, but the internal file name recorded by Asset will be updated.
 	std::string invalidFileName("Non-exist-file");
 	EXPECT_ANY_THROW(test.load(invalidFileName));
 	EXPECT_EQ(invalidFileName, test.getFileName());

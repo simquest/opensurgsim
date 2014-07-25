@@ -40,9 +40,9 @@ public:
 	/// Destructor
 	virtual ~Asset();
 
-	/// Check the existence of file 'fileName' using 'data'.
-	/// If 'fileName' exists, this method calls 'doLoad()' to load the file.
-	/// It asserts on loading the file successfully.
+	/// Load a file with given name using 'data' as look up path(s).
+	/// If 'fileName' is not empty and the file is found, this method calls 'doLoad()' to load the file.
+	/// Assertions will fail if 'fileName' is empty or file is not found or file loading is unsuccessful.
 	/// \note As a side effect, the name of the file will be recorded in
 	/// \note Asset::m_fileName and can be retrieved by Asset::getFileName().
 	/// \param fileName Name of the file to be loaded.
