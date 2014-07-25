@@ -76,5 +76,10 @@ void OctreeShape::setRootNode(std::shared_ptr<OctreeShape::NodeType> node)
 	m_rootNode = node;
 }
 
+bool OctreeShape::isValid() const
+{
+	return (nullptr != m_rootNode) && (m_rootNode->getBoundingBox().sizes().minCoeff() >= 0);
+}
+
 }; // namespace Math
 }; // namespace SurgSim

@@ -237,19 +237,17 @@ bool RigidRepresentationParameters::checkValidity() const
 
 void RigidRepresentationParameters::updateProperties()
 {
-	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shapeForMassInertia);
-	if (nullptr != meshShape)
+	if (nullptr != m_shapeForMassInertia)
 	{
-		SURGSIM_ASSERT(meshShape->isValid()) << "MeshShape held must be valid";
-	}
+		SURGSIM_ASSERT(m_shapeForMassInertia->isValid()) << "Invalid shape used for mass inertia.";
+		if (m_rho > 0)
+		{
+			m_mass         = m_rho * m_shapeForMassInertia->getVolume();
+			m_massCenter   = m_shapeForMassInertia->getCenter();
+			m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentOfVolume();
 
-	if (m_rho && m_shapeForMassInertia)
-	{
-		m_mass         = m_rho * m_shapeForMassInertia->getVolume();
-		m_massCenter   = m_shapeForMassInertia->getCenter();
-		m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentOfVolume();
-
-		m_isValid = checkValidity();
+			m_isValid = checkValidity();
+		}
 	}
 }
 

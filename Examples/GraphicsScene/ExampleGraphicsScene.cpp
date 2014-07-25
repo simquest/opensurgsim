@@ -54,7 +54,6 @@ using SurgSim::Framework::Logger;
 using SurgSim::Graphics::OsgTextureUniform;
 using SurgSim::Graphics::OsgTexture2d;
 using SurgSim::Graphics::OsgUniform;
-using SurgSim::Graphics::createMaterialWithShaders;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -112,6 +111,23 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->addComponent(interpolator);
 
 	return viewElement;
+}
+
+std::shared_ptr<SurgSim::Graphics::OsgMaterial> createMaterialWithShaders(
+	const SurgSim::Framework::ApplicationData& data,
+	const std::string& name)
+{
+
+	auto shader = SurgSim::Graphics::loadShader(data, name);
+
+	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material;
+	if (shader != nullptr)
+	{
+		material = std::make_shared<SurgSim::Graphics::OsgMaterial>(name);
+		material->setShader(shader);
+	}
+
+	return material;
 }
 
 std::shared_ptr<SurgSim::Framework::SceneElement> createLight()

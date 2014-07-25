@@ -130,7 +130,6 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("fem3d");
 	fem->setFilename(filename);
 	fem->setIntegrationScheme(integrationScheme);
-	fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt"));
 	sceneElement->addComponent(fem);
 
 	// The mesh for visualizing the surface of the finite element model

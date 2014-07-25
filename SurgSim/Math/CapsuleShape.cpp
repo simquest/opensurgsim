@@ -116,5 +116,10 @@ SurgSim::Math::Matrix33d CapsuleShape::getSecondMomentOfVolume() const
 	return secondMoment;
 }
 
+bool CapsuleShape::isValid() const
+{
+	return (m_length >= 0) && (m_radius >= 0);
+}
+
 }; // namespace Math
 }; // namespace SurgSim
