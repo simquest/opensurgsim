@@ -45,7 +45,7 @@ bool StapleElement::doInitialize()
 {
 	auto meshShape = std::make_shared<MeshShape>();
 	const std::string file = "/Geometry/staple_collision.ply";
-	meshShape->setFileName(file);
+	meshShape->load(file);
 
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)

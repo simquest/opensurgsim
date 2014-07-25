@@ -97,7 +97,7 @@ TEST_F(OsgMeshRepresentationRenderTests, StaticRotateDynamicScale)
 	auto meshRepresentation2 = makeRepresentation("textureMesh");
 	meshRepresentation2->getMesh()->initialize(cubeVertices, std::vector<Vector4d>(), cubeTextures, cubeTriangles);
 
-	auto material = std::make_shared<OsgMaterial>();
+	auto material = std::make_shared<OsgMaterial>("material");
 	auto texture = std::make_shared<OsgTexture2d>();
 	texture->loadImage(applicationData->findFile("OsgMeshRepresentationRenderTests/cube.png"));
 
@@ -106,6 +106,7 @@ TEST_F(OsgMeshRepresentationRenderTests, StaticRotateDynamicScale)
 	material->addUniform(uniform2d);
 	meshRepresentation2->setMaterial(material);
 
+	element->addComponent(material);
 	element->addComponent(meshRepresentation1);
 	element->addComponent(meshRepresentation2);
 
@@ -201,7 +202,7 @@ TEST_F(OsgMeshRepresentationRenderTests, DeformableMeshRenderTest)
 
 
 	// Create material to transport the Textures
-	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("material");
 	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
 	texture->loadImage(textureFilename);
 	auto diffuseMapUniform =
@@ -212,6 +213,7 @@ TEST_F(OsgMeshRepresentationRenderTests, DeformableMeshRenderTest)
 
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Wound");
 	sceneElement->addComponent(graphics);
+	sceneElement->addComponent(material);
 
 	scene->addSceneElement(sceneElement);
 	viewElement->setPose(SurgSim::Math::makeRigidTransform(

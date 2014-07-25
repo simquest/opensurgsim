@@ -54,6 +54,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgTextureRectangle.cpp
 	OsgTrackballZoomManipulator.cpp
 	OsgUniformBase.cpp
+	OsgUniformFactory.cpp
 	OsgUnitAxes.cpp
 	OsgVectorFieldRepresentation.cpp
 	OsgView.cpp
@@ -120,6 +121,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgUniform.h
 	OsgUniform-inl.h
 	OsgUniformBase.h
+	OsgUniformFactory.h
 	OsgUniformTypes.h
 	OsgUnitAxes.h
 	OsgUnitBox.h

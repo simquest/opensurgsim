@@ -111,7 +111,7 @@ public:
 	/// \return true if this shape contains a valid mesh; otherwise, false.
 	bool isValid() const;
 
-	virtual bool doInitialize(const std::string& fileName) override;
+	virtual bool doLoad(const std::string& fileName) override;
 
 private:
 	/// Compute useful volume integrals based on the triangle mesh, which

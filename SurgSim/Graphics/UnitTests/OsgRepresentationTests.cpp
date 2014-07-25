@@ -134,7 +134,7 @@ TEST(OsgRepresentationTests, MaterialTest)
 
 	{
 		SCOPED_TRACE("Set material");
-		std::shared_ptr<Material> material = std::make_shared<OsgMaterial>();
+		std::shared_ptr<Material> material = std::make_shared<OsgMaterial>("material");
 		EXPECT_TRUE(representation->setMaterial(material));
 		EXPECT_EQ(material, representation->getMaterial());
 	}

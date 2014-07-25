@@ -16,22 +16,23 @@
 #ifndef SURGSIM_FRAMEWORK_ASSET_H
 #define SURGSIM_FRAMEWORK_ASSET_H
 
-#include <memory>
 #include <string>
 
 namespace SurgSim
 {
 namespace Framework
 {
-
+class Accessible;
 class ApplicationData;
+class AssetTest;
 
-/// This class stores a relative file name and during initialization it will try to load
-/// the file based on the ApplicationData passed in.
-/// Classes not in the Framework::Component hierarchy should inherit this class in
+/// This class is used to facilitate file loading. It uses the static ApplicationData
+/// in SurgSim::Framework::Runtime to load file.
+/// Classes not in SurgSim::Framework::Component hierarchy should inherit this class in
 /// order to load a file.
 class Asset
 {
+	friend AssetTest;
 public:
 	/// Constructor
 	Asset();
@@ -39,37 +40,36 @@ public:
 	/// Destructor
 	virtual ~Asset();
 
-	/// Set the file name to be loaded.
+	/// Load a file with given name using 'data' as look up path(s).
+	/// If 'fileName' is not empty and the file is found, this method calls 'doLoad()' to load the file.
+	/// Assertions will fail if 'fileName' is empty or file is not found or file loading is unsuccessful.
+	/// \note As a side effect, the name of the file will be recorded in
+	/// \note Asset::m_fileName and can be retrieved by Asset::getFileName().
 	/// \param fileName Name of the file to be loaded.
-	void setFileName(const std::string& fileName);
+	/// \param data ApplicationData which provides the runtime look up path(s).
+	void load(const std::string& fileName, const SurgSim::Framework::ApplicationData& data);
+
+	/// Overloaded function using SurgSim::Framework::Runtime::getApplicationData() as look up path(s).
+	/// \param fileName Name of the file to be loaded.
+	void load(const std::string& fileName);
 
 	/// Return the name of file loaded by this class.
 	/// \return Name of the file loaded by this class.
 	std::string getFileName() const;
 
-	/// Check for existence of the resolved filename, return false if not found.
-	/// If found, it then calls 'doInitialize()' to load the file. Return 'false' if 'doInitialize()' fails.
-	/// It asserts on double calls.
-	/// \param data Gives the locations to search for the file.
-	/// \return true if file is found and loaded successfully; false otherwise.
-	bool initialize(const ApplicationData& data);
-
-	/// Check to see if an attempt has been made to load the file.
-	/// \return true if initialization succeeded, false otherwise
-	bool isInitialized() const;
-
+protected:
 	/// Derived classes will overwrite this method to do actual loading.
 	/// \note This method is not required to do any check on the validity or the existence of the file.
-	/// \return false if loading failed, assume filename != ""
-	virtual bool doInitialize(const std::string& fileName) = 0;
+	/// \param filePath Absolute path to the file.
+	/// \return True if loading is successful; Otherwise, false.
+	virtual bool doLoad(const std::string& filePath) = 0;
+
+	/// Derived classes (which also inherit from SurgSim::Framework::Accessible) should call this function
+	/// with 'this' pointer as the parameter in their constructors to register file name property for serialization.
+	/// \param accessible 'this' pointer of derived class.
+	void serializeFileName(SurgSim::Framework::Accessible* accessible);
 
 private:
-	/// Indicates if an attempt to load the file has been made.
-	bool m_didInit;
-
-	/// Indicates if load is successful.
-	bool m_isInitialized;
-
 	/// Name of the file to be loaded.
 	std::string m_fileName;
 };
