@@ -1455,6 +1455,74 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 	}
 }
 
+TEST_F(GeometryTest, DoesIntersectBoxCapsule)
+{
+	typedef Eigen::AlignedBox<SizeType, 3> BoxType;
+	{
+		SCOPED_TRACE("No intersection");
+		VectorType bottom(-5.0, 5.0, 0.0);
+		VectorType top(5.0, 5.0, 0.0);
+		double radius = 1.0;
+		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		EXPECT_FALSE(doesIntersectBoxCapsule(bottom, top, radius, box));
+	}
+	{
+		SCOPED_TRACE("Intersection, capsule in middle of box");
+		VectorType bottom(-5.0, -5.0, -5.0);
+		VectorType top(5.0, 5.0, 5.0);
+		double radius = 10.0;
+		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		EXPECT_TRUE(doesIntersectBoxCapsule(bottom, top, radius, box));
+	}
+	{
+		SCOPED_TRACE("No Intersection, box not centered");
+		VectorType bottom(-5.0, -5.0, -5.0);
+		VectorType top(5.0, 5.0, 5.0);
+		double radius = 1.0;
+		BoxType box(VectorType(1.0 , 1.0, -1.0), VectorType(2.0 , 2.0, -2.0));
+		EXPECT_FALSE(doesIntersectBoxCapsule(bottom, top, radius, box));
+	}
+	{
+		SCOPED_TRACE("Intersection, box not centered");
+		VectorType bottom(-5.0, -5.0, -5.0);
+		VectorType top(5.0, 5.0, 5.0);
+		double radius = 1.0;
+		BoxType box(VectorType(0.0 , 0.0, 0.0), VectorType(1.0 , 1.0, 1.0));
+		EXPECT_TRUE(doesIntersectBoxCapsule(bottom, top, radius, box));
+	}
+	{
+		SCOPED_TRACE("No intersection, capsule along edge");
+		VectorType bottom(2.0, -2.0, 2.0);
+		VectorType top(2.0, 2.0, 2.0);
+		double radius = sqrt(2.0) - 1.0;
+		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		EXPECT_FALSE(doesIntersectBoxCapsule(bottom, top, radius, box));
+	}
+	{
+		SCOPED_TRACE("Intersection, capsule along edge");
+		VectorType bottom(2.0, -2.0, 2.0);
+		VectorType top(2.0, 2.0, 2.0);
+		double radius = sqrt(2.0) + 0.1;
+		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		EXPECT_TRUE(doesIntersectBoxCapsule(bottom, top, radius, box));
+	}
+	{
+		SCOPED_TRACE("No Intersection, capsule at corner");
+		VectorType bottom(2.0, 3.0, 1.0);
+		VectorType top(2.0, 1.0, 3.0);
+		double radius = sqrt(3.0) - 0.1;
+		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		EXPECT_FALSE(doesIntersectBoxCapsule(bottom, top, radius, box));
+	}
+	{
+		SCOPED_TRACE("Intersection, capsule at corner");
+		VectorType bottom(2.0, 3.0, 1.0);
+		VectorType top(2.0, 1.0, 3.0);
+		double radius = sqrt(3.0) + 0.1;
+		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		EXPECT_TRUE(doesIntersectBoxCapsule(bottom, top, radius, box));
+	}
+}
 
 }; // namespace Math
 }; // namespace SurgSim

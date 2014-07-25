@@ -31,6 +31,7 @@ namespace SurgSim
 namespace Framework
 {
 
+std::shared_ptr<ApplicationData> Runtime::m_applicationData;
 
 Runtime::Runtime() :
 	m_isRunning(false),
@@ -277,8 +278,10 @@ void Runtime::initSearchPaths(const std::string& configFilePath)
 	}
 }
 
-std::shared_ptr<const ApplicationData> Runtime::getApplicationData() const
+std::shared_ptr<const ApplicationData> Runtime::getApplicationData()
 {
+	SURGSIM_ASSERT(nullptr != m_applicationData) <<
+			"Runtime::getApplicationData() should be called after the Runtime is created.";
 	return m_applicationData;
 }
 

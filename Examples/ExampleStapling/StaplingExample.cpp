@@ -111,7 +111,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Load the surface triangle mesh of the finite element model
 	auto meshShape = std::make_shared<MeshShape>();
-	meshShape->setFileName(filename);
+	meshShape->load(filename);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	auto graphicalFem = std::make_shared<OsgMeshRepresentation>("Triangle mesh");
@@ -120,6 +120,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Create material to transport the Textures
 	graphicalFem->setMaterial(material);
+	sceneElement->addComponent(material);
 
 	// Create the collision mesh for the surface of the finite element model
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
@@ -166,7 +167,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	// Stapler collision mesh
 	auto meshShapeForCollision = std::make_shared<MeshShape>();
-	meshShapeForCollision->setFileName(filename);
+	meshShapeForCollision->load(filename);
 
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
 		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
@@ -224,8 +225,8 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	auto meshShapeForVirtualStaple1 = std::make_shared<MeshShape>();
 	auto meshShapeForVirtualStaple2 = std::make_shared<MeshShape>();
-	meshShapeForVirtualStaple1->setFileName("Geometry/virtual_staple_1.ply");
-	meshShapeForVirtualStaple2->setFileName("Geometry/virtual_staple_2.ply");
+	meshShapeForVirtualStaple1->load("Geometry/virtual_staple_1.ply");
+	meshShapeForVirtualStaple2->load("Geometry/virtual_staple_2.ply");
 
 	std::vector<std::shared_ptr<MeshShape>> virtualTeethShapes;
 	virtualTeethShapes.push_back(meshShapeForVirtualStaple1);
@@ -272,7 +273,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 
 	// Arm collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>();
-	meshShape->setFileName(filename);
+	meshShape->load(filename);
 
 	// Visualization of arm collision mesh
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization = std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
@@ -295,6 +296,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 	armSceneElement->addComponent(upperarmSceneryRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
 	armSceneElement->addComponent(physicsRepresentation);
+	armSceneElement->addComponent(material);
 
 	return armSceneElement;
 }
@@ -336,7 +338,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
 {
 	// Default Material with shader
 	// using scopes to keep from having to introduce new variables with different types
-	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("shiny");
 	material->setShader(shader);
 
 	{

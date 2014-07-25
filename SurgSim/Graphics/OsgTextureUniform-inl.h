@@ -35,6 +35,9 @@ template <class T>
 OsgTextureUniform<T>::OsgTextureUniform(const std::string& name) :
 	UniformBase(), Uniform<std::shared_ptr<T>>(), OsgUniformBase(name), m_unit(-1), m_minimumTextureUnit(0)
 {
+	SURGSIM_ADD_RW_PROPERTY(OsgTextureUniform<T>, size_t,
+							MinimumTextureUnit, getMinimumTextureUnit, setMinimumTextureUnit);
+
 	osg::Uniform::Type osgUniformType = getOsgUniformType<std::shared_ptr<T>>();
 	SURGSIM_ASSERT(osgUniformType != osg::Uniform::UNDEFINED) << "Failed to get OSG uniform type!";
 	SURGSIM_ASSERT(m_uniform->setType(osgUniformType)) << "Failed to set OSG uniform type!";

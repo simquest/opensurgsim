@@ -46,62 +46,48 @@ class OsgMaterial : public Material
 public:
 	/// Constructor
 	/// \post	The material has no uniforms and no shader.
-	OsgMaterial();
+	explicit OsgMaterial(const std::string& name);
 
 	/// Adds a uniform to this material
 	/// \param	uniform	Uniform to add
 	/// \return	True if uniform was added successfully, otherwise false
 	/// \note	OsgMaterial only accepts subclasses of OsgUniformBase
-	virtual bool addUniform(std::shared_ptr<UniformBase> uniform);
+	virtual bool addUniform(std::shared_ptr<UniformBase> uniform) override;
+
+	virtual bool addUniform(const std::string& type, const std::string& name) override;
 
 	/// Removes a uniform from this material
 	/// \param	uniform	Uniform to remove
 	/// \return True if uniform was removed successfully, otherwise false
 	/// \note	OsgMaterial only accepts subclasses of OsgUniformBase
-	virtual bool removeUniform(std::shared_ptr<UniformBase> uniform);
+	virtual bool removeUniform(std::shared_ptr<UniformBase> uniform) override;
 
-	/// Removes a uniform from this material
-	/// \param	name The name of the Uniform to remove
-	/// \return True if uniform was removed successfully, otherwise false
-	/// \note	OsgMaterial only accepts subclasses of OsgUniformBase
-	virtual bool removeUniform(const std::string& name);
+	virtual bool removeUniform(const std::string& name) override;
 
-	/// Returns the number of uniforms in this material
-	virtual size_t getNumUniforms() const;
+	virtual size_t getNumUniforms() const override;
 
-	/// Gets a uniform in this material
-	/// \param	index	Index of the uniform in the material's list of uniforms
-	/// \return	Uniform at the index
-	virtual std::shared_ptr<UniformBase> getUniform(size_t index) const;
+	virtual std::shared_ptr<UniformBase> getUniform(size_t index) const override;
 
-	virtual std::shared_ptr<UniformBase> getUniform(const std::string& name) const;
+	virtual std::shared_ptr<UniformBase> getUniform(const std::string& name) const override;
 
-	virtual bool hasUniform(const std::string& name) const;
+	virtual bool hasUniform(const std::string& name) const override;
 
 	/// Sets the shader used by this material
 	/// \param	shader	Shader program
 	/// \return	True if shader was set successfully, otherwise false
 	/// \note	OsgMaterial only accepts subclasses of OsgShader
-	virtual bool setShader(std::shared_ptr<Shader> shader);
+	virtual bool setShader(std::shared_ptr<Shader> shader) override;
 
-	/// Gets the shader used by this material
-	/// \return	Shader program
-	virtual std::shared_ptr<Shader> getShader() const;
+	virtual std::shared_ptr<Shader> getShader() const override;
 
-	/// Removes the shader from the material, falling back to fixed-function pipeline
-	virtual void clearShader();
+	virtual void clearShader() override;
 
-	/// Returns the OSG state set with the material properties
-	osg::ref_ptr<osg::StateSet> getOsgStateSet() const
-	{
-		return m_stateSet;
-	}
+	/// \return the OSG state set with the material properties
+	osg::ref_ptr<osg::StateSet> getOsgStateSet() const;
 
-	virtual bool doInitialize();
+	virtual bool doInitialize() override;
 
-	virtual bool doWakeUp();
-
-
+	virtual bool doWakeUp() override;
 
 private:
 	/// OSG state set which provides material properties in the scenegraph

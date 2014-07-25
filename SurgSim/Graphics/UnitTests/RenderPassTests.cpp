@@ -49,7 +49,7 @@ TEST(RenderPassTests, SettersTest)
 	ASSERT_NO_THROW({renderPass->setRenderTarget(renderTarget);});
 	EXPECT_EQ(renderTarget, renderPass->getCamera()->getRenderTarget());
 
-	auto material = std::make_shared<OsgMaterial>();
+	auto material = std::make_shared<OsgMaterial>("material");
 
 	ASSERT_NO_THROW({renderPass->setMaterial(material);});
 	EXPECT_EQ(material, renderPass->getMaterial());
