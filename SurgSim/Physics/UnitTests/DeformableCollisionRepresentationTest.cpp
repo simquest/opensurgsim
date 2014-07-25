@@ -42,20 +42,18 @@ struct DeformableCollisionRepresentationTest : public ::testing::Test
 {
 	void SetUp()
 	{
+		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		m_filename = std::string("Geometry/wound_deformable.ply");
-		m_applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 		m_meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-		m_meshShape->setFileName(m_filename);
+		m_meshShape->load(m_filename);
 		m_deformableRepresentation = std::make_shared<MockDeformableRepresentation>("DeformableRepresentation");
 		m_deformableCollisionRepresentation =
 			std::make_shared<DeformableCollisionRepresentation>("DeformableCollisionRepresentation");
-		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	}
 
-	std::string m_filename;
-	std::shared_ptr<SurgSim::Framework::ApplicationData> m_applicationData;
-	std::shared_ptr<SurgSim::Math::MeshShape> m_meshShape;
 	std::shared_ptr<SurgSim::Framework::Runtime> m_runtime;
+	std::string m_filename;
+	std::shared_ptr<SurgSim::Math::MeshShape> m_meshShape;
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_deformableRepresentation;
 	std::shared_ptr<SurgSim::Physics::DeformableCollisionRepresentation> m_deformableCollisionRepresentation;
 };
@@ -74,7 +72,6 @@ TEST_F(DeformableCollisionRepresentationTest, SetGetDeformableRepresentationTest
 TEST_F(DeformableCollisionRepresentationTest, ShapeTest)
 {
 	EXPECT_ANY_THROW(m_deformableCollisionRepresentation->getShapeType());
-	m_meshShape->initialize(*m_applicationData);
 	m_deformableCollisionRepresentation->setShape(m_meshShape);
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_MESH, m_deformableCollisionRepresentation->getShapeType());
 
@@ -87,8 +84,6 @@ TEST_F(DeformableCollisionRepresentationTest, ShapeTest)
 
 TEST_F(DeformableCollisionRepresentationTest, MeshTest)
 {
-	m_meshShape->initialize(*m_applicationData);
-
 	m_deformableCollisionRepresentation->setMesh(m_meshShape->getMesh());
 	EXPECT_EQ(m_meshShape->getMesh()->getNumVertices(),
 		m_deformableCollisionRepresentation->getMesh()->getNumVertices());
@@ -117,7 +112,6 @@ TEST_F(DeformableCollisionRepresentationTest, SerializationTest)
 	newDeformableCollisionRepresentation->initialize(m_runtime);
 
 	auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(newDeformableCollisionRepresentation->getShape());
-	m_meshShape->initialize(*m_applicationData);
 	EXPECT_NEAR(m_meshShape->getVolume(), mesh->getVolume(), epsilon);
 	EXPECT_TRUE(m_meshShape->getCenter().isApprox(mesh->getCenter()));
 	EXPECT_TRUE(m_meshShape->getSecondMomentOfVolume().isApprox(mesh->getSecondMomentOfVolume()));

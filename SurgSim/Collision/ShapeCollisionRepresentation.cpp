@@ -64,8 +64,10 @@ const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getSha
 void ShapeCollisionRepresentation::update(const double& dt)
 {
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
-	if (nullptr != meshShape && meshShape->isValid())
+	if (nullptr != meshShape)
 	{
+		SURGSIM_ASSERT(meshShape->isValid()) <<
+			"Try to update an invalid MeshShape.";
 		meshShape->setPose(getPose());
 	}
 }
@@ -76,12 +78,8 @@ bool ShapeCollisionRepresentation::doInitialize()
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
 	if (nullptr != meshShape)
 	{
-		if (!meshShape->initialize(*(getRuntime()->getApplicationData())))
-		{
-			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-				"No mesh loaded for m_shape ";
-			result = false;
-		}
+		SURGSIM_ASSERT(meshShape->isValid()) <<
+			"An invalid MeshShape is used in this ShapeCollisionRepresentation.";
 	}
 
 	return result;
