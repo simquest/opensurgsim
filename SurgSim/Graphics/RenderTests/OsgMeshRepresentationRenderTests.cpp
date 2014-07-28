@@ -248,7 +248,7 @@ TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
 
 	// Create material to transport the Textures
 
-	auto material = std::make_shared<OsgMaterial>();
+	auto material = std::make_shared<OsgMaterial>("material");
 	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
 	ASSERT_TRUE(shader != nullptr);
 	material->setShader(shader);
@@ -309,7 +309,7 @@ TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
 
 	viewElement->getCamera()->setAmbientColor(Vector4d(0.2, 0.2, 0.2, 1.0));
 	viewElement->getCamera()->setMaterial(material);
-
+	viewElement->addComponent(material);
 	viewElement->addComponent(light);
 
 	std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->setOsgMapsUniforms(true);

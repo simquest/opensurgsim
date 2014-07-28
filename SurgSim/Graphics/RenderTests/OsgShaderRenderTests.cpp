@@ -78,7 +78,7 @@ std::shared_ptr<Shader> loadExampleShader(const SurgSim::Framework::ApplicationD
 
 std::shared_ptr<Material> createShinyMaterial(const SurgSim::Framework::ApplicationData& data)
 {
-	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("material");
 	auto shader = SurgSim::Graphics::loadShader(data, "Shaders/material");
 	material->setShader(shader);
 
@@ -171,12 +171,12 @@ TEST_F(OsgShaderRenderTests, ShinyShaderTest)
 
 TEST_F(OsgShaderRenderTests, TexturedShinyShaderTest)
 {
-	// The textureed Sphere
+	// The textured Sphere
 	std::shared_ptr<SphereRepresentation> sphereRepresentation =
 		std::make_shared<OsgSphereRepresentation>("sphere representation");
 	sphereRepresentation->setRadius(0.25);
 
-	auto material = std::make_shared<OsgMaterial>();
+	auto material = std::make_shared<OsgMaterial>("material");
 	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
 	ASSERT_TRUE(shader != nullptr);
 	material->setShader(shader);
@@ -209,8 +209,7 @@ TEST_F(OsgShaderRenderTests, TexturedShinyShaderTest)
 	EXPECT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/black.png", &filename));
 	texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
 	texture->loadImage(filename);
-	textureUniform =
-		std::make_shared<OsgTextureUniform<OsgTexture2d>>("shadowMap");
+	textureUniform = std::make_shared<OsgTextureUniform<OsgTexture2d>>("shadowMap");
 	textureUniform->set(texture);
 	textureUniform->setMinimumTextureUnit(8);
 	material->addUniform(textureUniform);
