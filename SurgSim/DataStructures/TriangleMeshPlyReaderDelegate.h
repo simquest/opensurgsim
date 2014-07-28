@@ -29,12 +29,12 @@ namespace DataStructures
 {
 
 /// Implementation of PlyReaderDelegate for simple triangle meshes
+template <class M>
 class TriangleMeshPlyReaderDelegate : public PlyReaderDelegate
 {
 public:
 
-	/// The Mesh Type
-	typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> MeshType;
+	typedef M MeshType;
 
 	/// Default constructor.
 	TriangleMeshPlyReaderDelegate();
@@ -45,7 +45,7 @@ public:
 
 	/// Gets the mesh.
 	/// \return The mesh.
-	std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> getMesh();
+	std::shared_ptr<MeshType> getMesh();
 
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
@@ -85,6 +85,9 @@ public:
 	/// \param elementName Name of the element.
 	void endFaces(const std::string& elementName);
 
+	/// Callback function to finalize processing of the mesh
+	void endFile();
+
 
 private:
 	/// Internal structure, the receiver for data from the "vertex" element
@@ -113,5 +116,7 @@ private:
 
 }
 }
+
+#include <SurgSim/DataStructures/TriangleMeshPlyReaderDelegate-inl.h>
 
 #endif

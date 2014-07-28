@@ -36,7 +36,6 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	TreeNode.cpp
 	TriangleMesh.cpp
 	TriangleMeshBase.cpp
-	TriangleMeshPlyReaderDelegate.cpp
 )
 
 set(SURGSIM_DATA_STRUCTURES_HEADERS
@@ -76,6 +75,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	TriangleMeshBase.h
 	TriangleMeshBase-inl.h
 	TriangleMeshPlyReaderDelegate.h
+	TriangleMeshPlyReaderDelegate-inl.h
 	Vertex.h
 	Vertices.h
 )
