@@ -88,10 +88,10 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 				barycentricCoordinates =
 					expected.get()->penetrationPoints.first.meshLocalCoordinate.getValue().barycentricCoordinate;
 			}
-			eigenEqual(expected->penetrationPoints.first.globalPosition.getValue(),
-				barycentricCoordinates[0] * triangleContact->firstVertices[0] +
-				barycentricCoordinates[1] * triangleContact->firstVertices[1] +
-				barycentricCoordinates[2] * triangleContact->firstVertices[2]);
+			contactPresent &= eigenEqual(expected->penetrationPoints.first.globalPosition.getValue(),
+										 barycentricCoordinates[0] * triangleContact->firstVertices[0] +
+										 barycentricCoordinates[1] * triangleContact->firstVertices[1] +
+										 barycentricCoordinates[2] * triangleContact->firstVertices[2]);
 		}
 		EXPECT_EQ(expected->penetrationPoints.second.meshLocalCoordinate.hasValue(),
 				  it->get()->penetrationPoints.second.meshLocalCoordinate.hasValue());
@@ -114,10 +114,10 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 				barycentricCoordinates =
 					expected.get()->penetrationPoints.second.meshLocalCoordinate.getValue().barycentricCoordinate;
 			}
-			eigenEqual(expected->penetrationPoints.second.globalPosition.getValue(),
-				barycentricCoordinates[0] * triangleContact->firstVertices[0] +
-				barycentricCoordinates[1] * triangleContact->firstVertices[1] +
-				barycentricCoordinates[2] * triangleContact->firstVertices[2]);
+			contactPresent &= eigenEqual(expected->penetrationPoints.second.globalPosition.getValue(),
+										 barycentricCoordinates[0] * triangleContact->secondVertices[0] +
+										 barycentricCoordinates[1] * triangleContact->secondVertices[1] +
+										 barycentricCoordinates[2] * triangleContact->secondVertices[2]);
 		}
 	}
 

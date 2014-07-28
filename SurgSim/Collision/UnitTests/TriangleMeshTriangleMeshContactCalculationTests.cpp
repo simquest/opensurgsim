@@ -331,6 +331,11 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 																 expectedPenetrationPoints);
 				contact->firstVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
 				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
+				for (size_t i = 0; i < 3; ++i)
+				{
+					contact->firstVertices[i] = pose * contact->firstVertices[i];
+					contact->secondVertices[i] = pose * contact->secondVertices[i];
+				}
 				expectedContacts.push_back(contact);
 			}
 		}
@@ -435,6 +440,11 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 																 expectedPenetrationPoints);
 				contact->firstVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
 				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
+				for (size_t i = 0; i < 3; ++i)
+				{
+					contact->firstVertices[i] = pose * contact->firstVertices[i];
+					contact->secondVertices[i] = pose * contact->secondVertices[i];
+				}
 				expectedContacts.push_back(contact);
 			}
 			{
@@ -449,6 +459,11 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 																 expectedPenetrationPoints);
 				contact->firstVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
 				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
+				for (size_t i = 0; i < 3; ++i)
+				{
+					contact->firstVertices[i] = pose * contact->firstVertices[i];
+					contact->secondVertices[i] = pose * contact->secondVertices[i];
+				}
 				expectedContacts.push_back(contact);
 			}
 		}
