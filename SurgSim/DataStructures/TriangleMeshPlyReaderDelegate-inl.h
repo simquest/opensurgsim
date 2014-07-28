@@ -49,6 +49,15 @@ bool SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::registerDelegate
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(VertexData, y));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(VertexData, z));
 
+	// Normal processing
+	m_hasTextureCoordinates = reader->hasProperty("vertex", "s") && reader->hasProperty("vertex", "t");
+
+	if (m_hasTextureCoordinates)
+	{
+		reader->requestScalarProperty("vertex", "s", PlyReader::TYPE_DOUBLE, offsetof(VertexData, s));
+		reader->requestScalarProperty("vertex", "t", PlyReader::TYPE_DOUBLE, offsetof(VertexData, t));
+	}
+
 	// Face Processing
 	reader->requestElement("face",
 						   std::bind(&TriangleMeshPlyReaderDelegate::beginFaces, this, std::placeholders::_1, std::placeholders::_2),
@@ -85,7 +94,8 @@ void* SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::beginVertices(
 	const std::string& elementName,
 	size_t vertexCount)
 {
-	m_vertexData.overrun = 0l;
+	m_vertexData.overrun1 = 0l;
+	m_vertexData.overrun2 = 0l;
 	return &m_vertexData;
 }
 
@@ -99,7 +109,7 @@ void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::processVertex(co
 template <class M>
 void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::endVertices(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_vertexData.overrun == 0) <<
+	SURGSIM_ASSERT(m_vertexData.overrun1 == 0 && m_vertexData.overrun2 == 0) <<
 			"There was an overrun while reading the vertex structures, it is likely that data " <<
 			"has become corrupted.";
 }
@@ -136,5 +146,12 @@ void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::endFile()
 {
 	m_mesh->update();
 }
+
+template <class M>
+bool SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::hasTextureCoordinates()
+{
+	return m_hasTextureCoordinates;
+}
+
 
 #endif

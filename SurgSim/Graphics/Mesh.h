@@ -82,10 +82,12 @@ public:
 					const std::vector<size_t>& triangles);
 };
 
-std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName);
 
 }; // Graphics
 }; // SurgSim
+
+template<>
+std::shared_ptr<SurgSim::Graphics::Mesh> SurgSim::DataStructures::loadTriangleMesh(const std::string& fileName);
 
 #include "SurgSim/Graphics/Mesh-inl.h"
 

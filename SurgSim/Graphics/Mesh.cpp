@@ -88,7 +88,11 @@ void Mesh::initialize(
 	}
 }
 
-std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName)
+}; // Graphics
+}; // SurgSim
+
+template<>
+std::shared_ptr<SurgSim::Graphics::Mesh> SurgSim::DataStructures::loadTriangleMesh(const std::string& fileName)
 {
 	SurgSim::DataStructures::PlyReader reader(fileName);
 	auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
@@ -97,6 +101,3 @@ std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName)
 
 	return delegate->getMesh();
 }
-
-}; // Graphics
-}; // SurgSim
