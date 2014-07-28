@@ -70,6 +70,9 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const override;
 
+	/// \return True if length and radius are bigger than or equal to 0; Otherwise, false.
+	virtual bool isValid() const override;
+
 protected:
 	// Setters in 'protected' sections are for serialization purpose only.
 

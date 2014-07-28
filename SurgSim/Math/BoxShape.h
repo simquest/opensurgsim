@@ -80,6 +80,9 @@ public:
 	/// \return All eight vertices of the box
 	const std::array<Vector3d, 8>& getVertices() const;
 
+	/// \return True if size along X, Y, Z are bigger than or equal to 0; Otherwise, false.
+	virtual bool isValid() const override;
+
 protected:
 	// Setters in 'protected' sections are for serialization purpose only.
 

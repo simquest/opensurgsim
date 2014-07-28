@@ -111,7 +111,7 @@ bool SceneElement::initialize()
 	m_isInitialized = doInitialize();
 
 	// For completeness
-	m_pose->setSceneElement(getSharedPtr()); 
+	m_pose->setSceneElement(getSharedPtr());
 
 	if (m_isInitialized)
 	{

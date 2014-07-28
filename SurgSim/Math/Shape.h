@@ -88,6 +88,10 @@ public:
 
 	/// Get class name
 	virtual std::string getClassName() const;
+
+	/// Check if the shape is valid
+	/// \return True if shape is valid; Otherwise, false.
+	virtual bool isValid() const = 0;
 };
 
 }; // Math
