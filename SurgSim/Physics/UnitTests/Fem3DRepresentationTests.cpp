@@ -212,9 +212,9 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 			SurgSim::Collision::Location location;
 			std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 
-			SurgSim::DataStructures::MeshElementLocalCoordinate triangleLocalPosition;
+			SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;
 			triangleLocalPosition.elementId = triangleId;
-			triangleLocalPosition.naturalCoordinate = (*barycentricCoordinate);
+			triangleLocalPosition.barycentricCoordinate = (*barycentricCoordinate);
 			location.meshLocalCoordinate.setValue(triangleLocalPosition);
 			EXPECT_NO_THROW(localization =
 				std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(

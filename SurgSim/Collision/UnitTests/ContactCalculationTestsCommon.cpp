@@ -47,10 +47,6 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 							contact->penetrationPoints.second.globalPosition.getValue()));
 }
 
-void isMeshLocalCoordinateCorrect(std::shared_ptr<Contact> contact1, std::shared_ptr<Contact> contact2)
-{
-
-}
 ::testing::AssertionResult isContactPresentInList(std::shared_ptr<Contact> expected,
 												  const std::list<std::shared_ptr<Contact>>& contactsList,
 												  bool expectedHasTriangleContactObject)
@@ -70,58 +66,46 @@ void isMeshLocalCoordinateCorrect(std::shared_ptr<Contact> contact1, std::shared
 									 it->get()->penetrationPoints.second.globalPosition.getValue());
 		// Compare the depth.
 		contactPresent &= std::abs(expected->depth - it->get()->depth) <= ScalarEpsilon;
-		// Check if the optional 'triangleLocalPosition' is present in expected contact.
-		EXPECT_EQ(expected->penetrationPoints.first.meshLocalCoordinate.hasValue(),
-				  it->get()->penetrationPoints.first.meshLocalCoordinate.hasValue());
-		if (expected->penetrationPoints.first.meshLocalCoordinate.hasValue() &&
-			it->get()->penetrationPoints.first.meshLocalCoordinate.hasValue())
+		// Check if the optional 'meshLocalCoordinate' are the same.
+		std::shared_ptr<SurgSim::Collision::TriangleContact> triangleContact;
+		std::shared_ptr<SurgSim::Collision::Contact> contact;
+		if (expectedHasTriangleContactObject)
 		{
-			contactPresent &= expected->penetrationPoints.first.meshLocalCoordinate.getValue().elementId ==
-							  it->get()->penetrationPoints.first.meshLocalCoordinate.getValue().elementId;
-			Vector3d barycentricCoordinates;
-			std::shared_ptr<SurgSim::Collision::TriangleContact> triangleContact;
-			if (expectedHasTriangleContactObject)
-			{
-				triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(expected);
-				barycentricCoordinates =
-					it->get()->penetrationPoints.first.meshLocalCoordinate.getValue().naturalCoordinate;
-			}
-			else
-			{
-				triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(*it);
-				barycentricCoordinates =
-					expected.get()->penetrationPoints.first.meshLocalCoordinate.getValue().naturalCoordinate;
-			}
-			eigenEqual(expected->penetrationPoints.first.globalPosition.getValue(),
-				barycentricCoordinates[0] * triangleContact->firstVertices[0] +
-				barycentricCoordinates[1] * triangleContact->firstVertices[1] +
-				barycentricCoordinates[2] * triangleContact->firstVertices[2]);
+			triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(expected);
+			contact = *it;
 		}
-		EXPECT_EQ(expected->penetrationPoints.second.meshLocalCoordinate.hasValue(),
-				  it->get()->penetrationPoints.second.meshLocalCoordinate.hasValue());
-		if (expected->penetrationPoints.second.meshLocalCoordinate.hasValue() &&
-			it->get()->penetrationPoints.second.meshLocalCoordinate.hasValue())
+		else
 		{
-			contactPresent &= expected->penetrationPoints.second.meshLocalCoordinate.getValue().elementId ==
-							  it->get()->penetrationPoints.second.meshLocalCoordinate.getValue().elementId;
-			Vector3d barycentricCoordinates;
-			std::shared_ptr<SurgSim::Collision::TriangleContact> triangleContact;
-			if (expectedHasTriangleContactObject)
-			{
-				triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(expected);
-				barycentricCoordinates =
-					it->get()->penetrationPoints.second.meshLocalCoordinate.getValue().naturalCoordinate;
-			}
-			else
-			{
-				triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(*it);
-				barycentricCoordinates =
-					expected.get()->penetrationPoints.second.meshLocalCoordinate.getValue().naturalCoordinate;
-			}
-			eigenEqual(expected->penetrationPoints.second.globalPosition.getValue(),
-				barycentricCoordinates[0] * triangleContact->firstVertices[0] +
-				barycentricCoordinates[1] * triangleContact->firstVertices[1] +
-				barycentricCoordinates[2] * triangleContact->firstVertices[2]);
+			triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(*it);
+			contact = expected;
+		}
+		EXPECT_EQ(triangleContact->penetrationPoints.first.meshLocalCoordinate.hasValue(),
+				  contact->penetrationPoints.first.meshLocalCoordinate.hasValue());
+		if (triangleContact->penetrationPoints.first.meshLocalCoordinate.hasValue() &&
+			contact->penetrationPoints.first.meshLocalCoordinate.hasValue())
+		{
+			contactPresent &= triangleContact->penetrationPoints.first.meshLocalCoordinate.getValue().elementId ==
+							  contact->penetrationPoints.first.meshLocalCoordinate.getValue().elementId;
+			Vector3d barycentricCoordinates =
+				contact->penetrationPoints.first.meshLocalCoordinate.getValue().barycentricCoordinate;
+			contactPresent &= eigenEqual(expected->penetrationPoints.first.globalPosition.getValue(),
+										 barycentricCoordinates[0] * triangleContact->firstVertices[0] +
+										 barycentricCoordinates[1] * triangleContact->firstVertices[1] +
+										 barycentricCoordinates[2] * triangleContact->firstVertices[2]);
+		}
+		EXPECT_EQ(triangleContact->penetrationPoints.second.meshLocalCoordinate.hasValue(),
+				  contact->penetrationPoints.second.meshLocalCoordinate.hasValue());
+		if (triangleContact->penetrationPoints.second.meshLocalCoordinate.hasValue() &&
+			contact->penetrationPoints.second.meshLocalCoordinate.hasValue())
+		{
+			contactPresent &= triangleContact->penetrationPoints.second.meshLocalCoordinate.getValue().elementId ==
+							  contact->penetrationPoints.second.meshLocalCoordinate.getValue().elementId;
+			Vector3d barycentricCoordinates =
+				contact->penetrationPoints.second.meshLocalCoordinate.getValue().barycentricCoordinate;
+			contactPresent &= eigenEqual(expected->penetrationPoints.second.globalPosition.getValue(),
+										 barycentricCoordinates[0] * triangleContact->secondVertices[0] +
+										 barycentricCoordinates[1] * triangleContact->secondVertices[1] +
+										 barycentricCoordinates[2] * triangleContact->secondVertices[2]);
 		}
 	}
 

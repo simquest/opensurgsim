@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/MeshElementLocalCoordinate.h"
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 
 namespace SurgSim
 {
@@ -21,12 +21,12 @@ namespace SurgSim
 namespace DataStructures
 {
 
-MeshElementLocalCoordinate::MeshElementLocalCoordinate() : elementId(0)
+IndexedLocalCoordinate::IndexedLocalCoordinate() : elementId(0)
 {
 }
 
-MeshElementLocalCoordinate::MeshElementLocalCoordinate(size_t elementId, SurgSim::Math::Vector naturalCoordinate)
-	: elementId(elementId), naturalCoordinate(naturalCoordinate)
+IndexedLocalCoordinate::IndexedLocalCoordinate(size_t elementId, const SurgSim::Math::Vector& barycentricCoordinate)
+	: elementId(elementId), barycentricCoordinate(barycentricCoordinate)
 {
 }
 
