@@ -26,16 +26,7 @@ namespace DataStructures
 std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadTriangleMesh(const std::string& fileName)
 {
 	typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> MeshType;
-	auto triangleMeshDelegate = std::make_shared<TriangleMeshPlyReaderDelegate<MeshType>>();
-
-	PlyReader reader(fileName);
-	if (reader.isValid())
-	{
-		SURGSIM_ASSERT(reader.parseWithDelegate(triangleMeshDelegate)) <<
-				"The input file " << fileName << " does not have the property required by triangle mesh.";
-	}
-
-	return triangleMeshDelegate->getMesh();
+	return std::move(loadTriangleMesh<MeshType>(fileName));
 }
 
 };  // namespace DataStructures

@@ -81,71 +81,72 @@ size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::getNumTriangles() c
 
 template <class VertexData, class EdgeData, class TriangleData>
 const std::vector<typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType>&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdges() const
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdges() const
 {
 	return m_edges;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 std::vector<typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType>&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdges()
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdges()
 {
 	return m_edges;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 const std::vector<typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType>&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangles() const
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangles() const
 {
 	return m_triangles;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 std::vector<typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType>&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangles()
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangles()
 {
 	return m_triangles;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 const typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdge(size_t id) const
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdge(size_t id) const
 {
 	return m_edges[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdge(size_t id)
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdge(size_t id)
 {
 	return m_edges[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 const typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(size_t id) const
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(size_t id) const
 {
 	return m_triangles[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType&
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(size_t id)
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(size_t id)
 {
 	return m_triangles[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 std::array<SurgSim::Math::Vector3d, 3>
-	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTrianglePositions(size_t id) const
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTrianglePositions(size_t id) const
 {
 	auto& ids = getTriangle(id).verticesId;
 	std::array<SurgSim::Math::Vector3d, 3> result
-		= {{
-				Vertices<VertexData>::getVertex(ids[0]).position,
-				Vertices<VertexData>::getVertex(ids[1]).position,
-				Vertices<VertexData>::getVertex(ids[2]).position
-		}};
+	= {{
+			Vertices<VertexData>::getVertex(ids[0]).position,
+			Vertices<VertexData>::getVertex(ids[1]).position,
+			Vertices<VertexData>::getVertex(ids[2]).position
+		}
+	};
 
 	return result;
 }
@@ -203,7 +204,7 @@ bool TriangleMeshBase<VertexData, EdgeData, TriangleData>::isEqual(const Vertice
 {
 	const TriangleMeshBase& triangleMesh = static_cast<const TriangleMeshBase&>(mesh);
 	return Vertices<VertexData>::isEqual(triangleMesh) && m_edges == triangleMesh.getEdges() &&
-		m_triangles == triangleMesh.getTriangles();
+		   m_triangles == triangleMesh.getTriangles();
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
@@ -212,6 +213,21 @@ void TriangleMeshBase<VertexData, EdgeData, TriangleData>::doClear()
 	doClearTriangles();
 	doClearEdges();
 	this->doClearVertices();
+}
+
+template <class M>
+std::shared_ptr<M> loadTriangleMesh<M>(const std::string& fileName)
+{
+	auto triangleMeshDelegate = std::make_shared<TriangleMeshPlyReaderDelegate<M>>();
+
+	PlyReader reader(fileName);
+	if (reader.isValid())
+	{
+		SURGSIM_ASSERT(reader.parseWithDelegate(triangleMeshDelegate)) <<
+				"The input file " << fileName << " does not have the property required by triangle mesh.";
+	}
+
+	return triangleMeshDelegate->getMesh();
 }
 
 };  // namespace DataStructures
