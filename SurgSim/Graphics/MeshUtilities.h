@@ -16,14 +16,19 @@
 #ifndef SURGSIM_GRAPHICS_MESHUTILITIES_H
 #define SURGSIM_GRAPHICS_MESHUTILITIES_H
 
-#include <SurgSim/DataStructures/TriangleMeshUtilities.h>
-#include <SurgSim/Graphics/MeshPlyReaderDelegate.h>
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
+#include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 
 namespace SurgSim
 {
 namespace DataStructures
 {
 
+/// Specialization for Graphics::Mesh
+/// Helper function to load a mesh from a given filename, does NOT do path resolution.
+/// \throws SurgSim::Framework::AssertionFailure if the reader does not contain mesh information.
+/// \param filename Path to the file that is to be read.
+/// \return the filled mesh a filled mesh if the reading succeeds, nullptr otherwise
 template <>
 std::shared_ptr<SurgSim::Graphics::Mesh> loadTriangleMesh(const std::string& fileName);
 

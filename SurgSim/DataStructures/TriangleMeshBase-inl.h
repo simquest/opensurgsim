@@ -16,7 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_INL_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_INL_H
 
-#include <SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h>
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 
 namespace SurgSim
 {

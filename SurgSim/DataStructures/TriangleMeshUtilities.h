@@ -16,10 +16,10 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESHUTILITIES_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESHUTILITIES_H
 
-#include <SurgSim/DataStructures/TriangleMeshBase.h>
-#include <SurgSim/DataStructures/TriangleMesh.h>
-#include <SurgSim/DataStructures/PlyReader.h>
-#include <SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h>
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 
 namespace SurgSim
 {
@@ -38,6 +38,6 @@ std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadTriangleM
 }
 }
 
-#include <SurgSim/DataStructures/TriangleMeshUtilities-inl.h>
+#include "SurgSim/DataStructures/TriangleMeshUtilities-inl.h"
 
 #endif

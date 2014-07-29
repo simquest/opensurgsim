@@ -42,7 +42,8 @@ bool SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::registerDelegate
 {
 	// Vertex processing
 	reader->requestElement("vertex",
-						   std::bind(&TriangleMeshPlyReaderDelegate::beginVertices, this, std::placeholders::_1, std::placeholders::_2),
+						   std::bind(&TriangleMeshPlyReaderDelegate::beginVertices, this,
+									 std::placeholders::_1, std::placeholders::_2),
 						   std::bind(&TriangleMeshPlyReaderDelegate::processVertex, this, std::placeholders::_1),
 						   std::bind(&TriangleMeshPlyReaderDelegate::endVertices, this, std::placeholders::_1));
 	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(VertexData, x));
@@ -60,7 +61,8 @@ bool SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::registerDelegate
 
 	// Face Processing
 	reader->requestElement("face",
-						   std::bind(&TriangleMeshPlyReaderDelegate::beginFaces, this, std::placeholders::_1, std::placeholders::_2),
+						   std::bind(&TriangleMeshPlyReaderDelegate::beginFaces, this,
+									 std::placeholders::_1, std::placeholders::_2),
 						   std::bind(&TriangleMeshPlyReaderDelegate::processFace, this, std::placeholders::_1),
 						   std::bind(&TriangleMeshPlyReaderDelegate::endFaces, this, std::placeholders::_1));
 	reader->requestListProperty("face", "vertex_indices",

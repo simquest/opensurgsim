@@ -80,9 +80,9 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Material.h
 	Mesh.h
 	Mesh-inl.h
-	MeshUtilities.h
 	MeshPlyReaderDelegate.h
 	MeshRepresentation.h
+	MeshUtilities.h
 	OctreeRepresentation.h
 	OsgAxesRepresentation.h
 	OsgBoxRepresentation.h

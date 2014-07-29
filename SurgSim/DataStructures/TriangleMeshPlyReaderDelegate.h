@@ -130,6 +130,6 @@ private:
 }
 }
 
-#include <SurgSim/DataStructures/TriangleMeshPlyReaderDelegate-inl.h>
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate-inl.h"
 
 #endif

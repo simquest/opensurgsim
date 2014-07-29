@@ -169,13 +169,15 @@ TEST_F(PlyReaderTests, ScalarReadTest)
 	TestData testData;
 	PlyReader reader(findFile("Testdata.ply"));
 	EXPECT_TRUE(reader.requestElement("vertex",
-									  std::bind(&TestData::beginVertices, &testData, std::placeholders::_1, std::placeholders::_2),
+									  std::bind(&TestData::beginVertices, &testData,
+											  std::placeholders::_1, std::placeholders::_2),
 									  std::bind(&TestData::newVertex, &testData, std::placeholders::_1),
 									  std::bind(&TestData::endVertices, &testData, std::placeholders::_1)));
 
 	/// Should not be able to register the element twice
 	EXPECT_FALSE(reader.requestElement("vertex",
-									   std::bind(&TestData::beginVertices, &testData, std::placeholders::_1, std::placeholders::_2),
+									   std::bind(&TestData::beginVertices, &testData,
+											   std::placeholders::_1, std::placeholders::_2),
 									   std::bind(&TestData::newVertex, &testData, std::placeholders::_1),
 									   std::bind(&TestData::endVertices, &testData, std::placeholders::_1)));
 
@@ -211,7 +213,8 @@ TEST_F(PlyReaderTests, ListReadTest)
 	TestData testData;
 	PlyReader reader(findFile("Testdata.ply"));
 	EXPECT_TRUE(reader.requestElement("face",
-									  std::bind(&TestData::beginFaces, &testData, std::placeholders::_1, std::placeholders::_2),
+									  std::bind(&TestData::beginFaces, &testData,
+											  std::placeholders::_1, std::placeholders::_2),
 									  std::bind(&TestData::newFace, &testData, std::placeholders::_1),
 									  nullptr));
 	EXPECT_TRUE(reader.requestListProperty("face", "vertex_indices",
