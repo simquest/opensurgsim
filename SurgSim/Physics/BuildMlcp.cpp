@@ -41,39 +41,31 @@ std::shared_ptr<PhysicsManagerState>
 {
 	// Copy state to new state
 	std::shared_ptr<PhysicsManagerState> result = state;
-	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
+	MlcpMapping<Representation> representationsMapping;
+	MlcpMapping<Constraint> constraintsMapping;
 
 	size_t numAtomicConstraint = 0;
 	size_t numConstraint = 0;
 	size_t numDof = 0;
 
 	// Calculate numAtomicConstraint and numConstraint
-	for (int constraintType = 0;
-		constraintType < CONSTRAINT_GROUP_TYPE_COUNT;
-		constraintType++)
+	auto const activeConstraints = result->getActiveConstraints();
+	numConstraint = activeConstraints.size();
+	for (auto it = activeConstraints.cbegin(); it != activeConstraints.cend(); it++)
 	{
-		ConstraintGroupType constraintGroupType = static_cast<ConstraintGroupType>(constraintType);
-		auto const constraints = result->getConstraintGroup(constraintGroupType);
-		for (auto it = constraints.begin(); it != constraints.end(); it++)
-		{
-			if ((*it)->isActive())
-			{
-				numAtomicConstraint += (*it)->getNumDof();
-				numConstraint++;
-			}
-		}
+		constraintsMapping.setValue((*it).get(), static_cast<ptrdiff_t>(numAtomicConstraint));
+		numAtomicConstraint += (*it)->getNumDof();
 	}
+	result->setConstraintsMapping(constraintsMapping);
 
 	// Calculate numDof size
-	for (auto it = result->getRepresentations().begin();
-		it != result->getRepresentations().end();
-		it++)
+	auto const activeRepresentations = result->getActiveRepresentations();
+	for (auto it = activeRepresentations.cbegin(); it != activeRepresentations.cend(); it++)
 	{
-		if ((*it)->isActive())
-		{
-			numDof += (*it)->getNumDof();
-		}
+		representationsMapping.setValue((*it).get(), numDof);
+		numDof += (*it)->getNumDof();
 	}
+	result->setRepresentationsMapping(representationsMapping);
 
 	// Resize the Mlcp problem
 	result->getMlcpProblem().A.resize(numAtomicConstraint, numAtomicConstraint);
@@ -95,43 +87,28 @@ std::shared_ptr<PhysicsManagerState>
 	result->getMlcpSolution().x.setZero();
 
 	// Fill up the Mlcp problem
-	size_t constraintId = 0;
-	for (int constraintType = 0;
-		constraintType < CONSTRAINT_GROUP_TYPE_COUNT;
-		constraintType++)
+	for (auto it = activeConstraints.begin(); it != activeConstraints.end(); it++)
 	{
-		ConstraintGroupType constraintGroupType = static_cast<ConstraintGroupType>(constraintType);
-		auto const constraints = result->getConstraintGroup(constraintGroupType);
-		for (auto it = constraints.begin(); it != constraints.end(); it++)
-		{
-			if (!(*it)->isActive())
-			{
-				continue;
-			}
+		ptrdiff_t indexConstraint = result->getConstraintsMapping().getValue((*it).get());
+		SURGSIM_ASSERT(indexConstraint >= 0) << "Index for constraint is invalid: " << indexConstraint << std::endl;
 
-			ptrdiff_t indexConstraint = result->getConstraintsMapping().getValue((*it).get());
-			SURGSIM_ASSERT(indexConstraint >= 0) << "Index for constraint is invalid: " << indexConstraint << std::endl;
+		std::shared_ptr<ConstraintImplementation> side0 = (*it)->getImplementations().first;
+		std::shared_ptr<ConstraintImplementation> side1 = (*it)->getImplementations().second;
+		SURGSIM_ASSERT(side0) << "Constraint does not have a side0" << std::endl;
+		SURGSIM_ASSERT(side1) << "Constraint does not have a side1" << std::endl;
+		std::shared_ptr<Localization> localization0 = (*it)->getLocalizations().first;
+		std::shared_ptr<Localization> localization1 = (*it)->getLocalizations().second;
+		SURGSIM_ASSERT(localization0) << "ConstraintImplementation does not have a localization on side0";
+		SURGSIM_ASSERT(localization1) << "ConstraintImplementation does not have a localization on side1";
+		const MlcpMapping<Representation>& mapping = result->getRepresentationsMapping();
+		ptrdiff_t indexRepresentation0 = mapping.getValue(localization0->getRepresentation().get());
+		ptrdiff_t indexRepresentation1 = mapping.getValue(localization1->getRepresentation().get());
+		SURGSIM_ASSERT(indexRepresentation0 >= 0) << "Index for representation 0 is invalid: " <<
+			indexRepresentation0;
+		SURGSIM_ASSERT(indexRepresentation1 >= 0) << "Index for representation 1 is invalid: " <<
+			indexRepresentation1;
 
-			std::shared_ptr<ConstraintImplementation> side0 = (*it)->getImplementations().first;
-			std::shared_ptr<ConstraintImplementation> side1 = (*it)->getImplementations().second;
-			SURGSIM_ASSERT(side0) << "Constraint does not have a side[0]" << std::endl;
-			SURGSIM_ASSERT(side1) << "Constraint does not have a side[1]" << std::endl;
-			std::shared_ptr<Localization> localization0 = (*it)->getLocalizations().first;
-			std::shared_ptr<Localization> localization1 = (*it)->getLocalizations().second;
-			SURGSIM_ASSERT(localization0) << "ConstraintImplementation does not have a localization on side[0]";
-			SURGSIM_ASSERT(localization1) << "ConstraintImplementation does not have a localization on side[1]";
-			const MlcpMapping<Representation>& mapping = result->getRepresentationsMapping();
-			ptrdiff_t indexRepresentation0 = mapping.getValue(localization0->getRepresentation().get());
-			ptrdiff_t indexRepresentation1 = mapping.getValue(localization1->getRepresentation().get());
-			SURGSIM_ASSERT(indexRepresentation0 >= 0) << "Index for representation 0 is invalid: " <<
-				indexRepresentation0;
-			SURGSIM_ASSERT(indexRepresentation1 >= 0) << "Index for representation 0 is invalid: " <<
-				indexRepresentation1;
-
-			(*it)->build(dt, &result->getMlcpProblem(), indexRepresentation0, indexRepresentation1, indexConstraint);
-
-			constraintId++;
-		}
+		(*it)->build(dt, &result->getMlcpProblem(), indexRepresentation0, indexRepresentation1, indexConstraint);
 	}
 
 	return result;

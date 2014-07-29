@@ -59,7 +59,6 @@ surgsim_show_ide_folders(
 	"${EXAMPLESTAPLING_SOURCES}" "${EXAMPLESTAPLING_HEADERS}")
 
 set(LIBS 
-	${LIBS}
 	IdentityPoseDevice
 	MultiAxisDevice
 	SurgSimBlocks
@@ -68,7 +67,7 @@ set(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-file(COPY ${CMAKE_SOURCE_DIR}/Examples/Data/Stapling DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
+file(COPY ${CMAKE_SOURCE_DIR}/Examples/Data/Stapling/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 # Configure the path for the data files
 configure_file(

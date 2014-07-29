@@ -62,7 +62,7 @@ bool SphereElement::doInitialize()
 		std::make_shared<OsgSphereRepresentation>(m_name + " Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
 
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
 
 	shader->setVertexShaderSource(

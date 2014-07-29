@@ -55,7 +55,7 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 
 	// Set up color array with default color
 	m_colors = new osg::Vec4Array(1);
-	(*m_colors)[0]= osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	(*m_colors)[0] = osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_geometry->setColorArray(m_colors, osg::Array::BIND_OVERALL);
 
 	// Set up textureCoordinates array, texture coords are optional, don't add them to the
@@ -71,7 +71,7 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	// Create normals, currently per triangle
 	m_normals = new osg::Vec3Array();
 	m_normals->setDataVariance(osg::Object::DYNAMIC);
-	m_geometry->setNormalArray(m_normals,osg::Array::BIND_PER_VERTEX);
+	m_geometry->setNormalArray(m_normals, osg::Array::BIND_PER_VERTEX);
 
 	osg::ref_ptr<osg::Geode> geode = new osg::Geode();
 	geode->addDrawable(m_geometry);
@@ -119,18 +119,16 @@ bool OsgMeshRepresentation::doInitialize()
 
 		if (filePath.empty())
 		{
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-				"OsgMeshRepresentation::doInitialize(): file " << m_filename << " can not be found.";
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+					<< "OsgMeshRepresentation::doInitialize(): file " << m_filename << " can not be found.";
 			result = false;
 		}
 		else
 		{
-			auto triangleMesh = SurgSim::DataStructures::loadTriangleMesh(filePath);
-			SURGSIM_ASSERT(nullptr != triangleMesh && triangleMesh->isValid()) <<
-				"OsgMeshRepresentation::doInitialize(): SurgSim::DataStructures::loadTriangleMesh() returned a "
-				"null mesh or invalid mesh from file " << m_filename;
-
-			m_mesh = std::make_shared<Mesh>(*triangleMesh);
+			m_mesh = SurgSim::Graphics::loadMesh(filePath);
+			SURGSIM_ASSERT(nullptr != m_mesh && m_mesh->isValid())
+					<< "OsgMeshRepresentation::doInitialize(): SurgSim::DataStructures::loadTriangleMesh() returned a "
+					<< "null mesh or invalid mesh from file " << filePath;
 		}
 	}
 
@@ -234,9 +232,9 @@ int OsgMeshRepresentation::updateOsgArrays()
 		result |= UPDATE_OPTION_TEXTURES;
 	}
 
-	if (m_mesh->getNumTriangles()*3 > m_triangles->size())
+	if (m_mesh->getNumTriangles() * 3 > m_triangles->size())
 	{
-		m_triangles->resize(m_mesh->getNumTriangles()*3);
+		m_triangles->resize(m_mesh->getNumTriangles() * 3);
 		m_triangles->setDataVariance(getDataVariance(UPDATE_OPTION_TRIANGLES));
 		result |= UPDATE_OPTION_TRIANGLES;
 	}

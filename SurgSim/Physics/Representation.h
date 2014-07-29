@@ -89,12 +89,12 @@ public:
 	/// \return true if gravity enabled, false if not.
 	bool isGravityEnabled() const;
 
-	/// Set whether this Representation is controling the pose of the SceneElement
+	/// Set whether this Representation is controlling the pose of the SceneElement
 	/// that it is part of.
 	/// \param isDrivingSceneElementPose true if this Representation is driving the pose of the SceneElement
 	void setIsDrivingSceneElementPose(bool isDrivingSceneElementPose);
 
-	/// Query if this Representation is controling the pose of the SceneElement
+	/// Query if this Representation is controlling the pose of the SceneElement
 	/// that it is part of.
 	/// \return true if this Representation is controlling the pose of the SceneElement
 	bool isDrivingSceneElementPose();
@@ -149,6 +149,11 @@ protected:
 	/// This entity's collision representation, these are usually very specific to the physics representation
 	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 
+	/// This conditionally updates that pose for the scenelement to the given pose
+	/// The update gets exectuded if the representation actually has  sceneelement and isDrivingScenElement() is true
+	/// \param pose New pose for the SceneElement
+	void driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose);
+
 private:
 	/// NO copy constructor
 	Representation(const Representation&);
@@ -168,7 +173,7 @@ private:
 	/// Is this representation active or not ?
 	bool m_isActive;
 
-	/// Is this representation driving the SceneElement
+	/// Is this representation driving the sceneElement pose
 	bool m_isDrivingSceneElementPose;
 
 };

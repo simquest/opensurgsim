@@ -24,7 +24,7 @@ property double y
 property double z
 element face 407
 property list uint uint vertex_indices
-element polyhedron 1476
+element 3d_element 1476
 property list uint uint vertex_indices
 element boundary_condition 79
 property uint vertex_index

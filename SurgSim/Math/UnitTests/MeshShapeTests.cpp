@@ -21,6 +21,7 @@
 #include "SurgSim/DataStructures/AabbTreeNode.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
@@ -81,16 +82,13 @@ public:
 	void SetUp()
 	{
 		m_numIterations = 100;
-
+		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		srand((unsigned int)time(nullptr));
-	}
-
-	void TearDown()
-	{
 	}
 
 	/// Number of iterations to test
 	int m_numIterations;
+	std::shared_ptr<SurgSim::Framework::Runtime> m_runtime;
 };
 
 TEST_F(MeshShapeTest, InvalidMeshCubeTest)
@@ -143,7 +141,7 @@ TEST_F(MeshShapeTest, EmptyMeshTest)
 	EXPECT_NEAR(0.0, meshShape.getVolume(), 1e-8);
 	EXPECT_TRUE(meshShape.getCenter().isZero());
 	EXPECT_TRUE(meshShape.getSecondMomentOfVolume().isZero());
-	EXPECT_TRUE(meshShape.isValid()); // An empty mesh is regard as valid.
+	EXPECT_TRUE(meshShape.isValid()); // An empty mesh is regarded as valid.
 
 	SurgSim::Math::MeshShape emptyMeshShape;
 	EXPECT_FALSE(emptyMeshShape.isValid());
@@ -152,7 +150,7 @@ TEST_F(MeshShapeTest, EmptyMeshTest)
 TEST_F(MeshShapeTest, ValidMeshTest)
 {
 	{
-		SCOPED_TRACE("MeshShapeTest.ValidMeshTest.Invalid Mesh");
+		SCOPED_TRACE("Invalid Mesh");
 		auto emptyMesh = std::make_shared<TriangleMeshBase>();
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>(*emptyMesh);
 		auto mesh = meshShape->getMesh();
@@ -173,7 +171,7 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 	}
 
 	{
-		SCOPED_TRACE("MeshShapeTest.ValidMeshTest.Valid Mesh");
+		SCOPED_TRACE("Valid Mesh");
 		auto emptyMesh = std::make_shared<TriangleMeshBase>();
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>(*emptyMesh);
 		auto mesh = meshShape->getMesh();
@@ -244,12 +242,10 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 
 TEST_F(MeshShapeTest, SerializationTest)
 {
-	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
-
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	meshShape->setFileName(fileName);
-	EXPECT_TRUE(meshShape->initialize(*data));
+	EXPECT_NO_THROW(meshShape->load(fileName));
+	EXPECT_TRUE(meshShape->isValid());
 
 	// We chose to let YAML serialization only works with base class pointer.
 	// i.e. We need to serialize 'meshShape' via a SurgSim::Math::Shape pointer.
@@ -268,20 +264,17 @@ TEST_F(MeshShapeTest, SerializationTest)
 	EXPECT_EQ("SurgSim::Math::MeshShape", newMeshShape->getClassName());
 	EXPECT_EQ(fileName, newMeshShape->getFileName());
 
-	EXPECT_TRUE(newMeshShape->initialize(*data));
 	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), newMeshShape->getMesh()->getNumVertices());
 	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), newMeshShape->getMesh()->getNumEdges());
 	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), newMeshShape->getMesh()->getNumTriangles());
+	EXPECT_TRUE(newMeshShape->isValid());
 }
 
 TEST_F(MeshShapeTest, CreateAabbTreeTest)
 {
-	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
-
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	meshShape->setFileName(fileName);
-	EXPECT_TRUE(meshShape->initialize(*data));
+	EXPECT_NO_THROW(meshShape->load(fileName));
 
 	auto tree = meshShape->getAabbTree();
 
@@ -299,26 +292,26 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 	}
 }
 
-TEST_F(MeshShapeTest, DoInitializeTest)
+TEST_F(MeshShapeTest, DoLoadTest)
 {
 	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 	{
 		auto fileName = std::string("MeshShapeData/staple_collision.ply");
-		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-
-		meshShape->setFileName(fileName);
 		auto path = data->findFile(fileName);
 		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
-		EXPECT_NO_THROW(EXPECT_TRUE(meshShape->doInitialize(path)));
+
+		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
+		EXPECT_NO_THROW(EXPECT_TRUE(meshShape->doLoad(path)));
+		EXPECT_TRUE(meshShape->isValid());
 	}
 
 	{
 		auto fileName = std::string("MeshShapeData/InvalidMesh.ply");
-		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-
-		meshShape->setFileName(fileName);
 		auto path = data->findFile(fileName);
 		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
-		EXPECT_ANY_THROW(meshShape->doInitialize(path));
+
+		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
+		EXPECT_ANY_THROW(meshShape->doLoad(path));
+		EXPECT_FALSE(meshShape->isValid());
 	}
 }

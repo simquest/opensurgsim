@@ -64,5 +64,10 @@ SurgSim::Math::Matrix33d SphereShape::getSecondMomentOfVolume() const
 	return secondMoment;
 }
 
+bool SphereShape::isValid() const
+{
+	return m_radius >= 0;
+}
+
 }; // namespace Math
 }; // namespace SurgSim

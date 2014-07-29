@@ -29,7 +29,8 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct VertexData {
+struct VertexData
+{
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector2d> texture;
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector4d> color;
 
@@ -52,7 +53,7 @@ struct VertexData {
 };
 
 class Mesh : public SurgSim::DataStructures::TriangleMeshBase<VertexData, SurgSim::DataStructures::EmptyData,
-					SurgSim::DataStructures::EmptyData>
+	SurgSim::DataStructures::EmptyData>
 {
 public:
 	/// Default constructor
@@ -80,6 +81,8 @@ public:
 					const std::vector<SurgSim::Math::Vector2d>& textures,
 					const std::vector<size_t>& triangles);
 };
+
+std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName);
 
 }; // Graphics
 }; // SurgSim

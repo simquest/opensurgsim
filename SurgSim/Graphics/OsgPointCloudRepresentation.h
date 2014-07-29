@@ -24,10 +24,17 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/PointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
-#include "SurgSim/DataStructures/Vertices.h"
 
 namespace SurgSim
 {
+namespace DataStructures
+{
+class EmptyData;
+
+template<class Data>
+class Vertices;
+}
+
 namespace Graphics
 {
 
@@ -38,8 +45,7 @@ namespace Graphics
 SURGSIM_STATIC_REGISTRATION(OsgPointCloudRepresentation);
 
 /// Osg point cloud representation, implementation of a PointCloudRepresenation using OSG.
-template <class Data>
-class OsgPointCloudRepresentation : public PointCloudRepresentation<Data>, public OsgRepresentation
+class OsgPointCloudRepresentation : public PointCloudRepresentation, public OsgRepresentation
 {
 public:
 	/// Constructor
@@ -49,11 +55,11 @@ public:
 	/// Destructor
 	~OsgPointCloudRepresentation();
 
-	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgPointCloudRepresentation<SurgSim::DataStructures::EmptyData>);
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgPointCloudRepresentation);
 
 	/// Gets the vertices.
 	/// \return	The vertices.
-	virtual std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> getVertices() const override;
+	virtual std::shared_ptr<PointCloud> getVertices() const override;
 
 	/// Sets point size.
 	/// \param	val	The value.
@@ -77,7 +83,7 @@ public:
 
 private:
 	/// Local pointer to vertices with data
-	std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> m_vertices;
+	std::shared_ptr<PointCloud> m_vertices;
 
 	/// OSG vertex data for updating
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
@@ -101,7 +107,5 @@ private:
 
 }; // Graphics
 }; // SurgSim
-
-#include "SurgSim/Graphics/OsgPointCloudRepresentation-inl.h"
 
 #endif // SURGSIM_GRAPHICS_OSGPOINTCLOUDREPRESENTATION_H

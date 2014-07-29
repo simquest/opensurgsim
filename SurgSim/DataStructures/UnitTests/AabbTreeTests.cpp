@@ -23,6 +23,7 @@
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Timer.h"
 #include "SurgSim/Math/Aabb.h"
 #include "SurgSim/Math/MeshShape.h"
@@ -33,22 +34,6 @@
 using SurgSim::Math::Aabbd;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
-
-namespace
-{
-std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<
-SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData>>
-		loadTriangleMesh(const std::string& fileName)
-{
-	auto triangleMeshDelegate = std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
-
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
-
-	return triangleMeshDelegate->getMesh();
-}
-}
 
 namespace SurgSim
 {
@@ -226,16 +211,14 @@ static typename std::list<PairTypeLhs>::const_iterator getEquivalentPair(const s
 
 TEST(AabbTreeTests, SpatialJoinTest)
 {
-	auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	SurgSim::Framework::Runtime runtime("config.txt");
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 
 	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
-	meshA->setFileName(fileName);
-	ASSERT_TRUE(meshA->initialize(*applicationData));
+	EXPECT_NO_THROW(meshA->load(fileName));
 
 	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();
-	meshB->setFileName(fileName);
-	ASSERT_TRUE(meshB->initialize(*applicationData));
+	EXPECT_NO_THROW(meshB->load(fileName));
 
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
 	meshB->getMesh()->copyWithTransform(rhsPose, *meshA->getMesh());

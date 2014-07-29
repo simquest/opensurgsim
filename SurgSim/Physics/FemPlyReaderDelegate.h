@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEM3DREPRESENTATIONPLYREADERDELEGATE_H
-#define SURGSIM_PHYSICS_FEM3DREPRESENTATIONPLYREADERDELEGATE_H
+#ifndef SURGSIM_PHYSICS_FEMPLYREADERDELEGATE_H
+#define SURGSIM_PHYSICS_FEMPLYREADERDELEGATE_H
 
 #include <array>
 #include <memory>
@@ -31,32 +31,30 @@ class OdeState;
 
 namespace Physics
 {
+class FemRepresentation;
 
-class Fem3DRepresentation;
-
-/// Implementation of PlyReaderDelegate for polyhedral Fem3DRepresentation
-class Fem3DRepresentationPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
+/// Common part of implementation of PlyReaderDelegate for FemRepresentations.
+/// This is an abstract class and needs to be inherited.
+/// Methods 'registerDelegate()' and 'fileIsAcceptable()' need to be overridden.
+class FemPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
 	/// Constructor
 	/// \param fem The object that is updated when PlyReader::parseFile is called.
-	explicit Fem3DRepresentationPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem);
+	explicit FemPlyReaderDelegate(std::shared_ptr<FemRepresentation> fem);
 
-	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
-	/// \param reader The reader that should be used.
-	/// \return true if it succeeds, false otherwise.
+protected:
+	// \return Name of the element (1/2/3D), which this delegate processes.
+	virtual std::string getElementName() const = 0;
+
 	virtual bool registerDelegate(SurgSim::DataStructures::PlyReader* reader) override;
-
-	/// Check whether this file is acceptable to the delegate, overridden from \sa PlyReaderDelegate.
-	/// \param reader The reader that should be used.
-	/// \return true if it succeeds, false otherwise.
 	virtual bool fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader) override;
 
 	/// Callback for beginning of PlyReader::parseFile.
 	void startParseFile();
 
 	/// Callback for end of PlyReader::parseFile.
-	void endParseFile();
+	virtual void endParseFile();
 
 	/// Callback function, begin the processing of vertices.
 	/// \param elementName Name of the element.
@@ -72,25 +70,29 @@ public:
 	/// \param elementName Name of the element.
 	void endVertices(const std::string& elementName);
 
-	/// Callback function, begin the processing of polyhedrons.
+	/// Callback function, begin the processing of FemElements.
 	/// \param elementName Name of the element.
-	/// \param polyhedronCount Number of polyhedrons.
-	/// \return memory for polyhedron data to the reader.
-	void* beginPolyhedrons(const std::string& elementName, size_t polyhedronCount);
+	/// \param elementCount Number of elements.
+	/// \return memory for FemElement data to the reader.
+	void* beginFemElements(const std::string& elementName, size_t elementCount);
 
-	/// Callback function to process one polyhedron.
+	/// Callback function to process one FemElement.
 	/// \param elementName Name of the element.
-	void processPolyhedron(const std::string& elementName);
+	virtual void processFemElement(const std::string& elementName) = 0;
 
-	/// Callback function to finalize processing of polyhedrons.
+	/// Callback function to finalize processing of FemElements.
 	/// \param elementName Name of the element.
-	void endPolyhedrons(const std::string& elementName);
+	void endFemElements(const std::string& elementName);
 
 	/// Callback function, begin the processing of materials.
 	/// \param elementName Name of the element.
 	/// \param materialCount Number of materials.
 	/// \return memory for material data to the reader.
 	void* beginMaterials(const std::string& elementName, size_t materialCount);
+
+	/// Callback function, end the processing of materials.
+	/// \param elementName Name of the element.
+	void endMaterials(const std::string& elementName);
 
 	/// Callback function, begin the processing of boundary conditions.
 	/// \param elementName Name of the element.
@@ -102,24 +104,24 @@ public:
 	/// \param elementName Name of the element.
 	void processBoundaryCondition(const std::string& elementName);
 
-private:
+protected:
+	/// Flag indicating if the associated file has boundary conditions
+	bool m_hasBoundaryConditions;
+
+	/// Internal data to receive the "boundary_condition" element
+	size_t m_boundaryConditionData;
+
+	/// Internal iterator to save the "vertex" element
+	double* m_vertexIterator;
+
 	/// Internal data to receive the "vertex" element
 	std::array<double, 3> m_vertexData;
 
-	/// Internal iterator to save the "vertex" element
-	double *vertexIterator;
+	/// The fem that will be created by loading
+	std::shared_ptr<FemRepresentation> m_fem;
 
-	/// Internal data to receive the "polyhedron" element
-	struct PolyhedronData
-	{
-		PolyhedronData();
-
-		unsigned int* indicies;
-		unsigned int vertexCount;
-	} m_polyhedronData;
-
-	/// Internal data to receive the "boundary_condition" element
-	unsigned int m_boundaryConditionData;
+	/// The state that will be created by loading
+	std::shared_ptr<SurgSim::Math::OdeState> m_state;
 
 	/// Internal data to receive the "material" data
 	struct MaterialData
@@ -127,19 +129,21 @@ private:
 		double massDensity;
 		double poissonRatio;
 		double youngModulus;
+		int64_t overrun; ///< Used to check for buffer overruns
 	} m_materialData;
 
-	/// The fem that will be created by loading
-	std::shared_ptr<Fem3DRepresentation> m_fem;
+	/// Internal data to receive the fem element
+	struct ElementData
+	{
+		ElementData();
 
-	/// The state that will be created by loading
-	std::shared_ptr<SurgSim::Math::OdeState> m_state;
-
-	/// Flag indicating whether the associated file has boundary conditions
-	bool m_hasBoundaryConditions;
+		unsigned int* indices;
+		unsigned int vertexCount;
+		int64_t overrun; ///< Used to check for buffer overruns
+	} m_femData;
 };
 
 } // namespace Physics
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEM3DREPRESENTATIONPLYREADERDELEGATE_H
+#endif // SURGSIM_PHYSICS_FEMPLYREADERDELEGATE_H

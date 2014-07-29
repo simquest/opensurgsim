@@ -99,6 +99,11 @@ public:
 	/// \return File name of the external file which contains the triangle mesh.
 	std::string getFileName() const;
 
+	/// Check if this shape contains a valid mesh and the thickness is at least 1e-5 (in meter,
+	/// to avoid formal and numerical issues).
+	/// \return True if this shape contains a valid mesh and thickness is at least 1e-5; Otherwise, false.
+	virtual bool isValid() const override;
+
 private:
 
 	/// Compute useful volume integrals based on the triangle mesh, which

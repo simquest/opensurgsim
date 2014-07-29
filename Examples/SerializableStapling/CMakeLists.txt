@@ -37,7 +37,6 @@ surgsim_show_ide_folders(
 	"${SERIALIZABLESTAPLING_SOURCES}" "${SERIALIZABLESTAPLING_SOURCES}")
 
 set(LIBS 
-	${LIBS}
 	IdentityPoseDevice
 	MultiAxisDevice
 	SurgSimBlocks

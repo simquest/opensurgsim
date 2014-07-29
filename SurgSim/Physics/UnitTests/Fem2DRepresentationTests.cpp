@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -89,6 +90,27 @@ TEST(Fem2DRepresentationTests, TransformInitialStateTest)
 
 	EXPECT_TRUE(fem->getInitialState()->getPositions().isApprox(expectedX));
 	EXPECT_TRUE(fem->getInitialState()->getVelocities().isApprox(expectedV));
+}
+
+TEST(Fem2DRepresentationTests, SerializationTest)
+{
+	auto fem2DRepresentation = std::make_shared<SurgSim::Physics::Fem2DRepresentation>("Test-Fem2D");
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*fem2DRepresentation));
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(1u, node.size());
+
+	YAML::Node data = node["SurgSim::Physics::Fem2DRepresentation"];
+	EXPECT_EQ(10u, data.size());
+
+	std::shared_ptr<Fem2DRepresentation> newRepresentation;
+	ASSERT_NO_THROW(newRepresentation =
+		std::dynamic_pointer_cast<Fem2DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	ASSERT_NE(nullptr, newRepresentation);
+
+	EXPECT_EQ("SurgSim::Physics::Fem2DRepresentation", newRepresentation->getClassName());
+	EXPECT_EQ(REPRESENTATION_TYPE_FEM2D, newRepresentation->getType());
 }
 
 } // namespace Physics

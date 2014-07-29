@@ -289,7 +289,7 @@ void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
 
 void SurgSim::Graphics::OsgView::setOsgMapsUniforms(bool val)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "Can't change mapping mode after initialization.";
+	SURGSIM_ASSERT(!isAwake()) << "Can't change mapping mode after waking up.";
 	m_osgMapUniforms = val;
 }
 
@@ -413,9 +413,8 @@ std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getMou
 }
 
 
-void SurgSim::Graphics::OsgView::setManipulatorParameters(
-	SurgSim::Math::Vector3d position,
-	SurgSim::Math::Vector3d lookat)
+void SurgSim::Graphics::OsgView::setManipulatorParameters(const SurgSim::Math::Vector3d& position,
+														  const SurgSim::Math::Vector3d& lookat)
 {
 	m_manipulatorPosition = position;
 	m_manipulatorLookat = lookat;
@@ -429,7 +428,7 @@ void SurgSim::Graphics::OsgView::setManipulatorParameters(
 	}
 }
 
-void SurgSim::Graphics::OsgView::setManipulatorPosition(SurgSim::Math::Vector3d position)
+void SurgSim::Graphics::OsgView::setManipulatorPosition(const SurgSim::Math::Vector3d& position)
 {
 	setManipulatorParameters(position, m_manipulatorLookat);
 }
@@ -439,7 +438,7 @@ SurgSim::Math::Vector3d SurgSim::Graphics::OsgView::getManipulatorPosition()
 	return m_manipulatorPosition;
 }
 
-void SurgSim::Graphics::OsgView::setManipulatorLookAt(SurgSim::Math::Vector3d lookAt)
+void SurgSim::Graphics::OsgView::setManipulatorLookAt(const SurgSim::Math::Vector3d& lookAt)
 {
 	setManipulatorParameters(m_manipulatorPosition, lookAt);
 }

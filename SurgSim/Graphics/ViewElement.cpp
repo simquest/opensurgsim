@@ -22,10 +22,8 @@ namespace SurgSim
 {
 namespace Graphics
 {
-using SurgSim::Graphics::View;
-using SurgSim::Graphics::ViewElement;
 
-ViewElement::ViewElement(const std::string& name) : SceneElement(name)
+ViewElement::ViewElement(const std::string& name) : BasicSceneElement(name)
 {
 }
 
@@ -69,7 +67,5 @@ bool ViewElement::doInitialize()
 	return true;
 }
 
-
-
-}; // End of namespace Graphics
-}; // End of namespace SurgSim
+}; // namespace Graphics
+}; // namespace SurgSim

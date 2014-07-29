@@ -49,8 +49,8 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 	std::shared_ptr<SphereShape> sphere(std::static_pointer_cast<SphereShape>(representationSphere->getShape()));
 
 	Vector3d sphereCenter(representationSphere->getPose().translation());
-	Vector3d globalTop(representationCapsule->getPose() * capsule->topCentre());
-	Vector3d globalBottom(representationCapsule->getPose() * capsule->bottomCentre());
+	Vector3d globalTop(representationCapsule->getPose() * capsule->topCenter());
+	Vector3d globalBottom(representationCapsule->getPose() * capsule->bottomCenter());
 	Vector3d result;
 
 	double dist =
