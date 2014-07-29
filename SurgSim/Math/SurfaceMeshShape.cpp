@@ -15,7 +15,7 @@
 //
 
 #include "SurgSim/Math/SurfaceMeshShape.h"
-
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Framework/Log.h"
 
 namespace
@@ -44,7 +44,7 @@ void SurfaceMeshShape::setFileName(const std::string& fileName)
 {
 	using SurgSim::DataStructures::TriangleMesh;
 	m_fileName = fileName;
-	m_mesh = std::make_shared<TriangleMesh>(*SurgSim::DataStructures::loadTriangleMesh(fileName));
+	m_mesh = SurgSim::DataStructures::loadTriangleMesh<SurgSim::DataStructures::TriangleMesh>(fileName);
 }
 
 std::string SurfaceMeshShape::getFileName() const
@@ -62,7 +62,7 @@ double SurfaceMeshShape::getVolume() const
 	if (nullptr == m_mesh)
 	{
 		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"No mesh set for SurfaceMeshShape, so it cannot compute volume.";
+				"No mesh set for SurfaceMeshShape, so it cannot compute volume.";
 	}
 	return m_volume;
 }
@@ -72,7 +72,7 @@ SurgSim::Math::Vector3d SurfaceMeshShape::getCenter() const
 	if (nullptr == m_mesh)
 	{
 		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"No mesh set for SurfaceMeshShape, so it cannot compute center.";
+				"No mesh set for SurfaceMeshShape, so it cannot compute center.";
 	}
 	return m_center;
 }
@@ -82,7 +82,7 @@ SurgSim::Math::Matrix33d SurfaceMeshShape::getSecondMomentOfVolume() const
 	if (nullptr == m_mesh)
 	{
 		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"No mesh set for SurfaceMeshShape, so it cannot compute second moment of volume.";
+				"No mesh set for SurfaceMeshShape, so it cannot compute second moment of volume.";
 	}
 	return m_secondMomentOfVolume;
 }
@@ -143,9 +143,9 @@ void SurfaceMeshShape::computeVolumeIntegrals()
 		integral[1] += (A[0] + (u[0] + v[0]) / 3.0) * area;
 		integral[2] += (A[1] + (u[1] + v[1]) / 3.0) * area;
 		integral[3] += (A[2] + (u[2] + v[2]) / 3.0) * area;
-		integral[4] += (A[0] * (A[0] + 2.0 * (u[0] + v[0]) / 3.0) + (u[0]*v[0] + v[0]*v[0] + u[0]*u[0]) / 6.0) * area;
-		integral[5] += (A[1] * (A[1] + 2.0 * (u[1] + v[1]) / 3.0) + (u[1]*v[1] + v[1]*v[1] + u[1]*u[1]) / 6.0) * area;
-		integral[6] += (A[2] * (A[2] + 2.0 * (u[2] + v[2]) / 3.0) + (u[2]*v[2] + v[2]*v[2] + u[2]*u[2]) / 6.0) * area;
+		integral[4] += (A[0] * (A[0] + 2.0 * (u[0] + v[0]) / 3.0) + (u[0] * v[0] + v[0] * v[0] + u[0] * u[0]) / 6.0) * area;
+		integral[5] += (A[1] * (A[1] + 2.0 * (u[1] + v[1]) / 3.0) + (u[1] * v[1] + v[1] * v[1] + u[1] * u[1]) / 6.0) * area;
+		integral[6] += (A[2] * (A[2] + 2.0 * (u[2] + v[2]) / 3.0) + (u[2] * v[2] + v[2] * v[2] + u[2] * u[2]) / 6.0) * area;
 		integral[7] += (A[0] * A[1] + (A[0] * (u[1] + v[1]) + A[1] * (u[0] + v[0])) / 3.0) * area;
 		integral[7] += ((u[0] * u[1] + v[0] * v[1]) / 6.0 + (u[0] * v[1] + u[1] * v[0]) / 12.0) * area;
 		integral[8] += (A[1] * A[2] + (A[1] * (u[2] + v[2]) + A[2] * (u[1] + v[1])) / 3.0) * area;

@@ -22,7 +22,7 @@
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Behavior.h"

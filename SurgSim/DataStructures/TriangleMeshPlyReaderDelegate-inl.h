@@ -102,7 +102,7 @@ void* SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::beginVertices(
 template <class M>
 void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::processVertex(const std::string& elementName)
 {
-	MeshType::VertexType vertex(SurgSim::Math::Vector3d(m_vertexData.x, m_vertexData.y, m_vertexData.z));
+	typename M::VertexType vertex(SurgSim::Math::Vector3d(m_vertexData.x, m_vertexData.y, m_vertexData.z));
 	m_mesh->addVertex(vertex);
 }
 
@@ -129,7 +129,7 @@ void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::processFace(cons
 	SURGSIM_ASSERT(m_faceData.edgeCount == 3) << "Can only process triangle meshes.";
 	std::copy(m_faceData.indices, m_faceData.indices + 3, m_indices.begin());
 
-	M::TriangleType triangle(m_indices);
+	typename M::TriangleType triangle(m_indices);
 	m_mesh->addTriangle(triangle);
 }
 

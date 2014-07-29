@@ -86,9 +86,6 @@ public:
 }; // Graphics
 }; // SurgSim
 
-template<>
-std::shared_ptr<SurgSim::Graphics::Mesh> SurgSim::DataStructures::loadTriangleMesh(const std::string& fileName);
-
 #include "SurgSim/Graphics/Mesh-inl.h"
 
 #endif // SURGSIM_GRAPHICS_MESH_H

@@ -13,22 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Graphics/MeshUtilities.h"
 
-#include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+template <>
+std::shared_ptr<SurgSim::Graphics::Mesh> SurgSim::DataStructures::loadTriangleMesh(const std::string& fileName)
+{
+	SurgSim::DataStructures::PlyReader reader(fileName);
+	auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
+	SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
+	reader.parseFile();
 
-namespace SurgSim
-{
-namespace DataStructures
-{
-
-std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadTriangleMesh(const std::string& fileName)
-{
-	typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> MeshType;
-	return std::move(loadTriangleMesh<MeshType>(fileName));
+	return delegate->getMesh();
 }
-
-};  // namespace DataStructures
-};  // namespace SurgSim
 

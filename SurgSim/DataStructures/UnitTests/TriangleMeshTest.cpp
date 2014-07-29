@@ -17,6 +17,7 @@
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -47,7 +48,7 @@ TEST(TriangleMeshTest, NormalTest)
 
 	// Add vertex
 	TriangleMeshBase::VertexType v0(Vector3d(-1.0, -1.0, -1.0));
-	TriangleMeshBase::VertexType v1(Vector3d( 1.0, -1.0, -1.0));
+	TriangleMeshBase::VertexType v1(Vector3d(1.0, -1.0, -1.0));
 	TriangleMeshBase::VertexType v2(Vector3d(-1.0,  1.0, -1.0));
 
 	mesh->addVertex(v0);

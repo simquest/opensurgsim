@@ -27,6 +27,7 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Graphics/MeshUtilities.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/TriangleNormalGenerator.h"
 

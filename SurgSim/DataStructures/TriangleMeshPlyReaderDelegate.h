@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/PlyReaderDelegate.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 

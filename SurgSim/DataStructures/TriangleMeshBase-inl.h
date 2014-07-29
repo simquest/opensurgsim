@@ -16,6 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_INL_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_INL_H
 
+#include <SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h>
+
 namespace SurgSim
 {
 namespace DataStructures
@@ -215,20 +217,7 @@ void TriangleMeshBase<VertexData, EdgeData, TriangleData>::doClear()
 	this->doClearVertices();
 }
 
-template <class M>
-std::shared_ptr<M> loadTriangleMesh<M>(const std::string& fileName)
-{
-	auto triangleMeshDelegate = std::make_shared<TriangleMeshPlyReaderDelegate<M>>();
 
-	PlyReader reader(fileName);
-	if (reader.isValid())
-	{
-		SURGSIM_ASSERT(reader.parseWithDelegate(triangleMeshDelegate)) <<
-				"The input file " << fileName << " does not have the property required by triangle mesh.";
-	}
-
-	return triangleMeshDelegate->getMesh();
-}
 
 };  // namespace DataStructures
 };  // namespace SurgSim
