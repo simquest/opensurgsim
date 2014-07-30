@@ -145,7 +145,7 @@ protected:
 
 	void checkAngularIsCriticallyDamped()
 	{
-		double initialAngle = M_PI/4.0;
+		double initialAngle = M_PI_4;
 		RigidTransform3d initialPose = RigidTransform3d::Identity();
 		initialPose.linear() = Matrix33d(Eigen::AngleAxisd(initialAngle, Vector3d::UnitY()));
 		rigidBody->setLocalPose(initialPose);
@@ -192,20 +192,30 @@ protected:
 TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 {
 	const double mass = rigidBody->getCurrentParameters().getMass();
-	virtualToolCoupler->overrideAngularDamping(mass * 1.0 );
+	virtualToolCoupler->overrideAngularDamping(mass * 1.0);
 	virtualToolCoupler->overrideAngularStiffness(mass * 200);
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
 	virtualToolCoupler->overrideLinearStiffness(mass * 200);
-
-	virtualToolCoupler->initialize(std::make_shared<SurgSim::Framework::Runtime>());
-	virtualToolCoupler->wakeUp();
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.translation() = Vector3d(0.1, 0.0, 0.0);
 	rigidBody->setLocalPose(initialPose);
 	rigidBody->setIsGravityEnabled(false);
 
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
+	virtualToolCoupler->wakeUp();
+
+	EXPECT_FALSE(rigidBody->getCurrentState().getPose().translation().isZero(epsilon));
+
 	EXPECT_TRUE(rigidBody->isActive());
+	runSystem(2);
+	EXPECT_TRUE(rigidBody->isActive());
+
+	EXPECT_FALSE(rigidBody->getCurrentState().getLinearVelocity().isZero(epsilon));
+	EXPECT_TRUE(rigidBody->getCurrentState().getAngularVelocity().isZero(epsilon));
+
 	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
 
@@ -221,20 +231,29 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 {
 	const double mass = rigidBody->getCurrentParameters().getMass();
-	virtualToolCoupler->overrideAngularDamping(mass * 1.0 );
+	virtualToolCoupler->overrideAngularDamping(mass * 1.0);
 	virtualToolCoupler->overrideAngularStiffness(mass * 200);
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
 	virtualToolCoupler->overrideLinearStiffness(mass * 200);
-
-	virtualToolCoupler->initialize(std::make_shared<SurgSim::Framework::Runtime>());
-	virtualToolCoupler->wakeUp();
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.linear() = Matrix33d(Eigen::AngleAxisd(M_PI/4.0, Vector3d::UnitY()));
 	rigidBody->setLocalPose(initialPose);
 	rigidBody->setIsGravityEnabled(false);
 
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
+	virtualToolCoupler->wakeUp();
+
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(rigidBody->getCurrentState().getPose().linear());
+	EXPECT_NEAR(M_PI_4, angleAxis.angle(), epsilon);
+
 	EXPECT_TRUE(rigidBody->isActive());
+	runSystem(2);
+	EXPECT_TRUE(rigidBody->isActive());
+	EXPECT_FALSE(rigidBody->getCurrentState().getAngularVelocity().isZero(epsilon));
+
 	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
 
@@ -243,7 +262,7 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getPose().translation().isZero(epsilon));
 
-	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
+	angleAxis = Eigen::AngleAxisd(state.getPose().linear());
 	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
 }
 
@@ -263,8 +282,12 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 	const double stiffness = 1000;
 	virtualToolCoupler->overrideLinearStiffness(stiffness);
 
-	virtualToolCoupler->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
 	virtualToolCoupler->wakeUp();
+
+	EXPECT_TRUE(rigidBody->getCurrentState().getPose().translation().isApprox(Vector3d::Zero(), epsilon));
 
 	EXPECT_TRUE(rigidBody->isActive());
 	runSystem(2000);
