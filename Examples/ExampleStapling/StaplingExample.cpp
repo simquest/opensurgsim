@@ -193,6 +193,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	inputVTC->setInput(inputComponent);
 	inputVTC->setRepresentation(physicsRepresentation);
 	inputVTC->overrideAttachmentPoint(Vector3d::Zero());
+	inputVTC->setCalculateInertialTorques(true);
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
 	// Also, it is aware of collisions of the stapler.

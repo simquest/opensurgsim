@@ -129,6 +129,18 @@ public:
 	/// \return The attachment point in the Representations local coordinate frame
 	const SurgSim::Math::Vector3d& getAttachmentPoint();
 
+	/// Enable/disable torques that simulate inertia.  This setting only has an effect if the attachment point is not
+	/// the mass center.
+	/// \sa overrideAttachmentPoint
+	/// \param calculateInertialTorques true to simulate inertia.
+	void setCalculateInertialTorques(bool calculateInertialTorques);
+
+	/// Get whether the calculated torques will simulate inertia.  This setting only has an effect if the attachment
+	/// point is not the mass center.
+	/// \sa overrideAttachmentPoint
+	/// \return true if inertia is being simulated.
+	bool getCalculateInertialTorques() const;
+
 protected:
 	virtual bool doInitialize() override;
 	virtual bool doWakeUp() override;
@@ -222,6 +234,10 @@ private:
 
 	/// The input's point of attachment in the local frame, i.e., the same frame in which the mass center is defined.
 	SurgSim::Math::Vector3d m_localAttachmentPoint;
+
+	/// Whether or not the calculated torques will simulate inertia.  This setting only has an effect if the device
+	/// input point is not the mass center.
+	bool m_calculateInertialTorques;
 };
 
 }; // Physics

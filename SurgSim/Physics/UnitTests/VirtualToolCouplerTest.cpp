@@ -228,6 +228,49 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
 }
 
+TEST_F(VirtualToolCouplerTest, LinearDisplacementWithInertialTorques)
+{
+	const double mass = rigidBody->getCurrentParameters().getMass();
+	virtualToolCoupler->overrideAngularDamping(mass * 2);
+	virtualToolCoupler->overrideAngularStiffness(mass * 20);
+	virtualToolCoupler->overrideLinearDamping(mass * 5);
+	virtualToolCoupler->overrideLinearStiffness(mass * 20);
+
+	const Vector3d attachmentPoint = Vector3d::UnitY();
+	virtualToolCoupler->overrideAttachmentPoint(attachmentPoint);
+	virtualToolCoupler->setCalculateInertialTorques(true);
+
+	RigidTransform3d expectedFinalPose = RigidTransform3d::Identity();
+	expectedFinalPose.translation() = -attachmentPoint;
+	RigidTransform3d initialPose = RigidTransform3d::Identity();
+	initialPose.translation() = Vector3d(0.01, 0.0, 0.0) + expectedFinalPose.translation();
+	rigidBody->setLocalPose(initialPose);
+	rigidBody->setIsGravityEnabled(false);
+
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
+	virtualToolCoupler->wakeUp();
+
+	RigidRepresentationState state = rigidBody->getCurrentState();
+	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
+	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
+
+	EXPECT_TRUE(rigidBody->isActive());
+	runSystem(2);
+	EXPECT_TRUE(rigidBody->isActive());
+	EXPECT_FALSE(rigidBody->getCurrentState().getAngularVelocity().isZero(epsilon));
+
+	runSystem(6000);
+	EXPECT_TRUE(rigidBody->isActive());
+
+	state = rigidBody->getCurrentState();
+	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
+	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
+	EXPECT_TRUE(state.getPose().isApprox(expectedFinalPose, epsilon));
+}
+
 TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 {
 	const double mass = rigidBody->getCurrentParameters().getMass();
@@ -458,6 +501,7 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	virtualToolCoupler->setOptionalAngularStiffness(optionalNum);
 	virtualToolCoupler->setOptionalAngularDamping(optionalNum);
 	virtualToolCoupler->setOptionalAttachmentPoint(optionalVec);
+	virtualToolCoupler->setCalculateInertialTorques(true);
 
 	// Encode
 	YAML::Node node;
@@ -477,6 +521,7 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	EXPECT_EQ(num, newVirtualToolCoupler->getAngularStiffness());
 	EXPECT_EQ(num, newVirtualToolCoupler->getAngularDamping());
 	EXPECT_TRUE(vec.isApprox(newVirtualToolCoupler->getAttachmentPoint()));
+	EXPECT_TRUE(newVirtualToolCoupler->getCalculateInertialTorques());
 
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getInput());
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getRepresentation());

@@ -50,7 +50,8 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_angularStiffness(std::numeric_limits<double>::quiet_NaN()),
 	m_angularDamping(std::numeric_limits<double>::quiet_NaN()),
 	m_localAttachmentPoint(Vector3d(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
-		std::numeric_limits<double>::quiet_NaN()))
+		std::numeric_limits<double>::quiet_NaN())),
+	m_calculateInertialTorques(false)
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addVector(SurgSim::DataStructures::Names::FORCE);
@@ -73,6 +74,8 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler,
 			SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>, AttachmentPoint,
 			getOptionalAttachmentPoint, setOptionalAttachmentPoint);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, bool, CalculateInertialTorques,
+		getCalculateInertialTorques, setCalculateInertialTorques);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 		Input, getInput, setInput);
@@ -143,9 +146,13 @@ void VirtualToolCoupler::update(double dt)
 
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
-		Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
 		Vector3d attachmentPoint = objectPose * m_localAttachmentPoint;
-		Vector3d leverArm = attachmentPoint - objectPosition;
+		Vector3d leverArm = Vector3d::Zero();
+		if (m_calculateInertialTorques)
+		{
+			const Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
+			leverArm = attachmentPoint - objectPosition;
+		}
 		Vector3d attachmentPointVelocity = objectState.getLinearVelocity();
 		attachmentPointVelocity += objectState.getAngularVelocity().cross(leverArm);
 
@@ -424,6 +431,15 @@ VirtualToolCoupler::getOptionalAttachmentPoint() const
 	return m_optionalAttachmentPoint;
 }
 
+void VirtualToolCoupler::setCalculateInertialTorques(bool calculateInertialTorques)
+{
+	m_calculateInertialTorques = calculateInertialTorques;
+}
+
+bool VirtualToolCoupler::getCalculateInertialTorques() const
+{
+	return m_calculateInertialTorques;
+}
 
 }; /// Physics
 }; /// SurgSim
