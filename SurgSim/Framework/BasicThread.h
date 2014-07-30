@@ -72,12 +72,20 @@ public:
 	/// 	  by going back to asynchronous mode and then calling stop
 	void stop();
 
+	/// Set/Unset the thread in an idle state (doUpdate() called or not in the update() method)
+	/// \param isIdle True to set the thread in an idle state, false otherwise
+	void setIdle(bool isIdle);
+
+	/// Query if this thread is in idle state or not
+	/// \return	true if the thread is in idle state, false otherwise.
+	bool isIdle();
+
 	/// Query if this object is initialized.
 	/// \return	true if initialized, false if not.
 	bool isInitialized();
 
 	/// Query if this object is running.
-	/// \return	true if the threads update() function is being called.
+	/// \return	true if the threads update() function is being called
 	bool isRunning() const;
 
 	/// This is what boost::thread executes on thread creation.
@@ -135,6 +143,7 @@ private:
 	boost::chrono::duration<double> m_period;
 	std::shared_ptr<Barrier> m_startupBarrier;
 
+	bool m_isIdle;
 	bool m_isInitialized;
 	bool m_isRunning;
 	bool m_stopExecution;
