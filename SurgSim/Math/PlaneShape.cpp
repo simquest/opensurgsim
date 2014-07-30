@@ -55,5 +55,10 @@ SurgSim::Math::Vector3d PlaneShape::getNormal() const
 	return Vector3d(0.0, 1.0, 0.0);
 }
 
+bool PlaneShape::isValid() const
+{
+	return true;
+}
+
 }; // namespace Math
 }; // namespace SurgSim

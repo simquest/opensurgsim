@@ -59,6 +59,10 @@ public:
 	/// Gets the normal of the plane equation.
 	/// \return	The value of the normal (always Y axis).
 	Vector3d getNormal() const;
+
+	/// A DoubleSidedPlaneShape is always valid.
+	/// \return True.
+	virtual bool isValid() const override;
 };
 
 }; // Math

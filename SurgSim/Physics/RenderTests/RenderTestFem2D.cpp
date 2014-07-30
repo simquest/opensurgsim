@@ -17,11 +17,13 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -29,7 +31,8 @@
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
+using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
+using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -171,24 +174,25 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 	femSceneElement->addComponent(graphicsTriangleMeshRepresentation);
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
-	femSceneElement->addComponent(
-		std::make_shared<SurgSim::Blocks::TransferOdeStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
-			"physics to triangle mesh",
-			physicsRepresentation->getFinalState(),
-			graphicsTriangleMeshRepresentation->getMesh()));
+	auto physicsToMesh =
+		std::make_shared<SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior>("physics to triangle mesh");
+	physicsToMesh->setSource(physicsRepresentation);
+	physicsToMesh->setTarget(graphicsTriangleMeshRepresentation);
+	femSceneElement->addComponent(physicsToMesh);
 
-	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsPointCloudRepresentation
-			= std::make_shared<OsgPointCloudRepresentation<void>>("PointCloud Representation");
+	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation> graphicsPointCloudRepresentation
+			= std::make_shared<OsgPointCloudRepresentation>("PointCloud Representation");
 	graphicsPointCloudRepresentation->setLocalPose(gfxPose);
 	graphicsPointCloudRepresentation->setColor(color);
 	graphicsPointCloudRepresentation->setPointSize(3.0f);
 	graphicsPointCloudRepresentation->setVisible(true);
 	femSceneElement->addComponent(graphicsPointCloudRepresentation);
 
-	femSceneElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>(
-		"Transfer from Physics to Graphics point cloud",
-		physicsRepresentation->getFinalState(),
-		graphicsPointCloudRepresentation->getVertices()));
+	auto physicsToPointCloud =
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Transfer from Physics to Graphics point cloud");
+	physicsToPointCloud->setSource(physicsRepresentation);
+	physicsToPointCloud->setTarget(graphicsPointCloudRepresentation);
+	femSceneElement->addComponent(physicsToPointCloud);
 
 	return femSceneElement;
 }

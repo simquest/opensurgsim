@@ -15,16 +15,17 @@
 
 #include "SurgSim/Framework/Asset.h"
 
+#include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
 
 namespace SurgSim
 {
 namespace Framework
 {
 
-Asset::Asset() : m_didInit(false), m_isInitialized(false), m_fileName()
+Asset::Asset() : m_fileName()
 {
 }
 
@@ -32,9 +33,20 @@ Asset::~Asset()
 {
 }
 
-void Asset::setFileName(const std::string& fileName)
+void Asset::load(const std::string& fileName, const SurgSim::Framework::ApplicationData& data)
 {
 	m_fileName = fileName;
+	SURGSIM_ASSERT(!m_fileName.empty()) << "File name is empty";
+
+	std::string path = data.findFile(m_fileName);
+
+	SURGSIM_ASSERT(!path.empty()) << "Can not locate file " << m_fileName;
+	SURGSIM_ASSERT(doLoad(path)) << "Failed to load file " << m_fileName;
+}
+
+void Asset::load(const std::string& fileName)
+{
+	load(fileName, *SurgSim::Framework::Runtime::getApplicationData());
 }
 
 std::string Asset::getFileName() const
@@ -42,30 +54,20 @@ std::string Asset::getFileName() const
 	return m_fileName;
 }
 
-bool Asset::initialize(const ApplicationData& data)
+void Asset::serializeFileName(SurgSim::Framework::Accessible* accesible)
 {
-	SURGSIM_ASSERT(!m_didInit) << "Initialization has been called before";
-	m_didInit = true;
+	// Special treatment to let std::bind() deal with overloaded function.
+	auto resolvedOverloadFunction = static_cast<void(Asset::*)(const std::string&)>(&Asset::load);
 
-	bool result = false;
-	std::string path = data.findFile(m_fileName);
+	accesible->setAccessors("FileName",
+			   std::bind(&Asset::getFileName, this),
+			   std::bind(resolvedOverloadFunction, this,
+						 std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1)));
 
-	if (path.empty())
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << "Can not locate file " << m_fileName;
-	}
-	else
-	{
-		m_isInitialized = doInitialize(path);
-		result = m_isInitialized;
-	}
-
-	return result;
-}
-
-bool Asset::isInitialized() const
-{
-	return m_isInitialized;
+	accesible->setSerializable("FileName",
+			   std::bind(&YAML::convert<std::string>::encode, std::bind(&Asset::getFileName, this)),
+			   std::bind(resolvedOverloadFunction, this,
+						 std::bind(&YAML::Node::as<std::string>, std::placeholders::_1)));
 }
 
 }; // Framework

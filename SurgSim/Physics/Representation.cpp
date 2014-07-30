@@ -15,6 +15,8 @@
 
 #include "SurgSim/Collision/Location.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
 
@@ -125,6 +127,18 @@ std::shared_ptr<SurgSim::Collision::Representation> Representation::getCollision
 void Representation::setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> val)
 {
 	m_collisionRepresentation = val;
+}
+
+void Representation::driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	if (isDrivingSceneElementPose())
+	{
+		std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement = getSceneElement();
+		if (sceneElement != nullptr)
+		{
+			sceneElement->setPose(pose);
+		}
+	}
 }
 
 }; // namespace Physics

@@ -18,9 +18,9 @@
 
 #include <string>
 #include <functional>
-#include <vector>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 namespace SurgSim
 {
@@ -85,7 +85,6 @@ class PlyReaderDelegate;
 class PlyReader
 {
 public:
-
 	/// Values that represent the data type/size of requested data.
 	enum Type
 	{
@@ -114,7 +113,6 @@ public:
 	/// Constructor.
 	/// \param	filename	Filename of the .ply file.
 	explicit PlyReader(std::string filename);
-
 
 	/// Destructor.
 	virtual ~PlyReader();
@@ -166,9 +164,9 @@ public:
 	///
 	/// \return true if it succeeds, false if it fails.
 	bool requestListProperty(std::string elementName,
-						 std::string propertyName,
-						 int dataType, int dataOffset,
-						 int countType, int countOffset);
+							 std::string propertyName,
+							 int dataType, int dataOffset,
+							 int countType, int countOffset);
 
 	/// Query if this elementName is in the .ply file
 	/// \param elementName Name of the element.
@@ -187,6 +185,17 @@ public:
 	/// \return true if the element exists and has the property and it is a scalar value.
 	bool isScalar(std::string elementName, std::string propertyName) const;
 
+	/// Sets a delegate for parsing and then parse the file.
+	/// \param delegate The delegate.
+	/// \return true if set and parse are successful; otherwise false.
+	bool parseWithDelegate(std::shared_ptr<PlyReaderDelegate> delegate);
+
+	/// Register callback to be called at the begining of parseFile.
+	void setStartParseFileCallback(std::function<void (void)> startParseFileCallback);
+
+	/// Register callback to be called at the end of parseFile.
+	void setEndParseFileCallback(std::function<void (void)> endParseFileCallback);
+
 	/// Sets a delegate for parsing.
 	/// \param delegate The delegate.
 	/// \return true if it succeeds and the properties in the ply file satisfy the delegates fileIsAcceptable().
@@ -195,13 +204,8 @@ public:
 	/// Parse the file.
 	void parseFile();
 
-	/// Register callback to be called at the begining of parseFile.
-	void setStartParseFileCallback(std::function<void (void)> startParseFileCallback);
-
-	/// Register callback to be called at the end of parseFile.
-	void setEndParseFileCallback(std::function<void (void)> endParseFileCallback);
-
 private:
+	friend class PlyReaderTests;
 
 	/// Generic Internal function to handle list and scalar properties, see requestScalarProperty() and
 	/// requestListProperty() for full documentation.
@@ -214,9 +218,9 @@ private:
 	///
 	/// \return true if it succeeds, false if it fails.
 	bool requestProperty(std::string elementName,
-		std::string propertyName,
-		int dataType, int dataOffset,
-		int countType, int countOffset);
+						 std::string propertyName,
+						 int dataType, int dataOffset,
+						 int countType, int countOffset);
 
 	/// The name of the .ply file
 	std::string m_filename;
@@ -259,9 +263,7 @@ private:
 	std::function<void(void)> m_endParseFileCallback;
 };
 
+} // DataStructures
+} // SurgSim
 
-
-}
-}
-
-#endif
+#endif // SURGSIM_DATASTRUCTURES_PLYREADER_H

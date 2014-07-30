@@ -23,14 +23,14 @@
 using SurgSim::Math::Vector3d;
 
 namespace {
-	std::string findFile(std::string filename)
-	{
-		std::vector<std::string> paths;
-		paths.push_back("Data/PlyReaderTests");
-		SurgSim::Framework::ApplicationData data(paths);
+std::string findFile(std::string filename)
+{
+	std::vector<std::string> paths;
+	paths.push_back("Data/PlyReaderTests");
+	SurgSim::Framework::ApplicationData data(paths);
 
-		return data.findFile(filename);
-	}
+	return data.findFile(filename);
+}
 }
 
 namespace SurgSim
@@ -38,7 +38,11 @@ namespace SurgSim
 namespace DataStructures
 {
 
-TEST(PlyReaderTests, InitTest)
+class PlyReaderTests : public ::testing::Test
+{
+};
+
+TEST_F(PlyReaderTests, InitTest)
 {
 	ASSERT_NO_THROW(PlyReader("xxx"));
 	ASSERT_NO_THROW(PlyReader(findFile("Cube.ply")));
@@ -50,7 +54,7 @@ TEST(PlyReaderTests, InitTest)
 	EXPECT_FALSE(reader2.isValid());
 }
 
-TEST(PlyReaderTests, FindElementsAndProperties)
+TEST_F(PlyReaderTests, FindElementsAndProperties)
 {
 	PlyReader reader(findFile("Cube.ply"));
 
@@ -65,7 +69,7 @@ TEST(PlyReaderTests, FindElementsAndProperties)
 	EXPECT_FALSE(reader.hasProperty("vertex", "vertex_indices"));
 }
 
-TEST(PlyReaderTests, IsScalar)
+TEST_F(PlyReaderTests, IsScalar)
 {
 	PlyReader reader(findFile("Testdata.ply"));
 
@@ -155,7 +159,7 @@ public:
 
 };
 
-TEST(PlyReaderTests, ScalarReadTest)
+TEST_F(PlyReaderTests, ScalarReadTest)
 {
 	TestData testData;
 	PlyReader reader(findFile("Testdata.ply"));
@@ -197,7 +201,7 @@ TEST(PlyReaderTests, ScalarReadTest)
 }
 
 
-TEST(PlyReaderTests, ListReadTest)
+TEST_F(PlyReaderTests, ListReadTest)
 {
 	TestData testData;
 	PlyReader reader(findFile("Testdata.ply"));
@@ -225,7 +229,7 @@ TEST(PlyReaderTests, ListReadTest)
 	for (size_t i = 0; i < testData.faces.size(); ++i)
 	{
 		std::vector<unsigned int> face = testData.faces[i];
-		EXPECT_EQ(i+1, face.size());
+		EXPECT_EQ(i + 1, face.size());
 		EXPECT_EQ(-static_cast<int>(i), testData.extras[i]);
 
 		for (size_t j = 0; j < face.size(); ++j)
@@ -236,13 +240,13 @@ TEST(PlyReaderTests, ListReadTest)
 	}
 }
 
-TEST(PlyReaderTests, TriangleMeshDelegateTest)
+TEST_F(PlyReaderTests, TriangleMeshDelegateTest)
 {
 	PlyReader reader(findFile("Cube.ply"));
 	auto delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
 
-	EXPECT_TRUE(reader.setDelegate(delegate));
-	EXPECT_NO_THROW(reader.parseFile());
+	// parseWithDeletegate() will first call setDelegate(), then parseFile() if previous step successed.
+	EXPECT_NO_THROW(EXPECT_TRUE(reader.parseWithDelegate(delegate)));
 
 	auto mesh = delegate->getMesh();
 	EXPECT_EQ(26u, mesh->getNumVertices());
@@ -262,7 +266,5 @@ TEST(PlyReaderTests, TriangleMeshDelegateTest)
 	EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);
 }
 
-
-}
-}
-
+} // DataStructures
+} // SurgSim

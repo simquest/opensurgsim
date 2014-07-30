@@ -89,11 +89,14 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	shader->setFragmentShaderSource(fragmentShaderSource);
 	shader->setVertexShaderSource(vertexShaderSource);
 
-	auto material1 = std::make_shared<OsgMaterial>();
-	auto material2 = std::make_shared<OsgMaterial>();
+	auto material1 = std::make_shared<OsgMaterial>("material1");
+	auto material2 = std::make_shared<OsgMaterial>("material2");
 
 	material1->setShader(shader);
 	material2->setShader(shader);
+
+	viewElement->addComponent(material1);
+	viewElement->addComponent(material2);
 
 	renderPass->setMaterial(material2);
 
@@ -133,7 +136,7 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	viewElement->addComponent(quad);
 
 	Quaterniond quat = Quaterniond::Identity();
-	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat,Vector3d(0.0, 0.0, -0.2));
+	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0, 0.0, -0.2));
 	quat = SurgSim::Math::makeRotationQuaternion(M_PI, Vector3d::UnitY().eval());
 	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0, 0.0, -0.2));
 

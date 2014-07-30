@@ -17,9 +17,10 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -27,7 +28,7 @@
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
+using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -93,8 +94,8 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 
-	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsRepresentation
-			= std::make_shared<OsgPointCloudRepresentation<void>>("Graphics Representation: " + name);
+	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation> graphicsRepresentation
+			= std::make_shared<OsgPointCloudRepresentation>("Graphics Representation: " + name);
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
@@ -102,10 +103,11 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 
 	femSceneElement->addComponent(graphicsRepresentation);
 
-	femSceneElement->addComponent(
-		std::make_shared<TransferOdeStateToVerticesBehavior<void>>("Transfer from Physics to Graphics: " + name,
-				physicsRepresentation->getFinalState(),
-				graphicsRepresentation->getVertices()));
+	auto physicsToGraphics =
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Transfer from Physics to Graphics");
+	physicsToGraphics->setSource(physicsRepresentation);
+	physicsToGraphics->setTarget(graphicsRepresentation);
+	femSceneElement->addComponent(physicsToGraphics);
 
 	return femSceneElement;
 }

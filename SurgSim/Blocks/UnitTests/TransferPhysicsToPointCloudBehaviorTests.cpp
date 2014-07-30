@@ -14,53 +14,62 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the TransferPhysicsToGraphicsMeshBehavior class.
+/// Tests for the TransferPhysicsToGraphicsBehavior class.
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Graphics/Mesh.h"
-#include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
-using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
+using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
-using SurgSim::Graphics::OsgMeshRepresentation;
+using SurgSim::Graphics::OsgBoxRepresentation;
+using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem3DRepresentation;
+using SurgSim::Physics::RigidRepresentation;
 
-TEST(TransferPhysicsToGraphicsMeshBehaviorTests, ConstructorTest)
+TEST(TransferPhysicsToPointCloudBehaviorTests, ConstructorTest)
 {
-	ASSERT_NO_THROW(TransferPhysicsToGraphicsMeshBehavior("TestBehavior"));
+	ASSERT_NO_THROW(TransferPhysicsToPointCloudBehavior("TestBehavior"));
 }
 
-TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetSourceTest)
+TEST(TransferPhysicsToPointCloudBehaviorTests, SetGetSourceTest)
 {
 	auto physics = std::make_shared<Fem3DRepresentation>("PhysicsDeformable");
-	auto behavior = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Behavior");
+	auto rigid = std::make_shared<RigidRepresentation>("PhysicsRigid");
+	auto behavior = std::make_shared<TransferPhysicsToPointCloudBehavior>("Behavior");
 
+	EXPECT_THROW(behavior->setSource(nullptr), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(behavior->setSource(rigid), SurgSim::Framework::AssertionFailure);
 	EXPECT_NO_THROW(behavior->setSource(physics));
 	EXPECT_EQ(physics, behavior->getSource());
 }
 
-TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetTargetTest)
+TEST(TransferPhysicsToPointCloudBehaviorTests, SetGetTargetTest)
 {
-	auto graphics = std::make_shared<OsgMeshRepresentation>("OsgMesh");
-	auto behavior = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Behavior");
+	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("OsgMesh");
+	auto graphicsBox = std::make_shared<OsgBoxRepresentation>("OsgBox");
+	auto behavior = std::make_shared<TransferPhysicsToPointCloudBehavior>("Behavior");
 
-	EXPECT_NO_THROW(behavior->setTarget(graphics));
-	EXPECT_EQ(graphics, behavior->getTarget());
+	EXPECT_THROW(behavior->setTarget(nullptr), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(behavior->setTarget(graphicsBox), SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(behavior->setTarget(pointCloud));
+	EXPECT_EQ(pointCloud, behavior->getTarget());
 }
 
-TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
+TEST(TransferPhysicsToPointCloudBehaviorTests, UpdateTest)
 {
 	auto runtime = std::make_shared<Runtime>("config.txt");
 	auto behaviorManager = std::make_shared<BehaviorManager>();
@@ -72,14 +81,14 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
 	auto physics = std::make_shared<Fem3DRepresentation>("Fem3D");
 	physics->setFilename("Geometry/wound_deformable.ply");
 
-	auto graphics = std::make_shared<OsgMeshRepresentation>("GraphicsMesh");
-	auto behavior = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Behavior");
+	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
+	auto behavior = std::make_shared<TransferPhysicsToPointCloudBehavior>("Behavior");
 	behavior->setSource(physics);
-	behavior->setTarget(graphics);
+	behavior->setTarget(pointCloud);
 
 	sceneElement->addComponent(behavior);
 	sceneElement->addComponent(physics);
-	sceneElement->addComponent(graphics);
+	sceneElement->addComponent(pointCloud);
 	scene->addSceneElement(sceneElement);
 
 	// Test doInitialize(), doWakeUP()
@@ -88,7 +97,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
 
 	auto finalState = physics->getFinalState();
 	auto numNodes = finalState->getNumNodes();
-	auto target = graphics->getMesh();
+	auto target = pointCloud->getVertices();
 	ASSERT_NE(0, target->getNumVertices());
 	ASSERT_NE(0, numNodes);
 	ASSERT_EQ(numNodes, target->getNumVertices());
@@ -98,7 +107,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
 		EXPECT_TRUE(finalState->getPosition(nodeId).isApprox(target->getVertex(nodeId).position));
 	}
 
-	// Test TransferPhysicsToGraphicsMeshBehavior::update()
+	// Test TransferPhysicsToGraphicsBehavior::update()
 	finalState->reset();
 	behavior->update(1.0);
 
@@ -110,7 +119,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
 	runtime->stop();
 }
 
-TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SerializationTest)
+TEST(TransferPhysicsToPointCloudBehaviorTests, SerializationTest)
 {
 	std::string filename = std::string("Data/Geometry/wound_deformable.ply");
 
@@ -118,25 +127,25 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SerializationTest)
 	auto fem3d = std::dynamic_pointer_cast<Fem3DRepresentation>(physics);
 	fem3d->setFilename(filename);
 
-	std::shared_ptr<SurgSim::Framework::Component> graphics =
-		std::make_shared<OsgMeshRepresentation>("GraphicsMesh");
-	auto behavior = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Behavior");
+	std::shared_ptr<SurgSim::Framework::Component> pointCloud =
+		std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
+	auto behavior = std::make_shared<TransferPhysicsToPointCloudBehavior>("Behavior");
 
 	EXPECT_NO_THROW(behavior->setValue("Source", physics));
-	EXPECT_NO_THROW(behavior->setValue("Target", graphics));
+	EXPECT_NO_THROW(behavior->setValue("Target", pointCloud));
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*behavior));
 	EXPECT_EQ(1u, node.size());
 
-	YAML::Node data = node["SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior"];
+	YAML::Node data = node["SurgSim::Blocks::TransferPhysicsToPointCloudBehavior"];
 	EXPECT_EQ(4u, data.size());
 
-	std::shared_ptr<TransferPhysicsToGraphicsMeshBehavior> newBehavior;
-	ASSERT_NO_THROW(newBehavior = std::dynamic_pointer_cast<TransferPhysicsToGraphicsMeshBehavior>(
+	std::shared_ptr<TransferPhysicsToPointCloudBehavior> newBehavior;
+	ASSERT_NO_THROW(newBehavior = std::dynamic_pointer_cast<TransferPhysicsToPointCloudBehavior>(
 									node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
-	EXPECT_EQ("SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior", newBehavior->getClassName());
-	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<SurgSim::Framework::Component>>("Source"));
-	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<SurgSim::Framework::Component>>("Target"));
+	EXPECT_EQ("SurgSim::Blocks::TransferPhysicsToPointCloudBehavior", newBehavior->getClassName());
+	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<SurgSim::Physics::DeformableRepresentation>>("Source"));
+	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation>>("Target"));
 }

@@ -27,7 +27,7 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::MeshShape, MeshShape);
 
 MeshShape::MeshShape() : m_volume(0.0)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshShape, std::string, FileName, getFileName, setFileName);
+	serializeFileName(this);
 }
 
 int MeshShape::getType()
@@ -40,7 +40,7 @@ bool MeshShape::isValid() const
 	return (nullptr != m_mesh) && (m_mesh->isValid());
 }
 
-bool MeshShape::doInitialize(const std::string& fileName)
+bool MeshShape::doLoad(const std::string& fileName)
 {
 	using SurgSim::DataStructures::TriangleMesh;
 

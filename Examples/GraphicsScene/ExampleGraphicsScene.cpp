@@ -54,7 +54,6 @@ using SurgSim::Framework::Logger;
 using SurgSim::Graphics::OsgTextureUniform;
 using SurgSim::Graphics::OsgTexture2d;
 using SurgSim::Graphics::OsgUniform;
-using SurgSim::Graphics::createMaterialWithShaders;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -112,6 +111,23 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->addComponent(interpolator);
 
 	return viewElement;
+}
+
+std::shared_ptr<SurgSim::Graphics::OsgMaterial> createMaterialWithShaders(
+	const SurgSim::Framework::ApplicationData& data,
+	const std::string& name)
+{
+
+	auto shader = SurgSim::Graphics::loadShader(data, name);
+
+	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material;
+	if (shader != nullptr)
+	{
+		material = std::make_shared<SurgSim::Graphics::OsgMaterial>(name);
+		material->setShader(shader);
+	}
+
+	return material;
 }
 
 std::shared_ptr<SurgSim::Framework::SceneElement> createLight()
@@ -179,43 +195,33 @@ void configureShinyMaterial()
 	// This will change the shared material
 	auto material = materials["shiny"];
 
-	std::shared_ptr<SurgSim::Graphics::UniformBase>
-	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
-	material->addUniform(uniform);
+	material->addUniform("vec4", "diffuseColor");
 	material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.1, 1.0));
 
-	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("specularColor");
-	material->addUniform(uniform);
+	material->addUniform("vec4", "specularColor");
 	material->setValue("specularColor", SurgSim::Math::Vector4f(0.9, 0.9, 0.1, 1.0));
 
-	uniform = std::make_shared<OsgUniform<float>>("shininess");
-	material->addUniform(uniform);
+	material->addUniform("float", "shininess");
 	material->setValue("shininess", 32.0f);
 }
 
 void configureTexturedMaterial(const std::string& filename)
 {
 	auto material = materials["texturedShadowed"];
-	std::shared_ptr<SurgSim::Graphics::UniformBase>
-	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
-	material->addUniform(uniform);
+	material->addUniform("vec4", "diffuseColor");
 	material->setValue("diffuseColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
 
-	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("specularColor");
-	material->addUniform(uniform);
+	material->addUniform("vec4", "specularColor");
 	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
 
-	uniform = std::make_shared<OsgUniform<float>>("shininess");
-	material->addUniform(uniform);
+	material->addUniform("float", "shininess");
 	material->setValue("shininess", 32.0f);
 
 	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
 	texture->loadImage(filename);
-	auto diffuseMapUniform =
-		std::make_shared<OsgTextureUniform<OsgTexture2d>>("diffuseMap");
-	diffuseMapUniform->set(texture);
-	material->addUniform(diffuseMapUniform);
 
+	material->addUniform("sampler2D", "diffuseMap");
+	material->setValue("diffuseMap", texture);
 }
 
 /// A simple box as a scenelement
@@ -360,6 +366,9 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	auto copier =  std::make_shared<SurgSim::Framework::TransferPropertiesBehavior>("Copier");
 	copier->setTargetManagerType(SurgSim::Framework::MANAGER_TYPE_GRAPHICS);
 	viewElement->addComponent(copier);
+	viewElement->addComponent(materials["shiny"]);
+	viewElement->addComponent(materials["texturedShadowed"]);
+
 
 	auto lightElement = createLight();
 	scene->addSceneElement(lightElement);
@@ -372,19 +381,16 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	copier->connect(lightElement->getPoseComponent(), "Pose", lightMapPass->getPoseComponent(), "Pose");
 
 	auto shadowMapPass = createShadowMapPass();
-	scene->addSceneElement(shadowMapPass);
 
 	// The following three uniforms in the shadowMapPass, carry the information from the
 	// lightMapPass. They are used to project the incoming point into the space of the lightMap
 	// The view matrix of the camera used to render the light map
-	auto lightViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("lightViewMatrix");
-	shadowMapPass->getMaterial()->addUniform(lightViewMatrix);
+	shadowMapPass->getMaterial()->addUniform("mat4", "lightViewMatrix");
 	copier->connect(lightMapPass->getCamera(), "FloatViewMatrix",
 					shadowMapPass->getMaterial(), "lightViewMatrix");
 
 	// The projection matrix of the camera used to render the light map
-	auto lightProjectionMatrix = std::make_shared<OsgUniform<Matrix44f>>("lightProjectionMatrix");
-	shadowMapPass->getMaterial()->addUniform(lightProjectionMatrix);
+	shadowMapPass->getMaterial()->addUniform("mat4", "lightProjectionMatrix");
 	copier->connect(lightMapPass->getCamera(), "FloatProjectionMatrix",
 					shadowMapPass->getMaterial(), "lightProjectionMatrix");
 
@@ -400,26 +406,28 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	// Get the result of the lightMapPass and pass it on to the shadowMapPass, because it is used
 	// in a pass we ask the system to use a higher than normal texture unit (in this case 8) for
 	// this texture, this prevents the texture from being overwritten by other textures
-	auto lightDepthTexture =
-		std::make_shared<OsgTextureUniform<OsgTexture2d>>("encodedLightDepthMap");
-	lightDepthTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(lightMapPass->getRenderTarget()->getColorTarget(0)));
-	lightDepthTexture->setMinimumTextureUnit(8);
-	shadowMapPass->getMaterial()->addUniform(lightDepthTexture);
+	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material;
+	material = std::dynamic_pointer_cast<SurgSim::Graphics::OsgMaterial>(shadowMapPass->getMaterial());
+
+	material->addUniform("sampler2D", "encodedLightDepthMap");
+	material->setValue("encodedLightDepthMap", lightMapPass->getRenderTarget()->getColorTarget(0));
+	material->getUniform("encodedLightDepthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
 
 	// Make the camera in the shadowMapPass follow the main camera that is being used to render the
 	// whole scene
 	copier->connect(viewElement->getPoseComponent(), "Pose", shadowMapPass->getPoseComponent(), "Pose");
 	copier->connect(mainCamera, "ProjectionMatrix", shadowMapPass->getCamera() , "ProjectionMatrix");
+	scene->addSceneElement(shadowMapPass);
 
 
 	// Put the result of the last pass into the main camera to make it accessible
-	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
-	auto shadowMapTexture =
-		std::make_shared<OsgTextureUniform<OsgTexture2d>>("shadowMap");
-	shadowMapTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(shadowMapPass->getRenderTarget()->getColorTarget(0)));
-	shadowMapTexture->setMinimumTextureUnit(8);
-	material->addUniform(shadowMapTexture);
+	material = std::make_shared<SurgSim::Graphics::OsgMaterial>("material");
+
+	material->addUniform("sampler2D", "shadowMap");
+	material->setValue("shadowMap", shadowMapPass->getRenderTarget()->getColorTarget(0));
+	material->getUniform("shadowMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
 	mainCamera->setMaterial(material);
+	viewElement->addComponent(material);
 
 	auto debug = std::make_shared<SurgSim::Framework::BasicSceneElement>("debug");
 	debug->addComponent(makeDebugQuad("light",
