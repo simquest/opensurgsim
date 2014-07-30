@@ -31,7 +31,7 @@ namespace Framework
 BasicThread::BasicThread(const std::string& name) :
 	m_name(name),
 	m_period(1.0 / 30),
-	m_isCallingUpdate(true),
+	m_isPaused(false),
 	m_isInitialized(false),
 	m_isRunning(false),
 	m_stopExecution(false),
@@ -63,7 +63,7 @@ bool BasicThread::isInitialized()
 
 bool BasicThread::isRunning() const
 {
-	return m_isRunning;
+	return m_isRunning && !m_isPaused;
 }
 
 bool BasicThread::initialize()
@@ -119,7 +119,7 @@ void BasicThread::operator()()
 				boost::this_thread::sleep_until(Clock::now() + sleepTime);
 			}
 			start = Clock::now();
-			if (m_isCallingUpdate)
+			if (!m_isPaused)
 			{
 				m_isRunning = doUpdate(m_period.count());
 			}
@@ -132,7 +132,7 @@ void BasicThread::operator()()
 			// all the threads that are waiting to indefinitely wait as there is one less thread on the barrier
 			// #threadsafety
 			bool success = waitForBarrier(true);
-			if (success && m_isCallingUpdate)
+			if (success && !m_isPaused)
 			{
 				m_isRunning = doUpdate(m_period.count());
 			}
@@ -173,19 +173,19 @@ void BasicThread::stop()
 	}
 }
 
-void BasicThread::pauseUpdateCall()
+void BasicThread::pause()
 {
-	m_isCallingUpdate = false;
+	m_isPaused = true;
 }
 
-void BasicThread::resumeUpdateCall()
+void BasicThread::resume()
 {
-	m_isCallingUpdate = true;
+	m_isPaused = false;
 }
 
-bool BasicThread::isCallingUpdate()
+bool BasicThread::isPaused()
 {
-	return m_isCallingUpdate;
+	return m_isPaused;
 }
 
 std::string BasicThread::getName() const

@@ -162,7 +162,7 @@ TEST(BasicThreadTest, PauseResumeUpdateTest)
 	EXPECT_FALSE(m.didStartUp);
 	EXPECT_FALSE(m.isRunning());
 	EXPECT_FALSE(m.isSynchronous());
-	EXPECT_TRUE(m.isCallingUpdate());
+	EXPECT_FALSE(m.isPaused());
 
 	m.start(barrier, true);
 
@@ -173,7 +173,7 @@ TEST(BasicThreadTest, PauseResumeUpdateTest)
 
 	EXPECT_TRUE(m.isRunning());
 	EXPECT_TRUE(m.isSynchronous());
-	EXPECT_TRUE(m.isCallingUpdate());
+	EXPECT_FALSE(m.isPaused());
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -183,9 +183,10 @@ TEST(BasicThreadTest, PauseResumeUpdateTest)
 		barrier->wait(true);
 	}
 
-	m.pauseUpdateCall();
+	m.pause();
 
-	EXPECT_FALSE(m.isCallingUpdate());
+	EXPECT_TRUE(m.isPaused());
+	EXPECT_FALSE(m.isRunning());
 
 	barrier->wait(true);
 	previousCount = m.count;
@@ -198,7 +199,10 @@ TEST(BasicThreadTest, PauseResumeUpdateTest)
 		barrier->wait(true);
 	}
 
-	m.resumeUpdateCall();
+	m.resume();
+
+	EXPECT_FALSE(m.isPaused());
+	EXPECT_TRUE(m.isRunning());
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -227,7 +231,6 @@ TEST(BasicThreadTest, SwitchSyncOnThread)
 	// Run through the initialization
 	barrier->wait(true);
 	barrier->wait(true);
-
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
 	EXPECT_TRUE(m.isRunning());

@@ -72,22 +72,22 @@ public:
 	/// 	  by going back to asynchronous mode and then calling stop
 	void stop();
 
-	/// Pause the doUpdate calls.
-	void pauseUpdateCall();
+	/// Pause the thread update calls.
+	void pause();
 
-	/// Resume the doUpdate calls.
-	void resumeUpdateCall();
+	/// Resume the thread update calls.
+	void resume();
 
-	/// Query if this object is calling the doUpdate method or not in its loop.
-	/// \return	true if the method doUpdate is being called, false otherwise.
-	bool isCallingUpdate();
+	/// Query if this thread is updating or not in its loop.
+	/// \return	false if the thread is updating, true otherwise.
+	bool isPaused();
 
 	/// Query if this object is initialized.
 	/// \return	true if initialized, false if not.
 	bool isInitialized();
 
 	/// Query if this object is running.
-	/// \return	true if the threads update() function is being called.
+	/// \return	true if the threads update() function is being called and the thread is not paused
 	bool isRunning() const;
 
 	/// This is what boost::thread executes on thread creation.
@@ -145,7 +145,7 @@ private:
 	boost::chrono::duration<double> m_period;
 	std::shared_ptr<Barrier> m_startupBarrier;
 
-	bool m_isCallingUpdate;
+	bool m_isPaused;
 	bool m_isInitialized;
 	bool m_isRunning;
 	bool m_stopExecution;
