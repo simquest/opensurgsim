@@ -108,6 +108,7 @@ TEST_F(PhysicsManagerTest, AddRemoveRepresentation)
 
 TEST_F(PhysicsManagerTest, AddRemoveConstraintComponent)
 {
+	runtime->stop();
 	auto constraintComponent1 = std::make_shared<ConstraintComponent>("component1");
 	auto constraintComponent2 = std::make_shared<ConstraintComponent>("component2");
 
