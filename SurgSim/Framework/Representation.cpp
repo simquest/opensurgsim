@@ -54,7 +54,7 @@ SurgSim::Math::RigidTransform3d Representation::getPose() const
 {
 	if (getSceneElement() != nullptr)
 	{
-		return getPoseComponent()->getPose() * getLocalPose();
+		return getSceneElement()->getPose() * getLocalPose();
 	}
 	else
 	{
