@@ -53,7 +53,6 @@ public:
 		physicsManager = std::make_shared<PhysicsManager>();
 
 		runtime->addManager(physicsManager);
-		runtime->start();
 	}
 
 	virtual void TearDown()
@@ -84,10 +83,6 @@ public:
 
 TEST_F(PhysicsManagerTest, InitTest)
 {
-	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
-	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
-
-	runtime->addManager(physicsManager);
 	EXPECT_NO_THROW(runtime->start());
 	EXPECT_NO_THROW(runtime->stop());
 }
@@ -108,7 +103,6 @@ TEST_F(PhysicsManagerTest, AddRemoveRepresentation)
 
 TEST_F(PhysicsManagerTest, AddRemoveConstraintComponent)
 {
-	runtime->stop();
 	auto constraintComponent1 = std::make_shared<ConstraintComponent>("component1");
 	auto constraintComponent2 = std::make_shared<ConstraintComponent>("component2");
 
