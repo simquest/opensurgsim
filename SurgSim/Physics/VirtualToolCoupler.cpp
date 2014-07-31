@@ -280,13 +280,13 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	if (!m_optionalAttachmentPoint.hasValue())
+	if (m_optionalAttachmentPoint.hasValue())
 	{
-		m_localAttachmentPoint = m_rigid->getCurrentParameters().getMassCenter();
+		m_localAttachmentPoint = m_optionalAttachmentPoint.getValue();
 	}
 	else
 	{
-		m_localAttachmentPoint = m_optionalAttachmentPoint.getValue();
+		m_localAttachmentPoint = m_rigid->getCurrentParameters().getMassCenter();
 	}
 
 	return true;
