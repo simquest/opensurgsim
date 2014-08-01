@@ -49,6 +49,7 @@ struct NormalData
 	}
 };
 
+typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshPlain;
 
 /// A TriangleMesh stores normal information for the triangles.
 class TriangleMesh: public SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, NormalData>

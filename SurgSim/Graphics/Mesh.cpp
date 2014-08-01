@@ -88,15 +88,5 @@ void Mesh::initialize(
 	}
 }
 
-std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName)
-{
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
-	SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
-
-	return delegate->getMesh();
-}
-
 }; // Graphics
 }; // SurgSim

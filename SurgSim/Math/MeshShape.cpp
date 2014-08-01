@@ -15,8 +15,8 @@
 //
 
 #include "SurgSim/Math/MeshShape.h"
-
 #include "SurgSim/DataStructures/AabbTree.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
@@ -44,11 +44,10 @@ bool MeshShape::doLoad(const std::string& fileName)
 {
 	using SurgSim::DataStructures::TriangleMesh;
 
-	auto mesh = SurgSim::DataStructures::loadTriangleMesh(fileName);
-	SURGSIM_ASSERT(nullptr != mesh && mesh->isValid()) << "MeshShape::doInitialize(): " <<
-		"SurgSim::DataStructures::loadTriangleMesh returned an invalid mesh";
+	m_initialMesh = SurgSim::DataStructures::loadTriangleMesh<TriangleMesh>(fileName);
+	SURGSIM_ASSERT(nullptr != m_initialMesh && m_initialMesh->isValid()) << "MeshShape::doInitialize(): " <<
+			"SurgSim::DataStructures::loadTriangleMesh returned an invalid mesh";
 
-	m_initialMesh = std::make_shared<TriangleMesh>(*mesh);
 	m_mesh = std::make_shared<TriangleMesh>(*m_initialMesh);
 
 	updateAabbTree();
@@ -183,7 +182,7 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
 
-void MeshShape::setPose(const SurgSim::Math::RigidTransform3d &pose)
+void MeshShape::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	m_mesh->copyWithTransform(pose, *m_initialMesh);
 	updateAabbTree();
