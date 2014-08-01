@@ -18,6 +18,7 @@
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/TriangleMeshUtilities.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -30,6 +31,7 @@
 
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMesh;
+using SurgSim::Framework::ApplicationData;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
@@ -119,6 +121,14 @@ TEST(TriangleMeshTest, CopyWithTransformTest)
 
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
+}
+
+TEST(TriangleMeshTest, DoLoadTest)
+{
+	ApplicationData appData("config.txt");
+	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
+	EXPECT_NO_THROW(mesh->load(fileName, appData));
 }
 
 };

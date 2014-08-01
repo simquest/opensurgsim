@@ -18,6 +18,7 @@
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -52,7 +53,9 @@ struct NormalData
 typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshPlain;
 
 /// A TriangleMesh stores normal information for the triangles.
-class TriangleMesh: public SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, NormalData>
+class TriangleMesh: public std::enable_shared_from_this<TriangleMesh>,
+					public SurgSim::Framework::Asset,
+					public SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, NormalData>
 {
 public:
 
@@ -85,6 +88,8 @@ public:
 
 protected:
 	virtual void doUpdate() override;
+
+	virtual bool doLoad(const std::string& fileName) override;
 };
 
 }; // namespace DataStructures

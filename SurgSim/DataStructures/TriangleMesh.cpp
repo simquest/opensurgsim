@@ -13,7 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+
 #include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 
 namespace SurgSim
 {
@@ -22,9 +26,7 @@ namespace DataStructures
 
 TriangleMesh::TriangleMesh()
 {
-
 }
-
 
 const SurgSim::Math::Vector3d& TriangleMesh::getNormal(size_t triangleId)
 {
@@ -50,6 +52,22 @@ void TriangleMesh::calculateNormals()
 void TriangleMesh::doUpdate()
 {
 	calculateNormals();
+}
+
+bool TriangleMesh::doLoad(const std::string& fileName)
+{
+	auto triangleMeshDelegate = std::make_shared<TriangleMeshPlyReaderDelegate<TriangleMesh>>(shared_from_this());
+
+	PlyReader reader(fileName);
+	if (reader.isValid())
+	{
+		SURGSIM_ASSERT(reader.parseWithDelegate(triangleMeshDelegate)) <<
+			"The input file " << fileName << " does not have the property required by triangle mesh.";
+	}
+
+	calculateNormals();
+
+	return true;
 }
 
 void TriangleMesh::copyWithTransform(const SurgSim::Math::RigidTransform3d& pose, const TriangleMesh& source)
