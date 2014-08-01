@@ -294,24 +294,22 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 
 TEST_F(MeshShapeTest, DoLoadTest)
 {
-	auto data = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	SurgSim::Framework::ApplicationData data("config.txt");
 	{
 		auto fileName = std::string("MeshShapeData/staple_collision.ply");
-		auto path = data->findFile(fileName);
-		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
-
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-		EXPECT_NO_THROW(EXPECT_TRUE(meshShape->doLoad(path)));
+
+		EXPECT_NO_THROW(meshShape->load(fileName, data));
 		EXPECT_TRUE(meshShape->isValid());
+		EXPECT_EQ(fileName, meshShape->getFileName());
 	}
 
 	{
 		auto fileName = std::string("MeshShapeData/InvalidMesh.ply");
-		auto path = data->findFile(fileName);
-		ASSERT_TRUE(!path.empty()) << fileName << " can not be found.";
-
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-		EXPECT_ANY_THROW(meshShape->doLoad(path));
+
+		EXPECT_ANY_THROW(meshShape->load(fileName, data));
 		EXPECT_FALSE(meshShape->isValid());
+		EXPECT_EQ(fileName, meshShape->getFileName());
 	}
 }
