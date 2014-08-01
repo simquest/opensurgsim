@@ -111,7 +111,7 @@ void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::processVertex(co
 template <class M>
 void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::endVertices(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_vertexData.overrun1 == 0 && m_vertexData.overrun2 == 0) <<
+	SURGSIM_ASSERT(m_vertexData.overrun1 == 0l && m_vertexData.overrun2 == 0l) <<
 			"There was an overrun while reading the vertex structures, it is likely that data " <<
 			"has become corrupted.";
 }
@@ -138,7 +138,7 @@ void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::processFace(cons
 template <class M>
 void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::endFaces(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_faceData.overrun == 0)
+	SURGSIM_ASSERT(m_faceData.overrun == 0l)
 			<< "There was an overrun while reading the face structures, it is likely that data "
 			<< "has become corrupted.";
 }
