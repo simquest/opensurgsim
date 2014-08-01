@@ -27,6 +27,11 @@
 namespace SurgSim
 {
 
+namespace Math
+{
+class OctreeShape;
+}
+
 namespace DataStructures
 {
 
@@ -47,6 +52,8 @@ template<class Data>
 class OctreeNode : public SurgSim::Framework::Asset,
 				   public std::enable_shared_from_this<OctreeNode<Data>>
 {
+friend class SurgSim::Math::OctreeShape;
+
 public:
 	/// Bounding box type for convenience
 	typedef Eigen::AlignedBox<double, 3> AxisAlignedBoundingBox;

@@ -524,6 +524,7 @@ TEST_F(ShapeTest, OctreeShape)
 		OctreeShape octree;
 		EXPECT_NO_THROW(octree.setRootNode(node));
 		EXPECT_NO_THROW(octree.load(fileName));
+		EXPECT_EQ(fileName, octree.getFileName());
 
 		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
 		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, octree.getType());
