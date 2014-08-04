@@ -44,6 +44,12 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${SURGSIM_THIRD_PARTY_DIR})
 include(SurgSimBuildFlags)
 include(SurgSimUtilities)
 
+if (NOT PROJECT_SOURCE_DIR)
+	set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+endif (NOT PROJECT_SOURCE_DIR)
+
+set(OPENSURGSIM_INCLUDE_DIRS ${PROJECT_SOURCE_DIR} PARENT_SCOPE)
+
 ### Find required libraries
 
 find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
@@ -125,3 +131,5 @@ install(FILES
 install(EXPORT ${PROJECT_NAME}Targets DESTINATION ${INSTALL_CMAKE_DIR} COMPONENT dev)
 
 surgsim_cpplint_this_tree(cpplint)
+
+set(OPENSURGSIM_LIBRARIES ${EXPORT_TARGETS} PARENT_SCOPE)
