@@ -844,7 +844,7 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 
 	const std::unordered_map<int, LabJack::TimerSettings>& timers = device->getTimers();
 
-	LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, timers.size(), 0);
+	LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, static_cast<int>(timers.size()), 0);
 	bool result = isOk(error);
 	SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 		"Failed to configure number of enabled timers for a device named '" << device->getName() <<
