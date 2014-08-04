@@ -205,12 +205,12 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 												  location.meshLocalCoordinate.getValue().barycentricCoordinate[1],
 												  location.meshLocalCoordinate.getValue().barycentricCoordinate[2],
 												  0.0);
-	FemRepresentationCoordinate coordinate;
+	SurgSim::DataStructures::IndexedLocalCoordinate coordinate;
 	coordinate.elementId = elementId;
-	coordinate.naturalCoordinate.resize(elementVertices.size());
+	coordinate.barycentricCoordinate.resize(elementVertices.size());
 	for (size_t i = 0; i < elementVertices.size(); ++i)
 	{
-		coordinate.naturalCoordinate[i] = barycentricCoordinate[indices[i]];
+		coordinate.barycentricCoordinate[i] = barycentricCoordinate[indices[i]];
 	}
 
 	// Fem3DRepresentationLocalization::setLocalPosition verifies argument based on its Representation.

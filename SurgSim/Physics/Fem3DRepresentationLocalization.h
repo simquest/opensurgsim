@@ -16,8 +16,8 @@
 #ifndef SURGSIM_PHYSICS_FEM3DREPRESENTATIONLOCALIZATION_H
 #define SURGSIM_PHYSICS_FEM3DREPRESENTATIONLOCALIZATION_H
 
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/FemRepresentationCoordinate.h"
 
 namespace SurgSim
 {
@@ -27,14 +27,14 @@ namespace Physics
 
 /// Implementation of Localization for Fem3DRepresentation
 ///
-/// Fem3DRepresentationLocalization tracks the global coordinates of an FemRepresentationCoordinate associated with an
+/// Fem3DRepresentationLocalization tracks the global coordinates of an IndexedLocalCoordinate associated with an
 /// Fem3DRepresentation.  It is used, for example, as a helper class for filling out the MlcpPhysicsProblem in
 /// Fem3DRepresentationContact::doBuild, which constrains the motion of Fem3DRepresentation at a frictionless contact.
 ///
 /// Fem3DRepresentationLocalization stores a pointer to a Fem3DRepresentation in an abstract Representation object.  It
-/// holds an FemRepresentationCoordinate, which contains a barycentric coordinate and the ID of an FemElement associated
+/// holds an IndexedLocalCoordinate, which contains a barycentric coordinate and the ID of an FemElement associated
 /// with an Fem3DRepresentation, and it provides a helper function Fem3DRepresentationLocalization::calculatePosition to
-/// find the FemRepresentationCoordinate in coordinates in the current OdeState.
+/// find the IndexedLocalCoordinate in coordinates in the current OdeState.
 class Fem3DRepresentationLocalization : public Localization
 {
 public:
@@ -50,11 +50,11 @@ public:
 
 	/// Sets the local position.
 	/// \param p The local position to set the localization at.
-	void setLocalPosition(const FemRepresentationCoordinate& p);
+	void setLocalPosition(const SurgSim::DataStructures::IndexedLocalCoordinate& p);
 
 	/// Gets the local position.
 	/// \return The local position set for this localization.
-	const FemRepresentationCoordinate& getLocalPosition() const;
+	const SurgSim::DataStructures::IndexedLocalCoordinate& getLocalPosition() const;
 
 	/// Query if 'representation' is valid representation.
 	/// \param	representation	The representation.
@@ -69,7 +69,7 @@ private:
 	SurgSim::Math::Vector3d doCalculatePosition(double time);
 
 	/// Barycentric position in local coordinates
-	FemRepresentationCoordinate m_position;
+	SurgSim::DataStructures::IndexedLocalCoordinate m_position;
 };
 
 } // namespace Physics

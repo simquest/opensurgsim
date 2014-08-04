@@ -58,7 +58,7 @@ void Fem3DRepresentationContact::doBuild(double dt,
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
 	const double d = contactData.getDistance();
 
-	const FemRepresentationCoordinate& coord
+	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<Fem3DRepresentationLocalization>(localization)->getLocalPosition();
 
 	// FRICTIONLESS CONTACT in a LCP
@@ -89,7 +89,7 @@ void Fem3DRepresentationContact::doBuild(double dt,
 	size_t numNodeToConstrain = 0;
 	for (size_t index = 0; index < numNodes; index++)
 	{
-		if (coord.naturalCoordinate[index] != 0.0)
+		if (coord.barycentricCoordinate[index] != 0.0)
 		{
 			numNodeToConstrain++;
 		}
@@ -98,12 +98,12 @@ void Fem3DRepresentationContact::doBuild(double dt,
 
 	for (size_t index = 0; index < numNodes; index++)
 	{
-		if (coord.naturalCoordinate[index] != 0.0)
+		if (coord.barycentricCoordinate[index] != 0.0)
 		{
 			size_t nodeIndex = femElement->getNodeId(index);
-			m_newH.insert(3 * nodeIndex + 0) = coord.naturalCoordinate[index] * n[0] * scale * dt;
-			m_newH.insert(3 * nodeIndex + 1) = coord.naturalCoordinate[index] * n[1] * scale * dt;
-			m_newH.insert(3 * nodeIndex + 2) = coord.naturalCoordinate[index] * n[2] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 0) = coord.barycentricCoordinate[index] * n[0] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 1) = coord.barycentricCoordinate[index] * n[1] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 2) = coord.barycentricCoordinate[index] * n[2] * scale * dt;
 		}
 	}
 

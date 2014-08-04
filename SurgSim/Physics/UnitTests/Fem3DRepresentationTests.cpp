@@ -224,10 +224,10 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 			EXPECT_TRUE(localization != nullptr);
 
 			SurgSim::Math::Vector globalPosition;
-			SurgSim::Physics::FemRepresentationCoordinate coordinate = localization->getLocalPosition();
+			SurgSim::DataStructures::IndexedLocalCoordinate coordinate = localization->getLocalPosition();
 			EXPECT_NO_THROW(globalPosition =
-								fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(*fem->getCurrentState(),
-										coordinate.naturalCoordinate););
+				fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(*fem->getCurrentState(),
+								   coordinate.barycentricCoordinate););
 			EXPECT_EQ(3, globalPosition.size());
 			EXPECT_TRUE(globalPosition.isApprox(*point));
 		}
@@ -252,7 +252,7 @@ TEST(Fem3DRepresentationTests, SerializationTest)
 
 	std::shared_ptr<Fem3DRepresentation> newRepresentation;
 	ASSERT_NO_THROW(newRepresentation =
-						std::dynamic_pointer_cast<Fem3DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+		std::dynamic_pointer_cast<Fem3DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	EXPECT_EQ("SurgSim::Physics::Fem3DRepresentation", newRepresentation->getClassName());
 	EXPECT_EQ(filename, newRepresentation->getValue<std::string>("Filename"));

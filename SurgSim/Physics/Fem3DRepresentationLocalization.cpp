@@ -41,7 +41,7 @@ Fem3DRepresentationLocalization::~Fem3DRepresentationLocalization()
 
 }
 
-void Fem3DRepresentationLocalization::setLocalPosition(const FemRepresentationCoordinate& p)
+void Fem3DRepresentationLocalization::setLocalPosition(const SurgSim::DataStructures::IndexedLocalCoordinate& p)
 {
 	auto femRepresentation = std::static_pointer_cast<Fem3DRepresentation>(getRepresentation());
 
@@ -49,12 +49,12 @@ void Fem3DRepresentationLocalization::setLocalPosition(const FemRepresentationCo
 		" initialized";
 
 	SURGSIM_ASSERT(femRepresentation->isValidCoordinate(p))
-		<< "FemRepresentationCoordinate is invalid for Representation " << getRepresentation()->getName();
+		<< "IndexedLocalCoordinate is invalid for Representation " << getRepresentation()->getName();
 
 	m_position = p;
 }
 
-const FemRepresentationCoordinate& Fem3DRepresentationLocalization::getLocalPosition() const
+const SurgSim::DataStructures::IndexedLocalCoordinate& Fem3DRepresentationLocalization::getLocalPosition() const
 {
 	return m_position;
 }
@@ -72,17 +72,17 @@ SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(dou
 
 	if (time == 0.0)
 	{
-		return femElement->computeCartesianCoordinate(*previousState, m_position.naturalCoordinate);
+		return femElement->computeCartesianCoordinate(*previousState, m_position.barycentricCoordinate);
 	}
 	else if (time == 1.0)
 	{
-		return femElement->computeCartesianCoordinate(*currentState, m_position.naturalCoordinate);
+		return femElement->computeCartesianCoordinate(*currentState, m_position.barycentricCoordinate);
 	}
 
 	const SurgSim::Math::Vector& currentPosition = femElement->computeCartesianCoordinate(*previousState,
-		m_position.naturalCoordinate);
+		m_position.barycentricCoordinate);
 	const SurgSim::Math::Vector& previousPosition = femElement->computeCartesianCoordinate(*currentState,
-		m_position.naturalCoordinate);
+		m_position.barycentricCoordinate);
 
 	return previousPosition + time * (currentPosition - previousPosition);
 }
