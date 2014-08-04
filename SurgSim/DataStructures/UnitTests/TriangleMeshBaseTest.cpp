@@ -22,6 +22,7 @@
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 
 #include <random>
 

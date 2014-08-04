@@ -82,7 +82,6 @@ public:
 					const std::vector<size_t>& triangles);
 };
 
-std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName);
 
 }; // Graphics
 }; // SurgSim

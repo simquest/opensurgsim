@@ -22,6 +22,7 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h" //< Used to initialize the Component Fem3DRepresentation
 #include "SurgSim/Math/OdeState.h"
@@ -172,7 +173,7 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 
 	std::string path = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
 	std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData>> triangleMesh =
-		SurgSim::DataStructures::loadTriangleMesh(path);
+				SurgSim::DataStructures::loadTriangleMesh(path);
 
 	// Create the collision mesh for the surface of the finite element model
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
@@ -199,7 +200,8 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 		std::array<SurgSim::Math::Vector3d, 4> points = {centroid,
 														 triangleMesh->getVertexPosition(triangleNodeIds[0]),
 														 triangleMesh->getVertexPosition(triangleNodeIds[1]),
-														 triangleMesh->getVertexPosition(triangleNodeIds[2])};
+														 triangleMesh->getVertexPosition(triangleNodeIds[2])
+														};
 
 		std::array<SurgSim::Math::Vector3d, 4> barycentricCoordinates = {SurgSim::Math::Vector3d::Ones() / 3.0,
 																		 SurgSim::Math::Vector3d::UnitX(),
@@ -217,15 +219,15 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 			triangleLocalPosition.barycentricCoordinate = (*barycentricCoordinate);
 			location.meshLocalCoordinate.setValue(triangleLocalPosition);
 			EXPECT_NO_THROW(localization =
-				std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
-					fem->createLocalization(location)););
+								std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
+									fem->createLocalization(location)););
 			EXPECT_TRUE(localization != nullptr);
 
 			SurgSim::Math::Vector globalPosition;
 			SurgSim::Physics::FemRepresentationCoordinate coordinate = localization->getLocalPosition();
 			EXPECT_NO_THROW(globalPosition =
-				fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(*fem->getCurrentState(),
-																					 coordinate.naturalCoordinate););
+								fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(*fem->getCurrentState(),
+										coordinate.naturalCoordinate););
 			EXPECT_EQ(3, globalPosition.size());
 			EXPECT_TRUE(globalPosition.isApprox(*point));
 		}
@@ -250,7 +252,7 @@ TEST(Fem3DRepresentationTests, SerializationTest)
 
 	std::shared_ptr<Fem3DRepresentation> newRepresentation;
 	ASSERT_NO_THROW(newRepresentation =
-		std::dynamic_pointer_cast<Fem3DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+						std::dynamic_pointer_cast<Fem3DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	EXPECT_EQ("SurgSim::Physics::Fem3DRepresentation", newRepresentation->getClassName());
 	EXPECT_EQ(filename, newRepresentation->getValue<std::string>("Filename"));

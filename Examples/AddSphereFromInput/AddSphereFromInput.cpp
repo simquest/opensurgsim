@@ -100,12 +100,11 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
-	
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 	planeElement->addComponent(material);
-	
+
 	auto rigidCollision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
 	physicsRepresentation->setCollisionRepresentation(rigidCollision);
 	planeElement->addComponent(rigidCollision);

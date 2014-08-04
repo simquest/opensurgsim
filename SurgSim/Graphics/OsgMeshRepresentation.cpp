@@ -27,6 +27,7 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Graphics/MeshUtilities.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/TriangleNormalGenerator.h"
 
@@ -125,7 +126,7 @@ bool OsgMeshRepresentation::doInitialize()
 		}
 		else
 		{
-			m_mesh = SurgSim::Graphics::loadMesh(filePath);
+			m_mesh = SurgSim::DataStructures::loadTriangleMesh<Mesh>(filePath);
 			SURGSIM_ASSERT(nullptr != m_mesh && m_mesh->isValid())
 					<< "OsgMeshRepresentation::doInitialize(): SurgSim::DataStructures::loadTriangleMesh() returned a "
 					<< "null mesh or invalid mesh from file " << filePath;
