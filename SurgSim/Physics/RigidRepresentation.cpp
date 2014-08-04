@@ -182,7 +182,6 @@ void RigidRepresentation::update(double dt)
 			"|q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
-		resetState();
 		setIsActive(false);
 	}
 
@@ -270,7 +269,6 @@ void RigidRepresentation::applyCorrection(double dt,
 			"and |q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
-		resetState();
 		setIsActive(false);
 	}
 
