@@ -38,18 +38,17 @@ TEST(OsgOctreeRepresentationTests, GetSetUpdateTest)
 {
 	OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones() * 4.0);
 	auto octreeNode = std::make_shared<OctreeShape::NodeType>(boundingBox);
-	OctreeShape octreeShape;
-	octreeShape.setRootNode(octreeNode);
+	auto octreeShape = std::make_shared<SurgSim::Math::OctreeShape>(*octreeNode);
 
 	auto runtime = std::make_shared<Runtime>();
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Test Octree");
-	octreeRepresentation->setOctree(octreeShape);
+	octreeRepresentation->setOctreeShape(octreeShape);
 
 	EXPECT_TRUE(octreeRepresentation->initialize(runtime));
 	EXPECT_TRUE(octreeRepresentation->wakeUp());
 
 	// Set the octree after wake up will cause a assertion failure.
-	ASSERT_ANY_THROW( { octreeRepresentation->setOctree(octreeShape); } );
+	ASSERT_ANY_THROW( { octreeRepresentation->setOctreeShape(octreeShape); } );
 
 	ASSERT_NO_THROW(octreeRepresentation->update(0.1));
 }
@@ -63,9 +62,7 @@ TEST(OsgOctreeRepresentationTests, SetNodeVisibilityTest)
 	octreeNode->addData(Vector3d(0.0, 0.0, 0.0), emptyData, 2);
 	octreeNode->addData(Vector3d(0.0, 0.0, 1.0), emptyData, 3);
 
-	OctreeShape octreeShape;
-	octreeShape.setRootNode(octreeNode);
-
+	auto octreeShape = std::make_shared<SurgSim::Math::OctreeShape>(*octreeNode);
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Test Octree");
 
 	// Path to leaf node
@@ -76,7 +73,7 @@ TEST(OsgOctreeRepresentationTests, SetNodeVisibilityTest)
 	// Set node visibility when no octree is held by OsgOctreeRepresentation will throw.
 	EXPECT_ANY_THROW(octreeRepresentation->setNodeVisible(path, true));
 
-	octreeRepresentation->setOctree(octreeShape);
+	octreeRepresentation->setOctreeShape(octreeShape);
 	EXPECT_NO_THROW(octreeRepresentation->setNodeVisible(path, false));
 
 	// Path to internal node
