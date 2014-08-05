@@ -172,8 +172,8 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 	ASSERT_NO_THROW(fem->setFilename("Geometry/wound_deformable.ply"));
 
 	std::string path = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
-	std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData>> triangleMesh =
-				SurgSim::DataStructures::loadTriangleMesh(path);
+	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlain> triangleMesh =
+		SurgSim::DataStructures::loadTriangleMesh(path);
 
 	// Create the collision mesh for the surface of the finite element model
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
@@ -217,9 +217,8 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 
 			SurgSim::Math::Vector globalPosition;
 			SurgSim::Physics::FemRepresentationCoordinate coordinate = localization->getLocalPosition();
-			EXPECT_NO_THROW(globalPosition =
-								fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(*fem->getCurrentState(),
-										coordinate.naturalCoordinate););
+			EXPECT_NO_THROW(globalPosition = fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(
+												 *fem->getCurrentState(), coordinate.naturalCoordinate););
 			EXPECT_EQ(3, globalPosition.size());
 			EXPECT_TRUE(globalPosition.isApprox(*point));
 		}
@@ -243,8 +242,8 @@ TEST(Fem3DRepresentationTests, SerializationTest)
 	EXPECT_EQ(10u, data.size());
 
 	std::shared_ptr<Fem3DRepresentation> newRepresentation;
-	ASSERT_NO_THROW(newRepresentation =
-						std::dynamic_pointer_cast<Fem3DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	ASSERT_NO_THROW(newRepresentation = std::dynamic_pointer_cast<Fem3DRepresentation>(
+											node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	EXPECT_EQ("SurgSim::Physics::Fem3DRepresentation", newRepresentation->getClassName());
 	EXPECT_EQ(filename, newRepresentation->getValue<std::string>("Filename"));
