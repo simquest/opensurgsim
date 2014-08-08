@@ -37,8 +37,7 @@ endif()
 # Use SURGSIM_SOURCE_DIR SURGSIM_SOURCE_DIR will always point to the top of the OSS Tree
 set(SURGSIM_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(SURGSIM_TOP_INCLUDE_DIR ${SURGSIM_SOURCE_DIR})
-include_directories(${SURGSIM_TOP_INCLUDE_DIR})
+include_directories(${SURGSIM_SOURCE_DIR})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 set(SURGSIM_TOOLS_DIR "${SURGSIM_SOURCE_DIR}/Tools")
@@ -110,7 +109,7 @@ if(BUILD_DOCUMENTATION)
 endif()
 
 #OpenSurgSimConfig For the Build Tree
-set(CONFIG_INCLUDE_DIRS "${SURGSIM_TOP_INCLUDE_DIR}")
+set(CONFIG_INCLUDE_DIRS "${SURGSIM_SOURCE_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfig.cmake" @ONLY)
 
