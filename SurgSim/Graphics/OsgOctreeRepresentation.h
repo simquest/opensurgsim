@@ -20,8 +20,8 @@
 #include <string>
 
 #include <osg/ref_ptr>
-#include <osg/Group>
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/OctreeRepresentation.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Math/OctreeShape.h"
@@ -31,13 +31,14 @@
 #pragma warning(disable:4250)
 #endif
 
-
 namespace SurgSim
 {
 namespace Graphics
 {
 
 class OsgUnitBox;
+
+SURGSIM_STATIC_REGISTRATION(OsgOctreeRepresentation);
 
 /// OSG octree representation, implements an OctreeRepresenation using OSG.
 /// Given a OctreeShape, this representation will copy the Octree instead of sharing the Octree (with the OctreeShape).
@@ -54,13 +55,14 @@ public:
 	/// Destructor
 	~OsgOctreeRepresentation();
 
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgOctreeRepresentation);
+
 	/// Executes the update operation
 	/// \param	dt	The time step
 	virtual void doUpdate(double dt) override;
 
-	/// Set the Octree of this representation. The Octree is retrieved from a Math::OctreeShape.
-	/// \param octreeShape The OctreeShape from which the octree is retrieved.
-	virtual void setOctree(const SurgSim::Math::OctreeShape& octreeShape) override;
+	virtual void setOctreeShape(const std::shared_ptr<SurgSim::Math::Shape>& shape) override;
+	virtual std::shared_ptr<SurgSim::Math::OctreeShape> getOctreeShape() const override;
 
 	/// Mark the OctreeNode visible/invisible in the given a OctreePath (typedef-ed in OctreeNode.h).
 	/// \param path An OctreePath, giving the path leads to the OctreeNode whose visibility to be changed.
@@ -77,6 +79,10 @@ private:
 
 	/// Shared unit box, so that the geometry can be instanced rather than having multiple copies.
 	std::shared_ptr<OsgUnitBox> m_sharedUnitBox;
+
+	/// The OctreeShape whose Octree will be visualized.
+	std::shared_ptr<SurgSim::Math::OctreeShape> m_octreeShape;
+
 	/// Returns the shared unit box
 	static std::shared_ptr<OsgUnitBox> getSharedUnitBox();
 };
