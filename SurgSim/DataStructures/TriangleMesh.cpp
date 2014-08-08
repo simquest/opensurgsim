@@ -59,11 +59,9 @@ bool TriangleMesh::doLoad(const std::string& fileName)
 	auto triangleMeshDelegate = std::make_shared<TriangleMeshPlyReaderDelegate<TriangleMesh>>(shared_from_this());
 
 	PlyReader reader(fileName);
-	if (reader.isValid())
-	{
-		SURGSIM_ASSERT(reader.parseWithDelegate(triangleMeshDelegate)) <<
+	SURGSIM_ASSERT(reader.isValid()) << "'" << fileName << "' is an invalid .ply file.";
+	SURGSIM_ASSERT(reader.parseWithDelegate(triangleMeshDelegate)) <<
 			"The input file " << fileName << " does not have the property required by triangle mesh.";
-	}
 
 	calculateNormals();
 

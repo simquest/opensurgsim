@@ -126,9 +126,27 @@ TEST(TriangleMeshTest, CopyWithTransformTest)
 TEST(TriangleMeshTest, DoLoadTest)
 {
 	ApplicationData appData("config.txt");
-	const std::string fileName = "MeshShapeData/staple_collision.ply";
-	auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
-	EXPECT_NO_THROW(mesh->load(fileName, appData));
+
+	{
+		// Nonexistent file
+		const std::string fileName = "Nonexistent file";
+		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
+		EXPECT_ANY_THROW(mesh->load(fileName, appData));
+	}
+
+	{
+		// File exists, but contains an invalid Mesh
+		const std::string fileName = "MeshShapeData/InvalidMesh.ply";
+		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
+		EXPECT_ANY_THROW(mesh->load(fileName, appData));
+	}
+
+	{
+		// File exists, and contains a valid Mesh
+		const std::string fileName = "MeshShapeData/staple_collision.ply";
+		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
+		EXPECT_NO_THROW(mesh->load(fileName, appData));
+	}
 }
 
 };
