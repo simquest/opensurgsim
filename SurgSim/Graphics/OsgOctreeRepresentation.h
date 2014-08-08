@@ -20,7 +20,6 @@
 #include <string>
 
 #include <osg/ref_ptr>
-#include <osg/Group>
 
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/OctreeRepresentation.h"
@@ -31,7 +30,6 @@
 #pragma warning(push)
 #pragma warning(disable:4250)
 #endif
-
 
 namespace SurgSim
 {

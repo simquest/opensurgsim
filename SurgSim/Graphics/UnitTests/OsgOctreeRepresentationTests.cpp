@@ -16,12 +16,14 @@
 /// \file
 /// Unit Tests for the OsgOctreeRepresentation class.
 
+#include <gtest/gtest.h>
+
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Graphics/OsgOctreeRepresentation.h"
 #include "SurgSim/Math/OctreeShape.h"
-
-#include <gtest/gtest.h>
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Framework::Runtime;
 using SurgSim::DataStructures::EmptyData;
@@ -63,7 +65,7 @@ TEST(OsgOctreeRepresentationTests, SetNodeVisibilityTest)
 	octreeNode->addData(Vector3d(0.0, 0.0, 1.0), emptyData, 3);
 
 	auto octreeShape = std::make_shared<SurgSim::Math::OctreeShape>(*octreeNode);
-	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Test Octree");
+	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("TestOctree");
 
 	// Path to leaf node
 	SurgSim::DataStructures::OctreePath path;
@@ -86,4 +88,36 @@ TEST(OsgOctreeRepresentationTests, SetNodeVisibilityTest)
 	invalidPath.push_back(4);
 	invalidPath.push_back(1);
 	EXPECT_ANY_THROW(octreeRepresentation->setNodeVisible(invalidPath, true));
+}
+
+TEST(OsgOctreeRepresentationTests, SerializationTest)
+{
+	Runtime runtime("config.txt");
+	std::shared_ptr<SurgSim::Math::Shape> octreeShape = std::make_shared<SurgSim::Math::OctreeShape>();
+	std::string filename = "OctreeShapeData/staple.vox";
+	std::static_pointer_cast<SurgSim::Math::OctreeShape>(octreeShape)->load(filename);
+
+	std::shared_ptr<SurgSim::Framework::Component> osgOctree = std::make_shared<OsgOctreeRepresentation>("TestOctree");
+	osgOctree->setValue("OctreeShape", octreeShape);
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*osgOctree));
+	EXPECT_EQ(1u, node.size());
+
+	YAML::Node data = node["SurgSim::Graphics::OsgOctreeRepresentation"];
+	EXPECT_EQ(7u, data.size());
+
+	std::shared_ptr<SurgSim::Graphics::OsgOctreeRepresentation> newOsgOctree;
+	ASSERT_NO_THROW(newOsgOctree = std::dynamic_pointer_cast<OsgOctreeRepresentation>(
+									node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	EXPECT_EQ("SurgSim::Graphics::OsgOctreeRepresentation", newOsgOctree->getClassName());
+
+	auto newOctree = newOsgOctree->getOctreeShape();
+	auto oldOctree = std::static_pointer_cast<OctreeShape>(octreeShape)->getRootNode();
+	EXPECT_TRUE(newOctree->getRootNode()->getBoundingBox().isApprox(oldOctree->getBoundingBox()));
+	EXPECT_TRUE(newOsgOctree->getOctreeShape()->isValid());
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, newOctree->getType());
+	EXPECT_THROW(newOctree->getVolume(), SurgSim::Framework::AssertionFailure);
+	EXPECT_TRUE((newOctree->getCenter() - Vector3d::Zero()).isZero());
+	EXPECT_THROW(newOctree->getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
 }

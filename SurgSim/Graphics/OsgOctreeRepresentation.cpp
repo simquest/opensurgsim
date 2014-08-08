@@ -18,10 +18,8 @@
 #include "SurgSim/Graphics/OsgOctreeRepresentation.h"
 
 #include "SurgSim/DataStructures/OctreeNode.h"
-#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/OsgUnitBox.h"
@@ -43,11 +41,9 @@ OsgOctreeRepresentation::OsgOctreeRepresentation(const std::string& name) :
 {
 }
 
-
 OsgOctreeRepresentation::~OsgOctreeRepresentation()
 {
 }
-
 
 void OsgOctreeRepresentation::doUpdate(double dt)
 {
@@ -93,9 +89,11 @@ void OsgOctreeRepresentation::buildOctree(osg::ref_ptr<osg::PositionAttitudeTran
 void OsgOctreeRepresentation::setOctreeShape(const std::shared_ptr<SurgSim::Math::Shape>& shape)
 {
 	SURGSIM_ASSERT(!isAwake()) << "OsgOctreeRepresentation::setOctree() should be called before wake up.";
+
 	auto octreeShape = std::dynamic_pointer_cast<SurgSim::Math::OctreeShape>(shape);
 	SURGSIM_ASSERT(octreeShape != nullptr) << "OsgOctreeRepresentation can only accept an OctreeShape.";
 	m_octreeShape = octreeShape;
+
 	buildOctree(m_transform, m_octreeShape->getRootNode());
 }
 
