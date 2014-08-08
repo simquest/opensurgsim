@@ -53,19 +53,19 @@ bool checkMeshLocalCoordinate(
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& expectedLocalCoordinate,
 	const SurgSim::Math::Vector3d& expectedGlobalPosition)
 {
-	bool meshLocalCoordinateExpected = true;
+	bool isEqual = true;
 	EXPECT_EQ(expectedLocalCoordinate.hasValue(), actualLocalCoordinate.hasValue());
 	if (expectedLocalCoordinate.hasValue() && actualLocalCoordinate.hasValue())
 	{
-		meshLocalCoordinateExpected &=
+		isEqual &=
 			expectedLocalCoordinate.getValue().elementId == actualLocalCoordinate.getValue().elementId;
 		Vector3d barycentricCoordinates = actualLocalCoordinate.getValue().barycentricCoordinate;
-		meshLocalCoordinateExpected &= eigenEqual(expectedGlobalPosition,
-												  barycentricCoordinates[0] * vertices[0] +
-												  barycentricCoordinates[1] * vertices[1] +
-												  barycentricCoordinates[2] * vertices[2]);
+		isEqual &= eigenEqual(expectedGlobalPosition,
+							  barycentricCoordinates[0] * vertices[0] +
+							  barycentricCoordinates[1] * vertices[1] +
+							  barycentricCoordinates[2] * vertices[2]);
 	}
-	return meshLocalCoordinateExpected;
+	return isEqual;
 }
 
 ::testing::AssertionResult isContactPresentInList(std::shared_ptr<Contact> expected,
