@@ -312,4 +312,13 @@ TEST_F(MeshShapeTest, DoLoadTest)
 		EXPECT_FALSE(meshShape->isValid());
 		EXPECT_EQ(fileName, meshShape->getFileName());
 	}
+
+	{
+		auto fileName = std::string("Nonexistent file");
+		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
+
+		EXPECT_ANY_THROW(meshShape->load(fileName, data));
+		EXPECT_FALSE(meshShape->isValid());
+		EXPECT_EQ(fileName, meshShape->getFileName());
+	}
 }

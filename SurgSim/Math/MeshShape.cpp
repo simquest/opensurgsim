@@ -43,8 +43,8 @@ bool MeshShape::isValid() const
 bool MeshShape::doLoad(const std::string& filePath)
 {
 	m_initialMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
-	m_initialMesh->doLoad(filePath);
-	SURGSIM_ASSERT(m_initialMesh->isValid()) << __FUNCTION__ << filePath << " contains an invalid mesh.";
+	SURGSIM_ASSERT(m_initialMesh->doLoad(filePath)) << "Failed to load file " << filePath;
+	SURGSIM_ASSERT(m_initialMesh->isValid()) << filePath << " contains an invalid mesh.";
 
 	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*m_initialMesh);
 
