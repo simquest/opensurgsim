@@ -179,7 +179,6 @@ TEST(OptionalValueTests, DereferenceAccess)
 {
 	OptionalValue<int> one;
 	OptionalValue<int> two(10);
-	OptionalValue<int> target(100);
 
 	EXPECT_ANY_THROW(*one);
 	EXPECT_NO_THROW(*two);
