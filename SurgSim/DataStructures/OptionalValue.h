@@ -73,7 +73,8 @@ public:
 	}
 
 	/// Gets the value.
-	/// \return	The assigned value if set, excepts if no value was set.
+	/// \throws SurgSim::Framework::AssertionFailure if the value was not set
+	/// \return	The assigned value if set.
 	const T& getValue() const
 	{
 		SURGSIM_ASSERT(m_hasValue) << "Tried to fetch a value from an invalid OptionalValue";
@@ -83,7 +84,8 @@ public:
 	/// Gets the value
 	/// \note do not implement T& operator*(), because *optionalValue = X; would not be able to set
 	///       the hasValue() property properly.
-	/// \return the contained value, excpets if no value was set.
+	/// \throws SurgSim::Framework::AssertionFailure if the value was not set
+	/// \return the contained value.
 	const T& operator*() const
 	{
 		SURGSIM_ASSERT(m_hasValue) << "Tried to fetch a value from an invalid OptionalValue";
@@ -139,6 +141,7 @@ public:
 
 	/// Assignment operator.
 	/// \param rhs The right hand side of the operator.
+	/// \return reference to this.
 	OptionalValue& operator=(const OptionalValue& rhs)
 	{
 		m_hasValue = rhs.m_hasValue;
@@ -150,8 +153,9 @@ public:
 	}
 
 	/// Assignment operator from template type, after this hasValue() is true even if the
-	/// right and side was not initialized
-	/// \param the value to be assigned to this optional value
+	/// right hand side was not initialized
+	/// \param rhs the value to be assigned to this optional value
+	/// \return reference to this.
 	OptionalValue& operator=(const T& rhs)
 	{
 		setValue(rhs);
