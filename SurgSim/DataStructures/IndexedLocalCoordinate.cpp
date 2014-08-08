@@ -21,12 +21,12 @@ namespace SurgSim
 namespace DataStructures
 {
 
-IndexedLocalCoordinate::IndexedLocalCoordinate() : elementId(0)
+IndexedLocalCoordinate::IndexedLocalCoordinate() : index(0)
 {
 }
 
-IndexedLocalCoordinate::IndexedLocalCoordinate(size_t elementId, const SurgSim::Math::Vector& barycentricCoordinate)
-	: elementId(elementId), barycentricCoordinate(barycentricCoordinate)
+IndexedLocalCoordinate::IndexedLocalCoordinate(size_t index, const SurgSim::Math::Vector& coordinate)
+	: index(index), coordinate(coordinate)
 {
 }
 

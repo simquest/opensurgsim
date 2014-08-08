@@ -215,8 +215,8 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 			std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 
 			SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;
-			triangleLocalPosition.elementId = triangleId;
-			triangleLocalPosition.barycentricCoordinate = (*barycentricCoordinate);
+			triangleLocalPosition.index = triangleId;
+			triangleLocalPosition.coordinate = (*barycentricCoordinate);
 			location.meshLocalCoordinate.setValue(triangleLocalPosition);
 			EXPECT_NO_THROW(localization =
 								std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
@@ -226,8 +226,8 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 			SurgSim::Math::Vector globalPosition;
 			SurgSim::DataStructures::IndexedLocalCoordinate coordinate = localization->getLocalPosition();
 			EXPECT_NO_THROW(globalPosition =
-				fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(*fem->getCurrentState(),
-								   coordinate.barycentricCoordinate););
+				fem->getFemElement(coordinate.index)->computeCartesianCoordinate(*fem->getCurrentState(),
+								   coordinate.coordinate););
 			EXPECT_EQ(3, globalPosition.size());
 			EXPECT_TRUE(globalPosition.isApprox(*point));
 		}

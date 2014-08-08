@@ -323,9 +323,9 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 				expectedPenetrationPoints.first.globalPosition.setValue(expectedPoint0);
 				expectedPenetrationPoints.second.globalPosition.setValue(expectedPoint1);
 				SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;
-				triangleLocalPosition.elementId = i;
+				triangleLocalPosition.index = i;
 				expectedPenetrationPoints.first.meshLocalCoordinate.setValue(triangleLocalPosition);
-				triangleLocalPosition.elementId = 0;
+				triangleLocalPosition.index = 0;
 				expectedPenetrationPoints.second.meshLocalCoordinate.setValue(triangleLocalPosition);
 				auto contact = std::make_shared<TriangleContact>(expectedDepth, expectedContact, expectedNormal,
 																 expectedPenetrationPoints);
@@ -431,9 +431,9 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 			{
 				expectedPenetrationPoints.first.globalPosition.setValue(pose * Vector3d(0, 0, coordinate));
 				expectedPenetrationPoints.second.globalPosition.setValue(pose * Vector3d(0, 0, 0));
-				triangleLocalPosition.elementId = i;
+				triangleLocalPosition.index = i;
 				expectedPenetrationPoints.first.meshLocalCoordinate.setValue(triangleLocalPosition);
-				triangleLocalPosition.elementId = 0;
+				triangleLocalPosition.index = 0;
 				expectedPenetrationPoints.second.meshLocalCoordinate.setValue(triangleLocalPosition);
 				auto contact = std::make_shared<TriangleContact>(expectedDepth, expectedContact,
 																 pose.linear() * Vector3d(0, 0, -1),
@@ -450,9 +450,9 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 			{
 				expectedPenetrationPoints.first.globalPosition.setValue(pose * Vector3d(0, -coordinate, coordinate));
 				expectedPenetrationPoints.second.globalPosition.setValue(pose * Vector3d(0, 0, coordinate));
-				triangleLocalPosition.elementId = i;
+				triangleLocalPosition.index = i;
 				expectedPenetrationPoints.first.meshLocalCoordinate.setValue(triangleLocalPosition);
-				triangleLocalPosition.elementId = 0;
+				triangleLocalPosition.index = 0;
 				expectedPenetrationPoints.second.meshLocalCoordinate.setValue(triangleLocalPosition);
 				auto contact = std::make_shared<TriangleContact>(expectedDepth, expectedContact,
 																 pose.linear() * Vector3d(0, 1, 0),

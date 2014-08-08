@@ -190,8 +190,8 @@ TEST_F(Fem3DRepresentationLocalizationTest, SetGetLocalization)
 	{
 		auto localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem);
 		EXPECT_NO_THROW(localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector4d(0.1, 0.1, 0.4, 0.4))));
-		EXPECT_EQ(1u, localization->getLocalPosition().elementId);
-		EXPECT_TRUE(Vector4d(0.1, 0.1, 0.4, 0.4).isApprox(localization->getLocalPosition().barycentricCoordinate));
+		EXPECT_EQ(1u, localization->getLocalPosition().index);
+		EXPECT_TRUE(Vector4d(0.1, 0.1, 0.4, 0.4).isApprox(localization->getLocalPosition().coordinate));
 	}
 }
 

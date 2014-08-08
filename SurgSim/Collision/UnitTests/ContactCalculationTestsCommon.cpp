@@ -58,8 +58,8 @@ bool checkMeshLocalCoordinate(
 	if (expectedLocalCoordinate.hasValue() && actualLocalCoordinate.hasValue())
 	{
 		isEqual &=
-			expectedLocalCoordinate.getValue().elementId == actualLocalCoordinate.getValue().elementId;
-		Vector3d barycentricCoordinates = actualLocalCoordinate.getValue().barycentricCoordinate;
+			expectedLocalCoordinate.getValue().index == actualLocalCoordinate.getValue().index;
+		Vector3d barycentricCoordinates = actualLocalCoordinate.getValue().coordinate;
 		isEqual &= eigenEqual(expectedGlobalPosition,
 							  barycentricCoordinates[0] * vertices[0] +
 							  barycentricCoordinates[1] * vertices[1] +

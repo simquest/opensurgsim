@@ -146,8 +146,8 @@ std::shared_ptr<FemElement> FemRepresentation::getFemElement(size_t femElementId
 
 bool FemRepresentation::isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const
 {
-	return (coordinate.elementId < m_femElements.size())
-		   && m_femElements[coordinate.elementId]->isValidCoordinate(coordinate.barycentricCoordinate);
+	return (coordinate.index < m_femElements.size())
+		   && m_femElements[coordinate.index]->isValidCoordinate(coordinate.coordinate);
 }
 
 double FemRepresentation::getTotalMass() const

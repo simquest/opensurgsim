@@ -162,7 +162,7 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 	SURGSIM_ASSERT(location.meshLocalCoordinate.hasValue())
 		<< "Localization cannot be created if the triangle ID is not available.";
 
-	SURGSIM_ASSERT(location.meshLocalCoordinate.getValue().barycentricCoordinate.size() == 3)
+	SURGSIM_ASSERT(location.meshLocalCoordinate.getValue().coordinate.size() == 3)
 		<< "Localization has incorrect size for the barycentric coordinates.";
 
 	auto deformableCollisionRepresentation
@@ -172,7 +172,7 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 		<< "Localization cannot be created if the DeformableCollisionRepresentation is not correctly set.";
 
 	// Find the vertex ids of the triangle.
-	size_t triangleId = location.meshLocalCoordinate.getValue().elementId;
+	size_t triangleId = location.meshLocalCoordinate.getValue().index;
 	auto triangleVertices = deformableCollisionRepresentation->getMesh()->getTriangle(triangleId).verticesId;
 
 	// Find the vertex ids of the corresponding FemNode.
@@ -201,16 +201,16 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 	}
 
 	// Create the natural coordinate.
-	SurgSim::Math::Vector4d barycentricCoordinate(location.meshLocalCoordinate.getValue().barycentricCoordinate[0],
-												  location.meshLocalCoordinate.getValue().barycentricCoordinate[1],
-												  location.meshLocalCoordinate.getValue().barycentricCoordinate[2],
+	SurgSim::Math::Vector4d barycentricCoordinate(location.meshLocalCoordinate.getValue().coordinate[0],
+												  location.meshLocalCoordinate.getValue().coordinate[1],
+												  location.meshLocalCoordinate.getValue().coordinate[2],
 												  0.0);
 	SurgSim::DataStructures::IndexedLocalCoordinate coordinate;
-	coordinate.elementId = elementId;
-	coordinate.barycentricCoordinate.resize(elementVertices.size());
+	coordinate.index = elementId;
+	coordinate.coordinate.resize(elementVertices.size());
 	for (size_t i = 0; i < elementVertices.size(); ++i)
 	{
-		coordinate.barycentricCoordinate[i] = barycentricCoordinate[indices[i]];
+		coordinate.coordinate[i] = barycentricCoordinate[indices[i]];
 	}
 
 	// Fem3DRepresentationLocalization::setLocalPosition verifies argument based on its Representation.

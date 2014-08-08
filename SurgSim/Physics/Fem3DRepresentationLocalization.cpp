@@ -66,23 +66,23 @@ SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(dou
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
 
-	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.elementId);
+	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
 	const std::shared_ptr<SurgSim::Math::OdeState> previousState = femRepresentation->getPreviousState();
 	const std::shared_ptr<SurgSim::Math::OdeState> currentState = femRepresentation->getCurrentState();
 
 	if (time == 0.0)
 	{
-		return femElement->computeCartesianCoordinate(*previousState, m_position.barycentricCoordinate);
+		return femElement->computeCartesianCoordinate(*previousState, m_position.coordinate);
 	}
 	else if (time == 1.0)
 	{
-		return femElement->computeCartesianCoordinate(*currentState, m_position.barycentricCoordinate);
+		return femElement->computeCartesianCoordinate(*currentState, m_position.coordinate);
 	}
 
 	const SurgSim::Math::Vector& currentPosition = femElement->computeCartesianCoordinate(*previousState,
-		m_position.barycentricCoordinate);
+		m_position.coordinate);
 	const SurgSim::Math::Vector& previousPosition = femElement->computeCartesianCoordinate(*currentState,
-		m_position.barycentricCoordinate);
+		m_position.coordinate);
 
 	return previousPosition + time * (currentPosition - previousPosition);
 }

@@ -24,23 +24,24 @@ namespace SurgSim
 namespace DataStructures
 {
 
-/// Structure which contains the elementId of an FemElement in an FemRepresentation and a coordinate in the FemElement.
+/// A generic (size_t index, Vector coordinate) pair. The coordinate is a dynamic size vector.
+/// E.g. This can be used to represent a barycentric coordinate within a simplex (identified by the index).
 struct IndexedLocalCoordinate
 {
 	/// Default constructor with no initialization.
 	IndexedLocalCoordinate();
 
 	/// Constructor with initialization.
-	/// \param elementId Numeric index.
-	/// \param barycentricCoordinate Barycentric coordinates with respect to element.
+	/// \param index Numeric index.
+	/// \param coordinate Coordinates with respect to the entity identified by the index.
 	/// \note Constructor does not throw when given malformed parameters.
-	IndexedLocalCoordinate(size_t elementId, const SurgSim::Math::Vector& barycentricCoordinate);
+	IndexedLocalCoordinate(size_t index, const SurgSim::Math::Vector& coordinate);
 
 	/// Numeric index to indicate the entity w.r.t which the barycentricCoordinate is defined.
-	size_t elementId;
+	size_t index;
 
-	/// Barycentric Coordinate representing position with respect to the nodes of the MeshElement.
-	SurgSim::Math::Vector barycentricCoordinate;
+	/// Coordinates with respect to the entity identified by the index.
+	SurgSim::Math::Vector coordinate;
 };
 
 } // namespace DataStructures
