@@ -53,16 +53,6 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 		std::numeric_limits<double>::quiet_NaN())),
 	m_calculateInertialTorques(false)
 {
-	SurgSim::DataStructures::DataGroupBuilder builder;
-	builder.addVector(SurgSim::DataStructures::Names::FORCE);
-	builder.addVector(SurgSim::DataStructures::Names::TORQUE);
-	builder.addMatrix(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
-	builder.addPose(SurgSim::DataStructures::Names::INPUT_POSE);
-	builder.addMatrix(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
-	builder.addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
-	builder.addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
-	m_outputData = builder.createData();
-
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
 		LinearStiffness, getOptionalLinearStiffness, setOptionalLinearStiffness);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
@@ -201,7 +191,25 @@ void VirtualToolCoupler::update(double dt)
 
 bool VirtualToolCoupler::doInitialize()
 {
+	if (m_outputData.isEmpty())
+	{
+		SurgSim::DataStructures::DataGroupBuilder builder;
+		addEntriesForOutputDataGroup(&builder);
+		m_outputData = builder.createData();
+	}
+
 	return true;
+}
+
+void VirtualToolCoupler::addEntriesForOutputDataGroup(SurgSim::DataStructures::DataGroupBuilder* builder)
+{
+	builder->addVector(SurgSim::DataStructures::Names::FORCE);
+	builder->addVector(SurgSim::DataStructures::Names::TORQUE);
+	builder->addMatrix(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
+	builder->addPose(SurgSim::DataStructures::Names::INPUT_POSE);
+	builder->addMatrix(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
+	builder->addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
+	builder->addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
 }
 
 bool VirtualToolCoupler::doWakeUp()

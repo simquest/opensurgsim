@@ -146,6 +146,10 @@ protected:
 	virtual bool doWakeUp() override;
 	virtual int getTargetManagerType() const override;
 
+	/// Add the entries needed in the output DataGroup to a builder.
+	/// \param [in,out] builder The DataGroupBuilder that will be used to build m_outputData.
+	void addEntriesForOutputDataGroup(SurgSim::DataStructures::DataGroupBuilder* builder);
+
 	/// Used for Serialization.
 	/// \param linearStiffness The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
 	void setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& linearStiffness);
@@ -205,9 +209,17 @@ protected:
 	/// User supplied attachment point
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> m_optionalAttachmentPoint;
 
-private:
+	/// The DataGroup to output
+	SurgSim::DataStructures::DataGroup m_outputData;
+
+	/// The input component.  Should provide a pose and the VTC will perform better with linear and angular velocities.
 	std::shared_ptr<SurgSim::Input::InputComponent> m_input;
+
+	/// The output component.  The VTC will provide a force and torque, the pose and velocities used in the
+	/// calculations, and Jacobians relating the force & torque to the pose and velocities.
 	std::shared_ptr<SurgSim::Input::OutputComponent> m_output;
+
+private:
 	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
 	std::string m_poseName;
 
@@ -228,9 +240,6 @@ private:
 
 	/// Scaling factor for the torques sent to the OutputComponent
 	double m_outputTorqueScaling;
-
-	/// The DataGroup to output
-	SurgSim::DataStructures::DataGroup m_outputData;
 
 	/// The input's point of attachment in the local frame, i.e., the same frame in which the mass center is defined.
 	SurgSim::Math::Vector3d m_localAttachmentPoint;
