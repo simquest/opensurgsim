@@ -220,6 +220,7 @@ SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState
 	addGravityForce(&m_f, state);
 	addRayleighDampingForce(&m_f, state);
 	addFemElementsForce(&m_f, state);
+	m_f += m_externalForce;
 
 	return m_f;
 }
@@ -321,6 +322,9 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSi
 
 	// Add the Rayleigh damping force to m_f
 	addRayleighDampingForce(&m_f, state, true, true);
+
+	// Add the external force to m_f
+	m_f += m_externalForce;
 
 	*f = &m_f;
 	*M = &m_M;

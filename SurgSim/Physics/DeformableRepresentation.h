@@ -76,6 +76,14 @@ public:
 	/// \return The integration scheme currently in use
 	SurgSim::Math::IntegrationScheme getIntegrationScheme() const;
 
+	/// Reset all external forces applied on the model
+	void resetExternalForce();
+
+	/// Add an external force applied on a specific node of the model
+	/// \param nodeId The node id on which the force is applied
+	/// \param force The force to apply (of dimension getNumDofPerNode())
+	void addExternalForce(size_t nodeId, SurgSim::Math::Vector force);
+
 	/// Gets the compliance matrix associated with motion
 	/// \return The compliance matrix
 	/// \note The compliance matrix is computed automatically by the ode solver in the method 'update'
@@ -120,6 +128,9 @@ protected:
 	/// Last valid state (a.k.a final state)
 	/// \note Backup of the current state for thread-safety access while the current state is being recomputed.
 	std::shared_ptr<SurgSim::Math::OdeState> m_finalState;
+
+	/// External force applied on the deformable representation
+	SurgSim::Math::Vector m_externalForce;
 
 	/// Force applied on the deformable representation
 	SurgSim::Math::Vector m_f;

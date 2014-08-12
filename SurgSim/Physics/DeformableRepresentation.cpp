@@ -77,6 +77,9 @@ void DeformableRepresentation::setInitialState(
 
 	// Set the representation number of degree of freedom
 	setNumDof(m_initialState->getNumDof());
+
+	// Reset the external force vector
+	resetExternalForce();
 }
 
 const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const
@@ -108,6 +111,21 @@ void DeformableRepresentation::setIntegrationScheme(SurgSim::Math::IntegrationSc
 SurgSim::Math::IntegrationScheme DeformableRepresentation::getIntegrationScheme() const
 {
 	return m_integrationScheme;
+}
+
+void DeformableRepresentation::resetExternalForce()
+{
+	SurgSim::Math::resizeVector(&m_externalForce, getNumDof(), true);
+}
+
+void DeformableRepresentation::addExternalForce(size_t nodeId, SurgSim::Math::Vector force)
+{
+	if (m_externalForce.size() != getNumDof())
+	{
+		resetExternalForce();
+	}
+
+	SurgSim::Math::addSubVector(force, nodeId, getNumDofPerNode(), &m_externalForce);
 }
 
 const SurgSim::Math::Matrix& DeformableRepresentation::getComplianceMatrix() const

@@ -136,6 +136,7 @@ Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 	addGravityForce(&m_f, state);
 	addRayleighDampingForce(&m_f, state);
 	addSpringsForce(&m_f, state);
+	m_f += m_externalForce;
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
@@ -294,6 +295,9 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 
 	// Add the Rayleigh damping force to m_f (using the damping matrix)
 	addRayleighDampingForce(&m_f, state, true, true);
+
+	// Add the external force to m_f
+	m_f += m_externalForce;
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
