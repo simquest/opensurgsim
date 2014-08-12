@@ -193,8 +193,7 @@ public:
 	/// Mark all data as not current.
 	void resetAll();
 
-	/// An empty DataGroup can be assigned to by any DataGroup that can be assigned from (i.e., the assigner's
-	/// NamedData are all valid).
+	/// An empty DataGroup can be assigned to by any DataGroup with only valid NamedData.
 	/// return true if all the NamedData are invalid.
 	bool isEmpty() const;
 
