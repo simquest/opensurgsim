@@ -279,6 +279,11 @@ public:
 	template <typename N>
 	void copy(const NamedData<N>& source, const NamedDataCopyMap& map);
 
+	/// Caches an entry's index if it is not already cached. An index is considered already cached if it is >= 0.
+	/// \param name The name of the entry.
+	/// \param [in,out] index The cached index.
+	void cacheIndex(const std::string& name, int* index) const;
+
 private:
 	/// The mapping between names and indices.
 	std::shared_ptr<const IndexDirectory> m_directory;
@@ -289,7 +294,6 @@ private:
 	/// The array storing whether the data is currently valid.
 	std::vector<bool> m_isDataValid;
 };
-
 
 };  // namespace DataStructures
 };  // namespace SurgSim
