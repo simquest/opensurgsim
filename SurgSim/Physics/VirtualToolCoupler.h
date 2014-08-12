@@ -238,6 +238,20 @@ private:
 	/// Whether or not the calculated torques will simulate inertia.  This setting only has an effect if the device
 	/// input point is not the mass center.
 	bool m_calculateInertialTorques;
+
+	///@{
+	/// Cached DataGroup indices.
+	int m_poseIndex;
+	int m_linearVelocityIndex;
+	int m_angularVelocityIndex;
+	int m_forceIndex;
+	int m_torqueIndex;
+	int m_inputLinearVelocityIndex;
+	int m_inputAngularVelocityIndex;
+	int m_inputPoseIndex;
+	int m_springJacobianIndex;
+	int m_damperJacobianIndex;
+	///@}
 };
 
 }; // Physics
