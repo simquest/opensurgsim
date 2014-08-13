@@ -281,6 +281,15 @@ TEST_F(MassSpringRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 	EXPECT_TRUE((*M).isApprox(m_expectedMass));
 	EXPECT_TRUE((*D).isApprox(m_expectedDamping));
 	EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+
+	SurgSim::Math::Vector externalForce = SurgSim::Math::Vector::Zero(m_massSpring->getNumDof());
+	externalForce.segment(0, m_massSpring->getNumDofPerNode()) =
+		SurgSim::Math::Vector::Ones(m_massSpring->getNumDofPerNode());
+	m_massSpring->addExternalForce(0, externalForce.segment(0, m_massSpring->getNumDofPerNode()));
+	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(
+		m_expectedSpringsForce + externalForce)));
+	EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
+	EXPECT_TRUE((*F).isApprox(m_expectedSpringsForce + externalForce));
 }
 
 TEST_F(MassSpringRepresentationTests, ComputesWithNoGravityAndDampingTest)
@@ -298,18 +307,27 @@ TEST_F(MassSpringRepresentationTests, ComputesWithNoGravityAndDampingTest)
 	m_massSpring->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 	m_massSpring->wakeUp();
 
-	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(
-		m_expectedSpringsForce + m_expectedRayleighDampingForce)));
+	SurgSim::Math::Vector expectedForce = m_expectedSpringsForce + m_expectedRayleighDampingForce;
+
+	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce)));
 	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeM(*m_initialState).isApprox(m_expectedMass)));
 	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(
 		m_expectedDamping + m_expectedRayleighDamping)));
 	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(m_expectedStiffness)));
 	// Test combo method computeFMDK
 	EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-	EXPECT_TRUE((*F).isApprox(m_expectedSpringsForce + m_expectedRayleighDampingForce));
+	EXPECT_TRUE((*F).isApprox(expectedForce));
 	EXPECT_TRUE((*M).isApprox(m_expectedMass));
 	EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping));
 	EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+
+	SurgSim::Math::Vector externalForce = SurgSim::Math::Vector::Zero(m_massSpring->getNumDof());
+	externalForce.segment(0, m_massSpring->getNumDofPerNode()) =
+		SurgSim::Math::Vector::Ones(m_massSpring->getNumDofPerNode());
+	m_massSpring->addExternalForce(0, externalForce.segment(0, m_massSpring->getNumDofPerNode()));
+	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce + externalForce)));
+	EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
+	EXPECT_TRUE((*F).isApprox(expectedForce + externalForce));
 }
 
 TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndNoDampingTest)
@@ -325,17 +343,26 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndNoDampingTest)
 	m_massSpring->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 	m_massSpring->wakeUp();
 
-	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(
-		m_expectedSpringsForce + m_expectedGravityForce)));
+	SurgSim::Math::Vector expectedForce = m_expectedSpringsForce + m_expectedGravityForce;
+
+	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce)));
 	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeM(*m_initialState).isApprox(m_expectedMass)));
 	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(m_expectedDamping)));
 	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(m_expectedStiffness)));
 	// Test combo method computeFMDK
 	EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-	EXPECT_TRUE((*F).isApprox(m_expectedSpringsForce + m_expectedGravityForce));
+	EXPECT_TRUE((*F).isApprox(expectedForce));
 	EXPECT_TRUE((*M).isApprox(m_expectedMass));
 	EXPECT_TRUE((*D).isApprox(m_expectedDamping));
 	EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+
+	SurgSim::Math::Vector externalForce = SurgSim::Math::Vector::Zero(m_massSpring->getNumDof());
+	externalForce.segment(0, m_massSpring->getNumDofPerNode()) =
+		SurgSim::Math::Vector::Ones(m_massSpring->getNumDofPerNode());
+	m_massSpring->addExternalForce(0, externalForce.segment(0, m_massSpring->getNumDofPerNode()));
+	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce + externalForce)));
+	EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
+	EXPECT_TRUE((*F).isApprox(expectedForce + externalForce));
 }
 
 TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndDampingTest)
@@ -353,16 +380,26 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndDampingTest)
 	m_massSpring->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 	m_massSpring->wakeUp();
 
-	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(
-		m_expectedSpringsForce + m_expectedRayleighDampingForce + m_expectedGravityForce)));
+	SurgSim::Math::Vector expectedForce = m_expectedSpringsForce + m_expectedRayleighDampingForce +
+		m_expectedGravityForce;
+
+	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce)));
 	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeM(*m_initialState).isApprox(m_expectedMass)));
 	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(
 		m_expectedDamping + m_expectedRayleighDamping)));
 	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(m_expectedStiffness)));
 	// Test combo method computeFMDK
 	EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-	EXPECT_TRUE((*F).isApprox(m_expectedSpringsForce + m_expectedRayleighDampingForce + m_expectedGravityForce));
+	EXPECT_TRUE((*F).isApprox(expectedForce));
 	EXPECT_TRUE((*M).isApprox(m_expectedMass));
 	EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping));
 	EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+
+	SurgSim::Math::Vector externalForce = SurgSim::Math::Vector::Zero(m_massSpring->getNumDof());
+	externalForce.segment(0, m_massSpring->getNumDofPerNode()) =
+		SurgSim::Math::Vector::Ones(m_massSpring->getNumDofPerNode());
+	m_massSpring->addExternalForce(0, externalForce.segment(0, m_massSpring->getNumDofPerNode()));
+	EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce + externalForce)));
+	EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
+	EXPECT_TRUE((*F).isApprox(expectedForce + externalForce));
 }

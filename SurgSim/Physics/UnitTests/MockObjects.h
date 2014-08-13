@@ -108,6 +108,8 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::MockDeformableRepresentation);
 
+	const SurgSim::Math::Vector& getExternalForce() const { return m_externalForce; }
+
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
 	virtual Vector& computeF(const OdeState& state) override;

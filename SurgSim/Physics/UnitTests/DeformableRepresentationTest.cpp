@@ -159,6 +159,38 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4, getIntegrationScheme());
 }
 
+TEST_F(DeformableRepresentationTest, ExternalForceAPITest)
+{
+	// External force vector not initialized until the initial state has been set (it contains the #dof...)
+	EXPECT_EQ(0, getExternalForce().size());
+
+	setInitialState(m_localInitialState);
+
+	// Vector initialized (properly sized and zeroed)
+	EXPECT_NE(0, getExternalForce().size());
+	EXPECT_EQ(getNumDof(), getExternalForce().size());
+	EXPECT_TRUE(getExternalForce().isZero());
+
+	SurgSim::Math::Vector F1 = SurgSim::Math::Vector::Zero(getNumDof());
+	F1[0] = 12.34;
+
+	addExternalForce(0, F1);
+	EXPECT_FALSE(getExternalForce().isZero());
+	EXPECT_TRUE(getExternalForce().isApprox(F1));
+
+	SurgSim::Math::Vector F2 = SurgSim::Math::Vector::Zero(getNumDof());
+	F2[0] = 12.34;
+	F2[1] = 0.34;
+	F2[2] = -9.32;
+
+	addExternalForce(0, F2);
+	EXPECT_FALSE(getExternalForce().isZero());
+	EXPECT_TRUE(getExternalForce().isApprox(F1 + F2));
+
+	resetExternalForce();
+	EXPECT_TRUE(getExternalForce().isZero());
+}
+
 TEST_F(DeformableRepresentationTest, GetComplianceMatrix)
 {
 	double dt = 1e-3;
