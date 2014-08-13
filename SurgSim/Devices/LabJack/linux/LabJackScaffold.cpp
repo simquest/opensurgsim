@@ -348,7 +348,7 @@ public:
 	/// The timer channels set for timer outputs (e.g., PWM outputs).
 	const std::unordered_set<int> timerOutputChannels;
 	/// The analog inputs.
-	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputs;
+	const std::unordered_map<int, LabJack::AnalogInputSettings> analogInputs;
 	/// The channels set for analog outputs.
 	const std::unordered_set<int> analogOutputChannels;
 	/// The DataGroup indices for the digital outputs.
@@ -373,7 +373,7 @@ private:
 	/// \param timers The timers.
 	/// \return The timers that provide inputs.
 	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int,
-		LabJack::TimerModeAndOptionalInitialValue>& timers) const
+		LabJack::TimerSettings>& timers) const
 	{
 		std::unordered_set<int> timersWithInputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
@@ -392,7 +392,7 @@ private:
 	/// \param timers The timers.
 	/// \return The timers that take outputs.
 	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int,
-		LabJack::TimerModeAndOptionalInitialValue>& timers) const
+		LabJack::TimerSettings>& timers) const
 	{
 		std::unordered_set<int> timersWithOutputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
@@ -1223,7 +1223,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 	int sendBytesSize = 7; // the first IOType goes here
 
 	int readBytesSize = 9; // Reading after a Feedback command provides 9+ bytes.
-	const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue> timers = device->getTimers();
+	const std::unordered_map<int, LabJack::TimerSettings> timers = device->getTimers();
 	for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 	{
 		const int minimumTimer = 0;
