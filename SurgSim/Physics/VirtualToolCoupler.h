@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/ObjectFactory.h"
