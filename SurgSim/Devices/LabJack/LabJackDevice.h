@@ -32,6 +32,72 @@ class LabJackScaffold;
 
 namespace LabJack
 {
+///@{
+/// The timer or channel number that corresponds with the descriptive name used by the LabJack.
+/// Use these for the arguments to the enable* functions.
+enum TIMER
+{
+	TIMER0,
+	TIMER1,
+	TIMER2,
+	TIMER3,
+	TIMER4,
+	TIMER5
+};
+
+enum FIO
+{
+	FIO0,
+	FIO1,
+	FIO2,
+	FIO3,
+	FIO4,
+	FIO5,
+	FIO6,
+	FIO7,
+	FIO8,
+	FIO9,
+	FIO10,
+	FIO11,
+	FIO12,
+	FIO13,
+	FIO14,
+	FIO15,
+	FIO16,
+	FIO17,
+	FIO18,
+	FIO19,
+	FIO20,
+	FIO21,
+	FIO22
+};
+
+enum AIN
+{
+	AIN0,
+	AIN1,
+	AIN2,
+	AIN3,
+	AIN4,
+	AIN5,
+	AIN6,
+	AIN7,
+	AIN8,
+	AIN9,
+	AIN10,
+	AIN11,
+	AIN12,
+	AIN13,
+	AIN14,
+	AIN15
+};
+
+enum DAC
+{
+	DAC0,
+	DAC1
+};
+///@}
 
 /// The models of LabJack devices.  Numbers come from LabJackUD.h.
 enum Model

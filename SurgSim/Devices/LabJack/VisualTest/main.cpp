@@ -236,30 +236,30 @@ int main(int argc, char** argv)
 	std::shared_ptr<LabJackDevice> toolDevice = std::make_shared<LabJackDevice>("LabJackDevice");
 	toolDevice->setAddress(""); // Get the first-found of the specified type and connection.
 
-	const int plusX = 0;
+	const int plusX = SurgSim::Device::LabJack::FIO0;
 	toolDevice->enableDigitalInput(plusX);
-	const int minusX = 1;
+	const int minusX = SurgSim::Device::LabJack::FIO1;
 	toolDevice->enableDigitalInput(minusX);
 
-	const int loopbackOut = 2;
+	const int loopbackOut = SurgSim::Device::LabJack::FIO2;
 	toolDevice->enableDigitalOutput(loopbackOut);
 
 	const int offset = 4;
 	toolDevice->setTimerCounterPinOffset(offset); // the U3 requires the offset to be 4+.
 
-	const int firstTimerForQuadrature = 0;
+	const int firstTimerForQuadrature = SurgSim::Device::LabJack::TIMER0;
 	toolDevice->enableTimer(firstTimerForQuadrature, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE);
 	toolDevice->enableTimer(firstTimerForQuadrature + 1, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE);
 
-	const int singleEndedAnalog = 1;
+	const int singleEndedAnalog = SurgSim::Device::LabJack::AIN1;
 	toolDevice->enableAnalogInput(singleEndedAnalog, SurgSim::Device::LabJack::Range::RANGE_10);
 
-	const int positiveAnalogDifferential = 2;
-	const int negativeAnalogDifferential = 3;
+	const int positiveAnalogDifferential = SurgSim::Device::LabJack::AIN2;
+	const int negativeAnalogDifferential = SurgSim::Device::LabJack::AIN3;
 	toolDevice->enableAnalogInput(positiveAnalogDifferential, SurgSim::Device::LabJack::Range::RANGE_10,
 		negativeAnalogDifferential);
 
-	const int xOut = 1;
+	const int xOut = SurgSim::Device::LabJack::DAC1;
 	toolDevice->enableAnalogOutput(xOut);
 
 	const double translationPerUpdate = 0.001; // Millimeter per update.
