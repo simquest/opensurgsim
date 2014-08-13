@@ -150,7 +150,7 @@ TEST(LabJackDeviceTest, InputConsumer)
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 1);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 1.1 * device->getMaximumUpdateRate());
 
-	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasEntry(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasEntry(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
 		std::to_string(0))); // The LabJackDevice provides entries for digital input lines 0 - 23.
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasEntry(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +

@@ -90,9 +90,9 @@ public:
 
 	void initializeInput(const std::string& device, const DataGroup& inputData)
 	{
-		m_digitalInputPlusXIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+		m_digitalInputPlusXIndex = inputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
 			std::to_string(m_lineForPlusX));
-		m_digitalInputMinusXIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+		m_digitalInputMinusXIndex = inputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
 			std::to_string(m_lineForMinusX));
 		m_timerInputIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
 			std::to_string(m_firstTimerForQuadrature));
@@ -127,11 +127,11 @@ public:
 		// Turn LabJack inputs into a pose so it can control the sphere.
 		if (m_digitalInputPlusXIndex >= 0)
 		{
-			double value;
-			if (dataToFilter.scalars().get(m_digitalInputPlusXIndex, &value))
+			bool value;
+			if (dataToFilter.booleans().get(m_digitalInputPlusXIndex, &value))
 			{
 				// If the device passed us this line's input, and the input is high...
-				if (value > 0.5)
+				if (value)
 				{
 					m_pose.translation() += Vector3d::UnitX() * m_translationPerUpdate;
 				}
@@ -140,11 +140,11 @@ public:
 
 		if (m_digitalInputMinusXIndex >= 0)
 		{
-			double value;
-			if (dataToFilter.scalars().get(m_digitalInputMinusXIndex, &value))
+			bool value;
+			if (dataToFilter.booleans().get(m_digitalInputMinusXIndex, &value))
 			{
 				// If the device passed us this line's input, and the input is high...
-				if (value > 0.5)
+				if (value)
 				{
 					m_pose.translation() -= Vector3d::UnitX() * m_translationPerUpdate;
 				}

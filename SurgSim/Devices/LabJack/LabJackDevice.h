@@ -166,10 +166,10 @@ struct AnalogInputSettings
 ///   | scalar | "analogInput"               | %Analog input with AIN1 as the positive channel                 |
 ///   | ...    |  ...                        | ...                                                             |
 ///   | scalar | "analogInput16"             | %Analog input with AIN16 as the positive channel                |
-///   | scalar | "digitalInput0"             | %Digital input, line #0                                         |
-///   | scalar | "digitalInput1"             | %Digital input, line #1                                         |
+///   | boolean| "digitalInput0"             | %Digital input, line #0, true for high input, false for low     |
+///   | boolean| "digitalInput1"             | %Digital input, line #1, true for high input, false for low     |
 ///   | ...    |  ...                        | ...                                                             |
-///   | scalar | "digitalInput23"            | %Digital input, line #23                                        |
+///   | boolean| "digitalInput23"            | %Digital input, line #23, true for high input, false for low    |
 ///   | scalar | "timerInput0"               | %The input from timer #0 if that timer provides input values    |
 ///   | scalar | "timerInput1"               | %The input from timer #1 if that timer provides input values    |
 ///   | ...    |  ...                        | ...                                                             |
@@ -181,10 +181,10 @@ struct AnalogInputSettings
 ///   | ----   | ----              | ---                                                                       |
 ///   | scalar | "analogOutput0"   | %Analog output, DAC0                                                      |
 ///   | scalar | "analogOutput1"   | %Analog output, DAC1                                                      |
-///   | scalar | "digitalOutput0"  | %Digital output, line #0                                                  |
-///   | scalar | "digitalOutput1"  | %Digital output, line #1                                                  |
+///   | boolean| "digitalOutput0"  | %Digital output, line #0, true for high output, false for low             |
+///   | boolean| "digitalOutput1"  | %Digital output, line #1, true for high output, false for low             |
 ///   | ...    |  ...              | ...                                                                       |
-///   | scalar | "digitalOutput23" | %Digital output, line #23                                                 |
+///   | boolean| "digitalOutput23" | %Digital output, line #23, true for high output, false for low            |
 ///   | scalar | "timerOutput0"    | %The output for timer #0 if that timer accepts output values              |
 ///   | scalar | "timerOutput1"    | %The output for timer #1 if that timer accepts output values              |
 ///   | ...    |  ...              | ...                                                                       |

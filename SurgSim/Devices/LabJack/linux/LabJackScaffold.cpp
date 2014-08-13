@@ -584,7 +584,7 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 				++input)
 			{
 				info->digitalInputIndices[*input] =
-					inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+					inputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
 					std::to_string(*input));
 				SURGSIM_ASSERT(info->digitalInputIndices[*input] >= 0) << "LabJackScaffold::DeviceData " <<
 					"failed to get a valid NamedData index for the digital input for line " << *input <<
@@ -664,7 +664,7 @@ bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 		for (auto output = digitalOutputChannels.cbegin(); output != digitalOutputChannels.cend(); ++output)
 		{
 			info->digitalOutputIndices[*output] =
-				initialOutputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX +
+				initialOutputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX +
 				std::to_string(*output));
 		}
 
@@ -738,10 +738,10 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 				" set to digital output, but the scaffold does not know the correct index into the NamedData. " <<
 				" Make sure there is an entry in the scalars with the correct string key.";
 
-			double value;
-			if (outputData.scalars().get(index, &value))
+			bool value;
+			if (outputData.booleans().get(index, &value))
 			{
-				const BYTE valueAsByte = static_cast<BYTE>(value + 0.5); // value is >=0. Conversion will truncate.
+				const BYTE valueAsByte = (value ? 1 : 0);
 				sendBytes.at(sendBytesSize++) = 11;  //IOType, BitStateWrite
 				sendBytes.at(sendBytesSize++) = (*output) | ((valueAsByte & 0xF) << 7);  //Bits 0-4: IO Number,
 																						//Bit 7: State
@@ -930,7 +930,8 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		// Digital inputs.
 		for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 		{
-			inputData.scalars().set(info->digitalInputIndices[*input], readBytes.at(currentByte++));
+			const bool value = (readBytes.at(currentByte++) > 0 ? true : false);
+			inputData.booleans().set(info->digitalInputIndices[*input], value);
 		}
 
 		// Read from the timers in the same order as above.
@@ -1024,7 +1025,7 @@ SurgSim::DataStructures::DataGroup LabJackScaffold::buildDeviceInputData()
 	const int maxDigitalInputs = 23; // The UE9 can have 23 digital inputs.
 	for (int i = 0; i < maxDigitalInputs; ++i)
 	{
-		builder.addScalar(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(i));
+		builder.addBoolean(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(i));
 	}
 
 	const int maxTimerInputs = 6; // The UE9 can have 6 timers.
