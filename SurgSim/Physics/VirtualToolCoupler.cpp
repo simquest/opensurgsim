@@ -21,6 +21,7 @@
 #include "SurgSim/Framework/LogMacros.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/OutputComponent.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -48,8 +49,9 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_linearDamping(std::numeric_limits<double>::quiet_NaN()),
 	m_angularStiffness(std::numeric_limits<double>::quiet_NaN()),
 	m_angularDamping(std::numeric_limits<double>::quiet_NaN()),
-	m_outputForceScaling(1.0),
-	m_outputTorqueScaling(1.0)
+	m_localAttachmentPoint(Vector3d(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
+		std::numeric_limits<double>::quiet_NaN())),
+	m_calculateInertialTorques(false)
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addVector(SurgSim::DataStructures::Names::FORCE);
@@ -69,6 +71,11 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 		AngularStiffness, getOptionalAngularStiffness, setOptionalAngularStiffness);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
 		AngularDamping, getOptionalAngularDamping, setOptionalAngularDamping);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler,
+			SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>, AttachmentPoint,
+			getOptionalAttachmentPoint, setOptionalAttachmentPoint);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, bool, CalculateInertialTorques,
+		getCalculateInertialTorques, setCalculateInertialTorques);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 		Input, getInput, setInput);
@@ -76,11 +83,6 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 		Output, getOutput, setOutput);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 		Representation, getRepresentation, setRepresentation);
-
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, double, OutputForceScaling,
-		getOutputForceScaling, setOutputForceScaling);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, double, OutputTorqueScaling,
-		getOutputTorqueScaling, setOutputTorqueScaling);
 }
 
 VirtualToolCoupler::~VirtualToolCoupler()
@@ -144,14 +146,23 @@ void VirtualToolCoupler::update(double dt)
 
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
-		Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
+		Vector3d attachmentPoint = objectPose * m_localAttachmentPoint;
+		Vector3d leverArm = Vector3d::Zero();
+		if (m_calculateInertialTorques)
+		{
+			const Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
+			leverArm = attachmentPoint - objectPosition;
+		}
+		Vector3d attachmentPointVelocity = objectState.getLinearVelocity();
+		attachmentPointVelocity += objectState.getAngularVelocity().cross(leverArm);
 
-		Vector3d force = m_linearStiffness * (inputPose.translation() - objectPosition);
-		force += m_linearDamping * (inputLinearVelocity - objectState.getLinearVelocity());
+		Vector3d force = m_linearStiffness * (inputPose.translation() - attachmentPoint);
+		force += m_linearDamping * (inputLinearVelocity - attachmentPointVelocity);
 
 		Vector3d rotationVector;
 		SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationVector);
 		Vector3d torque = m_angularStiffness * rotationVector;
+		torque += leverArm.cross(force);
 		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
@@ -164,25 +175,23 @@ void VirtualToolCoupler::update(double dt)
 
 		if (m_output != nullptr)
 		{
-			m_outputData.vectors().set(SurgSim::DataStructures::Names::FORCE, -force * m_outputForceScaling);
-			m_outputData.vectors().set(SurgSim::DataStructures::Names::TORQUE, -torque * m_outputTorqueScaling);
+			m_outputData.vectors().set(SurgSim::DataStructures::Names::FORCE, -force);
+			m_outputData.vectors().set(SurgSim::DataStructures::Names::TORQUE, -torque);
 			m_outputData.vectors().set(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY, inputLinearVelocity);
 			m_outputData.vectors().set(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY, inputAngularVelocity);
 
 			m_outputData.poses().set(SurgSim::DataStructures::Names::INPUT_POSE, inputPose);
 
-			Matrix66d springJacobian = Matrix66d::Zero();
-			Matrix33d outputLinearStiffnessMatrix = -linearStiffnessMatrix * m_outputForceScaling;
-			SurgSim::Math::setSubMatrix(outputLinearStiffnessMatrix, 0, 0, 3, 3, &springJacobian);
-			Matrix33d outputAngularStiffnessMatrix = -angularStiffnessMatrix * m_outputTorqueScaling;
-			SurgSim::Math::setSubMatrix(outputAngularStiffnessMatrix, 1, 1, 3, 3, &springJacobian);
+			const Matrix33d skewLeverArm = SurgSim::Math::makeSkewSymmetricMatrix(leverArm);
+
+			Matrix66d springJacobian;
+			springJacobian << -linearStiffnessMatrix, Matrix33d::Zero(),
+							  -m_linearStiffness * skewLeverArm, -angularStiffnessMatrix;
 			m_outputData.matrices().set(SurgSim::DataStructures::Names::SPRING_JACOBIAN, springJacobian);
 
-			Matrix66d damperJacobian = Matrix66d::Zero();
-			Matrix33d outputLinearDampingMatrix = -linearDampingMatrix * m_outputForceScaling;
-			SurgSim::Math::setSubMatrix(outputLinearDampingMatrix, 0, 0, 3, 3, &damperJacobian);
-			Matrix33d outputAngularDampingMatrix = -angularDampingMatrix * m_outputTorqueScaling;
-			SurgSim::Math::setSubMatrix(outputAngularDampingMatrix, 1, 1, 3, 3, &damperJacobian);
+			Matrix66d damperJacobian;
+			damperJacobian << -linearDampingMatrix, Matrix33d::Zero(),
+							  m_linearDamping * skewLeverArm, -angularDampingMatrix;
 			m_outputData.matrices().set(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, damperJacobian);
 
 			m_output->setData(m_outputData);
@@ -271,32 +280,21 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
+	if (m_optionalAttachmentPoint.hasValue())
+	{
+		m_localAttachmentPoint = m_optionalAttachmentPoint.getValue();
+	}
+	else
+	{
+		m_localAttachmentPoint = m_rigid->getCurrentParameters().getMassCenter();
+	}
+
 	return true;
 }
 
 int VirtualToolCoupler::getTargetManagerType() const
 {
 	return SurgSim::Framework::MANAGER_TYPE_PHYSICS;
-}
-
-double VirtualToolCoupler::getOutputForceScaling()
-{
-	return m_outputForceScaling;
-}
-
-void VirtualToolCoupler::setOutputForceScaling(double forceScaling)
-{
-	m_outputForceScaling = forceScaling;
-}
-
-double VirtualToolCoupler::getOutputTorqueScaling()
-{
-	return m_outputTorqueScaling;
-}
-
-void VirtualToolCoupler::setOutputTorqueScaling(double torqueScaling)
-{
-	m_outputTorqueScaling = torqueScaling;
 }
 
 void VirtualToolCoupler::overrideLinearStiffness(double linearStiffness)
@@ -363,6 +361,21 @@ double VirtualToolCoupler::getAngularDamping()
 	return m_angularDamping;
 }
 
+void VirtualToolCoupler::overrideAttachmentPoint(const SurgSim::Math::Vector3d& attachment)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot override vtc parameter after it has initialized";
+
+	m_optionalAttachmentPoint.setValue(attachment);
+	m_localAttachmentPoint = attachment;
+}
+
+const SurgSim::Math::Vector3d& VirtualToolCoupler::getAttachmentPoint()
+{
+	SURGSIM_ASSERT(isAwake() || m_optionalAttachmentPoint.hasValue())
+		<< "Vtc parameter has not been initialized";
+	return m_localAttachmentPoint;
+}
+
 void VirtualToolCoupler::setOptionalLinearStiffness(
 	const SurgSim::DataStructures::OptionalValue<double>& linearStiffness)
 {
@@ -404,6 +417,28 @@ void VirtualToolCoupler::setOptionalAngularDamping(
 const SurgSim::DataStructures::OptionalValue<double>& VirtualToolCoupler::getOptionalAngularDamping() const
 {
 	return m_optionalAngularDamping;
+}
+
+void VirtualToolCoupler::setOptionalAttachmentPoint(
+	const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& attachmentPoint)
+{
+	m_optionalAttachmentPoint = attachmentPoint;
+}
+
+const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>&
+VirtualToolCoupler::getOptionalAttachmentPoint() const
+{
+	return m_optionalAttachmentPoint;
+}
+
+void VirtualToolCoupler::setCalculateInertialTorques(bool calculateInertialTorques)
+{
+	m_calculateInertialTorques = calculateInertialTorques;
+}
+
+bool VirtualToolCoupler::getCalculateInertialTorques() const
+{
+	return m_calculateInertialTorques;
 }
 
 }; /// Physics

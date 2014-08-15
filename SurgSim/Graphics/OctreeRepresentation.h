@@ -19,6 +19,7 @@
 #include <string>
 
 #include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/OctreeShape.h"
 
 namespace SurgSim
@@ -34,6 +35,8 @@ public:
 	/// \param name Name of OctreeRepresentation
 	explicit OctreeRepresentation(const std::string& name) : Representation(name)
 	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(OctreeRepresentation, std::shared_ptr<SurgSim::Math::Shape>, OctreeShape,
+										  getOctreeShape, setOctreeShape);
 	}
 
 	/// Destructor
@@ -41,9 +44,12 @@ public:
 	{
 	}
 
-	/// Set the Octree of this representation. The Octree is retrieved from a Math::OctreeShape.
-	/// \param octreeShape The OctreeShape from which the octree is retrieved.
-	virtual void setOctree(const SurgSim::Math::OctreeShape& octreeShape) = 0;
+	/// Set the OctreeShape of this representation. The Octree is retrieved and visualized.
+	/// \param shape The OctreeShape from which the octree is retrieved and visualized.
+	virtual void setOctreeShape(const std::shared_ptr<SurgSim::Math::Shape>& shape) = 0;
+
+	/// \return The OctreeShape from which the Octree is retrieved.
+	virtual std::shared_ptr<SurgSim::Math::OctreeShape> getOctreeShape() const = 0;
 
 	/// Mark the OctreeNode visible/invisible in the given a OctreePath (typedef-ed in OctreeNode.h).
 	/// \param path An OctreePath, giving the path leads to the OctreeNode whose visibility to be changed.

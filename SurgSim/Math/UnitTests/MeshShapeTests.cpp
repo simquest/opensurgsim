@@ -27,8 +27,8 @@
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Vector.h"
 
-
 using SurgSim::DataStructures::EmptyData;
+using SurgSim::DataStructures::TriangleMeshPlain;
 
 // CUBE
 //     3*----------*2
@@ -40,24 +40,24 @@ using SurgSim::DataStructures::EmptyData;
 //   4*----------*5
 
 static const int cubeNumPoints = 8;
-static const SurgSim::Math::Vector3d cubePoints[8]=
+static const SurgSim::Math::Vector3d cubePoints[8] =
 {
-	SurgSim::Math::Vector3d(-1.0/2.0, -1.0/2.0, -1.0/2.0),
-	SurgSim::Math::Vector3d( 1.0/2.0, -1.0/2.0, -1.0/2.0),
-	SurgSim::Math::Vector3d( 1.0/2.0,  1.0/2.0, -1.0/2.0),
-	SurgSim::Math::Vector3d(-1.0/2.0,  1.0/2.0, -1.0/2.0),
+	SurgSim::Math::Vector3d(-1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	SurgSim::Math::Vector3d(1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	SurgSim::Math::Vector3d(1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
+	SurgSim::Math::Vector3d(-1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
 
-	SurgSim::Math::Vector3d(-1.0/2.0, -1.0/2.0,  1.0/2.0),
-	SurgSim::Math::Vector3d( 1.0/2.0, -1.0/2.0,  1.0/2.0),
-	SurgSim::Math::Vector3d( 1.0/2.0,  1.0/2.0,  1.0/2.0),
-	SurgSim::Math::Vector3d(-1.0/2.0,  1.0/2.0,  1.0/2.0)
+	SurgSim::Math::Vector3d(-1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	SurgSim::Math::Vector3d(1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	SurgSim::Math::Vector3d(1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0),
+	SurgSim::Math::Vector3d(-1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0)
 };
 
 static const int cubeNumEdges = 12;
 static const int cubeEdges[12][2] =
 {
 	{0, 1}, {3, 2}, {4, 5}, {7, 6}, // +X
-	{0, 3}, {1, 2}, {4, 7}, {5 ,6}, // +Y
+	{0, 3}, {1, 2}, {4, 7}, {5 , 6}, // +Y
 	{0, 4}, {1, 5}, {2, 6}, {3, 7}  // +Z
 };
 
@@ -75,10 +75,6 @@ static const int cubeTrianglesCCW[12][3] =
 class MeshShapeTest : public ::testing::Test
 {
 public:
-	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshBase;
-	typedef SurgSim::DataStructures::MeshElement<2, EmptyData> EdgeElement;
-	typedef SurgSim::DataStructures::MeshElement<3, EmptyData> TriangleElement;
-
 	void SetUp()
 	{
 		m_numIterations = 100;
@@ -94,37 +90,35 @@ public:
 TEST_F(MeshShapeTest, InvalidMeshCubeTest)
 {
 	// Cube
-	std::shared_ptr<TriangleMeshBase> invalidTriMesh = std::make_shared<TriangleMeshBase>();
+	std::shared_ptr<TriangleMeshPlain> invalidTriMesh = std::make_shared<TriangleMeshPlain>();
 	for (int i = 0; i < cubeNumPoints; i++)
 	{
 		SurgSim::Math::Vector3d p;
 		p[0] = cubePoints[i][0];
 		p[1] = cubePoints[i][1];
 		p[2] = cubePoints[i][2];
-		TriangleMeshBase::VertexType v(p);
+		TriangleMeshPlain::VertexType v(p);
 		invalidTriMesh->addVertex(v);
 	}
 	for (int i = 0; i < cubeNumEdges; i++)
 	{
-		std::array<size_t,2> edgePoints;
+		std::array<size_t, 2> edgePoints;
 		for (int j = 0; j < 2; j++)
 		{
 			edgePoints[j] = cubeEdges[i][j];
 		}
-		EdgeElement edgeElement(edgePoints);
-		TriangleMeshBase::EdgeType e(edgeElement);
+		TriangleMeshPlain::EdgeType e(edgePoints);
 		invalidTriMesh->addEdge(e);
 	}
 	for (int i = 0; i < cubeNumTriangles; i++)
 	{
-		std::array<size_t,3> trianglePoints;
+		std::array<size_t, 3> trianglePoints;
 		for (int j = 0; j < 3; j++)
 		{
 			// Add an offset of 3 to the indices (=> some of them will be invalid)
 			trianglePoints[j] = cubeTrianglesCCW[i][j] + 3;
 		}
-		TriangleElement triangleElement(trianglePoints);
-		TriangleMeshBase::TriangleType t(triangleElement);
+		TriangleMeshPlain::TriangleType t(trianglePoints);
 		invalidTriMesh->addTriangle(t);
 	}
 
@@ -133,7 +127,7 @@ TEST_F(MeshShapeTest, InvalidMeshCubeTest)
 
 TEST_F(MeshShapeTest, EmptyMeshTest)
 {
-	std::shared_ptr<TriangleMeshBase> emptyMesh = std::make_shared<TriangleMeshBase>();
+	std::shared_ptr<TriangleMeshPlain> emptyMesh = std::make_shared<TriangleMeshPlain>();
 
 	EXPECT_NO_THROW(SurgSim::Math::MeshShape meshShape(*emptyMesh));
 
@@ -151,19 +145,18 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 {
 	{
 		SCOPED_TRACE("Invalid Mesh");
-		auto emptyMesh = std::make_shared<TriangleMeshBase>();
+		auto emptyMesh = std::make_shared<TriangleMeshPlain>();
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>(*emptyMesh);
 		auto mesh = meshShape->getMesh();
 
 		for (int i = 0; i < cubeNumEdges; ++i)
 		{
-			std::array<size_t,2> edgePoints;
+			std::array<size_t, 2> edgePoints;
 			for (int j = 0; j < 2; j++)
 			{
 				edgePoints[j] = cubeEdges[i][j];
 			}
-			EdgeElement edgeElement(edgePoints);
-			TriangleMeshBase::EdgeType e(edgeElement);
+			TriangleMeshPlain::EdgeType e(edgePoints);
 			mesh->addEdge(e);
 		}
 
@@ -172,15 +165,15 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 
 	{
 		SCOPED_TRACE("Valid Mesh");
-		auto emptyMesh = std::make_shared<TriangleMeshBase>();
+		auto emptyMesh = std::make_shared<TriangleMeshPlain>();
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>(*emptyMesh);
 		auto mesh = meshShape->getMesh();
 
-		std::shared_ptr<TriangleMeshBase> invalidTriMesh = std::make_shared<TriangleMeshBase>();
+		std::shared_ptr<TriangleMeshPlain> invalidTriMesh = std::make_shared<TriangleMeshPlain>();
 		for (int i = 0; i < cubeNumPoints; i++)
 		{
 			SurgSim::Math::Vector3d point(cubePoints[i][0], cubePoints[i][1], cubePoints[i][2]);
-			TriangleMeshBase::VertexType vertex(point);
+			TriangleMeshPlain::VertexType vertex(point);
 			mesh->addVertex(vertex);
 		}
 
@@ -192,41 +185,39 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 {
 	for (int iterationID = 0; iterationID < m_numIterations; iterationID++)
 	{
-		double lx = 10.0 * (1.0/static_cast<double>(iterationID+1));
-		double ly = 10.0 * (2.0/static_cast<double>(iterationID+1));
-		double lz = 10.0 * (static_cast<double>(iterationID+1)/3.0);
+		double lx = 10.0 * (1.0 / static_cast<double>(iterationID + 1));
+		double ly = 10.0 * (2.0 / static_cast<double>(iterationID + 1));
+		double lz = 10.0 * (static_cast<double>(iterationID + 1) / 3.0);
 
 		// Cube
-		std::shared_ptr<TriangleMeshBase> mesh = std::make_shared<TriangleMeshBase>();
+		std::shared_ptr<TriangleMeshPlain> mesh = std::make_shared<TriangleMeshPlain>();
 		for (int i = 0; i < cubeNumPoints; i++)
 		{
 			SurgSim::Math::Vector3d p;
 			p[0] = cubePoints[i][0] * lx;
 			p[1] = cubePoints[i][1] * ly;
 			p[2] = cubePoints[i][2] * lz;
-			TriangleMeshBase::VertexType v(p);
+			TriangleMeshPlain::VertexType v(p);
 			mesh->addVertex(v);
 		}
 		for (int i = 0; i < cubeNumEdges; i++)
 		{
-			std::array<size_t,2> edgePoints;
+			std::array<size_t, 2> edgePoints;
 			for (int j = 0; j < 2; j++)
 			{
 				edgePoints[j] = cubeEdges[i][j];
 			}
-			EdgeElement edgeElement(edgePoints);
-			TriangleMeshBase::EdgeType e(edgeElement);
+			TriangleMeshPlain::EdgeType e(edgePoints);
 			mesh->addEdge(e);
 		}
 		for (int i = 0; i < cubeNumTriangles; i++)
 		{
-			std::array<size_t,3> trianglePoints;
+			std::array<size_t, 3> trianglePoints;
 			for (int j = 0; j < 3; j++)
 			{
 				trianglePoints[j] = cubeTrianglesCCW[i][j];
 			}
-			TriangleElement triangleElement(trianglePoints);
-			TriangleMeshBase::TriangleType t(triangleElement);
+			TriangleMeshPlain::TriangleType t(trianglePoints);
 			mesh->addTriangle(t);
 		}
 
@@ -258,8 +249,8 @@ TEST_F(MeshShapeTest, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 
 	std::shared_ptr<SurgSim::Math::MeshShape> newMeshShape;
-	ASSERT_NO_THROW(newMeshShape =
-				std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(node.as<std::shared_ptr<SurgSim::Math::Shape>>()));
+	ASSERT_NO_THROW(newMeshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(
+									   node.as<std::shared_ptr<SurgSim::Math::Shape>>()));
 
 	EXPECT_EQ("SurgSim::Math::MeshShape", newMeshShape->getClassName());
 	EXPECT_EQ(fileName, newMeshShape->getFileName());
@@ -287,8 +278,8 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 	for (auto it = triangles.begin(); it != triangles.end(); ++it)
 	{
 		auto ids = it->verticesId;
-		EXPECT_TRUE(tree->getAabb().contains(
-			SurgSim::Math::makeAabb(vertices[ids[0]].position, vertices[ids[1]].position, vertices[ids[2]].position)));
+		EXPECT_TRUE(tree->getAabb().contains(SurgSim::Math::makeAabb(
+				vertices[ids[0]].position, vertices[ids[1]].position, vertices[ids[2]].position)));
 	}
 }
 

@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
+#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Math/Vector.h"
 
-using SurgSim::DataStructures::EmptyData;
-using SurgSim::DataStructures::TriangleMeshBase;
+using SurgSim::DataStructures::TriangleMeshPlain;
 using SurgSim::Math::Vector3d;
 
 namespace SurgSim
@@ -42,12 +42,12 @@ static const int cubeNumPoints = 8;
 static const Vector3d cubePoints[8] =
 {
 	Vector3d(-1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
-	Vector3d( 1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
-	Vector3d( 1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
+	Vector3d(1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	Vector3d(1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
 	Vector3d(-1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
 	Vector3d(-1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
-	Vector3d( 1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
-	Vector3d( 1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0),
+	Vector3d(1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	Vector3d(1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0),
 	Vector3d(-1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0)
 };
 
@@ -55,7 +55,7 @@ static const int cubeNumEdges = 12;
 static const int cubeEdges[12][2] =
 {
 	{0, 1}, {3, 2}, {4, 5}, {7, 6}, // +X
-	{0, 3}, {1, 2}, {4, 7}, {5 ,6}, // +Y
+	{0, 3}, {1, 2}, {4, 7}, {5 , 6}, // +Y
 	{0, 4}, {1, 5}, {2, 6}, {3, 7}  // +Z
 };
 
@@ -99,19 +99,15 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::makeRotationQuaternion;
 
-	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshBase;
-	typedef SurgSim::DataStructures::MeshElement<2, EmptyData> EdgeElement;
-	typedef SurgSim::DataStructures::MeshElement<3, EmptyData> TriangleElement;
-
 	// Create a Mesh Cube
-	std::shared_ptr<TriangleMeshBase> mesh = std::make_shared<TriangleMeshBase>();
+	std::shared_ptr<TriangleMeshPlain> mesh = std::make_shared<TriangleMeshPlain>();
 	for (int i = 0; i < cubeNumPoints; ++i)
 	{
 		Vector3d p;
 		p[0] = cubePoints[i][0];
 		p[1] = cubePoints[i][1];
 		p[2] = cubePoints[i][2];
-		TriangleMeshBase::VertexType v(p);
+		TriangleMeshPlain::VertexType v(p);
 		mesh->addVertex(v);
 	}
 	for (int i = 0; i < cubeNumEdges; ++i)
@@ -121,8 +117,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		{
 			edgePoints[j] = cubeEdges[i][j];
 		}
-		EdgeElement edgeElement(edgePoints);
-		TriangleMeshBase::EdgeType e(edgeElement);
+		TriangleMeshPlain::EdgeType e(edgePoints);
 		mesh->addEdge(e);
 	}
 	for (int i = 0; i < cubeNumTriangles; ++i)
@@ -132,8 +127,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		{
 			trianglePoints[j] = cubeTrianglesCCW[i][j];
 		}
-		TriangleElement triangleElement(trianglePoints);
-		TriangleMeshBase::TriangleType t(triangleElement);
+		TriangleMeshPlain::TriangleType t(trianglePoints);
 		mesh->addTriangle(t);
 	}
 
@@ -222,45 +216,44 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 }
 
 
-void addNewTriangle(std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData>> mesh,
+void addNewTriangle(std::shared_ptr<TriangleMeshPlain> mesh,
 					SurgSim::Math::Vector3d point0, SurgSim::Math::Vector3d point1, SurgSim::Math::Vector3d point2)
 {
-	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
 
 	// Add vertices
-	TriangleMesh::VertexType vertexMesh(Vector3d::Zero());
+	TriangleMeshPlain::VertexType vertexMesh(Vector3d::Zero());
 
-	vertexMesh = TriangleMesh::VertexType(point0);
+	vertexMesh = TriangleMeshPlain::VertexType(point0);
 	size_t index0 = mesh->addVertex(vertexMesh);
 
-	vertexMesh = TriangleMesh::VertexType(point1);
+	vertexMesh = TriangleMeshPlain::VertexType(point1);
 	size_t index1 = mesh->addVertex(vertexMesh);
 
-	vertexMesh = TriangleMesh::VertexType(point2);
+	vertexMesh = TriangleMeshPlain::VertexType(point2);
 	size_t index2 = mesh->addVertex(vertexMesh);
 
 	// Add edges
 	std::array<size_t, 2> edge;
-	TriangleMesh::EdgeType meshEdge(edge);
+	TriangleMeshPlain::EdgeType meshEdge(edge);
 
 	edge[0] = index0;
 	edge[1] = index1;
-	meshEdge = TriangleMesh::EdgeType(edge);
+	meshEdge = TriangleMeshPlain::EdgeType(edge);
 	mesh->addEdge(meshEdge);
 
 	edge[0] = index1;
 	edge[1] = index2;
-	meshEdge = TriangleMesh::EdgeType(edge);
+	meshEdge = TriangleMeshPlain::EdgeType(edge);
 	mesh->addEdge(meshEdge);
 
 	edge[0] = index2;
 	edge[1] = index0;
-	meshEdge = TriangleMesh::EdgeType(edge);
+	meshEdge = TriangleMeshPlain::EdgeType(edge);
 	mesh->addEdge(meshEdge);
 
 	// Add triangle
 	std::array<size_t, 3> triangle = {index0, index1, index2};
-	TriangleMesh::TriangleType meshTriangle(triangle);
+	TriangleMeshPlain::TriangleType meshTriangle(triangle);
 	mesh->addTriangle(meshTriangle);
 }
 
@@ -272,14 +265,11 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 
 	RigidTransform3d pose;
 	pose = SurgSim::Math::makeRigidTransform(
-			SurgSim::Math::makeRotationQuaternion(0.3468, Vector3d(0.2577, 0.8245, 1.0532).normalized()),
-			Vector3d(120.34, 567.23, -832.84));
-
-	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
-
+			   SurgSim::Math::makeRotationQuaternion(0.3468, Vector3d(0.2577, 0.8245, 1.0532).normalized()),
+			   Vector3d(120.34, 567.23, -832.84));
 	{
 		// The second mesh.
-		auto intersectingTriangle = std::make_shared<TriangleMesh>();
+		auto intersectingTriangle = std::make_shared<TriangleMeshPlain>();
 		addNewTriangle(intersectingTriangle,
 					   Vector3d(0.0, 0.0, 0.0),
 					   Vector3d(0.0, 0.0, 1.0),
@@ -287,7 +277,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 		auto triangleMesh = std::make_shared<MeshShape>(*intersectingTriangle);
 
 		// The first mesh.
-		auto baseTriangles = std::make_shared<TriangleMesh>();
+		auto baseTriangles = std::make_shared<TriangleMeshPlain>();
+
 		static const int numTriangles = 100;
 
 		std::list<std::shared_ptr<Contact>> expectedContacts;
@@ -389,18 +380,16 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 
 	RigidTransform3d pose;
 	pose = SurgSim::Math::makeRigidTransform(
-			SurgSim::Math::makeRotationQuaternion(0.4638, Vector3d(0.5727, 0.2485, 1.532).normalized()),
-			Vector3d(210.34, 675.23, -283.84));
+			   SurgSim::Math::makeRotationQuaternion(0.4638, Vector3d(0.5727, 0.2485, 1.532).normalized()),
+			   Vector3d(210.34, 675.23, -283.84));
 	pose = SurgSim::Math::makeRigidTransform(
-			SurgSim::Math::makeRotationQuaternion(0.0, Vector3d(0.5727, 0.2485, 1.532).normalized()),
-			Vector3d(0, 0, 0));
-
-	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
+			   SurgSim::Math::makeRotationQuaternion(0.0, Vector3d(0.5727, 0.2485, 1.532).normalized()),
+			   Vector3d(0, 0, 0));
 
 	{
 		// The second mesh.
 		const double e = 8e-11;
-		auto intersectingTriangle = std::make_shared<TriangleMesh>();
+		auto intersectingTriangle = std::make_shared<TriangleMeshPlain>();
 		addNewTriangle(intersectingTriangle,
 					   Vector3d(e, 0.0, 0.0),
 					   Vector3d(-0.5, 0.0, 1.0),
@@ -408,7 +397,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 		auto triangleMesh = std::make_shared<MeshShape>(*intersectingTriangle);
 
 		// The first mesh.
-		auto baseTriangles = std::make_shared<TriangleMesh>();
+		auto baseTriangles = std::make_shared<TriangleMeshPlain>();
+
 		static const size_t numTriangles = 100;
 		SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;
 
