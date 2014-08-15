@@ -17,6 +17,7 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Math/OdeState.h"
@@ -27,7 +28,6 @@
 #include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
-#include "SurgSim/Physics/FemRepresentationCoordinate.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
 using SurgSim::Math::Vector3d;
@@ -126,7 +126,7 @@ TEST(Fem3DRepresentationBilateral3DTests, BuildMlcpBasic)
 
 	// Setup parameters for Fem3DRepresentationBilateral3D::build
 	auto localization = std::make_shared<Fem3DRepresentationLocalization>(getTestingFem3d("representation"));
-	localization->setLocalPosition(FemRepresentationCoordinate(2u, Vector4d(0.0, 0.0, 1.0, 0.0)));
+	localization->setLocalPosition(SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.0, 0.0, 1.0, 0.0)));
 
 	actual = localization->calculatePosition();
 
@@ -160,7 +160,8 @@ TEST(Fem3DRepresentationBilateral3DTests, BuildMlcp)
 
 	// Setup parameters for Fem3DRepresentationBilateral3D::build
 	auto localization = std::make_shared<Fem3DRepresentationLocalization>(getTestingFem3d("representation"));
-	localization->setLocalPosition(FemRepresentationCoordinate(2u, Vector4d(0.11, 0.02, 0.33, 0.54)));
+	localization->setLocalPosition(
+		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.11, 0.02, 0.33, 0.54)));
 
 	actual = localization->calculatePosition();
 
@@ -203,12 +204,14 @@ TEST(Fem3DRepresentationBilateral3DTests, BuildMlcpTwoStep)
 
 	auto localization = std::make_shared<Fem3DRepresentationLocalization>(getTestingFem3d("representation"));
 
-	localization->setLocalPosition(FemRepresentationCoordinate(2u, Vector4d(0.11, 0.02, 0.33, 0.54)));
+	localization->setLocalPosition(
+		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.11, 0.02, 0.33, 0.54)));
 	actual = localization->calculatePosition();
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
-	localization->setLocalPosition(FemRepresentationCoordinate(1u, Vector4d(0.32, 0.05, 0.14, 0.49)));
+	localization->setLocalPosition(
+		SurgSim::DataStructures::IndexedLocalCoordinate(1u, Vector4d(0.32, 0.05, 0.14, 0.49)));
 	desired = localization->calculatePosition();
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_NEGATIVE_SIDE));

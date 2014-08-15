@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/ApplicationData.h"
@@ -23,7 +24,6 @@
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemRepresentation.h"
-#include "SurgSim/Physics/FemRepresentationCoordinate.h"
 
 namespace SurgSim
 {
@@ -144,10 +144,10 @@ std::shared_ptr<FemElement> FemRepresentation::getFemElement(size_t femElementId
 	return m_femElements[femElementId];
 }
 
-bool FemRepresentation::isValidCoordinate(const FemRepresentationCoordinate& coordinate) const
+bool FemRepresentation::isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const
 {
-	return (coordinate.elementId < m_femElements.size())
-		   && m_femElements[coordinate.elementId]->isValidCoordinate(coordinate.naturalCoordinate);
+	return (coordinate.index < m_femElements.size())
+		   && m_femElements[coordinate.index]->isValidCoordinate(coordinate.coordinate);
 }
 
 double FemRepresentation::getTotalMass() const

@@ -47,7 +47,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemElement.cpp
 	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
-	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentation.cpp
 	FixedRepresentationBilateral3D.cpp
@@ -109,7 +108,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	FemElement.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
-	FemRepresentationCoordinate.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FixedRepresentationBilateral3D.h
