@@ -147,9 +147,8 @@ protected:
 	virtual bool doWakeUp() override;
 	virtual int getTargetManagerType() const override;
 
-	/// Add the entries needed in the output DataGroup to a builder.
-	/// \param [in,out] builder The DataGroupBuilder that will be used to build m_outputData.
-	void addEntriesForOutputDataGroup(SurgSim::DataStructures::DataGroupBuilder* builder);
+	/// \return The DataGroup to be sent to the device via the OutputComponent.
+	virtual SurgSim::DataStructures::DataGroup buildOutputData();
 
 	/// Used for Serialization.
 	/// \param linearStiffness The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)

@@ -191,25 +191,22 @@ void VirtualToolCoupler::update(double dt)
 
 bool VirtualToolCoupler::doInitialize()
 {
-	if (m_outputData.isEmpty())
-	{
-		SurgSim::DataStructures::DataGroupBuilder builder;
-		addEntriesForOutputDataGroup(&builder);
-		m_outputData = builder.createData();
-	}
+	m_outputData = buildOutputData();
 
 	return true;
 }
 
-void VirtualToolCoupler::addEntriesForOutputDataGroup(SurgSim::DataStructures::DataGroupBuilder* builder)
+SurgSim::DataStructures::DataGroup VirtualToolCoupler::buildOutputData()
 {
-	builder->addVector(SurgSim::DataStructures::Names::FORCE);
-	builder->addVector(SurgSim::DataStructures::Names::TORQUE);
-	builder->addMatrix(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
-	builder->addPose(SurgSim::DataStructures::Names::INPUT_POSE);
-	builder->addMatrix(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
-	builder->addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
-	builder->addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
+	SurgSim::DataStructures::DataGroupBuilder builder;
+	builder.addVector(SurgSim::DataStructures::Names::FORCE);
+	builder.addVector(SurgSim::DataStructures::Names::TORQUE);
+	builder.addMatrix(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
+	builder.addPose(SurgSim::DataStructures::Names::INPUT_POSE);
+	builder.addMatrix(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
+	builder.addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
+	builder.addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
+	return builder.createData();
 }
 
 bool VirtualToolCoupler::doWakeUp()
