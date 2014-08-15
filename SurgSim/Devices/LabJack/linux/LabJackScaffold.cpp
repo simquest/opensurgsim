@@ -1069,7 +1069,19 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
 	// One-time configuration of counters and timers.
-	const BYTE numberOfTimers = device->getTimers().size();
+	const std::unordered_map<int, LabJack::TimerSettings>& timers = device->getTimers();
+
+	for (auto timer : timers)
+	{
+		SURGSIM_LOG_IF(timer.first >= static_cast<int>(timers.size()), m_logger, SEVERE) <<
+			"Error configuring enabled timers for a device named '" << device->getName() <<
+			"', with number of timers: " << timers.size() << "." << std::endl <<
+			"  Timers must be enabled consecutively, starting with #0." << std::endl <<
+			"  With the currently enabled number of timers, the highest allowable timer is #" <<
+			timers.size() - 1 << ", but one of the enabled timers is #" << timer.first << "." << std::endl;
+	}
+
+	const BYTE numberOfTimers = timers.size();
 	const BYTE counterEnable = 0; // Counters are not currently supported.
 	const BYTE pinOffset = device->getTimerCounterPinOffset();
 
