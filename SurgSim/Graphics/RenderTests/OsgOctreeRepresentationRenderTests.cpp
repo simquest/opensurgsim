@@ -76,8 +76,7 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 	octree->addData(Vector3d(0.01, 0.01, 0.11), emptyData, 3);
 	octree->addData(Vector3d(0.01, 0.01, 0.11), emptyData, 4);
 
-	OctreeShape octreeShape;
-	octreeShape.setRootNode(octree);
+	auto octreeShape = std::make_shared<SurgSim::Math::OctreeShape>(*octree);
 
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Octree Representation");
 	octreeRepresentation->setLocalPose(makeRigidTransform(
@@ -85,7 +84,7 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 										   Vector3d(0.0, 0.0, -1.0))
 									  );
 	viewElement->addComponent(octreeRepresentation);
-	octreeRepresentation->setOctree(octreeShape);
+	octreeRepresentation->setOctreeShape(octreeShape);
 
 	// Path to a leaf node
 	SurgSim::DataStructures::OctreePath path0;

@@ -192,13 +192,16 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::shared_ptr<VirtualToolCoupler> inputVTC = std::make_shared<VirtualToolCoupler>("VTC");
 	inputVTC->setInput(inputComponent);
 	inputVTC->setRepresentation(physicsRepresentation);
+	inputVTC->overrideAttachmentPoint(Vector3d::Zero());
+	inputVTC->setCalculateInertialTorques(true);
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
 	// Also, it is aware of collisions of the stapler.
 	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>("Behavior");
 	staplerBehavior->setInputComponent(inputComponent);
 	staplerBehavior->setRepresentation(physicsRepresentation);
-	staplerBehavior->enableStaplingForSceneElement("armSceneElement");
+	staplerBehavior->enableStaplingForSceneElement("arm");
+	staplerBehavior->enableStaplingForSceneElement("wound");
 
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
 		std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");

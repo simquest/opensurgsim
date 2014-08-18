@@ -33,7 +33,7 @@ namespace DataStructures
 template <class M>
 std::shared_ptr<M> loadTriangleMesh(const std::string& filename);
 
-std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadTriangleMesh(const std::string& filename);
+std::shared_ptr<TriangleMeshPlain> loadTriangleMesh(const std::string& filename);
 
 }
 }

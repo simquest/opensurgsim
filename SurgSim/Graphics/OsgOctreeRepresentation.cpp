@@ -29,6 +29,7 @@ namespace SurgSim
 {
 namespace Graphics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgOctreeRepresentation, OsgOctreeRepresentation);
 
 using SurgSim::Math::Vector3d;
 
@@ -40,11 +41,9 @@ OsgOctreeRepresentation::OsgOctreeRepresentation(const std::string& name) :
 {
 }
 
-
 OsgOctreeRepresentation::~OsgOctreeRepresentation()
 {
 }
-
 
 void OsgOctreeRepresentation::doUpdate(double dt)
 {
@@ -87,11 +86,20 @@ void OsgOctreeRepresentation::buildOctree(osg::ref_ptr<osg::PositionAttitudeTran
 	}
 }
 
-void OsgOctreeRepresentation::setOctree(const SurgSim::Math::OctreeShape& octreeShape)
+void OsgOctreeRepresentation::setOctreeShape(const std::shared_ptr<SurgSim::Math::Shape>& shape)
 {
 	SURGSIM_ASSERT(!isAwake()) << "OsgOctreeRepresentation::setOctree() should be called before wake up.";
-	auto octree = std::make_shared<SurgSim::Math::OctreeShape::NodeType>(*(octreeShape.getRootNode()));
-	buildOctree(m_transform, octree);
+
+	auto octreeShape = std::dynamic_pointer_cast<SurgSim::Math::OctreeShape>(shape);
+	SURGSIM_ASSERT(octreeShape != nullptr) << "OsgOctreeRepresentation can only accept an OctreeShape.";
+	m_octreeShape = octreeShape;
+
+	buildOctree(m_transform, m_octreeShape->getRootNode());
+}
+
+std::shared_ptr<SurgSim::Math::OctreeShape> OsgOctreeRepresentation::getOctreeShape() const
+{
+	return m_octreeShape;
 }
 
 void OsgOctreeRepresentation::setNodeVisible(const SurgSim::DataStructures::OctreePath& path, bool visibility)

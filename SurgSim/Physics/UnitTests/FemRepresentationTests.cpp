@@ -18,9 +18,9 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Framework/Runtime.h" //< Used to initialize the Component Fem3DRepresentation
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
-#include "SurgSim/Physics/FemRepresentationCoordinate.h"
 
 namespace SurgSim
 {
@@ -166,7 +166,7 @@ TEST_F(FemRepresentationTests, AddSetGetTest)
 
 TEST_F(FemRepresentationTests, IsValidCoordinateTest)
 {
-	using SurgSim::Physics::FemRepresentationCoordinate;
+	using SurgSim::DataStructures::IndexedLocalCoordinate;
 
 	MockFemRepresentation fem("name");
 
@@ -184,9 +184,9 @@ TEST_F(FemRepresentationTests, IsValidCoordinateTest)
 
 	// Only the elementId is tested (by passing a valid natural coordinate).
 	// The validation of the natural coordinate is tested in the respective FemElement's UnitTest.
-	FemRepresentationCoordinate invalidCoordinates(1, validNaturalCoordinate);
+	IndexedLocalCoordinate invalidCoordinates(1, validNaturalCoordinate);
 	EXPECT_FALSE(fem.isValidCoordinate(invalidCoordinates));
-	FemRepresentationCoordinate validCoordinates(0, validNaturalCoordinate);
+	IndexedLocalCoordinate validCoordinates(0, validNaturalCoordinate);
 	EXPECT_TRUE(fem.isValidCoordinate(validCoordinates));
 }
 

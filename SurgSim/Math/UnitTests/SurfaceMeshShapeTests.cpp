@@ -22,6 +22,7 @@
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::EmptyData;
+using SurgSim::DataStructures::TriangleMeshPlain;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::SurfaceMeshShape;
 using SurgSim::Math::Quaterniond;
@@ -30,9 +31,6 @@ using SurgSim::Math::Vector3d;
 class SurfaceMeshShapeTest : public ::testing::Test
 {
 public:
-	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshBase;
-	typedef SurgSim::DataStructures::MeshElement<2, EmptyData> EdgeElement;
-	typedef SurgSim::DataStructures::MeshElement<3, EmptyData> TriangleElement;
 
 	void SetUp()
 	{
@@ -57,27 +55,27 @@ public:
 	double m_expectedVolume;
 	Matrix33d m_expectedMatrix;
 
-	TriangleMeshBase buildDiskZ(const Quaterniond& q, const Vector3d& center, double radius) const
+	TriangleMeshPlain buildDiskZ(const Quaterniond& q, const Vector3d& center, double radius) const
 	{
 		size_t totalNumNodes = 501; // 1 center + lots on perimeter
 		double deltaAngle = 2.0 * M_PI / static_cast<double>(totalNumNodes - 1);
-		TriangleMeshBase disk;
+		TriangleMeshPlain disk;
 
 		// Add the center point
-		disk.addVertex(TriangleMeshBase::VertexType(center));
+		disk.addVertex(TriangleMeshPlain::VertexType(center));
 		// Add the peripheral points
 		for (size_t nodeId = 0; nodeId < totalNumNodes - 1; ++nodeId)
 		{
 			double angle = deltaAngle * nodeId;
 			Vector3d p(m_radius * cos(angle), m_radius * sin(angle), 0.0);
-			disk.addVertex(TriangleMeshBase::VertexType(q._transformVector(p) + center));
+			disk.addVertex(TriangleMeshPlain::VertexType(q._transformVector(p) + center));
 		}
 
 		// Define the triangles
 		for (size_t triId = 1; triId < totalNumNodes - 1; ++triId)
 		{
 			std::array<size_t, 3> indices = {{ 0, triId, triId + 1}};
-			disk.addTriangle(TriangleMeshBase::TriangleType(indices));
+			disk.addTriangle(TriangleMeshPlain::TriangleType(indices));
 		}
 		return disk;
 	}
@@ -85,7 +83,7 @@ public:
 
 TEST_F(SurfaceMeshShapeTest, EmptyMeshTest)
 {
-	TriangleMeshBase emptyMesh;
+	TriangleMeshPlain emptyMesh;
 	std::shared_ptr<SurfaceMeshShape> diskShape = std::make_shared<SurfaceMeshShape>(emptyMesh, m_thickness);
 
 	EXPECT_NEAR(0.0, diskShape->getVolume(), 1e-9);
@@ -95,7 +93,7 @@ TEST_F(SurfaceMeshShapeTest, EmptyMeshTest)
 
 TEST_F(SurfaceMeshShapeTest, DiskShapeTest)
 {
-	TriangleMeshBase diskMesh = buildDiskZ(Quaterniond::Identity(), m_center, m_radius);
+	TriangleMeshPlain diskMesh = buildDiskZ(Quaterniond::Identity(), m_center, m_radius);
 	std::shared_ptr<SurfaceMeshShape> diskShape = std::make_shared<SurfaceMeshShape>(diskMesh, m_thickness);
 
 	EXPECT_NEAR(m_expectedVolume, diskShape->getVolume(), 1e-2);
@@ -107,7 +105,7 @@ TEST_F(SurfaceMeshShapeTest, NonAlignedDiskShapeTest)
 {
 	Quaterniond q(1.3, 5.3, -8.2, 2.4);
 	q.normalize();
-	TriangleMeshBase diskMesh = buildDiskZ(q, m_center, m_radius);
+	TriangleMeshPlain diskMesh = buildDiskZ(q, m_center, m_radius);
 	std::shared_ptr<SurfaceMeshShape> diskShape = std::make_shared<SurfaceMeshShape>(diskMesh, m_thickness);
 
 	Matrix33d rotatedExpectedMatrix = q.toRotationMatrix() * m_expectedMatrix * q.toRotationMatrix().transpose();
@@ -135,8 +133,8 @@ TEST_F(SurfaceMeshShapeTest, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 
 	std::shared_ptr<SurgSim::Math::SurfaceMeshShape> newSurfaceMesh;
-	ASSERT_NO_THROW(newSurfaceMesh =
-		std::dynamic_pointer_cast<SurgSim::Math::SurfaceMeshShape>(node.as<std::shared_ptr<SurgSim::Math::Shape>>()));
+	ASSERT_NO_THROW(newSurfaceMesh = std::dynamic_pointer_cast<SurgSim::Math::SurfaceMeshShape>(
+										 node.as<std::shared_ptr<SurgSim::Math::Shape>>()));
 
 	EXPECT_EQ("SurgSim::Math::SurfaceMeshShape", newSurfaceMesh->getClassName());
 	EXPECT_EQ(fileName, newSurfaceMesh->getFileName());

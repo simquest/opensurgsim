@@ -59,18 +59,34 @@ public:
 	}
 
 	/// Mark this object as invalid
-	void invalidate() {m_hasValue = false;}
+	void invalidate()
+	{
+		m_hasValue = false;
+	}
 
 	/// Set the value of this object, and mark it as valid
 	/// \param val The value  of the object
-	void setValue(const T& val) {
+	void setValue(const T& val)
+	{
 		m_hasValue = true;
 		m_value = val;
 	}
 
 	/// Gets the value.
-	/// \return	The assigned value if set, excepts if no value was set.
+	/// \throws SurgSim::Framework::AssertionFailure if the value was not set
+	/// \return	The assigned value if set.
 	const T& getValue() const
+	{
+		SURGSIM_ASSERT(m_hasValue) << "Tried to fetch a value from an invalid OptionalValue";
+		return m_value;
+	}
+
+	/// Gets the value
+	/// \note do not implement T& operator*(), because *optionalValue = X; would not be able to set
+	///       the hasValue() property properly.
+	/// \throws SurgSim::Framework::AssertionFailure if the value was not set
+	/// \return the contained value.
+	const T& operator*() const
 	{
 		SURGSIM_ASSERT(m_hasValue) << "Tried to fetch a value from an invalid OptionalValue";
 		return m_value;
@@ -91,6 +107,22 @@ public:
 		}
 	}
 
+
+	/// Equality operator.
+	/// \param	rhs	The right hand side with the specific template type.
+	/// \return	true if the parameters are considered equivalent.
+	bool operator==(const T& rhs) const
+	{
+		if (m_hasValue)
+		{
+			return m_value == rhs;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	/// Inequality operator
 	/// \param rhs the right hand side.
 	/// \return true if the parameters are not considered equivalent
@@ -99,8 +131,17 @@ public:
 		return !(*this == rhs);
 	}
 
+	/// Inequality operator
+	/// \param rhs the right hand side.
+	/// \return true if the parameters are not considered equivalent
+	bool operator!=(const T& rhs) const
+	{
+		return !(*this == rhs);
+	}
+
 	/// Assignment operator.
 	/// \param rhs The right hand side of the operator.
+	/// \return reference to this.
 	OptionalValue& operator=(const OptionalValue& rhs)
 	{
 		m_hasValue = rhs.m_hasValue;
@@ -108,6 +149,16 @@ public:
 		{
 			m_value = rhs.m_value;
 		}
+		return *this;
+	}
+
+	/// Assignment operator from template type, after this hasValue() is true even if the
+	/// right hand side was not initialized
+	/// \param rhs the value to be assigned to this optional value
+	/// \return reference to this.
+	OptionalValue& operator=(const T& rhs)
+	{
+		setValue(rhs);
 		return *this;
 	}
 
