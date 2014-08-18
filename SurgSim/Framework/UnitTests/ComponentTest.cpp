@@ -450,3 +450,12 @@ TEST(ComponentTests, PoseComponentTest)
 	EXPECT_NE(nullptr, decoded);
 	EXPECT_TRUE(pose.isApprox(decoded->getValue<SurgSim::Math::RigidTransform3d>("Pose")));
 }
+
+
+TEST(ComponentTests, SetActiveTest)
+{
+	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component");
+	EXPECT_TRUE(mock1->isActive());
+	EXPECT_NO_THROW(mock1->setActive(false));
+	EXPECT_FALSE(mock1->isActive());
+}
