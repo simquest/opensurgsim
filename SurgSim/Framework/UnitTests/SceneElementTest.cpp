@@ -189,25 +189,3 @@ TEST(SceneElementTest, DoubleInitTest)
 
 	ASSERT_ANY_THROW(element->initialize());
 }
-
-TEST(SceneElement, SetActiveTest)
-{
-	auto element = std::make_shared<MockSceneElement>();
-	auto poseComponent = element->getPoseComponent();
-
-	EXPECT_TRUE(element->isActive());
-	EXPECT_TRUE(poseComponent->isActive());
-
-	element->setActive(false);
-	EXPECT_FALSE(element->isActive());
-	EXPECT_FALSE(poseComponent->isActive());
-
-	auto mockComponent = std::make_shared<MockComponent>("MockComponent");
-
-	mockComponent->setActive(false);
-	element->addComponent(mockComponent);
-	EXPECT_FALSE(mockComponent->isActive());
-
-	element->setActive(true);
-	EXPECT_TRUE(mockComponent->isActive());
-}

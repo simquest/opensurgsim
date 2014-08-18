@@ -29,9 +29,7 @@ namespace Framework
 {
 
 SceneElement::SceneElement(const std::string& name) :
-	m_name(name),
-	m_isInitialized(false),
-	m_isActive(true)
+	m_name(name), m_isInitialized(false)
 {
 	m_pose = std::make_shared<SurgSim::Framework::PoseComponent>("Pose");
 	m_pose->setPose(SurgSim::Math::RigidTransform3d::Identity());
@@ -272,20 +270,6 @@ std::string SceneElement::getClassName() const
 {
 	// SURGSIM_FAILURE() << "SceneElement is abstract, this should not be called.";
 	return "SurgSim::Framework::SceneElement";
-}
-
-void SceneElement::setActive(bool val)
-{
-	for(auto it = std::begin(m_components); it != std::end(m_components); ++it)
-	{
-		it->second->setActive(val);
-	}
-	m_isActive = val;
-}
-
-bool SceneElement::isActive() const
-{
-	return m_isActive;
 }
 
 }; // namespace Framework

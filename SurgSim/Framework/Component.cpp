@@ -37,8 +37,7 @@ Component::Component(const std::string& name) :
 	m_didInit(false),
 	m_didWakeUp(false),
 	m_isInitialized(false),
-	m_isAwake(false),
-	m_isActive(true)
+	m_isAwake(false)
 {
 }
 
@@ -161,24 +160,6 @@ std::shared_ptr<Component> Component::getSharedPtr()
 		SURGSIM_FAILURE() << "Component was not created as a shared_ptr.";
 	}
 	return result;
-}
-
-void Component::setActive(bool val)
-{
-	SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Component::setActive() not implemented";
-	m_isActive = val;
-}
-
-bool Component::isActive() const
-{
-	if (getSceneElement() != nullptr)
-	{
-		return getSceneElement()->isActive() && m_isActive;
-	}
-	else
-	{
-		return m_isActive;
-	}
 }
 
 }; // namespace Framework
