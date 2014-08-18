@@ -127,6 +127,13 @@ public:
 	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp() = 0;
 
+	/// Set this component to active if 'val' is true, inactive if 'val' is false.
+	virtual void setActive(bool val);
+
+	/// \return True if this component is active and the SceneElement (if any) contains it is also active;
+	/// Otherwise, false.
+	bool isActive() const;
+
 protected:
 	/// Get the PoseComponent for this component
 	/// \return The PoseComponent
@@ -163,6 +170,9 @@ private:
 
 	/// Indicates if this component is awake
 	bool m_isAwake;
+
+	/// Indicates if this component is active
+	bool m_isActive;
 };
 
 }; // namespace Framework
