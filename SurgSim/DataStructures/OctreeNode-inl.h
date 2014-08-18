@@ -236,11 +236,10 @@ bool SurgSim::DataStructures::OctreeNode<Data>::doLoad(const std::string& filePa
 	m_boundingBox.min() = boundsMin;
 	m_boundingBox.max() = boundsMin.array() + octreeDimensions.array() * spacing.array();
 
-	typedef typename Data templatedData;
 	SurgSim::Math::Vector3d position;
 	while (octreeData >> position[0] >> position[1] >> position[2])
 	{
-		addData(position, templatedData(), numLevels);
+		addData(position, Data(), numLevels);
 	}
 
 	return true;
