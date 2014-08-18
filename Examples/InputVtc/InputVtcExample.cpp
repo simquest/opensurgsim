@@ -43,7 +43,6 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
@@ -70,7 +69,6 @@ using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::VirtualToolCoupler;
-using SurgSim::Physics::RigidRepresentationParameters;
 
 std::shared_ptr<SceneElement> createPlane(const std::string& name)
 {
@@ -78,9 +76,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(name + " Physics");
-	RigidRepresentationParameters params;
-	params.setShapeUsedForMassInertia(planeShape);
-	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setShape(planeShape);
 
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
 		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
@@ -116,26 +112,16 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 
 std::shared_ptr<SceneElement> createBox(const std::string& name, const std::string& toolDeviceName)
 {
-	// Physics Components
-	RigidRepresentationParameters params;
-	// The VTC needs a mass for the calculations in Physics, but ideally it would track the input perfectly if no
-	// collisions occurred.  (Since the VTC follows the input device, it may appear to have mass based on the force
-	// output -> pose input feedback, but any inertial forces should be applied directly to the device.)
-	// To minimize the VTC's inertia, we set its density (and thereby its mass) low.  However, the lower the
-	// Representation's mass (and the longer the inter-update duration), the more likely that high spring forces in the
-	// simulation will make the system unstable, creating unbounded oscillations that eventually make the
-	// RigidRepresentation invalid.  Therefore, whenever the mass or shape is changed, the inputCoupler's stiffness and
-	// damping (translational and angular) should be adjusted to make the system close to critically damped in free
-	// motion (i.e., converges quickly without oscillation when no collisions are occurring).
-	params.setDensity(0.1);
 	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.8, 2.0, 0.2); // in meter
-	params.setShapeUsedForMassInertia(box);
 
+	// Physics Components
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>(name + " Physics");
-	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setIsGravityEnabled(false);
+	physicsRepresentation->setDensity(0.1);
+	physicsRepresentation->setShape(box);
 
+	// Collision Components
 	auto collisionRepresentation =
 		std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Box Collision Representation");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
@@ -150,6 +136,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 		std::make_shared<SurgSim::Input::InputComponent>(name + " Input");
 	inputComponent->setDeviceName(toolDeviceName);
 
+	// Output Components
 	std::shared_ptr<SurgSim::Input::OutputComponent> outputComponent = nullptr;
 	outputComponent = std::make_shared<SurgSim::Input::OutputComponent>(name + " Output");
 	outputComponent->setDeviceName(toolDeviceName);

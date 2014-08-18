@@ -22,7 +22,6 @@ namespace SurgSim
 {
 namespace Physics
 {
-class RigidRepresentationParameters;
 class RigidRepresentationState;
 }
 }
@@ -37,13 +36,6 @@ struct convert<SurgSim::Physics::RigidRepresentationState>
 	static bool decode(const Node& node, SurgSim::Physics::RigidRepresentationState& rhs);
 };
 
-
-template <>
-struct convert<SurgSim::Physics::RigidRepresentationParameters>
-{
-	static Node encode(const SurgSim::Physics::RigidRepresentationParameters& rhs);
-	static bool decode(const Node& node, SurgSim::Physics::RigidRepresentationParameters& rhs);
-};
 
 }; // namespace YAML
 

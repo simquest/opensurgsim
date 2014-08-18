@@ -26,7 +26,6 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -119,11 +118,9 @@ protected:
 		m_rigid->setIsGravityEnabled(false);
 		m_rigid->setLocalPose(m_poseRigid);
 		{
-			RigidRepresentationParameters param;
-			param.setDensity(1000.0);
+			m_rigid->setDensity(1000.0);
 			std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(m_radius);
-			param.setShapeUsedForMassInertia(shape);
-			m_rigid->setInitialParameters(param);
+			m_rigid->setShape(shape);
 		}
 		m_numDof += m_rigid->getNumDof();
 

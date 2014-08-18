@@ -26,7 +26,6 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"

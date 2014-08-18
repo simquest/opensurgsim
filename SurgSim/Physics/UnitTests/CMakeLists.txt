@@ -69,7 +69,6 @@ set(UNIT_TEST_SOURCES
 	RigidRepresentationBilateral3DTests.cpp
 	RigidRepresentationContactTests.cpp
 	RigidRepresentationLocalizationTest.cpp
-	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
 	RigidRepresentationTest.cpp
 	SolveMlcpTests.cpp

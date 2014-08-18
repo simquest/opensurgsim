@@ -27,7 +27,6 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
@@ -49,15 +48,12 @@ struct RigidCollisionRepresentationTest : public ::testing::Test
 	{
 		m_sphereShape = std::make_shared<SurgSim::Math::SphereShape>(1.0);
 		m_rigidRepresentation = std::make_shared<RigidRepresentation>("RigidRepresentation");
-		m_rigidRepresentationParameters.setShapeUsedForMassInertia(m_sphereShape);
-
-		m_rigidRepresentation->setInitialParameters(m_rigidRepresentationParameters);
+		m_rigidRepresentation->setShape(m_sphereShape);
 	}
 
 	std::shared_ptr<SurgSim::Math::SphereShape> m_sphereShape;
 	std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> m_rigidCollisionRepresentation;
 	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigidRepresentation;
-	SurgSim::Physics::RigidRepresentationParameters m_rigidRepresentationParameters;
 };
 
 TEST_F(RigidCollisionRepresentationTest, InitTest)
@@ -125,14 +121,11 @@ TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 	EXPECT_NO_THROW(meshShape->load(fileName, applicationData));
 
-	RigidRepresentationParameters params;
-	params.setDensity(8050); // Stainless steel (in Kg.m-3)
-	params.setShapeUsedForMassInertia(meshShape);
-
 	auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>("Collision");
 	auto physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 
-	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setDensity(8050); // Stainless steel (in Kg.m-3)
+	physicsRepresentation->setShape(meshShape);
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 	collisionRepresentation->update(dt);
 

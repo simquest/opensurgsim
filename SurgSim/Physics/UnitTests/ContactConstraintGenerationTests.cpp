@@ -28,7 +28,6 @@
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Collision::ContactCalculation;
@@ -44,18 +43,14 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 {
 	virtual void SetUp()
 	{
-		RigidRepresentationParameters params0;
-		params0.setShapeUsedForMassInertia(std::make_shared<SphereShape>(2.0));
 		rigid0 = std::make_shared<RigidRepresentation>("Physics Representation 0");
-		rigid0->setInitialParameters(params0);
+		rigid0->setShape(std::make_shared<SphereShape>(2.0));
 		sphere = std::make_shared<RigidCollisionRepresentation>("Collision Representation 0");
 		rigid0->setCollisionRepresentation(sphere);
 		representations.push_back(rigid0);
 
-		RigidRepresentationParameters params1;
-		params1.setShapeUsedForMassInertia(std::make_shared<DoubleSidedPlaneShape>());
 		rigid1 = std::make_shared<RigidRepresentation>("Physics Representation 1");
-		rigid1->setInitialParameters(params1);
+		rigid1->setShape(std::make_shared<DoubleSidedPlaneShape>());
 		plane = std::make_shared<RigidCollisionRepresentation>("Collision Representation 1");
 		rigid1->setCollisionRepresentation(plane);
 		representations.push_back(rigid1);

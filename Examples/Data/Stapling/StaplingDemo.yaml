@@ -119,14 +119,12 @@ SurgSim::Framework::Scene:
                     Translation: [0, 0, 0]
               Id: 0ee73b63-b022-49cf-91b9-465e7da60a1d
               Name: Physics
-              RigidRepresentationParameters:
-                SurgSim::Physics::RigidRepresentationParameters:
-                  Density: 0
-                  LinearDamping: 0
-                  AngularDamping: 0
-                  ShapeUsedForMassInertia:
-                    SurgSim::Math::MeshShape:
-                      FileName: Geometry/arm_collision.ply
+              Density: 0
+              LinearDamping: 0
+              AngularDamping: 0
+              Shape:
+                SurgSim::Math::MeshShape:
+                  FileName: Geometry/arm_collision.ply
               IsDrivingSceneElementPose: true
     - SurgSim::Framework::BasicSceneElement:
         Components:
@@ -174,14 +172,12 @@ SurgSim::Framework::Scene:
               Id: b24b8dd6-714f-4cdb-9db4-66ac958076c2
               Name: StaplerOsgMesh
           - SurgSim::Physics::RigidRepresentation:
-              RigidRepresentationParameters:
-                SurgSim::Physics::RigidRepresentationParameters:
-                  Density: 8050
-                  LinearDamping: 0
-                  AngularDamping: 0
-                  ShapeUsedForMassInertia:
-                    SurgSim::Math::MeshShape:
-                      FileName: Geometry/stapler_collision.ply
+              Density: 8050
+              LinearDamping: 0
+              AngularDamping: 0
+              Shape:
+                SurgSim::Math::MeshShape:
+                  FileName: Geometry/stapler_collision.ply
               IsDrivingSceneElementPose: true
               LocalPose:
                 Quaternion: [0, 0, 0, 1]

@@ -82,8 +82,6 @@ public:
 
 	void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
-	virtual void resetParameters() override;
-
 	/// Retrieve the rigid body 6x6 compliance matrix
 	/// \return the 6x6 compliance matrix
 	const SurgSim::Math::Matrix66d& getComplianceMatrix() const;

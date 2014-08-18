@@ -71,7 +71,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentationBilateral3D.cpp
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
-	RigidRepresentationParameters.cpp
 	RigidRepresentationState.cpp
 	SolveMlcp.cpp
 	UpdateCollisionRepresentations.cpp
@@ -138,7 +137,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationBilateral3D.h
 	RigidRepresentationContact.h
 	RigidRepresentationLocalization.h
-	RigidRepresentationParameters.h
 	RigidRepresentationState.h
 	SolveMlcp.h
 	Spring.h

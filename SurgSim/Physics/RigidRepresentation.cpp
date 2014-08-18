@@ -75,11 +75,10 @@ void RigidRepresentation::beforeUpdate(double dt)
 {
 	RigidRepresentationBase::beforeUpdate(dt);
 
-	bool isParametersValid = m_currentParameters.isValid();
-	SURGSIM_LOG_IF(!isParametersValid,
+	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in beforeUpdate because m_currentParameters is not valid." << std::endl;
-	if (!isActive() || !isParametersValid)
+						   " deactivated in beforeUpdate because parameters are not valid." << std::endl;
+	if (!isActive() || !m_parametersValid)
 	{
 		setIsActive(false);
 		return;
@@ -92,19 +91,17 @@ void RigidRepresentation::update(double dt)
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
 
-	bool isParametersValid = m_currentParameters.isValid();
-	SURGSIM_LOG_IF(!isParametersValid,
+	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in update because m_currentParameters is not valid." << std::endl;
-	if (!isActive() || !isParametersValid)
+						   " deactivated in update because parameters are not valid." << std::endl;
+	if (!isActive() || !m_parametersValid)
 	{
 		setIsActive(false);
 		return;
 	}
 
 	// For convenience
-	RigidRepresentationParameters& p = m_currentParameters;
-	Vector3d         G = m_currentState.getPose() * p.getMassCenter();
+	Vector3d         G = m_currentState.getPose() * getMassCenter();
 	Vector3d        dG = m_currentState.getLinearVelocity();
 	Matrix33d        R = m_currentState.getPose().linear();
 	Quaterniond      q = Quaterniond(R);
@@ -127,20 +124,20 @@ void RigidRepresentation::update(double dt)
 	m_torque += m_externalTorque;
 	if (isGravityEnabled())
 	{
-		m_force += getGravity() * p.getMass();
+		m_force += getGravity() * getMass();
 	}
 	m_torque -= w.cross(m_globalInertia * w);
 
 	// Add Backward Euler RHS terms
-	m_force  += p.getMass()     * dG / dt;
+	m_force  += getMass()     * dG / dt;
 	m_torque += m_globalInertia *  w / dt;
 
 	// Solve the 6D system on the velocity level
 	{
 		// { Id33.m.(1/dt + alphaLinear ).v(t+dt) = Id33.m.v(t)/dt + f
 		// { I     .(1/dt + alphaAngular).w(t+dt) = I.w(t)/dt + t - w(t)^(I.w(t))
-		dG = (1.0 / p.getMass()) * m_force  / (1.0 / dt + p.getLinearDamping());
-		w  = m_invGlobalInertia * m_torque / (1.0 / dt + p.getAngularDamping());
+		dG = (1.0 / getMass()) * m_force  / (1.0 / dt + getLinearDamping());
+		w  = m_invGlobalInertia * m_torque / (1.0 / dt + getAngularDamping());
 		// Compute the quaternion velocity as well: dq = 1/2.(0 w).q
 		dq = Quaterniond(0.0, w[0], w[1], w[2]) * q;
 		dq.coeffs() *= 0.5;
@@ -160,7 +157,7 @@ void RigidRepresentation::update(double dt)
 		q.normalize();
 	}
 	R = q.matrix();
-	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*p.getMassCenter()));
+	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*getMassCenter()));
 
 	// Compute the global inertia matrix with the current state
 	updateGlobalInertiaMatrices(m_currentState);
@@ -193,11 +190,10 @@ void RigidRepresentation::afterUpdate(double dt)
 {
 	RigidRepresentationBase::afterUpdate(dt);
 
-	bool isParametersValid = m_currentParameters.isValid();
-	SURGSIM_LOG_IF(!isParametersValid,
+	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in afterUpdate because m_currentParameters is not valid." << std::endl;
-	if (!isActive() || !isParametersValid)
+						   " deactivated in afterUpdate because parameters are not valid." << std::endl;
+	if (!isActive() || !m_parametersValid)
 	{
 		setIsActive(false);
 		return;
@@ -216,18 +212,16 @@ void RigidRepresentation::applyCorrection(double dt,
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
 
-	bool isParametersValid = m_currentParameters.isValid();
-	SURGSIM_LOG_IF(!isParametersValid,
+	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in applyCorrection because m_currentParameters is not valid." << std::endl;
-	if (!isActive() || !isParametersValid)
+						   " deactivated in applyCorrection because parameters are not valid." << std::endl;
+	if (!isActive() || !m_parametersValid)
 	{
 		setIsActive(false);
 		return;
 	}
 
-	RigidRepresentationParameters& p = m_currentParameters;
-	Vector3d          G = m_currentState.getPose() * p.getMassCenter();
+	Vector3d          G = m_currentState.getPose() * getMassCenter();
 	Vector3d         dG = m_currentState.getLinearVelocity();
 	Matrix33d         R = m_currentState.getPose().linear();
 	Quaterniond       q = Quaterniond(R);
@@ -253,7 +247,7 @@ void RigidRepresentation::applyCorrection(double dt,
 		q.normalize();
 	}
 	R = q.matrix();
-	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*p.getMassCenter()));
+	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*getMassCenter()));
 
 	// Compute the global inertia matrix with the current state
 	updateGlobalInertiaMatrices(m_currentState);
@@ -276,14 +270,6 @@ void RigidRepresentation::applyCorrection(double dt,
 	computeComplianceMatrix(dt);
 }
 
-void SurgSim::Physics::RigidRepresentation::resetParameters()
-{
-	Representation::resetParameters();
-	m_currentParameters = m_initialParameters;
-
-	updateGlobalInertiaMatrices(m_currentState);
-}
-
 const Eigen::Matrix < double, 6, 6, Eigen::RowMajor > &
 SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
 {
@@ -292,22 +278,20 @@ SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
 
 void RigidRepresentation::computeComplianceMatrix(double dt)
 {
-	bool isParametersValid = m_currentParameters.isValid();
-	SURGSIM_LOG_IF(!isParametersValid,
+	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in computComplianceMatrix because m_currentParameters is not valid." <<
+						   " deactivated in computComplianceMatrix because parameters are not valid." <<
 						   std::endl;
-	if (!isActive() || !isParametersValid)
+	if (!isActive() || !m_parametersValid)
 	{
 		setIsActive(false);
 		return;
 	}
 
 	SurgSim::Math::Matrix66d systemMatrix;
-	RigidRepresentationParameters& parameters = m_currentParameters;
 	const SurgSim::Math::Matrix33d identity3x3 = SurgSim::Math::Matrix33d::Identity();
-	systemMatrix.block<3, 3>(0, 0) = identity3x3 * (parameters.getMass() / dt + parameters.getLinearDamping());
-	systemMatrix.block<3, 3>(3, 3) = m_globalInertia / dt + parameters.getAngularDamping() * identity3x3;
+	systemMatrix.block<3, 3>(0, 0) = identity3x3 * (getMass() / dt + getLinearDamping());
+	systemMatrix.block<3, 3>(3, 3) = m_globalInertia / dt + getAngularDamping() * identity3x3;
 	systemMatrix += m_externalDampingMatrix + m_externalStiffnessMatrix * dt;
 
 	m_C.setZero();
@@ -320,7 +304,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 
 void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
 {
-	if (!isActive() || !m_currentParameters.isValid())
+	if (!isActive() || !m_parametersValid)
 	{
 		// do not setIsActive(false) due to invalid parameters because RigidRepresentationBase::setInitialParameters may
 		// not have been called before RigidRepresentationBase::setInitialState (which calls this function), in which
@@ -329,7 +313,7 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 	}
 
 	const SurgSim::Math::Matrix33d& R = state.getPose().linear();
-	m_globalInertia =  R * m_currentParameters.getLocalInertia() * R.transpose();
+	m_globalInertia =  R * getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
 }
 
@@ -339,11 +323,7 @@ bool RigidRepresentation::doInitialize()
 
 	if (result)
 	{
-		double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
-		SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
-
-		shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
-		SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
+		SURGSIM_ASSERT(getShape()->getVolume() > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
 	}
 
 	return result;
