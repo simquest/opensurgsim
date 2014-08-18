@@ -63,7 +63,7 @@ class TriangleMesh: public std::enable_shared_from_this<TriangleMesh>,
 					public SurgSim::Framework::Asset,
 					public SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, NormalData>
 {
-friend SurgSim::Math::MeshShape;
+friend class SurgSim::Math::MeshShape;
 public:
 
 	/// Constructor

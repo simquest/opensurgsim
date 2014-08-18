@@ -128,6 +128,7 @@ TEST(TriangleMeshTest, DoLoadTest)
 	ApplicationData appData("config.txt");
 
 	{
+		SCOPED_TRACE("Load nonexistent file should throw");
 		// Nonexistent file
 		const std::string fileName = "Nonexistent file";
 		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
@@ -135,6 +136,7 @@ TEST(TriangleMeshTest, DoLoadTest)
 	}
 
 	{
+		SCOPED_TRACE("Load existent file which contains invalid mesh should throw");
 		// File exists, but contains an invalid Mesh
 		const std::string fileName = "MeshShapeData/InvalidMesh.ply";
 		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
@@ -142,6 +144,7 @@ TEST(TriangleMeshTest, DoLoadTest)
 	}
 
 	{
+		SCOPED_TRACE("Load existent file which contains valid mesh should not throw");
 		// File exists, and contains a valid Mesh
 		const std::string fileName = "MeshShapeData/staple_collision.ply";
 		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
