@@ -30,6 +30,7 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector6d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
@@ -166,12 +167,20 @@ void VirtualToolCoupler::update(double dt)
 		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
+		const Matrix33d zero3x3 = Matrix33d::Zero();
 		const Matrix33d linearStiffnessMatrix = m_linearStiffness * identity3x3;
 		const Matrix33d linearDampingMatrix = m_linearDamping * identity3x3;
 		const Matrix33d angularStiffnessMatrix = m_angularStiffness * identity3x3;
 		const Matrix33d angularDampingMatrix = m_angularDamping * identity3x3;
-		m_rigid->addExternalForce(force, linearStiffnessMatrix, linearDampingMatrix);
-		m_rigid->addExternalTorque(torque, angularStiffnessMatrix, angularDampingMatrix);
+
+		Vector6d generalizedForce;
+		generalizedForce << force, torque;
+		Matrix66d generalizedStiffness;
+		generalizedStiffness << linearStiffnessMatrix, zero3x3, angularStiffnessMatrix, zero3x3;
+		Matrix66d generalizedDamping;
+		generalizedDamping << linearDampingMatrix, zero3x3, angularDampingMatrix, zero3x3;
+
+		m_rigid->addExternalGeneralizedForce(generalizedForce, generalizedStiffness, generalizedDamping);
 
 		if (m_output != nullptr)
 		{
