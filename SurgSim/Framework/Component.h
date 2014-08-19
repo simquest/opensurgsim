@@ -143,6 +143,9 @@ protected:
 	/// \return The PoseComponent
 	virtual std::shared_ptr<const PoseComponent> getPoseComponent() const;
 
+	/// Indicates if this component is active
+	bool m_isActive;
+
 private:
 	/// Name of this component
 	std::string m_name;
@@ -170,9 +173,6 @@ private:
 
 	/// Indicates if this component is awake
 	bool m_isAwake;
-
-	/// Indicates if this component is active
-	bool m_isActive;
 };
 
 }; // namespace Framework
