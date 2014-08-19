@@ -80,7 +80,8 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
 
-include_directories(${SURGSIM_SOURCE_DIR}
+include_directories(${SURGSIM_SOURCE_DIR})
+include_directories(SYSTEM
 	${Boost_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR}
 	${YAML_CPP_INCLUDE_DIR}
