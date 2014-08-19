@@ -73,6 +73,9 @@ TEST(TimerTest, Comparison)
 	{
 		EXPECT_GE(timer1->getAverageFramePeriod(), timer2->getAverageFramePeriod());
 		EXPECT_GT(timer1->getCumulativeTime(), timer1->getLastFramePeriod());
+
+		EXPECT_GE(timer1->getMaxFramePeriod(), timer2->getMaxFramePeriod());
+		EXPECT_GE(timer1->getMinFramePeriod(), timer2->getMinFramePeriod());
 	}
 }
 

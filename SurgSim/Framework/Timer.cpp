@@ -117,5 +117,15 @@ Timer::TimerTimePoint Timer::now()
 	return currentTime;
 }
 
+double Timer::getMaxFramePeriod() const
+{
+	return std::max_element(m_frameDurations.cbegin(), m_frameDurations.cend())->count();
+}
+
+double Timer::getMinFramePeriod() const
+{
+	return std::min_element(m_frameDurations.cbegin(), m_frameDurations.cend())->count();
+}
+
 }; // namespace Framework
 }; // namespace SurgSim
