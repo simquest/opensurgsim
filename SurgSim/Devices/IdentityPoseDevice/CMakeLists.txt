@@ -17,11 +17,7 @@
 
 link_directories(${Boost_LIBRARY_DIRS})
 
-include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
-)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(IDENTITY_POSE_DEVICE_SOURCES
 	IdentityPoseDevice.cpp

@@ -26,8 +26,6 @@ set(LIBS
 
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}
-	${EIGEN3_INCLUDE_DIR}
-	${Boost_INCLUDE_DIR}
 	${LABJACK_INCLUDE_DIR}
 )
 

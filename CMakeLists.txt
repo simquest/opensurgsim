@@ -37,8 +37,6 @@ endif()
 # Use SURGSIM_SOURCE_DIR SURGSIM_SOURCE_DIR will always point to the top of the OSS Tree
 set(SURGSIM_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-include_directories(${SURGSIM_SOURCE_DIR})
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 set(SURGSIM_TOOLS_DIR "${SURGSIM_SOURCE_DIR}/Tools")
 set(SURGSIM_THIRD_PARTY_DIR "${SURGSIM_SOURCE_DIR}/ThirdParty")
@@ -81,6 +79,12 @@ list(APPEND Boost_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
+
+include_directories(${SURGSIM_SOURCE_DIR}
+	${Boost_INCLUDE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
+)
 
 include(CTest)
 configure_file(CTestCustom.cmake.in CTestCustom.cmake)
