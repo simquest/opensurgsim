@@ -28,6 +28,7 @@ namespace SurgSim
 namespace Physics
 {
 class RigidRepresentationState;
+class Localization;
 
 SURGSIM_STATIC_REGISTRATION(RigidRepresentation);
 
@@ -60,10 +61,12 @@ public:
 	/// Note this force is generalized (i.e. it's a 6D vector, containing both 3D force and 3D torque)
 	/// Note the stiffness and damping are 6x6 matrices with coupling between the translational and rotation dof.
 	/// Note this generalized force will be zeroed every afterUpdate call of the rigid representation
+	/// \param localization The application point (Leave undefined to point at the mass center of the rigid body)
 	/// \param generalizedForce The external generalized force
 	/// \param K The stiffness matrix associated with the generalized force (jacobian of the force w.r.t position)
 	/// \param D The damping matrix associated with the generalized force (jacobian of the force w.r.t velocity)
-	void addExternalGeneralizedForce(const SurgSim::Math::Vector6d& generalizedForce,
+	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+									 const SurgSim::Math::Vector6d& generalizedForce,
 									 const SurgSim::Math::Matrix66d& K = SurgSim::Math::Matrix66d::Zero(),
 									 const SurgSim::Math::Matrix66d& D = SurgSim::Math::Matrix66d::Zero());
 

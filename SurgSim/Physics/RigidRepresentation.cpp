@@ -19,6 +19,7 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 namespace SurgSim
@@ -52,13 +53,57 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 	return REPRESENTATION_TYPE_RIGID;
 }
 
-void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::Math::Vector6d& generalizedForce,
+void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+													  const SurgSim::Math::Vector6d& generalizedForce,
 													  const SurgSim::Math::Matrix66d& K,
 													  const SurgSim::Math::Matrix66d& D)
 {
-	m_externalGeneralizedForce += generalizedForce;
-	m_externalGeneralizedStiffness += K;
-	m_externalGeneralizedDamping += D;
+	using SurgSim::Math::Matrix33d;
+	using SurgSim::Math::Matrix66d;
+	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::Vector6d;
+
+	if (localization == nullptr)
+	{
+		m_externalGeneralizedForce += generalizedForce;
+		m_externalGeneralizedStiffness += K;
+		m_externalGeneralizedDamping += D;
+	}
+	else
+	{
+		// Let's note the position dof (C,W) and the velocity dof (v, w).
+		// The force (F) applied on a point (P) that is not the mass center(C), produces a torque (T) and
+		// also affect matrix derivatives (K and D) as follow:
+		// T = cross(CP, F) = CP^F
+		// K.block<3, 3>(3, 0) += -dT/dC = -dCP/dC ^ F - CP ^ dF/dC = Id(3x3) ^ F + CP ^ K.block<3, 3>(0, 0)
+		// K.block<3, 3>(3, 3) += -dT/dW = -dCP/dW ^ F - CP ^ dF/dW = CP ^ K.block<3, 3>(0, 3)
+		// D.block<3, 3>(3, 0) += -dT/dv = -dCP/dv ^ F - CP ^ dF/dv = CP ^ D.block<3, 3>(0, 0)
+		// D.block<3, 3>(3, 3) += -dT/dw = -dCP/dw ^ F - CP ^ dF/dw = CP ^ D.block<3, 3>(0, 3)
+		const Vector3d point = localization->calculatePosition();
+		const Vector3d massCenter = getCurrentState().getPose().translation();
+		const Vector3d lever = point - massCenter;
+		const Vector3d force = generalizedForce.segment<3>(0);
+		const Vector3d torque = lever.cross(force);
+
+		m_externalGeneralizedForce += generalizedForce;
+		// add the extra torque produced by the lever
+		m_externalGeneralizedForce.segment<3>(3) += torque;
+
+		m_externalGeneralizedStiffness += K;
+		// add the extra stiffness terms produced by the lever
+		m_externalGeneralizedStiffness.block<3, 3>(3, 0) += -SurgSim::Math::makeSkewSymmetricMatrix(force);
+		for (size_t column = 0; column < 6; ++column)
+		{
+			m_externalGeneralizedStiffness.block<3, 1>(3, column) += lever.cross(K.block<3, 1>(0, column));
+		}
+
+		m_externalGeneralizedDamping += D;
+		// add the extra damping terms produced by the lever
+		for (size_t column = 0; column < 6; ++column)
+		{
+			m_externalGeneralizedDamping.block<3, 1>(3, column) += lever.cross(D.block<3, 1>(0, column));
+		}
+	}
 }
 
 void RigidRepresentation::beforeUpdate(double dt)

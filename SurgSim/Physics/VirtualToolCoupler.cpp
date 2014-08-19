@@ -27,6 +27,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Math::Vector3d;
@@ -180,7 +181,8 @@ void VirtualToolCoupler::update(double dt)
 		Matrix66d generalizedDamping;
 		generalizedDamping << linearDampingMatrix, zero3x3, angularDampingMatrix, zero3x3;
 
-		m_rigid->addExternalGeneralizedForce(generalizedForce, generalizedStiffness, generalizedDamping);
+		std::shared_ptr<RigidRepresentationLocalization> localization;
+		m_rigid->addExternalGeneralizedForce(localization, generalizedForce, generalizedStiffness, generalizedDamping);
 
 		if (m_output != nullptr)
 		{
