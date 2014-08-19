@@ -20,11 +20,17 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Aabb.h"
 
 namespace SurgSim
 {
+
+namespace Math
+{
+class OctreeShape;
+}
 
 namespace DataStructures
 {
@@ -43,8 +49,11 @@ typedef std::vector<size_t> OctreePath;
 ///
 /// \tparam	Data Type of extra data stored in each node
 template<class Data>
-class OctreeNode : public std::enable_shared_from_this<OctreeNode<Data>>
+class OctreeNode : public SurgSim::Framework::Asset,
+				   public std::enable_shared_from_this<OctreeNode<Data>>
 {
+friend class SurgSim::Math::OctreeShape;
+
 public:
 	/// Bounding box type for convenience
 	typedef Eigen::AlignedBox<double, 3> AxisAlignedBoundingBox;
@@ -137,6 +146,8 @@ protected:
 	/// \return true if data is added
 	bool doAddData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
 				   const int currentLevel);
+
+	virtual bool doLoad(const std::string& filePath) override;
 
 	/// The bounding box of the current OctreeNode
 	SurgSim::Math::Aabbd m_boundingBox;

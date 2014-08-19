@@ -52,6 +52,21 @@ namespace SurgSim
 namespace Collision
 {
 
+/// Struct to store the triangle vertices along with the Contact struct.
+struct TriangleContact : public Contact
+{
+	TriangleContact(const double& newDepth,
+			const SurgSim::Math::Vector3d& newContact,
+			const SurgSim::Math::Vector3d& newNormal,
+			const std::pair<Location, Location>& newPenetrationPoints)
+			: Contact(newDepth, newContact, newNormal, newPenetrationPoints)
+	{
+	}
+
+	std::array<SurgSim::Math::Vector3d, 3> firstVertices;
+	std::array<SurgSim::Math::Vector3d, 3> secondVertices;
+};
+
 /// Function that compares two 3d vectors and asserts that they are equal.
 /// The tolerance for the numerical values is SurgSim::Math::Geometry::DistanceEpsilon.
 /// \param left First vector.
@@ -72,14 +87,20 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 /// Function that checks if a given contact is present in the list of given contacts.
 /// \param expected The expected contact.
 /// \param contactsList The list of contacts.
+/// \param expectedHasTriangleContactObject True, if the expected pointer points to a TriangleContact object.
+///		   False, if contactsList points to TriangleContact objects.
 ::testing::AssertionResult isContactPresentInList(std::shared_ptr<Contact> expected,
-												  const std::list<std::shared_ptr<Contact>>& contactsList);
+												  const std::list<std::shared_ptr<Contact>>& contactsList,
+												  bool expectedHasTriangleContactObject = false);
 
 /// Function that checks if two given list of contacts are the same.
 /// \param expectedContacts The expected contact lists.
 /// \param calculatedContacts The list of given contact list.
+/// \param expectedHasTriangleContactObject True, if the expectedContacts points to TriangleContact objects.
+///		   False, if calculatedContacts points to TriangleContact objects.
 void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expectedContacts,
-							  const std::list<std::shared_ptr<Contact>>& calculatedContacts);
+							  const std::list<std::shared_ptr<Contact>>& calculatedContacts,
+							  bool expectedHasTriangleContactObject = false);
 
 /// Function that generates (no collision detection performed) the contact information between a box and a plane,
 /// given the box vertex indices that are known to be in contact.

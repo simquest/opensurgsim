@@ -74,10 +74,10 @@ public:
 	void createLocalization()
 	{
 		m_localization = std::make_shared<Fem3DRepresentationLocalization>();
-		FemRepresentationCoordinate femRepCoordinate;
-		femRepCoordinate.elementId = 0;
-		femRepCoordinate.naturalCoordinate = SurgSim::Math::Vector::Zero(4);
-		femRepCoordinate.naturalCoordinate[0] = 1.0;
+		SurgSim::DataStructures::IndexedLocalCoordinate femRepCoordinate;
+		femRepCoordinate.index = 0;
+		femRepCoordinate.coordinate = SurgSim::Math::Vector::Zero(4);
+		femRepCoordinate.coordinate[0] = 1.0;
 		m_localization->setRepresentation(m_fem);
 		m_localization->setLocalPosition(femRepCoordinate);
 	}
@@ -232,22 +232,31 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 														 triangleMesh->getVertexPosition(triangleNodeIds[2])
 														};
 
-		for (auto point = points.cbegin(); point != points.cend(); ++point)
+		std::array<SurgSim::Math::Vector3d, 4> barycentricCoordinates = {SurgSim::Math::Vector3d::Ones() / 3.0,
+																		 SurgSim::Math::Vector3d::UnitX(),
+																		 SurgSim::Math::Vector3d::UnitY(),
+																		 SurgSim::Math::Vector3d::UnitZ()};
+
+		auto barycentricCoordinate = barycentricCoordinates.cbegin();
+		for (auto point = points.cbegin(); point != points.cend(); ++point, ++barycentricCoordinate)
 		{
 			SurgSim::Collision::Location location;
 			std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 
-			location.triangleId.setValue(triangleId);
-			location.globalPosition.setValue(*point);
+			SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;
+			triangleLocalPosition.index = triangleId;
+			triangleLocalPosition.coordinate = (*barycentricCoordinate);
+			location.meshLocalCoordinate.setValue(triangleLocalPosition);
 			EXPECT_NO_THROW(localization =
-								std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
-									m_fem->createLocalization(location)););
+							std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
+							m_fem->createLocalization(location)););
 			EXPECT_TRUE(localization != nullptr);
 
 			SurgSim::Math::Vector globalPosition;
-			SurgSim::Physics::FemRepresentationCoordinate coordinate = localization->getLocalPosition();
-			EXPECT_NO_THROW(globalPosition = m_fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(
-												 *m_fem->getCurrentState(), coordinate.naturalCoordinate););
+			SurgSim::DataStructures::IndexedLocalCoordinate coordinate = localization->getLocalPosition();
+			EXPECT_NO_THROW(globalPosition =
+							m_fem->getFemElement(coordinate.index)->computeCartesianCoordinate(
+							*m_fem->getCurrentState(), coordinate.coordinate););
 			EXPECT_EQ(3, globalPosition.size());
 			EXPECT_TRUE(globalPosition.isApprox(*point));
 		}

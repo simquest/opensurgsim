@@ -47,8 +47,30 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 							contact->penetrationPoints.second.globalPosition.getValue()));
 }
 
+bool checkMeshLocalCoordinate(
+	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& actualLocalCoordinate,
+	const std::array<SurgSim::Math::Vector3d, 3>& vertices,
+	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& expectedLocalCoordinate,
+	const SurgSim::Math::Vector3d& expectedGlobalPosition)
+{
+	bool isEqual = true;
+	EXPECT_EQ(expectedLocalCoordinate.hasValue(), actualLocalCoordinate.hasValue());
+	if (expectedLocalCoordinate.hasValue() && actualLocalCoordinate.hasValue())
+	{
+		isEqual &=
+			expectedLocalCoordinate.getValue().index == actualLocalCoordinate.getValue().index;
+		Vector3d barycentricCoordinates = actualLocalCoordinate.getValue().coordinate;
+		isEqual &= eigenEqual(expectedGlobalPosition,
+							  barycentricCoordinates[0] * vertices[0] +
+							  barycentricCoordinates[1] * vertices[1] +
+							  barycentricCoordinates[2] * vertices[2]);
+	}
+	return isEqual;
+}
+
 ::testing::AssertionResult isContactPresentInList(std::shared_ptr<Contact> expected,
-												  const std::list<std::shared_ptr<Contact>>& contactsList)
+												  const std::list<std::shared_ptr<Contact>>& contactsList,
+												  bool expectedHasTriangleContactObject)
 {
 	using SurgSim::Math::Geometry::ScalarEpsilon;
 
@@ -65,19 +87,29 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 									 it->get()->penetrationPoints.second.globalPosition.getValue());
 		// Compare the depth.
 		contactPresent &= std::abs(expected->depth - it->get()->depth) <= ScalarEpsilon;
-		// Check if the optional 'triangleId' is present in expected contact.
-		if (expected->penetrationPoints.first.triangleId.hasValue())
+		// Check if the optional 'meshLocalCoordinate' are the same.
+		std::shared_ptr<SurgSim::Collision::TriangleContact> triangleContact;
+		std::shared_ptr<SurgSim::Collision::Contact> contact;
+		if (expectedHasTriangleContactObject)
 		{
-			EXPECT_TRUE(it->get()->penetrationPoints.first.triangleId.hasValue());
-			contactPresent &= expected->penetrationPoints.first.triangleId.getValue() ==
-							  it->get()->penetrationPoints.first.triangleId.getValue();
+			triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(expected);
+			contact = *it;
 		}
-		if (expected->penetrationPoints.second.triangleId.hasValue())
+		else
 		{
-			EXPECT_TRUE(it->get()->penetrationPoints.second.triangleId.hasValue());
-			contactPresent &= expected->penetrationPoints.second.triangleId.getValue() ==
-							  it->get()->penetrationPoints.second.triangleId.getValue();
+			triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(*it);
+			contact = expected;
 		}
+		contactPresent &= checkMeshLocalCoordinate(
+							contact->penetrationPoints.first.meshLocalCoordinate,
+							triangleContact->firstVertices,
+							triangleContact->penetrationPoints.first.meshLocalCoordinate,
+							expected->penetrationPoints.first.globalPosition.getValue());
+		contactPresent &= checkMeshLocalCoordinate(
+							contact->penetrationPoints.second.meshLocalCoordinate,
+							triangleContact->secondVertices,
+							triangleContact->penetrationPoints.second.meshLocalCoordinate,
+							expected->penetrationPoints.second.globalPosition.getValue());
 	}
 
 	if (contactPresent)
@@ -97,7 +129,8 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 }
 
 void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expectedContacts,
-							  const std::list<std::shared_ptr<Contact>>& calculatedContacts)
+							  const std::list<std::shared_ptr<Contact>>& calculatedContacts,
+							  bool expectedHasTriangleContactObject)
 {
 	SCOPED_TRACE("Comparing the contact info.");
 
@@ -105,7 +138,7 @@ void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expecte
 
 	for (auto it = expectedContacts.begin(); it != expectedContacts.end(); ++it)
 	{
-		EXPECT_TRUE(isContactPresentInList(*it, calculatedContacts));
+		EXPECT_TRUE(isContactPresentInList(*it, calculatedContacts, expectedHasTriangleContactObject));
 	}
 }
 

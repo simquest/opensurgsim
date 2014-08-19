@@ -13,26 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/FemRepresentationCoordinate.h"
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 
 namespace SurgSim
 {
 
-namespace Physics
+namespace DataStructures
 {
 
-FemRepresentationCoordinate::FemRepresentationCoordinate() : elementId(0)
+IndexedLocalCoordinate::IndexedLocalCoordinate() : index(0)
 {
-
 }
 
-FemRepresentationCoordinate::FemRepresentationCoordinate(size_t elementId,
-														 SurgSim::Math::Vector naturalCoordinate) :
-	elementId(elementId), naturalCoordinate(naturalCoordinate)
+IndexedLocalCoordinate::IndexedLocalCoordinate(size_t index, const SurgSim::Math::Vector& coordinate)
+	: index(index), coordinate(coordinate)
 {
-
 }
 
-} // namespace Physics
+} // namespace DataStructures
 
 } // namespace SurgSim

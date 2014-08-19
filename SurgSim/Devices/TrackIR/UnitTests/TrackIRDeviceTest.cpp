@@ -27,7 +27,7 @@
 #include "SurgSim/Devices/TrackIR/TrackIRDevice.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Testing/DevicesUtilities.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::Device::TrackIRDevice;
 using SurgSim::DataStructures::DataGroup;

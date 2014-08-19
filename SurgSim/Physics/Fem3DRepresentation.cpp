@@ -90,11 +90,11 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	std::shared_ptr<Fem3DRepresentationLocalization> localization3D =
 		std::static_pointer_cast<Fem3DRepresentationLocalization>(localization);
 
-	const size_t elementId = localization3D->getLocalPosition().elementId;
+	const size_t elementId = localization3D->getLocalPosition().index;
 	SURGSIM_ASSERT(elementId >= 0 && elementId < getNumFemElements()) << "Invalid elementId " << elementId <<
 		". Valid range is {0.." << getNumFemElements() << "}";
 
-	const SurgSim::Math::Vector coordinate = localization3D->getLocalPosition().naturalCoordinate;
+	const SurgSim::Math::Vector coordinate = localization3D->getLocalPosition().coordinate;
 	SURGSIM_ASSERT(coordinate.size() > 0) << "Invalid (empty) coordinate vector";
 
 	std::shared_ptr<FemElement> element = getFemElement(elementId);
@@ -226,21 +226,59 @@ bool Fem3DRepresentation::doWakeUp()
 
 std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::Collision::Location& location)
 {
-	SURGSIM_ASSERT(location.triangleId.hasValue())
+	SURGSIM_ASSERT(location.meshLocalCoordinate.hasValue())
 		<< "Localization cannot be created if the triangle ID is not available.";
 
-	size_t triangleId = location.triangleId.getValue();
-	SurgSim::Math::Vector globalPosition = location.globalPosition.getValue();
+	SURGSIM_ASSERT(location.meshLocalCoordinate.getValue().coordinate.size() == 3)
+		<< "Localization has incorrect size for the barycentric coordinates.";
 
+	auto deformableCollisionRepresentation
+		= std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
+
+	SURGSIM_ASSERT(deformableCollisionRepresentation != nullptr)
+		<< "Localization cannot be created if the DeformableCollisionRepresentation is not correctly set.";
+
+	// Find the vertex ids of the triangle.
+	size_t triangleId = location.meshLocalCoordinate.getValue().index;
+	auto triangleVertices = deformableCollisionRepresentation->getMesh()->getTriangle(triangleId).verticesId;
+
+	// Find the vertex ids of the corresponding FemNode.
 	// Get FemElement id from the triangle id.
 	SURGSIM_ASSERT(m_triangleIdToElementIdMap.count(triangleId) == 1) << "Triangle must be mapped to an fem element.";
 
 	size_t elementId = m_triangleIdToElementIdMap[triangleId];
 	std::shared_ptr<FemElement> element = getFemElement(elementId);
 
-	FemRepresentationCoordinate coordinate;
-	coordinate.elementId = elementId;
-	coordinate.naturalCoordinate = element->computeNaturalCoordinate(*m_currentState, globalPosition);
+	auto elementVertices = element->getNodeIds();
+
+	// Find the mapping between triangleVertices and elementVertices.
+	std::vector<size_t> indices;
+	indices.reserve(elementVertices.size());
+	for (size_t i = 0; i < elementVertices.size(); ++i)
+	{
+		indices.push_back(3);
+		for (int j = 0; j < 3; ++j)
+		{
+			if (triangleVertices[j] == elementVertices[i])
+			{
+				indices[i] = j;
+				break;
+			}
+		}
+	}
+
+	// Create the natural coordinate.
+	SurgSim::Math::Vector4d barycentricCoordinate(location.meshLocalCoordinate.getValue().coordinate[0],
+												  location.meshLocalCoordinate.getValue().coordinate[1],
+												  location.meshLocalCoordinate.getValue().coordinate[2],
+												  0.0);
+	SurgSim::DataStructures::IndexedLocalCoordinate coordinate;
+	coordinate.index = elementId;
+	coordinate.coordinate.resize(elementVertices.size());
+	for (size_t i = 0; i < elementVertices.size(); ++i)
+	{
+		coordinate.coordinate[i] = barycentricCoordinate[indices[i]];
+	}
 
 	// Fem3DRepresentationLocalization::setLocalPosition verifies argument based on its Representation.
 	auto result = std::make_shared<Fem3DRepresentationLocalization>();

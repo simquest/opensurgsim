@@ -172,7 +172,7 @@ private:
 	/// Contains the teeth for detecting collisions
 	std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> m_virtualTeeth;
 
-	/// The list of scene element names that this behaviour can staple.
+	/// The list of scene element names that this behavior can staple.
 	std::list<std::string> m_stapleEnabledSceneElements;
 };
 
