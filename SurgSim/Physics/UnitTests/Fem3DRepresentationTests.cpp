@@ -33,6 +33,7 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
 {
@@ -40,74 +41,103 @@ namespace SurgSim
 namespace Physics
 {
 
-TEST(Fem3DRepresentationTests, ConstructorTest)
+class Fem3DRepresentationTests : public ::testing::Test
+{
+public:
+	void SetUp() override
+	{
+		m_fem = std::make_shared<MockFem3DRepresentation>();
+
+		m_numNodes = 10;
+
+		m_initialState = std::make_shared<SurgSim::Math::OdeState>();
+		m_initialState->setNumDof(m_fem->getNumDofPerNode(), m_numNodes);
+		m_initialState->getPositions().setLinSpaced(1.23, 9.43);
+		m_initialState->getVelocities().setLinSpaced(-0.94, 1.09);
+
+		SurgSim::Math::Quaterniond q(1.0, 2.0, 3.0, 4.0);
+		SurgSim::Math::Vector3d t(1.0, 2.0, 3.0);
+		q.normalize();
+		m_initialPose = SurgSim::Math::makeRigidTransform(q, t);
+	}
+
+	void addFemElement()
+	{
+		std::array<size_t, 4> nodeIds = {{0, 1, 2, 3}};
+		std::shared_ptr<Fem3DElementTetrahedron> tet = std::make_shared<Fem3DElementTetrahedron>(nodeIds);
+		tet->setYoungModulus(1e9);
+		tet->setPoissonRatio(0.45);
+		tet->setMassDensity(1000.0);
+		m_fem->addFemElement(tet);
+	}
+
+	void createLocalization()
+	{
+		m_localization = std::make_shared<Fem3DRepresentationLocalization>();
+		FemRepresentationCoordinate femRepCoordinate;
+		femRepCoordinate.elementId = 0;
+		femRepCoordinate.naturalCoordinate = SurgSim::Math::Vector::Zero(4);
+		femRepCoordinate.naturalCoordinate[0] = 1.0;
+		m_localization->setRepresentation(m_fem);
+		m_localization->setLocalPosition(femRepCoordinate);
+	}
+
+protected:
+	size_t m_numNodes;
+	std::shared_ptr<MockFem3DRepresentation> m_fem;
+	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
+	SurgSim::Math::RigidTransform3d m_initialPose;
+	std::shared_ptr<Fem3DRepresentationLocalization> m_localization;
+};
+
+TEST_F(Fem3DRepresentationTests, ConstructorTest)
 {
 	ASSERT_NO_THROW(std::shared_ptr<Fem3DRepresentation> fem = std::make_shared<Fem3DRepresentation>("Fem3D"));
 }
 
-TEST(Fem3DRepresentationTests, GetTypeTest)
+TEST_F(Fem3DRepresentationTests, GetTypeTest)
 {
-	std::shared_ptr<Fem3DRepresentation> fem = std::make_shared<Fem3DRepresentation>("Fem3D");
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM3D, fem->getType());
+	EXPECT_EQ(REPRESENTATION_TYPE_FEM3D, m_fem->getType());
 }
 
-TEST(Fem3DRepresentationTests, GetNumDofPerNodeTest)
+TEST_F(Fem3DRepresentationTests, GetNumDofPerNodeTest)
 {
-	std::shared_ptr<Fem3DRepresentation> fem = std::make_shared<Fem3DRepresentation>("Fem3D");
-	EXPECT_EQ(3u, fem->getNumDofPerNode());
+	EXPECT_EQ(3u, m_fem->getNumDofPerNode());
 }
 
-TEST(Fem3DRepresentationTests, TransformInitialStateTest)
+TEST_F(Fem3DRepresentationTests, TransformInitialStateTest)
 {
 	using SurgSim::Math::Vector;
 
-	std::shared_ptr<Fem3DRepresentation> fem = std::make_shared<Fem3DRepresentation>("Fem3D");
+	m_fem->setLocalPose(m_initialPose);
+	m_fem->setInitialState(m_initialState);
 
-	const size_t numNodes = 4;
-	const size_t numDofPerNode = fem->getNumDofPerNode();
-	const size_t numDof = numDofPerNode * numNodes;
-
-	SurgSim::Math::RigidTransform3d initialPose;
-	SurgSim::Math::Quaterniond q(1.0, 2.0, 3.0, 4.0);
-	SurgSim::Math::Vector3d t(1.0, 2.0, 3.0);
-	q.normalize();
-	initialPose = SurgSim::Math::makeRigidTransform(q, t);
-	fem->setLocalPose(initialPose);
-
-	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
-	initialState->setNumDof(numDofPerNode, numNodes);
-	Vector x = Vector::LinSpaced(numDof, 1.0, static_cast<double>(numDof));
-	Vector v = Vector::Ones(numDof);
-	initialState->getPositions() = x;
-	initialState->getVelocities() = v;
-	fem->setInitialState(initialState);
-
-	Vector expectedX = x, expectedV = v;
-	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
+	Vector expectedX = Vector::Zero(m_fem->getNumDof()), expectedV = Vector::Zero(m_fem->getNumDof());
+	for (size_t nodeId = 0; nodeId < m_numNodes; nodeId++)
 	{
-		expectedX.segment<3>(numDofPerNode * nodeId) = initialPose * x.segment<3>(numDofPerNode * nodeId);
-		expectedV.segment<3>(numDofPerNode * nodeId) = initialPose.linear() * v.segment<3>(numDofPerNode * nodeId);
+		expectedX.segment<3>(m_fem->getNumDofPerNode() * nodeId) =
+			m_initialPose * m_initialState->getPosition(nodeId);
+		expectedV.segment<3>(m_fem->getNumDofPerNode() * nodeId) =
+			m_initialPose.linear() * m_initialState->getVelocity(nodeId);
 	}
 
 	// Initialize the component
-	ASSERT_TRUE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>()));
+	ASSERT_TRUE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>()));
 	// Wake-up the component => apply the pose to the initial state
-	ASSERT_TRUE(fem->wakeUp());
+	ASSERT_TRUE(m_fem->wakeUp());
 
-	EXPECT_TRUE(fem->getInitialState()->getPositions().isApprox(expectedX));
-	EXPECT_TRUE(fem->getInitialState()->getVelocities().isApprox(expectedV));
+	EXPECT_TRUE(m_fem->getInitialState()->getPositions().isApprox(expectedX));
+	EXPECT_TRUE(m_fem->getInitialState()->getVelocities().isApprox(expectedV));
 }
 
-TEST(Fem3DRepresentationTests, SetGetFilenameTest)
+TEST_F(Fem3DRepresentationTests, SetGetFilenameTest)
 {
-	auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-
-	ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
-	ASSERT_NO_THROW(fem->getFilename());
-	ASSERT_EQ("Data/PlyReaderTests/Tetrahedron.ply", fem->getFilename());
+	ASSERT_NO_THROW(m_fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
+	ASSERT_NO_THROW(m_fem->getFilename());
+	ASSERT_EQ("Data/PlyReaderTests/Tetrahedron.ply", m_fem->getFilename());
 }
 
-TEST(Fem3DRepresentationTests, DoInitializeTest)
+TEST_F(Fem3DRepresentationTests, DoInitializeTest)
 {
 	{
 		SCOPED_TRACE("Initialize with a valid file name");
@@ -163,13 +193,12 @@ TEST(Fem3DRepresentationTests, DoInitializeTest)
 	}
 }
 
-TEST(Fem3DRepresentationTests, CreateLocalizationTest)
+TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 {
 	using SurgSim::DataStructures::EmptyData;
 
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-	auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-	ASSERT_NO_THROW(fem->setFilename("Geometry/wound_deformable.ply"));
+	ASSERT_NO_THROW(m_fem->setFilename("Geometry/wound_deformable.ply"));
 
 	std::string path = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
 	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlain> triangleMesh =
@@ -178,11 +207,11 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 	// Create the collision mesh for the surface of the finite element model
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
 	collisionRepresentation->setMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>(*triangleMesh));
-	fem->setCollisionRepresentation(collisionRepresentation);
+	m_fem->setCollisionRepresentation(collisionRepresentation);
 
 	bool wokeUp = false;
-	ASSERT_TRUE(fem->initialize(runtime));
-	EXPECT_NO_THROW(wokeUp = fem->wakeUp(););
+	ASSERT_TRUE(m_fem->initialize(runtime));
+	EXPECT_NO_THROW(wokeUp = m_fem->wakeUp(););
 	EXPECT_TRUE(wokeUp);
 
 	auto& meshTriangles = triangleMesh->getTriangles();
@@ -212,20 +241,73 @@ TEST(Fem3DRepresentationTests, CreateLocalizationTest)
 			location.globalPosition.setValue(*point);
 			EXPECT_NO_THROW(localization =
 								std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
-									fem->createLocalization(location)););
+									m_fem->createLocalization(location)););
 			EXPECT_TRUE(localization != nullptr);
 
 			SurgSim::Math::Vector globalPosition;
 			SurgSim::Physics::FemRepresentationCoordinate coordinate = localization->getLocalPosition();
-			EXPECT_NO_THROW(globalPosition = fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(
-												 *fem->getCurrentState(), coordinate.naturalCoordinate););
+			EXPECT_NO_THROW(globalPosition = m_fem->getFemElement(coordinate.elementId)->computeCartesianCoordinate(
+												 *m_fem->getCurrentState(), coordinate.naturalCoordinate););
 			EXPECT_EQ(3, globalPosition.size());
 			EXPECT_TRUE(globalPosition.isApprox(*point));
 		}
 	}
 }
 
-TEST(Fem3DRepresentationTests, SerializationTest)
+TEST_F(Fem3DRepresentationTests, ExternalForceAPITest)
+{
+	// External force vector not initialized until the initial state has been set (it contains the #dof...)
+	EXPECT_EQ(0, m_fem->getExternalForce().size());
+	EXPECT_EQ(0, m_fem->getExternalStiffness().rows());
+	EXPECT_EQ(0, m_fem->getExternalStiffness().cols());
+	EXPECT_EQ(0, m_fem->getExternalDamping().rows());
+	EXPECT_EQ(0, m_fem->getExternalDamping().cols());
+
+	m_fem->setInitialState(m_initialState);
+
+	// Vector initialized (properly sized and zeroed)
+	EXPECT_NE(0, m_fem->getExternalForce().size());
+	EXPECT_NE(0, m_fem->getExternalStiffness().rows());
+	EXPECT_NE(0, m_fem->getExternalStiffness().cols());
+	EXPECT_NE(0, m_fem->getExternalDamping().rows());
+	EXPECT_NE(0, m_fem->getExternalDamping().cols());
+	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalForce().size());
+	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalStiffness().cols());
+	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalStiffness().rows());
+	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalDamping().cols());
+	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalDamping().rows());
+	EXPECT_TRUE(m_fem->getExternalForce().isZero());
+	EXPECT_TRUE(m_fem->getExternalStiffness().isZero());
+	EXPECT_TRUE(m_fem->getExternalDamping().isZero());
+
+	addFemElement();
+	createLocalization();
+
+	Vector Flocal = Vector::LinSpaced(m_fem->getNumDofPerNode(), -3.12, 4.09);
+	Matrix Klocal = Matrix::Ones(m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) * 0.34;
+	Matrix Dlocal = Klocal + Matrix::Identity(m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode());
+	Vector F = Vector::Zero(m_fem->getNumDof());
+	F.segment(0, m_fem->getNumDofPerNode()) = Flocal;
+	Matrix K = Matrix::Zero(m_fem->getNumDof(), m_fem->getNumDof());
+	K.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = Klocal;
+	Matrix D = Matrix::Zero(m_fem->getNumDof(), m_fem->getNumDof());
+	D.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = Dlocal;
+
+	m_fem->addExternalGeneralizedForce(m_localization, Flocal, Klocal, Dlocal);
+	EXPECT_FALSE(m_fem->getExternalForce().isZero());
+	EXPECT_FALSE(m_fem->getExternalStiffness().isZero());
+	EXPECT_FALSE(m_fem->getExternalDamping().isZero());
+	EXPECT_TRUE(m_fem->getExternalForce().isApprox(F));
+	EXPECT_TRUE(m_fem->getExternalStiffness().isApprox(K));
+	EXPECT_TRUE(m_fem->getExternalDamping().isApprox(D));
+
+	m_fem->addExternalGeneralizedForce(m_localization, Flocal, Klocal, Dlocal);
+	EXPECT_TRUE(m_fem->getExternalForce().isApprox(2.0 * F));
+	EXPECT_TRUE(m_fem->getExternalStiffness().isApprox(2.0 * K));
+	EXPECT_TRUE(m_fem->getExternalDamping().isApprox(2.0 * D));
+}
+
+TEST_F(Fem3DRepresentationTests, SerializationTest)
 {
 	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Test-Fem3D");
 	const std::string filename = "TestFilename";

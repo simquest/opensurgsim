@@ -220,7 +220,9 @@ SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState
 	addGravityForce(&m_f, state);
 	addRayleighDampingForce(&m_f, state);
 	addFemElementsForce(&m_f, state);
-	m_f += m_externalForce;
+
+	// Add external generalized force
+	m_f += m_externalGeneralizedForce;
 
 	return m_f;
 }
@@ -270,6 +272,9 @@ const SurgSim::Math::Matrix& FemRepresentation::computeD(const SurgSim::Math::Od
 		(*femElement)->addDamping(state, &m_D);
 	}
 
+	// Add external generalized damping
+	m_D += m_externalGeneralizedDamping;
+
 	return m_D;
 }
 
@@ -282,6 +287,9 @@ const SurgSim::Math::Matrix& FemRepresentation::computeK(const SurgSim::Math::Od
 	{
 		(*femElement)->addStiffness(state, &m_K);
 	}
+
+	// Add external generalized stiffness
+	m_K += m_externalGeneralizedStiffness;
 
 	return m_K;
 }
@@ -323,8 +331,10 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSi
 	// Add the Rayleigh damping force to m_f
 	addRayleighDampingForce(&m_f, state, true, true);
 
-	// Add the external force to m_f
-	m_f += m_externalForce;
+	// Add external generalized force, stiffness and damping
+	m_f += m_externalGeneralizedForce;
+	m_K += m_externalGeneralizedStiffness;
+	m_D += m_externalGeneralizedDamping;
 
 	*f = &m_f;
 	*M = &m_M;
