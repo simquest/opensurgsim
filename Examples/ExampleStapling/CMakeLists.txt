@@ -50,6 +50,7 @@ surgsim_add_library(
 	${SURGSIMEXAMPLESTAPLING_HEADERS}
 	"Examples/ExampleStapling"
 )
+add_dependencies(SurgSimExampleStapling yaml-cpp)
 
 surgsim_show_ide_folders(
 	"${EXAMPLESTAPLING_SOURCES}" "${EXAMPLESTAPLING_HEADERS}")
