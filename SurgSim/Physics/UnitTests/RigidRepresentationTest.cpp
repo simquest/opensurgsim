@@ -108,7 +108,7 @@ TEST_F(RigidRepresentationTest, ResetTest)
 	rigidBody->setInitialParameters(m_defaultParameters);
 	rigidBody->setCurrentParameters(m_param);
 	rigidBody->setInitialState(m_state);
-	rigidBody->setIsActive(false);
+	rigidBody->setActive(false);
 	rigidBody->setIsGravityEnabled(false);
 	rigidBody->setLocalPose(RigidTransform3d::Identity());
 
@@ -157,9 +157,9 @@ TEST_F(RigidRepresentationTest, SetGetAndDefaultValueTest)
 
 	// Get/Set active flag [default = true]
 	EXPECT_TRUE(rigidBody->isActive());
-	rigidBody->setIsActive(false);
+	rigidBody->setActive(false);
 	ASSERT_FALSE(rigidBody->isActive());
-	rigidBody->setIsActive(true);
+	rigidBody->setActive(true);
 	ASSERT_TRUE(rigidBody->isActive());
 
 	// Get numDof = 6
@@ -179,7 +179,7 @@ TEST_F(RigidRepresentationTest, NoForceTorqueTest)
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 
 	// Setup phase
-	rigidBody->setIsActive(true);
+	rigidBody->setActive(true);
 	rigidBody->setIsGravityEnabled(false);
 	rigidBody->setInitialParameters(m_param);
 
@@ -209,7 +209,7 @@ TEST_F(RigidRepresentationTest, GravityTest)
 	Vector3d gravity(0.0, -9.81, 0.0);
 
 	// Setup phase
-	rigidBody->setIsActive(true);
+	rigidBody->setActive(true);
 	rigidBody->setIsGravityEnabled(true);
 	rigidBody->setInitialParameters(m_param);
 
@@ -251,7 +251,7 @@ TEST_F(RigidRepresentationTest, PreviousStateDifferentFromCurrentTest)
 	Vector3d gravity(0.0, -9.81, 0.0);
 
 	// Setup phase
-	rigidBody->setIsActive(true);
+	rigidBody->setActive(true);
 	rigidBody->setIsGravityEnabled(true);
 	rigidBody->setInitialParameters(m_param);
 
@@ -271,7 +271,7 @@ void disableWhenDivergeTest(std::shared_ptr<RigidRepresentation> rigidBody,
 							const RigidRepresentationState& state, double dt)
 {
 	// Setup phase
-	rigidBody->setIsActive(true);
+	rigidBody->setActive(true);
 	rigidBody->setIsGravityEnabled(true);
 	rigidBody->setInitialParameters(param);
 	rigidBody->setInitialState(state);

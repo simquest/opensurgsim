@@ -81,7 +81,7 @@ void RigidRepresentation::beforeUpdate(double dt)
 						   " deactivated in beforeUpdate because m_currentParameters is not valid." << std::endl;
 	if (!isActive() || !isParametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 }
@@ -98,7 +98,7 @@ void RigidRepresentation::update(double dt)
 						   " deactivated in update because m_currentParameters is not valid." << std::endl;
 	if (!isActive() || !isParametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 
@@ -182,7 +182,7 @@ void RigidRepresentation::update(double dt)
 			"|q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
-		setIsActive(false);
+		setActive(false);
 	}
 
 	// Prepare the compliance matrix
@@ -199,7 +199,7 @@ void RigidRepresentation::afterUpdate(double dt)
 						   " deactivated in afterUpdate because m_currentParameters is not valid." << std::endl;
 	if (!isActive() || !isParametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 
@@ -222,7 +222,7 @@ void RigidRepresentation::applyCorrection(double dt,
 						   " deactivated in applyCorrection because m_currentParameters is not valid." << std::endl;
 	if (!isActive() || !isParametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 
@@ -269,7 +269,7 @@ void RigidRepresentation::applyCorrection(double dt,
 			"and |q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
-		setIsActive(false);
+		setActive(false);
 	}
 
 	// Prepare the compliance matrix
@@ -299,7 +299,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 						   std::endl;
 	if (!isActive() || !isParametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 

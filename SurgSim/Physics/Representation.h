@@ -75,7 +75,7 @@ public:
 
 	/// Set active flag for this Representation
 	/// \param isActive True if the Representation is being activated, False otherwise
-	void setIsActive(bool isActive);
+	virtual void setActive(bool isActive) override;
 
 	/// Query if this object is active in the scene.
 	/// \return true if active, false if not.
