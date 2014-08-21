@@ -14,14 +14,7 @@
 # limitations under the License.
 
 
-
 link_directories(${Boost_LIBRARY_DIRS})
-
-include_directories(
-	${Boost_INCLUDE_DIR}
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
-)
 
 set(SURGSIM_FRAMEWORK_SOURCES
 	Accessible.cpp

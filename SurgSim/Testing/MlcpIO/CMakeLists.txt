@@ -15,7 +15,6 @@
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
 )
 
 set(MLCP_IO_SOURCES

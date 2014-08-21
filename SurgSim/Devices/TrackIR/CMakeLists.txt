@@ -17,8 +17,6 @@ find_package(OptiTrack REQUIRED)
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${Boost_INCLUDE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
 	"${OPENSCENEGRAPH_INCLUDE_DIR}"
 	"${OPTITRACK_INCLUDE_DIR}"
 )
