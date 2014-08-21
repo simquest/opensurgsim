@@ -13,10 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
-)
 
 set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
@@ -47,7 +43,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemElement.cpp
 	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
-	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentation.cpp
 	FixedRepresentationBilateral3D.cpp
@@ -109,7 +104,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	FemElement.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
-	FemRepresentationCoordinate.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FixedRepresentationBilateral3D.h

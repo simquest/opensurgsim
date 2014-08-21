@@ -26,6 +26,7 @@ set(UNIT_TEST_SOURCES
 	DataGroupTests.cpp
 	DataStructuresConvertTests.cpp
 	IndexDirectoryTests.cpp
+	IndexedLocalCoordinateTest.cpp
 	MeshElementTest.cpp
 	MeshTest.cpp
 	MeshVertexTest.cpp
@@ -51,7 +52,7 @@ set(LIBS
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/TriangleMeshBaseTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/OctreeShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/OctreeShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"

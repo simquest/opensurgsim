@@ -14,10 +14,8 @@
 # limitations under the License.
 
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
 	${gmock_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}/include
-	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_TESTING_SOURCES

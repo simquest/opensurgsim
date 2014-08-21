@@ -936,8 +936,12 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 			double value;
 			error = GetResult(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, &value);
 			result = result && isOk(error);
-			error = GetResult(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, &value);
-			result = result && isOk(error);
+
+			if (result && timer->second.initialValue.hasValue())
+			{
+				error = GetResult(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, &value);
+				result = result && isOk(error);
+			}
 
 			SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
 				"Failed to configure timer for a device named '" << device->getName() <<

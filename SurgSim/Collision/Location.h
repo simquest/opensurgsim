@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Math/Vector.h"
@@ -33,7 +34,7 @@ public:
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> globalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::OctreePath> octreeNodePath;
-	SurgSim::DataStructures::OptionalValue<size_t> triangleId;
+	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> meshLocalCoordinate;
 };
 
 }; // namespace Collision
