@@ -68,7 +68,6 @@ surgsim_add_library(
 SET(LIBS
 	SurgSimFramework
 	SurgSimMath
-	SurgSimPhysics
 	${Boost_LIBRARIES}
 )
 

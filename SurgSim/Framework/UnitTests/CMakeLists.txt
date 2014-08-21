@@ -57,6 +57,7 @@ configure_file(
 
 set(LIBS
 	SurgSimFramework
+	SurgSimDataStructures
 )
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)

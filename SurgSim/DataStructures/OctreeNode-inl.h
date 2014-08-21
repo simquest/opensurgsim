@@ -16,6 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_OCTREENODE_INL_H
 #define SURGSIM_DATASTRUCTURES_OCTREENODE_INL_H
 
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 

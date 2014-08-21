@@ -27,7 +27,6 @@ set(SURGSIM_MATH_SOURCES
 	GaussLegendreQuadrature.cpp
 	LinearSolveAndInverse.cpp
 	MathConvert.cpp
-	Matrix.cpp
 	MeshShape.cpp
 	MlcpGaussSeidelSolver.cpp
 	MlcpProblem.cpp
@@ -112,7 +111,6 @@ surgsim_add_library(
 set(LIBS 
 	SurgSimDataStructures
 	SurgSimFramework 
-	SurgSimTesting
 	${YAML_CPP_LIBRARIES}
 )
 

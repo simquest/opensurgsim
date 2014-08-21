@@ -24,8 +24,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include "SurgSim/Framework/Assert.h"
-
 namespace SurgSim
 {
 namespace Math
@@ -136,28 +134,6 @@ void getSubVector(const Vector& vector, const std::vector<size_t> blockIds, size
 		size_t blockId = blockIds[block];
 
 		subVector->segment(blockSize * block, blockSize) = vector.segment(blockSize * blockId, blockSize);
-	}
-}
-
-/// Helper method to resize a vector (if necessary), and potentially zero it out
-/// \tparam Vector The vector type
-/// \param[in,out] v The vector to resize and potentially zero out
-/// \param size The size to resize the vector v to
-/// \param zeroOut True if the vector v should be filled up with 0 after having been resized, False if not
-template <class Vector>
-void resizeVector(Vector *v, size_t size, bool zeroOut = false)
-{
-	if (v == nullptr)
-	{
-		return;
-	}
-	if (v->size() != static_cast<ptrdiff_t>(size))
-	{
-		v->resize(size);
-	}
-	if (zeroOut)
-	{
-		v->setZero();
 	}
 }
 

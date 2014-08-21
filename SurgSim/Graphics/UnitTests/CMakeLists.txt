@@ -83,6 +83,7 @@ file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/Data/Geometry DESTINATION ${CMAKE_
 
 set(LIBS 
 	SurgSimGraphics
+	SurgSimMath
 	SurgSimTesting
 )
 

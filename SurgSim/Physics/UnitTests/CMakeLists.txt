@@ -84,6 +84,7 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS
 	SurgSimBlocks
+	SurgSimGraphics
 	SurgSimPhysics
 	SurgSimMath
 	SurgSimInput
