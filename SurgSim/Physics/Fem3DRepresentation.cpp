@@ -88,13 +88,14 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	const size_t dofPerNode = getNumDofPerNode();
 
 	std::shared_ptr<Fem3DRepresentationLocalization> localization3D =
-		std::static_pointer_cast<Fem3DRepresentationLocalization>(localization);
+		std::dynamic_pointer_cast<Fem3DRepresentationLocalization>(localization);
+	SURGSIM_ASSERT(localization3D != nullptr) << "Invalid localization type (not a Fem3DRepresentationLocalization)";
 
 	const size_t elementId = localization3D->getLocalPosition().index;
 	SURGSIM_ASSERT(elementId >= 0 && elementId < getNumFemElements()) << "Invalid elementId " << elementId <<
 		". Valid range is {0.." << getNumFemElements() << "}";
 
-	const SurgSim::Math::Vector coordinate = localization3D->getLocalPosition().coordinate;
+	const SurgSim::Math::Vector& coordinate = localization3D->getLocalPosition().coordinate;
 	SURGSIM_ASSERT(coordinate.size() > 0) << "Invalid (empty) coordinate vector";
 
 	std::shared_ptr<FemElement> element = getFemElement(elementId);

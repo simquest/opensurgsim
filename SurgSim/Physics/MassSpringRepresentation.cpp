@@ -117,7 +117,9 @@ void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Local
 														   const SurgSim::Math::Matrix& D)
 {
 	std::shared_ptr<MassSpringRepresentationLocalization> localization3D =
-		std::static_pointer_cast<MassSpringRepresentationLocalization>(localization);
+		std::dynamic_pointer_cast<MassSpringRepresentationLocalization>(localization);
+	SURGSIM_ASSERT(localization3D != nullptr) <<
+		"Invalid localization type (not a MassSpringRepresentationLocalization)";
 
 	const size_t dofPerNode = getNumDofPerNode();
 

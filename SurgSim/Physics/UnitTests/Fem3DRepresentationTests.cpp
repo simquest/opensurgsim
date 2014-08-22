@@ -80,6 +80,9 @@ public:
 		femRepCoordinate.coordinate[0] = 1.0;
 		m_localization->setRepresentation(m_fem);
 		m_localization->setLocalPosition(femRepCoordinate);
+
+		m_wrongLocalizationType = std::make_shared<MockLocalization>();
+		m_wrongLocalizationType->setRepresentation(m_fem);
 	}
 
 protected:
@@ -88,6 +91,7 @@ protected:
 	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
 	SurgSim::Math::RigidTransform3d m_initialPose;
 	std::shared_ptr<Fem3DRepresentationLocalization> m_localization;
+	std::shared_ptr<MockLocalization> m_wrongLocalizationType;
 };
 
 TEST_F(Fem3DRepresentationTests, ConstructorTest)
@@ -301,6 +305,11 @@ TEST_F(Fem3DRepresentationTests, ExternalForceAPITest)
 	K.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = Klocal;
 	Matrix D = Matrix::Zero(m_fem->getNumDof(), m_fem->getNumDof());
 	D.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = Dlocal;
+
+	ASSERT_THROW(m_fem->addExternalGeneralizedForce(nullptr, Flocal, Klocal, Dlocal),
+		SurgSim::Framework::AssertionFailure);
+	ASSERT_THROW(m_fem->addExternalGeneralizedForce(m_wrongLocalizationType, Flocal, Klocal, Dlocal),
+		SurgSim::Framework::AssertionFailure);
 
 	m_fem->addExternalGeneralizedForce(m_localization, Flocal, Klocal, Dlocal);
 	EXPECT_FALSE(m_fem->getExternalForce().isZero());

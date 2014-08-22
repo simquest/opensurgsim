@@ -29,8 +29,10 @@ using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
 using SurgSim::Physics::MassSpringRepresentation;
 using SurgSim::Physics::MassSpringRepresentationLocalization;
+using SurgSim::Physics::MockLocalization;
 using SurgSim::Physics::MockMassSpring;
 using SurgSim::Physics::MockSpring;
+
 
 namespace
 {
@@ -280,6 +282,8 @@ TEST_F(MassSpringRepresentationTests, ExternalForceAPITest)
 	std::shared_ptr<MockMassSpring> massSpring = std::make_shared<MockMassSpring>();
 	std::shared_ptr<MassSpringRepresentationLocalization> localization =
 		std::make_shared<MassSpringRepresentationLocalization>();
+	std::shared_ptr<MockLocalization> wrongLocalizationType =
+		std::make_shared<MockLocalization>();
 
 	// External force vector not initialized until the initial state has been set (it contains the #dof...)
 	EXPECT_EQ(0, massSpring->getExternalForce().size());
@@ -307,6 +311,7 @@ TEST_F(MassSpringRepresentationTests, ExternalForceAPITest)
 
 	localization->setRepresentation(massSpring);
 	localization->setLocalNode(0);
+	wrongLocalizationType->setRepresentation(massSpring);
 
 	Vector F = Vector::LinSpaced(massSpring->getNumDofPerNode(), -3.12, 4.09);
 	Matrix K = Matrix::Ones(massSpring->getNumDofPerNode(), massSpring->getNumDofPerNode()) * 0.34;
@@ -317,6 +322,11 @@ TEST_F(MassSpringRepresentationTests, ExternalForceAPITest)
 	expectedK.block(0, 0, massSpring->getNumDofPerNode(), massSpring->getNumDofPerNode()) = K;
 	Matrix expectedD = Matrix::Zero(massSpring->getNumDof(), massSpring->getNumDof());
 	expectedD.block(0, 0, massSpring->getNumDofPerNode(), massSpring->getNumDofPerNode()) = D;
+
+	ASSERT_THROW(massSpring->addExternalGeneralizedForce(nullptr, F, K, D),
+		SurgSim::Framework::AssertionFailure);
+	ASSERT_THROW(massSpring->addExternalGeneralizedForce(wrongLocalizationType, F, K, D),
+		SurgSim::Framework::AssertionFailure);
 
 	massSpring->addExternalGeneralizedForce(localization, F, K, D);
 	EXPECT_FALSE(massSpring->getExternalForce().isZero());
