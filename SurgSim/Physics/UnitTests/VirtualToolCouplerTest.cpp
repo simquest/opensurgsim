@@ -537,5 +537,31 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 		node[virtualToolCoupler->getClassName()][input->getName()][input->getClassName()]["Id"].as<std::string>());
 }
 
+TEST_F(VirtualToolCouplerTest, OutputDataEntries)
+{
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	ASSERT_TRUE(virtualToolCoupler->initialize(runtime));
+	auto data = virtualToolCoupler->getOutputData();
+
+	EXPECT_EQ(1, data.poses().getNumEntries());
+	EXPECT_TRUE(data.poses().hasEntry(SurgSim::DataStructures::Names::INPUT_POSE));
+
+	EXPECT_EQ(4, data.vectors().getNumEntries());
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::FORCE));
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::TORQUE));
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY));
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY));
+
+	EXPECT_EQ(2, data.matrices().getNumEntries());
+	EXPECT_TRUE(data.matrices().hasEntry(SurgSim::DataStructures::Names::SPRING_JACOBIAN));
+	EXPECT_TRUE(data.matrices().hasEntry(SurgSim::DataStructures::Names::DAMPER_JACOBIAN));
+
+	EXPECT_EQ(0, data.scalars().getNumEntries());
+	EXPECT_EQ(0, data.integers().getNumEntries());
+	EXPECT_EQ(0, data.booleans().getNumEntries());
+	EXPECT_EQ(0, data.strings().getNumEntries());
+	EXPECT_EQ(0, data.customData().getNumEntries());
+}
+
 }; // namespace Physics
 }; // namespace SurgSim

@@ -63,16 +63,6 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_springJacobianIndex(-1),
 	m_damperJacobianIndex(-1)
 {
-	SurgSim::DataStructures::DataGroupBuilder builder;
-	builder.addVector(SurgSim::DataStructures::Names::FORCE);
-	builder.addVector(SurgSim::DataStructures::Names::TORQUE);
-	builder.addMatrix(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
-	builder.addPose(SurgSim::DataStructures::Names::INPUT_POSE);
-	builder.addMatrix(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
-	builder.addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
-	builder.addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
-	m_outputData = builder.createData();
-
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
 		LinearStiffness, getOptionalLinearStiffness, setOptionalLinearStiffness);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
@@ -214,6 +204,8 @@ void VirtualToolCoupler::update(double dt)
 
 bool VirtualToolCoupler::doInitialize()
 {
+	m_outputData = buildOutputData();
+
 	m_forceIndex = m_outputData.vectors().getIndex(SurgSim::DataStructures::Names::FORCE);
 	m_torqueIndex = m_outputData.vectors().getIndex(SurgSim::DataStructures::Names::TORQUE);
 	m_inputLinearVelocityIndex = m_outputData.vectors().getIndex(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
@@ -224,6 +216,19 @@ bool VirtualToolCoupler::doInitialize()
 	m_damperJacobianIndex = m_outputData.matrices().getIndex(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
 
 	return true;
+}
+
+SurgSim::DataStructures::DataGroup VirtualToolCoupler::buildOutputData()
+{
+	SurgSim::DataStructures::DataGroupBuilder builder;
+	builder.addVector(SurgSim::DataStructures::Names::FORCE);
+	builder.addVector(SurgSim::DataStructures::Names::TORQUE);
+	builder.addMatrix(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
+	builder.addPose(SurgSim::DataStructures::Names::INPUT_POSE);
+	builder.addMatrix(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
+	builder.addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
+	builder.addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
+	return builder.createData();
 }
 
 bool VirtualToolCoupler::doWakeUp()
