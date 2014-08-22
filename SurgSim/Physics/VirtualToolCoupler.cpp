@@ -176,9 +176,11 @@ void VirtualToolCoupler::update(double dt)
 		Vector6d generalizedForce;
 		generalizedForce << force, torque;
 		Matrix66d generalizedStiffness;
-		generalizedStiffness << linearStiffnessMatrix, zero3x3, zero3x3, angularStiffnessMatrix;
+		generalizedStiffness << linearStiffnessMatrix, zero3x3,
+								zero3x3, angularStiffnessMatrix;
 		Matrix66d generalizedDamping;
-		generalizedDamping << linearDampingMatrix, zero3x3, zero3x3, angularDampingMatrix;
+		generalizedDamping << linearDampingMatrix, zero3x3,
+							  zero3x3, angularDampingMatrix;
 
 		// By adding an external force applied on the attachment point, the extra torque (leverArm.cross(force))
 		// and its derivatives will be added automatically in the rigid.
