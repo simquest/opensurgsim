@@ -64,7 +64,7 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 													  const SurgSim::Math::Matrix& K,
 													  const SurgSim::Math::Matrix& D)
 {
-
+	SURGSIM_FAILURE() << "Not implemented yet";
 }
 
 RepresentationType Fem2DRepresentation::getType() const
