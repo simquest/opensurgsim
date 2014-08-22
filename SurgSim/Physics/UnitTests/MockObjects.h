@@ -344,6 +344,8 @@ public:
 	void setOptionalAngularStiffness(const SurgSim::DataStructures::OptionalValue<double>& val);
 	void setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& val);
 	void setOptionalAttachmentPoint(const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& val);
+
+	const SurgSim::DataStructures::DataGroup& getOutputData() const;
 };
 
 inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepresentation> firstRepresentation,

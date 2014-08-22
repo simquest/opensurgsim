@@ -212,11 +212,10 @@ protected:
 	/// The DataGroup to output
 	SurgSim::DataStructures::DataGroup m_outputData;
 
-	/// The input component.  Should provide a pose and the VTC will perform better with linear and angular velocities.
+	/// The input component.
 	std::shared_ptr<SurgSim::Input::InputComponent> m_input;
 
-	/// The output component.  The VTC will provide a force and torque, the pose and velocities used in the
-	/// calculations, and Jacobians relating the force & torque to the pose and velocities.
+	/// The output component.
 	std::shared_ptr<SurgSim::Input::OutputComponent> m_output;
 
 private:

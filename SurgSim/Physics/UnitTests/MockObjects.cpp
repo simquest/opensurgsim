@@ -547,5 +547,10 @@ void MockVirtualToolCoupler::setOptionalAttachmentPoint(
 	VirtualToolCoupler::setOptionalAttachmentPoint(val);
 }
 
+const SurgSim::DataStructures::DataGroup& MockVirtualToolCoupler::getOutputData() const
+{
+	return m_outputData;
+}
+
 }; // Physics
 }; // SurgSim
