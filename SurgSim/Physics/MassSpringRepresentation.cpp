@@ -233,8 +233,8 @@ const Matrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& 
 	using SurgSim::Math::addSubMatrix;
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_D.resize(state.getNumDof(), state.getNumDof());
-	m_D.setZero();
+	m_K.resize(state.getNumDof(), state.getNumDof());
+	m_K.setZero();
 
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
