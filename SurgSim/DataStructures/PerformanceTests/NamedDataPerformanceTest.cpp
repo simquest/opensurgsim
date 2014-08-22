@@ -24,40 +24,10 @@
 #include "SurgSim/DataStructures/NamedDataBuilder.h"
 #include "SurgSim/Framework/Timer.h"
 
-namespace
-{
-const std::string array[] =
-	{"uzgfk1f41V",
-	"PbpZficBR2",
-	"M3OYjZgHXX",
-	"WVIEjG3QaX",
-	"2o6nN2nuaW",
-	"3rWXCXR2gi",
-	"XO2dATxWFq",
-	"M2xpjE6PAL",
-	"cT1Bmj3Z1U",
-	"65UtrrfXn7",
-	"tNltVIcurd",
-	"jFVkKzn17i",
-	"0QlA0FAPc3",
-	"jCXGBopngK",
-	"GTwY4YyVnC",
-	"0uVPK4S9Le",
-	"iNdq3p6ZQb",
-	"LfREPeFczN",
-	"9RKdlFnm1I",
-	"N2acPVhGY2"};
-
-const std::vector<std::string> names(std::begin(array), std::end(array));
-
-const int numberOfLoops = 100000;
-};
-
 namespace SurgSim
 {
 namespace DataStructures
 {
-	
 
 class NamedDataTest : public ::testing::Test
 {
@@ -65,6 +35,32 @@ public:
 
 	virtual void SetUp()
 	{
+		numberOfLoops = 100000;
+
+		const std::string array[] =
+		{"uzgfk1f41V",
+		"PbpZficBR2",
+		"M3OYjZgHXX",
+		"WVIEjG3QaX",
+		"2o6nN2nuaW",
+		"3rWXCXR2gi",
+		"XO2dATxWFq",
+		"M2xpjE6PAL",
+		"cT1Bmj3Z1U",
+		"65UtrrfXn7",
+		"tNltVIcurd",
+		"jFVkKzn17i",
+		"0QlA0FAPc3",
+		"jCXGBopngK",
+		"GTwY4YyVnC",
+		"0uVPK4S9Le",
+		"iNdq3p6ZQb",
+		"LfREPeFczN",
+		"9RKdlFnm1I",
+		"N2acPVhGY2"};
+
+		names = std::vector<std::string>(std::begin(array), std::end(array));
+
 		NamedDataBuilder<int> builder;
 		for (std::string name : names)
 		{
@@ -86,17 +82,19 @@ public:
 
 	NamedData<int> data;
 	std::vector<int> indices;
+	std::vector<std::string> names;
+	int numberOfLoops;
 };
 
 TEST_F(NamedDataTest, GetByName)
 {
 	int value;
-	const int numberOfEntries = static_cast<int>(names.size());
+	const size_t numberOfEntries = names.size();
 
 	SurgSim::Framework::Timer timer;
 	for (int i = 0; i < numberOfLoops; ++i)
 	{
-		for (int j = 0; j < numberOfEntries; ++j)
+		for (size_t j = 0; j < numberOfEntries; ++j)
 		{
 			ASSERT_TRUE(data.get(names[j], &value));
 		}
@@ -108,12 +106,12 @@ TEST_F(NamedDataTest, GetByName)
 TEST_F(NamedDataTest, GetByIndex)
 {
 	int value;
-	const int numberOfEntries = static_cast<int>(indices.size());
+	const size_t numberOfEntries = indices.size();
 
 	SurgSim::Framework::Timer timer;
 	for (int i = 0; i < numberOfLoops; ++i)
 	{
-		for (int j = 0; j < numberOfEntries; ++j)
+		for (size_t j = 0; j < numberOfEntries; ++j)
 		{
 			ASSERT_TRUE(data.get(indices[j], &value));
 		}
