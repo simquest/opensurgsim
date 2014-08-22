@@ -35,7 +35,7 @@ std::shared_ptr<T> SurgSim::Physics::RigidRepresentationBase::createTypedLocaliz
 	SurgSim::Math::Vector3d localPosition;
 	if (!location.rigidLocalPosition.hasValue())
 	{
-		localPosition = m_currentState.getPose().inverse() * location.globalPosition.getValue();
+		localPosition = getPose().inverse() * location.globalPosition.getValue();
 	}
 	else
 	{

@@ -52,7 +52,7 @@ void Fem3DRepresentationBilateral3D::doBuild(double dt,
 	}
 
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
-	const FemRepresentationCoordinate& coord
+	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<Fem3DRepresentationLocalization>(localization)->getLocalPosition();
 
 	Vector3d globalPosition = localization->calculatePosition();
@@ -88,20 +88,20 @@ void Fem3DRepresentationBilateral3D::doBuild(double dt,
 	// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
 	m_newH.resize(fem3d->getNumDof());
 	// m_newH is a member variable, so 'reserve' only needs to allocate memory on the first run.
-	size_t numNodeToConstrain = (coord.naturalCoordinate.array() != 0.0).count();
+	size_t numNodeToConstrain = (coord.coordinate.array() != 0.0).count();
 	m_newH.reserve(3 * numNodeToConstrain);
 
-	std::shared_ptr<FemElement> femElement = fem3d->getFemElement(coord.elementId);
+	std::shared_ptr<FemElement> femElement = fem3d->getFemElement(coord.index);
 	size_t numNodes = femElement->getNumNodes();
 	for (size_t axis = 0; axis < 3; axis++)
 	{
 		m_newH.setZero();
 		for (size_t index = 0; index < numNodes; index++)
 		{
-			if (coord.naturalCoordinate[index] != 0.0)
+			if (coord.coordinate[index] != 0.0)
 			{
 				size_t nodeIndex = femElement->getNodeId(index);
-				m_newH.insert(3 * nodeIndex + axis) = coord.naturalCoordinate[index] * (dt * scale);
+				m_newH.insert(3 * nodeIndex + axis) = coord.coordinate[index] * (dt * scale);
 			}
 		}
 		mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + axis);

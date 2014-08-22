@@ -232,7 +232,7 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 		cameraList.Refresh();
 		if (cameraList.Count() > static_cast<int>(m_state->activeDeviceList.size()))
 		{
-			int cameraID = m_state->activeDeviceList.size();
+			int cameraID = static_cast<int>(m_state->activeDeviceList.size());
 			std::unique_ptr<DeviceData> info(new DeviceData(device, cameraID));
 			createPerDeviceThread(info.get());
 			SURGSIM_ASSERT(info->thread) << "Failed to create a per-device thread for TrackIR device: " <<
