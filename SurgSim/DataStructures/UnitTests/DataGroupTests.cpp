@@ -445,3 +445,20 @@ TEST(DataGroupTests, DataGroupInLockedContainer)
 	EXPECT_EQ(outBool, outCopiedBool);
 	EXPECT_EQ(trueBool, outCopiedBool);
 }
+
+TEST(DataGroupTests, IsEmpty)
+{
+	DataGroupBuilder builder;
+	builder.addBoolean("test");
+	DataGroup data;
+	EXPECT_TRUE(data.isEmpty());
+
+	data = builder.createData();
+	EXPECT_FALSE(data.isEmpty());
+
+	DataGroup data2;
+	std::vector<std::string> names;
+	names.push_back("test string");
+	data2.scalars() = SurgSim::DataStructures::NamedData<SurgSim::DataStructures::DataGroup::ScalarType>(names);
+	EXPECT_FALSE(data2.isEmpty());
+}

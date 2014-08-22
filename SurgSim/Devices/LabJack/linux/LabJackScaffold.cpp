@@ -170,8 +170,8 @@ bool readAndCheck(const LJ_HANDLE rawHandle, std::array<BYTE, LabJack::MAXIMUM_B
 	else if ((*readBytes)[6] != 0)
 	{
 		SURGSIM_LOG_SEVERE(logger) << "Failed to read response of " << text << " a device named '" << name <<
-			"'.  The device library returned an error code: " << (*readBytes)[6] << ", for frame: " <<
-			(*readBytes)[7] << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+			"'.  The device library returned an error code: " << static_cast<int>((*readBytes)[6]) << ", for frame: " <<
+			static_cast<int>((*readBytes)[7]) << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
 		result = false;
 	}
 
@@ -914,8 +914,9 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
 				"Failed to read response of " << errorText << " a device named '" <<	device->getName() <<
-				"'.  The number of words in the response is wrong.  Expected: " << dataWords << ".  Received: " <<
-				readBytes[2] << "." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+				"'.  The number of words in the response is wrong.  Expected: " << static_cast<int>(dataWords) <<
+				".  Received: " << static_cast<int>(readBytes[2]) << "." << std::endl << "  labjackusb error code: " <<
+				errno << "." << std::endl;
 			result = false;
 		}
 	}
@@ -1070,7 +1071,19 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
 	// One-time configuration of counters and timers.
-	const BYTE numberOfTimers = device->getTimers().size();
+	const std::unordered_map<int, LabJack::TimerSettings>& timers = device->getTimers();
+
+	for (auto timer : timers)
+	{
+		SURGSIM_LOG_IF(timer.first >= static_cast<int>(timers.size()), m_logger, SEVERE) <<
+			"Error configuring enabled timers for a device named '" << device->getName() <<
+			"', with number of timers: " << timers.size() << "." << std::endl <<
+			"  Timers must be enabled consecutively, starting with #0." << std::endl <<
+			"  With the currently enabled number of timers, the highest allowable timer is #" <<
+			timers.size() - 1 << ", but one of the enabled timers is #" << timer.first << "." << std::endl;
+	}
+
+	const BYTE numberOfTimers = timers.size();
 	const BYTE counterEnable = 0; // Counters are not currently supported.
 	const BYTE pinOffset = device->getTimerCounterPinOffset();
 
@@ -1295,7 +1308,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
 				device->getName() << "'.  The number of words in the response is wrong.  Expected: " <<
-				dataWords << ".  Received: " << readBytes[2] << "." << std::endl <<
+				static_cast<int>(dataWords) << ".  Received: " << static_cast<int>(readBytes[2]) << "." << std::endl <<
 				"  labjackusb error code: " << errno << "." << std::endl;
 			result = false;
 		}
@@ -1384,7 +1397,8 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 				SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
 					device->getName() << "'.  The command bytes are wrong.  Expected byte 2: " <<
 					static_cast<int>(parameters.calibrationThirdByte[device->getModel()]) << ".  Received: " <<
-					readBytes[2] << "." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+					static_cast<int>(readBytes[2]) << "." << std::endl << "  labjackusb error code: " << errno << "." <<
+					std::endl;
 				result = false;
 			}
 
@@ -1480,8 +1494,8 @@ bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 			{
 				SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
 					device->getName() << "'.  The number of words in the response is wrong.  Expected: " <<
-					dataWords << ".  Received: " << readBytes[2] << "." << std::endl <<
-					"  labjackusb error code: " << errno << "." << std::endl;
+					static_cast<int>(dataWords) << ".  Received: " << static_cast<int>(readBytes[2]) << "." <<
+					std::endl << "  labjackusb error code: " << errno << "." << std::endl;
 				result = false;
 			}
 		}
