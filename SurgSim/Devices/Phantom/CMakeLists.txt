@@ -27,8 +27,6 @@ set(LIBS
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
 	"${OPENHAPTICS_INCLUDE_DIR}"
 )
 

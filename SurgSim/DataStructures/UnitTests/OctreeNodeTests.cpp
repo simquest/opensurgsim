@@ -23,6 +23,7 @@
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::EmptyData;
@@ -292,7 +293,33 @@ TEST(OctreeNodeTests, EmptyData)
 TEST(OctreeNodeTests, LoadOctree)
 {
 	std::shared_ptr<OctreeNode<SurgSim::DataStructures::EmptyData>> octree;
-	EXPECT_NO_THROW(octree = SurgSim::DataStructures::loadOctree("OctreeShapeData/staple.vox"));
+	EXPECT_NO_THROW(octree = SurgSim::DataStructures::loadOctree("Data/OctreeShapeData/staple.vox"));
+
+	ASSERT_TRUE(nullptr != octree);
+	auto boundingBox = octree->getBoundingBox();
+
+	SurgSim::Math::Vector3d boundingMin(-0.00207699998282, -0.00532899983227, -0.000403999991249);
+	SurgSim::Math::Vector3d boundingMax(0.01392300001718, 0.01067100016773, 0.015596000008751);
+	EXPECT_TRUE(boundingMin.isApprox(boundingBox.min()));
+	EXPECT_TRUE(boundingMax.isApprox(boundingBox.max()));
+
+	EXPECT_TRUE(octree->isActive());
+	EXPECT_TRUE(octree->hasChildren());
+
+	EXPECT_TRUE(octree->getChild(0)->isActive());
+	EXPECT_TRUE(octree->getChild(0)->hasChildren());
+
+	EXPECT_TRUE(octree->getChild(0)->getChild(2)->isActive());
+	EXPECT_TRUE(octree->getChild(0)->getChild(2)->hasChildren());
+
+	EXPECT_TRUE(octree->getChild(0)->getChild(2)->getChild(2)->isActive());
+}
+
+TEST(OctreeNodeTests, DoLoadOctree)
+{
+	SurgSim::Framework::ApplicationData appData("config.txt");
+	auto octree = std::make_shared<OctreeNode<SurgSim::DataStructures::EmptyData>>();
+	EXPECT_NO_THROW(octree->load("OctreeShapeData/staple.vox", appData));
 
 	ASSERT_TRUE(nullptr != octree);
 	auto boundingBox = octree->getBoundingBox();

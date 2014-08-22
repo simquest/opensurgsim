@@ -40,15 +40,13 @@ bool MeshShape::isValid() const
 	return (nullptr != m_mesh) && (m_mesh->isValid());
 }
 
-bool MeshShape::doLoad(const std::string& fileName)
+bool MeshShape::doLoad(const std::string& filePath)
 {
-	using SurgSim::DataStructures::TriangleMesh;
+	m_initialMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
+	SURGSIM_ASSERT(m_initialMesh->doLoad(filePath)) << "Failed to load file " << filePath;
+	SURGSIM_ASSERT(m_initialMesh->isValid()) << filePath << " contains an invalid mesh.";
 
-	m_initialMesh = SurgSim::DataStructures::loadTriangleMesh<TriangleMesh>(fileName);
-	SURGSIM_ASSERT(nullptr != m_initialMesh && m_initialMesh->isValid()) << "MeshShape::doInitialize(): " <<
-			"SurgSim::DataStructures::loadTriangleMesh returned an invalid mesh";
-
-	m_mesh = std::make_shared<TriangleMesh>(*m_initialMesh);
+	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*m_initialMesh);
 
 	updateAabbTree();
 	computeVolumeIntegrals();
