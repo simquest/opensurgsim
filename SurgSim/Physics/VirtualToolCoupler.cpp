@@ -177,9 +177,9 @@ void VirtualToolCoupler::update(double dt)
 		Vector6d generalizedForce;
 		generalizedForce << force, torque;
 		Matrix66d generalizedStiffness;
-		generalizedStiffness << linearStiffnessMatrix, zero3x3, angularStiffnessMatrix, zero3x3;
+		generalizedStiffness << linearStiffnessMatrix, zero3x3, zero3x3, angularStiffnessMatrix;
 		Matrix66d generalizedDamping;
-		generalizedDamping << linearDampingMatrix, zero3x3, angularDampingMatrix, zero3x3;
+		generalizedDamping << linearDampingMatrix, zero3x3, zero3x3, angularDampingMatrix;
 
 		std::shared_ptr<RigidRepresentationLocalization> localization;
 		m_rigid->addExternalGeneralizedForce(localization, generalizedForce, generalizedStiffness, generalizedDamping);
