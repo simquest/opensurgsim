@@ -58,7 +58,7 @@ void Fem3DRepresentationContact::doBuild(double dt,
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
 	const double d = contactData.getDistance();
 
-	const FemRepresentationCoordinate& coord
+	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<Fem3DRepresentationLocalization>(localization)->getLocalPosition();
 
 	// FRICTIONLESS CONTACT in a LCP
@@ -84,12 +84,12 @@ void Fem3DRepresentationContact::doBuild(double dt,
 	// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
 	m_newH.resize(fem3d->getNumDof());
 	// m_newH is a member variable, so 'reserve' only needs to allocate memory on the first run.
-	std::shared_ptr<FemElement> femElement = fem3d->getFemElement(coord.elementId);
+	std::shared_ptr<FemElement> femElement = fem3d->getFemElement(coord.index);
 	size_t numNodes = femElement->getNumNodes();
 	size_t numNodeToConstrain = 0;
 	for (size_t index = 0; index < numNodes; index++)
 	{
-		if (coord.naturalCoordinate[index] != 0.0)
+		if (coord.coordinate[index] != 0.0)
 		{
 			numNodeToConstrain++;
 		}
@@ -98,12 +98,12 @@ void Fem3DRepresentationContact::doBuild(double dt,
 
 	for (size_t index = 0; index < numNodes; index++)
 	{
-		if (coord.naturalCoordinate[index] != 0.0)
+		if (coord.coordinate[index] != 0.0)
 		{
 			size_t nodeIndex = femElement->getNodeId(index);
-			m_newH.insert(3 * nodeIndex + 0) = coord.naturalCoordinate[index] * n[0] * scale * dt;
-			m_newH.insert(3 * nodeIndex + 1) = coord.naturalCoordinate[index] * n[1] * scale * dt;
-			m_newH.insert(3 * nodeIndex + 2) = coord.naturalCoordinate[index] * n[2] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 0) = coord.coordinate[index] * n[0] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 1) = coord.coordinate[index] * n[1] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 2) = coord.coordinate[index] * n[2] * scale * dt;
 		}
 	}
 

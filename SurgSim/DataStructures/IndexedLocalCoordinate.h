@@ -13,37 +13,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMREPRESENTATIONCOORDINATE_H
-#define SURGSIM_PHYSICS_FEMREPRESENTATIONCOORDINATE_H
+#ifndef SURGSIM_DATASTRUCTURES_INDEXEDLOCALCOORDINATE_H
+#define SURGSIM_DATASTRUCTURES_INDEXEDLOCALCOORDINATE_H
 
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
 
-namespace Physics
+namespace DataStructures
 {
 
-/// Structure which contains the elementId of an FemElement in an FemRepresentation and a coordinate in the FemElement.
-struct FemRepresentationCoordinate {
+/// A generic (size_t index, Vector coordinate) pair. The coordinate is a dynamic size vector.
+/// E.g. This can be used to represent a barycentric coordinate within a simplex (identified by the index).
+struct IndexedLocalCoordinate
+{
 	/// Default constructor with no initialization.
-	FemRepresentationCoordinate();
+	IndexedLocalCoordinate();
 
 	/// Constructor with initialization.
-	/// \param elementId Numeric index of the FemElement contained in the FemRepresentation.
-	/// \param naturalCoordinate Natural coordinates with respect to element.
+	/// \param index Numeric index.
+	/// \param coordinate Coordinates with respect to the entity identified by the index.
 	/// \note Constructor does not throw when given malformed parameters.
-	FemRepresentationCoordinate(size_t elementId, SurgSim::Math::Vector naturalCoordinate);
+	IndexedLocalCoordinate(size_t index, const SurgSim::Math::Vector& coordinate);
 
-	/// Numeric index of the FemElement contained in the FemRepresentation.
-	size_t elementId;
+	/// Numeric index to indicate the entity w.r.t which the barycentricCoordinate is defined.
+	size_t index;
 
-	/// Barycentric Coordinate representing position with respect to the nodes of the FemElement.
-	SurgSim::Math::Vector naturalCoordinate;
+	/// Coordinates with respect to the entity identified by the index.
+	SurgSim::Math::Vector coordinate;
 };
 
-} // namespace Physics
+} // namespace DataStructures
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMREPRESENTATIONCOORDINATE_H
+#endif // SURGSIM_DATASTRUCTURES_INDEXEDLOCALCOORDINATE_H

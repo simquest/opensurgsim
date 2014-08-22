@@ -14,11 +14,6 @@
 # limitations under the License.
 
 
-include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
-)
-
 set(SURGSIM_DATA_STRUCTURES_SOURCES
 	AabbTree.cpp
 	AabbTreeData.cpp
@@ -28,6 +23,7 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	DataGroupBuilder.cpp
 	DataGroupCopier.cpp
 	IndexDirectory.cpp
+	IndexedLocalCoordinate.cpp
 	OctreeNode.cpp
 	ply.c
 	PlyReader.cpp
@@ -52,6 +48,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataStructuresConvert-inl.h
 	EmptyData.h
 	IndexDirectory.h
+	IndexedLocalCoordinate.h
 	MeshElement.h
 	NamedData.h
 	NamedData-inl.h

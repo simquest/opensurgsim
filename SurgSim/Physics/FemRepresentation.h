@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
@@ -28,7 +29,6 @@ namespace Physics
 {
 
 class FemElement;
-struct FemRepresentationCoordinate;
 class FemPlyReaderDelegate;
 
 /// Finite Element Model (a.k.a. fem) is a deformable model (a set of nodes connected by FemElement).
@@ -95,7 +95,7 @@ public:
 	/// Determines whether the associated coordinate is valid
 	/// \param coordinate Coordinate to check
 	/// \return True if coordinate is valid
-	bool isValidCoordinate(const FemRepresentationCoordinate &coordinate) const;
+	bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate &coordinate) const;
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
