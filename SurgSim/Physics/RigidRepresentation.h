@@ -57,11 +57,22 @@ public:
 	/// \param angularVelocity The angular velocity
 	void setAngularVelocity(const SurgSim::Math::Vector3d& angularVelocity);
 
-	/// Add an external generalized force applied to the rigid representation
+	/// Add an external generalized force applied to the rigid representation's mass center
 	/// Note this force is generalized (i.e. it's a 6D vector, containing both 3D force and 3D torque)
 	/// Note the stiffness and damping are 6x6 matrices with coupling between the translational and rotation dof.
 	/// Note this generalized force will be zeroed every afterUpdate call of the rigid representation
-	/// \param localization The application point (Leave undefined to point at the mass center of the rigid body)
+	/// \param generalizedForce The external generalized force to apply at the mass center
+	/// \param K The stiffness matrix associated with the generalized force (jacobian of the force w.r.t position)
+	/// \param D The damping matrix associated with the generalized force (jacobian of the force w.r.t velocity)
+	void addExternalGeneralizedForce(const SurgSim::Math::Vector6d& generalizedForce,
+									 const SurgSim::Math::Matrix66d& K = SurgSim::Math::Matrix66d::Zero(),
+									 const SurgSim::Math::Matrix66d& D = SurgSim::Math::Matrix66d::Zero());
+
+	/// Add an external generalized force applied to the rigid representation (anywhere)
+	/// Note this force is generalized (i.e. it's a 6D vector, containing both 3D force and 3D torque)
+	/// Note the stiffness and damping are 6x6 matrices with coupling between the translational and rotation dof.
+	/// Note this generalized force will be zeroed every afterUpdate call of the rigid representation
+	/// \param localization The application point
 	/// \param generalizedForce The external generalized force
 	/// \param K The stiffness matrix associated with the generalized force (jacobian of the force w.r.t position)
 	/// \param D The damping matrix associated with the generalized force (jacobian of the force w.r.t velocity)
@@ -69,6 +80,15 @@ public:
 									 const SurgSim::Math::Vector6d& generalizedForce,
 									 const SurgSim::Math::Matrix66d& K = SurgSim::Math::Matrix66d::Zero(),
 									 const SurgSim::Math::Matrix66d& D = SurgSim::Math::Matrix66d::Zero());
+
+	/// \return the current external generalized 6D force
+	const SurgSim::Math::Vector6d& getExternalGeneralizedForce() const;
+
+	/// \return the current external generalized stiffness 6x6 matrix
+	const SurgSim::Math::Matrix66d& getExternalGeneralizedStiffness() const;
+
+	/// \return the current external generalized damping 6x6 matrix
+	const SurgSim::Math::Matrix66d& getExternalGeneralizedDamping() const;
 
 	virtual void beforeUpdate(double dt) override;
 
