@@ -119,11 +119,15 @@ Timer::TimerTimePoint Timer::now()
 
 double Timer::getMaxFramePeriod() const
 {
+	SURGSIM_ASSERT(m_frameDurations.size() > 0) <<
+		"Attempted to access the maximum frame period for a Timer with no frames.";
 	return std::max_element(m_frameDurations.cbegin(), m_frameDurations.cend())->count();
 }
 
 double Timer::getMinFramePeriod() const
 {
+	SURGSIM_ASSERT(m_frameDurations.size() > 0) <<
+		"Attempted to access the maximum frame period for a Timer with no frames.";
 	return std::min_element(m_frameDurations.cbegin(), m_frameDurations.cend())->count();
 }
 
