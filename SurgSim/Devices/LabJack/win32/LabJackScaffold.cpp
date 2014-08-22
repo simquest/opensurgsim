@@ -846,6 +846,16 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 
 	const std::unordered_map<int, LabJack::TimerSettings>& timers = device->getTimers();
 
+	for (auto timer : timers)
+	{
+		SURGSIM_LOG_IF(timer.first >= static_cast<int>(timers.size()), m_logger, SEVERE) <<
+			"Error configuring enabled timers for a device named '" << device->getName() <<
+			"', with number of timers: " << timers.size() << "." << std::endl <<
+			"  Timers must be enabled consecutively, starting with #0." << std::endl <<
+			"  With the currently enabled number of timers, the highest allowable timer is #" <<
+			timers.size() - 1 << ", but one of the enabled timers is #" << timer.first << "." << std::endl;
+	}
+
 	LJ_ERROR error =
 		ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, static_cast<double>(timers.size()), 0);
 	bool result = isOk(error);
