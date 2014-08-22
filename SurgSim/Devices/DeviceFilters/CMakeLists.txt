@@ -21,12 +21,6 @@ set(LIBS
 	SurgSimInput
 )
 
-include_directories(
-	${Boost_INCLUDE_DIR}
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
-)
-
 set(DEVICE_FILTERS_SOURCES
 	ForceScale.cpp
 	PoseIntegrator.cpp

@@ -40,7 +40,9 @@ int OctreeShape::getType()
 
 bool OctreeShape::doLoad(const std::string& filePath)
 {
-	m_rootNode = std::make_shared<NodeType>(*SurgSim::DataStructures::loadOctree(filePath));
+	m_rootNode = std::make_shared<NodeType>();
+	SURGSIM_ASSERT(m_rootNode->doLoad(filePath)) << "Failed to load file" << filePath;
+	SURGSIM_ASSERT(isValid()) << filePath << " contains an invalid octree.";
 	return true;
 }
 

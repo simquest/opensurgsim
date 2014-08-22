@@ -200,7 +200,8 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>("Behavior");
 	staplerBehavior->setInputComponent(inputComponent);
 	staplerBehavior->setRepresentation(physicsRepresentation);
-	staplerBehavior->enableStaplingForSceneElement("armSceneElement");
+	staplerBehavior->enableStaplingForSceneElement("arm");
+	staplerBehavior->enableStaplingForSceneElement("wound");
 
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
 		std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");

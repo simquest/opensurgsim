@@ -13,11 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
-)
-
 set(SURGSIM_COLLISION_SOURCES
 	BoxCapsuleDcdContact.cpp
 	BoxDoubleSidedPlaneDcdContact.cpp
