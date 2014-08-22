@@ -164,7 +164,6 @@ void VirtualToolCoupler::update(double dt)
 		Vector3d rotationVector;
 		SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationVector);
 		Vector3d torque = m_angularStiffness * rotationVector;
-		torque += leverArm.cross(force);
 		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
@@ -181,13 +180,18 @@ void VirtualToolCoupler::update(double dt)
 		Matrix66d generalizedDamping;
 		generalizedDamping << linearDampingMatrix, zero3x3, zero3x3, angularDampingMatrix;
 
-		std::shared_ptr<RigidRepresentationLocalization> localization;
+		// By adding an external force applied on the attachment point, the extra torque (leverArm.cross(force))
+		// and its derivatives will be added automatically in the rigid.
+		std::shared_ptr<RigidRepresentationLocalization> localization =
+			std::make_shared<RigidRepresentationLocalization>();
+		localization->setRepresentation(m_rigid);
+		localization->setLocalPosition(m_localAttachmentPoint);
 		m_rigid->addExternalGeneralizedForce(localization, generalizedForce, generalizedStiffness, generalizedDamping);
 
 		if (m_output != nullptr)
 		{
 			m_outputData.vectors().set(SurgSim::DataStructures::Names::FORCE, -force);
-			m_outputData.vectors().set(SurgSim::DataStructures::Names::TORQUE, -torque);
+			m_outputData.vectors().set(SurgSim::DataStructures::Names::TORQUE, -torque - leverArm.cross(force));
 			m_outputData.vectors().set(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY, inputLinearVelocity);
 			m_outputData.vectors().set(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY, inputAngularVelocity);
 
