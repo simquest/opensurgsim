@@ -174,12 +174,13 @@ void VirtualToolCoupler::update(double dt)
 		const Matrix33d angularStiffnessMatrix = m_angularStiffness * identity3x3;
 		const Matrix33d angularDampingMatrix = m_angularDamping * identity3x3;
 		const Matrix33d skewLeverArm = SurgSim::Math::makeSkewSymmetricMatrix(leverArm);
+		const Matrix33d skewForce = SurgSim::Math::makeSkewSymmetricMatrix(force);
 
 		Vector6d generalizedForce;
 		generalizedForce << force, torque;
 		Matrix66d generalizedStiffness;
 		generalizedStiffness << linearStiffnessMatrix, zero3x3,
-								m_linearStiffness * skewLeverArm, angularStiffnessMatrix;
+								m_linearStiffness * skewLeverArm - skewForce, angularStiffnessMatrix;
 		Matrix66d generalizedDamping;
 		generalizedDamping << linearDampingMatrix, zero3x3,
 							  m_linearDamping * skewLeverArm, angularDampingMatrix;
