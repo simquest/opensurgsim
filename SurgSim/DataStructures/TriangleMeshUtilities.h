@@ -13,8 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
+#ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESHUTILITIES_H
+#define SURGSIM_DATASTRUCTURES_TRIANGLEMESHUTILITIES_H
 
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 
@@ -23,21 +26,18 @@ namespace SurgSim
 namespace DataStructures
 {
 
-std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadTriangleMesh(const std::string& fileName)
-{
-	std::shared_ptr<TriangleMeshPlyReaderDelegate> triangleMeshDelegate
-		= std::make_shared<TriangleMeshPlyReaderDelegate>();
+/// Helper function to load a mesh from a given filename, does NOT do path resolution.
+/// \throws SurgSim::Framework::AssertionFailure if the reader does not contain mesh information.
+/// \param filename Path to the file that is to be read.
+/// \return the filled mesh a filled mesh if the reading succeeds, nullptr otherwise
+template <class M>
+std::shared_ptr<M> loadTriangleMesh(const std::string& filename);
 
-	PlyReader reader(fileName);
-	if (reader.isValid())
-	{
-		SURGSIM_ASSERT(reader.parseWithDelegate(triangleMeshDelegate)) <<
-			"The input file " << fileName << " does not have the property required by triangle mesh.";
-	}
+std::shared_ptr<TriangleMeshPlain> loadTriangleMesh(const std::string& filename);
 
-	return triangleMeshDelegate->getMesh();
+}
 }
 
-};  // namespace DataStructures
-};  // namespace SurgSim
+#include "SurgSim/DataStructures/TriangleMeshUtilities-inl.h"
 
+#endif

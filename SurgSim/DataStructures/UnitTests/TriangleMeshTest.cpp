@@ -15,20 +15,17 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
+#include "SurgSim/DataStructures/UnitTests/MockObjects.h"
+#include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
-#include "SurgSim/DataStructures/EmptyData.h"
-#include "SurgSim/DataStructures/MeshElement.h"
-#include "SurgSim/DataStructures/UnitTests/MockObjects.h"
-#include "SurgSim/DataStructures/Vertex.h"
-
 #include <random>
 
-using SurgSim::DataStructures::EmptyData;
-using SurgSim::DataStructures::TriangleMesh;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
@@ -39,16 +36,12 @@ namespace DataStructures
 
 TEST(TriangleMeshTest, NormalTest)
 {
-	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshBase;
-	typedef SurgSim::DataStructures::MeshElement<2, EmptyData> EdgeElement;
-	typedef SurgSim::DataStructures::MeshElement<3, EmptyData> TriangleElement;
-
-	std::shared_ptr<TriangleMeshBase> mesh = std::make_shared<TriangleMeshBase>();
+	auto mesh = std::make_shared<TriangleMeshPlain>();
 
 	// Add vertex
-	TriangleMeshBase::VertexType v0(Vector3d(-1.0, -1.0, -1.0));
-	TriangleMeshBase::VertexType v1(Vector3d( 1.0, -1.0, -1.0));
-	TriangleMeshBase::VertexType v2(Vector3d(-1.0,  1.0, -1.0));
+	TriangleMeshPlain::VertexType v0(Vector3d(-1.0, -1.0, -1.0));
+	TriangleMeshPlain::VertexType v1(Vector3d(1.0, -1.0, -1.0));
+	TriangleMeshPlain::VertexType v2(Vector3d(-1.0,  1.0, -1.0));
 
 	mesh->addVertex(v0);
 	mesh->addVertex(v1);
@@ -59,13 +52,9 @@ TEST(TriangleMeshTest, NormalTest)
 	std::array<size_t, 2> edgePoints02;
 	std::array<size_t, 2> edgePoints12;
 
-	EdgeElement element01(edgePoints01);
-	EdgeElement element02(edgePoints02);
-	EdgeElement element12(edgePoints12);
-
-	TriangleMeshBase::EdgeType e01(element01);
-	TriangleMeshBase::EdgeType e02(element02);
-	TriangleMeshBase::EdgeType e12(element12);
+	TriangleMeshPlain::EdgeType e01(edgePoints01);
+	TriangleMeshPlain::EdgeType e02(edgePoints02);
+	TriangleMeshPlain::EdgeType e12(edgePoints12);
 
 	mesh->addEdge(e01);
 	mesh->addEdge(e02);
@@ -74,8 +63,7 @@ TEST(TriangleMeshTest, NormalTest)
 	// Add triangle
 	std::array<size_t, 3> trianglePoints = {0, 1, 2};
 
-	TriangleElement triangleElement(trianglePoints);
-	TriangleMeshBase::TriangleType t(triangleElement);
+	TriangleMeshPlain::TriangleType t(trianglePoints);
 	mesh->addTriangle(t);
 
 	std::shared_ptr<TriangleMesh> meshWithNormal = std::make_shared<TriangleMesh>(*mesh);
@@ -102,7 +90,7 @@ TEST(TriangleMeshTest, CopyWithTransformTest)
 	auto actualMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*originalMesh);
 
 	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(
-		Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5), Vector3d(8.7, -4.7, -3.1));
+									 Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5), Vector3d(8.7, -4.7, -3.1));
 
 	for (auto it = expectedMesh->getVertices().begin(); it != expectedMesh->getVertices().end(); ++it)
 	{
@@ -118,6 +106,35 @@ TEST(TriangleMeshTest, CopyWithTransformTest)
 
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
+}
+
+TEST(TriangleMeshTest, DoLoadTest)
+{
+	SurgSim::Framework::ApplicationData appData("config.txt");
+
+	{
+		SCOPED_TRACE("Load nonexistent file should throw");
+		// Nonexistent file
+		const std::string fileName = "Nonexistent file";
+		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
+		EXPECT_ANY_THROW(mesh->load(fileName, appData));
+	}
+
+	{
+		SCOPED_TRACE("Load existent file which contains invalid mesh should throw");
+		// File exists, but contains an invalid Mesh
+		const std::string fileName = "MeshShapeData/InvalidMesh.ply";
+		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
+		EXPECT_ANY_THROW(mesh->load(fileName, appData));
+	}
+
+	{
+		SCOPED_TRACE("Load existent file which contains valid mesh should not throw");
+		// File exists, and contains a valid Mesh
+		const std::string fileName = "MeshShapeData/staple_collision.ply";
+		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
+		EXPECT_NO_THROW(mesh->load(fileName, appData));
+	}
 }
 
 };

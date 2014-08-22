@@ -19,6 +19,7 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/AabbTreeNode.h"
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Math/Geometry.h"
@@ -203,8 +204,15 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
-					penetrationPoints.first.triangleId.setValue(*i);
-					penetrationPoints.second.triangleId.setValue(*j);
+					Vector3d barycentricCoordinate;
+					SurgSim::Math::barycentricCoordinates(penetrationPointA, verticesA[0], verticesA[1], verticesA[2],
+						normalA, &barycentricCoordinate);
+					penetrationPoints.first.meshLocalCoordinate.setValue(
+						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
+					SurgSim::Math::barycentricCoordinates(penetrationPointB, verticesB[0], verticesB[1], verticesB[2],
+						normalB, &barycentricCoordinate);
+					penetrationPoints.second.meshLocalCoordinate.setValue(
+						SurgSim::DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate));
 					penetrationPoints.first.globalPosition.setValue(penetrationPointA);
 					penetrationPoints.second.globalPosition.setValue(penetrationPointB);
 

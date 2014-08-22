@@ -314,7 +314,7 @@ void StaplerBehavior::createStaple()
 		std::shared_ptr<SurgSim::Physics::Constraint> constraint =
 			createBilateral3DConstraint(staple->getComponents<SurgSim::Physics::Representation>()[0],
 										targetPhysicsRepresentation,
-										targetContact->penetrationPoints.first);
+										targetContact->penetrationPoints.second);
 
 		if (constraint == nullptr)
 		{
@@ -369,7 +369,7 @@ void StaplerBehavior::update(double dt)
 
 int StaplerBehavior::getTargetManagerType() const
 {
-	return SurgSim::Framework::MANAGER_TYPE_INPUT;
+	return SurgSim::Framework::MANAGER_TYPE_PHYSICS;
 }
 
 bool StaplerBehavior::doInitialize()

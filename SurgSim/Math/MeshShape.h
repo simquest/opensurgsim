@@ -106,12 +106,13 @@ public:
 	/// \return The object's associated AabbTree
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree();
 
-	/// Check to see if this shape contains a valid mesh.
+	/// Check if this shape contains a valid mesh.
 	/// Equals 'MeshShape::getMesh() != nullptr && MeshShape::getMesh()->isValid()'
 	/// \return true if this shape contains a valid mesh; otherwise, false.
 	bool isValid() const;
 
-	virtual bool doInitialize(const std::string& fileName) override;
+protected:
+	virtual bool doLoad(const std::string& filePath) override;
 
 private:
 	/// Compute useful volume integrals based on the triangle mesh, which

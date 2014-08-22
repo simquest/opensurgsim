@@ -22,7 +22,7 @@
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Behavior.h"
@@ -106,18 +106,6 @@ private:
 	std::shared_ptr<TargetType> m_targetMesh;
 };
 
-static std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate::MeshType>
-loadMesh(const std::string& fileName)
-{
-	// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	auto delegate = std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
-
-	SURGSIM_ASSERT(reader.parseWithDelegate(delegate)) << "The input file " << fileName << " is malformed.";
-
-	return delegate->getMesh();
-}
-
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
@@ -130,7 +118,6 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("fem3d");
 	fem->setFilename(filename);
 	fem->setIntegrationScheme(integrationScheme);
-	fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt"));
 	sceneElement->addComponent(fem);
 
 	// The mesh for visualizing the surface of the finite element model
@@ -147,7 +134,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	sceneElement->addComponent(femToMesh);
 
 	auto collision = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("collision");
-	collision->setMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>(*loadMesh(filename)));
+	collision->setMesh(SurgSim::DataStructures::loadTriangleMesh<SurgSim::DataStructures::TriangleMesh>(filename));
 	sceneElement->addComponent(collision);
 	fem->setCollisionRepresentation(collision);
 

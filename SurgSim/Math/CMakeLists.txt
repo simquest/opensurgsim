@@ -14,10 +14,6 @@
 # limitations under the License.
 
 
-include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
-)
 
 set(SURGSIM_MATH_SOURCES
 	BoxShape.cpp

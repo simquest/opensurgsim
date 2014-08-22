@@ -85,7 +85,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
 		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
 
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
 
 	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
@@ -104,6 +104,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
+	planeElement->addComponent(material);
 
 	std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> collisionRepresentation;
 	collisionRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>(name + " Collision");
@@ -197,7 +198,7 @@ std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, cons
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> graphicsRepresentation;
 	graphicsRepresentation = std::make_shared<OsgBoxRepresentation>(name + " Graphics");
 	graphicsRepresentation->setSizeXYZ(0.8, 2.0, 0.2);
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
 	shader->setVertexShaderSource(
 		"void main(void)\n"
@@ -224,6 +225,7 @@ std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, cons
 	element->addComponent(graphicsRepresentation);
 	element->addComponent(inputComponent);
 	element->addComponent(driver);
+	element->addComponent(material);
 
 	return element;
 }

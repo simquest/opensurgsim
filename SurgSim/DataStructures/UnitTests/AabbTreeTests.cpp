@@ -21,8 +21,9 @@
 #include "SurgSim/DataStructures/AabbTreeIntersectionVisitor.h"
 #include "SurgSim/DataStructures/AabbTreeNode.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Timer.h"
 #include "SurgSim/Math/Aabb.h"
 #include "SurgSim/Math/MeshShape.h"
@@ -73,9 +74,6 @@ TEST(AabbTreeTests, BuildTest)
 	ASSERT_FALSE(filename.empty());
 	auto mesh = loadTriangleMesh(filename);
 
-	std::cout << mesh->getNumTriangles() << std::endl;
-
-
 	SurgSim::Framework::Timer timer;
 	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
 	{
@@ -87,7 +85,6 @@ TEST(AabbTreeTests, BuildTest)
 		tree->add(aabb, i);
 	}
 	timer.endFrame();
-	std::cout << timer.getCumulativeTime() << std::endl;
 }
 
 TEST(AabbTreeTests, EasyIntersectionTest)
@@ -135,8 +132,6 @@ TEST(AabbTreeTests, MeshIntersectionTest)
 	ASSERT_FALSE(filename.empty());
 	auto mesh = loadTriangleMesh(filename);
 
-	std::cout << mesh->getNumTriangles() << std::endl;
-
 	Aabbd expectedBigBox;
 
 	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
@@ -163,9 +158,6 @@ TEST(AabbTreeTests, MeshIntersectionTest)
 	timer.start();
 	tree->getRoot()->accept(&intersector);
 	timer.endFrame();
-
-	std::cout << timer.getCumulativeTime() << std::endl;
-	std::cout << intersector.getIntersections().size() << std::endl;
 
 	EXPECT_EQ(mesh->getNumTriangles(), intersector.getIntersections().size());
 }
@@ -195,31 +187,29 @@ public:
 
 template <typename PairTypeLhs, typename PairTypeRhs>
 static typename std::list<PairTypeLhs>::const_iterator getEquivalentPair(const std::list<PairTypeLhs>& list,
-																		 const PairTypeRhs& item)
+		const PairTypeRhs& item)
 {
 	return std::find_if(list.cbegin(), list.cend(),
-						[&item] (const PairTypeLhs& pair)
-		{
-			return (pair.first->getAabb().isApprox(item.first->getAabb())
-					&& pair.second->getAabb().isApprox(item.second->getAabb()))
-				|| (pair.first->getAabb().isApprox(item.second->getAabb())
-					&& pair.second->getAabb().isApprox(item.first->getAabb()));
-		}
-	);
+						[&item](const PairTypeLhs & pair)
+	{
+		return (pair.first->getAabb().isApprox(item.first->getAabb())
+				&& pair.second->getAabb().isApprox(item.second->getAabb()))
+			   || (pair.first->getAabb().isApprox(item.second->getAabb())
+				   && pair.second->getAabb().isApprox(item.first->getAabb()));
+	}
+					   );
 }
 
 TEST(AabbTreeTests, SpatialJoinTest)
 {
-	auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	SurgSim::Framework::Runtime runtime("config.txt");
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 
 	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
-	meshA->setFileName(fileName);
-	ASSERT_TRUE(meshA->initialize(*applicationData));
+	EXPECT_NO_THROW(meshA->load(fileName));
 
 	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();
-	meshB->setFileName(fileName);
-	ASSERT_TRUE(meshB->initialize(*applicationData));
+	EXPECT_NO_THROW(meshB->load(fileName));
 
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
 	meshB->getMesh()->copyWithTransform(rhsPose, *meshA->getMesh());
@@ -241,7 +231,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	auto& leavesB = leavesVisitorB.leaves;
 
 	std::list<std::pair<SurgSim::DataStructures::AabbTreeNode*, SurgSim::DataStructures::AabbTreeNode*>>
-		expectedIntersection;
+			expectedIntersection;
 	for (auto leafA = leavesA.begin(); leafA != leavesA.end(); ++leafA)
 	{
 		for (auto leafB = leavesB.begin(); leafB != leavesB.end(); ++leafB)

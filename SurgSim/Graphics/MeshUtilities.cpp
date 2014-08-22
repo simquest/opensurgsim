@@ -13,26 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/FemRepresentationCoordinate.h"
+#include "SurgSim/Graphics/MeshUtilities.h"
 
-namespace SurgSim
+template <>
+std::shared_ptr<SurgSim::Graphics::Mesh> SurgSim::DataStructures::loadTriangleMesh(const std::string& fileName)
 {
+	SurgSim::DataStructures::PlyReader reader(fileName);
+	auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
+	SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
+	reader.parseFile();
 
-namespace Physics
-{
-
-FemRepresentationCoordinate::FemRepresentationCoordinate() : elementId(0)
-{
-
+	return delegate->getMesh();
 }
 
-FemRepresentationCoordinate::FemRepresentationCoordinate(size_t elementId,
-														 SurgSim::Math::Vector naturalCoordinate) :
-	elementId(elementId), naturalCoordinate(naturalCoordinate)
-{
-
-}
-
-} // namespace Physics
-
-} // namespace SurgSim

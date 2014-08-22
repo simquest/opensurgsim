@@ -515,6 +515,12 @@ const SurgSim::DataStructures::OptionalValue<double>& MockVirtualToolCoupler::ge
 	return VirtualToolCoupler::getOptionalAngularDamping();
 }
 
+const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>&
+MockVirtualToolCoupler::getOptionalAttachmentPoint() const
+{
+	return VirtualToolCoupler::getOptionalAttachmentPoint();
+}
+
 void MockVirtualToolCoupler::setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& val)
 {
 	VirtualToolCoupler::setOptionalLinearStiffness(val);
@@ -533,6 +539,12 @@ void MockVirtualToolCoupler::setOptionalAngularStiffness(const SurgSim::DataStru
 void MockVirtualToolCoupler::setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& val)
 {
 	VirtualToolCoupler::setOptionalAngularDamping(val);
+}
+
+void MockVirtualToolCoupler::setOptionalAttachmentPoint(
+		const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& val)
+{
+	VirtualToolCoupler::setOptionalAttachmentPoint(val);
 }
 
 }; // Physics

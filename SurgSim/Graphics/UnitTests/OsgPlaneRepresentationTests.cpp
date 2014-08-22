@@ -131,7 +131,7 @@ TEST(OsgPlaneRepresentationTests, PoseTest)
 	{
 		SCOPED_TRACE("Set Local Pose");
 		localPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+						Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		representation->setLocalPose(localPose);
 		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
 		EXPECT_TRUE(representation->getPose().isApprox(localPose));
@@ -141,7 +141,7 @@ TEST(OsgPlaneRepresentationTests, PoseTest)
 	{
 		SCOPED_TRACE("Set Element Pose");
 		elementPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+						  Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		element->setPose(elementPose);
 		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
 		EXPECT_TRUE(representation->getPose().isApprox(elementPose * localPose));
@@ -150,7 +150,7 @@ TEST(OsgPlaneRepresentationTests, PoseTest)
 	{
 		SCOPED_TRACE("Change Local Pose");
 		localPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+						Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		representation->setLocalPose(localPose);
 		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
 		EXPECT_TRUE(representation->getPose().isApprox(elementPose * localPose));
@@ -162,7 +162,7 @@ TEST(OsgPlaneRepresentationTests, MaterialTest)
 	std::shared_ptr<OsgRepresentation> osgRepresentation = std::make_shared<OsgPlaneRepresentation>("test name");
 	std::shared_ptr<Representation> representation = osgRepresentation;
 
-	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<Material> material = osgMaterial;
 	{
 		SCOPED_TRACE("Set material");

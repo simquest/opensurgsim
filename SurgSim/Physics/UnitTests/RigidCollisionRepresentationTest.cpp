@@ -119,12 +119,11 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 
 TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 {
-	auto applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
+	SurgSim::Framework::ApplicationData applicationData("config.txt");
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
-	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 
-	meshShape->setFileName(fileName);
-	meshShape->initialize(*applicationData);
+	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
+	EXPECT_NO_THROW(meshShape->load(fileName, applicationData));
 
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)

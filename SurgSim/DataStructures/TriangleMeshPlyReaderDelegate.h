@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/PlyReaderDelegate.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 
@@ -29,12 +30,12 @@ namespace DataStructures
 {
 
 /// Implementation of PlyReaderDelegate for simple triangle meshes
+template <class M>
 class TriangleMeshPlyReaderDelegate : public PlyReaderDelegate
 {
 public:
 
-	/// The Mesh Type
-	typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> MeshType;
+	typedef M MeshType;
 
 	/// Default constructor.
 	TriangleMeshPlyReaderDelegate();
@@ -45,7 +46,7 @@ public:
 
 	/// Gets the mesh.
 	/// \return The mesh.
-	std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> getMesh();
+	std::shared_ptr<MeshType> getMesh();
 
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
@@ -65,7 +66,7 @@ public:
 
 	/// Callback function to process one vertex.
 	/// \param elementName Name of the element.
-	void processVertex(const std::string& elementName);
+	virtual void processVertex(const std::string& elementName);
 
 	/// Callback function to finalize processing of vertices.
 	/// \param elementName Name of the element.
@@ -85,15 +86,25 @@ public:
 	/// \param elementName Name of the element.
 	void endFaces(const std::string& elementName);
 
+	/// Callback function to finalize processing of the mesh
+	void endFile();
 
-private:
+protected:
+
+	/// \return true if s/t coordinates where found in the ply file on registration.
+	bool hasTextureCoordinates();
+
 	/// Internal structure, the receiver for data from the "vertex" element
+	/// Provide space for standard ply vertex data, x/y/z and s/t
 	struct VertexData
 	{
 		double x;
 		double y;
 		double z;
-		int64_t overrun; ///< Used to check for buffer overruns
+		int64_t overrun1; ///< Used to check for buffer overruns
+		double s;
+		double t;
+		int64_t overrun2; ///< Used to check for buffer overruns
 	} m_vertexData;
 
 	/// Internal structure, the received for data from the "face" element
@@ -109,9 +120,16 @@ private:
 
 	// Statically allocated index array to receive data for the faces
 	std::array<size_t, 3> m_indices;
+
+private:
+	/// Set to true if s/t coordinates are found in the .ply file
+	bool m_hasTextureCoordinates;
+
 };
 
 }
 }
+
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate-inl.h"
 
 #endif

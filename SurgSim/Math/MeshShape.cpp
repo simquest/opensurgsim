@@ -15,8 +15,8 @@
 //
 
 #include "SurgSim/Math/MeshShape.h"
-
 #include "SurgSim/DataStructures/AabbTree.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
@@ -27,7 +27,7 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::MeshShape, MeshShape);
 
 MeshShape::MeshShape() : m_volume(0.0)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshShape, std::string, FileName, getFileName, setFileName);
+	serializeFileName(this);
 }
 
 int MeshShape::getType()
@@ -40,16 +40,13 @@ bool MeshShape::isValid() const
 	return (nullptr != m_mesh) && (m_mesh->isValid());
 }
 
-bool MeshShape::doInitialize(const std::string& fileName)
+bool MeshShape::doLoad(const std::string& filePath)
 {
-	using SurgSim::DataStructures::TriangleMesh;
+	m_initialMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
+	SURGSIM_ASSERT(m_initialMesh->doLoad(filePath)) << "Failed to load file " << filePath;
+	SURGSIM_ASSERT(m_initialMesh->isValid()) << filePath << " contains an invalid mesh.";
 
-	auto mesh = SurgSim::DataStructures::loadTriangleMesh(fileName);
-	SURGSIM_ASSERT(nullptr != mesh && mesh->isValid()) << "MeshShape::doInitialize(): " <<
-		"SurgSim::DataStructures::loadTriangleMesh returned an invalid mesh";
-
-	m_initialMesh = std::make_shared<TriangleMesh>(*mesh);
-	m_mesh = std::make_shared<TriangleMesh>(*m_initialMesh);
+	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*m_initialMesh);
 
 	updateAabbTree();
 	computeVolumeIntegrals();
@@ -183,7 +180,7 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
 
-void MeshShape::setPose(const SurgSim::Math::RigidTransform3d &pose)
+void MeshShape::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	m_mesh->copyWithTransform(pose, *m_initialMesh);
 	updateAabbTree();

@@ -49,16 +49,11 @@ class PhysicsManagerTest : public ::testing::Test
 public:
 	virtual void SetUp()
 	{
-		runtime = std::make_shared<Runtime>();
 		physicsManager = std::make_shared<PhysicsManager>();
-
-		runtime->addManager(physicsManager);
-		runtime->start();
 	}
 
 	virtual void TearDown()
 	{
-		runtime->stop();
 	}
 
 
@@ -78,15 +73,12 @@ public:
 		return &physicsManager.m_excludedCollisionPairs;
 	}
 
-	std::shared_ptr<Runtime> runtime;
 	std::shared_ptr<PhysicsManager> physicsManager;
 };
 
 TEST_F(PhysicsManagerTest, InitTest)
 {
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
-	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
-
 	runtime->addManager(physicsManager);
 	EXPECT_NO_THROW(runtime->start());
 	EXPECT_NO_THROW(runtime->stop());

@@ -76,6 +76,8 @@ OsgView::OsgView(const std::string& name) : View(name),
 	m_areWindowSettingsDirty(false),
 	m_view(new osgViewer::View()),
 	m_osgMapUniforms(false),
+	m_manipulatorPosition(SurgSim::Math::Vector3d(0.0, 0.0, -3.0)),
+	m_manipulatorLookat(SurgSim::Math::Vector3d::Zero()),
 	m_keyboardEnabled(false),
 	m_mouseEnabled(false)
 {
@@ -88,16 +90,16 @@ OsgView::OsgView(const std::string& name) : View(name),
 	m_view->setCamera(nullptr);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, CameraManipulatorEnabled,
-		isManipulatorEnabled, enableManipulator);
+									  isManipulatorEnabled, enableManipulator);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, SurgSim::Math::Vector3d, CameraPosition,
-		getManipulatorPosition, setManipulatorPosition);
+									  getManipulatorPosition, setManipulatorPosition);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, SurgSim::Math::Vector3d, CameraLookAt,
-		getManipulatorLookAt, setManipulatorLookAt);
+									  getManipulatorLookAt, setManipulatorLookAt);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, OsgMapUniforms, getOsgMapsUniforms, setOsgMapsUniforms);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, KeyboardDeviceEnabled,
-		isKeyboardDeviceEnabled, enableKeyboardDevice);
+									  isKeyboardDeviceEnabled, enableKeyboardDevice);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, MouseDeviceEnabled,
-		isMouseDeviceEnabled, enableMouseDevice);
+									  isMouseDeviceEnabled, enableMouseDevice);
 }
 
 OsgView::~OsgView()
@@ -289,7 +291,7 @@ void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
 
 void SurgSim::Graphics::OsgView::setOsgMapsUniforms(bool val)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "Can't change mapping mode after initialization.";
+	SURGSIM_ASSERT(!isAwake()) << "Can't change mapping mode after waking up.";
 	m_osgMapUniforms = val;
 }
 
@@ -414,7 +416,7 @@ std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getMou
 
 
 void SurgSim::Graphics::OsgView::setManipulatorParameters(const SurgSim::Math::Vector3d& position,
-														  const SurgSim::Math::Vector3d& lookat)
+		const SurgSim::Math::Vector3d& lookat)
 {
 	m_manipulatorPosition = position;
 	m_manipulatorLookat = lookat;

@@ -34,15 +34,17 @@ else()
 	set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/${PROJECT_NAME})
 endif()
 
-set(SURGSIM_TOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${SURGSIM_TOP_INCLUDE_DIR})
+# Use SURGSIM_SOURCE_DIR SURGSIM_SOURCE_DIR will always point to the top of the OSS Tree
+set(SURGSIM_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
-set(SURGSIM_TOOLS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Tools")
-set(SURGSIM_THIRD_PARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty")
+set(SURGSIM_TOOLS_DIR "${SURGSIM_SOURCE_DIR}/Tools")
+set(SURGSIM_THIRD_PARTY_DIR "${SURGSIM_SOURCE_DIR}/ThirdParty")
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${SURGSIM_THIRD_PARTY_DIR})
 
 include(SurgSimBuildFlags)
 include(SurgSimUtilities)
+
 
 ### Find required libraries
 
@@ -82,6 +84,13 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
 
+include_directories(${SURGSIM_SOURCE_DIR})
+include_directories(SYSTEM
+	${Boost_INCLUDE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
+)
+
 include(CTest)
 configure_file(CTestCustom.cmake.in CTestCustom.cmake)
 
@@ -109,7 +118,7 @@ if(BUILD_DOCUMENTATION)
 endif()
 
 #OpenSurgSimConfig For the Build Tree
-set(CONFIG_INCLUDE_DIRS "${SURGSIM_TOP_INCLUDE_DIR}")
+set(CONFIG_INCLUDE_DIRS "${SURGSIM_SOURCE_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfig.cmake" @ONLY)
 
@@ -129,3 +138,8 @@ install(FILES
 install(EXPORT ${PROJECT_NAME}Targets DESTINATION ${INSTALL_CMAKE_DIR} COMPONENT dev)
 
 surgsim_cpplint_this_tree(cpplint)
+
+# Set these variables for Projects using Oss inside their Project structure rather than
+# Through the installed version
+set(OPENSURGSIM_INCLUDE_DIRS ${SURGSIM_SOURCE_DIR} CACHE INTERNAL "OSS Include Directories")
+set(OPENSURGSIM_LIBRARIES ${EXPORT_TARGETS} CACHE INTERNAL "OSS Exported Libraries")

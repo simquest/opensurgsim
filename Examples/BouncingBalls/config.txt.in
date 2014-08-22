@@ -1,1 +1,1 @@
-${CMAKE_SOURCE_DIR}/Examples/Data/BouncingBalls
+${SURGSIM_SOURCE_DIR}/Examples/Data/BouncingBalls

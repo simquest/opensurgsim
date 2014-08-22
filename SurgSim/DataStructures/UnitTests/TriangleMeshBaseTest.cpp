@@ -20,13 +20,16 @@
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
-#include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
+#include "SurgSim/DataStructures/Vertex.h"
 
 #include <random>
 
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMeshBase;
+using SurgSim::DataStructures::TriangleMeshPlain;
 using SurgSim::Math::Vector3d;
 
 class TriangleMeshBaseTest : public ::testing::Test
@@ -168,8 +171,6 @@ TEST_F(TriangleMeshBaseTest, InitTest)
 	typedef TriangleMeshBase<EmptyData, MockEdgeData, EmptyData> TriangleMeshNoVertexOrTriangleData;
 	typedef TriangleMeshBase<EmptyData, EmptyData, MockTriangleData> TriangleMeshNoVertexOrEdgeData;
 
-	typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshNoData;
-
 	ASSERT_NO_THROW({TriangleMeshNoVertexData mesh;});
 	ASSERT_NO_THROW({TriangleMeshNoEdgeData mesh;});
 	ASSERT_NO_THROW({TriangleMeshNoTriangleData mesh;});
@@ -178,7 +179,7 @@ TEST_F(TriangleMeshBaseTest, InitTest)
 	ASSERT_NO_THROW({TriangleMeshNoVertexOrTriangleData mesh;});
 	ASSERT_NO_THROW({TriangleMeshNoVertexOrEdgeData mesh;});
 
-	ASSERT_NO_THROW({TriangleMeshNoData mesh;});
+	ASSERT_NO_THROW({TriangleMeshPlain mesh;});
 }
 
 TEST_F(TriangleMeshBaseTest, CreateVerticesTest)
@@ -525,7 +526,7 @@ TEST_F(TriangleMeshBaseTest, CopyConstructorTest)
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
 	}
 
-	TriangleMeshBase<EmptyData, EmptyData, EmptyData> mesh2(mesh);
+	SurgSim::DataStructures::TriangleMeshPlain mesh2(mesh);
 
 	for (size_t i = 0; i < mesh.getNumVertices(); ++i)
 	{
