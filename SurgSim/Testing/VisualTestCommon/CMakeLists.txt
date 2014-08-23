@@ -41,6 +41,10 @@ set(LIBS
 	${GLUT_LIBRARIES}
 )
 
+if(SURGSIM_PRECOMPILED_HEADERS)
+	LIST(APPEND LIBS PrecompiledHeader)
+endif(SURGSIM_PRECOMPILED_HEADERS)
+
 
 # The headers etc. for this do not need to be shipped, so do NOT use
 # surgsim_add_library here.
