@@ -85,6 +85,7 @@ TEST(BasicSceneElementTests, SerializationTest)
 
 	sceneElement->addComponent(representation1);
 	sceneElement->addComponent(representation2);
+	sceneElement->setActive(false);
 
 	RigidTransform3d pose(makeRigidTransform(Quaterniond(0.0, 1.0, 0.0, 0.0), Vector3d(1.0, 2.0, 3.0)));
 	sceneElement->setPose(pose);
@@ -102,6 +103,7 @@ TEST(BasicSceneElementTests, SerializationTest)
 	EXPECT_EQ("SceneElement", result->getName());
 	EXPECT_EQ(3u, result->getComponents().size());
 	EXPECT_TRUE(pose.isApprox(result->getPose()));
+	EXPECT_FALSE(result->isActive());
 }
 
 };  // namespace Blocks
