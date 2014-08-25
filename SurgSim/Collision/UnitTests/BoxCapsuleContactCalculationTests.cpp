@@ -268,6 +268,19 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 		bool expectedInContact = true;
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
 	}
+
+	{
+		SCOPED_TRACE("Intersection with box corner");
+		std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.0032, 0.0032, 0.0032);
+		std::shared_ptr<CapsuleShape> capsule = std::make_shared<CapsuleShape>(0.01, 0.0063);
+		boxQuat = Quaterniond::Identity();
+		boxTrans = Vector3d(0.011, 0.038, 0.5496);
+		capsuleQuat =
+			Quaterniond(0.99814646292568798, 0.0035271245394549833, -0.023780789153701510, 0.055907709742473284);
+		capsuleTrans = Vector3d(0.0059124370262071749, 0.031538130383304983, 0.54312746745813301);
+		bool expectedInContact = true;
+		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+	}
 }
 
 

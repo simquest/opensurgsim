@@ -102,8 +102,8 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 			else
 			{
 				// The closest point on the capsule's segment to the center of the box is outside the box.
-				Vector3d clampedSegmentPoint = segmentPoint.array().min(box.max().array()).max(box.min().array());
-				normal = clampedSegmentPoint - segmentPoint;
+				deepestBoxPoint = segmentPoint.array().min(box.max().array()).max(box.min().array());
+				normal = deepestBoxPoint - segmentPoint;
 				if (normal.norm() > capsuleRadius)
 				{
 					//find the closest point to all 12 box edges.
@@ -125,7 +125,6 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 					normal = deepestBoxPoint - segmentPoint;
 				}
 				normal.normalize();
-				deepestBoxPoint = clampedSegmentPoint;
 				deepestCapsulePoint = segmentPoint + capsuleRadius * normal;
 			}
 		}
