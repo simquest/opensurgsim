@@ -75,6 +75,8 @@ TEST_F(RigidCollisionRepresentationTest, SetGetRigidRepresentationTest)
 TEST_F(RigidCollisionRepresentationTest, ShapeTest)
 {
 	m_rigidCollisionRepresentation = std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
+	ASSERT_ANY_THROW(m_rigidCollisionRepresentation->getShape());
+
 	m_rigidCollisionRepresentation->setRigidRepresentation(m_rigidRepresentation);
 
 	EXPECT_EQ(m_sphereShape, m_rigidCollisionRepresentation->getShape());
@@ -100,17 +102,67 @@ TEST_F(RigidCollisionRepresentationTest, PoseTest)
 
 TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 {
-	m_rigidCollisionRepresentation = std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
+	{
+		SCOPED_TRACE("RigidCollisionRepresenation must have a shape.");
+		auto rigidCollisionRepresentation = std::make_shared<RigidCollisionRepresentation>("CollisionRepresentation");
 
-	YAML::Node node;
-	// Same as call YAML::convert<SurgSim::Framework::Component>::encode(m_rigidCollisionRepresentation);
-	ASSERT_NO_THROW(node = m_rigidCollisionRepresentation);
+		YAML::Node node;
+		// Same as call YAML::convert<SurgSim::Framework::Component>::encode(rigidCollisionRepresentation);
+		// Encode RigidCollisionRepresentation as reference has no problem.
+		ASSERT_NO_THROW(node = rigidCollisionRepresentation);
 
-	std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> newRigidCollisionRepresentation;
-	ASSERT_NO_THROW(newRigidCollisionRepresentation =
-		std::dynamic_pointer_cast<SurgSim::Physics::RigidCollisionRepresentation>
-			(node.as<std::shared_ptr<SurgSim::Framework::Component>>())
-		);
+		// Encode RigidCollisionRepresentation as concrete object will throw.
+		// It's because RigidCollisionRepresentation::getShape() will throw
+		// if no shape is assigned and no PhysicsRepresentation is connected.
+		ASSERT_ANY_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*rigidCollisionRepresentation));
+	}
+	{
+		SCOPED_TRACE("RigidCollisionRepresenation uses a shape directly.");
+		auto rigidCollisionRepresentation = std::make_shared<RigidCollisionRepresentation>("CollisionRepresentation");
+		auto boxShape = std::make_shared<SurgSim::Math::BoxShape>(0.1, 0.1, 0.1);
+		rigidCollisionRepresentation->setShape(boxShape);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*rigidCollisionRepresentation));
+		YAML::Node data = node["SurgSim::Physics::RigidCollisionRepresentation"];
+		EXPECT_EQ(4u, data.size());
+
+		std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> newRepresentation;
+		ASSERT_NO_THROW(newRepresentation =
+							std::dynamic_pointer_cast<SurgSim::Physics::RigidCollisionRepresentation>(
+								node.as<std::shared_ptr<SurgSim::Framework::Component>>())
+					   );
+		EXPECT_EQ("SurgSim::Physics::RigidCollisionRepresentation", newRepresentation->getClassName());
+		EXPECT_EQ(boxShape->getType(), newRepresentation->getShapeType());
+		auto newBoxShape = std::dynamic_pointer_cast<SurgSim::Math::BoxShape>(newRepresentation->getShape());
+		EXPECT_TRUE(boxShape->getSize().isApprox(newBoxShape->getSize()));
+		EXPECT_TRUE(boxShape->getCenter().isApprox(newBoxShape->getCenter()));
+		EXPECT_TRUE(boxShape->getSecondMomentOfVolume().isApprox(newBoxShape->getSecondMomentOfVolume()));
+		EXPECT_DOUBLE_EQ(boxShape->getVolume(), newBoxShape->getVolume());
+	}
+	{
+		SCOPED_TRACE("RigidCollisionRepresenation uses the shape in PhysicsRepresentation.");
+		auto rigidCollisionRepresentation = std::make_shared<RigidCollisionRepresentation>("CollisionRepresentation");
+		m_rigidRepresentation->setCollisionRepresentation(rigidCollisionRepresentation);
+
+		YAML::Node node;
+		ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*rigidCollisionRepresentation));
+		YAML::Node data = node["SurgSim::Physics::RigidCollisionRepresentation"];
+		EXPECT_EQ(4u, data.size());
+
+		std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> newRepresentation;
+		ASSERT_NO_THROW(newRepresentation =
+							std::dynamic_pointer_cast<SurgSim::Physics::RigidCollisionRepresentation>(
+								node.as<std::shared_ptr<SurgSim::Framework::Component>>())
+					   );
+		EXPECT_EQ("SurgSim::Physics::RigidCollisionRepresentation", newRepresentation->getClassName());
+		EXPECT_EQ(m_sphereShape->getType(), newRepresentation->getShapeType());
+		auto newShpereShape = std::dynamic_pointer_cast<SurgSim::Math::SphereShape>(newRepresentation->getShape());
+		EXPECT_TRUE(m_sphereShape->getCenter().isApprox(newShpereShape->getCenter()));
+		EXPECT_TRUE(m_sphereShape->getSecondMomentOfVolume().isApprox(newShpereShape->getSecondMomentOfVolume()));
+		EXPECT_DOUBLE_EQ(m_sphereShape->getVolume(), newShpereShape->getVolume());
+		EXPECT_DOUBLE_EQ(m_sphereShape->getRadius(), newShpereShape->getRadius());
+	}
 }
 
 TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)

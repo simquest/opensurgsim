@@ -61,12 +61,12 @@ TEST(SphereSphereContactCalculationTests, UnitTests)
 		SCOPED_TRACE("Sphere-Sphere intersection at origin");
 		doSphereSphereTest(0.5,
 						   Vector3d(-0.5+DistanceEpsilon/2.0,0.0,0.0), 0.5, Vector3d(0.5-DistanceEpsilon/2.0,0.0,0.0),
-						   true, DistanceEpsilon, Vector3d(-1.0,0.0,0.0), Vector3d::Zero(), Vector3d::Zero());
+						   true, -DistanceEpsilon, Vector3d(-1.0,0.0,0.0), Vector3d::Zero(), Vector3d::Zero());
 	}
 
 	{
 		SCOPED_TRACE("Sphere-Sphere intersection");
-		doSphereSphereTest(0.5, Vector3d(0.0,0.0,0.0), 0.5, Vector3d(0.5,0.0,0.0), true, 0.5,
+		doSphereSphereTest(0.5, Vector3d(0.0,0.0,0.0), 0.5, Vector3d(0.5,0.0,0.0), true, -0.5,
 						   Vector3d(-1.0,0.0,0.0), Vector3d(0.5,0.0,0.0), Vector3d(0.0,0.0,0.0));
 	}
 }

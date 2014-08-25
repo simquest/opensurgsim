@@ -451,7 +451,7 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 				++input)
 			{
 				const std::string name = SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(*input);
-				info->digitalInputIndices[*input] = inputData.scalars().getIndex(name);
+				info->digitalInputIndices[*input] = inputData.booleans().getIndex(name);
 				SURGSIM_ASSERT(info->digitalInputIndices[*input] >= 0) << "LabJackScaffold::DeviceData " <<
 					"failed to get a valid NamedData index for the digital input for line " << *input <<
 					".  Make sure that is a valid line number.  Expected an entry named " << name << ".";
@@ -528,7 +528,7 @@ bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 		for (auto output = digitalOutputChannels.cbegin(); output != digitalOutputChannels.cend(); ++output)
 		{
 			info->digitalOutputIndices[*output] =
-				initialOutputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX +
+				initialOutputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX +
 				std::to_string(*output));
 		}
 
@@ -590,13 +590,14 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 				" set to digital output, but the scaffold does not know the correct index into the NamedData. " <<
 				" Make sure there is an entry in the scalars with the correct string key.";
 
-			double value;
-			if (outputData.scalars().get(index, &value))
+			bool value;
+			if (outputData.booleans().get(index, &value))
 			{
-				const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_DIGITAL_BIT, *output, value, 0, 0);
+				const double valueToSend = (value ? 1.0 : 0.0);
+				const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_DIGITAL_BIT, *output, valueToSend, 0, 0);
 				SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
 					"Failed to set digital output for a device named '" << info->deviceObject->getName() <<
-					"', line number " << *output << ", value " << value << "." <<
+					"', line number " << *output << ", value " << valueToSend << "." <<
 					std::endl << formatErrorMessage(error);
 			}
 		}
@@ -694,14 +695,15 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_DIGITAL_BIT, *input, &value);
 			if (isOk(error))
 			{
-				inputData.scalars().set(info->digitalInputIndices[*input], value);
+				const bool valueToSet = value > 0.5 ? true : false;
+				inputData.booleans().set(info->digitalInputIndices[*input], valueToSet);
 			}
 			else
 			{
 				SURGSIM_LOG_WARNING(m_logger) << "Failed to get digital input for a device named '" <<
 					info->deviceObject->getName() << "', line number " << *input << "." << std::endl <<
 					formatErrorMessage(error);
-				inputData.scalars().reset(info->digitalInputIndices[*input]);
+				inputData.booleans().reset(info->digitalInputIndices[*input]);
 			}
 		}
 
@@ -789,7 +791,7 @@ SurgSim::DataStructures::DataGroup LabJackScaffold::buildDeviceInputData()
 	const int maxDigitalInputs = 23; // The UE9 can have 23 digital inputs.
 	for (int i = 0; i < maxDigitalInputs; ++i)
 	{
-		builder.addScalar(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(i));
+		builder.addBoolean(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(i));
 	}
 
 	const int maxTimerInputs = 6; // The UE9 can have 6 timers.
@@ -843,6 +845,16 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
 	const std::unordered_map<int, LabJack::TimerSettings>& timers = device->getTimers();
+
+	for (auto timer : timers)
+	{
+		SURGSIM_LOG_IF(timer.first >= static_cast<int>(timers.size()), m_logger, SEVERE) <<
+			"Error configuring enabled timers for a device named '" << device->getName() <<
+			"', with number of timers: " << timers.size() << "." << std::endl <<
+			"  Timers must be enabled consecutively, starting with #0." << std::endl <<
+			"  With the currently enabled number of timers, the highest allowable timer is #" <<
+			timers.size() - 1 << ", but one of the enabled timers is #" << timer.first << "." << std::endl;
+	}
 
 	LJ_ERROR error =
 		ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, static_cast<double>(timers.size()), 0);

@@ -17,6 +17,7 @@
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 
@@ -30,6 +31,8 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidCollision
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
 	Representation(name)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
+									  CollisionShape, getShape, setShape);
 }
 
 RigidCollisionRepresentation::~RigidCollisionRepresentation()

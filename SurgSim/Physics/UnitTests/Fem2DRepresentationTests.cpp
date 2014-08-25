@@ -25,6 +25,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
 {
@@ -47,6 +48,19 @@ TEST(Fem2DRepresentationTests, GetNumDofPerNodeTest)
 {
 	std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem2D");
 	EXPECT_EQ(6u, fem->getNumDofPerNode());
+}
+
+TEST(Fem2DRepresentationTests, AddExternalGeneralizedForceTest)
+{
+	std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem1D");
+	SurgSim::Math::Vector F = SurgSim::Math::Vector::Ones(10);
+	SurgSim::Math::Matrix K = SurgSim::Math::Matrix::Ones(10, 10);
+	SurgSim::Math::Matrix D = SurgSim::Math::Matrix::Ones(10, 10);
+	std::shared_ptr<MockLocalization> localization = std::make_shared<MockLocalization>();
+	EXPECT_THROW(fem->addExternalGeneralizedForce(nullptr, F), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(fem->addExternalGeneralizedForce(nullptr, F, K, D), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(fem->addExternalGeneralizedForce(localization, F), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(fem->addExternalGeneralizedForce(localization, F, K, D), SurgSim::Framework::AssertionFailure);
 }
 
 TEST(Fem2DRepresentationTests, TransformInitialStateTest)
