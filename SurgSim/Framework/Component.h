@@ -128,9 +128,12 @@ public:
 	virtual bool doWakeUp() = 0;
 
 	/// Set this component to active if 'val' is true, inactive if 'val' is false.
+	/// An active component will be processed by the managers and its state will be updated.
+	/// And an inactive component will not be processed/updated.
+	/// \param val The status (active/inactive) to be set on this component.
 	virtual void setActive(bool val);
 
-	/// \return True if this component is active and the SceneElement (if any) contains it is also active;
+	/// \return True if this component is active and the SceneElement (if any) containing it is also active;
 	/// Otherwise, false.
 	bool isActive() const;
 
