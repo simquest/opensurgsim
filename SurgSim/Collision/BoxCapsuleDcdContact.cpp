@@ -95,6 +95,9 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 				(boxRadii - segmentPoint.cwiseAbs()).minCoeff(&closestFace);
 				normal.setZero();
 				normal[closestFace] = -segmentPoint[closestFace];
+				normal.normalize();
+				deepestBoxPoint = boxRadii.array() * (1 - 2 * (segmentPoint.array() < 0).cast<double>());
+				deepestCapsulePoint = segmentPoint - capsuleRadius * segmentPoint.normalized();
 			}
 			else
 			{
@@ -121,11 +124,10 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 					}
 					normal = deepestBoxPoint - segmentPoint;
 				}
-
+				normal.normalize();
+				deepestBoxPoint = clampedSegmentPoint;
+				deepestCapsulePoint = segmentPoint + capsuleRadius * normal;
 			}
-			normal.normalize();
-			deepestBoxPoint = boxRadii.array() * (1 - 2 * (segmentPoint.array() < 0).cast<double>());
-			deepestCapsulePoint = segmentPoint - capsuleRadius * segmentPoint.normalized();
 		}
 		else
 		{

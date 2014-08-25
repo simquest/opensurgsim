@@ -248,11 +248,23 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 	}
 
 	{
-		SCOPED_TRACE("Intersection with box edge");
+		SCOPED_TRACE("Intersection with box edge, box's point on edge");
 		boxQuat = Quaterniond::Identity();
 		boxTrans = Vector3d::Zero();
 		capsuleQuat = makeRotationQuaternion(0.1, Vector3d::UnitZ().eval());
 		capsuleTrans = Vector3d(1.52, 0.0, 0.0);
+		bool expectedInContact = true;
+		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+	}
+
+	{
+		SCOPED_TRACE("Intersection with box edge, box's point on edge, capsule point along vector towards box point");
+		std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.0256, 0.0256, 0.0256);
+		std::shared_ptr<CapsuleShape> capsule = std::make_shared<CapsuleShape>(0.01, 0.0063);
+		boxQuat = Quaterniond::Identity();
+		boxTrans = Vector3d(0.0254, 0.0524, 0.5128);
+		capsuleQuat = Quaterniond::Identity();
+		capsuleTrans = Vector3d(0.0081837091898594016, 0.074665473951012307, 0.50404931721342927);
 		bool expectedInContact = true;
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
 	}
