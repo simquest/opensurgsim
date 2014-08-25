@@ -56,12 +56,6 @@ set(LIBS
 	SurgSimMath
 	SurgSimTesting
 	SurgSimBlocks
-	gmock
-	gtest
-	yaml-cpp
-	${Boost_LIBRARIES}
-	${OPENSCENEGRAPH_LIBRARIES}
-	${OPENTHREADS_LIBRARY}
 )
 
 surgsim_add_unit_tests(SurgSimGraphicsRenderTest)
