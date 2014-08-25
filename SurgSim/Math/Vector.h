@@ -24,6 +24,8 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 namespace Math

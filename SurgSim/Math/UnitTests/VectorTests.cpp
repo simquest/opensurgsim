@@ -1238,20 +1238,6 @@ TYPED_TEST(AllDynamicVectorTests, getSubVectorBlocks)
 	}
 }
 
-TYPED_TEST(AllDynamicVectorTests, resizeVector)
-{
-	typedef typename TestFixture::Vector Vector;
-
-	Vector v;
-
-	ASSERT_NO_THROW(SurgSim::Math::resizeVector(&v, 10, false););
-	EXPECT_EQ(10, v.size());
-
-	ASSERT_NO_THROW(SurgSim::Math::resizeVector(&v, 13, true););
-	EXPECT_EQ(13, v.size());
-	EXPECT_TRUE(v.isZero());
-}
-
 template <class Vector>
 void testOrthonormalBasis(const Vector& i, const Vector& j, const Vector& k)
 {
