@@ -80,6 +80,74 @@ RepresentationType Fem3DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM3D;
 }
 
+void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+													  SurgSim::Math::Vector& generalizedForce,
+													  const SurgSim::Math::Matrix& K,
+													  const SurgSim::Math::Matrix& D)
+{
+	const size_t dofPerNode = getNumDofPerNode();
+
+	std::shared_ptr<Fem3DRepresentationLocalization> localization3D =
+		std::dynamic_pointer_cast<Fem3DRepresentationLocalization>(localization);
+	SURGSIM_ASSERT(localization3D != nullptr) << "Invalid localization type (not a Fem3DRepresentationLocalization)";
+
+	const size_t elementId = localization3D->getLocalPosition().index;
+	SURGSIM_ASSERT(elementId >= 0 && elementId < getNumFemElements()) << "Invalid elementId " << elementId <<
+		". Valid range is {0.." << getNumFemElements() << "}";
+
+	const SurgSim::Math::Vector& coordinate = localization3D->getLocalPosition().coordinate;
+	SURGSIM_ASSERT(coordinate.size() > 0) << "Invalid (empty) coordinate vector";
+
+	std::shared_ptr<FemElement> element = getFemElement(elementId);
+	SURGSIM_ASSERT(element != nullptr) << "Invalid element (nullptr) for elementId " << elementId;
+	const size_t elementNumNodes = element->getNodeIds().size();
+	SURGSIM_ASSERT(static_cast<const SurgSim::Math::Vector::Index>(elementNumNodes) == coordinate.size()) <<
+		"Mismatch coordinate size (" << coordinate.size() << ") and element size " << elementNumNodes;
+
+	SURGSIM_ASSERT(K.size() == 0 ||
+		(K.rows() == static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode) &&
+		K.cols() == static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode))) <<
+		"Stiffness matrix has an invalid size (" << K.rows() << "," << K.cols() <<
+		") was expecting a square matrix of size " << dofPerNode;
+	SURGSIM_ASSERT(D.size() == 0 ||
+		(D.rows() == static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode) &&
+		D.cols() == static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode))) <<
+		"Damping matrix has an invalid size (" << D.rows() << "," << D.cols() <<
+		") was expecting a square matrix of size " << dofPerNode;
+
+	size_t index = 0;
+	for (auto nodeId : element->getNodeIds())
+	{
+		m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce * coordinate[index];
+		index++;
+	}
+
+	if (K.size() != 0 || D.size() != 0)
+	{
+		size_t index1 = 0;
+		for (auto nodeId1 : element->getNodeIds())
+		{
+			size_t index2 = 0;
+			for (auto nodeId2 : element->getNodeIds())
+			{
+				if (K.size() != 0)
+				{
+					m_externalGeneralizedStiffness.block(dofPerNode * nodeId1, dofPerNode * nodeId2,
+						dofPerNode, dofPerNode) += coordinate[index1] * coordinate[index2] * K;
+				}
+				if (D.size() != 0)
+				{
+					m_externalGeneralizedDamping.block(dofPerNode * nodeId1, dofPerNode * nodeId2,
+						dofPerNode, dofPerNode) += coordinate[index1] * coordinate[index2] * D;
+				}
+				index2++;
+			}
+
+			index1++;
+		}
+	}
+}
+
 std::shared_ptr<FemPlyReaderDelegate> Fem3DRepresentation::getDelegate()
 {
 	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(shared_from_this());
