@@ -21,6 +21,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -454,8 +455,27 @@ TEST(ComponentTests, PoseComponentTest)
 
 TEST(ComponentTests, SetActiveTest)
 {
-	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component");
-	EXPECT_TRUE(mock1->isActive());
-	EXPECT_NO_THROW(mock1->setActive(false));
-	EXPECT_FALSE(mock1->isActive());
+	std::shared_ptr<Component> mock = std::make_shared<MockComponent>("Component");
+	EXPECT_TRUE(mock->isActive());
+	EXPECT_NO_THROW(mock->setActive(false));
+	EXPECT_FALSE(mock->isActive());
+
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("SceneElement");
+	sceneElement->addComponent(mock);
+	EXPECT_TRUE(sceneElement->isActive());
+
+	// An inactive component in an active SceneElement is 'inactive'.
+	EXPECT_FALSE(mock->isActive());
+
+	// An active component in an active SceneElement is 'active'.
+	mock->setActive(true);
+	EXPECT_TRUE(mock->isActive());
+
+	sceneElement->setActive(false);
+	// An active component in an inactive SceneElement is 'inactive'.
+	EXPECT_FALSE(mock->isActive());
+
+	// An inactive component in an inactive SceneElement is 'inactive'.
+	mock->setActive(false);
+	EXPECT_FALSE(mock->isActive());
 }

@@ -36,6 +36,7 @@ TEST(BehaviorManagerTest, BehaviorInitTest)
 	std::shared_ptr<MockBehavior> behavior(new MockBehavior("MockBehavior"));
 	std::shared_ptr<MockComponent> component(new MockComponent("Test Component"));
 
+
 	element->addComponent(behavior);
 	element->addComponent(component);
 	scene->addSceneElement(element);
@@ -43,62 +44,63 @@ TEST(BehaviorManagerTest, BehaviorInitTest)
 	EXPECT_TRUE(behavior->isInitialized());
 	EXPECT_TRUE(component->isInitialized());
 
-	{
-		// Set the SceneElement to inactive will also set all components it owns to inactive
-		element->setActive(false);
-		EXPECT_FALSE(behavior->isActive());
-		EXPECT_FALSE(component->isActive());
+	runtime->start();
+	EXPECT_TRUE(behaviorManager->isInitialized());
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	runtime->stop();
 
-		// BehaviorManager will not update inactive behaviors.
-		runtime->start();
-		EXPECT_TRUE(behaviorManager->isInitialized());
-		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-		runtime->stop();
-		EXPECT_EQ(0, behavior->updateCount);
-	}
+	EXPECT_TRUE(behavior->isAwake());
+	EXPECT_FALSE(component->isAwake());
+	EXPECT_GT(behavior->updateCount, 0);
 
-	{
-		// Set the SceneElement to active will also set all components it owns to active
-		element->setActive(true);
-		EXPECT_TRUE(behavior->isActive());
-		EXPECT_TRUE(component->isActive());
+}
 
-		// BehaviorManager will update active behaviors.
-		runtime->start();
-		EXPECT_TRUE(behaviorManager->isInitialized());
-		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-		runtime->stop();
-		EXPECT_GT(behavior->updateCount, 0);
-	}
+TEST(BehaviorManagerTest, UpdateTest)
+{
+	auto runtime = std::make_shared<Runtime>();
+	auto scene = runtime->getScene();
+	auto behaviorManager = std::make_shared<BehaviorManager>();
+	auto element = std::make_shared<MockSceneElement>();
+	auto behavior = std::make_shared<MockBehavior>("MockBehavior");
+
+	runtime->addManager(behaviorManager);
+	element->addComponent(behavior);
+	scene->addSceneElement(element);
+	EXPECT_TRUE(element->isInitialized());
+	EXPECT_TRUE(behavior->isInitialized());
 
 	{
-		behavior->updateCount = 0;
-		// Set only the behavior to inactive, its 'updateCount' will not be updated.
 		behavior->setActive(false);
-		EXPECT_FALSE(behavior->isActive());
-		EXPECT_TRUE(component->isActive());
+		behavior->updateCount = 0;
 
 		// BehaviorManager will not update inactive behaviors.
 		runtime->start();
 		EXPECT_TRUE(behaviorManager->isInitialized());
 		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-		runtime->stop();
 		EXPECT_EQ(0, behavior->updateCount);
+
+		// Turn on the behavior, it will be updated.
+		behavior->setActive(true);
+		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+		EXPECT_GT(behavior->updateCount, 0);
+		runtime->stop();
 	}
 
 	{
-		// Set 'behavior' to active, its 'updateCount' will be updated.
 		behavior->setActive(true);
-		EXPECT_TRUE(behavior->isActive());
+		behavior->updateCount = 0;
 
 		// BehaviorManager will update active behaviors.
 		runtime->start();
 		EXPECT_TRUE(behaviorManager->isInitialized());
 		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-		runtime->stop();
-
-		EXPECT_TRUE(behavior->isAwake());
-		EXPECT_FALSE(component->isAwake());
 		EXPECT_GT(behavior->updateCount, 0);
+
+		// Turn off the behavior, it will not be updated any more.
+		behavior->setActive(false);
+		auto count = behavior->updateCount;
+		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+		EXPECT_EQ(behavior->updateCount, count);
+		runtime->stop();
 	}
 }

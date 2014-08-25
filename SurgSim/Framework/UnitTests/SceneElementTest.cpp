@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -192,54 +193,38 @@ TEST(SceneElementTest, DoubleInitTest)
 
 TEST(SceneElement, SetActiveTest)
 {
-	auto element = std::make_shared<MockSceneElement>();
-	auto poseComponent = element->getPoseComponent();
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("BasicSceneElement");
 	auto mockComponent0 = std::make_shared<MockComponent>("MockComponent0");
 	auto mockComponent1 = std::make_shared<MockComponent>("MockComponent1");
-	element->addComponent(mockComponent0);
-	element->addComponent(mockComponent1);
 
 	mockComponent1->setActive(false);
 
 	EXPECT_TRUE(element->isActive());
-	EXPECT_TRUE(poseComponent->isActive());
+	// An active component add to an active SceneElement, the Component is active.
+	element->addComponent(mockComponent0);
 	EXPECT_TRUE(mockComponent0->isActive());
+
+	// An inactive component add to an active SceneElement, the Component is inactive.
+	element->addComponent(mockComponent1);
 	EXPECT_FALSE(mockComponent1->isActive());
 
-	// Before initialization, setting SceneElement to inactive will not affect its PoseComponent.
-	// But all other Components will be affected.
+	// Setting SceneElement to inactive will affect its components.
 	element->setActive(false);
 	EXPECT_FALSE(element->isActive());
-	EXPECT_TRUE(poseComponent->isActive());
 	EXPECT_FALSE(mockComponent0->isActive());
 	EXPECT_FALSE(mockComponent1->isActive());
 
-	// After initialization, SceneElement's activity (active/inactive) will affect all its
-	// component (including the PoseComponent).
-	element->initialize();
-	EXPECT_FALSE(element->isActive());
-	EXPECT_FALSE(poseComponent->isActive());
-	EXPECT_FALSE(mockComponent0->isActive());
-	EXPECT_FALSE(mockComponent1->isActive());
-
-	// After initialization, set SceneElement back to active, its Component will be active (if they were active).
+	// Set SceneElement back to active, its Component will be active (if they were active).
 	element->setActive(true);
 	EXPECT_TRUE(element->isActive());
-	EXPECT_TRUE(poseComponent->isActive());
 	EXPECT_TRUE(mockComponent0->isActive());
-	EXPECT_FALSE(mockComponent1->isActive());
-
-	// After initialization, setting SceneElement to inactive will affect all its components.
-	element->setActive(false);
-	EXPECT_FALSE(element->isActive());
-	EXPECT_FALSE(poseComponent->isActive());
-	EXPECT_FALSE(mockComponent0->isActive());
 	EXPECT_FALSE(mockComponent1->isActive());
 
 	auto mockComponent2 = std::make_shared<MockComponent>("MockComponent2");
 	EXPECT_TRUE(mockComponent2->isActive());
 
 	// An active component added to an inactive SceneElement, the Component will be inactive.
+	element->setActive(false);
 	element->addComponent(mockComponent2);
 	EXPECT_FALSE(element->isActive());
 	EXPECT_FALSE(mockComponent2->isActive());
