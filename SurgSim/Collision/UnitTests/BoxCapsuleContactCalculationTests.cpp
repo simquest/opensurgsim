@@ -246,6 +246,16 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 		bool expectedInContact = true;
 		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
 	}
+
+	{
+		SCOPED_TRACE("Intersection with box edge");
+		boxQuat = Quaterniond::Identity();
+		boxTrans = Vector3d::Zero();
+		capsuleQuat = makeRotationQuaternion(0.1, Vector3d::UnitZ().eval());
+		capsuleTrans = Vector3d(1.52, 0.0, 0.0);
+		bool expectedInContact = true;
+		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+	}
 }
 
 

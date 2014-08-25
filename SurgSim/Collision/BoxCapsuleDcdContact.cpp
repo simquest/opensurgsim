@@ -42,6 +42,21 @@ namespace Collision
 
 BoxCapsuleDcdContact::BoxCapsuleDcdContact()
 {
+	typedef Eigen::AlignedBox<double, 3>::CornerType CornerType;
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomLeftFloor, CornerType::TopLeftFloor));
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomRightFloor, CornerType::TopRightFloor));
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomLeftCeil, CornerType::TopLeftCeil));
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomRightCeil, CornerType::TopRightCeil));
+
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomLeftFloor, CornerType::BottomRightFloor));
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomLeftCeil, CornerType::BottomRightCeil));
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::TopLeftFloor, CornerType::TopRightFloor));
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::TopLeftCeil, CornerType::TopRightCeil));
+
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomLeftFloor, CornerType::BottomLeftCeil));
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomRightFloor, CornerType::BottomRightCeil));
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::TopLeftFloor, CornerType::TopLeftCeil));
+	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::TopRightFloor, CornerType::TopRightCeil));
 }
 
 std::pair<int,int> BoxCapsuleDcdContact::getShapeTypes()
@@ -83,8 +98,30 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 			}
 			else
 			{
+				// The closest point on the capsule's segment to the center of the box is outside the box.
 				Vector3d clampedSegmentPoint = segmentPoint.array().min(box.max().array()).max(box.min().array());
 				normal = clampedSegmentPoint - segmentPoint;
+				if (normal.norm() > capsuleRadius)
+				{
+					//find the closest point to all 12 box edges.
+					double minDistance = 2.0 * capsuleRadius;
+					for (auto edge : m_boxEdges)
+					{
+						Vector3d tempSegmentPoint;
+						Vector3d tempBoxPoint;
+						double tempDistance = SurgSim::Math::distanceSegmentSegment(capsuleBottom, capsuleTop,
+							box.corner(edge.first), box.corner(edge.second),
+							&tempSegmentPoint, &tempBoxPoint);
+						if (tempDistance < minDistance)
+						{
+							minDistance = tempDistance;
+							segmentPoint = tempSegmentPoint;
+							deepestBoxPoint = tempBoxPoint;
+						}
+					}
+					normal = deepestBoxPoint - segmentPoint;
+				}
+
 			}
 			normal.normalize();
 			deepestBoxPoint = boxRadii.array() * (1 - 2 * (segmentPoint.array() < 0).cast<double>());
