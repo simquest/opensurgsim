@@ -1,5 +1,5 @@
 /*!
-	\fn void SurgSim::Physics::RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr< Localization > localization, const SurgSim::Math::Vector6d &generalizedForce, const SurgSim::Math::Matrix66d &K=SurgSim::Math::Matrix66d::Zero(), const SurgSim::Math::Matrix66d &D=SurgSim::Math::Matrix66d::Zero())
+	\fn void SurgSim::Physics::RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr< Localization > localization, SurgSim::Math::Vector6d *generalizedForce, SurgSim::Math::Matrix66d *K=nullptr, SurgSim::Math::Matrix66d *D=nullptr)
 	<br>
 
 	The localization produces an extra torque and extra terms in the derivatives (stiffness/damping matrices) coming from this extra torque. <br>

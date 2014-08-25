@@ -63,81 +63,89 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::Math::Vecto
 }
 
 void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-													  const SurgSim::Math::Vector6d& generalizedForce,
-													  const SurgSim::Math::Matrix66d& K,
-													  const SurgSim::Math::Matrix66d& D)
+													  SurgSim::Math::Vector6d* generalizedForce,
+													  SurgSim::Math::Matrix66d* K,
+													  SurgSim::Math::Matrix66d* D)
 {
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Matrix66d;
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Vector6d;
 
-	SURGSIM_ASSERT(localization != nullptr) << "Uninitialized localization (nullptr)";
+	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
+	SURGSIM_ASSERT(generalizedForce != nullptr) << "Invalid generalized force (nullptr)";
 
 	const Vector3d point = localization->calculatePosition();
 	const Vector3d massCenter = getCurrentState().getPose().translation();
 	const Vector3d lever = point - massCenter;
-	const Vector3d leverInLocalSpace = getCurrentState().getPose().rotation().inverse() * lever;
-	const Vector3d force = generalizedForce.segment<3>(0);
+	auto force = generalizedForce->segment<3>(0);
 	const Vector3d torque = lever.cross(force);
-	const Eigen::AngleAxisd angleAxis(getCurrentState().getPose().rotation());
-	double angle = angleAxis.angle();
-	const Vector3d axis = angleAxis.axis();
-	const Vector3d rotationVector = axis * angle; // rotationVector = W
-	double rotationVectorNorm = rotationVector.norm();
-	double rotationVectorNormCubic = rotationVectorNorm * rotationVectorNorm * rotationVectorNorm;
-	double sinAngle = sin(angle);
-	double cosAngle = cos(angle);
-	double oneMinusCos = 1.0 - cosAngle;
-	const Matrix33d skewAxis = SurgSim::Math::makeSkewSymmetricMatrix(axis);
 
-	Matrix33d dRdAngle;
-	Matrix33d dRdAxisX, dRdAxisY, dRdAxisZ;
-	dRdAngle = -sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * skewAxis * skewAxis;
-	dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos * axis[1], oneMinusCos * axis[2],
-				oneMinusCos * axis[1], 0.0, -sinAngle,
-				oneMinusCos * axis[2], sinAngle, 0.0;
-	dRdAxisY << 0.0, oneMinusCos * axis[0], sinAngle,
-				oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], cosAngle * axis[2],
-				-sinAngle, oneMinusCos * axis[2], 0.0;
-	dRdAxisZ << 0.0, -sinAngle, oneMinusCos * axis[0],
-				sinAngle, 0.0, oneMinusCos * axis[1],
-				oneMinusCos * axis[0], oneMinusCos * axis[1], oneMinusCos * 2.0 * axis[2];
-
-	const Vector3d tmp = rotationVector / rotationVectorNormCubic;
-	Vector3d dAngledRotationVector, dAxisXdRotationVector, dAxisYdRotationVector, dAxisZdRotationVector;
-	dAngledRotationVector = rotationVector / rotationVectorNorm;
-	dAxisXdRotationVector = Vector3d::UnitX() / rotationVectorNorm + rotationVector[0] * tmp;
-	dAxisXdRotationVector = Vector3d::UnitY() / rotationVectorNorm + rotationVector[1] * tmp;
-	dAxisXdRotationVector = Vector3d::UnitZ() / rotationVectorNorm + rotationVector[2] * tmp;
-
-	m_externalGeneralizedForce += generalizedForce;
 	// add the extra torque produced by the lever
-	m_externalGeneralizedForce.segment<3>(3) += torque;
+	generalizedForce->segment<3>(3) += torque;
+	m_externalGeneralizedForce += *generalizedForce;
 
-	m_externalGeneralizedStiffness += K;
-	// add the extra stiffness terms produced by the lever
-	for (size_t column = 0; column < 6; ++column)
+	if (K != nullptr)
 	{
-		m_externalGeneralizedStiffness.block<3, 1>(3, column) += lever.cross(K.block<3, 1>(0, column));
-	}
-	// add extra term - dCP/dW[alpha] ^ F = - dR.CP(local)/dW[alpha] ^ F = -dR/dW[alpha].CP(local) ^ F
-	//   -[(dR/dangle.dangle/dW[alpha] + dR/daxisX.daxisX/dW[alpha] +
-	//      dR/daxisY.daxisY/dW[alpha] + dR/daxisZ.daxisZ/dW[alpha]) . CP(local)] ^ F
-	for (size_t axis = 0; axis < 3; ++axis)
-	{
-		m_externalGeneralizedStiffness.block<3, 1>(3, 3 + axis) +=
-			-((dRdAngle * dAngledRotationVector[axis] +
-			   dRdAxisX * dAxisXdRotationVector[axis] +
-			   dRdAxisY * dAxisYdRotationVector[axis] +
-			   dRdAxisZ * dAxisZdRotationVector[axis]) * leverInLocalSpace).cross(force);
+		const Vector3d leverInLocalSpace = getCurrentState().getPose().rotation().inverse() * lever;
+		const Eigen::AngleAxisd angleAxis(getCurrentState().getPose().rotation());
+		double angle = angleAxis.angle();
+		const Vector3d axis = angleAxis.axis();
+		const Vector3d rotationVector = axis * angle; // rotationVector = W
+		double rotationVectorNorm = rotationVector.norm();
+		double rotationVectorNormCubic = rotationVectorNorm * rotationVectorNorm * rotationVectorNorm;
+		double sinAngle = sin(angle);
+		double cosAngle = cos(angle);
+		double oneMinusCos = 1.0 - cosAngle;
+		const Matrix33d skewAxis = SurgSim::Math::makeSkewSymmetricMatrix(axis);
+
+		Matrix33d dRdAngle;
+		Matrix33d dRdAxisX, dRdAxisY, dRdAxisZ;
+		dRdAngle = -sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * skewAxis * skewAxis;
+		dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos * axis[1], oneMinusCos * axis[2],
+			oneMinusCos * axis[1], 0.0, -sinAngle,
+			oneMinusCos * axis[2], sinAngle, 0.0;
+		dRdAxisY << 0.0, oneMinusCos * axis[0], sinAngle,
+			oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], cosAngle * axis[2],
+			-sinAngle, oneMinusCos * axis[2], 0.0;
+		dRdAxisZ << 0.0, -sinAngle, oneMinusCos * axis[0],
+			sinAngle, 0.0, oneMinusCos * axis[1],
+			oneMinusCos * axis[0], oneMinusCos * axis[1], oneMinusCos * 2.0 * axis[2];
+
+		const Vector3d tmp = rotationVector / rotationVectorNormCubic;
+		Vector3d dAngledRotationVector, dAxisXdRotationVector, dAxisYdRotationVector, dAxisZdRotationVector;
+		dAngledRotationVector = rotationVector / rotationVectorNorm;
+		dAxisXdRotationVector = Vector3d::UnitX() / rotationVectorNorm + rotationVector[0] * tmp;
+		dAxisXdRotationVector = Vector3d::UnitY() / rotationVectorNorm + rotationVector[1] * tmp;
+		dAxisXdRotationVector = Vector3d::UnitZ() / rotationVectorNorm + rotationVector[2] * tmp;
+
+		// add the extra stiffness terms produced by the lever
+		for (size_t column = 0; column < 6; ++column)
+		{
+			K->block<3, 1>(3, column) += lever.cross(K->block<3, 1>(0, column));
+		}
+		// add extra term - dCP/dW[alpha] ^ F = - dR.CP(local)/dW[alpha] ^ F = -dR/dW[alpha].CP(local) ^ F
+		//   -[(dR/dangle.dangle/dW[alpha] + dR/daxisX.daxisX/dW[alpha] +
+		//      dR/daxisY.daxisY/dW[alpha] + dR/daxisZ.daxisZ/dW[alpha]) . CP(local)] ^ F
+		for (size_t axis = 0; axis < 3; ++axis)
+		{
+			K->block<3, 1>(3, 3 + axis) +=
+				-((dRdAngle * dAngledRotationVector[axis] +
+				dRdAxisX * dAxisXdRotationVector[axis] +
+				dRdAxisY * dAxisYdRotationVector[axis] +
+				dRdAxisZ * dAxisZdRotationVector[axis]) * leverInLocalSpace).cross(force);
+		}
+		m_externalGeneralizedStiffness += *K;
 	}
 
-	m_externalGeneralizedDamping += D;
-	// add the extra damping terms produced by the lever
-	for (size_t column = 0; column < 6; ++column)
+	if (D != nullptr)
 	{
-		m_externalGeneralizedDamping.block<3, 1>(3, column) += lever.cross(D.block<3, 1>(0, column));
+		// add the extra damping terms produced by the lever
+		for (size_t column = 0; column < 6; ++column)
+		{
+			D->block<3, 1>(3, column) += lever.cross(D->block<3, 1>(0, column));
+		}
+		m_externalGeneralizedDamping += *D;
 	}
 }
 

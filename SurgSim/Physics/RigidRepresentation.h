@@ -74,13 +74,15 @@ public:
 	/// Note the stiffness and damping are 6x6 matrices with coupling between the translational and rotation dof. <br>
 	/// Note all external generalized forces will be zeroed every afterUpdate call of the rigid representation. <br>
 	/// \param localization The application point
-	/// \param generalizedForce The external generalized force
-	/// \param K The stiffness matrix associated with the generalized force (jacobian of the force w.r.t position)
-	/// \param D The damping matrix associated with the generalized force (jacobian of the force w.r.t velocity)
+	/// \param [in,out] generalizedForce The external generalized force
+	/// \param [in,out] K The stiffness matrix associated with generalizedForce (jacobian w.r.t position)
+	/// \param [in,out] D The damping matrix associated with generalizedForce (jacobian w.r.t velocity)
+	/// \note K and D can be nullptr if they don't exist or are not provided.
+	/// \note generalizedForce, K and D may contain extra information on output if an extra torque has been produced.
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-									 const SurgSim::Math::Vector6d& generalizedForce,
-									 const SurgSim::Math::Matrix66d& K = SurgSim::Math::Matrix66d::Zero(),
-									 const SurgSim::Math::Matrix66d& D = SurgSim::Math::Matrix66d::Zero());
+									 SurgSim::Math::Vector6d* generalizedForce,
+									 SurgSim::Math::Matrix66d* K = nullptr,
+									 SurgSim::Math::Matrix66d* D = nullptr);
 
 	/// \return the current external generalized 6D force
 	const SurgSim::Math::Vector6d& getExternalGeneralizedForce() const;
