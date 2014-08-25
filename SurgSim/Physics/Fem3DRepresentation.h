@@ -56,6 +56,11 @@ public:
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
 
+	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+											 SurgSim::Math::Vector& generalizedForce,
+											 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+											 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
+
 	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location) override;
 
 protected:

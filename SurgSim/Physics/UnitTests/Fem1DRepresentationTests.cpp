@@ -51,6 +51,19 @@ TEST(Fem1DRepresentationTests, GetNumDofPerNodeTest)
 	EXPECT_EQ(6u, fem->getNumDofPerNode());
 }
 
+TEST(Fem1DRepresentationTests, AddExternalGeneralizedForceTest)
+{
+	std::shared_ptr<Fem1DRepresentation> fem = std::make_shared<Fem1DRepresentation>("Fem1D");
+	SurgSim::Math::Vector F = SurgSim::Math::Vector::Ones(10);
+	SurgSim::Math::Matrix K = SurgSim::Math::Matrix::Ones(10, 10);
+	SurgSim::Math::Matrix D = SurgSim::Math::Matrix::Ones(10, 10);
+	std::shared_ptr<MockLocalization> localization = std::make_shared<MockLocalization>();
+	EXPECT_THROW(fem->addExternalGeneralizedForce(nullptr, F), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(fem->addExternalGeneralizedForce(nullptr, F, K, D), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(fem->addExternalGeneralizedForce(localization, F), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(fem->addExternalGeneralizedForce(localization, F, K, D), SurgSim::Framework::AssertionFailure);
+}
+
 TEST(Fem1DRepresentationTests, TransformInitialStateTest)
 {
 	using SurgSim::Math::Vector;

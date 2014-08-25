@@ -31,6 +31,8 @@ namespace SurgSim
 namespace Physics
 {
 
+class Localization;
+
 /// Base class for all deformable representations MassSprings, Finite Element Models,...
 /// \note It is both a Physics::Representation and a Math::OdeEquation
 /// \note It holds the representation states (common to all deformable) except the initial state,
@@ -76,6 +78,16 @@ public:
 	/// \return The integration scheme currently in use
 	SurgSim::Math::IntegrationScheme getIntegrationScheme() const;
 
+	/// Add an external generalized force applied on a specific localization
+	/// \param localization where the generalized force is applied
+	/// \param generalizedForce The force to apply (of dimension getNumDofPerNode())
+	/// \param K The stiffness matrix associated with the generalized force (Jacobian of the force w.r.t dof's position)
+	/// \param D The damping matrix associated with the generalized force (Jacobian of the force w.r.t dof's velocity)
+	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+											 SurgSim::Math::Vector& generalizedForce,
+											 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+											 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) = 0;
+
 	/// Gets the compliance matrix associated with motion
 	/// \return The compliance matrix
 	/// \note The compliance matrix is computed automatically by the ode solver in the method 'update'
@@ -120,6 +132,13 @@ protected:
 	/// Last valid state (a.k.a final state)
 	/// \note Backup of the current state for thread-safety access while the current state is being recomputed.
 	std::shared_ptr<SurgSim::Math::OdeState> m_finalState;
+
+	/// External generalized force, stiffness and damping applied on the deformable representation
+	/// @{
+	SurgSim::Math::Vector m_externalGeneralizedForce;
+	SurgSim::Math::Matrix m_externalGeneralizedStiffness;
+	SurgSim::Math::Matrix m_externalGeneralizedDamping;
+	/// @}
 
 	/// Force applied on the deformable representation
 	SurgSim::Math::Vector m_f;

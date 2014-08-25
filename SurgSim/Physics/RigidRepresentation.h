@@ -28,6 +28,7 @@ namespace SurgSim
 namespace Physics
 {
 class RigidRepresentationState;
+class Localization;
 
 SURGSIM_STATIC_REGISTRATION(RigidRepresentation);
 
@@ -56,23 +57,38 @@ public:
 	/// \param angularVelocity The angular velocity
 	void setAngularVelocity(const SurgSim::Math::Vector3d& angularVelocity);
 
-	/// Set the external force being applied to the rigid representation
-	/// Note this force will be zeroed every update of the rigid representation
-	/// \param force The external force
-	/// \param K The stiffness matrix associated with the force (jacobian of the force w.r.t position)
-	/// \param D The damping matrix associated with the force (jacobian of the force w.r.t velocity)
-	void addExternalForce(const SurgSim::Math::Vector3d& force,
-						  const SurgSim::Math::Matrix33d& K = SurgSim::Math::Matrix33d::Zero(),
-						  const SurgSim::Math::Matrix33d& D = SurgSim::Math::Matrix33d::Zero());
+	/// Add an external generalized force applied to the rigid representation's mass center
+	/// Note this force is generalized (i.e. it's a 6D vector, containing both 3D force and 3D torque)
+	/// Note the stiffness and damping are 6x6 matrices with coupling between the translational and rotation dof.
+	/// Note this generalized force will be zeroed every afterUpdate call of the rigid representation
+	/// \param generalizedForce The external generalized force to apply at the mass center
+	/// \param K The stiffness matrix associated with the generalized force (jacobian of the force w.r.t position)
+	/// \param D The damping matrix associated with the generalized force (jacobian of the force w.r.t velocity)
+	void addExternalGeneralizedForce(const SurgSim::Math::Vector6d& generalizedForce,
+									 const SurgSim::Math::Matrix66d& K = SurgSim::Math::Matrix66d::Zero(),
+									 const SurgSim::Math::Matrix66d& D = SurgSim::Math::Matrix66d::Zero());
 
-	/// Set the external torque being applied to the rigid representation
-	/// Note this torque will be zeroed every update of the rigid representation
-	/// \param torque The external torque
-	/// \param K The angular stiffness matrix associated with the torque (jacobian of the torque w.r.t position)
-	/// \param D The angular damping matrix associated with the torque (jacobian of the torque w.r.t velocity)
-	void addExternalTorque(const SurgSim::Math::Vector3d& torque,
-						   const SurgSim::Math::Matrix33d& K = SurgSim::Math::Matrix33d::Zero(),
-						   const SurgSim::Math::Matrix33d& D = SurgSim::Math::Matrix33d::Zero());
+	/// Add an external generalized force applied to the rigid representation (anywhere)
+	/// Note this force is generalized (i.e. it's a 6D vector, containing both 3D force and 3D torque)
+	/// Note the stiffness and damping are 6x6 matrices with coupling between the translational and rotation dof.
+	/// Note this generalized force will be zeroed every afterUpdate call of the rigid representation
+	/// \param localization The application point
+	/// \param generalizedForce The external generalized force
+	/// \param K The stiffness matrix associated with the generalized force (jacobian of the force w.r.t position)
+	/// \param D The damping matrix associated with the generalized force (jacobian of the force w.r.t velocity)
+	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+									 const SurgSim::Math::Vector6d& generalizedForce,
+									 const SurgSim::Math::Matrix66d& K = SurgSim::Math::Matrix66d::Zero(),
+									 const SurgSim::Math::Matrix66d& D = SurgSim::Math::Matrix66d::Zero());
+
+	/// \return the current external generalized 6D force
+	const SurgSim::Math::Vector6d& getExternalGeneralizedForce() const;
+
+	/// \return the current external generalized stiffness 6x6 matrix
+	const SurgSim::Math::Matrix66d& getExternalGeneralizedStiffness() const;
+
+	/// \return the current external generalized damping 6x6 matrix
+	const SurgSim::Math::Matrix66d& getExternalGeneralizedDamping() const;
 
 	virtual void beforeUpdate(double dt) override;
 
@@ -102,10 +118,9 @@ protected:
 	/// Compliance matrix (size of the number of Dof = 6)
 	SurgSim::Math::Matrix66d m_C;
 
-	SurgSim::Math::Vector3d m_externalForce;
-	SurgSim::Math::Vector3d m_externalTorque;
-	SurgSim::Math::Matrix66d m_externalStiffnessMatrix;
-	SurgSim::Math::Matrix66d m_externalDampingMatrix;
+	SurgSim::Math::Vector6d m_externalGeneralizedForce;
+	SurgSim::Math::Matrix66d m_externalGeneralizedStiffness;
+	SurgSim::Math::Matrix66d m_externalGeneralizedDamping;
 
 private:
 	virtual bool doInitialize() override;

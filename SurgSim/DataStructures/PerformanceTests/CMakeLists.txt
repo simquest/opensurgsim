@@ -19,27 +19,16 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	GraphicsConvertTest.cpp
-	ShapesConvertTest.cpp
-	ShapesFactoryTest.cpp
+	NamedDataPerformanceTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
 )
 
 set(LIBS
-	SurgSimSerialize
-	SurgSimPhysics
-	SurgSimMath
-	SurgSimFramework
-	SurgSimGraphics
-	gmock
-	gtest
-	${YAML_CPP_LIBRARIES}}
-	${Boost_LIBRARIES}
+	SurgSimDataStructures
 )
 
-surgsim_add_unit_tests(SurgSimSerializeTest)
+surgsim_add_unit_tests(SurgSimDataStructuresPerformanceTest)
 
-# Put SurgSimSerializeTest into folder "Serialize"
-set_target_properties(SurgSimSerializeTest PROPERTIES FOLDER "Serialize")
+set_target_properties(SurgSimDataStructuresPerformanceTest PROPERTIES FOLDER "DataStructures")

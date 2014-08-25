@@ -22,11 +22,8 @@ link_directories(
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
 	"${OSG_INCLUDE_DIR}"
 	"${OPENTHREADS_INCLUDE_DIR}"
-	"${YAML_CPP_INCLUDE_DIR}"
 )
 
 set(EXAMPLE_SOURCES

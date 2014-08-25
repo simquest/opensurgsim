@@ -170,8 +170,8 @@ bool readAndCheck(const LJ_HANDLE rawHandle, std::array<BYTE, LabJack::MAXIMUM_B
 	else if ((*readBytes)[6] != 0)
 	{
 		SURGSIM_LOG_SEVERE(logger) << "Failed to read response of " << text << " a device named '" << name <<
-			"'.  The device library returned an error code: " << (*readBytes)[6] << ", for frame: " <<
-			(*readBytes)[7] << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+			"'.  The device library returned an error code: " << static_cast<int>((*readBytes)[6]) << ", for frame: " <<
+			static_cast<int>((*readBytes)[7]) << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
 		result = false;
 	}
 
@@ -348,7 +348,7 @@ public:
 	/// The timer channels set for timer outputs (e.g., PWM outputs).
 	const std::unordered_set<int> timerOutputChannels;
 	/// The analog inputs.
-	const std::unordered_map<int, LabJack::RangeAndOptionalNegativeChannel> analogInputs;
+	const std::unordered_map<int, LabJack::AnalogInputSettings> analogInputs;
 	/// The channels set for analog outputs.
 	const std::unordered_set<int> analogOutputChannels;
 	/// The DataGroup indices for the digital outputs.
@@ -373,7 +373,7 @@ private:
 	/// \param timers The timers.
 	/// \return The timers that provide inputs.
 	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int,
-		LabJack::TimerModeAndOptionalInitialValue>& timers) const
+		LabJack::TimerSettings>& timers) const
 	{
 		std::unordered_set<int> timersWithInputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
@@ -392,7 +392,7 @@ private:
 	/// \param timers The timers.
 	/// \return The timers that take outputs.
 	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int,
-		LabJack::TimerModeAndOptionalInitialValue>& timers) const
+		LabJack::TimerSettings>& timers) const
 	{
 		std::unordered_set<int> timersWithOutputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
@@ -584,7 +584,7 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 				++input)
 			{
 				info->digitalInputIndices[*input] =
-					inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+					inputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
 					std::to_string(*input));
 				SURGSIM_ASSERT(info->digitalInputIndices[*input] >= 0) << "LabJackScaffold::DeviceData " <<
 					"failed to get a valid NamedData index for the digital input for line " << *input <<
@@ -664,7 +664,7 @@ bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 		for (auto output = digitalOutputChannels.cbegin(); output != digitalOutputChannels.cend(); ++output)
 		{
 			info->digitalOutputIndices[*output] =
-				initialOutputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX +
+				initialOutputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX +
 				std::to_string(*output));
 		}
 
@@ -738,10 +738,10 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 				" set to digital output, but the scaffold does not know the correct index into the NamedData. " <<
 				" Make sure there is an entry in the scalars with the correct string key.";
 
-			double value;
-			if (outputData.scalars().get(index, &value))
+			bool value;
+			if (outputData.booleans().get(index, &value))
 			{
-				const BYTE valueAsByte = static_cast<BYTE>(value + 0.5); // value is >=0. Conversion will truncate.
+				const BYTE valueAsByte = (value ? 1 : 0);
 				sendBytes.at(sendBytesSize++) = 11;  //IOType, BitStateWrite
 				sendBytes.at(sendBytesSize++) = (*output) | ((valueAsByte & 0xF) << 7);  //Bits 0-4: IO Number,
 																						//Bit 7: State
@@ -914,8 +914,9 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
 				"Failed to read response of " << errorText << " a device named '" <<	device->getName() <<
-				"'.  The number of words in the response is wrong.  Expected: " << dataWords << ".  Received: " <<
-				readBytes[2] << "." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+				"'.  The number of words in the response is wrong.  Expected: " << static_cast<int>(dataWords) <<
+				".  Received: " << static_cast<int>(readBytes[2]) << "." << std::endl << "  labjackusb error code: " <<
+				errno << "." << std::endl;
 			result = false;
 		}
 	}
@@ -930,7 +931,8 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		// Digital inputs.
 		for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 		{
-			inputData.scalars().set(info->digitalInputIndices[*input], readBytes.at(currentByte++));
+			const bool value = (readBytes.at(currentByte++) > 0 ? true : false);
+			inputData.booleans().set(info->digitalInputIndices[*input], value);
 		}
 
 		// Read from the timers in the same order as above.
@@ -1024,7 +1026,7 @@ SurgSim::DataStructures::DataGroup LabJackScaffold::buildDeviceInputData()
 	const int maxDigitalInputs = 23; // The UE9 can have 23 digital inputs.
 	for (int i = 0; i < maxDigitalInputs; ++i)
 	{
-		builder.addScalar(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(i));
+		builder.addBoolean(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(i));
 	}
 
 	const int maxTimerInputs = 6; // The UE9 can have 6 timers.
@@ -1069,7 +1071,19 @@ bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
 	// One-time configuration of counters and timers.
-	const BYTE numberOfTimers = device->getTimers().size();
+	const std::unordered_map<int, LabJack::TimerSettings>& timers = device->getTimers();
+
+	for (auto timer : timers)
+	{
+		SURGSIM_LOG_IF(timer.first >= static_cast<int>(timers.size()), m_logger, SEVERE) <<
+			"Error configuring enabled timers for a device named '" << device->getName() <<
+			"', with number of timers: " << timers.size() << "." << std::endl <<
+			"  Timers must be enabled consecutively, starting with #0." << std::endl <<
+			"  With the currently enabled number of timers, the highest allowable timer is #" <<
+			timers.size() - 1 << ", but one of the enabled timers is #" << timer.first << "." << std::endl;
+	}
+
+	const BYTE numberOfTimers = timers.size();
 	const BYTE counterEnable = 0; // Counters are not currently supported.
 	const BYTE pinOffset = device->getTimerCounterPinOffset();
 
@@ -1223,7 +1237,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 	int sendBytesSize = 7; // the first IOType goes here
 
 	int readBytesSize = 9; // Reading after a Feedback command provides 9+ bytes.
-	const std::unordered_map<int, LabJack::TimerModeAndOptionalInitialValue> timers = device->getTimers();
+	const std::unordered_map<int, LabJack::TimerSettings> timers = device->getTimers();
 	for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 	{
 		const int minimumTimer = 0;
@@ -1294,7 +1308,7 @@ bool LabJackScaffold::configureTimers(DeviceData* deviceData)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
 				device->getName() << "'.  The number of words in the response is wrong.  Expected: " <<
-				dataWords << ".  Received: " << readBytes[2] << "." << std::endl <<
+				static_cast<int>(dataWords) << ".  Received: " << static_cast<int>(readBytes[2]) << "." << std::endl <<
 				"  labjackusb error code: " << errno << "." << std::endl;
 			result = false;
 		}
@@ -1383,7 +1397,8 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 				SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
 					device->getName() << "'.  The command bytes are wrong.  Expected byte 2: " <<
 					static_cast<int>(parameters.calibrationThirdByte[device->getModel()]) << ".  Received: " <<
-					readBytes[2] << "." << std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+					static_cast<int>(readBytes[2]) << "." << std::endl << "  labjackusb error code: " << errno << "." <<
+					std::endl;
 				result = false;
 			}
 
@@ -1479,8 +1494,8 @@ bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 			{
 				SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of " << errorText << " a device named '" <<
 					device->getName() << "'.  The number of words in the response is wrong.  Expected: " <<
-					dataWords << ".  Received: " << readBytes[2] << "." << std::endl <<
-					"  labjackusb error code: " << errno << "." << std::endl;
+					static_cast<int>(dataWords) << ".  Received: " << static_cast<int>(readBytes[2]) << "." <<
+					std::endl << "  labjackusb error code: " << errno << "." << std::endl;
 				result = false;
 			}
 		}

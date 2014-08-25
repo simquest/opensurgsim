@@ -18,6 +18,7 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
+#include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
 
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
@@ -110,6 +111,27 @@ RepresentationType MassSpringRepresentation::getType() const
 	return REPRESENTATION_TYPE_MASSSPRING;
 }
 
+void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+														   SurgSim::Math::Vector& generalizedForce,
+														   const SurgSim::Math::Matrix& K,
+														   const SurgSim::Math::Matrix& D)
+{
+	std::shared_ptr<MassSpringRepresentationLocalization> localization3D =
+		std::dynamic_pointer_cast<MassSpringRepresentationLocalization>(localization);
+	SURGSIM_ASSERT(localization3D != nullptr) <<
+		"Invalid localization type (not a MassSpringRepresentationLocalization)";
+
+	const size_t dofPerNode = getNumDofPerNode();
+
+	const size_t nodeId = localization3D->getLocalNode();
+	SURGSIM_ASSERT(nodeId >= 0 && nodeId < getNumMasses()) << "Invalid nodeId " << nodeId <<
+		". Valid range is {0.." << getNumMasses() << "}";
+
+	m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce;
+	m_externalGeneralizedStiffness.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += K;
+	m_externalGeneralizedDamping.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += D;
+}
+
 void MassSpringRepresentation::beforeUpdate(double dt)
 {
 	// Call the DeformableRepresentation implementation
@@ -136,6 +158,9 @@ Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 	addGravityForce(&m_f, state);
 	addRayleighDampingForce(&m_f, state);
 	addSpringsForce(&m_f, state);
+
+	// Add external generalized force
+	m_f += m_externalGeneralizedForce;
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
@@ -212,6 +237,9 @@ const Matrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& 
 		(*spring)->addDamping(state, &m_D);
 	}
 
+	// Add external generalized damping
+	m_D += m_externalGeneralizedDamping;
+
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
 		boundaryCondition != std::end(state.getBoundaryConditions());
@@ -236,6 +264,9 @@ const Matrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& 
 	{
 		(*spring)->addStiffness(state, &m_K);
 	}
+
+	// Add external generalized stiffness
+	m_K += m_externalGeneralizedStiffness;
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
@@ -294,6 +325,11 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 
 	// Add the Rayleigh damping force to m_f (using the damping matrix)
 	addRayleighDampingForce(&m_f, state, true, true);
+
+	// Add external generalized force, stiffness and damping
+	m_f += m_externalGeneralizedForce;
+	m_K += m_externalGeneralizedStiffness;
+	m_D += m_externalGeneralizedDamping;
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
