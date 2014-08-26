@@ -16,7 +16,6 @@
 #include "SurgSim/DataStructures/OctreeNode.h"
 
 #include <array>
-#include <iterator>
 #include <cmath>
 #include <fstream>
 
@@ -36,6 +35,7 @@ using SurgSim::DataStructures::SYMBOL_BACK;
 using SurgSim::DataStructures::SYMBOL_UP;
 using SurgSim::DataStructures::SYMBOL_DOWN;
 
+/// State machine codes, paired by new Value, new Directions value
 static TransitionCode transitionTable[6][8] =
 {
 	// Transition codes for 'Down'
@@ -177,17 +177,21 @@ OctreePath getNeighbor(const OctreePath& source, const std::array<int, 3>& direc
 
 	bool didHalt = false;
 
+	// For each level iterate over all directions and remember the new node value, and any directions
+	// if there were any new directions (transitionCode.second != SYMBOL_HALT) then do the same for the
+	// preceding level. If there are no new directions then we are done and the superior level are unchanged
+	// If after the topmost level was dealt with there are still directions to work with, the neighbor is outside
+	// of the octree, an empty array is returned in that case.
+
 	for (ptrdiff_t pathIndex = source.size() - 1; pathIndex >= 0; --pathIndex)
 	{
 		newDirection.clear();
 		size_t currentNodeId = source[pathIndex];
-		std::cout << "Current Node : " << currentNodeId << std::endl;
-		std::cout << "Direction  : " << direction[0] << ", " << direction[1] << ", " << direction[2] << std::endl;
+
 		for (size_t directionIndex = 0; directionIndex < currentDirection.size(); ++directionIndex)
 		{
 			TransitionCode code = transitionTable[currentDirection[directionIndex]][currentNodeId];
 			currentNodeId = code.first;
-			std::cout << "TransitionCode: " << code.first << ", " << code.second << std::endl;
 			if (code.second != SYMBOL_HALT)
 			{
 				newDirection.push_back(code.second);
@@ -197,6 +201,7 @@ OctreePath getNeighbor(const OctreePath& source, const std::array<int, 3>& direc
 		currentDirection = newDirection;
 		result[pathIndex] = currentNodeId;
 
+		// If now other new direction was found then we are done and can break of the algorithm
 		if (currentDirection.empty())
 		{
 			didHalt = true;
@@ -210,16 +215,10 @@ OctreePath getNeighbor(const OctreePath& source, const std::array<int, 3>& direc
 		result.clear();
 	}
 
-	std::cout << "Result: ";
-	for (auto i : result)
-	{
-		std::cout << i << ", ";
-	}
-	std::cout << std::endl;
 	return std::move(result);
 }
 
-std::vector<OctreePath> getNeighbors(const OctreePath& source, Neighborhood type)
+std::vector<OctreePath> getNeighbors(const OctreePath& source, int type)
 {
 	std::vector<OctreePath> result;
 	auto f = [&source, &result](const std::array<int, 3>& direction)

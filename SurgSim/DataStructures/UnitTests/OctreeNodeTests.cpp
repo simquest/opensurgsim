@@ -425,40 +425,49 @@ TEST(OctreeNodeTests, NeigborhoodPlainFaces)
 	}
 }
 
-/// This verifies face neighbours for one node
-TEST(OctreeNodeTests, FaceNeighbors)
+/// Verifies face neighbors for one set of second level nodes, this should exercise all of the state table,
+/// the expected data was calculated manually
+TEST(OctreeNodeTests, AllFaceNeighbors)
 {
-	OctreePath path;
-	path.push_back(1);
-	path.push_back(6);
-
-	auto neighbors = getNeighbors(path, NEIGHBORHOOD_FACE);
-	const size_t expectedCount = 6;
-
-	EXPECT_EQ(expectedCount, neighbors.size());
-
-	// Expected coordinates of face neighbors for the node 1/6
-	size_t expected[expectedCount][2] =
+	size_t expected[8][7][2] =
 	{
-		1, 4, // Down
-		3, 4, // Up
-		1, 7, // Right
-		0, 7, // Left
-		1, 2, // Back
-		5, 2, // Front
+		// Node	Down	Up		Right	Left	Back	Front
+		7, 0,	5, 2,	7, 2,	7, 1,	6, 1,	3, 4,	7, 4,
+		6, 1,	4, 3,	6, 3,	7, 0,	6, 0,	2, 5,	6, 5,
+		5, 2,	5, 0,	7, 0,	5, 3,	4, 3,	1, 6,	5, 6,
+		4, 3, 	6, 1,	4, 1,	5, 2,	4, 2,	0, 7,	4, 7,
+		3, 4,	1, 6,	3, 6,	2, 5,	3, 5,	3, 0,	7, 0,
+		2, 5,	0, 7,	2, 7,	3, 4,	2, 4,	2, 1,	6, 1,
+		1, 6,	1, 4, 	3, 4, 	1, 7, 	0, 7,	1, 2, 	5, 2,
+		0, 7,	0, 5,	2, 5,	1, 6,	0, 6,   0, 3,	4, 3
 	};
 
-	for (int i = 0; i < expectedCount; ++i)
-	{
-		OctreePath path;
-		path.push_back(expected[i][0]);
-		path.push_back(expected[i][1]);
 
-		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), path) != neighbors.end())
-				<< "Item #" << i << " not found";
+	size_t checkSum = 0;
+	for (int i = 0; i < 8; ++i)
+	{
+		OctreePath node;
+		node.push_back(expected[i][0][0]);
+		node.push_back(expected[i][0][1]);
+
+		auto neighbors = getNeighbors(node, NEIGHBORHOOD_FACE);
+		checkSum += neighbors.size();
+
+		for (int j = 0; j < 6; ++j)
+		{
+			OctreePath neighbor;
+			neighbor.push_back(expected[i][1 + j][0]);
+			neighbor.push_back(expected[i][1 + j][1]);
+
+			EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), neighbor) != neighbors.end())
+					<< "Node # " << i << "Neighbor #" << j << " not found";
+
+		}
 	}
 
+	EXPECT_EQ(48u, checkSum);
 }
+
 
 // This verifies edge neighbours for one node
 TEST(OctreeNodeTests, EdgeNeighbors)
@@ -542,7 +551,65 @@ TEST(OctreeNodeTests, VertexNeighbors)
 		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), path) != neighbors.end())
 				<< "Item #" << i << " not found";
 	}
+}
 
+
+TEST(OctreeNodeTests, AllNeighbors)
+{
+	// All of these nodes are interior, they should return 26 neighbors
+	size_t nodes[8][2] =
+	{
+		7, 0, 6, 1, 5, 2, 4, 3, 3, 4, 2, 5, 1, 6, 0, 7
+	};
+
+	for (int i = 0; i < 8; ++i)
+	{
+		OctreePath path;
+		path.push_back(nodes[i][0]);
+		path.push_back(nodes[i][1]);
+
+		auto neighbors = getNeighbors(path, NEIGHBORHOOD_FACE | NEIGHBORHOOD_EDGE | NEIGHBORHOOD_VERTEX);
+
+		EXPECT_EQ(26u, neighbors.size());
+	}
+}
+
+TEST(OctreeNodeTests, IncompleteNeighbors)
+{
+	static const size_t numNodes = 16;
+	size_t nodes[numNodes][3] =
+	{
+		//Node, Expected Vertex Neighbors
+		0, 0, 1, // These are the cube corner pieces
+		1, 1, 1,
+		2, 2, 1,
+		3, 3, 1,
+		4, 4, 1,
+		5, 5, 1,
+		6, 6, 1,
+		7, 7, 1,
+		5, 4, 2, // These are on the outside cube edge
+		3, 2, 2,
+		1, 5, 2,
+		0, 4, 2,
+		3, 6, 4, // These are on an outside surface
+		1, 4, 4,
+		4, 2, 4,
+		7, 2, 4
+	};
+
+	for (int i = 0; i < numNodes; ++i)
+	{
+		OctreePath path;
+		path.push_back(nodes[i][0]);
+		path.push_back(nodes[i][1]);
+
+		auto neighbors = getNeighbors(path, NEIGHBORHOOD_VERTEX);
+
+		EXPECT_EQ(nodes[i][2], neighbors.size())
+				<< "Incorrect Neighbor Count for Node #" << i
+				<< " [" << path[0] << ", " << path[1] << "].";
+	}
 }
 
 }

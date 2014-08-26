@@ -72,7 +72,7 @@ enum Symbol
 OctreePath getNeighbor(const OctreePath& source, const std::array<int, 3>& direction);
 
 
-std::vector<OctreePath> getNeighbors(const OctreePath& source, Neighborhood type);
+std::vector<OctreePath> getNeighbors(const OctreePath& source, int type);
 
 /// Octree data structure
 ///
