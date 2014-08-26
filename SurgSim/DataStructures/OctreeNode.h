@@ -40,21 +40,63 @@ namespace DataStructures
 /// the specific node the front of the vector holds the index of the root's children.
 typedef std::vector<size_t> OctreePath;
 
+enum Neighborhood
+{
+	NEIGHBORHOOD_NONE = 0x0,
+	NEIGHBORHOOD_FACE = 0x1,
+	NEIGHBORHOOD_EDGE = 0x2,
+	NEIGHBORHOOD_VERTEX  = 0x4
+};
+
+enum Symbol
+{
+	SYMBOL_HALT = -1,
+	SYMBOL_DOWN = 0,
+	SYMBOL_UP = 1,
+	SYMBOL_RIGHT = 2,
+	SYMBOL_LEFT = 3,
+	SYMBOL_BACK = 4,
+	SYMBOL_FRONT = 5
+};
+
+/// Calculate the neighbor of an node in the octree by traversing a state machine, see
+/// http://ww1.ucmss.com/books/LFS/CSREA2006/MSV4517.pdf for detailed description.
+/// The information about the location of a nodes neighbor is encoded in a state machine, this machine is traversed
+/// until a 'Halt' instruction is found. If the neighbor is across a boundary on the octree, a new search direction
+/// is determined by the algorithm.
+/// \param source the node whose neighbor is needed
+/// \param direction a set of directions, for face neighbors use 1, for edge neigbhors use 2 and for vertex neighbors
+///        use 3 direction, fill the other spots with SYMBOL_HALT. E.g. to find the left neighbor use
+///        {SYMBOL_LEFT, SYMBOL_HALT, SYMBOL_HALT}, for the vertex neighber on the upper left front corner use
+///        {SYMBOL_LEFT, SYMBOLD_FRONT, SYMBOL_UP}
+OctreePath getNeighbor(const OctreePath& source, const std::array<int, 3>& direction);
+
+
+std::vector<OctreePath> getNeighbors(const OctreePath& source, Neighborhood type);
 
 /// Octree data structure
 ///
 /// The octree node consists of an axis aligned bounding box, that can be
 /// subdivided into 8 equally sized subregions. Each subregion is an octree
 /// node and can be further subdivided.
+/// with x-right and y-up on a right handed coordinate system this is the ordering of the nodes of the tree, looking
+/// down the z-axis
+/// Back Face
+///        2  3
+///        0  1
+/// Front Face
+///	       6  7
+///        4  5
 ///
 /// \tparam	Data Type of extra data stored in each node
 template<class Data>
 class OctreeNode : public SurgSim::Framework::Asset,
-				   public std::enable_shared_from_this<OctreeNode<Data>>
+	public std::enable_shared_from_this<OctreeNode<Data>>
 {
-friend class SurgSim::Math::OctreeShape;
+	friend class SurgSim::Math::OctreeShape;
 
 public:
+
 	/// Bounding box type for convenience
 	typedef Eigen::AlignedBox<double, 3> AxisAlignedBoundingBox;
 
