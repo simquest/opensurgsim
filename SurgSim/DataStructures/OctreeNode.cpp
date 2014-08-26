@@ -157,10 +157,10 @@ std::shared_ptr<OctreeNode<EmptyData>> loadOctree(const std::string& fileName)
 	return octree;
 }
 
-OctreePath getNeighbor(const OctreePath& source, const std::array<int, 3>& direction)
+SurgSim::DataStructures::OctreePath getNeighbor(const OctreePath& origin, const std::array<int, 3>& direction)
 {
 	// Early Exit
-	if (source.size() == 0 || direction[0] == SYMBOL_HALT)
+	if (origin.size() == 0 || direction[0] == SYMBOL_HALT)
 	{
 		return OctreePath();
 	}
@@ -173,7 +173,7 @@ OctreePath getNeighbor(const OctreePath& source, const std::array<int, 3>& direc
 		currentDirection.push_back(direction[i]);
 	}
 
-	OctreePath result(source);
+	OctreePath result(origin);
 
 	bool didHalt = false;
 
@@ -183,10 +183,10 @@ OctreePath getNeighbor(const OctreePath& source, const std::array<int, 3>& direc
 	// If after the topmost level was dealt with there are still directions to work with, the neighbor is outside
 	// of the octree, an empty array is returned in that case.
 
-	for (ptrdiff_t pathIndex = source.size() - 1; pathIndex >= 0; --pathIndex)
+	for (ptrdiff_t pathIndex = origin.size() - 1; pathIndex >= 0; --pathIndex)
 	{
 		newDirection.clear();
-		size_t currentNodeId = source[pathIndex];
+		size_t currentNodeId = origin[pathIndex];
 
 		for (size_t directionIndex = 0; directionIndex < currentDirection.size(); ++directionIndex)
 		{
@@ -218,12 +218,12 @@ OctreePath getNeighbor(const OctreePath& source, const std::array<int, 3>& direc
 	return std::move(result);
 }
 
-std::vector<OctreePath> getNeighbors(const OctreePath& source, int type)
+std::vector<OctreePath> getNeighbors(const OctreePath& origin, int type)
 {
 	std::vector<OctreePath> result;
-	auto f = [&source, &result](const std::array<int, 3>& direction)
+	auto f = [&origin, &result](const std::array<int, 3>& direction)
 	{
-		auto n = getNeighbor(source, direction);
+		auto n = getNeighbor(origin, direction);
 		if (! n.empty())
 		{
 			result.push_back(std::move(n));

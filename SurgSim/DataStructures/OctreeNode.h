@@ -40,6 +40,7 @@ namespace DataStructures
 /// the specific node the front of the vector holds the index of the root's children.
 typedef std::vector<size_t> OctreePath;
 
+/// Indicates what neighbors to grab
 enum Neighborhood
 {
 	NEIGHBORHOOD_NONE = 0x0,
@@ -48,6 +49,7 @@ enum Neighborhood
 	NEIGHBORHOOD_VERTEX  = 0x4
 };
 
+/// Direction code for the neighborhood search
 enum Symbol
 {
 	SYMBOL_HALT = -1,
@@ -64,15 +66,20 @@ enum Symbol
 /// The information about the location of a nodes neighbor is encoded in a state machine, this machine is traversed
 /// until a 'Halt' instruction is found. If the neighbor is across a boundary on the octree, a new search direction
 /// is determined by the algorithm.
-/// \param source the node whose neighbor is needed
-/// \param direction a set of directions, for face neighbors use 1, for edge neigbhors use 2 and for vertex neighbors
+/// \param origin the node whose neighbor is needed
+/// \param direction a set of directions, for face neighbors use 1, for edge neighbors use 2 and for vertex neighbors
 ///        use 3 direction, fill the other spots with SYMBOL_HALT. E.g. to find the left neighbor use
 ///        {SYMBOL_LEFT, SYMBOL_HALT, SYMBOL_HALT}, for the vertex neighber on the upper left front corner use
 ///        {SYMBOL_LEFT, SYMBOLD_FRONT, SYMBOL_UP}
-OctreePath getNeighbor(const OctreePath& source, const std::array<int, 3>& direction);
+/// \return a OctreePath to the correct neighbor, empty if the neighbor is outside of the tree
+OctreePath getNeighbor(const OctreePath& origin, const std::array<int, 3>& direction);
 
-
-std::vector<OctreePath> getNeighbors(const OctreePath& source, int type);
+/// Fetch a list of neighbors, indicated by the type, Face, Edge and Vertex are possible types and can be combined
+/// via OR
+/// \param origin the node whose neighbor is needed
+/// \param type the kind of neighborhood that is needed, \sa Neighborhood
+/// \return list of paths with neighbors of the node at origin
+std::vector<OctreePath> getNeighbors(const OctreePath& origin, int type);
 
 /// Octree data structure
 ///
