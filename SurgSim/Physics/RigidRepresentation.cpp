@@ -112,12 +112,36 @@ void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			sinAngle, 0.0, oneMinusCos * axis[1],
 			oneMinusCos * axis[0], oneMinusCos * axis[1], oneMinusCos * 2.0 * axis[2];
 
-		const Vector3d tmp = rotationVector / rotationVectorNormCubic;
 		Vector3d dAngledRotationVector, dAxisXdRotationVector, dAxisYdRotationVector, dAxisZdRotationVector;
-		dAngledRotationVector = rotationVector / rotationVectorNorm;
-		dAxisXdRotationVector = Vector3d::UnitX() / rotationVectorNorm + rotationVector[0] * tmp;
-		dAxisXdRotationVector = Vector3d::UnitY() / rotationVectorNorm + rotationVector[1] * tmp;
-		dAxisXdRotationVector = Vector3d::UnitZ() / rotationVectorNorm + rotationVector[2] * tmp;
+		if (std::abs(rotationVectorNorm) > 1e-8)
+		{
+			const Vector3d tmp = rotationVector / rotationVectorNormCubic;
+			dAngledRotationVector = rotationVector / rotationVectorNorm;
+			dAxisXdRotationVector = Vector3d::UnitX() / rotationVectorNorm - rotationVector[0] * tmp;
+			dAxisYdRotationVector = Vector3d::UnitY() / rotationVectorNorm - rotationVector[1] * tmp;
+			dAxisZdRotationVector = Vector3d::UnitZ() / rotationVectorNorm - rotationVector[2] * tmp;
+		}
+		else
+		{
+			// Development around theta ~ 0 => sin(theta) ~ theta
+			// We simplify by theta across the products dRdAxis[alpha].dAxis[alpha]dRotationVector[beta]
+			dAngledRotationVector = Vector3d::Zero();
+			dAxisXdRotationVector = Vector3d::UnitX();
+			dAxisYdRotationVector = Vector3d::UnitY();
+			dAxisZdRotationVector = Vector3d::UnitZ();
+
+			dRdAxisX << 0.0, 0.0, 0.0,
+						0.0, 0.0, -1.0,
+						0.0, 1.0, 0.0;
+
+			dRdAxisY << 0.0, 0.0, 1.0,
+						0.0, 0.0, 0.0,
+						-1.0, 0.0, 0.0;
+
+			dRdAxisZ << 0.0, -1.0, 0.0,
+						1.0, 0.0, 0.0,
+						0.0, 0.0, 0.0;
+		}
 
 		// add the extra stiffness terms produced by the lever
 		for (size_t column = 0; column < 6; ++column)
