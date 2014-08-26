@@ -85,7 +85,6 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 	if (doesIntersectBoxCapsule(capsuleBottom, capsuleTop, capsuleRadius, box))
 	{
 		Vector3d normal, segmentPoint, deepestBoxPoint, deepestCapsulePoint;
-		double distance;
 		distancePointSegment(Vector3d::Zero().eval(), capsuleBottom, capsuleTop, &segmentPoint);
 		if (!segmentPoint.isZero(DistanceEpsilon))
 		{
@@ -106,7 +105,8 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 				normal = deepestBoxPoint - segmentPoint;
 				if (normal.norm() > capsuleRadius)
 				{
-					//find the closest point to all 12 box edges.
+					// The closest point to the box center is too far away.
+					// Find the closest point to all 12 box edges.
 					double minDistance = 2.0 * capsuleRadius;
 					for (auto edge : m_boxEdges)
 					{
@@ -123,6 +123,19 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 						}
 					}
 					normal = deepestBoxPoint - segmentPoint;
+					if (normal.norm() > capsuleRadius)
+					{
+						// Check the endpoints.
+						segmentPoint = capsuleTop;
+						deepestBoxPoint = segmentPoint.array().min(box.max().array()).max(box.min().array());
+						normal = deepestBoxPoint - segmentPoint;
+						if (normal.norm() > capsuleRadius)
+						{
+							segmentPoint = capsuleBottom;
+							deepestBoxPoint = segmentPoint.array().min(box.max().array()).max(box.min().array());
+							normal = deepestBoxPoint - segmentPoint;
+						}
+					}
 				}
 				normal.normalize();
 				deepestCapsulePoint = segmentPoint + capsuleRadius * normal;
@@ -155,7 +168,7 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 			deepestCapsulePoint = segmentPoint + capsuleRadius * normal;
 		}
 
-		distance = (deepestCapsulePoint - deepestBoxPoint).dot(normal);
+		double distance = (deepestCapsulePoint - deepestBoxPoint).dot(normal);
 		std::pair<Location, Location> penetrationPoints;
 		penetrationPoints.first.globalPosition.setValue(boxPose * deepestBoxPoint);
 		penetrationPoints.second.globalPosition.setValue(boxPose * deepestCapsulePoint);
