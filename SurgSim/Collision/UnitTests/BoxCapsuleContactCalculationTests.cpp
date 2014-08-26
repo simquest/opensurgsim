@@ -283,6 +283,20 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
 	}
 
 	{
+		SCOPED_TRACE("Another intersection with box corner");
+		std::shared_ptr<BoxShape> box =
+			std::make_shared<BoxShape>(0.0008, 0.0008, 0.0008);
+		std::shared_ptr<CapsuleShape> capsule = std::make_shared<CapsuleShape>(0.01, 0.0063);
+		boxQuat = Quaterniond::Identity();
+		boxTrans = Vector3d(0.005, 0.052, 0.5308);
+		capsuleQuat =
+			Quaterniond(0.71851427633922127, 0.00027205941221747750, 0.0021375922639339773, 0.69550887225089708);
+		capsuleTrans = Vector3d(0.010224217835903153, 0.058515488684803690, 0.53177563225691493);
+		bool expectedInContact = true;
+		doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+	}
+
+	{
 		SCOPED_TRACE("Intersection with box face, but closest point to box center is outside dilated box");
 		std::shared_ptr<BoxShape> box =
 			std::make_shared<BoxShape>(0.012800000000000004, 0.012799999999999999, 0.012800000000000034);

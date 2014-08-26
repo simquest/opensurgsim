@@ -49,6 +49,9 @@ static const double DistanceEpsilon = 1e-10;
 /// Used as epsilon for general distance calculations with squared distances
 static const double SquaredDistanceEpsilon = 1e-10;
 
+/// Used as epsilon for general distance calculations with distances to the fourth power
+static const double FourthDistanceEpsilon = 1e-20;
+
 /// Epsilon used in angular comparisons
 static const double AngularEpsilon = 1e-10;
 
@@ -359,7 +362,7 @@ T distanceSegmentSegment(
 	int region = -1;
 	T tmp;
 	// Non-parallel case
-	if (std::abs(ratio) >= Geometry::ScalarEpsilon)
+	if (std::abs(ratio) >= Geometry::FourthDistanceEpsilon)
 	{
 		// Get the region of the global minimum in the s-t space based on the line-line solution
 		//		s=0		s=1

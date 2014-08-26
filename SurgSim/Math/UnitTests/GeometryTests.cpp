@@ -93,7 +93,7 @@ public:
 		a(pointA), b(pointB), ab(pointB - pointA) {}
 	~Segment() {}
 	/// Point on the line that the segment is on, s =< 1 and s >= 0 will give you a point on the segment
-	VectorType pointOnLine(double s)
+	VectorType pointOnLine(double s) const
 	{
 		return a + ab * s;
 	}
@@ -559,6 +559,15 @@ TEST_F(GeometryTest, DistanceSegmentSegment)
 	// <12> go past the end of the on the other side, switching up endpoints
 	otherSegment = Segment(closestPoint - otherNormal * 2, closestPoint - otherNormal);
 	segments.push_back(SegmentData(plainSegment, otherSegment, plainSegment.a, otherSegment.b));
+
+	// <13> projections intersect, short segments
+	const VectorType aPoint = VectorType(1, 0, 0);
+	const SizeType shortLength = 0.0001;
+	const Segment shortSegment = Segment(VectorType(0, -shortLength/2, 0), VectorType(0, shortLength/2, 0));
+	const VectorType shortSegmentNormal = shortSegment.ab.cross(aPoint).normalized();
+	const Segment otherShortSegment = Segment(aPoint, aPoint + shortLength * shortSegmentNormal);
+	segments.push_back(SegmentData(shortSegment, otherShortSegment,
+		shortSegment.pointOnLine(0.5), otherShortSegment.a));
 
 	for (size_t i = 0; i < segments.size(); ++i)
 	{
