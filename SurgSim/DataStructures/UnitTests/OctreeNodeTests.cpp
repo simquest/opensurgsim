@@ -502,7 +502,7 @@ TEST(OctreeNodeTests, EdgeNeighbors)
 		4, 3, // Front Left
 	};
 
-	for (int i = 0; i < expectedCount; ++i)
+	for (size_t i = 0; i < expectedCount; ++i)
 	{
 		OctreePath path;
 		path.push_back(expected[i][0]);
@@ -542,7 +542,7 @@ TEST(OctreeNodeTests, VertexNeighbors)
 		2, 1, // Up Left Back
 	};
 
-	for (int i = 0; i < expectedCount; ++i)
+	for (size_t i = 0; i < expectedCount; ++i)
 	{
 		OctreePath path;
 		path.push_back(expected[i][0]);
@@ -598,7 +598,7 @@ TEST(OctreeNodeTests, IncompleteNeighbors)
 		7, 2, 4
 	};
 
-	for (int i = 0; i < numNodes; ++i)
+	for (size_t i = 0; i < numNodes; ++i)
 	{
 		OctreePath path;
 		path.push_back(nodes[i][0]);
