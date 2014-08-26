@@ -206,6 +206,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 	virtualToolCoupler->initialize(runtime);
 	rigidBody->initialize(runtime);
 	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
 
 	EXPECT_FALSE(rigidBody->getCurrentState().getPose().translation().isZero(epsilon));
 
@@ -251,6 +252,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacementWithInertialTorques)
 	virtualToolCoupler->initialize(runtime);
 	rigidBody->initialize(runtime);
 	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
 
 	RigidRepresentationState state = rigidBody->getCurrentState();
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
@@ -288,6 +290,7 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 	virtualToolCoupler->initialize(runtime);
 	rigidBody->initialize(runtime);
 	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
 
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(rigidBody->getCurrentState().getPose().linear());
 	EXPECT_NEAR(M_PI_4, angleAxis.angle(), epsilon);
@@ -329,6 +332,7 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 	virtualToolCoupler->initialize(runtime);
 	rigidBody->initialize(runtime);
 	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
 
 	EXPECT_TRUE(rigidBody->getCurrentState().getPose().translation().isApprox(Vector3d::Zero(), epsilon));
 

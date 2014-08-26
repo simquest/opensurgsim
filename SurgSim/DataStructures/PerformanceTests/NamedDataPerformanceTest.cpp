@@ -69,7 +69,7 @@ public:
 
 		data = builder.createData();
 
-		for (int i = 0; i < names.size(); ++i)
+		for (int i = 0; i < static_cast<int>(names.size()); ++i)
 		{
 			ASSERT_TRUE(data.set(i, i));
 			indices.push_back(i);
