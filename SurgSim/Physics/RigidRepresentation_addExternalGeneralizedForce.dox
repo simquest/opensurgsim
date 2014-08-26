@@ -38,11 +38,13 @@
 	\end{eqnarray*}
 	\right.
 	\f]
-	In this new coordinate system, we have:
+	In this new coordinate system, we have (see reference http://en.wikipedia.org/wiki/Rotation_matrix):
 	\f[
-	R(\theta, \mathbf{u}) = cos(\theta).I + sin(\theta).\left[\mathbf{u}\right] + (1-cos(\theta)).\left[\mathbf{u}\right]^2
+	R(\theta, \mathbf{u}) = cos(\theta).I + sin(\theta).\left[\mathbf{u}\right] + (1-cos(\theta)).\mathbf{u} \otimes \mathbf{u}
 	\f]
-	where \f$\left[\mathbf{u}\right]\f$ denotes the skew symmetric matrix of the vector \f$\mathbf{u}\f$.
+	where \f$\left[\mathbf{u}\right]\f$ denotes the skew symmetric matrix of the vector \f$\mathbf{u}\f$, 
+	\f$\left[\mathbf{u}\right] = \left( \begin{array}{ccc} 0 & -u^z & u^y \\ u^z & 0 & -u^x \\ -u^y & u^x & 0 \end{array} \right)\f$
+	and \f$\mathbf{u} \otimes \mathbf{u}\f$ the tensor product: \f$\left(\mathbf{u} \otimes \mathbf{u}^T\right)_{ij} = u^i * u^j\f$.
 
 	Applying the chain derivation rule, we get:
 	\f[
@@ -53,7 +55,7 @@
 	\f]
 	with
 	\f[
-	\frac{\partial R}{\partial \theta} = -sin(\theta).I + cos(\theta).\left[\mathbf{u}\right] + sin(\theta).\left[\mathbf{u}\right]^2
+	\frac{\partial R}{\partial \theta} = -sin(\theta).I + cos(\theta).\left[\mathbf{u}\right] + sin(\theta).\mathbf{u} \otimes \mathbf{u}
 	\f]
 
 	\f[

@@ -91,7 +91,7 @@ void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 		const Eigen::AngleAxisd angleAxis(getCurrentState().getPose().rotation());
 		double angle = angleAxis.angle();
 		const Vector3d axis = angleAxis.axis();
-		const Vector3d rotationVector = axis * angle; // rotationVector = W
+		const Vector3d rotationVector = axis * angle;
 		double rotationVectorNorm = rotationVector.norm();
 		double rotationVectorNormCubic = rotationVectorNorm * rotationVectorNorm * rotationVectorNorm;
 		double sinAngle = sin(angle);
@@ -101,12 +101,12 @@ void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 
 		Matrix33d dRdAngle;
 		Matrix33d dRdAxisX, dRdAxisY, dRdAxisZ;
-		dRdAngle = -sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * skewAxis * skewAxis;
+		dRdAngle = -sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * axis * axis.transpose();
 		dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos * axis[1], oneMinusCos * axis[2],
 			oneMinusCos * axis[1], 0.0, -sinAngle,
 			oneMinusCos * axis[2], sinAngle, 0.0;
 		dRdAxisY << 0.0, oneMinusCos * axis[0], sinAngle,
-			oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], cosAngle * axis[2],
+			oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos * axis[2],
 			-sinAngle, oneMinusCos * axis[2], 0.0;
 		dRdAxisZ << 0.0, -sinAngle, oneMinusCos * axis[0],
 			sinAngle, 0.0, oneMinusCos * axis[1],
