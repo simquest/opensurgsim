@@ -122,13 +122,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
 #OpenSurgSimConfig For the Install Tree
 file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_PREFIX}/include")
 set(CONFIG_INCLUDE_DIRS "\${OPENSURGSIM_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-set(CONFIG_DATA_DIR "${OPENSURGSIM_CMAKE_DIR}/Data")
+file(RELATIVE_PATH REL_DATA_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_PREFIX}/Data")
+set(CONFIG_DATA_DIR "\${OPENSURGSIM_CMAKE_DIR}/${REL_DATA_DIR}")
+install(DIRECTORY Data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/Data)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
 	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/OpenSurgSimConfig.cmake" @ONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfigVersion.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfigVersion.cmake" @ONLY)
+	
 
 install(FILES
 	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/OpenSurgSimConfig.cmake"
