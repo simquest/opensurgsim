@@ -47,6 +47,8 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataStructuresConvert.h
 	DataStructuresConvert-inl.h
 	EmptyData.h
+	Image.h
+	Image-inl.h
 	IndexDirectory.h
 	IndexedLocalCoordinate.h
 	MeshElement.h
