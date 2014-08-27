@@ -99,10 +99,10 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>* expec
 		vertex = calculateTriangleMeshVertex(expectedMeshIndicesInContacts[i], meshQuat, meshTrans);
 
 		std::pair<Location, Location> penetrationPoint;
-		depth = planeNormalGlobal.dot(vertex - pointOnPlane);
+		depth = -planeNormalGlobal.dot(vertex - pointOnPlane);
 
 		penetrationPoint.first.globalPosition.setValue(vertex);
-		penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
+		penetrationPoint.second.globalPosition.setValue(vertex + planeNormalGlobal * depth);
 		expectedContacts->push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
 									collisionNormal, penetrationPoint));
 	}

@@ -161,8 +161,8 @@ void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContac
 		vertex = boxTransform * box->getVertex(expectedBoxIndicesInContacts[i]);
 		std::pair<Location, Location> penetrationPoint;
 		penetrationPoint.first.globalPosition.setValue(vertex);
-		depth = planeNormalGlobal.dot(vertex - pointOnPlane);
-		penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
+		depth = -planeNormalGlobal.dot(vertex - pointOnPlane);
+		penetrationPoint.second.globalPosition.setValue(vertex + planeNormalGlobal * depth);
 		expectedContacts->push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
 															 collisionNormal, penetrationPoint));
 	}

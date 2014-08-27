@@ -81,7 +81,7 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 			penetrationPoints.first.globalPosition.setValue(meshVertex);
 			penetrationPoints.second.globalPosition.setValue(meshVertex - normal * d);
 
-			pair->addContact(d, normal, penetrationPoints);
+			pair->addContact(-d, normal, penetrationPoints);
 		}
 	}
 }
