@@ -210,7 +210,7 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	digitalInputChannels.insert(2);
 	digitalInputChannels.insert(11);
 	EXPECT_NO_THROW(device->enableDigitalInput(SurgSim::Device::LabJack::FIO2));
-	EXPECT_NO_THROW(device->enableDigitalInput(SurgSim::Device::LabJack::FIO11));
+	EXPECT_NO_THROW(device->enableDigitalInput(SurgSim::Device::LabJack::EIO3));
 	EXPECT_EQ(digitalInputChannels, device->getDigitalInputs());
 
 	digitalInputChannels.insert(14);
@@ -221,7 +221,7 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	digitalOutputChannels.insert(3);
 	digitalOutputChannels.insert(17);
 	EXPECT_NO_THROW(device->enableDigitalOutput(SurgSim::Device::LabJack::FIO3));
-	EXPECT_NO_THROW(device->enableDigitalOutput(SurgSim::Device::LabJack::FIO17));
+	EXPECT_NO_THROW(device->enableDigitalOutput(SurgSim::Device::LabJack::CIO1));
 	EXPECT_EQ(digitalOutputChannels, device->getDigitalOutputs());
 
 	digitalOutputChannels.insert(5);
