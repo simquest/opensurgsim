@@ -31,10 +31,12 @@ set(UNIT_TEST_SOURCES
 	Fem1DElementBeamTests.cpp
 	Fem1DMechanicalValidationTests.cpp
 	Fem1DPlyReaderDelegateTests.cpp
+	Fem1DRepresentationLocalizationTest.cpp
 	Fem1DRepresentationTests.cpp
 	Fem2DElementTriangleTests.cpp
 	Fem2DMechanicalValidationTests.cpp
 	Fem2DPlyReaderDelegateTests.cpp
+	Fem2DRepresentationLocalizationTest.cpp
 	Fem2DRepresentationTests.cpp
 	Fem3DElementCorotationalTetrahedronTests.cpp
 	Fem3DElementCubeTests.cpp
