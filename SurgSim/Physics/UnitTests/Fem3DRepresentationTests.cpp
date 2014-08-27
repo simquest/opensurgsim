@@ -46,9 +46,12 @@ class Fem3DRepresentationTests : public ::testing::Test
 public:
 	void SetUp() override
 	{
-		m_fem = std::make_shared<MockFem3DRepresentation>();
-
 		m_numNodes = 10;
+	}
+
+	void createFem()
+	{
+		m_fem = std::make_shared<Fem3DRepresentation>("Fem3d");
 
 		m_initialState = std::make_shared<SurgSim::Math::OdeState>();
 		m_initialState->setNumDof(m_fem->getNumDofPerNode(), m_numNodes);
@@ -63,16 +66,18 @@ public:
 
 	void addFemElement()
 	{
-		std::array<size_t, 4> nodeIds = {{0, 1, 2, 3}};
-		std::shared_ptr<Fem3DElementTetrahedron> tet = std::make_shared<Fem3DElementTetrahedron>(nodeIds);
-		tet->setYoungModulus(1e9);
-		tet->setPoissonRatio(0.45);
-		tet->setMassDensity(1000.0);
-		m_fem->addFemElement(tet);
+		std::array<size_t, 4> elementNodeIds = {{0, 1, 2, 3}};
+		std::shared_ptr<Fem3DElementTetrahedron> element = std::make_shared<Fem3DElementTetrahedron>(elementNodeIds);
+		element->setYoungModulus(1e9);
+		element->setPoissonRatio(0.45);
+		element->setMassDensity(1000.0);
+		m_fem->addFemElement(element);
 	}
 
 	void createLocalization()
 	{
+		m_uninitializedLocalization = std::make_shared<Fem3DRepresentationLocalization>();
+
 		m_localization = std::make_shared<Fem3DRepresentationLocalization>();
 		SurgSim::DataStructures::IndexedLocalCoordinate femRepCoordinate;
 		femRepCoordinate.index = 0;
@@ -87,10 +92,11 @@ public:
 
 protected:
 	size_t m_numNodes;
-	std::shared_ptr<MockFem3DRepresentation> m_fem;
+	std::shared_ptr<Fem3DRepresentation> m_fem;
 	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
 	SurgSim::Math::RigidTransform3d m_initialPose;
 	std::shared_ptr<Fem3DRepresentationLocalization> m_localization;
+	std::shared_ptr<Fem3DRepresentationLocalization> m_uninitializedLocalization;
 	std::shared_ptr<MockLocalization> m_wrongLocalizationType;
 };
 
@@ -101,11 +107,13 @@ TEST_F(Fem3DRepresentationTests, ConstructorTest)
 
 TEST_F(Fem3DRepresentationTests, GetTypeTest)
 {
+	createFem();
 	EXPECT_EQ(REPRESENTATION_TYPE_FEM3D, m_fem->getType());
 }
 
 TEST_F(Fem3DRepresentationTests, GetNumDofPerNodeTest)
 {
+	createFem();
 	EXPECT_EQ(3u, m_fem->getNumDofPerNode());
 }
 
@@ -113,6 +121,7 @@ TEST_F(Fem3DRepresentationTests, TransformInitialStateTest)
 {
 	using SurgSim::Math::Vector;
 
+	createFem();
 	m_fem->setLocalPose(m_initialPose);
 	m_fem->setInitialState(m_initialState);
 
@@ -136,6 +145,7 @@ TEST_F(Fem3DRepresentationTests, TransformInitialStateTest)
 
 TEST_F(Fem3DRepresentationTests, SetGetFilenameTest)
 {
+	createFem();
 	ASSERT_NO_THROW(m_fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
 	ASSERT_NO_THROW(m_fem->getFilename());
 	ASSERT_EQ("Data/PlyReaderTests/Tetrahedron.ply", m_fem->getFilename());
@@ -145,35 +155,32 @@ TEST_F(Fem3DRepresentationTests, DoInitializeTest)
 {
 	{
 		SCOPED_TRACE("Initialize with a valid file name");
-		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-		fem->setFilename("PlyReaderTests/Tetrahedron.ply");
-
+		createFem();
+		m_fem->setFilename("PlyReaderTests/Tetrahedron.ply");
 		// Fem3DRepresentation::initialize() will call Fem3DRepresentation::doInitialize(), which should load the file.
-		ASSERT_NO_THROW(ASSERT_TRUE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt"))));
-
-		EXPECT_EQ(3u, fem->getNumDofPerNode());
-		EXPECT_EQ(3u * 26u, fem->getNumDof());
-		EXPECT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
+		ASSERT_NO_THROW(ASSERT_TRUE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt"))));
+		EXPECT_EQ(3u, m_fem->getNumDofPerNode());
+		EXPECT_EQ(3u * 26u, m_fem->getNumDof());
+		EXPECT_EQ(24u, m_fem->getInitialState()->getNumBoundaryConditions());
 	}
 
 	{
 		SCOPED_TRACE("Initialize with an invalid file name");
-		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-		fem->setFilename("Non existent fake name");
-		EXPECT_FALSE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		createFem();
+		m_fem->setFilename("Non existent fake name");
+		EXPECT_FALSE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
 	{
 		SCOPED_TRACE("Initialize with file name not set");
-		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+		createFem();
 		// Fem3DRepresentation will not try to load file, but FemRepresentation::doInitialize() will throw.
-		EXPECT_ANY_THROW(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		EXPECT_ANY_THROW(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
 	{
 		SCOPED_TRACE("Initialization called on object instance");
 		Fem3DRepresentation fem("fem3d");
-
 		fem.setFilename("PlyReaderTests/Tetrahedron.ply");
 		// It throws because within doInitialize(), 'this' Fem3DRepresentation will be passed as a shared_ptr<> to
 		// the Fem3DRepresentationPlyReaderDelegate.
@@ -182,18 +189,16 @@ TEST_F(Fem3DRepresentationTests, DoInitializeTest)
 
 	{
 		SCOPED_TRACE("Loading file with incorrect PLY format");
-		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-
-		fem->setFilename("PlyReaderTests/WrongPlyTetrahedron.ply");
-		EXPECT_FALSE(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		createFem();
+		m_fem->setFilename("PlyReaderTests/WrongPlyTetrahedron.ply");
+		EXPECT_FALSE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 
 	{
 		SCOPED_TRACE("Loading file with incorrect data");
-		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
-
-		fem->setFilename("PlyReaderTests/WrongDataTetrahedron.ply");
-		EXPECT_ANY_THROW(fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		createFem();
+		m_fem->setFilename("PlyReaderTests/WrongDataTetrahedron.ply");
+		EXPECT_ANY_THROW(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
 	}
 }
 
@@ -202,6 +207,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 	using SurgSim::DataStructures::EmptyData;
 
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	createFem();
 	ASSERT_NO_THROW(m_fem->setFilename("Geometry/wound_deformable.ply"));
 
 	std::string path = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
@@ -269,29 +275,31 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 
 TEST_F(Fem3DRepresentationTests, ExternalForceAPITest)
 {
+	createFem();
+
 	// External force vector not initialized until the initial state has been set (it contains the #dof...)
-	EXPECT_EQ(0, m_fem->getExternalForce().size());
-	EXPECT_EQ(0, m_fem->getExternalStiffness().rows());
-	EXPECT_EQ(0, m_fem->getExternalStiffness().cols());
-	EXPECT_EQ(0, m_fem->getExternalDamping().rows());
-	EXPECT_EQ(0, m_fem->getExternalDamping().cols());
+	EXPECT_EQ(0, m_fem->getExternalGeneralizedForce().size());
+	EXPECT_EQ(0, m_fem->getExternalGeneralizedStiffness().rows());
+	EXPECT_EQ(0, m_fem->getExternalGeneralizedStiffness().cols());
+	EXPECT_EQ(0, m_fem->getExternalGeneralizedDamping().rows());
+	EXPECT_EQ(0, m_fem->getExternalGeneralizedDamping().cols());
 
 	m_fem->setInitialState(m_initialState);
 
 	// Vector initialized (properly sized and zeroed)
-	EXPECT_NE(0, m_fem->getExternalForce().size());
-	EXPECT_NE(0, m_fem->getExternalStiffness().rows());
-	EXPECT_NE(0, m_fem->getExternalStiffness().cols());
-	EXPECT_NE(0, m_fem->getExternalDamping().rows());
-	EXPECT_NE(0, m_fem->getExternalDamping().cols());
-	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalForce().size());
-	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalStiffness().cols());
-	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalStiffness().rows());
-	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalDamping().cols());
-	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalDamping().rows());
-	EXPECT_TRUE(m_fem->getExternalForce().isZero());
-	EXPECT_TRUE(m_fem->getExternalStiffness().isZero());
-	EXPECT_TRUE(m_fem->getExternalDamping().isZero());
+	EXPECT_NE(0, m_fem->getExternalGeneralizedForce().size());
+	EXPECT_NE(0, m_fem->getExternalGeneralizedStiffness().rows());
+	EXPECT_NE(0, m_fem->getExternalGeneralizedStiffness().cols());
+	EXPECT_NE(0, m_fem->getExternalGeneralizedDamping().rows());
+	EXPECT_NE(0, m_fem->getExternalGeneralizedDamping().cols());
+	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalGeneralizedForce().size());
+	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalGeneralizedStiffness().cols());
+	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalGeneralizedStiffness().rows());
+	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalGeneralizedDamping().cols());
+	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalGeneralizedDamping().rows());
+	EXPECT_TRUE(m_fem->getExternalGeneralizedForce().isZero());
+	EXPECT_TRUE(m_fem->getExternalGeneralizedStiffness().isZero());
+	EXPECT_TRUE(m_fem->getExternalGeneralizedDamping().isZero());
 
 	addFemElement();
 	createLocalization();
@@ -306,23 +314,36 @@ TEST_F(Fem3DRepresentationTests, ExternalForceAPITest)
 	Matrix D = Matrix::Zero(m_fem->getNumDof(), m_fem->getNumDof());
 	D.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = Dlocal;
 
+	// Test invalid localization nullptr
+	ASSERT_THROW(m_fem->addExternalGeneralizedForce(nullptr, Flocal),
+		SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(m_fem->addExternalGeneralizedForce(nullptr, Flocal, Klocal, Dlocal),
+		SurgSim::Framework::AssertionFailure);
+	// Test invalid localization type
+	ASSERT_THROW(m_fem->addExternalGeneralizedForce(m_wrongLocalizationType, Flocal),
 		SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(m_fem->addExternalGeneralizedForce(m_wrongLocalizationType, Flocal, Klocal, Dlocal),
 		SurgSim::Framework::AssertionFailure);
+	// Test uninitialized localization
+	ASSERT_THROW(m_fem->addExternalGeneralizedForce(m_uninitializedLocalization, Flocal),
+		SurgSim::Framework::AssertionFailure);
+	ASSERT_THROW(m_fem->addExternalGeneralizedForce(m_uninitializedLocalization, Flocal, Klocal, Dlocal),
+		SurgSim::Framework::AssertionFailure);
 
+	// Test valid call to addExternalGeneralizedForce
 	m_fem->addExternalGeneralizedForce(m_localization, Flocal, Klocal, Dlocal);
-	EXPECT_FALSE(m_fem->getExternalForce().isZero());
-	EXPECT_FALSE(m_fem->getExternalStiffness().isZero());
-	EXPECT_FALSE(m_fem->getExternalDamping().isZero());
-	EXPECT_TRUE(m_fem->getExternalForce().isApprox(F));
-	EXPECT_TRUE(m_fem->getExternalStiffness().isApprox(K));
-	EXPECT_TRUE(m_fem->getExternalDamping().isApprox(D));
+	EXPECT_FALSE(m_fem->getExternalGeneralizedForce().isZero());
+	EXPECT_FALSE(m_fem->getExternalGeneralizedStiffness().isZero());
+	EXPECT_FALSE(m_fem->getExternalGeneralizedDamping().isZero());
+	EXPECT_TRUE(m_fem->getExternalGeneralizedForce().isApprox(F));
+	EXPECT_TRUE(m_fem->getExternalGeneralizedStiffness().isApprox(K));
+	EXPECT_TRUE(m_fem->getExternalGeneralizedDamping().isApprox(D));
 
+	// Test valid call to addExternalGeneralizedForce to add things up
 	m_fem->addExternalGeneralizedForce(m_localization, Flocal, Klocal, Dlocal);
-	EXPECT_TRUE(m_fem->getExternalForce().isApprox(2.0 * F));
-	EXPECT_TRUE(m_fem->getExternalStiffness().isApprox(2.0 * K));
-	EXPECT_TRUE(m_fem->getExternalDamping().isApprox(2.0 * D));
+	EXPECT_TRUE(m_fem->getExternalGeneralizedForce().isApprox(2.0 * F));
+	EXPECT_TRUE(m_fem->getExternalGeneralizedStiffness().isApprox(2.0 * K));
+	EXPECT_TRUE(m_fem->getExternalGeneralizedDamping().isApprox(2.0 * D));
 }
 
 TEST_F(Fem3DRepresentationTests, SerializationTest)
