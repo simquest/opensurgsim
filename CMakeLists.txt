@@ -68,6 +68,7 @@ endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 if(${BUILD_SHARED_LIBS})
 	set(Boost_USE_STATIC_LIBS OFF)
+	add_definitions("-DBOOST_ALL_DYN_LINK")
 else()
 	set(Boost_USE_STATIC_LIBS ON)
 endif()
