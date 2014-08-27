@@ -27,8 +27,6 @@
 
 using SurgSim::DataStructures::IndexedLocalCoordinate;
 using SurgSim::Math::getSubVector;
-using SurgSim::Physics::Fem3DRepresentation;
-using SurgSim::Physics::Fem3DRepresentationLocalization;
 
 namespace
 {
