@@ -165,7 +165,6 @@ std::shared_ptr<Component> Component::getSharedPtr()
 
 void Component::setActive(bool val)
 {
-	SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Component::setActive() not implemented";
 	m_isActive = val;
 }
 
