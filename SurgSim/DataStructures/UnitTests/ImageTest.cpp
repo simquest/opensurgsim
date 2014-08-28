@@ -192,7 +192,7 @@ TYPED_TEST(ImageTests, EigenAccess)
 		}
 
 		Matrix total = image.getChannel(0) + image.getChannel(1) + image.getChannel(2);
-		EXPECT_TRUE(total.isApprox(Matrix::Constant(300, 300, T(3)), epsilon));
+		EXPECT_TRUE(total.isApprox(Matrix::Constant(300, 300, T(3))));
 	}
 	{
 		Image<T> image(6, 6, 1);

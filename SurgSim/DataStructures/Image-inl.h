@@ -26,21 +26,27 @@ namespace DataStructures
 
 template<class T>
 Image<T>::Image() :
-	m_size({{0, 0}}), m_channels(0), m_data(nullptr)
+	m_channels(0), m_data(nullptr)
 {
+	m_size[0] = 0;
+	m_size[1] = 0;
 }
 
 
 template<class T>
 Image<T>::Image(size_t width, size_t height, size_t channels) :
-	m_size({{width, height}}), m_channels(channels), m_data(new T[channels*width*height])
+	m_channels(channels), m_data(new T[channels*width*height])
 {
+	m_size[0] = width;
+	m_size[1] = height;
 }
 
 template<class T>
 Image<T>::Image(size_t width, size_t height, size_t channels, const T* const data) :
-	m_size({{width, height}}), m_channels(channels), m_data(new T[channels*width*height])
+	m_channels(channels), m_data(new T[channels*width*height])
 {
+	m_size[0] = width;
+	m_size[1] = height;
 	std::copy(data, data+width*height*channels, m_data);
 }
 
@@ -54,7 +60,7 @@ Image<T>::Image(const Image<T>& other) :
 
 template<class T>
 Image<T>::Image(Image<T>&& other) :
-	m_size({{0, 0}}), m_channels(0), m_data(nullptr)
+	m_data(nullptr)
 {
 	*this = std::move(other);
 }
@@ -89,7 +95,8 @@ Image<T>& Image<T>::operator=(Image<T>&& other)
 		m_channels = other.getNumChannels();
 
 		other.m_data = nullptr;
-		other.m_size = {0, 0};
+		other.m_size[0] = 0;
+		other.m_size[1] = 0;
 		other.m_channels = 0;
 	}
 	return *this;
