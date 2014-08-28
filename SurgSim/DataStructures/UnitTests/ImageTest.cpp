@@ -42,10 +42,11 @@ public:
 typedef ::testing::Types<unsigned char, char, unsigned int, int, float, double> ImageTestTypes;
 TYPED_TEST_CASE(ImageTests, ImageTestTypes);
 
-TYPED_TEST(ImageTests, CanConstruct)
+TYPED_TEST(ImageTests, Construct)
 {
 	typedef typename TestFixture::Scalar T;
 
+	ASSERT_NO_THROW({Image<T> image;});
 	ASSERT_NO_THROW({Image<T> image(10, 10, 1);});
 	ASSERT_NO_THROW({Image<T> image(100, 10, 3);});
 	ASSERT_NO_THROW({Image<T> image(512, 1024, 4);});
@@ -54,7 +55,7 @@ TYPED_TEST(ImageTests, CanConstruct)
 	ASSERT_NO_THROW({Image<T> image(3, 3, 1, array);});
 }
 
-TYPED_TEST(ImageTests, CanCopy)
+TYPED_TEST(ImageTests, Copy)
 {
 	typedef typename TestFixture::Scalar T;
 	Image<T> image(10, 10, 1);
@@ -64,20 +65,14 @@ TYPED_TEST(ImageTests, CanCopy)
 	EXPECT_NE(image.getData(), newImage.getData());
 }
 
-TYPED_TEST(ImageTests, CanAssign)
+TYPED_TEST(ImageTests, Assign)
 {
 	typedef typename TestFixture::Scalar T;
 	Image<T> image(10, 10, 1);
 
-	Image<T> wrongSize(10, 11, 1);
-	Image<T> wrongChannels(10, 10, 2);
+	Image<T> newImage;
+	newImage = image;
 
-	Image<T> newImage(10, 10, 1);
-
-	EXPECT_THROW(wrongSize = image, SurgSim::Framework::AssertionFailure);
-	EXPECT_THROW(wrongChannels = image, SurgSim::Framework::AssertionFailure);
-
-	EXPECT_NO_THROW(newImage = image);
 	EXPECT_EQ(image.getSize(), newImage.getSize());
 	EXPECT_EQ(image.getNumChannels(), newImage.getNumChannels());
 	EXPECT_NE(image.getData(), newImage.getData());
@@ -87,6 +82,16 @@ TYPED_TEST(ImageTests, Accessors)
 {
 	typedef typename TestFixture::Scalar T;
 	{
+		Image<T> image;
+		EXPECT_EQ(0, image.getWidth());
+		EXPECT_EQ(0, image.getHeight());
+		EXPECT_EQ(0, image.getNumChannels());
+		EXPECT_EQ(nullptr, image.getData());
+
+		std::array<size_t, 2> size = {0, 0};
+		EXPECT_EQ(size, image.getSize());
+	}
+	{
 		Image<T> image(10, 20, 30);
 		EXPECT_EQ(10, image.getWidth());
 		EXPECT_EQ(20, image.getHeight());
@@ -95,7 +100,6 @@ TYPED_TEST(ImageTests, Accessors)
 		std::array<size_t, 2> size = {10, 20};
 		EXPECT_EQ(size, image.getSize());
 	}
-
 	{
 		T array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 		Image<T> image(3, 3, 1, array);
@@ -110,6 +114,43 @@ TYPED_TEST(ImageTests, Accessors)
 		{
 			EXPECT_NEAR(array[i], image.getData()[i], epsilon);
 		}
+	}
+}
+
+TYPED_TEST(ImageTests, Move)
+{
+	typedef typename TestFixture::Scalar T;
+
+	{
+		Image<T> oldImage(3, 3, 1);
+		T* const dataPtr = oldImage.getData();
+		Image<T> newImage = std::move(oldImage);
+
+		EXPECT_EQ(nullptr, oldImage.getData());
+		EXPECT_NE(dataPtr, oldImage.getData());
+		EXPECT_EQ(0, oldImage.getWidth());
+		EXPECT_EQ(0, oldImage.getHeight());
+		EXPECT_EQ(0, oldImage.getNumChannels());
+
+		EXPECT_EQ(dataPtr, newImage.getData());
+		EXPECT_EQ(3, newImage.getWidth());
+		EXPECT_EQ(3, newImage.getHeight());
+		EXPECT_EQ(1, newImage.getNumChannels());
+	}
+	{
+		Image<T> oldImage(15, 25, 4);
+		T* const dataPtr = oldImage.getData();
+		Image<T> newImage(std::move(oldImage));
+
+		EXPECT_EQ(nullptr, oldImage.getData());
+		EXPECT_EQ(0, oldImage.getWidth());
+		EXPECT_EQ(0, oldImage.getHeight());
+		EXPECT_EQ(0, oldImage.getNumChannels());
+
+		EXPECT_EQ(dataPtr, newImage.getData());
+		EXPECT_EQ(15, newImage.getWidth());
+		EXPECT_EQ(25, newImage.getHeight());
+		EXPECT_EQ(4, newImage.getNumChannels());
 	}
 }
 
@@ -139,7 +180,6 @@ TYPED_TEST(ImageTests, EigenAccess)
 		EXPECT_THROW(image.getChannel(2), SurgSim::Framework::AssertionFailure);
 		EXPECT_THROW(image.getChannel(100), SurgSim::Framework::AssertionFailure);
 	}
-
 	{
 		Image<T> image(300, 300, 3);
 		image.getChannel(0) = Matrix::Constant(300, 300, T(0));
@@ -154,7 +194,6 @@ TYPED_TEST(ImageTests, EigenAccess)
 		Matrix total = image.getChannel(0) + image.getChannel(1) + image.getChannel(2);
 		EXPECT_TRUE(total.isApprox(Matrix::Constant(300, 300, T(3)), epsilon));
 	}
-
 	{
 		Image<T> image(6, 6, 1);
 		image.getChannel(0) <<  0,  1,  2,  3,  4,  5,

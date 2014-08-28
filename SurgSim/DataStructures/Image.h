@@ -16,6 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_IMAGE_H
 #define SURGSIM_DATASTRUCTURES_IMAGE_H
 
+#include <array>
 #include <Eigen/Core>
 
 namespace SurgSim
@@ -31,6 +32,9 @@ template<class T>
 class Image
 {
 public:
+	/// Default Constructor
+	Image();
+
 	/// Constructor
 	/// \param width the image width
 	/// \param height the image height
@@ -44,8 +48,13 @@ public:
 	/// \param data pointer to the data to copy from
 	Image(size_t width, size_t height, size_t channels, const T* const data);
 
-	/// Copy constructor from another Image
+	/// Copy constructor
+	/// \param other Image to copy from
 	Image(const Image<T>& other);
+
+	/// Move constructor
+	/// \param other Image to move data from
+	Image(Image<T>&& other);
 
 	/// Destructor
 	virtual ~Image();
@@ -54,6 +63,11 @@ public:
 	/// \param other The Image to copy from
 	/// \return The Image that was assigned into
 	Image<T>& operator=(const Image<T>& other);
+
+	/// Move Assignment Operator
+	/// \param other The Image to move data from
+	/// \return The Image that was assigned into
+	Image<T>& operator=(Image<T>&& other);
 
 	/// Get the Image width
 	/// \return the width
@@ -72,7 +86,7 @@ public:
 	size_t getNumChannels() const;
 
 	/// Get the data in the channel as an eigen matrix
-	/// \param the channel number
+	/// \param channel the channel number
 	/// \return an eigen matrix
 	Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 0, Eigen::InnerStride<>> getChannel(size_t channel);
 
@@ -81,9 +95,9 @@ public:
 	T* const getData();
 
 private:
-	const std::array<size_t, 2> m_size;
-	const size_t m_channels;
-	T* const m_data;
+	std::array<size_t, 2> m_size;
+	size_t m_channels;
+	T* m_data;
 };
 
 typedef Image<float> ImageF;

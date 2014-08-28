@@ -25,6 +25,13 @@ namespace DataStructures
 {
 
 template<class T>
+Image<T>::Image() :
+	m_size({{0, 0}}), m_channels(0), m_data(nullptr)
+{
+}
+
+
+template<class T>
 Image<T>::Image(size_t width, size_t height, size_t channels) :
 	m_size({{width, height}}), m_channels(channels), m_data(new T[channels*width*height])
 {
@@ -46,14 +53,44 @@ Image<T>::Image(const Image<T>& other) :
 }
 
 template<class T>
+Image<T>::Image(Image<T>&& other) :
+	m_size({{0, 0}}), m_channels(0), m_data(nullptr)
+{
+	*this = std::move(other);
+}
+
+template<class T>
 Image<T>& Image<T>::operator=(const Image<T>& other)
 {
 	if (this != &other)
 	{
-		SURGSIM_ASSERT(m_size == other.getSize()) << "Cannot assign images of different size";
-		SURGSIM_ASSERT(m_channels == other.getNumChannels())
-			<< "Cannot assign images with different number of channels";
-		std::copy(other.m_data, other.m_data + m_size[0]*m_size[1]*m_channels, m_data);
+		size_t newDataSize = other.getWidth() * other.getHeight() * other.getNumChannels();
+		size_t oldDataSize = getWidth() * getHeight() * getNumChannels();
+		if (newDataSize != oldDataSize)
+		{
+			delete [] m_data;
+			m_data = new T[newDataSize];
+		}
+		m_size = other.getSize();
+		m_channels = other.getNumChannels();
+		std::copy(other.m_data, other.m_data + newDataSize, m_data);
+	}
+	return *this;
+}
+
+template<class T>
+Image<T>& Image<T>::operator=(Image<T>&& other)
+{
+	if (this != &other)
+	{
+		delete [] m_data;
+		m_data = other.m_data;
+		m_size = other.getSize();
+		m_channels = other.getNumChannels();
+
+		other.m_data = nullptr;
+		other.m_size = {0, 0};
+		other.m_channels = 0;
 	}
 	return *this;
 }
