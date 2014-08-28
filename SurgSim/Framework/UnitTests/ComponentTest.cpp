@@ -290,6 +290,7 @@ TEST(ComponentTests, MacroRegistrationTest)
 	EXPECT_NE(nullptr, testComponent);
 	EXPECT_EQ("ComponentName", testComponent->getName());
 	EXPECT_EQ("TestComponent2", testComponent->getClassName());
+	EXPECT_TRUE(testComponent->isActive());
 }
 
 TEST(ComponentTests, DecodeSharedReferences)
@@ -300,10 +301,12 @@ TEST(ComponentTests, DecodeSharedReferences)
 
 	auto component1 = node.as<std::shared_ptr<Component>>();
 	EXPECT_NE(nullptr, component1);
+	EXPECT_TRUE(component1->isActive());
 
 	auto component1copy = node.as<std::shared_ptr<Component>>();
 	EXPECT_NE(nullptr, component1copy);
 	EXPECT_EQ(component1, component1copy);
+	EXPECT_TRUE(component1copy->isActive());
 
 	node["TestComponent2"]["Id"] = "DecodeSharedReferences_TwoComponentName";
 
@@ -311,6 +314,11 @@ TEST(ComponentTests, DecodeSharedReferences)
 	EXPECT_NE(nullptr, component2);
 	EXPECT_NE(component2, component1);
 	EXPECT_NE(component2, component1copy);
+	EXPECT_TRUE(component2->isActive());
+
+	node["TestComponent2"]["IsActive"] = false;
+	auto component3 = node.as<std::shared_ptr<Component>>();
+	EXPECT_FALSE(component3->isActive());
 }
 
 TEST(ComponentTests, EncodeComponent)
@@ -327,6 +335,8 @@ TEST(ComponentTests, EncodeComponent)
 	EXPECT_EQ("TestComponent2", className);
 	EXPECT_EQ(1, (data["ValueOne"].IsDefined() ? data["ValueOne"].as<int>() : 0xbad));
 	EXPECT_EQ(2, (data["ValueTwo"].IsDefined() ? data["ValueTwo"].as<int>() : 0xbad));
+	EXPECT_TRUE(data["IsActive"].IsDefined());
+	EXPECT_TRUE(data["IsActive"].as<bool>());
 }
 
 TEST(ComponentTests, DecodeComponent)
@@ -336,6 +346,8 @@ TEST(ComponentTests, DecodeComponent)
 	node["TestComponent2"]["Id"] = "DecodeComponent_TestComponentName";
 	node["TestComponent2"]["ValueOne"] = 100;
 	node["TestComponent2"]["ValueTwo"] = 101;
+	node["TestComponent2"]["IsActive"] = false;
+
 
 	auto component = node.as<std::shared_ptr<Component>>();
 
@@ -345,6 +357,7 @@ TEST(ComponentTests, DecodeComponent)
 	EXPECT_EQ("TestComponentName", testComponent->getName());
 	EXPECT_EQ(100, testComponent->getValueOne());
 	EXPECT_EQ(101, testComponent->getValueTwo());
+	EXPECT_FALSE(testComponent->isActive());
 }
 
 TEST(ComponentTests, ComponentReferences)
@@ -410,7 +423,7 @@ TEST(ComponentTests, MockComponent)
 	ASSERT_NE(nullptr, component);
 
 	/// SerializationMockComponent does not have an explicit definition anywhere in the code
-	/// there is not SerializationMockComponent, but this should still suceed, this test protects
+	/// there is no SerializationMockComponent, but this should still succeed, this test protects
 	/// against linker optimization
 	auto nonDefinedComponent = SurgSim::Framework::Component::getFactory().create(
 								   "SerializationMockComponent",

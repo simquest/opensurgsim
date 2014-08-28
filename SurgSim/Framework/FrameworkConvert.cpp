@@ -25,6 +25,7 @@ namespace
 {
 const std::string NamePropertyName = "Name";
 const std::string IdPropertyName = "Id";
+const std::string ActivityPropertyName = "IsActive";
 }
 
 namespace YAML
@@ -91,6 +92,12 @@ bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(
 				}
 			}
 		}
+
+		if (data[ActivityPropertyName].IsDefined())
+		{
+			rhs->setActive(data[ActivityPropertyName].as<bool>());
+		}
+
 		rhs->decode(data);
 		result = true;
 	}
@@ -109,6 +116,7 @@ Node convert<SurgSim::Framework::Component>::encode(const SurgSim::Framework::Co
 	YAML::Node data(rhs.encode());
 	data[IdPropertyName] = to_string(rhs.getUuid());
 	data[NamePropertyName] = rhs.getName();
+	data[ActivityPropertyName] = rhs.isActive();
 
 	YAML::Node result;
 	result[rhs.getClassName()] = data;

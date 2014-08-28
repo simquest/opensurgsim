@@ -140,7 +140,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 
 	YAML::Node data = node["SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior"];
-	EXPECT_EQ(4u, data.size());
+	EXPECT_EQ(5u, data.size());
 
 	std::shared_ptr<TransferPhysicsToGraphicsMeshBehavior> newBehavior;
 	ASSERT_NO_THROW(newBehavior = std::dynamic_pointer_cast<TransferPhysicsToGraphicsMeshBehavior>(

@@ -129,7 +129,7 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 		YAML::Node node;
 		ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*rigidCollisionRepresentation));
 		YAML::Node data = node["SurgSim::Physics::RigidCollisionRepresentation"];
-		EXPECT_EQ(4u, data.size());
+		EXPECT_EQ(5u, data.size());
 
 		std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> newRepresentation;
 		ASSERT_NO_THROW(newRepresentation =
@@ -152,7 +152,7 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 		YAML::Node node;
 		ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*rigidCollisionRepresentation));
 		YAML::Node data = node["SurgSim::Physics::RigidCollisionRepresentation"];
-		EXPECT_EQ(4u, data.size());
+		EXPECT_EQ(5u, data.size());
 
 		std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> newRepresentation;
 		ASSERT_NO_THROW(newRepresentation =
