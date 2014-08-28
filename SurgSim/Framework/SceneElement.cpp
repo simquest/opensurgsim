@@ -216,7 +216,7 @@ YAML::Node SceneElement::encode(bool standalone) const
 {
 	YAML::Node data(YAML::NodeType::Map);
 	data["Name"] = getName();
-	data["Activity"] = isActive();
+	data["IsActive"] = isActive();
 
 	for (auto component = std::begin(m_components); component != std::end(m_components); ++component)
 	{
@@ -248,7 +248,11 @@ bool SceneElement::decode(const YAML::Node& node)
 		YAML::Node data = node[getClassName()];
 
 		m_name = data["Name"].as<std::string>();
-		m_isActive = data["Activity"].as<bool>();
+
+		if (data["IsActive"].IsDefined())
+		{
+			m_isActive = data["IsActive"].as<bool>();
+		}
 
 		if (data["Components"].IsSequence())
 		{
