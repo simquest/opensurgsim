@@ -61,7 +61,6 @@ TYPED_TEST(ImageTests, Copy)
 	Image<T> image(10, 10, 1);
 	Image<T> newImage(image);
 	EXPECT_EQ(image.getSize(), newImage.getSize());
-	EXPECT_EQ(image.getNumChannels(), newImage.getNumChannels());
 	EXPECT_NE(image.getData(), newImage.getData());
 }
 
@@ -74,7 +73,6 @@ TYPED_TEST(ImageTests, Assign)
 	newImage = image;
 
 	EXPECT_EQ(image.getSize(), newImage.getSize());
-	EXPECT_EQ(image.getNumChannels(), newImage.getNumChannels());
 	EXPECT_NE(image.getData(), newImage.getData());
 }
 
@@ -88,7 +86,7 @@ TYPED_TEST(ImageTests, Accessors)
 		EXPECT_EQ(0, image.getNumChannels());
 		EXPECT_EQ(nullptr, image.getData());
 
-		std::array<size_t, 2> size = {0, 0};
+		std::array<size_t, 3> size = {0, 0, 0};
 		EXPECT_EQ(size, image.getSize());
 	}
 	{
@@ -97,7 +95,7 @@ TYPED_TEST(ImageTests, Accessors)
 		EXPECT_EQ(20, image.getHeight());
 		EXPECT_EQ(30, image.getNumChannels());
 
-		std::array<size_t, 2> size = {10, 20};
+		std::array<size_t, 3> size = {10, 20, 30};
 		EXPECT_EQ(size, image.getSize());
 	}
 	{
@@ -107,7 +105,7 @@ TYPED_TEST(ImageTests, Accessors)
 		EXPECT_EQ(3, image.getHeight());
 		EXPECT_EQ(1, image.getNumChannels());
 
-		std::array<size_t, 2> size = {3, 3};
+		std::array<size_t, 3> size = {3, 3, 1};
 		EXPECT_EQ(size, image.getSize());
 
 		for(int i=0; i<9; i++)

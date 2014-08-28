@@ -78,8 +78,8 @@ public:
 	size_t getHeight() const;
 
 	/// Get the Image size
-	/// \return the image size
-	std::array<size_t, 2> getSize() const;
+	/// \return the image size as (width, height, channels)
+	std::array<size_t, 3> getSize() const;
 
 	/// Get the number of channels in this Image
 	/// \return the number of channels
@@ -95,8 +95,7 @@ public:
 	T* const getData();
 
 private:
-	std::array<size_t, 2> m_size;
-	size_t m_channels;
+	std::array<size_t, 3> m_size;
 	T* m_data;
 };
 
