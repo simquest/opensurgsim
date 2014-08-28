@@ -455,27 +455,27 @@ TEST(ComponentTests, PoseComponentTest)
 
 TEST(ComponentTests, SetActiveTest)
 {
-	std::shared_ptr<Component> mock = std::make_shared<MockComponent>("Component");
-	EXPECT_TRUE(mock->isActive());
-	EXPECT_NO_THROW(mock->setActive(false));
-	EXPECT_FALSE(mock->isActive());
+	std::shared_ptr<Component> component = std::make_shared<MockComponent>("Component");
+	EXPECT_TRUE(component->isActive());
+	EXPECT_NO_THROW(component->setActive(false));
+	EXPECT_FALSE(component->isActive());
 
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("SceneElement");
-	sceneElement->addComponent(mock);
+	sceneElement->addComponent(component);
 	EXPECT_TRUE(sceneElement->isActive());
 
 	// An inactive component in an active SceneElement is 'inactive'.
-	EXPECT_FALSE(mock->isActive());
+	EXPECT_FALSE(component->isActive());
 
 	// An active component in an active SceneElement is 'active'.
-	mock->setActive(true);
-	EXPECT_TRUE(mock->isActive());
+	component->setActive(true);
+	EXPECT_TRUE(component->isActive());
 
 	sceneElement->setActive(false);
 	// An active component in an inactive SceneElement is 'inactive'.
-	EXPECT_FALSE(mock->isActive());
+	EXPECT_FALSE(component->isActive());
 
 	// An inactive component in an inactive SceneElement is 'inactive'.
-	mock->setActive(false);
-	EXPECT_FALSE(mock->isActive());
+	component->setActive(false);
+	EXPECT_FALSE(component->isActive());
 }

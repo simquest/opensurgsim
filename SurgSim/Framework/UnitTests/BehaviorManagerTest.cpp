@@ -69,38 +69,25 @@ TEST(BehaviorManagerTest, UpdateTest)
 	EXPECT_TRUE(element->isInitialized());
 	EXPECT_TRUE(behavior->isInitialized());
 
-	{
-		behavior->setActive(false);
-		behavior->updateCount = 0;
+	behavior->setActive(false);
+	behavior->updateCount = 0;
 
-		// BehaviorManager will not update inactive behaviors.
-		runtime->start();
-		EXPECT_TRUE(behaviorManager->isInitialized());
-		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-		EXPECT_EQ(0, behavior->updateCount);
+	// BehaviorManager will not update inactive behaviors.
+	runtime->start();
+	EXPECT_TRUE(behaviorManager->isInitialized());
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(0, behavior->updateCount);
 
-		// Turn on the behavior, it will be updated.
-		behavior->setActive(true);
-		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-		EXPECT_GT(behavior->updateCount, 0);
-		runtime->stop();
-	}
+	// Turn on the behavior, it will be updated.
+	behavior->setActive(true);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_GT(behavior->updateCount, 0);
 
-	{
-		behavior->setActive(true);
-		behavior->updateCount = 0;
+	// Turn off the behavior, it will not be updated any more.
+	behavior->setActive(false);
+	auto count = behavior->updateCount;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(behavior->updateCount, count);
 
-		// BehaviorManager will update active behaviors.
-		runtime->start();
-		EXPECT_TRUE(behaviorManager->isInitialized());
-		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-		EXPECT_GT(behavior->updateCount, 0);
-
-		// Turn off the behavior, it will not be updated any more.
-		behavior->setActive(false);
-		auto count = behavior->updateCount;
-		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-		EXPECT_EQ(behavior->updateCount, count);
-		runtime->stop();
-	}
+	runtime->stop();
 }
