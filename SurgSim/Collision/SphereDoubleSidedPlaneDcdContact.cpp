@@ -72,8 +72,10 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 			(representationPlane->getPose().linear() * plane->getNormal()) * ((dist < 0.0) ? -1.0 : 1.0);
 
 		std::pair<Location,Location> penetrationPoints;
-		penetrationPoints.first.globalPosition.setValue(sphereCenter - normal * sphere->getRadius());
-		penetrationPoints.second.globalPosition.setValue(sphereCenter - normal * distAbsolute);
+		penetrationPoints.first.rigidLocalPosition.setValue(
+			representationSphere->getPose().inverse() * (sphereCenter - normal * sphere->getRadius()));
+		penetrationPoints.second.rigidLocalPosition.setValue(
+			representationPlane->getPose().inverse() * (sphereCenter - normal * distAbsolute));
 
 		pair->addContact(depth, normal, penetrationPoints);
 	}
