@@ -16,11 +16,13 @@
 #include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::TriangleMeshPlain;
+using SurgSim::Math::Geometry::DistanceEpsilon;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
@@ -144,6 +146,25 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape> mesh,
 	TriangleMeshPlaneDcdContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshRep, planeRep);
 	calcContact.calculateContact(pair);
+
+	const Vector3d globalPlaneNormal = planeRep->getPose().linear() * plane->getNormal();
+	mesh->updateAabbTree();
+	const double maxRadius = mesh->getAabbTree()->getAabb().diagonal().norm() / 2.0;
+	const Vector3d planeToMesh = mesh->getCenter() - planeTrans;
+	Vector3d nearestPointOnPlane;
+	const double distanceMeshPlane = SurgSim::Math::distancePointPlane(planeToMesh, globalPlaneNormal,
+		plane->getD(), &nearestPointOnPlane);
+
+	const double minDepth = -distanceMeshPlane - maxRadius;
+	const double maxDepth = -distanceMeshPlane + maxRadius;
+
+	for (auto contact : pair->getContacts())
+	{
+		EXPECT_LT(-DistanceEpsilon, contact->depth);
+		EXPECT_LT(minDepth - DistanceEpsilon, contact->depth);
+		EXPECT_GT(maxDepth + DistanceEpsilon, contact->depth);
+		EXPECT_TRUE(eigenEqual(globalPlaneNormal, contact->normal));
+	}
 
 	// Compare the contact info.
 	contactsInfoEqualityTest(expectedContacts, pair->getContacts());

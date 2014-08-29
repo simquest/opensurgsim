@@ -21,6 +21,7 @@
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
+#include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Framework/Asset.h"
@@ -30,11 +31,6 @@
 
 namespace SurgSim
 {
-
-namespace DataStructures
-{
-class AabbTree;
-}
 
 namespace Math
 {
