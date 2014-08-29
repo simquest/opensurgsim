@@ -27,9 +27,11 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector6d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
@@ -169,12 +171,28 @@ void VirtualToolCoupler::update(double dt)
 		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
+		const Matrix33d zero3x3 = Matrix33d::Zero();
 		const Matrix33d linearStiffnessMatrix = m_linearStiffness * identity3x3;
 		const Matrix33d linearDampingMatrix = m_linearDamping * identity3x3;
 		const Matrix33d angularStiffnessMatrix = m_angularStiffness * identity3x3;
 		const Matrix33d angularDampingMatrix = m_angularDamping * identity3x3;
-		m_rigid->addExternalForce(force, linearStiffnessMatrix, linearDampingMatrix);
-		m_rigid->addExternalTorque(torque, angularStiffnessMatrix, angularDampingMatrix);
+		const Matrix33d skewLeverArm = SurgSim::Math::makeSkewSymmetricMatrix(leverArm);
+		const Matrix33d skewForce = SurgSim::Math::makeSkewSymmetricMatrix(force);
+
+		Vector6d generalizedForce;
+		generalizedForce << force, torque;
+		Matrix66d generalizedStiffness;
+		generalizedStiffness << linearStiffnessMatrix, zero3x3,
+								m_linearStiffness * skewLeverArm - skewForce, angularStiffnessMatrix;
+		Matrix66d generalizedDamping;
+		generalizedDamping << linearDampingMatrix, zero3x3,
+							  m_linearDamping * skewLeverArm, angularDampingMatrix;
+
+		// Here, we could add the external generalized force applied on the attachment point,
+		// the extra torque (leverArm.cross(force)) and its derivatives would be added automatically in the rigid.
+		// But, we do need these informations as well below to pass it on to the haptic, so we compute them
+		// locally and simply add them to the rigid.
+		m_rigid->addExternalGeneralizedForce(generalizedForce, generalizedStiffness, generalizedDamping);
 
 		if (m_output != nullptr)
 		{
@@ -185,17 +203,8 @@ void VirtualToolCoupler::update(double dt)
 
 			m_outputData.poses().set(m_inputPoseIndex, inputPose);
 
-			const Matrix33d skewLeverArm = SurgSim::Math::makeSkewSymmetricMatrix(leverArm);
-
-			Matrix66d springJacobian;
-			springJacobian << -linearStiffnessMatrix, Matrix33d::Zero(),
-							  -m_linearStiffness * skewLeverArm, -angularStiffnessMatrix;
-			m_outputData.matrices().set(m_springJacobianIndex, springJacobian);
-
-			Matrix66d damperJacobian;
-			damperJacobian << -linearDampingMatrix, Matrix33d::Zero(),
-							  m_linearDamping * skewLeverArm, -angularDampingMatrix;
-			m_outputData.matrices().set(m_damperJacobianIndex, damperJacobian);
+			m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
+			m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
 
 			m_output->setData(m_outputData);
 		}

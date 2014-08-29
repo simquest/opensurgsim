@@ -67,6 +67,14 @@ RepresentationType Fem1DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM1D;
 }
 
+void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+										 SurgSim::Math::Vector& generalizedForce,
+										 const SurgSim::Math::Matrix& K,
+										 const SurgSim::Math::Matrix& D)
+{
+	SURGSIM_FAILURE() << "Not implemented yet";
+}
+
 bool Fem1DRepresentation::doWakeUp()
 {
 	using SurgSim::Math::LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix;
