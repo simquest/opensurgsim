@@ -89,6 +89,7 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>* expec
 									  const Vector3d& planeTrans, const Quaterniond& planeQuat)
 {
 	Vector3d vertex;
+	Vector3d boxLocalVertex, planeLocalVertex;
 	Vector3d planeNormalGlobal = planeQuat * planeNormal;
 	Vector3d pointOnPlane = planeTrans + (planeNormalGlobal * planeD);
 	double depth = 0.0;
@@ -97,12 +98,16 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>* expec
 	for (int i = 0; i < expectedNumberOfContacts; ++i)
 	{
 		vertex = calculateTriangleMeshVertex(expectedMeshIndicesInContacts[i], meshQuat, meshTrans);
-
-		std::pair<Location, Location> penetrationPoint;
 		depth = -planeNormalGlobal.dot(vertex - pointOnPlane);
 
-		penetrationPoint.first.globalPosition.setValue(vertex);
-		penetrationPoint.second.globalPosition.setValue(vertex + planeNormalGlobal * depth);
+		boxLocalVertex = calculateTriangleMeshVertex(expectedMeshIndicesInContacts[i],
+													 Quaterniond::Identity(), Vector3d::Zero());
+		planeLocalVertex = vertex + planeNormalGlobal * depth;
+		planeLocalVertex = planeQuat.inverse() * (planeLocalVertex - planeTrans);
+
+		std::pair<Location, Location> penetrationPoint;
+		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
+		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
 		expectedContacts->push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
 									collisionNormal, penetrationPoint));
 	}

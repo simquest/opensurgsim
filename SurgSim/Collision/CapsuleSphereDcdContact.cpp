@@ -65,8 +65,10 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 		Vector3d normal = (result - sphereCenter).normalized();
 
 		std::pair<Location,Location> penetrationPoints;
-		penetrationPoints.first.globalPosition.setValue(result - normal * capsule->getRadius());
-		penetrationPoints.second.globalPosition.setValue(sphereCenter + normal * sphere->getRadius());
+		penetrationPoints.first.rigidLocalPosition.setValue(
+			representationCapsule->getPose().inverse() * (result - normal * capsule->getRadius()));
+		penetrationPoints.second.rigidLocalPosition.setValue(
+			representationSphere->getPose().inverse() * (sphereCenter + normal * sphere->getRadius()));
 
 		pair->addContact(depth, normal, penetrationPoints);
 	}

@@ -588,7 +588,7 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			const int index = info->digitalOutputIndices[*output];
 			SURGSIM_ASSERT(index >= 0) << "LabJackScaffold: A LabJackDevice was configured with line " << *output <<
 				" set to digital output, but the scaffold does not know the correct index into the NamedData. " <<
-				" Make sure there is an entry in the scalars with the correct string key.";
+				" Make sure there is an entry in the booleans with the correct string key.";
 
 			bool value;
 			if (outputData.booleans().get(index, &value))

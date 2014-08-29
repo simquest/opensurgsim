@@ -78,8 +78,10 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 			// Create the contact
 			normal = representationPlane->getPose().linear() * plane->getNormal();
 			std::pair<Location,Location> penetrationPoints;
-			penetrationPoints.first.globalPosition.setValue(meshVertex);
-			penetrationPoints.second.globalPosition.setValue(meshVertex - normal * d);
+			penetrationPoints.first.rigidLocalPosition.setValue(
+				representationTriangleMesh->getPose().inverse() * meshVertex);
+			penetrationPoints.second.rigidLocalPosition.setValue(
+				representationPlane->getPose().inverse() * (meshVertex - normal * d));
 
 			pair->addContact(-d, normal, penetrationPoints);
 		}
