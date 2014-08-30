@@ -61,28 +61,27 @@ const SurgSim::DataStructures::IndexedLocalCoordinate& Fem3DRepresentationLocali
 
 SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(double time)
 {
+	using SurgSim::Math::Vector3d;
+
 	auto femRepresentation = std::static_pointer_cast<Fem3DRepresentation>(getRepresentation());
 
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
 
 	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
-	const std::shared_ptr<SurgSim::Math::OdeState> previousState = femRepresentation->getPreviousState();
-	const std::shared_ptr<SurgSim::Math::OdeState> currentState = femRepresentation->getCurrentState();
+	const Vector3d currentPosition = femElement->computeCartesianCoordinate(*femRepresentation->getCurrentState(),
+		m_position.coordinate);
+	const Vector3d previousPosition = femElement->computeCartesianCoordinate(*femRepresentation->getPreviousState(),
+		m_position.coordinate);
 
 	if (time == 0.0)
 	{
-		return femElement->computeCartesianCoordinate(*previousState, m_position.coordinate);
+		return previousPosition;
 	}
 	else if (time == 1.0)
 	{
-		return femElement->computeCartesianCoordinate(*currentState, m_position.coordinate);
+		return currentPosition;
 	}
-
-	const SurgSim::Math::Vector& currentPosition = femElement->computeCartesianCoordinate(*previousState,
-		m_position.coordinate);
-	const SurgSim::Math::Vector& previousPosition = femElement->computeCartesianCoordinate(*currentState,
-		m_position.coordinate);
 
 	return previousPosition + time * (currentPosition - previousPosition);
 }
