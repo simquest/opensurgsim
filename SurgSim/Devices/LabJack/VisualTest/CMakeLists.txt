@@ -20,7 +20,6 @@ link_directories(
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${GLUT_INCLUDE_DIR}"
 )
 
 set(EXAMPLE_SOURCES
@@ -35,9 +34,16 @@ add_executable(LabJackVisualTest
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-set(LIBS LabJackDevice IdentityPoseDevice VisualTestCommon
-	SurgSimInput SurgSimFramework SurgSimDataStructures
-	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+set(LIBS
+	LabJackDevice
+	IdentityPoseDevice
+	VisualTestCommon
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
+	${Boost_LIBRARIES}
+	${OPENGL_LIBRARIES}
+)
 
 target_link_libraries(LabJackVisualTest ${LIBS})
 
