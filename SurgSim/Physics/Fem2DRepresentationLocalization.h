@@ -29,11 +29,6 @@ namespace Physics
 ///
 /// Fem2DRepresentationLocalization tracks the global coordinates of an IndexedLocalCoordinate associated with an
 /// Fem2DRepresentation.
-///
-/// Fem2DRepresentationLocalization stores a pointer to a Fem2DRepresentation in an abstract Representation object.  It
-/// holds an IndexedLocalCoordinate, which contains a barycentric coordinate and the ID of an FemElement associated
-/// with an Fem2DRepresentation, and it provides a helper function Fem2DRepresentationLocalization::calculatePosition to
-/// find the IndexedLocalCoordinate in coordinates in the current OdeState.
 class Fem2DRepresentationLocalization : public Localization
 {
 public:
