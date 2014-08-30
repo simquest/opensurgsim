@@ -272,10 +272,10 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 		coordinate.coordinate[i] = barycentricCoordinate[indices[i]];
 	}
 
-	// Fem3DRepresentationLocalization::setLocalPosition verifies argument based on its Representation.
-	auto result = std::make_shared<Fem3DRepresentationLocalization>();
-	result->setRepresentation(std::static_pointer_cast<SurgSim::Physics::Representation>(getSharedPtr()));
-	result->setLocalPosition(coordinate);
+	// Fem3DRepresentationLocalization will verify the coordinate (2nd parameter) based on
+	// the Fem3DRepresentation passed as 1st parameter.
+	auto result = std::make_shared<Fem3DRepresentationLocalization>(
+		std::static_pointer_cast<SurgSim::Physics::Representation>(getSharedPtr()), coordinate);
 
 	return result;
 }

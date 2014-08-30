@@ -33,19 +33,18 @@ namespace Physics
 class Fem3DRepresentationLocalization : public Localization
 {
 public:
-	/// Default constructor
-	Fem3DRepresentationLocalization();
-
 	/// Constructor
 	/// \param representation The representation to assign to this localization.
-	explicit Fem3DRepresentationLocalization(std::shared_ptr<Representation> representation);
+	/// \param localPosition The local position to set the localization at.
+	Fem3DRepresentationLocalization(std::shared_ptr<Representation> representation,
+									const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition);
 
 	/// Destructor
 	virtual ~Fem3DRepresentationLocalization();
 
 	/// Sets the local position.
-	/// \param p The local position to set the localization at.
-	void setLocalPosition(const SurgSim::DataStructures::IndexedLocalCoordinate& p);
+	/// \param localPosition The local position to set the localization at.
+	void setLocalPosition(const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition);
 
 	/// Gets the local position.
 	/// \return The local position set for this localization.

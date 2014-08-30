@@ -79,6 +79,21 @@ public:
 
 		m_fem->setInitialState(state);
 		m_fem->setIsActive(true);
+
+		m_validLocalPosition.index = 1;
+		m_validLocalPosition.coordinate = SurgSim::Math::Vector::Zero(2);
+		m_validLocalPosition.coordinate[0] = 0.4;
+		m_validLocalPosition.coordinate[1] = 0.6;
+
+		m_invalidIndexLocalPosition.index = 3;
+		m_validLocalPosition.coordinate = SurgSim::Math::Vector::Zero(2);
+		m_validLocalPosition.coordinate[0] = 0.4;
+		m_validLocalPosition.coordinate[1] = 0.6;
+
+		m_invalidCoordinateLocalPosition.index = 1;
+		m_invalidCoordinateLocalPosition.coordinate = SurgSim::Math::Vector::Zero(2);
+		m_invalidCoordinateLocalPosition.coordinate[0] = 0.6;
+		m_invalidCoordinateLocalPosition.coordinate[1] = 0.6;
 	}
 
 	void TearDown()
@@ -86,30 +101,47 @@ public:
 	}
 
 	std::shared_ptr<Fem1DRepresentation> m_fem;
+	SurgSim::DataStructures::IndexedLocalCoordinate m_validLocalPosition;
+	SurgSim::DataStructures::IndexedLocalCoordinate m_invalidIndexLocalPosition;
+	SurgSim::DataStructures::IndexedLocalCoordinate m_invalidCoordinateLocalPosition;
 };
 
 TEST_F(Fem1DRepresentationLocalizationTest, ConstructorTest)
 {
-	ASSERT_NO_THROW({
-		Fem1DRepresentationLocalization localization;
-	});
+	ASSERT_THROW(
+		std::make_shared<Fem1DRepresentationLocalization>(m_fem, m_invalidIndexLocalPosition),
+		SurgSim::Framework::AssertionFailure);
 
-	ASSERT_NO_THROW({
-		Fem1DRepresentationLocalization localization(m_fem);
-	});
+	ASSERT_THROW(
+		std::make_shared<Fem1DRepresentationLocalization>(m_fem, m_invalidCoordinateLocalPosition),
+		SurgSim::Framework::AssertionFailure);
+
+	ASSERT_NO_THROW(std::make_shared<Fem1DRepresentationLocalization>(m_fem, m_validLocalPosition););
 }
 
 TEST_F(Fem1DRepresentationLocalizationTest, SetGetRepresentation)
 {
-	Fem1DRepresentationLocalization localization;
+	Fem1DRepresentationLocalization localization(m_fem, m_validLocalPosition);
 
-	EXPECT_EQ(nullptr, localization.getRepresentation());
-
-	localization.setRepresentation(m_fem);
+	EXPECT_NE(nullptr, localization.getRepresentation());
 	EXPECT_EQ(m_fem, localization.getRepresentation());
+
+	EXPECT_EQ(1u, localization.getLocalPosition().index);
+	EXPECT_TRUE(localization.getLocalPosition().coordinate.isApprox(m_validLocalPosition.coordinate));
 
 	localization.setRepresentation(nullptr);
 	EXPECT_EQ(nullptr, localization.getRepresentation());
+	localization.setRepresentation(m_fem);
+	EXPECT_EQ(m_fem, localization.getRepresentation());
+
+	SurgSim::DataStructures::IndexedLocalCoordinate m_otherValidLocalPosition;
+	m_otherValidLocalPosition.index = 0;
+	m_otherValidLocalPosition.coordinate = SurgSim::Math::Vector::Zero(2);
+	m_otherValidLocalPosition.coordinate[1] = 1.0;
+
+	localization.setLocalPosition(m_otherValidLocalPosition);
+	EXPECT_EQ(m_otherValidLocalPosition.index, localization.getLocalPosition().index);
+	EXPECT_TRUE(localization.getLocalPosition().coordinate.isApprox(m_otherValidLocalPosition.coordinate));
 }
 
 TEST_F(Fem1DRepresentationLocalizationTest, SetGetLocalization)
@@ -118,15 +150,18 @@ TEST_F(Fem1DRepresentationLocalizationTest, SetGetLocalization)
 	using SurgSim::Math::Vector3d;
 
 	{
+		SCOPED_TRACE("Uninitialized Representation");
+
 		// Uninitialized Representation
-		auto localization = std::make_shared<Fem1DRepresentationLocalization>();
-		EXPECT_THROW(localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector2d(1.0, 0.0))),
+		EXPECT_THROW(std::make_shared<Fem1DRepresentationLocalization>(nullptr, m_validLocalPosition),
 			SurgSim::Framework::AssertionFailure);
 	}
 
 	{
+		SCOPED_TRACE("Incorrectly formed natural coordinate");
+
 		// Incorrectly formed natural coordinate
-		auto localization = std::make_shared<Fem1DRepresentationLocalization>(m_fem);
+		auto localization = std::make_shared<Fem1DRepresentationLocalization>(m_fem, m_validLocalPosition);
 		EXPECT_THROW(localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector2d(0.89, 0.54))),
 			SurgSim::Framework::AssertionFailure);
 
@@ -135,14 +170,18 @@ TEST_F(Fem1DRepresentationLocalizationTest, SetGetLocalization)
 	}
 
 	{
+		SCOPED_TRACE("Out of bounds element Id");
+
 		// Out of bounds element Id
-		auto localization = std::make_shared<Fem1DRepresentationLocalization>(m_fem);
+		auto localization = std::make_shared<Fem1DRepresentationLocalization>(m_fem, m_validLocalPosition);
 		EXPECT_THROW(localization->setLocalPosition(IndexedLocalCoordinate(6u, Vector2d(1.0, 0.0))),
 			SurgSim::Framework::AssertionFailure);
 	}
 
 	{
-		auto localization = std::make_shared<Fem1DRepresentationLocalization>(m_fem);
+		SCOPED_TRACE("valid");
+
+		auto localization = std::make_shared<Fem1DRepresentationLocalization>(m_fem, m_validLocalPosition);
 		EXPECT_NO_THROW(localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector2d(0.2, 0.8))));
 		EXPECT_EQ(1u, localization->getLocalPosition().index);
 		EXPECT_TRUE(Vector2d(0.2, 0.8).isApprox(localization->getLocalPosition().coordinate));
@@ -155,7 +194,7 @@ TEST_F(Fem1DRepresentationLocalizationTest, CalculatePositionTest)
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Vector2d;
 
-	auto localization = std::make_shared<Fem1DRepresentationLocalization>(m_fem);
+	auto localization = std::make_shared<Fem1DRepresentationLocalization>(m_fem, m_validLocalPosition);
 
 	// Test beam 1: nodes 0, 1
 	localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector2d(1.0, 0.0)));

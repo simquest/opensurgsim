@@ -25,15 +25,13 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem2DRepresentationLocalization::Fem2DRepresentationLocalization()
-{
-
-}
-
-Fem2DRepresentationLocalization::Fem2DRepresentationLocalization(std::shared_ptr<Representation> representation) :
+Fem2DRepresentationLocalization::Fem2DRepresentationLocalization(
+	std::shared_ptr<Representation> representation,
+	const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition) :
 	Localization()
 {
 	setRepresentation(representation);
+	setLocalPosition(localPosition);
 }
 
 Fem2DRepresentationLocalization::~Fem2DRepresentationLocalization()
@@ -41,17 +39,18 @@ Fem2DRepresentationLocalization::~Fem2DRepresentationLocalization()
 
 }
 
-void Fem2DRepresentationLocalization::setLocalPosition(const SurgSim::DataStructures::IndexedLocalCoordinate& p)
+void Fem2DRepresentationLocalization::setLocalPosition(
+	const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition)
 {
 	auto femRepresentation = std::static_pointer_cast<Fem2DRepresentation>(getRepresentation());
 
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
 
-	SURGSIM_ASSERT(femRepresentation->isValidCoordinate(p))
+	SURGSIM_ASSERT(femRepresentation->isValidCoordinate(localPosition))
 		<< "IndexedLocalCoordinate is invalid for Representation " << getRepresentation()->getName();
 
-	m_position = p;
+	m_position = localPosition;
 }
 
 const SurgSim::DataStructures::IndexedLocalCoordinate& Fem2DRepresentationLocalization::getLocalPosition() const

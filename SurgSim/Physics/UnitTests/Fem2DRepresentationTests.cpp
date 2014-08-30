@@ -132,16 +132,16 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 	auto element2 = std::make_shared<Fem2DElementTriangle>(element2NodeIds);
 	fem->addFemElement(element2);
 
-	auto wrongLocalizationType = std::make_shared<MockLocalization>();
-	auto uninitializedLocalization = std::make_shared<Fem2DRepresentationLocalization>();
-	auto localization = std::make_shared<Fem2DRepresentationLocalization>();
 	SurgSim::DataStructures::IndexedLocalCoordinate femRepCoordinate;
 	femRepCoordinate.index = 0;
 	femRepCoordinate.coordinate = SurgSim::Math::Vector::Zero(3);
 	femRepCoordinate.coordinate[0] = 1.0;
-	localization->setRepresentation(fem);
-	localization->setLocalPosition(femRepCoordinate);
+	auto localization = std::make_shared<Fem2DRepresentationLocalization>(fem, femRepCoordinate);
+	auto wrongLocalizationType = std::make_shared<MockLocalization>();
 
+	Vector FLocalWrongSize = Vector::Ones(2 * fem->getNumDofPerNode());
+	Matrix KLocalWrongSize = Matrix::Ones(3 * fem->getNumDofPerNode(), 3 * fem->getNumDofPerNode());
+	Matrix DLocalWrongSize = Matrix::Ones(4 * fem->getNumDofPerNode(), 4 * fem->getNumDofPerNode());
 	Vector Flocal = Vector::LinSpaced(fem->getNumDofPerNode(), -3.12, 4.09);
 	Matrix Klocal = Matrix::Ones(fem->getNumDofPerNode(), fem->getNumDofPerNode()) * 0.34;
 	Matrix Dlocal = Klocal + Matrix::Identity(fem->getNumDofPerNode(), fem->getNumDofPerNode());
@@ -162,10 +162,16 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 		SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(fem->addExternalGeneralizedForce(wrongLocalizationType, Flocal, Klocal, Dlocal),
 		SurgSim::Framework::AssertionFailure);
-	// Test uninitialized localization
-	ASSERT_THROW(fem->addExternalGeneralizedForce(uninitializedLocalization, Flocal),
+	// Test invalid force size
+	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, FLocalWrongSize),
 		SurgSim::Framework::AssertionFailure);
-	ASSERT_THROW(fem->addExternalGeneralizedForce(uninitializedLocalization, Flocal, Klocal, Dlocal),
+	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, FLocalWrongSize, Klocal, Dlocal),
+		SurgSim::Framework::AssertionFailure);
+	// Test invalid stiffness size
+	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, Flocal, KLocalWrongSize, Dlocal),
+		SurgSim::Framework::AssertionFailure);
+	// Test invalid damping size
+	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, Flocal, Klocal, DLocalWrongSize),
 		SurgSim::Framework::AssertionFailure);
 
 	// Test valid call to addExternalGeneralizedForce
