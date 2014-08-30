@@ -75,34 +75,25 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 										 const SurgSim::Math::Matrix& D)
 {
 	const size_t dofPerNode = getNumDofPerNode();
+	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
+
+	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
+	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
+		"Generalized force has an invalid size of " << generalizedForce.size() << ". Expected " << dofPerNode;
+	SURGSIM_ASSERT(K.size() == 0 || (K.rows() == expectedSize && K.cols() == expectedSize)) <<
+		"Stiffness matrix K has an invalid size (" << K.rows() << "," << K.cols() <<
+		") was expecting a square matrix of size " << dofPerNode;
+	SURGSIM_ASSERT(D.size() == 0 || (D.rows() == expectedSize && D.cols() == expectedSize)) <<
+		"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
+		") was expecting a square matrix of size " << dofPerNode;
 
 	std::shared_ptr<Fem1DRepresentationLocalization> localization1D =
 		std::dynamic_pointer_cast<Fem1DRepresentationLocalization>(localization);
 	SURGSIM_ASSERT(localization1D != nullptr) << "Invalid localization type (not a Fem1DRepresentationLocalization)";
 
 	const size_t elementId = localization1D->getLocalPosition().index;
-	SURGSIM_ASSERT(elementId >= 0 && elementId < getNumFemElements()) << "Invalid elementId " << elementId <<
-		". Valid range is {0.." << getNumFemElements() << "}";
-
 	const SurgSim::Math::Vector& coordinate = localization1D->getLocalPosition().coordinate;
-	SURGSIM_ASSERT(coordinate.size() > 0) << "Invalid (empty) coordinate vector";
-
 	std::shared_ptr<FemElement> element = getFemElement(elementId);
-	SURGSIM_ASSERT(element != nullptr) << "Invalid element (nullptr) for elementId " << elementId;
-	const size_t elementNumNodes = element->getNodeIds().size();
-	SURGSIM_ASSERT(static_cast<const SurgSim::Math::Vector::Index>(elementNumNodes) == coordinate.size()) <<
-		"Mismatch coordinate size (" << coordinate.size() << ") and element size " << elementNumNodes;
-
-	SURGSIM_ASSERT(K.size() == 0 ||
-		(K.rows() == static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode) &&
-		K.cols() == static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode))) <<
-		"Stiffness matrix has an invalid size (" << K.rows() << "," << K.cols() <<
-		") was expecting a square matrix of size " << dofPerNode;
-	SURGSIM_ASSERT(D.size() == 0 ||
-		(D.rows() == static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode) &&
-		D.cols() == static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode))) <<
-		"Damping matrix has an invalid size (" << D.rows() << "," << D.cols() <<
-		") was expecting a square matrix of size " << dofPerNode;
 
 	size_t index = 0;
 	for (auto nodeId : element->getNodeIds())
