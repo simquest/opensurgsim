@@ -25,15 +25,16 @@ add_executable(TrackIRVisualTest
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-set(LIBS IdentityPoseDevice
-		 TrackIRDevice  
-		 VisualTestCommon
-		 SurgSimDataStructures
-		 SurgSimFramework 
-		 SurgSimInput 
-		 ${GLUT_LIBRARIES}
-		 ${OPENGL_LIBRARIES}
-		 ${OPTITRACK_LIBRARY})
+set(LIBS
+	IdentityPoseDevice
+	TrackIRDevice  
+	VisualTestCommon
+	SurgSimDataStructures
+	SurgSimFramework 
+	SurgSimInput 
+	${OPENGL_LIBRARIES}
+	${OPTITRACK_LIBRARY}
+)
 
 target_link_libraries(TrackIRVisualTest ${LIBS})
 

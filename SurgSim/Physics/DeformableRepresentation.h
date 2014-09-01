@@ -88,6 +88,15 @@ public:
 											 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 											 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) = 0;
 
+	/// \return the external generalized force vector
+	const SurgSim::Math::Vector& getExternalGeneralizedForce() const;
+
+	/// \return the external generalized stiffness matrix
+	const SurgSim::Math::Matrix& getExternalGeneralizedStiffness() const;
+
+	/// \return the external generalized damping matrix
+	const SurgSim::Math::Matrix& getExternalGeneralizedDamping() const;
+
 	/// Gets the compliance matrix associated with motion
 	/// \return The compliance matrix
 	/// \note The compliance matrix is computed automatically by the ode solver in the method 'update'

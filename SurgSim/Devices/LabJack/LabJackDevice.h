@@ -45,7 +45,7 @@ enum TIMER
 	TIMER5
 };
 
-enum FIO
+enum FIO_LINE
 {
 	FIO0,
 	FIO1,
@@ -54,22 +54,34 @@ enum FIO
 	FIO4,
 	FIO5,
 	FIO6,
-	FIO7,
-	FIO8,
-	FIO9,
-	FIO10,
-	FIO11,
-	FIO12,
-	FIO13,
-	FIO14,
-	FIO15,
-	FIO16,
-	FIO17,
-	FIO18,
-	FIO19,
-	FIO20,
-	FIO21,
-	FIO22
+	FIO7
+};
+
+enum EIO_LINE
+{
+	EIO0 = 8,
+	EIO1,
+	EIO2,
+	EIO3,
+	EIO4,
+	EIO5,
+	EIO6,
+	EIO7
+};
+
+enum CIO_LINE
+{
+	CIO0 = 16,
+	CIO1,
+	CIO2,
+	CIO3
+};
+
+enum MIO_LINE
+{
+	MIO0 = 20,
+	MIO1,
+	MIO2
 };
 
 enum AIN

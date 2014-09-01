@@ -51,8 +51,11 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
 
 	// Again this replicates the way this is calculated in the contact calculation just with different
 	// starting values
-	Vector3d spherePenetration = sphereTrans - expectedNorm * sphere->getRadius();
-	Vector3d planePenetration = sphereTrans - expectedNorm * (sphere->getRadius() - expectedDepth);
+	Vector3d sphereLocalNormal = sphereQuat.inverse() * expectedNorm;
+	Vector3d spherePenetration = -sphereLocalNormal * sphere->getRadius();
+	Vector3d planePenetration = -sphereLocalNormal * (sphere->getRadius() - expectedDepth);
+	planePenetration = (sphereQuat * planePenetration) + sphereTrans;
+	planePenetration = planeQuat.inverse() * (planePenetration - planeTrans);
 
 	calcNormal.calculateContact(pair);
 	if (expectedIntersect)
@@ -61,12 +64,12 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
 		std::shared_ptr<Contact> contact = pair->getContacts().front();
 		EXPECT_NEAR(expectedDepth, contact->depth, SurgSim::Math::Geometry::DistanceEpsilon);
 		EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal));
-		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
-		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
+		EXPECT_TRUE(contact->penetrationPoints.first.rigidLocalPosition.hasValue());
+		EXPECT_TRUE(contact->penetrationPoints.second.rigidLocalPosition.hasValue());
 		EXPECT_TRUE(eigenEqual(spherePenetration,
-							   contact->penetrationPoints.first.globalPosition.getValue()));
+							   contact->penetrationPoints.first.rigidLocalPosition.getValue()));
 		EXPECT_TRUE(eigenEqual(planePenetration,
-							   contact->penetrationPoints.second.globalPosition.getValue()));
+							   contact->penetrationPoints.second.rigidLocalPosition.getValue()));
 	}
 	else
 	{

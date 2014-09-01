@@ -170,8 +170,9 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 
 		double distance = (deepestCapsulePoint - deepestBoxPoint).dot(normal);
 		std::pair<Location, Location> penetrationPoints;
-		penetrationPoints.first.globalPosition.setValue(boxPose * deepestBoxPoint);
-		penetrationPoints.second.globalPosition.setValue(boxPose * deepestCapsulePoint);
+		penetrationPoints.first.rigidLocalPosition.setValue(deepestBoxPoint);
+		penetrationPoints.second.rigidLocalPosition.setValue(
+			capsuleRepresentation->getPose().inverse() * boxPose * deepestCapsulePoint);
 		pair->addContact(distance, boxPose.linear() * normal, penetrationPoints);
 	}
 }

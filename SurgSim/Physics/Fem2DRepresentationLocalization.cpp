@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
+#include "SurgSim/Physics/Fem2DRepresentationLocalization.h"
 
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
 
 namespace SurgSim
@@ -25,7 +25,7 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DRepresentationLocalization::Fem3DRepresentationLocalization(
+Fem2DRepresentationLocalization::Fem2DRepresentationLocalization(
 	std::shared_ptr<Representation> representation,
 	const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition) :
 	Localization()
@@ -34,15 +34,15 @@ Fem3DRepresentationLocalization::Fem3DRepresentationLocalization(
 	setLocalPosition(localPosition);
 }
 
-Fem3DRepresentationLocalization::~Fem3DRepresentationLocalization()
+Fem2DRepresentationLocalization::~Fem2DRepresentationLocalization()
 {
 
 }
 
-void Fem3DRepresentationLocalization::setLocalPosition(
+void Fem2DRepresentationLocalization::setLocalPosition(
 	const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition)
 {
-	auto femRepresentation = std::static_pointer_cast<Fem3DRepresentation>(getRepresentation());
+	auto femRepresentation = std::static_pointer_cast<Fem2DRepresentation>(getRepresentation());
 
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
@@ -53,16 +53,16 @@ void Fem3DRepresentationLocalization::setLocalPosition(
 	m_position = localPosition;
 }
 
-const SurgSim::DataStructures::IndexedLocalCoordinate& Fem3DRepresentationLocalization::getLocalPosition() const
+const SurgSim::DataStructures::IndexedLocalCoordinate& Fem2DRepresentationLocalization::getLocalPosition() const
 {
 	return m_position;
 }
 
-SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(double time)
+SurgSim::Math::Vector3d Fem2DRepresentationLocalization::doCalculatePosition(double time)
 {
 	using SurgSim::Math::Vector3d;
 
-	auto femRepresentation = std::static_pointer_cast<Fem3DRepresentation>(getRepresentation());
+	auto femRepresentation = std::static_pointer_cast<Fem2DRepresentation>(getRepresentation());
 
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
@@ -85,9 +85,9 @@ SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(dou
 	return previousPosition + time * (currentPosition - previousPosition);
 }
 
-bool Fem3DRepresentationLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
+bool Fem2DRepresentationLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
 {
-	auto femRepresentation = std::dynamic_pointer_cast<Fem3DRepresentation>(representation);
+	auto femRepresentation = std::dynamic_pointer_cast<Fem2DRepresentation>(representation);
 
 	// Allows to reset the representation to nullptr ...
 	return (femRepresentation != nullptr || representation == nullptr);

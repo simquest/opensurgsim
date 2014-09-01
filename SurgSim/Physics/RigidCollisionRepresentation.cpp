@@ -32,7 +32,7 @@ RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& na
 	Representation(name)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
-									  CollisionShape, getShape, setShape);
+									  Shape, getShape, setShape);
 }
 
 RigidCollisionRepresentation::~RigidCollisionRepresentation()

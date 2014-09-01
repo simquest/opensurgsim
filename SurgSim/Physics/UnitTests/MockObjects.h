@@ -159,10 +159,6 @@ public:
 		const SurgSim::Math::Matrix& K,
 		const SurgSim::Math::Matrix& D) override;
 
-	const SurgSim::Math::Vector& getExternalForce() const { return m_externalGeneralizedForce; }
-	const SurgSim::Math::Matrix& getExternalStiffness() const { return m_externalGeneralizedStiffness; }
-	const SurgSim::Math::Matrix& getExternalDamping() const { return m_externalGeneralizedDamping; }
-
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
 	virtual Vector& computeF(const OdeState& state) override;
@@ -308,18 +304,6 @@ public:
 	explicit MockFem1DRepresentation(const std::string& name);
 
 	const std::shared_ptr<OdeSolver> getOdeSolver() const;
-};
-
-class MockFem3DRepresentation : public SurgSim::Physics::Fem3DRepresentation
-{
-public:
-	MockFem3DRepresentation() : SurgSim::Physics::Fem3DRepresentation("Fem3D")
-	{
-	}
-
-	const SurgSim::Math::Vector& getExternalForce() const { return m_externalGeneralizedForce; }
-	const SurgSim::Math::Matrix& getExternalStiffness() const { return m_externalGeneralizedStiffness; }
-	const SurgSim::Math::Matrix& getExternalDamping() const { return m_externalGeneralizedDamping; }
 };
 
 class MockFixedConstraintBilateral3D : public ConstraintImplementation

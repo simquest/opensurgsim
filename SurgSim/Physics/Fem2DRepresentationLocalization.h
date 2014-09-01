@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEM3DREPRESENTATIONLOCALIZATION_H
-#define SURGSIM_PHYSICS_FEM3DREPRESENTATIONLOCALIZATION_H
+#ifndef SURGSIM_PHYSICS_FEM2DREPRESENTATIONLOCALIZATION_H
+#define SURGSIM_PHYSICS_FEM2DREPRESENTATIONLOCALIZATION_H
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Physics/Localization.h"
@@ -25,26 +25,25 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Implementation of Localization for Fem3DRepresentation
+/// Implementation of Localization for Fem2DRepresentation
 ///
-/// Fem3DRepresentationLocalization tracks the global coordinates of an IndexedLocalCoordinate associated with an
-/// Fem3DRepresentation.  It is used, for example, as a helper class for filling out the MlcpPhysicsProblem in
-/// Fem3DRepresentationContact::doBuild, which constrains the motion of Fem3DRepresentation at a frictionless contact.
-class Fem3DRepresentationLocalization : public Localization
+/// Fem2DRepresentationLocalization tracks the global coordinates of an IndexedLocalCoordinate associated with an
+/// Fem2DRepresentation.
+class Fem2DRepresentationLocalization : public Localization
 {
 public:
 	/// Constructor
 	/// \param representation The representation to assign to this localization.
-	/// \param localPosition The local position to set the localization at.
-	Fem3DRepresentationLocalization(std::shared_ptr<Representation> representation,
-									const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition);
+	/// \param localCoordinate The indexed local coordinate relative to the representation.
+	Fem2DRepresentationLocalization(std::shared_ptr<Representation> representation,
+									const SurgSim::DataStructures::IndexedLocalCoordinate& localCoordinate);
 
 	/// Destructor
-	virtual ~Fem3DRepresentationLocalization();
+	virtual ~Fem2DRepresentationLocalization();
 
 	/// Sets the local position.
-	/// \param localPosition The local position to set the localization at.
-	void setLocalPosition(const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition);
+	/// \param localCoordinate The local position to set the localization at.
+	void setLocalPosition(const SurgSim::DataStructures::IndexedLocalCoordinate& localCoordinate);
 
 	/// Gets the local position.
 	/// \return The local position set for this localization.
@@ -70,4 +69,4 @@ private:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEM3DREPRESENTATIONLOCALIZATION_H
+#endif // SURGSIM_PHYSICS_FEM2DREPRESENTATIONLOCALIZATION_H
