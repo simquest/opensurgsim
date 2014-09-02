@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 	}
 	inputManager->addDevice(device);
 
-	YAML::Node node = YAML::LoadFile("Data/Stapling/StaplingDemo.yaml");
+	YAML::Node node = YAML::LoadFile("Data/StaplingDemo.yaml");
 
 	runtime->getScene()->decode(node);
 

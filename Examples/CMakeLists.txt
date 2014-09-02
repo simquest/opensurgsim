@@ -16,7 +16,6 @@
 if(BUILD_DEVICE_MULTIAXIS)
 	add_subdirectory(AddSphereFromInput)
 	add_subdirectory(ExampleStapling)
-	add_subdirectory(SerializableStapling)
 endif(BUILD_DEVICE_MULTIAXIS)
 
 if(BUILD_DEVICE_MULTIAXIS OR BUILD_DEVICE_NOVINT)

@@ -21,7 +21,6 @@ include_directories(
 set(EXAMPLESTAPLING_SOURCES
 	StapleElement.cpp
 	StaplerBehavior.cpp
-	StaplingExample.cpp
 )
 
 set(EXAMPLESTAPLING_HEADERS
@@ -30,29 +29,19 @@ set(EXAMPLESTAPLING_HEADERS
 )
 
 add_executable(ExampleStapling
-	${EXAMPLESTAPLING_SOURCES} ${EXAMPLESTAPLING_HEADERS}
-)
-
-set(SURGSIMEXAMPLESTAPLING_SOURCES
-	StapleElement.cpp
-	StaplerBehavior.cpp
 	StaplingExample.cpp
+	${EXAMPLESTAPLING_SOURCES}
+	${EXAMPLESTAPLING_HEADERS}
 )
 
-set(SURGSIMEXAMPLESTAPLING_HEADERS
-	StapleElement.h
-	StaplerBehavior.h
-)
-
-surgsim_add_library(
-	SurgSimExampleStapling
-	${SURGSIMEXAMPLESTAPLING_SOURCES}
-	${SURGSIMEXAMPLESTAPLING_HEADERS}
-	"Examples/ExampleStapling"
+add_executable(SerializableStapling
+	SerializableStapling.cpp
+	${EXAMPLESTAPLING_SOURCES}
+	${EXAMPLESTAPLING_HEADERS}
 )
 
 surgsim_show_ide_folders(
-	"${EXAMPLESTAPLING_SOURCES}" "${EXAMPLESTAPLING_HEADERS}")
+	"StaplingExample.cpp SerializableStapling.cpp ${EXAMPLESTAPLING_SOURCES}" "${EXAMPLESTAPLING_HEADERS}")
 
 set(LIBS 
 	IdentityPoseDevice
@@ -72,6 +61,8 @@ configure_file(
 )
 
 target_link_libraries(ExampleStapling ${LIBS})
+target_link_libraries(SerializableStapling ${LIBS})
 
 # Put ExampleStapling into folder "Examples"
 set_target_properties(ExampleStapling PROPERTIES FOLDER "Examples") 
+set_target_properties(SerializableStapling PROPERTIES FOLDER "Examples") 
