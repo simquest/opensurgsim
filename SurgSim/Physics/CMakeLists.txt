@@ -29,9 +29,11 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem1DElementBeam.cpp
 	Fem1DPlyReaderDelegate.cpp
 	Fem1DRepresentation.cpp
+	Fem1DRepresentationLocalization.cpp
 	Fem2DElementTriangle.cpp
 	Fem2DPlyReaderDelegate.cpp
 	Fem2DRepresentation.cpp
+	Fem2DRepresentationLocalization.cpp
 	Fem3DElementCorotationalTetrahedron.cpp
 	Fem3DElementCube.cpp
 	Fem3DElementTetrahedron.cpp
@@ -89,9 +91,11 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem1DElementBeam.h
 	Fem1DPlyReaderDelegate.h
 	Fem1DRepresentation.h
+	Fem1DRepresentationLocalization.h
 	Fem2DElementTriangle.h
 	Fem2DPlyReaderDelegate.h
 	Fem2DRepresentation.h
+	Fem2DRepresentationLocalization.h
 	Fem3DElementCorotationalTetrahedron.h
 	Fem3DElementCube.h
 	Fem3DElementTetrahedron.h

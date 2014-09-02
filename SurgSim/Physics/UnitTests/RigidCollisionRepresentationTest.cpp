@@ -119,8 +119,8 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 	{
 		SCOPED_TRACE("RigidCollisionRepresenation uses a shape directly.");
 		auto rigidCollisionRepresentation = std::make_shared<RigidCollisionRepresentation>("CollisionRepresentation");
-		auto boxShape = std::make_shared<SurgSim::Math::BoxShape>(0.1, 0.1, 0.1);
-		rigidCollisionRepresentation->setShape(boxShape);
+		std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SurgSim::Math::BoxShape>(0.1, 0.1, 0.1);
+		rigidCollisionRepresentation->setValue("Shape", shape);
 
 		YAML::Node node;
 		ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*rigidCollisionRepresentation));
@@ -133,8 +133,12 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 								node.as<std::shared_ptr<SurgSim::Framework::Component>>())
 					   );
 		EXPECT_EQ("SurgSim::Physics::RigidCollisionRepresentation", newRepresentation->getClassName());
+		auto boxShape = std::dynamic_pointer_cast<SurgSim::Math::BoxShape>(shape);
+		auto newBoxShape = std::dynamic_pointer_cast<SurgSim::Math::BoxShape>(
+							newRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
+		ASSERT_NE(nullptr, newBoxShape);
+
 		EXPECT_EQ(boxShape->getType(), newRepresentation->getShapeType());
-		auto newBoxShape = std::dynamic_pointer_cast<SurgSim::Math::BoxShape>(newRepresentation->getShape());
 		EXPECT_TRUE(boxShape->getSize().isApprox(newBoxShape->getSize()));
 		EXPECT_TRUE(boxShape->getCenter().isApprox(newBoxShape->getCenter()));
 		EXPECT_TRUE(boxShape->getSecondMomentOfVolume().isApprox(newBoxShape->getSecondMomentOfVolume()));
@@ -157,7 +161,11 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 					   );
 		EXPECT_EQ("SurgSim::Physics::RigidCollisionRepresentation", newRepresentation->getClassName());
 		EXPECT_EQ(m_sphereShape->getType(), newRepresentation->getShapeType());
-		auto newShpereShape = std::dynamic_pointer_cast<SurgSim::Math::SphereShape>(newRepresentation->getShape());
+
+		auto newShpereShape = std::dynamic_pointer_cast<SurgSim::Math::SphereShape>(
+			newRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
+		ASSERT_NE(nullptr, newShpereShape);
+
 		EXPECT_TRUE(m_sphereShape->getCenter().isApprox(newShpereShape->getCenter()));
 		EXPECT_TRUE(m_sphereShape->getSecondMomentOfVolume().isApprox(newShpereShape->getSecondMomentOfVolume()));
 		EXPECT_DOUBLE_EQ(m_sphereShape->getVolume(), newShpereShape->getVolume());
