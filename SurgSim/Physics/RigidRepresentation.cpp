@@ -22,6 +22,11 @@
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
+namespace
+{
+const double rotationVectorEpsilon = 1e-8;
+};
+
 namespace SurgSim
 {
 namespace Physics
@@ -99,21 +104,23 @@ void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 		double oneMinusCos = 1.0 - cosAngle;
 		const Matrix33d skewAxis = SurgSim::Math::makeSkewSymmetricMatrix(axis);
 
-		Matrix33d dRdAngle;
-		Matrix33d dRdAxisX, dRdAxisY, dRdAxisZ;
-		dRdAngle = -sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * axis * axis.transpose();
+		Matrix33d dRdAxisX;
+		Matrix33d dRdAxisY;
+		Matrix33d dRdAxisZ;
+		Matrix33d dRdAngle =
+			-sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * axis * axis.transpose();
 		dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos * axis[1], oneMinusCos * axis[2],
-			oneMinusCos * axis[1], 0.0, -sinAngle,
-			oneMinusCos * axis[2], sinAngle, 0.0;
+					oneMinusCos * axis[1], 0.0, -sinAngle,
+					oneMinusCos * axis[2], sinAngle, 0.0;
 		dRdAxisY << 0.0, oneMinusCos * axis[0], sinAngle,
-			oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos * axis[2],
-			-sinAngle, oneMinusCos * axis[2], 0.0;
+					oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos * axis[2],
+					-sinAngle, oneMinusCos * axis[2], 0.0;
 		dRdAxisZ << 0.0, -sinAngle, oneMinusCos * axis[0],
-			sinAngle, 0.0, oneMinusCos * axis[1],
-			oneMinusCos * axis[0], oneMinusCos * axis[1], oneMinusCos * 2.0 * axis[2];
+					sinAngle, 0.0, oneMinusCos * axis[1],
+					oneMinusCos * axis[0], oneMinusCos * axis[1], oneMinusCos * 2.0 * axis[2];
 
 		Vector3d dAngledRotationVector, dAxisXdRotationVector, dAxisYdRotationVector, dAxisZdRotationVector;
-		if (std::abs(rotationVectorNorm) > 1e-8)
+		if (std::abs(rotationVectorNorm) > rotationVectorEpsilon)
 		{
 			const Vector3d tmp = rotationVector / rotationVectorNormCubic;
 			dAngledRotationVector = rotationVector / rotationVectorNorm;
@@ -149,15 +156,15 @@ void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			K->block<3, 1>(3, column) += lever.cross(K->block<3, 1>(0, column));
 		}
 		// add extra term - dCP/dW[alpha] ^ F = - dR.CP(local)/dW[alpha] ^ F = -dR/dW[alpha].CP(local) ^ F
-		//   -[(dR/dangle.dangle/dW[alpha] + dR/daxisX.daxisX/dW[alpha] +
+		// = -[(dR/dangle.dangle/dW[alpha] + dR/daxisX.daxisX/dW[alpha] +
 		//      dR/daxisY.daxisY/dW[alpha] + dR/daxisZ.daxisZ/dW[alpha]) . CP(local)] ^ F
-		for (size_t axis = 0; axis < 3; ++axis)
+		for (size_t i = 0; i < 3; ++i)
 		{
-			K->block<3, 1>(3, 3 + axis) +=
-				-((dRdAngle * dAngledRotationVector[axis] +
-				dRdAxisX * dAxisXdRotationVector[axis] +
-				dRdAxisY * dAxisYdRotationVector[axis] +
-				dRdAxisZ * dAxisZdRotationVector[axis]) * leverInLocalSpace).cross(force);
+			K->block<3, 1>(3, 3 + i) +=
+				-((dRdAngle * dAngledRotationVector[i] +
+				dRdAxisX * dAxisXdRotationVector[i] +
+				dRdAxisY * dAxisYdRotationVector[i] +
+				dRdAxisZ * dAxisZdRotationVector[i]) * leverInLocalSpace).cross(force);
 		}
 		m_externalGeneralizedStiffness += *K;
 	}

@@ -59,9 +59,9 @@ public:
 	void setAngularVelocity(const SurgSim::Math::Vector3d& angularVelocity);
 
 	/// Add an external generalized force applied to the rigid representation's mass center.
-	/// Note this force is generalized (i.e. it's a 6D vector, containing both 3D force and 3D torque). <br>
-	/// Note the stiffness and damping are 6x6 matrices with coupling between the translational and rotation dof. <br>
-	/// Note this generalized force will be zeroed every afterUpdate call of the rigid representation. <br>
+	/// \note this force is generalized (i.e. it's a 6D vector, containing both 3D force and 3D torque).
+	/// \note the stiffness and damping are 6x6 matrices with coupling between the translational and rotation dof.
+	/// \note this generalized force will be zeroed every afterUpdate call of the rigid representation.
 	/// \param generalizedForce The external generalized force to apply at the mass center
 	/// \param K The stiffness matrix associated with the generalized force (jacobian of the force w.r.t position)
 	/// \param D The damping matrix associated with the generalized force (jacobian of the force w.r.t velocity)
@@ -70,9 +70,9 @@ public:
 									 const SurgSim::Math::Matrix66d& D = SurgSim::Math::Matrix66d::Zero());
 
 	/// Add an external generalized force applied to the rigid representation (anywhere).
-	/// Note this force is generalized (i.e. it's a 6D vector, containing both 3D force and 3D torque). <br>
-	/// Note the stiffness and damping are 6x6 matrices with coupling between the translational and rotation dof. <br>
-	/// Note all external generalized forces will be zeroed every afterUpdate call of the rigid representation. <br>
+	/// \note This force is generalized (i.e. it's a 6D vector, containing both 3D force and 3D torque).
+	/// \note The stiffness and damping are 6x6 matrices with coupling between the translational and rotation dof.
+	/// \note All external generalized forces will be zeroed every afterUpdate call of the rigid representation.
 	/// \param localization The application point
 	/// \param [in,out] generalizedForce The external generalized force
 	/// \param [in,out] K The stiffness matrix associated with generalizedForce (jacobian w.r.t position)
