@@ -40,7 +40,7 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-add_executable(ExampleBouncingBalls
+add_executable(ExampleDroppingBalls
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
@@ -53,7 +53,7 @@ SET(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-target_link_libraries(ExampleBouncingBalls ${LIBS})
+target_link_libraries(ExampleDroppingBalls ${LIBS})
 
-# Put ExampleBouncingBalls into folder "Examples"
-set_target_properties(ExampleBouncingBalls PROPERTIES FOLDER "Examples") 
+# Put ExampleDroppingBalls into folder "Examples"
+set_target_properties(ExampleDroppingBalls PROPERTIES FOLDER "Examples") 

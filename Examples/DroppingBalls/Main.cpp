@@ -45,7 +45,7 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-#include "Examples/BouncingBalls/AddRandomSphereBehavior.h"
+#include "Examples/DroppingBalls/AddRandomSphereBehavior.h"
 
 using SurgSim::Blocks::AddRandomSphereBehavior;
 using SurgSim::Framework::BasicSceneElement;

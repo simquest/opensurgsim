@@ -22,6 +22,6 @@ if(BUILD_DEVICE_MULTIAXIS OR BUILD_DEVICE_NOVINT)
 	add_subdirectory(InputVtc)
 endif(BUILD_DEVICE_MULTIAXIS OR BUILD_DEVICE_NOVINT)
 
-add_subdirectory(BouncingBalls)
+add_subdirectory(DroppingBalls)
 
 add_subdirectory(GraphicsScene)
