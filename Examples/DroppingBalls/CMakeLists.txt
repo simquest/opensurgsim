@@ -23,12 +23,12 @@ include_directories(
 	${OPENTHREADS_INCLUDE_DIR}
 )
 
-set(EXAMPLE_SOURCES
+set(SOURCES
 	AddRandomSphereBehavior.cpp
 	Main.cpp
 )
 
-set(EXAMPLE_HEADERS
+set(HEADERS
 	AddRandomSphereBehavior.h
 )
 
@@ -40,10 +40,8 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-add_executable(ExampleDroppingBalls
-	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-surgsim_show_ide_folders(
-	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+add_executable(DroppingBalls ${SOURCES} ${HEADERS})
+surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
 
 SET(LIBS
 	SurgSimBlocks
@@ -53,7 +51,7 @@ SET(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-target_link_libraries(ExampleDroppingBalls ${LIBS})
+target_link_libraries(DroppingBalls ${LIBS})
 
-# Put ExampleDroppingBalls into folder "Examples"
-set_target_properties(ExampleDroppingBalls PROPERTIES FOLDER "Examples") 
+# Put DroppingBalls into folder "Examples"
+set_target_properties(DroppingBalls PROPERTIES FOLDER "Examples") 

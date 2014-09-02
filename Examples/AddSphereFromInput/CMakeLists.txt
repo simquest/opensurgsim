@@ -26,22 +26,17 @@ include_directories(
 	${OPENTHREADS_INCLUDE_DIR}
 )
 
-set(ADDSPHEREFROMINPUT_EXAMPLE_SOURCE
+set(SOURCES
 	AddSphereBehavior.cpp
 	Main.cpp
 )
 
-
-set(ADDSPHEREFROMINPUT_EXAMPLE_HEADER
+set(HEADERS
 	AddSphereBehavior.h
 )
 
-add_executable(ExampleAddSphereFromInput
-	${ADDSPHEREFROMINPUT_EXAMPLE_SOURCE}
-	${ADDSPHEREFROMINPUT_EXAMPLE_HEADER})
-
-surgsim_show_ide_folders(
-"${ADDSPHEREFROMINPUT_EXAMPLE_SOURCE}" "${ADDSPHEREFROMINPUT_EXAMPLE_HEADER}")
+add_executable(AddSphereFromInput ${SOURCES} ${HEADERS})
+surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
 
 set(LIBS 
 	MultiAxisDevice
@@ -51,8 +46,7 @@ set(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-target_link_libraries(ExampleAddSphereFromInput ${LIBS}
-)
+target_link_libraries(AddSphereFromInput ${LIBS})
 
-# Put ExampleAddSphereFromInput into folder "Examples"
-set_target_properties(ExampleAddSphereFromInput PROPERTIES FOLDER "Examples") 
+# Put AddSphereFromInput into folder "Examples"
+set_target_properties(AddSphereFromInput PROPERTIES FOLDER "Examples") 

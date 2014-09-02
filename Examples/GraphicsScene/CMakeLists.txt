@@ -26,11 +26,11 @@ include_directories(
 	"${OPENTHREADS_INCLUDE_DIR}"
 )
 
-set(EXAMPLE_SOURCES
+set(SOURCES
 	Main.cpp
 )
 
-set(EXAMPLE_HEADERS
+set(HEADERS
 )
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -41,10 +41,8 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-add_executable(ExampleGraphicsScene
-	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-surgsim_show_ide_folders(
-	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+add_executable(GraphicsScene ${SOURCES} ${HEADERS})
+surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
 
 SET(LIBS
 	SurgSimBlocks
@@ -52,7 +50,7 @@ SET(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-target_link_libraries(ExampleGraphicsScene ${LIBS})
+target_link_libraries(GraphicsScene ${LIBS})
 
-# Put ExampleGraphicsScene into folder "Examples"
-set_target_properties(ExampleGraphicsScene PROPERTIES FOLDER "Examples") 
+# Put GraphicsScene into folder "Examples"
+set_target_properties(GraphicsScene PROPERTIES FOLDER "Examples") 

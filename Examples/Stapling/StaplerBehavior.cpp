@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Examples/ExampleStapling/StaplerBehavior.h"
+#include "Examples/Stapling/StaplerBehavior.h"
 
 #include <boost/exception/to_string.hpp>
 
-#include "Examples/ExampleStapling/StapleElement.h"
+#include "Examples/Stapling/StapleElement.h"
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
