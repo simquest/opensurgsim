@@ -28,8 +28,8 @@ set(HEADERS
 	StaplerBehavior.h
 )
 
-add_executable(Stapling Main.cpp ${SOURCES} ${HEADERS})
-add_executable(SerializedStapling MainSerialized.cpp ${SOURCES} ${HEADERS})
+add_executable(Stapling Stapling.cpp ${SOURCES} ${HEADERS})
+add_executable(SerializedStapling SerializedStapling.cpp ${SOURCES} ${HEADERS})
 
 surgsim_show_ide_folders("Main.cpp SerializedMain.cpp ${SOURCES}" "${HEADERS}")
 

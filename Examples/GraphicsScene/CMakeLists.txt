@@ -27,7 +27,7 @@ include_directories(
 )
 
 set(SOURCES
-	Main.cpp
+	GraphicsScene.cpp
 )
 
 set(HEADERS

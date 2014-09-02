@@ -25,7 +25,7 @@ include_directories(
 
 set(SOURCES
 	AddRandomSphereBehavior.cpp
-	Main.cpp
+	DroppingBalls.cpp
 )
 
 set(HEADERS

@@ -28,7 +28,7 @@ include_directories(
 
 set(SOURCES
 	AddSphereBehavior.cpp
-	Main.cpp
+	AddSphereFromInput.cpp
 )
 
 set(HEADERS
