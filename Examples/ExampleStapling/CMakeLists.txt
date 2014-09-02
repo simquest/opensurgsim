@@ -52,7 +52,7 @@ set(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-file(COPY ${SURGSIM_SOURCE_DIR}/Examples/Data/Stapling/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Configure the path for the data files
 configure_file(

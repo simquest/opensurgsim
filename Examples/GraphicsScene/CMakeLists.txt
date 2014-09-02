@@ -33,6 +33,8 @@ set(EXAMPLE_SOURCES
 set(EXAMPLE_HEADERS
 )
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 # Configure the path for the data files
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"

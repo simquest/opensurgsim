@@ -1,1 +1,1 @@
-${SURGSIM_SOURCE_DIR}/Examples/Data/BouncingBalls
+${CMAKE_CURRENT_BINARY_DIR}/Data/
