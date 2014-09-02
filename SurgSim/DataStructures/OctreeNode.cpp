@@ -34,6 +34,7 @@ using SurgSim::DataStructures::SYMBOL_FRONT;
 using SurgSim::DataStructures::SYMBOL_BACK;
 using SurgSim::DataStructures::SYMBOL_UP;
 using SurgSim::DataStructures::SYMBOL_DOWN;
+using SurgSim::DataStructures::Symbol;
 
 /// State machine codes, paired by new Value, new Directions value
 static TransitionCode transitionTable[6][8] =
@@ -75,7 +76,7 @@ static TransitionCode transitionTable[6][8] =
 	std::make_pair(2, SYMBOL_FRONT), std::make_pair(3, SYMBOL_FRONT),
 };
 
-static const std::array<std::array<int, 3>, 6> FaceNeighbors =
+static const std::array<std::array<Symbol, 3>, 6> FaceNeighbors =
 {
 	SYMBOL_DOWN, SYMBOL_HALT, SYMBOL_HALT,
 	SYMBOL_UP, SYMBOL_HALT, SYMBOL_HALT,
@@ -85,7 +86,7 @@ static const std::array<std::array<int, 3>, 6> FaceNeighbors =
 	SYMBOL_FRONT, SYMBOL_HALT, SYMBOL_HALT,
 };
 
-static const std::array<std::array<int, 3>, 12> EdgeNeighbors =
+static const std::array<std::array<Symbol, 3>, 12> EdgeNeighbors =
 {
 	SYMBOL_DOWN, SYMBOL_RIGHT, SYMBOL_HALT,
 	SYMBOL_DOWN, SYMBOL_LEFT, SYMBOL_HALT,
@@ -101,7 +102,7 @@ static const std::array<std::array<int, 3>, 12> EdgeNeighbors =
 	SYMBOL_FRONT, SYMBOL_LEFT, SYMBOL_HALT,
 };
 
-static const std::array<std::array<int, 3>, 8> VertexNeighbors =
+static const std::array<std::array<Symbol, 3>, 8> VertexNeighbors =
 {
 	SYMBOL_DOWN, SYMBOL_RIGHT, SYMBOL_FRONT,
 	SYMBOL_DOWN, SYMBOL_RIGHT, SYMBOL_BACK,
@@ -157,7 +158,7 @@ std::shared_ptr<OctreeNode<EmptyData>> loadOctree(const std::string& fileName)
 	return octree;
 }
 
-SurgSim::DataStructures::OctreePath getNeighbor(const OctreePath& origin, const std::array<int, 3>& direction)
+SurgSim::DataStructures::OctreePath getNeighbor(const OctreePath& origin, const std::array<Symbol, 3>& direction)
 {
 	// Early Exit
 	if (origin.size() == 0 || direction[0] == SYMBOL_HALT)
@@ -221,7 +222,7 @@ SurgSim::DataStructures::OctreePath getNeighbor(const OctreePath& origin, const 
 std::vector<OctreePath> getNeighbors(const OctreePath& origin, int type)
 {
 	std::vector<OctreePath> result;
-	auto f = [&origin, &result](const std::array<int, 3>& direction)
+	auto f = [&origin, &result](const std::array<Symbol, 3>& direction)
 	{
 		auto n = getNeighbor(origin, direction);
 		if (! n.empty())

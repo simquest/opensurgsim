@@ -351,14 +351,14 @@ TEST(OctreeNodeTests, NeighborhoodTestSimple)
 	OctreePath path;
 	{
 		SCOPED_TRACE("No direction should not fail");
-		std::array<int, 3> direction = { -1, -1, -1};
+		std::array<Symbol, 3> direction = { SYMBOL_HALT, SYMBOL_HALT, SYMBOL_HALT};
 		EXPECT_NO_THROW(getNeighbor(path, direction));
 	}
 
 	path.push_back(0);
 	{
 		SCOPED_TRACE("Right of 0 should be 1");
-		std::array<int, 3> direction = { SYMBOL_RIGHT, -1, -1};
+		std::array<Symbol, 3> direction = { SYMBOL_RIGHT, SYMBOL_HALT, SYMBOL_HALT};
 		EXPECT_NO_THROW(getNeighbor(path, direction));
 		auto result = getNeighbor(path, direction);
 		ASSERT_EQ(1u, result.size());
@@ -367,7 +367,7 @@ TEST(OctreeNodeTests, NeighborhoodTestSimple)
 
 	{
 		SCOPED_TRACE("Left of 0 with not levels is nothing");
-		std::array<int, 3> direction = { SYMBOL_LEFT, -1, -1};
+		std::array<Symbol, 3> direction = { SYMBOL_LEFT, SYMBOL_HALT, SYMBOL_HALT};
 		EXPECT_NO_THROW(getNeighbor(path, direction));
 		auto result = getNeighbor(path, direction);
 		ASSERT_EQ(0u, result.size());
@@ -417,7 +417,7 @@ TEST(OctreeNodeTests, NeigborhoodPlainFaces)
 	{
 		OctreePath path(1);
 		path[0] = testValues[i][0];
-		std::array<int, 3> direction = { testValues[i][1], -1, -1};
+		std::array<Symbol, 3> direction = { static_cast<Symbol>(testValues[i][1]), SYMBOL_HALT, SYMBOL_HALT};
 
 		auto result = getNeighbor(path, direction);
 		ASSERT_EQ(1u, result.size()) << "For row " << i;

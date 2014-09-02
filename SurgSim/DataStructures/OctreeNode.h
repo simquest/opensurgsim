@@ -66,13 +66,18 @@ enum Symbol
 /// The information about the location of a nodes neighbor is encoded in a state machine, this machine is traversed
 /// until a 'Halt' instruction is found. If the neighbor is across a boundary on the octree, a new search direction
 /// is determined by the algorithm.
+/// \note The numbering in the paper and our numbering is slightly different, this means the following transformations
+///		  took place.
+///       a) The colums where reordered to match our numbering
+///       b) All the numbers where replaced to match out numbering
+///       The number changes where as following: 0 => 6, 1 => 7, 2 => 4, 3 => 5, 4 => 2, 5 => 3, 6 => 0, 7 => 1
 /// \param origin the node whose neighbor is needed
 /// \param direction a set of directions, for face neighbors use 1, for edge neighbors use 2 and for vertex neighbors
 ///        use 3 direction, fill the other spots with SYMBOL_HALT. E.g. to find the left neighbor use
 ///        {SYMBOL_LEFT, SYMBOL_HALT, SYMBOL_HALT}, for the vertex neighber on the upper left front corner use
 ///        {SYMBOL_LEFT, SYMBOLD_FRONT, SYMBOL_UP}
 /// \return a OctreePath to the correct neighbor, empty if the neighbor is outside of the tree
-OctreePath getNeighbor(const OctreePath& origin, const std::array<int, 3>& direction);
+OctreePath getNeighbor(const OctreePath& origin, const std::array<Symbol, 3>& direction);
 
 /// Fetch a list of neighbors, indicated by the type, Face, Edge and Vertex are possible types and can be combined
 /// via OR
