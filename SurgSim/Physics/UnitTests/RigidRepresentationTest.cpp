@@ -185,10 +185,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceOnMassCenterTest)
 	Matrix66d K = 0.4 * Matrix66d::Ones() + 8.3 * Matrix66d::Identity();
 	Matrix66d D = -0.6 * Matrix66d::Ones() + 4.1 * Matrix66d::Identity();
 
-	ASSERT_NO_THROW(rigidBody->addExternalGeneralizedForce(F, K, D));
-	ASSERT_NO_THROW(rigidBody->getExternalGeneralizedForce());
-	ASSERT_NO_THROW(rigidBody->getExternalGeneralizedStiffness());
-	ASSERT_NO_THROW(rigidBody->getExternalGeneralizedDamping());
+	rigidBody->addExternalGeneralizedForce(F, K, D);
 	EXPECT_TRUE(rigidBody->getExternalGeneralizedForce().isApprox(F));
 	EXPECT_TRUE(rigidBody->getExternalGeneralizedStiffness().isApprox(K));
 	EXPECT_TRUE(rigidBody->getExternalGeneralizedDamping().isApprox(D));
