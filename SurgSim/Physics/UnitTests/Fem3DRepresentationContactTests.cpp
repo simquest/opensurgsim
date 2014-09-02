@@ -106,13 +106,12 @@ public:
 		m_fem->beforeUpdate(dt);
 		m_fem->update(dt);
 
-		m_localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem);
 	}
 
 	void setContactAt(const IndexedLocalCoordinate &coord)
 	{
 		m_coord = coord;
-		m_localization->setLocalPosition(coord);
+		m_localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem, m_coord);
 
 		// Calculate position at state before "m_fem->update(dt)" was called.
 		double distance = -m_localization->calculatePosition(0.0).dot(m_n);

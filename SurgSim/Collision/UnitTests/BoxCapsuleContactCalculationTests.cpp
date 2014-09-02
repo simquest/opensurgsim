@@ -82,8 +82,10 @@ void doBoxCapsuleTest(std::shared_ptr<BoxShape> box,
 			EXPECT_GT(depthMax, (*contact)->depth);
 
 			// Check that the locations are sane
-			Vector3d boxPenetrationPoint = (*contact)->penetrationPoints.first.globalPosition.getValue();
-			Vector3d capsulePenetrationPoint = (*contact)->penetrationPoints.second.globalPosition.getValue();
+			Vector3d boxPenetrationPoint =
+				boxQuat * (*contact)->penetrationPoints.first.rigidLocalPosition.getValue() + boxTrans;
+			Vector3d capsulePenetrationPoint =
+				capsuleQuat * (*contact)->penetrationPoints.second.rigidLocalPosition.getValue() + capsuleTrans;
 			EXPECT_GT(0.0, (*contact)->normal.dot(boxPenetrationPoint - boxTrans));
 			EXPECT_LT(0.0, (*contact)->normal.dot(capsulePenetrationPoint - capsuleTrans));
 		}
