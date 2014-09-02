@@ -28,14 +28,14 @@ set(EXAMPLESTAPLING_HEADERS
 	StaplerBehavior.h
 )
 
-add_executable(ExampleStapling
-	StaplingExample.cpp
+add_executable(Stapling
+	Main.cpp
 	${EXAMPLESTAPLING_SOURCES}
 	${EXAMPLESTAPLING_HEADERS}
 )
 
-add_executable(SerializableStapling
-	SerializableStapling.cpp
+add_executable(SerializedStapling
+	MainSerialized.cpp
 	${EXAMPLESTAPLING_SOURCES}
 	${EXAMPLESTAPLING_HEADERS}
 )
@@ -60,9 +60,9 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-target_link_libraries(ExampleStapling ${LIBS})
-target_link_libraries(SerializableStapling ${LIBS})
+target_link_libraries(Stapling ${LIBS})
+target_link_libraries(SerializedStapling ${LIBS})
 
 # Put ExampleStapling into folder "Examples"
-set_target_properties(ExampleStapling PROPERTIES FOLDER "Examples") 
-set_target_properties(SerializableStapling PROPERTIES FOLDER "Examples") 
+set_target_properties(Stapling PROPERTIES FOLDER "Examples") 
+set_target_properties(SerializedStapling PROPERTIES FOLDER "Examples") 

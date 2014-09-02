@@ -27,7 +27,7 @@ include_directories(
 )
 
 set(EXAMPLE_SOURCES
-	ExampleGraphicsScene.cpp
+	Main.cpp
 )
 
 set(EXAMPLE_HEADERS

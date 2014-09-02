@@ -25,7 +25,7 @@ include_directories(
 
 set(INPUTVTCEXAMPLE_SOURCES
 	DeviceFactory.cpp
-	InputVtcExample.cpp
+	Main.cpp
 )
 
 set(INPUTVTCEXAMPLE_HEADERS
