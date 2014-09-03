@@ -39,7 +39,7 @@ namespace {
 
 typedef Eigen::AlignedBox<double, 3>::CornerType CornerType;
 
-const std::array<std::pair<CornerType, CornerType>, 12> edges = { 
+const std::array<std::pair<CornerType, CornerType>, 12> edges = {
 	std::make_pair(CornerType::BottomLeftFloor, CornerType::TopLeftFloor),
 	std::make_pair(CornerType::BottomRightFloor, CornerType::TopRightFloor),
 	std::make_pair(CornerType::BottomLeftCeil, CornerType::TopLeftCeil),
