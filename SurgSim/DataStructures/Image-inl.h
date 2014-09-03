@@ -26,45 +26,37 @@ namespace DataStructures
 
 template<class T>
 Image<T>::Image() :
-	m_data(nullptr)
+	m_width(0), m_height(0), m_channels(0), m_data(nullptr)
 {
-	m_size[0] = 0;
-	m_size[1] = 0;
-	m_size[2] = 0;
 }
 
 
 template<class T>
 Image<T>::Image(size_t width, size_t height, size_t channels) :
-	m_data(new T[channels*width*height])
+	m_width(width), m_height(height), m_channels(channels), m_data(new T[m_width * m_height * m_channels])
 {
-	m_size[0] = width;
-	m_size[1] = height;
-	m_size[2] = channels;
 }
 
 template<class T>
 Image<T>::Image(size_t width, size_t height, size_t channels, const T* const data) :
-	m_data(new T[channels*width*height])
+	m_width(width), m_height(height), m_channels(channels), m_data(new T[m_width * m_height * m_channels])
 {
-	m_size[0] = width;
-	m_size[1] = height;
-	m_size[2] = channels;
 	std::copy(data, data+width*height*channels, m_data);
 }
 
 template<class T>
 Image<T>::Image(const Image<T>& other) :
-	m_size(other.getSize()),
-	m_data(new T[other.getNumChannels()*other.getWidth()*other.getHeight()])
+	m_width(other.getWidth()), m_height(other.getHeight()), m_channels(other.getNumChannels()),
+	m_data(new T[m_width * m_height * m_channels])
 {
-	std::copy(other.m_data, other.m_data + m_size[0]*m_size[1]*m_size[2], m_data);
+	std::copy(other.m_data, other.m_data + m_width * m_height * m_channels, m_data);
 }
 
 template<class T>
 Image<T>::Image(Image<T>&& other) :
 	m_data(nullptr)
 {
+	// Can use the move assignment operator to construct
 	*this = std::move(other);
 }
 
@@ -80,7 +72,9 @@ Image<T>& Image<T>::operator=(const Image<T>& other)
 			delete [] m_data;
 			m_data = new T[newDataSize];
 		}
-		m_size = other.getSize();
+		m_width = other.getWidth();
+		m_height = other.getHeight();
+		m_channels = other.getNumChannels();
 		std::copy(other.m_data, other.m_data + newDataSize, m_data);
 	}
 	return *this;
@@ -93,12 +87,14 @@ Image<T>& Image<T>::operator=(Image<T>&& other)
 	{
 		delete [] m_data;
 		m_data = other.m_data;
-		m_size = other.getSize();
+		m_width = other.getWidth();
+		m_height = other.getHeight();
+		m_channels = other.getNumChannels();
 
 		other.m_data = nullptr;
-		other.m_size[0] = 0;
-		other.m_size[1] = 0;
-		other.m_size[2] = 0;
+		other.m_width = 0;
+		other.m_height = 0;
+		other.m_channels = 0;
 	}
 	return *this;
 }
@@ -113,33 +109,34 @@ template<class T>
 Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 0, Eigen::InnerStride<>>
 Image<T>::getChannel(size_t channel)
 {
-	SURGSIM_ASSERT(channel < m_size[2]) << "channel number is larger than the number of channels";
+	SURGSIM_ASSERT(channel < m_channels) << "channel number is larger than the number of channels";
 	return Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 0, Eigen::InnerStride<>>(
-			m_data+channel, m_size[0], m_size[1], Eigen::InnerStride<>(m_size[2]));
+			m_data+channel, m_width, m_height, Eigen::InnerStride<>(m_channels));
 }
 
 template<class T>
 size_t Image<T>::getWidth() const
 {
-	return m_size[0];
+	return m_width;
 }
 
 template<class T>
 size_t Image<T>::getHeight() const
 {
-	return m_size[1];
+	return m_height;
 }
 
 template<class T>
 std::array<size_t, 3> Image<T>::getSize() const
 {
-	return m_size;
+	std::array<size_t, 3> size = {m_width, m_height, m_channels};
+	return std::move(size);
 }
 
 template<class T>
 size_t Image<T>::getNumChannels() const
 {
-	return m_size[2];
+	return m_channels;
 }
 
 template<class T>

@@ -95,11 +95,13 @@ public:
 	T* const getData();
 
 private:
-	std::array<size_t, 3> m_size;
+	size_t m_width;
+	size_t m_height;
+	size_t m_channels;
 	T* m_data;
 };
 
-typedef Image<float> ImageF;
+typedef Image<float> Imagef;
 
 }
 }
