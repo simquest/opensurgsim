@@ -34,6 +34,27 @@ using SurgSim::Math::distancePointSegment;
 using SurgSim::Math::intersectionsSegmentBox;
 using SurgSim::Math::Geometry::DistanceEpsilon;
 
+namespace {
+
+typedef Eigen::AlignedBox<double, 3>::CornerType CornerType;
+
+const std::array<std::pair<CornerType, CornerType>, 12> edges = { 
+	std::make_pair(CornerType::BottomLeftFloor, CornerType::TopLeftFloor),
+	std::make_pair(CornerType::BottomRightFloor, CornerType::TopRightFloor),
+	std::make_pair(CornerType::BottomLeftCeil, CornerType::TopLeftCeil),
+	std::make_pair(CornerType::BottomRightCeil, CornerType::TopRightCeil),
+
+	std::make_pair(CornerType::BottomLeftFloor, CornerType::BottomRightFloor),
+	std::make_pair(CornerType::BottomLeftCeil, CornerType::BottomRightCeil),
+	std::make_pair(CornerType::TopLeftFloor, CornerType::TopRightFloor),
+	std::make_pair(CornerType::TopLeftCeil, CornerType::TopRightCeil),
+
+	std::make_pair(CornerType::BottomLeftFloor, CornerType::BottomLeftCeil),
+	std::make_pair(CornerType::BottomRightFloor, CornerType::BottomRightCeil),
+	std::make_pair(CornerType::TopLeftFloor, CornerType::TopLeftCeil),
+	std::make_pair(CornerType::TopRightFloor, CornerType::TopRightCeil)
+};
+};
 
 namespace SurgSim
 {
@@ -42,21 +63,6 @@ namespace Collision
 
 BoxCapsuleDcdContact::BoxCapsuleDcdContact()
 {
-	typedef Eigen::AlignedBox<double, 3>::CornerType CornerType;
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomLeftFloor, CornerType::TopLeftFloor));
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomRightFloor, CornerType::TopRightFloor));
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomLeftCeil, CornerType::TopLeftCeil));
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomRightCeil, CornerType::TopRightCeil));
-
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomLeftFloor, CornerType::BottomRightFloor));
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomLeftCeil, CornerType::BottomRightCeil));
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::TopLeftFloor, CornerType::TopRightFloor));
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::TopLeftCeil, CornerType::TopRightCeil));
-
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomLeftFloor, CornerType::BottomLeftCeil));
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::BottomRightFloor, CornerType::BottomRightCeil));
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::TopLeftFloor, CornerType::TopLeftCeil));
-	m_boxEdges.push_back(std::pair<CornerType, CornerType>(CornerType::TopRightFloor, CornerType::TopRightCeil));
 }
 
 std::pair<int,int> BoxCapsuleDcdContact::getShapeTypes()
@@ -88,8 +94,10 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 		distancePointSegment(Vector3d::Zero().eval(), capsuleBottom, capsuleTop, &segmentPoint);
 		if (!segmentPoint.isZero(DistanceEpsilon))
 		{
+			// The capsule's segment does not pass through the box center.
 			if (box.contains(segmentPoint))
 			{
+				// The capsule's segment passes through the box.
 				Vector3d::Index closestFace;
 				(boxRadii - segmentPoint.cwiseAbs()).minCoeff(&closestFace);
 				normal.setZero();
@@ -108,7 +116,7 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 					// The closest point to the box center is too far away.
 					// Find the closest point to all 12 box edges.
 					double minDistance = 2.0 * capsuleRadius;
-					for (auto edge : m_boxEdges)
+					for (auto edge : edges)
 					{
 						Vector3d tempSegmentPoint;
 						Vector3d tempBoxPoint;
@@ -125,6 +133,7 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 					normal = deepestBoxPoint - segmentPoint;
 					if (normal.norm() > capsuleRadius)
 					{
+						// The closest point to any edge is too far away.
 						// Check the endpoints.
 						segmentPoint = capsuleTop;
 						deepestBoxPoint = segmentPoint.array().min(box.max().array()).max(box.min().array());
@@ -143,8 +152,10 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 		}
 		else
 		{
+			// The capsule's segment passes through the box center.
 			if (capsuleTop.isZero(DistanceEpsilon) && capsuleBottom.isZero(DistanceEpsilon))
 			{
+				// The capsule's segment has no length and is located at the box center.
 				Vector3d::Index closestFace;
 				boxRadii.minCoeff(&closestFace);
 				normal.setZero();
@@ -153,6 +164,7 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 			}
 			else
 			{
+				// The capsule's segment has a length, pick the closest endpoint to the box center.
 				if (capsuleTop.squaredNorm() < capsuleBottom.squaredNorm())
 				{
 					segmentPoint = capsuleTop;

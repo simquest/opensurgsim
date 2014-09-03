@@ -45,10 +45,6 @@ private:
 	/// \param	pair	The symmetric pair that is under consideration.
 	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
-	/// The corners that define edges for an aligned box.
-	std::vector<std::pair<Eigen::AlignedBox<double, 3>::CornerType,
-		Eigen::AlignedBox<double, 3>::CornerType>> m_boxEdges;
-
 };
 
 }; // namespace Collision
