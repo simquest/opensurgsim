@@ -85,6 +85,7 @@ TEST(BehaviorManagerTest, UpdateTest)
 
 	// Turn off the behavior, it will not be updated any more.
 	behavior->setActive(false);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	auto count = behavior->updateCount;
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	EXPECT_EQ(behavior->updateCount, count);

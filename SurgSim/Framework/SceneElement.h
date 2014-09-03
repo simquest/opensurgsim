@@ -133,7 +133,7 @@ public:
 	/// \note Set 'active' on an inactive SceneElement will cause all the components it contains which are active
 	/// \note to be processed again.
 	/// \note Inactive components will not be processed no matter the SceneElement is active or inactive.
-	/// \param val The status (active/inactive) to be set on this SceneElement.
+	/// \param val True to set the SceneElement active, false to set inactive.
 	void setActive(bool val);
 
 	/// \return True if this SceneElement is active; Otherwise, false.
