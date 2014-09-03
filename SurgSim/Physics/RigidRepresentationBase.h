@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 
-#include "SurgSim/Collision/Location.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
@@ -62,7 +62,7 @@ public:
 	/// \return The previous state (pose + lin/ang velocities)
 	const RigidRepresentationState& getPreviousState() const;
 
-	std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location);
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location);
 
 	/// Set the initial parameters of the rigid representation
 	/// \param parameters The initial parameters
@@ -113,7 +113,7 @@ protected:
 	/// \param	location	The location for the localization.
 	/// \return	The new Localization;
 	template <class T>
-	std::shared_ptr<T> createTypedLocalization(const SurgSim::Collision::Location& location);
+	std::shared_ptr<T> createTypedLocalization(const SurgSim::DataStructures::Location& location);
 
 private:
 	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) = 0;

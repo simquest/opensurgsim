@@ -24,9 +24,13 @@
 namespace SurgSim
 {
 
-namespace Collision
+namespace DataStructures
 {
 struct Location;
+}
+
+namespace Collision
+{
 class Representation;
 }
 
@@ -116,7 +120,7 @@ public:
 	/// Computes a localized coordinate w.r.t this representation, given a Location object.
 	/// \param location A location in 3d space.
 	/// \return A localization object for the given location.
-	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location);
+	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location);
 
 	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
 	/// deltaVelocity.

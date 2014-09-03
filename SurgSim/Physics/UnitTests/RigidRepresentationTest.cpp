@@ -17,12 +17,12 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Collision/Location.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/PlaneShape.h"
@@ -31,11 +31,14 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Framework::Component;
 using SurgSim::Framework::Runtime;
-using SurgSim::Collision::Location;
 using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Matrix66d;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::PlaneShape;
@@ -43,6 +46,7 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector6d;
 
 namespace SurgSim
 {
@@ -171,6 +175,522 @@ TEST_F(RigidRepresentationTest, SetGetAndDefaultValueTest)
 	ASSERT_FALSE(rigidBody->isGravityEnabled());
 	rigidBody->setIsGravityEnabled(true);
 	ASSERT_TRUE(rigidBody->isGravityEnabled());
+}
+
+TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceOnMassCenterTest)
+{
+	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+
+	Vector6d F = 6.4 * Vector6d::Ones();
+	Matrix66d K = 0.4 * Matrix66d::Ones() + 8.3 * Matrix66d::Identity();
+	Matrix66d D = -0.6 * Matrix66d::Ones() + 4.1 * Matrix66d::Identity();
+
+	rigidBody->addExternalGeneralizedForce(F, K, D);
+	EXPECT_TRUE(rigidBody->getExternalGeneralizedForce().isApprox(F));
+	EXPECT_TRUE(rigidBody->getExternalGeneralizedStiffness().isApprox(K));
+	EXPECT_TRUE(rigidBody->getExternalGeneralizedDamping().isApprox(D));
+}
+
+namespace
+{
+// Extra force/torque that should be added
+Vector6d computeExtraTorque(const Vector6d& inputForce, const Vector3d& anchorLocalPoint,
+							const Vector6d& dofPosition, const Vector6d& dofVelocity)
+{
+	Vector6d f = inputForce;
+
+	auto C = dofPosition.segment<3>(0);               // Mass center
+	auto rotVector = dofPosition.segment<3>(3);       // Rotation vector
+
+	double angle;
+	Vector3d axis = rotVector;
+	angle = axis.norm();
+	if (std::abs(angle) < 1e-8)
+	{
+		axis.setZero();
+	}
+	else
+	{
+		axis.normalize();
+	}
+	Matrix33d R = SurgSim::Math::makeRotationMatrix(angle, axis);
+
+	Vector3d anchorPoint = C + R * anchorLocalPoint;
+	Vector3d lever = anchorPoint - C;
+
+	f.segment<3>(3) += lever.cross(f.segment<3>(0));
+
+	return f;
+}
+
+Matrix66d computeExtraStiffness(const Vector6d& inputForce, const Vector3d& anchorLocalPoint,
+								const Vector6d& dofPosition, const Vector6d& dofVelocity)
+{
+	Matrix66d K = Matrix66d::Zero();
+	const double epsilon = 1e-8;
+
+	for (size_t column = 0; column < 6; ++column)
+	{
+		Vector6d dofX = dofPosition;
+		dofX[column] += 2.0 * epsilon;
+		Vector6d fXPlus2H = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofVelocity);
+
+		dofX = dofPosition;
+		dofX[column] += epsilon;
+		Vector6d fXPlusH = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofVelocity);
+
+		dofX = dofPosition;
+		dofX[column] -= epsilon;
+		Vector6d fXMinusH = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofVelocity);
+
+		dofX = dofPosition;
+		dofX[column] -= 2.0 * epsilon;
+		Vector6d fXMinus2H = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofVelocity);
+
+		K.col(column) = - (-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
+	}
+
+	return K;
+}
+
+Matrix66d computeExtraDamping(const Vector6d& inputForce, const Vector3d& anchorLocalPoint,
+							  const Vector6d& dofPosition, const Vector6d& dofVelocity)
+{
+	Matrix66d D = Matrix66d::Zero();
+	const double epsilon = 1e-8;
+
+	for (size_t column = 0; column < 6; ++column)
+	{
+		Vector6d dofV = dofVelocity;
+		dofV[column] += 2.0 * epsilon;
+		Vector6d fXPlus2H = computeExtraTorque(inputForce, anchorLocalPoint, dofPosition, dofV);
+
+		dofV = dofVelocity;
+		dofV[column] += epsilon;
+		Vector6d fXPlusH = computeExtraTorque(inputForce, anchorLocalPoint, dofPosition, dofV);
+
+		dofV = dofVelocity;
+		dofV[column] -= epsilon;
+		Vector6d fXMinusH = computeExtraTorque(inputForce, anchorLocalPoint, dofPosition, dofV);
+
+		dofV = dofVelocity;
+		dofV[column] -= 2.0 * epsilon;
+		Vector6d fXMinus2H = computeExtraTorque(inputForce, anchorLocalPoint, dofPosition, dofV);
+
+		D.col(column) = - (-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
+	}
+
+	return D;
+}
+}; // namespace anonymous
+
+TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
+{
+	{
+		SCOPED_TRACE("Non identity pose");
+
+		Eigen::AngleAxisd angleAxis(0.34512, Vector3d(1.1, -1.4, 3.23).normalized());
+		Vector3d t(1.1, 2.2, 3.3);
+		RigidTransform3d transform = makeRigidTransform(Quaterniond(angleAxis), t);
+
+		Vector6d inputForce = Vector6d::LinSpaced(1.1, 6.6);
+		Vector6d dofX = Vector6d::Zero();
+		dofX.segment<3>(0) = transform.translation();
+		Eigen::AngleAxisd angleAxis2(transform.rotation());
+		dofX.segment<3>(3) = angleAxis2.axis() * angleAxis2.angle();
+		Vector6d dofV = Vector6d::Zero();
+		Vector3d anchorLocalPoint = Vector3d::Ones();
+
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		SurgSim::Physics::RigidRepresentationState initialState;
+		initialState.setPose(transform);
+		rigidBody->setInitialState(initialState);
+		SurgSim::DataStructures::Location location(anchorLocalPoint);
+
+		Vector6d Fnumeric = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofV);
+		Matrix66d Knumeric = computeExtraStiffness(inputForce, anchorLocalPoint, dofX, dofV);
+		Matrix66d Dnumeric = computeExtraDamping(inputForce, anchorLocalPoint, dofX, dofV);
+
+		Vector6d F = inputForce;
+		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
+		rigidBody->addExternalGeneralizedForce(location, F, K, D);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+		D = rigidBody->getExternalGeneralizedDamping();
+
+		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((D - Dnumeric).cwiseAbs().maxCoeff(), 2e-7);
+	}
+
+	{
+		SCOPED_TRACE("Exactly Identity pose");
+
+		Vector6d inputForce = Vector6d::LinSpaced(1.1, 6.6);
+		Vector6d dofX = Vector6d::Zero();
+		Vector6d dofV = Vector6d::Zero();
+		Vector3d anchorLocalPoint = Vector3d::Ones();
+
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		SurgSim::DataStructures::Location location(anchorLocalPoint);
+
+		Vector6d Fnumeric = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofV);
+		Matrix66d Knumeric = computeExtraStiffness(inputForce, anchorLocalPoint, dofX, dofV);
+		Matrix66d Dnumeric = computeExtraDamping(inputForce, anchorLocalPoint, dofX, dofV);
+
+		Vector6d F = inputForce;
+		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
+		rigidBody->addExternalGeneralizedForce(location, F, K, D);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+		D = rigidBody->getExternalGeneralizedDamping();
+
+		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((D - Dnumeric).cwiseAbs().maxCoeff(), 2e-7);
+	}
+
+	{
+		SCOPED_TRACE("Almost Identity pose, limitted development not used yet");
+
+		Eigen::AngleAxisd angleAxis(5e-8, Vector3d(1.1, -1.4, 3.23).normalized());
+		Vector3d t(1.1, 2.2, 3.3);
+		RigidTransform3d transform = makeRigidTransform(Quaterniond(angleAxis), t);
+
+		Vector6d inputForce = Vector6d::LinSpaced(1.1, 6.6);
+		Vector6d dofX = Vector6d::Zero();
+		dofX.segment<3>(0) = transform.translation();
+		Eigen::AngleAxisd angleAxis2(transform.rotation());
+		dofX.segment<3>(3) = angleAxis2.angle() * angleAxis2.axis();
+		Vector6d dofV = Vector6d::Zero();
+		Vector3d anchorLocalPoint = Vector3d::Ones();
+
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		SurgSim::Physics::RigidRepresentationState initialState;
+		initialState.setPose(transform);
+		rigidBody->setInitialState(initialState);
+		SurgSim::DataStructures::Location location(anchorLocalPoint);
+
+		Vector6d Fnumeric = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofV);
+		Matrix66d Knumeric = computeExtraStiffness(inputForce, anchorLocalPoint, dofX, dofV);
+		Matrix66d Dnumeric = computeExtraDamping(inputForce, anchorLocalPoint, dofX, dofV);
+
+		Vector6d F = inputForce;
+		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
+		rigidBody->addExternalGeneralizedForce(location, F, K, D);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+		D = rigidBody->getExternalGeneralizedDamping();
+
+		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((D - Dnumeric).cwiseAbs().maxCoeff(), 2e-7);
+	}
+
+	{
+		SCOPED_TRACE("Almost Identity pose, limitted development in use");
+
+		Eigen::AngleAxisd angleAxis(0.2e-8, Vector3d(1.1, -1.4, 3.23).normalized());
+		Vector3d t(1.1, 2.2, 3.3);
+		RigidTransform3d transform = makeRigidTransform(Quaterniond(angleAxis), t);
+
+		Vector6d inputForce = Vector6d::LinSpaced(1.1, 6.6);
+		Vector6d dofX = Vector6d::Zero();
+		dofX.segment<3>(0) = transform.translation();
+		Eigen::AngleAxisd angleAxis2(transform.rotation());
+		dofX.segment<3>(3) = angleAxis2.angle() * angleAxis2.axis();
+		Vector6d dofV = Vector6d::Zero();
+		Vector3d anchorLocalPoint = Vector3d::Ones();
+
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		SurgSim::Physics::RigidRepresentationState initialState;
+		initialState.setPose(transform);
+		rigidBody->setInitialState(initialState);
+		SurgSim::DataStructures::Location location(anchorLocalPoint);
+
+		Vector6d Fnumeric = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofV);
+		Matrix66d Knumeric = computeExtraStiffness(inputForce, anchorLocalPoint, dofX, dofV);
+		Matrix66d Dnumeric = computeExtraDamping(inputForce, anchorLocalPoint, dofX, dofV);
+
+		Vector6d F = inputForce;
+		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
+		rigidBody->addExternalGeneralizedForce(location, F, K, D);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+		D = rigidBody->getExternalGeneralizedDamping();
+
+		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((D - Dnumeric).cwiseAbs().maxCoeff(), 2e-7);
+	}
+}
+
+namespace
+{
+Vector6d computeSpringForce(double linearStiffness, double linearDamping,
+							double angularStiffness, double angularDamping,
+							Vector3d targetPosition, Vector3d targetLinearVelocity,
+							Vector3d targetRotationVector, Vector3d targetAngularVelocity,
+							Vector6d dofX, Vector6d dofV,
+							bool doComputeExtraTorque = false, Vector3d localApplicationPoint = Vector3d::Zero())
+{
+	Vector6d f = Vector6d::Zero();
+
+	f.segment<3>(0) += linearStiffness * (targetPosition - dofX.segment<3>(0));
+	f.segment<3>(0) += linearDamping * (targetLinearVelocity - dofV.segment<3>(0));
+
+	f.segment<3>(3) += angularStiffness * (targetRotationVector - dofX.segment<3>(3));
+	f.segment<3>(3) += angularDamping * (targetAngularVelocity - dofV.segment<3>(3));
+	if (doComputeExtraTorque)
+	{
+		Vector3d rotationVector = dofX.segment<3>(3);
+		Matrix33d R;
+		double angle = rotationVector.norm();
+		if (std::abs(angle) < 1e-8)
+		{
+			R.setIdentity();
+		}
+		else
+		{
+			Vector3d axis = rotationVector / angle;
+			R = cos(angle) * Matrix33d::Identity() +
+				sin(angle) * SurgSim::Math::makeSkewSymmetricMatrix(axis) +
+				(1.0 - cos(angle)) * axis * axis.transpose();
+		}
+		Vector3d applicationPoint = dofX.segment<3>(0) + R * localApplicationPoint;
+		Vector3d lever = applicationPoint - dofX.segment<3>(0);
+		f.segment<3>(3) += lever.cross(f.segment<3>(0));
+	}
+
+	return f;
+}
+
+Matrix66d computeSpringStiffness(double linearStiffness, double linearDamping,
+								double angularStiffness, double angularDamping,
+								Vector3d targetPosition, Vector3d targetLinearVelocity,
+								Vector3d targetRotationVector, Vector3d targetAngularVelocity,
+								Vector6d dofPosition, Vector6d dofVelocity,
+								bool doComputeExtraTorque = false, Vector3d localApplicationPoint = Vector3d::Zero())
+{
+	Matrix66d K = Matrix66d::Zero();
+	const double epsilon = 1e-8;
+
+	for (size_t column = 0; column < 6; ++column)
+	{
+		Vector6d dofX = dofPosition;
+		dofX[column] += 2.0 * epsilon;
+		Vector6d fXPlus2H = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
+			targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofX, dofVelocity,
+			doComputeExtraTorque, localApplicationPoint);
+
+		dofX = dofPosition;
+		dofX[column] += epsilon;
+		Vector6d fXPlusH = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
+			targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofX, dofVelocity,
+			doComputeExtraTorque, localApplicationPoint);
+
+		dofX = dofPosition;
+		dofX[column] -= epsilon;
+		Vector6d fXMinusH = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
+			targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofX, dofVelocity,
+			doComputeExtraTorque, localApplicationPoint);
+
+		dofX = dofPosition;
+		dofX[column] -= 2.0 * epsilon;
+		Vector6d fXMinus2H = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
+			targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofX, dofVelocity,
+			doComputeExtraTorque, localApplicationPoint);
+
+		K.col(column) = - (-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
+	}
+
+	return K;
+}
+
+Matrix66d computeSpringDamping(double linearStiffness, double linearDamping,
+							   double angularStiffness, double angularDamping,
+							   Vector3d targetPosition, Vector3d targetLinearVelocity,
+							   Vector3d targetRotationVector, Vector3d targetAngularVelocity,
+							   Vector6d dofPosition, Vector6d dofVelocity,
+							   bool doComputeExtraTorque = false, Vector3d localApplicationPoint = Vector3d::Zero())
+{
+	Matrix66d D = Matrix66d::Zero();
+	const double epsilon = 1e-8;
+
+	for (size_t column = 0; column < 6; ++column)
+	{
+		Vector6d dofV = dofVelocity;
+		dofV[column] += 2.0 * epsilon;
+		Vector6d fXPlus2H = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
+			targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofPosition, dofV,
+			doComputeExtraTorque, localApplicationPoint);
+
+		dofV = dofVelocity;
+		dofV[column] += epsilon;
+		Vector6d fXPlusH = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
+			targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofPosition, dofV,
+			doComputeExtraTorque, localApplicationPoint);
+
+		dofV = dofVelocity;
+		dofV[column] -= epsilon;
+		Vector6d fXMinusH = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
+			targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofPosition, dofV,
+			doComputeExtraTorque, localApplicationPoint);
+
+		dofV = dofVelocity;
+		dofV[column] -= 2.0 * epsilon;
+		Vector6d fXMinus2H = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
+			targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofPosition, dofV,
+			doComputeExtraTorque, localApplicationPoint);
+
+		D.col(column) = - (-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
+	}
+
+	return D;
+}
+}; // namespace anonymous
+
+TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
+{
+	double linearStiffness = 1.1;
+	double linearDamping = 1.2;
+	double angularStiffness = 1.3;
+	double angularDamping = 1.4;
+	Vector3d targetPosition = Vector3d::Ones();
+	Vector3d targetLinearVelocity = Vector3d::Ones() / 100.0;
+	double angle = 1.2354;
+	Vector3d axis = Vector3d(1.2, 0.4, 5.2).normalized();
+	Vector3d targetRotationVector = axis * angle;
+	Vector3d targetAngularVelocity = Vector3d::Ones() / 200.0;
+	Vector3d localAnchorPoint = Vector3d::Ones();
+
+	{
+		SCOPED_TRACE("With stiffness, with damping");
+
+		Eigen::AngleAxisd angleAxis(0.34512, Vector3d(1.1, -1.4, 3.23).normalized());
+		Vector3d t(1.1, 0.9, 1.02);
+		RigidTransform3d transform = makeRigidTransform(Quaterniond(angleAxis), t);
+
+		Vector6d dofX = Vector6d::Zero();
+		dofX.segment<3>(0) = transform.translation();
+		Eigen::AngleAxisd angleAxis2(transform.rotation());
+		dofX.segment<3>(3) = angleAxis2.axis() * angleAxis2.angle();
+		Vector6d dofV = Vector6d::Zero();
+
+		Vector6d FWithoutExtraTorque = computeSpringForce(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV);
+		Matrix66d KWithoutExtraTorque = computeSpringStiffness(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV);
+		Matrix66d DWithoutExtraTorque = computeSpringDamping(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV);
+
+		Vector6d FWithExtraTorque = computeSpringForce(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV, true, localAnchorPoint);
+		Matrix66d KWithExtraTorque = computeSpringStiffness(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV, true, localAnchorPoint);
+		Matrix66d DWithExtraTorque = computeSpringDamping(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV, true, localAnchorPoint);
+
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		SurgSim::Physics::RigidRepresentationState initialState;
+		initialState.setPose(transform);
+		rigidBody->setInitialState(initialState);
+		SurgSim::DataStructures::Location location(localAnchorPoint);
+
+		Vector6d F = FWithoutExtraTorque;
+		Matrix66d K = KWithoutExtraTorque, D = DWithoutExtraTorque;
+		rigidBody->addExternalGeneralizedForce(location, F, K, D);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+		D = rigidBody->getExternalGeneralizedDamping();
+
+		EXPECT_LE((F - FWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
+		EXPECT_LE((K - KWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
+		EXPECT_LE((D - DWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
+	}
+
+	{
+		SCOPED_TRACE("With stiffness, without damping");
+
+		Eigen::AngleAxisd angleAxis(0.34512, Vector3d(1.1, -1.4, 3.23).normalized());
+		Vector3d t(1.1, 0.9, 1.02);
+		RigidTransform3d transform = makeRigidTransform(Quaterniond(angleAxis), t);
+
+		Vector6d dofX = Vector6d::Zero();
+		dofX.segment<3>(0) = transform.translation();
+		Eigen::AngleAxisd angleAxis2(transform.rotation());
+		dofX.segment<3>(3) = angleAxis2.axis() * angleAxis2.angle();
+		Vector6d dofV = Vector6d::Zero();
+
+		Vector6d FWithoutExtraTorque = computeSpringForce(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV);
+		Matrix66d KWithoutExtraTorque = computeSpringStiffness(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV);
+
+		Vector6d FWithExtraTorque = computeSpringForce(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV, true, localAnchorPoint);
+		Matrix66d KWithExtraTorque = computeSpringStiffness(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV, true, localAnchorPoint);
+
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		SurgSim::Physics::RigidRepresentationState initialState;
+		initialState.setPose(transform);
+		rigidBody->setInitialState(initialState);
+		SurgSim::DataStructures::Location location(localAnchorPoint);
+
+		Vector6d F = FWithoutExtraTorque;
+		Matrix66d K = KWithoutExtraTorque;
+		rigidBody->addExternalGeneralizedForce(location, F, K);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+
+		EXPECT_LE((F - FWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
+		EXPECT_LE((K - KWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
+	}
+
+	{
+		SCOPED_TRACE("Without stiffness, without damping");
+
+		Eigen::AngleAxisd angleAxis(0.34512, Vector3d(1.1, -1.4, 3.23).normalized());
+		Vector3d t(1.1, 0.9, 1.02);
+		RigidTransform3d transform = makeRigidTransform(Quaterniond(angleAxis), t);
+
+		Vector6d dofX = Vector6d::Zero();
+		dofX.segment<3>(0) = transform.translation();
+		Eigen::AngleAxisd angleAxis2(transform.rotation());
+		dofX.segment<3>(3) = angleAxis2.axis() * angleAxis2.angle();
+		Vector6d dofV = Vector6d::Zero();
+
+		Vector6d FWithoutExtraTorque = computeSpringForce(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV);
+
+		Vector6d FWithExtraTorque = computeSpringForce(linearStiffness, linearDamping,
+			angularStiffness, angularDamping, targetPosition, targetLinearVelocity,
+			targetRotationVector, targetAngularVelocity, dofX, dofV, true, localAnchorPoint);
+
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		SurgSim::Physics::RigidRepresentationState initialState;
+		initialState.setPose(transform);
+		rigidBody->setInitialState(initialState);
+		SurgSim::DataStructures::Location location(localAnchorPoint);
+
+		Vector6d F = FWithoutExtraTorque;
+		rigidBody->addExternalGeneralizedForce(location, F);
+		F = rigidBody->getExternalGeneralizedForce();
+
+		EXPECT_LE((F - FWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
+	}
 }
 
 TEST_F(RigidRepresentationTest, NoForceTorqueTest)
@@ -377,8 +897,7 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 TEST_F(RigidRepresentationTest, LocalizationCreation)
 {
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
-	Location loc;
-	loc.rigidLocalPosition.setValue(Vector3d(3.0, 2.0, 1.0));
+	Location loc(Vector3d(3.0, 2.0, 1.0));
 
 	std::shared_ptr<Localization> localization = rigidBody->createLocalization(loc);
 	localization->setRepresentation(rigidBody);

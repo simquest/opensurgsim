@@ -29,6 +29,7 @@
 #include "SurgSim/DataStructures/BufferedValue.h"
 
 using SurgSim::Collision::ContactMapType;
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -59,7 +60,7 @@ TEST(CollisionPairTests, InitTest)
 	EXPECT_FALSE(pair.hasContacts());
 	EXPECT_FALSE(pair.isSwapped());
 
-	std::pair<Location,Location> penetrationPoints;
+	std::pair<Location, Location> penetrationPoints;
 	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
 	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 	pair.addContact(1.0, Vector3d(1.0,0.0,0.0),penetrationPoints);
@@ -80,7 +81,7 @@ TEST(CollisionPairTests, SwapTest)
 	pair.swapRepresentations();
 	EXPECT_FALSE(pair.isSwapped());
 
-	std::pair<Location,Location> penetrationPoints;
+	std::pair<Location, Location> penetrationPoints;
 	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
 	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 
@@ -119,7 +120,7 @@ TEST(CollisionPairTests, addContactTest)
 	EXPECT_TRUE(rep0Collisions.empty());
 	EXPECT_TRUE(rep1Collisions.empty());
 
-	std::pair<Location,Location> penetrationPoints;
+	std::pair<Location, Location> penetrationPoints;
 	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
 	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 
