@@ -20,6 +20,7 @@
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 namespace
@@ -67,7 +68,7 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::Math::Vecto
 	m_externalGeneralizedDamping += D;
 }
 
-void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructures::Location& location,
 													  const SurgSim::Math::Vector6d& generalizedForce,
 													  const SurgSim::Math::Matrix66d& K,
 													  const SurgSim::Math::Matrix66d& D)
@@ -77,9 +78,12 @@ void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Vector6d;
 
-	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
+	SURGSIM_ASSERT(location.rigidLocalPosition.hasValue()) << "Invalid location (no rigid local position)";
 
-	const Vector3d point = localization->calculatePosition();
+	RigidRepresentationLocalization localization;
+	localization.setRepresentation(std::static_pointer_cast<Representation>(shared_from_this()));
+	localization.setLocalPosition(location.rigidLocalPosition.getValue());
+	const Vector3d point = localization.calculatePosition();
 	const Vector3d massCenter = getCurrentState().getPose().translation();
 	const Vector3d lever = point - massCenter;
 	auto force = generalizedForce.segment<3>(0);

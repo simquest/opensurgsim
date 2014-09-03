@@ -184,11 +184,9 @@ void VirtualToolCoupler::update(double dt)
 		generalizedDamping << linearDampingMatrix, zero3x3,
 							  zero3x3, angularDampingMatrix;
 
-		std::shared_ptr<RigidRepresentationLocalization> localization =
-			std::make_shared<RigidRepresentationLocalization>();
-		localization->setRepresentation(m_rigid);
-		localization->setLocalPosition(m_localAttachmentPoint);
-		m_rigid->addExternalGeneralizedForce(localization, generalizedForce, generalizedStiffness, generalizedDamping);
+		SurgSim::DataStructures::Location location;
+		location.rigidLocalPosition.setValue(m_localAttachmentPoint);
+		m_rigid->addExternalGeneralizedForce(location, generalizedForce, generalizedStiffness, generalizedDamping);
 
 		if (m_output != nullptr)
 		{

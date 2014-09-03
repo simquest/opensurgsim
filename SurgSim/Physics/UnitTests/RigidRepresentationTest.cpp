@@ -305,10 +305,8 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
-		std::shared_ptr<RigidRepresentationLocalization> localization =
-			std::make_shared<RigidRepresentationLocalization>();
-		localization->setRepresentation(rigidBody);
-		localization->setLocalPosition(anchorLocalPoint);
+		SurgSim::DataStructures::Location location;
+		location.rigidLocalPosition.setValue(anchorLocalPoint);
 
 		Vector6d Fnumeric = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofV);
 		Matrix66d Knumeric = computeExtraStiffness(inputForce, anchorLocalPoint, dofX, dofV);
@@ -316,7 +314,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		Vector6d F = inputForce;
 		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
-		rigidBody->addExternalGeneralizedForce(localization, F, K, D);
+		rigidBody->addExternalGeneralizedForce(location, F, K, D);
 		F = rigidBody->getExternalGeneralizedForce();
 		K = rigidBody->getExternalGeneralizedStiffness();
 		D = rigidBody->getExternalGeneralizedDamping();
@@ -335,10 +333,8 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		Vector3d anchorLocalPoint = Vector3d::Ones();
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
-		std::shared_ptr<RigidRepresentationLocalization> localization =
-			std::make_shared<RigidRepresentationLocalization>();
-		localization->setRepresentation(rigidBody);
-		localization->setLocalPosition(anchorLocalPoint);
+		SurgSim::DataStructures::Location location;
+		location.rigidLocalPosition.setValue(anchorLocalPoint);
 
 		Vector6d Fnumeric = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofV);
 		Matrix66d Knumeric = computeExtraStiffness(inputForce, anchorLocalPoint, dofX, dofV);
@@ -346,7 +342,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		Vector6d F = inputForce;
 		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
-		rigidBody->addExternalGeneralizedForce(localization, F, K, D);
+		rigidBody->addExternalGeneralizedForce(location, F, K, D);
 		F = rigidBody->getExternalGeneralizedForce();
 		K = rigidBody->getExternalGeneralizedStiffness();
 		D = rigidBody->getExternalGeneralizedDamping();
@@ -375,10 +371,8 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
-		std::shared_ptr<RigidRepresentationLocalization> localization =
-			std::make_shared<RigidRepresentationLocalization>();
-		localization->setRepresentation(rigidBody);
-		localization->setLocalPosition(anchorLocalPoint);
+		SurgSim::DataStructures::Location location;
+		location.rigidLocalPosition.setValue(anchorLocalPoint);
 
 		Vector6d Fnumeric = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofV);
 		Matrix66d Knumeric = computeExtraStiffness(inputForce, anchorLocalPoint, dofX, dofV);
@@ -386,7 +380,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		Vector6d F = inputForce;
 		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
-		rigidBody->addExternalGeneralizedForce(localization, F, K, D);
+		rigidBody->addExternalGeneralizedForce(location, F, K, D);
 		F = rigidBody->getExternalGeneralizedForce();
 		K = rigidBody->getExternalGeneralizedStiffness();
 		D = rigidBody->getExternalGeneralizedDamping();
@@ -415,10 +409,8 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
-		std::shared_ptr<RigidRepresentationLocalization> localization =
-			std::make_shared<RigidRepresentationLocalization>();
-		localization->setRepresentation(rigidBody);
-		localization->setLocalPosition(anchorLocalPoint);
+		SurgSim::DataStructures::Location location;
+		location.rigidLocalPosition.setValue(anchorLocalPoint);
 
 		Vector6d Fnumeric = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofV);
 		Matrix66d Knumeric = computeExtraStiffness(inputForce, anchorLocalPoint, dofX, dofV);
@@ -426,7 +418,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		Vector6d F = inputForce;
 		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
-		rigidBody->addExternalGeneralizedForce(localization, F, K, D);
+		rigidBody->addExternalGeneralizedForce(location, F, K, D);
 		F = rigidBody->getExternalGeneralizedForce();
 		K = rigidBody->getExternalGeneralizedStiffness();
 		D = rigidBody->getExternalGeneralizedDamping();
@@ -613,14 +605,12 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
-		std::shared_ptr<RigidRepresentationLocalization> localization =
-			std::make_shared<RigidRepresentationLocalization>();
-		localization->setRepresentation(rigidBody);
-		localization->setLocalPosition(localAnchorPoint);
+		SurgSim::DataStructures::Location location;
+		location.rigidLocalPosition.setValue(localAnchorPoint);
 
 		Vector6d F = FWithoutExtraTorque;
 		Matrix66d K = KWithoutExtraTorque, D = DWithoutExtraTorque;
-		rigidBody->addExternalGeneralizedForce(localization, F, K, D);
+		rigidBody->addExternalGeneralizedForce(location, F, K, D);
 		F = rigidBody->getExternalGeneralizedForce();
 		K = rigidBody->getExternalGeneralizedStiffness();
 		D = rigidBody->getExternalGeneralizedDamping();
@@ -661,14 +651,12 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
-		std::shared_ptr<RigidRepresentationLocalization> localization =
-			std::make_shared<RigidRepresentationLocalization>();
-		localization->setRepresentation(rigidBody);
-		localization->setLocalPosition(localAnchorPoint);
+		SurgSim::DataStructures::Location location;
+		location.rigidLocalPosition.setValue(localAnchorPoint);
 
 		Vector6d F = FWithoutExtraTorque;
 		Matrix66d K = KWithoutExtraTorque;
-		rigidBody->addExternalGeneralizedForce(localization, F, K);
+		rigidBody->addExternalGeneralizedForce(location, F, K);
 		F = rigidBody->getExternalGeneralizedForce();
 		K = rigidBody->getExternalGeneralizedStiffness();
 
@@ -701,13 +689,11 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
-		std::shared_ptr<RigidRepresentationLocalization> localization =
-			std::make_shared<RigidRepresentationLocalization>();
-		localization->setRepresentation(rigidBody);
-		localization->setLocalPosition(localAnchorPoint);
+		SurgSim::DataStructures::Location location;
+		location.rigidLocalPosition.setValue(localAnchorPoint);
 
 		Vector6d F = FWithoutExtraTorque;
-		rigidBody->addExternalGeneralizedForce(localization, F);
+		rigidBody->addExternalGeneralizedForce(location, F);
 		F = rigidBody->getExternalGeneralizedForce();
 
 		EXPECT_LE((F - FWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
