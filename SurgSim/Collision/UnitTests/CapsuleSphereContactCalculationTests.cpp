@@ -47,13 +47,15 @@ void doCapsuleSphereTest(double capsuleHeight, double capsuleRadius,
 
 		EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal));
 		EXPECT_NEAR(depth, contact->depth, SurgSim::Math::Geometry::DistanceEpsilon);
-		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
-		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
+		EXPECT_TRUE(contact->penetrationPoints.first.rigidLocalPosition.hasValue());
+		EXPECT_TRUE(contact->penetrationPoints.second.rigidLocalPosition.hasValue());
 
-		Vector3d penetrationPoint0(sphereProjection - expectedNorm * capsuleRadius);
-		Vector3d penetrationPoint1(spherePosition + expectedNorm * sphereRadius);
-		EXPECT_TRUE(eigenEqual(penetrationPoint0, contact->penetrationPoints.first.globalPosition.getValue()));
-		EXPECT_TRUE(eigenEqual(penetrationPoint1, contact->penetrationPoints.second.globalPosition.getValue()));
+		Vector3d capsuleLocalNormal = capsuleQuat.inverse() * expectedNorm;
+		Vector3d penetrationPoint0(sphereProjection - capsuleLocalNormal * capsuleRadius);
+		Vector3d sphereLocalNormal = sphereQuat.inverse() * expectedNorm;
+		Vector3d penetrationPoint1(sphereLocalNormal * sphereRadius);
+		EXPECT_TRUE(eigenEqual(penetrationPoint0, contact->penetrationPoints.first.rigidLocalPosition.getValue()));
+		EXPECT_TRUE(eigenEqual(penetrationPoint1, contact->penetrationPoints.second.rigidLocalPosition.getValue()));
 	}
 }
 
@@ -78,7 +80,7 @@ TEST(CapsuleSphereContactCalculationTests, UnitTests)
 							SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(0.0, 0.0, 1.0)),
 							0.1, Vector3d(-0.2, 0.0, 0.0),
 							Quaterniond::Identity(), true, 0.15,
-							Vector3d(-0.05, 0.0, 0.0), Vector3d(1.0, 0.0, 0.0));
+							Vector3d(0.0, 0.05, 0.0), Vector3d(1.0, 0.0, 0.0));
 	}
 
 	{
@@ -91,7 +93,7 @@ TEST(CapsuleSphereContactCalculationTests, UnitTests)
 							SurgSim::Math::makeRotationQuaternion(-M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 							1.0, sphereCenter,
 							Quaterniond::Identity(), true, 1,
-							sphereProjection, expectedNormal);
+							Vector3d(0.0, M_SQRT2, 0.0), expectedNormal);
 
 	}
 }

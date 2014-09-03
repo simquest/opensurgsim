@@ -31,7 +31,6 @@ namespace Collision
 struct Location
 {
 public:
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> globalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::OctreePath> octreeNodePath;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> meshLocalCoordinate;

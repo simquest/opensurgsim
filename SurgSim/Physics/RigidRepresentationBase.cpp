@@ -53,17 +53,17 @@ bool RigidRepresentationBase::doInitialize()
 			"An invalid shape is used in this RigidRepresentationBase.";
 	}
 
+	return true;
+}
+
+bool RigidRepresentationBase::doWakeUp()
+{
 	m_initialState.setPose(getPose());
 	m_currentState = m_initialState;
 	m_finalState = m_initialState;
 	m_previousState = m_initialState;
 	updateGlobalInertiaMatrices(m_currentState);
 
-	return true;
-}
-
-bool RigidRepresentationBase::doWakeUp()
-{
 	return true;
 }
 

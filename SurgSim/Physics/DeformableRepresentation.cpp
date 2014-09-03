@@ -114,6 +114,21 @@ SurgSim::Math::IntegrationScheme DeformableRepresentation::getIntegrationScheme(
 	return m_integrationScheme;
 }
 
+const SurgSim::Math::Vector& DeformableRepresentation::getExternalGeneralizedForce() const
+{
+	return m_externalGeneralizedForce;
+}
+
+const SurgSim::Math::Matrix& DeformableRepresentation::getExternalGeneralizedStiffness() const
+{
+	return m_externalGeneralizedStiffness;
+}
+
+const SurgSim::Math::Matrix& DeformableRepresentation::getExternalGeneralizedDamping() const
+{
+	return m_externalGeneralizedDamping;
+}
+
 const SurgSim::Math::Matrix& DeformableRepresentation::getComplianceMatrix() const
 {
 	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
