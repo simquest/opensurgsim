@@ -473,6 +473,14 @@ TEST(ComponentTests, SetActiveTest)
 	EXPECT_NO_THROW(component->setActive(false));
 	EXPECT_FALSE(component->isActive());
 
+	// RW property test
+	component->setValue("IsActive", true);
+	EXPECT_TRUE(component->isActive());
+	EXPECT_TRUE(component->getValue<bool>("IsActive"));
+	component->setValue("IsActive", false);
+	EXPECT_FALSE(component->isActive());
+	EXPECT_FALSE(component->getValue<bool>("IsActive"));
+
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("SceneElement");
 	sceneElement->addComponent(component);
 	EXPECT_TRUE(sceneElement->isActive());
@@ -491,4 +499,32 @@ TEST(ComponentTests, SetActiveTest)
 	// An inactive component in an inactive SceneElement is 'inactive'.
 	component->setActive(false);
 	EXPECT_FALSE(component->isActive());
+
+	// During serialization, it's Component::m_isActive being serialized, not Component::isActive().
+	component->setValue("IsActive", true);
+	YAML::Node node = sceneElement->encode(true);
+	YAML::Node data = node["SurgSim::Framework::BasicSceneElement"];
+
+	// Decode the component only.
+	std::shared_ptr<SurgSim::Framework::Component> decodedComponent;
+	for (auto nodeIt = data["Components"].begin(); nodeIt != data["Components"].end(); ++nodeIt)
+	{
+		if ("MockComponent" == nodeIt->begin()->first.as<std::string>())
+		{
+			decodedComponent = nodeIt->as<std::shared_ptr<MockComponent>>();
+			break;
+		}
+	}
+	EXPECT_EQ(nullptr, decodedComponent->getSceneElement());
+	EXPECT_TRUE(decodedComponent->isActive());
+
+	// Decode the component with a SceneElement. The SceneElement's activity (active/inactive) will
+	// affect the return value of Component::isActive().
+	decodedComponent = nullptr;
+	auto decodedSceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Decoded");
+	decodedSceneElement->decode(node);
+	EXPECT_FALSE(decodedSceneElement->isActive());
+	decodedComponent = decodedSceneElement->getComponent("Component");
+	EXPECT_NE(nullptr, decodedComponent->getSceneElement());
+	EXPECT_FALSE(decodedComponent->isActive());
 }

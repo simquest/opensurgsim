@@ -40,6 +40,11 @@ Component::Component(const std::string& name) :
 	m_isInitialized(false),
 	m_isAwake(false)
 {
+	SURGSIM_ADD_RW_PROPERTY(Component, bool, IsActive, isActive, setActive);
+
+	setSerializable("IsActive",
+		std::bind(&YAML::convert<bool>::encode, std::bind([&](){return m_isActive;})),
+		std::bind(&Component::setActive, this, std::bind(&YAML::Node::as<bool>, std::placeholders::_1)));
 }
 
 Component::~Component()
