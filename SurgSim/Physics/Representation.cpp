@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Collision/Location.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Physics/Localization.h"
@@ -100,7 +100,7 @@ void Representation::afterUpdate(double dt)
 {
 }
 
-std::shared_ptr<Localization> Representation::createLocalization(const SurgSim::Collision::Location& location)
+std::shared_ptr<Localization> Representation::createLocalization(const SurgSim::DataStructures::Location& location)
 {
 	return nullptr;
 }

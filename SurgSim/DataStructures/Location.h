@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_LOCATION_H
-#define SURGSIM_COLLISION_LOCATION_H
+#ifndef SURGSIM_DATASTRUCTURES_LOCATION_H
+#define SURGSIM_DATASTRUCTURES_LOCATION_H
 
 #include <vector>
 
@@ -25,7 +25,7 @@
 
 namespace SurgSim
 {
-namespace Collision
+namespace DataStructures
 {
 
 struct Location
@@ -36,7 +36,7 @@ public:
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> meshLocalCoordinate;
 };
 
-}; // namespace Collision
+}; // namespace DataStructures
 }; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_DATASTRUCTURES_LOCATION_H

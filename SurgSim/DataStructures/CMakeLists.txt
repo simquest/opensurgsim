@@ -49,6 +49,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	EmptyData.h
 	IndexDirectory.h
 	IndexedLocalCoordinate.h
+	Location.h
 	MeshElement.h
 	NamedData.h
 	NamedData-inl.h

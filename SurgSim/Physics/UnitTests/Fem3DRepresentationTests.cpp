@@ -18,7 +18,7 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Collision/Location.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
@@ -245,7 +245,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 		auto barycentricCoordinate = barycentricCoordinates.cbegin();
 		for (auto point = points.cbegin(); point != points.cend(); ++point, ++barycentricCoordinate)
 		{
-			SurgSim::Collision::Location location;
+			SurgSim::DataStructures::Location location;
 			std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 
 			SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;

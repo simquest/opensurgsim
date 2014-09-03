@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Collision/Location.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
@@ -34,9 +34,9 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Framework::Component;
 using SurgSim::Framework::Runtime;
-using SurgSim::Collision::Location;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Matrix66d;
 using SurgSim::Math::makeRigidTransform;
