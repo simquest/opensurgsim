@@ -67,7 +67,7 @@ TEST(VisualizeContactsBehaviorTests, Serialization)
 	Node node;
 	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*visualizeContactsBehavior));
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(4, node[visualizeContactsBehavior->getClassName()].size());
+	EXPECT_EQ(5, node[visualizeContactsBehavior->getClassName()].size());
 
 	// Decode
 	std::shared_ptr<VisualizeContactsBehavior> newVisualizeContactsBehavior;

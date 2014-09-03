@@ -81,10 +81,6 @@ public:
 	/// \param isActive True if the Representation is being activated, False otherwise
 	void setIsActive(bool isActive);
 
-	/// Query if this object is active in the scene.
-	/// \return true if active, false if not.
-	bool isActive() const;
-
 	/// Set the gravity enable flag
 	/// \param isGravityEnabled True if gravity enabled, false if not.
 	void setIsGravityEnabled(bool isGravityEnabled);
@@ -173,9 +169,6 @@ private:
 
 	/// Gravity enabled flag
 	bool m_isGravityEnabled;
-
-	/// Is this representation active or not ?
-	bool m_isActive;
 
 	/// Is this representation driving the sceneElement pose
 	bool m_isDrivingSceneElementPose;
