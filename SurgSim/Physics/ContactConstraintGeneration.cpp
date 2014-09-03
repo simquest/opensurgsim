@@ -152,8 +152,8 @@ std::shared_ptr<Localization> ContactConstraintGeneration::makeLocalization(
 			// to local coordinates of the physics representation that is creating a localization
 			SurgSim::Collision::Location physicsLocation = location;
 			physicsLocation.rigidLocalPosition.setValue(
-					physicsRepresentation->getPose().inverse() *
-					collisionRepresentation->getPose() *
+					physicsRepresentation->getLocalPose().inverse() *
+					collisionRepresentation->getLocalPose() *
 					location.rigidLocalPosition.getValue());
 			result = physicsRepresentation->createLocalization(physicsLocation);
 		}
