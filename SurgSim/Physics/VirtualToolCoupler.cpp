@@ -188,8 +188,7 @@ void VirtualToolCoupler::update(double dt)
 			std::make_shared<RigidRepresentationLocalization>();
 		localization->setRepresentation(m_rigid);
 		localization->setLocalPosition(m_localAttachmentPoint);
-		m_rigid->addExternalGeneralizedForce(localization, &generalizedForce, &generalizedStiffness,
-			&generalizedDamping);
+		m_rigid->addExternalGeneralizedForce(localization, generalizedForce, generalizedStiffness, generalizedDamping);
 
 		if (m_output != nullptr)
 		{

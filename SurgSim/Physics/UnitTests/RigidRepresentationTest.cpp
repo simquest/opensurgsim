@@ -316,7 +316,10 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		Vector6d F = inputForce;
 		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
-		rigidBody->addExternalGeneralizedForce(localization, &F, &K, &D);
+		rigidBody->addExternalGeneralizedForce(localization, F, K, D);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
 		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
@@ -343,7 +346,10 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		Vector6d F = inputForce;
 		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
-		rigidBody->addExternalGeneralizedForce(localization, &F, &K, &D);
+		rigidBody->addExternalGeneralizedForce(localization, F, K, D);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
 		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
@@ -380,7 +386,10 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		Vector6d F = inputForce;
 		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
-		rigidBody->addExternalGeneralizedForce(localization, &F, &K, &D);
+		rigidBody->addExternalGeneralizedForce(localization, F, K, D);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
 		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
@@ -417,7 +426,10 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		Vector6d F = inputForce;
 		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
-		rigidBody->addExternalGeneralizedForce(localization, &F, &K, &D);
+		rigidBody->addExternalGeneralizedForce(localization, F, K, D);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
 		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
@@ -608,7 +620,10 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 
 		Vector6d F = FWithoutExtraTorque;
 		Matrix66d K = KWithoutExtraTorque, D = DWithoutExtraTorque;
-		rigidBody->addExternalGeneralizedForce(localization, &F, &K, &D);
+		rigidBody->addExternalGeneralizedForce(localization, F, K, D);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
+		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - FWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
 		EXPECT_LE((K - KWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
@@ -653,7 +668,9 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 
 		Vector6d F = FWithoutExtraTorque;
 		Matrix66d K = KWithoutExtraTorque;
-		rigidBody->addExternalGeneralizedForce(localization, &F, &K);
+		rigidBody->addExternalGeneralizedForce(localization, F, K);
+		F = rigidBody->getExternalGeneralizedForce();
+		K = rigidBody->getExternalGeneralizedStiffness();
 
 		EXPECT_LE((F - FWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
 		EXPECT_LE((K - KWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
@@ -690,7 +707,8 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 		localization->setLocalPosition(localAnchorPoint);
 
 		Vector6d F = FWithoutExtraTorque;
-		rigidBody->addExternalGeneralizedForce(localization, &F);
+		rigidBody->addExternalGeneralizedForce(localization, F);
+		F = rigidBody->getExternalGeneralizedForce();
 
 		EXPECT_LE((F - FWithExtraTorque).cwiseAbs().maxCoeff(), 1e-7);
 	}
