@@ -2,7 +2,7 @@
 	\fn void SurgSim::Physics::RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructures::Location &location, const SurgSim::Math::Vector6d &generalizedForce, const SurgSim::Math::Matrix66d &K=SurgSim::Math::Matrix66d::Zero(), const SurgSim::Math::Matrix66d &D=SurgSim::Math::Matrix66d::Zero())
 	<br>
 
-	The localization produces an extra torque and extra terms in the derivatives (stiffness/damping matrices) coming from this extra torque. <br>
+	The location produces an extra torque and extra terms in the derivatives (stiffness/damping matrices) coming from this extra torque. <br>
 	Let's note the position dof (\f$\mathbf{C}\f$,\f$\mathbf{W}\f$) and the velocity dof (\f$\mathbf{v}\f$, \f$\mathbf{w}\f$), and \f$R\f$ the 3x3 rotation matrix dependent on \f$\mathbf{W}\f$.
 	The force (\f$\mathbf{F}\f$) applied on a point (\f$\mathbf{P}\f$) that is not the mass center (\f$\mathbf{C}\f$), produces a torque (\f$\mathbf{T}\f$) and also affect matrix derivatives (\f$K\f$ and \f$D\f$) as follow: <br>
 	\f[
