@@ -38,6 +38,8 @@
 
 #include "SurgSim/Math/Geometry.h"
 
+using SurgSim::DataStructures::Location;
+
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;

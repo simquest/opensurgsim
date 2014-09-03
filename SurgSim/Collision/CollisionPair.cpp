@@ -20,6 +20,8 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Assert.h"
 
+using SurgSim::DataStructures::Location;
+
 namespace SurgSim
 {
 namespace Collision

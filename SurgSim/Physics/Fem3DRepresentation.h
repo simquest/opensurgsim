@@ -61,7 +61,7 @@ public:
 											 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 											 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
-	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location) override;
+	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location&) override;
 
 protected:
 	virtual bool doWakeUp() override;

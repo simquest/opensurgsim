@@ -1,0 +1,101 @@
+/*!
+	\fn void SurgSim::Physics::RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructures::Location &location, const SurgSim::Math::Vector6d &generalizedForce, const SurgSim::Math::Matrix66d &K=SurgSim::Math::Matrix66d::Zero(), const SurgSim::Math::Matrix66d &D=SurgSim::Math::Matrix66d::Zero())
+	<br>
+
+	The location produces an extra torque and extra terms in the derivatives (stiffness/damping matrices) coming from this extra torque. <br>
+	Let's note the position dof (\f$\mathbf{C}\f$,\f$\mathbf{W}\f$) and the velocity dof (\f$\mathbf{v}\f$, \f$\mathbf{w}\f$), and \f$R\f$ the 3x3 rotation matrix dependent on \f$\mathbf{W}\f$.
+	The force (\f$\mathbf{F}\f$) applied on a point (\f$\mathbf{P}\f$) that is not the mass center (\f$\mathbf{C}\f$), produces a torque (\f$\mathbf{T}\f$) and also affect matrix derivatives (\f$K\f$ and \f$D\f$) as follow: <br>
+	\f[
+	\mathbf{T} = \mathbf{CP} \wedge \mathbf{F}
+	\f]
+	Note that \f$\mathbf{CP}\f$ does not depend on the velocity (neither \f$\mathbf{v}\f$ nor \f$\mathbf{w}\f$, therefore the damping matrix is affected by the terms:
+	\f[ \displaystyle
+		-\frac{\partial \mathbf{T}}{\partial \mathbf{v}} =
+		-\mathbf{CP} \wedge \frac{\partial \mathbf{F}}{\partial \mathbf{v}} = \mathbf{CP} \wedge D_{3 \times 3}^{(0, 0)}
+	\f]
+	\f[ \displaystyle
+		-\frac{\partial \mathbf{T}}{\partial \mathbf{w}} =
+		-\mathbf{CP} \wedge \frac{\partial \mathbf{F}}{\partial \mathbf{w}} = \mathbf{CP} \wedge D_{3 \times 3}^{(0, 3)}
+	\f]
+	Also note that \f$\mathbf{CP}\f$ does not change if the rigid translate (\f$\mathbf{C}\f$ changes), but it changes if the rotation of the rigid changes (\f$\mathbf{W}\f$ changes => \f$R\f$ changes). <br>
+	Therefore \f$\mathbf{CP}\f$ is a constant vector in the rigid local space \f$ \mathbf{CP} = R.\mathbf{CP_{local}} \f$ and its derivative w.r.t. \f$\mathbf{C}\f$ is null and we get: <br>
+	\f[ \displaystyle
+		-\frac{\partial \mathbf{T}}{\partial \mathbf{C}} =
+		-\mathbf{CP} \wedge \frac{\partial \mathbf{F}}{\partial \mathbf{C}} = \mathbf{CP} \wedge K_{3 \times 3}^{(0,0)}
+	\f]
+	\f[ \displaystyle
+		-\frac{\partial \mathbf{T}}{\partial \mathbf{W}} =
+		-\frac{\partial \mathbf{CP}}{\partial \mathbf{W}} \wedge \mathbf{F} - \mathbf{CP} \wedge \frac{\partial \mathbf{F}}{\partial \mathbf{W}} =
+		-\frac{\partial \mathbf{CP}}{\partial \mathbf{W}} \wedge \mathbf{F} + \mathbf{CP} \wedge K_{3 \times 3}^{(0, 3)}
+	\f]
+
+	To compute \f$\frac{\partial \mathbf{CP}}{\partial \mathbf{W}} = \frac{\partial R}{\partial \mathbf{W}}.\mathbf{CP}_{local}\f$, we operate a variable change, from the rotation vector \f$\mathbf{W}\f$ to angle/axis (\f$\theta\f$, \f$\mathbf{u}\f$) representation (4 dof):
+	\f[
+	\left\{
+	\begin{eqnarray*}
+	\theta = |\mathbf{W}| \\
+	\mathbf{u} = \frac{\mathbf{W}}{|\mathbf{W}|}
+	\end{eqnarray*}
+	\right.
+	\f]
+	In this new coordinate system, we have (see reference http://en.wikipedia.org/wiki/Rotation_matrix):
+	\f[
+	R(\theta, \mathbf{u}) = cos(\theta).I + sin(\theta).\left[\mathbf{u}\right] + (1-cos(\theta)).\mathbf{u} \otimes \mathbf{u}
+	\f]
+	where \f$\left[\mathbf{u}\right]\f$ denotes the skew symmetric matrix of the vector \f$\mathbf{u}\f$, 
+	\f$\left[\mathbf{u}\right] = \left( \begin{array}{ccc} 0 & -u^z & u^y \\ u^z & 0 & -u^x \\ -u^y & u^x & 0 \end{array} \right)\f$
+	and \f$\mathbf{u} \otimes \mathbf{u}\f$ the tensor product: \f$\left(\mathbf{u} \otimes \mathbf{u}^T\right)_{ij} = u^i * u^j\f$.
+
+	Applying the chain derivation rule, we get:
+	\f[
+	\frac{\partial R}{\partial W^{\alpha}} = \frac{\partial R}{\partial \theta}.\frac{\partial \theta}{\partial W^{\alpha}} +
+		\frac{\partial R}{\partial u^x}.\frac{\partial u^x}{\partial W^{\alpha}} +
+		\frac{\partial R}{\partial u^y}.\frac{\partial u^y}{\partial W^{\alpha}} +
+		\frac{\partial R}{\partial u^z}.\frac{\partial u^z}{\partial W^{\alpha}}
+	\f]
+	with
+	\f[
+	\frac{\partial R}{\partial \theta} = -sin(\theta).I + cos(\theta).\left[\mathbf{u}\right] + sin(\theta).\mathbf{u} \otimes \mathbf{u}
+	\f]
+
+	\f[
+	\frac{\partial R}{\partial u^x} =
+		sin(\theta) \left( \begin{array}{ccc} 0 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{array} \right) +
+		(1 - cos(\theta)) \left( \begin{array}{ccc} 2u^x & u^y & u^z \\ u^y & 0 & 0 \\ u^z & 0 & 0 \end{array} \right)
+	\f]
+
+	\f[
+	\frac{\partial R}{\partial u^y} =
+		sin(\theta) \left( \begin{array}{ccc} 0 & 0 & 1 \\ 0 & 0 & 0 \\ -1 & 0 & 0 \end{array} \right) +
+		(1 - cos(\theta)) \left( \begin{array}{ccc} 0 & u^x & 0 \\ u^x & 2u^y & u^z \\ 0 & u^z & 0 \end{array} \right)
+	\f]
+
+	\f[
+	\frac{\partial R}{\partial u^z} =
+		sin(\theta) \left( \begin{array}{ccc} 0 & -1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 0 \end{array} \right) +
+		(1 - cos(\theta)) \left( \begin{array}{ccc} 0 & 0 & u^x \\ 0 & 0 & u^y \\ u^x & u^y & 2u^z \end{array} \right)
+	\f]
+
+	and
+
+	\f[
+	\frac{\partial \theta}{\partial W^{\alpha}} = \frac{W^{\alpha}}{|\mathbf{W}|}
+	\f]
+
+	\f[
+	\frac{\partial u}{\partial W^{\alpha}} =
+	\frac{1}{|\mathbf{W}|} .
+	\left(
+		\left(
+			\begin{array}{c}
+				\delta^{x,\alpha} \\
+				\delta^{y,\alpha} \\
+				\delta^{z,\alpha}
+			\end{array}
+		\right)
+		-
+		\frac{W^{\alpha}}{|\mathbf{W}|}
+		\frac{\mathbf{W}}{|\mathbf{W}|}
+	\right)
+	\f]
+*/
