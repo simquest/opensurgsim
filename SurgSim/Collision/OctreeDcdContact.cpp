@@ -64,8 +64,9 @@ void OctreeDcdContact::calculateContactWithNode(
 	SurgSim::Math::Vector3d nodeSize = node->getBoundingBox().sizes();
 	std::shared_ptr<SurgSim::Math::Shape> nodeShape;
 	nodeShape = std::make_shared<SurgSim::Math::BoxShape>(nodeSize.x(), nodeSize.y(), nodeSize.z());
+	SurgSim::Math::Vector3d nodeCenter = node->getBoundingBox().center();
 	SurgSim::Math::RigidTransform3d nodePose = pair->getFirst()->getPose();
-	nodePose.translation() += nodePose.linear() * node->getBoundingBox().center();
+	nodePose.translation() += nodePose.linear() * nodeCenter;
 
 	m_nodeCollisionRepresentation->setShape(nodeShape);
 	m_nodeCollisionRepresentation->setLocalPose(nodePose);
@@ -88,9 +89,15 @@ void OctreeDcdContact::calculateContactWithNode(
 		else
 		{
 			const std::list<std::shared_ptr<Contact>>& newContacts = localPair->getContacts();
+			SurgSim::Math::Vector3d contactPosition;
 			for (auto contact = newContacts.cbegin(); contact != newContacts.cend(); ++contact)
 			{
 				(*contact)->penetrationPoints.first.octreeNodePath.setValue(*nodePath);
+
+				contactPosition = (*contact)->penetrationPoints.first.rigidLocalPosition.getValue();
+				contactPosition += nodeCenter;
+				(*contact)->penetrationPoints.first.rigidLocalPosition.setValue(contactPosition);
+
 				pair->addContact(*contact);
 			}
 		}
