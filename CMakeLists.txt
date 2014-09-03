@@ -115,17 +115,30 @@ endif()
 
 #OpenSurgSimConfig For the Build Tree
 set(CONFIG_INCLUDE_DIRS "${SURGSIM_SOURCE_DIR}")
+set(CONFIG_DATA_DIR "${SURGSIM_SOURCE_DIR}/Data")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfig.cmake" @ONLY)
 
 #OpenSurgSimConfig For the Install Tree
 file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_PREFIX}/include")
 set(CONFIG_INCLUDE_DIRS "\${OPENSURGSIM_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+
+if (WIN32)
+file(RELATIVE_PATH REL_DATA_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_PREFIX}/Data")
+install(DIRECTORY Data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/Data)
+else (WIN32)
+file(RELATIVE_PATH REL_DATA_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}")
+install(DIRECTORY Data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
+endif (WIN32)
+set(CONFIG_DATA_DIR "\${OPENSURGSIM_CMAKE_DIR}/${REL_DATA_DIR}")
+
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
 	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/OpenSurgSimConfig.cmake" @ONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfigVersion.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfigVersion.cmake" @ONLY)
+	
 
 install(FILES
 	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/OpenSurgSimConfig.cmake"
@@ -138,4 +151,5 @@ surgsim_cpplint_this_tree(cpplint)
 # Set these variables for Projects using Oss inside their Project structure rather than
 # Through the installed version
 set(OPENSURGSIM_INCLUDE_DIRS ${SURGSIM_SOURCE_DIR} CACHE INTERNAL "OSS Include Directories")
+set(OPENSURGSIM_DATA_DIR ${SURGSIM_SOURCE_DIR}/Data CACHE INTERNAL "OSS Data Directory")
 set(OPENSURGSIM_LIBRARIES ${EXPORT_TARGETS} CACHE INTERNAL "OSS Exported Libraries")
