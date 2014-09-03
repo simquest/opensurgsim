@@ -206,6 +206,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 	virtualToolCoupler->initialize(runtime);
 	rigidBody->initialize(runtime);
 	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
 
 	EXPECT_FALSE(rigidBody->getCurrentState().getPose().translation().isZero(epsilon));
 
@@ -251,6 +252,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacementWithInertialTorques)
 	virtualToolCoupler->initialize(runtime);
 	rigidBody->initialize(runtime);
 	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
 
 	RigidRepresentationState state = rigidBody->getCurrentState();
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
@@ -288,6 +290,7 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 	virtualToolCoupler->initialize(runtime);
 	rigidBody->initialize(runtime);
 	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
 
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(rigidBody->getCurrentState().getPose().linear());
 	EXPECT_NEAR(M_PI_4, angleAxis.angle(), epsilon);
@@ -329,6 +332,7 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 	virtualToolCoupler->initialize(runtime);
 	rigidBody->initialize(runtime);
 	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
 
 	EXPECT_TRUE(rigidBody->getCurrentState().getPose().translation().isApprox(Vector3d::Zero(), epsilon));
 
@@ -535,6 +539,32 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 
 	EXPECT_EQ(inputNode[input->getClassName()]["Id"].as<std::string>(),
 		node[virtualToolCoupler->getClassName()][input->getName()][input->getClassName()]["Id"].as<std::string>());
+}
+
+TEST_F(VirtualToolCouplerTest, OutputDataEntries)
+{
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	ASSERT_TRUE(virtualToolCoupler->initialize(runtime));
+	auto data = virtualToolCoupler->getOutputData();
+
+	EXPECT_EQ(1, data.poses().getNumEntries());
+	EXPECT_TRUE(data.poses().hasEntry(SurgSim::DataStructures::Names::INPUT_POSE));
+
+	EXPECT_EQ(4, data.vectors().getNumEntries());
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::FORCE));
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::TORQUE));
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY));
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY));
+
+	EXPECT_EQ(2, data.matrices().getNumEntries());
+	EXPECT_TRUE(data.matrices().hasEntry(SurgSim::DataStructures::Names::SPRING_JACOBIAN));
+	EXPECT_TRUE(data.matrices().hasEntry(SurgSim::DataStructures::Names::DAMPER_JACOBIAN));
+
+	EXPECT_EQ(0, data.scalars().getNumEntries());
+	EXPECT_EQ(0, data.integers().getNumEntries());
+	EXPECT_EQ(0, data.booleans().getNumEntries());
+	EXPECT_EQ(0, data.strings().getNumEntries());
+	EXPECT_EQ(0, data.customData().getNumEntries());
 }
 
 }; // namespace Physics

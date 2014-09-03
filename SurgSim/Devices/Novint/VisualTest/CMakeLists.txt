@@ -20,9 +20,6 @@ link_directories(
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
-	"${GLUT_INCLUDE_DIR}"
 )
 
 set(EXAMPLE_SOURCES
@@ -39,10 +36,17 @@ set(SEVEN_DOF_EXAMPLE_SOURCES
 set(SEVEN_DOF_EXAMPLE_HEADERS
 )
 
-set(LIBS NovintDevice IdentityPoseDevice VisualTestCommon
-	SurgSimInput SurgSimFramework SurgSimDataStructures
+set(LIBS
+	NovintDevice
+	IdentityPoseDevice
+	VisualTestCommon
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
 	${NOVINT_HDAL_SDK_LIBRARIES}
-	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+	${Boost_LIBRARIES}
+	${OPENGL_LIBRARIES}
+)
 
 add_executable(NovintVisualTest
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})

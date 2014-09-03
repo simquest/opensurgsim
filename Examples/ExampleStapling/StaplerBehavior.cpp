@@ -186,16 +186,17 @@ void StaplerBehavior::filterCollisionMapForSupportedRepresentationTypes(ContactM
 std::shared_ptr<SurgSim::Physics::Constraint> StaplerBehavior::createBilateral3DConstraint(
 	std::shared_ptr<SurgSim::Physics::Representation> stapleRep,
 	std::shared_ptr<SurgSim::Physics::Representation> otherRep,
-	SurgSim::Collision::Location contraintLocation)
+	SurgSim::DataStructures::Location stapleConstraintLocation,
+	SurgSim::DataStructures::Location otherConstraintLocation)
 {
 	// Create a bilateral constraint between the physicsRepresentation and staple.
 	// First find the points where the constraint is going to be applied.
 	std::shared_ptr<Localization> stapleRepLocalization
-		= stapleRep->createLocalization(contraintLocation);
+		= stapleRep->createLocalization(stapleConstraintLocation);
 	stapleRepLocalization->setRepresentation(stapleRep);
 
 	std::shared_ptr<Localization> otherRepLocatization
-		= otherRep->createLocalization(contraintLocation);
+		= otherRep->createLocalization(otherConstraintLocation);
 	otherRepLocatization->setRepresentation(otherRep);
 
 	std::shared_ptr<SurgSim::Physics::Constraint> constraint = nullptr;
@@ -310,10 +311,17 @@ void StaplerBehavior::createStaple()
 		std::shared_ptr<SurgSim::Physics::Representation> targetPhysicsRepresentation =
 			findCorrespondingPhysicsRepresentation(targetRepresentationContacts.first);
 
+		// The constraint is created at the contact point in targetContact->penetrationPoints.second.
+		// Convert this location to stapleRepresentation.
+		auto stapleRepresentation = staple->getComponents<SurgSim::Physics::Representation>()[0];
+		SurgSim::DataStructures::Location stapleConstraintLocation(SurgSim::Math::Vector3d(
+			stapleRepresentation->getPose().inverse() * targetPhysicsRepresentation->getPose() *
+			targetContact->penetrationPoints.second.rigidLocalPosition.getValue()));
+
 		// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
 		std::shared_ptr<SurgSim::Physics::Constraint> constraint =
 			createBilateral3DConstraint(staple->getComponents<SurgSim::Physics::Representation>()[0],
-										targetPhysicsRepresentation,
+										targetPhysicsRepresentation, stapleConstraintLocation,
 										targetContact->penetrationPoints.second);
 
 		if (constraint == nullptr)

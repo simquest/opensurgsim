@@ -20,9 +20,6 @@ link_directories(
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
-	"${GLUT_INCLUDE_DIR}"
 )
 
 set(EXAMPLE_SOURCES
@@ -39,9 +36,17 @@ set(RAW_EXAMPLE_SOURCES
 set(RAW_EXAMPLE_HEADERS
 )
 
-set(LIBS MultiAxisDevice IdentityPoseDevice VisualTestCommon
-	SurgSimInput SurgSimFramework SurgSimDataStructures
-	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+set(LIBS
+	MultiAxisDevice
+	IdentityPoseDevice
+	VisualTestCommon
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
+	${Boost_LIBRARIES}
+	${OPENGL_LIBRARIES}
+)
+
 if(WDK_FOUND)
 	list(APPEND LIBS ${WDK_LIBRARIES})
 endif()

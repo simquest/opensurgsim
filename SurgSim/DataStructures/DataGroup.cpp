@@ -157,5 +157,17 @@ void DataGroup::resetAll()
 	m_customData.resetAll();
 }
 
+bool DataGroup::isEmpty() const
+{
+	return !(m_poses.isValid() ||
+		m_vectors.isValid() ||
+		m_matrices.isValid() ||
+		m_scalars.isValid() ||
+		m_integers.isValid() ||
+		m_booleans.isValid() ||
+		m_strings.isValid() ||
+		m_customData.isValid());
+}
+
 };  // namespace DataStructures
 };  // namespace SurgSim

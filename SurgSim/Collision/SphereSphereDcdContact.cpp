@@ -17,10 +17,10 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
 
@@ -51,12 +51,14 @@ void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> p
 	double maxDist = firstSphere->getRadius() + secondSphere->getRadius();
 	if (dist < maxDist)
 	{
-		std::pair<Location,Location> penetrationPoints;
+		std::pair<Location, Location> penetrationPoints;
 		normal.normalize();
-		penetrationPoints.first.globalPosition.setValue(firstCenter - normal * firstSphere->getRadius());
-		penetrationPoints.second.globalPosition.setValue(secondCenter + normal * secondSphere->getRadius());
+		penetrationPoints.first.rigidLocalPosition.setValue(
+			(pair->getFirst()->getPose().linear().inverse() * -normal) * firstSphere->getRadius());
+		penetrationPoints.second.rigidLocalPosition.setValue(
+			(pair->getSecond()->getPose().linear().inverse() * normal) * secondSphere->getRadius());
 
-		pair->addContact(maxDist - dist, normal, penetrationPoints);
+		pair->addContact(dist - maxDist, normal, penetrationPoints);
 	}
 }
 

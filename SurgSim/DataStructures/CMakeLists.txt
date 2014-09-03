@@ -14,11 +14,6 @@
 # limitations under the License.
 
 
-include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
-)
-
 set(SURGSIM_DATA_STRUCTURES_SOURCES
 	AabbTree.cpp
 	AabbTreeData.cpp
@@ -54,6 +49,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	EmptyData.h
 	IndexDirectory.h
 	IndexedLocalCoordinate.h
+	Location.h
 	MeshElement.h
 	NamedData.h
 	NamedData-inl.h
@@ -102,6 +98,10 @@ target_link_libraries(SurgSimDataStructures ${LIBS}
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
+
+	if(BUILD_PERFORMANCE_TESTING)
+		add_subdirectory(PerformanceTests)
+	endif()
 endif()
 
 set_target_properties(SurgSimDataStructures PROPERTIES FOLDER "DataStructures")

@@ -19,11 +19,10 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::MeshShape;
 using SurgSim::Math::PlaneShape;
-using SurgSim::DataStructures::TriangleMeshBase;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
@@ -56,18 +55,18 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 	std::shared_ptr<PlaneShape> plane(std::static_pointer_cast<PlaneShape>(representationPlane->getShape()));
 
 	// Transform the plane normal to Mesh co-ordinate system.
-	SurgSim::Math::RigidTransform3d planeLocalToMeshLocal = representationPlane->getPose();
-	SurgSim::Math::Vector3d planeNormal = planeLocalToMeshLocal.linear() * plane->getNormal();
-	SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
-	SurgSim::Math::Vector3d planePoint = planeLocalToMeshLocal * planeNormalScaled;
+	RigidTransform3d planeLocalToMeshLocal = representationPlane->getPose();
+	Vector3d planeNormal = planeLocalToMeshLocal.linear() * plane->getNormal();
+	Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
+	Vector3d planePoint = planeLocalToMeshLocal * planeNormalScaled;
 	double planeD = -planeNormal.dot(planePoint);
 
 	// Now loop through all the vertices on the Mesh and check if it below the plane
 	size_t totalMeshVertices = mesh->getMesh()->getNumVertices();
 
 	double d;
-	SurgSim::Math::Vector3d normal;
-	SurgSim::Math::Vector3d meshVertex;
+	Vector3d normal;
+	Vector3d meshVertex;
 
 	for (size_t i = 0; i < totalMeshVertices; ++i)
 	{
@@ -77,9 +76,11 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 		{
 			// Create the contact
 			normal = representationPlane->getPose().linear() * plane->getNormal();
-			std::pair<Location,Location> penetrationPoints;
-			penetrationPoints.first.globalPosition.setValue(meshVertex);
-			penetrationPoints.second.globalPosition.setValue(meshVertex - normal * d);
+			std::pair<Location, Location> penetrationPoints;
+			penetrationPoints.first.rigidLocalPosition.setValue(
+				representationTriangleMesh->getPose().inverse() * meshVertex);
+			penetrationPoints.second.rigidLocalPosition.setValue(
+				representationPlane->getPose().inverse() * (meshVertex - normal * d));
 
 			pair->addContact(d, normal, penetrationPoints);
 		}

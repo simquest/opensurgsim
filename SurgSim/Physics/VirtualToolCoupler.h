@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/ObjectFactory.h"
@@ -146,6 +147,9 @@ protected:
 	virtual bool doWakeUp() override;
 	virtual int getTargetManagerType() const override;
 
+	/// \return The DataGroup to be sent to the device via the OutputComponent.
+	virtual SurgSim::DataStructures::DataGroup buildOutputData();
+
 	/// Used for Serialization.
 	/// \param linearStiffness The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
 	void setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& linearStiffness);
@@ -205,9 +209,16 @@ protected:
 	/// User supplied attachment point
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> m_optionalAttachmentPoint;
 
-private:
+	/// The DataGroup to output
+	SurgSim::DataStructures::DataGroup m_outputData;
+
+	/// The input component.
 	std::shared_ptr<SurgSim::Input::InputComponent> m_input;
+
+	/// The output component.
 	std::shared_ptr<SurgSim::Input::OutputComponent> m_output;
+
+private:
 	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
 	std::string m_poseName;
 
@@ -229,15 +240,26 @@ private:
 	/// Scaling factor for the torques sent to the OutputComponent
 	double m_outputTorqueScaling;
 
-	/// The DataGroup to output
-	SurgSim::DataStructures::DataGroup m_outputData;
-
 	/// The input's point of attachment in the local frame, i.e., the same frame in which the mass center is defined.
 	SurgSim::Math::Vector3d m_localAttachmentPoint;
 
 	/// Whether or not the calculated torques will simulate inertia.  This setting only has an effect if the device
 	/// input point is not the mass center.
 	bool m_calculateInertialTorques;
+
+	///@{
+	/// Cached DataGroup indices.
+	int m_poseIndex;
+	int m_linearVelocityIndex;
+	int m_angularVelocityIndex;
+	int m_forceIndex;
+	int m_torqueIndex;
+	int m_inputLinearVelocityIndex;
+	int m_inputAngularVelocityIndex;
+	int m_inputPoseIndex;
+	int m_springJacobianIndex;
+	int m_damperJacobianIndex;
+	///@}
 };
 
 }; // Physics

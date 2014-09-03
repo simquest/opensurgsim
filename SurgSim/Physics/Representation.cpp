@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Collision/Location.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Physics/Localization.h"
@@ -31,7 +31,6 @@ Representation::Representation(const std::string& name) :
 	m_gravity(0.0, -9.81, 0.0),
 	m_numDof(0),
 	m_isGravityEnabled(true),
-	m_isActive(true),
 	m_isDrivingSceneElementPose(true)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, size_t, NumDof, getNumDof, setNumDof);
@@ -61,11 +60,6 @@ size_t Representation::getNumDof() const
 void Representation::setActive(bool isActive)
 {
 	m_isActive = isActive;
-}
-
-bool Representation::isActive() const
-{
-	return m_isActive;
 }
 
 void Representation::setIsGravityEnabled(bool isGravityEnabled)
@@ -100,7 +94,7 @@ void Representation::afterUpdate(double dt)
 {
 }
 
-std::shared_ptr<Localization> Representation::createLocalization(const SurgSim::Collision::Location& location)
+std::shared_ptr<Localization> Representation::createLocalization(const SurgSim::DataStructures::Location& location)
 {
 	return nullptr;
 }

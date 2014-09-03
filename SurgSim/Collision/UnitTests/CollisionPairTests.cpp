@@ -29,6 +29,7 @@
 #include "SurgSim/DataStructures/BufferedValue.h"
 
 using SurgSim::Collision::ContactMapType;
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -59,9 +60,9 @@ TEST(CollisionPairTests, InitTest)
 	EXPECT_FALSE(pair.hasContacts());
 	EXPECT_FALSE(pair.isSwapped());
 
-	std::pair<Location,Location> penetrationPoints;
-	penetrationPoints.first.globalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
-	penetrationPoints.second.globalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
+	std::pair<Location, Location> penetrationPoints;
+	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
+	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 	pair.addContact(1.0, Vector3d(1.0,0.0,0.0),penetrationPoints);
 	EXPECT_TRUE(pair.hasContacts());
 }
@@ -80,9 +81,9 @@ TEST(CollisionPairTests, SwapTest)
 	pair.swapRepresentations();
 	EXPECT_FALSE(pair.isSwapped());
 
-	std::pair<Location,Location> penetrationPoints;
-	penetrationPoints.first.globalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
-	penetrationPoints.second.globalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
+	std::pair<Location, Location> penetrationPoints;
+	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
+	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 
 	pair.addContact(1.0, Vector3d(1.0,0.0,0.0),penetrationPoints);
 	EXPECT_TRUE(pair.hasContacts());
@@ -119,9 +120,9 @@ TEST(CollisionPairTests, addContactTest)
 	EXPECT_TRUE(rep0Collisions.empty());
 	EXPECT_TRUE(rep1Collisions.empty());
 
-	std::pair<Location,Location> penetrationPoints;
-	penetrationPoints.first.globalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
-	penetrationPoints.second.globalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
+	std::pair<Location, Location> penetrationPoints;
+	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
+	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 
 	CollisionPair pair(rep0, rep1);
 	pair.addContact(1.0, Vector3d::UnitY(), penetrationPoints);
@@ -136,9 +137,9 @@ TEST(CollisionPairTests, addContactTest)
 	std::shared_ptr<SurgSim::Collision::Contact> rep0FirstContact = rep0CollisionContacts->second.front();
 	EXPECT_EQ(rep0FirstContact->depth, 1.0);
 	EXPECT_TRUE(rep0FirstContact->normal.isApprox(Vector3d::UnitY()));
-	EXPECT_TRUE(rep0FirstContact->penetrationPoints.first.globalPosition.getValue().isApprox(
+	EXPECT_TRUE(rep0FirstContact->penetrationPoints.first.rigidLocalPosition.getValue().isApprox(
 		Vector3d(0.1, 0.2, 0.3)));
-	EXPECT_TRUE(rep0FirstContact->penetrationPoints.second.globalPosition.getValue().isApprox(
+	EXPECT_TRUE(rep0FirstContact->penetrationPoints.second.rigidLocalPosition.getValue().isApprox(
 		Vector3d(0.4, 0.5, 0.6)));
 
 	EXPECT_EQ(1u, rep1Collisions.size());
@@ -148,9 +149,9 @@ TEST(CollisionPairTests, addContactTest)
 	std::shared_ptr<SurgSim::Collision::Contact> rep1FirstContact = rep1CollisionContacts->second.front();
 	EXPECT_EQ(rep1FirstContact->depth, 1.0);
 	EXPECT_TRUE(rep1FirstContact->normal.isApprox(-Vector3d::UnitY()));
-	EXPECT_TRUE(rep1FirstContact->penetrationPoints.first.globalPosition.getValue().isApprox(
+	EXPECT_TRUE(rep1FirstContact->penetrationPoints.first.rigidLocalPosition.getValue().isApprox(
 		Vector3d(0.4, 0.5, 0.6)));
-	EXPECT_TRUE(rep1FirstContact->penetrationPoints.second.globalPosition.getValue().isApprox(
+	EXPECT_TRUE(rep1FirstContact->penetrationPoints.second.rigidLocalPosition.getValue().isApprox(
 		Vector3d(0.1, 0.2, 0.3)));
 }
 
