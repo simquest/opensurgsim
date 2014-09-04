@@ -163,7 +163,7 @@ void DeformableRepresentation::update(double dt)
 				<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
 				<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
 
-		setIsActive(false);
+		setActive(false);
 	}
 }
 
@@ -203,7 +203,7 @@ void DeformableRepresentation::applyCorrection(double dt,
 				<< "position=(" << m_currentState->getPositions() << ")" << std::endl
 				<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
 
-		setIsActive(false);
+		setActive(false);
 	}
 }
 
@@ -215,7 +215,7 @@ void DeformableRepresentation::deactivateAndReset(void)
 			<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
 
 	resetState();
-	setIsActive(false);
+	setActive(false);
 }
 
 void DeformableRepresentation::setCollisionRepresentation(

@@ -205,7 +205,7 @@ void FemRepresentation::afterUpdate(double dt)
 					<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
 					<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
 
-				setIsActive(false);
+				setActive(false);
 				return;
 			}
 		}

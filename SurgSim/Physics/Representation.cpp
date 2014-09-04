@@ -35,7 +35,7 @@ Representation::Representation(const std::string& name) :
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, size_t, NumDof, getNumDof, setNumDof);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, IsGravityEnabled, isGravityEnabled, setIsGravityEnabled);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, IsActive, isActive, setIsActive);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, IsActive, isActive, setActive);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, IsDrivingSceneElementPose,
 									  isDrivingSceneElementPose, setIsDrivingSceneElementPose);
 }
@@ -57,7 +57,7 @@ size_t Representation::getNumDof() const
 	return m_numDof;
 }
 
-void Representation::setIsActive(bool isActive)
+void Representation::setActive(bool isActive)
 {
 	m_isActive = isActive;
 }
