@@ -101,12 +101,10 @@ Image<T>::~Image()
 }
 
 template<class T>
-Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 0, Eigen::InnerStride<>>
-Image<T>::getChannel(size_t channel)
+typename Image<T>::ChannelType Image<T>::getChannel(size_t channel)
 {
 	SURGSIM_ASSERT(channel < m_channels) << "channel number is larger than the number of channels";
-	return Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 0, Eigen::InnerStride<>>(
-			m_data.get() + channel, m_width, m_height, Eigen::InnerStride<>(m_channels));
+	return ChannelType(m_data.get() + channel, m_width, m_height, Eigen::InnerStride<>(m_channels));
 }
 
 template<class T>
@@ -136,6 +134,12 @@ size_t Image<T>::getNumChannels() const
 
 template<class T>
 T* const Image<T>::getData()
+{
+	return m_data.get();
+}
+
+template<class T>
+const T* const Image<T>::getData() const
 {
 	return m_data.get();
 }

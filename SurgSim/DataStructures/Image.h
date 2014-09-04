@@ -87,14 +87,21 @@ public:
 	/// \return the number of channels
 	size_t getNumChannels() const;
 
+	/// Type of the channel returned by getChannel
+	typedef Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 0, Eigen::InnerStride<>> ChannelType;
+
 	/// Get the data in the channel as an eigen matrix
 	/// \param channel the channel number
 	/// \return an eigen matrix
-	Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 0, Eigen::InnerStride<>> getChannel(size_t channel);
+	ChannelType getChannel(size_t channel);
 
 	/// Get the pointer to the data
 	/// \return  the data
 	T* const getData();
+
+	/// Get the pointer to the data, constant version
+	/// \return  the data
+	const T* const getData() const;
 
 private:
 	size_t m_width;
