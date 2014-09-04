@@ -32,8 +32,7 @@ class Representation;
 /// The convention is that if body 1 is moved along the normal vector by
 /// a distance depth (or equivalently if body 2 is moved the same distance
 /// in the opposite direction) then the penetration depth will be reduced to
-/// zero. This means that for a contact, the normal vector points "in" to
-/// body 1, and the depth is non-positive.
+/// zero. This means that the normal vector points "in" to body 1
 struct Contact {
 	Contact(const double& newDepth,
 			const SurgSim::Math::Vector3d& newContact,

@@ -79,7 +79,7 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 			penetrationPoints.first.rigidLocalPosition.setValue(boxVertex);
 			penetrationPoints.second.rigidLocalPosition.setValue(boxLocalToPlaneLocal * (boxVertex - planeNormal * d));
 
-			pair->addContact(d, representationPlane->getPose().linear() * plane->getNormal(), penetrationPoints);
+			pair->addContact(-d, representationPlane->getPose().linear() * plane->getNormal(), penetrationPoints);
 		}
 	}
 }

@@ -15,9 +15,11 @@
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/Collision/BoxPlaneDcdContact.h"
+#include "SurgSim/Math/Geometry.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::PlaneShape;
+using SurgSim::Math::Geometry::DistanceEpsilon;
 
 namespace SurgSim
 {
@@ -55,6 +57,24 @@ void doBoxPlaneTest(std::shared_ptr<BoxShape> box,
 	BoxPlaneDcdContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(boxRep, planeRep);
 	calcContact.calculateContact(pair);
+
+	const Vector3d globalPlaneNormal = planeRep->getPose().linear() * plane->getNormal();
+	const Vector3d planeToBox = boxTrans - planeTrans;
+	Vector3d nearestPointOnPlane;
+	const double distanceBoxPlane = SurgSim::Math::distancePointPlane(planeToBox, globalPlaneNormal,
+		plane->getD(), &nearestPointOnPlane);
+
+	const Vector3d boxRadii = box->getSize() / 2.0;
+	const double minDepth = -distanceBoxPlane - boxRadii.norm();
+	const double maxDepth = -distanceBoxPlane + boxRadii.norm();
+
+	for (auto contact : pair->getContacts())
+	{
+		EXPECT_LT(-DistanceEpsilon, contact->depth);
+		EXPECT_LT(minDepth - DistanceEpsilon, contact->depth);
+		EXPECT_GT(maxDepth + DistanceEpsilon, contact->depth);
+		EXPECT_TRUE(eigenEqual(globalPlaneNormal, contact->normal));
+	}
 
 	// Compare the contact info.
 	contactsInfoEqualityTest(expectedContacts, pair->getContacts());
