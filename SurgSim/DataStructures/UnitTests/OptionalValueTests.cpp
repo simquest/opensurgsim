@@ -81,12 +81,12 @@ TEST(OptionalValueTests, ComparatorTest)
 	EXPECT_FALSE(a == b);
 	EXPECT_TRUE(a != b);
 
-	EXPECT_FALSE(a == 1);
+	EXPECT_FALSE(a == 1); // NOLINT
 
 	a = 2;
-	EXPECT_FALSE(a == 1);
-	EXPECT_TRUE(a != 1);
-	EXPECT_TRUE(a == 2);
+	EXPECT_FALSE(a == 1); // NOLINT
+	EXPECT_TRUE(a != 1);  // NOLINT
+	EXPECT_TRUE(a == 2);  // NOLINT
 }
 
 TEST(OptionalValueTests, CopyConstructorTest)
