@@ -79,8 +79,10 @@ void VisualizeContactsBehavior::update(double dt)
 		vectorField->getVertices().reserve(2 * totalContacts);
 
 		SurgSim::Math::RigidTransform3d inverseElementPose = getSceneElement()->getPose().inverse();
+		auto representationPoseFirst = m_collisionRepresentation->getPose();
 		for (auto it = collisions->cbegin(); it != collisions->cend(); ++it)
 		{
+			auto representationPoseSecond = (*it).first->getPose();
 			for (auto iter = (*it).second.cbegin(); iter != (*it).second.cend(); ++iter)
 			{
 				VectorFieldData vectorData1;
@@ -88,13 +90,13 @@ void VisualizeContactsBehavior::update(double dt)
 				vectorData1.direction = -(*iter)->normal * (*iter)->depth;
 				vectorData2.direction =  (*iter)->normal * (*iter)->depth;
 
-				Vertex<VectorFieldData> vertex1 =
-					Vertex<VectorFieldData>((*iter)->penetrationPoints.first.globalPosition.getValue(), vectorData1);
-				Vertex<VectorFieldData> vertex2 =
-					Vertex<VectorFieldData>((*iter)->penetrationPoints.second.globalPosition.getValue(), vectorData2);
+				Vertex<VectorFieldData> vertex1 = Vertex<VectorFieldData>(
+					(*iter)->penetrationPoints.first.rigidLocalPosition.getValue(), vectorData1);
+				Vertex<VectorFieldData> vertex2 = Vertex<VectorFieldData>(
+					(*iter)->penetrationPoints.second.rigidLocalPosition.getValue(), vectorData2);
 
-				vertex1.position = inverseElementPose * vertex1.position;
-				vertex2.position = inverseElementPose * vertex2.position;
+				vertex1.position = inverseElementPose * representationPoseFirst * vertex1.position;
+				vertex2.position = inverseElementPose * representationPoseSecond * vertex2.position;
 				vectorField->addVertex(vertex1);
 				vectorField->addVertex(vertex2);
 			}

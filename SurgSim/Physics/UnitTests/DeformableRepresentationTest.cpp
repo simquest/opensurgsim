@@ -73,6 +73,9 @@ public:
 		Vector3d t(1.45, 5.4, 2.42);
 		m_nonIdentityTransform = SurgSim::Math::makeRigidTransform(q, t);
 		m_identityTransform = SurgSim::Math::RigidTransform3d::Identity();
+
+		m_localization0 =  std::make_shared<SurgSim::Physics::MockDeformableRepresentationLocalization>();
+		m_localization0->setLocalNode(0);
 	}
 
 protected:
@@ -82,6 +85,9 @@ protected:
 	// Identity and nonIdentity (but still valid) transforms
 	SurgSim::Math::RigidTransform3d m_identityTransform;
 	SurgSim::Math::RigidTransform3d m_nonIdentityTransform;
+
+	// Localization of node 0, to apply external force
+	std::shared_ptr<SurgSim::Physics::MockDeformableRepresentationLocalization> m_localization0;
 };
 
 TEST_F(DeformableRepresentationTest, ConstructorTest)
@@ -117,7 +123,21 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	// Test set/get states
 	// Note that the initialState is in OdeEquation but is set in DeformableRepresentation
 	// Its getter is actually in OdeEquation (considered tested here)
+	EXPECT_EQ(0, getExternalGeneralizedForce().size());
+	EXPECT_EQ(0, getExternalGeneralizedStiffness().rows());
+	EXPECT_EQ(0, getExternalGeneralizedStiffness().cols());
+	EXPECT_EQ(0, getExternalGeneralizedDamping().rows());
+	EXPECT_EQ(0, getExternalGeneralizedDamping().cols());
 	setInitialState(m_localInitialState);
+	EXPECT_EQ(getNumDof(), getExternalGeneralizedForce().size());
+	EXPECT_EQ(getNumDof(), getExternalGeneralizedStiffness().rows());
+	EXPECT_EQ(getNumDof(), getExternalGeneralizedStiffness().cols());
+	EXPECT_EQ(getNumDof(), getExternalGeneralizedDamping().rows());
+	EXPECT_EQ(getNumDof(), getExternalGeneralizedDamping().cols());
+	EXPECT_TRUE(getExternalGeneralizedForce().isZero());
+	EXPECT_TRUE(getExternalGeneralizedStiffness().isZero());
+	EXPECT_TRUE(getExternalGeneralizedDamping().isZero());
+
 	doWakeUp();
 
 	EXPECT_TRUE(*m_initialState     == *m_localInitialState);
@@ -297,10 +317,30 @@ TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 	EXPECT_NO_THROW(EXPECT_TRUE(initialize(std::make_shared<SurgSim::Framework::Runtime>())));
 	EXPECT_NO_THROW(EXPECT_TRUE(wakeUp()));
 
+	// Set external generalized force/stiffness/damping
+	EXPECT_TRUE(getExternalGeneralizedForce().isZero());
+	EXPECT_TRUE(getExternalGeneralizedStiffness().isZero());
+	EXPECT_TRUE(getExternalGeneralizedDamping().isZero());
+	SurgSim::Math::Vector F = SurgSim::Math::Vector::LinSpaced(getNumDofPerNode(), -2.34, 4.41);
+	SurgSim::Math::Matrix K = SurgSim::Math::Matrix::Ones(getNumDofPerNode(), getNumDofPerNode());
+	SurgSim::Math::Matrix D = 2.3 * K;
+	addExternalGeneralizedForce(m_localization0, F, K, D);
+	EXPECT_FALSE(getExternalGeneralizedForce().isZero());
+	EXPECT_FALSE(getExternalGeneralizedStiffness().isZero());
+	EXPECT_FALSE(getExternalGeneralizedDamping().isZero());
+	EXPECT_TRUE(getExternalGeneralizedForce().isApprox(F));
+	EXPECT_TRUE(getExternalGeneralizedStiffness().isApprox(K));
+	EXPECT_TRUE(getExternalGeneralizedDamping().isApprox(D));
+
 	// update should backup current into previous and change current
 	EXPECT_NO_THROW(update(1e-3));
 	// afterUpdate should backup current into final
 	EXPECT_NO_THROW(afterUpdate(1e-3));
+
+	// External generalized force/stiffness/damping should have been reset
+	EXPECT_TRUE(getExternalGeneralizedForce().isZero());
+	EXPECT_TRUE(getExternalGeneralizedStiffness().isZero());
+	EXPECT_TRUE(getExternalGeneralizedDamping().isZero());
 
 	EXPECT_TRUE(*m_localInitialState  == *m_initialState);
 	EXPECT_TRUE(*m_localInitialState  == *m_previousState);
@@ -314,6 +354,7 @@ TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 	EXPECT_TRUE(*m_currentState       == *m_finalState);
 	EXPECT_FALSE(*getCurrentState()   == *getPreviousState());
 	EXPECT_TRUE(*getCurrentState()    == *getFinalState());
+
 }
 
 TEST_F(DeformableRepresentationTest, ApplyCorrectionTest)

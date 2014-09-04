@@ -14,8 +14,6 @@
 # limitations under the License.
 
 
-link_directories(${Boost_LIBRARY_DIRS})
-
 set(SURGSIM_FRAMEWORK_SOURCES
 	Accessible.cpp
 	ApplicationData.cpp

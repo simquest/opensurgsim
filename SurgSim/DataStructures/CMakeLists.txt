@@ -49,6 +49,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	EmptyData.h
 	IndexDirectory.h
 	IndexedLocalCoordinate.h
+	Location.h
 	MeshElement.h
 	NamedData.h
 	NamedData-inl.h
@@ -87,7 +88,6 @@ surgsim_add_library(
 )
 
 set(LIBS 
-	SurgSimMath 
 	SurgSimFramework
 	${Boost_LIBRARIES}
 )
@@ -97,6 +97,10 @@ target_link_libraries(SurgSimDataStructures ${LIBS}
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
+
+	if(BUILD_PERFORMANCE_TESTING)
+		add_subdirectory(PerformanceTests)
+	endif()
 endif()
 
 set_target_properties(SurgSimDataStructures PROPERTIES FOLDER "DataStructures")

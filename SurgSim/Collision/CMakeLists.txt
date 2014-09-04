@@ -42,7 +42,6 @@ set(SURGSIM_COLLISION_HEADERS
 	ContactCalculation.h
 	DcdCollision.h
 	DefaultContactCalculation.h
-	Location.h
 	OctreeDcdContact.h
 	Representation.h
 	ShapeCollisionRepresentation.h
@@ -63,7 +62,6 @@ surgsim_add_library(
 SET(LIBS
 	SurgSimFramework
 	SurgSimMath
-	SurgSimPhysics
 	${Boost_LIBRARIES}
 )
 

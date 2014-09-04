@@ -331,6 +331,15 @@ inline void NamedData<T>::copy(const NamedData<N>& source, const NamedDataCopyMa
 	}
 }
 
+template <typename T>
+void SurgSim::DataStructures::NamedData<T>::cacheIndex(const std::string& name, int* index) const
+{
+	if (*index < 0)
+	{
+		*index = getIndex(name);
+	}
+}
+
 };  // namespace Input
 };  // namespace SurgSim
 

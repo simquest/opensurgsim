@@ -97,7 +97,7 @@ public:
 
 		m_fem->setInitialState(state);
 		m_fem->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
-		m_fem->setIsActive(true);
+		m_fem->setActive(true);
 
 		m_fem->initialize(std::make_shared<Runtime>());
 		m_fem->wakeUp();
@@ -106,13 +106,12 @@ public:
 		m_fem->beforeUpdate(dt);
 		m_fem->update(dt);
 
-		m_localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem);
 	}
 
 	void setContactAt(const IndexedLocalCoordinate &coord)
 	{
 		m_coord = coord;
-		m_localization->setLocalPosition(coord);
+		m_localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem, m_coord);
 
 		// Calculate position at state before "m_fem->update(dt)" was called.
 		double distance = -m_localization->calculatePosition(0.0).dot(m_n);

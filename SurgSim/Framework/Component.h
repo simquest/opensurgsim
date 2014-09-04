@@ -127,6 +127,16 @@ public:
 	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp() = 0;
 
+	/// Set this component to active if 'val' is true, inactive if 'val' is false.
+	/// An active component will be processed by the managers and its state will be updated.
+	/// And an inactive component will not be processed/updated.
+	/// \param val The status (active/inactive) to be set on this component.
+	virtual void setActive(bool val);
+
+	/// \return True if this component is active and the SceneElement (if any) containing it is also active;
+	/// Otherwise, false.
+	bool isActive() const;
+
 protected:
 	/// Get the PoseComponent for this component
 	/// \return The PoseComponent
@@ -135,6 +145,9 @@ protected:
 	/// Get the PoseComponent for this component, constant access
 	/// \return The PoseComponent
 	virtual std::shared_ptr<const PoseComponent> getPoseComponent() const;
+
+	/// Indicates if this component is active
+	bool m_isActive;
 
 private:
 	/// Name of this component

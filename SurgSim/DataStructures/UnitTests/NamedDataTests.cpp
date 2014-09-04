@@ -378,3 +378,28 @@ TEST(NamedDataTests, ResetOne)
 	EXPECT_FALSE(data.hasData("second"));
 }
 
+TEST(NamedDataTests, CacheIndex)
+{
+	std::string name = "test";
+	NamedData<bool> data;
+	int index = -1;
+	// invalid NamedData
+	data.cacheIndex(name, &index);
+	EXPECT_EQ(-1, index);
+
+	NamedDataBuilder<bool> builder;
+	builder.addEntry(name);
+	data = builder.createData();
+	// valid NamedData, finds the string
+	data.cacheIndex(name, &index);
+	EXPECT_EQ(0, index);
+
+	// index is >= 0, so nothing happens
+	data.cacheIndex(name + "2", &index);
+	EXPECT_EQ(0, index);
+
+	int index2 = -1;
+	// valid NamedData, string not there
+	data.cacheIndex(name + "2", &index2);
+	EXPECT_EQ(-1, index2);
+}

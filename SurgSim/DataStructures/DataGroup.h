@@ -46,12 +46,12 @@ namespace DataStructures
 /// (i.e. there could be a scalar and a vector both named "friction", or a pose and a boolean both at index 1).
 /// It is recommended that you keep names separate between different types to avoid confusion.
 ///
-/// A DataGroup object constructed by the default constructor starts out empty, meaning its NamedData member
+/// A DataGroup object constructed by the default constructor starts out empty, meaning all its NamedData member
 /// objects are "invalid". An empty DataGroup object can be made non-empty by:
 /// \li using the \ref DataGroupBuilder class,
 /// \li copy construction,
 /// \li assigning from a non-empty DataGroup object, or
-/// \li assigning a "valid" NamedData object (of the correct template type) to each of the NamedData members.
+/// \li assigning a "valid" NamedData object (of the correct template type) to one or more NamedData members.
 ///
 /// Assignment to a non-empty DataGroup object is only possible if either of the two objects in the assignment was made
 /// non-empty based on the other object (see the above list items about copy construction and assignment from a
@@ -192,6 +192,10 @@ public:
 
 	/// Mark all data as not current.
 	void resetAll();
+
+	/// An empty DataGroup can be assigned to by any DataGroup with only valid NamedData.
+	/// return true if all the NamedData are invalid.
+	bool isEmpty() const;
 
 private:
 	/// The pose values.

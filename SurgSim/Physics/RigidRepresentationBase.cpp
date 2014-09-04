@@ -53,17 +53,17 @@ bool RigidRepresentationBase::doInitialize()
 			"An invalid shape is used in this RigidRepresentationBase.";
 	}
 
+	return true;
+}
+
+bool RigidRepresentationBase::doWakeUp()
+{
 	m_initialState.setPose(getPose());
 	m_currentState = m_initialState;
 	m_finalState = m_initialState;
 	m_previousState = m_initialState;
 	updateGlobalInertiaMatrices(m_currentState);
 
-	return true;
-}
-
-bool RigidRepresentationBase::doWakeUp()
-{
 	return true;
 }
 
@@ -102,7 +102,8 @@ const RigidRepresentationState& RigidRepresentationBase::getPreviousState() cons
 	return m_previousState;
 }
 
-std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(const SurgSim::Collision::Location& location)
+std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(
+	const SurgSim::DataStructures::Location& location)
 {
 	return std::move(createTypedLocalization<RigidRepresentationLocalization>(location));
 }

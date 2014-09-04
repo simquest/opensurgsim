@@ -42,6 +42,15 @@ surgsim_add_library(
 )
 add_dependencies(SurgSimTesting yaml-cpp)
 
+set(LIBS
+	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimInput
+	SurgSimMath
+	SurgSimPhysics
+)
+target_link_libraries(SurgSimTesting ${LIBS})
+
 add_subdirectory(MlcpIO)
 
 if(GLUT_FOUND)

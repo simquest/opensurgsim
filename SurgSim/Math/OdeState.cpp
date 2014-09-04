@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Math/OdeState.h"
+
+#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Valid.h"
 
 namespace SurgSim

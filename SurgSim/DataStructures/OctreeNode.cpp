@@ -15,6 +15,8 @@
 
 #include "SurgSim/DataStructures/OctreeNode.h"
 
+#include "SurgSim/Framework/Assert.h"
+
 #include <array>
 #include <cmath>
 #include <fstream>
