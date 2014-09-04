@@ -45,9 +45,9 @@ TEST(RepresentationTest, SetGetAndDefaultValueTest)
 
 	/// Get/Set active flag [default = true]
 	EXPECT_TRUE(representation->isActive());
-	representation->setIsActive(false);
+	representation->setActive(false);
 	ASSERT_FALSE(representation->isActive());
-	representation->setIsActive(true);
+	representation->setActive(true);
 	ASSERT_TRUE(representation->isActive());
 
 	/// Get numDof = 0

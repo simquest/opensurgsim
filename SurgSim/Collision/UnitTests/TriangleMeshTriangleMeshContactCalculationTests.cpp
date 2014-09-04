@@ -300,19 +300,19 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			{
 				expectedDepth = 0.5;
 				expectedNormal = pose.linear() * Vector3d(0, 1, 0);
-				expectedPoint0 = pose * Vector3d(0, -0.5, zValue);
-				expectedPoint1 = pose * Vector3d(0, 0, zValue);
+				expectedPoint0 = Vector3d(0, -0.5, zValue);
+				expectedPoint1 = Vector3d(0, 0, zValue);
 			}
 			else
 			{
 				expectedNormal = pose.linear() * Vector3d(0, 0, -1);
-				expectedPoint0 = pose * Vector3d(0, 0, zValue);
-				expectedPoint1 = pose * Vector3d(0, 0, 0);
+				expectedPoint0 = Vector3d(0, 0, zValue);
+				expectedPoint1 = Vector3d(0, 0, 0);
 			}
 			if (expectedDepth > 0.0)
 			{
-				expectedPenetrationPoints.first.globalPosition.setValue(expectedPoint0);
-				expectedPenetrationPoints.second.globalPosition.setValue(expectedPoint1);
+				expectedPenetrationPoints.first.rigidLocalPosition.setValue(expectedPoint0);
+				expectedPenetrationPoints.second.rigidLocalPosition.setValue(expectedPoint1);
 				SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;
 				triangleLocalPosition.index = i;
 				expectedPenetrationPoints.first.meshLocalCoordinate.setValue(triangleLocalPosition);
@@ -324,8 +324,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
 				for (size_t i = 0; i < 3; ++i)
 				{
-					contact->firstVertices[i] = pose * contact->firstVertices[i];
-					contact->secondVertices[i] = pose * contact->secondVertices[i];
+					contact->firstVertices[i] = contact->firstVertices[i];
+					contact->secondVertices[i] = contact->secondVertices[i];
 				}
 				expectedContacts.push_back(contact);
 			}
@@ -419,8 +419,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 						   Vector3d(-e, 1.0 - coordinate, coordinate));
 			expectedDepth = coordinate;
 			{
-				expectedPenetrationPoints.first.globalPosition.setValue(pose * Vector3d(0, 0, coordinate));
-				expectedPenetrationPoints.second.globalPosition.setValue(pose * Vector3d(0, 0, 0));
+				expectedPenetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0, 0, coordinate));
+				expectedPenetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0, 0, 0));
 				triangleLocalPosition.index = i;
 				expectedPenetrationPoints.first.meshLocalCoordinate.setValue(triangleLocalPosition);
 				triangleLocalPosition.index = 0;
@@ -432,14 +432,14 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
 				for (size_t i = 0; i < 3; ++i)
 				{
-					contact->firstVertices[i] = pose * contact->firstVertices[i];
-					contact->secondVertices[i] = pose * contact->secondVertices[i];
+					contact->firstVertices[i] = contact->firstVertices[i];
+					contact->secondVertices[i] = contact->secondVertices[i];
 				}
 				expectedContacts.push_back(contact);
 			}
 			{
-				expectedPenetrationPoints.first.globalPosition.setValue(pose * Vector3d(0, -coordinate, coordinate));
-				expectedPenetrationPoints.second.globalPosition.setValue(pose * Vector3d(0, 0, coordinate));
+				expectedPenetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0, -coordinate, coordinate));
+				expectedPenetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0, 0, coordinate));
 				triangleLocalPosition.index = i;
 				expectedPenetrationPoints.first.meshLocalCoordinate.setValue(triangleLocalPosition);
 				triangleLocalPosition.index = 0;
@@ -451,8 +451,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
 				for (size_t i = 0; i < 3; ++i)
 				{
-					contact->firstVertices[i] = pose * contact->firstVertices[i];
-					contact->secondVertices[i] = pose * contact->secondVertices[i];
+					contact->firstVertices[i] = contact->firstVertices[i];
+					contact->secondVertices[i] = contact->secondVertices[i];
 				}
 				expectedContacts.push_back(contact);
 			}

@@ -151,7 +151,7 @@ TEST(KeyboardTogglesGraphicsBehavior, Serialization)
 	YAML::Node node;
 	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*keyboardTogglesGraphicsBehavior));
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(4, node[keyboardTogglesGraphicsBehavior->getClassName()].size());
+	EXPECT_EQ(5, node[keyboardTogglesGraphicsBehavior->getClassName()].size());
 
 	std::shared_ptr<KeyboardTogglesGraphicsBehavior> newKeyboardTogglesGraphicsBehavior;
 	EXPECT_NO_THROW(newKeyboardTogglesGraphicsBehavior = std::dynamic_pointer_cast<KeyboardTogglesGraphicsBehavior>(

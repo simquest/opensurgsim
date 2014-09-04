@@ -30,9 +30,12 @@ namespace Framework
 class Logger;
 }
 
-namespace Collision
+namespace DataStructures
 {
 struct Location;
+}
+namespace Collision
+{
 class Representation;
 }
 
@@ -85,7 +88,7 @@ private:
 	/// \return	The localization for the collision representations physics representation.
 	std::shared_ptr<Localization> makeLocalization(
 		std::shared_ptr<SurgSim::Physics::Representation> representation,
-		const SurgSim::Collision::Location& location);
+		const SurgSim::DataStructures::Location& location);
 
 };
 

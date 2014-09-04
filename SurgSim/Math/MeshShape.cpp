@@ -15,7 +15,6 @@
 //
 
 #include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Framework/Log.h"
 

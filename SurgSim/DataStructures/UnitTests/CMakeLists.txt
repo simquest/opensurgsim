@@ -27,6 +27,7 @@ set(UNIT_TEST_SOURCES
 	DataStructuresConvertTests.cpp
 	IndexDirectoryTests.cpp
 	IndexedLocalCoordinateTest.cpp
+	LocationTests.cpp
 	MeshElementTest.cpp
 	MeshTest.cpp
 	MeshVertexTest.cpp

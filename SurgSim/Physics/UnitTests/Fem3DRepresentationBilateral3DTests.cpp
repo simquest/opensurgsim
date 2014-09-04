@@ -125,8 +125,9 @@ TEST(Fem3DRepresentationBilateral3DTests, BuildMlcpBasic)
 	Vector3d actual;
 
 	// Setup parameters for Fem3DRepresentationBilateral3D::build
-	auto localization = std::make_shared<Fem3DRepresentationLocalization>(getTestingFem3d("representation"));
-	localization->setLocalPosition(SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.0, 0.0, 1.0, 0.0)));
+	auto localization = std::make_shared<Fem3DRepresentationLocalization>(
+		getTestingFem3d("representation"),
+		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.0, 0.0, 1.0, 0.0)));
 
 	actual = localization->calculatePosition();
 
@@ -159,8 +160,8 @@ TEST(Fem3DRepresentationBilateral3DTests, BuildMlcp)
 	Vector3d actual;
 
 	// Setup parameters for Fem3DRepresentationBilateral3D::build
-	auto localization = std::make_shared<Fem3DRepresentationLocalization>(getTestingFem3d("representation"));
-	localization->setLocalPosition(
+	auto localization = std::make_shared<Fem3DRepresentationLocalization>(
+		getTestingFem3d("representation"),
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.11, 0.02, 0.33, 0.54)));
 
 	actual = localization->calculatePosition();
@@ -202,9 +203,8 @@ TEST(Fem3DRepresentationBilateral3DTests, BuildMlcpTwoStep)
 
 	ConstraintData emptyConstraint;
 
-	auto localization = std::make_shared<Fem3DRepresentationLocalization>(getTestingFem3d("representation"));
-
-	localization->setLocalPosition(
+	auto localization = std::make_shared<Fem3DRepresentationLocalization>(
+		getTestingFem3d("representation"),
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.11, 0.02, 0.33, 0.54)));
 	actual = localization->calculatePosition();
 	ASSERT_NO_THROW(constraint.build(

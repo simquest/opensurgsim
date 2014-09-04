@@ -27,12 +27,14 @@
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Mass.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
+#include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
@@ -89,10 +91,54 @@ class MockRigidRepresentation : public RigidRepresentation
 public:
 	MockRigidRepresentation();
 
-	// Non constand access to the states
+	// Non constant access to the states
 	RigidRepresentationState& getInitialState();
 	RigidRepresentationState& getCurrentState();
 	RigidRepresentationState& getPreviousState();
+};
+
+class MockDeformableRepresentationLocalization : public SurgSim::Physics::Localization
+{
+public:
+	MockDeformableRepresentationLocalization(){}
+
+	explicit MockDeformableRepresentationLocalization(std::shared_ptr<Representation> representation) : Localization()
+	{
+		setRepresentation(representation);
+	}
+
+	virtual ~MockDeformableRepresentationLocalization(){}
+
+	void setLocalNode(size_t nodeID){ m_nodeID = nodeID; }
+
+	const size_t& getLocalNode() const { return m_nodeID; }
+
+	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation) override
+	{
+		std::shared_ptr<DeformableRepresentation> defRepresentation =
+			std::dynamic_pointer_cast<DeformableRepresentation>(representation);
+
+		// Allows to reset the representation to nullptr ...
+		return (defRepresentation != nullptr || representation == nullptr);
+	}
+
+private:
+	virtual SurgSim::Math::Vector3d doCalculatePosition(double time) override
+	{
+		std::shared_ptr<DeformableRepresentation> defRepresentation =
+			std::static_pointer_cast<DeformableRepresentation>(getRepresentation());
+
+		SURGSIM_ASSERT(defRepresentation != nullptr) << "Deformable Representation is null, it was probably not" <<
+			" initialized";
+		SURGSIM_ASSERT((0.0 <= time) && (time <= 1.0)) << "Time must be between 0.0 and 1.0 inclusive";
+
+		const SurgSim::Math::Vector3d& currentPoint  = defRepresentation->getCurrentState()->getPosition(m_nodeID);
+		const SurgSim::Math::Vector3d& previousPoint = defRepresentation->getPreviousState()->getPosition(m_nodeID);
+
+		return SurgSim::Math::interpolate(previousPoint, currentPoint, time);
+	}
+
+	size_t m_nodeID;
 };
 
 class MockDeformableRepresentation : public SurgSim::Physics::DeformableRepresentation
@@ -107,6 +153,11 @@ public:
 	virtual SurgSim::Physics::RepresentationType getType() const override;
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::MockDeformableRepresentation);
+
+	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+		SurgSim::Math::Vector& generalizedForce,
+		const SurgSim::Math::Matrix& K,
+		const SurgSim::Math::Matrix& D) override;
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
@@ -157,6 +208,10 @@ private:
 class MockMassSpring : public SurgSim::Physics::MassSpringRepresentation
 {
 public:
+	MockMassSpring() : MassSpringRepresentation("MassSpring")
+	{
+	}
+
 	MockMassSpring(const std::string& name,
 		const SurgSim::Math::RigidTransform3d& pose,
 		size_t numNodes, std::vector<size_t> nodeBoundaryConditions,
@@ -168,6 +223,10 @@ public:
 	virtual ~MockMassSpring();
 
 	const Vector3d& getGravityVector() const;
+
+	const SurgSim::Math::Vector& getExternalForce() const { return m_externalGeneralizedForce; }
+	const SurgSim::Math::Matrix& getExternalStiffness() const { return m_externalGeneralizedStiffness; }
+	const SurgSim::Math::Matrix& getExternalDamping() const { return m_externalGeneralizedDamping; }
 };
 
 class MockFemElement : public FemElement
@@ -216,6 +275,11 @@ public:
 
 	/// Destructor
 	virtual ~MockFemRepresentation();
+
+	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+		SurgSim::Math::Vector& generalizedForce,
+		const SurgSim::Math::Matrix& K,
+		const SurgSim::Math::Matrix& D) override;
 
 	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
 
@@ -344,6 +408,8 @@ public:
 	void setOptionalAngularStiffness(const SurgSim::DataStructures::OptionalValue<double>& val);
 	void setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& val);
 	void setOptionalAttachmentPoint(const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& val);
+
+	const SurgSim::DataStructures::DataGroup& getOutputData() const;
 };
 
 inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepresentation> firstRepresentation,
