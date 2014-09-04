@@ -17,6 +17,8 @@
 #define SURGSIM_DATASTRUCTURES_IMAGE_H
 
 #include <array>
+#include <memory>
+
 #include <Eigen/Core>
 
 namespace SurgSim
@@ -98,7 +100,7 @@ private:
 	size_t m_width;
 	size_t m_height;
 	size_t m_channels;
-	T* m_data;
+	std::unique_ptr<T[]> m_data;
 };
 
 typedef Image<float> Imagef;
