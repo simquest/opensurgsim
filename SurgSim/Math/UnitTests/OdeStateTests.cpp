@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Framework/Assert.h"
 
 using SurgSim::Math::OdeState;
 

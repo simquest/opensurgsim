@@ -48,6 +48,7 @@ set(UNIT_TEST_HEADERS
 set(LIBS
 	SurgSimDataStructures
 	SurgSimGraphics
+	SurgSimMath
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

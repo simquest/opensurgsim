@@ -78,9 +78,12 @@ void DeformableRepresentation::setInitialState(
 	// Set the representation number of degree of freedom
 	setNumDof(m_initialState->getNumDof());
 
-	SurgSim::Math::resizeVector(&m_externalGeneralizedForce, getNumDof(), true);
-	SurgSim::Math::resizeMatrix(&m_externalGeneralizedStiffness, getNumDof(), getNumDof(), true);
-	SurgSim::Math::resizeMatrix(&m_externalGeneralizedDamping, getNumDof(), getNumDof(), true);
+	m_externalGeneralizedForce.resize(getNumDof());
+	m_externalGeneralizedStiffness.resize(getNumDof(), getNumDof());
+	m_externalGeneralizedDamping.resize(getNumDof(), getNumDof());
+	m_externalGeneralizedForce.setZero();
+	m_externalGeneralizedStiffness.setZero();
+	m_externalGeneralizedDamping.setZero();
 }
 
 const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const
