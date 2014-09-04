@@ -21,6 +21,7 @@ ExternalProject_Add(yaml-cpp
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
 		-DYAML_CPP_BUILD_TOOLS:BOOL=OFF
+		-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
 )
 
 ExternalProject_Get_Property(yaml-cpp install_dir)
@@ -31,9 +32,15 @@ if(MSVC)
 		optimized ${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}
 		CACHE INTERNAL "")
 else()
-	set(YAML_CPP_LIBRARIES
-		"${install_dir}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${CMAKE_STATIC_LIBRARY_SUFFIX}"
-		CACHE INTERNAL "")
+	if(BUILD_SHARED_LIBS)
+		set(YAML_CPP_LIBRARIES
+			"${install_dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}yaml-cpp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+			CACHE INTERNAL "")
+	else()
+		set(YAML_CPP_LIBRARIES
+			"${install_dir}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${CMAKE_STATIC_LIBRARY_SUFFIX}"
+			CACHE INTERNAL "")
+	endif()
 endif()
 
 set(YAML_CPP_INCLUDE_DIR "${install_dir}/include" CACHE INTERNAL "")
