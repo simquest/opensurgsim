@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set(file_id "bAvdlSnfqr5ikadmr6bg7m")
 ExternalProject_Add(yaml-cpp
-	GIT_REPOSITORY https://git.assembla.com/OpenSurgSim.yaml-cpp.git
-	GIT_TAG "94911bfbac1225082fbac253c4620abbdf051aad"
+	URL "https://www.assembla.com/spaces/OpenSurgSim/documents/${file_id}/download/yaml-cpp.tar.gz"
+	URL_MD5 "6bd2a7b4cc31ad0b65209a8030dda7ed"
 	PREFIX yaml-cpp
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
