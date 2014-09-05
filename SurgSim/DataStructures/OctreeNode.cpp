@@ -27,8 +27,6 @@
 namespace
 {
 
-typedef std::pair<size_t, SurgSim::DataStructures::Symbol> TransitionCode;
-
 using SurgSim::DataStructures::SYMBOL_HALT;
 using SurgSim::DataStructures::SYMBOL_LEFT;
 using SurgSim::DataStructures::SYMBOL_RIGHT;
@@ -38,44 +36,62 @@ using SurgSim::DataStructures::SYMBOL_UP;
 using SurgSim::DataStructures::SYMBOL_DOWN;
 using SurgSim::DataStructures::Symbol;
 
+struct TransitionCode
+{
+	size_t nodeId;
+	Symbol symbol;
+};
+
 /// State machine codes, paired by new Value, new Directions value
 static TransitionCode transitionTable[6][8] =
 {
 	// Transition codes for 'Down'
-	std::make_pair(2, SYMBOL_DOWN), std::make_pair(3, SYMBOL_DOWN),
-	std::make_pair(0, SYMBOL_HALT), std::make_pair(1, SYMBOL_HALT),
-	std::make_pair(6, SYMBOL_DOWN), std::make_pair(7, SYMBOL_DOWN),
-	std::make_pair(4, SYMBOL_HALT), std::make_pair(5, SYMBOL_HALT),
+	{
+		{2u, SYMBOL_DOWN}, {3u, SYMBOL_DOWN},
+		{0u, SYMBOL_HALT}, {1u, SYMBOL_HALT},
+		{6u, SYMBOL_DOWN}, {7u, SYMBOL_DOWN},
+		{4u, SYMBOL_HALT}, {5u, SYMBOL_HALT}
+	},
 
 	// Transition Codes for 'Up'
-	std::make_pair(2, SYMBOL_HALT), std::make_pair(3, SYMBOL_HALT),
-	std::make_pair(0, SYMBOL_UP), std::make_pair(1, SYMBOL_UP),
-	std::make_pair(6, SYMBOL_HALT), std::make_pair(7, SYMBOL_HALT),
-	std::make_pair(4, SYMBOL_UP), std::make_pair(5, SYMBOL_UP),
+	{
+		{2u, SYMBOL_HALT}, {3u, SYMBOL_HALT},
+		{0u, SYMBOL_UP}, {1u, SYMBOL_UP},
+		{6u, SYMBOL_HALT}, {7u, SYMBOL_HALT},
+		{4u, SYMBOL_UP}, {5u, SYMBOL_UP}
+	},
 
 	// Transition Codes for 'Right'
-	std::make_pair(1, SYMBOL_HALT), std::make_pair(0, SYMBOL_RIGHT),
-	std::make_pair(3, SYMBOL_HALT), std::make_pair(2, SYMBOL_RIGHT),
-	std::make_pair(5, SYMBOL_HALT), std::make_pair(4, SYMBOL_RIGHT),
-	std::make_pair(7, SYMBOL_HALT), std::make_pair(6, SYMBOL_RIGHT),
+	{
+		{1u, SYMBOL_HALT}, {0u, SYMBOL_RIGHT},
+		{3u, SYMBOL_HALT}, {2u, SYMBOL_RIGHT},
+		{5u, SYMBOL_HALT}, {4u, SYMBOL_RIGHT},
+		{7u, SYMBOL_HALT}, {6u, SYMBOL_RIGHT}
+	},
 
 	// Transition Codes for 'Left'
-	std::make_pair(1, SYMBOL_LEFT), std::make_pair(0, SYMBOL_HALT),
-	std::make_pair(3, SYMBOL_LEFT), std::make_pair(2, SYMBOL_HALT),
-	std::make_pair(5, SYMBOL_LEFT), std::make_pair(4, SYMBOL_HALT),
-	std::make_pair(7, SYMBOL_LEFT), std::make_pair(6, SYMBOL_HALT),
+	{
+		{1u, SYMBOL_LEFT}, {0u, SYMBOL_HALT},
+		{3u, SYMBOL_LEFT}, {2u, SYMBOL_HALT},
+		{5u, SYMBOL_LEFT}, {4u, SYMBOL_HALT},
+		{7u, SYMBOL_LEFT}, {6u, SYMBOL_HALT}
+	},
 
 	// Transition Codes for 'Back'
-	std::make_pair(4, SYMBOL_BACK), std::make_pair(5, SYMBOL_BACK),
-	std::make_pair(6, SYMBOL_BACK), std::make_pair(7, SYMBOL_BACK),
-	std::make_pair(0, SYMBOL_HALT), std::make_pair(1, SYMBOL_HALT),
-	std::make_pair(2, SYMBOL_HALT), std::make_pair(3, SYMBOL_HALT),
+	{
+		{4u, SYMBOL_BACK}, {5u, SYMBOL_BACK},
+		{6u, SYMBOL_BACK}, {7u, SYMBOL_BACK},
+		{0u, SYMBOL_HALT}, {1u, SYMBOL_HALT},
+		{2u, SYMBOL_HALT}, {3u, SYMBOL_HALT}
+	},
 
 	// Transition Codes for 'Front'
-	std::make_pair(4, SYMBOL_HALT), std::make_pair(5, SYMBOL_HALT),
-	std::make_pair(6, SYMBOL_HALT), std::make_pair(7, SYMBOL_HALT),
-	std::make_pair(0, SYMBOL_FRONT), std::make_pair(1, SYMBOL_FRONT),
-	std::make_pair(2, SYMBOL_FRONT), std::make_pair(3, SYMBOL_FRONT),
+	{
+		{4u, SYMBOL_HALT}, {5u, SYMBOL_HALT},
+		{6u, SYMBOL_HALT}, {7u, SYMBOL_HALT},
+		{0u, SYMBOL_FRONT}, {1u, SYMBOL_FRONT},
+		{2u, SYMBOL_FRONT}, {3u, SYMBOL_FRONT}
+	}
 };
 
 static const std::array<std::array<Symbol, 3>, 6> FaceNeighbors =
@@ -194,10 +210,10 @@ SurgSim::DataStructures::OctreePath getNeighbor(const OctreePath& origin, const 
 		for (size_t directionIndex = 0; directionIndex < currentDirection.size(); ++directionIndex)
 		{
 			TransitionCode code = transitionTable[currentDirection[directionIndex]][currentNodeId];
-			currentNodeId = code.first;
-			if (code.second != SYMBOL_HALT)
+			currentNodeId = code.nodeId;
+			if (code.symbol != SYMBOL_HALT)
 			{
-				newDirection.push_back(code.second);
+				newDirection.push_back(code.symbol);
 			}
 		}
 
