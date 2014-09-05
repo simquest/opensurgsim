@@ -64,8 +64,8 @@ public:
 	const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>&
 		getImplementations() const;
 
-	/// Gets both sides implementation as a pair.
-	/// \return the pair of implementations forming this constraint.
+	/// Gets both sides Localization as a pair.
+	/// \return the pair of localizations forming this constraint.
 	const std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>>&
 		getLocalizations() const;
 
