@@ -41,7 +41,7 @@ template<class T>
 Image<T>::Image(size_t width, size_t height, size_t channels, const T* const data) :
 	m_width(width), m_height(height), m_channels(channels), m_data(new T[m_width * m_height * m_channels])
 {
-	std::copy(data, data+width*height*channels, m_data.get());
+	std::copy(data, data + width * height * channels, m_data.get());
 }
 
 template<class T>

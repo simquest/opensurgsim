@@ -108,7 +108,7 @@ TYPED_TEST(ImageTests, Accessors)
 		std::array<size_t, 3> size = {3, 3, 1};
 		EXPECT_EQ(size, image.getSize());
 
-		for(int i=0; i<9; i++)
+		for (int i = 0; i < 9; i++)
 		{
 			EXPECT_NEAR(array[i], image.getData()[i], epsilon);
 		}
@@ -160,7 +160,7 @@ TYPED_TEST(ImageTests, PointerAccess)
 	T array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 	std::copy(array, array+9, image.getData());
 
-	for(int i=0; i<9; i++)
+	for (int i = 0; i < 9; i++)
 	{
 		EXPECT_NEAR(array[i], image.getData()[i], epsilon);
 	}
@@ -184,9 +184,9 @@ TYPED_TEST(ImageTests, EigenAccess)
 		image.getChannel(1) = Matrix::Constant(300, 300, T(1));
 		image.getChannel(2) = Matrix::Constant(300, 300, T(2));
 
-		for(int i=0; i<300*300; i++)
+		for (int i = 0; i < 300*300; i++)
 		{
-			EXPECT_NEAR(i%3, image.getData()[i], epsilon);
+			EXPECT_NEAR(i % 3, image.getData()[i], epsilon);
 		}
 
 		Matrix total = image.getChannel(0) + image.getChannel(1) + image.getChannel(2);
