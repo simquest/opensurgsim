@@ -23,6 +23,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::Vector3d;
@@ -147,7 +148,7 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 
 			if (generateContact)
 			{
-				std::pair<Location,Location> penetrationPoints;
+				std::pair<Location, Location> penetrationPoints;
 				boxVertexGlobal = representationBox->getPose() * boxVertices[i];
 				penetrationPoints.first.rigidLocalPosition.setValue(boxVertices[i]);
 				penetrationPoints.second.rigidLocalPosition.setValue(

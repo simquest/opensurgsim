@@ -93,7 +93,7 @@ public:
 		a(pointA), b(pointB), ab(pointB - pointA) {}
 	~Segment() {}
 	/// Point on the line that the segment is on, s =< 1 and s >= 0 will give you a point on the segment
-	VectorType pointOnLine(double s)
+	VectorType pointOnLine(double s) const
 	{
 		return a + ab * s;
 	}
@@ -560,13 +560,21 @@ TEST_F(GeometryTest, DistanceSegmentSegment)
 	otherSegment = Segment(closestPoint - otherNormal * 2, closestPoint - otherNormal);
 	segments.push_back(SegmentData(plainSegment, otherSegment, plainSegment.a, otherSegment.b));
 
+	// <13> projections intersect, short segments
+	const VectorType aPoint = VectorType(1, 0, 0);
+	const SizeType shortLength = 0.0001;
+	const Segment shortSegment = Segment(VectorType(0, -shortLength/2, 0), VectorType(0, shortLength/2, 0));
+	const VectorType shortSegmentNormal = shortSegment.ab.cross(aPoint).normalized();
+	const Segment otherShortSegment = Segment(aPoint, aPoint + shortLength * shortSegmentNormal);
+	segments.push_back(SegmentData(shortSegment, otherShortSegment,
+		shortSegment.pointOnLine(0.5), otherShortSegment.a));
+
 	for (size_t i = 0; i < segments.size(); ++i)
 	{
 		testSegmentDistance(segments[i], "basic cases", i);
 	}
 
 	// Parallel Segments
-	closestPoint = plainSegment.a;
 	otherSegment = Segment(plainSegment.a + plainNormal * 4, plainSegment.b + plainNormal * 4);
 	distance = distanceSegmentSegment(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
 	EXPECT_NEAR(4.0, distance, epsilon);
@@ -574,8 +582,35 @@ TEST_F(GeometryTest, DistanceSegmentSegment)
 
 	segments.clear();
 
+	// <0> parallel, non-overlapping
+	closestPoint = plainSegment.a;
+	const Vector3d segmentDirection = plainSegment.a - plainSegment.b;
+	otherSegment = Segment(closestPoint + plainNormal * 4 + 2 * segmentDirection,
+		closestPoint + plainNormal * 4 + 4 * segmentDirection);
+	distance = distanceSegmentSegment(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
+	segments.push_back(SegmentData(plainSegment, otherSegment, closestPoint, otherSegment.a));
+
+	// Anti-parallel Segments
+	otherSegment = Segment(plainSegment.b + plainNormal * 4, plainSegment.a + plainNormal * 4);
+	distance = distanceSegmentSegment(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
+	EXPECT_NEAR(4.0, distance, epsilon);
+
+	// <1> anti-parallel, non-overlapping
+	closestPoint = plainSegment.a;
+	otherSegment = Segment(closestPoint + plainNormal * 4 + 4 * segmentDirection,
+		closestPoint + plainNormal * 4 + 2 * segmentDirection);
+	distance = distanceSegmentSegment(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
+	segments.push_back(SegmentData(plainSegment, otherSegment, closestPoint, otherSegment.b));
+
+	for (size_t i = 0; i < segments.size(); ++i)
+	{
+		testSegmentDistance(segments[i], "parallel cases", i);
+	}
+
+	segments.clear();
+
 	// The closest points are some assumptions, it looks like the algorithm is slanted towards
-	// <0> the begining points of the segments for this
+	// <0> the beginning points of the segments for this
 	closestPoint = plainSegment.pointOnLine(0.5);
 	otherSegment = Segment(closestPoint + plainNormal * 4, closestPoint + plainNormal * 8);
 	segments.push_back(SegmentData(plainSegment, otherSegment, plainSegment.pointOnLine(0.5), otherSegment.a));

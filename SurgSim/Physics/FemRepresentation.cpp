@@ -205,7 +205,7 @@ void FemRepresentation::afterUpdate(double dt)
 					<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
 					<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
 
-				setIsActive(false);
+				setActive(false);
 				return;
 			}
 		}
@@ -215,7 +215,8 @@ void FemRepresentation::afterUpdate(double dt)
 SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
-	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
+	m_f.resize(state.getNumDof());
+	m_f.setZero();
 
 	addGravityForce(&m_f, state);
 	addRayleighDampingForce(&m_f, state);
@@ -230,7 +231,8 @@ SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState
 const SurgSim::Math::Matrix& FemRepresentation::computeM(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the mass matrix has been properly allocated and zeroed out
-	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), true);
+	m_M.resize(state.getNumDof(), state.getNumDof());
+	m_M.setZero();
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
@@ -246,7 +248,8 @@ const SurgSim::Math::Matrix& FemRepresentation::computeD(const SurgSim::Math::Od
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	SurgSim::Math::resizeMatrix(&m_D, state.getNumDof(), state.getNumDof(), true);
+	m_D.resize(state.getNumDof(), state.getNumDof());
+	m_D.setZero();
 
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
@@ -281,7 +284,8 @@ const SurgSim::Math::Matrix& FemRepresentation::computeD(const SurgSim::Math::Od
 const SurgSim::Math::Matrix& FemRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	SurgSim::Math::resizeMatrix(&m_K, state.getNumDof(), state.getNumDof(), true);
+	m_K.resize(state.getNumDof(), state.getNumDof());
+	m_K.setZero();
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
@@ -298,16 +302,20 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSi
 									SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
-	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
+	m_f.resize(state.getNumDof());
+	m_f.setZero();
 
 	// Make sure the mass matrix has been properly allocated and zeroed out
-	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), true);
+	m_M.resize(state.getNumDof(), state.getNumDof());
+	m_M.setZero();
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	SurgSim::Math::resizeMatrix(&m_D, state.getNumDof(), state.getNumDof(), true);
+	m_D.resize(state.getNumDof(), state.getNumDof());
+	m_D.setZero();
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	SurgSim::Math::resizeMatrix(&m_K, state.getNumDof(), state.getNumDof(), true);
+	m_K.resize(state.getNumDof(), state.getNumDof());
+	m_K.setZero();
 
 	// Add all the FemElement contribution to f, M, D, K
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
@@ -408,8 +416,7 @@ void FemRepresentation::addGravityForce(SurgSim::Math::Vector* f,
 			"Mass per node has not been properly allocated. Did you call Initialize() ?";
 
 	// Prepare a gravity vector of the proper size
-	SurgSim::Math::Vector gravitynD;
-	SurgSim::Math::resizeVector(&gravitynD, getNumDofPerNode(), true);
+	SurgSim::Math::Vector gravitynD = SurgSim::Math::Vector::Zero(getNumDofPerNode());
 	gravitynD.segment(0, 3) = getGravity();
 
 	if (isGravityEnabled())

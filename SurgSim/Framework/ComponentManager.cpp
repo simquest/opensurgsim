@@ -87,7 +87,10 @@ void ComponentManager::processBehaviors(const double dt)
 	auto endIt = std::end(m_behaviors);
 	for ( ;  it != endIt;  ++it)
 	{
-		(*it)->update(dt);
+		if ((*it)->isActive())
+		{
+			(*it)->update(dt);
+		}
 	}
 }
 

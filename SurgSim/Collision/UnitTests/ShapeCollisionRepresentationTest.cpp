@@ -90,7 +90,7 @@ TEST(ShapeCollisionRepresentationTest, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 
 	YAML::Node data = node["SurgSim::Collision::ShapeCollisionRepresentation"];
-	EXPECT_EQ(4u, data.size());
+	EXPECT_EQ(5u, data.size());
 
 	std::shared_ptr<ShapeCollisionRepresentation> newShapeCollisionRepresentation;
 	ASSERT_NO_THROW(newShapeCollisionRepresentation = std::dynamic_pointer_cast<ShapeCollisionRepresentation>

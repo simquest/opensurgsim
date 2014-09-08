@@ -27,6 +27,7 @@ set(UNIT_TEST_SOURCES
 	DataStructuresConvertTests.cpp
 	IndexDirectoryTests.cpp
 	IndexedLocalCoordinateTest.cpp
+	LocationTests.cpp
 	MeshElementTest.cpp
 	MeshTest.cpp
 	MeshVertexTest.cpp
@@ -47,6 +48,7 @@ set(UNIT_TEST_HEADERS
 set(LIBS
 	SurgSimDataStructures
 	SurgSimGraphics
+	SurgSimMath
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

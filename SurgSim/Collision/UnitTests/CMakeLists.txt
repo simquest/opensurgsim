@@ -48,6 +48,8 @@ set(LIBS
 	SurgSimCollision
 	SurgSimDataStructures
 	SurgSimMath
+	SurgSimPhysics
+	SurgSimInput
 )
 
 file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)

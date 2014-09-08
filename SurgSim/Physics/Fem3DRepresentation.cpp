@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Collision/Location.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
@@ -216,7 +216,7 @@ bool Fem3DRepresentation::doWakeUp()
 	return true;
 }
 
-std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::Collision::Location& location)
+std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::DataStructures::Location& location)
 {
 	SURGSIM_ASSERT(location.meshLocalCoordinate.hasValue())
 		<< "Localization cannot be created if the triangle ID is not available.";

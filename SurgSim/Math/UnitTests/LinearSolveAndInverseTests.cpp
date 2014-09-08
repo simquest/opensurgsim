@@ -67,7 +67,8 @@ private:
 	{
 		size_t numBlocks = size / BlockSize;
 
-		SurgSim::Math::resizeMatrix(m, size, size, true);
+		m->resize(size, size);
+		m->setZero();
 
 		for (size_t rowBlockId = 0; rowBlockId < numBlocks; rowBlockId++)
 		{

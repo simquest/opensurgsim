@@ -28,19 +28,14 @@
 namespace SurgSim
 {
 
+namespace DataStructures
+{
+struct Location;
+}
+
 namespace Framework
 {
 class Representation;
-}
-
-namespace Physics
-{
-class Constraint;
-}
-
-namespace Collision
-{
-struct Location;
 }
 
 namespace Graphics
@@ -51,6 +46,11 @@ class SceneryRepresentation;
 namespace Input
 {
 class InputComponent;
+}
+
+namespace Physics
+{
+class Constraint;
 }
 
 }
@@ -145,8 +145,8 @@ private:
 	std::shared_ptr<SurgSim::Physics::Constraint> createBilateral3DConstraint(
 		std::shared_ptr<SurgSim::Physics::Representation> stapleRep,
 		std::shared_ptr<SurgSim::Physics::Representation> otherRep,
-		SurgSim::Collision::Location stapleConstraintLocation,
-		SurgSim::Collision::Location otherConstraintLocation);
+		SurgSim::DataStructures::Location stapleConstraintLocation,
+		SurgSim::DataStructures::Location otherConstraintLocation);
 
 	/// Function to create the staple element.
 	/// \note This function also checks for collision with stapling enabled objects in the scene to create
