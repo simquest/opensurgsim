@@ -111,6 +111,7 @@ if(BUILD_TESTING)
 	add_subdirectory(${GOOGLEMOCK_DIR} GoogleMock)
 endif()
 
+unset(EXPORT_TARGETS CACHE)
 add_subdirectory(SurgSim)
 
 option(BUILD_EXAMPLES "Build the examples." ON)
