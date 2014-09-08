@@ -20,7 +20,13 @@
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
+
+namespace
+{
+const double rotationVectorEpsilon = 1e-8;
+};
 
 namespace SurgSim
 {
@@ -62,7 +68,7 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::Math::Vecto
 	m_externalGeneralizedDamping += D;
 }
 
-void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructures::Location& location,
 													  const SurgSim::Math::Vector6d& generalizedForce,
 													  const SurgSim::Math::Matrix66d& K,
 													  const SurgSim::Math::Matrix66d& D)
@@ -72,35 +78,100 @@ void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Vector6d;
 
-	SURGSIM_ASSERT(localization != nullptr) << "Uninitialized localization (nullptr)";
+	SURGSIM_ASSERT(location.rigidLocalPosition.hasValue()) << "Invalid location (no rigid local position)";
 
-	// Let's note the position dof (C,W) and the velocity dof (v, w).
-	// The force (F) applied on a point (P) that is not the mass center(C), produces a torque (T) and
-	// also affect matrix derivatives (K and D) as follow:
-	// T = cross(CP, F) = CP^F
-	// K.block<3, 3>(3, 0) += -dT/dC = -dCP/dC ^ F - CP ^ dF/dC = Id(3x3) ^ F + CP ^ K.block<3, 3>(0, 0)
-	// K.block<3, 3>(3, 3) += -dT/dW = -dCP/dW ^ F - CP ^ dF/dW = CP ^ K.block<3, 3>(0, 3)
-	// D.block<3, 3>(3, 0) += -dT/dv = -dCP/dv ^ F - CP ^ dF/dv = CP ^ D.block<3, 3>(0, 0)
-	// D.block<3, 3>(3, 3) += -dT/dw = -dCP/dw ^ F - CP ^ dF/dw = CP ^ D.block<3, 3>(0, 3)
-	const Vector3d point = localization->calculatePosition();
+	RigidRepresentationLocalization localization;
+	localization.setRepresentation(std::static_pointer_cast<Representation>(shared_from_this()));
+	localization.setLocalPosition(location.rigidLocalPosition.getValue());
+	const Vector3d point = localization.calculatePosition();
 	const Vector3d massCenter = getCurrentState().getPose().translation();
 	const Vector3d lever = point - massCenter;
-	const Vector3d force = generalizedForce.segment<3>(0);
+	auto force = generalizedForce.segment<3>(0);
 	const Vector3d torque = lever.cross(force);
 
+	// add the generalized force
 	m_externalGeneralizedForce += generalizedForce;
+	// add the generalized stiffness matrix
+	m_externalGeneralizedStiffness += K;
+	// add the generalized damping matrix
+	m_externalGeneralizedDamping += D;
+
 	// add the extra torque produced by the lever
 	m_externalGeneralizedForce.segment<3>(3) += torque;
 
-	m_externalGeneralizedStiffness += K;
+	// add the extra terms in the stiffness matrix
+	const Vector3d leverInLocalSpace = getCurrentState().getPose().rotation().inverse() * lever;
+	const Eigen::AngleAxisd angleAxis(getCurrentState().getPose().rotation());
+	double angle = angleAxis.angle();
+	const Vector3d axis = angleAxis.axis();
+	const Vector3d rotationVector = axis * angle;
+	double rotationVectorNorm = rotationVector.norm();
+	double rotationVectorNormCubic = rotationVectorNorm * rotationVectorNorm * rotationVectorNorm;
+	double sinAngle = sin(angle);
+	double cosAngle = cos(angle);
+	double oneMinusCos = 1.0 - cosAngle;
+	const Matrix33d skewAxis = SurgSim::Math::makeSkewSymmetricMatrix(axis);
+	Matrix33d dRdAxisX;
+	Matrix33d dRdAxisY;
+	Matrix33d dRdAxisZ;
+	Matrix33d dRdAngle =
+		-sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * axis * axis.transpose();
+	dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos * axis[1], oneMinusCos * axis[2],
+				oneMinusCos * axis[1], 0.0, -sinAngle,
+				oneMinusCos * axis[2], sinAngle, 0.0;
+	dRdAxisY << 0.0, oneMinusCos * axis[0], sinAngle,
+				oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos * axis[2],
+				-sinAngle, oneMinusCos * axis[2], 0.0;
+	dRdAxisZ << 0.0, -sinAngle, oneMinusCos * axis[0],
+				sinAngle, 0.0, oneMinusCos * axis[1],
+				oneMinusCos * axis[0], oneMinusCos * axis[1], oneMinusCos * 2.0 * axis[2];
+	Vector3d dAngledRotationVector, dAxisXdRotationVector, dAxisYdRotationVector, dAxisZdRotationVector;
+	if (std::abs(rotationVectorNorm) > rotationVectorEpsilon)
+	{
+		const Vector3d tmp = rotationVector / rotationVectorNormCubic;
+		dAngledRotationVector = rotationVector / rotationVectorNorm;
+		dAxisXdRotationVector = Vector3d::UnitX() / rotationVectorNorm - rotationVector[0] * tmp;
+		dAxisYdRotationVector = Vector3d::UnitY() / rotationVectorNorm - rotationVector[1] * tmp;
+		dAxisZdRotationVector = Vector3d::UnitZ() / rotationVectorNorm - rotationVector[2] * tmp;
+	}
+	else
+	{
+		// Development around theta ~ 0 => sin(theta) ~ theta
+		// We simplify by theta across the products dRdAxis[alpha].dAxis[alpha]dRotationVector[beta]
+		dAngledRotationVector = Vector3d::Zero();
+		dAxisXdRotationVector = Vector3d::UnitX();
+		dAxisYdRotationVector = Vector3d::UnitY();
+		dAxisZdRotationVector = Vector3d::UnitZ();
+
+		dRdAxisX << 0.0, 0.0, 0.0,
+					0.0, 0.0, -1.0,
+					0.0, 1.0, 0.0;
+
+		dRdAxisY << 0.0, 0.0, 1.0,
+					0.0, 0.0, 0.0,
+					-1.0, 0.0, 0.0;
+
+		dRdAxisZ << 0.0, -1.0, 0.0,
+					1.0, 0.0, 0.0,
+					0.0, 0.0, 0.0;
+	}
 	// add the extra stiffness terms produced by the lever
-	m_externalGeneralizedStiffness.block<3, 3>(3, 0) += -SurgSim::Math::makeSkewSymmetricMatrix(force);
 	for (size_t column = 0; column < 6; ++column)
 	{
 		m_externalGeneralizedStiffness.block<3, 1>(3, column) += lever.cross(K.block<3, 1>(0, column));
 	}
+	// add extra term - dCP/dW[alpha] ^ F = - dR.CP(local)/dW[alpha] ^ F = -dR/dW[alpha].CP(local) ^ F
+	// = -[(dR/dangle.dangle/dW[alpha] + dR/daxisX.daxisX/dW[alpha] +
+	//      dR/daxisY.daxisY/dW[alpha] + dR/daxisZ.daxisZ/dW[alpha]) . CP(local)] ^ F
+	for (size_t i = 0; i < 3; ++i)
+	{
+		m_externalGeneralizedStiffness.block<3, 1>(3, 3 + i) +=
+			-((dRdAngle * dAngledRotationVector[i] +
+			dRdAxisX * dAxisXdRotationVector[i] +
+			dRdAxisY * dAxisYdRotationVector[i] +
+			dRdAxisZ * dAxisZdRotationVector[i]) * leverInLocalSpace).cross(force);
+	}
 
-	m_externalGeneralizedDamping += D;
 	// add the extra damping terms produced by the lever
 	for (size_t column = 0; column < 6; ++column)
 	{
@@ -132,7 +203,7 @@ void RigidRepresentation::beforeUpdate(double dt)
 						   " deactivated in beforeUpdate because parameters are not valid." << std::endl;
 	if (!isActive() || !m_parametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 }
@@ -148,7 +219,7 @@ void RigidRepresentation::update(double dt)
 						   " deactivated in update because parameters are not valid." << std::endl;
 	if (!isActive() || !m_parametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 
@@ -231,7 +302,7 @@ void RigidRepresentation::update(double dt)
 			"|q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
-		setIsActive(false);
+		setActive(false);
 	}
 
 	// Prepare the compliance matrix
@@ -247,7 +318,7 @@ void RigidRepresentation::afterUpdate(double dt)
 						   " deactivated in afterUpdate because parameters are not valid." << std::endl;
 	if (!isActive() || !m_parametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 
@@ -268,7 +339,7 @@ void RigidRepresentation::applyCorrection(double dt,
 						   " deactivated in applyCorrection because parameters are not valid." << std::endl;
 	if (!isActive() || !m_parametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 
@@ -314,7 +385,7 @@ void RigidRepresentation::applyCorrection(double dt,
 			"and |q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
-		setIsActive(false);
+		setActive(false);
 	}
 
 	// Prepare the compliance matrix
@@ -335,7 +406,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 						   std::endl;
 	if (!isActive() || !m_parametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 

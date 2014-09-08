@@ -114,7 +114,7 @@ protected:
 		m_poseRigid.setIdentity();
 
 		m_rigid = std::make_shared<RigidRepresentation>("Rigid");
-		m_rigid->setIsActive(true);
+		m_rigid->setActive(true);
 		m_rigid->setIsGravityEnabled(false);
 		m_rigid->setLocalPose(m_poseRigid);
 		{
@@ -126,7 +126,7 @@ protected:
 
 		m_indexPlaneRepresentation = m_indexSphereRepresentation + m_rigid->getNumDof();
 		m_fixed = std::make_shared<FixedRepresentation>("Fixed");
-		m_fixed->setIsActive(true);
+		m_fixed->setActive(true);
 		m_fixed->setIsGravityEnabled(false);
 		m_fixed->setLocalPose(m_poseFixed);
 		m_numDof += m_fixed->getNumDof();

@@ -146,23 +146,23 @@ TEST_F(ContactConstraintGenerationTests, InactivePhysics)
 	state->setCollisionPairs(pairs);
 	ContactConstraintGeneration generator;
 
-	rigid0->setIsActive(false);
-	rigid1->setIsActive(true);
+	rigid0->setActive(false);
+	rigid1->setActive(true);
 	generator.update(0.1, state);
 	ASSERT_EQ(0u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
-	rigid0->setIsActive(true);
-	rigid1->setIsActive(false);
+	rigid0->setActive(true);
+	rigid1->setActive(false);
 	generator.update(0.1, state);
 	ASSERT_EQ(0u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
-	rigid0->setIsActive(false);
-	rigid1->setIsActive(false);
+	rigid0->setActive(false);
+	rigid1->setActive(false);
 	generator.update(0.1, state);
 	ASSERT_EQ(0u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
-	rigid0->setIsActive(true);
-	rigid1->setIsActive(true);
+	rigid0->setActive(true);
+	rigid1->setActive(true);
 	generator.update(0.1, state);
 	ASSERT_EQ(1u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 }

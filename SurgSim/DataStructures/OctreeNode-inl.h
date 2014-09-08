@@ -20,6 +20,8 @@
 #include <cmath>
 #include <fstream>
 
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 

@@ -117,7 +117,8 @@ const RigidRepresentationState& RigidRepresentationBase::getPreviousState() cons
 	return m_previousState;
 }
 
-std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(const SurgSim::Collision::Location& location)
+std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(
+	const SurgSim::DataStructures::Location& location)
 {
 	return std::move(createTypedLocalization<RigidRepresentationLocalization>(location));
 }

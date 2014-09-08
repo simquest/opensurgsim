@@ -1209,54 +1209,13 @@ namespace
 	}
 };
 
-TYPED_TEST(AllDynamicMatrixTests, resizeMatrix)
-{
-	typedef typename TestFixture::Matrix Matrix;
-
-	Matrix m;
-
-	ASSERT_NO_THROW(SurgSim::Math::resizeMatrix(&m, 10, 10, false););
-	EXPECT_EQ(10, static_cast<int>(m.rows()));
-	EXPECT_EQ(10, static_cast<int>(m.cols()));
-
-	ASSERT_NO_THROW(SurgSim::Math::resizeMatrix(&m, 13, 13, true););
-	EXPECT_EQ(13, static_cast<int>(m.rows()));
-	EXPECT_EQ(13, static_cast<int>(m.cols()));
-	EXPECT_TRUE(m.isZero());
-
-	ASSERT_NO_THROW(SurgSim::Math::resizeMatrix(&m, 12, 13, true););
-	EXPECT_EQ(12, static_cast<int>(m.rows()));
-	EXPECT_EQ(13, static_cast<int>(m.cols()));
-	EXPECT_TRUE(m.isZero());
-
-	ASSERT_NO_THROW(SurgSim::Math::resizeMatrix(&m, 12, 14, true););
-	EXPECT_EQ(12, static_cast<int>(m.rows()));
-	EXPECT_EQ(14, static_cast<int>(m.cols()));
-	EXPECT_TRUE(m.isZero());
-
-
-	{
-		SCOPED_TRACE("DiagonalMatrix");
-
-		SurgSim::Math::DiagonalMatrix m;
-		ASSERT_NO_THROW(SurgSim::Math::resizeMatrix(&m, 10, 10, false););
-		EXPECT_EQ(10, static_cast<int>(m.rows()));
-		EXPECT_EQ(10, static_cast<int>(m.cols()));
-
-		ASSERT_NO_THROW(SurgSim::Math::resizeMatrix(&m, 13, 13, true););
-		EXPECT_EQ(13, static_cast<int>(m.rows()));
-		EXPECT_EQ(13, static_cast<int>(m.cols()));
-		EXPECT_TRUE(m.diagonal().isZero());
-	}
-}
-
 TYPED_TEST(AllDynamicMatrixTests, addSubMatrix)
 {
 	typedef typename TestFixture::Matrix Matrix;
 
 	Matrix m, mInit, m2, m2Init;
-	SurgSim::Math::resizeMatrix(&m, 18, 18);   m.setRandom();   mInit  = m;
-	SurgSim::Math::resizeMatrix(&m2, 18, 18);  m2.setRandom();  m2Init = m2;
+	m.resize(18, 18);   m.setRandom();   mInit  = m;
+	m2.resize(18, 18);  m2.setRandom();  m2Init = m2;
 
 	ASSERT_NO_THROW(SurgSim::Math::addSubMatrix(m2.block(3,3, 3,3), 2,2, 3,3, &m););
 
@@ -1287,8 +1246,8 @@ TYPED_TEST(AllDynamicMatrixTests, addSubMatrixBlocks)
 
 	Matrix m, mInit, m2, m2Init;
 	std::vector<size_t> nodeIds;
-	SurgSim::Math::resizeMatrix(&m, 18, 18);   m.setRandom();   mInit = m;
-	SurgSim::Math::resizeMatrix(&m2, 18, 18);  m2.setRandom();  m2Init = m2;
+	m.resize(18, 18);   m.setRandom();   mInit = m;
+	m2.resize(18, 18);  m2.setRandom();  m2Init = m2;
 	nodeIds.push_back(1);
 	nodeIds.push_back(3);
 	nodeIds.push_back(5);
@@ -1363,8 +1322,8 @@ TYPED_TEST(AllDynamicMatrixTests, setSubMatrix)
 	typedef typename TestFixture::Matrix Matrix;
 
 	Matrix m, mInit, m2, m2Init;
-	SurgSim::Math::resizeMatrix(&m, 18, 18);   m.setRandom();   mInit  = m;
-	SurgSim::Math::resizeMatrix(&m2, 18, 18);  m2.setRandom();  m2Init = m2;
+	m.resize(18, 18);   m.setRandom();   mInit  = m;
+	m2.resize(18, 18);  m2.setRandom();  m2Init = m2;
 
 	ASSERT_NO_THROW(SurgSim::Math::setSubMatrix(m2.block(3,3, 3,3), 2,2, 3,3, &m););
 	EXPECT_TRUE(m2.isApprox(m2Init));
@@ -1393,7 +1352,7 @@ TYPED_TEST(AllDynamicMatrixTests, getSubMatrix)
 	typedef typename TestFixture::Matrix Matrix;
 
 	Matrix m, mInit;
-	SurgSim::Math::resizeMatrix(&m, 18, 18); m.setRandom(); mInit = m;
+	m.resize(18, 18); m.setRandom(); mInit = m;
 
 	Eigen::Block<Matrix> subMatrix = SurgSim::Math::getSubMatrix(m, 2,2, 3,3);
 	EXPECT_TRUE(m.isApprox(mInit));
