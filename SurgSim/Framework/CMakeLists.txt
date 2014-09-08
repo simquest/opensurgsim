@@ -94,6 +94,7 @@ SET(LIBS
 )
 
 target_link_libraries(SurgSimFramework ${LIBS})
+add_dependencies(SurgSimFramework yaml-cpp)
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)

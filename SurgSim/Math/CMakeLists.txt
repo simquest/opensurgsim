@@ -112,6 +112,7 @@ set(LIBS
 
 target_link_libraries(SurgSimMath ${LIBS}
 )
+add_dependencies(SurgSimMath yaml-cpp)
 
 
 if(BUILD_TESTING)

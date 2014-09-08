@@ -42,6 +42,7 @@ set(SURGSIM_TOOLS_DIR "${SURGSIM_SOURCE_DIR}/Tools")
 set(SURGSIM_THIRD_PARTY_DIR "${SURGSIM_SOURCE_DIR}/ThirdParty")
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${SURGSIM_THIRD_PARTY_DIR})
 
+include(ExternalProject)
 include(SurgSimBuildFlags)
 include(SurgSimUtilities)
 
@@ -52,7 +53,6 @@ find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB o
 find_package(OpenThreads)
 find_package(OpenGL)
 find_package(Eigen3 3.2.0 REQUIRED)
-find_package(yaml-cpp 0.5.1.2 EXACT REQUIRED)
 
 if(WIN32)
 	set(GLUT_ROOT_PATH "$ENV{GLUT_ROOT_PATH}")
@@ -84,6 +84,13 @@ list(APPEND Boost_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
+
+option(USE_SYSTEM_YAMLCPP "Should we use the system yaml-cpp?" OFF)
+if(USE_SYSTEM_YAMLCPP)
+	find_package(yaml-cpp 0.5.1.2 EXACT REQUIRED)
+else(USE_SYSTEM_YAMLCPP)
+	include(External_yamlcpp)
+endif(USE_SYSTEM_YAMLCPP)
 
 include_directories(${SURGSIM_SOURCE_DIR})
 include_directories(SYSTEM
