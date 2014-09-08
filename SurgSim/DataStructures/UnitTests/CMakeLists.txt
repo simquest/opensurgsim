@@ -25,6 +25,7 @@ set(UNIT_TEST_SOURCES
 	BufferedValueTests.cpp
 	DataGroupTests.cpp
 	DataStructuresConvertTests.cpp
+	ImageTest.cpp
 	IndexDirectoryTests.cpp
 	IndexedLocalCoordinateTest.cpp
 	LocationTests.cpp
