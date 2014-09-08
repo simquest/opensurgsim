@@ -29,6 +29,7 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
@@ -48,6 +49,11 @@ using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector6d;
 
+namespace
+{
+const double epsilon = 1e-10;
+}
+
 namespace SurgSim
 {
 namespace Physics
@@ -60,11 +66,17 @@ public:
 	{
 		m_dt = 1e-3;
 
-		double radius = 0.1;
-		m_param.setDensity(9000.0);
-		m_param.setAngularDamping(0.0);
-		m_param.setLinearDamping(0.0);
-		m_param.setShapeUsedForMassInertia(std::make_shared<SphereShape>(radius));
+		m_radius = 0.1;
+		m_density = 9000.0;
+		m_mass = 4.0 / 3.0 * M_PI * m_radius * m_radius * m_radius * m_density;
+		double coef = 2.0 / 5.0 * m_mass * m_radius * m_radius;
+		m_inertia << coef, 0.0, 0.0, 0.0, coef, 0.0, 0.0, 0.0, coef;
+		m_id33.setIdentity();
+		m_zero33.setZero();
+		m_invalidInertia.setRandom();
+		m_invalidInertia = m_invalidInertia + m_invalidInertia.transpose().eval(); // make symmetric
+		m_invalidInertia(0, 0) = -12.3; // Negative value on hte diagonal (invalid)
+		m_sphere = std::make_shared<SphereShape>(m_radius);
 
 		Quaterniond q(0.5, 0.4, 0.3, 0.2);
 		q.normalize();
@@ -83,11 +95,29 @@ public:
 	// Time step
 	double m_dt;
 
-	// Rigid representation parameters
-	RigidRepresentationParameters m_param;
+	// Sphere radius (in m)
+	double m_radius;
 
-	// Rigid representation default parameters
-	RigidRepresentationParameters m_defaultParameters;
+	// Sphere density (in Kg.m-3)
+	double m_density;
+
+	// Sphere mass (in Kg)
+	double m_mass;
+
+	// Sphere inertia matrix
+	SurgSim::Math::Matrix33d m_inertia;
+
+	// Identity matrix 3x3 (for convenience)
+	SurgSim::Math::Matrix33d m_id33;
+
+	// Zero matrix 3x3 (for convenience)
+	SurgSim::Math::Matrix33d m_zero33;
+
+	// Invalid inertia matrix
+	SurgSim::Math::Matrix33d m_invalidInertia;
+
+	// SphereShape
+	std::shared_ptr<SphereShape> m_sphere;
 
 	// Rigid representation state
 	RigidRepresentationState m_state;
@@ -109,8 +139,6 @@ TEST_F(RigidRepresentationTest, ResetTest)
 	// Create the rigid body
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 
-	rigidBody->setInitialParameters(m_defaultParameters);
-	rigidBody->setCurrentParameters(m_param);
 	rigidBody->setInitialState(m_state);
 	rigidBody->setActive(false);
 	rigidBody->setIsGravityEnabled(false);
@@ -119,8 +147,6 @@ TEST_F(RigidRepresentationTest, ResetTest)
 	// reset the representation state
 	rigidBody->resetState();
 
-	// Parameters unchanged
-	EXPECT_EQ(m_param, rigidBody->getCurrentParameters());
 	// isActive unchanged
 	EXPECT_FALSE(rigidBody->isActive());
 	// isGravityEnable flag unchanged
@@ -129,13 +155,6 @@ TEST_F(RigidRepresentationTest, ResetTest)
 	EXPECT_TRUE(rigidBody->getInitialState() == rigidBody->getCurrentState());
 	// previous state = initial state
 	EXPECT_TRUE(rigidBody->getInitialState() == rigidBody->getPreviousState());
-
-	// reset the representation parameters
-	rigidBody->resetParameters();
-
-	// Parameters reset to initial
-	EXPECT_EQ(rigidBody->getInitialParameters(), rigidBody->getCurrentParameters());
-	EXPECT_EQ(m_defaultParameters, rigidBody->getCurrentParameters());
 }
 
 TEST_F(RigidRepresentationTest, SetGetAndDefaultValueTest)
@@ -152,12 +171,42 @@ TEST_F(RigidRepresentationTest, SetGetAndDefaultValueTest)
 	EXPECT_TRUE(m_state == rigidBody->getCurrentState());
 	EXPECT_TRUE(m_state == rigidBody->getPreviousState());
 
-	// Get parameters (current, initial)
-	EXPECT_EQ(m_defaultParameters, rigidBody->getCurrentParameters());
-	EXPECT_EQ(m_defaultParameters, rigidBody->getInitialParameters());
-	rigidBody->setInitialParameters(m_param);
-	EXPECT_EQ(m_param, rigidBody->getInitialParameters());
-	EXPECT_EQ(m_param, rigidBody->getCurrentParameters());
+	// Mass density [default = 0]
+	EXPECT_NEAR(0.0, rigidBody->getDensity(), epsilon);
+	// Mass [default = qNaA]
+	EXPECT_FALSE(SurgSim::Math::isValid(rigidBody->getMass()));
+	// Inertia 3x3 symmetric matrix [default = qNaN values]
+	EXPECT_FALSE(SurgSim::Math::isValid(rigidBody->getLocalInertia()));
+	// Linear damping [default = 0]
+	EXPECT_NEAR(0.0, rigidBody->getLinearDamping(), epsilon);
+	// Angular damping [default = 0]
+	EXPECT_NEAR(0.0, rigidBody->getAngularDamping(), epsilon);
+	// Shape [default = nullptr]
+	EXPECT_EQ(nullptr, rigidBody->getShape());
+
+	// Mass density
+	rigidBody->setDensity(m_density);
+	EXPECT_NEAR(m_density, rigidBody->getDensity(), epsilon);
+	rigidBody->setDensity(0.0);
+	EXPECT_NEAR(0.0, rigidBody->getDensity(), epsilon);
+
+	// Linear damping
+	rigidBody->setLinearDamping(5.5);
+	EXPECT_NEAR(5.5, rigidBody->getLinearDamping(), epsilon);
+	rigidBody->setLinearDamping(0.0);
+	EXPECT_NEAR(0.0, rigidBody->getLinearDamping(), epsilon);
+
+	// Angular damping
+	rigidBody->setAngularDamping(5.5);
+	EXPECT_NEAR(5.5, rigidBody->getAngularDamping(), epsilon);
+	rigidBody->setAngularDamping(0.0);
+	EXPECT_NEAR(0.0, rigidBody->getAngularDamping(), epsilon);
+
+	// Shape
+	rigidBody->setShape(m_sphere);
+	EXPECT_EQ(m_sphere, rigidBody->getShape());
+	rigidBody->setShape(nullptr);
+	EXPECT_EQ(nullptr, rigidBody->getShape());
 
 	// Get/Set active flag [default = true]
 	EXPECT_TRUE(rigidBody->isActive());
@@ -701,7 +750,8 @@ TEST_F(RigidRepresentationTest, NoForceTorqueTest)
 	// Setup phase
 	rigidBody->setActive(true);
 	rigidBody->setIsGravityEnabled(false);
-	rigidBody->setInitialParameters(m_param);
+	rigidBody->setDensity(m_density);
+	rigidBody->setShape(m_sphere);
 
 	// Run few time steps
 	for (int timeStep = 0; timeStep < m_maxNumSimulationStepTest; timeStep++)
@@ -731,7 +781,8 @@ TEST_F(RigidRepresentationTest, GravityTest)
 	// Setup phase
 	rigidBody->setActive(true);
 	rigidBody->setIsGravityEnabled(true);
-	rigidBody->setInitialParameters(m_param);
+	rigidBody->setDensity(m_density);
+	rigidBody->setShape(m_sphere);
 
 	// Run few time steps
 	for (int timeStep = 0; timeStep < m_maxNumSimulationStepTest; timeStep++)
@@ -756,7 +807,6 @@ TEST_F(RigidRepresentationTest, GravityTest)
 		Vector3d tmpG = Gprev + tmpV * m_dt;
 		double diffG = (G - tmpG).norm();
 
-		double epsilon = 1e-15;
 		ASSERT_NEAR(0.0, diffG, epsilon);
 		ASSERT_TRUE(q.isApprox(Quaterniond::Identity()));
 		ASSERT_NEAR(0.0, diffV, epsilon);
@@ -773,7 +823,8 @@ TEST_F(RigidRepresentationTest, PreviousStateDifferentFromCurrentTest)
 	// Setup phase
 	rigidBody->setActive(true);
 	rigidBody->setIsGravityEnabled(true);
-	rigidBody->setInitialParameters(m_param);
+	rigidBody->setDensity(m_density);
+	rigidBody->setShape(m_sphere);
 
 	// Run few time steps
 	for (int timeStep = 0; timeStep < m_maxNumSimulationStepTest; timeStep++)
@@ -787,13 +838,11 @@ TEST_F(RigidRepresentationTest, PreviousStateDifferentFromCurrentTest)
 }
 
 void disableWhenDivergeTest(std::shared_ptr<RigidRepresentation> rigidBody,
-							const RigidRepresentationParameters& param,
 							const RigidRepresentationState& state, double dt)
 {
 	// Setup phase
 	rigidBody->setActive(true);
 	rigidBody->setIsGravityEnabled(true);
-	rigidBody->setInitialParameters(param);
 	rigidBody->setInitialState(state);
 
 	// Run 1 time step and make sure that the rigid body has been disabled
@@ -819,78 +868,96 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 	{
 		// Create the rigid body
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setDensity(m_density);
+		rigidBody->setShape(m_sphere);
+
 		// Sets the state
 		m_state.reset();
 		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vMax));
 		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::signaling_NaN()));
 
 		SCOPED_TRACE("Testing linear with Signaling Nan");
-		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+		disableWhenDivergeTest(rigidBody, m_state, m_dt);
 	}
 
 	// Test linear failure (with quiet Nan)
 	{
 		// Create the rigid body
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setDensity(m_density);
+		rigidBody->setShape(m_sphere);
+
 		// Sets the state
 		m_state.reset();
 		m_state.setPose(makeRigidTransform(q, vMax));
 		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN()));
 
 		SCOPED_TRACE("Testing linear with Quiet Nan");
-		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+		disableWhenDivergeTest(rigidBody, m_state, m_dt);
 	}
 
 	// Test linear failure (with numerical maximum value)
 	{
 		// Create the rigid body
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setDensity(m_density);
+		rigidBody->setShape(m_sphere);
+
 		// Sets the state
 		m_state.reset();
 		m_state.setPose(makeRigidTransform(q, vMax));
 		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
 
 		SCOPED_TRACE("Testing linear with double max");
-		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+		disableWhenDivergeTest(rigidBody, m_state, m_dt);
 	}
 
 	// Test angular failure (with Signaling Nan)
 	{
 		// Create the rigid body
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setDensity(m_density);
+		rigidBody->setShape(m_sphere);
+
 		// Sets the state
 		m_state.reset();
 		m_state.setPose(makeRigidTransform(q, vZero));
 		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::signaling_NaN()));
 
 		SCOPED_TRACE("Testing angular with Signaling Nan");
-		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+		disableWhenDivergeTest(rigidBody, m_state, m_dt);
 	}
 
 	// Test angular failure (with quiet Nan)
 	{
 		// Create the rigid body
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setDensity(m_density);
+		rigidBody->setShape(m_sphere);
+
 		// Sets the state
 		m_state.reset();
 		m_state.setPose(makeRigidTransform(q, vZero));
 		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN()));
 
 		SCOPED_TRACE("Testing angular with Quiet Nan");
-		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+		disableWhenDivergeTest(rigidBody, m_state, m_dt);
 	}
 
 	// Test angular failure (with numerical maximum value)
 	{
 		// Create the rigid body
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setDensity(m_density);
+		rigidBody->setShape(m_sphere);
+
 		// Sets the state
 		m_state.reset();
 		m_state.setPose(makeRigidTransform(q, vZero));
 		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
 
 		SCOPED_TRACE("Testing angular with double max");
-		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+		disableWhenDivergeTest(rigidBody, m_state, m_dt);
 	}
 }
 
@@ -915,20 +982,8 @@ TEST_F(RigidRepresentationTest, InvalidShapes)
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 
 	{
-		RigidRepresentationParameters parameters;
-		parameters.setShapeUsedForMassInertia(shapeWithNoVolume);
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
-		rigidBody->setCurrentParameters(parameters);
-
-		std::shared_ptr<Component> component = rigidBody;
-		EXPECT_THROW(component->initialize(runtime), SurgSim::Framework::AssertionFailure);
-	}
-
-	{
-		RigidRepresentationParameters parameters;
-		parameters.setShapeUsedForMassInertia(shapeWithNoVolume);
-		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
-		rigidBody->setInitialParameters(parameters);
+		rigidBody->setShape(shapeWithNoVolume);
 
 		std::shared_ptr<Component> component = rigidBody;
 		EXPECT_THROW(component->initialize(runtime), SurgSim::Framework::AssertionFailure);
@@ -943,17 +998,14 @@ TEST_F(RigidRepresentationTest, WithMeshShape)
 	shape->load("MeshShapeData/staple_collision.ply");
 	EXPECT_TRUE(shape->isValid());
 
-	SurgSim::Physics::RigidRepresentationParameters params;
-	params.setShapeUsedForMassInertia(shape);
-
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
-	rigidBody->setInitialParameters(params);
+	rigidBody->setShape(shape);
 
 	EXPECT_NO_THROW(rigidBody->initialize(runtime));
 	EXPECT_TRUE(shape->isValid());
 
 	std::shared_ptr<RigidRepresentation> rigidBody2 = std::make_shared<RigidRepresentation>("Rigid2");
-	rigidBody2->setInitialParameters(params);
+	rigidBody2->setShape(shape);
 	EXPECT_NO_THROW(rigidBody2->initialize(runtime));
 }
 
@@ -981,6 +1033,27 @@ TEST_F(RigidRepresentationTest, CollisionRepresentationTest)
 	EXPECT_EQ(nullptr, collision1->getRigidRepresentation());
 	EXPECT_EQ(nullptr, collision2->getRigidRepresentation());
 }
+
+TEST_F(RigidRepresentationTest, DensityWithSphereShapeTest)
+{
+	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+
+	// Mass density
+	rigidBody->setDensity(m_density);
+
+	// Shape
+	rigidBody->setShape(m_sphere);
+
+	// Test inertia
+	EXPECT_TRUE(rigidBody->getLocalInertia().isApprox(m_inertia));
+
+	// Test mass
+	EXPECT_EQ(m_mass, rigidBody->getMass());
+
+	// Test mass center
+	EXPECT_TRUE(rigidBody->getMassCenter().isZero());
+}
+
 
 TEST_F(RigidRepresentationTest, SerializationTest)
 {
@@ -1014,7 +1087,10 @@ TEST_F(RigidRepresentationTest, SerializationTest)
 			std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
 
 		rigidRepresentation->setCollisionRepresentation(rigidCollisionRepresentation);
-		rigidRepresentation->setInitialParameters(m_param);
+		rigidRepresentation->setDensity(0.1);
+		rigidRepresentation->setLinearDamping(0.2);
+		rigidRepresentation->setAngularDamping(0.3);
+		rigidRepresentation->setShape(m_sphere);
 
 		YAML::Node node;
 		EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));
@@ -1023,6 +1099,16 @@ TEST_F(RigidRepresentationTest, SerializationTest)
 		newRepresentation =
 			std::dynamic_pointer_cast<RigidRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>());
 		EXPECT_NE(nullptr, newRepresentation->getCollisionRepresentation());
+		EXPECT_NEAR(0.1, newRepresentation->getValue<double>("Density"), epsilon);
+		EXPECT_NEAR(0.2, newRepresentation->getValue<double>("LinearDamping"), epsilon);
+		EXPECT_NEAR(0.3, newRepresentation->getValue<double>("AngularDamping"), epsilon);
+
+		// Shape is encoded/decoded as concrete object instead of reference/shared_ptr<>.
+		EXPECT_NE(m_sphere, newRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
+
+		auto decodedShape = newRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape");
+		EXPECT_EQ(m_sphere->getClassName(), decodedShape->getClassName());
+		EXPECT_NEAR(m_sphere->getVolume(), decodedShape->getVolume(), epsilon);
 
 		auto newCollisionRepresentation =
 			std::dynamic_pointer_cast<RigidCollisionRepresentation>(newRepresentation->getCollisionRepresentation());

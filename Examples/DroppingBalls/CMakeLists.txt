@@ -23,14 +23,16 @@ include_directories(
 	${OPENTHREADS_INCLUDE_DIR}
 )
 
-set(EXAMPLE_SOURCES
+set(SOURCES
 	AddRandomSphereBehavior.cpp
-	ExampleBouncingBalls.cpp
+	DroppingBalls.cpp
 )
 
-set(EXAMPLE_HEADERS
+set(HEADERS
 	AddRandomSphereBehavior.h
 )
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Configure the path for the data files
 configure_file(
@@ -38,10 +40,8 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-add_executable(ExampleBouncingBalls
-	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-surgsim_show_ide_folders(
-	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+add_executable(DroppingBalls ${SOURCES} ${HEADERS})
+surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
 
 SET(LIBS
 	SurgSimBlocks
@@ -51,7 +51,7 @@ SET(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-target_link_libraries(ExampleBouncingBalls ${LIBS})
+target_link_libraries(DroppingBalls ${LIBS})
 
-# Put ExampleBouncingBalls into folder "Examples"
-set_target_properties(ExampleBouncingBalls PROPERTIES FOLDER "Examples") 
+# Put DroppingBalls into folder "Examples"
+set_target_properties(DroppingBalls PROPERTIES FOLDER "Examples") 

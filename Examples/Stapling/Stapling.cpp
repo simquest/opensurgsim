@@ -16,7 +16,7 @@
 #include <memory>
 #include <string>
 
-#include "Examples/ExampleStapling/StaplerBehavior.h"
+#include "Examples/Stapling/StaplerBehavior.h"
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
@@ -51,7 +51,6 @@
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 #include "SurgSim/DataStructures/PlyReader.h"
@@ -89,7 +88,6 @@ using SurgSim::Physics::DeformableCollisionRepresentation;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::PhysicsManager;
-using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
@@ -174,13 +172,11 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	meshShapeVisualization->setFilename(filename);
 	meshShapeVisualization->setDrawAsWireFrame(true);
 
-	RigidRepresentationParameters params;
-	params.setDensity(8050); // Stainless steel (in Kg.m-3)
-	params.setShapeUsedForMassInertia(meshShapeForCollision);
-
 	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
-	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setIsGravityEnabled(false);
+	physicsRepresentation->setDensity(8050); // Stainless steel (in Kg.m-3)
+	physicsRepresentation->setShape(meshShapeForCollision);
+
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
@@ -283,11 +279,8 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 	meshShapeVisualization->setFilename(filename);
 	meshShapeVisualization->setDrawAsWireFrame(true);
 
-	RigidRepresentationParameters params;
-	params.setShapeUsedForMassInertia(meshShape);
-
 	std::shared_ptr<FixedRepresentation> physicsRepresentation = std::make_shared<FixedRepresentation>("Physics");
-	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setShape(meshShape);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");

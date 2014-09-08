@@ -15,14 +15,13 @@
 
 if(BUILD_DEVICE_MULTIAXIS)
 	add_subdirectory(AddSphereFromInput)
-	add_subdirectory(ExampleStapling)
-	add_subdirectory(SerializableStapling)
+	add_subdirectory(Stapling)
 endif(BUILD_DEVICE_MULTIAXIS)
 
 if(BUILD_DEVICE_MULTIAXIS OR BUILD_DEVICE_NOVINT)
 	add_subdirectory(InputVtc)
 endif(BUILD_DEVICE_MULTIAXIS OR BUILD_DEVICE_NOVINT)
 
-add_subdirectory(BouncingBalls)
+add_subdirectory(DroppingBalls)
 
 add_subdirectory(GraphicsScene)

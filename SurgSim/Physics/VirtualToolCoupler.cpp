@@ -155,7 +155,7 @@ void VirtualToolCoupler::update(double dt)
 		Vector3d leverArm = Vector3d::Zero();
 		if (m_calculateInertialTorques)
 		{
-			const Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
+			const Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
 			leverArm = attachmentPoint - objectPosition;
 		}
 		Vector3d attachmentPointVelocity = objectState.getLinearVelocity();
@@ -257,7 +257,7 @@ bool VirtualToolCoupler::doWakeUp()
 	//     dampingRatio = (damping) / (2 * sqrt(mass * stiffness))
 	//
 	double dampingRatio = 1.0;
-	double mass = m_rigid->getCurrentParameters().getMass();
+	double mass = m_rigid->getMass();
 	if (!m_optionalLinearDamping.hasValue())
 	{
 		if (m_optionalLinearStiffness.hasValue())
@@ -283,7 +283,7 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	const Matrix33d& inertia = m_rigid->getCurrentParameters().getLocalInertia();
+	const Matrix33d& inertia = m_rigid->getLocalInertia();
 	double maxInertia = inertia.eigenvalues().real().maxCoeff();
 	if (!m_optionalAngularDamping.hasValue())
 	{
@@ -316,7 +316,7 @@ bool VirtualToolCoupler::doWakeUp()
 	}
 	else
 	{
-		m_localAttachmentPoint = m_rigid->getCurrentParameters().getMassCenter();
+		m_localAttachmentPoint = m_rigid->getMassCenter();
 	}
 
 	return true;

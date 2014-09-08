@@ -23,17 +23,16 @@ include_directories(
 	${OPENTHREADS_INCLUDE_DIR}
 )
 
-set(INPUTVTCEXAMPLE_SOURCES
+set(SOURCES
 	DeviceFactory.cpp
-	InputVtcExample.cpp
+	InputVtc.cpp
 )
 
-set(INPUTVTCEXAMPLE_HEADERS
+set(HEADERS
 	DeviceFactory.h
 )
 
-add_executable(ExampleInputVtc
-	${INPUTVTCEXAMPLE_SOURCES} ${INPUTVTCEXAMPLE_HEADERS})
+add_executable(InputVtc ${SOURCES} ${HEADERS})
 
 set(LIBS 
 	IdentityPoseDevice
@@ -53,7 +52,7 @@ if(BUILD_DEVICE_NOVINT)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOVINT_LIBRARY_AVAILABLE")
 endif(BUILD_DEVICE_NOVINT)
 
-target_link_libraries(ExampleInputVtc ${LIBS})
+target_link_libraries(InputVtc ${LIBS})
 
-# Put ExampleInputVtc into folder "Examples"
-set_target_properties(ExampleInputVtc PROPERTIES FOLDER "Examples") 
+# Put InputVtc into folder "Examples"
+set_target_properties(InputVtc PROPERTIES FOLDER "Examples") 

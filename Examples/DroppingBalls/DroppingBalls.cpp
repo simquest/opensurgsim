@@ -43,9 +43,8 @@
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-#include "Examples/BouncingBalls/AddRandomSphereBehavior.h"
+#include "Examples/DroppingBalls/AddRandomSphereBehavior.h"
 
 using SurgSim::Blocks::AddRandomSphereBehavior;
 using SurgSim::Framework::BasicSceneElement;
@@ -68,7 +67,6 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::PhysicsManager;
 
 /// \file
@@ -144,9 +142,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 
 	// A FixedRepresentation has no motion or compliance. It does not change.
 	std::shared_ptr<FixedRepresentation> physics = std::make_shared<FixedRepresentation>("Physics");
-	RigidRepresentationParameters params;
-	params.setShapeUsedForMassInertia(shape);
-	physics->setInitialParameters(params);
+	physics->setShape(shape);
 
 	// An OsgPlaneRepresentation is a Component containing the OSG-specific graphics information to display a plane.
 	std::shared_ptr<OsgPlaneRepresentation> graphics;
@@ -203,18 +199,15 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	// A RigidRepresentation is for a non-deformable 6 degree-of-freedom (DOF) object with compliance and inertia.
 	std::shared_ptr<RigidRepresentation> physics = std::make_shared<RigidRepresentation>("Physics");
 
-	// A RigidRepresentationParameters defines physical parameters for a rigid body like mass/inertia/damping.
-	RigidRepresentationParameters params;
 	// Density determines inertia and compliance, which are used in the collision response.
-	params.setDensity(5513.0);
+	physics->setDensity(5513.0);
 	// Damping generates a force that opposes the velocity.
-	params.setLinearDamping(0.1);
+	physics->setLinearDamping(0.1);
 
 	// A SphereShape is a Shape for a sphere.  It has functions to find shape properties such as the mass center,
 	// volume, and inertia. The constructor's argument is the radius in meters.
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5);
-	params.setShapeUsedForMassInertia(shape);
-	physics->setInitialParameters(params);
+	physics->setShape(shape);
 
 	std::shared_ptr<OsgSphereRepresentation> graphics = std::make_shared<OsgSphereRepresentation>("Graphics");
 	graphics->setRadius(shape->getRadius());

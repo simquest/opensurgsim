@@ -25,9 +25,12 @@ namespace DataStructures
 
 TEST(LocationTests, Constructor)
 {
-	SurgSim::Math::Vector3d rigidLocalPosition;
+	SurgSim::Math::Vector3d rigidLocalPosition = SurgSim::Math::Vector3d::Ones();
 	SurgSim::DataStructures::OctreePath octreeNodePath;
-	SurgSim::DataStructures::IndexedLocalCoordinate meshLocalCoordinate;
+	octreeNodePath.push_back(1);
+	octreeNodePath.push_back(2);
+	octreeNodePath.push_back(3);
+	SurgSim::DataStructures::IndexedLocalCoordinate meshLocalCoordinate(1, SurgSim::Math::Vector2d(4.0, 5.0));
 
 	EXPECT_NO_THROW({Location location(rigidLocalPosition);});
 	EXPECT_NO_THROW({Location location(octreeNodePath);});
