@@ -21,14 +21,12 @@
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Graphics::SceneryRepresentation;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Math::MeshShape;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationParameters;
 
 StapleElement::StapleElement(const std::string& name) :
 	SurgSim::Framework::BasicSceneElement(name),
@@ -47,14 +45,11 @@ bool StapleElement::doInitialize()
 	const std::string file = "/Geometry/staple_collision.ply";
 	meshShape->load(file);
 
-	RigidRepresentationParameters params;
-	params.setDensity(8050); // Stainless steel (in Kg.m-3)
-	params.setShapeUsedForMassInertia(meshShape);
-	params.setLinearDamping(1e-2);
-	params.setAngularDamping(1e-4);
-
 	auto physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
-	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setDensity(8050); // Stainless steel (in Kg.m-3)
+	physicsRepresentation->setShape(meshShape);
+	physicsRepresentation->setLinearDamping(1e-2);
+	physicsRepresentation->setAngularDamping(1e-4);
 
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSceneryRepresentation>("Graphics");

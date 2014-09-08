@@ -28,7 +28,6 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
@@ -57,13 +56,10 @@ struct VirtualToolCouplerTest : public ::testing::Test
 		inputDeviceName = "Device";
 
 		rigidBody = std::make_shared<RigidRepresentation>(representationName);
-
-		RigidRepresentationParameters parameters;
-		parameters.setDensity(700.0);
-		parameters.setAngularDamping(0.0);
-		parameters.setLinearDamping(0.0);
-		parameters.setShapeUsedForMassInertia(std::make_shared<SphereShape>(0.1));
-		rigidBody->setInitialParameters(parameters);
+		rigidBody->setDensity(700.0);
+		rigidBody->setAngularDamping(0.0);
+		rigidBody->setLinearDamping(0.0);
+		rigidBody->setShape(std::make_shared<SphereShape>(0.1));
 
 		RigidRepresentationState state;
 		state.setAngularVelocity(Vector3d::Zero());
@@ -120,7 +116,7 @@ protected:
 		//      t = 4.744 * naturalFrequency;
 		// we will run the system to this point, and then check that the
 		// final position is 5.1% of its initial position
-		double mass = rigidBody->getCurrentParameters().getMass();
+		double mass = rigidBody->getMass();
 		double stiffness = virtualToolCoupler->getLinearStiffness();
 		double naturalFrequency = sqrt(stiffness / mass);
 		double expectedSettlingTime = 4.744 / naturalFrequency;
@@ -162,7 +158,7 @@ protected:
 		//      t = 4.744 * naturalFrequency;
 		// we will run the system to this point, and then check that the
 		// final position is 5.1% of its initial position
-		double inertia = rigidBody->getCurrentParameters().getLocalInertia()(1,1);
+		double inertia = rigidBody->getLocalInertia()(1,1);
 		double stiffness = virtualToolCoupler->getAngularStiffness();
 		double naturalFrequency = sqrt(stiffness / inertia);
 		double expectedSettlingTime = 4.744 / naturalFrequency;
@@ -191,7 +187,7 @@ protected:
 
 TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 {
-	const double mass = rigidBody->getCurrentParameters().getMass();
+	const double mass = rigidBody->getMass();
 	virtualToolCoupler->overrideAngularDamping(mass * 1.0);
 	virtualToolCoupler->overrideAngularStiffness(mass * 200);
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
@@ -231,7 +227,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 
 TEST_F(VirtualToolCouplerTest, LinearDisplacementWithInertialTorques)
 {
-	const double mass = rigidBody->getCurrentParameters().getMass();
+	const double mass = rigidBody->getMass();
 	virtualToolCoupler->overrideAngularDamping(mass * 2);
 	virtualToolCoupler->overrideAngularStiffness(mass * 20);
 	virtualToolCoupler->overrideLinearDamping(mass * 5);
@@ -275,7 +271,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacementWithInertialTorques)
 
 TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 {
-	const double mass = rigidBody->getCurrentParameters().getMass();
+	const double mass = rigidBody->getMass();
 	virtualToolCoupler->overrideAngularDamping(mass * 1.0);
 	virtualToolCoupler->overrideAngularStiffness(mass * 200);
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
@@ -314,7 +310,7 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 
 TEST_F(VirtualToolCouplerTest, WithGravity)
 {
-	const double mass = rigidBody->getCurrentParameters().getMass();
+	const double mass = rigidBody->getMass();
 	virtualToolCoupler->overrideAngularDamping(mass * 1.0 );
 	virtualToolCoupler->overrideAngularStiffness(mass * 200);
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
@@ -344,9 +340,8 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 
-	RigidRepresentationParameters parameters = rigidBody->getCurrentParameters();
 	Vector3d g = Vector3d(0.0, -9.81, 0.0);
-	Vector3d expectedPosition = parameters.getMass() * g / stiffness;
+	Vector3d expectedPosition = rigidBody->getMass() * g / stiffness;
 	EXPECT_TRUE(state.getPose().translation().isApprox(expectedPosition, epsilon));
 
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());

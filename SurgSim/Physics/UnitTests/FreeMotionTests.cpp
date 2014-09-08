@@ -29,7 +29,6 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/FreeMotion.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
@@ -38,7 +37,6 @@ using SurgSim::Math::Vector3d;
 
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::FreeMotion;
 using SurgSim::Physics::PhysicsManagerState;
 
@@ -47,11 +45,9 @@ TEST(FreeMotionTest, RunTest)
 	std::vector<std::shared_ptr<Representation>> representations = std::vector<std::shared_ptr<Representation>>();
 	std::shared_ptr<RigidRepresentation> representation = std::make_shared<RigidRepresentation>("TestSphere");
 
-	RigidRepresentationParameters params;
-	params.setDensity(700.0); // Wood
+	representation->setDensity(700.0); // Wood
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.01); // 1cm Sphere
-	params.setShapeUsedForMassInertia(shape);
-	representation->setInitialParameters(params);
+	representation->setShape(shape);
 
 	representations.push_back(representation);
 
