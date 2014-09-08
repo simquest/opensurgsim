@@ -53,6 +53,7 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	m_vertices = new osg::Vec3Array();
 	m_vertices->setDataVariance(osg::Object::DYNAMIC);
 	m_geometry->setVertexArray(m_vertices);
+	m_geometry->setUseDisplayList(false);
 
 	// Set up color array with default color
 	m_colors = new osg::Vec4Array(1);
@@ -196,6 +197,7 @@ int OsgMeshRepresentation::updateOsgArrays()
 	int result = 0;
 
 	size_t numVertices = m_mesh->getNumVertices();
+
 	if (numVertices > m_vertices->size())
 	{
 		m_vertices->resize(numVertices);
