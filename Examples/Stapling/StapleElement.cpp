@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Examples/ExampleStapling/StapleElement.h"
+#include "Examples/Stapling/StapleElement.h"
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h"

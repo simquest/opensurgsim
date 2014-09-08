@@ -17,7 +17,7 @@
 #include <sstream>
 #include <stdlib.h>
 
-#include "Examples/BouncingBalls/AddRandomSphereBehavior.h"
+#include "Examples/DroppingBalls/AddRandomSphereBehavior.h"
 
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Scene.h"

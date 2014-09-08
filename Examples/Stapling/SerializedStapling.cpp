@@ -15,7 +15,7 @@
 
 #include <memory>
 
-#include "Examples/ExampleStapling/StaplerBehavior.h"
+#include "Examples/Stapling/StaplerBehavior.h"
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 	}
 	inputManager->addDevice(device);
 
-	YAML::Node node = YAML::LoadFile("Data/Stapling/StaplingDemo.yaml");
+	YAML::Node node = YAML::LoadFile("Data/StaplingDemo.yaml");
 
 	runtime->getScene()->decode(node);
 
