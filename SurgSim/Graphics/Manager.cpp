@@ -187,7 +187,6 @@ bool Manager::doUpdate(double dt)
 		{
 			(*it)->update(dt);
 		}
-		(*it)->setVisible((*it)->isActive());
 	}
 
 	for (auto it = m_views.begin(); it != m_views.end(); ++it)

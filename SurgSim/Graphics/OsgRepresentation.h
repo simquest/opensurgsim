@@ -51,32 +51,33 @@ public:
 	osg::ref_ptr<osg::Node> getOsgNode() const;
 
 	/// Sets whether the representation is currently visible
+	/// \note If the representation is inactive, this method does not have any effect.
 	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible);
+	virtual void setVisible(bool visible) override;
 
 	/// Gets whether the representation is currently visible
 	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const;
+	virtual bool isVisible() const override;
 
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
 	/// \return	True if set successfully, otherwise false
 	/// \note	OsgPlaneRepresentation only accepts subclasses of OsgMaterial.
-	virtual bool setMaterial(std::shared_ptr<Material> material);
+	virtual bool setMaterial(std::shared_ptr<Material> material) override;
 
 	/// Gets the material that defines the visual appearance of the representation
 	/// \return	Graphics material
-	virtual std::shared_ptr<Material> getMaterial() const;
+	virtual std::shared_ptr<Material> getMaterial() const override;
 
 	/// Removes the material from the representation
-	virtual void clearMaterial();
+	virtual void clearMaterial() override;
 
 	virtual void setDrawAsWireFrame(bool val) override;
 	virtual bool getDrawAsWireFrame() const override;
 
 	/// Updates the representation.
 	/// \param	dt	The time in seconds of the preceding timestep.
-	virtual void update(double dt);
+	virtual void update(double dt) override;
 
 protected:
 	virtual void doUpdate(double dt);
