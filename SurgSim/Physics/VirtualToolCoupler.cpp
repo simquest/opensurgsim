@@ -278,7 +278,7 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 		else
 		{
-			m_linearStiffness = mass * 800.0;
+			m_linearStiffness = mass * 100.0;
 		}
 		m_linearDamping = 2.0 * dampingRatio * sqrt(mass * m_linearStiffness);
 	}
