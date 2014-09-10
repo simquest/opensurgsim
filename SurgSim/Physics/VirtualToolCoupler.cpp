@@ -30,6 +30,7 @@
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
+using SurgSim::Math::makeSkewSymmetricMatrix;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector6d;
 using SurgSim::Math::Matrix33d;
@@ -260,7 +261,7 @@ bool VirtualToolCoupler::doWakeUp()
 	{
 		m_localAttachmentPoint = m_rigid->getMassCenter();
 	}
-	
+
 	// Provide sensible defaults based on the rigid representation.
 	// If one or both of the stiffness and damping are not provided, they are
 	// calculated to provide a critically damped system (dampingRatio-1.0).
@@ -295,8 +296,8 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	const Matrix33d leverArmMatrix = SurgSim::Math::makeSkewSymmetricMatrix((m_localAttachmentPoint - m_rigid->getMassCenter()).eval());
-	const Matrix33d& inertia = m_rigid->getLocalInertia() + mass * leverArmMatrix *leverArmMatrix;
+	Matrix33d leverArmMatrix = makeSkewSymmetricMatrix((m_localAttachmentPoint - m_rigid->getMassCenter()).eval());
+	const Matrix33d& inertia = m_rigid->getLocalInertia() + mass * leverArmMatrix * leverArmMatrix;
 	double maxInertia = inertia.eigenvalues().real().maxCoeff();
 	if (!m_optionalAngularDamping.hasValue())
 	{
