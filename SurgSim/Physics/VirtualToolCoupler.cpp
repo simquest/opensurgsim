@@ -151,13 +151,9 @@ void VirtualToolCoupler::update(double dt)
 
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
+		Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
 		Vector3d attachmentPoint = objectPose * m_localAttachmentPoint;
-		Vector3d leverArm = Vector3d::Zero();
-		if (m_calculateInertialTorques)
-		{
-			const Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
-			leverArm = attachmentPoint - objectPosition;
-		}
+		Vector3d leverArm = attachmentPoint - objectPosition;
 		Vector3d attachmentPointVelocity = objectState.getLinearVelocity();
 		attachmentPointVelocity += objectState.getAngularVelocity().cross(leverArm);
 
@@ -184,9 +180,16 @@ void VirtualToolCoupler::update(double dt)
 		generalizedDamping << linearDampingMatrix, zero3x3,
 							  zero3x3, angularDampingMatrix;
 
-		SurgSim::DataStructures::Location location;
-		location.rigidLocalPosition.setValue(m_localAttachmentPoint);
-		m_rigid->addExternalGeneralizedForce(location, generalizedForce, generalizedStiffness, generalizedDamping);
+		if (m_calculateInertialTorques)
+		{
+			SurgSim::DataStructures::Location location;
+			location.rigidLocalPosition.setValue(m_localAttachmentPoint);
+			m_rigid->addExternalGeneralizedForce(location, generalizedForce, generalizedStiffness, generalizedDamping);
+		}
+		else
+		{
+			m_rigid->addExternalGeneralizedForce(generalizedForce, generalizedStiffness, generalizedDamping);
+		}
 
 		if (m_output != nullptr)
 		{
