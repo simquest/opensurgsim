@@ -180,14 +180,16 @@ void OsgMeshRepresentation::updateNormals()
 
 void OsgMeshRepresentation::updateTriangles()
 {
-	std::vector<Mesh::TriangleType> triangles = m_mesh->getTriangles();
-	auto endIt = std::end(triangles);
 	int i = 0;
-	for (auto it = std::begin(triangles); it != endIt; ++it)
+	m_triangles->resize(m_mesh->getNumTriangles() * 3);
+	for (const auto& triangle : m_mesh->getTriangles())
 	{
-		(*m_triangles)[i++] = it->verticesId[0];
-		(*m_triangles)[i++] = it->verticesId[1];
-		(*m_triangles)[i++] = it->verticesId[2];
+		if (triangle.isValid)
+		{
+			(*m_triangles)[i++] = triangle.verticesId[0];
+			(*m_triangles)[i++] = triangle.verticesId[1];
+			(*m_triangles)[i++] = triangle.verticesId[2];
+		}
 	}
 }
 
