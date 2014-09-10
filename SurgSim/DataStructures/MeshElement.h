@@ -48,14 +48,16 @@ struct MeshElement
 	/// \param	data	Extra data to be stored with the element
 	MeshElement(const std::array<size_t, N>& verticesId, const Data& data) :
 		verticesId(verticesId),
-		data(data)
+		data(data),
+		isValid(true)
 	{
 	}
 
 	/// Constructor where the Data is constructed by its default constructor.
 	/// \param	verticesId IDs of the N element vertices
 	explicit MeshElement(const std::array<size_t, N>& verticesId) :
-		verticesId(verticesId)
+		verticesId(verticesId),
+		isValid(true)
 	{
 	}
 
@@ -63,15 +65,26 @@ struct MeshElement
 
 	/// Element vertices.
 	IdType verticesId;
+
 	/// Extra element data.
 	Data data;
+
+	/// Is this a valid element
+	bool isValid;
 
 	/// Compare the element with another one (equality)
 	/// \param element The MeshElement to compare it to
 	/// \return True if the two MeshElements are equals, False otherwise
 	bool operator==(const MeshElement<N, Data>& element) const
 	{
-		return verticesId == element.verticesId && data == element.data;
+		if (isValid && element.isValid)
+		{
+			return verticesId == element.verticesId && data == element.data;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	/// Compare the element with another one (inequality)
@@ -79,9 +92,13 @@ struct MeshElement
 	/// \return False if the two MeshElements are equals, True otherwise
 	bool operator!=(const MeshElement<N, Data>& element) const
 	{
-		return ! ((*this) == element);
+		return !((*this) == element);
 	}
+
+
 };
+
+
 
 };  // namespace DataStructures
 

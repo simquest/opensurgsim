@@ -43,10 +43,19 @@ TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleMeshBase(
 		EdgeType edgeData((mesh.getEdge(iEdge)).verticesId, EdgeData());
 		addEdge(edgeData);
 	}
-	for (size_t iTriangle = 0; iTriangle < mesh.getNumTriangles(); ++iTriangle)
+
+	auto& sourceTriangles = mesh.getTriangles();
+	size_t index = 0;
+	m_triangles.reserve(sourceTriangles.size());
+	for (auto sourceTriangle : sourceTriangles)
 	{
-		TriangleType triangleData((mesh.getTriangle(iTriangle)).verticesId, TriangleData());
+		TriangleType triangleData(sourceTriangle.verticesId, TriangleData());
 		addTriangle(triangleData);
+		if (!sourceTriangle.isValid)
+		{
+			m_freeTriangles.push_back(index);
+		}
+		++index;
 	}
 }
 
@@ -65,8 +74,19 @@ size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::addEdge(const EdgeT
 template <class VertexData, class EdgeData, class TriangleData>
 size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::addTriangle(const TriangleType& triangle)
 {
-	m_triangles.push_back(triangle);
-	return m_triangles.size() - 1;
+	size_t result;
+	if (m_freeTriangles.empty())
+	{
+		m_triangles.push_back(triangle);
+		result = m_triangles.size() - 1;
+	}
+	else
+	{
+		result = m_freeTriangles.back();
+		m_freeTriangles.pop_back();
+		m_triangles[result] = triangle;
+	}
+	return result;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
@@ -78,7 +98,7 @@ size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::getNumEdges() const
 template <class VertexData, class EdgeData, class TriangleData>
 size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::getNumTriangles() const
 {
-	return m_triangles.size();
+	return m_triangles.size() - m_freeTriangles.size();
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
@@ -127,14 +147,27 @@ template <class VertexData, class EdgeData, class TriangleData>
 const typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType&
 TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(size_t id) const
 {
-	return m_triangles[id];
+	const auto& triangle = m_triangles[id];
+	SURGSIM_ASSERT(triangle.isValid == true) << "Attempted to access invalid or deleted triangle.";
+	return triangle;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType&
 TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(size_t id)
 {
-	return m_triangles[id];
+	auto& triangle = m_triangles[id];
+	SURGSIM_ASSERT(triangle.isValid == true) << "Attempted to access invalid or deleted triangle.";
+	return triangle;
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
+void TriangleMeshBase<VertexData, EdgeData, TriangleData>::removeTriangle(size_t id)
+{
+	auto& triangle = m_triangles[id];
+	SURGSIM_ASSERT(triangle.isValid) << "This triangle has already been removed.";
+	triangle.isValid = false;
+	m_freeTriangles.push_back(id);
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
@@ -199,6 +232,7 @@ template <class VertexData, class EdgeData, class TriangleData>
 void TriangleMeshBase<VertexData, EdgeData, TriangleData>::doClearTriangles()
 {
 	m_triangles.clear();
+	m_freeTriangles.clear();
 }
 
 template <class VertexData, class EdgeData, class TriangleData>

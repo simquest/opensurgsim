@@ -592,3 +592,56 @@ TEST_F(TriangleMeshBaseTest, GetTrianglePositions)
 		EXPECT_TRUE(mesh.getVertex(vertexIds[2]).position.isApprox(verticesPositions[2]));
 	}
 }
+
+TEST_F(TriangleMeshBaseTest, TriangleDeletionTest)
+{
+	typedef TriangleMeshPlain::TriangleType TriangleType;
+
+	TriangleMeshPlain mesh;
+
+	mesh.addVertex(testPositions[0]);
+	mesh.addVertex(testPositions[0]);
+	mesh.addVertex(testPositions[0]);
+
+	TriangleType::IdType ids = {0, 1, 2};
+	mesh.addTriangle(TriangleType(ids));
+	mesh.addTriangle(TriangleType(ids));
+	mesh.addTriangle(TriangleType(ids));
+
+	EXPECT_TRUE(mesh.isValid());
+
+	EXPECT_NO_THROW(mesh.removeTriangle(1));
+	EXPECT_TRUE(mesh.isValid());
+
+	// Basic checks
+	EXPECT_EQ(2u, mesh.getNumTriangles());
+	EXPECT_ANY_THROW(mesh.getTriangle(1));
+	EXPECT_EQ(3u, mesh.getTriangles().size());
+
+	// Should not be able to remove the same triangle twice
+	EXPECT_ANY_THROW(mesh.removeTriangle(1));
+
+	// Remove all other triangles to check boundary conditions
+	mesh.removeTriangle(0);
+	EXPECT_EQ(1u, mesh.getNumTriangles());
+
+	mesh.removeTriangle(2);
+	EXPECT_EQ(0u, mesh.getNumTriangles());
+
+	EXPECT_EQ(3u, mesh.getTriangles().size());
+
+	// Adding a new triangle we should get an id from the old ids
+	EXPECT_GT(3u, mesh.addTriangle(TriangleType(ids)));
+	EXPECT_EQ(1u, mesh.getNumTriangles());
+
+	// The array size should not have been change
+	EXPECT_EQ(3u, mesh.getTriangles().size());
+
+	EXPECT_GT(3u, mesh.addTriangle(TriangleType(ids)));
+	EXPECT_GT(3u, mesh.addTriangle(TriangleType(ids)));
+
+	// That is a new triangle
+	EXPECT_EQ(3u, mesh.addTriangle(TriangleType(ids)));
+	EXPECT_EQ(4u, mesh.getNumTriangles());
+	EXPECT_EQ(4u, mesh.getTriangles().size());
+}

@@ -127,9 +127,12 @@ public:
 	/// Retrieve a specific triangle
 	/// Returns the specified triangle.
 	const TriangleType& getTriangle(size_t id) const;
+
 	/// Retrieve a specific triangle (non const version)
 	/// Returns the specified triangle.
 	TriangleType& getTriangle(size_t id);
+
+	void removeTriangle(size_t id);
 
 	/// Returns an array of the triangle's vertices' positions
 	/// \param id the id of the triangle
@@ -163,12 +166,14 @@ private:
 
 	/// Triangles
 	std::vector<TriangleType> m_triangles;
+	std::vector<size_t> m_freeTriangles;
 
 public:
 	// Dependent name resolution for inherited functions and typenames from templates
 	using typename Vertices<VertexData>::VertexType;
 	using Vertices<VertexData>::addVertex;
 };
+
 
 };  // namespace DataStructures
 
