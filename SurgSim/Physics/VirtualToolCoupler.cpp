@@ -249,6 +249,15 @@ bool VirtualToolCoupler::doWakeUp()
 		return false;
 	}
 
+	if (m_optionalAttachmentPoint.hasValue())
+	{
+		m_localAttachmentPoint = m_optionalAttachmentPoint.getValue();
+	}
+	else
+	{
+		m_localAttachmentPoint = m_rigid->getMassCenter();
+	}
+	
 	// Provide sensible defaults based on the rigid representation.
 	// If one or both of the stiffness and damping are not provided, they are
 	// calculated to provide a critically damped system (dampingRatio-1.0).
@@ -283,7 +292,8 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	const Matrix33d& inertia = m_rigid->getLocalInertia();
+	const Matrix33d leverArmMatrix = SurgSim::Math::makeSkewSymmetricMatrix((m_localAttachmentPoint - m_rigid->getMassCenter()).eval());
+	const Matrix33d& inertia = m_rigid->getLocalInertia() + mass * leverArmMatrix *leverArmMatrix;
 	double maxInertia = inertia.eigenvalues().real().maxCoeff();
 	if (!m_optionalAngularDamping.hasValue())
 	{
@@ -310,14 +320,6 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	if (m_optionalAttachmentPoint.hasValue())
-	{
-		m_localAttachmentPoint = m_optionalAttachmentPoint.getValue();
-	}
-	else
-	{
-		m_localAttachmentPoint = m_rigid->getMassCenter();
-	}
 
 	return true;
 }
