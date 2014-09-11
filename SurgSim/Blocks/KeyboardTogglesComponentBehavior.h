@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
-#define SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_KEYBOARDTOGGLESCOMPONENTBEHAVIOR_H
+#define SURGSIM_BLOCKS_KEYBOARDTOGGLESCOMPONENTBEHAVIOR_H
 
 #include <unordered_map>
 #include <unordered_set>
@@ -38,10 +38,10 @@ class InputComponent;
 
 namespace Blocks
 {
-SURGSIM_STATIC_REGISTRATION(KeyboardTogglesGraphicsBehavior);
+SURGSIM_STATIC_REGISTRATION(KeyboardTogglesComponentBehavior);
 
 /// This behavior is used to control the visibility of registered graphical representation(s)
-class KeyboardTogglesGraphicsBehavior : public SurgSim::Framework::Behavior
+class KeyboardTogglesComponentBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	typedef std::unordered_map<int, std::unordered_set<std::shared_ptr<SurgSim::Framework::Component>>>
@@ -49,9 +49,9 @@ public:
 
 	/// Constructor
 	/// \param	name	Name of the behavior
-	explicit KeyboardTogglesGraphicsBehavior(const std::string& name);
+	explicit KeyboardTogglesComponentBehavior(const std::string& name);
 
-	SURGSIM_CLASSNAME(SurgSim::Blocks::KeyboardTogglesGraphicsBehavior);
+	SURGSIM_CLASSNAME(SurgSim::Blocks::KeyboardTogglesComponentBehavior);
 
 	/// Set the input component from which pressed keys come.
 	/// \param	inputComponent	The input component which contains the pressed key(s).
@@ -104,4 +104,4 @@ private:
 }; // namespace Blocks
 }; // namespace SurgSim
 
-#endif //SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
+#endif //SURGSIM_BLOCKS_KEYBOARDTOGGLESCOMPONENTBEHAVIOR_H

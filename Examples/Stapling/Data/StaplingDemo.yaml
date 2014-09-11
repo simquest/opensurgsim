@@ -417,7 +417,7 @@ SurgSim::Framework::Scene:
               DeviceName: Keyboard
               Id: 616d866d-cc25-443a-a57f-1fcb43e7f376
               Name: KeyboardInputComponent
-          - SurgSim::Blocks::KeyboardTogglesGraphicsBehavior:
+          - SurgSim::Blocks::KeyboardTogglesComponentBehavior:
               InputComponent:
                 SurgSim::Input::InputComponent:
                   Id: 616d866d-cc25-443a-a57f-1fcb43e7f376

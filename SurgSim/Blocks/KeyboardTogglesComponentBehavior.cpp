@@ -12,33 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
+#include "SurgSim/Blocks/KeyboardTogglesComponentBehavior.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
 
 namespace SurgSim
 {
 namespace Blocks
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::KeyboardTogglesGraphicsBehavior,
-				 KeyboardTogglesGraphicsBehavior);
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::KeyboardTogglesComponentBehavior,
+				 KeyboardTogglesComponentBehavior);
 
-KeyboardTogglesGraphicsBehavior::KeyboardTogglesGraphicsBehavior(const std::string& name) :
+KeyboardTogglesComponentBehavior::KeyboardTogglesComponentBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
 	m_keyPressedLastUpdate(false)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardTogglesGraphicsBehavior, std::shared_ptr<SurgSim::Framework::Component>,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardTogglesComponentBehavior, std::shared_ptr<SurgSim::Framework::Component>,
 									  InputComponent, getInputComponent, setInputComponent);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardTogglesGraphicsBehavior, KeyboardRegistryType,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardTogglesComponentBehavior, KeyboardRegistryType,
 									  KeyboardRegistry, getKeyboardRegistry, setKeyboardRegistry);
 }
 
-void KeyboardTogglesGraphicsBehavior::setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent)
+void KeyboardTogglesComponentBehavior::setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent)
 {
 	SURGSIM_ASSERT(nullptr != inputComponent) << "'inputComponent' cannot be 'nullptr'";
 
@@ -47,18 +46,18 @@ void KeyboardTogglesGraphicsBehavior::setInputComponent(std::shared_ptr<SurgSim:
 	SURGSIM_ASSERT(nullptr != m_inputComponent)	<< "'inputComponent' must derive from SurgSim::Input::InputComponent";
 }
 
-std::shared_ptr<SurgSim::Input::InputComponent> KeyboardTogglesGraphicsBehavior::getInputComponent() const
+std::shared_ptr<SurgSim::Input::InputComponent> KeyboardTogglesComponentBehavior::getInputComponent() const
 {
 	return m_inputComponent;
 }
 
-void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
+void KeyboardTogglesComponentBehavior::registerKey(SurgSim::Device::KeyCode key,
 												  std::shared_ptr<SurgSim::Framework::Component> component)
 {
 	m_registry[static_cast<int>(key)].insert(component);
 }
 
-void KeyboardTogglesGraphicsBehavior::update(double dt)
+void KeyboardTogglesComponentBehavior::update(double dt)
 {
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_inputComponent->getData(&dataGroup);
@@ -78,30 +77,30 @@ void KeyboardTogglesGraphicsBehavior::update(double dt)
 	}
 }
 
-bool KeyboardTogglesGraphicsBehavior::doInitialize()
+bool KeyboardTogglesComponentBehavior::doInitialize()
 {
 	return true;
 }
 
-bool KeyboardTogglesGraphicsBehavior::doWakeUp()
+bool KeyboardTogglesComponentBehavior::doWakeUp()
 {
 	bool result = true;
 	if (nullptr == m_inputComponent)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"KeyboardTogglesGraphicsBehavior " << getName() << " does not have an Input Component.";
+			"KeyboardTogglesComponentBehavior " << getName() << " does not have an Input Component.";
 		result = false;
 	}
 	return result;
 }
 
-void KeyboardTogglesGraphicsBehavior::setKeyboardRegistry(const KeyboardRegistryType& map)
+void KeyboardTogglesComponentBehavior::setKeyboardRegistry(const KeyboardRegistryType& map)
 {
 	m_registry = map;
 }
 
-const KeyboardTogglesGraphicsBehavior::KeyboardRegistryType&
-		KeyboardTogglesGraphicsBehavior::getKeyboardRegistry() const
+const KeyboardTogglesComponentBehavior::KeyboardRegistryType&
+		KeyboardTogglesComponentBehavior::getKeyboardRegistry() const
 {
 	return m_registry;
 }

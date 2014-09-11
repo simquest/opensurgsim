@@ -17,7 +17,7 @@
 #include <string>
 
 #include "Examples/Stapling/StaplerBehavior.h"
-#include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
+#include "SurgSim/Blocks/KeyboardTogglesComponentBehavior.h"
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
@@ -56,7 +56,7 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 
-using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
+using SurgSim::Blocks::KeyboardTogglesComponentBehavior;
 using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
 using SurgSim::Blocks::VisualizeContactsBehavior;
 using SurgSim::Collision::ShapeCollisionRepresentation;
@@ -443,8 +443,8 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
 	keyboardComponent->setDeviceName("Keyboard"); // Name of device is case sensitive.
-	std::shared_ptr<KeyboardTogglesGraphicsBehavior> keyboardBehavior =
-		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardBehavior");
+	std::shared_ptr<KeyboardTogglesComponentBehavior> keyboardBehavior =
+		std::make_shared<KeyboardTogglesComponentBehavior>("KeyboardBehavior");
 	keyboardBehavior->setInputComponent(keyboardComponent);
 
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Handle"));
