@@ -37,7 +37,7 @@ using SurgSim::Input::OutputComponent;
 
 TEST(KeyboardTogglesComponentBehavior, Constructor)
 {
-	EXPECT_NO_THROW(KeyboardTogglesComponentBehavior keyboardTogglesComponentBehavior("KeyboardTogglesComponentBehavior"));
+	EXPECT_NO_THROW(KeyboardTogglesComponentBehavior behavior("KeyboardTogglesComponentBehavior"));
 }
 
 TEST(KeyboardTogglesComponentBehavior, InputComponentTests)
@@ -153,7 +153,8 @@ TEST(KeyboardTogglesComponentBehavior, Serialization)
 	EXPECT_NO_THROW(newKeyboardTogglesComponentBehavior = std::dynamic_pointer_cast<KeyboardTogglesComponentBehavior>(
 															node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	ASSERT_NE(nullptr, newKeyboardTogglesComponentBehavior);
-	EXPECT_NE(nullptr, newKeyboardTogglesComponentBehavior->getValue<std::shared_ptr<InputComponent>>("InputComponent"));
+	EXPECT_NE(nullptr, newKeyboardTogglesComponentBehavior->getValue<
+			std::shared_ptr<InputComponent>>("InputComponent"));
 
 	// Make sure every registered representation in the original 'keyMap' is present in the de-serialized keyMap.
 	auto retrievedKeyMap = newKeyboardTogglesComponentBehavior->getValue<
