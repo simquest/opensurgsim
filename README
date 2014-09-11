@@ -1,5 +1,20 @@
-OpenSurgSim simulation framework
-Copyright 2012-2013, SimQuest Solutions Inc.
+Welcome to the OpenSurgSim Project!
+OpenSurgSim is a new (2013) effort to build an open-source surgical simulation
+framework. The foundation of the framework draws on many years of proprietary
+simulation development that has matured to the point of being generally useful
+for a wide range of simulators. Over the course of the year, the released
+framework will grow from the minimal infrastructure that is currently available
+to a system capable of creating complete simulations. Although the initial core
+is being contributed by SimQuest, the intent is that other groups join in the
+effort to form an active community with contributions coming from a variety of
+places.
+
+Website: opensurgsim.org
+
+Contact: Subscribe to our mailing list by sending us a blank e-mail to:
+opensurgsim+subscribe@simquest.com
+
+Following is the procedure to install and use OpenSurgSim.
 
 Tools needed:
 • Get CMake from http://www.cmake.org/ and install it.
