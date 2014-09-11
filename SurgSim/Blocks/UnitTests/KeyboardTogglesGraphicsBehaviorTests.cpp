@@ -22,12 +22,14 @@
 
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
+#include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/OutputComponent.h"
 
 using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
+using SurgSim::Framework::Component;
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::Representation;
 using SurgSim::Input::InputComponent;
@@ -60,19 +62,13 @@ TEST(KeyboardTogglesGraphicsBehavior, RegistrationTests)
 	auto keyboardTogglesGraphicsBehavior =
 		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardTogglesGraphicsBehavior");
 	{
-		auto invalidInputComponent = std::make_shared<OutputComponent>("InvalidInputComponent");
-		EXPECT_FALSE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A,
-																  invalidInputComponent));
-	}
-
-	{
 		auto graphics = std::make_shared<OsgBoxRepresentation>("Graphics");
 		auto graphics2 = std::make_shared<OsgBoxRepresentation>("Graphics2");
 		auto graphics3 = std::make_shared<OsgBoxRepresentation>("Graphics3");
 
-		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, graphics));
-		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, graphics2));
-		EXPECT_TRUE(keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, graphics3));
+		keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, graphics);
+		keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, graphics2);
+		keyboardTogglesGraphicsBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, graphics3);
 
 		auto keyMap = keyboardTogglesGraphicsBehavior->getKeyboardRegistry();
 		auto keyAPair = keyMap.find(SurgSim::Device::KeyCode::KEY_A);
@@ -95,8 +91,8 @@ TEST(KeyboardTogglesGraphicsBehavior, SetAndGetKeyboardRegisterTypeTest)
 	std::shared_ptr<Representation> graphics2 = std::make_shared<OsgBoxRepresentation>("graphics2");
 	std::shared_ptr<Representation> graphics3 = std::make_shared<OsgBoxRepresentation>("graphics3");
 
-	std::unordered_set<std::shared_ptr<Representation>> set1;
-	std::unordered_set<std::shared_ptr<Representation>> set2;
+	std::unordered_set<std::shared_ptr<Component>> set1;
+	std::unordered_set<std::shared_ptr<Component>> set2;
 
 	set1.insert(graphics1);
 	set2.insert(graphics2);
@@ -112,16 +108,16 @@ TEST(KeyboardTogglesGraphicsBehavior, SetAndGetKeyboardRegisterTypeTest)
 	EXPECT_EQ(keyMap.size(), retrievedKeyMap.size());
 	for (auto it = std::begin(keyMap); it != std::end(keyMap); ++it)
 	{
-		auto representationSet = retrievedKeyMap.find(it->first)->second;
-		EXPECT_EQ(it->second.size(), representationSet.size());
+		auto componentSet = retrievedKeyMap.find(it->first)->second;
+		EXPECT_EQ(it->second.size(), componentSet.size());
 		for (auto item = std::begin(it->second); item != std::end(it->second); ++item)
 		{
-			auto match = std::find_if(std::begin(representationSet), std::end(representationSet),
-				[&item](const std::shared_ptr<Representation> rep)
+			auto match = std::find_if(std::begin(componentSet), std::end(componentSet),
+				[&item](const std::shared_ptr<Component> rep)
 			{
 				return rep->getName() == (*item)->getName();
 			});
-			EXPECT_NE(std::end(representationSet), match);
+			EXPECT_NE(std::end(componentSet), match);
 		}
 	}
 }
@@ -135,8 +131,8 @@ TEST(KeyboardTogglesGraphicsBehavior, Serialization)
 	std::shared_ptr<Representation> graphics1 = std::make_shared<OsgBoxRepresentation>("graphics1");
 	std::shared_ptr<Representation> graphics2 = std::make_shared<OsgBoxRepresentation>("graphics2");
 
-	std::unordered_set<std::shared_ptr<Representation>> set1;
-	std::unordered_set<std::shared_ptr<Representation>> set2;
+	std::unordered_set<std::shared_ptr<Component>> set1;
+	std::unordered_set<std::shared_ptr<Component>> set2;
 
 	set1.insert(graphics1);
 	set2.insert(graphics2);
@@ -166,16 +162,16 @@ TEST(KeyboardTogglesGraphicsBehavior, Serialization)
 	EXPECT_EQ(keyMap.size(), retrievedKeyMap.size());
 	for (auto it = std::begin(keyMap); it != std::end(keyMap); ++it)
 	{
-		auto representationSet = retrievedKeyMap.find(it->first)->second;
-		EXPECT_EQ(it->second.size(), representationSet.size());
+		auto componentSet = retrievedKeyMap.find(it->first)->second;
+		EXPECT_EQ(it->second.size(), componentSet.size());
 		for (auto item = std::begin(it->second); item != std::end(it->second); ++item)
 		{
-			auto match = std::find_if(std::begin(representationSet), std::end(representationSet),
-									  [&item](const std::shared_ptr<Representation> rep)
+			auto match = std::find_if(std::begin(componentSet), std::end(componentSet),
+									  [&item](const std::shared_ptr<Component> rep)
 									  {
 										return rep->getName() == (*item)->getName();
 									  });
-			 EXPECT_NE(std::end(representationSet), match);
+			 EXPECT_NE(std::end(componentSet), match);
 		}
 	}
 }

@@ -31,11 +31,6 @@ namespace Framework
 class Component;
 }
 
-namespace Graphics
-{
-class Representation;
-}
-
 namespace Input
 {
 class InputComponent;
@@ -49,7 +44,7 @@ SURGSIM_STATIC_REGISTRATION(KeyboardTogglesGraphicsBehavior);
 class KeyboardTogglesGraphicsBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	typedef std::unordered_map<int, std::unordered_set<std::shared_ptr<SurgSim::Graphics::Representation>>>
+	typedef std::unordered_map<int, std::unordered_set<std::shared_ptr<SurgSim::Framework::Component>>>
 			KeyboardRegistryType;
 
 	/// Constructor
@@ -69,9 +64,8 @@ public:
 	/// Register a key with a component in this behavior.
 	/// \param key A key used to control the component.
 	/// \param component The component being controlled by the key.
-	/// \return True if registeration is sucessful; Otherwise, false.
-	/// \note A key can be registered several times, so does a component.
-	bool registerKey(SurgSim::Device::KeyCode key, std::shared_ptr<SurgSim::Framework::Component> component);
+	/// \note A key can be registered several times, so can a component.
+	void registerKey(SurgSim::Device::KeyCode key, std::shared_ptr<SurgSim::Framework::Component> component);
 
 	/// Set the register map of this behavior
 	/// \param map The register map.

@@ -52,25 +52,10 @@ std::shared_ptr<SurgSim::Input::InputComponent> KeyboardTogglesGraphicsBehavior:
 	return m_inputComponent;
 }
 
-bool KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
+void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
 												  std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	auto graphicsRepresentation = std::dynamic_pointer_cast<SurgSim::Graphics::Representation>(component);
-
-	bool result = true;
-	if (nullptr != graphicsRepresentation)
-	{
-		m_registry[static_cast<int>(key)].insert(graphicsRepresentation);
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-				"Can not register component " << component->getName() <<
-				". It's not a SurgSim::Graphics::Representation.";
-		result = false;
-	}
-
-	return result;
+	m_registry[static_cast<int>(key)].insert(component);
 }
 
 void KeyboardTogglesGraphicsBehavior::update(double dt)
@@ -86,7 +71,7 @@ void KeyboardTogglesGraphicsBehavior::update(double dt)
 		{
 			for (auto it = std::begin(match->second); it != std::end(match->second); ++it)
 			{
-				(*it)->setVisible(!(*it)->isVisible());
+				(*it)->setActive(!(*it)->isActive());
 			};
 		}
 		m_keyPressedLastUpdate = (SurgSim::Device::KeyCode::NONE != key);
