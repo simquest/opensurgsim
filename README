@@ -14,56 +14,62 @@ Website: opensurgsim.org
 Contact: Subscribe to our mailing list by sending us a blank e-mail to:
 opensurgsim+subscribe@simquest.com
 
-Following is the procedure to install and use OpenSurgSim.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Tools needed:
-• Get CMake from http://www.cmake.org/ and install it.
-• Install Git and any Git client you like to use.
-• Windows compiler requirement: minimum Visual Studio 2012
+To compile OpenSurgSim, you will need the following depenedencies.
+
+REQUIRED DEPENDENCIES
+
+Boost
+  Homepage: http://www.boost.org/
+  Modules: chrono, date_time, filesystem, system, thread
+  Minimum Version: 1.54
+
+CMake
+  Homepage: http://www.cmake.org/
+  Minimum Version: 2.8
+
+Eigen
+  Homepage: http://eigen.tuxfamily.org/
+  Minimum Version: 3.2.0
+
+Git
+  Homepage: http://www.git-scm.com/
+  Minimum Version: 1.7.9
+
+Google Mock
+  Homepage: https://code.google.com/p/googlemock/
+  Minimum Version: 1.7.0
+
+OpenSceneGraph
+  Homepage: http://www.openscenegraph.org/
+  Modules: osg, osgViewer, osgText, osgUtil, osgDB, osgGA, osgAnimation 
+  Minimum Version: 3.2.0
+
+OPTIONAL DEPENDENCIES
+
+Doxygen
+  Homepage: http://doxygen.org/
+  Minimum Version: 1.8
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+OpenSurgSim installation and compilation instructions.
+
+Compiler minimum requirement:
+• Windows compiler requirement: Visual Studio 2012
 • Linux compiler requirement:
 
-OpenSurgSim source code:
-• Download the OpenSurgSim source code by going to http://opensurgsim.org and
-  clicking the Git tab.
-
-Dependencies:
-• Create an OSS folder to extract/install all the dependencies.
-• Get Eigen library from http://eigen.tuxfamily.org (version 3.2.0 minimum) and
-  extract it to the OSS folder.
-• Get boost libraries from http://www.boost.org/users/download/ (version 1.54
-  minimum) and extract to the OSS folder.
-  For OpenSurgSim, we need to compile chrono, filesystem, date_time, and thread
-  libraries in Boost.
-  Please refer to http://www.boost.org/doc/libs/1_54_0/more/getting_started/
-  for instructions on how to compile Boost for different platforms
-• [OPTIONAL] For producing documentation, install Doxygen from www.doxygen.org
-  or http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.4-setup.exe
-• Install OpenSceneGraph
-• [Optional] Install/setup GLUT:
-  ¤ Windows with OSG/win64/lib contaning glut32.lib:
-    If it is not automatically discovered by cmake, add the OSG/win64/include
-    and OSG/win64/lib folders to your environment.
-  ¤ Windows without OSG contaning glut:
-    Windows 32 bits libraries are at http://user.xmission.com/~nate/glut.html
-      or https://www.opengl.org/resources/libraries/glut/glut_downloads.php
-      Create the following folder structure:
-      + GLUT/include/GL/glut.h
-      + GLUT/Release/glut32.*
-      Create an environment variable GLUT_ROOT_PATH pointing to GLUT.
-    Windows 32 & 64 bit binaries (MSVG & MinGW) are provided for freeglut at
-      http://www.transmissionzero.co.uk/software/freeglut-devel/
-  ¤ Linux install the freeglut3 package
-    When running VisualTests on a virtual Linux, if you see errors like
-    https://www.virtualbox.org/ticket/12941 then try pre-pending
-    LIBGL_ALWAYS_INDIRECT=1 to the command-line.
+OpenSurgSim source code can be downloaded at http://opensurgsim.org under the
+  Git tab.
 
 Cmake configuration:
-• Create a folder inside the OSS folder where you want to generate the Visual
-  Studio IDE files. This folder is referred to as BUILD folder for the purpose
-  of the following steps.
-• Generate the OpenSurgSim solution file. Two ways to do this: using cmake gui
-  or the cmake command line.
-  ¤ Open CMake GUI: Enter the OSS folder, BUILD folder and click on the
+• Create a folder where you want to generate the solution/make file.
+  This folder is referred to as BUILD folder for the purpose of the following
+  steps.
+• Generate the OpenSurgSim solution file.
+  Two ways to do this: using cmake gui or the cmake command line.
+  ¤ Open CMake GUI: Enter the OpenSurgSim folder, BUILD folder and click on the
     'Configure' button. This will allow you to select the compiler (VS 11, even
     though you installed “Visual Studio 2012”).
     Once the configuration is complete without error, click on the 'Generate'
@@ -71,14 +77,6 @@ Cmake configuration:
     If CMake reports “library not found”, add system variables BOOST_ROOT,
     EIGEN_DIR and OSG_ROOT as environment variables. Then add %OSG_ROOT%\bin to
     your Path variable.
-    If you installed GLUT as explained above, Cmake’s FindGLUT module should
-    find it.
-    If not, delete the cache and configure/generate again. If it still won’t
-    find it on Windows, restart the computer (somehow CMake caches even when
-    you delete its cache...possibly a daemon thread?). And if it still can’t
-    find GLUT, you can just manually set the GLUT_INCLUDE_DIR and
-    GLUT_glut_LIBRARY variables in the Cmake GUI (the library variable should
-    point to glut32.lib).
   ¤ Using cmake command line: Create a cmake “cache” file with the following
     lines:
     + set(EIGEN3_INCLUDE_DIR "path-to-eigen" CACHE FILEPATH "" FORCE)
@@ -90,6 +88,7 @@ Cmake configuration:
 
 Building OpenSurgSim:
 • Go to the BUILD folder and open the OpenSurgSim solution file.
-• Build the ALL_BUILD project.
-• For documentation, you can find it in your build directory: build\Documentation\html\index.html
+• Build the project called ALL_BUILD.
+• For documentation, you can find it in your build directory:
+  BUILD\Documentation\html\index.html
 • For runnable code, see the Examples folder.
