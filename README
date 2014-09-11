@@ -60,8 +60,10 @@ Compiler minimum requirement:
 • Windows compiler requirement: Visual Studio 2012
 • Linux compiler requirement:
 
-OpenSurgSim source code can be downloaded at http://opensurgsim.org under the
-  Git tab.
+OpenSurgSim source code (http://opensurgsim.org):
+• Download it under the 'Git' tab.
+• Also find under the 'Dashboard' tab a nightly build result which can be used
+  to verify the current state of the build.
 
 Cmake configuration:
 • Create a folder where you want to generate the solution/make file.
