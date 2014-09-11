@@ -37,10 +37,6 @@ Git
   Homepage: http://www.git-scm.com/
   Minimum Version: 1.7.9
 
-Google Mock
-  Homepage: https://code.google.com/p/googlemock/
-  Minimum Version: 1.7.0
-
 OpenSceneGraph
   Homepage: http://www.openscenegraph.org/
   Modules: osg, osgViewer, osgText, osgUtil, osgDB, osgGA, osgAnimation 
@@ -51,6 +47,10 @@ OPTIONAL DEPENDENCIES
 Doxygen
   Homepage: http://doxygen.org/
   Minimum Version: 1.8
+
+Google Mock
+  Homepage: https://code.google.com/p/googlemock/
+  Minimum Version: 1.7.0
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
