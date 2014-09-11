@@ -1,4 +1,5 @@
 Welcome to the OpenSurgSim Project!
+
 OpenSurgSim is a new (2013) effort to build an open-source surgical simulation
 framework. The foundation of the framework draws on many years of proprietary
 simulation development that has matured to the point of being generally useful
@@ -9,16 +10,32 @@ is being contributed by SimQuest, the intent is that other groups join in the
 effort to form an active community with contributions coming from a variety of
 places.
 
-Website: opensurgsim.org
+For current information and documentation about the project, please
+visit our website:
 
-Contact: Subscribe to our mailing list by sending us a blank e-mail to:
-opensurgsim+subscribe@simquest.com
+	http://www.opensurgsim.org/
 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Support can also be on our public mailing list at:
+
+    http://groups.google.com/a/simquest.com/group/opensurgsim/
+
+To help get started using OpenSurgSim, use the following quick start
+guide.
+
+    1. Dependencies
+    2. Getting OpenSurgSim
+    3. Compiling OpenSurgSim
+      3.1 Compiling on Linux
+      3.2 Compiling on Windows
+    4. Running the Examples
+
+1. Dependencies
+===============
 
 To compile OpenSurgSim, you will need the following depenedencies.
 
-REQUIRED DEPENDENCIES
+1.1 Required Depenedencies
+--------------------------
 
 Boost
   Homepage: http://www.boost.org/
@@ -42,7 +59,8 @@ OpenSceneGraph
   Modules: osg, osgViewer, osgText, osgUtil, osgDB, osgGA, osgAnimation 
   Minimum Version: 3.2.0
 
-OPTIONAL DEPENDENCIES
+1.2 Optional Dependencies
+-------------------------
 
 Doxygen
   Homepage: http://doxygen.org/
@@ -52,7 +70,19 @@ Google Mock
   Homepage: https://code.google.com/p/googlemock/
   Minimum Version: 1.7.0
 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+2. Getting OpenSurgSim
+======================
+
+
+3. Compiling OpenSurgSim 
+========================
+
+3.1 Compiling on Linux
+----------------------
+
+2.1 Compiling on Windows 
+------------------------
 
 OpenSurgSim installation and compilation instructions.
 
