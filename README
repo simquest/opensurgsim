@@ -13,76 +13,62 @@ places.
 For current information and documentation about the project, please
 visit our website:
 
-	http://www.opensurgsim.org/
+    http://www.opensurgsim.org/
 
-Support can also be on our public mailing list at:
+Support can also be found on our public mailing list at
+opensurgsim@simquest.com. An archive of the mailing list is at:
 
     http://groups.google.com/a/simquest.com/group/opensurgsim/
 
 To help get started using OpenSurgSim, use the following quick start
 guide.
 
-    1. Dependencies
-    2. Getting OpenSurgSim
-    3. Compiling OpenSurgSim
-      3.1 Compiling on Linux
-      3.2 Compiling on Windows
+    1. Getting OpenSurgSim
+    2. Compiling on Linux
+    3. Compiling on Windows
     4. Running the Examples
-
-1. Dependencies
-===============
-
-To compile OpenSurgSim, you will need the following depenedencies.
-
-1.1 Required Depenedencies
---------------------------
-
-Boost
-  Homepage: http://www.boost.org/
-  Modules: chrono, date_time, filesystem, system, thread
-  Minimum Version: 1.54
-
-CMake
-  Homepage: http://www.cmake.org/
-  Minimum Version: 2.8
-
-Eigen
-  Homepage: http://eigen.tuxfamily.org/
-  Minimum Version: 3.2.0
-
-Git
-  Homepage: http://www.git-scm.com/
-  Minimum Version: 1.7.9
-
-OpenSceneGraph
-  Homepage: http://www.openscenegraph.org/
-  Modules: osg, osgViewer, osgText, osgUtil, osgDB, osgGA, osgAnimation 
-  Minimum Version: 3.2.0
-
-1.2 Optional Dependencies
--------------------------
-
-Doxygen
-  Homepage: http://doxygen.org/
-  Minimum Version: 1.8
-
-Google Mock
-  Homepage: https://code.google.com/p/googlemock/
-  Minimum Version: 1.7.0
+	Appendix: Dependencies
 
 
-2. Getting OpenSurgSim
+1. Getting OpenSurgSim
 ======================
 
+OpenSurgSim uses Git for source control, and this is the easiest way
+to obtain the most up to date version. Resources for installing and
+using Git can be found on Git's website (See Appendix). To obtain
+OpenSurgSim, run the following command:
 
-3. Compiling OpenSurgSim 
-========================
+    git clone git://git.assembla.com/OpenSurgSim.git 
 
-3.1 Compiling on Linux
-----------------------
+This will download the source code for OpenSurgSim and place it in the
+OpenSurgSim/ directory.
 
-2.1 Compiling on Windows 
-------------------------
+
+2. Compiling on GNU/Linux
+=========================
+
+OpenSurgSim has been tested extensively on Debian Testing (Jessie) as
+well as Ubuntu 14.04 (Trusty Tahr). If you are using another GNU/Linux
+distribution, please check your package management system for the
+dependancies (see Appendix). For Debian/Ubuntu based systems, the
+dependencies are easily installed through apt-get:
+
+    sudo apt-get install libboost-all-dev libeigen3-dev libopenscenegraph-dev
+	sudo apt-get install cmake doxygen google-mock
+
+To build OpenSurgSim, issue the following commands from the same
+directory used to obtain OpenSurgSim (see Section 1.)
+
+    mkdir OpenSurgSim/Build
+    cd OpenSurgSim/Build
+	cmake ../
+	make
+
+That's it!
+
+
+3. Compiling on Windows 
+=======================
 
 OpenSurgSim installation and compilation instructions.
 
@@ -124,3 +110,50 @@ Building OpenSurgSim:
 • For documentation, you can find it in your build directory:
   BUILD\Documentation\html\index.html
 • For runnable code, see the Examples folder.
+
+4. Running the Examples
+=======================
+
+
+Appendix Dependencies
+=====================
+
+To compile OpenSurgSim, you will need the following depenedencies.
+
+Required Depenedencies
+----------------------
+
+Boost
+  Homepage: http://www.boost.org/
+  Modules: chrono, date_time, filesystem, system, thread
+  Minimum Version: 1.54
+
+CMake
+  Homepage: http://www.cmake.org/
+  Minimum Version: 2.8
+
+Eigen
+  Homepage: http://eigen.tuxfamily.org/
+  Minimum Version: 3.2.0
+
+Git
+  Homepage: http://www.git-scm.com/
+  Minimum Version: 1.7.9
+
+OpenSceneGraph
+  Homepage: http://www.openscenegraph.org/
+  Modules: osg, osgViewer, osgText, osgUtil, osgDB, osgGA, osgAnimation 
+  Minimum Version: 3.2.0
+
+Optional Dependencies
+---------------------
+
+Doxygen
+  Homepage: http://doxygen.org/
+  Minimum Version: 1.8
+
+Google Mock
+  Homepage: https://code.google.com/p/googlemock/
+  Minimum Version: 1.7.0
+
+
