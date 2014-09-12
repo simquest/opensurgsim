@@ -72,9 +72,7 @@ That's it!
 
 OpenSurgSim installation and compilation instructions.
 
-Compiler minimum requirement:
-• Windows compiler requirement: Visual Studio 2012
-• Linux compiler requirement:
+Compiler minimum requirement: Visual Studio 2012
 
 OpenSurgSim source code (http://opensurgsim.org):
 • Download it under the 'Git' tab.
