@@ -52,7 +52,7 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 	poseFixed.setIdentity();
 
 	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("Fixed");
-	fixed->setActive(true);
+	fixed->setLocalActive(true);
 	fixed->setIsGravityEnabled(false);
 	fixed->setLocalPose(poseFixed);
 

@@ -32,19 +32,16 @@ class Runtime;
 class Scene;
 
 Component::Component(const std::string& name) :
-	m_isActive(true),
 	m_name(name),
 	m_uuid(boost::uuids::random_generator()()),
 	m_didInit(false),
 	m_didWakeUp(false),
 	m_isInitialized(false),
-	m_isAwake(false)
+	m_isAwake(false),
+	m_isLocalActive(true)
 {
-	SURGSIM_ADD_RW_PROPERTY(Component, bool, IsActive, isActive, setActive);
-
-	setSerializable("IsActive",
-		std::bind(&YAML::convert<bool>::encode, std::bind([&](){return m_isActive;})),
-		std::bind(&Component::setActive, this, std::bind(&YAML::Node::as<bool>, std::placeholders::_1)));
+	SURGSIM_ADD_RO_PROPERTY(Component, bool, IsActive, isActive);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Component, bool, IsLocalActive, isLocalActive, setLocalActive);
 }
 
 Component::~Component()
@@ -168,22 +165,28 @@ std::shared_ptr<Component> Component::getSharedPtr()
 	return result;
 }
 
-void Component::setActive(bool val)
-{
-	m_isActive = val;
-}
-
 bool Component::isActive() const
 {
 	if (getSceneElement() != nullptr)
 	{
-		return getSceneElement()->isActive() && m_isActive;
+		return getSceneElement()->isActive() && m_isLocalActive;
 	}
 	else
 	{
-		return m_isActive;
+		return m_isLocalActive;
 	}
 }
+
+void Component::setLocalActive(bool val)
+{
+	m_isLocalActive = val;
+}
+
+bool Component::isLocalActive() const
+{
+	return m_isLocalActive;
+}
+
 
 }; // namespace Framework
 }; // namespace SurgSim

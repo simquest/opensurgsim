@@ -137,7 +137,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Wire Frame");
 	wireFrameFem->setFilename(filename);
 	wireFrameFem->setDrawAsWireFrame(true);
-	wireFrameFem->setActive(false);
+	wireFrameFem->setLocalActive(false);
 	sceneElement->addComponent(wireFrameFem);
 
 	// Behavior transfers the position of the physics representation to wire frame representation of the fem.
@@ -172,7 +172,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 		std::make_shared<OsgMeshRepresentation>("Collision Mesh");
 	meshShapeVisualization->setFilename(filename);
 	meshShapeVisualization->setDrawAsWireFrame(true);
-	meshShapeVisualization->setActive(false);
+	meshShapeVisualization->setLocalActive(false);
 
 	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	physicsRepresentation->setIsGravityEnabled(false);
@@ -208,7 +208,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	// if we use the depth as the length of vector, the vector field will be too small to be seen on the screen.
 	// Thus, we enlarge the vector field by 200 times.
 	visualizeContactsBehavior->setVectorFieldScale(200);
-	visualizeContactsBehavior->setActive(false);
+	visualizeContactsBehavior->setLocalActive(false);
 
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(staplerName);
 	sceneElement->addComponent(physicsRepresentation);
@@ -275,7 +275,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 		std::make_shared<OsgMeshRepresentation>("Collision Mesh");
 	meshShapeVisualization->setFilename(filename);
 	meshShapeVisualization->setDrawAsWireFrame(true);
-	meshShapeVisualization->setActive(false);
+	meshShapeVisualization->setLocalActive(false);
 
 	std::shared_ptr<FixedRepresentation> physicsRepresentation = std::make_shared<FixedRepresentation>("Physics");
 	physicsRepresentation->setShape(meshShape);

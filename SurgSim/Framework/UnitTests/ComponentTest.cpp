@@ -316,9 +316,9 @@ TEST(ComponentTests, DecodeSharedReferences)
 	EXPECT_NE(component2, component1copy);
 	EXPECT_TRUE(component2->isActive());
 
-	node["TestComponent2"]["IsActive"] = false;
+	node["TestComponent2"]["IsLocalActive"] = false;
 	auto component3 = node.as<std::shared_ptr<Component>>();
-	EXPECT_FALSE(component3->isActive());
+	EXPECT_FALSE(component3->isLocalActive());
 }
 
 TEST(ComponentTests, EncodeComponent)
@@ -335,8 +335,8 @@ TEST(ComponentTests, EncodeComponent)
 	EXPECT_EQ("TestComponent2", className);
 	EXPECT_EQ(1, (data["ValueOne"].IsDefined() ? data["ValueOne"].as<int>() : 0xbad));
 	EXPECT_EQ(2, (data["ValueTwo"].IsDefined() ? data["ValueTwo"].as<int>() : 0xbad));
-	EXPECT_TRUE(data["IsActive"].IsDefined());
-	EXPECT_TRUE(data["IsActive"].as<bool>());
+	EXPECT_TRUE(data["IsLocalActive"].IsDefined());
+	EXPECT_TRUE(data["IsLocalActive"].as<bool>());
 }
 
 TEST(ComponentTests, DecodeComponent)
@@ -346,7 +346,7 @@ TEST(ComponentTests, DecodeComponent)
 	node["TestComponent2"]["Id"] = "DecodeComponent_TestComponentName";
 	node["TestComponent2"]["ValueOne"] = 100;
 	node["TestComponent2"]["ValueTwo"] = 101;
-	node["TestComponent2"]["IsActive"] = false;
+	node["TestComponent2"]["IsLocalActive"] = false;
 
 
 	auto component = node.as<std::shared_ptr<Component>>();
@@ -357,7 +357,7 @@ TEST(ComponentTests, DecodeComponent)
 	EXPECT_EQ("TestComponentName", testComponent->getName());
 	EXPECT_EQ(100, testComponent->getValueOne());
 	EXPECT_EQ(101, testComponent->getValueTwo());
-	EXPECT_FALSE(testComponent->isActive());
+	EXPECT_FALSE(testComponent->isLocalActive());
 }
 
 TEST(ComponentTests, ComponentReferences)
@@ -470,15 +470,19 @@ TEST(ComponentTests, SetActiveTest)
 {
 	std::shared_ptr<Component> component = std::make_shared<MockComponent>("Component");
 	EXPECT_TRUE(component->isActive());
-	EXPECT_NO_THROW(component->setActive(false));
+	EXPECT_TRUE(component->isLocalActive());
+	EXPECT_NO_THROW(component->setLocalActive(false));
 	EXPECT_FALSE(component->isActive());
+	EXPECT_FALSE(component->isLocalActive());
 
 	// RW property test
-	component->setValue("IsActive", true);
+	component->setValue("IsLocalActive", true);
 	EXPECT_TRUE(component->isActive());
+	EXPECT_TRUE(component->isLocalActive());
 	EXPECT_TRUE(component->getValue<bool>("IsActive"));
-	component->setValue("IsActive", false);
+	component->setValue("IsLocalActive", false);
 	EXPECT_FALSE(component->isActive());
+	EXPECT_FALSE(component->isLocalActive());
 	EXPECT_FALSE(component->getValue<bool>("IsActive"));
 
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("SceneElement");
@@ -489,7 +493,7 @@ TEST(ComponentTests, SetActiveTest)
 	EXPECT_FALSE(component->isActive());
 
 	// An active component in an active SceneElement is 'active'.
-	component->setActive(true);
+	component->setLocalActive(true);
 	EXPECT_TRUE(component->isActive());
 
 	sceneElement->setActive(false);
@@ -497,11 +501,11 @@ TEST(ComponentTests, SetActiveTest)
 	EXPECT_FALSE(component->isActive());
 
 	// An inactive component in an inactive SceneElement is 'inactive'.
-	component->setActive(false);
+	component->setLocalActive(false);
 	EXPECT_FALSE(component->isActive());
 
 	// During serialization, it's Component::m_isActive being serialized, not Component::isActive().
-	component->setValue("IsActive", true);
+	component->setValue("IsLocalActive", true);
 	YAML::Node node = sceneElement->encode(true);
 	YAML::Node data = node["SurgSim::Framework::BasicSceneElement"];
 
@@ -517,6 +521,7 @@ TEST(ComponentTests, SetActiveTest)
 	}
 	EXPECT_EQ(nullptr, decodedComponent->getSceneElement());
 	EXPECT_TRUE(decodedComponent->isActive());
+	EXPECT_TRUE(decodedComponent->isLocalActive());
 
 	// Decode the component with a SceneElement. The SceneElement's activity (active/inactive) will
 	// affect the return value of Component::isActive().
@@ -527,4 +532,5 @@ TEST(ComponentTests, SetActiveTest)
 	decodedComponent = decodedSceneElement->getComponent("Component");
 	EXPECT_NE(nullptr, decodedComponent->getSceneElement());
 	EXPECT_FALSE(decodedComponent->isActive());
+	EXPECT_TRUE(decodedComponent->isLocalActive());
 }

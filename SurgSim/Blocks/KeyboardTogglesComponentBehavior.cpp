@@ -70,7 +70,7 @@ void KeyboardTogglesComponentBehavior::update(double dt)
 		{
 			for (auto it = std::begin(match->second); it != std::end(match->second); ++it)
 			{
-				(*it)->setActive(!(*it)->isActive());
+				(*it)->setLocalActive(!(*it)->isLocalActive());
 			};
 		}
 		m_keyPressedLastUpdate = (SurgSim::Device::KeyCode::NONE != key);
