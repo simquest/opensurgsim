@@ -22,7 +22,10 @@
 #include "SurgSim/Collision/DcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
@@ -32,7 +35,10 @@
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Collision::ContactCalculation;
 using SurgSim::Math::DoubleSidedPlaneShape;
+using SurgSim::Math::makeRigidTransform;
+using SurgSim::Math::Quaterniond;
 using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -45,14 +51,14 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 	{
 		rigid0 = std::make_shared<RigidRepresentation>("Physics Representation 0");
 		rigid0->setShape(std::make_shared<SphereShape>(2.0));
-		sphere = std::make_shared<RigidCollisionRepresentation>("Collision Representation 0");
-		rigid0->setCollisionRepresentation(sphere);
+		collision0 = std::make_shared<RigidCollisionRepresentation>("Collision Representation 0");
+		rigid0->setCollisionRepresentation(collision0);
 		representations.push_back(rigid0);
 
 		rigid1 = std::make_shared<RigidRepresentation>("Physics Representation 1");
 		rigid1->setShape(std::make_shared<DoubleSidedPlaneShape>());
-		plane = std::make_shared<RigidCollisionRepresentation>("Collision Representation 1");
-		rigid1->setCollisionRepresentation(plane);
+		collision1 = std::make_shared<RigidCollisionRepresentation>("Collision Representation 1");
+		rigid1->setCollisionRepresentation(collision1);
 		representations.push_back(rigid1);
 
 		state = std::make_shared<PhysicsManagerState>();
@@ -63,10 +69,10 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 	{
 	}
 
-	std::shared_ptr<SurgSim::Collision::Representation> sphere;
+	std::shared_ptr<SurgSim::Collision::Representation> collision0;
 	std::shared_ptr<RigidRepresentation> rigid0;
 
-	std::shared_ptr<SurgSim::Collision::Representation> plane;
+	std::shared_ptr<SurgSim::Collision::Representation> collision1;
 	std::shared_ptr<RigidRepresentation> rigid1;
 
 
@@ -78,7 +84,7 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 
 TEST_F(ContactConstraintGenerationTests, BasicTest)
 {
-	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphere, plane);
+	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(collision0, collision1);
 	// Test case setup, create a pair with a contact and set up the physics state with it
 	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
 
@@ -114,17 +120,17 @@ TEST_F(ContactConstraintGenerationTests, CountTest)
 	std::shared_ptr<CollisionPair> pair;
 	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
 
-	pair = std::make_shared<CollisionPair>(sphere, plane);
+	pair = std::make_shared<CollisionPair>(collision0, collision1);
 	contactCalculation.calculateContact(pair);
 	contactCalculation.calculateContact(pair);
 
 	pairs.push_back(pair);
 
-	pair = std::make_shared<CollisionPair>(sphere, plane);
+	pair = std::make_shared<CollisionPair>(collision0, collision1);
 	contactCalculation.calculateContact(pair);
 	pairs.push_back(pair);
 
-	pair = std::make_shared<CollisionPair>(sphere, plane);
+	pair = std::make_shared<CollisionPair>(collision0, collision1);
 	pairs.push_back(pair);
 
 
@@ -139,7 +145,7 @@ TEST_F(ContactConstraintGenerationTests, CountTest)
 
 TEST_F(ContactConstraintGenerationTests, InactivePhysics)
 {
-	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphere, plane);
+	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(collision0, collision1);
 	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
 	contactCalculation.calculateContact(pair);
 	pairs.push_back(pair);
@@ -166,6 +172,35 @@ TEST_F(ContactConstraintGenerationTests, InactivePhysics)
 	generator.update(0.1, state);
 	ASSERT_EQ(1u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 }
+
+TEST_F(ContactConstraintGenerationTests, LocalPoses)
+{
+	//Move the collision representation away from the physics representation for the sphere
+	collision0->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(5.0, 0.0, 0.0)));
+
+	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(collision0, collision1);
+	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
+
+	contactCalculation.calculateContact(pair);
+	ASSERT_EQ(1u, pair->getContacts().size());
+
+	pairs.push_back(pair);
+	state->setCollisionPairs(pairs);
+	ContactConstraintGeneration generator;
+	generator.update(0.1, state);
+
+	ASSERT_EQ(1u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
+	auto constraint = state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT)[0];
+
+	auto localization = constraint->getLocalizations().first;
+	auto location = pair->getContacts().front()->penetrationPoints.first;
+
+	Vector3d localizationGlobalPosition = localization->calculatePosition();
+	Vector3d locationGlobalPosition = collision0->getPose() * location.rigidLocalPosition.getValue();
+	EXPECT_TRUE(localizationGlobalPosition.isApprox(locationGlobalPosition)) <<
+		"The contact location is not in the same position as the localization produced by constraint generation";
+}
+
 
 }; // namespace Physics
 }; // namespace SurgSim

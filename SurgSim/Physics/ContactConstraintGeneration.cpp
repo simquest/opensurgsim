@@ -71,29 +71,34 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 			{
 				std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>> localizations;
 
-				auto representations = (*pairsIt)->getRepresentations();
+				auto collisionRepresentations = (*pairsIt)->getRepresentations();
 
 				auto collisionToPhysicsMap = state->getCollisionToPhysicsMap();
-				auto foundFirst = collisionToPhysicsMap.find(representations.first);
-				auto foundSecond = collisionToPhysicsMap.find(representations.second);
+				auto foundFirst = collisionToPhysicsMap.find(collisionRepresentations.first);
+				auto foundSecond = collisionToPhysicsMap.find(collisionRepresentations.second);
 				if (foundFirst == collisionToPhysicsMap.end() || foundSecond == collisionToPhysicsMap.end())
 				{
 					SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
-						representations.first->getName() << " and/or " << representations.second->getName() <<
-						" does not have a physics representation";
+						collisionRepresentations.first->getName() << " and/or " <<
+						collisionRepresentations.second->getName() << " does not have a physics representation";
 					continue;
 				}
+				std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>> physicsRepresentations;
+				physicsRepresentations.first = foundFirst->second;
+				physicsRepresentations.second = foundSecond->second;
 
-				if (!(foundFirst->second->isActive() && foundSecond->second->isActive()))
+				if (!(physicsRepresentations.first->isActive() && physicsRepresentations.second->isActive()))
 				{
 					SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
-						foundFirst->second->getName() << " and/or " << foundSecond->second->getName() <<
-						" is not an active physics representation";
+						physicsRepresentations.first->getName() << " and/or " <<
+						physicsRepresentations.second->getName() << " is not an active physics representation";
 					continue;
 				}
 
-				localizations.first = makeLocalization(foundFirst->second, (*contactsIt)->penetrationPoints.first);
-				localizations.second = makeLocalization(foundSecond->second,(*contactsIt)->penetrationPoints.second);
+				localizations.first = makeLocalization(physicsRepresentations.first, collisionRepresentations.first,
+						(*contactsIt)->penetrationPoints.first);
+				localizations.second = makeLocalization(physicsRepresentations.second, collisionRepresentations.second,
+						(*contactsIt)->penetrationPoints.second);
 				if (localizations.first != nullptr && localizations.second != nullptr)
 				{
 					std::pair< std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>
@@ -135,12 +140,28 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 
 std::shared_ptr<Localization> ContactConstraintGeneration::makeLocalization(
 	std::shared_ptr<SurgSim::Physics::Representation> physicsRepresentation,
+	std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
 	const SurgSim::DataStructures::Location& location)
 {
 	std::shared_ptr<Localization> result;
 	if (physicsRepresentation != nullptr)
 	{
-		result = physicsRepresentation->createLocalization(location);
+		if (location.rigidLocalPosition.hasValue())
+		{
+			// Move the local position from the collision representation that created the location
+			// to local coordinates of the physics representation that is creating a localization
+			SurgSim::DataStructures::Location physicsLocation = location;
+			physicsLocation.rigidLocalPosition.setValue(
+					physicsRepresentation->getLocalPose().inverse() *
+					collisionRepresentation->getLocalPose() *
+					location.rigidLocalPosition.getValue());
+			result = physicsRepresentation->createLocalization(physicsLocation);
+		}
+		else
+		{
+			result = physicsRepresentation->createLocalization(location);
+		}
+
 		if (result != nullptr)
 		{
 			// HS 2013-jun-20 this is not quite right, we are passing in the pointer to the representation
