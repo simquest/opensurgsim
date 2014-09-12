@@ -84,7 +84,7 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 	localization.setRepresentation(std::static_pointer_cast<Representation>(shared_from_this()));
 	localization.setLocalPosition(location.rigidLocalPosition.getValue());
 	const Vector3d point = localization.calculatePosition();
-	const Vector3d massCenter = getCurrentState().getPose().translation();
+	const Vector3d massCenter = getCurrentState().getPose() * getMassCenter();
 	const Vector3d lever = point - massCenter;
 	auto force = generalizedForce.segment<3>(0);
 	const Vector3d torque = lever.cross(force);

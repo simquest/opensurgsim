@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
-#define EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
+#ifndef EXAMPLES_STAPLING_STAPLERBEHAVIOR_H
+#define EXAMPLES_STAPLING_STAPLERBEHAVIOR_H
 
 #include <array>
 #include <memory>
@@ -178,4 +178,4 @@ private:
 	std::list<std::string> m_stapleEnabledSceneElements;
 };
 
-#endif  // EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
+#endif  // EXAMPLES_STAPLING_STAPLERBEHAVIOR_H

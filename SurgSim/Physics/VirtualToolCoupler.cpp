@@ -30,6 +30,7 @@
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
+using SurgSim::Math::makeSkewSymmetricMatrix;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector6d;
 using SurgSim::Math::Matrix33d;
@@ -151,13 +152,9 @@ void VirtualToolCoupler::update(double dt)
 
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
+		Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
 		Vector3d attachmentPoint = objectPose * m_localAttachmentPoint;
-		Vector3d leverArm = Vector3d::Zero();
-		if (m_calculateInertialTorques)
-		{
-			const Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
-			leverArm = attachmentPoint - objectPosition;
-		}
+		Vector3d leverArm = attachmentPoint - objectPosition;
 		Vector3d attachmentPointVelocity = objectState.getLinearVelocity();
 		attachmentPointVelocity += objectState.getAngularVelocity().cross(leverArm);
 
@@ -184,9 +181,16 @@ void VirtualToolCoupler::update(double dt)
 		generalizedDamping << linearDampingMatrix, zero3x3,
 							  zero3x3, angularDampingMatrix;
 
-		SurgSim::DataStructures::Location location;
-		location.rigidLocalPosition.setValue(m_localAttachmentPoint);
-		m_rigid->addExternalGeneralizedForce(location, generalizedForce, generalizedStiffness, generalizedDamping);
+		if (m_calculateInertialTorques)
+		{
+			SurgSim::DataStructures::Location location;
+			location.rigidLocalPosition.setValue(m_localAttachmentPoint);
+			m_rigid->addExternalGeneralizedForce(location, generalizedForce, generalizedStiffness, generalizedDamping);
+		}
+		else
+		{
+			m_rigid->addExternalGeneralizedForce(generalizedForce, generalizedStiffness, generalizedDamping);
+		}
 
 		if (m_output != nullptr)
 		{
@@ -249,6 +253,15 @@ bool VirtualToolCoupler::doWakeUp()
 		return false;
 	}
 
+	if (m_optionalAttachmentPoint.hasValue())
+	{
+		m_localAttachmentPoint = m_optionalAttachmentPoint.getValue();
+	}
+	else
+	{
+		m_localAttachmentPoint = m_rigid->getMassCenter();
+	}
+
 	// Provide sensible defaults based on the rigid representation.
 	// If one or both of the stiffness and damping are not provided, they are
 	// calculated to provide a critically damped system (dampingRatio-1.0).
@@ -266,7 +279,7 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 		else
 		{
-			m_linearStiffness = mass * 800.0;
+			m_linearStiffness = mass * 100.0;
 		}
 		m_linearDamping = 2.0 * dampingRatio * sqrt(mass * m_linearStiffness);
 	}
@@ -283,7 +296,8 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	const Matrix33d& inertia = m_rigid->getLocalInertia();
+	Matrix33d leverArmMatrix = makeSkewSymmetricMatrix((m_localAttachmentPoint - m_rigid->getMassCenter()).eval());
+	const Matrix33d& inertia = m_rigid->getLocalInertia() + mass * leverArmMatrix * leverArmMatrix;
 	double maxInertia = inertia.eigenvalues().real().maxCoeff();
 	if (!m_optionalAngularDamping.hasValue())
 	{
@@ -310,14 +324,6 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	if (m_optionalAttachmentPoint.hasValue())
-	{
-		m_localAttachmentPoint = m_optionalAttachmentPoint.getValue();
-	}
-	else
-	{
-		m_localAttachmentPoint = m_rigid->getMassCenter();
-	}
 
 	return true;
 }

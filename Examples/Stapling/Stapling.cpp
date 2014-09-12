@@ -189,14 +189,13 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	inputVTC->setInput(inputComponent);
 	inputVTC->setRepresentation(physicsRepresentation);
 	inputVTC->overrideAttachmentPoint(Vector3d::Zero());
-	inputVTC->setCalculateInertialTorques(true);
+	inputVTC->setCalculateInertialTorques(false);
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
 	// Also, it is aware of collisions of the stapler.
 	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>("Behavior");
 	staplerBehavior->setInputComponent(inputComponent);
 	staplerBehavior->setRepresentation(physicsRepresentation);
-	staplerBehavior->enableStaplingForSceneElement("arm");
 	staplerBehavior->enableStaplingForSceneElement("wound");
 
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
@@ -393,6 +392,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
 	std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
+	physicsManager->setRate(100.0);
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	runtime->addManager(behaviorManager);
