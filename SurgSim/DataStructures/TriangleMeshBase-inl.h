@@ -75,6 +75,9 @@ template <class VertexData, class EdgeData, class TriangleData>
 size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::addTriangle(const TriangleType& triangle)
 {
 	size_t result;
+
+	SURGSIM_ASSERT(triangle.isValid) << "Cannot insert invalid triangle into mesh.";
+
 	if (m_freeTriangles.empty())
 	{
 		m_triangles.push_back(triangle);
@@ -86,6 +89,7 @@ size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::addTriangle(const T
 		m_freeTriangles.pop_back();
 		m_triangles[result] = triangle;
 	}
+
 	return result;
 }
 

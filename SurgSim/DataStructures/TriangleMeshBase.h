@@ -115,11 +115,17 @@ public:
 	std::vector<EdgeType>& getEdges();
 
 	/// Retrieve all triangles
+	/// \note The number of triangles might not match the size of the array returned by getTriangles(), after deletion
+	///       has occurred it cannot be used to access all triangles. When processing this array,
+	///       check \sa TriangleType::isValid to see wether to do something with this triangle
 	/// \return a vector containing the position of each triangle. Some of these triangles might be deleted, they need
 	///         to be checked via \sa isValid before further processing
 	const std::vector<TriangleType>& getTriangles() const;
 
 	/// Retrieve all triangles (non const version)
+	/// \note The number of triangles might not match the size of the array returned by getTriangles(), after deletion
+	///       has occurred it cannot be used to access all triangles. When processing this array,
+	///       check \sa TriangleType::isValid to see wether to do something with this triangle
 	/// \return a vector containing the position of each triangle. Some of these triangles might be deleted, they need
 	///         to be checked via \sa isValid before further processing
 	std::vector<TriangleType>& getTriangles();
@@ -135,7 +141,7 @@ public:
 	EdgeType& getEdge(size_t id);
 
 	/// Retrieve a specific triangle
-	/// \throws SurgSim::Framework::AssertionFailure if the give triangle was deleted
+	/// \throws SurgSim::Framework::AssertionFailure if the given triangle was deleted
 	/// \param id The id of the triangle to retrieve
 	/// \return the specified triangle
 	const TriangleType& getTriangle(size_t id) const;

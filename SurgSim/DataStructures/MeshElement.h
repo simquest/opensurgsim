@@ -77,14 +77,7 @@ struct MeshElement
 	/// \return True if the two MeshElements are equals, False otherwise
 	bool operator==(const MeshElement<N, Data>& element) const
 	{
-		if (isValid && element.isValid)
-		{
-			return verticesId == element.verticesId && data == element.data;
-		}
-		else
-		{
-			return false;
-		}
+		return isValid == element.isValid && verticesId == element.verticesId && data == element.data;
 	}
 
 	/// Compare the element with another one (inequality)
@@ -94,8 +87,6 @@ struct MeshElement
 	{
 		return !((*this) == element);
 	}
-
-
 };
 
 

@@ -644,4 +644,12 @@ TEST_F(TriangleMeshBaseTest, TriangleDeletionTest)
 	EXPECT_EQ(3u, mesh.addTriangle(TriangleType(ids)));
 	EXPECT_EQ(4u, mesh.getNumTriangles());
 	EXPECT_EQ(4u, mesh.getTriangles().size());
+
+	// Test clear with deleted triangles
+	mesh.removeTriangle(3);
+	EXPECT_NO_THROW(mesh.clear());
+	EXPECT_EQ(0u, mesh.getNumTriangles());
+	EXPECT_EQ(0u, mesh.addTriangle(TriangleType(ids)));
+	EXPECT_EQ(1u, mesh.addTriangle(TriangleType(ids)));
+
 }
