@@ -161,8 +161,8 @@ void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContac
 	{
 		boxLocalVertex = box->getVertex(expectedBoxIndicesInContacts[i]);
 		vertex = boxTransform * boxLocalVertex;
-		depth = planeNormalGlobal.dot(vertex - pointOnPlane);
-		planeLocalVertex = planeQuat.inverse() * (vertex - planeNormalGlobal * depth - planeTrans);
+		depth = -planeNormalGlobal.dot(vertex - pointOnPlane);
+		planeLocalVertex = planeQuat.inverse() * (vertex + planeNormalGlobal * depth - planeTrans);
 		std::pair<Location, Location> penetrationPoint;
 		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
 		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);

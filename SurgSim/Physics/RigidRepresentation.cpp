@@ -20,7 +20,13 @@
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
+
+namespace
+{
+const double rotationVectorEpsilon = 1e-8;
+};
 
 namespace SurgSim
 {
@@ -62,7 +68,7 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::Math::Vecto
 	m_externalGeneralizedDamping += D;
 }
 
-void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructures::Location& location,
 													  const SurgSim::Math::Vector6d& generalizedForce,
 													  const SurgSim::Math::Matrix66d& K,
 													  const SurgSim::Math::Matrix66d& D)
@@ -72,35 +78,100 @@ void RigidRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Vector6d;
 
-	SURGSIM_ASSERT(localization != nullptr) << "Uninitialized localization (nullptr)";
+	SURGSIM_ASSERT(location.rigidLocalPosition.hasValue()) << "Invalid location (no rigid local position)";
 
-	// Let's note the position dof (C,W) and the velocity dof (v, w).
-	// The force (F) applied on a point (P) that is not the mass center(C), produces a torque (T) and
-	// also affect matrix derivatives (K and D) as follow:
-	// T = cross(CP, F) = CP^F
-	// K.block<3, 3>(3, 0) += -dT/dC = -dCP/dC ^ F - CP ^ dF/dC = Id(3x3) ^ F + CP ^ K.block<3, 3>(0, 0)
-	// K.block<3, 3>(3, 3) += -dT/dW = -dCP/dW ^ F - CP ^ dF/dW = CP ^ K.block<3, 3>(0, 3)
-	// D.block<3, 3>(3, 0) += -dT/dv = -dCP/dv ^ F - CP ^ dF/dv = CP ^ D.block<3, 3>(0, 0)
-	// D.block<3, 3>(3, 3) += -dT/dw = -dCP/dw ^ F - CP ^ dF/dw = CP ^ D.block<3, 3>(0, 3)
-	const Vector3d point = localization->calculatePosition();
+	RigidRepresentationLocalization localization;
+	localization.setRepresentation(std::static_pointer_cast<Representation>(shared_from_this()));
+	localization.setLocalPosition(location.rigidLocalPosition.getValue());
+	const Vector3d point = localization.calculatePosition();
 	const Vector3d massCenter = getCurrentState().getPose().translation();
 	const Vector3d lever = point - massCenter;
-	const Vector3d force = generalizedForce.segment<3>(0);
+	auto force = generalizedForce.segment<3>(0);
 	const Vector3d torque = lever.cross(force);
 
+	// add the generalized force
 	m_externalGeneralizedForce += generalizedForce;
+	// add the generalized stiffness matrix
+	m_externalGeneralizedStiffness += K;
+	// add the generalized damping matrix
+	m_externalGeneralizedDamping += D;
+
 	// add the extra torque produced by the lever
 	m_externalGeneralizedForce.segment<3>(3) += torque;
 
-	m_externalGeneralizedStiffness += K;
+	// add the extra terms in the stiffness matrix
+	const Vector3d leverInLocalSpace = getCurrentState().getPose().rotation().inverse() * lever;
+	const Eigen::AngleAxisd angleAxis(getCurrentState().getPose().rotation());
+	double angle = angleAxis.angle();
+	const Vector3d axis = angleAxis.axis();
+	const Vector3d rotationVector = axis * angle;
+	double rotationVectorNorm = rotationVector.norm();
+	double rotationVectorNormCubic = rotationVectorNorm * rotationVectorNorm * rotationVectorNorm;
+	double sinAngle = sin(angle);
+	double cosAngle = cos(angle);
+	double oneMinusCos = 1.0 - cosAngle;
+	const Matrix33d skewAxis = SurgSim::Math::makeSkewSymmetricMatrix(axis);
+	Matrix33d dRdAxisX;
+	Matrix33d dRdAxisY;
+	Matrix33d dRdAxisZ;
+	Matrix33d dRdAngle =
+		-sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * axis * axis.transpose();
+	dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos * axis[1], oneMinusCos * axis[2],
+				oneMinusCos * axis[1], 0.0, -sinAngle,
+				oneMinusCos * axis[2], sinAngle, 0.0;
+	dRdAxisY << 0.0, oneMinusCos * axis[0], sinAngle,
+				oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos * axis[2],
+				-sinAngle, oneMinusCos * axis[2], 0.0;
+	dRdAxisZ << 0.0, -sinAngle, oneMinusCos * axis[0],
+				sinAngle, 0.0, oneMinusCos * axis[1],
+				oneMinusCos * axis[0], oneMinusCos * axis[1], oneMinusCos * 2.0 * axis[2];
+	Vector3d dAngledRotationVector, dAxisXdRotationVector, dAxisYdRotationVector, dAxisZdRotationVector;
+	if (std::abs(rotationVectorNorm) > rotationVectorEpsilon)
+	{
+		const Vector3d tmp = rotationVector / rotationVectorNormCubic;
+		dAngledRotationVector = rotationVector / rotationVectorNorm;
+		dAxisXdRotationVector = Vector3d::UnitX() / rotationVectorNorm - rotationVector[0] * tmp;
+		dAxisYdRotationVector = Vector3d::UnitY() / rotationVectorNorm - rotationVector[1] * tmp;
+		dAxisZdRotationVector = Vector3d::UnitZ() / rotationVectorNorm - rotationVector[2] * tmp;
+	}
+	else
+	{
+		// Development around theta ~ 0 => sin(theta) ~ theta
+		// We simplify by theta across the products dRdAxis[alpha].dAxis[alpha]dRotationVector[beta]
+		dAngledRotationVector = Vector3d::Zero();
+		dAxisXdRotationVector = Vector3d::UnitX();
+		dAxisYdRotationVector = Vector3d::UnitY();
+		dAxisZdRotationVector = Vector3d::UnitZ();
+
+		dRdAxisX << 0.0, 0.0, 0.0,
+					0.0, 0.0, -1.0,
+					0.0, 1.0, 0.0;
+
+		dRdAxisY << 0.0, 0.0, 1.0,
+					0.0, 0.0, 0.0,
+					-1.0, 0.0, 0.0;
+
+		dRdAxisZ << 0.0, -1.0, 0.0,
+					1.0, 0.0, 0.0,
+					0.0, 0.0, 0.0;
+	}
 	// add the extra stiffness terms produced by the lever
-	m_externalGeneralizedStiffness.block<3, 3>(3, 0) += -SurgSim::Math::makeSkewSymmetricMatrix(force);
 	for (size_t column = 0; column < 6; ++column)
 	{
 		m_externalGeneralizedStiffness.block<3, 1>(3, column) += lever.cross(K.block<3, 1>(0, column));
 	}
+	// add extra term - dCP/dW[alpha] ^ F = - dR.CP(local)/dW[alpha] ^ F = -dR/dW[alpha].CP(local) ^ F
+	// = -[(dR/dangle.dangle/dW[alpha] + dR/daxisX.daxisX/dW[alpha] +
+	//      dR/daxisY.daxisY/dW[alpha] + dR/daxisZ.daxisZ/dW[alpha]) . CP(local)] ^ F
+	for (size_t i = 0; i < 3; ++i)
+	{
+		m_externalGeneralizedStiffness.block<3, 1>(3, 3 + i) +=
+			-((dRdAngle * dAngledRotationVector[i] +
+			dRdAxisX * dAxisXdRotationVector[i] +
+			dRdAxisY * dAxisYdRotationVector[i] +
+			dRdAxisZ * dAxisZdRotationVector[i]) * leverInLocalSpace).cross(force);
+	}
 
-	m_externalGeneralizedDamping += D;
 	// add the extra damping terms produced by the lever
 	for (size_t column = 0; column < 6; ++column)
 	{
@@ -127,13 +198,12 @@ void RigidRepresentation::beforeUpdate(double dt)
 {
 	RigidRepresentationBase::beforeUpdate(dt);
 
-	bool isParametersValid = m_currentParameters.isValid();
-	SURGSIM_LOG_IF(!isParametersValid,
+	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in beforeUpdate because m_currentParameters is not valid." << std::endl;
-	if (!isActive() || !isParametersValid)
+						   " deactivated in beforeUpdate because parameters are not valid." << std::endl;
+	if (!isActive() || !m_parametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 }
@@ -144,19 +214,17 @@ void RigidRepresentation::update(double dt)
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
 
-	bool isParametersValid = m_currentParameters.isValid();
-	SURGSIM_LOG_IF(!isParametersValid,
+	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in update because m_currentParameters is not valid." << std::endl;
-	if (!isActive() || !isParametersValid)
+						   " deactivated in update because parameters are not valid." << std::endl;
+	if (!isActive() || !m_parametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 
 	// For convenience
-	RigidRepresentationParameters& p = m_currentParameters;
-	Vector3d         G = m_currentState.getPose() * p.getMassCenter();
+	Vector3d         G = m_currentState.getPose() * getMassCenter();
 	Vector3d        dG = m_currentState.getLinearVelocity();
 	Matrix33d        R = m_currentState.getPose().linear();
 	Quaterniond      q = Quaterniond(R);
@@ -179,20 +247,20 @@ void RigidRepresentation::update(double dt)
 	m_torque += m_externalGeneralizedForce.segment<3>(3);
 	if (isGravityEnabled())
 	{
-		m_force += getGravity() * p.getMass();
+		m_force += getGravity() * getMass();
 	}
 	m_torque -= w.cross(m_globalInertia * w);
 
 	// Add Backward Euler RHS terms
-	m_force  += p.getMass()     * dG / dt;
+	m_force  += getMass()     * dG / dt;
 	m_torque += m_globalInertia *  w / dt;
 
 	// Solve the 6D system on the velocity level
 	{
 		// { Id33.m.(1/dt + alphaLinear ).v(t+dt) = Id33.m.v(t)/dt + f
 		// { I     .(1/dt + alphaAngular).w(t+dt) = I.w(t)/dt + t - w(t)^(I.w(t))
-		dG = (1.0 / p.getMass()) * m_force  / (1.0 / dt + p.getLinearDamping());
-		w  = m_invGlobalInertia * m_torque / (1.0 / dt + p.getAngularDamping());
+		dG = (1.0 / getMass()) * m_force  / (1.0 / dt + getLinearDamping());
+		w  = m_invGlobalInertia * m_torque / (1.0 / dt + getAngularDamping());
 		// Compute the quaternion velocity as well: dq = 1/2.(0 w).q
 		dq = Quaterniond(0.0, w[0], w[1], w[2]) * q;
 		dq.coeffs() *= 0.5;
@@ -212,7 +280,7 @@ void RigidRepresentation::update(double dt)
 		q.normalize();
 	}
 	R = q.matrix();
-	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*p.getMassCenter()));
+	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*getMassCenter()));
 
 	// Compute the global inertia matrix with the current state
 	updateGlobalInertiaMatrices(m_currentState);
@@ -234,7 +302,7 @@ void RigidRepresentation::update(double dt)
 			"|q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
-		setIsActive(false);
+		setActive(false);
 	}
 
 	// Prepare the compliance matrix
@@ -245,13 +313,12 @@ void RigidRepresentation::afterUpdate(double dt)
 {
 	RigidRepresentationBase::afterUpdate(dt);
 
-	bool isParametersValid = m_currentParameters.isValid();
-	SURGSIM_LOG_IF(!isParametersValid,
+	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in afterUpdate because m_currentParameters is not valid." << std::endl;
-	if (!isActive() || !isParametersValid)
+						   " deactivated in afterUpdate because parameters are not valid." << std::endl;
+	if (!isActive() || !m_parametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 
@@ -267,18 +334,16 @@ void RigidRepresentation::applyCorrection(double dt,
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
 
-	bool isParametersValid = m_currentParameters.isValid();
-	SURGSIM_LOG_IF(!isParametersValid,
+	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in applyCorrection because m_currentParameters is not valid." << std::endl;
-	if (!isActive() || !isParametersValid)
+						   " deactivated in applyCorrection because parameters are not valid." << std::endl;
+	if (!isActive() || !m_parametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 
-	RigidRepresentationParameters& p = m_currentParameters;
-	Vector3d          G = m_currentState.getPose() * p.getMassCenter();
+	Vector3d          G = m_currentState.getPose() * getMassCenter();
 	Vector3d         dG = m_currentState.getLinearVelocity();
 	Matrix33d         R = m_currentState.getPose().linear();
 	Quaterniond       q = Quaterniond(R);
@@ -304,7 +369,7 @@ void RigidRepresentation::applyCorrection(double dt,
 		q.normalize();
 	}
 	R = q.matrix();
-	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*p.getMassCenter()));
+	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*getMassCenter()));
 
 	// Compute the global inertia matrix with the current state
 	updateGlobalInertiaMatrices(m_currentState);
@@ -320,19 +385,11 @@ void RigidRepresentation::applyCorrection(double dt,
 			"and |q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
-		setIsActive(false);
+		setActive(false);
 	}
 
 	// Prepare the compliance matrix
 	computeComplianceMatrix(dt);
-}
-
-void SurgSim::Physics::RigidRepresentation::resetParameters()
-{
-	Representation::resetParameters();
-	m_currentParameters = m_initialParameters;
-
-	updateGlobalInertiaMatrices(m_currentState);
 }
 
 const Eigen::Matrix < double, 6, 6, Eigen::RowMajor > &
@@ -343,22 +400,20 @@ SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
 
 void RigidRepresentation::computeComplianceMatrix(double dt)
 {
-	bool isParametersValid = m_currentParameters.isValid();
-	SURGSIM_LOG_IF(!isParametersValid,
+	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in computComplianceMatrix because m_currentParameters is not valid." <<
+						   " deactivated in computComplianceMatrix because parameters are not valid." <<
 						   std::endl;
-	if (!isActive() || !isParametersValid)
+	if (!isActive() || !m_parametersValid)
 	{
-		setIsActive(false);
+		setActive(false);
 		return;
 	}
 
 	SurgSim::Math::Matrix66d systemMatrix;
-	RigidRepresentationParameters& parameters = m_currentParameters;
 	const SurgSim::Math::Matrix33d identity3x3 = SurgSim::Math::Matrix33d::Identity();
-	systemMatrix.block<3, 3>(0, 0) = identity3x3 * (parameters.getMass() / dt + parameters.getLinearDamping());
-	systemMatrix.block<3, 3>(3, 3) = m_globalInertia / dt + parameters.getAngularDamping() * identity3x3;
+	systemMatrix.block<3, 3>(0, 0) = identity3x3 * (getMass() / dt + getLinearDamping());
+	systemMatrix.block<3, 3>(3, 3) = m_globalInertia / dt + getAngularDamping() * identity3x3;
 	systemMatrix += m_externalGeneralizedDamping + m_externalGeneralizedStiffness * dt;
 
 	m_C.setZero();
@@ -371,7 +426,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 
 void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
 {
-	if (!isActive() || !m_currentParameters.isValid())
+	if (!isActive() || !m_parametersValid)
 	{
 		// do not setIsActive(false) due to invalid parameters because RigidRepresentationBase::setInitialParameters may
 		// not have been called before RigidRepresentationBase::setInitialState (which calls this function), in which
@@ -380,7 +435,7 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 	}
 
 	const SurgSim::Math::Matrix33d& R = state.getPose().linear();
-	m_globalInertia =  R * m_currentParameters.getLocalInertia() * R.transpose();
+	m_globalInertia =  R * getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
 }
 
@@ -390,11 +445,7 @@ bool RigidRepresentation::doInitialize()
 
 	if (result)
 	{
-		double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
-		SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
-
-		shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
-		SURGSIM_ASSERT(shapeVolume > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
+		SURGSIM_ASSERT(getShape()->getVolume() > 0.0) << "Cannot use a shape with zero volume for RigidRepresentations";
 	}
 
 	return result;

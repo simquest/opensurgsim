@@ -128,6 +128,17 @@ public:
 	/// \return True if this SceneElement is initialized; Otherwise, false.
 	bool isInitialized() const;
 
+	/// Set this SceneElement's status (active/inactive)
+	/// \note Set 'inactive' on an active SceneElement will cause all the components it contains to not be processed.
+	/// \note Set 'active' on an inactive SceneElement will cause all the components it contains which are active
+	/// \note to be processed again.
+	/// \note Inactive components will not be processed no matter the SceneElement is active or inactive.
+	/// \param val True to set the SceneElement active, false to set inactive.
+	void setActive(bool val);
+
+	/// \return True if this SceneElement is active; Otherwise, false.
+	bool isActive() const;
+
 	/// Gets a shared pointer to this SceneElement.
 	/// \return	The shared pointer.
 	std::shared_ptr<SceneElement> getSharedPtr();
@@ -174,6 +185,9 @@ private:
 
 	/// Indicates if this SceneElement has been initialized or not.
 	bool m_isInitialized;
+
+	/// Indicates if this SceneElement is active or not.
+	bool m_isActive;
 };
 
 }; // namespace Framework

@@ -57,7 +57,8 @@ OsgRepresentation::~OsgRepresentation()
 
 void OsgRepresentation::setVisible(bool visible)
 {
-	m_switch->setChildValue(m_transform, visible);
+	m_switch->setChildValue(m_transform, isActive() && visible);
+	m_isVisible = visible;
 }
 
 bool OsgRepresentation::isVisible() const

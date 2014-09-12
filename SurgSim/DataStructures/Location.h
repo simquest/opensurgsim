@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_LOCATION_H
-#define SURGSIM_COLLISION_LOCATION_H
+#ifndef SURGSIM_DATASTRUCTURES_LOCATION_H
+#define SURGSIM_DATASTRUCTURES_LOCATION_H
 
 #include <vector>
 
@@ -25,18 +25,44 @@
 
 namespace SurgSim
 {
-namespace Collision
+namespace DataStructures
 {
 
 struct Location
 {
 public:
+	/// Default constructor
+	Location()
+	{
+	}
+
+	/// Constructor for rigid local position
+	/// \param localPosition The 3D local position to set this location to
+	explicit Location(const SurgSim::Math::Vector3d& localPosition)
+	{
+		rigidLocalPosition.setValue(localPosition);
+	}
+
+	/// Constructor for octree node path
+	/// \param nodePath The octree node path to set this location to
+	explicit Location(const SurgSim::DataStructures::OctreePath& nodePath)
+	{
+		octreeNodePath.setValue(nodePath);
+	}
+
+	/// Constructor for mesh local coordinate
+	/// \param localCoordinate The mesh local coordinate
+	explicit Location(const SurgSim::DataStructures::IndexedLocalCoordinate& localCoordinate)
+	{
+		meshLocalCoordinate.setValue(localCoordinate);
+	}
+
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::OctreePath> octreeNodePath;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> meshLocalCoordinate;
 };
 
-}; // namespace Collision
+}; // namespace DataStructures
 }; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_DATASTRUCTURES_LOCATION_H

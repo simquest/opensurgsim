@@ -17,7 +17,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/OctreeNode.h"
-#include "SurgSim/Collision/Location.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Collision/DcdCollision.h"
 #include "SurgSim/Collision/OctreeDcdContact.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
@@ -28,7 +28,7 @@
 #include "SurgSim/Math/Shapes.h"
 #include "SurgSim/Math/Vector.h"
 
-using SurgSim::Collision::Location;
+using SurgSim::DataStructures::Location;
 using SurgSim::DataStructures::OctreeNode;
 using SurgSim::DataStructures::OctreePath;
 using SurgSim::Collision::ShapeCollisionRepresentation;

@@ -47,8 +47,11 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataStructuresConvert.h
 	DataStructuresConvert-inl.h
 	EmptyData.h
+	Image.h
+	Image-inl.h
 	IndexDirectory.h
 	IndexedLocalCoordinate.h
+	Location.h
 	MeshElement.h
 	NamedData.h
 	NamedData-inl.h
@@ -87,7 +90,6 @@ surgsim_add_library(
 )
 
 set(LIBS 
-	SurgSimMath 
 	SurgSimFramework
 	${Boost_LIBRARIES}
 )

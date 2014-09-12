@@ -41,6 +41,14 @@ surgsim_add_library(
 	"SurgSim/MlcpTestIO"
 )
 
+SET(LIBS
+	SurgSimMath
+	SurgSimTesting
+)
+
+target_link_libraries(MlcpTestIO ${LIBS})
+
+
 surgsim_show_ide_folders("${MLCP_IO_SOURCES}" "${MLCP_IO_HEADERS}")
 
 # Put MlcpTestIO into folder "Testing"

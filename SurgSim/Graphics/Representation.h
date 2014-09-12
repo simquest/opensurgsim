@@ -51,12 +51,21 @@ public:
 	virtual ~Representation();
 
 	/// Sets whether the representation is currently visible
+	/// \note If the representation is inactive, this method has no visible effect.
 	/// \param	visible	True for visible, false for invisible
 	virtual void setVisible(bool visible) = 0;
 
 	/// Gets whether the representation is currently visible
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const = 0;
+
+	/// Set this representation to active if 'val' is true, inactive if 'val' is false.
+	/// An active representation will be processed by the graphics manager and its state will be updated.
+	/// And an inactive representation will not be processed/updated.
+	/// Also, an inactive representation is invisible and
+	/// 'setVisible()' has no visible effect on an inactive representation.
+	/// \param val The status (active/inactive) to be set on this component.
+	virtual void setActive(bool val) override;
 
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
@@ -113,6 +122,9 @@ public:
 
 	/// Clear all the Group references
 	void clearGroupReferences();
+
+protected:
+	bool m_isVisible;
 
 private:
 

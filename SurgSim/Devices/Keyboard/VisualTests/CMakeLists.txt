@@ -26,7 +26,6 @@ add_executable(KeyboardVisualTest
 set(LIBS KeyboardDevice
 		 SurgSimDataStructures 
 		 SurgSimInput 
-		 SurgSimTesting 
 		 ${OPENSCENEGRAPH_LIBRARIES}
 )
 

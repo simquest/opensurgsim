@@ -40,6 +40,16 @@ surgsim_add_library(
 	"${SURGSIM_TESTING_HEADERS}"
 	"SurgSim/Testing"
 )
+add_dependencies(SurgSimTesting yaml-cpp)
+
+set(LIBS
+	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimInput
+	SurgSimMath
+	SurgSimPhysics
+)
+target_link_libraries(SurgSimTesting ${LIBS})
 
 add_subdirectory(MlcpIO)
 

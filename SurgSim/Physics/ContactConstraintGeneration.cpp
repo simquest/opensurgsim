@@ -19,8 +19,8 @@
 #include <vector>
 
 #include "SurgSim/Collision/CollisionPair.h"
-#include "SurgSim/Collision/Location.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
@@ -141,7 +141,7 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 std::shared_ptr<Localization> ContactConstraintGeneration::makeLocalization(
 	std::shared_ptr<SurgSim::Physics::Representation> physicsRepresentation,
 	std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
-	const SurgSim::Collision::Location& location)
+	const SurgSim::DataStructures::Location& location)
 {
 	std::shared_ptr<Localization> result;
 	if (physicsRepresentation != nullptr)
@@ -150,7 +150,7 @@ std::shared_ptr<Localization> ContactConstraintGeneration::makeLocalization(
 		{
 			// Move the local position from the collision representation that created the location
 			// to local coordinates of the physics representation that is creating a localization
-			SurgSim::Collision::Location physicsLocation = location;
+			SurgSim::DataStructures::Location physicsLocation = location;
 			physicsLocation.rigidLocalPosition.setValue(
 					physicsRepresentation->getLocalPose().inverse() *
 					collisionRepresentation->getLocalPose() *

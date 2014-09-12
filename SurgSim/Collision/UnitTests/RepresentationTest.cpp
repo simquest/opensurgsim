@@ -28,8 +28,8 @@
 
 using SurgSim::Collision::Contact;
 using SurgSim::Collision::ContactMapType;
-using SurgSim::Collision::Location;
 using SurgSim::Collision::ShapeCollisionRepresentation;
+using SurgSim::DataStructures::Location;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::PlaneShape;

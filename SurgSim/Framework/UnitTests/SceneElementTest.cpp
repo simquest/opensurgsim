@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/RigidTransform.h"

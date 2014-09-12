@@ -20,9 +20,9 @@
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/SphereShape.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
@@ -71,7 +71,7 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 		Vector3d normal =
 			(representationPlane->getPose().linear() * plane->getNormal()) * ((dist < 0.0) ? -1.0 : 1.0);
 
-		std::pair<Location,Location> penetrationPoints;
+		std::pair<Location, Location> penetrationPoints;
 		penetrationPoints.first.rigidLocalPosition.setValue(
 			representationSphere->getPose().inverse() * (sphereCenter - normal * sphere->getRadius()));
 		penetrationPoints.second.rigidLocalPosition.setValue(

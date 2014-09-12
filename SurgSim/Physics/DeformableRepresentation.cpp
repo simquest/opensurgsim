@@ -78,9 +78,12 @@ void DeformableRepresentation::setInitialState(
 	// Set the representation number of degree of freedom
 	setNumDof(m_initialState->getNumDof());
 
-	SurgSim::Math::resizeVector(&m_externalGeneralizedForce, getNumDof(), true);
-	SurgSim::Math::resizeMatrix(&m_externalGeneralizedStiffness, getNumDof(), getNumDof(), true);
-	SurgSim::Math::resizeMatrix(&m_externalGeneralizedDamping, getNumDof(), getNumDof(), true);
+	m_externalGeneralizedForce.resize(getNumDof());
+	m_externalGeneralizedStiffness.resize(getNumDof(), getNumDof());
+	m_externalGeneralizedDamping.resize(getNumDof(), getNumDof());
+	m_externalGeneralizedForce.setZero();
+	m_externalGeneralizedStiffness.setZero();
+	m_externalGeneralizedDamping.setZero();
 }
 
 const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const
@@ -163,7 +166,7 @@ void DeformableRepresentation::update(double dt)
 				<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
 				<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
 
-		setIsActive(false);
+		setActive(false);
 	}
 }
 
@@ -203,7 +206,7 @@ void DeformableRepresentation::applyCorrection(double dt,
 				<< "position=(" << m_currentState->getPositions() << ")" << std::endl
 				<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
 
-		setIsActive(false);
+		setActive(false);
 	}
 }
 
@@ -215,7 +218,7 @@ void DeformableRepresentation::deactivateAndReset(void)
 			<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
 
 	resetState();
-	setIsActive(false);
+	setActive(false);
 }
 
 void DeformableRepresentation::setCollisionRepresentation(

@@ -155,7 +155,7 @@ void VirtualToolCoupler::update(double dt)
 		Vector3d leverArm = Vector3d::Zero();
 		if (m_calculateInertialTorques)
 		{
-			const Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
+			const Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
 			leverArm = attachmentPoint - objectPosition;
 		}
 		Vector3d attachmentPointVelocity = objectState.getLinearVelocity();
@@ -167,7 +167,6 @@ void VirtualToolCoupler::update(double dt)
 		Vector3d rotationVector;
 		SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationVector);
 		Vector3d torque = m_angularStiffness * rotationVector;
-		torque += leverArm.cross(force);
 		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
@@ -176,28 +175,23 @@ void VirtualToolCoupler::update(double dt)
 		const Matrix33d linearDampingMatrix = m_linearDamping * identity3x3;
 		const Matrix33d angularStiffnessMatrix = m_angularStiffness * identity3x3;
 		const Matrix33d angularDampingMatrix = m_angularDamping * identity3x3;
-		const Matrix33d skewLeverArm = SurgSim::Math::makeSkewSymmetricMatrix(leverArm);
-		const Matrix33d skewForce = SurgSim::Math::makeSkewSymmetricMatrix(force);
 
 		Vector6d generalizedForce;
+		Matrix66d generalizedStiffness, generalizedDamping;
 		generalizedForce << force, torque;
-		Matrix66d generalizedStiffness;
 		generalizedStiffness << linearStiffnessMatrix, zero3x3,
-								m_linearStiffness * skewLeverArm - skewForce, angularStiffnessMatrix;
-		Matrix66d generalizedDamping;
+								zero3x3, angularStiffnessMatrix;
 		generalizedDamping << linearDampingMatrix, zero3x3,
-							  m_linearDamping * skewLeverArm, angularDampingMatrix;
+							  zero3x3, angularDampingMatrix;
 
-		// Here, we could add the external generalized force applied on the attachment point,
-		// the extra torque (leverArm.cross(force)) and its derivatives would be added automatically in the rigid.
-		// But, we do need these informations as well below to pass it on to the haptic, so we compute them
-		// locally and simply add them to the rigid.
-		m_rigid->addExternalGeneralizedForce(generalizedForce, generalizedStiffness, generalizedDamping);
+		SurgSim::DataStructures::Location location;
+		location.rigidLocalPosition.setValue(m_localAttachmentPoint);
+		m_rigid->addExternalGeneralizedForce(location, generalizedForce, generalizedStiffness, generalizedDamping);
 
 		if (m_output != nullptr)
 		{
-			m_outputData.vectors().set(m_forceIndex, -force);
-			m_outputData.vectors().set(m_torqueIndex, -torque);
+			m_outputData.vectors().set(m_forceIndex, -generalizedForce.segment<3>(0));
+			m_outputData.vectors().set(m_torqueIndex, -generalizedForce.segment<3>(3));
 			m_outputData.vectors().set(m_inputLinearVelocityIndex, inputLinearVelocity);
 			m_outputData.vectors().set(m_inputAngularVelocityIndex, inputAngularVelocity);
 
@@ -263,7 +257,7 @@ bool VirtualToolCoupler::doWakeUp()
 	//     dampingRatio = (damping) / (2 * sqrt(mass * stiffness))
 	//
 	double dampingRatio = 1.0;
-	double mass = m_rigid->getCurrentParameters().getMass();
+	double mass = m_rigid->getMass();
 	if (!m_optionalLinearDamping.hasValue())
 	{
 		if (m_optionalLinearStiffness.hasValue())
@@ -289,7 +283,7 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	const Matrix33d& inertia = m_rigid->getCurrentParameters().getLocalInertia();
+	const Matrix33d& inertia = m_rigid->getLocalInertia();
 	double maxInertia = inertia.eigenvalues().real().maxCoeff();
 	if (!m_optionalAngularDamping.hasValue())
 	{
@@ -322,7 +316,7 @@ bool VirtualToolCoupler::doWakeUp()
 	}
 	else
 	{
-		m_localAttachmentPoint = m_rigid->getCurrentParameters().getMassCenter();
+		m_localAttachmentPoint = m_rigid->getMassCenter();
 	}
 
 	return true;

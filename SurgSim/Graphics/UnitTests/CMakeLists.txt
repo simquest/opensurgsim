@@ -83,6 +83,7 @@ file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/Data/Geometry DESTINATION ${CMAK
 
 set(LIBS 
 	SurgSimGraphics
+	SurgSimMath
 	SurgSimTesting
 )
 

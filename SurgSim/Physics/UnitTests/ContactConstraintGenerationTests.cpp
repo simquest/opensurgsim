@@ -31,7 +31,6 @@
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Collision::ContactCalculation;
@@ -50,18 +49,14 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 {
 	virtual void SetUp()
 	{
-		RigidRepresentationParameters params0;
-		params0.setShapeUsedForMassInertia(std::make_shared<SphereShape>(2.0));
 		rigid0 = std::make_shared<RigidRepresentation>("Physics Representation 0");
-		rigid0->setInitialParameters(params0);
+		rigid0->setShape(std::make_shared<SphereShape>(2.0));
 		collision0 = std::make_shared<RigidCollisionRepresentation>("Collision Representation 0");
 		rigid0->setCollisionRepresentation(collision0);
 		representations.push_back(rigid0);
 
-		RigidRepresentationParameters params1;
-		params1.setShapeUsedForMassInertia(std::make_shared<DoubleSidedPlaneShape>());
 		rigid1 = std::make_shared<RigidRepresentation>("Physics Representation 1");
-		rigid1->setInitialParameters(params1);
+		rigid1->setShape(std::make_shared<DoubleSidedPlaneShape>());
 		collision1 = std::make_shared<RigidCollisionRepresentation>("Collision Representation 1");
 		rigid1->setCollisionRepresentation(collision1);
 		representations.push_back(rigid1);
@@ -157,23 +152,23 @@ TEST_F(ContactConstraintGenerationTests, InactivePhysics)
 	state->setCollisionPairs(pairs);
 	ContactConstraintGeneration generator;
 
-	rigid0->setIsActive(false);
-	rigid1->setIsActive(true);
+	rigid0->setActive(false);
+	rigid1->setActive(true);
 	generator.update(0.1, state);
 	ASSERT_EQ(0u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
-	rigid0->setIsActive(true);
-	rigid1->setIsActive(false);
+	rigid0->setActive(true);
+	rigid1->setActive(false);
 	generator.update(0.1, state);
 	ASSERT_EQ(0u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
-	rigid0->setIsActive(false);
-	rigid1->setIsActive(false);
+	rigid0->setActive(false);
+	rigid1->setActive(false);
 	generator.update(0.1, state);
 	ASSERT_EQ(0u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
-	rigid0->setIsActive(true);
-	rigid1->setIsActive(true);
+	rigid0->setActive(true);
+	rigid1->setActive(true);
 	generator.update(0.1, state);
 	ASSERT_EQ(1u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 }

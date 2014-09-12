@@ -44,6 +44,11 @@ namespace
 const double epsilon = 1e-14;
 }
 
+namespace SurgSim
+{
+namespace DataStructures
+{
+
 TEST(OctreeNodeTests, CanConstruct)
 {
 	SurgSim::Math::Aabbd boundingBox(Vector3d::Zero(), Vector3d::Ones());
@@ -339,4 +344,273 @@ TEST(OctreeNodeTests, DoLoadOctree)
 	EXPECT_TRUE(octree->getChild(0)->getChild(2)->hasChildren());
 
 	EXPECT_TRUE(octree->getChild(0)->getChild(2)->getChild(2)->isActive());
+}
+
+TEST(OctreeNodeTests, NeighborhoodTestSimple)
+{
+	OctreePath path;
+	{
+		SCOPED_TRACE("No direction should not fail");
+		std::array<Symbol, 3> direction = { SYMBOL_HALT, SYMBOL_HALT, SYMBOL_HALT};
+		EXPECT_NO_THROW(getNeighbor(path, direction));
+	}
+
+	path.push_back(0);
+	{
+		SCOPED_TRACE("Right of 0 should be 1");
+		std::array<Symbol, 3> direction = { SYMBOL_RIGHT, SYMBOL_HALT, SYMBOL_HALT};
+		EXPECT_NO_THROW(getNeighbor(path, direction));
+		auto result = getNeighbor(path, direction);
+		ASSERT_EQ(1u, result.size());
+		EXPECT_EQ(1, result[0]);
+	}
+
+	{
+		SCOPED_TRACE("Left of 0 with not levels is nothing");
+		std::array<Symbol, 3> direction = { SYMBOL_LEFT, SYMBOL_HALT, SYMBOL_HALT};
+		EXPECT_NO_THROW(getNeighbor(path, direction));
+		auto result = getNeighbor(path, direction);
+		ASSERT_EQ(0u, result.size());
+	}
+}
+
+
+// This verifies the basic non-boundary crossing neighborhoods
+TEST(OctreeNodeTests, NeigborhoodPlainFaces)
+{
+	int testValues[24][3] =
+	{
+		0, SYMBOL_RIGHT, 1,
+		0, SYMBOL_UP, 2,
+		0, SYMBOL_FRONT, 4,
+
+		1, SYMBOL_LEFT, 0,
+		1, SYMBOL_UP, 3,
+		1, SYMBOL_FRONT, 5,
+
+		2, SYMBOL_RIGHT, 3,
+		2, SYMBOL_DOWN, 0,
+		2, SYMBOL_FRONT, 6,
+
+		3, SYMBOL_LEFT, 2,
+		3, SYMBOL_DOWN, 1,
+		3, SYMBOL_FRONT, 7,
+
+		4, SYMBOL_RIGHT, 5,
+		4, SYMBOL_UP, 6,
+		4, SYMBOL_BACK, 0,
+
+		5, SYMBOL_LEFT, 4,
+		5, SYMBOL_UP, 7,
+		5, SYMBOL_BACK, 1,
+
+		6, SYMBOL_RIGHT, 7,
+		6, SYMBOL_DOWN, 4,
+		6, SYMBOL_BACK, 2,
+
+		7, SYMBOL_LEFT, 6,
+		7, SYMBOL_DOWN, 5,
+		7, SYMBOL_BACK, 3
+	};
+
+	for (size_t i = 0; i < 24; ++i)
+	{
+		OctreePath path(1);
+		path[0] = testValues[i][0];
+		std::array<Symbol, 3> direction = { static_cast<Symbol>(testValues[i][1]), SYMBOL_HALT, SYMBOL_HALT};
+
+		auto result = getNeighbor(path, direction);
+		ASSERT_EQ(1u, result.size()) << "For row " << i;
+		EXPECT_EQ(testValues[i][2], result[0]) << "For row " << i;
+	}
+}
+
+/// Verifies face neighbors for one set of second level nodes, this should exercise all of the state table,
+/// the expected data was calculated manually
+TEST(OctreeNodeTests, AllFaceNeighbors)
+{
+	size_t expected[8][7][2] =
+	{
+		// Node	Down	Up		Right	Left	Back	Front
+		7, 0,	5, 2,	7, 2,	7, 1,	6, 1,	3, 4,	7, 4,
+		6, 1,	4, 3,	6, 3,	7, 0,	6, 0,	2, 5,	6, 5,
+		5, 2,	5, 0,	7, 0,	5, 3,	4, 3,	1, 6,	5, 6,
+		4, 3, 	6, 1,	4, 1,	5, 2,	4, 2,	0, 7,	4, 7,
+		3, 4,	1, 6,	3, 6,	2, 5,	3, 5,	3, 0,	7, 0,
+		2, 5,	0, 7,	2, 7,	3, 4,	2, 4,	2, 1,	6, 1,
+		1, 6,	1, 4, 	3, 4, 	1, 7, 	0, 7,	1, 2, 	5, 2,
+		0, 7,	0, 5,	2, 5,	1, 6,	0, 6,   0, 3,	4, 3
+	};
+
+
+	size_t checkSum = 0;
+	for (int i = 0; i < 8; ++i)
+	{
+		OctreePath node;
+		node.push_back(expected[i][0][0]);
+		node.push_back(expected[i][0][1]);
+
+		auto neighbors = getNeighbors(node, NEIGHBORHOOD_FACE);
+		checkSum += neighbors.size();
+
+		for (int j = 0; j < 6; ++j)
+		{
+			OctreePath neighbor;
+			neighbor.push_back(expected[i][1 + j][0]);
+			neighbor.push_back(expected[i][1 + j][1]);
+
+			EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), neighbor) != neighbors.end())
+					<< "Node # " << i << "Neighbor #" << j << " not found";
+
+		}
+	}
+
+	EXPECT_EQ(48u, checkSum);
+}
+
+
+// This verifies edge neighbours for one node
+TEST(OctreeNodeTests, EdgeNeighbors)
+{
+	OctreePath path;
+	path.push_back(1);
+	path.push_back(6);
+
+	auto neighbors = getNeighbors(path, NEIGHBORHOOD_EDGE);
+	const size_t expectedCount = 12;
+	EXPECT_EQ(expectedCount, neighbors.size());
+
+	// Expected coordinates of face neighbors for the node 1/6
+	size_t expected[expectedCount][2] =
+	{
+		// Upper Ring
+		3, 5, // Up Right
+		2, 5, // Up Left
+		3, 0, // Up Back
+		7, 0, // Up Front
+
+		// Lower Ring
+		1, 5, // Down Right
+		0, 5, // Down Left
+		1, 0, // Down Back
+		5, 0, // Down Front
+
+		// Horizontals
+		1, 3, // Back Right
+		0, 3, // Back Left
+		5, 3, // Front Right
+		4, 3, // Front Left
+	};
+
+	for (size_t i = 0; i < expectedCount; ++i)
+	{
+		OctreePath path;
+		path.push_back(expected[i][0]);
+		path.push_back(expected[i][1]);
+
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), path) != neighbors.end())
+				<< "Item #" << i << " not found";
+	}
+
+}
+
+// This verifies corner neighbours for one node
+TEST(OctreeNodeTests, VertexNeighbors)
+{
+	OctreePath path;
+	path.push_back(1);
+	path.push_back(6);
+
+	auto neighbors = getNeighbors(path, NEIGHBORHOOD_VERTEX);
+	const size_t expectedCount = 8;
+
+	EXPECT_EQ(expectedCount, neighbors.size());
+
+	// Expected coordinates of face neighbors for the node 1/6
+	size_t expected[expectedCount][2] =
+	{
+		// Lower Ring
+		5, 1, // Down Right Front
+		1, 1, // Down Right Back
+		4, 1, // Down Left Front
+		0, 1, // Down Left Back
+
+		// Upper Ring
+		7, 1, // Up Right Front
+		3, 1, // Up Right Back
+		6, 1, // Up Left Front
+		2, 1, // Up Left Back
+	};
+
+	for (size_t i = 0; i < expectedCount; ++i)
+	{
+		OctreePath path;
+		path.push_back(expected[i][0]);
+		path.push_back(expected[i][1]);
+
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), path) != neighbors.end())
+				<< "Item #" << i << " not found";
+	}
+}
+
+
+TEST(OctreeNodeTests, AllNeighbors)
+{
+	// All of these nodes are interior, they should return 26 neighbors
+	size_t nodes[8][2] =
+	{
+		7, 0, 6, 1, 5, 2, 4, 3, 3, 4, 2, 5, 1, 6, 0, 7
+	};
+
+	for (int i = 0; i < 8; ++i)
+	{
+		OctreePath path;
+		path.push_back(nodes[i][0]);
+		path.push_back(nodes[i][1]);
+
+		auto neighbors = getNeighbors(path, NEIGHBORHOOD_FACE | NEIGHBORHOOD_EDGE | NEIGHBORHOOD_VERTEX);
+
+		EXPECT_EQ(26u, neighbors.size());
+	}
+}
+
+TEST(OctreeNodeTests, IncompleteNeighbors)
+{
+	static const size_t numNodes = 16;
+	size_t nodes[numNodes][3] =
+	{
+		//Node, Expected Vertex Neighbors
+		0, 0, 1, // These are the cube corner pieces
+		1, 1, 1,
+		2, 2, 1,
+		3, 3, 1,
+		4, 4, 1,
+		5, 5, 1,
+		6, 6, 1,
+		7, 7, 1,
+		5, 4, 2, // These are on the outside cube edge
+		3, 2, 2,
+		1, 5, 2,
+		0, 4, 2,
+		3, 6, 4, // These are on an outside surface
+		1, 4, 4,
+		4, 2, 4,
+		7, 2, 4
+	};
+
+	for (size_t i = 0; i < numNodes; ++i)
+	{
+		OctreePath path;
+		path.push_back(nodes[i][0]);
+		path.push_back(nodes[i][1]);
+
+		auto neighbors = getNeighbors(path, NEIGHBORHOOD_VERTEX);
+
+		EXPECT_EQ(nodes[i][2], neighbors.size())
+				<< "Incorrect Neighbor Count for Node #" << i
+				<< " [" << path[0] << ", " << path[1] << "].";
+	}
+}
+
+}
 }

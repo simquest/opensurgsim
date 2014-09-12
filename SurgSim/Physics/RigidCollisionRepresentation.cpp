@@ -75,7 +75,7 @@ const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getSha
 		auto physicsRepresentation = m_physicsRepresentation.lock();
 		SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
 				"PhysicsRepresentation went out of scope for Collision Representation " << getName();
-		return physicsRepresentation->getCurrentParameters().getShapeUsedForMassInertia();
+		return physicsRepresentation->getShape();
 	}
 }
 
