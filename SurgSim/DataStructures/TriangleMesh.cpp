@@ -71,11 +71,11 @@ bool TriangleMesh::doLoad(const std::string& fileName)
 void TriangleMesh::copyWithTransform(const SurgSim::Math::RigidTransform3d& pose, const TriangleMesh& source)
 {
 	SURGSIM_ASSERT(getNumVertices() == source.getNumVertices())
-		<< "The source mesh must have the same number of vertices.";
+			<< "The source mesh must have the same number of vertices.";
 	SURGSIM_ASSERT(getNumEdges() == source.getNumEdges())
-		<< "The source mesh must have the same number of edges";
+			<< "The source mesh must have the same number of edges";
 	SURGSIM_ASSERT(getNumTriangles() == source.getNumTriangles())
-		<< "The source mesh must have the same number of triangles";
+			<< "The source mesh must have the same number of triangles";
 
 	auto targetVertex = getVertices().begin();
 	auto const& vertices = source.getVertices();
@@ -89,7 +89,11 @@ void TriangleMesh::copyWithTransform(const SurgSim::Math::RigidTransform3d& pose
 	auto const& triangles = source.getTriangles();
 	for (auto it = triangles.cbegin(); it != triangles.cend(); ++it)
 	{
-		targetTriangle->data.normal = pose.linear() * it->data.normal;
+		targetTriangle->isValid = it->isValid;
+		if (it->isValid)
+		{
+			targetTriangle->data.normal = pose.linear() * it->data.normal;
+		}
 		++targetTriangle;
 	}
 }
