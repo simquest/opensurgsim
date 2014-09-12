@@ -53,7 +53,7 @@ public:
 		size_t result = 0;
 		for (auto i : path)
 		{
-			result = result * 10 + i;
+			result = (result << 3) | i;
 		}
 
 		return m_hasher(result);
@@ -209,7 +209,7 @@ public:
 	/// Get the node at the supplied path
 	/// \throws SurgSim::Framework::AssertionFailure if returnLastValid is false and the node does not exist.
 	/// \param path the path to the specific node
-	/// \param returnLastValid if true and the path is longer than the tree dee, the function will return
+	/// \param returnLastValid if true and the path is longer than the tree deep, the function will return
 	//                         the last node on a given path, otherwise it will throw.
 	/// \return the requested octree node
 	virtual std::shared_ptr<OctreeNode<Data> > getNode(const OctreePath& path, bool returnLastValid = false);
