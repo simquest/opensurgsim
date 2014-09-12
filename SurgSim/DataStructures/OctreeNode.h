@@ -18,11 +18,13 @@
 
 #include <array>
 #include <memory>
+#include <functional>
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Aabb.h"
+
 
 namespace SurgSim
 {
@@ -40,13 +42,34 @@ namespace DataStructures
 /// the specific node the front of the vector holds the index of the root's children.
 typedef std::vector<size_t> OctreePath;
 
+/// Enable the OctreePath to be used as a key in an unordered map, if the int range is exceeded this will just
+/// push the least significant numbers (root addresses) out of scope, it loses a little bit of address space as
+/// octree ids only go from 0-7
+class OctreePathHash
+{
+public:
+	size_t operator()(const OctreePath& path) const
+	{
+		size_t result = 0;
+		for (auto i : path)
+		{
+			result = (result << 3) | i;
+		}
+
+		return m_hasher(result);
+	}
+private:
+	std::hash<size_t> m_hasher;
+};
+
 /// Indicates what neighbors to grab
 enum Neighborhood
 {
 	NEIGHBORHOOD_NONE = 0x0,
 	NEIGHBORHOOD_FACE = 0x1,
 	NEIGHBORHOOD_EDGE = 0x2,
-	NEIGHBORHOOD_VERTEX  = 0x4
+	NEIGHBORHOOD_VERTEX  = 0x4,
+	NEIGHBORHOOD_ALL = 0x1 | 0x2 | 0x4
 };
 
 /// Direction code for the neighborhood search
@@ -151,7 +174,7 @@ public:
 
 	/// Subdivide the node into 8 equal regions. Each subregion will be stored
 	/// as this nodes children.
-	/// NOTE: The data stored in the current node will not be automatically subdivided.
+	/// \note The data stored in the current node will not be automatically subdivided.
 	void subdivide();
 
 	/// Add data to a node in this octree
@@ -172,21 +195,24 @@ public:
 	const std::array<std::shared_ptr<OctreeNode<Data> >, 8>& getChildren() const;
 
 	/// Get a child of this node (non const version)
+	/// \throws SurgSim::Framework::AssertionFailure if the index >= 8
 	/// \param index the child index
 	/// \return the requested octree node
-	/// NOTE: an exception will be thrown if the index >= 8
 	std::shared_ptr<OctreeNode<Data> > getChild(size_t index);
 
 	/// Get a child of this node
+	/// \throws SurgSim::Framework::AssertionFailure if the index >= 8
 	/// \param index the child index
 	/// \return the requested octree node
-	/// NOTE: an exception will be thrown if the index >= 8
 	const std::shared_ptr<OctreeNode<Data> > getChild(size_t index) const;
 
 	/// Get the node at the supplied path
+	/// \throws SurgSim::Framework::AssertionFailure if returnLastValid is false and the node does not exist.
 	/// \param path the path to the specific node
+	/// \param returnLastValid if true and the path is longer than the tree deep, the function will return
+	//                         the last node on a given path, otherwise it will throw.
 	/// \return the requested octree node
-	virtual std::shared_ptr<OctreeNode<Data> > getNode(const OctreePath& path);
+	virtual std::shared_ptr<OctreeNode<Data> > getNode(const OctreePath& path, bool returnLastValid = false);
 
 	/// Extra node data
 	Data data;

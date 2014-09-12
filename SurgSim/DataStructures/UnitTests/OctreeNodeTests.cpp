@@ -215,8 +215,14 @@ TEST(OctreeNodeTests, OctreePath)
 	EXPECT_NO_THROW(octree->getNode(path));
 	EXPECT_NE(nullptr, octree->getNode(path));
 
+	auto previous = octree->getNode(path);
+
 	path.push_back(1);
 	EXPECT_THROW(octree->getNode(path), SurgSim::Framework::AssertionFailure);
+
+	// Should return the last valid node on the path
+	EXPECT_NO_THROW(octree->getNode(path, true));
+	EXPECT_EQ(previous, octree->getNode(path, true));
 }
 
 TEST(OctreeNodeTests, CopyConstructor)
