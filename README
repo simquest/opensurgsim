@@ -24,7 +24,7 @@ To help get started using OpenSurgSim, use the following quick start
 guide.
 
     1. Getting OpenSurgSim
-    2. Compiling on Linux
+    2. Compiling on GNU/Linux
     3. Compiling on Windows
     4. Running the Examples
 	Appendix: Dependencies
@@ -50,19 +50,19 @@ OpenSurgSim/ directory.
 OpenSurgSim has been tested extensively on Debian Testing (Jessie) as
 well as Ubuntu 14.04 (Trusty Tahr). If you are using another GNU/Linux
 distribution, please check your package management system for the
-dependancies (see Appendix). For Debian/Ubuntu based systems, the
+dependencies (see Appendix). For Debian/Ubuntu based systems, the
 dependencies are easily installed through apt-get:
 
     sudo apt-get install libboost-all-dev libeigen3-dev libopenscenegraph-dev
-	sudo apt-get install cmake doxygen google-mock
+    sudo apt-get install cmake doxygen google-mock
 
 To build OpenSurgSim, issue the following commands from the same
 directory used to obtain OpenSurgSim (see Section 1.)
 
     mkdir OpenSurgSim/Build
     cd OpenSurgSim/Build
-	cmake ../
-	make
+    cmake ../
+    make
 
 That's it!
 
