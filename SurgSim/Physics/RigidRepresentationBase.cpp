@@ -188,14 +188,16 @@ void RigidRepresentationBase::updateProperties()
 	if (m_shape != nullptr)
 	{
 		SURGSIM_ASSERT(m_shape->isValid()) << "Invalid shape.";
-		m_mass         = m_rho * m_shape->getVolume();
-		m_massCenter   = m_shape->getCenter();
-		m_localInertia = m_rho * m_shape->getSecondMomentOfVolume();
-		m_parametersValid = m_rho > 0.0 &&
-			SurgSim::Math::isValid(m_localInertia) &&
-			!m_localInertia.isZero() &&
-			m_localInertia.diagonal().minCoeff() > 0.0 &&
-			SurgSim::Math::isValid(m_mass) && m_mass > 0.0;
+		if (m_rho > 0.0)
+		{
+			m_mass         = m_rho * m_shape->getVolume();
+			m_massCenter   = m_shape->getCenter();
+			m_localInertia = m_rho * m_shape->getSecondMomentOfVolume();
+			m_parametersValid = SurgSim::Math::isValid(m_localInertia) &&
+				!m_localInertia.isZero() &&
+				m_localInertia.diagonal().minCoeff() > 0.0 &&
+				SurgSim::Math::isValid(m_mass) && m_mass > 0.0;
+		}
 	}
 }
 
