@@ -28,6 +28,8 @@ surgsim_add_library(
 	"SurgSim/PrecompiledHeader"
 )
 
+add_dependencies(PrecompiledHeader yaml-cpp)
+
 if(SURGSIM_PRECOMPILED_HEADERS)
 	if(MSVC)
 		set_source_files_properties(PrecompiledHeader.cpp PROPERTIES COMPILE_FLAGS "/YcPrecompiledHeader.h")
