@@ -41,6 +41,7 @@ RigidRepresentationBase::RigidRepresentationBase(const std::string& name) :
 	m_angularDamping(0.0)
 {
 	m_localInertia.setConstant(std::numeric_limits<double>::quiet_NaN());
+	m_massCenter.setConstant(std::numeric_limits<double>::quiet_NaN());
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, RigidRepresentationState,
 									  RigidRepresentationState, getInitialState, setInitialState);
@@ -188,10 +189,10 @@ void RigidRepresentationBase::updateProperties()
 	if (m_shape != nullptr)
 	{
 		SURGSIM_ASSERT(m_shape->isValid()) << "Invalid shape.";
+		m_massCenter   = m_shape->getCenter();
 		if (m_rho > 0.0)
 		{
 			m_mass         = m_rho * m_shape->getVolume();
-			m_massCenter   = m_shape->getCenter();
 			m_localInertia = m_rho * m_shape->getSecondMomentOfVolume();
 			m_parametersValid = SurgSim::Math::isValid(m_localInertia) &&
 				!m_localInertia.isZero() &&
