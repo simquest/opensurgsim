@@ -229,6 +229,7 @@ TEST_F(RigidRepresentationTest, SetGetAndDefaultValueTest)
 TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceOnMassCenterTest)
 {
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+	rigidBody->setShape(m_sphere);
 
 	Vector6d F = 6.4 * Vector6d::Ones();
 	Matrix66d K = 0.4 * Matrix66d::Ones() + 8.3 * Matrix66d::Identity();
@@ -351,6 +352,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		Vector3d anchorLocalPoint = Vector3d::Ones();
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setShape(m_sphere);
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
@@ -381,6 +383,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		Vector3d anchorLocalPoint = Vector3d::Ones();
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setShape(m_sphere);
 		SurgSim::DataStructures::Location location(anchorLocalPoint);
 
 		Vector6d Fnumeric = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofV);
@@ -415,6 +418,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		Vector3d anchorLocalPoint = Vector3d::Ones();
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setShape(m_sphere);
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
@@ -452,6 +456,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		Vector3d anchorLocalPoint = Vector3d::Ones();
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setShape(m_sphere);
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
@@ -647,6 +652,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 			targetRotationVector, targetAngularVelocity, dofX, dofV, true, localAnchorPoint);
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setShape(m_sphere);
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
@@ -692,6 +698,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 			targetRotationVector, targetAngularVelocity, dofX, dofV, true, localAnchorPoint);
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setShape(m_sphere);
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
@@ -729,6 +736,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 			targetRotationVector, targetAngularVelocity, dofX, dofV, true, localAnchorPoint);
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setShape(m_sphere);
 		SurgSim::Physics::RigidRepresentationState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
