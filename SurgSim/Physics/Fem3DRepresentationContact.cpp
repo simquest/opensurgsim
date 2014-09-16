@@ -56,7 +56,6 @@ void Fem3DRepresentationContact::doBuild(double dt,
 
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
-	const double d = contactData.getDistance();
 
 	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<Fem3DRepresentationLocalization>(localization)->getLocalPosition();
@@ -74,10 +73,13 @@ void Fem3DRepresentationContact::doBuild(double dt,
 	// n^t.u + (n^t.p(free) + d) >= 0
 	//
 	// For implicit integration, u = dt.v(t+dt)
+	// 
+	// Since the d term will be added to the constraint for one side of the contact and subtracted from the other,
+	// and because it is not clear which distance should be used, we leave it out.
 
 	// Update b with new violation
 	Vector3d globalPosition = localization->calculatePosition();
-	double violation = n.dot(globalPosition) + d;
+	double violation = n.dot(globalPosition);
 
 	mlcp->b[indexOfConstraint] += violation * scale;
 

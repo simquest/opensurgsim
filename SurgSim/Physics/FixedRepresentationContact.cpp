@@ -55,12 +55,11 @@ void FixedRepresentationContact::doBuild(double dt,
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE ? 1.0 : -1.0);
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
-	const double d = contactData.getDistance();
 
 	SurgSim::Math::Vector3d globalPosition = localization->calculatePosition();
 
 	// Fill up b with the constraint equation...
-	double violation = n.dot(globalPosition) + d;
+	double violation = n.dot(globalPosition);
 	b[indexOfConstraint] += violation * scale;
 }
 
