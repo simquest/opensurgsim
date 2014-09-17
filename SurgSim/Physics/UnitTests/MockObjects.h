@@ -30,6 +30,7 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Mass.h"
@@ -90,6 +91,17 @@ class MockRigidRepresentation : public RigidRepresentation
 {
 public:
 	MockRigidRepresentation();
+
+	// Non constant access to the states
+	RigidRepresentationState& getInitialState();
+	RigidRepresentationState& getCurrentState();
+	RigidRepresentationState& getPreviousState();
+};
+
+class MockFixedRepresentation : public FixedRepresentation
+{
+public:
+	MockFixedRepresentation();
 
 	// Non constant access to the states
 	RigidRepresentationState& getInitialState();

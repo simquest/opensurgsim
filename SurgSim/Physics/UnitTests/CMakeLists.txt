@@ -51,7 +51,6 @@ set(UNIT_TEST_SOURCES
 	FemRepresentationTests.cpp
 	FixedRepresentationBilateral3DTests.cpp
 	FixedRepresentationContactTests.cpp
-	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
@@ -68,9 +67,9 @@ set(UNIT_TEST_SOURCES
 	PushResultsTests.cpp
 	RepresentationTest.cpp
 	RigidCollisionRepresentationTest.cpp
+	RigidRepresentationBaseLocalizationTest.cpp
 	RigidRepresentationBilateral3DTests.cpp
 	RigidRepresentationContactTests.cpp
-	RigidRepresentationLocalizationTest.cpp
 	RigidRepresentationStateTest.cpp
 	RigidRepresentationTest.cpp
 	SolveMlcpTests.cpp

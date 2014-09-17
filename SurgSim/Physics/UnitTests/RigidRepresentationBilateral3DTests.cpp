@@ -25,8 +25,8 @@
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
@@ -78,7 +78,7 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcp)
 	// Setup parameters for RigidRepresentationBilateral3D::build
 	auto representation = std::make_shared<MockRigidRepresentation>();
 	representation->setShape(std::make_shared<SurgSim::Math::SphereShape>(1.0));
-	auto localization = std::make_shared<RigidRepresentationLocalization>(representation);
+	auto localization = std::make_shared<RigidRepresentationBaseLocalization>(representation);
 	localization->setLocalPosition(objectPose.inverse() * constraintPoint);
 	representation->getCurrentState().setPose(objectPose);
 
@@ -130,7 +130,7 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcpTwoStep)
 
 	auto representation = std::make_shared<MockRigidRepresentation>();
 	representation->setShape(std::make_shared<SurgSim::Math::SphereShape>(1.0));
-	auto localization = std::make_shared<RigidRepresentationLocalization>(representation);
+	auto localization = std::make_shared<RigidRepresentationBaseLocalization>(representation);
 
 	localization->setLocalPosition(objectPoseLhs.inverse() * constraintPointLhs);
 	representation->getCurrentState().setPose(objectPoseLhs);

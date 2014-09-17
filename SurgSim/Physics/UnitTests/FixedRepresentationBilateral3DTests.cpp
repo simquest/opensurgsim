@@ -22,7 +22,7 @@
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
-#include "SurgSim/Physics/FixedRepresentationLocalization.h"
+#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
 using SurgSim::Math::Vector3d;
@@ -64,7 +64,7 @@ TEST(FixedRepresentationBilateral3DTests, BuildMlcp)
 
 	// Setup parameters for FixedRepresentationBilateral3D::build
 	auto localization
-		= std::make_shared<FixedRepresentationLocalization>(std::make_shared<FixedRepresentation>("representation"));
+		= std::make_shared<RigidRepresentationBaseLocalization>(std::make_shared<FixedRepresentation>("representation"));
 	localization->setLocalPosition(actual);
 
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(0, 3, 1);
@@ -97,7 +97,7 @@ TEST(FixedRepresentationBilateral3DTests, BuildMlcpTwoStep)
 	ConstraintData emptyConstraint;
 
 	auto localization
-		= std::make_shared<FixedRepresentationLocalization>(std::make_shared<FixedRepresentation>("representation"));
+		= std::make_shared<RigidRepresentationBaseLocalization>(std::make_shared<FixedRepresentation>("representation"));
 
 	localization->setLocalPosition(actual);
 	ASSERT_NO_THROW(constraint.build(

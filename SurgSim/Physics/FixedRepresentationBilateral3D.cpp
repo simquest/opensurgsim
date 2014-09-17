@@ -15,8 +15,8 @@
 
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
-#include "SurgSim/Physics/FixedRepresentationLocalization.h"
 #include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 
 using SurgSim::Math::Vector3d;
 

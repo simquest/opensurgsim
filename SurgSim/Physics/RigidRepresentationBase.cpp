@@ -24,7 +24,7 @@
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
+#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/PhysicsConvert.h"
 
 namespace SurgSim
@@ -121,7 +121,7 @@ const RigidRepresentationState& RigidRepresentationBase::getPreviousState() cons
 std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(
 	const SurgSim::DataStructures::Location& location)
 {
-	return std::move(createTypedLocalization<RigidRepresentationLocalization>(location));
+	return std::move(createTypedLocalization<RigidRepresentationBaseLocalization>(location));
 }
 
 void RigidRepresentationBase::setDensity(double rho)
