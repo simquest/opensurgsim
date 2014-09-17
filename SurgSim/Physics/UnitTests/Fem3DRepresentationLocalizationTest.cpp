@@ -86,7 +86,7 @@ public:
 		}
 
 		m_fem->setInitialState(state);
-		m_fem->setActive(true);
+		m_fem->setLocalActive(true);
 
 		// FEMRepresentation for Fem3DElementCube
 		m_fem3DCube = std::make_shared<Fem3DRepresentation>("Fem3dCubeRepresentation");
@@ -114,7 +114,7 @@ public:
 			m_fem3DCube->addFemElement(femElement);
 		}
 		m_fem3DCube->setInitialState(restState);
-		m_fem3DCube->setActive(true);
+		m_fem3DCube->setLocalActive(true);
 
 		m_validLocalPosition.index = 1;
 		m_validLocalPosition.coordinate = SurgSim::Math::Vector::Zero(4);

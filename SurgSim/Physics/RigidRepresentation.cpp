@@ -201,9 +201,9 @@ void RigidRepresentation::beforeUpdate(double dt)
 	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
 						   " deactivated in beforeUpdate because parameters are not valid." << std::endl;
-	if (!isActive() || !m_parametersValid)
+	if (!m_parametersValid)
 	{
-		setActive(false);
+		setLocalActive(false);
 		return;
 	}
 }
@@ -217,9 +217,9 @@ void RigidRepresentation::update(double dt)
 	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
 						   " deactivated in update because parameters are not valid." << std::endl;
-	if (!isActive() || !m_parametersValid)
+	if (!m_parametersValid)
 	{
-		setActive(false);
+		setLocalActive(false);
 		return;
 	}
 
@@ -302,7 +302,7 @@ void RigidRepresentation::update(double dt)
 			"|q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
-		setActive(false);
+		setLocalActive(false);
 	}
 
 	// Prepare the compliance matrix
@@ -316,9 +316,9 @@ void RigidRepresentation::afterUpdate(double dt)
 	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
 						   " deactivated in afterUpdate because parameters are not valid." << std::endl;
-	if (!isActive() || !m_parametersValid)
+	if (!m_parametersValid)
 	{
-		setActive(false);
+		setLocalActive(false);
 		return;
 	}
 
@@ -337,9 +337,9 @@ void RigidRepresentation::applyCorrection(double dt,
 	SURGSIM_LOG_IF(!m_parametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
 						   " deactivated in applyCorrection because parameters are not valid." << std::endl;
-	if (!isActive() || !m_parametersValid)
+	if (!m_parametersValid)
 	{
-		setActive(false);
+		setLocalActive(false);
 		return;
 	}
 
@@ -385,7 +385,7 @@ void RigidRepresentation::applyCorrection(double dt,
 			"and |q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
-		setActive(false);
+		setLocalActive(false);
 	}
 
 	// Prepare the compliance matrix
@@ -404,9 +404,9 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
 						   " deactivated in computComplianceMatrix because parameters are not valid." <<
 						   std::endl;
-	if (!isActive() || !m_parametersValid)
+	if (!m_parametersValid)
 	{
-		setActive(false);
+		setLocalActive(false);
 		return;
 	}
 
@@ -426,7 +426,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 
 void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
 {
-	if (!isActive() || !m_parametersValid)
+	if (!m_parametersValid)
 	{
 		// do not setIsActive(false) due to invalid parameters because RigidRepresentationBase::setInitialParameters may
 		// not have been called before RigidRepresentationBase::setInitialState (which calls this function), in which

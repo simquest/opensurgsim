@@ -17,7 +17,7 @@
 #include <string>
 
 #include "Examples/Stapling/StaplerBehavior.h"
-#include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
+#include "SurgSim/Blocks/KeyboardTogglesComponentBehavior.h"
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
@@ -56,7 +56,7 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 
-using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
+using SurgSim::Blocks::KeyboardTogglesComponentBehavior;
 using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
 using SurgSim::Blocks::VisualizeContactsBehavior;
 using SurgSim::Collision::ShapeCollisionRepresentation;
@@ -112,7 +112,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	meshShape->load(filename);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
-	auto graphicalFem = std::make_shared<OsgMeshRepresentation>("Triangle mesh");
+	auto graphicalFem = std::make_shared<OsgMeshRepresentation>("Graphics");
 	graphicalFem->setFilename(filename);
 	sceneElement->addComponent(graphicalFem);
 
@@ -134,9 +134,10 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// WireFrame of the finite element model
 	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> wireFrameFem
-		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Wire frame");
+		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Wire Frame");
 	wireFrameFem->setFilename(filename);
 	wireFrameFem->setDrawAsWireFrame(true);
+	wireFrameFem->setLocalActive(false);
 	sceneElement->addComponent(wireFrameFem);
 
 	// Behavior transfers the position of the physics representation to wire frame representation of the fem.
@@ -168,9 +169,10 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	meshShapeForCollision->load(filename);
 
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
-		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
+		std::make_shared<OsgMeshRepresentation>("Collision Mesh");
 	meshShapeVisualization->setFilename(filename);
 	meshShapeVisualization->setDrawAsWireFrame(true);
+	meshShapeVisualization->setLocalActive(false);
 
 	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	physicsRepresentation->setIsGravityEnabled(false);
@@ -199,12 +201,13 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	staplerBehavior->enableStaplingForSceneElement("wound");
 
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
-		std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");
+		std::make_shared<VisualizeContactsBehavior>("Contacts");
 	visualizeContactsBehavior->setCollisionRepresentation(collisionRepresentation);
 	// Note: Since usually the penetration depth of a collision is so small (at the magnitude of mm),
 	// if we use the depth as the length of vector, the vector field will be too small to be seen on the screen.
 	// Thus, we enlarge the vector field by 200 times.
 	visualizeContactsBehavior->setVectorFieldScale(200);
+	visualizeContactsBehavior->setLocalActive(false);
 
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(staplerName);
 	sceneElement->addComponent(physicsRepresentation);
@@ -241,13 +244,6 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 		virtualTeeth[i] = virtualToothCollision;
 		sceneElement->addComponent(virtualToothCollision);
-
-		std::shared_ptr<MeshRepresentation> virtualToothMesh
-			= std::make_shared<OsgMeshRepresentation>("virtualToothMesh" + std::to_string(i));
-		virtualToothMesh->setFilename((*it)->getFileName());
-		virtualToothMesh->setDrawAsWireFrame(true);
-
-		sceneElement->addComponent(virtualToothMesh);
 	}
 
 	staplerBehavior->setVirtualTeeth(virtualTeeth);
@@ -263,10 +259,10 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 
 	// Graphic representation for arm
 	std::shared_ptr<SceneryRepresentation> forearmSceneryRepresentation =
-		createSceneryObject("forearm", "Geometry/forearm.osgb");
+		createSceneryObject("Forearm", "Geometry/forearm.osgb");
 	forearmSceneryRepresentation->setMaterial(material);
 	std::shared_ptr<SceneryRepresentation> upperarmSceneryRepresentation =
-		createSceneryObject("upperarm", "Geometry/upperarm.osgb");
+		createSceneryObject("Upperarm", "Geometry/upperarm.osgb");
 	upperarmSceneryRepresentation->setMaterial(material);
 
 	// Arm collision mesh
@@ -274,9 +270,11 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 	meshShape->load(filename);
 
 	// Visualization of arm collision mesh
-	std::shared_ptr<MeshRepresentation> meshShapeVisualization = std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
+	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
+		std::make_shared<OsgMeshRepresentation>("Collision Mesh");
 	meshShapeVisualization->setFilename(filename);
 	meshShapeVisualization->setDrawAsWireFrame(true);
+	meshShapeVisualization->setLocalActive(false);
 
 	std::shared_ptr<FixedRepresentation> physicsRepresentation = std::make_shared<FixedRepresentation>("Physics");
 	physicsRepresentation->setShape(meshShape);
@@ -443,22 +441,21 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
 	keyboardComponent->setDeviceName("Keyboard"); // Name of device is case sensitive.
-	std::shared_ptr<KeyboardTogglesGraphicsBehavior> keyboardBehavior =
-		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardBehavior");
+	std::shared_ptr<KeyboardTogglesComponentBehavior> keyboardBehavior =
+		std::make_shared<KeyboardTogglesComponentBehavior>("KeyboardBehavior");
 	keyboardBehavior->setInputComponent(keyboardComponent);
 
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Handle"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Indicator"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Markings"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Trigger"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, stapler->getComponent("StaplerOsgMesh"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, arm->getComponent("forearm"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, arm->getComponent("upperarm"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, arm->getComponent("ArmOsgMesh"));
-	keyboardBehavior->registerKey(
-		SurgSim::Device::KeyCode::KEY_E, wound->getComponent("Triangle mesh"));
-	keyboardBehavior->registerKey(
-		SurgSim::Device::KeyCode::KEY_F, wound->getComponent("Wire frame"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, stapler->getComponent("Contacts"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, stapler->getComponent("Collision Mesh"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, arm->getComponent("Forearm"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, arm->getComponent("Upperarm"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_E, arm->getComponent("Collision Mesh"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_F, wound->getComponent("Graphics"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_G, wound->getComponent("Wire Frame"));
 
 	std::shared_ptr<SceneElement> keyboard = std::make_shared<BasicSceneElement>("SceneElement");
 	keyboard->addComponent(keyboardComponent);
