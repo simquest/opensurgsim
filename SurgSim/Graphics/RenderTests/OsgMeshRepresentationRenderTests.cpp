@@ -388,10 +388,8 @@ TEST_F(OsgMeshRepresentationRenderTests, TriangleDeletionTest)
 			}
 		}
 
-		double scale = interpolate(interpolator.scale, t);
 		RigidTransform3d transform = interpolate(interpolator.transform, t);
 		element->setPose(transform);
-
 
 		/// The total number of steps should complete in 1 second
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps) * 4);
