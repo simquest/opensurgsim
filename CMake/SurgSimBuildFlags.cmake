@@ -31,7 +31,7 @@ endif()
 # Define our own debug symbol
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOSS_DEBUG")
 
-option(SURGSIM_WARNINGS_AS_ERRORS "Treat warnings as errors in the compilation process" ON) 
+option(SURGSIM_WARNINGS_AS_ERRORS "Treat warnings as errors in the compilation process" OFF)
 
 # G++ (C++ compilation) specific settings
 if(CMAKE_COMPILER_IS_GNUCXX)
