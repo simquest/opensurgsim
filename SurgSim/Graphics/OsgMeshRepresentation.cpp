@@ -183,7 +183,7 @@ void OsgMeshRepresentation::updateTriangles()
 {
 	int i = 0;
 	m_triangles->resize(m_mesh->getNumTriangles() * 3);
-	for (const auto& triangle : m_mesh->getTriangles())
+	for (auto const& triangle : m_mesh->getTriangles())
 	{
 		if (triangle.isValid)
 		{

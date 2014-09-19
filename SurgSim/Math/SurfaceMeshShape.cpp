@@ -128,7 +128,7 @@ void SurfaceMeshShape::computeVolumeIntegrals()
 	Eigen::VectorXd integral(10);
 	integral.setZero();
 
-	for (const auto& triangle : m_mesh->getTriangles())
+	for (auto const& triangle : m_mesh->getTriangles())
 	{
 		if (!triangle.isValid)
 		{

@@ -151,7 +151,7 @@ template <class VertexData, class EdgeData, class TriangleData>
 const typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType&
 TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(size_t id) const
 {
-	const auto& triangle = m_triangles[id];
+	auto const& triangle = m_triangles[id];
 	SURGSIM_ASSERT(triangle.isValid == true) << "Attempted to access invalid or deleted triangle.";
 	return triangle;
 }
