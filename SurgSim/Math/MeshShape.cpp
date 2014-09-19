@@ -122,7 +122,7 @@ void MeshShape::computeVolumeIntegrals()
 	Eigen::VectorXd integral(10); // integral order: 1, x, y, z, x^2, y^2, z^2, xy, yz, zx
 	integral.setZero();
 
-	for (const auto& triangle : m_mesh->getTriangles())
+	for (auto const& triangle : m_mesh->getTriangles())
 	{
 		if (! triangle.isValid)
 		{
@@ -198,7 +198,7 @@ void MeshShape::updateAabbTree()
 {
 	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
 
-	const auto& triangles = m_mesh->getTriangles();
+	auto const& triangles = m_mesh->getTriangles();
 	for (size_t id = 0; id < triangles.size(); ++id)
 	{
 		if (triangles[id].isValid)
