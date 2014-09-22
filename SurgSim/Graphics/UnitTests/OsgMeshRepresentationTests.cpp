@@ -119,7 +119,7 @@ TEST(OsgMeshRepresentationTests, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 	YAML::Node data;
 	data = node["SurgSim::Graphics::OsgMeshRepresentation"];
-	EXPECT_EQ(9u, data.size());
+	EXPECT_EQ(8u, data.size());
 
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> newOsgMesh;
 	ASSERT_NO_THROW(newOsgMesh =

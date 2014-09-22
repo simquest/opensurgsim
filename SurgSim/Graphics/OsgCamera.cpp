@@ -126,14 +126,10 @@ bool OsgCamera::setRenderGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	}
 }
 
-void OsgCamera::setVisible(bool visible)
+void OsgCamera::setLocalActive(bool val)
 {
-	m_switch->setChildValue(m_camera, visible);
-}
-
-bool OsgCamera::isVisible() const
-{
-	return m_switch->getChildValue(m_camera);
+	Component::setLocalActive(val);
+	m_switch->setChildValue(m_camera, isActive());
 }
 
 SurgSim::Math::Matrix44d OsgCamera::getViewMatrix() const

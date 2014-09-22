@@ -55,15 +55,10 @@ OsgRepresentation::~OsgRepresentation()
 
 }
 
-void OsgRepresentation::setVisible(bool visible)
+void OsgRepresentation::setLocalActive(bool val)
 {
-	m_switch->setChildValue(m_transform, isActive() && visible);
-	m_isVisible = visible;
-}
-
-bool OsgRepresentation::isVisible() const
-{
-	return m_switch->getChildValue(m_transform);
+	Component::setLocalActive(val);
+	m_switch->setChildValue(m_transform, isActive());
 }
 
 void OsgRepresentation::update(double dt)

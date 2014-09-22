@@ -31,15 +31,15 @@ TEST(GroupTests, InitTest)
 	ASSERT_NO_THROW({std::shared_ptr<Group> group = std::make_shared<MockGroup>("test name");});
 }
 
-TEST(GroupTests, VisibilityTest)
+TEST(GroupTests, ActivityTest)
 {
 	std::shared_ptr<Group> group = std::make_shared<MockGroup>("test name");
 
-	group->setVisible(true);
-	EXPECT_TRUE(group->isVisible());
+	group->setActive(true);
+	EXPECT_TRUE(group->isActive());
 
-	group->setVisible(false);
-	EXPECT_FALSE(group->isVisible());
+	group->setActive(false);
+	EXPECT_FALSE(group->isActive());
 }
 
 TEST(GroupTests, AddRemoveTest)

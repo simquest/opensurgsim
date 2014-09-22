@@ -44,13 +44,13 @@ public:
 	/// Destructor
 	virtual ~Group();
 
-	/// Sets whether the group is currently visible
-	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible) = 0;
+	/// Sets whether the group is currently active 
+	/// \param	val True for active, false for inactive
+	virtual void setActive(bool val) = 0;
 
-	/// Gets whether the group is currently visible
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const = 0;
+	/// Gets whether the group is currently active 
+	/// \return	True for active, false for inactive 
+	virtual bool isActive() const = 0;
 
 	/// Adds an representation
 	/// \param	representation	Representation to add to this group
@@ -77,12 +77,12 @@ public:
 	/// \return The name of this group.
 	std::string getName() const;
 
-private:
-
-	std::string m_name;
-
+protected:
 	/// Representations in this group
 	std::vector<std::shared_ptr<Representation>> m_representations;
+
+private:
+	std::string m_name;
 };
 
 };  // namespace Graphics

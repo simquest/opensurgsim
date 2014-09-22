@@ -40,23 +40,23 @@ public:
 	{
 	}
 
-	/// Sets whether the group is currently visible
-	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible)
+	/// Sets whether the group is currently active 
+	/// \param	val True for active, false for inactive
+	virtual void setActive(bool val)
 	{
-		m_isVisible = visible;
+		m_isActive= val;
 	}
 
-	/// Gets whether the group is currently visible
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const
+	/// Gets whether the group is currently active 
+	/// \return	True for active, false for inactive 
+	virtual bool isActive() const
 	{
-		return m_isVisible;
+		return m_isActive;
 	}
 
 private:
-	/// Whether this group is currently visible or not
-	bool m_isVisible;
+	/// Whether this group is currently active or not
+	bool m_isActive;
 };
 
 /// Manager class for testing

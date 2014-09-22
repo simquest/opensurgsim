@@ -50,14 +50,7 @@ public:
 	/// Returns the root OSG Node for this representations portion of the scene graph
 	osg::ref_ptr<osg::Node> getOsgNode() const;
 
-	/// Sets whether the representation is currently visible
-	/// \note If the representation is inactive, this method does not have any effect.
-	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible) override;
-
-	/// Gets whether the representation is currently visible
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const override;
+	virtual void setLocalActive(bool val) override;
 
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material

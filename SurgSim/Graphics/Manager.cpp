@@ -187,6 +187,7 @@ bool Manager::doUpdate(double dt)
 		{
 			(*it)->update(dt);
 		}
+		(*it)->setLocalActive((*it)->isLocalActive());
 	}
 
 	for (auto it = m_views.begin(); it != m_views.end(); ++it)
