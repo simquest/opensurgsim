@@ -254,18 +254,18 @@ private:
 		std::unordered_set<int> timersWithOutputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 		{
-			if ((timer->second.mode != LabJack::TIMERMODE_PWM_16BIT) &&
-				(timer->second.mode != LabJack::TIMERMODE_PWM_8BIT) &&
-				(timer->second.mode != LabJack::TIMERMODE_RISING_EDGES_32BIT) &&
-				(timer->second.mode != LabJack::TIMERMODE_FALLING_EDGES_32BIT) &&
-				(timer->second.mode != LabJack::TIMERMODE_DUTY_CYCLE) &&
-				(timer->second.mode != LabJack::TIMERMODE_FIRMWARE_COUNTER) &&
-				(timer->second.mode != LabJack::TIMERMODE_FIRMWARE_COUNTER_DEBOUNCED) &&
-				(timer->second.mode != LabJack::TIMERMODE_FREQUENCY_OUTPUT) &&
-				(timer->second.mode != LabJack::TIMERMODE_QUADRATURE) &&
-				(timer->second.mode != LabJack::TIMERMODE_RISING_EDGES_16BIT) &&
-				(timer->second.mode != LabJack::TIMERMODE_FALLING_EDGES_16BIT) &&
-				(timer->second.mode != LabJack::TIMERMODE_LINE_TO_LINE))
+			if ((timer->second.mode == LabJack::TIMERMODE_PWM_16BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_PWM_8BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_RISING_EDGES_32BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_FALLING_EDGES_32BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_DUTY_CYCLE) ||
+				(timer->second.mode == LabJack::TIMERMODE_FIRMWARE_COUNTER) ||
+				(timer->second.mode == LabJack::TIMERMODE_FIRMWARE_COUNTER_DEBOUNCED) ||
+				(timer->second.mode == LabJack::TIMERMODE_FREQUENCY_OUTPUT) ||
+				(timer->second.mode == LabJack::TIMERMODE_QUADRATURE) ||
+				(timer->second.mode == LabJack::TIMERMODE_RISING_EDGES_16BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_FALLING_EDGES_16BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_LINE_TO_LINE))
 			{
 				timersWithOutputs.insert(timer->first);
 			}
