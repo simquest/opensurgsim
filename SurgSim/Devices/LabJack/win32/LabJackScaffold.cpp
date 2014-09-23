@@ -124,23 +124,25 @@ public:
 			m_address << "'." << std::endl << formatErrorMessage(error);
 	}
 
-	bool destroy()
+	/// Close communication with the hardware.
+	/// \param reset true to cause a hardware reset & USB re-enumeration.  Otherwise the hardware's settings will be
+	///		unchanged (i.e., it will continue timing, counting, and outputting).
+	/// \return true.
+	bool destroy(bool reset = false)
 	{
-		bool result = false;
 		if (isValid())
 		{
-			// Reset the pin configuration.
-			const LJ_ERROR error = ePut(m_deviceHandle, LJ_ioPIN_CONFIGURATION_RESET, 0, 0, 0);
-			result = isOk(error);
-			SURGSIM_LOG_IF(!result, m_scaffold->getLogger(), SEVERE) <<
-				"Failed to reset a device's pin configuration. Model: " << m_model << ". Connection: " <<
-				m_connection << ". Address: '" << m_address << "'." << std::endl << formatErrorMessage(error);
-			if (result)
+			if (reset)
 			{
-				m_deviceHandle = LABJACK_INVALID_HANDLE;
+				const LJ_ERROR error = ResetLabJack(m_deviceHandle);
+				SURGSIM_LOG_IF(!isOk(error), m_scaffold->getLogger(), SEVERE) <<
+					"Failed to reset the LabJack device. Model: " << m_model << ". Connection: " <<
+					m_connection << ". Address: '" << m_address << "'." << std::endl << formatErrorMessage(error);
 			}
+
+			m_deviceHandle = LABJACK_INVALID_HANDLE;
 		}
-		return result;
+		return true;
 	}
 
 	/// \return The LabJackUD's handle wrapped by this Handle.
@@ -173,8 +175,8 @@ public:
 	/// Initialize the data, creating a thread.
 	DeviceData(LabJackDevice* device, std::unique_ptr<Handle>&& handle) :
 		deviceObject(device),
-		deviceHandle(std::move(handle)),
 		thread(),
+		deviceHandle(std::move(handle)),
 		digitalInputChannels(device->getDigitalInputs()),
 		digitalOutputChannels(device->getDigitalOutputs()),
 		timerInputChannels(getTimerInputChannels(device->getTimers())),
@@ -502,7 +504,7 @@ bool LabJackScaffold::unregisterDevice(const LabJackDevice* const device)
 			if ((*matching)->thread)
 			{
 				destroyPerDeviceThread(matching->get());
-				matching->get()->deviceHandle->destroy();
+				matching->get()->deviceHandle->destroy(matching->get()->deviceObject->getReset());
 			}
 			m_state->activeDeviceList.erase(matching);
 			// the iterator is now invalid but that's OK

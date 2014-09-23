@@ -274,16 +274,75 @@ public:
 		}
 	}
 
-	bool destroy()
+	/// Close communication with the hardware.
+	/// \param reset true to cause a hardware reset & USB re-enumeration.  Otherwise the hardware's settings will be
+	///		unchanged (i.e., it will continue timing, counting, and outputting).
+	/// \return true.
+	bool destroy(bool reset = false)
 	{
-		bool result = false;
 		if (isValid())
 		{
+			if (reset)
+			{
+				std::array<BYTE, LabJack::MAXIMUM_BUFFER> sendBytes;
+				sendBytes[1] = 0x99;  //Command byte, Reset
+				sendBytes[2] = 2;  // Bit 1: Hard Reset.  Bit 0: Soft Reset.
+				sendBytes[3] = 0x00;
+
+				int sendBytesSize = 4;
+				int readBytesSize = 4;
+
+				sendBytes[0] = LabJack::normalChecksum8(sendBytes, sendBytesSize);
+
+				const int sent = LJUSB_Write(m_deviceHandle, &(sendBytes[0]), sendBytesSize);
+
+				bool sendResult = true;
+				if (sent < sendBytesSize)
+				{
+					SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) <<
+						"Failed to write reset command to a device." <<
+						"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
+						m_address << "'." << std::endl << sendBytesSize << " bytes should have been sent, but only " <<
+						sent << " were actually sent." << std::endl <<
+						"  labjackusb error code: " << errno << "." << std::endl;
+					sendResult = false;
+				}
+
+				if (sendResult)
+				{
+					std::array<BYTE, LabJack::MAXIMUM_BUFFER> readBytes;
+					const int read = LJUSB_Read(m_deviceHandle, &(readBytes[0]), readBytesSize);
+					if (read < readBytesSize)
+					{
+						SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Failed to read response of reset command." <<
+							"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
+							m_address << "'." << std::endl <<
+							readBytesSize << " bytes were expected, but only " << read << " were received." <<
+							std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+					}
+					else if (LabJack::normalChecksum8(readBytes, readBytesSize) != readBytes[0])
+					{
+						SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Failed to read response of reset command." <<
+							"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
+							m_address << "'." << std::endl <<
+							"The checksums are bad." << std::endl << "  labjackusb error code: " << errno << "." <<
+							std::endl;
+					}
+					else if (readBytes[3] != 0)
+					{
+						SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Failed to read response of reset command." <<
+							"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
+							m_address << "'." << std::endl <<
+							"The device library returned an error code: " << static_cast<int>(readBytes[3]) << "." <<
+							std::endl << "  labjackusb error code: " << errno << "." << std::endl;
+					}
+				}
+			}
+
 			LJUSB_CloseDevice(m_deviceHandle);
 			m_deviceHandle = LABJACK_INVALID_HANDLE;
-			result = true;
 		}
-		return result;
+		return true;
 	}
 
 	/// \return The LabJack SDK's handle wrapped by this Handle.
@@ -638,7 +697,7 @@ bool LabJackScaffold::unregisterDevice(const LabJackDevice* const device)
 			if ((*matching)->thread)
 			{
 				destroyPerDeviceThread(matching->get());
-				matching->get()->deviceHandle->destroy();
+				matching->get()->deviceHandle->destroy(matching->get()->deviceObject->getReset());
 			}
 			m_state->activeDeviceList.erase(matching);
 			// the iterator is now invalid but that's OK

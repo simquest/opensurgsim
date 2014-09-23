@@ -206,6 +206,13 @@ TEST(LabJackDeviceTest, GettersAndSetters)
 	EXPECT_NO_THROW(device->setAddress(address));
 	EXPECT_EQ(address, device->getAddress());
 
+	bool reset = true;
+	device->setReset(reset);
+	EXPECT_EQ(reset, device->getReset());
+	reset = false;
+	device->setReset(reset);
+	EXPECT_EQ(reset, device->getReset());
+	
 	std::unordered_set<int> digitalInputChannels;
 	digitalInputChannels.insert(2);
 	digitalInputChannels.insert(11);
