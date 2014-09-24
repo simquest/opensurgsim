@@ -240,6 +240,21 @@ inline bool NamedData<T>::set(int index, const T& value)
 }
 
 template <typename T>
+inline bool NamedData<T>::set(int index, T&& value)
+{
+	if (! hasEntry(index))
+	{
+		return false;
+	}
+	else
+	{
+		m_data[index] = std::move(value);
+		m_isDataValid[index] = true;
+		return true;
+	}
+}
+
+template <typename T>
 inline bool NamedData<T>::set(const std::string& name, const T& value)
 {
 	if (! isValid())
@@ -255,6 +270,27 @@ inline bool NamedData<T>::set(const std::string& name, const T& value)
 	{
 		SURGSIM_ASSERT(hasEntry(index));
 		m_data[index] = value;
+		m_isDataValid[index] = true;
+		return true;
+	}
+}
+
+template <typename T>
+inline bool NamedData<T>::set(const std::string& name, T&& value)
+{
+	if (! isValid())
+	{
+		return false;
+	}
+	int index =  m_directory->getIndex(name);
+	if (index < 0)
+	{
+		return false;
+	}
+	else
+	{
+		SURGSIM_ASSERT(hasEntry(index));
+		m_data[index] = std::move(value);
 		m_isDataValid[index] = true;
 		return true;
 	}

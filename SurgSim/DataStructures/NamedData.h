@@ -247,6 +247,9 @@ public:
 	/// \return true if successful.
 	inline bool set(const std::string& name, const T& value);
 
+	inline bool set(int index, T&& value);
+	inline bool set(const std::string& name, T&& value);
+
 	/// Invalidate an entry&mdash; mark it as not containing any valid data.
 	///
 	/// \param index The index of the entry.
