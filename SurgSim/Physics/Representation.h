@@ -77,10 +77,6 @@ public:
 	/// \return The number of degrees of freedom
 	size_t getNumDof() const;
 
-	/// Set active flag for this Representation
-	/// \param isActive True if the Representation is being activated, False otherwise
-	virtual void setActive(bool isActive) override;
-
 	/// Set the gravity enable flag
 	/// \param isGravityEnabled True if gravity enabled, false if not.
 	void setIsGravityEnabled(bool isGravityEnabled);

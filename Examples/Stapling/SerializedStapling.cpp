@@ -16,7 +16,7 @@
 #include <memory>
 
 #include "Examples/Stapling/StaplerBehavior.h"
-#include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
+#include "SurgSim/Blocks/KeyboardTogglesComponentBehavior.h"
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"

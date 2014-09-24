@@ -85,7 +85,7 @@ TEST_F(FixedRepresentationTest, ConstructorTest)
 
 TEST_F(FixedRepresentationTest, ResetStateTest)
 {
-	m_fixedRepresentation->setActive(false);
+	m_fixedRepresentation->setLocalActive(false);
 	m_fixedRepresentation->setIsGravityEnabled(false);
 	m_fixedRepresentation->setLocalPose(m_initialTransformation);
 
@@ -143,9 +143,9 @@ TEST_F(FixedRepresentationTest, SetGetAndDefaultValueTest)
 {
 	// Get/Set active flag [default = true]
 	EXPECT_TRUE(m_fixedRepresentation->isActive());
-	m_fixedRepresentation->setActive(false);
+	m_fixedRepresentation->setLocalActive(false);
 	ASSERT_FALSE(m_fixedRepresentation->isActive());
-	m_fixedRepresentation->setActive(true);
+	m_fixedRepresentation->setLocalActive(true);
 	ASSERT_TRUE(m_fixedRepresentation->isActive());
 
 	// Get numDof = 0
