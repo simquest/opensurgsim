@@ -174,11 +174,7 @@ inline bool NamedData<T>::hasData(int index) const
 template <typename T>
 inline bool NamedData<T>::hasData(const std::string& name) const
 {
-	if (! isValid())
-	{
-		return false;
-	}
-	int index =  m_directory->getIndex(name);
+	int index = getIndex(name);
 	if (index < 0)
 	{
 		return false;
@@ -207,11 +203,7 @@ inline bool NamedData<T>::get(int index, T* value) const
 template <typename T>
 inline bool NamedData<T>::get(const std::string& name, T* value) const
 {
-	if (! isValid())
-	{
-		return false;
-	}
-	int index =  m_directory->getIndex(name);
+	int index = getIndex(name);
 	if ((index < 0) || ! m_isDataValid[index])
 	{
 		return false;
@@ -257,11 +249,7 @@ inline bool NamedData<T>::set(int index, T&& value)
 template <typename T>
 inline bool NamedData<T>::set(const std::string& name, const T& value)
 {
-	if (! isValid())
-	{
-		return false;
-	}
-	int index =  m_directory->getIndex(name);
+	int index = getIndex(name);
 	if (index < 0)
 	{
 		return false;
@@ -278,11 +266,7 @@ inline bool NamedData<T>::set(const std::string& name, const T& value)
 template <typename T>
 inline bool NamedData<T>::set(const std::string& name, T&& value)
 {
-	if (! isValid())
-	{
-		return false;
-	}
-	int index =  m_directory->getIndex(name);
+	int index = getIndex(name);
 	if (index < 0)
 	{
 		return false;
@@ -313,11 +297,7 @@ inline bool NamedData<T>::reset(int index)
 template <typename T>
 inline bool NamedData<T>::reset(const std::string& name)
 {
-	if (! isValid())
-	{
-		return false;
-	}
-	int index =  m_directory->getIndex(name);
+	int index = getIndex(name);
 	if (index < 0)
 	{
 		return false;
