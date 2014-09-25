@@ -40,8 +40,6 @@ add_executable(SerializedStapling
 	${HEADERS}
 )
 
-add_dependencies(SerializedStapling yaml-cpp)
-
 surgsim_show_ide_folders("Main.cpp SerializedMain.cpp ${SOURCES}" "${HEADERS}")
 
 set(LIBS 

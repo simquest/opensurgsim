@@ -110,10 +110,7 @@ set(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-target_link_libraries(SurgSimMath ${LIBS}
-)
-add_dependencies(SurgSimMath yaml-cpp)
-
+target_link_libraries(SurgSimMath ${LIBS})
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
