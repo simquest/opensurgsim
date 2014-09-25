@@ -110,8 +110,6 @@ private:
 	std::unique_ptr<T[]> m_data;
 };
 
-typedef Image<float> Imagef;
-
 }
 }
 
