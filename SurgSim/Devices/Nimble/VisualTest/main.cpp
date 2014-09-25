@@ -16,20 +16,33 @@
 #include <memory>
 
 #include "SurgSim/Input/DeviceInterface.h"
+#include "SurgSim/Devices/DeviceFilters/PoseTransform.h"
 #include "SurgSim/Devices/Nimble/NimbleDevice.h"
 
 #include "SurgSim/Testing/VisualTestCommon/ToolSquareTest.h"
 
 using SurgSim::Input::DeviceInterface;
+using SurgSim::Device::PoseTransform;
 using SurgSim::Device::NimbleDevice;
 
 int main(int argc, char** argv)
 {
 	auto leftDevice = std::make_shared<NimbleDevice>("NimbleDeviceLeft");
+	auto leftDeviceFilter = std::make_shared<PoseTransform>("NimbleDeviceLeftDeviceFilter");
+	leftDeviceFilter->setTranslationScale(0.0001);
+	leftDevice->addInputConsumer(leftDeviceFilter);
+	leftDevice->setOutputProducer(leftDeviceFilter);
+	leftDevice->initialize();
 
 	auto rightDevice = std::make_shared<NimbleDevice>("NimbleDeviceRight");
+	rightDevice->setupToTrackRightHand();
+	auto rightDeviceFilter = std::make_shared<PoseTransform>("NimbleDeviceRightDeviceFilter");
+	rightDeviceFilter->setTranslationScale(0.0001);
+	rightDevice->addInputConsumer(rightDeviceFilter);
+	rightDevice->setOutputProducer(rightDeviceFilter);
+	rightDevice->initialize();
 
-	runToolSquareTest(leftDevice, rightDevice, "Move the hands to control the sphere/square.");
+	runToolSquareTest(leftDeviceFilter, rightDeviceFilter, "Move the hands to control the sphere/square.");
 
 	std::cout << std::endl << "Exiting." << std::endl;
 	// Cleanup and shutdown will happen automatically as objects go out of scope.
