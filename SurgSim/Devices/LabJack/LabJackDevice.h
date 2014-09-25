@@ -32,6 +32,84 @@ class LabJackScaffold;
 
 namespace LabJack
 {
+///@{
+/// The timer or channel number that corresponds with the descriptive name used by the LabJack.
+/// Use these for the arguments to the enable* functions.
+enum TIMER
+{
+	TIMER0,
+	TIMER1,
+	TIMER2,
+	TIMER3,
+	TIMER4,
+	TIMER5
+};
+
+enum FIO_LINE
+{
+	FIO0,
+	FIO1,
+	FIO2,
+	FIO3,
+	FIO4,
+	FIO5,
+	FIO6,
+	FIO7
+};
+
+enum EIO_LINE
+{
+	EIO0 = 8,
+	EIO1,
+	EIO2,
+	EIO3,
+	EIO4,
+	EIO5,
+	EIO6,
+	EIO7
+};
+
+enum CIO_LINE
+{
+	CIO0 = 16,
+	CIO1,
+	CIO2,
+	CIO3
+};
+
+enum MIO_LINE
+{
+	MIO0 = 20,
+	MIO1,
+	MIO2
+};
+
+enum AIN
+{
+	AIN0,
+	AIN1,
+	AIN2,
+	AIN3,
+	AIN4,
+	AIN5,
+	AIN6,
+	AIN7,
+	AIN8,
+	AIN9,
+	AIN10,
+	AIN11,
+	AIN12,
+	AIN13,
+	AIN14,
+	AIN15
+};
+
+enum DAC
+{
+	DAC0,
+	DAC1
+};
+///@}
 
 /// The models of LabJack devices.  Numbers come from LabJackUD.h.
 enum Model
@@ -166,10 +244,10 @@ struct AnalogInputSettings
 ///   | scalar | "analogInput"               | %Analog input with AIN1 as the positive channel                 |
 ///   | ...    |  ...                        | ...                                                             |
 ///   | scalar | "analogInput16"             | %Analog input with AIN16 as the positive channel                |
-///   | scalar | "digitalInput0"             | %Digital input, line #0                                         |
-///   | scalar | "digitalInput1"             | %Digital input, line #1                                         |
+///   | boolean| "digitalInput0"             | %Digital input, line #0, true for high input, false for low     |
+///   | boolean| "digitalInput1"             | %Digital input, line #1, true for high input, false for low     |
 ///   | ...    |  ...                        | ...                                                             |
-///   | scalar | "digitalInput23"            | %Digital input, line #23                                        |
+///   | boolean| "digitalInput23"            | %Digital input, line #23, true for high input, false for low    |
 ///   | scalar | "timerInput0"               | %The input from timer #0 if that timer provides input values    |
 ///   | scalar | "timerInput1"               | %The input from timer #1 if that timer provides input values    |
 ///   | ...    |  ...                        | ...                                                             |
@@ -181,10 +259,10 @@ struct AnalogInputSettings
 ///   | ----   | ----              | ---                                                                       |
 ///   | scalar | "analogOutput0"   | %Analog output, DAC0                                                      |
 ///   | scalar | "analogOutput1"   | %Analog output, DAC1                                                      |
-///   | scalar | "digitalOutput0"  | %Digital output, line #0                                                  |
-///   | scalar | "digitalOutput1"  | %Digital output, line #1                                                  |
+///   | boolean| "digitalOutput0"  | %Digital output, line #0, true for high output, false for low             |
+///   | boolean| "digitalOutput1"  | %Digital output, line #1, true for high output, false for low             |
 ///   | ...    |  ...              | ...                                                                       |
-///   | scalar | "digitalOutput23" | %Digital output, line #23                                                 |
+///   | boolean| "digitalOutput23" | %Digital output, line #23, true for high output, false for low            |
 ///   | scalar | "timerOutput0"    | %The output for timer #0 if that timer accepts output values              |
 ///   | scalar | "timerOutput1"    | %The output for timer #1 if that timer accepts output values              |
 ///   | ...    |  ...              | ...                                                                       |

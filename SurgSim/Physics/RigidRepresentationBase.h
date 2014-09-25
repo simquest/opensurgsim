@@ -16,9 +16,9 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 
-#include "SurgSim/Collision/Location.h"
+#include "SurgSim/DataStructures/Location.h"
+#include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 namespace SurgSim
@@ -62,22 +62,52 @@ public:
 	/// \return The previous state (pose + lin/ang velocities)
 	const RigidRepresentationState& getPreviousState() const;
 
-	std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location);
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location);
 
-	/// Set the initial parameters of the rigid representation
-	/// \param parameters The initial parameters
-	/// This will also set the current parameters to the initial parameters
-	void setInitialParameters(const RigidRepresentationParameters& parameters);
-	/// Set the current parameters of the rigid representation
-	/// \param parameters The current parameters
-	void setCurrentParameters(const RigidRepresentationParameters& parameters);
+	/// Set the mass density of the rigid representation
+	/// \param rho The density (in Kg.m-3)
+	void setDensity(double rho);
 
-	/// Get the initial parameters of the rigid representation
-	/// \return The initial parameters of the rigid representation
-	const RigidRepresentationParameters& getInitialParameters() const;
-	/// Get the current parameters of the rigid representation
-	/// \return The current parameters of the rigid representation
-	const RigidRepresentationParameters& getCurrentParameters() const;
+	/// Get the mass density of the rigid representation
+	/// \return The density if it has been provided, 0 otherwise (in Kg.m-3)
+	double getDensity() const;
+
+	/// Get the mass of the rigid body
+	/// \return The mass (in Kg)
+	double getMass() const;
+
+	/// Get the mass center of the rigid body
+	/// \return The mass center (in local coordinate)
+	const SurgSim::Math::Vector3d& getMassCenter() const;
+
+	/// Get the local inertia 3x3 matrix of the rigid body
+	/// \return The inertia 3x3 matrix of the object
+	const SurgSim::Math::Matrix33d& getLocalInertia() const;
+
+	/// Set the linear damping parameter
+	/// \param linearDamping The linear damping parameter (in N.s.m-1)
+	void setLinearDamping(double linearDamping);
+
+	/// Get the linear damping parameter
+	/// \return The linear damping parameter (in N.s.m-1)
+	double getLinearDamping() const;
+
+	/// Set the angular damping parameter
+	/// \param angularDamping The angular damping parameter (in N.m.s.rad-1)
+	void setAngularDamping(double angularDamping);
+
+	/// Get the angular damping parameter
+	/// \return The angular damping parameter (in N.m.s.rad-1)
+	double getAngularDamping() const;
+
+	/// Set the shape to use internally for physical parameters computation
+	/// \param shape The shape to use for the mass/inertia calculation
+	/// \note Also add the shape to the shape list if it has not been added yet
+	void setShape(const std::shared_ptr<SurgSim::Math::Shape> shape);
+
+	/// Get the shape used internally for physical parameters computation
+	/// \return The shape used for calculation, nullptr if none exist
+	const std::shared_ptr<SurgSim::Math::Shape> getShape() const;
 
 	/// Set the collision representation for this physics representation, when the collision object
 	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
@@ -103,19 +133,41 @@ protected:
 	/// Last valid/final rigid representation state
 	RigidRepresentationState m_finalState;
 
-	/// Initial physical parameters
-	RigidRepresentationParameters m_initialParameters;
-	/// Current physical parameters
-	RigidRepresentationParameters m_currentParameters;
+	/// Validity of the parameters
+	bool m_parametersValid;
+
+	/// Density of the object (in Kg.m-3)
+	double m_rho;
+
+	/// Total mass of the object (in Kg)
+	double m_mass;
+
+	/// Linear damping parameter (in N.s.m-1 or Kg.s-1)
+	double m_linearDamping;
+
+	/// Angular damping parameter (in N.m.s.rad-1)
+	double m_angularDamping;
+
+	/// Mass-center of the object
+	SurgSim::Math::Vector3d m_massCenter;
+
+	/// Inertia matrix in local coordinates
+	SurgSim::Math::Matrix33d m_localInertia;
+
+	/// Shape to be used for the mass/inertia calculation
+	std::shared_ptr<SurgSim::Math::Shape> m_shape;
 
 	/// Creates typed localization.
 	/// \tparam	T	Type of localization to create.
 	/// \param	location	The location for the localization.
 	/// \return	The new Localization;
 	template <class T>
-	std::shared_ptr<T> createTypedLocalization(const SurgSim::Collision::Location& location);
+	std::shared_ptr<T> createTypedLocalization(const SurgSim::DataStructures::Location& location);
 
 private:
+	/// Updates mass, mass center and inertia when density and/or shape used for mass inertia is updated.
+	void updateProperties();
+
 	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) = 0;
 };
 

@@ -27,9 +27,12 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
+using SurgSim::Math::makeSkewSymmetricMatrix;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector6d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
@@ -51,18 +54,18 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_angularDamping(std::numeric_limits<double>::quiet_NaN()),
 	m_localAttachmentPoint(Vector3d(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
 		std::numeric_limits<double>::quiet_NaN())),
-	m_calculateInertialTorques(false)
+	m_calculateInertialTorques(false),
+	m_poseIndex(-1),
+	m_linearVelocityIndex(-1),
+	m_angularVelocityIndex(-1),
+	m_forceIndex(-1),
+	m_torqueIndex(-1),
+	m_inputLinearVelocityIndex(-1),
+	m_inputAngularVelocityIndex(-1),
+	m_inputPoseIndex(-1),
+	m_springJacobianIndex(-1),
+	m_damperJacobianIndex(-1)
 {
-	SurgSim::DataStructures::DataGroupBuilder builder;
-	builder.addVector(SurgSim::DataStructures::Names::FORCE);
-	builder.addVector(SurgSim::DataStructures::Names::TORQUE);
-	builder.addMatrix(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
-	builder.addPose(SurgSim::DataStructures::Names::INPUT_POSE);
-	builder.addMatrix(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
-	builder.addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
-	builder.addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
-	m_outputData = builder.createData();
-
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
 		LinearStiffness, getOptionalLinearStiffness, setOptionalLinearStiffness);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
@@ -134,25 +137,24 @@ void VirtualToolCoupler::update(double dt)
 	SurgSim::DataStructures::DataGroup inputData;
 	m_input->getData(&inputData);
 	RigidTransform3d inputPose;
-	if (inputData.poses().get(m_poseName, &inputPose))
+	inputData.poses().cacheIndex(m_poseName, &m_poseIndex);
+	if (inputData.poses().get(m_poseIndex, &inputPose))
 	{
 		// TODO(ryanbeasley): If the RigidRepresentation is not colliding, we should turn off the VTC forces and set the
 		// RigidRepresentation's state to the input state.
 		Vector3d inputLinearVelocity, inputAngularVelocity;
 		inputLinearVelocity.setZero();
-		inputData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY, &inputLinearVelocity);
+		inputData.vectors().cacheIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY, &m_linearVelocityIndex);
+		inputData.vectors().get(m_linearVelocityIndex, &inputLinearVelocity);
 		inputAngularVelocity.setZero();
-		inputData.vectors().get(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, &inputAngularVelocity);
+		inputData.vectors().cacheIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, &m_angularVelocityIndex);
+		inputData.vectors().get(m_angularVelocityIndex, &inputAngularVelocity);
 
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
+		Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
 		Vector3d attachmentPoint = objectPose * m_localAttachmentPoint;
-		Vector3d leverArm = Vector3d::Zero();
-		if (m_calculateInertialTorques)
-		{
-			const Vector3d objectPosition = objectPose * m_rigid->getCurrentParameters().getMassCenter();
-			leverArm = attachmentPoint - objectPosition;
-		}
+		Vector3d leverArm = attachmentPoint - objectPosition;
 		Vector3d attachmentPointVelocity = objectState.getLinearVelocity();
 		attachmentPointVelocity += objectState.getAngularVelocity().cross(leverArm);
 
@@ -162,37 +164,45 @@ void VirtualToolCoupler::update(double dt)
 		Vector3d rotationVector;
 		SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationVector);
 		Vector3d torque = m_angularStiffness * rotationVector;
-		torque += leverArm.cross(force);
 		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
+		const Matrix33d zero3x3 = Matrix33d::Zero();
 		const Matrix33d linearStiffnessMatrix = m_linearStiffness * identity3x3;
 		const Matrix33d linearDampingMatrix = m_linearDamping * identity3x3;
 		const Matrix33d angularStiffnessMatrix = m_angularStiffness * identity3x3;
 		const Matrix33d angularDampingMatrix = m_angularDamping * identity3x3;
-		m_rigid->addExternalForce(force, linearStiffnessMatrix, linearDampingMatrix);
-		m_rigid->addExternalTorque(torque, angularStiffnessMatrix, angularDampingMatrix);
+
+		Vector6d generalizedForce;
+		Matrix66d generalizedStiffness, generalizedDamping;
+		generalizedForce << force, torque;
+		generalizedStiffness << linearStiffnessMatrix, zero3x3,
+								zero3x3, angularStiffnessMatrix;
+		generalizedDamping << linearDampingMatrix, zero3x3,
+							  zero3x3, angularDampingMatrix;
+
+		if (m_calculateInertialTorques)
+		{
+			SurgSim::DataStructures::Location location;
+			location.rigidLocalPosition.setValue(m_localAttachmentPoint);
+			m_rigid->addExternalGeneralizedForce(location, generalizedForce, generalizedStiffness, generalizedDamping);
+		}
+		else
+		{
+			m_rigid->addExternalGeneralizedForce(generalizedForce, generalizedStiffness, generalizedDamping);
+		}
 
 		if (m_output != nullptr)
 		{
-			m_outputData.vectors().set(SurgSim::DataStructures::Names::FORCE, -force);
-			m_outputData.vectors().set(SurgSim::DataStructures::Names::TORQUE, -torque);
-			m_outputData.vectors().set(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY, inputLinearVelocity);
-			m_outputData.vectors().set(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY, inputAngularVelocity);
+			m_outputData.vectors().set(m_forceIndex, -generalizedForce.segment<3>(0));
+			m_outputData.vectors().set(m_torqueIndex, -generalizedForce.segment<3>(3));
+			m_outputData.vectors().set(m_inputLinearVelocityIndex, inputLinearVelocity);
+			m_outputData.vectors().set(m_inputAngularVelocityIndex, inputAngularVelocity);
 
-			m_outputData.poses().set(SurgSim::DataStructures::Names::INPUT_POSE, inputPose);
+			m_outputData.poses().set(m_inputPoseIndex, inputPose);
 
-			const Matrix33d skewLeverArm = SurgSim::Math::makeSkewSymmetricMatrix(leverArm);
-
-			Matrix66d springJacobian;
-			springJacobian << -linearStiffnessMatrix, Matrix33d::Zero(),
-							  -m_linearStiffness * skewLeverArm, -angularStiffnessMatrix;
-			m_outputData.matrices().set(SurgSim::DataStructures::Names::SPRING_JACOBIAN, springJacobian);
-
-			Matrix66d damperJacobian;
-			damperJacobian << -linearDampingMatrix, Matrix33d::Zero(),
-							  m_linearDamping * skewLeverArm, -angularDampingMatrix;
-			m_outputData.matrices().set(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, damperJacobian);
+			m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
+			m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
 
 			m_output->setData(m_outputData);
 		}
@@ -201,7 +211,31 @@ void VirtualToolCoupler::update(double dt)
 
 bool VirtualToolCoupler::doInitialize()
 {
+	m_outputData = buildOutputData();
+
+	m_forceIndex = m_outputData.vectors().getIndex(SurgSim::DataStructures::Names::FORCE);
+	m_torqueIndex = m_outputData.vectors().getIndex(SurgSim::DataStructures::Names::TORQUE);
+	m_inputLinearVelocityIndex = m_outputData.vectors().getIndex(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
+	m_inputAngularVelocityIndex =
+		m_outputData.vectors().getIndex(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
+	m_inputPoseIndex = m_outputData.poses().getIndex(SurgSim::DataStructures::Names::INPUT_POSE);
+	m_springJacobianIndex = m_outputData.matrices().getIndex(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
+	m_damperJacobianIndex = m_outputData.matrices().getIndex(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
+
 	return true;
+}
+
+SurgSim::DataStructures::DataGroup VirtualToolCoupler::buildOutputData()
+{
+	SurgSim::DataStructures::DataGroupBuilder builder;
+	builder.addVector(SurgSim::DataStructures::Names::FORCE);
+	builder.addVector(SurgSim::DataStructures::Names::TORQUE);
+	builder.addMatrix(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
+	builder.addPose(SurgSim::DataStructures::Names::INPUT_POSE);
+	builder.addMatrix(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
+	builder.addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
+	builder.addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
+	return builder.createData();
 }
 
 bool VirtualToolCoupler::doWakeUp()
@@ -219,6 +253,15 @@ bool VirtualToolCoupler::doWakeUp()
 		return false;
 	}
 
+	if (m_optionalAttachmentPoint.hasValue())
+	{
+		m_localAttachmentPoint = m_optionalAttachmentPoint.getValue();
+	}
+	else
+	{
+		m_localAttachmentPoint = m_rigid->getMassCenter();
+	}
+
 	// Provide sensible defaults based on the rigid representation.
 	// If one or both of the stiffness and damping are not provided, they are
 	// calculated to provide a critically damped system (dampingRatio-1.0).
@@ -227,7 +270,7 @@ bool VirtualToolCoupler::doWakeUp()
 	//     dampingRatio = (damping) / (2 * sqrt(mass * stiffness))
 	//
 	double dampingRatio = 1.0;
-	double mass = m_rigid->getCurrentParameters().getMass();
+	double mass = m_rigid->getMass();
 	if (!m_optionalLinearDamping.hasValue())
 	{
 		if (m_optionalLinearStiffness.hasValue())
@@ -236,7 +279,7 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 		else
 		{
-			m_linearStiffness = mass * 800.0;
+			m_linearStiffness = mass * 100.0;
 		}
 		m_linearDamping = 2.0 * dampingRatio * sqrt(mass * m_linearStiffness);
 	}
@@ -253,7 +296,8 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	const Matrix33d& inertia = m_rigid->getCurrentParameters().getLocalInertia();
+	Matrix33d leverArmMatrix = makeSkewSymmetricMatrix((m_localAttachmentPoint - m_rigid->getMassCenter()).eval());
+	const Matrix33d& inertia = m_rigid->getLocalInertia() + mass * leverArmMatrix * leverArmMatrix;
 	double maxInertia = inertia.eigenvalues().real().maxCoeff();
 	if (!m_optionalAngularDamping.hasValue())
 	{
@@ -280,14 +324,6 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	if (m_optionalAttachmentPoint.hasValue())
-	{
-		m_localAttachmentPoint = m_optionalAttachmentPoint.getValue();
-	}
-	else
-	{
-		m_localAttachmentPoint = m_rigid->getCurrentParameters().getMassCenter();
-	}
 
 	return true;
 }

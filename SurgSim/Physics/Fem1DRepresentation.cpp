@@ -20,6 +20,8 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/Fem1DRepresentationLocalization.h"
+#include "SurgSim/Physics/FemElement.h"
 
 namespace
 {
@@ -65,6 +67,65 @@ Fem1DRepresentation::~Fem1DRepresentation()
 RepresentationType Fem1DRepresentation::getType() const
 {
 	return REPRESENTATION_TYPE_FEM1D;
+}
+
+void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+										 SurgSim::Math::Vector& generalizedForce,
+										 const SurgSim::Math::Matrix& K,
+										 const SurgSim::Math::Matrix& D)
+{
+	const size_t dofPerNode = getNumDofPerNode();
+	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
+
+	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
+	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
+		"Generalized force has an invalid size of " << generalizedForce.size() << ". Expected " << dofPerNode;
+	SURGSIM_ASSERT(K.size() == 0 || (K.rows() == expectedSize && K.cols() == expectedSize)) <<
+		"Stiffness matrix K has an invalid size (" << K.rows() << "," << K.cols() <<
+		") was expecting a square matrix of size " << dofPerNode;
+	SURGSIM_ASSERT(D.size() == 0 || (D.rows() == expectedSize && D.cols() == expectedSize)) <<
+		"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
+		") was expecting a square matrix of size " << dofPerNode;
+
+	std::shared_ptr<Fem1DRepresentationLocalization> localization1D =
+		std::dynamic_pointer_cast<Fem1DRepresentationLocalization>(localization);
+	SURGSIM_ASSERT(localization1D != nullptr) << "Invalid localization type (not a Fem1DRepresentationLocalization)";
+
+	const size_t elementId = localization1D->getLocalPosition().index;
+	const SurgSim::Math::Vector& coordinate = localization1D->getLocalPosition().coordinate;
+	std::shared_ptr<FemElement> element = getFemElement(elementId);
+
+	size_t index = 0;
+	for (auto nodeId : element->getNodeIds())
+	{
+		m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce * coordinate[index];
+		index++;
+	}
+
+	if (K.size() != 0 || D.size() != 0)
+	{
+		size_t index1 = 0;
+		for (auto nodeId1 : element->getNodeIds())
+		{
+			size_t index2 = 0;
+			for (auto nodeId2 : element->getNodeIds())
+			{
+				if (K.size() != 0)
+				{
+					m_externalGeneralizedStiffness.block(dofPerNode * nodeId1, dofPerNode * nodeId2,
+						dofPerNode, dofPerNode) += coordinate[index1] * coordinate[index2] * K;
+				}
+				if (D.size() != 0)
+				{
+					m_externalGeneralizedDamping.block(dofPerNode * nodeId1, dofPerNode * nodeId2,
+						dofPerNode, dofPerNode) += coordinate[index1] * coordinate[index2] * D;
+				}
+				index2++;
+			}
+
+			index1++;
+		}
+	}
 }
 
 bool Fem1DRepresentation::doWakeUp()

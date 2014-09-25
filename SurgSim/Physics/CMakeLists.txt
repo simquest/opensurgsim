@@ -13,10 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
-)
 
 set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
@@ -33,9 +29,11 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem1DElementBeam.cpp
 	Fem1DPlyReaderDelegate.cpp
 	Fem1DRepresentation.cpp
+	Fem1DRepresentationLocalization.cpp
 	Fem2DElementTriangle.cpp
 	Fem2DPlyReaderDelegate.cpp
 	Fem2DRepresentation.cpp
+	Fem2DRepresentationLocalization.cpp
 	Fem3DElementCorotationalTetrahedron.cpp
 	Fem3DElementCube.cpp
 	Fem3DElementTetrahedron.cpp
@@ -47,7 +45,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemElement.cpp
 	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
-	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentation.cpp
 	FixedRepresentationBilateral3D.cpp
@@ -72,7 +69,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentationBilateral3D.cpp
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
-	RigidRepresentationParameters.cpp
 	RigidRepresentationState.cpp
 	SolveMlcp.cpp
 	UpdateCollisionRepresentations.cpp
@@ -95,9 +91,11 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem1DElementBeam.h
 	Fem1DPlyReaderDelegate.h
 	Fem1DRepresentation.h
+	Fem1DRepresentationLocalization.h
 	Fem2DElementTriangle.h
 	Fem2DPlyReaderDelegate.h
 	Fem2DRepresentation.h
+	Fem2DRepresentationLocalization.h
 	Fem3DElementCorotationalTetrahedron.h
 	Fem3DElementCube.h
 	Fem3DElementTetrahedron.h
@@ -109,7 +107,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	FemElement.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
-	FemRepresentationCoordinate.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FixedRepresentationBilateral3D.h
@@ -140,7 +137,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationBilateral3D.h
 	RigidRepresentationContact.h
 	RigidRepresentationLocalization.h
-	RigidRepresentationParameters.h
 	RigidRepresentationState.h
 	SolveMlcp.h
 	Spring.h

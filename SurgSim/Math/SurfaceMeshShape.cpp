@@ -128,11 +128,16 @@ void SurfaceMeshShape::computeVolumeIntegrals()
 	Eigen::VectorXd integral(10);
 	integral.setZero();
 
-	for (size_t triId = 0; triId < m_mesh->getNumTriangles(); ++triId)
+	for (auto const& triangle : m_mesh->getTriangles())
 	{
-		auto A = m_mesh->getVertexPosition(m_mesh->getTriangle(triId).verticesId[0]);
-		auto B = m_mesh->getVertexPosition(m_mesh->getTriangle(triId).verticesId[1]);
-		auto C = m_mesh->getVertexPosition(m_mesh->getTriangle(triId).verticesId[2]);
+		if (!triangle.isValid)
+		{
+			continue;
+		}
+
+		auto A = m_mesh->getVertexPosition(triangle.verticesId[0]);
+		auto B = m_mesh->getVertexPosition(triangle.verticesId[1]);
+		auto C = m_mesh->getVertexPosition(triangle.verticesId[2]);
 
 		// Triangle parametrization P(a, b) = A + u.a + v.b  with u=AB and v=AC
 		const Vector3d u = B - A;

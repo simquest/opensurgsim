@@ -23,6 +23,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Vector3d;
@@ -57,6 +58,8 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	// Transform the plane normal to box co-ordinate system.
 	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
 														   representationPlane->getPose();
+	SurgSim::Math::RigidTransform3d boxLocalToPlaneLocal = representationPlane->getPose().inverse() *
+														   representationBox->getPose();
 	Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
 	Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
 	Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
@@ -65,8 +68,6 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	// Loop through the box vertices (boxVertex) and check it it is below plane.
 	double d = 0.0;
 	Vector3d boxVertex;
-	Vector3d normal;
-	Vector3d boxVertexGlobal;
 	for (int i = 0; i < 8; ++i)
 	{
 		boxVertex = box->getVertex(i);
@@ -74,13 +75,11 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 		if (d < DistanceEpsilon)
 		{
 			// Add a contact.
-			normal = representationPlane->getPose().linear() * plane->getNormal();
-			std::pair<Location,Location> penetrationPoints;
-			boxVertexGlobal = representationBox->getPose() * boxVertex;
-			penetrationPoints.first.globalPosition.setValue(boxVertexGlobal);
-			penetrationPoints.second.globalPosition.setValue(boxVertexGlobal - normal * d);
+			std::pair<Location, Location> penetrationPoints;
+			penetrationPoints.first.rigidLocalPosition.setValue(boxVertex);
+			penetrationPoints.second.rigidLocalPosition.setValue(boxLocalToPlaneLocal * (boxVertex - planeNormal * d));
 
-			pair->addContact(d, normal, penetrationPoints);
+			pair->addContact(-d, representationPlane->getPose().linear() * plane->getNormal(), penetrationPoints);
 		}
 	}
 }

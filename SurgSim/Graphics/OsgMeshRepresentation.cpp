@@ -53,6 +53,7 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	m_vertices = new osg::Vec3Array();
 	m_vertices->setDataVariance(osg::Object::DYNAMIC);
 	m_geometry->setVertexArray(m_vertices);
+	m_geometry->setUseDisplayList(false);
 
 	// Set up color array with default color
 	m_colors = new osg::Vec4Array(1);
@@ -180,14 +181,16 @@ void OsgMeshRepresentation::updateNormals()
 
 void OsgMeshRepresentation::updateTriangles()
 {
-	std::vector<Mesh::TriangleType> triangles = m_mesh->getTriangles();
-	auto endIt = std::end(triangles);
 	int i = 0;
-	for (auto it = std::begin(triangles); it != endIt; ++it)
+	m_triangles->resize(m_mesh->getNumTriangles() * 3);
+	for (auto const& triangle : m_mesh->getTriangles())
 	{
-		(*m_triangles)[i++] = it->verticesId[0];
-		(*m_triangles)[i++] = it->verticesId[1];
-		(*m_triangles)[i++] = it->verticesId[2];
+		if (triangle.isValid)
+		{
+			(*m_triangles)[i++] = triangle.verticesId[0];
+			(*m_triangles)[i++] = triangle.verticesId[1];
+			(*m_triangles)[i++] = triangle.verticesId[2];
+		}
 	}
 }
 
@@ -196,6 +199,7 @@ int OsgMeshRepresentation::updateOsgArrays()
 	int result = 0;
 
 	size_t numVertices = m_mesh->getNumVertices();
+
 	if (numVertices > m_vertices->size())
 	{
 		m_vertices->resize(numVertices);

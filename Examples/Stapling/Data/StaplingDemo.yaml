@@ -1,0 +1,463 @@
+SurgSim::Framework::Scene:
+  SceneElements:
+    - SurgSim::Framework::BasicSceneElement:
+        Name: StaplingDemoView
+        Components:
+          - SurgSim::Graphics::OsgCamera:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              RenderGroupReference: __OssDefault__
+              Id: 169b057e-e2d7-4f6d-8628-e1b5cf70835d
+              Name: StaplingDemoView Camera
+              ProjectionMatrix: [[2.414213562373095, 0, 0, 0], [0, 2.414213562373095, 0, 0], [0, 0, -1.002002002002002, -0.02002002002002002], [0, 0, -1, 0]]
+              GroupReferences:
+                []
+              DrawAsWireFrame: false
+              AmbientColor: [0, 0, 0, 0]
+          - SurgSim::Framework::PoseComponent:
+              Pose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Name: Pose
+              Id: b7ea8b3d-ef64-4ade-ab89-664390816842
+          - SurgSim::Graphics::OsgView:
+              Position:
+                - 0
+                - 0
+              FullScreen: false
+              Dimensions:
+                - 1024
+                - 768
+              EyeSeparation: 0.06
+              ScreenDistance: 1
+              Camera:
+                SurgSim::Graphics::OsgCamera:
+                  Id: 169b057e-e2d7-4f6d-8628-e1b5cf70835d
+                  Name: StaplingDemoView Camera
+              WindowBorder: true
+              DisplayType: 0
+              TargetScreen: 0
+              KeyboardDeviceEnabled: true
+              StereoMode: -1
+              ScreenWidth: 0
+              ScreenHeight: 0
+              CameraManipulatorEnabled: true
+              CameraPosition: [0, 0.5, 0.5]
+              CameraLookAt: [0, 0, 0]
+              OsgMapUniforms: false
+              MouseDeviceEnabled: false
+              Id: f79e6280-9905-40b2-bb97-887bb689e605
+              Name: StaplingDemoView View
+    - SurgSim::Framework::BasicSceneElement:
+        Name: arm
+        Components:
+          - SurgSim::Framework::PoseComponent:
+              Pose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, -0.2, 0]
+              Id: 24879435-329d-47c6-a4d5-8f50c0c3e35c
+              Name: Pose
+          - SurgSim::Physics::RigidCollisionRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Name: Collision
+              Id: 16149947-44fa-404f-bfaa-096e7732ee1d
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: false
+              FileName: Geometry/upperarm.osgb
+              Id: 58b991bb-16dc-4fb0-9f0e-b153da9a641d
+              Name: upperarm
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              DrawAsWireFrame: false
+              FileName: Geometry/forearm.osgb
+              Id: b17ff057-4f16-49d2-95c7-ebaacda9ffc0
+              Name: forearm
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: true
+              Filename: Geometry/arm_collision.ply
+              UpdateOptions: 1
+              Id: 4ea6a631-6289-4886-98d2-aa91580e8250
+              Name: ArmOsgMesh
+          - SurgSim::Physics::FixedRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              NumDof: 0
+              IsGravityEnabled: true
+              IsLocalActive: true
+              CollisionRepresentation:
+                SurgSim::Physics::RigidCollisionRepresentation:
+                  Id: 16149947-44fa-404f-bfaa-096e7732ee1d
+                  Name: Collision
+              RigidRepresentationState:
+                SurgSim::Physics::RigidRepresentationState:
+                  LinearVelocity: [0, 0, 0]
+                  AngularVelocity: [0, 0, 0]
+                  Pose:
+                    Quaternion: [0, 0, 0, 1]
+                    Translation: [0, 0, 0]
+              Id: 0ee73b63-b022-49cf-91b9-465e7da60a1d
+              Name: Physics
+              Density: 0
+              LinearDamping: 0
+              AngularDamping: 0
+              Shape:
+                SurgSim::Math::MeshShape:
+                  FileName: Geometry/arm_collision.ply
+              IsDrivingSceneElementPose: true
+    - SurgSim::Framework::BasicSceneElement:
+        Components:
+          - SurgSim::Physics::VirtualToolCoupler:
+              LinearStiffness:
+                HasValue: false
+                Value: Not set
+              LinearDamping:
+                HasValue: false
+                Value: Not set
+              AngularStiffness:
+                HasValue: false
+                Value: Not set
+              AngularDamping:
+                HasValue: false
+                Value: Not set
+              OutputTorqueScaling: 1
+              Input:
+                SurgSim::Input::InputComponent:
+                  Id: a0686eb4-795b-4c66-8ecd-3a8b9b72eba4
+                  Name: InputComponent
+              OutputForceScaling: 1
+              Representation:
+                SurgSim::Physics::RigidRepresentation:
+                  Id: 4e069c9f-4684-4b31-b08e-9e43c48af422
+                  Name: Physics
+              Id: 0f65703b-00aa-40d7-82c7-d9e27bc7021b
+              Name: VTC
+          - SurgSim::Framework::PoseComponent:
+              Pose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Id: 886ced11-abc7-4c4d-8086-9f53247c5f83
+              Name: Pose
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: true
+              Filename: Geometry/stapler_collision.ply
+              UpdateOptions: 1
+              Id: b24b8dd6-714f-4cdb-9db4-66ac958076c2
+              Name: StaplerOsgMesh
+          - SurgSim::Physics::RigidRepresentation:
+              Density: 8050
+              LinearDamping: 0
+              AngularDamping: 0
+              Shape:
+                SurgSim::Math::MeshShape:
+                  FileName: Geometry/stapler_collision.ply
+              IsDrivingSceneElementPose: true
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              NumDof: 6
+              IsGravityEnabled: false
+              IsLocalActive: true
+              CollisionRepresentation:
+                SurgSim::Physics::RigidCollisionRepresentation:
+                  Id: 104ef7db-95fb-4745-b2fd-b81e00abddea
+                  Name: Collision
+              RigidRepresentationState:
+                SurgSim::Physics::RigidRepresentationState:
+                  LinearVelocity: [0, 0, 0]
+                  AngularVelocity: [0, 0, 0]
+                  Pose:
+                    Quaternion: [0, 0, 0, 1]
+                    Translation: [0, 0, 0]
+              Id: 4e069c9f-4684-4b31-b08e-9e43c48af422
+              Name: Physics
+          - StaplerBehavior:
+              StapleEnabledSceneElements:
+                - armSceneElement
+              InputComponent:
+                SurgSim::Input::InputComponent:
+                  Id: a0686eb4-795b-4c66-8ecd-3a8b9b72eba4
+                  Name: InputComponent
+              Representation:
+                SurgSim::Physics::RigidRepresentation:
+                  Id: 4e069c9f-4684-4b31-b08e-9e43c48af422
+                  Name: Physics
+              VirtualTeeth:
+                - SurgSim::Collision::ShapeCollisionRepresentation:
+                    Id: 56a34e38-2875-4f2b-971d-840d2579e902
+                    Name: VirtualToothCollision0
+                - SurgSim::Collision::ShapeCollisionRepresentation:
+                    Id: ae77a6b2-8735-465d-ace0-c7cb0953ddc7
+                    Name: VirtualToothCollision1
+              Id: 8714973d-9d4e-47c5-a0fd-1c607dd63bb8
+              Name: Behavior
+          - SurgSim::Physics::RigidCollisionRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Id: 104ef7db-95fb-4745-b2fd-b81e00abddea
+              Name: Collision
+          - SurgSim::Blocks::VisualizeContactsBehavior:
+              CollisionRepresentation:
+                SurgSim::Physics::RigidCollisionRepresentation:
+                  Id: 104ef7db-95fb-4745-b2fd-b81e00abddea
+                  Name: Collision
+              VectorFieldScale: 200
+              Id: a7f9ffba-b788-4241-85ff-71e18826e80e
+              Name: VisualizeContactsBehavior
+          - SurgSim::Input::InputComponent:
+              DeviceName: MultiAxisDevice
+              Id: a0686eb4-795b-4c66-8ecd-3a8b9b72eba4
+              Name: InputComponent
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: false
+              FileName: Geometry/stapler_handle.obj
+              Id: 18def2b5-a733-4021-b778-311c47ac5d7e
+              Name: Handle
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: false
+              FileName: Geometry/stapler_indicator.obj
+              Id: fde00dc7-50de-433c-b596-8ee80da75aaa
+              Name: Indicator
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: false
+              FileName: Geometry/stapler_markings.obj
+              Id: 81eae131-70c9-4752-82cf-9debaf12bcf2
+              Name: Markings
+          - SurgSim::Graphics::OsgSceneryRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: false
+              FileName: Geometry/stapler_trigger.obj
+              Id: cbc68446-17a6-4d23-aa5f-803b05a779f9
+              Name: Trigger
+          - SurgSim::Collision::ShapeCollisionRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Id: 56a34e38-2875-4f2b-971d-840d2579e902
+              Shape:
+                SurgSim::Math::MeshShape:
+                  FileName: Geometry/virtual_staple_1.ply
+              Name: VirtualToothCollision0
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: true
+              Filename: Geometry/virtual_staple_1.ply
+              UpdateOptions: 1
+              Id: 849d2267-4ce4-4580-9cec-b22584d7f05b
+              Name: virtualToothMesh0
+          - SurgSim::Collision::ShapeCollisionRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Shape:
+                SurgSim::Math::MeshShape:
+                  FileName: Geometry/virtual_staple_2.ply
+              Id: ae77a6b2-8735-465d-ace0-c7cb0953ddc7
+              Name: VirtualToothCollision1
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: true
+              Filename: Geometry/virtual_staple_2.ply
+              UpdateOptions: 1
+              Id: 156a4707-830e-445b-842c-f65900d6a621
+              Name: virtualToothMesh1
+        Name: stapler
+    - SurgSim::Framework::BasicSceneElement:
+        Name: wound
+        Components:
+          - SurgSim::Framework::PoseComponent:
+              Pose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, -0.2, 0]
+              Id: b147706a-ea62-4e8b-8ebf-fecd478750d6
+              Name: Pose
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: false
+              Filename: Geometry/wound_deformable.ply
+              UpdateOptions: 1
+              Id: ef06d974-74a8-4339-8885-7d42d281b6be
+              Name: Triangle mesh
+          - SurgSim::Physics::Fem3DRepresentation:
+              IsDrivingSceneElementPose: true
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Filename: Geometry/wound_deformable.ply
+              NumDof: 1173
+              IsGravityEnabled: true
+              IsLocalActive: true
+              CollisionRepresentation:
+                SurgSim::Physics::DeformableCollisionRepresentation:
+                  Id: 46070a73-9e34-4a9a-bd83-7d4dbf4cfa26
+                  Name: Collision
+              IntegrationScheme:
+                SurgSim::Math::IntegrationScheme: INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER
+              Id: 5b21c6c5-9e7a-4b4c-a1dd-521a83bd3658
+              Name: Physics
+          - SurgSim::Physics::DeformableCollisionRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Shape:
+                SurgSim::Math::MeshShape:
+                  FileName: Geometry/wound_deformable.ply
+              Id: 46070a73-9e34-4a9a-bd83-7d4dbf4cfa26
+              Name: Collision
+          - SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior:
+              Target:
+                SurgSim::Graphics::OsgMeshRepresentation:
+                  Id: ef06d974-74a8-4339-8885-7d42d281b6be
+                  Name: Triangle mesh
+              Source:
+                SurgSim::Physics::Fem3DRepresentation:
+                  Id: 5b21c6c5-9e7a-4b4c-a1dd-521a83bd3658
+                  Name: Physics
+              Id: 2710b639-f40c-4145-a1d6-c59790edc811
+              Name: PhysicsToGraphicalFem
+          - SurgSim::Graphics::OsgMeshRepresentation:
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Visible: true
+              GroupReferences:
+                - __OssDefault__
+              DrawAsWireFrame: true
+              Filename: Geometry/wound_deformable.ply
+              UpdateOptions: 1
+              Id: dbafb504-0f09-4f13-9713-7d83b41d4329
+              Name: Wire frame
+          - SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior:
+              Target:
+                SurgSim::Graphics::OsgMeshRepresentation:
+                  Id: dbafb504-0f09-4f13-9713-7d83b41d4329
+                  Name: Wire frame
+              Source:
+                SurgSim::Physics::Fem3DRepresentation:
+                  Id: 5b21c6c5-9e7a-4b4c-a1dd-521a83bd3658
+                  Name: Physics
+              Id: 4d0d3a03-3846-4619-ae86-823435531c0e
+              Name: PhysicsToWireFrameFem
+    - SurgSim::Framework::BasicSceneElement:
+        Name: SceneElement
+        Components:
+          - SurgSim::Framework::PoseComponent:
+              Pose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Id: c382ef16-f2b5-4c5d-a533-28566efcce7d
+              Name: Pose
+          - SurgSim::Input::InputComponent:
+              DeviceName: Keyboard
+              Id: 616d866d-cc25-443a-a57f-1fcb43e7f376
+              Name: KeyboardInputComponent
+          - SurgSim::Blocks::KeyboardTogglesComponentBehavior:
+              InputComponent:
+                SurgSim::Input::InputComponent:
+                  Id: 616d866d-cc25-443a-a57f-1fcb43e7f376
+                  Name: KeyboardInputComponent
+              Id: 81660851-2655-4891-9606-7462e3447b40
+              KeyboardRegistry:
+                97:
+                  - SurgSim::Graphics::OsgSceneryRepresentation:
+                      Id: 81eae131-70c9-4752-82cf-9debaf12bcf2
+                      Name: Markings
+                  - SurgSim::Graphics::OsgSceneryRepresentation:
+                      Id: 18def2b5-a733-4021-b778-311c47ac5d7e
+                      Name: Handle
+                  - SurgSim::Graphics::OsgSceneryRepresentation:
+                      Id: cbc68446-17a6-4d23-aa5f-803b05a779f9
+                      Name: Trigger
+                  - SurgSim::Graphics::OsgSceneryRepresentation:
+                      Id: fde00dc7-50de-433c-b596-8ee80da75aaa
+                      Name: Indicator
+                98:
+                  - SurgSim::Graphics::OsgMeshRepresentation:
+                      Id: b24b8dd6-714f-4cdb-9db4-66ac958076c2
+                      Name: StaplerOsgMesh
+                99:
+                  - SurgSim::Graphics::OsgSceneryRepresentation:
+                      Id: b17ff057-4f16-49d2-95c7-ebaacda9ffc0
+                      Name: forearm
+                  - SurgSim::Graphics::OsgSceneryRepresentation:
+                      Id: 58b991bb-16dc-4fb0-9f0e-b153da9a641d
+                      Name: upperarm
+                100:
+                  - SurgSim::Graphics::OsgMeshRepresentation:
+                      Id: 4ea6a631-6289-4886-98d2-aa91580e8250
+                      Name: ArmOsgMesh
+                101:
+                  - SurgSim::Graphics::OsgMeshRepresentation:
+                      Id: ef06d974-74a8-4339-8885-7d42d281b6be
+                      Name: Triangle mesh
+                102:
+                  - SurgSim::Graphics::OsgMeshRepresentation:
+                      Id: dbafb504-0f09-4f13-9713-7d83b41d4329
+                      Name: Wire frame
+              Name: KeyboardBehavior

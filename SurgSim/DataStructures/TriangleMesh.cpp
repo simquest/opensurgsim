@@ -13,7 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+
 #include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 
 namespace SurgSim
 {
@@ -22,9 +26,7 @@ namespace DataStructures
 
 TriangleMesh::TriangleMesh()
 {
-
 }
-
 
 const SurgSim::Math::Vector3d& TriangleMesh::getNormal(size_t triangleId)
 {
@@ -52,14 +54,28 @@ void TriangleMesh::doUpdate()
 	calculateNormals();
 }
 
+bool TriangleMesh::doLoad(const std::string& fileName)
+{
+	auto triangleMeshDelegate = std::make_shared<TriangleMeshPlyReaderDelegate<TriangleMesh>>(shared_from_this());
+
+	PlyReader reader(fileName);
+	SURGSIM_ASSERT(reader.isValid()) << "'" << fileName << "' is an invalid .ply file.";
+	SURGSIM_ASSERT(reader.parseWithDelegate(triangleMeshDelegate)) <<
+			"The input file " << fileName << " does not have the property required by triangle mesh.";
+
+	calculateNormals();
+
+	return true;
+}
+
 void TriangleMesh::copyWithTransform(const SurgSim::Math::RigidTransform3d& pose, const TriangleMesh& source)
 {
 	SURGSIM_ASSERT(getNumVertices() == source.getNumVertices())
-		<< "The source mesh must have the same number of vertices.";
+			<< "The source mesh must have the same number of vertices.";
 	SURGSIM_ASSERT(getNumEdges() == source.getNumEdges())
-		<< "The source mesh must have the same number of edges";
+			<< "The source mesh must have the same number of edges";
 	SURGSIM_ASSERT(getNumTriangles() == source.getNumTriangles())
-		<< "The source mesh must have the same number of triangles";
+			<< "The source mesh must have the same number of triangles";
 
 	auto targetVertex = getVertices().begin();
 	auto const& vertices = source.getVertices();
@@ -73,7 +89,11 @@ void TriangleMesh::copyWithTransform(const SurgSim::Math::RigidTransform3d& pose
 	auto const& triangles = source.getTriangles();
 	for (auto it = triangles.cbegin(); it != triangles.cend(); ++it)
 	{
-		targetTriangle->data.normal = pose.linear() * it->data.normal;
+		targetTriangle->isValid = it->isValid;
+		if (it->isValid)
+		{
+			targetTriangle->data.normal = pose.linear() * it->data.normal;
+		}
 		++targetTriangle;
 	}
 }

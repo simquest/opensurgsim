@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Collision/Location.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
@@ -38,7 +38,7 @@ void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
 
 	IndexType numNodes = x->size() / 3;
 	SURGSIM_ASSERT(numNodes * 3 == x->size()) <<
-		"Unexpected number of dof in a Fem3D state vector (not a multiple of 3)";
+			"Unexpected number of dof in a Fem3D state vector (not a multiple of 3)";
 
 	for (IndexType nodeId = 0; nodeId < numNodes; nodeId++)
 	{
@@ -80,6 +80,69 @@ RepresentationType Fem3DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM3D;
 }
 
+void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+		SurgSim::Math::Vector& generalizedForce,
+		const SurgSim::Math::Matrix& K,
+		const SurgSim::Math::Matrix& D)
+{
+	const size_t dofPerNode = getNumDofPerNode();
+	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
+
+	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
+	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
+			"Generalized force has an invalid size of " << generalizedForce.size() << ". Expected " << dofPerNode;
+	SURGSIM_ASSERT(K.size() == 0 || (K.rows() == expectedSize && K.cols() == expectedSize)) <<
+			"Stiffness matrix K has an invalid size (" << K.rows() << "," << K.cols() <<
+			") was expecting a square matrix of size " << dofPerNode;
+	SURGSIM_ASSERT(D.size() == 0 || (D.rows() == expectedSize && D.cols() == expectedSize)) <<
+			"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
+			") was expecting a square matrix of size " << dofPerNode;
+
+	std::shared_ptr<Fem3DRepresentationLocalization> localization3D =
+		std::dynamic_pointer_cast<Fem3DRepresentationLocalization>(localization);
+	SURGSIM_ASSERT(localization3D != nullptr) << "Invalid localization type (not a Fem3DRepresentationLocalization)";
+
+	const size_t elementId = localization3D->getLocalPosition().index;
+	const SurgSim::Math::Vector& coordinate = localization3D->getLocalPosition().coordinate;
+	std::shared_ptr<FemElement> element = getFemElement(elementId);
+
+	size_t index = 0;
+	for (auto nodeId : element->getNodeIds())
+	{
+		m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce * coordinate[index];
+		index++;
+	}
+
+	if (K.size() != 0 || D.size() != 0)
+	{
+		size_t index1 = 0;
+		for (auto nodeId1 : element->getNodeIds())
+		{
+			size_t index2 = 0;
+			for (auto nodeId2 : element->getNodeIds())
+			{
+				if (K.size() != 0)
+				{
+					m_externalGeneralizedStiffness.block(dofPerNode * nodeId1,
+														 dofPerNode * nodeId2,
+														 dofPerNode, dofPerNode)
+					+= coordinate[index1] * coordinate[index2] * K;
+				}
+				if (D.size() != 0)
+				{
+					m_externalGeneralizedDamping.block(dofPerNode * nodeId1,
+													   dofPerNode * nodeId2,
+													   dofPerNode, dofPerNode)
+					+= coordinate[index1] * coordinate[index2] * D;
+				}
+				index2++;
+			}
+
+			index1++;
+		}
+	}
+}
+
 std::shared_ptr<FemPlyReaderDelegate> Fem3DRepresentation::getDelegate()
 {
 	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(shared_from_this());
@@ -112,23 +175,29 @@ std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElemen
 
 	std::array<size_t, 3> triangleSorted;
 	auto doesIncludeTriangle = [&triangleSorted](const std::vector<size_t>& femElementSorted)
-							   { return std::includes(femElementSorted.begin(), femElementSorted.end(),
-													  triangleSorted.begin(), triangleSorted.end()); };
+	{
+		return std::includes(femElementSorted.begin(), femElementSorted.end(),
+							 triangleSorted.begin(), triangleSorted.end());
+	};
 
 	auto& meshTriangles = mesh.getTriangles();
 	for (auto triangle = meshTriangles.cbegin(); triangle != meshTriangles.cend(); ++triangle)
 	{
+		if (! triangle->isValid)
+		{
+			continue;
+		}
 		triangleSorted = triangle->verticesId;
 		std::sort(triangleSorted.begin(), triangleSorted.end());
 
 		// Find the femElement that contains all the node ids of this triangle.
 		std::vector<std::vector<size_t>>::iterator foundFemElement =
-			std::find_if(femElements.begin(), femElements.end(), doesIncludeTriangle);
+										  std::find_if(femElements.begin(), femElements.end(), doesIncludeTriangle);
 
 		// Assert to make sure that a triangle doesn't end up not having a femElement mapped to it.
 		SURGSIM_ASSERT(foundFemElement != femElements.end())
-			<< "A triangle in the given mesh of an Fem3DRepresentation does not have a corresponding"
-			<< " femElement.";
+				<< "A triangle in the given mesh of an Fem3DRepresentation does not have a corresponding"
+				<< " femElement.";
 
 		// Add a row to the mapping (triangleId, elementId).
 		// std::distance gives the index of the iterator within the container (by finding the distance
@@ -157,34 +226,72 @@ bool Fem3DRepresentation::doWakeUp()
 	return true;
 }
 
-std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::Collision::Location& location)
+std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::DataStructures::Location& location)
 {
-	SURGSIM_ASSERT(location.triangleId.hasValue())
-		<< "Localization cannot be created if the triangle ID is not available.";
+	SURGSIM_ASSERT(location.meshLocalCoordinate.hasValue())
+			<< "Localization cannot be created if the triangle ID is not available.";
 
-	size_t triangleId = location.triangleId.getValue();
-	SurgSim::Math::Vector globalPosition = location.globalPosition.getValue();
+	SURGSIM_ASSERT(location.meshLocalCoordinate.getValue().coordinate.size() == 3)
+			<< "Localization has incorrect size for the barycentric coordinates.";
 
+	auto deformableCollisionRepresentation
+		= std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
+
+	SURGSIM_ASSERT(deformableCollisionRepresentation != nullptr)
+			<< "Localization cannot be created if the DeformableCollisionRepresentation is not correctly set.";
+
+	// Find the vertex ids of the triangle.
+	size_t triangleId = location.meshLocalCoordinate.getValue().index;
+	auto triangleVertices = deformableCollisionRepresentation->getMesh()->getTriangle(triangleId).verticesId;
+
+	// Find the vertex ids of the corresponding FemNode.
 	// Get FemElement id from the triangle id.
 	SURGSIM_ASSERT(m_triangleIdToElementIdMap.count(triangleId) == 1) << "Triangle must be mapped to an fem element.";
 
 	size_t elementId = m_triangleIdToElementIdMap[triangleId];
 	std::shared_ptr<FemElement> element = getFemElement(elementId);
 
-	FemRepresentationCoordinate coordinate;
-	coordinate.elementId = elementId;
-	coordinate.naturalCoordinate = element->computeNaturalCoordinate(*m_currentState, globalPosition);
+	auto elementVertices = element->getNodeIds();
 
-	// Fem3DRepresentationLocalization::setLocalPosition verifies argument based on its Representation.
-	auto result = std::make_shared<Fem3DRepresentationLocalization>();
-	result->setRepresentation(std::static_pointer_cast<SurgSim::Physics::Representation>(getSharedPtr()));
-	result->setLocalPosition(coordinate);
+	// Find the mapping between triangleVertices and elementVertices.
+	std::vector<size_t> indices;
+	indices.reserve(elementVertices.size());
+	for (size_t i = 0; i < elementVertices.size(); ++i)
+	{
+		indices.push_back(3);
+		for (int j = 0; j < 3; ++j)
+		{
+			if (triangleVertices[j] == elementVertices[i])
+			{
+				indices[i] = j;
+				break;
+			}
+		}
+	}
+
+	// Create the natural coordinate.
+	SurgSim::Math::Vector4d barycentricCoordinate(location.meshLocalCoordinate.getValue().coordinate[0],
+			location.meshLocalCoordinate.getValue().coordinate[1],
+			location.meshLocalCoordinate.getValue().coordinate[2],
+			0.0);
+	SurgSim::DataStructures::IndexedLocalCoordinate coordinate;
+	coordinate.index = elementId;
+	coordinate.coordinate.resize(elementVertices.size());
+	for (size_t i = 0; i < elementVertices.size(); ++i)
+	{
+		coordinate.coordinate[i] = barycentricCoordinate[indices[i]];
+	}
+
+	// Fem3DRepresentationLocalization will verify the coordinate (2nd parameter) based on
+	// the Fem3DRepresentation passed as 1st parameter.
+	auto result = std::make_shared<Fem3DRepresentationLocalization>(
+					  std::static_pointer_cast<SurgSim::Physics::Representation>(getSharedPtr()), coordinate);
 
 	return result;
 }
 
 void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-	const SurgSim::Math::RigidTransform3d& transform)
+		const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);

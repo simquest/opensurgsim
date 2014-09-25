@@ -24,25 +24,15 @@ namespace Physics
 
 template <class T>
 std::shared_ptr<T> SurgSim::Physics::RigidRepresentationBase::createTypedLocalization(
-	const SurgSim::Collision::Location& location)
+	const SurgSim::DataStructures::Location& location)
 {
 	// Change when we deal with the meshes as shapes
 	std::shared_ptr<T> result = std::make_shared<T>();
 
-	SURGSIM_ASSERT(location.globalPosition.hasValue() || location.rigidLocalPosition.hasValue()) <<
+	SURGSIM_ASSERT(location.rigidLocalPosition.hasValue()) <<
 		"Tried to create a rigid localization without valid position information";
 
-	SurgSim::Math::Vector3d localPosition;
-	if (!location.rigidLocalPosition.hasValue())
-	{
-		localPosition = m_currentState.getPose().inverse() * location.globalPosition.getValue();
-	}
-	else
-	{
-		localPosition = location.rigidLocalPosition.getValue();
-	}
-
-	result->setLocalPosition(localPosition);
+	result->setLocalPosition(location.rigidLocalPosition.getValue());
 
 	return std::move(result);
 }

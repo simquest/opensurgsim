@@ -19,14 +19,14 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/AabbTreeNode.h"
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/RigidTransform.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::DataStructures::TriangleMesh;
-using SurgSim::DataStructures::TriangleMeshBase;
 using SurgSim::Math::MeshShape;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
@@ -203,10 +203,20 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
-					penetrationPoints.first.triangleId.setValue(*i);
-					penetrationPoints.second.triangleId.setValue(*j);
-					penetrationPoints.first.globalPosition.setValue(penetrationPointA);
-					penetrationPoints.second.globalPosition.setValue(penetrationPointB);
+					Vector3d barycentricCoordinate;
+					SurgSim::Math::barycentricCoordinates(penetrationPointA, verticesA[0], verticesA[1], verticesA[2],
+						normalA, &barycentricCoordinate);
+					penetrationPoints.first.meshLocalCoordinate.setValue(
+						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
+					SurgSim::Math::barycentricCoordinates(penetrationPointB, verticesB[0], verticesB[1], verticesB[2],
+						normalB, &barycentricCoordinate);
+					penetrationPoints.second.meshLocalCoordinate.setValue(
+						SurgSim::DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate));
+
+					penetrationPoints.first.rigidLocalPosition.setValue(
+						pair->getFirst()->getPose().inverse() * penetrationPointA);
+					penetrationPoints.second.rigidLocalPosition.setValue(
+						pair->getSecond()->getPose().inverse() * penetrationPointB);
 
 					pair->addContact(std::abs(depth), normal, penetrationPoints);
 				}

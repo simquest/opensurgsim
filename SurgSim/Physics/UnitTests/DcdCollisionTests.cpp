@@ -41,19 +41,16 @@ using SurgSim::Physics::PhysicsManagerState;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationParameters;
 
 std::shared_ptr<RigidRepresentation> createSphere(const std::string& name, const SurgSim::Math::Vector3d& position)
 {
 	std::shared_ptr<RigidRepresentation> representation = std::make_shared<RigidRepresentation>(name);
 
-	RigidRepresentationParameters params;
-	params.setDensity(700.0); // Wood
+	representation->setDensity(700.0); // Wood
 
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(1.0); // 1cm Sphere
-	params.setShapeUsedForMassInertia(shape);
+	representation->setShape(shape);
 
-	representation->setInitialParameters(params);
 	representation->setLocalPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), position));
 
 	return representation;
@@ -102,11 +99,9 @@ TEST(DcdCollisionTest, FixedRigidCollisionTest)
 		std::make_shared<RigidCollisionRepresentation>("Sphere Collision");
 	sphere1->setCollisionRepresentation(sphere1Collision);
 
-	RigidRepresentationParameters params;
-	std::shared_ptr<Shape> shape = std::make_shared<DoubleSidedPlaneShape>();
-	params.setShapeUsedForMassInertia(shape);
 	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("Fixed");
-	fixed->setInitialParameters(params);
+	std::shared_ptr<Shape> shape = std::make_shared<DoubleSidedPlaneShape>();
+	fixed->setShape(shape);
 	std::shared_ptr<SurgSim::Collision::Representation> fixedCollision =
 		std::make_shared<RigidCollisionRepresentation>("Plane Collision");
 	fixed->setCollisionRepresentation(fixedCollision);

@@ -78,7 +78,7 @@ TEST_F(FixedRepresentationLocalizationTest, GetPositionTest)
 		std::make_shared<FixedRepresentation>("FixedRepresentation");
 
 	// Activate the rigid body and setup its initial pose
-	fixedRepresentation->setIsActive(true);
+	fixedRepresentation->setLocalActive(true);
 	fixedRepresentation->setLocalPose(m_initialTransformation);
 	fixedRepresentation->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 	fixedRepresentation->wakeUp();

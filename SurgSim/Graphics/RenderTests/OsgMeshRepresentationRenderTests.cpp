@@ -318,8 +318,82 @@ TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	runtime->stop();
 
+}
 
+TEST_F(OsgMeshRepresentationRenderTests, TriangleDeletionTest)
+{
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Scene");
+	scene->addSceneElement(element);
 
+	SurgSim::Testing::Cube::makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
+
+	// make a colored cube
+	auto meshRepresentation1 = makeRepresentation("colormesh");
+	meshRepresentation1->getMesh()->initialize(cubeVertices, cubeColors, std::vector<Vector2d>(), cubeTriangles);
+	meshRepresentation1->setUpdateOptions(MeshRepresentation::UPDATE_OPTION_COLORS |
+										  MeshRepresentation::UPDATE_OPTION_VERTICES |
+										  MeshRepresentation::UPDATE_OPTION_TRIANGLES);
+
+	element->addComponent(meshRepresentation1);
+
+	auto axes = std::make_shared<OsgAxesRepresentation>("Origin");
+	viewElement->addComponent(axes);
+	viewElement->setPose(SurgSim::Math::makeRigidTransform(
+							 Vector3d(-2.0, -2.0, -2.0),
+							 Vector3d(0.0, 0.0, 0.0),
+							 Vector3d(0.0, 0.0, 1.0)));
+// 	auto view = std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView());
+// 	view->enableManipulator(true);
+
+	struct InterpolationData
+	{
+	public:
+		std::pair<RigidTransform3d, RigidTransform3d> transform;
+		std::pair<double, double> scale;
+	};
+
+	InterpolationData interpolator;
+	interpolator.transform.first =
+		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 1.0, 1.0)), Vector3d(-0.1, 0.0, -0.2));
+	interpolator.scale.first = 0.03;
+	interpolator.transform.second =
+		makeRigidTransform(makeRotationQuaternion(M_PI_2 * 2, Vector3d(1.0, -1.0, 1.0)), Vector3d(0.1, 0.0, -0.2));
+	interpolator.scale.second = 0.03;
+
+	/// Run the thread
+	runtime->start();
+	EXPECT_TRUE(graphicsManager->isInitialized());
+	EXPECT_TRUE(viewElement->isInitialized());
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+
+	int numSteps = 1000;
+
+	std::vector<Vector3d> newVertices(cubeVertices.size());
+
+	size_t triangleCount = meshRepresentation1->getMesh()->getNumTriangles();
+
+	for (int i = 0; i < numSteps; ++i)
+	{
+		double t = static_cast<double>(i) / numSteps;
+
+		if (i % (numSteps / triangleCount) == 0)
+		{
+			size_t triangle = meshRepresentation1->getMesh()->getNumTriangles() - 1;
+
+			// Leave one triangle for the mesh
+			if (triangle > 0)
+			{
+				meshRepresentation1->getMesh()->removeTriangle(triangle);
+			}
+		}
+
+		RigidTransform3d transform = interpolate(interpolator.transform, t);
+		element->setPose(transform);
+
+		/// The total number of steps should complete in 1 second
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps) * 4);
+	}
 }
 
 }; // namespace Graphics

@@ -21,6 +21,7 @@
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
+#include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Framework/Asset.h"
@@ -30,11 +31,6 @@
 
 namespace SurgSim
 {
-
-namespace DataStructures
-{
-class AabbTree;
-}
 
 namespace Math
 {
@@ -111,7 +107,8 @@ public:
 	/// \return true if this shape contains a valid mesh; otherwise, false.
 	bool isValid() const;
 
-	virtual bool doLoad(const std::string& fileName) override;
+protected:
+	virtual bool doLoad(const std::string& filePath) override;
 
 private:
 	/// Compute useful volume integrals based on the triangle mesh, which

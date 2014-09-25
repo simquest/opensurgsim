@@ -16,6 +16,7 @@
 /// \file
 /// Tests for the Graphics Manager class.
 
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/Component.h"
@@ -26,6 +27,7 @@
 
 #include <algorithm>
 
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::ComponentManager;
 using SurgSim::Framework::Component;
 using SurgSim::Framework::Runtime;
@@ -196,6 +198,41 @@ TEST_F(GraphicsManagerTest, AddRemoveTest)
 	/// Try to remove a component that is not graphics-related
 	EXPECT_TRUE(componentManager->enqueueRemoveComponent(nonGraphicsComponent)) <<
 			"Removing a component that this manager is not concerned with should return true";
+}
+
+TEST_F(GraphicsManagerTest, UpdateTest)
+{
+	auto mockRepresentation = std::make_shared<MockRepresentation>("MockRepresentation");
+	auto sceneElement = std::make_shared<BasicSceneElement>("BasicSceneElement");
+	sceneElement->addComponent(mockRepresentation);
+	runtime->getScene()->addSceneElement(sceneElement);
+
+	EXPECT_TRUE(mockRepresentation->isVisible());
+
+	// When a graphics representation is inactive, it will be set to invisible by Graphics Manager.
+	// And it won't be updated by Graphics Manager.
+	mockRepresentation->setLocalActive(false);
+	runtime->start();
+	EXPECT_TRUE(graphicsManager->isInitialized());
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(0, mockRepresentation->getNumUpdates());
+	EXPECT_FALSE(mockRepresentation->isVisible());
+
+	// When a graphics representation is active, it will be set to visible by Graphics Manager.
+	// And it will be updated by Graphics Manager.
+	mockRepresentation->setLocalActive(true);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_GT(mockRepresentation->getNumUpdates(), 0);
+	EXPECT_TRUE(mockRepresentation->isVisible());
+
+	// Turn off an active graphics representation, the update of it will be stopped and it will be invisible.
+	mockRepresentation->setLocalActive(false);
+	auto updateCount = mockRepresentation->getNumUpdates();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(updateCount, mockRepresentation->getNumUpdates());
+	EXPECT_FALSE(mockRepresentation->isVisible());
+
+	runtime->stop();
 }
 
 };  // namespace Graphics

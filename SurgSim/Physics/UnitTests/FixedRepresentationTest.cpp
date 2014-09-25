@@ -26,7 +26,6 @@
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Vector3d;
@@ -37,7 +36,6 @@ using SurgSim::Physics::Representation;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentationState;
-using SurgSim::Physics::RigidRepresentationParameters;
 
 class FixedRepresentationTest : public ::testing::Test
 {
@@ -87,7 +85,7 @@ TEST_F(FixedRepresentationTest, ConstructorTest)
 
 TEST_F(FixedRepresentationTest, ResetStateTest)
 {
-	m_fixedRepresentation->setIsActive(false);
+	m_fixedRepresentation->setLocalActive(false);
 	m_fixedRepresentation->setIsGravityEnabled(false);
 	m_fixedRepresentation->setLocalPose(m_initialTransformation);
 
@@ -145,9 +143,9 @@ TEST_F(FixedRepresentationTest, SetGetAndDefaultValueTest)
 {
 	// Get/Set active flag [default = true]
 	EXPECT_TRUE(m_fixedRepresentation->isActive());
-	m_fixedRepresentation->setIsActive(false);
+	m_fixedRepresentation->setLocalActive(false);
 	ASSERT_FALSE(m_fixedRepresentation->isActive());
-	m_fixedRepresentation->setIsActive(true);
+	m_fixedRepresentation->setLocalActive(true);
 	ASSERT_TRUE(m_fixedRepresentation->isActive());
 
 	// Get numDof = 0
@@ -182,9 +180,6 @@ TEST_F(FixedRepresentationTest, UpdateTest)
 
 TEST_F(FixedRepresentationTest, SerializationTest)
 {
-	auto sphereShaper = std::make_shared<SphereShape>(0.1);
-	RigidRepresentationParameters params;
-	params.setShapeUsedForMassInertia(sphereShaper);
 
 	{
 		SCOPED_TRACE("Encode/Decode as shared_ptr<>, should be OK");
@@ -217,7 +212,7 @@ TEST_F(FixedRepresentationTest, SerializationTest)
 			std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation");
 
 		rigidRepresentation->setCollisionRepresentation(rigidCollisionRepresentation);
-		rigidRepresentation->setInitialParameters(params);
+		rigidRepresentation->setShape(std::make_shared<SphereShape>(0.1));
 
 		YAML::Node node;
 		EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*rigidRepresentation));

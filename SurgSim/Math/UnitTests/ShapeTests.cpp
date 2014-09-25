@@ -524,6 +524,7 @@ TEST_F(ShapeTest, OctreeShape)
 		OctreeShape octree;
 		EXPECT_NO_THROW(octree.setRootNode(node));
 		EXPECT_NO_THROW(octree.load(fileName));
+		EXPECT_EQ(fileName, octree.getFileName());
 
 		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
 		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, octree.getType());
@@ -532,6 +533,22 @@ TEST_F(ShapeTest, OctreeShape)
 		EXPECT_THROW(octree.getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
 		EXPECT_EQ(fileName, octree.getFileName());
 		EXPECT_TRUE(octree.isValid());
+	}
+
+	{
+		SCOPED_TRACE("Load nonexistent file will throw");
+		SurgSim::Framework::ApplicationData appData("config.txt");
+		const std::string fileName = "Nonexistent file";
+		OctreeShape octree;
+		EXPECT_ANY_THROW(octree.load(fileName, appData));
+	}
+
+	{
+		SCOPED_TRACE("Load existent file containing invalid Octree will throw");
+		SurgSim::Framework::ApplicationData appData("config.txt");
+		const std::string fileName = "OctreeShapeData/invalid-staple.vox";
+		OctreeShape octree;
+		EXPECT_ANY_THROW(octree.load(fileName, appData));
 	}
 }
 

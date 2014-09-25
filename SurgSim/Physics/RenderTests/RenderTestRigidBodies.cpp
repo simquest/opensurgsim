@@ -49,7 +49,6 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationParameters;
 
 namespace
 {
@@ -59,14 +58,11 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidSphereSceneElement(
 	// Physics representation
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>("Physics");
-	RigidRepresentationParameters params;
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(radius);
-	params.setDensity(750.0); // Average mass density of
-							  // Oak wood (http://www.engineeringtoolbox.com/wood-density-d_40.html)
-	params.setShapeUsedForMassInertia(shape);
-	params.setLinearDamping(1e-2);
-	params.setAngularDamping(1e-4);
-	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setShape(shape);
+	physicsRepresentation->setDensity(750.0); // Average mass density of Oak Wood
+	physicsRepresentation->setLinearDamping(1e-2);
+	physicsRepresentation->setAngularDamping(1e-4);
 
 	// Collision representation
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
@@ -91,14 +87,11 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidBoxSceneElement(con
 	// Physics representation
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>("Physics");
-	RigidRepresentationParameters params;
 	std::shared_ptr<BoxShape> shape = std::make_shared<BoxShape>(size[0], size[1], size[2]);
-	params.setDensity(750.0); // Average mass density of
-							  // Oak wood (http://www.engineeringtoolbox.com/wood-density-d_40.html)
-	params.setShapeUsedForMassInertia(shape);
-	params.setLinearDamping(1e-2);
-	params.setAngularDamping(1e-4);
-	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setShape(shape);
+	physicsRepresentation->setDensity(750.0); // Average mass density of oak wood
+	physicsRepresentation->setLinearDamping(1e-2);
+	physicsRepresentation->setAngularDamping(1e-4);
 
 	// Collision representation
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
@@ -123,10 +116,8 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedPlaneSceneElement(c
 	// Physics representation
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>("Physics");
-	RigidRepresentationParameters params;
 	std::shared_ptr<PlaneShape> shape = std::make_shared<PlaneShape>();
-	params.setShapeUsedForMassInertia(shape);
-	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setShape(shape);
 
 	// Collision representation
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
@@ -161,14 +152,11 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	// Physics representation
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>("Physics");
-	RigidRepresentationParameters params;
 	std::shared_ptr<MeshShape> shape = std::make_shared<MeshShape>(*mesh);
-	params.setDensity(750.0); // Average mass density of
-							  // Oak wood (http://www.engineeringtoolbox.com/wood-density-d_40.html)
-	params.setShapeUsedForMassInertia(shape);
-	params.setLinearDamping(1e-2);
-	params.setAngularDamping(1e-4);
-	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setShape(shape);
+	physicsRepresentation->setDensity(750.0); // Average mass density of oak wood
+	physicsRepresentation->setLinearDamping(1e-2);
+	physicsRepresentation->setAngularDamping(1e-4);
 
 	// Collision representation
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =

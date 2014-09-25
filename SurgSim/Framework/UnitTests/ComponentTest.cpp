@@ -21,6 +21,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -289,6 +290,7 @@ TEST(ComponentTests, MacroRegistrationTest)
 	EXPECT_NE(nullptr, testComponent);
 	EXPECT_EQ("ComponentName", testComponent->getName());
 	EXPECT_EQ("TestComponent2", testComponent->getClassName());
+	EXPECT_TRUE(testComponent->isActive());
 }
 
 TEST(ComponentTests, DecodeSharedReferences)
@@ -299,10 +301,12 @@ TEST(ComponentTests, DecodeSharedReferences)
 
 	auto component1 = node.as<std::shared_ptr<Component>>();
 	EXPECT_NE(nullptr, component1);
+	EXPECT_TRUE(component1->isActive());
 
 	auto component1copy = node.as<std::shared_ptr<Component>>();
 	EXPECT_NE(nullptr, component1copy);
 	EXPECT_EQ(component1, component1copy);
+	EXPECT_TRUE(component1copy->isActive());
 
 	node["TestComponent2"]["Id"] = "DecodeSharedReferences_TwoComponentName";
 
@@ -310,6 +314,11 @@ TEST(ComponentTests, DecodeSharedReferences)
 	EXPECT_NE(nullptr, component2);
 	EXPECT_NE(component2, component1);
 	EXPECT_NE(component2, component1copy);
+	EXPECT_TRUE(component2->isActive());
+
+	node["TestComponent2"]["IsLocalActive"] = false;
+	auto component3 = node.as<std::shared_ptr<Component>>();
+	EXPECT_FALSE(component3->isLocalActive());
 }
 
 TEST(ComponentTests, EncodeComponent)
@@ -326,6 +335,8 @@ TEST(ComponentTests, EncodeComponent)
 	EXPECT_EQ("TestComponent2", className);
 	EXPECT_EQ(1, (data["ValueOne"].IsDefined() ? data["ValueOne"].as<int>() : 0xbad));
 	EXPECT_EQ(2, (data["ValueTwo"].IsDefined() ? data["ValueTwo"].as<int>() : 0xbad));
+	EXPECT_TRUE(data["IsLocalActive"].IsDefined());
+	EXPECT_TRUE(data["IsLocalActive"].as<bool>());
 }
 
 TEST(ComponentTests, DecodeComponent)
@@ -335,6 +346,8 @@ TEST(ComponentTests, DecodeComponent)
 	node["TestComponent2"]["Id"] = "DecodeComponent_TestComponentName";
 	node["TestComponent2"]["ValueOne"] = 100;
 	node["TestComponent2"]["ValueTwo"] = 101;
+	node["TestComponent2"]["IsLocalActive"] = false;
+
 
 	auto component = node.as<std::shared_ptr<Component>>();
 
@@ -344,6 +357,7 @@ TEST(ComponentTests, DecodeComponent)
 	EXPECT_EQ("TestComponentName", testComponent->getName());
 	EXPECT_EQ(100, testComponent->getValueOne());
 	EXPECT_EQ(101, testComponent->getValueTwo());
+	EXPECT_FALSE(testComponent->isLocalActive());
 }
 
 TEST(ComponentTests, ComponentReferences)
@@ -409,7 +423,7 @@ TEST(ComponentTests, MockComponent)
 	ASSERT_NE(nullptr, component);
 
 	/// SerializationMockComponent does not have an explicit definition anywhere in the code
-	/// there is not SerializationMockComponent, but this should still suceed, this test protects
+	/// there is no SerializationMockComponent, but this should still succeed, this test protects
 	/// against linker optimization
 	auto nonDefinedComponent = SurgSim::Framework::Component::getFactory().create(
 								   "SerializationMockComponent",
@@ -449,4 +463,74 @@ TEST(ComponentTests, PoseComponentTest)
 
 	EXPECT_NE(nullptr, decoded);
 	EXPECT_TRUE(pose.isApprox(decoded->getValue<SurgSim::Math::RigidTransform3d>("Pose")));
+}
+
+
+TEST(ComponentTests, SetActiveTest)
+{
+	std::shared_ptr<Component> component = std::make_shared<MockComponent>("Component");
+	EXPECT_TRUE(component->isActive());
+	EXPECT_TRUE(component->isLocalActive());
+	EXPECT_NO_THROW(component->setLocalActive(false));
+	EXPECT_FALSE(component->isActive());
+	EXPECT_FALSE(component->isLocalActive());
+
+	// RW property test
+	component->setValue("IsLocalActive", true);
+	EXPECT_TRUE(component->isActive());
+	EXPECT_TRUE(component->isLocalActive());
+	EXPECT_TRUE(component->getValue<bool>("IsActive"));
+	component->setValue("IsLocalActive", false);
+	EXPECT_FALSE(component->isActive());
+	EXPECT_FALSE(component->isLocalActive());
+	EXPECT_FALSE(component->getValue<bool>("IsActive"));
+
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("SceneElement");
+	sceneElement->addComponent(component);
+	EXPECT_TRUE(sceneElement->isActive());
+
+	// An inactive component in an active SceneElement is 'inactive'.
+	EXPECT_FALSE(component->isActive());
+
+	// An active component in an active SceneElement is 'active'.
+	component->setLocalActive(true);
+	EXPECT_TRUE(component->isActive());
+
+	sceneElement->setActive(false);
+	// An active component in an inactive SceneElement is 'inactive'.
+	EXPECT_FALSE(component->isActive());
+
+	// An inactive component in an inactive SceneElement is 'inactive'.
+	component->setLocalActive(false);
+	EXPECT_FALSE(component->isActive());
+
+	// During serialization, it's Component::m_isActive being serialized, not Component::isActive().
+	component->setValue("IsLocalActive", true);
+	YAML::Node node = sceneElement->encode(true);
+	YAML::Node data = node["SurgSim::Framework::BasicSceneElement"];
+
+	// Decode the component only.
+	std::shared_ptr<SurgSim::Framework::Component> decodedComponent;
+	for (auto nodeIt = data["Components"].begin(); nodeIt != data["Components"].end(); ++nodeIt)
+	{
+		if ("MockComponent" == nodeIt->begin()->first.as<std::string>())
+		{
+			decodedComponent = nodeIt->as<std::shared_ptr<MockComponent>>();
+			break;
+		}
+	}
+	EXPECT_EQ(nullptr, decodedComponent->getSceneElement());
+	EXPECT_TRUE(decodedComponent->isActive());
+	EXPECT_TRUE(decodedComponent->isLocalActive());
+
+	// Decode the component with a SceneElement. The SceneElement's activity (active/inactive) will
+	// affect the return value of Component::isActive().
+	decodedComponent = nullptr;
+	auto decodedSceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Decoded");
+	decodedSceneElement->decode(node);
+	EXPECT_FALSE(decodedSceneElement->isActive());
+	decodedComponent = decodedSceneElement->getComponent("Component");
+	EXPECT_NE(nullptr, decodedComponent->getSceneElement());
+	EXPECT_FALSE(decodedComponent->isActive());
+	EXPECT_TRUE(decodedComponent->isLocalActive());
 }

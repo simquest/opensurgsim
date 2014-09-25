@@ -37,13 +37,12 @@ endif()
 # Use SURGSIM_SOURCE_DIR SURGSIM_SOURCE_DIR will always point to the top of the OSS Tree
 set(SURGSIM_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-include_directories(${SURGSIM_SOURCE_DIR})
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 set(SURGSIM_TOOLS_DIR "${SURGSIM_SOURCE_DIR}/Tools")
 set(SURGSIM_THIRD_PARTY_DIR "${SURGSIM_SOURCE_DIR}/ThirdParty")
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${SURGSIM_THIRD_PARTY_DIR})
 
+include(ExternalProject)
 include(SurgSimBuildFlags)
 include(SurgSimUtilities)
 
@@ -54,7 +53,6 @@ find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB o
 find_package(OpenThreads)
 find_package(OpenGL)
 find_package(Eigen3 3.2.0 REQUIRED)
-find_package(yaml-cpp 0.5.1.2 EXACT REQUIRED)
 
 if(WIN32)
 	set(GLUT_ROOT_PATH "$ENV{GLUT_ROOT_PATH}")
@@ -68,7 +66,12 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	set(GLUT_LIBRARIES ${GLUT_glut_LIBRARY})
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
-set(Boost_USE_STATIC_LIBS ON)
+if(${BUILD_SHARED_LIBS})
+	set(Boost_USE_STATIC_LIBS OFF)
+	add_definitions("-DBOOST_ALL_DYN_LINK")
+else()
+	set(Boost_USE_STATIC_LIBS ON)
+endif()
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.54 COMPONENTS chrono date_time filesystem system thread REQUIRED)
@@ -82,6 +85,20 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
 
+option(USE_SYSTEM_YAMLCPP "Should we use the system yaml-cpp?" OFF)
+if(USE_SYSTEM_YAMLCPP)
+	find_package(yaml-cpp 0.5.1.2 EXACT REQUIRED)
+else(USE_SYSTEM_YAMLCPP)
+	include(External_yamlcpp)
+endif(USE_SYSTEM_YAMLCPP)
+
+include_directories(${SURGSIM_SOURCE_DIR})
+include_directories(SYSTEM
+	${Boost_INCLUDE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
+)
+
 include(CTest)
 configure_file(CTestCustom.cmake.in CTestCustom.cmake)
 
@@ -94,6 +111,7 @@ if(BUILD_TESTING)
 	add_subdirectory(${GOOGLEMOCK_DIR} GoogleMock)
 endif()
 
+unset(EXPORT_TARGETS CACHE)
 add_subdirectory(SurgSim)
 
 option(BUILD_EXAMPLES "Build the examples." ON)
@@ -110,17 +128,30 @@ endif()
 
 #OpenSurgSimConfig For the Build Tree
 set(CONFIG_INCLUDE_DIRS "${SURGSIM_SOURCE_DIR}")
+set(CONFIG_DATA_DIR "${SURGSIM_SOURCE_DIR}/Data")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfig.cmake" @ONLY)
 
 #OpenSurgSimConfig For the Install Tree
 file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_PREFIX}/include")
 set(CONFIG_INCLUDE_DIRS "\${OPENSURGSIM_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+
+if (WIN32)
+file(RELATIVE_PATH REL_DATA_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_PREFIX}/Data")
+install(DIRECTORY Data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/Data)
+else (WIN32)
+file(RELATIVE_PATH REL_DATA_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}")
+install(DIRECTORY Data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
+endif (WIN32)
+set(CONFIG_DATA_DIR "\${OPENSURGSIM_CMAKE_DIR}/${REL_DATA_DIR}")
+
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
 	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/OpenSurgSimConfig.cmake" @ONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfigVersion.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfigVersion.cmake" @ONLY)
+
 
 install(FILES
 	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/OpenSurgSimConfig.cmake"
@@ -133,4 +164,5 @@ surgsim_cpplint_this_tree(cpplint)
 # Set these variables for Projects using Oss inside their Project structure rather than
 # Through the installed version
 set(OPENSURGSIM_INCLUDE_DIRS ${SURGSIM_SOURCE_DIR} CACHE INTERNAL "OSS Include Directories")
+set(OPENSURGSIM_DATA_DIR ${SURGSIM_SOURCE_DIR}/Data CACHE INTERNAL "OSS Data Directory")
 set(OPENSURGSIM_LIBRARIES ${EXPORT_TARGETS} CACHE INTERNAL "OSS Exported Libraries")

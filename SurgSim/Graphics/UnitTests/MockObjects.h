@@ -160,7 +160,7 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const
 	{
-		return m_isVisible;
+		return isActive() && m_isVisible;
 	}
 
 	/// Returns the number of times the representation has been updated

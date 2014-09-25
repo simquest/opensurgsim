@@ -115,8 +115,10 @@ bool writeMlcpTestDataAsText(const std::string& fileName, const MlcpTestData& te
 
 
 	fprintf(out, "%s %d\n", TEXT_LABEL_NUM_DEGREES_OF_FREEDOM, testData.numDegreesOfFreedom);
-	fprintf(out, "%s %llu\n", TEXT_LABEL_NUM_CONSTRAINTS, static_cast<unsigned long long int>(numConstraints));
-	fprintf(out, "%s %lld\n", TEXT_LABEL_NUM_ATOMIC_CONSTRAINTS, static_cast<long long int>(numAtomicConstraints));
+	fprintf(out, "%s %llu\n", TEXT_LABEL_NUM_CONSTRAINTS,
+		static_cast<unsigned long long int>(numConstraints)); // NOLINT
+	fprintf(out, "%s %lld\n", TEXT_LABEL_NUM_ATOMIC_CONSTRAINTS,
+		static_cast<long long int>(numAtomicConstraints)); // NOLINT
 
 	fprintf(out, "%s", TEXT_LABEL_CONSTRAINT_TYPES_LIST);
 	for (auto it = testData.problem.constraintTypes.begin();  it != testData.problem.constraintTypes.end();  ++it)

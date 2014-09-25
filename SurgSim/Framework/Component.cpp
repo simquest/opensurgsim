@@ -37,8 +37,11 @@ Component::Component(const std::string& name) :
 	m_didInit(false),
 	m_didWakeUp(false),
 	m_isInitialized(false),
-	m_isAwake(false)
+	m_isAwake(false),
+	m_isLocalActive(true)
 {
+	SURGSIM_ADD_RO_PROPERTY(Component, bool, IsActive, isActive);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Component, bool, IsLocalActive, isLocalActive, setLocalActive);
 }
 
 Component::~Component()
@@ -161,6 +164,29 @@ std::shared_ptr<Component> Component::getSharedPtr()
 	}
 	return result;
 }
+
+bool Component::isActive() const
+{
+	if (getSceneElement() != nullptr)
+	{
+		return getSceneElement()->isActive() && m_isLocalActive;
+	}
+	else
+	{
+		return m_isLocalActive;
+	}
+}
+
+void Component::setLocalActive(bool val)
+{
+	m_isLocalActive = val;
+}
+
+bool Component::isLocalActive() const
+{
+	return m_isLocalActive;
+}
+
 
 }; // namespace Framework
 }; // namespace SurgSim

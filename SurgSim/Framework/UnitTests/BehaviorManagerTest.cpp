@@ -15,10 +15,10 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Framework/BehaviorManager.h"
-
-#include "SurgSim/Framework/UnitTests/MockObjects.h"
 #include "boost/thread/thread.hpp"
+
+#include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/UnitTests/MockObjects.h"
 
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
@@ -53,4 +53,42 @@ TEST(BehaviorManagerTest, BehaviorInitTest)
 	EXPECT_FALSE(component->isAwake());
 	EXPECT_GT(behavior->updateCount, 0);
 
+}
+
+TEST(BehaviorManagerTest, UpdateTest)
+{
+	auto runtime = std::make_shared<Runtime>();
+	auto scene = runtime->getScene();
+	auto behaviorManager = std::make_shared<BehaviorManager>();
+	auto element = std::make_shared<MockSceneElement>();
+	auto behavior = std::make_shared<MockBehavior>("MockBehavior");
+
+	runtime->addManager(behaviorManager);
+	element->addComponent(behavior);
+	scene->addSceneElement(element);
+	EXPECT_TRUE(element->isInitialized());
+	EXPECT_TRUE(behavior->isInitialized());
+
+	behavior->setLocalActive(false);
+	behavior->updateCount = 0;
+
+	// BehaviorManager will not update inactive behaviors.
+	runtime->start();
+	EXPECT_TRUE(behaviorManager->isInitialized());
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(0, behavior->updateCount);
+
+	// Turn on the behavior, it will be updated.
+	behavior->setLocalActive(true);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_GT(behavior->updateCount, 0);
+
+	// Turn off the behavior, it will not be updated any more.
+	behavior->setLocalActive(false);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	auto count = behavior->updateCount;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(behavior->updateCount, count);
+
+	runtime->stop();
 }

@@ -16,6 +16,8 @@
 #ifndef SURGSIM_FRAMEWORK_ACCESSIBLE_INL_H
 #define SURGSIM_FRAMEWORK_ACCESSIBLE_INL_H
 
+#include "SurgSim/Framework/Assert.h"
+
 template <class T>
 bool SurgSim::Framework::Accessible::getValue(const std::string& name, T* value) const
 {

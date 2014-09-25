@@ -51,12 +51,15 @@ public:
 	virtual ~Representation();
 
 	/// Sets whether the representation is currently visible
+	/// \note If the representation is inactive, this method has no visible effect.
 	/// \param	visible	True for visible, false for invisible
 	virtual void setVisible(bool visible) = 0;
 
 	/// Gets whether the representation is currently visible
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const = 0;
+
+	virtual void setLocalActive(bool val) override;
 
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
@@ -113,6 +116,9 @@ public:
 
 	/// Clear all the Group references
 	void clearGroupReferences();
+
+protected:
+	bool m_isVisible;
 
 private:
 

@@ -127,6 +127,18 @@ public:
 	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp() = 0;
 
+	/// \return True if this component is active and its SceneElement (if any) is also active;
+	/// Otherwise, false.
+	bool isActive() const;
+
+	/// Set the component's active state
+	/// \param val If true component is active, inactive if false.
+	virtual void setLocalActive(bool val);
+
+	/// \return True if this component is active
+	/// Otherwise, false.
+	bool isLocalActive() const;
+
 protected:
 	/// Get the PoseComponent for this component
 	/// \return The PoseComponent
@@ -163,6 +175,10 @@ private:
 
 	/// Indicates if this component is awake
 	bool m_isAwake;
+
+	/// Indicates if this component is active
+	bool m_isLocalActive;
+
 };
 
 }; // namespace Framework

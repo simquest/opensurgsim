@@ -15,7 +15,6 @@
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
 )
 
 set(MLCP_IO_SOURCES
@@ -41,6 +40,14 @@ surgsim_add_library(
 	"${MLCP_IO_HEADERS}"
 	"SurgSim/MlcpTestIO"
 )
+
+SET(LIBS
+	SurgSimMath
+	SurgSimTesting
+)
+
+target_link_libraries(MlcpTestIO ${LIBS})
+
 
 surgsim_show_ide_folders("${MLCP_IO_SOURCES}" "${MLCP_IO_HEADERS}")
 

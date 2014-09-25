@@ -76,7 +76,7 @@ void RigidRepresentationContact::doBuild(double dt,
 	// b = n.P(t) + d             -> P(t) evaluated after free motion
 
 	Vector3d globalPosition = localization->calculatePosition();
-	Vector3d GP = globalPosition - rigid->getCurrentState().getPose() * rigid->getCurrentParameters().getMassCenter();
+	Vector3d GP = globalPosition - rigid->getCurrentState().getPose() * rigid->getMassCenter();
 
 	// Fill up b with the constraint equation...
 	double violation = n.dot(globalPosition) + d;
