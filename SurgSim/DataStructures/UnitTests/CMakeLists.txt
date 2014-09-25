@@ -35,6 +35,7 @@ set(UNIT_TEST_SOURCES
 	OptionalValueTests.cpp
 	PlyReaderTests.cpp
 	TetrahedronMeshTest.cpp
+	TokenStreamTest.cpp
 	TriangleMeshBaseTest.cpp
 	TriangleMeshTest.cpp
 )
