@@ -15,16 +15,20 @@
 
 #include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 
+#include "SurgSim/Physics/RigidRepresentationBase.h"
+
 namespace SurgSim
 {
 namespace Physics
 {
-RigidRepresentationBaseLocalization::RigidRepresentationBaseLocalization()
+RigidRepresentationBaseLocalization::RigidRepresentationBaseLocalization() :
+	Localization()
 {
 
 }
 
-RigidRepresentationBaseLocalization::RigidRepresentationBaseLocalization(std::shared_ptr<Representation> representation) :
+RigidRepresentationBaseLocalization::RigidRepresentationBaseLocalization(std::shared_ptr<Representation>
+																		 representation) :
 	Localization()
 {
 	setRepresentation(representation);

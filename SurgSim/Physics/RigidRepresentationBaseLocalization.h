@@ -17,11 +17,9 @@
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASELOCALIZATION_H
 
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/RigidRepresentationBase.h"
 
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
