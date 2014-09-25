@@ -28,8 +28,17 @@ set(HEADERS
 	StaplerBehavior.h
 )
 
-add_executable(Stapling Stapling.cpp ${SOURCES} ${HEADERS})
-add_executable(SerializedStapling SerializedStapling.cpp ${SOURCES} ${HEADERS})
+add_executable(Stapling
+	Stapling.cpp
+	${SOURCES}
+	${HEADERS}
+)
+
+add_executable(SerializedStapling
+	SerializedStapling.cpp
+	${SOURCES}
+	${HEADERS}
+)
 
 add_dependencies(SerializedStapling yaml-cpp)
 

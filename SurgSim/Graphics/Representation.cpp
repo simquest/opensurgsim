@@ -122,9 +122,9 @@ Representation::~Representation()
 
 }
 
-void Representation::setActive(bool val)
+void Representation::setLocalActive(bool val)
 {
-	Component::setActive(val);
+	Component::setLocalActive(val);
 	setVisible(m_isVisible);
 }
 

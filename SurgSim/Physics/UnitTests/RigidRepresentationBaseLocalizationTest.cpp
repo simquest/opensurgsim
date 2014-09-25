@@ -106,7 +106,7 @@ TEST_F(RigidRepresentationBaseLocalizationTest, GetPositionTest)
 		std::make_shared<MockRigidRepresentation>();
 
 	// Activate the rigid body and setup its initial pose
-	rigidRepresentation->setActive(true);
+	rigidRepresentation->setLocalActive(true);
 	rigidRepresentation->getCurrentState().setPose(m_initialTransformation);
 
 	RigidRepresentationBaseLocalization localization = RigidRepresentationBaseLocalization(rigidRepresentation);
@@ -131,7 +131,7 @@ TEST_F(RigidRepresentationBaseLocalizationTest, FixedRepresentation)
 	auto fixedRepresentation = std::make_shared<MockFixedRepresentation>();
 
 	// Activate the rigid body and setup its initial pose
-	fixedRepresentation->setActive(true);
+	fixedRepresentation->setLocalActive(true);
 	fixedRepresentation->getCurrentState().setPose(m_initialTransformation);
 
 	RigidRepresentationBaseLocalization localization = RigidRepresentationBaseLocalization(fixedRepresentation);

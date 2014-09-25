@@ -105,7 +105,7 @@ SurgSim::Framework::Scene:
                 Translation: [0, 0, 0]
               NumDof: 0
               IsGravityEnabled: true
-              IsActive: true
+              IsLocalActive: true
               CollisionRepresentation:
                 SurgSim::Physics::RigidCollisionRepresentation:
                   Id: 16149947-44fa-404f-bfaa-096e7732ee1d
@@ -184,7 +184,7 @@ SurgSim::Framework::Scene:
                 Translation: [0, 0, 0]
               NumDof: 6
               IsGravityEnabled: false
-              IsActive: true
+              IsLocalActive: true
               CollisionRepresentation:
                 SurgSim::Physics::RigidCollisionRepresentation:
                   Id: 104ef7db-95fb-4745-b2fd-b81e00abddea
@@ -352,7 +352,7 @@ SurgSim::Framework::Scene:
               Filename: Geometry/wound_deformable.ply
               NumDof: 1173
               IsGravityEnabled: true
-              IsActive: true
+              IsLocalActive: true
               CollisionRepresentation:
                 SurgSim::Physics::DeformableCollisionRepresentation:
                   Id: 46070a73-9e34-4a9a-bd83-7d4dbf4cfa26
@@ -417,7 +417,7 @@ SurgSim::Framework::Scene:
               DeviceName: Keyboard
               Id: 616d866d-cc25-443a-a57f-1fcb43e7f376
               Name: KeyboardInputComponent
-          - SurgSim::Blocks::KeyboardTogglesGraphicsBehavior:
+          - SurgSim::Blocks::KeyboardTogglesComponentBehavior:
               InputComponent:
                 SurgSim::Input::InputComponent:
                   Id: 616d866d-cc25-443a-a57f-1fcb43e7f376

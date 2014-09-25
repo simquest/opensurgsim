@@ -211,7 +211,7 @@ TEST_F(GraphicsManagerTest, UpdateTest)
 
 	// When a graphics representation is inactive, it will be set to invisible by Graphics Manager.
 	// And it won't be updated by Graphics Manager.
-	mockRepresentation->setActive(false);
+	mockRepresentation->setLocalActive(false);
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
@@ -220,13 +220,13 @@ TEST_F(GraphicsManagerTest, UpdateTest)
 
 	// When a graphics representation is active, it will be set to visible by Graphics Manager.
 	// And it will be updated by Graphics Manager.
-	mockRepresentation->setActive(true);
+	mockRepresentation->setLocalActive(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	EXPECT_GT(mockRepresentation->getNumUpdates(), 0);
 	EXPECT_TRUE(mockRepresentation->isVisible());
 
 	// Turn off an active graphics representation, the update of it will be stopped and it will be invisible.
-	mockRepresentation->setActive(false);
+	mockRepresentation->setLocalActive(false);
 	auto updateCount = mockRepresentation->getNumUpdates();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	EXPECT_EQ(updateCount, mockRepresentation->getNumUpdates());

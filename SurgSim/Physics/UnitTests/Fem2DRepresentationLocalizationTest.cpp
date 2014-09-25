@@ -79,7 +79,7 @@ public:
 		}
 
 		m_fem->setInitialState(state);
-		m_fem->setActive(true);
+		m_fem->setLocalActive(true);
 
 		m_validLocalPosition.index = 1;
 		m_validLocalPosition.coordinate = SurgSim::Math::Vector::Zero(3);

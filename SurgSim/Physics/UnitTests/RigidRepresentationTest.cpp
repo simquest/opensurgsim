@@ -139,7 +139,7 @@ TEST_F(RigidRepresentationTest, ResetTest)
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 
 	rigidBody->setInitialState(m_state);
-	rigidBody->setActive(false);
+	rigidBody->setLocalActive(false);
 	rigidBody->setIsGravityEnabled(false);
 	rigidBody->setLocalPose(RigidTransform3d::Identity());
 
@@ -209,10 +209,13 @@ TEST_F(RigidRepresentationTest, SetGetAndDefaultValueTest)
 
 	// Get/Set active flag [default = true]
 	EXPECT_TRUE(rigidBody->isActive());
-	rigidBody->setActive(false);
+	EXPECT_TRUE(rigidBody->isLocalActive());
+	rigidBody->setLocalActive(false);
 	ASSERT_FALSE(rigidBody->isActive());
-	rigidBody->setActive(true);
+	ASSERT_FALSE(rigidBody->isLocalActive());
+	rigidBody->setLocalActive(true);
 	ASSERT_TRUE(rigidBody->isActive());
+	ASSERT_TRUE(rigidBody->isLocalActive());
 
 	// Get numDof = 6
 	ASSERT_EQ(6u, rigidBody->getNumDof());
@@ -755,7 +758,7 @@ TEST_F(RigidRepresentationTest, NoForceTorqueTest)
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 
 	// Setup phase
-	rigidBody->setActive(true);
+	rigidBody->setLocalActive(true);
 	rigidBody->setIsGravityEnabled(false);
 	rigidBody->setDensity(m_density);
 	rigidBody->setShape(m_sphere);
@@ -786,7 +789,7 @@ TEST_F(RigidRepresentationTest, GravityTest)
 	Vector3d gravity(0.0, -9.81, 0.0);
 
 	// Setup phase
-	rigidBody->setActive(true);
+	rigidBody->setLocalActive(true);
 	rigidBody->setIsGravityEnabled(true);
 	rigidBody->setDensity(m_density);
 	rigidBody->setShape(m_sphere);
@@ -828,7 +831,7 @@ TEST_F(RigidRepresentationTest, PreviousStateDifferentFromCurrentTest)
 	Vector3d gravity(0.0, -9.81, 0.0);
 
 	// Setup phase
-	rigidBody->setActive(true);
+	rigidBody->setLocalActive(true);
 	rigidBody->setIsGravityEnabled(true);
 	rigidBody->setDensity(m_density);
 	rigidBody->setShape(m_sphere);
@@ -848,7 +851,7 @@ void disableWhenDivergeTest(std::shared_ptr<RigidRepresentation> rigidBody,
 							const RigidRepresentationState& state, double dt)
 {
 	// Setup phase
-	rigidBody->setActive(true);
+	rigidBody->setLocalActive(true);
 	rigidBody->setIsGravityEnabled(true);
 	rigidBody->setInitialState(state);
 

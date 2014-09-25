@@ -45,9 +45,11 @@ TEST(RepresentationTest, SetGetAndDefaultValueTest)
 
 	/// Get/Set active flag [default = true]
 	EXPECT_TRUE(representation->isActive());
-	representation->setActive(false);
+	representation->setLocalActive(false);
+	ASSERT_FALSE(representation->isLocalActive());
 	ASSERT_FALSE(representation->isActive());
-	representation->setActive(true);
+	representation->setLocalActive(true);
+	ASSERT_TRUE(representation->isLocalActive());
 	ASSERT_TRUE(representation->isActive());
 
 	/// Get numDof = 0
@@ -99,7 +101,7 @@ TEST(RepresentationTest, SerializationTest)
 
 		EXPECT_EQ(representation->getName(), newRepresentation->getName());
 		EXPECT_EQ("SurgSim::Physics::MockRepresentation", newRepresentation->getClassName());
-		EXPECT_TRUE(newRepresentation->getValue<bool>("IsActive"));
+		EXPECT_TRUE(newRepresentation->getValue<bool>("IsLocalActive"));
 		EXPECT_TRUE(newRepresentation->getValue<bool>("IsGravityEnabled"));
 		EXPECT_TRUE(newRepresentation->getValue<bool>("IsDrivingSceneElementPose"));
 		EXPECT_EQ(1u, newRepresentation->getValue<size_t>("NumDof"));
@@ -131,13 +133,13 @@ TEST(RepresentationTest, SerializationTest)
 		std::shared_ptr<Representation> representation3 = std::make_shared<MockRepresentation>("MockRepresentation3");
 		std::shared_ptr<Representation> representation4 = std::make_shared<MockRepresentation>("MockRepresentation4");
 
-		representation1->setValue("IsActive", false);
+		representation1->setValue("IsLocalActive", false);
 
 		representation2->setValue("IsGravityEnabled", false);
 
 		representation3->setValue("IsDrivingSceneElementPose", false);
 
-		representation4->setValue("IsActive", false);
+		representation4->setValue("IsLocalActive", false);
 		representation4->setValue("IsGravityEnabled", false);
 		representation4->setValue("IsDrivingSceneElementPose", false);
 
@@ -165,19 +167,19 @@ TEST(RepresentationTest, SerializationTest)
 		EXPECT_EQ(representation3->getName(), newRepresentation3->getName());
 		EXPECT_EQ(representation4->getName(), newRepresentation4->getName());
 
-		EXPECT_FALSE(newRepresentation1->getValue<bool>("IsActive"));
+		EXPECT_FALSE(newRepresentation1->getValue<bool>("IsLocalActive"));
 		EXPECT_TRUE(newRepresentation1->getValue<bool>("IsGravityEnabled"));
 		EXPECT_TRUE(newRepresentation1->getValue<bool>("IsDrivingSceneElementPose"));
 
-		EXPECT_TRUE(newRepresentation2->getValue<bool>("IsActive"));
+		EXPECT_TRUE(newRepresentation2->getValue<bool>("IsLocalActive"));
 		EXPECT_FALSE(newRepresentation2->getValue<bool>("IsGravityEnabled"));
 		EXPECT_TRUE(newRepresentation2->getValue<bool>("IsDrivingSceneElementPose"));
 
-		EXPECT_TRUE(newRepresentation3->getValue<bool>("IsActive"));
+		EXPECT_TRUE(newRepresentation3->getValue<bool>("IsLocalActive"));
 		EXPECT_TRUE(newRepresentation3->getValue<bool>("IsGravityEnabled"));
 		EXPECT_FALSE(newRepresentation3->getValue<bool>("IsDrivingSceneElementPose"));
 
-		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsActive"));
+		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsLocalActive"));
 		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsGravityEnabled"));
 		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsDrivingSceneElementPose"));
 	}
