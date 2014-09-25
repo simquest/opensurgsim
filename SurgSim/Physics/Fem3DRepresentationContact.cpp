@@ -73,7 +73,7 @@ void Fem3DRepresentationContact::doBuild(double dt,
 	// n^t.u + (n^t.p(free) + d) >= 0
 	//
 	// For implicit integration, u = dt.v(t+dt)
-	// 
+	//
 	// Since the d term will be added to the constraint for one side of the contact and subtracted from the other,
 	// and because it is not clear which distance should be used, we leave it out.
 

@@ -56,6 +56,13 @@ void FixedRepresentationContact::doBuild(double dt,
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
 
+	// FRICTIONLESS CONTACT in a LCP
+	//   (n, d) defines the plane of contact
+	//   P(t) the point of contact
+	// b = n.P(t) + d
+	// Since the d term will be added to the constraint for one side of the contact and subtracted from the other,
+	// and because it is not clear which distance should be used, we leave it out.
+
 	SurgSim::Math::Vector3d globalPosition = localization->calculatePosition();
 
 	// Fill up b with the constraint equation...
