@@ -14,6 +14,9 @@
 # limitations under the License.
 
 
+# Choose not to link boost::regex as we dont use read_until() or async_read_until()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_REGEX_NO_LIB")
+
 link_directories(${Boost_LIBRARY_DIRS})
 
 set(LIBS
