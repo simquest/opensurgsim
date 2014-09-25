@@ -25,8 +25,7 @@ namespace Device
 {
 
 NimbleDevice::NimbleDevice(const std::string& uniqueName) :
-	SurgSim::Input::CommonDevice(uniqueName, NimbleScaffold::buildDeviceInputData()), m_positionScale(1.0),
-	m_trackedHandDataIndex(0)
+	SurgSim::Input::CommonDevice(uniqueName, NimbleScaffold::buildDeviceInputData()), m_trackedHandDataIndex(0)
 {
 }
 
@@ -36,11 +35,6 @@ NimbleDevice::~NimbleDevice()
 	{
 		finalize();
 	}
-}
-
-void NimbleDevice::setPositionScale(double positionScale)
-{
-	m_positionScale = positionScale;
 }
 
 void NimbleDevice::setupToTrackLeftHand()

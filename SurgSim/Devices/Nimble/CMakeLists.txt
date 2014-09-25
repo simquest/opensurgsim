@@ -18,6 +18,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 set(LIBS
 	${Boost_LIBRARIES}
+	SurgSimInput
 )
 
 include_directories(

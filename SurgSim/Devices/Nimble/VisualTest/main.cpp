@@ -17,21 +17,17 @@
 
 #include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Devices/Nimble/NimbleDevice.h"
-#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 
 #include "SurgSim/Testing/VisualTestCommon/ToolSquareTest.h"
 
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Device::NimbleDevice;
-using SurgSim::Device::IdentityPoseDevice;
 
 int main(int argc, char** argv)
 {
-	std::shared_ptr<NimbleDevice> leftDevice = std::make_shared<NimbleDevice>("NimbleDeviceLeft");
-	leftDevice->setPositionScale(0.0001); // Convert to 0.1 mm.
-	std::shared_ptr<NimbleDevice> rightDevice = std::make_shared<NimbleDevice>("NimbleDeviceRight");
-	rightDevice->setPositionScale(0.0001); // Convert to 0.1 mm.
-	rightDevice->setupToTrackRightHand();
+	auto leftDevice = std::make_shared<NimbleDevice>("NimbleDeviceLeft");
+
+	auto rightDevice = std::make_shared<NimbleDevice>("NimbleDeviceRight");
 
 	runToolSquareTest(leftDevice, rightDevice, "Move the hands to control the sphere/square.");
 

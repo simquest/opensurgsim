@@ -29,6 +29,7 @@
 #include "SurgSim/Devices/Nimble/NimbleThread.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/DataStructures/TokenStream.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
@@ -57,78 +58,36 @@ struct HandTrackingData
 	/// Number of DOFs for each finger.
 	static const size_t N_FINGER_DOFS_PER_HAND = 16;
 
-	/// Position of the hand.
+	/// Position of the hand (w.r.t JointFrameIndex.ROOT_JOINT).
 	Vector3d position;
-	/// Orientation of the hand.
+	/// Orientation of the hand (w.r.t JointFrameIndex.ROOT_JOINT).
 	Quaterniond quaternion;
 	/// Number of times the hand was clicked. 0, 1 or 2.
 	int clickCount;
 	/// Value between 0 and 1 to specify the confidence of the poses. Currently, either 0 or 1.
 	double confidenceEstimate;
 	/// Orientation of each of the joints.
-	Quaterniond jointQuaternions[N_JOINTS];
+	std::array<Quaterniond, N_JOINTS> jointQuaternions;
 	/// Position of each of the joints.
-	Vector3d jointPositions[N_JOINTS];
+	std::array<Vector3d, N_JOINTS> jointPositions;
 	/// Position of each of the finger tips.
-	Vector3d fingerTips[N_FINGERS];
+	std::array<Vector3d, N_FINGERS> fingerTips;
 	/// Value between 0 and 1 to specify the confidence of the hand being in one of the N_POSES poses. Sums to 1.
-	double handPoseConfidences[N_POSES];
+	std::array<double, N_POSES> handPoseConfidences;
 	/// The angle of each of the finger joints.
-	double fingerDofs[N_FINGER_DOFS_PER_HAND];
+	std::array<double, N_FINGER_DOFS_PER_HAND> fingerDofs;
 };
 
 /// A class to parse std::stringstream into requested data type.
 /// The class is initialized with a std::stringstream and can parse it into requested datatype.
-class TokenStream
+class NimbleStream : public SurgSim::DataStructures::TokenStream
 {
 public:
 	/// Constructor.
 	/// \param stream The string stream from which the values are parsed.
-	explicit TokenStream(std::stringstream* stream)
-		: m_stream(*stream)
+	explicit NimbleStream(std::stringstream* stream)
+		: SurgSim::DataStructures::TokenStream(stream)
 	{}
-
-	/// \param [out] var Parse stream into this int.
-	/// \return True, if parsing is successful.
-	bool parse(int* var)
-	{
-		return (m_stream >> *var).good();
-	}
-
-	/// \param [out] var Parse stream into this string.
-	/// \return True, if parsing is successful.
-	bool parse(std::string* var)
-	{
-		return (m_stream >> *var).good();
-	}
-
-	/// \param [out] var Parse stream into this double.
-	/// \return True, if parsing is successful.
-	bool parse(double* var)
-	{
-		return (m_stream >> *var).good();
-	}
-
-	/// \param [out] v Parse stream into this variable size Eigen vector.
-	/// \return True, if parsing is successful.
-	template <typename T, int Rows>
-	bool parse(Eigen::Matrix<T, Rows, 1>* v)
-	{
-		bool success = true;
-		for (int i = 0; success && i < Rows; ++i)
-		{
-			success &= parse(&(*v)[i]);
-		}
-		return success;
-	}
-
-	/// \param [out] q Parse stream into this variable size Eigen quaternion.
-	/// \return True, if parsing is successful.
-	template <typename T>
-	bool parse(Eigen::Quaternion<T>* q)
-	{
-		return parse(&q->x()) && parse(&q->y()) && parse(&q->z()) && parse(&q->w());
-	}
 
 	/// Parse the values in the stream into the HandTracking Data structure.
 	/// \param [out] handData The data structure where the parsed values are written to.
@@ -179,10 +138,6 @@ public:
 
 		return success;
 	}
-
-private:
-	/// The string stream from where the values are parsed.
-	std::stringstream& m_stream;
 };
 
 /// Parse the values in the stream based on its message type (the first few characters).
@@ -195,7 +150,7 @@ private:
 bool processNimbleMessage(std::stringstream* stream, HandTrackingData* handData, bool* parseSuccess)
 {
 	bool messageParsed = false;
-	TokenStream tokenStream(stream);
+	NimbleStream tokenStream(stream);
 	std::string messageType;
 
 	if (tokenStream.parse(&messageType) && messageType == "POSE")
@@ -247,7 +202,7 @@ NimbleScaffold::NimbleScaffold(std::shared_ptr<SurgSim::Framework::Logger> logge
 	m_logger(logger), m_state(new StateData()), m_serverIpAddress("127.0.0.1"), m_serverPort("1988"),
 	m_serverSocketOpen(false)
 {
-	if (!m_logger)
+	if (m_logger == nullptr)
 	{
 		m_logger = SurgSim::Framework::Logger::getLogger("Nimble device");
 	}
@@ -473,7 +428,7 @@ void NimbleScaffold::updateDeviceData()
 		size_t index = (*it)->m_trackedHandDataIndex;
 
 		RigidTransform3d pose = SurgSim::Math::makeRigidTransform(m_state->handData[index].quaternion,
-									m_state->handData[index].position * (*it)->m_positionScale);
+									m_state->handData[index].position);
 
 		SurgSim::DataStructures::DataGroup& inputData = (*it)->getInputData();
 		inputData.poses().set(SurgSim::DataStructures::Names::POSE, pose);

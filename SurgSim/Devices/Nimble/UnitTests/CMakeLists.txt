@@ -25,10 +25,6 @@ set(UNIT_TEST_SOURCES
 
 set(LIBS 
 	NimbleDevice
-	SurgSimInput
-	SurgSimFramework
-	SurgSimDataStructures
-	${Boost_LIBRARIES}
 )
 
 surgsim_add_unit_tests(NimbleDeviceTest)
