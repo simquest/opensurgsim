@@ -51,7 +51,7 @@ bool OsgGroup::add(std::shared_ptr<SurgSim::Graphics::Representation> representa
 	if (osgRepresentation && Group::add(osgRepresentation))
 	{
 		m_switch->addChild(osgRepresentation->getOsgNode());
-		osgRepresentation->setLocalActive(m_isActive);
+		osgRepresentation->setLocalActive(m_isActive && osgRepresentation->isLocalActive());
 		return true;
 	}
 	else
