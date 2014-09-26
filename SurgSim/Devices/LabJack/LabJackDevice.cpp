@@ -123,12 +123,12 @@ const std::string& LabJackDevice::getAddress() const
 	return m_address;
 }
 
-void LabJackDevice::setReset(bool reset)
+void LabJackDevice::setResetOnDestruct(bool reset)
 {
 	m_reset = reset;
 }
 
-bool LabJackDevice::getReset() const
+bool LabJackDevice::getResetOnDestruct() const
 {
 	return m_reset;
 }
