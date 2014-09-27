@@ -18,6 +18,7 @@
 
 #include <Eigen/Core>
 
+#include "SurgSim/DataStructures/Image.h"
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/DataStructures/NamedVariantData.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -31,15 +32,16 @@ namespace DataStructures
 /// A collection of \ref NamedData objects.
 ///
 /// A DataGroup object contains a NamedData for each of several predefined types:
+/// \li \em Booleans contain a Boolean logic value (true or false).
+/// \li \em Images contain float images.
+/// \li \em Integers contain an integer value.
 /// \li \em Poses contain the position and orientation of an object in space, represented as a 3D rigid-body
 /// 	 (isometric) transformation.
-/// \li \em Vectors contain a vector quantity that does not change when the coordinate system is translated,
-/// 	such as a force or an oriented distance.
 /// \li \em Matrices contain a matrix.
 /// \li \em Scalars contain a scalar value (i.e. anything that can be represented as a double).
-/// \li \em Integers contain an integer value.
-/// \li \em Booleans contain a Boolean logic value (true or false).
 /// \li \em Strings contain a text value.
+/// \li \em Vectors contain a vector quantity that does not change when the coordinate system is translated,
+/// 	such as a force or an oriented distance.
 /// \li \em CustomData contain a custom data structure, \ref NamedVariantData.
 ///
 /// The entries (names and indices) are unique within each NamedData member, but not necessarily across different types
@@ -80,6 +82,8 @@ public:
 	typedef bool BooleanType;
 	/// The type used for strings.
 	typedef std::string StringType;
+	/// The type used for images.
+	typedef Image<float> ImageType;
 
 	/// Construct an empty object, with no associated names and indices yet.
 	DataGroup();
@@ -182,6 +186,14 @@ public:
 	/// \return the read-only string data.
 	const NamedData<StringType>& strings() const;
 
+	/// Return the image data structure.
+	/// \return the mutable iamge data.
+	NamedData<ImageType>& images();
+
+	/// Return the image data structure.
+	/// \return the read-only images data.
+	const NamedData<ImageType>& images() const;
+
 	/// Return the custom data structure.
 	/// \return the mutable data.
 	NamedVariantData& customData();
@@ -218,6 +230,9 @@ private:
 
 	/// The string values.
 	NamedData<StringType> m_strings;
+
+	/// The string values.
+	NamedData<ImageType> m_images;
 
 	/// The custom data values.
 	NamedVariantData m_customData;

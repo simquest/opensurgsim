@@ -28,6 +28,7 @@ LabJackDevice::LabJackDevice(const std::string& uniqueName) :
 	m_model(LabJack::MODEL_SEARCH),
 	m_connection(LabJack::CONNECTION_SEARCH),
 	m_address(""),
+	m_reset(false),
 	m_timerBase(LabJack::TIMERBASE_DEFAULT),
 	m_timerClockDivisor(1),
 	m_timerCounterPinOffset(0),
@@ -120,6 +121,16 @@ void LabJackDevice::setAddress(std::string address)
 const std::string& LabJackDevice::getAddress() const
 {
 	return m_address;
+}
+
+void LabJackDevice::setResetOnDestruct(bool reset)
+{
+	m_reset = reset;
+}
+
+bool LabJackDevice::getResetOnDestruct() const
+{
+	return m_reset;
 }
 
 void LabJackDevice::enableDigitalInput(int channel)

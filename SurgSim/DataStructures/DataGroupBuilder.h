@@ -52,6 +52,8 @@ public:
 	typedef DataGroup::BooleanType BooleanType;
 	/// The type used for strings.
 	typedef DataGroup::StringType StringType;
+	/// The type used for images.
+	typedef Image<float> ImageType;
 
 	/// Constructs an empty builder object.
 	DataGroupBuilder();
@@ -122,6 +124,14 @@ public:
 	/// \return a read-only reference to the sub-object that contains string value entries.
 	const NamedDataBuilder<StringType>& strings() const;
 
+	/// Provides access to the image value entries.
+	/// \return a writable reference to the sub-object that contains image value entries.
+	NamedDataBuilder<ImageType>& images();
+
+	/// Provides access to the image value entries.
+	/// \return a read-only reference to the sub-object that contains image value entries.
+	const NamedDataBuilder<ImageType>& images() const;
+
 	/// Provides access to the custom data entries.
 	/// \return a writable reference to the sub-object that contains custom data entries.
 	NamedVariantDataBuilder& customData();
@@ -157,6 +167,10 @@ public:
 	/// A shortcut for adding a named string entry.
 	/// Identical to <code>%strings().addEntry(name)</code>.
 	void addString(const std::string& name);
+
+	/// A shortcut for adding a named image entry.
+	/// Identical to <code>%images().addEntry(name)</code>.
+	void addImage(const std::string& name);
 
 	/// A shortcut for adding a named custom data entry.
 	/// Identical to <code>%customData().addEntry(name)</code>.
@@ -195,6 +209,9 @@ private:
 
 	/// The subsidiary builder used for string values.
 	NamedDataBuilder<StringType> m_strings;
+
+	/// The subsidiary builder used for image values.
+	NamedDataBuilder<ImageType> m_images;
 
 	/// The subsidiary builder used for custom data.
 	NamedVariantDataBuilder m_customData;

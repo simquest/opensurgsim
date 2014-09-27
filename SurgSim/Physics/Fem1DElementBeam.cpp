@@ -243,8 +243,6 @@ void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state,
 	m_MLocal(5, 7)   =  13.0 * L / 420.0 - m_Iz / (10.0 * AL);
 	m_MLocal(5, 11)  = -L2 / 140.0 - m_Iz / (30.0 * m_A);
 
-	//m_MLocal.setIdentity();
-
 	m_MLocal *= m;
 
 	// Transformation Local -> Global
@@ -258,7 +256,7 @@ void Fem1DElementBeam::computeStiffness(const SurgSim::Math::OdeState& state,
 	double L2 = L * L;
 	double L3 = L2 * L;
 
-	// General expresson for shear modulus in terms of Young's modulus and Poisson's ratio
+	// General expression for shear modulus in terms of Young's modulus and Poisson's ratio
 	m_G = m_E / (2.0 * (1.0 + m_nu));
 
 	if (m_haveShear)
