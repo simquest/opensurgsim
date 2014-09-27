@@ -40,15 +40,15 @@ public:
 	{
 	}
 
-	/// Sets whether the group is currently active 
+	/// Sets whether the group is currently active
 	/// \param	val True for active, false for inactive
 	virtual void setActive(bool val)
 	{
 		m_isActive= val;
 	}
 
-	/// Gets whether the group is currently active 
-	/// \return	True for active, false for inactive 
+	/// Gets whether the group is currently active
+	/// \return	True for active, false for inactive
 	virtual bool isActive() const
 	{
 		return m_isActive;

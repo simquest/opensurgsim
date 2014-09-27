@@ -52,7 +52,7 @@ public:
 
 	/// To turn off/set a graphics representation to invisible, call 'setLocalActive(false)'
 	/// An inactive graphics representation is invisible and an active graphics representation is visible.
-	/// \pram val True if this graphics representation is active and visible; false for inactive and invisible.
+	/// \param val True if this graphics representation is active and visible; false for inactive and invisible.
 	virtual void setLocalActive(bool val) override;
 
 	/// Sets the material that defines the visual appearance of the representation

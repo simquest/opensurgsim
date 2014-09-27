@@ -44,12 +44,12 @@ public:
 	/// Destructor
 	virtual ~Group();
 
-	/// Sets whether the group is currently active 
+	/// Sets whether the group is currently active
 	/// \param	val True for active, false for inactive
 	virtual void setActive(bool val) = 0;
 
-	/// Gets whether the group is currently active 
-	/// \return	True for active, false for inactive 
+	/// Gets whether the group is currently active
+	/// \return	True for active, false for inactive
 	virtual bool isActive() const = 0;
 
 	/// Adds an representation
