@@ -181,7 +181,7 @@ public:
 	std::unique_ptr<NimbleThread> thread;
 
 	/// The socket used for connecting to the Nimble server.
-	std::shared_ptr<boost::asio::ip::tcp::socket> socket;
+	std::shared_ptr<boost::asio::ip::tcp::iostream> socketStream;
 
 	/// The hand tracking data.
 	HandTrackingData handData[2];
@@ -293,36 +293,13 @@ bool NimbleScaffold::initialize()
 	// Connect to the Nimble hand tracking server.
 	m_serverSocketOpen = true;
 
-	boost::asio::io_service *ioService = new boost::asio::io_service();
-	boost::asio::ip::tcp::resolver resolver(*ioService);
-	boost::asio::ip::tcp::resolver::query query(m_serverIpAddress, m_serverPort);
-	boost::asio::ip::tcp::resolver::iterator iterator = resolver.resolve(query);
+	m_state->socketStream = std::make_shared<boost::asio::ip::tcp::iostream>(m_serverIpAddress, m_serverPort);
 
-	m_state->socket = std::make_shared<boost::asio::ip::tcp::socket>(*ioService);
-	boost::system::error_code error;
-
-	boost::asio::connect(*m_state->socket, iterator, error);
-
-	if (!m_state->socket->is_open())
-	{
-		SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Unable to open a socket to the server.";
-		m_serverSocketOpen = false;
-	}
-
-	if (error.value() > 0)
+	if (!(*m_state->socketStream))
 	{
 		SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Error while opening a socket to the server: "
-			<< error.value() << " (" << error.message() << ")";
+			<< m_state->socketStream->error().message() << ")";
 		m_serverSocketOpen = false;
-	}
-
-	if (m_serverSocketOpen)
-	{
-		SURGSIM_LOG_INFO(m_logger) << "Nimble: Socket opened and connection established.";
-	}
-	else
-	{
-		SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Failed to open the socket and establish connection.";
 	}
 
 	return m_serverSocketOpen;
@@ -332,65 +309,32 @@ bool NimbleScaffold::update()
 {
 	bool success = true;
 
-	const size_t BUFFER_LENGTH = 512;
-	std::array<char, BUFFER_LENGTH> buffer;
-
-	boost::system::error_code error;
-	size_t bytesRead = m_state->socket->read_some(boost::asio::buffer(buffer), error);
-
-	// Each message from the Nimble server is terminated with a '\n' character. Although we read BUFFER_LENGTH
-	// chars every time, the message can be of arbitrary length. The loop below reads BUFFER_LENGTH char at a time,
-	// and keeps track of the data until a '\n' is encountered. At which point, the data is sent to
-	// processNimbleMessage for parsing.
-	if (bytesRead == 0)
+	if (!(*m_state->socketStream))
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Nimble: Nothing read from server.";
-	}
-
-	if (error.value() > 0)
-	{
-		SURGSIM_LOG_WARNING(m_logger) << "Nimble: Error while reading from server: "
-			<< error.value() << " (" << error.message() << ")";
+		SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Socket stream no longer good: "
+			<< m_state->socketStream->error().message() << ")";
 		success = false;
-	}
-
-	if (success)
-	{
-		bool handDataParsed = false;
-		auto bufferIterator = buffer.begin();
-		for (size_t i = 0; i < bytesRead; ++i)
-		{
-			if (*bufferIterator != '\n')
-			{
-				m_serverMessage << *bufferIterator;
-			}
-			else
-			{
-				m_serverMessage << '\0';
-
-				if (processNimbleMessage(&m_serverMessage, m_state->handData, &handDataParsed))
-				{
-					if (handDataParsed)
-					{
-						updateDeviceData();
-					}
-					else
-					{
-						SURGSIM_LOG_WARNING(m_logger)
-							<< "Nimble: Hand data not parsed correctly.";
-						resetDeviceData();
-					}
-				}
-
-				m_serverMessage.str(std::string());
-				m_serverMessage.clear();
-			}
-			++bufferIterator;
-		}
 	}
 	else
 	{
-		resetDeviceData();
+		bool handDataParsed = false;
+		std::string iosBuf;
+		std::getline(*m_state->socketStream, iosBuf);
+		std::stringstream serverMessage(iosBuf);
+
+		if (processNimbleMessage(&serverMessage, m_state->handData, &handDataParsed))
+		{
+			if (handDataParsed)
+			{
+				updateDeviceData();
+			}
+			else
+			{
+				SURGSIM_LOG_WARNING(m_logger)
+					<< "Nimble: Hand data not parsed correctly.";
+				resetDeviceData();
+			}
+		}
 	}
 
 	return success;
@@ -401,20 +345,11 @@ void NimbleScaffold::finalize()
 	// The m_state->thread would be killed soon, so the socket is closed here.
 	if (m_serverSocketOpen)
 	{
-		boost::system::error_code errorShutdown;
-		m_state->socket->shutdown(boost::asio::ip::tcp::socket::socket_base::shutdown_both, errorShutdown);
-		if (errorShutdown.value() > 0)
+		m_state->socketStream->close();
+		if (m_state->socketStream->fail())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Error when shutting down socket: "
-				<< errorShutdown.value() << " (" << errorShutdown.message() << ")";
-		}
-
-		boost::system::error_code errorClose;
-		m_state->socket->close(errorClose);
-		if (errorClose.value() > 0)
-		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Error when closing socket: "
-				<< errorClose.value() << " (" << errorClose.message() << ")";
+				<< m_state->socketStream->error().message() << ")";
 		}
 	}
 }

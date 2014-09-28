@@ -110,8 +110,6 @@ private:
 	std::string m_serverPort;
 	/// Flag to indicate that the socket is opened successfully.
 	bool m_serverSocketOpen;
-	/// The data read from the server.
-	std::stringstream m_serverMessage;
 };
 
 };  // namespace Device
