@@ -131,6 +131,10 @@ struct HandTrackingData
 	std::array<HandData, 2> hands;
 };
 
+/// Parse the values in the stream into a Vector3d.
+/// \param in The stream from where data is parsed.
+/// \param [out] vector The object to which the parsed values are written to.
+/// \return The stream that was sent in.
 std::istream& operator>> (std::istream& in, Vector3d& vector)
 {
 	std::istream::sentry sentry(in);
@@ -143,6 +147,10 @@ std::istream& operator>> (std::istream& in, Vector3d& vector)
 	return in;
 }
 
+/// Parse the values in the stream into a Quaterniond.
+/// \param in The stream from where data is parsed.
+/// \param [out] quaternion The object to which the parsed values are written to.
+/// \return The stream that was sent in.
 std::istream& operator>> (std::istream& in, Quaterniond& quaternion)
 {
 	std::istream::sentry sentry(in);
@@ -157,8 +165,9 @@ std::istream& operator>> (std::istream& in, Quaterniond& quaternion)
 }
 
 /// Parse the values in the stream into the HandTracking Data structure.
-/// \param [out] handData The data structure where the parsed values are written to.
-/// \return True, if parsing is successful.
+/// \param in The stream from where data is parsed.
+/// \param [out] handData The object to which the parsed values are written to.
+/// \return The stream that was sent in.
 std::istream& operator>> (std::istream& in, HandTrackingData& handData)
 {
 	Vector3d position;
