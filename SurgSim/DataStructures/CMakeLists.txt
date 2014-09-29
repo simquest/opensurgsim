@@ -27,7 +27,6 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	OctreeNode.cpp
 	ply.c
 	PlyReader.cpp
-	TokenStream.cpp
 	Tree.cpp
 	TreeData.cpp
 	TreeNode.cpp
@@ -67,8 +66,6 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	PlyReaderDelegate.h
 	TetrahedronMesh.h
 	TetrahedronMesh-inl.h
-	TokenStream.h
-	TokenStream-inl.h
 	Tree.h
 	TreeData.h
 	TreeNode.h
