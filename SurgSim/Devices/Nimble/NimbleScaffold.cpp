@@ -159,12 +159,12 @@ std::istream& operator>> (std::istream& in, Quaterniond& quaternion)
 /// Parse the values in the stream into the HandTracking Data structure.
 /// \param [out] handData The data structure where the parsed values are written to.
 /// \return True, if parsing is successful.
-std::istream& operator>> (std::istream& in, HandTrackingData* handData)
+std::istream& operator>> (std::istream& in, HandTrackingData& handData)
 {
 	Vector3d position;
 	Quaterniond quaternion;
 
-	for (auto hand = handData->hands.begin(); in.good() && hand != handData->hands.end(); ++hand)
+	for (auto hand = handData.hands.begin(); in.good() && hand != handData.hands.end(); ++hand)
 	{
 		in >> position;
 		hand->pose.translation() = position;
@@ -173,7 +173,7 @@ std::istream& operator>> (std::istream& in, HandTrackingData* handData)
 		in >> hand->clickCount;
 	}
 
-	for (auto hand = handData->hands.begin(); in.good() && hand != handData->hands.end(); ++hand)
+	for (auto hand = handData.hands.begin(); in.good() && hand != handData.hands.end(); ++hand)
 	{
 		in >> hand->confidenceEstimate;
 
@@ -191,7 +191,7 @@ std::istream& operator>> (std::istream& in, HandTrackingData* handData)
 		}
 	}
 
-	for (auto hand = handData->hands.begin(); in.good() && hand != handData->hands.end(); ++hand)
+	for (auto hand = handData.hands.begin(); in.good() && hand != handData.hands.end(); ++hand)
 	{
 		for (auto handPoseConfidence = hand->handPoseConfidences.begin(); in.good() &&
 			 handPoseConfidence != hand->handPoseConfidences.end(); ++handPoseConfidence)
@@ -200,7 +200,7 @@ std::istream& operator>> (std::istream& in, HandTrackingData* handData)
 		}
 	}
 
-	for (auto hand = handData->hands.begin(); in.good() && hand != handData->hands.end(); ++hand)
+	for (auto hand = handData.hands.begin(); in.good() && hand != handData.hands.end(); ++hand)
 	{
 		for (auto fingerDof = hand->fingerDofs.begin(); in.good() && fingerDof != hand->fingerDofs.end(); ++fingerDof)
 		{
@@ -209,28 +209,6 @@ std::istream& operator>> (std::istream& in, HandTrackingData* handData)
 	}
 
 	return in;
-}
-
-/// Parse the values in the stream based on its message type (the first few characters).
-/// Only certain message types are parsed (POSE).
-/// The rest of them are for other uses (CALIBRATION, PINCHING, WELCOME, USER).
-/// \param stream The stream read from the socket.
-/// \param [out] handData The data structure where the parsed values are written to.
-/// \param [out] parseSuccess True, if the parsing to handData was a success.
-/// \return True if the message was parsed, instead of being ignored.
-bool processNimbleMessage(std::stringstream* stream, HandTrackingData* handData, bool* parseSuccess)
-{
-	bool messageParsed = false;
-	std::string messageType;
-
-	if (!(*stream >> messageType).fail() && messageType == "POSE")
-	{
-		*stream >> handData;
-		*parseSuccess = !stream->fail();
-		messageParsed = true;
-	}
-
-	return messageParsed;
 }
 
 }
@@ -252,7 +230,7 @@ public:
 	std::unique_ptr<NimbleThread> thread;
 
 	/// The socket used for connecting to the Nimble server.
-	std::shared_ptr<boost::asio::ip::tcp::iostream> socketStream;
+	boost::asio::ip::tcp::iostream socketStream;
 
 	/// The hand tracking data.
 	HandTrackingData handData;
@@ -364,12 +342,12 @@ bool NimbleScaffold::initialize()
 	// Connect to the Nimble hand tracking server.
 	m_serverSocketOpen = true;
 
-	m_state->socketStream = std::make_shared<boost::asio::ip::tcp::iostream>(m_serverIpAddress, m_serverPort);
+	m_state->socketStream.connect(m_serverIpAddress, m_serverPort);
 
-	if (!(*m_state->socketStream))
+	if (!m_state->socketStream)
 	{
-		SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Error while opening a socket to the server: "
-			<< m_state->socketStream->error().message() << ")";
+		SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Error while opening a iostream to the server: "
+			<< m_state->socketStream.error().message() << ")";
 		m_serverSocketOpen = false;
 	}
 
@@ -380,22 +358,21 @@ bool NimbleScaffold::update()
 {
 	bool success = true;
 
-	if (!(*m_state->socketStream))
+	if (!m_state->socketStream)
 	{
 		SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Socket stream no longer good: "
-			<< m_state->socketStream->error().message() << ")";
+			<< m_state->socketStream.error().message() << ")";
 		success = false;
 	}
 	else
 	{
-		bool handDataParsed = false;
-		std::string iosBuf;
-		std::getline(*m_state->socketStream, iosBuf);
-		std::stringstream serverMessage(iosBuf);
+		std::string messageType;
+		m_state->socketStream >> messageType;
 
-		if (processNimbleMessage(&serverMessage, &m_state->handData, &handDataParsed))
+		if (messageType == "POSE")
 		{
-			if (handDataParsed)
+			m_state->socketStream >> m_state->handData;
+			if (!m_state->socketStream.fail())
 			{
 				updateDeviceData();
 			}
@@ -405,6 +382,10 @@ bool NimbleScaffold::update()
 					<< "Nimble: Hand data not parsed correctly.";
 				resetDeviceData();
 			}
+		}
+		else
+		{
+			m_state->socketStream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		}
 	}
 
@@ -416,11 +397,11 @@ void NimbleScaffold::finalize()
 	// The m_state->thread would be killed soon, so the socket is closed here.
 	if (m_serverSocketOpen)
 	{
-		m_state->socketStream->close();
-		if (m_state->socketStream->fail())
+		m_state->socketStream.close();
+		if (m_state->socketStream.fail())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Error when shutting down socket: "
-				<< m_state->socketStream->error().message() << ")";
+				<< m_state->socketStream.error().message() << ")";
 		}
 	}
 }
