@@ -44,6 +44,7 @@ set(LIBS
 	IdentityPoseDevice
 	VisualTestCommon
 	${GLUT_LIBRARIES}
+	${OPENGL_LIBRARIES}
 )
 
 target_link_libraries(NimbleVisualTest ${LIBS})

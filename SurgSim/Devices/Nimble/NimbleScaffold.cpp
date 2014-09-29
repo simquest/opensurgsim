@@ -13,6 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4250)
+#endif
+
 #include "SurgSim/Devices/Nimble/NimbleScaffold.h"
 
 #include <algorithm>
@@ -485,3 +490,7 @@ std::shared_ptr<NimbleScaffold> NimbleScaffold::getOrCreateSharedInstance()
 
 }  // namespace Device
 }  // namespace SurgSim
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
