@@ -77,12 +77,12 @@ public:
 	/// \return The name of this group.
 	std::string getName() const;
 
-protected:
+private:
+
+	std::string m_name;
+
 	/// Representations in this group
 	std::vector<std::shared_ptr<Representation>> m_representations;
-
-private:
-	std::string m_name;
 };
 
 };  // namespace Graphics

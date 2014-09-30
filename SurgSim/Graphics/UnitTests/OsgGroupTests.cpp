@@ -79,12 +79,12 @@ TEST(OsgGroupTests, AddRemoveTest)
 	EXPECT_EQ(1u, group->getMembers().size());
 	EXPECT_EQ(1u, osgSwitch->getNumChildren());
 	EXPECT_EQ(0u, osgSwitch->getChildIndex(representation1->getOsgNode()));
-	EXPECT_TRUE(representation1->isActive()) << "Representation 1 should be active!";
+	EXPECT_TRUE(osgSwitch->getChildValue(representation1->getOsgNode())) << "Representation 1 should be visible!";
 
 	/// Set group to not active and check the osg::Switch values
 	group->setActive(false);
 	EXPECT_FALSE(group->isActive());
-	EXPECT_FALSE(representation1->isActive()) << "Representation 1 should not be active!";
+	EXPECT_FALSE(osgSwitch->getChildValue(representation1->getOsgNode())) << "Representation 1 should be visible!";
 
 	/// Add another representation and make sure the osg::Switch value for it is set correctly (should be false)
 	std::shared_ptr<OsgRepresentation> representation2 =
@@ -93,19 +93,20 @@ TEST(OsgGroupTests, AddRemoveTest)
 	EXPECT_EQ(2u, group->getMembers().size());
 	EXPECT_EQ(2u, osgSwitch->getNumChildren());
 	EXPECT_EQ(1u, osgSwitch->getChildIndex(representation2->getOsgNode()));
-	EXPECT_FALSE(representation2->isActive()) << "Representation 2 should not be active!";
+	EXPECT_FALSE(osgSwitch->getChildValue(representation2->getOsgNode())) << "Representation 2 should not be visible!";
 
-	/// Set group to active and check the osg::Switch values
+	/// Set group to active (visible) and check the osg::Switch values
 	group->setActive(true);
 	EXPECT_TRUE(group->isActive());
-	EXPECT_TRUE(representation1->isActive()) << "Representation 1 should be active!";
-	EXPECT_TRUE(representation2->isActive()) << "Representation 2 should be active!";
+	EXPECT_TRUE(osgSwitch->getChildValue(representation1->getOsgNode())) << "Representation 1 should be visible!";
+	EXPECT_TRUE(osgSwitch->getChildValue(representation2->getOsgNode())) << "Representation 2 should be visible!";
 
-	/// Set group to not active and check the osg::Switch values
+	/// Set group to inactive (not visible) and check the osg::Switch values
 	group->setActive(false);
 	EXPECT_FALSE(group->isActive());
-	EXPECT_FALSE(representation1->isActive()) << "Representation 1 should not be active!";
-	EXPECT_FALSE(representation2->isActive()) << "Representation 1 should not be active!";
+	EXPECT_FALSE(osgSwitch->getChildValue(representation1->getOsgNode())) << "Representation 1 should not be visible!";
+	EXPECT_FALSE(osgSwitch->getChildValue(representation2->getOsgNode())) << "Representation 1 should not be visible!";
+
 
 	/// Try to add a duplicate representation
 	EXPECT_FALSE(group->add(representation1));

@@ -33,9 +33,13 @@ void OsgGroup::setActive(bool val)
 {
 	m_isActive= val;
 
-	for (auto representation : m_representations)
+	if (m_isActive)
 	{
-		representation->setLocalActive(m_isActive);
+		m_switch->setAllChildrenOn();
+	}
+	else
+	{
+		m_switch->setAllChildrenOff();
 	}
 }
 
@@ -51,7 +55,7 @@ bool OsgGroup::add(std::shared_ptr<SurgSim::Graphics::Representation> representa
 	if (osgRepresentation && Group::add(osgRepresentation))
 	{
 		m_switch->addChild(osgRepresentation->getOsgNode());
-		osgRepresentation->setLocalActive(m_isActive && osgRepresentation->isLocalActive());
+		m_switch->setChildValue(osgRepresentation->getOsgNode(), m_isActive && osgRepresentation->isActive());
 		return true;
 	}
 	else
