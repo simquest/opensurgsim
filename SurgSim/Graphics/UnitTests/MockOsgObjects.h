@@ -58,7 +58,7 @@ public:
 	/// Updates the representation.
 	/// \param	dt	The time in seconds of the preceding timestep.
 	/// \post m_numUpdates is incremented and dt is added to m_sumDt
-	virtual void update(double dt)
+	virtual void doUpdate(double dt)
 	{
 		++m_numUpdates;
 		m_sumDt += dt;

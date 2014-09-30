@@ -73,14 +73,17 @@ TEST(OsgRepresentationTests, ActivityTest)
 	ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
 
 	EXPECT_TRUE(representation->isActive());
+	representation->update(0.0);
 	EXPECT_TRUE(switchNode->getChildValue(switchNode->getChild(0)));
 
 	representation->setLocalActive(false);
 	EXPECT_FALSE(representation->isActive());
+	representation->update(0.0);
 	EXPECT_FALSE(switchNode->getChildValue(switchNode->getChild(0)));
 
 	representation->setLocalActive(true);
 	EXPECT_TRUE(representation->isActive());
+	representation->update(0.0);
 	EXPECT_TRUE(switchNode->getChildValue(switchNode->getChild(0)));
 }
 

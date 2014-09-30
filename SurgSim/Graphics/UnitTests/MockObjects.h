@@ -163,8 +163,11 @@ public:
 	/// \post m_numUpdates is incremented and dt is added to m_sumDt
 	virtual void update(double dt)
 	{
-		++m_numUpdates;
-		m_sumDt += dt;
+		if (isActive())
+		{
+			++m_numUpdates;
+			m_sumDt += dt;
+		}
 	}
 
 	/// Gets whether the representation has been initialized
