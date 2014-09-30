@@ -50,11 +50,6 @@ public:
 	/// Returns the root OSG Node for this representations portion of the scene graph
 	osg::ref_ptr<osg::Node> getOsgNode() const;
 
-	/// To turn off/set a graphics representation to invisible, call 'setLocalActive(false)'
-	/// An inactive graphics representation is invisible and an active graphics representation is visible.
-	/// \param val True if this graphics representation is active and visible; false for inactive and invisible.
-	virtual void setLocalActive(bool val) override;
-
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
 	/// \return	True if set successfully, otherwise false
@@ -77,6 +72,10 @@ public:
 
 protected:
 	virtual void doUpdate(double dt);
+
+	/// Set the visibility of this representation
+	/// \param val The visibility
+	void setVisible(bool val);
 
 	/// Switch used to toggle the visibility of the representation
 	osg::ref_ptr<osg::Switch> m_switch;

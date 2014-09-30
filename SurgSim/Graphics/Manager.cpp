@@ -183,19 +183,12 @@ bool Manager::doUpdate(double dt)
 
 	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
 	{
-		if ((*it)->isActive())
-		{
-			(*it)->update(dt);
-		}
-		(*it)->setLocalActive((*it)->isLocalActive());
+		(*it)->update(dt);
 	}
 
 	for (auto it = m_views.begin(); it != m_views.end(); ++it)
 	{
-		if ((*it)->isActive())
-		{
-			(*it)->update(dt);
-		}
+		(*it)->update(dt);
 	}
 
 	return true;

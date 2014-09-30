@@ -159,7 +159,7 @@ void OsgView::setCamera(std::shared_ptr<SurgSim::Framework::Component> camera)
 
 void OsgView::update(double dt)
 {
-	if (m_areWindowSettingsDirty)
+	if (isActive() && m_areWindowSettingsDirty)
 	{
 		osg::Camera* viewCamera = m_view->getCamera();
 		if (viewCamera)
