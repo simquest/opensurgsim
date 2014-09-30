@@ -26,7 +26,7 @@ if(SURGSIM_PRECOMPILED_HEADERS)
 	)
 
 	if(MSVC)
-		if(${CMAKE_MAKE_PROGRAM} MATCHES "ninja\\.exe")
+		if(${CMAKE_MAKE_PROGRAM} MATCHES "ninja\\.exe" OR ${CMAKE_MAKE_PROGRAM} MATCHES "jom")
 			set(COMPILE_DIR "CMakeFiles/PrecompiledHeader.dir")
 		else()
 			set(COMPILE_DIR "$(Configuration)")
@@ -40,9 +40,9 @@ if(SURGSIM_PRECOMPILED_HEADERS)
 		# /Z7: use alternative debugging format (pdb/idb is incompatible with single pch)
 		add_compile_options(
 			"/YuPrecompiledHeader.h"
-			"/Fp${CMAKE_CURRENT_BINARY_DIR}/SurgSim/PrecompiledHeader/${COMPILE_DIR}/PrecompiledHeader.pch"
+			"/Fp${CMAKE_CURRENT_BINARY_DIR}/PrecompiledHeader/${COMPILE_DIR}/PrecompiledHeader.pch"
 			"/FIPrecompiledHeader.h"
-			"/Zm348"
+			"/Zm360"
 		)
 		add_compile_options($<$<CONFIG:Debug>:/Z7>)
 		add_compile_options($<$<CONFIG:RelWithDebInfo>:/Z7>)
