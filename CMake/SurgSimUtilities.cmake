@@ -171,7 +171,14 @@ endmacro()
 function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIRECTORY)
 	if (SOURCE_FILES)
 		add_library(${LIBRARY_NAME} ${SOURCE_FILES} ${HEADER_FILES})
+
 		if(SURGSIM_PRECOMPILED_HEADERS AND NOT ${LIBRARY_NAME} MATCHES "PrecompiledHeader")
+			foreach(source ${SOURCE_FILES})
+				# C++ precompiled headers cannot be used with C source files
+				if(source MATCHES ".c$")
+					set_source_files_properties(${source} PROPERTIES COMPILE_FLAGS "/Y-")
+				endif(source MATCHES ".c$")
+			endforeach(source)
 			target_link_libraries(${LIBRARY_NAME} PrecompiledHeader)
 		endif(SURGSIM_PRECOMPILED_HEADERS AND NOT ${LIBRARY_NAME} MATCHES "PrecompiledHeader")
 
