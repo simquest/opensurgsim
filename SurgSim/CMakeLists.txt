@@ -18,38 +18,34 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 if(SURGSIM_PRECOMPILED_HEADERS)
 	include_directories(
-		${EIGEN3_INCLUDE_DIR}
 		${OPENTHREADS_INCLUDE_DIR}
 		${OSG_INCLUDE_DIR}
-		${YAML_CPP_INCLUDE_DIR}
 		"PrecompiledHeader"
 	)
 
-	if(MSVC)
-		if(${CMAKE_MAKE_PROGRAM} MATCHES "ninja\\.exe" OR ${CMAKE_MAKE_PROGRAM} MATCHES "jom")
-			set(COMPILE_DIR "CMakeFiles/PrecompiledHeader.dir")
-		else()
-			set(COMPILE_DIR "$(Configuration)")
-		endif()
-
-		# On every following target
-		# /Yu: use the precompiled header
-		# /Fp: compiled location
-		# /FI: inject the header into every compilation
-		# /Zm: increase the compiler RAM
-		# /Z7: use alternative debugging format (pdb/idb is incompatible with single pch)
-		add_compile_options(
-			"/YuPrecompiledHeader.h"
-			"/Fp${CMAKE_CURRENT_BINARY_DIR}/PrecompiledHeader/${COMPILE_DIR}/PrecompiledHeader.pch"
-			"/FIPrecompiledHeader.h"
-			"/Zm360"
-		)
-		add_compile_options($<$<CONFIG:Debug>:/Z7>)
-		add_compile_options($<$<CONFIG:RelWithDebInfo>:/Z7>)
+	if(${CMAKE_MAKE_PROGRAM} MATCHES "ninja\\.exe" OR ${CMAKE_MAKE_PROGRAM} MATCHES "jom")
+		set(COMPILE_DIR "CMakeFiles/PrecompiledHeader.dir")
+	else()
+		set(COMPILE_DIR "$(Configuration)")
 	endif()
 
+	# On every following target
+	# /Yu: use the precompiled header
+	# /Fp: compiled location
+	# /FI: inject the header into every compilation
+	# /Zm: increase the compiler RAM
+	# /Z7: use alternative debugging format (pdb/idb is incompatible with single pch)
+	add_compile_options(
+		"/YuPrecompiledHeader.h"
+		"/Fp${CMAKE_CURRENT_BINARY_DIR}/PrecompiledHeader/${COMPILE_DIR}/PrecompiledHeader.pch"
+		"/FIPrecompiledHeader.h"
+		"/Zm360"
+	)
+	add_compile_options($<$<CONFIG:Debug>:/Z7>)
+	add_compile_options($<$<CONFIG:RelWithDebInfo>:/Z7>)
+
 	add_subdirectory(PrecompiledHeader)
-endif()
+endif(SURGSIM_PRECOMPILED_HEADERS)
 
 add_subdirectory(Blocks)
 add_subdirectory(Collision)
