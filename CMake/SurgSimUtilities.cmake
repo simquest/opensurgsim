@@ -140,6 +140,9 @@ option(SURGSIM_RUN_TEST_WITHIN_BUILD "This exectutes the tests directly from the
 macro(surgsim_add_unit_tests TESTNAME)
 	add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
 	target_link_libraries(${TESTNAME} SurgSimTesting gmock ${LIBS})
+	if(SURGSIM_PRECOMPILED_HEADERS)
+		target_link_libraries(${TESTNAME} PrecompiledHeader)
+	endif(SURGSIM_PRECOMPILED_HEADERS)
 	add_test(NAME ${TESTNAME} COMMAND ${TESTNAME} "--gtest_output=xml")
 	
 	if(SURGSIM_RUN_TEST_WITHIN_BUILD)
@@ -168,6 +171,9 @@ endmacro()
 function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIRECTORY)
 	if (SOURCE_FILES)
 		add_library(${LIBRARY_NAME} ${SOURCE_FILES} ${HEADER_FILES})
+		if(SURGSIM_PRECOMPILED_HEADERS AND NOT ${LIBRARY_NAME} MATCHES "PrecompiledHeader")
+			target_link_libraries(${LIBRARY_NAME} PrecompiledHeader)
+		endif(SURGSIM_PRECOMPILED_HEADERS AND NOT ${LIBRARY_NAME} MATCHES "PrecompiledHeader")
 
 		set_target_properties(${LIBRARY_NAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
 		install(TARGETS ${LIBRARY_NAME}

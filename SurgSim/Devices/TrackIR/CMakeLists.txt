@@ -52,10 +52,6 @@ surgsim_add_library(
 	SurgSim/Devices/TrackIR
 )
 
-if(SURGSIM_PRECOMPILED_HEADERS)
-	target_link_libraries(TrackIRDevice PrecompiledHeader)
-endif(SURGSIM_PRECOMPILED_HEADERS)
-
 if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)

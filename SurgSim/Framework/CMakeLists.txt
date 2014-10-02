@@ -93,10 +93,6 @@ SET(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-if(SURGSIM_PRECOMPILED_HEADERS)
-	LIST(APPEND LIBS PrecompiledHeader)
-endif()
-
 target_link_libraries(SurgSimFramework ${LIBS})
 add_dependencies(SurgSimFramework yaml-cpp)
 
