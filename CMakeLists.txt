@@ -112,6 +112,7 @@ if(BUILD_TESTING)
 endif()
 
 unset(EXPORT_TARGETS CACHE)
+unset(SURGSIM_EXECUTABLE_TARGETS CACHE)
 add_subdirectory(SurgSim)
 add_subdirectory(Modules)
 

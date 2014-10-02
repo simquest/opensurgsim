@@ -28,16 +28,16 @@ set(HEADERS
 	StaplerBehavior.h
 )
 
-add_executable(Stapling
+surgsim_add_executable(Stapling
 	Stapling.cpp
-	${SOURCES}
-	${HEADERS}
+	"${SOURCES}"
+	"${HEADERS}"
 )
 
-add_executable(SerializedStapling
+surgsim_add_executable(SerializedStapling
 	SerializedStapling.cpp
-	${SOURCES}
-	${HEADERS}
+	"${SOURCES}"
+	"${HEADERS}"
 )
 
 add_dependencies(SerializedStapling yaml-cpp)

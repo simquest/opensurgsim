@@ -51,14 +51,14 @@ if(WDK_FOUND)
 	list(APPEND LIBS ${WDK_LIBRARIES})
 endif()
 
-add_executable(MultiAxisVisualTest
-	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
+surgsim_add_executable(MultiAxisVisualTest
+	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 target_link_libraries(MultiAxisVisualTest ${LIBS})
 
-add_executable(RawMultiAxisVisualTest
-	${RAW_EXAMPLE_SOURCES} ${RAW_EXAMPLE_HEADERS})
+surgsim_add_executable(RawMultiAxisVisualTest
+	"${RAW_EXAMPLE_SOURCES}" "${RAW_EXAMPLE_HEADERS}")
 surgsim_show_ide_folders(
 	"${RAW_EXAMPLE_SOURCES}" "${RAW_EXAMPLE_HEADERS}")
 target_link_libraries(RawMultiAxisVisualTest ${LIBS})

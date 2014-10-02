@@ -20,8 +20,8 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-add_executable(KeyboardVisualTest
-	${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
+surgsim_add_executable(KeyboardVisualTest
+	"${UNIT_TEST_SOURCES}" "${UNIT_TEST_HEADERS}")
 
 set(LIBS KeyboardDevice
 		 SurgSimDataStructures 
