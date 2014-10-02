@@ -114,13 +114,14 @@ endif()
 unset(EXPORT_TARGETS CACHE)
 unset(SURGSIM_EXECUTABLE_TARGETS CACHE)
 add_subdirectory(SurgSim)
-add_subdirectory(Modules)
 
 option(BUILD_EXAMPLES "Build the examples." ON)
 
 if(BUILD_EXAMPLES)
 	add_subdirectory(Examples)
 endif()
+
+add_subdirectory(Modules)
 
 option(BUILD_DOCUMENTATION "Build the documentation using Doxygen." OFF)
 
