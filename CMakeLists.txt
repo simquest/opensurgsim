@@ -113,6 +113,7 @@ endif()
 
 unset(EXPORT_TARGETS CACHE)
 add_subdirectory(SurgSim)
+add_subdirectory(Modules)
 
 option(BUILD_EXAMPLES "Build the examples." ON)
 

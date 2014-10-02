@@ -314,6 +314,21 @@ public:
 	/// \return The address of the LabJack, e.g., "1" or "192.168.7.23".
 	const std::string& getAddress() const;
 
+	/// Reset LabJack during destruct.
+	/// \param reset true if the hardware should reset & re-enumerate when this object destructs.
+	/// \note The LabJack hardware has the feature that it continues operation and remembers all settings even after
+	///		the associated LabJackDevice object destructs and communication ends.
+	///		This function causes the hardware to reset when the LabJackDevice object destructs, thereby returning to its
+	///		default (boot-up) settings and forcing USB re-enumeration.
+	/// \note After a reset, it will take a few seconds before the hardware can communicate.
+	/// \warning If the LabJackDevice object does not cleanly destruct (e.g., the executable halts due to an exception),
+	///		then the hardware will not reset.
+	void setResetOnDestruct(bool reset);
+
+	/// Get whether or not the hardware should reset when the LabJackDevice object destructs.
+	/// \return true if should reset on destruct.
+	bool getResetOnDestruct() const;
+
 	/// Enable digital input line.
 	/// \param channel The channel number.
 	/// \exception Asserts if already initialized.
@@ -480,6 +495,9 @@ private:
 
 	/// The address, or a zero-length string to indicate the first-found device of this type on this connection.
 	std::string m_address;
+
+	/// Whether or not the hardware should reset when this object destructs.
+	bool m_reset;
 
 	/// The line numbers for the digital inputs.
 	std::unordered_set<int> m_digitalInputChannels;
