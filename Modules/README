@@ -1,0 +1,6 @@
+Modules Directory
+
+The Modules directory is a place to put extensions to OpenSurgSim. For
+all subdirectories that contain a CMakeLists.txt file, a
+BUILD_MODULE_<Directory_Name> cmake option will be added. If this
+option is turned on, the module will be added to OpenSurgSim.

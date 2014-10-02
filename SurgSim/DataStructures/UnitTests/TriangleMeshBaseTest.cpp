@@ -618,8 +618,8 @@ TEST_F(TriangleMeshBaseTest, TriangleDeletionTest)
 	EXPECT_ANY_THROW(mesh.getTriangle(1));
 	EXPECT_EQ(3u, mesh.getTriangles().size());
 
-	// Should not be able to remove the same triangle twice
-	EXPECT_ANY_THROW(mesh.removeTriangle(1));
+	// Should be able to remove the same triangle twice
+	EXPECT_NO_THROW(mesh.removeTriangle(1));
 
 	// Remove all other triangles to check boundary conditions
 	mesh.removeTriangle(0);

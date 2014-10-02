@@ -169,9 +169,11 @@ template <class VertexData, class EdgeData, class TriangleData>
 void TriangleMeshBase<VertexData, EdgeData, TriangleData>::removeTriangle(size_t id)
 {
 	auto& triangle = m_triangles[id];
-	SURGSIM_ASSERT(triangle.isValid) << "This triangle has already been removed.";
-	triangle.isValid = false;
-	m_freeTriangles.push_back(id);
+	if (triangle.isValid)
+	{
+		triangle.isValid = false;
+		m_freeTriangles.push_back(id);
+	}
 }
 
 template <class VertexData, class EdgeData, class TriangleData>

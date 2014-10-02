@@ -40,14 +40,16 @@ class LabJackToPoseFilter : public SurgSim::Input::CommonDevice,
 {
 
 public:
-	LabJackToPoseFilter(const std::string& name, int firstTimerForQuadrature, int plusX, int minusX,
-		double translationPerUpdate, int positiveAnalogDifferential, int analogSingleEnded, int xOut, int loopbackOut) :
+	LabJackToPoseFilter(const std::string& name, int firstTimerForQuadrature, int resetQuadrature, int plusX,
+		int minusX, double translationPerUpdate, int positiveAnalogDifferential, int analogSingleEnded, int xOut,
+		int loopbackOut) :
 		SurgSim::Input::CommonDevice(name),
 		m_pose(RigidTransform3d::Identity()),
 		m_translationPerUpdate(translationPerUpdate),
 		m_lineForPlusX(plusX),
 		m_lineForMinusX(minusX),
 		m_firstTimerForQuadrature(firstTimerForQuadrature),
+		m_lineForResetQuadrature(resetQuadrature),
 		m_analogInputDifferentialPositive(positiveAnalogDifferential),
 		m_analogInputSingleEnded(analogSingleEnded),
 		m_cachedOutputIndices(false),
@@ -71,6 +73,8 @@ public:
 		const std::string digitalOutputName =
 			SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX + std::to_string(loopbackOut);
 		outputBuilder.addBoolean(digitalOutputName);
+		outputBuilder.addScalar(SurgSim::DataStructures::Names::TIMER_OUTPUT_PREFIX +
+			std::to_string(m_firstTimerForQuadrature));
 		m_outputData = outputBuilder.createData();
 		m_analogOutputIndex = m_outputData.scalars().getIndex(outputName);
 		m_digitalOutputIndex = m_outputData.booleans().getIndex(digitalOutputName);
@@ -203,6 +207,20 @@ public:
 		{
 			result->booleans().reset(m_digitalOutputIndex);
 		}
+
+		bool resetQuadrature = false;
+		if ((m_lastInputData.booleans().get(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+			std::to_string(m_lineForResetQuadrature), &resetQuadrature)) &&
+			resetQuadrature)
+		{
+			result->scalars().set(SurgSim::DataStructures::Names::TIMER_OUTPUT_PREFIX +
+				std::to_string(m_firstTimerForQuadrature), 0.0);
+		}
+		else
+		{
+			result->scalars().reset(SurgSim::DataStructures::Names::TIMER_OUTPUT_PREFIX +
+				std::to_string(m_firstTimerForQuadrature));
+		}
 	}
 
 private:
@@ -215,6 +233,7 @@ private:
 	int m_lineForPlusX;
 	int m_lineForMinusX;
 	int m_firstTimerForQuadrature;
+	int m_lineForResetQuadrature;
 	int m_analogInputDifferentialPositive;
 	int m_analogInputDifferentialNegative;
 	int m_analogInputSingleEnded;
@@ -251,6 +270,9 @@ int main(int argc, char** argv)
 	toolDevice->enableTimer(firstTimerForQuadrature, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE);
 	toolDevice->enableTimer(firstTimerForQuadrature + 1, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE);
 
+	const int resetQuadrature = SurgSim::Device::LabJack::FIO3;
+	toolDevice->enableDigitalInput(resetQuadrature);
+
 	const int singleEndedAnalog = SurgSim::Device::LabJack::AIN1;
 	toolDevice->enableAnalogInput(singleEndedAnalog, SurgSim::Device::LabJack::Range::RANGE_10);
 
@@ -264,7 +286,7 @@ int main(int argc, char** argv)
 
 	const double translationPerUpdate = 0.001; // Millimeter per update.
 	auto filter = std::make_shared<LabJackToPoseFilter>("LabJack to Pose filter", firstTimerForQuadrature,
-		plusX, minusX, translationPerUpdate, positiveAnalogDifferential, singleEndedAnalog,
+		resetQuadrature, plusX, minusX, translationPerUpdate, positiveAnalogDifferential, singleEndedAnalog,
 		xOut, loopbackOut);
 	toolDevice->setOutputProducer(filter);
 	toolDevice->addInputConsumer(filter);
@@ -288,7 +310,8 @@ int main(int argc, char** argv)
 
 		text += "Spin a quadrature encoder attached to FIO" + std::to_string(firstTimerForQuadrature + offset);
 		text += " and FIO" + std::to_string(firstTimerForQuadrature + offset + 1);
-		text += " to move the sphere +/- y-direction.  ";
+		text += " to move the sphere +/- y-direction.  Set FIO" + std::to_string(resetQuadrature);
+		text += " high to reset the quadrature reading.  ";
 
 		text += "Provide a differential analog input to AIN" + std::to_string(positiveAnalogDifferential);
 		text += " and AIN" + std::to_string(negativeAnalogDifferential) + " to spin about the red axis.  ";
