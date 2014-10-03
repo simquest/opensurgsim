@@ -19,7 +19,6 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
@@ -80,7 +79,7 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 
 	SURGSIM_ASSERT(location.rigidLocalPosition.hasValue()) << "Invalid location (no rigid local position)";
 
-	RigidRepresentationBaseLocalization localization;
+	RigidRepresentationLocalization localization;
 	localization.setRepresentation(std::static_pointer_cast<Representation>(shared_from_this()));
 	localization.setLocalPosition(location.rigidLocalPosition.getValue());
 	const Vector3d point = localization.calculatePosition();

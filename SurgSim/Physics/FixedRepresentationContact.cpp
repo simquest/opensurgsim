@@ -18,7 +18,6 @@
 #include "SurgSim/Physics/FixedRepresentationContact.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 
 namespace SurgSim
 {

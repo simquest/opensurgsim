@@ -65,6 +65,9 @@ private:
 	SurgSim::Math::Vector3d m_position;
 };
 
+typedef RigidRepresentationBaseLocalization RigidRepresentationLocalization;
+typedef RigidRepresentationBaseLocalization FixedRepresentationLocalization;
+
 };  // namespace Physics
 
 };  // namespace SurgSim

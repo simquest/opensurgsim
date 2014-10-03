@@ -148,7 +148,7 @@ TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			rigidLocalization = rigidLocalizationTyped;
@@ -158,7 +158,7 @@ TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			auto fixedLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			fixedLocalization = fixedLocalizationTyped;
@@ -221,7 +221,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			rigidLocalization = rigidLocalizationTyped;
@@ -231,7 +231,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			auto fixedLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			fixedLocalization = fixedLocalizationTyped;
@@ -293,7 +293,7 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			rigidLocalization = rigidLocalizationTyped;
@@ -303,7 +303,7 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			auto fixedLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			fixedLocalization = fixedLocalizationTyped;
@@ -325,7 +325,7 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Ones());
 			rigidLocalization = rigidLocalizationTyped;
@@ -335,7 +335,7 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			auto fixedLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Ones());
 			fixedLocalization = fixedLocalizationTyped;
@@ -406,7 +406,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigid1Localization;
 		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid1Localization = rigidLocalizationTyped;
@@ -416,7 +416,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 
 		std::shared_ptr<Localization> rigid2Localization;
 		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[1]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid2Localization = rigidLocalizationTyped;
@@ -438,7 +438,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigid1Localization;
 		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid1Localization = rigidLocalizationTyped;
@@ -448,7 +448,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 
 		std::shared_ptr<Localization> rigid2Localization;
 		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationBaseLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[1]);
 			rigidLocalizationTyped->setLocalPosition(pointOne);
 			rigid2Localization = rigidLocalizationTyped;

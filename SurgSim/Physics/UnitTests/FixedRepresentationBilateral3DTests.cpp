@@ -63,7 +63,7 @@ TEST(FixedRepresentationBilateral3DTests, BuildMlcp)
 	Vector3d actual = Vector3d(8.0, 6.4, 3.5);
 
 	// Setup parameters for FixedRepresentationBilateral3D::build
-	auto localization = std::make_shared<RigidRepresentationBaseLocalization>(
+	auto localization = std::make_shared<FixedRepresentationLocalization>(
 		std::make_shared<FixedRepresentation>("representation"));
 	localization->setLocalPosition(actual);
 
@@ -96,7 +96,7 @@ TEST(FixedRepresentationBilateral3DTests, BuildMlcpTwoStep)
 
 	ConstraintData emptyConstraint;
 
-	auto localization = std::make_shared<RigidRepresentationBaseLocalization>(
+	auto localization = std::make_shared<FixedRepresentationLocalization>(
 		std::make_shared<FixedRepresentation>("representation"));
 
 	localization->setLocalPosition(actual);

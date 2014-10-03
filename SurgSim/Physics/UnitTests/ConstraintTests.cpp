@@ -130,9 +130,9 @@ protected:
 		m_fixed->setLocalPose(m_poseFixed);
 		m_numDof += m_fixed->getNumDof();
 
-		auto locFixedPlane = std::make_shared<RigidRepresentationBaseLocalization>(m_fixed);
+		auto locFixedPlane = std::make_shared<FixedRepresentationLocalization>(m_fixed);
 		m_locFixedPlane = locFixedPlane;
-		auto locRigidSphere = std::make_shared<RigidRepresentationBaseLocalization>(m_rigid);
+		auto locRigidSphere = std::make_shared<RigidRepresentationLocalization>(m_rigid);
 		m_locRigidSphere = locRigidSphere;
 
 		locFixedPlane->setLocalPosition(m_contactPositionPlane);
@@ -173,8 +173,8 @@ TEST_F (ConstraintTests, TestConstructor)
 	auto fixedRep = std::make_shared<FixedRepresentation>("fixed");
 	auto rigidRep = std::make_shared<RigidRepresentation>("rigid");
 
-	std::shared_ptr<Localization> fixedLoc = std::make_shared<RigidRepresentationBaseLocalization>();
-	std::shared_ptr<Localization> rigidLoc = std::make_shared<RigidRepresentationBaseLocalization>();
+	std::shared_ptr<Localization> fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+	std::shared_ptr<Localization> rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 
 	fixedLoc->setRepresentation(fixedRep);
 	rigidLoc->setRepresentation(rigidRep);
@@ -203,28 +203,28 @@ TEST_F (ConstraintTests, TestConstructor)
 	{
 		SCOPED_TRACE("Localization nullptr test");
 
-		fixedLoc = std::make_shared<RigidRepresentationBaseLocalization>();
-		rigidLoc = std::make_shared<RigidRepresentationBaseLocalization>();
+		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 		EXPECT_THROW(
 			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
 			SurgSim::Framework::AssertionFailure);
 
-		fixedLoc = std::make_shared<RigidRepresentationBaseLocalization>();
-		rigidLoc = std::make_shared<RigidRepresentationBaseLocalization>();
+		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 		fixedLoc->setRepresentation(fixedRep);
 		EXPECT_THROW(
 			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
 			SurgSim::Framework::AssertionFailure);
 
-		fixedLoc = std::make_shared<RigidRepresentationBaseLocalization>();
-		rigidLoc = std::make_shared<RigidRepresentationBaseLocalization>();
+		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 		rigidLoc->setRepresentation(rigidRep);
 		EXPECT_THROW(
 			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
 			SurgSim::Framework::AssertionFailure);
 
-		fixedLoc = std::make_shared<RigidRepresentationBaseLocalization>();
-		rigidLoc = std::make_shared<RigidRepresentationBaseLocalization>();
+		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 		fixedLoc->setRepresentation(fixedRep);
 		rigidLoc->setRepresentation(rigidRep);
 		EXPECT_NO_THROW(
@@ -258,8 +258,8 @@ TEST_F (ConstraintTests, TestGetNumDof)
 	auto fixedRep = std::make_shared<FixedRepresentation>("fixed");
 	auto rigidRep = std::make_shared<RigidRepresentation>("rigid");
 
-	std::shared_ptr<Localization> fixedLoc = std::make_shared<RigidRepresentationBaseLocalization>();
-	std::shared_ptr<Localization> rigidLoc = std::make_shared<RigidRepresentationBaseLocalization>();
+	std::shared_ptr<Localization> fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+	std::shared_ptr<Localization> rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 
 	fixedLoc->setRepresentation(fixedRep);
 	rigidLoc->setRepresentation(rigidRep);
