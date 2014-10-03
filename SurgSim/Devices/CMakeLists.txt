@@ -21,6 +21,7 @@ add_subdirectory(Mouse)
 set(DEVICES
 	LabJack
 	MultiAxis
+	Nimble
 	Novint
 	Phantom
 	Sixense
