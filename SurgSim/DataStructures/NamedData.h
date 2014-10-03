@@ -239,6 +239,15 @@ public:
 	/// \return true if successful.
 	inline bool set(int index, const T& value);
 
+	/// Record the data for an entry specified by an index.
+	/// This version accepts rvalues, and the data will be moved
+	/// The entry will also be marked as containing valid data.
+	///
+	/// \param index The index of the entry.
+	/// \param value The value to be set.
+	/// \return true if successful.
+	inline bool set(int index, T&& value);
+
 	/// Record the data for an entry specified by a name.
 	/// The entry will also be marked as containing valid data.
 	///
@@ -246,6 +255,15 @@ public:
 	/// \param value The value to be set.
 	/// \return true if successful.
 	inline bool set(const std::string& name, const T& value);
+
+	/// Record the data for an entry specified by a name.
+	/// This version accepts rvalues, and the data will be moved
+	/// The entry will also be marked as containing valid data.
+	///
+	/// \param name The name of the entry.
+	/// \param value The value to be set.
+	/// \return true if successful.
+	inline bool set(const std::string& name, T&& value);
 
 	/// Invalidate an entry&mdash; mark it as not containing any valid data.
 	///

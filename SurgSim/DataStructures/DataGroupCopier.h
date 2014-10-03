@@ -30,7 +30,7 @@ class DataGroup;
 class IndexDirectory;
 
 /// The type used for copying values between two DataGroups that cannot assign to each other.
-typedef std::array<NamedDataCopyMap, 8> DataGroupCopyMap;
+typedef std::array<NamedDataCopyMap, 9> DataGroupCopyMap;
 
 /// A class that assists in copying from one DataGroup to another, when assignment is not possible.
 /// \sa SurgSim::DataStructures::DataGroup
