@@ -21,7 +21,6 @@
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
 
 #include "SurgSim/Math/Quaternion.h"

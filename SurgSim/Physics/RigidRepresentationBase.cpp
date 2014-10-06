@@ -23,7 +23,6 @@
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
-#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/PhysicsConvert.h"
 
 namespace SurgSim

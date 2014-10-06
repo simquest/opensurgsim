@@ -22,7 +22,6 @@
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
 
 namespace SurgSim

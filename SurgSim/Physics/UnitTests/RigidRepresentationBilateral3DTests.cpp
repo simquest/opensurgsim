@@ -25,7 +25,6 @@
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"

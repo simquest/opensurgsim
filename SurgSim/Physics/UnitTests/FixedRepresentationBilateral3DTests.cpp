@@ -22,7 +22,6 @@
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
-#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
 using SurgSim::Math::Vector3d;
