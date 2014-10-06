@@ -51,7 +51,7 @@ if(WIN32 AND MSVC)
 	endif()
 endif(WIN32 AND MSVC)
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "64")
+	if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8") # 64 bit
 		set(LIB_SUFFIX "${LIB_SUFFIX}_64")
 	endif()
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
