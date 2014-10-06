@@ -253,6 +253,7 @@ TEST(CommonDeviceTests, RemoveOutputProducer)
 	EXPECT_FALSE(device.getOutputData().integers().hasData("value"));
 
 	EXPECT_TRUE(device.setOutputProducer(producer1));
+	EXPECT_TRUE(device.hasOutputProducer());
 	device.clearOutputProducer();
-	EXPECT_FALSE(device.pullOutput());
+	EXPECT_FALSE(device.hasOutputProducer());
 }
