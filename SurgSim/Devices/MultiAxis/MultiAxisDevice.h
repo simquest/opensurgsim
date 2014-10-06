@@ -90,6 +90,8 @@ public:
 	/// \return True if successful.
 	virtual bool removeInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
 
+	virtual void clearInputConsumers() override;
+
 	/// Connect this device to an OutputProducerInterface, which will send data to this device.
 	/// \param outputProducer The OutputProducerInterface to connect with.
 	/// \return True if successful.
@@ -103,6 +105,8 @@ public:
 	/// Getter for whether or not this device is connected with an OutputProducerInterface.
 	/// \return True if an OutputProducerInterface is connected.
 	virtual bool hasOutputProducer() override;
+
+	virtual void clearOutputProducer() override;
 
 	/// Sets the position scale for this device.
 	/// The position scale controls how much the pose changes for a given device translation.
