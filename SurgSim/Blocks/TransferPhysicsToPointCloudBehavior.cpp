@@ -25,6 +25,8 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
+using SurgSim::Framework::checkAndConvert;
+
 namespace SurgSim
 {
 
@@ -37,29 +39,23 @@ TransferPhysicsToPointCloudBehavior::TransferPhysicsToPointCloudBehavior(const s
 	SurgSim::Framework::Behavior(name)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TransferPhysicsToPointCloudBehavior,
-		std::shared_ptr<SurgSim::Framework::Component>, Source, getSource, setSource);
+									  std::shared_ptr<SurgSim::Framework::Component>, Source, getSource, setSource);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TransferPhysicsToPointCloudBehavior,
-		std::shared_ptr<SurgSim::Framework::Component>, Target, getTarget, setTarget);
+									  std::shared_ptr<SurgSim::Framework::Component>, Target, getTarget, setTarget);
 }
 
 void TransferPhysicsToPointCloudBehavior::setSource(const std::shared_ptr<SurgSim::Framework::Component>& source)
 {
 	SURGSIM_ASSERT(nullptr != source) << "'source' can not be nullptr.";
-
-	auto deformable = std::dynamic_pointer_cast<SurgSim::Physics::DeformableRepresentation>(source);
-	SURGSIM_ASSERT(nullptr != deformable) << "'source' is not a SurgSim::Physics::DeformableRepresentation.";
-
-	m_source = deformable;
+	m_source = checkAndConvert<SurgSim::Physics::DeformableRepresentation>(
+				   source, "SurgSim::Physics::DeformableRepresentation");
 }
 
 void TransferPhysicsToPointCloudBehavior::setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target)
 {
 	SURGSIM_ASSERT(nullptr != target) << "'target' can not be nullptr.";
-
-	auto pointCloud = std::dynamic_pointer_cast<SurgSim::Graphics::PointCloudRepresentation>(target);
-	SURGSIM_ASSERT(nullptr != pointCloud) << " 'target' is not a SurgSim::Graphics::PointCloudRepresentation.";
-
-	m_target = pointCloud;
+	m_target = checkAndConvert<SurgSim::Graphics::PointCloudRepresentation>(
+				   target, "SurgSim::Graphics::PointCloudRepresentation");
 }
 
 std::shared_ptr<SurgSim::Physics::DeformableRepresentation> TransferPhysicsToPointCloudBehavior::getSource() const

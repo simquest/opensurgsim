@@ -27,7 +27,7 @@ template <class Target, class Source>
 std::shared_ptr<Target> checkAndConvert(std::shared_ptr<Source> incoming, const std::string& expectedTypeName)
 {
 	auto result = std::dynamic_pointer_cast<Target>(incoming);
-	SURGSIM_ASSERT(result != nullptr)
+	SURGSIM_ASSERT(incoming != nullptr && result != nullptr)
 			<< "Expected " << expectedTypeName << " but received " << incoming->getClassName() << " which cannot "
 			<< "be converted.";
 	return result;
