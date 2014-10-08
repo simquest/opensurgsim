@@ -8,6 +8,7 @@ Devices with Dependencies:
 - \subpage LabJack
 - \subpage MultiAxis
 - \subpage Novint
+- \subpage OpenNI
 - \subpage Phantom
 - \subpage Sixense
 - \subpage TrackIR
