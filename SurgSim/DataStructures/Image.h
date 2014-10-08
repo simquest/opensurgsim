@@ -88,7 +88,8 @@ public:
 	size_t getNumChannels() const;
 
 	/// Type of the channel returned by getChannel
-	typedef Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 0, Eigen::InnerStride<>> ChannelType;
+	typedef Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, Eigen::Unaligned,
+			Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ChannelType;
 
 	/// Get the data in the channel as an eigen matrix
 	/// \param channel the channel number

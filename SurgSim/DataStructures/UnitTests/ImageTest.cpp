@@ -206,6 +206,15 @@ TYPED_TEST(ImageTests, EigenAccess)
 		EXPECT_NEAR(30, matrix(3, 0), epsilon);
 		EXPECT_NEAR(54, matrix(5, 4), epsilon);
 	}
+	{
+		Image<T> image(10, 30, 1);
+		image.getChannel(0) = Matrix::Constant(10, 30, T(1));
+		image.getChannel(0) *= 2;
+		EXPECT_TRUE(image.getChannel(0).isApprox(Matrix::Constant(10, 30, T(2))));
+
+		image.getChannel(0) = image.getChannel(0).array() + T(3);
+		EXPECT_TRUE(image.getChannel(0).isApprox(Matrix::Constant(10, 30, T(5))));
+	}
 }
 
 }

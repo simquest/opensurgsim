@@ -104,7 +104,8 @@ template<class T>
 typename Image<T>::ChannelType Image<T>::getChannel(size_t channel)
 {
 	SURGSIM_ASSERT(channel < m_channels) << "channel number is larger than the number of channels";
-	return ChannelType(m_data.get() + channel, m_width, m_height, Eigen::InnerStride<>(m_channels));
+	Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> stride(m_width*m_channels, m_channels);
+	return ChannelType(m_data.get() + channel, m_width, m_height, stride);
 }
 
 template<class T>
