@@ -118,6 +118,12 @@ typename Image<T>::ChannelType Image<T>::getChannel(size_t channel)
 }
 
 template<class T>
+typename Image<T>::VectorType Image<T>::getAsVector()
+{
+	return VectorType(m_data.get(), m_width * m_height * m_channels);
+}
+
+template<class T>
 size_t Image<T>::getWidth() const
 {
 	return m_width;

@@ -178,7 +178,7 @@ TYPED_TEST(ImageTests, PointerAccess)
 	}
 }
 
-TYPED_TEST(ImageTests, EigenAccess)
+TYPED_TEST(ImageTests, GetChannel)
 {
 	typedef typename TestFixture::Scalar T;
 	typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> Matrix;
@@ -229,5 +229,36 @@ TYPED_TEST(ImageTests, EigenAccess)
 	}
 }
 
+TYPED_TEST(ImageTests, GetAsVector)
+{
+	typedef typename TestFixture::Scalar T;
+
+	T array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+	{
+		Image<T> image(3, 3, 1, array);
+		for (int i = 0; i < 9; i++)
+		{
+			typename Image<T>::VectorType vector = image.getAsVector();
+			EXPECT_NEAR(array[i], vector[i], epsilon);
+		}
+	}
+	{
+		Image<T> image(3, 1, 3, array);
+		for (int i = 0; i < 9; i++)
+		{
+			typename Image<T>::VectorType vector = image.getAsVector();
+			EXPECT_NEAR(array[i], vector[i], epsilon);
+		}
+	}
+	{
+		Image<T> image(1, 3, 3, array);
+		for (int i = 0; i < 9; i++)
+		{
+			typename Image<T>::VectorType vector = image.getAsVector();
+			EXPECT_NEAR(array[i], vector[i], epsilon);
+		}
+	}
 }
-}
+
+};
+};

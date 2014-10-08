@@ -105,6 +105,13 @@ public:
 	/// \return an eigen matrix
 	ChannelType getChannel(size_t channel);
 
+	/// Type of the vector returned by getAsVector
+	typedef Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> VectorType;
+
+	/// Get the data as a 1D Eigen Vector
+	/// \return an eigen vector
+	VectorType getAsVector();
+
 	/// Get the pointer to the data
 	/// \return  the data
 	T* const getData();
