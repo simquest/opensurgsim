@@ -55,6 +55,18 @@ TYPED_TEST(ImageTests, Construct)
 	ASSERT_NO_THROW({Image<T> image(3, 3, 1, array);});
 }
 
+TYPED_TEST(ImageTests, ConstructFromOtherType)
+{
+	typedef typename TestFixture::Scalar T;
+
+	double array[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+	Image<T> image(3, 3, 1, array);
+	for (int i = 0; i < 9; i++)
+	{
+		EXPECT_NEAR(static_cast<T>(array[i]), image.getData()[i], epsilon);
+	}
+}
+
 TYPED_TEST(ImageTests, Copy)
 {
 	typedef typename TestFixture::Scalar T;

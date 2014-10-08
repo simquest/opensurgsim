@@ -45,6 +45,15 @@ Image<T>::Image(size_t width, size_t height, size_t channels, const T* const dat
 }
 
 template<class T>
+template<class D>
+Image<T>::Image(size_t width, size_t height, size_t channels, const D* const data) :
+	m_width(width), m_height(height), m_channels(channels), m_data(new T[m_width * m_height * m_channels])
+{
+	Eigen::Map<const Eigen::Matrix<D, Eigen::Dynamic, 1> > input(data, width * height * channels);
+	getAsVector() = input.template cast<T>();
+}
+
+template<class T>
 Image<T>::Image(const Image<T>& other) :
 	m_width(other.getWidth()), m_height(other.getHeight()), m_channels(other.getNumChannels()),
 	m_data(new T[m_width * m_height * m_channels])

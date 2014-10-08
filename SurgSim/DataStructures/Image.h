@@ -50,6 +50,15 @@ public:
 	/// \param data pointer to the data to copy from
 	Image(size_t width, size_t height, size_t channels, const T* const data);
 
+	/// Copy constructor from a data pointer of a different type
+	/// \tparam D type of data stored in the pointer
+	/// \param width the image width
+	/// \param height the image height
+	/// \param channels the number of channels in the image
+	/// \param data pointer to the data to copy from
+	template<class D>
+	Image(size_t width, size_t height, size_t channels, const D* const data);
+
 	/// Copy constructor
 	/// \param other Image to copy from
 	Image(const Image<T>& other);
