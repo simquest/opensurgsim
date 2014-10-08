@@ -33,7 +33,7 @@ GlutRenderObject::~GlutRenderObject()
 {
 }
 
-void GlutSquare::draw() const
+void GlutSquare::draw()
 {
 	glEnable(GL_LIGHTING);
 
@@ -73,7 +73,7 @@ void GlutSquare::draw() const
 	glPopMatrix();
 }
 
-void GlutAxes::draw() const
+void GlutAxes::draw()
 {
 	glDisable(GL_LIGHTING);
 
@@ -106,7 +106,7 @@ void GlutAxes::draw() const
 	glPopMatrix();
 }
 
-void GlutSphere::draw() const
+void GlutSphere::draw()
 {
 	glEnable(GL_LIGHTING);
 
@@ -124,7 +124,7 @@ void GlutSphere::draw() const
 	glPopMatrix();
 }
 
-void GlutGroup::draw() const
+void GlutGroup::draw()
 {
 	glPushMatrix();
 
