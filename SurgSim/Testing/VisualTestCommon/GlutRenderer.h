@@ -42,7 +42,7 @@ struct GlutRenderObject
 	virtual ~GlutRenderObject();
 
 	/// Pure virtual draw method for subclasses to define how to draw themselves with Glut.
-	virtual void draw() const = 0;
+	virtual void draw() = 0;
 };
 
 /// Square with center at local origin.
@@ -71,7 +71,7 @@ struct GlutSquare : public GlutRenderObject
 	}
 
 	/// Draws the square with Glut.
-	virtual void draw() const;
+	virtual void draw();
 };
 
 /// Axes with center at local origin, red axis along the local X-axis, green axis along the local Y-axis, and blue axis
@@ -91,7 +91,7 @@ struct GlutAxes : GlutRenderObject
 	}
 
 	/// Draws the axes with Glut.
-	virtual void draw() const;
+	virtual void draw();
 };
 
 /// Sphere with center at local origin.
@@ -111,7 +111,7 @@ struct GlutSphere : GlutRenderObject
 	}
 
 	/// Draws the sphere with Glut.
-	virtual void draw() const;
+	virtual void draw();
 
 private:
 	/// GLU quadric object for the quadric operations required to build the sphere.
@@ -130,7 +130,7 @@ struct GlutGroup : public GlutRenderObject
 	}
 
 	/// Draws the group with Glut and iterates through its children to draw them.
-	virtual void draw() const;
+	virtual void draw();
 };
 
 /// Camera which controls the view of the scene.
