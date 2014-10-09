@@ -35,6 +35,7 @@
 
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
+using SurgSim::Framework::checkAndConvert;
 
 namespace
 {
@@ -150,8 +151,7 @@ bool OsgView::isWindowBorderEnabled() const
 
 void OsgView::setCamera(std::shared_ptr<SurgSim::Framework::Component> camera)
 {
-	std::shared_ptr<OsgCamera> osgCamera = std::dynamic_pointer_cast<OsgCamera>(camera);
-	SURGSIM_ASSERT(osgCamera != nullptr) << "OsgView can only take an OsgCamera.";
+	auto osgCamera = checkAndConvert<OsgCamera>(camera, "SurgSim::Graphics::OsgCamera");
 
 	View::setCamera(camera);
 	m_view->setCamera(osgCamera->getOsgCamera());

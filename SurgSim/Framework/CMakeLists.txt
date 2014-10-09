@@ -53,6 +53,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	BehaviorManager.h
 	Clock.h
 	Component.h
+	Component-inl.h
 	ComponentManager.h
 	ComponentManager-inl.h
 	FrameworkConvert.h
