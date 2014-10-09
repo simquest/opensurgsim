@@ -27,7 +27,6 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Math::makeSkewSymmetricMatrix;

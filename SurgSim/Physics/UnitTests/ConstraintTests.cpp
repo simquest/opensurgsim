@@ -21,11 +21,9 @@
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationContact.h"
-#include "SurgSim/Physics/FixedRepresentationLocalization.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -131,11 +129,9 @@ protected:
 		m_fixed->setLocalPose(m_poseFixed);
 		m_numDof += m_fixed->getNumDof();
 
-		std::shared_ptr<FixedRepresentationLocalization> locFixedPlane;
-		locFixedPlane = std::make_shared<FixedRepresentationLocalization>(m_fixed);
+		auto locFixedPlane = std::make_shared<FixedRepresentationLocalization>(m_fixed);
 		m_locFixedPlane = locFixedPlane;
-		std::shared_ptr<RigidRepresentationLocalization> locRigidSphere;
-		locRigidSphere = std::make_shared<RigidRepresentationLocalization>(m_rigid);
+		auto locRigidSphere = std::make_shared<RigidRepresentationLocalization>(m_rigid);
 		m_locRigidSphere = locRigidSphere;
 
 		locFixedPlane->setLocalPosition(m_contactPositionPlane);
