@@ -116,6 +116,23 @@ TEST(NimbleDeviceTest, InputConsumer)
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 30);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseRoot"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseWrist"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseThumbProximal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseThumbIntermediate"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseThumbDistal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseIndexProximal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseIndexIntermediate"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseIndexDistal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseMiddleProximal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseMiddleIntermediate"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseMiddleDistal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseRingProximal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseRingIntermediate"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseRingDistal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseSmallProximal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseSmallIntermediate"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("jointPoseSmallDistal"));
 }
 
 TEST(NimbleDeviceTest, OutputProducer)

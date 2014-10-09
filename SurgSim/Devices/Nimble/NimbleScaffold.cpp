@@ -80,9 +80,9 @@ struct HandTrackingData
 		RING_PROXIMAL = 11,       // Ring finger proximal frame, refers to the proximal phalange.
 		RING_INTERMEDIATE = 12,   // Ring finger intermediate frame, refers to the intermediate phalange.
 		RING_DISTAL = 13,         // Ring finger distal frame, refers to the distal phalange.
-		PINKY_PROXIMAL = 14,      // Pinky finger proximal frame, refers to the proximal phalange.
-		PINKY_INTERMEDIATE = 15,  // Pinky finger intermediate frame, refers to the intermediate phalange.
-		PINKY_DISTAL = 16,        // Pinky finger distal frame, refers to the distal phalange.
+		SMALL_PROXIMAL = 14,      // Small finger proximal frame, refers to the proximal phalange.
+		SMALL_INTERMEDIATE = 15,  // Small finger intermediate frame, refers to the intermediate phalange.
+		SMALL_DISTAL = 16,        // Small finger distal frame, refers to the distal phalange.
 		NUM_JOINTS
 	};
 
@@ -109,9 +109,9 @@ struct HandTrackingData
 		RING_MCP_AA   = 10,    ///< Ring finger metacarpal-phalangeal joint, adduction/abduction
 		RING_MCP_FE   = 11,    ///< Ring finger metacarpal-phalangeal joint, flexion/extension
 		RING_PIP      = 12,    ///< Ring finger proximal interphalangeal joint, flexion/extension
-		PINKY_MCP_AA  = 13,    ///< Pinky finger metacarpal-phalangeal joint, adduction/abduction
-		PINKY_MCP_FE  = 14,    ///< Pinky finger metacarpal-phalangeal joint, flexion/extension
-		PINKY_PIP     = 15,    ///< Pinky finger proximal interphalangeal joint, flexion/extension
+		SMALL_MCP_AA  = 13,    ///< Small finger metacarpal-phalangeal joint, adduction/abduction
+		SMALL_MCP_FE  = 14,    ///< Small finger metacarpal-phalangeal joint, flexion/extension
+		SMALL_PIP     = 15,    ///< Small finger proximal interphalangeal joint, flexion/extension
 		NUM_FINGER_DOFS_PER_HAND
 	};
 
@@ -231,6 +231,27 @@ namespace SurgSim
 {
 namespace Device
 {
+
+std::array<std::pair<std::string, int>, 17> NimbleScaffold::m_jointPoseNames =
+{
+	std::make_pair("jointPoseRoot", HandTrackingData::ROOT_JOINT),
+	std::make_pair("jointPoseWrist", HandTrackingData::WRIST_JOINT),
+	std::make_pair("jointPoseThumbProximal", HandTrackingData::THUMB_PROXIMAL),
+	std::make_pair("jointPoseThumbIntermediate", HandTrackingData::THUMB_INTERMEDIATE),
+	std::make_pair("jointPoseThumbDistal", HandTrackingData::THUMB_DISTAL),
+	std::make_pair("jointPoseIndexProximal", HandTrackingData::INDEX_PROXIMAL),
+	std::make_pair("jointPoseIndexIntermediate", HandTrackingData::INDEX_INTERMEDIATE),
+	std::make_pair("jointPoseIndexDistal", HandTrackingData::INDEX_DISTAL),
+	std::make_pair("jointPoseMiddleProximal", HandTrackingData::MIDDLE_PROXIMAL),
+	std::make_pair("jointPoseMiddleIntermediate", HandTrackingData::MIDDLE_INTERMEDIATE),
+	std::make_pair("jointPoseMiddleDistal", HandTrackingData::MIDDLE_DISTAL),
+	std::make_pair("jointPoseRingProximal", HandTrackingData::RING_PROXIMAL),
+	std::make_pair("jointPoseRingIntermediate", HandTrackingData::RING_INTERMEDIATE),
+	std::make_pair("jointPoseRingDistal", HandTrackingData::RING_DISTAL),
+	std::make_pair("jointPoseSmallProximal", HandTrackingData::SMALL_PROXIMAL),
+	std::make_pair("jointPoseSmallIntermediate", HandTrackingData::SMALL_INTERMEDIATE),
+	std::make_pair("jointPoseSmallDistal", HandTrackingData::SMALL_DISTAL)
+};
 
 struct NimbleScaffold::StateData
 {
@@ -430,6 +451,10 @@ void NimbleScaffold::updateDeviceData()
 
 		SurgSim::DataStructures::DataGroup& inputData = (*it)->getInputData();
 		inputData.poses().set(SurgSim::DataStructures::Names::POSE, m_state->handData.hands[index].pose);
+		for (auto name = m_jointPoseNames.begin(); name != m_jointPoseNames.end(); ++name)
+		{
+			inputData.poses().set(name->first, m_state->handData.hands[index].jointPoses[name->second]);
+		}
 		(*it)->pushInput();
 	}
 }
@@ -471,6 +496,10 @@ SurgSim::DataStructures::DataGroup NimbleScaffold::buildDeviceInputData()
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addPose(SurgSim::DataStructures::Names::POSE);
+	for (auto name = m_jointPoseNames.begin(); name != m_jointPoseNames.end(); ++name)
+	{
+		builder.addPose(name->first);
+	}
 	return builder.createData();
 }
 
