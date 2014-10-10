@@ -37,13 +37,13 @@ public:
 	/// \param	name	Name of the group
 	explicit OsgGroup(const std::string& name);
 
-	/// Sets whether the group is currently active
-	/// \param	val True for active, false for inactive
-	virtual void setActive(bool val) override;
+	/// Sets whether this group is currently visible
+	/// \param    visible    True for visible, false for invisible
+	virtual void setVisible(bool visible) override;
 
-	/// Gets whether the group is currently active
-	/// \return	True for active, false for inactive
-	virtual bool isActive() const override;
+	/// Gets whether this group is currently visible
+	/// \return    True for visible, false for invisible
+	virtual bool isVisible() const override;
 
 	/// Adds an representation
 	/// \param	representation	Representation to add to this group
@@ -70,9 +70,9 @@ public:
 	osg::ref_ptr<osg::Group> getOsgGroup() const;
 
 private:
-	/// Whether the group is currently active or not
-	/// Newly added representations or groups will have this activity.
-	bool m_isActive;
+	/// Whether the group is currently visible or not
+	/// Newly added representations or groups will have this visibility.
+	bool m_isVisible;
 
 	/// OSG group node
 	/// A switch is used to provide visibility functionality.

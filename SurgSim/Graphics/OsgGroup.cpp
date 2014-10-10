@@ -22,18 +22,18 @@ using SurgSim::Graphics::OsgRepresentation;
 using SurgSim::Graphics::OsgGroup;
 
 OsgGroup::OsgGroup(const std::string& name) : SurgSim::Graphics::Group(name),
-	m_isActive(true),
+	m_isVisible(true),
 	m_switch(new osg::Switch())
 {
 	m_switch->getOrCreateStateSet()->setGlobalDefaults();
 	m_switch->setName(name + " Switch");
 };
 
-void OsgGroup::setActive(bool val)
+void OsgGroup::setVisible(bool visible)
 {
-	m_isActive= val;
+	m_isVisible = visible;
 
-	if (m_isActive)
+	if (m_isVisible)
 	{
 		m_switch->setAllChildrenOn();
 	}
@@ -43,9 +43,9 @@ void OsgGroup::setActive(bool val)
 	}
 }
 
-bool OsgGroup::isActive() const
+bool OsgGroup::isVisible() const
 {
-	return m_isActive;
+	return m_isVisible;
 }
 
 bool OsgGroup::add(std::shared_ptr<SurgSim::Graphics::Representation> representation)
@@ -55,7 +55,7 @@ bool OsgGroup::add(std::shared_ptr<SurgSim::Graphics::Representation> representa
 	if (osgRepresentation && Group::add(osgRepresentation))
 	{
 		m_switch->addChild(osgRepresentation->getOsgNode());
-		m_switch->setChildValue(osgRepresentation->getOsgNode(), m_isActive);
+		m_switch->setChildValue(osgRepresentation->getOsgNode(), m_isVisible);
 		return true;
 	}
 	else

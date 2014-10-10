@@ -36,7 +36,7 @@ TEST(OsgGroupTests, InitTest)
 	std::shared_ptr<Group> group = osgGroup;
 
 	EXPECT_EQ("test group", group->getName());
-	EXPECT_TRUE(group->isActive());
+	EXPECT_TRUE(group->isVisible());
 	EXPECT_EQ(0u, group->getMembers().size());
 	EXPECT_EQ(0u, osgGroup->getOsgGroup()->getNumChildren());
 }
@@ -49,16 +49,16 @@ TEST(OsgGroupTests, OsgNodesTest)
 	ASSERT_TRUE(osgSwitch.valid()) << "Group's OSG node should be a switch!";
 }
 
-TEST(OsgGroupTests, ActivityTest)
+TEST(OsgGroupTests, VisibilityTest)
 {
 	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test group");
 	std::shared_ptr<Group> group = osgGroup;
 
-	group->setActive(false);
-	EXPECT_FALSE(group->isActive());
+	group->setVisible(false);
+	EXPECT_FALSE(group->isVisible());
 
-	group->setActive(true);
-	EXPECT_TRUE(group->isActive());
+	group->setVisible(true);
+	EXPECT_TRUE(group->isVisible());
 }
 
 TEST(OsgGroupTests, AddRemoveTest)
@@ -81,10 +81,10 @@ TEST(OsgGroupTests, AddRemoveTest)
 	EXPECT_EQ(0u, osgSwitch->getChildIndex(representation1->getOsgNode()));
 	EXPECT_TRUE(osgSwitch->getChildValue(representation1->getOsgNode())) << "Representation 1 should be visible!";
 
-	/// Set group to not active and check the osg::Switch values
-	group->setActive(false);
-	EXPECT_FALSE(group->isActive());
-	EXPECT_FALSE(osgSwitch->getChildValue(representation1->getOsgNode())) << "Representation 1 should be visible!";
+	/// Set group to not visible and check the osg::Switch values
+	group->setVisible(false);
+	EXPECT_FALSE(group->isVisible());
+	EXPECT_FALSE(osgSwitch->getChildValue(representation1->getOsgNode())) << "Representation 1 should not be visible!";
 
 	/// Add another representation and make sure the osg::Switch value for it is set correctly (should be false)
 	std::shared_ptr<OsgRepresentation> representation2 =
@@ -95,18 +95,17 @@ TEST(OsgGroupTests, AddRemoveTest)
 	EXPECT_EQ(1u, osgSwitch->getChildIndex(representation2->getOsgNode()));
 	EXPECT_FALSE(osgSwitch->getChildValue(representation2->getOsgNode())) << "Representation 2 should not be visible!";
 
-	/// Set group to active (visible) and check the osg::Switch values
-	group->setActive(true);
-	EXPECT_TRUE(group->isActive());
+	/// Set group to visible and check the osg::Switch values
+	group->setVisible(true);
+	EXPECT_TRUE(group->isVisible());
 	EXPECT_TRUE(osgSwitch->getChildValue(representation1->getOsgNode())) << "Representation 1 should be visible!";
 	EXPECT_TRUE(osgSwitch->getChildValue(representation2->getOsgNode())) << "Representation 2 should be visible!";
 
-	/// Set group to inactive (not visible) and check the osg::Switch values
-	group->setActive(false);
-	EXPECT_FALSE(group->isActive());
+	/// Set group to not visible and check the osg::Switch values
+	group->setVisible(false);
+	EXPECT_FALSE(group->isVisible());
 	EXPECT_FALSE(osgSwitch->getChildValue(representation1->getOsgNode())) << "Representation 1 should not be visible!";
 	EXPECT_FALSE(osgSwitch->getChildValue(representation2->getOsgNode())) << "Representation 1 should not be visible!";
-
 
 	/// Try to add a duplicate representation
 	EXPECT_FALSE(group->add(representation1));
@@ -129,7 +128,7 @@ TEST(OsgGroupTests, AddRemoveTest)
 		"OsgGroup should only succeed on representations that derive from OsgRepresentation!";
 	EXPECT_EQ(1u, group->getMembers().size());
 	EXPECT_EQ(group->getMembers().end(),
-			  std::find(group->getMembers().begin(), group->getMembers().end(), nonOsgRepresentation)) <<
+		std::find(group->getMembers().begin(), group->getMembers().end(), nonOsgRepresentation)) <<
 		"Only subclasses of OsgRepresentation should be in an OsgGroup!";
 	EXPECT_EQ(1u, osgSwitch->getNumChildren());
 }
@@ -160,11 +159,11 @@ TEST(OsgGroupTests, AppendTest)
 	// Check that the representations from group 1 were added to group 2, and that it still has the representation
 	// that was added directly to it.
 	EXPECT_NE(group2->getMembers().end(),
-			  std::find(group2->getMembers().begin(), group2->getMembers().end(), representation1));
+		std::find(group2->getMembers().begin(), group2->getMembers().end(), representation1));
 	EXPECT_NE(group2->getMembers().end(),
-			  std::find(group2->getMembers().begin(), group2->getMembers().end(), representation2));
+		std::find(group2->getMembers().begin(), group2->getMembers().end(), representation2));
 	EXPECT_NE(group2->getMembers().end(),
-			  std::find(group2->getMembers().begin(), group2->getMembers().end(), representation3));
+		std::find(group2->getMembers().begin(), group2->getMembers().end(), representation3));
 
 	/// Try to append a group that has already been appended - this will try to add duplicate representations.
 	EXPECT_FALSE(group2->append(group1)) << "Append should return false if any representation is a duplicate!";
@@ -173,9 +172,9 @@ TEST(OsgGroupTests, AppendTest)
 	/// Check that group 1 was not modified by appending it to group 2.
 	EXPECT_EQ(2u, group1->getMembers().size());
 	EXPECT_NE(group1->getMembers().end(),
-			  std::find(group1->getMembers().begin(), group1->getMembers().end(), representation1));
+		std::find(group1->getMembers().begin(), group1->getMembers().end(), representation1));
 	EXPECT_NE(group1->getMembers().end(),
-			  std::find(group1->getMembers().begin(), group1->getMembers().end(), representation2));
+		std::find(group1->getMembers().begin(), group1->getMembers().end(), representation2));
 
 	/// Try to append a group that is not a subclass of OsgGroup
 	std::shared_ptr<Group> nonOsgGroup = std::make_shared<MockGroup>("non-osg group");
@@ -189,9 +188,9 @@ TEST(OsgGroupTests, AppendTest)
 	EXPECT_EQ(2u, group1->getMembers().size()) <<
 		"Nothing from the non-OSG group should have been added to the OsgGroup!";
 	EXPECT_EQ(group1->getMembers().end(),
-			  std::find(group1->getMembers().begin(), group1->getMembers().end(), representation3));
+		std::find(group1->getMembers().begin(), group1->getMembers().end(), representation3));
 	EXPECT_EQ(group1->getMembers().end(),
-			  std::find(group1->getMembers().begin(), group1->getMembers().end(), nonOsgRepresentation));
+		std::find(group1->getMembers().begin(), group1->getMembers().end(), nonOsgRepresentation));
 }
 
 TEST(OsgGroupTests, ClearTest)
