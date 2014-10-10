@@ -72,7 +72,6 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 		= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("point cloud");
 	pointCloud->setColor(SurgSim::Math::Vector4d(0.2, 0.2, 1.0, 1.0));
 	pointCloud->setPointSize(3.0f);
-	pointCloud->setVisible(true);
 	sceneElement->addComponent(pointCloud);
 
 	// The behavior which transfers the position of the vertices in the FEM to locations in the point cloud

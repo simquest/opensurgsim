@@ -103,11 +103,11 @@ void VisualizeContactsBehavior::update(double dt)
 				vectorField->addVertex(vertex2);
 			}
 		}
-		m_vectorField->setVisible(true);
+		m_vectorField->setLocalActive(true);
 	}
 	else
 	{
-		m_vectorField->setVisible(false);
+		m_vectorField->setLocalActive(false);
 	}
 }
 
