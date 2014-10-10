@@ -86,6 +86,30 @@ TEST(OsgCameraTests, OsgNodesTest)
 	EXPECT_EQ(camera.get(), switchNode->getChild(0));
 }
 
+TEST(OsgCameraTests, ActivenessTest)
+{
+	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
+	std::shared_ptr<OsgRepresentation> osgRepresentation = osgCamera;
+	std::shared_ptr<Camera> camera = osgCamera;
+
+	// Get the osg::Switch from the OsgRepresentation so that we can make sure that the osg::Camera has the
+	// correct visibility.
+	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
+	EXPECT_TRUE(switchNode.valid());
+
+	EXPECT_TRUE(camera->isActive());
+	EXPECT_TRUE(switchNode->getChildValue(osgCamera->getOsgCamera()));
+
+	camera->setLocalActive(false);
+	EXPECT_FALSE(camera->isActive());
+	EXPECT_FALSE(switchNode->getChildValue(osgCamera->getOsgCamera()));
+
+	camera->setLocalActive(true);
+	EXPECT_TRUE(camera->isActive());
+	EXPECT_TRUE(switchNode->getChildValue(osgCamera->getOsgCamera()));
+
+}
+
 TEST(OsgCameraTests, GroupTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
