@@ -83,7 +83,7 @@ void Fem2DElementTriangle::initialize(const SurgSim::Math::OdeState& state)
 	getSubVector(state.getPositions(), m_nodeIds, 6, &m_x0);
 
 	// Store the rest rotation in m_initialRotation
-	computeInitialRotation(state);
+	m_initialRotation = computeRotation(state);
 
 	// computeShapeFunctionsParameters needs the initial rotation and
 	// is required to compute the stiffness and mass matrices
@@ -344,8 +344,10 @@ void Fem2DElementTriangle::computeStiffness(const SurgSim::Math::OdeState& state
 	}
 }
 
-void Fem2DElementTriangle::computeInitialRotation(const SurgSim::Math::OdeState& state)
+SurgSim::Math::Matrix33d Fem2DElementTriangle::computeRotation(const SurgSim::Math::OdeState& state)
 {
+	SurgSim::Math::Matrix33d rotation;
+
 	// Build (A; i, j, k) an orthonormal frame
 	// such that in the local frame, we have:
 	// A(0, 0)
@@ -371,9 +373,11 @@ void Fem2DElementTriangle::computeInitialRotation(const SurgSim::Math::OdeState&
 	j.normalize();
 
 	// Initialize the initial rotation matrix (transform vectors from local to global coordinates)
-	m_initialRotation.col(0) = i;
-	m_initialRotation.col(1) = j;
-	m_initialRotation.col(2) = k;
+	rotation.col(0) = i;
+	rotation.col(1) = j;
+	rotation.col(2) = k;
+
+	return rotation;
 }
 
 SurgSim::Math::Vector Fem2DElementTriangle::computeCartesianCoordinate(

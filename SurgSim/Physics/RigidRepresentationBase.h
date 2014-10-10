@@ -19,6 +19,7 @@
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 namespace SurgSim
@@ -31,7 +32,6 @@ class Representation;
 
 namespace Physics
 {
-class Localization;
 
 /// The RigidRepresentationBase class defines the base class for
 /// all rigid motion based representations (fixed, rigid body, rigid body + vtc,...)

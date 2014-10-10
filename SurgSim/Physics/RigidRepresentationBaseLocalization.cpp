@@ -13,39 +13,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
+#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
+
+#include "SurgSim/Physics/RigidRepresentationBase.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
-RigidRepresentationLocalization::RigidRepresentationLocalization()
+RigidRepresentationBaseLocalization::RigidRepresentationBaseLocalization() :
+	Localization()
 {
 
 }
 
-RigidRepresentationLocalization::RigidRepresentationLocalization(std::shared_ptr<Representation> representation) :
+RigidRepresentationBaseLocalization::RigidRepresentationBaseLocalization(std::shared_ptr<Representation>
+																		 representation) :
 	Localization()
 {
 	setRepresentation(representation);
 }
 
-RigidRepresentationLocalization::~RigidRepresentationLocalization()
+RigidRepresentationBaseLocalization::~RigidRepresentationBaseLocalization()
 {
 
 }
 
-void RigidRepresentationLocalization::setLocalPosition(const SurgSim::Math::Vector3d& p)
+void RigidRepresentationBaseLocalization::setLocalPosition(const SurgSim::Math::Vector3d& p)
 {
 	m_position = p;
 }
 
-const SurgSim::Math::Vector3d& RigidRepresentationLocalization::getLocalPosition() const
+const SurgSim::Math::Vector3d& RigidRepresentationBaseLocalization::getLocalPosition() const
 {
 	return m_position;
 }
 
-SurgSim::Math::Vector3d RigidRepresentationLocalization::doCalculatePosition(double time)
+SurgSim::Math::Vector3d RigidRepresentationBaseLocalization::doCalculatePosition(double time)
 {
 	std::shared_ptr<RigidRepresentationBase> rigidRepresentation =
 		std::static_pointer_cast<RigidRepresentationBase>(getRepresentation());
@@ -74,7 +78,7 @@ SurgSim::Math::Vector3d RigidRepresentationLocalization::doCalculatePosition(dou
 	return pose * m_position;
 }
 
-bool RigidRepresentationLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
+bool RigidRepresentationBaseLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
 {
 
 	std::shared_ptr<RigidRepresentationBase> rigidRepresentation =

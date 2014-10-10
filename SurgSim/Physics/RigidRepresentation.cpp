@@ -19,8 +19,6 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 namespace

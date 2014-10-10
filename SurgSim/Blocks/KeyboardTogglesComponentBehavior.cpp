@@ -20,6 +20,8 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Input/InputComponent.h"
 
+using SurgSim::Framework::checkAndConvert;
+
 namespace SurgSim
 {
 namespace Blocks
@@ -41,9 +43,8 @@ void KeyboardTogglesComponentBehavior::setInputComponent(std::shared_ptr<SurgSim
 {
 	SURGSIM_ASSERT(nullptr != inputComponent) << "'inputComponent' cannot be 'nullptr'";
 
-	m_inputComponent = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(inputComponent);
-
-	SURGSIM_ASSERT(nullptr != m_inputComponent)	<< "'inputComponent' must derive from SurgSim::Input::InputComponent";
+	m_inputComponent = checkAndConvert<SurgSim::Input::InputComponent>(
+						   inputComponent, "SurgSim::Input::InputComponent");
 }
 
 std::shared_ptr<SurgSim::Input::InputComponent> KeyboardTogglesComponentBehavior::getInputComponent() const
@@ -52,7 +53,7 @@ std::shared_ptr<SurgSim::Input::InputComponent> KeyboardTogglesComponentBehavior
 }
 
 void KeyboardTogglesComponentBehavior::registerKey(SurgSim::Device::KeyCode key,
-												  std::shared_ptr<SurgSim::Framework::Component> component)
+		std::shared_ptr<SurgSim::Framework::Component> component)
 {
 	m_registry[static_cast<int>(key)].insert(component);
 }
@@ -88,7 +89,7 @@ bool KeyboardTogglesComponentBehavior::doWakeUp()
 	if (nullptr == m_inputComponent)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"KeyboardTogglesComponentBehavior " << getName() << " does not have an Input Component.";
+				"KeyboardTogglesComponentBehavior " << getName() << " does not have an Input Component.";
 		result = false;
 	}
 	return result;
@@ -100,7 +101,7 @@ void KeyboardTogglesComponentBehavior::setKeyboardRegistry(const KeyboardRegistr
 }
 
 const KeyboardTogglesComponentBehavior::KeyboardRegistryType&
-		KeyboardTogglesComponentBehavior::getKeyboardRegistry() const
+KeyboardTogglesComponentBehavior::getKeyboardRegistry() const
 {
 	return m_registry;
 }

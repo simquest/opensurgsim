@@ -24,6 +24,8 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
+using SurgSim::Framework::checkAndConvert;
+
 namespace SurgSim
 {
 
@@ -36,29 +38,23 @@ TransferPhysicsToGraphicsMeshBehavior::TransferPhysicsToGraphicsMeshBehavior(con
 	SurgSim::Framework::Behavior(name)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TransferPhysicsToGraphicsMeshBehavior,
-		std::shared_ptr<SurgSim::Framework::Component>, Source, getSource, setSource);
+									  std::shared_ptr<SurgSim::Framework::Component>, Source, getSource, setSource);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TransferPhysicsToGraphicsMeshBehavior,
-		std::shared_ptr<SurgSim::Framework::Component>, Target, getTarget, setTarget);
+									  std::shared_ptr<SurgSim::Framework::Component>, Target, getTarget, setTarget);
 }
 
 void TransferPhysicsToGraphicsMeshBehavior::setSource(const std::shared_ptr<SurgSim::Framework::Component>& source)
 {
 	SURGSIM_ASSERT(nullptr != source) << " 'source' can not be nullptr.";
-
-	auto deformable = std::dynamic_pointer_cast<SurgSim::Physics::DeformableRepresentation>(source);
-	SURGSIM_ASSERT(nullptr != deformable) << " 'source' is not a SurgSim::Physics::DeformableRepresentation.";
-
-	m_source = deformable;
+	m_source = checkAndConvert<SurgSim::Physics::DeformableRepresentation>(
+				   source, "SurgSim::Physics::DeformableRepresentation");
 }
 
 void TransferPhysicsToGraphicsMeshBehavior::setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target)
 {
 	SURGSIM_ASSERT(nullptr != target) << " 'target' can not be nullptr.";
-
-	auto mesh = std::dynamic_pointer_cast<SurgSim::Graphics::MeshRepresentation>(target);
-	SURGSIM_ASSERT(nullptr != mesh) << " 'target' is not a SurgSim::Graphics::MeshRepresentation.";
-
-	m_target = mesh;
+	m_target = checkAndConvert<SurgSim::Graphics::MeshRepresentation>(
+				   target, "SurgSim::Graphics::MeshRepresentation");
 }
 
 std::shared_ptr<SurgSim::Physics::DeformableRepresentation> TransferPhysicsToGraphicsMeshBehavior::getSource() const
