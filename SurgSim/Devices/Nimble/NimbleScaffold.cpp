@@ -232,25 +232,23 @@ namespace SurgSim
 namespace Device
 {
 
-std::array<std::pair<std::string, int>, 17> NimbleScaffold::m_jointPoseNames =
+std::array<std::pair<std::string, int>, 15> NimbleScaffold::m_jointPoseNames =
 {
-	std::make_pair("jointPoseRoot", HandTrackingData::ROOT_JOINT),
-	std::make_pair("jointPoseWrist", HandTrackingData::WRIST_JOINT),
-	std::make_pair("jointPoseThumbProximal", HandTrackingData::THUMB_PROXIMAL),
-	std::make_pair("jointPoseThumbIntermediate", HandTrackingData::THUMB_INTERMEDIATE),
-	std::make_pair("jointPoseThumbDistal", HandTrackingData::THUMB_DISTAL),
-	std::make_pair("jointPoseIndexProximal", HandTrackingData::INDEX_PROXIMAL),
-	std::make_pair("jointPoseIndexIntermediate", HandTrackingData::INDEX_INTERMEDIATE),
-	std::make_pair("jointPoseIndexDistal", HandTrackingData::INDEX_DISTAL),
-	std::make_pair("jointPoseMiddleProximal", HandTrackingData::MIDDLE_PROXIMAL),
-	std::make_pair("jointPoseMiddleIntermediate", HandTrackingData::MIDDLE_INTERMEDIATE),
-	std::make_pair("jointPoseMiddleDistal", HandTrackingData::MIDDLE_DISTAL),
-	std::make_pair("jointPoseRingProximal", HandTrackingData::RING_PROXIMAL),
-	std::make_pair("jointPoseRingIntermediate", HandTrackingData::RING_INTERMEDIATE),
-	std::make_pair("jointPoseRingDistal", HandTrackingData::RING_DISTAL),
-	std::make_pair("jointPoseSmallProximal", HandTrackingData::SMALL_PROXIMAL),
-	std::make_pair("jointPoseSmallIntermediate", HandTrackingData::SMALL_INTERMEDIATE),
-	std::make_pair("jointPoseSmallDistal", HandTrackingData::SMALL_DISTAL)
+	std::make_pair("ThumbProximal", HandTrackingData::THUMB_PROXIMAL),
+	std::make_pair("ThumbIntermediate", HandTrackingData::THUMB_INTERMEDIATE),
+	std::make_pair("ThumbDistal", HandTrackingData::THUMB_DISTAL),
+	std::make_pair("IndexFingerProximal", HandTrackingData::INDEX_PROXIMAL),
+	std::make_pair("IndexFingerIntermediate", HandTrackingData::INDEX_INTERMEDIATE),
+	std::make_pair("IndexFingerDistal", HandTrackingData::INDEX_DISTAL),
+	std::make_pair("MiddleFingerProximal", HandTrackingData::MIDDLE_PROXIMAL),
+	std::make_pair("MiddleFingerIntermediate", HandTrackingData::MIDDLE_INTERMEDIATE),
+	std::make_pair("MiddleFingerDistal", HandTrackingData::MIDDLE_DISTAL),
+	std::make_pair("RingFingerProximal", HandTrackingData::RING_PROXIMAL),
+	std::make_pair("RingFingerIntermediate", HandTrackingData::RING_INTERMEDIATE),
+	std::make_pair("RingFingerDistal", HandTrackingData::RING_DISTAL),
+	std::make_pair("SmallFingerProximal", HandTrackingData::SMALL_PROXIMAL),
+	std::make_pair("SmallFingerIntermediate", HandTrackingData::SMALL_INTERMEDIATE),
+	std::make_pair("SmallFingerDistal", HandTrackingData::SMALL_DISTAL)
 };
 
 struct NimbleScaffold::StateData

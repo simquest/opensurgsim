@@ -31,9 +31,24 @@ class NimbleScaffold;
 /// A class implementing the communication with the Nimble server.
 ///
 /// \par Application input provided by the device:
-///   | type       | name              |                                                                           |
-///   | ----       | ----              | ---                                                                       |
-///   | pose       | "pose"			   | %Hand pose w.r.t. JointFrameIndex.ROOT_JOINT (units are meters).		   |
+///   | type       | name						|                                                                   |
+///   | ----       | ----						| ---                                                               |
+///   | pose       | "pose"						| %Hand pose w.r.t. JointFrameIndex.ROOT_JOINT (units are meters).	|
+///   | pose       | "ThumbProximal"			| %Pose w.r.t. thumb proximal joint									|
+///   | pose       | "ThumbIntermediate"		| %Pose w.r.t. thumb intermediate joint								|
+///   | pose       | "ThumbDistal"				| %Pose w.r.t. thumb distal joint									|
+///   | pose       | "IndexFingerProximal"      | %Pose w.r.t. index finger proximal joint							|
+///   | pose       | "IndexFingerIntermediate"	| %Pose w.r.t. index finger intermediate joint						|
+///   | pose       | "IndexFingerDistal"		| %Pose w.r.t. index finger distal joint							|
+///   | pose       | "MiddleFingerProximal"		| %Pose w.r.t. middle finger proximal joint							|
+///   | pose       | "MiddleFingerIntermediate"	| %Pose w.r.t. middle finger intermediate joint						|
+///   | pose       | "MiddleFingerDistal"		| %Pose w.r.t. middle finger distal joint							|
+///   | pose       | "RingFingerProximal"		| %Pose w.r.t. ring finger proximal joint							|
+///   | pose       | "RingFingerIntermediate"	| %Pose w.r.t. ring finger intermediate joint						|
+///   | pose       | "RingFingerDistal"			| %Pose w.r.t. ring finger distal joint								|
+///   | pose       | "SmallFingerProximal"      | %Pose w.r.t. small finger proximal joint							|
+///   | pose       | "SmallFingerIntermediate"	| %Pose w.r.t. small finger intermediate joint						|
+///   | pose       | "SmallFingerDistal"		| %Pose w.r.t. small finger distal joint							|
 ///
 /// \par Application output used by the device: none.
 ///
