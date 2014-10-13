@@ -49,8 +49,9 @@ template<class D>
 Image<T>::Image(size_t width, size_t height, size_t channels, const D* const data) :
 	m_width(width), m_height(height), m_channels(channels), m_data(new T[m_width * m_height * m_channels])
 {
-	Eigen::Map<const Eigen::Matrix<D, Eigen::Dynamic, 1> > input(data, width * height * channels);
-	getAsVector() = input.template cast<T>();
+	Eigen::Map<const Eigen::Matrix<D, Eigen::Dynamic, 1>> theirData(data, width * height * channels);
+	Eigen::Map<VectorType, Eigen::Aligned> myData(m_data.get(), width * height * channels);
+	myData = theirData.template cast<T>();
 }
 
 template<class T>
@@ -110,17 +111,54 @@ Image<T>::~Image()
 }
 
 template<class T>
-typename Image<T>::ChannelType Image<T>::getChannel(size_t channel)
+Eigen::Map<typename Image<T>::ChannelType, Eigen::Aligned, Eigen::Stride<-1, -1>> Image<T>::getChannel(size_t index)
 {
-	SURGSIM_ASSERT(channel < m_channels) << "channel number is larger than the number of channels";
+	SURGSIM_ASSERT(index < m_channels) << "Channel number is larger than the number of channels";
 	Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> stride(m_width*m_channels, m_channels);
-	return ChannelType(m_data.get() + channel, m_width, m_height, stride);
+	return Eigen::Map<ChannelType, Eigen::Aligned, Eigen::Stride<-1, -1>>
+		(m_data.get() + index, m_width, m_height, stride);
 }
 
 template<class T>
-typename Image<T>::VectorType Image<T>::getAsVector()
+Eigen::Map<const typename Image<T>::ChannelType, Eigen::Aligned, Eigen::Stride<-1, -1>>
+Image<T>::getChannel(size_t index) const
 {
-	return VectorType(m_data.get(), m_width * m_height * m_channels);
+	SURGSIM_ASSERT(index < m_channels) << "Channel number is larger than the number of channels";
+	Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> stride(m_width*m_channels, m_channels);
+	return Eigen::Map<const ChannelType, Eigen::Aligned, Eigen::Stride<-1, -1>>
+		(m_data.get() + index, m_width, m_height, stride);
+}
+
+template<class T>
+void Image<T>::setChannel(size_t index, const Eigen::Ref<const ChannelType>& data)
+{
+	auto myChannel = getChannel(index);
+	SURGSIM_ASSERT(myChannel.rows() == data.rows() && myChannel.cols() == data.cols())
+		<< "Channel data must be of size " << myChannel.rows() << "x" << myChannel.cols() << ". "
+		<< data.rows() << "x" << data.cols() << " data was provided.";
+	myChannel = data;
+}
+
+template<class T>
+Eigen::Map<typename Image<T>::VectorType, Eigen::Aligned> Image<T>::getAsVector()
+{
+	return Eigen::Map<VectorType, Eigen::Aligned>(m_data.get(), m_width * m_height * m_channels);
+}
+
+template<class T>
+Eigen::Map<const typename Image<T>::VectorType, Eigen::Aligned> Image<T>::getAsVector() const
+{
+	return Eigen::Map<const VectorType, Eigen::Aligned>(m_data.get(), m_width * m_height * m_channels);
+}
+
+template<class T>
+void Image<T>::setAsVector(const Eigen::Ref<const VectorType>& data)
+{
+	auto myVector = getAsVector();
+	SURGSIM_ASSERT(myVector.rows() == data.rows() && myVector.cols() == data.cols())
+		<< "Vector must be of size " << myVector.rows() << "x" << myVector.cols() << ". "
+		<< "A " << data.rows() << "x" << data.cols() << " vector was provided.";
+	myVector = data;
 }
 
 template<class T>

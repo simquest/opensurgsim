@@ -96,21 +96,38 @@ public:
 	/// \return the number of channels
 	size_t getNumChannels() const;
 
-	/// Type of the channel returned by getChannel
-	typedef Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, Eigen::Unaligned,
-			Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ChannelType;
+	/// 2D Channel Type;
+	typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> ChannelType;
 
-	/// Get the data in the channel as an eigen matrix
-	/// \param channel the channel number
-	/// \return an eigen matrix
-	ChannelType getChannel(size_t channel);
+	/// Get the 2D image channel data
+	/// \param index the channel number
+	/// \return mutable channel data as an Eigen::Map (can be used as an Eigen::Matrix)
+	Eigen::Map<ChannelType, Eigen::Aligned, Eigen::Stride<-1, -1>> getChannel(size_t index);
 
-	/// Type of the vector returned by getAsVector
-	typedef Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> VectorType;
+	/// Get the 2D image channel data, constant version
+	/// \param index the channel number
+	/// \return constant channel data as an Eigen::Map (can be used as an Eigen::Matrix)
+	Eigen::Map<const ChannelType, Eigen::Aligned, Eigen::Stride<-1, -1>> getChannel(size_t index) const;
 
-	/// Get the data as a 1D Eigen Vector
-	/// \return an eigen vector
-	VectorType getAsVector();
+	/// Set the image data in the channel
+	/// \param index the channel number
+	/// \param data the channel data as a compatible Eigen type
+	void setChannel(size_t index, const Eigen::Ref<const ChannelType>& data);
+
+	/// 1D Vector Type;
+	typedef Eigen::Matrix<T, Eigen::Dynamic, 1> VectorType;
+
+	/// Get the data as a 1D Vector
+	/// \return mutable 1D data as an Eigen::Map (can be used as an Eigen::Matrix)
+	Eigen::Map<VectorType, Eigen::Aligned> getAsVector();
+
+	/// Get the data as a 1D Vector, constant version
+	/// \return constant 1D data as an Eigen::Map (can be used as an Eigen::Matrix)
+	Eigen::Map<const VectorType, Eigen::Aligned> getAsVector() const;
+
+	/// Set the image data as a 1D Vector
+	/// \param data the data as a compatible Eigen vector type
+	void setAsVector(const Eigen::Ref<const VectorType>& data);
 
 	/// Get the pointer to the data
 	/// \return  the data
