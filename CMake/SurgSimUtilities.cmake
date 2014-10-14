@@ -133,6 +133,7 @@ macro(surgsim_copy_to_target_directory_for_release TARGET)
 endmacro()
 
 # Add an executable and store the target.
+unset(SURGSIM_EXECUTABLE_TARGETS CACHE)
 macro(surgsim_add_executable NAME SOURCES HEADERS)
 	add_executable(${NAME} ${SOURCES} ${HEADERS})
 	set(SURGSIM_EXECUTABLE_TARGETS ${SURGSIM_EXECUTABLE_TARGETS} ${NAME} CACHE INTERNAL "executable targets")
@@ -171,6 +172,7 @@ endmacro()
 # header only or has source files, for header only the headers are copied into
 # the appropriate directory. 
 # Note that when calling this the parameters  should be quoted to separate lists
+unset(EXPORT_TARGETS CACHE)
 function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIRECTORY)
 	if (SOURCE_FILES)
 		add_library(${LIBRARY_NAME} ${SOURCE_FILES} ${HEADER_FILES})
