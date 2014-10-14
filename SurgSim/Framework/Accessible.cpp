@@ -13,7 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
@@ -136,25 +138,43 @@ YAML::Node Accessible::encode() const
 	return result;
 }
 
-void  Accessible::decode(const YAML::Node& node)
+void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& ignoredProperties)
 {
-	SURGSIM_ASSERT(node.IsMap()) << "Node to decode accessible has to be map.";
-	for (auto functors = m_functors.cbegin(); functors != m_functors.cend(); ++functors)
+	SURGSIM_ASSERT(node.IsMap()) << "Node to be decoded has to be map.";
+
+	for (auto data = node.begin(); data != node.end(); ++data)
 	{
-		auto decoder = functors->second.decoder;
-		if (decoder != nullptr)
+		std::string name = data->first.as<std::string>();
+		if (std::find(std::begin(ignoredProperties), std::end(ignoredProperties), name) != std::end(ignoredProperties))
 		{
-			YAML::Node temporary = node[functors->first];
+			continue;
+		}
+
+		auto functors = m_functors.find(name);
+		if (functors == std::end(m_functors) || !functors->second.decoder)
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Framework/Accessible"))
+				<< "Can't find property with name " << name << " in the accessible.";
+		}
+		else
+		{
+			YAML::Node temporary = data->second;
 			if (!temporary.IsNull() && temporary.IsDefined())
 			{
 				try
 				{
-					decoder(&temporary);
+					functors->second.decoder(&temporary);
 				}
 				catch (std::exception e)
 				{
 					SURGSIM_FAILURE() << e.what();
 				}
+			}
+			else
+			{
+				SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/Accessible"))
+					<< "Found property with name " << name << " in the accessible."
+					<< " But it seems no value is specified for this property in the YAML file.";
 			}
 		}
 	}
