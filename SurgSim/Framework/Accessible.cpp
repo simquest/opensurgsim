@@ -154,7 +154,7 @@ void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& 
 		if (functors == std::end(m_functors) || !functors->second.decoder)
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Framework/Accessible"))
-				<< "No decoder registered for the property " << name;
+				<< "Can't find property with name " << name << " in the accessible.";
 		}
 		else
 		{
@@ -173,7 +173,8 @@ void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& 
 			else
 			{
 				SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/Accessible"))
-					<< "No value associated with property " << name;
+					<< "Found property with name " << name << " in the accessible."
+					<< " But it seems no value is specified for this property in the YAML file.";
 			}
 		}
 	}
