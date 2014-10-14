@@ -41,7 +41,6 @@ configure_file(
 )
 
 surgsim_add_executable(DroppingBalls "${SOURCES}" "${HEADERS}")
-surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
 
 SET(LIBS
 	SurgSimBlocks

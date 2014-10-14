@@ -48,8 +48,5 @@ SET(LIBS
 
 target_link_libraries(MlcpTestIO ${LIBS})
 
-
-surgsim_show_ide_folders("${MLCP_IO_SOURCES}" "${MLCP_IO_HEADERS}")
-
 # Put MlcpTestIO into folder "Testing"
 set_target_properties(MlcpTestIO PROPERTIES FOLDER "Testing")

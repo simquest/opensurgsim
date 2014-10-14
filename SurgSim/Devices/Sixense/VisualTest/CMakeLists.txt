@@ -32,9 +32,6 @@ set(EXAMPLE_HEADERS
 surgsim_add_executable(SixenseVisualTest
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-surgsim_show_ide_folders(
-	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
-
 set(LIBS
 	SixenseDevice
 	IdentityPoseDevice

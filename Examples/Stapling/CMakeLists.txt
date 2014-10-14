@@ -18,31 +18,28 @@ include_directories(
 	${OSG_INCLUDE_DIR}
 )
 
-set(SOURCES
+set(STAPLING_SOURCES
 	StapleElement.cpp
 	StaplerBehavior.cpp
+	Stapling.cpp
 )
-
-set(HEADERS
+set(STAPLING_HEADERS
 	StapleElement.h
 	StaplerBehavior.h
 )
+surgsim_add_executable(Stapling "${STAPLING_SOURCES}" "${STAPLING_HEADERS}")
 
-surgsim_add_executable(Stapling
-	Stapling.cpp
-	"${SOURCES}"
-	"${HEADERS}"
-)
-
-surgsim_add_executable(SerializedStapling
+set(SERIALIZEDSTAPLING_SOURCES
 	SerializedStapling.cpp
-	"${SOURCES}"
-	"${HEADERS}"
+	StapleElement.cpp
+	StaplerBehavior.cpp
 )
-
+set(SERIALIZEDSTAPLING_HEADERS
+	StapleElement.h
+	StaplerBehavior.h
+)
+surgsim_add_executable(SerializedStapling "${SERIALIZEDSTAPLING_SOURCES}" "${SERIALIZEDSTAPLING_HEADERS}")
 add_dependencies(SerializedStapling yaml-cpp)
-
-surgsim_show_ide_folders("Main.cpp SerializedMain.cpp ${SOURCES}" "${HEADERS}")
 
 set(LIBS 
 	IdentityPoseDevice

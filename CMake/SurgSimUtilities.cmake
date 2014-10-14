@@ -137,6 +137,7 @@ unset(SURGSIM_EXECUTABLE_TARGETS CACHE)
 macro(surgsim_add_executable EXECUTABLE_NAME SOURCES HEADERS)
 	add_executable(${EXECUTABLE_NAME} ${SOURCES} ${HEADERS})
 	set(SURGSIM_EXECUTABLE_TARGETS ${SURGSIM_EXECUTABLE_TARGETS} ${EXECUTABLE_NAME} CACHE INTERNAL "executable targets")
+	surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
 endmacro()
 
 option(SURGSIM_RUN_TEST_WITHIN_BUILD "This exectutes the tests directly from the chosen build system." OFF)

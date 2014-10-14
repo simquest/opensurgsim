@@ -36,7 +36,6 @@ set(HEADERS
 )
 
 surgsim_add_executable(AddSphereFromInput "${SOURCES}" "${HEADERS}")
-surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
 
 set(LIBS 
 	MultiAxisDevice
