@@ -300,7 +300,7 @@ bool NimbleScaffold::registerDevice(NimbleDevice* device)
 
 		auto found = std::find_if(m_state->activeDevices.begin(), m_state->activeDevices.end(),
 			[device](const NimbleDevice* it) { return it->getName() == device->getName(); });
-		
+
 		if (found == m_state->activeDevices.end())
 		{
 			m_state->activeDevices.push_back(device);

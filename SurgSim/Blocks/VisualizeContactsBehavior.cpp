@@ -93,9 +93,9 @@ void VisualizeContactsBehavior::update(double dt)
 				vectorData2.direction = (*iter)->normal * (*iter)->depth;
 
 				Vertex<VectorFieldData> vertex1 = Vertex<VectorFieldData>(
-													  (*iter)->penetrationPoints.first.rigidLocalPosition.getValue(), vectorData1);
+						(*iter)->penetrationPoints.first.rigidLocalPosition.getValue(), vectorData1);
 				Vertex<VectorFieldData> vertex2 = Vertex<VectorFieldData>(
-													  (*iter)->penetrationPoints.second.rigidLocalPosition.getValue(), vectorData2);
+						(*iter)->penetrationPoints.second.rigidLocalPosition.getValue(), vectorData2);
 
 				vertex1.position = inverseElementPose * representationPoseFirst * vertex1.position;
 				vertex2.position = inverseElementPose * representationPoseSecond * vertex2.position;

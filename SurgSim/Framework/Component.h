@@ -200,6 +200,6 @@ std::shared_ptr<Target> checkAndConvert(std::shared_ptr<Source> incoming, const 
 }; // namespace Framework
 }; // namespace SurgSim
 
-#include <SurgSim/Framework/Component-inl.h>
+#include "SurgSim/Framework/Component-inl.h"
 
 #endif // SURGSIM_FRAMEWORK_COMPONENT_H
