@@ -134,9 +134,9 @@ endmacro()
 
 # Add an executable and store the target.
 unset(SURGSIM_EXECUTABLE_TARGETS CACHE)
-macro(surgsim_add_executable NAME SOURCES HEADERS)
-	add_executable(${NAME} ${SOURCES} ${HEADERS})
-	set(SURGSIM_EXECUTABLE_TARGETS ${SURGSIM_EXECUTABLE_TARGETS} ${NAME} CACHE INTERNAL "executable targets")
+macro(surgsim_add_executable EXECUTABLE_NAME SOURCES HEADERS)
+	add_executable(${EXECUTABLE_NAME} ${SOURCES} ${HEADERS})
+	set(SURGSIM_EXECUTABLE_TARGETS ${SURGSIM_EXECUTABLE_TARGETS} ${EXECUTABLE_NAME} CACHE INTERNAL "executable targets")
 endmacro()
 
 option(SURGSIM_RUN_TEST_WITHIN_BUILD "This exectutes the tests directly from the chosen build system." OFF)
@@ -144,25 +144,26 @@ option(SURGSIM_RUN_TEST_WITHIN_BUILD "This exectutes the tests directly from the
 # Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS, LIBS, UNIT_TEST_SHARED_LIBS,
 # UNIT_TEST_SHARED_RELEASE_LIBS and UNIT_TEST_SHARED_DEBUG_LIBS.
 #
-macro(surgsim_add_unit_tests TESTNAME)
-	surgsim_add_executable(${TESTNAME} "${UNIT_TEST_SOURCES}" "${UNIT_TEST_HEADERS}")
-	target_link_libraries(${TESTNAME} SurgSimTesting gmock ${LIBS})
-	add_test(NAME ${TESTNAME} COMMAND ${TESTNAME} "--gtest_output=xml")
+macro(surgsim_add_unit_tests TEST_NAME)
+	add_executable(${TEST_NAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
+	set(SURGSIM_EXECUTABLE_TARGETS ${SURGSIM_EXECUTABLE_TARGETS} ${TEST_NAME} CACHE INTERNAL "executable targets")
+	target_link_libraries(${TEST_NAME} SurgSimTesting gmock ${LIBS})
+	add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} "--gtest_output=xml")
 	
 	if(SURGSIM_RUN_TEST_WITHIN_BUILD)
-        add_custom_command(TARGET ${TESTNAME} POST_BUILD
-            COMMAND ${SURGSIM_TEST_RUN_PREFIX} $<TARGET_FILE:${TESTNAME}>
+        add_custom_command(TARGET ${TEST_NAME} POST_BUILD
+            COMMAND ${SURGSIM_TEST_RUN_PREFIX} $<TARGET_FILE:${TEST_NAME}>
                 ${SURGSIM_TEST_RUN_SUFFIX}
             VERBATIM)
     endif()
 
 
 	# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
-	surgsim_copy_to_target_directory(${TESTNAME}
+	surgsim_copy_to_target_directory(${TEST_NAME}
 		${UNIT_TEST_SHARED_LIBS})
-	surgsim_copy_to_target_directory_for_release(${TESTNAME}
+	surgsim_copy_to_target_directory_for_release(${TEST_NAME}
 		${UNIT_TEST_SHARED_RELEASE_LIBS})
-	surgsim_copy_to_target_directory_for_debug(${TESTNAME}
+	surgsim_copy_to_target_directory_for_debug(${TEST_NAME}
 		${UNIT_TEST_SHARED_DEBUG_LIBS})
 	surgsim_show_ide_folders("${UNIT_TEST_SOURCES}" "${UNIT_TEST_HEADERS}")
 endmacro()
@@ -173,11 +174,11 @@ endmacro()
 # the appropriate directory. 
 # Note that when calling this the parameters  should be quoted to separate lists
 unset(SURGSIM_EXPORT_TARGETS CACHE)
-function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIRECTORY)
-	if (SOURCE_FILES)
-		add_library(${LIBRARY_NAME} ${SOURCE_FILES} ${HEADER_FILES})
+function(surgsim_add_library LIBRARY_NAME SOURCES HEADERS HEADER_DIRECTORY)
+	if (SOURCES)
+		add_library(${LIBRARY_NAME} ${SOURCES} ${HEADERS})
 
-		set_target_properties(${LIBRARY_NAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
+		set_target_properties(${LIBRARY_NAME} PROPERTIES PUBLIC_HEADER "${HEADERS}")
 		install(TARGETS ${LIBRARY_NAME}
 			EXPORT ${PROJECT_NAME}Targets
 			RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
@@ -186,10 +187,10 @@ function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIREC
 			PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
 			
 		set(SURGSIM_EXPORT_TARGETS ${LIBRARY_NAME} ${SURGSIM_EXPORT_TARGETS} CACHE INTERNAL "export targets")
-		surgsim_show_ide_folders("${SOURCE_FILES}" "${HEADER_FILES}")
+		surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
 	else()
-		install(FILES ${HEADER_FILES} DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
-		surgsim_show_ide_folders("" "${HEADER_FILES}")
+		install(FILES ${HEADERS} DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
+		surgsim_show_ide_folders("" "${HEADERS}")
 	endif()
 endfunction()
 
