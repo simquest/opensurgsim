@@ -102,12 +102,12 @@ public:
 	/// Get the 2D image channel data
 	/// \param index the channel number
 	/// \return mutable channel data as an Eigen::Map (can be used as an Eigen::Matrix)
-	Eigen::Map<ChannelType, Eigen::Aligned, Eigen::Stride<-1, -1>> getChannel(size_t index);
+	Eigen::Map<ChannelType, Eigen::Unaligned, Eigen::Stride<-1, -1>> getChannel(size_t index);
 
 	/// Get the 2D image channel data, constant version
 	/// \param index the channel number
 	/// \return constant channel data as an Eigen::Map (can be used as an Eigen::Matrix)
-	Eigen::Map<const ChannelType, Eigen::Aligned, Eigen::Stride<-1, -1>> getChannel(size_t index) const;
+	Eigen::Map<const ChannelType, Eigen::Unaligned, Eigen::Stride<-1, -1>> getChannel(size_t index) const;
 
 	/// Set the image data in the channel
 	/// \param index the channel number
@@ -119,11 +119,11 @@ public:
 
 	/// Get the data as a 1D Vector
 	/// \return mutable 1D data as an Eigen::Map (can be used as an Eigen::Matrix)
-	Eigen::Map<VectorType, Eigen::Aligned> getAsVector();
+	Eigen::Map<VectorType, Eigen::Unaligned> getAsVector();
 
 	/// Get the data as a 1D Vector, constant version
 	/// \return constant 1D data as an Eigen::Map (can be used as an Eigen::Matrix)
-	Eigen::Map<const VectorType, Eigen::Aligned> getAsVector() const;
+	Eigen::Map<const VectorType, Eigen::Unaligned> getAsVector() const;
 
 	/// Set the image data as a 1D Vector
 	/// \param data the data as a compatible Eigen vector type
