@@ -172,7 +172,7 @@ endmacro()
 # header only or has source files, for header only the headers are copied into
 # the appropriate directory. 
 # Note that when calling this the parameters  should be quoted to separate lists
-unset(EXPORT_TARGETS CACHE)
+unset(SURGSIM_EXPORT_TARGETS CACHE)
 function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIRECTORY)
 	if (SOURCE_FILES)
 		add_library(${LIBRARY_NAME} ${SOURCE_FILES} ${HEADER_FILES})
@@ -185,7 +185,7 @@ function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIREC
 			ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
 			PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
 			
-		set(EXPORT_TARGETS ${LIBRARY_NAME} ${EXPORT_TARGETS} CACHE INTERNAL "export targets")
+		set(SURGSIM_EXPORT_TARGETS ${LIBRARY_NAME} ${SURGSIM_EXPORT_TARGETS} CACHE INTERNAL "export targets")
 		surgsim_show_ide_folders("${SOURCE_FILES}" "${HEADER_FILES}")
 	else()
 		install(FILES ${HEADER_FILES} DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})

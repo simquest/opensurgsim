@@ -12,7 +12,7 @@ set(OPENSURGSIM_INCLUDE_DIRS "@CONFIG_INCLUDE_DIRS@")
 include("${OPENSURGSIM_CMAKE_DIR}/OpenSurgSimTargets.cmake")
 
 # These are IMPORTED targets created by OpenSurgSimTargets.cmake
-set(OPENSURGSIM_LIBRARIES "@EXPORT_TARGETS@") 
+set(OPENSURGSIM_LIBRARIES "@SURGSIM_EXPORT_TARGETS@")
 
 # This is the default data directory
 set(OPENSURGSIM_DATA_DIR "@CONFIG_DATA_DIR@")
