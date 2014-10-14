@@ -91,6 +91,24 @@ RigidRepresentationState& MockRigidRepresentation::getPreviousState()
 	return m_previousState;
 }
 
+MockFixedRepresentation::MockFixedRepresentation() : FixedRepresentation("MockFixedRepresentation")
+{
+}
+
+RigidRepresentationState& MockFixedRepresentation::getInitialState()
+{
+	return m_initialState;
+}
+
+RigidRepresentationState& MockFixedRepresentation::getCurrentState()
+{
+	return m_currentState;
+}
+
+RigidRepresentationState& MockFixedRepresentation::getPreviousState()
+{
+	return m_previousState;
+}
 
 MockDeformableRepresentation::MockDeformableRepresentation(const std::string& name) :
 	SurgSim::Physics::DeformableRepresentation(name)

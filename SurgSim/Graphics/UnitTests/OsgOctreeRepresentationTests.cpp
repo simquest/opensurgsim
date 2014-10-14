@@ -105,7 +105,7 @@ TEST(OsgOctreeRepresentationTests, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 
 	YAML::Node data = node["SurgSim::Graphics::OsgOctreeRepresentation"];
-	EXPECT_EQ(8u, data.size());
+	EXPECT_EQ(7u, data.size());
 
 	std::shared_ptr<SurgSim::Graphics::OsgOctreeRepresentation> newOsgOctree;
 	ASSERT_NO_THROW(newOsgOctree = std::dynamic_pointer_cast<OsgOctreeRepresentation>(

@@ -95,7 +95,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setVisible(true);
+	graphicsRepresentation->setLocalActive(true);
 	massSpringElement->addComponent(graphicsRepresentation);
 
 	auto physicsToGraphics =
@@ -165,7 +165,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setVisible(true);
+	graphicsRepresentation->setLocalActive(true);
 	massSpringElement->addComponent(graphicsRepresentation);
 	auto physicsToGraphics =
 		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
@@ -237,7 +237,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setVisible(true);
+	graphicsRepresentation->setLocalActive(true);
 	massSpringElement->addComponent(graphicsRepresentation);
 
 	auto physicsToGraphics =

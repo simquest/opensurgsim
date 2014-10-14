@@ -22,7 +22,6 @@
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -60,7 +59,7 @@ TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 	rigid->setDensity(1000.0);
 	rigid->setShape(std::make_shared<SphereShape>(radius));
 
-	std::shared_ptr<RigidRepresentationLocalization> loc = std::make_shared<RigidRepresentationLocalization>(rigid);
+	auto loc = std::make_shared<RigidRepresentationLocalization>(rigid);
 	loc->setLocalPosition(contactPosition);
 	std::shared_ptr<RigidRepresentationContact> implementation = std::make_shared<RigidRepresentationContact>();
 

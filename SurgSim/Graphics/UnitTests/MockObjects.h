@@ -41,14 +41,14 @@ public:
 	}
 
 	/// Sets whether the group is currently visible
-	/// \param	visible	True for visible, false for invisible
+	/// \param    visible    True for visible, false for invisible
 	virtual void setVisible(bool visible)
 	{
 		m_isVisible = visible;
 	}
 
 	/// Gets whether the group is currently visible
-	/// \return	visible	True for visible, false for invisible
+	/// \return    visible    True for visible, false for invisible
 	virtual bool isVisible() const
 	{
 		return m_isVisible;
@@ -137,9 +137,7 @@ public:
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity
 	/// \post m_isInitialized and m_isAwoken are set to false
-	/// \post m_isVisible is set to true
 	explicit MockRepresentation(const std::string& name) : SurgSim::Graphics::Representation(name),
-		m_isVisible(true),
 		m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isInitialized(false),
@@ -147,20 +145,6 @@ public:
 		m_drawAsWireFrame(false)
 	{
 		m_transform.setIdentity();
-	}
-
-	/// Sets whether the representation is currently visible
-	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible)
-	{
-		m_isVisible = visible;
-	}
-
-	/// Gets whether the representation is currently visible
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const
-	{
-		return isActive() && m_isVisible;
 	}
 
 	/// Returns the number of times the representation has been updated
@@ -179,8 +163,11 @@ public:
 	/// \post m_numUpdates is incremented and dt is added to m_sumDt
 	virtual void update(double dt)
 	{
-		++m_numUpdates;
-		m_sumDt += dt;
+		if (isActive())
+		{
+			++m_numUpdates;
+			m_sumDt += dt;
+		}
 	}
 
 	/// Gets whether the representation has been initialized
@@ -240,9 +227,6 @@ private:
 		return true;
 	}
 
-	/// Whether this representation is currently visible or not
-	bool m_isVisible;
-
 	/// Number of times the representation has been updated
 	int m_numUpdates;
 	/// Sum of the dt that the representation has been updated with
@@ -273,28 +257,11 @@ public:
 		SurgSim::Graphics::Representation(name),
 		SurgSim::Graphics::Camera(name),
 		m_numUpdates(0),
-		m_sumDt(0.0),
-		m_isVisible(true)
+		m_sumDt(0.0)
 	{
 		m_pose.setIdentity();
 		m_viewMatrix.setIdentity();
 		m_projectionMatrix.setIdentity();
-	}
-
-	/// Sets whether the camera is currently visible
-	/// When the camera is invisible, it does not produce an image.
-	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible)
-	{
-		m_isVisible = visible;
-	}
-
-	/// Gets whether the camera is currently visible
-	/// When the camera is invisible, it does not produce an image.
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const
-	{
-		return m_isVisible;
 	}
 
 	/// Returns the number of times the representation has been updated
@@ -443,10 +410,6 @@ private:
 
 	/// Projection matrix of the camera
 	SurgSim::Math::Matrix44d m_projectionMatrix;
-
-	/// Whether this camera is currently visible or not
-	/// When the camera is invisible, it does not produce an image.
-	bool m_isVisible;
 };
 
 /// View class for testing

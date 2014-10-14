@@ -55,23 +55,17 @@ OsgRepresentation::~OsgRepresentation()
 
 }
 
-void OsgRepresentation::setVisible(bool visible)
-{
-	m_switch->setChildValue(m_transform, isActive() && visible);
-	m_isVisible = visible;
-}
-
-bool OsgRepresentation::isVisible() const
-{
-	return m_switch->getChildValue(m_transform);
-}
-
 void OsgRepresentation::update(double dt)
 {
-	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(getPose());
-	m_transform->setAttitude(pose.first);
-	m_transform->setPosition(pose.second);
-	doUpdate(dt);
+	setVisible(isActive());
+
+	if (isActive())
+	{
+		std::pair<osg::Quat, osg::Vec3d> pose = toOsg(getPose());
+		m_transform->setAttitude(pose.first);
+		m_transform->setPosition(pose.second);
+		doUpdate(dt);
+	}
 }
 
 bool OsgRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
@@ -132,8 +126,10 @@ bool OsgRepresentation::getDrawAsWireFrame() const
 	return m_drawAsWireFrame;
 }
 
-
-
+void OsgRepresentation::setVisible(bool val)
+{
+	m_switch->setChildValue(m_transform, val);
+}
 
 }; // Graphics
 }; // SurgSim

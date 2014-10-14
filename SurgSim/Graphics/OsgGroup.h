@@ -38,11 +38,11 @@ public:
 	explicit OsgGroup(const std::string& name);
 
 	/// Sets whether this group is currently visible
-	/// \param	visible	True for visible, false for invisible
+	/// \param    visible    True for visible, false for invisible
 	virtual void setVisible(bool visible) override;
 
 	/// Gets whether this group is currently visible
-	/// \return	True for visible, false for invisible
+	/// \return    True for visible, false for invisible
 	virtual bool isVisible() const override;
 
 	/// Adds an representation
