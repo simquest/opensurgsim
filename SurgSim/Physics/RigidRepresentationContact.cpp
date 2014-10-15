@@ -18,9 +18,7 @@
 #include "SurgSim/Physics/RigidRepresentationContact.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
-
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -60,7 +58,6 @@ void RigidRepresentationContact::doBuild(double dt,
 	const Eigen::Matrix<double, 6,6, Eigen::RowMajor>& C = rigid->getComplianceMatrix();
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
 	const Vector3d& n = contactData.getNormal();
-	const double d = contactData.getDistance();
 
 	// FRICTIONLESS CONTACT in a LCP
 	//   (n, d) defines the plane of contact
@@ -74,12 +71,14 @@ void RigidRepresentationContact::doBuild(double dt,
 	// H.v(t+dt) + b >= 0
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
 	// b = n.P(t) + d             -> P(t) evaluated after free motion
+	// Since the d term will be added to the constraint for one side of the contact and subtracted from the other,
+	// and because it is not clear which distance should be used, we leave it out.
 
 	Vector3d globalPosition = localization->calculatePosition();
-	Vector3d GP = globalPosition - rigid->getCurrentState().getPose() * rigid->getCurrentParameters().getMassCenter();
+	Vector3d GP = globalPosition - rigid->getCurrentState().getPose() * rigid->getMassCenter();
 
 	// Fill up b with the constraint equation...
-	double violation = n.dot(globalPosition) + d;
+	double violation = n.dot(globalPosition);
 	mlcp->b[indexOfConstraint] += violation * scale;
 
 	m_newH.resize(rigid->getNumDof());

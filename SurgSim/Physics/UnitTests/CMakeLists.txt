@@ -30,24 +30,27 @@ set(UNIT_TEST_SOURCES
 	EigenGtestAsserts.cpp
 	Fem1DElementBeamTests.cpp
 	Fem1DMechanicalValidationTests.cpp
+	Fem1DPlyReaderDelegateTests.cpp
+	Fem1DRepresentationLocalizationTest.cpp
 	Fem1DRepresentationTests.cpp
 	Fem2DElementTriangleTests.cpp
 	Fem2DMechanicalValidationTests.cpp
+	Fem2DPlyReaderDelegateTests.cpp
+	Fem2DRepresentationLocalizationTest.cpp
 	Fem2DRepresentationTests.cpp
 	Fem3DElementCorotationalTetrahedronTests.cpp
 	Fem3DElementCubeTests.cpp
 	Fem3DElementTetrahedronTests.cpp
+	Fem3DPlyReaderDelegateTests.cpp
 	Fem3DRepresentationBilateral3DTests.cpp
 	Fem3DRepresentationContactTests.cpp
-	Fem3DRepresentationReaderTests.cpp
+	Fem3DRepresentationLocalizationTest.cpp
 	Fem3DRepresentationTests.cpp
 	FemElementTests.cpp
-	FemRepresentationLocalizationTest.cpp
 	FemRepresentationParametersTest.cpp
 	FemRepresentationTests.cpp
 	FixedRepresentationBilateral3DTests.cpp
 	FixedRepresentationContactTests.cpp
-	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
@@ -64,10 +67,9 @@ set(UNIT_TEST_SOURCES
 	PushResultsTests.cpp
 	RepresentationTest.cpp
 	RigidCollisionRepresentationTest.cpp
+	RigidRepresentationBaseLocalizationTest.cpp
 	RigidRepresentationBilateral3DTests.cpp
 	RigidRepresentationContactTests.cpp
-	RigidRepresentationLocalizationTest.cpp
-	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
 	RigidRepresentationTest.cpp
 	SolveMlcpTests.cpp
@@ -82,6 +84,7 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS
 	SurgSimBlocks
+	SurgSimGraphics
 	SurgSimPhysics
 	SurgSimMath
 	SurgSimInput
@@ -89,9 +92,9 @@ set(LIBS
 	IdentityPoseDevice
 )
 
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 configure_file(

@@ -17,13 +17,14 @@
 find_package(NovintHdalSdk REQUIRED)
 
 link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${NOVINT_HDAL_SDK_LIBRARIES})
+
+set(LIBS
+	${Boost_LIBRARIES}
+	${NOVINT_HDAL_SDK_LIBRARIES}
+)
 
 include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
 	"${NOVINT_HDAL_SDK_INCLUDE_DIR}"
 )
 

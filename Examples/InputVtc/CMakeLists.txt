@@ -18,26 +18,21 @@ link_directories(
 )
 
 include_directories(
-	${SURGSIM_TOP_INCLUDE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}
-	${EIGEN3_INCLUDE_DIR}
-	${Boost_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
 )
 
-set(INPUTVTCEXAMPLE_SOURCES
+set(SOURCES
 	DeviceFactory.cpp
-	InputVtcExample.cpp
+	InputVtc.cpp
 )
 
-set(INPUTVTCEXAMPLE_HEADERS
+set(HEADERS
 	DeviceFactory.h
 )
 
-add_executable(ExampleInputVtc
-	${INPUTVTCEXAMPLE_SOURCES} ${INPUTVTCEXAMPLE_HEADERS})
+add_executable(InputVtc ${SOURCES} ${HEADERS})
 
 set(LIBS 
 	IdentityPoseDevice
@@ -57,7 +52,7 @@ if(BUILD_DEVICE_NOVINT)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOVINT_LIBRARY_AVAILABLE")
 endif(BUILD_DEVICE_NOVINT)
 
-target_link_libraries(ExampleInputVtc ${LIBS})
+target_link_libraries(InputVtc ${LIBS})
 
-# Put ExampleInputVtc into folder "Examples"
-set_target_properties(ExampleInputVtc PROPERTIES FOLDER "Examples") 
+# Put InputVtc into folder "Examples"
+set_target_properties(InputVtc PROPERTIES FOLDER "Examples") 

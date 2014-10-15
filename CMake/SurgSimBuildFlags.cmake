@@ -17,12 +17,6 @@
 ## Set build flags through CMake.
 ## Splitting this out removes excessive verbiage from CMakeLists.txt.
 
-# If no build type is specified, default to "Release".
-# Note that this does nothing for VS and the like (but no harm either).
-if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-	set(CMAKE_BUILD_TYPE "Release")
-endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
-
 # We always want to use defines from <math.h>.
 if(MSVC)
 	add_definitions( -D_USE_MATH_DEFINES )
@@ -31,7 +25,7 @@ endif()
 # Define our own debug symbol
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOSS_DEBUG")
 
-option(SURGSIM_WARNINGS_AS_ERRORS "Treat warnings as errors in the compilation process" ON) 
+option(SURGSIM_WARNINGS_AS_ERRORS "Treat warnings as errors in the compilation process" OFF)
 
 # G++ (C++ compilation) specific settings
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -101,6 +95,10 @@ if(MSVC)
 	if(MSVC_VERSION EQUAL 1700)
 		add_definitions( -D_VARIADIC_MAX=10 )
 	endif(MSVC_VERSION EQUAL 1700)
+
+	if(BUILD_SHARED_LIBS)
+		message(FATAL_ERROR "Please turn off BUILD_SHARED_LIBS. Shared libraries on Windows is currently unsupported.")
+	endif()
 endif(MSVC)
 
 # Settings for LLVM Clang.

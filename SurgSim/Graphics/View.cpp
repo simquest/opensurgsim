@@ -14,12 +14,14 @@
 // limitations under the License.
 
 #include "SurgSim/Graphics/View.h"
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Graphics/Camera.h"
 
 using SurgSim::Framework::Component;
+using SurgSim::Framework::checkAndConvert;
 
 namespace SurgSim
 {
@@ -37,6 +39,9 @@ View::View(const std::string& name) :
 	m_screenWidth(0.0),
 	m_screenHeight(0.0)
 {
+	typedef std::array<int, 2> CoordinateType;
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, CoordinateType, Position, getPosition, setPosition);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, CoordinateType, Dimensions, getDimensions, setDimensions);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, std::shared_ptr<SurgSim::Framework::Component>, Camera,
 									  getCamera, setCamera);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, bool, WindowBorder, isWindowBorderEnabled, setWindowBorderEnabled);
@@ -46,15 +51,13 @@ View::View(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, int, TargetScreen, getTargetScreen, setTargetScreen);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, double, EyeSeparation, getEyeSeparation, setEyeSeparation);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, double, ScreenDistance, getScreenDistance, setScreenDistance);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, float, ScreenWidth, getScreenWidth, setScreenWidth);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, float, ScreenHeight, getScreenHeight, setScreenHeight);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, double, ScreenWidth, getScreenWidth, setScreenWidth);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, double, ScreenHeight, getScreenHeight, setScreenHeight);
 }
 
 void View::setCamera(std::shared_ptr<Component> camera)
 {
-	auto castCamera = std::dynamic_pointer_cast<Camera>(camera);
-	SURGSIM_ASSERT(castCamera != nullptr) << "setCamera() passed not a camera.";
-	m_camera = castCamera;
+	m_camera = checkAndConvert<Camera>(camera, "SurgSim::Graphics::Camera");
 }
 
 std::shared_ptr<Camera> View::getCamera() const

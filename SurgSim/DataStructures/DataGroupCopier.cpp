@@ -41,7 +41,8 @@ void DataGroupCopier::copy()
 	m_target.integers().copy(m_source.integers(), m_map[4]);
 	m_target.booleans().copy(m_source.booleans(), m_map[5]);
 	m_target.strings().copy(m_source.strings(), m_map[6]);
-	m_target.customData().copy(m_source.customData(), m_map[7]);
+	m_target.images().copy(m_source.images(), m_map[7]);
+	m_target.customData().copy(m_source.customData(), m_map[8]);
 }
 
 void DataGroupCopier::findMap()
@@ -53,7 +54,8 @@ void DataGroupCopier::findMap()
 	m_map[4] = findMap(m_source.integers().getDirectory(), m_target.integers().getDirectory());
 	m_map[5] = findMap(m_source.booleans().getDirectory(), m_target.booleans().getDirectory());
 	m_map[6] = findMap(m_source.strings().getDirectory(), m_target.strings().getDirectory());
-	m_map[7] = findMap(m_source.customData().getDirectory(), m_target.customData().getDirectory());
+	m_map[7] = findMap(m_source.images().getDirectory(), m_target.images().getDirectory());
+	m_map[8] = findMap(m_source.customData().getDirectory(), m_target.customData().getDirectory());
 }
 
 NamedDataCopyMap DataGroupCopier::findMap(std::shared_ptr<const IndexDirectory> source,

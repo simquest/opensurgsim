@@ -27,6 +27,9 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem1DRepresentation);
+
+class FemPlyReaderDelegate;
 
 /// Finite Element Model 1D is a fem built with 1D FemElement
 ///
@@ -41,6 +44,13 @@ public:
 	/// Destructor
 	virtual ~Fem1DRepresentation();
 
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DRepresentation);
+
+	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+		SurgSim::Math::Vector& generalizedForce,
+		const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+		const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
+
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
@@ -53,6 +63,9 @@ protected:
 	/// \param transform The transformation to apply
 	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 								const SurgSim::Math::RigidTransform3d& transform) override;
+
+private:
+	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
 };
 
 } // namespace Physics

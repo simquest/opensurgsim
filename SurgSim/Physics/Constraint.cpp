@@ -96,6 +96,12 @@ void Constraint::build(double dt,
 	mlcp->constraintTypes.push_back(m_constraintType);
 }
 
+bool Constraint::isActive()
+{
+	return m_localizations.first->getRepresentation()->isActive() &&
+		   m_localizations.second->getRepresentation()->isActive();
+}
+
 void Constraint::doBuild(double dt,
 	const ConstraintData& data,
 	MlcpPhysicsProblem* mlcp,

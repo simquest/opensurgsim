@@ -19,9 +19,9 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
@@ -49,8 +49,8 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 	std::shared_ptr<SphereShape> sphere(std::static_pointer_cast<SphereShape>(representationSphere->getShape()));
 
 	Vector3d sphereCenter(representationSphere->getPose().translation());
-	Vector3d globalTop(representationCapsule->getPose() * capsule->topCentre());
-	Vector3d globalBottom(representationCapsule->getPose() * capsule->bottomCentre());
+	Vector3d globalTop(representationCapsule->getPose() * capsule->topCenter());
+	Vector3d globalBottom(representationCapsule->getPose() * capsule->bottomCenter());
 	Vector3d result;
 
 	double dist =
@@ -64,9 +64,11 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 		// Calculate the normal going from the sphere to the capsule
 		Vector3d normal = (result - sphereCenter).normalized();
 
-		std::pair<Location,Location> penetrationPoints;
-		penetrationPoints.first.globalPosition.setValue(result - normal * capsule->getRadius());
-		penetrationPoints.second.globalPosition.setValue(sphereCenter + normal * sphere->getRadius());
+		std::pair<Location, Location> penetrationPoints;
+		penetrationPoints.first.rigidLocalPosition.setValue(
+			representationCapsule->getPose().inverse() * (result - normal * capsule->getRadius()));
+		penetrationPoints.second.rigidLocalPosition.setValue(
+			representationSphere->getPose().inverse() * (sphereCenter + normal * sphere->getRadius()));
 
 		pair->addContact(depth, normal, penetrationPoints);
 	}

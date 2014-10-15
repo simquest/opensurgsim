@@ -77,12 +77,13 @@ configure_file(
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/Data/Geometry DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/Data/Geometry DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 
 set(LIBS 
 	SurgSimGraphics
+	SurgSimMath
 	SurgSimTesting
 )
 

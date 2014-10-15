@@ -26,7 +26,6 @@ add_executable(MouseVisualTest
 set(LIBS MouseDevice
 		 SurgSimDataStructures 
 		 SurgSimInput 
-		 SurgSimTesting 
 		 ${OPENSCENEGRAPH_LIBRARIES}
 )
 

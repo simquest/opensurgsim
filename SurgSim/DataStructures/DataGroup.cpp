@@ -32,6 +32,7 @@ DataGroup::DataGroup(const DataGroup& dataGroup) :
 	m_integers(dataGroup.m_integers),
 	m_booleans(dataGroup.m_booleans),
 	m_strings(dataGroup.m_strings),
+	m_images(dataGroup.m_images),
 	m_customData(dataGroup.m_customData)
 {
 }
@@ -45,6 +46,7 @@ DataGroup& DataGroup::operator=(const DataGroup& dataGroup)
 	m_integers = dataGroup.m_integers;
 	m_booleans = dataGroup.m_booleans;
 	m_strings = dataGroup.m_strings;
+	m_images = dataGroup.m_images;
 	m_customData = dataGroup.m_customData;
 
 	return *this;
@@ -59,6 +61,7 @@ DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
 	m_integers = std::move(dataGroup.m_integers);
 	m_booleans = std::move(dataGroup.m_booleans);
 	m_strings = std::move(dataGroup.m_strings);
+	m_images = std::move(dataGroup.m_images);
 	m_customData = std::move(dataGroup.m_customData);
 
 	return *this;
@@ -135,6 +138,16 @@ const NamedData<DataGroup::StringType>& DataGroup::strings() const
 	return m_strings;
 }
 
+NamedData<DataGroup::ImageType>& DataGroup::images()
+{
+	return m_images;
+}
+
+const NamedData<DataGroup::ImageType>& DataGroup::images() const
+{
+	return m_images;
+}
+
 NamedVariantData& DataGroup::customData()
 {
 	return m_customData;
@@ -154,7 +167,21 @@ void DataGroup::resetAll()
 	m_integers.resetAll();
 	m_booleans.resetAll();
 	m_strings.resetAll();
+	m_images.resetAll();
 	m_customData.resetAll();
+}
+
+bool DataGroup::isEmpty() const
+{
+	return !(m_poses.isValid() ||
+		m_vectors.isValid() ||
+		m_matrices.isValid() ||
+		m_scalars.isValid() ||
+		m_integers.isValid() ||
+		m_booleans.isValid() ||
+		m_strings.isValid() ||
+		m_images.isValid() ||
+		m_customData.isValid());
 }
 
 };  // namespace DataStructures

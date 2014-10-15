@@ -20,6 +20,7 @@
 #include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgGroup.h"
 #include "SurgSim/Graphics/OsgMatrixConversions.h"
@@ -55,7 +56,7 @@ TEST(OsgCameraTests, InitTest)
 
 	EXPECT_EQ("test name", camera->getName());
 
-	EXPECT_TRUE(camera->isVisible());
+	EXPECT_TRUE(camera->isActive());
 
 	EXPECT_TRUE(camera->getPose().matrix().isApprox(
 					fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).inverse())) <<
@@ -85,7 +86,7 @@ TEST(OsgCameraTests, OsgNodesTest)
 	EXPECT_EQ(camera.get(), switchNode->getChild(0));
 }
 
-TEST(OsgCameraTests, VisibilityTest)
+TEST(OsgCameraTests, ActivenessTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<OsgRepresentation> osgRepresentation = osgCamera;
@@ -96,15 +97,15 @@ TEST(OsgCameraTests, VisibilityTest)
 	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
 	EXPECT_TRUE(switchNode.valid());
 
-	EXPECT_TRUE(camera->isVisible());
+	EXPECT_TRUE(camera->isActive());
 	EXPECT_TRUE(switchNode->getChildValue(osgCamera->getOsgCamera()));
 
-	camera->setVisible(false);
-	EXPECT_FALSE(camera->isVisible());
+	camera->setLocalActive(false);
+	EXPECT_FALSE(camera->isActive());
 	EXPECT_FALSE(switchNode->getChildValue(osgCamera->getOsgCamera()));
 
-	camera->setVisible(true);
-	EXPECT_TRUE(camera->isVisible());
+	camera->setLocalActive(true);
+	EXPECT_TRUE(camera->isActive());
 	EXPECT_TRUE(switchNode->getChildValue(osgCamera->getOsgCamera()));
 
 }
@@ -224,6 +225,31 @@ TEST(OsgCameraTests, CameraGroupTest)
 	EXPECT_EQ(1u, camera->getGroupReferences().size());
 }
 
+TEST(OsgCameraTests, Serialization)
+{
+	std::shared_ptr<OsgCamera> camera = std::make_shared<OsgCamera>("TestOsgCamera");
+
+	// Set values.
+	SurgSim::Math::Matrix44d projection = SurgSim::Math::Matrix44d::Random();
+	camera->setValue("ProjectionMatrix", projection);
+	camera->setValue("AmbientColor", SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4));
+
+	// Serialize.
+	YAML::Node node;
+	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*camera););
+
+	// Deserialize.
+	std::shared_ptr<Camera> newCamera;
+	newCamera = std::dynamic_pointer_cast<OsgCamera>(node.as<std::shared_ptr<SurgSim::Framework::Component>>());
+	EXPECT_NE(nullptr, newCamera);
+
+	// Verify.
+	EXPECT_TRUE(boost::any_cast<SurgSim::Math::Matrix44d>(camera->getValue("ProjectionMatrix")).isApprox(
+				boost::any_cast<SurgSim::Math::Matrix44d>(newCamera->getValue("ProjectionMatrix"))));
+
+	EXPECT_TRUE(boost::any_cast<SurgSim::Math::Vector4d>(camera->getValue("AmbientColor")).isApprox(
+				boost::any_cast<SurgSim::Math::Vector4d>(newCamera->getValue("AmbientColor"))));
+}
 
 }  // namespace Graphics
 }  // namespace SurgSim

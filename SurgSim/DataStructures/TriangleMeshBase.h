@@ -92,44 +92,72 @@ public:
 	/// Recommend that subclasses with a specific purpose (such as for use in collision detection) have a
 	/// createTriangle(vertices, other data...) method which performs any checking desired and sets up the triangle data
 	/// based on the vertices and other parameters.
-	/// \return	Unique ID of the new triangle.
+	/// \note The ids of deleted triangles will be reused in no particular order
+	/// \return	id of the new triangle.
 	size_t addTriangle(const TriangleType& triangle);
 
 	/// Get the number of edges
-	/// Returns the number of edges in this mesh.
+	/// \return the number of edges in this mesh.
 	size_t getNumEdges() const;
 
 	/// Get the number of triangles
-	/// Returns the number of triangles in this mesh.
+	/// \note The number of triangles might not match the size of the array returned by getTriangles(), after deletion
+	///       has occurred it cannot be used to access all triangles.
+	/// \return the number of triangles in this mesh.
 	size_t getNumTriangles() const;
 
 	/// Retrieve all edges
-	/// Returns a vector containing the position of each edge.
+	/// \return a vector containing the position of each edge.
 	const std::vector<EdgeType>& getEdges() const;
+
 	/// Retrieve all edges (non const version)
-	/// Returns a vector containing the position of each edge.
+	/// \return a vector containing the position of each edge.
 	std::vector<EdgeType>& getEdges();
 
 	/// Retrieve all triangles
-	/// Returns a vector containing the position of each triangle.
+	/// \note The number of triangles might not match the size of the array returned by getTriangles(), after deletion
+	///       has occurred it cannot be used to access all triangles. When processing this array,
+	///       check \sa TriangleType::isValid to see wether to do something with this triangle
+	/// \return a vector containing the position of each triangle. Some of these triangles might be deleted, they need
+	///         to be checked via \sa isValid before further processing
 	const std::vector<TriangleType>& getTriangles() const;
+
 	/// Retrieve all triangles (non const version)
-	/// Returns a vector containing the position of each triangle.
+	/// \note The number of triangles might not match the size of the array returned by getTriangles(), after deletion
+	///       has occurred it cannot be used to access all triangles. When processing this array,
+	///       check \sa TriangleType::isValid to see wether to do something with this triangle
+	/// \return a vector containing the position of each triangle. Some of these triangles might be deleted, they need
+	///         to be checked via \sa isValid before further processing
 	std::vector<TriangleType>& getTriangles();
 
 	/// Retrieve a specific edge
-	/// Returns the specified edge.
+	/// \param id the edge to be retrieved.
+	/// \return the specified edge.
 	const EdgeType& getEdge(size_t id) const;
+
 	/// Retrieve a specific edge (non const version)
-	/// Returns the specified edge.
+	/// \param id the edge to be retrieved.
+	/// \return the specified edge.
 	EdgeType& getEdge(size_t id);
 
 	/// Retrieve a specific triangle
-	/// Returns the specified triangle.
+	/// \throws SurgSim::Framework::AssertionFailure if the given triangle was deleted
+	/// \param id The id of the triangle to retrieve
+	/// \return the specified triangle
 	const TriangleType& getTriangle(size_t id) const;
+
 	/// Retrieve a specific triangle (non const version)
-	/// Returns the specified triangle.
+	/// \throws SurgSim::Framework::AssertionFailure if the give triangle was deleted
+	/// \param id The id of the triangle to retrieve
+	/// \return the specified triangle
 	TriangleType& getTriangle(size_t id);
+
+	/// Marks a triangle as invalid, the triangle cannot be accessed via getTriangle anymore
+	/// \note users of getTriangles() will have to check for deleted triangles if this feature is used
+	///       the size of the vector returned by getTriangles does not reflect the number of triangles anymore
+	///       use getNumTriangles() to figure out the correct number.
+	/// \param id triangle to delete
+	void removeTriangle(size_t id);
 
 	/// Returns an array of the triangle's vertices' positions
 	/// \param id the id of the triangle
@@ -164,17 +192,15 @@ private:
 	/// Triangles
 	std::vector<TriangleType> m_triangles;
 
+	/// List of indices of deleted triangles, to be reused when another triangle is added
+	std::vector<size_t> m_freeTriangles;
+
 public:
 	// Dependent name resolution for inherited functions and typenames from templates
 	using typename Vertices<VertexData>::VertexType;
 	using Vertices<VertexData>::addVertex;
 };
 
-
-/// A free function to load a triangle mesh base from file
-/// \param fileName	Name of the external file, from which to load the triangle mesh.
-/// \return A triangle mesh.
-std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadTriangleMesh(const std::string& fileName);
 
 };  // namespace DataStructures
 

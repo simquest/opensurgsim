@@ -17,20 +17,24 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/OctreeNode.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Collision/DcdCollision.h"
 #include "SurgSim/Collision/OctreeDcdContact.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Shapes.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::DataStructures::OctreeNode;
 using SurgSim::DataStructures::OctreePath;
 using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
+using SurgSim::Math::Geometry::DistanceEpsilon;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Math::OctreeShape;
@@ -72,6 +76,20 @@ std::list<std::shared_ptr<Contact>> doCollision(std::shared_ptr<Shape> octree,
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(octreeRep, shapeRep);
 	calculator.calculateContact(pair);
 	return pair->getContacts();
+}
+
+void checkContacts(const std::list<std::shared_ptr<Contact>>& contacts, std::shared_ptr<OctreeNode<OctreeData>> octree)
+{
+	for(auto contact = contacts.cbegin(); contact != contacts.cend(); ++contact)
+	{
+		Location& location = (*contact)->penetrationPoints.first;
+		ASSERT_TRUE(location.octreeNodePath.hasValue());
+		ASSERT_TRUE(location.rigidLocalPosition.hasValue());
+
+		auto nodeBoundingBox = octree->getNode(location.octreeNodePath.getValue())->getBoundingBox();
+		double distanceFromBox = nodeBoundingBox.squaredExteriorDistance(location.rigidLocalPosition.getValue());
+		EXPECT_GT(DistanceEpsilon, distanceFromBox) << "Location of contact is not inside the node";
+	}
 }
 
 bool nodeInContacts(const std::string& name, const std::list<std::shared_ptr<Contact>>& contacts,
@@ -174,6 +192,7 @@ TEST(OctreeContactCalculationTests, Capsule)
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(8.0, 8.0, 8.0),
 				calculator);
+		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("center", contacts, octree));
 	}
 
@@ -187,6 +206,7 @@ TEST(OctreeContactCalculationTests, Capsule)
 				makeRotationQuaternion(M_PI_2, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(8.0, 0.0, 0.0),
 				calculator);
+		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
 	}
@@ -201,6 +221,7 @@ TEST(OctreeContactCalculationTests, Capsule)
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 12.0, 0.0),
 				calculator);
+		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner3", contacts, octree));
 	}
 }
@@ -236,6 +257,7 @@ TEST(OctreeContactCalculationTests, Plane)
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 2.0, 0.0),
 				calculator);
+		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner4", contacts, octree));
@@ -252,6 +274,7 @@ TEST(OctreeContactCalculationTests, Plane)
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 2.0, 0.0),
 				calculator);
+		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner4", contacts, octree));
 	}
@@ -266,6 +289,7 @@ TEST(OctreeContactCalculationTests, Plane)
 				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 8.0, 0.0),
 				calculator);
+		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner3", contacts, octree));
@@ -305,6 +329,7 @@ TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
 				calculator);
+		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner4", contacts, octree));
@@ -321,6 +346,7 @@ TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
 				calculator);
+		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("center", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner3", contacts, octree));
@@ -360,6 +386,7 @@ TEST(OctreeContactCalculationTests, Sphere)
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(8.0, 8.0, 8.0),
 				calculator);
+		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("center", contacts, octree));
 	}
 
@@ -373,6 +400,7 @@ TEST(OctreeContactCalculationTests, Sphere)
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(8.0, 8.0, 0.0),
 				calculator);
+		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner2", contacts, octree));

@@ -45,7 +45,6 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Blocks::DriveElementFromInputBehavior;
 using SurgSim::Framework::BasicSceneElement;
@@ -68,7 +67,6 @@ using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::PhysicsManager;
-using SurgSim::Physics::RigidRepresentationParameters;
 
 
 std::shared_ptr<SceneElement> createPlane(const std::string& name)
@@ -77,14 +75,12 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(name + " Physics");
-	RigidRepresentationParameters params;
-	params.setShapeUsedForMassInertia(planeShape);
-	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setShape(planeShape);
 
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
 		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
 
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
 
 	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
@@ -103,6 +99,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
+	planeElement->addComponent(material);
 
 	auto rigidCollision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
 	physicsRepresentation->setCollisionRepresentation(rigidCollision);

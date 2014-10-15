@@ -20,13 +20,16 @@
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
-#include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
+#include "SurgSim/DataStructures/Vertex.h"
 
 #include <random>
 
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMeshBase;
+using SurgSim::DataStructures::TriangleMeshPlain;
 using SurgSim::Math::Vector3d;
 
 class TriangleMeshBaseTest : public ::testing::Test
@@ -61,7 +64,7 @@ public:
 		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d position(positionDistribution(generator), positionDistribution(generator),
-				positionDistribution(generator));
+							  positionDistribution(generator));
 			testPositions.push_back(position);
 
 			if (printPositions)
@@ -80,7 +83,7 @@ public:
 		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d normal(normalDistribution(generator), normalDistribution(generator),
-				normalDistribution(generator));
+							normalDistribution(generator));
 			normal.normalize();
 			testNormals.push_back(normal);
 
@@ -98,8 +101,11 @@ public:
 		/// Generate random vertex IDs within [0, numVertices) in triplets for mesh triangles
 		for (size_t i = 0; i < numTriangles; ++i)
 		{
-			std::array<size_t, 3> triangleVertices = {{ vertexIdDistribution(generator),
-				vertexIdDistribution(generator), vertexIdDistribution(generator) }};
+			std::array<size_t, 3> triangleVertices = {{
+					vertexIdDistribution(generator),
+					vertexIdDistribution(generator), vertexIdDistribution(generator)
+				}
+			};
 			testTriangleVertices.push_back(triangleVertices);
 
 			/// Create 3 vertex ID pairs for each triangle edge (not worrying about duplicates for these tests)
@@ -165,8 +171,6 @@ TEST_F(TriangleMeshBaseTest, InitTest)
 	typedef TriangleMeshBase<EmptyData, MockEdgeData, EmptyData> TriangleMeshNoVertexOrTriangleData;
 	typedef TriangleMeshBase<EmptyData, EmptyData, MockTriangleData> TriangleMeshNoVertexOrEdgeData;
 
-	typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshNoData;
-
 	ASSERT_NO_THROW({TriangleMeshNoVertexData mesh;});
 	ASSERT_NO_THROW({TriangleMeshNoEdgeData mesh;});
 	ASSERT_NO_THROW({TriangleMeshNoTriangleData mesh;});
@@ -175,7 +179,7 @@ TEST_F(TriangleMeshBaseTest, InitTest)
 	ASSERT_NO_THROW({TriangleMeshNoVertexOrTriangleData mesh;});
 	ASSERT_NO_THROW({TriangleMeshNoVertexOrEdgeData mesh;});
 
-	ASSERT_NO_THROW({TriangleMeshNoData mesh;});
+	ASSERT_NO_THROW({TriangleMeshPlain mesh;});
 }
 
 TEST_F(TriangleMeshBaseTest, CreateVerticesTest)
@@ -522,7 +526,7 @@ TEST_F(TriangleMeshBaseTest, CopyConstructorTest)
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
 	}
 
-	TriangleMeshBase<EmptyData, EmptyData, EmptyData> mesh2(mesh);
+	SurgSim::DataStructures::TriangleMeshPlain mesh2(mesh);
 
 	for (size_t i = 0; i < mesh.getNumVertices(); ++i)
 	{
@@ -581,10 +585,71 @@ TEST_F(TriangleMeshBaseTest, GetTrianglePositions)
 	{
 		auto verticesPositions = mesh.getTrianglePositions(id);
 
-		auto &vertexIds = mesh.getTriangle(id).verticesId;
+		auto& vertexIds = mesh.getTriangle(id).verticesId;
 
 		EXPECT_TRUE(mesh.getVertex(vertexIds[0]).position.isApprox(verticesPositions[0]));
 		EXPECT_TRUE(mesh.getVertex(vertexIds[1]).position.isApprox(verticesPositions[1]));
 		EXPECT_TRUE(mesh.getVertex(vertexIds[2]).position.isApprox(verticesPositions[2]));
 	}
+}
+
+TEST_F(TriangleMeshBaseTest, TriangleDeletionTest)
+{
+	typedef TriangleMeshPlain::TriangleType TriangleType;
+
+	TriangleMeshPlain mesh;
+
+	mesh.addVertex(testPositions[0]);
+	mesh.addVertex(testPositions[0]);
+	mesh.addVertex(testPositions[0]);
+
+	TriangleType::IdType ids = {0, 1, 2};
+	mesh.addTriangle(TriangleType(ids));
+	mesh.addTriangle(TriangleType(ids));
+	mesh.addTriangle(TriangleType(ids));
+
+	EXPECT_TRUE(mesh.isValid());
+
+	EXPECT_NO_THROW(mesh.removeTriangle(1));
+	EXPECT_TRUE(mesh.isValid());
+
+	// Basic checks
+	EXPECT_EQ(2u, mesh.getNumTriangles());
+	EXPECT_ANY_THROW(mesh.getTriangle(1));
+	EXPECT_EQ(3u, mesh.getTriangles().size());
+
+	// Should be able to remove the same triangle twice
+	EXPECT_NO_THROW(mesh.removeTriangle(1));
+
+	// Remove all other triangles to check boundary conditions
+	mesh.removeTriangle(0);
+	EXPECT_EQ(1u, mesh.getNumTriangles());
+
+	mesh.removeTriangle(2);
+	EXPECT_EQ(0u, mesh.getNumTriangles());
+
+	EXPECT_EQ(3u, mesh.getTriangles().size());
+
+	// Adding a new triangle we should get an id from the old ids
+	EXPECT_GT(3u, mesh.addTriangle(TriangleType(ids)));
+	EXPECT_EQ(1u, mesh.getNumTriangles());
+
+	// The array size should not have been change
+	EXPECT_EQ(3u, mesh.getTriangles().size());
+
+	EXPECT_GT(3u, mesh.addTriangle(TriangleType(ids)));
+	EXPECT_GT(3u, mesh.addTriangle(TriangleType(ids)));
+
+	// That is a new triangle
+	EXPECT_EQ(3u, mesh.addTriangle(TriangleType(ids)));
+	EXPECT_EQ(4u, mesh.getNumTriangles());
+	EXPECT_EQ(4u, mesh.getTriangles().size());
+
+	// Test clear with deleted triangles
+	mesh.removeTriangle(3);
+	EXPECT_NO_THROW(mesh.clear());
+	EXPECT_EQ(0u, mesh.getNumTriangles());
+	EXPECT_EQ(0u, mesh.addTriangle(TriangleType(ids)));
+	EXPECT_EQ(1u, mesh.addTriangle(TriangleType(ids)));
+
 }

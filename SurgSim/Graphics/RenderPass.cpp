@@ -34,7 +34,7 @@ RenderPass::RenderPass(const std::string& name) :
 	m_camera = std::make_shared<OsgCamera>(getName() + " camera");
 	m_camera->setRenderGroupReference(name);
 
-	m_material = std::make_shared<OsgMaterial>();
+	m_material = std::make_shared<OsgMaterial>("material");
 	m_camera->setMaterial(m_material);
 }
 
@@ -46,6 +46,7 @@ RenderPass::~RenderPass()
 bool RenderPass::doInitialize()
 {
 	addComponent(m_camera);
+	addComponent(m_material);
 	return true;
 }
 
@@ -100,7 +101,7 @@ void RenderPass::showColorTarget(int x, int y, int width, int height)
 	{
 		m_debugColor->setLocation(x, y);
 		m_debugColor->setSize(width, height);
-		m_debugColor->setVisible(true);
+		m_debugColor->setLocalActive(true);
 	}
 }
 
@@ -108,7 +109,7 @@ void RenderPass::hideColorTarget()
 {
 	if (m_debugColor != nullptr)
 	{
-		m_debugColor->setVisible(false);
+		m_debugColor->setLocalActive(false);
 	}
 }
 
@@ -123,7 +124,7 @@ void RenderPass::showDepthTarget(int x, int y, int width, int height)
 	{
 		m_debugDepth->setLocation(x, y);
 		m_debugDepth->setSize(width, height);
-		m_debugDepth->setVisible(true);
+		m_debugDepth->setLocalActive(true);
 	}
 }
 
@@ -131,7 +132,7 @@ void RenderPass::hideDepthTarget()
 {
 	if (m_debugDepth != nullptr)
 	{
-		m_debugDepth->setVisible(false);
+		m_debugDepth->setLocalActive(false);
 	}
 }
 

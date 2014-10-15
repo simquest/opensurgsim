@@ -65,9 +65,7 @@ public:
 
 	virtual bool setRenderGroup(std::shared_ptr<Group> group) override;
 
-	virtual void setVisible(bool visible) override;
-
-	virtual bool isVisible() const override;
+	virtual void setLocalActive(bool val) override;
 
 	virtual SurgSim::Math::Matrix44d getViewMatrix() const;
 

@@ -50,6 +50,7 @@ TEST(DataGroupTests, CanConstruct)
 	builder.addInteger("test");
 	builder.addBoolean("test");
 	builder.addString("test");
+	builder.addImage("test");
 	builder.addCustom("test");
 	DataGroup data = builder.createData();
 	EXPECT_TRUE(data.poses().hasEntry("test"));
@@ -81,6 +82,7 @@ TEST(DataGroupTests, CanCreateShared)
 	builder.addInteger("test");
 	builder.addBoolean("test");
 	builder.addString("test");
+	builder.addImage("test");
 	builder.addCustom("test");
 	std::shared_ptr<DataGroup> data = builder.createSharedData();
 
@@ -108,6 +110,7 @@ TEST(DataGroupTests, PutName)
 	builder.addInteger("integer");
 	builder.addBoolean("boolean");
 	builder.addString("string");
+	builder.addImage("image");
 	builder.addCustom("mock_data");
 	DataGroup data = builder.createData();
 
@@ -121,6 +124,8 @@ TEST(DataGroupTests, PutName)
 	Mock3DData<double> mockData(10,10,10);
 	mockData.set(5, 5, 5, 1.2345);
 
+	DataGroup::ImageType mockImage(3,3,1);
+
 	data.poses().set("pose", pose);
 	data.vectors().set("vector", vector);
 	data.matrices().set("matrix", matrix);
@@ -128,6 +133,7 @@ TEST(DataGroupTests, PutName)
 	data.integers().set("integer", 123);
 	data.booleans().set("boolean", true);
 	data.strings().set("string", "string");
+	data.images().set("image", mockImage);
 	data.customData().set("mock_data", mockData);
 
 	EXPECT_TRUE(data.poses().hasEntry("pose"));
@@ -151,6 +157,9 @@ TEST(DataGroupTests, PutName)
 	EXPECT_TRUE(data.strings().hasEntry("string"));
 	EXPECT_TRUE(data.strings().hasData("string"));
 
+	EXPECT_TRUE(data.images().hasEntry("image"));
+	EXPECT_TRUE(data.images().hasData("image"));
+
 	EXPECT_TRUE(data.customData().hasEntry("mock_data"));
 	EXPECT_TRUE(data.customData().hasData("mock_data"));
 }
@@ -166,6 +175,7 @@ TEST(DataGroupTests, GetName)
 	builder.addInteger("integer");
 	builder.addBoolean("boolean");
 	builder.addString("string");
+	builder.addImage("image");
 	builder.addCustom("mock_data");
 	DataGroup data = builder.createData();
 
@@ -180,6 +190,11 @@ TEST(DataGroupTests, GetName)
 	mockData.set(5, 5, 5, 1.23);
 	mockData.set(1, 2, 3, 4.56);
 
+	DataGroup::ImageType mockImage(3,3,1);
+	mockImage.getChannel(0) << 0, 3, 6,
+							   1, 4, 7,
+							   2, 5, 8;
+
 	data.poses().set("pose", pose);
 	data.vectors().set("vector", vector);
 	data.matrices().set("matrix", matrix);
@@ -187,6 +202,7 @@ TEST(DataGroupTests, GetName)
 	data.integers().set("integer", 123);
 	data.booleans().set("boolean", true);
 	data.strings().set("string", "string");
+	data.images().set("image", mockImage);
 	data.customData().set("mock_data", mockData);
 
 	{
@@ -228,6 +244,19 @@ TEST(DataGroupTests, GetName)
 		EXPECT_EQ("string", value);
 	}
 	{
+		DataGroup::ImageType value;
+		EXPECT_TRUE(data.images().get("image", &value));
+		EXPECT_NEAR(0.0f, value.getData()[0], EPSILON);
+		EXPECT_NEAR(1.0f, value.getData()[1], EPSILON);
+		EXPECT_NEAR(2.0f, value.getData()[2], EPSILON);
+		EXPECT_NEAR(3.0f, value.getData()[3], EPSILON);
+		EXPECT_NEAR(4.0f, value.getData()[4], EPSILON);
+		EXPECT_NEAR(5.0f, value.getData()[5], EPSILON);
+		EXPECT_NEAR(6.0f, value.getData()[6], EPSILON);
+		EXPECT_NEAR(7.0f, value.getData()[7], EPSILON);
+		EXPECT_NEAR(8.0f, value.getData()[8], EPSILON);
+	}
+	{
 		Mock3DData<double> value;
 		EXPECT_TRUE(data.customData().get("mock_data", &value));
 		EXPECT_NEAR(1.23, value.get(5, 5, 5), EPSILON);
@@ -243,11 +272,13 @@ TEST(DataGroupTests, ResetAll)
 	builder.addScalar("second");
 	builder.addString("third");
 	builder.addCustom("fourth");
+	builder.addImage("fifth");
 	DataGroup data = builder.createData();
 
 	data.scalars().set("second", 1.23);
 	data.strings().set("third", "hello");
 	data.customData().set("fourth", Mock3DData<double>(10, 10, 10));
+	data.images().set("fifth", DataGroup::ImageType(10,10,2));
 
 	data.resetAll();
 
@@ -262,6 +293,9 @@ TEST(DataGroupTests, ResetAll)
 
 	EXPECT_TRUE(data.customData().hasEntry("fourth"));
 	EXPECT_FALSE(data.customData().hasData("fourth"));
+
+	EXPECT_TRUE(data.images().hasEntry("fifth"));
+	EXPECT_FALSE(data.images().hasData("fifth"));
 }
 
 /// Resetting one data entry at a time.
@@ -444,4 +478,21 @@ TEST(DataGroupTests, DataGroupInLockedContainer)
 	copied_data.booleans().get("test", &outCopiedBool);
 	EXPECT_EQ(outBool, outCopiedBool);
 	EXPECT_EQ(trueBool, outCopiedBool);
+}
+
+TEST(DataGroupTests, IsEmpty)
+{
+	DataGroupBuilder builder;
+	builder.addBoolean("test");
+	DataGroup data;
+	EXPECT_TRUE(data.isEmpty());
+
+	data = builder.createData();
+	EXPECT_FALSE(data.isEmpty());
+
+	DataGroup data2;
+	std::vector<std::string> names;
+	names.push_back("test string");
+	data2.scalars() = SurgSim::DataStructures::NamedData<SurgSim::DataStructures::DataGroup::ScalarType>(names);
+	EXPECT_FALSE(data2.isEmpty());
 }

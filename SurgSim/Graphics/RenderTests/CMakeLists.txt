@@ -42,13 +42,7 @@ set(UNIT_TEST_HEADERS
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
-
-set(LIBS
-	SurgSimGraphics
-	SurgSimBlocks
-	SurgSimTesting
-)
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 # Configure the path for the data files
 configure_file(
@@ -62,12 +56,6 @@ set(LIBS
 	SurgSimMath
 	SurgSimTesting
 	SurgSimBlocks
-	gmock
-	gtest
-	yaml-cpp
-	${Boost_LIBRARIES}
-	${OPENSCENEGRAPH_LIBRARIES}
-	${OPENTHREADS_LIBRARY}
 )
 
 surgsim_add_unit_tests(SurgSimGraphicsRenderTest)

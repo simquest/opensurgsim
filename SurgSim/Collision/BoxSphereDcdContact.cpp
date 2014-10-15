@@ -19,10 +19,10 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
@@ -119,9 +119,10 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 	normal = representationBox->getPose().linear() * normal;
 
 	// Create the contact.
-	std::pair<Location,Location> penetrationPoints;
-	penetrationPoints.first.globalPosition.setValue(representationBox->getPose() * closestPoint);
-	penetrationPoints.second.globalPosition.setValue(sphereCenter + (normal * sphere->getRadius()));
+	std::pair<Location, Location> penetrationPoints;
+	penetrationPoints.first.rigidLocalPosition.setValue(closestPoint);
+	penetrationPoints.second.rigidLocalPosition.setValue(
+		representationSphere->getPose().inverse() * (sphereCenter + (normal * sphere->getRadius())));
 
 	pair->addContact(std::abs(distance - sphere->getRadius()), normal, penetrationPoints);
 }

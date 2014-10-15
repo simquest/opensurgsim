@@ -25,15 +25,13 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DRepresentationLocalization::Fem3DRepresentationLocalization()
-{
-
-}
-
-Fem3DRepresentationLocalization::Fem3DRepresentationLocalization(std::shared_ptr<Representation> representation) :
+Fem3DRepresentationLocalization::Fem3DRepresentationLocalization(
+	std::shared_ptr<Representation> representation,
+	const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition) :
 	Localization()
 {
 	setRepresentation(representation);
+	setLocalPosition(localPosition);
 }
 
 Fem3DRepresentationLocalization::~Fem3DRepresentationLocalization()
@@ -41,48 +39,48 @@ Fem3DRepresentationLocalization::~Fem3DRepresentationLocalization()
 
 }
 
-void Fem3DRepresentationLocalization::setLocalPosition(const FemRepresentationCoordinate& p)
+void Fem3DRepresentationLocalization::setLocalPosition(
+	const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition)
 {
 	auto femRepresentation = std::static_pointer_cast<Fem3DRepresentation>(getRepresentation());
 
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
 
-	SURGSIM_ASSERT(femRepresentation->isValidCoordinate(p))
-		<< "FemRepresentationCoordinate is invalid for Representation " << getRepresentation()->getName();
+	SURGSIM_ASSERT(femRepresentation->isValidCoordinate(localPosition))
+		<< "IndexedLocalCoordinate is invalid for Representation " << getRepresentation()->getName();
 
-	m_position = p;
+	m_position = localPosition;
 }
 
-const FemRepresentationCoordinate& Fem3DRepresentationLocalization::getLocalPosition() const
+const SurgSim::DataStructures::IndexedLocalCoordinate& Fem3DRepresentationLocalization::getLocalPosition() const
 {
 	return m_position;
 }
 
 SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(double time)
 {
+	using SurgSim::Math::Vector3d;
+
 	auto femRepresentation = std::static_pointer_cast<Fem3DRepresentation>(getRepresentation());
 
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
 
-	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.elementId);
-	const std::shared_ptr<SurgSim::Math::OdeState> previousState = femRepresentation->getPreviousState();
-	const std::shared_ptr<SurgSim::Math::OdeState> currentState = femRepresentation->getCurrentState();
+	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
+	const Vector3d currentPosition = femElement->computeCartesianCoordinate(*femRepresentation->getCurrentState(),
+		m_position.coordinate);
+	const Vector3d previousPosition = femElement->computeCartesianCoordinate(*femRepresentation->getPreviousState(),
+		m_position.coordinate);
 
 	if (time == 0.0)
 	{
-		return femElement->computeCartesianCoordinate(*previousState, m_position.naturalCoordinate);
+		return previousPosition;
 	}
 	else if (time == 1.0)
 	{
-		return femElement->computeCartesianCoordinate(*currentState, m_position.naturalCoordinate);
+		return currentPosition;
 	}
-
-	const SurgSim::Math::Vector& currentPosition = femElement->computeCartesianCoordinate(*previousState,
-		m_position.naturalCoordinate);
-	const SurgSim::Math::Vector& previousPosition = femElement->computeCartesianCoordinate(*currentState,
-		m_position.naturalCoordinate);
 
 	return previousPosition + time * (currentPosition - previousPosition);
 }

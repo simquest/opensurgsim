@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 
 namespace SurgSim
 {
@@ -90,6 +91,24 @@ RigidRepresentationState& MockRigidRepresentation::getPreviousState()
 	return m_previousState;
 }
 
+MockFixedRepresentation::MockFixedRepresentation() : FixedRepresentation("MockFixedRepresentation")
+{
+}
+
+RigidRepresentationState& MockFixedRepresentation::getInitialState()
+{
+	return m_initialState;
+}
+
+RigidRepresentationState& MockFixedRepresentation::getCurrentState()
+{
+	return m_currentState;
+}
+
+RigidRepresentationState& MockFixedRepresentation::getPreviousState()
+{
+	return m_previousState;
+}
 
 MockDeformableRepresentation::MockDeformableRepresentation(const std::string& name) :
 	SurgSim::Physics::DeformableRepresentation(name)
@@ -104,6 +123,19 @@ MockDeformableRepresentation::MockDeformableRepresentation(const std::string& na
 RepresentationType MockDeformableRepresentation::getType() const
 {
 	return SurgSim::Physics::REPRESENTATION_TYPE_INVALID;
+}
+
+void MockDeformableRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+										 SurgSim::Math::Vector& generalizedForce,
+										 const SurgSim::Math::Matrix& K,
+										 const SurgSim::Math::Matrix& D)
+{
+	std::shared_ptr<MockDeformableRepresentationLocalization> loc =
+		std::dynamic_pointer_cast<MockDeformableRepresentationLocalization>(localization);
+
+	m_externalGeneralizedForce.segment<3>(3 * loc->getLocalNode()) += generalizedForce;
+	m_externalGeneralizedStiffness.block<3, 3>(3 * loc->getLocalNode(), 3 * loc->getLocalNode()) += K;
+	m_externalGeneralizedDamping.block<3, 3>(3 * loc->getLocalNode(), 3 * loc->getLocalNode()) += D;
 }
 
 Vector& MockDeformableRepresentation::computeF(const OdeState& state)
@@ -349,6 +381,27 @@ MockFemRepresentation::~MockFemRepresentation()
 {
 }
 
+void MockFemRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+														SurgSim::Math::Vector& generalizedForce,
+														const SurgSim::Math::Matrix& K,
+														const SurgSim::Math::Matrix& D)
+{
+	std::shared_ptr<MockDeformableRepresentationLocalization> loc =
+		std::dynamic_pointer_cast<MockDeformableRepresentationLocalization>(localization);
+
+	size_t numDofPerNode = getNumDofPerNode();
+	m_externalGeneralizedForce.segment(numDofPerNode * loc->getLocalNode(), numDofPerNode) += generalizedForce;
+	m_externalGeneralizedStiffness.block(numDofPerNode * loc->getLocalNode(), numDofPerNode * loc->getLocalNode(),
+		numDofPerNode, numDofPerNode) += K;
+	m_externalGeneralizedDamping.block(numDofPerNode * loc->getLocalNode(), numDofPerNode * loc->getLocalNode(),
+		numDofPerNode, numDofPerNode) += D;
+}
+
+std::shared_ptr<FemPlyReaderDelegate> MockFemRepresentation::getDelegate()
+{
+	return nullptr;
+}
+
 RepresentationType MockFemRepresentation::getType() const
 {
 	return REPRESENTATION_TYPE_INVALID;
@@ -367,7 +420,6 @@ const std::vector<double>& MockFemRepresentation::getMassPerNode() const
 void MockFemRepresentation::transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform)
 {
 }
-
 
 MockFem1DRepresentation::MockFem1DRepresentation(const std::string& name) : SurgSim::Physics::Fem1DRepresentation(name)
 {
@@ -510,6 +562,12 @@ const SurgSim::DataStructures::OptionalValue<double>& MockVirtualToolCoupler::ge
 	return VirtualToolCoupler::getOptionalAngularDamping();
 }
 
+const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>&
+MockVirtualToolCoupler::getOptionalAttachmentPoint() const
+{
+	return VirtualToolCoupler::getOptionalAttachmentPoint();
+}
+
 void MockVirtualToolCoupler::setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& val)
 {
 	VirtualToolCoupler::setOptionalLinearStiffness(val);
@@ -528,6 +586,17 @@ void MockVirtualToolCoupler::setOptionalAngularStiffness(const SurgSim::DataStru
 void MockVirtualToolCoupler::setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& val)
 {
 	VirtualToolCoupler::setOptionalAngularDamping(val);
+}
+
+void MockVirtualToolCoupler::setOptionalAttachmentPoint(
+		const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& val)
+{
+	VirtualToolCoupler::setOptionalAttachmentPoint(val);
+}
+
+const SurgSim::DataStructures::DataGroup& MockVirtualToolCoupler::getOutputData() const
+{
+	return m_outputData;
 }
 
 }; // Physics

@@ -20,9 +20,10 @@
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Blocks/MassSpring2DRepresentation.h"
 #include "SurgSim/Blocks/MassSpring3DRepresentation.h"
-#include "SurgSim/Blocks/TransferOdeStateToVerticesBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -31,7 +32,7 @@
 using SurgSim::Blocks::MassSpring1DRepresentation;
 using SurgSim::Blocks::MassSpring2DRepresentation;
 using SurgSim::Blocks::MassSpring3DRepresentation;
-using SurgSim::Blocks::TransferOdeStateToVerticesBehavior;
+using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -89,18 +90,20 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 	std::shared_ptr<BasicSceneElement> massSpringElement = std::make_shared<BasicSceneElement>(name);
 	massSpringElement->addComponent(physicsRepresentation);
 
-	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
-				std::make_shared<OsgPointCloudRepresentation<void>>("Graphics object");
+	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation =
+				std::make_shared<OsgPointCloudRepresentation>("Graphics object");
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setVisible(true);
+	graphicsRepresentation->setLocalActive(true);
 	massSpringElement->addComponent(graphicsRepresentation);
-	massSpringElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>
-									("Physics to Graphics deformable points",
-										physicsRepresentation->getFinalState(),
-										graphicsRepresentation->getVertices()));
 
+	auto physicsToGraphics =
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
+	physicsToGraphics->setSource(physicsRepresentation);
+	physicsToGraphics->setTarget(graphicsRepresentation);
+
+	massSpringElement->addComponent(physicsToGraphics);
 	return massSpringElement;
 
 }
@@ -157,17 +160,18 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 	std::shared_ptr<BasicSceneElement> massSpringElement = std::make_shared<BasicSceneElement>(name);
 	massSpringElement->addComponent(physicsRepresentation);
 
-	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
-				std::make_shared<OsgPointCloudRepresentation<void>>("Graphics object");
+	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation =
+				std::make_shared<OsgPointCloudRepresentation>("Graphics object");
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setVisible(true);
+	graphicsRepresentation->setLocalActive(true);
 	massSpringElement->addComponent(graphicsRepresentation);
-	massSpringElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>
-									("Physics to Graphics deformable points",
-										physicsRepresentation->getFinalState(),
-										graphicsRepresentation->getVertices()));
+	auto physicsToGraphics =
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
+	physicsToGraphics->setSource(physicsRepresentation);
+	physicsToGraphics->setTarget(graphicsRepresentation);
+	massSpringElement->addComponent(physicsToGraphics);
 
 	return massSpringElement;
 }
@@ -228,17 +232,19 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	std::shared_ptr<BasicSceneElement> massSpringElement = std::make_shared<BasicSceneElement>(name);
 	massSpringElement->addComponent(physicsRepresentation);
 
-	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
-				std::make_shared<OsgPointCloudRepresentation<void>>("Graphics object");
+	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation =
+				std::make_shared<OsgPointCloudRepresentation>("Graphics object");
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setVisible(true);
+	graphicsRepresentation->setLocalActive(true);
 	massSpringElement->addComponent(graphicsRepresentation);
-	massSpringElement->addComponent(std::make_shared<TransferOdeStateToVerticesBehavior<void>>
-									("Physics to Graphics deformable points",
-										physicsRepresentation->getFinalState(),
-										graphicsRepresentation->getVertices()));
+
+	auto physicsToGraphics =
+		std::make_shared<TransferPhysicsToPointCloudBehavior>("Physics to Graphics deformable points");
+	physicsToGraphics->setSource(physicsRepresentation);
+	physicsToGraphics->setTarget(graphicsRepresentation);
+	massSpringElement->addComponent(physicsToGraphics);
 
 	return massSpringElement;
 }

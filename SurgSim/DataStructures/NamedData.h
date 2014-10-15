@@ -63,6 +63,8 @@ static const char* const DIGITAL_INPUT_PREFIX = "digitalInput";
 static const char* const DIGITAL_OUTPUT_PREFIX = "digitalOutput";
 static const char* const TIMER_INPUT_PREFIX = "timerInput";
 static const char* const TIMER_OUTPUT_PREFIX = "timerOutput";
+static const char* const ANALOG_INPUT_PREFIX = "analogInput";
+static const char* const ANALOG_OUTPUT_PREFIX = "analogOutput";
 };
 
 /// A templated dictionary in which data can be accessed by name or index, with immutable names & indices.
@@ -237,6 +239,15 @@ public:
 	/// \return true if successful.
 	inline bool set(int index, const T& value);
 
+	/// Record the data for an entry specified by an index.
+	/// This version accepts rvalues, and the data will be moved
+	/// The entry will also be marked as containing valid data.
+	///
+	/// \param index The index of the entry.
+	/// \param value The value to be set.
+	/// \return true if successful.
+	inline bool set(int index, T&& value);
+
 	/// Record the data for an entry specified by a name.
 	/// The entry will also be marked as containing valid data.
 	///
@@ -244,6 +255,15 @@ public:
 	/// \param value The value to be set.
 	/// \return true if successful.
 	inline bool set(const std::string& name, const T& value);
+
+	/// Record the data for an entry specified by a name.
+	/// This version accepts rvalues, and the data will be moved
+	/// The entry will also be marked as containing valid data.
+	///
+	/// \param name The name of the entry.
+	/// \param value The value to be set.
+	/// \return true if successful.
+	inline bool set(const std::string& name, T&& value);
 
 	/// Invalidate an entry&mdash; mark it as not containing any valid data.
 	///
@@ -277,6 +297,11 @@ public:
 	template <typename N>
 	void copy(const NamedData<N>& source, const NamedDataCopyMap& map);
 
+	/// Caches an entry's index if it is not already cached. An index is considered already cached if it is >= 0.
+	/// \param name The name of the entry.
+	/// \param [in,out] index The cached index.
+	void cacheIndex(const std::string& name, int* index) const;
+
 private:
 	/// The mapping between names and indices.
 	std::shared_ptr<const IndexDirectory> m_directory;
@@ -287,7 +312,6 @@ private:
 	/// The array storing whether the data is currently valid.
 	std::vector<bool> m_isDataValid;
 };
-
 
 };  // namespace DataStructures
 };  // namespace SurgSim

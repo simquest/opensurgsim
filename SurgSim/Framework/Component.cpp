@@ -37,8 +37,11 @@ Component::Component(const std::string& name) :
 	m_didInit(false),
 	m_didWakeUp(false),
 	m_isInitialized(false),
-	m_isAwake(false)
+	m_isAwake(false),
+	m_isLocalActive(true)
 {
+	SURGSIM_ADD_RO_PROPERTY(Component, bool, IsActive, isActive);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Component, bool, IsLocalActive, isLocalActive, setLocalActive);
 }
 
 Component::~Component()
@@ -82,15 +85,6 @@ bool Component::wakeUp()
 	SURGSIM_ASSERT(m_didInit) << "Component " << getName() << " was awoken without being initialized.";
 	SURGSIM_ASSERT(m_isInitialized) << "Wakeup called even though initialization failed on component." << getName();
 
-	std::shared_ptr<SurgSim::Framework::SceneElement> element = getSceneElement();
-	if (element != nullptr)
-	{
-		auto poseComponents = element->getComponents<SurgSim::Framework::PoseComponent>();
-		SURGSIM_ASSERT(poseComponents.size() == 1) << " SceneElement " << element->getName()
-			<< " needs one and only one PoseComponent.";
-		m_poseComponent = poseComponents[0];
-	}
-
 	m_didWakeUp = true;
 	m_isAwake = doWakeUp();
 
@@ -129,12 +123,14 @@ std::shared_ptr<Runtime> Component::getRuntime() const
 
 std::shared_ptr<const PoseComponent> Component::getPoseComponent() const
 {
-	return m_poseComponent.lock();
+	SURGSIM_ASSERT(m_isInitialized) << "Can't access the pose component before initialization";
+	return m_sceneElement.lock()->getPoseComponent();
 }
 
 std::shared_ptr<PoseComponent> Component::getPoseComponent()
 {
-	return m_poseComponent.lock();
+	SURGSIM_ASSERT(m_isInitialized) << "Can't access the pose component before initialization";
+	return m_sceneElement.lock()->getPoseComponent();
 }
 
 boost::uuids::uuid Component::getUuid() const
@@ -168,6 +164,29 @@ std::shared_ptr<Component> Component::getSharedPtr()
 	}
 	return result;
 }
+
+bool Component::isActive() const
+{
+	if (getSceneElement() != nullptr)
+	{
+		return getSceneElement()->isActive() && m_isLocalActive;
+	}
+	else
+	{
+		return m_isLocalActive;
+	}
+}
+
+void Component::setLocalActive(bool val)
+{
+	m_isLocalActive = val;
+}
+
+bool Component::isLocalActive() const
+{
+	return m_isLocalActive;
+}
+
 
 }; // namespace Framework
 }; // namespace SurgSim

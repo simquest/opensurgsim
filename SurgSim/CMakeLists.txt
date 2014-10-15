@@ -15,11 +15,6 @@
 
 
 link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
-
-include_directories(
-	"${Boost_INCLUDE_DIR}"
-)
 
 add_subdirectory(Blocks)
 add_subdirectory(Collision)

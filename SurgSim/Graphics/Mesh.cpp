@@ -14,8 +14,11 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/EmptyData.h"
-#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
+
 
 using SurgSim::DataStructures::EmptyData;
 
@@ -35,11 +38,11 @@ void Mesh::initialize(
 	const std::vector<size_t>& triangles)
 {
 	SURGSIM_ASSERT(textures.empty() || textures.size() >= vertices.size()) <<
-		"To make a mesh you need to either provide at least the same amount" <<
-		" of texture coordinates as vertices or none at all.";
+			"To make a mesh you need to either provide at least the same amount" <<
+			" of texture coordinates as vertices or none at all.";
 	SURGSIM_ASSERT(colors.empty() || colors.size() >= vertices.size()) <<
-		"To make a mesh you need to either provide at least the same amount" <<
-		" of colors as vertices or none at all.";
+			"To make a mesh you need to either provide at least the same amount" <<
+			" of colors as vertices or none at all.";
 
 	clear();
 
@@ -60,7 +63,7 @@ void Mesh::initialize(
 
 	for (size_t i = 0; i < triangles.size(); i += 3)
 	{
-		TriangleType::IdType ids = {{triangles[i], triangles[i+1], triangles[i+2]}};
+		TriangleType::IdType ids = {{triangles[i], triangles[i + 1], triangles[i + 2]}};
 
 		bool valid = true;
 		for (auto it = std::begin(ids); it != std::end(ids); ++it)
@@ -80,7 +83,7 @@ void Mesh::initialize(
 		else
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
-				"When building a mesh a vertex was present in a triangle that was not in the list of vertices";
+					"When building a mesh a vertex was present in a triangle that was not in the list of vertices";
 		}
 	}
 }

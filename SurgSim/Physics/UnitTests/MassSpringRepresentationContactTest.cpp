@@ -146,14 +146,12 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpTest)
 	//      = p(0) + v(1)*dt
 	//      = p(0) + (0, -g*dt^2, 0)
 	//
-	// The constraint violation is the position from the plane projected onto the constraint.  Note, we have defined the
-	// plane to intersect with p(0).  The constraint is
-	//      U(t) = n^t.(p(t) - p(0)) >= 0
-	//
-	// U(1) = n^t.(p(1) - p(0))
-	//      = (nx, ny, nz)^t.(0, -g*dt^2, 0)
-	//      = -g*dt^2*ny
-	EXPECT_NEAR(-9.81 * dt * dt * m_n[1], mlcpPhysicsProblem.b[0], epsilon);
+	// The constraint violation is the projection of the new position onto the constraint normal.  Note, we have
+	// defined the plane to intersect with p(0).  The constraint is
+	//      U(t) = n^t.p(t) >= 0
+	// U(1) = n^t.p(1)
+	const Vector3d newPosition = m_extremities[0] - Vector3d::UnitY() * 9.81 * dt * dt;
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0], epsilon);
 
 	// By definition, H = dU/dp.
 	//
@@ -234,7 +232,8 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
 		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	// b -> E -> [#constraints, 1]
-	EXPECT_NEAR(-9.81 * dt * dt * m_n[1], mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
+	const Vector3d newPosition = m_extremities[1] - Vector3d::UnitY() * 9.81 * dt * dt;
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
 
 	// H -> [#constraints, #dof]
 	EXPECT_NEAR(m_n[0], mlcpPhysicsProblem.H(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 0), epsilon);

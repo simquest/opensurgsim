@@ -27,11 +27,13 @@ namespace Graphics
 const std::string Representation::DefaultGroupName = "__OssDefault__";
 const std::string Representation::DefaultHudGroupName = "__OssDefaulHud__";
 
-Representation::Representation(const std::string& name) : SurgSim::Framework::Representation(name)
+Representation::Representation(const std::string& name) :
+	SurgSim::Framework::Representation(name)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, Visible, isVisible, setVisible);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>,
 									  GroupReferences, getGroupReferences, setGroupReferences);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, DrawAsWireFrame,
+									  getDrawAsWireFrame, setDrawAsWireFrame);
 
 	addGroupReference(DefaultGroupName);
 }
@@ -118,7 +120,5 @@ Representation::~Representation()
 
 }
 
-}
-}
-
-
+}; // namespace Graphics
+}; // namespace SurgSim

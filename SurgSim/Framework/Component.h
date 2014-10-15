@@ -127,6 +127,18 @@ public:
 	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp() = 0;
 
+	/// \return True if this component is active and its SceneElement (if any) is also active;
+	/// Otherwise, false.
+	bool isActive() const;
+
+	/// Set the component's active state
+	/// \param val If true component is active, inactive if false.
+	virtual void setLocalActive(bool val);
+
+	/// \return True if this component is active
+	/// Otherwise, false.
+	bool isLocalActive() const;
+
 protected:
 	/// Get the PoseComponent for this component
 	/// \return The PoseComponent
@@ -136,7 +148,10 @@ protected:
 	/// \return The PoseComponent
 	virtual std::shared_ptr<const PoseComponent> getPoseComponent() const;
 
+
 private:
+
+
 	/// Name of this component
 	std::string m_name;
 
@@ -164,11 +179,27 @@ private:
 	/// Indicates if this component is awake
 	bool m_isAwake;
 
-	/// PoseComponent associated with this Component
-	std::weak_ptr<PoseComponent> m_poseComponent;
+	/// Indicates if this component is active
+	bool m_isLocalActive;
+
 };
+
+/// The function tries to convert the Source type to the Target type it will throw if Target is not a subclass
+/// of Source.
+/// \tparam Target type that is used as the target type for the conversion, can usually be deduced
+/// \tparam Source type that is the type of the incoming parameter, target needs to be a subclass of Source for the
+///         function to succeed
+/// \param incoming pointer to an instance of Source that is supposed to be converted to a pointer to Target
+/// \param expectedTypeName a name to be used in the error message if the conversion fails, use the full
+///        namespace name of Source here.
+/// \throws if
+/// \return pointer of type Target if Target is a subclass of Source, throws otherwise.
+template <class Target, class Source>
+std::shared_ptr<Target> checkAndConvert(std::shared_ptr<Source> incoming, const std::string& expectedTypeName);
 
 }; // namespace Framework
 }; // namespace SurgSim
+
+#include <SurgSim/Framework/Component-inl.h>
 
 #endif // SURGSIM_FRAMEWORK_COMPONENT_H

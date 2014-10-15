@@ -19,6 +19,8 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
@@ -27,6 +29,9 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem2DRepresentation);
+
+class Fem2DPlyReaderDelegate;
 
 /// Finite Element Model 2D is a fem built with 2D FemElement
 class Fem2DRepresentation : public FemRepresentation
@@ -39,11 +44,21 @@ public:
 	/// Destructor
 	virtual ~Fem2DRepresentation();
 
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DRepresentation);
+
+	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+		SurgSim::Math::Vector& generalizedForce,
+		const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+		const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
+
 	virtual RepresentationType getType() const override;
 
 protected:
 	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 								const SurgSim::Math::RigidTransform3d& transform) override;
+
+private:
+	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
 };
 
 } // namespace Physics

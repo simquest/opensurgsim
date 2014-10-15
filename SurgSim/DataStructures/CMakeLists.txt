@@ -14,11 +14,6 @@
 # limitations under the License.
 
 
-include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
-)
-
 set(SURGSIM_DATA_STRUCTURES_SOURCES
 	AabbTree.cpp
 	AabbTreeData.cpp
@@ -28,6 +23,7 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	DataGroupBuilder.cpp
 	DataGroupCopier.cpp
 	IndexDirectory.cpp
+	IndexedLocalCoordinate.cpp
 	OctreeNode.cpp
 	ply.c
 	PlyReader.cpp
@@ -35,8 +31,7 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	TreeData.cpp
 	TreeNode.cpp
 	TriangleMesh.cpp
-	TriangleMeshBase.cpp
-	TriangleMeshPlyReaderDelegate.cpp
+	TriangleMeshUtilities.cpp
 )
 
 set(SURGSIM_DATA_STRUCTURES_HEADERS
@@ -52,7 +47,11 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataStructuresConvert.h
 	DataStructuresConvert-inl.h
 	EmptyData.h
+	Image.h
+	Image-inl.h
 	IndexDirectory.h
+	IndexedLocalCoordinate.h
+	Location.h
 	MeshElement.h
 	NamedData.h
 	NamedData-inl.h
@@ -76,6 +75,9 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	TriangleMeshBase.h
 	TriangleMeshBase-inl.h
 	TriangleMeshPlyReaderDelegate.h
+	TriangleMeshPlyReaderDelegate-inl.h
+	TriangleMeshUtilities.h
+	TriangleMeshUtilities-inl.h
 	Vertex.h
 	Vertices.h
 )
@@ -88,7 +90,6 @@ surgsim_add_library(
 )
 
 set(LIBS 
-	SurgSimMath 
 	SurgSimFramework
 	${Boost_LIBRARIES}
 )
@@ -98,6 +99,10 @@ target_link_libraries(SurgSimDataStructures ${LIBS}
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
+
+	if(BUILD_PERFORMANCE_TESTING)
+		add_subdirectory(PerformanceTests)
+	endif()
 endif()
 
 set_target_properties(SurgSimDataStructures PROPERTIES FOLDER "DataStructures")

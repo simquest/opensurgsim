@@ -16,6 +16,12 @@
 #ifndef SURGSIM_DATASTRUCTURES_OCTREENODE_INL_H
 #define SURGSIM_DATASTRUCTURES_OCTREENODE_INL_H
 
+#include <array>
+#include <cmath>
+#include <fstream>
+
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 
@@ -197,16 +203,60 @@ const std::shared_ptr<OctreeNode<Data> > OctreeNode<Data>::getChild(size_t index
 }
 
 template<class Data>
-std::shared_ptr<OctreeNode<Data>> OctreeNode<Data>::getNode(const OctreePath& path)
+std::shared_ptr<OctreeNode<Data>> OctreeNode<Data>::getNode(const OctreePath& path, bool returnLastValid)
 {
 	std::shared_ptr<OctreeNode<Data>> node = this->shared_from_this();
+	std::shared_ptr<OctreeNode<Data>> previous;
 	for (auto index = path.cbegin(); index != path.cend(); ++index)
 	{
-		node = node->getChild(*index);
-		SURGSIM_ASSERT(node != nullptr)
-				<< "Octree path is invalid. Path is longer than octree is deep in this given branch.";
+		previous = std::move(node);
+		node = previous->getChild(*index);
+		if (node == nullptr)
+		{
+			if (returnLastValid)
+			{
+				node = std::move(previous);
+				break;
+			}
+			else
+			{
+				SURGSIM_FAILURE() << "Octree path is invalid. Path is longer than octree is deep in this given branch.";
+			}
+		}
 	}
 	return node;
+}
+
+template<class Data>
+bool SurgSim::DataStructures::OctreeNode<Data>::doLoad(const std::string& filePath)
+{
+	std::ifstream octreeData(filePath, std::ios::in);
+	SURGSIM_ASSERT(octreeData) << "Could not open file (" << filePath << ")" << std::endl;
+
+	SurgSim::Math::Vector3d spacing, boundsMin, boundsMax;
+	std::array<int, 3> dimensions;
+	octreeData >> dimensions[0] >> dimensions[1] >> dimensions[2];
+	octreeData >> spacing[0] >> spacing[1] >> spacing[2];
+	octreeData >> boundsMin[0] >> boundsMax[0] >> boundsMin[1] >> boundsMax[1] >> boundsMin[2] >> boundsMax[2];
+
+	int maxDimension = dimensions[0];
+	maxDimension = maxDimension >= dimensions[1] ?
+				   (maxDimension >= dimensions[2] ? maxDimension : dimensions[2]) :
+				   (dimensions[1] >= dimensions[2] ? dimensions[1] : dimensions[2]);
+
+	int numLevels = static_cast<int>(std::ceil(std::log(maxDimension) / std::log(2.0)));
+	SurgSim::Math::Vector3d octreeDimensions = SurgSim::Math::Vector3d::Ones() * std::pow(2.0, numLevels);
+
+	m_boundingBox.min() = boundsMin;
+	m_boundingBox.max() = boundsMin.array() + octreeDimensions.array() * spacing.array();
+
+	SurgSim::Math::Vector3d position;
+	while (octreeData >> position[0] >> position[1] >> position[2])
+	{
+		addData(position, Data(), numLevels);
+	}
+
+	return true;
 }
 
 };  // namespace DataStructures

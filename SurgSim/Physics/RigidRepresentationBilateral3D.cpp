@@ -16,7 +16,6 @@
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -94,7 +93,7 @@ void RigidRepresentationBilateral3D::doBuild(double dt,
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
 
 	// Fill up H with the transform from rigid body velocity -> constraint space
-	Vector3d GP = globalPosition - rigid->getCurrentState().getPose().translation();
+	Vector3d GP = globalPosition - rigid->getCurrentState().getPose() * rigid->getMassCenter();
 	m_newH.resize(rigid->getNumDof());
 	m_newH.reserve(3);
 

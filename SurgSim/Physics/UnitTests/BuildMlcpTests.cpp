@@ -98,6 +98,8 @@ TEST_F(BuildMlcpTests, OneRepresentationNoConstraintTest)
 
 	EXPECT_EQ(0, mlcpSolution.x.rows());
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
 }
 
 TEST_F(BuildMlcpTests, TwoRepresentationsNoConstraintTest)
@@ -128,6 +130,10 @@ TEST_F(BuildMlcpTests, TwoRepresentationsNoConstraintTest)
 
 	EXPECT_EQ(0, mlcpSolution.x.rows());
 	EXPECT_EQ(12, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
+	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+			  m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[1].get()));
 }
 
 TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
@@ -142,8 +148,7 @@ TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			rigidLocalization = rigidLocalizationTyped;
@@ -153,8 +158,7 @@ TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
-			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			fixedLocalization = fixedLocalizationTyped;
@@ -198,6 +202,11 @@ TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
 
 	EXPECT_EQ(1, mlcpSolution.x.rows());
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
+	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+			  m_physicsManagerState->getRepresentationsMapping().getValue(m_fixedWorldRepresentation.get()));
+	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
 }
 
 TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
@@ -212,8 +221,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			rigidLocalization = rigidLocalizationTyped;
@@ -223,8 +231,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
-			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			fixedLocalization = fixedLocalizationTyped;
@@ -267,6 +274,11 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 
 	EXPECT_EQ(3, mlcpSolution.x.rows());
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
+	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+			  m_physicsManagerState->getRepresentationsMapping().getValue(m_fixedWorldRepresentation.get()));
+	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
 }
 
 TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
@@ -281,8 +293,7 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			rigidLocalization = rigidLocalizationTyped;
@@ -292,8 +303,7 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
-			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			fixedLocalization = fixedLocalizationTyped;
@@ -315,8 +325,7 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Ones());
 			rigidLocalization = rigidLocalizationTyped;
@@ -326,8 +335,7 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
-			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Ones());
 			fixedLocalization = fixedLocalizationTyped;
@@ -372,6 +380,13 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 
 	EXPECT_EQ(2, mlcpSolution.x.rows());
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
+	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+			  m_physicsManagerState->getRepresentationsMapping().getValue(m_fixedWorldRepresentation.get()));
+	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
+	EXPECT_EQ(m_usedConstraints[0]->getNumDof(),
+			  m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[1].get()));
 }
 
 TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
@@ -391,8 +406,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigid1Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid1Localization = rigidLocalizationTyped;
@@ -402,8 +416,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 
 		std::shared_ptr<Localization> rigid2Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[1]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid2Localization = rigidLocalizationTyped;
@@ -425,8 +438,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigid1Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid1Localization = rigidLocalizationTyped;
@@ -436,8 +448,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 
 		std::shared_ptr<Localization> rigid2Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[1]);
 			rigidLocalizationTyped->setLocalPosition(pointOne);
 			rigid2Localization = rigidLocalizationTyped;
@@ -487,6 +498,13 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 
 	EXPECT_EQ(2, mlcpSolution.x.rows());
 	EXPECT_EQ(12, mlcpSolution.dofCorrection.rows());
+
+	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
+	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+			  m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[1].get()));
+	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
+	EXPECT_EQ(m_usedConstraints[0]->getNumDof(),
+			  m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[1].get()));
 }
 
 }; // namespace Physics

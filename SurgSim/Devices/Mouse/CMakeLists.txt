@@ -14,9 +14,7 @@
 # limitations under the License.
 
 include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
 	"${OPENSCENEGRAPH_INCLUDE_DIR}"
 )
 
@@ -39,8 +37,8 @@ surgsim_add_library(
 	SurgSim/Devices/Mouse
 )
 
-set(LIBS ${LIBS}
-		 SurgSimInput
+set(LIBS
+	SurgSimInput
 )
 
 target_link_libraries(MouseDevice ${LIBS}

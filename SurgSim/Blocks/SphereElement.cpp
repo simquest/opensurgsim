@@ -21,7 +21,6 @@
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 
@@ -32,7 +31,6 @@ using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Math::SphereShape;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationParameters;
 
 SphereElement::SphereElement(const std::string& name) :
 	SurgSim::Framework::SceneElement(name), m_name(name)
@@ -49,20 +47,17 @@ bool SphereElement::doInitialize()
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>(m_name + " Physics");
 
-	RigidRepresentationParameters params;
-	params.setDensity(700.0); // Wood
-	params.setLinearDamping(0.1);
+	physicsRepresentation->setDensity(700.0); // Wood
+	physicsRepresentation->setLinearDamping(0.1);
 
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.1); // 1cm Sphere
-	params.setShapeUsedForMassInertia(shape);
-
-	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setShape(shape);
 
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSphereRepresentation>(m_name + " Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
 
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
 
 	shader->setVertexShaderSource(

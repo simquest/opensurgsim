@@ -21,6 +21,7 @@
 
 #include <osg/Geode>
 #include <osg/Switch>
+#include <osg/PolygonMode>
 #include <osg/PositionAttitudeTransform>
 
 #include "SurgSim/Framework/Log.h"
@@ -34,7 +35,8 @@ namespace Graphics
 {
 
 OsgRepresentation::OsgRepresentation(const std::string& name) :
-	Representation(name)
+	Representation(name),
+	m_drawAsWireFrame(false)
 {
 	m_switch = new osg::Switch;
 	m_switch->setName(name + " Representation Switch");
@@ -53,22 +55,17 @@ OsgRepresentation::~OsgRepresentation()
 
 }
 
-void OsgRepresentation::setVisible(bool visible)
-{
-	m_switch->setChildValue(m_transform, visible);
-}
-
-bool OsgRepresentation::isVisible() const
-{
-	return m_switch->getChildValue(m_transform);
-}
-
 void OsgRepresentation::update(double dt)
 {
-	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(getPose());
-	m_transform->setAttitude(pose.first);
-	m_transform->setPosition(pose.second);
-	doUpdate(dt);
+	setVisible(isActive());
+
+	if (isActive())
+	{
+		std::pair<osg::Quat, osg::Vec3d> pose = toOsg(getPose());
+		m_transform->setAttitude(pose.first);
+		m_transform->setPosition(pose.second);
+		doUpdate(dt);
+	}
 }
 
 bool OsgRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
@@ -104,6 +101,34 @@ osg::ref_ptr<osg::Node> OsgRepresentation::getOsgNode() const
 void OsgRepresentation::doUpdate(double dt)
 {
 
+}
+
+void OsgRepresentation::setDrawAsWireFrame(bool val)
+{
+	m_drawAsWireFrame = val;
+	osg::StateSet* state = m_switch->getOrCreateStateSet();
+
+	osg::ref_ptr<osg::PolygonMode> polygonMode;
+	if (val)
+	{
+		 polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE);
+	}
+	else
+	{
+		polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT, osg::PolygonMode::FILL);
+	}
+
+	state->setAttributeAndModes(polygonMode, osg::StateAttribute::ON);
+}
+
+bool OsgRepresentation::getDrawAsWireFrame() const
+{
+	return m_drawAsWireFrame;
+}
+
+void OsgRepresentation::setVisible(bool val)
+{
+	m_switch->setChildValue(m_transform, val);
 }
 
 }; // Graphics

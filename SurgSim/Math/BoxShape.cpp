@@ -120,5 +120,10 @@ void BoxShape::calculateVertices()
 	}
 }
 
+bool BoxShape::isValid() const
+{
+	return (m_size.minCoeff() >= 0);
+}
+
 }; // namespace Math
 }; // namespace SurgSim

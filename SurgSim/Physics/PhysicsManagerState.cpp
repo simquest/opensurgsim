@@ -40,18 +40,16 @@ void PhysicsManagerState::setRepresentations(const std::vector<std::shared_ptr<R
 {
 	m_representations = val;
 
-	ptrdiff_t index = 0;
-	m_representationsIndexMapping.clear();
 	m_collisionsToPhysicsMap.clear();
 	for (auto it = m_representations.begin(); it != m_representations.end(); it++)
 	{
-		m_representationsIndexMapping.setValue((*it).get(), index);
-		index += (*it)->getNumDof();
-
-		auto collision = (*it)->getCollisionRepresentation();
-		if (collision != nullptr)
+		if ((*it)->isActive())
 		{
-			m_collisionsToPhysicsMap[collision] = (*it);
+			auto collision = (*it)->getCollisionRepresentation();
+			if (collision != nullptr)
+			{
+				m_collisionsToPhysicsMap[collision] = (*it);
+			}
 		}
 	}
 }
@@ -59,6 +57,17 @@ void PhysicsManagerState::setRepresentations(const std::vector<std::shared_ptr<R
 const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getRepresentations()
 {
 	return m_representations;
+}
+
+void PhysicsManagerState::setActiveRepresentations(
+	const std::vector<std::shared_ptr<Representation>>& activeRepresentations)
+{
+	m_activeRepresentations = activeRepresentations;
+}
+
+const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getActiveRepresentations() const
+{
+	return m_activeRepresentations;
 }
 
 const std::unordered_map<
@@ -83,10 +92,6 @@ PhysicsManagerState::getCollisionRepresentations()
 
 void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_ptr<ConstraintComponent>>& val)
 {
-	if (m_constraintComponents == val)
-	{
-		return;
-	}
 	m_constraintComponents = val;
 
 	std::vector<std::shared_ptr<Constraint>>& constraints = m_constraints[CONSTRAINT_GROUP_TYPE_SCENE];
@@ -95,7 +100,10 @@ void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_
 	constraints.clear();
 	for (auto it = m_constraintComponents.cbegin(); it != m_constraintComponents.cend(); ++it)
 	{
-		constraints.push_back((*it)->getConstraint());
+		if ((*it)->getConstraint()->isActive())
+		{
+			constraints.push_back((*it)->getConstraint());
+		}
 	}
 
 	setConstraintGroup(CONSTRAINT_GROUP_TYPE_SCENE, constraints);
@@ -133,20 +141,6 @@ void PhysicsManagerState::setConstraintGroup(
 	const std::vector<std::shared_ptr<Constraint>>& constraints)
 {
 	m_constraints[type] = constraints;
-
-	// As of now, the mapping is redone entirely each time we call setConstraints
-	ptrdiff_t index = 0;
-	m_constraintsIndexMapping.clear();
-	int constraintTypeEnd   = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);
-	for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
-	{
-		//ConstraintGroupType type = static_cast<ConstraintGroupType>(constraintType);
-		for (auto it = m_constraints[constraintType].begin(); it != m_constraints[constraintType].end(); it++)
-		{
-			m_constraintsIndexMapping.setValue((*it).get(), index);
-			index += (*it)->getNumDof();
-		}
-	}
 }
 
 const std::vector<std::shared_ptr<Constraint>>& PhysicsManagerState::getConstraintGroup(int type) const
@@ -157,6 +151,17 @@ const std::vector<std::shared_ptr<Constraint>>& PhysicsManagerState::getConstrai
 	}
 	static std::vector<std::shared_ptr<Constraint>> emptyVector;
 	return emptyVector;
+}
+
+void PhysicsManagerState::setActiveConstraints(
+	const std::vector<std::shared_ptr<Constraint>>& activeConstraints)
+{
+	m_activeConstraints = activeConstraints;
+}
+
+const std::vector<std::shared_ptr<Constraint>>& PhysicsManagerState::getActiveConstraints() const
+{
+	return m_activeConstraints;
 }
 
 MlcpPhysicsProblem& PhysicsManagerState::getMlcpProblem()
@@ -184,9 +189,19 @@ const MlcpMapping<Representation>& PhysicsManagerState::getRepresentationsMappin
 	return m_representationsIndexMapping;
 }
 
+void PhysicsManagerState::setRepresentationsMapping(const MlcpMapping<Representation>& representationsMapping)
+{
+	m_representationsIndexMapping = representationsMapping;
+}
+
 const MlcpMapping<Constraint>& PhysicsManagerState::getConstraintsMapping() const
 {
 	return m_constraintsIndexMapping;
+}
+
+void PhysicsManagerState::setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping)
+{
+	m_constraintsIndexMapping = constraintsMapping;
 }
 
 }; // Physics

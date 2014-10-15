@@ -48,9 +48,11 @@ set(LIBS
 	SurgSimCollision
 	SurgSimDataStructures
 	SurgSimMath
+	SurgSimPhysics
+	SurgSimInput
 )
 
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 # Configure the path for the data files
 configure_file(

@@ -52,14 +52,13 @@ void Representation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
 
 SurgSim::Math::RigidTransform3d Representation::getPose() const
 {
-	std::shared_ptr<const PoseComponent> poseComponent = getPoseComponent();
-	if (poseComponent == nullptr)
+	if (getSceneElement() != nullptr)
 	{
-		return getLocalPose();
+		return getSceneElement()->getPose() * getLocalPose();
 	}
 	else
 	{
-		return poseComponent->getPose() * getLocalPose();
+		return getLocalPose();
 	}
 }
 

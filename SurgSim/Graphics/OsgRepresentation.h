@@ -50,35 +50,32 @@ public:
 	/// Returns the root OSG Node for this representations portion of the scene graph
 	osg::ref_ptr<osg::Node> getOsgNode() const;
 
-	/// Sets whether the representation is currently visible
-	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible);
-
-	/// Gets whether the representation is currently visible
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const;
-
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
 	/// \return	True if set successfully, otherwise false
 	/// \note	OsgPlaneRepresentation only accepts subclasses of OsgMaterial.
-	virtual bool setMaterial(std::shared_ptr<Material> material);
+	virtual bool setMaterial(std::shared_ptr<Material> material) override;
 
 	/// Gets the material that defines the visual appearance of the representation
 	/// \return	Graphics material
-	virtual std::shared_ptr<Material> getMaterial() const;
+	virtual std::shared_ptr<Material> getMaterial() const override;
 
 	/// Removes the material from the representation
-	virtual void clearMaterial();
+	virtual void clearMaterial() override;
+
+	virtual void setDrawAsWireFrame(bool val) override;
+	virtual bool getDrawAsWireFrame() const override;
 
 	/// Updates the representation.
 	/// \param	dt	The time in seconds of the preceding timestep.
-	virtual void update(double dt);
-
-
+	virtual void update(double dt) override;
 
 protected:
 	virtual void doUpdate(double dt);
+
+	/// Set the visibility of this representation
+	/// \param val The visibility
+	void setVisible(bool val);
 
 	/// Switch used to toggle the visibility of the representation
 	osg::ref_ptr<osg::Switch> m_switch;
@@ -88,6 +85,8 @@ protected:
 	/// Material defining the visual appearance of the representation
 	std::shared_ptr<OsgMaterial> m_material;
 
+	/// Indicates if the representation is rendered as a wireframe.
+	bool m_drawAsWireFrame;
 };
 
 }; // Graphics

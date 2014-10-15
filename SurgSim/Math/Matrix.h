@@ -21,8 +21,6 @@
 
 #include <vector>
 
-#include "SurgSim/Framework/Assert.h"
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/LU> 		// needed for determinant() and inverse()
@@ -218,31 +216,6 @@ Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, size_t blockIdRow, size_t bloc
 {
 	return matrix.block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol);
 }
-
-/// Helper methods to resize/allocate a matrix with a given size (if necessary), and potentially zero it out
-/// \param[in,out] A matrix to resize
-/// \param numRow, numCol The size to account for
-/// \param zeroOut True if the vector v should be filled up with 0, False if not
-/// \note This template method is useful to account for different matrix class having different API
-template <class Matrix>
-void resizeMatrix(Matrix* A, size_t numRow, size_t numCol, bool zeroOut = false)
-{
-	if (A == nullptr)
-	{
-		return;
-	}
-	if (A->rows() != static_cast<ptrdiff_t>(numRow) || A->cols() != static_cast<ptrdiff_t>(numCol))
-	{
-		A->resize(numRow, numCol);
-	}
-	if (zeroOut)
-	{
-		A->setZero();
-	}
-}
-
-template <>
-void resizeMatrix<DiagonalMatrix>(DiagonalMatrix* A, size_t numRow, size_t numCol, bool zeroOut);
 
 };  // namespace Math
 };  // namespace SurgSim

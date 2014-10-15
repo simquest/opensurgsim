@@ -18,6 +18,7 @@
 
 #include <Eigen/Core>
 
+#include "SurgSim/DataStructures/Image.h"
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/DataStructures/NamedVariantData.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -31,27 +32,28 @@ namespace DataStructures
 /// A collection of \ref NamedData objects.
 ///
 /// A DataGroup object contains a NamedData for each of several predefined types:
+/// \li \em Booleans contain a Boolean logic value (true or false).
+/// \li \em Images contain float images.
+/// \li \em Integers contain an integer value.
 /// \li \em Poses contain the position and orientation of an object in space, represented as a 3D rigid-body
 /// 	 (isometric) transformation.
-/// \li \em Vectors contain a vector quantity that does not change when the coordinate system is translated,
-/// 	such as a force or an oriented distance.
 /// \li \em Matrices contain a matrix.
 /// \li \em Scalars contain a scalar value (i.e. anything that can be represented as a double).
-/// \li \em Integers contain an integer value.
-/// \li \em Booleans contain a Boolean logic value (true or false).
 /// \li \em Strings contain a text value.
+/// \li \em Vectors contain a vector quantity that does not change when the coordinate system is translated,
+/// 	such as a force or an oriented distance.
 /// \li \em CustomData contain a custom data structure, \ref NamedVariantData.
 ///
 /// The entries (names and indices) are unique within each NamedData member, but not necessarily across different types
 /// (i.e. there could be a scalar and a vector both named "friction", or a pose and a boolean both at index 1).
 /// It is recommended that you keep names separate between different types to avoid confusion.
 ///
-/// A DataGroup object constructed by the default constructor starts out empty, meaning its NamedData member
+/// A DataGroup object constructed by the default constructor starts out empty, meaning all its NamedData member
 /// objects are "invalid". An empty DataGroup object can be made non-empty by:
 /// \li using the \ref DataGroupBuilder class,
 /// \li copy construction,
 /// \li assigning from a non-empty DataGroup object, or
-/// \li assigning a "valid" NamedData object (of the correct template type) to each of the NamedData members.
+/// \li assigning a "valid" NamedData object (of the correct template type) to one or more NamedData members.
 ///
 /// Assignment to a non-empty DataGroup object is only possible if either of the two objects in the assignment was made
 /// non-empty based on the other object (see the above list items about copy construction and assignment from a
@@ -80,6 +82,8 @@ public:
 	typedef bool BooleanType;
 	/// The type used for strings.
 	typedef std::string StringType;
+	/// The type used for images.
+	typedef Image<float> ImageType;
 
 	/// Construct an empty object, with no associated names and indices yet.
 	DataGroup();
@@ -182,6 +186,14 @@ public:
 	/// \return the read-only string data.
 	const NamedData<StringType>& strings() const;
 
+	/// Return the image data structure.
+	/// \return the mutable iamge data.
+	NamedData<ImageType>& images();
+
+	/// Return the image data structure.
+	/// \return the read-only images data.
+	const NamedData<ImageType>& images() const;
+
 	/// Return the custom data structure.
 	/// \return the mutable data.
 	NamedVariantData& customData();
@@ -192,6 +204,10 @@ public:
 
 	/// Mark all data as not current.
 	void resetAll();
+
+	/// An empty DataGroup can be assigned to by any DataGroup with only valid NamedData.
+	/// return true if all the NamedData are invalid.
+	bool isEmpty() const;
 
 private:
 	/// The pose values.
@@ -214,6 +230,9 @@ private:
 
 	/// The string values.
 	NamedData<StringType> m_strings;
+
+	/// The string values.
+	NamedData<ImageType> m_images;
 
 	/// The custom data values.
 	NamedVariantData m_customData;

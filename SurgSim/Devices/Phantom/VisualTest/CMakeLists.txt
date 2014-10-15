@@ -18,12 +18,8 @@ link_directories(
 	${Boost_LIBRARY_DIRS}
 )
 
-include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
+include_directories( 
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
-	"${GLUT_INCLUDE_DIR}"
 )
 
 set(EXAMPLE_SOURCES
@@ -38,10 +34,17 @@ add_executable(PhantomVisualTest
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-set(LIBS PhantomDevice IdentityPoseDevice VisualTestCommon
-	SurgSimInput SurgSimFramework SurgSimDataStructures
+set(LIBS
+	PhantomDevice
+	IdentityPoseDevice
+	VisualTestCommon
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
 	${OPENHAPTICS_LIBRARIES}
-	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+	${Boost_LIBRARIES}
+	${OPENGL_LIBRARIES}
+)
 
 target_link_libraries(PhantomVisualTest ${LIBS})
 

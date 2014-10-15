@@ -19,11 +19,7 @@ link_directories(
 )
 
 include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
-	"${GLUT_INCLUDE_DIR}"
 )
 
 set(EXAMPLE_SOURCES
@@ -39,9 +35,7 @@ add_executable(SixenseVisualTest
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-target_link_libraries(
-	SixenseVisualTest
-	${LIBS}
+set(LIBS
 	SixenseDevice
 	IdentityPoseDevice
 	VisualTestCommon
@@ -50,9 +44,11 @@ target_link_libraries(
 	SurgSimDataStructures
 	${Boost_LIBRARIES}
 	${SIXENSE_SDK_LIBRARIES}
-	${GLUT_LIBRARIES}
 	${OPENGL_LIBRARIES}
 )
+
+target_link_libraries(SixenseVisualTest ${LIBS})
+
 
 # Copy the device DLLs into the build directory
 surgsim_copy_to_target_directory_for_release(SixenseVisualTest

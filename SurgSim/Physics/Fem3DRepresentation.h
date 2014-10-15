@@ -37,6 +37,8 @@ namespace Physics
 {
 SURGSIM_STATIC_REGISTRATION(Fem3DRepresentation);
 
+class FemPlyReaderDelegate;
+
 /// Finite Element Model 3D is a fem built with 3D FemElement
 class Fem3DRepresentation : public FemRepresentation
 {
@@ -50,27 +52,19 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
 
-	/// Sets the name of the file to be loaded
-	/// \param filename The name of the file to be loaded
-	void setFilename(const std::string& filename);
-
-	/// Gets the name of the file to be loaded
-	/// \return filename The name of the file to be loaded
-	const std::string& getFilename() const;
-
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
 
-	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location) override;
+	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+											 SurgSim::Math::Vector& generalizedForce,
+											 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+											 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
+
+	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location&) override;
 
 protected:
-	/// Loads the file
-	/// \return true if load is successful; false otherwise.
-	bool loadFile();
-
 	virtual bool doWakeUp() override;
-	virtual bool doInitialize() override;
 
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
@@ -79,6 +73,8 @@ protected:
 		const SurgSim::Math::RigidTransform3d& transform) override;
 
 private:
+	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
+
 	/// Produces a mapping from the provided mesh's triangle ids to this object's fem element ids. The mesh's vertices
 	/// must be identical to this object's fem element nodes.
 	/// \param mesh The mesh used to produce the mapping.
@@ -86,18 +82,11 @@ private:
 	std::unordered_map<size_t, size_t> createTriangleIdToElementIdMap(
 		const SurgSim::DataStructures::TriangleMesh& mesh);
 
-	/// Filename for loading the fem3d representation.
-	std::string m_filename;
-
-	/// Whether the file should be loaded or not.
-	bool m_doLoadFile;
-
 	/// Mapping from collision triangle's id to fem element id.
 	std::unordered_map<size_t, size_t> m_triangleIdToElementIdMap;
 };
 
 } // namespace Physics
-
 } // namespace SurgSim
 
 #endif // SURGSIM_PHYSICS_FEM3DREPRESENTATION_H

@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "SurgSim/Physics/UnitTests/CommonTests.h"
+#include "SurgSim/Physics/BuildMlcp.h"
 #include "SurgSim/Physics/PushResults.h"
 
 namespace SurgSim
@@ -44,6 +45,13 @@ protected:
 	/// The Push Results computation
 	std::shared_ptr<PushResults> m_pushResultsComputation;
 };
+
+void updateRepresentationsMapping(std::shared_ptr<PhysicsManagerState> state)
+{
+	// The BuildMlcp computation build the representations mapping. So it is called.
+	auto buildMlcpComputation = std::make_shared<BuildMlcp>();
+	buildMlcpComputation->update(0.0, state);
+}
 
 TEST_F(PushResultsTests, NoRepresentationNoConstraint)
 {
@@ -86,8 +94,7 @@ TEST_F(PushResultsTests, OneRepresentationOneConstraintTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			rigidLocalization = rigidLocalizationTyped;
@@ -97,8 +104,7 @@ TEST_F(PushResultsTests, OneRepresentationOneConstraintTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
-			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			fixedLocalization = fixedLocalizationTyped;
@@ -120,6 +126,9 @@ TEST_F(PushResultsTests, OneRepresentationOneConstraintTest)
 
 	// Set the constraint list in the Physics Manager State
 	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
+
+	// Update the Representations mapping.
+	updateRepresentationsMapping(m_physicsManagerState);
 
 	// Fill up the Mlcp problem and clear up the Mlcp solution
 	resetMlcpProblem(6, 1);
@@ -179,8 +188,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			rigidLocalization = rigidLocalizationTyped;
@@ -190,8 +198,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
-			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			fixedLocalization = fixedLocalizationTyped;
@@ -213,8 +220,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Ones());
 			rigidLocalization = rigidLocalizationTyped;
@@ -224,8 +230,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
-			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Ones());
 			fixedLocalization = fixedLocalizationTyped;
@@ -247,6 +252,9 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 
 	// Set the constraint list in the Physics Manager State
 	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
+
+	// Update the Representations mapping.
+	updateRepresentationsMapping(m_physicsManagerState);
 
 	// Fill up the Mlcp problem and clear up the Mlcp solution
 	resetMlcpProblem(6, 2);
@@ -318,8 +326,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigid1Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid1Localization = rigidLocalizationTyped;
@@ -329,8 +336,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 
 		std::shared_ptr<Localization> rigid2Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[1]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid2Localization = rigidLocalizationTyped;
@@ -352,8 +358,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigid1Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid1Localization = rigidLocalizationTyped;
@@ -363,8 +368,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 
 		std::shared_ptr<Localization> rigid2Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[1]);
 			rigidLocalizationTyped->setLocalPosition(pointOne);
 			rigid2Localization = rigidLocalizationTyped;
@@ -386,6 +390,9 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 
 	// Set the constraint list in the Physics Manager State
 	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
+
+	// Update the Representations mapping.
+	updateRepresentationsMapping(m_physicsManagerState);
 
 	// Fill up the Mlcp problem and clear up the Mlcp solution
 	resetMlcpProblem(12, 2);

@@ -28,7 +28,6 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
@@ -57,13 +56,10 @@ struct VirtualToolCouplerTest : public ::testing::Test
 		inputDeviceName = "Device";
 
 		rigidBody = std::make_shared<RigidRepresentation>(representationName);
-
-		RigidRepresentationParameters parameters;
-		parameters.setDensity(700.0);
-		parameters.setAngularDamping(0.0);
-		parameters.setLinearDamping(0.0);
-		parameters.setShapeUsedForMassInertia(std::make_shared<SphereShape>(0.1));
-		rigidBody->setInitialParameters(parameters);
+		rigidBody->setDensity(700.0);
+		rigidBody->setAngularDamping(0.0);
+		rigidBody->setLinearDamping(0.0);
+		rigidBody->setShape(std::make_shared<SphereShape>(0.1));
 
 		RigidRepresentationState state;
 		state.setAngularVelocity(Vector3d::Zero());
@@ -120,7 +116,7 @@ protected:
 		//      t = 4.744 * naturalFrequency;
 		// we will run the system to this point, and then check that the
 		// final position is 5.1% of its initial position
-		double mass = rigidBody->getCurrentParameters().getMass();
+		double mass = rigidBody->getMass();
 		double stiffness = virtualToolCoupler->getLinearStiffness();
 		double naturalFrequency = sqrt(stiffness / mass);
 		double expectedSettlingTime = 4.744 / naturalFrequency;
@@ -145,7 +141,7 @@ protected:
 
 	void checkAngularIsCriticallyDamped()
 	{
-		double initialAngle = M_PI/4.0;
+		double initialAngle = M_PI_4;
 		RigidTransform3d initialPose = RigidTransform3d::Identity();
 		initialPose.linear() = Matrix33d(Eigen::AngleAxisd(initialAngle, Vector3d::UnitY()));
 		rigidBody->setLocalPose(initialPose);
@@ -162,7 +158,7 @@ protected:
 		//      t = 4.744 * naturalFrequency;
 		// we will run the system to this point, and then check that the
 		// final position is 5.1% of its initial position
-		double inertia = rigidBody->getCurrentParameters().getLocalInertia()(1,1);
+		double inertia = rigidBody->getLocalInertia()(1,1);
 		double stiffness = virtualToolCoupler->getAngularStiffness();
 		double naturalFrequency = sqrt(stiffness / inertia);
 		double expectedSettlingTime = 4.744 / naturalFrequency;
@@ -191,8 +187,8 @@ protected:
 
 TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 {
-	const double mass = rigidBody->getCurrentParameters().getMass();
-	virtualToolCoupler->overrideAngularDamping(mass * 1.0 );
+	const double mass = rigidBody->getMass();
+	virtualToolCoupler->overrideAngularDamping(mass * 1.0);
 	virtualToolCoupler->overrideAngularStiffness(mass * 200);
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
 	virtualToolCoupler->overrideLinearStiffness(mass * 200);
@@ -202,7 +198,21 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 	rigidBody->setLocalPose(initialPose);
 	rigidBody->setIsGravityEnabled(false);
 
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
+	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
+
+	EXPECT_FALSE(rigidBody->getCurrentState().getPose().translation().isZero(epsilon));
+
 	EXPECT_TRUE(rigidBody->isActive());
+	runSystem(2);
+	EXPECT_TRUE(rigidBody->isActive());
+
+	EXPECT_FALSE(rigidBody->getCurrentState().getLinearVelocity().isZero(epsilon));
+	EXPECT_TRUE(rigidBody->getCurrentState().getAngularVelocity().isZero(epsilon));
+
 	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
 
@@ -215,21 +225,77 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
 }
 
+TEST_F(VirtualToolCouplerTest, LinearDisplacementWithInertialTorques)
+{
+	const double mass = rigidBody->getMass();
+	virtualToolCoupler->overrideAngularDamping(mass * 2);
+	virtualToolCoupler->overrideAngularStiffness(mass * 20);
+	virtualToolCoupler->overrideLinearDamping(mass * 5);
+	virtualToolCoupler->overrideLinearStiffness(mass * 20);
+
+	const Vector3d attachmentPoint = Vector3d::UnitY();
+	virtualToolCoupler->overrideAttachmentPoint(attachmentPoint);
+	virtualToolCoupler->setCalculateInertialTorques(true);
+
+	RigidTransform3d expectedFinalPose = RigidTransform3d::Identity();
+	expectedFinalPose.translation() = -attachmentPoint;
+	RigidTransform3d initialPose = RigidTransform3d::Identity();
+	initialPose.translation() = Vector3d(0.01, 0.0, 0.0) + expectedFinalPose.translation();
+	rigidBody->setLocalPose(initialPose);
+	rigidBody->setIsGravityEnabled(false);
+
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
+	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
+
+	RigidRepresentationState state = rigidBody->getCurrentState();
+	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
+	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
+
+	EXPECT_TRUE(rigidBody->isActive());
+	runSystem(2);
+	EXPECT_TRUE(rigidBody->isActive());
+	EXPECT_FALSE(rigidBody->getCurrentState().getAngularVelocity().isZero(epsilon));
+
+	runSystem(6000);
+	EXPECT_TRUE(rigidBody->isActive());
+
+	state = rigidBody->getCurrentState();
+	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
+	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
+	EXPECT_TRUE(state.getPose().isApprox(expectedFinalPose, epsilon));
+}
+
 TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 {
-	const double mass = rigidBody->getCurrentParameters().getMass();
-	virtualToolCoupler->overrideAngularDamping(mass * 1.0 );
+	const double mass = rigidBody->getMass();
+	virtualToolCoupler->overrideAngularDamping(mass * 1.0);
 	virtualToolCoupler->overrideAngularStiffness(mass * 200);
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
 	virtualToolCoupler->overrideLinearStiffness(mass * 200);
-
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
 	initialPose.linear() = Matrix33d(Eigen::AngleAxisd(M_PI/4.0, Vector3d::UnitY()));
 	rigidBody->setLocalPose(initialPose);
 	rigidBody->setIsGravityEnabled(false);
 
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
+	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
+
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(rigidBody->getCurrentState().getPose().linear());
+	EXPECT_NEAR(M_PI_4, angleAxis.angle(), epsilon);
+
 	EXPECT_TRUE(rigidBody->isActive());
+	runSystem(2);
+	EXPECT_TRUE(rigidBody->isActive());
+	EXPECT_FALSE(rigidBody->getCurrentState().getAngularVelocity().isZero(epsilon));
+
 	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
 
@@ -238,13 +304,13 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getPose().translation().isZero(epsilon));
 
-	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
+	angleAxis = Eigen::AngleAxisd(state.getPose().linear());
 	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
 }
 
 TEST_F(VirtualToolCouplerTest, WithGravity)
 {
-	const double mass = rigidBody->getCurrentParameters().getMass();
+	const double mass = rigidBody->getMass();
 	virtualToolCoupler->overrideAngularDamping(mass * 1.0 );
 	virtualToolCoupler->overrideAngularStiffness(mass * 200);
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
@@ -258,6 +324,14 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 	const double stiffness = 1000;
 	virtualToolCoupler->overrideLinearStiffness(stiffness);
 
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
+	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
+
+	EXPECT_TRUE(rigidBody->getCurrentState().getPose().translation().isApprox(Vector3d::Zero(), epsilon));
+
 	EXPECT_TRUE(rigidBody->isActive());
 	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
@@ -266,9 +340,8 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 
-	RigidRepresentationParameters parameters = rigidBody->getCurrentParameters();
 	Vector3d g = Vector3d(0.0, -9.81, 0.0);
-	Vector3d expectedPosition = parameters.getMass() * g / stiffness;
+	Vector3d expectedPosition = rigidBody->getMass() * g / stiffness;
 	EXPECT_TRUE(state.getPose().translation().isApprox(expectedPosition, epsilon));
 
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
@@ -331,85 +404,103 @@ TEST_F(VirtualToolCouplerTest, GetRigid)
 }
 
 typedef SurgSim::DataStructures::OptionalValue<double> OptionalValued;
+typedef SurgSim::DataStructures::OptionalValue<Vector3d> OptionalValueVec3;
 
 TEST_F(VirtualToolCouplerTest, OptionalParams)
 {
 	double num = 2.56527676;
+	Vector3d vec(1.0, 2.0, 3.0);
 	{
 		SCOPED_TRACE("Getters");
+		EXPECT_FALSE(virtualToolCoupler->getOptionalLinearStiffness().hasValue());
 		virtualToolCoupler->overrideLinearStiffness(num);
-		virtualToolCoupler->overrideLinearDamping(num);
-		virtualToolCoupler->overrideAngularStiffness(num);
-		virtualToolCoupler->overrideAngularDamping(num);
-
 		const OptionalValued& linearStiffness = virtualToolCoupler->getOptionalLinearStiffness();
-		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
-		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
-		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
-
 		EXPECT_TRUE(linearStiffness.hasValue());
-		EXPECT_TRUE(linearDamping.hasValue());
-		EXPECT_TRUE(angularStiffness.hasValue());
-		EXPECT_TRUE(angularDamping.hasValue());
-
 		EXPECT_EQ(num, linearStiffness.getValue());
+
+		EXPECT_FALSE(virtualToolCoupler->getOptionalLinearDamping().hasValue());
+		virtualToolCoupler->overrideLinearDamping(num);
+		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
+		EXPECT_TRUE(linearDamping.hasValue());
 		EXPECT_EQ(num, linearDamping.getValue());
+
+		EXPECT_FALSE(virtualToolCoupler->getOptionalAngularStiffness().hasValue());
+		virtualToolCoupler->overrideAngularStiffness(num);
+		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
+		EXPECT_TRUE(angularStiffness.hasValue());
 		EXPECT_EQ(num, angularStiffness.getValue());
+
+		EXPECT_FALSE(virtualToolCoupler->getOptionalAngularDamping().hasValue());
+		virtualToolCoupler->overrideAngularDamping(num);
+		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
+		EXPECT_TRUE(angularDamping.hasValue());
 		EXPECT_EQ(num, angularDamping.getValue());
+
+		EXPECT_FALSE(virtualToolCoupler->getOptionalAttachmentPoint().hasValue());
+		virtualToolCoupler->overrideAttachmentPoint(vec);
+		const OptionalValueVec3& attachmentPoint = virtualToolCoupler->getOptionalAttachmentPoint();
+		EXPECT_TRUE(attachmentPoint.hasValue());
+		EXPECT_TRUE(vec.isApprox(attachmentPoint.getValue()));
 	}
 	{
 		SCOPED_TRACE("Setters");
-		virtualToolCoupler->overrideLinearStiffness(0.0);
-		virtualToolCoupler->overrideLinearDamping(0.0);
-		virtualToolCoupler->overrideAngularStiffness(0.0);
-		virtualToolCoupler->overrideAngularDamping(0.0);
-
 		OptionalValued optionalNum;
 		optionalNum.setValue(num);
 
+		OptionalValueVec3 optionalVec;
+		optionalVec.setValue(vec);
+
+		virtualToolCoupler->overrideLinearStiffness(0.0);
+		EXPECT_NEAR(0.0, virtualToolCoupler->getOptionalLinearStiffness().getValue(), 1e-9);
 		virtualToolCoupler->setOptionalLinearStiffness(optionalNum);
-		virtualToolCoupler->setOptionalLinearDamping(optionalNum);
-		virtualToolCoupler->setOptionalAngularStiffness(optionalNum);
-		virtualToolCoupler->setOptionalAngularDamping(optionalNum);
-
 		const OptionalValued& linearStiffness = virtualToolCoupler->getOptionalLinearStiffness();
-		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
-		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
-		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
-
-		EXPECT_TRUE(linearStiffness.hasValue());
-		EXPECT_TRUE(linearDamping.hasValue());
-		EXPECT_TRUE(angularStiffness.hasValue());
-		EXPECT_TRUE(angularDamping.hasValue());
-
 		EXPECT_EQ(num, linearStiffness.getValue());
-		EXPECT_EQ(num, linearDamping.getValue());
-		EXPECT_EQ(num, angularStiffness.getValue());
-		EXPECT_EQ(num, angularDamping.getValue());
-	}
-}
 
-TEST_F(VirtualToolCouplerTest, OutputScaling)
-{
-	double num = 2.56527676;
-	virtualToolCoupler->setOutputForceScaling(num);
-	virtualToolCoupler->setOutputTorqueScaling(num);
-	EXPECT_EQ(num, virtualToolCoupler->getOutputForceScaling());
-	EXPECT_EQ(num, virtualToolCoupler->getOutputTorqueScaling());
+		virtualToolCoupler->overrideLinearDamping(0.0);
+		EXPECT_NEAR(0.0, virtualToolCoupler->getOptionalLinearDamping().getValue(), 1e-9);
+		virtualToolCoupler->setOptionalLinearDamping(optionalNum);
+		const OptionalValued& linearDamping = virtualToolCoupler->getOptionalLinearDamping();
+		EXPECT_TRUE(linearDamping.hasValue());
+		EXPECT_EQ(num, linearDamping.getValue());
+
+		virtualToolCoupler->overrideAngularStiffness(0.0);
+		EXPECT_NEAR(0.0, virtualToolCoupler->getOptionalAngularStiffness().getValue(), 1e-9);
+		virtualToolCoupler->setOptionalAngularStiffness(optionalNum);
+		const OptionalValued& angularStiffness = virtualToolCoupler->getOptionalAngularStiffness();
+		EXPECT_TRUE(angularStiffness.hasValue());
+		EXPECT_EQ(num, angularStiffness.getValue());
+
+		virtualToolCoupler->overrideAngularDamping(0.0);
+		EXPECT_NEAR(0.0, virtualToolCoupler->getOptionalAngularDamping().getValue(), 1e-9);
+		virtualToolCoupler->setOptionalAngularDamping(optionalNum);
+		const OptionalValued& angularDamping = virtualToolCoupler->getOptionalAngularDamping();
+		EXPECT_TRUE(angularDamping.hasValue());
+		EXPECT_EQ(num, angularDamping.getValue());
+
+		virtualToolCoupler->overrideAttachmentPoint(Vector3d::Zero());
+		EXPECT_TRUE(virtualToolCoupler->getOptionalAttachmentPoint().getValue().isApprox(Vector3d::Zero()));
+		virtualToolCoupler->setOptionalAttachmentPoint(optionalVec);
+		const OptionalValueVec3& attachmentPoint = virtualToolCoupler->getOptionalAttachmentPoint();
+		EXPECT_TRUE(attachmentPoint.hasValue());
+		EXPECT_TRUE(vec.isApprox(attachmentPoint.getValue()));
+	}
 }
 
 TEST_F(VirtualToolCouplerTest, Serialization)
 {
 	double num = 3.6415;
+	Vector3d vec(28.4, -37.2, 91.8);
 
 	OptionalValued optionalNum;
 	optionalNum.setValue(num);
+	OptionalValueVec3 optionalVec;
+	optionalVec.setValue(vec);
 	virtualToolCoupler->setOptionalLinearStiffness(optionalNum);
 	virtualToolCoupler->setOptionalLinearDamping(optionalNum);
 	virtualToolCoupler->setOptionalAngularStiffness(optionalNum);
 	virtualToolCoupler->setOptionalAngularDamping(optionalNum);
-	virtualToolCoupler->setOutputForceScaling(num);
-	virtualToolCoupler->setOutputTorqueScaling(num);
+	virtualToolCoupler->setOptionalAttachmentPoint(optionalVec);
+	virtualToolCoupler->setCalculateInertialTorques(true);
 
 	// Encode
 	YAML::Node node;
@@ -428,9 +519,8 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	EXPECT_EQ(num, newVirtualToolCoupler->getLinearDamping());
 	EXPECT_EQ(num, newVirtualToolCoupler->getAngularStiffness());
 	EXPECT_EQ(num, newVirtualToolCoupler->getAngularDamping());
-
-	EXPECT_EQ(num, newVirtualToolCoupler->getOutputForceScaling());
-	EXPECT_EQ(num, newVirtualToolCoupler->getOutputTorqueScaling());
+	EXPECT_TRUE(vec.isApprox(newVirtualToolCoupler->getAttachmentPoint()));
+	EXPECT_TRUE(newVirtualToolCoupler->getCalculateInertialTorques());
 
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getInput());
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getRepresentation());
@@ -444,6 +534,32 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 
 	EXPECT_EQ(inputNode[input->getClassName()]["Id"].as<std::string>(),
 		node[virtualToolCoupler->getClassName()][input->getName()][input->getClassName()]["Id"].as<std::string>());
+}
+
+TEST_F(VirtualToolCouplerTest, OutputDataEntries)
+{
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	ASSERT_TRUE(virtualToolCoupler->initialize(runtime));
+	auto data = virtualToolCoupler->getOutputData();
+
+	EXPECT_EQ(1, data.poses().getNumEntries());
+	EXPECT_TRUE(data.poses().hasEntry(SurgSim::DataStructures::Names::INPUT_POSE));
+
+	EXPECT_EQ(4, data.vectors().getNumEntries());
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::FORCE));
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::TORQUE));
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY));
+	EXPECT_TRUE(data.vectors().hasEntry(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY));
+
+	EXPECT_EQ(2, data.matrices().getNumEntries());
+	EXPECT_TRUE(data.matrices().hasEntry(SurgSim::DataStructures::Names::SPRING_JACOBIAN));
+	EXPECT_TRUE(data.matrices().hasEntry(SurgSim::DataStructures::Names::DAMPER_JACOBIAN));
+
+	EXPECT_EQ(0, data.scalars().getNumEntries());
+	EXPECT_EQ(0, data.integers().getNumEntries());
+	EXPECT_EQ(0, data.booleans().getNumEntries());
+	EXPECT_EQ(0, data.strings().getNumEntries());
+	EXPECT_EQ(0, data.customData().getNumEntries());
 }
 
 }; // namespace Physics

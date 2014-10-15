@@ -15,17 +15,10 @@
 
 link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS
-	${LIBS}
 	${Boost_LIBRARIES}
 	SurgSimDataStructures
 	SurgSimFramework
 	SurgSimInput
-)
-
-include_directories(
-	${Boost_INCLUDE_DIR}
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(DEVICE_FILTERS_SOURCES

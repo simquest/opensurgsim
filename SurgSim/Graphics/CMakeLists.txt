@@ -14,10 +14,8 @@
 # limitations under the License.
 
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_GRAPHICS_SOURCES
@@ -25,6 +23,8 @@ set(SURGSIM_GRAPHICS_SOURCES
 	Group.cpp
 	Manager.cpp
 	Mesh.cpp
+	MeshPlyReaderDelegate.cpp
+	MeshUtilities.cpp
 	OsgAxesRepresentation.cpp
 	OsgBoxRepresentation.cpp
 	OsgCamera.cpp
@@ -53,10 +53,12 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgTextureRectangle.cpp
 	OsgTrackballZoomManipulator.cpp
 	OsgUniformBase.cpp
+	OsgUniformFactory.cpp
 	OsgUnitAxes.cpp
 	OsgVectorFieldRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
+	PointCloudRepresentation.cpp
 	RenderPass.cpp
 	Representation.cpp
 	TriangleNormalGenerator.cpp
@@ -76,7 +78,9 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Material.h
 	Mesh.h
 	Mesh-inl.h
+	MeshPlyReaderDelegate.h
 	MeshRepresentation.h
+	MeshUtilities.h
 	OctreeRepresentation.h
 	OsgAxesRepresentation.h
 	OsgBoxRepresentation.h
@@ -95,7 +99,6 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgPointCloudRepresentation.h
-	OsgPointCloudRepresentation-inl.h
 	OsgQuaternionConversions.h
 	OsgRenderTarget.h
 	OsgRenderTarget-inl.h
@@ -118,6 +121,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgUniform.h
 	OsgUniform-inl.h
 	OsgUniformBase.h
+	OsgUniformFactory.h
 	OsgUniformTypes.h
 	OsgUnitAxes.h
 	OsgUnitBox.h

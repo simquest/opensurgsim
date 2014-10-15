@@ -48,7 +48,7 @@ TEST(OsgRepresentationTests, InitTest)
 	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
 
 	EXPECT_EQ("test name", representation->getName());
-	EXPECT_TRUE(representation->isVisible());
+	EXPECT_TRUE(representation->isActive());
 }
 
 TEST(OsgRepresentationTests, OsgNodeTest)
@@ -63,15 +63,38 @@ TEST(OsgRepresentationTests, OsgNodeTest)
 	EXPECT_TRUE(osgGroup.valid()) << "Representation's OSG node should be a group!";
 }
 
-TEST(OsgRepresentationTests, VisibilityTest)
+TEST(OsgRepresentationTests, ActivityTest)
+{
+	std::shared_ptr<OsgRepresentation> osgRepresentation = std::make_shared<MockOsgRepresentation>("test name");
+	std::shared_ptr<Representation> representation = osgRepresentation;
+
+	osg::Switch* switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
+	ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
+	ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
+
+	EXPECT_TRUE(representation->isActive());
+	representation->update(0.0);
+	EXPECT_TRUE(switchNode->getChildValue(switchNode->getChild(0)));
+
+	representation->setLocalActive(false);
+	EXPECT_FALSE(representation->isActive());
+	representation->update(0.0);
+	EXPECT_FALSE(switchNode->getChildValue(switchNode->getChild(0)));
+
+	representation->setLocalActive(true);
+	EXPECT_TRUE(representation->isActive());
+	representation->update(0.0);
+	EXPECT_TRUE(switchNode->getChildValue(switchNode->getChild(0)));
+}
+
+TEST(OsgRepresentationTests, WireFrameTest)
 {
 	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
 
-	representation->setVisible(true);
-	EXPECT_TRUE(representation->isVisible());
+	EXPECT_FALSE(representation->getDrawAsWireFrame());
 
-	representation->setVisible(false);
-	EXPECT_FALSE(representation->isVisible());
+	representation->setDrawAsWireFrame(true);
+	EXPECT_TRUE(representation->getDrawAsWireFrame());
 }
 
 TEST(OsgRepresentationTests, PoseTest)
@@ -124,7 +147,7 @@ TEST(OsgRepresentationTests, MaterialTest)
 
 	{
 		SCOPED_TRACE("Set material");
-		std::shared_ptr<Material> material = std::make_shared<OsgMaterial>();
+		std::shared_ptr<Material> material = std::make_shared<OsgMaterial>("material");
 		EXPECT_TRUE(representation->setMaterial(material));
 		EXPECT_EQ(material, representation->getMaterial());
 	}

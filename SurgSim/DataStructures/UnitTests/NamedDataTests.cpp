@@ -16,6 +16,8 @@
 /// \file
 /// Tests for the NamedData<T> class.
 
+#include <string>
+
 #include "SurgSim/DataStructures/IndexDirectory.h"
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/DataStructures/NamedDataBuilder.h"
@@ -378,3 +380,60 @@ TEST(NamedDataTests, ResetOne)
 	EXPECT_FALSE(data.hasData("second"));
 }
 
+TEST(NamedDataTests, CacheIndex)
+{
+	std::string name = "test";
+	NamedData<bool> data;
+	int index = -1;
+	// invalid NamedData
+	data.cacheIndex(name, &index);
+	EXPECT_EQ(-1, index);
+
+	NamedDataBuilder<bool> builder;
+	builder.addEntry(name);
+	data = builder.createData();
+	// valid NamedData, finds the string
+	data.cacheIndex(name, &index);
+	EXPECT_EQ(0, index);
+
+	// index is >= 0, so nothing happens
+	data.cacheIndex(name + "2", &index);
+	EXPECT_EQ(0, index);
+
+	int index2 = -1;
+	// valid NamedData, string not there
+	data.cacheIndex(name + "2", &index2);
+	EXPECT_EQ(-1, index2);
+}
+
+TEST(NamedDataTests, SetRValue)
+{
+	NamedDataBuilder<std::string> builder;
+	builder.addEntry("test");
+	{
+		NamedData<std::string> data;
+		data = builder.createData();
+
+		std::string setValue = "value";
+		std::string getValue;
+		data.set("test", std::move(setValue));
+		EXPECT_EQ("", setValue);
+
+		data.get("test", &getValue);
+		EXPECT_EQ("value", getValue);
+	}
+	{
+		NamedData<std::string> data;
+		data = builder.createData();
+
+		std::string setValue = "value";
+		std::string getValue;
+		int index = data.getIndex("test");
+
+		data.set(index, std::move(setValue));
+		EXPECT_EQ("", setValue);
+
+		data.get(index, &getValue);
+		EXPECT_EQ("value", getValue);
+	}
+}

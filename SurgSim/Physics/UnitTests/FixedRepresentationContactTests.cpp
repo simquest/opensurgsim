@@ -21,12 +21,9 @@
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationContact.h"
-#include "SurgSim/Physics/FixedRepresentationLocalization.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -53,11 +50,11 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 	poseFixed.setIdentity();
 
 	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("Fixed");
-	fixed->setIsActive(true);
+	fixed->setLocalActive(true);
 	fixed->setIsGravityEnabled(false);
 	fixed->setLocalPose(poseFixed);
 
-	std::shared_ptr<FixedRepresentationLocalization> loc = std::make_shared<FixedRepresentationLocalization>(fixed);
+	auto loc = std::make_shared<FixedRepresentationLocalization>(fixed);
 	loc->setLocalPosition(contactPosition);
 	std::shared_ptr<FixedRepresentationContact> implementation = std::make_shared<FixedRepresentationContact>();
 

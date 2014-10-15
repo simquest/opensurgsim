@@ -16,14 +16,8 @@
 
 
 link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
 
-include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
-)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(IDENTITY_POSE_DEVICE_SOURCES
 	IdentityPoseDevice.cpp

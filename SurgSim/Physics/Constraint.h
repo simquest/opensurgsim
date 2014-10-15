@@ -64,8 +64,8 @@ public:
 	const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>&
 		getImplementations() const;
 
-	/// Gets both sides implementation as a pair.
-	/// \return the pair of implementations forming this constraint.
+	/// Gets both sides Localization as a pair.
+	/// \return the pair of localizations forming this constraint.
 	const std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>>&
 		getLocalizations() const;
 
@@ -92,6 +92,9 @@ public:
 		size_t indexOfRepresentation0,
 		size_t indexOfRepresentation1,
 		size_t indexOfConstraint);
+
+	/// \return Whether this constraint is active.
+	bool isActive();
 
 private:
 	/// Specific data associated to this constraint

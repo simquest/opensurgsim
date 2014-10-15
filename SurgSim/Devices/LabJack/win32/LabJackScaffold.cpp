@@ -61,18 +61,18 @@ std::string formatErrorMessage(LJ_ERROR code)
 	return std::string("LabJackUD returned error code: ") + std::to_string(code) + ", and string: " + error;
 }
 
-/// A struct containing the default settings that depend on the type of LabJack.
+/// A struct containing the default settings that depend on the model of LabJack.
 struct LabJackDefaults
 {
 	LabJackDefaults()
 	{
-		timerBase[LabJackType::LABJACKTYPE_U3] = LabJackTimerBase::LABJACKTIMERBASE_22;
-		timerBase[LabJackType::LABJACKTYPE_U6] = LabJackTimerBase::LABJACKTIMERBASE_22;
-		timerBase[LabJackType::LABJACKTYPE_UE9] = LabJackTimerBase::LABJACKTIMERBASE_1;
+		timerBase[LabJack::MODEL_U3] = LabJack::TIMERBASE_22;
+		timerBase[LabJack::MODEL_U6] = LabJack::TIMERBASE_22;
+		timerBase[LabJack::MODEL_UE9] = LabJack::TIMERBASE_1;
 	}
 
 	/// The default timer base rate.
-	std::unordered_map<LabJackType, LabJackTimerBase> timerBase;
+	std::unordered_map<LabJack::Model, LabJack::TimerBase> timerBase;
 };
 };
 
@@ -80,14 +80,14 @@ class LabJackScaffold::Handle
 {
 public:
 	/// Constructor that attempts to open a device.
-	/// \param deviceType The type of LabJack device to open (see strings in LabJackUD.h).
-	/// \param connectionType How to connect to the device (e.g., USB) (see strings in LabJackUD.h).
+	/// \param model The model of LabJack device to open (see strings in LabJackUD.h).
+	/// \param connection How to connect to the device (e.g., USB) (see strings in LabJackUD.h).
 	/// \param address Either the ID or serial number (if USB), or the IP address.
-	Handle(SurgSim::Device::LabJackType deviceType, SurgSim::Device::LabJackConnection connectionType,
+	Handle(LabJack::Model model, LabJack::Connection connection,
 		const std::string& address) :
 		m_address(address),
-		m_type(deviceType),
-		m_connection(connectionType),
+		m_model(model),
+		m_connection(connection),
 		m_deviceHandle(LABJACK_INVALID_HANDLE),
 		m_scaffold(LabJackScaffold::getOrCreateSharedInstance())
 	{
@@ -115,33 +115,34 @@ public:
 		int firstFound = 0;
 		if (m_address.length() == 0)
 		{
-			firstFound = 1;  // If no address is specified, grab the first device found of this type and connection.
+			firstFound = 1;  // If no address is specified, grab the first device found of this model and connection.
 		}
 
-		const LJ_ERROR error = OpenLabJack(m_type, m_connection, m_address.c_str(), firstFound, &m_deviceHandle);
-		bool result = isOk(error);
-		SURGSIM_LOG_IF(!result, m_scaffold->getLogger(), SEVERE) <<
-			"Failed to initialize a device. Type: " << m_type << ". Connection: " << m_connection << ". Address: '" <<
+		const LJ_ERROR error = OpenLabJack(m_model, m_connection, m_address.c_str(), firstFound, &m_deviceHandle);
+		SURGSIM_LOG_IF(!isOk(error), m_scaffold->getLogger(), SEVERE) <<
+			"Failed to initialize a device. Model: " << m_model << ". Connection: " << m_connection << ". Address: '" <<
 			m_address << "'." << std::endl << formatErrorMessage(error);
 	}
 
-	bool destroy()
+	/// Close communication with the hardware.
+	/// \param reset true to cause a hardware reset & USB re-enumeration.  Otherwise the hardware's settings will be
+	///		unchanged (i.e., it will continue timing, counting, and outputting).
+	/// \return true.
+	bool destroy(bool reset = false)
 	{
-		bool result = false;
 		if (isValid())
 		{
-			// Reset the pin configuration.
-			const LJ_ERROR error = ePut(m_deviceHandle, LJ_ioPIN_CONFIGURATION_RESET, 0, 0, 0);
-			result = isOk(error);
-			SURGSIM_LOG_IF(!result, m_scaffold->getLogger(), SEVERE) <<
-				"Failed to reset a device's pin configuration. Type: " << m_type << ". Connection: " << m_connection <<
-				". Address: '" << m_address << "'." << std::endl << formatErrorMessage(error);
-			if (result)
+			if (reset)
 			{
-				m_deviceHandle = LABJACK_INVALID_HANDLE;
+				const LJ_ERROR error = ResetLabJack(m_deviceHandle);
+				SURGSIM_LOG_IF(!isOk(error), m_scaffold->getLogger(), SEVERE) <<
+					"Failed to reset the LabJack device. Model: " << m_model << ". Connection: " <<
+					m_connection << ". Address: '" << m_address << "'." << std::endl << formatErrorMessage(error);
 			}
+
+			m_deviceHandle = LABJACK_INVALID_HANDLE;
 		}
-		return result;
+		return true;
 	}
 
 	/// \return The LabJackUD's handle wrapped by this Handle.
@@ -159,10 +160,10 @@ private:
 	LJ_HANDLE m_deviceHandle;
 	/// The address used to open the device.  Can be the empty string if the first-found device was opened.
 	std::string m_address;
-	/// The type of the device.
-	SurgSim::Device::LabJackType m_type;
+	/// The device model.
+	LabJack::Model m_model;
 	/// The connection to the device.
-	SurgSim::Device::LabJackConnection m_connection;
+	LabJack::Connection m_connection;
 	/// The scaffold.
 	std::shared_ptr<LabJackScaffold> m_scaffold;
 };
@@ -174,12 +175,14 @@ public:
 	/// Initialize the data, creating a thread.
 	DeviceData(LabJackDevice* device, std::unique_ptr<Handle>&& handle) :
 		deviceObject(device),
-		deviceHandle(std::move(handle)),
 		thread(),
-		digitalInputChannels(device->getDigitalInputChannels()),
-		digitalOutputChannels(device->getDigitalOutputChannels()),
+		deviceHandle(std::move(handle)),
+		digitalInputChannels(device->getDigitalInputs()),
+		digitalOutputChannels(device->getDigitalOutputs()),
 		timerInputChannels(getTimerInputChannels(device->getTimers())),
 		timerOutputChannels(getTimerOutputChannels(device->getTimers())),
+		analogInputs(device->getAnalogInputs()),
+		analogOutputChannels(device->getAnalogOutputs()),
 		cachedOutputIndices(false)
 	{
 	}
@@ -203,6 +206,10 @@ public:
 	const std::unordered_set<int> timerInputChannels;
 	/// The timer channels set for timer outputs (e.g., PWM outputs).
 	const std::unordered_set<int> timerOutputChannels;
+	/// The analog inputs.
+	const std::unordered_map<int, LabJack::AnalogInputSettings> analogInputs;
+	/// The channels set for analog outputs.
+	const std::unordered_set<int> analogOutputChannels;
 	/// The DataGroup indices for the digital outputs.
 	std::unordered_map<int, int> digitalOutputIndices;
 	/// The DataGroup indices for the digital inputs.
@@ -211,6 +218,10 @@ public:
 	std::unordered_map<int, int> timerOutputIndices;
 	/// The DataGroup indices for the timer inputs.
 	std::unordered_map<int, int> timerInputIndices;
+	/// The DataGroup indices for the analog outputs.
+	std::unordered_map<int, int> analogOutputIndices;
+	/// The DataGroup indices for the analog inputs.
+	std::unordered_map<int, int> analogInputIndices;
 	/// True if the output indices have been cached.
 	bool cachedOutputIndices;
 
@@ -218,14 +229,15 @@ private:
 	/// Given all the timers, return just the ones that provide inputs.
 	/// \param timers The timers.
 	/// \return The timers that provide inputs.
-	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int, LabJackTimerMode>& timers) const
+	const std::unordered_set<int> getTimerInputChannels(const std::unordered_map<int,
+		LabJack::TimerSettings>& timers) const
 	{
 		std::unordered_set<int> timersWithInputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 		{
-			if ((timer->second != LABJACKTIMERMODE_PWM16) &&
-				(timer->second != LABJACKTIMERMODE_PWM8) &&
-				(timer->second != LABJACKTIMERMODE_FREQOUT))
+			if ((timer->second.mode != LabJack::TIMERMODE_PWM_16BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_PWM_8BIT) &&
+				(timer->second.mode != LabJack::TIMERMODE_FREQUENCY_OUTPUT))
 			{
 				timersWithInputs.insert(timer->first);
 			}
@@ -236,23 +248,24 @@ private:
 	/// Given all the timers, return just the ones that take outputs.
 	/// \param timers The timers.
 	/// \return The timers that take outputs.
-	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int, LabJackTimerMode>& timers) const
+	const std::unordered_set<int> getTimerOutputChannels(const std::unordered_map<int,
+		LabJack::TimerSettings>& timers) const
 	{
 		std::unordered_set<int> timersWithOutputs;
 		for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
 		{
-			if ((timer->second != LABJACKTIMERMODE_PWM16) &&
-				(timer->second != LABJACKTIMERMODE_PWM8) &&
-				(timer->second != LABJACKTIMERMODE_RISINGEDGES32) &&
-				(timer->second != LABJACKTIMERMODE_FALLINGEDGES32) &&
-				(timer->second != LABJACKTIMERMODE_DUTYCYCLE) &&
-				(timer->second != LABJACKTIMERMODE_FIRMCOUNTER) &&
-				(timer->second != LABJACKTIMERMODE_FIRMCOUNTERDEBOUNCE) &&
-				(timer->second != LABJACKTIMERMODE_FREQOUT) &&
-				(timer->second != LABJACKTIMERMODE_QUAD) &&
-				(timer->second != LABJACKTIMERMODE_RISINGEDGES16) &&
-				(timer->second != LABJACKTIMERMODE_FALLINGEDGES16) &&
-				(timer->second != LABJACKTIMERMODE_LINETOLINE))
+			if ((timer->second.mode == LabJack::TIMERMODE_PWM_16BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_PWM_8BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_RISING_EDGES_32BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_FALLING_EDGES_32BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_DUTY_CYCLE) ||
+				(timer->second.mode == LabJack::TIMERMODE_FIRMWARE_COUNTER) ||
+				(timer->second.mode == LabJack::TIMERMODE_FIRMWARE_COUNTER_DEBOUNCED) ||
+				(timer->second.mode == LabJack::TIMERMODE_FREQUENCY_OUTPUT) ||
+				(timer->second.mode == LabJack::TIMERMODE_QUADRATURE) ||
+				(timer->second.mode == LabJack::TIMERMODE_RISING_EDGES_16BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_FALLING_EDGES_16BIT) ||
+				(timer->second.mode == LabJack::TIMERMODE_LINE_TO_LINE))
 			{
 				timersWithOutputs.insert(timer->first);
 			}
@@ -338,24 +351,24 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 	}
 
 	// Make sure the combination of connection and address is unique, unless the address is zero-length, in which
-	// case the first-found device of this type on this connection will be opened.
+	// case the first-found device of this model on this connection will be opened.
 	const std::string& address = device->getAddress();
 	if (result && (address.length() > 0))
 	{
-		const SurgSim::Device::LabJackType deviceType = device->getType();
-		const SurgSim::Device::LabJackConnection connectionType = device->getConnection();
+		const LabJack::Model model = device->getModel();
+		const LabJack::Connection connection = device->getConnection();
 
 		auto const sameInitialization = std::find_if(m_state->activeDeviceList.cbegin(),
 			m_state->activeDeviceList.cend(),
-			[&address, connectionType, deviceType](const std::unique_ptr<DeviceData>& info)
+			[&address, connection, model](const std::unique_ptr<DeviceData>& info)
 		{ return (info->deviceObject->getAddress() == address) &&
-				(info->deviceObject->getConnection() == connectionType) &&
-				(info->deviceObject->getType() == deviceType); });
+				(info->deviceObject->getConnection() == connection) &&
+				(info->deviceObject->getModel() == model); });
 
 		if (sameInitialization != m_state->activeDeviceList.cend())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Tried to register a device named '" << device->getName() <<
-				"', but a device with the same type (" << deviceType << "), connection (" << connectionType <<
+				"', but a device with the same model (" << model << "), connection (" << connection <<
 				"), and address ('" << address << "') is already present!";
 			result = false;
 		}
@@ -364,27 +377,27 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 	if (result)
 	{
 		// Create a handle, opening communications.
-		// If the device's type or connection are SEARCH, iterate over the options.
-		std::vector<LabJackType> typesToSearch;
-		if (device->getType() == LABJACKTYPE_SEARCH)
+		// If the device's model or connection are SEARCH, iterate over the options.
+		std::vector<LabJack::Model> modelsToSearch;
+		if (device->getModel() == LabJack::MODEL_SEARCH)
 		{
-			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": searching for types U3, U6, and UE9.";
-			typesToSearch.push_back(LABJACKTYPE_U6);
-			typesToSearch.push_back(LABJACKTYPE_U3);
-			typesToSearch.push_back(LABJACKTYPE_UE9);
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": searching for models U3, U6, and UE9.";
+			modelsToSearch.push_back(LabJack::MODEL_U6);
+			modelsToSearch.push_back(LabJack::MODEL_U3);
+			modelsToSearch.push_back(LabJack::MODEL_UE9);
 		}
 		else
 		{
-			typesToSearch.push_back(device->getType());
+			modelsToSearch.push_back(device->getModel());
 		}
 
-		std::vector<LabJackConnection> connectionsToSearch;
-		if (device->getConnection() == LABJACKCONNECTION_SEARCH)
+		std::vector<LabJack::Connection> connectionsToSearch;
+		if (device->getConnection() == LabJack::CONNECTION_SEARCH)
 		{
 			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() <<
 				": searching for connections USB and Ethernet.";
-			connectionsToSearch.push_back(LABJACKCONNECTION_USB);
-			connectionsToSearch.push_back(LABJACKCONNECTION_ETHERNET);
+			connectionsToSearch.push_back(LabJack::CONNECTION_USB);
+			connectionsToSearch.push_back(LabJack::CONNECTION_ETHERNET);
 		}
 		else
 		{
@@ -392,14 +405,14 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 		}
 
 		std::unique_ptr<Handle> handle;
-		for (auto type = typesToSearch.cbegin(); type != typesToSearch.cend(); ++type)
+		for (auto model = modelsToSearch.cbegin(); model != modelsToSearch.cend(); ++model)
 		{
 			for (auto connection = connectionsToSearch.cbegin(); connection != connectionsToSearch.cend(); ++connection)
 			{
-				device->setType(*type);
+				device->setModel(*model);
 				device->setConnection(*connection);
 
-				handle = std::unique_ptr<Handle>(new Handle(*type, *connection, address));
+				handle = std::unique_ptr<Handle>(new Handle(*model, *connection, address));
 				result = handle->isValid();
 				if (result)
 				{
@@ -439,24 +452,32 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 				input != info->digitalInputChannels.cend();
 				++input)
 			{
-				info->digitalInputIndices[*input] =
-					inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
-					std::to_string(*input));
+				const std::string name = SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(*input);
+				info->digitalInputIndices[*input] = inputData.booleans().getIndex(name);
 				SURGSIM_ASSERT(info->digitalInputIndices[*input] >= 0) << "LabJackScaffold::DeviceData " <<
 					"failed to get a valid NamedData index for the digital input for line " << *input <<
-					".  Make sure that is a valid line number.";
+					".  Make sure that is a valid line number.  Expected an entry named " << name << ".";
 			}
 
 			for (auto timer = info->timerInputChannels.cbegin();
 				timer != info->timerInputChannels.cend();
 				++timer)
 			{
-				info->timerInputIndices[*timer] =
-					inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
-					std::to_string(*timer));
+				const std::string name = SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX + std::to_string(*timer);
+				info->timerInputIndices[*timer] = inputData.scalars().getIndex(name);
 				SURGSIM_ASSERT(info->timerInputIndices[*timer] >= 0) << "LabJackScaffold::DeviceData " <<
 					"failed to get a valid NamedData index for the timer for channel " << *timer <<
-					".  Make sure that is a valid timer number.";
+					".  Make sure that is a valid timer number.  Expected an entry named " << name << ".";
+			}
+
+			for (auto input = info->analogInputs.cbegin(); input != info->analogInputs.cend(); ++input)
+			{
+				std::string name = SurgSim::DataStructures::Names::ANALOG_INPUT_PREFIX + std::to_string(input->first);
+				info->analogInputIndices[input->first] = inputData.scalars().getIndex(name);
+				SURGSIM_ASSERT(info->analogInputIndices[input->first] >= 0) <<
+					"LabJackScaffold::DeviceData failed to get a valid NamedData index for the " <<
+					"analog input for channel " << input->first << ".  Make sure that is a valid line number.  " <<
+					"Expected an entry named " << name << ".";
 			}
 
 			std::unique_ptr<LabJackThread> thread(new LabJackThread(this, info.get()));
@@ -483,7 +504,7 @@ bool LabJackScaffold::unregisterDevice(const LabJackDevice* const device)
 			if ((*matching)->thread)
 			{
 				destroyPerDeviceThread(matching->get());
-				matching->get()->deviceHandle->destroy();
+				matching->get()->deviceHandle->destroy(matching->get()->deviceObject->getResetOnDestruct());
 			}
 			m_state->activeDeviceList.erase(matching);
 			// the iterator is now invalid but that's OK
@@ -501,9 +522,7 @@ bool LabJackScaffold::unregisterDevice(const LabJackDevice* const device)
 
 bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 {
-	info->deviceObject->pullOutput();
-
-	if (!info->cachedOutputIndices)
+	if (info->deviceObject->pullOutput() && !info->cachedOutputIndices)
 	{
 		const SurgSim::DataStructures::DataGroup& initialOutputData = info->deviceObject->getOutputData();
 
@@ -511,7 +530,7 @@ bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 		for (auto output = digitalOutputChannels.cbegin(); output != digitalOutputChannels.cend(); ++output)
 		{
 			info->digitalOutputIndices[*output] =
-				initialOutputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX +
+				initialOutputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX +
 				std::to_string(*output));
 		}
 
@@ -523,14 +542,25 @@ bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 				std::to_string(*timer));
 		}
 
+		const std::unordered_set<int>& analogOutputChannels = info->analogOutputChannels;
+		for (auto output = analogOutputChannels.cbegin(); output != analogOutputChannels.cend(); ++output)
+		{
+			info->analogOutputIndices[*output] =
+				initialOutputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_OUTPUT_PREFIX +
+				std::to_string(*output));
+		}
+
 		info->cachedOutputIndices = true;
 	}
 
-	if (!updateDevice(info))
+	if (!info->deviceObject->hasOutputProducer() || info->cachedOutputIndices)
 	{
-		return false;
+		if (!updateDevice(info))
+		{
+			return false;
+		}
+		info->deviceObject->pushInput();
 	}
-	info->deviceObject->pushInput();
 	return true;
 }
 
@@ -560,15 +590,16 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			const int index = info->digitalOutputIndices[*output];
 			SURGSIM_ASSERT(index >= 0) << "LabJackScaffold: A LabJackDevice was configured with line " << *output <<
 				" set to digital output, but the scaffold does not know the correct index into the NamedData. " <<
-				" Make sure there is an entry in the scalars with the correct string key.";
+				" Make sure there is an entry in the booleans with the correct string key.";
 
-			double value;
-			if (outputData.scalars().get(index, &value))
+			bool value;
+			if (outputData.booleans().get(index, &value))
 			{
-				const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_DIGITAL_BIT, *output, value, 0, 0);
+				const double valueToSend = (value ? 1.0 : 0.0);
+				const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_DIGITAL_BIT, *output, valueToSend, 0, 0);
 				SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
 					"Failed to set digital output for a device named '" << info->deviceObject->getName() <<
-					"', line number " << *output << ", value " << value << "." <<
+					"', line number " << *output << ", value " << valueToSend << "." <<
 					std::endl << formatErrorMessage(error);
 			}
 		}
@@ -607,33 +638,74 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 			"', channel number " << *timer << "." << std::endl << formatErrorMessage(error);
 	}
 
+	// Request the values of analog inputs.
+	auto const& analogInputs = info->analogInputs;
+	for (auto input = analogInputs.cbegin(); input != analogInputs.cend(); ++input)
+	{
+		if (input->second.negativeChannel.hasValue())
+		{
+			const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_AIN_DIFF, input->first, 0,
+				input->second.negativeChannel.getValue(), 0);
+			SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
+				"Failed to request differential analog input for a device named '" << info->deviceObject->getName() <<
+				"', positive channel " << input->first << ", negative channel " <<
+				input->second.negativeChannel.getValue() << "." << std::endl << formatErrorMessage(error);
+		}
+		else
+		{
+			const LJ_ERROR error = AddRequest(rawHandle, LJ_ioGET_AIN, input->first, 0, 0, 0);
+			SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
+				"Failed to request single-ended analog input for a device named '" << info->deviceObject->getName() <<
+				"', channel " << input->first << "." << std::endl << formatErrorMessage(error);
+		}
+	}
+
+	// Request to set analog outputs.
+	const std::unordered_set<int>& analogOutputChannels = info->analogOutputChannels;
+	for (auto output = analogOutputChannels.cbegin(); output != analogOutputChannels.cend(); ++output)
+	{
+		if (info->analogOutputIndices.count(*output) > 0)
+		{
+			const int index = info->analogOutputIndices[*output];
+			SURGSIM_ASSERT(index >= 0) << "LabJackScaffold: A LabJackDevice was configured with line " << *output <<
+				" set to analog output, but the scaffold does not know the correct index into the NamedData. " <<
+				" Make sure there is an entry in the scalars with the correct string key.";
+
+			double value;
+			if (outputData.scalars().get(index, &value))
+			{
+				const LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_DAC, *output, value, 0, 0);
+				SURGSIM_LOG_IF(!isOk(error), m_logger, WARNING) <<
+					"Failed to set analog output for a device named '" << info->deviceObject->getName() <<
+					"', line number " << *output << ", value " << value << "." <<
+					std::endl << formatErrorMessage(error);
+			}
+		}
+	}
+
 	// GoOne, telling this specific LabJack to perform the requests.
 	const LJ_ERROR error = GoOne(rawHandle);
-	bool result = isOk(error);
-	SURGSIM_LOG_IF(!result, m_logger, WARNING) <<
-		"Failed to submit requests for a device named '" << info->deviceObject->getName() << "." <<
-		std::endl << formatErrorMessage(error);
 
 	// Finally we get the results.
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	if (result)
+	if (isOk(error))
 	{
 		// Digital inputs.
 		for (auto input = digitalInputChannels.cbegin(); input != digitalInputChannels.cend(); ++input)
 		{
 			double value;
 			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_DIGITAL_BIT, *input, &value);
-			result = isOk(error);
-			SURGSIM_LOG_IF(!result, m_logger, WARNING) <<
-				"Failed to get digital input for a device named '" << info->deviceObject->getName() <<
-				"', line number " << *input << "." << std::endl << formatErrorMessage(error);
-			if (result)
+			if (isOk(error))
 			{
-				inputData.scalars().set(info->digitalInputIndices[*input], value);
+				const bool valueToSet = value > 0.5 ? true : false;
+				inputData.booleans().set(info->digitalInputIndices[*input], valueToSet);
 			}
 			else
 			{
-				inputData.scalars().reset(info->digitalInputIndices[*input]);
+				SURGSIM_LOG_WARNING(m_logger) << "Failed to get digital input for a device named '" <<
+					info->deviceObject->getName() << "', line number " << *input << "." << std::endl <<
+					formatErrorMessage(error);
+				inputData.booleans().reset(info->digitalInputIndices[*input]);
 			}
 		}
 
@@ -642,22 +714,60 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 		{
 			double value;
 			const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_TIMER, *timer, &value);
-			result = isOk(error);
-			SURGSIM_LOG_IF(!result, m_logger, WARNING) <<
-				"Failed to get timer input for a device named '" << info->deviceObject->getName() <<
-				"', channel number " << *timer << "." << std::endl << formatErrorMessage(error);
-			if (result)
+			if (isOk(error))
 			{
 				inputData.scalars().set(info->timerInputIndices[*timer], value);
 			}
 			else
 			{
+				SURGSIM_LOG_WARNING(m_logger) << "Failed to get timer input for a device named '" <<
+					info->deviceObject->getName() << "', channel number " << *timer << "." << std::endl <<
+					formatErrorMessage(error);
 				inputData.scalars().reset(info->timerInputIndices[*timer]);
+			}
+		}
+
+		// Analog inputs.
+		for (auto input = analogInputs.cbegin(); input != analogInputs.cend(); ++input)
+		{
+			double value;
+			if (input->second.negativeChannel.hasValue())
+			{
+				const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_AIN_DIFF, input->first, &value);
+				if (isOk(error))
+				{
+					inputData.scalars().set(info->analogInputIndices[input->first], value);
+				}
+				else
+				{
+					SURGSIM_LOG_WARNING(m_logger) << "Failed to get differential analog input for a device named '" <<
+						info->deviceObject->getName() << "', positive channel " << input->first <<
+						", negative channel " << input->second.negativeChannel.getValue() << "." << std::endl
+						<< formatErrorMessage(error);
+					inputData.scalars().reset(info->analogInputIndices[input->first]);
+				}
+			}
+			else
+			{
+				const LJ_ERROR error = GetResult(rawHandle, LJ_ioGET_AIN, input->first, &value);
+				if (isOk(error))
+				{
+					inputData.scalars().set(info->analogInputIndices[input->first], value);
+				}
+				else
+				{
+					SURGSIM_LOG_WARNING(m_logger) << "Failed to get single-ended analog input for a device named '" <<
+						info->deviceObject->getName() << "', channel " << input->first << "." << std::endl <<
+						formatErrorMessage(error);
+					inputData.scalars().reset(info->analogInputIndices[input->first]);
+				}
 			}
 		}
 	}
 	else
 	{
+		SURGSIM_LOG_WARNING(m_logger) << "Failed to submit requests for a device named '" <<
+			info->deviceObject->getName() << "." << std::endl << formatErrorMessage(error);
 		inputData.resetAll();
 	}
 
@@ -683,13 +793,19 @@ SurgSim::DataStructures::DataGroup LabJackScaffold::buildDeviceInputData()
 	const int maxDigitalInputs = 23; // The UE9 can have 23 digital inputs.
 	for (int i = 0; i < maxDigitalInputs; ++i)
 	{
-		builder.addScalar(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(i));
+		builder.addBoolean(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX + std::to_string(i));
 	}
 
 	const int maxTimerInputs = 6; // The UE9 can have 6 timers.
 	for (int i = 0; i < maxTimerInputs; ++i)
 	{
 		builder.addScalar(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX + std::to_string(i));
+	}
+
+	const int maxAnalogInputs = 16; // The U3 can have 16 analog inputs.
+	for (int i = 0; i < maxAnalogInputs; ++i)
+	{
+		builder.addScalar(SurgSim::DataStructures::Names::ANALOG_INPUT_PREFIX + std::to_string(i));
 	}
 	return builder.createData();
 }
@@ -702,91 +818,210 @@ std::shared_ptr<LabJackScaffold> LabJackScaffold::getOrCreateSharedInstance()
 
 bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 {
-	bool result = true;
-
-	LabJackDevice* device = deviceData->deviceObject;
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
 	// Reset the configuration.
-	const LJ_ERROR error = ePut(rawHandle, LJ_ioPIN_CONFIGURATION_RESET, 0, 0, 0);
-	result = isOk(error);
+	LJ_ERROR error = ePut(rawHandle, LJ_ioPIN_CONFIGURATION_RESET, 0, 0, 0);
+	bool result = isOk(error);
 	SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
-		"Failed to reset configuration for a device named '" << device->getName() << "." <<
+		"Failed to reset configuration for a device named '" << deviceData->deviceObject->getName() << "." <<
 		std::endl << formatErrorMessage(error);
 
-	// One-time configuration of counters.  Counters are not yet supported so they are explicitly disabled.
+	return result && configureClockAndTimers(deviceData) && configureDigital(deviceData) && configureAnalog(deviceData);
+}
+
+bool LabJackScaffold::configureClockAndTimers(DeviceData* deviceData)
+{
+	bool result = configureNumberOfTimers(deviceData);
+
+	if (result && (deviceData->deviceObject->getTimers().size() > 0))
+	{
+		result = configureClock(deviceData) && configureTimers(deviceData);
+	}
+	return result;
+}
+
+bool LabJackScaffold::configureNumberOfTimers(DeviceData* deviceData)
+{
+	LabJackDevice* device = deviceData->deviceObject;
+	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
+
+	const std::unordered_map<int, LabJack::TimerSettings>& timers = device->getTimers();
+
+	for (auto timer : timers)
+	{
+		SURGSIM_LOG_IF(timer.first >= static_cast<int>(timers.size()), m_logger, SEVERE) <<
+			"Error configuring enabled timers for a device named '" << device->getName() <<
+			"', with number of timers: " << timers.size() << "." << std::endl <<
+			"  Timers must be enabled consecutively, starting with #0." << std::endl <<
+			"  With the currently enabled number of timers, the highest allowable timer is #" <<
+			timers.size() - 1 << ", but one of the enabled timers is #" << timer.first << "." << std::endl;
+	}
+
+	LJ_ERROR error =
+		ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, static_cast<double>(timers.size()), 0);
+	bool result = isOk(error);
+	SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+		"Failed to configure number of enabled timers for a device named '" << device->getName() <<
+		"', with number of timers " << timers.size() << "." << std::endl << formatErrorMessage(error);
+
+	// Counters are not yet supported so they are explicitly disabled.
 	const int numberOfChannels = 2; // The LabJack U3, U6, and UE9 models each have two counters.
 	for (int channel = 0; channel < numberOfChannels; ++channel)
 	{
 		const int enable = 0; // Disable both counters.
 		const LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_COUNTER_ENABLE, channel, enable, 0);
 		result = result && isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 			"Failed to enable/disable counter for a device named '" << device->getName() << "." <<
 			std::endl << formatErrorMessage(error);
 	}
 
-	// One-time configuration of timers
-	const std::unordered_map<int,LabJackTimerMode> timers = device->getTimers();
-	if (timers.size() > 0)
+	error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_COUNTER_PIN_OFFSET, device->getTimerCounterPinOffset(), 0);
+	result = result && isOk(error);
+	SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+		"Failed to configure timer/counter pin offset for a device named '" << device->getName() <<
+		"', with offset " << device->getTimerCounterPinOffset() << "." << std::endl << formatErrorMessage(error);
+
+	return result;
+}
+
+bool LabJackScaffold::configureClock(DeviceData* deviceData)
+{
+	LabJackDevice* device = deviceData->deviceObject;
+	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
+
+	LabJack::TimerBase base = device->getTimerBase();
+	if (base == LabJack::TIMERBASE_DEFAULT)
 	{
-		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_COUNTER_PIN_OFFSET,
-			device->getTimerCounterPinOffset(), 0);
-		result = result && isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
-			"Failed to configure timer/counter pin offset for a device named '" << device->getName() <<
-			"', with offset " << device->getTimerCounterPinOffset() << "." << std::endl << formatErrorMessage(error);
+		LabJackDefaults defaults;
+		base = defaults.timerBase[device->getModel()];
+	}
+	LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_BASE, base, 0);
+	bool result = isOk(error);
+	SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+		"Failed to configure the timer base rate for a device named '" << device->getName() <<
+		"', with timer base " << device->getTimerBase() << "." << std::endl << formatErrorMessage(error);
 
-		LabJackTimerBase base = device->getTimerBase();
-		if (base == LABJACKTIMERBASE_DEFAULT)
+	error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_DIVISOR, device->getTimerClockDivisor(), 0);
+	result = result && isOk(error);
+	SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+		"Failed to configure the timer/clock divisor for a device named '" << device->getName() <<
+		"', with divisor " << device->getTimerClockDivisor() << "." << std::endl << formatErrorMessage(error);
+
+	return result;
+}
+
+bool LabJackScaffold::configureTimers(DeviceData* deviceData)
+{
+	LabJackDevice* device = deviceData->deviceObject;
+	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
+
+	bool result = true;
+
+	const std::unordered_map<int, LabJack::TimerSettings>& timers = device->getTimers();
+	for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
+	{
+		LJ_ERROR error = AddRequest(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, timer->second.mode, 0, 0);
+		result = result && isOk(error);
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+			"Failed to configure a timer for a device named '" << device->getName() <<
+			"', timer number " << timer->first << ", with mode code " << timer->second.mode << "." <<
+			std::endl << formatErrorMessage(error);
+		if (result && (timer->second.initialValue.hasValue()))
 		{
-			LabJackDefaults defaults;
-			base = defaults.timerBase[device->getType()];
+			error = AddRequest(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, timer->second.initialValue.getValue(), 0,
+				0);
+			result = result && isOk(error);
+			SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+				"Failed to set the initial value for a timer for a device named '" << device->getName() <<
+				"', timer number " << timer->first << ", with mode code " << timer->second.mode <<
+				", and value " << timer->second.initialValue.getValue() << "."  << std::endl <<
+				formatErrorMessage(error);
 		}
-		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_BASE, base, 0);
-		result = result && isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
-			"Failed to configure the timer base rate for a device named '" << device->getName() <<
-			"', with timer base " << device->getTimerBase() << "." << std::endl << formatErrorMessage(error);
-
-		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chTIMER_CLOCK_DIVISOR, device->getTimerClockDivisor(), 0);
-		result = result && isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
-			"Failed to configure the timer/clock divisor for a device named '" << device->getName() <<
-			"', with divisor " << device->getTimerClockDivisor() << "." << std::endl << formatErrorMessage(error);
-
-		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chNUMBER_TIMERS_ENABLED, timers.size(), 0);
-		result = result && isOk(error);
-		SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
-			"Failed to configure number of enabled timers for a device named '" << device->getName() <<
-			"', with number of timers " << timers.size() << "." << std::endl << formatErrorMessage(error);
 
 		if (result)
 		{
-			for (auto timer = timers.cbegin(); timer != timers.cend(); ++timer)
+			error = GoOne(rawHandle);
+			result = result && isOk(error);
+
+			double value;
+			error = GetResult(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, &value);
+			result = result && isOk(error);
+
+			if (result && timer->second.initialValue.hasValue())
 			{
-				error = ePut(rawHandle, LJ_ioPUT_TIMER_MODE, timer->first, timer->second, 0);
+				error = GetResult(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, &value);
 				result = result && isOk(error);
-				SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
-					"Failed to configure a timer for a device named '" << device->getName() <<
-					"', timer number " << timer->first << ", with mode code " << timer->second << "." <<
-					std::endl << formatErrorMessage(error);
-				if (result &&
-					((timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM8) ||
-					 (timer->second == LabJackTimerMode::LABJACKTIMERMODE_PWM16)))
-				{  // Initialize PWMs to almost-always low.
-					const int value = 65535; // the value corresponding to a PWM that is low as much as possible.
-					error = ePut(rawHandle, LJ_ioPUT_TIMER_VALUE, timer->first, value, 0);
-					result = result && isOk(error);
-					SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
-						"Failed to set the initial value for a PWM timer for a device named '" << device->getName() <<
-						"', timer number " << timer->first << ", with mode code " << timer->second <<
-						", and value " << value << "."  << std::endl << formatErrorMessage(error);
-				}
 			}
+
+			SURGSIM_LOG_IF(!result, m_logger, SEVERE) <<
+				"Failed to configure timer for a device named '" << device->getName() <<
+				"', timer number " << timer->first << ", with mode code " << timer->second.mode <<
+				"."  << std::endl << formatErrorMessage(error);
 		}
 	}
+
 	return result;
+}
+
+bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
+{
+	LabJackDevice* device = deviceData->deviceObject;
+	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
+
+	bool result = true;
+
+	const std::unordered_set<int>& analogOutputs = deviceData->analogOutputChannels;
+	for (auto output = analogOutputs.cbegin(); output != analogOutputs.cend(); ++output)
+	{
+		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_DAC_ENABLE, *output, 1, 0);
+		result = result && isOk(error);
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+			"Failed to enable analog output for a device named '" << device->getName() <<
+			"', channel " << *output << "." << std::endl << formatErrorMessage(error);
+	}
+
+	auto const& analogInputs = deviceData->analogInputs;
+	if (analogInputs.size() > 0)
+	{
+		LJ_ERROR error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chAIN_RESOLUTION, device->getAnalogInputResolution(), 0);
+		result = result && isOk(error);
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+			"Failed to configure analog input resolution for a device named '" << device->getName() <<
+			"', with resolution code " << device->getAnalogInputResolution() << "." << std::endl <<
+			formatErrorMessage(error);
+
+		error = ePut(rawHandle, LJ_ioPUT_CONFIG, LJ_chAIN_SETTLING_TIME, device->getAnalogInputSettling(), 0);
+		result = result && isOk(error);
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+			"Failed to configure analog input settling time for a device named '" << device->getName() <<
+			"', with settling time code " << device->getAnalogInputSettling() << "." << std::endl <<
+			formatErrorMessage(error);
+
+		for (auto input = analogInputs.cbegin(); input != analogInputs.cend(); ++input)
+		{
+			error = ePut(rawHandle, LJ_ioPUT_ANALOG_ENABLE_BIT, input->first, 1, 0);
+			result = result && isOk(error);
+			SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+				"Failed to enable analog input for a device named '" << device->getName() <<
+				"', channel " << input->first << "." << std::endl << formatErrorMessage(error);
+
+			error = ePut(rawHandle, LJ_ioPUT_AIN_RANGE, input->first, input->second.range, 0);
+			result = result && isOk(error);
+			SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
+				"Failed to set the range for an analog input for a device named '" << device->getName() <<
+				"', channel " << input->first << ", with range code " << input->second.range << "." <<
+				std::endl << formatErrorMessage(error);
+		}
+	}
+
+	return result;
+}
+
+bool LabJackScaffold::configureDigital(DeviceData* deviceData)
+{
+	return true;
 }
 
 std::shared_ptr<SurgSim::Framework::Logger> LabJackScaffold::getLogger() const

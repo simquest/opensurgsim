@@ -18,14 +18,15 @@ include_directories (
 )
 
 set(UNIT_TEST_SOURCES
+	KeyboardTogglesComponentBehaviorTests.cpp
 	MassSpring1DRepresentationTests.cpp
 	MassSpring2DRepresentationTests.cpp
 	MassSpring3DRepresentationTests.cpp
 	MassSpringNDRepresentationUtilsTests.cpp
 	PoseInterpolatorTests.cpp
 	SpringTestUtils.cpp
-	TransferOdeStateToVerticesBehaviorTests.cpp
-	TransferPhysicsToGraphicsMeshBehavior.cpp
+	TransferPhysicsToGraphicsMeshBehaviorTests.cpp
+	TransferPhysicsToPointCloudBehaviorTests.cpp
 	VisualizeContactsBehaviorTests.cpp
 )
 

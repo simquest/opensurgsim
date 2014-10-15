@@ -29,13 +29,11 @@
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationContact.h"
-#include "SurgSim/Physics/FixedRepresentationLocalization.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/MlcpPhysicsSolution.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::Shape;
@@ -77,12 +75,10 @@ public:
 		std::shared_ptr<RigidRepresentation> rigidSphereRepresentation;
 		rigidSphereRepresentation = std::make_shared<RigidRepresentation>("RigidSphere");
 		{
-			RigidRepresentationParameters param;
 			double radius = 1e-2;
-			param.setDensity(1000);
 			std::shared_ptr<Shape> shape = std::make_shared<SphereShape>(radius);
-			param.setShapeUsedForMassInertia(shape);
-			rigidSphereRepresentation->setInitialParameters(param);
+			rigidSphereRepresentation->setShape(shape);
+			rigidSphereRepresentation->setDensity(1000);
 			rigidSphereRepresentation->setIsGravityEnabled(false);
 			{
 				// Simply do 1 time step to make sure things are initialized (compliance matrix...)
@@ -96,12 +92,10 @@ public:
 		// Create a Rigid Box
 		std::shared_ptr<RigidRepresentation> rigidBoxRepresentation = std::make_shared<RigidRepresentation>("RigidBox");
 		{
-			RigidRepresentationParameters param;
 			double size[3]={0.01, 0.02, 0.03};
-			param.setDensity(1000);
+			rigidBoxRepresentation->setDensity(1000);
 			std::shared_ptr<Shape> shape = std::make_shared<BoxShape>(size[0], size[1], size[2]);
-			param.setShapeUsedForMassInertia(shape);
-			rigidBoxRepresentation->setInitialParameters(param);
+			rigidBoxRepresentation->setShape(shape);
 			rigidBoxRepresentation->setIsGravityEnabled(false);
 			{
 				// Simply do 1 time step to make sure things are initialized (compliance matrix...)

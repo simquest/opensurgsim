@@ -21,12 +21,9 @@
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationContact.h"
-#include "SurgSim/Physics/FixedRepresentationLocalization.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -115,30 +112,26 @@ protected:
 		m_poseRigid.setIdentity();
 
 		m_rigid = std::make_shared<RigidRepresentation>("Rigid");
-		m_rigid->setIsActive(true);
+		m_rigid->setLocalActive(true);
 		m_rigid->setIsGravityEnabled(false);
 		m_rigid->setLocalPose(m_poseRigid);
 		{
-			RigidRepresentationParameters param;
-			param.setDensity(1000.0);
+			m_rigid->setDensity(1000.0);
 			std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(m_radius);
-			param.setShapeUsedForMassInertia(shape);
-			m_rigid->setInitialParameters(param);
+			m_rigid->setShape(shape);
 		}
 		m_numDof += m_rigid->getNumDof();
 
 		m_indexPlaneRepresentation = m_indexSphereRepresentation + m_rigid->getNumDof();
 		m_fixed = std::make_shared<FixedRepresentation>("Fixed");
-		m_fixed->setIsActive(true);
+		m_fixed->setLocalActive(true);
 		m_fixed->setIsGravityEnabled(false);
 		m_fixed->setLocalPose(m_poseFixed);
 		m_numDof += m_fixed->getNumDof();
 
-		std::shared_ptr<FixedRepresentationLocalization> locFixedPlane;
-		locFixedPlane = std::make_shared<FixedRepresentationLocalization>(m_fixed);
+		auto locFixedPlane = std::make_shared<FixedRepresentationLocalization>(m_fixed);
 		m_locFixedPlane = locFixedPlane;
-		std::shared_ptr<RigidRepresentationLocalization> locRigidSphere;
-		locRigidSphere = std::make_shared<RigidRepresentationLocalization>(m_rigid);
+		auto locRigidSphere = std::make_shared<RigidRepresentationLocalization>(m_rigid);
 		m_locRigidSphere = locRigidSphere;
 
 		locFixedPlane->setLocalPosition(m_contactPositionPlane);

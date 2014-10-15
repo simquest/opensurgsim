@@ -49,6 +49,42 @@ bool Computation::isCopyingState()
 
 std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std::shared_ptr<PhysicsManagerState>& state)
 {
+	// Compile the list of active representations and set it on the state.
+	std::vector<std::shared_ptr<Representation>> activeRepresentations;
+	auto representations = state->getRepresentations();
+	activeRepresentations.reserve(representations.size());
+	for (auto it = representations.begin(); it != representations.end(); ++it)
+	{
+		if ((*it)->isActive())
+		{
+			activeRepresentations.push_back(*it);
+		}
+	}
+	state->setActiveRepresentations(activeRepresentations);
+
+	// Compile the list of active constraints and set it on the state.
+	std::vector<std::shared_ptr<Constraint>> activeConstraints;
+	size_t size = 0;
+	int constraintTypeEnd = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);
+	for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
+	{
+		size += state->getConstraintGroup(constraintType).size();
+	}
+	activeConstraints.reserve(size);
+
+	for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
+	{
+		auto constraints = state->getConstraintGroup(constraintType);
+		for (auto it = constraints.begin(); it != constraints.end(); it++)
+		{
+			if ((*it)->isActive())
+			{
+				activeConstraints.push_back(*it);
+			}
+		}
+	}
+	state->setActiveConstraints(activeConstraints);
+
 	if (m_copyState)
 	{
 		return std::move(std::make_shared<PhysicsManagerState>(*state));

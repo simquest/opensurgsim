@@ -22,8 +22,6 @@
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -55,18 +53,13 @@ TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 	poseRigid.setIdentity();
 
 	std::shared_ptr<RigidRepresentation> rigid = std::make_shared<RigidRepresentation>("Rigid");
-	rigid->setIsActive(true);
+	rigid->setLocalActive(true);
 	rigid->setIsGravityEnabled(false);
 	rigid->setLocalPose(poseRigid);
-	{
-		RigidRepresentationParameters param;
-		param.setDensity(1000.0);
-		std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(radius);
-		param.setShapeUsedForMassInertia(shape);
-		rigid->setInitialParameters(param);
-	}
+	rigid->setDensity(1000.0);
+	rigid->setShape(std::make_shared<SphereShape>(radius));
 
-	std::shared_ptr<RigidRepresentationLocalization> loc = std::make_shared<RigidRepresentationLocalization>(rigid);
+	auto loc = std::make_shared<RigidRepresentationLocalization>(rigid);
 	loc->setLocalPosition(contactPosition);
 	std::shared_ptr<RigidRepresentationContact> implementation = std::make_shared<RigidRepresentationContact>();
 

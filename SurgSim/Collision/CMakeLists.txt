@@ -13,11 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
-)
-
 set(SURGSIM_COLLISION_SOURCES
 	BoxCapsuleDcdContact.cpp
 	BoxDoubleSidedPlaneDcdContact.cpp
@@ -47,7 +42,6 @@ set(SURGSIM_COLLISION_HEADERS
 	ContactCalculation.h
 	DcdCollision.h
 	DefaultContactCalculation.h
-	Location.h
 	OctreeDcdContact.h
 	Representation.h
 	ShapeCollisionRepresentation.h
@@ -68,7 +62,6 @@ surgsim_add_library(
 SET(LIBS
 	SurgSimFramework
 	SurgSimMath
-	SurgSimPhysics
 	${Boost_LIBRARIES}
 )
 

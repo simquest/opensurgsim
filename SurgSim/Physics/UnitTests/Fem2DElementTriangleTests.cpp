@@ -18,6 +18,7 @@
 #include <memory>
 #include <array>
 
+#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/GaussLegendreQuadrature.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"

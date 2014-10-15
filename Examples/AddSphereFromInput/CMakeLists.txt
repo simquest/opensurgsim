@@ -21,31 +21,22 @@ link_directories(
 )
 
 include_directories(
-	${SURGSIM_TOP_INCLUDE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}
-	${EIGEN3_INCLUDE_DIR}
-	${Boost_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
 )
 
-set(ADDSPHEREFROMINPUT_EXAMPLE_SOURCE
+set(SOURCES
 	AddSphereBehavior.cpp
 	AddSphereFromInput.cpp
 )
 
-
-set(ADDSPHEREFROMINPUT_EXAMPLE_HEADER
+set(HEADERS
 	AddSphereBehavior.h
 )
 
-add_executable(ExampleAddSphereFromInput
-	${ADDSPHEREFROMINPUT_EXAMPLE_SOURCE}
-	${ADDSPHEREFROMINPUT_EXAMPLE_HEADER})
-
-surgsim_show_ide_folders(
-"${ADDSPHEREFROMINPUT_EXAMPLE_SOURCE}" "${ADDSPHEREFROMINPUT_EXAMPLE_HEADER}")
+add_executable(AddSphereFromInput ${SOURCES} ${HEADERS})
+surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
 
 set(LIBS 
 	MultiAxisDevice
@@ -55,8 +46,7 @@ set(LIBS
 	${YAML_CPP_LIBRARIES}
 )
 
-target_link_libraries(ExampleAddSphereFromInput ${LIBS}
-)
+target_link_libraries(AddSphereFromInput ${LIBS})
 
-# Put ExampleAddSphereFromInput into folder "Examples"
-set_target_properties(ExampleAddSphereFromInput PROPERTIES FOLDER "Examples") 
+# Put AddSphereFromInput into folder "Examples"
+set_target_properties(AddSphereFromInput PROPERTIES FOLDER "Examples") 

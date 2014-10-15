@@ -15,6 +15,7 @@
 
 include_directories (
 	${gtest_SOURCE_DIR}/include
+	${OSG_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -24,7 +25,10 @@ set(UNIT_TEST_SOURCES
 	BufferedValueTests.cpp
 	DataGroupTests.cpp
 	DataStructuresConvertTests.cpp
+	ImageTest.cpp
 	IndexDirectoryTests.cpp
+	IndexedLocalCoordinateTest.cpp
+	LocationTests.cpp
 	MeshElementTest.cpp
 	MeshTest.cpp
 	MeshVertexTest.cpp
@@ -44,12 +48,14 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS
 	SurgSimDataStructures
+	SurgSimGraphics
+	SurgSimMath
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/TriangleMeshBaseTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OctreeShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/TriangleMeshBaseTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
+file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/OctreeShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"

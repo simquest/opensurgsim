@@ -38,24 +38,46 @@ using SurgSim::Math::Vector3d;
 class LabJackToPoseFilter : public SurgSim::Input::CommonDevice,
 	public SurgSim::Input::InputConsumerInterface, public SurgSim::Input::OutputProducerInterface
 {
+
 public:
-	LabJackToPoseFilter(const std::string& name, int firstTimerForQuadrature,
-		int lineForPlusX, int lineForMinusX, double translationPerUpdate) :
+	LabJackToPoseFilter(const std::string& name, int firstTimerForQuadrature, int resetQuadrature, int plusX,
+		int minusX, double translationPerUpdate, int positiveAnalogDifferential, int analogSingleEnded, int xOut,
+		int loopbackOut) :
 		SurgSim::Input::CommonDevice(name),
+		m_pose(RigidTransform3d::Identity()),
+		m_translationPerUpdate(translationPerUpdate),
+		m_lineForPlusX(plusX),
+		m_lineForMinusX(minusX),
+		m_firstTimerForQuadrature(firstTimerForQuadrature),
+		m_lineForResetQuadrature(resetQuadrature),
+		m_analogInputDifferentialPositive(positiveAnalogDifferential),
+		m_analogInputSingleEnded(analogSingleEnded),
+		m_cachedOutputIndices(false),
 		m_digitalInputPlusXIndex(-1),
 		m_digitalInputMinusXIndex(-1),
 		m_timerInputIndex(-1),
-		m_pose(RigidTransform3d::Identity()),
-		m_lineForPlusX(lineForPlusX),
-		m_lineForMinusX(lineForMinusX),
-		m_firstTimerForQuadrature(firstTimerForQuadrature),
-		m_translationPerUpdate(translationPerUpdate)
+		m_analogInputDifferentialIndex(-1),
+		m_analogInputSingleEndedIndex(-1),
+		m_analogOutputIndex(-1),
+		m_digitalOutputIndex(-1)
 	{
 		DataGroupBuilder inputBuilder;
 		inputBuilder.addPose(SurgSim::DataStructures::Names::POSE);
 		getInputData() = inputBuilder.createData();
-		getInitialInputData() = getInputData();
 		m_poseIndex = getInputData().poses().getIndex(SurgSim::DataStructures::Names::POSE);
+
+		DataGroupBuilder outputBuilder;
+		const std::string outputName =
+			SurgSim::DataStructures::Names::ANALOG_OUTPUT_PREFIX + std::to_string(xOut);
+		outputBuilder.addScalar(outputName);
+		const std::string digitalOutputName =
+			SurgSim::DataStructures::Names::DIGITAL_OUTPUT_PREFIX + std::to_string(loopbackOut);
+		outputBuilder.addBoolean(digitalOutputName);
+		outputBuilder.addScalar(SurgSim::DataStructures::Names::TIMER_OUTPUT_PREFIX +
+			std::to_string(m_firstTimerForQuadrature));
+		m_outputData = outputBuilder.createData();
+		m_analogOutputIndex = m_outputData.scalars().getIndex(outputName);
+		m_digitalOutputIndex = m_outputData.booleans().getIndex(digitalOutputName);
 	}
 
 	virtual ~LabJackToPoseFilter()
@@ -75,19 +97,25 @@ public:
 
 	void initializeInput(const std::string& device, const DataGroup& inputData)
 	{
-		m_digitalInputPlusXIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+		m_digitalInputPlusXIndex = inputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
 			std::to_string(m_lineForPlusX));
-		m_digitalInputMinusXIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+		m_digitalInputMinusXIndex = inputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
 			std::to_string(m_lineForMinusX));
 		m_timerInputIndex = inputData.scalars().getIndex(SurgSim::DataStructures::Names::TIMER_INPUT_PREFIX +
 			std::to_string(m_firstTimerForQuadrature));
+		m_analogInputDifferentialIndex =
+			inputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_INPUT_PREFIX +
+			std::to_string(m_analogInputDifferentialPositive));
+		m_analogInputSingleEndedIndex =
+			inputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_INPUT_PREFIX +
+			std::to_string(m_analogInputSingleEnded));
 
-		inputFilter(inputData, &getInitialInputData());
-		getInputData() = getInitialInputData();
+		inputFilter(inputData, &getInputData());
 	}
 
 	void handleInput(const std::string& device, const DataGroup& inputData)
 	{
+		m_lastInputData = inputData;
 		inputFilter(inputData, &getInputData());
 		pushInput();
 	}
@@ -97,7 +125,7 @@ public:
 		bool state = pullOutput();
 		if (state)
 		{
-			outputFilter(getOutputData(), outputData);
+			outputFilter(m_outputData, outputData);
 		}
 		return state;
 	}
@@ -107,25 +135,26 @@ public:
 		// Turn LabJack inputs into a pose so it can control the sphere.
 		if (m_digitalInputPlusXIndex >= 0)
 		{
-			double value;
-			if (dataToFilter.scalars().get(m_digitalInputPlusXIndex, &value))
+			bool value;
+			if (dataToFilter.booleans().get(m_digitalInputPlusXIndex, &value))
 			{
 				// If the device passed us this line's input, and the input is high...
-				if (value > 0.5)
+				if (value)
 				{
-					m_pose.translate(Vector3d::UnitX() * m_translationPerUpdate);
+					m_pose.translation() += Vector3d::UnitX() * m_translationPerUpdate;
 				}
 			}
 		}
-		if (m_digitalInputPlusXIndex >= 0)
+
+		if (m_digitalInputMinusXIndex >= 0)
 		{
-			double value;
-			if (dataToFilter.scalars().get(m_digitalInputMinusXIndex, &value))
+			bool value;
+			if (dataToFilter.booleans().get(m_digitalInputMinusXIndex, &value))
 			{
 				// If the device passed us this line's input, and the input is high...
-				if (value > 0.5)
+				if (value)
 				{
-					m_pose.translate(-Vector3d::UnitX() * m_translationPerUpdate);
+					m_pose.translation() -= Vector3d::UnitX() * m_translationPerUpdate;
 				}
 			}
 		}
@@ -139,25 +168,86 @@ public:
 				m_pose.translation()[1] = value * m_translationPerUpdate;
 			}
 		}
+
+		const double rotationScaling = 0.0001 * 180.0 / M_PI;
+		if (m_analogInputDifferentialIndex >= 0)
+		{
+			double value;
+			if (dataToFilter.scalars().get(m_analogInputDifferentialIndex, &value))
+			{
+				m_pose.rotate(SurgSim::Math::makeRotationQuaternion(value * rotationScaling, Vector3d::UnitX().eval()));
+			}
+		}
+
+		if (m_analogInputSingleEndedIndex >= 0)
+		{
+			double value;
+			if (dataToFilter.scalars().get(m_analogInputSingleEndedIndex, &value))
+			{
+				m_pose.rotate(SurgSim::Math::makeRotationQuaternion(value * rotationScaling, Vector3d::UnitY().eval()));
+			}
+		}
+
 		result->poses().set(m_poseIndex, m_pose);
 	}
 
 	void outputFilter(const DataGroup& dataToFilter, DataGroup* result)
 	{
 		*result = dataToFilter;
+		const double xScaling = 100.0;
+		const double x = std::min(5.0, std::abs(m_pose.translation().x() * xScaling));
+		result->scalars().set(m_analogOutputIndex, x);
+
+		bool value;
+		if (m_lastInputData.booleans().get(m_digitalInputMinusXIndex, &value))
+		{
+			result->booleans().set(m_digitalOutputIndex, value);
+		}
+		else
+		{
+			result->booleans().reset(m_digitalOutputIndex);
+		}
+
+		bool resetQuadrature = false;
+		if ((m_lastInputData.booleans().get(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
+			std::to_string(m_lineForResetQuadrature), &resetQuadrature)) &&
+			resetQuadrature)
+		{
+			result->scalars().set(SurgSim::DataStructures::Names::TIMER_OUTPUT_PREFIX +
+				std::to_string(m_firstTimerForQuadrature), 0.0);
+		}
+		else
+		{
+			result->scalars().reset(SurgSim::DataStructures::Names::TIMER_OUTPUT_PREFIX +
+				std::to_string(m_firstTimerForQuadrature));
+		}
 	}
 
 private:
-	int m_digitalInputPlusXIndex;
-	int m_digitalInputMinusXIndex;
-	int m_digitalOutputsIndex;
-	int m_timerInputIndex;
-	int m_poseIndex;
+	DataGroup m_outputData;
+	DataGroup m_lastInputData;
+
 	RigidTransform3d m_pose;
+	double m_translationPerUpdate;
+
 	int m_lineForPlusX;
 	int m_lineForMinusX;
 	int m_firstTimerForQuadrature;
-	double m_translationPerUpdate;
+	int m_lineForResetQuadrature;
+	int m_analogInputDifferentialPositive;
+	int m_analogInputDifferentialNegative;
+	int m_analogInputSingleEnded;
+
+	bool m_cachedOutputIndices;
+
+	int m_poseIndex;
+	int m_digitalInputPlusXIndex;
+	int m_digitalInputMinusXIndex;
+	int m_timerInputIndex;
+	int m_analogInputDifferentialIndex;
+	int m_analogInputSingleEndedIndex;
+	int m_analogOutputIndex;
+	int m_digitalOutputIndex;
 };
 
 int main(int argc, char** argv)
@@ -165,37 +255,69 @@ int main(int argc, char** argv)
 	std::shared_ptr<LabJackDevice> toolDevice = std::make_shared<LabJackDevice>("LabJackDevice");
 	toolDevice->setAddress(""); // Get the first-found of the specified type and connection.
 
-	const int lineForPlusX = 0;
-	const int lineForMinusX = 1;
-	std::unordered_set<int> digitalInputChannels;
-	digitalInputChannels.insert(lineForPlusX);
-	digitalInputChannels.insert(lineForMinusX);
-	toolDevice->setDigitalInputChannels(digitalInputChannels);
+	const int plusX = SurgSim::Device::LabJack::FIO0;
+	toolDevice->enableDigitalInput(plusX);
+	const int minusX = SurgSim::Device::LabJack::FIO1;
+	toolDevice->enableDigitalInput(minusX);
 
-	toolDevice->setTimerCounterPinOffset(4); // the U3 requires the offset to be 4+.
+	const int loopbackOut = SurgSim::Device::LabJack::FIO2;
+	toolDevice->enableDigitalOutput(loopbackOut);
 
-	const int firstTimerForQuadrature = 0;
-	std::unordered_map<int,SurgSim::Device::LabJackTimerMode> timers;
-	timers[firstTimerForQuadrature] = SurgSim::Device::LABJACKTIMERMODE_QUAD;
-	timers[firstTimerForQuadrature + 1] = SurgSim::Device::LABJACKTIMERMODE_QUAD;
-	toolDevice->setTimers(timers);
+	const int offset = 4;
+	toolDevice->setTimerCounterPinOffset(offset); // the U3 requires the offset to be 4+.
+
+	const int firstTimerForQuadrature = SurgSim::Device::LabJack::TIMER0;
+	toolDevice->enableTimer(firstTimerForQuadrature, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE);
+	toolDevice->enableTimer(firstTimerForQuadrature + 1, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE);
+
+	const int resetQuadrature = SurgSim::Device::LabJack::FIO3;
+	toolDevice->enableDigitalInput(resetQuadrature);
+
+	const int singleEndedAnalog = SurgSim::Device::LabJack::AIN1;
+	toolDevice->enableAnalogInput(singleEndedAnalog, SurgSim::Device::LabJack::Range::RANGE_10);
+
+	const int positiveAnalogDifferential = SurgSim::Device::LabJack::AIN2;
+	const int negativeAnalogDifferential = SurgSim::Device::LabJack::AIN3;
+	toolDevice->enableAnalogInput(positiveAnalogDifferential, SurgSim::Device::LabJack::Range::RANGE_10,
+		negativeAnalogDifferential);
+
+	const int xOut = SurgSim::Device::LabJack::DAC1;
+	toolDevice->enableAnalogOutput(xOut);
+
+	const double translationPerUpdate = 0.001; // Millimeter per update.
+	auto filter = std::make_shared<LabJackToPoseFilter>("LabJack to Pose filter", firstTimerForQuadrature,
+		resetQuadrature, plusX, minusX, translationPerUpdate, positiveAnalogDifferential, singleEndedAnalog,
+		xOut, loopbackOut);
+	toolDevice->setOutputProducer(filter);
+	toolDevice->addInputConsumer(filter);
 
 	if (toolDevice->initialize())
 	{
-		const double translationPerUpdate = 0.001; // Millimeter per update.
-		auto filter = std::make_shared<LabJackToPoseFilter>("LabJack to Pose filter", firstTimerForQuadrature,
-			lineForPlusX, lineForMinusX, translationPerUpdate);
-		toolDevice->setOutputProducer(filter);
-		toolDevice->addInputConsumer(filter);
 		filter->initialize();
 
 		// The square is controlled by a second device.  For a simple test, we're using an IdentityPoseDevice--
 		// a pretend device that doesn't actually move.
 		std::shared_ptr<DeviceInterface> squareDevice = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
 
-		std::string text = "Set FIO0 low to move the sphere tool in positive x-direction. ";
-		text += "Set FIO1 low to move in negative x. ";
-		text += "Spin a quadrature encoder attached to FIO4 and FIO5 to move the sphere +/- y-direction.";
+		std::string text = "Set FIO" + std::to_string(plusX);
+		text += " low to move the sphere tool in positive x-direction.  ";
+		text += "Set FIO" + std::to_string(minusX);
+		text += " low to move in negative x, and that input will be output to FIO";
+		text += std::to_string(loopbackOut) + " (a loopback).  ";
+
+		text += "DAC" + std::to_string(xOut);
+		text += " will provide a voltage proportional to the absolute value of the x-position, up to 5v.  ";
+
+		text += "Spin a quadrature encoder attached to FIO" + std::to_string(firstTimerForQuadrature + offset);
+		text += " and FIO" + std::to_string(firstTimerForQuadrature + offset + 1);
+		text += " to move the sphere +/- y-direction.  Set FIO" + std::to_string(resetQuadrature);
+		text += " high to reset the quadrature reading.  ";
+
+		text += "Provide a differential analog input to AIN" + std::to_string(positiveAnalogDifferential);
+		text += " and AIN" + std::to_string(negativeAnalogDifferential) + " to spin about the red axis.  ";
+
+		text += "Provide a single-ended analog input to AIN" + std::to_string(singleEndedAnalog);
+		text += " to spin about the green axis.";
 
 		runToolSquareTest(filter, squareDevice,
 			//2345678901234567890123456789012345678901234567890123456789012345678901234567890

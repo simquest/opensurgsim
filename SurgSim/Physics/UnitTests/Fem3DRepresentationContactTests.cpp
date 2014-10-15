@@ -26,13 +26,13 @@
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
+using SurgSim::DataStructures::IndexedLocalCoordinate;
 using SurgSim::Framework::Runtime;
 using SurgSim::Physics::ContactConstraintData;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::Fem3DRepresentationContact;
 using SurgSim::Physics::Fem3DRepresentationLocalization;
 using SurgSim::Physics::Fem3DElementTetrahedron;
-using SurgSim::Physics::FemRepresentationCoordinate;
 using SurgSim::Physics::MlcpPhysicsProblem;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
@@ -97,7 +97,7 @@ public:
 
 		m_fem->setInitialState(state);
 		m_fem->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
-		m_fem->setIsActive(true);
+		m_fem->setLocalActive(true);
 
 		m_fem->initialize(std::make_shared<Runtime>());
 		m_fem->wakeUp();
@@ -106,13 +106,12 @@ public:
 		m_fem->beforeUpdate(dt);
 		m_fem->update(dt);
 
-		m_localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem);
 	}
 
-	void setContactAt(const FemRepresentationCoordinate &coord)
+	void setContactAt(const IndexedLocalCoordinate &coord)
 	{
 		m_coord = coord;
-		m_localization->setLocalPosition(coord);
+		m_localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem, m_coord);
 
 		// Calculate position at state before "m_fem->update(dt)" was called.
 		double distance = -m_localization->calculatePosition(0.0).dot(m_n);
@@ -122,7 +121,7 @@ public:
 	std::shared_ptr<Fem3DRepresentation> m_fem;
 	std::shared_ptr<Fem3DRepresentationLocalization> m_localization;
 
-	FemRepresentationCoordinate m_coord;
+	IndexedLocalCoordinate m_coord;
 	Vector3d m_n;
 	ContactConstraintData m_constraintData;
 };
@@ -153,13 +152,14 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpTest)
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 1, 1);
 
 	// Apply constraint purely to the first node of the 0th tetrahedron.
-	FemRepresentationCoordinate coord(0, Vector4d(1.0, 0.0, 0.0, 0.0));
+	IndexedLocalCoordinate coord(0, Vector4d(1.0, 0.0, 0.0, 0.0));
 	setContactAt(coord);
 
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	EXPECT_NEAR(-9.81 * dt * dt * m_n[1], mlcpPhysicsProblem.b[0], epsilon);
+	const Vector3d newPosition = Vector3d(0.30, -0.57,  0.40) - Vector3d::UnitY() * 9.81 * dt * dt;
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0], epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
 	SurgSim::Math::setSubVector(dt * m_n, 0, 3, &H);
@@ -186,13 +186,19 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpCoordinateTest)
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 1, 1);
 
 	// Apply constraint to all nodes of an fem.
-	FemRepresentationCoordinate coord(1, Vector4d(0.25, 0.33, 0.28, 0.14));
+	const Vector4d barycentric = Vector4d(0.25, 0.33, 0.28, 0.14);
+	IndexedLocalCoordinate coord(1, barycentric);
 	setContactAt(coord);
 
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	EXPECT_NEAR(-9.81 * dt * dt * m_n[1], mlcpPhysicsProblem.b[0], epsilon);
+	const Vector3d newPosition = (Vector3d( 0.30, -0.57,  0.40) * barycentric[0] +
+		Vector3d( 0.06,  0.63, -0.32) * barycentric[1] +
+		Vector3d( 0.35,  0.52,  0.50) * barycentric[2] +
+		Vector3d( 1.14,  0.66,  0.71) * barycentric[3]) -
+		Vector3d::UnitY() * 9.81 * dt * dt;
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0], epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
 	SurgSim::Math::setSubVector(0.25 * dt * m_n, 0, 3, &H);
@@ -248,13 +254,19 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpIndiciesTest)
 	size_t indexOfConstraint = 1;
 
 	// Apply constraint to all nodes of an fem.
-	FemRepresentationCoordinate coord(1, Vector4d(0.25, 0.33, 0.28, 0.14));
+	const Vector4d barycentric = Vector4d(0.25, 0.33, 0.28, 0.14);
+	IndexedLocalCoordinate coord(1, barycentric);
 	setContactAt(coord);
 
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	EXPECT_NEAR(-9.81 * dt * dt * m_n[1], mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
+	const Vector3d newPosition = (Vector3d( 0.30, -0.57,  0.40) * barycentric[0] +
+		Vector3d( 0.06,  0.63, -0.32) * barycentric[1] +
+		Vector3d( 0.35,  0.52,  0.50) * barycentric[2] +
+		Vector3d( 1.14,  0.66,  0.71) * barycentric[3]) -
+		Vector3d::UnitY() * 9.81 * dt * dt;
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
 	SurgSim::Math::setSubVector(0.25 * dt * m_n, 0, 3, &H);

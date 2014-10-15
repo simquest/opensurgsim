@@ -17,11 +17,12 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/PhysicsConvert.h"
 
 namespace SurgSim
@@ -29,14 +30,29 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidRepresentationBase::RigidRepresentationBase(const std::string& name) : Representation(name)
+RigidRepresentationBase::RigidRepresentationBase(const std::string& name) :
+	Representation(name),
+	m_parametersValid(false),
+	m_rho(0.0),
+	m_mass(std::numeric_limits<double>::quiet_NaN()),
+	m_linearDamping(0.0),
+	m_angularDamping(0.0)
 {
+	m_localInertia.setConstant(std::numeric_limits<double>::quiet_NaN());
+	m_massCenter.setConstant(std::numeric_limits<double>::quiet_NaN());
+
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, RigidRepresentationState,
-		RigidRepresentationState, getInitialState, setInitialState);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, RigidRepresentationParameters,
-		RigidRepresentationParameters, getInitialParameters, setInitialParameters);
+									  RigidRepresentationState, getInitialState, setInitialState);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, std::shared_ptr<SurgSim::Collision::Representation>,
-		CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
+									  CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, double, Density, getDensity, setDensity);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, double, LinearDamping,
+									  getLinearDamping, setLinearDamping);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, double, AngularDamping,
+									  getAngularDamping, setAngularDamping);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, std::shared_ptr<SurgSim::Math::Shape>, Shape,
+									  getShape, setShape);
+
 }
 
 RigidRepresentationBase::~RigidRepresentationBase()
@@ -45,14 +61,10 @@ RigidRepresentationBase::~RigidRepresentationBase()
 
 bool RigidRepresentationBase::doInitialize()
 {
-	auto meshShape =
-		std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getInitialParameters().getShapeUsedForMassInertia());
-	if (nullptr != meshShape)
+	if (m_shape != nullptr)
 	{
-		SURGSIM_ASSERT(meshShape->initialize(*(getRuntime()->getApplicationData()))) <<
-			"Failed to initialize the mesh shape in this representation.";
-		m_initialParameters.updateProperties();
-		setCurrentParameters(m_initialParameters);
+		SURGSIM_ASSERT(m_shape->isValid()) <<
+			"An invalid shape is used in this RigidRepresentationBase.";
 	}
 
 	return true;
@@ -65,6 +77,7 @@ bool RigidRepresentationBase::doWakeUp()
 	m_finalState = m_initialState;
 	m_previousState = m_initialState;
 	updateGlobalInertiaMatrices(m_currentState);
+
 	return true;
 }
 
@@ -103,33 +116,88 @@ const RigidRepresentationState& RigidRepresentationBase::getPreviousState() cons
 	return m_previousState;
 }
 
-std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(const SurgSim::Collision::Location& location)
+std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(
+	const SurgSim::DataStructures::Location& location)
 {
-	return std::move(createTypedLocalization<RigidRepresentationLocalization>(location));
+	return std::move(createTypedLocalization<RigidRepresentationBaseLocalization>(location));
 }
 
-void RigidRepresentationBase::setInitialParameters(const RigidRepresentationParameters& parameters)
+void RigidRepresentationBase::setDensity(double rho)
 {
-	m_initialParameters = parameters;
-	m_currentParameters = parameters;
-
-	updateGlobalInertiaMatrices(m_currentState);
+	m_rho = rho;
+	updateProperties();
 }
 
-void RigidRepresentationBase::setCurrentParameters(const RigidRepresentationParameters& parameters)
+double RigidRepresentationBase::getDensity() const
 {
-	m_currentParameters = parameters;
-	updateGlobalInertiaMatrices(m_currentState);
+	return m_rho;
 }
 
-const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getInitialParameters() const
+double RigidRepresentationBase::getMass() const
 {
-	return m_initialParameters;
+	return m_mass;
 }
 
-const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getCurrentParameters() const
+const SurgSim::Math::Vector3d& RigidRepresentationBase::getMassCenter() const
 {
-	return m_currentParameters;
+	return m_massCenter;
+}
+
+const SurgSim::Math::Matrix33d& RigidRepresentationBase::getLocalInertia() const
+{
+	return m_localInertia;
+}
+
+void RigidRepresentationBase::setLinearDamping(double linearDamping)
+{
+	m_linearDamping = linearDamping;
+}
+
+double RigidRepresentationBase::getLinearDamping() const
+{
+	return m_linearDamping;
+}
+
+void RigidRepresentationBase::setAngularDamping(double angularDamping)
+{
+	m_angularDamping = angularDamping;
+}
+
+double RigidRepresentationBase::getAngularDamping() const
+{
+	return m_angularDamping;
+}
+
+void RigidRepresentationBase::setShape(const std::shared_ptr<SurgSim::Math::Shape> shape)
+{
+	m_shape = shape;
+	if (shape != nullptr)
+	{
+		updateProperties();
+	}
+}
+
+const std::shared_ptr<SurgSim::Math::Shape> RigidRepresentationBase::getShape() const
+{
+	return m_shape;
+}
+
+void RigidRepresentationBase::updateProperties()
+{
+	if (m_shape != nullptr)
+	{
+		SURGSIM_ASSERT(m_shape->isValid()) << "Invalid shape.";
+		m_massCenter   = m_shape->getCenter();
+		if (m_rho > 0.0)
+		{
+			m_mass         = m_rho * m_shape->getVolume();
+			m_localInertia = m_rho * m_shape->getSecondMomentOfVolume();
+			m_parametersValid = SurgSim::Math::isValid(m_localInertia) &&
+				!m_localInertia.isZero() &&
+				m_localInertia.diagonal().minCoeff() > 0.0 &&
+				SurgSim::Math::isValid(m_mass) && m_mass > 0.0;
+		}
+	}
 }
 
 void SurgSim::Physics::RigidRepresentationBase::beforeUpdate(double dt)
@@ -140,14 +208,7 @@ void SurgSim::Physics::RigidRepresentationBase::beforeUpdate(double dt)
 void SurgSim::Physics::RigidRepresentationBase::afterUpdate(double dt)
 {
 	m_finalState = m_currentState;
-	if (isDrivingSceneElementPose())
-	{
-		std::shared_ptr<SurgSim::Framework::PoseComponent> poseComponent = getPoseComponent();
-		if (poseComponent != nullptr)
-		{
-			poseComponent->setPose(m_finalState.getPose() * getLocalPose().inverse());
-		}
-	}
+	driveSceneElementPose(m_finalState.getPose() * getLocalPose().inverse());
 }
 
 void RigidRepresentationBase::setCollisionRepresentation(

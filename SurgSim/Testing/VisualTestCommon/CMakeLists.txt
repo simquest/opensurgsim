@@ -19,10 +19,7 @@ link_directories(
 )
 
 include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
 	"${GLUT_INCLUDE_DIR}"
 )
 
@@ -41,7 +38,7 @@ set(VISUAL_TEST_COMMON_HEADERS
 )
 
 set(LIBS
-	glut
+	${GLUT_LIBRARIES}
 )
 
 
@@ -49,6 +46,8 @@ set(LIBS
 # surgsim_add_library here.
 add_library(VisualTestCommon
 	${VISUAL_TEST_COMMON_SOURCES} ${VISUAL_TEST_COMMON_HEADERS})
+
+target_link_libraries(VisualTestCommon ${LIBS})
 
 surgsim_show_ide_folders(
 	"${VISUAL_TEST_COMMON_SOURCES}" "${VISUAL_TEST_COMMON_HEADERS}")

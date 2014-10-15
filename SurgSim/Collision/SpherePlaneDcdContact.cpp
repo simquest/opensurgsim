@@ -19,10 +19,10 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/PlaneShape.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
@@ -68,9 +68,11 @@ void SpherePlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pa
 		// plane pose, flipped if the sphere is behind the plane and normalize it
 		Vector3d normal = representationPlane->getPose().linear() * plane->getNormal();
 
-		std::pair<Location,Location> penetrationPoints;
-		penetrationPoints.first.globalPosition.setValue(sphereCenter - normal * sphere->getRadius());
-		penetrationPoints.second.globalPosition.setValue(sphereCenter - normal * dist);
+		std::pair<Location, Location> penetrationPoints;
+		penetrationPoints.first.rigidLocalPosition.setValue(
+			representationSphere->getPose().inverse() * (sphereCenter - normal * sphere->getRadius()));
+		penetrationPoints.second.rigidLocalPosition.setValue(
+			representationPlane->getPose().inverse() * (sphereCenter - normal * dist));
 
 		pair->addContact(depth, normal, penetrationPoints);
 	}

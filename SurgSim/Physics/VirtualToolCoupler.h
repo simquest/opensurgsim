@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/ObjectFactory.h"
@@ -119,24 +120,35 @@ public:
 	/// \return The damping of the vtc in angular mode (in N·m·s·rad-1)
 	double getAngularDamping();
 
-	/// \return The factor to multiply the forces.
-	double getOutputForceScaling();
+	/// Override the point of attachment to the Representation
+	/// If this value is not provided, the point of attachment will be automatically
+	/// set to the Representation's center of mass.
+	/// \param attachment The attachment point in the Representations local coordinate frame
+	void overrideAttachmentPoint(const SurgSim::Math::Vector3d& attachment);
 
-	/// Set the scaling term for the force sent to the output component.
-	/// \param forceScaling The factor to multiply the forces.
-	void setOutputForceScaling(double forceScaling);
+	/// Get the point of attachment on the Representation
+	/// \return The attachment point in the Representations local coordinate frame
+	const SurgSim::Math::Vector3d& getAttachmentPoint();
 
-	/// \return The factor to multiply the torque.
-	double getOutputTorqueScaling();
+	/// Enable/disable torques that simulate inertia.  This setting only has an effect if the attachment point is not
+	/// the mass center.
+	/// \sa overrideAttachmentPoint
+	/// \param calculateInertialTorques true to simulate inertia.
+	void setCalculateInertialTorques(bool calculateInertialTorques);
 
-	/// Set the scaling term for the torque sent to the output component.
-	/// \param torqueScaling The factor to multiply the torque.
-	void setOutputTorqueScaling(double torqueScaling);
+	/// Get whether the calculated torques will simulate inertia.  This setting only has an effect if the attachment
+	/// point is not the mass center.
+	/// \sa overrideAttachmentPoint
+	/// \return true if inertia is being simulated.
+	bool getCalculateInertialTorques() const;
 
 protected:
 	virtual bool doInitialize() override;
 	virtual bool doWakeUp() override;
 	virtual int getTargetManagerType() const override;
+
+	/// \return The DataGroup to be sent to the device via the OutputComponent.
+	virtual SurgSim::DataStructures::DataGroup buildOutputData();
 
 	/// Used for Serialization.
 	/// \param linearStiffness The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
@@ -173,6 +185,15 @@ protected:
 	/// \return The OptionalValue object containing the damping of the vtc in angular mode (in N·m·s·rad-1)
 	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularDamping() const;
 
+	/// Used for Serialization.
+	/// \param attachmentPoint The OptionalValue object containing the attachment point.
+	void setOptionalAttachmentPoint(
+			const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& attachmentPoint);
+
+	/// Used for Serialization.
+	/// \return The OptionalValue object containing the attachment point.
+	const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& getOptionalAttachmentPoint() const;
+
 	/// User supplied Vtc stiffness parameter in linear mode (in N·m-1)
 	SurgSim::DataStructures::OptionalValue<double> m_optionalLinearStiffness;
 
@@ -185,9 +206,19 @@ protected:
 	/// User supplied Vtc damping parameter in angular mode (in N·m·s·rad-1)
 	SurgSim::DataStructures::OptionalValue<double> m_optionalAngularDamping;
 
-private:
+	/// User supplied attachment point
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> m_optionalAttachmentPoint;
+
+	/// The DataGroup to output
+	SurgSim::DataStructures::DataGroup m_outputData;
+
+	/// The input component.
 	std::shared_ptr<SurgSim::Input::InputComponent> m_input;
+
+	/// The output component.
 	std::shared_ptr<SurgSim::Input::OutputComponent> m_output;
+
+private:
 	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
 	std::string m_poseName;
 
@@ -209,8 +240,26 @@ private:
 	/// Scaling factor for the torques sent to the OutputComponent
 	double m_outputTorqueScaling;
 
-	/// The DataGroup to output
-	SurgSim::DataStructures::DataGroup m_outputData;
+	/// The input's point of attachment in the local frame, i.e., the same frame in which the mass center is defined.
+	SurgSim::Math::Vector3d m_localAttachmentPoint;
+
+	/// Whether or not the calculated torques will simulate inertia.  This setting only has an effect if the device
+	/// input point is not the mass center.
+	bool m_calculateInertialTorques;
+
+	///@{
+	/// Cached DataGroup indices.
+	int m_poseIndex;
+	int m_linearVelocityIndex;
+	int m_angularVelocityIndex;
+	int m_forceIndex;
+	int m_torqueIndex;
+	int m_inputLinearVelocityIndex;
+	int m_inputAngularVelocityIndex;
+	int m_inputPoseIndex;
+	int m_springJacobianIndex;
+	int m_damperJacobianIndex;
+	///@}
 };
 
 }; // Physics

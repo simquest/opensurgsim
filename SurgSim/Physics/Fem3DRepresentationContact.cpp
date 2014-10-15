@@ -56,9 +56,8 @@ void Fem3DRepresentationContact::doBuild(double dt,
 
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
-	const double d = contactData.getDistance();
 
-	const FemRepresentationCoordinate& coord
+	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<Fem3DRepresentationLocalization>(localization)->getLocalPosition();
 
 	// FRICTIONLESS CONTACT in a LCP
@@ -74,22 +73,25 @@ void Fem3DRepresentationContact::doBuild(double dt,
 	// n^t.u + (n^t.p(free) + d) >= 0
 	//
 	// For implicit integration, u = dt.v(t+dt)
+	//
+	// Since the d term will be added to the constraint for one side of the contact and subtracted from the other,
+	// and because it is not clear which distance should be used, we leave it out.
 
 	// Update b with new violation
 	Vector3d globalPosition = localization->calculatePosition();
-	double violation = n.dot(globalPosition) + d;
+	double violation = n.dot(globalPosition);
 
 	mlcp->b[indexOfConstraint] += violation * scale;
 
 	// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
 	m_newH.resize(fem3d->getNumDof());
 	// m_newH is a member variable, so 'reserve' only needs to allocate memory on the first run.
-	std::shared_ptr<FemElement> femElement = fem3d->getFemElement(coord.elementId);
+	std::shared_ptr<FemElement> femElement = fem3d->getFemElement(coord.index);
 	size_t numNodes = femElement->getNumNodes();
 	size_t numNodeToConstrain = 0;
 	for (size_t index = 0; index < numNodes; index++)
 	{
-		if (coord.naturalCoordinate[index] != 0.0)
+		if (coord.coordinate[index] != 0.0)
 		{
 			numNodeToConstrain++;
 		}
@@ -98,12 +100,12 @@ void Fem3DRepresentationContact::doBuild(double dt,
 
 	for (size_t index = 0; index < numNodes; index++)
 	{
-		if (coord.naturalCoordinate[index] != 0.0)
+		if (coord.coordinate[index] != 0.0)
 		{
 			size_t nodeIndex = femElement->getNodeId(index);
-			m_newH.insert(3 * nodeIndex + 0) = coord.naturalCoordinate[index] * n[0] * scale * dt;
-			m_newH.insert(3 * nodeIndex + 1) = coord.naturalCoordinate[index] * n[1] * scale * dt;
-			m_newH.insert(3 * nodeIndex + 2) = coord.naturalCoordinate[index] * n[2] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 0) = coord.coordinate[index] * n[0] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 1) = coord.coordinate[index] * n[1] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 2) = coord.coordinate[index] * n[2] * scale * dt;
 		}
 	}
 

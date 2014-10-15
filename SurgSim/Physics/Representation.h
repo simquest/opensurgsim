@@ -24,9 +24,13 @@
 namespace SurgSim
 {
 
-namespace Collision
+namespace DataStructures
 {
 struct Location;
+}
+
+namespace Collision
+{
 class Representation;
 }
 
@@ -73,14 +77,6 @@ public:
 	/// \return The number of degrees of freedom
 	size_t getNumDof() const;
 
-	/// Set active flag for this Representation
-	/// \param isActive True if the Representation is being activated, False otherwise
-	void setIsActive(bool isActive);
-
-	/// Query if this object is active in the scene.
-	/// \return true if active, false if not.
-	bool isActive() const;
-
 	/// Set the gravity enable flag
 	/// \param isGravityEnabled True if gravity enabled, false if not.
 	void setIsGravityEnabled(bool isGravityEnabled);
@@ -89,12 +85,12 @@ public:
 	/// \return true if gravity enabled, false if not.
 	bool isGravityEnabled() const;
 
-	/// Set whether this Representation is controling the pose of the SceneElement
+	/// Set whether this Representation is controlling the pose of the SceneElement
 	/// that it is part of.
 	/// \param isDrivingSceneElementPose true if this Representation is driving the pose of the SceneElement
 	void setIsDrivingSceneElementPose(bool isDrivingSceneElementPose);
 
-	/// Query if this Representation is controling the pose of the SceneElement
+	/// Query if this Representation is controlling the pose of the SceneElement
 	/// that it is part of.
 	/// \return true if this Representation is controlling the pose of the SceneElement
 	bool isDrivingSceneElementPose();
@@ -116,7 +112,7 @@ public:
 	/// Computes a localized coordinate w.r.t this representation, given a Location object.
 	/// \param location A location in 3d space.
 	/// \return A localization object for the given location.
-	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location);
+	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location);
 
 	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
 	/// deltaVelocity.
@@ -149,6 +145,11 @@ protected:
 	/// This entity's collision representation, these are usually very specific to the physics representation
 	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 
+	/// This conditionally updates that pose for the scenelement to the given pose
+	/// The update gets exectuded if the representation actually has  sceneelement and isDrivingScenElement() is true
+	/// \param pose New pose for the SceneElement
+	void driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose);
+
 private:
 	/// NO copy constructor
 	Representation(const Representation&);
@@ -165,10 +166,7 @@ private:
 	/// Gravity enabled flag
 	bool m_isGravityEnabled;
 
-	/// Is this representation active or not ?
-	bool m_isActive;
-
-	/// Is this representation driving the SceneElement
+	/// Is this representation driving the sceneElement pose
 	bool m_isDrivingSceneElementPose;
 
 };

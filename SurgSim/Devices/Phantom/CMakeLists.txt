@@ -17,13 +17,16 @@
 find_package(OpenHaptics REQUIRED)
 
 link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES} SurgSimFramework SurgSimInput)
+
+set(LIBS
+	${Boost_LIBRARIES}
+	${OPENHAPTICS_LIBRARIES}
+	SurgSimFramework
+	SurgSimInput
+)
 
 include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
 	"${OPENHAPTICS_INCLUDE_DIR}"
 )
 
@@ -43,6 +46,9 @@ surgsim_add_library(
 	"${PHANTOM_DEVICE_SOURCES}" "${PHANTOM_DEVICE_HEADERS}"
 	SurgSim/Devices/Phantom
 )
+
+target_link_libraries(PhantomDevice ${LIBS})
+
 if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)

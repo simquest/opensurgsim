@@ -73,7 +73,23 @@ TEST(TimerTest, Comparison)
 	{
 		EXPECT_GE(timer1->getAverageFramePeriod(), timer2->getAverageFramePeriod());
 		EXPECT_GT(timer1->getCumulativeTime(), timer1->getLastFramePeriod());
+
+		EXPECT_GE(timer1->getMaxFramePeriod(), timer2->getMaxFramePeriod());
+		EXPECT_GE(timer1->getMinFramePeriod(), timer2->getMinFramePeriod());
 	}
+}
+
+TEST(TimerTest, GetWithoutAnyFrames)
+{
+	std::shared_ptr<Timer> timer = std::make_shared<Timer>();
+
+	EXPECT_ANY_THROW(timer->getCumulativeTime());
+	EXPECT_ANY_THROW(timer->getAverageFramePeriod());
+	EXPECT_ANY_THROW(timer->getAverageFrameRate());
+	EXPECT_ANY_THROW(timer->getLastFramePeriod());
+	EXPECT_ANY_THROW(timer->getLastFrameRate());
+	EXPECT_ANY_THROW(timer->getMaxFramePeriod());
+	EXPECT_ANY_THROW(timer->getMinFramePeriod());
 }
 
 

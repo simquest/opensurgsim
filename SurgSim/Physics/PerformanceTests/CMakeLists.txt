@@ -28,6 +28,7 @@ set(UNIT_TEST_HEADERS
 )
 
 set(LIBS
+	SurgSimInput
 	SurgSimPhysics
 )
 

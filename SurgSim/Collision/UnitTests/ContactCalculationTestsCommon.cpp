@@ -39,16 +39,38 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 {
 	EXPECT_NEAR(expectedDepth, contact->depth, SurgSim::Math::Geometry::DistanceEpsilon);
 	EXPECT_TRUE(eigenEqual(expectedNormal, contact->normal));
-	EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
-	EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
+	EXPECT_TRUE(contact->penetrationPoints.first.rigidLocalPosition.hasValue());
+	EXPECT_TRUE(contact->penetrationPoints.second.rigidLocalPosition.hasValue());
 	EXPECT_TRUE(eigenEqual(expectedPenetrationPointFirst,
-							contact->penetrationPoints.first.globalPosition.getValue()));
+							contact->penetrationPoints.first.rigidLocalPosition.getValue()));
 	EXPECT_TRUE(eigenEqual(expectedPenetrationPointSecond,
-							contact->penetrationPoints.second.globalPosition.getValue()));
+							contact->penetrationPoints.second.rigidLocalPosition.getValue()));
+}
+
+bool checkMeshLocalCoordinate(
+	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& actualLocalCoordinate,
+	const std::array<SurgSim::Math::Vector3d, 3>& vertices,
+	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& expectedLocalCoordinate,
+	const SurgSim::Math::Vector3d& expectedLocalPosition)
+{
+	bool isEqual = true;
+	EXPECT_EQ(expectedLocalCoordinate.hasValue(), actualLocalCoordinate.hasValue());
+	if (expectedLocalCoordinate.hasValue() && actualLocalCoordinate.hasValue())
+	{
+		isEqual &=
+			expectedLocalCoordinate.getValue().index == actualLocalCoordinate.getValue().index;
+		Vector3d barycentricCoordinates = actualLocalCoordinate.getValue().coordinate;
+		isEqual &= eigenEqual(expectedLocalPosition,
+							  barycentricCoordinates[0] * vertices[0] +
+							  barycentricCoordinates[1] * vertices[1] +
+							  barycentricCoordinates[2] * vertices[2]);
+	}
+	return isEqual;
 }
 
 ::testing::AssertionResult isContactPresentInList(std::shared_ptr<Contact> expected,
-												  const std::list<std::shared_ptr<Contact>>& contactsList)
+												  const std::list<std::shared_ptr<Contact>>& contactsList,
+												  bool expectedHasTriangleContactObject)
 {
 	using SurgSim::Math::Geometry::ScalarEpsilon;
 
@@ -58,26 +80,36 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 		// Compare the normals.
 		contactPresent = eigenEqual(expected->normal, it->get()->normal);
 		// Compare the global position of first object.
-		contactPresent &= eigenEqual(expected->penetrationPoints.first.globalPosition.getValue(),
-									 it->get()->penetrationPoints.first.globalPosition.getValue());
+		contactPresent &= eigenEqual(expected->penetrationPoints.first.rigidLocalPosition.getValue(),
+									 it->get()->penetrationPoints.first.rigidLocalPosition.getValue());
 		// Compare the global position of second object.
-		contactPresent &= eigenEqual(expected->penetrationPoints.second.globalPosition.getValue(),
-									 it->get()->penetrationPoints.second.globalPosition.getValue());
+		contactPresent &= eigenEqual(expected->penetrationPoints.second.rigidLocalPosition.getValue(),
+									 it->get()->penetrationPoints.second.rigidLocalPosition.getValue());
 		// Compare the depth.
 		contactPresent &= std::abs(expected->depth - it->get()->depth) <= ScalarEpsilon;
-		// Check if the optional 'triangleId' is present in expected contact.
-		if (expected->penetrationPoints.first.triangleId.hasValue())
+		// Check if the optional 'meshLocalCoordinate' are the same.
+		std::shared_ptr<SurgSim::Collision::TriangleContact> triangleContact;
+		std::shared_ptr<SurgSim::Collision::Contact> contact;
+		if (expectedHasTriangleContactObject)
 		{
-			EXPECT_TRUE(it->get()->penetrationPoints.first.triangleId.hasValue());
-			contactPresent &= expected->penetrationPoints.first.triangleId.getValue() ==
-							  it->get()->penetrationPoints.first.triangleId.getValue();
+			triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(expected);
+			contact = *it;
 		}
-		if (expected->penetrationPoints.second.triangleId.hasValue())
+		else
 		{
-			EXPECT_TRUE(it->get()->penetrationPoints.second.triangleId.hasValue());
-			contactPresent &= expected->penetrationPoints.second.triangleId.getValue() ==
-							  it->get()->penetrationPoints.second.triangleId.getValue();
+			triangleContact = std::static_pointer_cast<SurgSim::Collision::TriangleContact>(*it);
+			contact = expected;
 		}
+		contactPresent &= checkMeshLocalCoordinate(
+							contact->penetrationPoints.first.meshLocalCoordinate,
+							triangleContact->firstVertices,
+							triangleContact->penetrationPoints.first.meshLocalCoordinate,
+							expected->penetrationPoints.first.rigidLocalPosition.getValue());
+		contactPresent &= checkMeshLocalCoordinate(
+							contact->penetrationPoints.second.meshLocalCoordinate,
+							triangleContact->secondVertices,
+							triangleContact->penetrationPoints.second.meshLocalCoordinate,
+							expected->penetrationPoints.second.rigidLocalPosition.getValue());
 	}
 
 	if (contactPresent)
@@ -88,16 +120,17 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 	{
 		return ::testing::AssertionFailure() << "Expected contact not found in calculated contacts list:\n" <<
 			   "Normal: " << expected->normal << "\n" <<
-			   "First objects' contact point: " << expected->penetrationPoints.first.globalPosition.getValue()
+			   "First objects' contact point: " << expected->penetrationPoints.first.rigidLocalPosition.getValue()
 			   << "\n" <<
-			   "Second objects' contact point: " << expected->penetrationPoints.second.globalPosition.getValue()
+			   "Second objects' contact point: " << expected->penetrationPoints.second.rigidLocalPosition.getValue()
 			   << "\n" <<
 			   "Depth of penetration: " << expected->depth << "\n";
 	}
 }
 
 void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expectedContacts,
-							  const std::list<std::shared_ptr<Contact>>& calculatedContacts)
+							  const std::list<std::shared_ptr<Contact>>& calculatedContacts,
+							  bool expectedHasTriangleContactObject)
 {
 	SCOPED_TRACE("Comparing the contact info.");
 
@@ -105,7 +138,7 @@ void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expecte
 
 	for (auto it = expectedContacts.begin(); it != expectedContacts.end(); ++it)
 	{
-		EXPECT_TRUE(isContactPresentInList(*it, calculatedContacts));
+		EXPECT_TRUE(isContactPresentInList(*it, calculatedContacts, expectedHasTriangleContactObject));
 	}
 }
 
@@ -118,6 +151,7 @@ void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContac
 							 const Vector3d& planeTrans, const Quaterniond& planeQuat)
 {
 	Vector3d vertex;
+	Vector3d boxLocalVertex, planeLocalVertex;
 	Vector3d planeNormalGlobal = planeQuat * plane->getNormal();
 	Vector3d pointOnPlane = planeTrans + (planeNormalGlobal * plane->getD());
 	double depth = 0.0;
@@ -125,11 +159,13 @@ void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContac
 	RigidTransform3d boxTransform = SurgSim::Math::makeRigidTransform(boxQuat, boxTrans);
 	for (int i = 0; i < expectedNumberOfContacts; ++i)
 	{
-		vertex = boxTransform * box->getVertex(expectedBoxIndicesInContacts[i]);
+		boxLocalVertex = box->getVertex(expectedBoxIndicesInContacts[i]);
+		vertex = boxTransform * boxLocalVertex;
+		depth = -planeNormalGlobal.dot(vertex - pointOnPlane);
+		planeLocalVertex = planeQuat.inverse() * (vertex + planeNormalGlobal * depth - planeTrans);
 		std::pair<Location, Location> penetrationPoint;
-		penetrationPoint.first.globalPosition.setValue(vertex);
-		depth = planeNormalGlobal.dot(vertex - pointOnPlane);
-		penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
+		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
+		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
 		expectedContacts->push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
 															 collisionNormal, penetrationPoint));
 	}
@@ -145,6 +181,7 @@ void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>* exp
 										const bool collisionNormalIsPlaneNormal)
 {
 	Vector3d vertex;
+	Vector3d boxLocalVertex, planeLocalVertex;
 	Vector3d planeNormalGlobal = planeQuat * plane->getNormal();
 	Vector3d pointOnPlane = planeTrans + (planeNormalGlobal * plane->getD());
 	double depth = 0.0;
@@ -152,11 +189,13 @@ void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>* exp
 	RigidTransform3d boxTransform = SurgSim::Math::makeRigidTransform(boxQuat, boxTrans);
 	for (int i = 0; i < expectedNumberOfContacts; ++i)
 	{
-		vertex = boxTransform * box->getVertex(expectedBoxIndicesInContacts[i]);
-		std::pair<Location, Location> penetrationPoint;
-		penetrationPoint.first.globalPosition.setValue(vertex);
+		boxLocalVertex = box->getVertex(expectedBoxIndicesInContacts[i]);
+		vertex = boxTransform * boxLocalVertex;
 		depth = planeNormalGlobal.dot(vertex - pointOnPlane);
-		penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
+		planeLocalVertex = planeQuat.inverse() * (vertex - planeNormalGlobal * depth - planeTrans);
+		std::pair<Location, Location> penetrationPoint;
+		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
+		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
 		expectedContacts->push_back(std::make_shared<Contact>(std::abs(depth), Vector3d::Zero(),
 															 collisionNormal, penetrationPoint));
 	}

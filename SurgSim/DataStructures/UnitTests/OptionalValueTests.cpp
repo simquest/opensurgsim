@@ -80,6 +80,13 @@ TEST(OptionalValueTests, ComparatorTest)
 	a.invalidate();
 	EXPECT_FALSE(a == b);
 	EXPECT_TRUE(a != b);
+
+	EXPECT_FALSE(a == 1); // NOLINT
+
+	a = 2;
+	EXPECT_FALSE(a == 1); // NOLINT
+	EXPECT_TRUE(a != 1);  // NOLINT
+	EXPECT_TRUE(a == 2);  // NOLINT
 }
 
 TEST(OptionalValueTests, CopyConstructorTest)
@@ -111,6 +118,10 @@ TEST(OptionalValueTests, AssignmentOperatorTest)
 	target = two;
 	EXPECT_NE(one, target);
 	EXPECT_EQ(two, target);
+
+	one = 1;
+	EXPECT_TRUE(one.hasValue());
+	EXPECT_EQ(1, one.getValue());
 }
 
 template <typename Type>
@@ -152,7 +163,7 @@ void testOptionalValueSerialization(Type value)
 	}
 }
 
-TEST(OptionalValueTests, OptionalValue)
+TEST(OptionalValueTests, Serialization)
 {
 	testOptionalValueSerialization<bool>(true);
 	testOptionalValueSerialization<bool>(false);
@@ -162,6 +173,16 @@ TEST(OptionalValueTests, OptionalValue)
 	testOptionalValueSerialization<double>(3.1415);
 	testOptionalValueSerialization<char>('f');
 	testOptionalValueSerialization<std::string>("TestString");
+}
+
+TEST(OptionalValueTests, DereferenceAccess)
+{
+	OptionalValue<int> one;
+	OptionalValue<int> two(10);
+
+	EXPECT_ANY_THROW(*one);
+	EXPECT_NO_THROW(*two);
+	EXPECT_EQ(10, *two);
 }
 
 }; // namespace DataStructures

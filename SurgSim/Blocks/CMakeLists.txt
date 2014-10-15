@@ -14,15 +14,13 @@
 # limitations under the License.
 
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_BLOCKS_SOURCES
 	DriveElementFromInputBehavior.cpp
-	KeyboardTogglesGraphicsBehavior.cpp
+	KeyboardTogglesComponentBehavior.cpp
 	MassSpring1DRepresentation.cpp
 	MassSpring2DRepresentation.cpp
 	MassSpring3DRepresentation.cpp
@@ -30,21 +28,21 @@ set(SURGSIM_BLOCKS_SOURCES
 	PoseInterpolator.cpp
 	SphereElement.cpp
 	TransferPhysicsToGraphicsMeshBehavior.cpp
+	TransferPhysicsToPointCloudBehavior.cpp
 	VisualizeContactsBehavior.cpp
 )
 
 set(SURGSIM_BLOCKS_HEADERS
 	DriveElementFromInputBehavior.h
-	KeyboardTogglesGraphicsBehavior.h
+	KeyboardTogglesComponentBehavior.h
 	MassSpring1DRepresentation.h
 	MassSpring2DRepresentation.h
 	MassSpring3DRepresentation.h
 	MassSpringNDRepresentationUtils.h
 	PoseInterpolator.h
 	SphereElement.h
-	TransferOdeStateToVerticesBehavior.h
-	TransferOdeStateToVerticesBehavior-inl.h
 	TransferPhysicsToGraphicsMeshBehavior.h
+	TransferPhysicsToPointCloudBehavior.h
 	VisualizeContactsBehavior.h
 )
 

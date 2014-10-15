@@ -91,7 +91,12 @@ bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(
 				}
 			}
 		}
-		rhs->decode(data);
+
+		std::vector<std::string> ignoredProperties;
+		ignoredProperties.push_back(NamePropertyName);
+		ignoredProperties.push_back(IdPropertyName);
+
+		rhs->decode(data, ignoredProperties);
 		result = true;
 	}
 	return result;
