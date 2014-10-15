@@ -23,6 +23,7 @@
 #include "SurgSim/Framework/Barrier.h"
 #include "SurgSim/Framework/ComponentManager.h"
 #include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Scene.h"
 
@@ -305,6 +306,30 @@ void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 			(*it)->enqueueRemoveComponent(component);
 		}
 	}
+}
+
+bool Runtime::loadScene(const std::string& fileName)
+{
+	// To make sure things are correct, clear the Component cache before and after loading
+
+	bool result = false;
+	std::string path;
+	if (m_applicationData->tryFindFile(fileName, &path))
+	{
+		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
+
+		YAML::Node node = YAML::LoadFile(path);
+
+		auto scene = std::make_shared<Scene>(getSharedPtr());
+		scene->decode(node);
+		m_scene = scene;
+		result = true;
+
+		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
+	}
+
+	return result;
+
 }
 
 }; // namespace Framework
