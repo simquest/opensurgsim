@@ -57,7 +57,6 @@ surgsim_add_library(
 	SurgSimCollision
 	"${SURGSIM_COLLISION_SOURCES}"
 	"${SURGSIM_COLLISION_HEADERS}"
-	"SurgSim/Collision"
 )
 
 SET(LIBS

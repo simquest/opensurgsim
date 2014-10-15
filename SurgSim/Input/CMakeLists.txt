@@ -36,7 +36,6 @@ surgsim_add_library(
 	SurgSimInput
 	"${SURGSIM_INPUT_SOURCES}"
 	"${SURGSIM_INPUT_HEADERS}"
-	"SurgSim/Input"
 )
 
 set(LIBS  

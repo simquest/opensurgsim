@@ -33,8 +33,8 @@ set(KEYBOARD_DEVICE_HEADERS
 
 surgsim_add_library(
 	KeyboardDevice
-	"${KEYBOARD_DEVICE_SOURCES}" "${KEYBOARD_DEVICE_HEADERS}"
-	SurgSim/Devices/Keyboard
+	"${KEYBOARD_DEVICE_SOURCES}"
+	"${KEYBOARD_DEVICE_HEADERS}"
 )
 
 set(LIBS

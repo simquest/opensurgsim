@@ -35,8 +35,8 @@ set(DEVICE_FILTERS_HEADERS
 
 surgsim_add_library(
 	SurgSimDeviceFilters
-	"${DEVICE_FILTERS_SOURCES}" "${DEVICE_FILTERS_HEADERS}"
-	SurgSim/Devices/DeviceFilters
+	"${DEVICE_FILTERS_SOURCES}"
+	"${DEVICE_FILTERS_HEADERS}"
 )
 
 target_link_libraries(SurgSimDeviceFilters ${LIBS})

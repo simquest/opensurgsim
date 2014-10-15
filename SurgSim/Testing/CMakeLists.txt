@@ -39,7 +39,6 @@ surgsim_add_library(
 	SurgSimTesting
 	"${SURGSIM_TESTING_SOURCES}"
 	"${SURGSIM_TESTING_HEADERS}"
-	"SurgSim/Testing"
 )
 add_dependencies(SurgSimTesting yaml-cpp)
 

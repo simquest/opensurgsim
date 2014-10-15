@@ -160,7 +160,6 @@ surgsim_add_library(
 	SurgSimGraphics
 	"${SURGSIM_GRAPHICS_SOURCES}"
 	"${SURGSIM_GRAPHICS_HEADERS}"
-	"SurgSim/Graphics"
 )
 
 SET(LIBS

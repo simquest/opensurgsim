@@ -148,7 +148,6 @@ surgsim_add_library(
 	SurgSimPhysics
 	"${SURGSIM_PHYSICS_SOURCES}"
 	"${SURGSIM_PHYSICS_HEADERS}"
-	"SurgSim/Physics"
 )
 
 SET(LIBS

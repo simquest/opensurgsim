@@ -45,8 +45,8 @@ set(NOVINT_DEVICE_HEADERS
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
 	NovintDevice
-	"${NOVINT_DEVICE_SOURCES}" "${NOVINT_DEVICE_HEADERS}"
-	SurgSim/Devices/Novint
+	"${NOVINT_DEVICE_SOURCES}"
+	"${NOVINT_DEVICE_HEADERS}"
 )
 
 target_link_libraries(NovintDevice ${LIBS})

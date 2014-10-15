@@ -185,8 +185,9 @@ endfunction()
 # Works with the install system and detects whether the library is 
 # header only or has source files, for header only the headers are copied into
 # the appropriate directory. 
-# Note that when calling this the parameters  should be quoted to separate lists
-function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIRECTORY)
+# Note that when calling this the parameters should be quoted to separate lists
+function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES)
+	file(RELATIVE_PATH HEADER_DIRECTORY ${SURGSIM_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 	if (SOURCE_FILES)
 		add_library(${LIBRARY_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 

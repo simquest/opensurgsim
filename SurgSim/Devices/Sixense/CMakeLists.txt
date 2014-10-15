@@ -42,8 +42,8 @@ set(SIXENSE_DEVICE_HEADERS
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
 	SixenseDevice
-	"${SIXENSE_DEVICE_SOURCES}" "${SIXENSE_DEVICE_HEADERS}"
-	SurgSim/Devices/Sixense
+	"${SIXENSE_DEVICE_SOURCES}"
+	"${SIXENSE_DEVICE_HEADERS}"
 )
 
 target_link_libraries(SixenseDevice ${LIBS})

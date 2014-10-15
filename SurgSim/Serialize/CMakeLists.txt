@@ -34,7 +34,6 @@ surgsim_add_library(
 	SurgSimSerialize
 	"${SURGSIM_SERIALIZE_SOURCES}"
 	"${SURGSIM_SERIALIZE_HEADERS}"
-	"SurgSim/Serialize"
 )
 
 set(LIBS 

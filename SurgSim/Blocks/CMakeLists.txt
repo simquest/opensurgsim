@@ -51,7 +51,6 @@ surgsim_add_library(
 	SurgSimBlocks
 	"${SURGSIM_BLOCKS_SOURCES}"
 	"${SURGSIM_BLOCKS_HEADERS}"
-	"SurgSim/Blocks"
 )
 
 SET(LIBS
