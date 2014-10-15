@@ -166,7 +166,9 @@ bool OsgManager::doUpdate(double dt)
 
 void OsgManager::doBeforeStop()
 {
+#ifdef OSS_DEBUG
 	dumpDebugInfo();
+#endif
 	// Delete the viewer so that the graphics context will be released in the manager's thread
 	m_viewer = nullptr;
 }
