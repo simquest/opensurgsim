@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_@MODULE_NAME_UPPER@_H
-#define SURGSIM_@MODULE_NAME_UPPER@_H
+#ifndef @HEADER_GUARD@
+#define @HEADER_GUARD@
 
 @HEADER_FILES_INCLUDES@
 
-#endif // SURGSIM_@MODULE_NAME_UPPER@_H
+#endif // @HEADER_GUARD@
 
 

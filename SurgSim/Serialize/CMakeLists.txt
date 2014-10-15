@@ -28,6 +28,7 @@ set(SURGSIM_SERIALIZE_HEADERS
 	ShapesFactory.h
 	ShapesFactory-inl.h
 )
+surgsim_add_library_header(Serialize.h "${SURGSIM_SERIALIZE_HEADERS}")
 
 surgsim_add_library(
 	SurgSimSerialize
