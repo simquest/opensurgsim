@@ -16,27 +16,15 @@
 #include <memory>
 
 #include "Examples/Stapling/StaplerBehavior.h"
-#include "SurgSim/Blocks/KeyboardTogglesComponentBehavior.h"
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
-#include "SurgSim/Blocks/VisualizeContactsBehavior.h"
-#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
-#include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/BehaviorManager.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/Scene.h"
+
+#include "SurgSim/Blocks/Blocks.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
-#include "SurgSim/Graphics/OsgManager.h"
-#include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
-#include "SurgSim/Graphics/OsgView.h"
-#include "SurgSim/Graphics/OsgViewElement.h"
-#include "SurgSim/Input/InputManager.h"
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/PhysicsManager.h"
-#include "SurgSim/Physics/VirtualToolCoupler.h"
+#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Framework/Framework.h"
+#include "SurgSim/Graphics/Graphics.h"
+#include "SurgSim/Input/Input.h"
+#include "SurgSim/Math/Math.h"
+#include "SurgSim/Physics/Physics.h"
 
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Device::MultiAxisDevice;
