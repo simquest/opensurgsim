@@ -383,7 +383,7 @@ bool StaplerBehavior::doInitialize()
 {
 	SURGSIM_ASSERT(m_from) << "StaplerBehavior: no InputComponent held.";
 	SURGSIM_ASSERT((m_virtualTeeth[0] != nullptr) && (m_virtualTeeth[1] != nullptr)) <<
-			"StaplerBehavior: setVirtualStaple was not called, or it was passed nullptr for a Collision Representation.";
+		"StaplerBehavior: setVirtualStaple was not called, or it was passed nullptr for a Collision Representation.";
 	return true;
 }
 

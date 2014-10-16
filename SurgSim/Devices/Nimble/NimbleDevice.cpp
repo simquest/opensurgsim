@@ -66,7 +66,7 @@ bool NimbleDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized()) << "Nimble: Attempt to finalize an uninitialized device.";
 	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
-	
+
 	bool ok = m_scaffold->unregisterDevice(this);
 	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalized.";
 	m_scaffold.reset();
