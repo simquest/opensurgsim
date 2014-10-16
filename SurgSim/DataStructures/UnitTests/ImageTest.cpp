@@ -55,6 +55,18 @@ TYPED_TEST(ImageTests, Construct)
 	ASSERT_NO_THROW({Image<T> image(3, 3, 1, array);});
 }
 
+TYPED_TEST(ImageTests, ConstructFromOtherType)
+{
+	typedef typename TestFixture::Scalar T;
+
+	double array[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+	Image<T> image(3, 3, 1, array);
+	for (int i = 0; i < 9; i++)
+	{
+		EXPECT_NEAR(static_cast<T>(array[i]), image.getData()[i], epsilon);
+	}
+}
+
 TYPED_TEST(ImageTests, Copy)
 {
 	typedef typename TestFixture::Scalar T;
@@ -166,7 +178,7 @@ TYPED_TEST(ImageTests, PointerAccess)
 	}
 }
 
-TYPED_TEST(ImageTests, EigenAccess)
+TYPED_TEST(ImageTests, ChannelAccess)
 {
 	typedef typename TestFixture::Scalar T;
 	typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> Matrix;
@@ -179,10 +191,17 @@ TYPED_TEST(ImageTests, EigenAccess)
 		EXPECT_THROW(image.getChannel(100), SurgSim::Framework::AssertionFailure);
 	}
 	{
+		Image<T> image(10, 20, 3);
+		EXPECT_THROW(image.setChannel(100, Matrix::Constant(10, 20, T(0))), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(image.setChannel(0, Matrix::Constant(20, 10, T(0))), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(image.setChannel(2, Matrix::Constant(20, 20, T(0))), SurgSim::Framework::AssertionFailure);
+		EXPECT_NO_THROW(image.setChannel(2, Matrix::Constant(10, 20, T(0))));
+	}
+	{
 		Image<T> image(300, 300, 3);
-		image.getChannel(0) = Matrix::Constant(300, 300, T(0));
-		image.getChannel(1) = Matrix::Constant(300, 300, T(1));
-		image.getChannel(2) = Matrix::Constant(300, 300, T(2));
+		image.setChannel(0, Matrix::Constant(300, 300, T(0)));
+		image.setChannel(1, Matrix::Constant(300, 300, T(1)));
+		image.setChannel(2, Matrix::Constant(300, 300, T(2)));
 
 		for (int i = 0; i < 300*300; i++)
 		{
@@ -206,7 +225,77 @@ TYPED_TEST(ImageTests, EigenAccess)
 		EXPECT_NEAR(30, matrix(3, 0), epsilon);
 		EXPECT_NEAR(54, matrix(5, 4), epsilon);
 	}
+	{
+		Image<T> image(10, 30, 1);
+		image.setChannel(0, Matrix::Constant(10, 30, T(1)));
+		image.setChannel(0, image.getChannel(0) * T(2));
+		EXPECT_TRUE(image.getChannel(0).isApprox(Matrix::Constant(10, 30, T(2))));
+
+		image.setChannel(0, image.getChannel(0).array() + T(3));
+		EXPECT_TRUE(image.getChannel(0).isApprox(Matrix::Constant(10, 30, T(5))));
+	}
+	{
+		Image<T> image(10, 30, 1);
+		image.getChannel(0) = Matrix::Constant(10, 30, T(1));
+		image.getChannel(0) *= 2;
+		EXPECT_TRUE(image.getChannel(0).isApprox(Matrix::Constant(10, 30, T(2))));
+
+		image.getChannel(0) = image.getChannel(0).array() + T(3);
+		EXPECT_TRUE(image.getChannel(0).isApprox(Matrix::Constant(10, 30, T(5))));
+	}
 }
 
+TYPED_TEST(ImageTests, VectorAccess)
+{
+	typedef typename TestFixture::Scalar T;
+	typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+
+	T array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+	{
+		Image<T> image(3, 3, 1, array);
+		for (int i = 0; i < 9; i++)
+		{
+			auto vector = image.getAsVector();
+			EXPECT_NEAR(array[i], vector[i], epsilon);
+		}
+	}
+	{
+		Image<T> image(3, 1, 3, array);
+		for (int i = 0; i < 9; i++)
+		{
+			auto vector = image.getAsVector();
+			EXPECT_NEAR(array[i], vector[i], epsilon);
+		}
+	}
+	{
+		Image<T> image(1, 3, 3, array);
+		for (int i = 0; i < 9; i++)
+		{
+			auto vector = image.getAsVector();
+			EXPECT_NEAR(array[i], vector[i], epsilon);
+		}
+	}
+	{
+		Image<T> image(10, 20, 3);
+		EXPECT_THROW(image.setAsVector(Matrix::Constant(2, 1, T(0))), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(image.setAsVector(Matrix::Constant(10*20, 1, T(0))), SurgSim::Framework::AssertionFailure);
+		EXPECT_NO_THROW(image.setAsVector(Matrix::Constant(10*20*3, 1, T(0))));
+	}
+	{
+		Image<T> image(3,3,1);
+		image.setAsVector(Matrix::Constant(9, 1, T(7)));
+		EXPECT_TRUE(image.getAsVector().isApprox(Matrix::Constant(9, 1, T(7))));
+		EXPECT_TRUE(image.getChannel(0).isApprox(Matrix::Constant(3, 3, T(7))));
+
+		image.setAsVector(image.getAsVector() * T(2));
+		EXPECT_TRUE(image.getAsVector().isApprox(Matrix::Constant(9, 1, T(14))));
+		EXPECT_TRUE(image.getChannel(0).isApprox(Matrix::Constant(3, 3, T(14))));
+
+		image.getAsVector() *= T(2);
+		EXPECT_TRUE(image.getAsVector().isApprox(Matrix::Constant(9, 1, T(28))));
+		EXPECT_TRUE(image.getChannel(0).isApprox(Matrix::Constant(3, 3, T(28))));
+	}
 }
-}
+
+};
+};
