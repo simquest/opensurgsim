@@ -154,6 +154,8 @@ private:
 
 	std::shared_ptr<Barrier> m_barrier;
 	bool m_isPaused;
+
+	bool m_isStopped;
 };
 
 }; // namespace Framework
