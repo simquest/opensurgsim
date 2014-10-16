@@ -320,9 +320,9 @@ bool Runtime::loadScene(const std::string& fileName)
 
 		YAML::Node node = YAML::LoadFile(path);
 
-		auto scene = std::make_shared<Scene>(getSharedPtr());
-		scene->decode(node);
-		m_scene = scene;
+		m_scene = std::make_shared<Scene>(getSharedPtr());
+		m_scene->decode(node);
+
 		result = true;
 
 		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
