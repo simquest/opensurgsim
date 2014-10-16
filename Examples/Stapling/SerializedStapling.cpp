@@ -53,7 +53,7 @@ using SurgSim::Physics::PhysicsManager;
 
 template <typename Type>
 std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement,
-										  const std::string& name)
+		const std::string& name)
 {
 	std::shared_ptr<SurgSim::Framework::Component> component = sceneElement->getComponent(name);
 	SURGSIM_ASSERT(component != nullptr) << "Failed to get Component named '" << name << "'.";
@@ -84,15 +84,13 @@ int main(int argc, char* argv[])
 	if (!device->initialize())
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "Could not initialize device " << device->getName() << " for the tool.";
+				<< "Could not initialize device " << device->getName() << " for the tool.";
 
 		device = std::make_shared<IdentityPoseDevice>(deviceName);
 	}
 	inputManager->addDevice(device);
 
-	YAML::Node node = YAML::LoadFile("Data/StaplingDemo.yaml");
-
-	runtime->getScene()->decode(node);
+	runtime->loadScene("Data/StaplingDemo.yaml");
 
 	std::shared_ptr<SceneElement> arm = runtime->getScene()->getSceneElement("arm");
 	std::shared_ptr<SceneElement> wound = runtime->getScene()->getSceneElement("wound");
