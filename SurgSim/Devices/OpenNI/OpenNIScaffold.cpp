@@ -229,7 +229,7 @@ bool OpenNIScaffold::doUpdate(double dt)
 			newImages = true;
 			ImageType image(depthFrame.getWidth(), depthFrame.getHeight(), 1,
 					reinterpret_cast<const unsigned short*>(depthFrame.getData()));
-			image.getAsVector() *= (1.0 / 1000.0); // convert from mm to meters
+			image.getAsVector() *= (1.0f / 1000.0f); // convert from mm to meters
 			inputData.images().set("depth", std::move(image));
 		}
 

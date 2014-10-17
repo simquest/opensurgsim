@@ -121,7 +121,7 @@ struct GlutImage : GlutRenderObject
 private:
 	int m_imageNum;
 	int m_numImages;
-	uint m_texture;
+	unsigned int m_texture;
 	bool m_firstRun;
 };
 
