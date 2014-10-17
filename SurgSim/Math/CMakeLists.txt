@@ -96,7 +96,7 @@ set(SURGSIM_MATH_HEADERS
 	Valid-inl.h
 	Vector.h
 )
-surgsim_add_library_header(Math.h "${SURGSIM_MATH_HEADERS}")
+surgsim_create_library_header(Math.h "${SURGSIM_MATH_HEADERS}")
 
 surgsim_add_library(
 	SurgSimMath

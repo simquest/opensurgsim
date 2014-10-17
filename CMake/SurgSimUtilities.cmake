@@ -162,7 +162,7 @@ endmacro()
 
 # This function will create a new header file (LIBRARY_HEADER) that includes
 # all the headers in HEADER_FILES.
-function(surgsim_add_library_header LIBRARY_HEADER HEADER_FILES)
+function(surgsim_create_library_header LIBRARY_HEADER HEADER_FILES)
 	if(";${HEADER_FILES};" MATCHES ";${LIBRARY_HEADER};")
 		message(FATAL_ERROR
 			"Cannot create library header named '${LIBRARY_HEADER}' because there is already a header with that name")
