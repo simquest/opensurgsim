@@ -48,17 +48,13 @@ set(LIBS
 	${OPENGL_LIBRARIES}
 )
 
-add_executable(NovintVisualTest
-	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-target_link_libraries(NovintVisualTest ${LIBS})
-surgsim_show_ide_folders(
+surgsim_add_executable(NovintVisualTest
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+target_link_libraries(NovintVisualTest ${LIBS})
 
-add_executable(Novint7DofVisualTest
-	${SEVEN_DOF_EXAMPLE_SOURCES} ${SEVEN_DOF_EXAMPLE_HEADERS})
-target_link_libraries(Novint7DofVisualTest ${LIBS})
-surgsim_show_ide_folders(
+surgsim_add_executable(Novint7DofVisualTest
 	"${SEVEN_DOF_EXAMPLE_SOURCES}" "${SEVEN_DOF_EXAMPLE_HEADERS}")
+target_link_libraries(Novint7DofVisualTest ${LIBS})
 
 # Put Novint7DofVisualTest into folder "Devices"
 set_target_properties(Novint7DofVisualTest PROPERTIES FOLDER "Devices")

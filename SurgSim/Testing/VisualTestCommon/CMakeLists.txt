@@ -49,7 +49,4 @@ add_library(VisualTestCommon
 
 target_link_libraries(VisualTestCommon ${LIBS})
 
-surgsim_show_ide_folders(
-	"${VISUAL_TEST_COMMON_SOURCES}" "${VISUAL_TEST_COMMON_HEADERS}")
-
 set_target_properties(VisualTestCommon PROPERTIES FOLDER "Testing")
