@@ -30,6 +30,8 @@ namespace Physics
 class RigidRepresentationState;
 class Localization;
 
+typedef RigidRepresentationBaseLocalization RigidRepresentationLocalization;
+
 SURGSIM_STATIC_REGISTRATION(RigidRepresentation);
 
 /// \class RigidRepresentation

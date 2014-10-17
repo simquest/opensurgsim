@@ -697,7 +697,7 @@ bool LabJackScaffold::unregisterDevice(const LabJackDevice* const device)
 			if ((*matching)->thread)
 			{
 				destroyPerDeviceThread(matching->get());
-				matching->get()->deviceHandle->destroy(matching->get()->deviceObject->getReset());
+				matching->get()->deviceHandle->destroy(matching->get()->deviceObject->getResetOnDestruct());
 			}
 			m_state->activeDeviceList.erase(matching);
 			// the iterator is now invalid but that's OK

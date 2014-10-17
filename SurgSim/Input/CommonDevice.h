@@ -80,6 +80,8 @@ public:
 	/// \return true if successful
 	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
 
+	virtual void clearInputConsumers() override;
+
 	/// Connect this device to an OutputProducerInterface, which will send data to this device.
 	/// \param outputProducer The OutputProducerInterface to connect with.
 	/// \return true if successful
@@ -93,6 +95,8 @@ public:
 	/// Getter for whether or not this device is connected with an OutputProducerInterface.
 	/// \return true if an OutputProducerInterface is connected.
 	virtual bool hasOutputProducer() override;
+
+	virtual void clearOutputProducer() override;
 
 protected:
 

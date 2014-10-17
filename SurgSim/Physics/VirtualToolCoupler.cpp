@@ -27,7 +27,6 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Math::makeSkewSymmetricMatrix;
@@ -37,6 +36,7 @@ using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Quaterniond;
+using SurgSim::Framework::checkAndConvert;
 
 namespace SurgSim
 {
@@ -53,7 +53,7 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_angularStiffness(std::numeric_limits<double>::quiet_NaN()),
 	m_angularDamping(std::numeric_limits<double>::quiet_NaN()),
 	m_localAttachmentPoint(Vector3d(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
-		std::numeric_limits<double>::quiet_NaN())),
+									std::numeric_limits<double>::quiet_NaN())),
 	m_calculateInertialTorques(false),
 	m_poseIndex(-1),
 	m_linearVelocityIndex(-1),
@@ -67,25 +67,25 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_damperJacobianIndex(-1)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
-		LinearStiffness, getOptionalLinearStiffness, setOptionalLinearStiffness);
+									  LinearStiffness, getOptionalLinearStiffness, setOptionalLinearStiffness);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
-		LinearDamping, getOptionalLinearDamping, setOptionalLinearDamping);
+									  LinearDamping, getOptionalLinearDamping, setOptionalLinearDamping);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
-		AngularStiffness, getOptionalAngularStiffness, setOptionalAngularStiffness);
+									  AngularStiffness, getOptionalAngularStiffness, setOptionalAngularStiffness);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, SurgSim::DataStructures::OptionalValue<double>,
-		AngularDamping, getOptionalAngularDamping, setOptionalAngularDamping);
+									  AngularDamping, getOptionalAngularDamping, setOptionalAngularDamping);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler,
-			SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>, AttachmentPoint,
-			getOptionalAttachmentPoint, setOptionalAttachmentPoint);
+									  SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>, AttachmentPoint,
+									  getOptionalAttachmentPoint, setOptionalAttachmentPoint);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, bool, CalculateInertialTorques,
-		getCalculateInertialTorques, setCalculateInertialTorques);
+									  getCalculateInertialTorques, setCalculateInertialTorques);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
-		Input, getInput, setInput);
+									  Input, getInput, setInput);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
-		Output, getOutput, setOutput);
+									  Output, getOutput, setOutput);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
-		Representation, getRepresentation, setRepresentation);
+									  Representation, getRepresentation, setRepresentation);
 }
 
 VirtualToolCoupler::~VirtualToolCoupler()
@@ -99,7 +99,7 @@ const std::shared_ptr<SurgSim::Framework::Component> VirtualToolCoupler::getInpu
 
 void VirtualToolCoupler::setInput(const std::shared_ptr<SurgSim::Framework::Component> input)
 {
-	m_input = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(input);
+	m_input = checkAndConvert<SurgSim::Input::InputComponent>(input, "SurgSim::Input::InputComponent");
 }
 
 const std::shared_ptr<SurgSim::Framework::Component> VirtualToolCoupler::getOutput()
@@ -109,7 +109,7 @@ const std::shared_ptr<SurgSim::Framework::Component> VirtualToolCoupler::getOutp
 
 void VirtualToolCoupler::setOutput(const std::shared_ptr<SurgSim::Framework::Component> output)
 {
-	m_output = std::dynamic_pointer_cast<SurgSim::Input::OutputComponent>(output);
+	m_output = checkAndConvert<SurgSim::Input::OutputComponent>(output, "SurgSim::Input::OutputComponent");
 }
 
 const std::shared_ptr<SurgSim::Framework::Component> VirtualToolCoupler::getRepresentation()
@@ -177,9 +177,9 @@ void VirtualToolCoupler::update(double dt)
 		Matrix66d generalizedStiffness, generalizedDamping;
 		generalizedForce << force, torque;
 		generalizedStiffness << linearStiffnessMatrix, zero3x3,
-								zero3x3, angularStiffnessMatrix;
+							 zero3x3, angularStiffnessMatrix;
 		generalizedDamping << linearDampingMatrix, zero3x3,
-							  zero3x3, angularDampingMatrix;
+						   zero3x3, angularDampingMatrix;
 
 		if (m_calculateInertialTorques)
 		{
@@ -243,13 +243,13 @@ bool VirtualToolCoupler::doWakeUp()
 	if (m_input == nullptr)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "VirtualToolCoupler named " <<
-			getName() << " does not have an Input Component.";
+				getName() << " does not have an Input Component.";
 		return false;
 	}
 	if (m_rigid == nullptr)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "VirtualToolCoupler named " <<
-			getName() << " does not have a Representation.";
+				getName() << " does not have a Representation.";
 		return false;
 	}
 
@@ -344,7 +344,7 @@ void VirtualToolCoupler::overrideLinearStiffness(double linearStiffness)
 double VirtualToolCoupler::getLinearStiffness()
 {
 	SURGSIM_ASSERT(isAwake() || m_optionalLinearStiffness.hasValue())
-		<< "Vtc parameter has not been initialized";
+			<< "Vtc parameter has not been initialized";
 
 	return m_linearStiffness;
 }
@@ -360,7 +360,7 @@ void VirtualToolCoupler::overrideLinearDamping(double linearDamping)
 double VirtualToolCoupler::getLinearDamping()
 {
 	SURGSIM_ASSERT(isAwake() || m_optionalLinearDamping.hasValue())
-		<< "Vtc parameter has not been initialized";
+			<< "Vtc parameter has not been initialized";
 
 	return m_linearDamping;
 }
@@ -376,7 +376,7 @@ void VirtualToolCoupler::overrideAngularStiffness(double angularStiffness)
 double VirtualToolCoupler::getAngularStiffness()
 {
 	SURGSIM_ASSERT(isAwake() || m_optionalAngularStiffness.hasValue())
-		<< "Vtc parameter has not been initialized";
+			<< "Vtc parameter has not been initialized";
 
 	return m_angularStiffness;
 }
@@ -392,7 +392,7 @@ void VirtualToolCoupler::overrideAngularDamping(double angularDamping)
 double VirtualToolCoupler::getAngularDamping()
 {
 	SURGSIM_ASSERT(isAwake() || m_optionalAngularDamping.hasValue())
-		<< "Vtc parameter has not been initialized";
+			<< "Vtc parameter has not been initialized";
 
 	return m_angularDamping;
 }
@@ -408,7 +408,7 @@ void VirtualToolCoupler::overrideAttachmentPoint(const SurgSim::Math::Vector3d& 
 const SurgSim::Math::Vector3d& VirtualToolCoupler::getAttachmentPoint()
 {
 	SURGSIM_ASSERT(isAwake() || m_optionalAttachmentPoint.hasValue())
-		<< "Vtc parameter has not been initialized";
+			<< "Vtc parameter has not been initialized";
 	return m_localAttachmentPoint;
 }
 

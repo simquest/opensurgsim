@@ -140,9 +140,10 @@ public:
 	/// Decode this Accessible from a YAML::Node, will throw an exception if the data type cannot
 	/// be converted.
 	/// \throws SurgSim::Framework::AssertionFailure if node is not of YAML::NodeType::Map.
-	/// \param node The node that carries the data to be, properties with names that don't
-	///             match up with properties in the Accessible are ignored
-	void decode(const YAML::Node& node);
+	/// \param node The node that carries the data to be decoded, properties with names that don't
+	///             match up with properties in the Accessible will be reported.
+	/// \param ignoredProperties Properties that will be ignored.
+	void decode(const YAML::Node& node, const std::vector<std::string>& ignoredProperties = std::vector<std::string>());
 
 private:
 

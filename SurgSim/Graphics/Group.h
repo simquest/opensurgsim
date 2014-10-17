@@ -45,11 +45,11 @@ public:
 	virtual ~Group();
 
 	/// Sets whether the group is currently visible
-	/// \param	visible	True for visible, false for invisible
+	/// \param    visible    True for visible, false for invisible
 	virtual void setVisible(bool visible) = 0;
 
 	/// Gets whether the group is currently visible
-	/// \return	visible	True for visible, false for invisible
+	/// \return    visible    True for visible, false for invisible
 	virtual bool isVisible() const = 0;
 
 	/// Adds an representation

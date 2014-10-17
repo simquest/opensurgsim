@@ -45,6 +45,7 @@ using SurgSim::Physics::FixedRepresentationBilateral3D;
 using SurgSim::Physics::RigidRepresentationBilateral3D;
 using SurgSim::Physics::Fem3DRepresentationBilateral3D;
 using SurgSim::Physics::Localization;
+using SurgSim::Framework::checkAndConvert;
 
 SURGSIM_REGISTER(SurgSim::Framework::Component, StaplerBehavior, StaplerBehavior);
 
@@ -57,22 +58,19 @@ StaplerBehavior::StaplerBehavior(const std::string& name):
 {
 	typedef std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> VirtualTeethArray;
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::shared_ptr<SurgSim::Framework::Component>,
-		InputComponent, getInputComponent, setInputComponent);
+									  InputComponent, getInputComponent, setInputComponent);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::shared_ptr<SurgSim::Framework::Component>,
-		Representation, getRepresentation, setRepresentation);
+									  Representation, getRepresentation, setRepresentation);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, VirtualTeethArray, VirtualTeeth,
-		getVirtualTeeth, setVirtualTeeth);
+									  getVirtualTeeth, setVirtualTeeth);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::list<std::string>, StapleEnabledSceneElements,
-		getStapleEnabledSceneElements, setStapleEnabledSceneElements);
+									  getStapleEnabledSceneElements, setStapleEnabledSceneElements);
 }
 
 void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent)
 {
 	SURGSIM_ASSERT(nullptr != inputComponent) << "'inputComponent' cannot be set to 'nullptr'";
-
-	m_from = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(inputComponent);
-
-	SURGSIM_ASSERT(nullptr != m_from) << "'inputComponent' must derive from SurgSim::Input::InputComponent";
+	m_from = checkAndConvert<SurgSim::Input::InputComponent>(inputComponent, "SurgSim::Input::InputComponent");
 }
 
 std::shared_ptr<SurgSim::Input::InputComponent> StaplerBehavior::getInputComponent()
@@ -83,11 +81,8 @@ std::shared_ptr<SurgSim::Input::InputComponent> StaplerBehavior::getInputCompone
 void StaplerBehavior::setRepresentation(std::shared_ptr<SurgSim::Framework::Component> staplerRepresentation)
 {
 	SURGSIM_ASSERT(nullptr != staplerRepresentation) << "'staplerRepresentation' cannot be set to 'nullptr'";
-
-	m_representation = std::dynamic_pointer_cast<SurgSim::Framework::Representation>(staplerRepresentation);
-
-	SURGSIM_ASSERT(nullptr != m_representation)
-		<< "'staplerRepresentation' must derive from SurgSim::Framework::Representation";
+	m_representation = checkAndConvert<SurgSim::Framework::Representation>(
+						   staplerRepresentation, "SurgSim::Framework::Representation");
 }
 
 std::shared_ptr<SurgSim::Framework::Representation> StaplerBehavior::getRepresentation()
@@ -204,36 +199,36 @@ std::shared_ptr<SurgSim::Physics::Constraint> StaplerBehavior::createBilateral3D
 	// Create the Constraint with appropriate constraint implementation.
 	switch (otherRep->getType())
 	{
-	case SurgSim::Physics::REPRESENTATION_TYPE_FIXED:
-		constraint = std::make_shared<SurgSim::Physics::Constraint>(
-						std::make_shared<SurgSim::Physics::ConstraintData>(),
-						std::make_shared<RigidRepresentationBilateral3D>(),
-						stapleRepLocalization,
-						std::make_shared<FixedRepresentationBilateral3D>(),
-						otherRepLocatization);
-		break;
+		case SurgSim::Physics::REPRESENTATION_TYPE_FIXED:
+			constraint = std::make_shared<SurgSim::Physics::Constraint>(
+							 std::make_shared<SurgSim::Physics::ConstraintData>(),
+							 std::make_shared<RigidRepresentationBilateral3D>(),
+							 stapleRepLocalization,
+							 std::make_shared<FixedRepresentationBilateral3D>(),
+							 otherRepLocatization);
+			break;
 
-	case SurgSim::Physics::REPRESENTATION_TYPE_RIGID:
-		constraint = std::make_shared<SurgSim::Physics::Constraint>(
-						std::make_shared<SurgSim::Physics::ConstraintData>(),
-						std::make_shared<RigidRepresentationBilateral3D>(),
-						stapleRepLocalization,
-						std::make_shared<RigidRepresentationBilateral3D>(),
-						otherRepLocatization);
-		break;
+		case SurgSim::Physics::REPRESENTATION_TYPE_RIGID:
+			constraint = std::make_shared<SurgSim::Physics::Constraint>(
+							 std::make_shared<SurgSim::Physics::ConstraintData>(),
+							 std::make_shared<RigidRepresentationBilateral3D>(),
+							 stapleRepLocalization,
+							 std::make_shared<RigidRepresentationBilateral3D>(),
+							 otherRepLocatization);
+			break;
 
-	case SurgSim::Physics::REPRESENTATION_TYPE_FEM3D:
-		constraint = std::make_shared<SurgSim::Physics::Constraint>(
-						std::make_shared<SurgSim::Physics::ConstraintData>(),
-						std::make_shared<RigidRepresentationBilateral3D>(),
-						stapleRepLocalization,
-						std::make_shared<Fem3DRepresentationBilateral3D>(),
-						otherRepLocatization);
-		break;
+		case SurgSim::Physics::REPRESENTATION_TYPE_FEM3D:
+			constraint = std::make_shared<SurgSim::Physics::Constraint>(
+							 std::make_shared<SurgSim::Physics::ConstraintData>(),
+							 std::make_shared<RigidRepresentationBilateral3D>(),
+							 stapleRepLocalization,
+							 std::make_shared<Fem3DRepresentationBilateral3D>(),
+							 otherRepLocatization);
+			break;
 
-	default:
-		SURGSIM_FAILURE() << "Stapling constraint not supported for this representation type";
-		break;
+		default:
+			SURGSIM_FAILURE() << "Stapling constraint not supported for this representation type";
+			break;
 	}
 
 	return constraint;
@@ -281,15 +276,19 @@ void StaplerBehavior::createStaple()
 		// collision pairs with.
 		ContactMapType::value_type targetRepresentationContacts
 			= *std::max_element(collisionsMap.begin(), collisionsMap.end(),
-								[](const ContactMapType::value_type& lhs, const ContactMapType::value_type& rhs)
-								{ return lhs.second.size() < rhs.second.size(); });
+								[](const ContactMapType::value_type & lhs, const ContactMapType::value_type & rhs)
+		{
+			return lhs.second.size() < rhs.second.size();
+		});
 
 		// Iterate through the list of collision pairs to find a contact with the deepest penetration.
 		std::shared_ptr<SurgSim::Collision::Contact> targetContact
 			= *std::max_element(targetRepresentationContacts.second.begin(), targetRepresentationContacts.second.end(),
 								[](const std::shared_ptr<SurgSim::Collision::Contact>& lhs,
 								   const std::shared_ptr<SurgSim::Collision::Contact>& rhs)
-								{ return lhs->depth < rhs->depth; });
+		{
+			return lhs->depth < rhs->depth;
+		});
 
 		// Create the staple, before creating the constraint with the staple.
 		// The staple is created with no collision representation, because it is going to be constrained.
@@ -315,8 +314,8 @@ void StaplerBehavior::createStaple()
 		// Convert this location to stapleRepresentation.
 		auto stapleRepresentation = staple->getComponents<SurgSim::Physics::Representation>()[0];
 		SurgSim::DataStructures::Location stapleConstraintLocation(SurgSim::Math::Vector3d(
-			stapleRepresentation->getPose().inverse() * targetPhysicsRepresentation->getPose() *
-			targetContact->penetrationPoints.second.rigidLocalPosition.getValue()));
+					stapleRepresentation->getPose().inverse() * targetPhysicsRepresentation->getPose() *
+					targetContact->penetrationPoints.second.rigidLocalPosition.getValue()));
 
 		// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
 		std::shared_ptr<SurgSim::Physics::Constraint> constraint =
@@ -327,10 +326,10 @@ void StaplerBehavior::createStaple()
 		if (constraint == nullptr)
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Failed to create constraint between staple and "
-				<< targetRepresentationContacts.first->getSceneElement()->getName()
-				<< ". This might be because the createBilateral3DConstraint is not supporting the Physics Type: "
-				<< targetPhysicsRepresentation->getType();
+					<< "Failed to create constraint between staple and "
+					<< targetRepresentationContacts.first->getSceneElement()->getName()
+					<< ". This might be because the createBilateral3DConstraint is not supporting the Physics Type: "
+					<< targetPhysicsRepresentation->getType();
 			continue;
 		}
 

@@ -153,10 +153,10 @@ public:
 		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
-	/// Computes the triangle element's initial rotation
+	/// Computes the triangle element's rotation given a state
 	/// \param state The state to compute the rotation from
-	/// \note This method stores the result in m_initialRotation
-	void computeInitialRotation(const SurgSim::Math::OdeState& state);
+	/// \return The rotation matrix of the element in the given state
+	SurgSim::Math::Matrix33d computeRotation(const SurgSim::Math::OdeState& state);
 
 	/// Computes the triangle's stiffness matrix
 	/// \param state The state to compute the stiffness matrix from

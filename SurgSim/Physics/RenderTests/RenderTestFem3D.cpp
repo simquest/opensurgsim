@@ -106,7 +106,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createTetrahedronFem3D(const s
 	graphicsRepresentation->setLocalPose(pose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setVisible(true);
+	graphicsRepresentation->setLocalActive(true);
 
 	// Scene Element
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
@@ -173,7 +173,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createCubeFem3D(const std::str
 	graphicsRepresentation->setLocalPose(pose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setVisible(true);
+	graphicsRepresentation->setLocalActive(true);
 
 	// Scene Element
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);

@@ -21,20 +21,22 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
+using SurgSim::Physics::MockFixedRepresentation;
 using SurgSim::Physics::MockRigidRepresentation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationLocalization;
+using SurgSim::Physics::RigidRepresentationBaseLocalization;
 
 namespace
 {
 	const double epsilon = 1e-10;
 };
 
-class RigidRepresentationLocalizationTest : public ::testing::Test
+class RigidRepresentationBaseLocalizationTest : public ::testing::Test
 {
 public:
 	void SetUp()
@@ -72,20 +74,20 @@ public:
 	SurgSim::Math::RigidTransform3d m_identityTransformation;
 };
 
-TEST_F(RigidRepresentationLocalizationTest, ConstructorTest)
+TEST_F(RigidRepresentationBaseLocalizationTest, ConstructorTest)
 {
-	ASSERT_NO_THROW( {RigidRepresentationLocalization rigidRepresentationLoc;});
+	ASSERT_NO_THROW( {RigidRepresentationBaseLocalization rigidRepresentationLoc;});
 
 	ASSERT_NO_THROW(
 	{
 		std::shared_ptr<RigidRepresentation> rigid = std::make_shared<RigidRepresentation>("RigidRepresentation");
-		RigidRepresentationLocalization rigidRepresentationLoc(rigid);
+		RigidRepresentationBaseLocalization rigidRepresentationLoc(rigid);
 	});
 }
 
-TEST_F(RigidRepresentationLocalizationTest, SetGetRepresentation)
+TEST_F(RigidRepresentationBaseLocalizationTest, SetGetRepresentation)
 {
-	RigidRepresentationLocalization rigidRepresentationLoc;
+	RigidRepresentationBaseLocalization rigidRepresentationLoc;
 	std::shared_ptr<RigidRepresentation> rigid = std::make_shared<RigidRepresentation>("RigidRepresentation");
 
 	EXPECT_EQ(nullptr, rigidRepresentationLoc.getRepresentation());
@@ -97,7 +99,7 @@ TEST_F(RigidRepresentationLocalizationTest, SetGetRepresentation)
 	EXPECT_EQ(nullptr, rigidRepresentationLoc.getRepresentation());
 }
 
-TEST_F(RigidRepresentationLocalizationTest, GetPositionTest)
+TEST_F(RigidRepresentationBaseLocalizationTest, GetPositionTest)
 {
 	// Create the rigid body
 	std::shared_ptr<MockRigidRepresentation> rigidRepresentation =
@@ -107,8 +109,33 @@ TEST_F(RigidRepresentationLocalizationTest, GetPositionTest)
 	rigidRepresentation->setLocalActive(true);
 	rigidRepresentation->getCurrentState().setPose(m_initialTransformation);
 
-	RigidRepresentationLocalization localization = RigidRepresentationLocalization(rigidRepresentation);
+	RigidRepresentationBaseLocalization localization = RigidRepresentationBaseLocalization(rigidRepresentation);
 	ASSERT_EQ(rigidRepresentation, localization.getRepresentation());
+
+	SurgSim::Math::Vector3d origin = m_initialTransformation.translation();
+	SurgSim::Math::Vector3d zero = SurgSim::Math::Vector3d::Zero();
+	localization.setLocalPosition(zero);
+	EXPECT_TRUE(localization.getLocalPosition().isZero(epsilon));
+	EXPECT_TRUE(localization.calculatePosition().isApprox(origin, epsilon));
+
+	SurgSim::Math::Vector3d position = SurgSim::Math::Vector3d::Random();
+	localization.setLocalPosition(position);
+	EXPECT_TRUE(localization.getLocalPosition().isApprox(position, epsilon));
+	EXPECT_FALSE(localization.calculatePosition().isApprox(origin, epsilon));
+}
+
+
+TEST_F(RigidRepresentationBaseLocalizationTest, FixedRepresentation)
+{
+	// Create the rigid body
+	auto fixedRepresentation = std::make_shared<MockFixedRepresentation>();
+
+	// Activate the rigid body and setup its initial pose
+	fixedRepresentation->setLocalActive(true);
+	fixedRepresentation->getCurrentState().setPose(m_initialTransformation);
+
+	RigidRepresentationBaseLocalization localization = RigidRepresentationBaseLocalization(fixedRepresentation);
+	ASSERT_EQ(fixedRepresentation, localization.getRepresentation());
 
 	SurgSim::Math::Vector3d origin = m_initialTransformation.translation();
 	SurgSim::Math::Vector3d zero = SurgSim::Math::Vector3d::Zero();

@@ -51,12 +51,12 @@ set(SURGSIM_COLLISION_HEADERS
 	TriangleMeshPlaneDcdContact.h
 	TriangleMeshTriangleMeshDcdContact.h
 )
+surgsim_create_library_header(Collision.h "${SURGSIM_COLLISION_HEADERS}")
 
 surgsim_add_library(
 	SurgSimCollision
 	"${SURGSIM_COLLISION_SOURCES}"
 	"${SURGSIM_COLLISION_HEADERS}"
-	"SurgSim/Collision"
 )
 
 SET(LIBS

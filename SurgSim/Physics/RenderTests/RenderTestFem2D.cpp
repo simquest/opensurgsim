@@ -185,7 +185,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem2D(const std::string&
 	graphicsPointCloudRepresentation->setLocalPose(gfxPose);
 	graphicsPointCloudRepresentation->setColor(color);
 	graphicsPointCloudRepresentation->setPointSize(3.0f);
-	graphicsPointCloudRepresentation->setVisible(true);
+	graphicsPointCloudRepresentation->setLocalActive(true);
 	femSceneElement->addComponent(graphicsPointCloudRepresentation);
 
 	auto physicsToPointCloud =

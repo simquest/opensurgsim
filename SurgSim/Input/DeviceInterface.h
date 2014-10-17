@@ -63,6 +63,9 @@ public:
 	/// \param inputConsumer The input consumer to be removed.
 	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) = 0;
 
+	/// Removes all InputConsumers.
+	virtual void clearInputConsumers() = 0;
+
 	/// Sets an output producer that will be asked for application output state when the device needs it.
 	/// Any previously set output producer will be removed.
 	///
@@ -77,6 +80,9 @@ public:
 	/// Query if this object has output producer.
 	/// \return	true if there is an output producer, false if not.
 	virtual bool hasOutputProducer() = 0;
+
+	/// Removes any OutputProducer
+	virtual void clearOutputProducer() = 0;
 
 protected:
 	/// Finalize (de-initialize) the device.

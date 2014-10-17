@@ -204,6 +204,12 @@ TEST(CommonDeviceTests, RemoveInputConsumer)
 	EXPECT_EQ(3, consumer2->m_numTimesReceivedInput);
 	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasData("helloWorld"));
 	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasData("helloWorld"));
+
+	device.clearInputConsumers();
+	device.pushInput();
+	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
+	EXPECT_EQ(3, consumer2->m_numTimesReceivedInput);
+	EXPECT_FALSE(device.removeInputConsumer(consumer2));
 }
 
 TEST(CommonDeviceTests, RemoveOutputProducer)
@@ -245,4 +251,9 @@ TEST(CommonDeviceTests, RemoveOutputProducer)
 	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
 	EXPECT_EQ(2, producer2->m_numTimesRequestedOutput);
 	EXPECT_FALSE(device.getOutputData().integers().hasData("value"));
+
+	EXPECT_TRUE(device.setOutputProducer(producer1));
+	EXPECT_TRUE(device.hasOutputProducer());
+	device.clearOutputProducer();
+	EXPECT_FALSE(device.hasOutputProducer());
 }

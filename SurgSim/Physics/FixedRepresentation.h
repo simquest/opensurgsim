@@ -26,6 +26,8 @@ namespace Physics
 {
 class RigidRepresentationState;
 
+typedef RigidRepresentationBaseLocalization FixedRepresentationLocalization;
+
 SURGSIM_STATIC_REGISTRATION(FixedRepresentation);
 
 /// The FixedRepresentation class represents a physics entity without any motion nor

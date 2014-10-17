@@ -99,7 +99,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setVisible(true);
+	graphicsRepresentation->setLocalActive(true);
 
 	femSceneElement->addComponent(graphicsRepresentation);
 

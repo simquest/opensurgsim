@@ -48,8 +48,8 @@ endif()
 
 surgsim_add_library(
 	TrackIRDevice
-	"${TRACKIR_DEVICE_SOURCES}" "${TRACKIR_DEVICE_HEADERS}"
-	SurgSim/Devices/TrackIR
+	"${TRACKIR_DEVICE_SOURCES}"
+	"${TRACKIR_DEVICE_HEADERS}"
 )
 
 if(BUILD_TESTING)

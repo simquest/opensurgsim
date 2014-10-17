@@ -67,16 +67,11 @@ struct convert<std::shared_ptr<SurgSim::Framework::Component> >
 	static Node encode(const std::shared_ptr<SurgSim::Framework::Component> rhs);
 	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Component>& rhs);
 
-private:
-
 	typedef std::unordered_map<std::string, std::shared_ptr<SurgSim::Framework::Component>> RegistryType;
 
 	/// \return The static registry for shared instances
 	static RegistryType& getRegistry();
 };
-
-
-
 
 /// Override of the convert structure for an Component, use this form to write out a full version
 /// of the component information, to decode a component use the other converter. This converter
@@ -106,9 +101,6 @@ struct convert<std::shared_ptr<SurgSim::Framework::Scene>>
 	static Node encode(const std::shared_ptr<SurgSim::Framework::Scene> rhs);
 	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Scene>& rhs);
 };
-
-
-
 
 };
 

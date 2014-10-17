@@ -13,15 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONLOCALIZATION_H
-#define SURGSIM_PHYSICS_RIGIDREPRESENTATIONLOCALIZATION_H
+#ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASELOCALIZATION_H
+#define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASELOCALIZATION_H
 
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/RigidRepresentationBase.h"
 
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
@@ -29,23 +27,19 @@ namespace SurgSim
 namespace Physics
 {
 
-/// This class implement the localization on a RigidRepresentation, as a local position
-/// \todo HS-2013-jun-21 There is a slight mismatch in the way the class was written and
-/// 	  the current use, the constructor needs the correct shared_ptr and that might not
-/// 	  be available, setRepresentation is currently used, but this does not check on the
-/// 	  type of the representation, this needs to be fixed
-class RigidRepresentationLocalization: public Localization
+/// This class implements the localization on a RigidRepresentationBase, as a local position.
+class RigidRepresentationBaseLocalization: public Localization
 {
 public:
 	/// Default constructor
-	RigidRepresentationLocalization();
+	RigidRepresentationBaseLocalization();
 
 	/// Constructor
 	/// \param representation The representation to assign to this localization.
-	explicit RigidRepresentationLocalization(std::shared_ptr<Representation> representation);
+	explicit RigidRepresentationBaseLocalization(std::shared_ptr<Representation> representation);
 
 	/// Destructor
-	virtual ~RigidRepresentationLocalization();
+	virtual ~RigidRepresentationBaseLocalization();
 
 	/// Sets the local position.
 	/// \param p The local position to set the localization at.
@@ -75,4 +69,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_RIGIDREPRESENTATIONLOCALIZATION_H
+#endif  // SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASELOCALIZATION_H

@@ -37,27 +37,11 @@ public:
 	explicit MockOsgRepresentation(const std::string& name) :
 		SurgSim::Graphics::Representation(name),
 		SurgSim::Graphics::OsgRepresentation(name),
-		m_isVisible(true),
 		m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isInitialized(false),
 		m_isAwoken(false)
 	{
-		m_transform.setIdentity();
-	}
-
-	/// Sets whether the representation is currently visible
-	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible)
-	{
-		m_isVisible = visible;
-	}
-
-	/// Gets whether the representation is currently visible
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const
-	{
-		return m_isVisible;
 	}
 
 	/// Returns the number of times the representation has been updated
@@ -74,7 +58,7 @@ public:
 	/// Updates the representation.
 	/// \param	dt	The time in seconds of the preceding timestep.
 	/// \post m_numUpdates is incremented and dt is added to m_sumDt
-	virtual void update(double dt)
+	virtual void doUpdate(double dt)
 	{
 		++m_numUpdates;
 		m_sumDt += dt;
@@ -107,9 +91,6 @@ private:
 		return true;
 	}
 
-	/// Whether this representation is currently visible or not
-	bool m_isVisible;
-
 	/// Number of times the representation has been updated
 	int m_numUpdates;
 	/// Sum of the dt that the representation has been updated with
@@ -119,9 +100,6 @@ private:
 	bool m_isInitialized;
 	/// Whether the representation has been awoken
 	bool m_isAwoken;
-
-	/// Rigid transform describing pose of the representation
-	SurgSim::Math::RigidTransform3d m_transform;
 };
 
 

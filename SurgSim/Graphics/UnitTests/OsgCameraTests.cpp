@@ -56,7 +56,7 @@ TEST(OsgCameraTests, InitTest)
 
 	EXPECT_EQ("test name", camera->getName());
 
-	EXPECT_TRUE(camera->isVisible());
+	EXPECT_TRUE(camera->isActive());
 
 	EXPECT_TRUE(camera->getPose().matrix().isApprox(
 					fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).inverse())) <<
@@ -86,7 +86,7 @@ TEST(OsgCameraTests, OsgNodesTest)
 	EXPECT_EQ(camera.get(), switchNode->getChild(0));
 }
 
-TEST(OsgCameraTests, VisibilityTest)
+TEST(OsgCameraTests, ActivenessTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<OsgRepresentation> osgRepresentation = osgCamera;
@@ -97,15 +97,15 @@ TEST(OsgCameraTests, VisibilityTest)
 	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
 	EXPECT_TRUE(switchNode.valid());
 
-	EXPECT_TRUE(camera->isVisible());
+	EXPECT_TRUE(camera->isActive());
 	EXPECT_TRUE(switchNode->getChildValue(osgCamera->getOsgCamera()));
 
-	camera->setVisible(false);
-	EXPECT_FALSE(camera->isVisible());
+	camera->setLocalActive(false);
+	EXPECT_FALSE(camera->isActive());
 	EXPECT_FALSE(switchNode->getChildValue(osgCamera->getOsgCamera()));
 
-	camera->setVisible(true);
-	EXPECT_TRUE(camera->isVisible());
+	camera->setLocalActive(true);
+	EXPECT_TRUE(camera->isActive());
 	EXPECT_TRUE(switchNode->getChildValue(osgCamera->getOsgCamera()));
 
 }
@@ -232,7 +232,6 @@ TEST(OsgCameraTests, Serialization)
 	// Set values.
 	SurgSim::Math::Matrix44d projection = SurgSim::Math::Matrix44d::Random();
 	camera->setValue("ProjectionMatrix", projection);
-	camera->setValue("Visible", true);
 	camera->setValue("AmbientColor", SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4));
 
 	// Serialize.
@@ -247,8 +246,7 @@ TEST(OsgCameraTests, Serialization)
 	// Verify.
 	EXPECT_TRUE(boost::any_cast<SurgSim::Math::Matrix44d>(camera->getValue("ProjectionMatrix")).isApprox(
 				boost::any_cast<SurgSim::Math::Matrix44d>(newCamera->getValue("ProjectionMatrix"))));
-	EXPECT_EQ(boost::any_cast<bool>(camera->getValue("Visible")),
-			  boost::any_cast<bool>(newCamera->getValue("Visible")));
+
 	EXPECT_TRUE(boost::any_cast<SurgSim::Math::Vector4d>(camera->getValue("AmbientColor")).isApprox(
 				boost::any_cast<SurgSim::Math::Vector4d>(newCamera->getValue("AmbientColor"))));
 }

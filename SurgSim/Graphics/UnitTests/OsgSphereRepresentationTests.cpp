@@ -95,27 +95,6 @@ TEST(OsgSphereRepresentationTests, OsgNodeTest)
 	ASSERT_NE(nullptr, node) << "Could not get unit sphere OSG node!";
 }
 
-TEST(OsgSphereRepresentationTests, VisibilityTest)
-{
-	std::shared_ptr<OsgRepresentation> osgRepresentation = std::make_shared<OsgSphereRepresentation>("test name");
-	std::shared_ptr<Representation> representation = osgRepresentation;
-
-	osg::Switch* switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
-	ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
-	ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
-
-	EXPECT_TRUE(representation->isVisible());
-	EXPECT_TRUE(switchNode->getChildValue(switchNode->getChild(0)));
-
-	representation->setVisible(false);
-	EXPECT_FALSE(representation->isVisible());
-	EXPECT_FALSE(switchNode->getChildValue(switchNode->getChild(0)));
-
-	representation->setVisible(true);
-	EXPECT_TRUE(representation->isVisible());
-	EXPECT_TRUE(switchNode->getChildValue(switchNode->getChild(0)));
-}
-
 TEST(OsgSphereRepresentationTests, RadiusTest)
 {
 	std::shared_ptr<SphereRepresentation> sphereRepresentation = std::make_shared<OsgSphereRepresentation>("test name");

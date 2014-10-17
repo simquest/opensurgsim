@@ -72,17 +72,6 @@ TEST(OsgBoxRepresentationTests, AccessibleTest)
 	EXPECT_TRUE(size.isApprox(decoded->getValue<SurgSim::Math::Vector3d>("Size")));
 }
 
-TEST(OsgBoxRepresentationTests, VisibilityTest)
-{
-	std::shared_ptr<Representation> representation = std::make_shared<OsgBoxRepresentation>("test name");
-
-	representation->setVisible(true);
-	EXPECT_TRUE(representation->isVisible());
-
-	representation->setVisible(false);
-	EXPECT_FALSE(representation->isVisible());
-}
-
 TEST(OsgBoxRepresentationTests, SizeXTest)
 {
 	std::shared_ptr<BoxRepresentation> boxRepresentation = std::make_shared<OsgBoxRepresentation>("test name");

@@ -93,6 +93,7 @@ else(USE_SYSTEM_YAMLCPP)
 endif(USE_SYSTEM_YAMLCPP)
 
 include_directories(${SURGSIM_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(SYSTEM
 	${Boost_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR}

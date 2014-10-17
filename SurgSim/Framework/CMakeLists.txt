@@ -53,6 +53,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	BehaviorManager.h
 	Clock.h
 	Component.h
+	Component-inl.h
 	ComponentManager.h
 	ComponentManager-inl.h
 	FrameworkConvert.h
@@ -80,12 +81,12 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Timer.h
 	TransferPropertiesBehavior.h
 )
+surgsim_create_library_header(Framework.h "${SURGSIM_FRAMEWORK_HEADERS}")
 
 surgsim_add_library(
 	SurgSimFramework
 	"${SURGSIM_FRAMEWORK_SOURCES}"
 	"${SURGSIM_FRAMEWORK_HEADERS}"
-	"SurgSim/Framework"
 )
 
 SET(LIBS
@@ -94,7 +95,6 @@ SET(LIBS
 )
 
 target_link_libraries(SurgSimFramework ${LIBS})
-add_dependencies(SurgSimFramework yaml-cpp)
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)

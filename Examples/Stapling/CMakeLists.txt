@@ -39,7 +39,6 @@ set(SERIALIZEDSTAPLING_HEADERS
 	StaplerBehavior.h
 )
 surgsim_add_executable(SerializedStapling "${SERIALIZEDSTAPLING_SOURCES}" "${SERIALIZEDSTAPLING_HEADERS}")
-add_dependencies(SerializedStapling yaml-cpp)
 
 set(LIBS 
 	IdentityPoseDevice

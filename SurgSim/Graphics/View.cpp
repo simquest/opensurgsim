@@ -21,6 +21,7 @@
 #include "SurgSim/Graphics/Camera.h"
 
 using SurgSim::Framework::Component;
+using SurgSim::Framework::checkAndConvert;
 
 namespace SurgSim
 {
@@ -56,9 +57,7 @@ View::View(const std::string& name) :
 
 void View::setCamera(std::shared_ptr<Component> camera)
 {
-	auto castCamera = std::dynamic_pointer_cast<Camera>(camera);
-	SURGSIM_ASSERT(castCamera != nullptr) << "setCamera() passed not a camera.";
-	m_camera = castCamera;
+	m_camera = checkAndConvert<Camera>(camera, "SurgSim::Graphics::Camera");
 }
 
 std::shared_ptr<Camera> View::getCamera() const

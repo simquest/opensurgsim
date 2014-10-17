@@ -85,6 +85,11 @@ bool MultiAxisDevice::removeInputConsumer(std::shared_ptr<SurgSim::Input::InputC
 	return m_filter->removeInputConsumer(inputConsumer);
 }
 
+void MultiAxisDevice::clearInputConsumers()
+{
+	m_filter->clearInputConsumers();
+}
+
 bool MultiAxisDevice::setOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer)
 {
 	return m_filter->setOutputProducer(outputProducer);
@@ -98,6 +103,11 @@ bool MultiAxisDevice::removeOutputProducer(std::shared_ptr<SurgSim::Input::Outpu
 bool MultiAxisDevice::hasOutputProducer()
 {
 	return m_filter->hasOutputProducer();
+}
+
+void MultiAxisDevice::clearOutputProducer()
+{
+	m_filter->clearOutputProducer();
 }
 
 void MultiAxisDevice::setPositionScale(double scale)

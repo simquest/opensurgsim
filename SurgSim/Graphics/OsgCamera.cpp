@@ -126,14 +126,10 @@ bool OsgCamera::setRenderGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	}
 }
 
-void OsgCamera::setVisible(bool visible)
+void OsgCamera::setLocalActive(bool val)
 {
-	m_switch->setChildValue(m_camera, visible);
-}
-
-bool OsgCamera::isVisible() const
-{
-	return m_switch->getChildValue(m_camera);
+	Component::setLocalActive(val);
+	m_switch->setChildValue(m_camera, isActive());
 }
 
 SurgSim::Math::Matrix44d OsgCamera::getViewMatrix() const
@@ -154,17 +150,22 @@ const SurgSim::Math::Matrix44d& OsgCamera::getProjectionMatrix() const
 
 void OsgCamera::update(double dt)
 {
-	// HS-2014-may-05 There is an issue between setting the projection matrix in the constructor and the
-	// instantiation of the viewer with the view port that may change the matrix inbetween, for now ... update
-	// every frame
-	// #workaround
-	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+	setVisible(isActive());
 
-	auto viewMatrix = getViewMatrix();
-	auto floatMatrix = viewMatrix.cast<float>();
-	m_camera->setViewMatrix(toOsg(viewMatrix));
-	m_viewMatrixUniform->set(floatMatrix);
-	m_inverseViewMatrixUniform->set(floatMatrix.inverse());
+	if (isActive())
+	{
+		// HS-2014-may-05 There is an issue between setting the projection matrix in the constructor and the
+		// instantiation of the viewer with the view port that may change the matrix inbetween, for now ... update
+		// every frame
+		// #workaround
+		m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+
+		auto viewMatrix = getViewMatrix();
+		auto floatMatrix = viewMatrix.cast<float>();
+		m_camera->setViewMatrix(toOsg(viewMatrix));
+		m_viewMatrixUniform->set(floatMatrix);
+		m_inverseViewMatrixUniform->set(floatMatrix.inverse());
+	}
 }
 
 bool OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)

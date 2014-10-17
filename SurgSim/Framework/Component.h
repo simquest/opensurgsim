@@ -148,7 +148,10 @@ protected:
 	/// \return The PoseComponent
 	virtual std::shared_ptr<const PoseComponent> getPoseComponent() const;
 
+
 private:
+
+
 	/// Name of this component
 	std::string m_name;
 
@@ -181,7 +184,22 @@ private:
 
 };
 
+/// The function tries to convert the Source type to the Target type it will throw if Target is not a subclass
+/// of Source.
+/// \tparam Target type that is used as the target type for the conversion, can usually be deduced
+/// \tparam Source type that is the type of the incoming parameter, target needs to be a subclass of Source for the
+///         function to succeed
+/// \param incoming pointer to an instance of Source that is supposed to be converted to a pointer to Target
+/// \param expectedTypeName a name to be used in the error message if the conversion fails, use the full
+///        namespace name of Source here.
+/// \throws if
+/// \return pointer of type Target if Target is a subclass of Source, throws otherwise.
+template <class Target, class Source>
+std::shared_ptr<Target> checkAndConvert(std::shared_ptr<Source> incoming, const std::string& expectedTypeName);
+
 }; // namespace Framework
 }; // namespace SurgSim
+
+#include "SurgSim/Framework/Component-inl.h"
 
 #endif // SURGSIM_FRAMEWORK_COMPONENT_H

@@ -23,8 +23,10 @@
 #include "SurgSim/Framework/Barrier.h"
 #include "SurgSim/Framework/ComponentManager.h"
 #include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/Timer.h"
 
 namespace SurgSim
 {
@@ -35,14 +37,16 @@ std::shared_ptr<ApplicationData> Runtime::m_applicationData;
 
 Runtime::Runtime() :
 	m_isRunning(false),
-	m_isPaused(false)
+	m_isPaused(false),
+	m_isStopped(false)
 {
 	initSearchPaths("");
 }
 
 Runtime::Runtime(const std::string& configFilePath) :
 	m_isRunning(false),
-	m_isPaused(false)
+	m_isPaused(false),
+	m_isStopped(false)
 {
 	initSearchPaths(configFilePath);
 }
@@ -135,6 +139,8 @@ bool Runtime::start(bool paused)
 {
 	auto logger = Logger::getDefaultLogger();
 
+	SURGSIM_ASSERT(m_isStopped == false) << "This runtime has already been stopped, it cannot be started again.";
+
 	// Gather all the Components from the currently known SceneElements to add them
 	// collectively.
 	// HS-2013-dec-12 This construct cause a bug as this also gathers the elements to be processed
@@ -173,6 +179,11 @@ bool Runtime::start(bool paused)
 
 bool Runtime::stop()
 {
+	if (m_isStopped == true)
+	{
+		return false;
+	}
+
 	if (isPaused())
 	{
 		resume();
@@ -180,11 +191,29 @@ bool Runtime::stop()
 
 	m_isRunning = false;
 
+	// Suspend updates on all threads
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
 	{
-		(*it)->stop();
+		(*it)->setIdle(true);
 	}
+
+	// Give all threads time to run through update
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+
+	// Now stop all threads
+	for (it = m_managers.begin(); it != m_managers.end(); ++it)
+	{
+		SurgSim::Framework::Timer timer;
+		timer.start();
+		(*it)->stop();
+		timer.endFrame();
+		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "Killing : " << (*it)->getName() << " took " << timer.getCumulativeTime() << "s";
+	}
+
+	m_isStopped = true;
+
 	return true;
 }
 
@@ -305,6 +334,30 @@ void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 			(*it)->enqueueRemoveComponent(component);
 		}
 	}
+}
+
+bool Runtime::loadScene(const std::string& fileName)
+{
+	// To make sure things are correct, clear the Component cache before and after loading
+
+	bool result = false;
+	std::string path;
+	if (m_applicationData->tryFindFile(fileName, &path))
+	{
+		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
+
+		YAML::Node node = YAML::LoadFile(path);
+
+		m_scene = std::make_shared<Scene>(getSharedPtr());
+		m_scene->decode(node);
+
+		result = true;
+
+		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
+	}
+
+	return result;
+
 }
 
 }; // namespace Framework

@@ -16,27 +16,15 @@
 #include <memory>
 
 #include "Examples/Stapling/StaplerBehavior.h"
-#include "SurgSim/Blocks/KeyboardTogglesComponentBehavior.h"
-#include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
-#include "SurgSim/Blocks/VisualizeContactsBehavior.h"
-#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
-#include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/BehaviorManager.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/Scene.h"
+
+#include "SurgSim/Blocks/Blocks.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
-#include "SurgSim/Graphics/OsgManager.h"
-#include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
-#include "SurgSim/Graphics/OsgView.h"
-#include "SurgSim/Graphics/OsgViewElement.h"
-#include "SurgSim/Input/InputManager.h"
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/PhysicsManager.h"
-#include "SurgSim/Physics/VirtualToolCoupler.h"
+#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Framework/Framework.h"
+#include "SurgSim/Graphics/Graphics.h"
+#include "SurgSim/Input/Input.h"
+#include "SurgSim/Math/Math.h"
+#include "SurgSim/Physics/Physics.h"
 
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Device::MultiAxisDevice;
@@ -53,7 +41,7 @@ using SurgSim::Physics::PhysicsManager;
 
 template <typename Type>
 std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement,
-										  const std::string& name)
+		const std::string& name)
 {
 	std::shared_ptr<SurgSim::Framework::Component> component = sceneElement->getComponent(name);
 	SURGSIM_ASSERT(component != nullptr) << "Failed to get Component named '" << name << "'.";
@@ -84,15 +72,13 @@ int main(int argc, char* argv[])
 	if (!device->initialize())
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "Could not initialize device " << device->getName() << " for the tool.";
+				<< "Could not initialize device " << device->getName() << " for the tool.";
 
 		device = std::make_shared<IdentityPoseDevice>(deviceName);
 	}
 	inputManager->addDevice(device);
 
-	YAML::Node node = YAML::LoadFile("Data/StaplingDemo.yaml");
-
-	runtime->getScene()->decode(node);
+	runtime->loadScene("Data/StaplingDemo.yaml");
 
 	std::shared_ptr<SceneElement> arm = runtime->getScene()->getSceneElement("arm");
 	std::shared_ptr<SceneElement> wound = runtime->getScene()->getSceneElement("wound");

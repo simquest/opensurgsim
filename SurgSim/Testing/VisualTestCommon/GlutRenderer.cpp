@@ -33,7 +33,7 @@ GlutRenderObject::~GlutRenderObject()
 {
 }
 
-void GlutSquare::draw() const
+void GlutSquare::draw()
 {
 	glEnable(GL_LIGHTING);
 
@@ -73,7 +73,7 @@ void GlutSquare::draw() const
 	glPopMatrix();
 }
 
-void GlutAxes::draw() const
+void GlutAxes::draw()
 {
 	glDisable(GL_LIGHTING);
 
@@ -106,7 +106,7 @@ void GlutAxes::draw() const
 	glPopMatrix();
 }
 
-void GlutSphere::draw() const
+void GlutSphere::draw()
 {
 	glEnable(GL_LIGHTING);
 
@@ -124,7 +124,7 @@ void GlutSphere::draw() const
 	glPopMatrix();
 }
 
-void GlutGroup::draw() const
+void GlutGroup::draw()
 {
 	glPushMatrix();
 
@@ -169,13 +169,19 @@ void GlutRenderer::display()
 	glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(m_camera->fovY, static_cast<float>(m_width) / m_height, m_camera->zNear, m_camera->zFar);
+	if (m_camera)
+	{
+		gluPerspective(m_camera->fovY, static_cast<float>(m_width) / m_height, m_camera->zNear, m_camera->zFar);
+	}
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(m_camera->eye.x(), m_camera->eye.y(), m_camera->eye.z(),
-			  m_camera->center.x(), m_camera->center.y(), m_camera->center.z(),
-			  m_camera->up.x(), m_camera->up.y(), m_camera->up.z());
+	if (m_camera)
+	{
+		gluLookAt(m_camera->eye.x(), m_camera->eye.y(), m_camera->eye.z(),
+				  m_camera->center.x(), m_camera->center.y(), m_camera->center.z(),
+				  m_camera->up.x(), m_camera->up.y(), m_camera->up.z());
+	}
 
 	glEnable(GL_LIGHT0);
 

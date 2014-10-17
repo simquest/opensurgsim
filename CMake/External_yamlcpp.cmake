@@ -14,34 +14,43 @@
 # limitations under the License.
 
 set(file_id "bAvdlSnfqr5ikadmr6bg7m")
+set(CMAKE_ARGS
+	-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+	-DYAML_CPP_BUILD_TOOLS:BOOL=OFF
+	-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+)
+if(DEFINED CMAKE_BUILD_TYPE)
+	LIST(APPEND CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
+endif(DEFINED CMAKE_BUILD_TYPE)
+
 ExternalProject_Add(yaml-cpp
 	URL "https://www.assembla.com/spaces/OpenSurgSim/documents/${file_id}/download/yaml-cpp.tar.gz"
 	URL_MD5 "6bd2a7b4cc31ad0b65209a8030dda7ed"
 	PREFIX yaml-cpp
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-		-DYAML_CPP_BUILD_TOOLS:BOOL=OFF
-		-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+	CMAKE_ARGS ${CMAKE_ARGS}
 )
 
 ExternalProject_Get_Property(yaml-cpp install_dir)
 
 if(MSVC)
-	set(YAML_CPP_LIBRARIES
-		debug ${install_dir}/lib/libyaml-cppmdd${CMAKE_STATIC_LIBRARY_SUFFIX}
-		optimized ${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}
-		CACHE INTERNAL "")
+	add_library(yaml-cpp-lib STATIC IMPORTED GLOBAL)
+	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_DEBUG
+		"${install_dir}/lib/libyaml-cppmdd${CMAKE_STATIC_LIBRARY_SUFFIX}")
+	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_RELEASE
+		"${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}")
 else()
 	if(BUILD_SHARED_LIBS)
-		set(YAML_CPP_LIBRARIES
-			"${install_dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}yaml-cpp${CMAKE_SHARED_LIBRARY_SUFFIX}"
-			CACHE INTERNAL "")
+		add_library(yaml-cpp-lib SHARED IMPORTED)
+		set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION
+			"${install_dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}yaml-cpp${CMAKE_SHARED_LIBRARY_SUFFIX}")
 	else()
-		set(YAML_CPP_LIBRARIES
-			"${install_dir}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${CMAKE_STATIC_LIBRARY_SUFFIX}"
-			CACHE INTERNAL "")
+		add_library(yaml-cpp-lib STATIC IMPORTED)
+		set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION
+			"${install_dir}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	endif()
 endif()
+add_dependencies(yaml-cpp-lib yaml-cpp)
 
+set(YAML_CPP_LIBRARIES "yaml-cpp-lib" CACHE INTERNAL "")
 set(YAML_CPP_INCLUDE_DIR "${install_dir}/include" CACHE INTERNAL "")
 

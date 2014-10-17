@@ -33,7 +33,6 @@
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
 using SurgSim::DataStructures::Location;
 using SurgSim::Framework::Component;

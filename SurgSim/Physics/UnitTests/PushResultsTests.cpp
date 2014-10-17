@@ -94,8 +94,7 @@ TEST_F(PushResultsTests, OneRepresentationOneConstraintTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			rigidLocalization = rigidLocalizationTyped;
@@ -105,8 +104,7 @@ TEST_F(PushResultsTests, OneRepresentationOneConstraintTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
-			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			fixedLocalization = fixedLocalizationTyped;
@@ -190,8 +188,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			rigidLocalization = rigidLocalizationTyped;
@@ -201,8 +198,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
-			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
 			fixedLocalization = fixedLocalizationTyped;
@@ -224,8 +220,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigidLocalization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Ones());
 			rigidLocalization = rigidLocalizationTyped;
@@ -235,8 +230,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 
 		std::shared_ptr<Localization> fixedLocalization;
 		{
-			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
-			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
 			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
 			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Ones());
 			fixedLocalization = fixedLocalizationTyped;
@@ -332,8 +326,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigid1Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid1Localization = rigidLocalizationTyped;
@@ -343,8 +336,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 
 		std::shared_ptr<Localization> rigid2Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[1]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid2Localization = rigidLocalizationTyped;
@@ -366,8 +358,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 	{
 		std::shared_ptr<Localization> rigid1Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
 			rigidLocalizationTyped->setLocalPosition(pointOrigin);
 			rigid1Localization = rigidLocalizationTyped;
@@ -377,8 +368,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 
 		std::shared_ptr<Localization> rigid2Localization;
 		{
-			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
-			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
 			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[1]);
 			rigidLocalizationTyped->setLocalPosition(pointOne);
 			rigid2Localization = rigidLocalizationTyped;

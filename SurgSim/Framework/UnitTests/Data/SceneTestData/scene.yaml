@@ -1,0 +1,36 @@
+SurgSim::Framework::Scene:
+  SceneElements:
+    - SurgSim::Framework::BasicSceneElement:
+        IsActive: true
+        Components:
+          - SurgSim::Framework::PoseComponent:
+              Name: Pose
+              Id: 71fc22e9-a908-48d5-b0f9-198d60513117
+              IsLocalActive: true
+              Pose:
+                Translation: [0, 0, 0]
+                Quaternion: [0, 0, 0, 1]
+          - MockComponent:
+              Name: component0
+              IsLocalActive: true
+              SucceedWithInit: true
+              SucceedWithWakeUp: true
+              Id: 350c883b-0283-4e34-8148-5b281b758e3b
+        Name: element0
+    - SurgSim::Framework::BasicSceneElement:
+        Components:
+          - MockComponent:
+              IsLocalActive: true
+              SucceedWithInit: true
+              SucceedWithWakeUp: true
+              Id: 5def200c-6515-4c2b-a818-936d616c43af
+              Name: component1
+          - SurgSim::Framework::PoseComponent:
+              IsLocalActive: true
+              Pose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0, 0]
+              Id: 65a4bc87-4d3f-487b-aac9-a9db5a250a28
+              Name: Pose
+        Name: element1
+        IsActive: true

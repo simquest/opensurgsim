@@ -246,7 +246,7 @@ TEST(ComponentTests, NullPointerSerialization)
 	auto container = std::make_shared<TestComponent3>("TestComponent3");
 	YAML::Node containerNode = YAML::convert<Component>::encode(*container);
 	std::shared_ptr<TestComponent3> newContainer = std::dynamic_pointer_cast<TestComponent3>(
-		containerNode.as<std::shared_ptr<Component>>());
+				containerNode.as<std::shared_ptr<Component>>());
 	EXPECT_EQ(nullptr, newContainer->getComponentOne());
 	EXPECT_EQ(nullptr, newContainer->getComponentTwo());
 	EXPECT_EQ(container->getName(), newContainer->getName());
@@ -533,4 +533,21 @@ TEST(ComponentTests, SetActiveTest)
 	EXPECT_NE(nullptr, decodedComponent->getSceneElement());
 	EXPECT_FALSE(decodedComponent->isActive());
 	EXPECT_TRUE(decodedComponent->isLocalActive());
+}
+
+TEST(ComponentTests, CheckAndConvertTest)
+{
+	using SurgSim::Framework::checkAndConvert;
+
+	auto original = std::make_shared<MockComponent>("test");
+	auto other = std::make_shared<MockBehavior>("other");
+	std::shared_ptr<Component> source = original;
+	std::shared_ptr<MockComponent> result;
+
+	EXPECT_NO_THROW(result = checkAndConvert<MockComponent>(source, "MockComponent"));
+	EXPECT_EQ(result, original);
+
+
+	EXPECT_ANY_THROW(result = checkAndConvert<MockComponent>(other, "MockBehavior"));
+
 }

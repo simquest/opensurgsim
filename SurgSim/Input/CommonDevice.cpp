@@ -71,6 +71,8 @@ CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::Dat
 
 CommonDevice::~CommonDevice()
 {
+	clearInputConsumers();
+	clearOutputProducer();
 }
 
 std::string CommonDevice::getName() const
@@ -129,6 +131,12 @@ bool CommonDevice::removeInputConsumer(std::shared_ptr<InputConsumerInterface> i
 	return false;
 }
 
+void CommonDevice::clearInputConsumers()
+{
+	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
+	m_state->inputConsumerList.clear();
+}
+
 bool CommonDevice::setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer)
 {
 	if (! outputProducer)
@@ -159,6 +167,12 @@ bool CommonDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface>
 		return true;
 	}
 	return false;
+}
+
+void CommonDevice::clearOutputProducer()
+{
+	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
+	m_state->outputProducer.reset();
 }
 
 

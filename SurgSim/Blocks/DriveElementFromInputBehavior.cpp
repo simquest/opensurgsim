@@ -23,6 +23,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Framework::checkAndConvert;
 
 namespace SurgSim
 {
@@ -36,15 +37,13 @@ DriveElementFromInputBehavior::DriveElementFromInputBehavior(const std::string& 
 	m_poseName("pose")
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DriveElementFromInputBehavior, std::shared_ptr<SurgSim::Framework::Component>,
-			Source, getSource, setSource);
+									  Source, getSource, setSource);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DriveElementFromInputBehavior, std::string, PoseName, getPoseName, setPoseName);
 }
 
 void DriveElementFromInputBehavior::setSource(std::shared_ptr<SurgSim::Framework::Component> source)
 {
-	m_source = std::dynamic_pointer_cast<SurgSim::Input::InputComponent>(source);
-	SURGSIM_ASSERT(m_source != nullptr) << " setSource for " << getClassName()
-		<< " requires a SurgSim::Input::InputComponent";
+	m_source = checkAndConvert<SurgSim::Input::InputComponent>(source, "SurgSim::Input::InputComponent");
 }
 
 std::shared_ptr<SurgSim::Framework::Component> DriveElementFromInputBehavior::getSource()
@@ -84,14 +83,14 @@ bool DriveElementFromInputBehavior::doWakeUp()
 	if (m_source == nullptr)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
-			getName() + "' must have a source to do anything.";
+				getName() + "' must have a source to do anything.";
 		result = false;
 	}
 
 	if (getPoseComponent() == nullptr)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
-			getName() + "' must belong to a SceneElement with a PoseComponent.";
+				getName() + "' must belong to a SceneElement with a PoseComponent.";
 		result = false;
 	}
 

@@ -40,7 +40,7 @@ namespace Blocks
 {
 SURGSIM_STATIC_REGISTRATION(KeyboardTogglesComponentBehavior);
 
-/// This behavior is used to control the visibility of registered graphical representation(s)
+/// This behavior is used to control the activity of registered components.
 class KeyboardTogglesComponentBehavior : public SurgSim::Framework::Behavior
 {
 public:

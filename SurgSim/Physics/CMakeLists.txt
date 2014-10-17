@@ -66,9 +66,9 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
+	RigidRepresentationBaseLocalization.cpp
 	RigidRepresentationBilateral3D.cpp
 	RigidRepresentationContact.cpp
-	RigidRepresentationLocalization.cpp
 	RigidRepresentationState.cpp
 	SolveMlcp.cpp
 	UpdateCollisionRepresentations.cpp
@@ -111,7 +111,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	FixedRepresentation.h
 	FixedRepresentationBilateral3D.h
 	FixedRepresentationContact.h
-	FixedRepresentationLocalization.h
 	FreeMotion.h
 	LinearSpring.h
 	Localization.h
@@ -134,21 +133,21 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentation.h
 	RigidRepresentationBase.h
 	RigidRepresentationBase-inl.h
+	RigidRepresentationBaseLocalization.h
 	RigidRepresentationBilateral3D.h
 	RigidRepresentationContact.h
-	RigidRepresentationLocalization.h
 	RigidRepresentationState.h
 	SolveMlcp.h
 	Spring.h
 	UpdateCollisionRepresentations.h
 	VirtualToolCoupler.h
 )
+surgsim_create_library_header(Physics.h "${SURGSIM_PHYSICS_HEADERS}")
 
 surgsim_add_library(
 	SurgSimPhysics
 	"${SURGSIM_PHYSICS_SOURCES}"
 	"${SURGSIM_PHYSICS_HEADERS}"
-	"SurgSim/Physics"
 )
 
 SET(LIBS
