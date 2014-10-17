@@ -45,12 +45,12 @@ set(SURGSIM_BLOCKS_HEADERS
 	TransferPhysicsToPointCloudBehavior.h
 	VisualizeContactsBehavior.h
 )
+surgsim_create_library_header(Blocks.h "${SURGSIM_BLOCKS_HEADERS}")
 
 surgsim_add_library(
 	SurgSimBlocks
 	"${SURGSIM_BLOCKS_SOURCES}"
 	"${SURGSIM_BLOCKS_HEADERS}"
-	"SurgSim/Blocks"
 )
 
 SET(LIBS

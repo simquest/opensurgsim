@@ -160,12 +160,34 @@ macro(surgsim_add_unit_tests TESTNAME)
 	surgsim_show_ide_folders("${UNIT_TEST_SOURCES}" "${UNIT_TEST_HEADERS}")
 endmacro()
 
+# This function will create a new header file (LIBRARY_HEADER) that includes
+# all the headers in HEADER_FILES.
+function(surgsim_create_library_header LIBRARY_HEADER HEADER_FILES)
+	if(";${HEADER_FILES};" MATCHES ";${LIBRARY_HEADER};")
+		message(FATAL_ERROR
+			"Cannot create library header named '${LIBRARY_HEADER}' because there is already a header with that name")
+	endif()
+
+	file(RELATIVE_PATH HEADER_DIRECTORY ${SURGSIM_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+	foreach(HEADER ${HEADER_FILES})
+		set(HEADER_FILES_INCLUDES "${HEADER_FILES_INCLUDES}#include \"${HEADER_DIRECTORY}/${HEADER}\"\n")
+	endforeach()
+
+	string(REPLACE "/" "_" HEADER_GUARD "${HEADER_DIRECTORY}/${LIBRARY_HEADER}")
+	string(REPLACE "." "_" HEADER_GUARD ${HEADER_GUARD})
+	string(TOUPPER ${HEADER_GUARD} HEADER_GUARD)
+	configure_file(${SURGSIM_SOURCE_DIR}/CMake/Library.h.in "${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_HEADER}" @ONLY)
+	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_HEADER}"
+		DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
+endfunction()
+
 # Do all the work to add a library to the system
 # Works with the install system and detects whether the library is 
 # header only or has source files, for header only the headers are copied into
 # the appropriate directory. 
-# Note that when calling this the parameters  should be quoted to separate lists
-function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIRECTORY)
+# Note that when calling this the parameters should be quoted to separate lists
+function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES)
+	file(RELATIVE_PATH HEADER_DIRECTORY ${SURGSIM_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 	if (SOURCE_FILES)
 		add_library(${LIBRARY_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 

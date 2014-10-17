@@ -154,12 +154,12 @@ set(SURGSIM_GRAPHICS_HEADERS
 	View.h
 	ViewElement.h
 )
+surgsim_create_library_header(Graphics.h "${SURGSIM_GRAPHICS_HEADERS}")
 
 surgsim_add_library(
 	SurgSimGraphics
 	"${SURGSIM_GRAPHICS_SOURCES}"
 	"${SURGSIM_GRAPHICS_HEADERS}"
-	"SurgSim/Graphics"
 )
 
 SET(LIBS

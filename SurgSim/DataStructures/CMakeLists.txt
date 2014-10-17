@@ -81,12 +81,12 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	Vertex.h
 	Vertices.h
 )
+surgsim_create_library_header(DataStructures.h "${SURGSIM_DATA_STRUCTURES_HEADERS}")
 
 surgsim_add_library(
 	SurgSimDataStructures
 	"${SURGSIM_DATA_STRUCTURES_SOURCES}"
 	"${SURGSIM_DATA_STRUCTURES_HEADERS}"
-	"SurgSim/DataStructures"
 )
 
 set(LIBS 

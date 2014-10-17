@@ -44,8 +44,8 @@ set(NIMBLE_DEVICE_HEADERS
 
 surgsim_add_library(
 	NimbleDevice
-	"${NIMBLE_DEVICE_SOURCES}" "${NIMBLE_DEVICE_HEADERS}"
-	SurgSim/Devices/Nimble
+	"${NIMBLE_DEVICE_SOURCES}"
+	"${NIMBLE_DEVICE_HEADERS}"
 )
 
 target_link_libraries(NimbleDevice ${LIBS})
