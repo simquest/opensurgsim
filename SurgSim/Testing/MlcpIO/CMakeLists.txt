@@ -33,7 +33,10 @@ set(MLCP_IO_HEADERS
 
 # The headers etc. for this do not need to be shipped, so do NOT use
 # surgsim_add_library here.
-add_library(MlcpTestIO ${MLCP_IO_SOURCES} ${MLCP_IO_HEADERS})
+add_library(MlcpTestIO
+	${MLCP_IO_SOURCES}
+	${MLCP_IO_HEADERS}
+)
 
 SET(LIBS
 	SurgSimMath
