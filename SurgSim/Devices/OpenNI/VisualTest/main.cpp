@@ -186,7 +186,7 @@ int main(int argc, char** argv)
 	}
 
 	std::vector<std::string> imagesToDraw;
-	imagesToDraw.push_back("image");
+	imagesToDraw.push_back("color");
 	imagesToDraw.push_back("depth");
 	std::shared_ptr<ImageGlutWindow> imageWindow = std::make_shared<ImageGlutWindow>(imagesToDraw);
 	device->addInputConsumer(imageWindow);

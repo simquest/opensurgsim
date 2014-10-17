@@ -29,7 +29,7 @@ class OpenNIScaffold;
 /// \par Application input provided by the device:
 ///   | type       | name              |                                                                            |
 ///   | ----       | ----              | ---                                                                        |
-///   | image      | "image"           | Color image (RGB) of floats, each pixel value is between 0 and 1.          |
+///   | image      | "color"           | Color image (RGB) of floats, each pixel value is between 0 and 1.          |
 ///   | image      | "depth"           | Depth image of floats, each pixel value is depth from the camera in meters.|
 ///
 /// \par Application output used by the device: none.

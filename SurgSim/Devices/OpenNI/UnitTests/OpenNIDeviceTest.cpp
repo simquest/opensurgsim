@@ -101,7 +101,7 @@ TEST(OpenNIDeviceTest, InputConsumer)
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 10);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 120);
 
-	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasData("image"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasData("color"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasData("depth"));
 }
 

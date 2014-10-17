@@ -43,7 +43,7 @@ struct OpenNIScaffold::DeviceData
 	/// OpenNI Depth Video Stream
 	openni::VideoStream depthStream;
 	/// OpenNI RGB Image Video Stream
-	openni::VideoStream rgbStream;
+	openni::VideoStream colorStream;
 	/// The corresponding device object.
 	OpenNIDevice* const deviceObject;
 };
@@ -134,10 +134,10 @@ bool OpenNIScaffold::doRegisterDevice(DeviceData* info)
 		return false;
 	}
 
-	status = info->rgbStream.create(info->camera, openni::SENSOR_COLOR);
+	status = info->colorStream.create(info->camera, openni::SENSOR_COLOR);
 	if (status != openni::STATUS_OK)
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Could find image stream: " << openni::OpenNI::getExtendedError();
+		SURGSIM_LOG_DEBUG(m_logger) << "Could find color image stream: " << openni::OpenNI::getExtendedError();
 		return false;
 	}
 
@@ -148,10 +148,10 @@ bool OpenNIScaffold::doRegisterDevice(DeviceData* info)
 		return false;
 	}
 
-	status = info->rgbStream.start();
-	if (status != openni::STATUS_OK || !info->rgbStream.isValid())
+	status = info->colorStream.start();
+	if (status != openni::STATUS_OK || !info->colorStream.isValid())
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Unable to start image stream: " << openni::OpenNI::getExtendedError();
+		SURGSIM_LOG_DEBUG(m_logger) << "Unable to start color image stream: " << openni::OpenNI::getExtendedError();
 		return false;
 	}
 	return true;
@@ -196,7 +196,7 @@ bool OpenNIScaffold::unregisterDevice(const OpenNIDevice* device)
 bool OpenNIScaffold::doUnregisterDevice(DeviceData* info)
 {
 	info->depthStream.destroy();
-	info->rgbStream.destroy();
+	info->colorStream.destroy();
 	info->camera.close();
 	return true;
 }
@@ -216,7 +216,7 @@ bool OpenNIScaffold::doUpdate(double dt)
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
 	openni::VideoFrameRef depthFrame;
-	openni::VideoFrameRef rgbFrame;
+	openni::VideoFrameRef colorFrame;
 	typedef SurgSim::DataStructures::DataGroup::ImageType ImageType;
 
 	for (auto info = m_state->activeDevices.begin();  info != m_state->activeDevices.end();  ++info)
@@ -229,17 +229,17 @@ bool OpenNIScaffold::doUpdate(double dt)
 			newImages = true;
 			ImageType image(depthFrame.getWidth(), depthFrame.getHeight(), 1,
 					reinterpret_cast<const unsigned short*>(depthFrame.getData()));
-			image.getAsVector() *= (1.0f / 1000.0f); // convert from mm to meters
+			image.getAsVector() *= (1.0f / 1000.0f); // OpenNI2 returns mm, convert to meters
 			inputData.images().set("depth", std::move(image));
 		}
 
-		if ((*info)->rgbStream.readFrame(&rgbFrame) == openni::STATUS_OK)
+		if ((*info)->colorStream.readFrame(&colorFrame) == openni::STATUS_OK)
 		{
 			newImages = true;
-			ImageType image(rgbFrame.getWidth(), rgbFrame.getHeight(), 3,
-					reinterpret_cast<const unsigned char*>(rgbFrame.getData()));
-			image.getAsVector() *= (1.0 / 256.0); // scale values to 0..1
-			inputData.images().set("image", std::move(image));
+			ImageType image(colorFrame.getWidth(), colorFrame.getHeight(), 3,
+					reinterpret_cast<const unsigned char*>(colorFrame.getData()));
+			image.getAsVector() *= (1.0 / 256.0); // OpenNI returns colors between 0 and 255, scale values to 0..1
+			inputData.images().set("color", std::move(image));
 		}
 
 		if (newImages)
@@ -263,7 +263,7 @@ std::shared_ptr<OpenNIScaffold> OpenNIScaffold::getOrCreateSharedInstance()
 SurgSim::DataStructures::DataGroup OpenNIScaffold::buildDeviceInputData()
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
-	builder.addImage("image");
+	builder.addImage("color");
 	builder.addImage("depth");
 	return builder.createData();
 }
