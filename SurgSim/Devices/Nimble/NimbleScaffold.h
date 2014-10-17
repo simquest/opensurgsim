@@ -110,6 +110,9 @@ private:
 	std::string m_serverPort;
 	/// Flag to indicate that the socket is opened successfully.
 	bool m_serverSocketOpen;
+
+	/// The data group name for the joint poses, and the corresponding indices within the state data.
+	static std::array<std::pair<std::string, int>, 15> m_jointPoseNames;
 };
 
 };  // namespace Device
