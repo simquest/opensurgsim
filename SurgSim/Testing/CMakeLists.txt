@@ -40,7 +40,6 @@ surgsim_add_library(
 	"${SURGSIM_TESTING_HEADERS}"
 	"SurgSim/Testing"
 )
-add_dependencies(SurgSimTesting yaml-cpp)
 
 set(LIBS
 	SurgSimDataStructures
