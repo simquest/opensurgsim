@@ -177,14 +177,18 @@ void Fem2DElementTriangle::computeLocalMass(const SurgSim::Math::OdeState& state
 
 	for(size_t i = 0; i < 3; ++i)
 	{
+		size_t j = (i + 1) % 3;
+		size_t k = (j + 1) % 3;
+
 		// Membrane inertia matrix
 		// Przemieniecki book "Theory of Matrix Structural Analysis"
 		// Chapter 11.6, equation 11.42 for a in-plane triangle deformation
-		// m = rho.A(123).t/12.0.[2 1 1]
+		// m = rho.A(123).t/12.0.[2 1 1] for the axis X and Y
 		//                       [1 2 1]
 		//                       [1 1 2]
-		localMassMatrix->block<3, 3>(i * 6, i * 6).setConstant(mass / 12.0);
-		localMassMatrix->block<3, 3>(i * 6, i * 6).diagonal().setConstant(mass / 6.0);
+		localMassMatrix->block<2, 2>(i * 6, i * 6).diagonal().setConstant(mass / 6.0);
+		localMassMatrix->block<2, 2>(i * 6, j * 6).diagonal().setConstant(mass / 12.0);
+		localMassMatrix->block<2, 2>(i * 6, k * 6).diagonal().setConstant(mass / 12.0);
 
 		// Plate inertia matrix developed from Batoz paper
 		// Interpolation of the rotational displacement over the triangle w.r.t. DOF:
