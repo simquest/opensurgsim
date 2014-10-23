@@ -222,31 +222,33 @@ bool OpenNIScaffold::doUpdate(double dt)
 
 	for (auto info = m_state->activeDevices.begin();  info != m_state->activeDevices.end();  ++info)
 	{
-		bool newImages = false;
 		SurgSim::DataStructures::DataGroup& inputData = (*info)->deviceObject->getInputData();
 
 		if ((*info)->depthStream.readFrame(&depthFrame) == openni::STATUS_OK)
 		{
-			newImages = true;
 			ImageType image(depthFrame.getWidth(), depthFrame.getHeight(), 1,
 					reinterpret_cast<const unsigned short*>(depthFrame.getData()));
 			image.getAsVector() *= (1.0f / 1000.0f); // OpenNI2 returns mm, convert to meters
 			inputData.images().set("depth", std::move(image));
 		}
+		else
+		{
+			inputData.images().reset("depth");
+		}
 
 		if ((*info)->colorStream.readFrame(&colorFrame) == openni::STATUS_OK)
 		{
-			newImages = true;
 			ImageType image(colorFrame.getWidth(), colorFrame.getHeight(), 3,
 					reinterpret_cast<const unsigned char*>(colorFrame.getData()));
-			image.getAsVector() *= (1.0 / 256.0); // OpenNI returns colors between 0 and 255, scale values to 0..1
+			image.getAsVector() *= (1.0f / 255.0f); // OpenNI returns colors between 0 and 255, scale values to 0..1
 			inputData.images().set("color", std::move(image));
 		}
-
-		if (newImages)
+		else
 		{
-			(*info)->deviceObject->pushInput();
+			inputData.images().reset("color");
 		}
+
+		(*info)->deviceObject->pushInput();
 	}
 	return true;
 }
