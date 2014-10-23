@@ -1760,14 +1760,14 @@ TEMPLATE_RELATIONS     = NO
 # file showing the direct and indirect include dependencies of the file with
 # other documented files.
 
-INCLUDE_GRAPH          = YES
+INCLUDE_GRAPH          = NO
 
 # If the ENABLE_PREPROCESSING, SEARCH_INCLUDES, INCLUDED_BY_GRAPH, and
 # HAVE_DOT tags are set to YES then doxygen will generate a graph for each
 # documented header file showing the documented files that directly or
 # indirectly include this file.
 
-INCLUDED_BY_GRAPH      = YES
+INCLUDED_BY_GRAPH      = NO
 
 # If the CALL_GRAPH and HAVE_DOT options are set to YES then
 # doxygen will generate a call dependency graph for every global function
@@ -1849,8 +1849,7 @@ DOT_GRAPH_MAX_NODES    = 50
 # code bases. Also note that the size of a graph can be further restricted by
 # DOT_GRAPH_MAX_NODES. Using a depth of 0 means no depth restriction.
 
-MAX_DOT_GRAPH_DEPTH    = 0
-#MAX_DOT_GRAPH_DEPTH    = 3
+MAX_DOT_GRAPH_DEPTH    = 2
 
 # Set the DOT_TRANSPARENT tag to YES to generate images with a transparent
 # background. This is disabled by default, because dot on Windows does not
