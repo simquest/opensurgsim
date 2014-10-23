@@ -22,6 +22,7 @@
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/OpenNI/OpenNIDevice.h"
+#include "SurgSim/Framework/Barrier.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
 
@@ -63,9 +64,6 @@ OpenNIScaffold::OpenNIScaffold() :
 	m_logger(SurgSim::Framework::Logger::getLogger("OpenNI"))
 {
 	setRate(100);
-	openni::Status status = openni::OpenNI::initialize();
-	bool success = (status == openni::STATUS_OK);
-	SURGSIM_LOG_IF(!success, m_logger, DEBUG) << "Initialize failed: " << openni::OpenNI::getExtendedError();
 }
 
 OpenNIScaffold::~OpenNIScaffold()
@@ -76,7 +74,16 @@ OpenNIScaffold::~OpenNIScaffold()
 bool OpenNIScaffold::registerDevice(OpenNIDevice* device)
 {
 	bool success = true;
+	if (!isRunning())
+	{
+		std::shared_ptr<SurgSim::Framework::Barrier> barrier = std::make_shared<SurgSim::Framework::Barrier>(2);
+		start(barrier);
+		barrier->wait(true); // Wait for initialize
+		barrier->wait(true); // Wait for startup
+		success = isInitialized();
+	}
 
+	if (success)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 		const std::string deviceName = device->getName();
@@ -102,11 +109,6 @@ bool OpenNIScaffold::registerDevice(OpenNIDevice* device)
 				device->getName() << "', is already present!";
 			success = false;
 		}
-	}
-
-	if (success && !isRunning())
-	{
-		start();
 	}
 
 	return success;
@@ -199,7 +201,10 @@ bool OpenNIScaffold::doUnregisterDevice(DeviceData* info)
 
 bool OpenNIScaffold::doInitialize()
 {
-	return true;
+	openni::Status status = openni::OpenNI::initialize();
+	bool success = (status == openni::STATUS_OK);
+	SURGSIM_LOG_IF(!success, m_logger, SEVERE) << "Initialize failed: " << openni::OpenNI::getExtendedError();
+	return success;
 }
 
 bool OpenNIScaffold::doStartUp()
