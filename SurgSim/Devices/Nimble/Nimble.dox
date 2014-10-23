@@ -1,6 +1,6 @@
 /*!
 
-\page NimbleHandTrack Nimble: Hand tracking using the NimbleSDK and OpenNI.
+\page Nimble Nimble: Hand tracking using the NimbleSDK and OpenNI.
 
 NimbleSDK (http://www.threegear.com/download.html), by Three Gear Systems, is a hand tracking software which can communicate (using OpenNI) with a range of special depth cameras, and use the data to calculate the pose of the (two) hands in view.
 
