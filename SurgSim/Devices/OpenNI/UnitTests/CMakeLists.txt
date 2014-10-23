@@ -24,9 +24,6 @@ set(UNIT_TEST_SOURCES
 
 set(LIBS
 	OpenNIDevice
-	SurgSimInput
-	SurgSimFramework
-	SurgSimDataStructures
 )
 
 surgsim_add_unit_tests(OpenNIDeviceTest)
