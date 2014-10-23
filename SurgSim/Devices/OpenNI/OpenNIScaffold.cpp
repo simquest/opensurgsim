@@ -116,42 +116,38 @@ bool OpenNIScaffold::doRegisterDevice(DeviceData* info)
 {
 	openni::Status status;
 
-	openni::Array<openni::DeviceInfo> deviceList;
-	openni::OpenNI::enumerateDevices(&deviceList);
-	SURGSIM_LOG_INFO(m_logger) << "Found " << deviceList.getSize() << " devices";
-
 	status = info->camera.open(openni::ANY_DEVICE);
 	if (status != openni::STATUS_OK)
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Could not connect to a camera: " << openni::OpenNI::getExtendedError();
+		SURGSIM_LOG_SEVERE(m_logger) << "Could not connect to a camera: " << openni::OpenNI::getExtendedError();
 		return false;
 	}
 
 	status = info->depthStream.create(info->camera, openni::SENSOR_DEPTH);
 	if (status != openni::STATUS_OK)
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Could not find depth stream: " << openni::OpenNI::getExtendedError();
+		SURGSIM_LOG_SEVERE(m_logger) << "Could not find depth stream: " << openni::OpenNI::getExtendedError();
 		return false;
 	}
 
 	status = info->colorStream.create(info->camera, openni::SENSOR_COLOR);
 	if (status != openni::STATUS_OK)
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Could find color image stream: " << openni::OpenNI::getExtendedError();
+		SURGSIM_LOG_SEVERE(m_logger) << "Could find color image stream: " << openni::OpenNI::getExtendedError();
 		return false;
 	}
 
 	status = info->depthStream.start();
 	if (status != openni::STATUS_OK || !info->depthStream.isValid())
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Unable to start depth stream: " << openni::OpenNI::getExtendedError();
+		SURGSIM_LOG_SEVERE(m_logger) << "Unable to start depth stream: " << openni::OpenNI::getExtendedError();
 		return false;
 	}
 
 	status = info->colorStream.start();
 	if (status != openni::STATUS_OK || !info->colorStream.isValid())
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Unable to start color image stream: " << openni::OpenNI::getExtendedError();
+		SURGSIM_LOG_SEVERE(m_logger) << "Unable to start color image stream: " << openni::OpenNI::getExtendedError();
 		return false;
 	}
 	return true;

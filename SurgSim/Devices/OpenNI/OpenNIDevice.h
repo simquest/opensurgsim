@@ -49,7 +49,8 @@ public:
 
 	virtual bool finalize() override;
 
-	/// Check wheter this device is initialized.
+	/// Check if this device is initialized.
+	/// \return True if this device is initialized; otherwise, false.
 	bool isInitialized() const;
 
 private:
