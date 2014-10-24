@@ -122,18 +122,14 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 set(DEFAULT_EIGEN_ALIGNMENT OFF)
-# Enable alignement on linux by default
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	set(DEFAULT_EIGEN_ALIGNMENT ON)
-endif()
-
-# Enable alignement on Windows 64bit by default
-if(${CMAKE_CL_64})
+# Enable alignement on 64bit systems by default
+if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
 	set(DEFAULT_EIGEN_ALIGNMENT ON)
 endif()
 
 option(EIGEN_ALIGNMENT "Enable alignment in Eigen" ${DEFAULT_EIGEN_ALIGNMENT})
 mark_as_advanced(EIGEN_ALIGNMENT)
+
 if(NOT EIGEN_ALIGNMENT)
 	add_definitions( -DEIGEN_DONT_ALIGN )
 endif()
