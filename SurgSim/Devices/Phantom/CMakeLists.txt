@@ -43,8 +43,8 @@ set(PHANTOM_DEVICE_HEADERS
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
 	PhantomDevice
-	"${PHANTOM_DEVICE_SOURCES}" "${PHANTOM_DEVICE_HEADERS}"
-	SurgSim/Devices/Phantom
+	"${PHANTOM_DEVICE_SOURCES}"
+	"${PHANTOM_DEVICE_HEADERS}"
 )
 
 target_link_libraries(PhantomDevice ${LIBS})

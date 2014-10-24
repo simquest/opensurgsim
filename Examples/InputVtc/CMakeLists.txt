@@ -32,7 +32,7 @@ set(HEADERS
 	DeviceFactory.h
 )
 
-add_executable(InputVtc ${SOURCES} ${HEADERS})
+surgsim_add_executable(InputVtc "${SOURCES}" "${HEADERS}")
 
 set(LIBS 
 	IdentityPoseDevice

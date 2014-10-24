@@ -116,6 +116,21 @@ TEST(NimbleDeviceTest, InputConsumer)
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 30);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("ThumbProximal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("ThumbIntermediate"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("ThumbDistal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("IndexFingerProximal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("IndexFingerIntermediate"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("IndexFingerDistal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("MiddleFingerProximal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("MiddleFingerIntermediate"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("MiddleFingerDistal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("RingFingerProximal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("RingFingerIntermediate"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("RingFingerDistal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("SmallFingerProximal"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("SmallFingerIntermediate"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("SmallFingerDistal"));
 }
 
 TEST(NimbleDeviceTest, OutputProducer)

@@ -34,7 +34,6 @@ surgsim_add_library(
 	MouseDevice
 	"${Mouse_DEVICE_SOURCES}"
 	"${Mouse_DEVICE_HEADERS}"
-	SurgSim/Devices/Mouse
 )
 
 set(LIBS

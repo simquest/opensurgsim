@@ -119,6 +119,12 @@ public:
 	/// \param	component	The component.
 	void removeComponent(const std::shared_ptr<Component>& component);
 
+	/// Loads the scene from the given file, clears all the elements in the scene, the old scene will be
+	/// overwritten
+	/// \param fileName the filename of the scene to be loaded, needs to be found
+	/// \return true if the loading suceeded and the scene was found
+	bool loadScene(const std::string& fileName);
+
 private:
 
 	/// Preprocess scene elements. This is called during the startup sequence
@@ -148,6 +154,8 @@ private:
 
 	std::shared_ptr<Barrier> m_barrier;
 	bool m_isPaused;
+
+	bool m_isStopped;
 };
 
 }; // namespace Framework

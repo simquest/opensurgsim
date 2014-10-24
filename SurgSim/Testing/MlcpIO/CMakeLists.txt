@@ -33,13 +33,11 @@ set(MLCP_IO_HEADERS
 
 # The headers etc. for this do not need to be shipped, so do NOT use
 # surgsim_add_library here.
-
-surgsim_add_library(
-	MlcpTestIO
-	"${MLCP_IO_SOURCES}"
-	"${MLCP_IO_HEADERS}"
-	"SurgSim/MlcpTestIO"
+add_library(MlcpTestIO
+	${MLCP_IO_SOURCES}
+	${MLCP_IO_HEADERS}
 )
+surgsim_show_ide_folders("${MLCP_IO_SOURCES}" "${MLCP_IO_HEADERS}")
 
 SET(LIBS
 	SurgSimMath
@@ -47,9 +45,6 @@ SET(LIBS
 )
 
 target_link_libraries(MlcpTestIO ${LIBS})
-
-
-surgsim_show_ide_folders("${MLCP_IO_SOURCES}" "${MLCP_IO_HEADERS}")
 
 # Put MlcpTestIO into folder "Testing"
 set_target_properties(MlcpTestIO PROPERTIES FOLDER "Testing")

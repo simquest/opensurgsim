@@ -41,8 +41,7 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-add_executable(GraphicsScene ${SOURCES} ${HEADERS})
-surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
+surgsim_add_executable(GraphicsScene "${SOURCES}" "${HEADERS}")
 
 SET(LIBS
 	SurgSimBlocks

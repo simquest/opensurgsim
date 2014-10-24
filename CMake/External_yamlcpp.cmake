@@ -33,21 +33,29 @@ ExternalProject_Add(yaml-cpp
 ExternalProject_Get_Property(yaml-cpp install_dir)
 
 if(MSVC)
-	set(YAML_CPP_LIBRARIES
-		debug ${install_dir}/lib/libyaml-cppmdd${CMAKE_STATIC_LIBRARY_SUFFIX}
-		optimized ${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}
-		CACHE INTERNAL "")
+	add_library(yaml-cpp-lib STATIC IMPORTED GLOBAL)
+	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_DEBUG
+		"${install_dir}/lib/libyaml-cppmdd${CMAKE_STATIC_LIBRARY_SUFFIX}")
+	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_RELEASE
+		"${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}")
+	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_RELWITHDEBINFO
+		"${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}")
+	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_MINSIZREL
+		"${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}")
+		
 else()
 	if(BUILD_SHARED_LIBS)
-		set(YAML_CPP_LIBRARIES
-			"${install_dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}yaml-cpp${CMAKE_SHARED_LIBRARY_SUFFIX}"
-			CACHE INTERNAL "")
+		add_library(yaml-cpp-lib SHARED IMPORTED)
+		set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION
+			"${install_dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}yaml-cpp${CMAKE_SHARED_LIBRARY_SUFFIX}")
 	else()
-		set(YAML_CPP_LIBRARIES
-			"${install_dir}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${CMAKE_STATIC_LIBRARY_SUFFIX}"
-			CACHE INTERNAL "")
+		add_library(yaml-cpp-lib STATIC IMPORTED)
+		set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION
+			"${install_dir}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	endif()
 endif()
+add_dependencies(yaml-cpp-lib yaml-cpp)
 
+set(YAML_CPP_LIBRARIES "yaml-cpp-lib" CACHE INTERNAL "")
 set(YAML_CPP_INCLUDE_DIR "${install_dir}/include" CACHE INTERNAL "")
 

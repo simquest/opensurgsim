@@ -120,5 +120,27 @@ TEST(SceneTest, YamlTest)
 
 }
 
+TEST(SceneTest, LoadSceneTest)
+{
+	auto runtime = std::make_shared<Runtime>("config.txt");
+
+	ASSERT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
+
+	auto scene = runtime->getScene();
+	auto element = scene->getSceneElement("element0");
+	auto component = element->getComponent("component0");
+	component->setLocalActive(false);
+
+	// If we get stale components this would assert as the components would be initialized alread
+	ASSERT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
+
+	scene = runtime->getScene();
+	element = scene->getSceneElement("element0");
+	component = element->getComponent("component0");
+
+	// Another check for fresh components, if they are from the cache, this would be false
+	EXPECT_TRUE(component->isLocalActive());
+}
+
 }
 }

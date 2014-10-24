@@ -94,8 +94,8 @@ endif()
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
 	MultiAxisDevice
-	"${MULTIAXIS_DEVICE_SOURCES}" "${MULTIAXIS_DEVICE_HEADERS}"
-	SurgSim/Devices/MultiAxis
+	"${MULTIAXIS_DEVICE_SOURCES}"
+	"${MULTIAXIS_DEVICE_HEADERS}"
 )
 
 set(LIBS  

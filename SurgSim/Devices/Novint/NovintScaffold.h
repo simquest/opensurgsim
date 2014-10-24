@@ -53,7 +53,7 @@ public:
 	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
 
 	/// Gets or creates the scaffold shared by all NovintDevice and Novint7DofDevice instances.
-	/// The scaffold is managed using a SingleInstance object, so it will be destroyed when all devices are released.
+	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
 	static std::shared_ptr<NovintScaffold> getOrCreateSharedInstance();
 
