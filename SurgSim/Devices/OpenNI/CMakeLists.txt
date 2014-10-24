@@ -36,8 +36,8 @@ set(OPENNI_DEVICE_HEADERS
 
 surgsim_add_library(
 	OpenNIDevice
-	"${OPENNI_DEVICE_SOURCES}" "${OPENNI_DEVICE_HEADERS}"
-	SurgSim/Devices/OpenNI
+	"${OPENNI_DEVICE_SOURCES}"
+	"${OPENNI_DEVICE_HEADERS}"
 )
 target_link_libraries(OpenNIDevice ${LIBS})
 

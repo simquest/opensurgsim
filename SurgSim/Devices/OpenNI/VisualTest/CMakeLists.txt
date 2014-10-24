@@ -24,11 +24,10 @@ set(EXAMPLE_SOURCES
 set(EXAMPLE_HEADERS
 )
 
-add_executable(OpenNIVisualTest
-	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-
-surgsim_show_ide_folders(
-	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+surgsim_add_executable(OpenNIVisualTest
+	"${EXAMPLE_SOURCES}"
+	"${EXAMPLE_HEADERS}"
+)
 
 set(LIBS
 	OpenNIDevice
