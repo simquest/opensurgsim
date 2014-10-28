@@ -125,13 +125,22 @@ public:
 	/// \param targetProperty The name of the property that should be used.
 	void forwardProperty(const std::string& name, const Accessible& target, const std::string& targetProperty);
 
-	/// Sets the functions used to convert data from and to a YAML::Node. Will throw and exception
+	/// Sets the functions used to convert data from and to a YAML::Node. Will throw an exception
 	/// if the data type that is passed to YAML cannot be converted into a YAML::Node
 	/// \param name The name of the property.
 	/// \param encoder The function to be used to put the property into the node.
 	/// \param decoder The function to be used to read the property from the node and set it
 	///                in the instance.
 	void setSerializable(const std::string& name, EncoderType encoder, DecoderType decoder);
+
+	/// Sets the functions used to convert data from a YAML::Node.
+	/// This leaves the encoder (class -> YAML) conversion empty, this can be used to let the user decide how to
+	/// model the data in the data file, inside the class this should all result in one member to be created/changed.
+	/// \param name The name of the property.
+	/// \param decoder The function to be used to read the property from the node and set it
+	///                in the instance.
+	void setDecoder(const std::string& name, DecoderType decoder);
+
 
 	/// Encode this Accessible to a YAML::Node
 	/// \return The encoded version of this instance.

@@ -124,6 +124,13 @@ void Accessible::setSerializable(const std::string& name, EncoderType encoder, D
 	m_functors[name].decoder = decoder;
 }
 
+void Accessible::setDecoder(const std::string& name, DecoderType decoder)
+{
+	SURGSIM_ASSERT(decoder != nullptr) << "Decoder functor can't be nullptr";
+	m_functors[name].encoder = nullptr;
+	m_functors[name].decoder = decoder;
+}
+
 YAML::Node Accessible::encode() const
 {
 	YAML::Node result;
@@ -154,7 +161,7 @@ void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& 
 		if (functors == std::end(m_functors) || !functors->second.decoder)
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Framework/Accessible"))
-				<< "Can't find property with name " << name << " in the accessible.";
+					<< "Can't find property with name " << name << " in the accessible.";
 		}
 		else
 		{
@@ -173,8 +180,8 @@ void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& 
 			else
 			{
 				SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/Accessible"))
-					<< "Found property with name " << name << " in the accessible."
-					<< " But it seems no value is specified for this property in the YAML file.";
+						<< "Found property with name " << name << " in the accessible."
+						<< " But it seems no value is specified for this property in the YAML file.";
 			}
 		}
 	}
