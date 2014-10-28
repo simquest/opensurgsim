@@ -235,7 +235,7 @@ TEST_F(MeshShapeTest, SerializationTest)
 {
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->load(fileName));
+	EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
 	EXPECT_TRUE(meshShape->isValid());
 
 	// We chose to let YAML serialization only works with base class pointer.
@@ -253,7 +253,6 @@ TEST_F(MeshShapeTest, SerializationTest)
 									   node.as<std::shared_ptr<SurgSim::Math::Shape>>()));
 
 	EXPECT_EQ("SurgSim::Math::MeshShape", newMeshShape->getClassName());
-	EXPECT_EQ(fileName, newMeshShape->getFileName());
 
 	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), newMeshShape->getMesh()->getNumVertices());
 	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), newMeshShape->getMesh()->getNumEdges());
@@ -265,7 +264,7 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 {
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->load(fileName));
+	EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
 
 	auto tree = meshShape->getAabbTree();
 
@@ -285,31 +284,41 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 
 TEST_F(MeshShapeTest, DoLoadTest)
 {
-	SurgSim::Framework::ApplicationData data("config.txt");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	{
+		SCOPED_TRACE("Normal load should succeed");
 		auto fileName = std::string("MeshShapeData/staple_collision.ply");
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 
-		EXPECT_NO_THROW(meshShape->load(fileName, data));
+		EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
 		EXPECT_TRUE(meshShape->isValid());
-		EXPECT_EQ(fileName, meshShape->getFileName());
+		EXPECT_EQ(fileName, meshShape->getInitialMesh()->getFileName());
 	}
 
 	{
+		SCOPED_TRACE("Load through parameter should succeed");
+		auto fileName = std::string("MeshShapeData/staple_collision.ply");
+		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
+
+		EXPECT_NO_THROW(meshShape->setValue("InitialMeshFileName", fileName));
+		EXPECT_TRUE(meshShape->isValid());
+		EXPECT_EQ(fileName, meshShape->getInitialMesh()->getFileName());
+	}
+
+	{
+		SCOPED_TRACE("Load of invalid mesh should throw");
 		auto fileName = std::string("MeshShapeData/InvalidMesh.ply");
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 
-		EXPECT_ANY_THROW(meshShape->load(fileName, data));
-		EXPECT_FALSE(meshShape->isValid());
-		EXPECT_EQ(fileName, meshShape->getFileName());
+		EXPECT_ANY_THROW(meshShape->loadInitialMesh(fileName));
 	}
 
 	{
+		SCOPED_TRACE("Load of non existant file should throw");
 		auto fileName = std::string("Nonexistent file");
 		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
 
-		EXPECT_ANY_THROW(meshShape->load(fileName, data));
-		EXPECT_FALSE(meshShape->isValid());
-		EXPECT_EQ(fileName, meshShape->getFileName());
+		EXPECT_ANY_THROW(meshShape->loadInitialMesh(fileName));
 	}
+
 }

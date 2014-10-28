@@ -82,7 +82,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Load the surface triangle mesh of the finite element model
 	auto meshShape = std::make_shared<MeshShape>();
-	meshShape->load(filename);
+	meshShape->loadInitialMesh(filename);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	auto graphicalFem = std::make_shared<OsgMeshRepresentation>("Graphics");
@@ -139,7 +139,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	// Stapler collision mesh
 	auto meshShapeForCollision = std::make_shared<MeshShape>();
-	meshShapeForCollision->load(filename);
+	meshShapeForCollision->loadInitialMesh(filename);
 
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
 		std::make_shared<OsgMeshRepresentation>("Collision Mesh");
@@ -199,8 +199,8 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	auto meshShapeForVirtualStaple1 = std::make_shared<MeshShape>();
 	auto meshShapeForVirtualStaple2 = std::make_shared<MeshShape>();
-	meshShapeForVirtualStaple1->load("Geometry/virtual_staple_1.ply");
-	meshShapeForVirtualStaple2->load("Geometry/virtual_staple_2.ply");
+	meshShapeForVirtualStaple1->loadInitialMesh("Geometry/virtual_staple_1.ply");
+	meshShapeForVirtualStaple2->loadInitialMesh("Geometry/virtual_staple_2.ply");
 
 	std::vector<std::shared_ptr<MeshShape>> virtualTeethShapes;
 	virtualTeethShapes.push_back(meshShapeForVirtualStaple1);
@@ -240,7 +240,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 
 	// Arm collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>();
-	meshShape->load(filename);
+	meshShape->loadInitialMesh(filename);
 
 	// Visualization of arm collision mesh
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =

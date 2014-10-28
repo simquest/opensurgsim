@@ -95,6 +95,12 @@ OctreeNode<Data>::~OctreeNode()
 }
 
 template<class Data>
+std::string OctreeNode<Data>::getClassName() const
+{
+	return m_className;
+}
+
+template<class Data>
 const SurgSim::Math::Aabbd& OctreeNode<Data>::getBoundingBox() const
 {
 	return m_boundingBox;

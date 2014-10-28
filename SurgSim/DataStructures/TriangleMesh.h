@@ -60,14 +60,15 @@ typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshPlain;
 
 /// A TriangleMesh stores normal information for the triangles.
 class TriangleMesh: public std::enable_shared_from_this<TriangleMesh>,
-					public SurgSim::Framework::Asset,
-					public SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, NormalData>
+	public SurgSim::Framework::Asset,
+	public SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, NormalData>
 {
-friend class SurgSim::Math::MeshShape;
 public:
 
 	/// Constructor
 	TriangleMesh();
+
+	SURGSIM_CLASSNAME(SurgSim::DataStructures::TriangleMesh);
 
 	/// Templated constructor this lets us convert one mesh class into another mesh class
 	/// \tparam	VertexDataSource	Type of extra data stored in each vertex
@@ -97,6 +98,7 @@ protected:
 	virtual void doUpdate() override;
 
 	virtual bool doLoad(const std::string& fileName) override;
+
 };
 
 }; // namespace DataStructures

@@ -24,6 +24,7 @@
 #include <boost/container/static_vector.hpp>
 
 
+
 namespace
 {
 
@@ -135,13 +136,20 @@ static const std::array<std::array<Symbol, 3>, 8> VertexNeighbors =
 }
 
 
+
+
 namespace SurgSim
 {
 
 namespace DataStructures
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Asset,
+				 SurgSim::DataStructures::OctreeNode<EmptyData>,
+				 OctreeNodeEmptyData);
 
+// Predefine classname of OctreeNode of EmptyData
+std::string OctreeNode<EmptyData>::m_className = "SurgSim::DataStructures::OctreeNode<EmptyData>";
 
 std::shared_ptr<OctreeNode<EmptyData>> loadOctree(const std::string& fileName)
 {

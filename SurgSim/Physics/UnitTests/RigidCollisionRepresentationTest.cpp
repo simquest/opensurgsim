@@ -27,6 +27,7 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Framework/Runtime.h"
 
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
@@ -61,8 +62,8 @@ TEST_F(RigidCollisionRepresentationTest, InitTest)
 	EXPECT_NO_THROW(RigidCollisionRepresentation("TestRigidCollisionRepresentation"));
 
 	EXPECT_NO_THROW(m_rigidCollisionRepresentation =
-					std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation")
-	);
+						std::make_shared<RigidCollisionRepresentation>("RigidCollisionRepresentation")
+				   );
 }
 
 TEST_F(RigidCollisionRepresentationTest, SetGetRigidRepresentationTest)
@@ -135,7 +136,7 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 		EXPECT_EQ("SurgSim::Physics::RigidCollisionRepresentation", newRepresentation->getClassName());
 		auto boxShape = std::dynamic_pointer_cast<SurgSim::Math::BoxShape>(shape);
 		auto newBoxShape = std::dynamic_pointer_cast<SurgSim::Math::BoxShape>(
-							newRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
+							   newRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
 		ASSERT_NE(nullptr, newBoxShape);
 
 		EXPECT_EQ(boxShape->getType(), newRepresentation->getShapeType());
@@ -163,7 +164,7 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 		EXPECT_EQ(m_sphereShape->getType(), newRepresentation->getShapeType());
 
 		auto newShpereShape = std::dynamic_pointer_cast<SurgSim::Math::SphereShape>(
-			newRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
+								  newRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
 		ASSERT_NE(nullptr, newShpereShape);
 
 		EXPECT_TRUE(m_sphereShape->getCenter().isApprox(newShpereShape->getCenter()));
@@ -175,11 +176,11 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 
 TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 {
-	SurgSim::Framework::ApplicationData applicationData("config.txt");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->load(fileName, applicationData));
+	EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
 
 	auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>("Collision");
 	auto physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
@@ -198,8 +199,8 @@ TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
 
 	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(Vector3d(4.3, 2.1, 6.5),
-																   Vector3d(-1.5, 7.5, -2.5),
-																   Vector3d(8.7, -4.7, -3.1));
+								 Vector3d(-1.5, 7.5, -2.5),
+								 Vector3d(8.7, -4.7, -3.1));
 
 	//physicsRepresentation->setLocalPose(transform);
 	//collisionRepresentation->update(dt);

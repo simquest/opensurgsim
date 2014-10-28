@@ -31,7 +31,7 @@ SURGSIM_STATIC_REGISTRATION(OctreeShape);
 
 /// Octree Shape
 /// A defined by an octree data structure
-class OctreeShape : public Shape, public SurgSim::Framework::Asset
+class OctreeShape : public Shape
 {
 public:
 	typedef SurgSim::DataStructures::OctreeNode<SurgSim::DataStructures::EmptyData> NodeType;
@@ -70,20 +70,20 @@ public:
 
 	/// Get the root node
 	/// \return the octree root node of this shape
-	std::shared_ptr<NodeType> getRootNode();
+	std::shared_ptr<NodeType> getOctree();
 
-	/// const version to get the root node
-	/// \return A const reference of the shared pointer, which points to the octree root node of this shape.
-	const std::shared_ptr<const NodeType> getRootNode() const;
+// 	/// const version to get the root node
+// 	/// \return A const reference of the shared pointer, which points to the octree root node of this shape.
+// 	const std::shared_ptr<const NodeType> getRootNode() const;
 
 	/// Set the root node
 	/// \param node the octree root node of this shape
-	void setRootNode(std::shared_ptr<NodeType> node);
+	void setOctree(std::shared_ptr<SurgSim::Framework::Asset> node);
 
 	/// \return True if the bounding box is bigger than or equal to 0; Otherwise, false.
 	virtual bool isValid() const override;
 
-	virtual bool doLoad(const std::string& filePath) override;
+	void loadOctree(const std::string& filePath);
 
 private:
 	/// Root node of the octree datastructure

@@ -96,7 +96,7 @@ SurgSim::Framework::Scene:
                 Translation: [0, 0, 0]
               Shape:
                 SurgSim::Math::MeshShape:
-                  FileName: Geometry/arm_collision.ply
+                  InitialMeshFileName: Geometry/arm_collision.ply
           - SurgSim::Graphics::OsgSceneryRepresentation:
               IsLocalActive: true
               FileName: Geometry/upperarm.osgb
@@ -119,7 +119,7 @@ SurgSim::Framework::Scene:
               AngularDamping: 0
               Shape:
                 SurgSim::Math::MeshShape:
-                  FileName: Geometry/arm_collision.ply
+                  InitialMeshFileName: Geometry/arm_collision.ply
               Id: 007741f4-d2d7-4f4f-9d2c-505539aa00bf
               Name: Physics
               IsLocalActive: true
@@ -207,7 +207,7 @@ SurgSim::Framework::Scene:
               AngularDamping: 0
               Shape:
                 SurgSim::Math::MeshShape:
-                  FileName: Geometry/stapler_collision.ply
+                  InitialMeshFileName: Geometry/stapler_collision.ply
               Id: 87eefb88-55d8-48c7-81c9-f8cb24aa65fd
               Name: Physics
           - SurgSim::Input::InputComponent:
@@ -219,7 +219,7 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               Shape:
                 SurgSim::Math::MeshShape:
-                  FileName: Geometry/stapler_collision.ply
+                  InitialMeshFileName: Geometry/stapler_collision.ply
               Id: ec7ac2e2-93b5-46e6-9fda-55b125555092
               Name: Collision
               LocalPose:
@@ -295,7 +295,7 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               Shape:
                 SurgSim::Math::MeshShape:
-                  FileName: Geometry/virtual_staple_1.ply
+                  InitialMeshFileName: Geometry/virtual_staple_1.ply
               Id: b7f70a7d-a6ab-4719-8fcd-698912de1aa6
               Name: VirtualToothCollision0
               LocalPose:
@@ -316,7 +316,7 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               Shape:
                 SurgSim::Math::MeshShape:
-                  FileName: Geometry/virtual_staple_2.ply
+                  InitialMeshFileName: Geometry/virtual_staple_2.ply
               Id: c5fae459-35d8-4ded-b478-d04ed66e8694
               Name: VirtualToothCollision1
               LocalPose:
@@ -393,7 +393,7 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               Shape:
                 SurgSim::Math::MeshShape:
-                  FileName: Geometry/wound_deformable.ply
+                  InitialMeshFileName: Geometry/wound_deformable.ply
               Id: 2cb010a8-8ac3-4735-9551-1a1c17388e27
               Name: Collision
           - SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior:

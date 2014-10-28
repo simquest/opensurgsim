@@ -19,6 +19,8 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 
+SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::DataStructures::TriangleMesh, TriangleMesh);
+
 namespace SurgSim
 {
 namespace DataStructures

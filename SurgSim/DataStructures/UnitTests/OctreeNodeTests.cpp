@@ -39,6 +39,8 @@ struct MockData
 
 typedef OctreeNode<MockData> OctreeNodeType;
 
+std::string OctreeNodeType::m_className = "OctreeNode<MockData>";
+
 namespace
 {
 const double epsilon = 1e-14;
@@ -225,16 +227,23 @@ TEST(OctreeNodeTests, OctreePath)
 	EXPECT_EQ(previous, octree->getNode(path, true));
 }
 
+struct Data1
+{
+	std::string name;
+};
+
+std::string OctreeNode<Data1>::m_className = "OctreeNode<Data1>";
+
+struct Data2
+{
+	double value;
+};
+
+std::string OctreeNode<Data2>::m_className = "OctreeNode<Data2>";
+
 TEST(OctreeNodeTests, CopyConstructor)
 {
-	struct Data1
-	{
-		std::string name;
-	};
-	struct Data2
-	{
-		double value;
-	};
+
 
 	SurgSim::Math::Aabbd boundingBox(Vector3d::Zero(), 2 * Vector3d::Ones());
 	std::shared_ptr<OctreeNode<Data1>> octree1 = std::make_shared<OctreeNode<Data1>>(boundingBox);

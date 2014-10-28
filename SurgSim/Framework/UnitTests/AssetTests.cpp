@@ -31,6 +31,8 @@ public:
 	MockAsset() {}
 	~MockAsset() {}
 
+	SURGSIM_CLASSNAME(MockAsset)
+
 	virtual bool doLoad(const std::string& fileName)
 	{
 		bool result = false;

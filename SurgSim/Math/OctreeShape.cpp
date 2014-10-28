@@ -16,6 +16,8 @@
 #include "SurgSim/Math/OctreeShape.h"
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Asset.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 namespace SurgSim
 {
@@ -24,9 +26,17 @@ namespace Math
 {
 SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::OctreeShape, OctreeShape);
 
-OctreeShape::OctreeShape()
+OctreeShape::OctreeShape() :
+	m_rootNode(std::make_shared<NodeType>())
 {
-	serializeFileName(this);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(
+		SurgSim::Math::OctreeShape,
+		std::shared_ptr<SurgSim::Framework::Asset>,
+		Octree,
+		getOctree,
+		setOctree);
+
+	forwardProperty("OctreeFileName", *m_rootNode, "FileName");
 }
 
 OctreeShape::~OctreeShape()
@@ -38,12 +48,15 @@ int OctreeShape::getType()
 	return SHAPE_TYPE_OCTREE;
 }
 
-bool OctreeShape::doLoad(const std::string& filePath)
+void OctreeShape::loadOctree(const std::string& filePath)
 {
-	m_rootNode = std::make_shared<NodeType>();
-	SURGSIM_ASSERT(m_rootNode->doLoad(filePath)) << "Failed to load file" << filePath;
-	SURGSIM_ASSERT(isValid()) << filePath << " contains an invalid octree.";
-	return true;
+	auto rootNode = std::make_shared<NodeType>();
+	rootNode->load(filePath);
+
+	SURGSIM_ASSERT((rootNode != nullptr) && (rootNode->getBoundingBox().sizes().minCoeff() >= 0))
+			<< "Loading failed " << filePath << " contains an invalid octree.";
+
+	setOctree(rootNode);
 }
 
 double OctreeShape::getVolume() const
@@ -63,19 +76,18 @@ Matrix33d OctreeShape::getSecondMomentOfVolume() const
 	return Matrix33d::Zero();
 }
 
-std::shared_ptr<OctreeShape::NodeType> OctreeShape::getRootNode()
+std::shared_ptr<OctreeShape::NodeType> OctreeShape::getOctree()
 {
 	return m_rootNode;
 }
 
-const std::shared_ptr<const OctreeShape::NodeType> OctreeShape::getRootNode() const
+void OctreeShape::setOctree(std::shared_ptr<SurgSim::Framework::Asset> node)
 {
-	return m_rootNode;
-}
-
-void OctreeShape::setRootNode(std::shared_ptr<OctreeShape::NodeType> node)
-{
-	m_rootNode = node;
+	auto octreeNode = std::dynamic_pointer_cast<NodeType>(node);
+	SURGSIM_ASSERT(node != nullptr) << "Tried to set the shape with a nullptr";
+	SURGSIM_ASSERT(octreeNode != nullptr)
+			<< "OctreeShape needs OctreeNode<SurgSim::DataStructures::EmptyData> but received " << node->getClassName();
+	m_rootNode = octreeNode;
 }
 
 bool OctreeShape::isValid() const

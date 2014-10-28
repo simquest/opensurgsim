@@ -61,7 +61,7 @@ void OsgOctreeRepresentation::doUpdate(double dt)
 			|0__|__4|/
 */
 void OsgOctreeRepresentation::buildOctree(osg::ref_ptr<osg::PositionAttitudeTransform> transformNode,
-										  std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree)
+		std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree)
 {
 	SURGSIM_ASSERT(!isAwake()) << "OsgOctreeRepresentation::buildOctree() should be called before wake up.";
 	osg::ref_ptr<osg::PositionAttitudeTransform> osgTransform = new osg::PositionAttitudeTransform();
@@ -70,7 +70,7 @@ void OsgOctreeRepresentation::buildOctree(osg::ref_ptr<osg::PositionAttitudeTran
 	if (octree->hasChildren())
 	{
 		auto octreeChildren = octree->getChildren();
-		for(int i = 0; i < 8; ++i)
+		for (int i = 0; i < 8; ++i)
 		{
 			buildOctree(osgTransform, octreeChildren[i]);
 		}
@@ -94,7 +94,7 @@ void OsgOctreeRepresentation::setOctreeShape(const std::shared_ptr<SurgSim::Math
 	SURGSIM_ASSERT(octreeShape != nullptr) << "OsgOctreeRepresentation can only accept an OctreeShape.";
 	m_octreeShape = octreeShape;
 
-	buildOctree(m_transform, m_octreeShape->getRootNode());
+	buildOctree(m_transform, m_octreeShape->getOctree());
 }
 
 std::shared_ptr<SurgSim::Math::OctreeShape> OsgOctreeRepresentation::getOctreeShape() const
@@ -107,10 +107,10 @@ void OsgOctreeRepresentation::setNodeVisible(const SurgSim::DataStructures::Octr
 	SURGSIM_ASSERT(0 != m_transform->getNumChildren()) << "No Octree held by OsgOctreeRepresentation";
 
 	osg::ref_ptr<osg::Group> result = m_transform->getChild(0)->asGroup();
-	for(auto index = std::begin(path); index != std::end(path); ++index)
+	for (auto index = std::begin(path); index != std::end(path); ++index)
 	{
 		SURGSIM_ASSERT(result->getNumChildren() > 1) <<
-			"OsgOctreeRepresentation::setNodeVisible(): Invalid OctreePath";
+				"OsgOctreeRepresentation::setNodeVisible(): Invalid OctreePath";
 
 		result = result->getChild(*index)->asGroup();
 	}

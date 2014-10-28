@@ -17,6 +17,8 @@
 #define SURGSIM_FRAMEWORK_ASSET_H
 
 #include <string>
+#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Accessible.h"
 
 namespace SurgSim
 {
@@ -30,12 +32,15 @@ class AssetTest;
 /// in SurgSim::Framework::Runtime to load file.
 /// Classes not in SurgSim::Framework::Component hierarchy should inherit this class in
 /// order to load a file.
-class Asset
+class Asset : public Accessible
 {
 	friend AssetTest;
 public:
 	/// Constructor
 	Asset();
+
+	/// Copy Constructor
+	Asset(const Asset& rhs);
 
 	/// Destructor
 	virtual ~Asset();
@@ -57,6 +62,13 @@ public:
 	/// \return Name of the file loaded by this class.
 	std::string getFileName() const;
 
+	virtual std::string getClassName() const = 0;
+
+	typedef SurgSim::Framework::ObjectFactory<SurgSim::Framework::Asset> FactoryType;
+
+	/// \return The static class factory that is being used in the conversion.
+	static FactoryType& getFactory();
+
 protected:
 	/// Derived classes will overwrite this method to do actual loading.
 	/// \note This method is not required to do any check on the validity or the existence of the file.
@@ -64,12 +76,12 @@ protected:
 	/// \return True if loading is successful; Otherwise, false.
 	virtual bool doLoad(const std::string& filePath) = 0;
 
-	/// Derived classes (which also inherit from SurgSim::Framework::Accessible) should call this function
-	/// with 'this' pointer as the parameter in their constructors to register file name property for serialization.
+private:
+	/// Wrap the registration calls for the filename property, which is more complicated due to the overloaded
+	/// function call load()
 	/// \param accessible 'this' pointer of derived class.
 	void serializeFileName(SurgSim::Framework::Accessible* accessible);
 
-private:
 	/// Name of the file to be loaded.
 	std::string m_fileName;
 };

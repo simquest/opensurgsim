@@ -27,7 +27,8 @@
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
-namespace {
+namespace
+{
 static const double dt = 0.001;
 }
 
@@ -42,7 +43,7 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->load(fileName));
+	EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
 
 	auto collisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Collision");
 	collisionRepresentation->setShape(meshShape);
@@ -58,7 +59,7 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
 
 	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(
-		Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5), Vector3d(8.7, -4.7, -3.1));
+									 Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5), Vector3d(8.7, -4.7, -3.1));
 
 	collisionRepresentation->setLocalPose(transform);
 	collisionRepresentation->update(dt);
@@ -76,13 +77,13 @@ TEST(ShapeCollisionRepresentationTest, SerializationTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SurgSim::Math::MeshShape>();
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
-	EXPECT_NO_THROW(meshShape->load(fileName));
+	EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
 
 	auto collisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Collision");
 	collisionRepresentation->setValue("Shape", shape);
 	RigidTransform3d pose = SurgSim::Math::makeRigidTransform(Vector3d(4.3, 2.1, 6.5),
-															  Vector3d(-1.5, 7.5, -2.5),
-															  Vector3d(8.7, -4.7, -3.1));
+							Vector3d(-1.5, 7.5, -2.5),
+							Vector3d(8.7, -4.7, -3.1));
 	collisionRepresentation->setLocalPose(pose);
 
 	YAML::Node node;
@@ -94,11 +95,11 @@ TEST(ShapeCollisionRepresentationTest, SerializationTest)
 
 	std::shared_ptr<ShapeCollisionRepresentation> newShapeCollisionRepresentation;
 	ASSERT_NO_THROW(newShapeCollisionRepresentation = std::dynamic_pointer_cast<ShapeCollisionRepresentation>
-														(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+					(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	EXPECT_TRUE(pose.isApprox(newShapeCollisionRepresentation->getPose()));
 
 	auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(
-				newShapeCollisionRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
+					newShapeCollisionRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
 	ASSERT_TRUE(nullptr != mesh);
 	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), mesh->getMesh()->getNumEdges());
 	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), mesh->getMesh()->getNumTriangles());

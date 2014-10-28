@@ -50,7 +50,7 @@ SURGSIM_STATIC_REGISTRATION(MeshShape);
 /// \note * Deformable  object, the mesh will be updated, but the geometric properties will not be used.
 ///
 /// \sa SurfaceMeshShape
-class MeshShape : public Shape, public SurgSim::Framework::Asset
+class MeshShape : public Shape
 {
 public:
 	/// Constructor
@@ -70,6 +70,18 @@ public:
 	/// Gets the initial mesh
 	/// \return The collision mesh associated to this MeshShape
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getInitialMesh();
+
+	/// Sets the mesh, alternatively you can use \sa load() to just load a mesh with a given name
+	/// \param mesh the mesh asset to be used here
+	void setInitialMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh);
+
+
+	/// Utility function, will create a mesh and load it if the path is correct
+	/// \param filePath the name of the mesh
+	/// \return whether the mesh was successfully loaded
+	void loadInitialMesh(const std::string& filePath);
+
+
 
 	/// Get mesh
 	/// \return The collision mesh associated to this MeshShape
@@ -93,7 +105,7 @@ public:
 
 	/// Set the object's global pose
 	/// \param pose the rigid transform to apply
-	void setPose(const SurgSim::Math::RigidTransform3d &pose);
+	void setPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
 	void updateAabbTree();
@@ -107,14 +119,10 @@ public:
 	/// \return true if this shape contains a valid mesh; otherwise, false.
 	bool isValid() const;
 
-protected:
-	virtual bool doLoad(const std::string& filePath) override;
-
 private:
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.
 	void computeVolumeIntegrals();
-
 	/// Center (considering a uniform distribution in the mesh volume)
 	SurgSim::Math::Vector3d m_center;
 
