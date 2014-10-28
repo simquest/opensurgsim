@@ -33,13 +33,11 @@ include_directories(
 set(NIMBLE_DEVICE_SOURCES
 	NimbleDevice.cpp
 	NimbleScaffold.cpp
-	NimbleThread.cpp
 )
 
 set(NIMBLE_DEVICE_HEADERS
 	NimbleDevice.h
 	NimbleScaffold.h
-	NimbleThread.h
 )
 
 surgsim_add_library(

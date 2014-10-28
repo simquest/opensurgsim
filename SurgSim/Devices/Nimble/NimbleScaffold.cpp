@@ -31,7 +31,6 @@
 #include <boost/thread/mutex.hpp>
 
 #include "SurgSim/Devices/Nimble/NimbleDevice.h"
-#include "SurgSim/Devices/Nimble/NimbleThread.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Framework/Assert.h"
@@ -259,9 +258,6 @@ public:
 	{
 	}
 
-	/// Processing thread.
-	std::unique_ptr<NimbleThread> thread;
-
 	/// The socket used for connecting to the Nimble server.
 	boost::asio::ip::tcp::iostream socketStream;
 
@@ -281,9 +277,11 @@ private:
 };
 
 NimbleScaffold::NimbleScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new StateData()), m_serverIpAddress("127.0.0.1"), m_serverPort("1988"),
+	SurgSim::Framework::BasicThread("Nimble Scaffold"), m_logger(logger),
+	m_state(new StateData()), m_serverIpAddress("127.0.0.1"), m_serverPort("1988"),
 	m_serverSocketOpen(false)
 {
+	setRate(1000.0);
 	if (m_logger == nullptr)
 	{
 		m_logger = SurgSim::Framework::Logger::getLogger("Nimble device");
@@ -300,11 +298,6 @@ NimbleScaffold::~NimbleScaffold()
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Destroying scaffold while devices are active!?!";
 		}
-	}
-
-	if (m_state->thread)
-	{
-		destroyThread();
 	}
 
 	SURGSIM_LOG_DEBUG(m_logger) << "Nimble: Shared scaffold destroyed.";
@@ -332,9 +325,13 @@ bool NimbleScaffold::registerDevice(NimbleDevice* device)
 		}
 	}
 
-	if (success && !m_state->thread)
+	if (success && !isRunning())
 	{
-		createThread();
+		std::shared_ptr<SurgSim::Framework::Barrier> barrier = std::make_shared<SurgSim::Framework::Barrier>(2);
+		start(barrier);
+		barrier->wait(true); // Wait for initialize
+		barrier->wait(true); // Wait for startup
+		success = isInitialized();
 	}
 
 	return success;
@@ -362,15 +359,15 @@ bool NimbleScaffold::unregisterDevice(const NimbleDevice* device)
 		}
 	}
 
-	if (m_state->activeDevices.size() == 0 && m_state->thread)
+	if (success && isRunning() && m_state->activeDevices.size() == 0)
 	{
-		destroyThread();
+		stop();
 	}
 
 	return success;
 }
 
-bool NimbleScaffold::initialize()
+bool NimbleScaffold::doInitialize()
 {
 	// Connect to the Nimble hand tracking server.
 	m_serverSocketOpen = true;
@@ -387,7 +384,12 @@ bool NimbleScaffold::initialize()
 	return m_serverSocketOpen;
 }
 
-bool NimbleScaffold::update()
+bool NimbleScaffold::doStartUp()
+{
+	return true;
+}
+
+bool NimbleScaffold::doUpdate(double dt)
 {
 	bool success = true;
 
@@ -425,9 +427,9 @@ bool NimbleScaffold::update()
 	return success;
 }
 
-void NimbleScaffold::finalize()
+void NimbleScaffold::doBeforeStop()
 {
-	// The m_state->thread would be killed soon, so the socket is closed here.
+	// This would be killed soon, so the socket is closed here.
 	if (m_serverSocketOpen)
 	{
 		m_state->socketStream.close();
@@ -436,6 +438,7 @@ void NimbleScaffold::finalize()
 			SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Error when shutting down socket: "
 				<< m_state->socketStream.error().message() << ")";
 		}
+		m_serverSocketOpen = false;
 	}
 }
 
@@ -466,28 +469,6 @@ void NimbleScaffold::resetDeviceData()
 		SurgSim::DataStructures::DataGroup& inputData = (*it)->getInputData();
 		inputData.resetAll();
 	}
-}
-
-bool NimbleScaffold::createThread()
-{
-	SURGSIM_ASSERT(!m_state->thread) << "Nimble: Attempt to create a thread when there is already one.";
-
-	std::unique_ptr<NimbleThread> thread(new NimbleThread(this));
-	thread->start();
-	m_state->thread = std::move(thread);
-
-	return true;
-}
-
-bool NimbleScaffold::destroyThread()
-{
-	SURGSIM_ASSERT(m_state->thread) << "Nimble: Attempt to destroy thread when there is none.";
-
-	std::unique_ptr<NimbleThread> thread = std::move(m_state->thread);
-	thread->stop();
-	thread.release();
-
-	return true;
 }
 
 SurgSim::DataStructures::DataGroup NimbleScaffold::buildDeviceInputData()
