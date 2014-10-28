@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Graphics/Model.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
@@ -53,7 +54,7 @@ bool StapleElement::doInitialize()
 
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSceneryRepresentation>("Graphics");
-	graphicsRepresentation->setFileName("Geometry/staple.obj");
+	graphicsRepresentation->loadModel("Geometry/staple.obj");
 
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);

@@ -129,7 +129,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& name, const std::string& fileName)
 {
 	std::shared_ptr<SceneryRepresentation> sceneryRepresentation = std::make_shared<OsgSceneryRepresentation>(name);
-	sceneryRepresentation->setFileName(fileName);
+	sceneryRepresentation->loadModel(fileName);
 	return sceneryRepresentation;
 }
 

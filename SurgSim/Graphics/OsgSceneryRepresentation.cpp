@@ -16,9 +16,11 @@
 #include <osg/PositionAttitudeTransform>
 #include <osgDB/ReadFile>
 
+#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/OsgModel.h"
 
 namespace SurgSim
 {
@@ -31,36 +33,46 @@ OsgSceneryRepresentation::OsgSceneryRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
 	SceneryRepresentation(name),
-	m_sceneryRepresentation(nullptr),
+	m_osgNode(nullptr),
 	m_fileName()
 {
 }
 
 bool OsgSceneryRepresentation::doInitialize()
 {
-	// HS-2013-dec-17 This should probably use a return value of false rather than assertions
-	SURGSIM_ASSERT(m_fileName != "") << "Filename can't be empty.";
-	std::shared_ptr<const SurgSim::Framework::ApplicationData> applicationData = getRuntime()->getApplicationData();
-
-	std::string objectPath = applicationData->findFile(m_fileName);
-	SURGSIM_ASSERT(!objectPath.empty()) << "Could not find file " << m_fileName << std::endl;
-
-	m_sceneryRepresentation = osgDB::readNodeFile(objectPath);
-	SURGSIM_ASSERT(m_sceneryRepresentation.valid()) << "Could not load file " << objectPath << std::endl;
-
-	m_transform->addChild(m_sceneryRepresentation);
 	return true;
 }
 
-std::string OsgSceneryRepresentation::getFileName() const
+void OsgSceneryRepresentation::loadModel(const std::string& fileName)
 {
-	return m_fileName;
+	auto model = std::make_shared<OsgModel>();
+	model->load(fileName);
+	setModel(model);
 }
 
-void OsgSceneryRepresentation::setFileName(const std::string& fileName)
+void OsgSceneryRepresentation::setModel(std::shared_ptr<SurgSim::Framework::Asset> model)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "Can't set the filename after the object has been initialized.";
-	m_fileName = fileName;
+	auto osgModel = std::dynamic_pointer_cast<OsgModel>(model);
+
+	SURGSIM_ASSERT(model == nullptr || osgModel != nullptr) << "OsgSceneryRepresentation expects an OsgModel.";
+
+	if (m_osgNode.valid())
+	{
+		m_transform->removeChild(m_osgNode);
+	}
+	if (osgModel != nullptr)
+	{
+		m_osgNode = osgModel->getOsgNode();
+		m_transform->addChild(m_osgNode);
+	}
+
+	m_model = osgModel;
+
+}
+
+std::shared_ptr<Model> OsgSceneryRepresentation::getModel() const
+{
+	return m_model;
 }
 
 };	// namespace Graphics

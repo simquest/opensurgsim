@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 	}
 	inputManager->addDevice(device);
 
-	runtime->loadScene("Data/StaplingDemo.yaml");
+	runtime->loadScene("StaplingDemo.yaml");
 
 	std::shared_ptr<SceneElement> arm = runtime->getScene()->getSceneElement("arm");
 	std::shared_ptr<SceneElement> wound = runtime->getScene()->getSceneElement("wound");

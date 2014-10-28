@@ -26,6 +26,7 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgModel.h"
 
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::OsgViewElement;
@@ -62,16 +63,16 @@ public:
 
 TEST_F(OsgSceneryRepresentationTest, FileNameTest)
 {
-	sceneryObject->setFileName("OsgSceneryRepresentationTests/Torus.obj");
-	EXPECT_EQ("OsgSceneryRepresentationTests/Torus.obj", sceneryObject->getFileName());
+	sceneryObject->loadModel("OsgSceneryRepresentationTests/Torus.obj");
+	EXPECT_EQ("OsgSceneryRepresentationTests/Torus.obj", sceneryObject->getModel()->getFileName());
 }
 
 TEST_F(OsgSceneryRepresentationTest, InitTest)
 {
-	sceneryObject->setFileName("OsgSceneryRepresentationTests/Torus.obj");
+	sceneryObject->loadModel("OsgSceneryRepresentationTests/Torus.obj");
 	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject));
 
-	sceneryObject2->setFileName("OsgSceneryRepresentationTests/Torus.osgb");
+	sceneryObject2->loadModel("OsgSceneryRepresentationTests/Torus.osgb");
 	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject2));
 }
 
@@ -82,17 +83,18 @@ TEST_F(OsgSceneryRepresentationTest, AccessibleTest)
 									"SurgSim::Graphics::OsgSceneryRepresentation",
 									"scenery"));
 
-	std::string fileName("TestFileName");
-	component->setValue("FileName", fileName);
-	EXPECT_EQ(fileName, component->getValue<std::string>("FileName"));
+	std::string fileName("OsgSceneryRepresentationTests/Torus.obj");
+	component->setValue("ModelFileName", fileName);
+	auto asset = component->getValue<std::shared_ptr<SurgSim::Graphics::Model>>("Model");
+	EXPECT_EQ(fileName, asset->getFileName());
 }
 
 TEST_F(OsgSceneryRepresentationTest, SerializationTests)
 {
 	std::shared_ptr<SceneryRepresentation> scenery = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
 
-	std::string fileName("TestFileName");
-	scenery->setFileName(fileName);
+	std::string fileName("OsgSceneryRepresentationTests/Torus.obj");
+	scenery->loadModel(fileName);
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = scenery->encode());
@@ -102,5 +104,5 @@ TEST_F(OsgSceneryRepresentationTest, SerializationTests)
 	std::shared_ptr<SceneryRepresentation> result = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
 	ASSERT_NO_THROW(result->decode(node));
 	EXPECT_EQ("SurgSim::Graphics::OsgSceneryRepresentation", result->getClassName());
-	EXPECT_EQ(fileName, result->getFileName());
+	EXPECT_EQ(fileName, result->getModel()->getFileName());
 }

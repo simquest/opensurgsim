@@ -50,7 +50,7 @@ TEST(OsgOctreeRepresentationTests, GetSetUpdateTest)
 	EXPECT_TRUE(octreeRepresentation->wakeUp());
 
 	// Set the octree after wake up will cause a assertion failure.
-	ASSERT_ANY_THROW( { octreeRepresentation->setOctreeShape(octreeShape); } );
+	ASSERT_ANY_THROW({ octreeRepresentation->setOctreeShape(octreeShape); });
 
 	ASSERT_NO_THROW(octreeRepresentation->update(0.1));
 }
@@ -95,7 +95,7 @@ TEST(OsgOctreeRepresentationTests, SerializationTest)
 	Runtime runtime("config.txt");
 	std::shared_ptr<SurgSim::Math::Shape> octreeShape = std::make_shared<SurgSim::Math::OctreeShape>();
 	std::string filename = "OctreeShapeData/staple.vox";
-	std::static_pointer_cast<SurgSim::Math::OctreeShape>(octreeShape)->load(filename);
+	std::static_pointer_cast<SurgSim::Math::OctreeShape>(octreeShape)->loadOctree(filename);
 
 	std::shared_ptr<SurgSim::Framework::Component> osgOctree = std::make_shared<OsgOctreeRepresentation>("TestOctree");
 	osgOctree->setValue("OctreeShape", octreeShape);
@@ -109,12 +109,12 @@ TEST(OsgOctreeRepresentationTests, SerializationTest)
 
 	std::shared_ptr<SurgSim::Graphics::OsgOctreeRepresentation> newOsgOctree;
 	ASSERT_NO_THROW(newOsgOctree = std::dynamic_pointer_cast<OsgOctreeRepresentation>(
-									node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+									   node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	EXPECT_EQ("SurgSim::Graphics::OsgOctreeRepresentation", newOsgOctree->getClassName());
 
 	auto newOctree = newOsgOctree->getOctreeShape();
-	auto oldOctree = std::static_pointer_cast<OctreeShape>(octreeShape)->getRootNode();
-	EXPECT_TRUE(newOctree->getRootNode()->getBoundingBox().isApprox(oldOctree->getBoundingBox()));
+	auto oldOctree = std::static_pointer_cast<OctreeShape>(octreeShape)->getOctree();
+	EXPECT_TRUE(newOctree->getOctree()->getBoundingBox().isApprox(oldOctree->getBoundingBox()));
 	EXPECT_TRUE(newOsgOctree->getOctreeShape()->isValid());
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, newOctree->getType());
 	EXPECT_THROW(newOctree->getVolume(), SurgSim::Framework::AssertionFailure);

@@ -80,7 +80,7 @@ SurgSim::Framework::Scene:
               Id: 201e6e8d-59f9-409c-8688-64192aedad4a
               DrawAsWireFrame: false
               Name: Forearm
-              FileName: Geometry/forearm.osgb
+              ModelFileName: Geometry/forearm.osgb
               IsLocalActive: true
               GroupReferences:
                 - __OssDefault__
@@ -99,7 +99,7 @@ SurgSim::Framework::Scene:
                   InitialMeshFileName: Geometry/arm_collision.ply
           - SurgSim::Graphics::OsgSceneryRepresentation:
               IsLocalActive: true
-              FileName: Geometry/upperarm.osgb
+              ModelFileName: Geometry/upperarm.osgb
               GroupReferences:
                 - __OssDefault__
               LocalPose:
@@ -259,7 +259,7 @@ SurgSim::Framework::Scene:
                     Name: VirtualToothCollision1
               Name: Behavior
           - SurgSim::Graphics::OsgSceneryRepresentation:
-              FileName: Geometry/stapler_indicator.obj
+              ModelFileName: Geometry/stapler_indicator.obj
               IsLocalActive: true
               GroupReferences:
                 - __OssDefault__
@@ -273,7 +273,7 @@ SurgSim::Framework::Scene:
               Name: Handle
               DrawAsWireFrame: false
               IsLocalActive: true
-              FileName: Geometry/stapler_handle.obj
+              ModelFileName: Geometry/stapler_handle.obj
               GroupReferences:
                 - __OssDefault__
               LocalPose:
@@ -282,7 +282,7 @@ SurgSim::Framework::Scene:
               Id: 5709c8b8-b12b-42fa-9bd8-37e5fd55773e
           - SurgSim::Graphics::OsgSceneryRepresentation:
               IsLocalActive: true
-              FileName: Geometry/stapler_markings.obj
+              ModelFileName: Geometry/stapler_markings.obj
               GroupReferences:
                 - __OssDefault__
               LocalPose:
@@ -302,7 +302,7 @@ SurgSim::Framework::Scene:
                 Quaternion: [0, 0, 0, 1]
                 Translation: [0, 0, 0]
           - SurgSim::Graphics::OsgSceneryRepresentation:
-              FileName: Geometry/stapler_trigger.obj
+              ModelFileName: Geometry/stapler_trigger.obj
               IsLocalActive: true
               GroupReferences:
                 - __OssDefault__
