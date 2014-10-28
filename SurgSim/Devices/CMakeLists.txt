@@ -23,6 +23,7 @@ set(DEVICES
 	MultiAxis
 	Nimble
 	Novint
+	OpenNI
 	Phantom
 	Sixense
 	TrackIR

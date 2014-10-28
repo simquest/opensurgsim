@@ -1,0 +1,18 @@
+/*!
+
+\page OpenNI OpenNI: Depth Sensing Cameras
+
+This adds support for OpenNI 2 compatible depth sensing cameras, such as the Asus Xtion Pro.
+
+Dependencies
+------------
+OpenNI 2 SDK: Prebuilt binaries are availble for Windows, and GNU/Linux on <A
+HREF="http://structure.io/openni">Structure.io</A>'s website. For Windows, add
+the 'OpenNI2/Redist/' folder to your PATH environment variable. If you used the
+default installation location, this will be:
+
+\code
+  C:/ProgramFiles (x86)/OpenNI2/Redist/
+\endcode
+
+*/
