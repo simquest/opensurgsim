@@ -226,11 +226,14 @@ protected:
 	SurgSim::Math::Vector3d m_ck;      //< (1/4 xij^2 - 1/2 yij^2)/lij^2
 	SurgSim::Math::Vector3d m_dk;      //< -yij/lij^2
 	SurgSim::Math::Vector3d m_ek;      //< (1/4 yij^2 - 1/2 xij^2)/lij^2
-	//...and more variables for the derivatives
+	///...and more variables for the derivatives
 	SurgSim::Math::Vector3d m_Pk;      //< -6xij/lij^2    = 6 m_ak
 	SurgSim::Math::Vector3d m_qk;      //< 3xijyij/lij^2  = 4 m_bk
 	SurgSim::Math::Vector3d m_tk;      //< -6yij/lij^2    = 6 m_dk
 	SurgSim::Math::Vector3d m_rk;      //< 3yij^2/lij^2
+	/// Integral terms (useful for the plate mass matrix) related respectively to the dof (z, thetaX, thetaY)
+	SurgSim::Math::Matrix m_integral_dT_d, m_integralHyiHyj, m_integralHxiHxj;
+
 	/// Batoz derivative dHx/dxi
 	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
 	/// \return The vector dHx/dxi evaluated at (xi, neta)
@@ -266,6 +269,24 @@ private:
 	/// \note displacements in direction (z, thetax, thetay).
 	void computeLocalPlateMass(const SurgSim::Math::OdeState& state,
 							   Eigen::Matrix<double, 18, 18>* localMassMatrix);
+
+	/// Computes the integral terms d^T.d over the parametrized triangle area.
+	/// This integral is required in the plate mass matrix computation.
+	/// The displacement along z is w(x, y) = [d1 d2 d3 d4 d5 d6 d7 d8 d9].U = d.U
+	/// with di cubic interpolation functions and U nodal plate displacements.
+	void computeIntegral_dTd();
+
+	/// Computes the integral terms Hy.Hy^T over the parametrized triangle area.
+	/// This integral is required in the plate mass matrix computation.
+	// The displacement along thetay is Thetay(x, y) = -dw/dx = betax = Hx^T.U
+	/// with Hxi quadratic interpolation functions and U nodal plate displacements.
+	void computeIntegral_HxHxT();
+
+	/// Computes the integral terms Hx.Hx^T over the parametrized triangle area.
+	/// This integral is required in the plate mass matrix computation.
+	// The displacement along thetax is Thetax(x, y) = dw/dy = -betay = -Hy^T.U
+	/// with Hyi quadratic interpolation functions and U nodal plate displacements.
+	void computeIntegral_HyHyT();
 };
 
 } // namespace Physics

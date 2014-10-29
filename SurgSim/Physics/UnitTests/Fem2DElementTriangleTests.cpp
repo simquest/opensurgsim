@@ -26,6 +26,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 
+using SurgSim::Math::gaussQuadrature2DTriangle6Points;
+using SurgSim::Math::gaussQuadrature2DTriangle12Points;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
@@ -65,6 +67,16 @@ public:
 		SurgSim::Math::setSubMatrix(R0, 5, 5, 3, 3, &m_initialRotationTimes6);
 
 		return m_initialRotationTimes6;
+	}
+
+	const double get_xij(size_t i) const
+	{
+		return m_xij[i];
+	}
+
+	const double get_yij(size_t i) const
+	{
+		return m_yij[i];
 	}
 
 	const Eigen::Matrix<double, 3, 9> getBatozStrainDisplacement(double xi, double neta) const
@@ -153,7 +165,7 @@ public:
 	// dN6/dneta(xi, neta) = -4xi
 	double batozDN6Dneta(double xi, double neta) const { return -4.0 * xi;                     }
 
-	std::array<double, 9> batozHx(double xi, double neta)
+	std::array<double, 9> batozHx(double xi, double neta) const
 	{
 		std::array<double, 9> res;
 
@@ -180,7 +192,7 @@ public:
 
 		return res;
 	}
-	std::array<double, 9> batozDhxDxiAlternative(double xi, double neta)
+	std::array<double, 9> batozDhxDxiAlternative(double xi, double neta) const
 	{
 		std::array<double, 9> res;
 
@@ -207,7 +219,7 @@ public:
 
 		return res;
 	}
-	std::array<double, 9> batozDhxDnetaAlternative(double xi, double neta)
+	std::array<double, 9> batozDhxDnetaAlternative(double xi, double neta) const
 	{
 		std::array<double, 9> res;
 
@@ -235,7 +247,7 @@ public:
 		return res;
 	}
 
-	std::array<double, 9> batozHy(double xi, double neta)
+	std::array<double, 9> batozHy(double xi, double neta) const
 	{
 		std::array<double, 9> res;
 
@@ -262,7 +274,7 @@ public:
 
 		return res;
 	}
-	std::array<double, 9> batozDhyDxiAlternative(double xi, double neta)
+	std::array<double, 9> batozDhyDxiAlternative(double xi, double neta) const
 	{
 		std::array<double, 9> res;
 
@@ -289,7 +301,7 @@ public:
 
 		return res;
 	}
-	std::array<double, 9> batozDhyDnetaAlternative(double xi, double neta)
+	std::array<double, 9> batozDhyDnetaAlternative(double xi, double neta) const
 	{
 		std::array<double, 9> res;
 
@@ -317,7 +329,7 @@ public:
 		return res;
 	}
 
-	Eigen::Matrix<double, 3, 9> batozStrainDisplacementAlternativeDerivative(double xi, double neta)
+	Eigen::Matrix<double, 3, 9> batozStrainDisplacementAlternativeDerivative(double xi, double neta) const
 	{
 		Eigen::Matrix<double, 3, 9> res;
 		std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
@@ -348,7 +360,7 @@ public:
 		double (MockFem2DElement::*f3)(double,double) const,
 		double (MockFem2DElement::*f4)(double,double) const,
 		double (MockFem2DElement::*f5)(double,double) const,
-		double (MockFem2DElement::*f6)(double,double) const)
+		double (MockFem2DElement::*f6)(double,double) const) const
 	{
 		std::array<double, 9> res;
 
@@ -382,7 +394,7 @@ public:
 		double (MockFem2DElement::*f3)(double,double) const,
 		double (MockFem2DElement::*f4)(double,double) const,
 		double (MockFem2DElement::*f5)(double,double) const,
-		double (MockFem2DElement::*f6)(double,double) const)
+		double (MockFem2DElement::*f6)(double,double) const) const
 	{
 		std::array<double, 9> res;
 
@@ -410,7 +422,7 @@ public:
 		return res;
 	}
 
-	Eigen::Matrix<double, 3, 9> batozStrainDisplacementNumericalDerivation(double xi, double neta)
+	Eigen::Matrix<double, 3, 9> batozStrainDisplacementNumericalDerivation(double xi, double neta) const
 	{
 		Eigen::Matrix<double, 3, 9> res;
 		std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
@@ -500,29 +512,125 @@ public:
 		m_expectedRotation = m_rotation;
 	}
 
+	// Useful method to numerically evaluate the 9x9 matrix d^T.d on a given point on the triangle
+	SurgSim::Math::Matrix evaluate_dTd_at(const MockFem2DElement& fem2DElement, double xi, double eta)
+	{
+		SurgSim::Math::Vector d(9); // column vector
+
+		const double xi2 = xi * xi;
+		const double xi3 = xi2 * xi;
+		const double eta2 = eta * eta;
+		const double eta3 = eta2 * eta;
+		const double lambda = 1.0 - xi - eta;
+		const double lambda2 = lambda * lambda;
+		const double lambda3 = lambda2 * lambda;
+		const double xiEtaLambda = xi * eta * lambda;
+
+		const double N1 = 3.0 * lambda2 - 2.0 * lambda3 + 2.0 * xiEtaLambda;
+		const double N2 = lambda2 * xi + xiEtaLambda / 2.0;
+		const double N3 = lambda2 * eta + xiEtaLambda / 2.0;
+		const double N4 = 3.0 * xi2 - 2.0 * xi3 + 2.0 * xiEtaLambda;
+		const double N5 = xi2 * (xi - 1.0) - xiEtaLambda;
+		const double N6 = xi2 * eta + xiEtaLambda / 2.0;
+		const double N7 = 3.0 * eta2 - 2.0 * eta3 + 2.0 * xiEtaLambda;
+		const double N8 = eta2 * xi + xiEtaLambda / 2.0;
+		const double N9 = eta2 * (eta - 1.0) - xiEtaLambda;
+
+		// x0 = y0 = y1 = 0.0
+		const double x1 = -fem2DElement.get_xij(2); // x0 - x1 = -x1
+		const double x2 = fem2DElement.get_xij(1); // x2 - x0 = x2
+		const double y2 = fem2DElement.get_yij(1); // y2 - y0 = y2
+
+		d << N1, N3 * y2, -N2 * x1 - N3 * x2, N4, N6 * y2, -N5 * x1 - N6 * x2, N7, N9 * y2, -N8 * x1 - N9 * x2;
+
+		return d * d.transpose();
+	}
+
+	// Useful method to numerically evaluate the 9x9 matrix Hx.Hx^T on a given point on the triangle
+	SurgSim::Math::Matrix evaluate_HxHxT_at(const MockFem2DElement& fem2DElement, double xi, double eta)
+	{
+		auto Hx_array = fem2DElement.batozHx(xi, eta);
+		SurgSim::Math::Vector Hx(9); // column vector
+		Hx << Hx_array[0], Hx_array[1], Hx_array[2],
+			Hx_array[3], Hx_array[4], Hx_array[5],
+			Hx_array[6], Hx_array[7], Hx_array[8];
+		return Hx * Hx.transpose();
+	}
+
+	// Useful method to numerically evaluate the 9x9 matrix Hy.Hy^T on a given point on the triangle
+	SurgSim::Math::Matrix evaluate_HyHyT_at(const MockFem2DElement& fem2DElement, double xi, double eta)
+	{
+		auto Hy_array = fem2DElement.batozHy(xi, eta);
+		SurgSim::Math::Vector Hy(9); // column vector
+		Hy << Hy_array[0], Hy_array[1], Hy_array[2],
+			Hy_array[3], Hy_array[4], Hy_array[5],
+			Hy_array[6], Hy_array[7], Hy_array[8];
+		return Hy * Hy.transpose();
+	}
+
+	// Useful method to numerically evaluate the plate mass matrix of an element
+	// This method uses a Gauss quadrature rules on the triangle to numerically evaluate the vaious integral terms.
+	void numericallyEvaluatePlateMassMatrix(const MockFem2DElement& fem2DElement,
+		Eigen::Ref<SurgSim::Math::Matrix> mass)
+	{
+		// M = 2.A.rho.h \int_0^1 \int_0^{1-eta} d^T.d dxi deta
+		//  + 2.A.h^3/12.rho \int_0^1 \int_0^{1-eta} Hx.Hx^T dxi deta
+		//  + 2.A.h^3/12.rho \int_0^1 \int_0^{1-eta} Hy.Hy^T dxi deta
+		const double A = fem2DElement.getRestArea();
+		const double rho = fem2DElement.getMassDensity();
+		const double h = fem2DElement.getThickness();
+		const double coefUz = 2.0 * A * rho * h;
+		const double coefUtheta = coefUz * h * h / 12.0;
+
+		// math2.uncc.edu/~shaodeng/TEACHING/math5172/.../Lect_15.PDF
+		// "Quadrature Formulas in Two Dimensions"
+		// \int_0^1 \int_0^{1-eta} f(xi, eta) dxi deta = 1/2 sum_i w[i] f(xi[i], eta[i])
+		const double half = 1.0 / 2.0;
+
+		// Note that matrix d contains monomial terms up to degree 3,
+		// therefore dT.d contains monomial terms up to degree 6.
+		// Exact integration of such functions over the triangle requires a Gauss-Legendre quadrature with 12 points:
+		for (size_t pointId = 0; pointId < 12; ++pointId)
+		{
+			const double& weight = gaussQuadrature2DTriangle12Points[pointId].weight;
+			const double& xi = gaussQuadrature2DTriangle12Points[pointId].coordinateXi;
+			const double& eta = gaussQuadrature2DTriangle12Points[pointId].coordinateEta;
+			mass += coefUz * (half * weight * evaluate_dTd_at(fem2DElement, xi, eta));
+		}
+
+		// Note that Hx and Hy are of degree 2, therefore Hx.Hx^T and Hy.Hy^T are of degree 4.
+		// Exact integration of such functions over the triangle requires a Gauss-Legendre quadrature with 6 points:
+		for (size_t pointId = 0; pointId < 6; ++pointId)
+		{
+			const double& weight = gaussQuadrature2DTriangle6Points[pointId].weight;
+			const double& xi = gaussQuadrature2DTriangle6Points[pointId].coordinateXi;
+			const double& eta = gaussQuadrature2DTriangle6Points[pointId].coordinateEta;
+			mass += coefUtheta * (half * weight * evaluate_HxHxT_at(fem2DElement, xi, eta));
+			mass += coefUtheta * (half * weight * evaluate_HyHyT_at(fem2DElement, xi, eta));
+		}
+	}
+
 	void getExpectedLocalMassMatrix(Eigen::Ref<SurgSim::Math::Matrix> mass)
 	{
-		double m = m_rho * m_thickness * m_A;
+		typedef Eigen::Matrix<double, 9, 9> Matrix99Type;
+		typedef Eigen::Matrix<double, 6, 6> Matrix66Type;
 
-		mass.setIdentity();
+		Matrix66Type membraneMass = getMembraneLocalMassMatrix();
+		Matrix99Type plateMass = getPlateLocalMassMatrix();
 
-		mass.block<2, 2>(0, 0).diagonal().setConstant(m / 6.0);
-		mass.block<2, 2>(0, 6).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(0, 12).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(3, 3).setConstant(-6.25e-6);
-		mass.block<2, 2>(3, 3).diagonal().setConstant(6.0416666666666666e-5);
+		// Assemble the membrane and plane stiffness
+		mass.setIdentity(); // The drilling dof will have an independent dof of mass 1kg.
+		for(size_t row = 0; row < 3; ++row)
+		{
+			for(size_t column = 0; column < 3; ++column)
+			{
+				// Membrane part
+				mass.block<2, 2>(6 * row, 6 * column) = membraneMass.block<2, 2>(2 * row, 2 * column);
 
-		mass.block<2, 2>(6, 0).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(6, 6).diagonal().setConstant(m / 6.0);
-		mass.block<2, 2>(6, 12).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(9, 9).setConstant(-6.25e-6);
-		mass.block<2, 2>(9, 9).diagonal().setConstant(6.0416666666666666e-5);
-
-		mass.block<2, 2>(12, 0).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(12, 6).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(12, 12).diagonal().setConstant(m / 6.0);
-		mass.block<2, 2>(15, 15).setConstant(-6.25e-6);
-		mass.block<2, 2>(15, 15).diagonal().setConstant(6.0416666666666666e-5);
+				// Thin-plate part
+				mass.block<3, 3>(6 * row + 2, 6 * column + 2) = plateMass.block<3, 3>(3 * row, 3 * column);
+			}
+		}
 	}
 
 	void getExpectedLocalStiffnessMatrix(Eigen::Ref<SurgSim::Math::Matrix> stiffness)
@@ -540,10 +648,10 @@ public:
 			for(size_t column = 0; column < 3; ++column)
 			{
 				// Membrane part
-				stiffness.block(6 * row, 6 * column, 2, 2) = membraneStiffness.block(2 * row, 2 * column, 2, 2);
+				stiffness.block<2, 2>(6 * row, 6 * column) = membraneStiffness.block<2, 2>(2 * row, 2 * column);
 
 				// Thin-plate part
-				stiffness.block(6 * row + 2, 6 * column + 2, 3, 3) = plateStiffness.block(3 * row, 3 * column, 3, 3);
+				stiffness.block<3, 3>(6 * row + 2, 6 * column + 2) = plateStiffness.block<3, 3>(3 * row, 3 * column);
 			}
 		}
 	}
@@ -627,6 +735,40 @@ public:
 		stiffness *= 2.0 * m_A;
 
 		return stiffness;
+	}
+
+	Eigen::Matrix<double, 6, 6> getMembraneLocalMassMatrix()
+	{
+		typedef Eigen::Matrix<double, 6, 6> Matrix66Type;
+
+		Matrix66Type membraneMassMatrix = Matrix66Type::Zero();
+		double m = m_rho * m_thickness * m_A;
+
+		membraneMassMatrix.block<2, 2>(0, 0).diagonal().setConstant(m / 6.0);
+		membraneMassMatrix.block<2, 2>(0, 2).diagonal().setConstant(m / 12.0);
+		membraneMassMatrix.block<2, 2>(0, 4).diagonal().setConstant(m / 12.0);
+
+		membraneMassMatrix.block<2, 2>(2, 0).diagonal().setConstant(m / 12.0);
+		membraneMassMatrix.block<2, 2>(2, 2).diagonal().setConstant(m / 6.0);
+		membraneMassMatrix.block<2, 2>(2, 4).diagonal().setConstant(m / 12.0);
+
+		membraneMassMatrix.block<2, 2>(4, 0).diagonal().setConstant(m / 12.0);
+		membraneMassMatrix.block<2, 2>(4, 2).diagonal().setConstant(m / 12.0);
+		membraneMassMatrix.block<2, 2>(4, 4).diagonal().setConstant(m / 6.0);
+
+		return membraneMassMatrix;
+	}
+
+	Eigen::Matrix<double, 9, 9> getPlateLocalMassMatrix()
+	{
+		typedef Eigen::Matrix<double, 9, 9> Matrix99Type;
+
+		Matrix99Type plateMassMatrix = Matrix99Type::Zero();
+
+		std::shared_ptr<MockFem2DElement> element = getElement();
+		numericallyEvaluatePlateMassMatrix(*element, plateMassMatrix);
+
+		return plateMassMatrix;
 	}
 
 	std::shared_ptr<MockFem2DElement> getElement()
@@ -1022,13 +1164,111 @@ TEST_F(Fem2DElementTriangleTests, StiffnessMatrixTest)
 		"KGlobal expected = " << std::endl << expectedLocalStiffness << std::endl;
 }
 
+static double evaluatePolynome(size_t degree, const SurgSim::Math::Vector& polynomeCoefficients, double x, double y)
+{
+	SurgSim::Math::Vector monome = SurgSim::Math::Vector::Zero(polynomeCoefficients.size());
+
+	size_t monomeId = 0;
+	for (size_t d = 0; d <= degree; d++)
+	{
+		for (size_t monomeOfDegreed = 0; monomeOfDegreed <= d; monomeOfDegreed++)
+		{
+			monome[monomeId++] = pow(x, d - monomeOfDegreed) * pow(y, monomeOfDegreed);
+		}
+	}
+
+	return monome.dot(polynomeCoefficients);
+}
+
+TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomeOrder4Test)
+{
+	// Polynomial of order 4 on 2 variables:
+	// {1, 2x, 3y, 4x^2, 5xy, 6y^2, 7x^3, 8x^2y, 9xy^2, 10y^3, 11x^4, 12x^3y, 13x^2y^2, 14xy^3, 15y^4}
+	// \int_0^1 \int_0^{1-y} P(x, y) dx dy = 1679 / 360
+	SurgSim::Math::Vector polynome(15);
+	polynome.setLinSpaced(1.0, 15.0);
+
+	// math2.uncc.edu/~shaodeng/TEACHING/math5172/.../Lect_15.PDF
+	// "Quadrature Formulas in Two Dimensions"
+	// \int_0^1 \int_0^{1-eta} f(xi, eta) dxi deta = 1/2 sum_i w[i] f(xi[i], eta[i])
+	const double half = 1.0 / 2.0;
+
+	// Note that Hx and Hy are of degree 2, therefore Hx.Hx^T and Hy.Hy^T are of degree 4.
+	// Exact integration of such functions over the triangle requires a Gauss-Legendre quadrature with 6 points:
+	//        xi              eta             weight
+	// 0.44594849091597 0.44594849091597 0.22338158967801
+	// 0.44594849091597 0.10810301816807 0.22338158967801
+	// 0.10810301816807 0.44594849091597 0.22338158967801
+	// 0.09157621350977 0.09157621350977 0.10995174365532
+	// 0.09157621350977 0.81684757298046 0.10995174365532
+	// 0.81684757298046 0.09157621350977 0.10995174365532
+	double integral = 0.0;
+	integral += half * 0.22338158967801 * evaluatePolynome(4, polynome, 0.44594849091597, 0.44594849091597);
+	integral += half * 0.22338158967801 * evaluatePolynome(4, polynome, 0.44594849091597, 0.10810301816807);
+	integral += half * 0.22338158967801 * evaluatePolynome(4, polynome, 0.10810301816807, 0.44594849091597);
+	integral += half * 0.10995174365532 * evaluatePolynome(4, polynome, 0.09157621350977, 0.09157621350977);
+	integral += half * 0.10995174365532 * evaluatePolynome(4, polynome, 0.09157621350977, 0.81684757298046);
+	integral += half * 0.10995174365532 * evaluatePolynome(4, polynome, 0.81684757298046, 0.09157621350977);
+
+	EXPECT_NEAR(1679.0 / 360.0, integral, 1e-8);
+}
+
+TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomeOrder6Test)
+{
+	// Polynomial of order 6 on 2 variables:
+	// {1, 2x, 3y, 4x^2, 5xy, 6y^2, 7x^3, 8x^2y, 9xy^2, 10y^3, 11x^4, 12x^3y, 13x^2y^2, 14xy^3, 15y^4,
+	// 16x^5, 17x^4y, 18x^3y^2, 19x^2y^3, 20xy^4, 21y^5,
+	// 22x^6, 23x^5y, 24x^4y^2, 25x^3y^3, 26x^2y^4, 27xy^5, 28y^6}
+	// \int_0^1 \int_0^{1-y} P(x, y) dx dy = 9983 / 1440
+	SurgSim::Math::Vector polynome(28);
+	polynome.setLinSpaced(1.0, 28.0);
+
+	// math2.uncc.edu/~shaodeng/TEACHING/math5172/.../Lect_15.PDF
+	// "Quadrature Formulas in Two Dimensions"
+	// \int_0^1 \int_0^{1-eta} f(xi, eta) dxi deta = 1/2 sum_i w[i] f(xi[i], eta[i])
+	const double half = 1.0 / 2.0;
+
+	// Note that matrix d contains monomial terms up to degree 3,
+	// therefore dT.d contains monomial terms up to degree 6.
+	// Exact integration of such functions over the triangle requires a Gauss-Legendre quadrature with 12 points:
+	//       xi               eta             weight
+	// 0.24928674517091 0.24928674517091 0.11678627572638
+	// 0.24928674517091 0.50142650965818 0.11678627572638
+	// 0.50142650965818 0.24928674517091 0.11678627572638
+	// 0.06308901449150 0.06308901449150 0.05084490637021
+	// 0.06308901449150 0.87382197101700 0.05084490637021
+	// 0.87382197101700 0.06308901449150 0.05084490637021
+	// 0.31035245103378 0.63650249912140 0.08285107561837
+	// 0.63650249912140 0.05314504984482 0.08285107561837
+	// 0.05314504984482 0.31035245103378 0.08285107561837
+	// 0.63650249912140 0.31035245103378 0.08285107561837
+	// 0.31035245103378 0.05314504984482 0.08285107561837
+	// 0.05314504984482 0.63650249912140 0.08285107561837
+	double integral = 0.0;
+	integral += half * 0.11678627572638 * evaluatePolynome(6, polynome, 0.24928674517091, 0.24928674517091);
+	integral += half * 0.11678627572638 * evaluatePolynome(6, polynome, 0.24928674517091, 0.50142650965818);
+	integral += half * 0.11678627572638 * evaluatePolynome(6, polynome, 0.50142650965818, 0.24928674517091);
+	integral += half * 0.05084490637021 * evaluatePolynome(6, polynome, 0.06308901449150, 0.06308901449150);
+	integral += half * 0.05084490637021 * evaluatePolynome(6, polynome, 0.06308901449150, 0.87382197101700);
+	integral += half * 0.05084490637021 * evaluatePolynome(6, polynome, 0.87382197101700, 0.06308901449150);
+	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.31035245103378, 0.63650249912140);
+	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.63650249912140, 0.05314504984482);
+	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.05314504984482, 0.31035245103378);
+	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.63650249912140, 0.31035245103378);
+	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.31035245103378, 0.05314504984482);
+	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.05314504984482, 0.63650249912140);
+
+	EXPECT_NEAR(9983.0 / 1440.0, integral, 1e-6);
+}
+
 TEST_F(Fem2DElementTriangleTests, MassMatrixTest)
 {
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
 	Eigen::Matrix<double, 18, 18> expectedMassMatrix;
 	getExpectedLocalMassMatrix(expectedMassMatrix);
-	EXPECT_TRUE(tri->getLocalMassMatrix().isApprox(expectedMassMatrix));
+	EXPECT_TRUE(tri->getLocalMassMatrix().isApprox(expectedMassMatrix)) <<
+		"Error = " << std::endl << tri->getLocalMassMatrix() - expectedMassMatrix << std::endl;
 
 	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalMassMatrix().isApprox(R0 * expectedMassMatrix * R0.transpose()));
@@ -1073,7 +1313,8 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	EXPECT_TRUE(forceVector.isZero());
 
 	tri->addMass(m_restState, &massMatrix);
-	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix));
+	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix)) << "MassMatrix = " << std::endl << massMatrix << std::endl <<
+		"ExpectedMassMatrix = " << std::endl << expectedMassMatrix << std::endl;
 
 	tri->addDamping(m_restState, &dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isZero());
