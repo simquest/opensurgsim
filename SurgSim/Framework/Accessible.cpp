@@ -196,6 +196,8 @@ void Accessible::forwardProperty(const std::string& name, const Accessible& targ
 	{
 		functors.getter = found->second.getter;
 		functors.setter = found->second.setter;
+		functors.encoder = found->second.encoder;
+		functors.decoder = found->second.decoder;
 		m_functors[name] = std::move(functors);
 	}
 	else
