@@ -168,85 +168,98 @@ void Fem2DElementTriangle::addMatVec(const SurgSim::Math::OdeState& state, doubl
 	}
 }
 
-void Fem2DElementTriangle::computeLocalMass(const SurgSim::Math::OdeState& state,
-											Eigen::Matrix<double, 18, 18>* localMassMatrix)
+void Fem2DElementTriangle::computeLocalMembraneMass(const SurgSim::Math::OdeState& state,
+													Eigen::Matrix<double, 18, 18>* localMassMatrix)
 {
 	double mass = m_rho * m_restArea * m_thickness;
 
-	localMassMatrix->setIdentity();
-
+	// Membrane mass matrix
+	// Przemieniecki book "Theory of Matrix Structural Analysis"
+	// Chapter 11.6, equation 11.42 for a in-plane triangle deformation
+	// m = rho.A(123).t/12.0.[2 1 1] for the axis X and Y
+	//                       [1 2 1]
+	//                       [1 1 2]
 	for(size_t i = 0; i < 3; ++i)
 	{
 		size_t j = (i + 1) % 3;
 		size_t k = (j + 1) % 3;
 
-		// Membrane inertia matrix
-		// Przemieniecki book "Theory of Matrix Structural Analysis"
-		// Chapter 11.6, equation 11.42 for a in-plane triangle deformation
-		// m = rho.A(123).t/12.0.[2 1 1] for the axis X and Y
-		//                       [1 2 1]
-		//                       [1 1 2]
 		localMassMatrix->block<2, 2>(i * 6, i * 6).diagonal().setConstant(mass / 6.0);
 		localMassMatrix->block<2, 2>(i * 6, j * 6).diagonal().setConstant(mass / 12.0);
 		localMassMatrix->block<2, 2>(i * 6, k * 6).diagonal().setConstant(mass / 12.0);
+	}
+}
 
-		// Plate inertia matrix developed from Batoz paper
-		// Interpolation of the rotational displacement over the triangle w.r.t. DOF:
-		// Uthetax(xi,neta) = z.Hx^T. U
-		// Uthetay(xi,neta) = z.Hy^T. U
-		//
-		// Which means that the shape functions for the rotational DOF are:
-		// a=(zHx^T zH^yT)
-		//
-		// Mass = \int_V rho.a^T.a dV
-		//      = rho . \int_z \int_A a^T.a dA dz
-		//      = rho . \int_{-h/2}^{h/2} \int_A z^2 ( Hx^t.Hx Hx^T.Hy ) dA dz
-		//                                           ( Hy^t.Hx Hy^T.Hy )
-		//
-		//      = rho . [z^3/3]_{-h/2}^{h/2} \int_0^{1} \int_0^{1-neta} 2A (Hx^T.Hx  Hx^T.Hy) dxi dneta
-		//                                                                 (Hy^T.Hx  Hy^T.Hy)
-		//
-		//      = rho . (h^3/12) . 2A . \int_0^{1} \int_0^{1-neta} (Hx^T.Hx  Hx^T.Hy) dxi dneta
-		//                                                         (Hy^T.Hx  Hy^T.Hy)
-		//
-		// int_0^1 \int_0^(1-neta) Hx^T.Hx dxi dneta =
-		//        1/5.( 2a4^2 + 2a5^2 + 2a6^2 - a4a5 - a4a6 - a5a6 ) +
-		//        1/20 +
-		//        4/45.( 2b4^2 + 2b5^2 + 2b6^2 + b4b5 + b4b6 + b5b6 + 2c4^2 + 2c5^2 + 2c6^2 + c4c5 + c4c6 + c5c6)
-		//
-		// int_0^1 \int_0^(1-neta) Hy^T.Hy dxi dneta =
-		//        1/5.( 2d4^2 + 2d5^2 + 2d6^2 - d4d5 - d4d6 - d5d6 ) +
-		//        1/20 +
-		//        4/45.( 2b4^2 + 2b5^2 + 2b6^2 + b4b5 + b4b6 + b5b6 + 2e4^2 + 2e5^2 + 2e6^2 + e4e5 + e4e6 + e5e6)
-		//
-		// int_0^1 \int_0^(1-neta) Hy^T.Hx dxi dneta =
-		// int_0^1 \int_0^(1-neta) Hx^T.Hy dxi dneta =
-		//        1/5 .( 2a4d4 + 2a5d5 + 2a6d6) - 1/10.( a4(d5+d6) + a5(d4+d6) + a6(d4+d5) )
-		//        4/45.( 2b4(e4+c4) + 2b5(e5+c5) + 2b6(e6+c6) )
-		//        2/45.( b4(e5+c5) + b4(e6+c6) + b5(e4+c4) + b5(e6+c6) + b6(e4+c4) + b6(e5+c5) )
-		//
-		double xx = 1.0 / 20.0;
-		xx += 1.0 / 5.0 * ( 2.0 * m_ak.squaredNorm() - m_ak[0] * m_ak[1] - m_ak[0] * m_ak[2] - m_ak[1] * m_ak[2] );
-		xx += 4.0 / 45.0 * ( 2.0 * m_bk.squaredNorm() + m_bk[0] * m_bk[1] + m_bk[0] * m_bk[2] + m_bk[1] * m_bk[2] );
-		xx += 4.0 / 45.0 * ( 2.0 * m_ck.squaredNorm() + m_ck[0] * m_ck[1] + m_ck[0] * m_ck[2] + m_ck[1] * m_ck[2] );
-		double yy = 1.0 / 20.0;
-		yy += 1.0 / 5.0 * ( 2.0 * m_dk.squaredNorm() - m_dk[0] * m_dk[1] - m_dk[0] * m_dk[2] - m_dk[1] * m_dk[2] );
-		yy += 4.0 / 45.0 * ( 2.0 * m_bk.squaredNorm() + m_bk[0] * m_bk[1] + m_bk[0] * m_bk[2] + m_bk[1] * m_bk[2] );
-		yy += 4.0 / 45.0 * ( 2.0 * m_ek.squaredNorm() + m_ek[0] * m_ek[1] + m_ek[0] * m_ek[2] + m_ek[1] * m_ek[2] );
-		double xy = 0.0;
-		xy += 1.0 / 5.0 * ( 2.0 * m_ak.dot(m_dk) );
-		xy -= 1.0 / 10.0 * ( m_ak.dot(Vector3d(m_dk[1] + m_dk[2], m_dk[0] + m_dk[2], m_dk[0] + m_dk[1])) );
-		xy += 4.0 / 45.0 * ( 2.0 * m_bk.dot(m_ek + m_ck) );
-		xy += 2.0 / 45.0 * ( m_bk[0] * (m_ek[1] + m_ck[1] + m_ek[2] + m_ck[2]) );
-		xy += 2.0 / 45.0 * ( m_bk[1] * (m_ek[0] + m_ck[0] + m_ek[2] + m_ck[2]) );
-		xy += 2.0 / 45.0 * ( m_bk[2] * (m_ek[0] + m_ck[0] + m_ek[1] + m_ck[1]) );
+void Fem2DElementTriangle::computeLocalPlateMass(const SurgSim::Math::OdeState& state,
+													Eigen::Matrix<double, 18, 18>* localMassMatrix)
+{
+	// Plate inertia matrix developed from Batoz paper
+	// Interpolation of the rotational displacement over the triangle w.r.t. DOF:
+	// Uthetax(xi,neta) = z.Hx^T. U
+	// Uthetay(xi,neta) = z.Hy^T. U
+	//
+	// Which means that the shape functions for the rotational DOF are:
+	// a=(zHx^T zH^yT)
+	//
+	// Mass = \int_V rho.a^T.a dV
+	//      = rho . \int_z \int_A a^T.a dA dz
+	//      = rho . \int_{-h/2}^{h/2} \int_A z^2 ( Hx^t.Hx Hx^T.Hy ) dA dz
+	//                                           ( Hy^t.Hx Hy^T.Hy )
+	//
+	//      = rho . [z^3/3]_{-h/2}^{h/2} \int_0^{1} \int_0^{1-neta} 2A (Hx^T.Hx  Hx^T.Hy) dxi dneta
+	//                                                                 (Hy^T.Hx  Hy^T.Hy)
+	//
+	//      = rho . (h^3/12) . 2A . \int_0^{1} \int_0^{1-neta} (Hx^T.Hx  Hx^T.Hy) dxi dneta
+	//                                                         (Hy^T.Hx  Hy^T.Hy)
+	//
+	// int_0^1 \int_0^(1-neta) Hx^T.Hx dxi dneta =
+	//        1/5.( 2a4^2 + 2a5^2 + 2a6^2 - a4a5 - a4a6 - a5a6 ) +
+	//        1/20 +
+	//        4/45.( 2b4^2 + 2b5^2 + 2b6^2 + b4b5 + b4b6 + b5b6 + 2c4^2 + 2c5^2 + 2c6^2 + c4c5 + c4c6 + c5c6)
+	//
+	// int_0^1 \int_0^(1-neta) Hy^T.Hy dxi dneta =
+	//        1/5.( 2d4^2 + 2d5^2 + 2d6^2 - d4d5 - d4d6 - d5d6 ) +
+	//        1/20 +
+	//        4/45.( 2b4^2 + 2b5^2 + 2b6^2 + b4b5 + b4b6 + b5b6 + 2e4^2 + 2e5^2 + 2e6^2 + e4e5 + e4e6 + e5e6)
+	//
+	// int_0^1 \int_0^(1-neta) Hy^T.Hx dxi dneta =
+	// int_0^1 \int_0^(1-neta) Hx^T.Hy dxi dneta =
+	//        1/5 .( 2a4d4 + 2a5d5 + 2a6d6) - 1/10.( a4(d5+d6) + a5(d4+d6) + a6(d4+d5) )
+	//        4/45.( 2b4(e4+c4) + 2b5(e5+c5) + 2b6(e6+c6) )
+	//        2/45.( b4(e5+c5) + b4(e6+c6) + b5(e4+c4) + b5(e6+c6) + b6(e4+c4) + b6(e5+c5) )
+	//
+	double xx = 1.0 / 20.0;
+	xx += 1.0 / 5.0 * ( 2.0 * m_ak.squaredNorm() - m_ak[0] * m_ak[1] - m_ak[0] * m_ak[2] - m_ak[1] * m_ak[2] );
+	xx += 4.0 / 45.0 * ( 2.0 * m_bk.squaredNorm() + m_bk[0] * m_bk[1] + m_bk[0] * m_bk[2] + m_bk[1] * m_bk[2] );
+	xx += 4.0 / 45.0 * ( 2.0 * m_ck.squaredNorm() + m_ck[0] * m_ck[1] + m_ck[0] * m_ck[2] + m_ck[1] * m_ck[2] );
+	double yy = 1.0 / 20.0;
+	yy += 1.0 / 5.0 * ( 2.0 * m_dk.squaredNorm() - m_dk[0] * m_dk[1] - m_dk[0] * m_dk[2] - m_dk[1] * m_dk[2] );
+	yy += 4.0 / 45.0 * ( 2.0 * m_bk.squaredNorm() + m_bk[0] * m_bk[1] + m_bk[0] * m_bk[2] + m_bk[1] * m_bk[2] );
+	yy += 4.0 / 45.0 * ( 2.0 * m_ek.squaredNorm() + m_ek[0] * m_ek[1] + m_ek[0] * m_ek[2] + m_ek[1] * m_ek[2] );
+	double xy = 0.0;
+	xy += 1.0 / 5.0 * ( 2.0 * m_ak.dot(m_dk) );
+	xy -= 1.0 / 10.0 * ( m_ak.dot(Vector3d(m_dk[1] + m_dk[2], m_dk[0] + m_dk[2], m_dk[0] + m_dk[1])) );
+	xy += 4.0 / 45.0 * ( 2.0 * m_bk.dot(m_ek + m_ck) );
+	xy += 2.0 / 45.0 * ( m_bk[0] * (m_ek[1] + m_ck[1] + m_ek[2] + m_ck[2]) );
+	xy += 2.0 / 45.0 * ( m_bk[1] * (m_ek[0] + m_ck[0] + m_ek[2] + m_ck[2]) );
+	xy += 2.0 / 45.0 * ( m_bk[2] * (m_ek[0] + m_ck[0] + m_ek[1] + m_ck[1]) );
 
-		double coef2 = m_rho * (m_restArea * 2.0) * (m_thickness * m_thickness * m_thickness / 12.0);
+	double coef2 = m_rho * (m_restArea * 2.0) * (m_thickness * m_thickness * m_thickness / 12.0);
+	for(size_t i = 0; i < 3; ++i)
+	{
 		(*localMassMatrix)(6 * i + 3, 6 * i + 3) = coef2 * xx;
 		(*localMassMatrix)(6 * i + 3, 6 * i + 4) = coef2 * xy;
 		(*localMassMatrix)(6 * i + 4, 6 * i + 3) = coef2 * xy;
 		(*localMassMatrix)(6 * i + 4, 6 * i + 4) = coef2 * yy;
 	}
+}
+
+void Fem2DElementTriangle::computeLocalMass(const SurgSim::Math::OdeState& state,
+											Eigen::Matrix<double, 18, 18>* localMassMatrix)
+{
+	localMassMatrix->setIdentity();
+	computeLocalMembraneMass(state, localMassMatrix);
+	computeLocalPlateMass(state, localMassMatrix);
 }
 
 void Fem2DElementTriangle::computeMass(const SurgSim::Math::OdeState& state,

@@ -251,6 +251,21 @@ protected:
 	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
 	/// \return The 3x9 strain displacement matrix evaluated at (xi, neta)
 	Matrix39Type batozStrainDisplacement(double xi, double neta) const;
+
+private:
+	/// Computes the triangle's local membrane part mass matrix
+	/// \param state The state to compute the local membrane part mass matrix from
+	/// \param[out] localMassMatrix The local mass matrix to store the result into
+	void computeLocalMembraneMass(const SurgSim::Math::OdeState& state,
+								  Eigen::Matrix<double, 18, 18>* localMassMatrix);
+
+	/// Computes the triangle's local plate part mass matrix
+	/// \param state The state to compute the local plate part mass matrix from
+	/// \param[out] localMassMatrix The local mass matrix to store the result into
+	/// \note The plate mass matrix is composed of 3 matrices associated respectively to
+	/// \note displacements in direction (z, thetax, thetay).
+	void computeLocalPlateMass(const SurgSim::Math::OdeState& state,
+							   Eigen::Matrix<double, 18, 18>* localMassMatrix);
 };
 
 } // namespace Physics
