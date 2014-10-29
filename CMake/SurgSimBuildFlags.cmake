@@ -17,6 +17,11 @@
 ## Set build flags through CMake.
 ## Splitting this out removes excessive verbiage from CMakeLists.txt.
 
+# If no build type is specified, default to "Release".
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+	set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 # We always want to use defines from <math.h>.
 if(MSVC)
 	add_definitions( -D_USE_MATH_DEFINES )
