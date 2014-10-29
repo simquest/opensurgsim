@@ -49,6 +49,7 @@ struct OctreeData
 	std::string name;
 };
 
+template<>
 std::string SurgSim::DataStructures::OctreeNode<OctreeData>::m_className = "OctreeNode<OctreeData>";
 
 namespace SurgSim

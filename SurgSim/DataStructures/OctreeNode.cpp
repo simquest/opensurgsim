@@ -149,6 +149,7 @@ SURGSIM_REGISTER(SurgSim::Framework::Asset,
 				 OctreeNodeEmptyData);
 
 // Predefine classname of OctreeNode of EmptyData
+template<>
 std::string OctreeNode<EmptyData>::m_className = "SurgSim::DataStructures::OctreeNode<EmptyData>";
 
 std::shared_ptr<OctreeNode<EmptyData>> loadOctree(const std::string& fileName)
