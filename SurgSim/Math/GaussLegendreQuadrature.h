@@ -38,8 +38,8 @@ struct gaussQuadraturePoint
 };
 
 /// 2D Gauss-Legendre quadrature on a triangle
-/// \note For a triangle ABC, a point is defined by its parametrized coordinate \f$(\xi, \eta)\f$
-/// \note as \f$P = A + \xi.AB + \eta.AC\f$
+/// \note In a triangle ABC, a point \f$P\f$ is defined by its parametrized coordinate \f$(\xi, \eta)\f$ as
+/// \note \f$P = A + \xi.AB + \eta.AC\f$
 struct gaussQuadratureTrianglePoint
 {
 	gaussQuadratureTrianglePoint(double xi, double eta, double w) : coordinateXi(xi), coordinateEta(eta), weight(w){}
@@ -48,7 +48,7 @@ struct gaussQuadratureTrianglePoint
 	const double weight;
 };
 
-/// 1D 1-point Gauss-Legendre quadrature {<x_1, w_1>}
+/// 1D 1-point Gauss-Legendre quadrature \f${<x_1, w_1>}\f$
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
 /// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
@@ -57,7 +57,7 @@ struct gaussQuadratureTrianglePoint
 /// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<gaussQuadraturePoint, 1> gaussQuadrature1Point;
 
-/// 1D 2-points Gauss-Legendre quadrature {<x_1, w_1>, <x_2, w_2>}
+/// 1D 2-points Gauss-Legendre quadrature \f${<x_1, w_1>, <x_2, w_2>}\f$
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
 /// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
@@ -66,7 +66,7 @@ extern std::array<gaussQuadraturePoint, 1> gaussQuadrature1Point;
 /// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<gaussQuadraturePoint, 2> gaussQuadrature2Points;
 
-/// 3-points Gauss-Legendre quadrature {<x_1, w_1>, <x_2, w_2>, <x_3, w_3>}
+/// 3-points Gauss-Legendre quadrature \f${<x_1, w_1>, <x_2, w_2>, <x_3, w_3>}\f$
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
 /// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
@@ -75,7 +75,7 @@ extern std::array<gaussQuadraturePoint, 2> gaussQuadrature2Points;
 /// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<gaussQuadraturePoint, 3> gaussQuadrature3Points;
 
-/// 1D 4-points Gauss-Legendre quadrature {<x_1, w_1>, <x_2, w_2>, <x_3, w_3>, <x_4, w_4>}
+/// 1D 4-points Gauss-Legendre quadrature \f${<x_1, w_1>, <x_2, w_2>, <x_3, w_3>, <x_4, w_4>}\f$
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
 /// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
@@ -84,7 +84,7 @@ extern std::array<gaussQuadraturePoint, 3> gaussQuadrature3Points;
 /// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<gaussQuadraturePoint, 4> gaussQuadrature4Points;
 
-/// 1D 5-points Gauss-Legendre quadrature {<x_1, w_1>, <x_2, w_2>, <x_3, w_3>, <x_4, w_4>, <x_5, w_5>}
+/// 1D 5-points Gauss-Legendre quadrature \f${<x_1, w_1>, <x_2, w_2>, <x_3, w_3>, <x_4, w_4>, <x_5, w_5>}\f$
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
 /// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
@@ -93,7 +93,7 @@ extern std::array<gaussQuadraturePoint, 4> gaussQuadrature4Points;
 /// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<gaussQuadraturePoint, 5> gaussQuadrature5Points;
 
-/// 1D 100-points Gauss-Legendre quadrature {<x_1, w_1>, <x_2, w_2>, <x_3, w_3>, ..., <x_100, w_100>}
+/// 1D 100-points Gauss-Legendre quadrature \f${<x_1, w_1>, <x_2, w_2>, <x_3, w_3>, ..., <x_{100}, w_{100}>}\f$
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
 /// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
@@ -102,7 +102,7 @@ extern std::array<gaussQuadraturePoint, 5> gaussQuadrature5Points;
 /// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<gaussQuadraturePoint, 100> gaussQuadrature100Points;
 
-/// 2D triangle Gauss-Legendre quadrature 6-points \f${<\xi_1, \eta_1, w_1>, ..., <\xi_6, \eta_6, \w_6>}\f$
+/// 2D triangle Gauss-Legendre quadrature 6-points \f${<\xi_1, \eta_1, w_1>, ..., <\xi_6, \eta_6, w_6>}\f$
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f(\xi, \eta)\f$ with a
 /// finite sum using some weights and specific points on the triangle.
 /// \note \f$\int_{0}^{1} \int_{0}^{1-\eta} f(\xi, \eta) d\xi d\eta = \sum_{i=1}^n w_i f(\xi_i, \eta_i)\f$
@@ -112,7 +112,7 @@ extern std::array<gaussQuadraturePoint, 100> gaussQuadrature100Points;
 /// \note A 6-points Gauss-Legendre quadrature on the triangle is exact for polynomial functions of degree 4 or less.
 extern std::array<gaussQuadratureTrianglePoint, 6> gaussQuadrature2DTriangle6Points;
 
-/// 2D triangle Gauss-Legendre quadrature 12-points \f${<\xi_1, \eta_1, w_1>, ..., <\xi_12, \eta_12, w_12>}\f$
+/// 2D triangle Gauss-Legendre quadrature 12-points \f${<\xi_1, \eta_1, w_1>, ..., <\xi_{12}, \eta_{12}, w_{12}>}\f$
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f(\xi, \eta)\f$ with a
 /// finite sum using some weights and specific points on the triangle.
 /// \note \f$\int_{0}^{1} \int_{0}^{1-\eta} f(\xi, \eta) d\xi d\eta = \sum_{i=1}^n w_i f(\xi_i, \eta_i)\f$
