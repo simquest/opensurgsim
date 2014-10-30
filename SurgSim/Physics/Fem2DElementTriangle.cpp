@@ -423,9 +423,9 @@ void Fem2DElementTriangle::computeIntegral_dTd()
 	const double x2 = m_xij[1];  // x2 - x0    = x2 (as x0 = 0)
 	const double y2 = m_yij[1];  // y2 - y0)   = y2 (as y1 = 0)
 
-	const double x1SQ = x1 * x1;
-	const double x2SQ = x2 * x2;
-	const double y2SQ = y2 * y2;
+	const double x1x1 = x1 * x1;
+	const double x2x2 = x2 * x2;
+	const double y2y2 = y2 * y2;
 	const double x1x2 = x1 * x2;
 
 	m_integral_dT_d(0, 0) = 121.0 / 1260.0;
@@ -439,24 +439,24 @@ void Fem2DElementTriangle::computeIntegral_dTd()
 	m_integral_dT_d(0, 8) = (53.0 * x2 - 19.0 * x1) / 5040.0;
 
 	m_integral_dT_d(1, 0) = m_integral_dT_d(0, 1); // symmetric part
-	m_integral_dT_d(1, 1) = 31.0 / 20160.0 * y2SQ;
+	m_integral_dT_d(1, 1) = 31.0 / 20160.0 * y2y2;
 	m_integral_dT_d(1, 2) = (-y2) / 20160.0 * (19.0 * x1 + 31.0 * x2);
 	m_integral_dT_d(1, 3) = 19.0 / 5040.0 * y2;
-	m_integral_dT_d(1, 4) = 11.0 / 20160.0 * y2SQ;
+	m_integral_dT_d(1, 4) = 11.0 / 20160.0 * y2y2;
 	m_integral_dT_d(1, 5) = y2 / 20160.0 * (24.0 * x1 - 11.0 * x2);
 	m_integral_dT_d(1, 6) = 17.0 / 2520.0 * y2;
-	m_integral_dT_d(1, 7) = 19.0 / 10080.0 * (-y2SQ);
+	m_integral_dT_d(1, 7) = 19.0 / 10080.0 * (-y2y2);
 	m_integral_dT_d(1, 8) = (-y2) / 20160.0 * (13.0 * x1 - 38.0 * x2);
 
 	m_integral_dT_d(2, 0) = m_integral_dT_d(0, 2); // symmetric part
 	m_integral_dT_d(2, 1) = m_integral_dT_d(1, 2); // symmetric part
-	m_integral_dT_d(2, 2) = (31.0 * (x1SQ + x2SQ) + 2.0 * 19.0 * x1x2) / 20160.0;
+	m_integral_dT_d(2, 2) = (31.0 * (x1x1 + x2x2) + 2.0 * 19.0 * x1x2) / 20160.0;
 	m_integral_dT_d(2, 3) = (-19.0 * x2 - 2.0 * 17.0 * x1) / 5040.0;
 	m_integral_dT_d(2, 4) = (-y2) / 20160.0 * (13.0 * x1 + 11.0 * x2);
-	m_integral_dT_d(2, 5) = (11.0 * x2 * (x2 - x1) - 2.0 * 19.0 * x1SQ) / 20160.0;
+	m_integral_dT_d(2, 5) = (11.0 * x2 * (x2 - x1) - 2.0 * 19.0 * x1x1) / 20160.0;
 	m_integral_dT_d(2, 6) = (-19.0 * x1 - 2.0 * 17.0 * x2) / 5040.0;
 	m_integral_dT_d(2, 7) = y2 / 10080.0 * (12.0 * x1 + 19.0 * x2);
-	m_integral_dT_d(2, 8) = (11.0 * x1 * (x1 - x2) - 2.0 * 19.0 * x2SQ) / 20160.0;
+	m_integral_dT_d(2, 8) = (11.0 * x1 * (x1 - x2) - 2.0 * 19.0 * x2x2) / 20160.0;
 
 	m_integral_dT_d(3, 0) = m_integral_dT_d(0, 3); // symmetric part
 	m_integral_dT_d(3, 1) = m_integral_dT_d(1, 3); // symmetric part
@@ -472,10 +472,10 @@ void Fem2DElementTriangle::computeIntegral_dTd()
 	m_integral_dT_d(4, 1) = m_integral_dT_d(1, 4); // symmetric part
 	m_integral_dT_d(4, 2) = m_integral_dT_d(2, 4); // symmetric part
 	m_integral_dT_d(4, 3) = m_integral_dT_d(3, 4); // symmetric part
-	m_integral_dT_d(4, 4) = 31.0 / 20160.0 * y2SQ;
+	m_integral_dT_d(4, 4) = 31.0 / 20160.0 * y2y2;
 	m_integral_dT_d(4, 5) = y2 / 20160.0 * (50.0 * x1 - 31.0 * x2);
 	m_integral_dT_d(4, 6) = 17.0 / 2520.0 * y2;
-	m_integral_dT_d(4, 7) = 19.0 / 10080.0 * (-y2SQ);
+	m_integral_dT_d(4, 7) = 19.0 / 10080.0 * (-y2y2);
 	m_integral_dT_d(4, 8) = (-y2) / 20160.0 * (25.0 * x1 - 38.0 * x2);
 
 	m_integral_dT_d(5, 0) = m_integral_dT_d(0, 5); // symmetric part
@@ -483,10 +483,10 @@ void Fem2DElementTriangle::computeIntegral_dTd()
 	m_integral_dT_d(5, 2) = m_integral_dT_d(2, 5); // symmetric part
 	m_integral_dT_d(5, 3) = m_integral_dT_d(3, 5); // symmetric part
 	m_integral_dT_d(5, 4) = m_integral_dT_d(4, 5); // symmetric part
-	m_integral_dT_d(5, 5) = (20.0 * 5.0 * x1 * (x1 - x2) + 31.0 * x2SQ) / 20160.0;
+	m_integral_dT_d(5, 5) = (20.0 * 5.0 * x1 * (x1 - x2) + 31.0 * x2x2) / 20160.0;
 	m_integral_dT_d(5, 6) = (53.0 * x1 - 2.0 * 17.0 * x2) / 5040.0;
 	m_integral_dT_d(5, 7) = (-y2) / 10080.0 * (31.0 * x1 - 19.0 * x2);
-	m_integral_dT_d(5, 8) = 19.0 * (-x1SQ - x2SQ) / 10080.0 + 29.0 / 6720.0 * x1x2;
+	m_integral_dT_d(5, 8) = 19.0 * (-x1x1 - x2x2) / 10080.0 + 29.0 / 6720.0 * x1x2;
 
 	m_integral_dT_d(6, 0) = m_integral_dT_d(0, 6); // symmetric part
 	m_integral_dT_d(6, 1) = m_integral_dT_d(1, 6); // symmetric part
@@ -505,7 +505,7 @@ void Fem2DElementTriangle::computeIntegral_dTd()
 	m_integral_dT_d(7, 4) = m_integral_dT_d(4, 7); // symmetric part
 	m_integral_dT_d(7, 5) = m_integral_dT_d(5, 7); // symmetric part
 	m_integral_dT_d(7, 6) = m_integral_dT_d(6, 7); // symmetric part
-	m_integral_dT_d(7, 7) = 5.0 / 1008.0 * y2SQ;
+	m_integral_dT_d(7, 7) = 5.0 / 1008.0 * y2y2;
 	m_integral_dT_d(7, 8) = 5.0 / 2016.0 * y2 * (x1 - 2.0 * x2);
 
 	m_integral_dT_d(8, 0) = m_integral_dT_d(0, 8); // symmetric part
@@ -516,7 +516,7 @@ void Fem2DElementTriangle::computeIntegral_dTd()
 	m_integral_dT_d(8, 5) = m_integral_dT_d(5, 8); // symmetric part
 	m_integral_dT_d(8, 6) = m_integral_dT_d(6, 8); // symmetric part
 	m_integral_dT_d(8, 7) = m_integral_dT_d(7, 8); // symmetric part
-	m_integral_dT_d(8, 8) = 5.0 / 1008.0 * x2 * (x2 - x1) + 31.0 / 20160.0 * x1SQ;
+	m_integral_dT_d(8, 8) = 5.0 / 1008.0 * x2 * (x2 - x1) + 31.0 / 20160.0 * x1x1;
 }
 
 void Fem2DElementTriangle::computeIntegral_HxHxT()
