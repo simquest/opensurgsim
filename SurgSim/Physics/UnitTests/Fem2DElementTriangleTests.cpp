@@ -1188,7 +1188,7 @@ TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomeOrder4Test)
 	SurgSim::Math::Vector polynome(15);
 	polynome.setLinSpaced(1.0, 15.0);
 
-	// math2.uncc.edu/~shaodeng/TEACHING/math5172/.../Lect_15.PDF
+	// http://math2.uncc.edu/~shaodeng/TEACHING/math5172/Lectures/Lect_15.PDF
 	// "Quadrature Formulas in Two Dimensions"
 	// \int_0^1 \int_0^{1-eta} f(xi, eta) dxi deta = 1/2 sum_i w[i] f(xi[i], eta[i])
 	const double half = 1.0 / 2.0;
