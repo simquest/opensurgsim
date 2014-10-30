@@ -1164,29 +1164,41 @@ TEST_F(Fem2DElementTriangleTests, StiffnessMatrixTest)
 		"KGlobal expected = " << std::endl << expectedLocalStiffness << std::endl;
 }
 
-static double evaluatePolynome(size_t degree, const SurgSim::Math::Vector& polynomeCoefficients, double x, double y)
+/// Evaluate a given polynomial at the given coordinates (x, y)
+/// \param degree The degree of the polynomial
+/// \param coefficients The vector of coefficients for all monomials in order
+///                     [1, x, y,..., x^n, x^{n-1}y^1, ..., x^1y^{n-1}, x^0y^n]
+/// \param x,y The coordinates to evaluate the polynomial at
+/// \return the polynomial evaluation at the coordinates (x, y)
+static double evaluatePolynomial(size_t degree, const SurgSim::Math::Vector& coefficients, double x, double y)
 {
-	SurgSim::Math::Vector monome = SurgSim::Math::Vector::Zero(polynomeCoefficients.size());
+	SURGSIM_ASSERT((degree + 1) * (degree + 2) / 2 == coefficients.size()) <<
+		"Invalid coefficients vector (of size " << coefficients.size() <<
+		") provided for a polynomial of degree " << degree;
 
-	size_t monomeId = 0;
+	SurgSim::Math::Vector monomials = SurgSim::Math::Vector::Zero(coefficients.size());
+
+	size_t monomialId = 0;
 	for (size_t d = 0; d <= degree; d++)
 	{
-		for (size_t monomeOfDegreed = 0; monomeOfDegreed <= d; monomeOfDegreed++)
+		for (size_t monomialOfDegreed = 0; monomialOfDegreed <= d; monomialOfDegreed++)
 		{
-			monome[monomeId++] = pow(x, d - monomeOfDegreed) * pow(y, monomeOfDegreed);
+			monomials[monomialId] =
+				coefficients[monomialId] * pow(x, d - monomialOfDegreed) * pow(y, monomialOfDegreed);
+			monomialId++;
 		}
 	}
 
-	return monome.dot(polynomeCoefficients);
+	return monomials.sum();
 }
 
-TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomeOrder4Test)
+TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomialOrder4Test)
 {
 	// Polynomial of order 4 on 2 variables:
 	// {1, 2x, 3y, 4x^2, 5xy, 6y^2, 7x^3, 8x^2y, 9xy^2, 10y^3, 11x^4, 12x^3y, 13x^2y^2, 14xy^3, 15y^4}
 	// \int_0^1 \int_0^{1-y} P(x, y) dx dy = 1679 / 360
-	SurgSim::Math::Vector polynome(15);
-	polynome.setLinSpaced(1.0, 15.0);
+	SurgSim::Math::Vector polynomial(15);
+	polynomial.setLinSpaced(1.0, 15.0);
 
 	// http://math2.uncc.edu/~shaodeng/TEACHING/math5172/Lectures/Lect_15.PDF
 	// "Quadrature Formulas in Two Dimensions"
@@ -1195,35 +1207,29 @@ TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomeOrder4Test)
 
 	// Note that Hx and Hy are of degree 2, therefore Hx.Hx^T and Hy.Hy^T are of degree 4.
 	// Exact integration of such functions over the triangle requires a Gauss-Legendre quadrature with 6 points:
-	//        xi              eta             weight
-	// 0.44594849091597 0.44594849091597 0.22338158967801
-	// 0.44594849091597 0.10810301816807 0.22338158967801
-	// 0.10810301816807 0.44594849091597 0.22338158967801
-	// 0.09157621350977 0.09157621350977 0.10995174365532
-	// 0.09157621350977 0.81684757298046 0.10995174365532
-	// 0.81684757298046 0.09157621350977 0.10995174365532
 	double integral = 0.0;
-	integral += half * 0.22338158967801 * evaluatePolynome(4, polynome, 0.44594849091597, 0.44594849091597);
-	integral += half * 0.22338158967801 * evaluatePolynome(4, polynome, 0.44594849091597, 0.10810301816807);
-	integral += half * 0.22338158967801 * evaluatePolynome(4, polynome, 0.10810301816807, 0.44594849091597);
-	integral += half * 0.10995174365532 * evaluatePolynome(4, polynome, 0.09157621350977, 0.09157621350977);
-	integral += half * 0.10995174365532 * evaluatePolynome(4, polynome, 0.09157621350977, 0.81684757298046);
-	integral += half * 0.10995174365532 * evaluatePolynome(4, polynome, 0.81684757298046, 0.09157621350977);
+	for (size_t pointId = 0; pointId < 6; ++pointId)
+	{
+		const double& weight = gaussQuadrature2DTriangle6Points[pointId].weight;
+		const double& xi  = gaussQuadrature2DTriangle6Points[pointId].coordinateXi;
+		const double& eta = gaussQuadrature2DTriangle6Points[pointId].coordinateEta;
+		integral += half * weight * evaluatePolynomial(4, polynomial, xi, eta);
+	}
 
 	EXPECT_NEAR(1679.0 / 360.0, integral, 1e-8);
 }
 
-TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomeOrder6Test)
+TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomialOrder6Test)
 {
 	// Polynomial of order 6 on 2 variables:
 	// {1, 2x, 3y, 4x^2, 5xy, 6y^2, 7x^3, 8x^2y, 9xy^2, 10y^3, 11x^4, 12x^3y, 13x^2y^2, 14xy^3, 15y^4,
 	// 16x^5, 17x^4y, 18x^3y^2, 19x^2y^3, 20xy^4, 21y^5,
 	// 22x^6, 23x^5y, 24x^4y^2, 25x^3y^3, 26x^2y^4, 27xy^5, 28y^6}
 	// \int_0^1 \int_0^{1-y} P(x, y) dx dy = 9983 / 1440
-	SurgSim::Math::Vector polynome(28);
-	polynome.setLinSpaced(1.0, 28.0);
+	SurgSim::Math::Vector polynomial(28);
+	polynomial.setLinSpaced(1.0, 28.0);
 
-	// math2.uncc.edu/~shaodeng/TEACHING/math5172/.../Lect_15.PDF
+	// http://math2.uncc.edu/~shaodeng/TEACHING/math5172/Lectures/Lect_15.PDF
 	// "Quadrature Formulas in Two Dimensions"
 	// \int_0^1 \int_0^{1-eta} f(xi, eta) dxi deta = 1/2 sum_i w[i] f(xi[i], eta[i])
 	const double half = 1.0 / 2.0;
@@ -1231,32 +1237,14 @@ TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomeOrder6Test)
 	// Note that matrix d contains monomial terms up to degree 3,
 	// therefore dT.d contains monomial terms up to degree 6.
 	// Exact integration of such functions over the triangle requires a Gauss-Legendre quadrature with 12 points:
-	//       xi               eta             weight
-	// 0.24928674517091 0.24928674517091 0.11678627572638
-	// 0.24928674517091 0.50142650965818 0.11678627572638
-	// 0.50142650965818 0.24928674517091 0.11678627572638
-	// 0.06308901449150 0.06308901449150 0.05084490637021
-	// 0.06308901449150 0.87382197101700 0.05084490637021
-	// 0.87382197101700 0.06308901449150 0.05084490637021
-	// 0.31035245103378 0.63650249912140 0.08285107561837
-	// 0.63650249912140 0.05314504984482 0.08285107561837
-	// 0.05314504984482 0.31035245103378 0.08285107561837
-	// 0.63650249912140 0.31035245103378 0.08285107561837
-	// 0.31035245103378 0.05314504984482 0.08285107561837
-	// 0.05314504984482 0.63650249912140 0.08285107561837
 	double integral = 0.0;
-	integral += half * 0.11678627572638 * evaluatePolynome(6, polynome, 0.24928674517091, 0.24928674517091);
-	integral += half * 0.11678627572638 * evaluatePolynome(6, polynome, 0.24928674517091, 0.50142650965818);
-	integral += half * 0.11678627572638 * evaluatePolynome(6, polynome, 0.50142650965818, 0.24928674517091);
-	integral += half * 0.05084490637021 * evaluatePolynome(6, polynome, 0.06308901449150, 0.06308901449150);
-	integral += half * 0.05084490637021 * evaluatePolynome(6, polynome, 0.06308901449150, 0.87382197101700);
-	integral += half * 0.05084490637021 * evaluatePolynome(6, polynome, 0.87382197101700, 0.06308901449150);
-	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.31035245103378, 0.63650249912140);
-	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.63650249912140, 0.05314504984482);
-	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.05314504984482, 0.31035245103378);
-	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.63650249912140, 0.31035245103378);
-	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.31035245103378, 0.05314504984482);
-	integral += half * 0.08285107561837 * evaluatePolynome(6, polynome, 0.05314504984482, 0.63650249912140);
+	for (size_t pointId = 0; pointId < 12; ++pointId)
+	{
+		const double& weight = gaussQuadrature2DTriangle12Points[pointId].weight;
+		const double& xi  = gaussQuadrature2DTriangle12Points[pointId].coordinateXi;
+		const double& eta = gaussQuadrature2DTriangle12Points[pointId].coordinateEta;
+		integral += half * weight * evaluatePolynomial(6, polynomial, xi, eta);
+	}
 
 	EXPECT_NEAR(9983.0 / 1440.0, integral, 1e-6);
 }
