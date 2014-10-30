@@ -45,6 +45,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgScreenSpacePass.cpp
 	OsgScreenSpaceQuadRepresentation.cpp
 	OsgShader.cpp
+	OsgSkeletonRepresentation.cpp
 	OsgSphereRepresentation.cpp
 	OsgTexture.cpp
 	OsgTexture1d.cpp
@@ -111,6 +112,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgScreenSpacePass.h
 	OsgScreenSpaceQuadRepresentation.h
 	OsgShader.h
+	OsgSkeletonRepresentation.h
 	OsgSphereRepresentation.h
 	OsgTexture.h
 	OsgTexture1d.h
@@ -142,6 +144,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	SceneryRepresentation.h
 	ScreenSpaceQuadRepresentation.h
 	Shader.h
+	SkeletonRepresentation.h
 	SphereRepresentation.h
 	Texture.h
 	Texture1d.h
