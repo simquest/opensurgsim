@@ -40,6 +40,9 @@ namespace Physics
 /// Numerical Methods in Engineering, vol 15, 1771-1812 (1980)
 /// \note The plate mass matrix is not detailed in the above paper, but the analytical equations
 /// \note have been derived from it.
+/// \note Moreover, to account for contribution of the displacement along z to the plate mass matrix,
+/// \note we used a cubic expression of this displacement given in:
+/// "Shell elements: modelizations DKT, DST, DKTG and Q4g", Code_Aster, 2013, Thomas De Soza
 ///
 /// \note The element is considered to have a constant thickness.
 class Fem2DElementTriangle : public FemElement
@@ -273,19 +276,19 @@ private:
 	/// Computes the integral terms d^T.d over the parametrized triangle area.
 	/// This integral is required in the plate mass matrix computation.
 	/// The displacement along z is w(x, y) = [d1 d2 d3 d4 d5 d6 d7 d8 d9].U = d.U
-	/// with di cubic interpolation functions and U nodal plate displacements.
+	/// with di cubic shape functions and U nodal plate displacements.
 	void computeIntegral_dTd();
 
 	/// Computes the integral terms Hy.Hy^T over the parametrized triangle area.
 	/// This integral is required in the plate mass matrix computation.
-	// The displacement along thetay is Thetay(x, y) = -dw/dx = betax = Hx^T.U
-	/// with Hxi quadratic interpolation functions and U nodal plate displacements.
+	/// The displacement along thetay is Thetay(x, y) = -dw/dx = betax = Hx^T.U
+	/// with Hxi quadratic shape functions and U nodal plate displacements.
 	void computeIntegral_HxHxT();
 
 	/// Computes the integral terms Hx.Hx^T over the parametrized triangle area.
 	/// This integral is required in the plate mass matrix computation.
-	// The displacement along thetax is Thetax(x, y) = dw/dy = -betay = -Hy^T.U
-	/// with Hyi quadratic interpolation functions and U nodal plate displacements.
+	/// The displacement along thetax is Thetax(x, y) = dw/dy = -betay = -Hy^T.U
+	/// with Hyi quadratic shape functions and U nodal plate displacements.
 	void computeIntegral_HyHyT();
 };
 

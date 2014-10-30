@@ -1,0 +1,165 @@
+/*!
+	\fn void SurgSim::Physics::Fem2DElementTriangle::computeLocalPlateMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 18, 18>* localMassMatrix)
+	<br>
+
+	The mass matrix is derived from the kinetic energy, which depends on the displacements \f$\mathbf{u}\f$.<br>
+	In the case of triangle plate, the displacements are a subset of the full shell displacements:
+	\f[ \displaystyle
+	\mathbf{u}(x, y, z)
+	=
+	\left(
+		\begin{array}{c}
+			u(x, y, z) = z.\beta_x(x, y) \\
+			v(x, y, z) = z.\beta_y(x, y) \\
+			w(x, y)
+		\end{array}
+	\right)
+	\f]
+
+	Note that we use the plate formulation DKT (Discrete Kirchhoff Theory) developped by Batoz in 1980.
+	In this formulation, the displacement \f$w\f$ is never formaly expressed, we only know that it is a
+	cubic polynomial function of \f$(x, y)\f$.
+	To complete the plate mass matrix calculation, we tried to use the expression of \f$w\f$ from
+	Przemieniecki book "Theory of Matrix Structural Analysis"  Chapter 11.10, equation 11.57
+	(i.e. \f$w(x, y) = \mathbf{d}.C^{-1}.\mathbf{U}\f$).
+	Unfortunately, it can occur that the matrix \f$C\f$ becomes singular (example of a triangle isoceles
+	rectangle, i.e. \f$x_0=y_0=y_1=x_2=0\f$ and \f$x_1=y_2=1\f$).
+	To overcome this issue, we prefered the Code_Aster approach developped in
+	"Shell elements: modelizations DKT, DST, DKTG and Q4g", Code_Aster, 2013, Thomas De Soza
+	where a cubic well defined expression of \f$w(x, y)\f$ is given as:
+	\f$w(x, y) = \mathbf{d}.\mathbf{U}\f$ where \f$d_i\f$ are cubic shape functions.
+	
+	Therefore, it leads to the following plate displacements:
+	\f[
+	\mathbf{u}(x, y, z)
+	=
+	\left(
+		\begin{array}{c}
+			u(x, y, z) = z.\beta_x(x, y) = z.\mathbf{H_x}^T(\xi, \eta).\mathbf{U} \\
+			v(x, y, z) = z.\beta_y(x, y) = z.\mathbf{H_y}^T(\xi, \eta).\mathbf{U} \\
+			w(x, y) = \mathbf{d}.\mathbf{U}
+		\end{array}
+	\right)
+	=
+	\left(
+		\begin{array}{c}
+			z.\mathbf{H_x}^T(\xi, \eta) \\
+			z.\mathbf{H_y}^T(\xi, \eta) \\
+			\mathbf{d}
+		\end{array}
+	\right)
+	.
+	\mathbf{U}
+	=
+	a.\mathbf{U}
+	\f]
+	with \f$\mathbf{U}\f$ the triangle plate nodal displacements vector (subset of the full shell nodal displacements)
+	and \f$\mathbf{H_x}\f$ and \f$\mathbf{H_y}\f$ are the Batoz shape functions.
+
+	Considering a constant mass density \f$\rho\f$ and a constant thickness \f$t\f$, the kinetic energy of the triangle plate is
+	\f$T = \int_V \frac{1}{2} \rho(x, y, z) \mathbf{\dot{u}}^T.\mathbf{\dot{u}} \, dV = 
+	\frac{1}{2}.\rho.\int_{-t/2}^{+t/2} \int_A \left(\dot{\mathbf{U}}^T.a^T\right).\left(a.\dot{\mathbf{U}}\right) \, dA \, dz \f$.
+
+	The triangle plate mass matrix can be derived from the kinetic energy using the Lagrange equation of motion:
+	\f[
+		\displaystyle
+		\frac{d \frac{\partial T}{\partial \dot{\mathbf{U}}}}{d t}
+		=
+		\frac{1}{2}.\rho.\frac{d \frac{\partial \displaystyle \int_{-t/2}^{+t/2} \int_A \left(\dot{\mathbf{U}}^T.a^T\right).\left(a.\dot{\mathbf{U}}\right) \, dA \, dz}{\partial \dot{\mathbf{U}}}}{d t}
+		=
+		\frac{1}{2}.\rho.\frac{d \displaystyle \int_{-t/2}^{+t/2} \int_A 2.a^T.a.\dot{\mathbf{U}} \, dA \, dz}{d t}
+		\\
+		=
+		\left( \rho.\int_{-t/2}^{+t/2} \int_A a^T.a \, dA \, dz \right).\ddot{\mathbf{U}}
+		=
+		\left( \rho.\int_{-t/2}^{+t/2} \int_A
+			(z.\mathbf{H_x}).(z.\mathbf{H_x}^T) +
+			(z.\mathbf{H_y}).(z.\mathbf{H_y}^T) +
+			\mathbf{d}^T).\mathbf{d}
+		\, dA \, dz \right).\ddot{\mathbf{U}}
+	\f]
+	Therefore, the mass matrix is:
+	\f[
+		M
+		= \rho.\int_{-t/2}^{+t/2} \int_A (z.\mathbf{H_x}).(z.\mathbf{H_x}^T) \, dA \, dz
+		+ \rho.\int_{-t/2}^{+t/2} \int_A (z.\mathbf{H_y}).(z.\mathbf{H_y}^T) \, dA \, dz
+		+ \rho.\int_{-t/2}^{+t/2} \int_A \mathbf{d}^T.\mathbf{d} \, dA \, dz
+	\f]
+	It clearly appears that the triangle plate mass matrix is composed of 3 matrices,
+	each providing the contribution of a displacement (i.e. \f$(u, v, w)\f$) associated to a
+	given degree of freedom (i.e. respectively \f$(\theta_y, \theta_x, z)\f$). Let's note these
+	3 matrices \f$M_u\f$, \f$M_v\f$ and \f$M_w\f$.
+
+	To integrate over the triangle area, we operate the following variables change:
+	\f[
+		\left\{
+		\begin{array}{ccc}
+			x(\xi, \eta) & = & x_0 + \xi.(x_1 - x_0) + \eta.(x_2 - x_0) \\
+			y(\xi, \eta) & = & y_0 + \xi.(y_1 - y_0) + \eta.(y_2 - y_0)
+		\end{array}
+		\right.
+	\f]
+	Therefore, we have
+	\f$
+	J
+	=
+	\left(
+		\begin{array}{cc}
+			\frac{\partial x}{\partial \xi} & \frac{\partial x}{\partial \eta} \\
+			\frac{\partial y}{\partial \xi} & \frac{\partial y}{\partial \eta}
+		\end{array}
+	\right)
+	=
+	\left(
+		\begin{array}{cc}
+			(x_1 - x_0) & (x_2 - x_0) \\
+			(y_1 - y_0) & (y_2 - y_0) \\
+		\end{array}
+	\right)
+	\f$
+	and \f$|J| = 2A\f$. Therefore the mass matrices become (noting that the shape functions \f$d_i\f$ do not depend on \f$z\f$):
+	\f[
+	\begin{array}{ccc}
+		M_u
+		& = &
+		\rho.\int_{-t/2}^{+t/2} \int_A (z.\mathbf{H_x}).(z.\mathbf{H_x}^T) \, dA \, dz
+		=
+		\rho.\int_{-t/2}^{+t/2} z^2 \, dz.\int_A \mathbf{H_x}.\mathbf{H_x}^T \, dA
+		\\
+		& = &
+		\rho.\frac{t^3}{12}.\int_0^1 \int_0^{1-\eta} \mathbf{H_x}.\mathbf{H_x}^T |J| \, d\xi d\eta
+		=
+		2.A.\rho.\frac{t^3}{12}.\int_0^1 \int_0^{1-\eta} \mathbf{H_x}.\mathbf{H_x}^T \, d\xi d\eta
+		\\
+		M_v
+		& = &
+		\rho.\int_{-t/2}^{+t/2} \int_A (z.\mathbf{H_y}).(z.\mathbf{H_y}^T) \, dA \, dz
+		=
+		\rho.\int_{-t/2}^{+t/2} z^2 \, dz.\int_A \mathbf{H_y}.\mathbf{H_y}^T \, dA
+		\\
+		& = &
+		\rho.\frac{t^3}{12}.\int_0^1 \int_0^{1-\eta} \mathbf{H_y}.\mathbf{H_y}^T |J| \, d\xi d\eta
+		=
+		2.A.\rho.\frac{t^3}{12}.\int_0^1 \int_0^{1-\eta} \mathbf{H_y}.\mathbf{H_y}^T \, d\xi d\eta
+		\\
+		M_w
+		& = &
+		\rho.\int_{-t/2}^{+t/2} \int_A \mathbf{d}^T.\mathbf{d} \, dA \, dz
+		=
+		2.A.\rho.t.\int_0^1 \int_0^{1-\eta} \mathbf{d}^T.\mathbf{d} \, d\xi d\eta
+	\end{array}
+	\f]
+
+	To evaluate the 3 integral terms
+	\f[
+	\begin{array}{ccccc}
+		\int_0^1 \int_0^{1-\eta} \mathbf{H_x}.\mathbf{H_x}^T \, d\xi d\eta & , &
+		\int_0^1 \int_0^{1-\eta} \mathbf{H_y}.\mathbf{H_y}^T \, d\xi d\eta & , &
+		\int_0^1 \int_0^{1-\eta} \mathbf{d}^T.\mathbf{d} \, d\xi d\eta
+	\end{array}
+	\f]
+	we used a formal mathematical package and tested the corresponding code against a numerically exact evaluation
+	using the appropriate Gauss quadrature on the triangle.
+
+	The resulting triangle plate mass matrix needs to be assembled properly in the full shell element mass matrix.
+*/

@@ -1,0 +1,141 @@
+/*!
+	\fn void SurgSim::Physics::Fem2DElementTriangle::computeLocalMembraneMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 18, 18>* localMassMatrix)
+	<br>
+
+	The mass matrix is derived from the kinetic energy, which depends on the displacements \f$\mathbf{u}\f$.<br>
+	In the case of triangle membrane, the displacements are a subset of the full shell displacements:
+	\f[ \displaystyle
+	\mathbf{u}(x, y)
+	=
+	\left(
+		\begin{array}{c}
+			u_x(x, y) \\
+			u_y(x, y)
+		\end{array}
+	\right)
+	=
+	\left(
+		\begin{array}{c}
+			\sum_{i=0}^2 N_i(x, y).u_x^i \\
+			\sum_{i=0}^2 N_i(x, y).u_y^i
+		\end{array}
+	\right)
+	=
+	\left(
+		\begin{array}{cccccc}
+			N_0(x, y) & 0 & N_1(x, y) & 0 & N_2(x, y) & 0 \\
+			0 & N_0(x, y) & 0 & N_1(x, y) & 0 & N_2(x, y)
+		\end{array}
+	\right)
+	\left(
+		\begin{array}{c}
+			u_x^0 \\
+			u_y^0 \\
+			u_x^1 \\
+			u_y^1 \\
+			u_x^2 \\
+			u_y^2
+		\end{array}
+	\right)
+	=
+	a.\mathbf{U}
+	\f]
+	with \f$\mathbf{U}\f$ the triangle membrane nodal displacements vector (subset of the full shell nodal displacements)
+	and \f$N_i(x, y) = a_i + b_i.x + c_i.y\f$ the triangle linear shape functions.
+
+	Considering a constant mass density \f$\rho\f$ and a constant thickness \f$t\f$, the kinetic energy of the triangle membrane is
+	\f$T = \int_V \frac{1}{2} \rho(x, y, z) \mathbf{\dot{u}}^T.\mathbf{\dot{u}} \, dV = 
+	\frac{1}{2}.\rho.t.\int_A \left(\dot{\mathbf{U}}^T.a^T\right).\left(a.\dot{\mathbf{U}}\right) \, dA\f$.
+
+	The triangle membrane mass matrix can be derived from the kinetic energy using the Lagrange equation of motion:
+	\f[
+		\displaystyle
+		\frac{d \frac{\partial T}{\partial \dot{\mathbf{U}}}}{d t}
+		=
+		\frac{1}{2}.\rho.t.\frac{d \frac{\partial \displaystyle \int_A \left(\dot{\mathbf{U}}^T.a^T\right).\left(a.\dot{\mathbf{U}}\right) \, dA}{\partial \dot{\mathbf{U}}}}{d t}
+		=
+		\frac{1}{2}.\rho.t.\frac{d \displaystyle \int_A 2.a^T.a.\dot{\mathbf{U}} \, dA}{d t}
+		=
+		\left( \rho.t.\int_A a^T.a \, dA \right).\ddot{\mathbf{U}}
+	\f]
+	Therefore, the mass matrix is:
+	\f[
+		M = \rho.t.\int_A a^T.a \, dA
+	\f]
+	To integrate over the triangle area, we operate the following variables change:
+	\f[
+		\left\{
+		\begin{array}{ccc}
+			x(\xi, \eta) & = & x_0 + \xi.(x_1 - x_0) + \eta.(x_2 - x_0) \\
+			y(\xi, \eta) & = & y_0 + \xi.(y_1 - y_0) + \eta.(y_2 - y_0)
+		\end{array}
+		\right.
+	\f]
+	Therefore, we have
+	\f$
+	J
+	=
+	\left(
+		\begin{array}{cc}
+			\frac{\partial x}{\partial \xi} & \frac{\partial x}{\partial \eta} \\
+			\frac{\partial y}{\partial \xi} & \frac{\partial y}{\partial \eta}
+		\end{array}
+	\right)
+	=
+	\left(
+		\begin{array}{cc}
+			(x_1 - x_0) & (x_2 - x_0) \\
+			(y_1 - y_0) & (y_2 - y_0) \\
+		\end{array}
+	\right)
+	\f$
+	and \f$|J| = 2A\f$. Therefore the mass matrix becomes
+	\f[
+		M
+		=
+		\rho.t.\int_0^1 \int_0^{1-\eta} a^T.a |J| \, d\xi \, d\eta
+		=
+		2.A.\rho.t.\int_0^1 \int_0^{1-\eta}
+		\left(
+		\begin{array}{cccccc}
+		N0.N0 & 0 & N0.N1 & 0 & N0.N2 & 0 \\
+		0 & N0.N0 & 0 & N0.N1 & 0 & N0.N2 \\
+		N1.N0 & 0 & N1.N1 & 0 & N1.N2 & 0 \\
+		0 & N1.N0 & 0 & N1.N1 & 0 & N1.N2 \\
+		N2.N0 & 0 & N2.N1 & 0 & N2.N2 & 0 \\
+		0 & N2.N0 & 0 & N2.N1 & 0 & N2.N2
+		\end{array}
+		\right)
+		\, d\xi \, d\eta
+	\f]
+
+	Considering the triangle in its local space (i.e. \f$x_0=y_0=y_1=0\f$, \f$x_1>0\f$, \f$y_2>0\f$), we get:
+	\f[
+		M
+		=
+		2.A.\rho.t.
+		\left(
+		\begin{array}{cccccc}
+		\frac{1.0}{12.0} & 0 & \frac{1.0}{24.0} & 0 & \frac{1.0}{24.0} & 0 \\
+		0 & \frac{1.0}{12.0} & 0 & \frac{1.0}{24.0} & 0 & \frac{1.0}{24.0} \\
+		\frac{1.0}{24.0} & 0 & \frac{1.0}{12.0} & 0 & \frac{1.0}{24.0} & 0 \\
+		0 & \frac{1.0}{24.0} & 0 & \frac{1.0}{12.0} & 0 & \frac{1.0}{24.0} \\
+		\frac{1.0}{24.0} & 0 & \frac{1.0}{24.0} & 0 & \frac{1.0}{12.0} & 0 \\
+		0 & \frac{1.0}{24.0} & 0 & \frac{1.0}{24.0} & 0 & \frac{1.0}{12.0}
+		\end{array}
+		\right)
+		=
+		\rho.A.t.
+		\left(
+		\begin{array}{cccccc}
+		\frac{1.0}{6.0} & 0 & \frac{1.0}{12.0} & 0 & \frac{1.0}{12.0} & 0 \\
+		0 & \frac{1.0}{6.0} & 0 & \frac{1.0}{12.0} & 0 & \frac{1.0}{12.0} \\
+		\frac{1.0}{12.0} & 0 & \frac{1.0}{6.0} & 0 & \frac{1.0}{12.0} & 0 \\
+		0 & \frac{1.0}{12.0} & 0 & \frac{1.0}{6.0} & 0 & \frac{1.0}{12.0} \\
+		\frac{1.0}{12.0} & 0 & \frac{1.0}{12.0} & 0 & \frac{1.0}{6.0} & 0 \\
+		0 & \frac{1.0}{12.0} & 0 & \frac{1.0}{12.0} & 0 & \frac{1.0}{6.0}
+		\end{array}
+		\right)
+	\f]
+	which needs to be assembled properly in the full shell element mass matrix.
+*/

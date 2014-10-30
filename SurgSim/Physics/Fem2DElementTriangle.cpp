@@ -173,12 +173,6 @@ void Fem2DElementTriangle::computeLocalMembraneMass(const SurgSim::Math::OdeStat
 {
 	double mass = m_rho * m_restArea * m_thickness;
 
-	// Membrane mass matrix
-	// Przemieniecki book "Theory of Matrix Structural Analysis"
-	// Chapter 11.6, equation 11.42 for a in-plane triangle deformation
-	// m = rho.A(123).t/12.0.[2 1 1] for the axis X and Y
-	//                       [1 2 1]
-	//                       [1 1 2]
 	for(size_t i = 0; i < 3; ++i)
 	{
 		size_t j = (i + 1) % 3;
@@ -193,61 +187,6 @@ void Fem2DElementTriangle::computeLocalMembraneMass(const SurgSim::Math::OdeStat
 void Fem2DElementTriangle::computeLocalPlateMass(const SurgSim::Math::OdeState& state,
 													Eigen::Matrix<double, 18, 18>* localMassMatrix)
 {
-	// Plate mass matrix derived from Batoz paper.
-	// Note that the displacement on axis Z is unknown/undefined in Batoz paper.
-	// To be able to compute a mechanically correct contribution of this displacement to the mass matrix,
-	// we considered its expression from Przemieniecki book "Theory of Matrix Structural Analysis":
-	// Chapter 11.10, equation 11.57 (Uz = d.C^-1.U). Unfortunately, it can occur that the matrix C is singular
-	// (example of a triangle isoceles rectangle).
-	// To overcome this issue, we prefered the approach in:
-	// "Shell elements: modelizations DKT, DST, DKTG and Q4g", Code_Aster, 2013, Thomas De Soza
-	// where a cubic well defined expression of w(x, y) is given as:
-	// w(x, y) = [d1 d2 d3 d4 d5 d6 d7 d8 d9].U where di are cubic shape functions.
-
-	// Displacements over the triangle w.r.t. DOF:
-	// (Uz     )         (d     )
-	// (Uthetax) = a.U = (z.Hx^T).U
-	// (Uthetay)         (z.Hy^T)
-	//
-	// The time derivative of the displacements is:
-	// d/dt(Uz Uthetax Uthetay)^T = a.dU/dt = a.V
-	//
-	// Kinetic energy = T = integral 1/2 rho (a.V)^T.(a.V) dOmega = integral 1/2 rho V^T.a^T.a.V dOmega
-	// Lagrange equation: d(dT/dV)/dt = rho integral a^T.a dOmega . dV/dt
-	// M = rho integral a^T.a dOmega
-	//   = rho \int_V a^T.a dV
-	//   = rho \int_V (d^T   z.Hx   z.Hy).(d     ) dV
-	//                                    (z.Hx^T)
-	//                                    (z.Hy^T)
-	//   = rho \int_V d^T.d dV +
-	//     rho \int_V z^2.Hx.Hx^T dV +
-	//     rho \int_V z^2.Hy.Hy^T dV
-	//
-	// The 1st contribution d^T.d does not depend on z, only on x and y, therefore
-	//     rho \int_V d^T.d dV = rho.h \int_A d^T.d dA
-	// The 2nd and 3rd contributions z^2.Hx.Hx^T and z^2.Hy.Hy^T depend not only on x and y,
-	// but also z (note that Hx and Hy do not depend on z).
-	//     rho \int_V z^2.Hx.Hx^T dV = rho \int_{-h/2}^{h/2} z^2 \int_A Hx.Hx^T dA dz
-	//   = h^3/12.rho \int_A Hx.Hx^T dA
-	// Similarly, we get
-	//     rho \int_V z^2.Hy.Hy^T dV = h^3/12.rho \int_A Hy.Hy^T dA
-
-	// We operate a variable change to integrate over the triangle (x,y) -> (xi, eta))
-	// (x = x0 + xi.(x1 - x0) + eta.(x2 - x0))  J = (dx/dxi dx/deta)  |J| = 2.A
-	// (x = y0 + xi.(y1 - y0) + eta.(y2 - y0))      (dy/dxi dy/deta)
-	//
-	// 1st term gives:
-	//   (2A).rho.h \int_0^1 \int_0^{1-eta} d^T.d dxi deta
-	// 2nd term gives:
-	//   (2A).h^3/12.rho \int_0^1 \int_0^{1-eta} Hx.Hx^T dxi deta
-	// 3rd term gives:
-	//   (2A).h^3/12.rho \int_0^1 \int_0^{1-eta} Hy.Hy^T dxi deta
-	//
-	// Using a formal mathematical package, we can evaluate and pre-compute all 3 integrals:
-	// \int_0^1 \int_0^{1-eta} d^T.d   dxi deta
-	// \int_0^1 \int_0^{1-eta} Hx.Hx^T dxi deta
-	// \int_0^1 \int_0^{1-eta} Hy.Hy^T dxi deta
-
 	double coefZ = 2.0 * m_restArea * m_rho * m_thickness;
 	double coefTheta = m_restArea * m_rho * (m_thickness * m_thickness * m_thickness) / 6.0;
 
