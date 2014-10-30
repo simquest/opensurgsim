@@ -22,10 +22,10 @@
 	To complete the plate mass matrix calculation, we tried to use the expression of \f$w\f$ from
 	Przemieniecki book "Theory of Matrix Structural Analysis"  Chapter 11.10, equation 11.57
 	(i.e. \f$w(x, y) = \mathbf{d}.C^{-1}.\mathbf{U}\f$).
-	Unfortunately, it can occur that the matrix \f$C\f$ becomes singular (example of a triangle isoceles
-	rectangle, i.e. \f$x_0=y_0=y_1=x_2=0\f$ and \f$x_1=y_2=1\f$).
+	Unfortunately, it can occur that the matrix \f$C\f$ becomes singular (example of a right isoceles
+	triangle, i.e. \f$x_0=y_0=y_1=x_2=0\f$ and \f$x_1=y_2=1\f$).
 	To overcome this issue, we prefered the Code_Aster approach developped in
-	"Shell elements: modelizations DKT, DST, DKTG and Q4g", Code_Aster, 2013, Thomas De Soza
+	"Shell elements: modelizations DKT, DST, DKTG and Q4g", Code_Aster, 2013, Thomas De Soza,
 	where a cubic well defined expression of \f$w(x, y)\f$ is given as:
 	\f$w(x, y) = \mathbf{d}.\mathbf{U}\f$ where \f$d_i\f$ are cubic shape functions.
 	

@@ -28,21 +28,21 @@ namespace Physics
 
 /// 2D FemElement based on a triangle with a constant thickness
 ///
-/// The triangle is modelled as a shell (6DOF) which is decomposed into a membrane (in-plane 2DOF (X,Y)) and
-/// a plate (bending/twisting 3DOF (Z, ThetaX,ThetaY)). The thin-plate assumption does not consider the drilling
-/// dof (ThetaZ). The system includes the DOF for completeness but does not assign any mass or stiffness to it.
+/// The triangle is modeled as a shell (6DOF) which is decomposed into a membrane (in-plane 2DOF \f$(x, y)\f$) and a
+/// plate (bending/twisting 3DOF \f$(z, \theta_x, \theta_y)\f$). The thin-plate assumption does not consider the
+/// drilling dof \f$\theta_z\f$.
+/// The system includes the drilling DOF for completeness but does not assign any mass or stiffness to it.
 ///
 /// The membrane (in-plane) equations (mass and stiffness) are following
 /// "Theory of Matrix Structural Analysis" from J.S. Przemieniecki.
 ///
 /// The thin-plate (bending) equations (mass and stiffness) are following
 /// "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
-/// Numerical Methods in Engineering, vol 15, 1771-1812 (1980)
-/// \note The plate mass matrix is not detailed in the above paper, but the analytical equations
-/// \note have been derived from it.
-/// \note Moreover, to account for contribution of the displacement along z to the plate mass matrix,
-/// \note we used a cubic expression of this displacement given in:
-/// "Shell elements: modelizations DKT, DST, DKTG and Q4g", Code_Aster, 2013, Thomas De Soza
+/// Numerical Methods in Engineering, vol 15, 1771-1812 (1980). <br>
+/// The plate mass matrix is not detailed in the above paper, but the analytical equations
+/// have been derived from it. Moreover, to account for contribution of the displacement
+/// along z to the plate mass matrix, we used a cubic expression of this displacement given in:
+/// "Shell elements: modelizations DKT, DST, DKTG and Q4g", Code_Aster, 2013, Thomas De Soza.
 ///
 /// \note The element is considered to have a constant thickness.
 class Fem2DElementTriangle : public FemElement
@@ -205,37 +205,46 @@ protected:
 	double m_thickness;
 
 	/// Compute the various shape functions (membrane and plate deformations) parameters
-	/// \param restState the rest state to compute the shape functions paramters from
+	/// \param restState the rest state to compute the shape functions parameters from
 	void computeShapeFunctionsParameters(const SurgSim::Math::OdeState& restState);
 
-	/// Membrane (in-plane) deformation. DOF simulated: (x, y)
-	/// "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
-	/// Shape functions fi(x, y) = ai + bi.x + ci.y
-	SurgSim::Math::Matrix33d m_membraneShapeFunctionsParameters; //< Stores (ai, bi, ci) on each row
+	/// Membrane (in-plane) deformation. DOF simulated: (x, y).
+	/// "Theory of Matrix Structural Analysis" from J.S. Przemieniecki.
+	/// Shape functions are \f$f_i(x, y) = a_i + b_i.x + c_i.y\f$, here we store \f$(a_i, b_i, c_i)\f$ on each row.
+	SurgSim::Math::Matrix33d m_membraneShapeFunctionsParameters;
 
-	/// Thin-plate (bending/twisting) specific data structure
-	/// DOF simulated: (z, thetaX, thetaY)
-	/// "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
-	/// Numerical Methods in Engineering, vol 15, 1771-1812 (1980)
-	/// Indices are as follow:
-	/// 0 1 2 denotes triangle's points ABC:
-	/// 4 (mid-edge 12) 5 (mid-edge 20) 6 (mid-edge 01) denotes mid-edge points
-	/// Data structures having only mid-edge information are 0 based (0->4 (mid-egde 12) ; 1->5 ; 2->6)
-	SurgSim::Math::Vector3d m_xij;     //< xi - xj
-	SurgSim::Math::Vector3d m_yij;     //< yi - yj
-	SurgSim::Math::Vector3d m_lij_sqr; //< xij^2 + yij^2
-	SurgSim::Math::Vector3d m_ak;      //< -xij/li^2
-	SurgSim::Math::Vector3d m_bk;      //< 3/4 xij yij/lij2
-	SurgSim::Math::Vector3d m_ck;      //< (1/4 xij^2 - 1/2 yij^2)/lij^2
-	SurgSim::Math::Vector3d m_dk;      //< -yij/lij^2
-	SurgSim::Math::Vector3d m_ek;      //< (1/4 yij^2 - 1/2 xij^2)/lij^2
-	///...and more variables for the derivatives
-	SurgSim::Math::Vector3d m_Pk;      //< -6xij/lij^2    = 6 m_ak
-	SurgSim::Math::Vector3d m_qk;      //< 3xijyij/lij^2  = 4 m_bk
-	SurgSim::Math::Vector3d m_tk;      //< -6yij/lij^2    = 6 m_dk
-	SurgSim::Math::Vector3d m_rk;      //< 3yij^2/lij^2
-	/// Integral terms (useful for the plate mass matrix) related respectively to the dof (z, thetaX, thetaY)
-	SurgSim::Math::Matrix m_integral_dT_d, m_integralHyiHyj, m_integralHxiHxj;
+	// Thin-plate (bending/twisting) specific data structure
+	// DOF simulated: (z, thetaX, thetaY)
+	// "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
+	// Numerical Methods in Engineering, vol 15, 1771-1812 (1980)
+	// Indices are as follow:
+	// 0 1 2 denotes triangle's points ABC:
+	// 4 (mid-edge 12) 5 (mid-edge 20) 6 (mid-edge 01) denotes mid-edge points
+	// Data structures having only mid-edge information are 0 based (0->4 (mid-egde 12) ; 1->5 ; 2->6)
+
+	//@{
+	SurgSim::Math::Vector3d m_xij;     ///< Batoz variable \f$x_{ij} = x_i - x_j\f$
+	SurgSim::Math::Vector3d m_yij;     ///< Batoz variable \f$y_{ij} = y_i - y_j\f$
+	SurgSim::Math::Vector3d m_lij_sqr; ///< Batoz variable \f$l_{ij}^2 = x_{ij}^2 + y_{ij}^2\f$
+	SurgSim::Math::Vector3d m_ak;      ///< Batoz variable \f$a_{k} = -x_{ij}/l_i^2\f$
+	SurgSim::Math::Vector3d m_bk;      ///< Batoz variable \f$b_{k} = 3/4 x_{ij} y_{ij}/l_{ij}2\f$
+	SurgSim::Math::Vector3d m_ck;      ///< Batoz variable \f$c_{k} = (1/4 x_{ij}^2 - 1/2 y_{ij}^2)/l_{ij}^2\f$
+	SurgSim::Math::Vector3d m_dk;      ///< Batoz variable \f$d_{k} = -y_{ij}/l_{ij}^2\f$
+	SurgSim::Math::Vector3d m_ek;      ///< Batoz variable \f$e_{k} = (1/4 y_{ij}^2 - 1/2 x_{ij}^2)/l_{ij}^2\f$
+	//@}
+
+	//@{
+	SurgSim::Math::Vector3d m_Pk;      ///< Batoz variable \f$P_{k} = -6x_{ij}/l_{ij}^2    = 6.\textrm{m_a}_k\f$
+	SurgSim::Math::Vector3d m_qk;      ///< Batoz variable \f$q_{k} = 3x_{ij}y_{ij}/l_{ij}^2  = 4.\textrm{m_b}_k\f$
+	SurgSim::Math::Vector3d m_tk;      ///< Batoz variable \f$t_{k} = -6y_{ij}/l_{ij}^2    = 6.\textrm{m_d}_k\f$
+	SurgSim::Math::Vector3d m_rk;      ///< Batoz variable \f$r_{k} = 3y_{ij}^2/l_{ij}^2\f$
+	//@}
+
+	//@{
+	SurgSim::Math::Matrix m_integral_dT_d;  ///< Plate mass matrix: integral terms related to the dof \f$(z)\f$
+	SurgSim::Math::Matrix m_integralHyiHyj; ///< Plate mass matrix: integral terms related to the dof \f$(\theta_x)\f$
+	SurgSim::Math::Matrix m_integralHxiHxj; ///< Plate mass matrix: integral terms related to the dof \f$(\theta_y)\f$
+	//@}
 
 	/// Batoz derivative dHx/dxi
 	/// \param xi, eta The parametric coordinate (in [0 1] and xi+eta<1.0)

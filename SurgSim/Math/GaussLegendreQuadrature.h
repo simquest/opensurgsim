@@ -44,7 +44,8 @@ struct gaussQuadratureTrianglePoint
 {
 	gaussQuadratureTrianglePoint(double xi, double eta, double w) : coordinateXi(xi), coordinateEta(eta), weight(w){}
 
-	const double coordinateXi, coordinateEta; //< Parametrized coordinates xi >= 0, eta >= 0 and xi + eta <= 1.0
+	const double coordinateXi;  ///< \f$\xi  \in [0, 1]\f$, must verify \f$\xi + \eta \leq 1.0\f$
+	const double coordinateEta; ///< \f$\eta \in [0, 1]\f$, must verify \f$\xi + \eta \leq 1.0\f$
 	const double weight;
 };
 
