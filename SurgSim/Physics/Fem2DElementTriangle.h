@@ -235,25 +235,25 @@ protected:
 	SurgSim::Math::Matrix m_integral_dT_d, m_integralHyiHyj, m_integralHxiHxj;
 
 	/// Batoz derivative dHx/dxi
-	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
-	/// \return The vector dHx/dxi evaluated at (xi, neta)
-	std::array<double, 9> batozDhxDxi(double xi, double neta) const;
-	/// Batoz derivative dHx/dneta
-	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
-	/// \return The vector dHx/dneta evaluated at (xi, neta)
-	std::array<double, 9> batozDhxDneta(double xi, double neta) const;
+	/// \param xi, eta The parametric coordinate (in [0 1] and xi+eta<1.0)
+	/// \return The vector dHx/dxi evaluated at (xi, eta)
+	std::array<double, 9> batozDhxDxi(double xi, double eta) const;
+	/// Batoz derivative dHx/deta
+	/// \param xi, eta The parametric coordinate (in [0 1] and xi+eta<1.0)
+	/// \return The vector dHx/deta evaluated at (xi, eta)
+	std::array<double, 9> batozDhxDeta(double xi, double eta) const;
 	/// Batoz derivative dHy/dxi
-	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
-	/// \return The vector dHy/dxi evaluated at (xi, neta)
-	std::array<double, 9> batozDhyDxi(double xi, double neta) const;
-	/// Batoz derivative dHy/dneta
-	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
-	/// \return The vector dHy/dneta evaluated at (xi, neta)
-	std::array<double, 9> batozDhyDneta(double xi, double neta) const;
+	/// \param xi, eta The parametric coordinate (in [0 1] and xi+eta<1.0)
+	/// \return The vector dHy/dxi evaluated at (xi, eta)
+	std::array<double, 9> batozDhyDxi(double xi, double eta) const;
+	/// Batoz derivative dHy/deta
+	/// \param xi, eta The parametric coordinate (in [0 1] and xi+eta<1.0)
+	/// \return The vector dHy/deta evaluated at (xi, eta)
+	std::array<double, 9> batozDhyDeta(double xi, double eta) const;
 	/// Batoz strain displacement matrix evaluated at a given point
-	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
-	/// \return The 3x9 strain displacement matrix evaluated at (xi, neta)
-	Matrix39Type batozStrainDisplacement(double xi, double neta) const;
+	/// \param xi, eta The parametric coordinate (in [0 1] and xi+eta<1.0)
+	/// \return The 3x9 strain displacement matrix evaluated at (xi, eta)
+	Matrix39Type batozStrainDisplacement(double xi, double eta) const;
 
 private:
 	/// Computes the triangle's local membrane part mass matrix

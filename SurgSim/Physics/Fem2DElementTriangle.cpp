@@ -334,7 +334,7 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 	plateElasticMaterial *= m_thickness * m_thickness * m_thickness / 12.0;
 	// Thin-plate local stiffness matrix = integral(strain:stress) using a 3 points integration
 	// rule over the parametrized triangle (exact integration because only quadratic terms)
-	// integral(over parametric triangle) Bt.Em.B = sum(gauss point (xi,neta)) wi Bt(xi,neta).Em.B(xi,neta)
+	// integral(over parametric triangle) Bt.Em.B = sum(gauss point (xi,eta)) wi Bt(xi,eta).Em.B(xi,eta)
 	// http://www.ams.org/journals/mcom/1959-13-068/S0025-5718-1959-0107976-5/S0025-5718-1959-0107976-5.pdf
 	// = Area(parametric triangle)/3.0 * Bt(0.5, 0.0).Em.B(0.5, 0.0)
 	// + Area(parametric triangle)/3.0 * Bt(0.0, 0.5).Em.B(0.0, 0.5)
@@ -932,107 +932,109 @@ void Fem2DElementTriangle::computeShapeFunctionsParameters(const SurgSim::Math::
 	computeIntegral_HxHxT();  // associated to the displacement along thetay
 }
 
-std::array<double, 9> Fem2DElementTriangle::batozDhxDxi(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhxDxi(double xi, double eta) const
 {
 	std::array<double, 9> res;
 
 	double a = 1.0 - 2.0 * xi;
 
-	res[0] = m_Pk[2] * a + (m_Pk[1] - m_Pk[2]) * neta;                   // P6(1-2xi) + (P5-P6)neta
-	res[1] = m_qk[2] * a - (m_qk[1] + m_qk[2]) * neta;                   // q6(1-2xi) - (q5-q6)neta
-	res[2] = -4.0 + 6.0 * (xi + neta) + m_rk[2] * a - neta * (m_rk[1] + m_rk[2]); // -4 + 6(xi+neta) + r6(1-2xi) -
-																				  // neta(r5+r6)
-	res[3] = -m_Pk[2] * a + neta * (m_Pk[0] + m_Pk[2]);                  // -P6(1-2xi) + neta(P4+P6)
-	res[4] = m_qk[2] * a - neta * (m_qk[2] - m_qk[0]);                   // q6(1-2xi) - neta(q6-q4)
-	res[5] = -2.0 + 6.0 * xi + m_rk[2] * a + neta * (m_rk[0] - m_rk[2]); // -2 + 6xi + r6(1-2xi) + neta(r4-r6)
+	res[0] = m_Pk[2] * a + (m_Pk[1] - m_Pk[2]) * eta;                   // P6(1-2xi) + (P5-P6)eta
+	res[1] = m_qk[2] * a - (m_qk[1] + m_qk[2]) * eta;                   // q6(1-2xi) - (q5-q6)eta
+	res[2] = -4.0 + 6.0 * (xi + eta) + m_rk[2] * a -                    // -4 + 6(xi+eta) + r6(1-2xi) - eta(r5+r6)
+		eta * (m_rk[1] + m_rk[2]);
 
-	res[6] = -neta * (m_Pk[1] + m_Pk[0]);                                // -neta(P5+P4)
-	res[7] = neta * (m_qk[0] - m_qk[1]);                                 // neta(a4-a5)
-	res[8] = -neta * (m_rk[1] - m_rk[0]);                                // -neta(r5-r4)
+	res[3] = -m_Pk[2] * a + eta * (m_Pk[0] + m_Pk[2]);                  // -P6(1-2xi) + eta(P4+P6)
+	res[4] = m_qk[2] * a - eta * (m_qk[2] - m_qk[0]);                   // q6(1-2xi) - eta(q6-q4)
+	res[5] = -2.0 + 6.0 * xi + m_rk[2] * a + eta * (m_rk[0] - m_rk[2]); // -2 + 6xi + r6(1-2xi) + eta(r4-r6)
+
+	res[6] = -eta * (m_Pk[1] + m_Pk[0]);                                // -eta(P5+P4)
+	res[7] = eta * (m_qk[0] - m_qk[1]);                                 // eta(a4-a5)
+	res[8] = -eta * (m_rk[1] - m_rk[0]);                                // -eta(r5-r4)
 
 	return res;
 }
 
-std::array<double, 9> Fem2DElementTriangle::batozDhxDneta(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhxDeta(double xi, double eta) const
 {
 	std::array<double, 9> res;
-	double a = 1.0 - 2.0 * neta;
+	double a = 1.0 - 2.0 * eta;
 
-	res[0] = -m_Pk[1] * a - xi * (m_Pk[2] - m_Pk[1]);                    // -P5(1-2neta) - xi(P6-P5)
-	res[1] =  m_qk[1] * a - xi * (m_qk[1] + m_qk[2]);                    //  q5(1-2neta) - xi(q5+q6)
-	res[2] = -4.0 + 6.0 * (xi + neta) + m_rk[1] * a - xi * (m_rk[1] + m_rk[2]); // -4 + 6(xi+neta) + r5(1-2neta) -
-																				// xi(r5+r6)
+	res[0] = -m_Pk[1] * a - xi * (m_Pk[2] - m_Pk[1]);                    // -P5(1-2eta) - xi(P6-P5)
+	res[1] =  m_qk[1] * a - xi * (m_qk[1] + m_qk[2]);                    //  q5(1-2eta) - xi(q5+q6)
+	res[2] = -4.0 + 6.0 * (xi + eta) + m_rk[1] * a -                     // -4 + 6(xi+eta) + r5(1-2eta) - xi(r5+r6)
+		xi * (m_rk[1] + m_rk[2]);
+
 	res[3] = xi * (m_Pk[0] + m_Pk[2]);                                   //  xi(P4+P6)
 	res[4] = xi * (m_qk[0] - m_qk[2]);                                   //  xi(q4-q6)
 	res[5] = -xi * (m_rk[2] - m_rk[0]);                                  // -xi(r6-r4)
 
-	res[6] = m_Pk[1] * a - xi * (m_Pk[0] + m_Pk[1]);                     //  P5(1-2neta) - xi(P4+P5)
-	res[7] = m_qk[1] * a + xi * (m_qk[0] - m_qk[1]);                     //  q5(1-2neta) + xi(q4-q5)
-	res[8] = -2.0 + 6.0 * neta + m_rk[1] * a + xi * (m_rk[0] - m_rk[1]); // -2 + 6neta + r5(1-2neta) + xi(r4-r5)
+	res[6] = m_Pk[1] * a - xi * (m_Pk[0] + m_Pk[1]);                     //  P5(1-2eta) - xi(P4+P5)
+	res[7] = m_qk[1] * a + xi * (m_qk[0] - m_qk[1]);                     //  q5(1-2eta) + xi(q4-q5)
+	res[8] = -2.0 + 6.0 * eta + m_rk[1] * a + xi * (m_rk[0] - m_rk[1]);  // -2 + 6eta + r5(1-2eta) + xi(r4-r5)
 
 	return res;
 }
 
-std::array<double, 9> Fem2DElementTriangle::batozDhyDxi(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhyDxi(double xi, double eta) const
 {
 	std::array<double, 9> res;
 	double a = 1.0 - 2.0 * xi;
 
-	res[0] = m_tk[2] * a + neta * (m_tk[1] - m_tk[2]);        // t6(1-2xi) + neta(t5-t6)
-	res[1] = 1.0 + m_rk[2] * a - neta * (m_rk[1] + m_rk[2]);  // 1+r6(1-2xi) - neta(r5+r6)
-	res[2] = -m_qk[2] * a + neta * (m_qk[1] + m_qk[2]);       // -q6(1-2xi) + neta(q5+q6)
+	res[0] = m_tk[2] * a + eta * (m_tk[1] - m_tk[2]);        // t6(1-2xi) + eta(t5-t6)
+	res[1] = 1.0 + m_rk[2] * a - eta * (m_rk[1] + m_rk[2]);  // 1+r6(1-2xi) - eta(r5+r6)
+	res[2] = -m_qk[2] * a + eta * (m_qk[1] + m_qk[2]);       // -q6(1-2xi) + eta(q5+q6)
 
-	res[3] = -m_tk[2] * a + neta * (m_tk[0] + m_tk[2]);       // -t6(1-2xi) + neta(t4+t6)
-	res[4] = -1.0 + m_rk[2] * a + neta * (m_rk[0] - m_rk[2]); // -1 + r6(1-2xi) + neta(r4-r6)
-	res[5] = -m_qk[2] * a - neta * (m_qk[0] - m_qk[2]);       // -q6(1-2xi) - neta(q4-q6)
+	res[3] = -m_tk[2] * a + eta * (m_tk[0] + m_tk[2]);       // -t6(1-2xi) + eta(t4+t6)
+	res[4] = -1.0 + m_rk[2] * a + eta * (m_rk[0] - m_rk[2]); // -1 + r6(1-2xi) + eta(r4-r6)
+	res[5] = -m_qk[2] * a - eta * (m_qk[0] - m_qk[2]);       // -q6(1-2xi) - eta(q4-q6)
 
-	res[6] = -neta * (m_tk[0] + m_tk[1]);                     // -neta(t4+t5)
-	res[7] = neta * (m_rk[0] - m_rk[1]);                      // neta(r4-r5)
-	res[8] = -neta * (m_qk[0] - m_qk[1]);                     // -neta(q4-q5)
+	res[6] = -eta * (m_tk[0] + m_tk[1]);                     // -eta(t4+t5)
+	res[7] = eta * (m_rk[0] - m_rk[1]);                      // eta(r4-r5)
+	res[8] = -eta * (m_qk[0] - m_qk[1]);                     // -eta(q4-q5)
 
 	return res;
 }
 
-std::array<double, 9> Fem2DElementTriangle::batozDhyDneta(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhyDeta(double xi, double eta) const
 {
 	std::array<double, 9> res;
-	double a = 1.0 - 2.0 * neta;
+	double a = 1.0 - 2.0 * eta;
 
-	res[0] = -m_tk[1] * a - xi * (m_tk[2] - m_tk[1]);       // -t5(1-2neta) - xi(t6-t5)
-	res[1] = 1.0 + m_rk[1] * a - xi * (m_rk[1] + m_rk[2]);  // 1+r5(1-2neta) - xi(r5+r6)
-	res[2] = -m_qk[1] * a + xi * (m_qk[1] + m_qk[2]);       // -q5(1-2neta) + xi(q5+q6)
+	res[0] = -m_tk[1] * a - xi * (m_tk[2] - m_tk[1]);       // -t5(1-2eta) - xi(t6-t5)
+	res[1] = 1.0 + m_rk[1] * a - xi * (m_rk[1] + m_rk[2]);  // 1+r5(1-2eta) - xi(r5+r6)
+	res[2] = -m_qk[1] * a + xi * (m_qk[1] + m_qk[2]);       // -q5(1-2eta) + xi(q5+q6)
 
 	res[3] = xi * (m_tk[0] + m_tk[2]);                      // xi(t4+t6)
 	res[4] = xi * (m_rk[0] - m_rk[2]);                      // xi(r4-r6)
 	res[5] = -xi * (m_qk[0] - m_qk[2]);                     // -xi(q4-q6)
 
-	res[6] = m_tk[1] * a - xi * (m_tk[0] + m_tk[1]);        // t5(1-2neta) - xi(t4+t5)
-	res[7] = -1.0 + m_rk[1] * a + xi * (m_rk[0] - m_rk[1]); // -1 + r5(1-2neta) + xi (r4-r5)
-	res[8] = -m_qk[1] * a - xi * (m_qk[0] - m_qk[1]);       // -q5(1-2neta) - xi(q4-q5)
+	res[6] = m_tk[1] * a - xi * (m_tk[0] + m_tk[1]);        // t5(1-2eta) - xi(t4+t5)
+	res[7] = -1.0 + m_rk[1] * a + xi * (m_rk[0] - m_rk[1]); // -1 + r5(1-2eta) + xi (r4-r5)
+	res[8] = -m_qk[1] * a - xi * (m_qk[0] - m_qk[1]);       // -q5(1-2eta) - xi(q4-q5)
 
 	return res;
 }
 
-Fem2DElementTriangle::Matrix39Type Fem2DElementTriangle::batozStrainDisplacement(double xi, double neta)const
+Fem2DElementTriangle::Matrix39Type Fem2DElementTriangle::batozStrainDisplacement(double xi, double eta)const
 {
 	Matrix39Type res;
-	std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
+	std::array<double, 9> dHx_dxi, dHx_deta, dHy_dxi, dHy_deta;
 	double coefficient = 1.0 / (2.0 * m_restArea);
 
-	dHx_dxi   = batozDhxDxi(xi, neta);
-	dHx_dneta = batozDhxDneta(xi, neta);
-	dHy_dxi   = batozDhyDxi(xi, neta);
-	dHy_dneta = batozDhyDneta(xi, neta);
+	dHx_dxi   = batozDhxDxi(xi, eta);
+	dHx_deta = batozDhxDeta(xi, eta);
+	dHy_dxi   = batozDhyDxi(xi, eta);
+	dHy_deta = batozDhyDeta(xi, eta);
 
 	for(size_t i = 0; i < 9; ++i)
 	{
 		//  4 -> mid-edge 12
 		//  5 -> mid-edge 20
 		//  6 -> mid-edge 01
-		res(0, i) = coefficient * ( m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_dneta[i]);
-		res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_dneta[i]);
+		res(0, i) = coefficient * ( m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_deta[i]);
+		res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_deta[i]);
 		res(2, i) = coefficient *
-			(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_dneta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_dneta[i]);
+			(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_deta[i]);
 	}
 
 	return res;
