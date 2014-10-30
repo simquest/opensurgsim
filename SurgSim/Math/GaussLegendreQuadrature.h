@@ -66,7 +66,7 @@ extern std::array<gaussQuadraturePoint, 1> gaussQuadrature1Point;
 /// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<gaussQuadraturePoint, 2> gaussQuadrature2Points;
 
-/// 3-points Gauss-Legendre quadrature \f${<x_1, w_1>, <x_2, w_2>, <x_3, w_3>}\f$
+/// 1D 3-points Gauss-Legendre quadrature \f${<x_1, w_1>, <x_2, w_2>, <x_3, w_3>}\f$
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
 /// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
