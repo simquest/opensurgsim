@@ -1172,9 +1172,10 @@ TEST_F(Fem2DElementTriangleTests, StiffnessMatrixTest)
 /// \return the polynomial evaluation at the coordinates (x, y)
 static double evaluatePolynomial(size_t degree, const SurgSim::Math::Vector& coefficients, double x, double y)
 {
-	SURGSIM_ASSERT((degree + 1) * (degree + 2) / 2 == coefficients.size()) <<
+	SURGSIM_ASSERT((degree + 1) * (degree + 2) / 2 == static_cast<size_t>(coefficients.size())) <<
 		"Invalid coefficients vector (of size " << coefficients.size() <<
-		") provided for a polynomial of degree " << degree;
+		") provided for a polynomial of degree " << degree <<
+		". Was expecting " << (degree + 1) * (degree + 2) / 2 << " coefficients";
 
 	SurgSim::Math::Vector monomials = SurgSim::Math::Vector::Zero(coefficients.size());
 

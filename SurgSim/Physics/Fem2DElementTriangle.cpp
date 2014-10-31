@@ -536,14 +536,6 @@ void Fem2DElementTriangle::computeIntegral_HxHxT()
 	const double &c5 = m_ck[1];
 	const double &c6 = m_ck[2];
 
-	const double &d4 = m_dk[0];
-	const double &d5 = m_dk[1];
-	const double &d6 = m_dk[2];
-
-	const double &e4 = m_ek[0];
-	const double &e5 = m_ek[1];
-	const double &e6 = m_ek[2];
-
 	m_integralHxiHxj.resize(9, 9);
 
 	m_integralHxiHxj(0, 0) = 1./5. * (a6 * a6 - a5 * a6 + a5 * a5);
@@ -642,17 +634,9 @@ void Fem2DElementTriangle::computeIntegral_HyHyT()
 	// Compute the integral terms of Batoz Hy product functions
 	// m_integralHyiHyj(i, j) = int_0^1 int_0^{1-eta} Hyi.Hyj dxi deta
 
-	const double &a4 = m_ak[0];
-	const double &a5 = m_ak[1];
-	const double &a6 = m_ak[2];
-
 	const double &b4 = m_bk[0];
 	const double &b5 = m_bk[1];
 	const double &b6 = m_bk[2];
-
-	const double &c4 = m_ck[0];
-	const double &c5 = m_ck[1];
-	const double &c6 = m_ck[2];
 
 	const double &d4 = m_dk[0];
 	const double &d5 = m_dk[1];
