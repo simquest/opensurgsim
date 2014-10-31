@@ -57,11 +57,11 @@ endif(MSVC)
 
 find_package(MathJax)
 if(MATHJAX_FOUND)
-	set(MATHJAX_RELPATH ${MATHJAX_DIR})
-	message(STATUS "Using local MathJax:" ${MATHJAX_DIR})
+	set(MATHJAX_RELPATH_CONFIG "MATHJAX_RELPATH = ${MATHJAX_DIR}")
+	message(STATUS "Using local MathJax: " ${MATHJAX_DIR})
 else()
-	set(MATHJAX_RELPATH "http://cdn.mathjax.org/mathjax/latest")
-	message(STATUS "Using web-based MathJax: " ${MATHJAX_RELPATH})
+	set(MATHJAX_RELPATH_CONFIG "")
+	message(STATUS "Using default web-based MathJax")
 endif()
 
 # Generate Doxyfile from Doxyfile.in, with @VARIABLE@ substitution.
