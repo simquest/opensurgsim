@@ -57,7 +57,7 @@ endif(MSVC)
 
 find_package(MathJax)
 if(MATHJAX_FOUND)
-	set(MATHJAX_RELPATH_CONFIG "MATHJAX_RELPATH = ${MATHJAX_DIR}")
+	set(MATHJAX_RELPATH_CONFIG "MATHJAX_RELPATH = file://${MATHJAX_DIR}")
 	message(STATUS "Using local MathJax: " ${MATHJAX_DIR})
 else()
 	set(MATHJAX_RELPATH_CONFIG "")

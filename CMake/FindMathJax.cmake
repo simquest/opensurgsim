@@ -30,6 +30,9 @@ if(NOT MATHJAX_DIR)
 endif()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(MathJax DEFAULT_MSG MATHJAX_DIR)
+find_package_handle_standard_args(MathJax
+	"Could NOT find MathJax. To use a local version, set MATHJAX_DIR to the directory containing MathJax.js."
+	MATHJAX_DIR
+)
 
 mark_as_advanced(MATHJAX_DIR)
