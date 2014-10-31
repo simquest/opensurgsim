@@ -72,10 +72,6 @@ public:
 	/// \return the octree root node of this shape
 	std::shared_ptr<NodeType> getOctree();
 
-// 	/// const version to get the root node
-// 	/// \return A const reference of the shared pointer, which points to the octree root node of this shape.
-// 	const std::shared_ptr<const NodeType> getRootNode() const;
-
 	/// Set the root node
 	/// \param node the octree root node of this shape
 	void setOctree(std::shared_ptr<SurgSim::Framework::Asset> node);
@@ -86,6 +82,11 @@ public:
 	void loadOctree(const std::string& filePath);
 
 private:
+
+	/// \param node the OctreeNode to check
+	/// \return True if the bounding box is bigger than or equal to 0; Otherwise, false.
+	bool isValid(std::shared_ptr<NodeType> node) const;
+
 	/// Root node of the octree datastructure
 	std::shared_ptr<NodeType> m_rootNode;
 };
