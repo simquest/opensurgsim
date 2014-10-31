@@ -36,7 +36,17 @@ OctreeShape::OctreeShape() :
 		getOctree,
 		setOctree);
 
-	forwardProperty("OctreeFileName", *m_rootNode, "FileName");
+	// Enables the alternative use of the mesh file instead of the actual mesh object
+	DecoderType decoder = std::bind(&OctreeShape::loadOctree,
+									this,
+									std::bind(&YAML::Node::as<std::string>, std::placeholders::_1));
+	setDecoder("OctreehFileName", decoder);
+
+	SetterType setter = std::bind(&OctreeShape::loadOctree,
+								  this,
+								  std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1));
+
+	setSetter("OctreeFileName", setter);
 }
 
 OctreeShape::~OctreeShape()

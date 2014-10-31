@@ -165,6 +165,7 @@ private:
 	/// Private struct to keep the map under control
 	struct Functors
 	{
+		Functors() : getter(nullptr), setter(nullptr), encoder(nullptr), decoder(nullptr) {}
 		GetterType getter;
 		SetterType setter;
 		EncoderType encoder;
