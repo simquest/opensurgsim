@@ -45,8 +45,8 @@ using another GNU/Linux distribution, please check your package management
 system for the dependencies (see Appendix). For Debian/Ubuntu based systems, the
 dependencies are easily installed through apt-get:
 
-    sudo apt-get install libboost-all-dev cmake doxygen
-    sudo apt-get install libeigen3-dev google-mock libopenscenegraph-dev
+    sudo apt-get install libboost-all-dev cmake doxygen libeigen3-dev
+    sudo apt-get install google-mock libjs-mathjax libopenscenegraph-dev
 
 To build OpenSurgSim, issue the following commands from the same directory used
 to obtain OpenSurgSim (see Section 1)
@@ -140,4 +140,8 @@ Optional Dependencies
 * Google Mock  
   Homepage: https://code.google.com/p/googlemock/  
   Minimum Version: 1.7.0  
+
+* MathJax  
+  Homepage: http://www.mathjax.org/  
+  Minimum Version: 2.4
 

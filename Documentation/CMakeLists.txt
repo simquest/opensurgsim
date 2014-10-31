@@ -28,21 +28,10 @@ find_program(DOXYGEN_DOT_EXECUTABLE
 
 find_package(Doxygen REQUIRED)
 
-if(EXISTS "${SURGSIM_THIRD_PARTY_DIR}/mathjax")
-	set(MATHJAX_LOCAL "${SURGSIM_THIRD_PARTY_DIR}/mathjax")
-else()
-	set(MATHJAX_LOCAL "")
-endif()
-
 set(SURGSIM_DOCUMENTATION_EXCLUDE_LIST
 	*/UnitTests/*
 	CACHE STRING "Directories and files to ignore when generating documentation")
 mark_as_advanced(SURGSIM_DOCUMENTATION_EXCLUDE_LIST)
-
-set(SURGSIM_DOCUMENTATION_MATHJAX_LOCAL
-	"${MATHJAX_LOCAL}"
-	CACHE PATH "A local copy of MathJax to be used for HTML documentation")
-mark_as_advanced(SURGSIM_DOCUMENTATION_LOCAL_MATHJAX)
 
 set(PROJECT_LOGO "${CMAKE_CURRENT_SOURCE_DIR}/OpenSurgSim-dox.png")
 set(HTML_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/header.html")
@@ -66,20 +55,13 @@ else(MSVC)
 	set(WARN_FORMAT "\"$file:$line: $text\"")
 endif(MSVC)
 
-if(SURGSIM_DOCUMENTATION_MATHJAX_LOCAL STREQUAL "")
-	# Use MathJax directly from the web
-	set(MATHJAX_RELPATH http://www.mathjax.org/mathjax)
+find_package(MathJax)
+if(MATHJAX_FOUND)
+	set(MATHJAX_RELPATH ${MATHJAX_DIR})
+	message(STATUS "Using local MathJax:" ${MATHJAX_DIR})
 else()
-	# Copy MathJax directly into the generated documentation
-	if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/html/mathjax")
-		message("Copying local MathJax (please be patient)...")
-		file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html/")
-		file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html/mathjax/")
-		file(COPY "${SURGSIM_THIRD_PARTY_DIR}/mathjax/."
-			DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/html/")
-		message("...done!")
-	endif()
-	set(MATHJAX_RELPATH ./mathjax)
+	set(MATHJAX_RELPATH "http://cdn.mathjax.org/mathjax/latest")
+	message(STATUS "Using web-based MathJax: " ${MATHJAX_RELPATH})
 endif()
 
 # Generate Doxyfile from Doxyfile.in, with @VARIABLE@ substitution.
