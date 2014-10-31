@@ -233,7 +233,8 @@ void MeshShape::setInitialMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh)
 	auto triangleMesh = std::dynamic_pointer_cast<SurgSim::DataStructures::TriangleMesh>(mesh);
 	SURGSIM_ASSERT(triangleMesh != nullptr)
 			<< "Mesh for MeshShape needs to be a TriangleMesh";
-
+	SURGSIM_ASSERT(triangleMesh->isValid())
+			<< "Mesh for MeshShape needs to be valid";
 	m_initialMesh = triangleMesh;
 
 	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*m_initialMesh);

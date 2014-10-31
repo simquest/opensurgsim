@@ -17,7 +17,6 @@
 #define SURGSIM_GRAPHICS_SCENERYREPRESENTATION_H
 
 #include "SurgSim/Graphics/Representation.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
 
 #include <string>
 
@@ -40,26 +39,9 @@ public:
 
 	/// Constructor.
 	/// \param	name	The name of the representation.
-	explicit SceneryRepresentation(const std::string& name): Representation(name)
-	{
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(SceneryRepresentation, std::shared_ptr<SurgSim::Framework::Asset>,
-										  Model , getModel, setModel);
+	explicit SceneryRepresentation(const std::string& name);
 
-
-		// Enables the alternative use of the model file instead of the actual mesh object
-		DecoderType decoder = std::bind(&SceneryRepresentation::loadModel,
-										this,
-										std::bind(&YAML::Node::as<std::string>, std::placeholders::_1));
-		setDecoder("ModelFileName", decoder);
-
-		SetterType setter = std::bind(&SceneryRepresentation::loadModel,
-									  this,
-									  std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1));
-
-		setSetter("ModelFileName", setter);
-	}
-
-	/// Convenience function to trigger the load of the model with the given filename, if successfull, this will
+	/// Convenience function to trigger the load of the model with the given filename, if successful, this will
 	/// replace the old model
 	/// \param	fileName Name of the file to be loaded
 	virtual void loadModel(const std::string& fileName) = 0;

@@ -17,6 +17,11 @@
 ## Set build flags through CMake.
 ## Splitting this out removes excessive verbiage from CMakeLists.txt.
 
+# If no build type is specified, default to "Release".
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+	set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 # We always want to use defines from <math.h>.
 if(MSVC)
 	add_definitions( -D_USE_MATH_DEFINES )
@@ -122,18 +127,14 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 set(DEFAULT_EIGEN_ALIGNMENT OFF)
-# Enable alignement on linux by default
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	set(DEFAULT_EIGEN_ALIGNMENT ON)
-endif()
-
-# Enable alignement on Windows 64bit by default
-if(${CMAKE_CL_64})
+# Enable alignement on 64bit systems by default
+if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
 	set(DEFAULT_EIGEN_ALIGNMENT ON)
 endif()
 
 option(EIGEN_ALIGNMENT "Enable alignment in Eigen" ${DEFAULT_EIGEN_ALIGNMENT})
 mark_as_advanced(EIGEN_ALIGNMENT)
+
 if(NOT EIGEN_ALIGNMENT)
 	add_definitions( -DEIGEN_DONT_ALIGN )
 endif()

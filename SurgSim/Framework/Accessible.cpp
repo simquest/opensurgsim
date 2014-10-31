@@ -74,14 +74,12 @@ void Accessible::setValue(const std::string& name, const boost::any& value)
 void Accessible::setGetter(const std::string& name, GetterType func)
 {
 	SURGSIM_ASSERT(func != nullptr) << "Getter functor can't be nullptr";
-
 	m_functors[name].getter = func;
 }
 
 void Accessible::setSetter(const std::string& name, SetterType func)
 {
 	SURGSIM_ASSERT(func != nullptr) << "Setter functor can't be nullptr";
-
 	m_functors[name].setter = func;
 }
 
@@ -127,7 +125,7 @@ void Accessible::setSerializable(const std::string& name, EncoderType encoder, D
 void Accessible::setDecoder(const std::string& name, DecoderType decoder)
 {
 	SURGSIM_ASSERT(decoder != nullptr) << "Decoder functor can't be nullptr";
-	m_functors[name].encoder = nullptr;
+
 	m_functors[name].decoder = decoder;
 }
 
@@ -196,6 +194,8 @@ void Accessible::forwardProperty(const std::string& name, const Accessible& targ
 	{
 		functors.getter = found->second.getter;
 		functors.setter = found->second.setter;
+		functors.encoder = found->second.encoder;
+		functors.decoder = found->second.decoder;
 		m_functors[name] = std::move(functors);
 	}
 	else

@@ -62,6 +62,8 @@ void OsgSceneryRepresentation::setModel(std::shared_ptr<SurgSim::Framework::Asse
 	}
 	if (osgModel != nullptr)
 	{
+		SURGSIM_ASSERT(osgModel->getOsgNode().valid())
+				<< "OsgSceneryRepresentation was passed a model that did not have any geometry assigned to it.";
 		m_osgNode = osgModel->getOsgNode();
 		m_transform->addChild(m_osgNode);
 	}

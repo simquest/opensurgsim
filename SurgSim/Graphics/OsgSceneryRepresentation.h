@@ -35,7 +35,6 @@ class Asset;
 namespace Graphics
 {
 class Model;
-class OsgModel;
 
 SURGSIM_STATIC_REGISTRATION(OsgSceneryRepresentation);
 
@@ -51,11 +50,11 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgSceneryRepresentation);
 
-	void loadModel(const std::string& fileName) override;
+	virtual void loadModel(const std::string& fileName) override;
 
-	void setModel(std::shared_ptr<SurgSim::Framework::Asset> model) override;
+	virtual void setModel(std::shared_ptr<SurgSim::Framework::Asset> model) override;
 
-	std::shared_ptr<Model> getModel() const override;
+	virtual std::shared_ptr<Model> getModel() const override;
 
 private:
 	virtual bool doInitialize() override;

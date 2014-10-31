@@ -39,6 +39,7 @@ struct MockData
 
 typedef OctreeNode<MockData> OctreeNodeType;
 
+template<>
 std::string OctreeNodeType::m_className = "OctreeNode<MockData>";
 
 namespace
@@ -232,6 +233,7 @@ struct Data1
 	std::string name;
 };
 
+template <>
 std::string OctreeNode<Data1>::m_className = "OctreeNode<Data1>";
 
 struct Data2
@@ -239,6 +241,7 @@ struct Data2
 	double value;
 };
 
+template <>
 std::string OctreeNode<Data2>::m_className = "OctreeNode<Data2>";
 
 TEST(OctreeNodeTests, CopyConstructor)

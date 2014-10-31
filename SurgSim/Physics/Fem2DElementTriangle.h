@@ -158,16 +158,27 @@ protected:
 	/// \return The rotation matrix of the element in the given state
 	SurgSim::Math::Matrix33d computeRotation(const SurgSim::Math::OdeState& state);
 
+	/// Computes the triangle's local stiffness matrix
+	/// \param state The state to compute the local stiffness matrix from
+	/// \param[out] localStiffnessMatrix The local stiffness matrix to store the result into
+	virtual void computeLocalStiffness(const SurgSim::Math::OdeState& state,
+									   Eigen::Matrix<double, 18, 18>* localStiffnessMatrix);
+
 	/// Computes the triangle's stiffness matrix
 	/// \param state The state to compute the stiffness matrix from
-	/// \param[out] k The stiffness matrix to store the result into
-	void computeStiffness(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 18, 18>* k);
+	/// \param[out] stiffnessMatrix The stiffness matrix to store the result into
+	void computeStiffness(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 18, 18>* stiffnessMatrix);
+
+	/// Computes the triangle's local mass matrix
+	/// \param state The state to compute the local mass matrix from
+	/// \param[out] localMassMatrix The local mass matrix to store the result into
+	virtual void computeLocalMass(const SurgSim::Math::OdeState& state,
+								  Eigen::Matrix<double, 18, 18>* localMassMatrix);
 
 	/// Computes the triangle's mass matrix
-	/// \param state The state to compute the stiffness matrix from
-	/// \param[out] m The mass matrix to store the result into
-	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 18, 18>* m);
+	/// \param state The state to compute the mass matrix from
+	/// \param[out] massMatrix The mass matrix to store the result into
+	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 18, 18>* massMatrix);
 
 	/// The element's rest state
 	Eigen::Matrix<double, 18, 1> m_x0;

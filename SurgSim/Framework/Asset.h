@@ -62,6 +62,8 @@ public:
 	/// \return Name of the file loaded by this class.
 	std::string getFileName() const;
 
+	/// Support serialization with a classname
+	/// \return the name of this class
 	virtual std::string getClassName() const = 0;
 
 	typedef SurgSim::Framework::ObjectFactory<SurgSim::Framework::Asset> FactoryType;

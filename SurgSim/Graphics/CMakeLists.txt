@@ -63,6 +63,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	PointCloudRepresentation.cpp
 	RenderPass.cpp
 	Representation.cpp
+	SceneryRepresentation.cpp
 	TriangleNormalGenerator.cpp
 	View.cpp
 	ViewElement.cpp
