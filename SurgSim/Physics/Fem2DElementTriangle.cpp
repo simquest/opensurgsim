@@ -168,85 +168,46 @@ void Fem2DElementTriangle::addMatVec(const SurgSim::Math::OdeState& state, doubl
 	}
 }
 
-void Fem2DElementTriangle::computeLocalMass(const SurgSim::Math::OdeState& state,
-											Eigen::Matrix<double, 18, 18>* localMassMatrix)
+void Fem2DElementTriangle::computeLocalMembraneMass(const SurgSim::Math::OdeState& state,
+													Eigen::Matrix<double, 18, 18>* localMassMatrix)
 {
 	double mass = m_rho * m_restArea * m_thickness;
-
-	localMassMatrix->setIdentity();
 
 	for(size_t i = 0; i < 3; ++i)
 	{
 		size_t j = (i + 1) % 3;
 		size_t k = (j + 1) % 3;
 
-		// Membrane inertia matrix
-		// Przemieniecki book "Theory of Matrix Structural Analysis"
-		// Chapter 11.6, equation 11.42 for a in-plane triangle deformation
-		// m = rho.A(123).t/12.0.[2 1 1] for the axis X and Y
-		//                       [1 2 1]
-		//                       [1 1 2]
 		localMassMatrix->block<2, 2>(i * 6, i * 6).diagonal().setConstant(mass / 6.0);
 		localMassMatrix->block<2, 2>(i * 6, j * 6).diagonal().setConstant(mass / 12.0);
 		localMassMatrix->block<2, 2>(i * 6, k * 6).diagonal().setConstant(mass / 12.0);
-
-		// Plate inertia matrix developed from Batoz paper
-		// Interpolation of the rotational displacement over the triangle w.r.t. DOF:
-		// Uthetax(xi,neta) = z.Hx^T. U
-		// Uthetay(xi,neta) = z.Hy^T. U
-		//
-		// Which means that the shape functions for the rotational DOF are:
-		// a=(zHx^T zH^yT)
-		//
-		// Mass = \int_V rho.a^T.a dV
-		//      = rho . \int_z \int_A a^T.a dA dz
-		//      = rho . \int_{-h/2}^{h/2} \int_A z^2 ( Hx^t.Hx Hx^T.Hy ) dA dz
-		//                                           ( Hy^t.Hx Hy^T.Hy )
-		//
-		//      = rho . [z^3/3]_{-h/2}^{h/2} \int_0^{1} \int_0^{1-neta} 2A (Hx^T.Hx  Hx^T.Hy) dxi dneta
-		//                                                                 (Hy^T.Hx  Hy^T.Hy)
-		//
-		//      = rho . (h^3/12) . 2A . \int_0^{1} \int_0^{1-neta} (Hx^T.Hx  Hx^T.Hy) dxi dneta
-		//                                                         (Hy^T.Hx  Hy^T.Hy)
-		//
-		// int_0^1 \int_0^(1-neta) Hx^T.Hx dxi dneta =
-		//        1/5.( 2a4^2 + 2a5^2 + 2a6^2 - a4a5 - a4a6 - a5a6 ) +
-		//        1/20 +
-		//        4/45.( 2b4^2 + 2b5^2 + 2b6^2 + b4b5 + b4b6 + b5b6 + 2c4^2 + 2c5^2 + 2c6^2 + c4c5 + c4c6 + c5c6)
-		//
-		// int_0^1 \int_0^(1-neta) Hy^T.Hy dxi dneta =
-		//        1/5.( 2d4^2 + 2d5^2 + 2d6^2 - d4d5 - d4d6 - d5d6 ) +
-		//        1/20 +
-		//        4/45.( 2b4^2 + 2b5^2 + 2b6^2 + b4b5 + b4b6 + b5b6 + 2e4^2 + 2e5^2 + 2e6^2 + e4e5 + e4e6 + e5e6)
-		//
-		// int_0^1 \int_0^(1-neta) Hy^T.Hx dxi dneta =
-		// int_0^1 \int_0^(1-neta) Hx^T.Hy dxi dneta =
-		//        1/5 .( 2a4d4 + 2a5d5 + 2a6d6) - 1/10.( a4(d5+d6) + a5(d4+d6) + a6(d4+d5) )
-		//        4/45.( 2b4(e4+c4) + 2b5(e5+c5) + 2b6(e6+c6) )
-		//        2/45.( b4(e5+c5) + b4(e6+c6) + b5(e4+c4) + b5(e6+c6) + b6(e4+c4) + b6(e5+c5) )
-		//
-		double xx = 1.0 / 20.0;
-		xx += 1.0 / 5.0 * ( 2.0 * m_ak.squaredNorm() - m_ak[0] * m_ak[1] - m_ak[0] * m_ak[2] - m_ak[1] * m_ak[2] );
-		xx += 4.0 / 45.0 * ( 2.0 * m_bk.squaredNorm() + m_bk[0] * m_bk[1] + m_bk[0] * m_bk[2] + m_bk[1] * m_bk[2] );
-		xx += 4.0 / 45.0 * ( 2.0 * m_ck.squaredNorm() + m_ck[0] * m_ck[1] + m_ck[0] * m_ck[2] + m_ck[1] * m_ck[2] );
-		double yy = 1.0 / 20.0;
-		yy += 1.0 / 5.0 * ( 2.0 * m_dk.squaredNorm() - m_dk[0] * m_dk[1] - m_dk[0] * m_dk[2] - m_dk[1] * m_dk[2] );
-		yy += 4.0 / 45.0 * ( 2.0 * m_bk.squaredNorm() + m_bk[0] * m_bk[1] + m_bk[0] * m_bk[2] + m_bk[1] * m_bk[2] );
-		yy += 4.0 / 45.0 * ( 2.0 * m_ek.squaredNorm() + m_ek[0] * m_ek[1] + m_ek[0] * m_ek[2] + m_ek[1] * m_ek[2] );
-		double xy = 0.0;
-		xy += 1.0 / 5.0 * ( 2.0 * m_ak.dot(m_dk) );
-		xy -= 1.0 / 10.0 * ( m_ak.dot(Vector3d(m_dk[1] + m_dk[2], m_dk[0] + m_dk[2], m_dk[0] + m_dk[1])) );
-		xy += 4.0 / 45.0 * ( 2.0 * m_bk.dot(m_ek + m_ck) );
-		xy += 2.0 / 45.0 * ( m_bk[0] * (m_ek[1] + m_ck[1] + m_ek[2] + m_ck[2]) );
-		xy += 2.0 / 45.0 * ( m_bk[1] * (m_ek[0] + m_ck[0] + m_ek[2] + m_ck[2]) );
-		xy += 2.0 / 45.0 * ( m_bk[2] * (m_ek[0] + m_ck[0] + m_ek[1] + m_ck[1]) );
-
-		double coef2 = m_rho * (m_restArea * 2.0) * (m_thickness * m_thickness * m_thickness / 12.0);
-		(*localMassMatrix)(6 * i + 3, 6 * i + 3) = coef2 * xx;
-		(*localMassMatrix)(6 * i + 3, 6 * i + 4) = coef2 * xy;
-		(*localMassMatrix)(6 * i + 4, 6 * i + 3) = coef2 * xy;
-		(*localMassMatrix)(6 * i + 4, 6 * i + 4) = coef2 * yy;
 	}
+}
+
+void Fem2DElementTriangle::computeLocalPlateMass(const SurgSim::Math::OdeState& state,
+													Eigen::Matrix<double, 18, 18>* localMassMatrix)
+{
+	double coefZ = 2.0 * m_restArea * m_rho * m_thickness;
+	double coefTheta = m_restArea * m_rho * (m_thickness * m_thickness * m_thickness) / 6.0;
+
+	for(size_t nodeId1 = 0; nodeId1 < 3; ++nodeId1)
+	{
+		for(size_t nodeId2 = 0; nodeId2 < 3; ++nodeId2)
+		{
+			localMassMatrix->block<3, 3>(6 * nodeId1 + 2, 6 * nodeId2 + 2) =
+				coefZ * m_integral_dT_d.block<3, 3>(3 * nodeId1, 3 * nodeId2) +
+				coefTheta * m_integralHxiHxj.block<3, 3>(3 * nodeId1, 3 * nodeId2) +
+				coefTheta * m_integralHyiHyj.block<3, 3>(3 * nodeId1, 3 * nodeId2);
+		}
+	}
+}
+
+void Fem2DElementTriangle::computeLocalMass(const SurgSim::Math::OdeState& state,
+											Eigen::Matrix<double, 18, 18>* localMassMatrix)
+{
+	localMassMatrix->setIdentity();
+	computeLocalMembraneMass(state, localMassMatrix);
+	computeLocalPlateMass(state, localMassMatrix);
 }
 
 void Fem2DElementTriangle::computeMass(const SurgSim::Math::OdeState& state,
@@ -312,7 +273,7 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 	plateElasticMaterial *= m_thickness * m_thickness * m_thickness / 12.0;
 	// Thin-plate local stiffness matrix = integral(strain:stress) using a 3 points integration
 	// rule over the parametrized triangle (exact integration because only quadratic terms)
-	// integral(over parametric triangle) Bt.Em.B = sum(gauss point (xi,neta)) wi Bt(xi,neta).Em.B(xi,neta)
+	// integral(over parametric triangle) Bt.Em.B = sum(gauss point (xi,eta)) wi Bt(xi,eta).Em.B(xi,eta)
 	// http://www.ams.org/journals/mcom/1959-13-068/S0025-5718-1959-0107976-5/S0025-5718-1959-0107976-5.pdf
 	// = Area(parametric triangle)/3.0 * Bt(0.5, 0.0).Em.B(0.5, 0.0)
 	// + Area(parametric triangle)/3.0 * Bt(0.0, 0.5).Em.B(0.0, 0.5)
@@ -424,6 +385,360 @@ SurgSim::Math::Vector Fem2DElementTriangle::computeNaturalCoordinate(
 	return SurgSim::Math::Vector3d::Zero();
 }
 
+void Fem2DElementTriangle::computeIntegral_dTd()
+{
+	// Component of the plate mass matrix coming from the displacement w(x,y) = d.U = [d1 d2 d3 d4 d5 d6 d7 d8 d9].U
+	// With d = [N1, N2.y10 + N3.y20, -N2.x10 - N3.x20,
+	//           N4, N5.y10 + N6.y20, -N5.x10 - N6.x20,
+	//           N7, N8.y10 + N9.y20, -N8.x10 - N9.x20]
+	// Let's define lambda = 1 - xi - eta
+	// N1(xi, eta) = 3.lambda^2 - 2.lambda^3 + 2.xi.eta.lambda
+	// N2(xi, eta) = lambda^2.xi + xi.eta.lambda/2
+	// N3(xi, eta) = lambda^2.eta + xi.eta.lambda/2
+	// N4(xi, eta) = 3.xi^2 - 2.xi^3 + 2.xi.eta.lambda
+	// N5(xi, eta) = xi^2.(xi - 1) - xi.eta.lambda
+	// N6(xi, eta) = xi^2.eta + xi.eta.lambda/2
+	// N7(xi, eta) = 3.eta^2 - 2.eta^3 + 2.xi.eta.lambda
+	// N8(xi, eta) = eta^2.xi + xi.eta.lambda/2
+	// N9(xi, eta) = eta^2.(eta - 1) - xi.eta.lambda
+	// For more details, c.f. "Shell elements: modelizations DKT, DST, DKTG and Q4g", Code_Aster, 2013, Thomas De Soza.
+	// w = N1.w1 + N2.dw1/dxi + N3.dw1/deta
+	//   + N4.w2 + N5.dw2/dxi + N6.dw2/deta
+	//   + N7.w3 + N8.dw3/dxi + N9.dw3/deta
+	//
+	// Note that J = (dx/dxi=x10   dy/dxi=y10 )
+	//               (dx/deta=x20  dy/deta=y20)
+	// And dw/dx = -thetay
+	// And dw/dy = thetax
+
+	// with dwi/dxi = dwi/dx.dx/dxi + dwi/dy.dy/dxi = -thetayi.x10 + thetaxi.y10
+	// with dwi/deta = dwi/dx.dx/deta + dwi/dy.dy/deta = -thetayi.x20 + thetaxi.y20
+
+	// m_integral_dT_d(i, j) = int_0^1 int_0^{1-eta} di.dj dxi deta
+
+	m_integral_dT_d.resize(9, 9);
+
+	// In the local space, the triangle point coordinates are A(x0=0, y0=0) B(x1, y1=0) C(x2, y2)
+	const double x1 = -m_xij[2]; // -(x0 - x1) = x1 (as x0 = 0)
+	const double x2 = m_xij[1];  // x2 - x0    = x2 (as x0 = 0)
+	const double y2 = m_yij[1];  // y2 - y0)   = y2 (as y1 = 0)
+
+	const double x1x1 = x1 * x1;
+	const double x2x2 = x2 * x2;
+	const double y2y2 = y2 * y2;
+	const double x1x2 = x1 * x2;
+
+	m_integral_dT_d(0, 0) = 121.0 / 1260.0;
+	m_integral_dT_d(0, 1) = 13.0 / 1260.0 * y2;
+	m_integral_dT_d(0, 2) = 13.0 / 1260.0 * (-x1 - x2);
+	m_integral_dT_d(0, 3) = 89.0 / 2520.0;
+	m_integral_dT_d(0, 4) = 19.0 / 5040.0 * y2;
+	m_integral_dT_d(0, 5) = (53.0 * x1 - 19.0 * x2) / 5040.0;
+	m_integral_dT_d(0, 6) = 89.0 / 2520.0;
+	m_integral_dT_d(0, 7) = 53.0 / 5040.0 * (-y2);
+	m_integral_dT_d(0, 8) = (53.0 * x2 - 19.0 * x1) / 5040.0;
+
+	m_integral_dT_d(1, 0) = m_integral_dT_d(0, 1); // symmetric part
+	m_integral_dT_d(1, 1) = 31.0 / 20160.0 * y2y2;
+	m_integral_dT_d(1, 2) = (-y2) / 20160.0 * (19.0 * x1 + 31.0 * x2);
+	m_integral_dT_d(1, 3) = 19.0 / 5040.0 * y2;
+	m_integral_dT_d(1, 4) = 11.0 / 20160.0 * y2y2;
+	m_integral_dT_d(1, 5) = y2 / 20160.0 * (24.0 * x1 - 11.0 * x2);
+	m_integral_dT_d(1, 6) = 17.0 / 2520.0 * y2;
+	m_integral_dT_d(1, 7) = 19.0 / 10080.0 * (-y2y2);
+	m_integral_dT_d(1, 8) = (-y2) / 20160.0 * (13.0 * x1 - 38.0 * x2);
+
+	m_integral_dT_d(2, 0) = m_integral_dT_d(0, 2); // symmetric part
+	m_integral_dT_d(2, 1) = m_integral_dT_d(1, 2); // symmetric part
+	m_integral_dT_d(2, 2) = (31.0 * (x1x1 + x2x2) + 2.0 * 19.0 * x1x2) / 20160.0;
+	m_integral_dT_d(2, 3) = (-19.0 * x2 - 2.0 * 17.0 * x1) / 5040.0;
+	m_integral_dT_d(2, 4) = (-y2) / 20160.0 * (13.0 * x1 + 11.0 * x2);
+	m_integral_dT_d(2, 5) = (11.0 * x2 * (x2 - x1) - 2.0 * 19.0 * x1x1) / 20160.0;
+	m_integral_dT_d(2, 6) = (-19.0 * x1 - 2.0 * 17.0 * x2) / 5040.0;
+	m_integral_dT_d(2, 7) = y2 / 10080.0 * (12.0 * x1 + 19.0 * x2);
+	m_integral_dT_d(2, 8) = (11.0 * x1 * (x1 - x2) - 2.0 * 19.0 * x2x2) / 20160.0;
+
+	m_integral_dT_d(3, 0) = m_integral_dT_d(0, 3); // symmetric part
+	m_integral_dT_d(3, 1) = m_integral_dT_d(1, 3); // symmetric part
+	m_integral_dT_d(3, 2) = m_integral_dT_d(2, 3); // symmetric part
+	m_integral_dT_d(3, 3) = 121.0 / 1260.0;
+	m_integral_dT_d(3, 4) = 13.0 / 1260.0 * y2;
+	m_integral_dT_d(3, 5) = (-13.0 * x2 + 2.0 * 13.0 * x1) / 1260.0;
+	m_integral_dT_d(3, 6) = 89.0 / 2520.0;
+	m_integral_dT_d(3, 7) = 53.0 / 5040.0 * (-y2);
+	m_integral_dT_d(3, 8) = (53.0 * x2 - 2.0 * 17.0 * x1)/ 5040.0;
+
+	m_integral_dT_d(4, 0) = m_integral_dT_d(0, 4); // symmetric part
+	m_integral_dT_d(4, 1) = m_integral_dT_d(1, 4); // symmetric part
+	m_integral_dT_d(4, 2) = m_integral_dT_d(2, 4); // symmetric part
+	m_integral_dT_d(4, 3) = m_integral_dT_d(3, 4); // symmetric part
+	m_integral_dT_d(4, 4) = 31.0 / 20160.0 * y2y2;
+	m_integral_dT_d(4, 5) = y2 / 20160.0 * (50.0 * x1 - 31.0 * x2);
+	m_integral_dT_d(4, 6) = 17.0 / 2520.0 * y2;
+	m_integral_dT_d(4, 7) = 19.0 / 10080.0 * (-y2y2);
+	m_integral_dT_d(4, 8) = (-y2) / 20160.0 * (25.0 * x1 - 38.0 * x2);
+
+	m_integral_dT_d(5, 0) = m_integral_dT_d(0, 5); // symmetric part
+	m_integral_dT_d(5, 1) = m_integral_dT_d(1, 5); // symmetric part
+	m_integral_dT_d(5, 2) = m_integral_dT_d(2, 5); // symmetric part
+	m_integral_dT_d(5, 3) = m_integral_dT_d(3, 5); // symmetric part
+	m_integral_dT_d(5, 4) = m_integral_dT_d(4, 5); // symmetric part
+	m_integral_dT_d(5, 5) = (20.0 * 5.0 * x1 * (x1 - x2) + 31.0 * x2x2) / 20160.0;
+	m_integral_dT_d(5, 6) = (53.0 * x1 - 2.0 * 17.0 * x2) / 5040.0;
+	m_integral_dT_d(5, 7) = (-y2) / 10080.0 * (31.0 * x1 - 19.0 * x2);
+	m_integral_dT_d(5, 8) = 19.0 * (-x1x1 - x2x2) / 10080.0 + 29.0 / 6720.0 * x1x2;
+
+	m_integral_dT_d(6, 0) = m_integral_dT_d(0, 6); // symmetric part
+	m_integral_dT_d(6, 1) = m_integral_dT_d(1, 6); // symmetric part
+	m_integral_dT_d(6, 2) = m_integral_dT_d(2, 6); // symmetric part
+	m_integral_dT_d(6, 3) = m_integral_dT_d(3, 6); // symmetric part
+	m_integral_dT_d(6, 4) = m_integral_dT_d(4, 6); // symmetric part
+	m_integral_dT_d(6, 5) = m_integral_dT_d(5, 6); // symmetric part
+	m_integral_dT_d(6, 6) = 121.0 / 1260.0;
+	m_integral_dT_d(6, 7) = (-y2) * 13.0 / 630.0;
+	m_integral_dT_d(6, 8) = (-13.0 * x1 + 2.0 * 13.0 * x2) / 1260.0;
+
+	m_integral_dT_d(7, 0) = m_integral_dT_d(0, 7); // symmetric part
+	m_integral_dT_d(7, 1) = m_integral_dT_d(1, 7); // symmetric part
+	m_integral_dT_d(7, 2) = m_integral_dT_d(2, 7); // symmetric part
+	m_integral_dT_d(7, 3) = m_integral_dT_d(3, 7); // symmetric part
+	m_integral_dT_d(7, 4) = m_integral_dT_d(4, 7); // symmetric part
+	m_integral_dT_d(7, 5) = m_integral_dT_d(5, 7); // symmetric part
+	m_integral_dT_d(7, 6) = m_integral_dT_d(6, 7); // symmetric part
+	m_integral_dT_d(7, 7) = 5.0 / 1008.0 * y2y2;
+	m_integral_dT_d(7, 8) = 5.0 / 2016.0 * y2 * (x1 - 2.0 * x2);
+
+	m_integral_dT_d(8, 0) = m_integral_dT_d(0, 8); // symmetric part
+	m_integral_dT_d(8, 1) = m_integral_dT_d(1, 8); // symmetric part
+	m_integral_dT_d(8, 2) = m_integral_dT_d(2, 8); // symmetric part
+	m_integral_dT_d(8, 3) = m_integral_dT_d(3, 8); // symmetric part
+	m_integral_dT_d(8, 4) = m_integral_dT_d(4, 8); // symmetric part
+	m_integral_dT_d(8, 5) = m_integral_dT_d(5, 8); // symmetric part
+	m_integral_dT_d(8, 6) = m_integral_dT_d(6, 8); // symmetric part
+	m_integral_dT_d(8, 7) = m_integral_dT_d(7, 8); // symmetric part
+	m_integral_dT_d(8, 8) = 5.0 / 1008.0 * x2 * (x2 - x1) + 31.0 / 20160.0 * x1x1;
+}
+
+void Fem2DElementTriangle::computeIntegral_HxHxT()
+{
+	// Compute the integral terms of Batoz Hx product functions
+	// m_integralHxiHxj(i, j) = int_0^1 int_0^{1-eta} Hxi.Hxj dxi deta
+
+	const double &a4 = m_ak[0];
+	const double &a5 = m_ak[1];
+	const double &a6 = m_ak[2];
+
+	const double &b4 = m_bk[0];
+	const double &b5 = m_bk[1];
+	const double &b6 = m_bk[2];
+
+	const double &c4 = m_ck[0];
+	const double &c5 = m_ck[1];
+	const double &c6 = m_ck[2];
+
+	m_integralHxiHxj.resize(9, 9);
+
+	m_integralHxiHxj(0, 0) = 1./5. * (a6 * a6 - a5 * a6 + a5 * a5);
+	m_integralHxiHxj(0, 1) = 1./15. * (b6 * (2.0 * a6 - a5) + b5 * (a6 - 2.0 * a5));
+	m_integralHxiHxj(0, 2) = 1./15. * (c6 * (-2.0 * a6 + a5) + c5 *(-a6 + 2.0 * a5));
+	m_integralHxiHxj(0, 3) = 1./10. * (a6 * (-2.0 * a6 + a5) + a4 * (a6 - a5));
+	m_integralHxiHxj(0, 4) = 1./15. * (b6 * (2.0 * a6 - a5) + b4 * (a6 - a5));
+	m_integralHxiHxj(0, 5) = 1./60. * a5 + 1./15. * (c6 * (-2.0 * a6 + a5) + c4 * (-a6 + a5));
+	m_integralHxiHxj(0, 6) = 1./10. * (a5 * (a6 - 2.0 * a5) + a4 * (-a6 + a5));
+	m_integralHxiHxj(0, 7) = 1./15. * (b5 * (a6 - 2.0 * a5) + b4 * (a6 - a5));
+	m_integralHxiHxj(0, 8) = -1./60. * a6 + 1./15. * (c5 * (-a6 + 2.0 * a5) + c4 * (-a6 + a5));
+
+	m_integralHxiHxj(1, 0) = m_integralHxiHxj(0, 1); // symmetric part
+	m_integralHxiHxj(1, 1) = 4./45. * (b5 * b5 + b5 * b6 + b6 * b6);
+	m_integralHxiHxj(1, 2) = 2./45. * (c5 * (-2.0 * b5 - b6) + c6 * (-b5 - 2.0 * b6));
+	m_integralHxiHxj(1, 3) = 1./15. * (a6 * (-2.0 * b6 - b5) + a4 * (b6 + b5));
+	m_integralHxiHxj(1, 4) = 2./45. * (b6 * (b5 + 2.0 * b6) + b4 * (b6 + b5));
+	m_integralHxiHxj(1, 5) = -1./90. * b5 + 2./45. * (c6 * (-2.0 * b6 - b5) - c4 * (b6 + b5));
+	m_integralHxiHxj(1, 6) = 1./15. * (a5 * (b6 + 2.0 * b5) - a4 * (b6 + b5));
+	m_integralHxiHxj(1, 7) = 2./45. * (b5 * (b6 + 2.0 * b5) + b4 * (b6 + b5));
+	m_integralHxiHxj(1, 8) = -1./90. * b6 - 2./45. * (c5 * (2.0 * b5 + b6) + c4 * (b6 + b5));
+
+	m_integralHxiHxj(2, 0) = m_integralHxiHxj(0, 2); // symmetric part
+	m_integralHxiHxj(2, 1) = m_integralHxiHxj(1, 2); // symmetric part
+	m_integralHxiHxj(2, 2) = 1./60. + 4./45. * (c5 * c5 + c6 * c6 + c5 * c6);
+	m_integralHxiHxj(2, 3) = -1./60. * a4 + 1./15. * (-a4 * (c6 + c5) + a6 * (2.0 * c6 + c5));
+	m_integralHxiHxj(2, 4) = -1./90. * b4 - 2./45. * (b6 * (c5 + 2.0 * c6) + b4 * (c6 + c5));
+	m_integralHxiHxj(2, 5) = -1./360. + 1./90. * (c5 + c4) + 2./45. * (c6 * (2.0 * c6 + c5) + c4 * (c6 + c5));
+	m_integralHxiHxj(2, 6) = 1./60. * a4 + 1./15. * (a4 * (c6 + c5) - a5 * (c6 + 2.0 * c5));
+	m_integralHxiHxj(2, 7) = -1./90. * b4 - 2./45. * (b5 * (2.0 * c5 + c6) + b4 * (c6 + c5));
+	m_integralHxiHxj(2, 8) = -1./360. + 1./90. * (c6 + c4) + 2./45. * (c5 * (2.0 * c5 + c6) + c4 * (c6 + c5));
+
+	m_integralHxiHxj(3, 0) = m_integralHxiHxj(0, 3); // symmetric part
+	m_integralHxiHxj(3, 1) = m_integralHxiHxj(1, 3); // symmetric part
+	m_integralHxiHxj(3, 2) = m_integralHxiHxj(2, 3); // symmetric part
+	m_integralHxiHxj(3, 3) = 1./5. * (a6 * a6 - a6 * a4 + a4 * a4);
+	m_integralHxiHxj(3, 4) = 1./15. * (b6 * (-2.0 * a6 + a4) + b4 * (-a6 + 2.0 * a4));
+	m_integralHxiHxj(3, 5) = 1./15. * (c6 * (-a4 + 2.0 * a6) + c4 * (-2.0 * a4 + a6));
+	m_integralHxiHxj(3, 6) = 1./10. * (a6 * (-a5 + a4) + a4 * (a5 - 2.0 * a4));
+	m_integralHxiHxj(3, 7) = 1./15. * (-a6 * (b4 + b5) + a4 * (2.0 * b4 + b5));
+	m_integralHxiHxj(3, 8) = 1./60. * a6 + 1./15. * (a6 * (c4 + c5) - a4 * (2.0 * c4 + c5));
+
+	m_integralHxiHxj(4, 0) = m_integralHxiHxj(0, 4); // symmetric part
+	m_integralHxiHxj(4, 1) = m_integralHxiHxj(1, 4); // symmetric part
+	m_integralHxiHxj(4, 2) = m_integralHxiHxj(2, 4); // symmetric part
+	m_integralHxiHxj(4, 3) = m_integralHxiHxj(3, 4); // symmetric part
+	m_integralHxiHxj(4, 4) = 4./45. * (b6 * b6 + b6 * b4 + b4 * b4);
+	m_integralHxiHxj(4, 5) = -2./45. * (b6 * (2.0 * b6 + c4) + b4 * (c6 + 2.0 * c4));
+	m_integralHxiHxj(4, 6) = 1./15. * (b6 * (a5 - a4) + b4 * (a5 - 2.0 * a4));
+	m_integralHxiHxj(4, 7) = 2./45. * (b6 * (b4 + b5) + b4 * (2.0 * b4 + b5));
+	m_integralHxiHxj(4, 8) = -1./90. * b6 - 2./45. * (b6 * (c4 + c5) + b4 * (2.0 * c4 + c5));
+
+	m_integralHxiHxj(5, 0) = m_integralHxiHxj(0, 5); // symmetric part
+	m_integralHxiHxj(5, 1) = m_integralHxiHxj(1, 5); // symmetric part
+	m_integralHxiHxj(5, 2) = m_integralHxiHxj(2, 5); // symmetric part
+	m_integralHxiHxj(5, 3) = m_integralHxiHxj(3, 5); // symmetric part
+	m_integralHxiHxj(5, 4) = m_integralHxiHxj(4, 5); // symmetric part
+	m_integralHxiHxj(5, 5) = 1./60. + 4./45. * (c6 * c6 + c6 * c4 + c4 * c4);
+	m_integralHxiHxj(5, 6) = -1./60. * a5 + 1./15. * (-a5 * (c6 + c4) + a4 * (c6 + 2.0 * c4));
+	m_integralHxiHxj(5, 7) = -1./90. * b5 - 2./45. * (c6 * (b4 + b5) + c4 * (b5 + 2.0 * b4));
+	m_integralHxiHxj(5, 8) = -1./360. + 1./90. * (c5 + c6) + 2./45. * (c4 * (2.0 * c4 + c5) + c6 * (c5 + c4));
+
+	m_integralHxiHxj(6, 0) = m_integralHxiHxj(0, 6); // symmetric part
+	m_integralHxiHxj(6, 1) = m_integralHxiHxj(1, 6); // symmetric part
+	m_integralHxiHxj(6, 2) = m_integralHxiHxj(2, 6); // symmetric part
+	m_integralHxiHxj(6, 3) = m_integralHxiHxj(3, 6); // symmetric part
+	m_integralHxiHxj(6, 4) = m_integralHxiHxj(4, 6); // symmetric part
+	m_integralHxiHxj(6, 5) = m_integralHxiHxj(5, 6); // symmetric part
+	m_integralHxiHxj(6, 6) = 1./5. * (a4 * a4 - a4 * a5 + a5 * a5);
+	m_integralHxiHxj(6, 7) = 1./15. * (a5 * (b4 + 2.0 * b5) - a4 * (2.0 * b4 + b5));
+	m_integralHxiHxj(6, 8) = 1./15. * (-a5 * (c4 + 2.0 * c5) + a4 * (2.0 * c4 + c5));
+
+	m_integralHxiHxj(7, 0) = m_integralHxiHxj(0, 7); // symmetric part
+	m_integralHxiHxj(7, 1) = m_integralHxiHxj(1, 7); // symmetric part
+	m_integralHxiHxj(7, 2) = m_integralHxiHxj(2, 7); // symmetric part
+	m_integralHxiHxj(7, 3) = m_integralHxiHxj(3, 7); // symmetric part
+	m_integralHxiHxj(7, 4) = m_integralHxiHxj(4, 7); // symmetric part
+	m_integralHxiHxj(7, 5) = m_integralHxiHxj(5, 7); // symmetric part
+	m_integralHxiHxj(7, 6) = m_integralHxiHxj(6, 7); // symmetric part
+	m_integralHxiHxj(7, 7) = 4./45. * (b4 * b4 + b4 * b5 + b5 * b5);
+	m_integralHxiHxj(7, 8) = -2./45. * (b4 * (2.0 * c4 + c5) + b5 * (c4 + 2.0 * c5));
+
+	m_integralHxiHxj(8, 0) = m_integralHxiHxj(0, 8); // symmetric part
+	m_integralHxiHxj(8, 1) = m_integralHxiHxj(1, 8); // symmetric part
+	m_integralHxiHxj(8, 2) = m_integralHxiHxj(2, 8); // symmetric part
+	m_integralHxiHxj(8, 3) = m_integralHxiHxj(3, 8); // symmetric part
+	m_integralHxiHxj(8, 4) = m_integralHxiHxj(4, 8); // symmetric part
+	m_integralHxiHxj(8, 5) = m_integralHxiHxj(5, 8); // symmetric part
+	m_integralHxiHxj(8, 6) = m_integralHxiHxj(6, 8); // symmetric part
+	m_integralHxiHxj(8, 7) = m_integralHxiHxj(7, 8); // symmetric part
+	m_integralHxiHxj(8, 8) = 1./60. + 4./45. * (c4 * c4 + c5 * c4 + c5 * c5);
+}
+
+void Fem2DElementTriangle::computeIntegral_HyHyT()
+{
+	// Compute the integral terms of Batoz Hy product functions
+	// m_integralHyiHyj(i, j) = int_0^1 int_0^{1-eta} Hyi.Hyj dxi deta
+
+	const double &b4 = m_bk[0];
+	const double &b5 = m_bk[1];
+	const double &b6 = m_bk[2];
+
+	const double &d4 = m_dk[0];
+	const double &d5 = m_dk[1];
+	const double &d6 = m_dk[2];
+
+	const double &e4 = m_ek[0];
+	const double &e5 = m_ek[1];
+	const double &e6 = m_ek[2];
+
+	m_integralHyiHyj.resize(9, 9);
+
+	m_integralHyiHyj(0, 0) = 1./5. * (d6 * d6 - d5 * d6 + d5 * d5);
+	m_integralHyiHyj(0, 1) = 1./15. * (d6 * (2.0 * e6 + e5) - d5 * (e6 + 2.0 * e5));
+	m_integralHyiHyj(0, 2) = 1./15. * (b6 * (-2.0 * d6 + d5) + b5 * (-d6 + 2.0 * d5));
+	m_integralHyiHyj(0, 3) = 1./10. * (d6 * (d4 - 2.0 * d6) + d5 * (-d4 + d6));
+	m_integralHyiHyj(0, 4) = -1./60. * d5 + 1./15. * (d6 * (2.0 * e6 + e4) - d5 * (e6 + e4));
+	m_integralHyiHyj(0, 5) = 1./15. * (b6 * (-2.0 * d6 + d5) + b4 * (-d6 + d5));
+	m_integralHyiHyj(0, 6) = 1./10. * (d6 * (d5 - d4) + d5 * (-2.0 * d5 + d4));
+	m_integralHyiHyj(0, 7) = 1./60. * d6 + 1./15. * (d6 * (e4 + e5) - d5 * (e4 + 2.0 * e5));
+	m_integralHyiHyj(0, 8) = 1./15. * (b5 * (-d6 + 2.0 * d5) + b4 * (-d6 + d5));
+
+	m_integralHyiHyj(1, 0) = m_integralHyiHyj(0, 1); // symmetric part
+	m_integralHyiHyj(1, 1) = 1./60. + 4./45. * (e6 * e6 + e5 * e6 + e5 * e5);
+	m_integralHyiHyj(1, 2) = 2./45. * (-e5 * (b6 + 2.0 * b5) - e6 * (b5 + 2.0 * b6));
+	m_integralHyiHyj(1, 3) = 1./60. * d4 + 1./15. * (e6 * (d4 - 2.0 * d6) + e5 * (-d6 + d4));
+	m_integralHyiHyj(1, 4) = -1./360. + 1./90. * (e5 + e4) + 2./45. * (e6 * (2.0 * e6 + e5) + e4 * (e5 + e6));
+	m_integralHyiHyj(1, 5) = -1./90. * b4 - 2./45. * (e5 * (b6 + b4) + e6 * (2.0 * b6 + b4));
+	m_integralHyiHyj(1, 6) = -1./60. * d4 + 1./15. * (e6 * (-d4 + d5) + e5 * (-d4 + 2.0 * d5));
+	m_integralHyiHyj(1, 7) = -1./360. + 1./90. * (e4 + e6) + 2./45. * (e6 * (e5 + e4) + e5 * (e4 + 2.0 * e5));
+	m_integralHyiHyj(1, 8) = -1./90. * b4 - 2./45. * (e5 * (b4 + 2.0 * b5) + e6 * (b5 + b4));
+
+	m_integralHyiHyj(2, 0) = m_integralHyiHyj(0, 2); // symmetric part
+	m_integralHyiHyj(2, 1) = m_integralHyiHyj(1, 2); // symmetric part
+	m_integralHyiHyj(2, 2) = 4./45. * (b5 * b5 + b5 * b6 + b6 * b6);
+	m_integralHyiHyj(2, 3) = 1./15. * (b6 * (2.0 * d6 - d4) + b5 * (d6 - d4));
+	m_integralHyiHyj(2, 4) = -1./90. * b5 - 2./45. * (b6 * (2.0 * e6 + e4) + b5 * (e6 + e4));
+	m_integralHyiHyj(2, 5) = 2./45. * (b6 * (2.0 * b6 + b4) + b5 *(b6 + b4));
+	m_integralHyiHyj(2, 6) = 1./15. * (b6 * (-d5 + d4) + b5 * (-2.0 * d5 + d4));
+	m_integralHyiHyj(2, 7) = -1./90. * b6 - 2./45. * (b6 * (e5 + e4) + b5 * (2.0 * e5 + e4));
+	m_integralHyiHyj(2, 8) = 2./45. * (b5 * (b4 + 2.0 * b5) + b6 *(b4 + b5));
+
+	m_integralHyiHyj(3, 0) = m_integralHyiHyj(0, 3); // symmetric part
+	m_integralHyiHyj(3, 1) = m_integralHyiHyj(1, 3); // symmetric part
+	m_integralHyiHyj(3, 2) = m_integralHyiHyj(2, 3); // symmetric part
+	m_integralHyiHyj(3, 3) = 1./5. * (d6 * d6 - d6 * d4 + d4 * d4);
+	m_integralHyiHyj(3, 4) = 1./15. * (d4 * (e6 + 2.0 * e4) - d6 * (2.0 * e6 + e4));
+	m_integralHyiHyj(3, 5) = 1./15. * (d6 * (2.0 * b6 + b4) - d4 * (b6 + 2.0 * b4));
+	m_integralHyiHyj(3, 6) = 1./10. * (d6 * (-d5 + d4) + d4 * (d5 - 2.0 * d4));
+	m_integralHyiHyj(3, 7) = -1./60. * d6 + 1./15. * (-d6 * (e4 + e5) + d4 * (2.0 * e4 + e5));
+	m_integralHyiHyj(3, 8) = 1./15. * (d6 * (b4 + b5) - d4 * (2.0 * b4 + b5));
+
+	m_integralHyiHyj(4, 0) = m_integralHyiHyj(0, 4); // symmetric part
+	m_integralHyiHyj(4, 1) = m_integralHyiHyj(1, 4); // symmetric part
+	m_integralHyiHyj(4, 2) = m_integralHyiHyj(2, 4); // symmetric part
+	m_integralHyiHyj(4, 3) = m_integralHyiHyj(3, 4); // symmetric part
+	m_integralHyiHyj(4, 4) = 1./60. + 4./45. * (e6 * e6 + e6 * e4 + e4 * e4);
+	m_integralHyiHyj(4, 5) = -2./45. * (e6 * (2.0 * b6 + b4) + e4 * (b6 + 2.0 * b4));
+	m_integralHyiHyj(4, 6) = 1./60. * d5 + 1./15. * (e6 * (d5 - d4) + e4 * (d5 - 2.0 * d4));
+	m_integralHyiHyj(4, 7) = -1./360. + 1./90. * (e6 + e5) + 2./45. * (e6 * (e5 + e4) + e4 * (e5 + 2.0 * e4));
+	m_integralHyiHyj(4, 8) = -1./90. * b5 - 2./45. * (e6 * (b5 + b4) + e4 * (b5 + 2.0 * b4));
+
+	m_integralHyiHyj(5, 0) = m_integralHyiHyj(0, 5); // symmetric part
+	m_integralHyiHyj(5, 1) = m_integralHyiHyj(1, 5); // symmetric part
+	m_integralHyiHyj(5, 2) = m_integralHyiHyj(2, 5); // symmetric part
+	m_integralHyiHyj(5, 3) = m_integralHyiHyj(3, 5); // symmetric part
+	m_integralHyiHyj(5, 4) = m_integralHyiHyj(4, 5); // symmetric part
+	m_integralHyiHyj(5, 5) = 4./45. * (b6 * b6 + b6 * b4 + b4 * b4);
+	m_integralHyiHyj(5, 6) = 1./15. * (b6 * (-d5 + d4) + b4 * (-d5 + 2.0 * d4));
+	m_integralHyiHyj(5, 7) = -1./90. * b6 - 2./45. * (b6 * (e4 + e5) + b4 * (2.0 * e4 + e5));
+	m_integralHyiHyj(5, 8) = 2./45. * (b6 * (b4 + b5) + b4 * (2.0 * b4 + b5));
+
+	m_integralHyiHyj(6, 0) = m_integralHyiHyj(0, 6); // symmetric part
+	m_integralHyiHyj(6, 1) = m_integralHyiHyj(1, 6); // symmetric part
+	m_integralHyiHyj(6, 2) = m_integralHyiHyj(2, 6); // symmetric part
+	m_integralHyiHyj(6, 3) = m_integralHyiHyj(3, 6); // symmetric part
+	m_integralHyiHyj(6, 4) = m_integralHyiHyj(4, 6); // symmetric part
+	m_integralHyiHyj(6, 5) = m_integralHyiHyj(5, 6); // symmetric part
+	m_integralHyiHyj(6, 6) = 1./5. * (d4 * d4 - d5 * d4 + d5 * d5);
+	m_integralHyiHyj(6, 7) = 1./15. * (d5 * (e4 + 2.0 * e5) - d4 * (2.0 * e4 + e5));
+	m_integralHyiHyj(6, 8) = 1./15. * (-d5 * (b4 + 2.0 * b5) + d4 * (2.0 * b4 + b5));
+
+	m_integralHyiHyj(7, 0) = m_integralHyiHyj(0, 7); // symmetric part
+	m_integralHyiHyj(7, 1) = m_integralHyiHyj(1, 7); // symmetric part
+	m_integralHyiHyj(7, 2) = m_integralHyiHyj(2, 7); // symmetric part
+	m_integralHyiHyj(7, 3) = m_integralHyiHyj(3, 7); // symmetric part
+	m_integralHyiHyj(7, 4) = m_integralHyiHyj(4, 7); // symmetric part
+	m_integralHyiHyj(7, 5) = m_integralHyiHyj(5, 7); // symmetric part
+	m_integralHyiHyj(7, 6) = m_integralHyiHyj(6, 7); // symmetric part
+	m_integralHyiHyj(7, 7) = 1./60. + 4./45. * (e4 * e4 + e4 * e5 + e5 * e5);
+	m_integralHyiHyj(7, 8) = -2./45. * (e4 * (2.0 * b4 + b5) + e5 * (b4 + 2.0 * b5));
+
+	m_integralHyiHyj(8, 0) = m_integralHyiHyj(0, 8); // symmetric part
+	m_integralHyiHyj(8, 1) = m_integralHyiHyj(1, 8); // symmetric part
+	m_integralHyiHyj(8, 2) = m_integralHyiHyj(2, 8); // symmetric part
+	m_integralHyiHyj(8, 3) = m_integralHyiHyj(3, 8); // symmetric part
+	m_integralHyiHyj(8, 4) = m_integralHyiHyj(4, 8); // symmetric part
+	m_integralHyiHyj(8, 5) = m_integralHyiHyj(5, 8); // symmetric part
+	m_integralHyiHyj(8, 6) = m_integralHyiHyj(6, 8); // symmetric part
+	m_integralHyiHyj(8, 7) = m_integralHyiHyj(7, 8); // symmetric part
+	m_integralHyiHyj(8, 8) = 4./45. * (b4 * b4 + b4 * b5 + b5 * b5);
+}
+
 void Fem2DElementTriangle::computeShapeFunctionsParameters(const SurgSim::Math::OdeState& restState)
 {
 	SURGSIM_ASSERT(m_nodeIds[0] < restState.getNumNodes()) << "Invalid nodeId[0] = " << m_nodeIds[0] <<
@@ -533,109 +848,116 @@ void Fem2DElementTriangle::computeShapeFunctionsParameters(const SurgSim::Math::
 		m_tk[k]  = 6.0 * m_dk[k];                                  // tk      = -6yij/lij^2    = 6dk
 		m_rk[k]  = 3.0 * m_yij[k] * m_yij[k] / m_lij_sqr[k];       // rk      = 3yij^2/lij^2
 	}
+
+	// Pre-compute the 3 integral terms useful for the plate mass matrix
+	computeIntegral_dTd();    // associated to the displacement along z (noted w)
+	computeIntegral_HyHyT();  // associated to the displacement along thetax
+	computeIntegral_HxHxT();  // associated to the displacement along thetay
 }
 
-std::array<double, 9> Fem2DElementTriangle::batozDhxDxi(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhxDxi(double xi, double eta) const
 {
 	std::array<double, 9> res;
 
 	double a = 1.0 - 2.0 * xi;
 
-	res[0] = m_Pk[2] * a + (m_Pk[1] - m_Pk[2]) * neta;                   // P6(1-2xi) + (P5-P6)neta
-	res[1] = m_qk[2] * a - (m_qk[1] + m_qk[2]) * neta;                   // q6(1-2xi) - (q5-q6)neta
-	res[2] = -4.0 + 6.0 * (xi + neta) + m_rk[2] * a - neta * (m_rk[1] + m_rk[2]); // -4 + 6(xi+neta) + r6(1-2xi) -
-																				  // neta(r5+r6)
-	res[3] = -m_Pk[2] * a + neta * (m_Pk[0] + m_Pk[2]);                  // -P6(1-2xi) + neta(P4+P6)
-	res[4] = m_qk[2] * a - neta * (m_qk[2] - m_qk[0]);                   // q6(1-2xi) - neta(q6-q4)
-	res[5] = -2.0 + 6.0 * xi + m_rk[2] * a + neta * (m_rk[0] - m_rk[2]); // -2 + 6xi + r6(1-2xi) + neta(r4-r6)
+	res[0] = m_Pk[2] * a + (m_Pk[1] - m_Pk[2]) * eta;                   // P6(1-2xi) + (P5-P6)eta
+	res[1] = m_qk[2] * a - (m_qk[1] + m_qk[2]) * eta;                   // q6(1-2xi) - (q5-q6)eta
+	res[2] = -4.0 + 6.0 * (xi + eta) + m_rk[2] * a -                    // -4 + 6(xi+eta) + r6(1-2xi) - eta(r5+r6)
+		eta * (m_rk[1] + m_rk[2]);
 
-	res[6] = -neta * (m_Pk[1] + m_Pk[0]);                                // -neta(P5+P4)
-	res[7] = neta * (m_qk[0] - m_qk[1]);                                 // neta(a4-a5)
-	res[8] = -neta * (m_rk[1] - m_rk[0]);                                // -neta(r5-r4)
+	res[3] = -m_Pk[2] * a + eta * (m_Pk[0] + m_Pk[2]);                  // -P6(1-2xi) + eta(P4+P6)
+	res[4] = m_qk[2] * a - eta * (m_qk[2] - m_qk[0]);                   // q6(1-2xi) - eta(q6-q4)
+	res[5] = -2.0 + 6.0 * xi + m_rk[2] * a + eta * (m_rk[0] - m_rk[2]); // -2 + 6xi + r6(1-2xi) + eta(r4-r6)
+
+	res[6] = -eta * (m_Pk[1] + m_Pk[0]);                                // -eta(P5+P4)
+	res[7] = eta * (m_qk[0] - m_qk[1]);                                 // eta(a4-a5)
+	res[8] = -eta * (m_rk[1] - m_rk[0]);                                // -eta(r5-r4)
 
 	return res;
 }
 
-std::array<double, 9> Fem2DElementTriangle::batozDhxDneta(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhxDeta(double xi, double eta) const
 {
 	std::array<double, 9> res;
-	double a = 1.0 - 2.0 * neta;
+	double a = 1.0 - 2.0 * eta;
 
-	res[0] = -m_Pk[1] * a - xi * (m_Pk[2] - m_Pk[1]);                    // -P5(1-2neta) - xi(P6-P5)
-	res[1] =  m_qk[1] * a - xi * (m_qk[1] + m_qk[2]);                    //  q5(1-2neta) - xi(q5+q6)
-	res[2] = -4.0 + 6.0 * (xi + neta) + m_rk[1] * a - xi * (m_rk[1] + m_rk[2]); // -4 + 6(xi+neta) + r5(1-2neta) -
-																				// xi(r5+r6)
+	res[0] = -m_Pk[1] * a - xi * (m_Pk[2] - m_Pk[1]);                    // -P5(1-2eta) - xi(P6-P5)
+	res[1] =  m_qk[1] * a - xi * (m_qk[1] + m_qk[2]);                    //  q5(1-2eta) - xi(q5+q6)
+	res[2] = -4.0 + 6.0 * (xi + eta) + m_rk[1] * a -                     // -4 + 6(xi+eta) + r5(1-2eta) - xi(r5+r6)
+		xi * (m_rk[1] + m_rk[2]);
+
 	res[3] = xi * (m_Pk[0] + m_Pk[2]);                                   //  xi(P4+P6)
 	res[4] = xi * (m_qk[0] - m_qk[2]);                                   //  xi(q4-q6)
 	res[5] = -xi * (m_rk[2] - m_rk[0]);                                  // -xi(r6-r4)
 
-	res[6] = m_Pk[1] * a - xi * (m_Pk[0] + m_Pk[1]);                     //  P5(1-2neta) - xi(P4+P5)
-	res[7] = m_qk[1] * a + xi * (m_qk[0] - m_qk[1]);                     //  q5(1-2neta) + xi(q4-q5)
-	res[8] = -2.0 + 6.0 * neta + m_rk[1] * a + xi * (m_rk[0] - m_rk[1]); // -2 + 6neta + r5(1-2neta) + xi(r4-r5)
+	res[6] = m_Pk[1] * a - xi * (m_Pk[0] + m_Pk[1]);                     //  P5(1-2eta) - xi(P4+P5)
+	res[7] = m_qk[1] * a + xi * (m_qk[0] - m_qk[1]);                     //  q5(1-2eta) + xi(q4-q5)
+	res[8] = -2.0 + 6.0 * eta + m_rk[1] * a + xi * (m_rk[0] - m_rk[1]);  // -2 + 6eta + r5(1-2eta) + xi(r4-r5)
 
 	return res;
 }
 
-std::array<double, 9> Fem2DElementTriangle::batozDhyDxi(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhyDxi(double xi, double eta) const
 {
 	std::array<double, 9> res;
 	double a = 1.0 - 2.0 * xi;
 
-	res[0] = m_tk[2] * a + neta * (m_tk[1] - m_tk[2]);        // t6(1-2xi) + neta(t5-t6)
-	res[1] = 1.0 + m_rk[2] * a - neta * (m_rk[1] + m_rk[2]);  // 1+r6(1-2xi) - neta(r5+r6)
-	res[2] = -m_qk[2] * a + neta * (m_qk[1] + m_qk[2]);       // -q6(1-2xi) + neta(q5+q6)
+	res[0] = m_tk[2] * a + eta * (m_tk[1] - m_tk[2]);        // t6(1-2xi) + eta(t5-t6)
+	res[1] = 1.0 + m_rk[2] * a - eta * (m_rk[1] + m_rk[2]);  // 1+r6(1-2xi) - eta(r5+r6)
+	res[2] = -m_qk[2] * a + eta * (m_qk[1] + m_qk[2]);       // -q6(1-2xi) + eta(q5+q6)
 
-	res[3] = -m_tk[2] * a + neta * (m_tk[0] + m_tk[2]);       // -t6(1-2xi) + neta(t4+t6)
-	res[4] = -1.0 + m_rk[2] * a + neta * (m_rk[0] - m_rk[2]); // -1 + r6(1-2xi) + neta(r4-r6)
-	res[5] = -m_qk[2] * a - neta * (m_qk[0] - m_qk[2]);       // -q6(1-2xi) - neta(q4-q6)
+	res[3] = -m_tk[2] * a + eta * (m_tk[0] + m_tk[2]);       // -t6(1-2xi) + eta(t4+t6)
+	res[4] = -1.0 + m_rk[2] * a + eta * (m_rk[0] - m_rk[2]); // -1 + r6(1-2xi) + eta(r4-r6)
+	res[5] = -m_qk[2] * a - eta * (m_qk[0] - m_qk[2]);       // -q6(1-2xi) - eta(q4-q6)
 
-	res[6] = -neta * (m_tk[0] + m_tk[1]);                     // -neta(t4+t5)
-	res[7] = neta * (m_rk[0] - m_rk[1]);                      // neta(r4-r5)
-	res[8] = -neta * (m_qk[0] - m_qk[1]);                     // -neta(q4-q5)
+	res[6] = -eta * (m_tk[0] + m_tk[1]);                     // -eta(t4+t5)
+	res[7] = eta * (m_rk[0] - m_rk[1]);                      // eta(r4-r5)
+	res[8] = -eta * (m_qk[0] - m_qk[1]);                     // -eta(q4-q5)
 
 	return res;
 }
 
-std::array<double, 9> Fem2DElementTriangle::batozDhyDneta(double xi, double neta) const
+std::array<double, 9> Fem2DElementTriangle::batozDhyDeta(double xi, double eta) const
 {
 	std::array<double, 9> res;
-	double a = 1.0 - 2.0 * neta;
+	double a = 1.0 - 2.0 * eta;
 
-	res[0] = -m_tk[1] * a - xi * (m_tk[2] - m_tk[1]);       // -t5(1-2neta) - xi(t6-t5)
-	res[1] = 1.0 + m_rk[1] * a - xi * (m_rk[1] + m_rk[2]);  // 1+r5(1-2neta) - xi(r5+r6)
-	res[2] = -m_qk[1] * a + xi * (m_qk[1] + m_qk[2]);       // -q5(1-2neta) + xi(q5+q6)
+	res[0] = -m_tk[1] * a - xi * (m_tk[2] - m_tk[1]);       // -t5(1-2eta) - xi(t6-t5)
+	res[1] = 1.0 + m_rk[1] * a - xi * (m_rk[1] + m_rk[2]);  // 1+r5(1-2eta) - xi(r5+r6)
+	res[2] = -m_qk[1] * a + xi * (m_qk[1] + m_qk[2]);       // -q5(1-2eta) + xi(q5+q6)
 
 	res[3] = xi * (m_tk[0] + m_tk[2]);                      // xi(t4+t6)
 	res[4] = xi * (m_rk[0] - m_rk[2]);                      // xi(r4-r6)
 	res[5] = -xi * (m_qk[0] - m_qk[2]);                     // -xi(q4-q6)
 
-	res[6] = m_tk[1] * a - xi * (m_tk[0] + m_tk[1]);        // t5(1-2neta) - xi(t4+t5)
-	res[7] = -1.0 + m_rk[1] * a + xi * (m_rk[0] - m_rk[1]); // -1 + r5(1-2neta) + xi (r4-r5)
-	res[8] = -m_qk[1] * a - xi * (m_qk[0] - m_qk[1]);       // -q5(1-2neta) - xi(q4-q5)
+	res[6] = m_tk[1] * a - xi * (m_tk[0] + m_tk[1]);        // t5(1-2eta) - xi(t4+t5)
+	res[7] = -1.0 + m_rk[1] * a + xi * (m_rk[0] - m_rk[1]); // -1 + r5(1-2eta) + xi (r4-r5)
+	res[8] = -m_qk[1] * a - xi * (m_qk[0] - m_qk[1]);       // -q5(1-2eta) - xi(q4-q5)
 
 	return res;
 }
 
-Fem2DElementTriangle::Matrix39Type Fem2DElementTriangle::batozStrainDisplacement(double xi, double neta)const
+Fem2DElementTriangle::Matrix39Type Fem2DElementTriangle::batozStrainDisplacement(double xi, double eta)const
 {
 	Matrix39Type res;
-	std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
+	std::array<double, 9> dHx_dxi, dHx_deta, dHy_dxi, dHy_deta;
 	double coefficient = 1.0 / (2.0 * m_restArea);
 
-	dHx_dxi   = batozDhxDxi(xi, neta);
-	dHx_dneta = batozDhxDneta(xi, neta);
-	dHy_dxi   = batozDhyDxi(xi, neta);
-	dHy_dneta = batozDhyDneta(xi, neta);
+	dHx_dxi   = batozDhxDxi(xi, eta);
+	dHx_deta = batozDhxDeta(xi, eta);
+	dHy_dxi   = batozDhyDxi(xi, eta);
+	dHy_deta = batozDhyDeta(xi, eta);
 
 	for(size_t i = 0; i < 9; ++i)
 	{
 		//  4 -> mid-edge 12
 		//  5 -> mid-edge 20
 		//  6 -> mid-edge 01
-		res(0, i) = coefficient * ( m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_dneta[i]);
-		res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_dneta[i]);
+		res(0, i) = coefficient * ( m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_deta[i]);
+		res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_deta[i]);
 		res(2, i) = coefficient *
-			(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_dneta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_dneta[i]);
+			(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_deta[i]);
 	}
 
 	return res;
