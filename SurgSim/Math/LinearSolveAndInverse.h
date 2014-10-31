@@ -62,9 +62,12 @@ public:
 
 /// Derivation for tri-diagonal block matrix type
 /// \tparam BlockSize Define the block size of the tri-diagonal block matrix
-template <int BlockSize>
+template <size_t BlockSize>
 class LinearSolveAndInverseTriDiagonalBlockMatrix : public LinearSolveAndInverse
 {
+public:
+	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+
 protected:
 	/// Computes the inverse matrix
 	/// \param A The matrix to inverse
@@ -80,9 +83,6 @@ protected:
 	Matrix m_inverse;
 
 private:
-	static_assert(BlockSize > 0,
-		"Cannot define a tri-diagonal block matrix with block size 0 or negative");
-
 	typedef Eigen::Matrix<Matrix::Scalar, BlockSize, BlockSize, Matrix::Options> Block;
 
 	/// Gets a lower-diagonal block element (named -Ai in the algorithm)
@@ -107,14 +107,11 @@ private:
 	/// Intermediate block matrices, helpful to construct the inverse matrix
 	std::vector<Block> m_Di, m_Ei, m_Bi_AiDiminus1_inv;
 	///@}
-
-public:
-	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
 };
 
 /// Derivation for symmetric tri-diagonal block matrix type
 /// \tparam BlockSize Define the block size of the tri-diagonal block matrix
-template <int BlockSize>
+template <size_t BlockSize>
 class LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix :
 	public LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>
 {

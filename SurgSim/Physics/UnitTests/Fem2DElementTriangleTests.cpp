@@ -502,15 +502,27 @@ public:
 
 	void getExpectedLocalMassMatrix(Eigen::Ref<SurgSim::Math::Matrix> mass)
 	{
-		// This is hard-coded for density(rho)=1000 A=0.5 thickness=1e-2
+		double m = m_rho * m_thickness * m_A;
+
 		mass.setIdentity();
-		for (size_t nodeId = 0; nodeId < 3; ++nodeId)
-		{
-			mass.block(6 * nodeId, 6 * nodeId, 3, 3).setConstant(5.0 / 12.0);
-			mass.block(6 * nodeId, 6 * nodeId, 3, 3).diagonal().setConstant(5.0 / 6.0);
-			mass.block(6 * nodeId + 3, 6 * nodeId + 3, 2, 2).setConstant(-6.25e-6);
-			mass.block(6 * nodeId + 3, 6 * nodeId + 3, 2, 2).diagonal().setConstant(6.0416666666666666e-5);
-		}
+
+		mass.block<2, 2>(0, 0).diagonal().setConstant(m / 6.0);
+		mass.block<2, 2>(0, 6).diagonal().setConstant(m / 12.0);
+		mass.block<2, 2>(0, 12).diagonal().setConstant(m / 12.0);
+		mass.block<2, 2>(3, 3).setConstant(-6.25e-6);
+		mass.block<2, 2>(3, 3).diagonal().setConstant(6.0416666666666666e-5);
+
+		mass.block<2, 2>(6, 0).diagonal().setConstant(m / 12.0);
+		mass.block<2, 2>(6, 6).diagonal().setConstant(m / 6.0);
+		mass.block<2, 2>(6, 12).diagonal().setConstant(m / 12.0);
+		mass.block<2, 2>(9, 9).setConstant(-6.25e-6);
+		mass.block<2, 2>(9, 9).diagonal().setConstant(6.0416666666666666e-5);
+
+		mass.block<2, 2>(12, 0).diagonal().setConstant(m / 12.0);
+		mass.block<2, 2>(12, 6).diagonal().setConstant(m / 12.0);
+		mass.block<2, 2>(12, 12).diagonal().setConstant(m / 6.0);
+		mass.block<2, 2>(15, 15).setConstant(-6.25e-6);
+		mass.block<2, 2>(15, 15).diagonal().setConstant(6.0416666666666666e-5);
 	}
 
 	void getExpectedLocalStiffnessMatrix(Eigen::Ref<SurgSim::Math::Matrix> stiffness)
@@ -1014,20 +1026,10 @@ TEST_F(Fem2DElementTriangleTests, MassMatrixTest)
 {
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
-	// We analytically test the 3x3 (x y z) component
-	// m = rho.A(123).t/12.0.[2 1 1]
-	//                       [1 2 1]
-	//                       [1 1 2]
-	double mass = m_rho * m_A * m_thickness;
-	Matrix33d M;
-	M.setConstant(mass / 12.0);
-	M.diagonal().setConstant(mass / 6.0);
-	EXPECT_TRUE(tri->getLocalMassMatrix().block(0,0,3,3).isApprox(M));
-
-	// And use a hard-coded mass matrix for expected matrix
 	Eigen::Matrix<double, 18, 18> expectedMassMatrix;
 	getExpectedLocalMassMatrix(expectedMassMatrix);
 	EXPECT_TRUE(tri->getLocalMassMatrix().isApprox(expectedMassMatrix));
+
 	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalMassMatrix().isApprox(R0 * expectedMassMatrix * R0.transpose()));
 }

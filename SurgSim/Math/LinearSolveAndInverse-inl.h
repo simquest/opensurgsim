@@ -24,28 +24,28 @@ namespace SurgSim
 namespace Math
 {
 
-template <int BlockSize>
+template <size_t BlockSize>
 const Eigen::Block<const Matrix, BlockSize, BlockSize>
 	LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::minusAi(const SurgSim::Math::Matrix& A, size_t i) const
 {
 	return A.block<BlockSize, BlockSize>(BlockSize * i, BlockSize * (i - 1));
 }
 
-template <int BlockSize>
+template <size_t BlockSize>
 const Eigen::Block<const Matrix, BlockSize, BlockSize>
 	LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::Bi(const SurgSim::Math::Matrix& A, size_t i) const
 {
 	return A.block<BlockSize, BlockSize>(BlockSize * i, BlockSize * i);
 }
 
-template <int BlockSize>
+template <size_t BlockSize>
 const Eigen::Block<const Matrix, BlockSize, BlockSize>
 	LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::minusCi(const SurgSim::Math::Matrix& A, size_t i) const
 {
 	return A.block<BlockSize, BlockSize>(BlockSize * i, BlockSize * (i + 1));
 }
 
-template <int BlockSize>
+template <size_t BlockSize>
 void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalBlock(const SurgSim::Math::Matrix& A,
 																					 SurgSim::Math::Matrix* inverse,
 																					 bool isSymmetric)
@@ -151,7 +151,7 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 	}
 }
 
-template <int BlockSize>
+template <size_t BlockSize>
 void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::operator ()(const Matrix& A, const Vector& b, Vector* x,
 																		 Matrix* Ainv)
 {
@@ -172,7 +172,7 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::operator ()(const M
 	}
 }
 
-template <int BlockSize>
+template <size_t BlockSize>
 void LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<BlockSize>::operator ()(const Matrix& A, const Vector& b,
 																				  Vector* x,
 																				  Matrix* Ainv)

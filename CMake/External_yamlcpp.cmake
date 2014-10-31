@@ -38,6 +38,11 @@ if(MSVC)
 		"${install_dir}/lib/libyaml-cppmdd${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_RELEASE
 		"${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}")
+	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_RELWITHDEBINFO
+		"${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}")
+	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_MINSIZREL
+		"${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}")
+		
 else()
 	if(BUILD_SHARED_LIBS)
 		add_library(yaml-cpp-lib SHARED IMPORTED)

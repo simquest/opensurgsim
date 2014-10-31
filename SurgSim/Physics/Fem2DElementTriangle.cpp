@@ -168,23 +168,27 @@ void Fem2DElementTriangle::addMatVec(const SurgSim::Math::OdeState& state, doubl
 	}
 }
 
-void Fem2DElementTriangle::computeMass(const SurgSim::Math::OdeState& state,
-								   Eigen::Matrix<double, 18, 18>* M)
+void Fem2DElementTriangle::computeLocalMass(const SurgSim::Math::OdeState& state,
+											Eigen::Matrix<double, 18, 18>* localMassMatrix)
 {
 	double mass = m_rho * m_restArea * m_thickness;
 
-	m_MLocal.setIdentity();
+	localMassMatrix->setIdentity();
 
 	for(size_t i = 0; i < 3; ++i)
 	{
+		size_t j = (i + 1) % 3;
+		size_t k = (j + 1) % 3;
+
 		// Membrane inertia matrix
 		// Przemieniecki book "Theory of Matrix Structural Analysis"
 		// Chapter 11.6, equation 11.42 for a in-plane triangle deformation
-		// m = rho.A(123).t/12.0.[2 1 1]
+		// m = rho.A(123).t/12.0.[2 1 1] for the axis X and Y
 		//                       [1 2 1]
 		//                       [1 1 2]
-		m_MLocal.block<3, 3>(i * 6, i * 6).setConstant(mass / 12.0);
-		m_MLocal.block<3, 3>(i * 6, i * 6).diagonal().setConstant(mass / 6.0);
+		localMassMatrix->block<2, 2>(i * 6, i * 6).diagonal().setConstant(mass / 6.0);
+		localMassMatrix->block<2, 2>(i * 6, j * 6).diagonal().setConstant(mass / 12.0);
+		localMassMatrix->block<2, 2>(i * 6, k * 6).diagonal().setConstant(mass / 12.0);
 
 		// Plate inertia matrix developed from Batoz paper
 		// Interpolation of the rotational displacement over the triangle w.r.t. DOF:
@@ -238,26 +242,33 @@ void Fem2DElementTriangle::computeMass(const SurgSim::Math::OdeState& state,
 		xy += 2.0 / 45.0 * ( m_bk[2] * (m_ek[0] + m_ck[0] + m_ek[1] + m_ck[1]) );
 
 		double coef2 = m_rho * (m_restArea * 2.0) * (m_thickness * m_thickness * m_thickness / 12.0);
-		m_MLocal(6 * i + 3, 6 * i + 3) = coef2 * xx;
-		m_MLocal(6 * i + 3, 6 * i + 4) = coef2 * xy;
-		m_MLocal(6 * i + 4, 6 * i + 3) = coef2 * xy;
-		m_MLocal(6 * i + 4, 6 * i + 4) = coef2 * yy;
-	}
-
-	// Transformation Local -> Global
-	// m_MLocal has only 3x3 block element on the diagonal, we can transform each block independently
-	m_M.setZero();
-	const SurgSim::Math::Matrix33d& rotation = m_initialRotation;
-	const SurgSim::Math::Matrix33d rotationTranspose = m_initialRotation.transpose();
-	for (size_t rowId = 0; rowId < 6; ++rowId)
-	{
-		auto MLocal3x3block = getSubMatrix(m_MLocal, rowId, rowId, 3, 3);
-		setSubMatrix(rotation * MLocal3x3block * rotationTranspose, rowId, rowId, 3, 3, &m_M);
+		(*localMassMatrix)(6 * i + 3, 6 * i + 3) = coef2 * xx;
+		(*localMassMatrix)(6 * i + 3, 6 * i + 4) = coef2 * xy;
+		(*localMassMatrix)(6 * i + 4, 6 * i + 3) = coef2 * xy;
+		(*localMassMatrix)(6 * i + 4, 6 * i + 4) = coef2 * yy;
 	}
 }
 
-void Fem2DElementTriangle::computeStiffness(const SurgSim::Math::OdeState& state,
-										Eigen::Matrix<double, 18, 18>* k)
+void Fem2DElementTriangle::computeMass(const SurgSim::Math::OdeState& state,
+									   Eigen::Matrix<double, 18, 18>* massMatrix)
+{
+	computeLocalMass(state, &m_MLocal);
+
+	// Transformation Local -> Global
+	const SurgSim::Math::Matrix33d& rotation = m_initialRotation;
+	const SurgSim::Math::Matrix33d rotationTranspose = m_initialRotation.transpose();
+	for (size_t rowBlockId = 0; rowBlockId < 6; ++rowBlockId)
+	{
+		for (size_t colBlockId = 0; colBlockId < 6; ++colBlockId)
+		{
+			auto MLocal3x3block = getSubMatrix(m_MLocal, rowBlockId, colBlockId, 3, 3);
+			setSubMatrix(rotation * MLocal3x3block * rotationTranspose, rowBlockId, colBlockId, 3, 3, massMatrix);
+		}
+	}
+}
+
+void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& state,
+												 Eigen::Matrix<double, 18, 18>* localStiffnessMatrix)
 {
 	// Membrane part from "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
 	// Compute the membrane local strain-displacement matrix
@@ -318,18 +329,25 @@ void Fem2DElementTriangle::computeStiffness(const SurgSim::Math::OdeState& state
 	// Assemble shell stiffness as combination of membrane (Ux Uy) and plate stiffnesses (Uz ThetaX ThetaY)
 	// In the Kirchhof theory of Thin-Plate, the drilling dof (ThetaZ) is not considered.
 	// DOF are stored as follow (Ux Uy Uz ThetaX ThetaY ThetaZ)
-	m_KLocal.setIdentity();
+	localStiffnessMatrix->setIdentity();
 	for(size_t row = 0; row < 3; ++row)
 	{
 		for(size_t column = 0; column < 3; ++column)
 		{
 			// Membrane part
-			m_KLocal.block<2, 2>(6 * row, 6 * column) = membraneKLocal.block<2 ,2>(2 * row , 2 * column);
+			localStiffnessMatrix->block<2, 2>(6 * row, 6 * column) = membraneKLocal.block<2 ,2>(2 * row , 2 * column);
 
 			// Thin-plate part
-			m_KLocal.block(6 * row + 2, 6 * column + 2, 3, 3) = plateKLocal.block(3 * row, 3 * column, 3, 3);
+			localStiffnessMatrix->block<3, 3>(6 * row + 2, 6 * column + 2) =
+				plateKLocal.block<3, 3>(3 * row, 3 * column);
 		}
 	}
+}
+
+void Fem2DElementTriangle::computeStiffness(const SurgSim::Math::OdeState& state,
+											Eigen::Matrix<double, 18, 18>* stiffnessMatrix)
+{
+	computeLocalStiffness(state, &m_KLocal);
 
 	// Transformation Local -> Global
 	const SurgSim::Math::Matrix33d& rotation = m_initialRotation;
@@ -339,7 +357,7 @@ void Fem2DElementTriangle::computeStiffness(const SurgSim::Math::OdeState& state
 		for (size_t colBlockId = 0; colBlockId < 6; ++colBlockId)
 		{
 			auto KLocal3x3block = getSubMatrix(m_KLocal, rowBlockId, colBlockId, 3, 3);
-			setSubMatrix(rotation * KLocal3x3block * rotationTranspose, rowBlockId, colBlockId, 3, 3, &m_K);
+			setSubMatrix(rotation * KLocal3x3block * rotationTranspose, rowBlockId, colBlockId, 3, 3, stiffnessMatrix);
 		}
 	}
 }
