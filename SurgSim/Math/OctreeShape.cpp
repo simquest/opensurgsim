@@ -40,7 +40,7 @@ OctreeShape::OctreeShape() :
 	DecoderType decoder = std::bind(&OctreeShape::loadOctree,
 									this,
 									std::bind(&YAML::Node::as<std::string>, std::placeholders::_1));
-	setDecoder("OctreehFileName", decoder);
+	setDecoder("OctreeFileName", decoder);
 
 	SetterType setter = std::bind(&OctreeShape::loadOctree,
 								  this,
