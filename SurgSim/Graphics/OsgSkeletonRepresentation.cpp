@@ -29,26 +29,17 @@
 
 #include <boost/thread.hpp>
 
-#include <osg/Node>
 #include <osg/Quat>
 #include <osg/Vec3>
-#include <osg/NodeVisitor>
-#include <osg/Shader>
-#include <osg/Transform>
 #include <osg/Geode>
 #include <osg/PositionAttitudeTransform>
 
 #include <osgAnimation/Skeleton>
-#include <osgAnimation/Bone>
-#include <osgAnimation/UpdateBone>
-#include <osgAnimation/StackedQuaternionElement>
-#include <osgAnimation/StackedTranslateElement>
 #include <osgAnimation/RigGeometry>
 #include <osgAnimation/RigTransformHardware>
 #include <osgAnimation/UpdateBone>
 
 #include <osgDB/ReadFile>
-#include <osgUtil/UpdateVisitor>
 
 namespace
 {
@@ -88,7 +79,7 @@ public:
 			if (callback == nullptr)
 			{
 				bone->setDefaultUpdateCallback();
-				callback = callback = dynamic_cast<osgAnimation::UpdateMatrixTransform*>(bone->getUpdateCallback());
+				callback = dynamic_cast<osgAnimation::UpdateMatrixTransform*>(bone->getUpdateCallback());
 			}
 
 			SURGSIM_ASSERT(callback != nullptr) << "Could neither find nor create the appropriate BoneUpdate callback";

@@ -19,11 +19,17 @@
 #include <string>
 #include <map>
 
-#include <osg/ref_ptr>
-#include <osg/Quat>
-#include <osg/Vec3>
-#include <osg/Matrix>
+#include <osg/Group>
 #include <osg/MatrixTransform>
+#include <osg/Node>
+#include <osg/ref_ptr>
+#include <osg/Shader>
+
+#include <osgAnimation/Bone>
+#include <osgAnimation/StackedQuaternionElement>
+#include <osgAnimation/StackedTranslateElement>
+
+#include <osgUtil/UpdateVisitor>
 
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Framework/ObjectFactory.h"
@@ -34,25 +40,6 @@
 #pragma warning(push)
 #pragma warning(disable:4250)
 #endif
-
-namespace osg
-{
-class Node;
-class Shader;
-class MatrixTransform;
-}
-
-namespace osgAnimation
-{
-class Bone;
-class StackedQuaternionElement;
-class StackedTranslateElement;
-}
-
-namespace osgUtil
-{
-class UpdateVisitor;
-}
 
 namespace SurgSim
 {
