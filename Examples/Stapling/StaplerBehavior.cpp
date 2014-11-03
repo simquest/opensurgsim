@@ -27,6 +27,7 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/SceneryRepresentation.h"
+#include "SurgSim/Graphics/Model.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
@@ -382,8 +383,9 @@ int StaplerBehavior::getTargetManagerType() const
 bool StaplerBehavior::doInitialize()
 {
 	SURGSIM_ASSERT(m_from) << "StaplerBehavior: no InputComponent held.";
-	SURGSIM_ASSERT((m_virtualTeeth[0] != nullptr) && (m_virtualTeeth[1] != nullptr)) <<
-		"StaplerBehavior: setVirtualStaple was not called, or it was passed nullptr for a Collision Representation.";
+	SURGSIM_ASSERT((m_virtualTeeth[0] != nullptr) && (m_virtualTeeth[1] != nullptr))
+			<< "StaplerBehavior: setVirtualStaple was not called, "
+			<< "or it was passed nullptr for a Collision Representation.";
 	return true;
 }
 

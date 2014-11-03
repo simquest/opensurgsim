@@ -149,6 +149,8 @@ public:
 	template <class T>
 	OctreeNode(const OctreeNode<T>& other);
 
+	virtual std::string getClassName() const override;
+
 	/// Constructor
 	/// \param  boundingBox The region contained by this octree node
 	explicit OctreeNode(const SurgSim::Math::Aabbd& boundingBox);
@@ -240,6 +242,9 @@ protected:
 
 	/// The children of this node
 	std::array<std::shared_ptr<OctreeNode<Data> >, 8> m_children;
+
+private:
+	static std::string m_className;
 };
 
 

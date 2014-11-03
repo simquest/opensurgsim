@@ -27,6 +27,12 @@ namespace Framework
 
 Asset::Asset() : m_fileName()
 {
+	serializeFileName(this);
+}
+
+Asset::Asset(const Asset& rhs)
+{
+	serializeFileName(this);
 }
 
 Asset::~Asset()
@@ -54,21 +60,28 @@ std::string Asset::getFileName() const
 	return m_fileName;
 }
 
-void Asset::serializeFileName(SurgSim::Framework::Accessible* accesible)
+void Asset::serializeFileName(SurgSim::Framework::Accessible* accessible)
 {
 	// Special treatment to let std::bind() deal with overloaded function.
 	auto resolvedOverloadFunction = static_cast<void(Asset::*)(const std::string&)>(&Asset::load);
 
-	accesible->setAccessors("FileName",
-			   std::bind(&Asset::getFileName, this),
-			   std::bind(resolvedOverloadFunction, this,
-						 std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1)));
+	accessible->setAccessors("FileName",
+							 std::bind(&Asset::getFileName, this),
+							 std::bind(resolvedOverloadFunction, this,
+									   std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1)));
 
-	accesible->setSerializable("FileName",
-			   std::bind(&YAML::convert<std::string>::encode, std::bind(&Asset::getFileName, this)),
-			   std::bind(resolvedOverloadFunction, this,
-						 std::bind(&YAML::Node::as<std::string>, std::placeholders::_1)));
+	accessible->setSerializable("FileName",
+								std::bind(&YAML::convert<std::string>::encode, std::bind(&Asset::getFileName, this)),
+								std::bind(resolvedOverloadFunction, this,
+										  std::bind(&YAML::Node::as<std::string>, std::placeholders::_1)));
 }
+
+Asset::FactoryType& Asset::getFactory()
+{
+	static FactoryType factory;
+	return factory;
+}
+
 
 }; // Framework
 }; // SurgSim

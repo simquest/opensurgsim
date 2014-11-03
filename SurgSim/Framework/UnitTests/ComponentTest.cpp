@@ -519,6 +519,7 @@ TEST(ComponentTests, SetActiveTest)
 			break;
 		}
 	}
+	ASSERT_NE(nullptr, decodedComponent);
 	EXPECT_EQ(nullptr, decodedComponent->getSceneElement());
 	EXPECT_TRUE(decodedComponent->isActive());
 	EXPECT_TRUE(decodedComponent->isLocalActive());

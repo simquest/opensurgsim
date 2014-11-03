@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Graphics/Model.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
@@ -43,7 +44,7 @@ bool StapleElement::doInitialize()
 {
 	auto meshShape = std::make_shared<MeshShape>();
 	const std::string file = "/Geometry/staple_collision.ply";
-	meshShape->load(file);
+	meshShape->loadInitialMesh(file);
 
 	auto physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	physicsRepresentation->setDensity(8050); // Stainless steel (in Kg.m-3)
@@ -53,7 +54,7 @@ bool StapleElement::doInitialize()
 
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSceneryRepresentation>("Graphics");
-	graphicsRepresentation->setFileName("Geometry/staple.obj");
+	graphicsRepresentation->loadModel("Geometry/staple.obj");
 
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);

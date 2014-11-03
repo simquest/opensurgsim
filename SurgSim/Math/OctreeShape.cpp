@@ -16,6 +16,8 @@
 #include "SurgSim/Math/OctreeShape.h"
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Asset.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 namespace SurgSim
 {
@@ -24,9 +26,27 @@ namespace Math
 {
 SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::OctreeShape, OctreeShape);
 
-OctreeShape::OctreeShape()
+OctreeShape::OctreeShape() :
+	m_rootNode(std::make_shared<NodeType>())
 {
-	serializeFileName(this);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(
+		SurgSim::Math::OctreeShape,
+		std::shared_ptr<SurgSim::Framework::Asset>,
+		Octree,
+		getOctree,
+		setOctree);
+
+	// Enables the alternative use of the mesh file instead of the actual mesh object
+	DecoderType decoder = std::bind(&OctreeShape::loadOctree,
+									this,
+									std::bind(&YAML::Node::as<std::string>, std::placeholders::_1));
+	setDecoder("OctreehFileName", decoder);
+
+	SetterType setter = std::bind(&OctreeShape::loadOctree,
+								  this,
+								  std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1));
+
+	setSetter("OctreeFileName", setter);
 }
 
 OctreeShape::~OctreeShape()
@@ -38,12 +58,15 @@ int OctreeShape::getType()
 	return SHAPE_TYPE_OCTREE;
 }
 
-bool OctreeShape::doLoad(const std::string& filePath)
+void OctreeShape::loadOctree(const std::string& filePath)
 {
-	m_rootNode = std::make_shared<NodeType>();
-	SURGSIM_ASSERT(m_rootNode->doLoad(filePath)) << "Failed to load file" << filePath;
-	SURGSIM_ASSERT(isValid()) << filePath << " contains an invalid octree.";
-	return true;
+	auto rootNode = std::make_shared<NodeType>();
+	rootNode->load(filePath);
+
+	SURGSIM_ASSERT(isValid(rootNode))
+			<< "Loading failed " << filePath << " contains an invalid octree.";
+
+	setOctree(rootNode);
 }
 
 double OctreeShape::getVolume() const
@@ -63,24 +86,30 @@ Matrix33d OctreeShape::getSecondMomentOfVolume() const
 	return Matrix33d::Zero();
 }
 
-std::shared_ptr<OctreeShape::NodeType> OctreeShape::getRootNode()
+std::shared_ptr<OctreeShape::NodeType> OctreeShape::getOctree()
 {
 	return m_rootNode;
 }
 
-const std::shared_ptr<const OctreeShape::NodeType> OctreeShape::getRootNode() const
+void OctreeShape::setOctree(std::shared_ptr<SurgSim::Framework::Asset> node)
 {
-	return m_rootNode;
+	SURGSIM_ASSERT(node != nullptr) << "Tried to set the shape with a nullptr";
+	auto octreeNode = std::dynamic_pointer_cast<NodeType>(node);
+	SURGSIM_ASSERT(octreeNode != nullptr)
+			<< "OctreeShape needs OctreeNode<SurgSim::DataStructures::EmptyData> but received " << node->getClassName();
+	SURGSIM_ASSERT(isValid(octreeNode))
+			<< "OctreeShape was passed an invalid Octree.";
+	m_rootNode = octreeNode;
 }
 
-void OctreeShape::setRootNode(std::shared_ptr<OctreeShape::NodeType> node)
+bool OctreeShape::isValid(std::shared_ptr<NodeType> node) const
 {
-	m_rootNode = node;
+	return (nullptr != node) && (node->getBoundingBox().sizes().minCoeff() >= 0);
 }
 
 bool OctreeShape::isValid() const
 {
-	return (nullptr != m_rootNode) && (m_rootNode->getBoundingBox().sizes().minCoeff() >= 0);
+	return isValid(m_rootNode);
 }
 
 }; // namespace Math

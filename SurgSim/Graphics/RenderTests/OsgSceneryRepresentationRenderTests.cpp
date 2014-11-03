@@ -16,6 +16,7 @@
 /// \file
 /// Render Tests for OsgSceneryRepresentation class.
 
+#include "SurgSim/Graphics/OsgModel.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -60,13 +61,15 @@ TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 	int numSteps = 100;
 
 	auto sceneryObject1 = std::make_shared<OsgSceneryRepresentation>("Torus1");
-	sceneryObject1->setFileName("OsgSceneryRepresentationTests/Torus.obj");
+	sceneryObject1->loadModel("OsgSceneryRepresentationTests/Torus.obj");
 	sceneryObject1->setLocalPose(SurgSim::Math::makeRigidTransform(
 									 SurgSim::Math::Quaterniond::Identity(),	startPosition1));
 	viewElement->addComponent(sceneryObject1);
 
 	auto sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("Torus2");
-	sceneryObject2->setFileName("OsgSceneryRepresentationTests/Torus.osgb");
+	auto torus = std::make_shared<OsgModel>();
+	torus->load("OsgSceneryRepresentationTests/Torus.osgb");
+	sceneryObject2->setModel(torus);
 	sceneryObject2->setLocalPose(SurgSim::Math::makeRigidTransform(
 									 SurgSim::Math::Quaterniond::Identity(),	startPosition2));
 	viewElement->addComponent(sceneryObject2);
@@ -85,6 +88,8 @@ TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 		/// The total number of steps should complete in 1 second
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
+
+	std::cout << sceneryObject2->encode();
 }
 
 

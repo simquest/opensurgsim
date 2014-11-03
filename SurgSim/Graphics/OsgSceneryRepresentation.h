@@ -28,8 +28,14 @@
 
 namespace SurgSim
 {
+namespace Framework
+{
+class Asset;
+}
 namespace Graphics
 {
+class Model;
+
 SURGSIM_STATIC_REGISTRATION(OsgSceneryRepresentation);
 
 /// A OsgSceneryRepresentation is used to load osg object/node from file
@@ -44,19 +50,18 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgSceneryRepresentation);
 
-	/// Return file name of the object
-	/// \return File name of the object
-	std::string getFileName() const override;
-	/// Set file name of the object to be loaded
-	/// \param	fileName Name of the file to be loaded
-	void setFileName(const std::string& fileName) override;
+	virtual void loadModel(const std::string& fileName) override;
 
+	virtual void setModel(std::shared_ptr<SurgSim::Framework::Asset> model) override;
+
+	virtual std::shared_ptr<Model> getModel() const override;
 
 private:
 	virtual bool doInitialize() override;
-
 	/// A osg::Node to hold the objet loaded from file
-	osg::ref_ptr<osg::Node> m_sceneryRepresentation;
+	osg::ref_ptr<osg::Node> m_osgNode;
+
+	std::shared_ptr<Model> m_model;
 
 	/// Name of the object file to be loaded
 	std::string m_fileName;
