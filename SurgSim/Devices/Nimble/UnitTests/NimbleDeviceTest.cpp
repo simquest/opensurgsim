@@ -66,7 +66,8 @@ TEST(NimbleDeviceTest, CreateDeviceSeveralTimes)
 		std::shared_ptr<NimbleDevice> device = std::make_shared<NimbleDevice>("TestNimble");
 		ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.";
-		// The device will be destroyed here and thread stopped. Give some time for that.
+		// Rapidly initializing and destructing causes the thread destructor to be called before it has been
+		// stopped (by calling stop()), this sleep prevents the problem.
 		boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
 	}
 }
