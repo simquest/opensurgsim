@@ -18,6 +18,7 @@
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/Asset.h"
 
 #include <boost/uuid/uuid_io.hpp>
 
@@ -163,6 +164,48 @@ bool convert<std::shared_ptr<SurgSim::Framework::Scene>>::decode(
 	{
 		result = rhs->decode(node);
 	}
+	return result;
+}
+
+YAML::Node YAML::convert<std::shared_ptr<SurgSim::Framework::Asset>>::encode(
+			const std::shared_ptr<SurgSim::Framework::Asset> rhs)
+{
+	YAML::Node node;
+	node[rhs->getClassName()] = rhs->encode();
+	return node;
+}
+
+bool YAML::convert<std::shared_ptr<SurgSim::Framework::Asset>>::decode(
+			const Node& node, std::shared_ptr<SurgSim::Framework::Asset>& rhs)
+{
+	bool result = false;
+
+	if (node.IsMap())
+	{
+		if (nullptr == rhs)
+		{
+			std::string className = node.begin()->first.as<std::string>();
+			auto& factory = SurgSim::Framework::Asset::getFactory();
+
+			if (factory.isRegistered(className))
+			{
+				rhs = factory.create(className);
+			}
+			else
+			{
+				SURGSIM_FAILURE() << "Class " << className << " is not registered in the Asset factory.";
+			}
+		}
+
+		Node data = node.begin()->second;
+		if (data.IsMap())
+		{
+			rhs->decode(data);
+		}
+
+		result = true;
+	}
+
 	return result;
 }
 

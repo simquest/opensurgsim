@@ -22,9 +22,15 @@
 
 namespace SurgSim
 {
+namespace Framework
+{
+class Asset;
+}
 
 namespace Graphics
 {
+
+class Model;
 
 /// Base class defining the interface for a Graphics Scenery Object.
 class SceneryRepresentation : public virtual Representation
@@ -33,18 +39,19 @@ public:
 
 	/// Constructor.
 	/// \param	name	The name of the representation.
-	explicit SceneryRepresentation(const std::string& name): Representation(name)
-	{
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(SceneryRepresentation, std::string, FileName, getFileName, setFileName);
-	}
+	explicit SceneryRepresentation(const std::string& name);
 
-	/// Return file name of the object
-	/// \return File name of the object
-	virtual std::string getFileName() const = 0;
-
-	/// Set file name of the object to be loaded
+	/// Convenience function to trigger the load of the model with the given filename, if successful, this will
+	/// replace the old model
 	/// \param	fileName Name of the file to be loaded
-	virtual void setFileName(const std::string& fileName) = 0;
+	virtual void loadModel(const std::string& fileName) = 0;
+
+	/// Set the current model to the model passed
+	/// \param model to be used for this scenery representation, this will replace the old model
+	virtual void setModel(std::shared_ptr<SurgSim::Framework::Asset> model) = 0;
+
+	/// \return the current model.
+	virtual std::shared_ptr<Model> getModel() const = 0;
 };
 
 };  // namespace Graphics

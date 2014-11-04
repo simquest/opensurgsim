@@ -44,15 +44,18 @@ using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
 
-namespace SurgSim
-{
-namespace Collision
-{
-
 struct OctreeData
 {
 	std::string name;
 };
+
+template<>
+std::string SurgSim::DataStructures::OctreeNode<OctreeData>::m_className = "OctreeNode<OctreeData>";
+
+namespace SurgSim
+{
+namespace Collision
+{
 
 std::list<std::shared_ptr<Contact>> doCollision(std::shared_ptr<Shape> octree,
 		const Quaterniond& octreeQuat,
@@ -80,7 +83,7 @@ std::list<std::shared_ptr<Contact>> doCollision(std::shared_ptr<Shape> octree,
 
 void checkContacts(const std::list<std::shared_ptr<Contact>>& contacts, std::shared_ptr<OctreeNode<OctreeData>> octree)
 {
-	for(auto contact = contacts.cbegin(); contact != contacts.cend(); ++contact)
+	for (auto contact = contacts.cbegin(); contact != contacts.cend(); ++contact)
 	{
 		Location& location = (*contact)->penetrationPoints.first;
 		ASSERT_TRUE(location.octreeNodePath.hasValue());
@@ -93,9 +96,9 @@ void checkContacts(const std::list<std::shared_ptr<Contact>>& contacts, std::sha
 }
 
 bool nodeInContacts(const std::string& name, const std::list<std::shared_ptr<Contact>>& contacts,
-		std::shared_ptr<OctreeNode<OctreeData>> octree)
+					std::shared_ptr<OctreeNode<OctreeData>> octree)
 {
-	for(auto contact = contacts.cbegin(); contact != contacts.cend(); ++contact)
+	for (auto contact = contacts.cbegin(); contact != contacts.cend(); ++contact)
 	{
 		OctreePath path = (*contact)->penetrationPoints.first.octreeNodePath.getValue();
 		std::shared_ptr<OctreeNode<OctreeData>> node = octree->getNode(path);
@@ -119,28 +122,28 @@ std::shared_ptr<OctreeNode<OctreeData>> buildTestOctree()
 
 	OctreeData data;
 	data.name = "center";
-	rootNode->addData(Vector3d( 8.5,  8.5,  8.5), data, numLevels);
+	rootNode->addData(Vector3d(8.5,  8.5,  8.5), data, numLevels);
 
 	data.name = "corner0";
-	rootNode->addData(Vector3d( 0.5,  0.5,  0.5), data, numLevels);
+	rootNode->addData(Vector3d(0.5,  0.5,  0.5), data, numLevels);
 
 	data.name = "corner1";
 	rootNode->addData(Vector3d(15.5,  0.5,  0.5), data, numLevels);
 
 	data.name = "corner2";
-	rootNode->addData(Vector3d( 0.5, 15.5,  0.5), data, numLevels);
+	rootNode->addData(Vector3d(0.5, 15.5,  0.5), data, numLevels);
 
 	data.name = "corner3";
 	rootNode->addData(Vector3d(15.5, 15.5,  0.5), data, numLevels);
 
 	data.name = "corner4";
-	rootNode->addData(Vector3d( 0.5,  0.5, 15.5), data, numLevels);
+	rootNode->addData(Vector3d(0.5,  0.5, 15.5), data, numLevels);
 
 	data.name = "corner5";
 	rootNode->addData(Vector3d(15.5,  0.5, 15.5), data, numLevels);
 
 	data.name = "corner6";
-	rootNode->addData(Vector3d( 0.5, 15.5, 15.5), data, numLevels);
+	rootNode->addData(Vector3d(0.5, 15.5, 15.5), data, numLevels);
 
 	data.name = "corner7";
 	rootNode->addData(Vector3d(15.5, 15.5, 15.5), data, numLevels);

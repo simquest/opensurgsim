@@ -22,6 +22,7 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Shapes.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/DataStructures/OctreeNode.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
@@ -35,8 +36,9 @@ using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
 
-namespace {
-	const double epsilon = 1e-10;
+namespace
+{
+const double epsilon = 1e-10;
 }
 
 class ShapeTest : public ::testing::Test
@@ -135,8 +137,8 @@ TEST_F(ShapeTest, Sphere)
 	double coef = 2.0 / 5.0 * expectedMass * r2;
 	Matrix33d expectedInertia;
 	expectedInertia << coef, 0.0, 0.0,
-					   0.0, coef, 0.0,
-					   0.0, 0.0, coef;
+					0.0, coef, 0.0,
+					0.0, 0.0, coef;
 
 	double volume = sphere.getVolume();
 	Vector3d center = sphere.getCenter();
@@ -222,8 +224,8 @@ TEST_F(ShapeTest, Box)
 	double z2 = m_size[2] * m_size[2];
 	Matrix33d expectedInertia;
 	expectedInertia << coef * (y2 + z2), 0.0, 0.0,
-					   0.0, coef * (x2 + z2), 0.0,
-					   0.0, 0.0, coef * (x2 + y2);
+					0.0, coef * (x2 + z2), 0.0,
+					0.0, 0.0, coef * (x2 + y2);
 
 	double volume = box.getVolume();
 	Vector3d center = box.getCenter();
@@ -305,8 +307,8 @@ TEST_F(ShapeTest, Cylinder)
 	double coef    = 1.0 / 12.0 * expectedMass * (3.0 * (r1sq) + l2);
 	Matrix33d expectedInertia;
 	expectedInertia << coef, 0.0, 0.0,
-					   0.0, coefDir, 0.0,
-					   0.0, 0.0, coef;
+					0.0, coefDir, 0.0,
+					0.0, 0.0, coef;
 
 	double volume = cylinder.getVolume();
 	Vector3d center = cylinder.getCenter();
@@ -396,8 +398,8 @@ TEST_F(ShapeTest, Capsule)
 	coef += 1.0 / 12.0 * massCylinder * (3 * r2 + l2);
 	Matrix33d expectedInertia;
 	expectedInertia << coef, 0.0, 0.0,
-					   0.0, coefDir, 0.0,
-					   0.0, 0.0, coef;
+					0.0, coefDir, 0.0,
+					0.0, 0.0, coef;
 
 	double volume = capsule.getVolume();
 	Vector3d center = capsule.getCenter();
@@ -439,7 +441,7 @@ TEST_F(ShapeTest, DoubleSidedPlaneShapeSerializationTest)
 
 		std::shared_ptr<DoubleSidedPlaneShape> doubleSidedPlaneShape;
 		ASSERT_NO_THROW(doubleSidedPlaneShape =
-			std::dynamic_pointer_cast<DoubleSidedPlaneShape>(node.as<std::shared_ptr<Shape>>()));
+							std::dynamic_pointer_cast<DoubleSidedPlaneShape>(node.as<std::shared_ptr<Shape>>()));
 		EXPECT_EQ("SurgSim::Math::DoubleSidedPlaneShape", doubleSidedPlaneShape->getClassName());
 		EXPECT_TRUE(doubleSidedPlaneShape->isValid());
 	}
@@ -460,95 +462,90 @@ TEST_F(ShapeTest, DoubleSidedPlaneShape)
 }
 
 
-TEST_F(ShapeTest, OctreeSerializationTest)
+TEST_F(ShapeTest, OctreeShapeSerializationTest)
 {
 	const std::string fileName = "OctreeShapeData/staple.vox";
 	SurgSim::Framework::Runtime runtime("config.txt");
 
-	{
-		YAML::Node node;
-		node["SurgSim::Math::OctreeShape"]["FileName"] = fileName;
+	auto shape = std::make_shared<OctreeShape>();
 
-		std::shared_ptr<Shape> shape;
-		ASSERT_NO_THROW(shape = node.as<std::shared_ptr<Shape>>());
+	ASSERT_NO_THROW(shape->loadOctree(fileName));
 
-		EXPECT_EQ("SurgSim::Math::OctreeShape", shape->getClassName());
-		EXPECT_EQ(fileName, shape->getValue<std::string>("FileName"));
-		EXPECT_TRUE(shape->isValid());
-	}
+	YAML::Node node = YAML::convert<std::shared_ptr<SurgSim::Math::Shape>>::encode(shape);
 
-	{
-		std::shared_ptr<Shape> shape;
-		ASSERT_NO_THROW(shape = Shape::getFactory().create("SurgSim::Math::OctreeShape"));
-		shape->setValue("FileName", fileName);
-		EXPECT_TRUE(shape->isValid());
+	EXPECT_TRUE(node[shape->getClassName()].IsMap());
+	EXPECT_TRUE(node[shape->getClassName()]["Octree"].IsMap());
 
-		YAML::Node node;
-		ASSERT_NO_THROW(node = shape);
-		EXPECT_TRUE(node.IsMap());
-		EXPECT_EQ(1u, node.size());
+	std::shared_ptr<SurgSim::Math::Shape> decodedShape;
+	ASSERT_NO_THROW(decodedShape = node.as<std::shared_ptr<SurgSim::Math::Shape>>());
+	ASSERT_NE(nullptr, decodedShape);
 
-		ASSERT_TRUE(node["SurgSim::Math::OctreeShape"].IsDefined());
-		auto data = node["SurgSim::Math::OctreeShape"];
-		EXPECT_EQ(1u, data.size());
+	auto convertedShape = std::dynamic_pointer_cast<OctreeShape>(decodedShape);
+	ASSERT_NE(nullptr, convertedShape);
 
-		std::shared_ptr<OctreeShape> newOctreeShape;
-		ASSERT_NO_THROW(newOctreeShape = std::dynamic_pointer_cast<OctreeShape>(node.as<std::shared_ptr<Shape>>()));
-		EXPECT_EQ("SurgSim::Math::OctreeShape", newOctreeShape->getClassName());
-		EXPECT_EQ(fileName, newOctreeShape->getFileName());
-		EXPECT_TRUE(newOctreeShape->isValid());
-	}
+	ASSERT_NE(nullptr, convertedShape->getOctree());
+	EXPECT_EQ(fileName, convertedShape->getOctree()->getFileName());
 }
 
 TEST_F(ShapeTest, OctreeShape)
 {
 	OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), m_size);
 	std::shared_ptr<OctreeShape::NodeType> node = std::make_shared<OctreeShape::NodeType>(boundingBox);
+	SurgSim::Framework::Runtime runtime("config.txt");
+
 
 	{
-		ASSERT_NO_THROW({OctreeShape octree; EXPECT_FALSE(octree.isValid());});
-		ASSERT_NO_THROW({OctreeShape octree(*node); EXPECT_TRUE(octree.isValid());});
+		ASSERT_NO_THROW({OctreeShape shape; EXPECT_FALSE(shape.isValid());});
+		ASSERT_NO_THROW({OctreeShape shape(*node); EXPECT_TRUE(shape.isValid());});
 	}
 
 	{
-		OctreeShape octree;
-		EXPECT_EQ(nullptr, octree.getRootNode());
-		octree.setRootNode(node);
-		EXPECT_EQ(node, octree.getRootNode());
-		EXPECT_TRUE(octree.isValid());
+		OctreeShape shape;
+		EXPECT_NE(nullptr, shape.getOctree());
+		shape.setOctree(node);
+		EXPECT_EQ(node, shape.getOctree());
+		EXPECT_TRUE(shape.isValid());
 	}
 
 	{
-		SurgSim::Framework::Runtime runtime("config.txt");
+		SCOPED_TRACE("Normal Loading");
 		const std::string fileName = "OctreeShapeData/staple.vox";
-		OctreeShape octree;
-		EXPECT_NO_THROW(octree.setRootNode(node));
-		EXPECT_NO_THROW(octree.load(fileName));
-		EXPECT_EQ(fileName, octree.getFileName());
+		OctreeShape shape;
+		EXPECT_NO_THROW(shape.setOctree(node));
+		EXPECT_NO_THROW(shape.loadOctree(fileName));
+		EXPECT_EQ(fileName, shape.getOctree()->getFileName());
 
-		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
-		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, octree.getType());
-		EXPECT_THROW(octree.getVolume(), SurgSim::Framework::AssertionFailure);
-		EXPECT_TRUE(octree.getCenter().isApprox(Vector3d::Zero(), epsilon));
-		EXPECT_THROW(octree.getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
-		EXPECT_EQ(fileName, octree.getFileName());
-		EXPECT_TRUE(octree.isValid());
+		EXPECT_EQ(shape.getClassName(), "SurgSim::Math::OctreeShape");
+		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, shape.getType());
+		EXPECT_THROW(shape.getVolume(), SurgSim::Framework::AssertionFailure);
+		EXPECT_TRUE(shape.getCenter().isApprox(Vector3d::Zero(), epsilon));
+		EXPECT_THROW(shape.getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
+		EXPECT_EQ(fileName, shape.getOctree()->getFileName());
+		EXPECT_TRUE(shape.isValid());
+	}
+
+	{
+		SCOPED_TRACE("Alternative load through property");
+		const std::string fileName = "OctreeShapeData/staple.vox";
+		OctreeShape shape;
+		EXPECT_NO_THROW(shape.setValue("OctreeFileName", fileName));
+		EXPECT_EQ(fileName, shape.getOctree()->getFileName());
 	}
 
 	{
 		SCOPED_TRACE("Load nonexistent file will throw");
 		SurgSim::Framework::ApplicationData appData("config.txt");
 		const std::string fileName = "Nonexistent file";
-		OctreeShape octree;
-		EXPECT_ANY_THROW(octree.load(fileName, appData));
+		OctreeShape shape;
+		EXPECT_ANY_THROW(shape.loadOctree(fileName));
 	}
 
 	{
 		SCOPED_TRACE("Load existent file containing invalid Octree will throw");
 		SurgSim::Framework::ApplicationData appData("config.txt");
 		const std::string fileName = "OctreeShapeData/invalid-staple.vox";
-		OctreeShape octree;
-		EXPECT_ANY_THROW(octree.load(fileName, appData));
+		OctreeShape shape;
+		EXPECT_ANY_THROW(shape.loadOctree(fileName));
 	}
 }
 

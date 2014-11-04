@@ -45,7 +45,7 @@ struct DeformableCollisionRepresentationTest : public ::testing::Test
 		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		m_filename = std::string("Geometry/wound_deformable.ply");
 		m_meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-		m_meshShape->load(m_filename);
+		m_meshShape->loadInitialMesh(m_filename);
 		m_deformableRepresentation = std::make_shared<MockDeformableRepresentation>("DeformableRepresentation");
 		m_deformableCollisionRepresentation =
 			std::make_shared<DeformableCollisionRepresentation>("DeformableCollisionRepresentation");
@@ -86,11 +86,11 @@ TEST_F(DeformableCollisionRepresentationTest, MeshTest)
 {
 	m_deformableCollisionRepresentation->setMesh(m_meshShape->getMesh());
 	EXPECT_EQ(m_meshShape->getMesh()->getNumVertices(),
-		m_deformableCollisionRepresentation->getMesh()->getNumVertices());
+			  m_deformableCollisionRepresentation->getMesh()->getNumVertices());
 	EXPECT_EQ(m_meshShape->getMesh()->getNumEdges(),
-		m_deformableCollisionRepresentation->getMesh()->getNumEdges());
+			  m_deformableCollisionRepresentation->getMesh()->getNumEdges());
 	EXPECT_EQ(m_meshShape->getMesh()->getNumTriangles(),
-		m_deformableCollisionRepresentation->getMesh()->getNumTriangles());
+			  m_deformableCollisionRepresentation->getMesh()->getNumTriangles());
 }
 
 TEST_F(DeformableCollisionRepresentationTest, SerializationTest)
@@ -103,9 +103,9 @@ TEST_F(DeformableCollisionRepresentationTest, SerializationTest)
 
 	std::shared_ptr<SurgSim::Physics::DeformableCollisionRepresentation> newDeformableCollisionRepresentation;
 	ASSERT_NO_THROW(newDeformableCollisionRepresentation =
-		std::dynamic_pointer_cast<SurgSim::Physics::DeformableCollisionRepresentation>
-			(node.as<std::shared_ptr<SurgSim::Framework::Component>>())
-		);
+						std::dynamic_pointer_cast<SurgSim::Physics::DeformableCollisionRepresentation>
+						(node.as<std::shared_ptr<SurgSim::Framework::Component>>())
+				   );
 
 	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Fem3DRepresentation");
 	fem3DRepresentation->setCollisionRepresentation(newDeformableCollisionRepresentation);

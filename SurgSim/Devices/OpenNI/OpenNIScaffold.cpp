@@ -227,7 +227,7 @@ bool OpenNIScaffold::doUpdate(double dt)
 		if ((*info)->depthStream.readFrame(&depthFrame) == openni::STATUS_OK)
 		{
 			ImageType image(depthFrame.getWidth(), depthFrame.getHeight(), 1,
-					reinterpret_cast<const unsigned short*>(depthFrame.getData()));
+					reinterpret_cast<const uint16_t*>(depthFrame.getData()));
 			image.getAsVector() *= (1.0f / 1000.0f); // OpenNI2 returns mm, convert to meters
 			inputData.images().set("depth", std::move(image));
 		}
@@ -239,7 +239,7 @@ bool OpenNIScaffold::doUpdate(double dt)
 		if ((*info)->colorStream.readFrame(&colorFrame) == openni::STATUS_OK)
 		{
 			ImageType image(colorFrame.getWidth(), colorFrame.getHeight(), 3,
-					reinterpret_cast<const unsigned char*>(colorFrame.getData()));
+					reinterpret_cast<const uint8_t*>(colorFrame.getData()));
 			image.getAsVector() *= (1.0f / 255.0f); // OpenNI returns colors between 0 and 255, scale values to 0..1
 			inputData.images().set("color", std::move(image));
 		}

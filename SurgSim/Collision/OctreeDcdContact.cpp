@@ -32,7 +32,7 @@ OctreeDcdContact::OctreeDcdContact(std::shared_ptr<ContactCalculation> calculato
 	m_calculator(calculator)
 {
 	SURGSIM_ASSERT(m_calculator->getShapeTypes().first == SurgSim::Math::SHAPE_TYPE_BOX) <<
-		"OctreeDcdContact needs a contact calculator that works with Boxes";
+			"OctreeDcdContact needs a contact calculator that works with Boxes";
 	m_shapeTypes = m_calculator->getShapeTypes();
 	m_shapeTypes.first = SurgSim::Math::SHAPE_TYPE_OCTREE;
 
@@ -47,8 +47,8 @@ std::pair<int, int> OctreeDcdContact::getShapeTypes()
 void OctreeDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	typedef SurgSim::Math::OctreeShape OctreeShapeType;
-	std::shared_ptr<OctreeShapeType> octree = std::static_pointer_cast<OctreeShapeType>(pair->getFirst()->getShape());
-	calculateContactWithNode(octree->getRootNode(), pair, std::make_shared<SurgSim::DataStructures::OctreePath>());
+	std::shared_ptr<OctreeShapeType> shape = std::static_pointer_cast<OctreeShapeType>(pair->getFirst()->getShape());
+	calculateContactWithNode(shape->getOctree(), pair, std::make_shared<SurgSim::DataStructures::OctreePath>());
 }
 
 void OctreeDcdContact::calculateContactWithNode(

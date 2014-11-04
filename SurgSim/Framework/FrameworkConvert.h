@@ -25,6 +25,7 @@ namespace SurgSim
 {
 namespace Framework
 {
+class Asset;
 class Component;
 class SceneElement;
 class Scene;
@@ -34,9 +35,10 @@ class Scene;
 namespace YAML
 {
 
-/// Specializatio of YAML::convert for std::shared_ptr, this is used to redirect the serialization of a derived class
+
+/// Specialization of YAML::convert for std::shared_ptr, this is used to redirect the serialization of a derived class
 /// to the specialization of the serialization for a base class, for example all subclasses of Component can use the
-/// Component serialization specialization, currently each redirection has to be implemented separately, there is
+/// Component serialization specialization, currently each redirection has to be implemented separately, the re is
 /// probably a way to do this automatically.
 /// \tparam T class that should be converted from a shared ptr
 template <class T>
@@ -50,6 +52,7 @@ struct convert<std::shared_ptr<T>>
 		typename std::enable_if <std::is_base_of<SurgSim::Framework::Component, T>::value,
 		std::shared_ptr<T> >::type& rhs);
 };
+
 
 /// Specialization of YAML::convert for std::shared_ptr<Component>, use this for to read in a component
 /// written by the convert<SurgSim::Framework::Component> converter, or a reference to a
@@ -100,6 +103,13 @@ struct convert<std::shared_ptr<SurgSim::Framework::Scene>>
 {
 	static Node encode(const std::shared_ptr<SurgSim::Framework::Scene> rhs);
 	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Scene>& rhs);
+};
+
+template<>
+struct convert<std::shared_ptr<SurgSim::Framework::Asset>>
+{
+	static Node encode(const std::shared_ptr<SurgSim::Framework::Asset> rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Asset>& rhs);
 };
 
 };

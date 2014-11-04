@@ -26,6 +26,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 
+using SurgSim::Math::gaussQuadrature2DTriangle6Points;
+using SurgSim::Math::gaussQuadrature2DTriangle12Points;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
@@ -67,9 +69,19 @@ public:
 		return m_initialRotationTimes6;
 	}
 
-	const Eigen::Matrix<double, 3, 9> getBatozStrainDisplacement(double xi, double neta) const
+	const double get_xij(size_t i) const
 	{
-		return batozStrainDisplacement(xi, neta);
+		return m_xij[i];
+	}
+
+	const double get_yij(size_t i) const
+	{
+		return m_yij[i];
+	}
+
+	const Eigen::Matrix<double, 3, 9> getBatozStrainDisplacement(double xi, double eta) const
+	{
+		return batozStrainDisplacement(xi, eta);
 	}
 
 	const Eigen::Matrix<double, 18, 18>& getLocalStiffnessMatrix() const
@@ -114,330 +126,330 @@ public:
 	}
 
 	// The Thin-Plate shape functions (Batoz shape functions)
-	// N1(xi, neta) = 2(1-xi-neta)(0.5-xi-neta)
-	double batozN1(double xi, double neta) const { return 2.0 * (1.0 - xi - neta) * (0.5 - xi - neta); }
-	// N2(xi, neta) = xi(2 xi-1)
-	double batozN2(double xi, double neta) const { return xi * (2.0 * xi - 1.0);                       }
-	// N3(xi, neta) = neta(2 neta-1)
-	double batozN3(double xi, double neta) const { return neta * (2.0 * neta - 1.0);                   }
-	// N4(xi, neta) = 4 xi neta
-	double batozN4(double xi, double neta) const { return 4.0 * xi * neta;                             }
-	// N5(xi, neta) = 4 neta(1-xi-neta)
-	double batozN5(double xi, double neta) const { return 4.0 * neta * (1.0 - xi - neta);              }
-	// N6(xi, neta) = 4 xi(1-xi-neta)
-	double batozN6(double xi, double neta) const { return 4.0 * xi * (1.0 - xi - neta);                }
+	// N1(xi, eta) = 2(1-xi-eta)(0.5-xi-eta)
+	double batozN1(double xi, double eta) const { return 2.0 * (1.0 - xi - eta) * (0.5 - xi - eta); }
+	// N2(xi, eta) = xi(2 xi-1)
+	double batozN2(double xi, double eta) const { return xi * (2.0 * xi - 1.0);                       }
+	// N3(xi, eta) = eta(2 eta-1)
+	double batozN3(double xi, double eta) const { return eta * (2.0 * eta - 1.0);                   }
+	// N4(xi, eta) = 4 xi eta
+	double batozN4(double xi, double eta) const { return 4.0 * xi * eta;                             }
+	// N5(xi, eta) = 4 eta(1-xi-eta)
+	double batozN5(double xi, double eta) const { return 4.0 * eta * (1.0 - xi - eta);              }
+	// N6(xi, eta) = 4 xi(1-xi-eta)
+	double batozN6(double xi, double eta) const { return 4.0 * xi * (1.0 - xi - eta);                }
 
-	// dN1/dxi(xi, neta) = 2[(-0.5+xi+neta) + (-1+xi+neta)] = 2(-3/2+2(xi+neta)) = 4(xi+neta) - 3
-	double batozDN1Dxi(double xi, double neta) const { return 4.0 * (xi + neta) - 3.0;       }
-	// dN2/dxi(xi, neta) = (2xi-1) + 2xi = 4xi-1
-	double batozDN2Dxi(double xi, double neta) const { return 4.0 * xi - 1.0;                }
-	// dN3/dxi(xi, neta) = 0
-	double batozDN3Dxi(double xi, double neta) const { return 0.0;                           }
-	// dN4/dxi(xi, neta) = 4 neta
-	double batozDN4Dxi(double xi, double neta) const { return 4.0 * neta;                    }
-	// dN5/dxi(xi,neta) = -4 neta
-	double batozDN5Dxi(double xi, double neta) const { return -4.0 * neta;                   }
-	// dN6/dxi(xi,neta) = 4(1-xi-neta) -4xi = 4(1-2xi-neta)
-	double batozDN6Dxi(double xi, double neta) const { return 4.0 * (1.0 - 2.0 * xi - neta); }
+	// dN1/dxi(xi, eta) = 2[(-0.5+xi+eta) + (-1+xi+eta)] = 2(-3/2+2(xi+eta)) = 4(xi+eta) - 3
+	double batozDN1Dxi(double xi, double eta) const { return 4.0 * (xi + eta) - 3.0;       }
+	// dN2/dxi(xi, eta) = (2xi-1) + 2xi = 4xi-1
+	double batozDN2Dxi(double xi, double eta) const { return 4.0 * xi - 1.0;                }
+	// dN3/dxi(xi, eta) = 0
+	double batozDN3Dxi(double xi, double eta) const { return 0.0;                           }
+	// dN4/dxi(xi, eta) = 4 eta
+	double batozDN4Dxi(double xi, double eta) const { return 4.0 * eta;                    }
+	// dN5/dxi(xi,eta) = -4 eta
+	double batozDN5Dxi(double xi, double eta) const { return -4.0 * eta;                   }
+	// dN6/dxi(xi,eta) = 4(1-xi-eta) -4xi = 4(1-2xi-eta)
+	double batozDN6Dxi(double xi, double eta) const { return 4.0 * (1.0 - 2.0 * xi - eta); }
 
-	// dN1/dneta(xi, neta) = 2[(-0.5+xi+neta) + (-1+xi+neta)] = 2(-3/2 + 2xi + 2neta) = 4(xi+neta) - 3
-	double batozDN1Dneta(double xi, double neta) const { return 4.0 * (xi + neta) - 3.0;       }
-	// dN2/dneta(xi, neta) = 0
-	double batozDN2Dneta(double xi, double neta) const { return 0.0;                           }
-	// dN3/dneta(xi, neta) = 2neta-1 + 2neta = 4neta-1
-	double batozDN3Dneta(double xi, double neta) const { return 4.0 * neta - 1.0;              }
-	// dN4/dneta(xi, neta) = 4xi
-	double batozDN4Dneta(double xi, double neta) const { return 4.0 * xi;                      }
-	// dN5/dneta(xi, neta) = 4[(1-xi-neta) - neta] = 4(1-xi-2neta)
-	double batozDN5Dneta(double xi, double neta) const { return 4.0 * (1.0 - xi - 2.0 * neta); }
-	// dN6/dneta(xi, neta) = -4xi
-	double batozDN6Dneta(double xi, double neta) const { return -4.0 * xi;                     }
+	// dN1/deta(xi, eta) = 2[(-0.5+xi+eta) + (-1+xi+eta)] = 2(-3/2 + 2xi + 2eta) = 4(xi+eta) - 3
+	double batozDN1Deta(double xi, double eta) const { return 4.0 * (xi + eta) - 3.0;       }
+	// dN2/deta(xi, eta) = 0
+	double batozDN2Deta(double xi, double eta) const { return 0.0;                           }
+	// dN3/deta(xi, eta) = 2eta-1 + 2eta = 4eta-1
+	double batozDN3Deta(double xi, double eta) const { return 4.0 * eta - 1.0;              }
+	// dN4/deta(xi, eta) = 4xi
+	double batozDN4Deta(double xi, double eta) const { return 4.0 * xi;                      }
+	// dN5/deta(xi, eta) = 4[(1-xi-eta) - eta] = 4(1-xi-2eta)
+	double batozDN5Deta(double xi, double eta) const { return 4.0 * (1.0 - xi - 2.0 * eta); }
+	// dN6/deta(xi, eta) = -4xi
+	double batozDN6Deta(double xi, double eta) const { return -4.0 * xi;                     }
 
-	std::array<double, 9> batozHx(double xi, double neta)
+	std::array<double, 9> batozHx(double xi, double eta) const
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (a6N6-a5N5)
-		res[0] = 1.5 * (m_ak[2] * batozN6(xi, neta) - m_ak[1] * batozN5(xi, neta));
+		res[0] = 1.5 * (m_ak[2] * batozN6(xi, eta) - m_ak[1] * batozN5(xi, eta));
 		// b5N5+b6N6
-		res[1] = m_bk[1] * batozN5(xi, neta) + m_bk[2] * batozN6(xi, neta);
+		res[1] = m_bk[1] * batozN5(xi, eta) + m_bk[2] * batozN6(xi, eta);
 		// N1 - c5N5 - c6N6
-		res[2] = batozN1(xi, neta) - m_ck[1] * batozN5(xi, neta) - m_ck[2] * batozN6(xi, neta);
+		res[2] = batozN1(xi, eta) - m_ck[1] * batozN5(xi, eta) - m_ck[2] * batozN6(xi, eta);
 
 		// 1.5 (a4N4-a6N6)
-		res[3] = 1.5 * (m_ak[0] * batozN4(xi, neta) - m_ak[2] * batozN6(xi, neta));
+		res[3] = 1.5 * (m_ak[0] * batozN4(xi, eta) - m_ak[2] * batozN6(xi, eta));
 		// b6N6+b4N4
-		res[4] = m_bk[2] * batozN6(xi, neta) + m_bk[0] * batozN4(xi, neta);
+		res[4] = m_bk[2] * batozN6(xi, eta) + m_bk[0] * batozN4(xi, eta);
 		// N2 - c6N6 - c4N4
-		res[5] = batozN2(xi, neta) - m_ck[2] * batozN6(xi, neta) - m_ck[0] * batozN4(xi, neta);
+		res[5] = batozN2(xi, eta) - m_ck[2] * batozN6(xi, eta) - m_ck[0] * batozN4(xi, eta);
 
 		// 1.5 (a5N5-a4N4)
-		res[6] = 1.5 * (m_ak[1] * batozN5(xi, neta) - m_ak[0] * batozN4(xi, neta));
+		res[6] = 1.5 * (m_ak[1] * batozN5(xi, eta) - m_ak[0] * batozN4(xi, eta));
 		// b4N4+b5N5
-		res[7] = m_bk[0] * batozN4(xi, neta) + m_bk[1] * batozN5(xi, neta);
+		res[7] = m_bk[0] * batozN4(xi, eta) + m_bk[1] * batozN5(xi, eta);
 		// N3 - c4N4 - c5N5
-		res[8] = batozN3(xi, neta) - m_ck[0] * batozN4(xi, neta) - m_ck[1] * batozN5(xi, neta);
+		res[8] = batozN3(xi, eta) - m_ck[0] * batozN4(xi, eta) - m_ck[1] * batozN5(xi, eta);
 
 		return res;
 	}
-	std::array<double, 9> batozDhxDxiAlternative(double xi, double neta)
+	std::array<double, 9> batozDhxDxiAlternative(double xi, double eta) const
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (a6dN6-a5dN5)
-		res[0] = 1.5 * (m_ak[2] * batozDN6Dxi(xi, neta) - m_ak[1] * batozDN5Dxi(xi, neta));
+		res[0] = 1.5 * (m_ak[2] * batozDN6Dxi(xi, eta) - m_ak[1] * batozDN5Dxi(xi, eta));
 		// b5dN5+b6dN6
-		res[1] = m_bk[1] * batozDN5Dxi(xi, neta) + m_bk[2] * batozDN6Dxi(xi, neta);
+		res[1] = m_bk[1] * batozDN5Dxi(xi, eta) + m_bk[2] * batozDN6Dxi(xi, eta);
 		// dN1 - c5dN5 - c6dN6
-		res[2] = batozDN1Dxi(xi, neta) - m_ck[1] * batozDN5Dxi(xi, neta) - m_ck[2] * batozDN6Dxi(xi, neta);
+		res[2] = batozDN1Dxi(xi, eta) - m_ck[1] * batozDN5Dxi(xi, eta) - m_ck[2] * batozDN6Dxi(xi, eta);
 
 		// 1.5 (a4dN4-a6dN6)
-		res[3] = 1.5 * (m_ak[0] * batozDN4Dxi(xi, neta) - m_ak[2] * batozDN6Dxi(xi, neta));
+		res[3] = 1.5 * (m_ak[0] * batozDN4Dxi(xi, eta) - m_ak[2] * batozDN6Dxi(xi, eta));
 		// b6dN6+b4dN4
-		res[4] = m_bk[2] * batozDN6Dxi(xi, neta) + m_bk[0] * batozDN4Dxi(xi, neta);
+		res[4] = m_bk[2] * batozDN6Dxi(xi, eta) + m_bk[0] * batozDN4Dxi(xi, eta);
 		// dN2 - c6dN6 - c4dN4
-		res[5] = batozDN2Dxi(xi, neta) - m_ck[2] * batozDN6Dxi(xi, neta) - m_ck[0] * batozDN4Dxi(xi, neta);
+		res[5] = batozDN2Dxi(xi, eta) - m_ck[2] * batozDN6Dxi(xi, eta) - m_ck[0] * batozDN4Dxi(xi, eta);
 
 		// 1.5 (a5dN5-a4dN4)
-		res[6] = 1.5 * (m_ak[1] * batozDN5Dxi(xi, neta) - m_ak[0] * batozDN4Dxi(xi, neta));
+		res[6] = 1.5 * (m_ak[1] * batozDN5Dxi(xi, eta) - m_ak[0] * batozDN4Dxi(xi, eta));
 		// b4dN4+b5dN5
-		res[7] = m_bk[0] * batozDN4Dxi(xi, neta) + m_bk[1] * batozDN5Dxi(xi, neta);
+		res[7] = m_bk[0] * batozDN4Dxi(xi, eta) + m_bk[1] * batozDN5Dxi(xi, eta);
 		// dN3 - c4dN4 - c5dN5
-		res[8] = batozDN3Dxi(xi, neta) - m_ck[0] * batozDN4Dxi(xi, neta) - m_ck[1] * batozDN5Dxi(xi, neta);
+		res[8] = batozDN3Dxi(xi, eta) - m_ck[0] * batozDN4Dxi(xi, eta) - m_ck[1] * batozDN5Dxi(xi, eta);
 
 		return res;
 	}
-	std::array<double, 9> batozDhxDnetaAlternative(double xi, double neta)
+	std::array<double, 9> batozDhxDetaAlternative(double xi, double eta) const
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (a6dN6-a5dN5)
-		res[0] = 1.5 * (m_ak[2] * batozDN6Dneta(xi, neta) - m_ak[1] * batozDN5Dneta(xi, neta));
+		res[0] = 1.5 * (m_ak[2] * batozDN6Deta(xi, eta) - m_ak[1] * batozDN5Deta(xi, eta));
 		// b5dN5+b6dN6
-		res[1] = m_bk[1] * batozDN5Dneta(xi, neta) + m_bk[2] * batozDN6Dneta(xi, neta);
+		res[1] = m_bk[1] * batozDN5Deta(xi, eta) + m_bk[2] * batozDN6Deta(xi, eta);
 		// dN1 - c5dN5 - c6dN6
-		res[2] = batozDN1Dneta(xi, neta) - m_ck[1] * batozDN5Dneta(xi, neta) - m_ck[2] * batozDN6Dneta(xi, neta);
+		res[2] = batozDN1Deta(xi, eta) - m_ck[1] * batozDN5Deta(xi, eta) - m_ck[2] * batozDN6Deta(xi, eta);
 
 		// 1.5 (a4dN4-a6dN6)
-		res[3] = 1.5 * (m_ak[0] * batozDN4Dneta(xi, neta) - m_ak[2] * batozDN6Dneta(xi, neta));
+		res[3] = 1.5 * (m_ak[0] * batozDN4Deta(xi, eta) - m_ak[2] * batozDN6Deta(xi, eta));
 		// b6dN6+b4dN4
-		res[4] = m_bk[2] * batozDN6Dneta(xi, neta) + m_bk[0] * batozDN4Dneta(xi, neta);
+		res[4] = m_bk[2] * batozDN6Deta(xi, eta) + m_bk[0] * batozDN4Deta(xi, eta);
 		// dN2 - c6dN6 - c4dN4
-		res[5] = batozDN2Dneta(xi, neta) - m_ck[2] * batozDN6Dneta(xi, neta) - m_ck[0] * batozDN4Dneta(xi, neta);
+		res[5] = batozDN2Deta(xi, eta) - m_ck[2] * batozDN6Deta(xi, eta) - m_ck[0] * batozDN4Deta(xi, eta);
 
 		// 1.5 (a5dN5-a4dN4)
-		res[6] = 1.5 * (m_ak[1] * batozDN5Dneta(xi, neta) - m_ak[0] * batozDN4Dneta(xi, neta));
+		res[6] = 1.5 * (m_ak[1] * batozDN5Deta(xi, eta) - m_ak[0] * batozDN4Deta(xi, eta));
 		// b4dN4+b5dN5
-		res[7] = m_bk[0] * batozDN4Dneta(xi, neta) + m_bk[1] * batozDN5Dneta(xi, neta);
+		res[7] = m_bk[0] * batozDN4Deta(xi, eta) + m_bk[1] * batozDN5Deta(xi, eta);
 		// dN3 - c4dN4 - c5dN5
-		res[8] = batozDN3Dneta(xi, neta) - m_ck[0] * batozDN4Dneta(xi, neta) - m_ck[1] * batozDN5Dneta(xi, neta);
+		res[8] = batozDN3Deta(xi, eta) - m_ck[0] * batozDN4Deta(xi, eta) - m_ck[1] * batozDN5Deta(xi, eta);
 
 		return res;
 	}
 
-	std::array<double, 9> batozHy(double xi, double neta)
+	std::array<double, 9> batozHy(double xi, double eta) const
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (d6N6-d5N5)
-		res[0] = 1.5 * (m_dk[2] * batozN6(xi, neta) - m_dk[1] * batozN5(xi, neta));
+		res[0] = 1.5 * (m_dk[2] * batozN6(xi, eta) - m_dk[1] * batozN5(xi, eta));
 		// -N1 + e5N5 + e6N6
-		res[1] = -batozN1(xi, neta) + m_ek[1] * batozN5(xi, neta) + m_ek[2] * batozN6(xi, neta);
+		res[1] = -batozN1(xi, eta) + m_ek[1] * batozN5(xi, eta) + m_ek[2] * batozN6(xi, eta);
 		// -b5N5-b6N6
-		res[2] = -m_bk[1] * batozN5(xi, neta) - m_bk[2] * batozN6(xi, neta);
+		res[2] = -m_bk[1] * batozN5(xi, eta) - m_bk[2] * batozN6(xi, eta);
 
 		// 1.5 (d4N4-d6N6)
-		res[3] = 1.5 * (m_dk[0] * batozN4(xi, neta) - m_dk[2] * batozN6(xi, neta));
+		res[3] = 1.5 * (m_dk[0] * batozN4(xi, eta) - m_dk[2] * batozN6(xi, eta));
 		// -N2 + e6N6 + e4N4
-		res[4] = -batozN2(xi, neta) + m_ek[2] * batozN6(xi, neta) + m_ek[0] * batozN4(xi, neta);
+		res[4] = -batozN2(xi, eta) + m_ek[2] * batozN6(xi, eta) + m_ek[0] * batozN4(xi, eta);
 		// -b6N6-b4N4
-		res[5] = -m_bk[2] * batozN6(xi, neta) - m_bk[0] * batozN4(xi, neta);
+		res[5] = -m_bk[2] * batozN6(xi, eta) - m_bk[0] * batozN4(xi, eta);
 
 		// 1.5 (d5N5-d4N4)
-		res[6] = 1.5 * (m_dk[1] * batozN5(xi, neta) - m_dk[0] * batozN4(xi, neta));
+		res[6] = 1.5 * (m_dk[1] * batozN5(xi, eta) - m_dk[0] * batozN4(xi, eta));
 		// -N3 + e4N4 + e5N5
-		res[7] = -batozN3(xi, neta) + m_ek[0] * batozN4(xi, neta) + m_ek[1] * batozN5(xi, neta);
+		res[7] = -batozN3(xi, eta) + m_ek[0] * batozN4(xi, eta) + m_ek[1] * batozN5(xi, eta);
 		// -b4N4-b5N5
-		res[8] = -m_bk[0] * batozN4(xi, neta) - m_bk[1] * batozN5(xi, neta);
+		res[8] = -m_bk[0] * batozN4(xi, eta) - m_bk[1] * batozN5(xi, eta);
 
 		return res;
 	}
-	std::array<double, 9> batozDhyDxiAlternative(double xi, double neta)
+	std::array<double, 9> batozDhyDxiAlternative(double xi, double eta) const
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (d6dN6-d5dN5)
-		res[0] = 1.5 * (m_dk[2] * batozDN6Dxi(xi, neta) - m_dk[1] * batozDN5Dxi(xi, neta));
+		res[0] = 1.5 * (m_dk[2] * batozDN6Dxi(xi, eta) - m_dk[1] * batozDN5Dxi(xi, eta));
 		// -dN1 + e5dN5 + e6dN6
-		res[1] = -batozDN1Dxi(xi, neta) + m_ek[1] * batozDN5Dxi(xi, neta) + m_ek[2] * batozDN6Dxi(xi, neta);
+		res[1] = -batozDN1Dxi(xi, eta) + m_ek[1] * batozDN5Dxi(xi, eta) + m_ek[2] * batozDN6Dxi(xi, eta);
 		// -b5dN5-b6dN6
-		res[2] = -m_bk[1] * batozDN5Dxi(xi, neta) - m_bk[2] * batozDN6Dxi(xi, neta);
+		res[2] = -m_bk[1] * batozDN5Dxi(xi, eta) - m_bk[2] * batozDN6Dxi(xi, eta);
 
 		// 1.5 (d4dN4-d6dN6)
-		res[3] = 1.5 * (m_dk[0] * batozDN4Dxi(xi, neta) - m_dk[2] * batozDN6Dxi(xi, neta));
+		res[3] = 1.5 * (m_dk[0] * batozDN4Dxi(xi, eta) - m_dk[2] * batozDN6Dxi(xi, eta));
 		// -dN2 + e6dN6 + e4dN4
-		res[4] = -batozDN2Dxi(xi, neta) + m_ek[2] * batozDN6Dxi(xi, neta) + m_ek[0] * batozDN4Dxi(xi, neta);
+		res[4] = -batozDN2Dxi(xi, eta) + m_ek[2] * batozDN6Dxi(xi, eta) + m_ek[0] * batozDN4Dxi(xi, eta);
 		// -b6dN6-b4dN4
-		res[5] = -m_bk[2] * batozDN6Dxi(xi, neta) - m_bk[0] * batozDN4Dxi(xi, neta);
+		res[5] = -m_bk[2] * batozDN6Dxi(xi, eta) - m_bk[0] * batozDN4Dxi(xi, eta);
 
 		// 1.5 (d5dN5-d4dN4)
-		res[6] = 1.5 * (m_dk[1] * batozDN5Dxi(xi, neta) - m_dk[0] * batozDN4Dxi(xi, neta));
+		res[6] = 1.5 * (m_dk[1] * batozDN5Dxi(xi, eta) - m_dk[0] * batozDN4Dxi(xi, eta));
 		// -dN3 + e4dN4 + e5dN5
-		res[7] = -batozDN3Dxi(xi, neta) + m_ek[0] * batozDN4Dxi(xi, neta) + m_ek[1] * batozDN5Dxi(xi, neta);
+		res[7] = -batozDN3Dxi(xi, eta) + m_ek[0] * batozDN4Dxi(xi, eta) + m_ek[1] * batozDN5Dxi(xi, eta);
 		// -b4dN4-b5dN5
-		res[8] = -m_bk[0] * batozDN4Dxi(xi, neta) - m_bk[1] * batozDN5Dxi(xi, neta);
+		res[8] = -m_bk[0] * batozDN4Dxi(xi, eta) - m_bk[1] * batozDN5Dxi(xi, eta);
 
 		return res;
 	}
-	std::array<double, 9> batozDhyDnetaAlternative(double xi, double neta)
+	std::array<double, 9> batozDhyDetaAlternative(double xi, double eta) const
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (d6dN6-d5dN5)
-		res[0] = 1.5 * (m_dk[2] * batozDN6Dneta(xi, neta) - m_dk[1] * batozDN5Dneta(xi, neta));
+		res[0] = 1.5 * (m_dk[2] * batozDN6Deta(xi, eta) - m_dk[1] * batozDN5Deta(xi, eta));
 		// -dN1 + e5dN5 + e6dN6
-		res[1] = -batozDN1Dneta(xi, neta) + m_ek[1] * batozDN5Dneta(xi, neta) + m_ek[2] * batozDN6Dneta(xi, neta);
+		res[1] = -batozDN1Deta(xi, eta) + m_ek[1] * batozDN5Deta(xi, eta) + m_ek[2] * batozDN6Deta(xi, eta);
 		// -b5dN5-b6dN6
-		res[2] = -m_bk[1] * batozDN5Dneta(xi, neta) - m_bk[2] * batozDN6Dneta(xi, neta);
+		res[2] = -m_bk[1] * batozDN5Deta(xi, eta) - m_bk[2] * batozDN6Deta(xi, eta);
 
 		// 1.5 (d4dN4-d6dN6)
-		res[3] = 1.5 * (m_dk[0] * batozDN4Dneta(xi, neta) - m_dk[2] * batozDN6Dneta(xi, neta));
+		res[3] = 1.5 * (m_dk[0] * batozDN4Deta(xi, eta) - m_dk[2] * batozDN6Deta(xi, eta));
 		// -dN2 + e6dN6 + e4dN4
-		res[4] = -batozDN2Dneta(xi, neta) + m_ek[2] * batozDN6Dneta(xi, neta) + m_ek[0] * batozDN4Dneta(xi, neta);
+		res[4] = -batozDN2Deta(xi, eta) + m_ek[2] * batozDN6Deta(xi, eta) + m_ek[0] * batozDN4Deta(xi, eta);
 		// -b6dN6-b4dN4
-		res[5] = -m_bk[2] * batozDN6Dneta(xi, neta) - m_bk[0] * batozDN4Dneta(xi, neta);
+		res[5] = -m_bk[2] * batozDN6Deta(xi, eta) - m_bk[0] * batozDN4Deta(xi, eta);
 
 		// -dN3 + e4dN4 + e5dN5
-		res[6] = 1.5 * (m_dk[1] * batozDN5Dneta(xi, neta) - m_dk[0] * batozDN4Dneta(xi, neta));
+		res[6] = 1.5 * (m_dk[1] * batozDN5Deta(xi, eta) - m_dk[0] * batozDN4Deta(xi, eta));
 		// -dN3 + e4dN4 + e5dN5
-		res[7] = -batozDN3Dneta(xi, neta) + m_ek[0] * batozDN4Dneta(xi, neta) + m_ek[1] * batozDN5Dneta(xi, neta);
+		res[7] = -batozDN3Deta(xi, eta) + m_ek[0] * batozDN4Deta(xi, eta) + m_ek[1] * batozDN5Deta(xi, eta);
 		// -b4dN4-b5dN5
-		res[8] = -m_bk[0] * batozDN4Dneta(xi, neta) - m_bk[1] * batozDN5Dneta(xi, neta);
+		res[8] = -m_bk[0] * batozDN4Deta(xi, eta) - m_bk[1] * batozDN5Deta(xi, eta);
 
 		return res;
 	}
 
-	Eigen::Matrix<double, 3, 9> batozStrainDisplacementAlternativeDerivative(double xi, double neta)
+	Eigen::Matrix<double, 3, 9> batozStrainDisplacementAlternativeDerivative(double xi, double eta) const
 	{
 		Eigen::Matrix<double, 3, 9> res;
-		std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
+		std::array<double, 9> dHx_dxi, dHx_deta, dHy_dxi, dHy_deta;
 		double coefficient = 1.0 / (2.0 * m_restArea);
 
-		dHx_dxi   = batozDhxDxiAlternative(xi, neta);
-		dHx_dneta = batozDhxDnetaAlternative(xi, neta);
-		dHy_dxi   = batozDhyDxiAlternative(xi, neta);
-		dHy_dneta = batozDhyDnetaAlternative(xi, neta);
+		dHx_dxi   = batozDhxDxiAlternative(xi, eta);
+		dHx_deta = batozDhxDetaAlternative(xi, eta);
+		dHy_dxi   = batozDhyDxiAlternative(xi, eta);
+		dHy_deta = batozDhyDetaAlternative(xi, eta);
 
 		for(size_t i = 0; i < 9; ++i)
 		{
 			//  4 -> mid-edge 12
 			//  5 -> mid-edge 20
 			//  6 -> mid-edge 01
-			res(0, i) = coefficient * ( m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_dneta[i]);
-			res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_dneta[i]);
+			res(0, i) = coefficient * ( m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_deta[i]);
+			res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_deta[i]);
 			res(2, i) = coefficient *
-				(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_dneta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_dneta[i]);
+				(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_deta[i]);
 		}
 
 		return res;
 	}
 
-	std::array<double, 9> batozFx(double xi, double neta,
+	std::array<double, 9> batozFx(double xi, double eta,
 		double (MockFem2DElement::*f1)(double,double) const,
 		double (MockFem2DElement::*f2)(double,double) const,
 		double (MockFem2DElement::*f3)(double,double) const,
 		double (MockFem2DElement::*f4)(double,double) const,
 		double (MockFem2DElement::*f5)(double,double) const,
-		double (MockFem2DElement::*f6)(double,double) const)
+		double (MockFem2DElement::*f6)(double,double) const) const
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (a6N6-a5N5)
-		res[0] = 1.5 * (m_ak[2] * (this->*f6)(xi, neta) - m_ak[1] * (this->*f5)(xi, neta));
+		res[0] = 1.5 * (m_ak[2] * (this->*f6)(xi, eta) - m_ak[1] * (this->*f5)(xi, eta));
 		// b5N5+b6N6
-		res[1] = m_bk[1] * (this->*f5)(xi, neta) + m_bk[2] * (this->*f6)(xi, neta);
+		res[1] = m_bk[1] * (this->*f5)(xi, eta) + m_bk[2] * (this->*f6)(xi, eta);
 		// N1 - c5N5 - c6N6
-		res[2] = (this->*f1)(xi, neta) - m_ck[1] * (this->*f5)(xi, neta) - m_ck[2] * (this->*f6)(xi, neta);
+		res[2] = (this->*f1)(xi, eta) - m_ck[1] * (this->*f5)(xi, eta) - m_ck[2] * (this->*f6)(xi, eta);
 
 		// 1.5 (a4N4-a6N6)
-		res[3] = 1.5 * (m_ak[0] * (this->*f4)(xi, neta) - m_ak[2] * (this->*f6)(xi, neta));
+		res[3] = 1.5 * (m_ak[0] * (this->*f4)(xi, eta) - m_ak[2] * (this->*f6)(xi, eta));
 		// b6N6+b4N4
-		res[4] = m_bk[2] * (this->*f6)(xi, neta) + m_bk[0] * (this->*f4)(xi, neta);
+		res[4] = m_bk[2] * (this->*f6)(xi, eta) + m_bk[0] * (this->*f4)(xi, eta);
 		// N2 - c6N6 - c4N4
-		res[5] = (this->*f2)(xi, neta) - m_ck[2] * (this->*f6)(xi, neta) - m_ck[0] * (this->*f4)(xi, neta);
+		res[5] = (this->*f2)(xi, eta) - m_ck[2] * (this->*f6)(xi, eta) - m_ck[0] * (this->*f4)(xi, eta);
 
 		// 1.5 (a5N5-a4N4)
-		res[6] = 1.5 * (m_ak[1] * (this->*f5)(xi, neta) - m_ak[0] * (this->*f4)(xi, neta));
+		res[6] = 1.5 * (m_ak[1] * (this->*f5)(xi, eta) - m_ak[0] * (this->*f4)(xi, eta));
 		// b4N4+b5N5
-		res[7] = m_bk[0] * (this->*f4)(xi, neta) + m_bk[1] * (this->*f5)(xi, neta);
+		res[7] = m_bk[0] * (this->*f4)(xi, eta) + m_bk[1] * (this->*f5)(xi, eta);
 		// N3 - c4N4 - c5N5
-		res[8] = (this->*f3)(xi, neta) - m_ck[0] * (this->*f4)(xi, neta) - m_ck[1] * (this->*f5)(xi, neta);
+		res[8] = (this->*f3)(xi, eta) - m_ck[0] * (this->*f4)(xi, eta) - m_ck[1] * (this->*f5)(xi, eta);
 
 		return res;
 	}
 
-	std::array<double, 9> batozFy(double xi, double neta,
+	std::array<double, 9> batozFy(double xi, double eta,
 		double (MockFem2DElement::*f1)(double,double) const,
 		double (MockFem2DElement::*f2)(double,double) const,
 		double (MockFem2DElement::*f3)(double,double) const,
 		double (MockFem2DElement::*f4)(double,double) const,
 		double (MockFem2DElement::*f5)(double,double) const,
-		double (MockFem2DElement::*f6)(double,double) const)
+		double (MockFem2DElement::*f6)(double,double) const) const
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (d6N6-d5N5)
-		res[0] = 1.5 * (m_dk[2] * (this->*f6)(xi, neta) - m_dk[1] * (this->*f5)(xi, neta));
+		res[0] = 1.5 * (m_dk[2] * (this->*f6)(xi, eta) - m_dk[1] * (this->*f5)(xi, eta));
 		// -N1 + e5N5 + e6N6
-		res[1] = -(this->*f1)(xi, neta) + m_ek[1] * (this->*f5)(xi, neta) + m_ek[2] * (this->*f6)(xi, neta);
+		res[1] = -(this->*f1)(xi, eta) + m_ek[1] * (this->*f5)(xi, eta) + m_ek[2] * (this->*f6)(xi, eta);
 		// -b5N5-b6N6
-		res[2] = -m_bk[1] * (this->*f5)(xi, neta) - m_bk[2] * (this->*f6)(xi, neta);
+		res[2] = -m_bk[1] * (this->*f5)(xi, eta) - m_bk[2] * (this->*f6)(xi, eta);
 
 		// 1.5 (d4N4-d6N6)
-		res[3] = 1.5 * (m_dk[0] * (this->*f4)(xi, neta) - m_dk[2] * (this->*f6)(xi, neta));
+		res[3] = 1.5 * (m_dk[0] * (this->*f4)(xi, eta) - m_dk[2] * (this->*f6)(xi, eta));
 		// -N2 + e6N6 + e4N4
-		res[4] = -(this->*f2)(xi, neta) + m_ek[2] * (this->*f6)(xi, neta) + m_ek[0] * (this->*f4)(xi, neta);
+		res[4] = -(this->*f2)(xi, eta) + m_ek[2] * (this->*f6)(xi, eta) + m_ek[0] * (this->*f4)(xi, eta);
 		// -b6N6-b4N4
-		res[5] = -m_bk[2] * (this->*f6)(xi, neta) - m_bk[0] * (this->*f4)(xi, neta);
+		res[5] = -m_bk[2] * (this->*f6)(xi, eta) - m_bk[0] * (this->*f4)(xi, eta);
 
 		// 1.5 (d5N5-d4N4)
-		res[6] = 1.5 * (m_dk[1] * (this->*f5)(xi, neta) - m_dk[0] * (this->*f4)(xi, neta));
+		res[6] = 1.5 * (m_dk[1] * (this->*f5)(xi, eta) - m_dk[0] * (this->*f4)(xi, eta));
 		// -N3 + e4N4 + e5N5
-		res[7] = -(this->*f3)(xi, neta) + m_ek[0] * (this->*f4)(xi, neta) + m_ek[1] * (this->*f5)(xi, neta);
+		res[7] = -(this->*f3)(xi, eta) + m_ek[0] * (this->*f4)(xi, eta) + m_ek[1] * (this->*f5)(xi, eta);
 		// -b4N4-b5N5
-		res[8] = -m_bk[0] * (this->*f4)(xi, neta) - m_bk[1] * (this->*f5)(xi, neta);
+		res[8] = -m_bk[0] * (this->*f4)(xi, eta) - m_bk[1] * (this->*f5)(xi, eta);
 
 		return res;
 	}
 
-	Eigen::Matrix<double, 3, 9> batozStrainDisplacementNumericalDerivation(double xi, double neta)
+	Eigen::Matrix<double, 3, 9> batozStrainDisplacementNumericalDerivation(double xi, double eta) const
 	{
 		Eigen::Matrix<double, 3, 9> res;
-		std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
+		std::array<double, 9> dHx_dxi, dHx_deta, dHy_dxi, dHy_deta;
 		double coefficient = 1.0 / (2.0 * m_restArea);
 
-		dHx_dxi = batozFx(xi, neta, &MockFem2DElement::batozDN1Dxi , &MockFem2DElement::batozDN2Dxi ,
+		dHx_dxi = batozFx(xi, eta, &MockFem2DElement::batozDN1Dxi , &MockFem2DElement::batozDN2Dxi ,
 			&MockFem2DElement::batozDN3Dxi , &MockFem2DElement::batozDN4Dxi , &MockFem2DElement::batozDN5Dxi ,
 			&MockFem2DElement::batozDN6Dxi);
-		dHx_dneta = batozFx(xi, neta, &MockFem2DElement::batozDN1Dneta, &MockFem2DElement::batozDN2Dneta,
-			&MockFem2DElement::batozDN3Dneta, &MockFem2DElement::batozDN4Dneta, &MockFem2DElement::batozDN5Dneta,
-			&MockFem2DElement::batozDN6Dneta);
-		dHy_dxi = batozFy(xi, neta, &MockFem2DElement::batozDN1Dxi, &MockFem2DElement::batozDN2Dxi ,
+		dHx_deta = batozFx(xi, eta, &MockFem2DElement::batozDN1Deta, &MockFem2DElement::batozDN2Deta,
+			&MockFem2DElement::batozDN3Deta, &MockFem2DElement::batozDN4Deta, &MockFem2DElement::batozDN5Deta,
+			&MockFem2DElement::batozDN6Deta);
+		dHy_dxi = batozFy(xi, eta, &MockFem2DElement::batozDN1Dxi, &MockFem2DElement::batozDN2Dxi ,
 			&MockFem2DElement::batozDN3Dxi, &MockFem2DElement::batozDN4Dxi, &MockFem2DElement::batozDN5Dxi,
 			&MockFem2DElement::batozDN6Dxi);
-		dHy_dneta = batozFy(xi, neta, &MockFem2DElement::batozDN1Dneta, &MockFem2DElement::batozDN2Dneta,
-			&MockFem2DElement::batozDN3Dneta, &MockFem2DElement::batozDN4Dneta, &MockFem2DElement::batozDN5Dneta,
-			&MockFem2DElement::batozDN6Dneta);
+		dHy_deta = batozFy(xi, eta, &MockFem2DElement::batozDN1Deta, &MockFem2DElement::batozDN2Deta,
+			&MockFem2DElement::batozDN3Deta, &MockFem2DElement::batozDN4Deta, &MockFem2DElement::batozDN5Deta,
+			&MockFem2DElement::batozDN6Deta);
 
 		for(size_t i = 0; i < 9; ++i)
 		{
 			//  4 -> mid-edge 12
 			//  5 -> mid-edge 20
 			//  6 -> mid-edge 01
-			res(0, i) = coefficient * ( m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_dneta[i]);
-			res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_dneta[i]);
+			res(0, i) = coefficient * ( m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_deta[i]);
+			res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_deta[i]);
 			res(2, i) = coefficient *
-				(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_dneta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_dneta[i]);
+				(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_deta[i]);
 		}
 
 		return res;
@@ -500,29 +512,125 @@ public:
 		m_expectedRotation = m_rotation;
 	}
 
+	// Useful method to numerically evaluate the 9x9 matrix d^T.d on a given point on the triangle
+	SurgSim::Math::Matrix evaluate_dTd_at(const MockFem2DElement& fem2DElement, double xi, double eta)
+	{
+		SurgSim::Math::Vector d(9); // column vector
+
+		const double xi2 = xi * xi;
+		const double xi3 = xi2 * xi;
+		const double eta2 = eta * eta;
+		const double eta3 = eta2 * eta;
+		const double lambda = 1.0 - xi - eta;
+		const double lambda2 = lambda * lambda;
+		const double lambda3 = lambda2 * lambda;
+		const double xiEtaLambda = xi * eta * lambda;
+
+		const double N1 = 3.0 * lambda2 - 2.0 * lambda3 + 2.0 * xiEtaLambda;
+		const double N2 = lambda2 * xi + xiEtaLambda / 2.0;
+		const double N3 = lambda2 * eta + xiEtaLambda / 2.0;
+		const double N4 = 3.0 * xi2 - 2.0 * xi3 + 2.0 * xiEtaLambda;
+		const double N5 = xi2 * (xi - 1.0) - xiEtaLambda;
+		const double N6 = xi2 * eta + xiEtaLambda / 2.0;
+		const double N7 = 3.0 * eta2 - 2.0 * eta3 + 2.0 * xiEtaLambda;
+		const double N8 = eta2 * xi + xiEtaLambda / 2.0;
+		const double N9 = eta2 * (eta - 1.0) - xiEtaLambda;
+
+		// x0 = y0 = y1 = 0.0
+		const double x1 = -fem2DElement.get_xij(2); // x0 - x1 = -x1
+		const double x2 = fem2DElement.get_xij(1); // x2 - x0 = x2
+		const double y2 = fem2DElement.get_yij(1); // y2 - y0 = y2
+
+		d << N1, N3 * y2, -N2 * x1 - N3 * x2, N4, N6 * y2, -N5 * x1 - N6 * x2, N7, N9 * y2, -N8 * x1 - N9 * x2;
+
+		return d * d.transpose();
+	}
+
+	// Useful method to numerically evaluate the 9x9 matrix Hx.Hx^T on a given point on the triangle
+	SurgSim::Math::Matrix evaluate_HxHxT_at(const MockFem2DElement& fem2DElement, double xi, double eta)
+	{
+		auto Hx_array = fem2DElement.batozHx(xi, eta);
+		SurgSim::Math::Vector Hx(9); // column vector
+		Hx << Hx_array[0], Hx_array[1], Hx_array[2],
+			Hx_array[3], Hx_array[4], Hx_array[5],
+			Hx_array[6], Hx_array[7], Hx_array[8];
+		return Hx * Hx.transpose();
+	}
+
+	// Useful method to numerically evaluate the 9x9 matrix Hy.Hy^T on a given point on the triangle
+	SurgSim::Math::Matrix evaluate_HyHyT_at(const MockFem2DElement& fem2DElement, double xi, double eta)
+	{
+		auto Hy_array = fem2DElement.batozHy(xi, eta);
+		SurgSim::Math::Vector Hy(9); // column vector
+		Hy << Hy_array[0], Hy_array[1], Hy_array[2],
+			Hy_array[3], Hy_array[4], Hy_array[5],
+			Hy_array[6], Hy_array[7], Hy_array[8];
+		return Hy * Hy.transpose();
+	}
+
+	// Useful method to numerically evaluate the plate mass matrix of an element
+	// This method uses a Gauss quadrature rules on the triangle to numerically evaluate the vaious integral terms.
+	void numericallyEvaluatePlateMassMatrix(const MockFem2DElement& fem2DElement,
+		Eigen::Ref<SurgSim::Math::Matrix> mass)
+	{
+		// M = 2.A.rho.h \int_0^1 \int_0^{1-eta} d^T.d dxi deta
+		//  + 2.A.h^3/12.rho \int_0^1 \int_0^{1-eta} Hx.Hx^T dxi deta
+		//  + 2.A.h^3/12.rho \int_0^1 \int_0^{1-eta} Hy.Hy^T dxi deta
+		const double A = fem2DElement.getRestArea();
+		const double rho = fem2DElement.getMassDensity();
+		const double h = fem2DElement.getThickness();
+		const double coefUz = 2.0 * A * rho * h;
+		const double coefUtheta = coefUz * h * h / 12.0;
+
+		// http://math2.uncc.edu/~shaodeng/TEACHING/math5172/Lectures/Lect_15.PDF
+		// "Quadrature Formulas in Two Dimensions"
+		// \int_0^1 \int_0^{1-eta} f(xi, eta) dxi deta = 1/2 sum_i w[i] f(xi[i], eta[i])
+		const double half = 1.0 / 2.0;
+
+		// Note that matrix d contains monomial terms up to degree 3,
+		// therefore dT.d contains monomial terms up to degree 6.
+		// Exact integration of such functions over the triangle requires a Gauss-Legendre quadrature with 12 points:
+		for (size_t pointId = 0; pointId < 12; ++pointId)
+		{
+			const double& weight = gaussQuadrature2DTriangle12Points[pointId].weight;
+			const double& xi = gaussQuadrature2DTriangle12Points[pointId].coordinateXi;
+			const double& eta = gaussQuadrature2DTriangle12Points[pointId].coordinateEta;
+			mass += coefUz * (half * weight * evaluate_dTd_at(fem2DElement, xi, eta));
+		}
+
+		// Note that Hx and Hy are of degree 2, therefore Hx.Hx^T and Hy.Hy^T are of degree 4.
+		// Exact integration of such functions over the triangle requires a Gauss-Legendre quadrature with 6 points:
+		for (size_t pointId = 0; pointId < 6; ++pointId)
+		{
+			const double& weight = gaussQuadrature2DTriangle6Points[pointId].weight;
+			const double& xi = gaussQuadrature2DTriangle6Points[pointId].coordinateXi;
+			const double& eta = gaussQuadrature2DTriangle6Points[pointId].coordinateEta;
+			mass += coefUtheta * (half * weight * evaluate_HxHxT_at(fem2DElement, xi, eta));
+			mass += coefUtheta * (half * weight * evaluate_HyHyT_at(fem2DElement, xi, eta));
+		}
+	}
+
 	void getExpectedLocalMassMatrix(Eigen::Ref<SurgSim::Math::Matrix> mass)
 	{
-		double m = m_rho * m_thickness * m_A;
+		typedef Eigen::Matrix<double, 9, 9> Matrix99Type;
+		typedef Eigen::Matrix<double, 6, 6> Matrix66Type;
 
-		mass.setIdentity();
+		Matrix66Type membraneMass = getMembraneLocalMassMatrix();
+		Matrix99Type plateMass = getPlateLocalMassMatrix();
 
-		mass.block<2, 2>(0, 0).diagonal().setConstant(m / 6.0);
-		mass.block<2, 2>(0, 6).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(0, 12).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(3, 3).setConstant(-6.25e-6);
-		mass.block<2, 2>(3, 3).diagonal().setConstant(6.0416666666666666e-5);
+		// Assemble the membrane and plane stiffness
+		mass.setIdentity(); // The drilling dof will have an independent dof of mass 1kg.
+		for(size_t row = 0; row < 3; ++row)
+		{
+			for(size_t column = 0; column < 3; ++column)
+			{
+				// Membrane part
+				mass.block<2, 2>(6 * row, 6 * column) = membraneMass.block<2, 2>(2 * row, 2 * column);
 
-		mass.block<2, 2>(6, 0).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(6, 6).diagonal().setConstant(m / 6.0);
-		mass.block<2, 2>(6, 12).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(9, 9).setConstant(-6.25e-6);
-		mass.block<2, 2>(9, 9).diagonal().setConstant(6.0416666666666666e-5);
-
-		mass.block<2, 2>(12, 0).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(12, 6).diagonal().setConstant(m / 12.0);
-		mass.block<2, 2>(12, 12).diagonal().setConstant(m / 6.0);
-		mass.block<2, 2>(15, 15).setConstant(-6.25e-6);
-		mass.block<2, 2>(15, 15).diagonal().setConstant(6.0416666666666666e-5);
+				// Thin-plate part
+				mass.block<3, 3>(6 * row + 2, 6 * column + 2) = plateMass.block<3, 3>(3 * row, 3 * column);
+			}
+		}
 	}
 
 	void getExpectedLocalStiffnessMatrix(Eigen::Ref<SurgSim::Math::Matrix> stiffness)
@@ -540,10 +648,10 @@ public:
 			for(size_t column = 0; column < 3; ++column)
 			{
 				// Membrane part
-				stiffness.block(6 * row, 6 * column, 2, 2) = membraneStiffness.block(2 * row, 2 * column, 2, 2);
+				stiffness.block<2, 2>(6 * row, 6 * column) = membraneStiffness.block<2, 2>(2 * row, 2 * column);
 
 				// Thin-plate part
-				stiffness.block(6 * row + 2, 6 * column + 2, 3, 3) = plateStiffness.block(3 * row, 3 * column, 3, 3);
+				stiffness.block<3, 3>(6 * row + 2, 6 * column + 2) = plateStiffness.block<3, 3>(3 * row, 3 * column);
 			}
 		}
 	}
@@ -627,6 +735,40 @@ public:
 		stiffness *= 2.0 * m_A;
 
 		return stiffness;
+	}
+
+	Eigen::Matrix<double, 6, 6> getMembraneLocalMassMatrix()
+	{
+		typedef Eigen::Matrix<double, 6, 6> Matrix66Type;
+
+		Matrix66Type membraneMassMatrix = Matrix66Type::Zero();
+		double m = m_rho * m_thickness * m_A;
+
+		membraneMassMatrix.block<2, 2>(0, 0).diagonal().setConstant(m / 6.0);
+		membraneMassMatrix.block<2, 2>(0, 2).diagonal().setConstant(m / 12.0);
+		membraneMassMatrix.block<2, 2>(0, 4).diagonal().setConstant(m / 12.0);
+
+		membraneMassMatrix.block<2, 2>(2, 0).diagonal().setConstant(m / 12.0);
+		membraneMassMatrix.block<2, 2>(2, 2).diagonal().setConstant(m / 6.0);
+		membraneMassMatrix.block<2, 2>(2, 4).diagonal().setConstant(m / 12.0);
+
+		membraneMassMatrix.block<2, 2>(4, 0).diagonal().setConstant(m / 12.0);
+		membraneMassMatrix.block<2, 2>(4, 2).diagonal().setConstant(m / 12.0);
+		membraneMassMatrix.block<2, 2>(4, 4).diagonal().setConstant(m / 6.0);
+
+		return membraneMassMatrix;
+	}
+
+	Eigen::Matrix<double, 9, 9> getPlateLocalMassMatrix()
+	{
+		typedef Eigen::Matrix<double, 9, 9> Matrix99Type;
+
+		Matrix99Type plateMassMatrix = Matrix99Type::Zero();
+
+		std::shared_ptr<MockFem2DElement> element = getElement();
+		numericallyEvaluatePlateMassMatrix(*element, plateMassMatrix);
+
+		return plateMassMatrix;
 	}
 
 	std::shared_ptr<MockFem2DElement> getElement()
@@ -984,23 +1126,23 @@ TEST_F(Fem2DElementTriangleTests, PlateShapeFunctionsTest)
 	EXPECT_DOUBLE_EQ(0.0, tri->batozN6(0.0, 0.5));
 	EXPECT_DOUBLE_EQ(1.0, tri->batozN6(0.5, 0.0));
 
-	// We should have the relation sum(Ni(xi, neta) = 1) for all points in the triangle
+	// We should have the relation sum(Ni(xi, eta) = 1) for all points in the triangle
 	for (double xi = 0.0; xi <= 1.0; xi += 0.1)
 	{
-		for (double neta = 0.0; xi + neta <= 1.0; neta += 0.1)
+		for (double eta = 0.0; xi + eta <= 1.0; eta += 0.1)
 		{
-			EXPECT_DOUBLE_EQ(1.0, tri->batozN1(xi, neta) + tri->batozN2(xi, neta) + tri->batozN3(xi, neta) + \
-				tri->batozN4(xi, neta) + tri->batozN5(xi, neta) + tri->batozN6(xi, neta)) <<
-				"For (xi = " << xi << ", neta = " << neta << "), " << std::endl <<
-				" N1 = " << tri->batozN1(xi, neta) << std::endl <<
-				" N2 = " << tri->batozN2(xi, neta) << std::endl <<
-				" N3 = " << tri->batozN3(xi, neta) << std::endl <<
-				" N4 = " << tri->batozN4(xi, neta) << std::endl <<
-				" N5 = " << tri->batozN5(xi, neta) << std::endl <<
-				" N6 = " << tri->batozN6(xi, neta) << std::endl <<
+			EXPECT_DOUBLE_EQ(1.0, tri->batozN1(xi, eta) + tri->batozN2(xi, eta) + tri->batozN3(xi, eta) + \
+				tri->batozN4(xi, eta) + tri->batozN5(xi, eta) + tri->batozN6(xi, eta)) <<
+				"For (xi = " << xi << ", eta = " << eta << "), " << std::endl <<
+				" N1 = " << tri->batozN1(xi, eta) << std::endl <<
+				" N2 = " << tri->batozN2(xi, eta) << std::endl <<
+				" N3 = " << tri->batozN3(xi, eta) << std::endl <<
+				" N4 = " << tri->batozN4(xi, eta) << std::endl <<
+				" N5 = " << tri->batozN5(xi, eta) << std::endl <<
+				" N6 = " << tri->batozN6(xi, eta) << std::endl <<
 				" N1+N2+N3+N4+N5+N6 = " <<
-				tri->batozN1(xi, neta) + tri->batozN2(xi, neta) + tri->batozN3(xi, neta) +
-				tri->batozN4(xi, neta) + tri->batozN5(xi, neta) + tri->batozN6(xi, neta);
+				tri->batozN1(xi, eta) + tri->batozN2(xi, eta) + tri->batozN3(xi, eta) +
+				tri->batozN4(xi, eta) + tri->batozN5(xi, eta) + tri->batozN6(xi, eta);
 		}
 	}
 }
@@ -1022,13 +1164,100 @@ TEST_F(Fem2DElementTriangleTests, StiffnessMatrixTest)
 		"KGlobal expected = " << std::endl << expectedLocalStiffness << std::endl;
 }
 
+/// Evaluate a given polynomial at the given coordinates (x, y)
+/// \param degree The degree of the polynomial
+/// \param coefficients The vector of coefficients for all monomials in order
+///                     [1, x, y,..., x^n, x^{n-1}y^1, ..., x^1y^{n-1}, x^0y^n]
+/// \param x,y The coordinates to evaluate the polynomial at
+/// \return the polynomial evaluation at the coordinates (x, y)
+static double evaluatePolynomial(size_t degree, const SurgSim::Math::Vector& coefficients, double x, double y)
+{
+	SURGSIM_ASSERT((degree + 1) * (degree + 2) / 2 == static_cast<size_t>(coefficients.size())) <<
+		"Invalid coefficients vector (of size " << coefficients.size() <<
+		") provided for a polynomial of degree " << degree <<
+		". Was expecting " << (degree + 1) * (degree + 2) / 2 << " coefficients";
+
+	SurgSim::Math::Vector monomials = SurgSim::Math::Vector::Zero(coefficients.size());
+
+	size_t monomialId = 0;
+	for (size_t d = 0; d <= degree; d++)
+	{
+		for (size_t monomialOfDegreed = 0; monomialOfDegreed <= d; monomialOfDegreed++)
+		{
+			monomials[monomialId] =
+				coefficients[monomialId] * pow(x, d - monomialOfDegreed) * pow(y, monomialOfDegreed);
+			monomialId++;
+		}
+	}
+
+	return monomials.sum();
+}
+
+TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomialOrder4Test)
+{
+	// Polynomial of order 4 on 2 variables:
+	// {1, 2x, 3y, 4x^2, 5xy, 6y^2, 7x^3, 8x^2y, 9xy^2, 10y^3, 11x^4, 12x^3y, 13x^2y^2, 14xy^3, 15y^4}
+	// \int_0^1 \int_0^{1-y} P(x, y) dx dy = 1679 / 360
+	SurgSim::Math::Vector polynomial(15);
+	polynomial.setLinSpaced(1.0, 15.0);
+
+	// http://math2.uncc.edu/~shaodeng/TEACHING/math5172/Lectures/Lect_15.PDF
+	// "Quadrature Formulas in Two Dimensions"
+	// \int_0^1 \int_0^{1-eta} f(xi, eta) dxi deta = 1/2 sum_i w[i] f(xi[i], eta[i])
+	const double half = 1.0 / 2.0;
+
+	// Note that Hx and Hy are of degree 2, therefore Hx.Hx^T and Hy.Hy^T are of degree 4.
+	// Exact integration of such functions over the triangle requires a Gauss-Legendre quadrature with 6 points:
+	double integral = 0.0;
+	for (size_t pointId = 0; pointId < 6; ++pointId)
+	{
+		const double& weight = gaussQuadrature2DTriangle6Points[pointId].weight;
+		const double& xi  = gaussQuadrature2DTriangle6Points[pointId].coordinateXi;
+		const double& eta = gaussQuadrature2DTriangle6Points[pointId].coordinateEta;
+		integral += half * weight * evaluatePolynomial(4, polynomial, xi, eta);
+	}
+
+	EXPECT_NEAR(1679.0 / 360.0, integral, 1e-8);
+}
+
+TEST_F(Fem2DElementTriangleTests, TriangleIntegrationPolynomialOrder6Test)
+{
+	// Polynomial of order 6 on 2 variables:
+	// {1, 2x, 3y, 4x^2, 5xy, 6y^2, 7x^3, 8x^2y, 9xy^2, 10y^3, 11x^4, 12x^3y, 13x^2y^2, 14xy^3, 15y^4,
+	// 16x^5, 17x^4y, 18x^3y^2, 19x^2y^3, 20xy^4, 21y^5,
+	// 22x^6, 23x^5y, 24x^4y^2, 25x^3y^3, 26x^2y^4, 27xy^5, 28y^6}
+	// \int_0^1 \int_0^{1-y} P(x, y) dx dy = 9983 / 1440
+	SurgSim::Math::Vector polynomial(28);
+	polynomial.setLinSpaced(1.0, 28.0);
+
+	// http://math2.uncc.edu/~shaodeng/TEACHING/math5172/Lectures/Lect_15.PDF
+	// "Quadrature Formulas in Two Dimensions"
+	// \int_0^1 \int_0^{1-eta} f(xi, eta) dxi deta = 1/2 sum_i w[i] f(xi[i], eta[i])
+	const double half = 1.0 / 2.0;
+
+	// Note that matrix d contains monomial terms up to degree 3,
+	// therefore dT.d contains monomial terms up to degree 6.
+	// Exact integration of such functions over the triangle requires a Gauss-Legendre quadrature with 12 points:
+	double integral = 0.0;
+	for (size_t pointId = 0; pointId < 12; ++pointId)
+	{
+		const double& weight = gaussQuadrature2DTriangle12Points[pointId].weight;
+		const double& xi  = gaussQuadrature2DTriangle12Points[pointId].coordinateXi;
+		const double& eta = gaussQuadrature2DTriangle12Points[pointId].coordinateEta;
+		integral += half * weight * evaluatePolynomial(6, polynomial, xi, eta);
+	}
+
+	EXPECT_NEAR(9983.0 / 1440.0, integral, 1e-6);
+}
+
 TEST_F(Fem2DElementTriangleTests, MassMatrixTest)
 {
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
 	Eigen::Matrix<double, 18, 18> expectedMassMatrix;
 	getExpectedLocalMassMatrix(expectedMassMatrix);
-	EXPECT_TRUE(tri->getLocalMassMatrix().isApprox(expectedMassMatrix));
+	EXPECT_TRUE(tri->getLocalMassMatrix().isApprox(expectedMassMatrix)) <<
+		"Error = " << std::endl << tri->getLocalMassMatrix() - expectedMassMatrix << std::endl;
 
 	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalMassMatrix().isApprox(R0 * expectedMassMatrix * R0.transpose()));
@@ -1073,7 +1302,8 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	EXPECT_TRUE(forceVector.isZero());
 
 	tri->addMass(m_restState, &massMatrix);
-	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix));
+	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix)) << "MassMatrix = " << std::endl << massMatrix << std::endl <<
+		"ExpectedMassMatrix = " << std::endl << expectedMassMatrix << std::endl;
 
 	tri->addDamping(m_restState, &dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isZero());
