@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/BasicThread.h"
 #include "SurgSim/Framework/Logger.h"
 
 namespace SurgSim
@@ -32,7 +33,7 @@ class NimbleThread;
 /// A class that manages Nimble devices.
 ///
 /// \sa SurgSim::Device::NimbleDevice
-class NimbleScaffold
+class NimbleScaffold : public SurgSim::Framework::BasicThread
 {
 public:
 	/// Destructor.
@@ -46,6 +47,12 @@ public:
 	/// The scaffold is managed using a SingleInstance object.
 	/// \return the scaffold object.
 	static std::shared_ptr<NimbleScaffold> getOrCreateSharedInstance();
+
+protected:
+	virtual bool doInitialize() override;
+	virtual bool doStartUp() override;
+	virtual bool doUpdate(double dt) override;
+	virtual void doBeforeStop() override;
 
 private:
 	/// Internal shared state data type.
@@ -70,31 +77,11 @@ private:
 	/// \return true on success, false on failure.
 	bool unregisterDevice(const NimbleDevice* device);
 
-	/// Initialize the state and establish connection with the Nimble server.
-	/// \returns True, if the connection is Nimble server is established.
-	bool initialize();
-
-	/// Listens to the Nimble server and de-serializes the data that is read.
-	/// \return True, if everything went well and the thread can continue to run.
-	bool update();
-
-	/// Close communication with the Nimble server.
-	void finalize();
-
 	/// Update the devices based on the data read from the Nimble server.
 	void updateDeviceData();
 
 	/// Reset the device data.
 	void resetDeviceData();
-
-	/// Creates the hand tracking client thread.
-	/// \return true on success.
-	bool createThread();
-
-	/// Destroys the hand tracking client thread.
-	/// Should be called while NOT holding the internal device list mutex, to prevent deadlock.
-	/// \return true on success.
-	bool destroyThread();
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
