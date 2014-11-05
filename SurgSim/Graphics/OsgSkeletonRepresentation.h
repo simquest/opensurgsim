@@ -19,7 +19,6 @@
 #include <string>
 #include <map>
 
-#include <osg/Group>
 #include <osg/MatrixTransform>
 #include <osg/Node>
 #include <osg/ref_ptr>
@@ -67,11 +66,11 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgSkeletonRepresentation);
 
-	void loadModel(const std::string& fileName) override;
+	virtual void loadModel(const std::string& fileName) override;
 
-	void setModel(std::shared_ptr<SurgSim::Framework::Asset> model) override;
+	virtual void setModel(std::shared_ptr<SurgSim::Framework::Asset> model) override;
 
-	std::shared_ptr<Model> getModel() const override;
+	virtual std::shared_ptr<Model> getModel() const override;
 
 	/// Set the file containing the skinning shader.
 	/// \param fileName The file containing the skinning shader.
@@ -80,10 +79,7 @@ public:
 	/// \return The file containing the skinning shader.
 	std::string getSkinningShaderFileName();
 
-	/// Set the bone pose for a given string.
-	/// \param name The name of the bone.
-	/// \param pose The pose of the bone.
-	virtual void setBonePose(std::string name, SurgSim::Math::RigidTransform3d pose);
+	virtual void setBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) override;
 
 protected:
 	virtual void doUpdate(double dt) override;
@@ -103,8 +99,8 @@ private:
 	/// Mutex to access m_boneData thread safely.
 	boost::mutex m_boneDataMutex;
 
-	/// The skeleton which is represented.
-	osg::ref_ptr<osg::Group> m_skeleton;
+	/// The skeleton which is read from the mesh file.
+	osg::ref_ptr<osg::Node> m_skeleton;
 
 	/// The file containing the skinning shader.
 	std::string m_skinningShaderFileName;

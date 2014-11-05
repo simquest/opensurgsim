@@ -79,13 +79,13 @@ TEST_F(OsgSkeletonRepresentationRenderTests, BasicTest)
 	rootTransform.first =
 		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 1.0, 1.0)), Vector3d::Zero());
 	rootTransform.second =
-		makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d(1.0, 1.0, 1.0)), Vector3d::Zero());
+		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 1.0, 1.0)), Vector3d::Zero());
 
 	std::pair<RigidTransform3d, RigidTransform3d> boneTransform;
 	boneTransform.first =
 		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 0.0, 0.0)), Vector3d::Zero());
 	boneTransform.second =
-		makeRigidTransform(makeRotationQuaternion(M_PI, Vector3d(1.0, 0.0, 0.0)), Vector3d::Zero());
+		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 0.0, 0.0)), Vector3d(0.0, 4.0, 0.0));
 
 	int numSteps = 1000;
 
@@ -97,6 +97,34 @@ TEST_F(OsgSkeletonRepresentationRenderTests, BasicTest)
 		sceneElement->setPose(pose);
 
 		pose = interpolate(boneTransform, t / 3.0);
+		graphics->setBonePose("Bone", RigidTransform3d::Identity());
+		graphics->setBonePose("Bone_001", pose);
+		graphics->setBonePose("Bone_002", pose);
+		graphics->setBonePose("Bone_003", pose);
+
+		/// The total number of steps should complete in 5 seconds
+		boost::this_thread::sleep(boost::posix_time::milliseconds(5000 / numSteps));
+	}
+
+	rootTransform.first =
+		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 1.0, 1.0)), Vector3d::Zero());
+	rootTransform.second =
+		makeRigidTransform(makeRotationQuaternion(M_2_PI, Vector3d(1.0, 1.0, 1.0)), Vector3d::Zero());
+
+	boneTransform.first =
+		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 0.0, 0.0)), Vector3d::Zero());
+	boneTransform.second =
+		makeRigidTransform(makeRotationQuaternion(M_PI, Vector3d(1.0, 0.0, 0.0)), Vector3d::Zero());
+
+	for (int i = 0; i < numSteps; ++i)
+	{
+		double t = static_cast<double>(i) / numSteps;
+
+		RigidTransform3d pose = interpolate(rootTransform, t);
+		sceneElement->setPose(pose);
+
+		pose = interpolate(boneTransform, t / 3.0);
+		graphics->setBonePose("Bone", pose);
 		graphics->setBonePose("Bone_001", pose);
 		graphics->setBonePose("Bone_002", pose);
 		graphics->setBonePose("Bone_003", pose);

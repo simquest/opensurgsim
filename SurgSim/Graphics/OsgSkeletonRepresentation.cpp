@@ -61,9 +61,9 @@ public:
 	void apply(osg::Node& node)
 	{
 		// Look for the transformation root ..
-		if (m_root == nullptr)
+		if (m_rootTransform == nullptr)
 		{
-			m_root = dynamic_cast<osg::MatrixTransform*>(&node);
+			m_rootTransform = dynamic_cast<osg::MatrixTransform*>(&node);
 		}
 
 		// Parse the bone data.
@@ -85,14 +85,15 @@ public:
 			SURGSIM_ASSERT(callback != nullptr) << "Could neither find nor create the appropriate BoneUpdate callback";
 
 			// Push these transformations onto the stack so we can manipulate them
-			data.rotation = new osgAnimation::StackedQuaternionElement("userrotation");
+			data.rotation = new osgAnimation::StackedQuaternionElement("OssRotation");
 			callback->getStackedTransforms().push_back(data.rotation);
 			data.rotation->setQuaternion(osg::Quat());
-			data.translation = new osgAnimation::StackedTranslateElement("usertranslation");
+			data.translation = new osgAnimation::StackedTranslateElement("OssTranslation");
 			callback->getStackedTransforms().push_back(data.translation);
 
 			SURGSIM_ASSERT(m_boneData.find(bone->getName()) == m_boneData.end())
-				<< "There already exists a bone with that name in this skeleton. Cannot create a duplicate.";
+				<< "There already exists a bone with name, " << bone->getName()
+				<< ", in this skeleton. Cannot create a duplicate.";
 
 			m_boneData[bone->getName()] = data;
 		}
@@ -103,14 +104,15 @@ public:
 			osg::Geode* meshGeode= dynamic_cast<osg::Geode*>(&node);
 			if (nullptr != meshGeode)
 			{
+				osgAnimation::RigTransformHardware* rigTransform = new osgAnimation::RigTransformHardware();
+				osg::Shader* shader = new osg::Shader(*m_shader);
+				rigTransform->setShader(shader);
+
 				for (size_t i = 0; i < meshGeode->getDrawableList().size(); ++i)
 				{
 					auto rigGeometry = dynamic_cast<osgAnimation::RigGeometry*>(meshGeode->getDrawable(i));
 					if (nullptr != rigGeometry)
 					{
-						osgAnimation::RigTransformHardware* rigTransform = new osgAnimation::RigTransformHardware();
-						osg::Shader* shader = new osg::Shader(*m_shader);
-						rigTransform->setShader(shader);
 						rigGeometry->setRigTransformImplementation(rigTransform);
 					}
 				}
@@ -125,15 +127,15 @@ public:
 		return m_boneData;
 	}
 
-	/// \return The root node of the skeleton.
-	osg::ref_ptr<osg::MatrixTransform> getRoot()
+	/// \return The root node of the skeleton on which the transform is set.
+	osg::ref_ptr<osg::MatrixTransform> getRootTransform()
 	{
-		return m_root;
+		return m_rootTransform;
 	}
 
 private:
 	/// The root bone of the skeleton where the global transform is set.
-	osg::ref_ptr<osg::MatrixTransform> m_root;
+	osg::ref_ptr<osg::MatrixTransform> m_rootTransform;
 
 	/// The hardware skinning shader.
 	osg::ref_ptr<osg::Shader> m_shader;
@@ -195,13 +197,19 @@ std::string OsgSkeletonRepresentation::getSkinningShaderFileName()
 	return m_skinningShaderFileName;
 }
 
-void OsgSkeletonRepresentation::setBonePose(std::string name, SurgSim::Math::RigidTransform3d pose)
+void OsgSkeletonRepresentation::setBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose)
 {
-	boost::lock_guard<boost::mutex> lock(m_boneDataMutex);
 	auto boneData = m_boneData.find(name);
 	if (boneData != m_boneData.end())
 	{
+		boost::lock_guard<boost::mutex> lock(m_boneDataMutex);
 		boneData->second.pose = pose;
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "OsgSkeletonRepresentation::setBonePose(): Bone with name, " << name << ", is not present in mesh."
+			<< "Cannot set pose.";
 	}
 }
 
@@ -210,10 +218,11 @@ void OsgSkeletonRepresentation::doUpdate(double dt)
 	{
 		boost::lock_guard<boost::mutex> lock(m_boneDataMutex);
 		// Update the pose of all the bones.
-		for (auto boneData = m_boneData.begin(); boneData != m_boneData.end(); ++boneData)
+		for (auto& boneData : m_boneData)
 		{
-			std::pair<osg::Quat, osg::Vec3d> pose = toOsg(boneData->second.pose);
-			boneData->second.rotation->setQuaternion(pose.first);
+			std::pair<osg::Quat, osg::Vec3d> pose = toOsg(boneData.second.pose);
+			boneData.second.rotation->setQuaternion(pose.first);
+			boneData.second.translation->setTranslate(pose.second);
 		}
 	}
 
@@ -244,7 +253,8 @@ bool OsgSkeletonRepresentation::doInitialize()
 		if (shaderFilename.empty())
 		{
 			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "OsgSkeletonRepresentation::doInitialize(): Skinning shader file not found.";
+				<< "OsgSkeletonRepresentation::doInitialize(): Skinning shader file (" << m_skinningShaderFileName
+				<< ") not found.";
 			result = false;
 		}
 		else
@@ -264,10 +274,10 @@ bool OsgSkeletonRepresentation::doInitialize()
 		}
 		else
 		{
-			m_skeleton = dynamic_cast<osg::Group*>(std::dynamic_pointer_cast<OsgModel>(m_model)->getOsgNode().get());
+			m_skeleton = dynamic_cast<osg::Node*>(std::dynamic_pointer_cast<OsgModel>(m_model)->getOsgNode().get());
 			result = nullptr != m_skeleton;
 			SURGSIM_ASSERT(result)
-				<< "OsgSkeletonRepresentation::doInitialize(): osgDB::readNodeFile returned a null mesh";
+				<< "OsgSkeletonRepresentation::doInitialize(): model does not have a valid osgNode.";
 		}
 	}
 
@@ -282,7 +292,7 @@ bool OsgSkeletonRepresentation::doInitialize()
 			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
 				<< "Could not find any osgAnimation::Bone nodes in tree with root <" + m_skeleton->getName() + ">";
 		}
-		m_base = mapCreator.getRoot();
+		m_base = mapCreator.getRootTransform();
 
 		// Setup the transform updater for the skeleton.
 		m_updateVisitor = new osgUtil::UpdateVisitor();

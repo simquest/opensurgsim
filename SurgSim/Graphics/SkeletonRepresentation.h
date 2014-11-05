@@ -67,8 +67,10 @@ public:
 	/// \return the current model.
 	virtual std::shared_ptr<Model> getModel() const = 0;
 
-	/// Set the bone pose for a given string.
-	virtual void setBonePose(std::string name, SurgSim::Math::RigidTransform3d) = 0;
+	/// Set the pose for a given bone.
+	/// \param name The name of the bone.
+	/// \param pose The pose of the bone.
+	virtual void setBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) = 0;
 };
 
 };  // namespace Graphics
