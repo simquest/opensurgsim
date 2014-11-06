@@ -13,28 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(SURGSIM_PARTICLES_SOURCES
-	PointGenerator.cpp
-	RandomBoxPointGenerator.cpp
-	RandomSpherePointGenerator.cpp
-	ShapesPointGenerator.cpp
+include_directories(
+	${gtest_SOURCE_DIR}/include
 )
 
-set(SURGSIM_PARTICLES_HEADERS
-	PointGenerator.h
-	RandomBoxPointGenerator.h
-	RandomSpherePointGenerator.h
-	ShapesPointGenerator.h
+set(UNIT_TEST_SOURCES
+	PointGeneratorTests.cpp
 )
 
-surgsim_add_library(
+set(UNIT_TEST_HEADERS
+)
+
+set(LIBS
 	SurgSimParticles
-	"${SURGSIM_PARTICLES_SOURCES}"
-	"${SURGSIM_PARTICLES_HEADERS}"
 )
 
-if(BUILD_TESTING)
-	add_subdirectory(UnitTests)
-endif()
+surgsim_add_unit_tests(SurgSimParticlesTest)
 
-set_target_properties(SurgSimParticles PROPERTIES FOLDER "Particles")
+set_target_properties(SurgSimParticlesTest PROPERTIES FOLDER "Particles")
