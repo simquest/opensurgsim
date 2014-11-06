@@ -32,7 +32,7 @@ class Shape;
 namespace Particles
 {
 
-/// PointGenerator is used to generate one point inside or on the surface of a given shape.
+/// PointGenerator is used to generate points inside or on the surface of a given shape.
 /// Derived classes need to implement pointInShape() and pointOnShape().
 class PointGenerator
 {
@@ -44,11 +44,11 @@ public:
 	virtual ~PointGenerator();
 
 	/// Generates one point inside the shape
-	/// \return A point inside the shape, shape is assumed to located at the origin.
+	/// \return A point inside the shape, shape is assumed to be located at the origin.
 	virtual SurgSim::Math::Vector3d pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape) = 0;
 
 	/// Generates one point on the surface of the shape
-	/// \return A point on the surface of the shape, shape is assumed to located at the origin.
+	/// \return A point on the surface of the shape, shape is assumed to be located at the origin.
 	virtual SurgSim::Math::Vector3d pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape) = 0;
 
 protected:
