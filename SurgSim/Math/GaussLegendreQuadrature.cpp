@@ -22,25 +22,25 @@ namespace SurgSim
 namespace Math
 {
 
-std::array<gaussQuadraturePoint, 1> gaussQuadrature1Point =
+const std::array<gaussQuadraturePoint, 1> gaussQuadrature1Point =
 {{
 	gaussQuadraturePoint(0.0, 2.0)
 }};
 
-std::array<gaussQuadraturePoint, 2> gaussQuadrature2Points =
+const std::array<gaussQuadraturePoint, 2> gaussQuadrature2Points =
 {{
 	gaussQuadraturePoint( 1.0 / sqrt(3.0), 1.0),
 	gaussQuadraturePoint(-1.0 / sqrt(3.0), 1.0)
 }};
 
-std::array<gaussQuadraturePoint, 3> gaussQuadrature3Points =
+const std::array<gaussQuadraturePoint, 3> gaussQuadrature3Points =
 {{
 	gaussQuadraturePoint(             0.0, 8.0 / 9.0),
 	gaussQuadraturePoint( sqrt(3.0 / 5.0), 5.0 / 9.0),
 	gaussQuadraturePoint(-sqrt(3.0 / 5.0), 5.0 / 9.0)
 }};
 
-std::array<gaussQuadraturePoint, 4> gaussQuadrature4Points =
+const std::array<gaussQuadraturePoint, 4> gaussQuadrature4Points =
 {{
 	gaussQuadraturePoint( sqrt((3.0 - 2.0 * sqrt(6.0 / 5.0)) / 7.0), (18.0 + sqrt(30.0)) / 36.0),
 	gaussQuadraturePoint(-sqrt((3.0 - 2.0 * sqrt(6.0 / 5.0)) / 7.0), (18.0 + sqrt(30.0)) / 36.0),
@@ -48,7 +48,7 @@ std::array<gaussQuadraturePoint, 4> gaussQuadrature4Points =
 	gaussQuadraturePoint(-sqrt((3.0 + 2.0 * sqrt(6.0 / 5.0)) / 7.0), (18.0 - sqrt(30.0)) / 36.0)
 }};
 
-std::array<gaussQuadraturePoint, 5> gaussQuadrature5Points =
+const std::array<gaussQuadraturePoint, 5> gaussQuadrature5Points =
 {{
 	gaussQuadraturePoint( 0.0, 128.0 / 225.0),
 	gaussQuadraturePoint( sqrt(5.0 - 2.0 * sqrt(10.0 / 7.0)) / 3.0, (322.0 + 13.0 * sqrt(70.0)) / 900.0),
@@ -57,7 +57,7 @@ std::array<gaussQuadraturePoint, 5> gaussQuadrature5Points =
 	gaussQuadraturePoint(-sqrt(5.0 + 2.0 * sqrt(10.0 / 7.0)) / 3.0, (322.0 - 13.0 * sqrt(70.0)) / 900.0)
 }};
 
-std::array<gaussQuadraturePoint, 100> gaussQuadrature100Points =
+const std::array<gaussQuadraturePoint, 100> gaussQuadrature100Points =
 {{
 	gaussQuadraturePoint( 0.0156289844215430828722167, 0.0312554234538633569476425),
 	gaussQuadraturePoint(-0.0156289844215430828722167, 0.0312554234538633569476425),
@@ -161,7 +161,14 @@ std::array<gaussQuadraturePoint, 100> gaussQuadrature100Points =
 	gaussQuadraturePoint(-0.9997137267734412336782285, 0.0007346344905056717304063)
 }};
 
-std::array<gaussQuadratureTrianglePoint, 6> gaussQuadrature2DTriangle6Points =
+const std::array<gaussQuadratureTrianglePoint, 3> gaussQuadrature2DTriangle3Points =
+{{
+	gaussQuadratureTrianglePoint(1.0 / 2.0, 1.0 / 2.0, 1.0 / 3.0),
+	gaussQuadratureTrianglePoint(1.0 / 2.0,       0.0, 1.0 / 3.0),
+	gaussQuadratureTrianglePoint(0.0      , 1.0 / 2.0, 1.0 / 3.0)
+}};
+
+const std::array<gaussQuadratureTrianglePoint, 6> gaussQuadrature2DTriangle6Points =
 {{
 	gaussQuadratureTrianglePoint(0.44594849091597, 0.44594849091597, 0.22338158967801),
 	gaussQuadratureTrianglePoint(0.44594849091597, 0.10810301816807, 0.22338158967801),
@@ -171,7 +178,7 @@ std::array<gaussQuadratureTrianglePoint, 6> gaussQuadrature2DTriangle6Points =
 	gaussQuadratureTrianglePoint(0.81684757298046, 0.09157621350977, 0.10995174365532)
 }};
 
-std::array<gaussQuadratureTrianglePoint, 12> gaussQuadrature2DTriangle12Points =
+const std::array<gaussQuadratureTrianglePoint, 12> gaussQuadrature2DTriangle12Points =
 {{
 	gaussQuadratureTrianglePoint(0.24928674517091, 0.24928674517091, 0.11678627572638),
 	gaussQuadratureTrianglePoint(0.24928674517091, 0.50142650965818, 0.11678627572638),

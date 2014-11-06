@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/GaussLegendreQuadrature.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -21,6 +22,7 @@
 
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
+using SurgSim::Math::gaussQuadrature2DTriangle3Points;
 using SurgSim::Math::getSubMatrix;
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::setSubMatrix;
@@ -233,8 +235,7 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 {
 	// Membrane part from "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
 	// Compute the membrane local strain-displacement matrix
-	Matrix36Type membraneStrainDisplacement;
-	membraneStrainDisplacement.setZero();
+	Matrix36Type membraneStrainDisplacement = Matrix36Type::Zero();
 	for(size_t i = 0; i < 3; ++i)
 	{
 		// Noting f(x,y) the membrane shape function, the displacement is:
@@ -264,28 +265,21 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 	membraneKLocal *= m_thickness * m_restArea;
 
 	// Thin-plate part from "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
-	// Thin-Plate strain-displacement matrices using a 3 point Gauss quadrature located at the middle of the edges
-	Matrix39Type plateStrainDisplacementGaussPoint0 = batozStrainDisplacement(0.0 , 0.5);
-	Matrix39Type plateStrainDisplacementGaussPoint1 = batozStrainDisplacement(0.5 , 0.0);
-	Matrix39Type plateStrainDisplacementGaussPoint2 = batozStrainDisplacement(0.5 , 0.5);
 	// Thin-plate material stiffness coming from Hooke Law (isotropic material)
 	Matrix33Type plateElasticMaterial = membraneElasticMaterial;
 	plateElasticMaterial *= m_thickness * m_thickness * m_thickness / 12.0;
-	// Thin-plate local stiffness matrix = integral(strain:stress) using a 3 points integration
-	// rule over the parametrized triangle (exact integration because only quadratic terms)
-	// integral(over parametric triangle) Bt.Em.B = sum(gauss point (xi,eta)) wi Bt(xi,eta).Em.B(xi,eta)
-	// http://www.ams.org/journals/mcom/1959-13-068/S0025-5718-1959-0107976-5/S0025-5718-1959-0107976-5.pdf
-	// = Area(parametric triangle)/3.0 * Bt(0.5, 0.0).Em.B(0.5, 0.0)
-	// + Area(parametric triangle)/3.0 * Bt(0.0, 0.5).Em.B(0.0, 0.5)
-	// + Area(parametric triangle)/3.0 * Bt(0.5, 0.5).Em.B(0.5, 0.5)
-	double areaParametricTriangle = 1.0 / 2.0;
-	Matrix99Type plateKLocal = (areaParametricTriangle / 3.0) *
-		plateStrainDisplacementGaussPoint0.transpose() * plateElasticMaterial * plateStrainDisplacementGaussPoint0;
-	plateKLocal += (areaParametricTriangle / 3.0) *
-		plateStrainDisplacementGaussPoint1.transpose() * plateElasticMaterial * plateStrainDisplacementGaussPoint1;
-	plateKLocal += (areaParametricTriangle / 3.0) *
-		plateStrainDisplacementGaussPoint2.transpose() * plateElasticMaterial * plateStrainDisplacementGaussPoint2;
-	plateKLocal *= 2.0 * m_restArea; // Factor due to switch from cartesian coordinates to parametric coordinates
+	// Thin-Plate stiffness matrix evaluation using a 3 point Gauss quadrature for exact integration (quadratic terms)
+	Matrix99Type plateKLocal = Matrix99Type::Zero();
+	for (size_t pointId = 0; pointId < 3; ++pointId)
+	{
+		const double xi = gaussQuadrature2DTriangle3Points[pointId].coordinateXi;
+		const double eta = gaussQuadrature2DTriangle3Points[pointId].coordinateEta;
+		const double weight = gaussQuadrature2DTriangle3Points[pointId].weight;
+
+		Matrix39Type strainDisplacementAtGaussPoint = batozStrainDisplacement(xi , eta);
+		plateKLocal += ((2.0 * m_restArea) * 0.5 * weight) *
+			strainDisplacementAtGaussPoint.transpose() * plateElasticMaterial * strainDisplacementAtGaussPoint;
+	}
 
 	// Assemble shell stiffness as combination of membrane (Ux Uy) and plate stiffnesses (Uz ThetaX ThetaY)
 	// In the Kirchhof theory of Thin-Plate, the drilling dof (ThetaZ) is not considered.
