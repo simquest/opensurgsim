@@ -17,12 +17,14 @@ set(SURGSIM_PARTICLES_SOURCES
 	PointGenerator.cpp
 	RandomBoxPointGenerator.cpp
 	RandomSpherePointGenerator.cpp
+	ShapesPointGenerator.cpp
 )
 
 set(SURGSIM_PARTICLES_HEADERS
 	PointGenerator.h
 	RandomBoxPointGenerator.h
 	RandomSpherePointGenerator.h
+	ShapesPointGenerator.h
 )
 
 surgsim_add_library(
