@@ -161,6 +161,13 @@ std::array<gaussQuadraturePoint, 100> gaussQuadrature100Points =
 	gaussQuadraturePoint(-0.9997137267734412336782285, 0.0007346344905056717304063)
 }};
 
+std::array<gaussQuadratureTrianglePoint, 3> gaussQuadrature2DTriangle3Points =
+{{
+	gaussQuadratureTrianglePoint(1.0 / 2.0, 1.0 / 2.0, 1.0 / 3.0),
+	gaussQuadratureTrianglePoint(1.0 / 2.0,       0.0, 1.0 / 3.0),
+	gaussQuadratureTrianglePoint(0.0      , 1.0 / 2.0, 1.0 / 3.0)
+}};
+
 std::array<gaussQuadratureTrianglePoint, 6> gaussQuadrature2DTriangle6Points =
 {{
 	gaussQuadratureTrianglePoint(0.44594849091597, 0.44594849091597, 0.22338158967801),

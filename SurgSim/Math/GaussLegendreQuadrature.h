@@ -103,6 +103,20 @@ extern std::array<gaussQuadraturePoint, 5> gaussQuadrature5Points;
 /// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<gaussQuadraturePoint, 100> gaussQuadrature100Points;
 
+// http://math2.uncc.edu/~shaodeng/TEACHING/math5172/Lectures/Lect_15.PDF
+// "Quadrature Formulas in Two Dimensions"
+// \int_0^1 \int_0^{1-eta} f(xi, eta) dxi deta = 1/2 sum_i w[i] f(xi[i], eta[i])
+
+/// 2D triangle Gauss-Legendre quadrature 3-points \f${<\xi_1, \eta_1, w_1>, ..., <\xi_3, \eta_3, w_3>}\f$
+/// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f(\xi, \eta)\f$ with a
+/// finite sum using some weights and specific points on the triangle.
+/// \note \f$\int_{0}^{1} \int_{0}^{1-\eta} f(\xi, \eta) d\xi d\eta = \sum_{i=1}^n w_i f(\xi_i, \eta_i)\f$
+/// \note n is the number of points used to discretized the integral
+/// \note \f$(\xi_i, \eta_i)\f$ is the parametrized location of the triangle point to evaluate the function with
+/// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point
+/// \note A 3-points Gauss-Legendre quadrature on the triangle is exact for polynomial functions of degree 2 or less.
+extern std::array<gaussQuadratureTrianglePoint, 3> gaussQuadrature2DTriangle3Points;
+
 /// 2D triangle Gauss-Legendre quadrature 6-points \f${<\xi_1, \eta_1, w_1>, ..., <\xi_6, \eta_6, w_6>}\f$
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f(\xi, \eta)\f$ with a
 /// finite sum using some weights and specific points on the triangle.
