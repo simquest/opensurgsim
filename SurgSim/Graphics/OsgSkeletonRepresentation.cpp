@@ -15,16 +15,6 @@
 
 #include "SurgSim/Graphics/OsgSkeletonRepresentation.h"
 
-#include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/ObjectFactory.h"
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgModel.h"
-#include "SurgSim/Graphics/OsgRigidTransformConversions.h"
-#include "SurgSim/Graphics/OsgShader.h"
-
 #include <map>
 
 #include <boost/thread.hpp>
@@ -40,6 +30,16 @@
 #include <osgAnimation/UpdateBone>
 
 #include <osgDB/ReadFile>
+
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgModel.h"
+#include "SurgSim/Graphics/OsgRigidTransformConversions.h"
+#include "SurgSim/Graphics/OsgShader.h"
 
 namespace
 {
