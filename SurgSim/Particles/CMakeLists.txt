@@ -13,17 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set(SURGSIM_PARTICLES_SOURCES
+	PointGenerator.cpp
+)
 
-link_directories(${Boost_LIBRARY_DIRS})
+set(SURGSIM_PARTICLES_HEADERS
+	PointGenerator.h
+)
 
-add_subdirectory(Blocks)
-add_subdirectory(Collision)
-add_subdirectory(DataStructures)
-add_subdirectory(Devices)
-add_subdirectory(Framework)
-add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-add_subdirectory(Particles)
-add_subdirectory(Physics)
-add_subdirectory(Testing)
+surgsim_add_library(
+	SurgSimParticles
+	"${SURGSIM_PARTICLES_SOURCES}"
+	"${SURGSIM_PARTICLES_HEADERS}"
+)
+
+set_target_properties(SurgSimParticles PROPERTIES FOLDER "Particles")
