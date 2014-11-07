@@ -46,31 +46,19 @@ Vector3d RandomBoxPointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math::Sh
 	auto box = std::static_pointer_cast<SurgSim::Math::BoxShape>(shape);
 	auto halfSize = box->getSize() * 0.5;
 
-	Vector3d result;
-
-	// First choose one out of (x,y,z) to be fixed, and then randomly generate the other two coordinates.
 	std::uniform_int_distribution<int> axisDirectionSelector(0, 2); // 0: X-Axis, 1: Y-Axis, 2: Z-Axis.
 	std::uniform_int_distribution<int> valueSelector(0, 1); // 0: negative size value, 1: positive size value.
-	switch (axisDirectionSelector(m_generator))
+
+	Vector3d result;
+	// Choose one axis to be fixed.
+	int axis = axisDirectionSelector(m_generator);
+	result[axis] = valueSelector(m_generator) == 0 ? -halfSize[axis] : halfSize[axis];
+
+	// Then generate coordinates for the other two axes.
+	for (size_t t = 0; t < 2; ++t)
 	{
-	case 0:
-		result.x() = (valueSelector(m_generator) == 0 ? -halfSize.x() : halfSize.x());
-		result.y() = m_closedOneOneDistribution(m_generator) * halfSize.y();
-		result.z() = m_closedOneOneDistribution(m_generator) * halfSize.z();;
-		break;
-	case 1:
-		result.x() = m_closedOneOneDistribution(m_generator) * halfSize.x();;
-		result.y() = (valueSelector(m_generator) == 0 ? -halfSize.y() : halfSize.y());
-		result.z() = m_closedOneOneDistribution(m_generator) * halfSize.z();;
-		break;
-	case 2:
-		result.x() = m_closedOneOneDistribution(m_generator) * halfSize.x();;
-		result.y() = m_closedOneOneDistribution(m_generator) * halfSize.y();;
-		result.z() = (valueSelector(m_generator) == 0 ? -halfSize.z() : halfSize.z());
-		break;
-	default:
-		SURGSIM_FAILURE() << "Failed to generate a point";
-		break;
+		axis = (++axis) % 2;
+		result[axis] = m_closedOneOneDistribution(m_generator) * halfSize[axis];
 	}
 
 	return result;
