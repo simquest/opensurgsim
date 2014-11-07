@@ -13,38 +13,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PARTICLES_SHAPESPOINTGENERATOR_H
-#define SURGSIM_PARTICLES_SHAPESPOINTGENERATOR_H
+#ifndef SURGSIM_PARTICLES_DEFAULTPOINTGENERATOR_H
+#define SURGSIM_PARTICLES_DEFAULTPOINTGENERATOR_H
 
-#include <array>
-#include <memory>
-
-#include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/PointGenerator.h"
 
 namespace SurgSim
 {
 
+namespace Math
+{
+class Shape;
+}
+
 namespace Particles
 {
 
-class ShapesPointGenerator : public PointGenerator
+// DefaultPointGenerator, exception will be thrown if methods of instance of this class being called.
+class DefaultPointGenerator: public PointGenerator
 {
 public:
-	/// Constructor
-	ShapesPointGenerator();
+	/// Destructor
+	virtual ~DefaultPointGenerator();
 
 	virtual SurgSim::Math::Vector3d pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
 	virtual SurgSim::Math::Vector3d pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
-
-private:
-	/// List of point generators.
-	/// Will be populated by constructor.
-	std::array<std::unique_ptr<PointGenerator>, SurgSim::Math::SHAPE_TYPE_COUNT> m_pointGenerators;
 };
 
 }; // namespace Particles
 }; // namespace SurgSim
 
-#endif // SURGSIM_PARTICLES_SHAPESPOINTGENERATOR_H
+#endif // SURGSIM_PARTICLES_DEFAULTPOINTGENERATOR_H

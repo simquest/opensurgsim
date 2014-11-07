@@ -16,6 +16,7 @@
 #include "SurgSim/Particles/ShapesPointGenerator.h"
 
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/Particles/DefaultPointGenerator.h"
 #include "SurgSim/Particles/RandomBoxPointGenerator.h"
 #include "SurgSim/Particles/RandomSpherePointGenerator.h"
 
@@ -27,18 +28,35 @@ using SurgSim::Math::Vector3d;
 
 ShapesPointGenerator::ShapesPointGenerator()
 {
+	for (size_t index = 0; index < static_cast<size_t>(SurgSim::Math::SHAPE_TYPE_COUNT); ++index)
+	{
+		m_pointGenerators[index].reset(new DefaultPointGenerator());
+	}
+
 	m_pointGenerators[SurgSim::Math::SHAPE_TYPE_BOX].reset(new RandomBoxPointGenerator());
 	m_pointGenerators[SurgSim::Math::SHAPE_TYPE_SPHERE].reset(new RandomSpherePointGenerator());
 }
 
 Vector3d ShapesPointGenerator::pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
-	return m_pointGenerators[shape->getType()]->pointInShape(shape);
+	SURGSIM_ASSERT(shape != nullptr) << "Empty shape passed in.";
+
+	auto shapeType = shape->getType();
+	SURGSIM_ASSERT(SurgSim::Math::SHAPE_TYPE_NONE < shapeType && shapeType < SurgSim::Math::SHAPE_TYPE_COUNT) <<
+		"Unknown shape type passed in.";
+
+	return m_pointGenerators[shapeType]->pointInShape(shape);
 }
 
 Vector3d ShapesPointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
-	return m_pointGenerators[shape->getType()]->pointOnShape(shape);
+	SURGSIM_ASSERT(shape != nullptr) << "Empty shape passed in.";
+
+	auto shapeType = shape->getType();
+	SURGSIM_ASSERT(SurgSim::Math::SHAPE_TYPE_NONE < shapeType && shapeType < SurgSim::Math::SHAPE_TYPE_COUNT) <<
+		"Unknown shape type passed in.";
+
+	return m_pointGenerators[shapeType]->pointOnShape(shape);
 }
 
 }; // namespace Particles

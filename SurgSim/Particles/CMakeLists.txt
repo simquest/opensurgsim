@@ -14,6 +14,7 @@
 # limitations under the License.
 
 set(SURGSIM_PARTICLES_SOURCES
+	DefaultPointGenerator.cpp
 	PointGenerator.cpp
 	RandomBoxPointGenerator.cpp
 	RandomSpherePointGenerator.cpp
@@ -21,6 +22,7 @@ set(SURGSIM_PARTICLES_SOURCES
 )
 
 set(SURGSIM_PARTICLES_HEADERS
+	DefaultPointGenerator.h
 	PointGenerator.h
 	RandomBoxPointGenerator.h
 	RandomSpherePointGenerator.h

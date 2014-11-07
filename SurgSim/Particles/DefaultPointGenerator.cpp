@@ -13,38 +13,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PARTICLES_SHAPESPOINTGENERATOR_H
-#define SURGSIM_PARTICLES_SHAPESPOINTGENERATOR_H
+#include "SurgSim/Particles/DefaultPointGenerator.h"
 
-#include <array>
-#include <memory>
-
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Shape.h"
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/PointGenerator.h"
 
 namespace SurgSim
 {
-
 namespace Particles
 {
+using SurgSim::Math::Vector3d;
 
-class ShapesPointGenerator : public PointGenerator
+DefaultPointGenerator::~DefaultPointGenerator()
 {
-public:
-	/// Constructor
-	ShapesPointGenerator();
+}
 
-	virtual SurgSim::Math::Vector3d pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
-	virtual SurgSim::Math::Vector3d pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
+Vector3d DefaultPointGenerator::pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape)
+{
+	SURGSIM_FAILURE() << "PointGenerator does not support generate point in shape: "<<
+		shape->getType() << " yet.";
 
-private:
-	/// List of point generators.
-	/// Will be populated by constructor.
-	std::array<std::unique_ptr<PointGenerator>, SurgSim::Math::SHAPE_TYPE_COUNT> m_pointGenerators;
-};
+	return Vector3d::Zero();
+}
+
+Vector3d DefaultPointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape)
+{
+	SURGSIM_FAILURE() << "PointGenerator does not support generate point on the surface of shape: "<<
+		shape->getType() << " yet.";
+
+	return Vector3d::Zero();
+}
 
 }; // namespace Particles
 }; // namespace SurgSim
-
-#endif // SURGSIM_PARTICLES_SHAPESPOINTGENERATOR_H
