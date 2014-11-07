@@ -19,6 +19,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	PointGeneratorTests.cpp
+	ShapesPointGeneratorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

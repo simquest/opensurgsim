@@ -43,7 +43,10 @@ Vector3d RandomSpherePointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math:
 	auto sphere = std::static_pointer_cast<SurgSim::Math::SphereShape>(shape);
 	double radius = sphere->getRadius();
 
-	// Based on http://www.cs.cmu.edu/~mws/rpos.html
+	// Spherical coordinate system can not produce an uniformly distributed points on the surface of the sphere.
+	// ref: http://mathworld.wolfram.com/SpherePointPicking.html
+
+	// Implementation was based on http://www.cs.cmu.edu/~mws/rpos.html
 	double z = 0.0;
 	double phi = 0.0;
 	double theta = 0.0;

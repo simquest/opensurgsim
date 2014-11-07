@@ -16,7 +16,6 @@
 #include <gtest/gtest.h>
 
 #include <memory>
-#include <vector>
 
 #include "SurgSim/Math/Aabb.h"
 #include "SurgSim/Math/BoxShape.h"
@@ -45,18 +44,18 @@ TEST(PointGeneratorTest, BoxPointGeneratorTest)
 	auto boxPointGenerator = std::make_shared<RandomBoxPointGenerator>();
 
 	auto pointInsideBox = boxPointGenerator->pointInShape(boxShape);
-	bool isInOrOnBox = ((pointInsideBox - aabb.min()).array() > -SurgSim::Math::Geometry::ScalarEpsilon).all() && 
+	bool isInOrOnBox = ((pointInsideBox - aabb.min()).array() > -SurgSim::Math::Geometry::ScalarEpsilon).all() &&
 					   ((pointInsideBox - aabb.max()).array() < SurgSim::Math::Geometry::ScalarEpsilon).all();
 	EXPECT_TRUE(isInOrOnBox); // The point is located in the aabb
-	size_t intersection = aabb.min().cwiseEqual(pointInsideBox).count() + 
+	size_t intersection = aabb.min().cwiseEqual(pointInsideBox).count() +
 						  aabb.max().cwiseEqual(pointInsideBox).count();
 	EXPECT_EQ(intersection, 0u); // The point is NOT on the surface of the aabb
 
 	auto pointOnBox = boxPointGenerator->pointOnShape(boxShape);
-	isInOrOnBox = ((pointOnBox - aabb.min()).array() >= -SurgSim::Math::Geometry::ScalarEpsilon).all() && 
+	isInOrOnBox = ((pointOnBox - aabb.min()).array() >= -SurgSim::Math::Geometry::ScalarEpsilon).all() &&
 				  ((pointOnBox - aabb.max()).array() <= SurgSim::Math::Geometry::ScalarEpsilon).all();
 	EXPECT_TRUE(isInOrOnBox); // The point is located in the aabb
-	intersection = aabb.min().cwiseEqual(pointOnBox).count() + 
+	intersection = aabb.min().cwiseEqual(pointOnBox).count() +
 				   aabb.max().cwiseEqual(pointOnBox).count();
 	EXPECT_GT(intersection, 0u); // The point IS on the surface of the aabb
 }
