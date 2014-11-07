@@ -43,11 +43,13 @@ public:
 	/// Destructor
 	virtual ~PointGenerator();
 
-	/// Generates one point inside the shape
+	/// Generates one point inside the given shape.
+	/// \param shape The shape inside which a point will be generated.
 	/// \return A point inside the shape, shape is assumed to be located at the origin.
 	virtual SurgSim::Math::Vector3d pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape) = 0;
 
-	/// Generates one point on the surface of the shape
+	/// Generates one point on the surface of the given shape.
+	/// \param shape The shape on which a point will be generated.
 	/// \return A point on the surface of the shape, shape is assumed to be located at the origin.
 	virtual SurgSim::Math::Vector3d pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape) = 0;
 
@@ -59,8 +61,8 @@ protected:
 
 	std::uniform_real_distribution<double> m_openOneOneDistribution; // <-- (-1.0, 1.0)
 	std::uniform_real_distribution<double> m_closedOneOneDistribution; // <-- [-1.0, 1.0]
-	std::uniform_real_distribution<double> m_closedZeroOneDistribution; // <-- [-0.0, 1.0]
-	std::uniform_real_distribution<double> m_zeroOneDistribution; // <-- [-0.0, 1.0)
+	std::uniform_real_distribution<double> m_closedZeroOneDistribution; // <-- [0.0, 1.0]
+	std::uniform_real_distribution<double> m_closedZeroOpenOneDistribution; // <-- [0.0, 1.0)
 	///@}
 };
 

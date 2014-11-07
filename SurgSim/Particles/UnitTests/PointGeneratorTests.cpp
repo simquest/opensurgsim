@@ -38,7 +38,7 @@ TEST(PointGeneratorTest, ConstructorTest)
 	ASSERT_NO_THROW(RandomSpherePointGenerator());
 }
 
-TEST(RepresentationTest, BoxPointGeneratorTest)
+TEST(PointGeneratorTest, BoxPointGeneratorTest)
 {
 	auto boxShape = std::make_shared<BoxShape>(2.0, 4.0, 6.0);
 	auto aabb = SurgSim::Math::Aabbd(Vector3d(-1.0, -2.0, -3.0), Vector3d(1.0, 2.0, 3.0));
@@ -54,7 +54,7 @@ TEST(RepresentationTest, BoxPointGeneratorTest)
 	EXPECT_NE(0u, intersections.size());
 }
 
-TEST(RepresentationTest, SpherePointGeneratorTest)
+TEST(PointGeneratorTest, SpherePointGeneratorTest)
 {
 	auto sphereShape = std::make_shared<SphereShape>(0.1);
 	auto spherePointGenerator = std::make_shared<RandomSpherePointGenerator>();

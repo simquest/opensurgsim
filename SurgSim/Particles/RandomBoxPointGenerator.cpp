@@ -49,9 +49,9 @@ Vector3d RandomBoxPointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math::Sh
 	Vector3d result;
 
 	// First choose one out of (x,y,z) to be fixed, and then randomly generate the other two coordinates.
-	std::uniform_int_distribution<int> axisSelector(0, 2); // 0: X-Axis, 1: Y-Axis, 2: Z-Axis.
+	std::uniform_int_distribution<int> axisDirectionSelector(0, 2); // 0: X-Axis, 1: Y-Axis, 2: Z-Axis.
 	std::uniform_int_distribution<int> valueSelector(0, 1); // 0: negative size value, 1: positive size value.
-	switch (axisSelector(m_generator))
+	switch (axisDirectionSelector(m_generator))
 	{
 	case 0:
 		result.x() = (valueSelector(m_generator) == 0 ? -halfSize.x() : halfSize.x());

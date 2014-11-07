@@ -33,7 +33,7 @@ Vector3d RandomSpherePointGenerator::pointInShape(std::shared_ptr<SurgSim::Math:
 	auto sphere = std::static_pointer_cast<SurgSim::Math::SphereShape>(shape);
 
 	// A point on the sphere, use it as direction and then multiple it by a non-negative length less than the radius.
-	Vector3d result = pointOnShape(shape) * m_zeroOneDistribution(m_generator) * sphere->getRadius();
+	Vector3d result = pointOnShape(shape) * m_closedZeroOpenOneDistribution(m_generator) * sphere->getRadius();
 
 	return result;
 }
