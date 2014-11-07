@@ -57,7 +57,7 @@ Vector3d RandomBoxPointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math::Sh
 	// Then generate coordinates for the other two axes.
 	for (size_t t = 0; t < 2; ++t)
 	{
-		axis = (++axis) % 2;
+		axis = (++axis) % 3;
 		result[axis] = m_closedOneOneDistribution(m_generator) * halfSize[axis];
 	}
 
