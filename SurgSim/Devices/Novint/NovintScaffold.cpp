@@ -335,8 +335,8 @@ public:
 	/// Wrapper for the haptic loop callback handle.
 	std::unique_ptr<NovintScaffold::Callback> callback;
 
-	/// The list of known devices.
-	std::list<std::unique_ptr<NovintScaffold::DeviceData>> activeDeviceList;
+	/// The registered devices.
+	std::list<std::unique_ptr<NovintScaffold::DeviceData>> registeredDevices;
 
 	/// The mutex that protects the list of known devices.
 	boost::mutex mutex;
@@ -406,11 +406,11 @@ NovintScaffold::~NovintScaffold()
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-		if (! m_state->activeDeviceList.empty())
+		if (! m_state->registeredDevices.empty())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Novint: Destroying scaffold while devices are active!?!";
 			// do anything special with each device?
-			m_state->activeDeviceList.clear();
+			m_state->registeredDevices.clear();
 		}
 
 		if (m_state->isApiInitialized)
@@ -435,16 +435,16 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 	}
 
 	// Make sure the object is unique.
-	auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
+	auto sameObject = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
 		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-	SURGSIM_ASSERT(sameObject == m_state->activeDeviceList.end()) << "Novint: Tried to register a device" <<
+	SURGSIM_ASSERT(sameObject == m_state->registeredDevices.end()) << "Novint: Tried to register a device" <<
 		" which is already present!";
 
 	// Make sure the name is unique.
 	const std::string deviceName = device->getName();
-	auto sameName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
+	auto sameName = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
 		[&deviceName](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == deviceName; });
-	if (sameName != m_state->activeDeviceList.end())
+	if (sameName != m_state->registeredDevices.end())
 	{
 		SURGSIM_LOG_CRITICAL(m_logger) << "Novint: Tried to register a device when the same name is" <<
 			" already present!";
@@ -453,10 +453,10 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 
 	// Make sure the initialization name is unique.
 	const std::string initializationName = device->getInitializationName();
-	auto sameInitializationName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
+	auto sameInitializationName = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
 		[&initializationName](const std::unique_ptr<DeviceData>& info)
 			{ return info->deviceObject->getInitializationName() == initializationName; });
-	if (sameInitializationName != m_state->activeDeviceList.end())
+	if (sameInitializationName != m_state->registeredDevices.end())
 	{
 		SURGSIM_LOG_CRITICAL(m_logger) << "Novint: Tried to register a device when the same initialization" <<
 			" (HDAL) name is already present!";
@@ -472,9 +472,9 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 		return false;   // message already printed
 	}
 	info->initializationTime = Clock::now();
-	m_state->activeDeviceList.emplace_back(std::move(info));
+	m_state->registeredDevices.emplace_back(std::move(info));
 
-	if (m_state->activeDeviceList.size() == 1)
+	if (m_state->registeredDevices.size() == 1)
 	{
 		// If this is the first device, create the haptic loop as well.
 		createHapticLoop();
@@ -489,15 +489,15 @@ bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 	bool haveOtherDevices = false;
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-		auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
 			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-		if (matching != m_state->activeDeviceList.end())
+		if (matching != m_state->registeredDevices.end())
 		{
 			savedInfo = std::move(*matching);
-			m_state->activeDeviceList.erase(matching);
+			m_state->registeredDevices.erase(matching);
 			// the iterator is now invalid but that's OK
 		}
-		haveOtherDevices = (m_state->activeDeviceList.size() > 0);
+		haveOtherDevices = (m_state->registeredDevices.size() > 0);
 	}
 
 	bool status = true;
@@ -918,7 +918,7 @@ bool NovintScaffold::runHapticFrame()
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-	for (auto it = m_state->activeDeviceList.begin();  it != m_state->activeDeviceList.end();  ++it)
+	for (auto it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
 	{
 		(*it)->deviceObject->pullOutput();
 		if (updateDevice((*it).get()))
@@ -1153,9 +1153,9 @@ SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double scale)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+	auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
 		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-	if (matching != m_state->activeDeviceList.end())
+	if (matching != m_state->registeredDevices.end())
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
 		(*matching)->positionScale = scale;
@@ -1165,9 +1165,9 @@ void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double s
 void NovintScaffold::setOrientationScale(const NovintCommonDevice* device, double scale)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+	auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
 		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-	if (matching != m_state->activeDeviceList.end())
+	if (matching != m_state->registeredDevices.end())
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
 		(*matching)->orientationScale = scale;
