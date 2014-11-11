@@ -40,10 +40,6 @@ class NovintDevice;
 class NovintScaffold
 {
 public:
-	/// Constructor.
-	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
-	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit NovintScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
 
 	/// Destructor.
 	~NovintScaffold();
@@ -53,9 +49,9 @@ public:
 	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
 
 	/// Gets or creates the scaffold shared by all NovintDevice and Novint7DofDevice instances.
-	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
+	/// The scaffold is a singleton, so it will not be destroyed until the application exits.
 	/// \return the scaffold object.
-	static std::shared_ptr<NovintScaffold> getOrCreateSharedInstance();
+	static NovintScaffold& getInstance();
 
 	/// Sets the default log level.
 	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
@@ -63,6 +59,13 @@ public:
 	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
 
 private:
+	/// Constructor.
+	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
+	/// 			  If unspecified or empty, a console logger will be created and used.
+	explicit NovintScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+
+	NovintScaffold(const NovintScaffold&) /*= delete*/;
+	NovintScaffold& operator=(const NovintScaffold&) /*= delete*/;
 
 	/// Internal shared state data type.
 	struct StateData;
