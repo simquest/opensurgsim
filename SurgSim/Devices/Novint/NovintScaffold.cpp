@@ -910,6 +910,7 @@ void NovintScaffold::createAllHandles()
 
 	char serials[HDL_MAX_DEVICES * HDL_SERNUM_BUFFSIZE];
 	const int numDevices = hdlCatalogDevices(HDL_NOT_OPEN_BY_ANY_APP, &(serials[0]), NULL);
+	checkForFatalError("Failed to get catalog of devices.");
 
 	SURGSIM_LOG_DEBUG(m_logger) << numDevices << " Novint devices available.";
 
@@ -923,6 +924,8 @@ void NovintScaffold::createAllHandles()
 		if (handle->isValid())
 		{
 			m_state->serialToHandle[serial] = handle;
+			hdlMakeCurrent(handle->get());
+			checkForFatalError("Failed to make device current.");
 		}
 		else
 		{
