@@ -16,25 +16,24 @@
 /// \file
 /// Tests for the NovintDevice class.
 
+#include <boost/chrono.hpp>
+#include <boost/thread.hpp>
+#include <gtest/gtest.h>
 #include <memory>
 #include <string>
-#include <boost/thread.hpp>
-#include <boost/chrono.hpp>
-#include <gtest/gtest.h>
-#include "SurgSim/Devices/Novint/NovintDevice.h"
-//#include "SurgSim/Devices/Novint/NovintScaffold.h"  // only needed if calling setDefaultLogLevel()
+
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Devices/Novint/NovintDevice.h"
 #include "SurgSim/Framework/Clock.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::Device::NovintDevice;
-using SurgSim::Device::NovintScaffold;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Framework::Clock;
-using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
+using SurgSim::Math::RigidTransform3d;
 using SurgSim::Testing::MockInputOutput;
 
 // Define common device names used in the Novint device tests.
@@ -43,41 +42,39 @@ extern const char* const NOVINT_TEST_DEVICE_NAME_2 = "FALCON_FRANKEN_L";
 //extern const char* const NOVINT_TEST_DEVICE_NAME = "FALCON_BURRv3_1";
 //extern const char* const NOVINT_TEST_DEVICE_NAME_2 = "FALCON_BURRv3_2";
 
-TEST(NovintDeviceTest, CreateUninitializedDevice)
-{
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-}
-
 TEST(NovintDeviceTest, CreateAndInitializeDevice)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_FALSE(device->isInitialized());
+	EXPECT_EQ("TestFalcon", device->getName());
+
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 	EXPECT_TRUE(device->isInitialized());
+	EXPECT_EQ("TestFalcon", device->getName());
+
+	EXPECT_EQ(NOVINT_TEST_DEVICE_NAME, device->getInitializationName());
+
+	const double positionScale = 2.0;
+	device->setPositionScale(positionScale);
+	EXPECT_EQ(positionScale, device->getPositionScale());
+
+	const double orientationScale = 2.0;
+	device->setOrientationScale(orientationScale);
+	EXPECT_EQ(orientationScale, device->getOrientationScale());
+	
+	EXPECT_TRUE(device->finalize());
 }
 
 TEST(NovintDeviceTest, CreateAndInitializeDefaultDevice)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", "");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_FALSE(device->isInitialized());
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 	EXPECT_TRUE(device->isInitialized());
-}
 
-TEST(NovintDeviceTest, Name)
-{
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-	EXPECT_EQ("TestFalcon", device->getName());
-	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
-	EXPECT_EQ("TestFalcon", device->getName());
+	EXPECT_EQ("", device->getInitializationName());
 }
 
 static void testCreateDeviceSeveralTimes(bool doSleep)
@@ -97,22 +94,18 @@ static void testCreateDeviceSeveralTimes(bool doSleep)
 
 TEST(NovintDeviceTest, CreateDeviceSeveralTimes)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	testCreateDeviceSeveralTimes(true);
 }
 
-TEST(NovintDeviceTest, CreateSeveralDevices)
+TEST(NovintDeviceTest, CreateTwoDevices)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint1", NOVINT_TEST_DEVICE_NAME);
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 
-	// We can't check what happens with the scaffolds, since those are no longer a part of the device's API...
-
 	std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("Novint2", NOVINT_TEST_DEVICE_NAME_2);
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
-	if (! device2->initialize())
+	if (!device2->initialize())
 	{
 		std::cerr << "[Warning: second Novint did not come up; is it plugged in?]" << std::endl;
 	}
@@ -120,7 +113,6 @@ TEST(NovintDeviceTest, CreateSeveralDevices)
 
 TEST(NovintDeviceTest, CreateDevicesWithSameName)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint", NOVINT_TEST_DEVICE_NAME);
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
@@ -132,7 +124,6 @@ TEST(NovintDeviceTest, CreateDevicesWithSameName)
 
 TEST(NovintDeviceTest, CreateDevicesWithSameInitializationName)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint1", NOVINT_TEST_DEVICE_NAME);
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
@@ -144,7 +135,6 @@ TEST(NovintDeviceTest, CreateDevicesWithSameInitializationName)
 
 TEST(NovintDeviceTest, InputConsumer)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
@@ -179,7 +169,6 @@ TEST(NovintDeviceTest, InputConsumer)
 
 TEST(NovintDeviceTest, OutputProducer)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
