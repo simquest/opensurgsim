@@ -373,15 +373,9 @@ static inline T clampToRange(T value, T rangeMin, T rangeMax)
 
 
 
-NovintScaffold::NovintScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new StateData)
+NovintScaffold::NovintScaffold() :
+	m_logger(SurgSim::Framework::Logger::getLogger("Devices/Novint")), m_state(new StateData)
 {
-	if (! m_logger)
-	{
-		m_logger = SurgSim::Framework::Logger::getLogger("Novint device");
-		m_logger->setThreshold(m_defaultLogLevel);
-	}
-
 	{
 		// Drain the HDAL error stack
 		HDLError errorCode = hdlGetError();
@@ -1281,17 +1275,10 @@ NovintScaffold& NovintScaffold::getInstance()
 	return instance;
 }
 
-void NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
-{
-	m_defaultLogLevel = logLevel;
-}
-
 std::shared_ptr<SurgSim::Framework::Logger> NovintScaffold::getLogger() const
 {
 	return m_logger;
 }
-
-SurgSim::Framework::LogLevel NovintScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 
 };  // namespace Device

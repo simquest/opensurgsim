@@ -53,16 +53,11 @@ public:
 	/// \return the scaffold object.
 	static NovintScaffold& getInstance();
 
-	/// Sets the default log level.
-	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
-	/// \param logLevel The log level.
-	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
-
 private:
 	/// Constructor.
 	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
 	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit NovintScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+	explicit NovintScaffold();
 
 	NovintScaffold(const NovintScaffold&) /*= delete*/;
 	NovintScaffold& operator=(const NovintScaffold&) /*= delete*/;
@@ -232,11 +227,9 @@ private:
 
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
-
-	/// The default logging level.
-	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 };
 
 };  // namespace Device
