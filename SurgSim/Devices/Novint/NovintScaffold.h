@@ -95,6 +95,11 @@ private:
 	/// \return	true on success.
 	bool initializeDeviceState(DeviceData* info);
 
+	/// Get the Handle associated with a name, if any.
+	/// \param name The initialization name (from the configuration file).
+	/// \return Shared pointer to Handle, or nullptr if not found.
+	std::shared_ptr<NovintScaffold::Handle> findHandle(const std::string& name);
+
 	/// Finalizes a single device, destroying the necessary HDAL resources.
 	/// \param [in,out] info	The device data.
 	/// \return	true on success.
@@ -131,9 +136,19 @@ private:
 	/// \return true on success.
 	bool initializeSdk();
 
+	/// Gets the map from name to serial number.
+	/// \return The map.
+	std::map<std::string, std::string> getNameMap();
+
+	/// Creates a NovintScaffold::Handle for each device connected when the first registerDevice is called.
+	void createAllHandles();
+
 	/// Finalizes (de-initializes) the HDAL SDK.
 	/// \return true on success.
 	bool finalizeSdk();
+
+	/// Destroys all the initialized handles.
+	void destroyAllHandles();
 
 	/// Executes the operations for a single haptic frame.
 	/// Should only be called from the context of a HDAL callback.
