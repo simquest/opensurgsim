@@ -331,6 +331,9 @@ public:
 	/// The map from serial number to Handle for all devices that were available when the SDK was initialized.
 	std::unordered_map<std::string, std::shared_ptr<NovintScaffold::Handle>> serialToHandle;
 
+	/// List of devices that have been unregistered and should have their forces zeroed in the next update.
+	std::list<std::shared_ptr<NovintScaffold::Handle>> unregisteredHandles;
+
 	/// The map from name to serial number for all devices.
 	std::map<std::string, std::string> nameToSerial;
 
@@ -467,6 +470,7 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 
 bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 {
+	bool result = false;
 	std::unique_ptr<DeviceData> savedInfo;
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
@@ -474,19 +478,16 @@ bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 		if (matching != m_state->registeredDevices.end())
 		{
+			result = true;
 			savedInfo = std::move(*matching);
 			m_state->registeredDevices.erase(matching);
+			m_state->unregisteredHandles.push_back(savedInfo->deviceHandle);
 			// the iterator is now invalid but that's OK
 		}
 	}
 
-	bool status = true;
-	if (! savedInfo)
-	{
-		SURGSIM_LOG_WARNING(m_logger) << "Novint: Attempted to release a non-registered device.";
-		status = false;
-	}
-	return status;
+	SURGSIM_LOG_IF(!result, m_logger, WARNING) << "Novint: Attempted to release a non-registered device.";
+	return result;
 }
 
 std::shared_ptr<NovintScaffold::Handle> NovintScaffold::findHandle(const std::string& name)
@@ -553,6 +554,7 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 		"The raw handle should be nullptr before initialization.";
 
 	info->deviceHandle = findHandle(info->deviceObject->getInitializationName());
+	m_state->unregisteredHandles.remove(info->deviceHandle);
 
 	bool result = info->deviceHandle != nullptr;
 
@@ -1017,6 +1019,24 @@ bool NovintScaffold::runHapticFrame()
 			(*it)->deviceObject->pushInput();
 		}
 	}
+
+	for (auto handle : m_state->unregisteredHandles)
+	{
+		hdlMakeCurrent(handle->get());
+
+		bool desiredGravityCompensation = false;
+		hdlGripSetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &desiredGravityCompensation);
+		checkForFatalError("Cannot set gravity compensation state on recently unregistered device.");
+
+		Vector3d force = Vector3d::Zero();
+		hdlGripSetAttributev(HDL_GRIP_FORCE, 0, force.data());
+		checkForFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
+
+		Vector4d torque = Vector4d::Zero();
+		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, torque.data());
+		checkForFatalError("hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+	}
+	m_state->unregisteredHandles.clear();
 
 	return true;
 }
