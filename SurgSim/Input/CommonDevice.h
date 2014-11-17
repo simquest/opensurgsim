@@ -20,7 +20,6 @@
 #include <string>
 
 #include "SurgSim/Input/DeviceInterface.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
@@ -28,6 +27,8 @@ namespace SurgSim
 namespace Input
 {
 
+class InputConsumerInterface;
+class OutputProducerInterface;
 
 /// A class that implements some common management code on top of the DeviceInterface.
 /// Practically every class that implements DeviceInterface will likely want to inherit from CommonDevice.
@@ -133,18 +134,15 @@ private:
 	/// The data the output producer (if any) is providing to the device.
 	SurgSim::DataStructures::DataGroup m_outputData;
 
-	/// Struct to hide some of the private member variables, PImpl (Pointer to Implementation).
-	/// For CommonDevice, we are hiding:
-	/// - The list of input consumers,
-	/// - The output producer, if any, and
-	/// - The mutex that protects the consumers and the producer.
-	/// The PImpl idiom is being used so that subclasses of CommonDevice will never store device-specific datatypes in
-	/// member variables.  Instead they would store them in the PImpl object, so that the device-specific include
-	/// file(s) are only included by the subclass's .cpp file.  A benefit of this idiom is that any change to the
-	/// device's API/SDK will not force a recompile of any file including the subclass's .h file.  For historical
-	/// reasons we are not currently using the PImpl object to store all this class's private member variables, as is
-	/// commonly recommended.
-	std::unique_ptr<State> m_state;
+	/// The list of input consumers.
+	std::vector<std::shared_ptr<InputConsumerInterface>> m_inputConsumerList;
+
+	/// The output producer, if any.
+	std::shared_ptr<OutputProducerInterface> m_outputProducer;
+
+	/// The mutex that protects the consumers and the producer.
+	boost::mutex m_consumerProducerMutex;
+
 };
 
 
