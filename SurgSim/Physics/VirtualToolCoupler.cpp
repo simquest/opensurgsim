@@ -136,19 +136,23 @@ void VirtualToolCoupler::update(double dt)
 {
 	SurgSim::DataStructures::DataGroup inputData;
 	m_input->getData(&inputData);
-	RigidTransform3d inputPose;
 	inputData.poses().cacheIndex(m_poseName, &m_poseIndex);
+	inputData.vectors().cacheIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY, &m_linearVelocityIndex);
+	inputData.vectors().cacheIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, &m_angularVelocityIndex);
+
+	RigidTransform3d inputPose;
 	if (inputData.poses().get(m_poseIndex, &inputPose))
 	{
-		// TODO(ryanbeasley): If the RigidRepresentation is not colliding, we should turn off the VTC forces and set the
-		// RigidRepresentation's state to the input state.
-		Vector3d inputLinearVelocity, inputAngularVelocity;
-		inputLinearVelocity.setZero();
-		inputData.vectors().cacheIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY, &m_linearVelocityIndex);
+		Vector3d inputLinearVelocity(Vector3d::Zero());
 		inputData.vectors().get(m_linearVelocityIndex, &inputLinearVelocity);
-		inputAngularVelocity.setZero();
-		inputData.vectors().cacheIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, &m_angularVelocityIndex);
+
+		Vector3d inputAngularVelocity(Vector3d::Zero());
 		inputData.vectors().get(m_angularVelocityIndex, &inputAngularVelocity);
+
+		RigidTransform3d inputAlignment = m_input->getLocalPose();
+		inputPose = inputAlignment * inputPose;
+		inputLinearVelocity = inputAlignment.linear() * inputLinearVelocity;
+		inputAngularVelocity = inputAlignment.rotation() * inputAngularVelocity;
 
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
@@ -166,20 +170,16 @@ void VirtualToolCoupler::update(double dt)
 		Vector3d torque = m_angularStiffness * rotationVector;
 		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
+		Vector6d generalizedForce;
+		generalizedForce << force, torque;
+
 		const Matrix33d identity3x3 = Matrix33d::Identity();
 		const Matrix33d zero3x3 = Matrix33d::Zero();
-		const Matrix33d linearStiffnessMatrix = m_linearStiffness * identity3x3;
-		const Matrix33d linearDampingMatrix = m_linearDamping * identity3x3;
-		const Matrix33d angularStiffnessMatrix = m_angularStiffness * identity3x3;
-		const Matrix33d angularDampingMatrix = m_angularDamping * identity3x3;
-
-		Vector6d generalizedForce;
 		Matrix66d generalizedStiffness, generalizedDamping;
-		generalizedForce << force, torque;
-		generalizedStiffness << linearStiffnessMatrix, zero3x3,
-							 zero3x3, angularStiffnessMatrix;
-		generalizedDamping << linearDampingMatrix, zero3x3,
-						   zero3x3, angularDampingMatrix;
+		generalizedStiffness << m_linearStiffness * identity3x3, zero3x3,
+								zero3x3                        , m_angularStiffness * identity3x3;
+		generalizedDamping << m_linearDamping * identity3x3, zero3x3,
+							  zero3x3                      , m_angularDamping * identity3x3;
 
 		if (m_calculateInertialTorques)
 		{
@@ -194,12 +194,15 @@ void VirtualToolCoupler::update(double dt)
 
 		if (m_output != nullptr)
 		{
-			m_outputData.vectors().set(m_forceIndex, -generalizedForce.segment<3>(0));
-			m_outputData.vectors().set(m_torqueIndex, -generalizedForce.segment<3>(3));
-			m_outputData.vectors().set(m_inputLinearVelocityIndex, inputLinearVelocity);
-			m_outputData.vectors().set(m_inputAngularVelocityIndex, inputAngularVelocity);
+			RigidTransform3d outputAlignment = m_output->getLocalPose().inverse();
+			Matrix33d outputAlignmentUnScaled = outputAlignment.rotation();
 
-			m_outputData.poses().set(m_inputPoseIndex, inputPose);
+			m_outputData.vectors().set(m_forceIndex, outputAlignmentUnScaled * (-force));
+			m_outputData.vectors().set(m_torqueIndex, outputAlignmentUnScaled * (-torque));
+
+			m_outputData.poses().set(m_inputPoseIndex, outputAlignment * inputPose);
+			m_outputData.vectors().set(m_inputLinearVelocityIndex, outputAlignment.linear() * inputLinearVelocity);
+			m_outputData.vectors().set(m_inputAngularVelocityIndex, outputAlignmentUnScaled * inputAngularVelocity);
 
 			m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
 			m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
