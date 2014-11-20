@@ -191,9 +191,42 @@ void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasComplianc
 	}
 }
 
+namespace anonymous
+{
+
+/// Test if a 64 bit floating point number is a finite number or not
+/// \param a The double to test (supposed to be of IEEE754 format)
+/// \return True if a is a finite number (not INF, not NaN), False otherwise
+/// \note This method assumes that 'a' is 64 bits.
+///
+/// http://en.wikipedia.org/wiki/IEEE_754-1985
+///
+/// Infinity number is defined by         NaN number is defined by
+/// bit 63 = sign = anything              anything
+/// bit 52-62 = exponent = all 1          all 1
+/// bit 0-51 = fraction = all 0           anything except 0
+///
+/// So any finite number should be !(a infinite number or a NaN number):
+/// bit 63 = sign = anything
+/// bit 52-62 = exponent = all 1
+/// bit 0-51 = fraction = anything
+/// Masking the sign and fraction, we must verify that the value equal 0x7FF0000000000000
+inline bool isFinite(double a)
+{
+	return (*(int64_t*)(&a) & 0x7FF0000000000000) != 0x7FF0000000000000;
+}
+}; //namespace anonymous
+
 bool OdeState::isValid() const
 {
-	return SurgSim::Math::isValid(getPositions()) && SurgSim::Math::isValid(getVelocities());
+	static_assert(sizeof(double) == 8, "'double' type are expected to be 64bits IEEE754, but they are not !");
+
+	/// http://steve.hollasch.net/cgindex/coding/ieeefloat.html
+	/// We use the IEEE754 standard stipulating that any arithmetic operation with a NaN operand will produce NaN
+	/// and any sum of +-INF with a finite number or +-INF will produce +-INF.
+	/// Therefore, testing if a vector contains only finite numbers can be achieve easily by summing all the values
+	/// and testing if the result is a finite number or not.
+	return anonymous::isFinite(getPositions().sum()) && anonymous::isFinite(getVelocities().sum());
 }
 
 }; // namespace Math

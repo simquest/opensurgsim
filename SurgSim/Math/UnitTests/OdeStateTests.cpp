@@ -360,19 +360,33 @@ TEST(OdeStateTest, ApplyBoundaryConditionsToMatrixTest)
 
 namespace
 {
-void testIsValidWith(double invalidNumber)
+void testIsValidWith(double invalidNumber, bool valid = false)
 {
 	OdeState invalidStateInfinityOnPosition;
 	invalidStateInfinityOnPosition.setNumDof(3u, 3u);
 	invalidStateInfinityOnPosition.getPositions().setOnes();
 	invalidStateInfinityOnPosition.getPositions()[2] = invalidNumber;
-	EXPECT_FALSE(invalidStateInfinityOnPosition.isValid());
+	if (valid)
+	{
+		EXPECT_TRUE(invalidStateInfinityOnPosition.isValid());
+	}
+	else
+	{
+		EXPECT_FALSE(invalidStateInfinityOnPosition.isValid());
+	}
 
 	OdeState invalidStateInfinityOnVelocity;
 	invalidStateInfinityOnVelocity.setNumDof(3u, 3u);
 	invalidStateInfinityOnVelocity.getVelocities().setOnes();
 	invalidStateInfinityOnVelocity.getVelocities()[2] = invalidNumber;
-	EXPECT_FALSE(invalidStateInfinityOnVelocity.isValid());
+	if (valid)
+	{
+		EXPECT_TRUE(invalidStateInfinityOnVelocity.isValid());
+	}
+	else
+	{
+		EXPECT_FALSE(invalidStateInfinityOnVelocity.isValid());
+	}
 }
 }; // anonymous namespace
 
@@ -396,5 +410,10 @@ TEST(OdeStateTest, IsValidTest)
 	{
 		SCOPED_TRACE("Test with invalid SignalingNaN");
 		testIsValidWith(std::numeric_limits<double>::signaling_NaN());
+	}
+
+	{
+		SCOPED_TRACE("Test with valid numbers");
+		testIsValidWith(4.5e-34, true);
 	}
 }
