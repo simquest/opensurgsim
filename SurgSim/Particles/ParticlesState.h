@@ -25,7 +25,7 @@ namespace SurgSim
 namespace Particles
 {
 
-// The state of a ParticleSystem
+/// The state of a ParticleSystem
 class ParticlesState : public SurgSim::Math::OdeState
 {
 public:

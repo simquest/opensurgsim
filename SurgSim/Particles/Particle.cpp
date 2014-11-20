@@ -39,7 +39,7 @@ Particle::Particle(const SurgSim::Math::Vector3d& position, const SurgSim::Math:
 
 Particle::Particle(const ParticleReference& other) :
 	m_position(other.getPosition()),
-	m_velocity(other.getPosition()),
+	m_velocity(other.getVelocity()),
 	m_lifetime(other.getLifetime())
 {
 }
@@ -47,7 +47,7 @@ Particle::Particle(const ParticleReference& other) :
 void Particle::operator=(const ParticleReference& other)
 {
 	m_position = other.getPosition();
-	m_velocity = other.getPosition();
+	m_velocity = other.getVelocity();
 	m_lifetime = other.getLifetime();
 }
 

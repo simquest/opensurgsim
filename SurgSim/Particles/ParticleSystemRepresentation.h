@@ -59,11 +59,13 @@ public:
 	size_t getMaxParticles() const;
 
 	/// Add a particle
+	/// Copy the particle into the particle system
 	/// \param particle the particle to be added
 	/// \return True if the particle was successfully added, false otherwise
 	bool addParticle(const Particle& particle);
 
 	/// Add multiple particles
+	/// Copy the particles into the particle system
 	/// \param particles the particles to be added
 	/// \return True if the particles were successfully added, false otherwise
 	bool addParticles(const std::vector<Particle>& particles);

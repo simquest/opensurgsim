@@ -35,7 +35,7 @@ bool ParticlesState::operator ==(const ParticlesState& other) const
 
 bool ParticlesState::operator !=(const ParticlesState& other) const
 {
-	return ! ((*this) == other);
+	return !((*this) == other);
 }
 
 SurgSim::Math::Vector& ParticlesState::getLifetimes()

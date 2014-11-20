@@ -32,8 +32,8 @@ TEST(ParticleTests, InitTest)
 
 	{
 		Particle particle;
-		EXPECT_TRUE(Vector3d::Zero().isApprox(particle.getPosition()));
-		EXPECT_TRUE(Vector3d::Zero().isApprox(particle.getVelocity()));
+		EXPECT_TRUE(particle.getPosition().isZero());
+		EXPECT_TRUE(particle.getVelocity().isZero());
 		EXPECT_NEAR(0.0, particle.getLifetime(), 1e-9);
 	}
 

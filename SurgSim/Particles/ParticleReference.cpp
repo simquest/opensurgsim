@@ -40,27 +40,27 @@ void ParticleReference::operator=(const Particle& other)
 
 bool ParticleReference::operator==(const ParticleReference& other) const
 {
-	return m_state.get() == other.m_state.get() && m_index == other.m_index;
+	return m_index == other.m_index && m_state.get() == other.m_state.get();
 }
 
-const Eigen::Block<SurgSim::Math::Vector, 3, 1> ParticleReference::getPosition() const
+const Eigen::VectorBlock<SurgSim::Math::Vector, 3> ParticleReference::getPosition() const
 {
-	return m_state->getPositions().block<3, 1>(3 * m_index, 0);
+	return m_state->getPositions().segment<3>(3 * m_index);
 }
 
 void ParticleReference::setPosition(const Eigen::Ref<const SurgSim::Math::Vector3d>& position)
 {
-	m_state->getPositions().segment(3 * m_index, 3) = position;
+	m_state->getPositions().segment<3>(3 * m_index) = position;
 }
 
-const Eigen::Block<SurgSim::Math::Vector, 3, 1> ParticleReference::getVelocity() const
+const Eigen::VectorBlock<SurgSim::Math::Vector, 3> ParticleReference::getVelocity() const
 {
-	return m_state->getVelocities().block<3, 1>(3 * m_index, 0);
+	return m_state->getVelocities().segment<3>(3 * m_index);
 }
 
 void ParticleReference::setVelocity(const Eigen::Ref<const SurgSim::Math::Vector3d>& velocity)
 {
-	m_state->getVelocities().segment(3 * m_index, 3) = velocity;
+	m_state->getVelocities().segment<3>(3 * m_index) = velocity;
 }
 
 double ParticleReference::getLifetime() const

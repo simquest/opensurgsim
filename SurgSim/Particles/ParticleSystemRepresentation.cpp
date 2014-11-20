@@ -61,6 +61,7 @@ size_t ParticleSystemRepresentation::getMaxParticles() const
 
 bool ParticleSystemRepresentation::addParticle(const Particle& particle)
 {
+	SURGSIM_ASSERT(isInitialized()) << "Cannot add particles before initialization";
 	bool result;
 	if (!m_unusedParticles.empty())
 	{
@@ -119,7 +120,7 @@ bool ParticleSystemRepresentation::update(double dt)
 	{
 		auto nextIter = particleIter;
 		nextIter++;
-		particleIter->setLifetime(particleIter->getLifetime() - 1);
+		particleIter->setLifetime(particleIter->getLifetime() - dt);
 		if (particleIter->getLifetime() <= 0)
 		{
 			m_unusedParticles.splice(m_unusedParticles.end(), m_particles, particleIter);
