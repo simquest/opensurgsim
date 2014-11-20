@@ -44,7 +44,7 @@
 namespace
 {
 
-/// Visitor to collect information about the tree that we are using, collect all the 
+/// Visitor to collect information about the tree that we are using, collect all the
 /// osgAnimation::Bone nodes in it and add stacked transform elements to them so
 /// we can manipulate them, also switches the skinning to Hardware
 class BoneMapCreator : public osg::NodeVisitor
@@ -52,13 +52,13 @@ class BoneMapCreator : public osg::NodeVisitor
 public:
 	/// Single argument constructor.
 	/// \param hardwareShader The shader which does the skinning.
-	BoneMapCreator(osg::Shader* hardwareShader) : 
+	explicit BoneMapCreator(osg::Shader* hardwareShader) :
 		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN), m_shader(hardwareShader) {}
 
 	/// Traverse the given tree and collect the bone data in them.
 	/// Also setup for hardware skinning, if a hardware shader is provided.
 	/// \param node The root node of the skeleton tree that needs to be traversed.
-	void apply(osg::Node& node)
+	virtual void apply(osg::Node& node) override // NOLINT
 	{
 		// Look for the transformation root ..
 		if (m_rootTransform == nullptr)
@@ -218,7 +218,7 @@ void OsgSkeletonRepresentation::doUpdate(double dt)
 	{
 		boost::lock_guard<boost::mutex> lock(m_boneDataMutex);
 		// Update the pose of all the bones.
-		for (auto& boneData : m_boneData)
+		for (auto& boneData : m_boneData) // NOLINT
 		{
 			std::pair<osg::Quat, osg::Vec3d> pose = toOsg(boneData.second.pose);
 			boneData.second.rotation->setQuaternion(pose.first);
