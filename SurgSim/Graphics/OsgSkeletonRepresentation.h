@@ -117,7 +117,7 @@ private:
 	/// The root node of the skeleton tree.
 	osg::ref_ptr<osg::Node> m_root;
 
-	/// The first MatrixTransform node 
+	/// The first MatrixTransform node
 	osg::ref_ptr<osg::MatrixTransform> m_base;
 };
 
