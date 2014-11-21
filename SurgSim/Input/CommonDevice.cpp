@@ -14,11 +14,13 @@
 // limitations under the License.
 
 #include "SurgSim/Input/CommonDevice.h"
-#include "SurgSim/Framework/Log.h"
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
 
 namespace SurgSim
 {
@@ -26,46 +28,25 @@ namespace Input
 {
 
 
-struct CommonDevice::State
-{
-	/// Constructor.
-	State()
-	{
-	}
-
-	/// The list of input consumers.
-	std::vector<std::shared_ptr<InputConsumerInterface>> inputConsumerList;
-
-	/// The output producer, if any.
-	std::shared_ptr<OutputProducerInterface> outputProducer;
-
-	/// The mutex that protects the consumers and the producer.
-	boost::mutex consumerProducerMutex;
-};
-
-
 
 CommonDevice::CommonDevice(const std::string& name) :
 	m_name(name),
 	m_nameForCallback(name),
-	m_inputData(SurgSim::DataStructures::DataGroup()),
-	m_state(new State)
+	m_inputData(SurgSim::DataStructures::DataGroup())
 {
 }
 
 CommonDevice::CommonDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
 	m_name(name),
 	m_nameForCallback(name),
-	m_inputData(inputData),
-	m_state(new State)
+	m_inputData(inputData)
 {
 }
 
 CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData) :
 	m_name(name),
 	m_nameForCallback(name),
-	m_inputData(std::move(inputData)),
-	m_state(new State)
+	m_inputData(std::move(inputData))
 {
 }
 
@@ -97,9 +78,9 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 		return false;
 	}
 
-	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
-	auto it = std::find(m_state->inputConsumerList.begin(), m_state->inputConsumerList.end(), inputConsumer);
-	if (it != m_state->inputConsumerList.end())
+	boost::lock_guard<boost::mutex> lock(m_consumerProducerMutex);
+	auto it = std::find(m_inputConsumerList.begin(), m_inputConsumerList.end(), inputConsumer);
+	if (it != m_inputConsumerList.end())
 	{
 		return false;
 	}
@@ -107,7 +88,7 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 	// NB: callbacks are called with the local m_nameForCallback.
 	// This allows e.g. filters to call their callbacks with a name different from their "real" name.
 	inputConsumer->initializeInput(m_nameForCallback, m_inputData);
-	m_state->inputConsumerList.emplace_back(std::move(inputConsumer));
+	m_inputConsumerList.emplace_back(std::move(inputConsumer));
 	return true;
 }
 
@@ -118,12 +99,12 @@ bool CommonDevice::removeInputConsumer(std::shared_ptr<InputConsumerInterface> i
 		return false;
 	}
 
-	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
-	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
+	boost::lock_guard<boost::mutex> lock(m_consumerProducerMutex);
+	for (auto it = m_inputConsumerList.begin();  it != m_inputConsumerList.end();  ++it)
 	{
 		if (*it == inputConsumer)
 		{
-			m_state->inputConsumerList.erase(it);
+			m_inputConsumerList.erase(it);
 			// The iterator is now invalid.
 			return true;
 		}
@@ -133,8 +114,8 @@ bool CommonDevice::removeInputConsumer(std::shared_ptr<InputConsumerInterface> i
 
 void CommonDevice::clearInputConsumers()
 {
-	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
-	m_state->inputConsumerList.clear();
+	boost::lock_guard<boost::mutex> lock(m_consumerProducerMutex);
+	m_inputConsumerList.clear();
 }
 
 bool CommonDevice::setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer)
@@ -144,12 +125,12 @@ bool CommonDevice::setOutputProducer(std::shared_ptr<OutputProducerInterface> ou
 		return false;
 	}
 
-	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
-	if (m_state->outputProducer == outputProducer)
+	boost::lock_guard<boost::mutex> lock(m_consumerProducerMutex);
+	if (m_outputProducer == outputProducer)
 	{
 		return false;
 	}
-	m_state->outputProducer = std::move(outputProducer);
+	m_outputProducer = std::move(outputProducer);
 	return true;
 }
 
@@ -160,10 +141,10 @@ bool CommonDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface>
 		return false;
 	}
 
-	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
-	if (m_state->outputProducer == outputProducer)
+	boost::lock_guard<boost::mutex> lock(m_consumerProducerMutex);
+	if (m_outputProducer == outputProducer)
 	{
-		m_state->outputProducer.reset();
+		m_outputProducer.reset();
 		return true;
 	}
 	return false;
@@ -171,20 +152,20 @@ bool CommonDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface>
 
 void CommonDevice::clearOutputProducer()
 {
-	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
-	m_state->outputProducer.reset();
+	boost::lock_guard<boost::mutex> lock(m_consumerProducerMutex);
+	m_outputProducer.reset();
 }
 
 
 bool CommonDevice::hasOutputProducer()
 {
-	return (m_state->outputProducer != nullptr);
+	return (m_outputProducer != nullptr);
 }
 
 void CommonDevice::pushInput()
 {
-	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
-	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
+	boost::lock_guard<boost::mutex> lock(m_consumerProducerMutex);
+	for (auto it = m_inputConsumerList.begin();  it != m_inputConsumerList.end();  ++it)
 	{
 		// NB: callbacks are called with the local m_nameForCallback.
 		// This allows e.g. filters to call their callbacks with a name different from their "real" name.
@@ -194,12 +175,12 @@ void CommonDevice::pushInput()
 
 bool CommonDevice::pullOutput()
 {
-	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
-	if (m_state->outputProducer)
+	boost::lock_guard<boost::mutex> lock(m_consumerProducerMutex);
+	if (m_outputProducer)
 	{
 		// NB: callbacks are called with the local m_nameForCallback.
 		// This allows e.g. filters to call their callbacks with a name different from their "real" name.
-		bool gotOutput = m_state->outputProducer->requestOutput(m_nameForCallback, &m_outputData);
+		bool gotOutput = m_outputProducer->requestOutput(m_nameForCallback, &m_outputData);
 		if (gotOutput)
 		{
 			return true;
