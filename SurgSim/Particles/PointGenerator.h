@@ -56,7 +56,6 @@ public:
 protected:
 	///@{
 	/// Random number generator and some predefined distributions to be used by different shape point generators.
-	std::random_device m_randomDevice;
 	std::mt19937 m_generator;
 
 	std::uniform_real_distribution<double> m_openOneOneDistribution; // <-- (-1.0, 1.0)

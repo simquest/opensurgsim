@@ -45,8 +45,5 @@ TEST(ShapesPointGeneratorTest, GenerationTest)
 
 	EXPECT_NO_THROW(shapesPointGenerator->pointInShape(boxShape));
 	EXPECT_NO_THROW(shapesPointGenerator->pointOnShape(sphereShape));
-	EXPECT_ANY_THROW(shapesPointGenerator->pointOnShape(shape));
-
-	// As of Nov 7, 2014, ShapesPointGenerator does not support CapsuleShape.
-	EXPECT_ANY_THROW(shapesPointGenerator->pointInShape(capsuleShape));
+	EXPECT_THROW(shapesPointGenerator->pointOnShape(shape), SurgSim::Framework::AssertionFailure);
 }

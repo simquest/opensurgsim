@@ -31,16 +31,16 @@ DefaultPointGenerator::~DefaultPointGenerator()
 
 Vector3d DefaultPointGenerator::pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
-	SURGSIM_FAILURE() << "PointGenerator does not support generate point in shape: "<<
-		shape->getType() << " yet.";
+	SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << 
+		"PointGenerator does not support generate point in shape: "<< shape->getType() << " yet.";
 
 	return Vector3d::Zero();
 }
 
 Vector3d DefaultPointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
-	SURGSIM_FAILURE() << "PointGenerator does not support generate point on the surface of shape: "<<
-		shape->getType() << " yet.";
+	SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << 
+		"PointGenerator does not support generate point on the surface of shape: "<< shape->getType() << " yet.";
 
 	return Vector3d::Zero();
 }

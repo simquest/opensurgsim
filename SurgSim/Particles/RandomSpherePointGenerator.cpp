@@ -50,6 +50,7 @@ Vector3d RandomSpherePointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math:
 	double z = 0.0;
 	double phi = 0.0;
 	double theta = 0.0;
+	double cosineTheta = 0.0;
 
 	Vector3d result = Vector3d::Zero();
 	// If the origin (0.0, 0.0, 0.0) is produced, regenerate.
@@ -57,10 +58,12 @@ Vector3d RandomSpherePointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math:
 	{
 		z = m_closedOneOneDistribution(m_generator) * radius;
 		phi = m_closedZeroOneDistribution(m_generator) * 2.0 * M_PI;
-		theta = 1.0 / std::sin(z / radius);
+		theta = std::asin(z / radius);
 
-		result.x() = radius * std::cos(theta) * std::cos(phi);
-		result.y() = radius * std::cos(theta) * std::sin(phi);
+		cosineTheta = std::cos(theta);
+
+		result.x() = radius * cosineTheta * std::cos(phi);
+		result.y() = radius * cosineTheta * std::sin(phi);
 		result.z() = z;
 	}
 

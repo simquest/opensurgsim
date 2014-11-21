@@ -23,12 +23,13 @@ namespace SurgSim
 namespace Particles
 {
 PointGenerator::PointGenerator() :
-	m_generator(m_randomDevice()),
 	m_openOneOneDistribution(boost::math::float_next(-1.0), 1.0),
 	m_closedOneOneDistribution(-1.0, boost::math::float_next(1.0)),
 	m_closedZeroOneDistribution(0.0, boost::math::float_next(1.0)),
 	m_closedZeroOpenOneDistribution(0.0, 1.0)
 {
+	std::random_device randomDevice;
+	m_generator.seed(randomDevice());
 }
 
 PointGenerator::~PointGenerator()

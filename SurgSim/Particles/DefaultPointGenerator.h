@@ -30,7 +30,7 @@ class Shape;
 namespace Particles
 {
 
-// DefaultPointGenerator, exception will be thrown if methods of instance of this class being called.
+/// DefaultPointGenerator, exception will be thrown if methods of instance of this class being called.
 class DefaultPointGenerator: public PointGenerator
 {
 public:

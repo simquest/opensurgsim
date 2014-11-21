@@ -28,7 +28,10 @@ namespace SurgSim
 
 namespace Particles
 {
-
+/// ShapesPointGenerator is a list of PointGenerators.
+/// The list gets populated when ShapesPointGeneartor is constructed.
+/// Based on the shape passed, ShapesPointGenerator invokes the corresponding PointGenerator.
+/// \sa PointGenerator
 class ShapesPointGenerator : public PointGenerator
 {
 public:
