@@ -360,60 +360,55 @@ TEST(OdeStateTest, ApplyBoundaryConditionsToMatrixTest)
 
 namespace
 {
-void testIsValidWith(double invalidNumber, bool valid = false)
+void testOdeStateValidityWith(double number, bool isValid)
 {
-	OdeState invalidStateInfinityOnPosition;
-	invalidStateInfinityOnPosition.setNumDof(3u, 3u);
-	invalidStateInfinityOnPosition.getPositions().setOnes();
-	invalidStateInfinityOnPosition.getPositions()[2] = invalidNumber;
-	if (valid)
+	OdeState stateWithNumberOnPosition;
+	stateWithNumberOnPosition.setNumDof(3u, 3u);
+	stateWithNumberOnPosition.getPositions().setOnes();
+	stateWithNumberOnPosition.getPositions()[2] = number;
+	if (isValid)
 	{
-		EXPECT_TRUE(invalidStateInfinityOnPosition.isValid());
+		EXPECT_TRUE(stateWithNumberOnPosition.isValid());
 	}
 	else
 	{
-		EXPECT_FALSE(invalidStateInfinityOnPosition.isValid());
+		EXPECT_FALSE(stateWithNumberOnPosition.isValid());
 	}
 
-	OdeState invalidStateInfinityOnVelocity;
-	invalidStateInfinityOnVelocity.setNumDof(3u, 3u);
-	invalidStateInfinityOnVelocity.getVelocities().setOnes();
-	invalidStateInfinityOnVelocity.getVelocities()[2] = invalidNumber;
-	if (valid)
+	OdeState stateWithNumberOnVelocity;
+	stateWithNumberOnVelocity.setNumDof(3u, 3u);
+	stateWithNumberOnVelocity.getVelocities().setOnes();
+	stateWithNumberOnVelocity.getVelocities()[2] = number;
+	if (isValid)
 	{
-		EXPECT_TRUE(invalidStateInfinityOnVelocity.isValid());
+		EXPECT_TRUE(stateWithNumberOnVelocity.isValid());
 	}
 	else
 	{
-		EXPECT_FALSE(invalidStateInfinityOnVelocity.isValid());
+		EXPECT_FALSE(stateWithNumberOnVelocity.isValid());
 	}
 }
 }; // anonymous namespace
 
 TEST(OdeStateTest, IsValidTest)
 {
-	OdeState validState;
-	validState.setNumDof(3u, 3u);
-	validState.getPositions().setOnes();
-	EXPECT_TRUE(validState.isValid());
-
 	{
-		SCOPED_TRACE("Test with invalid INF");
-		testIsValidWith(std::numeric_limits<double>::infinity());
+		SCOPED_TRACE("Test with invalid number INF");
+		testOdeStateValidityWith(std::numeric_limits<double>::infinity(), false);
 	}
 
 	{
-		SCOPED_TRACE("Test with invalid QuietNaN");
-		testIsValidWith(std::numeric_limits<double>::quiet_NaN());
+		SCOPED_TRACE("Test with invalid number QuietNaN");
+		testOdeStateValidityWith(std::numeric_limits<double>::quiet_NaN(), false);
 	}
 
 	{
-		SCOPED_TRACE("Test with invalid SignalingNaN");
-		testIsValidWith(std::numeric_limits<double>::signaling_NaN());
+		SCOPED_TRACE("Test with invalid number SignalingNaN");
+		testOdeStateValidityWith(std::numeric_limits<double>::signaling_NaN(), false);
 	}
 
 	{
 		SCOPED_TRACE("Test with valid numbers");
-		testIsValidWith(4.5e-34, true);
+		testOdeStateValidityWith(4.5e-34, true);
 	}
 }
