@@ -29,7 +29,8 @@ namespace DataStructures
 /// BufferedValue is a class to enable a representation of two values for one variable, where both values need to be
 /// accessible at the same time, one in a thread safe, single threaded context, the other in a thread unsafe context.
 /// \tparam T Type that is used for the value.
-template <class T>
+/// \tparam ST The safe type if different than the Type T
+template <class T, class ST = T>
 class BufferedValue
 {
 public:
@@ -53,7 +54,7 @@ public:
 
 	/// Get the buffered value
 	/// \return The value at the last call to publish.
-	std::shared_ptr<const T> safeGet() const;
+	std::shared_ptr<const ST> safeGet() const;
 
 private:
 	typedef boost::shared_lock<boost::shared_mutex> SharedLock;
@@ -63,7 +64,7 @@ private:
 	T m_value;
 
 	/// The buffered value
-	std::shared_ptr<const T> m_safeValue;
+	std::shared_ptr<const ST> m_safeValue;
 
 	/// The mutex used to lock for reading and writing
 	mutable boost::shared_mutex m_mutex;

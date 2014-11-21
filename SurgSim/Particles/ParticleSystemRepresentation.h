@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Representation.h"
 
 
@@ -36,8 +37,10 @@ namespace Particles
 {
 
 class Particle;
+class Particles;
 class ParticleReference;
 class ParticlesState;
+
 
 /// The ParticleSystemRepresentation class defines the base class for all Particle System.
 class ParticleSystemRepresentation : public SurgSim::Framework::Representation
@@ -74,9 +77,16 @@ public:
 	/// \param particle A reference to a particle to remove
 	bool removeParticle(const ParticleReference& particle);
 
-	/// Get the particles
-	/// \return A list of reference to the particles
-	std::list<ParticleReference>& getParticles();
+	/// Type of ParticleReference container
+	typedef std::list<ParticleReference> ParticleReferences;
+
+	/// Type of the BufferedValue for Particles
+	typedef SurgSim::DataStructures::BufferedValue<ParticleReferences, Particles> BufferedParticles;
+
+	/// Get the particles using a BufferedValue, proving thread safe and
+	/// thread unsafe access to the system's particles.
+	/// \return A BufferedValue of Particles
+	BufferedParticles& getParticles();
 
 	/// Update the particle system
 	/// \param dt The time step.
@@ -87,7 +97,7 @@ protected:
 	size_t m_maxParticles;
 
 	/// List of particles.
-	std::list<ParticleReference> m_particles;
+	BufferedParticles m_particles;
 
 	/// List of unused particles.
 	std::list<ParticleReference> m_unusedParticles;

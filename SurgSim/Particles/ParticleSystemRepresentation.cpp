@@ -21,6 +21,7 @@
 #include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/ParticlesState.h"
 
+
 namespace SurgSim
 {
 namespace Particles
@@ -63,10 +64,11 @@ bool ParticleSystemRepresentation::addParticle(const Particle& particle)
 {
 	SURGSIM_ASSERT(isInitialized()) << "Cannot add particles before initialization";
 	bool result;
+	ParticleReferences& particles = m_particles.unsafeGet();
 	if (!m_unusedParticles.empty())
 	{
 		(*m_unusedParticles.begin()) = particle;
-		m_particles.splice(m_particles.end(), m_unusedParticles, m_unusedParticles.begin());
+		particles.splice(particles.end(), m_unusedParticles, m_unusedParticles.begin());
 		result = true;
 	}
 	else
@@ -95,10 +97,11 @@ bool ParticleSystemRepresentation::addParticles(const std::vector<Particle>& par
 bool ParticleSystemRepresentation::removeParticle(const ParticleReference& particle)
 {
 	bool result;
-	auto found = std::find(m_particles.begin(), m_particles.end(), particle);
-	if (found != m_particles.end())
+	ParticleReferences& particles = m_particles.unsafeGet();
+	auto found = std::find(particles.begin(), particles.end(), particle);
+	if (found != particles.end())
 	{
-		m_unusedParticles.splice(m_unusedParticles.end(), m_particles, found);
+		m_unusedParticles.splice(m_unusedParticles.end(), particles, found);
 		result = true;
 	}
 	else
@@ -109,25 +112,33 @@ bool ParticleSystemRepresentation::removeParticle(const ParticleReference& parti
 	return result;
 }
 
-std::list<ParticleReference>& ParticleSystemRepresentation::getParticles()
+ParticleSystemRepresentation::BufferedParticles& ParticleSystemRepresentation::getParticles()
 {
 	return m_particles;
 }
 
 bool ParticleSystemRepresentation::update(double dt)
 {
-	for(auto particleIter = m_particles.begin(); particleIter != m_particles.end(); )
+	ParticleReferences& particles = m_particles.unsafeGet();
+	for(auto particleIter = particles.begin(); particleIter != particles.end(); )
 	{
 		auto nextIter = particleIter;
 		nextIter++;
 		particleIter->setLifetime(particleIter->getLifetime() - dt);
 		if (particleIter->getLifetime() <= 0)
 		{
-			m_unusedParticles.splice(m_unusedParticles.end(), m_particles, particleIter);
+			m_unusedParticles.splice(m_unusedParticles.end(), particles, particleIter);
 		}
 		particleIter = nextIter;
 	}
-	return doUpdate(dt);
+
+	bool result = false;
+	if (doUpdate(dt))
+	{
+		m_particles.publish();
+		result = true;
+	}
+	return result;
 }
 
 }; // namespace Particles

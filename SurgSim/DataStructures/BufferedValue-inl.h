@@ -21,39 +21,39 @@ namespace SurgSim
 namespace DataStructures
 {
 
-template <class T>
-BufferedValue<T>::BufferedValue()
+template <class T, class ST>
+BufferedValue<T, ST>::BufferedValue()
 {
-	m_safeValue = std::make_shared<const T>();
+	m_safeValue = std::make_shared<const ST>();
 }
 
-template <class T>
-BufferedValue<T>::BufferedValue(const T& value) :
+template <class T, class ST>
+BufferedValue<T, ST>::BufferedValue(const T& value) :
 	m_value(value)
 {
-	m_safeValue = std::make_shared<const T>(m_value);
+	m_safeValue = std::make_shared<const ST>(m_value);
 }
 
-template <class T>
-BufferedValue<T>::~BufferedValue()
+template <class T, class ST>
+BufferedValue<T, ST>::~BufferedValue()
 {
 }
 
-template <class T>
-void BufferedValue<T>::publish()
+template <class T, class ST>
+void BufferedValue<T, ST>::publish()
 {
 	UniqueLock lock(m_mutex);
-	m_safeValue = std::make_shared<const T>(m_value);
+	m_safeValue = std::make_shared<const ST>(m_value);
 }
 
-template <class T>
-T& BufferedValue<T>::unsafeGet()
+template <class T, class ST>
+T& BufferedValue<T, ST>::unsafeGet()
 {
 	return m_value;
 }
 
-template <class T>
-std::shared_ptr<const T> BufferedValue<T>::safeGet() const
+template <class T, class ST>
+std::shared_ptr<const ST> BufferedValue<T, ST>::safeGet() const
 {
 	SharedLock lock(m_mutex);
 	return m_safeValue;
