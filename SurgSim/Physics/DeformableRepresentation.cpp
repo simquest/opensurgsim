@@ -158,16 +158,6 @@ void DeformableRepresentation::update(double dt)
 	m_currentState.swap(m_previousState);
 	// Make the new state, the current state (by swapping)
 	m_currentState.swap(m_newState);
-
-	if (!m_currentState->isValid())
-	{
-		SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-				<< getName() << " deactivated :" << std::endl
-				<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
-				<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
-
-		setLocalActive(false);
-	}
 }
 
 void DeformableRepresentation::afterUpdate(double dt)
@@ -198,16 +188,6 @@ void DeformableRepresentation::applyCorrection(double dt,
 
 	m_currentState->getPositions() += deltaVelocity * dt;
 	m_currentState->getVelocities() += deltaVelocity;
-
-	if (!m_currentState->isValid())
-	{
-		SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-				<< getName() << " deactivated :" << std::endl
-				<< "position=(" << m_currentState->getPositions() << ")" << std::endl
-				<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
-
-		setLocalActive(false);
-	}
 }
 
 void DeformableRepresentation::deactivateAndReset(void)
