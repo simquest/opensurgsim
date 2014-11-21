@@ -13,17 +13,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set(SURGSIM_PARTICLES_SOURCES
+	Particle.cpp
+	ParticleReference.cpp
+	ParticlesState.cpp
+	ParticleSystemRepresentation.cpp
+)
 
-link_directories(${Boost_LIBRARY_DIRS})
+set(SURGSIM_PARTICLES_HEADERS
+	Particle.h
+	ParticleReference.h
+	ParticlesState.h
+	ParticleSystemRepresentation.h
+)
 
-add_subdirectory(Blocks)
-add_subdirectory(Collision)
-add_subdirectory(DataStructures)
-add_subdirectory(Devices)
-add_subdirectory(Framework)
-add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-add_subdirectory(Particles)
-add_subdirectory(Physics)
-add_subdirectory(Testing)
+surgsim_add_library(
+	SurgSimParticles
+	"${SURGSIM_PARTICLES_SOURCES}"
+	"${SURGSIM_PARTICLES_HEADERS}"
+)
+
+SET(LIBS SurgSimMath)
+target_link_libraries(SurgSimParticles ${LIBS})
+
+if(BUILD_TESTING)
+	add_subdirectory(UnitTests)
+endif()
+
+set_target_properties(SurgSimParticles PROPERTIES FOLDER "Particles")

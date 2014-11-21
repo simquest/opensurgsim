@@ -13,17 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_directories(
+	${gtest_SOURCE_DIR}/include
+)
 
-link_directories(${Boost_LIBRARY_DIRS})
+set(UNIT_TEST_SOURCES
+	ParticleReferenceTests.cpp
+	ParticlesStateTests.cpp
+	ParticleSystemRepresentationTests.cpp
+	ParticleTests.cpp
+)
 
-add_subdirectory(Blocks)
-add_subdirectory(Collision)
-add_subdirectory(DataStructures)
-add_subdirectory(Devices)
-add_subdirectory(Framework)
-add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-add_subdirectory(Particles)
-add_subdirectory(Physics)
-add_subdirectory(Testing)
+set(UNIT_TEST_HEADERS
+)
+
+set(LIBS
+	SurgSimParticles
+)
+
+surgsim_add_unit_tests(SurgSimParticlesTest)
+
+set_target_properties(SurgSimParticlesTest PROPERTIES FOLDER "Particles")
