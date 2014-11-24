@@ -31,7 +31,7 @@ template <class T, class ST>
 BufferedValue<T, ST>::BufferedValue(const T& value) :
 	m_value(value)
 {
-	m_safeValue = std::make_shared<const ST>(m_value);
+	publish();
 }
 
 template <class T, class ST>
@@ -42,8 +42,7 @@ BufferedValue<T, ST>::~BufferedValue()
 template <class T, class ST>
 void BufferedValue<T, ST>::publish()
 {
-	UniqueLock lock(m_mutex);
-	m_safeValue = std::make_shared<const ST>(m_value);
+	doPublish<T>(0);
 }
 
 template <class T, class ST>
@@ -58,6 +57,23 @@ std::shared_ptr<const ST> BufferedValue<T, ST>::safeGet() const
 	SharedLock lock(m_mutex);
 	return m_safeValue;
 }
+
+template <class T, class ST>
+template <typename V>
+void BufferedValue<T, ST>::doPublish(decltype(typename V::const_iterator(), int()))
+{
+	UniqueLock lock(m_mutex);
+	m_safeValue = std::make_shared<const ST>(m_value.cbegin(), m_value.cend());
+}
+
+template <class T, class ST>
+template <typename>
+void BufferedValue<T, ST>::doPublish(...)
+{
+	UniqueLock lock(m_mutex);
+	m_safeValue = std::make_shared<const ST>(m_value);
+};
+
 
 } // DataStructures
 } // SurgSim

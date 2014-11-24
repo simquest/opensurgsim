@@ -77,25 +77,6 @@ private:
 	double m_lifetime;
 };
 
-/// Container of Particles
-/// This class is a std::vector of Particle with the added ability to copy
-/// from containers of compatible type (ie ParticleReference containers).
-class Particles : public std::vector<Particle>
-{
-public:
-	/// Copy constructor from another container of compatible type
-	template<class R, decltype(typename R::const_iterator(), int()) = 0>
-	Particles(const R& other) :
-		std::vector<Particle>::vector(other.cbegin(), other.cend())
-	{
-	}
-
-	/// Constructor
-	Particles()
-	{
-	}
-};
-
 }; // namespace Particles
 }; // namespace SurgSim
 

@@ -19,6 +19,7 @@
 #include <memory>
 #include <utility>
 #include <boost/thread.hpp>
+
 #include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
@@ -57,6 +58,17 @@ public:
 	std::shared_ptr<const ST> safeGet() const;
 
 private:
+	/// Implementation of publish
+	/// Will be used with container types, and is usefull when T and ST are
+	/// containers with different, but compatible types.
+	template <typename V>
+	void doPublish(decltype(typename V::const_iterator(), int()));
+
+	/// Implementation of publish
+	/// Default version of doPublish
+	template <typename>
+	void doPublish(...);
+
 	typedef boost::shared_lock<boost::shared_mutex> SharedLock;
 	typedef boost::unique_lock<boost::shared_mutex> UniqueLock;
 

@@ -37,7 +37,6 @@ namespace Particles
 {
 
 class Particle;
-class Particles;
 class ParticleReference;
 class ParticlesState;
 
@@ -77,14 +76,12 @@ public:
 	/// \param particle A reference to a particle to remove
 	bool removeParticle(const ParticleReference& particle);
 
-	/// Type of ParticleReference container
-	typedef std::list<ParticleReference> ParticleReferences;
-
 	/// Type of the BufferedValue for Particles
-	typedef SurgSim::DataStructures::BufferedValue<ParticleReferences, Particles> BufferedParticles;
+	typedef SurgSim::DataStructures::BufferedValue<std::list<ParticleReference>, std::vector<Particle>>
+		BufferedParticles;
 
-	/// Get the particles using a BufferedValue, proving thread safe and
-	/// thread unsafe access to the system's particles.
+	/// Get the particles using a BufferedValue, providing a copy of the data (safeGet) and
+	/// direct access to the system's internal particles (unsafeGet).
 	/// \return A BufferedValue of Particles
 	BufferedParticles& getParticles();
 

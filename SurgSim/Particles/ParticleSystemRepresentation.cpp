@@ -64,7 +64,7 @@ bool ParticleSystemRepresentation::addParticle(const Particle& particle)
 {
 	SURGSIM_ASSERT(isInitialized()) << "Cannot add particles before initialization";
 	bool result;
-	ParticleReferences& particles = m_particles.unsafeGet();
+	std::list<ParticleReference>& particles = m_particles.unsafeGet();
 	if (!m_unusedParticles.empty())
 	{
 		(*m_unusedParticles.begin()) = particle;
@@ -97,7 +97,7 @@ bool ParticleSystemRepresentation::addParticles(const std::vector<Particle>& par
 bool ParticleSystemRepresentation::removeParticle(const ParticleReference& particle)
 {
 	bool result;
-	ParticleReferences& particles = m_particles.unsafeGet();
+	std::list<ParticleReference>& particles = m_particles.unsafeGet();
 	auto found = std::find(particles.begin(), particles.end(), particle);
 	if (found != particles.end())
 	{
@@ -119,7 +119,7 @@ ParticleSystemRepresentation::BufferedParticles& ParticleSystemRepresentation::g
 
 bool ParticleSystemRepresentation::update(double dt)
 {
-	ParticleReferences& particles = m_particles.unsafeGet();
+	std::list<ParticleReference>& particles = m_particles.unsafeGet();
 	for(auto particleIter = particles.begin(); particleIter != particles.end(); )
 	{
 		auto nextIter = particleIter;
