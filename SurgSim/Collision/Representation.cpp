@@ -36,6 +36,14 @@ SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getColli
 	return m_collisions;
 }
 
+
+bool Representation::collidedWith(const std::shared_ptr<Representation>& other)
+{
+	auto collisions = m_collisions.safeGet();
+	return (collisions->find(other) != collisions->end());
+}
+
+
 void Representation::update(const double& dt)
 {
 }
