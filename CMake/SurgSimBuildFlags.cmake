@@ -89,13 +89,10 @@ if(MSVC)
 	# Enable parallel builds:
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 	
-	if(SURGSIM_WARNINGS_AS_ERRORS)
+	if (SURGSIM_WARNINGS_AS_ERRORS)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
 	endif(SURGSIM_WARNINGS_AS_ERRORS)
 	
-	# Allow for default template arguments in function templates, permitted in C++11
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w14519 /wd4519")
-
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")  # is this needed?
 	set(CMAKE_DEBUG_POSTFIX "d")
 
