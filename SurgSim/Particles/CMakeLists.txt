@@ -15,6 +15,10 @@
 
 set(SURGSIM_PARTICLES_SOURCES
 	DefaultPointGenerator.cpp
+	Particle.cpp
+	ParticleReference.cpp
+	ParticlesState.cpp
+	ParticleSystemRepresentation.cpp
 	PointGenerator.cpp
 	RandomBoxPointGenerator.cpp
 	RandomSpherePointGenerator.cpp
@@ -23,6 +27,10 @@ set(SURGSIM_PARTICLES_SOURCES
 
 set(SURGSIM_PARTICLES_HEADERS
 	DefaultPointGenerator.h
+	Particle.h
+	ParticleReference.h
+	ParticlesState.h
+	ParticleSystemRepresentation.h
 	PointGenerator.h
 	RandomBoxPointGenerator.h
 	RandomSpherePointGenerator.h
@@ -34,6 +42,9 @@ surgsim_add_library(
 	"${SURGSIM_PARTICLES_SOURCES}"
 	"${SURGSIM_PARTICLES_HEADERS}"
 )
+
+SET(LIBS SurgSimMath)
+target_link_libraries(SurgSimParticles ${LIBS})
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)

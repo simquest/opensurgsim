@@ -30,6 +30,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgCamera.cpp
 	OsgCapsuleRepresentation.cpp
 	OsgCylinderRepresentation.cpp
+	OsgFont.cpp
 	OsgGroup.cpp
 	OsgLight.cpp
 	OsgLog.cpp
@@ -47,6 +48,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgShader.cpp
 	OsgSkeletonRepresentation.cpp
 	OsgSphereRepresentation.cpp
+	OsgTextRepresentation.cpp
 	OsgTexture.cpp
 	OsgTexture1d.cpp
 	OsgTexture2d.cpp
@@ -64,6 +66,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	RenderPass.cpp
 	Representation.cpp
 	SceneryRepresentation.cpp
+	TextRepresentation.cpp
 	TriangleNormalGenerator.cpp
 	View.cpp
 	ViewElement.cpp
@@ -75,6 +78,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Camera.h
 	CapsuleRepresentation.h
 	CylinderRepresentation.h
+	Font.h
 	Group.h
 	Light.h
 	Manager.h
@@ -92,6 +96,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgCapsuleRepresentation.h
 	OsgConversions.h
 	OsgCylinderRepresentation.h
+	OsgFont.h
 	OsgGroup.h
 	OsgLight.h
 	OsgLog.h
@@ -115,6 +120,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgShader.h
 	OsgSkeletonRepresentation.h
 	OsgSphereRepresentation.h
+	OsgTextRepresentation.h
 	OsgTexture.h
 	OsgTexture1d.h
 	OsgTexture2d.h
@@ -147,6 +153,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Shader.h
 	SkeletonRepresentation.h
 	SphereRepresentation.h
+	TextRepresentation.h
 	Texture.h
 	Texture1d.h
 	Texture2d.h

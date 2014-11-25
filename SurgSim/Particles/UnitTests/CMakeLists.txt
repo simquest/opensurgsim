@@ -18,6 +18,10 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	ParticleReferenceTests.cpp
+	ParticlesStateTests.cpp
+	ParticleSystemRepresentationTests.cpp
+	ParticleTests.cpp
 	PointGeneratorTests.cpp
 	ShapesPointGeneratorTests.cpp
 )
