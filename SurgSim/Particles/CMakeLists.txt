@@ -21,8 +21,8 @@ set(SURGSIM_PARTICLES_SOURCES
 	ParticleSystemRepresentation.cpp
 	PointGenerator.cpp
 	RandomBoxPointGenerator.cpp
+	RandomPointGenerator.cpp
 	RandomSpherePointGenerator.cpp
-	ShapesPointGenerator.cpp
 )
 
 set(SURGSIM_PARTICLES_HEADERS
@@ -33,8 +33,8 @@ set(SURGSIM_PARTICLES_HEADERS
 	ParticleSystemRepresentation.h
 	PointGenerator.h
 	RandomBoxPointGenerator.h
+	RandomPointGenerator.h
 	RandomSpherePointGenerator.h
-	ShapesPointGenerator.h
 )
 
 surgsim_add_library(

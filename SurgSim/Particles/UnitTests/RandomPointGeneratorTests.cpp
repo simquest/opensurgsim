@@ -21,23 +21,23 @@
 #include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/ShapesPointGenerator.h"
+#include "SurgSim/Particles/RandomPointGenerator.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
-using SurgSim::Particles::ShapesPointGenerator;
+using SurgSim::Particles::RandomPointGenerator;
 
 TEST(ShapesPointGeneratorTest, ConstructorTest)
 {
-	ASSERT_NO_THROW(ShapesPointGenerator());
+	ASSERT_NO_THROW(RandomPointGenerator());
 }
 
 TEST(ShapesPointGeneratorTest, GenerationTest)
 {
-	auto shapesPointGenerator = std::make_shared<ShapesPointGenerator>();
+	auto shapesPointGenerator = std::make_shared<RandomPointGenerator>();
 	auto boxShape = std::make_shared<BoxShape>(1.0, 2.0, 3.0);
 	auto capsuleShape = std::make_shared<CapsuleShape>(4.0, 5.0);
 	auto sphereShape = std::make_shared<SphereShape>(6.0);

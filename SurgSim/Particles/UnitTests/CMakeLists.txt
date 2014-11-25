@@ -23,7 +23,7 @@ set(UNIT_TEST_SOURCES
 	ParticleSystemRepresentationTests.cpp
 	ParticleTests.cpp
 	PointGeneratorTests.cpp
-	ShapesPointGeneratorTests.cpp
+	RandomPointGeneratorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

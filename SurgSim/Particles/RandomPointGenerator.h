@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PARTICLES_SHAPESPOINTGENERATOR_H
-#define SURGSIM_PARTICLES_SHAPESPOINTGENERATOR_H
+#ifndef SURGSIM_PARTICLES_RANDOMPOINTGENERATOR_H
+#define SURGSIM_PARTICLES_RANDOMPOINTGENERATOR_H
 
 #include <array>
 #include <memory>
@@ -28,15 +28,15 @@ namespace SurgSim
 
 namespace Particles
 {
-/// ShapesPointGenerator is a list of PointGenerators.
-/// The list gets populated when ShapesPointGeneartor is constructed.
-/// Based on the shape passed, ShapesPointGenerator invokes the corresponding PointGenerator.
+/// RandomPointGenerator will generate points based on the shape passed.
+/// Internally, this class maintains a list of PointGenerators for each supported shape.
+/// The list gets populated when RandomPointGenerator is constructed.
 /// \sa PointGenerator
-class ShapesPointGenerator : public PointGenerator
+class RandomPointGenerator : public PointGenerator
 {
 public:
 	/// Constructor
-	ShapesPointGenerator();
+	RandomPointGenerator();
 
 	virtual SurgSim::Math::Vector3d pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
 	virtual SurgSim::Math::Vector3d pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
@@ -50,4 +50,4 @@ private:
 }; // namespace Particles
 }; // namespace SurgSim
 
-#endif // SURGSIM_PARTICLES_SHAPESPOINTGENERATOR_H
+#endif // SURGSIM_PARTICLES_RANDOMPOINTGENERATOR_H
