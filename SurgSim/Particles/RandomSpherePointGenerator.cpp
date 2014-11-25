@@ -15,7 +15,6 @@
 
 #include "SurgSim/Particles/RandomSpherePointGenerator.h"
 
-#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/SphereShape.h"
 
 namespace SurgSim
@@ -66,9 +65,6 @@ Vector3d RandomSpherePointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math:
 		result.y() = radius * cosineTheta * std::sin(phi);
 		result.z() = z;
 	}
-
-	result.normalize();
-	result *= radius;
 
 	return result;
 }
