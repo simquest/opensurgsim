@@ -30,7 +30,7 @@ class Shape;
 namespace Particles
 {
 
-// Generates points inside or on the surface of a box.
+/// Class to generate points inside or on the surface of a box.
 class RandomBoxPointGenerator: public PointGenerator
 {
 public:

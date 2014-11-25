@@ -15,7 +15,6 @@
 
 #include "SurgSim/Particles/DefaultPointGenerator.h"
 
-#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Shape.h"
 

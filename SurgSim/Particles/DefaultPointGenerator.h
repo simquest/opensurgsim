@@ -30,7 +30,9 @@ class Shape;
 namespace Particles
 {
 
-/// DefaultPointGenerator, exception will be thrown if methods of instance of this class being called.
+/// DefaultPointGenerator, methods of this class will always return (0.0, 0.0, 0.0) and output a severe logging message.
+/// They are served more like a place holder (concrete implementation) to be used in ShapesPointGenerator.
+/// One should develop an actual XXXPointGenerator to produce points in/on the shape.
 class DefaultPointGenerator: public PointGenerator
 {
 public:

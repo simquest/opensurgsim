@@ -15,7 +15,6 @@
 
 #include "SurgSim/Particles/RandomBoxPointGenerator.h"
 
-#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/BoxShape.h"
 
 namespace SurgSim
