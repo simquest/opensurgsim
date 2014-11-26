@@ -96,7 +96,9 @@ void OsgTextRepresentation::getLocation(double* x, double* y) const
 
 void OsgTextRepresentation::setText(const std::string& text)
 {
+	boost::mutex::scoped_lock lock(m_parameterMutex);
 	m_text = text;
+	m_needUpdate = true;
 }
 
 std::string OsgTextRepresentation::getText() const
