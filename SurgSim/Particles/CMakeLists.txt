@@ -21,6 +21,8 @@ set(SURGSIM_PARTICLES_SOURCES
 )
 
 set(SURGSIM_PARTICLES_HEADERS
+	Grid.h
+	Grid-inl.h
 	Particle.h
 	ParticleReference.h
 	ParticlesState.h
