@@ -193,7 +193,14 @@ void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasComplianc
 
 bool OdeState::isValid() const
 {
-	return SurgSim::Math::isValid(getPositions()) && SurgSim::Math::isValid(getVelocities());
+	using SurgSim::Math::isValid;
+
+	/// http://steve.hollasch.net/cgindex/coding/ieeefloat.html
+	/// We use the IEEE754 standard stipulating that any arithmetic operation with a NaN operand will produce NaN
+	/// and any sum of +-INF with a finite number or +-INF will produce +-INF.
+	/// Therefore, testing if a vector contains only finite numbers can be achieve easily by summing all the values
+	/// and testing if the result is a finite number or not.
+	return isValid(getPositions().sum()) && isValid(getVelocities().sum());
 }
 
 }; // namespace Math
