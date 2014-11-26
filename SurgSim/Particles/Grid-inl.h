@@ -39,7 +39,7 @@ class Number : public Eigen::Matrix<T, N, 1>
 public:
 	Number()
 	{
-		setZero();
+		this->setZero();
 	}
 
 	bool next()
@@ -109,7 +109,7 @@ void Grid<T, N>::init(double size, const Eigen::Matrix<size_t, N, 1>& powerOf2Ce
 		m_offsetPerDimension[N - 1] = 1;
 		m_offsetPowerOf2PerDimension[N - 1] = 0;
 	}
-	for (int i = N - 2; i >= 0; i--)
+	for (int i = static_cast<int>(N) - 2; i >= 0; i--)
 	{
 		m_offsetPerDimension[i] = m_offsetPerDimension[i + 1] * m_numCellsPerDimension[i + 1];
 		m_offsetPowerOf2PerDimension[i] = m_offsetPowerOf2PerDimension[i + 1] + m_powerOf2CellsPerDimension[i + 1];
@@ -214,8 +214,6 @@ void Grid<T, N>::getNeighborsCellId(size_t cellId,
 	// In which cell are we in the n-d array ?
 	Eigen::Matrix<int, N, 1> cellIdnDOriginal;
 	cellId_1dTond(cellId, &cellIdnDOriginal);
-	cellIdnDOriginal -= Eigen::Matrix<int, N, 1>::Ones();
-	Eigen::Matrix<int, N, 1> cellIdnD = cellIdnDOriginal;
 
 	// Now build up all the neighbors cell around this n-d cell
 	// It corresponds to all possible permutation in n-d of the indices
@@ -227,6 +225,9 @@ void Grid<T, N>::getNeighborsCellId(size_t cellId,
 	//   000 001 002 010 011 012 020 021 022
 	//   100 101 102 110 111 112 120 121 122
 	//   200 201 202 210 211 212 220 221 222
+
+	cellIdnDOriginal -= Eigen::Matrix<int, N, 1>::Ones();
+
 	Number<int, 3, N> currentNumberNDigitBase3;
 	for (size_t i = 0; i < powerOf3<N>::value; ++i)
 	{
@@ -251,7 +252,8 @@ size_t Grid<T, N>::cellId_ndTo1d(const Eigen::Matrix<int, N, 1>& cellIdnD) const
 template <typename T, size_t N>
 void Grid<T, N>::cellId_ndTo1d(const Eigen::Matrix<int, N, 1>& cellIdnD, size_t* cellId1D, bool* valid) const
 {
-	if ((cellIdnD.array() < 0).any() || (cellIdnD.cast<size_t>().array() >= m_numCellsPerDimension.array()).any())
+	if ((cellIdnD.array() < 0).any() ||
+		(cellIdnD.template cast<size_t>().array() >= m_numCellsPerDimension.array()).any())
 	{
 		*valid = false;
 	}
