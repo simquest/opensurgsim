@@ -14,17 +14,27 @@
 # limitations under the License.
 
 set(SURGSIM_PARTICLES_SOURCES
+	DefaultPointGenerator.cpp
 	Particle.cpp
 	ParticleReference.cpp
 	ParticlesState.cpp
 	ParticleSystemRepresentation.cpp
+	PointGenerator.cpp
+	RandomBoxPointGenerator.cpp
+	RandomPointGenerator.cpp
+	RandomSpherePointGenerator.cpp
 )
 
 set(SURGSIM_PARTICLES_HEADERS
+	DefaultPointGenerator.h
 	Particle.h
 	ParticleReference.h
 	ParticlesState.h
 	ParticleSystemRepresentation.h
+	PointGenerator.h
+	RandomBoxPointGenerator.h
+	RandomPointGenerator.h
+	RandomSpherePointGenerator.h
 )
 
 surgsim_add_library(

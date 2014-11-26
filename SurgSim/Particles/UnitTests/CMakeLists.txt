@@ -22,6 +22,8 @@ set(UNIT_TEST_SOURCES
 	ParticlesStateTests.cpp
 	ParticleSystemRepresentationTests.cpp
 	ParticleTests.cpp
+	PointGeneratorTests.cpp
+	RandomPointGeneratorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
