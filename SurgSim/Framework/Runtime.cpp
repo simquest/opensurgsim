@@ -360,5 +360,11 @@ bool Runtime::loadScene(const std::string& fileName)
 
 }
 
+void Runtime::saveScene(const std::string& fileName) const
+{
+	std::ofstream out(fileName);
+	out << m_scene->encode();
+}
+
 }; // namespace Framework
 }; // namespace SurgSim
