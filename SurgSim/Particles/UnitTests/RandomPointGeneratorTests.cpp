@@ -30,12 +30,12 @@ using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
 using SurgSim::Particles::RandomPointGenerator;
 
-TEST(ShapesPointGeneratorTest, ConstructorTest)
+TEST(RandomPointGeneratorTest, ConstructorTest)
 {
 	ASSERT_NO_THROW(RandomPointGenerator());
 }
 
-TEST(ShapesPointGeneratorTest, GenerationTest)
+TEST(RandomPointGeneratorTest, GenerationTest)
 {
 	auto pointGenerator = std::make_shared<RandomPointGenerator>();
 	auto boxShape = std::make_shared<BoxShape>(1.0, 2.0, 3.0);
