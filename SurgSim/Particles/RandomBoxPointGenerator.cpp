@@ -32,7 +32,7 @@ Vector3d RandomBoxPointGenerator::pointInShape(std::shared_ptr<SurgSim::Math::Sh
 	auto box = std::static_pointer_cast<SurgSim::Math::BoxShape>(shape);
 	auto halfSize = box->getSize() * 0.5;
 
-	Vector3d random = Vector3d::NullaryExpr([&](int val){return m_openOneOneDistribution(m_generator);});
+	Vector3d random = Vector3d::NullaryExpr([&](int index){return m_openOneOneDistribution(m_generator);});
 
 	return random.array() * halfSize.array();
 }

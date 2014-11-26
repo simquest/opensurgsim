@@ -37,13 +37,13 @@ TEST(ShapesPointGeneratorTest, ConstructorTest)
 
 TEST(ShapesPointGeneratorTest, GenerationTest)
 {
-	auto shapesPointGenerator = std::make_shared<RandomPointGenerator>();
+	auto pointGenerator = std::make_shared<RandomPointGenerator>();
 	auto boxShape = std::make_shared<BoxShape>(1.0, 2.0, 3.0);
 	auto capsuleShape = std::make_shared<CapsuleShape>(4.0, 5.0);
 	auto sphereShape = std::make_shared<SphereShape>(6.0);
 	std::shared_ptr<Shape> shape;
 
-	EXPECT_NO_THROW(shapesPointGenerator->pointInShape(boxShape));
-	EXPECT_NO_THROW(shapesPointGenerator->pointOnShape(sphereShape));
-	EXPECT_THROW(shapesPointGenerator->pointOnShape(shape), SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(pointGenerator->pointInShape(boxShape));
+	EXPECT_NO_THROW(pointGenerator->pointOnShape(sphereShape));
+	EXPECT_THROW(pointGenerator->pointOnShape(shape), SurgSim::Framework::AssertionFailure);
 }
