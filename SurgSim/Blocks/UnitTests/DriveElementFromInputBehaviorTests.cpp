@@ -74,7 +74,7 @@ TEST(DriveElementFromInputBehaviorTest, Update)
 	auto element = std::make_shared<BasicSceneElement>("SceneElement");
 	auto device = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
 	auto inputComponent = std::make_shared<InputComponent>("InputComponent");
-	
+
 	inputComponent->connectDevice(device);
 	behavior->setSource(inputComponent);
 	element->addComponent(behavior);

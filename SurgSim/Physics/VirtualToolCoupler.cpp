@@ -175,9 +175,10 @@ void VirtualToolCoupler::update(double dt)
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
 		const Matrix33d zero3x3 = Matrix33d::Zero();
-		Matrix66d generalizedStiffness, generalizedDamping;
+		Matrix66d generalizedStiffness;
 		generalizedStiffness << m_linearStiffness * identity3x3, zero3x3,
 								zero3x3                        , m_angularStiffness * identity3x3;
+		Matrix66d generalizedDamping;
 		generalizedDamping << m_linearDamping * identity3x3, zero3x3,
 							  zero3x3                      , m_angularDamping * identity3x3;
 
