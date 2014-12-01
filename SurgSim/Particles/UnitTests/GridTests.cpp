@@ -146,6 +146,19 @@ typedef ::testing::Types<
 	tuple<ElementTest, TypeValue<3>>> MyTypes;
 TYPED_TEST_CASE(GridTestBase, MyTypes);
 
+template <typename T>
+class Grid3DTestBase : public GridTestBase<T>
+{
+};
+
+typedef ::testing::Types<
+	tuple<size_t, TypeValue<3>>,
+	tuple<int, TypeValue<3>>,
+	tuple<float, TypeValue<3>>,
+	tuple<double, TypeValue<3>>,
+	tuple<ElementTest, TypeValue<3>>> My3DTypes;
+TYPED_TEST_CASE(Grid3DTestBase, My3DTypes);
+
 TEST(Grid, PowerOf3StaticAssertionTest)
 {
 	static_assert(powerOf3<0>::value == 1, "3^0 != 1");
@@ -158,81 +171,71 @@ TYPED_TEST(GridTestBase, ConstructorTest)
 {
 	typedef typename TestFixture::GridType GridType;
 
-	ASSERT_NO_THROW({GridType grid;});
-}
-
-TYPED_TEST(GridTestBase, InitTest)
-{
-	typedef typename TestFixture::GridType GridType;
-
-	ASSERT_NO_THROW({GridType grid; grid.init(this->m_size, this->validPowerOf2Dimension1Cell);});
-	ASSERT_NO_THROW({GridType grid; grid.init(this->m_size, this->validPowerOf2Dimension);});
-	ASSERT_THROW({GridType grid; grid.init(this->m_size, this->invalidTooBigPowerOf2Dimension);},
+	ASSERT_NO_THROW({GridType grid(this->m_size, this->validPowerOf2Dimension1Cell);});
+	ASSERT_NO_THROW({GridType grid(this->m_size, this->validPowerOf2Dimension);});
+	ASSERT_THROW({GridType grid(this->m_size, this->invalidTooBigPowerOf2Dimension);},
 		SurgSim::Framework::AssertionFailure);
 
-	GridType grid;
-	grid.init(this->m_size, this->validPowerOf2Dimension);
+	GridType grid(this->m_size, this->validPowerOf2Dimension);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
-	ASSERT_EQ(0u, grid.getMappingElementToCellId().size());
+	ASSERT_EQ(0u, grid.getCellIds().size());
 	ASSERT_DOUBLE_EQ(this->m_size, grid.getSize());
-	ASSERT_TRUE(grid.getNumCellsPerDimension() == this->validNumCellsPerDimension);
-	ASSERT_TRUE(grid.getPowerOf2CellsPerDimension() == this->validPowerOf2Dimension);
-	ASSERT_TRUE(grid.getOffsetPerDimension() == this->validOffsetPerDimension);
-	ASSERT_TRUE(grid.getOffsetPowerOf2PerDimension() == this->validOffsetPowerOf2PerDimension);
-	ASSERT_EQ(this->validNumCellsPerDimension.prod(), grid.getNumCells());
+	ASSERT_TRUE(grid.getNumCells() == this->validNumCellsPerDimension);
+	ASSERT_TRUE(grid.getExponents() == this->validPowerOf2Dimension);
+	ASSERT_TRUE(grid.getOffsets() == this->validOffsetPerDimension);
+	ASSERT_TRUE(grid.getOffsetExponents() == this->validOffsetPowerOf2PerDimension);
 	ASSERT_TRUE(grid.getAABB().min().isApprox(this->minExpected));
 	ASSERT_TRUE(grid.getAABB().max().isApprox(this->maxExpected));
 }
 
-TYPED_TEST(GridTestBase, AddElementAtTest)
+TYPED_TEST(GridTestBase, addElementTest)
 {
 	typedef typename TestFixture::GridType GridType;
 	typedef typename TestFixture::TypeElement TypeElement;
 
-	GridType grid;
-	grid.init(this->m_size, this->validPowerOf2Dimension);
+	GridType grid(this->m_size, this->validPowerOf2Dimension);
 
 	// Add an element outside of the grid
-	grid.addElementAt(this->validNumCellsPerDimension.template cast<double>() * 3.0 * this->m_size, TypeElement());
+	grid.addElement(TypeElement(), this->validNumCellsPerDimension.template cast<double>() * 3.0 * this->m_size);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
-	ASSERT_EQ(0u, grid.getMappingElementToCellId().size());
+	ASSERT_EQ(0u, grid.getCellIds().size());
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element outside of the grid
-	grid.addElementAt(-this->validNumCellsPerDimension.template cast<double>() * 3.0 * this->m_size, TypeElement());
+	grid.addElement(TypeElement(), -this->validNumCellsPerDimension.template cast<double>() * 3.0 * this->m_size);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
-	ASSERT_EQ(0u, grid.getMappingElementToCellId().size());
+	ASSERT_EQ(0u, grid.getCellIds().size());
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid
 	TypeElement e0(0), e1(1);
-	grid.addElementAt(Eigen::Matrix<double, this->dimension, 1>::Zero(), e0);
+	grid.addElement(e0, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
 	ASSERT_EQ(1u, grid.getActiveCells().size());
-	ASSERT_EQ(1u, grid.getMappingElementToCellId().size());
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e0));
-	ASSERT_ANY_THROW(grid.getMappingElementToCellId().at(e1));
+	ASSERT_EQ(1u, grid.getCellIds().size());
+	ASSERT_NO_THROW(grid.getCellIds().at(e0));
+	ASSERT_ANY_THROW(grid.getCellIds().at(e1));
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, in the same cell
-	grid.addElementAt(Eigen::Matrix<double, this->dimension, 1>::Zero(), e1);
+	grid.addElement(e1, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
 	ASSERT_EQ(1u, grid.getActiveCells().size());
-	ASSERT_EQ(2u, grid.getMappingElementToCellId().size());
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e0));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e1));
-	ASSERT_EQ(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e1]);
+	ASSERT_EQ(2u, grid.getCellIds().size());
+	ASSERT_NO_THROW(grid.getCellIds().at(e0));
+	ASSERT_NO_THROW(grid.getCellIds().at(e1));
+	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, in a different cell
 	TypeElement e2(2);
-	grid.addElementAt(Eigen::Matrix<double, this->dimension, 1>::Ones() * this->m_size * 1.5, e2);
+	grid.addElement(e2, Eigen::Matrix<double, TestFixture::dimension, 1>::Ones() * this->m_size * 1.5);
 	ASSERT_EQ(2u, grid.getActiveCells().size());
-	ASSERT_EQ(3u, grid.getMappingElementToCellId().size());
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e0));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e1));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e2));
-	ASSERT_EQ(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e1]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e2]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e1], grid.getMappingElementToCellId()[e2]);
+	ASSERT_EQ(3u, grid.getCellIds().size());
+	ASSERT_NO_THROW(grid.getCellIds().at(e0));
+	ASSERT_NO_THROW(grid.getCellIds().at(e1));
+	ASSERT_NO_THROW(grid.getCellIds().at(e2));
+	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
+	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e2]);
+	ASSERT_NE(grid.getCellIds()[e1], grid.getCellIds()[e2]);
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 }
 
@@ -241,81 +244,81 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	typedef typename TestFixture::GridType GridType;
 	typedef typename TestFixture::TypeElement TypeElement;
 
-	GridType grid;
-	grid.init(this->m_size, this->validPowerOf2Dimension);
+	GridType grid(this->m_size, this->validPowerOf2Dimension);
 
 	// Build the following grid:
 	// Cell(e0, e1) <- neighbor -> Cell(e2) <- neighbor -> Cell(e3) <- ..not neighbor.. -> Cell(e4)
 
-	Eigen::Matrix<double, this->dimension, 1> position = Eigen::Matrix<double, this->dimension, 1>::Zero();
+	Eigen::Matrix<double, TestFixture::dimension, 1> position =
+		Eigen::Matrix<double, TestFixture::dimension, 1>::Zero();
 
 	// Add an element inside of the grid
 	TypeElement e0(0), e1(1);
-	grid.addElementAt(position, e0);
+	grid.addElement(e0, position);
 	ASSERT_EQ(1u, grid.getActiveCells().size());
-	ASSERT_EQ(1u, grid.getMappingElementToCellId().size());
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e0));
-	ASSERT_ANY_THROW(grid.getMappingElementToCellId().at(e1));
+	ASSERT_EQ(1u, grid.getCellIds().size());
+	ASSERT_NO_THROW(grid.getCellIds().at(e0));
+	ASSERT_ANY_THROW(grid.getCellIds().at(e1));
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, in the same cell
-	grid.addElementAt(position, e1);
+	grid.addElement(e1, position);
 	ASSERT_EQ(1u, grid.getActiveCells().size());
-	ASSERT_EQ(2u, grid.getMappingElementToCellId().size());
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e0));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e1));
-	ASSERT_EQ(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e1]);
+	ASSERT_EQ(2u, grid.getCellIds().size());
+	ASSERT_NO_THROW(grid.getCellIds().at(e0));
+	ASSERT_NO_THROW(grid.getCellIds().at(e1));
+	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, in a different cell
 	position[0] += this->m_size * 1.1; // Next cell on the 1st dimension
 	TypeElement e2(2);
-	grid.addElementAt(position, e2);
+	grid.addElement(e2, position);
 	ASSERT_EQ(2u, grid.getActiveCells().size());
-	ASSERT_EQ(3u, grid.getMappingElementToCellId().size());
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e0));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e1));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e2));
-	ASSERT_EQ(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e1]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e2]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e1], grid.getMappingElementToCellId()[e2]);
+	ASSERT_EQ(3u, grid.getCellIds().size());
+	ASSERT_NO_THROW(grid.getCellIds().at(e0));
+	ASSERT_NO_THROW(grid.getCellIds().at(e1));
+	ASSERT_NO_THROW(grid.getCellIds().at(e2));
+	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
+	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e2]);
+	ASSERT_NE(grid.getCellIds()[e1], grid.getCellIds()[e2]);
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, in a different cell
 	position[0] += this->m_size * 1.1; // Next cell on the 1st dimension
 	TypeElement e3(3);
-	grid.addElementAt(position, e3);
+	grid.addElement(e3, position);
 	ASSERT_EQ(3u, grid.getActiveCells().size());
-	ASSERT_EQ(4u, grid.getMappingElementToCellId().size());
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e0));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e1));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e2));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e3));
-	ASSERT_EQ(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e1]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e2]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e3]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e2], grid.getMappingElementToCellId()[e3]);
+	ASSERT_EQ(4u, grid.getCellIds().size());
+	ASSERT_NO_THROW(grid.getCellIds().at(e0));
+	ASSERT_NO_THROW(grid.getCellIds().at(e1));
+	ASSERT_NO_THROW(grid.getCellIds().at(e2));
+	ASSERT_NO_THROW(grid.getCellIds().at(e3));
+	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
+	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e2]);
+	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e3]);
+	ASSERT_NE(grid.getCellIds()[e2], grid.getCellIds()[e3]);
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, far away from all other elements
 	position[0] += this->m_size * 2.1; // Few cells further on the 1st dimension
 	TypeElement e4(4);
-	grid.addElementAt(position, e4);
+	grid.addElement(e4, position);
 	ASSERT_EQ(4u, grid.getActiveCells().size());
-	ASSERT_EQ(5u, grid.getMappingElementToCellId().size());
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e0));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e1));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e2));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e3));
-	ASSERT_NO_THROW(grid.getMappingElementToCellId().at(e4));
-	ASSERT_EQ(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e1]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e2]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e3]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e2], grid.getMappingElementToCellId()[e3]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e0], grid.getMappingElementToCellId()[e4]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e1], grid.getMappingElementToCellId()[e4]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e2], grid.getMappingElementToCellId()[e4]);
-	ASSERT_NE(grid.getMappingElementToCellId()[e3], grid.getMappingElementToCellId()[e4]);
+	ASSERT_EQ(5u, grid.getCellIds().size());
+	ASSERT_NO_THROW(grid.getCellIds().at(e0));
+	ASSERT_NO_THROW(grid.getCellIds().at(e1));
+	ASSERT_NO_THROW(grid.getCellIds().at(e2));
+	ASSERT_NO_THROW(grid.getCellIds().at(e3));
+	ASSERT_NO_THROW(grid.getCellIds().at(e4));
+	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
+	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e2]);
+	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e3]);
+	ASSERT_NE(grid.getCellIds()[e2], grid.getCellIds()[e3]);
+	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e4]);
+	ASSERT_NE(grid.getCellIds()[e1], grid.getCellIds()[e4]);
+	ASSERT_NE(grid.getCellIds()[e2], grid.getCellIds()[e4]);
+	ASSERT_NE(grid.getCellIds()[e3], grid.getCellIds()[e4]);
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	grid.computeNeighborsMap();
@@ -372,25 +375,98 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_TRUE(std::find(e4Neighbors.begin(), e4Neighbors.end(), e4) != e4Neighbors.end());
 }
 
+TYPED_TEST(Grid3DTestBase, Neighbors3DTest)
+{
+	typedef typename TestFixture::GridType GridType;
+	typedef typename TestFixture::TypeElement TypeElement;
+
+	GridType grid(this->m_size, this->validPowerOf2Dimension);
+
+	// Build a grid where we have 1 element per cell and 1 cell has all its neighbors populated
+	// The grid content would be for dimension x=0 (similar on dimension x=1 and x=2):
+	// Cell(e000) Cell(e001) Cell(e002)
+	// Cell(e010) Cell(e011) Cell(e012)
+	// Cell(e020) Cell(e021) Cell(e022)
+
+	// Add the 27 elements inside the grid on 27 different cells forming a cube
+	Eigen::Matrix<double, 3, 1> position = Eigen::Matrix<double, 3, 1>::Zero();
+	Number<size_t, 3, 3> number; // 3 digits in base 3 => covers 27 different numbers
+	const TypeElement element[27] = {
+		TypeElement(0), TypeElement(1), TypeElement(2),
+		TypeElement(3), TypeElement(4), TypeElement(5),
+		TypeElement(6), TypeElement(7), TypeElement(8),
+		TypeElement(9), TypeElement(10), TypeElement(11),
+		TypeElement(12), TypeElement(13), TypeElement(14),
+		TypeElement(15), TypeElement(16), TypeElement(17),
+		TypeElement(18), TypeElement(19), TypeElement(20),
+		TypeElement(21), TypeElement(22), TypeElement(23),
+		TypeElement(24), TypeElement(25), TypeElement(26)};
+
+	for(size_t X = 0; X < 3; ++X)
+	{
+		for(size_t Y = 0; Y < 3; ++Y)
+		{
+			for(size_t Z = 0; Z < 3; ++Z)
+			{
+				SurgSim::Math::Vector3d offset(this->m_size * X, this->m_size * Y, this->m_size * Z);
+				grid.addElement(element[number.toDecimal()], position + offset);
+				number.next();
+			}
+		}
+	}
+
+	ASSERT_EQ(27u, grid.getActiveCells().size()); ///< 27 cells
+	ASSERT_EQ(27u, grid.getCellIds().size()); ///< 27 elements
+	for (size_t elementId = 0; elementId < 27; elementId++)
+	{
+		ASSERT_NO_THROW(grid.getCellIds().at(element[elementId]));
+		for (size_t otherElementId = 0; otherElementId < 27; otherElementId++)
+		{
+			if (elementId == otherElementId)
+			{
+				continue;
+			}
+			/// Each cell contains only 1 unique element and each element is associated to a unique cell
+			ASSERT_NE(grid.getCellIds()[element[elementId]], grid.getCellIds()[element[otherElementId]]);
+		}
+	}
+	ASSERT_EQ(0u, grid.getNeighborsMap().size());
+
+	grid.computeNeighborsMap();
+	ASSERT_EQ(27u, grid.getNeighborsMap().size());
+	for (size_t elementId = 0; elementId < 27; elementId++)
+	{
+		ASSERT_NO_THROW(grid.getNeighborsMap().at(element[elementId]));
+	}
+
+	// The central element should have all the elements for neighbors (including itself)
+	auto& e111Neighbors = grid.getNonConstNeighborsMap()[element[13]];
+	ASSERT_EQ(27u, e111Neighbors.size());
+	for (size_t elementId = 0; elementId < 27; elementId++)
+	{
+		auto found = std::find(e111Neighbors.begin(), e111Neighbors.end(), element[elementId]);
+		ASSERT_NE(e111Neighbors.end(), found);
+	}
+}
+
 TYPED_TEST(GridTestBase, ResetTest)
 {
 	typedef typename TestFixture::GridType GridType;
 	typedef typename TestFixture::TypeElement TypeElement;
 
-	GridType grid;
-	grid.init(this->m_size, this->validPowerOf2Dimension);
+	GridType grid(this->m_size, this->validPowerOf2Dimension);
 
 	TypeElement e0(0), e1(1);
-	grid.addElementAt(Eigen::Matrix<double, this->dimension, 1>::Zero(), e0);
-	grid.addElementAt(Eigen::Matrix<double, this->dimension, 1>::Zero(), e1);
+	grid.addElement(e0, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
+	grid.addElement(e1, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
 	grid.computeNeighborsMap();
 	ASSERT_NE(0u, grid.getActiveCells().size());
-	ASSERT_NE(0u, grid.getMappingElementToCellId().size());
+	ASSERT_NE(0u, grid.getCellIds().size());
 	ASSERT_NE(0u, grid.getNeighborsMap().size());
 
 	ASSERT_NO_THROW(grid.reset());
 	ASSERT_EQ(0u, grid.getActiveCells().size());
-	ASSERT_EQ(0u, grid.getMappingElementToCellId().size());
+	ASSERT_EQ(0u, grid.getCellIds().size());
 	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 }
 

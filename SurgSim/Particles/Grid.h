@@ -52,30 +52,28 @@ class Grid
 {
 public:
 	/// Constructor
-	Grid();
+	/// \param size The size of each cell, should be the range in which we want to look for neighbors
+	/// \param exponents For each cell the exponent to 2 indicating the requested number of cell per dimension,
+	///        the sum of all the exponents can't exceed the architecture bit size i.e. 32 and 64 respectively
+	/// \note Power of 2 limitation:<br>
+	/// \note * 32 bit architecture: maximum exponents sum is 32, for example in 3d {{10, 10, 10}}<br>
+	/// \note * 64 bit architecture: maximum exponents sum is 64, for example in 3d {{21, 21, 21}}
+	Grid(double size, const Eigen::Matrix<size_t, N, 1>& exponents);
 
 	/// Destructor
 	virtual ~Grid();
-
-	/// Initialization
-	/// \param size The size of each cell, should be the range in which we want to look for neighbors
-	/// \param powerOf2CellsPerDimension The power of 2 cells per dimension (i.e. 8 => 2^8 cells)
-	/// \note Power of 2 limitation:<br>
-	/// \note * 32 bit architecture: maximum number of cells is 2^32, for example in 3d {{2^10, 2^10, 2^10}}<br>
-	/// \note * 64 bit architecture: maximum number of cells is 2^64, for example in 3d {{2^21, 2^21, 2^21}}
-	void init(double size, const Eigen::Matrix<size_t, N, 1>& powerOf2CellsPerDimension);
 
 	/// Reset the grid content and the neighbors' mapping
 	void reset();
 
 	/// Add an element in the grid
-	/// \param position of the element in the n-D space
 	/// \param element to be added at this position
+	/// \param position of the element in the n-D space
 	/// \note If the position is outside of the grid, the element is simply not added to the grid
 	template <class Derived>
-	void addElementAt(const Eigen::MatrixBase<Derived>& position, const T element);
+	void addElement(const T element, const Eigen::MatrixBase<Derived>& position);
 
-	/// Compute all the particles' neighbors list
+	/// Compute all the elements' neighbors list
 	/// \note The neighbors lists are inclusive (the element itself is in its neighbor's list)
 	/// \note The neighbors lists are cleared on reset call
 	void computeNeighborsMap();
@@ -90,28 +88,25 @@ protected:
 	std::unordered_map<size_t, std::vector<T>> m_activeCells;
 
 	/// Mapping from element to cell id containing the element
-	std::unordered_map<T, size_t> m_mapElementToCellId;
+	std::unordered_map<T, size_t> m_cellIds;
 
 	/// Mapping from element to element's neighbors
-	std::unordered_map<T, std::vector<T>> m_mapElementNeighbors;
+	std::unordered_map<T, std::vector<T>> m_neighbors;
 
 	/// Size of each cell (same on all dimension)
 	double m_size;
 
 	/// Number of cells per dimension
-	Eigen::Matrix<size_t, N, 1> m_numCellsPerDimension;
+	Eigen::Matrix<size_t, N, 1> m_numCells;
 
-	/// Power of 2 cells per dimension
-	Eigen::Matrix<size_t, N, 1> m_powerOf2CellsPerDimension;
+	/// Exponent of 2 cells per dimension
+	Eigen::Matrix<size_t, N, 1> m_exponents;
 
 	/// Offset for each dimension to go from n-d array to 1d array and vice-versa
-	Eigen::Matrix<size_t, N, 1> m_offsetPerDimension;
+	Eigen::Matrix<size_t, N, 1> m_offsets;
 
-	/// Offset (in power of 2) for each dimension to go from n-d array to 1d array and vice-versa
-	Eigen::Matrix<size_t, N, 1> m_offsetPowerOf2PerDimension;
-
-	/// Total number of cells = product[over dimension](m_numCellsPerDimension[i])
-	size_t m_numCells;
+	/// Offset (in exponent of 2) for each dimension to go from n-d array to 1d array and vice-versa
+	Eigen::Matrix<size_t, N, 1> m_offsetExponents;
 
 	/// Grid min and max
 	Eigen::AlignedBox<double, N> m_aabb;
@@ -121,7 +116,7 @@ private:
 	/// \param element for which the neighbors are requested
 	/// \param [out] result The element neighbors
 	/// \note The list also include the element itself
-	void getNeighborsOfElement(const T& element, std::vector<T>* result);
+	void getNeighbors(const T& element, std::vector<T>* result);
 
 	/// Retrieve the neighboring cells id (excluding this cell)
 	/// \param cellId for which the neighbors cells are requested
@@ -131,23 +126,23 @@ private:
 		Eigen::Matrix<size_t, powerOf3<N>::value, 1>* cellsId,
 		Eigen::Matrix<bool, powerOf3<N>::value, 1>* cellsValidity);
 
-	/// Cell id correspondence from dimension-D to 1d (without input validity check)
-	/// \param cellIdnD The cell id in dimension-D
+	/// Cell id correspondence from dimension-N to 1d (without input validity check)
+	/// \param nd The cell id in dimension-N
 	/// \return The cell unique 1d id
 	/// \note No check is performed on the validity of the input cell id.
 	/// \note Return value undefined if invalid input
-	size_t cellId_ndTo1d(const Eigen::Matrix<int, N, 1>& cellIdnD) const;
+	size_t mappingNdTo1d(const Eigen::Matrix<int, N, 1>& nd) const;
 
-	/// Cell id correspondence from dimension-D to 1d (with input validity check)
-	/// \param cellIdnD The cell id in dimension-D
-	/// \param [out] cellId1D The cell unique 1d id if valid is True, undefined otherwise
+	/// Cell id correspondence from dimension-N to 1d (with input validity check)
+	/// \param nd The cell id in dimension-N
+	/// \param [out] oned The cell unique 1d id if valid is True, undefined otherwise
 	/// \param [out] valid The cell validity (existence in the grid)
-	void cellId_ndTo1d(const Eigen::Matrix<int, N, 1>& cellIdnD, size_t* cellId1D, bool* valid) const;
+	void mappingNdTo1d(const Eigen::Matrix<int, N, 1>& nd, size_t* oned, bool* valid) const;
 
 	/// Cell id correspondence from 1d to dimension-D (without input validity check)
-	/// \param cellId1D A cell unique 1d id
-	/// \param [out] cellIdnD The cell dimension-d id
-	void cellId_1dTond(size_t cellId1D, Eigen::Matrix<int, N, 1>* cellIdnD) const;
+	/// \param oned A cell unique 1d id
+	/// \param [out] nd The cell dimension-d id
+	void mapping1dToNd(size_t oned, Eigen::Matrix<int, N, 1>* nd) const;
 };
 
 };  // namespace Particles

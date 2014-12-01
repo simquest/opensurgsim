@@ -28,25 +28,23 @@ template <typename T, size_t N>
 class MockGrid : public Grid<T, N>
 {
 public:
-	MockGrid() : Grid<T,N>(){}
+	MockGrid(double size, const Eigen::Matrix<size_t, N, 1>& exponents) : Grid<T,N>(size, exponents){}
 
 	std::unordered_map<size_t, std::vector<T>>& getActiveCells() { return this->m_activeCells; }
 
-	std::unordered_map<T, size_t>& getMappingElementToCellId() { return this->m_mapElementToCellId; }
+	std::unordered_map<T, size_t>& getCellIds() { return this->m_cellIds; }
 
-	std::unordered_map<T, std::vector<T>>& getNonConstNeighborsMap() { return this->m_mapElementNeighbors; }
+	std::unordered_map<T, std::vector<T>>& getNonConstNeighborsMap() { return this->m_neighbors; }
 
 	double getSize() const { return this->m_size; }
 
-	Eigen::Matrix<size_t, N, 1> getNumCellsPerDimension() const { return this->m_numCellsPerDimension; }
+	Eigen::Matrix<size_t, N, 1> getNumCells() const { return this->m_numCells; }
 
-	Eigen::Matrix<size_t, N, 1> getPowerOf2CellsPerDimension() const { return this->m_powerOf2CellsPerDimension; }
+	Eigen::Matrix<size_t, N, 1> getExponents() const { return this->m_exponents; }
 
-	Eigen::Matrix<size_t, N, 1> getOffsetPerDimension() const { return this->m_offsetPerDimension; }
+	Eigen::Matrix<size_t, N, 1> getOffsets() const { return this->m_offsets; }
 
-	Eigen::Matrix<size_t, N, 1> getOffsetPowerOf2PerDimension() const { return this->m_offsetPowerOf2PerDimension; }
-
-	size_t getNumCells() const { return this->m_numCells; }
+	Eigen::Matrix<size_t, N, 1> getOffsetExponents() const { return this->m_offsetExponents; }
 
 	Eigen::AlignedBox<double, N> getAABB() const { return this->m_aabb; }
 };
