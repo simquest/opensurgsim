@@ -57,7 +57,6 @@ OsgRepresentation::~OsgRepresentation()
 
 void OsgRepresentation::update(double dt)
 {
-	setVisible(isActive());
 
 	if (isActive())
 	{
@@ -65,7 +64,13 @@ void OsgRepresentation::update(double dt)
 		m_transform->setAttitude(pose.first);
 		m_transform->setPosition(pose.second);
 		doUpdate(dt);
+		setVisible(true);
 	}
+	else
+	{
+		setVisible(false);
+	}
+
 }
 
 bool OsgRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
@@ -111,7 +116,7 @@ void OsgRepresentation::setDrawAsWireFrame(bool val)
 	osg::ref_ptr<osg::PolygonMode> polygonMode;
 	if (val)
 	{
-		 polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE);
+		polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE);
 	}
 	else
 	{
