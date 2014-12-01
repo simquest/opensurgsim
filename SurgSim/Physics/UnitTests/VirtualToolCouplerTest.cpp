@@ -35,6 +35,7 @@
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Input::InputComponent;
 using SurgSim::Framework::Runtime;
+using SurgSim::Math::makeRigidTranslation;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -223,6 +224,41 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
 	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
+}
+
+TEST_F(VirtualToolCouplerTest, LinearDisplacementWithOffset)
+{
+	const double mass = rigidBody->getMass();
+	virtualToolCoupler->overrideAngularDamping(mass * 1.0);
+	virtualToolCoupler->overrideAngularStiffness(mass * 200);
+	virtualToolCoupler->overrideLinearDamping(mass * 50);
+	virtualToolCoupler->overrideLinearStiffness(mass * 200);
+	rigidBody->setIsGravityEnabled(false);
+
+	auto device = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
+	auto inputComponent = std::make_shared<InputComponent>("InputComponent");
+	inputComponent->connectDevice(device);
+	virtualToolCoupler->setInput(inputComponent);
+
+	RigidTransform3d inputOffset = makeRigidTranslation(Vector3d(0.1, 0.0, 0.0));
+	inputComponent->setLocalPose(inputOffset);
+
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
+	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
+
+	runSystem(2500);
+	EXPECT_TRUE(rigidBody->isActive());
+
+	RigidRepresentationState state = rigidBody->getCurrentState();
+	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
+	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
+	EXPECT_TRUE(state.getPose().translation().isApprox(inputOffset.translation(), epsilon))
+		<< "Rigid Body Position is incorrect" << std::endl
+		<< "  Actual: " << state.getPose().translation().transpose() << std::endl
+		<< "Expected: " << inputOffset.translation().transpose() << std::endl;
 }
 
 TEST_F(VirtualToolCouplerTest, LinearDisplacementWithInertialTorques)

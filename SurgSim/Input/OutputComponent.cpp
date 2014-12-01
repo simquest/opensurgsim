@@ -71,7 +71,7 @@ private:
 };
 
 OutputComponent::OutputComponent(const std::string& name) :
-	Component(name),
+	Representation(name),
 	m_deviceName(),
 	m_deviceConnected(false),
 	m_output(std::make_shared<OutputProducer>())
