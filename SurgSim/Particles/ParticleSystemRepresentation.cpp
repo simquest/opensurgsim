@@ -30,7 +30,7 @@ ParticleSystemRepresentation::ParticleSystemRepresentation(const std::string& na
 	SurgSim::Framework::Representation(name),
 	m_maxParticles(0u),
 	m_state(std::make_shared<ParticlesState>()),
-	m_logger(SurgSim::Framework::Logger::getLogger(name))
+	m_logger(SurgSim::Framework::Logger::getLogger("Particles"))
 {
 }
 

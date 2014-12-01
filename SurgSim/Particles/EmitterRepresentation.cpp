@@ -38,7 +38,7 @@ EmitterRepresentation::EmitterRepresentation(const std::string& name) :
 	m_lifetimeRange(std::make_pair(0.0, 0.0)),
 	m_velocityRange(std::make_pair(Vector3d::Zero(), Vector3d::Zero())),
 	m_particlesNotAdded(0.0),
-	m_logger(SurgSim::Framework::Logger::getLogger(name))
+	m_logger(SurgSim::Framework::Logger::getLogger("Particles"))
 {
 	std::random_device device;
 	m_generator.seed(device());

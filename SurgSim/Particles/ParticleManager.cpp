@@ -28,7 +28,7 @@ namespace Particles
 
 ParticleManager::ParticleManager() : ComponentManager("Particle Manager")
 {
-	m_logger = SurgSim::Framework::Logger::getLogger(getName());
+	m_logger = SurgSim::Framework::Logger::getLogger("Particles");
 }
 
 ParticleManager::~ParticleManager()
