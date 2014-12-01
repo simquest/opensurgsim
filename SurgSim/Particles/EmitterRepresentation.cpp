@@ -79,11 +79,11 @@ void EmitterRepresentation::update(double dt)
 	{
 		if (m_mode == EMIT_MODE_VOLUME)
 		{
-			position = m_pointGenerator.pointInShape(m_shape);
+			position = getPose() * m_pointGenerator.pointInShape(m_shape);
 		}
 		else
 		{
-			position = m_pointGenerator.pointOnShape(m_shape);
+			position = getPose() * m_pointGenerator.pointOnShape(m_shape);
 		}
 
 		velocity = Vector3d::NullaryExpr([this](int index){return m_zeroOneDistribution(m_generator);});
@@ -124,7 +124,7 @@ const std::shared_ptr<SurgSim::Framework::Component> EmitterRepresentation::getT
 
 void EmitterRepresentation::setMode(EmitMode mode)
 {
-	SURGSIM_ASSERT(0 < mode && mode < EMIT_MODE_COUNT) << "Invalid emit mode";
+	SURGSIM_ASSERT(mode < EMIT_MODE_COUNT) << "Invalid emit mode";
 	m_mode = mode;
 }
 
