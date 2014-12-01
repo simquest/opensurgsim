@@ -16,7 +16,6 @@
 #ifndef SURGSIM_MATH_TRIANGLETRIANGLEINTERSECTION_INL_H
 #define SURGSIM_MATH_TRIANGLETRIANGLEINTERSECTION_INL_H
 
-
 namespace
 {
 static const double EPSILOND = 1e-12;
@@ -79,6 +78,7 @@ bool doesIntersectTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1n)
 {
 	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
+	using SurgSim::Math::Geometry::DistanceEpsilon;
 
 	if (t0n.isZero() || t1n.isZero())
 	{
@@ -150,7 +150,9 @@ bool doesIntersectTriangleTriangle(
 			<< "The intersection between the triangle and the separating axis is not a line segment."
 			<< " This scenario cannot happen, at this point in the algorithm.";
 
-	return !(s1[0] <= s2[0] && s1[0] <= s2[1] && s1[1] <= s2[0] && s1[1] <= s2[1]) &&
+	return !(std::abs(s1[0] - s2[0]) <= DistanceEpsilon && std::abs(s1[0] - s2[1]) <= DistanceEpsilon &&
+		     std::abs(s1[1] - s2[0]) <= DistanceEpsilon && std::abs(s1[1] - s2[1]) <= DistanceEpsilon) &&
+		   !(s1[0] <= s2[0] && s1[0] <= s2[1] && s1[1] <= s2[0] && s1[1] <= s2[1]) &&
 		   !(s1[0] >= s2[0] && s1[0] >= s2[1] && s1[1] >= s2[0] && s1[1] >= s2[1]);
 }
 
