@@ -18,8 +18,10 @@
 #include <Eigen/Geometry>
 #include <memory>
 #include <vector>
+#include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
@@ -236,6 +238,45 @@ TEST(EmitterRepresentationTest, PosedUpdate)
 	EXPECT_GT(sphere->getRadius(), ((pose2*pose1).inverse() * particles[2].getPosition()).norm());
 }
 
+TEST(EmitterRepresentationTest, Serialization)
+{
+	auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
+	EXPECT_EQ("SurgSim::Particles::EmitterRepresentation", emitter->getClassName());
 
+	const std::pair<double, double> expectedLifetimeRange(1.0, 10.0);
+	const int expectedMode = 1;
+	const double expectedRate = 10.0;
+	std::shared_ptr<SurgSim::Math::Shape> expectedShape = std::make_shared<SurgSim::Math::SphereShape>(0.1);
+	const std::pair<Vector3d, Vector3d> expectedVelocityRange(Vector3d::Ones(), Vector3d::Constant(2.0));
+
+	EXPECT_NO_THROW(emitter->setValue("LifetimeRange", expectedLifetimeRange));
+	EXPECT_NO_THROW(emitter->setValue("Mode", expectedMode));
+	EXPECT_NO_THROW(emitter->setValue("Rate", expectedRate));
+	EXPECT_NO_THROW(emitter->setValue("Shape", expectedShape));
+	EXPECT_NO_THROW(emitter->setValue("VelocityRange", expectedVelocityRange));
+
+	YAML::Node node;
+	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*emitter));
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(9, node[emitter->getClassName()].size());
+
+	std::shared_ptr<EmitterRepresentation> decodedEmitter;
+	EXPECT_NO_THROW(decodedEmitter = std::dynamic_pointer_cast<EmitterRepresentation>(
+				node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+
+	auto lifetimeRange = SurgSim::Framework::convert<std::pair<double, double>>(
+			decodedEmitter->getValue("LifetimeRange"));
+	EXPECT_EQ(expectedLifetimeRange, lifetimeRange);
+
+	EXPECT_EQ(expectedMode, SurgSim::Framework::convert<int>(decodedEmitter->getValue("Mode")));
+	EXPECT_EQ(expectedRate, SurgSim::Framework::convert<double>(decodedEmitter->getValue("Rate")));
+	EXPECT_EQ(expectedShape->getType(),
+			decodedEmitter->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape")->getType());
+
+	auto velocityRange = SurgSim::Framework::convert<std::pair<Vector3d, Vector3d>>(
+			decodedEmitter->getValue("VelocityRange"));
+	EXPECT_TRUE(expectedVelocityRange.first.isApprox(velocityRange.first));
+	EXPECT_TRUE(expectedVelocityRange.second.isApprox(velocityRange.second));
+}
 }; // namespace Particles
 }; // namespace SurgSim

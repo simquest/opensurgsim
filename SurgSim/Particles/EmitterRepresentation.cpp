@@ -17,7 +17,9 @@
 
 #include <utility>
 
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Particles/Particle.h"
 #include "SurgSim/Particles/ParticleSystemRepresentation.h"
@@ -31,6 +33,8 @@ namespace SurgSim
 namespace Particles
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Particles::EmitterRepresentation, EmitterRepresentation);
+
 EmitterRepresentation::EmitterRepresentation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
 	m_mode(EMIT_MODE_VOLUME),
@@ -40,6 +44,17 @@ EmitterRepresentation::EmitterRepresentation(const std::string& name) :
 	m_particlesNotAdded(0.0),
 	m_logger(SurgSim::Framework::Logger::getLogger("Particles"))
 {
+	typedef std::pair<double, double> LifetimeRangeType;
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(EmitterRepresentation, LifetimeRangeType, LifetimeRange, getLifetimeRange,
+			setLifetimeRange);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(EmitterRepresentation, int, Mode, getMode, setMode);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(EmitterRepresentation, double, Rate, getRate, setRate);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(EmitterRepresentation, std::shared_ptr<SurgSim::Math::Shape>, Shape, getShape,
+			setShape);
+	typedef std::pair<Vector3d, Vector3d> VelocityRangeType;
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(EmitterRepresentation, VelocityRangeType, VelocityRange, getVelocityRange,
+			setVelocityRange);
+
 	std::random_device device;
 	m_generator.seed(device());
 	m_zeroOneDistribution.param(std::uniform_real_distribution<double>::param_type(0.0, 1.0));
@@ -122,13 +137,13 @@ const std::shared_ptr<SurgSim::Framework::Component> EmitterRepresentation::getT
 	return m_target;
 }
 
-void EmitterRepresentation::setMode(EmitMode mode)
+void EmitterRepresentation::setMode(int mode)
 {
-	SURGSIM_ASSERT(mode < EMIT_MODE_COUNT) << "Invalid emit mode";
+	SURGSIM_ASSERT(0 <= mode && mode < EMIT_MODE_COUNT) << "Invalid emit mode";
 	m_mode = mode;
 }
 
-SurgSim::Particles::EmitMode EmitterRepresentation::getMode() const
+int EmitterRepresentation::getMode() const
 {
 	return m_mode;
 }

@@ -20,6 +20,7 @@
 #include <memory>
 #include <random>
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/RandomPointGenerator.h"
@@ -47,12 +48,14 @@ class ParticleSystemRepresentation;
 enum EmitMode
 {
 	/// Emit particles from within the shapes volume
-	EMIT_MODE_VOLUME,
+	EMIT_MODE_VOLUME = 0,
 	/// Emit particles only from the surface
 	EMIT_MODE_SURFACE,
 	/// The number of EmitModes
 	EMIT_MODE_COUNT
 };
+
+SURGSIM_STATIC_REGISTRATION(EmitterRepresentation);
 
 /// EmitterRepresentation emits particles into a ParticleSystem
 class EmitterRepresentation : public SurgSim::Framework::Representation
@@ -63,6 +66,8 @@ public:
 
 	/// Destructor
 	virtual ~EmitterRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Particles::EmitterRepresentation);
 
 	/// Update the emitter
 	/// \param dt The time step.
@@ -86,11 +91,11 @@ public:
 
 	/// Set the emit mode of this emitter.
 	//// \param mode The emit mode.
-	void setMode(EmitMode mode);
+	void setMode(int mode);
 
 	/// Get the emit mode of this emitter.
 	/// \return Emit mode of this emitter.
-	EmitMode getMode() const;
+	int getMode() const;
 
 	/// Set the emit rate of this emitter.
 	/// \param rate The rate of emitting [particles/s].
@@ -125,7 +130,7 @@ private:
 	RandomPointGenerator m_pointGenerator;
 
 	/// The emit mode of this emitter.
-	EmitMode m_mode;
+	int m_mode;
 
 	/// The emit rate of this emitter.
 	double m_rate;
