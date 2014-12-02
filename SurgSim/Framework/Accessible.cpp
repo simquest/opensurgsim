@@ -43,7 +43,7 @@ boost::any Accessible::getValue(const std::string& name) const
 	}
 	else
 	{
-		SURGSIM_FAILURE() << "Can't get property: " << name << "." << ((functors == std::end(m_functors)) ?
+		SURGSIM_FAILURE() << "Can't get property: " << name << ". " << ((functors == std::end(m_functors)) ?
 						  "Property not found." : "No getter defined for property.");
 		return boost::any();
 	}
@@ -65,7 +65,7 @@ void Accessible::setValue(const std::string& name, const boost::any& value)
 	}
 	else
 	{
-		SURGSIM_FAILURE() << "Can't set property: " << name << "." << ((functors == std::end(m_functors)) ?
+		SURGSIM_FAILURE() << "Can't set property: " << name << ". " << ((functors == std::end(m_functors)) ?
 						  "Property not found." : "No setter defined for property.");
 	}
 }
