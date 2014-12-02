@@ -27,7 +27,7 @@ CylinderShape::CylinderShape(double length, double radius) : m_length(length), m
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CylinderShape, double, Length, getLength, setLength);
 }
 
-int CylinderShape::getType()
+int CylinderShape::getType() const
 {
 	return SHAPE_TYPE_CYLINDER;
 }

@@ -27,7 +27,7 @@ CapsuleShape::CapsuleShape(double length, double radius) : m_length(length), m_r
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CapsuleShape, double, Length, getLength, setLength);
 }
 
-int CapsuleShape::getType()
+int CapsuleShape::getType() const
 {
 	return SHAPE_TYPE_CAPSULE;
 }

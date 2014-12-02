@@ -65,7 +65,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Math::MeshShape);
 
 	/// \return the type of the shape
-	virtual int getType() override;
+	virtual int getType() const override;
 
 	/// Gets the initial mesh
 	/// \return The collision mesh associated to this MeshShape
