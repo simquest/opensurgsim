@@ -126,86 +126,86 @@ void Grid<T, N>::reset()
 
 	// Clear the active cells
 	m_activeCells.clear();
-
-	// Clear the neighbors' lists
-	m_neighbors.clear();
 }
 
 template <typename T, size_t N>
 template <class Derived>
 void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& position)
 {
+	// Only add element that are located in the grid
 	if (!(position.array() >= m_aabb.min().array() && position.array() <= m_aabb.max().array()).all())
 	{
 		return;
 	}
 
-	// Find the n-D cell id from the location
+	// Find the dimension-N cell id from the location
+	// Example in 3D: cell (i, j, k) has 3D min/max coordinates
+	//   min[axis] = (size * (-numCellPerDim[axis] / 2 + i)
+	//   max[axis] = (size * (-numCellPerDim[axis] / 2 + i + 1)
 	Eigen::Matrix<int, N, 1> cellIdnD;
-	// Example in 3D:
-	// cell (i,j,k) has a min/max of
-	// min = (size * (-numCellPerDim[0] / 2 + i)   max = (size * (-numCellPerDim[0] / 2 + i + 1)
-	//       (size * (-numCellPerDim[1] / 2 + i)         (size * (-numCellPerDim[1] / 2 + i + 1)
-	//       (size * (-numCellPerDim[2] / 2 + i)         (size * (-numCellPerDim[2] / 2 + i + 1)
 	for (size_t i = 0; i < N; ++i)
 	{
 		double cellIdForThisDimension = position[i] / m_size + static_cast<double>(m_numCells[i] >> 1);
 		cellIdnD[i] = static_cast<int>(floor(cellIdForThisDimension));
 	}
 
-	// Find the 1D cell id from the n-D cell id
+	// Find the dimension-1 cell id from the dimension-N cell id
 	size_t cellId1D = mappingNdTo1d(cellIdnD);
 
-	// Add the cell id to the list of active cell if not present already
-	// and add the element into this cell.
-	m_activeCells[cellId1D].push_back(element);
+	// Register the element into its corresponding cell if it exists, or creates it.
+	m_activeCells[cellId1D].elements.push_back(element);
 
 	// Add this element in the map [element -> cellID]
 	m_cellIds[element] = cellId1D;
 }
 
 template <typename T, size_t N>
-void Grid<T, N>::computeNeighborsMap()
+void Grid<T, N>::update(void)
 {
-	// All currently active particles are stored in m_mapElementToCellId
-	for (auto element : m_cellIds)
+	Eigen::Matrix<size_t, powerOf3<N>::value, 1> cellsId;
+	Eigen::Matrix<bool, powerOf3<N>::value, 1> cellsValidity;
+
+	// Update each cell's neighbors list
+	for (auto& cell : m_activeCells) // NOLINT
 	{
-		getNeighbors(element.first, &m_neighbors[element.first]);
-	}
-}
+		getNeighborsCellId(cell.first, &cellsId, &cellsValidity);
 
-template <typename T, size_t N>
-const std::unordered_map<T, std::vector<T>>& Grid<T, N>::getNeighborsMap() const
-{
-	return m_neighbors;
-}
-
-template <typename T, size_t N>
-void Grid<T, N>::getNeighbors(const T& element, std::vector<T>* result)
-{
-	Eigen::Matrix<bool, powerOf3<N>::value, 1> neighborCellsValidity;
-	Eigen::Matrix<size_t, powerOf3<N>::value, 1> neighborCellsId;
-	size_t thisCellId = m_cellIds[element];
-
-	getNeighborsCellId(thisCellId, &neighborCellsId, &neighborCellsValidity);
-
-	result->clear();
-
-	// Look in the neighbor cells for elements
-	for (size_t index = 0; index < powerOf3<N>::value; ++index)
-	{
-		// Does this neighboring cell exist in the given n-d grid ? Handles border cells...
-		if (neighborCellsValidity[index])
+		for (size_t neighborCellId = 0; neighborCellId < powerOf3<N>::value; ++neighborCellId)
 		{
-			// Does this cell is active ? (i.e. contains anything useful ?)
-			auto neighborCellId = neighborCellsId[index];
-			if(m_activeCells.find(neighborCellId) != m_activeCells.end())
+			// Check neighbor's cell validity and use symmetry between pair of cells
+			// to only treat neighbors with a larger or equal id.
+			if (cellsValidity[neighborCellId] && cellsId[neighborCellId] >= cell.first)
 			{
-				result->insert(result->end(), m_activeCells[neighborCellId].cbegin(),
-					m_activeCells[neighborCellId].cend());
+				auto neighborCell = m_activeCells.find(cellsId[neighborCellId]);
+				if (neighborCell != m_activeCells.end())
+				{
+					cell.second.neighbors.insert(cell.second.neighbors.end(),
+						neighborCell->second.elements.cbegin(), neighborCell->second.elements.cend());
+
+					// Treat symmetry if the cells are different
+					if (cellsId[neighborCellId] != cell.first)
+					{
+						neighborCell->second.neighbors.insert(neighborCell->second.neighbors.end(),
+							cell.second.elements.cbegin(), cell.second.elements.cend());
+					}
+				}
 			}
 		}
 	}
+}
+
+template <typename T, size_t N>
+const std::vector<T>& Grid<T, N>::getNeighbors(const T& element)
+{
+	static std::vector<T> empty;
+
+	auto const foundCell = m_cellIds.find(element);
+	if (foundCell != m_cellIds.cend())
+	{
+		return m_activeCells[foundCell->second].neighbors;
+	}
+
+	return empty;
 }
 
 template <typename T, size_t N>
@@ -213,12 +213,12 @@ void Grid<T, N>::getNeighborsCellId(size_t cellId,
 	Eigen::Matrix<size_t, powerOf3<N>::value, 1>* cellsId,
 	Eigen::Matrix<bool, powerOf3<N>::value, 1>* cellsValidity)
 {
-	// In which cell are we in the n-d array ?
+	// In which cell are we in the dimension-N array ?
 	Eigen::Matrix<int, N, 1> cellIdnDOriginal;
 	mapping1dToNd(cellId, &cellIdnDOriginal);
 
-	// Now build up all the neighbors cell around this n-d cell
-	// It corresponds to all possible permutation in n-d of the indices
+	// Now build up all the 3^N neighbors cell around this n-d cell
+	// It corresponds to all possible permutation in dimension-N of the indices
 	// {(cellIdnD[0] - 1, cellIdnD[0], cellIdnD[0] + 1) x ... x
 	//  (cellIdnD[N - 1] - 1, cellIdnD[N - 1], cellIdnD[N - 1] + 1)}
 	// It is (cellIdnD[0] - 1, ... , cellIdnD[N - 1] - 1) + all possible number in base 3 with N digit

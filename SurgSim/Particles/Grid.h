@@ -73,25 +73,27 @@ public:
 	template <class Derived>
 	void addElement(const T element, const Eigen::MatrixBase<Derived>& position);
 
-	/// Compute all the elements' neighbors list
-	/// \note The neighbors lists are inclusive (the element itself is in its neighbor's list)
-	/// \note The neighbors lists are cleared on reset call
-	void computeNeighborsMap();
+	/// Update the neighbors lists
+	void update(void);
 
-	/// Retrieve the elements' neighbors mapping
-	/// \return The mapping from any element to its corresponding neighbors elements within neighbors cells
-	/// \note The neighbors lists are inclusive (the element itself is in its neighbor's list)
-	const std::unordered_map<T, std::vector<T>>& getNeighborsMap() const;
+	/// Retrieve an elements' neighbors
+	/// \param element The element for which the neighbors are requested
+	/// \return The element's neighbors list (including the element itself)
+	const std::vector<T>& getNeighbors(const T& element);
 
 protected:
-	/// Active cells (referenced by their ids) with their content
-	std::unordered_map<size_t, std::vector<T>> m_activeCells;
+	/// Data structure for a cell's content (the list of elements and the list of all the neighbors)
+	typedef struct
+	{
+		std::vector<T> elements;
+		std::vector<T> neighbors;
+	} CellContent;
+
+	/// Active cells (referenced by their ids (spatial hashing)) with their content
+	std::unordered_map<size_t, CellContent> m_activeCells;
 
 	/// Mapping from element to cell id containing the element
 	std::unordered_map<T, size_t> m_cellIds;
-
-	/// Mapping from element to element's neighbors
-	std::unordered_map<T, std::vector<T>> m_neighbors;
 
 	/// Size of each cell (same on all dimension)
 	double m_size;
@@ -112,13 +114,7 @@ protected:
 	Eigen::AlignedBox<double, N> m_aabb;
 
 private:
-	/// Compute the neighbors' list for a given element
-	/// \param element for which the neighbors are requested
-	/// \param [out] result The element neighbors
-	/// \note The list also include the element itself
-	void getNeighbors(const T& element, std::vector<T>* result);
-
-	/// Retrieve the neighboring cells id (excluding this cell)
+	/// Retrieve the neighboring cells id (including this cell)
 	/// \param cellId for which the neighbors cells are requested
 	/// \param cellsId [out] Neighbors cells ids (only if a cell is valid, undefined otherwise)
 	/// \param cellsValidity [out] Neighbors cells validity (True if a cell exists in the grid, false otherwise)
@@ -126,21 +122,21 @@ private:
 		Eigen::Matrix<size_t, powerOf3<N>::value, 1>* cellsId,
 		Eigen::Matrix<bool, powerOf3<N>::value, 1>* cellsValidity);
 
-	/// Cell id correspondence from dimension-N to 1d (without input validity check)
+	/// Cell id mapping from dimension-N to dimension-1 (without input validity check)
 	/// \param nd The cell id in dimension-N
-	/// \return The cell unique 1d id
+	/// \return The cell id in dimension-1
 	/// \note No check is performed on the validity of the input cell id.
 	/// \note Return value undefined if invalid input
 	size_t mappingNdTo1d(const Eigen::Matrix<int, N, 1>& nd) const;
 
-	/// Cell id correspondence from dimension-N to 1d (with input validity check)
+	/// Cell id mapping from dimension-N to dimension-1 (with input validity check)
 	/// \param nd The cell id in dimension-N
-	/// \param [out] oned The cell unique 1d id if valid is True, undefined otherwise
-	/// \param [out] valid The cell validity (existence in the grid)
+	/// \param [out] oned The cell id in dimension-1 if valid is True, undefined otherwise
+	/// \param [out] valid The cell validity (grid spatial limit check)
 	void mappingNdTo1d(const Eigen::Matrix<int, N, 1>& nd, size_t* oned, bool* valid) const;
 
 	/// Cell id correspondence from 1d to dimension-D (without input validity check)
-	/// \param oned A cell unique 1d id
+	/// \param oned A dimension-1 id
 	/// \param [out] nd The cell dimension-d id
 	void mapping1dToNd(size_t oned, Eigen::Matrix<int, N, 1>* nd) const;
 };

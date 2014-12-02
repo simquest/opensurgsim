@@ -199,13 +199,11 @@ TYPED_TEST(GridTestBase, addElementTest)
 	grid.addElement(TypeElement(), this->validNumCellsPerDimension.template cast<double>() * 3.0 * this->m_size);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element outside of the grid
 	grid.addElement(TypeElement(), -this->validNumCellsPerDimension.template cast<double>() * 3.0 * this->m_size);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid
 	TypeElement e0(0), e1(1);
@@ -214,7 +212,6 @@ TYPED_TEST(GridTestBase, addElementTest)
 	ASSERT_EQ(1u, grid.getCellIds().size());
 	ASSERT_NO_THROW(grid.getCellIds().at(e0));
 	ASSERT_ANY_THROW(grid.getCellIds().at(e1));
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, in the same cell
 	grid.addElement(e1, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
@@ -223,7 +220,6 @@ TYPED_TEST(GridTestBase, addElementTest)
 	ASSERT_NO_THROW(grid.getCellIds().at(e0));
 	ASSERT_NO_THROW(grid.getCellIds().at(e1));
 	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, in a different cell
 	TypeElement e2(2);
@@ -236,7 +232,6 @@ TYPED_TEST(GridTestBase, addElementTest)
 	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
 	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e2]);
 	ASSERT_NE(grid.getCellIds()[e1], grid.getCellIds()[e2]);
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 }
 
 TYPED_TEST(GridTestBase, NeighborsTest)
@@ -259,7 +254,6 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_EQ(1u, grid.getCellIds().size());
 	ASSERT_NO_THROW(grid.getCellIds().at(e0));
 	ASSERT_ANY_THROW(grid.getCellIds().at(e1));
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, in the same cell
 	grid.addElement(e1, position);
@@ -268,7 +262,6 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_NO_THROW(grid.getCellIds().at(e0));
 	ASSERT_NO_THROW(grid.getCellIds().at(e1));
 	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, in a different cell
 	position[0] += this->m_size * 1.1; // Next cell on the 1st dimension
@@ -282,7 +275,6 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
 	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e2]);
 	ASSERT_NE(grid.getCellIds()[e1], grid.getCellIds()[e2]);
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, in a different cell
 	position[0] += this->m_size * 1.1; // Next cell on the 1st dimension
@@ -298,7 +290,6 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e2]);
 	ASSERT_NE(grid.getCellIds()[e0], grid.getCellIds()[e3]);
 	ASSERT_NE(grid.getCellIds()[e2], grid.getCellIds()[e3]);
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
 	// Add an element inside of the grid, far away from all other elements
 	position[0] += this->m_size * 2.1; // Few cells further on the 1st dimension
@@ -319,18 +310,17 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_NE(grid.getCellIds()[e1], grid.getCellIds()[e4]);
 	ASSERT_NE(grid.getCellIds()[e2], grid.getCellIds()[e4]);
 	ASSERT_NE(grid.getCellIds()[e3], grid.getCellIds()[e4]);
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
-	grid.computeNeighborsMap();
-	ASSERT_EQ(5u, grid.getNeighborsMap().size());
-	ASSERT_NO_THROW(grid.getNeighborsMap().at(e0));
-	ASSERT_NO_THROW(grid.getNeighborsMap().at(e1));
-	ASSERT_NO_THROW(grid.getNeighborsMap().at(e2));
-	ASSERT_NO_THROW(grid.getNeighborsMap().at(e3));
-	ASSERT_NO_THROW(grid.getNeighborsMap().at(e4));
+	grid.update();
+
+	ASSERT_NO_THROW(grid.getNeighbors(e0));
+	ASSERT_NO_THROW(grid.getNeighbors(e1));
+	ASSERT_NO_THROW(grid.getNeighbors(e2));
+	ASSERT_NO_THROW(grid.getNeighbors(e3));
+	ASSERT_NO_THROW(grid.getNeighbors(e4));
 
 	// e0's neighbors = {e0, e1, e2}
-	auto& e0Neighbors = grid.getNonConstNeighborsMap()[e0];
+	auto& e0Neighbors = grid.getNonConstNeighbors(e0);
 	ASSERT_EQ(3u, e0Neighbors.size());
 	ASSERT_TRUE(std::find(e0Neighbors.begin(), e0Neighbors.end(), e0) != e0Neighbors.end());
 	ASSERT_TRUE(std::find(e0Neighbors.begin(), e0Neighbors.end(), e1) != e0Neighbors.end());
@@ -339,7 +329,7 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_FALSE(std::find(e0Neighbors.begin(), e0Neighbors.end(), e4) != e0Neighbors.end());
 
 	// e1's neighbors = {e0, e1, e2}
-	auto& e1Neighbors = grid.getNonConstNeighborsMap()[e1];
+	auto& e1Neighbors = grid.getNonConstNeighbors(e1);
 	ASSERT_EQ(3u, e1Neighbors.size());
 	ASSERT_TRUE(std::find(e1Neighbors.begin(), e1Neighbors.end(), e0) != e1Neighbors.end());
 	ASSERT_TRUE(std::find(e1Neighbors.begin(), e1Neighbors.end(), e1) != e1Neighbors.end());
@@ -348,7 +338,7 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_FALSE(std::find(e1Neighbors.begin(), e1Neighbors.end(), e4) != e1Neighbors.end());
 
 	// e2's neighbors = {e0, e1, e2, e3}
-	auto& e2Neighbors = grid.getNonConstNeighborsMap()[e2];
+	auto& e2Neighbors = grid.getNonConstNeighbors(e2);
 	ASSERT_EQ(4u, e2Neighbors.size());
 	ASSERT_TRUE(std::find(e2Neighbors.begin(), e2Neighbors.end(), e0) != e2Neighbors.end());
 	ASSERT_TRUE(std::find(e2Neighbors.begin(), e2Neighbors.end(), e1) != e2Neighbors.end());
@@ -357,7 +347,7 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_FALSE(std::find(e2Neighbors.begin(), e2Neighbors.end(), e4) != e2Neighbors.end());
 
 	// e3's neighbors = {e2, e3}
-	auto& e3Neighbors = grid.getNonConstNeighborsMap()[e3];
+	auto& e3Neighbors = grid.getNonConstNeighbors(e3);
 	ASSERT_EQ(2u, e3Neighbors.size());
 	ASSERT_FALSE(std::find(e3Neighbors.begin(), e3Neighbors.end(), e0) != e3Neighbors.end());
 	ASSERT_FALSE(std::find(e3Neighbors.begin(), e3Neighbors.end(), e1) != e3Neighbors.end());
@@ -366,13 +356,17 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_FALSE(std::find(e3Neighbors.begin(), e3Neighbors.end(), e4) != e3Neighbors.end());
 
 	// e4's neighbors = {e4}
-	auto& e4Neighbors = grid.getNonConstNeighborsMap()[e4];
+	auto& e4Neighbors = grid.getNonConstNeighbors(e4);
 	ASSERT_EQ(1u, e4Neighbors.size());
 	ASSERT_FALSE(std::find(e4Neighbors.begin(), e4Neighbors.end(), e0) != e4Neighbors.end());
 	ASSERT_FALSE(std::find(e4Neighbors.begin(), e4Neighbors.end(), e1) != e4Neighbors.end());
 	ASSERT_FALSE(std::find(e4Neighbors.begin(), e4Neighbors.end(), e2) != e4Neighbors.end());
 	ASSERT_FALSE(std::find(e4Neighbors.begin(), e4Neighbors.end(), e3) != e4Neighbors.end());
 	ASSERT_TRUE(std::find(e4Neighbors.begin(), e4Neighbors.end(), e4) != e4Neighbors.end());
+
+	// Test element not in the grid has no neighbors
+	TypeElement e5(5);
+	ASSERT_EQ(0u, grid.getNeighbors(e5).size());
 }
 
 TYPED_TEST(Grid3DTestBase, Neighbors3DTest)
@@ -430,17 +424,16 @@ TYPED_TEST(Grid3DTestBase, Neighbors3DTest)
 			ASSERT_NE(grid.getCellIds()[element[elementId]], grid.getCellIds()[element[otherElementId]]);
 		}
 	}
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
 
-	grid.computeNeighborsMap();
-	ASSERT_EQ(27u, grid.getNeighborsMap().size());
+	grid.update();
 	for (size_t elementId = 0; elementId < 27; elementId++)
 	{
-		ASSERT_NO_THROW(grid.getNeighborsMap().at(element[elementId]));
+		ASSERT_NO_THROW(grid.getNeighbors(element[elementId]));
+		ASSERT_GT(grid.getNeighbors(element[elementId]).size(), 0u);
 	}
 
 	// The central element should have all the elements for neighbors (including itself)
-	auto& e111Neighbors = grid.getNonConstNeighborsMap()[element[13]];
+	auto& e111Neighbors = grid.getNonConstNeighbors(element[13]);
 	ASSERT_EQ(27u, e111Neighbors.size());
 	for (size_t elementId = 0; elementId < 27; elementId++)
 	{
@@ -459,15 +452,17 @@ TYPED_TEST(GridTestBase, ResetTest)
 	TypeElement e0(0), e1(1);
 	grid.addElement(e0, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
 	grid.addElement(e1, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
-	grid.computeNeighborsMap();
+	grid.update();
 	ASSERT_NE(0u, grid.getActiveCells().size());
 	ASSERT_NE(0u, grid.getCellIds().size());
-	ASSERT_NE(0u, grid.getNeighborsMap().size());
+	ASSERT_NE(0u, grid.getNeighbors(e0).size());
+	ASSERT_NE(0u, grid.getNeighbors(e1).size());
 
 	ASSERT_NO_THROW(grid.reset());
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
-	ASSERT_EQ(0u, grid.getNeighborsMap().size());
+	ASSERT_EQ(0u, grid.getNeighbors(e0).size());
+	ASSERT_EQ(0u, grid.getNeighbors(e1).size());
 }
 
 }; // namespace Particles

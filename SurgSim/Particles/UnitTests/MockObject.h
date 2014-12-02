@@ -30,11 +30,14 @@ class MockGrid : public Grid<T, N>
 public:
 	MockGrid(double size, const Eigen::Matrix<size_t, N, 1>& exponents) : Grid<T,N>(size, exponents){}
 
-	std::unordered_map<size_t, std::vector<T>>& getActiveCells() { return this->m_activeCells; }
+	std::unordered_map<size_t, typename Grid<T, N>::CellContent>& getActiveCells()
+	{
+		return this->m_activeCells;
+	}
 
 	std::unordered_map<T, size_t>& getCellIds() { return this->m_cellIds; }
 
-	std::unordered_map<T, std::vector<T>>& getNonConstNeighborsMap() { return this->m_neighbors; }
+	std::vector<T>& getNonConstNeighbors(const T& element) { return this->m_activeCells[this->m_cellIds[element]].neighbors; }
 
 	double getSize() const { return this->m_size; }
 
