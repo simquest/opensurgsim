@@ -51,6 +51,8 @@ EmitterRepresentation::EmitterRepresentation(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(EmitterRepresentation, double, Rate, getRate, setRate);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(EmitterRepresentation, std::shared_ptr<SurgSim::Math::Shape>, Shape, getShape,
 			setShape);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(EmitterRepresentation, std::shared_ptr<SurgSim::Framework::Component>,
+									 Target, getTarget, setTarget);
 	typedef std::pair<Vector3d, Vector3d> VelocityRangeType;
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(EmitterRepresentation, VelocityRangeType, VelocityRange, getVelocityRange,
 			setVelocityRange);

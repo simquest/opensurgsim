@@ -32,6 +32,8 @@ ParticleSystemRepresentation::ParticleSystemRepresentation(const std::string& na
 	m_state(std::make_shared<ParticlesState>()),
 	m_logger(SurgSim::Framework::Logger::getLogger("Particles"))
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticleSystemRepresentation, size_t, MaxParticles, getMaxParticles,
+			setMaxParticles);
 }
 
 ParticleSystemRepresentation::~ParticleSystemRepresentation()

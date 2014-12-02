@@ -16,13 +16,8 @@
 #include "SurgSim/Particles/UnitTests/MockObjects.h"
 
 
-namespace SurgSim
-{
-namespace Particles
-{
-
 MockParticleSystem::MockParticleSystem(const std::string& name) :
-	ParticleSystemRepresentation(name),
+	SurgSim::Particles::ParticleSystemRepresentation(name),
 	updateCount(0)
 {
 }
@@ -34,14 +29,14 @@ bool MockParticleSystem::doUpdate(double dt)
 }
 
 MockEmitter::MockEmitter(const std::string& name) :
-	EmitterRepresentation(name),
+	SurgSim::Particles::EmitterRepresentation(name),
 	updateCount(0)
 {
 }
 
 void MockEmitter::update(double dt)
 {
-	EmitterRepresentation::update(dt);
+	SurgSim::Particles::EmitterRepresentation::update(dt);
 	updateCount++;
 }
 
@@ -70,6 +65,3 @@ int MockParticleBehavior::getTargetManagerType() const
 {
 	return SurgSim::Framework::MANAGER_TYPE_PARTICLES;
 }
-
-}; // namespace Particles
-}; // namespace SurgSim

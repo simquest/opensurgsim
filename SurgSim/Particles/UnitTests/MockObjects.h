@@ -17,26 +17,23 @@
 #define SURGSIM_PARTICLES_UNITTESTS_MOCKOBJECTS_H
 
 #include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Particles/EmitterRepresentation.h"
 #include "SurgSim/Particles/ParticleSystemRepresentation.h"
 
 
-namespace SurgSim
-{
-namespace Particles
-{
-
-class MockParticleSystem : public ParticleSystemRepresentation
+class MockParticleSystem : public SurgSim::Particles::ParticleSystemRepresentation
 {
 public:
 	explicit MockParticleSystem(const std::string& name);
+	SURGSIM_CLASSNAME(MockParticleSystem);
 	int updateCount;
 
 private:
 	virtual bool doUpdate(double dt) override;
 };
 
-class MockEmitter : public EmitterRepresentation
+class MockEmitter : public SurgSim::Particles::EmitterRepresentation
 {
 public:
 	explicit MockEmitter(const std::string& name);
@@ -59,9 +56,6 @@ private:
 	virtual bool doWakeUp() override;
 };
 
-
-}; // namespace Particles
-}; // namespace SurgSim
 
 #endif //SURGSIM_PARTICLES_UNITTESTS_MOCKOBJECTS_H
 
