@@ -44,7 +44,7 @@ public:
 	/// Destructor
 	virtual ~ParticleManager();
 
-	virtual	int getType() const override;
+	virtual int getType() const override;
 
 protected:
 	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
