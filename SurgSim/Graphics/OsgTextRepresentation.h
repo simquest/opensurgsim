@@ -50,6 +50,8 @@ namespace Graphics
 {
 class OsgFont;
 
+SURGSIM_STATIC_REGISTRATION(OsgTextRepresentation);
+
 /// Osg implementation of the TextRepresentation, to be used with OsgFont assets
 class OsgTextRepresentation : public OsgRepresentation, public TextRepresentation
 {
