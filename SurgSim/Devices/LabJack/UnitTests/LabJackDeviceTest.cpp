@@ -130,7 +130,7 @@ TEST(LabJackDeviceTest, InputConsumer)
 
 	EXPECT_TRUE(device->addInputConsumer(consumer));
 	EXPECT_TRUE(device->setOutputProducer(consumer));
-	
+
 	// Adding the same input consumer again should fail.
 	EXPECT_FALSE(device->addInputConsumer(consumer));
 

@@ -24,7 +24,7 @@
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/Runtime.h" //< Used to initialize the Component Fem3DRepresentation
+#include "SurgSim/Framework/Runtime.h" ///< Used to initialize the Component Fem3DRepresentation
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"

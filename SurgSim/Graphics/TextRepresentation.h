@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_INFO_H
-#define SURGSIM_GRAPHICS_INFO_H
+#ifndef SURGSIM_GRAPHICS_TEXTREPRESENTATION_H
+#define SURGSIM_GRAPHICS_TEXTREPRESENTATION_H
 
 #include <memory>
 
@@ -110,4 +110,4 @@ protected:
 }; // Graphics
 }; // SurgSim
 
-#endif // SURGSIM_GRAPHICS_INFO_H
+#endif // SURGSIM_GRAPHICS_TEXTREPRESENTATION_H
