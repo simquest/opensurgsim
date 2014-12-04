@@ -234,7 +234,7 @@ void RigidRepresentation::update(double dt)
 	Quaterniond     dq;
 	double       qNorm = q.norm(); // Norm of q before normalization
 
-	// Rigid body dynamics (using backward euler numerical integration scheme):
+	// Rigid body dynamics (using backward Euler numerical integration scheme):
 	// { Id33.m.(v(t+dt) - v(t))/dt = f
 	// { I     .(w(t+dt) - w(t))/dt = t - w(t)^(I.w(t))
 	//
