@@ -52,7 +52,7 @@ class Grid
 {
 public:
 	/// Constructor
-	/// \param size The size of each cell, should be the range in which we want to look for neighbors in each direction
+	/// \param cellSize The size of each cell in dimension N (i.e. cells are not necessarily cubic).
 	/// \param exponents For each cell the exponent to 2 indicating the requested number of cell per dimension,
 	///        the sum of all the exponents can't exceed the architecture bit size i.e. 32 and 64 respectively
 	/// \note Power of 2 limitation:<br>
