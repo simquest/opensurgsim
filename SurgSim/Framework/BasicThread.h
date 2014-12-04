@@ -125,7 +125,7 @@ public:
 	/// \return the actual rate since last timer reset in [frame/s]
 	double getRealRate() const;
 
-	/// Reset the he cumulative time of all doUpdate calls since last timer reset
+	/// Reset the timer used to measure real time/rate
 	void resetTimer();
 
 protected:
