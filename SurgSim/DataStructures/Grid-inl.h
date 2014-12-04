@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PARTICLES_GRID_INL_H
-#define SURGSIM_PARTICLES_GRID_INL_H
+#ifndef SURGSIM_DATASTRUCTURES_GRID_INL_H
+#define SURGSIM_DATASTRUCTURES_GRID_INL_H
 
 namespace SurgSim
 {
-namespace Particles
+namespace DataStructures
 {
 
 namespace
@@ -274,7 +274,7 @@ void Grid<T, N>::mapping1dToNd(size_t oned, Eigen::Matrix<int, N, 1>* nd) const
 	}
 }
 
-}; // namespace Particles
+}; // namespace DataStructures
 }; // namespace SurgSim
 
-#endif // SURGSIM_PARTICLES_GRID_INL_H
+#endif // SURGSIM_DATASTRUCTURES_GRID_INL_H

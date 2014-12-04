@@ -20,8 +20,8 @@
 #include <tuple>
 
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/Grid.h"
-#include "SurgSim/Particles/UnitTests/MockObject.h"
+#include "SurgSim/DataStructures/Grid.h"
+#include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 
 using std::tuple;
 
@@ -44,26 +44,26 @@ public:
 };
 // Add a hash function for this class
 namespace std {
-	template <>
-	struct hash<ElementTest>
+template <>
+struct hash<ElementTest>
+{
+	std::size_t operator()(const ElementTest& k) const
 	{
-		std::size_t operator()(const ElementTest& k) const
-		{
-			using std::size_t;
-			using std::hash;
-			using std::string;
+		using std::size_t;
+		using std::hash;
+		using std::string;
 
-			// Compute individual hash values for first,
-			// second and third and combine them using XOR
-			// and bit shifting:
-			return (hash<string>()(k.m_string) ^ (hash<int>()(k.m_number) << 1));
-		}
-	};
+		// Compute individual hash values for first,
+		// second and third and combine them using XOR
+		// and bit shifting:
+		return (hash<string>()(k.m_string) ^ (hash<int>()(k.m_number) << 1));
+	}
+};
 }
 
 namespace SurgSim
 {
-namespace Particles
+namespace DataStructures
 {
 
 /// TypeValue template to pack value as template parameters
@@ -84,7 +84,7 @@ public:
 	static const size_t dimension = std::tuple_element<1, T>::type::value;
 
 	/// The grid type for this test
-	typedef SurgSim::Particles::MockGrid<TypeElement, dimension> GridType;
+	typedef MockGrid<TypeElement, dimension> GridType;
 
 	/// Useful vector type of various vectors
 	typedef Eigen::Matrix<size_t, dimension, 1> UintVectorND;
@@ -465,5 +465,5 @@ TYPED_TEST(GridTestBase, ResetTest)
 	ASSERT_EQ(0u, grid.getNeighbors(e1).size());
 }
 
-}; // namespace Particles
+}; // namespace DataStructures
 }; // namespace SurgSim

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PARTICLES_GRID_H
-#define SURGSIM_PARTICLES_GRID_H
+#ifndef SURGSIM_DATASTRUCTURES_GRID_H
+#define SURGSIM_DATASTRUCTURES_GRID_H
 
 #include <array>
 #include <unordered_map>
@@ -24,7 +24,7 @@
 namespace SurgSim
 {
 
-namespace Particles
+namespace DataStructures
 {
 
 /// Templated function to compute a power of 3 at compile time (useful for template parameter)
@@ -141,9 +141,9 @@ private:
 	void mapping1dToNd(size_t oned, Eigen::Matrix<int, N, 1>* nd) const;
 };
 
-};  // namespace Particles
+};  // namespace DataStructures
 };  // namespace SurgSim
 
-#include "SurgSim/Particles/Grid-inl.h"
+#include "SurgSim/DataStructures/Grid-inl.h"
 
-#endif  // SURGSIM_PARTICLES_GRID_H
+#endif  // SURGSIM_DATASTRUCTURES_GRID_H

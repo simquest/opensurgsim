@@ -16,6 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
 
+#include "SurgSim/DataStructures/Grid.h"
 #include "SurgSim/DataStructures/TetrahedronMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/Vertices.h"
@@ -467,6 +468,39 @@ private:
 
 	/// Number of updates performed on the mesh
 	int m_numUpdates;
+};
+
+template <typename T, size_t N>
+class MockGrid : public SurgSim::DataStructures::Grid<T, N>
+{
+public:
+	MockGrid(double size, const Eigen::Matrix<size_t, N, 1>& exponents) :
+		SurgSim::DataStructures::Grid<T,N>(size, exponents)
+	{}
+
+	std::unordered_map<size_t, typename Grid<T, N>::CellContent>& getActiveCells()
+	{
+		return this->m_activeCells;
+	}
+
+	std::unordered_map<T, size_t>& getCellIds() { return this->m_cellIds; }
+
+	std::vector<T>& getNonConstNeighbors(const T& element)
+	{
+		return this->m_activeCells[this->m_cellIds[element]].neighbors;
+	}
+
+	double getSize() const { return this->m_size; }
+
+	Eigen::Matrix<size_t, N, 1> getNumCells() const { return this->m_numCells; }
+
+	Eigen::Matrix<size_t, N, 1> getExponents() const { return this->m_exponents; }
+
+	Eigen::Matrix<size_t, N, 1> getOffsets() const { return this->m_offsets; }
+
+	Eigen::Matrix<size_t, N, 1> getOffsetExponents() const { return this->m_offsetExponents; }
+
+	Eigen::AlignedBox<double, N> getAABB() const { return this->m_aabb; }
 };
 
 namespace wrappers
