@@ -126,6 +126,7 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			index1++;
 		}
 	}
+	m_hasExternalGeneralizedForce = true;
 }
 
 bool Fem1DRepresentation::doWakeUp()

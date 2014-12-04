@@ -119,9 +119,13 @@ protected:
 	/// Compliance matrix (size of the number of Dof = 6)
 	SurgSim::Math::Matrix66d m_C;
 
+	/// External generalized force, stiffness and damping applied on the rigid representation
+	/// @{
+	bool m_hasExternalGeneralizedForce;
 	SurgSim::Math::Vector6d m_externalGeneralizedForce;
 	SurgSim::Math::Matrix66d m_externalGeneralizedStiffness;
 	SurgSim::Math::Matrix66d m_externalGeneralizedDamping;
+	/// @}
 
 private:
 	virtual bool doInitialize() override;

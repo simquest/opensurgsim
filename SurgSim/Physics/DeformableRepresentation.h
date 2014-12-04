@@ -144,6 +144,7 @@ protected:
 
 	/// External generalized force, stiffness and damping applied on the deformable representation
 	/// @{
+	bool m_hasExternalGeneralizedForce;
 	SurgSim::Math::Vector m_externalGeneralizedForce;
 	SurgSim::Math::Matrix m_externalGeneralizedStiffness;
 	SurgSim::Math::Matrix m_externalGeneralizedDamping;

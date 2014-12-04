@@ -65,7 +65,7 @@ public:
 			0.0); // Damping bending
 
 		// Update position in only 1 timestep
-		// Forward euler for velocity, backward euler for position
+		// Forward Euler for velocity, backward Euler for position
 		m_massSpring->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
 
 		m_massSpring->initialize(std::make_shared<SurgSim::Framework::Runtime>());

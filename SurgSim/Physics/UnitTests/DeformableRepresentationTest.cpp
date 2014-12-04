@@ -188,7 +188,7 @@ TEST_F(DeformableRepresentationTest, GetComplianceMatrix)
 	EXPECT_NO_THROW(EXPECT_TRUE(wakeUp()));
 
 	// This call solves the Ode equation and computes the compliance matrix using the default ode solver
-	// Explicit euler => M.a(t+dt) = F(t) <=> M/dt.deltaV = F(t)
+	// Explicit Euler => M.a(t+dt) = F(t) <=> M/dt.deltaV = F(t)
 	// So the compliance matrix will be (M/dt)^-1
 	// In our case, M = Identity, so the compliance matrix will be Identity*dt
 	EXPECT_NO_THROW(update(dt));

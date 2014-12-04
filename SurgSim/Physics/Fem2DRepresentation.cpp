@@ -118,6 +118,7 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			index1++;
 		}
 	}
+	m_hasExternalGeneralizedForce = true;
 }
 
 RepresentationType Fem2DRepresentation::getType() const
