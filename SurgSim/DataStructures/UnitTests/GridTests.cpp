@@ -88,6 +88,7 @@ public:
 
 	/// Useful vector type of various vectors
 	typedef Eigen::Matrix<size_t, dimension, 1> UintVectorND;
+	typedef Eigen::Matrix<double, dimension, 1> VectorND;
 	UintVectorND validPowerOf2Dimension1Cell;
 	UintVectorND invalidTooBigPowerOf2Dimension;
 	UintVectorND validPowerOf2Dimension;
@@ -96,22 +97,22 @@ public:
 	UintVectorND validOffsetPowerOf2PerDimension;
 
 	/// Useful variables
-	double m_size;
+	VectorND m_size;
 
 	/// Grid min and max n-d vectors
 	Eigen::Matrix<double, dimension, 1> minExpected, maxExpected;
 
 	virtual void SetUp() override
 	{
-		m_size = 0.6;
+		m_size = VectorND::LinSpaced(0.6, 1.67);
 
 		validPowerOf2Dimension1Cell = UintVectorND::Constant(0u);
 		invalidTooBigPowerOf2Dimension = UintVectorND::Constant(96u);
 		validPowerOf2Dimension = UintVectorND::Constant(4u);
 		validNumCellsPerDimension = UintVectorND::Constant(16u); // 2^4
 
-		minExpected = -(validNumCellsPerDimension.template cast<double>() * m_size * 0.5);
-		maxExpected = validNumCellsPerDimension.template cast<double>() * m_size * 0.5;
+		minExpected = -(validNumCellsPerDimension.template cast<double>().cwiseProduct(m_size) * 0.5);
+		maxExpected = validNumCellsPerDimension.template cast<double>().cwiseProduct(m_size) * 0.5;
 
 		// Offsets are {2^{powerOf2[1]+...+powerOf2[N-1]} , ... 2^{powerOf2[N-1]}, 2^{0}}
 		if (dimension >= 1)
@@ -179,7 +180,7 @@ TYPED_TEST(GridTestBase, ConstructorTest)
 	GridType grid(this->m_size, this->validPowerOf2Dimension);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
-	ASSERT_DOUBLE_EQ(this->m_size, grid.getSize());
+	ASSERT_TRUE(grid.getSize().isApprox(this->m_size));
 	ASSERT_TRUE(grid.getNumCells() == this->validNumCellsPerDimension);
 	ASSERT_TRUE(grid.getExponents() == this->validPowerOf2Dimension);
 	ASSERT_TRUE(grid.getOffsets() == this->validOffsetPerDimension);
@@ -196,12 +197,13 @@ TYPED_TEST(GridTestBase, addElementTest)
 	GridType grid(this->m_size, this->validPowerOf2Dimension);
 
 	// Add an element outside of the grid
-	grid.addElement(TypeElement(), this->validNumCellsPerDimension.template cast<double>() * 3.0 * this->m_size);
+	auto position =  3.0 * this->m_size.cwiseProduct(this->validNumCellsPerDimension.template cast<double>());
+	grid.addElement(TypeElement(), position);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
 
 	// Add an element outside of the grid
-	grid.addElement(TypeElement(), -this->validNumCellsPerDimension.template cast<double>() * 3.0 * this->m_size);
+	grid.addElement(TypeElement(), -position);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
 
@@ -223,7 +225,7 @@ TYPED_TEST(GridTestBase, addElementTest)
 
 	// Add an element inside of the grid, in a different cell
 	TypeElement e2(2);
-	grid.addElement(e2, Eigen::Matrix<double, TestFixture::dimension, 1>::Ones() * this->m_size * 1.5);
+	grid.addElement(e2, this->m_size * 1.5);
 	ASSERT_EQ(2u, grid.getActiveCells().size());
 	ASSERT_EQ(3u, grid.getCellIds().size());
 	ASSERT_NO_THROW(grid.getCellIds().at(e0));
@@ -264,7 +266,7 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_EQ(grid.getCellIds()[e0], grid.getCellIds()[e1]);
 
 	// Add an element inside of the grid, in a different cell
-	position[0] += this->m_size * 1.1; // Next cell on the 1st dimension
+	position[0] += this->m_size[0] * 1.1; // Next cell on the 1st dimension
 	TypeElement e2(2);
 	grid.addElement(e2, position);
 	ASSERT_EQ(2u, grid.getActiveCells().size());
@@ -277,7 +279,7 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_NE(grid.getCellIds()[e1], grid.getCellIds()[e2]);
 
 	// Add an element inside of the grid, in a different cell
-	position[0] += this->m_size * 1.1; // Next cell on the 1st dimension
+	position[0] += this->m_size[0] * 1.1; // Next cell on the 1st dimension
 	TypeElement e3(3);
 	grid.addElement(e3, position);
 	ASSERT_EQ(3u, grid.getActiveCells().size());
@@ -292,7 +294,7 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_NE(grid.getCellIds()[e2], grid.getCellIds()[e3]);
 
 	// Add an element inside of the grid, far away from all other elements
-	position[0] += this->m_size * 2.1; // Few cells further on the 1st dimension
+	position[0] += this->m_size[0] * 2.1; // Few cells further on the 1st dimension
 	TypeElement e4(4);
 	grid.addElement(e4, position);
 	ASSERT_EQ(4u, grid.getActiveCells().size());
@@ -402,7 +404,7 @@ TYPED_TEST(Grid3DTestBase, Neighbors3DTest)
 		{
 			for(size_t Z = 0; Z < 3; ++Z)
 			{
-				SurgSim::Math::Vector3d offset(this->m_size * X, this->m_size * Y, this->m_size * Z);
+				SurgSim::Math::Vector3d offset(this->m_size[0] * X, this->m_size[1] * Y, this->m_size[2] * Z);
 				grid.addElement(element[number.toDecimal()], position + offset);
 				number.next();
 			}

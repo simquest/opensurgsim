@@ -42,9 +42,9 @@ struct powerOf3<0>
 /// n-dimension grid structure with a fixed uniform size on all directions
 /// This data structure is useful to search for neighbors in a given range (the size of each cell)
 /// This grid is optimized to contain a power of 2 number of cells on each dimension.
-/// The grid is formed of cubic cells of size 'size' extending on each dimension
-/// from -0.5 * size * pow(2, powerOf2CellsPerDimension[dimension])
-/// to    0.5 * size * pow(2, powerOf2CellsPerDimension[dimension])
+/// The grid is formed of cells of size 'size'
+/// from -0.5 * size[dimension] * pow(2, powerOf2CellsPerDimension[dimension])
+/// to    0.5 * size[dimension] * pow(2, powerOf2CellsPerDimension[dimension])
 /// \tparam T Element type to be stored
 /// \tparam N The dimension of the grid (i.e. 2 => 2D, 3 => 3D)
 template <typename T, size_t N>
@@ -52,13 +52,13 @@ class Grid
 {
 public:
 	/// Constructor
-	/// \param size The size of each cell, should be the range in which we want to look for neighbors
+	/// \param size The size of each cell, should be the range in which we want to look for neighbors in each direction
 	/// \param exponents For each cell the exponent to 2 indicating the requested number of cell per dimension,
 	///        the sum of all the exponents can't exceed the architecture bit size i.e. 32 and 64 respectively
 	/// \note Power of 2 limitation:<br>
 	/// \note * 32 bit architecture: maximum exponents sum is 32, for example in 3d {{10, 10, 10}}<br>
 	/// \note * 64 bit architecture: maximum exponents sum is 64, for example in 3d {{21, 21, 21}}
-	Grid(double size, const Eigen::Matrix<size_t, N, 1>& exponents);
+	Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Matrix<size_t, N, 1>& exponents);
 
 	/// Destructor
 	virtual ~Grid();
@@ -96,7 +96,7 @@ protected:
 	std::unordered_map<T, size_t> m_cellIds;
 
 	/// Size of each cell (same on all dimension)
-	double m_size;
+	Eigen::Matrix<double, N, 1> m_size;
 
 	/// Number of cells per dimension
 	Eigen::Matrix<size_t, N, 1> m_numCells;

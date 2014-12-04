@@ -80,7 +80,7 @@ public:
 }; // namespace
 
 template <typename T, size_t N>
-Grid<T, N>::Grid(double size, const Eigen::Matrix<size_t, N, 1>& exponents)
+Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Matrix<size_t, N, 1>& exponents)
 {
 	// Check that the size of the requested grid fit the current architecture.
 	size_t maximumCellsPowerOf2 = sizeof(size_t) * 8;
@@ -89,14 +89,14 @@ Grid<T, N>::Grid(double size, const Eigen::Matrix<size_t, N, 1>& exponents)
 		<< requestedCellsPozerOf2 << " cells) is too large for the "
 		<< maximumCellsPowerOf2 << " bit architecture";
 
-	m_size = size;
+	m_size = cellSize;
 	m_exponents = exponents;
 	for (size_t i = 0; i < N; ++i)
 	{
 		m_numCells[i] = (static_cast<size_t>(1u) << exponents[i]);
-		m_aabb.min()[i] = -static_cast<double>(m_numCells[i]) * m_size * 0.5;
-		m_aabb.max()[i] = static_cast<double>(m_numCells[i]) * m_size * 0.5;
 	}
+	m_aabb.min() = -(m_size.cwiseProduct(m_numCells.template cast<double>())) * 0.5;
+	m_aabb.max() = (m_size.cwiseProduct(m_numCells.template cast<double>())) * 0.5;
 
 	// Cell indexing goes as follow:
 	// Example: a cell in 3d with the indices (i, j, k) will have a 1d index of
@@ -140,12 +140,12 @@ void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& p
 
 	// Find the dimension-N cell id from the location
 	// Example in 3D: cell (i, j, k) has 3D min/max coordinates
-	//   min[axis] = (size * (-numCellPerDim[axis] / 2 + i)
-	//   max[axis] = (size * (-numCellPerDim[axis] / 2 + i + 1)
+	//   min[axis] = (size[axis] * (-numCellPerDim[axis] / 2 + i)
+	//   max[axis] = (size[axis] * (-numCellPerDim[axis] / 2 + i + 1)
 	Eigen::Matrix<int, N, 1> cellIdnD;
 	for (size_t i = 0; i < N; ++i)
 	{
-		double cellIdForThisDimension = position[i] / m_size + static_cast<double>(m_numCells[i] >> 1);
+		double cellIdForThisDimension = position[i] / m_size[i] + static_cast<double>(m_numCells[i] >> 1);
 		cellIdnD[i] = static_cast<int>(floor(cellIdForThisDimension));
 	}
 
