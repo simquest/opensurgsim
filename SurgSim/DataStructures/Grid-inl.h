@@ -81,6 +81,7 @@ public:
 
 template <typename T, size_t N>
 Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Matrix<size_t, N, 1>& exponents)
+	: m_neighborsDirtyFlag(false)
 {
 	// Check that the size of the requested grid fit the current architecture.
 	size_t maximumCellsPowerOf2 = sizeof(size_t) * 8;
@@ -126,6 +127,9 @@ void Grid<T, N>::reset()
 
 	// Clear the active cells
 	m_activeCells.clear();
+
+	// Nothing in the grid (no elements, no neighbors)...so it is up to date
+	m_neighborsDirtyFlag = false;
 }
 
 template <typename T, size_t N>
@@ -157,6 +161,9 @@ void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& p
 
 	// Add this element in the map [element -> cellID]
 	m_cellIds[element] = cellId1D;
+
+	/// Flag that the neighbors list will need to be recomputed on the next access
+	m_neighborsDirtyFlag = true;
 }
 
 template <typename T, size_t N>
@@ -165,7 +172,13 @@ void Grid<T, N>::update(void)
 	Eigen::Matrix<size_t, powerOf3<N>::value, 1> cellsId;
 	Eigen::Matrix<bool, powerOf3<N>::value, 1> cellsValidity;
 
-	// Update each cell's neighbors list
+	// Start by clearing up all the neighbor's list
+	for (auto& cell : m_activeCells) // NOLINT
+	{
+		cell.second.neighbors.clear();
+	}
+
+	// Compute each cell's neighbors list
 	for (auto& cell : m_activeCells) // NOLINT
 	{
 		getNeighborsCellId(cell.first, &cellsId, &cellsValidity);
@@ -198,6 +211,12 @@ template <typename T, size_t N>
 const std::vector<T>& Grid<T, N>::getNeighbors(const T& element)
 {
 	static std::vector<T> empty;
+
+	if (m_neighborsDirtyFlag)
+	{
+		update();
+		m_neighborsDirtyFlag = false;
+	}
 
 	auto const foundCell = m_cellIds.find(element);
 	if (foundCell != m_cellIds.cend())

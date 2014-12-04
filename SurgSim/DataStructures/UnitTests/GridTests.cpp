@@ -313,8 +313,6 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	ASSERT_NE(grid.getCellIds()[e2], grid.getCellIds()[e4]);
 	ASSERT_NE(grid.getCellIds()[e3], grid.getCellIds()[e4]);
 
-	grid.update();
-
 	ASSERT_NO_THROW(grid.getNeighbors(e0));
 	ASSERT_NO_THROW(grid.getNeighbors(e1));
 	ASSERT_NO_THROW(grid.getNeighbors(e2));
@@ -427,7 +425,6 @@ TYPED_TEST(Grid3DTestBase, Neighbors3DTest)
 		}
 	}
 
-	grid.update();
 	for (size_t elementId = 0; elementId < 27; elementId++)
 	{
 		ASSERT_NO_THROW(grid.getNeighbors(element[elementId]));
@@ -454,7 +451,6 @@ TYPED_TEST(GridTestBase, ResetTest)
 	TypeElement e0(0), e1(1);
 	grid.addElement(e0, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
 	grid.addElement(e1, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
-	grid.update();
 	ASSERT_NE(0u, grid.getActiveCells().size());
 	ASSERT_NE(0u, grid.getCellIds().size());
 	ASSERT_NE(0u, grid.getNeighbors(e0).size());

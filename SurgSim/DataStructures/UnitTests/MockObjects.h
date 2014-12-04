@@ -487,7 +487,7 @@ public:
 
 	std::vector<T>& getNonConstNeighbors(const T& element)
 	{
-		return this->m_activeCells[this->m_cellIds[element]].neighbors;
+		return const_cast<std::vector<T>&>(this->getNeighbors(element));
 	}
 
 	Eigen::Matrix<double, N, 1> getSize() const { return this->m_size; }

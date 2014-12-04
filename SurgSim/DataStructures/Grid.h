@@ -73,9 +73,6 @@ public:
 	template <class Derived>
 	void addElement(const T element, const Eigen::MatrixBase<Derived>& position);
 
-	/// Update the neighbors lists
-	void update(void);
-
 	/// Retrieve an elements' neighbors
 	/// \param element The element for which the neighbors are requested
 	/// \return The element's neighbors list (including the element itself)
@@ -113,7 +110,13 @@ protected:
 	/// Grid min and max
 	Eigen::AlignedBox<double, N> m_aabb;
 
+	/// Does the neighbors needs to be recomputed ?
+	bool m_neighborsDirtyFlag;
+
 private:
+	/// Update the neighbors lists
+	void update(void);
+
 	/// Retrieve the neighboring cells id (including this cell)
 	/// \param cellId for which the neighbors cells are requested
 	/// \param cellsId [out] Neighbors cells ids (only if a cell is valid, undefined otherwise)
