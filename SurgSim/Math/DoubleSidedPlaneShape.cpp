@@ -25,7 +25,7 @@ DoubleSidedPlaneShape::DoubleSidedPlaneShape()
 {
 }
 
-int DoubleSidedPlaneShape::getType()
+int DoubleSidedPlaneShape::getType() const
 {
 	return SHAPE_TYPE_DOUBLESIDEDPLANE;
 }

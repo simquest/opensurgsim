@@ -26,7 +26,7 @@ SphereShape::SphereShape(double radius) : m_radius(radius)
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphereShape, double, Radius, getRadius, setRadius);
 }
 
-int SphereShape::getType()
+int SphereShape::getType() const
 {
 	return SHAPE_TYPE_SPHERE;
 }

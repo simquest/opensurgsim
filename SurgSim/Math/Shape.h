@@ -66,7 +66,7 @@ public:
 	virtual ~Shape();
 
 	/// \return the type of shape
-	virtual int getType() = 0;
+	virtual int getType() const = 0;
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)

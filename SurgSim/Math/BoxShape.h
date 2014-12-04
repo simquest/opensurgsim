@@ -40,7 +40,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Math::BoxShape);
 
 	/// \return the type of the shape
-	virtual int getType() override;
+	virtual int getType() const override;
 
 	/// Get size of the box
 	/// \return the size of the box (in m)
