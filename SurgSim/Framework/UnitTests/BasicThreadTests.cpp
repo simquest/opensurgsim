@@ -271,6 +271,19 @@ TEST(BasicThreadTest, SwitchSyncOnThread)
 	m.stop();
 }
 
+TEST(BasicThreadTest, RealTimings)
+{
+	MockThread m;
+	m.start(nullptr);
+
+	while(m.getRealTime() < 0.00001);
+	std::cout << m.getRealRate() << " fps" << std::endl;
+	m.resetTimer();
+	EXPECT_LT(m.getRealTime(), 0.00001);
+
+	m.stop();
+}
+
 // HS-2013-jun-25 Can't figure out how to make this work or what is going wrong with the test
 class BasicThreadDeathTest : public ::testing::Test
 {

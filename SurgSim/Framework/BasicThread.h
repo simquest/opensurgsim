@@ -23,6 +23,7 @@
 #include <boost/chrono.hpp>
 
 #include "SurgSim/Framework/Barrier.h"
+#include "SurgSim/Framework/Timer.h"
 
 namespace SurgSim
 {
@@ -118,7 +119,19 @@ public:
 	/// \return	true if synchronized, false if not.
 	bool isSynchronous();
 
+	/// \return the actual cumulative time of all doUpdate calls since last timer reset in [s]
+	double getRealTime() const;
+
+	/// \return the actual rate since last timer reset in [frame/s]
+	double getRealRate() const;
+
+	/// Reset the he cumulative time of all doUpdate calls since last timer reset
+	void resetTimer();
+
 protected:
+
+	/// Timer to measure the actual time taken to doUpdate
+	Timer m_timer;
 
 	/// Trigger the initialization of this object, this will be called before all other threads doStartup()
 	/// are called
@@ -134,7 +147,6 @@ protected:
 	bool waitForBarrier(bool success);
 
 	virtual bool executeInitialization();
-
 
 private:
 	std::string m_name;
