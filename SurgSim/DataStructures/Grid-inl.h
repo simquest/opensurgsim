@@ -177,13 +177,13 @@ void Grid<T, N>::update(void)
 	Eigen::Matrix<bool, powerOf3<N>::value, 1> cellsValidities;
 
 	// Start by clearing up all the neighbor's list
-	for (auto& cell : m_activeCells) // NOLINT
+	for (typename std::unordered_map<size_t, typename Grid<T, N>::CellContent>::reference cell : m_activeCells)
 	{
 		cell.second.neighbors.clear();
 	}
 
 	// Compute each cell's neighbors list
-	for (auto& cell : m_activeCells) // NOLINT
+	for (typename std::unordered_map<size_t, typename Grid<T, N>::CellContent>::reference cell : m_activeCells)
 	{
 		getNeighborsCellIds(cell.first, &cellsIds, &cellsValidities);
 
