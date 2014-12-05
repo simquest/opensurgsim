@@ -276,10 +276,9 @@ TEST(BasicThreadTest, RealTimings)
 	MockThread m;
 	m.start(nullptr);
 
-	while(m.getRealTime() < 0.00001);
-	std::cout << m.getRealRate() << " fps" << std::endl;
-	m.resetTimer();
-	EXPECT_LT(m.getRealTime(), 0.00001);
+	while(m.getTimer().getCumulativeTime() < 0.00001);
+	EXPECT_GT(m.getTimer().getCumulativeTime(), 0.00001);
+	EXPECT_GT(m.getTimer().getAverageFrameRate(), 0.0);
 
 	m.stop();
 }

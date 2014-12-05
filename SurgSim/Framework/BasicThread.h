@@ -119,14 +119,8 @@ public:
 	/// \return	true if synchronized, false if not.
 	bool isSynchronous();
 
-	/// \return the actual cumulative time of all doUpdate calls since last timer reset in [s]
-	double getRealTime() const;
-
-	/// \return the actual rate since last timer reset in [frame/s]
-	double getRealRate() const;
-
-	/// Reset the timer used to measure real time/rate
-	void resetTimer();
+	/// \return the timer measuring the performance of this thread
+	const Timer& getTimer() const;
 
 protected:
 

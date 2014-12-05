@@ -246,19 +246,9 @@ bool BasicThread::isSynchronous()
 	return m_isSynchronous;
 }
 
-double BasicThread::getRealTime() const
+const Timer& BasicThread::getTimer() const
 {
-	return m_timer.getCumulativeTime();
-}
-
-double BasicThread::getRealRate() const
-{
-	return m_timer.getAverageFrameRate();
-}
-
-void BasicThread::resetTimer()
-{
-	m_timer.start();
+	return m_timer;
 }
 
 bool BasicThread::doUpdate(double dt)
