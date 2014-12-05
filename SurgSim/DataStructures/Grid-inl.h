@@ -24,55 +24,66 @@ namespace DataStructures
 namespace
 {
 
-/// Class handling number in a given base with a given number of digit
+/// Class handling number in a given base with a given number of digits
 /// Example numbers in base 3 with 3 digits are defined in order:
 /// 000, 001, 002, 010, 011, 012, 020, 021, 022,
 /// 100, 101, 102, 110, 111, 112, 120, 121, 122
 /// 200, 201, 202, 210, 211, 212, 220, 221, 222
 /// Note that the storage is done in Eigen column-major vector (ith entry corresponds to the ith degree of the base)
+/// Expected usage looking for all neighbors in a 3d array:
+///    Number<size_t, 3, 3> neighborOffset;
+///    Eigen::Matrix<size_t, 3, 1> currentElement = ...; // Location of an element in a 3d grid;
+///    do{
+///      Eigen::Matrix<size_t, 3, 1> neighborElement = currentElement + neighborOffset;
+///      // do something with the neighbor element
+/// ...} while (neighborOffset.next());
 /// \tparam T The type storing the number (must be an integral type)
 /// \tparam B The base in which the number is expressed (must be within [2..9])
-/// \tparam N The number of digit for this number
+/// \tparam N The number of digits for this number
 template <typename T, size_t B, size_t N>
 class Number : public Eigen::Matrix<T, N, 1>
 {
 public:
 	static_assert(B > 1 && B < 10, "B (the base) needs to be within [2..9]");
 
+	/// Constructor
 	Number()
 	{
 		this->setZero();
 	}
 
+	/// \return the number expressed in base 10
 	size_t toDecimal() const
 	{
 		size_t value = 0;
-		size_t BPowerDim = 1;
-		for (size_t dim = 0; dim < N; ++dim)
+		size_t BexponentDigit = 1;
+		for (size_t digit = 0; digit < N; ++digit)
 		{
-			value += (*this)[dim] * BPowerDim;
-			BPowerDim *= B;
+			value += (*this)[digit] * BexponentDigit;
+			BexponentDigit *= B;
 		}
 		return value;
 	}
 
+	/// Increment the number
+	/// \return False if there is no next number on N digits, True otherwise.
 	bool next()
 	{
-		size_t dim = 0;
+		size_t digit = 0;
 		do
 		{
-			(*this)[dim]++;
-			if ((*this)[dim] == B)
+			(*this)[digit]++;
+			if ((*this)[digit] == B)
 			{
-				(*this)[dim] = 0;
+				(*this)[digit] = 0;
 			}
 			else
 			{
 				return true;
 			}
-			dim++;
+			digit++;
 		}
-		while (dim < N);
+		while (digit < N);
 
 		return false;
 	}
