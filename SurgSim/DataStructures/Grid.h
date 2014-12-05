@@ -112,7 +112,7 @@ protected:
 
 private:
 	/// Update the neighbors lists
-	void update(void);
+	void update();
 
 	/// Retrieve the neighboring cells id (including this cell)
 	/// \param cellId for which the neighbors cells are requested
