@@ -25,6 +25,44 @@
 #include <array>
 #include <limits>
 
+class ElementTest
+{
+public:
+	int m_number;
+	std::string m_string;
+
+	ElementTest() : m_number(-1), m_string("Empty"){}
+
+	explicit ElementTest(int i) : m_number(i) { std::stringstream s; s << i; m_string = s.str(); }
+
+	ElementTest(const ElementTest& e) : m_number(e.m_number), m_string(e.m_string){}
+
+	bool operator ==(const ElementTest& e) const
+	{
+		return m_number == e.m_number && m_string.compare(e.m_string) == 0;
+	}
+};
+
+// Add a hash function for this class
+namespace std
+{
+template <>
+struct hash<ElementTest>
+{
+	std::size_t operator()(const ElementTest& k) const
+	{
+		using std::size_t;
+		using std::hash;
+		using std::string;
+
+		// Compute individual hash values for first,
+		// second and third and combine them using XOR
+		// and bit shifting:
+		return (hash<string>()(k.m_string) ^ (hash<int>()(k.m_number) << 1));
+	}
+};
+}; // namespace std
+
 template<typename T>
 class Mock3DData
 {
@@ -476,7 +514,8 @@ class MockGrid : public SurgSim::DataStructures::Grid<T, N>
 public:
 	MockGrid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds) :
 		SurgSim::DataStructures::Grid<T,N>(cellSize, bounds)
-	{}
+	{
+	}
 
 	std::unordered_map<size_t, typename SurgSim::DataStructures::Grid<T, N>::CellContent>& getActiveCells()
 	{

@@ -26,6 +26,9 @@ set(UNIT_TEST_SOURCES
 	DataGroupTests.cpp
 	DataStructuresConvertTests.cpp
 	GridTests.cpp
+	Grid1DTests.cpp
+	Grid2DTests.cpp
+	Grid3DTests.cpp
 	ImageTest.cpp
 	IndexDirectoryTests.cpp
 	IndexedLocalCoordinateTest.cpp
@@ -44,6 +47,7 @@ set(UNIT_TEST_SOURCES
 )
 
 set(UNIT_TEST_HEADERS
+	GridTests.h
 	MockObjects.h
 )
 
