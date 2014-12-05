@@ -136,14 +136,16 @@ bool ParticleSystemRepresentation::update(double dt)
 		particleIter = nextIter;
 	}
 
-	bool result = false;
-	if (doUpdate(dt))
+	bool success = doUpdate(dt);
+	if (success)
 	{
-		boost::unique_lock<boost::shared_mutex> uniqueLock(m_mutex);
-		m_safeParticles = std::make_shared<std::vector<Particle>>(m_particles.cbegin(), m_particles.cend());
-		result = true;
+		auto particles = std::make_shared<std::vector<Particle>>(m_particles.cbegin(), m_particles.cend());
+		{
+			boost::unique_lock<boost::shared_mutex> uniqueLock(m_mutex);
+			std::swap(particles, m_safeParticles);
+		}
 	}
-	return result;
+	return success;
 }
 
 }; // namespace Particles
