@@ -30,8 +30,10 @@ ParticleSystemRepresentation::ParticleSystemRepresentation(const std::string& na
 	SurgSim::Framework::Representation(name),
 	m_maxParticles(0u),
 	m_state(std::make_shared<ParticlesState>()),
-	m_logger(SurgSim::Framework::Logger::getLogger(name))
+	m_logger(SurgSim::Framework::Logger::getLogger("Particles"))
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticleSystemRepresentation, size_t, MaxParticles, getMaxParticles,
+			setMaxParticles);
 }
 
 ParticleSystemRepresentation::~ParticleSystemRepresentation()
@@ -114,7 +116,7 @@ std::list<ParticleReference>& ParticleSystemRepresentation::getParticles()
 	return m_particles;
 }
 
-bool ParticleSystemRepresentation::update(double dt)
+void ParticleSystemRepresentation::update(double dt)
 {
 	for(auto particleIter = m_particles.begin(); particleIter != m_particles.end(); )
 	{
@@ -127,7 +129,7 @@ bool ParticleSystemRepresentation::update(double dt)
 		}
 		particleIter = nextIter;
 	}
-	return doUpdate(dt);
+	SURGSIM_LOG_IF(!doUpdate(dt), m_logger, WARNING) << "Particle System " << getName() << " failed to update.";
 }
 
 }; // namespace Particles

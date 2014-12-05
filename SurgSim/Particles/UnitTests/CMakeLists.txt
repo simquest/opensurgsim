@@ -18,6 +18,9 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	EmitterRepresentationTests.cpp
+	MockObjects.cpp
+	ParticleManagerTests.cpp
 	ParticleReferenceTests.cpp
 	ParticlesStateTests.cpp
 	ParticleSystemRepresentationTests.cpp
@@ -27,6 +30,7 @@ set(UNIT_TEST_SOURCES
 )
 
 set(UNIT_TEST_HEADERS
+	MockObjects.h
 )
 
 set(LIBS

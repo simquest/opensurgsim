@@ -80,7 +80,7 @@ public:
 
 	/// Update the particle system
 	/// \param dt The time step.
-	bool update(double dt);
+	void update(double dt);
 
 protected:
 	/// Maximum amount of particles allowed in this particle system.
