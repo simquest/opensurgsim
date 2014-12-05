@@ -89,8 +89,6 @@ public:
 	/// Useful vector type of various vectors
 	typedef Eigen::Matrix<size_t, dimension, 1> UintVectorND;
 	typedef Eigen::Matrix<double, dimension, 1> VectorND;
-	UintVectorND validPowerOf2Dimension1Cell;
-	UintVectorND invalidTooBigPowerOf2Dimension;
 	UintVectorND validPowerOf2Dimension;
 	UintVectorND validNumCellsPerDimension;
 	UintVectorND validOffsetPerDimension;
@@ -100,19 +98,25 @@ public:
 	VectorND m_size;
 
 	/// Grid min and max n-d vectors
-	Eigen::Matrix<double, dimension, 1> minExpected, maxExpected;
+	Eigen::AlignedBox<double, dimension> m_aabb;
+	Eigen::AlignedBox<double, dimension> m_aabb1Cell;
+	Eigen::AlignedBox<double, dimension> m_aabbTooBig;
 
 	virtual void SetUp() override
 	{
 		m_size = VectorND::LinSpaced(0.6, 1.67);
 
-		validPowerOf2Dimension1Cell = UintVectorND::Constant(0u);
-		invalidTooBigPowerOf2Dimension = UintVectorND::Constant(96u);
 		validPowerOf2Dimension = UintVectorND::Constant(4u);
 		validNumCellsPerDimension = UintVectorND::Constant(16u); // 2^4
 
-		minExpected = -(validNumCellsPerDimension.template cast<double>().cwiseProduct(m_size) * 0.5);
-		maxExpected = validNumCellsPerDimension.template cast<double>().cwiseProduct(m_size) * 0.5;
+		m_aabb.min() = -(validNumCellsPerDimension.template cast<double>().cwiseProduct(m_size) * 0.5);
+		m_aabb.max() = validNumCellsPerDimension.template cast<double>().cwiseProduct(m_size) * 0.5;
+
+		m_aabb1Cell.min() = -(m_size * 0.5);
+		m_aabb1Cell.max() = m_size * 0.5;
+
+		m_aabbTooBig.min() = -((1 << 30) * m_size * 0.5);
+		m_aabbTooBig.max() = (1 << 30) * m_size * 0.5;
 
 		// Offsets are {2^{powerOf2[1]+...+powerOf2[N-1]} , ... 2^{powerOf2[N-1]}, 2^{0}}
 		if (dimension >= 1)
@@ -172,20 +176,22 @@ TYPED_TEST(GridTestBase, ConstructorTest)
 {
 	typedef typename TestFixture::GridType GridType;
 
-	ASSERT_NO_THROW({GridType grid(this->m_size, this->validPowerOf2Dimension1Cell);});
-	ASSERT_NO_THROW({GridType grid(this->m_size, this->validPowerOf2Dimension);});
-	ASSERT_THROW({GridType grid(this->m_size, this->invalidTooBigPowerOf2Dimension);},
-		SurgSim::Framework::AssertionFailure);
+	ASSERT_NO_THROW({GridType grid(this->m_size, this->m_aabb1Cell);});
+	ASSERT_NO_THROW({GridType grid(this->m_size, this->m_aabb);});
+	if (this->dimension > 1)
+	{
+		ASSERT_THROW({GridType grid(this->m_size, this->m_aabbTooBig);},
+			SurgSim::Framework::AssertionFailure);
+	}
 
-	GridType grid(this->m_size, this->validPowerOf2Dimension);
+	GridType grid(this->m_size, this->m_aabb);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
 	ASSERT_TRUE(grid.getSize().isApprox(this->m_size));
 	ASSERT_TRUE(grid.getNumCells() == this->validNumCellsPerDimension);
 	ASSERT_TRUE(grid.getExponents() == this->validPowerOf2Dimension);
 	ASSERT_TRUE(grid.getOffsetExponents() == this->validOffsetPowerOf2PerDimension);
-	ASSERT_TRUE(grid.getAABB().min().isApprox(this->minExpected));
-	ASSERT_TRUE(grid.getAABB().max().isApprox(this->maxExpected));
+	ASSERT_TRUE(grid.getAABB().isApprox(this->m_aabb));
 }
 
 TYPED_TEST(GridTestBase, addElementTest)
@@ -193,7 +199,7 @@ TYPED_TEST(GridTestBase, addElementTest)
 	typedef typename TestFixture::GridType GridType;
 	typedef typename TestFixture::TypeElement TypeElement;
 
-	GridType grid(this->m_size, this->validPowerOf2Dimension);
+	GridType grid(this->m_size, this->m_aabb);
 
 	// Add an element outside of the grid
 	auto position =  3.0 * this->m_size.cwiseProduct(this->validNumCellsPerDimension.template cast<double>());
@@ -240,7 +246,7 @@ TYPED_TEST(GridTestBase, NeighborsTest)
 	typedef typename TestFixture::GridType GridType;
 	typedef typename TestFixture::TypeElement TypeElement;
 
-	GridType grid(this->m_size, this->validPowerOf2Dimension);
+	GridType grid(this->m_size, this->m_aabb);
 
 	// Build the following grid:
 	// Cell(e0, e1) <- neighbor -> Cell(e2) <- neighbor -> Cell(e3) <- ..not neighbor.. -> Cell(e4)
@@ -373,7 +379,7 @@ TYPED_TEST(Grid3DTestBase, Neighbors3DTest)
 	typedef typename TestFixture::GridType GridType;
 	typedef typename TestFixture::TypeElement TypeElement;
 
-	GridType grid(this->m_size, this->validPowerOf2Dimension);
+	GridType grid(this->m_size, this->m_aabb);
 
 	// Build a grid where we have 1 element per cell and 1 cell has all its neighbors populated
 	// The grid content would be for dimension x=0 (similar on dimension x=1 and x=2):
@@ -445,7 +451,7 @@ TYPED_TEST(GridTestBase, ResetTest)
 	typedef typename TestFixture::GridType GridType;
 	typedef typename TestFixture::TypeElement TypeElement;
 
-	GridType grid(this->m_size, this->validPowerOf2Dimension);
+	GridType grid(this->m_size, this->m_aabb);
 
 	TypeElement e0(0), e1(1);
 	grid.addElement(e0, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());

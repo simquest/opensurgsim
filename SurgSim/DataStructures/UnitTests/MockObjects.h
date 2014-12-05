@@ -474,8 +474,8 @@ template <typename T, size_t N>
 class MockGrid : public SurgSim::DataStructures::Grid<T, N>
 {
 public:
-	MockGrid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Matrix<size_t, N, 1>& exponents) :
-		SurgSim::DataStructures::Grid<T,N>(cellSize, exponents)
+	MockGrid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds) :
+		SurgSim::DataStructures::Grid<T,N>(cellSize, bounds)
 	{}
 
 	std::unordered_map<size_t, typename SurgSim::DataStructures::Grid<T, N>::CellContent>& getActiveCells()

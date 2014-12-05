@@ -91,12 +91,24 @@ public:
 }; // namespace
 
 template <typename T, size_t N>
-Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Matrix<size_t, N, 1>& exponents)
+Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds)
 	: m_size(cellSize),
-	m_exponents(exponents),
+	m_aabb(bounds),
 	m_neighborsDirtyFlag(false)
 {
 	static_assert(N >= 1, "A grid must have a positive non null dimension");
+
+	Eigen::Matrix<double, N, 1> exactNumCells = m_aabb.sizes().cwiseQuotient(m_size);
+	for (size_t i = 0; i < N; ++i)
+	{
+		m_exponents[i] = static_cast<size_t>(std::log(exactNumCells[i]) / std::log(2.0));
+		// Choose the next bigger power of 2, if the number of cells is not exactly a power of 2
+		if (exactNumCells[i] > static_cast<double>(1u << m_exponents[i]))
+		{
+			m_exponents[i]++;
+		}
+		m_numCells[i] = (1u << m_exponents[i]);
+	}
 
 	// Check that the size of the requested grid fit the current architecture.
 	size_t maximumCellsPowerOf2 = sizeof(size_t) * 8;
@@ -104,14 +116,6 @@ Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Matri
 	SURGSIM_ASSERT(requestedCellsPowerOf2 <= maximumCellsPowerOf2) << "The requested grid dimension (2^"
 		<< requestedCellsPowerOf2 << " cells) is too large for the "
 		<< maximumCellsPowerOf2 << " bit architecture";
-
-	for (size_t i = 0; i < N; ++i)
-	{
-		m_numCells[i] = (static_cast<size_t>(1u) << exponents[i]);
-	}
-
-	m_aabb.min() = -(m_size.cwiseProduct(m_numCells.template cast<double>())) * 0.5;
-	m_aabb.max() = (m_size.cwiseProduct(m_numCells.template cast<double>())) * 0.5;
 
 	// Cell indexing goes as follow:
 	// Example: a cell in 3d with the indices (i, j, k) will have a 1d index of

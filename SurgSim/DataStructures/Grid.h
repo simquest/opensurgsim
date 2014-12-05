@@ -39,12 +39,8 @@ struct powerOf3<0>
 	enum { value = 1 };
 };
 
-/// n-dimension grid structure with a fixed uniform size on all directions
+/// n-dimensional grid structure with uniform non-cubic cells
 /// This data structure is useful to search for neighbors in a given range (the size of each cell)
-/// This grid is optimized to contain 2^exponents[i] number of cells per dimension and is
-/// formed of cells of size 'size':
-/// from -0.5 * size[dimension] * pow(2, exponents[dimension])
-/// to    0.5 * size[dimension] * pow(2, exponents[dimension])
 /// \tparam T Element type to be stored
 /// \tparam N The dimension of the grid (i.e. 2 => 2D, 3 => 3D)
 template <typename T, size_t N>
@@ -53,12 +49,8 @@ class Grid
 public:
 	/// Constructor
 	/// \param cellSize The size of each cell in dimension N (i.e. cells are not necessarily cubic).
-	/// \param exponents For each cell the exponent to 2 indicating the requested number of cell per dimension,
-	///        the sum of all the exponents can't exceed the architecture bit size i.e. 32 and 64 respectively
-	/// \note Power of 2 limitation:<br>
-	/// \note * 32 bit architecture: maximum exponents sum is 32, for example in 3d {{10, 10, 10}}<br>
-	/// \note * 64 bit architecture: maximum exponents sum is 64, for example in 3d {{21, 21, 21}}
-	Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Matrix<size_t, N, 1>& exponents);
+	/// \param bounds The dimension-N boundaries of the space covered by the grid.
+	Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds);
 
 	/// Destructor
 	virtual ~Grid();
