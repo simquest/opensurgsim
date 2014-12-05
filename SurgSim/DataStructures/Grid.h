@@ -50,6 +50,8 @@ public:
 	/// Constructor
 	/// \param cellSize The size of each cell in dimension N (i.e. cells are not necessarily cubic).
 	/// \param bounds The dimension-N boundaries of the space covered by the grid.
+	/// \note The only restriction is that the maximum number of cells should hold on the cpu architecture.
+	/// \note If not, an exception will be raised.
 	Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds);
 
 	/// Destructor
