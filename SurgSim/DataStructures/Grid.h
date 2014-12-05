@@ -101,9 +101,6 @@ protected:
 	/// Exponent of 2 cells per dimension
 	Eigen::Matrix<size_t, N, 1> m_exponents;
 
-	/// Offset for each dimension to go from n-d array to 1d array and vice-versa
-	Eigen::Matrix<size_t, N, 1> m_offsets;
-
 	/// Offset (in exponent of 2) for each dimension to go from n-d array to 1d array and vice-versa
 	Eigen::Matrix<size_t, N, 1> m_offsetExponents;
 

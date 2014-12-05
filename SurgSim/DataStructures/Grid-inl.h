@@ -83,6 +83,8 @@ template <typename T, size_t N>
 Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Matrix<size_t, N, 1>& exponents)
 	: m_neighborsDirtyFlag(false)
 {
+	static_assert(N >= 1, "A grid must have a positive non null dimension");
+
 	// Check that the size of the requested grid fit the current architecture.
 	size_t maximumCellsPowerOf2 = sizeof(size_t) * 8;
 	size_t requestedCellsPozerOf2 = exponents.sum();
@@ -101,15 +103,10 @@ Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Matri
 
 	// Cell indexing goes as follow:
 	// Example: a cell in 3d with the indices (i, j, k) will have a 1d index of
-	// i * m_offsetPerDimension[0] + j * m_offsetPerDimension[1] + k * m_offsetPerDimension[2]
-	if (N >= 1)
-	{
-		m_offsets[N - 1] = 1;
-		m_offsetExponents[N - 1] = 0;
-	}
+	// i * (1 << m_offsetExponents[0]) + j * (1 << m_offsetExponents[1]) + k * (1 << m_offsetExponents[2])
+	m_offsetExponents[N - 1] = 0;
 	for (int i = static_cast<int>(N) - 2; i >= 0; i--)
 	{
-		m_offsets[i] = m_offsets[i + 1] * m_numCells[i + 1];
 		m_offsetExponents[i] = m_offsetExponents[i + 1] + m_exponents[i + 1];
 	}
 }

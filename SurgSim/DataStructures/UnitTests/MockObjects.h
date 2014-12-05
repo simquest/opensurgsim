@@ -496,8 +496,6 @@ public:
 
 	Eigen::Matrix<size_t, N, 1> getExponents() const { return this->m_exponents; }
 
-	Eigen::Matrix<size_t, N, 1> getOffsets() const { return this->m_offsets; }
-
 	Eigen::Matrix<size_t, N, 1> getOffsetExponents() const { return this->m_offsetExponents; }
 
 	Eigen::AlignedBox<double, N> getAABB() const { return this->m_aabb; }

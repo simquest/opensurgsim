@@ -183,7 +183,6 @@ TYPED_TEST(GridTestBase, ConstructorTest)
 	ASSERT_TRUE(grid.getSize().isApprox(this->m_size));
 	ASSERT_TRUE(grid.getNumCells() == this->validNumCellsPerDimension);
 	ASSERT_TRUE(grid.getExponents() == this->validPowerOf2Dimension);
-	ASSERT_TRUE(grid.getOffsets() == this->validOffsetPerDimension);
 	ASSERT_TRUE(grid.getOffsetExponents() == this->validOffsetPowerOf2PerDimension);
 	ASSERT_TRUE(grid.getAABB().min().isApprox(this->minExpected));
 	ASSERT_TRUE(grid.getAABB().max().isApprox(this->maxExpected));
