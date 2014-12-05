@@ -30,6 +30,7 @@ namespace Particles
 ParticleSystemRepresentation::ParticleSystemRepresentation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
 	m_maxParticles(0u),
+	m_safeParticles(std::make_shared<std::vector<Particle>>()),
 	m_state(std::make_shared<ParticlesState>()),
 	m_logger(SurgSim::Framework::Logger::getLogger(name))
 {
@@ -64,11 +65,10 @@ bool ParticleSystemRepresentation::addParticle(const Particle& particle)
 {
 	SURGSIM_ASSERT(isInitialized()) << "Cannot add particles before initialization";
 	bool result;
-	std::list<ParticleReference>& particles = m_particles.unsafeGet();
 	if (!m_unusedParticles.empty())
 	{
 		(*m_unusedParticles.begin()) = particle;
-		particles.splice(particles.end(), m_unusedParticles, m_unusedParticles.begin());
+		m_particles.splice(m_particles.end(), m_unusedParticles, m_unusedParticles.begin());
 		result = true;
 	}
 	else
@@ -97,11 +97,10 @@ bool ParticleSystemRepresentation::addParticles(const std::vector<Particle>& par
 bool ParticleSystemRepresentation::removeParticle(const ParticleReference& particle)
 {
 	bool result;
-	std::list<ParticleReference>& particles = m_particles.unsafeGet();
-	auto found = std::find(particles.begin(), particles.end(), particle);
-	if (found != particles.end())
+	auto found = std::find(m_particles.begin(), m_particles.end(), particle);
+	if (found != m_particles.end())
 	{
-		m_unusedParticles.splice(m_unusedParticles.end(), particles, found);
+		m_unusedParticles.splice(m_unusedParticles.end(), m_particles, found);
 		result = true;
 	}
 	else
@@ -112,22 +111,27 @@ bool ParticleSystemRepresentation::removeParticle(const ParticleReference& parti
 	return result;
 }
 
-ParticleSystemRepresentation::BufferedParticles& ParticleSystemRepresentation::getParticles()
+std::list<ParticleReference>& ParticleSystemRepresentation::getParticleReferences()
 {
 	return m_particles;
 }
 
+std::shared_ptr<const std::vector<Particle>> ParticleSystemRepresentation::getParticles() const
+{
+	boost::shared_lock<boost::shared_mutex> sharedLock(m_mutex);
+	return m_safeParticles;
+}
+
 bool ParticleSystemRepresentation::update(double dt)
 {
-	std::list<ParticleReference>& particles = m_particles.unsafeGet();
-	for(auto particleIter = particles.begin(); particleIter != particles.end(); )
+	for(auto particleIter = m_particles.begin(); particleIter != m_particles.end(); )
 	{
 		auto nextIter = particleIter;
 		nextIter++;
 		particleIter->setLifetime(particleIter->getLifetime() - dt);
 		if (particleIter->getLifetime() <= 0)
 		{
-			m_unusedParticles.splice(m_unusedParticles.end(), particles, particleIter);
+			m_unusedParticles.splice(m_unusedParticles.end(), m_particles, particleIter);
 		}
 		particleIter = nextIter;
 	}
@@ -135,7 +139,8 @@ bool ParticleSystemRepresentation::update(double dt)
 	bool result = false;
 	if (doUpdate(dt))
 	{
-		m_particles.publish();
+		boost::unique_lock<boost::shared_mutex> uniqueLock(m_mutex);
+		m_safeParticles = std::make_shared<std::vector<Particle>>(m_particles.cbegin(), m_particles.cend());
 		result = true;
 	}
 	return result;

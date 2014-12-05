@@ -16,12 +16,12 @@
 #ifndef SURGSIM_PARTICLES_PARTICLESYSTEMREPRESENTATION_H
 #define SURGSIM_PARTICLES_PARTICLESYSTEMREPRESENTATION_H
 
+#include <boost/thread.hpp>
 #include <list>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Representation.h"
 
 
@@ -76,14 +76,14 @@ public:
 	/// \param particle A reference to a particle to remove
 	bool removeParticle(const ParticleReference& particle);
 
-	/// Type of the BufferedValue for Particles
-	typedef SurgSim::DataStructures::BufferedValue<std::list<ParticleReference>, std::vector<Particle>>
-		BufferedParticles;
+	/// Get references to the internal particles
+	/// \note this is thread unsafe access to the internal state of the particle system
+	/// \return A list of ParticleReference
+	std::list<ParticleReference>& getParticleReferences();
 
-	/// Get the particles using a BufferedValue, providing a copy of the data (safeGet) and
-	/// direct access to the system's internal particles (unsafeGet).
-	/// \return A BufferedValue of Particles
-	BufferedParticles& getParticles();
+	/// Get a copy of the particles in a thread safe manner
+	/// \return A vector of particles
+	std::shared_ptr<const std::vector<Particle>> getParticles() const;
 
 	/// Update the particle system
 	/// \param dt The time step.
@@ -94,16 +94,22 @@ protected:
 	size_t m_maxParticles;
 
 	/// List of particles.
-	BufferedParticles m_particles;
+	std::list<ParticleReference> m_particles;
 
 	/// List of unused particles.
 	std::list<ParticleReference> m_unusedParticles;
+
+	/// Thread safe copy of the particles
+	std::shared_ptr<std::vector<Particle>> m_safeParticles;
 
 	/// The particle system state.
 	std::shared_ptr<ParticlesState> m_state;
 
 	/// Logger used by the particle system.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
+	/// The mutex used to lock the particles
+	mutable boost::shared_mutex m_mutex;
 
 private:
 	/// Implementation of the specific behavior of the particle system
