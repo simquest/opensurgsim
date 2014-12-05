@@ -146,7 +146,7 @@ template <class Derived>
 void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& position)
 {
 	// Only add element that are located in the grid
-	if (!(position.array() >= m_aabb.min().array() && position.array() <= m_aabb.max().array()).all())
+	if (!m_aabb.contains(position))
 	{
 		return;
 	}
@@ -155,12 +155,7 @@ void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& p
 	// Example in 3D: cell (i, j, k) has 3D min/max coordinates
 	//   min[axis] = (size[axis] * (-numCellPerDim[axis] / 2 + i)
 	//   max[axis] = (size[axis] * (-numCellPerDim[axis] / 2 + i + 1)
-	Eigen::Matrix<int, N, 1> cellIdnD;
-	for (size_t i = 0; i < N; ++i)
-	{
-		double cellIdForThisDimension = position[i] / m_size[i] + static_cast<double>(m_numCells[i] >> 1);
-		cellIdnD[i] = static_cast<int>(floor(cellIdForThisDimension));
-	}
+	Eigen::Matrix<int, N, 1> cellIdnD = ((position - m_aabb.min()).cwiseQuotient(m_size)).template cast<int>();
 
 	// Find the dimension-1 cell id from the dimension-N cell id
 	size_t cellId1D = mappingNdTo1d(cellIdnD);
