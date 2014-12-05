@@ -16,6 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_GRID_INL_H
 #define SURGSIM_DATASTRUCTURES_GRID_INL_H
 
+#include <boost/functional/hash.hpp>
+
 namespace SurgSim
 {
 namespace DataStructures
@@ -90,6 +92,13 @@ public:
 };
 }; // namespace
 
+
+template <typename T, size_t N>
+size_t Grid<T, N>::NDIdHash::operator()(const NDId& nd) const
+{
+	return boost::hash_range(nd.data(), nd.data() + N);
+}
+
 template <typename T, size_t N>
 Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds)
 	: m_size(cellSize),
@@ -97,34 +106,6 @@ Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Align
 	m_neighborsDirtyFlag(false)
 {
 	static_assert(N >= 1, "A grid must have a positive non null dimension");
-
-	Eigen::Matrix<double, N, 1> exactNumCells = m_aabb.sizes().cwiseQuotient(m_size);
-	for (size_t i = 0; i < N; ++i)
-	{
-		m_exponents[i] = static_cast<size_t>(std::log(exactNumCells[i]) / std::log(2.0));
-		// Choose the next bigger power of 2, if the number of cells is not exactly a power of 2
-		if (exactNumCells[i] > static_cast<double>(static_cast<size_t>(1) << m_exponents[i]))
-		{
-			m_exponents[i]++;
-		}
-		m_numCells[i] = (static_cast<size_t>(1) << m_exponents[i]);
-	}
-
-	// Check that the size of the requested grid fit the current architecture.
-	size_t maximumCellsPowerOf2 = sizeof(size_t) * 8;
-	size_t requestedCellsPowerOf2 = m_exponents.sum();
-	SURGSIM_ASSERT(requestedCellsPowerOf2 <= maximumCellsPowerOf2) << "The requested grid dimension (2^"
-		<< requestedCellsPowerOf2 << " cells) is too large for the "
-		<< maximumCellsPowerOf2 << " bit architecture";
-
-	// Cell indexing goes as follow:
-	// Example: a cell in 3d with the indices (i, j, k) will have a 1d index of
-	// i * (1 << m_offsetExponents[0]) + j * (1 << m_offsetExponents[1]) + k * (1 << m_offsetExponents[2])
-	m_offsetExponents[N - 1] = 0;
-	for (int i = static_cast<int>(N) - 2; i >= 0; i--)
-	{
-		m_offsetExponents[i] = m_offsetExponents[i + 1] + m_exponents[i + 1];
-	}
 }
 
 template <typename T, size_t N>
@@ -159,16 +140,13 @@ void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& p
 	// Example in 3D: cell (i, j, k) has 3D min/max coordinates
 	//   min[axis] = (size[axis] * (-numCellPerDim[axis] / 2 + i)
 	//   max[axis] = (size[axis] * (-numCellPerDim[axis] / 2 + i + 1)
-	Eigen::Matrix<int, N, 1> cellIdnD = ((position - m_aabb.min()).cwiseQuotient(m_size)).template cast<int>();
-
-	// Find the dimension-1 cell id from the dimension-N cell id
-	size_t cellId1D = mapNdTo1d(cellIdnD);
+	NDId cellId = ((position - m_aabb.min()).cwiseQuotient(m_size)).template cast<int>();
 
 	// Register the element into its corresponding cell if it exists, or creates it.
-	m_activeCells[cellId1D].elements.push_back(element);
+	m_activeCells[cellId].elements.push_back(element);
 
 	// Add this element in the map [element -> cellID]
-	m_cellIds[element] = cellId1D;
+	m_cellIds[element] = cellId;
 
 	/// Flag that the neighbors list will need to be recomputed on the next access
 	m_neighborsDirtyFlag = true;
@@ -177,25 +155,23 @@ void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& p
 template <typename T, size_t N>
 void Grid<T, N>::update(void)
 {
-	Eigen::Matrix<size_t, powerOf3<N>::value, 1> cellsIds;
-	Eigen::Matrix<bool, powerOf3<N>::value, 1> cellsValidities;
+	std::array<NDId, powerOf3<N>::value> cellsIds;
 
 	// Start by clearing up all the neighbor's list
-	for (typename std::unordered_map<size_t, typename Grid<T, N>::CellContent>::reference cell : m_activeCells)
+	for (typename std::unordered_map<NDId, typename Grid<T, N>::CellContent, NDIdHash>::reference cell : m_activeCells)
 	{
 		cell.second.neighbors.clear();
 	}
 
 	// Compute each cell's neighbors list
-	for (typename std::unordered_map<size_t, typename Grid<T, N>::CellContent>::reference cell : m_activeCells)
+	for (typename std::unordered_map<NDId, typename Grid<T, N>::CellContent, NDIdHash>::reference cell : m_activeCells)
 	{
-		getNeighborsCellIds(cell.first, &cellsIds, &cellsValidities);
+		getNeighborsCellIds(cell.first, &cellsIds);
 
 		for (size_t index = 0; index < powerOf3<N>::value; ++index)
 		{
-			// Check neighbor's cell validity and use symmetry between pair of cells
-			// to only treat neighbors with a larger or equal id.
-			if (cellsValidities[index] && cellsIds[index] >= cell.first)
+			// Use symmetry between pair of cells to only treat neighbors with a larger or equal id.
+			if (isNdGreaterOrEqual(cellsIds[index], cell.first))
 			{
 				auto neighborCell = m_activeCells.find(cellsIds[index]);
 				if (neighborCell != m_activeCells.end())
@@ -236,14 +212,9 @@ const std::vector<T>& Grid<T, N>::getNeighbors(const T& element)
 }
 
 template <typename T, size_t N>
-void Grid<T, N>::getNeighborsCellIds(size_t cellId,
-	Eigen::Matrix<size_t, powerOf3<N>::value, 1>* cellsIds,
-	Eigen::Matrix<bool, powerOf3<N>::value, 1>* cellsValidities)
+void Grid<T, N>::getNeighborsCellIds(NDId cellId,
+	std::array<NDId, powerOf3<N>::value>* cellsIds)
 {
-	// In which cell are we in the dimension-N array ?
-	Eigen::Matrix<int, N, 1> cellIdnDOriginal;
-	map1dToNd(cellId, &cellIdnDOriginal);
-
 	// Now build up all the 3^N neighbors cell around this n-d cell
 	// It corresponds to all possible permutation in dimension-N of the indices
 	// {(cellIdnD[0] - 1, cellIdnD[0], cellIdnD[0] + 1) x ... x
@@ -254,51 +225,32 @@ void Grid<T, N>::getNeighborsCellIds(size_t cellId,
 	//   000 001 002 010 011 012 020 021 022
 	//   100 101 102 110 111 112 120 121 122
 	//   200 201 202 210 211 212 220 221 222
-
-	cellIdnDOriginal -= Eigen::Matrix<int, N, 1>::Ones();
+	cellId -= NDId::Ones();
 
 	Number<int, 3, N> currentNumberNDigitBase3;
 	for (size_t i = 0; i < powerOf3<N>::value; ++i)
 	{
-		mapNdTo1d(cellIdnDOriginal + currentNumberNDigitBase3, &(*cellsIds)[i], &(*cellsValidities)[i]);
+		(*cellsIds)[i] = cellId + currentNumberNDigitBase3;
 		currentNumberNDigitBase3.next();
 	}
 }
 
 template <typename T, size_t N>
-size_t Grid<T, N>::mapNdTo1d(const Eigen::Matrix<int, N, 1>& nd) const
-{
-	size_t oned = 0;
-
-	for (size_t i = 0; i < N; ++i)
-	{
-		oned |= static_cast<size_t>(nd[i]) << m_offsetExponents[i];
-	}
-
-	return oned;
-}
-
-template <typename T, size_t N>
-void Grid<T, N>::mapNdTo1d(const Eigen::Matrix<int, N, 1>& nd, size_t* oned, bool* valid) const
-{
-	if ((nd.array() < 0).any() ||
-		(nd.template cast<size_t>().array() >= m_numCells.array()).any())
-	{
-		*valid = false;
-	}
-
-	*oned = mapNdTo1d(nd);
-	*valid = true;
-}
-
-template <typename T, size_t N>
-void Grid<T, N>::map1dToNd(size_t oned, Eigen::Matrix<int, N, 1>* nd) const
+bool Grid<T, N>::isNdGreaterOrEqual(const NDId& a, const NDId& b)
 {
 	for (size_t i = 0; i < N; ++i)
 	{
-		(*nd)[i] = static_cast<int>(oned >> m_offsetExponents[i]);
-		oned -= static_cast<size_t>((*nd)[i]) << m_offsetExponents[i];
+		if (a[i] > b[i])
+		{
+			return true;
+		}
+
+		if (a[i] < b[i])
+		{
+			return false;
+		}
 	}
+	return true;
 }
 
 }; // namespace DataStructures

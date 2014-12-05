@@ -50,8 +50,6 @@ public:
 	/// Constructor
 	/// \param cellSize The size of each cell in dimension N (i.e. cells are not necessarily cubic).
 	/// \param bounds The dimension-N boundaries of the space covered by the grid.
-	/// \note The only restriction is that the maximum number of cells should hold on the cpu architecture.
-	/// \note If not, an exception will be raised.
 	Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds);
 
 	/// Destructor
@@ -80,23 +78,24 @@ protected:
 		std::vector<T> neighbors;
 	} CellContent;
 
+	/// The type of the n-dimensional cell Id.
+	typedef Eigen::Matrix<int, N, 1> NDId;
+
+	/// Enable the NDId to be used as a key in an unordered map.
+	class NDIdHash
+	{
+	public:
+		size_t operator()(const NDId& nd) const;
+	};
+
 	/// Active cells (referenced by their ids (spatial hashing)) with their content
-	std::unordered_map<size_t, CellContent> m_activeCells;
+	std::unordered_map<NDId, CellContent, NDIdHash> m_activeCells;
 
 	/// Mapping from element to cell id containing the element
-	std::unordered_map<T, size_t> m_cellIds;
+	std::unordered_map<T, NDId> m_cellIds;
 
 	/// Size of each cell (same on all dimension)
 	Eigen::Matrix<double, N, 1> m_size;
-
-	/// Number of cells per dimension
-	Eigen::Matrix<size_t, N, 1> m_numCells;
-
-	/// Exponent of 2 cells per dimension
-	Eigen::Matrix<size_t, N, 1> m_exponents;
-
-	/// Offset (in exponent of 2) for each dimension to go from n-d array to 1d array and vice-versa
-	Eigen::Matrix<size_t, N, 1> m_offsetExponents;
 
 	/// Grid min and max
 	Eigen::AlignedBox<double, N> m_aabb;
@@ -110,29 +109,14 @@ private:
 
 	/// Retrieve the neighboring cells id (including this cell)
 	/// \param cellId for which the neighbors cells are requested
-	/// \param cellsIds [out] Neighbors cells ids (only if a cell is valid, undefined otherwise)
-	/// \param cellsValidities [out] Neighbors cells validity (True if a cell exists in the grid, false otherwise)
-	void getNeighborsCellIds(size_t cellId,
-		Eigen::Matrix<size_t, powerOf3<N>::value, 1>* cellsIds,
-		Eigen::Matrix<bool, powerOf3<N>::value, 1>* cellsValidities);
+	/// \param cellsIds [out] Neighbors cells ids
+	void getNeighborsCellIds(NDId cellId,
+		std::array<NDId, powerOf3<N>::value>* cellsIds);
 
-	/// Cell id mapping from dimension-N to dimension-1 (without input validity check)
-	/// \param nd The cell id in dimension-N
-	/// \return The cell id in dimension-1
-	/// \note No check is performed on the validity of the input cell id.
-	/// \note Return value undefined if invalid input
-	size_t mapNdTo1d(const Eigen::Matrix<int, N, 1>& nd) const;
-
-	/// Cell id mapping from dimension-N to dimension-1 (with input validity check)
-	/// \param nd The cell id in dimension-N
-	/// \param [out] oned The cell id in dimension-1 if valid is True, undefined otherwise
-	/// \param [out] valid The cell validity (grid spatial limit check)
-	void mapNdTo1d(const Eigen::Matrix<int, N, 1>& nd, size_t* oned, bool* valid) const;
-
-	/// Cell id mapping from dimension-1 to dimension-N (without input validity check)
-	/// \param oned A dimension-1 id
-	/// \param [out] nd The cell dimension-d id
-	void map1dToNd(size_t oned, Eigen::Matrix<int, N, 1>* nd) const;
+	/// \param a The first cell ID.
+	/// \param b The second cell ID.
+	/// \return true if a is > b.
+	bool isNdGreaterOrEqual(const NDId& a, const NDId& b);
 };
 
 };  // namespace DataStructures

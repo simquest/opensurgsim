@@ -512,17 +512,17 @@ template <typename T, size_t N>
 class MockGrid : public SurgSim::DataStructures::Grid<T, N>
 {
 public:
+	typedef typename SurgSim::DataStructures::Grid<T, N>::CellContent CellContent;
+	typedef typename SurgSim::DataStructures::Grid<T, N>::NDId NDId;
+	typedef typename SurgSim::DataStructures::Grid<T, N>::NDIdHash NDIdHash;
+
 	MockGrid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds) :
 		SurgSim::DataStructures::Grid<T,N>(cellSize, bounds)
-	{
-	}
+	{}
 
-	std::unordered_map<size_t, typename SurgSim::DataStructures::Grid<T, N>::CellContent>& getActiveCells()
-	{
-		return this->m_activeCells;
-	}
+	std::unordered_map<NDId, CellContent, NDIdHash>& getActiveCells() { return this->m_activeCells; }
 
-	std::unordered_map<T, size_t>& getCellIds() { return this->m_cellIds; }
+	std::unordered_map<T, NDId>& getCellIds() { return this->m_cellIds; }
 
 	std::vector<T>& getNonConstNeighbors(const T& element)
 	{
@@ -530,12 +530,6 @@ public:
 	}
 
 	Eigen::Matrix<double, N, 1> getSize() const { return this->m_size; }
-
-	Eigen::Matrix<size_t, N, 1> getNumCells() const { return this->m_numCells; }
-
-	Eigen::Matrix<size_t, N, 1> getExponents() const { return this->m_exponents; }
-
-	Eigen::Matrix<size_t, N, 1> getOffsetExponents() const { return this->m_offsetExponents; }
 
 	Eigen::AlignedBox<double, N> getAABB() const { return this->m_aabb; }
 };

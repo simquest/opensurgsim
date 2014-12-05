@@ -46,9 +46,6 @@ TYPED_TEST(Grid1DTestBase, ConstructorTest)
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
 	ASSERT_TRUE(grid.getSize().isApprox(this->m_size));
-	ASSERT_TRUE(grid.getNumCells() == this->validNumCellsPerDimension);
-	ASSERT_TRUE(grid.getExponents() == this->validPowerOf2Dimension);
-	ASSERT_TRUE(grid.getOffsetExponents() == this->validOffsetPowerOf2PerDimension);
 	ASSERT_TRUE(grid.getAABB().isApprox(this->m_aabb));
 }
 
@@ -60,13 +57,14 @@ TYPED_TEST(Grid1DTestBase, addElementTest)
 	GridType grid(this->m_size, this->m_aabb);
 
 	// Add an element outside of the grid
-	auto position =  3.0 * this->m_size.cwiseProduct(this->validNumCellsPerDimension.template cast<double>());
-	grid.addElement(TypeElement(), position);
+	auto positionMin =  this->m_aabb.max() - this->m_aabb.sizes() * 1.001;
+	grid.addElement(TypeElement(), positionMin);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
 
 	// Add an element outside of the grid
-	grid.addElement(TypeElement(), -position);
+	auto positionMax =  this->m_aabb.min() + this->m_aabb.sizes() * 1.001;
+	grid.addElement(TypeElement(), positionMax);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
 

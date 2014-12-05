@@ -25,10 +25,10 @@ set(UNIT_TEST_SOURCES
 	BufferedValueTests.cpp
 	DataGroupTests.cpp
 	DataStructuresConvertTests.cpp
-	GridTests.cpp
 	Grid1DTests.cpp
 	Grid2DTests.cpp
 	Grid3DTests.cpp
+	GridTests.cpp
 	ImageTest.cpp
 	IndexDirectoryTests.cpp
 	IndexedLocalCoordinateTest.cpp
