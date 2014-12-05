@@ -19,7 +19,6 @@
 #include <memory>
 #include <utility>
 #include <boost/thread.hpp>
-
 #include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
@@ -30,8 +29,7 @@ namespace DataStructures
 /// BufferedValue is a class to enable a representation of two values for one variable, where both values need to be
 /// accessible at the same time, one in a thread safe, single threaded context, the other in a thread unsafe context.
 /// \tparam T Type that is used for the value.
-/// \tparam ST The safe type if different than the Type T
-template <class T, class ST = T>
+template <class T>
 class BufferedValue
 {
 public:
@@ -55,20 +53,9 @@ public:
 
 	/// Get the buffered value
 	/// \return The value at the last call to publish.
-	std::shared_ptr<const ST> safeGet() const;
+	std::shared_ptr<const T> safeGet() const;
 
 private:
-	/// Implementation of publish
-	/// Will be used with container types, and is usefull when T and ST are
-	/// containers with different, but compatible types.
-	template <typename V>
-	void doPublish(decltype(typename V::const_iterator(), int()));
-
-	/// Implementation of publish
-	/// Default version of doPublish
-	template <typename>
-	void doPublish(...);
-
 	typedef boost::shared_lock<boost::shared_mutex> SharedLock;
 	typedef boost::unique_lock<boost::shared_mutex> UniqueLock;
 
@@ -76,7 +63,7 @@ private:
 	T m_value;
 
 	/// The buffered value
-	std::shared_ptr<const ST> m_safeValue;
+	std::shared_ptr<const T> m_safeValue;
 
 	/// The mutex used to lock for reading and writing
 	mutable boost::shared_mutex m_mutex;
