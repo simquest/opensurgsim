@@ -116,29 +116,29 @@ private:
 
 	/// Retrieve the neighboring cells id (including this cell)
 	/// \param cellId for which the neighbors cells are requested
-	/// \param cellsId [out] Neighbors cells ids (only if a cell is valid, undefined otherwise)
-	/// \param cellsValidity [out] Neighbors cells validity (True if a cell exists in the grid, false otherwise)
-	void getNeighborsCellId(size_t cellId,
-		Eigen::Matrix<size_t, powerOf3<N>::value, 1>* cellsId,
-		Eigen::Matrix<bool, powerOf3<N>::value, 1>* cellsValidity);
+	/// \param cellsIds [out] Neighbors cells ids (only if a cell is valid, undefined otherwise)
+	/// \param cellsValidities [out] Neighbors cells validity (True if a cell exists in the grid, false otherwise)
+	void getNeighborsCellIds(size_t cellId,
+		Eigen::Matrix<size_t, powerOf3<N>::value, 1>* cellsIds,
+		Eigen::Matrix<bool, powerOf3<N>::value, 1>* cellsValidities);
 
 	/// Cell id mapping from dimension-N to dimension-1 (without input validity check)
 	/// \param nd The cell id in dimension-N
 	/// \return The cell id in dimension-1
 	/// \note No check is performed on the validity of the input cell id.
 	/// \note Return value undefined if invalid input
-	size_t mappingNdTo1d(const Eigen::Matrix<int, N, 1>& nd) const;
+	size_t mapNdTo1d(const Eigen::Matrix<int, N, 1>& nd) const;
 
 	/// Cell id mapping from dimension-N to dimension-1 (with input validity check)
 	/// \param nd The cell id in dimension-N
 	/// \param [out] oned The cell id in dimension-1 if valid is True, undefined otherwise
 	/// \param [out] valid The cell validity (grid spatial limit check)
-	void mappingNdTo1d(const Eigen::Matrix<int, N, 1>& nd, size_t* oned, bool* valid) const;
+	void mapNdTo1d(const Eigen::Matrix<int, N, 1>& nd, size_t* oned, bool* valid) const;
 
-	/// Cell id correspondence from 1d to dimension-D (without input validity check)
+	/// Cell id mapping from dimension-1 to dimension-N (without input validity check)
 	/// \param oned A dimension-1 id
 	/// \param [out] nd The cell dimension-d id
-	void mapping1dToNd(size_t oned, Eigen::Matrix<int, N, 1>* nd) const;
+	void map1dToNd(size_t oned, Eigen::Matrix<int, N, 1>* nd) const;
 };
 
 };  // namespace DataStructures

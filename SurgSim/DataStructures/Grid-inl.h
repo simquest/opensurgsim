@@ -158,7 +158,7 @@ void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& p
 	Eigen::Matrix<int, N, 1> cellIdnD = ((position - m_aabb.min()).cwiseQuotient(m_size)).template cast<int>();
 
 	// Find the dimension-1 cell id from the dimension-N cell id
-	size_t cellId1D = mappingNdTo1d(cellIdnD);
+	size_t cellId1D = mapNdTo1d(cellIdnD);
 
 	// Register the element into its corresponding cell if it exists, or creates it.
 	m_activeCells[cellId1D].elements.push_back(element);
@@ -173,8 +173,8 @@ void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& p
 template <typename T, size_t N>
 void Grid<T, N>::update(void)
 {
-	Eigen::Matrix<size_t, powerOf3<N>::value, 1> cellsId;
-	Eigen::Matrix<bool, powerOf3<N>::value, 1> cellsValidity;
+	Eigen::Matrix<size_t, powerOf3<N>::value, 1> cellsIds;
+	Eigen::Matrix<bool, powerOf3<N>::value, 1> cellsValidities;
 
 	// Start by clearing up all the neighbor's list
 	for (auto& cell : m_activeCells) // NOLINT
@@ -185,22 +185,22 @@ void Grid<T, N>::update(void)
 	// Compute each cell's neighbors list
 	for (auto& cell : m_activeCells) // NOLINT
 	{
-		getNeighborsCellId(cell.first, &cellsId, &cellsValidity);
+		getNeighborsCellIds(cell.first, &cellsIds, &cellsValidities);
 
-		for (size_t neighborCellId = 0; neighborCellId < powerOf3<N>::value; ++neighborCellId)
+		for (size_t index = 0; index < powerOf3<N>::value; ++index)
 		{
 			// Check neighbor's cell validity and use symmetry between pair of cells
 			// to only treat neighbors with a larger or equal id.
-			if (cellsValidity[neighborCellId] && cellsId[neighborCellId] >= cell.first)
+			if (cellsValidities[index] && cellsIds[index] >= cell.first)
 			{
-				auto neighborCell = m_activeCells.find(cellsId[neighborCellId]);
+				auto neighborCell = m_activeCells.find(cellsIds[index]);
 				if (neighborCell != m_activeCells.end())
 				{
 					cell.second.neighbors.insert(cell.second.neighbors.end(),
 						neighborCell->second.elements.cbegin(), neighborCell->second.elements.cend());
 
 					// Treat symmetry if the cells are different
-					if (cellsId[neighborCellId] != cell.first)
+					if (cellsIds[index] != cell.first)
 					{
 						neighborCell->second.neighbors.insert(neighborCell->second.neighbors.end(),
 							cell.second.elements.cbegin(), cell.second.elements.cend());
@@ -232,13 +232,13 @@ const std::vector<T>& Grid<T, N>::getNeighbors(const T& element)
 }
 
 template <typename T, size_t N>
-void Grid<T, N>::getNeighborsCellId(size_t cellId,
-	Eigen::Matrix<size_t, powerOf3<N>::value, 1>* cellsId,
-	Eigen::Matrix<bool, powerOf3<N>::value, 1>* cellsValidity)
+void Grid<T, N>::getNeighborsCellIds(size_t cellId,
+	Eigen::Matrix<size_t, powerOf3<N>::value, 1>* cellsIds,
+	Eigen::Matrix<bool, powerOf3<N>::value, 1>* cellsValidities)
 {
 	// In which cell are we in the dimension-N array ?
 	Eigen::Matrix<int, N, 1> cellIdnDOriginal;
-	mapping1dToNd(cellId, &cellIdnDOriginal);
+	map1dToNd(cellId, &cellIdnDOriginal);
 
 	// Now build up all the 3^N neighbors cell around this n-d cell
 	// It corresponds to all possible permutation in dimension-N of the indices
@@ -256,13 +256,13 @@ void Grid<T, N>::getNeighborsCellId(size_t cellId,
 	Number<int, 3, N> currentNumberNDigitBase3;
 	for (size_t i = 0; i < powerOf3<N>::value; ++i)
 	{
-		mappingNdTo1d(cellIdnDOriginal + currentNumberNDigitBase3, &(*cellsId)[i], &(*cellsValidity)[i]);
+		mapNdTo1d(cellIdnDOriginal + currentNumberNDigitBase3, &(*cellsIds)[i], &(*cellsValidities)[i]);
 		currentNumberNDigitBase3.next();
 	}
 }
 
 template <typename T, size_t N>
-size_t Grid<T, N>::mappingNdTo1d(const Eigen::Matrix<int, N, 1>& nd) const
+size_t Grid<T, N>::mapNdTo1d(const Eigen::Matrix<int, N, 1>& nd) const
 {
 	size_t oned = 0;
 
@@ -275,7 +275,7 @@ size_t Grid<T, N>::mappingNdTo1d(const Eigen::Matrix<int, N, 1>& nd) const
 }
 
 template <typename T, size_t N>
-void Grid<T, N>::mappingNdTo1d(const Eigen::Matrix<int, N, 1>& nd, size_t* oned, bool* valid) const
+void Grid<T, N>::mapNdTo1d(const Eigen::Matrix<int, N, 1>& nd, size_t* oned, bool* valid) const
 {
 	if ((nd.array() < 0).any() ||
 		(nd.template cast<size_t>().array() >= m_numCells.array()).any())
@@ -283,12 +283,12 @@ void Grid<T, N>::mappingNdTo1d(const Eigen::Matrix<int, N, 1>& nd, size_t* oned,
 		*valid = false;
 	}
 
-	*oned = mappingNdTo1d(nd);
+	*oned = mapNdTo1d(nd);
 	*valid = true;
 }
 
 template <typename T, size_t N>
-void Grid<T, N>::mapping1dToNd(size_t oned, Eigen::Matrix<int, N, 1>* nd) const
+void Grid<T, N>::map1dToNd(size_t oned, Eigen::Matrix<int, N, 1>* nd) const
 {
 	for (size_t i = 0; i < N; ++i)
 	{
