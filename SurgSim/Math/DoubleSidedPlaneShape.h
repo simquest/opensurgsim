@@ -37,7 +37,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Math::DoubleSidedPlaneShape);
 
 	/// \return the type of the shape
-	virtual int getType() override;
+	virtual int getType() const override;
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)

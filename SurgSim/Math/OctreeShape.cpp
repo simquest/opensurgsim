@@ -53,7 +53,7 @@ OctreeShape::~OctreeShape()
 {
 }
 
-int OctreeShape::getType()
+int OctreeShape::getType() const
 {
 	return SHAPE_TYPE_OCTREE;
 }

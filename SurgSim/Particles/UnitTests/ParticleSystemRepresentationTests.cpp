@@ -22,6 +22,7 @@
 #include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/ParticlesState.h"
 #include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/UnitTests/MockObjects.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -30,21 +31,6 @@ namespace SurgSim
 {
 namespace Particles
 {
-
-class MockParticleSystem : public ParticleSystemRepresentation
-{
-public:
-	explicit MockParticleSystem(const std::string& name) :
-		ParticleSystemRepresentation(name)
-	{
-	}
-
-private:
-	virtual bool doUpdate(double dt)
-	{
-		return true;
-	}
-};
 
 TEST(ParticleSystemRepresentationTest, ConstructorTest)
 {

@@ -31,7 +31,7 @@ BoxShape::BoxShape(double sizeX, double sizeY, double sizeZ) :
 }
 
 
-int BoxShape::getType()
+int BoxShape::getType() const
 {
 	return SHAPE_TYPE_BOX;
 }

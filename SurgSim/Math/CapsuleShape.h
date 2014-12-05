@@ -39,7 +39,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Math::CapsuleShape);
 
 	/// \return the type of the shape
-	virtual int getType() override;
+	virtual int getType() const override;
 
 	/// Get the capsule length (i.e. cylinder length)
 	/// \return The capsule length (in m)

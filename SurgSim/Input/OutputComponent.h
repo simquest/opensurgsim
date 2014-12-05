@@ -18,7 +18,8 @@
 
 #include <string>
 #include <memory>
-#include "SurgSim/Framework/Component.h"
+
+#include "SurgSim/Framework/Representation.h"
 
 namespace SurgSim
 {
@@ -35,9 +36,9 @@ class OutputProducer;
 
 SURGSIM_STATIC_REGISTRATION(OutputComponent);
 
-/// OutputComponent is a Component that has an OutputProducer, a concrete instance of OutputProducerInterface, so that
-/// output devices can receive data through the normal component interface to SceneElements.
-class OutputComponent : public SurgSim::Framework::Component
+/// OutputComponents connect SceneElements to devices, facilitating data
+/// transfer from a SceneElement to a device.
+class OutputComponent : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor

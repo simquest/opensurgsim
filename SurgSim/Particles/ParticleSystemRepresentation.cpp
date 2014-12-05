@@ -32,8 +32,10 @@ ParticleSystemRepresentation::ParticleSystemRepresentation(const std::string& na
 	m_maxParticles(0u),
 	m_safeParticles(std::make_shared<std::vector<Particle>>()),
 	m_state(std::make_shared<ParticlesState>()),
-	m_logger(SurgSim::Framework::Logger::getLogger(name))
+	m_logger(SurgSim::Framework::Logger::getLogger("Particles"))
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticleSystemRepresentation, size_t, MaxParticles, getMaxParticles,
+			setMaxParticles);
 }
 
 ParticleSystemRepresentation::~ParticleSystemRepresentation()
@@ -122,7 +124,7 @@ std::shared_ptr<const std::vector<Particle>> ParticleSystemRepresentation::getPa
 	return m_safeParticles;
 }
 
-bool ParticleSystemRepresentation::update(double dt)
+void ParticleSystemRepresentation::update(double dt)
 {
 	for(auto particleIter = m_particles.begin(); particleIter != m_particles.end(); )
 	{
@@ -136,8 +138,7 @@ bool ParticleSystemRepresentation::update(double dt)
 		particleIter = nextIter;
 	}
 
-	bool success = doUpdate(dt);
-	if (success)
+	if (doUpdate(dt))
 	{
 		auto particles = std::make_shared<std::vector<Particle>>(m_particles.cbegin(), m_particles.cend());
 		{
@@ -145,7 +146,10 @@ bool ParticleSystemRepresentation::update(double dt)
 			std::swap(particles, m_safeParticles);
 		}
 	}
-	return success;
+	else
+	{
+		SURGSIM_LOG_WARNING(m_logger) << "Particle System " << getName() << " failed to update.";
+	}
 }
 
 }; // namespace Particles

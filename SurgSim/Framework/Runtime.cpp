@@ -355,6 +355,10 @@ bool Runtime::loadScene(const std::string& fileName)
 
 		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
 	}
+	else
+	{
+		SURGSIM_LOG_WARNING(Logger::getLogger("Runtime")) << "Could not find Scenefile " << fileName;
+	}
 
 	return result;
 

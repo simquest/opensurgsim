@@ -34,7 +34,7 @@ SurfaceMeshShape::SurfaceMeshShape() : m_volume(0.0), m_thickness(1e-2)
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurfaceMeshShape, std::string, FileName, getFileName, setFileName);
 }
 
-int SurfaceMeshShape::getType()
+int SurfaceMeshShape::getType() const
 {
 	return SHAPE_TYPE_SURFACEMESH;
 }
