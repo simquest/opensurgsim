@@ -92,23 +92,24 @@ public:
 
 template <typename T, size_t N>
 Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Matrix<size_t, N, 1>& exponents)
-	: m_neighborsDirtyFlag(false)
+	: m_size(cellSize),
+	m_exponents(exponents),
+	m_neighborsDirtyFlag(false)
 {
 	static_assert(N >= 1, "A grid must have a positive non null dimension");
 
 	// Check that the size of the requested grid fit the current architecture.
 	size_t maximumCellsPowerOf2 = sizeof(size_t) * 8;
-	size_t requestedCellsPozerOf2 = exponents.sum();
-	SURGSIM_ASSERT(requestedCellsPozerOf2 <= maximumCellsPowerOf2) << "The requested grid dimension (2^"
-		<< requestedCellsPozerOf2 << " cells) is too large for the "
+	size_t requestedCellsPowerOf2 = m_exponents.sum();
+	SURGSIM_ASSERT(requestedCellsPowerOf2 <= maximumCellsPowerOf2) << "The requested grid dimension (2^"
+		<< requestedCellsPowerOf2 << " cells) is too large for the "
 		<< maximumCellsPowerOf2 << " bit architecture";
 
-	m_size = cellSize;
-	m_exponents = exponents;
 	for (size_t i = 0; i < N; ++i)
 	{
 		m_numCells[i] = (static_cast<size_t>(1u) << exponents[i]);
 	}
+
 	m_aabb.min() = -(m_size.cwiseProduct(m_numCells.template cast<double>())) * 0.5;
 	m_aabb.max() = (m_size.cwiseProduct(m_numCells.template cast<double>())) * 0.5;
 
