@@ -103,11 +103,11 @@ Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::Align
 	{
 		m_exponents[i] = static_cast<size_t>(std::log(exactNumCells[i]) / std::log(2.0));
 		// Choose the next bigger power of 2, if the number of cells is not exactly a power of 2
-		if (exactNumCells[i] > static_cast<double>(1u << m_exponents[i]))
+		if (exactNumCells[i] > static_cast<double>(static_cast<size_t>(1) << m_exponents[i]))
 		{
 			m_exponents[i]++;
 		}
-		m_numCells[i] = (1u << m_exponents[i]);
+		m_numCells[i] = (static_cast<size_t>(1) << m_exponents[i]);
 	}
 
 	// Check that the size of the requested grid fit the current architecture.
