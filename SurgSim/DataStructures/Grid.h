@@ -41,10 +41,10 @@ struct powerOf3<0>
 
 /// n-dimension grid structure with a fixed uniform size on all directions
 /// This data structure is useful to search for neighbors in a given range (the size of each cell)
-/// This grid is optimized to contain a power of 2 number of cells on each dimension.
-/// The grid is formed of cells of size 'size'
-/// from -0.5 * size[dimension] * pow(2, powerOf2CellsPerDimension[dimension])
-/// to    0.5 * size[dimension] * pow(2, powerOf2CellsPerDimension[dimension])
+/// This grid is optimized to contain 2^exponents[i] number of cells per dimension and is
+/// formed of cells of size 'size':
+/// from -0.5 * size[dimension] * pow(2, exponents[dimension])
+/// to    0.5 * size[dimension] * pow(2, exponents[dimension])
 /// \tparam T Element type to be stored
 /// \tparam N The dimension of the grid (i.e. 2 => 2D, 3 => 3D)
 template <typename T, size_t N>
