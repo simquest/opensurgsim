@@ -174,21 +174,21 @@ TEST(EmitterRepresentationTest, Update)
 	ASSERT_TRUE(particleSystem->wakeUp());
 
 	emitter->update(0.1);
-	EXPECT_EQ(1, particleSystem->getParticles().size());
+	EXPECT_EQ(1, particleSystem->getParticleReferences().size());
 
 	emitter->update(0.05);
-	EXPECT_EQ(1, particleSystem->getParticles().size());
+	EXPECT_EQ(1, particleSystem->getParticleReferences().size());
 	emitter->update(0.05);
-	EXPECT_EQ(2, particleSystem->getParticles().size());
+	EXPECT_EQ(2, particleSystem->getParticleReferences().size());
 
 	emitter->update(0.9);
-	EXPECT_EQ(10, particleSystem->getParticles().size());
+	EXPECT_EQ(10, particleSystem->getParticleReferences().size());
 	emitter->update(0.2);
-	EXPECT_EQ(10, particleSystem->getParticles().size())
+	EXPECT_EQ(10, particleSystem->getParticleReferences().size())
 		<< "Particles should not have been added, the particle system should have reached its maximum.";
 
 	particleSystem->update(1.0);
-	auto particles = particleSystem->getParticles();
+	auto particles = particleSystem->getParticleReferences();
 	ASSERT_EQ(10, particles.size());
 	for (auto particle : particles)
 	{
@@ -231,17 +231,18 @@ TEST(EmitterRepresentationTest, PosedUpdate)
 			Vector3d(2.0, -2.0, 2.0));
 
 	emitter->update(1.0);
-	ASSERT_EQ(1, particleSystem->getParticles().size());
+	ASSERT_EQ(1, particleSystem->getParticleReferences().size());
 
 	emitter->setLocalPose(pose1);
 	emitter->update(1.0);
-	ASSERT_EQ(2, particleSystem->getParticles().size());
+	ASSERT_EQ(2, particleSystem->getParticleReferences().size());
 
 	element->setPose(pose2);
 	emitter->update(1.0);
-	ASSERT_EQ(3, particleSystem->getParticles().size());
+	ASSERT_EQ(3, particleSystem->getParticleReferences().size());
 
-	std::vector<Particle> particles(particleSystem->getParticles().cbegin(), particleSystem->getParticles().cend());
+	std::vector<Particle> particles(particleSystem->getParticleReferences().cbegin(),
+			particleSystem->getParticleReferences().cend());
 	EXPECT_GT(sphere->getRadius(), particles[0].getPosition().norm());
 	EXPECT_GT(sphere->getRadius(), (pose1.inverse() * particles[1].getPosition()).norm());
 	EXPECT_GT(sphere->getRadius(), ((pose2 * pose1).inverse() * particles[2].getPosition()).norm());

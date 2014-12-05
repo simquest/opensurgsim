@@ -51,7 +51,7 @@ TEST(ParticleSystemRepresentationTest, SetGetMaxParticles)
 	representation->initialize(runtime);
 	EXPECT_ANY_THROW(representation->setMaxParticles(1));
 
-	EXPECT_EQ(0, representation->getParticles().size());
+	EXPECT_EQ(0, representation->getParticleReferences().size());
 }
 
 TEST(ParticleSystemRepresentationTest, AddParticle)
@@ -63,9 +63,9 @@ TEST(ParticleSystemRepresentationTest, AddParticle)
 
 	Particle expectedParticle(Particle(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), 10));
 	ASSERT_TRUE(representation->addParticle(expectedParticle));
-	ASSERT_EQ(1, representation->getParticles().size());
+	ASSERT_EQ(1, representation->getParticleReferences().size());
 
-	auto particle = representation->getParticles().begin();
+	auto particle = representation->getParticleReferences().begin();
 	EXPECT_TRUE(expectedParticle.getPosition().isApprox(particle->getPosition()));
 	EXPECT_TRUE(expectedParticle.getVelocity().isApprox(particle->getVelocity()));
 	EXPECT_NEAR(expectedParticle.getLifetime(), particle->getLifetime(), 1e-9);
@@ -84,15 +84,61 @@ TEST(ParticleSystemRepresentationTest, AddParticles)
 	expectedParticles.emplace_back(Vector3d(3.0, 3.0, 3.0), Vector3d(0.0, 0.0, 0.0), 30);
 
 	ASSERT_TRUE(representation->addParticles(expectedParticles));
-	ASSERT_EQ(3, representation->getParticles().size());
+	ASSERT_EQ(3, representation->getParticleReferences().size());
 
 	auto expectedParticle = expectedParticles.cbegin();
-	auto particle = representation->getParticles().begin();
+	auto particle = representation->getParticleReferences().begin();
 	for( ; expectedParticle != expectedParticles.cend(); ++expectedParticle, ++particle)
 	{
 		EXPECT_TRUE(expectedParticle->getPosition().isApprox(particle->getPosition()));
 		EXPECT_TRUE(expectedParticle->getVelocity().isApprox(particle->getVelocity()));
 		EXPECT_NEAR(expectedParticle->getLifetime(), particle->getLifetime(), 1e-9);
+	}
+}
+
+TEST(ParticleSystemRepresentationTest, GetParticles)
+{
+	auto representation = std::make_shared<MockParticleSystem>("representation");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	representation->setMaxParticles(100);
+	representation->initialize(runtime);
+
+	Particle expectedParticle(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), 10);
+	representation->addParticle(expectedParticle);
+	{
+		EXPECT_EQ(0, representation->getParticles()->size())
+			<< "Added particle should not be yet avaible in safe access";
+		EXPECT_EQ(1, representation->getParticleReferences().size())
+			<< "Added particle should be available in unsafe access";
+	}
+
+	representation->update(1.0);
+	{
+		ASSERT_EQ(1, representation->getParticles()->size())
+			<< "Added particle should be avaible in safe access after update";
+		EXPECT_EQ(1, representation->getParticleReferences().size())
+			<< "Added particle should be available in unsafe access";
+
+		auto particles = representation->getParticles();
+		EXPECT_TRUE(expectedParticle.getPosition().isApprox((*particles)[0].getPosition()));
+		EXPECT_TRUE(expectedParticle.getVelocity().isApprox((*particles)[0].getVelocity()));
+		EXPECT_NEAR(expectedParticle.getLifetime() - 1.0, (*particles)[0].getLifetime(), 1e-9);
+	}
+
+	representation->removeParticle(*representation->getParticleReferences().begin());
+	{
+		EXPECT_EQ(1, representation->getParticles()->size())
+			<< "Removed particle should still be avaible in safe access";
+		EXPECT_EQ(0, representation->getParticleReferences().size())
+			<< "Removed particle should already be removed in unsafe access";
+	}
+
+	representation->update(1.0);
+	{
+		EXPECT_EQ(0, representation->getParticles()->size())
+			<< "Removed particle should be removed in safe access";
+		EXPECT_EQ(0, representation->getParticleReferences().size())
+			<< "Removed particle should be removed in unsafe access";
 	}
 }
 
@@ -104,11 +150,11 @@ TEST(ParticleSystemRepresentationTest, RemoveParticle)
 	representation->initialize(runtime);
 
 	ASSERT_TRUE(representation->addParticle(Particle(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), 10)));
-	ASSERT_EQ(1, representation->getParticles().size());
+	ASSERT_EQ(1, representation->getParticleReferences().size());
 
-	ParticleReference particle = *(representation->getParticles().begin());
+	ParticleReference particle = *(representation->getParticleReferences().begin());
 	EXPECT_TRUE(representation->removeParticle(particle));
-	EXPECT_EQ(0, representation->getParticles().size());
+	EXPECT_EQ(0, representation->getParticleReferences().size());
 
 	EXPECT_FALSE(representation->removeParticle(particle));
 }
@@ -148,19 +194,19 @@ TEST(ParticleSystemRepresentationTest, Aging)
 	representation->addParticle(Particle(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), 1));
 	representation->addParticle(Particle(Vector3d(2.0, 2.0, 2.0), Vector3d(0.0, 0.0, 0.0), 2));
 	representation->addParticle(Particle(Vector3d(3.0, 3.0, 3.0), Vector3d(0.0, 0.0, 0.0), 3));
-	EXPECT_EQ(3, representation->getParticles().size());
+	EXPECT_EQ(3, representation->getParticleReferences().size());
 
 	representation->update(1.0);
-	EXPECT_EQ(2, representation->getParticles().size());
+	EXPECT_EQ(2, representation->getParticleReferences().size());
 
 	representation->update(1.0);
-	EXPECT_EQ(1, representation->getParticles().size());
+	EXPECT_EQ(1, representation->getParticleReferences().size());
 
 	representation->update(1.0);
-	EXPECT_EQ(0, representation->getParticles().size());
+	EXPECT_EQ(0, representation->getParticleReferences().size());
 
 	representation->update(1.0);
-	EXPECT_EQ(0, representation->getParticles().size());
+	EXPECT_EQ(0, representation->getParticleReferences().size());
 }
 
 }; // namespace Particles

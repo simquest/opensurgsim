@@ -21,6 +21,7 @@
 #include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/ParticlesState.h"
 
+
 namespace SurgSim
 {
 namespace Particles
@@ -29,6 +30,7 @@ namespace Particles
 ParticleSystemRepresentation::ParticleSystemRepresentation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
 	m_maxParticles(0u),
+	m_safeParticles(std::make_shared<std::vector<Particle>>()),
 	m_state(std::make_shared<ParticlesState>()),
 	m_logger(SurgSim::Framework::Logger::getLogger("Particles"))
 {
@@ -111,9 +113,15 @@ bool ParticleSystemRepresentation::removeParticle(const ParticleReference& parti
 	return result;
 }
 
-std::list<ParticleReference>& ParticleSystemRepresentation::getParticles()
+std::list<ParticleReference>& ParticleSystemRepresentation::getParticleReferences()
 {
 	return m_particles;
+}
+
+std::shared_ptr<const std::vector<Particle>> ParticleSystemRepresentation::getParticles() const
+{
+	boost::shared_lock<boost::shared_mutex> sharedLock(m_mutex);
+	return m_safeParticles;
 }
 
 void ParticleSystemRepresentation::update(double dt)
@@ -129,7 +137,19 @@ void ParticleSystemRepresentation::update(double dt)
 		}
 		particleIter = nextIter;
 	}
-	SURGSIM_LOG_IF(!doUpdate(dt), m_logger, WARNING) << "Particle System " << getName() << " failed to update.";
+
+	if (doUpdate(dt))
+	{
+		auto particles = std::make_shared<std::vector<Particle>>(m_particles.cbegin(), m_particles.cend());
+		{
+			boost::unique_lock<boost::shared_mutex> uniqueLock(m_mutex);
+			std::swap(particles, m_safeParticles);
+		}
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(m_logger) << "Particle System " << getName() << " failed to update.";
+	}
 }
 
 }; // namespace Particles
