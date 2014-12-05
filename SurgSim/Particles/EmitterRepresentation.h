@@ -62,6 +62,7 @@ class EmitterRepresentation : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor
+	/// \param name The representation's name
 	explicit EmitterRepresentation(const std::string& name);
 
 	/// Destructor
@@ -90,7 +91,7 @@ public:
 	std::shared_ptr<SurgSim::Math::Shape> getShape() const;
 
 	/// Set the emit mode of this emitter.
-	//// \param mode The emit mode.
+	/// \param mode The emit mode.
 	void setMode(int mode);
 
 	/// Get the emit mode of this emitter.

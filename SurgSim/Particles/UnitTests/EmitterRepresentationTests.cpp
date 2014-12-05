@@ -225,8 +225,10 @@ TEST(EmitterRepresentationTest, PosedUpdate)
 	ASSERT_TRUE(emitter->wakeUp());
 	ASSERT_TRUE(particleSystem->wakeUp());
 
-	auto pose1 = makeRigidTransform(Eigen::AngleAxisd(0.25*M_PI, Vector3d::UnitX()).matrix(), Vector3d(1.0, 2.0, 3.0));
-	auto pose2 = makeRigidTransform(Eigen::AngleAxisd(0.25*M_PI, Vector3d::UnitZ()).matrix(), Vector3d(2.0, -2.0, 2.0));
+	auto pose1 = makeRigidTransform(Eigen::AngleAxisd(0.25 * M_PI, Vector3d::UnitX()).matrix(),
+			Vector3d(1.0, 2.0, 3.0));
+	auto pose2 = makeRigidTransform(Eigen::AngleAxisd(0.25 * M_PI, Vector3d::UnitZ()).matrix(),
+			Vector3d(2.0, -2.0, 2.0));
 
 	emitter->update(1.0);
 	ASSERT_EQ(1, particleSystem->getParticles().size());
@@ -242,7 +244,7 @@ TEST(EmitterRepresentationTest, PosedUpdate)
 	std::vector<Particle> particles(particleSystem->getParticles().cbegin(), particleSystem->getParticles().cend());
 	EXPECT_GT(sphere->getRadius(), particles[0].getPosition().norm());
 	EXPECT_GT(sphere->getRadius(), (pose1.inverse() * particles[1].getPosition()).norm());
-	EXPECT_GT(sphere->getRadius(), ((pose2*pose1).inverse() * particles[2].getPosition()).norm());
+	EXPECT_GT(sphere->getRadius(), ((pose2 * pose1).inverse() * particles[2].getPosition()).norm());
 }
 
 TEST(EmitterRepresentationTest, Serialization)
