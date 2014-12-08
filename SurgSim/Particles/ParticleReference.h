@@ -45,6 +45,10 @@ public:
 	/// \return True if the references are equal, False otherwise
 	bool operator==(const ParticleReference& other) const;
 
+	/// Get the particle's index
+	/// \return The particle's index in the state
+	size_t getIndex() const;
+
 	/// Get the particle's position
 	/// \return The particles position [m]
 	const Eigen::VectorBlock<SurgSim::Math::Vector, 3> getPosition() const;

@@ -43,6 +43,11 @@ bool ParticleReference::operator==(const ParticleReference& other) const
 	return m_index == other.m_index && m_state.get() == other.m_state.get();
 }
 
+size_t ParticleReference::getIndex() const
+{
+	return m_index;
+}
+
 const Eigen::VectorBlock<SurgSim::Math::Vector, 3> ParticleReference::getPosition() const
 {
 	return m_state->getPositions().segment<3>(3 * m_index);
