@@ -55,6 +55,9 @@ target_link_libraries(SurgSimParticles ${LIBS})
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
+	if(BUILD_RENDER_TESTING)
+		add_subdirectory(RenderTests)
+	endif()
 endif()
 
 set_target_properties(SurgSimParticles PROPERTIES FOLDER "Particles")
