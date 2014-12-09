@@ -39,7 +39,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Math::CylinderShape);
 
 	/// \return the type of the shape
-	virtual int getType() override;
+	virtual int getType() const override;
 
 	/// Get the cylinder length
 	/// \return The cylinder length (in m)

@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PARTICLES_PARTICLESYSTEMREPRESENTATION_H
 #define SURGSIM_PARTICLES_PARTICLESYSTEMREPRESENTATION_H
 
+#include <boost/thread.hpp>
 #include <list>
 #include <memory>
 #include <string>
@@ -38,6 +39,7 @@ namespace Particles
 class Particle;
 class ParticleReference;
 class ParticlesState;
+
 
 /// The ParticleSystemRepresentation class defines the base class for all Particle System.
 class ParticleSystemRepresentation : public SurgSim::Framework::Representation
@@ -74,13 +76,18 @@ public:
 	/// \param particle A reference to a particle to remove
 	bool removeParticle(const ParticleReference& particle);
 
-	/// Get the particles
-	/// \return A list of reference to the particles
-	std::list<ParticleReference>& getParticles();
+	/// Get references to the internal particles
+	/// \note this is thread unsafe access to the internal state of the particle system
+	/// \return A list of ParticleReference
+	std::list<ParticleReference>& getParticleReferences();
+
+	/// Get a copy of the particles in a thread safe manner
+	/// \return A vector of particles
+	std::shared_ptr<const std::vector<Particle>> getParticles() const;
 
 	/// Update the particle system
 	/// \param dt The time step.
-	bool update(double dt);
+	void update(double dt);
 
 protected:
 	/// Maximum amount of particles allowed in this particle system.
@@ -92,11 +99,17 @@ protected:
 	/// List of unused particles.
 	std::list<ParticleReference> m_unusedParticles;
 
+	/// Thread safe copy of the particles
+	std::shared_ptr<std::vector<Particle>> m_safeParticles;
+
 	/// The particle system state.
 	std::shared_ptr<ParticlesState> m_state;
 
 	/// Logger used by the particle system.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
+	/// The mutex used to lock the particles
+	mutable boost::shared_mutex m_mutex;
 
 private:
 	/// Implementation of the specific behavior of the particle system

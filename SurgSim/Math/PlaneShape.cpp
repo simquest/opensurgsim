@@ -25,7 +25,7 @@ PlaneShape::PlaneShape()
 {
 }
 
-int PlaneShape::getType()
+int PlaneShape::getType() const
 {
 	return SHAPE_TYPE_PLANE;
 }

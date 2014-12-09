@@ -18,6 +18,7 @@ include_directories (
 )
 
 set(UNIT_TEST_SOURCES
+	DriveElementFromInputBehaviorTests.cpp
 	KeyboardTogglesComponentBehaviorTests.cpp
 	MassSpring1DRepresentationTests.cpp
 	MassSpring2DRepresentationTests.cpp
@@ -43,6 +44,7 @@ configure_file(
 )
 
 set(LIBS
+	IdentityPoseDevice
 	SurgSimBlocks
 	SurgSimGraphics
 )

@@ -136,6 +136,7 @@ void MockDeformableRepresentation::addExternalGeneralizedForce(std::shared_ptr<L
 	m_externalGeneralizedForce.segment<3>(3 * loc->getLocalNode()) += generalizedForce;
 	m_externalGeneralizedStiffness.block<3, 3>(3 * loc->getLocalNode(), 3 * loc->getLocalNode()) += K;
 	m_externalGeneralizedDamping.block<3, 3>(3 * loc->getLocalNode(), 3 * loc->getLocalNode()) += D;
+	m_hasExternalGeneralizedForce = true;
 }
 
 Vector& MockDeformableRepresentation::computeF(const OdeState& state)
@@ -395,6 +396,7 @@ void MockFemRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localiza
 		numDofPerNode, numDofPerNode) += K;
 	m_externalGeneralizedDamping.block(numDofPerNode * loc->getLocalNode(), numDofPerNode * loc->getLocalNode(),
 		numDofPerNode, numDofPerNode) += D;
+	m_hasExternalGeneralizedForce = true;
 }
 
 std::shared_ptr<FemPlyReaderDelegate> MockFemRepresentation::getDelegate()

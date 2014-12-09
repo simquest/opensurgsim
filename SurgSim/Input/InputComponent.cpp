@@ -71,7 +71,7 @@ private:
 
 
 InputComponent::InputComponent(const std::string& name) :
-	Component(name),
+	Representation(name),
 	m_deviceName(),
 	m_deviceConnected(false),
 	m_input(std::make_shared<InputConsumer>())

@@ -174,7 +174,7 @@ protected:
 	virtual bool doInitialize() override;
 
 	/// Useful information per node
-	std::vector<double> m_massPerNode; //< Useful in setting up the gravity force F=mg
+	std::vector<double> m_massPerNode; ///< Useful in setting up the gravity force F=mg
 
 	/// Filename for loading the fem representation.
 	std::string m_filename;

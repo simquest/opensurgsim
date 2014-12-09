@@ -42,8 +42,11 @@ BufferedValue<T>::~BufferedValue()
 template <class T>
 void BufferedValue<T>::publish()
 {
-	UniqueLock lock(m_mutex);
-	m_safeValue = std::make_shared<const T>(m_value);
+	auto newSafeValue = std::make_shared<const T>(m_value);
+	{
+		UniqueLock lock(m_mutex);
+		std::swap(newSafeValue, m_safeValue);
+	}
 }
 
 template <class T>
