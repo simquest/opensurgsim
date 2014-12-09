@@ -18,6 +18,8 @@
 
 #include <vector>
 
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/ParticleSystemRepresentation.h"
@@ -37,6 +39,8 @@ namespace Particles
 class Particle;
 class ParticlesState;
 
+SURGSIM_STATIC_REGISTRATION(SphRepresentation);
+
 /// SphRepresentation is a ParticleSystemRepresentation dedicated to Smoothed-Particles Hydrodynamics (SPH).
 /// This class is mostly based on these papers:
 /// "Particle-Based Fluid Simulation for Interactive Applications", M. Muller, D. Charypar, M. Gross.
@@ -46,6 +50,8 @@ class ParticlesState;
 class SphRepresentation : public ParticleSystemRepresentation
 {
 public:
+	SURGSIM_CLASSNAME(SurgSim::Particles::SphRepresentation);
+
 	/// Data structure for constraining the fluid on the positive side of a plane
 	struct PlaneConstraint
 	{
@@ -141,7 +147,11 @@ public:
 	/// \param planeConstraint to interact with the fluid
 	void addPlaneConstraint(const PlaneConstraint& planeConstraint);
 
-	/// Get all plane constraints
+	/// Set all the plane constraints
+	/// \param planeConstraints All the plane constraints interacting with the fluid
+	void setPlaneConstraints(const std::vector<SphRepresentation::PlaneConstraint>& planeConstraints);
+
+	/// Get all the plane constraints
 	/// \return All plane constraints interacting with the fluid
 	const std::vector<SphRepresentation::PlaneConstraint>& getPlaneConstraints() const;
 
@@ -258,6 +268,39 @@ private:
 
 };  // namespace Particles
 };  // namespace SurgSim
+
+namespace YAML
+{
+/// Specialization of YAML::convert for SphRepresentation::PlaneConstraint
+template <>
+struct convert<SurgSim::Particles::SphRepresentation::PlaneConstraint>
+{
+	static Node encode(const SurgSim::Particles::SphRepresentation::PlaneConstraint rhs)
+	{
+		Node result;
+		result["planeEquation"] = rhs.planeEquation;
+		result["stiffness"] = rhs.stiffness;
+		result["damping"] = rhs.damping;
+		return result;
+	}
+	static bool decode(const Node& node, SurgSim::Particles::SphRepresentation::PlaneConstraint& rhs)
+	{
+		try
+		{
+			rhs.planeEquation = node["planeEquation"].as<SurgSim::Math::Vector4d>();
+			rhs.stiffness= node["stiffness"].as<double>();
+			rhs.damping = node["damping"].as<double>();
+		}
+		catch (YAML::RepresentationException)
+		{
+			auto logger = SurgSim::Framework::Logger::getLogger("Particles");
+			SURGSIM_LOG(logger, WARNING) << "Bad conversion to SphRepresentation::PlaneConstraint";
+			return false;
+		}
+		return true;
+	}
+};
+}; // namespace YAML
 
 #include "SurgSim/Particles/SphRepresentation-inl.h"
 

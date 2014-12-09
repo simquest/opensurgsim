@@ -26,6 +26,7 @@ namespace SurgSim
 {
 namespace Particles
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Particles::SphRepresentation, SphRepresentation);
 
 SphRepresentation::SphRepresentation(const std::string& name) :
 	ParticleSystemRepresentation(name),
@@ -33,23 +34,26 @@ SphRepresentation::SphRepresentation(const std::string& name) :
 	m_densityReference(0.0),
 	m_gasStiffness(0.0),
 	m_surfaceTensionCoefficient(0.0),
+	m_gravity(SurgSim::Math::Vector3d(0.0, -9.81, 0.0)),
 	m_viscosity(0.0),
 	m_h(0.0)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double, MassPerParticle, getMassPerParticle,
-		setMassPerParticle);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double, DensityReference, getDensityReference,
-		setDensityReference);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double, GasStiffness, getGasStiffness,
-		setGasStiffness);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double, SurfaceTensionCoefficient,
-		getSurfaceTensionCoefficient, setSurfaceTensionCoefficient);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double, Viscosity, getViscosity,
-		setViscosity);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double, KernelSupport, getKernelSupport,
-		setKernelSupport);
-
-	m_gravity = SurgSim::Math::Vector3d(0.0, -9.81, 0.0);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
+		MassPerParticle, getMassPerParticle, setMassPerParticle);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
+		DensityReference, getDensityReference, setDensityReference);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
+		GasStiffness, getGasStiffness, setGasStiffness);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
+		SurfaceTensionCoefficient, getSurfaceTensionCoefficient, setSurfaceTensionCoefficient);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
+		Viscosity, getViscosity, setViscosity);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
+		KernelSupport, getKernelSupport, setKernelSupport);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, SurgSim::Math::Vector3d,
+		Gravity, getGravity, setGravity);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, std::vector<PlaneConstraint>,
+		PlaneConstraints, getPlaneConstraints, setPlaneConstraints);
 }
 
 SphRepresentation::~SphRepresentation()
@@ -148,6 +152,11 @@ double SphRepresentation::getKernelSupport() const
 void SphRepresentation::addPlaneConstraint(const PlaneConstraint& planeConstraint)
 {
 	m_planeConstraints.push_back(planeConstraint);
+}
+
+void SphRepresentation::setPlaneConstraints(const std::vector<SphRepresentation::PlaneConstraint>& planeConstraints)
+{
+	m_planeConstraints = planeConstraints;
 }
 
 const std::vector<SphRepresentation::PlaneConstraint>& SphRepresentation::getPlaneConstraints() const

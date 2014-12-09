@@ -321,5 +321,48 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesInEquilibriumTest)
 	EXPECT_NEAR(finalDistance, distance, pow(h, 2));
 }
 
+TEST(SphRepresentationTest, SerializationTest)
+{
+	typedef SurgSim::Particles::SphRepresentation::PlaneConstraint PlaneConstraint;
+
+	auto sph = std::make_shared<SphRepresentation>("TestSphRepresentation");
+	sph->setDensityReference(1.1);
+	sph->setGasStiffness(2.2);
+	sph->setGravity(SurgSim::Math::Vector3d::Ones());
+	sph->setKernelSupport(3.3);
+	sph->setMassPerParticle(4.4);
+	sph->setMaxParticles(5);
+	SphRepresentation::PlaneConstraint p;
+	p.stiffness = 6.6;
+	p.damping = 7.7;
+	p.planeEquation.setLinSpaced(8.8, 9.9);
+	sph->addPlaneConstraint(p);
+	sph->setSurfaceTensionCoefficient(10.1);
+	sph->setViscosity(11.11);
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*sph));
+
+	std::shared_ptr<SphRepresentation> newRepresentation;
+	EXPECT_NO_THROW(newRepresentation =
+		std::dynamic_pointer_cast<SphRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+
+	EXPECT_DOUBLE_EQ(sph->getDensityReference(), newRepresentation->getValue<double>("DensityReference"));
+	EXPECT_DOUBLE_EQ(sph->getGasStiffness(), newRepresentation->getValue<double>("GasStiffness"));
+	EXPECT_TRUE(sph->getGravity().isApprox(newRepresentation->getValue<SurgSim::Math::Vector3d>("Gravity")));
+	EXPECT_DOUBLE_EQ(sph->getKernelSupport(), newRepresentation->getValue<double>("KernelSupport"));
+	EXPECT_DOUBLE_EQ(sph->getMassPerParticle(), newRepresentation->getValue<double>("MassPerParticle"));
+	EXPECT_EQ(sph->getMaxParticles(), newRepresentation->getValue<size_t>("MaxParticles"));
+	auto planeConstraints = newRepresentation->getValue<std::vector<PlaneConstraint>>("PlaneConstraints");
+	EXPECT_EQ(sph->getPlaneConstraints().size(), planeConstraints.size());
+	EXPECT_EQ(1u, planeConstraints.size());
+	EXPECT_TRUE(sph->getPlaneConstraints()[0].planeEquation.isApprox(planeConstraints[0].planeEquation));
+	EXPECT_DOUBLE_EQ(sph->getPlaneConstraints()[0].stiffness, planeConstraints[0].stiffness);
+	EXPECT_DOUBLE_EQ(sph->getPlaneConstraints()[0].damping, planeConstraints[0].damping);
+	EXPECT_DOUBLE_EQ(sph->getSurfaceTensionCoefficient(),
+		newRepresentation->getValue<double>("SurfaceTensionCoefficient"));
+	EXPECT_DOUBLE_EQ(sph->getViscosity(), newRepresentation->getValue<double>("Viscosity"));
+}
+
 }; // namespace Particles
 }; // namespace SurgSim
