@@ -28,11 +28,10 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/EmitterRepresentation.h"
-#include "SurgSim/Particles/RandomSpherePointGenerator.h"
 #include "SurgSim/Particles/Particle.h"
+#include "SurgSim/Particles/RandomSpherePointGenerator.h"
 #include "SurgSim/Particles/RenderTests/RenderTest.h"
 #include "SurgSim/Particles/SphRepresentation.h"
-//#include "SurgSim/Particles/UnitTests/MockObject.h"
 
 using SurgSim::Blocks::TransferParticlesToPointCloudBehavior;
 using SurgSim::Framework::Behavior;
@@ -88,7 +87,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createParticleSystem(const std
 	sphereEmitter->setTarget(particlesRepresentation);
 	sphereEmitter->setShape(std::make_shared<SurgSim::Math::SphereShape>(0.1));
 	sphereEmitter->setMode(SurgSim::Particles::EMIT_MODE_SURFACE);
-	sphereEmitter->setRate(1000.0); /// 500 particles per second
+	sphereEmitter->setRate(2000.0); /// 2000 particles per second (maximum is 5000)
 	sphereEmitter->setLifetimeRange(std::make_pair(30000, 600000));
 	sphereEmitter->setVelocityRange(std::make_pair(SurgSim::Math::Vector3d::Zero(), SurgSim::Math::Vector3d::Zero()));
 	sceneElement->addComponent(sphereEmitter);
@@ -117,6 +116,8 @@ TEST_F(RenderTests, SphRenderTest)
 {
 	scene->addSceneElement(createParticleSystem("Particles", Vector4d::Ones()));
 
+	// Particle manager runs at 500Hz
 	particlesManager->setRate(500.0);
-	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 30000.0);
+
+	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 20000.0);
 }
