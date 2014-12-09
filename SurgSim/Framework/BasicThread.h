@@ -120,7 +120,8 @@ public:
 	bool isSynchronous();
 
 	/// \return the timer measuring the performance of this thread
-	const Timer& getTimer() const;
+	/// \note The timer is returned non-const, so it can potentially be reset by calling start.
+	Timer& getTimer();
 
 protected:
 

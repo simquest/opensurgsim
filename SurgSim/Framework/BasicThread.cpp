@@ -246,7 +246,7 @@ bool BasicThread::isSynchronous()
 	return m_isSynchronous;
 }
 
-const Timer& BasicThread::getTimer() const
+Timer& BasicThread::getTimer()
 {
 	return m_timer;
 }
