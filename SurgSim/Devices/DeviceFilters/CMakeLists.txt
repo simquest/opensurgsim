@@ -25,12 +25,14 @@ set(DEVICE_FILTERS_SOURCES
 	ForceScale.cpp
 	PoseIntegrator.cpp
 	PoseTransform.cpp
+	VelocityFromPose.cpp
 )
 
 set(DEVICE_FILTERS_HEADERS
 	ForceScale.h
 	PoseIntegrator.h
 	PoseTransform.h
+	VelocityFromPose.h
 )
 
 surgsim_add_library(

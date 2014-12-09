@@ -16,6 +16,7 @@
 #include <memory>
 
 #include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
+#include "SurgSim/Devices/DeviceFilters/VelocityFromPose.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/Framework/Framework.h"
 #include "SurgSim/Graphics/Graphics.h"
@@ -206,7 +207,14 @@ int main(int argc, char* argv[])
 	DeviceFactory deviceFactory;
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device = deviceFactory.getDevice(toolDeviceName);
 	SURGSIM_ASSERT(device != nullptr) << "Unable to get a device, is one connected?";
+	
+	static const char* const filteredDeviceName = "filtered Tool Device";
+	auto velocityFilter = std::make_shared<SurgSim::Device::VelocityFromPose>(filteredDeviceName);
+	device->addInputConsumer(velocityFilter);
+	device->setOutputProducer(velocityFilter);
+
 	inputManager->addDevice(device);
+	inputManager->addDevice(velocityFilter);
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 	runtime->addManager(physicsManager);
@@ -215,8 +223,8 @@ int main(int argc, char* argv[])
 	runtime->addManager(inputManager);
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
-	scene->addSceneElement(createBox("VTC Box", toolDeviceName));
-	scene->addSceneElement(createBoxForRawInput("Raw Input", toolDeviceName));
+	scene->addSceneElement(createBox("VTC Box", filteredDeviceName));
+	scene->addSceneElement(createBoxForRawInput("Raw Input", filteredDeviceName));
 
 	std::shared_ptr<SceneElement> plane =  createPlane("Plane");
 	plane->setPose(makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0)));
