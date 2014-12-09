@@ -17,6 +17,7 @@
 #define SURGSIM_FRAMEWORK_TIMER_H
 
 #include <boost/chrono.hpp>
+#include <boost/thread/mutex.hpp>
 #include <deque>
 
 namespace SurgSim
@@ -46,7 +47,7 @@ public:
 	/// End the current frame and begin a new frame.
 	void markFrame();
 
-	/// Return the sum of the durations over all the stored frames.  Asserts if there are no frames.
+	/// Return the sum of the durations over all the stored frames.
 	/// \return Sum of stored frame durations in seconds.
 	double getCumulativeTime() const;
 
@@ -108,6 +109,9 @@ private:
 
 	/// Durations of the frames, i.e., the "stored frames".
 	std::deque<TimerDuration> m_frameDurations;
+
+	/// Mutex to access the data structure m_frameDurations safely
+	boost::mutex m_mutex;
 
 	/// Number of clock errors since last \c start.
 	size_t m_clockFails;
