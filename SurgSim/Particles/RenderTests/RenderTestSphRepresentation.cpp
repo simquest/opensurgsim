@@ -17,6 +17,7 @@
 
 #include <memory>
 
+#include "SurgSim/Blocks/TransferParticlesToPointCloudBehavior.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Macros.h"
@@ -33,125 +34,13 @@
 #include "SurgSim/Particles/SphRepresentation.h"
 //#include "SurgSim/Particles/UnitTests/MockObject.h"
 
+using SurgSim::Blocks::TransferParticlesToPointCloudBehavior;
 using SurgSim::Framework::Behavior;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
 using SurgSim::Particles::RenderTests;
 using SurgSim::Particles::SphRepresentation;
-
-namespace SurgSim
-{
-namespace Blocks
-{
-SURGSIM_STATIC_REGISTRATION(TransferParticlesToPointCloudBehavior);
-
-/// Behavior to copy positions of a ParticlesRepresentation to a PointCloud.
-class TransferParticlesToPointCloudBehavior : public Behavior
-{
-public:
-	/// Constructor
-	/// \param	name	Name of the behavior
-	explicit TransferParticlesToPointCloudBehavior(const std::string& name) :
-		Behavior(name)
-	{
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TransferParticlesToPointCloudBehavior,
-			std::shared_ptr<SurgSim::Framework::Component>, Source, getSource, setSource);
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TransferParticlesToPointCloudBehavior,
-			std::shared_ptr<SurgSim::Framework::Component>, Target, getTarget, setTarget);
-	}
-
-	SURGSIM_CLASSNAME(SurgSim::Blocks::TransferParticlesToPointCloudBehavior);
-
-	/// Set the representation from which the positions are from
-	/// \param source The physics representation
-	void setSource(const std::shared_ptr<SurgSim::Framework::Component>& source)
-	{
-		using SurgSim::Framework::checkAndConvert;
-
-		SURGSIM_ASSERT(nullptr != source) << "'source' can not be nullptr.";
-		m_source = checkAndConvert<SurgSim::Particles::ParticleSystemRepresentation>(
-			source, "SurgSim::Particles::ParticleSystemRepresentation");
-	}
-
-	/// Set the point cloud representation which will receive the positions
-	/// \param target The Graphics PointCloud representation
-	void setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target)
-	{
-		using SurgSim::Framework::checkAndConvert;
-
-		SURGSIM_ASSERT(nullptr != target) << "'target' can not be nullptr.";
-		m_target = checkAndConvert<SurgSim::Graphics::PointCloudRepresentation>(
-			target, "SurgSim::Graphics::PointCloudRepresentation");
-	}
-
-	/// Get the ParticleSystem representation which sends the positions
-	/// \return The particles system representation which produces positions.
-	std::shared_ptr<SurgSim::Particles::ParticleSystemRepresentation> getSource() const
-	{
-		return m_source;
-	}
-
-	/// Get the point cloud representation which receives the positions
-	/// \return The Graphics PointCloud representation which receives positions.
-	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation> getTarget() const
-	{
-		return m_target;
-	}
-
-	virtual void update(double dt) override
-	{
-		auto target = m_target->getVertices();
-		size_t nodeId = 0;
-		for (auto particle : m_source->getParticleReferences())
-		{
-			target->setVertexPosition(nodeId, particle.getPosition());
-			nodeId++;
-		}
-		for (; nodeId < m_source->getMaxParticles(); ++nodeId)
-		{
-			target->setVertexPosition(nodeId, SurgSim::Math::Vector3d::Zero());
-		}
-	}
-
-private:
-	virtual bool doInitialize() override
-	{
-		return true;
-	}
-
-	virtual bool doWakeUp() override
-	{
-		auto target = m_target->getVertices();
-
-		if (target->getNumVertices() == 0)
-		{
-			for (size_t nodeId = 0; nodeId < m_source->getMaxParticles(); ++nodeId)
-			{
-				SurgSim::Graphics::PointCloud::VertexType vertex(SurgSim::Math::Vector3d::Zero());
-				target->addVertex(vertex);
-			}
-		}
-		return true;
-	}
-
-	/// The ParticleSystem from which the positions come from.
-	std::shared_ptr<SurgSim::Particles::ParticleSystemRepresentation> m_source;
-
-	/// The Graphics PointCloud Representation to which the vertices' positions are set.
-	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation> m_target;
-};
-
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::TransferParticlesToPointCloudBehavior,
-				 TransferParticlesToPointCloudBehavior);
-
-};  // namespace Blocks
-};  // namespace SurgSim
-
-
-
-
-
 
 namespace
 {

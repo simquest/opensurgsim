@@ -26,6 +26,7 @@ set(UNIT_TEST_SOURCES
 	MassSpringNDRepresentationUtilsTests.cpp
 	PoseInterpolatorTests.cpp
 	SpringTestUtils.cpp
+	TransferParticlesToPointCloudBehaviorTests.cpp
 	TransferPhysicsToGraphicsMeshBehaviorTests.cpp
 	TransferPhysicsToPointCloudBehaviorTests.cpp
 	VisualizeContactsBehaviorTests.cpp
@@ -47,6 +48,7 @@ set(LIBS
 	IdentityPoseDevice
 	SurgSimBlocks
 	SurgSimGraphics
+	SurgSimParticles
 )
 
 surgsim_add_unit_tests(SurgSimBlocksTest)
