@@ -136,7 +136,7 @@ bool doesIntersectTriangleTriangle(
 	size_t s1Index = 0;
 	size_t s2Index = 0;
 
-	// Loop through the edges of each triangle and find the intersectio of these edges onto
+	// Loop through the edges of each triangle and find the intersection of these edges onto
 	// the plane of the other triangle.
 	for (int i = 0; i < 3; ++i)
 	{
@@ -150,8 +150,12 @@ bool doesIntersectTriangleTriangle(
 			<< "The intersection between the triangle and the separating axis is not a line segment."
 			<< " This scenario cannot happen, at this point in the algorithm.";
 
-	return !(std::abs(s1[0] - s2[0]) <= DistanceEpsilon && std::abs(s1[0] - s2[1]) <= DistanceEpsilon &&
-		     std::abs(s1[1] - s2[0]) <= DistanceEpsilon && std::abs(s1[1] - s2[1]) <= DistanceEpsilon) &&
+	// s1[0], s1[1] are the (unordered) extents of the projection of T1 on D.
+	// s2[0], s2[1] are the (unordered) extents of the projection of T2 on D.
+	// If both these are line segments (i.e. the distance between them is > epsilon),
+	// and if they overlap, then the two triangles intersect.
+
+	return !(std::abs(s1[0] - s1[1]) <= DistanceEpsilon && std::abs(s2[0] - s2[1]) <= DistanceEpsilon) &&
 		   !(s1[0] <= s2[0] && s1[0] <= s2[1] && s1[1] <= s2[0] && s1[1] <= s2[1]) &&
 		   !(s1[0] >= s2[0] && s1[0] >= s2[1] && s1[1] >= s2[0] && s1[1] >= s2[1]);
 }
