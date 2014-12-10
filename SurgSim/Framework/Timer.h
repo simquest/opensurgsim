@@ -17,7 +17,7 @@
 #define SURGSIM_FRAMEWORK_TIMER_H
 
 #include <boost/chrono.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/shared_mutex.hpp>
 #include <deque>
 
 namespace SurgSim
@@ -111,7 +111,7 @@ private:
 	std::deque<TimerDuration> m_frameDurations;
 
 	/// Mutex to access the data structure m_frameDurations safely
-	boost::mutex m_mutex;
+	mutable boost::shared_mutex m_sharedMutex;
 
 	/// Number of clock errors since last \c start.
 	size_t m_clockFails;

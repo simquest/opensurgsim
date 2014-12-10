@@ -15,8 +15,6 @@
 
 #include <numeric>
 
-#include <boost/thread/lock_guard.hpp>
-
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Timer.h"
 
@@ -32,7 +30,7 @@ Timer::Timer() :
 void Timer::start()
 {
 	{ // Define scope around m_frameDurations to lock only this access
-		boost::lock_guard<boost::mutex> lock(const_cast<boost::mutex&>(m_mutex));
+		boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);
 		m_frameDurations.clear();
 	}
 	m_clockFails = 0;
@@ -50,7 +48,7 @@ void Timer::endFrame()
 	TimerDuration duration = currentTime - m_lastTime;
 
 	{ // Define scope around m_frameDurations to lock only this access
-		boost::mutex::scoped_lock lock(m_mutex);
+		boost::unique_lock<boost::shared_mutex> lock(m_sharedMutex);
 		m_frameDurations.push_back(duration);
 		if (m_frameDurations.size() > m_maxNumberOfFrames)
 		{
@@ -70,7 +68,7 @@ double Timer::getCumulativeTime() const
 	TimerDuration cumulativeTime;
 
 	{ // Define scope around m_frameDurations to lock only this access
-		boost::mutex::scoped_lock lock(const_cast<boost::mutex&>(m_mutex));
+		boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);
 
 		cumulativeTime = std::accumulate(std::begin(m_frameDurations), std::end(m_frameDurations),
 		TimerDuration());
@@ -85,7 +83,7 @@ double Timer::getAverageFramePeriod() const
 	size_t numDuration;
 
 	{ // Define scope around m_frameDurations to lock only this access
-		boost::mutex::scoped_lock lock(const_cast<boost::mutex&>(m_mutex));
+		boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);
 
 		numDuration = m_frameDurations.size();
 		cumulativeTime = std::accumulate(std::begin(m_frameDurations), std::end(m_frameDurations),
@@ -104,7 +102,7 @@ double Timer::getAverageFrameRate() const
 
 double Timer::getLastFramePeriod() const
 {
-	boost::mutex::scoped_lock lock(const_cast<boost::mutex&>(m_mutex));
+	boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);
 
 	SURGSIM_ASSERT(m_frameDurations.size() > 0) <<
 		"Attempted to access the last frame period for a Timer with no frames.";
@@ -118,7 +116,7 @@ double Timer::getLastFrameRate() const
 
 void Timer::setMaxNumberOfFrames(size_t maxNumberOfFrames)
 {
-	boost::mutex::scoped_lock lock(m_mutex);
+	boost::unique_lock<boost::shared_mutex> lock(m_sharedMutex);
 
 	m_maxNumberOfFrames = (maxNumberOfFrames > 0) ? maxNumberOfFrames : 1;
 	if (m_frameDurations.size() > m_maxNumberOfFrames)
@@ -130,7 +128,7 @@ void Timer::setMaxNumberOfFrames(size_t maxNumberOfFrames)
 
 size_t Timer::getCurrentNumberOfFrames() const
 {
-	boost::mutex::scoped_lock lock(const_cast<boost::mutex&>(m_mutex));
+	boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);
 
 	return m_frameDurations.size();
 }
@@ -153,7 +151,7 @@ Timer::TimerTimePoint Timer::now()
 
 double Timer::getMaxFramePeriod() const
 {
-	boost::mutex::scoped_lock lock(const_cast<boost::mutex&>(m_mutex));
+	boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);
 
 	SURGSIM_ASSERT(m_frameDurations.size() > 0) <<
 		"Attempted to access the maximum frame period for a Timer with no frames.";
@@ -162,7 +160,7 @@ double Timer::getMaxFramePeriod() const
 
 double Timer::getMinFramePeriod() const
 {
-	boost::mutex::scoped_lock lock(const_cast<boost::mutex&>(m_mutex));
+	boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);
 
 	SURGSIM_ASSERT(m_frameDurations.size() > 0) <<
 		"Attempted to access the maximum frame period for a Timer with no frames.";
