@@ -136,59 +136,12 @@ void VelocityFromPose::calculateVelocity(const PoseType& pose, double period, Ve
 
 	std::cout << pose.translation() << "   " << pose.rotation().eulerAngles(2, 0, 2) << std::endl;
 
-// 	/// Update step.
-// 	/// measurement residual: y = z - H.x_predicted,k,k-1
-// 	/// innovation covariance: S = H.P_k,k-1.Ht + R
-// 	/// optimal Kalman gain: K = P_k,k-1.Ht.inv(S_k)
-// 	/// a posteriori state estimate: x_predicted,k,k = x_predicted,k_k-1 + K.y
-// 	/// a posteriori estimate covariance: P_k,k = (I - K.H).P_k,k-1
-// 	/// We assume no observation noise, so the observation noise covariance, R, is zero.
-// 	/// We observe the position, but not velocity.
-// 	Eigen::Matrix<double, 6, 12, Eigen::RowMajor> observationMatrix;
-// 	observationMatrix << Matrix33d::Identity(), Matrix33d::Zero(), Matrix33d::Zero(),     Matrix33d::Zero(),
-// 		Matrix33d::Zero(),     Matrix33d::Zero(), Matrix33d::Identity(), Matrix33d::Zero();
-// 	const SurgSim::Math::Vector6d innovation = measurement - observationMatrix * m_state;
-// 	const double measurementNoise = 1.0;
-// 	const Matrix66d measurementNoiseCovariance = measurementNoise * SurgSim::Math::Matrix66d::Identity();
-// 	const Matrix66d innovationCovariance = observationMatrix * m_covariance * observationMatrix.transpose() +
-// 		measurementNoiseCovariance;
-// 	const Eigen::Matrix<double, 12, 6, Eigen::RowMajor> gain =
-// 		m_covariance * observationMatrix.transpose() * innovationCovariance.inverse();
-// 	const VectorType postState = m_state + gain * innovation;
-// 	const MatrixType postCovariance = (MatrixType::Identity() - gain * observationMatrix) * m_covariance;
-// 
-// 	/// Predict step.
-// 	/// a priori state estimate: x_predicted,k,k-1 = F.x_predicted,k-1,k-1 + B.u
-// 	/// a priori estimate covariance: P_k,k-1 = F.P_k-1,k-1.Ft + Q
-// 	/// We have no control, so the control-input model, B, and the control, u, are zeros.
-// 	MatrixType stateTransition;
-// 	stateTransition <<
-// 		Matrix33d::Identity(), period * Matrix33d::Identity(), Matrix33d::Zero(),     Matrix33d::Zero(),
-// 		Matrix33d::Zero(),     Matrix33d::Identity(),          Matrix33d::Zero(),     Matrix33d::Zero(),
-// 		Matrix33d::Zero(),     Matrix33d::Zero(),              Matrix33d::Identity(), period * Matrix33d::Identity(),
-// 		Matrix33d::Zero(),     Matrix33d::Zero(),              Matrix33d::Zero(),     Matrix33d::Identity();
-// 	m_state = stateTransition * postState;
-// 
-// 	const double positionNoiseFactor = period * period / 2.0;
-// 	const double velocityNoiseFactor = period;
-// 	SurgSim::Math::Vector6d g;
-// 	g << positionNoiseFactor, positionNoiseFactor, positionNoiseFactor,
-// 		velocityNoiseFactor, velocityNoiseFactor, velocityNoiseFactor;
-// 	const double processNoise = 100.0;
-// 	MatrixType processNoiseCovariance = processNoise * MatrixType::Ones();
-// 	// 	processNoiseCovariance << processNoise * g * g.transpose(), Matrix66d::Zero(),
-// 	// 							Matrix66d::Zero(),                  processNoise * g * g.transpose();
-// 	m_covariance = stateTransition * postCovariance * stateTransition.transpose() + processNoiseCovariance;
-
 	kalman(pose.translation(), period, &m_linearState, &m_linearCovariance);
 
 	std::cout << m_linearState.transpose() << std::endl;
 	*linearVelocity = m_linearState.segment<3>(3);
 
-// 	std::cout << m_state.segment<6>(0).transpose() << std::endl;
-// 	*linearVelocity = m_state.segment<3>(3);
 // 	mat = AngleAxisf(ea[0], Vector3f::UnitZ()) * AngleAxisf(ea[1], Vector3f::UnitX()) * AngleAxisf(ea[2], Vector3f::UnitZ());
-//	*linearVelocity = Vector3d::Zero();
  	*angularVelocity = Vector3d::Zero();
 }
 
@@ -201,20 +154,15 @@ void VelocityFromPose::kalman(const SurgSim::Math::Vector3d& measurement, double
 	/// a priori estimate covariance: P_k,k-1 = F.P_k-1,k-1.Ft + Q
 	/// We have no control, so the control-input model, B, and the control, u, are zeros.
 	Eigen::Matrix<double, 9, 9, Eigen::RowMajor> stateTransition;
-	stateTransition << Matrix33d::Identity(), period * Matrix33d::Identity(), period * period * 0.5 * Matrix33d::Identity(),
+	stateTransition <<
+		Matrix33d::Identity(), period * Matrix33d::Identity(), period * period * 0.5 * Matrix33d::Identity(),
 		Matrix33d::Zero(),     Matrix33d::Identity(), period * Matrix33d::Identity(),
 		Matrix33d::Zero(),     Matrix33d::Zero(),     Matrix33d::Identity();
 	(*state) = stateTransition * (*state);
 
-	const double positionNoiseFactor = period * period / 2.0;
-	const double velocityNoiseFactor = period;
-	Eigen::Matrix<double, 9, 1> g;
-	g << positionNoiseFactor, positionNoiseFactor, positionNoiseFactor,
-		velocityNoiseFactor, velocityNoiseFactor, velocityNoiseFactor,
-		1.0, 1.0, 1.0;
-	const double processNoise = 0.01;
-	Eigen::Matrix<double, 9, 9, Eigen::RowMajor> processNoiseCovariance;
-	processNoiseCovariance << processNoise * g * g.transpose();
+	const double processNoise = 10.0;
+	Eigen::Matrix<double, 9, 9, Eigen::RowMajor> processNoiseCovariance =
+		processNoise * Eigen::Matrix<double, 9, 9, Eigen::RowMajor>::Identity();
 	*covariance = stateTransition * (*covariance) * stateTransition.transpose() + processNoiseCovariance;
 
 	/// Update step.
