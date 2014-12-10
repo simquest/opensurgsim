@@ -119,9 +119,14 @@ public:
 	/// \return	true if synchronized, false if not.
 	bool isSynchronous();
 
-	/// \return the timer measuring the performance of this thread
-	/// \note The timer is returned non-const, so it can potentially be reset by calling start.
-	Timer& getTimer();
+	/// \return the cumulated cpu time taken to run all update since last reset or thread creation
+	double getCpuTime() const;
+
+	/// \return the number of updates done since last reset or thread creation
+	size_t getUpdateCount() const;
+
+	/// Reset the cpu time and the update count to 0
+	void resetCpuTimeAndUpdateCount();
 
 protected:
 

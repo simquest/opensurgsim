@@ -276,18 +276,18 @@ TEST(BasicThreadTest, RealTimings)
 	MockThread m;
 	m.start(nullptr);
 
-	while(m.getTimer().getCumulativeTime() < 1e-6);
-	EXPECT_GT(m.getTimer().getCumulativeTime(), 1e-6);
-	EXPECT_GT(m.getTimer().getAverageFrameRate(), 0.0);
+	while(m.getCpuTime() < 1e-6);
+	EXPECT_GT(m.getCpuTime(), 1e-6);
+	EXPECT_GT(m.getUpdateCount(), 0u);
 
 	// Reset the timer (=> no more frames in the timer queue)
-	m.getTimer().start();
-	EXPECT_DOUBLE_EQ(0.0, m.getTimer().getCumulativeTime());
-	EXPECT_THROW(m.getTimer().getAverageFrameRate(), SurgSim::Framework::AssertionFailure);
+	m.resetCpuTimeAndUpdateCount();
+	EXPECT_DOUBLE_EQ(0.0, m.getCpuTime());
+	EXPECT_EQ(m.getUpdateCount(), 0u);
 
-	while(m.getTimer().getCumulativeTime() < 1e-6);
-	EXPECT_GT(m.getTimer().getCumulativeTime(), 1e-6);
-	EXPECT_GT(m.getTimer().getAverageFrameRate(), 0.0);
+	while(m.getCpuTime() < 1e-6);
+	EXPECT_GT(m.getCpuTime(), 1e-6);
+	EXPECT_GT(m.getUpdateCount(), 0u);
 
 	m.stop();
 }

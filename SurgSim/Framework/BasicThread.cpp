@@ -246,9 +246,19 @@ bool BasicThread::isSynchronous()
 	return m_isSynchronous;
 }
 
-Timer& BasicThread::getTimer()
+double BasicThread::getCpuTime() const
 {
-	return m_timer;
+	return m_timer.getCumulativeTime();
+}
+
+size_t BasicThread::getUpdateCount() const
+{
+	return m_timer.getCurrentNumberOfFrames();
+}
+
+void BasicThread::resetCpuTimeAndUpdateCount()
+{
+	m_timer.start();
 }
 
 bool BasicThread::doUpdate(double dt)
