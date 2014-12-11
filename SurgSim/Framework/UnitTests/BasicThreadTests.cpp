@@ -271,6 +271,35 @@ TEST(BasicThreadTest, SwitchSyncOnThread)
 	m.stop();
 }
 
+TEST(BasicThreadTest, RealTimings)
+{
+	MockThread m;
+	m.start(nullptr);
+
+	while(m.getCpuTime() < 1e-6);
+	EXPECT_GT(m.getCpuTime(), 1e-6);
+	EXPECT_GT(m.getUpdateCount(), 0u);
+
+	// Ask the manager to idle for a while, just the time for us to reset the timer and check right after
+	// what the timer contains (the delay between the reset and the checks could trigger a race condition).
+	// Asking the thread to idle suppress this race condition.
+	m.setIdle(true);
+
+	// Reset the timer (=> no more frames in the timer queue)
+	m.resetCpuTimeAndUpdateCount();
+	EXPECT_DOUBLE_EQ(0.0, m.getCpuTime());
+	EXPECT_EQ(m.getUpdateCount(), 0u);
+
+	// Resume the thread loop update.
+	m.setIdle(false);
+
+	while(m.getCpuTime() < 1e-6);
+	EXPECT_GT(m.getCpuTime(), 1e-6);
+	EXPECT_GT(m.getUpdateCount(), 0u);
+
+	m.stop();
+}
+
 // HS-2013-jun-25 Can't figure out how to make this work or what is going wrong with the test
 class BasicThreadDeathTest : public ::testing::Test
 {
