@@ -30,10 +30,10 @@ Timer::Timer() :
 void Timer::start()
 {
 	{ // Define scope around m_frameDurations to lock only this access
-		boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);
+		boost::unique_lock<boost::shared_mutex> lock(m_sharedMutex);
 		m_frameDurations.clear();
+		m_clockFails = 0;
 	}
-	m_clockFails = 0;
 	beginFrame();
 }
 
