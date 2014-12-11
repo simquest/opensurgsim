@@ -37,8 +37,11 @@ BasicThread::BasicThread(const std::string& name) :
 	m_stopExecution(false),
 	m_isSynchronous(false)
 {
-	// If the timer is reset every second, let's have enough frames to measure rates up to 10KHz
-	m_timer.setMaxNumberOfFrames(10000);
+	// The maximum number of frames in the timer is set to 1,000,000
+	// + If the timer is reset every second, that is enough frame to measure real rates up to 1MHz
+	// + If the timer is reset every minute, that is enough frame to measure real rates up to 16.66KHz
+	// + If the timer is reset every hour, that is enough frame to measure real rates up to 277.77Hz
+	m_timer.setMaxNumberOfFrames(1000000);
 }
 
 #ifdef _MSC_VER
