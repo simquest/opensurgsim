@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/exception/to_string.hpp>
+
 #include <array>
 
 #include "SurgSim/Framework/Timer.h"
@@ -25,34 +27,24 @@ namespace SurgSim
 namespace DataStructures
 {
 
-class GridPerformanceTestBase : public ::testing::Test
+/// This class test the grid timings for a given concentration of elements per cell and a given number of element per
+/// dimension. These two information are embedded in ::testing::WithParamInterface which takes a
+/// tuple<double = concentrationPerCell, size_t = #elementsPerDimension>
+class Grid3DPerformanceTests : public ::testing::Test,
+							   public ::testing::WithParamInterface<std::tuple<double, size_t> >
 {
 public:
+	typedef Eigen::Matrix<size_t, 3, 1> Vector3ui;
+
 	virtual void SetUp()
 	{
-		// The various concentration of elements per axis
-		size_t concentrationPerAxisId = 0;
-
-		// Fine discretization of the concentration per cell from 1^3 to 3^3
-		for (double concentrationPerCell = pow(1.0, 3.0); concentrationPerCell <= pow(3.0, 3.0); concentrationPerCell++)
-		{
-			double concentrationPerAxis = pow(concentrationPerCell, 1.0 / 3.0);
-			m_elementsPerAxis[concentrationPerAxisId++] = concentrationPerAxis;
-		}
-		// Coarse discretization of the concentration per cell from 4^3 to 10^3
-		for (double concentrationPerAxis = 4.0; concentrationPerAxis <= 10.0; concentrationPerAxis++)
-		{
-			m_elementsPerAxis[concentrationPerAxisId++] = concentrationPerAxis;
-		}
-
 		m_h = 0.1;
 		m_bounds.min().setConstant(-pow(2, 10) / 2.0);
 		m_bounds.max().setConstant(pow(2, 10) / 2.0);
 		m_grid = std::make_shared<Grid<size_t, 3>>(Eigen::Matrix<double, 3, 1>::Constant(m_h), m_bounds);
 	}
 
-	void addElementsUniformDistribution(const Eigen::Matrix<size_t, 3, 1>& numElementsPerAxis,
-										double concentrationPerAxis)
+	void addElementsUniformDistribution(const Vector3ui& numElementsPerAxis, double concentrationPerAxis)
 	{
 		double coef = m_h / static_cast<double>(concentrationPerAxis);
 		size_t elementId = 0;
@@ -67,52 +59,31 @@ public:
 					m_grid->addElement(elementId, point);
 					elementId++;
 				}
-				//printf("(%lu %lu)",x,y);
 			}
-			//printf("\n");
 		}
 	}
 
-	void performTimingTest()
+	double performTimingTest(double concentrationPerCell, size_t numElementPerDimension)
 	{
 		SurgSim::Framework::Timer timer;
+		Vector3ui numElementsPerAxis = Vector3ui::Constant(numElementPerDimension);
+		double concentrationPerAxis = pow(concentrationPerCell, 1.0 / 3.0);
 
-		printf("  Notation: e. stands for elements\n");
-		printf("  Unit: Concentration is the number of elements per cell\n");
-		printf("  Unit: Times are given in seconds\n");
-		printf("-------------------------------------------------------------------------------\n");
-		printf("Concentration | 50^3e.  60^3e.  70^3e.  80^3e.  90^3e.  100^3e. 110^3e. 120^3e.\n");
-		printf("-------------------------------------------------------------------------------\n");
-		for (double concentrationPerAxis : m_elementsPerAxis)
-		{
-			printf("%7.2lf       | ", concentrationPerAxis * concentrationPerAxis * concentrationPerAxis);
-			for (size_t i = 5; i <= 12; i++)
-			{
-				timer.start();
+		timer.start();
 
-				// Clear the grid from all previously added elements and clear the neighbor's list
-				m_grid->reset();
+		// Clear the grid from all previously added elements and clear the neighbor's list
+		m_grid->reset();
+		// Add all elements in the grid, triggering a dirty flag for the neighbor's list
+		addElementsUniformDistribution(numElementsPerAxis, concentrationPerAxis);
+		// Request any neighbor's list to force all neighbor's lists recalculation
+		m_grid->getNeighbors(0);
 
-				// Add all elements in the grid, triggering a dirty flag for the neighbor's list
-				addElementsUniformDistribution(Eigen::Matrix<size_t, 3, 1>::Constant(i * 10), concentrationPerAxis);
+		timer.endFrame();
 
-				// Request any neighbor's list to force all neighbor's lists recalculation
-				m_grid->getNeighbors(0);
-
-				timer.endFrame();
-
-				printf("%6.3lf  ", timer.getLastFramePeriod());
-				fflush(stdout);
-			}
-			printf("\n");
-		}
-		printf("-------------------------------------------------------------------------------\n");
+		return timer.getCumulativeTime();
 	}
 
 protected:
-	/// Concentration of elements per axis to be tested
-	std::array<double, 34> m_elementsPerAxis;
-
 	/// Grid size (cells are cubic in this test)
 	double m_h;
 
@@ -123,10 +94,27 @@ protected:
 	std::shared_ptr<Grid<size_t, 3>> m_grid;
 };
 
-TEST_F(GridPerformanceTestBase, GridTest)
+TEST_P(Grid3DPerformanceTests, Grid3DTest)
 {
-	performTimingTest();
+	double concentrationPerCell;
+	size_t numElementsPerDimension;
+	std::tie(concentrationPerCell, numElementsPerDimension) = GetParam();
+	size_t numElements = numElementsPerDimension * numElementsPerDimension * numElementsPerDimension;
+	RecordProperty("Concentration of elements per cell", boost::to_string(concentrationPerCell));
+	RecordProperty("Total number of elements", boost::to_string(numElements));
+	RecordProperty("Time (in s)", boost::to_string(performTimingTest(concentrationPerCell, numElementsPerDimension)));
 }
+
+INSTANTIATE_TEST_CASE_P(
+	Grid3D,
+	Grid3DPerformanceTests,
+	::testing::Combine(
+		// Concentration per cell is fine between 1 and 3^3, then coarser
+		::testing::Values(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0,
+						  18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0,
+						  4 * 4 * 4, 5 * 5 * 5, 6 * 6 * 6, 7 * 7 * 7, 8 * 8 * 8, 9 * 9 * 9, 10 * 10 * 10),
+		// Number of elements per dimension
+		::testing::Values(50, 60, 60, 70, 80, 90, 100, 110, 120)));
 
 } // namespace DataStructures
 } // namespace SurgSim
