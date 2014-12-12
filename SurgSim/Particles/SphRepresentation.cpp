@@ -139,11 +139,11 @@ void SphRepresentation::setKernelSupport(double support)
 		"The kernel support needs to be a valid positive non-null value." << support << " was provided.";
 
 	m_h = support;
-	m_hPow2 = m_h * m_h;
-	m_hPow3 = m_hPow2 * m_h;
-	m_hPow5 = m_hPow3 * m_hPow2;
-	m_hPow6 = m_hPow5 * m_h;
-	m_hPow9 = m_hPow6 * m_hPow3;
+	m_hPower2 = m_h * m_h;
+	m_hPower3 = m_hPower2 * m_h;
+	m_hPower5 = m_hPower3 * m_hPower2;
+	m_hPower6 = m_hPower5 * m_h;
+	m_hPower9 = m_hPower6 * m_hPower3;
 }
 
 double SphRepresentation::getKernelSupport() const
@@ -362,12 +362,12 @@ void SphRepresentation::handleCollisions()
 
 double SphRepresentation::kernelPoly6(const SurgSim::Math::Vector3d& rij)
 {
-	double rPow2 = rij.squaredNorm();
+	double rPower2 = rij.squaredNorm();
 
-	if (rPow2 <= m_hPow2)
+	if (rPower2 <= m_hPower2)
 	{
-		double hPow2_minus_rPow2 = (m_hPow2 - rPow2);
-		return 315.0 / (64.0 * M_PI * m_hPow9) * hPow2_minus_rPow2 * hPow2_minus_rPow2 * hPow2_minus_rPow2;
+		double hh_minus_rr = (m_hPower2 - rPower2);
+		return 315.0 / (64.0 * M_PI * m_hPower9) * hh_minus_rr * hh_minus_rr * hh_minus_rr;
 	}
 	else
 	{
@@ -377,12 +377,12 @@ double SphRepresentation::kernelPoly6(const SurgSim::Math::Vector3d& rij)
 
 SurgSim::Math::Vector3d SphRepresentation::kernelPoly6Gradient(const SurgSim::Math::Vector3d& rij)
 {
-	double rPow2 = rij.squaredNorm();
+	double rPower2 = rij.squaredNorm();
 
-	if (rPow2 <= m_hPow2)
+	if (rPower2 <= m_hPower2)
 	{
-		double hPow2_minus_rPow2 = (m_hPow2 - rPow2);
-		return -rij * 945.0 / (32.0 * M_PI * m_hPow9) * hPow2_minus_rPow2 * hPow2_minus_rPow2;
+		double hh_minus_rr = (m_hPower2 - rPower2);
+		return -rij * 945.0 / (32.0 * M_PI * m_hPower9) * hh_minus_rr * hh_minus_rr;
 	}
 	else
 	{
@@ -392,12 +392,12 @@ SurgSim::Math::Vector3d SphRepresentation::kernelPoly6Gradient(const SurgSim::Ma
 
 double SphRepresentation::kernelPoly6Laplacian(const SurgSim::Math::Vector3d& rij)
 {
-	double rPow2 = rij.squaredNorm();
+	double rPower2 = rij.squaredNorm();
 
-	if (rPow2 <= m_hPow2)
+	if (rPower2 <= m_hPower2)
 	{
-		double hPow2_minus_rPow2 = (m_hPow2 - rPow2);
-		return 945.0 / (8.0 * M_PI * m_hPow9) * hPow2_minus_rPow2 * (rPow2 - 3.0 / 4.0 * hPow2_minus_rPow2);
+		double hh_minus_rr = (m_hPower2 - rPower2);
+		return 945.0 / (8.0 * M_PI * m_hPower9) * hh_minus_rr * (rPower2 - 3.0 / 4.0 * hh_minus_rr);
 	}
 	else
 	{
@@ -412,7 +412,7 @@ double SphRepresentation::kernelSpiky(const SurgSim::Math::Vector3d& rij)
 	if (r <= m_h)
 	{
 		double h_minus_r = m_h - r;
-		return 15.0 / (M_PI * m_hPow6) * h_minus_r * h_minus_r * h_minus_r;
+		return 15.0 / (M_PI * m_hPower6) * h_minus_r * h_minus_r * h_minus_r;
 	}
 	else
 	{
@@ -427,7 +427,7 @@ SurgSim::Math::Vector3d SphRepresentation::kernelSpikyGradient(const SurgSim::Ma
 	if (r <= m_h)
 	{
 		double h_minus_r = m_h - r;
-		return -rij * 45.0 / (M_PI * m_hPow6 * r) * h_minus_r * h_minus_r;
+		return -rij * 45.0 / (M_PI * m_hPower6 * r) * h_minus_r * h_minus_r;
 	}
 	else
 	{
@@ -442,8 +442,8 @@ double SphRepresentation::kernelViscosity(const SurgSim::Math::Vector3d& rij)
 	if (r <= m_h)
 	{
 		double q = r / m_h;
-		double qPow2 = q * q;
-		return 15.0 / (2.0 * M_PI * m_hPow3) * (-0.5 * q * qPow2 + qPow2 + 0.5 / q - 1.0);
+		double qPower2 = q * q;
+		return 15.0 / (2.0 * M_PI * m_hPower3) * (-0.5 * q * qPower2 + qPower2 + 0.5 / q - 1.0);
 	}
 	else
 	{
@@ -457,7 +457,7 @@ SurgSim::Math::Vector3d SphRepresentation::kernelViscosityGradient(const SurgSim
 
 	if (r <= m_h)
 	{
-		return rij * 15.0 / (2.0 * M_PI * m_hPow3) * (-1.5 * r / m_hPow3 + 2.0 / m_hPow2 - 0.5 * m_h / (r*r*r));
+		return rij * 15.0 / (2.0 * M_PI * m_hPower3) * (-1.5 * r / m_hPower3 + 2.0 / m_hPower2 - 0.5 * m_h / (r*r*r));
 	}
 	else
 	{
@@ -471,7 +471,7 @@ double SphRepresentation::kernelViscosityLaplacian(const SurgSim::Math::Vector3d
 
 	if (r <= m_h)
 	{
-		return 45.0 / (M_PI * m_hPow5) * (1.0 - r / m_h);
+		return 45.0 / (M_PI * m_hPower5) * (1.0 - r / m_h);
 	}
 	else
 	{

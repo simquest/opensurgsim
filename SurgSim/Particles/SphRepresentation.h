@@ -169,7 +169,7 @@ protected:
 	double m_viscosity;                             ///< Viscosity coefficient
 
 	/// Kernels parameter (support length and its powers)
-	double m_h, m_hPow2, m_hPow3, m_hPow5, m_hPow6, m_hPow9;
+	double m_h, m_hPower2, m_hPower3, m_hPower5, m_hPower6, m_hPower9;
 
 	/// Grid acceleration to evaluate the kernels locally (storing the particles' index)
 	std::shared_ptr<SurgSim::DataStructures::Grid<size_t, 3>> m_grid;
