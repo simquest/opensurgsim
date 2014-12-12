@@ -73,6 +73,70 @@ TEST(TransferParticlesToPointCloudBehaviorTests, SetGetTargetTest)
 	EXPECT_EQ(pointCloud, behavior->getTarget());
 }
 
+namespace anonymous
+{
+void testdoInitialize(bool setSource, bool setTarget, bool expectedValidation)
+{
+	auto runtime = std::make_shared<Runtime>("config.txt");
+	auto behaviorManager = std::make_shared<BehaviorManager>();
+	runtime->addManager(behaviorManager);
+
+	auto sceneElement = std::make_shared<BasicSceneElement>("scene element");
+	auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+
+	if (setSource)
+	{
+		auto particles = std::make_shared<SphRepresentation>("Particles");
+		particles->setMassPerParticle(1.0);
+		particles->setDensityReference(1.0);
+		particles->setGasStiffness(1.0);
+		particles->setKernelSupport(1.0);
+		behavior->setSource(particles);
+	}
+
+	if (setTarget)
+	{
+		auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
+		behavior->setTarget(pointCloud);
+	}
+
+	sceneElement->addComponent(behavior);
+
+	// Add the scene element into the runtime->scene trigger a calls to doInitialize
+	if (expectedValidation)
+	{
+		EXPECT_NO_THROW(runtime->getScene()->addSceneElement(sceneElement));
+	}
+	else
+	{
+		EXPECT_THROW(runtime->getScene()->addSceneElement(sceneElement), SurgSim::Framework::AssertionFailure);
+	}
+}
+}; // namespace anonymous
+
+TEST(TransferParticlesToPointCloudBehaviorTests, DoInitializeTest)
+{
+	{
+		SCOPED_TRACE("Unset Source and Target");
+		anonymous::testdoInitialize(false, false, false);
+	}
+
+	{
+		SCOPED_TRACE("Unset Source and set Target");
+		anonymous::testdoInitialize(false, true, false);
+	}
+
+	{
+		SCOPED_TRACE("Set Source and unset Target");
+		anonymous::testdoInitialize(true, false, false);
+	}
+
+	{
+		SCOPED_TRACE("Set Source and set Target");
+		anonymous::testdoInitialize(true, true, true);
+	}
+}
+
 TEST(TransferParticlesToPointCloudBehaviorTests, UpdateTest)
 {
 	auto runtime = std::make_shared<Runtime>("config.txt");

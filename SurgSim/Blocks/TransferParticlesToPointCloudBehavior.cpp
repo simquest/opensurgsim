@@ -89,6 +89,9 @@ void TransferParticlesToPointCloudBehavior::update(double dt)
 
 bool TransferParticlesToPointCloudBehavior::doInitialize()
 {
+	SURGSIM_ASSERT(m_source != nullptr) << "SetSource must be called prior to initialization";
+	SURGSIM_ASSERT(m_target != nullptr) << "SetTarget must be called prior to initialization";
+
 	return true;
 }
 
