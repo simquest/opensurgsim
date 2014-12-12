@@ -65,6 +65,14 @@ public:
 	/// \param velocity The particle's velocity [m/s]
 	void setVelocity(const Eigen::Ref<const SurgSim::Math::Vector3d>& velocity);
 
+	/// Get the particle's acceleration
+	/// \return The particle's acceleration [m/s2]
+	const Eigen::VectorBlock<const SurgSim::Math::Vector, 3> getAcceleration() const;
+
+	/// Set the particle's acceleration
+	/// \param acceleration The particle's acceleration [m/s2]
+	void setAcceleration(const Eigen::Ref<const SurgSim::Math::Vector3d>& acceleration);
+
 	/// Get the particle's lifetime
 	/// \return The remaining lifetime [s]
 	double getLifetime() const;

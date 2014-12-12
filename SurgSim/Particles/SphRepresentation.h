@@ -156,7 +156,6 @@ public:
 	const std::vector<SphRepresentation::PlaneConstraint>& getPlaneConstraints() const;
 
 protected:
-	SurgSim::Math::Vector m_a;                      ///< Particles' acceleration
 	std::vector<SurgSim::Math::Vector3d> m_normal;  ///< Particles' normal
 	std::vector<double> m_density;                  ///< Particles' density
 	std::vector<double> m_pressure;                 ///< Particles' pressure
@@ -184,13 +183,13 @@ protected:
 
 	/// Compute the particles' acceleration given a time step dt
 	/// \param dt The time step to advance the simulation too
-	/// \note This method stores the particles' acceleration in m_a
+	/// \note This method stores the accelerations in the state.
 	virtual void computeAcceleration(double dt);
 
 	/// Compute the particles' velocity and position given a time step dt
 	/// \param dt The time step to advance the simulation too
-	/// \note This method integrates the ODE equation of the SPH, computing velocity and position (in the state)
-	/// \note from the acceleration m_a. Therefore computeAcceleration(dt) should be called before.
+	/// \note This method integrates the ODE equation of the SPH, computing velocities and positions from the
+	/// \note accelerations and storing them in the state. Therefore computeAcceleration(dt) should be called before.
 	virtual void computeVelocityAndPosition(double dt);
 
 private:

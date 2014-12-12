@@ -50,6 +50,14 @@ public:
 	/// \return Vector of collected lifetimes
 	const SurgSim::Math::Vector& getLifetimes() const;
 
+	/// Retrieves all accelerations (non-const version)
+	/// \return Vector of collected accelerations
+	SurgSim::Math::Vector& getAccelerations();
+
+	/// Retrieves all accelerations (const version)
+	/// \return Vector of collected accelerations
+	const SurgSim::Math::Vector& getAccelerations() const;
+
 	virtual void reset() override;
 
 	virtual void setNumDof(size_t numDofPerNode, size_t numNodes) override;
@@ -58,6 +66,8 @@ public:
 
 private:
 	SurgSim::Math::Vector m_lifetimes;
+
+	SurgSim::Math::Vector m_accelerations;
 };
 
 

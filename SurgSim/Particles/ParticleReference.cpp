@@ -70,6 +70,17 @@ void ParticleReference::setVelocity(const Eigen::Ref<const SurgSim::Math::Vector
 	m_state->getVelocities().segment<3>(3 * m_index) = velocity;
 }
 
+const Eigen::VectorBlock<const SurgSim::Math::Vector, 3> ParticleReference::getAcceleration() const
+{
+	const SurgSim::Math::Vector& a = m_state->getAccelerations();
+	return a.segment<3>(3 * m_index);
+}
+
+void ParticleReference::setAcceleration(const Eigen::Ref<const SurgSim::Math::Vector3d>& acceleration)
+{
+	m_state->getAccelerations().segment<3>(3 * m_index) = acceleration;
+}
+
 double ParticleReference::getLifetime() const
 {
 	return m_state->getLifetimes()[m_index];

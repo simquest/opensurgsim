@@ -182,7 +182,6 @@ bool SphRepresentation::doInitialize()
 	SURGSIM_ASSERT(m_h > 0.0) <<
 		"The kernel support needs to be set prior to adding the component in the SceneElement";
 
-	m_a.setZero(3 * m_maxParticles);
 	m_normal.resize(m_maxParticles);
 	m_density.resize(m_maxParticles);
 	m_pressure.resize(m_maxParticles);
@@ -225,11 +224,8 @@ void SphRepresentation::computeAcceleration(double dt)
 
 void SphRepresentation::computeVelocityAndPosition(double dt)
 {
-	auto& x = m_state->getPositions();
-	auto& v = m_state->getVelocities();
-
-	v += dt * m_a;
-	x += dt * v;
+	m_state->getVelocities() += dt * m_state->getAccelerations();
+	m_state->getPositions() += dt * m_state->getVelocities();
 }
 
 void SphRepresentation::computeNeighbors()
@@ -289,14 +285,13 @@ void SphRepresentation::computeAccelerations()
 {
 	SurgSim::Math::Vector3d f;
 
-	m_a.setZero();
+	m_state->getAccelerations().setZero();
 
 	for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
 		particleI != getParticleReferences().end();
 		++particleI)
 	{
 		const size_t indexI = particleI->getIndex();
-		Eigen::VectorBlock<SurgSim::Math::Vector, 3> aI = m_a.segment<3>(3 * indexI);
 		const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
 		const Eigen::VectorBlock<const Vector, 3> vI = particleI->getVelocity();
 
@@ -308,7 +303,6 @@ void SphRepresentation::computeAccelerations()
 				continue;
 			}
 
-			Eigen::VectorBlock<SurgSim::Math::Vector, 3> aJ = m_a.segment<3>(3 * indexJ);
 			SurgSim::Math::Vector3d rij = xI - m_state->getPositions().segment<3>(3 * indexJ);
 			SurgSim::Math::Vector3d vji = -vI + m_state->getVelocities().segment<3>(3 * indexJ);
 
@@ -330,15 +324,15 @@ void SphRepresentation::computeAccelerations()
 			}
 
 			// Action/reaction application on the pair of particles
-			aI += f;
-			aJ -= f;
+			particleI->setAcceleration(particleI->getAcceleration() + f);
+			m_state->getAccelerations().segment<3>(3 * indexJ) -= f;
 		}
 
 		// Compute the acceleration from the forces
-		aI /= m_density[indexI];
+		particleI->setAcceleration(particleI->getAcceleration() / m_density[indexI]);
 
 		// Adding the gravity term (F = rho.g)
-		aI += m_gravity;
+		particleI->setAcceleration(particleI->getAcceleration() + m_gravity);
 	}
 }
 
@@ -360,7 +354,7 @@ void SphRepresentation::handleCollisions()
 				const Eigen::VectorBlock<const Vector, 3> vI = particleI->getVelocity();
 				double forceIntensity = planeConstraint.stiffness * penetration +
 										planeConstraint.damping * vI.dot(n);
-				m_a.segment<3>(3 * particleI->getIndex()) -= forceIntensity * n;
+				particleI->setAcceleration(particleI->getAcceleration() - forceIntensity * n);
 			}
 		}
 	}

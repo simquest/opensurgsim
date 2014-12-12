@@ -48,6 +48,7 @@ TEST(ParticleReferenceTests, GetSetPosition)
 	EXPECT_TRUE(Vector3d::Constant(2.0).isApprox(reference.getPosition()));
 	EXPECT_TRUE(state->getPositions().isApprox((Vector(6) << 0.0, 0.0, 0.0, 2.0, 2.0, 2.0).finished()));
 	EXPECT_TRUE(state->getVelocities().isZero());
+	EXPECT_TRUE(state->getAccelerations().isZero());
 	EXPECT_TRUE(state->getLifetimes().isZero());
 }
 
@@ -62,6 +63,22 @@ TEST(ParticleReferenceTests, GetSetVelocity)
 	EXPECT_TRUE(Vector3d::Constant(5.0).isApprox(reference.getVelocity()));
 	EXPECT_TRUE(state->getPositions().isZero());
 	EXPECT_TRUE(state->getVelocities().isApprox((Vector(6) << 0.0, 0.0, 0.0, 5.0, 5.0, 5.0).finished()));
+	EXPECT_TRUE(state->getAccelerations().isZero());
+	EXPECT_TRUE(state->getLifetimes().isZero());
+}
+
+TEST(ParticleReferenceTests, GetSetAcceleration)
+{
+	auto state = std::make_shared<ParticlesState>();
+	state->setNumDof(3u, 2u);
+	ParticleReference reference(state, 1);
+
+	EXPECT_TRUE(reference.getAcceleration().isZero());
+	reference.setAcceleration(Vector3d::Constant(5.0));
+	EXPECT_TRUE(Vector3d::Constant(5.0).isApprox(reference.getAcceleration()));
+	EXPECT_TRUE(state->getPositions().isZero());
+	EXPECT_TRUE(state->getVelocities().isZero());
+	EXPECT_TRUE(state->getAccelerations().isApprox((Vector(6) << 0.0, 0.0, 0.0, 5.0, 5.0, 5.0).finished()));
 	EXPECT_TRUE(state->getLifetimes().isZero());
 }
 
@@ -77,6 +94,7 @@ TEST(ParticleReferenceTests, GetSetLifetime)
 	EXPECT_TRUE(state->getPositions().isZero());
 	EXPECT_TRUE(state->getVelocities().isZero());
 	EXPECT_TRUE(state->getLifetimes().isApprox((Vector(2) << 0.0, 20.0).finished()));
+	EXPECT_TRUE(state->getAccelerations().isZero());
 }
 
 TEST(ParticleReferenceTests, CanAssign)
@@ -90,6 +108,7 @@ TEST(ParticleReferenceTests, CanAssign)
 
 	EXPECT_TRUE(particle.getPosition().isApprox(reference.getPosition()));
 	EXPECT_TRUE(particle.getVelocity().isApprox(reference.getVelocity()));
+	// Note that particle does not hold an acceleration information.
 	EXPECT_NEAR(particle.getLifetime(), reference.getLifetime(), 1e-9);
 }
 
