@@ -48,7 +48,6 @@ set(LIBS
 	IdentityPoseDevice
 	SurgSimBlocks
 	SurgSimGraphics
-	SurgSimParticles
 )
 
 surgsim_add_unit_tests(SurgSimBlocksTest)
