@@ -260,19 +260,21 @@ struct convert<SurgSim::Particles::SphRepresentation::PlaneConstraint>
 {
 	static Node encode(const SurgSim::Particles::SphRepresentation::PlaneConstraint rhs)
 	{
-		Node result;
-		result["planeEquation"] = rhs.planeEquation;
-		result["stiffness"] = rhs.stiffness;
-		result["damping"] = rhs.damping;
+		Node data, result;
+		data["PlaneEquation"] = rhs.planeEquation;
+		data["Stiffness"] = rhs.stiffness;
+		data["Damping"] = rhs.damping;
+		result["PlaneConstraint"] = data;
 		return result;
 	}
 	static bool decode(const Node& node, SurgSim::Particles::SphRepresentation::PlaneConstraint& rhs)
 	{
 		try
 		{
-			rhs.planeEquation = node["planeEquation"].as<SurgSim::Math::Vector4d>();
-			rhs.stiffness= node["stiffness"].as<double>();
-			rhs.damping = node["damping"].as<double>();
+			Node data = node["PlaneConstraint"];
+			rhs.planeEquation = data["PlaneEquation"].as<SurgSim::Math::Vector4d>();
+			rhs.stiffness= data["Stiffness"].as<double>();
+			rhs.damping = data["Damping"].as<double>();
 		}
 		catch (YAML::RepresentationException)
 		{
