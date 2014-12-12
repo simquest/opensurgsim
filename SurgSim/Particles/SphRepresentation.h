@@ -212,58 +212,42 @@ private:
 	/// Kernel poly6
 	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
 	/// \return The kernel poly6 evaluated with rij and m_h
-	/// \tparam Derived Eigen vector 3d derived type
-	template <typename Derived>
-	double KernelPoly6(const Eigen::MatrixBase<Derived>& rij);
+	double kernelPoly6(const SurgSim::Math::Vector3d& rij);
 
 	/// Kernel poly6's gradient
 	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
 	/// \return The kernel poly6's gradient evaluated with rij and m_h
-	/// \tparam Derived Eigen vector 3d derived type
-	template <typename Derived>
-	SurgSim::Math::Vector3d KernelPoly6Gradient(const Eigen::MatrixBase<Derived>& rij);
+	SurgSim::Math::Vector3d kernelPoly6Gradient(const SurgSim::Math::Vector3d& rij);
 
 	/// Kernel poly6's laplacian
 	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
 	/// \return The kernel poly6's laplacian evaluated with rij and m_h
-	/// \tparam Derived Eigen vector 3d derived type
-	template <typename Derived>
-	double KernelPoly6Laplacian(const Eigen::MatrixBase<Derived>& rij);
+	double kernelPoly6Laplacian(const SurgSim::Math::Vector3d& rij);
 
 	/// Kernel spiky
 	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
 	/// \return The kernel spiky evaluated with rij and m_h
-	/// \tparam Derived Eigen vector 3d derived type
-	template <typename Derived>
-	double KernelSpiky(const Eigen::MatrixBase<Derived>& rij);
+	double kernelSpiky(const SurgSim::Math::Vector3d& rij);
 
 	/// Kernel spiky's gradient
 	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
 	/// \return The kernel spiky's gradient evaluated with rij and m_h
-	/// \tparam Derived Eigen vector 3d derived type
-	template <typename Derived>
-	SurgSim::Math::Vector3d KernelSpikyGradient(const Eigen::MatrixBase<Derived>& rij);
+	SurgSim::Math::Vector3d kernelSpikyGradient(const SurgSim::Math::Vector3d& rij);
 
 	/// Kernel viscosity
 	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
 	/// \return The kernel viscosity evaluated with rij and m_h
-	/// \tparam Derived Eigen vector 3d derived type
-	template <typename Derived>
-	double KernelViscosity(const Eigen::MatrixBase<Derived>& rij);
+	double kernelViscosity(const SurgSim::Math::Vector3d& rij);
 
 	/// Kernel viscosity's gradient
 	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
 	/// \return The kernel viscosity's gradient evaluated with rij and m_h
-	/// \tparam Derived Eigen vector 3d derived type
-	template <typename Derived>
-	SurgSim::Math::Vector3d KernelViscosityGradient(const Eigen::MatrixBase<Derived>& rij);
+	SurgSim::Math::Vector3d kernelViscosityGradient(const SurgSim::Math::Vector3d& rij);
 
 	/// Kernel viscosity's laplacian
 	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
 	/// \return The kernel viscosity's laplacian evaluated with rij and m_h
-	/// \tparam Derived Eigen vector 3d derived type
-	template <typename Derived>
-	double KernelViscosityLaplacian(const Eigen::MatrixBase<Derived>& rij);
+	double kernelViscosityLaplacian(const SurgSim::Math::Vector3d& rij);
 };
 
 };  // namespace Particles
@@ -301,7 +285,5 @@ struct convert<SurgSim::Particles::SphRepresentation::PlaneConstraint>
 	}
 };
 }; // namespace YAML
-
-#include "SurgSim/Particles/SphRepresentation-inl.h"
 
 #endif  // SURGSIM_PARTICLES_SPHREPRESENTATION_H

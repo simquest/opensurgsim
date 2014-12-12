@@ -41,7 +41,6 @@ set(SURGSIM_PARTICLES_HEADERS
 	RandomPointGenerator.h
 	RandomSpherePointGenerator.h
 	SphRepresentation.h
-	SphRepresentation-inl.h
 )
 
 surgsim_add_library(

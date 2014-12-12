@@ -258,7 +258,7 @@ void SphRepresentation::computeDensityAndPressureField(void)
 		for (auto indexJ : m_grid->getNeighbors(indexI))
 		{
 			const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
-			rhoI += m_mass[indexJ] * KernelPoly6(xI - xJ);
+			rhoI += m_mass[indexJ] * kernelPoly6(xI - xJ);
 		}
 
 		// Calculate the particle's pressure
@@ -282,7 +282,7 @@ void SphRepresentation::computeNormalField(void)
 		for (auto indexJ : m_grid->getNeighbors(indexI))
 		{
 			const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
-			normalI += m_mass[indexJ] / m_density[indexJ] * KernelPoly6Gradient(xI - xJ);
+			normalI += m_mass[indexJ] / m_density[indexJ] * kernelPoly6Gradient(xI - xJ);
 		}
 	}
 }
@@ -318,15 +318,15 @@ void SphRepresentation::computeAccelerations(void)
 			Eigen::VectorBlock<SurgSim::Math::Vector, 3> aJ = m_a.segment<3>(3 * indexJ);
 
 			// Acceleration from the pressure
-			SurgSim::Math::Vector3d grad = KernelSpikyGradient(xI - xJ);
+			SurgSim::Math::Vector3d grad = kernelSpikyGradient(xI - xJ);
 			f = (-massJ * (pI + pJ) / (2.0 * rhoI)) * grad;
 
 			// Acceleration from the viscosity
-			double laplacian = KernelViscosityLaplacian(xI - xJ);
+			double laplacian = kernelViscosityLaplacian(xI - xJ);
 			f += (m_viscosity * massJ * (vJ - vI) / rhoJ) * laplacian;
 
 			// Acceleration from the surface tension
-			double laplacianPoly6 = KernelPoly6Laplacian(xI - xJ);
+			double laplacianPoly6 = kernelPoly6Laplacian(xI - xJ);
 			double normalNorm = normalJ.norm();
 			if (normalNorm > 20.0)
 			{
@@ -363,6 +363,125 @@ void SphRepresentation::handleCollisions()
 				m_a.segment<3>(3 * particleI.getIndex()) -= forceIntensity * n;
 			}
 		}
+	}
+}
+
+double SphRepresentation::kernelPoly6(const SurgSim::Math::Vector3d& rij)
+{
+	double rPow2 = rij.squaredNorm();
+
+	if (rPow2 <= m_hPow2)
+	{
+		double hPow2_minus_rPow2 = (m_hPow2 - rPow2);
+		return 315.0 / (64.0 * M_PI * m_hPow9) * hPow2_minus_rPow2 * hPow2_minus_rPow2 * hPow2_minus_rPow2;
+	}
+	else
+	{
+		return 0.0;
+	}
+}
+
+SurgSim::Math::Vector3d SphRepresentation::kernelPoly6Gradient(const SurgSim::Math::Vector3d& rij)
+{
+	double rPow2 = rij.squaredNorm();
+
+	if (rPow2 <= m_hPow2)
+	{
+		double hPow2_minus_rPow2 = (m_hPow2 - rPow2);
+		return -rij * 945.0 / (32.0 * M_PI * m_hPow9) * hPow2_minus_rPow2 * hPow2_minus_rPow2;
+	}
+	else
+	{
+		return SurgSim::Math::Vector3d::Zero();
+	}
+}
+
+double SphRepresentation::kernelPoly6Laplacian(const SurgSim::Math::Vector3d& rij)
+{
+	double rPow2 = rij.squaredNorm();
+
+	if (rPow2 <= m_hPow2)
+	{
+		double hPow2_minus_rPow2 = (m_hPow2 - rPow2);
+		return 945.0 / (8.0 * M_PI * m_hPow9) * hPow2_minus_rPow2 * (rPow2 - 3.0 / 4.0 * hPow2_minus_rPow2);
+	}
+	else
+	{
+		return 0.0;
+	}
+}
+
+double SphRepresentation::kernelSpiky(const SurgSim::Math::Vector3d& rij)
+{
+	double r = rij.norm();
+
+	if (r <= m_h)
+	{
+		double h_minus_r = m_h - r;
+		return 15.0 / (M_PI * m_hPow6) * h_minus_r * h_minus_r * h_minus_r;
+	}
+	else
+	{
+		return 0.0;
+	}
+}
+
+SurgSim::Math::Vector3d SphRepresentation::kernelSpikyGradient(const SurgSim::Math::Vector3d& rij)
+{
+	double r = rij.norm();
+
+	if (r <= m_h)
+	{
+		double h_minus_r = m_h - r;
+		return -rij * 45.0 / (M_PI * m_hPow6 * r) * h_minus_r * h_minus_r;
+	}
+	else
+	{
+		return SurgSim::Math::Vector3d::Zero();
+	}
+}
+
+double SphRepresentation::kernelViscosity(const SurgSim::Math::Vector3d& rij)
+{
+	double r = rij.norm();
+
+	if (r <= m_h)
+	{
+		double q = r / m_h;
+		double qPow2 = q * q;
+		return 15.0 / (2.0 * M_PI * m_hPow3) * (-0.5 * q * qPow2 + qPow2 + 0.5 / q - 1.0);
+	}
+	else
+	{
+		return 0.0;
+	}
+}
+
+SurgSim::Math::Vector3d SphRepresentation::kernelViscosityGradient(const SurgSim::Math::Vector3d& rij)
+{
+	double r = rij.norm();
+
+	if (r <= m_h)
+	{
+		return rij * 15.0 / (2.0 * M_PI * m_hPow3) * (-1.5 * r / m_hPow3 + 2.0 / m_hPow2 - 0.5 * m_h / (r*r*r));
+	}
+	else
+	{
+		return SurgSim::Math::Vector3d::Zero();
+	}
+}
+
+double SphRepresentation::kernelViscosityLaplacian(const SurgSim::Math::Vector3d& rij)
+{
+	double r = rij.norm();
+
+	if (r <= m_h)
+	{
+		return 45.0 / (M_PI * m_hPow5) * (1.0 - r / m_h);
+	}
+	else
+	{
+		return 0.0;
 	}
 }
 
