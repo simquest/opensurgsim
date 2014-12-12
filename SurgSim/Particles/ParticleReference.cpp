@@ -48,9 +48,10 @@ size_t ParticleReference::getIndex() const
 	return m_index;
 }
 
-const Eigen::VectorBlock<SurgSim::Math::Vector, 3> ParticleReference::getPosition() const
+const Eigen::VectorBlock<const SurgSim::Math::Vector, 3> ParticleReference::getPosition() const
 {
-	return m_state->getPositions().segment<3>(3 * m_index);
+	const SurgSim::Math::Vector& x = m_state->getPositions();
+	return x.segment<3>(3 * m_index);
 }
 
 void ParticleReference::setPosition(const Eigen::Ref<const SurgSim::Math::Vector3d>& position)
@@ -58,9 +59,10 @@ void ParticleReference::setPosition(const Eigen::Ref<const SurgSim::Math::Vector
 	m_state->getPositions().segment<3>(3 * m_index) = position;
 }
 
-const Eigen::VectorBlock<SurgSim::Math::Vector, 3> ParticleReference::getVelocity() const
+const Eigen::VectorBlock<const SurgSim::Math::Vector, 3> ParticleReference::getVelocity() const
 {
-	return m_state->getVelocities().segment<3>(3 * m_index);
+	const SurgSim::Math::Vector& v = m_state->getVelocities();
+	return v.segment<3>(3 * m_index);
 }
 
 void ParticleReference::setVelocity(const Eigen::Ref<const SurgSim::Math::Vector3d>& velocity)

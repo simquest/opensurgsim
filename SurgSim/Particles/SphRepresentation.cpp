@@ -22,6 +22,8 @@
 #include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/ParticlesState.h"
 
+using SurgSim::Math::Vector;
+
 namespace SurgSim
 {
 namespace Particles
@@ -247,13 +249,13 @@ void SphRepresentation::computeDensityAndPressureField()
 		++particleI)
 	{
 		size_t indexI = particleI->getIndex();
-		const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xI = particleI->getPosition();
+		const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
 
 		// Calculate the particle's density
 		double densityI = 0.0;
 		for (auto indexJ : m_grid->getNeighbors(indexI))
 		{
-			const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
+			const Eigen::VectorBlock<Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
 			densityI += m_mass[indexJ] * kernelPoly6(xI - xJ);
 		}
 		m_density[indexI] = densityI;
@@ -270,13 +272,13 @@ void SphRepresentation::computeNormalField()
 		++particleI)
 	{
 		const size_t indexI = particleI->getIndex();
-		const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xI = particleI->getPosition();
+		const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
 
 		// Calculate the particle's normal (gradient of the color field)
 		SurgSim::Math::Vector3d normalI = SurgSim::Math::Vector3d::Zero();
 		for (auto indexJ : m_grid->getNeighbors(indexI))
 		{
-			const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
+			const Eigen::VectorBlock<Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
 			normalI += m_mass[indexJ] / m_density[indexJ] * kernelPoly6Gradient(xI - xJ);
 		}
 		m_normal[indexI] = normalI;
@@ -294,9 +296,9 @@ void SphRepresentation::computeAccelerations()
 		++particleI)
 	{
 		const size_t indexI = particleI->getIndex();
-		const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xI = particleI->getPosition();
-		const Eigen::VectorBlock<SurgSim::Math::Vector, 3> vI = particleI->getVelocity();
 		Eigen::VectorBlock<SurgSim::Math::Vector, 3> aI = m_a.segment<3>(3 * indexI);
+		const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
+		const Eigen::VectorBlock<const Vector, 3> vI = particleI->getVelocity();
 
 		for (auto indexJ : m_grid->getNeighbors(indexI))
 		{
@@ -308,7 +310,7 @@ void SphRepresentation::computeAccelerations()
 
 			Eigen::VectorBlock<SurgSim::Math::Vector, 3> aJ = m_a.segment<3>(3 * indexJ);
 			SurgSim::Math::Vector3d rij = xI - m_state->getPositions().segment<3>(3 * indexJ);
-			SurgSim::Math::Vector3d vji = m_state->getVelocities().segment<3>(3 * indexJ) - vI;
+			SurgSim::Math::Vector3d vji = -vI + m_state->getVelocities().segment<3>(3 * indexJ);
 
 			// Pressure force
 			SurgSim::Math::Vector3d grad = kernelSpikyGradient(rij);
@@ -346,16 +348,19 @@ void SphRepresentation::handleCollisions()
 	{
 		auto n = planeConstraint.planeEquation.segment<3>(0);
 
-		for (auto const & particleI : getParticleReferences())
+		for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
+			particleI != getParticleReferences().end();
+			++particleI)
 		{
-			const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xI = particleI.getPosition();
+			const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
 			double penetration = xI.dot(n) + planeConstraint.planeEquation[3];
 
 			if (penetration < 0.0)
 			{
-				const Eigen::VectorBlock<SurgSim::Math::Vector, 3> vI = particleI.getVelocity();
-				double forceIntensity = (planeConstraint.stiffness * penetration + planeConstraint.damping * vI.dot(n));
-				m_a.segment<3>(3 * particleI.getIndex()) -= forceIntensity * n;
+				const Eigen::VectorBlock<const Vector, 3> vI = particleI->getVelocity();
+				double forceIntensity = planeConstraint.stiffness * penetration +
+										planeConstraint.damping * vI.dot(n);
+				m_a.segment<3>(3 * particleI->getIndex()) -= forceIntensity * n;
 			}
 		}
 	}

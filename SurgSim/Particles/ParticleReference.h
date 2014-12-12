@@ -51,7 +51,7 @@ public:
 
 	/// Get the particle's position
 	/// \return The particles position [m]
-	const Eigen::VectorBlock<SurgSim::Math::Vector, 3> getPosition() const;
+	const Eigen::VectorBlock<const SurgSim::Math::Vector, 3> getPosition() const;
 
 	/// Set the particle's position
 	/// \param position The particles position [m]
@@ -59,7 +59,7 @@ public:
 
 	/// Get the particle's velocity
 	/// \return The particle's velocity [m/s]
-	const Eigen::VectorBlock<SurgSim::Math::Vector, 3> getVelocity() const;
+	const Eigen::VectorBlock<const SurgSim::Math::Vector, 3> getVelocity() const;
 
 	/// Set the particle's velocity
 	/// \param velocity The particle's velocity [m/s]
