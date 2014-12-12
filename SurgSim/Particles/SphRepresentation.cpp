@@ -240,7 +240,7 @@ void SphRepresentation::computeNeighbors()
 	}
 }
 
-void SphRepresentation::computeDensityAndPressureField(void)
+void SphRepresentation::computeDensityAndPressureField()
 {
 	for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
 		particleI != getParticleReferences().end();
@@ -263,7 +263,7 @@ void SphRepresentation::computeDensityAndPressureField(void)
 	}
 }
 
-void SphRepresentation::computeNormalField(void)
+void SphRepresentation::computeNormalField()
 {
 	for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
 		particleI != getParticleReferences().end();
@@ -283,7 +283,7 @@ void SphRepresentation::computeNormalField(void)
 	}
 }
 
-void SphRepresentation::computeAccelerations(void)
+void SphRepresentation::computeAccelerations()
 {
 	SurgSim::Math::Vector3d f;
 

@@ -153,7 +153,7 @@ void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& p
 }
 
 template <typename T, size_t N>
-void Grid<T, N>::update(void)
+void Grid<T, N>::update()
 {
 	std::array<NDId, powerOf3<N>::value> cellsIds;
 

@@ -198,13 +198,13 @@ private:
 	virtual void computeNeighbors();
 
 	/// Compute the density and pressure field
-	virtual void computeDensityAndPressureField(void);
+	virtual void computeDensityAndPressureField();
 
 	/// Compute the normal field
-	virtual void computeNormalField(void);
+	virtual void computeNormalField();
 
 	/// Compute the Sph accelerations
-	virtual void computeAccelerations(void);
+	virtual void computeAccelerations();
 
 	/// Compute collision detection and response against all plane constraints
 	virtual void handleCollisions();
