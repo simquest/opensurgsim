@@ -29,7 +29,8 @@ TEST(TimerTest, Starting)
 	std::shared_ptr<Timer> timer = std::make_shared<Timer>();
 	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 0);
 	EXPECT_EQ(timer->getNumberOfClockFails(), 0);
-	EXPECT_THROW(timer->getCumulativeTime(), SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(timer->getCumulativeTime());
+	EXPECT_EQ(0.0, timer->getCumulativeTime());
 	EXPECT_THROW(timer->getAverageFramePeriod(), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(timer->getAverageFrameRate(), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(timer->getLastFramePeriod(), SurgSim::Framework::AssertionFailure);
@@ -83,7 +84,7 @@ TEST(TimerTest, GetWithoutAnyFrames)
 {
 	std::shared_ptr<Timer> timer = std::make_shared<Timer>();
 
-	EXPECT_ANY_THROW(timer->getCumulativeTime());
+	EXPECT_NO_THROW(timer->getCumulativeTime());
 	EXPECT_ANY_THROW(timer->getAverageFramePeriod());
 	EXPECT_ANY_THROW(timer->getAverageFrameRate());
 	EXPECT_ANY_THROW(timer->getLastFramePeriod());
@@ -91,5 +92,3 @@ TEST(TimerTest, GetWithoutAnyFrames)
 	EXPECT_ANY_THROW(timer->getMaxFramePeriod());
 	EXPECT_ANY_THROW(timer->getMinFramePeriod());
 }
-
-

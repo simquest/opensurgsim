@@ -34,18 +34,19 @@ DefaultContactCalculation::~DefaultContactCalculation()
 {
 }
 
-std::pair<int,int> DefaultContactCalculation::getShapeTypes()
+std::pair<int, int> DefaultContactCalculation::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_NONE, SurgSim::Math::SHAPE_TYPE_NONE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_NONE, SurgSim::Math::SHAPE_TYPE_NONE);
 }
 
 void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	SURGSIM_ASSERT(!m_doAssert) << "Contact calculation not implemented for pairs with types ("<<
-		pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
-	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) <<
-		"Contact calculation not implemented for pairs with types (" <<
-		pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
+	SURGSIM_ASSERT(!m_doAssert)
+			<< "Contact calculation not implemented for pairs with types ("
+			<< pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
+	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
+			<< "Contact calculation not implemented for pairs with types ("
+			<< pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
 }
 
 }; // namespace Collision

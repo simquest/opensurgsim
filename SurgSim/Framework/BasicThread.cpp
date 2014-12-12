@@ -37,6 +37,11 @@ BasicThread::BasicThread(const std::string& name) :
 	m_stopExecution(false),
 	m_isSynchronous(false)
 {
+	// The maximum number of frames in the timer is set to 1,000,000
+	// + If the timer is reset every second, that is enough frame to measure real rates up to 1MHz
+	// + If the timer is reset every minute, that is enough frame to measure real rates up to 16.66KHz
+	// + If the timer is reset every hour, that is enough frame to measure real rates up to 277.77Hz
+	m_timer.setMaxNumberOfFrames(1000000);
 }
 
 #ifdef _MSC_VER
@@ -108,6 +113,7 @@ void BasicThread::operator()()
 	Clock::time_point start;
 
 	m_isRunning = true;
+	m_timer.start();
 	while (m_isRunning && !m_stopExecution)
 	{
 		if (! m_isSynchronous)
@@ -121,7 +127,9 @@ void BasicThread::operator()()
 			start = Clock::now();
 			if (!m_isIdle)
 			{
+				m_timer.beginFrame();
 				m_isRunning = doUpdate(m_period.count());
+				m_timer.endFrame();
 			}
 			frameTime = Clock::now() - start;
 		}
@@ -134,7 +142,9 @@ void BasicThread::operator()()
 			bool success = waitForBarrier(true);
 			if (success && !m_isIdle)
 			{
+				m_timer.beginFrame();
 				m_isRunning = doUpdate(m_period.count());
+				m_timer.endFrame();
 			}
 			if (! success || !m_isRunning)
 			{
@@ -237,6 +247,21 @@ bool BasicThread::setSynchronous(bool val)
 bool BasicThread::isSynchronous()
 {
 	return m_isSynchronous;
+}
+
+double BasicThread::getCpuTime() const
+{
+	return m_timer.getCumulativeTime();
+}
+
+size_t BasicThread::getUpdateCount() const
+{
+	return m_timer.getCurrentNumberOfFrames();
+}
+
+void BasicThread::resetCpuTimeAndUpdateCount()
+{
+	m_timer.start();
 }
 
 bool BasicThread::doUpdate(double dt)
