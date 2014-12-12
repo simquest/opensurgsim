@@ -265,22 +265,21 @@ void SphRepresentation::computeDensityAndPressureField(void)
 
 void SphRepresentation::computeNormalField(void)
 {
-	m_normal.assign(m_normal.size(), SurgSim::Math::Vector3d::Zero());
-
 	for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
 		particleI != getParticleReferences().end();
 		++particleI)
 	{
 		const size_t indexI = particleI->getIndex();
-		SurgSim::Math::Vector3d& normalI = m_normal[indexI];
 		const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xI = particleI->getPosition();
 
 		// Calculate the particle's normal (gradient of the color field)
+		SurgSim::Math::Vector3d normalI = SurgSim::Math::Vector3d::Zero();
 		for (auto indexJ : m_grid->getNeighbors(indexI))
 		{
 			const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
 			normalI += m_mass[indexJ] / m_density[indexJ] * kernelPoly6Gradient(xI - xJ);
 		}
+		m_normal[indexI] = normalI;
 	}
 }
 
