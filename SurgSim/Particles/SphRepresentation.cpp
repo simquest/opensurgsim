@@ -287,6 +287,8 @@ void SphRepresentation::computeAccelerations(void)
 {
 	SurgSim::Math::Vector3d f;
 
+	m_a.setZero();
+
 	for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
 		particleI != getParticleReferences().end();
 		++particleI)
@@ -295,8 +297,6 @@ void SphRepresentation::computeAccelerations(void)
 		const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xI = particleI->getPosition();
 		const Eigen::VectorBlock<SurgSim::Math::Vector, 3> vI = particleI->getVelocity();
 		Eigen::VectorBlock<SurgSim::Math::Vector, 3> aI = m_a.segment<3>(3 * indexI);
-		const double &rhoI = m_density[indexI];
-		const double &pI = m_pressure[indexI];
 
 		for (auto indexJ : m_grid->getNeighbors(indexI))
 		{
@@ -305,36 +305,35 @@ void SphRepresentation::computeAccelerations(void)
 			{
 				continue;
 			}
-			const double& massJ = m_mass[indexJ];
-			const double& rhoJ = m_density[indexJ];
-			const double& pJ = m_pressure[indexJ];
-			const SurgSim::Math::Vector3d& normalJ = m_normal[indexJ];
-			const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
-			const Eigen::VectorBlock<SurgSim::Math::Vector, 3> vJ = m_state->getVelocities().segment<3>(3 * indexJ);
+
 			Eigen::VectorBlock<SurgSim::Math::Vector, 3> aJ = m_a.segment<3>(3 * indexJ);
+			SurgSim::Math::Vector3d rij = xI - m_state->getPositions().segment<3>(3 * indexJ);
+			SurgSim::Math::Vector3d vji = m_state->getVelocities().segment<3>(3 * indexJ) - vI;
 
-			// Acceleration from the pressure
-			SurgSim::Math::Vector3d grad = kernelSpikyGradient(xI - xJ);
-			f = (-massJ * (pI + pJ) / (2.0 * rhoI)) * grad;
+			// Pressure force
+			SurgSim::Math::Vector3d grad = kernelSpikyGradient(rij);
+			f = (-m_mass[indexJ] * (m_pressure[indexI] + m_pressure[indexJ]) / (2.0 * m_density[indexI])) * grad;
 
-			// Acceleration from the viscosity
-			double laplacian = kernelViscosityLaplacian(xI - xJ);
-			f += (m_viscosity * massJ * (vJ - vI) / rhoJ) * laplacian;
+			// Viscosity force
+			double laplacian = kernelViscosityLaplacian(rij);
+			f += (m_viscosity * m_mass[indexJ] * vji / m_density[indexJ]) * laplacian;
 
-			// Acceleration from the surface tension
-			double laplacianPoly6 = kernelPoly6Laplacian(xI - xJ);
-			double normalNorm = normalJ.norm();
+			// Surface tension force
+			double laplacianPoly6 = kernelPoly6Laplacian(rij);
+			double normalNorm = m_normal[indexJ].norm();
 			if (normalNorm > 20.0)
 			{
-				f += -m_surfaceTension * massJ / rhoJ * laplacianPoly6 * normalJ.normalized();
+				SurgSim::Math::Vector3d unitNormal = m_normal[indexJ] / normalNorm;
+				f += -m_surfaceTension * m_mass[indexJ] / m_density[indexJ] * laplacianPoly6 * unitNormal;
 			}
 
+			// Action/reaction application on the pair of particles
 			aI += f;
 			aJ -= f;
 		}
 
 		// Compute the acceleration from the forces
-		aI /= rhoI;
+		aI /= m_density[indexI];
 
 		// Adding the gravity term (F = rho.g)
 		aI += m_gravity;
