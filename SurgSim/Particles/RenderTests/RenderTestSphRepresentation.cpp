@@ -59,11 +59,11 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createParticleSystem(const std
 	// for input data to simulate water.
 	particlesRepresentation->setMaxParticles(5000);
 	particlesRepresentation->setMassPerParticle(0.02);
-	particlesRepresentation->setDensityReference(998.29);
+	particlesRepresentation->setDensity(998.29);
 	particlesRepresentation->setGasStiffness(3.0);
 	particlesRepresentation->setGravity(SurgSim::Math::Vector3d(0.0, -9.81, 0.0));
 	particlesRepresentation->setKernelSupport(0.0457);
-	particlesRepresentation->setSurfaceTensionCoefficient(0.0728);
+	particlesRepresentation->setSurfaceTension(0.0728);
 	particlesRepresentation->setViscosity(3.5);
 
 	SphRepresentation::PlaneConstraint planeConstraint;

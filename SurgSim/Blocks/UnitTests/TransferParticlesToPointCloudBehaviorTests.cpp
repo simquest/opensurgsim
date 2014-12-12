@@ -88,7 +88,7 @@ void testdoInitialize(bool setSource, bool setTarget, bool expectedValidation)
 	{
 		auto particles = std::make_shared<SphRepresentation>("Particles");
 		particles->setMassPerParticle(1.0);
-		particles->setDensityReference(1.0);
+		particles->setDensity(1.0);
 		particles->setGasStiffness(1.0);
 		particles->setKernelSupport(1.0);
 		behavior->setSource(particles);
@@ -150,7 +150,7 @@ TEST(TransferParticlesToPointCloudBehaviorTests, UpdateTest)
 	auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
 	particles->setMaxParticles(10);
 	particles->setMassPerParticle(1.0);
-	particles->setDensityReference(1.0);
+	particles->setDensity(1.0);
 	particles->setGasStiffness(1.0);
 	particles->setKernelSupport(1.0);
 	behavior->setSource(particles);

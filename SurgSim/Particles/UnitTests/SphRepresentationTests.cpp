@@ -43,11 +43,11 @@ TEST(SphRepresentationTest, SetGetTest)
 	sph->setMassPerParticle(0.02);
 	EXPECT_DOUBLE_EQ(0.02, sph->getMassPerParticle());
 
-	EXPECT_DOUBLE_EQ(0.0, sph->getDensityReference());
-	EXPECT_THROW(sph->setDensityReference(0.0), SurgSim::Framework::AssertionFailure);
-	EXPECT_THROW(sph->setDensityReference(-1.0), SurgSim::Framework::AssertionFailure);
-	sph->setDensityReference(0.03);
-	EXPECT_DOUBLE_EQ(0.03, sph->getDensityReference());
+	EXPECT_DOUBLE_EQ(0.0, sph->getDensity());
+	EXPECT_THROW(sph->setDensity(0.0), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(sph->setDensity(-1.0), SurgSim::Framework::AssertionFailure);
+	sph->setDensity(0.03);
+	EXPECT_DOUBLE_EQ(0.03, sph->getDensity());
 
 	EXPECT_DOUBLE_EQ(0.0, sph->getGasStiffness());
 	EXPECT_THROW(sph->setGasStiffness(0.0), SurgSim::Framework::AssertionFailure);
@@ -55,11 +55,11 @@ TEST(SphRepresentationTest, SetGetTest)
 	sph->setGasStiffness(0.04);
 	EXPECT_DOUBLE_EQ(0.04, sph->getGasStiffness());
 
-	EXPECT_DOUBLE_EQ(0.0, sph->getSurfaceTensionCoefficient());
-	EXPECT_NO_THROW(sph->setSurfaceTensionCoefficient(0.0));
-	EXPECT_THROW(sph->setSurfaceTensionCoefficient(-1.0), SurgSim::Framework::AssertionFailure);
-	sph->setSurfaceTensionCoefficient(0.04);
-	EXPECT_DOUBLE_EQ(0.04, sph->getSurfaceTensionCoefficient());
+	EXPECT_DOUBLE_EQ(0.0, sph->getSurfaceTension());
+	EXPECT_NO_THROW(sph->setSurfaceTension(0.0));
+	EXPECT_THROW(sph->setSurfaceTension(-1.0), SurgSim::Framework::AssertionFailure);
+	sph->setSurfaceTension(0.04);
+	EXPECT_DOUBLE_EQ(0.04, sph->getSurfaceTension());
 
 	EXPECT_TRUE(sph->getGravity().isApprox(SurgSim::Math::Vector3d(0.0, -9.81, 0.0)));
 	sph->setGravity(SurgSim::Math::Vector3d::Ones() * 0.56);
@@ -133,7 +133,7 @@ TEST(SphRepresentationTest, DoInitializeTest)
 		auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 		auto sph = std::make_shared<SphRepresentation>("representation");
 		sph->setMassPerParticle(0.02);
-		sph->setDensityReference(0.02);
+		sph->setDensity(0.02);
 		EXPECT_THROW(sph->initialize(runtime), SurgSim::Framework::AssertionFailure);
 	}
 
@@ -143,7 +143,7 @@ TEST(SphRepresentationTest, DoInitializeTest)
 		auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 		auto sph = std::make_shared<SphRepresentation>("representation");
 		sph->setMassPerParticle(0.02);
-		sph->setDensityReference(0.02);
+		sph->setDensity(0.02);
 		sph->setGasStiffness(0.02);
 		EXPECT_THROW(sph->initialize(runtime), SurgSim::Framework::AssertionFailure);
 	}
@@ -154,7 +154,7 @@ TEST(SphRepresentationTest, DoInitializeTest)
 		auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 		auto sph = std::make_shared<SphRepresentation>("representation");
 		sph->setMassPerParticle(0.02);
-		sph->setDensityReference(0.02);
+		sph->setDensity(0.02);
 		sph->setGasStiffness(0.02);
 		sph->setKernelSupport(0.02);
 		EXPECT_NO_THROW(sph->initialize(runtime));
@@ -169,11 +169,11 @@ TEST(SphRepresentationTest, DoUpdate1ParticleTest)
 
 	sph->setMaxParticles(1);
 	sph->setMassPerParticle(0.02);
-	sph->setDensityReference(1000.0);
+	sph->setDensity(1000.0);
 	sph->setGasStiffness(3.0);
 	sph->setKernelSupport(0.01);
 	sph->setViscosity(0.01);
-	sph->setSurfaceTensionCoefficient(0.0);
+	sph->setSurfaceTension(0.0);
 
 	sph->initialize(runtime);
 
@@ -210,11 +210,11 @@ std::shared_ptr<SphRepresentation> set2ParticlesInteracting(double h, double dis
 	sph->setMaxParticles(2);
 	sph->setMassPerParticle(0.02);	// 50 particles for 0.001 m3 at 1000Kg.m-3
 	// If you note R the radius of 1 particle, then (50 * 4/3.PI.R^3) = 0.001 => R = 0.01683890300960629672761734255721m
-	sph->setDensityReference(1000.0);
+	sph->setDensity(1000.0);
 	sph->setGasStiffness(3.0);
 	sph->setKernelSupport(h);
 	sph->setViscosity(0.01);
-	sph->setSurfaceTensionCoefficient(0.0);
+	sph->setSurfaceTension(0.0);
 
 	sph->initialize(runtime);
 
@@ -326,7 +326,7 @@ TEST(SphRepresentationTest, SerializationTest)
 	typedef SurgSim::Particles::SphRepresentation::PlaneConstraint PlaneConstraint;
 
 	auto sph = std::make_shared<SphRepresentation>("TestSphRepresentation");
-	sph->setDensityReference(1.1);
+	sph->setDensity(1.1);
 	sph->setGasStiffness(2.2);
 	sph->setGravity(SurgSim::Math::Vector3d::Ones());
 	sph->setKernelSupport(3.3);
@@ -337,7 +337,7 @@ TEST(SphRepresentationTest, SerializationTest)
 	p.damping = 7.7;
 	p.planeEquation.setLinSpaced(8.8, 9.9);
 	sph->addPlaneConstraint(p);
-	sph->setSurfaceTensionCoefficient(10.1);
+	sph->setSurfaceTension(10.1);
 	sph->setViscosity(11.11);
 
 	YAML::Node node;
@@ -347,7 +347,7 @@ TEST(SphRepresentationTest, SerializationTest)
 	EXPECT_NO_THROW(newRepresentation =
 		std::dynamic_pointer_cast<SphRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
-	EXPECT_DOUBLE_EQ(sph->getDensityReference(), newRepresentation->getValue<double>("DensityReference"));
+	EXPECT_DOUBLE_EQ(sph->getDensity(), newRepresentation->getValue<double>("Density"));
 	EXPECT_DOUBLE_EQ(sph->getGasStiffness(), newRepresentation->getValue<double>("GasStiffness"));
 	EXPECT_TRUE(sph->getGravity().isApprox(newRepresentation->getValue<SurgSim::Math::Vector3d>("Gravity")));
 	EXPECT_DOUBLE_EQ(sph->getKernelSupport(), newRepresentation->getValue<double>("KernelSupport"));
@@ -359,8 +359,8 @@ TEST(SphRepresentationTest, SerializationTest)
 	EXPECT_TRUE(sph->getPlaneConstraints()[0].planeEquation.isApprox(planeConstraints[0].planeEquation));
 	EXPECT_DOUBLE_EQ(sph->getPlaneConstraints()[0].stiffness, planeConstraints[0].stiffness);
 	EXPECT_DOUBLE_EQ(sph->getPlaneConstraints()[0].damping, planeConstraints[0].damping);
-	EXPECT_DOUBLE_EQ(sph->getSurfaceTensionCoefficient(),
-		newRepresentation->getValue<double>("SurfaceTensionCoefficient"));
+	EXPECT_DOUBLE_EQ(sph->getSurfaceTension(),
+		newRepresentation->getValue<double>("SurfaceTension"));
 	EXPECT_DOUBLE_EQ(sph->getViscosity(), newRepresentation->getValue<double>("Viscosity"));
 }
 

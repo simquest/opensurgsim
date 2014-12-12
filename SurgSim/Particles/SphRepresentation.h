@@ -90,14 +90,14 @@ public:
 	/// \return The mass that is used for all particle [Kg]
 	double getMassPerParticle() const;
 
-	/// Set the reference density
-	/// \param density of the reference fluid [Kg.m-3]
 	/// \note An exception will be raised if the value is negative or null
-	void setDensityReference(double density);
+	/// Set the density of the fluid
+	/// \param density of the fluid [Kg.m-3]
+	void setDensity(double density);
 
-	/// Get the reference density
-	/// \return The density of the reference fluid [Kg.m-3]
-	double getDensityReference() const;
+	/// Get the density of the fluid
+	/// \return The density of the fluid [Kg.m-3]
+	double getDensity() const;
 
 	/// Set the gas stiffness coefficient
 	/// \param stiffness coefficient of the gas [N.m.Kg-1]
@@ -108,14 +108,14 @@ public:
 	/// \return The stiffness coefficient of the gas [N.m.Kg-1]
 	double getGasStiffness() const;
 
-	/// Set the surface tension coefficient
-	/// \param surfaceTensionCoefficient The surface tension coefficient [N.m-1]
 	/// \note An exception will be raised if the value is negative
-	void setSurfaceTensionCoefficient(double surfaceTensionCoefficient);
+	/// Set the surface tension
+	/// \param surfaceTension The surface tension [N.m-1]
+	void setSurfaceTension(double surfaceTension);
 
-	/// Get the surface tension coefficient
-	/// \return The surface tension coefficient [N.m-1]
-	double getSurfaceTensionCoefficient() const;
+	/// Get the surface tension
+	/// \return The surface tension [N.m-1]
+	double getSurfaceTension() const;
 
 	/// Set the gravity vector
 	/// \param gravity The 3d gravity vector [m]
@@ -164,7 +164,7 @@ protected:
 	double m_massPerParticle;                       ///< Mass per particle (determine the density of particle per m3)
 	double m_densityReference;                      ///< Density of the reference gas
 	double m_gasStiffness;                          ///< Stiffness of the gas considered
-	double m_surfaceTensionCoefficient;             ///< Surface tension coefficient
+	double m_surfaceTension;                        ///< Surface tension
 
 	SurgSim::Math::Vector3d m_gravity;              ///< 3D Gravity vector
 	double m_viscosity;                             ///< Viscosity coefficient
