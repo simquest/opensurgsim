@@ -79,7 +79,7 @@ public:
 
 	/// Set the mass for each particle
 	/// \param particleMass The mass that will be used for all particles [Kg]
-	/// \note An exception will be raised if the value is negative or null
+	/// \throws An exception SurgSim::Framework::AssertionFailure if the value is negative or null
 	/// \note In the SPH model, a particle has a constant mass, but its volume and density vary
 	/// \note (mass = volume * density). <br>
 	/// \note Example: If we want to simulate 1 liter of water (0.001 m3 at 1000kg.m-3)
@@ -90,9 +90,9 @@ public:
 	/// \return The mass that is used for all particle [Kg]
 	double getMassPerParticle() const;
 
-	/// \note An exception will be raised if the value is negative or null
 	/// Set the density of the fluid
 	/// \param density of the fluid [Kg.m-3]
+	/// \throws An exception SurgSim::Framework::AssertionFailure if the value is negative or null
 	void setDensity(double density);
 
 	/// Get the density of the fluid
@@ -101,16 +101,16 @@ public:
 
 	/// Set the gas stiffness coefficient
 	/// \param stiffness coefficient of the gas [N.m.Kg-1]
-	/// \note An exception will be raised if the value is negative or null
+	/// \throws An exception SurgSim::Framework::AssertionFailure if the value is negative or null
 	void setGasStiffness(double stiffness);
 
 	/// Get the gas stiffness coefficient
 	/// \return The stiffness coefficient of the gas [N.m.Kg-1]
 	double getGasStiffness() const;
 
-	/// \note An exception will be raised if the value is negative
 	/// Set the surface tension
 	/// \param surfaceTension The surface tension [N.m-1]
+	/// \throws An exception SurgSim::Framework::AssertionFailure if the value is negative
 	void setSurfaceTension(double surfaceTension);
 
 	/// Get the surface tension
@@ -127,7 +127,7 @@ public:
 
 	/// Set the viscosity coefficient
 	/// \param viscosity coefficient [N.s.m-2]
-	/// \note An exception will be raised if the value is negative
+	/// \throws An exception SurgSim::Framework::AssertionFailure if the value is negative
 	void setViscosity(double viscosity);
 
 	/// Get the viscosity coefficient (default is 0.0)
@@ -136,7 +136,7 @@ public:
 
 	/// Set the kernel function support
 	/// \param support The length of the kernel support [m]
-	/// \note An exception will be raised if the value is negative or null
+	/// \throws An exception SurgSim::Framework::AssertionFailure if the value is negative or null
 	void setKernelSupport(double support);
 
 	/// Get the kernel function support
