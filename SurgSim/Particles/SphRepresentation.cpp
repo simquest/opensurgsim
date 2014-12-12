@@ -242,27 +242,24 @@ void SphRepresentation::computeNeighbors()
 
 void SphRepresentation::computeDensityAndPressureField(void)
 {
-	m_density.assign(m_density.size(), 0.0);
-	m_pressure.assign(m_density.size(), 0.0);
-
 	for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
 		particleI != getParticleReferences().end();
 		++particleI)
 	{
 		size_t indexI = particleI->getIndex();
-		double &rhoI = m_density[indexI];
-		double &pI = m_pressure[indexI];
 		const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xI = particleI->getPosition();
 
 		// Calculate the particle's density
+		double densityI = 0.0;
 		for (auto indexJ : m_grid->getNeighbors(indexI))
 		{
 			const Eigen::VectorBlock<SurgSim::Math::Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
-			rhoI += m_mass[indexJ] * kernelPoly6(xI - xJ);
+			densityI += m_mass[indexJ] * kernelPoly6(xI - xJ);
 		}
+		m_density[indexI] = densityI;
 
 		// Calculate the particle's pressure
-		pI = m_gasStiffness * (rhoI - m_densityReference);
+		m_pressure[indexI] = m_gasStiffness * (m_density[indexI] - m_densityReference);
 	}
 }
 
