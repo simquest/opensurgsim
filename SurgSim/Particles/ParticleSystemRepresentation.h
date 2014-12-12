@@ -111,7 +111,6 @@ protected:
 	/// The mutex used to lock the particles
 	mutable boost::shared_mutex m_mutex;
 
-private:
 	/// Implementation of the specific behavior of the particle system
 	/// \return True if update succeeded, False otherwise.
 	virtual bool doUpdate(double dt) = 0;

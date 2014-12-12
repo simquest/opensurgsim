@@ -45,9 +45,13 @@ public:
 	/// \return True if the references are equal, False otherwise
 	bool operator==(const ParticleReference& other) const;
 
+	/// Get the particle's index
+	/// \return The particle's index in the state
+	size_t getIndex() const;
+
 	/// Get the particle's position
 	/// \return The particles position [m]
-	const Eigen::VectorBlock<SurgSim::Math::Vector, 3> getPosition() const;
+	const Eigen::VectorBlock<const SurgSim::Math::Vector, 3> getPosition() const;
 
 	/// Set the particle's position
 	/// \param position The particles position [m]
@@ -55,11 +59,19 @@ public:
 
 	/// Get the particle's velocity
 	/// \return The particle's velocity [m/s]
-	const Eigen::VectorBlock<SurgSim::Math::Vector, 3> getVelocity() const;
+	const Eigen::VectorBlock<const SurgSim::Math::Vector, 3> getVelocity() const;
 
 	/// Set the particle's velocity
 	/// \param velocity The particle's velocity [m/s]
 	void setVelocity(const Eigen::Ref<const SurgSim::Math::Vector3d>& velocity);
+
+	/// Get the particle's acceleration
+	/// \return The particle's acceleration [m/s2]
+	const Eigen::VectorBlock<const SurgSim::Math::Vector, 3> getAcceleration() const;
+
+	/// Set the particle's acceleration
+	/// \param acceleration The particle's acceleration [m/s2]
+	void setAcceleration(const Eigen::Ref<const SurgSim::Math::Vector3d>& acceleration);
 
 	/// Get the particle's lifetime
 	/// \return The remaining lifetime [s]

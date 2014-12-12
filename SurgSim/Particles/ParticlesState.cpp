@@ -30,7 +30,7 @@ ParticlesState::ParticlesState()
 
 bool ParticlesState::operator ==(const ParticlesState& other) const
 {
-	return OdeState::operator==(other) && m_lifetimes == other.m_lifetimes;
+	return OdeState::operator==(other) && m_accelerations == other.m_accelerations && m_lifetimes == other.m_lifetimes;
 }
 
 bool ParticlesState::operator !=(const ParticlesState& other) const
@@ -48,21 +48,33 @@ const SurgSim::Math::Vector& ParticlesState::getLifetimes() const
 	return m_lifetimes;
 }
 
+SurgSim::Math::Vector& ParticlesState::getAccelerations()
+{
+	return m_accelerations;
+}
+
+const SurgSim::Math::Vector& ParticlesState::getAccelerations() const
+{
+	return m_accelerations;
+}
+
 void ParticlesState::reset()
 {
 	OdeState::reset();
 	m_lifetimes.setZero();
+	m_accelerations.setZero();
 }
 
 void ParticlesState::setNumDof(size_t numDofPerNode, size_t numNodes)
 {
-	m_lifetimes.resize(numNodes);
+	m_lifetimes.setZero(numNodes);
+	m_accelerations.setZero(numDofPerNode * numNodes);
 	OdeState::setNumDof(numDofPerNode, numNodes);
 }
 
 bool ParticlesState::isValid() const
 {
-	return OdeState::isValid() && SurgSim::Math::isValid(getLifetimes());
+	return OdeState::isValid() && SurgSim::Math::isValid(getAccelerations()) && SurgSim::Math::isValid(getLifetimes());
 }
 
 }; // namespace Particles

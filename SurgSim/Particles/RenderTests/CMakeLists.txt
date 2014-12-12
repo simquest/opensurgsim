@@ -13,44 +13,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories (
+
+include_directories(
 	${gtest_SOURCE_DIR}/include
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
-	DriveElementFromInputBehaviorTests.cpp
-	KeyboardTogglesComponentBehaviorTests.cpp
-	MassSpring1DRepresentationTests.cpp
-	MassSpring2DRepresentationTests.cpp
-	MassSpring3DRepresentationTests.cpp
-	MassSpringNDRepresentationUtilsTests.cpp
-	PoseInterpolatorTests.cpp
-	SpringTestUtils.cpp
-	TransferParticlesToPointCloudBehaviorTests.cpp
-	TransferPhysicsToGraphicsMeshBehaviorTests.cpp
-	TransferPhysicsToPointCloudBehaviorTests.cpp
-	VisualizeContactsBehaviorTests.cpp
+	RenderTest.cpp
+	RenderTestSphRepresentation.cpp
 )
 
 set(UNIT_TEST_HEADERS
-	SpringTestUtils.h
+	RenderTest.h
 )
 
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-# Configure the path for the data files
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
 set(LIBS
-	IdentityPoseDevice
 	SurgSimBlocks
 	SurgSimGraphics
+	SurgSimParticles
 )
 
-surgsim_add_unit_tests(SurgSimBlocksTest)
+surgsim_add_unit_tests(SurgSimParticlesRenderTest)
 
-
-set_target_properties(SurgSimBlocksTest PROPERTIES FOLDER "Blocks") 
+set_target_properties(SurgSimParticlesRenderTest PROPERTIES FOLDER "Particles")

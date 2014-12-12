@@ -212,7 +212,7 @@ void DeformableRepresentation::applyCorrection(double dt,
 	}
 }
 
-void DeformableRepresentation::deactivateAndReset(void)
+void DeformableRepresentation::deactivateAndReset()
 {
 	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
 			<< getName() << " deactivated and reset:" << std::endl
