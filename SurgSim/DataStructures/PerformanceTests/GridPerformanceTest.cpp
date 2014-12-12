@@ -28,8 +28,8 @@ namespace DataStructures
 {
 
 /// This class test the grid timings for a given concentration of elements per cell and a given number of element per
-/// dimension. These two information are embedded in ::testing::WithParamInterface which takes a
-/// tuple<double = concentrationPerCell, size_t = #elementsPerDimension>
+/// dimension. These two information are embedded in GTest WithParamInterface which takes a
+/// tuple<double = concentrationPerCell, size_t = numElementsPerDimension>
 class Grid3DPerformanceTests : public ::testing::Test,
 							   public ::testing::WithParamInterface<std::tuple<double, size_t> >
 {
