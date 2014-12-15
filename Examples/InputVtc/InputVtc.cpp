@@ -18,6 +18,7 @@
 #include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/Framework/Framework.h"
+#include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Graphics/Graphics.h"
 #include "SurgSim/Input/Input.h"
 #include "SurgSim/Math/Math.h"
@@ -196,6 +197,7 @@ std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, cons
 
 int main(int argc, char* argv[])
 {
+	Logger::getLogger("Physics Manager")->setThreshold(SURGSIM_LOG_LEVEL(INFO));
 	static const char* const toolDeviceName = "Tool Device";
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();

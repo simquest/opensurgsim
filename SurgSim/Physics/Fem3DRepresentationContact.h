@@ -29,7 +29,7 @@ class Fem3DRepresentationContact : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	explicit Fem3DRepresentationContact();
+	Fem3DRepresentationContact();
 
 	/// Destructor
 	virtual ~Fem3DRepresentationContact();

@@ -49,7 +49,7 @@ const double epsilon = 2.3e-9;
 class MockFem3DElementTet : public Fem3DElementTetrahedron
 {
 public:
-	MockFem3DElementTet(std::array<size_t, 4> nodeIds) : Fem3DElementTetrahedron(nodeIds)
+	explicit MockFem3DElementTet(std::array<size_t, 4> nodeIds) : Fem3DElementTetrahedron(nodeIds)
 	{
 	}
 

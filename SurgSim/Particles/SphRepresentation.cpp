@@ -240,9 +240,7 @@ void SphRepresentation::computeNeighbors()
 
 void SphRepresentation::computeDensityAndPressureField()
 {
-	for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
-		particleI != getParticleReferences().end();
-		++particleI)
+	for (auto& particleI = getParticleReferences().begin(); particleI != getParticleReferences().end(); ++particleI)
 	{
 		size_t indexI = particleI->getIndex();
 		const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
@@ -263,9 +261,7 @@ void SphRepresentation::computeDensityAndPressureField()
 
 void SphRepresentation::computeNormalField()
 {
-	for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
-		particleI != getParticleReferences().end();
-		++particleI)
+	for (auto& particleI = getParticleReferences().begin(); particleI != getParticleReferences().end(); ++particleI)
 	{
 		const size_t indexI = particleI->getIndex();
 		const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
@@ -287,9 +283,7 @@ void SphRepresentation::computeAccelerations()
 
 	m_state->getAccelerations().setZero();
 
-	for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
-		particleI != getParticleReferences().end();
-		++particleI)
+	for (auto& particleI = getParticleReferences().begin(); particleI != getParticleReferences().end(); ++particleI)
 	{
 		const size_t indexI = particleI->getIndex();
 		const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
@@ -342,9 +336,7 @@ void SphRepresentation::handleCollisions()
 	{
 		auto n = planeConstraint.planeEquation.segment<3>(0);
 
-		for (std::list<ParticleReference>::iterator particleI = getParticleReferences().begin();
-			particleI != getParticleReferences().end();
-			++particleI)
+		for (auto& particleI = getParticleReferences().begin(); particleI != getParticleReferences().end(); ++particleI)
 		{
 			const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
 			double penetration = xI.dot(n) + planeConstraint.planeEquation[3];

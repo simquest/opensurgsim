@@ -40,7 +40,7 @@ const double epsilon = 1e-9;
 class MockFem1DElement : public Fem1DElementBeam
 {
 public:
-	MockFem1DElement(std::array<size_t, 2> nodeIds)
+	explicit MockFem1DElement(std::array<size_t, 2> nodeIds)
 		: Fem1DElementBeam(nodeIds)
 	{
 	}

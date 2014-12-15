@@ -35,7 +35,7 @@ class BoxShape: public Shape
 public:
 	/// Constructor
 	/// \param sizeX, sizeY, sizeZ the box sizes in all 3 directions (in m)
-	BoxShape(double sizeX = 0.0, double sizeY = 0.0, double sizeZ = 0.0);
+	explicit BoxShape(double sizeX = 0.0, double sizeY = 0.0, double sizeZ = 0.0);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::BoxShape);
 
