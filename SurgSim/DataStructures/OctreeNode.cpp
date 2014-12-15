@@ -152,39 +152,6 @@ SURGSIM_REGISTER(SurgSim::Framework::Asset,
 template<>
 std::string OctreeNode<EmptyData>::m_className = "SurgSim::DataStructures::OctreeNode<EmptyData>";
 
-std::shared_ptr<OctreeNode<EmptyData>> loadOctree(const std::string& fileName)
-{
-	std::ifstream octreeData(fileName, std::ios::in);
-	SURGSIM_ASSERT(octreeData) << "Could not open file (" << fileName << ")" << std::endl;
-
-	SurgSim::Math::Vector3d spacing, boundsMin, boundsMax;
-	std::array<int, 3> dimensions;
-	octreeData >> dimensions[0] >> dimensions[1] >> dimensions[2];
-	octreeData >> spacing[0] >> spacing[1] >> spacing[2];
-	octreeData >> boundsMin[0] >> boundsMax[0] >> boundsMin[1] >> boundsMax[1] >> boundsMin[2] >> boundsMax[2];
-
-	int maxDimension = dimensions[0];
-	maxDimension = maxDimension >= dimensions[1] ?
-				   (maxDimension >= dimensions[2] ? maxDimension : dimensions[2]) :
-				   (dimensions[1] >= dimensions[2] ? dimensions[1] : dimensions[2]);
-
-	int numLevels = static_cast<int>(std::ceil(std::log(maxDimension) / std::log(2.0)));
-	SurgSim::Math::Vector3d octreeDimensions = SurgSim::Math::Vector3d::Ones() * std::pow(2.0, numLevels);
-
-	typedef OctreeNode<SurgSim::DataStructures::EmptyData> OctreeNodeType;
-	OctreeNodeType::AxisAlignedBoundingBox boundingBox;
-	boundingBox.min() = boundsMin;
-	boundingBox.max() = boundsMin.array() + octreeDimensions.array() * spacing.array();
-	std::shared_ptr<OctreeNodeType> octree = std::make_shared<OctreeNodeType>(boundingBox);
-
-	SurgSim::Math::Vector3d position;
-	while (octreeData >> position[0] >> position[1] >> position[2])
-	{
-		octree->addData(position, SurgSim::DataStructures::EmptyData(), numLevels);
-	}
-	return octree;
-}
-
 SurgSim::DataStructures::OctreePath getNeighbor(const OctreePath& origin, const std::array<Symbol, 3>& direction)
 {
 	// Early Exit

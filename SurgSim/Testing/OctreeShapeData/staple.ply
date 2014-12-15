@@ -1,3 +1,26 @@
+ply
+format ascii 1.0
+comment Created by hand
+element dimension 1
+property uint x
+property uint y
+property uint z
+element spacing 1
+property double x
+property double y
+property double z
+element bounds 1
+property double xMin
+property double xMax
+property double yMin
+property double yMax
+property double zMin
+property double zMax
+element voxel 23
+property double x
+property double y
+property double z
+end_header
 7 11 1
 0.001 0.001 0.001
 -0.00207699998282 0.00480100000277 -0.00532899983227 0.00532899983227 -0.000403999991249 0.000403999991249

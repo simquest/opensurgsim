@@ -464,7 +464,7 @@ TEST_F(ShapeTest, DoubleSidedPlaneShape)
 
 TEST_F(ShapeTest, OctreeShapeSerializationTest)
 {
-	const std::string fileName = "OctreeShapeData/staple.vox";
+	const std::string fileName = "OctreeShapeData/staple.ply";
 	SurgSim::Framework::Runtime runtime("config.txt");
 
 	auto shape = std::make_shared<OctreeShape>();
@@ -509,7 +509,7 @@ TEST_F(ShapeTest, OctreeShape)
 
 	{
 		SCOPED_TRACE("Normal Loading");
-		const std::string fileName = "OctreeShapeData/staple.vox";
+		const std::string fileName = "OctreeShapeData/staple.ply";
 		OctreeShape shape;
 		EXPECT_NO_THROW(shape.setOctree(node));
 		EXPECT_NO_THROW(shape.loadOctree(fileName));
@@ -526,7 +526,7 @@ TEST_F(ShapeTest, OctreeShape)
 
 	{
 		SCOPED_TRACE("Alternative load through property");
-		const std::string fileName = "OctreeShapeData/staple.vox";
+		const std::string fileName = "OctreeShapeData/staple.ply";
 		OctreeShape shape;
 		EXPECT_NO_THROW(shape.setValue("OctreeFileName", fileName));
 		EXPECT_EQ(fileName, shape.getOctree()->getFileName());

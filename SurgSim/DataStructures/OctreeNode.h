@@ -109,6 +109,9 @@ OctreePath getNeighbor(const OctreePath& origin, const std::array<Symbol, 3>& di
 /// \return list of paths with neighbors of the node at origin
 std::vector<OctreePath> getNeighbors(const OctreePath& origin, int type);
 
+template <typename Data>
+class OctreeNodePlyReaderDelegate;
+
 /// Octree data structure
 ///
 /// The octree node consists of an axis aligned bounding box, that can be
@@ -129,6 +132,7 @@ class OctreeNode : public SurgSim::Framework::Asset,
 	public std::enable_shared_from_this<OctreeNode<Data>>
 {
 	friend class SurgSim::Math::OctreeShape;
+	friend class SurgSim::DataStructures::OctreeNodePlyReaderDelegate<Data>;
 
 public:
 
@@ -188,25 +192,30 @@ public:
 	/// \return true if data is added
 	bool addData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level);
 
+	bool addDefaultData(const SurgSim::Math::Vector3d& position, int level)
+	{
+		return addData(position, Data(), level);
+	}
+
 	/// Get the children of this node (non const version)
 	/// \return vector of all eight children
-	std::array<std::shared_ptr<OctreeNode<Data> >, 8>& getChildren();
+	std::array<std::shared_ptr<OctreeNode<Data>>, 8>& getChildren();
 
 	/// Get the children of this node
 	/// \return vector of all eight children
-	const std::array<std::shared_ptr<OctreeNode<Data> >, 8>& getChildren() const;
+	const std::array<std::shared_ptr<OctreeNode<Data>>, 8>& getChildren() const;
 
 	/// Get a child of this node (non const version)
 	/// \throws SurgSim::Framework::AssertionFailure if the index >= 8
 	/// \param index the child index
 	/// \return the requested octree node
-	std::shared_ptr<OctreeNode<Data> > getChild(size_t index);
+	std::shared_ptr<OctreeNode<Data>> getChild(size_t index);
 
 	/// Get a child of this node
 	/// \throws SurgSim::Framework::AssertionFailure if the index >= 8
 	/// \param index the child index
 	/// \return the requested octree node
-	const std::shared_ptr<OctreeNode<Data> > getChild(size_t index) const;
+	const std::shared_ptr<OctreeNode<Data>> getChild(size_t index) const;
 
 	/// Get the node at the supplied path
 	/// \throws SurgSim::Framework::AssertionFailure if returnLastValid is false and the node does not exist.
@@ -214,7 +223,7 @@ public:
 	/// \param returnLastValid if true and the path is longer than the tree deep, the function will return
 	//                         the last node on a given path, otherwise it will throw.
 	/// \return the requested octree node
-	virtual std::shared_ptr<OctreeNode<Data> > getNode(const OctreePath& path, bool returnLastValid = false);
+	virtual std::shared_ptr<OctreeNode<Data>> getNode(const OctreePath& path, bool returnLastValid = false);
 
 	/// Extra node data
 	Data data;
@@ -229,7 +238,7 @@ protected:
 	bool doAddData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
 				   const int currentLevel);
 
-	virtual bool doLoad(const std::string& filePath) override;
+	virtual bool doLoad(const std::string& fileName) override;
 
 	/// The bounding box of the current OctreeNode
 	SurgSim::Math::Aabbd m_boundingBox;
@@ -241,17 +250,11 @@ protected:
 	bool m_hasChildren;
 
 	/// The children of this node
-	std::array<std::shared_ptr<OctreeNode<Data> >, 8> m_children;
+	std::array<std::shared_ptr<OctreeNode<Data>>, 8> m_children;
 
 private:
 	static std::string m_className;
 };
-
-
-/// A free function to load an octree from file.
-/// \param fileName	Name of the external file which contains an octree.
-/// \return A std::shared_ptr<> pointing to an OctreeNode.
-std::shared_ptr<OctreeNode<SurgSim::DataStructures::EmptyData>> loadOctree(const std::string& fileName);
 
 };  // namespace DataStructures
 };  // namespace SurgSim
