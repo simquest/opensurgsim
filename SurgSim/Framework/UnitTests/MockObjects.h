@@ -25,6 +25,7 @@
 #include "SurgSim/Framework/ComponentManager.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SamplingMetricBase.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
 
@@ -325,5 +326,54 @@ private:
 	}
 };
 
+
+class MockSamplingMetric : public SurgSim::Framework::SamplingMetricBase
+{
+public:
+	/// Constructor
+	/// \param	name	Name of the representation
+	explicit MockSamplingMetric(const std::string& name,
+								bool ableToMeasure = true,
+								double initialMeasurement = 0.0) :
+		SurgSim::Framework::SamplingMetricBase(name),
+		m_canMeasure(ableToMeasure),
+		m_measurement(initialMeasurement)
+	{
+	}
+
+	SURGSIM_CLASSNAME(MockSamplingMetric);
+
+	/// Type of the individual entries in the measurement data structure. The first field of the
+	/// pair holds the elapsed time since the start of the measurement process and the second field
+	/// of the pair holds the measurement value obtained at that time.
+	typedef SurgSim::Framework::SamplingMetricBase::MeasurementEntryType MeasurementEntryType;
+
+	/// Type of the cumulative entries data structure. The code current caps the number of entries at a
+	/// user prescribed value to keep from overwriting all of memory when the process is allowed to run
+	/// unchecked over long periods. The maximum number of entries is nominally capped at 30 minutes of samples
+	/// taken 30 times per second, but it can be adjusted using he setMaxNumberOfMeasurements call. Note
+	/// that we always save the last measurements taken. After the limit is reached we delete the oldest
+	/// current entry every time we need to add a new measurement.
+	typedef SurgSim::Framework::SamplingMetricBase::MeasurementsType MeasurementsType;
+
+private:
+	/// Whether the representation has been initialized
+	bool m_canMeasure;
+
+	/// Next measurement value to return.
+	double m_measurement;
+
+	/// Return if the measurement can be made at this point
+	/// \return true or false
+	bool canMeasure(double dt)
+	{
+		return m_canMeasure;
+	}
+
+	double performMeasurement(double dt)
+	{
+		return ++m_measurement;
+	}
+};
 
 #endif  // SURGSIM_FRAMEWORK_UNITTESTS_MOCKOBJECTS_H

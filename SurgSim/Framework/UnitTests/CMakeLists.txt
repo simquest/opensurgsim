@@ -36,6 +36,7 @@ set(UNIT_TEST_SOURCES
 	ObjectFactoryTests.cpp
 	ReuseFactoryTest.cpp
 	RuntimeTest.cpp
+	SamplingMetricBaseTest.cpp
 	SceneElementTest.cpp
 	SceneTest.cpp
 	SharedInstanceTest.cpp

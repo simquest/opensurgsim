@@ -16,8 +16,10 @@
 #ifndef SURGSIM_FRAMEWORK_MEASUREMENTBASE_H
 #define SURGSIM_FRAMEWORK_MEASUREMENTBASE_H
 
-#include <SurgSim/Framework/Behavior.h>
 #include <deque>
+
+#include <SurgSim/Framework/Behavior.h>
+#include <SurgSim/Framework/ObjectFactory.h>
 
 namespace SurgSim
 {
@@ -27,15 +29,26 @@ class Logger;
 };
 };
 
-/// We will manage the measurement stream as a deque with a maximum size to protect against
-/// allowing memory to grow unbounded.
+namespace SurgSim
+{
+namespace Framework
+{
 
-class MetricBase : public SurgSim::Framework::Behavior
+/// SamplingMetricBase provides a base class to support metric development. New
+/// metrics should derive from the base class and redefine canMeasure() and
+/// takeMeasurement() ensure the system is ready to be measured and to perform
+/// the measurement respectively.
+///
+/// We will manage the measurement stream as a deque with a maximum size to protect against
+/// allowing memory to grow unbounded. The nominal setting provides for 30 minutes of
+/// continuous sampling at 30 hertz. After that time, old measurements will be discarded
+/// as new measurements are made so as to stay within the same memory footprint.
+class SamplingMetricBase : public SurgSim::Framework::Behavior
 {
 public:
-	explicit MetricBase(const std::string& name);
-	virtual void update(double dt) override;
-	void setTargetManagerType(int type);
+	/// Constructor for the class.
+	/// \param name is the name given to the behavior.
+	explicit SamplingMetricBase(const std::string& name);
 
 	/// Type of the individual entries in the measurement data structure. The first field of the
 	/// pair holds the elapsed time since the start of the measurement process and the second field
@@ -50,6 +63,22 @@ public:
 	/// current entry every time we need to add a new measurement.
 	typedef std::deque<MeasurementEntryType> MeasurementsType;
 
+	/// Run an update cycle on this metric.
+	/// \param dt is the elapsed time since the last call to update.
+	virtual void update(double dt) override;
+
+	/// Set the desired manager type for this metric. Given the potential tight coupling of the
+	/// and the various other behaviors, this will provide us with the flexibility to choose
+	/// the appropriate manager for the task.
+	/// \param targetManagerType is the manager type to be used for managing this metric
+	void setTargetManagerType(int);
+
+	/// Get the desired manager type for this metric. Given the potential tight coupling of the
+	/// and the various other behaviors, this will provide us with the flexibility to choose
+	/// the appropriate manager for the task.
+	/// \return the manager type to be used for managing this metric
+	virtual int getTargetManagerType() const override;
+
 	/// Set the maximum number of measurements to store.
 	void setMaxNumberOfMeasurements(size_t numberOfMeasurements);
 
@@ -59,32 +88,42 @@ public:
 	/// \return Number of frames currently stored (not the maximum number of frames).
 	size_t getCurrentNumberOfMeasurements() const;
 
+	/// Get the amount of time since the last successful measurement reading based on the
+	/// accumulation of successive dt values.
+	/// \return the elapsed time
+	double getElapsedTime() const;
+
 	/// Return the deque of measurement values obtained for this measurement.
 	virtual MeasurementsType getMeasurementValues();
 
 protected:
+	/// Wake up the behavior and perform any dependent initializations
+	/// \return true or false depending if the wakeup succeeded or not.
 	virtual bool doWakeUp() override;
+
+	/// Initialize the behavior and perform any independent initializations
+	/// \return true or false depending if the initialization succeeded or not.
 	virtual bool doInitialize() override;
 
 	/// \param dt is the elapsed time since the last call to update.
 	/// \return if it is currently valid to calculate the next measurement value.
-	virtual bool doTest(double dt);
+	virtual bool canMeasure(double dt);
 
 	/// \param dt is the elapsed time since the last call to update.
 	/// \return the next measurement value. This method should be overwritten to provide the
 	/// various measurements for the simulation.
-	virtual double doMeasure(double dt);
-
-	virtual int getTargetManagerType() const override;
+	virtual double performMeasurement(double dt) = 0;
 
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 private:
 	/// measurement list
 	MeasurementsType m_measurementValues;
-	int m_managerType;
+	int m_targetManagerType;
 	double m_elapsedTime;
 	size_t m_maxNumberOfMeasurements;
+};
+};
 };
 
 #endif // SURGSIM_FRAMEWORK_MEASUREMENTBASE_H
