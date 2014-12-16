@@ -34,13 +34,12 @@ typedef Eigen::Matrix<double, 3, 6, Eigen::RowMajor> AngularObservationMatrix;
 typedef Eigen::Matrix<double, 6, 6, Eigen::RowMajor> AngularStateMatrix;
 typedef Eigen::Matrix<double, 6, 1> AngularStateVector;
 
-/// Measure translational velocity by measuring translation, a 3-vector.
-/// The state is {position, velocity, acceleration}
+/// Measure translational velocity by measuring translation, a 3-vector. The state is {position, velocity}.
 typedef Eigen::Matrix<double, 3, 3, Eigen::RowMajor> LinearMeasurementMatrix;
 typedef Eigen::Matrix<double, 3, 1> LinearMeasurementVector;
-typedef Eigen::Matrix<double, 3, 9, Eigen::RowMajor> LinearObservationMatrix;
-typedef Eigen::Matrix<double, 9, 9, Eigen::RowMajor> LinearStateMatrix;
-typedef Eigen::Matrix<double, 9, 1> LinearStateVector;
+typedef Eigen::Matrix<double, 3, 6, Eigen::RowMajor> LinearObservationMatrix;
+typedef Eigen::Matrix<double, 6, 6, Eigen::RowMajor> LinearStateMatrix;
+typedef Eigen::Matrix<double, 6, 1> LinearStateVector;
 
 VelocityFromPose::VelocityFromPose(const std::string& name) :
 	CommonDevice(name),
@@ -50,13 +49,15 @@ VelocityFromPose::VelocityFromPose(const std::string& name) :
 	m_timer.setMaxNumberOfFrames(1);
 
 	LinearObservationMatrix linearObservationMatrix;
-	linearObservationMatrix << LinearMeasurementMatrix::Identity(), LinearMeasurementMatrix::Zero(),
-		LinearMeasurementMatrix::Zero();
+	linearObservationMatrix << LinearMeasurementMatrix::Identity(), LinearMeasurementMatrix::Zero();
 	m_linearFilter.setObservationMatrix(linearObservationMatrix);
 	m_linearFilter.setInitialState(LinearStateVector::Zero());
 	m_linearFilter.setInitialStateCovariance(LinearStateMatrix::Ones() * 1000.0);
-	m_linearFilter.setProcessNoiseCovariance(LinearStateMatrix::Identity() * 10.0);
-	m_linearFilter.setMeasurementNoiseCovariance(LinearMeasurementMatrix::Identity());
+	LinearStateMatrix linearProcessNoise;
+	linearProcessNoise << LinearMeasurementMatrix::Identity() * 0.1, LinearMeasurementMatrix::Zero(),
+							LinearMeasurementMatrix::Zero(), LinearMeasurementMatrix::Identity() * 100.0;
+	m_linearFilter.setProcessNoiseCovariance(linearProcessNoise);//LinearStateMatrix::Identity() * 1.0);
+	m_linearFilter.setMeasurementNoiseCovariance(LinearMeasurementMatrix::Identity() * 1.0);
 
 	AngularObservationMatrix angularObservationMatrix;
 	angularObservationMatrix << AngularMeasurementMatrix::Identity(), AngularMeasurementMatrix::Zero();
@@ -109,7 +110,7 @@ void VelocityFromPose::initializeInput(const std::string& device, const SurgSim:
 	{
 		m_lastPose = pose;
 		LinearStateVector linearState;
-		linearState << pose.translation(), LinearMeasurementVector::Zero(), LinearMeasurementVector::Zero();
+		linearState << pose.translation(), LinearMeasurementVector::Zero();
 		m_linearFilter.setInitialState(linearState);
 	}
 }
@@ -135,11 +136,7 @@ void VelocityFromPose::handleInput(const std::string& device, const SurgSim::Dat
 			LinearStateMatrix linearStateTransition;
 			linearStateTransition <<
 				LinearMeasurementMatrix::Identity(), period * LinearMeasurementMatrix::Identity(),
-															period * period * 0.5 * LinearMeasurementMatrix::Identity(),
-				LinearMeasurementMatrix::Zero(),     LinearMeasurementMatrix::Identity(),
-															period * LinearMeasurementMatrix::Identity(),
-				LinearMeasurementMatrix::Zero(),     LinearMeasurementMatrix::Zero(),
-															LinearMeasurementMatrix::Identity();
+				LinearMeasurementMatrix::Zero(),     LinearMeasurementMatrix::Identity();
 
 			m_linearFilter.setStateTransition(linearStateTransition);
 			const LinearStateVector& linearState = m_linearFilter.update(pose.translation());
