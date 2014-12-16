@@ -130,6 +130,7 @@ void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Local
 	m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce;
 	m_externalGeneralizedStiffness.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += K;
 	m_externalGeneralizedDamping.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += D;
+	m_hasExternalGeneralizedForce = true;
 }
 
 void MassSpringRepresentation::beforeUpdate(double dt)
@@ -161,7 +162,10 @@ Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 	addSpringsForce(&m_f, state);
 
 	// Add external generalized force
-	m_f += m_externalGeneralizedForce;
+	if (m_hasExternalGeneralizedForce)
+	{
+		m_f += m_externalGeneralizedForce;
+	}
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
@@ -241,7 +245,10 @@ const Matrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& 
 	}
 
 	// Add external generalized damping
-	m_D += m_externalGeneralizedDamping;
+	if (m_hasExternalGeneralizedForce)
+	{
+		m_D += m_externalGeneralizedDamping;
+	}
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
@@ -270,7 +277,10 @@ const Matrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& 
 	}
 
 	// Add external generalized stiffness
-	m_K += m_externalGeneralizedStiffness;
+	if (m_hasExternalGeneralizedForce)
+	{
+		m_K += m_externalGeneralizedStiffness;
+	}
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
@@ -335,9 +345,12 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 	addRayleighDampingForce(&m_f, state, true, true);
 
 	// Add external generalized force, stiffness and damping
-	m_f += m_externalGeneralizedForce;
-	m_K += m_externalGeneralizedStiffness;
-	m_D += m_externalGeneralizedDamping;
+	if (m_hasExternalGeneralizedForce)
+	{
+		m_f += m_externalGeneralizedForce;
+		m_K += m_externalGeneralizedStiffness;
+		m_D += m_externalGeneralizedDamping;
+	}
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());

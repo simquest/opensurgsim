@@ -37,7 +37,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Math::SphereShape);
 
 	/// \return the type of the shape
-	virtual int getType() override;
+	virtual int getType() const override;
 
 	/// Get the sphere radius
 	/// \return The sphere radius

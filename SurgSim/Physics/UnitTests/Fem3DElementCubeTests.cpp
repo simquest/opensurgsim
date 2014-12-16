@@ -32,7 +32,7 @@ using SurgSim::Physics::Fem3DElementCube;
 namespace
 {
 /// Epsilon used in this unit test, resulting from a trial and error test.
-const double epsilon = 2.6e-9;
+const double epsilon = 3.6e-9;
 };
 
 class MockFem3DElementCube : public Fem3DElementCube

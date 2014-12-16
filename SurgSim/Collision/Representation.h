@@ -42,7 +42,7 @@ struct Contact;
 class Representation;
 
 typedef std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-							std::list<std::shared_ptr<SurgSim::Collision::Contact>>> ContactMapType;
+		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> ContactMapType;
 
 /// Wrapper class to use for the collision operation, handles its enclosed shaped
 /// and a possible local to global coordinate system transform, if the physics representation
@@ -71,6 +71,11 @@ public:
 	/// For each collision representation, it gives the list of contacts registered against this instance.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
 	SurgSim::DataStructures::BufferedValue<ContactMapType>& getCollisions();
+
+	/// Check whether this collision representation collided with another during the last update
+	/// \param other other collision representation to check against
+	/// \return true if there were contacts recorded, false otherwise
+	bool collidedWith(const std::shared_ptr<Representation>& other);
 
 	/// Update the representation.
 	/// \param dt the time passed from the last update.

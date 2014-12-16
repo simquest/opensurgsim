@@ -42,7 +42,8 @@ double N(size_t i, double V, double *ai, double *bi, double *ci, double *di, con
 	return inv6V * (ai[i] + bi[i] * p[0] + ci[i] * p[1] + di[i] * p[2]);
 }
 
-const double epsilon = 1e-9;
+/// Epsilon used in this unit test, resulting from a trial and error test.
+const double epsilon = 2.3e-9;
 };
 
 class MockFem3DElementTet : public Fem3DElementTetrahedron

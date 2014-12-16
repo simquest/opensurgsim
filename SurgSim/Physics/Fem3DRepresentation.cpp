@@ -141,6 +141,7 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			index1++;
 		}
 	}
+	m_hasExternalGeneralizedForce = true;
 }
 
 std::shared_ptr<FemPlyReaderDelegate> Fem3DRepresentation::getDelegate()

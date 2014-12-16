@@ -13,44 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Nimble/NimbleThread.h"
+#ifndef SURGSIM_GRAPHICS_FONT_H
+#define SURGSIM_GRAPHICS_FONT_H
 
-#include "SurgSim/Devices/Nimble/NimbleScaffold.h"
+#include "SurgSim/Framework/Asset.h"
 
 namespace SurgSim
 {
-namespace Device
+namespace Graphics
+{
+/// Abstract base class for the Font Asset, fonts are typefaces that can be used to render
+/// text on screen they would usually be loaded from disk
+class Font : public SurgSim::Framework::Asset
 {
 
-NimbleThread::NimbleThread(NimbleScaffold* scaffold)
-	: BasicThread("Nimble thread"), m_scaffold(scaffold)
-{
-	setRate(1000.0);
+};
+
+}
 }
 
-NimbleThread::~NimbleThread()
-{
-}
-
-bool NimbleThread::doUpdate(double dt)
-{
-	return m_scaffold->update();
-}
-
-bool NimbleThread::doInitialize()
-{
-	return m_scaffold->initialize();
-}
-
-bool NimbleThread::doStartUp()
-{
-	return true;
-}
-
-void NimbleThread::doBeforeStop()
-{
-	return m_scaffold->finalize();
-}
-
-};  // namespace Device
-};  // namespace SurgSim
+#endif

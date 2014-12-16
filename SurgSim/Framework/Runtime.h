@@ -122,8 +122,13 @@ public:
 	/// Loads the scene from the given file, clears all the elements in the scene, the old scene will be
 	/// overwritten
 	/// \param fileName the filename of the scene to be loaded, needs to be found
-	/// \return true if the loading suceeded and the scene was found
+	/// \return true if the loading succeeded and the scene was found
 	bool loadScene(const std::string& fileName);
+
+	/// Write out the whole scene as a file
+	/// \param fileName the name of the scene-file if no path is given, uses the current path of the executable
+	void saveScene(const std::string& fileName) const;
+
 
 private:
 

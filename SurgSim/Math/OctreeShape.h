@@ -53,7 +53,7 @@ public:
 	virtual ~OctreeShape();
 
 	/// \return the type of shape
-	virtual int getType() override;
+	virtual int getType() const override;
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)

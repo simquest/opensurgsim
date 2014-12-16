@@ -46,6 +46,7 @@ set(UNIT_TEST_SOURCES
 	OsgShaderTests.cpp
 	OsgSkeletonRepresentationTests.cpp
 	OsgSphereRepresentationTests.cpp
+	OsgTextRepresentationTests.cpp
 	OsgTexture1dTests.cpp
 	OsgTexture2dTests.cpp
 	OsgTexture3dTests.cpp

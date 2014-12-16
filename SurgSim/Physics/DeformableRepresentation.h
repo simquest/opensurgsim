@@ -110,7 +110,7 @@ public:
 	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
 	/// Deactivate and call resetState
-	void deactivateAndReset(void);
+	void deactivateAndReset();
 
 	/// Set the collision representation for this physics representation, when the collision object
 	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
@@ -144,6 +144,7 @@ protected:
 
 	/// External generalized force, stiffness and damping applied on the deformable representation
 	/// @{
+	bool m_hasExternalGeneralizedForce;
 	SurgSim::Math::Vector m_externalGeneralizedForce;
 	SurgSim::Math::Matrix m_externalGeneralizedStiffness;
 	SurgSim::Math::Matrix m_externalGeneralizedDamping;
