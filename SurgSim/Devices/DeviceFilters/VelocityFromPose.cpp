@@ -20,24 +20,51 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/DataGroupCopier.h"
 #include "SurgSim/Framework/Log.h"
-
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Vector6d;
-using SurgSim::Math::Matrix33d;
-using SurgSim::Math::Matrix66d;
+#include "SurgSim/Math/Quaternion.h"
 
 namespace SurgSim
 {
 namespace Device
 {
 
+/// Estimate angular velocity by measuring angular velocity, a 3-vector.  The state is {velocity, acceleration}.
+typedef Eigen::Matrix<double, 3, 3, Eigen::RowMajor> AngularMeasurementMatrix;
+typedef Eigen::Matrix<double, 3, 1> AngularMeasurementVector;
+typedef Eigen::Matrix<double, 3, 6, Eigen::RowMajor> AngularObservationMatrix;
+typedef Eigen::Matrix<double, 6, 6, Eigen::RowMajor> AngularStateMatrix;
+typedef Eigen::Matrix<double, 6, 1> AngularStateVector;
+
+/// Measure translational velocity by measuring translation, a 3-vector.
+/// The state is {position, velocity, acceleration}
+typedef Eigen::Matrix<double, 3, 3, Eigen::RowMajor> LinearMeasurementMatrix;
+typedef Eigen::Matrix<double, 3, 1> LinearMeasurementVector;
+typedef Eigen::Matrix<double, 3, 9, Eigen::RowMajor> LinearObservationMatrix;
+typedef Eigen::Matrix<double, 9, 9, Eigen::RowMajor> LinearStateMatrix;
+typedef Eigen::Matrix<double, 9, 1> LinearStateVector;
+
 VelocityFromPose::VelocityFromPose(const std::string& name) :
 	CommonDevice(name),
 	m_firstInput(true),
-	m_linearState(Eigen::Matrix<double, 9, 1>::Zero()),
-	m_linearCovariance(Eigen::Matrix<double, 9, 9, Eigen::RowMajor>::Ones() * 1000.0)
+	m_lastPose(SurgSim::Math::RigidTransform3d::Identity())
 {
 	m_timer.setMaxNumberOfFrames(1);
+
+	LinearObservationMatrix linearObservationMatrix;
+	linearObservationMatrix << LinearMeasurementMatrix::Identity(), LinearMeasurementMatrix::Zero(),
+		LinearMeasurementMatrix::Zero();
+	m_linearFilter.setObservationMatrix(linearObservationMatrix);
+	m_linearFilter.setInitialState(LinearStateVector::Zero());
+	m_linearFilter.setInitialStateCovariance(LinearStateMatrix::Ones() * 1000.0);
+	m_linearFilter.setProcessNoiseCovariance(LinearStateMatrix::Identity() * 10.0);
+	m_linearFilter.setMeasurementNoiseCovariance(LinearMeasurementMatrix::Identity());
+
+	AngularObservationMatrix angularObservationMatrix;
+	angularObservationMatrix << AngularMeasurementMatrix::Identity(), AngularMeasurementMatrix::Zero();
+	m_angularFilter.setObservationMatrix(angularObservationMatrix);
+	m_angularFilter.setInitialState(AngularStateVector::Zero());
+	m_angularFilter.setInitialStateCovariance(AngularStateMatrix::Ones() * 1000.0);
+	m_angularFilter.setProcessNoiseCovariance(AngularStateMatrix::Identity() * 10.0);
+	m_angularFilter.setMeasurementNoiseCovariance(AngularMeasurementMatrix::Identity());
 }
 
 bool VelocityFromPose::initialize()
@@ -80,7 +107,10 @@ void VelocityFromPose::initializeInput(const std::string& device, const SurgSim:
 	PoseType pose;
 	if (inputData.poses().get(SurgSim::DataStructures::Names::POSE, &pose))
 	{
-	//	m_state << pose.translation(), Vector3d::Zero(), pose.rotation().eulerAngles(2, 0, 2), Vector3d::Zero();
+		m_lastPose = pose;
+		LinearStateVector linearState;
+		linearState << pose.translation(), LinearMeasurementVector::Zero(), LinearMeasurementVector::Zero();
+		m_linearFilter.setInitialState(linearState);
 	}
 }
 
@@ -99,21 +129,42 @@ void VelocityFromPose::handleInput(const std::string& device, const SurgSim::Dat
 	if (inputData.poses().get(SurgSim::DataStructures::Names::POSE, &pose))
 	{
 		m_timer.markFrame();
-		double period = m_timer.getLastFramePeriod();
-		if ((m_timer.getNumberOfClockFails() > 0) || (!boost::math::isnormal(period)))
+		const double period = m_timer.getLastFramePeriod();
+		if ((m_timer.getNumberOfClockFails() == 0) && (boost::math::isnormal(period)) && (period > 0.0))
+		{
+			LinearStateMatrix linearStateTransition;
+			linearStateTransition <<
+				LinearMeasurementMatrix::Identity(), period * LinearMeasurementMatrix::Identity(),
+															period * period * 0.5 * LinearMeasurementMatrix::Identity(),
+				LinearMeasurementMatrix::Zero(),     LinearMeasurementMatrix::Identity(),
+															period * LinearMeasurementMatrix::Identity(),
+				LinearMeasurementMatrix::Zero(),     LinearMeasurementMatrix::Zero(),
+															LinearMeasurementMatrix::Identity();
+
+			m_linearFilter.setStateTransition(linearStateTransition);
+			const LinearStateVector& linearState = m_linearFilter.update(pose.translation());
+ 			getInputData().vectors().set(SurgSim::DataStructures::Names::LINEAR_VELOCITY, linearState.segment<3>(3));
+
+			AngularStateMatrix angularStateTransition;
+			angularStateTransition <<
+				AngularMeasurementMatrix::Identity(), period * AngularMeasurementMatrix::Identity(),
+				AngularMeasurementMatrix::Zero(),     AngularMeasurementMatrix::Identity();
+			m_angularFilter.setStateTransition(angularStateTransition);
+			SurgSim::Math::Vector3d rotation;
+			SurgSim::Math::computeRotationVector(pose, m_lastPose, &rotation);
+			m_lastPose = pose;
+			const AngularStateVector& angularState = m_angularFilter.update(rotation / period);
+			getInputData().vectors().set(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, angularState.segment<3>(0));
+		}
+		else
 		{
 			m_timer.start();
-			period = 0.0;
-			SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Devices/Filters/VelocityFromPose")) <<
-				"The Timer used by " << getName() <<
-				" failed to get a good value.  The calculated velocities will be zero this update.";
-		}
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Devices/Filters/VelocityFromPose")) <<
+				"The Timer used by " << getName() << " failed to get a good value.  No velocity will be provided.";
 
-		Vector3d linearVelocity;
-		Vector3d angularVelocity;
-		calculateVelocity(pose, period, &linearVelocity, &angularVelocity);
- 		getInputData().vectors().set(SurgSim::DataStructures::Names::LINEAR_VELOCITY, linearVelocity);
- 		getInputData().vectors().set(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, angularVelocity);
+			getInputData().vectors().reset(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
+			getInputData().vectors().reset(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
+		}
 	}
 	pushInput();
 }
@@ -126,64 +177,6 @@ bool VelocityFromPose::requestOutput(const std::string& device, SurgSim::DataStr
 		*outputData = getOutputData();
 	}
 	return state;
-}
-
-void VelocityFromPose::calculateVelocity(const PoseType& pose, double period, Vector3d* linearVelocity,
-										 Vector3d* angularVelocity)
-{
-	typedef Eigen::Matrix<double, 12, 1> VectorType;
-	typedef Eigen::Matrix<double, 12, 12, Eigen::RowMajor> MatrixType;
-
-	std::cout << pose.translation() << "   " << pose.rotation().eulerAngles(2, 0, 2) << std::endl;
-
-	kalman(pose.translation(), period, &m_linearState, &m_linearCovariance);
-
-	std::cout << m_linearState.transpose() << std::endl;
-	*linearVelocity = m_linearState.segment<3>(3);
-
-// 	mat = AngleAxisf(ea[0], Vector3f::UnitZ()) * AngleAxisf(ea[1], Vector3f::UnitX()) * AngleAxisf(ea[2], Vector3f::UnitZ());
- 	*angularVelocity = Vector3d::Zero();
-}
-
-void VelocityFromPose::kalman(const SurgSim::Math::Vector3d& measurement, double period,
-							  Eigen::Matrix<double, 9, 1>* state,
-							  Eigen::Matrix<double, 9, 9, Eigen::RowMajor>* covariance)
-{
-	/// Predict step.
-	/// a priori state estimate: x_predicted,k,k-1 = F.x_predicted,k-1,k-1 + B.u
-	/// a priori estimate covariance: P_k,k-1 = F.P_k-1,k-1.Ft + Q
-	/// We have no control, so the control-input model, B, and the control, u, are zeros.
-	Eigen::Matrix<double, 9, 9, Eigen::RowMajor> stateTransition;
-	stateTransition <<
-		Matrix33d::Identity(), period * Matrix33d::Identity(), period * period * 0.5 * Matrix33d::Identity(),
-		Matrix33d::Zero(),     Matrix33d::Identity(), period * Matrix33d::Identity(),
-		Matrix33d::Zero(),     Matrix33d::Zero(),     Matrix33d::Identity();
-	(*state) = stateTransition * (*state);
-
-	const double processNoise = 10.0;
-	Eigen::Matrix<double, 9, 9, Eigen::RowMajor> processNoiseCovariance =
-		processNoise * Eigen::Matrix<double, 9, 9, Eigen::RowMajor>::Identity();
-	*covariance = stateTransition * (*covariance) * stateTransition.transpose() + processNoiseCovariance;
-
-	/// Update step.
-	/// measurement residual: y = z - H.x_predicted,k,k-1
-	/// innovation covariance: S = H.P_k,k-1.Ht + R
-	/// optimal Kalman gain: K = P_k,k-1.Ht.inv(S_k)
-	/// a posteriori state estimate: x_predicted,k,k = x_predicted,k_k-1 + K.y
-	/// a posteriori estimate covariance: P_k,k = (I - K.H).P_k,k-1
-	/// We assume no observation noise, so the observation noise covariance, R, is zero.
-	/// We observe the position, but not velocity or acceleration.
-	Eigen::Matrix<double, 3, 9, Eigen::RowMajor> observationMatrix;
-	observationMatrix << Matrix33d::Identity(), Matrix33d::Zero(), Matrix33d::Zero();
-	const Vector3d innovation = measurement - observationMatrix * (*state);
-	const double measurementNoise = 1.0;
-	const Matrix33d measurementNoiseCovariance = measurementNoise * SurgSim::Math::Matrix33d::Identity();
-	const Matrix33d innovationCovariance = observationMatrix * (*covariance) * observationMatrix.transpose() +
-		measurementNoiseCovariance;
-	const Eigen::Matrix<double, 9, 3, Eigen::RowMajor> gain =
-		(*covariance) * observationMatrix.transpose() * innovationCovariance.inverse();
-	*state = (*state) + gain * innovation;
-	*covariance = (Eigen::Matrix<double, 9, 9, Eigen::RowMajor>::Identity() - gain * observationMatrix) * (*covariance);
 }
 
 };  // namespace Device

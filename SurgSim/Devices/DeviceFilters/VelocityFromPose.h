@@ -23,10 +23,9 @@
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Input/CommonDevice.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/Math/KalmanFilter.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Framework/Timer.h"
 
 namespace SurgSim
@@ -66,18 +65,7 @@ public:
 	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
 private:
-	/// Calculate velocity via Kalman filter.
-	/// \param pose	The latest differential pose.
-	/// \param period The time duration since the previous update.
-	/// \param linearVelocity The linear velocity.
-	/// \param angularVelocity The angular velocity.
-	void calculateVelocity(const PoseType& pose, double period, SurgSim::Math::Vector3d* linearVelocity,
-		SurgSim::Math::Vector3d* angularVelocity);
-
-	void kalman(const SurgSim::Math::Vector3d& measurement, double period, Eigen::Matrix<double, 9, 1>* state,
-		Eigen::Matrix<double, 9, 9, Eigen::RowMajor>* covariance);
-	
-	/// A timer for the update rate needed for calculating velocity.
+	/// A timer for the update rate.
 	SurgSim::Framework::Timer m_timer;
 
 	/// true if the input DataGroup should be created.
@@ -86,9 +74,14 @@ private:
 	/// A copier into the input DataGroup, if needed.
 	std::shared_ptr<SurgSim::DataStructures::DataGroupCopier> m_copier;
 
+	/// The last pose received from the input data.
+	PoseType m_lastPose;
 
-	Eigen::Matrix<double, 9, 1> m_linearState;
-	Eigen::Matrix<double, 9, 9, Eigen::RowMajor> m_linearCovariance;
+	/// The translational Kalman filter.
+	SurgSim::Math::KalmanFilter m_linearFilter;
+
+	/// The angular Kalman filter.
+	SurgSim::Math::KalmanFilter m_angularFilter;
 };
 
 
