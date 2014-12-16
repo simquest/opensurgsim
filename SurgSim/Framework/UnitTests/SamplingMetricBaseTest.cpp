@@ -97,10 +97,4 @@ TEST(SamplingMetricBaseTest, UnableToPerformMeasurementsTests)
 	EXPECT_EQ(0, mockMetric->getCurrentNumberOfMeasurements());
 	EXPECT_EQ(0, samples.size());
 	EXPECT_EQ(accumulatedTime, mockMetric->getElapsedTime());
-
-	for (int ctr = 0; ctr < samples.size(); ++ctr)
-	{
-		EXPECT_EQ((double) ctr, samples[ctr].first);
-		EXPECT_EQ((double)(ctr + 1), samples[ctr].second);
-	}
 }

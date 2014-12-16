@@ -11,8 +11,8 @@ namespace Framework
 SamplingMetricBase::SamplingMetricBase(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
 	m_logger(SurgSim::Framework::Logger::getLogger(name)),
-	m_elapsedTime(0.0),
 	m_targetManagerType(SurgSim::Framework::MANAGER_TYPE_BEHAVIOR),
+	m_elapsedTime(0.0),
 	m_maxNumberOfMeasurements(54000)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Framework::SamplingMetricBase, size_t, MaxNumberOfMeasurements,
