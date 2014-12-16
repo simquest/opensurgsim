@@ -23,6 +23,7 @@
 #include <boost/chrono.hpp>
 
 #include "SurgSim/Framework/Barrier.h"
+#include "SurgSim/Framework/Timer.h"
 
 namespace SurgSim
 {
@@ -118,7 +119,22 @@ public:
 	/// \return	true if synchronized, false if not.
 	bool isSynchronous();
 
+	/// \return the cumulated cpu time taken to run all update since last reset or thread creation
+	/// \note Only the latest 1,000,000 frames since last reset are cumulated, so if the timer is never reset,
+	/// \note the Cpu time will not increase past that limit.
+	double getCpuTime() const;
+
+	/// \return the number of updates done since last reset or thread creation
+	/// \note The update count since last reset has a limit of 1,000,000.
+	size_t getUpdateCount() const;
+
+	/// Reset the cpu time and the update count to 0
+	void resetCpuTimeAndUpdateCount();
+
 protected:
+
+	/// Timer to measure the actual time taken to doUpdate
+	Timer m_timer;
 
 	/// Trigger the initialization of this object, this will be called before all other threads doStartup()
 	/// are called
@@ -134,7 +150,6 @@ protected:
 	bool waitForBarrier(bool success);
 
 	virtual bool executeInitialization();
-
 
 private:
 	std::string m_name;
