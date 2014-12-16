@@ -240,10 +240,10 @@ void SphRepresentation::computeNeighbors()
 
 void SphRepresentation::computeDensityAndPressureField()
 {
-	for (auto& particleI = getParticleReferences().begin(); particleI != getParticleReferences().end(); ++particleI)
+	for (auto& particleI : getParticleReferences())
 	{
-		size_t indexI = particleI->getIndex();
-		const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
+		size_t indexI = particleI.getIndex();
+		const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
 
 		// Calculate the particle's density
 		double densityI = 0.0;
@@ -261,10 +261,10 @@ void SphRepresentation::computeDensityAndPressureField()
 
 void SphRepresentation::computeNormalField()
 {
-	for (auto& particleI = getParticleReferences().begin(); particleI != getParticleReferences().end(); ++particleI)
+	for (auto& particleI : getParticleReferences())
 	{
-		const size_t indexI = particleI->getIndex();
-		const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
+		const size_t indexI = particleI.getIndex();
+		const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
 
 		// Calculate the particle's normal (gradient of the color field)
 		SurgSim::Math::Vector3d normalI = SurgSim::Math::Vector3d::Zero();
@@ -283,11 +283,11 @@ void SphRepresentation::computeAccelerations()
 
 	m_state->getAccelerations().setZero();
 
-	for (auto& particleI = getParticleReferences().begin(); particleI != getParticleReferences().end(); ++particleI)
+	for (auto& particleI : getParticleReferences())
 	{
-		const size_t indexI = particleI->getIndex();
-		const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
-		const Eigen::VectorBlock<const Vector, 3> vI = particleI->getVelocity();
+		const size_t indexI = particleI.getIndex();
+		const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
+		const Eigen::VectorBlock<const Vector, 3> vI = particleI.getVelocity();
 
 		for (auto indexJ : m_grid->getNeighbors(indexI))
 		{
@@ -318,15 +318,15 @@ void SphRepresentation::computeAccelerations()
 			}
 
 			// Action/reaction application on the pair of particles
-			particleI->setAcceleration(particleI->getAcceleration() + f);
+			particleI.setAcceleration(particleI.getAcceleration() + f);
 			m_state->getAccelerations().segment<3>(3 * indexJ) -= f;
 		}
 
 		// Compute the acceleration from the forces
-		particleI->setAcceleration(particleI->getAcceleration() / m_density[indexI]);
+		particleI.setAcceleration(particleI.getAcceleration() / m_density[indexI]);
 
 		// Adding the gravity term (F = rho.g)
-		particleI->setAcceleration(particleI->getAcceleration() + m_gravity);
+		particleI.setAcceleration(particleI.getAcceleration() + m_gravity);
 	}
 }
 
@@ -336,17 +336,17 @@ void SphRepresentation::handleCollisions()
 	{
 		auto n = planeConstraint.planeEquation.segment<3>(0);
 
-		for (auto& particleI = getParticleReferences().begin(); particleI != getParticleReferences().end(); ++particleI)
+		for (auto& particleI : getParticleReferences())
 		{
-			const Eigen::VectorBlock<const Vector, 3> xI = particleI->getPosition();
+			const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
 			double penetration = xI.dot(n) + planeConstraint.planeEquation[3];
 
 			if (penetration < 0.0)
 			{
-				const Eigen::VectorBlock<const Vector, 3> vI = particleI->getVelocity();
+				const Eigen::VectorBlock<const Vector, 3> vI = particleI.getVelocity();
 				double forceIntensity = planeConstraint.stiffness * penetration +
 										planeConstraint.damping * vI.dot(n);
-				particleI->setAcceleration(particleI->getAcceleration() - forceIntensity * n);
+				particleI.setAcceleration(particleI.getAcceleration() - forceIntensity * n);
 			}
 		}
 	}
