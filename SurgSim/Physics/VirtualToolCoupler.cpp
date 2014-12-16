@@ -55,6 +55,7 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_localAttachmentPoint(Vector3d(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
 									std::numeric_limits<double>::quiet_NaN())),
 	m_calculateInertialTorques(false),
+	m_putRigidAtInput(false),
 	m_poseIndex(-1),
 	m_linearVelocityIndex(-1),
 	m_angularVelocityIndex(-1),
@@ -79,6 +80,8 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 									  getOptionalAttachmentPoint, setOptionalAttachmentPoint);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, bool, CalculateInertialTorques,
 									  getCalculateInertialTorques, setCalculateInertialTorques);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, bool, PutRigidAtInput,
+									  getPutRigidAtInput, setPutRigidAtInput);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 									  Input, getInput, setInput);
@@ -143,6 +146,15 @@ void VirtualToolCoupler::update(double dt)
 	RigidTransform3d inputPose;
 	if (inputData.poses().get(m_poseIndex, &inputPose))
 	{
+		if (m_putRigidAtInput)
+		{
+			RigidRepresentationState objectState(m_rigid->getCurrentState());
+			RigidTransform3d desiredPose = inputPose;
+			desiredPose.translation() -= inputPose.linear() * m_localAttachmentPoint;
+			objectState.setPose(desiredPose);
+			m_rigid->setInitialState(objectState);
+			m_putRigidAtInput = false;
+		}
 		Vector3d inputLinearVelocity(Vector3d::Zero());
 		inputData.vectors().get(m_linearVelocityIndex, &inputLinearVelocity);
 
@@ -479,6 +491,16 @@ void VirtualToolCoupler::setCalculateInertialTorques(bool calculateInertialTorqu
 bool VirtualToolCoupler::getCalculateInertialTorques() const
 {
 	return m_calculateInertialTorques;
+}
+
+void VirtualToolCoupler::setPutRigidAtInput(bool putRigidAtInput)
+{
+	m_putRigidAtInput = putRigidAtInput;
+}
+
+bool VirtualToolCoupler::getPutRigidAtInput() const
+{
+	return m_putRigidAtInput;
 }
 
 }; /// Physics
