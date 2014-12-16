@@ -21,16 +21,10 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	Novint7DofDeviceTest.cpp
 	NovintDeviceTest.cpp
-	NovintScaffoldTest.cpp
 )
 
 set(LIBS
 	NovintDevice
-	SurgSimInput
-	SurgSimFramework
-	SurgSimDataStructures
-	${Boost_LIBRARIES}
-	${NOVINT_HDAL_SDK_LIBRARIES}
 )
 
 surgsim_add_unit_tests(NovintDeviceTest)

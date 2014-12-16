@@ -16,20 +16,20 @@
 
 #include "SurgSim/Devices/Novint/NovintScaffold.h"
 
-#include <vector>
-#include <memory>
 #include <algorithm>
 #include <array>
-
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/thread.hpp>
-
 #include <hdl/hdl.h>
+#include <memory>
+#include <vector>
+#include <yaml-cpp/yaml.h>
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/Novint/NovintDevice.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Clock.h"
 #include "SurgSim/Framework/Log.h"
@@ -61,15 +61,15 @@ class NovintScaffold::Handle
 public:
 	Handle() :
 		m_deviceHandle(HDL_INVALID_HANDLE),
-		m_scaffold(NovintScaffold::getOrCreateSharedInstance())
+		m_scaffold(NovintScaffold::getInstance())
 	{
 	}
 
-	Handle(const std::string& deviceName, const std::string& initializationName) :
+	Handle(const std::string& serial) :
 		m_deviceHandle(HDL_INVALID_HANDLE),
-		m_scaffold(NovintScaffold::getOrCreateSharedInstance())
+		m_scaffold(NovintScaffold::getInstance())
 	{
-		create(deviceName, initializationName);
+		create(serial);
 	}
 
 	~Handle()
@@ -82,34 +82,26 @@ public:
 		return (m_deviceHandle != HDL_INVALID_HANDLE);
 	}
 
-	bool create(const std::string& deviceName, const std::string& initializationName)
+	bool create(const std::string& serial)
 	{
 		SURGSIM_ASSERT(! isValid());
 
 		HDLDeviceHandle deviceHandle = HDL_INVALID_HANDLE;
-		std::string hdalName = initializationName;
-		const char* hdalNameToPassSdk = hdalName.c_str();
-		if (hdalName.length() == 0)
-		{
-			hdalName = "Default Falcon";
-			hdalNameToPassSdk = nullptr; // This is how the HDAL API initializes default Falcon.
-		}
-		deviceHandle = hdlInitNamedDevice(hdalNameToPassSdk);
+		deviceHandle = hdlInitDeviceBySerialNumber(serial.c_str());
 
-		if (m_scaffold->checkForFatalError("Failed to initialize"))
+		if (m_scaffold.checkForFatalError("Failed to initialize"))
 		{
 			// HDAL error message already logged
-			SURGSIM_LOG_INFO(m_scaffold->getLogger()) << std::endl <<
-				"  Device name: '" << deviceName << "'" << std::endl <<
-				"  HDAL device name: '" << hdalName << "'" << std::endl;
+			SURGSIM_LOG_INFO(m_scaffold.getLogger()) << std::endl <<
+				"  HDAL serial number: '" << serial << "'" << std::endl;
 			return false;
 		}
 		else if (deviceHandle == HDL_INVALID_HANDLE)
 		{
-			SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Novint: Failed to initialize '" << deviceName << "'" <<
+			SURGSIM_LOG_SEVERE(m_scaffold.getLogger()) << "Novint: Failed to initialize a device." <<
 				std::endl <<
 				"  Error details: unknown (HDAL returned an invalid handle)" << std::endl <<
-				"  HDAL device name: '" << hdalName << "'" << std::endl;
+				"  HDAL serial number: '" << serial << "'" << std::endl;
 			return false;
 		}
 
@@ -129,7 +121,7 @@ public:
 		m_deviceHandle = HDL_INVALID_HANDLE;
 
 		hdlUninitDevice(deviceHandle);
-		m_scaffold->checkForFatalError("Couldn't disable device");
+		m_scaffold.checkForFatalError("Couldn't disable device");
 		return true;
 	}
 
@@ -147,7 +139,7 @@ private:
 	/// The HDAL device handle (or HDL_INVALID_HANDLE if not valid).
 	HDLDeviceHandle m_deviceHandle;
 	/// The scaffold.
-	std::shared_ptr<NovintScaffold> m_scaffold;
+	NovintScaffold& m_scaffold;
 };
 
 
@@ -157,7 +149,7 @@ public:
 	Callback() :
 		m_callbackHandle(0),
 		m_haveCallback(false),
-		m_scaffold(NovintScaffold::getOrCreateSharedInstance())
+		m_scaffold(NovintScaffold::getInstance())
 	{
 		create();
 	}
@@ -180,8 +172,8 @@ public:
 		SURGSIM_ASSERT(! m_haveCallback);
 
 		const bool isCallbackNonblocking = false;
-		m_callbackHandle = hdlCreateServoOp(run, m_scaffold.get(), isCallbackNonblocking);
-		if (m_scaffold->checkForFatalError("Couldn't run haptic callback"))
+		m_callbackHandle = hdlCreateServoOp(run, &m_scaffold, isCallbackNonblocking);
+		if (m_scaffold.checkForFatalError("Couldn't run haptic callback"))
 		{
 			return false;
 		}
@@ -193,7 +185,7 @@ public:
 	{
 		SURGSIM_ASSERT(m_haveCallback);
 		hdlDestroyServoOp(m_callbackHandle);
-		if (m_scaffold->checkForFatalError("Couldn't stop haptic callback"))
+		if (m_scaffold.checkForFatalError("Couldn't stop haptic callback"))
 		{
 			return false;
 		}
@@ -216,7 +208,7 @@ private:
 	/// True if the callback has been created (and not destroyed).
 	bool m_haveCallback;
 	/// The scaffold.
-	std::shared_ptr<NovintScaffold> m_scaffold;
+	NovintScaffold& m_scaffold;
 };
 
 
@@ -263,9 +255,7 @@ struct NovintScaffold::DeviceData
 	NovintCommonDevice* const deviceObject;
 
 	/// The device handle wrapper.
-	NovintScaffold::Handle deviceHandle;
-	/// Time of the initialization of the handle.
-	Clock::time_point initializationTime;
+	std::shared_ptr<NovintScaffold::Handle> deviceHandle;
 
 	/// The joint angles for the device orientation.
 	Vector3d jointAngles;
@@ -335,11 +325,23 @@ public:
 	/// Wrapper for the haptic loop callback handle.
 	std::unique_ptr<NovintScaffold::Callback> callback;
 
-	/// The list of known devices.
-	std::list<std::unique_ptr<NovintScaffold::DeviceData>> activeDeviceList;
+	/// The registered devices.
+	std::list<std::unique_ptr<NovintScaffold::DeviceData>> registeredDevices;
 
-	/// The mutex that protects the list of known devices.
+	/// The map from serial number to Handle for all devices that were available when the SDK was initialized.
+	std::unordered_map<std::string, std::shared_ptr<NovintScaffold::Handle>> serialToHandle;
+
+	/// List of devices that have been unregistered and should have their forces zeroed in the next update.
+	std::list<std::shared_ptr<NovintScaffold::Handle>> unregisteredHandles;
+
+	/// The map from name to serial number for all devices.
+	std::map<std::string, std::string> nameToSerial;
+
+	/// The mutex that protects the list of registered devices.
 	boost::mutex mutex;
+
+	/// Time of the initialization of the latest handle.
+	Clock::time_point initializationTime;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -374,15 +376,9 @@ static inline T clampToRange(T value, T rangeMin, T rangeMax)
 
 
 
-NovintScaffold::NovintScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new StateData)
+NovintScaffold::NovintScaffold() :
+	m_logger(SurgSim::Framework::Logger::getLogger("Devices/Novint")), m_state(new StateData)
 {
-	if (! m_logger)
-	{
-		m_logger = SurgSim::Framework::Logger::getLogger("Novint device");
-		m_logger->setThreshold(m_defaultLogLevel);
-	}
-
 	{
 		// Drain the HDAL error stack
 		HDLError errorCode = hdlGetError();
@@ -398,19 +394,15 @@ NovintScaffold::NovintScaffold(std::shared_ptr<SurgSim::Framework::Logger> logge
 
 NovintScaffold::~NovintScaffold()
 {
-	if (m_state->callback)
-	{
-		destroyHapticLoop();
-	}
 	// The following block controls the duration of the mutex being locked.
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-		if (! m_state->activeDeviceList.empty())
+		if (!m_state->registeredDevices.empty())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Novint: Destroying scaffold while devices are active!?!";
 			// do anything special with each device?
-			m_state->activeDeviceList.clear();
+			m_state->registeredDevices.clear();
 		}
 
 		if (m_state->isApiInitialized)
@@ -426,25 +418,17 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-	if (! m_state->isApiInitialized)
-	{
-		if (! initializeSdk())
-		{
-			return false;
-		}
-	}
-
 	// Make sure the object is unique.
-	auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
+	auto sameObject = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
 		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-	SURGSIM_ASSERT(sameObject == m_state->activeDeviceList.end()) << "Novint: Tried to register a device" <<
+	SURGSIM_ASSERT(sameObject == m_state->registeredDevices.end()) << "Novint: Tried to register a device" <<
 		" which is already present!";
 
 	// Make sure the name is unique.
 	const std::string deviceName = device->getName();
-	auto sameName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
+	auto sameName = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
 		[&deviceName](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == deviceName; });
-	if (sameName != m_state->activeDeviceList.end())
+	if (sameName != m_state->registeredDevices.end())
 	{
 		SURGSIM_LOG_CRITICAL(m_logger) << "Novint: Tried to register a device when the same name is" <<
 			" already present!";
@@ -453,14 +437,22 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 
 	// Make sure the initialization name is unique.
 	const std::string initializationName = device->getInitializationName();
-	auto sameInitializationName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
+	auto sameInitializationName = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
 		[&initializationName](const std::unique_ptr<DeviceData>& info)
 			{ return info->deviceObject->getInitializationName() == initializationName; });
-	if (sameInitializationName != m_state->activeDeviceList.end())
+	if (sameInitializationName != m_state->registeredDevices.end())
 	{
 		SURGSIM_LOG_CRITICAL(m_logger) << "Novint: Tried to register a device when the same initialization" <<
 			" (HDAL) name is already present!";
 		return false;
+	}
+
+	if (!m_state->isApiInitialized)
+	{
+		if (!initializeSdk())
+		{
+			return false;
+		}
 	}
 
 	// Construct the object, start its thread, then move it to the list.
@@ -471,80 +463,106 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 	{
 		return false;   // message already printed
 	}
-	info->initializationTime = Clock::now();
-	m_state->activeDeviceList.emplace_back(std::move(info));
-
-	if (m_state->activeDeviceList.size() == 1)
-	{
-		// If this is the first device, create the haptic loop as well.
-		createHapticLoop();
-	}
+	m_state->registeredDevices.emplace_back(std::move(info));
 	return true;
 }
 
 
 bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 {
+	bool result = false;
 	std::unique_ptr<DeviceData> savedInfo;
-	bool haveOtherDevices = false;
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-		auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
 			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-		if (matching != m_state->activeDeviceList.end())
+		if (matching != m_state->registeredDevices.end())
 		{
+			result = true;
 			savedInfo = std::move(*matching);
-			m_state->activeDeviceList.erase(matching);
+			m_state->registeredDevices.erase(matching);
+			m_state->unregisteredHandles.push_back(savedInfo->deviceHandle);
 			// the iterator is now invalid but that's OK
 		}
-		haveOtherDevices = (m_state->activeDeviceList.size() > 0);
 	}
 
-	bool status = true;
-	if (! savedInfo)
+	SURGSIM_LOG_IF(!result, m_logger, WARNING) << "Novint: Attempted to release a non-registered device.";
+	return result;
+}
+
+std::shared_ptr<NovintScaffold::Handle> NovintScaffold::findHandle(const std::string& name)
+{
+	std::shared_ptr<NovintScaffold::Handle> handle;
+	if (name == "")
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Novint: Attempted to release a non-registered device.";
-		status = false;
+		// get the first available
+		for (auto it : m_state->serialToHandle)
+		{
+			auto possibleHandle = it.second;
+			auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
+				[possibleHandle](const std::unique_ptr<DeviceData>& info)
+			{
+				return info->deviceHandle == possibleHandle;
+			});
+			if (matching == m_state->registeredDevices.end())
+			{
+				handle = possibleHandle;
+				break;
+			}
+		}
+		if (handle == nullptr)
+		{
+			SURGSIM_ASSERT(m_state->serialToHandle.size() == m_state->registeredDevices.size()) <<
+				"Failed to find an un-registered device when the number of registered devices is not equal to" <<
+				" the number of devices found at startup.";
+			SURGSIM_LOG_SEVERE(m_logger) <<
+				"Attempted to register a default device, but no more devices are available." <<
+				" There were " << m_state->serialToHandle.size() << " devices available at program start.";
+		}
 	}
 	else
 	{
-		// The HDAL seems to do bad things (and the CRT complains) if we uninitialize the device too soon.
-		const int MINIMUM_LIFETIME_MILLISECONDS = 500;
-		Clock::time_point earliestEndTime =
-			savedInfo->initializationTime + boost::chrono::milliseconds(MINIMUM_LIFETIME_MILLISECONDS);
-		boost::this_thread::sleep_until(earliestEndTime);
-
-		// The destroy-pop-create structure of this code mirrors the structure of the OpenHaptics code, and
-		// probably isn't necessary when using the HDAL.
-		destroyHapticLoop();
-
-		finalizeDeviceState(savedInfo.get());
-		savedInfo.reset(nullptr);
-
-		if (haveOtherDevices)
+		if (m_state->nameToSerial.count(name) > 0)
 		{
-			createHapticLoop();
+			const std::string serial = m_state->nameToSerial[name];
+			if (m_state->serialToHandle.count(serial) > 0)
+			{
+				handle = m_state->serialToHandle[serial];
+			}
+			else
+			{
+				SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device named '" << name <<
+					"', which should map to serial number " << serial <<
+					", but no device with that serial number is available.";
+			}
+		}
+		else
+		{
+			SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device named '" << name <<
+				"', but that name does not map to a serial number.  Was the configuration file found?" << 
+				" Does it contain the text of a YAML node (for the map from name to serial number)?  Is '" << name <<
+				"' a key in that map?";
 		}
 	}
-	return status;
+	return handle;
 }
 
 
 bool NovintScaffold::initializeDeviceState(DeviceData* info)
 {
-	SURGSIM_ASSERT(! info->deviceHandle.isValid());
+	SURGSIM_ASSERT(info->deviceHandle == nullptr) <<
+		"The raw handle should be nullptr before initialization.";
 
-	if (! info->deviceHandle.create(info->deviceObject->getName(), info->deviceObject->getInitializationName()))
+	info->deviceHandle = findHandle(info->deviceObject->getInitializationName());
+	m_state->unregisteredHandles.remove(info->deviceHandle);
+
+	bool result = info->deviceHandle != nullptr;
+
+	if (result && info->isDevice7Dof)
 	{
-		return false;  // message was already printed
-	}
+		hdlMakeCurrent(info->deviceHandle->get());
+		checkForFatalError("Couldn't enable the handle");
 
-	// Select the handle.
-	hdlMakeCurrent(info->deviceHandle.get());
-	checkForFatalError("Couldn't enable the handle");
-
-	if (info->isDevice7Dof)
-	{
 		int gripStatus[2] = { 0, 0 };
 		// OSG2 grips report their "handedness" in the LSB of the second raw status byte
 		hdlGripGetAttributes (HDL_GRIP_STATUS, 2, gripStatus);
@@ -574,18 +592,7 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 		}
 	}
 
-	return true;
-}
-
-
-bool NovintScaffold::finalizeDeviceState(DeviceData* info)
-{
-	bool status = false;
-	if (info->deviceHandle.isValid())
-	{
-		status = info->deviceHandle.destroy();
-	}
-	return status;
+	return result;
 }
 
 
@@ -597,7 +604,7 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 
 	// TODO(bert): this code should cache the access indices.
 
-	hdlMakeCurrent(info->deviceHandle.get());	// This device is now "current", and all hdlXxx calls apply to it.
+	hdlMakeCurrent(info->deviceHandle->get());	// This device is now "current", and all hdlXxx calls apply to it.
 	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
 
 	// Receive the current device position (in meters), orientation transform, and button state bitmap.
@@ -891,15 +898,90 @@ void NovintScaffold::setInputData(DeviceData* info)
 	inputData.booleans().set(SurgSim::DataStructures::Names::IS_ORIENTATION_HOMED, info->isOrientationHomed);
 }
 
+void NovintScaffold::createAllHandles()
+{
+	// The Scaffold does not know which devices will be initialized, so we use hdlCatalogDevices to get the
+	// serial numbers for every connected device, then initialize all the connected devices, and when
+	// registerDevice is called the name can be matched to a Handle created from a serial number.
+
+	char serials[HDL_MAX_DEVICES * HDL_SERNUM_BUFFSIZE];
+	const int numDevices = hdlCatalogDevices(HDL_NOT_OPEN_BY_ANY_APP, &(serials[0]), NULL);
+	checkForFatalError("Failed to get catalog of devices.");
+
+	SURGSIM_LOG_DEBUG(m_logger) << numDevices << " Novint devices available.";
+
+	for (int i = 0; i < numDevices; ++i)
+	{
+		const std::string serial(&(serials[i * HDL_SERNUM_BUFFSIZE]), HDL_SERNUM_BUFFSIZE - 1);
+		SURGSIM_LOG_DEBUG(m_logger) << "Found serial number " << serial << ".";
+
+		auto handle = std::make_shared<NovintScaffold::Handle>(serial);
+
+		if (handle->isValid())
+		{
+			m_state->serialToHandle[serial] = handle;
+			hdlMakeCurrent(handle->get());
+			checkForFatalError("Failed to make device current.");
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(m_logger) << "Failed to initialize Falcon with serial " << serial << ".";
+		}
+	}
+	m_state->initializationTime = Clock::now();
+}
+
+void NovintScaffold::destroyAllHandles()
+{
+	for (auto it : m_state->serialToHandle)
+	{
+		it.second->destroy();
+	}
+}
+
+std::map<std::string, std::string> NovintScaffold::getNameMap()
+{
+	std::map<std::string, std::string> map;
+	std::vector<std::string> paths;
+	paths.push_back(".");
+	SurgSim::Framework::ApplicationData applicationData(paths);
+	std::string fileName;
+	if (applicationData.tryFindFile("novint.ini", &fileName))
+	{
+		SURGSIM_LOG_INFO(m_logger) << "Found novint.ini at '" << fileName << "'.";
+		YAML::Node node = YAML::LoadFile(fileName);
+		map = node["nameToSerial"].as<std::map<std::string, std::string>>();
+	}
+	else
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << "Failed to find novint.ini, cannot map names to serial numbers.";
+	}
+	return map;
+}
 
 bool NovintScaffold::initializeSdk()
 {
 	SURGSIM_ASSERT(! m_state->isApiInitialized);
 
-	// nothing to do!
+	// The canonical HDAL approach (Programmer's Guide, section 4.7 Multiple devices) is:
+	// 1) hdlInitX on all devices that will be used by this application,
+	// 2) hdlStart (must be after all hdlInitX and before hdlCreateServoOp), then
+	// 3) hdlCreateServoOp (starts the callback).
+	// According to the Programmer's Guide, it is undefined behavior to physically attach/detach devices during
+	// the application.
 
-	m_state->isApiInitialized = true;
-	return true;
+	createAllHandles();
+	m_state->nameToSerial = getNameMap();
+
+	bool result = true;
+	if (!createHapticLoop())
+	{
+		destroyAllHandles();
+		result = false;
+	}
+
+	m_state->isApiInitialized = result;
+	return result;
 }
 
 
@@ -907,7 +989,18 @@ bool NovintScaffold::finalizeSdk()
 {
 	SURGSIM_ASSERT(m_state->isApiInitialized);
 
-	// nothing to do!
+	// The HDAL seems to do bad things (and the CRT complains) if we uninitialize the device too soon.
+	const int MINIMUM_LIFETIME_MILLISECONDS = 500;
+	Clock::time_point earliestEndTime =
+		m_state->initializationTime + boost::chrono::milliseconds(MINIMUM_LIFETIME_MILLISECONDS);
+	boost::this_thread::sleep_until(earliestEndTime);
+
+	if (m_state->callback)
+	{
+		destroyHapticLoop();
+	}
+
+	destroyAllHandles();
 
 	m_state->isApiInitialized = false;
 	return true;
@@ -918,7 +1011,7 @@ bool NovintScaffold::runHapticFrame()
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-	for (auto it = m_state->activeDeviceList.begin();  it != m_state->activeDeviceList.end();  ++it)
+	for (auto it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
 	{
 		(*it)->deviceObject->pullOutput();
 		if (updateDevice((*it).get()))
@@ -926,6 +1019,24 @@ bool NovintScaffold::runHapticFrame()
 			(*it)->deviceObject->pushInput();
 		}
 	}
+
+	for (auto handle : m_state->unregisteredHandles)
+	{
+		hdlMakeCurrent(handle->get());
+
+		bool desiredGravityCompensation = false;
+		hdlGripSetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &desiredGravityCompensation);
+		checkForFatalError("Cannot set gravity compensation state on recently unregistered device.");
+
+		Vector3d force = Vector3d::Zero();
+		hdlGripSetAttributev(HDL_GRIP_FORCE, 0, force.data());
+		checkForFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
+
+		Vector4d torque = Vector4d::Zero();
+		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, torque.data());
+		checkForFatalError("hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+	}
+	m_state->unregisteredHandles.clear();
 
 	return true;
 }
@@ -1153,9 +1264,9 @@ SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double scale)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+	auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
 		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-	if (matching != m_state->activeDeviceList.end())
+	if (matching != m_state->registeredDevices.end())
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
 		(*matching)->positionScale = scale;
@@ -1165,9 +1276,9 @@ void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double s
 void NovintScaffold::setOrientationScale(const NovintCommonDevice* device, double scale)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+	auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
 		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-	if (matching != m_state->activeDeviceList.end())
+	if (matching != m_state->registeredDevices.end())
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
 		(*matching)->orientationScale = scale;
@@ -1175,23 +1286,19 @@ void NovintScaffold::setOrientationScale(const NovintCommonDevice* device, doubl
 }
 
 
-std::shared_ptr<NovintScaffold> NovintScaffold::getOrCreateSharedInstance()
+NovintScaffold& NovintScaffold::getInstance()
 {
-	static SurgSim::Framework::SharedInstance<NovintScaffold> sharedInstance;
-	return sharedInstance.get();
-}
-
-void NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
-{
-	m_defaultLogLevel = logLevel;
+	/// A SharedInstance is not appropriate, because we need to have a single point of contact with the HDAL
+	/// and letting the SharedInstance destruct and be re-constructed would not follow the canonical sequence
+	/// of calls to the HDAL.  That has caused the hdl calls to fail, hang, and exit the application.
+	static NovintScaffold instance;
+	return instance;
 }
 
 std::shared_ptr<SurgSim::Framework::Logger> NovintScaffold::getLogger() const
 {
 	return m_logger;
 }
-
-SurgSim::Framework::LogLevel NovintScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 
 };  // namespace Device
