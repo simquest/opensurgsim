@@ -30,7 +30,7 @@ TEST(SamplingMetricBaseTest, SamplingMetricBaseInitTest)
 	EXPECT_EQ(0, samples.size());
 	EXPECT_EQ(0.0, mockMetric->getElapsedTime());
 	EXPECT_EQ(SurgSim::Framework::MANAGER_TYPE_BEHAVIOR, mockMetric->getTargetManagerType());
-	EXPECT_LT(0, mockMetric->getMaxNumberOfMeasurements());
+	EXPECT_LT(0u, mockMetric->getMaxNumberOfMeasurements());
 	EXPECT_EQ(0, mockMetric->getCurrentNumberOfMeasurements());
 }
 
