@@ -242,7 +242,7 @@ bool SurgSim::DataStructures::OctreeNode<Data>::doLoad(const std::string& fileNa
 {
 	SurgSim::Framework::Timer timer;
 	timer.start();
-	auto delegate = std::make_shared<OctreeNodePlyReaderDelegate<Data>>(shared_from_this());
+	auto delegate = std::make_shared<OctreeNodePlyReaderDelegate<Data>>(this->shared_from_this());
 
 	PlyReader reader(fileName);
 	SURGSIM_ASSERT(reader.isValid()) << "'" << fileName << "' is an invalid .ply file.";

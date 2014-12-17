@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Datastructures/OctreeNodePlyReaderDelegate.h"
+#include "SurgSim/DataStructures/OctreeNodePlyReaderDelegate.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Log.h"
 
