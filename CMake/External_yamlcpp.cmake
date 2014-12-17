@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(file_id "bAvdlSnfqr5ikadmr6bg7m")
 set(CMAKE_ARGS
 	-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
 	-DYAML_CPP_BUILD_TOOLS:BOOL=OFF
@@ -24,8 +23,8 @@ if(DEFINED CMAKE_BUILD_TYPE)
 endif(DEFINED CMAKE_BUILD_TYPE)
 
 ExternalProject_Add(yaml-cpp
-	URL "https://www.assembla.com/spaces/OpenSurgSim/documents/${file_id}/download/yaml-cpp.tar.gz"
-	URL_MD5 "6bd2a7b4cc31ad0b65209a8030dda7ed"
+	URL "https://github.com/simquest/yaml-cpp/archive/v0.5.1.2.tar.gz"
+	URL_MD5 "1919d41dd3ecd34cafaf13a1e60ece95"
 	PREFIX yaml-cpp
 	CMAKE_ARGS ${CMAKE_ARGS}
 )
