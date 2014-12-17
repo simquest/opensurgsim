@@ -543,7 +543,7 @@ TEST_F(ShapeTest, OctreeShape)
 	{
 		SCOPED_TRACE("Load existent file containing invalid Octree will throw");
 		SurgSim::Framework::ApplicationData appData("config.txt");
-		const std::string fileName = "OctreeShapeData/invalid-staple.vox";
+		const std::string fileName = "OctreeShapeData/invalid-staple.ply";
 		OctreeShape shape;
 		EXPECT_ANY_THROW(shape.loadOctree(fileName));
 	}
