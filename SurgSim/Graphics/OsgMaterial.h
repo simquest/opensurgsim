@@ -103,7 +103,7 @@ private:
 /// Utility function to build the material.
 /// \param vertexShaderName name of the vertex shader to be used, needs to be available on the path.
 /// \param fragmentShaderName name of the fragment shader to be used, needs to be available on the path.
-/// \return a valid material if all the shaders are found
+/// \return a valid material if all the shaders are found, nullptr otherwise
 std::shared_ptr<OsgMaterial> buildMaterial(
 	const std::string& vertexShaderName,
 	const std::string& fragmentShaderName);
