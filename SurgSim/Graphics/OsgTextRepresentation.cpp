@@ -135,8 +135,7 @@ bool OsgTextRepresentation::doInitialize()
 	if (getMaterial() == nullptr)
 	{
 		result = false;
-		std::shared_ptr<OsgMaterial> material;
-		material = buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_text.frag");
+		auto material = buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_text.frag");
 		if (material != nullptr)
 		{
 			m_textNode->getOrCreateStateSet()->addUniform(new osg::Uniform("texture", 0));
