@@ -32,7 +32,7 @@ public:
 	/// Constructor
 	explicit AxesRepresentation(const std::string& name) : Representation(name)
 	{
-
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(AxesRepresentation, double, Size, getSize, setSize);
 	};
 
 	/// Sets the size of the shown axes.
