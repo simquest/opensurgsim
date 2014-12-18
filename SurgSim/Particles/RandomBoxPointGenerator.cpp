@@ -40,7 +40,7 @@ Vector3d RandomBoxPointGenerator::pointInShape(std::shared_ptr<SurgSim::Math::Sh
 Vector3d RandomBoxPointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
 	auto box = std::static_pointer_cast<SurgSim::Math::BoxShape>(shape);
-	auto halfSize = box->getSize() * 0.5;
+	Vector3d halfSize = box->getSize() * 0.5;
 
 	std::uniform_int_distribution<int> axisDirectionSelector(0, 2); // 0: X-Axis, 1: Y-Axis, 2: Z-Axis.
 	std::uniform_int_distribution<int> valueSelector(0, 1); // 0: negative size value, 1: positive size value.
