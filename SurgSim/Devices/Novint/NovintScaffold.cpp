@@ -825,7 +825,6 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		SurgSim::Math::setSubVector(angularVelocity - angularVelocityForNominal, 1, 3, &deltaVelocity);
 
 		Vector3d forceFromAcceleration = damperJacobian.block<3,6>(0, 0) * deltaVelocity;
-		std::cout << forceFromAcceleration.transpose() << std::endl;
 		info->force += damperJacobian.block<3,6>(0, 0) * deltaVelocity;
 	}
 
