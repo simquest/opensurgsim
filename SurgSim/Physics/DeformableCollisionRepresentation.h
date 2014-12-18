@@ -71,7 +71,7 @@ public:
 	/// \note The mesh held by this deformable collision representation will be updated as well.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);
 
-	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
 	/// Sets the deformable to which this collision representation is connected
 	/// \param representation The deformable that will be used to update the contained mesh
@@ -80,13 +80,13 @@ public:
 	/// \return The deformable that is used to update the contained mesh
 	const std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getDeformableRepresentation() const;
 
-	virtual int getShapeType() const override;
+	int getShapeType() const override;
 
-	virtual void update(const double& dt) override;
+	void update(const double& dt) override;
 
 private:
-	virtual bool doInitialize() override;
-	virtual bool doWakeUp() override;
+	bool doInitialize() override;
+	bool doWakeUp() override;
 
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::MeshShape> m_shape;

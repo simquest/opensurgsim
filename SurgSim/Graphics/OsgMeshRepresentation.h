@@ -58,21 +58,21 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgMeshRepresentation);
 
-	virtual std::shared_ptr<Mesh> getMesh() override;
+	std::shared_ptr<Mesh> getMesh() override;
 
-	virtual void setUpdateOptions(int val) override;
-	virtual int getUpdateOptions() const override;
+	void setUpdateOptions(int val) override;
+	int getUpdateOptions() const override;
 
 	osg::ref_ptr<osg::Geometry> getOsgGeometry();
 
-	virtual void setFilename(std::string filename) override;
-	virtual std::string getFilename() const override;
+	void setFilename(std::string filename) override;
+	std::string getFilename() const override;
 
 protected:
-	virtual void doUpdate(double dt) override;
+	void doUpdate(double dt) override;
 
 	/// \note If m_filename is set, m_mesh will be overwritten with the mesh loaded from the external file.
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 private:
 	/// Indicates which elements of the mesh should be updated on every frame

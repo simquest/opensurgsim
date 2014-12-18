@@ -114,15 +114,14 @@ public:
 	/// Specializes to register this representation in the collision representation if the collision representation
 	/// is a RigidCollisionRepresentation.
 	/// \param representation The collision representation to be used.
-	virtual void setCollisionRepresentation(
-		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
+	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
-	virtual	void beforeUpdate(double dt) override;
-	virtual	void afterUpdate(double dt) override;
+	void beforeUpdate(double dt) override;
+	void afterUpdate(double dt) override;
 
 protected:
-	virtual bool doInitialize() override;
-	virtual bool doWakeUp() override;
+	bool doInitialize() override;
+	bool doWakeUp() override;
 
 	/// Initial rigid representation state (useful for reset)
 	RigidRepresentationState m_initialState;

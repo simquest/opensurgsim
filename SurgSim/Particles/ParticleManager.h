@@ -44,16 +44,16 @@ public:
 	/// Destructor
 	virtual ~ParticleManager();
 
-	virtual int getType() const override;
+	int getType() const override;
 
 protected:
-	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
-	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
+	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
+	bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
 private:
-	virtual bool doInitialize() override;
-	virtual bool doStartUp() override;
-	virtual bool doUpdate(double dt) override;
+	bool doInitialize() override;
+	bool doStartUp() override;
+	bool doUpdate(double dt) override;
 
 	/// ParticleSystemRepresentations managed by this manager
 	std::vector<std::shared_ptr<ParticleSystemRepresentation>> m_particleSystems;

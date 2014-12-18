@@ -59,27 +59,27 @@ public:
 
 	/// Gets the vertices.
 	/// \return	The vertices.
-	virtual std::shared_ptr<PointCloud> getVertices() const override;
+	std::shared_ptr<PointCloud> getVertices() const override;
 
 	/// Sets point size.
 	/// \param	val	The value.
-	virtual void setPointSize(double val) override;
+	void setPointSize(double val) override;
 
 	/// Gets point size.
 	/// \return	The point size.
-	virtual double getPointSize() const override;
+	double getPointSize() const override;
 
 	/// Executes the update operation.
 	/// \param	dt	The dt.
-	virtual void doUpdate(double dt) override;
+	void doUpdate(double dt) override;
 
 	/// Sets a color.
 	/// \param	color	The color.
-	virtual void setColor(const SurgSim::Math::Vector4d& color) override;
+	void setColor(const SurgSim::Math::Vector4d& color) override;
 
 	/// Gets the color.
 	/// \return The current color.
-	virtual SurgSim::Math::Vector4d getColor() const override;
+	SurgSim::Math::Vector4d getColor() const override;
 
 private:
 	/// Local pointer to vertices with data

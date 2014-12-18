@@ -55,8 +55,8 @@ private:
 	/// Local Pose of the Representation with respect to the SceneElement
 	SurgSim::Math::RigidTransform3d m_localPose;
 
-	virtual bool doInitialize() override;
-	virtual bool doWakeUp() override;
+	bool doInitialize() override;
+	bool doWakeUp() override;
 };
 
 }; // namespace Framework

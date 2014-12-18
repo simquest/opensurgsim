@@ -169,7 +169,7 @@ public:
 		return m_gravityForce;
 	}
 
-	virtual Vector& computeF(const OdeState& state) override
+	Vector& computeF(const OdeState& state) override
 	{
 		// Internale deformation forces
 		m_f = -computeK(state) * (state.getPositions() - m_initialState->getPositions());
@@ -180,13 +180,13 @@ public:
 		return m_f;
 	}
 
-	virtual const Matrix& computeM(const OdeState& state) override
+	const Matrix& computeM(const OdeState& state) override
 	{
 		m_M.setZero();
 		return m_M;
 	}
 
-	virtual const Matrix& computeD(const OdeState& state) override
+	const Matrix& computeD(const OdeState& state) override
 	{
 		m_D.setZero();
 		return m_D;
@@ -201,8 +201,7 @@ public:
 		return m_K;
 	}
 
-	virtual void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K)
-		override
+	void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override
 	{
 		m_f = computeF(state);
 		m_M = computeM(state);

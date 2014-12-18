@@ -421,7 +421,7 @@ public:
 		addSubMatrix(M, nodeIdsVectorForm, 3 , &m_expectedMassMatrix);
 	}
 
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		using SurgSim::Math::getSubVector;
 		using SurgSim::Math::getSubMatrix;

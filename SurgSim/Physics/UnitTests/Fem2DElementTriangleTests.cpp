@@ -473,7 +473,7 @@ public:
 	Quaterniond m_rotation, m_expectedRotation;
 	Eigen::Matrix<double, 18, 1> m_expectedX0;
 
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		using SurgSim::Math::getSubVector;
 

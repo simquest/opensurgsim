@@ -71,15 +71,15 @@ public:
 
 	/// Gets a size.
 	/// \param [out]	width, height	The width and height of the RenderTarget textures.
-	virtual void getSize(int* width, int* height) const override;
+	void getSize(int* width, int* height) const override;
 
 	/// \return	The number of color targets that are available.
-	virtual int getColorTargetCount() const override;
+	int getColorTargetCount() const override;
 
 	/// Generic accessor for a specific color target texture.
 	/// \param	index	Zero-based index of the texure.
 	/// \return	The actual Texture.
-	virtual std::shared_ptr<Texture> getColorTarget(int index) const override;
+	std::shared_ptr<Texture> getColorTarget(int index) const override;
 
 	/// Accessor for the color target as an OsgTexture.
 	/// \param	index	Zero-based index of the color texture.
@@ -88,11 +88,11 @@ public:
 
 	/// Determines if RenderTarget does use a depth target.
 	/// \return	true if it does.
-	virtual bool doesUseDepthTarget() const override;
+	bool doesUseDepthTarget() const override;
 
 	/// Generic accessor for the depth Target.
 	/// \return	The depth target.
-	virtual std::shared_ptr<Texture> getDepthTarget() const override;
+	std::shared_ptr<Texture> getDepthTarget() const override;
 
 	/// Accessor for the depth target as an OsgTexture.
 	/// \return	The depth target as an osg specific class.

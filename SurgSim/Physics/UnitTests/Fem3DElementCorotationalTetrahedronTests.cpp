@@ -96,7 +96,7 @@ public:
 	Eigen::Matrix<double, 12, 12> m_R12x12;
 	Vector3d m_translation;
 
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		m_nodeIds[0] = 3;
 		m_nodeIds[1] = 1;

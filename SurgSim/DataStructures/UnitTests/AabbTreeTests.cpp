@@ -167,13 +167,13 @@ class TreeLeavesVisitor : public TreeVisitor
 {
 public:
 
-	virtual bool handle(TreeNode* node) override
+	bool handle(TreeNode* node) override
 	{
 		SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not implemented";
 		return false;
 	}
 
-	virtual bool handle(NodeType* node) override
+	bool handle(NodeType* node) override
 	{
 		if (node->getNumChildren() == 0)
 		{

@@ -115,7 +115,7 @@ public:
 	/// 			 determined.
 	virtual void setRenderOrder(RenderOrder order, int value) = 0;
 
-	virtual bool addGroupReference(const std::string& name) override;
+	bool addGroupReference(const std::string& name) override;
 
 	/// Sets a value for the ambient lighting term, this can add light to the scene when there is no lighting
 	/// \param color value for the light that should get added to the scene
@@ -127,7 +127,7 @@ public:
 
 private:
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Group of representations that this camera sees
 	/// Only the representations in this group will be rendered when this camera's view is rendered.

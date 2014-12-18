@@ -540,7 +540,7 @@ struct Fem3DVSTruthCubeRenderTests : public RenderTests
 		viewElement->addComponent(component);
 	}
 
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		RenderTests::SetUp();
 

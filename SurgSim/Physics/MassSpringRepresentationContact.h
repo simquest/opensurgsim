@@ -43,16 +43,16 @@ public:
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
-	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
 	/// Gets the Type of representation that this implementation is concerned with
 	/// \return SurgSim::Physics::REPRESENTATION_TYPE_MASSSPRING
-	virtual RepresentationType getRepresentationType() const override;
+	RepresentationType getRepresentationType() const override;
 
 private:
 	/// Gets the number of degrees of freedom for a frictionless contact.
 	/// \return 1, as a frictionless contact only has 1 equation of constraint (along the normal direction).
-	virtual size_t doGetNumDof() const override;
+	size_t doGetNumDof() const override;
 
 	/// Adds a mass-spring frictionless contact constraint to an MlcpPhysicsProblem.
 	/// \param dt The time step.
@@ -62,7 +62,7 @@ private:
 	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp.
 	/// \param indexOfConstraint The index of the constraint in the mlcp.
 	/// \param sign The sign of this implementation in the constraint (positive or negative side).
-	virtual void doBuild(double dt,
+	void doBuild(double dt,
 		const ConstraintData& data,
 		const std::shared_ptr<Localization>& localization,
 		MlcpPhysicsProblem* mlcp,

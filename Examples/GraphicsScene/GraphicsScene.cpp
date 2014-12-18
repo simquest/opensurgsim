@@ -216,7 +216,7 @@ public:
 		m_box->addGroupReference("shadowed");
 	}
 
-	virtual bool doInitialize() override
+	bool doInitialize() override
 	{
 		addComponent(m_box);
 		return true;
@@ -248,7 +248,7 @@ public:
 		m_sphere->addGroupReference("shadowed");
 	}
 
-	virtual bool doInitialize() override
+	bool doInitialize() override
 	{
 		addComponent(m_sphere);
 		return true;

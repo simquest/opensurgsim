@@ -55,7 +55,7 @@ public:
 	/// Destructor
 	virtual ~DeformableRepresentation();
 
-	virtual void resetState() override;
+	void resetState() override;
 
 	virtual void setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState);
 
@@ -103,11 +103,11 @@ public:
 	/// \note So one iteration needs to happen before retrieving a compliance matrix
 	const SurgSim::Math::Matrix& getComplianceMatrix() const;
 
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
-	virtual void afterUpdate(double dt) override;
+	void afterUpdate(double dt) override;
 
-	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
+	void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
 	/// Deactivate and call resetState
 	void deactivateAndReset();
@@ -116,11 +116,10 @@ public:
 	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
 	/// Specializes for discarding anything besides a rigid collision representation.
 	/// \param representation The collision representation to be used.
-	virtual void setCollisionRepresentation(
-		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
+	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
 protected:
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed

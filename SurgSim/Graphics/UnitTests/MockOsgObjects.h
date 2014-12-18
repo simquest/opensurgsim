@@ -112,7 +112,7 @@ public:
 		osg::setNotifyLevel(osg::DEBUG_FP);
 	}
 
-	virtual void notify(osg::NotifySeverity severity, const char *message) override
+	void notify(osg::NotifySeverity severity, const char *message) override
 	{
 		reset();
 		if (severity <= osg::FATAL)

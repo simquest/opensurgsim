@@ -66,19 +66,19 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::MockRepresentation);
 
-	virtual RepresentationType getType() const override;
+	RepresentationType getType() const override;
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
-	virtual void beforeUpdate(double dt) override;
+	void beforeUpdate(double dt) override;
 
 	/// Update the representation state to the current time step
 	/// \param dt The time step (in seconds)
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 	/// Postprocessing done after the update call
 	/// \param dt The time step (in seconds)
-	virtual void afterUpdate(double dt) override;
+	void afterUpdate(double dt) override;
 
 	int getPreUpdateCount() const;
 
@@ -125,7 +125,7 @@ public:
 
 	const size_t& getLocalNode() const { return m_nodeID; }
 
-	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation) override
+	bool isValidRepresentation(std::shared_ptr<Representation> representation) override
 	{
 		std::shared_ptr<DeformableRepresentation> defRepresentation =
 			std::dynamic_pointer_cast<DeformableRepresentation>(representation);
@@ -135,7 +135,7 @@ public:
 	}
 
 private:
-	virtual SurgSim::Math::Vector3d doCalculatePosition(double time) override
+	SurgSim::Math::Vector3d doCalculatePosition(double time) override
 	{
 		std::shared_ptr<DeformableRepresentation> defRepresentation =
 			std::static_pointer_cast<DeformableRepresentation>(getRepresentation());
@@ -162,38 +162,38 @@ public:
 	/// \return the RepresentationType for this representation
 	/// \note DeformableRepresentation is abstract because there is really no deformable behind this class !
 	/// \note For the test, we simply set the type to INVALID
-	virtual SurgSim::Physics::RepresentationType getType() const override;
+	SurgSim::Physics::RepresentationType getType() const override;
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::MockDeformableRepresentation);
 
-	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		SurgSim::Math::Vector& generalizedForce,
 		const SurgSim::Math::Matrix& K,
 		const SurgSim::Math::Matrix& D) override;
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
-	virtual Vector& computeF(const OdeState& state) override;
+	Vector& computeF(const OdeState& state) override;
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
-	virtual const Matrix& computeM(const OdeState& state) override;
+	const Matrix& computeM(const OdeState& state) override;
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
-	virtual const Matrix& computeD(const OdeState& state) override;
+	const Matrix& computeD(const OdeState& state) override;
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
-	virtual const Matrix& computeK(const OdeState& state) override;
+	const Matrix& computeK(const OdeState& state) override;
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
-	virtual void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override;
+	void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override;
 
 protected:
-	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-		const SurgSim::Math::RigidTransform3d& transform) override;
+	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
+			const SurgSim::Math::RigidTransform3d& transform) override;
 
 	Vector m_F;
 	Matrix m_M, m_D, m_K;
@@ -206,11 +206,11 @@ public:
 
 	void addNode(size_t nodeId);
 
-	virtual void addForce(const OdeState& state, Vector* F, double scale = 1.0) override;
-	virtual void addDamping(const OdeState& state, Matrix* D, double scale = 1.0) override;
-	virtual void addStiffness(const OdeState& state, Matrix* K, double scale = 1.0) override;
-	virtual void addFDK(const OdeState& state, Vector* f, Matrix* D, Matrix* K) override;
-	virtual void addMatVec(const OdeState& state, double alphaD, double alphaK, const Vector& x, Vector* F) override;
+	void addForce(const OdeState& state, Vector* F, double scale = 1.0) override;
+	void addDamping(const OdeState& state, Matrix* D, double scale = 1.0) override;
+	void addStiffness(const OdeState& state, Matrix* K, double scale = 1.0) override;
+	void addFDK(const OdeState& state, Vector* f, Matrix* D, Matrix* K) override;
+	void addMatVec(const OdeState& state, double alphaD, double alphaK, const Vector& x, Vector* F) override;
 
 private:
 	Vector m_F;
@@ -248,20 +248,19 @@ public:
 
 	void addNode(size_t nodeId);
 
-	virtual double getVolume(const OdeState& state) const override;
-	virtual void addForce(const OdeState& state, Vector* F, double scale = 1.0) override;
-	virtual void addMass(const OdeState& state, Matrix* M, double scale = 1.0) override;
-	virtual void addDamping(const OdeState& state, Matrix* D, double scale = 1.0) override;
-	virtual void addStiffness(const OdeState& state, Matrix* K, double scale = 1.0) override;
-	virtual void addFMDK(const OdeState& state, Vector* f, Matrix* M, Matrix* D, Matrix* K) override;
-	virtual void addMatVec(
-		const OdeState& state, double alphaM, double alphaD, double alphaK, const Vector& x, Vector* F) override;
-	virtual Vector computeCartesianCoordinate(
-		const OdeState& state, const Vector &barycentricCoordinate) const override;
-	virtual Vector computeNaturalCoordinate(
-		const SurgSim::Math::OdeState& state, const Vector &globalCoordinate) const override;
+	double getVolume(const OdeState& state) const override;
+	void addForce(const OdeState& state, Vector* F, double scale = 1.0) override;
+	void addMass(const OdeState& state, Matrix* M, double scale = 1.0) override;
+	void addDamping(const OdeState& state, Matrix* D, double scale = 1.0) override;
+	void addStiffness(const OdeState& state, Matrix* K, double scale = 1.0) override;
+	void addFMDK(const OdeState& state, Vector* f, Matrix* M, Matrix* D, Matrix* K) override;
+	void addMatVec(const OdeState& state, double alphaM, double alphaD, double alphaK, const Vector& x, Vector* F)
+		override;
+	Vector computeCartesianCoordinate(const OdeState& state, const Vector &barycentricCoordinate) const override;
+	Vector computeNaturalCoordinate(const SurgSim::Math::OdeState& state, const Vector &globalCoordinate) const
+		override;
 
-	virtual void initialize(const SurgSim::Math::OdeState& state) override;
+	void initialize(const SurgSim::Math::OdeState& state) override;
 
 	bool isInitialized() const;
 
@@ -274,7 +273,7 @@ private:
 class InvalidMockFemElement : public MockFemElement
 {
 public:
-	virtual bool update(const SurgSim::Math::OdeState& state) override;
+	bool update(const SurgSim::Math::OdeState& state) override;
 };
 
 // Concrete class for testing
@@ -288,16 +287,15 @@ public:
 	/// Destructor
 	virtual ~MockFemRepresentation();
 
-	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-		SurgSim::Math::Vector& generalizedForce,
-		const SurgSim::Math::Matrix& K,
-		const SurgSim::Math::Matrix& D) override;
+	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+			SurgSim::Math::Vector& generalizedForce, const SurgSim::Math::Matrix& K,
+			const SurgSim::Math::Matrix& D) override;
 
-	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
+	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
 
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
-	virtual RepresentationType getType() const override;
+	RepresentationType getType() const override;
 
 	std::shared_ptr<OdeSolver> getOdeSolver() const;
 
@@ -307,7 +305,7 @@ protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
-	virtual void transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform) override;
+	void transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform) override;
 };
 
 class MockFem1DRepresentation : public SurgSim::Physics::Fem1DRepresentation
@@ -324,14 +322,14 @@ public:
 	MockFixedConstraintBilateral3D();
 	virtual ~MockFixedConstraintBilateral3D();
 
-	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
-	virtual RepresentationType getRepresentationType() const override;
+	RepresentationType getRepresentationType() const override;
 
 private:
-	virtual size_t doGetNumDof() const override;
+	size_t doGetNumDof() const override;
 
-	virtual void doBuild(double dt,
+	void doBuild(double dt,
 		const ConstraintData& data,
 		const std::shared_ptr<Localization>& localization,
 		MlcpPhysicsProblem* mlcp,
@@ -346,14 +344,14 @@ public:
 	MockRigidConstraintBilateral3D();
 	virtual ~MockRigidConstraintBilateral3D();
 
-	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
-	virtual RepresentationType getRepresentationType() const override;
+	RepresentationType getRepresentationType() const override;
 
 private:
-	virtual size_t doGetNumDof() const override;
+	size_t doGetNumDof() const override;
 
-	virtual void doBuild(double dt,
+	void doBuild(double dt,
 		const ConstraintData& data,
 		const std::shared_ptr<Localization>& localization,
 		MlcpPhysicsProblem* mlcp,
@@ -382,18 +380,18 @@ private:
 	/// \param time The time in [0..1] at which the position should be calculated
 	/// \return The global position of the localization at the requested time
 	/// \note time can useful when dealing with CCD
-	virtual SurgSim::Math::Vector3d doCalculatePosition(double time) override;
+	SurgSim::Math::Vector3d doCalculatePosition(double time) override;
 };
 
 class MockConstraintImplementation : public ConstraintImplementation
 {
 public:
-	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
-	virtual RepresentationType getRepresentationType() const override;
+	RepresentationType getRepresentationType() const override;
 
 private:
-	virtual size_t doGetNumDof() const override;
+	size_t doGetNumDof() const override;
 
 	virtual void doBuild(double dt,
 		const ConstraintData& data,

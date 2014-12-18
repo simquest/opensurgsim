@@ -42,11 +42,11 @@ public:
 
 	/// Sets the size of the shown axes.
 	/// \param	val	The value.
-	virtual void setSize(double val) override;
+	void setSize(double val) override;
 
 	/// Gets the current size.
 	/// \return	The size.
-	virtual double getSize() override;
+	double getSize() override;
 
 private:
 

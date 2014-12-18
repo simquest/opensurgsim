@@ -47,22 +47,22 @@ public:
 		getCamera()->setRenderGroupReference("Test");
 	}
 
-	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override
+	std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override
 	{
 		return nullptr;
 	}
 
-	virtual	void enableKeyboardDevice(bool val) override
+	void enableKeyboardDevice(bool val) override
 	{
 		return;
 	}
 
-	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() override
+	std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() override
 	{
 		return nullptr;
 	}
 
-	virtual	void enableMouseDevice(bool val) override
+	void enableMouseDevice(bool val) override
 	{
 		return;
 	}

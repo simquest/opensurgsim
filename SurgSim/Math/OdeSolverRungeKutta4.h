@@ -51,7 +51,7 @@ public:
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
 protected:
 	/// Temporary vectors to store the 4 intermediates evaluations

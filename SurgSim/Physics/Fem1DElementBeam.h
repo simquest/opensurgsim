@@ -51,12 +51,12 @@ public:
 	/// Initializes the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
 	/// \note We use the theory of linear elasticity, so this method pre-computes the stiffness and mass matrices
-	virtual void initialize(const SurgSim::Math::OdeState& state) override;
+	void initialize(const SurgSim::Math::OdeState& state) override;
 
 	/// Gets the element's volume based on the input state
 	/// \param state The state to compute the volume with
 	/// \return The element's volume
-	virtual double getVolume(const SurgSim::Math::OdeState& state) const override;
+	double getVolume(const SurgSim::Math::OdeState& state) const override;
 
 	/// Gets whether shearing is enabled for the element
 	/// \return True if shearing is enabled
@@ -75,8 +75,7 @@ public:
 	/// \note The element's force is of size (getNumDofPerNode() x getNumNodes()).
 	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
 	/// getNumDofPerNode().
-	virtual void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
-						  double scale = 1.0) override;
+	void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) override;
 
 	/// Adds the element's mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
 	/// \param state The state to compute the mass matrix with
@@ -85,8 +84,7 @@ public:
 	/// \note The element's mass matrix is a square matrix of size getNumDofPerNode() x getNumNodes().
 	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
 	/// getNumDofPerNode()
-	virtual void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M,
-						 double scale = 1.0) override;
+	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale = 1.0) override;
 
 	/// Adds the element's damping matrix D (= -df/dv) (computed for a given state) to a complete system damping matrix
 	/// D (assembly)
@@ -97,8 +95,7 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
 	/// getNumDofPerNode().
 	/// \note The beam uses linear elasticity (not visco-elasticity), so it does not have any damping.
-	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
-							double scale = 1.0) override;
+	void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale = 1.0) override;
 
 	/// Adds the element's stiffness matrix K (= -df/dx) (computed for a given state) to a complete system stiffness
 	/// matrix K (assembly)
@@ -108,8 +105,7 @@ public:
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes().
 	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
 	/// getNumDofPerNode()
-	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
-							  double scale = 1.0) override;
+	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale = 1.0) override;
 
 	/// Adds the element's force vector, mass, stiffness and damping matrices (computed for a given state) into a
 	/// complete system data structure F, M, D, K (assembly)
@@ -120,8 +116,8 @@ public:
 	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
 	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
 	/// getNumDofPerNode().
-	virtual void addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, SurgSim::Math::Matrix* M,
-						 SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override;
+	void addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, SurgSim::Math::Matrix* M,
+			SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override;
 
 	/// Adds the element's matrix-vector contribution F += (alphaM.M + alphaD.D + alphaK.K).x (computed for a given
 	/// state) into a complete system data structure F (assembly)
@@ -140,7 +136,7 @@ public:
 		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const;
 
-	virtual SurgSim::Math::Vector computeNaturalCoordinate(
+	SurgSim::Math::Vector computeNaturalCoordinate(
 		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
