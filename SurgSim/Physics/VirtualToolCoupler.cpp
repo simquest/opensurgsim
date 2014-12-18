@@ -57,6 +57,7 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 									std::numeric_limits<double>::quiet_NaN())),
 	m_calculateInertialTorques(false),
 	m_putRigidAtInput(false),
+	m_hadCollisions(10),
 	m_poseIndex(-1),
 	m_linearVelocityIndex(-1),
 	m_angularVelocityIndex(-1),
@@ -218,7 +219,9 @@ void VirtualToolCoupler::update(double dt)
 			bool renderForces = true;
 			if (m_collision != nullptr)
 			{
-				renderForces = 0 < m_collision->getCollisions().safeGet()->size();
+				m_hadCollisions.push_back(0 < m_collision->getCollisions().safeGet()->size());
+				renderForces = !std::none_of(m_hadCollisions.begin(), m_hadCollisions.end(),
+					[](bool collision){return collision;});
 			}
 			if (renderForces)
 			{

@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_VIRTUALTOOLCOUPLER_H
 #define SURGSIM_PHYSICS_VIRTUALTOOLCOUPLER_H
 
+#include <boost/circular_buffer.hpp>
 #include <memory>
 
 #include "SurgSim/DataStructures/DataGroup.h"
@@ -26,6 +27,11 @@
 
 namespace SurgSim
 {
+
+namespace Collision
+{
+class Representation;
+}
 
 namespace Input
 {
@@ -232,7 +238,6 @@ protected:
 
 private:
 	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
-	std::shared_ptr<SurgSim::Collision::Representation> m_collision;
 	std::string m_poseName;
 
 	/// Used Vtc stiffness parameter in linear mode (in N·m-1)
@@ -262,6 +267,9 @@ private:
 
 	/// Whether or not to set the rigid state equal to the pose of the input.
 	bool m_putRigidAtInput;
+
+	std::shared_ptr<SurgSim::Collision::Representation> m_collision;
+	boost::circular_buffer<bool> m_hadCollisions;
 
 	///@{
 	/// Cached DataGroup indices.
