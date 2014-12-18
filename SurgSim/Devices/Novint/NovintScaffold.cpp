@@ -21,6 +21,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <hdl/hdl.h>
 #include <memory>
 #include <vector>
@@ -34,6 +35,8 @@
 #include "SurgSim/Framework/Clock.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/Framework/Timer.h"
+#include "SurgSim/Math/KalmanFilter.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -55,6 +58,20 @@ namespace SurgSim
 {
 namespace Device
 {
+
+/// Estimate angular velocity by measuring angular velocity, a 3-vector.  The state is {velocity, acceleration}.
+typedef Eigen::Matrix<double, 3, 3, Eigen::RowMajor> AngularMeasurementMatrix;
+typedef Eigen::Matrix<double, 3, 1> AngularMeasurementVector;
+typedef Eigen::Matrix<double, 3, 6, Eigen::RowMajor> AngularObservationMatrix;
+typedef Eigen::Matrix<double, 6, 6, Eigen::RowMajor> AngularStateMatrix;
+typedef Eigen::Matrix<double, 6, 1> AngularStateVector;
+
+/// Measure translational velocity by measuring translation, a 3-vector. The state is {position, velocity}.
+typedef Eigen::Matrix<double, 3, 3, Eigen::RowMajor> LinearMeasurementMatrix;
+typedef Eigen::Matrix<double, 3, 1> LinearMeasurementVector;
+typedef Eigen::Matrix<double, 3, 6, Eigen::RowMajor> LinearObservationMatrix;
+typedef Eigen::Matrix<double, 6, 6, Eigen::RowMajor> LinearStateMatrix;
+typedef Eigen::Matrix<double, 6, 1> LinearStateVector;
 
 class NovintScaffold::Handle
 {
@@ -232,13 +249,36 @@ struct NovintScaffold::DeviceData
 		positionScale(device->getPositionScale()),
 		orientationScale(device->getOrientationScale()),
 		position(Vector3d::Zero()),
+		linearVelocity(Vector3d::Zero()),
+		angularVelocity(Vector3d::Zero()),
 		jointAngles(Vector3d::Zero()),
 		force(Vector3d::Zero()),
 		torque(Vector4d::Zero()),
 		orientationTransform(RigidTransform3d::Identity()),
-		scaledPose(RigidTransform3d::Identity())
+		scaledPose(RigidTransform3d::Identity()),
+		timer()
 	{
 		buttonStates.fill(false);
+		timer.setMaxNumberOfFrames(1);
+
+		LinearObservationMatrix linearObservationMatrix;
+		linearObservationMatrix << LinearMeasurementMatrix::Identity(), LinearMeasurementMatrix::Zero();
+		linearFilter.setObservationMatrix(linearObservationMatrix);
+		linearFilter.setInitialState(LinearStateVector::Zero());
+		linearFilter.setInitialStateCovariance(LinearStateMatrix::Ones() * 1000.0);
+		LinearStateMatrix linearProcessNoise;
+		linearProcessNoise << LinearMeasurementMatrix::Identity() * 0.1, LinearMeasurementMatrix::Zero(),
+			LinearMeasurementMatrix::Zero(), LinearMeasurementMatrix::Identity() * 100.0;
+		linearFilter.setProcessNoiseCovariance(linearProcessNoise);
+		linearFilter.setMeasurementNoiseCovariance(LinearMeasurementMatrix::Identity() * 1.0);
+
+		AngularObservationMatrix angularObservationMatrix;
+		angularObservationMatrix << AngularMeasurementMatrix::Identity(), AngularMeasurementMatrix::Zero();
+		angularFilter.setObservationMatrix(angularObservationMatrix);
+		angularFilter.setInitialState(AngularStateVector::Zero());
+		angularFilter.setInitialStateCovariance(AngularStateMatrix::Ones() * 1000.0);
+		angularFilter.setProcessNoiseCovariance(AngularStateMatrix::Identity() * 10.0);
+		angularFilter.setMeasurementNoiseCovariance(AngularMeasurementMatrix::Identity());
 	}
 
 
@@ -287,6 +327,8 @@ struct NovintScaffold::DeviceData
 
 	/// The position value from the device.
 	Vector3d position;
+	Vector3d linearVelocity;
+	Vector3d angularVelocity;
 	/// The orientation value from the device.  If the device is not 7Dof the orientation is always Identity.
 	RigidTransform3d orientationTransform;
 	/// The pose value from the device, after scaling.
@@ -303,6 +345,15 @@ struct NovintScaffold::DeviceData
 	double orientationScale;
 	/// The mutex that protects the externally modifiable parameters.
 	boost::mutex parametersMutex;
+
+	SurgSim::Framework::Timer timer;
+	SurgSim::Math::RigidTransform3d lastPose;
+
+	/// The translational Kalman filter.
+	SurgSim::Math::KalmanFilter linearFilter;
+
+	/// The angular Kalman filter.
+	SurgSim::Math::KalmanFilter angularFilter;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -648,6 +699,9 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 	info->torque.setZero();
 	if (info->isDeviceHomed)
 	{
+		CalculateVelocity(info);
+
+
 		bool desiredGravityCompensation = false;
 		if (outputData.booleans().get("gravityCompensation", &desiredGravityCompensation))
 		{
@@ -759,9 +813,8 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		outputData.matrices().get(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, &damperJacobian);
 	if (havedamperJacobian)
 	{
-		// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
-		Vector3d linearVelocity = Vector3d::Zero();
-		Vector3d angularVelocity = Vector3d::Zero();
+		Vector3d linearVelocity = info->linearVelocity;
+		Vector3d angularVelocity = info->angularVelocity;
 
 		Vector3d linearVelocityForNominal = linearVelocity;
 		outputData.vectors().get(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY, &linearVelocityForNominal);
@@ -771,6 +824,8 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		SurgSim::Math::setSubVector(linearVelocity - linearVelocityForNominal, 0, 3, &deltaVelocity);
 		SurgSim::Math::setSubVector(angularVelocity - angularVelocityForNominal, 1, 3, &deltaVelocity);
 
+		Vector3d forceFromAcceleration = damperJacobian.block<3,6>(0, 0) * deltaVelocity;
+		std::cout << forceFromAcceleration.transpose() << std::endl;
 		info->force += damperJacobian.block<3,6>(0, 0) * deltaVelocity;
 	}
 
@@ -896,6 +951,8 @@ void NovintScaffold::setInputData(DeviceData* info)
 	inputData.booleans().set(SurgSim::DataStructures::Names::IS_HOMED, info->isDeviceHomed);
 	inputData.booleans().set(SurgSim::DataStructures::Names::IS_POSITION_HOMED, info->isPositionHomed);
 	inputData.booleans().set(SurgSim::DataStructures::Names::IS_ORIENTATION_HOMED, info->isOrientationHomed);
+	inputData.vectors().set(SurgSim::DataStructures::Names::LINEAR_VELOCITY, info->linearVelocity);
+	inputData.vectors().set(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, info->angularVelocity);
 }
 
 void NovintScaffold::createAllHandles()
@@ -1258,6 +1315,8 @@ SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 	builder.addBoolean(SurgSim::DataStructures::Names::IS_HOMED);
 	builder.addBoolean(SurgSim::DataStructures::Names::IS_POSITION_HOMED);
 	builder.addBoolean(SurgSim::DataStructures::Names::IS_ORIENTATION_HOMED);
+	builder.addVector(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
+	builder.addVector(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
 	return builder.createData();
 }
 
@@ -1298,6 +1357,41 @@ NovintScaffold& NovintScaffold::getInstance()
 std::shared_ptr<SurgSim::Framework::Logger> NovintScaffold::getLogger() const
 {
 	return m_logger;
+}
+
+void NovintScaffold::CalculateVelocity(DeviceData* info)
+{
+	info->timer.markFrame();
+	const double period = info->timer.getLastFramePeriod();
+	if ((info->timer.getNumberOfClockFails() == 0) && (boost::math::isnormal(period)) && (period > 0.0))
+	{
+		LinearStateMatrix linearStateTransition;
+		linearStateTransition <<
+			LinearMeasurementMatrix::Identity(), period * LinearMeasurementMatrix::Identity(),
+			LinearMeasurementMatrix::Zero(),     LinearMeasurementMatrix::Identity();
+
+		info->linearFilter.setStateTransition(linearStateTransition);
+		const LinearStateVector& linearState = info->linearFilter.update(info->scaledPose.translation());
+		info->linearVelocity = linearState.segment<3>(3);
+
+		AngularStateMatrix angularStateTransition;
+		angularStateTransition <<
+			AngularMeasurementMatrix::Identity(), period * AngularMeasurementMatrix::Identity(),
+			AngularMeasurementMatrix::Zero(),     AngularMeasurementMatrix::Identity();
+		info->angularFilter.setStateTransition(angularStateTransition);
+		SurgSim::Math::Vector3d rotation;
+		SurgSim::Math::computeRotationVector(info->scaledPose, info->lastPose, &rotation);
+		const AngularStateVector& angularState = info->angularFilter.update(rotation / period);
+		info->angularVelocity = angularState.segment<3>(0);
+	}
+	else
+	{
+		info->timer.start();
+
+		info->linearVelocity.Zero();
+		info->angularVelocity.Zero();
+	}
+	info->lastPose = info->scaledPose;
 }
 
 

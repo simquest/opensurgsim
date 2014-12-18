@@ -108,6 +108,8 @@ private:
 	/// \return	true on success.
 	bool updateDevice(DeviceData* info);
 
+	void CalculateVelocity(DeviceData* info);
+
 	/// Checks whether a device has been homed.  If the position and/or orientation have not been homed, zeros the
 	/// respective Values.  Call this before setting the data to send to the Input Component.  The DeviceData's
 	/// parameter mutex should be locked before this function is called.
