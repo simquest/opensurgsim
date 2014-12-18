@@ -32,7 +32,7 @@ Node convert<SurgSim::Physics::RigidRepresentationState>::encode(const SurgSim::
 
 bool convert<SurgSim::Physics::RigidRepresentationState>::decode(
 	const Node& node,
-	SurgSim::Physics::RigidRepresentationState& rhs)
+	SurgSim::Physics::RigidRepresentationState& rhs) //NOLINT
 {
 	bool result = false;
 	if (node[rhs.getClassName()].IsDefined())

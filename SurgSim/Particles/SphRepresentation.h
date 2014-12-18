@@ -267,7 +267,7 @@ struct convert<SurgSim::Particles::SphRepresentation::PlaneConstraint>
 		result["PlaneConstraint"] = data;
 		return result;
 	}
-	static bool decode(const Node& node, SurgSim::Particles::SphRepresentation::PlaneConstraint& rhs)
+	static bool decode(const Node& node, SurgSim::Particles::SphRepresentation::PlaneConstraint& rhs) //NOLINT
 	{
 		try
 		{

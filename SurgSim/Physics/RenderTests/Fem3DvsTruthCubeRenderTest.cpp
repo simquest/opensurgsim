@@ -392,7 +392,7 @@ private:
 /// \note For example, the constraint equation to fix the dof id 1 is in place (no displacement) is:
 /// \note H(0 1 0 0...0).U(u0 u1 u2 u3...un) = 0 (or desired displacement)
 void buildConstrainedSystem(std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation,
-							SurgSim::Math::Matrix& A, SurgSim::Math::Vector& B)
+							SurgSim::Math::Matrix* A, SurgSim::Math::Vector* B)
 {
 	// The static system with constraints is defined as follow:
 	// (K H^T).(U      ) = (F)
@@ -400,26 +400,26 @@ void buildConstrainedSystem(std::shared_ptr<TruthCubeRepresentation> truthCubeRe
 
 	size_t numConstraints = truthCubeRepresentation->getBoundaryConditions().size();
 	size_t numDof = truthCubeRepresentation->getNumDof();
-	A.resize(numDof + numConstraints, numDof + numConstraints);
-	B.resize(numDof + numConstraints);
+	A->resize(numDof + numConstraints, numDof + numConstraints);
+	B->resize(numDof + numConstraints);
 	SurgSim::Math::Matrix H(numConstraints, truthCubeRepresentation->getNumDof());
 	H.setZero();
-	B.setZero();
+	B->setZero();
 
 	// Build the temporary constraint matrix H along with the RHS vector B
 	for (size_t i = 0; i < numConstraints; i++)
 	{
 		H(i, truthCubeRepresentation->getBoundaryConditions()[i]) = 1.0;
-		B[numDof + i] = truthCubeRepresentation->getBoundaryConditionsDisplacement()[i];
+		(*B)[numDof + i] = truthCubeRepresentation->getBoundaryConditionsDisplacement()[i];
 	}
 
-	A.setZero();
+	A->setZero();
 	// Copy K into A
-	A.block(0,0, numDof, numDof) = truthCubeRepresentation->computeK(*truthCubeRepresentation->getInitialState());
+	A->block(0,0, numDof, numDof) = truthCubeRepresentation->computeK(*truthCubeRepresentation->getInitialState());
 	// Copy H into A
-	A.block(numDof,0, numConstraints, numDof) = H;
+	A->block(numDof,0, numConstraints, numDof) = H;
 	//Copy H^T into A
-	A.block(0, numDof, numDof, numConstraints) = H.transpose();
+	A->block(0, numDof, numDof, numConstraints) = H.transpose();
 }
 
 /// Using static solver to find the displacement of truth cube
@@ -432,7 +432,7 @@ SurgSim::Math::Vector staticSolver(std::shared_ptr<TruthCubeRepresentation> trut
 	// Build the constrained system A.X = B
 	SurgSim::Math::Matrix A;
 	SurgSim::Math::Vector B;
-	buildConstrainedSystem(truthCubeRepresentation, A, B);
+	buildConstrainedSystem(truthCubeRepresentation, &A, &B);
 
 	// Solve the constrained system A.X = B
 	SurgSim::Math::Vector X = A.inverse() * B;

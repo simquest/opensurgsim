@@ -102,7 +102,7 @@ public:
 	virtual RepresentationType getType() const override;
 
 	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-											 SurgSim::Math::Vector& generalizedForce,
+											 const SurgSim::Math::Vector& generalizedForce,
 											 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 											 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 

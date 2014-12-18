@@ -154,15 +154,15 @@ private:
 									  const std::vector<MlcpConstraintType>& constraintsType,
 									  double subStep,
 									  double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
-									  double& convergence_criteria,
-									  bool& signoriniVerified, bool& signoriniValid);
+									  double* convergence_criteria,
+									  bool* signoriniVerified, bool* signoriniValid);
 
 	void doOneIteration(int n, const MlcpProblem::Matrix& A, int nbColumnInA, const MlcpProblem::Vector& b,
 						MlcpSolution::Vector* initialGuess_and_solution,
 						const MlcpProblem::Vector& frictionCoefs,
 						const std::vector<MlcpConstraintType>& constraintsType, double subStep,
-						double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double& convergence_criteria,
-						bool& signoriniVerified);
+						double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double* convergence_criteria,
+						bool* signoriniVerified);
 
 	void printViolationsAndConvergence(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
 									   const MlcpProblem::Vector& b,
