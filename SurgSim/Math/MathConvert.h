@@ -42,55 +42,57 @@ class Shape;
 
 namespace YAML
 {
-	/// Specialization of convert for fixed size Eigen::Matrix
-	SURGSIM_DOUBLE_SPECIALIZATION
-	template <typename Type, int Rows, int Cols, int MOpt>
-	struct convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>
-	{
-		static Node encode(const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
-		static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
-	};
 
-	/// Specialization for Eigen Row Vectors, which are the type that Vector2x, Vector3x use
-	SURGSIM_DOUBLE_SPECIALIZATION
-	template <class Type, int Rows, int MOpt>
-	struct convert <typename Eigen::Matrix<Type,Rows,1,MOpt>>
-	{
-		static Node encode(const typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
-		static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
-	};
+/// Specialization of convert for fixed size Eigen::Matrix
+SURGSIM_DOUBLE_SPECIALIZATION
+template <typename Type, int Rows, int Cols, int MOpt>
+struct convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>
+{
+	static Node encode(const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
+	static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
+};
 
-	/// Specialization of convert for Eigen::Quaternion
-	SURGSIM_DOUBLE_SPECIALIZATION
-	template <class Type, int QOpt>
-	struct convert<typename Eigen::Quaternion<Type, QOpt>>
-	{
-		static Node encode(const typename Eigen::Quaternion<Type, QOpt>& rhs);
-		static bool decode(const Node& node, typename Eigen::Quaternion<Type, QOpt>& rhs);
-	};
+/// Specialization for Eigen Row Vectors, which are the type that Vector2x, Vector3x use
+SURGSIM_DOUBLE_SPECIALIZATION
+template <class Type, int Rows, int MOpt>
+struct convert <typename Eigen::Matrix<Type,Rows,1,MOpt>>
+{
+	static Node encode(const typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
+	static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
+};
 
-	/// Specialization of convert for Eigen::RigidTransform
-	SURGSIM_DOUBLE_SPECIALIZATION
-	template <class Type, int Dim, int TMode, int TOptions>
-	struct convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>
-	{
-		static Node encode(const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
-		static bool decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
-	};
+/// Specialization of convert for Eigen::Quaternion
+SURGSIM_DOUBLE_SPECIALIZATION
+template <class Type, int QOpt>
+struct convert<typename Eigen::Quaternion<Type, QOpt>>
+{
+	static Node encode(const typename Eigen::Quaternion<Type, QOpt>& rhs);
+	static bool decode(const Node& node, typename Eigen::Quaternion<Type, QOpt>& rhs);
+};
 
-	template <>
-	struct convert<std::shared_ptr<SurgSim::Math::Shape>>
-	{
-		static Node encode(const std::shared_ptr<SurgSim::Math::Shape>& rhs);
-		static bool decode(const Node& node, std::shared_ptr<SurgSim::Math::Shape>& rhs);
-	};
+/// Specialization of convert for Eigen::RigidTransform
+SURGSIM_DOUBLE_SPECIALIZATION
+template <class Type, int Dim, int TMode, int TOptions>
+struct convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>
+{
+	static Node encode(const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
+	static bool decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
+};
 
-	template <>
-	struct convert<SurgSim::Math::IntegrationScheme>
-	{
-		static Node encode(const SurgSim::Math::IntegrationScheme& rhs);
-		static bool decode(const Node& node, SurgSim::Math::IntegrationScheme& rhs);
-	};
+template <>
+struct convert<std::shared_ptr<SurgSim::Math::Shape>>
+{
+	static Node encode(const std::shared_ptr<SurgSim::Math::Shape>& rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Math::Shape>& rhs);
+};
+
+template <>
+struct convert<SurgSim::Math::IntegrationScheme>
+{
+	static Node encode(const SurgSim::Math::IntegrationScheme& rhs);
+	static bool decode(const Node& node, SurgSim::Math::IntegrationScheme& rhs);
+};
+
 };
 
 #include "SurgSim/Math/MathConvert-inl.h"

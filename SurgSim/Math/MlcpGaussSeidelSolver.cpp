@@ -112,16 +112,20 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 		}
 
 		if (initialConstraintConvergenceCriteria)
+		{
 			for (int i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; i++)
 			{
 				initialConstraintConvergenceCriteria[i] = initial_constraint_convergence_criteria[i];
 			}
+		}
 
 		if (constraintConvergenceCriteria)
+		{
 			for (int i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; i++)
 			{
 				initialConstraintConvergenceCriteria[i] = initial_constraint_convergence_criteria[i];
 			}
+		}
 
 		return true;
 	}

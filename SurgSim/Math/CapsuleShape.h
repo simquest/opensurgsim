@@ -34,7 +34,7 @@ public:
 	/// Constructor
 	/// \param length The capsule length (i.e. of the cylinder) (in m)
 	/// \param radius The capsule radius (i.e. of the cylinder/spheres) (in m)
-	CapsuleShape(double length = 0.0, double radius = 0.0);
+	explicit CapsuleShape(double length = 0.0, double radius = 0.0);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::CapsuleShape);
 

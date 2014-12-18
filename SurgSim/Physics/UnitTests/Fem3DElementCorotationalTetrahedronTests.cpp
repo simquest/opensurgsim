@@ -37,7 +37,7 @@ const double epsilonAddMatVec = 1e-10;
 class MockFem3DElementCorotationalTet : public Fem3DElementCorotationalTetrahedron
 {
 public:
-	MockFem3DElementCorotationalTet(std::array<size_t, 4> nodeIds)
+	explicit MockFem3DElementCorotationalTet(std::array<size_t, 4> nodeIds)
 		: Fem3DElementCorotationalTetrahedron(nodeIds)
 	{
 	}
