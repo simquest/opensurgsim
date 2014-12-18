@@ -74,6 +74,7 @@ public:
 	/// Set the Physics Representation which follows the input
 	/// \param rigid Rigid Representation that provides state and receives external forces and torques
 	void setRepresentation(const std::shared_ptr<SurgSim::Framework::Component> rigid);
+	void setCollisionRepresentation(const std::shared_ptr<SurgSim::Framework::Component> collision);
 
 	/// \return Name of the pose data in the input to transfer
 	const std::string& getPoseName();
@@ -231,6 +232,7 @@ protected:
 
 private:
 	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
+	std::shared_ptr<SurgSim::Collision::Representation> m_collision;
 	std::string m_poseName;
 
 	/// Used Vtc stiffness parameter in linear mode (in N·m-1)

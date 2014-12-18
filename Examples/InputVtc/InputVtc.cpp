@@ -145,6 +145,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	inputCoupler->setInput(inputComponent);
 	inputCoupler->setOutput(outputComponent);
 	inputCoupler->setRepresentation(physicsRepresentation);
+	inputCoupler->setCollisionRepresentation(collisionRepresentation);
 
 	// The SceneElement
 	std::shared_ptr<BasicSceneElement> boxElement = std::make_shared<BasicSceneElement>(name);

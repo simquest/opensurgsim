@@ -15,6 +15,7 @@
 
 #include <Eigen/Eigenvalues>
 
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
@@ -210,15 +211,29 @@ void VirtualToolCoupler::update(double dt)
 			RigidTransform3d outputAlignment = m_output->getLocalPose().inverse();
 			Matrix33d outputAlignmentUnScaled = outputAlignment.rotation();
 
-			m_outputData.vectors().set(m_forceIndex, outputAlignmentUnScaled * (-force));
-			m_outputData.vectors().set(m_torqueIndex, outputAlignmentUnScaled * (-torque));
-
 			m_outputData.poses().set(m_inputPoseIndex, outputAlignment * inputPose);
 			m_outputData.vectors().set(m_inputLinearVelocityIndex, outputAlignment.linear() * inputLinearVelocity);
 			m_outputData.vectors().set(m_inputAngularVelocityIndex, outputAlignmentUnScaled * inputAngularVelocity);
 
-			m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
-			m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
+			bool renderForces = true;
+			if (m_collision != nullptr)
+			{
+				renderForces = 0 < m_collision->getCollisions().safeGet()->size();
+			}
+			if (renderForces)
+			{
+				m_outputData.vectors().set(m_forceIndex, outputAlignmentUnScaled * (-force));
+				m_outputData.vectors().set(m_torqueIndex, outputAlignmentUnScaled * (-torque));
+				m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
+				m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
+			}
+			else
+			{
+				m_outputData.vectors().reset(m_forceIndex);
+				m_outputData.vectors().reset(m_torqueIndex);
+				m_outputData.matrices().reset(m_springJacobianIndex);
+				m_outputData.matrices().reset(m_damperJacobianIndex);
+			}
 
 			m_output->setData(m_outputData);
 		}
@@ -501,6 +516,11 @@ void VirtualToolCoupler::setPutRigidAtInput(bool putRigidAtInput)
 bool VirtualToolCoupler::getPutRigidAtInput() const
 {
 	return m_putRigidAtInput;
+}
+
+void VirtualToolCoupler::setCollisionRepresentation(const std::shared_ptr<SurgSim::Framework::Component> collision)
+{
+	m_collision = std::dynamic_pointer_cast<SurgSim::Collision::Representation>(collision);
 }
 
 }; /// Physics
