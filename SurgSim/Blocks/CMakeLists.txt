@@ -27,6 +27,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpringNDRepresentationUtils.cpp
 	PoseInterpolator.cpp
 	SphereElement.cpp
+	TransferParticlesToPointCloudBehavior.cpp
 	TransferPhysicsToGraphicsMeshBehavior.cpp
 	TransferPhysicsToPointCloudBehavior.cpp
 	VisualizeContactsBehavior.cpp
@@ -41,6 +42,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpringNDRepresentationUtils.h
 	PoseInterpolator.h
 	SphereElement.h
+	TransferParticlesToPointCloudBehavior.h
 	TransferPhysicsToGraphicsMeshBehavior.h
 	TransferPhysicsToPointCloudBehavior.h
 	VisualizeContactsBehavior.h
@@ -55,6 +57,7 @@ surgsim_add_library(
 
 SET(LIBS
 	SurgSimFramework
+	SurgSimParticles
 	SurgSimPhysics
 	${Boost_LIBRARIES}
 )
