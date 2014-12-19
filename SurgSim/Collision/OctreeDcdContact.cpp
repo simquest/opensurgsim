@@ -56,6 +56,7 @@ void OctreeDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	typedef SurgSim::Math::OctreeShape OctreeShapeType;
 	std::shared_ptr<OctreeShapeType> shape = std::static_pointer_cast<OctreeShapeType>(pair->getFirst()->getShape());
 	calculateContactWithNode(shape->getOctree(), pair, std::make_shared<SurgSim::DataStructures::OctreePath>());
+	pair->getSecond()->getCollisions().unsafeGet().erase(m_nodeCollisionRepresentation);
 }
 
 void OctreeDcdContact::calculateContactWithNode(
@@ -92,7 +93,6 @@ void OctreeDcdContact::calculateContactWithNode(
 
 	if (localPair->hasContacts())
 	{
-		pair->getSecond()->getCollisions().unsafeGet().erase(m_nodeCollisionRepresentation);
 		if (node->hasChildren())
 		{
 			for (size_t i = 0; i < node->getChildren().size(); i++)
