@@ -96,7 +96,6 @@ bool OctreeNodePlyReaderDelegateBase::fileIsAcceptable(const PlyReader& reader)
 			 reader.hasProperty("voxel", "z");
 
 	return result;
-	return true;
 }
 
 void* OctreeNodePlyReaderDelegateBase::beginBounds(const std::string& elementName, size_t count)
@@ -126,10 +125,7 @@ void* OctreeNodePlyReaderDelegateBase::beginVoxel(const std::string& elementName
 	SURGSIM_ASSERT(m_haveBounds) << "Need bounds data for complete octree.";
 	SURGSIM_ASSERT(m_haveDimensions) << "Need dimension data for complete octree.";
 
-	unsigned int maxDimension = m_dimension.x;
-	maxDimension = maxDimension >= m_dimension.y ?
-				   (maxDimension >= m_dimension.z ? maxDimension : m_dimension.z) :
-				   (m_dimension.y >= m_dimension.z ? m_dimension.y : m_dimension.z);
+	auto maxDimension = std::max(m_dimension.x, std::max(m_dimension.y, m_dimension.z));
 
 	m_numLevels = static_cast<int>(std::ceil(std::log(maxDimension) / std::log(2.0)));
 	SurgSim::Math::Vector3d octreeDimensions = SurgSim::Math::Vector3d::Ones() * std::pow(2.0, m_numLevels);

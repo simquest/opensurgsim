@@ -157,6 +157,14 @@ bool OctreeNode<Data>::addData(const SurgSim::Math::Vector3d& position, const Da
 	return doAddData(position, nodeData, level, 1);
 }
 
+
+template<class Data>
+bool OctreeNode<Data>::addDefaultData(const SurgSim::Math::Vector3d& position, int level)
+{
+	return doAddData(position, Data(), level, 1);
+}
+
+
 template<class Data>
 bool OctreeNode<Data>::doAddData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
 								 const int currentLevel)
@@ -241,7 +249,6 @@ template<class Data>
 bool SurgSim::DataStructures::OctreeNode<Data>::doLoad(const std::string& fileName)
 {
 	SurgSim::Framework::Timer timer;
-	timer.start();
 	auto delegate = std::make_shared<OctreeNodePlyReaderDelegate<Data>>(this->shared_from_this());
 
 	PlyReader reader(fileName);

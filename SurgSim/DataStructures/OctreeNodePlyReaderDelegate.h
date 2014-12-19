@@ -32,7 +32,7 @@ class OctreeNodePlyReaderDelegateBase : public PlyReaderDelegate
 public:
 
 	/// Constructor
-	explicit OctreeNodePlyReaderDelegateBase();
+	OctreeNodePlyReaderDelegateBase();
 
 	/// Destructor
 	virtual ~OctreeNodePlyReaderDelegateBase();
@@ -140,15 +140,15 @@ public:
 
 	/// Constructor
 	/// \param octree read the data into this octree
-	OctreeNodePlyReaderDelegate(std::shared_ptr<OctreeNode<Data>> octree);;
+	explicit OctreeNodePlyReaderDelegate(std::shared_ptr<OctreeNode<Data>> octree);
 
 	/// Destructor
-	~OctreeNodePlyReaderDelegate();
+	virtual ~OctreeNodePlyReaderDelegate();
 
 	/// \return the octree
 	std::shared_ptr<OctreeNode<Data>> getOctree();
 
-	void processVoxel(const std::string& elementName) override;
+	virtual void processVoxel(const std::string& elementName) override;
 
 	virtual void initializeOctree() override;
 

@@ -246,6 +246,7 @@ std::vector<OctreePath> getNeighbors(const OctreePath& origin, int type)
 	return std::move(result);
 }
 
+
 };  // namespace DataStructures
 };  // namespace SurgSim
 

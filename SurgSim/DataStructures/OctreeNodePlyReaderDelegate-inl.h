@@ -16,8 +16,6 @@
 #ifndef SURGSIM_DATASTRUCTURES_OCTREENODEPLYREADERDELEGATE_INL_H
 #define SURGSIM_DATASTRUCTURES_OCTREENODEPLYREADERDELEGATE_INL_H
 
-
-
 namespace SurgSim
 {
 namespace DataStructures
@@ -30,7 +28,6 @@ OctreeNodePlyReaderDelegate<Data>::OctreeNodePlyReaderDelegate() :
 	static_assert(std::is_default_constructible<Data>::value, "OctreeNode Data needs default constructor.");
 }
 
-
 template <typename Data>
 OctreeNodePlyReaderDelegate<Data>::OctreeNodePlyReaderDelegate(std::shared_ptr<OctreeNode<Data>> octree) :
 	m_octree(octree)
@@ -39,20 +36,17 @@ OctreeNodePlyReaderDelegate<Data>::OctreeNodePlyReaderDelegate(std::shared_ptr<O
 	SURGSIM_ASSERT(!m_octree->hasChildren()) << "Can't process an octree that already has children in it.";
 }
 
-
 template <typename Data>
 OctreeNodePlyReaderDelegate<Data>::~OctreeNodePlyReaderDelegate()
 {
 
 }
 
-
 template <typename Data>
 std::shared_ptr<OctreeNode<Data>> OctreeNodePlyReaderDelegate<Data>::getOctree()
 {
 	return m_octree;
 }
-
 
 template <typename Data>
 void OctreeNodePlyReaderDelegate<Data>::processVoxel(const std::string& elementName)
@@ -64,13 +58,11 @@ void OctreeNodePlyReaderDelegate<Data>::processVoxel(const std::string& elementN
 	m_octree->addDefaultData(position, m_numLevels);
 }
 
-
 template <typename Data>
 void OctreeNodePlyReaderDelegate<Data>::initializeOctree()
 {
 	m_octree->m_boundingBox = m_boundingBox;
 }
-
 
 }
 }
