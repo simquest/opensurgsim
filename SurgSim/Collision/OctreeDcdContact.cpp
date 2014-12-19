@@ -92,6 +92,7 @@ void OctreeDcdContact::calculateContactWithNode(
 
 	if (localPair->hasContacts())
 	{
+		pair->getSecond()->getCollisions().unsafeGet().erase(m_nodeCollisionRepresentation);
 		if (node->hasChildren())
 		{
 			for (size_t i = 0; i < node->getChildren().size(); i++)
