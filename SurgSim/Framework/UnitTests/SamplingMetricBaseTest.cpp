@@ -21,7 +21,7 @@
 
 TEST(SamplingMetricBaseTest, SamplingMetricBaseInitTest)
 {
-	std::shared_ptr<MockSamplingMetric> mockMetric(new MockSamplingMetric("Test Metric"));
+	std::shared_ptr<MockSamplingMetric> mockMetric(std::make_shared<MockSamplingMetric>("Test Metric"));
 
 	auto samples = mockMetric->getMeasurementValues();
 
@@ -36,7 +36,7 @@ TEST(SamplingMetricBaseTest, SamplingMetricBaseInitTest)
 
 TEST(SamplingMetricBaseTest, SetGetTests)
 {
-	std::shared_ptr<MockSamplingMetric> mockMetric(new MockSamplingMetric("Test Metric"));
+	std::shared_ptr<MockSamplingMetric> mockMetric(std::make_shared<MockSamplingMetric>("Test Metric"));
 
 	auto samples = mockMetric->getMeasurementValues();
 
@@ -53,13 +53,13 @@ TEST(SamplingMetricBaseTest, SetGetTests)
 
 TEST(SamplingMetricBaseTest, AbleToPerformMeasurementsTests)
 {
-	std::shared_ptr<MockSamplingMetric> mockMetric(new MockSamplingMetric("Test Metric", true, 1.0));
+	std::shared_ptr<MockSamplingMetric> mockMetric(std::make_shared<MockSamplingMetric>("Test Metric", true, 1.0));
 
 	// Make 10 out
 	mockMetric->setMaxNumberOfMeasurements(5);
-	for (int ctr = 0; ctr < 10; ++ctr)
+	for (int counter = 0; counter < 10; ++counter)
 	{
-		mockMetric->update((double) ctr);
+		mockMetric->update(static_cast<double>(counter));
 	}
 	auto samples = mockMetric->getMeasurementValues();
 
@@ -71,26 +71,26 @@ TEST(SamplingMetricBaseTest, AbleToPerformMeasurementsTests)
 	// first 5 because they already rolled off the end. The metric value
 	// starts at one
 	auto sampleIterator = samples.begin();
-	for (int ctr = 5;
+	for (int counter = 5;
 		 sampleIterator != samples.end();
-		 ++ctr, ++sampleIterator)
+		 ++counter, ++sampleIterator)
 	{
-		EXPECT_EQ((double) ctr, sampleIterator->first);
-		EXPECT_EQ((double)(ctr + 2), sampleIterator->second);
+		EXPECT_EQ(static_cast<double>(counter), sampleIterator->first);
+		EXPECT_EQ(static_cast<double>(counter + 2), sampleIterator->second);
 	}
 }
 
 TEST(SamplingMetricBaseTest, UnableToPerformMeasurementsTests)
 {
-	std::shared_ptr<MockSamplingMetric> mockMetric(new MockSamplingMetric("Test Metric", false, 1.0));
+	std::shared_ptr<MockSamplingMetric> mockMetric(std::make_shared<MockSamplingMetric>("Test Metric", false, 1.0));
 	double accumulatedTime = 0.0;
 	// Make 10 out
 	mockMetric->setMaxNumberOfMeasurements(5);
 
-	for (int ctr = 0; ctr < 10; ++ctr)
+	for (int counter = 0; counter < 10; ++counter)
 	{
-		mockMetric->update((double) ctr);
-		accumulatedTime += ctr;
+		mockMetric->update(static_cast<double>(counter));
+		accumulatedTime += counter;
 	}
 	auto samples = mockMetric->getMeasurementValues();
 

@@ -39,10 +39,9 @@ namespace Framework
 /// takeMeasurement() ensure the system is ready to be measured and to perform
 /// the measurement respectively.
 ///
-/// We will manage the measurement stream as a deque with a maximum size to protect against
-/// allowing memory to grow unbounded. The nominal setting provides for 30 minutes of
-/// continuous sampling at 30 hertz. After that time, old measurements will be discarded
-/// as new measurements are made so as to stay within the same memory footprint.
+/// The nominal setting provides for 30 minutes of continuous sampling at 30 hertz.
+/// After that time, old measurements will be discarded as new measurements are made
+/// so as to stay within the same memory footprint.
 class SamplingMetricBase : public SurgSim::Framework::Behavior
 {
 public:
@@ -51,20 +50,18 @@ public:
 	explicit SamplingMetricBase(const std::string& name);
 
 	/// Type of the individual entries in the measurement data structure. The first field of the
-	/// pair holds the elapsed time since the start of the measurement process and the second field
-	/// of the pair holds the measurement value obtained at that time.
+	/// pair holds the elapsed simulation time (accumulation of the dt value) since the last successful
+	/// measurement and the second field of the pair holds the measurement value obtained at that time.
 	typedef std::pair<double, double> MeasurementEntryType;
 
 	/// Type of the cumulative entries data structure. The code current caps the number of entries at a
 	/// user prescribed value to keep from overwriting all of memory when the process is allowed to run
 	/// unchecked over long periods. The maximum number of entries is nominally capped at 30 minutes of samples
 	/// taken 30 times per second, but it can be adjusted using he setMaxNumberOfMeasurements call. Note
-	/// that we always save the last measurements taken. After the limit is reached we delete the oldest
-	/// current entry every time we need to add a new measurement.
+	/// that the last measurements taken are always saved. After the limit is reached the oldest entry is
+	/// discarded to make room for the new measurement.
 	typedef std::deque<MeasurementEntryType> MeasurementsType;
 
-	/// Run an update cycle on this metric.
-	/// \param dt is the elapsed time since the last call to update.
 	virtual void update(double dt) override;
 
 	/// Set the desired manager type for this metric. Given the potential tight coupling of the
@@ -73,10 +70,6 @@ public:
 	/// \param targetManagerType is the manager type to be used for managing this metric
 	void setTargetManagerType(int);
 
-	/// Get the desired manager type for this metric. Given the potential tight coupling of the
-	/// and the various other behaviors, this will provide us with the flexibility to choose
-	/// the appropriate manager for the task.
-	/// \return the manager type to be used for managing this metric
 	virtual int getTargetManagerType() const override;
 
 	/// Set the maximum number of measurements to store.
@@ -85,7 +78,7 @@ public:
 	/// \return Maximum number of measurements to be stored.
 	size_t getMaxNumberOfMeasurements() const;
 
-	/// \return Number of frames currently stored (not the maximum number of frames).
+	/// \return Number of measurements currently stored (not the maximum number of measurements).
 	size_t getCurrentNumberOfMeasurements() const;
 
 	/// Get the amount of time since the last successful measurement reading based on the
@@ -93,22 +86,25 @@ public:
 	/// \return the elapsed time
 	double getElapsedTime() const;
 
-	/// Return the deque of measurement values obtained for this measurement.
+	/// Return the measurement values obtained for this measurement.
 	virtual MeasurementsType getMeasurementValues();
 
 protected:
-	/// Wake up the behavior and perform any dependent initializations
-	/// \return true or false depending if the wakeup succeeded or not.
+
 	virtual bool doWakeUp() override;
 
-	/// Initialize the behavior and perform any independent initializations
-	/// \return true or false depending if the initialization succeeded or not.
 	virtual bool doInitialize() override;
 
+	/// NOTE: Be careful with threading when implementing this call. Anything referenced both
+	/// here and in performMeasurement() must be safe.
+	///
 	/// \param dt is the elapsed time since the last call to update.
 	/// \return if it is currently valid to calculate the next measurement value.
 	virtual bool canMeasure(double dt);
 
+	/// NOTE: Be careful with threading when implementing this call. Anything referenced both
+	/// here and in canMeasure() must be safe.
+	///
 	/// \param dt is the elapsed time since the last call to update.
 	/// \return the next measurement value. This method should be overwritten to provide the
 	/// various measurements for the simulation.
