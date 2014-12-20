@@ -169,6 +169,79 @@ void PhysicsManager::initializeComputations(bool copyState)
 	m_pushResultsStep.reset(new PushResults(copyState));
 	m_postUpdateStep.reset(new PostUpdate(copyState));
 	m_updateCollisionRepresentationsStep.reset(new UpdateCollisionRepresentations(copyState));
+
+	if (m_maxIterations.hasValue())
+	{
+		m_solveMlcpStep->setMaxIterations(m_maxIterations.getValue());
+	}
+	if (m_precision.hasValue())
+	{
+		m_solveMlcpStep->setPrecision(m_precision.getValue());
+	}
+	if (m_contactTolerance.hasValue())
+	{
+		m_solveMlcpStep->setContactTolerance(m_contactTolerance.getValue());
+	}
+}
+
+void PhysicsManager::setMaxIterations(int maxIterations)
+{
+	m_maxIterations.setValue(maxIterations);
+}
+
+int PhysicsManager::getMaxIterations() const
+{
+	int result;
+	if (m_maxIterations.hasValue())
+	{
+		result = m_maxIterations.getValue();
+	}
+	else
+	{
+		SolveMlcp solver;
+		result = solver.getMaxIterations();
+	}
+	return result;
+}
+
+void PhysicsManager::setPrecision(double precision)
+{
+	m_precision.setValue(precision);
+}
+
+double PhysicsManager::getPrecision() const
+{
+	double result;
+	if (m_precision.hasValue())
+	{
+		result = m_precision.getValue();
+	}
+	else
+	{
+		SolveMlcp solver;
+		result = solver.getPrecision();
+	}
+	return result;
+}
+
+void PhysicsManager::setContactTolerance(double contactTolerance)
+{
+	m_contactTolerance.setValue(contactTolerance);
+}
+
+double PhysicsManager::getContactTolerance() const
+{
+	double result;
+	if (m_contactTolerance.hasValue())
+	{
+		result = m_contactTolerance.getValue();
+	}
+	else
+	{
+		SolveMlcp solver;
+		result = solver.getContactTolerance();
+	}
+	return result;
 }
 
 

@@ -37,11 +37,29 @@ public:
 	/// Destructor
 	virtual ~SolveMlcp();
 
+	/// Set the maximum number of iterations for the MLCP solver.
+	/// \param maxIterations The maximum number of iterations.
 	void setMaxIterations(int maxIterations);
 
-	void setSolverPrecision(double epsilon);
+	/// Get the maximum number of iterations for the MLCP solver.
+	/// \return The maximum number of iterations.
+	int getMaxIterations() const;
 
+	/// Set the precision of the MLCP solver.
+	/// \param epsilon The precision.
+	void setPrecision(double epsilon);
+
+	/// Get the precision of the MLCP solver.
+	/// \return The precision.
+	double getPrecision() const;
+
+	/// Set the contact tolerance for the MLCP solver.
+	/// \param epsilon The contact tolerance.
 	void setContactTolerance(double epsilon);
+
+	/// Get the contact tolerance for the MLCP solver.
+	/// \return The contact tolerance.
+	double getContactTolerance() const;
 
 protected:
 

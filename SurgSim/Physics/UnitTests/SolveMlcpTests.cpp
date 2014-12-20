@@ -51,7 +51,7 @@ static void testMlcp(std::string filename, double contactTolerance, double solve
 	double dt = 1e-3;
 
 	solveMlcpComputation->setContactTolerance(contactTolerance);
-	solveMlcpComputation->setSolverPrecision(solverPrecision);
+	solveMlcpComputation->setPrecision(solverPrecision);
 	solveMlcpComputation->setMaxIterations(maxIteration);
 
 	// Copy the MlcpProblem data over into the input state

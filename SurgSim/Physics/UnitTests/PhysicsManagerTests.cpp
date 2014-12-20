@@ -21,23 +21,24 @@
 
 #include <gtest/gtest.h>
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/SolveMlcp.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
-#include "SurgSim/Math/Vector.h"
 
-using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Component;
+using SurgSim::Framework::Runtime;
+using SurgSim::Math::Vector3d;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::PhysicsManager;
-using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -176,6 +177,27 @@ TEST_F(PhysicsManagerTest, AddRemoveExcludedCollisionPair)
 		EXPECT_NO_THROW(physicsManager->removeExcludedCollisionPair(rep2, rep1));
 		EXPECT_EQ(0u, collisionPairs->size());
 	}
+}
+
+TEST_F(PhysicsManagerTest, GetSetSolverParameters)
+{
+	auto physicsManager = std::make_shared<PhysicsManager>();
+	SolveMlcp solver;
+
+	EXPECT_EQ(solver.getMaxIterations(), physicsManager->getMaxIterations());
+	const int newMaxIterations = physicsManager->getMaxIterations() + 10;
+	physicsManager->setMaxIterations(newMaxIterations);
+	EXPECT_EQ(newMaxIterations, physicsManager->getMaxIterations());
+
+	EXPECT_EQ(solver.getPrecision(), physicsManager->getPrecision());
+	const double newPrecision = physicsManager->getPrecision() * 10.0;
+	physicsManager->setPrecision(newPrecision);
+	EXPECT_EQ(newPrecision, physicsManager->getPrecision());
+
+	EXPECT_EQ(solver.getContactTolerance(), physicsManager->getContactTolerance());
+	const double newContactTolerance = physicsManager->getContactTolerance() * 10.0;
+	physicsManager->setContactTolerance(newContactTolerance);
+	EXPECT_EQ(newContactTolerance, physicsManager->getContactTolerance());
 }
 
 }; // namespace Physics

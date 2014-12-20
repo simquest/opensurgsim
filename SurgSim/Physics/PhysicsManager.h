@@ -84,6 +84,30 @@ public:
 	void removeExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
 									 std::shared_ptr<SurgSim::Collision::Representation> representation2);
 
+	/// Set the maximum number of iterations for the MLCP solver.
+	/// \param maxIterations The maximum number of iterations.
+	void setMaxIterations(int maxIterations);
+
+	/// Get the maximum number of iterations for the MLCP solver.
+	/// \return The maximum number of iterations.
+	int PhysicsManager::getMaxIterations() const;
+
+	/// Set the precision of the MLCP solver.
+	/// \param precision The precision.
+	void setPrecision(double precision);
+
+	/// Get the precision of the MLCP solver.
+	/// \return The precision.
+	double getPrecision() const;
+
+	/// Set the contact tolerance for the MLCP solver.
+	/// \param epsilon The contact tolerance.
+	void setContactTolerance(double contactTolerance);
+
+	/// Get the contact tolerance for the MLCP solver.
+	/// \return The contact tolerance.
+	double getContactTolerance() const;
+
 protected:
 	///@{
 	/// Overridden from ComponentManager
@@ -133,6 +157,13 @@ private:
 	std::unique_ptr<PushResults> m_pushResultsStep;
 	std::unique_ptr<PostUpdate> m_postUpdateStep;
 	std::unique_ptr<UpdateCollisionRepresentations> m_updateCollisionRepresentationsStep;
+	///@}
+
+	///@{
+	/// Optional parameters to pass the SolveMlcp class.
+	SurgSim::DataStructures::OptionalValue<double> m_precision;
+	SurgSim::DataStructures::OptionalValue<double> m_contactTolerance;
+	SurgSim::DataStructures::OptionalValue<unsigned int> m_maxIterations;
 	///@}
 
 	/// A thread-safe copy of the last PhysicsManagerState in the previous update.

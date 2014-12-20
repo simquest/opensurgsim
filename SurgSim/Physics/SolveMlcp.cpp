@@ -51,14 +51,29 @@ void SolveMlcp::setMaxIterations(int maxIterations)
 	m_gaussSeidelSolver.setMaxIterations(maxIterations);
 }
 
-void SolveMlcp::setSolverPrecision(double epsilon)
+int SolveMlcp::getMaxIterations() const
+{
+	return m_gaussSeidelSolver.getMaxIterations();
+}
+
+void SolveMlcp::setPrecision(double epsilon)
 {
 	m_gaussSeidelSolver.setEpsilonConvergence(epsilon);
+}
+
+double SolveMlcp::getPrecision() const
+{
+	return m_gaussSeidelSolver.getEpsilonConvergence();
 }
 
 void SolveMlcp::setContactTolerance(double epsilon)
 {
 	m_gaussSeidelSolver.setContactTolerance(epsilon);
+}
+
+double SolveMlcp::getContactTolerance() const
+{
+	return m_gaussSeidelSolver.getContactTolerance();
 }
 
 }; // Physics
