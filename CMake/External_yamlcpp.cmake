@@ -24,7 +24,7 @@ endif(DEFINED CMAKE_BUILD_TYPE)
 
 ExternalProject_Add(yaml-cpp
 	URL "https://github.com/simquest/yaml-cpp/archive/v0.5.1.2.tar.gz"
-	URL_MD5 "1919d41dd3ecd34cafaf13a1e60ece95"
+	URL_MD5 "15c88ddb1a4607ed1df44a036c6feb76"
 	PREFIX yaml-cpp
 	CMAKE_ARGS ${CMAKE_ARGS}
 )
