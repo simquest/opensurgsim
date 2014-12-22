@@ -289,7 +289,6 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 void MlcpGaussSeidelSolver::computeEnforcementSystem(
 	size_t problemSize, const MlcpProblem::Matrix& A, const MlcpProblem::Vector& b,
 	const MlcpSolution::Vector& initialGuessAndSolution,
-	const MlcpProblem::Vector& frictionCoefs,
 	const std::vector<MlcpConstraintType>& constraintsType,
 	size_t constraintID, size_t matrixEntryForConstraintID)
 {
@@ -521,7 +520,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 		case MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
 		{
 			// Form the local system
-			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, frictionCoefs, constraintsType,
+			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, constraintsType,
 				constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
@@ -546,7 +545,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 		case MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT:
 		{
 			// Form the local system
-			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, frictionCoefs, constraintsType,
+			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, constraintsType,
 				constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
@@ -591,7 +590,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 		case MLCP_BILATERAL_FRICTIONLESS_SLIDING_CONSTRAINT:
 		{
 			// Form the local system
-			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, frictionCoefs, constraintsType,
+			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, constraintsType,
 				constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
@@ -610,7 +609,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 		case MLCP_BILATERAL_FRICTIONAL_SLIDING_CONSTRAINT:
 		{
 			// Form the local system
-			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, frictionCoefs, constraintsType,
+			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, constraintsType,
 				constraint, currentAtomicIndex);
 
 			// Solve A.f = violation

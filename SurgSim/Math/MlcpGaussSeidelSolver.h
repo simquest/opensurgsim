@@ -96,7 +96,6 @@ private:
 	void computeEnforcementSystem(size_t problemSize, const MlcpProblem::Matrix& A,
 								  const MlcpProblem::Vector& b,
 								  const MlcpSolution::Vector& initialGuessAndSolution,
-								  const MlcpProblem::Vector& frictionCoefs,
 								  const std::vector<MlcpConstraintType>& constraintsType,
 								  size_t constraintID, size_t matrixEntryForConstraintID);
 
