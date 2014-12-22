@@ -424,7 +424,8 @@ TEST(DataGroupTests, DataGroupCopier)
 
 	ASSERT_THROW(targetData = sourceData, SurgSim::Framework::AssertionFailure);
 
-	DataGroupCopier copier(sourceData, targetData);
+	ASSERT_THROW(DataGroupCopier badCopier(sourceData, nullptr), SurgSim::Framework::AssertionFailure);
+	DataGroupCopier copier(sourceData, &targetData);
 
 	const RigidTransform3d testPose = SurgSim::Math::makeRigidTransform(Vector3d(1.0, 2.0, 3.0),
 		Vector3d(1.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
@@ -439,7 +440,8 @@ TEST(DataGroupTests, DataGroupCopier)
 	ASSERT_TRUE(targetData.booleans().set("test2", !testBoolean2));
 
 	// Copy the data.
-	copier.copy();
+	ASSERT_THROW(copier.copy(sourceData, nullptr), SurgSim::Framework::AssertionFailure);
+	ASSERT_NO_THROW(copier.copy(sourceData, &targetData));
 
 	RigidTransform3d outTestPose;
 	ASSERT_TRUE(targetData.poses().get("test", &outTestPose));

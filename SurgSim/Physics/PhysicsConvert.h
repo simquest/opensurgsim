@@ -33,7 +33,7 @@ template <>
 struct convert<SurgSim::Physics::RigidRepresentationState>
 {
 	static Node encode(const SurgSim::Physics::RigidRepresentationState& rhs);
-	static bool decode(const Node& node, SurgSim::Physics::RigidRepresentationState& rhs);
+	static bool decode(const Node& node, SurgSim::Physics::RigidRepresentationState& rhs); //NOLINT
 };
 
 

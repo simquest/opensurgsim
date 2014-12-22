@@ -52,7 +52,7 @@ YAML::Node YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::encode(
 
 template <class T>
 bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
-	const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs)
+	const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs) //NOLINT
 {
 	bool result = true;
 	if (node[SurgSim::DataStructures::Convert::hasValueName].as<bool>())
@@ -87,7 +87,7 @@ YAML::Node YAML::convert<std::array<T, N>>::encode(const std::array<T, N>& rhs)
 }
 
 template <class T, size_t N>
-bool YAML::convert<std::array<T, N>>::decode(const Node& node, std::array<T, N>& rhs)
+bool YAML::convert<std::array<T, N>>::decode(const Node& node, std::array<T, N>& rhs) //NOLINT
 {
 	if (!node.IsSequence() || node.size() != N)
 	{
@@ -124,7 +124,7 @@ YAML::Node YAML::convert<std::unordered_map<Key, T>>::encode(const std::unordere
 }
 
 template <class Key, class T>
-bool YAML::convert<std::unordered_map<Key, T>>::decode(const Node& node, std::unordered_map<Key, T>& rhs)
+bool YAML::convert<std::unordered_map<Key, T>>::decode(const Node& node, std::unordered_map<Key, T>& rhs) //NOLINT
 {
 	if (!node.IsMap())
 	{
@@ -160,7 +160,7 @@ YAML::Node YAML::convert<std::unordered_set<Value>>::encode(const std::unordered
 }
 
 template <class Value>
-bool YAML::convert<std::unordered_set<Value>>::decode(const Node& node, std::unordered_set<Value>& rhs)
+bool YAML::convert<std::unordered_set<Value>>::decode(const Node& node, std::unordered_set<Value>& rhs) //NOLINT
 {
 	if (!node.IsSequence())
 	{

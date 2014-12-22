@@ -62,7 +62,7 @@ Fem2DRepresentation::~Fem2DRepresentation()
 }
 
 void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-													  SurgSim::Math::Vector& generalizedForce,
+													  const SurgSim::Math::Vector& generalizedForce,
 													  const SurgSim::Math::Matrix& K,
 													  const SurgSim::Math::Matrix& D)
 {

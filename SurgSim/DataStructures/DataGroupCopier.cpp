@@ -25,37 +25,32 @@ namespace SurgSim
 namespace DataStructures
 {
 
-DataGroupCopier::DataGroupCopier(const DataGroup& source, DataGroup& target) :
-	m_source(source),
-	m_target(target)
+DataGroupCopier::DataGroupCopier(const DataGroup& source, DataGroup* target)
 {
-	findMap();
+	SURGSIM_ASSERT(target != nullptr) << "Target is a nullptr";
+	m_map[0] = findMap(source.poses().getDirectory(), target->poses().getDirectory());
+	m_map[1] = findMap(source.vectors().getDirectory(), target->vectors().getDirectory());
+	m_map[2] = findMap(source.matrices().getDirectory(), target->matrices().getDirectory());
+	m_map[3] = findMap(source.scalars().getDirectory(), target->scalars().getDirectory());
+	m_map[4] = findMap(source.integers().getDirectory(), target->integers().getDirectory());
+	m_map[5] = findMap(source.booleans().getDirectory(), target->booleans().getDirectory());
+	m_map[6] = findMap(source.strings().getDirectory(), target->strings().getDirectory());
+	m_map[7] = findMap(source.images().getDirectory(), target->images().getDirectory());
+	m_map[8] = findMap(source.customData().getDirectory(), target->customData().getDirectory());
 }
 
-void DataGroupCopier::copy()
+void DataGroupCopier::copy(const DataGroup& source, DataGroup* target)
 {
-	m_target.poses().copy(m_source.poses(), m_map[0]);
-	m_target.vectors().copy(m_source.vectors(), m_map[1]);
-	m_target.matrices().copy(m_source.matrices(), m_map[2]);
-	m_target.scalars().copy(m_source.scalars(), m_map[3]);
-	m_target.integers().copy(m_source.integers(), m_map[4]);
-	m_target.booleans().copy(m_source.booleans(), m_map[5]);
-	m_target.strings().copy(m_source.strings(), m_map[6]);
-	m_target.images().copy(m_source.images(), m_map[7]);
-	m_target.customData().copy(m_source.customData(), m_map[8]);
-}
-
-void DataGroupCopier::findMap()
-{
-	m_map[0] = findMap(m_source.poses().getDirectory(), m_target.poses().getDirectory());
-	m_map[1] = findMap(m_source.vectors().getDirectory(), m_target.vectors().getDirectory());
-	m_map[2] = findMap(m_source.matrices().getDirectory(), m_target.matrices().getDirectory());
-	m_map[3] = findMap(m_source.scalars().getDirectory(), m_target.scalars().getDirectory());
-	m_map[4] = findMap(m_source.integers().getDirectory(), m_target.integers().getDirectory());
-	m_map[5] = findMap(m_source.booleans().getDirectory(), m_target.booleans().getDirectory());
-	m_map[6] = findMap(m_source.strings().getDirectory(), m_target.strings().getDirectory());
-	m_map[7] = findMap(m_source.images().getDirectory(), m_target.images().getDirectory());
-	m_map[8] = findMap(m_source.customData().getDirectory(), m_target.customData().getDirectory());
+	SURGSIM_ASSERT(target != nullptr) << "Target is a nullptr";
+	target->poses().copy(source.poses(), m_map[0]);
+	target->vectors().copy(source.vectors(), m_map[1]);
+	target->matrices().copy(source.matrices(), m_map[2]);
+	target->scalars().copy(source.scalars(), m_map[3]);
+	target->integers().copy(source.integers(), m_map[4]);
+	target->booleans().copy(source.booleans(), m_map[5]);
+	target->strings().copy(source.strings(), m_map[6]);
+	target->images().copy(source.images(), m_map[7]);
+	target->customData().copy(source.customData(), m_map[8]);
 }
 
 NamedDataCopyMap DataGroupCopier::findMap(std::shared_ptr<const IndexDirectory> source,
