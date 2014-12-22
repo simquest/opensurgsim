@@ -538,7 +538,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 }
 
 // Solve the system A x = b for x, with the assumption that the size is "size"
-static inline bool solveSystem(const MlcpProblem::Matrix& A, const MlcpProblem::Vector& b, size_t size,
+static inline void solveSystem(const MlcpProblem::Matrix& A, const MlcpProblem::Vector& b, size_t size,
 							   MlcpSolution::Vector* x)
 {
 	MlcpProblem::Matrix AA = A.block(0, 0, size, size);
@@ -548,7 +548,6 @@ static inline bool solveSystem(const MlcpProblem::Matrix& A, const MlcpProblem::
 	//MlcpSolution::Vector solution = AA.colPivHouseholderQr().solve(bb);
 	//MlcpSolution::Vector solution = AA.householderQr().solve(bb);
 	*x = solution;
-	return true;
 }
 
 void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA,
@@ -610,11 +609,8 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 				constraintsType, constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
-				&m_rhsEnforcedLocalSystem))
-			{
-				return;
-			}
+			solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+				&m_rhsEnforcedLocalSystem);
 
 			// Correct the forces accordingly
 			(*initialGuess_and_solution).head(m_numEnforcedAtomicConstraints - 1) -=
@@ -638,11 +634,8 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 				constraintsType, constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
-							  &m_rhsEnforcedLocalSystem))
-			{
-				return;
-			}
+			solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+				&m_rhsEnforcedLocalSystem);
 
 			// Correct the forces accordingly
 			(*initialGuess_and_solution).head(m_numEnforcedAtomicConstraints - 1) -=
@@ -686,11 +679,8 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 				constraintsType, constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
-							  &m_rhsEnforcedLocalSystem))
-			{
-				return;
-			}
+			solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+				&m_rhsEnforcedLocalSystem);
 
 			// Correct the forces accordingly
 			(*initialGuess_and_solution).head(m_numEnforcedAtomicConstraints - 2) -=
@@ -708,11 +698,8 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 				constraintsType, constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
-							  &m_rhsEnforcedLocalSystem))
-			{
-				return;
-			}
+			solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+				&m_rhsEnforcedLocalSystem);
 
 			// Correct the forces accordingly
 			(*initialGuess_and_solution).head(m_numEnforcedAtomicConstraints - 2) -=
