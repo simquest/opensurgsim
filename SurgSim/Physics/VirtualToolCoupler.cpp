@@ -56,8 +56,8 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_localAttachmentPoint(Vector3d(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
 									std::numeric_limits<double>::quiet_NaN())),
 	m_calculateInertialTorques(false),
-	m_putRigidAtInput(false),
-	m_hadCollisions(10),
+	m_hadCollisions(20),
+	m_previouslyMovedRigidToInput(false),
 	m_poseIndex(-1),
 	m_linearVelocityIndex(-1),
 	m_angularVelocityIndex(-1),
@@ -82,8 +82,6 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 									  getOptionalAttachmentPoint, setOptionalAttachmentPoint);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, bool, CalculateInertialTorques,
 									  getCalculateInertialTorques, setCalculateInertialTorques);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, bool, PutRigidAtInput,
-									  getPutRigidAtInput, setPutRigidAtInput);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 									  Input, getInput, setInput);
@@ -148,63 +146,81 @@ void VirtualToolCoupler::update(double dt)
 	RigidTransform3d inputPose;
 	if (inputData.poses().get(m_poseIndex, &inputPose))
 	{
-		if (m_putRigidAtInput)
-		{
-			RigidRepresentationState objectState(m_rigid->getCurrentState());
-			RigidTransform3d desiredPose = inputPose;
-			desiredPose.translation() -= inputPose.linear() * m_localAttachmentPoint;
-			objectState.setPose(desiredPose);
-			m_rigid->setInitialState(objectState);
-			m_putRigidAtInput = false;
-		}
 		Vector3d inputLinearVelocity(Vector3d::Zero());
 		inputData.vectors().get(m_linearVelocityIndex, &inputLinearVelocity);
-
 		Vector3d inputAngularVelocity(Vector3d::Zero());
 		inputData.vectors().get(m_angularVelocityIndex, &inputAngularVelocity);
-
 		RigidTransform3d inputAlignment = m_input->getLocalPose();
 		inputPose = inputAlignment * inputPose;
 		inputLinearVelocity = inputAlignment.linear() * inputLinearVelocity;
 		inputAngularVelocity = inputAlignment.rotation() * inputAngularVelocity;
 
-		RigidRepresentationState objectState(m_rigid->getCurrentState());
-		RigidTransform3d objectPose(objectState.getPose());
-		Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
-		Vector3d attachmentPoint = objectPose * m_localAttachmentPoint;
-		Vector3d leverArm = attachmentPoint - objectPosition;
-		Vector3d attachmentPointVelocity = objectState.getLinearVelocity();
-		attachmentPointVelocity += objectState.getAngularVelocity().cross(leverArm);
-
-		Vector3d force = m_linearStiffness * (inputPose.translation() - attachmentPoint);
-		force += m_linearDamping * (inputLinearVelocity - attachmentPointVelocity);
-
+		const RigidRepresentationState& objectState(m_rigid->getCurrentState());
+		const RigidTransform3d objectPose(objectState.getPose());
 		Vector3d rotationVector;
 		SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationVector);
-		Vector3d torque = m_angularStiffness * rotationVector;
-		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
-
-		Vector6d generalizedForce;
-		generalizedForce << force, torque;
-
-		const Matrix33d identity3x3 = Matrix33d::Identity();
-		const Matrix33d zero3x3 = Matrix33d::Zero();
+		Vector3d force;
+		Vector3d torque;
 		Matrix66d generalizedStiffness;
-		generalizedStiffness << m_linearStiffness * identity3x3, zero3x3,
-								zero3x3                        , m_angularStiffness * identity3x3;
 		Matrix66d generalizedDamping;
-		generalizedDamping << m_linearDamping * identity3x3, zero3x3,
-							  zero3x3                      , m_angularDamping * identity3x3;
 
-		if (m_calculateInertialTorques)
+		bool moveRigidToInput = false;
+		if (m_collision != nullptr)
 		{
-			SurgSim::DataStructures::Location location;
-			location.rigidLocalPosition.setValue(m_localAttachmentPoint);
-			m_rigid->addExternalGeneralizedForce(location, generalizedForce, generalizedStiffness, generalizedDamping);
+			m_hadCollisions.push_back(0 < m_collision->getCollisions().unsafeGet().size());
+			moveRigidToInput = std::none_of(m_hadCollisions.begin(), m_hadCollisions.end(),
+				[](bool collision){return collision;});
+		}
+		if (moveRigidToInput)
+		{
+			m_rigid->setLinearVelocity((inputPose.translation() -
+				inputPose.linear() * m_localAttachmentPoint - objectPose.translation()) / dt);
+			m_rigid->setAngularVelocity(rotationVector / dt);
+			force = Vector3d::Zero();
+			torque = Vector3d::Zero();
+			m_previouslyMovedRigidToInput = true;
 		}
 		else
 		{
-			m_rigid->addExternalGeneralizedForce(generalizedForce, generalizedStiffness, generalizedDamping);
+			if (m_previouslyMovedRigidToInput)
+			{
+				m_rigid->setLinearVelocity(Vector3d::Zero());
+				m_rigid->setAngularVelocity(Vector3d::Zero());
+				m_previouslyMovedRigidToInput = false;
+			}
+			const Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
+			const Vector3d attachmentPoint = objectPose * m_localAttachmentPoint;
+			Vector3d leverArm = attachmentPoint - objectPosition;
+			Vector3d attachmentPointVelocity = objectState.getLinearVelocity();
+			attachmentPointVelocity += objectState.getAngularVelocity().cross(leverArm);
+
+			force = m_linearStiffness * (inputPose.translation() - attachmentPoint);
+			force += m_linearDamping * (inputLinearVelocity - attachmentPointVelocity);
+
+			torque = m_angularStiffness * rotationVector;
+			torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
+
+			Vector6d generalizedForce;
+			generalizedForce << force, torque;
+
+			const Matrix33d identity3x3 = Matrix33d::Identity();
+			const Matrix33d zero3x3 = Matrix33d::Zero();
+			generalizedStiffness << m_linearStiffness * identity3x3, zero3x3,
+				zero3x3                        , m_angularStiffness * identity3x3;
+			generalizedDamping << m_linearDamping * identity3x3, zero3x3,
+				zero3x3                      , m_angularDamping * identity3x3;
+
+			if (m_calculateInertialTorques)
+			{
+				SurgSim::DataStructures::Location location;
+				location.rigidLocalPosition.setValue(m_localAttachmentPoint);
+				m_rigid->addExternalGeneralizedForce(location, generalizedForce, generalizedStiffness,
+					generalizedDamping);
+			}
+			else
+			{
+				m_rigid->addExternalGeneralizedForce(generalizedForce, generalizedStiffness, generalizedDamping);
+			}
 		}
 
 		if (m_output != nullptr)
@@ -216,26 +232,19 @@ void VirtualToolCoupler::update(double dt)
 			m_outputData.vectors().set(m_inputLinearVelocityIndex, outputAlignment.linear() * inputLinearVelocity);
 			m_outputData.vectors().set(m_inputAngularVelocityIndex, outputAlignmentUnScaled * inputAngularVelocity);
 
-			bool renderForces = true;
-			if (m_collision != nullptr)
-			{
-				m_hadCollisions.push_back(0 < m_collision->getCollisions().safeGet()->size());
-				renderForces = !std::none_of(m_hadCollisions.begin(), m_hadCollisions.end(),
-					[](bool collision){return collision;});
-			}
-			if (renderForces)
-			{
-				m_outputData.vectors().set(m_forceIndex, outputAlignmentUnScaled * (-force));
-				m_outputData.vectors().set(m_torqueIndex, outputAlignmentUnScaled * (-torque));
-				m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
-				m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
-			}
-			else
+			if (moveRigidToInput)
 			{
 				m_outputData.vectors().reset(m_forceIndex);
 				m_outputData.vectors().reset(m_torqueIndex);
 				m_outputData.matrices().reset(m_springJacobianIndex);
 				m_outputData.matrices().reset(m_damperJacobianIndex);
+			}
+			else
+			{
+				m_outputData.vectors().set(m_forceIndex, outputAlignmentUnScaled * (-force));
+				m_outputData.vectors().set(m_torqueIndex, outputAlignmentUnScaled * (-torque));
+				m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
+				m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
 			}
 
 			m_output->setData(m_outputData);
@@ -509,16 +518,6 @@ void VirtualToolCoupler::setCalculateInertialTorques(bool calculateInertialTorqu
 bool VirtualToolCoupler::getCalculateInertialTorques() const
 {
 	return m_calculateInertialTorques;
-}
-
-void VirtualToolCoupler::setPutRigidAtInput(bool putRigidAtInput)
-{
-	m_putRigidAtInput = putRigidAtInput;
-}
-
-bool VirtualToolCoupler::getPutRigidAtInput() const
-{
-	return m_putRigidAtInput;
 }
 
 void VirtualToolCoupler::setCollisionRepresentation(const std::shared_ptr<SurgSim::Framework::Component> collision)

@@ -149,17 +149,6 @@ public:
 	/// \return true if inertia is being simulated.
 	bool getCalculateInertialTorques() const;
 
-	/// Set whether or not the rigid representation should be moved to the input pose in the next update.
-	/// This function is intended for use at startup when the input pose may be far from the initial pose of the
-	/// rigid representation, which can cause large and unexpected forces and often significant oscillations. However,
-	/// if the change in pose causes a collision with a significant violation, the response may be undesirable.
-	/// \param putRigidAtInput true to move the rigid by setting the pose in its state to the input pose.
-	void setPutRigidAtInput(bool putRigidAtInput);
-
-	/// Get whether or not the rigid representation should be moved to the input pose in the next update.
-	/// \return true if the rigid will be moved by setting the pose in its state to the input pose.
-	bool getPutRigidAtInput() const;
-
 protected:
 	virtual bool doInitialize() override;
 	virtual bool doWakeUp() override;
@@ -265,11 +254,9 @@ private:
 	/// input point is not the mass center.
 	bool m_calculateInertialTorques;
 
-	/// Whether or not to set the rigid state equal to the pose of the input.
-	bool m_putRigidAtInput;
-
 	std::shared_ptr<SurgSim::Collision::Representation> m_collision;
 	boost::circular_buffer<bool> m_hadCollisions;
+	bool m_previouslyMovedRigidToInput;
 
 	///@{
 	/// Cached DataGroup indices.
