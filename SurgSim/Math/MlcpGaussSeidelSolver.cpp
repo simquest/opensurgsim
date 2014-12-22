@@ -94,7 +94,6 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	double* initialConvergenceCriteria = &solution->initialConvergenceCriteria;
 	double* constraintConvergenceCriteria = solution->constraintConvergenceCriteria;
 	double* initialConstraintConvergenceCriteria = solution->initialConstraintConvergenceCriteria;
-	bool catchExplodingConvergenceCriteria = true;
 
 	// Loop until it converges or maxIterations are reached
 	size_t nbLoop = 0;
@@ -148,18 +147,15 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 									 &signorini_verified, &signorini_valid);
 		++nbLoop;
 
-		if (catchExplodingConvergenceCriteria)
+		// If we have an incredibly high convergence criteria value, the displacements are going to be very large,
+		// causing problems in the next iteration, so we should break out here. The convergence_criteria should
+		// really only be a couple order of magnitudes higher than epsilon.
+		if (!SurgSim::Math::isValid(convergence_criteria) || convergence_criteria > 1.0)
 		{
-			// If we have an incredibly high convergence criteria value, the displacements are going to be very large,
-			// causing problems in the next iteration, so we should break out here. The convergence_criteria should
-			// really only be a couple order of magnitudes higher than epsilon.
-			if (!SurgSim::Math::isValid(convergence_criteria) || convergence_criteria > 1.0)
-			{
-				SURGSIM_LOG_WARNING(m_logger) << "Convergence (" << convergence_criteria <<
-					") is NaN, infinite, or greater than 1.0! MLCP is exploding after " << nbLoop <<
-					" Gauss Seidel iterations!!";
-				break;
-			}
+			SURGSIM_LOG_WARNING(m_logger) << "Convergence (" << convergence_criteria <<
+				") is NaN, infinite, or greater than 1.0! MLCP is exploding after " << nbLoop <<
+				" Gauss Seidel iterations!!";
+			break;
 		}
 	}
 	while ((!signorini_verified ||
