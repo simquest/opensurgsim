@@ -119,7 +119,8 @@ private:
 	void printViolationsAndConvergence(size_t problemSize, const MlcpProblem::Matrix& A,
 									   const MlcpProblem::Vector& b,
 									   const MlcpSolution::Vector& initialGuess_and_solution,
-									   const std::vector<MlcpConstraintType>& constraintsType, double convergence_criteria,
+									   const std::vector<MlcpConstraintType>& constraintsType,
+									   double convergence_criteria,
 									   bool signorini_verified, size_t nbLoop);
 
 	/// The precision.
