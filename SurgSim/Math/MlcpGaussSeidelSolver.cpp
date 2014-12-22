@@ -117,41 +117,20 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	// If it is already converged, fill the output and return true.
 	if (initial_convergence_criteria <= m_epsilonConvergence && initialSignoriniVerified)
 	{
-		if (validSignorini)
+		*validSignorini = initialSignoriniVerified;
+		*validConvergence = true;
+		*initialConvergenceCriteria = initial_convergence_criteria;
+		*convergenceCriteria = initial_convergence_criteria;
+		*MLCP_nbIterations = 0;
+
+		for (size_t i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; ++i)
 		{
-			*validSignorini = initialSignoriniVerified;
-		}
-		if (validConvergence)
-		{
-			*validConvergence = true;
-		}
-		if (initialConvergenceCriteria)
-		{
-			*initialConvergenceCriteria = initial_convergence_criteria;
-		}
-		if (convergenceCriteria)
-		{
-			*convergenceCriteria = initial_convergence_criteria;
-		}
-		if (MLCP_nbIterations)
-		{
-			*MLCP_nbIterations = 0;
+			initialConstraintConvergenceCriteria[i] = initial_constraint_convergence_criteria[i];
 		}
 
-		if (initialConstraintConvergenceCriteria)
+		for (size_t i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; ++i)
 		{
-			for (size_t i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; ++i)
-			{
-				initialConstraintConvergenceCriteria[i] = initial_constraint_convergence_criteria[i];
-			}
-		}
-
-		if (constraintConvergenceCriteria)
-		{
-			for (size_t i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; ++i)
-			{
-				initialConstraintConvergenceCriteria[i] = initial_constraint_convergence_criteria[i];
-			}
+			initialConstraintConvergenceCriteria[i] = initial_constraint_convergence_criteria[i];
 		}
 
 		return true;
@@ -187,54 +166,38 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 			(SurgSim::Math::isValid(convergence_criteria) && convergence_criteria > m_epsilonConvergence)) &&
 		   nbLoop < m_maxIterations);
 
-	if (MLCP_nbIterations)
+	*MLCP_nbIterations = nbLoop;
+	*validConvergence = true;
+
+	if (!SurgSim::Math::isValid(convergence_criteria) || convergence_criteria > 1.0)
 	{
-		*MLCP_nbIterations = nbLoop;
+		*validConvergence = false;
 	}
 
-	if (validConvergence)
+	if (convergence_criteria >= sqrt(m_epsilonConvergence))
 	{
-		*validConvergence = true;
-
-		if (!SurgSim::Math::isValid(convergence_criteria) || convergence_criteria > 1.0)
-		{
-			*validConvergence = false;
-		}
-
-		if (convergence_criteria >= sqrt(m_epsilonConvergence))
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Convergence criteria (" << convergence_criteria <<
-				") is greater than " << sqrt(m_epsilonConvergence) << " at end of " << nbLoop <<
-				" Gauss Seidel iterations.";
-		}
-
-		if (convergence_criteria > initial_convergence_criteria)
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Convergence criteria (" << convergence_criteria <<
-				") is greater than before " << nbLoop << " Gauss Seidel iterations (" <<
-				initial_convergence_criteria << ").";
-		}
+		SURGSIM_LOG_WARNING(m_logger) << "Convergence criteria (" << convergence_criteria <<
+			") is greater than " << sqrt(m_epsilonConvergence) << " at end of " << nbLoop <<
+			" Gauss Seidel iterations.";
+		//*validConvergence = false;
 	}
 
-	if (validSignorini)
+	if (convergence_criteria > initial_convergence_criteria)
 	{
-		*validSignorini = true;
-
-		if (!signorini_verified)
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Signorini not verified after " << nbLoop << " Gauss Seidel iterations.";
-			*validSignorini = false;
-		}
+		SURGSIM_LOG_WARNING(m_logger) << "Convergence criteria (" << convergence_criteria <<
+			") is greater than before " << nbLoop << " Gauss Seidel iterations (" <<
+			initial_convergence_criteria << ").";
+		//		  *validConvergence = false;   // This is a bit strict but it is useful to know when diverging.
 	}
 
-	if (convergenceCriteria)
+	*validSignorini = true;
+	if (!signorini_verified)
 	{
-		*convergenceCriteria = convergence_criteria;
+		SURGSIM_LOG_WARNING(m_logger) << "Signorini not verified after " << nbLoop << " Gauss Seidel iterations.";
+		*validSignorini = false;
 	}
-	if (initialConvergenceCriteria)
-	{
-		*initialConvergenceCriteria = initial_convergence_criteria;
-	}
+	*convergenceCriteria = convergence_criteria;
+	*initialConvergenceCriteria = initial_convergence_criteria;
 
 	return (SurgSim::Math::isValid(convergence_criteria) && convergence_criteria <= m_epsilonConvergence &&
 		signorini_valid);
@@ -307,7 +270,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 		{
 			const double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuess_and_solution;
 			// Enforce orthogonality condition
-			if (! SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
+			if (!SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
 				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&
 				 violation > m_contactTolerance))
 			{
@@ -321,7 +284,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 		{
 			const double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuess_and_solution;
 			// Enforce orthogonality condition
-			if (! SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
+			if (!SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
 				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&
 				 violation > m_contactTolerance))
 			{
