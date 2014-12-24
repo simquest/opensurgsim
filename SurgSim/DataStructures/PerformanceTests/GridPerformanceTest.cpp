@@ -100,9 +100,9 @@ TEST_P(Grid3DPerformanceTests, Grid3DTest)
 	size_t numElementsPerDimension;
 	std::tie(concentrationPerCell, numElementsPerDimension) = GetParam();
 	size_t numElements = numElementsPerDimension * numElementsPerDimension * numElementsPerDimension;
-	RecordProperty("Concentration of elements per cell", boost::to_string(concentrationPerCell));
-	RecordProperty("Total number of elements", boost::to_string(numElements));
-	RecordProperty("Time (in s)", boost::to_string(performTimingTest(concentrationPerCell, numElementsPerDimension)));
+	RecordProperty("ElementsPerCell", boost::to_string(concentrationPerCell));
+	RecordProperty("NumberOfElements", boost::to_string(numElements));
+	RecordProperty("Duration", boost::to_string(performTimingTest(concentrationPerCell, numElementsPerDimension)));
 }
 
 INSTANTIATE_TEST_CASE_P(
