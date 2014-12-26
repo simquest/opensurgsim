@@ -51,27 +51,27 @@ public:
 
 	/// Sets the size along X-axis of the box
 	/// \param sizeX Size along X-axis of the box
-	virtual void setSizeX(double sizeX) override;
+	void setSizeX(double sizeX) override;
 
 	/// Returns the size along X-axis of the box
 	/// \return Size along X-axis of the box
-	virtual double getSizeX() const override;
+	double getSizeX() const override;
 
 	/// Sets the size along Y-axis of the box
 	/// \param sizeY Size along Y-axis of the box
-	virtual void setSizeY(double sizeY) override;
+	void setSizeY(double sizeY) override;
 
 	/// Returns the size along Y-axis of the box
 	/// \return Size along Y-axis of the box
-	virtual double getSizeY() const override;
+	double getSizeY() const override;
 
 	/// Sets the size along Z-axis of the box
 	/// \param sizeZ Size along Z-axis of the box
-	virtual void setSizeZ(double sizeZ) override;
+	void setSizeZ(double sizeZ) override;
 
 	/// Returns the size along Z-axis of the box
 	/// \return Size along Z-axis of the box
-	virtual double getSizeZ() const override;
+	double getSizeZ() const override;
 
 	/// Sets the size of the box
 	/// \param sizeX Size along X-axis of the box
@@ -86,11 +86,11 @@ public:
 
 	/// Sets the size of the box
 	/// \param size Size of the box
-	virtual void setSize(const SurgSim::Math::Vector3d& size) override;
+	void setSize(const SurgSim::Math::Vector3d& size) override;
 
 	/// Returns the extents of the box
 	/// \return Size of the box
-	virtual SurgSim::Math::Vector3d getSize() const override;
+	SurgSim::Math::Vector3d getSize() const override;
 
 private:
 	/// The OSG box shape is a unit box and this transform scales it to the size set.

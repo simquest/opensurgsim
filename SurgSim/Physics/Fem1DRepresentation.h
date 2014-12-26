@@ -46,26 +46,26 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DRepresentation);
 
-	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,
 		const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 		const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
-	virtual RepresentationType getType() const override;
+	RepresentationType getType() const override;
 
 protected:
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
-	virtual void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-								const SurgSim::Math::RigidTransform3d& transform) override;
+	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
+			const SurgSim::Math::RigidTransform3d& transform) override;
 
 private:
-	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
+	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
 };
 
 } // namespace Physics

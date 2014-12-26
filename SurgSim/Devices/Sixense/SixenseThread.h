@@ -43,9 +43,9 @@ public:
 	virtual ~SixenseThread();
 
 protected:
-	virtual bool doInitialize() override;
-	virtual bool doStartUp() override;
-	virtual bool doUpdate(double dt) override;
+	bool doInitialize() override;
+	bool doStartUp() override;
+	bool doUpdate(double dt) override;
 
 private:
 	SixenseScaffold* m_scaffold;

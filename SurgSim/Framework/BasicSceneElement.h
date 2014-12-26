@@ -40,7 +40,7 @@ public:
 protected:
 	/// Initializes the scene element
 	/// \return	True if succeeds, false if fails
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 };
 

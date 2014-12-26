@@ -52,7 +52,7 @@ public:
 	/// Only allows OsgView components, any other will not be set and it will return false.
 	/// \param view The view that should be used.
 	/// \return	True if it succeeds, false if it fails.
-	virtual bool setView(std::shared_ptr<View> view) override;
+	bool setView(std::shared_ptr<View> view) override;
 
 	/// Enables a camera manipulator, implemented via a trackball, this is a temporary solution as it uses
 	/// the OSG input events rather than reading from the OpenSurgSim input.
@@ -67,17 +67,17 @@ public:
 
 	/// Return the keyboard to be used with this view.
 	/// \return A keyboard device
-	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override;
+	std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override;
 	/// Turn on/off the keyboard device to be used.
 	/// \param val Indicate whether or not to use keyboard device
-	virtual void enableKeyboardDevice(bool val) override;
+	void enableKeyboardDevice(bool val) override;
 
 	/// Return the mouse to be used with this view.
 	/// \return A mouse device
-	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() override;
+	std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() override;
 	/// Turn on/off the mouse device to be used.
 	/// \param val Indicate whether or not to use mouse device
-	virtual	void enableMouseDevice(bool val) override;
+	void enableMouseDevice(bool val) override;
 
 private:
 	/// Indicate if a keyboard device is enabled

@@ -95,7 +95,7 @@ public:
 	SurgSim::Math::Matrix m_expectedStiffnessMatrix, m_expectedStiffnessMatrix2;
 	SurgSim::Math::Vector m_vectorOnes;
 
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		using SurgSim::Math::getSubVector;
 		using SurgSim::Math::getSubMatrix;

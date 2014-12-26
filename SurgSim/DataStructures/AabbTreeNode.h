@@ -60,7 +60,7 @@ public:
 
 protected:
 
-	virtual bool doAccept(TreeVisitor* visitor) override;
+	bool doAccept(TreeVisitor* visitor) override;
 
 private:
 

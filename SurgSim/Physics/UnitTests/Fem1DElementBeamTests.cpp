@@ -121,7 +121,7 @@ public:
 	double m_radius;
 	Quaterniond m_orientation;
 
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		using SurgSim::Math::getSubVector;
 

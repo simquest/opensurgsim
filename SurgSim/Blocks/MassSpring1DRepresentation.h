@@ -54,7 +54,7 @@ public:
 
 protected:
 
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 };
 
 };  // namespace Blocks

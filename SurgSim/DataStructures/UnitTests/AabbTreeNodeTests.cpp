@@ -76,13 +76,13 @@ class TestVisitor : public TreeVisitor
 public:
 	virtual ~TestVisitor() {}
 
-	virtual bool handle(TreeNode* node) override
+	bool handle(TreeNode* node) override
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 		return false;
 	}
 
-	virtual bool handle(AabbTreeNode* node) override
+	bool handle(AabbTreeNode* node) override
 	{
 		return true;
 	}

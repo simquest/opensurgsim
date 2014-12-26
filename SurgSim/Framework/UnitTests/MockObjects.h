@@ -204,7 +204,7 @@ public:
 	{
 	}
 
-	virtual int getType() const override
+	int getType() const override
 	{
 		return SurgSim::Framework::MANAGER_TYPE_NONE;
 	}
@@ -259,12 +259,12 @@ private:
 		didBeforeStop = true;
 	}
 
-	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override
+	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override
 	{
 		return tryAddComponent(component, &m_components) != nullptr;
 	}
 
-	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override
+	bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override
 	{
 		return tryRemoveComponent(component, &m_components);
 	}

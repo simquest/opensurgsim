@@ -37,7 +37,7 @@ public:
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return int std::pair containing the shape types.
-	virtual std::pair<int,int> getShapeTypes() override;
+	std::pair<int,int> getShapeTypes() override;
 
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
@@ -45,7 +45,7 @@ private:
 	/// \note If there is a contact, the normal in the local space is always normal to the box face closest to the
 	/// sphere center.  That means that if a penetration near the corner increases or decreases in depth the normal may
 	/// switch directions instantly, leading to instabilities.
-	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 };
 

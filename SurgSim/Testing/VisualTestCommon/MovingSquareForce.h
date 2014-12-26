@@ -34,12 +34,11 @@ public:
 	/// Constructor.
 	MovingSquareForce(const std::string& toolDeviceName, const std::string& squareDeviceName);
 
-	virtual void initializeInput(const std::string& device,
-								 const SurgSim::DataStructures::DataGroup& inputData) override;
+	void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
-	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
+	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
-	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
+	bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
 protected:
 	/// Updates the state of the tool as described by toolInputData.

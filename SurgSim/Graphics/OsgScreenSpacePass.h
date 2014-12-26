@@ -49,7 +49,7 @@ public:
 	void setViewPort(int width, int height);
 
 	/// Initialize this Component
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 
 private:

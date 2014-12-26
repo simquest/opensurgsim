@@ -55,10 +55,10 @@ public:
 
 	/// Initialize this device and register it with corresponding scaffold.
 	/// \return True on success; false otherwise.
-	virtual bool initialize() override;
+	bool initialize() override;
 	/// "De"-initialize this device and unregister from the scaffold.
 	/// \return True on success; false, otherwise.
-	virtual bool finalize() override;
+	bool finalize() override;
 
 	/// Check if the scaffold of this device is initialized.
 	/// \return True if this the scaffold of this device is initialized; Otherwise, false.

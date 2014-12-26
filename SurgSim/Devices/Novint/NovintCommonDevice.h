@@ -51,9 +51,9 @@ public:
 	/// \return	The initialization name.
 	std::string getInitializationName() const;
 
-	virtual bool initialize() override;
+	bool initialize() override;
 
-	virtual bool finalize() override;
+	bool finalize() override;
 
 	/// Check whether this device is initialized.
 	bool isInitialized() const;

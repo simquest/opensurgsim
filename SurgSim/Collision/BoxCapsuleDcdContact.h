@@ -38,12 +38,12 @@ public:
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return int std::pair containing the shape types.
-	virtual std::pair<int,int> getShapeTypes() override;
+	std::pair<int,int> getShapeTypes() override;
 
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param	pair	The symmetric pair that is under consideration.
-	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 };
 

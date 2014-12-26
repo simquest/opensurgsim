@@ -53,17 +53,17 @@ protected:
 	/// A PoseComponent cannot have a PoseComponent, so this will
 	/// return nullptr.
 	/// \return The PoseComponent
-	virtual std::shared_ptr<PoseComponent> getPoseComponent() override;
+	std::shared_ptr<PoseComponent> getPoseComponent() override;
 
 	/// Get the PoseComponent for this component, constant access
 	/// A PoseComponent cannot have a PoseComponent, so this will
 	/// return nullptr.
 	/// \return The PoseComponent
-	virtual std::shared_ptr<const PoseComponent> getPoseComponent() const override;
+	std::shared_ptr<const PoseComponent> getPoseComponent() const override;
 
 private:
-	virtual bool doInitialize() override;
-	virtual bool doWakeUp() override;
+	bool doInitialize() override;
+	bool doWakeUp() override;
 
 	SurgSim::Math::RigidTransform3d m_pose;
 };

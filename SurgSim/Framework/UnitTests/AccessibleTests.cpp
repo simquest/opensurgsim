@@ -163,7 +163,7 @@ public:
 	}
 
 	// Overrides the accessor, this tests if the virtual function resolution works on the function pointer
-	virtual int getVirtualProperty() override
+	int getVirtualProperty() override
 	{
 		return otherValue;
 	}

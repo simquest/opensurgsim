@@ -42,14 +42,14 @@ public:
 protected:
 	/// Initialize this thread.
 	/// \return True on success, false otherwise.
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 	/// Start up this thread.
 	/// \return True on success, false otherwise.
-	virtual bool doStartUp() override;
+	bool doStartUp() override;
 	/// Update work of this thread.
 	/// \param dt The time step.
 	/// \return True on success, false otherwise.
-	virtual bool doUpdate(double dt) override;
+	bool doUpdate(double dt) override;
 
 private:
 	// Pointer to the scaffold which will be updated by this thread.

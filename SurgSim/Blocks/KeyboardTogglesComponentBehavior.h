@@ -77,18 +77,18 @@ public:
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 protected:
 	/// Initialize this behavior
 	/// \return True on success, otherwise false.
 	/// \note In current implementation, this method always returns "true".
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Wakeup this behavior
 	/// \return True on success, otherwise false.
 	/// \note In current implementation, this method always returns "true".
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
 private:
 	/// Record if any key is pressed in last update() call.
