@@ -36,9 +36,9 @@ public:
 	virtual ~LabJackThread();
 
 protected:
-	virtual bool doInitialize() override;
-	virtual bool doStartUp() override;
-	virtual bool doUpdate(double dt) override;
+	bool doInitialize() override;
+	bool doStartUp() override;
+	bool doUpdate(double dt) override;
 
 private:
 	LabJackScaffold* m_scaffold;

@@ -67,11 +67,11 @@ public:
 	/// \return The Graphics Mesh representation which receives positions.
 	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> getTarget() const;
 
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 private:
-	virtual bool doInitialize() override;
-	virtual bool doWakeUp() override;
+	bool doInitialize() override;
+	bool doWakeUp() override;
 
 	/// The DeformableRepresentation from which the Ode state comes.
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_source;

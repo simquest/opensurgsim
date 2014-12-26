@@ -40,11 +40,11 @@ public:
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return The MLCP constraint type corresponding to this constraint implementation
-	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
 	/// Gets the Type of representation that this implementation is concerned with
 	/// \return RepresentationType for this implementation
-	virtual RepresentationType getRepresentationType() const override;
+	RepresentationType getRepresentationType() const override;
 
 private:
 	/// Gets the number of degree of freedom for a frictionless contact.

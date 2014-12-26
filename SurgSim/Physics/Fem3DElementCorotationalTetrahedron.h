@@ -47,14 +47,13 @@ public:
 	/// simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
 	explicit Fem3DElementCorotationalTetrahedron(std::array<size_t, 4> nodeIds);
 
-	virtual void initialize(const SurgSim::Math::OdeState& state) override;
+	void initialize(const SurgSim::Math::OdeState& state) override;
 
-	virtual void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) override;
+	void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) override;
 
-	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
-		double scale = 1.0) override;
+	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale = 1.0) override;
 
-	virtual void addMatVec(const SurgSim::Math::OdeState& state,
+	void addMatVec(const SurgSim::Math::OdeState& state,
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result) override;
 
@@ -62,7 +61,7 @@ public:
 	/// \param state The state from which the element rigid transformation needs to be computed
 	/// \return True if the update was successful, false otherwise, in which case the representation should be
 	/// deactivated (invalid data).
-	virtual bool update(const SurgSim::Math::OdeState& state) override;
+	bool update(const SurgSim::Math::OdeState& state) override;
 
 protected:
 	/// The element rigid rotation

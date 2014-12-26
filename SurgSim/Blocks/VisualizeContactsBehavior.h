@@ -61,11 +61,11 @@ public:
 
 	/// Update the behavior, show vector field for contacts if there is any.
 	/// \param dt	The length of time (seconds) between update calls.
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 	/// Return the type of manager that should be responsible for this behavior
 	/// \return An integer indicating which manger should be responsible for this behavior.
-	virtual int getTargetManagerType() const override;
+	int getTargetManagerType() const override;
 
 	/// \return The scale of the vector field.
 	double getVectorFieldScale();
@@ -78,12 +78,12 @@ protected:
 	/// Initialize this behavior
 	/// \return True on success, otherwise false.
 	/// \note In current implementation, this method always returns "true".
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Wakeup this behavior
 	/// \return True on success, otherwise false.
 	/// \note In current implementation, this method always returns "true".
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
 private:
 	/// The collision representation to get contacts for visualizing.

@@ -99,40 +99,39 @@ public:
 
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
-	virtual RepresentationType getType() const override;
+	RepresentationType getType() const override;
 
-	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-											 const SurgSim::Math::Vector& generalizedForce,
-											 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
-											 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
+	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
+			const SurgSim::Math::Vector& generalizedForce, const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+			const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
-	virtual void beforeUpdate(double dt) override;
+	void beforeUpdate(double dt) override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
 	/// \return The vector containing f(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
-	virtual SurgSim::Math::Vector& computeF(const SurgSim::Math::OdeState& state) override;
+	SurgSim::Math::Vector& computeF(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of the LHS matrix M(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
 	/// \return The matrix M(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	virtual const SurgSim::Math::Matrix& computeM(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::Matrix& computeM(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of D = -df/dv (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix D = -df/dv(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	virtual const SurgSim::Math::Matrix& computeD(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::Matrix& computeD(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of K = -df/dx (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix K = -df/dx(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	virtual const SurgSim::Math::Matrix& computeK(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::Matrix& computeK(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
 	/// When all the terms are needed, this method can perform optimization in evaluating everything together
@@ -143,7 +142,7 @@ public:
 	/// \param[out] K The matrix K = -df/dx(x,v)
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
+	void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
 		SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
 
 protected:

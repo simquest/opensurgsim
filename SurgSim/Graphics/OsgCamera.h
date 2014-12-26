@@ -63,19 +63,19 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgCamera);
 
-	virtual bool setRenderGroup(std::shared_ptr<Group> group) override;
+	bool setRenderGroup(std::shared_ptr<Group> group) override;
 
-	virtual void setLocalActive(bool val) override;
+	void setLocalActive(bool val) override;
 
 	virtual SurgSim::Math::Matrix44d getViewMatrix() const;
 
 	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const;
 
-	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) override;
+	void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) override;
 
-	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const override;
+	const SurgSim::Math::Matrix44d& getProjectionMatrix() const override;
 
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 	/// \return the OSG camera node
 	osg::ref_ptr<osg::Camera> getOsgCamera() const;
@@ -83,21 +83,21 @@ public:
 	/// \return the OSG parent node for this object
 	osg::ref_ptr<osg::Node> getOsgNode() const;
 
-	virtual bool setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) override;
+	bool setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) override;
 
-	virtual std::shared_ptr<RenderTarget> getRenderTarget() const override;
+	std::shared_ptr<RenderTarget> getRenderTarget() const override;
 
-	virtual bool setMaterial(std::shared_ptr<Material> material) override;
+	bool setMaterial(std::shared_ptr<Material> material) override;
 
-	virtual std::shared_ptr<Material> getMaterial() const override;
+	std::shared_ptr<Material> getMaterial() const override;
 
-	virtual void clearMaterial() override;
+	void clearMaterial() override;
 
-	virtual void setRenderOrder(RenderOrder order, int value) override;
+	void setRenderOrder(RenderOrder order, int value) override;
 
-	virtual void setAmbientColor(const SurgSim::Math::Vector4d& color) override;
+	void setAmbientColor(const SurgSim::Math::Vector4d& color) override;
 
-	virtual SurgSim::Math::Vector4d getAmbientColor() override;
+	SurgSim::Math::Vector4d getAmbientColor() override;
 
 private:
 

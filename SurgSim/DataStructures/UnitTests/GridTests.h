@@ -49,7 +49,7 @@ public:
 	Eigen::AlignedBox<double, dimension> m_aabb1Cell;
 	Eigen::AlignedBox<double, dimension> m_aabbBig;
 
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		m_size = VectorND::LinSpaced(0.6, 1.67);
 

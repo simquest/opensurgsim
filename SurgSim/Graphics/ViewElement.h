@@ -81,7 +81,7 @@ public:
 protected:
 	/// Initializes the scene element
 	/// \return True if it succeeds, false if it fails
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 private:
 	/// View component that provides the visualization of the graphics representations

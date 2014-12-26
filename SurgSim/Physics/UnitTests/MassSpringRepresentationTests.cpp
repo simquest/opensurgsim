@@ -58,7 +58,7 @@ protected:
 	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
 	std::shared_ptr<SurgSim::Physics::MassSpringRepresentationLocalization> m_localization;
 
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		m_massSpring = std::make_shared<MockMassSpring>();
 

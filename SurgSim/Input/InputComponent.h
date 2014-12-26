@@ -74,10 +74,10 @@ public:
 	void getData(SurgSim::DataStructures::DataGroup* dataGroup);
 
 	/// Overridden from Component, do nothing
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Overridden from Component, do nothing
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
 	/// Gets device name.
 	/// \return	The device name.

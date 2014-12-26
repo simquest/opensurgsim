@@ -142,7 +142,7 @@ private:
 
 	/// Overridden from BasicThread, extends the initialization to contain component initialization
 	/// including waiting for the other threads to conclude their component initialization and wakeup
-	virtual bool executeInitialization() override;
+	bool executeInitialization() override;
 
 	/// Delegates to doRemoveComponent to remove all the components in the indicated array.
 	/// \param	beginIt	The begin iterator.

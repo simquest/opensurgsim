@@ -50,7 +50,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentation);
 
-	virtual RepresentationType getType() const override;
+	RepresentationType getType() const override;
 
 	/// Set the current linear velocity of the rigid representation
 	/// \param linearVelocity The linear velocity
@@ -93,11 +93,11 @@ public:
 	/// \return the current external generalized damping 6x6 matrix
 	const SurgSim::Math::Matrix66d& getExternalGeneralizedDamping() const;
 
-	virtual void beforeUpdate(double dt) override;
+	void beforeUpdate(double dt) override;
 
-	virtual	void update(double dt) override;
+	void update(double dt) override;
 
-	virtual	void afterUpdate(double dt) override;
+	void afterUpdate(double dt) override;
 
 	void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
@@ -128,7 +128,7 @@ protected:
 	/// @}
 
 private:
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Compute compliance matrix (internal data structure)
 	/// \param dt The time step in use
@@ -136,7 +136,7 @@ private:
 
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
-	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
+	void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
 };
 
 }; // Physics

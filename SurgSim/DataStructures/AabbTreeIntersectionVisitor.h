@@ -41,9 +41,9 @@ public:
 	/// Destructor
 	virtual ~AabbTreeIntersectionVisitor();
 
-	virtual bool handle(TreeNode* node) override;
+	bool handle(TreeNode* node) override;
 
-	virtual bool handle(AabbTreeNode* node) override;
+	bool handle(AabbTreeNode* node) override;
 
 	/// \return true if the visitor has found intersections
 	bool hasIntersections() const;

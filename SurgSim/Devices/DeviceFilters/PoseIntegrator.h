@@ -57,21 +57,20 @@ public:
 	/// \return	The integrated pose.
 	const PoseType& integrate(const PoseType& pose);
 
-	virtual bool initialize() override;
+	bool initialize() override;
 
-	virtual bool finalize() override;
+	bool finalize() override;
 
-	virtual void initializeInput(const std::string& device,
-		const SurgSim::DataStructures::DataGroup& inputData) override;
+	void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
 	/// Notifies the consumer that the application input coming from the device has been updated.
 	/// Treats the pose coming from the input device as a delta pose and integrates it to get the output pose.
 	/// \param device The name of the device that is producing the input.  This should only be used to identify
 	/// 	the device (e.g. if the consumer is listening to several devices at once).
 	/// \param inputData The application input state coming from the device.
-	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
+	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
-	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
+	bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
 	/// Sets the string name of the boolean entry that will reset the pose to its initial value.  Such a reset can be
 	/// useful if the integrated pose is used to position an object and the integration takes the object out of view.

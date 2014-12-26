@@ -45,12 +45,12 @@ public:
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return A pair of shape type ids
-	virtual std::pair<int, int> getShapeTypes() override;
+	std::pair<int, int> getShapeTypes() override;
 
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param pair The symmetric pair that is under consideration.
-	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 	/// Calculate the collision between a specific octree node and a shape
 	/// This function will check for contact between the node and shape. If

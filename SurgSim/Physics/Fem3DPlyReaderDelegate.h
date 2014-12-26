@@ -35,9 +35,9 @@ public:
 	explicit Fem3DPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem);
 
 protected:
-	virtual std::string getElementName() const override;
+	std::string getElementName() const override;
 
-	virtual void processFemElement(const std::string& elementName) override;
+	void processFemElement(const std::string& elementName) override;
 };
 
 } // namespace Physics

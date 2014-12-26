@@ -36,13 +36,13 @@ public:
 	explicit Fem1DPlyReaderDelegate(std::shared_ptr<Fem1DRepresentation> fem);
 
 protected:
-	virtual std::string getElementName() const override;
+	std::string getElementName() const override;
 
-	virtual bool registerDelegate(SurgSim::DataStructures::PlyReader* reader) override;
-	virtual bool fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader) override;
+	bool registerDelegate(SurgSim::DataStructures::PlyReader* reader) override;
+	bool fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader) override;
 
-	virtual void endParseFile() override;
-	virtual void processFemElement(const std::string& elementName) override;
+	void endParseFile() override;
+	void processFemElement(const std::string& elementName) override;
 
 	/// Callback function, begin the processing of radius.
 	/// \param elementName Name of the element.

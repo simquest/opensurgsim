@@ -83,7 +83,7 @@ public:
 	bool isPingPong() const;
 
 	/// Overridden from Behavior
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 private:
 
@@ -112,10 +112,10 @@ private:
 	bool m_loop;
 
 	/// Overridden from Component
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
 	/// Overridden from Component
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 };
 
 

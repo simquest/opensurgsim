@@ -42,7 +42,7 @@ public:
 	/// \param device The name of the device to receive the output.
 	/// \param [out] outputData The output data going to the device.
 	/// \return true if outputData was provided.
-	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override
+	bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override
 	{
 		bool result = false;
 		if (m_haveData && (outputData != nullptr))
