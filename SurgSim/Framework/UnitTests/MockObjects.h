@@ -154,7 +154,7 @@ public:
 class MockBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	MockBehavior(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
+	explicit MockBehavior(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
 		Behavior(name),
 		succeedWithInit(succeedInit),
 		succeedWithWakeUp(succeedWakeUp),
@@ -189,7 +189,7 @@ public:
 class MockManager : public SurgSim::Framework::ComponentManager
 {
 public:
-	MockManager(bool succeedInit = true, bool succeedStartup = true) :
+	explicit MockManager(bool succeedInit = true, bool succeedStartup = true) :
 		succeedInit(succeedInit),
 		succeedStartup(succeedStartup),
 		didInitialize(false),
@@ -203,7 +203,7 @@ public:
 	{
 	}
 
-	virtual int getType() const override
+	int getType() const override
 	{
 		return SurgSim::Framework::MANAGER_TYPE_NONE;
 	}
@@ -258,12 +258,12 @@ private:
 		didBeforeStop = true;
 	}
 
-	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override
+	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override
 	{
 		return tryAddComponent(component, &m_components) != nullptr;
 	}
 
-	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override
+	bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override
 	{
 		return tryRemoveComponent(component, &m_components);
 	}

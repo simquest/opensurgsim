@@ -117,11 +117,11 @@ public:
 
 	/// Enables the shader to override other material shaders
 	/// \param	val	if true the shader will replace other shaders in a lower hierarchy.
-	virtual void setGlobalScope(bool val) override;
+	void setGlobalScope(bool val) override;
 
 	/// Query if this object is global scope and overrides other lower level shaders.
 	/// \return	true if global scope, false if not.
-	virtual bool isGlobalScope() const override;
+	bool isGlobalScope() const override;
 
 
 private:

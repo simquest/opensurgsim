@@ -34,7 +34,7 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit OdeSolverLinearEulerImplicit(OdeEquation* equation);
 
-	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
 private:
 	/// The constant stiffness matrix

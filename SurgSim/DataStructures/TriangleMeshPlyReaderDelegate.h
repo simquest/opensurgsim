@@ -51,12 +51,12 @@ public:
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
 	/// \return true if it succeeds, false otherwise.
-	virtual bool registerDelegate(PlyReader* reader) override;
+	bool registerDelegate(PlyReader* reader) override;
 
 	/// Check whether this file is acceptable to the delegate, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
 	/// \return true if it succeeds, false otherwise.
-	virtual bool fileIsAcceptable(const PlyReader& reader) override;
+	bool fileIsAcceptable(const PlyReader& reader) override;
 
 	/// Callback function, begin the processing of vertices.
 	/// \param elementName Name of the element.

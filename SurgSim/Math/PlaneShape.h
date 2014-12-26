@@ -43,20 +43,20 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Math::PlaneShape);
 
 	/// \return the type of the shape
-	virtual int getType() const override;
+	int getType() const override;
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)
-	virtual double getVolume() const override;
+	double getVolume() const override;
 
 	/// Get the volumetric center of the shape
 	/// \return The center of the shape
-	virtual Vector3d getCenter() const override;
+	Vector3d getCenter() const override;
 
 	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
-	virtual Matrix33d getSecondMomentOfVolume() const override;
+	Matrix33d getSecondMomentOfVolume() const override;
 
 	/// Gets the d of the plane equation.
 	/// \return	The value of d (always 0).
@@ -68,7 +68,7 @@ public:
 
 	/// A PlaneShape is always valid.
 	/// \return True.
-	virtual bool isValid() const override;
+	bool isValid() const override;
 };
 
 }; // Math

@@ -52,12 +52,12 @@ public:
 	/// \return	true if it succeeds, false if the device is not in.
 	bool removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
 
-	virtual int getType() const override;
+	int getType() const override;
 
 private:
-	virtual bool doInitialize() override;
-	virtual bool doStartUp() override;
-	virtual bool doUpdate(double dt) override;
+	bool doInitialize() override;
+	bool doStartUp() override;
+	bool doUpdate(double dt) override;
 
 	/// Adds a component, this can be either input or output, it will call the appropriate
 	/// function in the device. For an InputComonent this will succeed if the device name
@@ -67,12 +67,12 @@ private:
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the device cannot be found to the component
 	/// 		has already been added to the manager, and return false.
-	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
+	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
 	/// Removes the component described by component.
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the component cannot be found and return false.
-	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
+	bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
 
 	/// Specific call for input components.

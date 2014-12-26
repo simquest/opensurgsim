@@ -30,14 +30,14 @@ public:
 	int updateCount;
 
 private:
-	virtual bool doUpdate(double dt) override;
+	bool doUpdate(double dt) override;
 };
 
 class MockEmitter : public SurgSim::Particles::EmitterRepresentation
 {
 public:
 	explicit MockEmitter(const std::string& name);
-	virtual void update(double dt) override;
+	void update(double dt) override;
 	int updateCount;
 };
 
@@ -46,14 +46,14 @@ class MockParticleBehavior : public SurgSim::Framework::Behavior
 public:
 	explicit MockParticleBehavior(const std::string& name);
 
-	virtual int getTargetManagerType() const override;
-	virtual void update(double dt) override;
+	int getTargetManagerType() const override;
+	void update(double dt) override;
 
 	int updateCount;
 
 private:
-	virtual bool doInitialize() override;
-	virtual bool doWakeUp() override;
+	bool doInitialize() override;
+	bool doWakeUp() override;
 };
 
 

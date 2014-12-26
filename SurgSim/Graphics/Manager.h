@@ -102,7 +102,7 @@ protected:
 	virtual bool doUpdate(double dt);
 
 	/// Overrides ComponentManager::getType()
-	virtual int getType() const override;
+	int getType() const override;
 
 	/// Fetch a group with a given name, if the group does not exist, create it.
 	/// \param name Name of the group to be fetched.

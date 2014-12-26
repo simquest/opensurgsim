@@ -44,17 +44,17 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Collision::ShapeCollisionRepresentation);
 
-	virtual int getShapeType() const override;
+	int getShapeType() const override;
 
-	virtual void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
+	void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
 	// Set the shape to be used in this representation
 	// \param shape Shape to be used in this representation.
 	void setShape(const std::shared_ptr<SurgSim::Math::Shape>& shape);
-	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
-	virtual void update(const double& dt) override;
-	virtual bool doInitialize() override;
+	void update(const double& dt) override;
+	bool doInitialize() override;
 
 private:
 	// Shape used by this representation

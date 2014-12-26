@@ -63,9 +63,9 @@ public:
 	/// Destructor.
 	virtual ~RawMultiAxisDevice();
 
-	virtual bool initialize() override;
+	bool initialize() override;
 
-	virtual bool finalize() override;
+	bool finalize() override;
 
 	/// Check whether this device is initialized.
 	bool isInitialized() const;

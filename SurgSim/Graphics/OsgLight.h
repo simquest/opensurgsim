@@ -60,37 +60,37 @@ public:
 	explicit OsgLight(const std::string& name);
 	virtual ~OsgLight();
 
-	virtual bool setGroup(std::shared_ptr<SurgSim::Graphics::Group> group) override;
+	bool setGroup(std::shared_ptr<SurgSim::Graphics::Group> group) override;
 
-	virtual void setLightGroupReference(const std::string& name) override;
+	void setLightGroupReference(const std::string& name) override;
 
-	virtual std::string getLightGroupReference() override;
+	std::string getLightGroupReference() override;
 
-	virtual std::shared_ptr<SurgSim::Graphics::Group> getGroup() override;
+	std::shared_ptr<SurgSim::Graphics::Group> getGroup() override;
 
-	virtual void setDiffuseColor(const SurgSim::Math::Vector4d& color) override;
+	void setDiffuseColor(const SurgSim::Math::Vector4d& color) override;
 
-	virtual SurgSim::Math::Vector4d getDiffuseColor() override;
+	SurgSim::Math::Vector4d getDiffuseColor() override;
 
-	virtual void setSpecularColor(const SurgSim::Math::Vector4d& color) override;
+	void setSpecularColor(const SurgSim::Math::Vector4d& color) override;
 
-	virtual SurgSim::Math::Vector4d getSpecularColor() override;
+	SurgSim::Math::Vector4d getSpecularColor() override;
 
-	virtual void setConstantAttenuation(double val) override;
+	void setConstantAttenuation(double val) override;
 
-	virtual double getConstantAttenuation() override;
+	double getConstantAttenuation() override;
 
-	virtual void setLinearAttenuation(double val) override;
+	void setLinearAttenuation(double val) override;
 
-	virtual double getLinearAttenuation() override;
+	double getLinearAttenuation() override;
 
-	virtual void setQuadraticAttenuation(double val) override;
+	void setQuadraticAttenuation(double val) override;
 
-	virtual double getQuadraticAttenuation() override;
+	double getQuadraticAttenuation() override;
 
 
 private:
-	virtual void doUpdate(double dt) override;
+	void doUpdate(double dt) override;
 
 	/// Applies all the lights variables to the given StateSet
 	void apply(osg::ref_ptr<osg::StateSet> stateSet);

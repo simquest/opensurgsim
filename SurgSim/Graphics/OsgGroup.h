@@ -39,32 +39,32 @@ public:
 
 	/// Sets whether this group is currently visible
 	/// \param    visible    True for visible, false for invisible
-	virtual void setVisible(bool visible) override;
+	void setVisible(bool visible) override;
 
 	/// Gets whether this group is currently visible
 	/// \return    True for visible, false for invisible
-	virtual bool isVisible() const override;
+	bool isVisible() const override;
 
 	/// Adds an representation
 	/// \param	representation	Representation to add to this group
 	/// \return	True if the representation is added successfully, false if failure
 	/// Only subclasses of OsgRepresentation will be added successfully.
-	virtual bool add(std::shared_ptr<Representation> representation) override;
+	bool add(std::shared_ptr<Representation> representation) override;
 
 	/// Adds all representations in another group to this group
 	/// \param	group	Group of representations to add
 	/// \return	True if all representations are added successfully, false if failure
 	/// Only subclasses of OsgGroup will be appended successfully.
-	virtual bool append(std::shared_ptr<Group> group) override;
+	bool append(std::shared_ptr<Group> group) override;
 
 	/// Removes an representation
 	/// \param	representation	Representation to remove from this group
 	/// \return	True if the representation is removed successfully, false if representation is not in this group or
 	///         other failure
-	virtual bool remove(std::shared_ptr<Representation> representation) override;
+	bool remove(std::shared_ptr<Representation> representation) override;
 
 	/// Removes all representations
-	virtual void clear() override;
+	void clear() override;
 
 	/// Returns the root OSG group node
 	osg::ref_ptr<osg::Group> getOsgGroup() const;

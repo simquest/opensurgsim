@@ -177,9 +177,9 @@ protected:
 	/// Collision planes
 	std::vector<PlaneConstraint> m_planeConstraints;
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
-	virtual bool doUpdate(double dt) override;
+	bool doUpdate(double dt) override;
 
 	/// Compute the particles' acceleration given a time step dt
 	/// \param dt The time step to advance the simulation too
@@ -267,7 +267,7 @@ struct convert<SurgSim::Particles::SphRepresentation::PlaneConstraint>
 		result["PlaneConstraint"] = data;
 		return result;
 	}
-	static bool decode(const Node& node, SurgSim::Particles::SphRepresentation::PlaneConstraint& rhs)
+	static bool decode(const Node& node, SurgSim::Particles::SphRepresentation::PlaneConstraint& rhs) //NOLINT
 	{
 		try
 		{

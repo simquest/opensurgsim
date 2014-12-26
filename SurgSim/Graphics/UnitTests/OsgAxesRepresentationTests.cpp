@@ -13,48 +13,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_OSGMODEL_H
-#define SURGSIM_GRAPHICS_OSGMODEL_H
+#include <gtest/gtest.h>
 
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
-#include "SurgSim/Framework/Macros.h"
-#include "SurgSim/Graphics/Model.h"
-#include <osg/ref_ptr>
-
-namespace osg
-{
-class Node;
-}
 
 namespace SurgSim
 {
 namespace Graphics
 {
 
-/// Osg implementation of the Model class, inheriting from Asset, this class knows how to load models that can be
-/// handled by osg.
-class OsgModel : public Model
+TEST(OsgAxesRepresentationTests, Serialization)
 {
-public:
+	using SurgSim::Framework::Component;
 
-	/// Constructor
-	OsgModel();
+	std::shared_ptr<Component> axes = std::make_shared<OsgAxesRepresentation>("axes");
+	axes->setValue("Size", 12.0);
 
-	virtual ~OsgModel();
+	YAML::Node node = YAML::convert<Component>::encode(*axes);
 
-	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgModel);
+	std::shared_ptr<Component> component = node.as<std::shared_ptr<Component>>();
 
-	/// \return the Node that is the root of the loaded model, nullptr if no model is loaded
-	osg::ref_ptr<osg::Node> getOsgNode();
+	ASSERT_NE(nullptr, component);
 
-private:
+	std::shared_ptr<OsgAxesRepresentation> newAxes = std::dynamic_pointer_cast<OsgAxesRepresentation>(component);
 
-	bool doLoad(const std::string& filePath) override;
+	ASSERT_NE(nullptr, newAxes);
 
-	osg::ref_ptr<osg::Node> m_root;
-};
+	EXPECT_DOUBLE_EQ(12.0, newAxes->getValue<double>("Size"));
+}
 
 }
 }
 
-#endif

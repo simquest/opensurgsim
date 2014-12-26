@@ -34,7 +34,7 @@ Node convert<std::shared_ptr<SurgSim::Math::Shape>>::encode(
 
 bool convert<std::shared_ptr<SurgSim::Math::Shape>>::decode(
 	const Node& node,
-	std::shared_ptr<SurgSim::Math::Shape>& rhs)
+	std::shared_ptr<SurgSim::Math::Shape>& rhs) //NOLINT
 {
 	bool result = false;
 
@@ -84,7 +84,7 @@ Node convert<SurgSim::Math::IntegrationScheme>::encode(
 
 bool convert<SurgSim::Math::IntegrationScheme>::decode(
 	const Node& node,
-	SurgSim::Math::IntegrationScheme& rhs)
+	SurgSim::Math::IntegrationScheme& rhs) //NOLINT
 {
 	bool result = false;
 

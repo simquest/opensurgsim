@@ -60,9 +60,9 @@ public:
 	/// Destructor.
 	virtual ~SixenseDevice();
 
-	virtual bool initialize() override;
+	bool initialize() override;
 
-	virtual bool finalize() override;
+	bool finalize() override;
 
 	/// Check wheter this device is initialized.
 	bool isInitialized() const;

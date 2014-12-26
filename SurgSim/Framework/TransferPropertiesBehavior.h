@@ -74,14 +74,14 @@ public:
 
 	/// Overridden from Behavior
 	/// \param dt The time step.
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 private:
 
 	///@{
 	/// Overridden from Behavior
-	virtual bool doInitialize() override;
-	virtual bool doWakeUp() override;
+	bool doInitialize() override;
+	bool doWakeUp() override;
 	virtual int getTargetManagerType() const;
 	///@}
 

@@ -13,17 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file unlit_texture_rectangle.frag
-/// Fragment Shader to do simple unlit texture mapping on rectangle textures, 
-/// use with unlit_texture.vert
+/// \file unlit_text.frag
+/// Fragment Shader to do text rendering
 
-#extension GL_ARB_texture_rectangle : enable
-
-uniform sampler2DRect texture;
+uniform sampler2D texture;
 
 varying vec2 texCoord0;
+varying vec3 color;
 
 void main(void) 
 {	
-	gl_FragColor = texture2DRect(texture, texCoord0);
+	gl_FragColor.rgb = color;
+	gl_FragColor.a = texture2D(texture, texCoord0.st).a; 
 }

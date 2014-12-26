@@ -53,7 +53,7 @@ public:
 	/// Query if 'representation' is valid representation.
 	/// \param	representation	The representation.
 	/// \return	true if valid representation, false if not.
-	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
+	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
 
 private:
 	/// Calculates the global position of this localization.

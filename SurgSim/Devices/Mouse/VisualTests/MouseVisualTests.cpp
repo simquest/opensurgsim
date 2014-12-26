@@ -34,11 +34,11 @@ using SurgSim::DataStructures::DataGroup;
 
 struct TestListener : public SurgSim::Input::InputConsumerInterface
 {
-	virtual void initializeInput(const std::string& device, const DataGroup& inputData) override
+	void initializeInput(const std::string& device, const DataGroup& inputData) override
 	{
 	}
 
-	virtual void handleInput(const std::string& device, const DataGroup& inputData) override
+	void handleInput(const std::string& device, const DataGroup& inputData) override
 	{
 		bool button1, button2, button3;
 		double x, y;

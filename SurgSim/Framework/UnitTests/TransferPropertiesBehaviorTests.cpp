@@ -22,7 +22,7 @@
 class A : public SurgSim::Framework::Accessible
 {
 public:
-	A(int initialA = 0, int initialB = 0) : a(initialA), b(initialB)
+	explicit A(int initialA = 0, int initialB = 0) : a(initialA), b(initialB)
 	{
 		SURGSIM_ADD_RW_PROPERTY(A,int,a,getA,setA);
 		SURGSIM_ADD_RW_PROPERTY(A,int,b,getB,setB);

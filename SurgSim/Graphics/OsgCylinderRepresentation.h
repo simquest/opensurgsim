@@ -48,33 +48,33 @@ public:
 
 	/// Sets the radius of the cylinder
 	/// \param	radius	Radius along X-axis and Z-axis of the cylinder
-	virtual void setRadius(double radius) override;
+	void setRadius(double radius) override;
 	/// Returns the radius of the cylinder
 	/// \return	Radius along X-axis and Z-axis of cylinder
-	virtual double getRadius() const override;
+	double getRadius() const override;
 
 	/// Sets the height of the cylinder
 	/// \param	height	Height along Y-axis of the cylinder
-	virtual void setHeight(double height) override;
+	void setHeight(double height) override;
 	/// Returns the height of the cylinder
 	/// \return	Height along Y-axis of the cylinder
-	virtual double getHeight() const override;
+	double getHeight() const override;
 
 	/// Sets the size of the cylinder
 	/// \param radius Size along X-axis and Z-axis of the cylinder
 	/// \param height Size along Y-axis of the cylinder
-	virtual void setSize(double radius, double height) override;
+	void setSize(double radius, double height) override;
 	/// Gets the size of the cylinder
 	/// \param [out] radius Variable to receive the size along X-axis and Z-axis of the cylinder
 	/// \param [out] height Variable to receive the size along Y-axis of the cylinder
-	virtual void getSize(double* radius, double* height) override;
+	void getSize(double* radius, double* height) override;
 
 	/// Sets the size of the cylinder
 	/// \param size Size of the cylinder
-	virtual void setSize(const SurgSim::Math::Vector2d& size) override;
+	void setSize(const SurgSim::Math::Vector2d& size) override;
 	/// Returns the size of the cylinder
 	/// \return Size of the cylinder
-	virtual SurgSim::Math::Vector2d getSize() const override;
+	SurgSim::Math::Vector2d getSize() const override;
 
 private:
 	/// The OSG Cylinder shape is a unit Cylinder and this transform scales it to the size set.

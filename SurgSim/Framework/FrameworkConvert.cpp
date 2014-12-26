@@ -46,7 +46,7 @@ Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(
 
 bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(
 			const Node& node,
-			std::shared_ptr<SurgSim::Framework::Component>& rhs)
+			std::shared_ptr<SurgSim::Framework::Component>& rhs) //NOLINT
 {
 	bool result = false;
 
@@ -132,7 +132,7 @@ Node convert<std::shared_ptr<SurgSim::Framework::SceneElement>>::encode(
 
 bool convert<std::shared_ptr<SurgSim::Framework::SceneElement>>::decode(
 			const Node& node,
-			std::shared_ptr<SurgSim::Framework::SceneElement>& rhs)
+			std::shared_ptr<SurgSim::Framework::SceneElement>& rhs) //NOLINT
 {
 	if (rhs == nullptr)
 	{
@@ -157,7 +157,7 @@ Node convert<std::shared_ptr<SurgSim::Framework::Scene>>::encode(
 
 bool convert<std::shared_ptr<SurgSim::Framework::Scene>>::decode(
 			const Node& node,
-			std::shared_ptr<SurgSim::Framework::Scene>& rhs)
+			std::shared_ptr<SurgSim::Framework::Scene>& rhs) //NOLINT
 {
 	bool result = false;
 	if (rhs != nullptr)
@@ -176,7 +176,7 @@ YAML::Node YAML::convert<std::shared_ptr<SurgSim::Framework::Asset>>::encode(
 }
 
 bool YAML::convert<std::shared_ptr<SurgSim::Framework::Asset>>::decode(
-			const Node& node, std::shared_ptr<SurgSim::Framework::Asset>& rhs)
+			const Node& node, std::shared_ptr<SurgSim::Framework::Asset>& rhs) //NOLINT
 {
 	bool result = false;
 

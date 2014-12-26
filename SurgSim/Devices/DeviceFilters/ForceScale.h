@@ -49,21 +49,20 @@ public:
 	/// When the manager object creates the device, the internal state of the device usually isn't fully
 	/// initialized yet.  This method performs any needed initialization.
 	/// \return True on success.
-	virtual bool initialize() override;
+	bool initialize() override;
 
 	/// Set the initial input data.  Passes through all data unchanged.
 	/// \param device The name of the device that is producing the input.  This should only be used to identify
 	/// 	the device (e.g. if the consumer is listening to several devices at once).
 	/// \param inputData The application input state coming from the device.
-	virtual void initializeInput(const std::string& device,
-		const SurgSim::DataStructures::DataGroup& inputData) override;
+	void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
 	/// Notifies the consumer that the application input coming from the device has been updated.
 	/// Passes through all data unchanged.
 	/// \param device The name of the device that is producing the input.  This should only be used to identify
 	/// 	the device (e.g. if the consumer is listening to several devices at once).
 	/// \param inputData The application input state coming from the device.
-	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
+	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
 	/// Asks the producer to provide output state to the device.  Passes through all data, modifying certain data
 	/// entries used by haptic devices to calculate force and torque.  Note that devices may never call this method,
@@ -73,7 +72,7 @@ public:
 	/// \param [out] outputData The data being sent to the device.
 	/// \return True if the producer has provided output data.  A producer that returns false should leave outputData
 	///		unmodified.
-	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
+	bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
 	/// Set the force scale factor so that each direction has the same scale.
 	/// \param forceScale The scalar scaling factor.
@@ -86,7 +85,7 @@ public:
 private:
 	/// Finalize (de-initialize) the device.
 	/// \return True on success.
-	virtual bool finalize() override;
+	bool finalize() override;
 
 	/// Filter the output data, scaling the forces and torques.
 	/// \param dataToFilter The data that will be filtered.
