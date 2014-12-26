@@ -31,7 +31,7 @@ class FixedRepresentationContact : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	explicit FixedRepresentationContact();
+	FixedRepresentationContact();
 
 	/// Destructor
 	virtual ~FixedRepresentationContact();

@@ -26,7 +26,7 @@ namespace Framework
 {
 
 ComponentManager::ComponentManager(const std::string& name /*= "Unknown Component Manager"*/) :
-	BasicThread(name), m_logger(Logger::getLogger(name))
+	BasicThread(name)
 {
 }
 

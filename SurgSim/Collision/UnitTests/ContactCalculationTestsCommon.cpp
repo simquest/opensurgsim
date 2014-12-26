@@ -15,6 +15,9 @@
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 
+using SurgSim::DataStructures::IndexedLocalCoordinate;
+
+
 namespace SurgSim
 {
 namespace Collision
@@ -34,8 +37,8 @@ namespace Collision
 }
 
 void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
-					  Vector3d &expectedNormal, Vector3d &expectedPenetrationPointFirst,
-					  Vector3d &expectedPenetrationPointSecond)
+					  const Vector3d& expectedNormal, const Vector3d& expectedPenetrationPointFirst,
+					  const Vector3d& expectedPenetrationPointSecond)
 {
 	EXPECT_NEAR(expectedDepth, contact->depth, SurgSim::Math::Geometry::DistanceEpsilon);
 	EXPECT_TRUE(eigenEqual(expectedNormal, contact->normal));
@@ -48,9 +51,9 @@ void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
 }
 
 bool checkMeshLocalCoordinate(
-	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& actualLocalCoordinate,
+	const SurgSim::DataStructures::OptionalValue<IndexedLocalCoordinate>& actualLocalCoordinate,
 	const std::array<SurgSim::Math::Vector3d, 3>& vertices,
-	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& expectedLocalCoordinate,
+	const SurgSim::DataStructures::OptionalValue<IndexedLocalCoordinate>& expectedLocalCoordinate,
 	const SurgSim::Math::Vector3d& expectedLocalPosition)
 {
 	bool isEqual = true;

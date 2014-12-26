@@ -247,8 +247,10 @@ mark_as_advanced(SURGSIM_RUNLINT_EXTRA_FLAGS)
 set(CPPLINT_DEFAULT_FILTER_LIST
 	# our coding standards differ from Google's when it comes to whitespace:
 	-whitespace/tab -whitespace/braces -whitespace/line_length
-	-whitespace/ending_newline
+	-whitespace/ending_newline -whitespace/indent
+	-whitespace/empty_loop_body
 	# these flag some useful stuff, but also currently produce a lot of noise:
+	-readability/inheritance -readability/namespace
 	-whitespace/operators -whitespace/newline -whitespace/blank_line
 	-whitespace/comma -whitespace/parens -whitespace/comments
 	# this is just broken if a comment is preceded by a tab and ends in ":":
@@ -261,7 +263,7 @@ set(CPPLINT_DEFAULT_FILTER_LIST
 	# (it claims <unordered_map> is a C header!?):
 	-build/include_order
 	# things disallowed by Google's coding standards, but not ours:
-	-runtime/rtti -readability/streams
+	-runtime/rtti -readability/streams -build/c++11
 )
 string(REPLACE ";" "," CPPLINT_DEFAULT_FILTERS
 	"--filter=${CPPLINT_DEFAULT_FILTER_LIST}")

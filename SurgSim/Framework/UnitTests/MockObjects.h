@@ -155,7 +155,7 @@ public:
 class MockBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	MockBehavior(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
+	explicit MockBehavior(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
 		Behavior(name),
 		succeedWithInit(succeedInit),
 		succeedWithWakeUp(succeedWakeUp),
@@ -190,7 +190,7 @@ public:
 class MockManager : public SurgSim::Framework::ComponentManager
 {
 public:
-	MockManager(bool succeedInit = true, bool succeedStartup = true) :
+	explicit MockManager(bool succeedInit = true, bool succeedStartup = true) :
 		succeedInit(succeedInit),
 		succeedStartup(succeedStartup),
 		didInitialize(false),

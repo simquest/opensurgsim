@@ -45,7 +45,7 @@ YAML::Node YAML::convert<typename Eigen::Matrix<Type, Rows, 1, MOpt>>::encode(
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int Rows, int MOpt>
 bool YAML::convert<typename Eigen::Matrix<Type, Rows, 1, MOpt>>::decode(
-	const Node& node, typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs)
+	const Node& node, typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs) //NOLINT
 {
 	if (! node.IsSequence() || node.size() != Rows)
 	{
@@ -92,7 +92,7 @@ SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int Rows, int Cols, int MOpt>
 bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 			const Node& node,
-			typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs)
+			typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs) //NOLINT
 {
 	if (! node.IsSequence() || node.size() != Rows)
 	{
@@ -135,7 +135,7 @@ SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int QOpt>
 bool YAML::convert<typename Eigen::Quaternion<Type, QOpt>>::decode(
 	const Node& node,
-	typename Eigen::Quaternion<Type, QOpt>& rhs)
+	typename Eigen::Quaternion<Type, QOpt>& rhs) //NOLINT
 {
 	bool result = false;
 	if (node.IsSequence() && node.size() == 4)
@@ -165,7 +165,7 @@ SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int Dim, int TMode, int TOptions>
 bool YAML::convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(
 			const Node& node,
-			typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
+			typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs) //NOLINT
 {
 	bool result = false;
 

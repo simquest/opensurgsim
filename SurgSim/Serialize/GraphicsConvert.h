@@ -25,22 +25,24 @@
 
 namespace YAML
 {
-	/// Specialize of YAML::convert<> template Represensation class.
-	template <>
-	struct convert <SurgSim::Graphics::Representation>
-	{
-		static Node encode(const SurgSim::Graphics::Representation& rhs);
-		static bool decode(const Node& node, std::shared_ptr<SurgSim::Graphics::Representation> rhs);
 
-	};
+/// Specialize of YAML::convert<> template Represensation class.
+template <>
+struct convert <SurgSim::Graphics::Representation>
+{
+	static Node encode(const SurgSim::Graphics::Representation& rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Graphics::Representation> rhs);
 
-	/// Specialize of YAML::convert<> template SphereRepresensation class.
-	template <>
-	struct convert <SurgSim::Graphics::SphereRepresentation>
-	{
-		static Node encode(const SurgSim::Graphics::SphereRepresentation& rhs);
-		static bool decode(const Node& node, std::shared_ptr<SurgSim::Graphics::SphereRepresentation> rhs);
-	};
+};
+
+/// Specialize of YAML::convert<> template SphereRepresensation class.
+template <>
+struct convert <SurgSim::Graphics::SphereRepresentation>
+{
+	static Node encode(const SurgSim::Graphics::SphereRepresentation& rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Graphics::SphereRepresentation> rhs);
+};
+
 };
 
 #endif // SURGSIM_SERIALIZE_GRAPHICSCONVERT_H

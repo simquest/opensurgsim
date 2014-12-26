@@ -84,7 +84,7 @@ public:
 	/// \param K The stiffness matrix associated with the generalized force (Jacobian of the force w.r.t dof's position)
 	/// \param D The damping matrix associated with the generalized force (Jacobian of the force w.r.t dof's velocity)
 	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-											 SurgSim::Math::Vector& generalizedForce,
+											 const SurgSim::Math::Vector& generalizedForce,
 											 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 											 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) = 0;
 
@@ -110,7 +110,7 @@ public:
 	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
 	/// Deactivate and call resetState
-	void deactivateAndReset(void);
+	void deactivateAndReset();
 
 	/// Set the collision representation for this physics representation, when the collision object
 	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.

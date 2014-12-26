@@ -38,7 +38,7 @@ class OsgModel : public Model
 public:
 
 	/// Constructor
-	explicit OsgModel();
+	OsgModel();
 
 	virtual ~OsgModel();
 

@@ -73,7 +73,7 @@ void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::D
 			builder.addVector(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
 			builder.addVector(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
 			getInputData() = builder.createData();
-			m_copier = std::make_shared<SurgSim::DataStructures::DataGroupCopier>(inputData, getInputData());
+			m_copier = std::make_shared<SurgSim::DataStructures::DataGroupCopier>(inputData, &getInputData());
 		}
 	}
 
@@ -83,7 +83,7 @@ void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::D
 	}
 	else
 	{
-		m_copier->copy();
+		m_copier->copy(inputData, &getInputData());
 	}
 
 	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::Names::POSE);
@@ -106,7 +106,7 @@ void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataS
 	}
 	else
 	{
-		m_copier->copy();
+		m_copier->copy(inputData, &getInputData());
 	}
 
 	if (m_poseIndex >= 0)

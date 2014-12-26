@@ -72,7 +72,7 @@ TEST(TriangleMeshTest, NormalTest)
 	EXPECT_EQ(expectedZNormal, meshWithNormal->getNormal(0));
 
 	// Update new vertex location of v2 to v3
-	Vector3d v3(-1.0, -1.0, 1.0);
+	TriangleMeshPlain::VertexType v3(Vector3d(-1.0, -1.0, 1.0));
 	SurgSim::DataStructures::Vertex<SurgSim::DataStructures::EmptyData>& v2p = meshWithNormal->getVertex(2);
 	v2p = v3;
 

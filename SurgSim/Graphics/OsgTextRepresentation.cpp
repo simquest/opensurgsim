@@ -23,6 +23,8 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/OsgFont.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -127,7 +129,23 @@ void OsgTextRepresentation::doUpdate(double dt)
 
 bool OsgTextRepresentation::doInitialize()
 {
-	return true;
+	bool result = true;
+
+	// if the material was preassigned, don't create a default one
+	if (getMaterial() == nullptr)
+	{
+		result = false;
+		auto material = buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_text.frag");
+		if (material != nullptr)
+		{
+			m_textNode->getOrCreateStateSet()->addUniform(new osg::Uniform("texture", 0));
+			setMaterial(material);
+			result = true;
+		}
+	}
+
+	return result;
+
 }
 
 void OsgTextRepresentation::loadFont(std::string fileName)

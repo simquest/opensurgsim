@@ -43,7 +43,7 @@ const double epsilon = 1e-8;
 class MockFem2DElement : public Fem2DElementTriangle
 {
 public:
-	MockFem2DElement(std::array<size_t, 3> nodeIds)
+	explicit MockFem2DElement(std::array<size_t, 3> nodeIds)
 		: Fem2DElementTriangle(nodeIds)
 	{
 	}
