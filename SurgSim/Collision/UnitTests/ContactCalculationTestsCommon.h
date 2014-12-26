@@ -83,8 +83,8 @@ struct TriangleContact : public Contact
 /// \param expectedPenetrationPointFirst The expected first penetration point.
 /// \param expectedPenetrationPointSecond The expected second penetration point.
 void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
-					  Vector3d &expectedNormal, Vector3d &expectedPenetrationPointFirst,
-					  Vector3d &expectedPenetrationPointSecond);
+					  const Vector3d &expectedNormal, const Vector3d &expectedPenetrationPointFirst,
+					  const Vector3d &expectedPenetrationPointSecond);
 
 /// Function that checks if a given contact is present in the list of given contacts.
 /// \param expected The expected contact.

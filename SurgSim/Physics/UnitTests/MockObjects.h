@@ -167,7 +167,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Physics::MockDeformableRepresentation);
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-		SurgSim::Math::Vector& generalizedForce,
+		const SurgSim::Math::Vector& generalizedForce,
 		const SurgSim::Math::Matrix& K,
 		const SurgSim::Math::Matrix& D) override;
 
@@ -288,7 +288,7 @@ public:
 	virtual ~MockFemRepresentation();
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-			SurgSim::Math::Vector& generalizedForce, const SurgSim::Math::Matrix& K,
+			const SurgSim::Math::Vector& generalizedForce, const SurgSim::Math::Matrix& K,
 			const SurgSim::Math::Matrix& D) override;
 
 	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;

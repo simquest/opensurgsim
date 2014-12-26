@@ -151,6 +151,9 @@ protected:
 
 	virtual bool executeInitialization();
 
+	/// Logger for this thread
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
 private:
 	std::string m_name;
 

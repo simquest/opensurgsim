@@ -140,13 +140,6 @@ private:
 	/// Indicate which type of texture is currently being used
 	SurgSim::DataStructures::OptionalValue<int> m_texureType;
 
-	/// Utility function to build the material.
-	/// \param vertexShaderName name of the vertex shader to be used, needs to be available on the path.
-	/// \param fragmentShaderName name of the fragmen shader to be used, needs to be available on the path.
-	/// \return a valid material if all the shaders are found
-	std::shared_ptr<OsgMaterial> buildMaterial(
-		const std::string& vertexShaderName,
-		const std::string& fragmentShaderName);
 };
 
 }; // Graphics

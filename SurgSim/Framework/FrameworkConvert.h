@@ -50,7 +50,7 @@ struct convert<std::shared_ptr<T>>
 	static bool decode(
 		const Node& node,
 		typename std::enable_if <std::is_base_of<SurgSim::Framework::Component, T>::value,
-		std::shared_ptr<T> >::type& rhs);
+		std::shared_ptr<T> >::type& rhs); //NOLINT
 };
 
 
@@ -68,7 +68,7 @@ template <>
 struct convert<std::shared_ptr<SurgSim::Framework::Component> >
 {
 	static Node encode(const std::shared_ptr<SurgSim::Framework::Component> rhs);
-	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Component>& rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Component>& rhs); //NOLINT
 
 	typedef std::unordered_map<std::string, std::shared_ptr<SurgSim::Framework::Component>> RegistryType;
 
@@ -89,7 +89,7 @@ template<>
 struct convert<std::shared_ptr<SurgSim::Framework::SceneElement>>
 {
 	static Node encode(const std::shared_ptr<SurgSim::Framework::SceneElement> rhs);
-	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::SceneElement>& rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::SceneElement>& rhs); //NOLINT
 };
 
 template<>
@@ -102,14 +102,14 @@ template<>
 struct convert<std::shared_ptr<SurgSim::Framework::Scene>>
 {
 	static Node encode(const std::shared_ptr<SurgSim::Framework::Scene> rhs);
-	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Scene>& rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Scene>& rhs); //NOLINT
 };
 
 template<>
 struct convert<std::shared_ptr<SurgSim::Framework::Asset>>
 {
 	static Node encode(const std::shared_ptr<SurgSim::Framework::Asset> rhs);
-	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Asset>& rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Asset>& rhs); //NOLINT
 };
 
 };

@@ -24,6 +24,8 @@ namespace SurgSim
 namespace Graphics
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgAxesRepresentation, OsgAxesRepresentation);
+
 OsgAxesRepresentation::OsgAxesRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
@@ -48,7 +50,7 @@ std::shared_ptr<OsgUnitAxes> OsgAxesRepresentation::getShareUnitAxes()
 void OsgAxesRepresentation::setSize(double val)
 {
 	m_size = val;
-	m_transform->setScale(osg::Vec3d(val,val,val));
+	m_transform->setScale(osg::Vec3d(val, val, val));
 }
 
 double OsgAxesRepresentation::getSize()

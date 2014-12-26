@@ -22,6 +22,7 @@ set(UNIT_TEST_SOURCES
 	GroupTests.cpp
 	ManagerTests.cpp
 	MeshTests.cpp
+	OsgAxesRepresentationTests.cpp
 	OsgBoxRepresentationTests.cpp
 	OsgCameraTests.cpp
 	OsgCapsuleRepresentationTests.cpp

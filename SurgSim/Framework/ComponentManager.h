@@ -122,9 +122,6 @@ protected:
 	std::vector<std::shared_ptr<Component>> m_componentRemovals;
 	///@}
 
-	/// Logger for this class
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-
 	/// Collection of behaviors
 	// Each behavior will have a type to be matched with the corresponding manager
 	// Managers will only handle matching behaviors
