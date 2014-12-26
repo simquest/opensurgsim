@@ -30,6 +30,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	LoggerManager.cpp
 	LogMessageBase.cpp
 	LogOutput.cpp
+	SamplingMetricBase.cpp
 	PoseComponent.cpp
 	Representation.cpp
 	Runtime.cpp
@@ -67,6 +68,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	LogMessageBase.h
 	LogOutput.h
 	Macros.h
+	SamplingMetricBase.h
 	ObjectFactory.h
 	ObjectFactory-inl.h
 	PoseComponent.h
