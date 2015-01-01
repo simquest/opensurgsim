@@ -150,6 +150,7 @@ surgsim_add_library(
 
 SET(LIBS
 	SurgSimCollision
+	SurgSimInput
 )
 
 target_link_libraries(SurgSimPhysics ${LIBS})
