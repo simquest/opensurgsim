@@ -92,7 +92,7 @@ void VelocityFromPose::initializeInput(const std::string& device, const SurgSim:
 			builder.addVector(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
 			builder.addVector(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
 			getInputData() = builder.createData();
-			m_copier = std::make_shared<SurgSim::DataStructures::DataGroupCopier>(inputData, getInputData());
+			m_copier = std::make_shared<SurgSim::DataStructures::DataGroupCopier>(inputData, &getInputData());
 		}
 	}
 
