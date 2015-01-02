@@ -21,6 +21,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS
 	${Boost_LIBRARIES}
 	${NOVINT_HDAL_SDK_LIBRARIES}
+	SurgSimMath
 )
 
 include_directories(
