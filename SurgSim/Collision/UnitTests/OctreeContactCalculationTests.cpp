@@ -432,7 +432,6 @@ TEST(OctreeContactCalculationTests, CheckNumberOfContacts)
 	std::shared_ptr<Shape> sphereShape = std::make_shared<SphereShape>(9);
 	OctreeDcdContact calculator(std::make_shared<BoxSphereDcdContact>());
 
-	std::list<std::shared_ptr<Contact>> contacts;
 	std::shared_ptr<ShapeCollisionRepresentation> octreeRep =
 		std::make_shared<ShapeCollisionRepresentation>("Collision Octree 0");
 	octreeRep->setShape(octreeShape);
