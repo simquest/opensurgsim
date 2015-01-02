@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_FRAMEWORK_MEASUREMENTBASE_H
-#define SURGSIM_FRAMEWORK_MEASUREMENTBASE_H
+#ifndef SURGSIM_FRAMEWORK_SAMPLINGMETRICBASE_H
+#define SURGSIM_FRAMEWORK_SAMPLINGMETRICBASE_H
 
 #include <deque>
 
-#include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Framework/ObjectFactory.h>
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
@@ -62,15 +62,15 @@ public:
 	/// discarded to make room for the new measurement.
 	typedef std::deque<MeasurementEntryType> MeasurementsType;
 
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 	/// Set the desired manager type for this metric. Given the potential tight coupling of the
 	/// and the various other behaviors, this will provide us with the flexibility to choose
 	/// the appropriate manager for the task.
 	/// \param targetManagerType is the manager type to be used for managing this metric
-	void setTargetManagerType(int);
+	void setTargetManagerType(int targetManagerType);
 
-	virtual int getTargetManagerType() const override;
+	int getTargetManagerType() const override;
 
 	/// Set the maximum number of measurements to store.
 	void setMaxNumberOfMeasurements(size_t numberOfMeasurements);
@@ -91,9 +91,9 @@ public:
 
 protected:
 
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// NOTE: Be careful with threading when implementing this call. Anything referenced both
 	/// here and in performMeasurement() must be safe.
@@ -122,4 +122,4 @@ private:
 };
 };
 
-#endif // SURGSIM_FRAMEWORK_MEASUREMENTBASE_H
+#endif // SURGSIM_FRAMEWORK_SAMPLINGMETRICBASE_H
