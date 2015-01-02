@@ -63,7 +63,7 @@ public:
 	virtual ~PhysicsManager();
 
 	/// Overrides ComponentManager::getType()
-	virtual int getType() const override;
+	int getType() const override;
 
 	friend class PhysicsManagerTest;
 
@@ -117,9 +117,9 @@ protected:
 
 	///@{
 	/// Overridden from BasicThread
-	virtual bool doInitialize() override;
-	virtual bool doStartUp() override;
-	virtual bool doUpdate(double dt) override;
+	bool doInitialize() override;
+	bool doStartUp() override;
+	bool doUpdate(double dt) override;
 	///@}
 
 	void initializeComputations(bool copyState);

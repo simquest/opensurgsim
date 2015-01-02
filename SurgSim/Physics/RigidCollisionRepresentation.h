@@ -44,19 +44,19 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::RigidCollisionRepresentation);
 
-	virtual void update(const double& dt) override;
+	void update(const double& dt) override;
 
 	/// Get the pose of the representation
 	/// \return The pose of this representation
-	virtual SurgSim::Math::RigidTransform3d getPose() const override;
+	SurgSim::Math::RigidTransform3d getPose() const override;
 
 	/// Get the shape type id
 	/// \return The unique type of the shape, used to determine which calculation to use.
-	virtual int getShapeType() const override;
+	int getShapeType() const override;
 
 	/// Get the shape
 	/// \return The actual shape used for collision.
-	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
 	/// Set the shape
 	/// The default is to use the shape of the Rigid Representation, this

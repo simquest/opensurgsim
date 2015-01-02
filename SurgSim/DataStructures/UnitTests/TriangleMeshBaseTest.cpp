@@ -595,13 +595,14 @@ TEST_F(TriangleMeshBaseTest, GetTrianglePositions)
 
 TEST_F(TriangleMeshBaseTest, TriangleDeletionTest)
 {
+	typedef TriangleMeshPlain::VertexType VertexType;
 	typedef TriangleMeshPlain::TriangleType TriangleType;
 
 	TriangleMeshPlain mesh;
 
-	mesh.addVertex(testPositions[0]);
-	mesh.addVertex(testPositions[0]);
-	mesh.addVertex(testPositions[0]);
+	mesh.addVertex(VertexType(testPositions[0]));
+	mesh.addVertex(VertexType(testPositions[0]));
+	mesh.addVertex(VertexType(testPositions[0]));
 
 	TriangleType::IdType ids = {0, 1, 2};
 	mesh.addTriangle(TriangleType(ids));

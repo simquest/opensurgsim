@@ -78,9 +78,8 @@ private:
 	/// \param	state	The physics state.
 	/// \return	The changed state of the, depending on the setting of doCopyState this is either the same instance
 	/// 		or a copied instance of the physics state.
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt,
-		const std::shared_ptr<PhysicsManagerState>& state) override;
+	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
+		override;
 
 	/// Generate a localization from a Collision Representation.
 	/// \param	physicsRepresentation	The physics representation.

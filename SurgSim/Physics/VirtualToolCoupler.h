@@ -89,7 +89,7 @@ public:
 	/// \param    poseName Name of the pose data in the input to transfer
 	void setPoseName(const std::string& poseName = SurgSim::DataStructures::Names::POSE);
 
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 	/// Override the linear stiffness connecting the input device and the physics representation
 	/// If this value is not provided, the stiffness will be automatically tuned using
@@ -150,9 +150,9 @@ public:
 	bool getCalculateInertialTorques() const;
 
 protected:
-	virtual bool doInitialize() override;
-	virtual bool doWakeUp() override;
-	virtual int getTargetManagerType() const override;
+	bool doInitialize() override;
+	bool doWakeUp() override;
+	int getTargetManagerType() const override;
 
 	/// \return The DataGroup to be sent to the device via the OutputComponent.
 	virtual SurgSim::DataStructures::DataGroup buildOutputData();

@@ -19,6 +19,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	GridPerformanceTest.cpp
 	NamedDataPerformanceTest.cpp
 )
 

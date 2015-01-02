@@ -37,7 +37,7 @@ public:
 	/// \param eventHandler A osgGA::GUIEventAdapter
 	/// \param actionAdapter A osgGA::GUIActionAdapter (required by this virtual method)
 	/// \return True if the event has been handled by this method; Otherwise, false.
-	virtual bool handle(const osgGA::GUIEventAdapter& eventHandler, osgGA::GUIActionAdapter& actionAdapter) override;
+	bool handle(const osgGA::GUIEventAdapter& eventHandler, osgGA::GUIActionAdapter& actionAdapter) override;
 
 private:
 	/// A back pointer to the scaffold which owns this handle

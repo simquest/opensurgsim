@@ -147,8 +147,7 @@ public:
 		}
 	}
 
-	virtual void initializeInput(const std::string& device,
-								 const SurgSim::DataStructures::DataGroup& inputData) override
+	void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
 	{
 		for (auto view : m_views)
 		{
@@ -157,7 +156,7 @@ public:
 		}
 	}
 
-	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
+	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
 	{
 		ImageType data;
 		for (auto view : m_views)

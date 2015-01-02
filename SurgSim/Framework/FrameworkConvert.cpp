@@ -46,7 +46,7 @@ Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(
 
 bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(
 			const Node& node,
-			std::shared_ptr<SurgSim::Framework::Component>& rhs)
+			std::shared_ptr<SurgSim::Framework::Component>& rhs) //NOLINT
 {
 	bool result = false;
 
@@ -55,41 +55,39 @@ bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(
 		return false;
 	}
 
-	Node data = node.begin()->second;
+	SurgSim::Framework::Component::FactoryType& factory = SurgSim::Framework::Component::getFactory();
 	std::string className = node.begin()->first.as<std::string>();
+	SURGSIM_ASSERT(factory.isRegistered(className)) << "Class " << className << " is not registered in the factory.";
 
-	if (data.IsMap() &&
-		data[IdPropertyName].IsDefined() &&
-		data[NamePropertyName].IsDefined())
+	Node data = node.begin()->second;
+	if (data.IsMap() && data[NamePropertyName].IsDefined())
 	{
+		std::string name = data[NamePropertyName].as<std::string>();
 		if (rhs == nullptr)
 		{
-			std::string id = data[IdPropertyName].as<std::string>();
-			RegistryType& registry = getRegistry();
-			auto sharedComponent = registry.find(id);
-			if (sharedComponent != registry.end())
+			if (data[IdPropertyName].IsDefined())
 			{
-				SURGSIM_ASSERT(data[NamePropertyName].as<std::string>() == sharedComponent->second->getName() &&
-							   className == sharedComponent->second->getClassName())
-						<< "The current node: " << std::endl << node << "has the same id as an instance "
-						<< "already registered, but the name and/or the className are different. This is "
-						<< "likely a problem with a manually assigned id.";
-				rhs = sharedComponent->second;
-			}
-			else
-			{
-				SurgSim::Framework::Component::FactoryType& factory =
-					SurgSim::Framework::Component::getFactory();
-
-				if (factory.isRegistered(className))
+				std::string id = data[IdPropertyName].as<std::string>();
+				RegistryType& registry = getRegistry();
+				auto sharedComponent = registry.find(id);
+				if (sharedComponent != registry.end())
 				{
-					rhs = factory.create(className, data[NamePropertyName].as<std::string>());
-					getRegistry()[id] = rhs;
+					SURGSIM_ASSERT(name == sharedComponent->second->getName() &&
+								   className == sharedComponent->second->getClassName())
+							<< "The current node: " << std::endl << node << "has the same id as an instance "
+							<< "already registered, but the name and/or the className are different. This is "
+							<< "likely a problem with a manually assigned id.";
+					rhs = sharedComponent->second;
 				}
 				else
 				{
-					SURGSIM_FAILURE() << "Class " << className << " is not registered in the factory.";
+					rhs = factory.create(className, name);
+					getRegistry()[id] = rhs;
 				}
+			}
+			else
+			{
+				rhs = factory.create(className, name);
 			}
 		}
 
@@ -132,7 +130,7 @@ Node convert<std::shared_ptr<SurgSim::Framework::SceneElement>>::encode(
 
 bool convert<std::shared_ptr<SurgSim::Framework::SceneElement>>::decode(
 			const Node& node,
-			std::shared_ptr<SurgSim::Framework::SceneElement>& rhs)
+			std::shared_ptr<SurgSim::Framework::SceneElement>& rhs) //NOLINT
 {
 	if (rhs == nullptr)
 	{
@@ -157,7 +155,7 @@ Node convert<std::shared_ptr<SurgSim::Framework::Scene>>::encode(
 
 bool convert<std::shared_ptr<SurgSim::Framework::Scene>>::decode(
 			const Node& node,
-			std::shared_ptr<SurgSim::Framework::Scene>& rhs)
+			std::shared_ptr<SurgSim::Framework::Scene>& rhs) //NOLINT
 {
 	bool result = false;
 	if (rhs != nullptr)
@@ -176,7 +174,7 @@ YAML::Node YAML::convert<std::shared_ptr<SurgSim::Framework::Asset>>::encode(
 }
 
 bool YAML::convert<std::shared_ptr<SurgSim::Framework::Asset>>::decode(
-			const Node& node, std::shared_ptr<SurgSim::Framework::Asset>& rhs)
+			const Node& node, std::shared_ptr<SurgSim::Framework::Asset>& rhs) //NOLINT
 {
 	bool result = false;
 

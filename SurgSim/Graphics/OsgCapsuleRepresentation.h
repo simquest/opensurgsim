@@ -52,33 +52,33 @@ public:
 
 	/// Sets the radius of the capsule
 	/// \param radius Radius of the capsule
-	virtual void setRadius(double radius) override;
+	void setRadius(double radius) override;
 	/// Returns the radius of the capsule
 	/// \return Radius along X-axis and Z-axis of the capsule
-	virtual double getRadius() const override;
+	double getRadius() const override;
 
 	/// Sets the height of the capsule
 	/// \param height Height of the capsule
-	virtual void setHeight(double height) override;
+	void setHeight(double height) override;
 	/// Returns the height of the capsule
 	/// \return Height along Y-axis of the capsule
-	virtual double getHeight() const override;
+	double getHeight() const override;
 
 	/// Sets the size of the capsule
 	/// \param radius Size along X-axis and Z-axis of the capsule
 	/// \param height Size along Y-axis of the capsule
-	virtual void setSize(double radius, double height) override;
+	void setSize(double radius, double height) override;
 	/// Gets the size of the capsule
 	/// \param [out] radius Variable to receive the size along X-axis and Z-axis of the capsule
 	/// \param [out] height Variable to receive the size along Y-axis of the capsule
-	virtual void getSize(double* radius, double* height) override;
+	void getSize(double* radius, double* height) override;
 
 	/// Sets the size of the capsule
 	/// \param size Size of the capsule
-	virtual void setSize(const SurgSim::Math::Vector2d& size) override;
+	void setSize(const SurgSim::Math::Vector2d& size) override;
 	/// Returns the radius of the capsule
 	/// \return Size of the capsule
-	virtual SurgSim::Math::Vector2d getSize() const override;
+	SurgSim::Math::Vector2d getSize() const override;
 
 private:
 	/// The OSG Capsule shape consist of one unit cylinder and two unit spheres

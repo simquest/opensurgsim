@@ -34,7 +34,7 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit OdeSolverLinearRungeKutta4(OdeEquation* equation);
 
-	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
 private:
 	bool m_initialized;

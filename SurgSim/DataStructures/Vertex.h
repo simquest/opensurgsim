@@ -46,7 +46,7 @@ struct Vertex
 	/// Constructor
 	/// \param	position	Position of the vertex
 	/// \param	data	Extra data to be stored in the vertex
-	Vertex(const SurgSim::Math::Vector3d& position, const Data& data = Data()) :
+	explicit Vertex(const SurgSim::Math::Vector3d& position, const Data& data = Data()) :
 		position(position),
 		data(data)
 	{

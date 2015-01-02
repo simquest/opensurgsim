@@ -82,7 +82,7 @@ private:
 	/// Recalculate the aabb of this class, in case items where updated
 	void recalculateAabb();
 
-	virtual bool isEqual(const TreeData* data) const override;
+	bool isEqual(const TreeData* data) const override;
 
 	/// AABB containg all items
 	SurgSim::Math::Aabbd m_aabb;

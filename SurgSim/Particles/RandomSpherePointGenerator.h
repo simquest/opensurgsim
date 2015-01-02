@@ -37,8 +37,8 @@ public:
 	/// Destructor
 	virtual ~RandomSpherePointGenerator();
 
-	virtual SurgSim::Math::Vector3d pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
-	virtual SurgSim::Math::Vector3d pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
+	SurgSim::Math::Vector3d pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
+	SurgSim::Math::Vector3d pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
 };
 
 }; // namespace Particles

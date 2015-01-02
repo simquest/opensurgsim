@@ -16,7 +16,9 @@
 #include "SurgSim/Graphics/OsgMaterial.h"
 
 #include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgUniformFactory.h"
@@ -212,6 +214,42 @@ osg::ref_ptr<osg::StateSet> OsgMaterial::getOsgStateSet() const
 {
 	return m_stateSet;
 }
+
+std::shared_ptr<OsgMaterial> buildMaterial(const std::string& vertexShaderName, const std::string& fragmentShaderName)
+{
+	bool result = true;
+
+	std::shared_ptr<OsgMaterial> material;
+
+	auto shader = std::make_shared<OsgShader>();
+	std::string fileName;
+	fileName = SurgSim::Framework::Runtime::getApplicationData()->findFile(vertexShaderName);
+	if (!shader->loadVertexShaderSource(fileName))
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
+				<< "Shader " << vertexShaderName << ", could not "
+				<< ((fileName == "") ? "find shader file" : "compile " + fileName) << ".";
+		result = false;
+	}
+
+	fileName = SurgSim::Framework::Runtime::getApplicationData()->findFile(fragmentShaderName);
+	if (!shader->loadFragmentShaderSource(fileName))
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
+				<< "Shader " << fragmentShaderName << " , could not "
+				<< ((fileName == "") ? "find shader file" : "compile " + fileName) << ".";
+		result = false;
+	}
+
+	if (result)
+	{
+		material = std::make_shared<OsgMaterial>("material");
+		material->setShader(shader);
+	}
+
+	return material;
+}
+
 }; // namespace Graphics
 
 }; // namespace SurgSim

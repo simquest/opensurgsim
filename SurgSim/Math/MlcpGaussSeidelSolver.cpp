@@ -84,8 +84,8 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 
 	calculateConvergenceCriteria(n, A, nbColumnInA, b,
 								 initialGuess_and_solution, constraintsType, subStep,
-								 initial_constraint_convergence_criteria, initial_convergence_criteria,
-								 initialSignoriniVerified, initialSignoriniValid);
+								 initial_constraint_convergence_criteria, &initial_convergence_criteria,
+								 &initialSignoriniVerified, &initialSignoriniValid);
 
 	// If it is already converged, fill the output and return true.
 	if (initial_convergence_criteria <= m_epsilonConvergence && initialSignoriniVerified)
@@ -112,16 +112,20 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 		}
 
 		if (initialConstraintConvergenceCriteria)
+		{
 			for (int i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; i++)
 			{
 				initialConstraintConvergenceCriteria[i] = initial_constraint_convergence_criteria[i];
 			}
+		}
 
 		if (constraintConvergenceCriteria)
+		{
 			for (int i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; i++)
 			{
 				initialConstraintConvergenceCriteria[i] = initial_constraint_convergence_criteria[i];
 			}
+		}
 
 		return true;
 	}
@@ -129,13 +133,13 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	do
 	{
 		doOneIteration(n, A, nbColumnInA, b, &initialGuess_and_solution, frictionCoefs,
-					   constraintsType, subStep, constraint_convergence_criteria, convergence_criteria,
-					   signorini_verified);
+					   constraintsType, subStep, constraint_convergence_criteria, &convergence_criteria,
+					   &signorini_verified);
 
 		calculateConvergenceCriteria(n, A, nbColumnInA, b,
 									 initialGuess_and_solution, constraintsType, subStep,
-									 constraint_convergence_criteria, convergence_criteria,
-									 signorini_verified, signorini_valid);
+									 constraint_convergence_criteria, &convergence_criteria,
+									 &signorini_verified, &signorini_valid);
 
 // 	  printViolationsAndConvergence(n, A, nbColumnInA, b, initialGuess_and_solution, constraintsType, subStep,
 // 		  convergence_criteria, signorini_verified, nbLoop);
@@ -253,8 +257,8 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 														 const std::vector<MlcpConstraintType>& constraintsType,
 														 double subStep,
 														 double constraint_convergence_criteria[],
-														 double& convergence_criteria,
-														 bool& signoriniVerified, bool& signoriniValid)
+														 double* convergence_criteria,
+														 bool* signoriniVerified, bool* signoriniValid)
 {
 	// Calculate initial convergence criteria.
 
@@ -262,9 +266,9 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 	{
 		constraint_convergence_criteria[i] = 0.0;
 	}
-	convergence_criteria = 0.0;
-	signoriniVerified = true;
-	signoriniValid = true;
+	*convergence_criteria = 0.0;
+	*signoriniVerified = true;
+	*signoriniValid = true;
 
 	int currentAtomicIndex=0;
 	int nbConstraints = static_cast<int>(constraintsType.size());
@@ -284,7 +288,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 				violation += A(currentAtomicIndex, j) * initialGuess_and_solution[j];
 			}
 			double criteria = sqrt(violation * violation);
-			convergence_criteria += criteria;
+			*convergence_criteria += criteria;
 			constraint_convergence_criteria[constraintsType[i]] += criteria;
 
 			nbNonContactConstraints++;
@@ -302,7 +306,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			double criteria = sqrt(violation[0]*violation[0] + violation[1]*violation[1]);
-			convergence_criteria += criteria;
+			*convergence_criteria += criteria;
 			constraint_convergence_criteria[constraintsType[i]] += criteria;
 
 			nbNonContactConstraints++;
@@ -324,7 +328,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 				violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			}
 			double criteria = sqrt(violation[0]*violation[0] + violation[1]*violation[1] + violation[2]*violation[2]);
-			convergence_criteria += criteria;
+			*convergence_criteria += criteria;
 			constraint_convergence_criteria[constraintsType[i]] += criteria;
 
 			nbNonContactConstraints++;
@@ -347,7 +351,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&
 				 violation > m_contactTolerance))
 			{
-				signoriniVerified=false;
+				*signoriniVerified = false;
 			}
 		}
 		currentAtomicIndex++;
@@ -365,7 +369,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&
 				 violation > m_contactTolerance))
 			{
-				signoriniVerified=false;
+				*signoriniVerified = false;
 			}
 		}
 		currentAtomicIndex+=3;
@@ -380,7 +384,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			double criteria = sqrt(violation[0]*violation[0] + violation[1]*violation[1]);
-			convergence_criteria += criteria;
+			*convergence_criteria += criteria;
 			constraint_convergence_criteria[constraintsType[i]] += criteria;
 
 			nbNonContactConstraints++;
@@ -399,7 +403,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			double criteria = sqrt(violation[0]*violation[0] + violation[1]*violation[1]);
-			convergence_criteria += criteria;
+			*convergence_criteria += criteria;
 			constraint_convergence_criteria[constraintsType[i]] += criteria;
 
 			nbNonContactConstraints++;
@@ -417,7 +421,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 
 	if (nbNonContactConstraints)
 	{
-		convergence_criteria /= nbNonContactConstraints;    // normalize if necessary
+		*convergence_criteria /= nbNonContactConstraints;    // normalize if necessary
 	}
 }
 
@@ -738,14 +742,14 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 										   const MlcpProblem::Vector& frictionCoefs,
 										   const std::vector<MlcpConstraintType>& constraintsType, double subStep,
 										   double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
-										   double& convergence_criteria, bool& signoriniVerified)
+										   double* convergence_criteria, bool* signoriniVerified)
 {
 	for (int i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; i++)
 	{
 		constraint_convergence_criteria[i] = 0.0;
 	}
-	convergence_criteria = 0.0;
-	signoriniVerified=true;
+	*convergence_criteria = 0.0;
+	*signoriniVerified = true;
 
 	int currentAtomicIndex=0;
 	int nbConstraints = static_cast<int>(constraintsType.size());

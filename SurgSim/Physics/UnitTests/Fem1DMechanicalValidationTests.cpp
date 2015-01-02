@@ -145,7 +145,7 @@ public:
 	Fem1DBuilder m_fem1DBuilder;
 
 protected:
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		using SurgSim::Math::getSubVector;
 

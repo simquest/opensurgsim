@@ -34,8 +34,8 @@ public:
 	/// Destructor
 	virtual ~UpdateCollisionRepresentations();
 
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt, const std::shared_ptr<PhysicsManagerState>& state) override;
+	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
+		override;
 
 };
 

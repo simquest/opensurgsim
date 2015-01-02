@@ -59,7 +59,7 @@ public:
 	virtual ~CommonDevice();
 
 	/// Return a (hopefully unique) device name.
-	virtual std::string getName() const override;
+	std::string getName() const override;
 
 	/// Set the name used for calling the input consumers and output producer.
 	/// By default, this will be the same as the name of the device that was passed to the constructor.
@@ -74,30 +74,30 @@ public:
 	/// Connect this device to an InputConsumerInterface, which will receive the data that comes from this device.
 	/// \param inputConsumer The InputConsumerInterface to connect with.
 	/// \return true if successful
-	virtual bool addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
+	bool addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
 
 	/// Disconnect this device from an InputConsumerInterface, which will no longer receive data from this device.
 	/// \param inputConsumer The InputConsumerInterface to disconnect from.
 	/// \return true if successful
-	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
+	bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
 
-	virtual void clearInputConsumers() override;
+	void clearInputConsumers() override;
 
 	/// Connect this device to an OutputProducerInterface, which will send data to this device.
 	/// \param outputProducer The OutputProducerInterface to connect with.
 	/// \return true if successful
-	virtual bool setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
+	bool setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
 
 	/// Disconnect this device from an OutputProducerInterface, which will no longer send data to this device.
 	/// \param outputProducer The OutputProducerInterface to disconnect from.
 	/// \return true if successful
-	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
+	bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
 
 	/// Getter for whether or not this device is connected with an OutputProducerInterface.
 	/// \return true if an OutputProducerInterface is connected.
-	virtual bool hasOutputProducer() override;
+	bool hasOutputProducer() override;
 
-	virtual void clearOutputProducer() override;
+	void clearOutputProducer() override;
 
 protected:
 

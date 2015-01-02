@@ -31,6 +31,8 @@ namespace SurgSim
 namespace Graphics
 {
 
+SURGSIM_STATIC_REGISTRATION(OsgAxesRepresentation);
+
 /// Osg axes representation implementation for the AxesRepresentation interface in graphics.
 class OsgAxesRepresentation : public OsgRepresentation, public AxesRepresentation
 {
@@ -40,13 +42,15 @@ public:
 	explicit OsgAxesRepresentation(const std::string& name);
 	~OsgAxesRepresentation();
 
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgAxesRepresentation);
+
 	/// Sets the size of the shown axes.
 	/// \param	val	The value.
-	virtual void setSize(double val) override;
+	void setSize(double val) override;
 
 	/// Gets the current size.
 	/// \return	The size.
-	virtual double getSize() override;
+	double getSize() override;
 
 private:
 

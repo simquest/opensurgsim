@@ -63,7 +63,7 @@ public:
 	virtual ~Novint7DofDevice();
 
 private:
-	virtual bool is7DofDevice() const override;
+	bool is7DofDevice() const override;
 };
 
 };  // namespace Device

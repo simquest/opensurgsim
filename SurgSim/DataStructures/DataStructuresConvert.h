@@ -34,7 +34,7 @@ template <class T>
 struct convert<SurgSim::DataStructures::OptionalValue<T>>
 {
 	static Node encode(const SurgSim::DataStructures::OptionalValue<T>& rhs);
-	static bool decode(const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs);
+	static bool decode(const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs); //NOLINT
 };
 
 /// YAML::convert specialization for std::array.
@@ -43,7 +43,7 @@ template <class T, size_t N>
 struct convert<std::array<T, N>>
 {
 	static Node encode(const std::array<T, N>& rhs);
-	static bool decode(const Node& node, std::array<T, N>& rhs);
+	static bool decode(const Node& node, std::array<T, N>& rhs); //NOLINT
 };
 
 /// YAML::convert specialization for std::unordered_map.
@@ -52,7 +52,7 @@ template <class Key, class T>
 struct convert<std::unordered_map<Key, T>>
 {
 	static Node encode(const std::unordered_map<Key, T>& rhs);
-	static bool decode(const Node& node, std::unordered_map<Key, T>& rhs);
+	static bool decode(const Node& node, std::unordered_map<Key, T>& rhs); //NOLINT
 };
 
 /// YAML::convert specialization for std::unordered_set.
@@ -61,7 +61,7 @@ template <class Value>
 struct convert<std::unordered_set<Value>>
 {
 	static Node encode(const std::unordered_set<Value>& rhs);
-	static bool decode(const Node& node, std::unordered_set<Value>& rhs);
+	static bool decode(const Node& node, std::unordered_set<Value>& rhs); //NOLINT
 };
 
 } // namespace YAML

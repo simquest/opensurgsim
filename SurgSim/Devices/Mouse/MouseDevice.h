@@ -62,10 +62,10 @@ public:
 
 	/// Initialize corresponding MouseScaffold.
 	/// \return True if MouseScaffold is initialized successfully; Otherwise, false.
-	virtual bool initialize() override;
+	bool initialize() override;
 	/// "De"-initialize corresponding MouseScaffold.
 	/// \return True if MouseScaffold is 'de'-initialized successfully; Otherwise, false.
-	virtual bool finalize() override;
+	bool finalize() override;
 
 	/// Check if the scaffold of this device is initialized.
 	/// \return True if this the scaffold of this device is initialized; Otherwise, false.

@@ -70,9 +70,9 @@ public:
 	/// Set the right hand to be tracked.
 	void setupToTrackRightHand();
 
-	virtual bool initialize() override;
+	bool initialize() override;
 
-	virtual bool finalize() override;
+	bool finalize() override;
 
 	/// \return True, if this device is initialized.
 	bool isInitialized() const;

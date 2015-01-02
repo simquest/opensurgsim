@@ -35,7 +35,7 @@ using SurgSim::Graphics::SceneryRepresentation;
 class OsgSceneryRepresentationTest: public ::testing::Test
 {
 public:
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		sceneryObject = std::make_shared<OsgSceneryRepresentation>("test");
 		sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("test2");
@@ -49,7 +49,7 @@ public:
 
 	}
 
-	virtual void TearDown() override
+	void TearDown() override
 	{
 	}
 

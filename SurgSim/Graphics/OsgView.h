@@ -69,23 +69,23 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgView);
 
-	virtual void setPosition(const std::array<int, 2>& position) override;
+	void setPosition(const std::array<int, 2>& position) override;
 
-	virtual std::array<int, 2> getPosition() const override;
+	std::array<int, 2> getPosition() const override;
 
-	virtual void setDimensions(const std::array<int, 2>& dimensions) override;
+	void setDimensions(const std::array<int, 2>& dimensions) override;
 
-	virtual std::array<int, 2> getDimensions() const override;
+	std::array<int, 2> getDimensions() const override;
 
-	virtual void setWindowBorderEnabled(bool enabled) override;
+	void setWindowBorderEnabled(bool enabled) override;
 
-	virtual bool isWindowBorderEnabled() const override;
+	bool isWindowBorderEnabled() const override;
 
 	/// Sets the camera which provides the viewpoint in the scene
 	/// Only allows OsgCamera components, any other will not be set and it will return false.
 	/// \param	camera	Camera whose image will be shown in this view
 	/// \return	True if it succeeded, false if it failed
-	virtual void setCamera(std::shared_ptr<SurgSim::Framework::Component> camera) override;
+	void setCamera(std::shared_ptr<SurgSim::Framework::Component> camera) override;
 
 	/// Enables a camera manipulator, implemented via a trackball, this is a temporary solution as it uses
 	/// the OSG input events rather than reading from the OpenSurgSim input.
@@ -145,7 +145,7 @@ public:
 	/// \return Whether the mouse device is enabled.
 	bool isMouseDeviceEnabled();
 
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 	/// \return the OSG view which performs the actual work involved in setting up and rendering to a window
 	osg::ref_ptr<osgViewer::View> getOsgView() const;
@@ -153,10 +153,10 @@ public:
 protected:
 	/// Initialize the view
 	/// \post The view's window is setup.
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Wake up the view
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 private:
 
 	/// Patch the StatsHandler rendering

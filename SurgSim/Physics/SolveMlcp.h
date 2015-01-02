@@ -67,8 +67,8 @@ protected:
 	/// \param dt The time step
 	/// \param state The Physics manager state
 	/// \return The updated physics manager state (input updated or copied updated)
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
-		const std::shared_ptr<PhysicsManagerState>& state) override;
+	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
+		override;
 
 private:
 

@@ -57,34 +57,34 @@ public:
 	osg::ref_ptr<osgViewer::CompositeViewer> getOsgCompositeViewer() const;
 
 	/// OsgManager will write out the scenegraph in the working directory
-	virtual void dumpDebugInfo() const override;
+	void dumpDebugInfo() const override;
 
 protected:
-	virtual bool doUpdate(double dt) override;
+	bool doUpdate(double dt) override;
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
-	virtual bool doStartUp() override;
+	bool doStartUp() override;
 
 	/// Adds an representation to the manager
 	/// \param	representation	The representation to be added.
 	/// Only allows OsgRepresentation components, any other will not be set and it will return false.
 	/// \return	True if the representation was not in this manager and has been successfully added, false if it fails.
-	virtual bool addRepresentation(std::shared_ptr<Representation> representation) override;
+	bool addRepresentation(std::shared_ptr<Representation> representation) override;
 
 	/// Adds a view to the manager
 	/// \param	view	The view to be added.
 	/// Only allows OsgView components, any other will not be set and it will return false.
 	/// \return	True if the view was not in this manager and has been successfully added, false if it fails.
-	virtual bool addView(std::shared_ptr<View> view) override;
+	bool addView(std::shared_ptr<View> view) override;
 
 	/// Removes a view from the manager
 	/// \param	view	The view to be removed.
 	/// \return	True if the view was in this manager and has been successfully removed, false if it fails.
 	/// \post	The view is removed from the manager and the osgViewer::CompositeViewer.
-	virtual bool removeView(std::shared_ptr<View> view) override;
+	bool removeView(std::shared_ptr<View> view) override;
 
-	virtual std::shared_ptr<Group> getOrCreateGroup(const std::string& name) override;
+	std::shared_ptr<Group> getOrCreateGroup(const std::string& name) override;
 
 private:
 

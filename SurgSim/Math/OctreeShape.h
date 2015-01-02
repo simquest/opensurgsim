@@ -53,20 +53,20 @@ public:
 	virtual ~OctreeShape();
 
 	/// \return the type of shape
-	virtual int getType() const override;
+	int getType() const override;
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)
-	virtual double getVolume() const override;
+	double getVolume() const override;
 
 	/// Get the volumetric center of the shape
 	/// \return The center of the shape
-	virtual Vector3d getCenter() const override;
+	Vector3d getCenter() const override;
 
 	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
-	virtual Matrix33d getSecondMomentOfVolume() const override;
+	Matrix33d getSecondMomentOfVolume() const override;
 
 	/// Get the root node
 	/// \return the octree root node of this shape
@@ -77,7 +77,7 @@ public:
 	void setOctree(std::shared_ptr<SurgSim::Framework::Asset> node);
 
 	/// \return True if the bounding box is bigger than or equal to 0; Otherwise, false.
-	virtual bool isValid() const override;
+	bool isValid() const override;
 
 	void loadOctree(const std::string& filePath);
 
