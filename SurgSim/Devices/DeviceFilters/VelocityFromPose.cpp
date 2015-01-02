@@ -102,7 +102,7 @@ void VelocityFromPose::initializeInput(const std::string& device, const SurgSim:
 	}
 	else
 	{
-		m_copier->copy();
+		m_copier->copy(inputData, &getInputData());
 	}
 
 	PoseType pose;
@@ -123,7 +123,7 @@ void VelocityFromPose::handleInput(const std::string& device, const SurgSim::Dat
 	}
 	else
 	{
-		m_copier->copy();
+		m_copier->copy(inputData, &getInputData());
 	}
 
 	PoseType pose;
