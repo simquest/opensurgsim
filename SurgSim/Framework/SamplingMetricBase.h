@@ -95,19 +95,19 @@ protected:
 
 	bool doInitialize() override;
 
-	/// NOTE: Be careful with threading when implementing this call. Anything referenced both
-	/// here and in performMeasurement() must be safe.
-	///
+	/// Determine if it is appropriate to take a measurement.
 	/// \param dt is the elapsed time since the last call to update.
 	/// \return if it is currently valid to calculate the next measurement value.
+	/// \note Be careful with threading when implementing this call. Anything referenced both
+	/// here and in performMeasurement() must be safe.
 	virtual bool canMeasure(double dt);
 
-	/// NOTE: Be careful with threading when implementing this call. Anything referenced both
-	/// here and in canMeasure() must be safe.
-	///
+	/// Obtain the measurement.
 	/// \param dt is the elapsed time since the last call to update.
 	/// \return the next measurement value. This method should be overwritten to provide the
 	/// various measurements for the simulation.
+	/// \note Be careful with threading when implementing this call. Anything referenced both
+	/// here and in canMeasure() must be safe.
 	virtual double performMeasurement(double dt) = 0;
 
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
