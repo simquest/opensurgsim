@@ -55,7 +55,7 @@ TEST(SamplingMetricBaseTest, AbleToPerformMeasurementsTests)
 {
 	std::shared_ptr<MockSamplingMetric> mockMetric(std::make_shared<MockSamplingMetric>("Test Metric", true, 1.0));
 
-	// Make 10 out
+	// Make 10 updates
 	mockMetric->setMaxNumberOfMeasurements(5);
 	for (int counter = 0; counter < 10; ++counter)
 	{
@@ -65,17 +65,19 @@ TEST(SamplingMetricBaseTest, AbleToPerformMeasurementsTests)
 
 	EXPECT_EQ(5, mockMetric->getCurrentNumberOfMeasurements());
 	EXPECT_EQ(5, samples.size());
-	EXPECT_EQ(0.0, mockMetric->getElapsedTime());
+	EXPECT_EQ(45.0, mockMetric->getElapsedTime());
 
 	// When we check the results, our deque holds 5 places. We skip the
 	// first 5 because they already rolled off the end. The metric value
-	// starts at one
+	// starts at one and accumulates. At position 5, we should already have
+	// a value of 10 accumulated.
 	auto sampleIterator = samples.begin();
-	for (int counter = 5;
+	for (int counter = 5, accumulator = 10;
 		 sampleIterator != samples.end();
 		 ++counter, ++sampleIterator)
 	{
-		EXPECT_EQ(static_cast<double>(counter), sampleIterator->first);
+		accumulator += counter;
+		EXPECT_EQ(static_cast<double>(accumulator), sampleIterator->first);
 		EXPECT_EQ(static_cast<double>(counter + 2), sampleIterator->second);
 	}
 }

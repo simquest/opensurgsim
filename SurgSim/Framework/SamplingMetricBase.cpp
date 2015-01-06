@@ -87,7 +87,6 @@ void SamplingMetricBase::update(double dt)
 		newEntry.first = m_elapsedTime;
 		newEntry.second = performMeasurement(dt);
 		m_measurementValues.push_back(newEntry);
-		m_elapsedTime = 0;
 		if (m_measurementValues.size() > m_maxNumberOfMeasurements)
 		{
 			m_measurementValues.pop_front();
