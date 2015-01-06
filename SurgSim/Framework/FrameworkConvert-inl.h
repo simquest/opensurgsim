@@ -32,7 +32,7 @@ YAML::Node YAML::convert<std::shared_ptr<T>>::encode(
 template <class T>
 bool YAML::convert<std::shared_ptr<T>>::decode(const Node& node,
 									typename std::enable_if <std::is_base_of<SurgSim::Framework::Component, T>::value,
-									std::shared_ptr<T> >::type& rhs)
+									std::shared_ptr<T> >::type& rhs) //NOLINT
 {
 	std::shared_ptr<SurgSim::Framework::Component> temporary;
 	bool success = 	YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(node, temporary);

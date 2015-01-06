@@ -49,7 +49,7 @@ const double epsilon = 2.3e-9;
 class MockFem3DElementTet : public Fem3DElementTetrahedron
 {
 public:
-	MockFem3DElementTet(std::array<size_t, 4> nodeIds) : Fem3DElementTetrahedron(nodeIds)
+	explicit MockFem3DElementTet(std::array<size_t, 4> nodeIds) : Fem3DElementTetrahedron(nodeIds)
 	{
 	}
 
@@ -95,7 +95,7 @@ public:
 	SurgSim::Math::Matrix m_expectedStiffnessMatrix, m_expectedStiffnessMatrix2;
 	SurgSim::Math::Vector m_vectorOnes;
 
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		using SurgSim::Math::getSubVector;
 		using SurgSim::Math::getSubMatrix;

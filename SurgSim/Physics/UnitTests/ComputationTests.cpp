@@ -38,7 +38,7 @@ public:
 	}
 
 protected:
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
+	std::shared_ptr<PhysicsManagerState> doUpdate(
 		const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state) override
 	{

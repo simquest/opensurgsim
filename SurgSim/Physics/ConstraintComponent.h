@@ -53,11 +53,11 @@ protected:
 
 	/// Initialize the component
 	/// \return true if successful
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Wakeup the component
 	/// \return true if successful
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 };
 
 }; // namespace SurgSim

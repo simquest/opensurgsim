@@ -60,7 +60,7 @@ public:
 	/// Queries whether Representation can be assigned to this class.
 	/// \param representation Representation to check.
 	/// \return	true if Representation is valid.
-	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
+	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
 
 private:
 	/// Calculates the global position of this localization.
@@ -68,7 +68,7 @@ private:
 	/// state (1.0).
 	/// \return The global position of the localization using an interpolation between the previous and current states.
 	/// \note The time parameter can useful when dealing with Continuous Collision Detection.
-	virtual SurgSim::Math::Vector3d doCalculatePosition(double time) override;
+	SurgSim::Math::Vector3d doCalculatePosition(double time) override;
 
 	/// Node defining the localization.
 	size_t m_nodeID;

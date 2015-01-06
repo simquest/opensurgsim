@@ -35,12 +35,12 @@ class BoxShape: public Shape
 public:
 	/// Constructor
 	/// \param sizeX, sizeY, sizeZ the box sizes in all 3 directions (in m)
-	BoxShape(double sizeX = 0.0, double sizeY = 0.0, double sizeZ = 0.0);
+	explicit BoxShape(double sizeX = 0.0, double sizeY = 0.0, double sizeZ = 0.0);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::BoxShape);
 
 	/// \return the type of the shape
-	virtual int getType() const override;
+	int getType() const override;
 
 	/// Get size of the box
 	/// \return the size of the box (in m)
@@ -60,16 +60,16 @@ public:
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)
-	virtual double getVolume() const override;
+	double getVolume() const override;
 
 	/// Get the volumetric center of the shape
 	/// \return The center of the shape
-	virtual Vector3d getCenter() const override;
+	Vector3d getCenter() const override;
 
 	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
-	virtual Matrix33d getSecondMomentOfVolume() const override;
+	Matrix33d getSecondMomentOfVolume() const override;
 
 	/// Function that returns the local vertex location, given an index.
 	/// \param i The vertex index.
@@ -81,7 +81,7 @@ public:
 	const std::array<Vector3d, 8>& getVertices() const;
 
 	/// \return True if size along X, Y, Z are bigger than or equal to 0; Otherwise, false.
-	virtual bool isValid() const override;
+	bool isValid() const override;
 
 protected:
 	// Setters in 'protected' sections are for serialization purpose only.

@@ -58,7 +58,7 @@ public:
 
 	/// Executes the initialize operation.
 	/// \return	true if it succeeds, false if it fails.
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Sets render target for the camera, this abstracts the textures that are being used for rendering into.
 	/// \param	target	The rendertarget structure.

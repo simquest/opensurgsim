@@ -122,9 +122,6 @@ protected:
 	std::vector<std::shared_ptr<Component>> m_componentRemovals;
 	///@}
 
-	/// Logger for this class
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-
 	/// Collection of behaviors
 	// Each behavior will have a type to be matched with the corresponding manager
 	// Managers will only handle matching behaviors
@@ -145,7 +142,7 @@ private:
 
 	/// Overridden from BasicThread, extends the initialization to contain component initialization
 	/// including waiting for the other threads to conclude their component initialization and wakeup
-	virtual bool executeInitialization() override;
+	bool executeInitialization() override;
 
 	/// Delegates to doRemoveComponent to remove all the components in the indicated array.
 	/// \param	beginIt	The begin iterator.

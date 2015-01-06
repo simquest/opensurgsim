@@ -27,8 +27,8 @@
 
 namespace SurgSim
 {
-	namespace Framework
-	{
+namespace Framework
+{
 
 template <typename T>
 SharedInstance<T>::SharedInstance() :

@@ -46,21 +46,21 @@ public:
 
 	/// Gets the vector field
 	/// \return The vector field
-	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const override;
+	std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const override;
 
 	/// Sets vector line width
 	/// \param	width	Width of vector line
-	virtual void setLineWidth(double width) override;
+	void setLineWidth(double width) override;
 	/// Gets line width
 	/// \return	The line width
-	virtual double getLineWidth() const override;
+	double getLineWidth() const override;
 
 	/// Sets the scale to be applied to all vectors
 	/// \param scale The scale
-	virtual void setScale(double scale) override;
+	void setScale(double scale) override;
 	/// Gets the scale applied to all vectors
 	/// \return The scale
-	virtual double getScale() const override;
+	double getScale() const override;
 
 	/// Sets the size of point indicating the starting of vector
 	/// \param size	Size of starting point of a vector
@@ -71,7 +71,7 @@ public:
 
 	/// Executes the update operation
 	/// \param	dt	The time step
-	virtual void doUpdate(double dt) override;
+	void doUpdate(double dt) override;
 
 private:
 	/// Vector Field holds a list of vertices/points (X,Y,Z) in 3D space

@@ -35,10 +35,9 @@ public:
 	/// Destructor.
 	~MovingSquareGlutWindow();
 
-	virtual void initializeInput(const std::string& device,
-								 const SurgSim::DataStructures::DataGroup& inputData) override;
+	void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
-	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
+	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
 protected:
 

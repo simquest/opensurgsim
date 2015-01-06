@@ -32,16 +32,16 @@ public:
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 	/// Return the type of manager that should be responsible for this behavior
-	virtual int getTargetManagerType() const override;
+	int getTargetManagerType() const override;
 
 protected:
 	/// Initialize the behavior
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 	/// Wakeup the behavior
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
 private:
 	/// Input component to get the pose

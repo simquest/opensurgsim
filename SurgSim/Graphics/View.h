@@ -181,7 +181,7 @@ public:
 
 private:
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Camera whose image will be shown in this view
 	std::shared_ptr<Camera> m_camera;

@@ -47,7 +47,7 @@ public:
 
 	/// \param	severity Log level of message to be logged.
 	/// \param	message The actual message to be logged.
-	virtual void notify(osg::NotifySeverity severity, const char *message) override;
+	void notify(osg::NotifySeverity severity, const char *message) override;
 
 private:
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;

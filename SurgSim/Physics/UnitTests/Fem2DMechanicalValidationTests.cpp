@@ -75,7 +75,7 @@ private:
 	SurgSim::Math::Vector m_F, m_U;
 
 protected:
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		m_fem = std::make_shared<Fem2DRepresentation>("Fem2D");
 	}

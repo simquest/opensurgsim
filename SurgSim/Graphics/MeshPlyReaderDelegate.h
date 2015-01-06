@@ -40,7 +40,7 @@ public:
 	/// \param mesh The mesh to be used, it will be cleared by the constructor.
 	explicit MeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh);
 
-	virtual void processVertex(const std::string& elementName) override;
+	void processVertex(const std::string& elementName) override;
 
 };
 

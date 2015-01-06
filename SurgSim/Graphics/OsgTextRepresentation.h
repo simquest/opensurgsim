@@ -67,32 +67,32 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgTextRepresentation);
 
-	virtual void setLocation(double x, double y) override;
-	virtual void getLocation(double* x, double* y) const override;
+	void setLocation(double x, double y) override;
+	void getLocation(double* x, double* y) const override;
 
-	virtual void setMaximumWidth(double width) override;
-	virtual double getMaximumWidth() override;
+	void setMaximumWidth(double width) override;
+	double getMaximumWidth() override;
 
-	virtual void setText(const std::string& text) override;
-	virtual std::string getText() const override;
+	void setText(const std::string& text) override;
+	std::string getText() const override;
 
-	virtual void loadFont(std::string fileName) override;
-	virtual void setFont(std::shared_ptr<SurgSim::Framework::Asset> font) override;
-	virtual std::shared_ptr<Font> getFont() const override;
+	void loadFont(std::string fileName) override;
+	void setFont(std::shared_ptr<SurgSim::Framework::Asset> font) override;
+	std::shared_ptr<Font> getFont() const override;
 
-	virtual void setColor(SurgSim::Math::Vector4d color) override;
-	virtual SurgSim::Math::Vector4d getColor() const override;
+	void setColor(SurgSim::Math::Vector4d color) override;
+	SurgSim::Math::Vector4d getColor() const override;
 
-	virtual void setFontSize(double size) override;
-	virtual double getFontSize() const override;
+	void setFontSize(double size) override;
+	double getFontSize() const override;
 
 
 protected:
-	virtual void doUpdate(double dt) override;
-	virtual bool doInitialize() override;
+	void doUpdate(double dt) override;
+	bool doInitialize() override;
 
-	virtual void setOptionalMaximumWidth(SurgSim::DataStructures::OptionalValue<double> maximum) override;
-	virtual SurgSim::DataStructures::OptionalValue<double> getOptionalMaximumWidth() override;
+	void setOptionalMaximumWidth(SurgSim::DataStructures::OptionalValue<double> maximum) override;
+	SurgSim::DataStructures::OptionalValue<double> getOptionalMaximumWidth() override;
 
 private:
 	osg::ref_ptr<osg::Geode> m_geode; ///< node used to render text

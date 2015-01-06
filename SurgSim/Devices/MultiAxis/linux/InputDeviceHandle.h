@@ -54,13 +54,13 @@ public:
 	static std::unique_ptr<InputDeviceHandle> open(const std::string& path,
 		std::shared_ptr<SurgSim::Framework::Logger> logger);
 
-	virtual std::string getDeviceName() const override;
+	std::string getDeviceName() const override;
 
-	virtual bool getDeviceIds(int* vendorId, int* productId) const override;
+	bool getDeviceIds(int* vendorId, int* productId) const override;
 
-	virtual bool hasTranslationAndRotationAxes() const override;
+	bool hasTranslationAndRotationAxes() const override;
 
-	virtual bool updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated) override;
+	bool updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated) override;
 
 private:
 	/// Constructor.

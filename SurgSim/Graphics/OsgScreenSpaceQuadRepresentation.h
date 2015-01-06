@@ -68,19 +68,19 @@ public:
 	/// Sets the size for the quad in screen coordinates.
 	/// \param	width 	The width of the quad in screen coordinates.
 	/// \param	height	The height of the quad in screen coordinates.
-	virtual void setSize(double width, double height) override;
+	void setSize(double width, double height) override;
 
 	/// Gets the size of the quad.
 	/// \param [out]	width 	If non-null, the width. Throws exception otherwise.
 	/// \param [out]	height	If non-null, the height. Throws exception otherwise.
-	virtual void getSize(double* width, double* height) const override;
+	void getSize(double* width, double* height) const override;
 
 	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
 	/// this will use the uniform name "texture" for the uniform in this operation. This can be accomplished
 	/// from the outside as well by using the material.
 	/// \param	texture	The texture to be set on the quad.
 	/// \return	true if it succeeds, false if it fails.
-	virtual bool setTexture(std::shared_ptr<Texture> texture) override;
+	bool setTexture(std::shared_ptr<Texture> texture) override;
 
 	/// Sets a Texture2d for this quad, this should replace a current texture, this is a convenience function and
 	/// this will use the uniform name "texture" for the uniform in this operation. This can be accomplished
@@ -97,9 +97,9 @@ public:
 	bool setTexture(std::shared_ptr<OsgTextureRectangle> texture);
 
 protected:
-	virtual void doUpdate(double dt) override;
+	void doUpdate(double dt) override;
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 private:
 
@@ -140,13 +140,6 @@ private:
 	/// Indicate which type of texture is currently being used
 	SurgSim::DataStructures::OptionalValue<int> m_texureType;
 
-	/// Utility function to build the material.
-	/// \param vertexShaderName name of the vertex shader to be used, needs to be available on the path.
-	/// \param fragmentShaderName name of the fragmen shader to be used, needs to be available on the path.
-	/// \return a valid material if all the shaders are found
-	std::shared_ptr<OsgMaterial> buildMaterial(
-		const std::string& vertexShaderName,
-		const std::string& fragmentShaderName);
 };
 
 }; // Graphics

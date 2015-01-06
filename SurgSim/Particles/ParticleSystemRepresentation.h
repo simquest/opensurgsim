@@ -115,7 +115,7 @@ protected:
 	/// \return True if update succeeded, False otherwise.
 	virtual bool doUpdate(double dt) = 0;
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 };
 
 };  // namespace Particles

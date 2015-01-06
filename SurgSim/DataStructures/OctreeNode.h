@@ -153,7 +153,7 @@ public:
 	template <class T>
 	OctreeNode(const OctreeNode<T>& other);
 
-	virtual std::string getClassName() const override;
+	std::string getClassName() const override;
 
 	/// Constructor
 	/// \param  boundingBox The region contained by this octree node
@@ -241,7 +241,7 @@ protected:
 	bool doAddData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
 				   const int currentLevel);
 
-	virtual bool doLoad(const std::string& fileName) override;
+	bool doLoad(const std::string& filePath) override;
 
 	/// The bounding box of the current OctreeNode
 	SurgSim::Math::Aabbd m_boundingBox;

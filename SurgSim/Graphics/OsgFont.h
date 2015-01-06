@@ -48,7 +48,7 @@ public:
 
 protected:
 
-	virtual bool doLoad(const std::string& filePath) override;
+	bool doLoad(const std::string& filePath) override;
 
 private:
 

@@ -124,8 +124,8 @@ public:
 	const std::pair<SurgSim::Math::Vector3d, SurgSim::Math::Vector3d>& getVelocityRange() const;
 
 private:
-	virtual bool doInitialize() override;
-	virtual bool doWakeUp() override;
+	bool doInitialize() override;
+	bool doWakeUp() override;
 
 	/// PointGenerator for generating random points within or on the emitter shape.
 	RandomPointGenerator m_pointGenerator;

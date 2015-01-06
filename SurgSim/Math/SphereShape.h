@@ -37,7 +37,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Math::SphereShape);
 
 	/// \return the type of the shape
-	virtual int getType() const override;
+	int getType() const override;
 
 	/// Get the sphere radius
 	/// \return The sphere radius
@@ -45,19 +45,19 @@ public:
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)
-	virtual double getVolume() const override;
+	double getVolume() const override;
 
 	/// Get the volumetric center of the shape
 	/// \return The center of the shape
-	virtual Vector3d getCenter() const override;
+	Vector3d getCenter() const override;
 
 	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
-	virtual Matrix33d getSecondMomentOfVolume() const override;
+	Matrix33d getSecondMomentOfVolume() const override;
 
 	/// \return True if radius is bigger than or equal to 0; Otherwise, false.
-	virtual bool isValid() const override;
+	bool isValid() const override;
 
 protected:
 	// Setters in 'protected' sections are for serialization purpose only.

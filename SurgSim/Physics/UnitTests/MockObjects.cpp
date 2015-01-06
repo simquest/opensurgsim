@@ -126,7 +126,7 @@ RepresentationType MockDeformableRepresentation::getType() const
 }
 
 void MockDeformableRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-										 SurgSim::Math::Vector& generalizedForce,
+										 const SurgSim::Math::Vector& generalizedForce,
 										 const SurgSim::Math::Matrix& K,
 										 const SurgSim::Math::Matrix& D)
 {
@@ -383,7 +383,7 @@ MockFemRepresentation::~MockFemRepresentation()
 }
 
 void MockFemRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-														SurgSim::Math::Vector& generalizedForce,
+														const SurgSim::Math::Vector& generalizedForce,
 														const SurgSim::Math::Matrix& K,
 														const SurgSim::Math::Matrix& D)
 {

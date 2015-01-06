@@ -35,7 +35,7 @@ using SurgSim::Graphics::SkeletonRepresentation;
 class OsgSkeletonRepresentationTest: public ::testing::Test
 {
 public:
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		skeletonObject = std::make_shared<OsgSkeletonRepresentation>("test");
 		runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
@@ -47,7 +47,7 @@ public:
 		runtime->addManager(manager);
 	}
 
-	virtual void TearDown() override
+	void TearDown() override
 	{
 	}
 

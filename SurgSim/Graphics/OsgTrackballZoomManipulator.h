@@ -115,13 +115,14 @@ protected:
 	/// \param eventAdapter Event adapter
 	/// \param actionAdapter Action adapter
 	/// \return true if the event was handled, false otherwise
-	virtual bool handle(const osgGA::GUIEventAdapter& eventAdapter, osgGA::GUIActionAdapter& actionAdapter);
+	virtual bool handle(const osgGA::GUIEventAdapter& eventAdapter, osgGA::GUIActionAdapter& actionAdapter); //NOLINT
 
 	/// Handle mouse wheel scrolling to zoom in or out
 	/// \param eventAdapter Event adapter
 	/// \param actionAdapter Action adapter
 	/// \return true if the mouse wheel was handled, false otherwise
-	virtual bool handleMouseWheel(const osgGA::GUIEventAdapter& eventAdapter, osgGA::GUIActionAdapter& actionAdapter);
+	virtual bool handleMouseWheel(const osgGA::GUIEventAdapter& eventAdapter,
+			osgGA::GUIActionAdapter& actionAdapter); //NOLINT
 };
 
 }; // namespace Graphics
