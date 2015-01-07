@@ -115,6 +115,7 @@ void BasicThread::operator()()
 	boost::chrono::duration<double> sleepTime(0.0);
 	boost::chrono::duration<double> totalSleepTime(0.0);
 	Clock::time_point start;
+	boost::chrono::duration<double> zeroDuration(0.0);
 
 	m_isRunning = true;
 	m_timer.start();
@@ -135,7 +136,11 @@ void BasicThread::operator()()
 			if (sleepTime.count() > 0.0)
 			{
 				totalSleepTime += sleepTime;
-				boost::this_thread::sleep_until(start + m_period);
+				//boost::this_thread::sleep_until(start + m_period);
+				while(m_period - (Clock::now() - start) > zeroDuration)
+				{
+					;
+				}
 			}
 		}
 		else
