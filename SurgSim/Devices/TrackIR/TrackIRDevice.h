@@ -28,7 +28,7 @@ namespace Device
 class TrackIRScaffold;
 
 /// A class implementing the communication with Natural Point TrackIR camera.
-///
+/// Facing the camera, X is to the right, Y is UP and Z is towards the user.
 /// \par Application input provided by the device:
 ///   | type       | name              |                                        |
 ///   | ----       | ----              | ---                                    |
