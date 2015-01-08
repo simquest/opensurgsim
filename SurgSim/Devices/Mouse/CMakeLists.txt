@@ -38,6 +38,7 @@ surgsim_add_library(
 
 set(LIBS
 	SurgSimInput
+	${OPENSCENEGRAPH_LIBRARIES}
 )
 
 target_link_libraries(MouseDevice ${LIBS}

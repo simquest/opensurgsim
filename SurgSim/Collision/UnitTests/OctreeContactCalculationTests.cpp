@@ -425,6 +425,27 @@ TEST(OctreeContactCalculationTests, Sphere)
 	}
 }
 
+TEST(OctreeContactCalculationTests, CheckNumberOfContacts)
+{
+	std::shared_ptr<OctreeNode<OctreeData>> octree = buildTestOctree();
+	std::shared_ptr<OctreeShape> octreeShape = std::make_shared<OctreeShape>(*octree);
+	std::shared_ptr<Shape> sphereShape = std::make_shared<SphereShape>(9);
+	OctreeDcdContact calculator(std::make_shared<BoxSphereDcdContact>());
+
+	std::shared_ptr<ShapeCollisionRepresentation> octreeRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision Octree 0");
+	octreeRep->setShape(octreeShape);
+
+	std::shared_ptr<ShapeCollisionRepresentation> shapeRep =
+		std::make_shared<ShapeCollisionRepresentation>("Collision sphere 0");
+	shapeRep->setShape(sphereShape);
+	shapeRep->setLocalPose(SurgSim::Math::makeRigidTranslation(Vector3d(8.0, 8.0, 8.0)));
+
+	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(octreeRep, shapeRep);
+	calculator.calculateContact(pair);
+	EXPECT_EQ(1, shapeRep->getCollisions().unsafeGet().size());
+	EXPECT_EQ(1, shapeRep->getCollisions().unsafeGet().count(octreeRep));
+}
 
 }; // namespace Collision
 }; // namespace SurgSim
