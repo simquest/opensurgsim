@@ -177,11 +177,10 @@ TEST(BasicThreadTest, PauseResumeUpdateTest)
 
 	for (int i = 0; i < 10; i++)
 	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-		EXPECT_LT(m.count, previousCount);
-		previousCount = m.count;
 		barrier->wait(true);
 	}
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(m.count, previousCount - 11);
 
 	m.setIdle(true);
 
@@ -193,11 +192,10 @@ TEST(BasicThreadTest, PauseResumeUpdateTest)
 
 	for (int i = 0; i < 10; i++)
 	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-		EXPECT_EQ(previousCount, m.count);
-		previousCount = m.count;
 		barrier->wait(true);
 	}
+	EXPECT_EQ(previousCount, m.count);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 
 	m.setIdle(false);
 
@@ -206,14 +204,13 @@ TEST(BasicThreadTest, PauseResumeUpdateTest)
 
 	for (int i = 0; i < 10; i++)
 	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-		EXPECT_LT(m.count, previousCount);
-		previousCount = m.count;
 		barrier->wait(true);
 	}
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(m.count, previousCount - 10);
 
 	barrier->wait(false);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	m.stop();
 }
 
