@@ -86,7 +86,7 @@ TEST(SamplingMetricBaseTest, UnableToPerformMeasurementsTests)
 {
 	std::shared_ptr<MockSamplingMetric> mockMetric(std::make_shared<MockSamplingMetric>("Test Metric", false, 1.0));
 	double accumulatedTime = 0.0;
-	// Make 10 out
+	// Make 10 updates
 	mockMetric->setMaxNumberOfMeasurements(5);
 
 	for (int counter = 0; counter < 10; ++counter)

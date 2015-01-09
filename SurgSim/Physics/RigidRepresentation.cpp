@@ -15,6 +15,7 @@
 
 #include "SurgSim/Physics/RigidRepresentation.h"
 
+#include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
@@ -59,19 +60,19 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 }
 
 void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::Math::Vector6d& generalizedForce,
-													  const SurgSim::Math::Matrix66d& K,
-													  const SurgSim::Math::Matrix66d& D)
+		const SurgSim::Math::Matrix66d& K,
+		const SurgSim::Math::Matrix66d& D)
 {
-	m_externalGeneralizedForce += generalizedForce;
+	m_externalGeneralizedForce.unsafeGet() += generalizedForce;
 	m_externalGeneralizedStiffness += K;
 	m_externalGeneralizedDamping += D;
 	m_hasExternalGeneralizedForce = true;
 }
 
 void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructures::Location& location,
-													  const SurgSim::Math::Vector6d& generalizedForce,
-													  const SurgSim::Math::Matrix66d& K,
-													  const SurgSim::Math::Matrix66d& D)
+		const SurgSim::Math::Vector6d& generalizedForce,
+		const SurgSim::Math::Matrix66d& K,
+		const SurgSim::Math::Matrix66d& D)
 {
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Matrix66d;
@@ -90,14 +91,14 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 	const Vector3d torque = lever.cross(force);
 
 	// add the generalized force
-	m_externalGeneralizedForce += generalizedForce;
+	m_externalGeneralizedForce.unsafeGet() += generalizedForce;
 	// add the generalized stiffness matrix
 	m_externalGeneralizedStiffness += K;
 	// add the generalized damping matrix
 	m_externalGeneralizedDamping += D;
 
 	// add the extra torque produced by the lever
-	m_externalGeneralizedForce.segment<3>(3) += torque;
+	m_externalGeneralizedForce.unsafeGet().segment<3>(3) += torque;
 
 	// add the extra terms in the stiffness matrix
 	const Vector3d leverInLocalSpace = getCurrentState().getPose().rotation().inverse() * lever;
@@ -116,15 +117,15 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 	Matrix33d dRdAxisZ;
 	Matrix33d dRdAngle =
 		-sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * axis * axis.transpose();
-	dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos * axis[1], oneMinusCos * axis[2],
-				oneMinusCos * axis[1], 0.0, -sinAngle,
-				oneMinusCos * axis[2], sinAngle, 0.0;
-	dRdAxisY << 0.0, oneMinusCos * axis[0], sinAngle,
-				oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos * axis[2],
-				-sinAngle, oneMinusCos * axis[2], 0.0;
-	dRdAxisZ << 0.0, -sinAngle, oneMinusCos * axis[0],
-				sinAngle, 0.0, oneMinusCos * axis[1],
-				oneMinusCos * axis[0], oneMinusCos * axis[1], oneMinusCos * 2.0 * axis[2];
+	dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos* axis[1], oneMinusCos* axis[2],
+			 oneMinusCos* axis[1], 0.0, -sinAngle,
+			 oneMinusCos* axis[2], sinAngle, 0.0;
+	dRdAxisY << 0.0, oneMinusCos* axis[0], sinAngle,
+			 oneMinusCos* axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos* axis[2],
+			 -sinAngle, oneMinusCos* axis[2], 0.0;
+	dRdAxisZ << 0.0, -sinAngle, oneMinusCos* axis[0],
+			 sinAngle, 0.0, oneMinusCos* axis[1],
+			 oneMinusCos* axis[0], oneMinusCos* axis[1], oneMinusCos * 2.0 * axis[2];
 	Vector3d dAngledRotationVector, dAxisXdRotationVector, dAxisYdRotationVector, dAxisZdRotationVector;
 	if (std::abs(rotationVectorNorm) > rotationVectorEpsilon)
 	{
@@ -144,16 +145,16 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 		dAxisZdRotationVector = Vector3d::UnitZ();
 
 		dRdAxisX << 0.0, 0.0, 0.0,
-					0.0, 0.0, -1.0,
-					0.0, 1.0, 0.0;
+				 0.0, 0.0, -1.0,
+				 0.0, 1.0, 0.0;
 
 		dRdAxisY << 0.0, 0.0, 1.0,
-					0.0, 0.0, 0.0,
-					-1.0, 0.0, 0.0;
+				 0.0, 0.0, 0.0,
+				 -1.0, 0.0, 0.0;
 
 		dRdAxisZ << 0.0, -1.0, 0.0,
-					1.0, 0.0, 0.0,
-					0.0, 0.0, 0.0;
+				 1.0, 0.0, 0.0,
+				 0.0, 0.0, 0.0;
 	}
 	// add the extra stiffness terms produced by the lever
 	for (size_t column = 0; column < 6; ++column)
@@ -167,9 +168,9 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 	{
 		m_externalGeneralizedStiffness.block<3, 1>(3, 3 + i) +=
 			-((dRdAngle * dAngledRotationVector[i] +
-			dRdAxisX * dAxisXdRotationVector[i] +
-			dRdAxisY * dAxisYdRotationVector[i] +
-			dRdAxisZ * dAxisZdRotationVector[i]) * leverInLocalSpace).cross(force);
+			   dRdAxisX * dAxisXdRotationVector[i] +
+			   dRdAxisY * dAxisYdRotationVector[i] +
+			   dRdAxisZ * dAxisZdRotationVector[i]) * leverInLocalSpace).cross(force);
 	}
 
 	// add the extra damping terms produced by the lever
@@ -181,7 +182,8 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 	m_hasExternalGeneralizedForce = true;
 }
 
-const SurgSim::Math::Vector6d& RigidRepresentation::getExternalGeneralizedForce() const
+SurgSim::DataStructures::BufferedValue<SurgSim::Math::Vector6d>&
+RigidRepresentation::getExternalGeneralizedForce()
 {
 	return m_externalGeneralizedForce;
 }
@@ -247,8 +249,8 @@ void RigidRepresentation::update(double dt)
 	m_torque.setZero();
 	if (m_hasExternalGeneralizedForce)
 	{
-		m_force += m_externalGeneralizedForce.segment<3>(0);
-		m_torque += m_externalGeneralizedForce.segment<3>(3);
+		m_force += m_externalGeneralizedForce.unsafeGet().segment<3>(0);
+		m_torque += m_externalGeneralizedForce.unsafeGet().segment<3>(3);
 	}
 	if (isGravityEnabled())
 	{
@@ -285,7 +287,7 @@ void RigidRepresentation::update(double dt)
 		q.normalize();
 	}
 	R = q.matrix();
-	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*getMassCenter()));
+	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G - R * getMassCenter()));
 
 	// Compute the global inertia matrix with the current state
 	updateGlobalInertiaMatrices(m_currentState);
@@ -316,6 +318,8 @@ void RigidRepresentation::update(double dt)
 
 void RigidRepresentation::afterUpdate(double dt)
 {
+	m_externalGeneralizedForce.publish();
+
 	RigidRepresentationBase::afterUpdate(dt);
 
 	SURGSIM_LOG_IF(!m_parametersValid,
@@ -330,14 +334,14 @@ void RigidRepresentation::afterUpdate(double dt)
 	if (m_hasExternalGeneralizedForce)
 	{
 		m_hasExternalGeneralizedForce = false;
-		m_externalGeneralizedForce.setZero();
+		m_externalGeneralizedForce.unsafeGet().setZero();
 		m_externalGeneralizedStiffness.setZero();
 		m_externalGeneralizedDamping.setZero();
 	}
 }
 
 void RigidRepresentation::applyCorrection(double dt,
-										  const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
+		const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Matrix33d;
@@ -378,7 +382,7 @@ void RigidRepresentation::applyCorrection(double dt,
 		q.normalize();
 	}
 	R = q.matrix();
-	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G-R*getMassCenter()));
+	m_currentState.setPose(SurgSim::Math::makeRigidTransform(R, G - R * getMassCenter()));
 
 	// Compute the global inertia matrix with the current state
 	updateGlobalInertiaMatrices(m_currentState);
@@ -401,7 +405,7 @@ void RigidRepresentation::applyCorrection(double dt,
 	computeComplianceMatrix(dt);
 }
 
-const Eigen::Matrix < double, 6, 6, Eigen::RowMajor > &
+const Eigen::Matrix <double, 6, 6, Eigen::RowMajor>&
 SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
 {
 	return m_C;
