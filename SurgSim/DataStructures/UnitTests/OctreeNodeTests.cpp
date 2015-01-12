@@ -166,8 +166,8 @@ TEST(OctreeNodeTests, AddNodes)
 	EXPECT_FALSE(octree->hasChildren());
 	EXPECT_FALSE(octree->isActive());
 
-	EXPECT_TRUE(octree->addData(Vector3d(1.0, 1.0, 1.0), data, levels));
-	EXPECT_TRUE(octree->addData(Vector3d(-4.0, 5.0, -7.0), data, levels));
+	EXPECT_TRUE(octree->addData(Vector3d(1.0, 1.0, 1.0), levels, data));
+	EXPECT_TRUE(octree->addData(Vector3d(-4.0, 5.0, -7.0), levels, data));
 
 	EXPECT_TRUE(octree->hasChildren());
 	EXPECT_TRUE(octree->isActive());
@@ -195,7 +195,7 @@ TEST(OctreeNodeTests, Data)
 
 	EXPECT_FALSE(octree.hasChildren());
 	EXPECT_FALSE(octree.isActive());
-	EXPECT_TRUE(octree.addData(Vector3d(1.0, 1.0, 1.0), expectedData, levels));
+	EXPECT_TRUE(octree.addData(Vector3d(1.0, 1.0, 1.0), levels, expectedData));
 	EXPECT_FALSE(octree.hasChildren());
 	EXPECT_TRUE(octree.isActive());
 
@@ -251,9 +251,9 @@ TEST(OctreeNodeTests, CopyConstructor)
 	SurgSim::Math::Aabbd boundingBox(Vector3d::Zero(), 2 * Vector3d::Ones());
 	std::shared_ptr<OctreeNode<Data1>> octree1 = std::make_shared<OctreeNode<Data1>>(boundingBox);
 	Data1 dataRoot = {"root"};
-	octree1->addData(Vector3d(1.0, 1.0, 1.0), dataRoot, 1);
+	octree1->addData(Vector3d(1.0, 1.0, 1.0), 1, dataRoot);
 	Data1 dataChild = {"child"};
-	octree1->addData(Vector3d(0.5, 0.5, 0.5), dataChild, 2);
+	octree1->addData(Vector3d(0.5, 0.5, 0.5), 2, dataChild);
 
 	{
 		SCOPED_TRACE("Copying with different Data Type");

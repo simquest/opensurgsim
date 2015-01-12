@@ -190,15 +190,7 @@ public:
 	/// \param nodeData The data to store in the node
 	/// \param level The number of levels down the octree to store the data
 	/// \return true if data is added
-	bool addData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level);
-
-	/// Add default data to a node in this octree
-	/// The octree will build the octree as necessary to add the
-	/// node at the specified level
-	/// \param position The position to add the data at
-	/// \param level The number of levels down the octree to store the data
-	/// \return true if data is added
-	bool addDefaultData(const SurgSim::Math::Vector3d& position, int level);
+	bool addData(const SurgSim::Math::Vector3d& position, const int level, const Data& nodeData = Data());
 
 	/// Get the children of this node (non const version)
 	/// \return vector of all eight children

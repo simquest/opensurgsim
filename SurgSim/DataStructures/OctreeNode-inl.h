@@ -152,18 +152,10 @@ void OctreeNode<Data>::subdivide()
 }
 
 template<class Data>
-bool OctreeNode<Data>::addData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level)
+bool OctreeNode<Data>::addData(const SurgSim::Math::Vector3d& position, const int level, const Data& nodeData)
 {
 	return doAddData(position, nodeData, level, 1);
 }
-
-
-template<class Data>
-bool OctreeNode<Data>::addDefaultData(const SurgSim::Math::Vector3d& position, int level)
-{
-	return doAddData(position, Data(), level, 1);
-}
-
 
 template<class Data>
 bool OctreeNode<Data>::doAddData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,

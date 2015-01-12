@@ -58,12 +58,12 @@ namespace Collision
 {
 
 std::list<std::shared_ptr<Contact>> doCollision(std::shared_ptr<Shape> octree,
-		const Quaterniond& octreeQuat,
-		const Vector3d& octreeTrans,
-		std::shared_ptr<Shape> shape,
-		const Quaterniond& shapeQuat,
-		const Vector3d& shapeTrans,
-		ContactCalculation* calculator)
+								 const Quaterniond& octreeQuat,
+								 const Vector3d& octreeTrans,
+								 std::shared_ptr<Shape> shape,
+								 const Quaterniond& shapeQuat,
+								 const Vector3d& shapeTrans,
+								 ContactCalculation* calculator)
 {
 	std::shared_ptr<ShapeCollisionRepresentation> octreeRep =
 		std::make_shared<ShapeCollisionRepresentation>("Collision Octree 0");
@@ -118,35 +118,35 @@ std::shared_ptr<OctreeNode<OctreeData>> buildTestOctree()
 	const int numLevels = 4;
 	boundingBox.min() = Vector3d::Zero();
 	boundingBox.max() = Vector3d::Ones() * pow(2.0, numLevels);
-	std::shared_ptr<OctreeNode<OctreeData> > rootNode = std::make_shared<OctreeNode<OctreeData> >(boundingBox);
+	std::shared_ptr<OctreeNode<OctreeData>> rootNode = std::make_shared<OctreeNode<OctreeData>>(boundingBox);
 
 	OctreeData data;
 	data.name = "center";
-	rootNode->addData(Vector3d(8.5,  8.5,  8.5), data, numLevels);
+	rootNode->addData(Vector3d(8.5,  8.5,  8.5), numLevels, data);
 
 	data.name = "corner0";
-	rootNode->addData(Vector3d(0.5,  0.5,  0.5), data, numLevels);
+	rootNode->addData(Vector3d(0.5,  0.5,  0.5), numLevels, data);
 
 	data.name = "corner1";
-	rootNode->addData(Vector3d(15.5,  0.5,  0.5), data, numLevels);
+	rootNode->addData(Vector3d(15.5,  0.5,  0.5), numLevels, data);
 
 	data.name = "corner2";
-	rootNode->addData(Vector3d(0.5, 15.5,  0.5), data, numLevels);
+	rootNode->addData(Vector3d(0.5, 15.5,  0.5), numLevels, data);
 
 	data.name = "corner3";
-	rootNode->addData(Vector3d(15.5, 15.5,  0.5), data, numLevels);
+	rootNode->addData(Vector3d(15.5, 15.5,  0.5), numLevels, data);
 
 	data.name = "corner4";
-	rootNode->addData(Vector3d(0.5,  0.5, 15.5), data, numLevels);
+	rootNode->addData(Vector3d(0.5,  0.5, 15.5), numLevels, data);
 
 	data.name = "corner5";
-	rootNode->addData(Vector3d(15.5,  0.5, 15.5), data, numLevels);
+	rootNode->addData(Vector3d(15.5,  0.5, 15.5), numLevels, data);
 
 	data.name = "corner6";
-	rootNode->addData(Vector3d(0.5, 15.5, 15.5), data, numLevels);
+	rootNode->addData(Vector3d(0.5, 15.5, 15.5), numLevels, data);
 
 	data.name = "corner7";
-	rootNode->addData(Vector3d(15.5, 15.5, 15.5), data, numLevels);
+	rootNode->addData(Vector3d(15.5, 15.5, 15.5), numLevels, data);
 
 	return rootNode;
 }
@@ -162,39 +162,39 @@ TEST(OctreeContactCalculationTests, Capsule)
 	{
 		SCOPED_TRACE("No intersection, capsule outside octree");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(5.0, 0.0, 0.0),
-				capsuleShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(5.0, 0.0, 0.0),
+					   capsuleShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   &calculator);
 		EXPECT_EQ(0, contacts.size());
 	}
 
 	{
 		SCOPED_TRACE("No intersection, capsule inside octree, but not contacting active nodes");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				capsuleShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(5.0, 3.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   capsuleShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(5.0, 3.0, 0.0),
+					   &calculator);
 		EXPECT_EQ(0, contacts.size());
 	}
 
 	{
 		SCOPED_TRACE("Intersection, capsule is in the center of the octree");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				capsuleShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(8.0, 8.0, 8.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   capsuleShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(8.0, 8.0, 8.0),
+					   &calculator);
 		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("center", contacts, octree));
 	}
@@ -202,13 +202,13 @@ TEST(OctreeContactCalculationTests, Capsule)
 	{
 		SCOPED_TRACE("Intersection, capsule intersection 2 nodes");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				capsuleShape,
-				makeRotationQuaternion(M_PI_2, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(8.0, 0.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   capsuleShape,
+					   makeRotationQuaternion(M_PI_2, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(8.0, 0.0, 0.0),
+					   &calculator);
 		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
@@ -217,13 +217,13 @@ TEST(OctreeContactCalculationTests, Capsule)
 	{
 		SCOPED_TRACE("Intersection, octree rotated");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				capsuleShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 12.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   capsuleShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 12.0, 0.0),
+					   &calculator);
 		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner3", contacts, octree));
 	}
@@ -240,26 +240,26 @@ TEST(OctreeContactCalculationTests, Plane)
 	{
 		SCOPED_TRACE("No intersection, plane outside octree");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 5.0, 0.0),
-				planeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 5.0, 0.0),
+					   planeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   &calculator);
 		EXPECT_EQ(0, contacts.size());
 	}
 
 	{
 		SCOPED_TRACE("Intersection, plane inside octree");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				planeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 2.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   planeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 2.0, 0.0),
+					   &calculator);
 		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
@@ -270,13 +270,13 @@ TEST(OctreeContactCalculationTests, Plane)
 	{
 		SCOPED_TRACE("Intersection, rotated octree");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				planeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 2.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   planeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 2.0, 0.0),
+					   &calculator);
 		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner4", contacts, octree));
@@ -285,13 +285,13 @@ TEST(OctreeContactCalculationTests, Plane)
 	{
 		SCOPED_TRACE("Intersection, rotated plane");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				planeShape,
-				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 8.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   planeShape,
+					   makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 8.0, 0.0),
+					   &calculator);
 		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
@@ -312,26 +312,26 @@ TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 	{
 		SCOPED_TRACE("No intersection, plane outside octree");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 5.0, 0.0),
-				planeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 5.0, 0.0),
+					   planeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   &calculator);
 		EXPECT_EQ(0, contacts.size());
 	}
 
 	{
 		SCOPED_TRACE("Intersection, plane along bottom face");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				planeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   planeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   &calculator);
 		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
@@ -342,13 +342,13 @@ TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 	{
 		SCOPED_TRACE("Intersection, plane along diagnol");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				planeShape,
-				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   planeShape,
+					   makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   &calculator);
 		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("center", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
@@ -369,26 +369,26 @@ TEST(OctreeContactCalculationTests, Sphere)
 	{
 		SCOPED_TRACE("No intersection, sphere outside octree");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 10.0, 0.0),
-				sphereShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 10.0, 0.0),
+					   sphereShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   &calculator);
 		EXPECT_EQ(0, contacts.size());
 	}
 
 	{
 		SCOPED_TRACE("Intersection, sphere at center of octree");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				sphereShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(8.0, 8.0, 8.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   sphereShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(8.0, 8.0, 8.0),
+					   &calculator);
 		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("center", contacts, octree));
 	}
@@ -396,13 +396,13 @@ TEST(OctreeContactCalculationTests, Sphere)
 	{
 		SCOPED_TRACE("Intersection, sphere center on box face");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 0.0),
-				sphereShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(8.0, 8.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   sphereShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(8.0, 8.0, 0.0),
+					   &calculator);
 		checkContacts(contacts, octree);
 		EXPECT_TRUE(nodeInContacts("corner0", contacts, octree));
 		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
@@ -414,13 +414,13 @@ TEST(OctreeContactCalculationTests, Sphere)
 	{
 		SCOPED_TRACE("No intersection, sphere inside octree, but not contacting active nodes");
 		contacts = doCollision(
-				octreeShape,
-				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(0.0, 0.0, 4.0),
-				sphereShape,
-				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
-				Vector3d(8.0, 8.0, 0.0),
-				&calculator);
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 4.0),
+					   sphereShape,
+					   makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(8.0, 8.0, 0.0),
+					   &calculator);
 		EXPECT_EQ(0, contacts.size());
 	}
 }

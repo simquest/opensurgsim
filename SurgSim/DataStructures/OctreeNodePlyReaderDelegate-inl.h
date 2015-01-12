@@ -55,7 +55,7 @@ void OctreeNodePlyReaderDelegate<Data>::processVoxel(const std::string& elementN
 	position[0] = m_voxel.x;
 	position[1] = m_voxel.y;
 	position[2] = m_voxel.z;
-	m_octree->addDefaultData(position, m_numLevels);
+	m_octree->addData(position, m_numLevels);
 }
 
 template <typename Data>

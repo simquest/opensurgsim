@@ -61,8 +61,8 @@ TEST(OsgOctreeRepresentationTests, SetNodeVisibilityTest)
 
 	OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones() * 4.0);
 	auto octreeNode = std::make_shared<OctreeShape::NodeType>(boundingBox);
-	octreeNode->addData(Vector3d(0.0, 0.0, 0.0), emptyData, 2);
-	octreeNode->addData(Vector3d(0.0, 0.0, 1.0), emptyData, 3);
+	octreeNode->addData(Vector3d(0.0, 0.0, 0.0), 2, emptyData);
+	octreeNode->addData(Vector3d(0.0, 0.0, 1.0), 3, emptyData);
 
 	auto octreeShape = std::make_shared<SurgSim::Math::OctreeShape>(*octreeNode);
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("TestOctree");
