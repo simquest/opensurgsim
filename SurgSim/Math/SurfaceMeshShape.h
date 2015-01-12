@@ -68,7 +68,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Math::SurfaceMeshShape);
 
 	/// \return the type of the shape
-	virtual int getType() override;
+	int getType() const override;
 
 	/// Get mesh
 	/// \return The collision mesh associated to this MeshShape
@@ -76,16 +76,16 @@ public:
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)
-	virtual double getVolume() const override;
+	double getVolume() const override;
 
 	/// Get the volumetric center of the shape
 	/// \return The center of the shape
-	virtual Vector3d getCenter() const override;
+	Vector3d getCenter() const override;
 
 	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
-	virtual Matrix33d getSecondMomentOfVolume() const override;
+	Matrix33d getSecondMomentOfVolume() const override;
 
 	/// Set loading filename
 	/// \param fileName	The filename to load
@@ -102,7 +102,7 @@ public:
 	/// Check if this shape contains a valid mesh and the thickness is at least 1e-5 (in meter,
 	/// to avoid formal and numerical issues).
 	/// \return True if this shape contains a valid mesh and thickness is at least 1e-5; Otherwise, false.
-	virtual bool isValid() const override;
+	bool isValid() const override;
 
 private:
 

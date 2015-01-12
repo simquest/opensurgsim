@@ -66,11 +66,11 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgSkeletonRepresentation);
 
-	virtual void loadModel(const std::string& fileName) override;
+	void loadModel(const std::string& fileName) override;
 
-	virtual void setModel(std::shared_ptr<SurgSim::Framework::Asset> model) override;
+	void setModel(std::shared_ptr<SurgSim::Framework::Asset> model) override;
 
-	virtual std::shared_ptr<Model> getModel() const override;
+	std::shared_ptr<Model> getModel() const override;
 
 	/// Set the file containing the skinning shader.
 	/// \param fileName The file containing the skinning shader.
@@ -79,11 +79,11 @@ public:
 	/// \return The file containing the skinning shader.
 	std::string getSkinningShaderFileName();
 
-	virtual void setBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) override;
+	void setBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) override;
 
 protected:
-	virtual void doUpdate(double dt) override;
-	virtual bool doInitialize() override;
+	void doUpdate(double dt) override;
+	bool doInitialize() override;
 
 private:
 
@@ -117,7 +117,7 @@ private:
 	/// The root node of the skeleton tree.
 	osg::ref_ptr<osg::Node> m_root;
 
-	/// The first MatrixTransform node 
+	/// The first MatrixTransform node
 	osg::ref_ptr<osg::MatrixTransform> m_base;
 };
 

@@ -53,7 +53,7 @@ TEST(CollisionPairTests, InitTest)
 	EXPECT_ANY_THROW({CollisionPair pair(rep0, nullptr);});
 
 	ASSERT_NO_THROW({CollisionPair pair(rep0, rep1);});
-	CollisionPair pair(rep0,rep1);
+	CollisionPair pair(rep0, rep1);
 
 	EXPECT_EQ(rep0, pair.getFirst());
 	EXPECT_EQ(rep1, pair.getSecond());
@@ -63,7 +63,7 @@ TEST(CollisionPairTests, InitTest)
 	std::pair<Location, Location> penetrationPoints;
 	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
 	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
-	pair.addContact(1.0, Vector3d(1.0,0.0,0.0),penetrationPoints);
+	pair.addContact(1.0, Vector3d(1.0, 0.0, 0.0), penetrationPoints);
 	EXPECT_TRUE(pair.hasContacts());
 }
 
@@ -72,10 +72,10 @@ TEST(CollisionPairTests, SwapTest)
 	std::shared_ptr<Representation> rep0 = makeSphereRepresentation(1.0);
 	std::shared_ptr<Representation> rep1 = makeSphereRepresentation(2.0);
 
-	CollisionPair pair(rep0,rep1);
+	CollisionPair pair(rep0, rep1);
 	EXPECT_FALSE(pair.isSwapped());
-	EXPECT_EQ(rep0.get(),pair.getRepresentations().first.get());
-	EXPECT_EQ(rep1.get(),pair.getRepresentations().second.get());
+	EXPECT_EQ(rep0.get(), pair.getRepresentations().first.get());
+	EXPECT_EQ(rep1.get(), pair.getRepresentations().second.get());
 	pair.swapRepresentations();
 	EXPECT_TRUE(pair.isSwapped());
 	pair.swapRepresentations();
@@ -85,7 +85,7 @@ TEST(CollisionPairTests, SwapTest)
 	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
 	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 
-	pair.addContact(1.0, Vector3d(1.0,0.0,0.0),penetrationPoints);
+	pair.addContact(1.0, Vector3d(1.0, 0.0, 0.0), penetrationPoints);
 	EXPECT_TRUE(pair.hasContacts());
 
 	EXPECT_ANY_THROW(pair.swapRepresentations());
@@ -98,11 +98,11 @@ TEST(CollisionPairTests, setRepresentationsTest)
 	std::shared_ptr<Representation> repA = makeSphereRepresentation(99.0);
 	std::shared_ptr<Representation> repB = makeSphereRepresentation(100.0);
 
-	CollisionPair pair(repA,repB);
+	CollisionPair pair(repA, repB);
 	EXPECT_FALSE(pair.isSwapped());
 	pair.swapRepresentations();
 
-	pair.setRepresentations(rep0,rep1);
+	pair.setRepresentations(rep0, rep1);
 
 	EXPECT_EQ(rep0.get(), pair.getRepresentations().first.get());
 	EXPECT_EQ(rep1.get(), pair.getRepresentations().second.get());
@@ -111,14 +111,15 @@ TEST(CollisionPairTests, setRepresentationsTest)
 
 TEST(CollisionPairTests, addContactTest)
 {
-	std::shared_ptr<Representation> rep0 = makeSphereRepresentation(1.0);
-	std::shared_ptr<Representation> rep1 = makeSphereRepresentation(2.0);
+	auto rep0 = makeSphereRepresentation(1.0);
+	auto rep1 = makeSphereRepresentation(2.0);
+	auto other = makeSphereRepresentation(3.0);
 
-	ContactMapType& rep0Collisions = rep0->getCollisions().unsafeGet();
-	ContactMapType& rep1Collisions = rep1->getCollisions().unsafeGet();
+	auto rep0Collisions = rep0->getCollisions().safeGet();
+	auto rep1Collisions = rep1->getCollisions().safeGet();
 
-	EXPECT_TRUE(rep0Collisions.empty());
-	EXPECT_TRUE(rep1Collisions.empty());
+	EXPECT_TRUE(rep0Collisions->empty());
+	EXPECT_TRUE(rep1Collisions->empty());
 
 	std::pair<Location, Location> penetrationPoints;
 	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
@@ -128,31 +129,40 @@ TEST(CollisionPairTests, addContactTest)
 	pair.addContact(1.0, Vector3d::UnitY(), penetrationPoints);
 
 	rep0->update(0.0);
+	rep0->getCollisions().publish();
 	rep1->update(0.0);
+	rep1->getCollisions().publish();
 
-	EXPECT_EQ(1u, rep0Collisions.size());
-	auto rep0CollisionContacts = rep0Collisions.find(rep1);
-	EXPECT_NE(rep0Collisions.end(), rep0CollisionContacts);
+	rep0Collisions = rep0->getCollisions().safeGet();
+	rep1Collisions = rep1->getCollisions().safeGet();
+
+	EXPECT_EQ(1u, rep0Collisions->size());
+	auto rep0CollisionContacts = rep0Collisions->find(rep1);
+	EXPECT_NE(rep0Collisions->end(), rep0CollisionContacts);
 	EXPECT_EQ(rep1, rep0CollisionContacts->first);
 	std::shared_ptr<SurgSim::Collision::Contact> rep0FirstContact = rep0CollisionContacts->second.front();
 	EXPECT_EQ(rep0FirstContact->depth, 1.0);
 	EXPECT_TRUE(rep0FirstContact->normal.isApprox(Vector3d::UnitY()));
 	EXPECT_TRUE(rep0FirstContact->penetrationPoints.first.rigidLocalPosition.getValue().isApprox(
-		Vector3d(0.1, 0.2, 0.3)));
+					Vector3d(0.1, 0.2, 0.3)));
 	EXPECT_TRUE(rep0FirstContact->penetrationPoints.second.rigidLocalPosition.getValue().isApprox(
-		Vector3d(0.4, 0.5, 0.6)));
+					Vector3d(0.4, 0.5, 0.6)));
+	EXPECT_TRUE(rep0->collidedWith(rep1));
+	EXPECT_FALSE(rep0->collidedWith(other));
 
-	EXPECT_EQ(1u, rep1Collisions.size());
-	auto rep1CollisionContacts = rep1Collisions.find(rep0);
-	EXPECT_NE(rep1Collisions.end(), rep1CollisionContacts);
+	EXPECT_EQ(1u, rep1Collisions->size());
+	auto rep1CollisionContacts = rep1Collisions->find(rep0);
+	EXPECT_NE(rep1Collisions->end(), rep1CollisionContacts);
 	EXPECT_EQ(rep0, rep1CollisionContacts->first);
 	std::shared_ptr<SurgSim::Collision::Contact> rep1FirstContact = rep1CollisionContacts->second.front();
 	EXPECT_EQ(rep1FirstContact->depth, 1.0);
 	EXPECT_TRUE(rep1FirstContact->normal.isApprox(-Vector3d::UnitY()));
 	EXPECT_TRUE(rep1FirstContact->penetrationPoints.first.rigidLocalPosition.getValue().isApprox(
-		Vector3d(0.4, 0.5, 0.6)));
+					Vector3d(0.4, 0.5, 0.6)));
 	EXPECT_TRUE(rep1FirstContact->penetrationPoints.second.rigidLocalPosition.getValue().isApprox(
-		Vector3d(0.1, 0.2, 0.3)));
+					Vector3d(0.1, 0.2, 0.3)));
+	EXPECT_TRUE(rep1->collidedWith(rep0));
+	EXPECT_FALSE(rep0->collidedWith(other));
 }
 
 }; // namespace Collision

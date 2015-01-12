@@ -32,13 +32,13 @@ using SurgSim::Physics::Fem3DElementCube;
 namespace
 {
 /// Epsilon used in this unit test, resulting from a trial and error test.
-const double epsilon = 2.6e-9;
+const double epsilon = 3.6e-9;
 };
 
 class MockFem3DElementCube : public Fem3DElementCube
 {
 public:
-	MockFem3DElementCube(std::array<size_t, 8> nodeIds) : Fem3DElementCube(nodeIds)
+	explicit MockFem3DElementCube(std::array<size_t, 8> nodeIds) : Fem3DElementCube(nodeIds)
 	{
 	}
 
@@ -421,7 +421,7 @@ public:
 		addSubMatrix(M, nodeIdsVectorForm, 3 , &m_expectedMassMatrix);
 	}
 
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		using SurgSim::Math::getSubVector;
 		using SurgSim::Math::getSubMatrix;

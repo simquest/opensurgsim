@@ -60,11 +60,11 @@ public:
 	/// \note   the last 4 nodeIds (EFGH) should define the opposite face CCW  i.e. (EF^EG or EF^EH or EG^EH).n > 0
 	/// \note A warning will be logged in if this condition is not met, but the simulation will keep running.
 	/// \note Behavior will be undefined because of possible negative volume terms.
-	virtual void initialize(const SurgSim::Math::OdeState& state) override;
+	void initialize(const SurgSim::Math::OdeState& state) override;
 
 	/// Gets the element volume based on the input state
 	/// \param state The state to compute the volume with
-	virtual double getVolume(const SurgSim::Math::OdeState& state) const override;
+	double getVolume(const SurgSim::Math::OdeState& state) const override;
 
 	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
 	/// \param state The state to compute the force with
@@ -73,8 +73,7 @@ public:
 	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
-		double scale = 1.0) override;
+	void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) override;
 
 	/// Adds the element mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
 	/// \param state The state to compute the mass matrix with
@@ -83,8 +82,7 @@ public:
 	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M,
-		double scale = 1.0) override;
+	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale = 1.0) override;
 
 	/// Adds the element damping matrix D (= -df/dv) (computed for a given state)
 	/// to a complete system damping matrix D (assembly)
@@ -95,8 +93,7 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
 	/// \note Fem3DElementCube uses linear elasticity (not visco-elasticity), so it does not give any damping.
-	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
-		double scale = 1.0) override;
+	void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale = 1.0) override;
 
 	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
 	/// to a complete system stiffness matrix K (assembly)
@@ -106,8 +103,7 @@ public:
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
-		double scale = 1.0) override;
+	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale = 1.0) override;
 
 	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
 	/// into a complete system data structure F, M, D, K (assembly)
@@ -118,11 +114,8 @@ public:
 	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addFMDK(const SurgSim::Math::OdeState& state,
-		SurgSim::Math::Vector* F,
-		SurgSim::Math::Matrix* M,
-		SurgSim::Math::Matrix* D,
-		SurgSim::Math::Matrix* K) override;
+	void addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, SurgSim::Math::Matrix* M,
+			SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override;
 
 	/// Adds the element matrix-vector contribution F += (alphaM.M + alphaD.D + alphaK.K).x (computed for a given state)
 	/// into a complete system data structure F (assembly)
@@ -134,17 +127,14 @@ public:
 	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addMatVec(const SurgSim::Math::OdeState& state,
-		double alphaM, double alphaD, double alphaK,
-		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
+	void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
+			const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
-	virtual SurgSim::Math::Vector computeCartesianCoordinate(
-		const SurgSim::Math::OdeState& state,
-		const SurgSim::Math::Vector& naturalCoordinate) const override;
+	SurgSim::Math::Vector computeCartesianCoordinate( const SurgSim::Math::OdeState& state,
+			const SurgSim::Math::Vector& naturalCoordinate) const override;
 
-	virtual SurgSim::Math::Vector computeNaturalCoordinate(
-		const SurgSim::Math::OdeState& state,
-		const SurgSim::Math::Vector& cartesianCoordinate) const override;
+	SurgSim::Math::Vector computeNaturalCoordinate( const SurgSim::Math::OdeState& state,
+			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
 	/// Build the constitutive material 6x6 matrix

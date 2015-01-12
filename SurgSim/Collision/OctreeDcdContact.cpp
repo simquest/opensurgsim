@@ -15,6 +15,8 @@
 
 #include "SurgSim/Collision/OctreeDcdContact.h"
 
+#include <boost/functional/hash.hpp>
+
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
@@ -27,6 +29,11 @@ namespace SurgSim
 {
 namespace Collision
 {
+
+size_t OctreeDcdContact::Vector3dHash::operator()(const SurgSim::Math::Vector3d& id) const
+{
+	return boost::hash_range(id.data(), id.data() + 3);
+}
 
 OctreeDcdContact::OctreeDcdContact(std::shared_ptr<ContactCalculation> calculator) :
 	m_calculator(calculator)
@@ -49,6 +56,7 @@ void OctreeDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	typedef SurgSim::Math::OctreeShape OctreeShapeType;
 	std::shared_ptr<OctreeShapeType> shape = std::static_pointer_cast<OctreeShapeType>(pair->getFirst()->getShape());
 	calculateContactWithNode(shape->getOctree(), pair, std::make_shared<SurgSim::DataStructures::OctreePath>());
+	pair->getSecond()->getCollisions().unsafeGet().erase(m_nodeCollisionRepresentation);
 }
 
 void OctreeDcdContact::calculateContactWithNode(
@@ -63,7 +71,15 @@ void OctreeDcdContact::calculateContactWithNode(
 
 	SurgSim::Math::Vector3d nodeSize = node->getBoundingBox().sizes();
 	std::shared_ptr<SurgSim::Math::Shape> nodeShape;
-	nodeShape = std::make_shared<SurgSim::Math::BoxShape>(nodeSize.x(), nodeSize.y(), nodeSize.z());
+	if (m_shapes.count(nodeSize) > 0)
+	{
+		nodeShape = m_shapes[nodeSize];
+	}
+	else
+	{
+		nodeShape = std::make_shared<SurgSim::Math::BoxShape>(nodeSize.x(), nodeSize.y(), nodeSize.z());
+		m_shapes[nodeSize] = nodeShape;
+	}
 	SurgSim::Math::Vector3d nodeCenter = node->getBoundingBox().center();
 	SurgSim::Math::RigidTransform3d nodePose = pair->getFirst()->getPose();
 	nodePose.translation() += nodePose.linear() * nodeCenter;

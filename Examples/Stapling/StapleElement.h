@@ -34,7 +34,7 @@ public:
 protected:
 	/// Initialize this scene element
 	/// \return True on success, otherwise false.
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 private:
 	/// Flag to specify if the stapleElement was created with a collision representation.

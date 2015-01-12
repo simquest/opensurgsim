@@ -177,11 +177,10 @@ TEST(BasicThreadTest, PauseResumeUpdateTest)
 
 	for (int i = 0; i < 10; i++)
 	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-		EXPECT_LT(m.count, previousCount);
-		previousCount = m.count;
 		barrier->wait(true);
 	}
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(m.count, previousCount - 11);
 
 	m.setIdle(true);
 
@@ -193,11 +192,10 @@ TEST(BasicThreadTest, PauseResumeUpdateTest)
 
 	for (int i = 0; i < 10; i++)
 	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-		EXPECT_EQ(previousCount, m.count);
-		previousCount = m.count;
 		barrier->wait(true);
 	}
+	EXPECT_EQ(previousCount, m.count);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 
 	m.setIdle(false);
 
@@ -206,14 +204,13 @@ TEST(BasicThreadTest, PauseResumeUpdateTest)
 
 	for (int i = 0; i < 10; i++)
 	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-		EXPECT_LT(m.count, previousCount);
-		previousCount = m.count;
 		barrier->wait(true);
 	}
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(m.count, previousCount - 10);
 
 	barrier->wait(false);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	m.stop();
 }
 
@@ -267,6 +264,35 @@ TEST(BasicThreadTest, SwitchSyncOnThread)
 	count = m.count;
 	boost::this_thread::sleep(boost::posix_time::milliseconds(200));
 	EXPECT_GT(count, m.count);
+
+	m.stop();
+}
+
+TEST(BasicThreadTest, RealTimings)
+{
+	MockThread m;
+	m.start(nullptr);
+
+	while(m.getCpuTime() < 1e-6);
+	EXPECT_GT(m.getCpuTime(), 1e-6);
+	EXPECT_GT(m.getUpdateCount(), 0u);
+
+	// Ask the manager to idle for a while, just the time for us to reset the timer and check right after
+	// what the timer contains (the delay between the reset and the checks could trigger a race condition).
+	// Asking the thread to idle suppress this race condition.
+	m.setIdle(true);
+
+	// Reset the timer (=> no more frames in the timer queue)
+	m.resetCpuTimeAndUpdateCount();
+	EXPECT_DOUBLE_EQ(0.0, m.getCpuTime());
+	EXPECT_EQ(m.getUpdateCount(), 0u);
+
+	// Resume the thread loop update.
+	m.setIdle(false);
+
+	while(m.getCpuTime() < 1e-6);
+	EXPECT_GT(m.getCpuTime(), 1e-6);
+	EXPECT_GT(m.getUpdateCount(), 0u);
 
 	m.stop();
 }

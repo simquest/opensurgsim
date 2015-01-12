@@ -18,6 +18,7 @@ include_directories (
 )
 
 set(UNIT_TEST_SOURCES
+	DriveElementFromInputBehaviorTests.cpp
 	KeyboardTogglesComponentBehaviorTests.cpp
 	MassSpring1DRepresentationTests.cpp
 	MassSpring2DRepresentationTests.cpp
@@ -25,6 +26,7 @@ set(UNIT_TEST_SOURCES
 	MassSpringNDRepresentationUtilsTests.cpp
 	PoseInterpolatorTests.cpp
 	SpringTestUtils.cpp
+	TransferParticlesToPointCloudBehaviorTests.cpp
 	TransferPhysicsToGraphicsMeshBehaviorTests.cpp
 	TransferPhysicsToPointCloudBehaviorTests.cpp
 	VisualizeContactsBehaviorTests.cpp
@@ -43,6 +45,7 @@ configure_file(
 )
 
 set(LIBS
+	IdentityPoseDevice
 	SurgSimBlocks
 	SurgSimGraphics
 )

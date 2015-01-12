@@ -78,12 +78,10 @@ void DeformableRepresentation::setInitialState(
 	// Set the representation number of degree of freedom
 	setNumDof(m_initialState->getNumDof());
 
-	m_externalGeneralizedForce.resize(getNumDof());
-	m_externalGeneralizedStiffness.resize(getNumDof(), getNumDof());
-	m_externalGeneralizedDamping.resize(getNumDof(), getNumDof());
-	m_externalGeneralizedForce.setZero();
-	m_externalGeneralizedStiffness.setZero();
-	m_externalGeneralizedDamping.setZero();
+	m_hasExternalGeneralizedForce = false;
+	m_externalGeneralizedForce.setZero(getNumDof());
+	m_externalGeneralizedStiffness.setZero(getNumDof(), getNumDof());
+	m_externalGeneralizedDamping.setZero(getNumDof(), getNumDof());
 }
 
 const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const
@@ -183,9 +181,13 @@ void DeformableRepresentation::afterUpdate(double dt)
 	*m_finalState = *m_currentState;
 
 	// Reset the external generalized force, stiffness and damping
-	m_externalGeneralizedForce.setZero();
-	m_externalGeneralizedStiffness.setZero();
-	m_externalGeneralizedDamping.setZero();
+	if (m_hasExternalGeneralizedForce)
+	{
+		m_externalGeneralizedForce.setZero();
+		m_externalGeneralizedStiffness.setZero();
+		m_externalGeneralizedDamping.setZero();
+		m_hasExternalGeneralizedForce = false;
+	}
 }
 
 void DeformableRepresentation::applyCorrection(double dt,
@@ -210,7 +212,7 @@ void DeformableRepresentation::applyCorrection(double dt,
 	}
 }
 
-void DeformableRepresentation::deactivateAndReset(void)
+void DeformableRepresentation::deactivateAndReset()
 {
 	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
 			<< getName() << " deactivated and reset:" << std::endl

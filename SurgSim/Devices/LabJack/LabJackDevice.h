@@ -284,7 +284,7 @@ public:
 	/// initialized yet.  This method performs any needed initialization.
 	/// \return True on success.
 	/// \exception Asserts if already initialized, or if unable to get a scaffold.
-	virtual bool initialize() override;
+	bool initialize() override;
 
 	/// Check whether this device is initialized.
 	bool isInitialized() const;
@@ -480,7 +480,7 @@ private:
 	/// Finalize (de-initialize) the device.
 	/// \return True if device was successfully un-registered.
 	/// \exception Asserts if not initialized.
-	virtual bool finalize() override;
+	bool finalize() override;
 
 	friend class LabJackScaffold;
 

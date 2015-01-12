@@ -25,6 +25,10 @@ set(UNIT_TEST_SOURCES
 	BufferedValueTests.cpp
 	DataGroupTests.cpp
 	DataStructuresConvertTests.cpp
+	Grid1DTests.cpp
+	Grid2DTests.cpp
+	Grid3DTests.cpp
+	GridTests.cpp
 	ImageTest.cpp
 	IndexDirectoryTests.cpp
 	IndexedLocalCoordinateTest.cpp
@@ -43,6 +47,7 @@ set(UNIT_TEST_SOURCES
 )
 
 set(UNIT_TEST_HEADERS
+	GridTests.h
 	MockObjects.h
 )
 

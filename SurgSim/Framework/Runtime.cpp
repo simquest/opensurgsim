@@ -355,9 +355,27 @@ bool Runtime::loadScene(const std::string& fileName)
 
 		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
 	}
+	else
+	{
+		SURGSIM_LOG_WARNING(Logger::getLogger("Runtime")) << "Could not find Scenefile " << fileName;
+	}
 
 	return result;
 
+}
+
+void Runtime::saveScene(const std::string& fileName) const
+{
+	std::ofstream out(fileName);
+	if (out.good())
+	{
+		out << m_scene->encode();
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(Logger::getLogger("Runtime"))
+				<< "Failed to open " <<  fileName << ". Cannot save the scene.";
+	}
 }
 
 }; // namespace Framework

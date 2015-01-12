@@ -65,7 +65,7 @@ void Fem3DRepresentationBilateral3D::doBuild(double dt,
 	// The equation is
 	//   u + (p(t) - s) = 0
 	//
-	// Using backward-euler integration,
+	// Using backward-Euler integration,
 	//   u = dt.v(t + dt)
 	//
 	// The constraint (p(t) - s) exists in 3-space, but we must modify the velocity of coordinates in (n * 3) space. The

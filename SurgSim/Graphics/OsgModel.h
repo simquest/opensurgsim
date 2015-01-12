@@ -38,7 +38,7 @@ class OsgModel : public Model
 public:
 
 	/// Constructor
-	explicit OsgModel();
+	OsgModel();
 
 	virtual ~OsgModel();
 
@@ -49,7 +49,7 @@ public:
 
 private:
 
-	virtual bool doLoad(const std::string& filePath) override;
+	bool doLoad(const std::string& filePath) override;
 
 	osg::ref_ptr<osg::Node> m_root;
 };

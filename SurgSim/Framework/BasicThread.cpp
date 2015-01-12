@@ -29,6 +29,7 @@ namespace Framework
 {
 
 BasicThread::BasicThread(const std::string& name) :
+	m_logger(Logger::getLogger(name)),
 	m_name(name),
 	m_period(1.0 / 30),
 	m_isIdle(false),
@@ -37,6 +38,11 @@ BasicThread::BasicThread(const std::string& name) :
 	m_stopExecution(false),
 	m_isSynchronous(false)
 {
+	// The maximum number of frames in the timer is set to 1,000,000
+	// + If the timer is reset every second, that is enough frame to measure real rates up to 1MHz
+	// + If the timer is reset every minute, that is enough frame to measure real rates up to 16.66KHz
+	// + If the timer is reset every hour, that is enough frame to measure real rates up to 277.77Hz
+	m_timer.setMaxNumberOfFrames(1000000);
 }
 
 #ifdef _MSC_VER
@@ -103,27 +109,34 @@ void BasicThread::operator()()
 		return;
 	}
 
-	boost::chrono::duration<double> frameTime(0.0);
+
+	size_t numUpdates = 0;
+	boost::chrono::duration<double> totalFrameTime(0.0);
 	boost::chrono::duration<double> sleepTime(0.0);
+	boost::chrono::duration<double> totalSleepTime(0.0);
 	Clock::time_point start;
 
 	m_isRunning = true;
+	m_timer.start();
 	while (m_isRunning && !m_stopExecution)
 	{
+		start = Clock::now();
 		if (! m_isSynchronous)
 		{
-			// Check for frameTime being > desired update period report error, adjust ...
-			if (m_period > frameTime)
-			{
-				sleepTime = m_period - frameTime;
-				boost::this_thread::sleep_until(Clock::now() + sleepTime);
-			}
-			start = Clock::now();
 			if (!m_isIdle)
 			{
+				m_timer.beginFrame();
 				m_isRunning = doUpdate(m_period.count());
+				m_timer.endFrame();
 			}
-			frameTime = Clock::now() - start;
+
+			// Check for frameTime being > desired update period report error, adjust ...
+			sleepTime = m_period - (Clock::now() - start);
+			if (sleepTime.count() > 0.0)
+			{
+				totalSleepTime += sleepTime;
+				boost::this_thread::sleep_until(start + m_period);
+			}
 		}
 		else
 		{
@@ -132,14 +145,35 @@ void BasicThread::operator()()
 			// all the threads that are waiting to indefinitely wait as there is one less thread on the barrier
 			// #threadsafety
 			bool success = waitForBarrier(true);
+			totalSleepTime += Clock::now() - start;
+
 			if (success && !m_isIdle)
 			{
+				m_timer.beginFrame();
 				m_isRunning = doUpdate(m_period.count());
+				m_timer.endFrame();
 			}
 			if (! success || !m_isRunning)
 			{
 				m_isRunning = false;
 				m_isSynchronous = false;
+			}
+		}
+		totalFrameTime += Clock::now() - start;
+		numUpdates++;
+
+		if (m_logger->getThreshold() >= SURGSIM_LOG_LEVEL(INFO))
+		{
+			if (totalFrameTime.count() > 5.0)
+			{
+				SURGSIM_LOG_INFO(m_logger) << std::setprecision(4)
+					<< "Rate: " << numUpdates / totalFrameTime.count() << "Hz "
+					<< "(Requested " << 1.0 / m_period.count() << "Hz), "
+					<< "Average doUpdate: " << (totalFrameTime.count() - totalSleepTime.count()) / numUpdates << "s, "
+					<< "Sleep: " << 100.0 * totalSleepTime.count() / totalFrameTime.count() << "%";
+				totalFrameTime = boost::chrono::duration<double>::zero();
+				totalSleepTime = boost::chrono::duration<double>::zero();
+				numUpdates = 0;
 			}
 		}
 	}
@@ -158,8 +192,7 @@ void BasicThread::stop()
 	{
 		if (! m_thisThread.joinable())
 		{
-			SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Thread " << getName() <<
-					" is detached, cannot wait for it to stop.";
+			SURGSIM_LOG_INFO(m_logger) << "Thread is detached, cannot wait for it to stop.";
 		}
 		else
 		{
@@ -168,8 +201,7 @@ void BasicThread::stop()
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Thread " << getName() <<
-				" is in synchronouse mode, stop with a barrier->wait(false).";
+		SURGSIM_LOG_INFO(m_logger) << "Thread is in synchronouse mode, stop with a barrier->wait(false).";
 	}
 }
 
@@ -194,7 +226,7 @@ bool BasicThread::executeInitialization()
 
 	success = initialize();
 	SURGSIM_ASSERT(success) << "Initialization has failed for thread " << getName();
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Initialization has succeeded for thread " << getName();
+	SURGSIM_LOG_INFO(m_logger) << "Initialization has succeeded for thread";
 	// Waits for all the threads to init and then proceeds
 	// If one of the other thread asserts and ends this does not matter
 	// as the process will be taken down
@@ -208,7 +240,7 @@ bool BasicThread::executeInitialization()
 	success = startUp();
 
 	SURGSIM_ASSERT(success) << "Startup has failed for thread " << getName();
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Startup has succeeded for thread " << getName();
+	SURGSIM_LOG_INFO(m_logger) << "Startup has succeeded for thread " << getName();
 
 	// Waits for all the threads to startup and then proceeds
 	success = waitForBarrier(success);
@@ -237,6 +269,21 @@ bool BasicThread::setSynchronous(bool val)
 bool BasicThread::isSynchronous()
 {
 	return m_isSynchronous;
+}
+
+double BasicThread::getCpuTime() const
+{
+	return m_timer.getCumulativeTime();
+}
+
+size_t BasicThread::getUpdateCount() const
+{
+	return m_timer.getCurrentNumberOfFrames();
+}
+
+void BasicThread::resetCpuTimeAndUpdateCount()
+{
+	m_timer.start();
 }
 
 bool BasicThread::doUpdate(double dt)

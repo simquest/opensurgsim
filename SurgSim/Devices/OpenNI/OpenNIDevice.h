@@ -45,9 +45,9 @@ public:
 	/// Destructor.
 	virtual ~OpenNIDevice();
 
-	virtual bool initialize() override;
+	bool initialize() override;
 
-	virtual bool finalize() override;
+	bool finalize() override;
 
 	/// Check if this device is initialized.
 	/// \return True if this device is initialized; otherwise, false.

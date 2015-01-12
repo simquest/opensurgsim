@@ -50,7 +50,7 @@ MeshShape::MeshShape() :
 
 }
 
-int MeshShape::getType()
+int MeshShape::getType() const
 {
 	return SHAPE_TYPE_MESH;
 }

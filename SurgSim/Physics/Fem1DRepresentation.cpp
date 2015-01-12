@@ -70,7 +70,7 @@ RepresentationType Fem1DRepresentation::getType() const
 }
 
 void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-										 SurgSim::Math::Vector& generalizedForce,
+										 const SurgSim::Math::Vector& generalizedForce,
 										 const SurgSim::Math::Matrix& K,
 										 const SurgSim::Math::Matrix& D)
 {
@@ -126,6 +126,7 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			index1++;
 		}
 	}
+	m_hasExternalGeneralizedForce = true;
 }
 
 bool Fem1DRepresentation::doWakeUp()

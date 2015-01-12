@@ -23,6 +23,11 @@
 
 namespace SurgSim
 {
+namespace Math
+{
+class BoxShape;
+};
+
 namespace Collision
 {
 
@@ -40,12 +45,12 @@ public:
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return A pair of shape type ids
-	virtual std::pair<int, int> getShapeTypes() override;
+	std::pair<int, int> getShapeTypes() override;
 
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param pair The symmetric pair that is under consideration.
-	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 	/// Calculate the collision between a specific octree node and a shape
 	/// This function will check for contact between the node and shape. If
@@ -62,11 +67,21 @@ private:
 	/// The contact calculator to use on each octree node
 	const std::shared_ptr<ContactCalculation> m_calculator;
 
-	/// The shape types that this contact caculation handles
+	/// The shape types that this contact calculation handles
 	std::pair<int, int> m_shapeTypes;
 
 	/// Collision Representation used to detect contacts with each octree node
 	std::shared_ptr<ShapeCollisionRepresentation> m_nodeCollisionRepresentation;
+
+	/// Enable a Vector3d to be used as a key in an unordered map.
+	class Vector3dHash
+	{
+	public:
+		size_t operator()(const SurgSim::Math::Vector3d& id) const;
+	};
+
+	/// The shapes used for the contact calculations are cached for performance.
+	std::unordered_map<SurgSim::Math::Vector3d, std::shared_ptr<SurgSim::Math::Shape>, Vector3dHash> m_shapes;
 };
 
 };

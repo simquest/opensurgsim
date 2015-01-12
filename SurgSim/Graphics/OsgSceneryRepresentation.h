@@ -50,14 +50,14 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgSceneryRepresentation);
 
-	virtual void loadModel(const std::string& fileName) override;
+	void loadModel(const std::string& fileName) override;
 
-	virtual void setModel(std::shared_ptr<SurgSim::Framework::Asset> model) override;
+	void setModel(std::shared_ptr<SurgSim::Framework::Asset> model) override;
 
-	virtual std::shared_ptr<Model> getModel() const override;
+	std::shared_ptr<Model> getModel() const override;
 
 private:
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 	/// A osg::Node to hold the objet loaded from file
 	osg::ref_ptr<osg::Node> m_osgNode;
 

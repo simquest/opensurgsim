@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
-#include "SurgSim/Framework/Runtime.h" //< Used to initialize the Component Fem3DRepresentation
+#include "SurgSim/Framework/Runtime.h" ///< Used to initialize the Component Fem3DRepresentation
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
@@ -50,7 +50,7 @@ public:
 	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
 
 protected:
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		m_rho = 2000.0;
 		m_nu = 0.45;

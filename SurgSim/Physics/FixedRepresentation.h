@@ -44,11 +44,11 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::FixedRepresentation);
 
-	virtual RepresentationType getType() const override;
+	RepresentationType getType() const override;
 
-	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
+	void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
 
-	virtual void update(double dt) override;
+	void update(double dt) override;
 };
 
 }; // Physics

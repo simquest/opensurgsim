@@ -18,7 +18,8 @@
 
 #include <string>
 #include <memory>
-#include "SurgSim/Framework/Component.h"
+
+#include "SurgSim/Framework/Representation.h"
 
 namespace SurgSim
 {
@@ -35,10 +36,9 @@ class InputConsumer;
 
 SURGSIM_STATIC_REGISTRATION(InputComponent);
 
-/// InputComponent combines the Component interface and the InputConsumerInterface so that input devices can
-/// provide input through the normal component interface. Multiple InputComponents can be added to
-/// the same device.
-class InputComponent : public SurgSim::Framework::Component
+/// InputComponents connect devices to SceneElements, facilitating data transfer
+/// from a device to SceneElements and other Components.
+class InputComponent : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor
@@ -74,10 +74,10 @@ public:
 	void getData(SurgSim::DataStructures::DataGroup* dataGroup);
 
 	/// Overridden from Component, do nothing
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Overridden from Component, do nothing
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
 	/// Gets device name.
 	/// \return	The device name.

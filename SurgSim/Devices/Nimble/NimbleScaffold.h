@@ -49,10 +49,10 @@ public:
 	static std::shared_ptr<NimbleScaffold> getOrCreateSharedInstance();
 
 protected:
-	virtual bool doInitialize() override;
-	virtual bool doStartUp() override;
-	virtual bool doUpdate(double dt) override;
-	virtual void doBeforeStop() override;
+	bool doInitialize() override;
+	bool doStartUp() override;
+	bool doUpdate(double dt) override;
+	void doBeforeStop() override;
 
 private:
 	/// Internal shared state data type.

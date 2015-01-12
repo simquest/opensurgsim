@@ -33,6 +33,7 @@ set(UNIT_TEST_SOURCES
 	OsgShaderRenderTests.cpp
 	OsgSkeletonRepresentationRenderTests.cpp
 	OsgSphereRepresentationRenderTests.cpp
+	OsgTextRepresentationRenderTests.cpp
 	OsgVectorFieldRepresentationRenderTests.cpp
 	OsgViewElementRenderTests.cpp
 	RenderTest.cpp

@@ -27,22 +27,22 @@ namespace Testing
 class MockPhysicsManager : public SurgSim::Physics::PhysicsManager
 {
 public:
-	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override
+	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override
 	{
 		return SurgSim::Physics::PhysicsManager::executeAdditions(component);
 	}
 
-	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override
+	bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override
 	{
 		return SurgSim::Physics::PhysicsManager::executeRemovals(component);
 	}
 
-	virtual bool doInitialize() override
+	bool doInitialize() override
 	{
 		return SurgSim::Physics::PhysicsManager::doInitialize();
 	}
 
-	virtual bool doStartUp() override
+	bool doStartUp() override
 	{
 		return SurgSim::Physics::PhysicsManager::doStartUp();
 	}

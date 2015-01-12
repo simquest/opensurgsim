@@ -40,13 +40,13 @@ public:
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
 protected:
 	/// Initialize the behavior
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 	/// Wakeup the behavior
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
 private:
 	/// Control how often a sphere is added

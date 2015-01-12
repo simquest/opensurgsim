@@ -40,8 +40,8 @@ struct TestListener : public SurgSim::Input::InputConsumerInterface
 		creatKeyMap();
 		createModifierMap();
 	}
-	virtual void initializeInput(const std::string& device, const DataGroup& inputData) override {}
-	virtual void handleInput(const std::string& device, const DataGroup& inputData) override
+	void initializeInput(const std::string& device, const DataGroup& inputData) override {}
+	void handleInput(const std::string& device, const DataGroup& inputData) override
 	{
 		int key, modifierMask;
 		inputData.integers().get("key", &key);

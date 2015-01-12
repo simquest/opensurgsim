@@ -38,7 +38,7 @@ public:
 	OdeState();
 
 	/// Destructor
-	~OdeState();
+	virtual ~OdeState();
 
 	/// Comparison operator (equality test)
 	/// \param state The state to compare it to
@@ -52,13 +52,13 @@ public:
 
 	/// Resets the state
 	/// \note Simply set all positions/velocities to 0 and remove all boundary conditions
-	void reset();
+	virtual void reset();
 
 	/// Allocates the state for a given number of degrees of freedom
 	/// \param numDofPerNode The number of degrees of freedom per node to account for
 	/// \param numNodes The number of nodes to account for
 	/// \note This method clears all the data structures and remove all existing boundary conditions
-	void setNumDof(size_t numDofPerNode, size_t numNodes);
+	virtual void setNumDof(size_t numDofPerNode, size_t numNodes);
 
 	/// Retrieves the number of degrees of freedom
 	/// \return The number of DOF for this representation
@@ -134,7 +134,7 @@ public:
 
 	/// Check if this state is numerically valid
 	/// \return True if all positions and velocities are valid numerical values, False otherwise
-	bool isValid() const;
+	virtual bool isValid() const;
 
 private:
 	/// Default public copy constructor and assignment operator are being used on purpose

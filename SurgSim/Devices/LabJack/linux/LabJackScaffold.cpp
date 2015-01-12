@@ -746,14 +746,12 @@ bool LabJackScaffold::runInputFrame(LabJackScaffold::DeviceData* info)
 		info->cachedOutputIndices = true;
 	}
 
-	if (!info->deviceObject->hasOutputProducer() || info->cachedOutputIndices)
+	if (!updateDevice(info))
 	{
-		if (!updateDevice(info))
-		{
-			return false;
-		}
-		info->deviceObject->pushInput();
+		return false;
 	}
+	info->deviceObject->pushInput();
+
 	return true;
 }
 

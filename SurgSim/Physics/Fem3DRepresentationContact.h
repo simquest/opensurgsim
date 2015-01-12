@@ -29,7 +29,7 @@ class Fem3DRepresentationContact : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	explicit Fem3DRepresentationContact();
+	Fem3DRepresentationContact();
 
 	/// Destructor
 	virtual ~Fem3DRepresentationContact();
@@ -40,7 +40,7 @@ public:
 
 	/// Gets the Type of representation that this implementation is concerned with
 	/// \return RepresentationType for this implementation
-	virtual RepresentationType getRepresentationType() const override;
+	RepresentationType getRepresentationType() const override;
 
 private:
 	/// Gets the number of degree of freedom.

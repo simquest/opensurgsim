@@ -16,6 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
 
+#include "SurgSim/DataStructures/Grid.h"
 #include "SurgSim/DataStructures/TetrahedronMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/Vertices.h"
@@ -23,6 +24,44 @@
 
 #include <array>
 #include <limits>
+
+class ElementTest
+{
+public:
+	int m_number;
+	std::string m_string;
+
+	ElementTest() : m_number(-1), m_string("Empty"){}
+
+	explicit ElementTest(int i) : m_number(i) { std::stringstream s; s << i; m_string = s.str(); }
+
+	ElementTest(const ElementTest& e) : m_number(e.m_number), m_string(e.m_string){}
+
+	bool operator ==(const ElementTest& e) const
+	{
+		return m_number == e.m_number && m_string.compare(e.m_string) == 0;
+	}
+};
+
+// Add a hash function for this class
+namespace std
+{
+template <>
+struct hash<ElementTest>
+{
+	std::size_t operator()(const ElementTest& k) const
+	{
+		using std::size_t;
+		using std::hash;
+		using std::string;
+
+		// Compute individual hash values for first,
+		// second and third and combine them using XOR
+		// and bit shifting:
+		return (hash<string>()(k.m_string) ^ (hash<int>()(k.m_number) << 1));
+	}
+};
+}; // namespace std
 
 template<typename T>
 class Mock3DData
@@ -467,6 +506,32 @@ private:
 
 	/// Number of updates performed on the mesh
 	int m_numUpdates;
+};
+
+template <typename T, size_t N>
+class MockGrid : public SurgSim::DataStructures::Grid<T, N>
+{
+public:
+	typedef typename SurgSim::DataStructures::Grid<T, N>::CellContent CellContent;
+	typedef typename SurgSim::DataStructures::Grid<T, N>::NDId NDId;
+	typedef typename SurgSim::DataStructures::Grid<T, N>::NDIdHash NDIdHash;
+
+	MockGrid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds) :
+		SurgSim::DataStructures::Grid<T,N>(cellSize, bounds)
+	{}
+
+	std::unordered_map<NDId, CellContent, NDIdHash>& getActiveCells() { return this->m_activeCells; }
+
+	std::unordered_map<T, NDId>& getCellIds() { return this->m_cellIds; }
+
+	std::vector<T>& getNonConstNeighbors(const T& element)
+	{
+		return const_cast<std::vector<T>&>(this->getNeighbors(element));
+	}
+
+	Eigen::Matrix<double, N, 1> getSize() const { return this->m_size; }
+
+	Eigen::AlignedBox<double, N> getAABB() const { return this->m_aabb; }
 };
 
 namespace wrappers

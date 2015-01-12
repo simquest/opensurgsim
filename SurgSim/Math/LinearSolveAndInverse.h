@@ -50,14 +50,14 @@ public:
 class LinearSolveAndInverseDenseMatrix : public LinearSolveAndInverse
 {
 public:
-	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
 };
 
 /// Derivation for diagonal matrix type
 class LinearSolveAndInverseDiagonalMatrix : public LinearSolveAndInverse
 {
 public:
-	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
 };
 
 /// Derivation for tri-diagonal block matrix type
@@ -66,7 +66,7 @@ template <size_t BlockSize>
 class LinearSolveAndInverseTriDiagonalBlockMatrix : public LinearSolveAndInverse
 {
 public:
-	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
 
 protected:
 	/// Computes the inverse matrix
@@ -116,7 +116,7 @@ class LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix :
 	public LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>
 {
 public:
-	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
 
 	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalBlock;
 	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::m_inverse;

@@ -59,15 +59,15 @@ public:
 
 	/// Executes the update operation
 	/// \param	dt	The time step
-	virtual void doUpdate(double dt) override;
+	void doUpdate(double dt) override;
 
-	virtual void setOctreeShape(const std::shared_ptr<SurgSim::Math::Shape>& shape) override;
-	virtual std::shared_ptr<SurgSim::Math::OctreeShape> getOctreeShape() const override;
+	void setOctreeShape(const std::shared_ptr<SurgSim::Math::Shape>& shape) override;
+	std::shared_ptr<SurgSim::Math::OctreeShape> getOctreeShape() const override;
 
 	/// Mark the OctreeNode visible/invisible in the given a OctreePath (typedef-ed in OctreeNode.h).
 	/// \param path An OctreePath, giving the path leads to the OctreeNode whose visibility to be changed.
 	/// \param visibility Whether or not the OctreeNode specified by 'path' is visible or not.
-	virtual	void setNodeVisible(const SurgSim::DataStructures::OctreePath& path, bool visibility) override;
+	void setNodeVisible(const SurgSim::DataStructures::OctreePath& path, bool visibility) override;
 
 private:
 	/// Draw the Octree associated with this OSG representation.

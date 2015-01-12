@@ -40,6 +40,7 @@ surgsim_add_library(
 set(LIBS
 	SurgSimInput
 	${Boost_LIBRARIES}
+	${OPENSCENEGRAPH_LIBRARIES}
 )
 
 target_link_libraries(KeyboardDevice ${LIBS}

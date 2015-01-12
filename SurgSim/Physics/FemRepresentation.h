@@ -99,37 +99,37 @@ public:
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
-	virtual void beforeUpdate(double dt) override;
+	void beforeUpdate(double dt) override;
 
 	/// Postprocessing done after the update call
 	/// \param dt The time step (in seconds)
 	/// \note This method will update all FemElement with the final state
 	/// \note and potentially deactivate/reset the representation if necessary.
-	virtual void afterUpdate(double dt) override;
+	void afterUpdate(double dt) override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
 	/// \return The vector containing f(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
-	virtual SurgSim::Math::Vector& computeF(const SurgSim::Math::OdeState& state) override;
+	SurgSim::Math::Vector& computeF(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of the LHS matrix M(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
 	/// \return The matrix M(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	virtual const SurgSim::Math::Matrix& computeM(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::Matrix& computeM(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of D = -df/dv (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix D = -df/dv(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	virtual const SurgSim::Math::Matrix& computeD(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::Matrix& computeD(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of K = -df/dx (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix K = -df/dx(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	virtual const SurgSim::Math::Matrix& computeK(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::Matrix& computeK(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
 	/// When all the terms are needed, this method can perform optimization in evaluating everything together
@@ -140,8 +140,8 @@ public:
 	/// \param[out] K The matrix K = -df/dx(x,v)
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
-							 SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
+	void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f, SurgSim::Math::Matrix** M,
+			SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
 
 protected:
 	/// Adds the Rayleigh damping forces
@@ -171,10 +171,10 @@ protected:
 	/// \note This method does not do anything if gravity is disabled
 	void addGravityForce(SurgSim::Math::Vector *f, const SurgSim::Math::OdeState& state, double scale = 1.0);
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
 	/// Useful information per node
-	std::vector<double> m_massPerNode; //< Useful in setting up the gravity force F=mg
+	std::vector<double> m_massPerNode; ///< Useful in setting up the gravity force F=mg
 
 	/// Filename for loading the fem representation.
 	std::string m_filename;

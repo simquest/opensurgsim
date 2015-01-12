@@ -36,7 +36,7 @@ public:
 	/// Constructor
 	/// \param	length	Length of the plane in X (default is 1000)
 	/// \param	width	Width of the plane in Z (default is 1000)
-	OsgPlane(float length = 1000.0f, float width = 1000.0f) :
+	explicit OsgPlane(float length = 1000.0f, float width = 1000.0f) :
 		m_geode(new osg::Geode())
 	{
 		osg::ref_ptr<osg::Geometry> plane = osg::createTexturedQuadGeometry(

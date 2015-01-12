@@ -43,7 +43,7 @@ public:
 	/// Handle the input coming from device.
 	/// \param device The name of the device that is producing the input.
 	/// \param inputData The input data coming from the device.
-	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
+	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
 	{
 		m_lastInput.set(inputData);
 	}
@@ -51,8 +51,7 @@ public:
 	/// Initialize the input data information stored in this input consumer.
 	/// \param device The name of the device that is producing the input.
 	/// \param initialData Initial input data of the device.
-	virtual void initializeInput(const std::string& device,
-		const SurgSim::DataStructures::DataGroup& initialData) override
+	void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& initialData) override
 	{
 		m_lastInput.set(initialData);
 	}
@@ -71,7 +70,7 @@ private:
 
 
 InputComponent::InputComponent(const std::string& name) :
-	Component(name),
+	Representation(name),
 	m_deviceName(),
 	m_deviceConnected(false),
 	m_input(std::make_shared<InputConsumer>())

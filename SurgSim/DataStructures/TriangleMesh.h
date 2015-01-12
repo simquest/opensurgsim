@@ -95,9 +95,9 @@ public:
 	void copyWithTransform(const SurgSim::Math::RigidTransform3d& pose, const TriangleMesh& source);
 
 protected:
-	virtual void doUpdate() override;
+	void doUpdate() override;
 
-	virtual bool doLoad(const std::string& fileName) override;
+	bool doLoad(const std::string& fileName) override;
 
 };
 

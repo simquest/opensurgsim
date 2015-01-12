@@ -45,7 +45,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemElement.cpp
 	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
-	FemRepresentationParameters.cpp
 	FixedRepresentation.cpp
 	FixedRepresentationBilateral3D.cpp
 	FixedRepresentationContact.cpp
@@ -107,7 +106,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	FemElement.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
-	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FixedRepresentationBilateral3D.h
 	FixedRepresentationContact.h
@@ -152,6 +150,7 @@ surgsim_add_library(
 
 SET(LIBS
 	SurgSimCollision
+	SurgSimInput
 )
 
 target_link_libraries(SurgSimPhysics ${LIBS})

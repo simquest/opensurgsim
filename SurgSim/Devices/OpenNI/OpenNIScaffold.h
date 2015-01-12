@@ -44,11 +44,11 @@ public:
 	virtual ~OpenNIScaffold();
 
 protected:
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
-	virtual bool doStartUp() override;
+	bool doStartUp() override;
 
-	virtual bool doUpdate(double dt) override;
+	bool doUpdate(double dt) override;
 
 private:
 	/// Internal shared state data type.
