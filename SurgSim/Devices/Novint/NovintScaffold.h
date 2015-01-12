@@ -55,8 +55,6 @@ public:
 
 private:
 	/// Constructor.
-	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
-	/// 			  If unspecified or empty, a console logger will be created and used.
 	explicit NovintScaffold();
 
 	NovintScaffold(const NovintScaffold&) /*= delete*/;
