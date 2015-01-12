@@ -55,7 +55,7 @@ public:
 
 private:
 	/// Constructor.
-	explicit NovintScaffold();
+	NovintScaffold();
 
 	NovintScaffold(const NovintScaffold&) /*= delete*/;
 	NovintScaffold& operator=(const NovintScaffold&) /*= delete*/;

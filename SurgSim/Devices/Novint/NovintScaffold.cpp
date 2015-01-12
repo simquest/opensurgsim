@@ -65,7 +65,7 @@ public:
 	{
 	}
 
-	Handle(const std::string& serial) :
+	explicit Handle(const std::string& serial) :
 		m_deviceHandle(HDL_INVALID_HANDLE),
 		m_scaffold(NovintScaffold::getInstance())
 	{
@@ -539,7 +539,7 @@ std::shared_ptr<NovintScaffold::Handle> NovintScaffold::findHandle(const std::st
 		else
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device named '" << name <<
-				"', but that name does not map to a serial number.  Was the configuration file found?" << 
+				"', but that name does not map to a serial number.  Was the configuration file found?" <<
 				" Does it contain the text of a YAML node (for the map from name to serial number)?  Is '" << name <<
 				"' a key in that map?";
 		}

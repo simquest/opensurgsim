@@ -61,7 +61,7 @@ TEST(Novint7DofDeviceTest, CreateAndInitializeDevice)
 	const double orientationScale = 2.0;
 	device->setOrientationScale(orientationScale);
 	EXPECT_EQ(orientationScale, device->getOrientationScale());
-	
+
 	EXPECT_TRUE(device->finalize());
 }
 
