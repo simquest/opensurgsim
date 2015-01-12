@@ -117,15 +117,15 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 	Matrix33d dRdAxisZ;
 	Matrix33d dRdAngle =
 		-sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * axis * axis.transpose();
-	dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos* axis[1], oneMinusCos* axis[2],
-			 oneMinusCos* axis[1], 0.0, -sinAngle,
-			 oneMinusCos* axis[2], sinAngle, 0.0;
-	dRdAxisY << 0.0, oneMinusCos* axis[0], sinAngle,
-			 oneMinusCos* axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos* axis[2],
-			 -sinAngle, oneMinusCos* axis[2], 0.0;
-	dRdAxisZ << 0.0, -sinAngle, oneMinusCos* axis[0],
-			 sinAngle, 0.0, oneMinusCos* axis[1],
-			 oneMinusCos* axis[0], oneMinusCos* axis[1], oneMinusCos * 2.0 * axis[2];
+	dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos * axis[1], oneMinusCos * axis[2],
+			 oneMinusCos * axis[1], 0.0, -sinAngle,
+			 oneMinusCos * axis[2], sinAngle, 0.0;
+	dRdAxisY << 0.0, oneMinusCos * axis[0], sinAngle,
+			 oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos * axis[2],
+			 -sinAngle, oneMinusCos * axis[2], 0.0;
+	dRdAxisZ << 0.0, -sinAngle, oneMinusCos * axis[0],
+			 sinAngle, 0.0, oneMinusCos * axis[1],
+			 oneMinusCos * axis[0], oneMinusCos * axis[1], oneMinusCos * 2.0 * axis[2];
 	Vector3d dAngledRotationVector, dAxisXdRotationVector, dAxisYdRotationVector, dAxisZdRotationVector;
 	if (std::abs(rotationVectorNorm) > rotationVectorEpsilon)
 	{
