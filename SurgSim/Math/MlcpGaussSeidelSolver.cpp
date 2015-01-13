@@ -92,7 +92,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	MlcpSolution::Vector& initialGuess_and_solution = solution->x;
 	const MlcpProblem::Vector& frictionCoefs = problem.mu;
 	const std::vector<MlcpConstraintType>& constraintsType = problem.constraintTypes;
-	double subStep = 1.0;//XXX
+	double subStep = 1.0;
 	size_t* MLCP_nbIterations = &solution->numIterations;
 	bool* validConvergence = &solution->validConvergence;
 	bool* validSignorini = &solution->validSignorini;
@@ -242,12 +242,8 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 		*initialConvergenceCriteria = initial_convergence_criteria;
 	}
 
-	if (convergence_criteria > m_epsilonConvergence || !SurgSim::Math::isValid(convergence_criteria) ||
-		!signorini_valid)
-	{
-		return false;
-	}
-	return true;
+	return (SurgSim::Math::isValid(convergence_criteria) && convergence_criteria <= m_epsilonConvergence &&
+		signorini_valid);
 }
 
 
@@ -297,7 +293,6 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 
 		case MLCP_BILATERAL_2D_CONSTRAINT:
 		{
-			// XXX REWRITE
 			double violation[2] = { b[currentAtomicIndex] * subStep , b[currentAtomicIndex + 1] * subStep };
 			for (size_t j = 0; j < problemSize; ++j)
 			{
@@ -321,7 +316,6 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 				b[currentAtomicIndex + 1] * subStep,
 				b[currentAtomicIndex + 2] * subStep
 			};
-			// XXX REWRITE
 			for (size_t j = 0; j < problemSize; ++j)
 			{
 				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
@@ -855,7 +849,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 			}
 			Fn -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints - 1];
 
-			if (Fn<0.0)
+			if (Fn < 0.0)
 			{
 				Fn  = 0;      // inactive contact on normal
 			}
@@ -875,7 +869,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 				constraintsType, subStep, constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
 							  &m_rhsEnforcedLocalSystem))
 			{
 				return;
@@ -904,12 +898,12 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 									   A(currentAtomicIndex + 2, currentAtomicIndex + 2));
 
 				double normFt = sqrt(Ft1 * Ft1 + Ft2 * Ft2);
-				if (normFt>local_mu*Fn)
+				if (normFt > local_mu * Fn)
 				{
 					// Here, the Friction is too strong, we keep the direction, but modulate its length
 					// to verify the Coulomb's law: |Ft| = mu |Fn|
-					Ft1 *= local_mu*Fn/normFt;
-					Ft2 *= local_mu*Fn/normFt;
+					Ft1 *= local_mu * Fn / normFt;
+					Ft2 *= local_mu * Fn / normFt;
 				}
 			}
 			else
@@ -932,7 +926,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 				constraintsType, subStep, constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
 							  &m_rhsEnforcedLocalSystem))
 			{
 				return;
@@ -961,7 +955,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 				constraintsType, subStep, constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
 							  &m_rhsEnforcedLocalSystem))
 			{
 				return;
