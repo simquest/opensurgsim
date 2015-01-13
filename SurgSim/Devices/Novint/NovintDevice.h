@@ -62,7 +62,7 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	/// \param initializationName An empty string indicates that the first available device should be used. A non-empty
 	///		string will be used to lookup the corresponding serial number from a file named novint.ini located in the
-	///		same directory as the executable (see \Data\Devices\novint.ini).
+	///		same directory as the executable (see /Data/Devices/novint.ini).
 	NovintDevice(const std::string& uniqueName, const std::string& initializationName);
 
 	/// Destructor.
