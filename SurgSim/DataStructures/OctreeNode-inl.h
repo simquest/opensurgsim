@@ -20,11 +20,11 @@
 #include <cmath>
 #include <fstream>
 
-#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/DataStructures/OctreeNodePlyReaderDelegate.h"
 #include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/Framework/Timer.h"
+#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Timer.h"
 
 namespace SurgSim
 {
