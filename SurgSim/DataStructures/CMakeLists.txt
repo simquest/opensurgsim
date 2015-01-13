@@ -25,6 +25,7 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	IndexDirectory.cpp
 	IndexedLocalCoordinate.cpp
 	OctreeNode.cpp
+	OctreeNodePlyReaderDelegate.cpp
 	ply.c
 	PlyReader.cpp
 	Tree.cpp
@@ -62,6 +63,8 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	NamedVariantData-inl.h
 	OctreeNode.h
 	OctreeNode-inl.h
+	OctreeNodePlyReaderDelegate.h
+	OctreeNodePlyReaderDelegate-inl.h
 	OptionalValue.h
 	ply.h
 	PlyReader.h

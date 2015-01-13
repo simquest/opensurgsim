@@ -67,14 +67,14 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 		}
 	};
 	auto octree = std::make_shared<OctreeShape::NodeType>(boundingBox);
-	octree->addData(secondLevelPositions[0], emptyData, 2);
-	octree->addData(secondLevelPositions[1], emptyData, 2);
-	octree->addData(secondLevelPositions[3], emptyData, 2);
-	octree->addData(secondLevelPositions[7], emptyData, 2);
-	octree->addData(Vector3d(0.2, 0.2, 0.01), emptyData, 3);
-	octree->addData(Vector3d(-0.2, -0.2, 0.2), emptyData, 3);
-	octree->addData(Vector3d(0.01, 0.01, 0.11), emptyData, 3);
-	octree->addData(Vector3d(0.01, 0.01, 0.11), emptyData, 4);
+	octree->addData(secondLevelPositions[0], 2, emptyData);
+	octree->addData(secondLevelPositions[1], 2, emptyData);
+	octree->addData(secondLevelPositions[3], 2, emptyData);
+	octree->addData(secondLevelPositions[7], 2, emptyData);
+	octree->addData(Vector3d(0.2, 0.2, 0.01), 3, emptyData);
+	octree->addData(Vector3d(-0.2, -0.2, 0.2), 3, emptyData);
+	octree->addData(Vector3d(0.01, 0.01, 0.11), 3, emptyData);
+	octree->addData(Vector3d(0.01, 0.01, 0.11), 4, emptyData);
 
 	auto octreeShape = std::make_shared<SurgSim::Math::OctreeShape>(*octree);
 
