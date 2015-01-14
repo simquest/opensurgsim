@@ -61,8 +61,8 @@ TEST(OsgOctreeRepresentationTests, SetNodeVisibilityTest)
 
 	OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones() * 4.0);
 	auto octreeNode = std::make_shared<OctreeShape::NodeType>(boundingBox);
-	octreeNode->addData(Vector3d(0.0, 0.0, 0.0), emptyData, 2);
-	octreeNode->addData(Vector3d(0.0, 0.0, 1.0), emptyData, 3);
+	octreeNode->addData(Vector3d(0.0, 0.0, 0.0), 2, emptyData);
+	octreeNode->addData(Vector3d(0.0, 0.0, 1.0), 3, emptyData);
 
 	auto octreeShape = std::make_shared<SurgSim::Math::OctreeShape>(*octreeNode);
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("TestOctree");
@@ -94,7 +94,7 @@ TEST(OsgOctreeRepresentationTests, SerializationTest)
 {
 	Runtime runtime("config.txt");
 	std::shared_ptr<SurgSim::Math::Shape> octreeShape = std::make_shared<SurgSim::Math::OctreeShape>();
-	std::string filename = "OctreeShapeData/staple.vox";
+	std::string filename = "OctreeShapeData/staple.ply";
 	std::static_pointer_cast<SurgSim::Math::OctreeShape>(octreeShape)->loadOctree(filename);
 
 	std::shared_ptr<SurgSim::Framework::Component> osgOctree = std::make_shared<OsgOctreeRepresentation>("TestOctree");

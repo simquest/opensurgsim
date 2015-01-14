@@ -20,7 +20,11 @@
 #include <cmath>
 #include <fstream>
 
+#include "SurgSim/DataStructures/OctreeNodePlyReaderDelegate.h"
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Timer.h"
 
 namespace SurgSim
 {
@@ -148,7 +152,7 @@ void OctreeNode<Data>::subdivide()
 }
 
 template<class Data>
-bool OctreeNode<Data>::addData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level)
+bool OctreeNode<Data>::addData(const SurgSim::Math::Vector3d& position, const int level, const Data& nodeData)
 {
 	return doAddData(position, nodeData, level, 1);
 }
@@ -185,25 +189,25 @@ bool OctreeNode<Data>::doAddData(const SurgSim::Math::Vector3d& position, const 
 }
 
 template<class Data>
-std::array<std::shared_ptr<OctreeNode<Data> >, 8>& OctreeNode<Data>::getChildren()
+std::array<std::shared_ptr<OctreeNode<Data>>, 8>& OctreeNode<Data>::getChildren()
 {
 	return m_children;
 }
 
 template<class Data>
-const std::array<std::shared_ptr<OctreeNode<Data> >, 8>& OctreeNode<Data>::getChildren() const
+const std::array<std::shared_ptr<OctreeNode<Data>>, 8>& OctreeNode<Data>::getChildren() const
 {
 	return m_children;
 }
 
 template<class Data>
-std::shared_ptr<OctreeNode<Data> > OctreeNode<Data>::getChild(size_t index)
+std::shared_ptr<OctreeNode<Data>> OctreeNode<Data>::getChild(size_t index)
 {
 	return m_children[index];
 }
 
 template<class Data>
-const std::shared_ptr<OctreeNode<Data> > OctreeNode<Data>::getChild(size_t index) const
+const std::shared_ptr<OctreeNode<Data>> OctreeNode<Data>::getChild(size_t index) const
 {
 	return m_children[index];
 }
@@ -234,34 +238,18 @@ std::shared_ptr<OctreeNode<Data>> OctreeNode<Data>::getNode(const OctreePath& pa
 }
 
 template<class Data>
-bool SurgSim::DataStructures::OctreeNode<Data>::doLoad(const std::string& filePath)
+bool SurgSim::DataStructures::OctreeNode<Data>::doLoad(const std::string& fileName)
 {
-	std::ifstream octreeData(filePath, std::ios::in);
-	SURGSIM_ASSERT(octreeData) << "Could not open file (" << filePath << ")" << std::endl;
+	SurgSim::Framework::Timer timer;
+	auto delegate = std::make_shared<OctreeNodePlyReaderDelegate<Data>>(this->shared_from_this());
 
-	SurgSim::Math::Vector3d spacing, boundsMin, boundsMax;
-	std::array<int, 3> dimensions;
-	octreeData >> dimensions[0] >> dimensions[1] >> dimensions[2];
-	octreeData >> spacing[0] >> spacing[1] >> spacing[2];
-	octreeData >> boundsMin[0] >> boundsMax[0] >> boundsMin[1] >> boundsMax[1] >> boundsMin[2] >> boundsMax[2];
-
-	int maxDimension = dimensions[0];
-	maxDimension = maxDimension >= dimensions[1] ?
-				   (maxDimension >= dimensions[2] ? maxDimension : dimensions[2]) :
-				   (dimensions[1] >= dimensions[2] ? dimensions[1] : dimensions[2]);
-
-	int numLevels = static_cast<int>(std::ceil(std::log(maxDimension) / std::log(2.0)));
-	SurgSim::Math::Vector3d octreeDimensions = SurgSim::Math::Vector3d::Ones() * std::pow(2.0, numLevels);
-
-	m_boundingBox.min() = boundsMin;
-	m_boundingBox.max() = boundsMin.array() + octreeDimensions.array() * spacing.array();
-
-	SurgSim::Math::Vector3d position;
-	while (octreeData >> position[0] >> position[1] >> position[2])
-	{
-		addData(position, Data(), numLevels);
-	}
-
+	PlyReader reader(fileName);
+	SURGSIM_ASSERT(reader.isValid()) << "'" << fileName << "' is an invalid .ply file.";
+	SURGSIM_ASSERT(reader.parseWithDelegate(delegate)) <<
+			"The input file " << fileName << " does not have the property required by the octree.";
+	timer.endFrame();
+	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "Loading " << fileName << " took " << timer.getCumulativeTime() << "s. ";
 	return true;
 }
 
