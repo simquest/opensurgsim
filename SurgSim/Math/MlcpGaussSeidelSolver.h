@@ -60,7 +60,7 @@ public:
 	/// \param epsilonConvergence The precision.
 	/// \param contactTolerance The contact tolerance.
 	/// \param maxIterations The max iterations.
-	explicit MlcpGaussSeidelSolver(double epsilonConvergence, double contactTolerance, size_t maxIterations);
+	MlcpGaussSeidelSolver(double epsilonConvergence, double contactTolerance, size_t maxIterations);
 
 	/// Destructor.
 	virtual ~MlcpGaussSeidelSolver();
