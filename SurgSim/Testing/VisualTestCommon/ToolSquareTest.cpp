@@ -18,6 +18,7 @@
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
+#define GLUT_NO_LIB_PRAGMA 1
 #include <GL/glut.h>
 #endif
 
