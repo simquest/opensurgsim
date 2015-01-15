@@ -21,7 +21,6 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Devices/Novint/NovintScaffold.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
@@ -74,7 +73,6 @@ bool NovintCommonDevice::initialize()
 	}
 	m_initialized = true;
 
-	SURGSIM_LOG_INFO(m_scaffold.getLogger()) << "Device " << getName() << ": " << "Initialized.";
 	return true;
 }
 
@@ -82,7 +80,6 @@ bool NovintCommonDevice::initialize()
 bool NovintCommonDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
-	SURGSIM_LOG_INFO(m_scaffold.getLogger()) << "Device " << getName() << ": " << "Finalizing.";
 	bool result = m_scaffold.unregisterDevice(this);
 	m_initialized = !result;
 	return result;

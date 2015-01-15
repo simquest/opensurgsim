@@ -459,11 +459,12 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 	// Note that since Visual Studio 2010 doesn't support multi-argument emplace_back() for STL containers, storing a
 	// list of unique_ptr results in nicer code than storing a list of DeviceData values directly.
 	std::unique_ptr<DeviceData> info(new DeviceData(initializationName, device));
-	if (! initializeDeviceState(info.get()))
+	if (!initializeDeviceState(info.get()))
 	{
 		return false;   // message already printed
 	}
 	m_state->registeredDevices.emplace_back(std::move(info));
+	SURGSIM_LOG_INFO(getLogger()) << "Device " << device->getName() << " initialized.";
 	return true;
 }
 
@@ -482,6 +483,7 @@ bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 			savedInfo = std::move(*matching);
 			m_state->registeredDevices.erase(matching);
 			m_state->unregisteredHandles.push_back(savedInfo->deviceHandle);
+			SURGSIM_LOG_INFO(getLogger()) << "Device " << device->getName() << " finalized.";
 			// the iterator is now invalid but that's OK
 		}
 	}
