@@ -25,7 +25,6 @@ namespace Physics
 
 SolveMlcp::SolveMlcp(bool doCopyState) : Computation(doCopyState)
 {
-	m_gaussSeidelSolver.setLogger(SurgSim::Framework::Logger::getLogger("Physics/Mlcp/Solver"));
 }
 
 SolveMlcp::~SolveMlcp()

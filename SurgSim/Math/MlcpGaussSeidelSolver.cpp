@@ -78,11 +78,6 @@ void MlcpGaussSeidelSolver::setMaxIterations(size_t maxIterations)
 	m_maxIterations = maxIterations;
 }
 
-void MlcpGaussSeidelSolver::setLogger(std::shared_ptr<SurgSim::Framework::Logger> logger)
-{
-	m_logger = logger;
-}
-
 bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solution)
 {
 	size_t problemSize = problem.getSize();

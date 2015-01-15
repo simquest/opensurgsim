@@ -92,10 +92,6 @@ public:
 	/// \param maxIterations The max number of iterations.
 	void setMaxIterations(size_t maxIterations);
 
-	/// Set the logger.
-	/// \param logger The logger.
-	void setLogger(std::shared_ptr<SurgSim::Framework::Logger> logger);
-
 private:
 	void computeEnforcementSystem(size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA,
 								  const MlcpProblem::Vector& b,
