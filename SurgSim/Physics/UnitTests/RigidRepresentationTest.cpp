@@ -537,25 +537,29 @@ Matrix66d computeSpringStiffness(double linearStiffness, double linearDamping,
 		Vector6d dofX = dofPosition;
 		dofX[column] += 2.0 * epsilon;
 		Vector6d fXPlus2H = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
-											   targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofX, dofVelocity,
+											   targetPosition, targetLinearVelocity, targetRotationVector,
+											   targetAngularVelocity, dofX, dofVelocity,
 											   doComputeExtraTorque, localApplicationPoint);
 
 		dofX = dofPosition;
 		dofX[column] += epsilon;
 		Vector6d fXPlusH = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
-											  targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofX, dofVelocity,
+											  targetPosition, targetLinearVelocity, targetRotationVector,
+											  targetAngularVelocity, dofX, dofVelocity,
 											  doComputeExtraTorque, localApplicationPoint);
 
 		dofX = dofPosition;
 		dofX[column] -= epsilon;
 		Vector6d fXMinusH = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
-											   targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofX, dofVelocity,
+											   targetPosition, targetLinearVelocity, targetRotationVector,
+											   targetAngularVelocity, dofX, dofVelocity,
 											   doComputeExtraTorque, localApplicationPoint);
 
 		dofX = dofPosition;
 		dofX[column] -= 2.0 * epsilon;
 		Vector6d fXMinus2H = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
-												targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofX, dofVelocity,
+												targetPosition, targetLinearVelocity, targetRotationVector,
+												targetAngularVelocity, dofX, dofVelocity,
 												doComputeExtraTorque, localApplicationPoint);
 
 		K.col(column) = - (-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
@@ -579,25 +583,29 @@ Matrix66d computeSpringDamping(double linearStiffness, double linearDamping,
 		Vector6d dofV = dofVelocity;
 		dofV[column] += 2.0 * epsilon;
 		Vector6d fXPlus2H = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
-											   targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofPosition, dofV,
+											   targetPosition, targetLinearVelocity, targetRotationVector,
+											   targetAngularVelocity, dofPosition, dofV,
 											   doComputeExtraTorque, localApplicationPoint);
 
 		dofV = dofVelocity;
 		dofV[column] += epsilon;
 		Vector6d fXPlusH = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
-											  targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofPosition, dofV,
+											  targetPosition, targetLinearVelocity, targetRotationVector,
+											  targetAngularVelocity, dofPosition, dofV,
 											  doComputeExtraTorque, localApplicationPoint);
 
 		dofV = dofVelocity;
 		dofV[column] -= epsilon;
 		Vector6d fXMinusH = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
-											   targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofPosition, dofV,
+											   targetPosition, targetLinearVelocity, targetRotationVector,
+											   targetAngularVelocity, dofPosition, dofV,
 											   doComputeExtraTorque, localApplicationPoint);
 
 		dofV = dofVelocity;
 		dofV[column] -= 2.0 * epsilon;
 		Vector6d fXMinus2H = computeSpringForce(linearStiffness, linearDamping, angularStiffness, angularDamping,
-												targetPosition, targetLinearVelocity, targetRotationVector, targetAngularVelocity, dofPosition, dofV,
+												targetPosition, targetLinearVelocity, targetRotationVector,
+												targetAngularVelocity, dofPosition, dofV,
 												doComputeExtraTorque, localApplicationPoint);
 
 		D.col(column) = - (-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
@@ -1072,12 +1080,12 @@ TEST_F(RigidRepresentationTest, SerializationTest)
 		SCOPED_TRACE("Encode/Decode as shared_ptr<>, should be OK");
 		auto rigidRepresentation = std::make_shared<RigidRepresentation>("TestRigidRepresentation");
 		YAML::Node node;
-		ASSERT_NO_THROW(node =
-							YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(rigidRepresentation));
+		ASSERT_NO_THROW(
+			node = YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(rigidRepresentation));
 
 		std::shared_ptr<RigidRepresentation> newRepresentation;
-		EXPECT_NO_THROW(newRepresentation =
-							std::dynamic_pointer_cast<RigidRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+		EXPECT_NO_THROW(newRepresentation =	std::dynamic_pointer_cast<RigidRepresentation>
+											(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	}
 
 	{
