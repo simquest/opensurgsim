@@ -213,6 +213,64 @@ void OsgSkeletonRepresentation::setBonePose(const std::string& name, const SurgS
 	}
 }
 
+SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getBonePose(const std::string& name)
+{
+	SurgSim::Math::RigidTransform3d pose;
+
+	auto boneData = m_boneData.find(name);
+	if (boneData != m_boneData.end())
+	{
+		boost::lock_guard<boost::mutex> lock(m_boneDataMutex);
+		pose = boneData->second.pose;
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "OsgSkeletonRepresentation::getBonePose(): Bone with name, " << name << ", is not present in mesh."
+			<< "Cannot get pose.";
+	}
+
+	return pose;
+}
+
+void OsgSkeletonRepresentation::setNeutralBonePose(const std::string& name,
+												   const SurgSim::Math::RigidTransform3d& pose)
+{
+	SURGSIM_ASSERT(!isInitialized())
+		<< "Cannot set neutral pose after OsgSkeletonRepresentation had been initialized.";
+
+	m_neutralPoseMap[name] = pose;
+}
+
+SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getNeutralBonePose(const std::string& name)
+{
+	if (m_neutralPoseMap.find(name) != m_neutralPoseMap.end())
+	{
+		return m_neutralPoseMap[name];
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "OsgSkeletonRepresentation::getNeutralBonePose(): Bone with name, " << name
+			<< ", does not have a neutral pose set.";
+		return SurgSim::Math::RigidTransform3d::Identity();
+	}
+}
+
+void OsgSkeletonRepresentation::setNeutralBonePoseMap(
+	const std::map<std::string, SurgSim::Math::RigidTransform3d>& poseMap)
+{
+	SURGSIM_ASSERT(!isInitialized())
+		<< "Cannot set neutral pose map after OsgSkeletonRepresentation had been initialized.";
+
+	m_neutralPoseMap = poseMap;
+}
+
+const std::map<std::string, SurgSim::Math::RigidTransform3d>& OsgSkeletonRepresentation::getNeutralBonePoseMap()
+{
+	return m_neutralPoseMap;
+}
+
 void OsgSkeletonRepresentation::doUpdate(double dt)
 {
 	{
@@ -220,7 +278,7 @@ void OsgSkeletonRepresentation::doUpdate(double dt)
 		// Update the pose of all the bones.
 		for (auto& boneData : m_boneData) // NOLINT
 		{
-			std::pair<osg::Quat, osg::Vec3d> pose = toOsg(boneData.second.pose);
+			std::pair<osg::Quat, osg::Vec3d> pose = toOsg(boneData.second.neutralPose * boneData.second.pose);
 			boneData.second.rotation->setQuaternion(pose.first);
 			boneData.second.translation->setTranslate(pose.second);
 		}
@@ -302,6 +360,23 @@ bool OsgSkeletonRepresentation::doInitialize()
 
 		// Add the bone skeleton as a child to m_transform
 		m_transform->addChild(m_base.get());
+	}
+
+	if (result && m_boneData.size() != 0)
+	{
+		boost::lock_guard<boost::mutex> lock(m_boneDataMutex);
+		// Update the neutral pose of all the bones.
+		for (auto& boneData : m_boneData) // NOLINT
+		{
+			if (m_neutralPoseMap.find(boneData.first) != m_neutralPoseMap.end())
+			{
+				boneData.second.neutralPose = m_neutralPoseMap[boneData.first];
+			}
+			else
+			{
+				boneData.second.neutralPose = SurgSim::Math::RigidTransform3d::Identity();
+			}
+		}
 	}
 
 	return result;

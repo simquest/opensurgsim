@@ -77,6 +77,32 @@ TEST_F(OsgSkeletonRepresentationTest, InitTest)
 	EXPECT_NO_THROW(viewElement->addComponent(skeletonObject));
 }
 
+TEST_F(OsgSkeletonRepresentationTest, PosesTest)
+{
+	skeletonObject->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
+	skeletonObject->setSkinningShaderFileName("Shaders/skinning.vert");
+	EXPECT_NO_THROW(viewElement->addComponent(skeletonObject));
+
+	SurgSim::Math::RigidTransform3d pose =
+		SurgSim::Math::makeRigidTransform(
+		SurgSim::Math::makeRotationQuaternion(2.143, SurgSim::Math::Vector3d(2.463, 6.346, 7.135).normalized()),
+		SurgSim::Math::Vector3d(2.3, 4.5, 6.7));
+
+	EXPECT_NO_THROW(skeletonObject->setBonePose("Bone", pose));
+	EXPECT_TRUE(pose.isApprox(skeletonObject->getBonePose("Bone")));
+}
+
+TEST_F(OsgSkeletonRepresentationTest, NeutralPosesTest)
+{
+	SurgSim::Math::RigidTransform3d pose =
+		SurgSim::Math::makeRigidTransform(
+			SurgSim::Math::makeRotationQuaternion(2.143, SurgSim::Math::Vector3d(2.463, 6.346, 7.135).normalized()),
+			SurgSim::Math::Vector3d(2.3, 4.5, 6.7));
+
+	EXPECT_NO_THROW(skeletonObject->setNeutralBonePose("Bone", pose));
+	EXPECT_TRUE(pose.isApprox(skeletonObject->getNeutralBonePose("Bone")));
+}
+
 TEST_F(OsgSkeletonRepresentationTest, AccessibleTest)
 {
 	std::shared_ptr<SurgSim::Framework::Component> component;
@@ -103,15 +129,25 @@ TEST_F(OsgSkeletonRepresentationTest, SerializationTests)
 	skeleton->loadModel(fileName);
 	std::string skinningShaderFileName("Shaders/skinning.vert");
 	skeleton->setSkinningShaderFileName(skinningShaderFileName);
+	SurgSim::Math::RigidTransform3d pose =
+		SurgSim::Math::makeRigidTransform(
+		SurgSim::Math::makeRotationQuaternion(2.143, SurgSim::Math::Vector3d(2.463, 6.346, 7.135).normalized()),
+		SurgSim::Math::Vector3d(2.3, 4.5, 6.7));
+	skeleton->setNeutralBonePose("Bone", pose);
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = skeleton->encode());
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(6u, node.size());
+	EXPECT_EQ(7u, node.size());
 
 	std::shared_ptr<OsgSkeletonRepresentation> result = std::make_shared<OsgSkeletonRepresentation>("OsgScenery");
 	ASSERT_NO_THROW(result->decode(node));
 	EXPECT_EQ("SurgSim::Graphics::OsgSkeletonRepresentation", result->getClassName());
 	EXPECT_EQ(fileName, result->getModel()->getFileName());
 	EXPECT_EQ(skinningShaderFileName, result->getSkinningShaderFileName());
+	EXPECT_TRUE(pose.isApprox(result->getNeutralBonePose("Bone")));
+	const auto& poseMap = result->getNeutralBonePoseMap();
+	EXPECT_EQ(1u, poseMap.size());
+	EXPECT_TRUE(poseMap.find("Bone") != poseMap.end());
+	EXPECT_TRUE(pose.isApprox(poseMap.at("Bone")));
 }

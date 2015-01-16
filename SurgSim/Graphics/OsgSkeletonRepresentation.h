@@ -53,6 +53,7 @@ struct OsgSkeletonBoneData
 	osg::ref_ptr<osgAnimation::StackedQuaternionElement> rotation;
 	osg::ref_ptr<osgAnimation::StackedTranslateElement> translation;
 	SurgSim::Math::RigidTransform3d pose;
+	SurgSim::Math::RigidTransform3d neutralPose;
 };
 
 /// Skeleton representation is used to move a mesh based on the movements of
@@ -80,6 +81,16 @@ public:
 	std::string getSkinningShaderFileName();
 
 	void setBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) override;
+
+	SurgSim::Math::RigidTransform3d getBonePose(const std::string& name) override;
+
+	void setNeutralBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) override;
+
+	SurgSim::Math::RigidTransform3d getNeutralBonePose(const std::string& name) override;
+
+	void setNeutralBonePoseMap(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poseMap) override;
+
+	const std::map<std::string, SurgSim::Math::RigidTransform3d>& getNeutralBonePoseMap() override;
 
 protected:
 	void doUpdate(double dt) override;
@@ -119,6 +130,9 @@ private:
 
 	/// The first MatrixTransform node
 	osg::ref_ptr<osg::MatrixTransform> m_base;
+
+	/// The neutral poses of the bones.
+	std::map<std::string, SurgSim::Math::RigidTransform3d> m_neutralPoseMap;
 };
 
 };  // namespace Graphics
