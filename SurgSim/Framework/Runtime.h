@@ -124,6 +124,11 @@ public:
 	/// \param fileName the filename of the scene to be loaded, needs to be found
 	/// \return true if the loading succeeded and the scene was found
 	bool loadScene(const std::string& fileName);
+	
+	/// Adds the content of the scene from the given file to the current scene. The old scene will not be
+	/// \param fileName the filename of the scene to be loaded, needs to be found
+	/// \return true if the loading succeeded and the scene was found
+	bool addScene(const std::string& fileName);
 
 	/// Write out the whole scene as a file
 	/// \param fileName the name of the scene-file if no path is given, uses the current path of the executable
@@ -145,6 +150,12 @@ private:
 	/// \param	configFilePath	Full pathname of the configuration file, if path is empty
 	/// 						"." will be used as default path.
 	void initSearchPaths(const std::string& configFilePath);
+
+	/// Perform the actual load operation
+	/// \param fileName the filename of the scene to be loaded, needs to be found
+	/// \param createScene if true a new scene is
+	/// \return true if the loading succeeded and the scene was found
+	bool doLoadScene(const std::string& fileName, bool clearScene);
 
 	/// Gets a shared pointer to the runtime.
 	/// \return	The shared pointer.

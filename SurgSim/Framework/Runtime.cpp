@@ -338,8 +338,17 @@ void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 
 bool Runtime::loadScene(const std::string& fileName)
 {
-	// To make sure things are correct, clear the Component cache before and after loading
+	return doLoadScene(fileName, true);
+}
 
+bool Runtime::addScene(const std::string& fileName)
+{
+	return doLoadScene(fileName, false);
+}
+
+bool Runtime::doLoadScene(const std::string& fileName, bool clearScene)
+{
+	// To make sure things are correct, clear the Component cache before and after loading
 	bool result = false;
 	std::string path;
 	if (m_applicationData->tryFindFile(fileName, &path))
@@ -347,8 +356,10 @@ bool Runtime::loadScene(const std::string& fileName)
 		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
 
 		YAML::Node node = YAML::LoadFile(path);
-
-		m_scene = std::make_shared<Scene>(getSharedPtr());
+		if (clearScene)
+		{
+			m_scene = std::make_shared<Scene>(getSharedPtr());
+		}
 		m_scene->decode(node);
 
 		result = true;
@@ -361,7 +372,6 @@ bool Runtime::loadScene(const std::string& fileName)
 	}
 
 	return result;
-
 }
 
 void Runtime::saveScene(const std::string& fileName) const

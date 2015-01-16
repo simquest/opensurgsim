@@ -238,3 +238,31 @@ TEST(RuntimeTest, AddComponentAddDuringRuntime)
 
 	runtime->stop();
 }
+
+TEST(RuntimeTest, LoadAndAddScene)
+{
+	auto runtime = std::make_shared<Runtime>("config.txt");
+	
+	EXPECT_TRUE(runtime->loadScene("SceneTestData/scene.yaml"));
+	
+	auto scene0 = runtime->getScene();
+	
+	EXPECT_NE(nullptr, scene0);
+	EXPECT_EQ(2L, scene0->getSceneElements().size());
+	
+	EXPECT_TRUE(runtime->loadScene("SceneTestData/scene.yaml"));
+
+	auto scene1 = runtime->getScene();
+	
+	EXPECT_NE(nullptr, scene1);
+	EXPECT_NE(scene0, scene1);
+
+	EXPECT_TRUE(runtime->addScene("SceneTestData/scene.yaml"));
+
+	auto scene2 = runtime->getScene();
+
+	EXPECT_NE(nullptr, scene2);
+	EXPECT_EQ(scene1, scene2);
+	
+	EXPECT_EQ(4L, scene2->getSceneElements().size());
+}

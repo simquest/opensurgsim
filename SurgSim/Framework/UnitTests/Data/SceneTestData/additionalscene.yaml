@@ -1,0 +1,20 @@
+SurgSim::Framework::Scene:
+  SceneElements:
+    - SurgSim::Framework::BasicSceneElement:
+        Name: element2
+        IsActive: true
+        Components:
+          - MockComponent:
+              Name: component0
+              IsLocalActive: true
+              SucceedWithInit: true
+              SucceedWithWakeUp: true
+    - SurgSim::Framework::BasicSceneElement:
+        Name: element3
+        IsActive: true
+        Components:
+          - MockComponent:
+              IsLocalActive: true
+              SucceedWithInit: true
+              SucceedWithWakeUp: true
+              Name: component1
