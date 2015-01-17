@@ -37,15 +37,28 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Testing::MockInputOutput;
 
 // Define common device names used in the Novint device tests.
-extern const char* const NOVINT_TEST_DEVICE_NAME = "FALCON_HTHR_R";
-extern const char* const NOVINT_TEST_DEVICE_NAME_2 = "FALCON_FRANKEN_L";
-//extern const char* const NOVINT_TEST_DEVICE_NAME = "FALCON_BURRv3_1";
-//extern const char* const NOVINT_TEST_DEVICE_NAME_2 = "FALCON_BURRv3_2";
+// These initialization names should be set to two of the names used in devices.yaml (or be empty strings to just get
+// the first device). The serial number should be a serial number for one of the attached Falcons (or be an empty
+// string to just get the first device.)
+const char* const NOVINT_TEST_DEVICE_NAME = "FALCON_1";
+const char* const NOVINT_TEST_DEVICE_NAME_2 = "FALCON_2";
+const char* const NOVINT_TEST_DEVICE_SERIAL_NUMBER = "14QAVEFF";
 
-TEST(NovintDeviceTest, CreateAndInitializeDevice)
+TEST(NovintDeviceTest, CreateAndInitializeDeviceByName)
 {
-	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
+	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	
+	std::string initializationName = "";
+	EXPECT_FALSE(device->getInitializationName(&initializationName));
+	device->setInitializationName(NOVINT_TEST_DEVICE_NAME);
+	ASSERT_TRUE(device->getInitializationName(&initializationName));
+	EXPECT_EQ(NOVINT_TEST_DEVICE_NAME, initializationName);
+
+	std::string serialNumber;
+	EXPECT_FALSE(device->getSerialNumber(&serialNumber));
+	EXPECT_ANY_THROW(device->setSerialNumber(""));
+
 	EXPECT_FALSE(device->isInitialized());
 	EXPECT_EQ("TestFalcon", device->getName());
 
@@ -53,7 +66,37 @@ TEST(NovintDeviceTest, CreateAndInitializeDevice)
 	EXPECT_TRUE(device->isInitialized());
 	EXPECT_EQ("TestFalcon", device->getName());
 
-	EXPECT_EQ(NOVINT_TEST_DEVICE_NAME, device->getInitializationName());
+	const double positionScale = 2.0;
+	device->setPositionScale(positionScale);
+	EXPECT_EQ(positionScale, device->getPositionScale());
+
+	const double orientationScale = 2.0;
+	device->setOrientationScale(orientationScale);
+	EXPECT_EQ(orientationScale, device->getOrientationScale());
+
+	EXPECT_TRUE(device->finalize());
+}
+TEST(NovintDeviceTest, CreateAndInitializeDeviceBySerialNumber)
+{
+	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+
+	std::string serialNumber = "";
+	EXPECT_FALSE(device->getSerialNumber(&serialNumber));
+	device->setSerialNumber(NOVINT_TEST_DEVICE_SERIAL_NUMBER);
+	ASSERT_TRUE(device->getSerialNumber(&serialNumber));
+	EXPECT_EQ(NOVINT_TEST_DEVICE_SERIAL_NUMBER, serialNumber);
+
+	std::string initializationName;
+	EXPECT_FALSE(device->getInitializationName(&initializationName));
+	EXPECT_ANY_THROW(device->setInitializationName(""));
+
+	EXPECT_FALSE(device->isInitialized());
+	EXPECT_EQ("TestFalcon", device->getName());
+
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
+	EXPECT_TRUE(device->isInitialized());
+	EXPECT_EQ("TestFalcon", device->getName());
 
 	const double positionScale = 2.0;
 	device->setPositionScale(positionScale);
@@ -66,22 +109,33 @@ TEST(NovintDeviceTest, CreateAndInitializeDevice)
 	EXPECT_TRUE(device->finalize());
 }
 
-TEST(NovintDeviceTest, CreateAndInitializeDefaultDevice)
+TEST(NovintDeviceTest, CreateAndInitializeDefaultDevices)
 {
-	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", "");
+	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_FALSE(device->isInitialized());
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 	EXPECT_TRUE(device->isInitialized());
 
-	EXPECT_EQ("", device->getInitializationName());
+	std::string initializationName;
+	EXPECT_FALSE(device->getInitializationName(&initializationName));
+	std::string serialNumber;
+	EXPECT_FALSE(device->getSerialNumber(&serialNumber));
+
+	std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("TestFalcon2");
+	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+	EXPECT_FALSE(device2->isInitialized());
+	if (!device2->initialize())
+	{
+		std::cerr << "[Warning: second Novint did not come up; is it plugged in?]" << std::endl;
+	}
 }
 
 static void testCreateDeviceSeveralTimes(bool doSleep)
 {
 	for (int i = 0;  i < 6;  ++i)
 	{
-		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
+		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
 		ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 		if (doSleep)
@@ -99,12 +153,14 @@ TEST(NovintDeviceTest, CreateDeviceSeveralTimes)
 
 TEST(NovintDeviceTest, CreateTwoDevices)
 {
-	std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint1", NOVINT_TEST_DEVICE_NAME);
+	std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint1");
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
+	device1->setInitializationName(NOVINT_TEST_DEVICE_NAME);
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 
-	std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("Novint2", NOVINT_TEST_DEVICE_NAME_2);
+	std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("Novint2");
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+	device2->setInitializationName(NOVINT_TEST_DEVICE_NAME_2);
 	if (!device2->initialize())
 	{
 		std::cerr << "[Warning: second Novint did not come up; is it plugged in?]" << std::endl;
@@ -113,30 +169,54 @@ TEST(NovintDeviceTest, CreateTwoDevices)
 
 TEST(NovintDeviceTest, CreateDevicesWithSameName)
 {
-	std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint", NOVINT_TEST_DEVICE_NAME);
+	std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint");
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
+	device1->setInitializationName(NOVINT_TEST_DEVICE_NAME);
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 
-	std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("Novint", NOVINT_TEST_DEVICE_NAME_2);
+	std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("Novint");
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+	device2->setInitializationName(NOVINT_TEST_DEVICE_NAME_2);
 	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate name.";
 }
 
 TEST(NovintDeviceTest, CreateDevicesWithSameInitializationName)
 {
-	std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint1", NOVINT_TEST_DEVICE_NAME);
-	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
-	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
+	if (NOVINT_TEST_DEVICE_NAME != "")
+	{
+		std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint1");
+		ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
+		device1->setInitializationName(NOVINT_TEST_DEVICE_NAME);
+		ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 
-	std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("Novint2", NOVINT_TEST_DEVICE_NAME);
-	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
-	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate initialization name.";
+		std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("Novint2");
+		ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+		device2->setInitializationName(NOVINT_TEST_DEVICE_NAME);
+		ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate initialization name.";
+	}
+}
+
+TEST(NovintDeviceTest, CreateDevicesWithSameSerialNumber)
+{
+	if (NOVINT_TEST_DEVICE_SERIAL_NUMBER != "")
+	{
+		std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint1");
+		ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
+		device1->setSerialNumber(NOVINT_TEST_DEVICE_SERIAL_NUMBER);
+		ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
+
+		std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("Novint2");
+		ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+		device2->setSerialNumber(NOVINT_TEST_DEVICE_SERIAL_NUMBER);
+		ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate initialization name.";
+	}
 }
 
 TEST(NovintDeviceTest, InputConsumer)
 {
-	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
+	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	device->setInitializationName(NOVINT_TEST_DEVICE_NAME);
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 
 	std::shared_ptr<MockInputOutput> consumer = std::make_shared<MockInputOutput>();
@@ -169,8 +249,9 @@ TEST(NovintDeviceTest, InputConsumer)
 
 TEST(NovintDeviceTest, OutputProducer)
 {
-	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
+	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	device->setInitializationName(NOVINT_TEST_DEVICE_NAME);
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 
 	std::shared_ptr<MockInputOutput> producer = std::make_shared<MockInputOutput>();

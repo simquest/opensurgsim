@@ -91,10 +91,10 @@ private:
 	/// \return	true on success.
 	bool initializeDeviceState(DeviceData* info);
 
-	/// Get the Handle associated with a name, if any.
-	/// \param name The initialization name (from the configuration file).
+	/// Get the Handle associated with an initialization name, if any.
+	/// \param initializationName The initialization name (from the configuration file).
 	/// \return Shared pointer to Handle, or nullptr if not found.
-	std::shared_ptr<NovintScaffold::Handle> findHandle(const std::string& name);
+	std::shared_ptr<NovintScaffold::Handle> findHandleByInitializationName(const std::string& initializationName);
 
 	/// Finalizes a single device, destroying the necessary HDAL resources.
 	/// \param [in,out] info	The device data.

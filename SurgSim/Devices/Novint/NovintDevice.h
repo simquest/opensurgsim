@@ -16,7 +16,6 @@
 #ifndef SURGSIM_DEVICES_NOVINT_NOVINTDEVICE_H
 #define SURGSIM_DEVICES_NOVINT_NOVINTDEVICE_H
 
-#include <memory>
 #include <string>
 
 #include "SurgSim/Devices/Novint/NovintCommonDevice.h"
@@ -60,10 +59,7 @@ public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	/// \param initializationName An empty string indicates that the first available device should be used. A non-empty
-	///		string will be used to lookup the corresponding serial number from a file named novint.ini located in the
-	///		same directory as the executable (see /Data/Devices/novint.ini).
-	NovintDevice(const std::string& uniqueName, const std::string& initializationName);
+	NovintDevice(const std::string& uniqueName);
 
 	/// Destructor.
 	virtual ~NovintDevice();

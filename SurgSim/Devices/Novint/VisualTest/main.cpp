@@ -24,7 +24,8 @@ static const char* const NOVINT_DEVICE_NAME = "";
 
 int main(int argc, char** argv)
 {
-	auto toolDevice = std::make_shared<SurgSim::Device::NovintDevice>("NovintDevice", NOVINT_DEVICE_NAME);
+	auto toolDevice = std::make_shared<SurgSim::Device::NovintDevice>("NovintDevice");
+	toolDevice->setInitializationName(NOVINT_DEVICE_NAME);
 	auto squareDevice = std::make_shared<SurgSim::Device::IdentityPoseDevice>("IdentityPoseDevice");
 
 	runToolSquareTest(toolDevice, squareDevice, "Move the Novint Falcon device to move the sphere tool.");

@@ -16,7 +16,6 @@
 #ifndef SURGSIM_DEVICES_NOVINT_NOVINT7DOFDEVICE_H
 #define SURGSIM_DEVICES_NOVINT_NOVINT7DOFDEVICE_H
 
-#include <memory>
 #include <string>
 
 #include "SurgSim/Devices/Novint/NovintCommonDevice.h"
@@ -55,9 +54,7 @@ public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	/// \param initializationName The name passed to HDAL when initializing the device.  This should match a
-	/// 	configured Novint device; alternately, an empty string indicates the default device.
-	Novint7DofDevice(const std::string& uniqueName, const std::string& initializationName);
+	Novint7DofDevice(const std::string& uniqueName);
 
 	/// Destructor.
 	virtual ~Novint7DofDevice();

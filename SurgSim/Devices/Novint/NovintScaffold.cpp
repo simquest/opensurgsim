@@ -215,8 +215,9 @@ private:
 struct NovintScaffold::DeviceData
 {
 	/// Initialize the state.
-	DeviceData(const std::string& apiName, NovintCommonDevice* device) :
-		initializationName(apiName),
+	DeviceData(NovintCommonDevice* device) :
+		initializationName(""),
+		serialNumber(""),
 		deviceObject(device),
 		isPositionHomed(false),
 		isOrientationHomed(false),
@@ -250,7 +251,9 @@ struct NovintScaffold::DeviceData
 
 
 	/// The HDAL device name.
-	const std::string initializationName;
+	std::string initializationName;
+	/// The HDAL device serial number.
+	std::string serialNumber;
 	/// The corresponding device object.
 	NovintCommonDevice* const deviceObject;
 
@@ -331,7 +334,8 @@ public:
 	/// The map from serial number to Handle for all devices that were available when the SDK was initialized.
 	std::unordered_map<std::string, std::shared_ptr<NovintScaffold::Handle>> serialToHandle;
 
-	/// List of devices that have been unregistered and should have their forces zeroed in the next update.
+	/// List of devices that have been unregistered and should have their forces, torques, and gravity compensation
+	/// zeroed in the next update.
 	std::list<std::shared_ptr<NovintScaffold::Handle>> unregisteredHandles;
 
 	/// The map from name to serial number for all devices.
@@ -430,21 +434,41 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 		[&deviceName](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == deviceName; });
 	if (sameName != m_state->registeredDevices.end())
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "Novint: Tried to register a device when the same name is" <<
-			" already present!";
+		SURGSIM_LOG_CRITICAL(m_logger) << "Novint: Tried to register a device when the same name " <<
+			deviceName << " is already present!";
 		return false;
 	}
 
-	// Make sure the initialization name is unique.
-	const std::string initializationName = device->getInitializationName();
-	auto sameInitializationName = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
-		[&initializationName](const std::unique_ptr<DeviceData>& info)
-			{ return info->deviceObject->getInitializationName() == initializationName; });
-	if (sameInitializationName != m_state->registeredDevices.end())
+	// Make sure the serial number is unique.
+	std::string serialNumber = "";
+	if ((device->getSerialNumber(&serialNumber)) && (serialNumber != ""))
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "Novint: Tried to register a device when the same initialization" <<
-			" (HDAL) name is already present!";
-		return false;
+		auto sameSerialNumber = std::find_if(m_state->registeredDevices.cbegin(),
+			m_state->registeredDevices.cend(),
+			[&serialNumber](const std::unique_ptr<DeviceData>& info)
+		{ return info->serialNumber == serialNumber; });
+		if (sameSerialNumber != m_state->registeredDevices.end())
+		{
+			SURGSIM_LOG_CRITICAL(m_logger) << "Tried to register a device when the same serial number " <<
+				serialNumber <<" is already present!";
+			return false;
+		}
+	}
+
+	// Make sure the initialization name is unique.
+	std::string initializationName = "";
+	if ((device->getInitializationName(&initializationName)) && (initializationName != ""))
+	{
+		auto sameInitializationName = std::find_if(m_state->registeredDevices.cbegin(),
+			m_state->registeredDevices.cend(),
+			[&initializationName](const std::unique_ptr<DeviceData>& info)
+		{ return info->initializationName == initializationName; });
+		if (sameInitializationName != m_state->registeredDevices.end())
+		{
+			SURGSIM_LOG_CRITICAL(m_logger) << "Tried to register a device when the same initialization (HDAL) name " <<
+				initializationName << " is already present!";
+			return false;
+		}
 	}
 
 	if (!m_state->isApiInitialized)
@@ -458,7 +482,10 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 	// Construct the object, start its thread, then move it to the list.
 	// Note that since Visual Studio 2010 doesn't support multi-argument emplace_back() for STL containers, storing a
 	// list of unique_ptr results in nicer code than storing a list of DeviceData values directly.
-	std::unique_ptr<DeviceData> info(new DeviceData(initializationName, device));
+	std::unique_ptr<DeviceData> info(new DeviceData(device));
+	info->serialNumber = serialNumber;
+	info->initializationName = initializationName;
+
 	if (!initializeDeviceState(info.get()))
 	{
 		return false;   // message already printed
@@ -479,11 +506,11 @@ bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 		if (matching != m_state->registeredDevices.end())
 		{
-			result = true;
 			savedInfo = std::move(*matching);
 			m_state->registeredDevices.erase(matching);
 			m_state->unregisteredHandles.push_back(savedInfo->deviceHandle);
 			SURGSIM_LOG_INFO(getLogger()) << "Device " << device->getName() << " finalized.";
+			result = true;
 			// the iterator is now invalid but that's OK
 		}
 	}
@@ -492,10 +519,11 @@ bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 	return result;
 }
 
-std::shared_ptr<NovintScaffold::Handle> NovintScaffold::findHandle(const std::string& name)
+std::shared_ptr<NovintScaffold::Handle>
+	NovintScaffold::findHandleByInitializationName(const std::string& initializationName)
 {
 	std::shared_ptr<NovintScaffold::Handle> handle;
-	if (name == "")
+	if (initializationName == "")
 	{
 		// get the first available
 		for (auto it : m_state->serialToHandle)
@@ -524,26 +552,26 @@ std::shared_ptr<NovintScaffold::Handle> NovintScaffold::findHandle(const std::st
 	}
 	else
 	{
-		if (m_state->nameToSerial.count(name) > 0)
+		if (m_state->nameToSerial.count(initializationName) > 0)
 		{
-			const std::string serial = m_state->nameToSerial[name];
+			const std::string serial = m_state->nameToSerial[initializationName];
 			if (m_state->serialToHandle.count(serial) > 0)
 			{
 				handle = m_state->serialToHandle[serial];
 			}
 			else
 			{
-				SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device named '" << name <<
+				SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device named '" << initializationName <<
 					"', which should map to serial number " << serial <<
 					", but no device with that serial number is available.";
 			}
 		}
 		else
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device named '" << name <<
+			SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device named '" << initializationName <<
 				"', but that name does not map to a serial number.  Was the configuration file found?" <<
-				" Does it contain the text of a YAML node (for the map from name to serial number)?  Is '" << name <<
-				"' a key in that map?";
+				" Does it contain the text of a YAML node (for the map from name to serial number)?  Is '" <<
+				initializationName << "' a key in that map?";
 		}
 	}
 	return handle;
@@ -555,7 +583,22 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 	SURGSIM_ASSERT(info->deviceHandle == nullptr) <<
 		"The raw handle should be nullptr before initialization.";
 
-	info->deviceHandle = findHandle(info->deviceObject->getInitializationName());
+	if (info->serialNumber == "")
+	{
+		info->deviceHandle = findHandleByInitializationName(info->initializationName);
+	}
+	else
+	{
+		if (m_state->serialToHandle.count(info->serialNumber) > 0)
+		{
+			info->deviceHandle = m_state->serialToHandle[info->serialNumber];
+		}
+		else
+		{
+			SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device by serial number for serial number " <<
+				info->serialNumber << ", but no device with that serial number is available.";
+		}
+	}
 	m_state->unregisteredHandles.remove(info->deviceHandle);
 
 	bool result = info->deviceHandle != nullptr;
@@ -948,15 +991,15 @@ std::map<std::string, std::string> NovintScaffold::getNameMap()
 	paths.push_back(".");
 	SurgSim::Framework::ApplicationData applicationData(paths);
 	std::string fileName;
-	if (applicationData.tryFindFile("novint.ini", &fileName))
+	if (applicationData.tryFindFile("devices.yaml", &fileName))
 	{
-		SURGSIM_LOG_INFO(m_logger) << "Found novint.ini at '" << fileName << "'.";
+		SURGSIM_LOG_DEBUG(m_logger) << "Found devices.yaml at '" << fileName << "'.";
 		YAML::Node node = YAML::LoadFile(fileName);
-		map = node["nameToSerial"].as<std::map<std::string, std::string>>();
+		map = node["Novint"].as<std::map<std::string, std::string>>();
 	}
 	else
 	{
-		SURGSIM_LOG_SEVERE(m_logger) << "Failed to find novint.ini, cannot map names to serial numbers.";
+		SURGSIM_LOG_DEBUG(m_logger) << "Failed to find devices.yaml, cannot map names to serial numbers.";
 	}
 	return map;
 }
