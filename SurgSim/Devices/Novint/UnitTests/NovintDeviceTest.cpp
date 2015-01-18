@@ -167,19 +167,6 @@ TEST(NovintDeviceTest, CreateTwoDevices)
 	}
 }
 
-TEST(NovintDeviceTest, CreateDevicesWithSameName)
-{
-	std::shared_ptr<NovintDevice> device1 = std::make_shared<NovintDevice>("Novint");
-	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
-	device1->setInitializationName(NOVINT_TEST_DEVICE_NAME);
-	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
-
-	std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("Novint");
-	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
-	device2->setInitializationName(NOVINT_TEST_DEVICE_NAME_2);
-	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate name.";
-}
-
 TEST(NovintDeviceTest, CreateDevicesWithSameInitializationName)
 {
 	if (NOVINT_TEST_DEVICE_NAME != "")

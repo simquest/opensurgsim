@@ -422,23 +422,6 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-	// Make sure the object is unique.
-	auto sameObject = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-	SURGSIM_ASSERT(sameObject == m_state->registeredDevices.end()) << "Novint: Tried to register a device" <<
-		" which is already present!";
-
-	// Make sure the name is unique.
-	const std::string deviceName = device->getName();
-	auto sameName = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
-		[&deviceName](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == deviceName; });
-	if (sameName != m_state->registeredDevices.end())
-	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "Novint: Tried to register a device when the same name " <<
-			deviceName << " is already present!";
-		return false;
-	}
-
 	// Make sure the serial number is unique.
 	std::string serialNumber = "";
 	if ((device->getSerialNumber(&serialNumber)) && (serialNumber != ""))
