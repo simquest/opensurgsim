@@ -426,7 +426,7 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 	std::string serialNumber = "";
 	if ((device->getSerialNumber(&serialNumber)) && (serialNumber != ""))
 	{
-		auto sameSerialNumber = std::find_if(m_state->registeredDevices.cbegin(),
+		auto& sameSerialNumber = std::find_if(m_state->registeredDevices.cbegin(),
 			m_state->registeredDevices.cend(),
 			[&serialNumber](const std::unique_ptr<DeviceData>& info)
 		{ return info->serialNumber == serialNumber; });
@@ -442,7 +442,7 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 	std::string initializationName = "";
 	if ((device->getInitializationName(&initializationName)) && (initializationName != ""))
 	{
-		auto sameInitializationName = std::find_if(m_state->registeredDevices.cbegin(),
+		auto& sameInitializationName = std::find_if(m_state->registeredDevices.cbegin(),
 			m_state->registeredDevices.cend(),
 			[&initializationName](const std::unique_ptr<DeviceData>& info)
 		{ return info->initializationName == initializationName; });
@@ -485,8 +485,8 @@ bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 	std::unique_ptr<DeviceData> savedInfo;
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-		auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+		auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
+			[&device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 		if (matching != m_state->registeredDevices.end())
 		{
 			savedInfo = std::move(*matching);
@@ -511,9 +511,9 @@ std::shared_ptr<NovintScaffold::Handle>
 		// get the first available
 		for (auto it : m_state->serialToHandle)
 		{
-			auto possibleHandle = it.second;
-			auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-				[possibleHandle](const std::unique_ptr<DeviceData>& info)
+			auto& possibleHandle = it.second;
+			auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
+				[&possibleHandle](const std::unique_ptr<DeviceData>& info)
 			{
 				return info->deviceHandle == possibleHandle;
 			});
@@ -563,8 +563,7 @@ std::shared_ptr<NovintScaffold::Handle>
 
 bool NovintScaffold::initializeDeviceState(DeviceData* info)
 {
-	SURGSIM_ASSERT(info->deviceHandle == nullptr) <<
-		"The raw handle should be nullptr before initialization.";
+	SURGSIM_ASSERT(info->deviceHandle == nullptr) << "The raw handle should be nullptr before initialization.";
 
 	if (info->serialNumber == "")
 	{
@@ -961,7 +960,7 @@ void NovintScaffold::createAllHandles()
 
 void NovintScaffold::destroyAllHandles()
 {
-	for (auto it : m_state->serialToHandle)
+	for (auto& it : m_state->serialToHandle)
 	{
 		it.second->destroy();
 	}
@@ -1039,7 +1038,7 @@ bool NovintScaffold::runHapticFrame()
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-	for (auto it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
+	for (auto& it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
 	{
 		(*it)->deviceObject->pullOutput();
 		if (updateDevice((*it).get()))
@@ -1048,19 +1047,19 @@ bool NovintScaffold::runHapticFrame()
 		}
 	}
 
-	for (auto handle : m_state->unregisteredHandles)
+	bool desiredGravityCompensation = false;
+	Vector3d force = Vector3d::Zero();
+	Vector4d torque = Vector4d::Zero();
+	for (auto& handle : m_state->unregisteredHandles)
 	{
 		hdlMakeCurrent(handle->get());
 
-		bool desiredGravityCompensation = false;
 		hdlGripSetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &desiredGravityCompensation);
 		checkForFatalError("Cannot set gravity compensation state on recently unregistered device.");
 
-		Vector3d force = Vector3d::Zero();
 		hdlGripSetAttributev(HDL_GRIP_FORCE, 0, force.data());
 		checkForFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
-		Vector4d torque = Vector4d::Zero();
 		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, torque.data());
 		checkForFatalError("hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 	}
@@ -1292,8 +1291,8 @@ SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double scale)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-	auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
+		[&device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 	if (matching != m_state->registeredDevices.end())
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
@@ -1304,8 +1303,8 @@ void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double s
 void NovintScaffold::setOrientationScale(const NovintCommonDevice* device, double scale)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-	auto matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
+		[&device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 	if (matching != m_state->registeredDevices.end())
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
