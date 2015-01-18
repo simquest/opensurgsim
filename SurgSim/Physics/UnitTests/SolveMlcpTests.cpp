@@ -40,7 +40,7 @@ TEST(SolveMlcpTest, CanConstruct)
 	ASSERT_NO_THROW({std::shared_ptr<SolveMlcp> solveMlcpComputation = std::make_shared<SolveMlcp>();});
 }
 
-static void testMlcp(std::string filename, double contactTolerance, double solverPrecision, int maxIteration)
+static void testMlcp(std::string filename, double contactTolerance, double solverPrecision, size_t maxIteration)
 {
 	std::shared_ptr<MlcpTestData> data = loadTestData(filename);
 	ASSERT_NE(nullptr, data) << "Could not load data file 'mlcpOriginalTest.txt'";
@@ -51,8 +51,11 @@ static void testMlcp(std::string filename, double contactTolerance, double solve
 	double dt = 1e-3;
 
 	solveMlcpComputation->setContactTolerance(contactTolerance);
-	solveMlcpComputation->setSolverPrecision(solverPrecision);
+	EXPECT_NEAR(contactTolerance, solveMlcpComputation->getContactTolerance(), 1e-10);
+	solveMlcpComputation->setPrecision(solverPrecision);
+	EXPECT_NEAR(solverPrecision, solveMlcpComputation->getPrecision(), 1e-10);
 	solveMlcpComputation->setMaxIterations(maxIteration);
+	EXPECT_EQ(maxIteration, solveMlcpComputation->getMaxIterations());
 
 	// Copy the MlcpProblem data over into the input state
 	state->getMlcpProblem().A = data->problem.A;
