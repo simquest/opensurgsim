@@ -97,7 +97,7 @@ private:
 	virtual bool is7DofDevice() const;
 
 	/// The scaffold handles all the communication with the SDK.
-	NovintScaffold& m_scaffold;
+	std::shared_ptr<NovintScaffold> m_scaffold;
 
 	/// true if this device has been registered with the scaffold.
 	bool m_initialized;

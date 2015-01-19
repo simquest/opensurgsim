@@ -40,6 +40,8 @@ class NovintDevice;
 class NovintScaffold
 {
 public:
+	/// Constructor.
+	NovintScaffold();
 
 	/// Destructor.
 	~NovintScaffold();
@@ -49,14 +51,11 @@ public:
 	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
 
 	/// Gets or creates the scaffold shared by all NovintDevice and Novint7DofDevice instances.
-	/// The scaffold is a singleton, so it will not be destroyed until the application exits.
+	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
-	static NovintScaffold& getInstance();
+	static std::shared_ptr<NovintScaffold> getOrCreateSharedInstance();
 
 private:
-	/// Constructor.
-	NovintScaffold();
-
 	NovintScaffold(const NovintScaffold&) /*= delete*/;
 	NovintScaffold& operator=(const NovintScaffold&) /*= delete*/;
 

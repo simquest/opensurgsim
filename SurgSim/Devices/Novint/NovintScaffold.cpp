@@ -61,13 +61,13 @@ class NovintScaffold::Handle
 public:
 	Handle() :
 		m_deviceHandle(HDL_INVALID_HANDLE),
-		m_scaffold(NovintScaffold::getInstance())
+		m_scaffold(NovintScaffold::getOrCreateSharedInstance())
 	{
 	}
 
 	explicit Handle(const std::string& serial) :
 		m_deviceHandle(HDL_INVALID_HANDLE),
-		m_scaffold(NovintScaffold::getInstance())
+		m_scaffold(NovintScaffold::getOrCreateSharedInstance())
 	{
 		create(serial);
 	}
@@ -89,16 +89,16 @@ public:
 		HDLDeviceHandle deviceHandle = HDL_INVALID_HANDLE;
 		deviceHandle = hdlInitDeviceBySerialNumber(serial.c_str());
 
-		if (m_scaffold.checkForFatalError("Failed to initialize"))
+		if (m_scaffold->checkForFatalError("Failed to initialize"))
 		{
 			// HDAL error message already logged
-			SURGSIM_LOG_INFO(m_scaffold.getLogger()) << std::endl <<
+			SURGSIM_LOG_INFO(m_scaffold->getLogger()) << std::endl <<
 				"  HDAL serial number: '" << serial << "'" << std::endl;
 			return false;
 		}
 		else if (deviceHandle == HDL_INVALID_HANDLE)
 		{
-			SURGSIM_LOG_SEVERE(m_scaffold.getLogger()) << "Novint: Failed to initialize a device." <<
+			SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Novint: Failed to initialize a device." <<
 				std::endl <<
 				"  Error details: unknown (HDAL returned an invalid handle)" << std::endl <<
 				"  HDAL serial number: '" << serial << "'" << std::endl;
@@ -121,7 +121,7 @@ public:
 		m_deviceHandle = HDL_INVALID_HANDLE;
 
 		hdlUninitDevice(deviceHandle);
-		m_scaffold.checkForFatalError("Couldn't disable device");
+		m_scaffold->checkForFatalError("Couldn't disable device");
 		return true;
 	}
 
@@ -139,7 +139,7 @@ private:
 	/// The HDAL device handle (or HDL_INVALID_HANDLE if not valid).
 	HDLDeviceHandle m_deviceHandle;
 	/// The scaffold.
-	NovintScaffold& m_scaffold;
+	std::shared_ptr<NovintScaffold> m_scaffold;
 };
 
 
@@ -149,7 +149,7 @@ public:
 	Callback() :
 		m_callbackHandle(0),
 		m_haveCallback(false),
-		m_scaffold(NovintScaffold::getInstance())
+		m_scaffold(NovintScaffold::getOrCreateSharedInstance())
 	{
 		create();
 	}
@@ -172,8 +172,8 @@ public:
 		SURGSIM_ASSERT(! m_haveCallback);
 
 		const bool isCallbackNonblocking = false;
-		m_callbackHandle = hdlCreateServoOp(run, &m_scaffold, isCallbackNonblocking);
-		if (m_scaffold.checkForFatalError("Couldn't run haptic callback"))
+		m_callbackHandle = hdlCreateServoOp(run, m_scaffold.get(), isCallbackNonblocking);
+		if (m_scaffold->checkForFatalError("Couldn't run haptic callback"))
 		{
 			return false;
 		}
@@ -185,7 +185,7 @@ public:
 	{
 		SURGSIM_ASSERT(m_haveCallback);
 		hdlDestroyServoOp(m_callbackHandle);
-		if (m_scaffold.checkForFatalError("Couldn't stop haptic callback"))
+		if (m_scaffold->checkForFatalError("Couldn't stop haptic callback"))
 		{
 			return false;
 		}
@@ -208,7 +208,7 @@ private:
 	/// True if the callback has been created (and not destroyed).
 	bool m_haveCallback;
 	/// The scaffold.
-	NovintScaffold& m_scaffold;
+	std::shared_ptr<NovintScaffold> m_scaffold;
 };
 
 
@@ -1313,13 +1313,10 @@ void NovintScaffold::setOrientationScale(const NovintCommonDevice* device, doubl
 }
 
 
-NovintScaffold& NovintScaffold::getInstance()
+std::shared_ptr<NovintScaffold> NovintScaffold::getOrCreateSharedInstance()
 {
-	/// A SharedInstance is not appropriate, because we need to have a single point of contact with the HDAL
-	/// and letting the SharedInstance destruct and be re-constructed would not follow the canonical sequence
-	/// of calls to the HDAL.  That has caused the hdl calls to fail, hang, and exit the application.
-	static NovintScaffold instance;
-	return instance;
+	static SurgSim::Framework::SharedInstance<NovintScaffold> sharedInstance;
+	return sharedInstance.get();
 }
 
 std::shared_ptr<SurgSim::Framework::Logger> NovintScaffold::getLogger() const

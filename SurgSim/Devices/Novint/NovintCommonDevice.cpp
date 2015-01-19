@@ -24,7 +24,7 @@ namespace Device
 
 NovintCommonDevice::NovintCommonDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, NovintScaffold::buildDeviceInputData()),
-	m_scaffold(NovintScaffold::getInstance()), m_initialized(false),
+	m_initialized(false),
 	m_positionScale(1.0), m_orientationScale(1.0)
 {
 }
@@ -77,36 +77,39 @@ bool NovintCommonDevice::getInitializationName(std::string* initializationName) 
 
 bool NovintCommonDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
+	SURGSIM_ASSERT(! isInitialized());
+	std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold);
 
-	if (!m_scaffold.registerDevice(this))
+	if (! scaffold->registerDevice(this))
 	{
 		return false;
 	}
-	m_initialized = true;
 
+	m_scaffold = std::move(scaffold);
 	return true;
 }
 
 bool NovintCommonDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
-	bool result = m_scaffold.unregisterDevice(this);
+	bool result = m_scaffold->unregisterDevice(this);
+	m_scaffold.reset();
 	m_initialized = !result;
 	return result;
 }
 
 bool NovintCommonDevice::isInitialized() const
 {
-	return m_initialized;
+	return (m_scaffold != nullptr);
 }
 
 void NovintCommonDevice::setPositionScale(double scale)
 {
 	m_positionScale = scale;
-	if (isInitialized())
+	if (m_scaffold)
 	{
-		m_scaffold.setPositionScale(this, m_positionScale);
+		m_scaffold->setPositionScale(this, m_positionScale);
 	}
 }
 
@@ -118,9 +121,9 @@ double NovintCommonDevice::getPositionScale() const
 void NovintCommonDevice::setOrientationScale(double scale)
 {
 	m_orientationScale = scale;
-	if (isInitialized())
+	if (m_scaffold)
 	{
-		m_scaffold.setOrientationScale(this, m_orientationScale);
+		m_scaffold->setOrientationScale(this, m_orientationScale);
 	}
 }
 
