@@ -204,7 +204,7 @@ TEST(NovintDeviceTest, InputConsumer)
 	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	device->setInitializationName(NOVINT_TEST_DEVICE_NAME);
-	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 
 	std::shared_ptr<MockInputOutput> consumer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
@@ -219,7 +219,7 @@ TEST(NovintDeviceTest, InputConsumer)
 
 	// Sleep for a second, to see how many times the consumer is invoked.
 	// (A Novint device is supposed to run at 1KHz.)
-	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(10000));
+	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
 
@@ -227,8 +227,8 @@ TEST(NovintDeviceTest, InputConsumer)
 	EXPECT_FALSE(device->removeInputConsumer(consumer));
 
 	// Check the number of invocations.
-	EXPECT_GE(consumer->m_numTimesReceivedInput, 10*700);
-	EXPECT_LE(consumer->m_numTimesReceivedInput, 10*1300);
+	EXPECT_GE(consumer->m_numTimesReceivedInput, 700);
+	EXPECT_LE(consumer->m_numTimesReceivedInput, 1300);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_1));
@@ -239,7 +239,7 @@ TEST(NovintDeviceTest, OutputProducer)
 	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	device->setInitializationName(NOVINT_TEST_DEVICE_NAME);
-	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 
 	std::shared_ptr<MockInputOutput> producer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
@@ -251,7 +251,7 @@ TEST(NovintDeviceTest, OutputProducer)
 
 	// Sleep for a second, to see how many times the producer is invoked.
 	// (A Novint Falcon device is supposed to run at 1KHz.)
-	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(10000));
+	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeOutputProducer(producer));
 
@@ -259,6 +259,6 @@ TEST(NovintDeviceTest, OutputProducer)
 	EXPECT_FALSE(device->removeOutputProducer(producer));
 
 	// Check the number of invocations.
-	EXPECT_GE(producer->m_numTimesRequestedOutput, 10*700);
-	EXPECT_LE(producer->m_numTimesRequestedOutput, 10*1300);
+	EXPECT_GE(producer->m_numTimesRequestedOutput, 700);
+	EXPECT_LE(producer->m_numTimesRequestedOutput, 1300);
 }

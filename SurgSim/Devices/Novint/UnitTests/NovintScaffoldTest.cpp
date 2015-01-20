@@ -16,23 +16,20 @@
 /// \file
 /// Tests for the NovintScaffold class and its device interactions.
 
+#include <boost/chrono.hpp>
+#include <boost/thread.hpp>
+#include <gtest/gtest.h>
 #include <memory>
 #include <string>
-#include <boost/thread.hpp>
-#include <boost/chrono.hpp>
-#include <gtest/gtest.h>
+
 #include "SurgSim/Devices/Novint/NovintDevice.h"
 #include "SurgSim/Devices/Novint/NovintScaffold.h"
-#include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Matrix.h"
 
 using SurgSim::Device::NovintDevice;
 using SurgSim::Device::NovintScaffold;
 
 TEST(NovintScaffoldTest, CreateAndDestroyScaffold)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
 	ASSERT_NE(nullptr, scaffold) << "The scaffold was not created!";
 	std::weak_ptr<NovintScaffold> scaffold1 = scaffold;
@@ -65,7 +62,6 @@ TEST(NovintScaffoldTest, CreateAndDestroyScaffold)
 
 TEST(NovintScaffoldTest, ScaffoldLifeCycle)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::weak_ptr<NovintScaffold> lastScaffold;
 	{
 		std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
@@ -144,7 +140,6 @@ TEST(NovintScaffoldTest, ScaffoldLifeCycle)
 
 TEST(NovintScaffoldTest, CreateDeviceSeveralTimes)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::weak_ptr<NovintScaffold> lastScaffold;
 
 	for (int i = 0;  i < 6;  ++i)
@@ -164,7 +159,6 @@ TEST(NovintScaffoldTest, CreateDeviceSeveralTimes)
 
 TEST(NovintScaffoldTest, CreateDeviceSeveralTimesWithScaffoldRef)
 {
-	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<NovintScaffold> lastScaffold;
 
 	for (int i = 0;  i < 6;  ++i)

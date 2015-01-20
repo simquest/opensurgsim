@@ -84,45 +84,50 @@ public:
 
 	bool create(const std::string& serial)
 	{
-		SURGSIM_ASSERT(! isValid());
+		SURGSIM_ASSERT(!isValid());
 
-		HDLDeviceHandle deviceHandle = HDL_INVALID_HANDLE;
-		deviceHandle = hdlInitDeviceBySerialNumber(serial.c_str());
-
-		if (m_scaffold->checkForFatalError("Failed to initialize"))
+		bool result = false;
+		std::shared_ptr<NovintScaffold> scaffold = m_scaffold.lock();
+		if (scaffold != nullptr)
 		{
-			// HDAL error message already logged
-			SURGSIM_LOG_INFO(m_scaffold->getLogger()) << std::endl <<
-				"  HDAL serial number: '" << serial << "'" << std::endl;
-			return false;
-		}
-		else if (deviceHandle == HDL_INVALID_HANDLE)
-		{
-			SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Novint: Failed to initialize a device." <<
-				std::endl <<
-				"  Error details: unknown (HDAL returned an invalid handle)" << std::endl <<
-				"  HDAL serial number: '" << serial << "'" << std::endl;
-			return false;
-		}
+			HDLDeviceHandle deviceHandle = HDL_INVALID_HANDLE;
+			deviceHandle = hdlInitDeviceBySerialNumber(serial.c_str());
 
-		m_deviceHandle = deviceHandle;
-		return true;
+			if (scaffold->checkForFatalError("Failed to initialize"))
+			{
+				// HDAL error message already logged
+				SURGSIM_LOG_INFO(scaffold->getLogger()) << std::endl <<
+					"  HDAL serial number: '" << serial << "'" << std::endl;
+			}
+			else if (deviceHandle == HDL_INVALID_HANDLE)
+			{
+				SURGSIM_LOG_SEVERE(scaffold->getLogger()) << "Novint: Failed to initialize a device." <<
+					std::endl <<
+					"  Error details: unknown (HDAL returned an invalid handle)" << std::endl <<
+					"  HDAL serial number: '" << serial << "'" << std::endl;
+			}
+			else
+			{
+				m_deviceHandle = deviceHandle;
+				result = true;
+			}
+		}
+		return result;
 	}
 
 	bool destroy()
 	{
 		SURGSIM_ASSERT(isValid());
-
-		HDLDeviceHandle deviceHandle = m_deviceHandle;
-		if (deviceHandle == HDL_INVALID_HANDLE)
+		bool result = false;
+		std::shared_ptr<NovintScaffold> scaffold = m_scaffold.lock();
+		if (scaffold != nullptr)
 		{
-			return false;
+			hdlUninitDevice(m_deviceHandle);
+			scaffold->checkForFatalError("Couldn't disable device");
+			result = true;
 		}
 		m_deviceHandle = HDL_INVALID_HANDLE;
-
-		hdlUninitDevice(deviceHandle);
-		m_scaffold->checkForFatalError("Couldn't disable device");
-		return true;
+		return result;
 	}
 
 	HDLDeviceHandle get() const
@@ -139,7 +144,7 @@ private:
 	/// The HDAL device handle (or HDL_INVALID_HANDLE if not valid).
 	HDLDeviceHandle m_deviceHandle;
 	/// The scaffold.
-	std::shared_ptr<NovintScaffold> m_scaffold;
+	std::weak_ptr<NovintScaffold> m_scaffold;
 };
 
 
@@ -497,8 +502,12 @@ bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 			// the iterator is now invalid but that's OK
 		}
 	}
+	SURGSIM_LOG_IF(!result, m_logger, SEVERE) << "Novint: Attempted to release a non-registered device.";
 
-	SURGSIM_LOG_IF(!result, m_logger, WARNING) << "Novint: Attempted to release a non-registered device.";
+	if ((m_state->registeredDevices.size() == 0) && (m_state->isApiInitialized))
+	{
+		finalizeSdk();
+	}
 	return result;
 }
 
@@ -509,7 +518,7 @@ std::shared_ptr<NovintScaffold::Handle>
 	if (initializationName == "")
 	{
 		// get the first available
-		for (auto it : m_state->serialToHandle)
+		for (auto& it : m_state->serialToHandle)
 		{
 			auto& possibleHandle = it.second;
 			auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
