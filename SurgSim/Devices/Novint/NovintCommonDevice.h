@@ -37,7 +37,7 @@ class NovintCommonDevice : public SurgSim::Input::CommonDevice
 public:
 	/// Constructor.
 	/// \param name A unique name for the device that will be used by the application.
-	NovintCommonDevice(const std::string& name);
+	explicit NovintCommonDevice(const std::string& name);
 
 	/// Destructor.
 	virtual ~NovintCommonDevice();

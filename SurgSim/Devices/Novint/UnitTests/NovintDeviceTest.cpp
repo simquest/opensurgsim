@@ -48,7 +48,7 @@ TEST(NovintDeviceTest, CreateAndInitializeDeviceByName)
 {
 	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-	
+
 	std::string initializationName = "";
 	EXPECT_FALSE(device->getInitializationName(&initializationName));
 	device->setInitializationName(NOVINT_TEST_DEVICE_NAME);

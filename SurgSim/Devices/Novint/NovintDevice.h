@@ -59,7 +59,7 @@ public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	NovintDevice(const std::string& uniqueName);
+	explicit NovintDevice(const std::string& uniqueName);
 
 	/// Destructor.
 	virtual ~NovintDevice();

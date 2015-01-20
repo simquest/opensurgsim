@@ -220,7 +220,7 @@ private:
 struct NovintScaffold::DeviceData
 {
 	/// Initialize the state.
-	DeviceData(NovintCommonDevice* device) :
+	explicit DeviceData(NovintCommonDevice* device) :
 		initializationName(""),
 		serialNumber(""),
 		deviceObject(device),

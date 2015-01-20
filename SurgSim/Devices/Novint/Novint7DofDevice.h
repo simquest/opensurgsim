@@ -54,7 +54,7 @@ public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	Novint7DofDevice(const std::string& uniqueName);
+	explicit Novint7DofDevice(const std::string& uniqueName);
 
 	/// Destructor.
 	virtual ~Novint7DofDevice();
