@@ -648,8 +648,9 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 			(*initialGuess_and_solution).head(m_numEnforcedAtomicConstraints - 1) -=
 				m_rhsEnforcedLocalSystem.head(m_numEnforcedAtomicConstraints - 1);
 
-			double& Fn  = (*initialGuess_and_solution)[currentAtomicIndex];
-			auto& Ft = (*initialGuess_and_solution).segment<2>(currentAtomicIndex + 1);
+			double& Fn = (*initialGuess_and_solution)[currentAtomicIndex];
+			Eigen::VectorBlock<MlcpSolution::Vector, 2> Ft =
+				(*initialGuess_and_solution).segment<2>(currentAtomicIndex + 1);
 			Fn -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints - 1];
 
 			if (Fn > 0.0)
@@ -716,13 +717,14 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 			// Correct the forces accordingly
 			(*initialGuess_and_solution).head(m_numEnforcedAtomicConstraints - 2) -=
 				m_rhsEnforcedLocalSystem.head(m_numEnforcedAtomicConstraints - 2);
-			auto& Fn = (*initialGuess_and_solution).segment<2>(currentAtomicIndex);
+			Eigen::VectorBlock<MlcpSolution::Vector, 2> Fn =
+				(*initialGuess_and_solution).segment<2>(currentAtomicIndex);
 			Fn -= m_rhsEnforcedLocalSystem.segment<2>(m_numEnforcedAtomicConstraints - 2);
 
 			// No Signorini to verify here, it is NOT a unilateral constraint, but bilateral
 			{
 				// Complete the violation of the friction along t, with the missing terms...
-				double& Ft  = (*initialGuess_and_solution)[currentAtomicIndex + 2];
+				double& Ft = (*initialGuess_and_solution)[currentAtomicIndex + 2];
 				Ft -= (b[currentAtomicIndex + 2] + A.row(currentAtomicIndex + 2) * (*initialGuess_and_solution)) /
 					A(currentAtomicIndex + 2, currentAtomicIndex + 2);
 
