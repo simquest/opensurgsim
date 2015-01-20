@@ -969,6 +969,8 @@ void NovintScaffold::createAllHandles()
 
 void NovintScaffold::destroyAllHandles()
 {
+	m_state->registeredDevices.clear();
+	m_state->unregisteredHandles.clear();
 	for (auto& it : m_state->serialToHandle)
 	{
 		it.second->destroy();
@@ -1061,16 +1063,19 @@ bool NovintScaffold::runHapticFrame()
 	Vector4d torque = Vector4d::Zero();
 	for (auto& handle : m_state->unregisteredHandles)
 	{
-		hdlMakeCurrent(handle->get());
+		if (handle->isValid())
+		{
+			hdlMakeCurrent(handle->get());
 
-		hdlGripSetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &desiredGravityCompensation);
-		checkForFatalError("Cannot set gravity compensation state on recently unregistered device.");
+			hdlGripSetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &desiredGravityCompensation);
+			checkForFatalError("Cannot set gravity compensation state on recently unregistered device.");
 
-		hdlGripSetAttributev(HDL_GRIP_FORCE, 0, force.data());
-		checkForFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
+			hdlGripSetAttributev(HDL_GRIP_FORCE, 0, force.data());
+			checkForFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
-		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, torque.data());
-		checkForFatalError("hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+			hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, torque.data());
+			checkForFatalError("hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+		}
 	}
 	m_state->unregisteredHandles.clear();
 
