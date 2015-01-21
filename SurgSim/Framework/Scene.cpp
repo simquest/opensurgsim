@@ -62,7 +62,14 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 		}
 		runtime->addSceneElement(element);
 	}
+}
 
+void Scene::addSceneElements(std::vector<std::shared_ptr<SceneElement>> elements)
+{
+	for (auto element : elements)
+	{
+		addSceneElement(element);
+	}
 }
 
 std::shared_ptr<Runtime> Scene::getRuntime()
@@ -139,6 +146,7 @@ bool Scene::decode(const YAML::Node& node)
 	}
 	return result;
 }
+
 }; // namespace Framework
 }; // namespace SurgSim
 
