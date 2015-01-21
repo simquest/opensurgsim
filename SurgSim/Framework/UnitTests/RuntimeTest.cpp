@@ -257,7 +257,7 @@ TEST(RuntimeTest, LoadAndAddScene)
 	EXPECT_NE(nullptr, scene1);
 	EXPECT_NE(scene0, scene1);
 
-	EXPECT_TRUE(runtime->addScene("SceneTestData/scene.yaml"));
+	EXPECT_TRUE(runtime->addSceneElements("SceneTestData/elements.yaml"));
 
 	auto scene2 = runtime->getScene();
 
@@ -265,4 +265,30 @@ TEST(RuntimeTest, LoadAndAddScene)
 	EXPECT_EQ(scene1, scene2);
 	
 	EXPECT_EQ(4L, scene2->getSceneElements().size());
+}
+
+TEST(RuntimeTest, LoadAndClone)
+{
+	auto runtime = std::make_shared<Runtime>("config.txt");
+	EXPECT_TRUE(runtime->loadScene("SceneTestData/scene.yaml"));
+	auto scene0 = runtime->getScene();
+
+	auto elements0 = runtime->cloneSceneElements("SceneTestData/element.yaml");
+	auto elements1 = runtime->cloneSceneElements("SceneTestData/element.yaml");
+	
+	EXPECT_EQ(1L, elements0.size());
+	EXPECT_EQ(1L, elements1.size());
+
+	// Without the correct cloning, both of these elements would point to the same instance which would be bad
+
+	auto component0 = elements0[0]->getComponent("clone");
+	auto component1 = elements1[0]->getComponent("clone");
+	ASSERT_NE(nullptr, component0);
+	ASSERT_NE(nullptr, component1);
+
+	EXPECT_NE(component0, component1);
+
+	component0->setLocalActive(false);
+	EXPECT_NE(component0->isLocalActive(), component1->isLocalActive());
+
 }

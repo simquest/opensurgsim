@@ -23,6 +23,11 @@
 
 #include <boost/thread/mutex.hpp>
 
+namespace YAML
+{
+class Node;
+}
+
 namespace SurgSim
 {
 namespace Framework
@@ -120,15 +125,40 @@ public:
 	void removeComponent(const std::shared_ptr<Component>& component);
 
 	/// Loads the scene from the given file, clears all the elements in the scene, the old scene will be
-	/// overwritten
+	/// overwritten.
 	/// \param fileName the filename of the scene to be loaded, needs to be found
 	/// \return true if the loading succeeded and the scene was found
 	bool loadScene(const std::string& fileName);
 	
-	/// Adds the content of the scene from the given file to the current scene. The old scene will not be
+	/// Adds the scene elements from the file to the current scene
+	/// The file format should be just a list of sceneElements
+	/// \code
+	/// - SurgSim::Framework::BasicSceneElement:
+	///	    Name: element1
+	///	    IsActive: true
+	///	    Components:
+	///	      - MockComponent:
+	///	          Name: component1
+	///	          Id: 792faa40-459b-40cf-981d-560a8f2bd1801
+	/// - SurgSim::Framework::BasicSceneElement:
+	///	    Name: element2
+	///	    IsActive: true
+	///	    Components:
+	///	      - MockComponent:
+	///	          Name: component2
+	///	          Id: 1de26315-82a7-46b2-ae38-324d25009629
+	/// \endcode
 	/// \param fileName the filename of the scene to be loaded, needs to be found
 	/// \return true if the loading succeeded and the scene was found
-	bool addScene(const std::string& fileName);
+	bool addSceneElements(const std::string& fileName);
+
+	/// Loads and duplicates the scene elements from the file, the elements will not have common ids
+	/// with any other cloned elements, this lets you repeatedly load a set of elements to replicate this
+	/// set. The format is a list of scene elements \sa addSceneElements().
+	/// \param fileName the filename of the scene to be loaded, needs to be found
+	/// \return a vector of scene elements with the loaded elements, is empty if loading failed
+	std::vector<std::shared_ptr<SceneElement>> cloneSceneElements(const std::string& fileName);
+
 
 	/// Write out the whole scene as a file
 	/// \param fileName the name of the scene-file if no path is given, uses the current path of the executable
@@ -153,11 +183,11 @@ private:
 
 	/// Perform the actual load operation
 	/// \param fileName the filename of the scene to be loaded, needs to be found
-	/// \param createScene if true a new scene is
-	/// \return true if the loading succeeded and the scene was found
-	bool doLoadScene(const std::string& fileName, bool clearScene);
-
-	/// Gets a shared pointer to the runtime.
+	/// \param nodes pointer to the nodes structure to receive the newly loaded nodes
+	/// \return true if the loading succeeded
+	bool Runtime::tryLoadNodes(const std::string& fileName, YAML::Node* nodes);
+	
+		/// Gets a shared pointer to the runtime.
 	/// \return	The shared pointer.
 	std::shared_ptr<Runtime> getSharedPtr();
 
@@ -166,7 +196,7 @@ private:
 	std::shared_ptr<Scene> m_scene;
 	static std::shared_ptr<ApplicationData> m_applicationData;
 
-	boost::mutex m_mutex;
+	boost::mutex m_sceneHandling;
 
 	std::shared_ptr<Barrier> m_barrier;
 	bool m_isPaused;

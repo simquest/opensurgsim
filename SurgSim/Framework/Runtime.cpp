@@ -338,39 +338,77 @@ void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 
 bool Runtime::loadScene(const std::string& fileName)
 {
-	return doLoadScene(fileName, true);
-}
-
-bool Runtime::addScene(const std::string& fileName)
-{
-	return doLoadScene(fileName, false);
-}
-
-bool Runtime::doLoadScene(const std::string& fileName, bool clearScene)
-{
-	// To make sure things are correct, clear the Component cache before and after loading
+	YAML::Node nodes;
 	bool result = false;
-	std::string path;
-	if (m_applicationData->tryFindFile(fileName, &path))
+	boost::lock_guard<boost::mutex> lock(m_sceneHandling);
+	if (tryLoadNodes(fileName, &nodes))
 	{
 		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
-
-		YAML::Node node = YAML::LoadFile(path);
-		if (clearScene)
-		{
-			m_scene = std::make_shared<Scene>(getSharedPtr());
-		}
-		m_scene->decode(node);
+		m_scene = std::make_shared<Scene>(getSharedPtr());
+		m_scene->decode(nodes);
 
 		result = true;
+	}
 
-		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
+	return result;
+}
+
+bool Runtime::addSceneElements(const std::string& fileName)
+{
+	YAML::Node nodes;
+	bool result = false;
+	boost::lock_guard<boost::mutex> lock(m_sceneHandling);
+	if (tryLoadNodes(fileName, &nodes))
+	{
+		SURGSIM_ASSERT(nodes.IsSequence()) << "Loaded nodes are not a sequence !";
+		auto elements = nodes.as<std::vector<std::shared_ptr<SceneElement>>>();
+		
+		for (auto element : elements)
+		{
+			m_scene->addSceneElement(element);
+		}
+		result = true;
+	}
+	return result;
+}
+
+std::vector<std::shared_ptr<SceneElement>> Runtime::cloneSceneElements(const std::string& fileName)
+{
+	YAML::Node nodes;
+	YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::RegistryType registry;
+	std::vector<std::shared_ptr<SceneElement>> result;
+
+	boost::lock_guard<boost::mutex> lock(m_sceneHandling);
+
+	// Use a temporary registry
+	std::swap(YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry(), registry);
+
+	if (tryLoadNodes(fileName, &nodes))
+	{
+		result = std::move(nodes.as<std::vector<std::shared_ptr<SceneElement>>>());
+	}
+
+	// restore the original registry
+	std::swap(YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry(), registry);
+
+	return result;
+}
+
+bool Runtime::tryLoadNodes(const std::string& fileName, YAML::Node* nodes)
+{
+	bool result = false;
+	std::string path;
+	SURGSIM_ASSERT(nodes != nullptr) << "Can't load nodes into nullptr.";
+	if (m_applicationData->tryFindFile(fileName, &path))
+	{
+		YAML::Node node = YAML::LoadFile(path);
+		*nodes = std::move(node);
+		result = true;
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(Logger::getLogger("Runtime")) << "Could not find Scenefile " << fileName;
+		SURGSIM_LOG_WARNING(Logger::getLogger("Runtime")) << "Could not find file " << fileName;
 	}
-
 	return result;
 }
 
