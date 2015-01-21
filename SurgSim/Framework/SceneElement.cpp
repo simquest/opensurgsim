@@ -247,7 +247,13 @@ bool SceneElement::decode(const YAML::Node& node)
 
 		YAML::Node data = node[getClassName()];
 
-		m_name = data["Name"].as<std::string>();
+		SURGSIM_ASSERT(data.IsDefined() && !data.IsNull()) 
+			<< "Content of node is empty, for class " << className << ". This is probably an indentation issue.";
+
+		if (data["Name"].IsScalar())
+		{
+			m_name = data["Name"].as<std::string>();
+		}
 
 		if (data["IsActive"].IsDefined())
 		{

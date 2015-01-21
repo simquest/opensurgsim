@@ -35,7 +35,6 @@ class Scene;
 namespace YAML
 {
 
-
 /// Specialization of YAML::convert for std::shared_ptr, this is used to redirect the serialization of a derived class
 /// to the specialization of the serialization for a base class, for example all subclasses of Component can use the
 /// Component serialization specialization, currently each redirection has to be implemented separately, the re is
@@ -65,7 +64,7 @@ struct convert<std::shared_ptr<T>>
 /// Additionally this class contains a class factory that can be used to generate the class from
 /// its name.
 template <>
-struct convert<std::shared_ptr<SurgSim::Framework::Component> >
+struct convert<std::shared_ptr<SurgSim::Framework::Component>>
 {
 	static Node encode(const std::shared_ptr<SurgSim::Framework::Component> rhs);
 	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Component>& rhs); //NOLINT
