@@ -123,8 +123,7 @@ public:
 		if (scaffold != nullptr)
 		{
 			hdlUninitDevice(m_deviceHandle);
-			scaffold->checkForFatalError("Couldn't disable device");
-			result = true;
+			result = !scaffold->checkForFatalError("Couldn't disable device");
 		}
 		m_deviceHandle = HDL_INVALID_HANDLE;
 		return result;
