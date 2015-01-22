@@ -24,7 +24,6 @@ namespace Device
 
 NovintCommonDevice::NovintCommonDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, NovintScaffold::buildDeviceInputData()),
-	m_initialized(false),
 	m_positionScale(1.0), m_orientationScale(1.0)
 {
 }
@@ -41,7 +40,7 @@ void NovintCommonDevice::setSerialNumber(const std::string& serialNumber)
 {
 	SURGSIM_ASSERT(!m_initializationName.hasValue()) << "Cannot set serialNumber for a NovintCommonDevice named " <<
 		getName() << ", which already has an initializationName.";
-	SURGSIM_ASSERT(!m_initialized) <<
+	SURGSIM_ASSERT(!isInitialized()) <<
 		"Cannot setSerialNumber after the device named " << getName() << " has been initialized.";
 	m_serialNumber.setValue(serialNumber);
 }
@@ -60,7 +59,7 @@ void NovintCommonDevice::setInitializationName(const std::string& initialization
 {
 	SURGSIM_ASSERT(!m_serialNumber.hasValue()) << "Cannot set initializationName for a NovintCommonDevice named " <<
 		getName() << ", which already has a serialNumber.";
-	SURGSIM_ASSERT(!m_initialized) <<
+	SURGSIM_ASSERT(!isInitialized()) <<
 		"Cannot setInitializationName after the device named " << getName() << " has been initialized.";
 	m_initializationName.setValue(initializationName);
 }
@@ -77,7 +76,7 @@ bool NovintCommonDevice::getInitializationName(std::string* initializationName) 
 
 bool NovintCommonDevice::initialize()
 {
-	SURGSIM_ASSERT(! isInitialized());
+	SURGSIM_ASSERT(!isInitialized());
 	std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold);
 
@@ -95,7 +94,6 @@ bool NovintCommonDevice::finalize()
 	SURGSIM_ASSERT(isInitialized());
 	bool result = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
-	m_initialized = !result;
 	return result;
 }
 

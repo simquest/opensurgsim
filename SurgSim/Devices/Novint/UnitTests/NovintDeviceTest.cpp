@@ -63,7 +63,8 @@ TEST(NovintDeviceTest, CreateAndInitializeDeviceByName)
 	EXPECT_EQ("TestFalcon", device->getName());
 
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
-	EXPECT_TRUE(device->isInitialized());
+	ASSERT_TRUE(device->isInitialized());
+	ASSERT_ANY_THROW(device->initialize()) << "Initialized the same device twice.";
 	EXPECT_EQ("TestFalcon", device->getName());
 
 	const double positionScale = 2.0;

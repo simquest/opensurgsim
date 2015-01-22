@@ -99,9 +99,6 @@ private:
 	/// The scaffold handles all the communication with the SDK.
 	std::shared_ptr<NovintScaffold> m_scaffold;
 
-	/// true if this device has been registered with the scaffold.
-	bool m_initialized;
-
 	/// The name passed to the SDK to specify which hardware device should be used.
 	SurgSim::DataStructures::OptionalValue<std::string> m_initializationName;
 
