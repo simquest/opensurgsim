@@ -62,7 +62,7 @@ struct TrackIRScaffold::DeviceData
 		camera = CameraLibrary::CameraManager::X().GetCamera(list[cameraID].UID());
 
 		SURGSIM_ASSERT(nullptr != camera) << "Failed to obtain a camera from CameraLibrary.";
-		camera->SetVideoType(CameraLibrary::BitPackedPrecisionMode);
+		camera->SetVideoType(Core::eVideoMode::BitPackedPrecisionMode);
 
 		CameraLibrary::cVectorProcessingSettings vectorProcessorSettings;
 		vectorProcessorSettings = *(vectorProcessor->Settings());
