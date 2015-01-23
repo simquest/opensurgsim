@@ -1,7 +1,7 @@
 # - Try to find the Sixense SDK, used by the Razer Hydra gaming controller.
 #
 # Once done this will define
-#  SIXENSE_SDK_FOUND - system has the Sixense SDK directory
+#  SIXENSESDK_FOUND - system has the Sixense SDK directory
 #  SIXENSE_SDK_INCLUDE_DIR - the Sixense SDK include directory
 #  SIXENSE_SDK_LIBRARIES - the Sixense SDK libraries
 
@@ -161,13 +161,13 @@ find_package_handle_standard_args(SixenseSdk
 	DEFAULT_MSG SIXENSE_SDK_ROOT_DIR SIXENSE_SDK_INCLUDE_DIR
 	SIXENSE_SDK_sixense_LIBRARY SIXENSE_SDK_sixense_utils_LIBRARY)
 
-if(SIXENSE_SDK_FOUND)
+if(SIXENSESDK_FOUND)
 	set(SIXENSE_SDK_LIBRARIES
 		${SIXENSE_SDK_sixense_LIBRARY} ${SIXENSE_SDK_sixense_utils_LIBRARY})
-endif(SIXENSE_SDK_FOUND)
+endif(SIXENSESDK_FOUND)
 mark_as_advanced(SIXENSE_SDK_LIBRARIES)
 
-if(SIXENSE_SDK_FOUND)
+if(SIXENSESDK_FOUND)
 	# HACK: for debug, we may also need the mysterious DeviceDLL.dll on Windows.
 	if(WIN32)
 		find_file(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG
@@ -187,4 +187,4 @@ if(SIXENSE_SDK_FOUND)
 			CACHE PATH "Path to DeviceDLL, if any.")
 		mark_as_advanced(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG)
 	endif()
-endif(SIXENSE_SDK_FOUND)
+endif(SIXENSESDK_FOUND)

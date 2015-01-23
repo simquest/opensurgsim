@@ -1,7 +1,7 @@
 # - Try to find the Novint HDAL SDK, used by the Novint Falcon haptic devices.
 #
 # Once done this will define
-#  NOVINT_HDAL_SDK_FOUND - system has the Novint HDAL SDK directory
+#  NOVINTHDALSDK_FOUND - system has the Novint HDAL SDK directory
 #  NOVINT_HDAL_SDK_INCLUDE_DIR - the Novint HDAL SDK include directory
 #  NOVINT_HDAL_SDK_LIBRARIES - the Novint HDAL SDK libraries
 
@@ -110,7 +110,8 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(NovintHdalSdk
 	DEFAULT_MSG NOVINT_HDAL_SDK_INCLUDE_DIR NOVINT_HDAL_SDK_hdl_LIBRARY)
 
-if(NOVINT_HDAL_SDK_FOUND)
+if(NOVINTHDALSDK_FOUND)
 	set(NOVINT_HDAL_SDK_LIBRARIES ${NOVINT_HDAL_SDK_hdl_LIBRARY})
-endif(NOVINT_HDAL_SDK_FOUND)
+endif(NOVINTHDALSDK_FOUND)
+
 mark_as_advanced(NOVINT_HDAL_SDK_LIBRARIES)
