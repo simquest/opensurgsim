@@ -146,8 +146,4 @@ TEST_F(OsgSkeletonRepresentationTest, SerializationTests)
 	EXPECT_EQ(fileName, result->getModel()->getFileName());
 	EXPECT_EQ(skinningShaderFileName, result->getSkinningShaderFileName());
 	EXPECT_TRUE(pose.isApprox(result->getNeutralBonePose("Bone")));
-	const auto& poseMap = result->getNeutralBonePoseMap();
-	EXPECT_EQ(1u, poseMap.size());
-	EXPECT_TRUE(poseMap.find("Bone") != poseMap.end());
-	EXPECT_TRUE(pose.isApprox(poseMap.at("Bone")));
 }

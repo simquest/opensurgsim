@@ -54,6 +54,8 @@ struct OsgSkeletonBoneData
 	osg::ref_ptr<osgAnimation::StackedTranslateElement> translation;
 	SurgSim::Math::RigidTransform3d pose;
 	SurgSim::Math::RigidTransform3d neutralPose;
+
+	OsgSkeletonBoneData() : neutralPose(SurgSim::Math::RigidTransform3d::Identity()) {}
 };
 
 /// Skeleton representation is used to move a mesh based on the movements of
@@ -88,15 +90,16 @@ public:
 
 	SurgSim::Math::RigidTransform3d getNeutralBonePose(const std::string& name) override;
 
-	void setNeutralBonePoseMap(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poseMap) override;
-
-	const std::map<std::string, SurgSim::Math::RigidTransform3d>& getNeutralBonePoseMap() override;
-
 protected:
+	void setNeutralBonePoseMap(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poseMap) override;
+	const std::map<std::string, SurgSim::Math::RigidTransform3d>& getNeutralBonePoseMap() override;
 	void doUpdate(double dt) override;
 	bool doInitialize() override;
 
 private:
+
+	/// The logger for this class.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 	/// The model containing the bone and mesh information.
 	std::shared_ptr<Model> m_model;

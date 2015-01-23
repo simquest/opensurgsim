@@ -92,6 +92,7 @@ public:
 	/// \return pose The neutral pose of the bone.
 	virtual SurgSim::Math::RigidTransform3d getNeutralBonePose(const std::string& name) = 0;
 
+protected:
 	/// Set the neutral pose for a given bone.
 	/// \param poseMap The neutral pose of the bone.
 	virtual void setNeutralBonePoseMap(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poseMap) = 0;

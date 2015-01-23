@@ -160,6 +160,8 @@ OsgSkeletonRepresentation::OsgSkeletonRepresentation(const std::string& name) :
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgSkeletonRepresentation, std::string,
 		SkinningShaderFileName, getSkinningShaderFileName, setSkinningShaderFileName);
+
+	m_logger = SurgSim::Framework::Logger::getLogger("Graphics/OsgSkeletonRepresentation");
 }
 
 void OsgSkeletonRepresentation::loadModel(const std::string& fileName)
@@ -207,7 +209,7 @@ void OsgSkeletonRepresentation::setBonePose(const std::string& name, const SurgS
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+		SURGSIM_LOG_WARNING(m_logger)
 			<< "OsgSkeletonRepresentation::setBonePose(): Bone with name, " << name << ", is not present in mesh."
 			<< "Cannot set pose.";
 	}
@@ -215,7 +217,7 @@ void OsgSkeletonRepresentation::setBonePose(const std::string& name, const SurgS
 
 SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getBonePose(const std::string& name)
 {
-	SurgSim::Math::RigidTransform3d pose;
+	SurgSim::Math::RigidTransform3d pose = SurgSim::Math::RigidTransform3d::Identity();
 
 	auto boneData = m_boneData.find(name);
 	if (boneData != m_boneData.end())
@@ -225,7 +227,7 @@ SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getBonePose(const std
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+		SURGSIM_LOG_WARNING(m_logger)
 			<< "OsgSkeletonRepresentation::getBonePose(): Bone with name, " << name << ", is not present in mesh."
 			<< "Cannot get pose.";
 	}
@@ -250,7 +252,7 @@ SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getNeutralBonePose(co
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+		SURGSIM_LOG_SEVERE(m_logger)
 			<< "OsgSkeletonRepresentation::getNeutralBonePose(): Bone with name, " << name
 			<< ", does not have a neutral pose set.";
 		return SurgSim::Math::RigidTransform3d::Identity();
@@ -360,21 +362,13 @@ bool OsgSkeletonRepresentation::doInitialize()
 
 		// Add the bone skeleton as a child to m_transform
 		m_transform->addChild(m_base.get());
-	}
 
-	if (result && m_boneData.size() != 0)
-	{
-		boost::lock_guard<boost::mutex> lock(m_boneDataMutex);
 		// Update the neutral pose of all the bones.
-		for (auto& boneData : m_boneData) // NOLINT
+		for (auto& boneData : m_boneData)
 		{
 			if (m_neutralPoseMap.find(boneData.first) != m_neutralPoseMap.end())
 			{
 				boneData.second.neutralPose = m_neutralPoseMap[boneData.first];
-			}
-			else
-			{
-				boneData.second.neutralPose = SurgSim::Math::RigidTransform3d::Identity();
 			}
 		}
 	}
