@@ -10,5 +10,6 @@ Dependencies:
 - Device drivers
 - OpenHaptics http://www.geomagic.com/en/products/open-haptics/overview/
   - An environment variable named 3DTOUCH_BASE or OH_SDK_BASE must be set to the directory containing <tt>(include\\)HD\hd.h</tt>
+  - The location of the hd.lib file must be added to your path, e.g., <tt>C:\Program Files (x86)\SensAble\3DTouch\lib\win32</tt>
 
 */
