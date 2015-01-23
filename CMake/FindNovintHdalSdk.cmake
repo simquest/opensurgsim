@@ -107,7 +107,7 @@ novint_find_library(hdl)
 # variable, so the HDAL library is the only thing we need to copy.
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Novint_HDAL_SDK
+find_package_handle_standard_args(NovintHdalSdk
 	DEFAULT_MSG NOVINT_HDAL_SDK_INCLUDE_DIR NOVINT_HDAL_SDK_hdl_LIBRARY)
 
 if(NOVINT_HDAL_SDK_FOUND)

@@ -157,7 +157,7 @@ sixense_find_library(sixense)
 sixense_find_library(sixense_utils)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Sixense_SDK
+find_package_handle_standard_args(SixenseSdk
 	DEFAULT_MSG SIXENSE_SDK_ROOT_DIR SIXENSE_SDK_INCLUDE_DIR
 	SIXENSE_SDK_sixense_LIBRARY SIXENSE_SDK_sixense_utils_LIBRARY)
 
