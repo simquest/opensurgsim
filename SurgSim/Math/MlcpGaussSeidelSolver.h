@@ -97,14 +97,13 @@ private:
 								  const MlcpProblem::Vector& b,
 								  const MlcpSolution::Vector& initialGuess_and_solution,
 								  const MlcpProblem::Vector& frictionCoefs,
-								  const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+								  const std::vector<MlcpConstraintType>& constraintsType,
 								  size_t constraintID, size_t matrixEntryForConstraintID);
 
 	void calculateConvergenceCriteria(size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA,
 									  const MlcpProblem::Vector& b,
 									  const MlcpSolution::Vector& initialGuess_and_solution,
 									  const std::vector<MlcpConstraintType>& constraintsType,
-									  double subStep,
 									  double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
 									  double* convergence_criteria,
 									  bool* signoriniVerified, bool* signoriniValid);
@@ -113,7 +112,7 @@ private:
 						const MlcpProblem::Vector& b,
 						MlcpSolution::Vector* initialGuess_and_solution,
 						const MlcpProblem::Vector& frictionCoefs,
-						const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+						const std::vector<MlcpConstraintType>& constraintsType,
 						double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double* convergence_criteria,
 						bool* signoriniVerified);
 
@@ -121,7 +120,7 @@ private:
 									   const MlcpProblem::Vector& b,
 									   const MlcpSolution::Vector& initialGuess_and_solution,
 									   const std::vector<MlcpConstraintType>& constraintsType,
-									   double subStep, double convergence_criteria,
+									   double convergence_criteria,
 									   bool signorini_verified, size_t nbLoop);
 
 	/// The precision.
