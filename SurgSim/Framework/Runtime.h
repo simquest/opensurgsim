@@ -129,7 +129,7 @@ public:
 	/// \param fileName the filename of the scene to be loaded, needs to be found
 	/// \return true if the loading succeeded and the scene was found
 	bool loadScene(const std::string& fileName);
-	
+
 	/// Adds the scene elements from the file to the current scene
 	/// The file format should be just a list of sceneElements
 	/// \code
@@ -183,14 +183,21 @@ private:
 
 	/// Perform the actual load operation
 	/// \param fileName the filename of the scene to be loaded, needs to be found
-	/// \param nodes pointer to the nodes structure to receive the newly loaded nodes
+	/// \param [out] nodes pointer to the nodes structure to receive the newly loaded nodes
 	/// \return true if the loading succeeded
 	bool Runtime::tryLoadNodes(const std::string& fileName, YAML::Node* nodes);
-	
-		/// Gets a shared pointer to the runtime.
+
+	/// Convert nodes to vector of elements
+	/// \param filename the original filename for error reporting
+	/// \param nodes the nodes to be converted
+	/// \param [out] elements the pointer for the results
+	/// \return true if the conversion was successful
+	bool tryConvertElements(const std::string& fileName, const YAML::Node& nodes,
+							std::vector<std::shared_ptr<SceneElement>>* elements);
+
+	/// Gets a shared pointer to the runtime.
 	/// \return	The shared pointer.
 	std::shared_ptr<Runtime> getSharedPtr();
-
 	bool m_isRunning;
 	std::vector< std::shared_ptr<ComponentManager> > m_managers;
 	std::shared_ptr<Scene> m_scene;

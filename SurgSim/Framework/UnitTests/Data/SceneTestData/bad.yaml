@@ -1,0 +1,10 @@
+- SurgSim::Framework::BasicSceneElement:
+    Name: element2
+    IsActive: true
+    Components:
+      - MockComponent:
+          Name: clone
+          Id 1de26315-82a7-46b2-ae38-324d25009629
+          IsLocalActive: true
+          SucceedWithInit: true
+          SucceedWithWakeUp: true

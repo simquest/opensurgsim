@@ -358,17 +358,23 @@ bool Runtime::addSceneElements(const std::string& fileName)
 	YAML::Node nodes;
 	bool result = false;
 	boost::lock_guard<boost::mutex> lock(m_sceneHandling);
+
 	if (tryLoadNodes(fileName, &nodes))
 	{
-		SURGSIM_ASSERT(nodes.IsSequence()) << "Loaded nodes are not a sequence !";
-		auto elements = nodes.as<std::vector<std::shared_ptr<SceneElement>>>();
-		
-		for (auto element : elements)
+		std::vector<std::shared_ptr<SceneElement>> elements;
+		if (tryConvertElements(fileName, nodes, &elements))
 		{
-			m_scene->addSceneElement(element);
+			m_scene->addSceneElements(elements);
+			result = true;
 		}
-		result = true;
 	}
+
+	if (!result)
+	{
+		SURGSIM_LOG_WARNING(Logger::getLogger("Runtime"))
+				<< "Could not add scene elements from the YAML file: " << fileName;
+	}
+
 	return result;
 }
 
@@ -383,9 +389,10 @@ std::vector<std::shared_ptr<SceneElement>> Runtime::cloneSceneElements(const std
 	// Use a temporary registry
 	std::swap(YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry(), registry);
 
-	if (tryLoadNodes(fileName, &nodes))
+	if (!tryLoadNodes(fileName, &nodes) || !tryConvertElements(fileName, nodes, &result))
 	{
-		result = std::move(nodes.as<std::vector<std::shared_ptr<SceneElement>>>());
+		SURGSIM_LOG_WARNING(Logger::getLogger("Runtime"))
+				<< "Could not clone from the YAML file: " << fileName;
 	}
 
 	// restore the original registry
@@ -401,13 +408,45 @@ bool Runtime::tryLoadNodes(const std::string& fileName, YAML::Node* nodes)
 	SURGSIM_ASSERT(nodes != nullptr) << "Can't load nodes into nullptr.";
 	if (m_applicationData->tryFindFile(fileName, &path))
 	{
-		YAML::Node node = YAML::LoadFile(path);
-		*nodes = std::move(node);
-		result = true;
+		try
+		{
+			*nodes = YAML::LoadFile(path);
+			result = true;
+		}
+		catch (YAML::ParserException e)
+		{
+			SURGSIM_FAILURE() << "Could not parse YAML File at " << path
+							  << " due to " << e.msg << " at line " << e.mark.line << " column " << e.mark.column;
+		}
 	}
 	else
 	{
 		SURGSIM_LOG_WARNING(Logger::getLogger("Runtime")) << "Could not find file " << fileName;
+	}
+	return result;
+}
+
+bool Runtime::tryConvertElements(const std::string& filename, const YAML::Node& nodes,
+								 std::vector<std::shared_ptr<SceneElement>>* elements)
+{
+	bool result = false;
+	if (nodes.IsSequence())
+	{
+		try
+		{
+			*elements = nodes.as<std::vector<std::shared_ptr<SceneElement>>>();
+			result = true;
+		}
+		catch (YAML::Exception e)
+		{
+			SURGSIM_LOG_WARNING(Logger::getLogger("Runtime"))
+					<< "File " << filename << " YAML conversion failed with exception: " + e.msg;
+		}
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(Logger::getLogger("Runtime"))
+				<< "File " << filename << " not a YAML sequence, can't load scene elements.";
 	}
 	return result;
 }
