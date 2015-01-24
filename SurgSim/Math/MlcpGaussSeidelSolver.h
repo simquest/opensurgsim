@@ -16,19 +16,25 @@
 #ifndef SURGSIM_MATH_MLCPGAUSSSEIDELSOLVER_H
 #define SURGSIM_MATH_MLCPGAUSSSEIDELSOLVER_H
 
-#include "SurgSim/Math/MlcpSolver.h"
-#include <Eigen/Core>
+#include <memory.h>
+
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/MlcpProblem.h"
+#include "SurgSim/Math/MlcpSolver.h"
 #include "SurgSim/Math/MlcpSolution.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
+namespace Framework
+{
+class Logger;
+}
+
 namespace Math
 {
 
 /// A solver for mixed LCP problems using the Gauss-Seidel iterative method.
-///
-/// \todo Clean this up more...
 ///
 /// The problem can contain:
 ///  - CONSTRAINT  = Bilateral constraint (all atomic, a fixed 3D point=3 atomics independents constraints)
@@ -47,145 +53,96 @@ namespace Math
 class MlcpGaussSeidelSolver : public MlcpSolver
 {
 public:
-	MlcpGaussSeidelSolver() :
-		m_epsilonConvergence(defaultEpsilonConvergence()),
-		m_contactTolerance(defaultContactTolerance()),
-		m_substepRatio(1.0),
-		m_maxIterations(defaultMaxIterations()),
-		m_catchExplodingConvergenceCriteria(true),
-		m_verbose(false),
-		m_numEnforcedAtomicConstraints(-1)
-	{
-	}
+	/// Constructor.
+	MlcpGaussSeidelSolver();
 
-	MlcpGaussSeidelSolver(double epsilonConvergence, double contactTolerance, unsigned int maxIterations) :
-		m_epsilonConvergence(epsilonConvergence),
-		m_contactTolerance(contactTolerance),
-		m_substepRatio(1.0),
-		m_maxIterations(maxIterations),
-		m_catchExplodingConvergenceCriteria(true),
-		m_verbose(false),
-		m_numEnforcedAtomicConstraints(-1)
-	{
-	}
+	/// Constructor.
+	/// \param epsilonConvergence The precision.
+	/// \param contactTolerance The contact tolerance.
+	/// \param maxIterations The max iterations.
+	MlcpGaussSeidelSolver(double epsilonConvergence, double contactTolerance, size_t maxIterations);
 
-	virtual ~MlcpGaussSeidelSolver()
-	{
-	}
+	/// Destructor.
+	virtual ~MlcpGaussSeidelSolver();
 
-
+	/// Resolution of a given MLCP (Gauss Seidel iterative solver)
+	/// \param problem The mlcp problem
+	/// \param [out] solution The mlcp solution
+	/// \return true if successfully converged.
 	bool solve(const MlcpProblem& problem, MlcpSolution* solution);
 
+	/// \return The precision.
+	double getEpsilonConvergence() const;
 
-	double getEpsilonConvergence() const
-	{
-		return m_epsilonConvergence;
-	}
-	void setEpsilonConvergence(double val)
-	{
-		m_epsilonConvergence = val;
-	}
-	double getContactTolerance() const
-	{
-		return m_contactTolerance;
-	}
-	void setContactTolerance(double val)
-	{
-		m_contactTolerance = val;
-	}
-	double getSubstepRatio() const
-	{
-		return m_substepRatio;
-	}
-	void setSubstepRatio(double val)
-	{
-		m_substepRatio = val;
-	}
-	unsigned int getMaxIterations() const
-	{
-		return m_maxIterations;
-	}
-	void setMaxIterations(unsigned int val)
-	{
-		m_maxIterations = val;
-	}
-	bool isCatchingExplodingConvergenceCriteria() const
-	{
-		return m_catchExplodingConvergenceCriteria;
-	}
-	void setCatchingExplodingConvergenceCriteria(bool val)
-	{
-		m_catchExplodingConvergenceCriteria = val;
-	}
-	bool isVerbose() const
-	{
-		return m_verbose;
-	}
-	void setVerbose(bool val)
-	{
-		m_verbose = val;
-	}
+	/// Set the precision.
+	/// \param precision The precision.
+	void setEpsilonConvergence(double precision);
 
+	/// \return The contact tolerance.
+	double getContactTolerance() const;
 
-	static double defaultEpsilonConvergence()
-	{
-		return 1e-4;
-	}
-	static double defaultContactTolerance()
-	{
-		return 2e-5;
-	}
-	static int defaultMaxIterations()
-	{
-		return 30;
-	}
+	/// Set the contact tolerance.
+	/// \param tolerance The contact tolerance.
+	void setContactTolerance(double tolerance);
+
+	/// \return The max number of iterations.
+	size_t getMaxIterations() const;
+
+	/// Set the max number of iterations.
+	/// \param maxIterations The max number of iterations.
+	void setMaxIterations(size_t maxIterations);
 
 private:
-	void computeEnforcementSystem(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
+	void computeEnforcementSystem(size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA,
 								  const MlcpProblem::Vector& b,
 								  const MlcpSolution::Vector& initialGuess_and_solution,
 								  const MlcpProblem::Vector& frictionCoefs,
-								  const std::vector<MlcpConstraintType>& constraintsType, double subStep,
-								  int constraintID, int matrixEntryForConstraintID);
+								  const std::vector<MlcpConstraintType>& constraintsType,
+								  size_t constraintID, size_t matrixEntryForConstraintID);
 
-	void calculateConvergenceCriteria(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
+	void calculateConvergenceCriteria(size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA,
 									  const MlcpProblem::Vector& b,
 									  const MlcpSolution::Vector& initialGuess_and_solution,
 									  const std::vector<MlcpConstraintType>& constraintsType,
-									  double subStep,
 									  double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
 									  double* convergence_criteria,
 									  bool* signoriniVerified, bool* signoriniValid);
 
-	void doOneIteration(int n, const MlcpProblem::Matrix& A, int nbColumnInA, const MlcpProblem::Vector& b,
+	void doOneIteration(size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA,
+						const MlcpProblem::Vector& b,
 						MlcpSolution::Vector* initialGuess_and_solution,
 						const MlcpProblem::Vector& frictionCoefs,
-						const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+						const std::vector<MlcpConstraintType>& constraintsType,
 						double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double* convergence_criteria,
 						bool* signoriniVerified);
 
-	void printViolationsAndConvergence(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
+	void printViolationsAndConvergence(size_t problemSize, const MlcpProblem::Matrix& A,
 									   const MlcpProblem::Vector& b,
 									   const MlcpSolution::Vector& initialGuess_and_solution,
 									   const std::vector<MlcpConstraintType>& constraintsType,
-									   double subStep, double convergence_criteria,
-									   bool signorini_verified, int nbLoop);
+									   double convergence_criteria,
+									   bool signorini_verified, size_t nbLoop);
 
+	/// The precision.
+	double m_epsilonConvergence;
 
-	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
-	typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
+	/// The contact tolerance.
+	double m_contactTolerance;
 
+	/// The maximum number of iterations
+	size_t m_maxIterations;
 
-	double       m_epsilonConvergence;
-	double       m_contactTolerance;
-	double       m_substepRatio;
-	unsigned int m_maxIterations;
-	bool         m_catchExplodingConvergenceCriteria;
-	bool         m_verbose;
+	/// The number of atomic constraints, aka the system size.
+	size_t m_numEnforcedAtomicConstraints;
 
-	int m_numEnforcedAtomicConstraints;
+	/// The left-hand side matrix.
 	Matrix m_lhsEnforcedLocalSystem;
+
+	/// The right-hand side vector.
 	Vector m_rhsEnforcedLocalSystem;
+
+	/// The logger.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 };  // namespace Math

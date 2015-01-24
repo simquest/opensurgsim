@@ -192,10 +192,10 @@ std::istream& operator>> (std::istream& in, HandTrackingData& handData)
 
 		for (auto jointPose = hand->jointPoses.begin(); in.good() && jointPose != hand->jointPoses.end(); ++jointPose)
 		{
-			in >> position;
-			jointPose->translation() = position;
 			in >> quaternion;
 			jointPose->linear() = quaternion.matrix();
+			in >> position;
+			jointPose->translation() = position;
 		}
 
 		for (auto fingerTip = hand->fingerTips.begin(); in.good() && fingerTip != hand->fingerTips.end(); ++fingerTip)

@@ -38,7 +38,7 @@ struct MlcpSolution
 	Vector x;
 
 	/// The number of iterations performed.
-	int numIterations;
+	size_t numIterations;
 	/// True if the final value of the convergence criteria is valid.
 	bool validConvergence;
 	/// True if the final solution satisfies the Signorini conditions.
