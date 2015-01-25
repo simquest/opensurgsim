@@ -43,7 +43,6 @@ typedef SurgSim::Math::Vector6d LinearStateVector;
 
 VelocityFromPose::VelocityFromPose(const std::string& name) :
 	CommonDevice(name),
-	m_lastTime(SurgSim::Framework::Clock::now()),
 	m_lastPose(SurgSim::Math::RigidTransform3d::Identity())
 {
 	LinearObservationMatrix linearObservationMatrix;
@@ -51,18 +50,13 @@ VelocityFromPose::VelocityFromPose(const std::string& name) :
 	m_linearFilter.setObservationMatrix(linearObservationMatrix);
 	m_linearFilter.setInitialState(LinearStateVector::Zero());
 	m_linearFilter.setInitialStateCovariance(LinearStateMatrix::Ones() * 1000.0);
-	LinearStateMatrix linearProcessNoise;
-	linearProcessNoise << LinearMeasurementMatrix::Identity() * 0.1, LinearMeasurementMatrix::Zero(),
-							LinearMeasurementMatrix::Zero(), LinearMeasurementMatrix::Identity() * 100.0;
-	m_linearFilter.setProcessNoiseCovariance(linearProcessNoise);
-	m_linearFilter.setMeasurementNoiseCovariance(LinearMeasurementMatrix::Identity());
+	m_linearFilter.setMeasurementNoiseCovariance(LinearMeasurementMatrix::Identity() * 0.1);
 
 	AngularObservationMatrix angularObservationMatrix;
 	angularObservationMatrix << AngularMeasurementMatrix::Identity(), AngularMeasurementMatrix::Zero();
 	m_angularFilter.setObservationMatrix(angularObservationMatrix);
 	m_angularFilter.setInitialState(AngularStateVector::Zero());
 	m_angularFilter.setInitialStateCovariance(AngularStateMatrix::Ones() * 1000.0);
-	m_angularFilter.setProcessNoiseCovariance(AngularStateMatrix::Identity() * 10.0);
 	m_angularFilter.setMeasurementNoiseCovariance(AngularMeasurementMatrix::Identity());
 }
 
@@ -102,6 +96,8 @@ void VelocityFromPose::initializeInput(const std::string& device, const SurgSim:
 		linearState << pose.translation(), LinearMeasurementVector::Zero();
 		m_linearFilter.setInitialState(linearState);
 	}
+
+	m_lastTime = SurgSim::Framework::Clock::now();
 }
 
 void VelocityFromPose::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
@@ -127,16 +123,38 @@ void VelocityFromPose::handleInput(const std::string& device, const SurgSim::Dat
 			linearStateTransition <<
 				LinearMeasurementMatrix::Identity(), period * LinearMeasurementMatrix::Identity(),
 				LinearMeasurementMatrix::Zero(),     LinearMeasurementMatrix::Identity();
-
 			m_linearFilter.setStateTransition(linearStateTransition);
+
+			LinearStateMatrix linearProcessNoise;
+			const double linearCovariance = 1e7;
+			const LinearMeasurementMatrix offDiagonalLinearCovariance =
+				LinearMeasurementMatrix::Identity() * std::pow(period, 3) * 0.5 * linearCovariance;
+			linearProcessNoise <<
+				LinearMeasurementMatrix::Identity() * std::pow(period, 4) * 0.25 * linearCovariance,
+																							offDiagonalLinearCovariance,
+				offDiagonalLinearCovariance, LinearMeasurementMatrix::Identity() * period * period * linearCovariance;
+			m_linearFilter.setProcessNoiseCovariance(linearProcessNoise);
+
 			const LinearStateVector& linearState = m_linearFilter.update(pose.translation());
- 			getInputData().vectors().set(SurgSim::DataStructures::Names::LINEAR_VELOCITY, linearState.segment<3>(3));
+			getInputData().vectors().set(SurgSim::DataStructures::Names::LINEAR_VELOCITY, linearState.segment<3>(3));
 
 			AngularStateMatrix angularStateTransition;
 			angularStateTransition <<
 				AngularMeasurementMatrix::Identity(), period * AngularMeasurementMatrix::Identity(),
 				AngularMeasurementMatrix::Zero(),     AngularMeasurementMatrix::Identity();
 			m_angularFilter.setStateTransition(angularStateTransition);
+
+			AngularStateMatrix angularProcessNoise;
+			const double angularCovariance = 1e8;
+			const AngularMeasurementMatrix offDiagonalAngularCovariance =
+				AngularMeasurementMatrix::Identity() * std::pow(period, 3) * 0.5 * angularCovariance;
+			angularProcessNoise <<
+				AngularMeasurementMatrix::Identity() * std::pow(period, 4) * 0.25 * angularCovariance,
+																						offDiagonalAngularCovariance,
+				offDiagonalAngularCovariance,
+											AngularMeasurementMatrix::Identity() * period * period * angularCovariance;
+			m_angularFilter.setProcessNoiseCovariance(angularProcessNoise);
+
 			SurgSim::Math::Vector3d rotation;
 			SurgSim::Math::computeRotationVector(pose, m_lastPose, &rotation);
 			const AngularStateVector& angularState = m_angularFilter.update(rotation / period);
