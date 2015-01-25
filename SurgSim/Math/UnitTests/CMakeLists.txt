@@ -21,6 +21,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	AabbTests.cpp
 	GeometryTests.cpp
+	KalmanFilterTests.cpp
 	MakeRigidTransformTests.cpp
 	MeshShapeTests.cpp
 	MlcpGaussSeidelSolverTests.cpp

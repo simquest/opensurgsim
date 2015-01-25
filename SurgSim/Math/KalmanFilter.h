@@ -48,7 +48,7 @@ public:
 	/// Set the process noise covariance, size m x m.
 	/// \param q The process noise covariance.
 	void setProcessNoiseCovariance(const Matrix& q);
-	
+
 	/// Set the measurement noise covariance, size n x n.
 	/// \param r The measurement noise covariance.
 	void setMeasurementNoiseCovariance(const Matrix& r);
