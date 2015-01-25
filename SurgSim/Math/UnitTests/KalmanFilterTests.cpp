@@ -47,11 +47,11 @@ TEST(KalmanFilterTests, 1DConstant)
 	}
 
 	const double result = 0.99046032523740679;
-	EXPECT_DOUBLE_EQ(result , kalman->getState()[0]);
+	EXPECT_NEAR(result , kalman->getState()[0], 1e-9);
 	// The state doesn't change unless there's an update.
-	EXPECT_DOUBLE_EQ(result, kalman->getState()[0]);
+	EXPECT_NEAR(result, kalman->getState()[0], 1e-9);
 	// Updating a constant model without a measurement shouldn't change the state.
-	EXPECT_DOUBLE_EQ(result, kalman->update()[0]);
+	EXPECT_NEAR(result, kalman->update()[0], 1e-9);
 }
 
 TEST(KalmanFilterTests, 1DVelocity)
@@ -89,15 +89,15 @@ TEST(KalmanFilterTests, 1DVelocity)
 
 	// check the state
 	const double position = 0.61844193701221828;
-	EXPECT_DOUBLE_EQ(position, kalman->getState()[0]);
+	EXPECT_NEAR(position, kalman->getState()[0], 1e-9);
 	const double velocity = 0.91376229444025137;
-	EXPECT_DOUBLE_EQ(velocity, kalman->getState()[1]);
+	EXPECT_NEAR(velocity, kalman->getState()[1], 1e-9);
 
 	// The state doesn't change unless there's an update.
-	EXPECT_DOUBLE_EQ(position, kalman->getState()[0]);
+	EXPECT_NEAR(position, kalman->getState()[0], 1e-9);
 	// Updating without a measurement will predict ahead.
-	EXPECT_DOUBLE_EQ(position + velocity * dt, kalman->update()[0]);
-	EXPECT_DOUBLE_EQ(velocity, kalman->getState()[1]);
+	EXPECT_NEAR(position + velocity * dt, kalman->update()[0], 1e-9);
+	EXPECT_NEAR(velocity, kalman->getState()[1], 1e-9);
 }
 }; // namespace Math
 
