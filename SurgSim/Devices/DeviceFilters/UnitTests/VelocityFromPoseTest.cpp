@@ -129,8 +129,8 @@ TEST(VelocityFromPoseDeviceFilterTest, InputDataFilter)
 	ASSERT_TRUE(filteredInputData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY,
 		&actualLinearVelocity));
 	EXPECT_NEAR(translationVelocity[0], actualLinearVelocity[0], 1e-3);
-	EXPECT_NEAR(translationVelocity[1], actualLinearVelocity[1], 1e-3);
-	EXPECT_NEAR(translationVelocity[2], actualLinearVelocity[2], 1e-3);
+	EXPECT_NEAR(translationVelocity[1], actualLinearVelocity[1], 2e-3);
+	EXPECT_NEAR(translationVelocity[2], actualLinearVelocity[2], 3e-3);
 
 	Vector3d actualAngularVelocity;
 	ASSERT_TRUE(filteredInputData.vectors().get(SurgSim::DataStructures::Names::ANGULAR_VELOCITY,
@@ -138,7 +138,7 @@ TEST(VelocityFromPoseDeviceFilterTest, InputDataFilter)
 	const Vector3d expectedAngularVelocity = rotationVelocity * rotationAxis;
 	EXPECT_NEAR(expectedAngularVelocity[0], actualAngularVelocity[0], 2e-3);
 	EXPECT_NEAR(expectedAngularVelocity[1], actualAngularVelocity[1], 2e-3);
-	EXPECT_NEAR(expectedAngularVelocity[2], actualAngularVelocity[2], 2e-3);
+	EXPECT_NEAR(expectedAngularVelocity[2], actualAngularVelocity[2], 4e-3);
 }
 
 TEST(VelocityFromPoseDeviceFilterTest, OutputDataFilter)
