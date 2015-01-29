@@ -24,7 +24,6 @@ set(SURGSIM_GRAPHICS_SOURCES
 	Manager.cpp
 	Mesh.cpp
 	MeshPlyReaderDelegate.cpp
-	MeshUtilities.cpp
 	OsgAxesRepresentation.cpp
 	OsgBoxRepresentation.cpp
 	OsgCamera.cpp
@@ -87,7 +86,6 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Mesh-inl.h
 	MeshPlyReaderDelegate.h
 	MeshRepresentation.h
-	MeshUtilities.h
 	Model.h
 	OctreeRepresentation.h
 	OsgAxesRepresentation.h

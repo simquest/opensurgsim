@@ -23,13 +23,15 @@
 #include <osgUtil/SmoothingVisitor>
 
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/Mesh.h"
-#include "SurgSim/Graphics/MeshUtilities.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/TriangleNormalGenerator.h"
+#include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
@@ -42,8 +44,7 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	OsgRepresentation(name),
 	MeshRepresentation(name),
 	m_updateOptions(UPDATE_OPTION_VERTICES),
-	m_mesh(std::make_shared<Mesh>()),
-	m_filename()
+	m_mesh(std::make_shared<Mesh>())
 {
 	// The actual size of the mesh is not known at this time, just allocate the
 	// osg structures that are needed and add them to the geometry, and the node
@@ -85,9 +86,31 @@ OsgMeshRepresentation::~OsgMeshRepresentation()
 {
 }
 
+void OsgMeshRepresentation::loadMesh(const std::string& fileName)
+{
+	auto mesh = std::make_shared<Mesh>();
+	mesh->load(fileName);
+	setMesh(mesh);
+}
+
+void OsgMeshRepresentation::setMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh)
+{
+	auto graphicsMesh = std::dynamic_pointer_cast<Mesh>(mesh);
+	SURGSIM_ASSERT(graphicsMesh != nullptr) << "Mesh for OsgMeshRepresentation needs to be a SurgSim::Graphics::Mesh";
+	m_mesh = graphicsMesh;
+}
+
 std::shared_ptr<Mesh> OsgMeshRepresentation::getMesh()
 {
 	return m_mesh;
+}
+
+void OsgMeshRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape)
+{
+	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+		<< "Shape for OsgMeshRepresentation needs to be a SurgSim::Math::MeshShape";
+	auto meshShape = std::static_pointer_cast<SurgSim::Math::MeshShape>(shape);
+	m_mesh = std::make_shared<Mesh>(*meshShape);
 }
 
 void OsgMeshRepresentation::doUpdate(double dt)
@@ -113,28 +136,7 @@ void OsgMeshRepresentation::doUpdate(double dt)
 
 bool OsgMeshRepresentation::doInitialize()
 {
-	bool result = true;
-
-	if (!m_filename.empty())
-	{
-		std::string filePath = getRuntime()->getApplicationData()->findFile(m_filename);
-
-		if (filePath.empty())
-		{
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-					<< "OsgMeshRepresentation::doInitialize(): file " << m_filename << " can not be found.";
-			result = false;
-		}
-		else
-		{
-			m_mesh = SurgSim::DataStructures::loadTriangleMesh<Mesh>(filePath);
-			SURGSIM_ASSERT(nullptr != m_mesh && m_mesh->isValid())
-					<< "OsgMeshRepresentation::doInitialize(): SurgSim::DataStructures::loadTriangleMesh() returned a "
-					<< "null mesh or invalid mesh from file " << filePath;
-		}
-	}
-
-	return result;
+	return true;
 }
 
 void OsgMeshRepresentation::updateVertices(int updateOptions)
@@ -267,16 +269,6 @@ osg::ref_ptr<osg::Geometry> OsgMeshRepresentation::getOsgGeometry()
 osg::Object::DataVariance OsgMeshRepresentation::getDataVariance(int updateOption)
 {
 	return ((m_updateOptions & updateOption) != 0) ? osg::Object::DYNAMIC : osg::Object::STATIC;
-}
-
-void OsgMeshRepresentation::setFilename(std::string filename)
-{
-	m_filename = filename;
-}
-
-std::string OsgMeshRepresentation::getFilename() const
-{
-	return m_filename;
 }
 
 }; // Graphics

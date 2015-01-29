@@ -45,7 +45,7 @@ struct DeformableCollisionRepresentationTest : public ::testing::Test
 		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		m_filename = std::string("Geometry/wound_deformable.ply");
 		m_meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-		m_meshShape->loadInitialMesh(m_filename);
+		m_meshShape->load(m_filename);
 		m_deformableRepresentation = std::make_shared<MockDeformableRepresentation>("DeformableRepresentation");
 		m_deformableCollisionRepresentation =
 			std::make_shared<DeformableCollisionRepresentation>("DeformableCollisionRepresentation");
@@ -84,13 +84,13 @@ TEST_F(DeformableCollisionRepresentationTest, ShapeTest)
 
 TEST_F(DeformableCollisionRepresentationTest, MeshTest)
 {
-	m_deformableCollisionRepresentation->setMesh(m_meshShape->getMesh());
-	EXPECT_EQ(m_meshShape->getMesh()->getNumVertices(),
-			  m_deformableCollisionRepresentation->getMesh()->getNumVertices());
-	EXPECT_EQ(m_meshShape->getMesh()->getNumEdges(),
-			  m_deformableCollisionRepresentation->getMesh()->getNumEdges());
-	EXPECT_EQ(m_meshShape->getMesh()->getNumTriangles(),
-			  m_deformableCollisionRepresentation->getMesh()->getNumTriangles());
+	m_deformableCollisionRepresentation->setShape(m_meshShape);
+	auto actualShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(
+			m_deformableCollisionRepresentation->getShape());
+	ASSERT_NE(nullptr, actualShape);
+	EXPECT_EQ(m_meshShape->getNumVertices(), actualShape->getNumVertices());
+	EXPECT_EQ(m_meshShape->getNumEdges(), actualShape->getNumEdges());
+	EXPECT_EQ(m_meshShape->getNumTriangles(), actualShape->getNumTriangles());
 }
 
 TEST_F(DeformableCollisionRepresentationTest, SerializationTest)
@@ -116,9 +116,9 @@ TEST_F(DeformableCollisionRepresentationTest, SerializationTest)
 	EXPECT_TRUE(m_meshShape->getCenter().isApprox(mesh->getCenter()));
 	EXPECT_TRUE(m_meshShape->getSecondMomentOfVolume().isApprox(mesh->getSecondMomentOfVolume()));
 
-	EXPECT_EQ(m_meshShape->getMesh()->getNumVertices(), mesh->getMesh()->getNumVertices());
-	EXPECT_EQ(m_meshShape->getMesh()->getNumEdges(), mesh->getMesh()->getNumEdges());
-	EXPECT_EQ(m_meshShape->getMesh()->getNumTriangles(), mesh->getMesh()->getNumTriangles());
+	EXPECT_EQ(m_meshShape->getNumVertices(), mesh->getNumVertices());
+	EXPECT_EQ(m_meshShape->getNumEdges(), mesh->getNumEdges());
+	EXPECT_EQ(m_meshShape->getNumTriangles(), mesh->getNumTriangles());
 }
 
 TEST_F(DeformableCollisionRepresentationTest, UpdateAndInitializationTest)

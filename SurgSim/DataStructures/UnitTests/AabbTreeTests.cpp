@@ -20,9 +20,7 @@
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/AabbTreeIntersectionVisitor.h"
 #include "SurgSim/DataStructures/AabbTreeNode.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
-#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Timer.h"
 #include "SurgSim/Math/Aabb.h"
@@ -67,12 +65,11 @@ TEST(AabbTreeTests, AddTest)
 
 TEST(AabbTreeTests, BuildTest)
 {
-	SurgSim::Framework::ApplicationData data("config.txt");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	auto tree = std::make_shared<AabbTree>(3);
 
-	std::string filename = data.findFile("Geometry/arm_collision.ply");
-	ASSERT_FALSE(filename.empty());
-	auto mesh = loadTriangleMesh(filename);
+	auto mesh = std::make_shared<TriangleMeshPlain>();
+	mesh->load("Geometry/arm_collision.ply");
 
 	SurgSim::Framework::Timer timer;
 	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
@@ -125,12 +122,11 @@ TEST(AabbTreeTests, EasyIntersectionTest)
 
 TEST(AabbTreeTests, MeshIntersectionTest)
 {
-	SurgSim::Framework::ApplicationData data("config.txt");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	auto tree = std::make_shared<AabbTree>(3);
 
-	std::string filename = data.findFile("Geometry/arm_collision.ply");
-	ASSERT_FALSE(filename.empty());
-	auto mesh = loadTriangleMesh(filename);
+	auto mesh = std::make_shared<TriangleMeshPlain>();
+	mesh->load("Geometry/arm_collision.ply");
 
 	Aabbd expectedBigBox;
 
@@ -202,17 +198,18 @@ static typename std::list<PairTypeLhs>::const_iterator getEquivalentPair(const s
 
 TEST(AabbTreeTests, SpatialJoinTest)
 {
-	SurgSim::Framework::Runtime runtime("config.txt");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 
 	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshA->loadInitialMesh(fileName));
+	meshA->load(fileName);
+	ASSERT_NO_THROW(meshA->load(fileName));
 
 	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshB->loadInitialMesh(fileName));
+	ASSERT_NO_THROW(meshB->load(fileName));
 
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
-	meshB->getMesh()->copyWithTransform(rhsPose, *meshA->getMesh());
+	meshB->setPose(rhsPose);
 
 	meshA->updateAabbTree();
 	meshB->updateAabbTree();

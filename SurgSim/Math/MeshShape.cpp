@@ -12,42 +12,80 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 #include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
-#include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
+
+#include "SurgSim/DataStructures/AabbTree.h"
+#include "SurgSim/Framework/Assert.h"
+
 
 namespace SurgSim
 {
 namespace Math
 {
+
 SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::MeshShape, MeshShape);
 
 MeshShape::MeshShape() :
-	m_volume(0.0),
-	m_initialMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>())
+	m_center(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN())),
+	m_volume(std::numeric_limits<double>::quiet_NaN()),
+	m_secondMomentOfVolume(Matrix33d::Constant(std::numeric_limits<double>::quiet_NaN())),
+	m_initialMesh(std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>())
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(
-		SurgSim::Math::MeshShape,
-		std::shared_ptr<SurgSim::Framework::Asset>,
-		InitialMesh,
-		getInitialMesh,
-		setInitialMesh);
+}
 
-	// Enables the alternative use of the mesh file instead of the actual mesh object
-	DecoderType decoder = std::bind(&MeshShape::loadInitialMesh,
-									this,
-									std::bind(&YAML::Node::as<std::string>, std::placeholders::_1));
-	setDecoder("InitialMeshFileName", decoder);
+const SurgSim::Math::Vector3d& MeshShape::getNormal(size_t triangleId)
+{
+	return getTriangle(triangleId).data.normal;
+}
 
-	SetterType setter = std::bind(&MeshShape::loadInitialMesh,
-								  this,
-								  std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1));
+void MeshShape::calculateNormals()
+{
+	for (size_t i = 0; i < getNumTriangles(); ++i)
+	{
+		const SurgSim::Math::Vector3d& vertex0 = getVertexPosition(getTriangle(i).verticesId[0]);
+		const SurgSim::Math::Vector3d& vertex1 = getVertexPosition(getTriangle(i).verticesId[1]);
+		const SurgSim::Math::Vector3d& vertex2 = getVertexPosition(getTriangle(i).verticesId[2]);
 
-	setSetter("InitialMeshFileName", setter);
+		// Calculate normal vector
+		SurgSim::Math::Vector3d normal = (vertex1 - vertex0).cross(vertex2 - vertex0);
+		normal.normalize();
 
+		getTriangle(i).data.normal = normal;
+	}
+}
+
+void MeshShape::doUpdate()
+{
+	calculateNormals();
+}
+
+bool MeshShape::doLoad(const std::string& fileName)
+{
+	SurgSim::DataStructures::TriangleMeshWithNormals::doLoad(fileName);
+	m_initialMesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>(*shared_from_this());
+	calculateNormals();
+	updateAabbTree();
+	computeVolumeIntegrals();
+	return true;
+}
+
+void MeshShape::copyWithTransform(const SurgSim::Math::RigidTransform3d& pose)
+{
+	SURGSIM_ASSERT(getNumVertices() == m_initialMesh->getNumVertices())
+			<< "The source mesh must have the same number of vertices.";
+	SURGSIM_ASSERT(getNumEdges() == m_initialMesh->getNumEdges())
+			<< "The source mesh must have the same number of edges";
+	SURGSIM_ASSERT(getNumTriangles() == m_initialMesh->getNumTriangles())
+			<< "The source mesh must have the same number of triangles";
+
+	auto targetVertex = getVertices().begin();
+	auto const& vertices = m_initialMesh->getVertices();
+	for (auto it = vertices.cbegin(); it != vertices.cend(); ++it)
+	{
+		targetVertex->position = pose * it->position;
+		++targetVertex;
+	}
 }
 
 int MeshShape::getType() const
@@ -55,60 +93,23 @@ int MeshShape::getType() const
 	return SHAPE_TYPE_MESH;
 }
 
-bool MeshShape::isValid() const
-{
-	return (nullptr != m_mesh) && (m_mesh->isValid());
-}
-
-void MeshShape::loadInitialMesh(const std::string& filePath)
-{
-	auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>();
-	mesh->load(filePath);
-
-	SURGSIM_ASSERT(mesh->isValid()) << "Loading failed " << filePath << " contains an invalid mesh.";
-
-	setInitialMesh(mesh);
-}
-
-std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getInitialMesh()
-{
-	return m_initialMesh;
-}
-
-
-
-std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh()
-{
-	return m_mesh;
-}
-
 double MeshShape::getVolume() const
 {
-	if (nullptr == m_mesh)
-	{
-		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-				"No mesh set for MeshShape, so it cannot compute volume.";
-	}
 	return m_volume;
+}
+
+bool MeshShape::isValid() const
+{
+	return SurgSim::DataStructures::TriangleMeshWithNormals::isValid();
 }
 
 SurgSim::Math::Vector3d MeshShape::getCenter() const
 {
-	if (nullptr == m_mesh)
-	{
-		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-				"No mesh set for MeshShape, so it cannot compute center.";
-	}
 	return m_center;
 }
 
 SurgSim::Math::Matrix33d MeshShape::getSecondMomentOfVolume() const
 {
-	if (nullptr == m_mesh)
-	{
-		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-				"No mesh set for MeshShape, so it cannot compute SecondMomentOfVolume.";
-	}
 	return m_secondMomentOfVolume;
 }
 
@@ -141,16 +142,16 @@ void MeshShape::computeVolumeIntegrals()
 	Eigen::VectorXd integral(10); // integral order: 1, x, y, z, x^2, y^2, z^2, xy, yz, zx
 	integral.setZero();
 
-	for (auto const& triangle : m_mesh->getTriangles())
+	for (auto const& triangle : getTriangles())
 	{
 		if (! triangle.isValid)
 		{
 			continue;
 		}
 
-		const Vector3d& v0 = m_mesh->getVertexPosition(triangle.verticesId[0]);
-		const Vector3d& v1 = m_mesh->getVertexPosition(triangle.verticesId[1]);
-		const Vector3d& v2 = m_mesh->getVertexPosition(triangle.verticesId[2]);
+		const Vector3d& v0 = getVertexPosition(triangle.verticesId[0]);
+		const Vector3d& v1 = getVertexPosition(triangle.verticesId[1]);
+		const Vector3d& v2 = getVertexPosition(triangle.verticesId[2]);
 
 		// get edges and cross product of edges
 		Vector3d normal = (v1 - v0).cross(v2 - v0);
@@ -204,7 +205,8 @@ void MeshShape::computeVolumeIntegrals()
 
 void MeshShape::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
-	m_mesh->copyWithTransform(pose, *m_initialMesh);
+	copyWithTransform(pose);
+	calculateNormals();
 	updateAabbTree();
 }
 
@@ -217,30 +219,15 @@ void MeshShape::updateAabbTree()
 {
 	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
 
-	auto const& triangles = m_mesh->getTriangles();
+	auto const& triangles = getTriangles();
 	for (size_t id = 0; id < triangles.size(); ++id)
 	{
 		if (triangles[id].isValid)
 		{
-			auto vertices = m_mesh->getTrianglePositions(id);
+			auto vertices = getTrianglePositions(id);
 			m_aabbTree->add(SurgSim::Math::makeAabb(vertices[0], vertices[1], vertices[2]), id);
 		}
 	}
-}
-
-void MeshShape::setInitialMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh)
-{
-	auto triangleMesh = std::dynamic_pointer_cast<SurgSim::DataStructures::TriangleMesh>(mesh);
-	SURGSIM_ASSERT(triangleMesh != nullptr)
-			<< "Mesh for MeshShape needs to be a TriangleMesh";
-	SURGSIM_ASSERT(triangleMesh->isValid())
-			<< "Mesh for MeshShape needs to be valid";
-	m_initialMesh = triangleMesh;
-
-	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*m_initialMesh);
-
-	updateAabbTree();
-	computeVolumeIntegrals();
 }
 
 }; // namespace Math

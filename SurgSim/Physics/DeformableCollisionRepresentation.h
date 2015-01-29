@@ -24,11 +24,6 @@
 
 namespace SurgSim
 {
-namespace DataStructures
-{
-class TriangleMesh;
-}
-
 namespace Math
 {
 class Shape;
@@ -57,18 +52,9 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::DeformableCollisionRepresentation);
 
-	/// Set the mesh to be used in this collision representation
-	/// the vertices in the mesh need to be the same number as the vertices in the deformable representation.
-	/// \param mesh The mesh to be used for the collision calculation and updates
-	/// \note The shape held by this deformable collision representation will be updated as well.
-	void setMesh(std::shared_ptr<SurgSim::DataStructures::TriangleMesh> mesh);
-
-	/// \return The mesh that is part of this representation
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh() const;
-
 	/// Set the shape for this collision representation, has to be a SurgSim::Math::MeshShape.
+	/// The vertices in the mesh need to be the same number as the vertices in the deformable representation.
 	/// \param shape The shape to be used.
-	/// \note The mesh held by this deformable collision representation will be updated as well.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);
 
 	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
@@ -90,9 +76,6 @@ private:
 
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::MeshShape> m_shape;
-
-	/// Mesh used for collision detection
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
 
 	/// Reference to the deformable driving changes to this mesh
 	std::weak_ptr<SurgSim::Physics::DeformableRepresentation> m_deformable;

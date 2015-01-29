@@ -24,14 +24,9 @@ namespace Math
 
 template <class VertexData, class EdgeData, class TriangleData>
 SurfaceMeshShape::SurfaceMeshShape(
-	const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh,
-	double thickness) : m_thickness(thickness)
+	const SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>& mesh,
+	double thickness) : MeshShape(mesh), m_thickness(thickness)
 {
-	SURGSIM_ASSERT(mesh.isValid()) << "Invalid mesh";
-
-	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
-
-	// Computes the geometric properties for the initial mesh
 	computeVolumeIntegrals();
 }
 

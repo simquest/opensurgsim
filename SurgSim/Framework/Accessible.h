@@ -223,7 +223,7 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 				std::bind(&class::getter, this),\
 				std::bind(&class::setter, this, std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)));\
 	setSerializable(#property,\
-				std::bind(&YAML::convert<type>::encode, std::bind(&class::getter, this)),\
+				std::bind(&YAML::convert<type>::encode, std::bind<type>(&class::getter, this)),\
 				std::bind(&class::setter, this, std::bind(&YAML::Node::as<type>,std::placeholders::_1)))
 
 }; // Framework

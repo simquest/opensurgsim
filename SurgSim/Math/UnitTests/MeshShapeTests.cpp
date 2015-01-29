@@ -30,6 +30,16 @@
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMeshPlain;
 
+namespace
+{
+const double epsilon = 1e-8;
+}
+
+namespace SurgSim
+{
+namespace Math
+{
+
 // CUBE
 //     3*----------*2
 //     /          /|
@@ -40,17 +50,17 @@ using SurgSim::DataStructures::TriangleMeshPlain;
 //   4*----------*5
 
 static const int cubeNumPoints = 8;
-static const SurgSim::Math::Vector3d cubePoints[8] =
+static const Vector3d cubePoints[8] =
 {
-	SurgSim::Math::Vector3d(-1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d(1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d(1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d(-1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
+	Vector3d(-1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	Vector3d(1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	Vector3d(1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
+	Vector3d(-1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
 
-	SurgSim::Math::Vector3d(-1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
-	SurgSim::Math::Vector3d(1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
-	SurgSim::Math::Vector3d(1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0),
-	SurgSim::Math::Vector3d(-1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0)
+	Vector3d(-1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	Vector3d(1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	Vector3d(1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0),
+	Vector3d(-1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0)
 };
 
 static const int cubeNumEdges = 12;
@@ -93,7 +103,7 @@ TEST_F(MeshShapeTest, InvalidMeshCubeTest)
 	std::shared_ptr<TriangleMeshPlain> invalidTriMesh = std::make_shared<TriangleMeshPlain>();
 	for (int i = 0; i < cubeNumPoints; i++)
 	{
-		SurgSim::Math::Vector3d p;
+		Vector3d p;
 		p[0] = cubePoints[i][0];
 		p[1] = cubePoints[i][1];
 		p[2] = cubePoints[i][2];
@@ -122,23 +132,23 @@ TEST_F(MeshShapeTest, InvalidMeshCubeTest)
 		invalidTriMesh->addTriangle(t);
 	}
 
-	EXPECT_THROW(SurgSim::Math::MeshShape invalidMeshShape(*invalidTriMesh), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(MeshShape invalidMeshShape(*invalidTriMesh), SurgSim::Framework::AssertionFailure);
 }
 
 TEST_F(MeshShapeTest, EmptyMeshTest)
 {
 	std::shared_ptr<TriangleMeshPlain> emptyMesh = std::make_shared<TriangleMeshPlain>();
 
-	EXPECT_NO_THROW(SurgSim::Math::MeshShape meshShape(*emptyMesh));
+	EXPECT_NO_THROW(MeshShape meshShape(*emptyMesh));
 
-	SurgSim::Math::MeshShape meshShape(*emptyMesh);
-	EXPECT_NEAR(0.0, meshShape.getVolume(), 1e-8);
+	MeshShape meshShape(*emptyMesh);
+	EXPECT_NEAR(0.0, meshShape.getVolume(), epsilon);
 	EXPECT_TRUE(meshShape.getCenter().isZero());
 	EXPECT_TRUE(meshShape.getSecondMomentOfVolume().isZero());
 	EXPECT_TRUE(meshShape.isValid()); // An empty mesh is regarded as valid.
 
-	SurgSim::Math::MeshShape emptyMeshShape;
-	EXPECT_FALSE(emptyMeshShape.isValid());
+	MeshShape emptyMeshShape;
+	EXPECT_TRUE(emptyMeshShape.isValid());
 }
 
 TEST_F(MeshShapeTest, ValidMeshTest)
@@ -146,8 +156,7 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 	{
 		SCOPED_TRACE("Invalid Mesh");
 		auto emptyMesh = std::make_shared<TriangleMeshPlain>();
-		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>(*emptyMesh);
-		auto mesh = meshShape->getMesh();
+		auto meshShape = std::make_shared<MeshShape>(*emptyMesh);
 
 		for (int i = 0; i < cubeNumEdges; ++i)
 		{
@@ -157,7 +166,7 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 				edgePoints[j] = cubeEdges[i][j];
 			}
 			TriangleMeshPlain::EdgeType e(edgePoints);
-			mesh->addEdge(e);
+			meshShape->addEdge(e);
 		}
 
 		EXPECT_FALSE(meshShape->isValid());
@@ -166,15 +175,14 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 	{
 		SCOPED_TRACE("Valid Mesh");
 		auto emptyMesh = std::make_shared<TriangleMeshPlain>();
-		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>(*emptyMesh);
-		auto mesh = meshShape->getMesh();
+		auto meshShape = std::make_shared<MeshShape>(*emptyMesh);
 
 		std::shared_ptr<TriangleMeshPlain> invalidTriMesh = std::make_shared<TriangleMeshPlain>();
 		for (int i = 0; i < cubeNumPoints; i++)
 		{
-			SurgSim::Math::Vector3d point(cubePoints[i][0], cubePoints[i][1], cubePoints[i][2]);
+			Vector3d point(cubePoints[i][0], cubePoints[i][1], cubePoints[i][2]);
 			TriangleMeshPlain::VertexType vertex(point);
-			mesh->addVertex(vertex);
+			meshShape->addVertex(vertex);
 		}
 
 		EXPECT_TRUE(meshShape->isValid());
@@ -193,7 +201,7 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 		std::shared_ptr<TriangleMeshPlain> mesh = std::make_shared<TriangleMeshPlain>();
 		for (int i = 0; i < cubeNumPoints; i++)
 		{
-			SurgSim::Math::Vector3d p;
+			Vector3d p;
 			p[0] = cubePoints[i][0] * lx;
 			p[1] = cubePoints[i][1] * ly;
 			p[2] = cubePoints[i][2] * lz;
@@ -221,55 +229,54 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 			mesh->addTriangle(t);
 		}
 
-		SurgSim::Math::MeshShape boxMesh(*mesh);
+		MeshShape boxMesh(*mesh);
 
-		SurgSim::Math::BoxShape boxShape(lx, ly, lz);
+		BoxShape boxShape(lx, ly, lz);
 
-		EXPECT_NEAR(boxShape.getVolume(), boxMesh.getVolume(), 1e-8);
+		EXPECT_NEAR(boxShape.getVolume(), boxMesh.getVolume(), epsilon);
 		EXPECT_TRUE((boxShape.getCenter() - boxMesh.getCenter()).isZero());
-		EXPECT_TRUE(boxShape.getSecondMomentOfVolume().isApprox(boxMesh.getSecondMomentOfVolume(), 1e-8));
+		EXPECT_TRUE(boxShape.getSecondMomentOfVolume().isApprox(boxMesh.getSecondMomentOfVolume(), epsilon));
 	}
 }
 
 TEST_F(MeshShapeTest, SerializationTest)
 {
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
-	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
+	auto meshShape = std::make_shared<MeshShape>();
+	EXPECT_NO_THROW(meshShape->load(fileName));
 	EXPECT_TRUE(meshShape->isValid());
 
 	// We chose to let YAML serialization only works with base class pointer.
 	// i.e. We need to serialize 'meshShape' via a SurgSim::Math::Shape pointer.
 	// The usage YAML::Node node = meshShape; will not compile.
-	std::shared_ptr<SurgSim::Math::Shape> shape = meshShape;
+	std::shared_ptr<Shape> shape = meshShape;
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = shape); // YAML::convert<std::shared_ptr<SurgSim::Math::Shape>> will be called.
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(1u, node.size());
 
-	std::shared_ptr<SurgSim::Math::MeshShape> newMeshShape;
-	ASSERT_NO_THROW(newMeshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(
-									   node.as<std::shared_ptr<SurgSim::Math::Shape>>()));
+	std::shared_ptr<MeshShape> newMeshShape;
+	ASSERT_NO_THROW(newMeshShape = std::dynamic_pointer_cast<MeshShape>(node.as<std::shared_ptr<Shape>>()));
 
 	EXPECT_EQ("SurgSim::Math::MeshShape", newMeshShape->getClassName());
 
-	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), newMeshShape->getMesh()->getNumVertices());
-	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), newMeshShape->getMesh()->getNumEdges());
-	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), newMeshShape->getMesh()->getNumTriangles());
+	EXPECT_EQ(meshShape->getNumVertices(), newMeshShape->getNumVertices());
+	EXPECT_EQ(meshShape->getNumEdges(), newMeshShape->getNumEdges());
+	EXPECT_EQ(meshShape->getNumTriangles(), newMeshShape->getNumTriangles());
 	EXPECT_TRUE(newMeshShape->isValid());
 }
 
 TEST_F(MeshShapeTest, CreateAabbTreeTest)
 {
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
-	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
+	auto meshShape = std::make_shared<MeshShape>();
+	EXPECT_NO_THROW(meshShape->load(fileName));
 
 	auto tree = meshShape->getAabbTree();
 
-	auto triangles = meshShape->getMesh()->getTriangles();
-	auto vertices = meshShape->getMesh()->getVertices();
+	auto triangles = meshShape->getTriangles();
+	auto vertices = meshShape->getVertices();
 
 	EXPECT_EQ(224u, triangles.size());
 	EXPECT_EQ(504u, vertices.size());
@@ -277,48 +284,124 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 	for (auto it = triangles.begin(); it != triangles.end(); ++it)
 	{
 		auto ids = it->verticesId;
-		EXPECT_TRUE(tree->getAabb().contains(SurgSim::Math::makeAabb(
+		EXPECT_TRUE(tree->getAabb().contains(makeAabb(
 				vertices[ids[0]].position, vertices[ids[1]].position, vertices[ids[2]].position)));
 	}
 }
+
+TEST_F(MeshShapeTest, SetPoseTest)
+{
+	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>();
+	ASSERT_NO_THROW(mesh->load(fileName));
+
+	auto originalMesh = std::make_shared<MeshShape>(*mesh);
+	auto actualMesh = std::make_shared<MeshShape>(*mesh);
+
+	RigidTransform3d transform = makeRigidTransform(Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5),
+			Vector3d(8.7, -4.7, -3.1));
+	actualMesh->setPose(transform);
+
+	Vector3d expectedPosition;
+	ASSERT_EQ(originalMesh->getNumVertices(), actualMesh->getNumVertices());
+	for (size_t i = 0; i < actualMesh->getNumVertices(); i++)
+	{
+		Vector3d expectedPosition = transform * originalMesh->getVertexPosition(i);
+		ASSERT_TRUE(actualMesh->getVertexPosition(i).isApprox(expectedPosition, epsilon)) <<
+			"Vertex #" << i << " is not as expected, remaining vertices may also be incorrect.";
+	}
+
+	Vector3d expectedNormal;
+	ASSERT_EQ(originalMesh->getNumTriangles(), actualMesh->getNumTriangles());
+	for (size_t i = 0; i < actualMesh->getNumTriangles(); i++)
+	{
+		expectedNormal = transform.linear() * originalMesh->getTriangle(i).data.normal;
+		ASSERT_TRUE(expectedNormal.isApprox(actualMesh->getTriangle(i).data.normal, epsilon)) <<
+			"Normal #" << i << " is not as expected, remaining normals may also be incorrect.";
+	}
+}
+
+TEST_F(MeshShapeTest, NormalTest)
+{
+	auto mesh = std::make_shared<TriangleMeshPlain>();
+
+	// Add vertex
+	TriangleMeshPlain::VertexType v0(Vector3d(-1.0, -1.0, -1.0));
+	TriangleMeshPlain::VertexType v1(Vector3d(1.0, -1.0, -1.0));
+	TriangleMeshPlain::VertexType v2(Vector3d(-1.0,  1.0, -1.0));
+
+	mesh->addVertex(v0);
+	mesh->addVertex(v1);
+	mesh->addVertex(v2);
+
+	// Add edges
+	std::array<size_t, 2> edgePoints01 = {0, 1};
+	std::array<size_t, 2> edgePoints02 = {1, 2};
+	std::array<size_t, 2> edgePoints12 = {2, 0};
+
+	TriangleMeshPlain::EdgeType e01(edgePoints01);
+	TriangleMeshPlain::EdgeType e02(edgePoints02);
+	TriangleMeshPlain::EdgeType e12(edgePoints12);
+
+	mesh->addEdge(e01);
+	mesh->addEdge(e02);
+	mesh->addEdge(e12);
+
+	// Add triangle
+	std::array<size_t, 3> trianglePoints = {0, 1, 2};
+
+	TriangleMeshPlain::TriangleType t(trianglePoints);
+	mesh->addTriangle(t);
+
+	std::shared_ptr<MeshShape> meshWithNormal = std::make_shared<MeshShape>(*mesh);
+
+	Vector3d expectedZNormal(0.0, 0.0, 1.0);
+	EXPECT_EQ(expectedZNormal, meshWithNormal->getNormal(0));
+
+	// Update new vertex location of v2 to v3
+	MeshShape::VertexType v3(Vector3d(-1.0, -1.0, 1.0));
+	SurgSim::DataStructures::Vertex<SurgSim::DataStructures::EmptyData>& v2p = meshWithNormal->getVertex(2);
+	v2p = v3;
+
+	// Recompute normals for meshWithNormal
+	meshWithNormal->calculateNormals();
+	Vector3d expectedXNormal(0.0, -1.0, 0.0);
+	EXPECT_EQ(expectedXNormal, meshWithNormal->getNormal(0));
+}
+
 
 TEST_F(MeshShapeTest, DoLoadTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	{
 		SCOPED_TRACE("Normal load should succeed");
-		auto fileName = std::string("MeshShapeData/staple_collision.ply");
-		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-
-		EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
+		auto meshShape = std::make_shared<MeshShape>();
+		EXPECT_NO_THROW(meshShape->load("MeshShapeData/staple_collision.ply"));
 		EXPECT_TRUE(meshShape->isValid());
-		EXPECT_EQ(fileName, meshShape->getInitialMesh()->getFileName());
 	}
 
 	{
-		SCOPED_TRACE("Load through parameter should succeed");
-		auto fileName = std::string("MeshShapeData/staple_collision.ply");
-		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
+		//SCOPED_TRACE("Load through parameter should succeed");
+		//auto fileName = std::string("MeshShapeData/staple_collision.ply");
+		//auto meshShape = std::make_shared<MeshShape>();
 
-		EXPECT_NO_THROW(meshShape->setValue("InitialMeshFileName", fileName));
-		EXPECT_TRUE(meshShape->isValid());
-		EXPECT_EQ(fileName, meshShape->getInitialMesh()->getFileName());
+		//EXPECT_NO_THROW(meshShape->setValue("InitialMeshFileName", fileName));
+		//EXPECT_TRUE(meshShape->isValid());
 	}
 
 	{
 		SCOPED_TRACE("Load of invalid mesh should throw");
-		auto fileName = std::string("MeshShapeData/InvalidMesh.ply");
-		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-
-		EXPECT_ANY_THROW(meshShape->loadInitialMesh(fileName));
+		auto meshShape = std::make_shared<MeshShape>();
+		EXPECT_THROW(meshShape->load("MeshShapeData/InvalidMesh.ply"), SurgSim::Framework::AssertionFailure);
 	}
 
 	{
 		SCOPED_TRACE("Load of non existant file should throw");
 		auto fileName = std::string("Nonexistent file");
-		auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-
-		EXPECT_ANY_THROW(meshShape->loadInitialMesh(fileName));
+		auto meshShape = std::make_shared<MeshShape>();
+		EXPECT_THROW(meshShape->load("Nonexistent file"), SurgSim::Framework::AssertionFailure);
 	}
-
 }
+
+};
+};

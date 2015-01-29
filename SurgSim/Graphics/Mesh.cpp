@@ -27,6 +27,12 @@ namespace SurgSim
 namespace Graphics
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Graphics::Mesh, Mesh);
+
+template<>
+std::string SurgSim::DataStructures::TriangleMesh<VertexData, EmptyData, EmptyData>
+::m_className = "SurgSim::Graphics::Mesh";
+
 Mesh::Mesh()
 {
 }
@@ -86,6 +92,18 @@ void Mesh::initialize(
 					"When building a mesh a vertex was present in a triangle that was not in the list of vertices";
 		}
 	}
+}
+
+bool Mesh::doLoad(const std::string& fileName)
+{
+	auto delegate = std::make_shared<MeshPlyReaderDelegate>(std::dynamic_pointer_cast<Mesh>(shared_from_this()));
+
+	SurgSim::DataStructures::PlyReader reader(fileName);
+	SURGSIM_ASSERT(reader.isValid()) << "'" << fileName << "' is an invalid .ply file.";
+	SURGSIM_ASSERT(reader.parseWithDelegate(delegate)) <<
+		"The input file " << fileName << " does not have the property required by triangle mesh.";
+
+	return true;
 }
 
 }; // Graphics
