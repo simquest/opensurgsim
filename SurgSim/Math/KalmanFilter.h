@@ -26,74 +26,80 @@ namespace Math
 
 /// Implements a linear Kalman filter, a recursive estimator.
 /// Does not support control inputs.
+/// \tparam M The length of the state vector.
+/// \tparam N The length of the measurement vector.
+template <size_t M, size_t N>
 class KalmanFilter
 {
 public:
 	/// Set the initial state vector, x(0), length m.
 	/// \param x The initial state.
-	void setInitialState(const Vector& x);
+	void setInitialState(const Eigen::Ref<const Eigen::Matrix<double, M, 1>>& x);
 
 	/// Set the initial covariance of the state, P(0), size m x m.
 	/// \param p The initial covariance.
-	void setInitialStateCovariance(const Matrix& p);
+	void setInitialStateCovariance(const Eigen::Ref<const Eigen::Matrix<double, M, M>>& p);
 
 	/// Set the state transition, A, such that x(t+1) = A.x(t), size m x m.
 	/// \param a The state transition matrix.
-	void setStateTransition(const Matrix& a);
+	void setStateTransition(const Eigen::Ref<const Eigen::Matrix<double, M, M>>& a);
 
 	/// Set the observation matrix, H, such that z(t) = H.x(t), size n x m.
 	/// \param h The observation matrix.
-	void setObservationMatrix(const Matrix& h);
+	void setObservationMatrix(const Eigen::Ref<const Eigen::Matrix<double, N, M>>& h);
 
 	/// Set the process noise covariance, size m x m.
 	/// \param q The process noise covariance.
-	void setProcessNoiseCovariance(const Matrix& q);
+	void setProcessNoiseCovariance(const Eigen::Ref<const Eigen::Matrix<double, M, M>>& q);
 
 	/// Set the measurement noise covariance, size n x n.
 	/// \param r The measurement noise covariance.
-	void setMeasurementNoiseCovariance(const Matrix& r);
+	void setMeasurementNoiseCovariance(const Eigen::Ref<const Eigen::Matrix<double, N, N>>& r);
 
 	/// Advance one step without a measurement.
 	/// \return The estimate for the new state, x(t+1), length m.
-	const Vector& update();
+	const Eigen::Matrix<double, M, 1>& update();
 
 	/// Advance one step with measurement.
+	/// \param measurement The measurement, z(t), length n.
 	/// \return The estimate for the new state, x(t+1), length m.
-	const Vector& update(const Vector& measurement);
+	const Eigen::Matrix<double, M, 1>& update(const Eigen::Ref<const Eigen::Matrix<double, N, 1>>& measurement);
 
 	/// Get the current state.  Does not advance the state.
 	/// \return The estimate for the current state, x(t), length m.
-	const Vector& getState() const;
+	const Eigen::Matrix<double, M, 1>& getState() const;
 
 private:
 	/// Use the current estimated state, x(t), and matrices to predict the new state, x(t+1), and
 	/// state covariance, P(t+1).
 	void updatePrediction();
 
-	/// Correct the current estimated state, x(t), and state covariance, P(t), based on a measurement.
+	/// Correct the current estimated state, x(t), and state covariance, P(t), based on a measurement, z(t).
 	/// \param measurement The measurement, length n.
-	void updateMeasurement(const Vector& measurement);
+	void updateMeasurement(const Eigen::Ref<const Eigen::Matrix<double, N, 1>>& measurement);
 
 	/// The state transition matrix.
-	Matrix m_stateTransition;
+	Eigen::Matrix<double, M, M, Eigen::RowMajor> m_stateTransition;
 
 	/// The observation matrix.
-	Matrix m_observationMatrix;
+	Eigen::Matrix<double, N, M, Eigen::RowMajor> m_observationMatrix;
 
 	/// The process noise covariance.
-	Matrix m_processNoiseCovariance;
+	Eigen::Matrix<double, M, M, Eigen::RowMajor> m_processNoiseCovariance;
 
 	/// The measurement noise covariance.
-	Matrix m_measurementNoiseCovariance;
+	Eigen::Matrix<double, N, N, Eigen::RowMajor> m_measurementNoiseCovariance;
 
 	/// The state.
-	Vector m_state;
+	Eigen::Matrix<double, M, 1> m_state;
 
 	/// The covariance of the state.
-	Matrix m_stateCovariance;
+	Eigen::Matrix<double, M, M, Eigen::RowMajor> m_stateCovariance;
 };
 
 }; // Math
 }; // SurgSim
+
+#include "SurgSim/Math/KalmanFilter-inl.h"
 
 #endif // SURGSIM_MATH_KALMANFILTER_H

@@ -32,7 +32,7 @@ namespace Math
 {
 TEST(KalmanFilterTests, 1DConstant)
 {
-	auto kalman = std::make_shared<KalmanFilter>();
+	auto kalman = std::make_shared<KalmanFilter<1, 1>>();
 	kalman->setInitialState(Vector1d::Constant(0.0)); // the state is a scalar, and we have an initial guess for it
 	kalman->setInitialStateCovariance(Matrix11d::Constant(1000.0)); // the uncertainty about initial guess is high
 	kalman->setStateTransition(Matrix11d::Constant(1.0)); // we predict the true state will stay constant
@@ -56,7 +56,7 @@ TEST(KalmanFilterTests, 1DConstant)
 
 TEST(KalmanFilterTests, 1DVelocity)
 {
-	auto kalman = std::make_shared<KalmanFilter>();
+	auto kalman = std::make_shared<KalmanFilter<2, 1>>();
 	// The state is the position and velocity, and here's our initial guess.
 	const Vector2d initialState = Vector2d::Zero();
 	kalman->setInitialState(initialState);

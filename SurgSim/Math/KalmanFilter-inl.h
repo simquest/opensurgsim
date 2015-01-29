@@ -13,69 +13,82 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Math/KalmanFilter.h"
+#ifndef SURGSIM_MATH_KALMANFILTER_INL_H
+#define SURGSIM_MATH_KALMANFILTER_INL_H
 
 namespace SurgSim
 {
 namespace Math
 {
 
-void KalmanFilter::setInitialState(const Vector& x)
+template <size_t M, size_t N>
+void KalmanFilter<M, N>::setInitialState(const Eigen::Ref<const Eigen::Matrix<double, M, 1>>& x)
 {
 	m_state = x;
 }
 
-void KalmanFilter::setInitialStateCovariance(const Matrix& p)
+template <size_t M, size_t N>
+void KalmanFilter<M, N>::setInitialStateCovariance(const Eigen::Ref<const Eigen::Matrix<double, M, M>>& p)
 {
 	m_stateCovariance = p;
 }
 
-void KalmanFilter::setStateTransition(const Matrix& a)
+template <size_t M, size_t N>
+void KalmanFilter<M, N>::setStateTransition(const Eigen::Ref<const Eigen::Matrix<double, M, M>>& a)
 {
 	m_stateTransition = a;
 }
 
-void KalmanFilter::setObservationMatrix(const Matrix& h)
+template <size_t M, size_t N>
+void KalmanFilter<M, N>::setObservationMatrix(const Eigen::Ref<const Eigen::Matrix<double, N, M>>& h)
 {
 	m_observationMatrix = h;
 }
 
-void KalmanFilter::setProcessNoiseCovariance(const Matrix& q)
+template <size_t M, size_t N>
+void KalmanFilter<M, N>::setProcessNoiseCovariance(const Eigen::Ref<const Eigen::Matrix<double, M, M>>& q)
 {
 	m_processNoiseCovariance = q;
 }
 
-void KalmanFilter::setMeasurementNoiseCovariance(const Matrix& r)
+template <size_t M, size_t N>
+void KalmanFilter<M, N>::setMeasurementNoiseCovariance(const Eigen::Ref<const Eigen::Matrix<double, N, N>>& r)
 {
 	m_measurementNoiseCovariance = r;
 }
 
-const Vector& KalmanFilter::update()
+template <size_t M, size_t N>
+const Eigen::Matrix<double, M, 1>& KalmanFilter<M, N>::update()
 {
 	updatePrediction();
 	return m_state;
 }
 
-const Vector& KalmanFilter::update(const Vector& measurement)
+template <size_t M, size_t N>
+const Eigen::Matrix<double, M, 1>&
+	KalmanFilter<M, N>::update(const Eigen::Ref<const Eigen::Matrix<double, N, 1>>& measurement)
 {
 	updatePrediction();
 	updateMeasurement(measurement);
 	return m_state;
 }
 
-const Vector& KalmanFilter::getState() const
+template <size_t M, size_t N>
+const Eigen::Matrix<double, M, 1>& KalmanFilter<M, N>::getState() const
 {
 	return m_state;
 }
 
-void KalmanFilter::updatePrediction()
+template <size_t M, size_t N>
+void KalmanFilter<M, N>::updatePrediction()
 {
 	m_state = m_stateTransition * m_state;
 	m_stateCovariance = m_stateTransition * m_stateCovariance * m_stateTransition.transpose() +
 		m_processNoiseCovariance;
 }
 
-void KalmanFilter::updateMeasurement(const Vector& measurement)
+template <size_t M, size_t N>
+void KalmanFilter<M, N>::updateMeasurement(const Eigen::Ref<const Eigen::Matrix<double, N, 1>>& measurement)
 {
 	const Matrix gain = m_stateCovariance * m_observationMatrix.transpose() *
 		(m_observationMatrix * m_stateCovariance * m_observationMatrix.transpose() +
@@ -86,3 +99,5 @@ void KalmanFilter::updateMeasurement(const Vector& measurement)
 
 }; // namespace Math
 }; // namespace SurgSim
+
+#endif // SURGSIM_MATH_KALMANFILTER_INL_H
