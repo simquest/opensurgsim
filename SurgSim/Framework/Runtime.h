@@ -149,7 +149,8 @@ public:
 	///	          Id: 1de26315-82a7-46b2-ae38-324d25009629
 	/// \endcode
 	/// \param fileName the filename of the scene to be loaded, needs to be found
-	/// \return true if the loading succeeded and the scene was found
+	/// \return true if the loading succeeded and the scene was found, the loaded scene elements will have been added
+	///         to the scene.
 	bool addSceneElements(const std::string& fileName);
 
 	/// Loads and duplicates the scene elements from the file, the elements will not have common ids
@@ -157,7 +158,7 @@ public:
 	/// set. The format is a list of scene elements \sa addSceneElements().
 	/// \param fileName the filename of the scene to be loaded, needs to be found
 	/// \return a vector of scene elements with the loaded elements, is empty if loading failed
-	std::vector<std::shared_ptr<SceneElement>> cloneSceneElements(const std::string& fileName);
+	std::vector<std::shared_ptr<SceneElement>> duplicateSceneElements(const std::string& fileName);
 
 
 	/// Write out the whole scene as a file
@@ -185,14 +186,14 @@ private:
 	/// \param fileName the filename of the scene to be loaded, needs to be found
 	/// \param [out] nodes pointer to the nodes structure to receive the newly loaded nodes
 	/// \return true if the loading succeeded
-	bool Runtime::tryLoadNodes(const std::string& fileName, YAML::Node* nodes);
+	bool Runtime::tryLoadNode(const std::string& fileName, YAML::Node* node);
 
 	/// Convert nodes to vector of elements
 	/// \param filename the original filename for error reporting
 	/// \param nodes the nodes to be converted
 	/// \param [out] elements the pointer for the results
 	/// \return true if the conversion was successful
-	bool tryConvertElements(const std::string& fileName, const YAML::Node& nodes,
+	bool tryConvertElements(const std::string& fileName, const YAML::Node& node,
 							std::vector<std::shared_ptr<SceneElement>>* elements);
 
 	/// Gets a shared pointer to the runtime.

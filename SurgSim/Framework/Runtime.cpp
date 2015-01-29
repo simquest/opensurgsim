@@ -338,14 +338,14 @@ void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 
 bool Runtime::loadScene(const std::string& fileName)
 {
-	YAML::Node nodes;
+	YAML::Node node;
 	bool result = false;
 	boost::lock_guard<boost::mutex> lock(m_sceneHandling);
-	if (tryLoadNodes(fileName, &nodes))
+	if (tryLoadNode(fileName, &node))
 	{
 		YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry().clear();
 		m_scene = std::make_shared<Scene>(getSharedPtr());
-		m_scene->decode(nodes);
+		m_scene->decode(node);
 
 		result = true;
 	}
@@ -355,14 +355,14 @@ bool Runtime::loadScene(const std::string& fileName)
 
 bool Runtime::addSceneElements(const std::string& fileName)
 {
-	YAML::Node nodes;
+	YAML::Node node;
 	bool result = false;
 	boost::lock_guard<boost::mutex> lock(m_sceneHandling);
 
-	if (tryLoadNodes(fileName, &nodes))
+	if (tryLoadNode(fileName, &node))
 	{
 		std::vector<std::shared_ptr<SceneElement>> elements;
-		if (tryConvertElements(fileName, nodes, &elements))
+		if (tryConvertElements(fileName, node, &elements))
 		{
 			m_scene->addSceneElements(elements);
 			result = true;
@@ -378,9 +378,9 @@ bool Runtime::addSceneElements(const std::string& fileName)
 	return result;
 }
 
-std::vector<std::shared_ptr<SceneElement>> Runtime::cloneSceneElements(const std::string& fileName)
+std::vector<std::shared_ptr<SceneElement>> Runtime::duplicateSceneElements(const std::string& fileName)
 {
-	YAML::Node nodes;
+	YAML::Node node;
 	YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::RegistryType registry;
 	std::vector<std::shared_ptr<SceneElement>> result;
 
@@ -389,7 +389,7 @@ std::vector<std::shared_ptr<SceneElement>> Runtime::cloneSceneElements(const std
 	// Use a temporary registry
 	std::swap(YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry(), registry);
 
-	if (!tryLoadNodes(fileName, &nodes) || !tryConvertElements(fileName, nodes, &result))
+	if (!tryLoadNode(fileName, &node) || !tryConvertElements(fileName, node, &result))
 	{
 		SURGSIM_LOG_WARNING(Logger::getLogger("Runtime"))
 				<< "Could not clone from the YAML file: " << fileName;
@@ -401,16 +401,16 @@ std::vector<std::shared_ptr<SceneElement>> Runtime::cloneSceneElements(const std
 	return result;
 }
 
-bool Runtime::tryLoadNodes(const std::string& fileName, YAML::Node* nodes)
+bool Runtime::tryLoadNode(const std::string& fileName, YAML::Node* node)
 {
 	bool result = false;
 	std::string path;
-	SURGSIM_ASSERT(nodes != nullptr) << "Can't load nodes into nullptr.";
+	SURGSIM_ASSERT(node != nullptr) << "Can't load node into nullptr.";
 	if (m_applicationData->tryFindFile(fileName, &path))
 	{
 		try
 		{
-			*nodes = YAML::LoadFile(path);
+			*node = YAML::LoadFile(path);
 			result = true;
 		}
 		catch (YAML::ParserException e)
@@ -426,15 +426,15 @@ bool Runtime::tryLoadNodes(const std::string& fileName, YAML::Node* nodes)
 	return result;
 }
 
-bool Runtime::tryConvertElements(const std::string& filename, const YAML::Node& nodes,
+bool Runtime::tryConvertElements(const std::string& filename, const YAML::Node& node,
 								 std::vector<std::shared_ptr<SceneElement>>* elements)
 {
 	bool result = false;
-	if (nodes.IsSequence())
+	if (node.IsSequence())
 	{
 		try
 		{
-			*elements = nodes.as<std::vector<std::shared_ptr<SceneElement>>>();
+			*elements = node.as<std::vector<std::shared_ptr<SceneElement>>>();
 			result = true;
 		}
 		catch (YAML::Exception e)

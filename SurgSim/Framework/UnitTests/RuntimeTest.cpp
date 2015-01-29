@@ -267,14 +267,14 @@ TEST(RuntimeTest, LoadAndAddScene)
 	EXPECT_EQ(4L, scene2->getSceneElements().size());
 }
 
-TEST(RuntimeTest, LoadAndClone)
+TEST(RuntimeTest, LoadAndDuplicate)
 {
 	auto runtime = std::make_shared<Runtime>("config.txt");
 	EXPECT_TRUE(runtime->loadScene("SceneTestData/scene.yaml"));
 	auto scene0 = runtime->getScene();
 
-	auto elements0 = runtime->cloneSceneElements("SceneTestData/element.yaml");
-	auto elements1 = runtime->cloneSceneElements("SceneTestData/element.yaml");
+	auto elements0 = runtime->duplicateSceneElements("SceneTestData/element.yaml");
+	auto elements1 = runtime->duplicateSceneElements("SceneTestData/element.yaml");
 
 	EXPECT_EQ(1L, elements0.size());
 	EXPECT_EQ(1L, elements1.size());
@@ -292,11 +292,11 @@ TEST(RuntimeTest, LoadAndClone)
 	EXPECT_NE(component0->isLocalActive(), component1->isLocalActive());
 }
 
-TEST(RuntimeTest, CloneBadYaml)
+TEST(RuntimeTest, DuplicateBadYaml)
 {
 	auto runtime = std::make_shared<Runtime>("config.txt");
 	EXPECT_TRUE(runtime->loadScene("SceneTestData/scene.yaml"));
 	auto scene0 = runtime->getScene();
 
-	EXPECT_ANY_THROW(auto elements0 = runtime->cloneSceneElements("SceneTestData/bad.yaml"););
+	EXPECT_ANY_THROW(auto elements0 = runtime->duplicateSceneElements("SceneTestData/bad.yaml"););
 }
