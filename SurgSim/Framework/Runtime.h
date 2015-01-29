@@ -184,13 +184,13 @@ private:
 
 	/// Perform the actual load operation
 	/// \param fileName the filename of the scene to be loaded, needs to be found
-	/// \param [out] nodes pointer to the nodes structure to receive the newly loaded nodes
+	/// \param [out] node pointer to the nodes structure to receive the newly loaded nodes
 	/// \return true if the loading succeeded
-	bool Runtime::tryLoadNode(const std::string& fileName, YAML::Node* node);
+	bool tryLoadNode(const std::string& fileName, YAML::Node* node);
 
 	/// Convert nodes to vector of elements
-	/// \param filename the original filename for error reporting
-	/// \param nodes the nodes to be converted
+	/// \param fileName the original filename for error reporting
+	/// \param nodes the node to be converted
 	/// \param [out] elements the pointer for the results
 	/// \return true if the conversion was successful
 	bool tryConvertElements(const std::string& fileName, const YAML::Node& node,
