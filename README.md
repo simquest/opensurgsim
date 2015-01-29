@@ -106,8 +106,8 @@ Required Dependencies
 
 * Boost  
   Homepage: http://www.boost.org/  
-  Modules: chrono, date_time, filesystem, system, thread
-  Minimum Version: 1.54
+  Modules: chrono, date_time, filesystem, system, thread  
+  Minimum Version: 1.54  
   Windows Binaries: http://sourceforge.net/projects/boost/files/boost-binaries/  
 
 * CMake  
@@ -125,7 +125,7 @@ Required Dependencies
 * OpenSceneGraph  
   Homepage: http://www.openscenegraph.org/  
   Modules: osg, osgViewer, osgText, osgUtil, osgDB, osgGA, osgAnimation  
-  Minimum Version: 3.2.0
+  Minimum Version: 3.2.0  
   
 Optional Dependencies
 ---------------------
@@ -144,5 +144,5 @@ Optional Dependencies
 
 * MathJax  
   Homepage: http://www.mathjax.org/  
-  Minimum Version: 2.4
+  Minimum Version: 2.4  
 
