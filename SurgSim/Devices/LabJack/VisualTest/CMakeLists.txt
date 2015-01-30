@@ -14,14 +14,6 @@
 # limitations under the License.
 
 
-link_directories(
-	${Boost_LIBRARY_DIRS}
-)
-
-include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
 set(EXAMPLE_SOURCES
 	main.cpp
 )
@@ -33,14 +25,12 @@ surgsim_add_executable(LabJackVisualTest
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
 set(LIBS
-	LabJackDevice
 	IdentityPoseDevice
-	VisualTestCommon
-	SurgSimInput
-	SurgSimFramework
+	LabJackDevice
 	SurgSimDataStructures
-	${Boost_LIBRARIES}
-	${OPENGL_LIBRARIES}
+	SurgSimInput
+	SurgSimMath
+	VisualTestCommon
 )
 
 target_link_libraries(LabJackVisualTest ${LIBS})

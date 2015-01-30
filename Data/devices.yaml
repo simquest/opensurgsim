@@ -1,0 +1,8 @@
+Novint:
+  FALCON_1: 14QAVEFF
+  FALCON_2: 16000166
+# To initialize a NovintDevice with a specific serial number in OSS:
+# 1) see NovintCommonDevice->setSerialNumber(), or
+# 2) copy this file to the working directory (same folder as the executable),
+# add or change a line here in the form "initializationName: serialNumber",
+# and pass that name to NovintCommonDevice->setInitializationName().

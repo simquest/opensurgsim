@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include "SurgSim/Physics/Computation.h"
 #include "SurgSim/Math/MlcpGaussSeidelSolver.h"
+#include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
 {
@@ -37,11 +37,29 @@ public:
 	/// Destructor
 	virtual ~SolveMlcp();
 
-	void setMaxIterations(int maxIterations);
+	/// Set the maximum number of iterations for the MLCP solver.
+	/// \param maxIterations The maximum number of iterations.
+	void setMaxIterations(size_t maxIterations);
 
-	void setSolverPrecision(double epsilon);
+	/// Get the maximum number of iterations for the MLCP solver.
+	/// \return The maximum number of iterations.
+	size_t getMaxIterations() const;
 
+	/// Set the precision of the MLCP solver.
+	/// \param epsilon The precision.
+	void setPrecision(double epsilon);
+
+	/// Get the precision of the MLCP solver.
+	/// \return The precision.
+	double getPrecision() const;
+
+	/// Set the contact tolerance for the MLCP solver.
+	/// \param epsilon The contact tolerance.
 	void setContactTolerance(double epsilon);
+
+	/// Get the contact tolerance for the MLCP solver.
+	/// \return The contact tolerance.
+	double getContactTolerance() const;
 
 protected:
 
