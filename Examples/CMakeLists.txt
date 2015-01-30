@@ -25,3 +25,5 @@ endif(BUILD_DEVICE_MULTIAXIS OR BUILD_DEVICE_NOVINT)
 add_subdirectory(DroppingBalls)
 
 add_subdirectory(GraphicsScene)
+
+add_subdirectory(ShowScenery)
