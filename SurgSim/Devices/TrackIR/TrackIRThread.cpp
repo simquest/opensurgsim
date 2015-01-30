@@ -27,6 +27,7 @@ TrackIRThread::TrackIRThread(TrackIRScaffold* scaffold, TrackIRScaffold::DeviceD
 	m_scaffold(scaffold),
 	m_deviceData(deviceData)
 {
+	setRate(100.0);
 }
 
 TrackIRThread::~TrackIRThread()
