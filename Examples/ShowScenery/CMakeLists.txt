@@ -16,9 +16,13 @@
 find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
 find_package(OpenThreads)
 
+find_package(Boost 1.54 COMPONENTS program_options REQUIRED)
+
 link_directories(
 	${Boost_LIBRARY_DIRS}
 )
+
+message (${Boost_LIBRARY_DIRS})
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
@@ -39,11 +43,12 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-surgsim_add_executable(TestSceneElements "${SOURCES}" "${HEADERS}")
+surgsim_add_executable(ShowScenery "${SOURCES}" "${HEADERS}")
 
 SET(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
+	boost_program_options
 	${YAML_CPP_LIBRARIES}
 )
 
@@ -53,7 +58,7 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
  
-target_link_libraries(TestSceneElements ${LIBS})
+target_link_libraries(ShowScenery ${LIBS})
 
 # Put GraphicsScene into folder "Examples"
-set_target_properties(TestSceneElements PROPERTIES FOLDER "Examples") 
+set_target_properties(ShowScenery PROPERTIES FOLDER "Examples") 
