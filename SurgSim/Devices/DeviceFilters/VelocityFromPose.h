@@ -70,10 +70,10 @@ private:
 	SurgSim::Math::RigidTransform3d m_lastPose;
 
 	/// The translational Kalman filter.
-	SurgSim::Math::KalmanFilter m_linearFilter;
+	SurgSim::Math::KalmanFilter<6, 3> m_linearFilter;
 
 	/// The angular Kalman filter.
-	SurgSim::Math::KalmanFilter m_angularFilter;
+	SurgSim::Math::KalmanFilter<6, 3> m_angularFilter;
 };
 
 
