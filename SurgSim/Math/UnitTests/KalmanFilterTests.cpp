@@ -16,6 +16,7 @@
 /// \file
 /// Tests for the KalmanFilter.cpp functions.
 
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 #include "SurgSim/Math/KalmanFilter.h"
@@ -33,7 +34,12 @@ namespace Math
 TEST(KalmanFilterTests, 1DConstant)
 {
 	auto kalman = std::make_shared<KalmanFilter<1, 1>>();
-	kalman->setInitialState(Vector1d::Constant(0.0)); // the state is a scalar, and we have an initial guess for it
+	EXPECT_TRUE(boost::math::isnan(kalman->getState()[0]));
+
+	const Vector1d initialState = Vector1d::Zero();
+	kalman->setInitialState(initialState); // the state is a scalar, and we have an initial guess for it
+	EXPECT_DOUBLE_EQ(initialState[0], kalman->getState()[0]);
+
 	kalman->setInitialStateCovariance(Matrix11d::Constant(1000.0)); // the uncertainty about initial guess is high
 	kalman->setStateTransition(Matrix11d::Constant(1.0)); // we predict the true state will stay constant
 	kalman->setObservationMatrix(Matrix11d::Constant(1.0)); // we observe the actual state plus measurement error

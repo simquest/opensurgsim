@@ -22,6 +22,25 @@ namespace Math
 {
 
 template <size_t M, size_t N>
+KalmanFilter<M, N>::KalmanFilter() :
+	m_stateTransition(Eigen::Matrix<double, M, M, Eigen::RowMajor>::Constant(std::numeric_limits<double>::quiet_NaN())),
+	m_observationMatrix(Eigen::Matrix<double, N, M, Eigen::RowMajor>::Constant(
+	std::numeric_limits<double>::quiet_NaN())),
+	m_processNoiseCovariance(Eigen::Matrix<double, M, M, Eigen::RowMajor>::Constant(
+		std::numeric_limits<double>::quiet_NaN())),
+	m_measurementNoiseCovariance(Eigen::Matrix<double, N, N, Eigen::RowMajor>::Constant(
+		std::numeric_limits<double>::quiet_NaN())),
+	m_state(Eigen::Matrix<double, M, 1>::Constant(std::numeric_limits<double>::quiet_NaN())),
+	m_stateCovariance(Eigen::Matrix<double, M, M, Eigen::RowMajor>::Constant(std::numeric_limits<double>::quiet_NaN()))
+{
+}
+
+template <size_t M, size_t N>
+KalmanFilter<M, N>::~KalmanFilter()
+{
+}
+
+template <size_t M, size_t N>
 void KalmanFilter<M, N>::setInitialState(const Eigen::Ref<const Eigen::Matrix<double, M, 1>>& x)
 {
 	m_state = x;

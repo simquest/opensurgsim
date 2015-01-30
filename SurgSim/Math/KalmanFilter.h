@@ -32,6 +32,12 @@ template <size_t M, size_t N>
 class KalmanFilter
 {
 public:
+	/// Constructor.
+	KalmanFilter();
+
+	/// Destructor.
+	virtual ~KalmanFilter();
+
 	/// Set the initial state vector, x(0), length m.
 	/// \param x The initial state.
 	void setInitialState(const Eigen::Ref<const Eigen::Matrix<double, M, 1>>& x);
