@@ -190,7 +190,7 @@ private:
 
 	/// Convert nodes to vector of elements
 	/// \param fileName the original filename for error reporting
-	/// \param nodes the node to be converted
+	/// \param node the node to be converted
 	/// \param [out] elements the pointer for the results
 	/// \return true if the conversion was successful
 	bool tryConvertElements(const std::string& fileName, const YAML::Node& node,
