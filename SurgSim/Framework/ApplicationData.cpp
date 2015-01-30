@@ -67,14 +67,21 @@ std::string ApplicationData::findFile(const std::string& fileName) const
 	}
 
 	path file(fileName);
-	for (auto it = m_paths.cbegin(); it != m_paths.cend(); ++it)
+	if (file.is_absolute() && boost::filesystem::exists(file))
 	{
-		path filePath(*it);
-		filePath /= fileName;
-		if (boost::filesystem::exists(filePath))
+		result = file.make_preferred().string();
+	}
+	else
+	{
+		for (auto it = m_paths.cbegin(); it != m_paths.cend(); ++it)
 		{
-			result = filePath.make_preferred().string();
-			break;
+			path filePath(*it);
+			filePath /= fileName;
+			if (boost::filesystem::exists(filePath))
+			{
+				result = filePath.make_preferred().string();
+				break;
+			}
 		}
 	}
 	return result;
