@@ -43,7 +43,7 @@ set(LIBS
 	SurgSimInput
 	SurgSimFramework
 	SurgSimDataStructures
-	${NOVINT_HDAL_SDK_LIBRARIES}
+	${NOVINTHDALSDK_LIBRARIES}
 	${Boost_LIBRARIES}
 	${OPENGL_LIBRARIES}
 )

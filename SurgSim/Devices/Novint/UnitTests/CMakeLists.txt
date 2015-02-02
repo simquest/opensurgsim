@@ -30,7 +30,7 @@ set(LIBS
 	SurgSimFramework
 	SurgSimDataStructures
 	${Boost_LIBRARIES}
-	${NOVINT_HDAL_SDK_LIBRARIES}
+	${NOVINTHDALSDK_LIBRARIES}
 )
 
 surgsim_add_unit_tests(NovintDeviceTest)
