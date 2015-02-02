@@ -31,6 +31,7 @@ class OpenNIScaffold;
 ///   | ----       | ----              | ---                                                                        |
 ///   | image      | "color"           | Color image (RGB) of floats, each pixel value is between 0 and 1.          |
 ///   | image      | "depth"           | Depth image of floats, each pixel value is depth from the camera in meters.|
+///   | image      | "depth_xyz"       | Position of each pixel (x, y, z) in meters with respect to the camera.     |
 ///
 /// \par Application output used by the device: none.
 ///
