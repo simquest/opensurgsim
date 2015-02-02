@@ -19,8 +19,13 @@ find_package(NovintHdalSdk REQUIRED)
 link_directories(${Boost_LIBRARY_DIRS})
 
 set(LIBS
+	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimInput
+	SurgSimMath
 	${Boost_LIBRARIES}
 	${NOVINTHDALSDK_LIBRARIES}
+	${YAML_CPP_LIBRARIES}
 )
 
 include_directories(

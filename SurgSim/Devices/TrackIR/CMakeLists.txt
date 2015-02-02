@@ -21,6 +21,10 @@ include_directories(
 	"${OPTITRACK_INCLUDE_DIR}"
 )
 
+set(LIBS
+	${OPTITRACK_LIBRARY}
+)
+
 set(TRACKIR_DEVICE_SOURCES
 	TrackIRDevice.cpp
 	TrackIRThread.cpp
@@ -51,6 +55,8 @@ surgsim_add_library(
 	"${TRACKIR_DEVICE_SOURCES}"
 	"${TRACKIR_DEVICE_HEADERS}"
 )
+
+target_link_libraries(TrackIRDevice ${LIBS})
 
 if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.

@@ -25,24 +25,16 @@ using SurgSim::Input::DeviceInterface;
 using SurgSim::Device::Novint7DofDevice;
 using SurgSim::Device::IdentityPoseDevice;
 
-
-// Define the HDAL name of the device to use.
-static const char* const NOVINT_DEVICE_NAME = "FALCON_HTHR_R";
-//static const char* const NOVINT_DEVICE_NAME = "FALCON_FRANKEN_L";
-
+// The initialization name of the Novint6DofDevice.  An empty string will use the first available Falcon.
+static const char* const NOVINT_DEVICE_NAME = "";
 
 int main(int argc, char** argv)
 {
-	std::shared_ptr<Novint7DofDevice> toolDevice =
-		std::make_shared<Novint7DofDevice>("Novint7DofDevice", NOVINT_DEVICE_NAME);
+	auto toolDevice = std::make_shared<Novint7DofDevice>("Novint7DofDevice");
+	toolDevice->setInitializationName(NOVINT_DEVICE_NAME);
+	auto squareDevice = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
 
-	// The square is controlled by a second device.  For a simple test, we're using an IdentityPoseDevice--
-	// a pretend device that doesn't actually move.
-	std::shared_ptr<DeviceInterface> squareDevice = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
-
-	runToolSquareTest(toolDevice, squareDevice,
-					  //2345678901234567890123456789012345678901234567890123456789012345678901234567890
-					  "Move the Novint Falcon device to move the sphere tool.");
+	runToolSquareTest(toolDevice, squareDevice, "Move the Novint Falcon device to move the sphere tool.");
 
 	std::cout << std::endl << "Exiting." << std::endl;
 	// Cleanup and shutdown will happen automatically as objects go out of scope.

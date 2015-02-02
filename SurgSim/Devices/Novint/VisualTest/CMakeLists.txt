@@ -14,14 +14,6 @@
 # limitations under the License.
 
 
-link_directories(
-	${Boost_LIBRARY_DIRS}
-)
-
-include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
 set(EXAMPLE_SOURCES
 	main.cpp
 )
@@ -37,15 +29,10 @@ set(SEVEN_DOF_EXAMPLE_HEADERS
 )
 
 set(LIBS
-	NovintDevice
 	IdentityPoseDevice
-	VisualTestCommon
+	NovintDevice
 	SurgSimInput
-	SurgSimFramework
-	SurgSimDataStructures
-	${NOVINTHDALSDK_LIBRARIES}
-	${Boost_LIBRARIES}
-	${OPENGL_LIBRARIES}
+	VisualTestCommon
 )
 
 surgsim_add_executable(NovintVisualTest

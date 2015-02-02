@@ -24,7 +24,9 @@ namespace Device
 {
 
 TrackIRDevice::TrackIRDevice(const std::string& uniqueName) :
-	SurgSim::Input::CommonDevice(uniqueName, TrackIRScaffold::buildDeviceInputData())
+	SurgSim::Input::CommonDevice(uniqueName, TrackIRScaffold::buildDeviceInputData()),
+	m_positionScale(1.0),
+	m_orientationScale(1.0)
 {
 }
 
