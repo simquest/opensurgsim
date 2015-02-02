@@ -99,7 +99,7 @@ protected:
 	///@}
 
 	void initializeComputations(bool copyState);
-private:
+
 	/// Get an iterator to an excluded collision pair.
 	/// \note Lock m_excludedCollisionPairMutex before calling
 	/// \param representation1 The first Collision::Representation for the pair
