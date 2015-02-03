@@ -76,7 +76,8 @@ public:
 	/// Return all the members of the given group
 	/// \param group group to query
 	/// \return members of the given group, empty if the group has no members
-	std::vector<T> operator[](const Key& key) const;
+	std::vector<T> operator[](const Key& group) const;
+
 private:
 
 	typedef boost::shared_lock<boost::shared_mutex> SharedLock;
