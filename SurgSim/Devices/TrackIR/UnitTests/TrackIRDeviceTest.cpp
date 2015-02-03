@@ -96,14 +96,14 @@ TEST(TrackIRDeviceTest, InputConsumer)
 
 	// Sleep for one second, to see how many times the consumer is invoked.
 	// (TrackIR device sample rate is 120FPS.)
-	// (The thread to poll data out of TrackIR is running at default 30Hz.)
+	// (The thread to poll data out of TrackIR is running at default 100Hz.)
 	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
 
 	// Check the number of invocations.
-	EXPECT_GE(consumer->m_numTimesReceivedInput, 20);
-	EXPECT_LE(consumer->m_numTimesReceivedInput, 50);
+	EXPECT_GE(consumer->m_numTimesReceivedInput, 50);
+	EXPECT_LE(consumer->m_numTimesReceivedInput, 120);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().isValid());
 }

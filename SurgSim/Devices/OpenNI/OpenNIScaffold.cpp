@@ -226,14 +226,34 @@ bool OpenNIScaffold::doUpdate(double dt)
 
 		if ((*info)->depthStream.readFrame(&depthFrame) == openni::STATUS_OK)
 		{
-			ImageType image(depthFrame.getWidth(), depthFrame.getHeight(), 1,
-					reinterpret_cast<const uint16_t*>(depthFrame.getData()));
-			image.getAsVector() *= (1.0f / 1000.0f); // OpenNI2 returns mm, convert to meters
-			inputData.images().set("depth", std::move(image));
+			size_t width = depthFrame.getWidth();
+			size_t height = depthFrame.getHeight();
+			typedef Eigen::Map<const Eigen::Matrix<uint16_t, Eigen::Dynamic, Eigen::Dynamic>> DepthDataType;
+			DepthDataType depthData(reinterpret_cast<const uint16_t*>(depthFrame.getData()), width, height);
+
+			ImageType depth(width, height, 1);
+			depth.getAsVector() = depthData.cast<float>() * (1.0f / 1000.0f); // convert milimeters to meters
+			inputData.images().set("depth", std::move(depth));
+
+			ImageType depth_xyz(width, height, 3);
+			auto x = depth_xyz.getChannel(0);
+			auto y = depth_xyz.getChannel(1);
+			auto z = depth_xyz.getChannel(2);
+			for (size_t i = 0; i < width; i++)
+			{
+				for (size_t j = 0; j < height; j++)
+				{
+					openni::CoordinateConverter::convertDepthToWorld((*info)->depthStream, i, j, depthData(i, j),
+							&x(i, j), &y(i, j), &z(i, j));
+				}
+			}
+			depth_xyz.getAsVector() *= (1.0f / 1000.0f); // convert milimeters to meters
+			inputData.images().set("depth_xyz", std::move(depth_xyz));
 		}
 		else
 		{
 			inputData.images().reset("depth");
+			inputData.images().reset("depth_xyz");
 		}
 
 		if ((*info)->colorStream.readFrame(&colorFrame) == openni::STATUS_OK)
@@ -268,6 +288,7 @@ SurgSim::DataStructures::DataGroup OpenNIScaffold::buildDeviceInputData()
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addImage("color");
 	builder.addImage("depth");
+	builder.addImage("depth_xyz");
 	return builder.createData();
 }
 

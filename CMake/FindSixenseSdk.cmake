@@ -1,9 +1,9 @@
 # - Try to find the Sixense SDK, used by the Razer Hydra gaming controller.
 #
 # Once done this will define
-#  SIXENSE_SDK_FOUND - system has the Sixense SDK directory
-#  SIXENSE_SDK_INCLUDE_DIR - the Sixense SDK include directory
-#  SIXENSE_SDK_LIBRARIES - the Sixense SDK libraries
+#  SIXENSESDK_FOUND - system has the Sixense SDK directory
+#  SIXENSESDK_INCLUDE_DIR - the Sixense SDK include directory
+#  SIXENSESDK_LIBRARIES - the Sixense SDK libraries
 
 # This file is a part of the OpenSurgSim project.
 # Copyright 2013, SimQuest Solutions Inc.
@@ -12,9 +12,9 @@
 # Cache settings and Sixense SDK environment variables take
 # precedence, or we try to fall back to the default search.
 
-find_path(SIXENSE_SDK_INCLUDE_DIR
+find_path(SIXENSESDK_INCLUDE_DIR
 	NAMES sixense.h
-	PATHS "$ENV{SIXENSE_SDK_PATH}" "$ENV{SIXENSE_ROOT}"
+	PATHS "$ENV{SIXENSESDK_PATH}" "$ENV{SIXENSE_ROOT}"
 	PATH_SUFFIXES "include"
 	NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 )
@@ -28,7 +28,7 @@ if(WIN32)
 	# Alternately, we could look at examining the registry; on my
 	# machine, there's some interesting stuff in
 	# HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 42300.
-	find_path(SIXENSE_SDK_INCLUDE_DIR
+	find_path(SIXENSESDK_INCLUDE_DIR
 		NAMES sixense.h
 		PATHS
 			"C:/Program Files (x86)/Steam/steamapps/common/sixense sdk/SixenseSDK"
@@ -40,7 +40,7 @@ endif(WIN32)
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	# Shake down some usual suspects under Linux.
 	# This is largely hypothetical.
-	find_path(SIXENSE_SDK_INCLUDE_DIR
+	find_path(SIXENSESDK_INCLUDE_DIR
 		NAMES sixense.h
 		PATHS
 			"$ENV{HOME}/.local/share/Steam/SteamApps/common/sixense sdk/SixenseSDK"
@@ -49,7 +49,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 		NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 	)
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-find_path(SIXENSE_SDK_INCLUDE_DIR
+find_path(SIXENSESDK_INCLUDE_DIR
 	NAMES sixense.h
 	PATH_SUFFIXES "include"
 )
@@ -80,10 +80,10 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	endif("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
-if(SIXENSE_SDK_INCLUDE_DIR)
-	get_filename_component(SIXENSE_SDK_ROOT_DIR
-		${SIXENSE_SDK_INCLUDE_DIR} PATH)
-endif(SIXENSE_SDK_INCLUDE_DIR)
+if(SIXENSESDK_INCLUDE_DIR)
+	get_filename_component(SIXENSESDK_ROOT_DIR
+		${SIXENSESDK_INCLUDE_DIR} PATH)
+endif(SIXENSESDK_INCLUDE_DIR)
 
 
 macro(sixense_shared_from_link OUTPUT)
@@ -107,49 +107,49 @@ macro(sixense_shared_from_link OUTPUT)
 endmacro()
 
 macro(sixense_find_library LIB_NAME)
-	find_library(SIXENSE_SDK_${LIB_NAME}_LIBRARY_RELEASE
+	find_library(SIXENSESDK_${LIB_NAME}_LIBRARY_RELEASE
 		NAMES ${LIB_NAME}${LIB_SUFFIX}
-		HINTS "${SIXENSE_SDK_ROOT_DIR}"
+		HINTS "${SIXENSESDK_ROOT_DIR}"
 		PATH_SUFFIXES "lib/${LIB_ARCH}/release_dll" "lib/${LIB_ARCH}/release"
 		NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 	)
-	find_library(SIXENSE_SDK_${LIB_NAME}_LIBRARY_RELEASE
+	find_library(SIXENSESDK_${LIB_NAME}_LIBRARY_RELEASE
 		NAMES ${LIB_NAME}${LIB_SUFFIX}
 		PATH_SUFFIXES "lib/${LIB_ARCH}/release_dll" "lib/${LIB_ARCH}/release"
 			"${LIB_SYSDIR}"
 	)
 
-	find_library(SIXENSE_SDK_${LIB_NAME}_LIBRARY_DEBUG
+	find_library(SIXENSESDK_${LIB_NAME}_LIBRARY_DEBUG
 		NAMES ${LIB_NAME}d${LIB_SUFFIX}
-		HINTS "${SIXENSE_SDK_ROOT_DIR}"
+		HINTS "${SIXENSESDK_ROOT_DIR}"
 		PATH_SUFFIXES "lib/${LIB_ARCH}/debug_dll" "lib/${LIB_ARCH}/debug"
 		NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 	)
-	find_library(SIXENSE_SDK_${LIB_NAME}_LIBRARY_DEBUG
+	find_library(SIXENSESDK_${LIB_NAME}_LIBRARY_DEBUG
 		NAMES ${LIB_NAME}d${LIB_SUFFIX}
 		PATH_SUFFIXES "lib/${LIB_ARCH}/debug_dll" "lib/${LIB_ARCH}/debug"
 			"${LIB_SYSDIR}"
 	)
 
-	if(SIXENSE_SDK_${LIB_NAME}_LIBRARY_RELEASE AND
-			SIXENSE_SDK_${LIB_NAME}_LIBRARY_DEBUG AND
-			NOT SIXENSE_SDK_${LIB_NAME}_LIBRARY)
-		set(SIXENSE_SDK_${LIB_NAME}_LIBRARY
-			optimized ${SIXENSE_SDK_${LIB_NAME}_LIBRARY_RELEASE}
-			debug     ${SIXENSE_SDK_${LIB_NAME}_LIBRARY_DEBUG}
+	if(SIXENSESDK_${LIB_NAME}_LIBRARY_RELEASE AND
+			SIXENSESDK_${LIB_NAME}_LIBRARY_DEBUG AND
+			NOT SIXENSESDK_${LIB_NAME}_LIBRARY)
+		set(SIXENSESDK_${LIB_NAME}_LIBRARY
+			optimized ${SIXENSESDK_${LIB_NAME}_LIBRARY_RELEASE}
+			debug     ${SIXENSESDK_${LIB_NAME}_LIBRARY_DEBUG}
 			CACHE STRING "The ${LIB_NAME} library from the Sixense SDK.")
-		mark_as_advanced(SIXENSE_SDK_${LIB_NAME}_LIBRARY)
+		mark_as_advanced(SIXENSESDK_${LIB_NAME}_LIBRARY)
 	endif()
 
-	if(SIXENSE_SDK_${LIB_NAME}_LIBRARY_RELEASE AND
-			NOT SIXENSE_SDK_${LIB_NAME}_SHARED_RELEASE)
-		sixense_shared_from_link(SIXENSE_SDK_${LIB_NAME}_SHARED_RELEASE
-			"${SIXENSE_SDK_${LIB_NAME}_LIBRARY_RELEASE}")
+	if(SIXENSESDK_${LIB_NAME}_LIBRARY_RELEASE AND
+			NOT SIXENSESDK_${LIB_NAME}_SHARED_RELEASE)
+		sixense_shared_from_link(SIXENSESDK_${LIB_NAME}_SHARED_RELEASE
+			"${SIXENSESDK_${LIB_NAME}_LIBRARY_RELEASE}")
 	endif()
-	if(SIXENSE_SDK_${LIB_NAME}_LIBRARY_DEBUG AND
-			NOT SIXENSE_SDK_${LIB_NAME}_SHARED_DEBUG)
-		sixense_shared_from_link(SIXENSE_SDK_${LIB_NAME}_SHARED_DEBUG
-			"${SIXENSE_SDK_${LIB_NAME}_LIBRARY_DEBUG}")
+	if(SIXENSESDK_${LIB_NAME}_LIBRARY_DEBUG AND
+			NOT SIXENSESDK_${LIB_NAME}_SHARED_DEBUG)
+		sixense_shared_from_link(SIXENSESDK_${LIB_NAME}_SHARED_DEBUG
+			"${SIXENSESDK_${LIB_NAME}_LIBRARY_DEBUG}")
 	endif()
 endmacro()
 
@@ -157,34 +157,34 @@ sixense_find_library(sixense)
 sixense_find_library(sixense_utils)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Sixense_SDK
-	DEFAULT_MSG SIXENSE_SDK_ROOT_DIR SIXENSE_SDK_INCLUDE_DIR
-	SIXENSE_SDK_sixense_LIBRARY SIXENSE_SDK_sixense_utils_LIBRARY)
+find_package_handle_standard_args(SixenseSdk
+	DEFAULT_MSG SIXENSESDK_ROOT_DIR SIXENSESDK_INCLUDE_DIR
+	SIXENSESDK_sixense_LIBRARY SIXENSESDK_sixense_utils_LIBRARY)
 
-if(SIXENSE_SDK_FOUND)
-	set(SIXENSE_SDK_LIBRARIES
-		${SIXENSE_SDK_sixense_LIBRARY} ${SIXENSE_SDK_sixense_utils_LIBRARY})
-endif(SIXENSE_SDK_FOUND)
-mark_as_advanced(SIXENSE_SDK_LIBRARIES)
+if(SIXENSESDK_FOUND)
+	set(SIXENSESDK_LIBRARIES
+		${SIXENSESDK_sixense_LIBRARY} ${SIXENSESDK_sixense_utils_LIBRARY})
+endif(SIXENSESDK_FOUND)
+mark_as_advanced(SIXENSESDK_LIBRARIES)
 
-if(SIXENSE_SDK_FOUND)
+if(SIXENSESDK_FOUND)
 	# HACK: for debug, we may also need the mysterious DeviceDLL.dll on Windows.
 	if(WIN32)
-		find_file(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG
+		find_file(SIXENSESDK_DeviceDLL_SHARED_DEBUG
 			NAMES DeviceDLL.dll
-			HINTS "${SIXENSE_SDK_ROOT_DIR}"
+			HINTS "${SIXENSESDK_ROOT_DIR}"
 			PATH_SUFFIXES "samples/${LIB_ARCH}/sixense_simple3d"
 			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 		)
-		if(NOT SIXENSE_SDK_DeviceDLL_SHARED_DEBUG)
+		if(NOT SIXENSESDK_DeviceDLL_SHARED_DEBUG)
 			# if not found, clear it and hope for the best...
 			message("Warning: DeviceDLL.dll (from Sixense) not found; continuing.")
-			set(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG
+			set(SIXENSESDK_DeviceDLL_SHARED_DEBUG
 				CACHE PATH "Path to DeviceDLL, if any." FORCE)
-		endif(NOT SIXENSE_SDK_DeviceDLL_SHARED_DEBUG)
+		endif(NOT SIXENSESDK_DeviceDLL_SHARED_DEBUG)
 	else()
-		set(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG
+		set(SIXENSESDK_DeviceDLL_SHARED_DEBUG
 			CACHE PATH "Path to DeviceDLL, if any.")
-		mark_as_advanced(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG)
+		mark_as_advanced(SIXENSESDK_DeviceDLL_SHARED_DEBUG)
 	endif()
-endif(SIXENSE_SDK_FOUND)
+endif(SIXENSESDK_FOUND)
