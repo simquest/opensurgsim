@@ -29,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	Grid2DTests.cpp
 	Grid3DTests.cpp
 	GridTests.cpp
+	GroupsTests.cpp
 	ImageTest.cpp
 	IndexDirectoryTests.cpp
 	IndexedLocalCoordinateTest.cpp

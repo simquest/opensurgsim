@@ -50,6 +50,8 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	EmptyData.h
 	Grid.h
 	Grid-inl.h
+	Groups.h
+	Groups-inl.h
 	Image.h
 	Image-inl.h
 	IndexDirectory.h
