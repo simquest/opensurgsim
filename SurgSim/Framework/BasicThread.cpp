@@ -135,7 +135,7 @@ void BasicThread::operator()()
 			if (sleepTime.count() > 0.0)
 			{
 				totalSleepTime += sleepTime;
-				boost::this_thread::sleep_until(start + m_period);
+				SurgSim::Framework::sleep_until(start + m_period);
 			}
 		}
 		else
