@@ -26,6 +26,8 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
+#include "SurgSim/Testing/Utilities.h"
+
 #include <gtest/gtest.h>
 
 #include <random>
@@ -86,6 +88,7 @@ TEST(BasicSceneElementTests, SerializationTest)
 	sceneElement->addComponent(representation1);
 	sceneElement->addComponent(representation2);
 	sceneElement->setActive(false);
+	sceneElement->addToGroup("One");
 
 	RigidTransform3d pose(makeRigidTransform(Quaterniond(0.0, 1.0, 0.0, 0.0), Vector3d(1.0, 2.0, 3.0)));
 	sceneElement->setPose(pose);
@@ -104,6 +107,7 @@ TEST(BasicSceneElementTests, SerializationTest)
 	EXPECT_EQ(3u, result->getComponents().size());
 	EXPECT_TRUE(pose.isApprox(result->getPose()));
 	EXPECT_FALSE(result->isActive());
+	EXPECT_TRUE(SurgSim::Testing::contains(result->getGroups(), "One"));
 }
 
 };  // namespace Blocks

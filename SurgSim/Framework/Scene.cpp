@@ -59,6 +59,7 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 		{
 			boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
 			m_elements.push_back(element);
+			m_groups.add(element->getGroups(), element);
 		}
 		runtime->addSceneElement(element);
 	}
@@ -139,6 +140,12 @@ bool Scene::decode(const YAML::Node& node)
 	}
 	return result;
 }
+
+SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>& Scene::getGroups()
+{
+	return m_groups;
+}
+
 }; // namespace Framework
 }; // namespace SurgSim
 

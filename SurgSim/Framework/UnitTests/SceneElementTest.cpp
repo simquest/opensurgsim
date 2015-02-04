@@ -21,6 +21,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Testing/Utilities.h"
 
 #include "MockObjects.h"  //NOLINT
 
@@ -74,7 +75,7 @@ TEST(SceneElementTest, AddAndTestComponents)
 	EXPECT_EQ(component->getSceneElement(), element);
 
 	// Scene in Component will not be set until initialization.
-	EXPECT_NE(component->getScene(), element->getScene() );
+	EXPECT_NE(component->getScene(), element->getScene());
 }
 
 TEST(SceneElementTest, AddAndAccessComponents)
@@ -189,4 +190,39 @@ TEST(SceneElementTest, DoubleInitTest)
 	EXPECT_TRUE(element->didInit);
 
 	ASSERT_ANY_THROW(element->initialize());
+}
+
+TEST(SceneElementTest, NoSceneGroupsTest)
+{
+	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
+	EXPECT_TRUE(element->getGroups().empty());
+
+	element->addToGroup("One");
+	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "One"));
+
+	element->addToGroup("Two");
+	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "Two"));
+	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "One"));
+
+	element->removeFromGroup("One");
+	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "Two"));
+	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "One"));
+
+	std::vector<std::string> newGroups;
+	newGroups.push_back("Three");
+	newGroups.push_back("Four");
+
+	element->setGroups(newGroups);
+	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "One"));
+	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "Two"));
+	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "Three"));
+	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "Four"));
+
+	std::vector<std::string> empty;
+	element->setGroups(empty);
+	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "One"));
+	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "Two"));
+	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "Three"));
+	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "Four"));
+
 }

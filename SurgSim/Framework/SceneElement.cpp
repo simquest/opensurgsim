@@ -22,6 +22,9 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
 
 namespace SurgSim
 {
@@ -217,6 +220,10 @@ YAML::Node SceneElement::encode(bool standalone) const
 	YAML::Node data(YAML::NodeType::Map);
 	data["Name"] = getName();
 	data["IsActive"] = isActive();
+	if (m_groups.size() > 0)
+	{
+		data["Groups"] = m_groups;
+	}
 
 	for (auto component = std::begin(m_components); component != std::end(m_components); ++component)
 	{
@@ -254,6 +261,12 @@ bool SceneElement::decode(const YAML::Node& node)
 			m_isActive = data["IsActive"].as<bool>();
 		}
 
+		if (data["Groups"].IsDefined())
+		{
+
+			m_groups = data["Groups"].as<std::unordered_set<std::string>>();
+		}
+
 		if (data["Components"].IsSequence())
 		{
 			for (auto nodeIt = data["Components"].begin(); nodeIt != data["Components"].end(); ++nodeIt)
@@ -289,6 +302,43 @@ void SceneElement::setActive(bool val)
 bool SceneElement::isActive() const
 {
 	return m_isActive;
+}
+
+void SceneElement::addToGroup(const std::string& group)
+{
+	m_groups.insert(group);
+	if (isInitialized())
+	{
+		getScene()->getGroups().add(group, getSharedPtr());
+	}
+}
+
+void SceneElement::removeFromGroup(const std::string& group)
+{
+	m_groups.erase(group);
+	if (isInitialized())
+	{
+		getScene()->getGroups().remove(group, getSharedPtr());
+	}
+}
+
+void SceneElement::setGroups(const std::vector<std::string>& groups)
+{
+	if (isInitialized())
+	{
+		auto& groupings = getScene()->getGroups();
+		for (auto group : groups)
+		{
+			groupings.add(group, getSharedPtr());
+		}
+	}
+	std::unordered_set<std::string> temp(groups.cbegin(), groups.cend());
+	std::swap(m_groups, temp);
+}
+
+std::vector<std::string> SceneElement::getGroups() const
+{
+	return std::vector<std::string>(m_groups.cbegin(), m_groups.cend());
 }
 
 }; // namespace Framework

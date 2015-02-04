@@ -22,6 +22,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/DataStructures/Groups.h"
 
 namespace YAML
 {
@@ -72,18 +73,22 @@ public:
 	/// \return true if the decoding succeeded and the node was formatted correctly, false otherwise
 	bool decode(const YAML::Node& node);
 
+
+	SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>& getGroups();
+
 private:
 
 	/// Get a shared pointer to Scene.
 	/// \return The shared pointer.
 	std::shared_ptr<Scene> getSharedPtr();
-
 	std::weak_ptr<Runtime> m_runtime;
 
 	std::vector<std::shared_ptr<SceneElement>> m_elements;
 
 	// Used in a const function, need to declare mutable
 	mutable boost::mutex m_sceneElementsMutex;
+
+	SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>> m_groups;
 };
 
 }; // namespace Framework

@@ -21,6 +21,8 @@
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 
+#include "SurgSim/Testing/Utilities.h"
+
 namespace SurgSim
 {
 namespace Framework
@@ -140,6 +142,54 @@ TEST(SceneTest, LoadSceneTest)
 
 	// Another check for fresh components, if they are from the cache, this would be false
 	EXPECT_TRUE(component->isLocalActive());
+}
+
+TEST(SceneTest, SceneElementGroups)
+{
+
+	using SurgSim::Testing::contains;
+
+	auto runtime = std::make_shared<Runtime>("config.txt");
+	auto scene = runtime->getScene();
+
+	auto element1 = std::make_shared<BasicSceneElement>("element1");
+	auto element2 = std::make_shared<BasicSceneElement>("element2");
+
+	element1->addToGroup("One");
+
+	auto& groups = scene->getGroups();
+
+	EXPECT_TRUE(groups.getGroups().empty());
+
+	scene->addSceneElement(element1);
+
+	EXPECT_EQ(1L, groups.getGroups().size());
+	EXPECT_TRUE(contains(groups.getGroups(), "One"));
+	EXPECT_TRUE(contains(groups.getMembers("One"), element1));
+
+	scene->addSceneElement(element2);
+	EXPECT_EQ(1L, groups.getGroups().size());
+
+	element2->addToGroup("Two");
+	EXPECT_EQ(2L, groups.getGroups().size());
+	EXPECT_TRUE(contains(groups.getGroups(), "Two"));
+	EXPECT_TRUE(contains(groups.getMembers("Two"), element2));
+
+	element1->removeFromGroup("One");
+	EXPECT_EQ(1L, groups.getGroups().size());
+	EXPECT_TRUE(contains(groups.getGroups(), "Two"));
+	EXPECT_TRUE(contains(groups.getMembers("Two"), element2));
+
+	element1->addToGroup("One");
+
+
+	std::vector<std::string> groupNames;
+	groupNames.push_back("Three");
+	groupNames.push_back("Four");
+
+	element1->setGroups(groupNames);
+	EXPECT_EQ(4L, groups.getGroups().size());
+
 }
 
 }
