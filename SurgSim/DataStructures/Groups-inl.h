@@ -30,6 +30,17 @@ bool SurgSim::DataStructures::Groups<Key, T>::add(const Key& group, const T& val
 
 
 template <typename Key, typename T>
+bool SurgSim::DataStructures::Groups<Key, T>::add(const std::vector<Key>& groups, const T& member)
+{
+	bool result = false;
+	for (auto& group : groups)
+	{
+		result = add(group, member) || result;
+	}
+	return result;
+}
+
+template <typename Key, typename T>
 bool SurgSim::DataStructures::Groups<Key, T>::remove(const Key& group, const T& value)
 {
 	bool result = false;

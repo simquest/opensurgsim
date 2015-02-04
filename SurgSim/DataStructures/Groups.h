@@ -45,8 +45,15 @@ public:
 	/// is already a member of the group, nothing happens
 	/// \param group the group to use
 	/// \param member the member to add
-	/// \return true if the member was actually added
+	/// \return true if the member was actually added to the group
 	bool add(const Key& group, const T& member);
+
+	/// Add a member to the given groups, if any of the groups don't exist they will be created, if the element
+	/// is already a member of a group, it won't be added to that specific group
+	/// \param groups the groups to use
+	/// \param member the member to add
+	/// \return true if the member was to at least one group
+	bool add(const std::vector<Key>& groups, const T& member);
 
 	/// Remove a member from a given group, if the group does not exist or the member is not a member of that
 	/// group, nothing will happen.

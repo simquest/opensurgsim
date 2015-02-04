@@ -96,6 +96,23 @@ TEST(GroupsTests, AddTest)
 	EXPECT_TRUE(SurgSim::Testing::contains(names, "Two"));
 }
 
+TEST(GroupsTests, MultiAddTest)
+{
+	Groups<std::string, std::shared_ptr<Framework::BasicSceneElement>> groups;
+
+	auto element1 = std::make_shared<Framework::BasicSceneElement>("One");
+	auto element2 = std::make_shared<Framework::BasicSceneElement>("Two");
+
+	std::vector<std::string> names;
+	names.push_back("One");
+	names.push_back("Two");
+
+	groups.add(names, element1);
+	EXPECT_EQ(2L, groups.getGroups().size());
+	EXPECT_EQ(2L, groups.getGroups(element1).size());
+
+}
+
 TEST(GroupsTests, BracketOperator)
 {
 	Groups<std::string, std::shared_ptr<Framework::BasicSceneElement>> groups;
