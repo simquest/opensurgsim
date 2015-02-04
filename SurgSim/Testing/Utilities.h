@@ -29,7 +29,7 @@ namespace Testing
 /// \return true when the container contains the given value
 /// \note for maps the value type is std::pair<key, mapped_type>
 template <class Container>
-bool contains(const Container& container, typename const Container::value_type& value)
+bool contains(const Container& container, const typename Container::value_type& value)
 {
 	return std::find(container.begin(), container.end(), value) != container.end();
 }
