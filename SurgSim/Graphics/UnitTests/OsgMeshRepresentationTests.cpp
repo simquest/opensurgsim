@@ -99,7 +99,7 @@ TEST(OsgMeshRepresentationTests, SerializationTest)
 {
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	std::shared_ptr<SurgSim::Framework::Component> osgMesh = std::make_shared<OsgMeshRepresentation>("TestMesh");
-	std::string filename = "Geometry/arm_collision.ply";
+	std::string filename = "OsgMeshRepresentationTests/Cube.ply";
 
 	osgMesh->setValue("MeshFileName", filename);
 	osgMesh->setValue("UpdateOptions", 2);

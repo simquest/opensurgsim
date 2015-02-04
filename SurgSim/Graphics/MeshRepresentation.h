@@ -20,6 +20,7 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/Representation.h"
 
 
@@ -28,7 +29,6 @@ namespace SurgSim
 
 namespace Graphics
 {
-class Mesh;
 
 /// Graphics representation of a mesh, can be initialized from a Mesh structure
 class MeshRepresentation : public virtual Representation

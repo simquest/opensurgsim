@@ -19,8 +19,12 @@
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 
-
 using SurgSim::DataStructures::EmptyData;
+
+
+template<>
+std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Graphics::VertexData, EmptyData, EmptyData>
+::m_className = "SurgSim::Graphics::Mesh";
 
 namespace SurgSim
 {
@@ -28,10 +32,6 @@ namespace Graphics
 {
 
 SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Graphics::Mesh, Mesh);
-
-template<>
-std::string SurgSim::DataStructures::TriangleMesh<VertexData, EmptyData, EmptyData>
-::m_className = "SurgSim::Graphics::Mesh";
 
 Mesh::Mesh()
 {
