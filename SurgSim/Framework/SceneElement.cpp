@@ -220,9 +220,12 @@ YAML::Node SceneElement::encode(bool standalone) const
 	YAML::Node data(YAML::NodeType::Map);
 	data["Name"] = getName();
 	data["IsActive"] = isActive();
+
+	// Only encode groups when they are there, also encode them using the flow style i.e. with []
 	if (m_groups.size() > 0)
 	{
 		data["Groups"] = m_groups;
+		data["Groups"].SetStyle(YAML::FlowStyle);
 	}
 
 	for (auto component = std::begin(m_components); component != std::end(m_components); ++component)
@@ -327,10 +330,8 @@ void SceneElement::setGroups(const std::vector<std::string>& groups)
 	if (isInitialized())
 	{
 		auto& groupings = getScene()->getGroups();
-		for (auto group : groups)
-		{
-			groupings.add(group, getSharedPtr());
-		}
+		groupings.remove(getSharedPtr());
+		groupings.add(groups, getSharedPtr());
 	}
 	std::unordered_set<std::string> temp(groups.cbegin(), groups.cend());
 	std::swap(m_groups, temp);
