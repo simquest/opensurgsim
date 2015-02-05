@@ -362,12 +362,12 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 		// Positions returned from CameraSDK are right-handed.
 		Vector3d position(x / 1000.0, y / 1000.0, z / 1000.0); // Convert millimeter to meter
 
-		// Euler conventions returned from CameraSDK are: left-handed, axis order intrinsic ZYX, X=roll, Y=yaw, Z=pitch.
-		// OSS uses right-handed coordinate system.
-		Matrix33d rotationX = makeRotationMatrix(-roll * M_PI / 180.0, Vector3d(Vector3d::UnitX()));
+		// The angles returned from CameraSDK are Euler angles (y-x'-z'' intrinsic rotations): X=pitch, Y=yaw, Z=roll.
+		// OSS use right handed coordinate system (X:Right, Y:Up, Z:Outward) and right hand rule for rotations.
+		Matrix33d rotationX = makeRotationMatrix(pitch * M_PI / 180.0, Vector3d(Vector3d::UnitX()));
 		Matrix33d rotationY = makeRotationMatrix(yaw   * M_PI / 180.0, Vector3d(Vector3d::UnitY()));
-		Matrix33d rotationZ = makeRotationMatrix(pitch * M_PI / 180.0, Vector3d(Vector3d::UnitZ()));
-		Matrix33d orientation = rotationZ * rotationY * rotationX;
+		Matrix33d rotationZ = makeRotationMatrix(roll * M_PI / 180.0, Vector3d(Vector3d::UnitZ()));
+		Matrix33d orientation = rotationY * rotationX * rotationZ;
 
 		RigidTransform3d pose;
 		pose.linear() = orientation;
