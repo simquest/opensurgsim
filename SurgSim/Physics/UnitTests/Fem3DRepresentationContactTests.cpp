@@ -105,7 +105,6 @@ public:
 		// Update model by one timestep
 		m_fem->beforeUpdate(dt);
 		m_fem->update(dt);
-
 	}
 
 	void setContactAt(const IndexedLocalCoordinate &coord)

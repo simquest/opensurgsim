@@ -68,23 +68,16 @@ std::shared_ptr<PhysicsManagerState>
 	result->setRepresentationsMapping(representationsMapping);
 
 	// Resize the Mlcp problem
-	result->getMlcpProblem().A.resize(numAtomicConstraint, numAtomicConstraint);
-	result->getMlcpProblem().A.setZero();
-	result->getMlcpProblem().b.resize(numAtomicConstraint);
-	result->getMlcpProblem().b.setZero();
-	result->getMlcpProblem().H.resize(numAtomicConstraint, numDof);
-	result->getMlcpProblem().H.setZero();
-	result->getMlcpProblem().CHt.resize(numDof, numAtomicConstraint);
-	result->getMlcpProblem().CHt.setZero();
-	result->getMlcpProblem().mu.resize(numConstraint);
-	result->getMlcpProblem().mu.setZero();
+	result->getMlcpProblem().A.setZero(numAtomicConstraint, numAtomicConstraint);
+	result->getMlcpProblem().b.setZero(numAtomicConstraint);
+	result->getMlcpProblem().H.setZero(numAtomicConstraint, numDof);
+	result->getMlcpProblem().CHt.setZero(numDof, numAtomicConstraint);
+	result->getMlcpProblem().mu.setZero(numConstraint);
 	result->getMlcpProblem().constraintTypes.clear();
 
 	// Resize the Mlcp solution
-	result->getMlcpSolution().dofCorrection.resize(numDof);
-	result->getMlcpSolution().dofCorrection.setZero();
-	result->getMlcpSolution().x.resize(numAtomicConstraint);
-	result->getMlcpSolution().x.setZero();
+	result->getMlcpSolution().dofCorrection.setZero(numDof);
+	result->getMlcpSolution().x.setZero(numAtomicConstraint);
 
 	// Fill up the Mlcp problem
 	for (auto it = activeConstraints.begin(); it != activeConstraints.end(); it++)

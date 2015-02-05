@@ -513,7 +513,7 @@ public:
 	}
 
 	// Useful method to numerically evaluate the 9x9 matrix d^T.d on a given point on the triangle
-	SurgSim::Math::Matrix evaluate_dTd_at(const MockFem2DElement& fem2DElement, double xi, double eta)
+	Matrix evaluate_dTd_at(const MockFem2DElement& fem2DElement, double xi, double eta)
 	{
 		SurgSim::Math::Vector d(9); // column vector
 
@@ -547,7 +547,7 @@ public:
 	}
 
 	// Useful method to numerically evaluate the 9x9 matrix Hx.Hx^T on a given point on the triangle
-	SurgSim::Math::Matrix evaluate_HxHxT_at(const MockFem2DElement& fem2DElement, double xi, double eta)
+	Matrix evaluate_HxHxT_at(const MockFem2DElement& fem2DElement, double xi, double eta)
 	{
 		auto Hx_array = fem2DElement.batozHx(xi, eta);
 		SurgSim::Math::Vector Hx(9); // column vector
@@ -558,7 +558,7 @@ public:
 	}
 
 	// Useful method to numerically evaluate the 9x9 matrix Hy.Hy^T on a given point on the triangle
-	SurgSim::Math::Matrix evaluate_HyHyT_at(const MockFem2DElement& fem2DElement, double xi, double eta)
+	Matrix evaluate_HyHyT_at(const MockFem2DElement& fem2DElement, double xi, double eta)
 	{
 		auto Hy_array = fem2DElement.batozHy(xi, eta);
 		SurgSim::Math::Vector Hy(9); // column vector
@@ -571,7 +571,7 @@ public:
 	// Useful method to numerically evaluate the plate mass matrix of an element
 	// This method uses a Gauss quadrature rules on the triangle to numerically evaluate the vaious integral terms.
 	void numericallyEvaluatePlateMassMatrix(const MockFem2DElement& fem2DElement,
-		Eigen::Ref<SurgSim::Math::Matrix> mass)
+		Eigen::Ref<Matrix> mass)
 	{
 		// M = 2.A.rho.h \int_0^1 \int_0^{1-eta} d^T.d dxi deta
 		//  + 2.A.h^3/12.rho \int_0^1 \int_0^{1-eta} Hx.Hx^T dxi deta
@@ -610,7 +610,7 @@ public:
 		}
 	}
 
-	void getExpectedLocalMassMatrix(Eigen::Ref<SurgSim::Math::Matrix> mass)
+	void getExpectedLocalMassMatrix(Eigen::Ref<Matrix> mass)
 	{
 		typedef Eigen::Matrix<double, 9, 9> Matrix99Type;
 		typedef Eigen::Matrix<double, 6, 6> Matrix66Type;
@@ -633,7 +633,7 @@ public:
 		}
 	}
 
-	void getExpectedLocalStiffnessMatrix(Eigen::Ref<SurgSim::Math::Matrix> stiffness)
+	void getExpectedLocalStiffnessMatrix(Eigen::Ref<Matrix> stiffness)
 	{
 		typedef Eigen::Matrix<double, 9, 9> Matrix99Type;
 		typedef Eigen::Matrix<double, 6, 6> Matrix66Type;
@@ -1270,14 +1270,14 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
 	const size_t numDof = 6 * m_restState.getNumNodes();
-	SurgSim::Math::Vector forceVector(numDof);
-	SurgSim::Math::Vector ones(numDof);
-	SurgSim::Math::Matrix massMatrix(numDof, numDof);
-	SurgSim::Math::Matrix dampingMatrix(numDof, numDof);
-	SurgSim::Math::Matrix stiffnessMatrix(numDof, numDof);
-	SurgSim::Math::Matrix expectedMassMatrix(numDof, numDof);
-	SurgSim::Math::Matrix expectedDampingMatrix(numDof, numDof);
-	SurgSim::Math::Matrix expectedStiffnessMatrix(numDof, numDof);
+	Vector forceVector(numDof);
+	Vector ones(numDof);
+	Matrix massMatrix(numDof, numDof);
+	Matrix dampingMatrix(numDof, numDof);
+	Matrix stiffnessMatrix(numDof, numDof);
+	Matrix expectedMassMatrix(numDof, numDof);
+	Matrix expectedDampingMatrix(numDof, numDof);
+	Matrix expectedStiffnessMatrix(numDof, numDof);
 
 	// Assemble manually the expectedStiffnessMatrix
 	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();

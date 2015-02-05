@@ -126,19 +126,13 @@ public:
 		m_E = 1e6;
 		m_nu = 0.45;
 
-		m_expectedMassMatrix.resize(3*15, 3*15);
-		m_expectedMassMatrix.setZero();
-		m_expectedDampingMatrix.resize(3*15, 3*15);
-		m_expectedDampingMatrix.setZero();
-		m_expectedStiffnessMatrix.resize(3*15, 3*15);
-		m_expectedStiffnessMatrix.setZero();
-		m_expectedStiffnessMatrix2.resize(3*15, 3*15);
-		m_expectedStiffnessMatrix2.setZero();
-		m_vectorOnes.resize(3*15);
-		m_vectorOnes.setConstant(1.0);
+		m_expectedMassMatrix.setZero(3*15, 3*15);
+		m_expectedDampingMatrix.setZero(3*15, 3*15);
+		m_expectedStiffnessMatrix.setZero(3*15, 3*15);
+		m_expectedStiffnessMatrix2.setZero(3*15, 3*15);
+		m_vectorOnes.setOnes(3*15);
 
-		Eigen::Matrix<double, 12, 12> M;
-		M.setZero();
+		Eigen::Matrix<double, 12, 12> M = Eigen::Matrix<double, 12, 12>::Zero();
 		{
 			M.diagonal().setConstant(2.0);
 			M.block(0, 3, 9, 9).diagonal().setConstant(1.0);
@@ -151,10 +145,7 @@ public:
 		M *= m_rho * m_expectedVolume / 20.0;
 		addSubMatrix(M, m_nodeIdsVectorForm, 3 , &m_expectedMassMatrix);
 
-		m_expectedDampingMatrix.setZero();
-
-		Eigen::Matrix<double, 12, 12> K;
-		K.setZero();
+		Eigen::Matrix<double, 12, 12> K = Eigen::Matrix<double, 12, 12>::Zero();
 		{
 			// Calculation done by hand from
 			// http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch09.d/AFEM.Ch09.pdf
@@ -162,10 +153,9 @@ public:
 			// bi = {-1 1 0 0}
 			// ci = {-1 0 1 0}
 			// di = {-1 0 0 1}
-			Eigen::Matrix<double, 6, 12> B;
-			Eigen::Matrix<double, 6, 6> E;
+			Eigen::Matrix<double, 6, 12> B = Eigen::Matrix<double, 6, 12>::Zero();
+			Eigen::Matrix<double, 6, 6> E = Eigen::Matrix<double, 6, 6>::Zero();
 
-			B.setZero();
 			B(0, 0) = -1; B(0, 3) = 1;
 			B(1, 1) = -1; B(1, 7) = 1;
 			B(2, 2) = -1; B(2, 11) = 1;
@@ -174,7 +164,6 @@ public:
 			B(5, 0) = -1; B(5, 2) = -1;  B(5, 5) = 1; B(5, 9) = 1;
 			B *= 1.0 / (6.0 * m_expectedVolume);
 
-			E.setZero();
 			E.block(0, 0, 3, 3).setConstant(m_nu);
 			E.block(0, 0, 3, 3).diagonal().setConstant(1.0 - m_nu);
 			E.block(3, 3, 3, 3).diagonal().setConstant(0.5 - m_nu);
@@ -463,15 +452,10 @@ TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 		ASSERT_NO_THROW(tet.initialize(m_restState));
 	}
 
-	SurgSim::Math::Vector forceVector(3*15);
-	SurgSim::Math::Matrix massMatrix(3*15, 3*15);
-	SurgSim::Math::Matrix dampingMatrix(3*15, 3*15);
-	SurgSim::Math::Matrix stiffnessMatrix(3*15, 3*15);
-
-	forceVector.setZero();
-	massMatrix.setZero();
-	dampingMatrix.setZero();
-	stiffnessMatrix.setZero();
+	Vector forceVector = Vector::Zero(3*15);
+	Matrix massMatrix = Matrix::Zero(3*15, 3*15);
+	Matrix dampingMatrix = Matrix::Zero(3*15, 3*15);
+	Matrix stiffnessMatrix = Matrix::Zero(3*15, 3*15);
 
 	// Make sure that the 2 ways of computing the expected stiffness matrix gives the same result
 	EXPECT_TRUE(m_expectedStiffnessMatrix.isApprox(m_expectedStiffnessMatrix2));
