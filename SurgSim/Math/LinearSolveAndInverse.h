@@ -16,12 +16,11 @@
 #ifndef SURGSIM_MATH_LINEARSOLVEANDINVERSE_H
 #define SURGSIM_MATH_LINEARSOLVEANDINVERSE_H
 
-#include "SurgSim/Framework/Assert.h"
+#include <Eigen/Core>
 
+#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
-
-#include <Eigen/Core>
 
 namespace SurgSim
 {
