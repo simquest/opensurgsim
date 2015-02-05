@@ -80,184 +80,90 @@ void MlcpGaussSeidelSolver::setMaxIterations(size_t maxIterations)
 
 bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solution)
 {
-	size_t problemSize = problem.getSize();
+	const size_t problemSize = problem.getSize();
 	const MlcpProblem::Matrix& A = problem.A;
-	const size_t nbColumnInA = A.cols();
 	const MlcpProblem::Vector& b = problem.b;
-	MlcpSolution::Vector& initialGuess_and_solution = solution->x;
-	const MlcpProblem::Vector& frictionCoefs = problem.mu;
+	MlcpSolution::Vector& initialGuessAndSolution = solution->x;
 	const std::vector<MlcpConstraintType>& constraintsType = problem.constraintTypes;
-	size_t* MLCP_nbIterations = &solution->numIterations;
+	size_t* iteration = &solution->numIterations;
 	bool* validConvergence = &solution->validConvergence;
 	bool* validSignorini = &solution->validSignorini;
 	double* convergenceCriteria = &solution->convergenceCriteria;
 	double* initialConvergenceCriteria = &solution->initialConvergenceCriteria;
 	double* constraintConvergenceCriteria = solution->constraintConvergenceCriteria;
 	double* initialConstraintConvergenceCriteria = solution->initialConstraintConvergenceCriteria;
-	bool catchExplodingConvergenceCriteria = true;
 
 	// Loop until it converges or maxIterations are reached
-	size_t nbLoop = 0;
+	*iteration = 0;
+	*validSignorini = true;
 
-	double convergence_criteria;
-	double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES];
-	bool signorini_verified;
-	bool signorini_valid;
-
-	double initial_convergence_criteria = 0.0;
-	double initial_constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES];
-	bool initialSignoriniVerified = true;
-	bool initialSignoriniValid = true;
-
-	calculateConvergenceCriteria(problemSize, A, nbColumnInA, b,
-								 initialGuess_and_solution, constraintsType,
-								 initial_constraint_convergence_criteria, &initial_convergence_criteria,
-								 &initialSignoriniVerified, &initialSignoriniValid);
+	calculateConvergenceCriteria(problemSize, A, b, initialGuessAndSolution,
+								 constraintsType, initialConstraintConvergenceCriteria, initialConvergenceCriteria,
+								 validSignorini);
 
 	// If it is already converged, fill the output and return true.
-	if (initial_convergence_criteria <= m_epsilonConvergence && initialSignoriniVerified)
+	if (*initialConvergenceCriteria <= m_epsilonConvergence && *validSignorini)
 	{
-		if (validSignorini)
-		{
-			*validSignorini = initialSignoriniVerified;
-		}
-		if (validConvergence)
-		{
-			*validConvergence = true;
-		}
-		if (initialConvergenceCriteria)
-		{
-			*initialConvergenceCriteria = initial_convergence_criteria;
-		}
-		if (convergenceCriteria)
-		{
-			*convergenceCriteria = initial_convergence_criteria;
-		}
-		if (MLCP_nbIterations)
-		{
-			*MLCP_nbIterations = 0;
-		}
-
-		if (initialConstraintConvergenceCriteria)
-		{
-			for (size_t i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; ++i)
-			{
-				initialConstraintConvergenceCriteria[i] = initial_constraint_convergence_criteria[i];
-			}
-		}
-
-		if (constraintConvergenceCriteria)
-		{
-			for (size_t i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; ++i)
-			{
-				initialConstraintConvergenceCriteria[i] = initial_constraint_convergence_criteria[i];
-			}
-		}
-
+		*validConvergence = true;
+		*convergenceCriteria = *initialConvergenceCriteria;
 		return true;
 	}
 
 	do
 	{
-		doOneIteration(problemSize, A, nbColumnInA, b, &initialGuess_and_solution, frictionCoefs,
-					   constraintsType, constraint_convergence_criteria, &convergence_criteria,
-					   &signorini_verified);
+		doOneIteration(problemSize, A, b, &initialGuessAndSolution, problem.mu, constraintsType,
+					   constraintConvergenceCriteria, convergenceCriteria, validSignorini);
 
-		calculateConvergenceCriteria(problemSize, A, nbColumnInA, b,
-									 initialGuess_and_solution, constraintsType,
-									 constraint_convergence_criteria, &convergence_criteria,
-									 &signorini_verified, &signorini_valid);
-		++nbLoop;
+		calculateConvergenceCriteria(problemSize, A, b, initialGuessAndSolution,
+									 constraintsType, constraintConvergenceCriteria, convergenceCriteria,
+									 validSignorini);
+		++(*iteration);
 
-		if (catchExplodingConvergenceCriteria)
+		// If we have an incredibly high convergence criteria value, the displacements are going to be very large,
+		// causing problems in the next iteration, so we should break out here. The convergence_criteria should
+		// really only be a couple order of magnitudes higher than epsilon.
+		if (!SurgSim::Math::isValid(*convergenceCriteria) || *convergenceCriteria > 1.0)
 		{
-			// If we have an incredibly high convergence criteria value, the displacements are going to be very large,
-			// causing problems in the next iteration, so we should break out here. The convergence_criteria should
-			// really only be a couple order of magnitudes higher than epsilon.
-			if (!SurgSim::Math::isValid(convergence_criteria) || convergence_criteria > 1.0)
-			{
-				SURGSIM_LOG_WARNING(m_logger) << "Convergence (" << convergence_criteria <<
-					") is NaN, infinite, or greater than 1.0! MLCP is exploding after " << nbLoop <<
-					" Gauss Seidel iterations!!";
-				break;
-			}
+			SURGSIM_LOG_WARNING(m_logger) << "Convergence (" << *convergenceCriteria <<
+				") is NaN, infinite, or greater than 1.0! MLCP is exploding after " << *iteration <<
+				" Gauss Seidel iterations!!";
+			break;
 		}
 	}
-	while ((!signorini_verified ||
-			(SurgSim::Math::isValid(convergence_criteria) && convergence_criteria > m_epsilonConvergence)) &&
-		   nbLoop < m_maxIterations);
+	while ((!(*validSignorini) || (*convergenceCriteria > m_epsilonConvergence)) && *iteration < m_maxIterations);
 
-	if (MLCP_nbIterations)
-	{
-		*MLCP_nbIterations = nbLoop;
-	}
+	*validConvergence = SurgSim::Math::isValid(*convergenceCriteria) && *convergenceCriteria <= 1.0;
 
-	if (validConvergence)
-	{
-		*validConvergence = true;
+	SURGSIM_LOG_IF(*convergenceCriteria >= sqrt(m_epsilonConvergence), m_logger, WARNING) <<
+		"Convergence criteria (" << *convergenceCriteria << ") is greater than " << sqrt(m_epsilonConvergence) <<
+		" at end of " << *iteration << " Gauss Seidel iterations.";
 
-		if (!SurgSim::Math::isValid(convergence_criteria) || convergence_criteria > 1.0)
-		{
-			*validConvergence = false;
-		}
+	SURGSIM_LOG_IF(*convergenceCriteria > *initialConvergenceCriteria, m_logger, WARNING) <<
+		"Convergence criteria (" << *convergenceCriteria << ") is greater than before " << *iteration <<
+		" Gauss Seidel iterations (" << *initialConvergenceCriteria << ").";
 
-		if (convergence_criteria >= sqrt(m_epsilonConvergence))
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Convergence criteria (" << convergence_criteria <<
-				") is greater than " << sqrt(m_epsilonConvergence) << " at end of " << nbLoop <<
-				" Gauss Seidel iterations.";
-		}
+	SURGSIM_LOG_IF(!(*validSignorini), m_logger, WARNING) <<
+		"Signorini not verified after " << *iteration << " Gauss Seidel iterations.";
 
-		if (convergence_criteria > initial_convergence_criteria)
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Convergence criteria (" << convergence_criteria <<
-				") is greater than before " << nbLoop << " Gauss Seidel iterations (" <<
-				initial_convergence_criteria << ").";
-		}
-	}
-
-	if (validSignorini)
-	{
-		*validSignorini = true;
-
-		if (!signorini_verified)
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Signorini not verified after " << nbLoop << " Gauss Seidel iterations.";
-			*validSignorini = false;
-		}
-	}
-
-	if (convergenceCriteria)
-	{
-		*convergenceCriteria = convergence_criteria;
-	}
-	if (initialConvergenceCriteria)
-	{
-		*initialConvergenceCriteria = initial_convergence_criteria;
-	}
-
-	return (SurgSim::Math::isValid(convergence_criteria) && convergence_criteria <= m_epsilonConvergence &&
-		signorini_valid);
+	return (SurgSim::Math::isValid(*convergenceCriteria) && *convergenceCriteria <= m_epsilonConvergence);
 }
 
 
 void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, const MlcpProblem::Matrix& A,
-													size_t nbColumnInA,
 													const MlcpProblem::Vector& b,
-													const MlcpSolution::Vector& initialGuess_and_solution,
+													const MlcpSolution::Vector& initialGuessAndSolution,
 													const std::vector<MlcpConstraintType>& constraintsType,
-													double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
-													double* convergence_criteria,
-													bool* signoriniVerified, bool* signoriniValid)
+													double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES],
+													double* convergenceCriteria,
+													bool* validSignorini)
 {
 	// Calculate initial convergence criteria.
 	for (size_t constraint = 0; constraint < MLCP_NUM_CONSTRAINT_TYPES; ++constraint)
 	{
-		constraint_convergence_criteria[constraint] = 0.0;
+		constraintConvergenceCriteria[constraint] = 0.0;
 	}
-	*convergence_criteria = 0.0;
-	*signoriniVerified = true;
-	*signoriniValid = true;
+	*convergenceCriteria = 0.0;
+	*validSignorini = true;
 
 	size_t currentAtomicIndex = 0;
 	const size_t nbConstraints = constraintsType.size();
@@ -270,9 +176,9 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 		case MLCP_BILATERAL_1D_CONSTRAINT:
 		{
 			const double criteria =
-				(b.segment<1>(currentAtomicIndex) + A.row(currentAtomicIndex) * initialGuess_and_solution).norm();
-			*convergence_criteria += criteria;
-			constraint_convergence_criteria[constraintsType[constraint]] += criteria;
+				(b.segment<1>(currentAtomicIndex) + A.row(currentAtomicIndex) * initialGuessAndSolution).norm();
+			*convergenceCriteria += criteria;
+			constraintConvergenceCriteria[constraintsType[constraint]] += criteria;
 
 			++nbNonContactConstraints;
 			currentAtomicIndex += 1;
@@ -282,9 +188,9 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 		case MLCP_BILATERAL_2D_CONSTRAINT:
 		{
 			const double criteria = (b.segment<2>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuess_and_solution).norm();
-			*convergence_criteria += criteria;
-			constraint_convergence_criteria[constraintsType[constraint]] += criteria;
+				A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuessAndSolution).norm();
+			*convergenceCriteria += criteria;
+			constraintConvergenceCriteria[constraintsType[constraint]] += criteria;
 
 			++nbNonContactConstraints;
 			currentAtomicIndex += 2;
@@ -294,9 +200,9 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 		case MLCP_BILATERAL_3D_CONSTRAINT:
 		{
 			const double criteria = (b.segment<3>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuess_and_solution).norm();
-			*convergence_criteria += criteria;
-			constraint_convergence_criteria[constraintsType[constraint]] += criteria;
+				A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution).norm();
+			*convergenceCriteria += criteria;
+			constraintConvergenceCriteria[constraintsType[constraint]] += criteria;
 
 			++nbNonContactConstraints;
 			currentAtomicIndex += 3;
@@ -305,13 +211,13 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 
 		case MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
 		{
-			const double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuess_and_solution;
+			const double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuessAndSolution;
 			// Enforce orthogonality condition
-			if (! SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
-				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&
+			if (!SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
+				(initialGuessAndSolution[currentAtomicIndex] > m_epsilonConvergence &&
 				 violation > m_contactTolerance))
 			{
-				*signoriniVerified = false;
+				*validSignorini = false;
 			}
 			currentAtomicIndex += 1;
 			break;
@@ -319,13 +225,13 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 
 		case MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT:
 		{
-			const double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuess_and_solution;
+			const double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuessAndSolution;
 			// Enforce orthogonality condition
-			if (! SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
-				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&
+			if (!SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
+				(initialGuessAndSolution[currentAtomicIndex] > m_epsilonConvergence &&
 				 violation > m_contactTolerance))
 			{
-				*signoriniVerified = false;
+				*validSignorini = false;
 			}
 			currentAtomicIndex += 3;
 			break;
@@ -334,9 +240,9 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 		case MLCP_BILATERAL_FRICTIONLESS_SLIDING_CONSTRAINT:
 		{
 			const double criteria = (b.segment<2>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuess_and_solution).norm();
-			*convergence_criteria += criteria;
-			constraint_convergence_criteria[constraintsType[constraint]] += criteria;
+				A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuessAndSolution).norm();
+			*convergenceCriteria += criteria;
+			constraintConvergenceCriteria[constraintsType[constraint]] += criteria;
 
 			++nbNonContactConstraints;
 			currentAtomicIndex += 2;
@@ -348,9 +254,9 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 			// We verify that the sliding point is on the line...no matter what the friction violation is
 			// (3rd component)
 			const double criteria = (b.segment<2>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuess_and_solution).norm();
-			*convergence_criteria += criteria;
-			constraint_convergence_criteria[constraintsType[constraint]] += criteria;
+				A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuessAndSolution).norm();
+			*convergenceCriteria += criteria;
+			constraintConvergenceCriteria[constraintsType[constraint]] += criteria;
 
 			++nbNonContactConstraints;
 			currentAtomicIndex += 3;
@@ -366,14 +272,13 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 
 	if (nbNonContactConstraints > 0)
 	{
-		*convergence_criteria /= nbNonContactConstraints;    // normalize if necessary
+		*convergenceCriteria /= nbNonContactConstraints;    // normalize if necessary
 	}
 }
 
 void MlcpGaussSeidelSolver::computeEnforcementSystem(
-	size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA, const MlcpProblem::Vector& b,
-	const MlcpSolution::Vector& initialGuess_and_solution,
-	const MlcpProblem::Vector& frictionCoefs,
+	size_t problemSize, const MlcpProblem::Matrix& A, const MlcpProblem::Vector& b,
+	const MlcpSolution::Vector& initialGuessAndSolution,
 	const std::vector<MlcpConstraintType>& constraintsType,
 	size_t constraintID, size_t matrixEntryForConstraintID)
 {
@@ -466,7 +371,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 	{
 		// Here we fill up the core part, compliance between all the constraints themselves !
 		m_rhsEnforcedLocalSystem.head(systemSizeWithoutConstraintID) = b.head(systemSizeWithoutConstraintID) +
-			A.block(0, 0, systemSizeWithoutConstraintID, problemSize) * initialGuess_and_solution;
+			A.block(0, 0, systemSizeWithoutConstraintID, problemSize) * initialGuessAndSolution;
 		m_lhsEnforcedLocalSystem.block(0, 0, systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) =
 			A.block(0, 0, systemSizeWithoutConstraintID, systemSizeWithoutConstraintID);
 
@@ -482,7 +387,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 			// Coupling part (fill up LHS and RHS)
 			m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] =
 				b[matrixEntryForConstraintID] +
-				A.row(matrixEntryForConstraintID) * initialGuess_and_solution;
+				A.row(matrixEntryForConstraintID) * initialGuessAndSolution;
 			m_lhsEnforcedLocalSystem.block(0, systemSizeWithoutConstraintID, systemSizeWithoutConstraintID, 1) =
 				A.block(0, matrixEntryForConstraintID, systemSizeWithoutConstraintID, 1);
 			m_lhsEnforcedLocalSystem.block(systemSizeWithoutConstraintID, 0, 1, systemSizeWithoutConstraintID) =
@@ -502,7 +407,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 			// Coupling part (fill up LHS and RHS)
 			m_rhsEnforcedLocalSystem.segment<2>(systemSizeWithoutConstraintID) =
 				b.segment<2>(matrixEntryForConstraintID) +
-				A.block(matrixEntryForConstraintID, 0, 2, problemSize) * initialGuess_and_solution;
+				A.block(matrixEntryForConstraintID, 0, 2, problemSize) * initialGuessAndSolution;
 			m_lhsEnforcedLocalSystem.block(0, systemSizeWithoutConstraintID, systemSizeWithoutConstraintID, 2) =
 				A.block(0, matrixEntryForConstraintID, systemSizeWithoutConstraintID, 2);
 			m_lhsEnforcedLocalSystem.block(systemSizeWithoutConstraintID, 0, 2, systemSizeWithoutConstraintID) =
@@ -518,7 +423,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 			// Coupling part (fill up LHS and RHS)
 			m_rhsEnforcedLocalSystem.segment<3>(systemSizeWithoutConstraintID) =
 				b.segment<3>(matrixEntryForConstraintID) +
-				A.block(matrixEntryForConstraintID, 0, 3, problemSize) * initialGuess_and_solution;
+				A.block(matrixEntryForConstraintID, 0, 3, problemSize) * initialGuessAndSolution;
 			m_lhsEnforcedLocalSystem.block(0, systemSizeWithoutConstraintID, systemSizeWithoutConstraintID, 3) =
 				A.block(0, matrixEntryForConstraintID, systemSizeWithoutConstraintID, 3);
 			m_lhsEnforcedLocalSystem.block(systemSizeWithoutConstraintID, 0, 3, systemSizeWithoutConstraintID) =
@@ -538,7 +443,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 }
 
 // Solve the system A x = b for x, with the assumption that the size is "size"
-static inline bool solveSystem(const MlcpProblem::Matrix& A, const MlcpProblem::Vector& b, size_t size,
+static inline void solveSystem(const MlcpProblem::Matrix& A, const MlcpProblem::Vector& b, size_t size,
 							   MlcpSolution::Vector* x)
 {
 	MlcpProblem::Matrix AA = A.block(0, 0, size, size);
@@ -548,23 +453,22 @@ static inline bool solveSystem(const MlcpProblem::Matrix& A, const MlcpProblem::
 	//MlcpSolution::Vector solution = AA.colPivHouseholderQr().solve(bb);
 	//MlcpSolution::Vector solution = AA.householderQr().solve(bb);
 	*x = solution;
-	return true;
 }
 
-void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA,
+void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem::Matrix& A,
 										   const MlcpProblem::Vector& b,
-										   MlcpSolution::Vector* initialGuess_and_solution,
+										   MlcpSolution::Vector* initialGuessAndSolution,
 										   const MlcpProblem::Vector& frictionCoefs,
 										   const std::vector<MlcpConstraintType>& constraintsType,
-										   double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
-										   double* convergence_criteria, bool* signoriniVerified)
+										   double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES],
+										   double* convergenceCriteria, bool* validSignorini)
 {
 	for (size_t constraint = 0; constraint < MLCP_NUM_CONSTRAINT_TYPES; ++constraint)
 	{
-		constraint_convergence_criteria[constraint] = 0.0;
+		constraintConvergenceCriteria[constraint] = 0.0;
 	}
-	*convergence_criteria = 0.0;
-	*signoriniVerified = true;
+	*convergenceCriteria = 0.0;
+	*validSignorini = true;
 
 	size_t currentAtomicIndex = 0;
 	size_t nbConstraints = constraintsType.size();
@@ -576,8 +480,8 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 		{
 		case MLCP_BILATERAL_1D_CONSTRAINT:
 		{
-			(*initialGuess_and_solution)[currentAtomicIndex] -=
-				(b[currentAtomicIndex] + A.row(currentAtomicIndex) * (*initialGuess_and_solution)) /
+			(*initialGuessAndSolution)[currentAtomicIndex] -=
+				(b[currentAtomicIndex] + A.row(currentAtomicIndex) * (*initialGuessAndSolution)) /
 				A(currentAtomicIndex, currentAtomicIndex);
 			++currentAtomicIndex;
 			break;
@@ -585,20 +489,20 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 
 		case MLCP_BILATERAL_2D_CONSTRAINT:
 		{
-			(*initialGuess_and_solution).segment<2>(currentAtomicIndex) -=
+			(*initialGuessAndSolution).segment<2>(currentAtomicIndex) -=
 				A.block<2, 2>(currentAtomicIndex, currentAtomicIndex).inverse() *
 				(b.segment<2>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 2, problemSize) * (*initialGuess_and_solution));
+				A.block(currentAtomicIndex, 0, 2, problemSize) * (*initialGuessAndSolution));
 			currentAtomicIndex += 2;
 			break;
 		}
 
 		case MLCP_BILATERAL_3D_CONSTRAINT:
 		{
-			(*initialGuess_and_solution).segment<3>(currentAtomicIndex) -=
+			(*initialGuessAndSolution).segment<3>(currentAtomicIndex) -=
 				A.block<3, 3>(currentAtomicIndex, currentAtomicIndex).inverse() *
 				(b.segment<3>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 3, problemSize) * (*initialGuess_and_solution));
+				A.block(currentAtomicIndex, 0, 3, problemSize) * (*initialGuessAndSolution));
 			currentAtomicIndex += 3;
 			break;
 		}
@@ -606,21 +510,18 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 		case MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
 		{
 			// Form the local system
-			computeEnforcementSystem(problemSize, A, nbColumnInA, b, *initialGuess_and_solution, frictionCoefs,
-				constraintsType, constraint, currentAtomicIndex);
+			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, constraintsType,
+				constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
-				&m_rhsEnforcedLocalSystem))
-			{
-				return;
-			}
+			solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+				&m_rhsEnforcedLocalSystem);
 
 			// Correct the forces accordingly
-			(*initialGuess_and_solution).head(m_numEnforcedAtomicConstraints - 1) -=
+			(*initialGuessAndSolution).head(m_numEnforcedAtomicConstraints - 1) -=
 				m_rhsEnforcedLocalSystem.head(m_numEnforcedAtomicConstraints - 1);
 
-			double& Fn  = (*initialGuess_and_solution)[currentAtomicIndex];
+			double& Fn  = (*initialGuessAndSolution)[currentAtomicIndex];
 			Fn -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints - 1];
 
 			if (Fn < 0.0)
@@ -634,30 +535,27 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 		case MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT:
 		{
 			// Form the local system
-			computeEnforcementSystem(problemSize, A, nbColumnInA, b, *initialGuess_and_solution, frictionCoefs,
-				constraintsType, constraint, currentAtomicIndex);
+			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, constraintsType,
+				constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
-							  &m_rhsEnforcedLocalSystem))
-			{
-				return;
-			}
+			solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+				&m_rhsEnforcedLocalSystem);
 
 			// Correct the forces accordingly
-			(*initialGuess_and_solution).head(m_numEnforcedAtomicConstraints - 1) -=
+			(*initialGuessAndSolution).head(m_numEnforcedAtomicConstraints - 1) -=
 				m_rhsEnforcedLocalSystem.head(m_numEnforcedAtomicConstraints - 1);
 
-			double& Fn = (*initialGuess_and_solution)[currentAtomicIndex];
+			double& Fn  = (*initialGuessAndSolution)[currentAtomicIndex];
 			Eigen::VectorBlock<MlcpSolution::Vector, 2> Ft =
-				(*initialGuess_and_solution).segment<2>(currentAtomicIndex + 1);
+				(*initialGuessAndSolution).segment<2>(currentAtomicIndex + 1);
 			Fn -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints - 1];
 
 			if (Fn > 0.0)
 			{
 				// Compute the frictions violation
 				Ft -= 2.0 * (b.segment<2>(currentAtomicIndex + 1) +
-					A.block(currentAtomicIndex + 1, 0, 2, problemSize) * (*initialGuess_and_solution)) /
+					A.block(currentAtomicIndex + 1, 0, 2, problemSize) * (*initialGuessAndSolution)) /
 					(A(currentAtomicIndex + 1, currentAtomicIndex + 1) +
 					A(currentAtomicIndex + 2, currentAtomicIndex + 2));
 
@@ -682,20 +580,17 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 		case MLCP_BILATERAL_FRICTIONLESS_SLIDING_CONSTRAINT:
 		{
 			// Form the local system
-			computeEnforcementSystem(problemSize, A, nbColumnInA, b, *initialGuess_and_solution, frictionCoefs,
-				constraintsType, constraint, currentAtomicIndex);
+			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, constraintsType,
+				constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
-							  &m_rhsEnforcedLocalSystem))
-			{
-				return;
-			}
+			solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+				&m_rhsEnforcedLocalSystem);
 
 			// Correct the forces accordingly
-			(*initialGuess_and_solution).head(m_numEnforcedAtomicConstraints - 2) -=
+			(*initialGuessAndSolution).head(m_numEnforcedAtomicConstraints - 2) -=
 				m_rhsEnforcedLocalSystem.head(m_numEnforcedAtomicConstraints - 2);
-			(*initialGuess_and_solution).segment<2>(currentAtomicIndex) -=
+			(*initialGuessAndSolution).segment<2>(currentAtomicIndex) -=
 				m_rhsEnforcedLocalSystem.segment<2>(m_numEnforcedAtomicConstraints - 2);
 			currentAtomicIndex += 2;
 			break;
@@ -704,28 +599,25 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 		case MLCP_BILATERAL_FRICTIONAL_SLIDING_CONSTRAINT:
 		{
 			// Form the local system
-			computeEnforcementSystem(problemSize, A, nbColumnInA, b, *initialGuess_and_solution, frictionCoefs,
-				constraintsType, constraint, currentAtomicIndex);
+			computeEnforcementSystem(problemSize, A, b, *initialGuessAndSolution, constraintsType,
+				constraint, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (!solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
-							  &m_rhsEnforcedLocalSystem))
-			{
-				return;
-			}
+			solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+				&m_rhsEnforcedLocalSystem);
 
 			// Correct the forces accordingly
-			(*initialGuess_and_solution).head(m_numEnforcedAtomicConstraints - 2) -=
+			(*initialGuessAndSolution).head(m_numEnforcedAtomicConstraints - 2) -=
 				m_rhsEnforcedLocalSystem.head(m_numEnforcedAtomicConstraints - 2);
 			Eigen::VectorBlock<MlcpSolution::Vector, 2> Fn =
-				(*initialGuess_and_solution).segment<2>(currentAtomicIndex);
+				(*initialGuessAndSolution).segment<2>(currentAtomicIndex);
 			Fn -= m_rhsEnforcedLocalSystem.segment<2>(m_numEnforcedAtomicConstraints - 2);
 
 			// No Signorini to verify here, it is NOT a unilateral constraint, but bilateral
 			{
 				// Complete the violation of the friction along t, with the missing terms...
-				double& Ft = (*initialGuess_and_solution)[currentAtomicIndex + 2];
-				Ft -= (b[currentAtomicIndex + 2] + A.row(currentAtomicIndex + 2) * (*initialGuess_and_solution)) /
+				double& Ft = (*initialGuessAndSolution)[currentAtomicIndex + 2];
+				Ft -= (b[currentAtomicIndex + 2] + A.row(currentAtomicIndex + 2) * (*initialGuessAndSolution)) /
 					A(currentAtomicIndex + 2, currentAtomicIndex + 2);
 
 				const double maxFriction = frictionCoefs[constraint] * Fn.norm();
@@ -752,12 +644,12 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 														  const MlcpProblem::Matrix& A,
 														  const MlcpProblem::Vector& b,
-														  const MlcpSolution::Vector& initialGuess_and_solution,
+														  const MlcpSolution::Vector& initialGuessAndSolution,
 														  const std::vector<MlcpConstraintType>& constraintsType,
-														  double convergence_criteria, bool signorini_verified,
-														  size_t nbLoop)
+														  double convergenceCriteria, bool validSignorini,
+														  size_t iterations)
 {
-	SURGSIM_LOG_INFO(m_logger) << "MLCP at iteration " << nbLoop << " =";
+	SURGSIM_LOG_INFO(m_logger) << "MLCP at iteration " << iterations << " =";
 
 	size_t currentAtomicIndex = 0;
 	size_t nbConstraints = constraintsType.size();
@@ -768,11 +660,11 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 		{
 		case MLCP_BILATERAL_1D_CONSTRAINT:
 		{
-			double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuess_and_solution;
+			double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuessAndSolution;
 			SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type BILATERAL_1D_CONSTRAINT" <<
 				std::endl << "\t with initial violation b=(" << b[currentAtomicIndex] << ")" << std::endl <<
 				"\t with final   violation b-Ax=(" << violation << ")" << std::endl <<
-				"\t force=(" << initialGuess_and_solution[currentAtomicIndex] << ")";
+				"\t force=(" << initialGuessAndSolution[currentAtomicIndex] << ")";
 			currentAtomicIndex += 1;
 			break;
 		}
@@ -780,12 +672,12 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 		case MLCP_BILATERAL_2D_CONSTRAINT:
 		{
 			Vector2d violation = b.segment<2>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuess_and_solution;
+				A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuessAndSolution;
 			SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type BILATERAL_2D_CONSTRAINT" <<
 				std::endl <<
 				"\t with initial violation b=(" << b.segment<2>(currentAtomicIndex).transpose() << ") " << std::endl <<
 				"\t with final   violation b-Ax=(" << violation.transpose() << ")" << std::endl <<
-				"\t force=(" << initialGuess_and_solution.segment<2>(currentAtomicIndex).transpose() << ")";
+				"\t force=(" << initialGuessAndSolution.segment<2>(currentAtomicIndex).transpose() << ")";
 			currentAtomicIndex += 2;
 			break;
 		}
@@ -793,19 +685,19 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 		case MLCP_BILATERAL_3D_CONSTRAINT:
 		{
 			Vector3d violation = b.segment<3>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuess_and_solution;
+				A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution;
 			SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type BILATERAL_3D_CONSTRAINT" <<
 				std::endl <<
 				"\t with initial violation b=(" << b.segment<3>(currentAtomicIndex).transpose() << ")" << std::endl <<
 				"\t with final   violation b-Ax=(" << violation.transpose() << ") " << std::endl <<
-				"\t force=(" << initialGuess_and_solution.segment<3>(currentAtomicIndex).transpose() << ")";
+				"\t force=(" << initialGuessAndSolution.segment<3>(currentAtomicIndex).transpose() << ")";
 			currentAtomicIndex += 3;
 			break;
 		}
 
 		case MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
 		{
-			double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuess_and_solution;
+			double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuessAndSolution;
 			SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint <<
 				"] of type UNILATERAL_FRICTIONLESS_CONSTRAINT" <<
 				std::endl << "\t with initial violation b=(" << b[currentAtomicIndex] << ") " << std::endl <<
@@ -815,7 +707,7 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 				SURGSIM_LOG_INFO(m_logger) << "\t  => normal violation = " << violation <<
 					" < -m_contactTolerance => Signorini not verified yet !";
 			}
-			SURGSIM_LOG_INFO(m_logger) << "\t force=(" << initialGuess_and_solution[currentAtomicIndex]  << ")";
+			SURGSIM_LOG_INFO(m_logger) << "\t force=(" << initialGuessAndSolution[currentAtomicIndex]  << ")";
 			currentAtomicIndex += 1;
 			break;
 		}
@@ -823,7 +715,7 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 		case MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT:
 		{
 			Vector3d violation = b.segment<3>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuess_and_solution;
+				A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution;
 			SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint <<
 				"] of type UNILATERAL_3D_FRICTIONAL_CONSTRAINT" <<
 				std::endl << "\t with initial violation b=(" << b.segment<3>(currentAtomicIndex).transpose() << ")" <<
@@ -834,7 +726,7 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 					" < -contactTolerance => Signorini not verified yet !";
 			}
 			SURGSIM_LOG_INFO(m_logger) << "\t force=(" <<
-				initialGuess_and_solution.segment<3>(currentAtomicIndex).transpose() << ")";
+				initialGuessAndSolution.segment<3>(currentAtomicIndex).transpose() << ")";
 			currentAtomicIndex += 3;
 			break;
 		}
@@ -842,12 +734,12 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 		case MLCP_BILATERAL_FRICTIONLESS_SLIDING_CONSTRAINT:
 		{
 			Vector2d violation = b.segment<2>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuess_and_solution;
+				A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuessAndSolution;
 			SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint <<
 				"] of type UNILATERAL_3D_FRICTIONLESS_SUTURING" <<
 				std::endl << "\t with initial violation b=(" << b.segment<2>(currentAtomicIndex).transpose() << ") " <<
 				std::endl << "\t with final   violation b-Ax=(" << violation.transpose() << ") " << std::endl <<
-				"\t force=(" << initialGuess_and_solution.segment<2>(currentAtomicIndex).transpose() << ")";
+				"\t force=(" << initialGuessAndSolution.segment<2>(currentAtomicIndex).transpose() << ")";
 			currentAtomicIndex += 2;
 			break;
 		}
@@ -855,12 +747,12 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 		case MLCP_BILATERAL_FRICTIONAL_SLIDING_CONSTRAINT:
 		{
 			Vector3d violation = b.segment<3>(currentAtomicIndex) +
-				A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuess_and_solution;
+				A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution;
 			SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint <<
 				"] of type UNILATERAL_3D_FRICTIONAL_SUTURING" <<
 				std::endl << "\t with initial violation b=(" << b.segment<3>(currentAtomicIndex).transpose() << ") " <<
 				std::endl << "\t with final   violation b-Ax=(" << violation.transpose() << ")" << std::endl <<
-				"\t force=(" << initialGuess_and_solution.segment<3>(currentAtomicIndex).transpose() << ")";
+				"\t force=(" << initialGuessAndSolution.segment<3>(currentAtomicIndex).transpose() << ")";
 			currentAtomicIndex += 3;
 			break;
 		}
@@ -869,8 +761,8 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 			break;
 		}
 	}
-	SURGSIM_LOG_INFO(m_logger) << "convergence_criteria=" << convergence_criteria << "  Signorini verified=" <<
-		(signorini_verified ? "yes" : "NO");
+	SURGSIM_LOG_INFO(m_logger) << "convergence_criteria=" << convergenceCriteria << "  Signorini verified=" <<
+		(validSignorini ? "yes" : "NO");
 }
 
 };  // namespace Math
