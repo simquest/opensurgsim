@@ -36,8 +36,7 @@ class DataGroupCopier;
 
 namespace Device
 {
-/// A device filter that integrates the pose, turning a relative device into an absolute one.
-/// Also provides the instantaneous linear and angular velocities.
+/// A device filter that estimates the linear and angular velocities based on the pose.
 /// \sa	SurgSim::Input::CommonDevice
 /// \sa	SurgSim::Input::InputConsumerInterface
 /// \sa	SurgSim::Input::OutputProducerInterface
