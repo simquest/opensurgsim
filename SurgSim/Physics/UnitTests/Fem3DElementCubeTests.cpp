@@ -101,8 +101,7 @@ public:
 		using SurgSim::Math::getSubMatrix;
 		using SurgSim::Math::addSubMatrix;
 
-		Eigen::Matrix<double, 24, 24> K;
-		K.setZero();
+		Eigen::Matrix<double, 24, 24> K = Eigen::Matrix<double, 24, 24>::Zero();
 		{
 			// Expected stiffness matrix given in
 			// "Physically-Based Simulation of Objects Represented by Surface Meshes"
@@ -373,8 +372,7 @@ public:
 	{
 		using SurgSim::Math::addSubMatrix;
 
-		Eigen::Matrix<double, 24, 24> M;
-		M.setZero();
+		Eigen::Matrix<double, 24, 24> M = Eigen::Matrix<double, 24, 24>::Zero();
 
 		// "Physically-Based Simulation of Objects Represented by Surface Meshes"
 		// Muller, Techner, Gross, CGI 2004
@@ -469,17 +467,12 @@ public:
 		m_E = 1e6;
 		m_nu = 0.45;
 
-		m_expectedMassMatrix.resize(3*8, 3*8);
-		m_expectedMassMatrix.setZero();
-		m_expectedDampingMatrix.resize(3*8, 3*8);
-		m_expectedDampingMatrix.setZero();
-		m_expectedStiffnessMatrix.resize(3*8, 3*8);
-		m_expectedStiffnessMatrix.setZero();
-		m_vectorOnes.resize(3*8);
-		m_vectorOnes.setConstant(1.0);
+		m_expectedMassMatrix.setZero(3*8, 3*8);
+		m_expectedDampingMatrix.setZero(3*8, 3*8);
+		m_expectedStiffnessMatrix.setZero(3*8, 3*8);
+		m_vectorOnes.setOnes(3*8);
 
 		computeExpectedMassMatrix(nodeIdsVectorForm);
-		m_expectedDampingMatrix.setZero();
 		computeExpectedStiffnessMatrix(nodeIdsVectorForm);
 	}
 
@@ -843,15 +836,10 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	auto cube = getCubeElement(m_nodeIds);
 	cube->initialize(m_restState);
 
-	SurgSim::Math::Vector forceVector(3*8);
-	SurgSim::Math::Matrix massMatrix(3*8, 3*8);
-	SurgSim::Math::Matrix dampingMatrix(3*8, 3*8);
-	SurgSim::Math::Matrix stiffnessMatrix(3*8, 3*8);
-
-	forceVector.setZero();
-	massMatrix.setZero();
-	dampingMatrix.setZero();
-	stiffnessMatrix.setZero();
+	Vector forceVector = Vector::Zero(3*8);
+	Matrix massMatrix = Matrix::Zero(3*8, 3*8);
+	Matrix dampingMatrix = Matrix::Zero(3*8, 3*8);
+	Matrix stiffnessMatrix = Matrix::Zero(3*8, 3*8);
 
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
 	cube->addForce(m_restState, &forceVector);

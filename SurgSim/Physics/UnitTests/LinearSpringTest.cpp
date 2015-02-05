@@ -24,8 +24,10 @@
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Matrix66d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector6d;
 using SurgSim::Physics::LinearSpring;
 
 namespace
@@ -34,9 +36,9 @@ const double epsilon = 1e-10;
 const double epsilonNumericalEvaluation = 1e-8;
 const double epsilonTestAgainstNumericalApproximation = 1e-7;
 
-Eigen::Matrix<double, 6, 6> KFormal(const Vector3d p0, const Vector3d p1,
-									const Vector3d v0, const Vector3d v1,
-									double l0, double stiffness, double damping)
+Matrix66d KFormal(const Vector3d p0, const Vector3d p1,
+				  const Vector3d v0, const Vector3d v1,
+				  double l0, double stiffness, double damping)
 {
 	Vector3d u = p1 - p0;
 	double m_l = u.norm();
@@ -48,8 +50,7 @@ Eigen::Matrix<double, 6, 6> KFormal(const Vector3d p0, const Vector3d p1,
 	K00 -= (u * u.transpose()) * (stiffness * (lRatio - 1.0) + 2.0 * damping * vRatio);
 	K00 += damping * (u * (v1 -v0).transpose()) / m_l;
 
-	Eigen::Matrix<double, 6, 6> K;
-	K.setZero();
+	Matrix66d K = Matrix66d::Zero();
 
 	// Assembly stage in K
 	SurgSim::Math::addSubMatrix( K00, 0, 0, 3, 3, &K);
@@ -60,17 +61,16 @@ Eigen::Matrix<double, 6, 6> KFormal(const Vector3d p0, const Vector3d p1,
 	return K;
 }
 
-Eigen::Matrix<double, 6, 6> DFormal(const Vector3d p0, const Vector3d p1,
-			   const Vector3d v0, const Vector3d v1,
-			   double l0, double stiffness, double damping)
+Matrix66d DFormal(const Vector3d p0, const Vector3d p1,
+				  const Vector3d v0, const Vector3d v1,
+				  double l0, double stiffness, double damping)
 {
 	Vector3d u = p1 - p0;
 	u.normalize();
 	Matrix33d D00 = damping * (u * u.transpose());
 
 	// Assembly stage in D
-	Eigen::Matrix<double, 6, 6> D;
-	D.setZero();
+	Matrix66d D = Matrix66d::Zero();
 	SurgSim::Math::addSubMatrix( D00, 0, 0, 3, 3, &D);
 	SurgSim::Math::addSubMatrix(-D00, 0, 1, 3, 3, &D);
 	SurgSim::Math::addSubMatrix(-D00, 1, 0, 3, 3, &D);
@@ -98,11 +98,11 @@ double f(size_t axis, const Vector3d p0, const Vector3d p1,
 	}
 }
 
-Eigen::Matrix<double, 6, 6> KNumerical(const Vector3d p0, const Vector3d p1,
-			   const Vector3d v0, const Vector3d v1,
-			   double l0, double stiffness, double damping)
+Matrix66d KNumerical(const Vector3d p0, const Vector3d p1,
+					 const Vector3d v0, const Vector3d v1,
+					 double l0, double stiffness, double damping)
 {
-	Eigen::Matrix<double, 6, 6> dfdx;
+	Matrix66d dfdx;
 
 	for (size_t row = 0; row < 6; row++)
 	{
@@ -113,8 +113,7 @@ Eigen::Matrix<double, 6, 6> KNumerical(const Vector3d p0, const Vector3d p1,
 			// (2) f(x-delta) = f(x) - df/dx.delta + o(delta^2)
 			// (1) - (2) f(x+delta) - f(x-delta) = 2df/dx.delta
 			// df/dx = (f(x+delta) - f(x-delta)) / 2delta
-			Eigen::Matrix<double, 6 ,1> delta6D;
-			delta6D.setZero();
+			Vector6d delta6D = Vector6d::Zero();
 			delta6D[col] = epsilonNumericalEvaluation;
 			double f_plus_delta = f(row, p0 + delta6D.segment(0, 3), p1 + delta6D.segment(3, 3), v0, v1,
 				l0, stiffness, damping);
@@ -127,11 +126,11 @@ Eigen::Matrix<double, 6, 6> KNumerical(const Vector3d p0, const Vector3d p1,
 	return - dfdx;
 }
 
-Eigen::Matrix<double, 6, 6> DNumerical(const Vector3d p0, const Vector3d p1,
-			   const Vector3d v0, const Vector3d v1,
-			   double l0, double stiffness, double damping)
+Matrix66d DNumerical(const Vector3d p0, const Vector3d p1,
+					 const Vector3d v0, const Vector3d v1,
+					 double l0, double stiffness, double damping)
 {
-	Eigen::Matrix<double, 6, 6> dfdv;
+	Matrix66d dfdv;
 
 	for (size_t row = 0; row < 6; row++)
 	{
@@ -142,8 +141,7 @@ Eigen::Matrix<double, 6, 6> DNumerical(const Vector3d p0, const Vector3d p1,
 			// (2) f(x-delta) = f(x) - df/dx.delta + o(delta^2)
 			// (1) - (2) f(x+delta) - f(x-delta) = 2df/dx.delta
 			// df/dx = (f(x+delta) - f(x-delta)) / 2delta
-			Eigen::Matrix<double, 6 ,1> delta6D;
-			delta6D.setZero();
+			Vector6d delta6D = Vector6d::Zero();
 			delta6D[col] = epsilonNumericalEvaluation;
 			double f_plus_delta = f(row, p0, p1, v0 + delta6D.segment(0, 3), v1 + delta6D.segment(3, 3),
 				l0, stiffness, damping);
@@ -228,8 +226,7 @@ TEST(LinearSpringTests, computeMethods)
 
 	// Calculating spring force
 	Vector3d expectedF3D(0.45563016177577925, 0.81221028838291076, 0.23772008440475439);
-	Vector expectedF;
-	expectedF.resize(6u);
+	Vector6d expectedF;
 	setSubVector(expectedF3D, 0, 3, &expectedF);
 	setSubVector(-expectedF3D, 1, 3, &expectedF);
 	Vector f(6);
@@ -243,14 +240,12 @@ TEST(LinearSpringTests, computeMethods)
 	expectedStiffness33 << 0.224919570941728960, 0.064210544149390564, 0.0011847965179350647,
 		0.047808674990512064, 0.312562344690556770, 0.0021120285754494608,
 		0.013992782924052311, 0.033501153469247251, 0.1987182250423049600;
-	Matrix expectedK;
-	expectedK.resize(6u, 6u);
+	Matrix66d expectedK;
 	setSubMatrix( expectedStiffness33, 0, 0, 3, 3, &expectedK);
 	setSubMatrix(-expectedStiffness33, 0, 1, 3, 3, &expectedK);
 	setSubMatrix(-expectedStiffness33, 1, 0, 3, 3, &expectedK);
 	setSubMatrix( expectedStiffness33, 1, 1, 3, 3, &expectedK);
-	Matrix K(6, 6);
-	K.setZero();
+	Matrix K = Matrix::Zero(6, 6);
 	ls.addStiffness(state, &K);
 	EXPECT_TRUE(K.isApprox(expectedK)) << " K = " << std::endl << K << std::endl <<
 		"expectedK = " << std::endl << expectedK << std::endl;
@@ -260,14 +255,12 @@ TEST(LinearSpringTests, computeMethods)
 	expectedDamping33 << 0.101125743415463040, 0.180267629566694950, 0.052761257434154628,
 		0.180267629566694950, 0.321346644010195360, 0.094052676295666937,
 		0.052761257434154628, 0.094052676295666937, 0.027527612574341543;
-	Matrix expectedD;
-	expectedD.resize(6u, 6u);
+	Matrix66d expectedD;
 	setSubMatrix( expectedDamping33, 0, 0, 3, 3, &expectedD);
 	setSubMatrix(-expectedDamping33, 0, 1, 3, 3, &expectedD);
 	setSubMatrix(-expectedDamping33, 1, 0, 3, 3, &expectedD);
 	setSubMatrix( expectedDamping33, 1, 1, 3, 3, &expectedD);
-	Matrix D(6, 6);
-	D.setZero();
+	Matrix D = Matrix::Zero(6, 6);
 	ls.addDamping(state, &D);
 	EXPECT_TRUE(D.isApprox(expectedD)) << " D = " << std::endl << D << std::endl <<
 		"expectedD = " << std::endl << expectedD << std::endl;
@@ -275,11 +268,9 @@ TEST(LinearSpringTests, computeMethods)
 	// Compute all together
 	{
 		SCOPED_TRACE("Testing addFDK method call");
-		Vector f(6);
-		Matrix K(6, 6), D(6, 6);
-		f.setZero();
-		K.setZero();
-		D.setZero();
+		Vector f = Vector::Zero(6);
+		Matrix K = Matrix::Zero(6, 6);
+		Matrix D = Matrix::Zero(6, 6);
 		ls.addFDK(state, &f, &D, &K);
 		EXPECT_TRUE(f.isApprox(expectedF)) << " F = " << f.transpose() << std::endl <<
 			"expectedF = " << expectedF.transpose() << std::endl;
@@ -290,9 +281,8 @@ TEST(LinearSpringTests, computeMethods)
 	}
 
 	// Test addMatVec method
-	Vector ones(6), oneToSix(6);
-	ones.setOnes();
-	oneToSix.setLinSpaced(1.0, 6.0);
+	Vector ones = Vector::Ones(6);
+	Vector oneToSix = Vector::LinSpaced(6, 1.0, 6.0);
 
 	f.setZero();
 	ls.addMatVec(state, 1.0, 0.0, ones, &f);
@@ -383,8 +373,7 @@ TEST(LinearSpringTests, addStiffnessNumericalTest)
 	state.getVelocities().segment(0, 3) = v0;
 	state.getVelocities().segment(3, 3) = v1;
 
-	Matrix K(6, 6);
-	K.setZero();
+	Matrix K = Matrix::Zero(6, 6);
 	ls.addStiffness(state, &K);
 
 	Eigen::Matrix<double, 6, 6> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
@@ -418,8 +407,7 @@ TEST(LinearSpringTests, addDampingNumericalTest)
 	state.getVelocities().segment(0, 3) = v0;
 	state.getVelocities().segment(3, 3) = v1;
 
-	Matrix D(6, 6);
-	D.setZero();
+	Matrix D = Matrix::Zero(6, 6);
 	ls.addDamping(state, &D);
 
 	Eigen::Matrix<double, 6, 6> Dnumeric = DNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
@@ -453,12 +441,9 @@ TEST(LinearSpringTests, addFDKNumericalTest)
 	state.getVelocities().segment(0, 3) = v0;
 	state.getVelocities().segment(3, 3) = v1;
 
-	Vector F(6);
-	Matrix K(6, 6);
-	Matrix D(6, 6);
-	F.setZero();
-	K.setZero();
-	D.setZero();
+	Vector F = Vector::Zero(6);
+	Matrix K = Matrix::Zero(6, 6);
+	Matrix D = Matrix::Zero(6, 6);
 	ls.addFDK(state, &F, &D, &K);
 
 	Eigen::Matrix<double, 6, 6> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);

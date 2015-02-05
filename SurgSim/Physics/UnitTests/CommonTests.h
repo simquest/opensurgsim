@@ -111,22 +111,15 @@ public:
 	{
 		if (m_physicsManagerState)
 		{
-			m_physicsManagerState->getMlcpProblem().A.resize(nbConstraint, nbConstraint);
-			m_physicsManagerState->getMlcpProblem().A.setZero();
-			m_physicsManagerState->getMlcpProblem().b.resize(nbConstraint);
-			m_physicsManagerState->getMlcpProblem().b.setZero();
-			m_physicsManagerState->getMlcpProblem().CHt.resize(nbDof, nbConstraint);
-			m_physicsManagerState->getMlcpProblem().CHt.setZero();
-			m_physicsManagerState->getMlcpProblem().H.resize(nbConstraint, nbDof);
-			m_physicsManagerState->getMlcpProblem().H.setZero();
-			m_physicsManagerState->getMlcpProblem().mu.resize(nbConstraint);
-			m_physicsManagerState->getMlcpProblem().mu.setZero();
+			m_physicsManagerState->getMlcpProblem().A.setZero(nbConstraint, nbConstraint);
+			m_physicsManagerState->getMlcpProblem().b.setZero(nbConstraint);
+			m_physicsManagerState->getMlcpProblem().CHt.setZero(nbDof, nbConstraint);
+			m_physicsManagerState->getMlcpProblem().H.setZero(nbConstraint, nbDof);
+			m_physicsManagerState->getMlcpProblem().mu.setZero(nbConstraint);
 			m_physicsManagerState->getMlcpProblem().constraintTypes.clear();
 
-			m_physicsManagerState->getMlcpSolution().x.resize(nbConstraint);
-			m_physicsManagerState->getMlcpSolution().x.setZero();
-			m_physicsManagerState->getMlcpSolution().dofCorrection.resize(nbDof);
-			m_physicsManagerState->getMlcpSolution().dofCorrection.setZero();
+			m_physicsManagerState->getMlcpSolution().x.setZero(nbConstraint);
+			m_physicsManagerState->getMlcpSolution().dofCorrection.setZero(nbDof);
 		}
 	}
 
