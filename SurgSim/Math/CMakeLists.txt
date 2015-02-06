@@ -54,6 +54,8 @@ set(SURGSIM_MATH_HEADERS
 	DoubleSidedPlaneShape.h
 	GaussLegendreQuadrature.h
 	Geometry.h
+	KalmanFilter.h
+	KalmanFilter-inl.h
 	LinearSolveAndInverse.h
 	LinearSolveAndInverse-inl.h
 	MathConvert.h
