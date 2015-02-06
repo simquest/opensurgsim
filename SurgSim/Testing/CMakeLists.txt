@@ -28,11 +28,11 @@ set(SURGSIM_TESTING_SOURCES
 
 set(SURGSIM_TESTING_HEADERS
 	MathUtilities.h
-	Utilities.h
 	MockInputOutput.h
 	MockPhysicsManager.h
 	SerializationMockComponent.h
 	TestCube.h
+	Utilities.h
 )
 surgsim_create_library_header(Testing.h "${SURGSIM_TESTING_HEADERS}")
 

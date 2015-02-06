@@ -22,18 +22,17 @@ namespace SurgSim
 namespace Testing
 {
 
-/// Predicate to use to test wether a container contains a certain element
-/// \tparam Container type of the container, can usually be deduced
+/// Predicate to use to test whether a container contains a certain element
+/// \tparam Container type, can usually be deduced
 /// \param container the container to be tested
 /// \param value the value to check for
 /// \return true when the container contains the given value
 /// \note for maps the value type is std::pair<key, mapped_type>
 template <class Container>
-bool contains(const Container& container, const typename Container::value_type& value)
+bool doesContain(const Container& container, const typename Container::value_type& value)
 {
 	return std::find(container.begin(), container.end(), value) != container.end();
 }
-
 
 }
 }

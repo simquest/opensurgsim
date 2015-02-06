@@ -89,11 +89,11 @@ TEST(GroupsTests, AddTest)
 
 	auto names = groups.getGroups();
 
-	EXPECT_TRUE(SurgSim::Testing::contains(members, element1));
-	EXPECT_TRUE(SurgSim::Testing::contains(members, element2));
+	EXPECT_TRUE(SurgSim::Testing::doesContain(members, element1));
+	EXPECT_TRUE(SurgSim::Testing::doesContain(members, element2));
 
-	EXPECT_TRUE(SurgSim::Testing::contains(names, "One"));
-	EXPECT_TRUE(SurgSim::Testing::contains(names, "Two"));
+	EXPECT_TRUE(SurgSim::Testing::doesContain(names, "One"));
+	EXPECT_TRUE(SurgSim::Testing::doesContain(names, "Two"));
 }
 
 TEST(GroupsTests, MultiAddTest)

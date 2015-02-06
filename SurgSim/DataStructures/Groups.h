@@ -41,43 +41,43 @@ public:
 	typedef Key IdentifierType;
 	typedef T MemberType;
 
-	/// Add a member to the given group, if the group doesn't exist it will be created, if the element
+	/// Add an element to the given group, if the group doesn't exist it will be created, if the element
 	/// is already a member of the group, nothing happens
 	/// \param group the group to use
-	/// \param member the member to add
-	/// \return true if the member was actually added to the group
-	bool add(const Key& group, const T& member);
+	/// \param element the element to add
+	/// \return true if the element was actually added to the group
+	bool add(const Key& group, const T& element);
 
 	/// Add a member to the given groups, if any of the groups don't exist they will be created, if the element
 	/// is already a member of a group, it won't be added to that specific group
 	/// \param groups the groups to use
-	/// \param member the member to add
-	/// \return true if the member was to at least one group
-	bool add(const std::vector<Key>& groups, const T& member);
+	/// \param element the element to add
+	/// \return true if the element was added to at least one group
+	bool add(const std::vector<Key>& groups, const T& element);
 
-	/// Remove a member from a given group, if the group does not exist or the member is not a member of that
+	/// Remove an element from a given group, if the group does not exist or the element is not a member of that
 	/// group, nothing will happen.
 	/// \param group the group to use
-	/// \param member the member to remove
-	/// \return true if the member was member of that group
-	bool remove(const Key& group, const T& member);
+	/// \param element the element to remove
+	/// \return true if the element was member of that group
+	bool remove(const Key& group, const T& element);
 
-	/// Remove a member from all known groups, if the member is not a member of any group, nothing happens
-	/// \param member the member to remove
+	/// Remove an element from all known groups, if the element is not a member of any group, nothing happens
+	/// \param element the element to remove
 	/// \return true if there was an actual removal that was executed
-	bool remove(const T& member);
+	bool remove(const T& element);
 
 	/// Return all the members of the given group
-	/// \param group group to query
-	/// \return members of the given group, empty if the group has no members
+	/// \param group the group to query
+	/// \return members of the given group, empty if the group has no members, or doesn't exist
 	std::vector<T> getMembers(const Key& group) const;
 
 	/// Return all the groups that the given member is a member of
-	/// \param member member to query
-	/// \return groups which contain the given member, empty if the member is not member of any group
-	std::vector<Key> getGroups(const T& member) const;
+	/// \param element the element to query
+	/// \return groups which contain the given element, empty if the element is not member of any group
+	std::vector<Key> getGroups(const T& element) const;
 
-	/// \return all the know groups with members
+	/// \return all the known groups that have members
 	std::vector<Key> getGroups() const;
 
 	/// Return all the members of the given group
