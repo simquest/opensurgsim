@@ -34,7 +34,9 @@ namespace Framework
 SceneElement::SceneElement(const std::string& name) :
 	m_name(name),
 	m_isInitialized(false),
-	m_isActive(true)
+	m_isActive(true),
+	/// Local groups for serialization local handling
+	m_groups(new SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>())
 {
 	m_pose = std::make_shared<SurgSim::Framework::PoseComponent>("Pose");
 	m_pose->setPose(SurgSim::Math::RigidTransform3d::Identity());
@@ -117,6 +119,10 @@ bool SceneElement::initialize()
 
 	// For completeness
 	m_pose->setSceneElement(getSharedPtr());
+
+	// Get my groups into the scenegroups and then copy from the scene
+	getScene()->getGroups()->add(*m_groups);
+	m_groups = getScene()->getGroups();
 
 	if (m_isInitialized)
 	{
@@ -222,9 +228,10 @@ YAML::Node SceneElement::encode(bool standalone) const
 	data["IsActive"] = isActive();
 
 	// Only encode groups when they are there, also encode them using the flow style i.e. with []
-	if (m_groups.size() > 0)
+	auto groups = getGroups();
+	if (groups.size() > 0)
 	{
-		data["Groups"] = m_groups;
+		data["Groups"] = groups;
 		data["Groups"].SetStyle(YAML::FlowStyle);
 	}
 
@@ -266,8 +273,7 @@ bool SceneElement::decode(const YAML::Node& node)
 
 		if (data["Groups"].IsDefined())
 		{
-
-			m_groups = data["Groups"].as<std::unordered_set<std::string>>();
+			setGroups(data["Groups"].as<std::vector<std::string>>());
 		}
 
 		if (data["Components"].IsSequence())
@@ -309,37 +315,22 @@ bool SceneElement::isActive() const
 
 void SceneElement::addToGroup(const std::string& group)
 {
-	m_groups.insert(group);
-	if (isInitialized())
-	{
-		getScene()->getGroups().add(group, getSharedPtr());
-	}
+	m_groups->add(group, getSharedPtr());
 }
 
 void SceneElement::removeFromGroup(const std::string& group)
 {
-	m_groups.erase(group);
-	if (isInitialized())
-	{
-		getScene()->getGroups().remove(group, getSharedPtr());
-	}
+	m_groups->remove(group, getSharedPtr());
 }
 
 void SceneElement::setGroups(const std::vector<std::string>& groups)
 {
-	if (isInitialized())
-	{
-		auto& groupings = getScene()->getGroups();
-		groupings.remove(getSharedPtr());
-		groupings.add(groups, getSharedPtr());
-	}
-	std::unordered_set<std::string> temp(groups.cbegin(), groups.cend());
-	std::swap(m_groups, temp);
+	m_groups->add(groups, getSharedPtr());
 }
 
 std::vector<std::string> SceneElement::getGroups() const
 {
-	return std::vector<std::string>(m_groups.cbegin(), m_groups.cend());
+	return m_groups->getGroups(std::const_pointer_cast<SceneElement>(shared_from_this()));
 }
 
 }; // namespace Framework

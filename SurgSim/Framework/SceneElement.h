@@ -32,6 +32,13 @@ class Node;
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+template <typename Key, typename T>
+class Groups;
+}
+
 namespace Framework
 {
 
@@ -39,6 +46,7 @@ class Component;
 class PoseComponent;
 class Scene;
 class Runtime;
+
 
 /// SceneElement is the basic part of a scene, it is a container of components. When a
 /// SceneElement is added to a Scene, the Scene will call initialize() on the SceneElement,
@@ -191,9 +199,6 @@ private:
 	/// A (weak) back pointer to the Runtime containing this SceneElement
 	std::weak_ptr<Runtime> m_runtime;
 
-	/// Local groups for serialization local handling
-	std::unordered_set<std::string> m_groups;
-
 	/// Method to initialize this SceneElement. To be overridden by derived class(es).
 	/// \return True if initialization is successful; Otherwise, false.
 	virtual bool doInitialize() = 0;
@@ -207,6 +212,10 @@ private:
 
 	/// Indicates if this SceneElement is active or not.
 	bool m_isActive;
+
+	/// Local groups for serialization local handling
+	std::shared_ptr<SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>> m_groups;
+
 };
 
 }; // namespace Framework
