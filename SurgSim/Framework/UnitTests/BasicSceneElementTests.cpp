@@ -107,7 +107,7 @@ TEST(BasicSceneElementTests, SerializationTest)
 	EXPECT_EQ(3u, result->getComponents().size());
 	EXPECT_TRUE(pose.isApprox(result->getPose()));
 	EXPECT_FALSE(result->isActive());
-	EXPECT_TRUE(SurgSim::Testing::contains(result->getGroups(), "One"));
+	EXPECT_TRUE(SurgSim::Testing::doesContain(result->getGroups(), "One"));
 }
 
 };  // namespace Blocks

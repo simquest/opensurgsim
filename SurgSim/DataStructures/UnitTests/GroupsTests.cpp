@@ -154,7 +154,6 @@ TEST(GroupsTests, AddGroups)
 	EXPECT_EQ(2L, groups.getMembers("One").size());
 	EXPECT_EQ(1L, groups.getMembers("Two").size());
 	EXPECT_EQ(1L, groups.getMembers("Three").size());
-
 }
 
 TEST(GroupsTests, BracketOperator)

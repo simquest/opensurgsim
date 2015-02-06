@@ -194,35 +194,37 @@ TEST(SceneElementTest, DoubleInitTest)
 
 TEST(SceneElementTest, NoSceneGroupsTest)
 {
+	using SurgSim::Testing::doesContain;
+
 	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
 	EXPECT_TRUE(element->getGroups().empty());
 
 	element->addToGroup("One");
-	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "One"));
+	EXPECT_TRUE(doesContain(element->getGroups(), "One"));
 
 	element->addToGroup("Two");
-	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "Two"));
-	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "One"));
+	EXPECT_TRUE(doesContain(element->getGroups(), "Two"));
+	EXPECT_TRUE(doesContain(element->getGroups(), "One"));
 
 	element->removeFromGroup("One");
-	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "Two"));
-	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "One"));
+	EXPECT_TRUE(doesContain(element->getGroups(), "Two"));
+	EXPECT_FALSE(doesContain(element->getGroups(), "One"));
 
 	std::vector<std::string> newGroups;
 	newGroups.push_back("Three");
 	newGroups.push_back("Four");
 
 	element->setGroups(newGroups);
-	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "One"));
-	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "Two"));
-	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "Three"));
-	EXPECT_TRUE(SurgSim::Testing::contains(element->getGroups(), "Four"));
+	EXPECT_FALSE(doesContain(element->getGroups(), "One"));
+	EXPECT_FALSE(doesContain(element->getGroups(), "Two"));
+	EXPECT_TRUE(doesContain(element->getGroups(), "Three"));
+	EXPECT_TRUE(doesContain(element->getGroups(), "Four"));
 
 	std::vector<std::string> empty;
 	element->setGroups(empty);
-	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "One"));
-	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "Two"));
-	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "Three"));
-	EXPECT_FALSE(SurgSim::Testing::contains(element->getGroups(), "Four"));
+	EXPECT_FALSE(doesContain(element->getGroups(), "One"));
+	EXPECT_FALSE(doesContain(element->getGroups(), "Two"));
+	EXPECT_FALSE(doesContain(element->getGroups(), "Three"));
+	EXPECT_FALSE(doesContain(element->getGroups(), "Four"));
 
 }

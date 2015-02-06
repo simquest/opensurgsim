@@ -325,6 +325,7 @@ void SceneElement::removeFromGroup(const std::string& group)
 
 void SceneElement::setGroups(const std::vector<std::string>& groups)
 {
+	m_groups->remove(getSharedPtr());
 	m_groups->add(groups, getSharedPtr());
 }
 
