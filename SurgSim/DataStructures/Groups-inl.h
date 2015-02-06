@@ -45,6 +45,19 @@ bool Groups<Key, T>::add(const std::vector<Key>& groups, const T& element)
 	return result;
 }
 
+
+template <typename Key, typename T>
+bool Groups<Key, T>::add(const Groups<Key, T>& other)
+{
+	bool result = false;
+	for (auto& members : other.m_membership)
+	{
+		result = add(std::vector<Key>(members.second.begin(), members.second.end()), members.first) || result;
+	}
+	return result;
+}
+
+
 template <typename Key, typename T>
 bool Groups<Key, T>::remove(const Key& group, const T& element)
 {
@@ -138,6 +151,16 @@ std::vector<T> Groups<Key, T>::operator[](const Key& group) const
 	// Get member does the locking, not needed here
 	return getMembers(group);
 }
+
+
+template <typename Key, typename T>
+void Groups<Key, T>::clear()
+{
+	UniqueLock lock(m_mutex);
+	m_groups.clear();
+	m_membership.clear();
+}
+
 
 }
 }

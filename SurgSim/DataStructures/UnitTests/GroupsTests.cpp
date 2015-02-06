@@ -50,7 +50,23 @@ TEST(GroupsTest, DefaultInitialization)
 	EXPECT_TRUE(groups.getMembers("None").empty());
 }
 
-TEST(GroupsTests, AddTest)
+TEST(GroupsTest, Clear)
+{
+	Groups<std::string, std::shared_ptr<Framework::BasicSceneElement>> groups;
+
+	auto element1 = std::make_shared<Framework::BasicSceneElement>("One");
+	EXPECT_TRUE(groups.add("One", element1));
+	EXPECT_TRUE(groups.add("Two", element1));
+
+	groups.clear();
+
+	EXPECT_EQ(0L, groups.getGroups().size());
+	EXPECT_EQ(0L, groups.getGroups(element1).size());
+	EXPECT_EQ(0L, groups.getMembers("One").size());
+	EXPECT_EQ(0L, groups.getMembers("Two").size());
+}
+
+TEST(GroupsTests, AddElement)
 {
 	Groups<std::string, std::shared_ptr<Framework::BasicSceneElement>> groups;
 
@@ -110,6 +126,34 @@ TEST(GroupsTests, MultiAddTest)
 	groups.add(names, element1);
 	EXPECT_EQ(2L, groups.getGroups().size());
 	EXPECT_EQ(2L, groups.getGroups(element1).size());
+}
+
+TEST(GroupsTests, AddGroups)
+{
+	Groups<std::string, int> groups;
+
+	Groups<std::string, int> sourceGroups;
+
+	groups.add("One", 1);
+	groups.add("Two", 1);
+
+	sourceGroups.add("One", 2);
+	sourceGroups.add("Two", 1);
+	sourceGroups.add("Three", 1);
+
+	EXPECT_FALSE(groups.add(groups));
+
+	EXPECT_EQ(2L, groups.getGroups().size());
+	EXPECT_EQ(2L, groups.getGroups(1).size());
+
+	EXPECT_TRUE(groups.add(sourceGroups));
+
+	EXPECT_EQ(3L, groups.getGroups().size());
+	EXPECT_EQ(3L, groups.getGroups(1).size());
+	EXPECT_EQ(1L, groups.getGroups(2).size());
+	EXPECT_EQ(2L, groups.getMembers("One").size());
+	EXPECT_EQ(1L, groups.getMembers("Two").size());
+	EXPECT_EQ(1L, groups.getMembers("Three").size());
 
 }
 

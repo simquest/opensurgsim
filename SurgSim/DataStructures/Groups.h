@@ -55,6 +55,11 @@ public:
 	/// \return true if the element was added to at least one group
 	bool add(const std::vector<Key>& groups, const T& element);
 
+	/// Add all the members from the other group to this group, essentially forming a union of the two
+	/// \param other object to add groups from
+	/// \return true if at least one new element was added
+	bool add(const Groups<Key, T>& other);
+
 	/// Remove an element from a given group, if the group does not exist or the element is not a member of that
 	/// group, nothing will happen.
 	/// \param group the group to use
@@ -84,6 +89,10 @@ public:
 	/// \param group group to query
 	/// \return members of the given group, empty if the group has no members
 	std::vector<T> operator[](const Key& group) const;
+
+	/// Erases all entries
+	void clear();
+
 
 private:
 
