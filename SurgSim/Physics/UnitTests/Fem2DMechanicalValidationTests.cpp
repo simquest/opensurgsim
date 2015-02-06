@@ -123,8 +123,7 @@ public:
 		// Apply load at extremity
 		if (m_F.size() != static_cast<Vector::Index>(m_fem->getInitialState()->getNumDof()))
 		{
-			m_F.resize(m_fem->getInitialState()->getNumDof());
-			m_F.setZero();
+			m_F.setZero(m_fem->getInitialState()->getNumDof());
 		}
 		m_F.segment(m_fem->getNumDofPerNode() * nodeId, 3) = f;
 	}

@@ -31,7 +31,12 @@ surgsim_add_executable(OpenNIVisualTest
 
 set(LIBS
 	OpenNIDevice
+	SurgSimDataStructures	
+	SurgSimFramework
+	SurgSimInput
+	SurgSimMath
 	VisualTestCommon
+	${Boost_LIBRARIES}
 	${GLUT_LIBRARIES}
 	${OPENGL_LIBRARIES}
 )
