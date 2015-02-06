@@ -29,8 +29,6 @@
 #include "SurgSim/Physics/SolveMlcp.h"
 #include "SurgSim/Physics/UpdateCollisionRepresentations.h"
 
-#include <list>
-
 namespace SurgSim
 {
 namespace Physics
@@ -162,6 +160,21 @@ void PhysicsManager::initializeComputations(bool copyState)
 	m_computations.push_back(std::make_shared<PushResults>(copyState));
 	m_computations.push_back(std::make_shared<PostUpdate>(copyState));
 	m_computations.push_back(std::make_shared<UpdateCollisionRepresentations>(copyState));
+}
+
+void PhysicsManager::addComputation(std::shared_ptr<Computation> computation)
+{
+	m_computations.push_back(computation);
+}
+
+void PhysicsManager::setComputations(std::list<std::shared_ptr<Computation>> computations)
+{
+	m_computations = computations;
+}
+
+const std::list<std::shared_ptr<Computation>> PhysicsManager::getComputations() const
+{
+	return m_computations;
 }
 
 }; // Physics
