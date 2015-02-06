@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 		std::string path;
 
 #ifdef WIN32
-		// Fix windows backslashes coming in from the commandline, which are may be absolute paths
+		// Fix windows backslashes coming in from the command-line, these may be absolute paths
 		std::replace_if(file.begin(), file.end(), [](const char& c)
 		{
 			return c == '\\';

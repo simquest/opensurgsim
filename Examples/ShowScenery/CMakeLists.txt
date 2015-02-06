@@ -13,16 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-find_package(OpenThreads)
-
-find_package(Boost 1.54 COMPONENTS program_options REQUIRED)
-
 link_directories(
 	${Boost_LIBRARY_DIRS}
 )
-
-message (${Boost_LIBRARY_DIRS})
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
@@ -48,17 +41,11 @@ surgsim_add_executable(ShowScenery "${SOURCES}" "${HEADERS}")
 SET(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
-	boost_program_options
+	${Boost_LIBRARIES}
 	${YAML_CPP_LIBRARIES}
-)
-
-# Configure the path for the data files
-configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
  
 target_link_libraries(ShowScenery ${LIBS})
 
-# Put GraphicsScene into folder "Examples"
+# Put ShowScenery into folder "Examples"
 set_target_properties(ShowScenery PROPERTIES FOLDER "Examples") 

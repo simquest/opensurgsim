@@ -106,7 +106,7 @@ Required Dependencies
 
 * Boost  
   Homepage: http://www.boost.org/  
-  Modules: chrono, date_time, filesystem, system, thread, program_options  
+  Modules: chrono, date_time, filesystem, program_options, system, thread   
   Minimum Version: 1.54  
 
 * CMake  

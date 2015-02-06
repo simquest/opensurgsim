@@ -26,4 +26,11 @@ add_subdirectory(DroppingBalls)
 
 add_subdirectory(GraphicsScene)
 
+# Not Required components
+find_package(Boost 1.54 COMPONENTS program_options)
+
+if(Boost_PROGRAM_OPTIONS_FOUND)
 add_subdirectory(ShowScenery)
+else()
+message("Can't build example ShowScenery, missing library boost_program_options.")
+endif()
