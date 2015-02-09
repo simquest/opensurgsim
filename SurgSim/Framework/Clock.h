@@ -28,7 +28,7 @@ namespace Framework
 {
 
 /// Wraps around the actual clock we are using.
-typedef boost::chrono::system_clock Clock;
+typedef boost::chrono::high_resolution_clock Clock;
 
 /// A more accurate sleep_until that accounts for scheduler errors
 template <class C, class D>
