@@ -175,7 +175,7 @@ const typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType&
 TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangle(size_t id) const
 {
 	auto const& triangle = m_triangles[id];
-	SURGSIM_ASSERT(triangle.isValid == true) << "Attempted to access invalid or deleted triangle.";
+	SURGSIM_ASSERT(triangle.isValid) << "Attempted to access invalid or deleted triangle.";
 	return triangle;
 }
 
@@ -184,7 +184,7 @@ typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType&
 TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangle(size_t id)
 {
 	auto& triangle = m_triangles[id];
-	SURGSIM_ASSERT(triangle.isValid == true) << "Attempted to access invalid or deleted triangle.";
+	SURGSIM_ASSERT(triangle.isValid) << "Attempted to access invalid or deleted triangle.";
 	return triangle;
 }
 
@@ -300,7 +300,7 @@ void TriangleMesh<VertexData, EdgeData, TriangleData>::doClear()
 {
 	doClearTriangles();
 	doClearEdges();
-	this->doClearVertices();
+	doClearVertices();
 }
 
 

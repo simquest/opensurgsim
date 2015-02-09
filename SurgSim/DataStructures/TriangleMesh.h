@@ -195,6 +195,8 @@ protected:
 
 	bool doLoad(const std::string& fileName) override;
 
+	using Vertices<VertexData>::doClearVertices;
+
 private:
 
 	/// Clear mesh to return to an empty state (no vertices, no edges, no triangles).

@@ -336,16 +336,16 @@ TEST_F(MeshShapeTest, NormalTest)
 
 	// Add edges
 	std::array<size_t, 2> edgePoints01 = {0, 1};
-	std::array<size_t, 2> edgePoints02 = {1, 2};
-	std::array<size_t, 2> edgePoints12 = {2, 0};
+	std::array<size_t, 2> edgePoints12 = {1, 2};
+	std::array<size_t, 2> edgePoints20 = {2, 0};
 
 	TriangleMeshPlain::EdgeType e01(edgePoints01);
-	TriangleMeshPlain::EdgeType e02(edgePoints02);
 	TriangleMeshPlain::EdgeType e12(edgePoints12);
+	TriangleMeshPlain::EdgeType e20(edgePoints20);
 
 	mesh->addEdge(e01);
-	mesh->addEdge(e02);
 	mesh->addEdge(e12);
+	mesh->addEdge(e20);
 
 	// Add triangle
 	std::array<size_t, 3> trianglePoints = {0, 1, 2};
@@ -381,12 +381,12 @@ TEST_F(MeshShapeTest, DoLoadTest)
 	}
 
 	{
-		//SCOPED_TRACE("Load through parameter should succeed");
-		//auto fileName = std::string("MeshShapeData/staple_collision.ply");
-		//auto meshShape = std::make_shared<MeshShape>();
+		SCOPED_TRACE("Load through parameter should succeed");
+		auto fileName = std::string("MeshShapeData/staple_collision.ply");
+		auto meshShape = std::make_shared<MeshShape>();
 
-		//EXPECT_NO_THROW(meshShape->setValue("InitialMeshFileName", fileName));
-		//EXPECT_TRUE(meshShape->isValid());
+		EXPECT_NO_THROW(meshShape->setValue("FileName", fileName));
+		EXPECT_TRUE(meshShape->isValid());
 	}
 
 	{

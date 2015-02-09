@@ -44,11 +44,6 @@ template <class Data>
 struct Vertex
 {
 	/// Constructor
-	Vertex()
-	{
-	}
-
-	/// Constructor
 	/// \param	position	Position of the vertex
 	/// \param	data	Extra data to be stored in the vertex
 	explicit Vertex(const SurgSim::Math::Vector3d& position, const Data& data = Data()) :

@@ -82,24 +82,6 @@ bool MeshShape::doLoad(const std::string& fileName)
 	return true;
 }
 
-void MeshShape::copyWithTransform(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_ASSERT(getNumVertices() == m_initialMesh->getNumVertices())
-			<< "The source mesh must have the same number of vertices.";
-	SURGSIM_ASSERT(getNumEdges() == m_initialMesh->getNumEdges())
-			<< "The source mesh must have the same number of edges";
-	SURGSIM_ASSERT(getNumTriangles() == m_initialMesh->getNumTriangles())
-			<< "The source mesh must have the same number of triangles";
-
-	auto targetVertex = getVertices().begin();
-	auto const& vertices = m_initialMesh->getVertices();
-	for (auto it = vertices.cbegin(); it != vertices.cend(); ++it)
-	{
-		targetVertex->position = pose * it->position;
-		++targetVertex;
-	}
-}
-
 int MeshShape::getType() const
 {
 	return SHAPE_TYPE_MESH;
@@ -217,7 +199,16 @@ void MeshShape::computeVolumeIntegrals()
 
 void MeshShape::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
-	copyWithTransform(pose);
+	SURGSIM_ASSERT(getNumVertices() == m_initialMesh->getNumVertices())
+			<< "The inital mesh must have the same number of vertices as the MeshShape for setPose.";
+	auto targetVertex = getVertices().begin();
+	auto const& vertices = m_initialMesh->getVertices();
+	for (auto it = vertices.cbegin(); it != vertices.cend(); ++it)
+	{
+		targetVertex->position = pose * it->position;
+		++targetVertex;
+	}
+
 	calculateNormals();
 	updateAabbTree();
 }

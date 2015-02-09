@@ -202,7 +202,6 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 
 	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
-	meshA->load(fileName);
 	ASSERT_NO_THROW(meshA->load(fileName));
 
 	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();

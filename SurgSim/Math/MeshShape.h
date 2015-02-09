@@ -127,11 +127,6 @@ protected:
 	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
 
 private:
-	/// Sets the mesh's vertices and normals by transforming the initial mesh
-	/// of vertices, edges, and triangles.
-	/// \param pose the transformation to be applied to the vertices and norms
-	void copyWithTransform(const SurgSim::Math::RigidTransform3d& pose);
-
 	/// The initial triangle mesh contained by this shape.
 	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlain> m_initialMesh;
 
