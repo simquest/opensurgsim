@@ -20,6 +20,8 @@
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -31,16 +33,16 @@ using SurgSim::Collision::ContactMapType;
 using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::Location;
 using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::makeRigidTransform;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 namespace SurgSim
@@ -52,6 +54,8 @@ struct RepresentationTest : public ::testing::Test
 {
 	virtual void SetUp()
 	{
+		runtime = std::make_shared<Framework::Runtime>();
+		scene = runtime->getScene();
 		element = std::make_shared<BasicSceneElement>("Element");
 		plane = std::make_shared<PlaneShape>();
 		sphere = std::make_shared<SphereShape>(1.0);
@@ -66,7 +70,7 @@ struct RepresentationTest : public ::testing::Test
 
 		element->addComponent(planeRep);
 		element->addComponent(sphereRep);
-		element->initialize();
+		scene->addSceneElement(element);
 		planeRep->wakeUp();
 		sphereRep->wakeUp();
 	}
@@ -74,6 +78,9 @@ struct RepresentationTest : public ::testing::Test
 	virtual void TearDown()
 	{
 	}
+
+	std::shared_ptr<Framework::Runtime> runtime;
+	std::shared_ptr<Framework::Scene> scene;
 
 	std::shared_ptr<BasicSceneElement> element;
 	std::shared_ptr<PlaneShape> plane;

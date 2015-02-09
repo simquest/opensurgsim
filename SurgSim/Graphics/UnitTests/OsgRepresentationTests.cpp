@@ -17,10 +17,11 @@
 /// Tests for the OsgRepresentation class.
 
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
-#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgCamera.h"
-
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -99,10 +100,13 @@ TEST(OsgRepresentationTests, WireFrameTest)
 
 TEST(OsgRepresentationTests, PoseTest)
 {
+	auto runtime = std::make_shared<Framework::Runtime>();
+	auto scene = runtime->getScene();
+
 	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
 	std::shared_ptr<BasicSceneElement> element = std::make_shared<BasicSceneElement>("element");
 	element->addComponent(representation);
-	element->initialize();
+	scene->addSceneElement(element);
 	representation->wakeUp();
 
 	{
@@ -143,19 +147,33 @@ TEST(OsgRepresentationTests, PoseTest)
 
 TEST(OsgRepresentationTests, MaterialTest)
 {
-	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
+	std::shared_ptr<OsgRepresentation> osgRepresentation = std::make_shared<MockOsgRepresentation>("test name");
+	std::shared_ptr<Representation> representation = osgRepresentation;
 
+	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>("material");
+	std::shared_ptr<Material> material = osgMaterial;
 	{
 		SCOPED_TRACE("Set material");
-		std::shared_ptr<Material> material = std::make_shared<OsgMaterial>("material");
 		EXPECT_TRUE(representation->setMaterial(material));
 		EXPECT_EQ(material, representation->getMaterial());
+
+		osg::Switch* switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
+		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
+		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
+		EXPECT_EQ(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
+				"State set should be the material's state set!";
 	}
 
 	{
 		SCOPED_TRACE("Clear material");
 		representation->clearMaterial();
 		EXPECT_EQ(nullptr, representation->getMaterial());
+
+		osg::Switch* switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
+		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
+		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
+		EXPECT_NE(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
+				"State set should have been cleared!";
 	}
 }
 
