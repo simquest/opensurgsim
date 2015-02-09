@@ -24,10 +24,6 @@ namespace DataStructures
 template<>
 std::string TriangleMeshPlain::m_className = "SurgSim::DataStructures::TriangleMeshPlain";
 
-template<>
-std::string SurgSim::DataStructures::TriangleMeshWithNormals
-::m_className = "SurgSim::DataStructures::TriangleMeshWithNormals";
-
 };  // namespace DataStructures
 };  // namespace SurgSim
 

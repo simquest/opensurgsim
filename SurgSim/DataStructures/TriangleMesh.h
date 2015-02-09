@@ -218,7 +218,6 @@ public:
 };
 
 typedef TriangleMesh<EmptyData, EmptyData, EmptyData> TriangleMeshPlain;
-typedef TriangleMesh<EmptyData, EmptyData, NormalData> TriangleMeshWithNormals;
 
 };  // namespace DataStructures
 };  // namespace SurgSim

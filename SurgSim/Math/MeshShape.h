@@ -18,6 +18,8 @@
 
 #include <memory>
 
+#include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/DataStructures/NormalData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -49,7 +51,8 @@ SURGSIM_STATIC_REGISTRATION(MeshShape);
 /// \note * Deformable  object, the mesh will be updated, but the geometric properties will not be used.
 ///
 /// \sa SurfaceMeshShape
-class MeshShape : public Shape, public SurgSim::DataStructures::TriangleMeshWithNormals
+class MeshShape : public Shape, public SurgSim::DataStructures::TriangleMesh<SurgSim::DataStructures::EmptyData,
+	SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::NormalData>
 {
 public:
 	/// Constructor

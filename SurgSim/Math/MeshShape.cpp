@@ -18,6 +18,13 @@
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/Framework/Assert.h"
 
+using SurgSim::DataStructures::EmptyData;
+using SurgSim::DataStructures::NormalData;
+
+
+template<>
+std::string SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, NormalData>
+::m_className = "SurgSim::Math::MeshShape";
 
 namespace SurgSim
 {
@@ -62,7 +69,8 @@ void MeshShape::doUpdate()
 
 bool MeshShape::doLoad(const std::string& fileName)
 {
-	SurgSim::DataStructures::TriangleMeshWithNormals::doLoad(fileName);
+	SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, NormalData>::doLoad(fileName);
+
 	m_initialMesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>(*shared_from_this());
 	calculateNormals();
 	updateAabbTree();
@@ -100,7 +108,7 @@ double MeshShape::getVolume() const
 
 bool MeshShape::isValid() const
 {
-	return SurgSim::DataStructures::TriangleMeshWithNormals::isValid();
+	return SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, NormalData>::isValid();
 }
 
 SurgSim::Math::Vector3d MeshShape::getCenter() const
