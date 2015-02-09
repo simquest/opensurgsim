@@ -16,6 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
 
+#include "SurgSim/Framework/Log.h"
+
 
 namespace SurgSim
 {
@@ -273,14 +275,22 @@ bool TriangleMesh<VertexData, EdgeData, TriangleData>::isEqual(const Vertices<Ve
 template <class VertexData, class EdgeData, class TriangleData>
 bool TriangleMesh<VertexData, EdgeData, TriangleData>::doLoad(const std::string& fileName)
 {
-	typedef TriangleMesh<VertexData, EdgeData, TriangleData> MeshType;
-	//typedef SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<> DelegateType;
-	auto delegate = std::make_shared<TriangleMeshPlyReaderDelegate<MeshType>>(this->shared_from_this());
-
 	PlyReader reader(fileName);
-	SURGSIM_ASSERT(reader.isValid()) << "'" << fileName << "' is an invalid .ply file.";
-	SURGSIM_ASSERT(reader.parseWithDelegate(delegate)) <<
-		"The input file " << fileName << " does not have the property required by triangle mesh.";
+	if (! reader.isValid())
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "'" << fileName << "' is an invalid .ply file.";
+		return false;
+	}
+
+	typedef TriangleMesh<VertexData, EdgeData, TriangleData> MeshType;
+	auto delegate = std::make_shared<TriangleMeshPlyReaderDelegate<MeshType>>(this->shared_from_this());
+	if (! reader.parseWithDelegate(delegate))
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "The input file '" << fileName << "' does not have the property required by triangle mesh.";
+		return false;
+	}
 
 	return true;
 }

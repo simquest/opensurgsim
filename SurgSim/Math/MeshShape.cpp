@@ -69,12 +69,16 @@ void MeshShape::doUpdate()
 
 bool MeshShape::doLoad(const std::string& fileName)
 {
-	SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, NormalData>::doLoad(fileName);
+	if(! SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, NormalData>::doLoad(fileName))
+	{
+		return false;
+	}
 
 	m_initialMesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>(*shared_from_this());
 	calculateNormals();
 	updateAabbTree();
 	computeVolumeIntegrals();
+
 	return true;
 }
 

@@ -96,12 +96,21 @@ void Mesh::initialize(
 
 bool Mesh::doLoad(const std::string& fileName)
 {
-	auto delegate = std::make_shared<MeshPlyReaderDelegate>(std::dynamic_pointer_cast<Mesh>(shared_from_this()));
-
 	SurgSim::DataStructures::PlyReader reader(fileName);
-	SURGSIM_ASSERT(reader.isValid()) << "'" << fileName << "' is an invalid .ply file.";
-	SURGSIM_ASSERT(reader.parseWithDelegate(delegate)) <<
-		"The input file " << fileName << " does not have the property required by triangle mesh.";
+	if (! reader.isValid())
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "'" << fileName << "' is an invalid .ply file.";
+		return false;
+	}
+
+	auto delegate = std::make_shared<MeshPlyReaderDelegate>(std::dynamic_pointer_cast<Mesh>(shared_from_this()));
+	if (! reader.parseWithDelegate(delegate))
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "The input file '" << fileName << "' does not have the property required by triangle mesh.";
+		return false;
+	}
 
 	return true;
 }
