@@ -30,22 +30,21 @@ namespace Framework
 /// Wraps around the actual clock we are using.
 typedef boost::chrono::system_clock Clock;
 
-template <class Clock, class Duration>
-void sleep_until(const boost::chrono::time_point<Clock, Duration>& abs_time)
+/// A more accurate sleep_until that accounts for scheduler errors
+template <class C, class D>
+void sleep_until(const boost::chrono::time_point<C, D>& time)
 {
-	// Some system dependant threshold, will probably need to tune this.
-	boost::chrono::duration<double> threshold(0.002);
-
-	if (abs_time - threshold > Clock::now())
+	boost::chrono::duration<double> schedulerError(0.002);
+	boost::chrono::time_point<C, D> earlierTime = time - schedulerError;
+	if (earlierTime > Clock::now())
 	{
-		boost::this_thread::sleep_until(abs_time - threshold);
+		boost::this_thread::sleep_until(earlierTime);
 	}
-	while (Clock::now() < abs_time)
+
+	while (Clock::now() < time)
 	{
-		// This has no effect on my system, still get the requested rate,
-		// but it still uses 100% of a core.
 		boost::this_thread::yield();
-	};
+	}
 }
 
 }; // Framework
