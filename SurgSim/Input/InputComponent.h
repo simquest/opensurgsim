@@ -29,10 +29,16 @@ namespace DataStructures
 class DataGroup;
 }
 
+namespace Testing
+{
+class MockInputComponent;
+}
+
 namespace Input
 {
 class DeviceInterface;
 class InputConsumer;
+class InputConsumerInterface;
 
 SURGSIM_STATIC_REGISTRATION(InputComponent);
 
@@ -71,7 +77,7 @@ public:
 	/// Gets the input data.
 	/// \param [out] dataGroup The location to write the data.  The pointer must be non-null.
 	/// \exception Asserts if the InputComponent is not connected to a device.
-	virtual void getData(SurgSim::DataStructures::DataGroup* dataGroup);
+	void getData(SurgSim::DataStructures::DataGroup* dataGroup);
 
 	/// Overridden from Component, do nothing
 	bool doInitialize() override;
@@ -83,7 +89,14 @@ public:
 	/// \return	The device name.
 	std::string getDeviceName() const;
 
+protected:
+	/// Gets the InputConsumerInterface that actually holds the data.
+	/// \return An InputConsumerInterface.
+	std::shared_ptr<InputConsumerInterface> getConsumer();
+
 private:
+	friend class SurgSim::Testing::MockInputComponent;
+
 	/// Name of the device to which this input component connects
 	std::string m_deviceName;
 	/// Indicates if this input component is connected to a device

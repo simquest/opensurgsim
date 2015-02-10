@@ -36,11 +36,6 @@ public:
 	/// Set the data that this mock InputComponent will provide via getData.
 	/// \param data The datagroup as if from a device.
 	void setData(const SurgSim::DataStructures::DataGroup& data);
-
-	void getData(SurgSim::DataStructures::DataGroup* dataGroup) override;
-
-	/// The data provided via getData.
-	SurgSim::DataStructures::DataGroup m_data;
 };
 
 };

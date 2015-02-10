@@ -15,6 +15,8 @@
 
 #include "SurgSim/Testing/MockInputComponent.h"
 
+#include "SurgSim/Input/InputConsumerInterface.h"
+
 namespace SurgSim
 {
 namespace Testing
@@ -26,12 +28,8 @@ MockInputComponent::MockInputComponent(const std::string& name) : SurgSim::Input
 
 void MockInputComponent::setData(const SurgSim::DataStructures::DataGroup& data)
 {
-	m_data = data;
-}
-
-void MockInputComponent::getData(SurgSim::DataStructures::DataGroup* dataGroup)
-{
-	*dataGroup = m_data;
+	getConsumer()->handleInput("fake device", data);
+	m_deviceConnected = true;
 }
 
 }; // Testing

@@ -127,6 +127,11 @@ void InputComponent::disconnectDevice(std::shared_ptr<SurgSim::Input::DeviceInte
 	m_deviceConnected = false;
 }
 
+std::shared_ptr<InputConsumerInterface> InputComponent::getConsumer()
+{
+	return m_input;
+}
+
 }; // namespace Input
 }; // namespace SurgSim
 
