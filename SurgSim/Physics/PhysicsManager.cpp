@@ -29,8 +29,6 @@
 #include "SurgSim/Physics/SolveMlcp.h"
 #include "SurgSim/Physics/UpdateCollisionRepresentations.h"
 
-#include <list>
-
 namespace SurgSim
 {
 namespace Physics
@@ -130,9 +128,8 @@ bool PhysicsManager::doUpdate(double dt)
 
 	processBehaviors(dt);
 
-	std::list<std::shared_ptr<PhysicsManagerState>> stateList;
-	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
-	stateList.push_back(state);
+	auto state = std::make_shared<PhysicsManagerState>();
+	std::list<std::shared_ptr<PhysicsManagerState>> stateList(1, state);
 	state->setRepresentations(m_representations);
 	state->setCollisionRepresentations(m_collisionRepresentations);
 	state->setConstraintComponents(m_constraintComponents);
@@ -142,16 +139,10 @@ bool PhysicsManager::doUpdate(double dt)
 		state->setExcludedCollisionPairs(m_excludedCollisionPairs);
 	}
 
-	stateList.push_back(m_preUpdateStep->update(dt, stateList.back()));
-	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
-	stateList.push_back(m_updateCollisionRepresentationsStep->update(dt, stateList.back()));
-	stateList.push_back(m_dcdCollisionStep->update(dt, stateList.back()));
-	stateList.push_back(m_constraintGenerationStep->update(dt, stateList.back()));
-	stateList.push_back(m_buildMlcpStep->update(dt, stateList.back()));
-	stateList.push_back(m_solveMlcpStep->update(dt, stateList.back()));
-	stateList.push_back(m_pushResultsStep->update(dt, stateList.back()));
-	stateList.push_back(m_updateCollisionRepresentationsStep->update(dt, stateList.back()));
-	stateList.push_back(m_postUpdateStep->update(dt, stateList.back()));
+	for (const auto& computation : m_computations)
+	{
+		stateList.push_back(computation->update(dt, stateList.back()));
+	}
 
 	m_finalState.set(*(stateList.back()));
 
@@ -160,17 +151,31 @@ bool PhysicsManager::doUpdate(double dt)
 
 void PhysicsManager::initializeComputations(bool copyState)
 {
-	m_preUpdateStep.reset(new PreUpdate(copyState));
-	m_freeMotionStep.reset(new FreeMotion(copyState));
-	m_dcdCollisionStep.reset(new DcdCollision(copyState));
-	m_constraintGenerationStep.reset(new ContactConstraintGeneration(copyState));
-	m_buildMlcpStep.reset(new BuildMlcp(copyState));
-	m_solveMlcpStep.reset(new SolveMlcp(copyState));
-	m_pushResultsStep.reset(new PushResults(copyState));
-	m_postUpdateStep.reset(new PostUpdate(copyState));
-	m_updateCollisionRepresentationsStep.reset(new UpdateCollisionRepresentations(copyState));
+	m_computations.push_back(std::make_shared<PreUpdate>(copyState));
+	m_computations.push_back(std::make_shared<FreeMotion>(copyState));
+	m_computations.push_back(std::make_shared<DcdCollision>(copyState));
+	m_computations.push_back(std::make_shared<ContactConstraintGeneration>(copyState));
+	m_computations.push_back(std::make_shared<BuildMlcp>(copyState));
+	m_computations.push_back(std::make_shared<SolveMlcp>(copyState));
+	m_computations.push_back(std::make_shared<PushResults>(copyState));
+	m_computations.push_back(std::make_shared<PostUpdate>(copyState));
+	m_computations.push_back(std::make_shared<UpdateCollisionRepresentations>(copyState));
 }
 
+void PhysicsManager::addComputation(std::shared_ptr<Computation> computation)
+{
+	m_computations.push_back(computation);
+}
+
+void PhysicsManager::setComputations(std::list<std::shared_ptr<Computation>> computations)
+{
+	m_computations = computations;
+}
+
+const std::list<std::shared_ptr<Computation>> PhysicsManager::getComputations() const
+{
+	return m_computations;
+}
 
 }; // Physics
 }; // SurgSim

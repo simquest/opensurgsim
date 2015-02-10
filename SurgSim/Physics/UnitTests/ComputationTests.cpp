@@ -16,35 +16,18 @@
 
 #include <gtest/gtest.h>
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Physics/Computation.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
-
-class MockComputation : public Computation
-{
-public:
-	explicit MockComputation(bool doCopyState = false) : Computation(doCopyState)
-	{
-
-	}
-
-protected:
-	std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt,
-		const std::shared_ptr<PhysicsManagerState>& state) override
-	{
-		return state;
-	}
-};
 
 TEST(ComputationTests, InitTest)
 {

@@ -178,6 +178,43 @@ TEST_F(PhysicsManagerTest, AddRemoveExcludedCollisionPair)
 	}
 }
 
+TEST_F(PhysicsManagerTest, AddSetGetComputations)
+{
+	auto computation1 = std::make_shared<MockComputation>();
+	auto computation2 = std::make_shared<MockComputation>();
+
+	EXPECT_NO_THROW(physicsManager->addComputation(computation1));
+	EXPECT_NO_THROW(physicsManager->addComputation(computation2));
+
+	std::list<std::shared_ptr<Computation>> computations;
+	EXPECT_NO_THROW(computations = physicsManager->getComputations());
+	EXPECT_FALSE(computations.empty());
+	EXPECT_EQ(2u, computations.size());
+
+	// Order of computations is the order they are added to physicsManger.
+	EXPECT_EQ(computation1, computations.front());
+	EXPECT_EQ(computation2, computations.back());
+
+	// A computation could be added to the physicsManager many times.
+	EXPECT_NO_THROW(physicsManager->addComputation(computation1));
+	EXPECT_NO_THROW(computations = physicsManager->getComputations());
+	EXPECT_EQ(3u, computations.size());
+	// Now computation1 is at the end of the list of computations.
+	EXPECT_EQ(computation1, computations.back());
+
+	auto computation3 = std::make_shared<MockComputation>();
+	auto computation4 = std::make_shared<MockComputation>();
+	std::list<std::shared_ptr<Computation>> computationList;
+	computationList.push_back(computation3);
+	computationList.push_back(computation4);
+	EXPECT_NO_THROW(physicsManager->setComputations(computationList));
+
+	EXPECT_NO_THROW(computations = physicsManager->getComputations());
+	EXPECT_EQ(2u, computations.size());
+	EXPECT_NE(computation1, computations.front());
+	EXPECT_EQ(computations, computationList);
+}
+
 }; // namespace Physics
 }; // namespace SurgSim
 

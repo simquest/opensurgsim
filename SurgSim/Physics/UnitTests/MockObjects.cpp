@@ -601,5 +601,15 @@ const SurgSim::DataStructures::DataGroup& MockVirtualToolCoupler::getOutputData(
 	return m_outputData;
 }
 
+MockComputation::MockComputation(bool doCopyState) : Computation(doCopyState)
+{
+}
+
+std::shared_ptr<PhysicsManagerState> MockComputation::doUpdate(const double& dt,
+															   const std::shared_ptr<PhysicsManagerState>& state)
+{
+	return state;
+}
+
 }; // Physics
 }; // SurgSim
