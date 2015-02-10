@@ -15,31 +15,53 @@
 
 #include "SurgSim/Graphics/OsgSkeletonRepresentation.h"
 
-#include <map>
-
+#include <algorithm>
 #include <boost/thread.hpp>
-
-#include <osg/Quat>
-#include <osg/Vec3>
+#include <map>
 #include <osg/Geode>
+#include <osg/Quat>
+#include <osg/Node>
 #include <osg/PositionAttitudeTransform>
-
-#include <osgAnimation/Skeleton>
+#include <osg/Shader>
+#include <osg/Vec3>
+#include <osgAnimation/Bone>
 #include <osgAnimation/RigGeometry>
 #include <osgAnimation/RigTransformHardware>
+#include <osgAnimation/Skeleton>
+#include <osgAnimation/StackedQuaternionElement>
+#include <osgAnimation/StackedTranslateElement>
 #include <osgAnimation/UpdateBone>
-
 #include <osgDB/ReadFile>
+#include <osgUtil/UpdateVisitor>
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgModel.h"
 #include "SurgSim/Graphics/OsgRigidTransformConversions.h"
 #include "SurgSim/Graphics/OsgShader.h"
+
+
+/// Local data structure to store the bones and their references to the transforms.
+struct SurgSim::Graphics::BoneData
+{
+	osg::ref_ptr<osgAnimation::Bone> osgBone;
+	osg::ref_ptr<osgAnimation::StackedQuaternionElement> osgRotation;
+	osg::ref_ptr<osgAnimation::StackedTranslateElement> osgTranslation;
+	SurgSim::Math::RigidTransform3d neutralPose;
+	SurgSim::Math::RigidTransform3d pose;
+
+	BoneData() :
+		osgBone(nullptr),
+		osgRotation(nullptr),
+		osgTranslation(nullptr),
+		neutralPose(SurgSim::Math::RigidTransform3d::Identity()),
+		pose(SurgSim::Math::RigidTransform3d::Identity())
+	{
+	}
+};
 
 namespace
 {
@@ -47,13 +69,19 @@ namespace
 /// Visitor to collect information about the tree that we are using, collect all the
 /// osgAnimation::Bone nodes in it and add stacked transform elements to them so
 /// we can manipulate them, also switches the skinning to Hardware
-class BoneMapCreator : public osg::NodeVisitor
+class BoneBuilder : public osg::NodeVisitor
 {
 public:
-	/// Single argument constructor.
+	/// Constructor
 	/// \param hardwareShader The shader which does the skinning.
-	explicit BoneMapCreator(osg::Shader* hardwareShader) :
-		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN), m_shader(hardwareShader) {}
+	/// \param bones The data structure to store the found bones
+	explicit BoneBuilder(osg::Shader* hardwareShader,
+			std::shared_ptr<std::map<std::string, SurgSim::Graphics::BoneData>> bones) :
+		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN),
+		m_shader(hardwareShader),
+		m_bones(bones)
+	{
+	}
 
 	/// Traverse the given tree and collect the bone data in them.
 	/// Also setup for hardware skinning, if a hardware shader is provided.
@@ -70,32 +98,38 @@ public:
 		osgAnimation::Bone* bone = dynamic_cast<osgAnimation::Bone*>(&node);
 		if (bone != nullptr)
 		{
-			SurgSim::Graphics::OsgSkeletonBoneData data;
-			data.bone = bone;
+			auto newBone = m_bones->find(bone->getName());
+			if (newBone == m_bones->end())
+			{
+				newBone = m_bones->emplace(std::make_pair(bone->getName(), SurgSim::Graphics::BoneData())).first;
+			}
+			else
+			{
+				if (newBone->second.osgBone != nullptr)
+				{
+					SURGSIM_ASSERT(m_bones->find(bone->getName()) == m_bones->end())
+						<< "There already exists a bone with name, " << bone->getName()
+						<< ", in this skeleton. Cannot create a duplicate.";
+				}
+			}
+
+			newBone->second.osgBone = bone;
+			newBone->second.osgRotation = new osgAnimation::StackedQuaternionElement("OssRotation");
+			newBone->second.osgRotation->setQuaternion(osg::Quat());
+			newBone->second.osgTranslation = new osgAnimation::StackedTranslateElement("OssTranslation");
+
 			osgAnimation::UpdateMatrixTransform* callback =
 				dynamic_cast<osgAnimation::UpdateMatrixTransform*>(bone->getUpdateCallback());
-
-			// If we can't find this callback, replace with the default
 			if (callback == nullptr)
 			{
 				bone->setDefaultUpdateCallback();
 				callback = dynamic_cast<osgAnimation::UpdateMatrixTransform*>(bone->getUpdateCallback());
 			}
-
 			SURGSIM_ASSERT(callback != nullptr) << "Could neither find nor create the appropriate BoneUpdate callback";
 
 			// Push these transformations onto the stack so we can manipulate them
-			data.rotation = new osgAnimation::StackedQuaternionElement("OssRotation");
-			callback->getStackedTransforms().push_back(data.rotation);
-			data.rotation->setQuaternion(osg::Quat());
-			data.translation = new osgAnimation::StackedTranslateElement("OssTranslation");
-			callback->getStackedTransforms().push_back(data.translation);
-
-			SURGSIM_ASSERT(m_boneData.find(bone->getName()) == m_boneData.end())
-				<< "There already exists a bone with name, " << bone->getName()
-				<< ", in this skeleton. Cannot create a duplicate.";
-
-			m_boneData[bone->getName()] = data;
+			callback->getStackedTransforms().push_back(newBone->second.osgRotation);
+			callback->getStackedTransforms().push_back(newBone->second.osgTranslation);
 		}
 
 		// Setup for hardware skinning.
@@ -121,12 +155,6 @@ public:
 		traverse(node);
 	}
 
-	/// \return The bone data that had been collected.
-	std::map<std::string, SurgSim::Graphics::OsgSkeletonBoneData> getMap()
-	{
-		return m_boneData;
-	}
-
 	/// \return The root node of the skeleton on which the transform is set.
 	osg::ref_ptr<osg::MatrixTransform> getRootTransform()
 	{
@@ -141,27 +169,28 @@ private:
 	osg::ref_ptr<osg::Shader> m_shader;
 
 	/// The bone data from the skeleton.
-	std::map<std::string, SurgSim::Graphics::OsgSkeletonBoneData> m_boneData;
+	std::shared_ptr<std::map<std::string, SurgSim::Graphics::BoneData>>  m_bones;
 };
 
-}
+};
 
 namespace SurgSim
 {
 namespace Graphics
 {
+
 SURGSIM_REGISTER(SurgSim::Framework::Component,
 				 SurgSim::Graphics::OsgSkeletonRepresentation, OsgSkeletonRepresentation);
 
 OsgSkeletonRepresentation::OsgSkeletonRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
-	SkeletonRepresentation(name)
+	SkeletonRepresentation(name),
+	m_logger(SurgSim::Framework::Logger::getLogger("Graphics/OsgSkeletonRepresentation")),
+	m_bones(std::make_shared<std::map<std::string, BoneData>>())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgSkeletonRepresentation, std::string,
 		SkinningShaderFileName, getSkinningShaderFileName, setSkinningShaderFileName);
-
-	m_logger = SurgSim::Framework::Logger::getLogger("Graphics/OsgSkeletonRepresentation");
 }
 
 void OsgSkeletonRepresentation::loadModel(const std::string& fileName)
@@ -178,9 +207,7 @@ void OsgSkeletonRepresentation::setModel(std::shared_ptr<SurgSim::Framework::Ass
 	SURGSIM_ASSERT(!isInitialized()) << "Cannot set model after OsgSkeletonRepresentation had been initialized.";
 
 	auto osgModel = std::dynamic_pointer_cast<OsgModel>(model);
-
 	SURGSIM_ASSERT(model == nullptr || osgModel != nullptr) << "OsgSkeletonRepresentation expects an OsgModel.";
-
 	m_model = osgModel;
 }
 
@@ -201,88 +228,108 @@ std::string OsgSkeletonRepresentation::getSkinningShaderFileName()
 
 void OsgSkeletonRepresentation::setBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose)
 {
-	auto boneData = m_boneData.find(name);
-	if (boneData != m_boneData.end())
+	boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+
+	auto found = m_bones->find(name);
+	if (found != m_bones->end())
 	{
-		boost::lock_guard<boost::mutex> lock(m_boneDataMutex);
-		boneData->second.pose = pose;
+		found->second.pose = pose;
+	}
+	else if (isInitialized())
+	{
+		SURGSIM_LOG_WARNING(m_logger) << "Bone with name " << name << " is not present in mesh.";
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(m_logger)
-			<< "OsgSkeletonRepresentation::setBonePose(): Bone with name, " << name << ", is not present in mesh."
-			<< "Cannot set pose.";
+		auto newBone = m_bones->emplace(std::make_pair(name, BoneData())).first;
+		newBone->second.pose = pose;
 	}
 }
 
 SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getBonePose(const std::string& name)
 {
 	SurgSim::Math::RigidTransform3d pose = SurgSim::Math::RigidTransform3d::Identity();
+	boost::shared_lock<boost::shared_mutex> lock(m_mutex);
 
-	auto boneData = m_boneData.find(name);
-	if (boneData != m_boneData.end())
+	auto found = m_bones->find(name);
+	if (found != m_bones->end())
 	{
-		boost::lock_guard<boost::mutex> lock(m_boneDataMutex);
-		pose = boneData->second.pose;
+		pose = found->second.pose;
 	}
-	else
+	else if (isInitialized())
 	{
-		SURGSIM_LOG_WARNING(m_logger)
-			<< "OsgSkeletonRepresentation::getBonePose(): Bone with name, " << name << ", is not present in mesh."
-			<< "Cannot get pose.";
+		SURGSIM_LOG_WARNING(m_logger) << "Bone with name " << name << " is not present in mesh.";
 	}
 
-	return pose;
+	return std::move(pose);
 }
 
 void OsgSkeletonRepresentation::setNeutralBonePose(const std::string& name,
 												   const SurgSim::Math::RigidTransform3d& pose)
 {
-	SURGSIM_ASSERT(!isInitialized())
-		<< "Cannot set neutral pose after OsgSkeletonRepresentation had been initialized.";
+	boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 
-	m_neutralPoseMap[name] = pose;
+	auto found = m_bones->find(name);
+	if (found != m_bones->end())
+	{
+		found->second.neutralPose = pose;
+	}
+	else if (isInitialized())
+	{
+		SURGSIM_LOG_WARNING(m_logger) << "Bone with name " << name << " is not present in mesh.";
+	}
+	else
+	{
+		auto newBone = m_bones->emplace(std::make_pair(name, BoneData())).first;
+		newBone->second.neutralPose = pose;
+	}
 }
 
 SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getNeutralBonePose(const std::string& name)
 {
-	if (m_neutralPoseMap.find(name) != m_neutralPoseMap.end())
+	SurgSim::Math::RigidTransform3d pose = SurgSim::Math::RigidTransform3d::Identity();
+	boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+
+	auto found = m_bones->find(name);
+	if (found != m_bones->end())
 	{
-		return m_neutralPoseMap[name];
+		pose = found->second.neutralPose;
 	}
-	else
+	else if (isInitialized())
 	{
-		SURGSIM_LOG_SEVERE(m_logger)
-			<< "OsgSkeletonRepresentation::getNeutralBonePose(): Bone with name, " << name
-			<< ", does not have a neutral pose set.";
-		return SurgSim::Math::RigidTransform3d::Identity();
+		SURGSIM_LOG_WARNING(m_logger) << "Bone with name " << name << " is not present in mesh.";
+	}
+
+	return std::move(pose);
+}
+
+void OsgSkeletonRepresentation::setNeutralBonePoses(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poses)
+{
+	for (auto& pose : poses)
+	{
+		setNeutralBonePose(pose.first, pose.second);
 	}
 }
 
-void OsgSkeletonRepresentation::setNeutralBonePoseMap(
-	const std::map<std::string, SurgSim::Math::RigidTransform3d>& poseMap)
+std::map<std::string, SurgSim::Math::RigidTransform3d> OsgSkeletonRepresentation::getNeutralBonePoses()
 {
-	SURGSIM_ASSERT(!isInitialized())
-		<< "Cannot set neutral pose map after OsgSkeletonRepresentation had been initialized.";
-
-	m_neutralPoseMap = poseMap;
-}
-
-const std::map<std::string, SurgSim::Math::RigidTransform3d>& OsgSkeletonRepresentation::getNeutralBonePoseMap()
-{
-	return m_neutralPoseMap;
+	std::map<std::string, SurgSim::Math::RigidTransform3d> neutralBonePoses;
+	for (auto& bone : *m_bones)
+	{
+		neutralBonePoses[bone.first] = bone.second.neutralPose;
+	}
+	return std::move(neutralBonePoses);
 }
 
 void OsgSkeletonRepresentation::doUpdate(double dt)
 {
 	{
-		boost::lock_guard<boost::mutex> lock(m_boneDataMutex);
-		// Update the pose of all the bones.
-		for (auto& boneData : m_boneData) // NOLINT
+		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+		for (auto& bone : *m_bones)
 		{
-			std::pair<osg::Quat, osg::Vec3d> pose = toOsg(boneData.second.neutralPose * boneData.second.pose);
-			boneData.second.rotation->setQuaternion(pose.first);
-			boneData.second.translation->setTranslate(pose.second);
+			std::pair<osg::Quat, osg::Vec3d> pose = toOsg(bone.second.neutralPose * bone.second.pose);
+			bone.second.osgRotation->setQuaternion(pose.first);
+			bone.second.osgTranslation->setTranslate(pose.second);
 		}
 	}
 
@@ -294,86 +341,81 @@ void OsgSkeletonRepresentation::doUpdate(double dt)
 
 bool OsgSkeletonRepresentation::doInitialize()
 {
-	bool result = true;
-
 	std::string shaderFilename;
 	if (m_skinningShaderFileName.empty())
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "OsgSkeletonRepresentation::doInitialize(): Skinning shader file not set.";
-		result = false;
-	}
-	else
-	{
-		getRuntime()->getApplicationData()->tryFindFile(m_skinningShaderFileName, &shaderFilename);
+		SURGSIM_LOG_SEVERE(m_logger) << getName() << ": Skinning shader file not set.";
+		return false;
 	}
 
-	if (result)
+	getRuntime()->getApplicationData()->tryFindFile(m_skinningShaderFileName, &shaderFilename);
+	if (shaderFilename.empty())
 	{
-		if (shaderFilename.empty())
+		SURGSIM_LOG_SEVERE(m_logger) << getName() << ": Skinning shader file (" << m_skinningShaderFileName
+			<< ") not found.";
+		return false;
+	}
+
+	m_skinningShader = new osg::Shader(osg::Shader::VERTEX);
+	if (! m_skinningShader->loadShaderSourceFromFile(shaderFilename))
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getName() << ": Error loading shader (" << shaderFilename << ").";
+		return false;
+	}
+
+	if (m_model == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getName() << ": Model is not set.";
+		return false;
+	}
+
+	m_skeleton = dynamic_cast<osg::Node*>(m_model->getOsgNode().get());
+	if (m_skeleton == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getName() << ": Model does not have a valid osgNode.";
+		return false;
+	}
+
+	if (!setupBones())
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getName() << ": Could not find any bones in model.";
+		return false;
+	}
+
+	// Setup the transform updater for the skeleton.
+	m_updateVisitor = new osgUtil::UpdateVisitor();
+	m_frameCount = 0;
+	m_updateVisitor->setTraversalNumber(m_frameCount);
+	m_base->accept(*m_updateVisitor);
+
+	// Add the bone skeleton as a child to m_transform
+	m_transform->addChild(m_base.get());
+
+	return true;
+}
+
+bool OsgSkeletonRepresentation::setupBones()
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+
+	BoneBuilder builder(m_skinningShader, m_bones);
+	builder.traverse(*m_skeleton.get());
+	m_base = builder.getRootTransform();
+
+	for (auto bone = m_bones->begin(); bone != m_bones->end();)
+	{
+		if (bone->second.osgBone == nullptr)
 		{
-			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "OsgSkeletonRepresentation::doInitialize(): Skinning shader file (" << m_skinningShaderFileName
-				<< ") not found.";
-			result = false;
+			SURGSIM_LOG_WARNING(m_logger) << "Bone with name " << bone->first << " is not present in mesh.";
+			bone = m_bones->erase(bone);
 		}
 		else
 		{
-			m_skinningShader = new osg::Shader(osg::Shader::VERTEX);
-			result = m_skinningShader->loadShaderSourceFromFile(shaderFilename);
+			++bone;
 		}
 	}
 
-	if (result)
-	{
-		if (m_model == nullptr || std::dynamic_pointer_cast<OsgModel>(m_model) == nullptr)
-		{
-			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "OsgSkeletonRepresentation::doInitialize(): model is not set.";
-			result = false;
-		}
-		else
-		{
-			m_skeleton = dynamic_cast<osg::Node*>(std::dynamic_pointer_cast<OsgModel>(m_model)->getOsgNode().get());
-			result = nullptr != m_skeleton;
-			SURGSIM_ASSERT(result)
-				<< "OsgSkeletonRepresentation::doInitialize(): model does not have a valid osgNode.";
-		}
-	}
-
-	if (result)
-	{
-		// Traverse the skeleton and collect bone data.
-		BoneMapCreator mapCreator(m_skinningShader);
-		mapCreator.traverse(*m_skeleton.get());
-		m_boneData = mapCreator.getMap();
-		if (m_boneData.size() == 0)
-		{
-			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Could not find any osgAnimation::Bone nodes in tree with root <" + m_skeleton->getName() + ">";
-		}
-		m_base = mapCreator.getRootTransform();
-
-		// Setup the transform updater for the skeleton.
-		m_updateVisitor = new osgUtil::UpdateVisitor();
-		m_frameCount = 0;
-		m_updateVisitor->setTraversalNumber(m_frameCount);
-		m_base->accept(*m_updateVisitor);
-
-		// Add the bone skeleton as a child to m_transform
-		m_transform->addChild(m_base.get());
-
-		// Update the neutral pose of all the bones.
-		for (auto& boneData : m_boneData)
-		{
-			if (m_neutralPoseMap.find(boneData.first) != m_neutralPoseMap.end())
-			{
-				boneData.second.neutralPose = m_neutralPoseMap[boneData.first];
-			}
-		}
-	}
-
-	return result;
+	return (m_bones->size() != 0);
 }
 
 }; // Graphics

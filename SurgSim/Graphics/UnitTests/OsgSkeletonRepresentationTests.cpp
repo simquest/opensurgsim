@@ -16,9 +16,8 @@
 /// \file
 /// Unit Tests for the OsgSkeletonRepresentation class.
 
-#include <memory>
-
 #include <gtest/gtest.h>
+#include <memory>
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -28,22 +27,30 @@
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgModel.h"
 
-using SurgSim::Graphics::OsgSkeletonRepresentation;
-using SurgSim::Graphics::OsgViewElement;
-using SurgSim::Graphics::SkeletonRepresentation;
+using namespace SurgSim;
+using Graphics::OsgSkeletonRepresentation;
+using Graphics::OsgViewElement;
+using Graphics::SkeletonRepresentation;
+using Math::makeRigidTransform;
+using Math::makeRotationQuaternion;
+using Math::Vector3d;
+
+namespace SurgSim
+{
+namespace Graphics
+{
 
 class OsgSkeletonRepresentationTest: public ::testing::Test
 {
 public:
 	void SetUp() override
 	{
-		skeletonObject = std::make_shared<OsgSkeletonRepresentation>("test");
-		runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-		manager = std::make_shared<SurgSim::Graphics::OsgManager>();
+		runtime = std::make_shared<Framework::Runtime>("config.txt");
+		manager = std::make_shared<OsgManager>();
 		scene = runtime->getScene();
-		viewElement = std::make_shared<OsgViewElement>("view element");
+		view = std::make_shared<OsgViewElement>("view element");
 
-		scene->addSceneElement(viewElement);
+		scene->addSceneElement(view);
 		runtime->addManager(manager);
 	}
 
@@ -51,71 +58,121 @@ public:
 	{
 	}
 
-	std::shared_ptr<SurgSim::Graphics::OsgSkeletonRepresentation> skeletonObject;
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-	std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
-	std::shared_ptr<SurgSim::Framework::Scene> scene;
-	std::shared_ptr<SurgSim::Graphics::OsgViewElement> viewElement;
+	std::shared_ptr<Framework::Runtime> runtime;
+	std::shared_ptr<OsgManager> manager;
+	std::shared_ptr<Framework::Scene> scene;
+	std::shared_ptr<OsgViewElement> view;
 };
+
+TEST_F(OsgSkeletonRepresentationTest, CanConstruct)
+{
+	EXPECT_NO_THROW({OsgSkeletonRepresentation skeleton("test");});
+	EXPECT_NO_THROW({auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");});
+}
 
 TEST_F(OsgSkeletonRepresentationTest, FileNameTest)
 {
-	skeletonObject->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
-	EXPECT_EQ("OsgSkeletonRepresentationTests/rigged_cylinder.osgt", skeletonObject->getModel()->getFileName());
+	auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");
+	skeleton->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
+	EXPECT_EQ("OsgSkeletonRepresentationTests/rigged_cylinder.osgt", skeleton->getModel()->getFileName());
 }
 
 TEST_F(OsgSkeletonRepresentationTest, SkinningShaderFileNameTest)
 {
-	skeletonObject->setSkinningShaderFileName("Shaders/skinning.vert");
-	EXPECT_EQ("Shaders/skinning.vert", skeletonObject->getSkinningShaderFileName());
+	auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");
+	skeleton->setSkinningShaderFileName("Shaders/skinning.vert");
+	EXPECT_EQ("Shaders/skinning.vert", skeleton->getSkinningShaderFileName());
 }
 
 TEST_F(OsgSkeletonRepresentationTest, InitTest)
 {
-	skeletonObject->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
-	skeletonObject->setSkinningShaderFileName("Shaders/skinning.vert");
-	EXPECT_NO_THROW(viewElement->addComponent(skeletonObject));
+	{
+		auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");
+		skeleton->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
+		skeleton->setSkinningShaderFileName("Shaders/skinning.vert");
+		EXPECT_NO_THROW(view->addComponent(skeleton));
+		EXPECT_TRUE(skeleton->isInitialized()) << "Should initialize with both model and shader.";
+	}
+	{
+		auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");
+		skeleton->setSkinningShaderFileName("Shaders/skinning.vert");
+		EXPECT_NO_THROW(view->addComponent(skeleton));
+		EXPECT_FALSE(skeleton->isInitialized()) << "Should not be initialized, no model set";
+	}
+	{
+		auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");
+		skeleton->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
+		EXPECT_NO_THROW(view->addComponent(skeleton));
+		EXPECT_FALSE(skeleton->isInitialized()) << "Should not be initialized, no shader set";
+	}
 }
 
 TEST_F(OsgSkeletonRepresentationTest, PosesTest)
 {
-	skeletonObject->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
-	skeletonObject->setSkinningShaderFileName("Shaders/skinning.vert");
-	EXPECT_NO_THROW(viewElement->addComponent(skeletonObject));
+	auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");
+	skeleton->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
+	skeleton->setSkinningShaderFileName("Shaders/skinning.vert");
 
-	SurgSim::Math::RigidTransform3d pose =
-		SurgSim::Math::makeRigidTransform(
-		SurgSim::Math::makeRotationQuaternion(2.143, SurgSim::Math::Vector3d(2.463, 6.346, 7.135).normalized()),
-		SurgSim::Math::Vector3d(2.3, 4.5, 6.7));
+	Math::RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(2.143, Vector3d::UnitZ().eval()),
+			Vector3d(2.3, 4.5, 6.7));
 
-	EXPECT_NO_THROW(skeletonObject->setBonePose("Bone", pose));
-	EXPECT_TRUE(pose.isApprox(skeletonObject->getBonePose("Bone")));
+	skeleton->setBonePose("Bone", pose);
+	skeleton->setBonePose("BadBoneName", pose);
+	EXPECT_TRUE(pose.isApprox(skeleton->getBonePose("Bone")));
+	EXPECT_TRUE(pose.isApprox(skeleton->getBonePose("BadBoneName")))
+		<< "Before initialization, the BadBoneName should still be there.";
+
+	view->addComponent(skeleton);
+	ASSERT_TRUE(skeleton->isInitialized());
+
+	EXPECT_TRUE(pose.isApprox(skeleton->getBonePose("Bone")));
+	EXPECT_FALSE(pose.isApprox(skeleton->getBonePose("BadBoneName")))
+		<< "After initialization, bones that aren't in the skeleton should be removed";
+
+	skeleton->setBonePose("AnotherBadBoneName", pose);
+	EXPECT_FALSE(pose.isApprox(skeleton->getBonePose("AnotherBadBoneName")))
+		<< "After initialization, bones that aren't in the skeleton shouldn't be set";
 }
 
 TEST_F(OsgSkeletonRepresentationTest, NeutralPosesTest)
 {
-	SurgSim::Math::RigidTransform3d pose =
-		SurgSim::Math::makeRigidTransform(
-			SurgSim::Math::makeRotationQuaternion(2.143, SurgSim::Math::Vector3d(2.463, 6.346, 7.135).normalized()),
-			SurgSim::Math::Vector3d(2.3, 4.5, 6.7));
+	auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");
+	skeleton->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
+	skeleton->setSkinningShaderFileName("Shaders/skinning.vert");
 
-	EXPECT_NO_THROW(skeletonObject->setNeutralBonePose("Bone", pose));
-	EXPECT_TRUE(pose.isApprox(skeletonObject->getNeutralBonePose("Bone")));
+	Math::RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(0.6, Vector3d::UnitY().eval()),
+			Vector3d(-2.3, -4.5, -6.7));
+
+	skeleton->setNeutralBonePose("Bone", pose);
+	skeleton->setNeutralBonePose("BadBoneName", pose);
+	EXPECT_TRUE(pose.isApprox(skeleton->getNeutralBonePose("Bone")));
+	EXPECT_TRUE(pose.isApprox(skeleton->getNeutralBonePose("BadBoneName")))
+		<< "Before initialization, the BadBoneName should still be there.";
+
+	view->addComponent(skeleton);
+	ASSERT_TRUE(skeleton->isInitialized());
+
+	EXPECT_TRUE(pose.isApprox(skeleton->getNeutralBonePose("Bone")));
+	EXPECT_FALSE(pose.isApprox(skeleton->getNeutralBonePose("BadBoneName")))
+		<< "After initialization, bones that aren't in the skeleton should be removed";
+
+	skeleton->setNeutralBonePose("AnotherBadBoneName", pose);
+	EXPECT_FALSE(pose.isApprox(skeleton->getNeutralBonePose("AnotherBadBoneName")))
+		<< "After initialization, bones that aren't in the skeleton shouldn't be set";
 }
 
 TEST_F(OsgSkeletonRepresentationTest, AccessibleTest)
 {
-	std::shared_ptr<SurgSim::Framework::Component> component;
-	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
-		"SurgSim::Graphics::OsgSkeletonRepresentation",
-		"skeleton"));
+	std::shared_ptr<Framework::Component> component;
+	ASSERT_NO_THROW(component = Framework::Component::getFactory().create(
+		"SurgSim::Graphics::OsgSkeletonRepresentation", "skeleton"));
 
 	std::string fileName("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
 	component->setValue("ModelFileName", fileName);
 	std::string skinningShaderFileName("Shaders/skinning.vert");
 	component->setValue("SkinningShaderFileName", skinningShaderFileName);
 
-	auto asset = component->getValue<std::shared_ptr<SurgSim::Graphics::Model>>("Model");
+	auto asset = component->getValue<std::shared_ptr<Model>>("Model");
 	EXPECT_EQ(fileName, asset->getFileName());
 	auto shaderName = component->getValue<std::string>("SkinningShaderFileName");
 	EXPECT_EQ(skinningShaderFileName, shaderName);
@@ -123,19 +180,18 @@ TEST_F(OsgSkeletonRepresentationTest, AccessibleTest)
 
 TEST_F(OsgSkeletonRepresentationTest, SerializationTests)
 {
-	std::shared_ptr<OsgSkeletonRepresentation> skeleton = std::make_shared<OsgSkeletonRepresentation>("OsgScenery");
+	auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");
 
 	std::string fileName("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
 	skeleton->loadModel(fileName);
 	std::string skinningShaderFileName("Shaders/skinning.vert");
 	skeleton->setSkinningShaderFileName(skinningShaderFileName);
-	SurgSim::Math::RigidTransform3d pose =
-		SurgSim::Math::makeRigidTransform(
-		SurgSim::Math::makeRotationQuaternion(2.143, SurgSim::Math::Vector3d(2.463, 6.346, 7.135).normalized()),
-		SurgSim::Math::Vector3d(2.3, 4.5, 6.7));
+	Math::RigidTransform3d pose = makeRigidTransform(
+		makeRotationQuaternion(2.143, Vector3d(2.463, 6.346, 7.135).normalized()), Vector3d(2.3, 4.5, 6.7));
 	skeleton->setNeutralBonePose("Bone", pose);
 
 	YAML::Node node;
+	node = skeleton->encode();
 	ASSERT_NO_THROW(node = skeleton->encode());
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(7u, node.size());
@@ -147,3 +203,6 @@ TEST_F(OsgSkeletonRepresentationTest, SerializationTests)
 	EXPECT_EQ(skinningShaderFileName, result->getSkinningShaderFileName());
 	EXPECT_TRUE(pose.isApprox(result->getNeutralBonePose("Bone")));
 }
+
+};
+};
