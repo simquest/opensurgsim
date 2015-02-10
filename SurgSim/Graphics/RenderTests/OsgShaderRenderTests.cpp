@@ -27,7 +27,7 @@
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
@@ -56,9 +56,9 @@ namespace SurgSim
 namespace Graphics
 {
 
-std::shared_ptr<Shader> loadExampleShader(const SurgSim::Framework::ApplicationData& data)
+std::shared_ptr<Program> loadExampleProgram(const SurgSim::Framework::ApplicationData& data)
 {
-	std::shared_ptr<Shader> shader = std::make_shared<OsgShader>();
+	std::shared_ptr<Program> program = std::make_shared<OsgProgram>();
 
 	std::string vertexShaderPath = data.findFile("OsgShaderRenderTests/shader.vert");
 	std::string geometryShaderPath = data.findFile("OsgShaderRenderTests/shader.geom");
@@ -68,19 +68,19 @@ std::shared_ptr<Shader> loadExampleShader(const SurgSim::Framework::ApplicationD
 	EXPECT_NE("", geometryShaderPath) << "Could not find geometry shader!";
 	EXPECT_NE("", fragmentShaderPath) << "Could not find fragment shader!";
 
-	shader->loadVertexShaderSource(vertexShaderPath);
-	shader->loadGeometryShaderSource(geometryShaderPath);
-	shader->loadFragmentShaderSource(fragmentShaderPath);
+	program->loadVertexShader(vertexShaderPath);
+	program->loadGeometryShader(geometryShaderPath);
+	program->loadFragmentShader(fragmentShaderPath);
 
-	return shader;
+	return program;
 }
 
 
 std::shared_ptr<Material> createShinyMaterial(const SurgSim::Framework::ApplicationData& data)
 {
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("material");
-	auto shader = SurgSim::Graphics::loadShader(data, "Shaders/material");
-	material->setShader(shader);
+	auto program = SurgSim::Graphics::loadProgram(data, "Shaders/material");
+	material->setProgram(program);
 
 	std::shared_ptr<SurgSim::Graphics::UniformBase>
 	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
@@ -112,9 +112,9 @@ TEST_F(OsgShaderRenderTests, SphereShaderTest)
 
 	/// Add a shader to the sphere
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
-	std::shared_ptr<Shader> shader = loadExampleShader(*applicationData);
+	std::shared_ptr<Program> program = loadExampleProgram(*applicationData);
 
-	material->setShader(shader);
+	material->setProgram(program);
 	sphereRepresentation->setMaterial(material);
 
 	viewElement->addComponent(sphereRepresentation);
@@ -177,9 +177,9 @@ TEST_F(OsgShaderRenderTests, TexturedShinyShaderTest)
 	sphereRepresentation->setRadius(0.25);
 
 	auto material = std::make_shared<OsgMaterial>("material");
-	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
-	ASSERT_TRUE(shader != nullptr);
-	material->setShader(shader);
+	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	ASSERT_TRUE(program != nullptr);
+	material->setProgram(program);
 
 	std::shared_ptr<SurgSim::Graphics::UniformBase>
 	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");

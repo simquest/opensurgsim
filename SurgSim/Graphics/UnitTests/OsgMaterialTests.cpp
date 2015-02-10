@@ -18,7 +18,7 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 
 #include <gtest/gtest.h>
@@ -41,7 +41,7 @@ public:
 	}
 };
 
-class MockShader : public Shader
+class MockShader : public Program
 {
 public:
 	MOCK_CONST_METHOD0(hasGeometryShader, bool());
@@ -52,9 +52,9 @@ public:
 	MOCK_METHOD1(setVertexShaderSource, void(const std::string&));
 	MOCK_METHOD1(setFragmentShaderSource, void(const std::string&));
 
-	MOCK_METHOD1(loadGeometryShaderSource, bool(const std::string&));
-	MOCK_METHOD1(loadVertexShaderSource, bool(const std::string&));
-	MOCK_METHOD1(loadFragmentShaderSource, bool(const std::string&));
+	MOCK_METHOD1(loadGeometryShader, bool(const std::string&));
+	MOCK_METHOD1(loadVertexShader, bool(const std::string&));
+	MOCK_METHOD1(loadFragmentShader, bool(const std::string&));
 
 	MOCK_CONST_METHOD1(getGeometryShaderSource, bool(std::string*));
 	MOCK_CONST_METHOD1(getVertexShaderSource, bool(std::string*));
@@ -74,7 +74,7 @@ TEST(OsgMaterialTests, InitTest)
 	auto material = std::make_shared<OsgMaterial>("material");
 
 	EXPECT_EQ(0u, material->getNumUniforms());
-	EXPECT_EQ(nullptr, material->getShader());
+	EXPECT_EQ(nullptr, material->getProgram());
 
 	EXPECT_NE(nullptr, material->getOsgStateSet());
 }
@@ -141,32 +141,32 @@ TEST(OsgMaterialTests, SetAndClearShaderTest)
 	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<Material> material = osgMaterial;
 
-	EXPECT_EQ(nullptr, material->getShader());
+	EXPECT_EQ(nullptr, material->getProgram());
 
-	std::shared_ptr<OsgShader> osgShader = std::make_shared<OsgShader>();
-	std::shared_ptr<Shader> shader = osgShader;
+	std::shared_ptr<OsgProgram> osgProgram = std::make_shared<OsgProgram>();
+	std::shared_ptr<Program> program = osgProgram;
 
 	const osg::StateSet::AttributeList& attributes = osgMaterial->getOsgStateSet()->getAttributeList();
 
-	// Set the material's shader
-	EXPECT_TRUE(material->setShader(shader));
-	EXPECT_EQ(shader, material->getShader());
+	// Set the material's program
+	EXPECT_TRUE(material->setProgram(program));
+	EXPECT_EQ(program, material->getProgram());
 
 	EXPECT_EQ(1u, attributes.size());
-	EXPECT_EQ(osgShader->getOsgProgram(), attributes.at(osg::StateAttribute::TypeMemberPair(
+	EXPECT_EQ(osgProgram->getOsgProgram(), attributes.at(osg::StateAttribute::TypeMemberPair(
 				  osg::StateAttribute::PROGRAM, 0)).first) <<
-						  "Shader should have been added to the material's state attributes!";
+						  "Program should have been added to the material's state attributes!";
 
-	/// Try setting a non-OSG Shader
+	/// Try setting a non-OSG Program
 	std::shared_ptr<MockShader> nonOsgShader = std::make_shared<MockShader>();
-	EXPECT_FALSE(material->setShader(nonOsgShader)) <<
-			"Should not be able to set a shader that is not a subclass of OsgShader!";
-	EXPECT_NE(nonOsgShader, material->getShader());
+	EXPECT_FALSE(material->setProgram(nonOsgShader)) <<
+			"Should not be able to set a program that is not a subclass of OsgProgram!";
+	EXPECT_NE(nonOsgShader, material->getProgram());
 
-	/// Clear the shader
-	material->clearShader();
-	EXPECT_EQ(nullptr, material->getShader());
-	EXPECT_EQ(0u, attributes.size()) << "Shader should have been removed from the material's state attributes!";
+	/// Clear the program
+	material->clearProgram();
+	EXPECT_EQ(nullptr, material->getProgram());
+	EXPECT_EQ(0u, attributes.size()) << "Program should have been removed from the material's state attributes!";
 }
 
 TEST(OsgMaterialTests, NamedAccessTest)

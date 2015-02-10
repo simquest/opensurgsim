@@ -28,7 +28,7 @@ namespace Graphics
 {
 
 class UniformBase;
-class Shader;
+class Program;
 
 /// Base class that defines the interface for graphics materials.
 ///
@@ -90,15 +90,15 @@ public:
 
 	/// Sets the shader used by this material.
 	/// \param	shader	Shader program.
-	/// \return	True if shader was set successfully, otherwise false.
-	virtual bool setShader(std::shared_ptr<Shader> shader) = 0;
+	/// \return	True if program was set successfully, otherwise false.
+	virtual bool setProgram(std::shared_ptr<Program> program) = 0;
 
 	/// Gets the shader used by this material.
 	/// \return	Shader program.
-	virtual std::shared_ptr<Shader> getShader() const = 0;
+	virtual std::shared_ptr<Program> getProgram() const = 0;
 
 	/// Removes the shader from the material, falling back to fixed-function pipeline.
-	virtual void clearShader() = 0;
+	virtual void clearProgram() = 0;
 };
 
 };  // namespace Graphics

@@ -23,7 +23,7 @@
 #include "SurgSim/Graphics/Material.h"
 #include "SurgSim/Graphics/RenderTarget.h"
 #include "SurgSim/Graphics/Representation.h"
-#include "SurgSim/Graphics/Shader.h"
+#include "SurgSim/Graphics/Program.h"
 #include "SurgSim/Graphics/UniformBase.h"
 #include "SurgSim/Graphics/View.h"
 #include "SurgSim/Graphics/ViewElement.h"
