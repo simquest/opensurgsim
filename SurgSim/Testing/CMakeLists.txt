@@ -29,7 +29,7 @@ set(SURGSIM_TESTING_SOURCES
 
 set(SURGSIM_TESTING_HEADERS
 	MathUtilities.h
-	MockInputComponent.cpp
+	MockInputComponent.h
 	MockInputOutput.h
 	MockPhysicsManager.h
 	SerializationMockComponent.h

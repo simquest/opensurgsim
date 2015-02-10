@@ -30,8 +30,8 @@ class MockInputComponent : public SurgSim::Input::InputComponent
 {
 public:
 	/// Constructor
-	/// \parameter name The name.
-	MockInputComponent(const std::string& name);
+	/// \param name The name.
+	explicit MockInputComponent(const std::string& name);
 
 	/// Set the data that this mock InputComponent will provide via getData.
 	/// \param data The datagroup as if from a device.
