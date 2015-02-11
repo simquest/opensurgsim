@@ -117,9 +117,11 @@ SurgSim::Math::MlcpConstraintType Fem3DRepresentationContact::getMlcpConstraintT
 	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 }
 
-SurgSim::Physics::RepresentationType Fem3DRepresentationContact::getRepresentationType() const
+std::string Fem3DRepresentationContact::getRepresentationType() const
 {
-	return REPRESENTATION_TYPE_FEM3D;
+	//	auto representation = std::make_shared<Fem3DRepresentation>("temp");
+	//	return representation->getClassName();
+	return "SurgSim::Physics::Fem3DRepresentation";
 }
 
 size_t Fem3DRepresentationContact::doGetNumDof() const

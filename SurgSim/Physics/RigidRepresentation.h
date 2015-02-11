@@ -51,7 +51,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentation);
 
-	RepresentationType getType() const override;
+	std::string getType() const override;
 
 	/// Set the current linear velocity of the rigid representation
 	/// \param linearVelocity The linear velocity

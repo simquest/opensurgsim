@@ -61,9 +61,11 @@ SurgSim::Math::MlcpConstraintType FixedRepresentationBilateral3D::getMlcpConstra
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-SurgSim::Physics::RepresentationType FixedRepresentationBilateral3D::getRepresentationType() const
+std::string FixedRepresentationBilateral3D::getRepresentationType() const
 {
-	return REPRESENTATION_TYPE_FIXED;
+//	auto representation = std::make_shared<FixedRepresentation>("temp");
+//	return representation->getClassName();
+	return "SurgSim::Physics::FixedRepresentation";
 }
 
 size_t FixedRepresentationBilateral3D::doGetNumDof() const

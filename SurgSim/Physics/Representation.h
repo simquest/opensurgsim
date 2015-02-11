@@ -39,19 +39,6 @@ namespace Physics
 
 class Localization;
 
-enum RepresentationType
-{
-	REPRESENTATION_TYPE_INVALID = -1,
-	REPRESENTATION_TYPE_FIXED = 0,
-	REPRESENTATION_TYPE_RIGID,
-	REPRESENTATION_TYPE_VTC_RIGID,
-	REPRESENTATION_TYPE_MASSSPRING,
-	REPRESENTATION_TYPE_FEM1D,
-	REPRESENTATION_TYPE_FEM2D,
-	REPRESENTATION_TYPE_FEM3D,
-	REPRESENTATION_TYPE_COUNT
-};
-
 /// The Representation class defines the base class for all physics objects
 class Representation : public SurgSim::Framework::Representation
 {
@@ -64,8 +51,8 @@ public:
 	virtual ~Representation();
 
 	/// Query the representation type
-	/// \return the RepresentationType for this representation
-	virtual RepresentationType getType() const = 0;
+	/// \return the class name for this representation
+	virtual std::string getType() const = 0;
 
 	/// Reset the representation to its initial/default state
 	virtual void resetState();

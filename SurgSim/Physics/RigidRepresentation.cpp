@@ -54,9 +54,9 @@ RigidRepresentation::~RigidRepresentation()
 {
 }
 
-SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
+std::string RigidRepresentation::getType() const
 {
-	return REPRESENTATION_TYPE_RIGID;
+	return getClassName();
 }
 
 void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::Math::Vector6d& generalizedForce,

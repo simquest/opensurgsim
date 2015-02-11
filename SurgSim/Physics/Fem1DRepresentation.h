@@ -51,9 +51,7 @@ public:
 		const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 		const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
-	/// Query the representation type
-	/// \return the RepresentationType for this representation
-	RepresentationType getType() const override;
+	std::string getType() const override;
 
 protected:
 	bool doWakeUp() override;

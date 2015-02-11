@@ -95,9 +95,11 @@ SurgSim::Math::MlcpConstraintType MassSpringRepresentationContact::getMlcpConstr
 	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 }
 
-SurgSim::Physics::RepresentationType MassSpringRepresentationContact::getRepresentationType() const
+std::string MassSpringRepresentationContact::getRepresentationType() const
 {
-	return REPRESENTATION_TYPE_MASSSPRING;
+//	auto representation = std::make_shared<MassSpringRepresentation>("temp");
+//	return representation->getClassName();
+	return "SurgSim::Physics::MassSpringRepresentation";
 }
 
 size_t MassSpringRepresentationContact::doGetNumDof() const

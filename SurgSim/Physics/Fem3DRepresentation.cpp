@@ -75,9 +75,9 @@ Fem3DRepresentation::~Fem3DRepresentation()
 {
 }
 
-RepresentationType Fem3DRepresentation::getType() const
+std::string Fem3DRepresentation::getType() const
 {
-	return REPRESENTATION_TYPE_FEM3D;
+	return getClassName();
 }
 
 void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,

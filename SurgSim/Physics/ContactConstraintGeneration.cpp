@@ -183,5 +183,10 @@ std::shared_ptr<Localization> ContactConstraintGeneration::makeLocalization(
 	return result;
 }
 
+void ContactConstraintGeneration::addImplementation(std::shared_ptr<ConstraintImplementation> implementation)
+{
+	m_factory.addImplementation(implementation);
+}
+
 }; // Physics
 }; // SurgSim

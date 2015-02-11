@@ -44,22 +44,23 @@ public:
 
 	/// Get the instance of a ConstraintImplementation for a specific representation and
 	/// constraint type.
-	/// \param	representationType	Type of the representation.
+	/// \param	representationType	The class name of the representation.
 	/// \param	constraintType	  	Type of the constraint.
 	/// \return	a pointer to an implementation if the implementation can be found, nullptr otherwise.
 	std::shared_ptr<ConstraintImplementation> getImplementation(
-		RepresentationType representationType,
+		const std::string& representationType,
 		SurgSim::Math::MlcpConstraintType constraintType) const;
-
-private:
 
 	/// Add an implementation to the internal directory.
 	/// \param	implementation	The ConstraintImplementation to add.
 	void addImplementation(std::shared_ptr<ConstraintImplementation> implementation);
 
-	/// Lookup table for constrain implementations
-	std::shared_ptr<ConstraintImplementation>
-		m_implementations[REPRESENTATION_TYPE_COUNT][SurgSim::Math::MLCP_NUM_CONSTRAINT_TYPES];
+private:
+
+	/// Lookup table for constraint implementations
+	std::unordered_map<std::string,
+		std::unordered_map<SurgSim::Math::MlcpConstraintType, std::shared_ptr<ConstraintImplementation>>>
+		m_implementations;
 
 
 };

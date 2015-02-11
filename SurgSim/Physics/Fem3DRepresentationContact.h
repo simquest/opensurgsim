@@ -38,9 +38,7 @@ public:
 	/// \return The MLCP constraint type corresponding to this constraint implementation
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
-	/// Gets the Type of representation that this implementation is concerned with
-	/// \return RepresentationType for this implementation
-	RepresentationType getRepresentationType() const override;
+	std::string getRepresentationType() const override;
 
 private:
 	/// Gets the number of degree of freedom.

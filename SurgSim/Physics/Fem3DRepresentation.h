@@ -52,9 +52,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
 
-	/// Query the representation type
-	/// \return the RepresentationType for this representation
-	RepresentationType getType() const override;
+	std::string getType() const override;
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 			const SurgSim::Math::Vector& generalizedForce,

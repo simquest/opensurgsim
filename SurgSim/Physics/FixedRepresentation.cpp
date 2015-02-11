@@ -31,9 +31,9 @@ FixedRepresentation::~FixedRepresentation()
 }
 
 
-RepresentationType FixedRepresentation::getType() const
+std::string FixedRepresentation::getType() const
 {
-	return REPRESENTATION_TYPE_FIXED;
+	return getClassName();
 }
 
 void FixedRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)

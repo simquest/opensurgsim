@@ -42,8 +42,9 @@ class Representation;
 namespace Physics
 {
 
-class PhysicsManagerState;
+class ConstraintImplementation;
 class Localization;
+class PhysicsManagerState;
 
 /// Generate a constraint for every contact that was calculated.
 /// The general algorithm is such, for each pair of Collision Representations that has Contacts
@@ -64,6 +65,10 @@ public:
 
 	/// Destructor
 	~ContactConstraintGeneration();
+
+	/// Add an implementation to the constraint implementation factory.
+	/// \param	implementation	The ConstraintImplementation to add.
+	void addImplementation(std::shared_ptr<ConstraintImplementation> implementation);
 
 private:
 

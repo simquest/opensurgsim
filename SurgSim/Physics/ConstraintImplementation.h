@@ -59,8 +59,8 @@ public:
 	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const = 0;
 
 	/// Gets the Type of representation that this implementation is concerned with
-	/// \return RepresentationType for this implementation
-	virtual RepresentationType getRepresentationType() const = 0;
+	/// \return The class name for this implementation
+	virtual std::string getRepresentationType() const = 0;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step

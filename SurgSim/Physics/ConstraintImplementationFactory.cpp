@@ -13,11 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
+
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Physics/Fem3DRepresentationContact.h"
 #include "SurgSim/Physics/FixedRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
-#include "SurgSim/Physics/Fem3DRepresentationContact.h"
 
 namespace SurgSim
 {
@@ -36,24 +37,39 @@ ConstraintImplementationFactory::~ConstraintImplementationFactory()
 }
 
 std::shared_ptr<ConstraintImplementation> ConstraintImplementationFactory::getImplementation(
-	RepresentationType representationType,
+	const std::string& representationType,
 	SurgSim::Math::MlcpConstraintType constraintType) const
 {
-	SURGSIM_ASSERT(representationType >= 0 && representationType < REPRESENTATION_TYPE_COUNT) <<
-		"Invalid representation type " << representationType;
+	SURGSIM_ASSERT(representationType.size() > 0) <<
+		"Representation type cannot be empty";
 	SURGSIM_ASSERT(constraintType >= 0 && constraintType < SurgSim::Math::MLCP_NUM_CONSTRAINT_TYPES) <<
 		"Invalid constraint type " << constraintType;
 
-	auto implementation = m_implementations[representationType][constraintType];
+	std::shared_ptr<ConstraintImplementation> implementation;
+	auto representationImplementations = m_implementations.find(representationType);
+	if (representationImplementations != m_implementations.end())
+	{
+		auto constraintImplementation = representationImplementations->second.find(constraintType);
+		if (constraintImplementation != representationImplementations->second.end())
+		{
+			implementation = constraintImplementation->second;
+		}
+	}
+
 	SURGSIM_LOG_IF(implementation == nullptr, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
-		"No constraint implementation for representation type (" << representationType <<
-		") and constraint type (" << constraintType << ")";
+			"No constraint implementation for representation type (" << representationType <<
+			") and constraint type (" << constraintType << ")";
 
 	return implementation;
 }
 
 void ConstraintImplementationFactory::addImplementation(std::shared_ptr<ConstraintImplementation> implementation)
 {
+// 	std::unordered_map<SurgSim::Math::MlcpConstraintType,
+// 		std::shared_ptr<ConstraintImplementation>>& representationImplementations =
+// 		m_implementations[implementation->getRepresentationType()];
+// 	representationImplementations[implementation->getMlcpConstraintType()] = implementation;
+	//m_implementations[implementation->getRepresentationType()] = representationImplementations;
 	m_implementations[implementation->getRepresentationType()][implementation->getMlcpConstraintType()] =
 		implementation;
 }

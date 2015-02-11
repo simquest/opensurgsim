@@ -64,9 +64,9 @@ Fem1DRepresentation::~Fem1DRepresentation()
 {
 }
 
-RepresentationType Fem1DRepresentation::getType() const
+std::string Fem1DRepresentation::getType() const
 {
-	return REPRESENTATION_TYPE_FEM1D;
+	return getClassName();
 }
 
 void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,

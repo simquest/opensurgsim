@@ -446,9 +446,11 @@ SurgSim::Math::MlcpConstraintType MockFixedConstraintBilateral3D::getMlcpConstra
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-RepresentationType MockFixedConstraintBilateral3D::getRepresentationType() const
+std::string MockFixedConstraintBilateral3D::getRepresentationType() const
 {
-	return REPRESENTATION_TYPE_FIXED;
+	//	auto representation = std::make_shared<FixedRepresentation>("temp");
+	//	return representation->getClassName();
+	return "SurgSim::Physics::FixedRepresentation";
 }
 
 size_t MockFixedConstraintBilateral3D::doGetNumDof() const
@@ -480,9 +482,11 @@ SurgSim::Math::MlcpConstraintType MockRigidConstraintBilateral3D::getMlcpConstra
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-RepresentationType MockRigidConstraintBilateral3D::getRepresentationType() const
+std::string MockRigidConstraintBilateral3D::getRepresentationType() const
 {
-	return REPRESENTATION_TYPE_RIGID;
+	//	auto representation = std::make_shared<RigidRepresentation>("temp");
+	//	return representation->getClassName();
+	return "SurgSim::Physics::RigidRepresentation";
 }
 
 size_t MockRigidConstraintBilateral3D::doGetNumDof() const
@@ -520,9 +524,11 @@ SurgSim::Math::MlcpConstraintType MockConstraintImplementation::getMlcpConstrain
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-RepresentationType MockConstraintImplementation::getRepresentationType() const
+std::string MockConstraintImplementation::getRepresentationType() const
 {
-	return SurgSim::Physics::REPRESENTATION_TYPE_FIXED;
+	//	auto representation = std::make_shared<FixedRepresentation>("temp");
+	//	return representation->getClassName();
+	return "SurgSim::Physics::FixedRepresentation";
 }
 
 size_t MockConstraintImplementation::doGetNumDof() const
