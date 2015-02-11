@@ -34,6 +34,7 @@
 #include "SurgSim/Framework/Clock.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/Framework/Timer.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -1029,6 +1030,21 @@ bool NovintScaffold::finalizeSdk()
 bool NovintScaffold::runHapticFrame()
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+
+	static double period = 5.0;
+	static SurgSim::Framework::Timer timer;
+	static bool runOnce = true;
+	if (runOnce)
+	{
+		runOnce = false;
+		timer.setMaxNumberOfFrames(100000);
+	}
+	timer.markFrame();
+	if (timer.getCumulativeTime() >= period)
+	{
+		SURGSIM_LOG_INFO(m_logger) << "average rate: " << timer.getAverageFrameRate();
+		timer.start();
+	}
 
 	for (auto& it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
 	{
