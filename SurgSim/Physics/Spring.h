@@ -45,6 +45,12 @@ public:
 	virtual ~Spring()
 	{}
 
+	/// Initialize the Spring once everything has been set
+	/// \param state The state to initialize the Spring with
+	virtual void initialize(const SurgSim::Math::OdeState& state)
+	{
+	}
+
 	/// Gets the number of nodes the spring is connecting
 	/// \return The number of nodes
 	size_t getNumNodes() const

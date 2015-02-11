@@ -170,14 +170,17 @@ TEST(LinearSpringTests, SetGetMethods)
 	// Stiffness getter/setter
 	ls.setStiffness(0.34);
 	ASSERT_DOUBLE_EQ(0.34, ls.getStiffness());
+	ASSERT_THROW(ls.setStiffness(-0.34), SurgSim::Framework::AssertionFailure);
 
 	// Damping getter/setter
 	ls.setDamping(0.45);
 	ASSERT_DOUBLE_EQ(0.45, ls.getDamping());
+	ASSERT_THROW(ls.setDamping(-0.45), SurgSim::Framework::AssertionFailure);
 
 	// Rest length getter/setter
 	ls.setRestLength(1.23);
 	ASSERT_DOUBLE_EQ(1.23, ls.getRestLength());
+	ASSERT_THROW(ls.setRestLength(-1.23), SurgSim::Framework::AssertionFailure);
 
 	// Operator ==/!= (with same node Ids)
 	LinearSpring ls2(0, 1);
