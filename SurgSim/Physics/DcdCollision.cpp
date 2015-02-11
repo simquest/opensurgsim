@@ -56,9 +56,9 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 		++it;
 	}
 
-	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> representations =
-		state->getCollisionRepresentations();
-	for (auto representation = std::begin(representations); representation != std::end(representations);
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> activeRepresentations =
+		state->getActiveCollisionRepresentations();
+	for (auto representation = std::begin(activeRepresentations); representation != std::end(activeRepresentations);
 		++representation)
 	{
 		(*representation)->getCollisions().publish();
@@ -101,24 +101,24 @@ void DcdCollision::populateCalculationTable()
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 {
-	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> representations =
-		state->getCollisionRepresentations();
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> activeRepresentations =
+		state->getActiveCollisionRepresentations();
 
-	if (representations.size() > 1)
+	if (activeRepresentations.size() > 1)
 	{
-		for (auto it = std::begin(representations); it != std::end(representations); ++it)
+		for (auto it = std::begin(activeRepresentations); it != std::end(activeRepresentations); ++it)
 		{
 			(*it)->getCollisions().unsafeGet().clear();
 		}
 
 		std::vector<std::shared_ptr<CollisionPair>> pairs;
-		auto firstEnd = std::end(representations);
+		auto firstEnd = std::end(activeRepresentations);
 		--firstEnd;
-		for (auto first = std::begin(representations); first != firstEnd; ++first)
+		for (auto first = std::begin(activeRepresentations); first != firstEnd; ++first)
 		{
 			auto second = first;
 			++second;
-			for (; second != std::end(representations); ++second)
+			for (; second != std::end(activeRepresentations); ++second)
 			{
 				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
 				pair->setRepresentations(*first,*second);
