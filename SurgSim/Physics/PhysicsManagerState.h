@@ -76,6 +76,14 @@ public:
 	/// \return The collision representations that are known to the state.
 	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& getCollisionRepresentations();
 
+	/// Sets the active collision representations for the state.
+	/// \param val collection of all active collision representations.
+	void setActiveCollisionRepresentations(const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val);
+
+	/// Gets the list of active collision representations.
+	/// \return The active collision representations that are known to the state.
+	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& getActiveCollisionRepresentations();
+
 	/// Sets the list of constraint components
 	/// \param val collection of all constraint components
 	void setConstraintComponents(const std::vector<std::shared_ptr<ConstraintComponent>>& val);
@@ -172,6 +180,9 @@ private:
 
 	/// List of all the collision representations know to the state
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
+
+	/// List of all the active collision representations know to the state
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_activeCollisionRepresentations;
 
 	/// List of the constraint components
 	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;

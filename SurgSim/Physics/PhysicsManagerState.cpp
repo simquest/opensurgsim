@@ -85,9 +85,21 @@ void PhysicsManagerState::setCollisionRepresentations(
 }
 
 const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
-PhysicsManagerState::getCollisionRepresentations()
+	PhysicsManagerState::getCollisionRepresentations()
 {
 	return m_collisionRepresentations;
+}
+
+void PhysicsManagerState::setActiveCollisionRepresentations(
+	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val)
+{
+	m_activeCollisionRepresentations = val;
+}
+
+const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
+	PhysicsManagerState::getActiveCollisionRepresentations()
+{
+	return m_activeCollisionRepresentations;
 }
 
 void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_ptr<ConstraintComponent>>& val)
