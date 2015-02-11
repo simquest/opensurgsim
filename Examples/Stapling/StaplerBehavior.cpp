@@ -198,38 +198,36 @@ std::shared_ptr<SurgSim::Physics::Constraint> StaplerBehavior::createBilateral3D
 	std::shared_ptr<SurgSim::Physics::Constraint> constraint = nullptr;
 
 	// Create the Constraint with appropriate constraint implementation.
-	switch (otherRep->getType())
+	if (otherRep->getType() == "SurgSim::Physics::FixedRepresentation")
 	{
-		case SurgSim::Physics::REPRESENTATION_TYPE_FIXED:
-			constraint = std::make_shared<SurgSim::Physics::Constraint>(
-							 std::make_shared<SurgSim::Physics::ConstraintData>(),
-							 std::make_shared<RigidRepresentationBilateral3D>(),
-							 stapleRepLocalization,
-							 std::make_shared<FixedRepresentationBilateral3D>(),
-							 otherRepLocatization);
-			break;
-
-		case SurgSim::Physics::REPRESENTATION_TYPE_RIGID:
-			constraint = std::make_shared<SurgSim::Physics::Constraint>(
-							 std::make_shared<SurgSim::Physics::ConstraintData>(),
-							 std::make_shared<RigidRepresentationBilateral3D>(),
-							 stapleRepLocalization,
-							 std::make_shared<RigidRepresentationBilateral3D>(),
-							 otherRepLocatization);
-			break;
-
-		case SurgSim::Physics::REPRESENTATION_TYPE_FEM3D:
-			constraint = std::make_shared<SurgSim::Physics::Constraint>(
-							 std::make_shared<SurgSim::Physics::ConstraintData>(),
-							 std::make_shared<RigidRepresentationBilateral3D>(),
-							 stapleRepLocalization,
-							 std::make_shared<Fem3DRepresentationBilateral3D>(),
-							 otherRepLocatization);
-			break;
-
-		default:
-			SURGSIM_FAILURE() << "Stapling constraint not supported for this representation type";
-			break;
+		constraint = std::make_shared<SurgSim::Physics::Constraint>(
+						 std::make_shared<SurgSim::Physics::ConstraintData>(),
+						 std::make_shared<RigidRepresentationBilateral3D>(),
+						 stapleRepLocalization,
+						 std::make_shared<FixedRepresentationBilateral3D>(),
+						 otherRepLocatization);
+	}
+	else if (otherRep->getType() == "SurgSim::Physics::RigidRepresentation")
+	{
+		constraint = std::make_shared<SurgSim::Physics::Constraint>(
+						 std::make_shared<SurgSim::Physics::ConstraintData>(),
+						 std::make_shared<RigidRepresentationBilateral3D>(),
+						 stapleRepLocalization,
+						 std::make_shared<RigidRepresentationBilateral3D>(),
+						 otherRepLocatization);
+	}
+	else if (otherRep->getType() == "SurgSim::Physics::Fem3DRepresentation")
+	{
+		constraint = std::make_shared<SurgSim::Physics::Constraint>(
+						 std::make_shared<SurgSim::Physics::ConstraintData>(),
+						 std::make_shared<RigidRepresentationBilateral3D>(),
+						 stapleRepLocalization,
+						 std::make_shared<Fem3DRepresentationBilateral3D>(),
+						 otherRepLocatization);
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "Stapling constraint not supported for this representation type";
 	}
 
 	return constraint;

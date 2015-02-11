@@ -112,7 +112,7 @@ TEST_F(MassSpringRepresentationContactTest, ConstraintConstantsTest)
 	auto implementation = std::make_shared<MassSpringRepresentationContact>();
 
 	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
-	EXPECT_EQ(SurgSim::Physics::REPRESENTATION_TYPE_MASSSPRING, implementation->getRepresentationType());
+	EXPECT_EQ("SurgSim::Physics::MassSpringRepresentation", implementation->getRepresentationType());
 	EXPECT_EQ(1u, implementation->getNumDof());
 }
 

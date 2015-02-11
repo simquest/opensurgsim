@@ -201,7 +201,7 @@ TEST_F(MassSpringRepresentationTests, SetGetMethods)
 	EXPECT_DOUBLE_EQ(5.4, massSpring->getRayleighDampingStiffness());
 
 	// set/get Type
-	EXPECT_EQ(SurgSim::Physics::REPRESENTATION_TYPE_MASSSPRING, massSpring->getType());
+	EXPECT_EQ("SurgSim::Physics::MassSpringRepresentation", massSpring->getType());
 }
 
 TEST_F(MassSpringRepresentationTests, BeforeUpdateTest)

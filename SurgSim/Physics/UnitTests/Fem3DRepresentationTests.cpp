@@ -103,7 +103,7 @@ TEST_F(Fem3DRepresentationTests, ConstructorTest)
 TEST_F(Fem3DRepresentationTests, GetTypeTest)
 {
 	createFem();
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM3D, m_fem->getType());
+	EXPECT_EQ("SurgSim::Physics::Fem3DRepresentation", m_fem->getType());
 }
 
 TEST_F(Fem3DRepresentationTests, GetNumDofPerNodeTest)

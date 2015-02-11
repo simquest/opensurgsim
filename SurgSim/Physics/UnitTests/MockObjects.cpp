@@ -36,9 +36,9 @@ MockRepresentation::~MockRepresentation()
 {
 }
 
-RepresentationType MockRepresentation::getType() const
+std::string MockRepresentation::getType() const
 {
-	return REPRESENTATION_TYPE_FIXED;
+	return "SurgSim::Physics::FixedRepresentation";
 }
 
 void MockRepresentation::beforeUpdate(double dt)
@@ -120,9 +120,9 @@ MockDeformableRepresentation::MockDeformableRepresentation(const std::string& na
 	m_K = Matrix::Identity(3, 3);
 }
 
-RepresentationType MockDeformableRepresentation::getType() const
+std::string MockDeformableRepresentation::getType() const
 {
-	return SurgSim::Physics::REPRESENTATION_TYPE_INVALID;
+	return "INVALID";
 }
 
 void MockDeformableRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
@@ -404,9 +404,9 @@ std::shared_ptr<FemPlyReaderDelegate> MockFemRepresentation::getDelegate()
 	return nullptr;
 }
 
-RepresentationType MockFemRepresentation::getType() const
+std::string MockFemRepresentation::getType() const
 {
-	return REPRESENTATION_TYPE_INVALID;
+	return "Invalid";
 }
 
 std::shared_ptr<OdeSolver> MockFemRepresentation::getOdeSolver() const

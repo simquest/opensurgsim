@@ -57,7 +57,7 @@ TEST(RigidRepresentationBilateral3DTests, Constants)
 	RigidRepresentationBilateral3D constraint;
 
 	EXPECT_EQ(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT, constraint.getMlcpConstraintType());
-	EXPECT_EQ(SurgSim::Physics::REPRESENTATION_TYPE_RIGID, constraint.getRepresentationType());
+	EXPECT_EQ("SurgSim::Physics::RigidRepresentation", constraint.getRepresentationType());
 	EXPECT_EQ(3u, constraint.getNumDof());
 }
 
