@@ -85,6 +85,19 @@ std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std:
 	}
 	state->setActiveConstraints(activeConstraints);
 
+	// Compile the list of active collision representations and set it on the state.
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> activeCollisionRepresentations;
+	auto collisionRepresentations = state->getCollisionRepresentations();
+	activeCollisionRepresentations.reserve(collisionRepresentations.size());
+	for (auto it = collisionRepresentations.begin(); it != collisionRepresentations.end(); ++it)
+	{
+		if ((*it)->isActive())
+		{
+			activeCollisionRepresentations.push_back(*it);
+		}
+	}
+	state->setActiveCollisionRepresentations(activeCollisionRepresentations);
+
 	if (m_copyState)
 	{
 		return std::move(std::make_shared<PhysicsManagerState>(*state));
