@@ -119,11 +119,6 @@ void MassSpringRepresentation::setRayleighDampingMass(double massCoef)
 	m_rayleighDamping.massCoefficient = massCoef;
 }
 
-RepresentationType MassSpringRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_MASSSPRING;
-}
-
 void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 														   const SurgSim::Math::Vector& generalizedForce,
 														   const SurgSim::Math::Matrix& K,

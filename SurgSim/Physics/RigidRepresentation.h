@@ -19,8 +19,9 @@
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Framework/ObjectFactory.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/MlcpConstraintType.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 
 namespace SurgSim
@@ -28,8 +29,9 @@ namespace SurgSim
 
 namespace Physics
 {
-class RigidRepresentationState;
+class ConstraintImplementation;
 class Localization;
+class RigidRepresentationState;
 
 typedef RigidRepresentationBaseLocalization RigidRepresentationLocalization;
 
@@ -50,8 +52,6 @@ public:
 	virtual ~RigidRepresentation();
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentation);
-
-	RepresentationType getType() const override;
 
 	/// Set the current linear velocity of the rigid representation
 	/// \param linearVelocity The linear velocity
@@ -101,6 +101,8 @@ public:
 	void afterUpdate(double dt) override;
 
 	void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
+
+	std::shared_ptr<ConstraintImplementation> createConstraint(SurgSim::Math::MlcpConstraintType type) override;
 
 	/// Retrieve the rigid body 6x6 compliance matrix
 	/// \return the 6x6 compliance matrix

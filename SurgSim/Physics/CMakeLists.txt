@@ -21,7 +21,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	ConstraintComponent.cpp
 	ConstraintData.cpp
 	ConstraintImplementation.cpp
-	ConstraintImplementationFactory.cpp
 	ContactConstraintGeneration.cpp
 	DcdCollision.cpp
 	DeformableCollisionRepresentation.cpp
@@ -82,7 +81,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	ConstraintComponent.h
 	ConstraintData.h
 	ConstraintImplementation.h
-	ConstraintImplementationFactory.h
 	ContactConstraintData.h
 	ContactConstraintGeneration.h
 	DcdCollision.h

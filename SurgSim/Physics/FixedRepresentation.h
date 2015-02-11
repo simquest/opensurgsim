@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
 
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 
 namespace SurgSim
@@ -24,6 +25,7 @@ namespace SurgSim
 
 namespace Physics
 {
+class ConstraintImplementation;
 class RigidRepresentationState;
 
 typedef RigidRepresentationBaseLocalization FixedRepresentationLocalization;
@@ -44,11 +46,11 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::FixedRepresentation);
 
-	RepresentationType getType() const override;
-
 	void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
 
 	void update(double dt) override;
+
+	std::shared_ptr<ConstraintImplementation> createConstraint(SurgSim::Math::MlcpConstraintType type) override;
 };
 
 }; // Physics

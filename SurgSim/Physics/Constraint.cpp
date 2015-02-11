@@ -129,13 +129,6 @@ void Constraint::setInformation(
 	SURGSIM_ASSERT(localization1->getRepresentation() != nullptr)
 		<< "Second localization must have a Representation";
 
-	SURGSIM_ASSERT(implementation0->getRepresentationType() == localization0->getRepresentation()->getType())
-		<< "The representation associated with the first localization must be compatible with the first "
-		   "implementation.";
-	SURGSIM_ASSERT(implementation1->getRepresentationType() == localization1->getRepresentation()->getType())
-		<< "The representation associated with the second localization must be compatible with the second "
-		   "implementation.";
-
 	SURGSIM_ASSERT(implementation0->getMlcpConstraintType() != SurgSim::Math::MLCP_INVALID_CONSTRAINT) <<
 		"First implementation has an invalid constraint type";
 	SURGSIM_ASSERT(implementation1->getMlcpConstraintType() != SurgSim::Math::MLCP_INVALID_CONSTRAINT) <<

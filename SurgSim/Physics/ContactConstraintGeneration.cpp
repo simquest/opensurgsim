@@ -23,8 +23,8 @@
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/Constraint.h"
-#include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/Representation.h"
@@ -41,7 +41,6 @@ ContactConstraintGeneration::ContactConstraintGeneration(bool doCopyState) : Com
 
 ContactConstraintGeneration::~ContactConstraintGeneration()
 {
-
 }
 
 std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
@@ -108,12 +107,9 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 					// that we can change we probably will need to predefine collision pairs and their appropriate
 					// contact constraints so we can look up which constraint to use here
 
-					implementations.first = m_factory.getImplementation(
-						localizations.first->getRepresentation()->getType(),
+					implementations.first = localizations.first->getRepresentation()->createConstraint(
 						SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT);
-
-					implementations.second = m_factory.getImplementation(
-						localizations.second->getRepresentation()->getType(),
+					implementations.second = localizations.second->getRepresentation()->createConstraint(
 						SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT);
 
 					if (implementations.first != nullptr && implementations.second != nullptr)

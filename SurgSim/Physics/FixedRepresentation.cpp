@@ -15,6 +15,9 @@
 
 #include "SurgSim/Physics/FixedRepresentation.h"
 
+#include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
+#include "SurgSim/Physics/FixedRepresentationContact.h"
+
 namespace SurgSim
 {
 namespace Physics
@@ -30,12 +33,6 @@ FixedRepresentation::~FixedRepresentation()
 {
 }
 
-
-RepresentationType FixedRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_FIXED;
-}
-
 void FixedRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
 {
 	// Do Nothing it is a fixed object
@@ -44,6 +41,20 @@ void FixedRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 void FixedRepresentation::update(double dt)
 {
 	m_currentState.setPose(getPose());
+}
+
+std::shared_ptr<ConstraintImplementation> FixedRepresentation::createConstraint(SurgSim::Math::MlcpConstraintType type)
+{
+	std::shared_ptr<ConstraintImplementation> constraint;
+	if (type == SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+	{
+		constraint = std::make_shared<FixedRepresentationContact>();
+	}
+	else if (type == SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT)
+	{
+		constraint = std::make_shared<FixedRepresentationBilateral3D>();
+	}
+	return constraint;
 }
 
 }; // Physics

@@ -20,6 +20,8 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
+#include "SurgSim/Physics/RigidRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 namespace
@@ -52,11 +54,6 @@ RigidRepresentation::RigidRepresentation(const std::string& name) :
 
 RigidRepresentation::~RigidRepresentation()
 {
-}
-
-SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_RIGID;
 }
 
 void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::Math::Vector6d& generalizedForce,
@@ -475,6 +472,20 @@ void RigidRepresentation::setLinearVelocity(const SurgSim::Math::Vector3d& linea
 void RigidRepresentation::setAngularVelocity(const SurgSim::Math::Vector3d& angularVelocity)
 {
 	m_currentState.setAngularVelocity(angularVelocity);
+}
+
+std::shared_ptr<ConstraintImplementation> RigidRepresentation::createConstraint(SurgSim::Math::MlcpConstraintType type)
+{
+	std::shared_ptr<ConstraintImplementation> constraint;
+	if (type == SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+	{
+		constraint = std::make_shared<RigidRepresentationContact>();
+	}
+	else if (type == SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT)
+	{
+		constraint = std::make_shared<RigidRepresentationBilateral3D>();
+	}
+	return constraint;
 }
 
 }; // Physics

@@ -24,6 +24,8 @@
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
+#include "SurgSim/Physics/Fem3DRepresentationContact.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
 #include "SurgSim/Physics/FemElement.h"
 
@@ -73,11 +75,6 @@ Fem3DRepresentation::Fem3DRepresentation(const std::string& name) :
 
 Fem3DRepresentation::~Fem3DRepresentation()
 {
-}
-
-RepresentationType Fem3DRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_FEM3D;
 }
 
 void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
@@ -294,6 +291,20 @@ void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
+}
+
+std::shared_ptr<ConstraintImplementation> Fem3DRepresentation::createConstraint(SurgSim::Math::MlcpConstraintType type)
+{
+	std::shared_ptr<ConstraintImplementation> constraint;
+	if (type == SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+	{
+		constraint = std::make_shared<Fem3DRepresentationContact>();
+	}
+	else if (type == SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT)
+	{
+		constraint = std::make_shared<Fem3DRepresentationBilateral3D>();
+	}
+	return constraint;
 }
 
 } // namespace Physics

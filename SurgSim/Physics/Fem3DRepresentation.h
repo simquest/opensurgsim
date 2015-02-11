@@ -23,6 +23,7 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
@@ -37,6 +38,7 @@ namespace Physics
 {
 SURGSIM_STATIC_REGISTRATION(Fem3DRepresentation);
 
+class ConstraintImplementation;
 class FemPlyReaderDelegate;
 
 /// Finite Element Model 3D is a fem built with 3D FemElement
@@ -52,16 +54,14 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
 
-	/// Query the representation type
-	/// \return the RepresentationType for this representation
-	RepresentationType getType() const override;
-
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 			const SurgSim::Math::Vector& generalizedForce,
 			const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 			const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
 	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location&) override;
+
+	std::shared_ptr<ConstraintImplementation> createConstraint(SurgSim::Math::MlcpConstraintType type) override;
 
 protected:
 	bool doWakeUp() override;

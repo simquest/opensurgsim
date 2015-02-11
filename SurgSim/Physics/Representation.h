@@ -19,6 +19,7 @@
 #include <string>
 
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -36,21 +37,8 @@ class Representation;
 
 namespace Physics
 {
-
+class ConstraintImplementation;
 class Localization;
-
-enum RepresentationType
-{
-	REPRESENTATION_TYPE_INVALID = -1,
-	REPRESENTATION_TYPE_FIXED = 0,
-	REPRESENTATION_TYPE_RIGID,
-	REPRESENTATION_TYPE_VTC_RIGID,
-	REPRESENTATION_TYPE_MASSSPRING,
-	REPRESENTATION_TYPE_FEM1D,
-	REPRESENTATION_TYPE_FEM2D,
-	REPRESENTATION_TYPE_FEM3D,
-	REPRESENTATION_TYPE_COUNT
-};
 
 /// The Representation class defines the base class for all physics objects
 class Representation : public SurgSim::Framework::Representation
@@ -62,10 +50,6 @@ public:
 
 	/// Destructor
 	virtual ~Representation();
-
-	/// Query the representation type
-	/// \return the RepresentationType for this representation
-	virtual RepresentationType getType() const = 0;
 
 	/// Reset the representation to its initial/default state
 	virtual void resetState();
@@ -113,6 +97,11 @@ public:
 	/// \param location A location in 3d space.
 	/// \return A localization object for the given location.
 	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location);
+
+	/// Creates a constraint of the right type for this representation.
+	/// \param type The type of constraint.
+	/// \return A contact constraint or nullptr.
+	virtual std::shared_ptr<ConstraintImplementation> createConstraint(SurgSim::Math::MlcpConstraintType type);
 
 	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
 	/// deltaVelocity.

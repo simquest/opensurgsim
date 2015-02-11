@@ -225,17 +225,6 @@ TEST_F (ConstraintTests, TestConstructor)
 			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); });
 	}
 
-	{
-		SCOPED_TRACE("Representation mismatch between Implementation and Localization");
-
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, fixedImp, rigidLoc, rigidImp, fixedLoc); },
-			SurgSim::Framework::AssertionFailure);
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, rigidImp, fixedLoc, fixedImp, rigidLoc); },
-			SurgSim::Framework::AssertionFailure);
-	}
-
 	// Need more checks for the other error conditions
 
 	Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);

@@ -17,6 +17,7 @@
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
 
@@ -127,6 +128,11 @@ void Representation::driveSceneElementPose(const SurgSim::Math::RigidTransform3d
 			sceneElement->setPose(pose);
 		}
 	}
+}
+
+std::shared_ptr<ConstraintImplementation> Representation::createConstraint(SurgSim::Math::MlcpConstraintType type)
+{
+	return nullptr;
 }
 
 }; // namespace Physics
