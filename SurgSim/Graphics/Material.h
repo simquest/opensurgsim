@@ -88,12 +88,12 @@ public:
 	virtual size_t getNumUniforms() const = 0;
 
 
-	/// Sets the shader used by this material.
-	/// \param	shader	Shader program.
+	/// Sets the program used by this material.
+	/// \param	program	Shader program.
 	/// \return	True if program was set successfully, otherwise false.
 	virtual bool setProgram(std::shared_ptr<Program> program) = 0;
 
-	/// Gets the shader used by this material.
+	/// Gets the program used by this material.
 	/// \return	Shader program.
 	virtual std::shared_ptr<Program> getProgram() const = 0;
 

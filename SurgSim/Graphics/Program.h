@@ -32,8 +32,10 @@ namespace Graphics
 
 /// Base class that defines the interface for graphics shaders.
 ///
-/// Shaders are the programs executed on the GPU to render the scene geometry.
-class Program : public SurgSim::Framework::Accessible
+/// A program in OSS is a collection of 'shaders' that are usually executed as in sequence  (Geometry,
+/// Vertex and Fragment). Each shader itself is software that is executed on the GPU, shaders are usually introduced
+/// as source.
+class Program
 {
 public:
 
