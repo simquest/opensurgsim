@@ -397,8 +397,7 @@ void testAddForce(MockFem3DElementCorotationalTet* tet,
 	}
 
 	SurgSim::Math::Vector expectedF;
-	expectedF.resize(statet.getNumDof());
-	expectedF.setZero();
+	expectedF.setZero(statet.getNumDof());
 	Eigen::Matrix<double, 12 ,1> f = - R12x12 * K * R12x12.transpose() * (x - (R12x12 * x0));
 	SurgSim::Math::addSubVector(f, tet->getNodeIds(), 3, &expectedF);
 
@@ -408,8 +407,7 @@ void testAddForce(MockFem3DElementCorotationalTet* tet,
 	{
 		SCOPED_TRACE("Scale 1.0");
 		SurgSim::Math::Vector F;
-		F.resize(statet.getNumDof());
-		F.setZero();
+		F.setZero(statet.getNumDof());
 		tet->addForce(statet, &F);
 		EXPECT_LT((F - expectedF).norm(), epsilonAddForce);
 		if (!addLocalDeformation)
@@ -421,8 +419,7 @@ void testAddForce(MockFem3DElementCorotationalTet* tet,
 	{
 		SCOPED_TRACE("Scale 0.4");
 		SurgSim::Math::Vector F;
-		F.resize(statet.getNumDof());
-		F.setZero();
+		F.setZero(statet.getNumDof());
 		tet->addForce(statet, &F, 0.4);
 		EXPECT_LT((F - 0.4 * expectedF).norm(), epsilonAddForce);
 		if (!addLocalDeformation)
