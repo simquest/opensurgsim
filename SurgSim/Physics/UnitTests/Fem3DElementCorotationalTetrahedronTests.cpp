@@ -61,14 +61,14 @@ public:
 	const Eigen::Matrix<double, 12, 12> getRotatedStiffnessMatrix(const SurgSim::Math::OdeState& state) const
 	{
 		Eigen::Matrix<double, 12, 12> RKRt;
-		computeMatrices(state, nullptr, nullptr, &RKRt);
+		computeRotationMassAndStiffness(state, nullptr, nullptr, &RKRt);
 		return RKRt;
 	}
 
 	const Eigen::Matrix<double, 12, 12> getRotatedMassMatrix(const SurgSim::Math::OdeState& state) const
 	{
 		Eigen::Matrix<double, 12, 12> RMRt;
-		computeMatrices(state, nullptr, &RMRt, nullptr);
+		computeRotationMassAndStiffness(state, nullptr, &RMRt, nullptr);
 		return RMRt;
 	}
 
@@ -77,16 +77,16 @@ public:
 	/// \param [out] R rotation matrix of the element in the given state (can be nullptr if not needed)
 	/// \param [out] Me, Ke Respectively the mass and stiffness matrices (Me and/or Ke be nullptr if not needed)
 	/// \note The model is not viscoelastic but purely elastic, so there is no damping matrix here.
-	void computeMatrices(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix33d* R,
+	void computeRotationMassAndStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix33d* R,
 		Eigen::Matrix<double, 12, 12>* Me, Eigen::Matrix<double, 12, 12>* Ke) const
 	{
-		Fem3DElementCorotationalTetrahedron::computeMatrices(state, R, Me, Ke);
+		Fem3DElementCorotationalTetrahedron::computeRotationMassAndStiffness(state, R, Me, Ke);
 	}
 
 	const SurgSim::Math::Matrix33d getRotation(const SurgSim::Math::OdeState& state) const
 	{
 		SurgSim::Math::Matrix33d R;
-		computeMatrices(state, &R, nullptr, nullptr);
+		computeRotationMassAndStiffness(state, &R, nullptr, nullptr);
 		return R;
 	}
 
@@ -230,7 +230,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, InitializeTest)
 		SurgSim::Framework::AssertionFailure);
 }
 
-TEST_F(Fem3DElementCorotationalTetrahedronTests, ComputeMatricesTest)
+TEST_F(Fem3DElementCorotationalTetrahedronTests, ComputeRotationMassAndStiffnessTest)
 {
 	using SurgSim::Math::skew;
 	using SurgSim::Math::makeSkewSymmetricMatrix;
@@ -248,7 +248,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, ComputeMatricesTest)
 		MockFem3DElementCorotationalTet tet(m_nodeIds);
 		tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
-		ASSERT_NO_THROW(tet.computeMatrices(m_state, &R, &M, &K));
+		ASSERT_NO_THROW(tet.computeRotationMassAndStiffness(m_state, &R, &M, &K));
 		EXPECT_TRUE(R.isIdentity());
 		EXPECT_TRUE(K.isApprox(tet.getNonRotatedStiffnessMatrix()));
 		EXPECT_TRUE(M.isApprox(tet.getNonRotatedMassMatrix()));
@@ -263,7 +263,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, ComputeMatricesTest)
 		MockFem3DElementCorotationalTet tet(m_nodeIds);
 		tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
-		ASSERT_NO_THROW(tet.computeMatrices(m_state, &R, &M, &K));
+		ASSERT_NO_THROW(tet.computeRotationMassAndStiffness(m_state, &R, &M, &K));
 		EXPECT_TRUE(R.isIdentity());
 		EXPECT_TRUE(K.isApprox(tet.getNonRotatedStiffnessMatrix()));
 		EXPECT_TRUE(M.isApprox(tet.getNonRotatedMassMatrix()));
@@ -278,7 +278,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, ComputeMatricesTest)
 		MockFem3DElementCorotationalTet tet(m_nodeIds);
 		tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
-		ASSERT_NO_THROW(tet.computeMatrices(m_state, &R, &M, &K));
+		ASSERT_NO_THROW(tet.computeRotationMassAndStiffness(m_state, &R, &M, &K));
 		EXPECT_TRUE(R.isApprox(m_rotation));
 		// The corotational stiffness has more terms than R.K0.R^t
 		// But, these terms are in the order of epsilon is no scaling is involved in the transformation.
@@ -298,7 +298,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, ComputeMatricesTest)
 		MockFem3DElementCorotationalTet tet(m_nodeIds);
 		tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
-		ASSERT_NO_THROW(tet.computeMatrices(m_state, &R, &M, &K));
+		ASSERT_NO_THROW(tet.computeRotationMassAndStiffness(m_state, &R, &M, &K));
 		EXPECT_TRUE(R.isApprox(m_rotation));
 		// The corotational stiffness has more terms than R.K0.R^t
 		// But, these terms are in the order of epsilon is no scaling is involved in the transformation.
@@ -319,7 +319,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, ComputeMatricesTest)
 		MockFem3DElementCorotationalTet tet(m_nodeIds);
 		tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
-		ASSERT_NO_THROW(tet.computeMatrices(m_state, &R, &M, &K));
+		ASSERT_NO_THROW(tet.computeRotationMassAndStiffness(m_state, &R, &M, &K));
 		EXPECT_TRUE(R.isApprox(m_rotation));
 		// The corotational stiffness has more terms than R.K0.R^t
 		// But, these terms are in the order of epsilon is no scaling is involved in the transformation.
@@ -363,7 +363,7 @@ void testAddMass(MockFem3DElementCorotationalTet* tet,
 	Eigen::Matrix<double, 12, 12> M0 = tet->getNonRotatedMassMatrix();
 	Matrix33d R;
 	Eigen::Matrix<double, 12, 12> Mrot;
-	tet->computeMatrices(state, &R, &Mrot, nullptr);
+	tet->computeRotationMassAndStiffness(state, &R, &Mrot, nullptr);
 	Eigen::Matrix<double, 12, 12> R12x12 = make12x12(Eigen::Matrix<double, 3, 3>(R));
 
 	Matrix expectedM = Matrix::Zero(state.getNumDof(), state.getNumDof());
@@ -387,7 +387,7 @@ void testAddFMDK(MockFem3DElementCorotationalTet* tet,
 	Eigen::Matrix<double, 12, 12> M0 = tet->getNonRotatedMassMatrix();
 	Matrix33d R;
 	Eigen::Matrix<double, 12, 12> Mrot;
-	tet->computeMatrices(state, &R, &Mrot, nullptr);
+	tet->computeRotationMassAndStiffness(state, &R, &Mrot, nullptr);
 	Eigen::Matrix<double, 12, 12> R12x12 = make12x12(Eigen::Matrix<double, 3, 3>(R));
 
 	Vector expectedF = Vector::Zero(state.getNumDof());

@@ -64,7 +64,7 @@ void Fem3DElementCorotationalTetrahedron::addForce(const SurgSim::Math::OdeState
 	Eigen::Matrix<double, 12, 1> x, R_x0, f;
 	SurgSim::Math::Matrix33d R;
 
-	computeMatrices(state, &R, nullptr, &RKRt);
+	computeRotationMassAndStiffness(state, &R, nullptr, &RKRt);
 
 	// R.K.(R^-1.x - x0) = Fext
 	// 0 = Fext + Fint     with Fint = -R.K.R^-1.(x - R.x0)
@@ -82,7 +82,7 @@ void Fem3DElementCorotationalTetrahedron::addStiffness(const SurgSim::Math::OdeS
 {
 	Eigen::Matrix<double, 12, 12> RKRt;
 
-	computeMatrices(state, nullptr, nullptr, &RKRt);
+	computeRotationMassAndStiffness(state, nullptr, nullptr, &RKRt);
 
 	addSubMatrix(RKRt * scale, getNodeIds(), 3, K);
 }
@@ -92,7 +92,7 @@ void Fem3DElementCorotationalTetrahedron::addMass(const SurgSim::Math::OdeState&
 {
 	Eigen::Matrix<double, 12, 12> RMRt;
 
-	computeMatrices(state, nullptr, &RMRt, nullptr);
+	computeRotationMassAndStiffness(state, nullptr, &RMRt, nullptr);
 
 	addSubMatrix(RMRt * scale, getNodeIds(), 3, M);
 }
@@ -107,7 +107,7 @@ void Fem3DElementCorotationalTetrahedron::addFMDK(const SurgSim::Math::OdeState&
 	Eigen::Matrix<double, 12, 1> x, R_x0, f;
 	SurgSim::Math::Matrix33d R;
 
-	computeMatrices(state, &R, &RMRt, &RKRt);
+	computeRotationMassAndStiffness(state, &R, &RMRt, &RKRt);
 
 	// Assemble the force Fint = -R.K.R^-1.(x - R.x0)
 	getSubVector(state.getPositions(), m_nodeIds, 3, &x);
@@ -135,7 +135,7 @@ void Fem3DElementCorotationalTetrahedron::addMatVec(const SurgSim::Math::OdeStat
 	}
 
 	Eigen::Matrix<double, 12, 12> RMRt, RKRt;
-	computeMatrices(state, nullptr, (alphaM != 0 ? &RMRt : nullptr), (alphaK != 0 ? &RKRt : nullptr));
+	computeRotationMassAndStiffness(state, nullptr, (alphaM != 0 ? &RMRt : nullptr), (alphaK != 0 ? &RKRt : nullptr));
 
 	Eigen::Matrix<double, 12, 1> vectorLocal, resultLocal = Eigen::Matrix<double, 12, 1>::Zero();
 	getSubVector(vector, m_nodeIds, 3, &vectorLocal);
@@ -156,10 +156,10 @@ void Fem3DElementCorotationalTetrahedron::addMatVec(const SurgSim::Math::OdeStat
 	addSubVector(resultLocal, m_nodeIds, 3, result);
 }
 
-void Fem3DElementCorotationalTetrahedron::computeMatrices(const SurgSim::Math::OdeState& state,
-														  SurgSim::Math::Matrix33d* rotation,
-														  Eigen::Matrix<double, 12, 12>* Me,
-														  Eigen::Matrix<double, 12, 12>* Ke) const
+void Fem3DElementCorotationalTetrahedron::computeRotationMassAndStiffness(const SurgSim::Math::OdeState& state,
+																		  SurgSim::Math::Matrix33d* rotation,
+																		  Eigen::Matrix<double, 12, 12>* Me,
+																		  Eigen::Matrix<double, 12, 12>* Ke) const
 {
 	using SurgSim::Math::makeSkewSymmetricMatrix;
 	using SurgSim::Math::skew;

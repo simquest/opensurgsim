@@ -71,7 +71,7 @@ protected:
 	/// \param [out] R rotation matrix of the element in the given state (can be nullptr if not needed)
 	/// \param [out] Me, Ke Respectively the mass and stiffness matrices (Me and/or Ke be nullptr if not needed)
 	/// \note The model is not viscoelastic but purely elastic, so there is no damping matrix here.
-	void computeMatrices(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix33d* R,
+	void computeRotationMassAndStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix33d* R,
 		Eigen::Matrix<double, 12, 12>* Me, Eigen::Matrix<double, 12, 12>* Ke) const;
 
 	/// The constant inverse matrix of the undeformed tetrahedron homogeneous 4 points coordinates.
