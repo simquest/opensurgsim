@@ -236,11 +236,9 @@ struct NovintScaffold::DeviceData
 		torqueScale(Vector3d::Constant(1.0)),
 		positionScale(device->getPositionScale()),
 		orientationScale(device->getOrientationScale()),
-		position(Vector3d::Zero()),
 		jointAngles(Vector3d::Zero()),
 		force(Vector3d::Zero()),
 		torque(Vector4d::Zero()),
-		orientationTransform(RigidTransform3d::Identity()),
 		scaledPose(RigidTransform3d::Identity())
 	{
 		buttonStates.fill(false);
@@ -292,10 +290,6 @@ struct NovintScaffold::DeviceData
 	/// The scaling factors for the torque axes.
 	Vector3d torqueScale;
 
-	/// The position value from the device.
-	Vector3d position;
-	/// The orientation value from the device.  If the device is not 7Dof the orientation is always Identity.
-	RigidTransform3d orientationTransform;
 	/// The pose value from the device, after scaling.
 	RigidTransform3d scaledPose;
 
@@ -630,28 +624,56 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 	return result;
 }
 
-
-bool NovintScaffold::updateDevice(DeviceData* info)
+bool NovintScaffold::updateDeviceOutput(DeviceData* info)
 {
-	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-
-	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
-
-	// TODO(bert): this code should cache the access indices.
-
 	hdlMakeCurrent(info->deviceHandle->get());	// This device is now "current", and all hdlXxx calls apply to it.
 	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
 
-	// Receive the current device position (in meters), orientation transform, and button state bitmap.
-	hdlGripGetAttributev(HDL_GRIP_POSITION, 0, info->position.data());
-	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributev(HDL_GRIP_POSITION)");
+	info->force.setZero();
+	info->torque.setZero();
+	if (info->isDeviceHomed)
+	{
+		bool desiredGravityCompensation = false;
+		if (info->deviceObject->getOutputData().booleans().get("gravityCompensation", &desiredGravityCompensation))
+		{
+			setGravityCompensation(info, desiredGravityCompensation);
+		}
+		calculateForceAndTorque(info);
+	}
+
+	// Set the force command (in newtons).
+	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
+	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
+
+	// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not used
+	// anywhere at the moment.
+	// The 2nd arg to this call is the count; we're setting 4 doubles.
+	hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torque.data());
+	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+
+	return !fatalError;
+}
+
+bool NovintScaffold::updateDeviceInput(DeviceData* info)
+{
+	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
+	hdlMakeCurrent(info->deviceHandle->get());	// This device is now "current", and all hdlXxx calls apply to it.
+	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
 
 	info->buttonStates.fill(false);
 	hdlGripGetAttributesb(HDL_GRIP_BUTTON, static_cast<int>(info->buttonStates.size()), info->buttonStates.data());
 	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesb(HDL_GRIP_BUTTON)");
 
+	checkDeviceHoming(info);
+	if (info->isPositionHomed)
+	{
+		hdlGripGetAttributev(HDL_GRIP_POSITION, 0, info->scaledPose.translation().data());
+		fatalError = checkForFatalError(fatalError, "hdlGripGetAttributev(HDL_GRIP_POSITION)");
+		info->scaledPose.translation() *= info->positionScale;
+	}
+
 	// Get the additional 7DoF data if available.
-	if (info->isDevice7Dof)
+	if (info->isDevice7Dof && info->isOrientationHomed)
 	{
 		// We compute the device orientation from the joint angles, for two reasons.  The first that it lets us
 		// compensate for recurrent bugs in the HDAL grip code.  The second is that we'll need the joint angles in
@@ -672,38 +694,10 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 			Vector3d(Vector3d::UnitY()));
 		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
 			Vector3d(Vector3d::UnitZ()));
-		Matrix33d orientation = rotationY * rotationZ * rotationX;
-		// Put the result into the orientation transform
-		info->orientationTransform.linear() = orientation;
+		info->scaledPose.linear() = rotationY * rotationZ * rotationX;
 	}
-
-	checkDeviceHoming(info);
-
-	info->force.setZero();
-	info->torque.setZero();
-	if (info->isDeviceHomed)
-	{
-		bool desiredGravityCompensation = false;
-		if (outputData.booleans().get("gravityCompensation", &desiredGravityCompensation))
-		{
-			setGravityCompensation(info, desiredGravityCompensation);
-		}
-
-		calculateForceAndTorque(info);
-	}
-
-	// Set the force command (in newtons).
-	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
-	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
-
-	// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not used
-	// anywhere at the moment.
-	// The 2nd arg to this call is the count; we're setting 4 doubles.
-	hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torque.data());
-	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 
 	setInputData(info);
-
 	return !fatalError;
 }
 
@@ -729,12 +723,12 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 		info->isDeviceHeld = true;  // ...I guess
 	}
 
-	if (info->isPositionHomed && info->isOrientationHomed && ! info->isDeviceHomed)
+	if (info->isPositionHomed && info->isOrientationHomed && !info->isDeviceHomed)
 	{
 		// Wait until the tool is pointed forwards (i.e. perpendicular to the Falcon centerline) before proclaiming the
 		// whole device homed.
 		Vector3d forwardDirection = Vector3d::UnitX();
-		double forwardMetric = forwardDirection.dot(info->orientationTransform.linear() * forwardDirection);
+		double forwardMetric = forwardDirection.dot(info->scaledPose.linear() * forwardDirection);
 
 		if (forwardMetric >= info->forwardPointingPoseThreshold)
 		{
@@ -742,18 +736,6 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 			info->isDeviceHomed = true;
 		}
 	}
-
-	if (! info->isPositionHomed)
-	{
-		info->position.setZero();
-	}
-	if (! info->isOrientationHomed)
-	{
-		info->orientationTransform.setIdentity();
-	}
-
-	info->scaledPose.translation() = info->position * info->positionScale;
-	info->scaledPose.linear() = info->orientationTransform.linear();
 }
 
 void NovintScaffold::calculateForceAndTorque(DeviceData* info)
@@ -1050,10 +1032,16 @@ bool NovintScaffold::runHapticFrame()
 
 	for (auto& it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
 	{
-		(*it)->deviceObject->pullOutput();
-		if (updateDevice((*it).get()))
+		if (updateDeviceInput((*it).get()))
 		{
 			(*it)->deviceObject->pushInput();
+		}
+	}
+	for (auto& it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
+	{
+		if (updateDeviceOutput((*it).get()))
+		{
+			(*it)->deviceObject->pullOutput();
 		}
 	}
 
