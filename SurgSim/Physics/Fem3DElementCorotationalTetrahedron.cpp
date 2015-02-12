@@ -73,7 +73,7 @@ void Fem3DElementCorotationalTetrahedron::addForce(const SurgSim::Math::OdeState
 	{
 		getSubVector(R_x0, nodeId, 3) = R * getSubVector(m_x0, nodeId, 3);
 	}
-	f = - scale * (RKRt * (x - R_x0));
+	f = -scale * (RKRt * (x - R_x0));
 	addSubVector(f, m_nodeIds, 3, F);
 }
 
@@ -115,7 +115,7 @@ void Fem3DElementCorotationalTetrahedron::addFMDK(const SurgSim::Math::OdeState&
 	{
 		getSubVector(R_x0, nodeId, 3) = R * getSubVector(m_x0, nodeId, 3);
 	}
-	f = - RKRt * (x - R_x0);
+	f = -RKRt * (x - R_x0);
 	addSubVector(f, m_nodeIds, 3, F);
 
 	// Assemble the stiffness matrix
