@@ -17,6 +17,7 @@
 #define SURGSIM_FRAMEWORK_CLOCK_H
 
 #include <boost/chrono.hpp>
+#include <boost/thread.hpp>
 
 /// \file
 /// Place for a simple wrapper around boost
