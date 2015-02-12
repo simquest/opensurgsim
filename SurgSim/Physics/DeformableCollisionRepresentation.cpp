@@ -41,20 +41,6 @@ DeformableCollisionRepresentation::~DeformableCollisionRepresentation()
 {
 }
 
-void DeformableCollisionRepresentation::setMesh(std::shared_ptr<SurgSim::DataStructures::TriangleMesh> mesh)
-{
-	SURGSIM_ASSERT(!isInitialized()) << "Can't set mesh after initialization.";
-	SURGSIM_ASSERT(mesh != nullptr) << "Can't use nullptr mesh.";
-
-	m_shape = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
-	m_mesh = m_shape->getMesh();
-}
-
-std::shared_ptr<SurgSim::DataStructures::TriangleMesh> DeformableCollisionRepresentation::getMesh() const
-{
-	return m_mesh;
-}
-
 void DeformableCollisionRepresentation::update(const double& dt)
 {
 	auto physicsRepresentation = m_deformable.lock();
@@ -65,14 +51,14 @@ void DeformableCollisionRepresentation::update(const double& dt)
 	auto odeState = physicsRepresentation->getCurrentState();
 	const size_t numNodes = odeState->getNumNodes();
 
-	SURGSIM_ASSERT(m_mesh->getNumVertices() == numNodes) <<
+	SURGSIM_ASSERT(m_shape->getNumVertices() == numNodes) <<
 		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 	{
-		m_mesh->setVertexPosition(nodeId, odeState->getPosition(nodeId));
+		m_shape->setVertexPosition(nodeId, odeState->getPosition(nodeId));
 	}
-	m_mesh->update();
+	m_shape->update();
 	m_shape->updateAabbTree();
 }
 
@@ -81,7 +67,6 @@ bool DeformableCollisionRepresentation::doInitialize()
 	bool result = false;
 	if (nullptr != m_shape && m_shape->isValid())
 	{
-		m_mesh = m_shape->getMesh();
 		result = true;
 	}
 
@@ -97,8 +82,7 @@ bool DeformableCollisionRepresentation::doWakeUp()
 	auto state = physicsRepresentation->getCurrentState();
 	SURGSIM_ASSERT(nullptr != state) <<
 		"DeformableRepresentation " << physicsRepresentation->getName() << " holds an empty OdeState.";
-	SURGSIM_ASSERT(nullptr != m_mesh) << "m_mesh is empty.";
-	SURGSIM_ASSERT(m_mesh->getNumVertices() == state->getNumNodes()) <<
+	SURGSIM_ASSERT(m_shape->getNumVertices() == state->getNumNodes()) <<
 		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	update(0.0);
@@ -118,7 +102,6 @@ void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::
 
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
 	m_shape = meshShape;
-	m_mesh = meshShape->getMesh();
 }
 
 const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::getShape() const

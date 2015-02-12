@@ -39,33 +39,30 @@ namespace Collision
 
 TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 {
-	SurgSim::Framework::Runtime runtime("config.txt");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
-	auto meshShape = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
+	auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>();
+	ASSERT_NO_THROW(mesh->load(fileName));
+
+	auto originalMesh = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
+	auto expectedMesh = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
 
 	auto collisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Collision");
-	collisionRepresentation->setShape(meshShape);
+	collisionRepresentation->setShape(originalMesh);
 	collisionRepresentation->setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
 	collisionRepresentation->update(dt);
 
-	auto originalMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*meshShape->getMesh());
-	auto expectedMesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(*meshShape->getMesh());
-	auto actualMesh
-		= std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getShape())->getMesh();
-
+	auto actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getShape());
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
 
-	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(
-									 Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5), Vector3d(8.7, -4.7, -3.1));
-
+	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5),
+			Vector3d(8.7, -4.7, -3.1));
 	collisionRepresentation->setLocalPose(transform);
 	collisionRepresentation->update(dt);
 
-	expectedMesh->copyWithTransform(transform, *originalMesh);
-
+	expectedMesh->setPose(transform);
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
 }
@@ -77,7 +74,7 @@ TEST(ShapeCollisionRepresentationTest, SerializationTest)
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SurgSim::Math::MeshShape>();
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
-	EXPECT_NO_THROW(meshShape->loadInitialMesh(fileName));
+	EXPECT_NO_THROW(meshShape->load(fileName));
 
 	auto collisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Collision");
 	collisionRepresentation->setValue("Shape", shape);
@@ -101,9 +98,9 @@ TEST(ShapeCollisionRepresentationTest, SerializationTest)
 	auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(
 					newShapeCollisionRepresentation->getValue<std::shared_ptr<SurgSim::Math::Shape>>("Shape"));
 	ASSERT_TRUE(nullptr != mesh);
-	EXPECT_EQ(meshShape->getMesh()->getNumEdges(), mesh->getMesh()->getNumEdges());
-	EXPECT_EQ(meshShape->getMesh()->getNumTriangles(), mesh->getMesh()->getNumTriangles());
-	EXPECT_EQ(meshShape->getMesh()->getNumVertices(), mesh->getMesh()->getNumVertices());
+	EXPECT_EQ(meshShape->getNumEdges(), mesh->getNumEdges());
+	EXPECT_EQ(meshShape->getNumTriangles(), mesh->getNumTriangles());
+	EXPECT_EQ(meshShape->getNumVertices(), mesh->getNumVertices());
 }
 
 } // namespace Collision

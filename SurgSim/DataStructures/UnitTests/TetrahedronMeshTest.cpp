@@ -282,7 +282,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
 
-		const std::vector<MockTriangleMeshBase::VertexType>& vertices = mesh.getVertices();
+		const std::vector<MockTetrahedronMesh::VertexType>& vertices = mesh.getVertices();
 		EXPECT_EQ(i + 1, vertices.size());
 
 		/// Make sure each vertex is set properly
@@ -302,7 +302,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createEdge(testEdgesVerticesId[i]));
 		EXPECT_EQ(i + 1, mesh.getNumEdges());
 
-		const std::vector<MockTriangleMeshBase::EdgeType>& edges = mesh.getEdges();
+		const std::vector<MockTetrahedronMesh::EdgeType>& edges = mesh.getEdges();
 		EXPECT_EQ(i + 1, edges.size());
 
 		/// Make sure each vertex is set properly
@@ -321,7 +321,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
 
-		const std::vector<MockTriangleMeshBase::TriangleType>& triangles = mesh.getTriangles();
+		const std::vector<MockTetrahedronMesh::TriangleType>& triangles = mesh.getTriangles();
 		EXPECT_EQ(i + 1, triangles.size());
 
 		/// Make sure each vertex is set properly
@@ -414,7 +414,7 @@ TEST_F(TetrahedronMeshTest, SetVertexPositionsTest)
 	EXPECT_EQ(1, mesh.getNumUpdates());
 	EXPECT_EQ(testPositions.size(), mesh.getNumVertices());
 
-	const std::vector<MockMesh::VertexType>& vertices = mesh.getVertices();
+	const std::vector<MockTetrahedronMesh::VertexType>& vertices = mesh.getVertices();
 	EXPECT_EQ(testPositions.size(), vertices.size());
 
 	/// Make sure each vertex is set properly

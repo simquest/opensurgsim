@@ -19,12 +19,9 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/DataStructures/Location.h"
-#include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
-#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h" ///< Used to initialize the Component Fem3DRepresentation
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -205,13 +202,12 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 	createFem();
 	ASSERT_NO_THROW(m_fem->setFilename("Geometry/wound_deformable.ply"));
 
-	std::string path = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
-	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlain> triangleMesh =
-		SurgSim::DataStructures::loadTriangleMesh(path);
+	auto triangleMesh = std::make_shared<SurgSim::Math::MeshShape>();
+	triangleMesh->load("Geometry/wound_deformable.ply");
 
 	// Create the collision mesh for the surface of the finite element model
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
-	collisionRepresentation->setMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>(*triangleMesh));
+	collisionRepresentation->setShape(triangleMesh);
 	m_fem->setCollisionRepresentation(collisionRepresentation);
 
 	bool wokeUp = false;

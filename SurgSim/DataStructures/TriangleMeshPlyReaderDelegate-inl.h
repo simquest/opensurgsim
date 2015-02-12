@@ -16,6 +16,10 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESHPLYREADERDELEGATE_INL_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESHPLYREADERDELEGATE_INL_H
 
+#include <cstddef>
+
+#include "SurgSim/Math/Vector.h"
+
 template <class M>
 SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::TriangleMeshPlyReaderDelegate() :
 	m_mesh(std::make_shared<M>())
