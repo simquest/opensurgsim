@@ -133,16 +133,6 @@ TEST(FemElementTests, InitializeMethods)
 	ASSERT_NO_THROW(femElement.initialize(fakeState));
 }
 
-TEST(FemElementTests, UpdateTest)
-{
-	MockFemElement femElement;
-	SurgSim::Math::OdeState state;
-
-	// By default, FemElement are considered elements of linear deformation,
-	// therefore no update is required, they return simply true.
-	EXPECT_TRUE(femElement.update(state));
-}
-
 void checkValidCoordinate(const MockFemElement& femElement, double v0, bool expected)
 {
 	Vector naturalCoordinate(1);

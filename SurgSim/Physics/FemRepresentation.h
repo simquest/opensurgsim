@@ -101,12 +101,6 @@ public:
 	/// \param dt The time step (in seconds)
 	void beforeUpdate(double dt) override;
 
-	/// Postprocessing done after the update call
-	/// \param dt The time step (in seconds)
-	/// \note This method will update all FemElement with the final state
-	/// \note and potentially deactivate/reset the representation if necessary.
-	void afterUpdate(double dt) override;
-
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
 	/// \return The vector containing f(x,v)

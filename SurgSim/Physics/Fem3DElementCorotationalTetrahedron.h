@@ -53,22 +53,26 @@ public:
 
 	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale = 1.0) override;
 
+	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale = 1.0) override;
+
+	void addFMDK(const SurgSim::Math::OdeState& state,
+		SurgSim::Math::Vector* F,
+		SurgSim::Math::Matrix* M,
+		SurgSim::Math::Matrix* D,
+		SurgSim::Math::Matrix* K) override;
+
 	void addMatVec(const SurgSim::Math::OdeState& state,
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result) override;
 
-	/// Update the element co-rotational frame. Updating as well the stiffness matrix.
-	/// \param state The state from which the element rigid transformation needs to be computed
-	/// \return True if the update was successful, false otherwise, in which case the representation should be
-	/// deactivated (invalid data).
-	bool update(const SurgSim::Math::OdeState& state) override;
-
 protected:
-	/// The element rigid rotation
-	SurgSim::Math::Matrix33d m_rotation;
-
-	/// The co-rotational stiffness matrix
-	Eigen::Matrix<double, 12, 12> m_corotationalStiffnessMatrix;
+	/// Compute the rotation, mass and stiffness matrices of the element from the given state
+	/// \param state The state to compute the rotation and jacobians from
+	/// \param [out] R rotation matrix of the element in the given state (can be nullptr if not needed)
+	/// \param [out] Me, Ke Respectively the mass and stiffness matrices (Me and/or Ke be nullptr if not needed)
+	/// \note The model is not viscoelastic but purely elastic, so there is no damping matrix here.
+	void computeMatrices(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix33d* R,
+		Eigen::Matrix<double, 12, 12>* Me, Eigen::Matrix<double, 12, 12>* Ke) const;
 
 	/// The constant inverse matrix of the undeformed tetrahedron homogeneous 4 points coordinates.
 	/// This is useful to compute the deformation gradient from which the element rotation is extracted.
