@@ -367,12 +367,6 @@ bool MockFemElement::isInitialized() const
 	return m_isInitialized;
 }
 
-bool InvalidMockFemElement::update(const SurgSim::Math::OdeState& state)
-{
-	return false;
-}
-
-
 MockFemRepresentation::MockFemRepresentation(const std::string& name) : FemRepresentation(name)
 {
 	this->m_numDofPerNode = 3;

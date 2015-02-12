@@ -190,28 +190,6 @@ void FemRepresentation::beforeUpdate(double dt)
 			<<	"State has not been initialized yet, call setInitialState() prior to running the simulation";
 }
 
-void FemRepresentation::afterUpdate(double dt)
-{
-	DeformableRepresentation::afterUpdate(dt);
-
-	// Update the elements with the final state
-	std::for_each(m_femElements.begin(), m_femElements.end(),
-		[this](std::shared_ptr<FemElement> element)
-		{
-			if (!element->update(*m_finalState))
-			{
-				SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-					<< getName() << " deactivated :" << std::endl
-					<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
-					<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
-
-				setLocalActive(false);
-				return;
-			}
-		}
-	);
-}
-
 SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
