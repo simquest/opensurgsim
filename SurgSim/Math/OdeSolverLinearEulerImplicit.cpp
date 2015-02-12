@@ -26,6 +26,14 @@ OdeSolverLinearEulerImplicit::OdeSolverLinearEulerImplicit(OdeEquation* equation
 	: OdeSolverEulerImplicit(equation), m_initialized(false)
 {
 	m_name = "Ode Solver Linear Euler Implicit";
+
+	// The system being linear, only 1 iteration is necessary to find the exact solution.
+	setNewtonRaphsonMaximumIteration(1);
+}
+
+void OdeSolverLinearEulerImplicit::setNewtonRaphsonMaximumIteration(size_t maximumIteration)
+{
+	m_maximumIteration = 1;
 }
 
 void OdeSolverLinearEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
