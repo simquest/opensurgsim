@@ -188,11 +188,6 @@ Eigen::Matrix<double, 12, 12> make12x12(const Eigen::Matrix<double, 3, 3>& R)
 	}
 	return res;
 }
-// Duplicates 4 times a 3x3 matrix on the diagonal blocks, with the 3x3 row-major matrix stored in a vector
-Eigen::Matrix<double, 12, 12> make12x12(const Eigen::Matrix<double, 9, 1>& R)
-{
-	return make12x12(Eigen::Matrix<double, 3, 3>(R.data()));
-}
 }; // anonymous namespace
 
 TEST_F(Fem3DElementCorotationalTetrahedronTests, ConstructorTest)
