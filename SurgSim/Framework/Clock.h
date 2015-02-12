@@ -31,17 +31,22 @@ namespace Framework
 typedef boost::chrono::high_resolution_clock Clock;
 
 /// A more accurate sleep_until that accounts for scheduler errors
+/// \tparam C Clock type
+/// \tparam D Duration type
+/// \param time The time point in absolute time to sleep until
 template <class C, class D>
 void sleep_until(const boost::chrono::time_point<C, D>& time)
 {
-	boost::chrono::duration<double> schedulerError(0.002);
+	// 2ms gives good results on windows and linux
+	static const boost::chrono::duration<double> schedulerError(0.002);
+
 	boost::chrono::time_point<C, D> earlierTime = time - schedulerError;
-	if (earlierTime > Clock::now())
+	if (earlierTime > C::now())
 	{
 		boost::this_thread::sleep_until(earlierTime);
 	}
 
-	while (Clock::now() < time)
+	while (C::now() < time)
 	{
 		boost::this_thread::yield();
 	}
