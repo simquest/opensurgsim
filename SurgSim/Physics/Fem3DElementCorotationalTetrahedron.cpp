@@ -165,17 +165,11 @@ void Fem3DElementCorotationalTetrahedron::computeRotationMassAndStiffness(const 
 	using SurgSim::Math::skew;
 	using SurgSim::Math::Vector3d;
 
-	// This method does two things:
-	// 1) Recompute the element's rotation
-	// 2) Update the element's stiffness matrix based on the new rotation
+	SurgSim::Math::Matrix33d R;
 
-	// Let's use the rotation matrix if it is provided, otherwise use a local variable to store this information.
-	SurgSim::Math::Matrix33d rotationLocal, *rotationPtr = &rotationLocal;
-	if (rotation != nullptr)
-	{
-		rotationPtr = rotation;
-	}
-	SurgSim::Math::Matrix33d &R = *rotationPtr;
+	// This method does two things:
+	// 1) Recompute the element's rotation R
+	// 2) Update the element's stiffness matrix based on the new rotation
 
 	// 1) Recompute the element's rotation R
 	Eigen::Matrix<double, 12, 1> x;
@@ -201,6 +195,11 @@ void Fem3DElementCorotationalTetrahedron::computeRotationMassAndStiffness(const 
 	// Compute the polar decomposition of F to extract the rotation and the scaling parts.
 	SurgSim::Math::Matrix33d scaling;
 	F.computeRotationScaling(&R, &scaling);
+
+	if (rotation != nullptr)
+	{
+		*rotation = std::move(R);
+	}
 
 	if (std::abs(R.determinant() - 1.0) > 1e-8)
 	{
