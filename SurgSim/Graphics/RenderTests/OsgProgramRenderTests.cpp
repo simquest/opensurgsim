@@ -102,7 +102,7 @@ struct OsgShaderRenderTests : public RenderTest
 
 /// Pops up a window with a sphere colored by its normals and its mirror along the x-axis is also drawn using the
 /// geometry shader
-TEST_F(OsgShaderRenderTests, SphereShaderTest)
+TEST_F(OsgProgramRenderTests, SphereShaderTest)
 {
 	/// Add the sphere representation to the view element, no need to make another scene element
 	std::shared_ptr<SphereRepresentation> sphereRepresentation =
@@ -110,7 +110,7 @@ TEST_F(OsgShaderRenderTests, SphereShaderTest)
 	sphereRepresentation->setRadius(0.25);
 	sphereRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.25, 0.0, -1.0)));
 
-	/// Add a shader to the sphere
+	/// Add a material to the sphere
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<Program> program = loadExampleProgram(*applicationData);
 
@@ -127,7 +127,7 @@ TEST_F(OsgShaderRenderTests, SphereShaderTest)
 
 }
 
-TEST_F(OsgShaderRenderTests, ShinyShaderTest)
+TEST_F(OsgProgramRenderTests, ShinyShaderTest)
 {
 	/// Add the sphere representation to the view element, no need to make another scene element
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Sphere");
@@ -169,7 +169,7 @@ TEST_F(OsgShaderRenderTests, ShinyShaderTest)
 
 }
 
-TEST_F(OsgShaderRenderTests, TexturedShinyShaderTest)
+TEST_F(OsgProgramRenderTests, TexturedShinyShaderTest)
 {
 	// The textured Sphere
 	std::shared_ptr<SphereRepresentation> sphereRepresentation =

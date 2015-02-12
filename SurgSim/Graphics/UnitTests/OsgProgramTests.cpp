@@ -161,7 +161,7 @@ void expectFileContents(const std::string& filePath, const std::string& contents
 
 	std::string fileLine;
 	std::string resultLine;
-	while (! fileStream.eof() && ! resultStream.eof())
+	while (!fileStream.eof() && !resultStream.eof())
 	{
 		fileStream >> fileLine;
 		resultStream >> resultLine;

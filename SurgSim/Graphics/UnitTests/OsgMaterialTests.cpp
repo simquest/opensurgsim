@@ -41,7 +41,7 @@ public:
 	}
 };
 
-class MockShader : public Program
+class MockProgram : public Program
 {
 public:
 	MOCK_CONST_METHOD0(hasGeometryShader, bool());
@@ -158,7 +158,7 @@ TEST(OsgMaterialTests, SetAndClearShaderTest)
 						  "Program should have been added to the material's state attributes!";
 
 	/// Try setting a non-OSG Program
-	std::shared_ptr<MockShader> nonOsgShader = std::make_shared<MockShader>();
+	std::shared_ptr<MockProgram> nonOsgShader = std::make_shared<MockProgram>();
 	EXPECT_FALSE(material->setProgram(nonOsgShader)) <<
 			"Should not be able to set a program that is not a subclass of OsgProgram!";
 	EXPECT_NE(nonOsgShader, material->getProgram());

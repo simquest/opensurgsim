@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-OsgProgram::OsgProgram() : SurgSim::Graphics::Program(),
+OsgProgram::OsgProgram() : Program(),
 	m_program(new osg::Program()),
 	m_globalScope(false)
 {
@@ -201,7 +201,7 @@ bool OsgProgram::getShaderSource(int shaderType, std::string* source) const
 osg::ref_ptr<osg::Shader> OsgProgram::getOrCreateOsgShader(int shaderType)
 {
 	osg::ref_ptr<osg::Shader> result;
-	if (! hasShader(shaderType))
+	if (!hasShader(shaderType))
 	{
 		result = new osg::Shader(OsgShaderTypes[shaderType]);
 		m_program->addShader(result);
@@ -221,7 +221,7 @@ std::shared_ptr<OsgProgram> loadProgram(const SurgSim::Framework::ApplicationDat
 
 	std::string filename;
 
-	auto shader(std::make_shared<SurgSim::Graphics::OsgProgram>());
+	auto program(std::make_shared<SurgSim::Graphics::OsgProgram>());
 	bool success = true;
 	filename = data.findFile(vertexShaderName);
 	if (filename == "")
@@ -230,13 +230,12 @@ std::shared_ptr<OsgProgram> loadProgram(const SurgSim::Framework::ApplicationDat
 				<< "Could not find vertex shader " << vertexShaderName;
 		success = false;
 	}
-	else if (! shader->loadVertexShader(filename))
+	else if (!program->loadVertexShader(filename))
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
 				<< "Could not load vertex shader " << vertexShaderName;
 		success = false;
 	}
-
 
 	filename = data.findFile(fragmentShaderName);
 	if (filename == "")
@@ -245,7 +244,7 @@ std::shared_ptr<OsgProgram> loadProgram(const SurgSim::Framework::ApplicationDat
 				<< "Could not find fragment shader " << fragmentShaderName;
 		success = false;
 	}
-	if (! shader->loadFragmentShader(filename))
+	if (!program->loadFragmentShader(filename))
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
 				<< "Could not load fragment shader " << fragmentShaderName;
@@ -254,10 +253,10 @@ std::shared_ptr<OsgProgram> loadProgram(const SurgSim::Framework::ApplicationDat
 
 	if (!success)
 	{
-		shader = nullptr;
+		program = nullptr;
 	}
 
-	return shader;
+	return program;
 }
 
 }

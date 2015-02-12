@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_SHADER_H
-#define SURGSIM_GRAPHICS_SHADER_H
+#ifndef SURGSIM_GRAPHICS_PROGRAM_H
+#define SURGSIM_GRAPHICS_PROGRAM_H
 
 #include <string>
-#include <SurgSim/Framework/Accessible.h>
+#include "SurgSim/Framework/Accessible.h"
 
 namespace SurgSim
 {
@@ -30,11 +30,12 @@ class Asset;
 namespace Graphics
 {
 
-/// Base class that defines the interface for graphics shaders.
+/// Base class that defines the interface for graphics programs.
 ///
-/// A program in OSS is a collection of 'shaders' that are usually executed as in sequence  (Geometry,
+/// A program in OSS is a collection of 'shaders' that are usually executed in sequence  (Geometry,
 /// Vertex and Fragment). Each shader itself is software that is executed on the GPU, shaders are usually introduced
-/// as source.
+/// as source. The concept is similar to the use of program in
+/// OpenGl see https://www.opengl.org/sdk/docs/man4/html/glCreateProgram.xhtml
 class Program
 {
 public:
