@@ -29,11 +29,6 @@ namespace DataStructures
 class DataGroup;
 }
 
-namespace Testing
-{
-class MockInputComponent;
-}
-
 namespace Input
 {
 class DeviceInterface;
@@ -94,13 +89,13 @@ protected:
 	/// \return An InputConsumerInterface.
 	std::shared_ptr<InputConsumerInterface> getConsumer();
 
-private:
-	friend class SurgSim::Testing::MockInputComponent;
-
-	/// Name of the device to which this input component connects
-	std::string m_deviceName;
 	/// Indicates if this input component is connected to a device
 	bool m_deviceConnected;
+
+private:
+	/// Name of the device to which this input component connects
+	std::string m_deviceName;
+
 	/// Input consumer which brings in information from hardware device
 	std::shared_ptr<InputConsumer> m_input;
 };
