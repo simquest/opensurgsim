@@ -93,6 +93,8 @@ protected:
 private:
 	/// Initialize the list of computations.
 	/// Derived class(es) could override this method to have a customized list of computations.
+	/// \param copyState Indicates if the output state in Computation::Update() is a copy or not of the input state
+	/// \sa SurgSim::Physics::Computation
 	virtual void initializeComputations(bool copyState);
 
 	/// Get an iterator to an excluded collision pair.
