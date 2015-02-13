@@ -87,13 +87,13 @@ std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std:
 
 	// Compile the list of active collision representations and set it on the state.
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> activeCollisionRepresentations;
-	auto collisionRepresentations = state->getCollisionRepresentations();
+	const auto& collisionRepresentations = state->getCollisionRepresentations();
 	activeCollisionRepresentations.reserve(collisionRepresentations.size());
-	for (auto it = collisionRepresentations.begin(); it != collisionRepresentations.end(); ++it)
+	for (const auto& collisionRepresentation : collisionRepresentations)
 	{
-		if ((*it)->isActive())
+		if (collisionRepresentation->isActive())
 		{
-			activeCollisionRepresentations.push_back(*it);
+			activeCollisionRepresentations.push_back(collisionRepresentation);
 		}
 	}
 	state->setActiveCollisionRepresentations(activeCollisionRepresentations);

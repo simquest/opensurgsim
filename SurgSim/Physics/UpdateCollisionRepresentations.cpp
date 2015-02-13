@@ -36,10 +36,9 @@ std::shared_ptr<PhysicsManagerState> SurgSim::Physics::UpdateCollisionRepresenta
 		const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
-	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> activeRepresentations =
-				result->getActiveCollisionRepresentations();
+	auto& representations = result->getActiveCollisionRepresentations();
 
-	std::for_each(activeRepresentations.begin(), activeRepresentations.end(),
+	std::for_each(representations.begin(), representations.end(),
 				  [&dt](std::shared_ptr<SurgSim::Collision::Representation> representation)
 	{
 		representation->update(dt);
