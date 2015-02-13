@@ -113,7 +113,8 @@ public:
 	bool operator !=(const Spring& spring) const;
 
 protected:
-	/// Compute the stiffness matrix Ke = -dF1/dx1 and damping matrix De = -dF1/dv1 of this spring for a given state
+	/// Compute the stiffness matrix Ke = -dF1/dx1 and damping matrix De = -dF1/dv1 of this spring for a given state,
+	/// where this spring is defined by its 2 nodes positions {x1, x2}, velocities {v1, v2} and forces {F1, F2=-F1}.
 	/// \param state The state to compute the jacobians from
 	/// \param [out] De, Ke Respectively the damping and stiffness matrices De and Ke
 	/// \note This method calculate only the 3x3 parts related to the force applied on the first node,

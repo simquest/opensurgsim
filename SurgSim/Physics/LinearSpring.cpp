@@ -106,6 +106,13 @@ void LinearSpring::addDamping(const OdeState& state, Matrix* D, double scale)
 {
 	Matrix33d De;
 
+	// The spring has 2 nodes with positions {x1, x2}, velocities {v1, v2} and force {F1, F2=-F1}
+	// Also note from addForce that the positions and velocities play a symmetric role in the force calculation
+	// i.e. dFi/dx1 = -dFi/dx2 and dFi/dv1 = -dFi/dv2
+	// The damping matrix is D = -dF/dv = (-dF1/dv1 -dF1/dv2) = (-dF1/dv1  dF1/dv1)
+	//                                    (-dF2/dv1 -dF2/dv2)   ( dF1/dv1 -dF1/dv1)
+
+	// Let's compute De = -dF1/dv1
 	computeMatrices(state, &De, nullptr);
 
 	// Assembly stage in D
@@ -119,6 +126,13 @@ void LinearSpring::addStiffness(const OdeState& state, Matrix* K, double scale)
 {
 	Matrix33d Ke;
 
+	// The spring has 2 nodes with positions {x1, x2}, velocities {v1, v2} and force {F1, F2=-F1}
+	// Also note from addForce that the positions and velocities play a symmetric role in the force calculation
+	// i.e. dFi/dx1 = -dFi/dx2 and dFi/dv1 = -dFi/dv2
+	// The stiffness matrix is K = -dF/dx = (-dF1/dx1 -dF1/dx2) = (-dF1/dx1  dF1/dx1)
+	//                                      (-dF2/dx1 -dF2/dx2)   ( dF1/dx1 -dF1/dx1)
+
+	// Let's compute Ke = -dF1/dx1
 	computeMatrices(state, nullptr, &Ke);
 
 	// Assembly stage in K
@@ -132,6 +146,15 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, Matrix* D, Matrix* K
 {
 	Matrix33d De, Ke;
 
+	// The spring has 2 nodes with positions {x1, x2}, velocities {v1, v2} and force {F1, F2=-F1}
+	// Also note from addForce that the positions and velocities play a symmetric role in the force calculation
+	// i.e. dFi/dx1 = -dFi/dx2 and dFi/dv1 = -dFi/dv2
+	// The stiffness matrix is K = -dF/dx = (-dF1/dx1 -dF1/dx2) = (-dF1/dx1  dF1/dx1)
+	//                                      (-dF2/dx1 -dF2/dx2)   ( dF1/dx1 -dF1/dx1)
+	// The damping matrix is D = -dF/dv = (-dF1/dv1 -dF1/dv2) = (-dF1/dv1  dF1/dv1)
+	//                                    (-dF2/dv1 -dF2/dv2)   ( dF1/dv1 -dF1/dv1)
+
+	// Let's compute De = -dF1/dv1 and Ke = -dF1/dx1
 	computeMatrices(state, &De, &Ke);
 
 	// Assembly stage in F. Note that the force calculation does not rely on any matrices.
