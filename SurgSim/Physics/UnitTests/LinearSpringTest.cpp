@@ -168,15 +168,24 @@ TEST(LinearSpringTests, SetGetMethods)
 	LinearSpring ls(0, 1);
 
 	// Stiffness getter/setter
-	ls.setStiffness(0.34);
+	ASSERT_THROW(ls.setStiffness(-0.34), SurgSim::Framework::AssertionFailure);
+	ASSERT_NO_THROW(ls.setStiffness(0.0));
+	ASSERT_DOUBLE_EQ(0.0, ls.getStiffness());
+	ASSERT_NO_THROW(ls.setStiffness(0.34));
 	ASSERT_DOUBLE_EQ(0.34, ls.getStiffness());
 
 	// Damping getter/setter
-	ls.setDamping(0.45);
+	ASSERT_THROW(ls.setDamping(-0.45), SurgSim::Framework::AssertionFailure);
+	ASSERT_NO_THROW(ls.setDamping(0.0));
+	ASSERT_DOUBLE_EQ(0.0, ls.getDamping());
+	ASSERT_NO_THROW(ls.setDamping(0.45));
 	ASSERT_DOUBLE_EQ(0.45, ls.getDamping());
 
 	// Rest length getter/setter
-	ls.setRestLength(1.23);
+	ASSERT_THROW(ls.setRestLength(-1.23), SurgSim::Framework::AssertionFailure);
+	ASSERT_NO_THROW(ls.setRestLength(0.0));
+	ASSERT_DOUBLE_EQ(0.0, ls.getRestLength());
+	ASSERT_NO_THROW(ls.setRestLength(1.23));
 	ASSERT_DOUBLE_EQ(1.23, ls.getRestLength());
 
 	// Operator ==/!= (with same node Ids)
@@ -203,6 +212,73 @@ TEST(LinearSpringTests, SetGetMethods)
 	ASSERT_TRUE(ls != ls3);
 	ls3.setRestLength(ls.getRestLength());
 	ASSERT_TRUE(ls != ls3);
+}
+
+namespace
+{
+void initializeTest(bool setStiffness, bool setDamping, bool setRestLength, bool expectException)
+{
+	LinearSpring ls(0, 1);
+	SurgSim::Math::OdeState state;
+	std::string scopeTrace;
+
+	state.setNumDof(3, 2);
+
+	if (setStiffness)
+	{
+		ls.setStiffness(1.23);
+		scopeTrace += "Stiffness set; ";
+	}
+	else
+	{
+		scopeTrace += "Stiffness unset; ";
+	}
+
+	if (setDamping)
+	{
+		ls.setDamping(1.23);
+		scopeTrace += "Damping set; ";
+	}
+	else
+	{
+		scopeTrace += "Damping unset; ";
+	}
+
+	if (setRestLength)
+	{
+		ls.setRestLength(1.23);
+		scopeTrace += "Rest length set; ";
+	}
+	else
+	{
+		scopeTrace += "Rest length unset; ";
+	}
+
+	SCOPED_TRACE(scopeTrace);
+	if (expectException)
+	{
+		EXPECT_THROW(ls.initialize(state), SurgSim::Framework::AssertionFailure);
+	}
+	else
+	{
+		EXPECT_NO_THROW(ls.initialize(state));
+	}
+}
+};
+TEST(LinearSpringTests, initializeTest)
+{
+	//            (stiff  damp   restL| expectException)
+	initializeTest(false, false, false, true);
+
+	initializeTest(true, false, false, true);
+	initializeTest(false, true, false, true);
+	initializeTest(false, false, true, true);
+
+	initializeTest(true, true, false, true);
+	initializeTest(true, false, true, false);
+	initializeTest(false, true, true, true);
+
+	initializeTest(true, true, true, false);
 }
 
 TEST(LinearSpringTests, computeMethods)

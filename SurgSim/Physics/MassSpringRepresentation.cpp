@@ -44,6 +44,19 @@ MassSpringRepresentation::~MassSpringRepresentation()
 {
 }
 
+bool MassSpringRepresentation::doInitialize()
+{
+	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
+
+	// Initialize the Springs
+	for (auto spring : m_springs)
+	{
+		spring->initialize(*m_initialState);
+	}
+
+	return true;
+}
+
 void MassSpringRepresentation::addMass(const std::shared_ptr<Mass> mass)
 {
 	m_masses.push_back(mass);
@@ -405,7 +418,7 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Surg
 	{
 		if (useGlobalStiffnessMatrix)
 		{
-			*force -= scale * rayleighStiffness * (m_K * v);
+			*force -= (scale * rayleighStiffness) * (m_K * v);
 		}
 		else
 		{
