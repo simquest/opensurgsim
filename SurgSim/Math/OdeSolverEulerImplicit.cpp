@@ -105,7 +105,8 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 
 		if (m_maximumIteration > 1)
 		{
-			double solutionVariation = (m_deltaV - m_previousDeltaV).norm();
+			// Use the infinity norm, to treat models with small or large number of dof the same way.
+			double solutionVariation = (m_deltaV - m_previousDeltaV).lpNorm<Eigen::Infinity>();
 
 			if (solutionVariation < m_epsilonConvergence)
 			{
