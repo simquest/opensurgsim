@@ -56,12 +56,10 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 		++it;
 	}
 
-	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> representations =
-		state->getCollisionRepresentations();
-	for (auto representation = std::begin(representations); representation != std::end(representations);
-		++representation)
+	auto& representations = state->getActiveCollisionRepresentations();
+	for (auto& representation : representations)
 	{
-		(*representation)->getCollisions().publish();
+		representation->getCollisions().publish();
 	}
 
 	return result;
@@ -101,8 +99,7 @@ void DcdCollision::populateCalculationTable()
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 {
-	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> representations =
-		state->getCollisionRepresentations();
+	auto& representations = state->getActiveCollisionRepresentations();
 
 	if (representations.size() > 1)
 	{
