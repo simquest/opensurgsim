@@ -119,7 +119,7 @@ protected:
 	/// \param [out] De, Ke Respectively the damping and stiffness matrices De and Ke
 	/// \note This method calculate only the 3x3 parts related to the force applied on the first node,
 	/// \note derived w.r.t. first node. By nature, we have dF2/dx2 = dF1/dx1 = -dF1/dx2 = -dF2/dx1.
-	void computeMatrices(const SurgSim::Math::OdeState& state,
+	void computeDampingAndStiffness(const SurgSim::Math::OdeState& state,
 		SurgSim::Math::Matrix33d* De,
 		SurgSim::Math::Matrix33d* Ke);
 

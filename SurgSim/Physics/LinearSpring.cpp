@@ -113,7 +113,7 @@ void LinearSpring::addDamping(const OdeState& state, Matrix* D, double scale)
 	//                                    (-dF2/dv1 -dF2/dv2)   ( dF1/dv1 -dF1/dv1)
 
 	// Let's compute De = -dF1/dv1
-	computeMatrices(state, &De, nullptr);
+	computeDampingAndStiffness(state, &De, nullptr);
 	De *= scale;
 
 	// Assembly stage in D
@@ -134,7 +134,7 @@ void LinearSpring::addStiffness(const OdeState& state, Matrix* K, double scale)
 	//                                      (-dF2/dx1 -dF2/dx2)   ( dF1/dx1 -dF1/dx1)
 
 	// Let's compute Ke = -dF1/dx1
-	computeMatrices(state, nullptr, &Ke);
+	computeDampingAndStiffness(state, nullptr, &Ke);
 	Ke *= scale;
 
 	// Assembly stage in K
@@ -157,7 +157,7 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, Matrix* D, Matrix* K
 	//                                    (-dF2/dv1 -dF2/dv2)   ( dF1/dv1 -dF1/dv1)
 
 	// Let's compute De = -dF1/dv1 and Ke = -dF1/dx1
-	computeMatrices(state, &De, &Ke);
+	computeDampingAndStiffness(state, &De, &Ke);
 
 	// Assembly stage in F. Note that the force calculation does not rely on any matrices.
 	addForce(state, F);
@@ -184,7 +184,7 @@ void LinearSpring::addMatVec(const OdeState& state, double alphaD, double alphaK
 	}
 
 	Matrix33d De, Ke;
-	computeMatrices(state, (alphaD != 0 ? &De : nullptr), (alphaK != 0 ? &Ke : nullptr));
+	computeDampingAndStiffness(state, (alphaD != 0 ? &De : nullptr), (alphaK != 0 ? &Ke : nullptr));
 
 	// Shared data: the 2x 3D vectors to multiply the matrices with
 	const auto& vector1 = vector.segment<3>(3 * m_nodeIds[0]);
@@ -205,7 +205,7 @@ void LinearSpring::addMatVec(const OdeState& state, double alphaD, double alphaK
 	}
 }
 
-void LinearSpring::computeMatrices(const OdeState& state, Matrix33d* De, Matrix33d* Ke)
+void LinearSpring::computeDampingAndStiffness(const OdeState& state, Matrix33d* De, Matrix33d* Ke)
 {
 	const auto& x0 = state.getPositions().segment<3>(3 * m_nodeIds[0]);
 	const auto& x1 = state.getPositions().segment<3>(3 * m_nodeIds[1]);
