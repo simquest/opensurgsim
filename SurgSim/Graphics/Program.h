@@ -35,7 +35,7 @@ namespace Graphics
 /// A program in OSS is a collection of 'shaders' that are usually executed in sequence  (Geometry,
 /// Vertex and Fragment). Each shader itself is software that is executed on the GPU, shaders are usually introduced
 /// as source. The concept is similar to the use of program in
-/// OpenGl see https://www.opengl.org/sdk/docs/man4/html/glCreateProgram.xhtml
+/// OpenGL see https://www.opengl.org/sdk/docs/man4/html/glCreateProgram.xhtml
 class Program
 {
 public:

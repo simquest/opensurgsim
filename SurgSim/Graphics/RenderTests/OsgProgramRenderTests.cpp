@@ -13,10 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file
-/// Render Tests for the OsgShader class.
-
-
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -95,7 +91,7 @@ std::shared_ptr<Material> createShinyMaterial(const SurgSim::Framework::Applicat
 	return material;
 }
 
-struct OsgShaderRenderTests : public RenderTest
+struct OsgProgramRenderTests : public RenderTest
 {
 
 };
@@ -124,7 +120,6 @@ TEST_F(OsgProgramRenderTests, SphereShaderTest)
 	runtime->start();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	runtime->stop();
-
 }
 
 TEST_F(OsgProgramRenderTests, ShinyShaderTest)
@@ -166,7 +161,6 @@ TEST_F(OsgProgramRenderTests, ShinyShaderTest)
 	runtime->start();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	runtime->stop();
-
 }
 
 TEST_F(OsgProgramRenderTests, TexturedShinyShaderTest)
@@ -245,7 +239,6 @@ TEST_F(OsgProgramRenderTests, TexturedShinyShaderTest)
 	runtime->start();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	runtime->stop();
-
 }
 
 };  // namespace Graphics
