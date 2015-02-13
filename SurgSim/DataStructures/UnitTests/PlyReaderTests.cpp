@@ -34,7 +34,7 @@ std::string findFile(std::string filename)
 	return data.findFile(filename);
 }
 
-typedef SurgSim::DataStructures::TriangleMesh MeshType;
+typedef SurgSim::DataStructures::TriangleMeshPlain MeshType;
 
 }
 

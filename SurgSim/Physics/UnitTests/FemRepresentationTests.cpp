@@ -215,55 +215,19 @@ TEST_F(FemRepresentationTests, BeforeUpdateTest)
 
 TEST_F(FemRepresentationTests, AfterUpdateTest)
 {
-	{
-		SCOPED_TRACE("Valid FemElements");
+	m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	m_fem->wakeUp();
 
-		m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
-		m_fem->wakeUp();
-
-		ASSERT_TRUE(m_fem->isActive());
-		ASSERT_NO_THROW(m_fem->beforeUpdate(m_dt));
-		ASSERT_TRUE(m_fem->isActive());
-		ASSERT_NO_THROW(m_fem->update(m_dt));
-		ASSERT_TRUE(m_fem->isActive());
-		// After update should backup the currentState into finalState and update all FemElement
-		ASSERT_NO_THROW(m_fem->afterUpdate(m_dt));
-		ASSERT_FALSE(*m_fem->getFinalState() == *m_fem->getInitialState());
-		ASSERT_TRUE(*m_fem->getFinalState() == *m_fem->getCurrentState());
-		ASSERT_TRUE(m_fem->isActive());
-	}
-	{
-		SCOPED_TRACE("Invalid FemElements");
-		MockFemRepresentation fem("name");
-		std::shared_ptr<InvalidMockFemElement> element = std::make_shared<InvalidMockFemElement>();
-		element->setMassDensity(m_rho);
-		element->setPoissonRatio(m_nu);
-		element->setYoungModulus(m_E);
-		// MockFemRepresentation does not connect any nodeIds by default, we need to provide them manually
-		// to construct a fake element. If none is provided, the element does not have any structure, any support,
-		// it would have no mass, no force and no stiffness/mass/damping matrix.
-		// Therefore the system would be undefined.
-		element->addNode(0);
-		element->addNode(1);
-		element->addNode(2);
-		fem.addFemElement(element);
-
-		std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
-		initialState->setNumDof(fem.getNumDofPerNode(), 3);
-		fem.setInitialState(initialState);
-
-		fem.initialize(std::make_shared<SurgSim::Framework::Runtime>());
-		fem.wakeUp();
-
-		ASSERT_TRUE(fem.isActive());
-		ASSERT_NO_THROW(fem.beforeUpdate(m_dt));
-		ASSERT_TRUE(fem.isActive());
-		ASSERT_NO_THROW(fem.update(m_dt));
-		ASSERT_TRUE(fem.isActive());
-		// After update should catch the invalid element update and deactivate the representation
-		ASSERT_NO_THROW(fem.afterUpdate(m_dt));
-		ASSERT_FALSE(fem.isActive());
-	}
+	ASSERT_TRUE(m_fem->isActive());
+	ASSERT_NO_THROW(m_fem->beforeUpdate(m_dt));
+	ASSERT_TRUE(m_fem->isActive());
+	ASSERT_NO_THROW(m_fem->update(m_dt));
+	ASSERT_TRUE(m_fem->isActive());
+	// After update should backup the currentState into finalState and update all FemElement
+	ASSERT_NO_THROW(m_fem->afterUpdate(m_dt));
+	ASSERT_FALSE(*m_fem->getFinalState() == *m_fem->getInitialState());
+	ASSERT_TRUE(*m_fem->getFinalState() == *m_fem->getCurrentState());
+	ASSERT_TRUE(m_fem->isActive());
 }
 
 TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)

@@ -15,10 +15,10 @@
 
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
@@ -153,7 +153,7 @@ std::shared_ptr<FemPlyReaderDelegate> Fem3DRepresentation::getDelegate()
 }
 
 std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElementIdMap(
-	const SurgSim::DataStructures::TriangleMesh& mesh)
+	std::shared_ptr<const SurgSim::Math::MeshShape> mesh)
 {
 	std::unordered_map<size_t, size_t> result;
 
@@ -181,7 +181,7 @@ std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElemen
 							 triangleSorted.begin(), triangleSorted.end());
 	};
 
-	auto& meshTriangles = mesh.getTriangles();
+	auto& meshTriangles = mesh->getTriangles();
 	for (auto triangle = meshTriangles.cbegin(); triangle != meshTriangles.cend(); ++triangle)
 	{
 		if (! triangle->isValid)
@@ -216,12 +216,11 @@ bool Fem3DRepresentation::doWakeUp()
 		return false;
 	}
 
-	auto deformableCollisionRepresentation
-		= std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
-
-	if (deformableCollisionRepresentation != nullptr)
+	auto deformableCollision = std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
+	if (deformableCollision != nullptr)
 	{
-		m_triangleIdToElementIdMap = createTriangleIdToElementIdMap(*deformableCollisionRepresentation->getMesh());
+		auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(deformableCollision->getShape());
+		m_triangleIdToElementIdMap = createTriangleIdToElementIdMap(mesh);
 	}
 
 	return true;
@@ -235,15 +234,14 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 	SURGSIM_ASSERT(location.meshLocalCoordinate.getValue().coordinate.size() == 3)
 			<< "Localization has incorrect size for the barycentric coordinates.";
 
-	auto deformableCollisionRepresentation
-		= std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
-
-	SURGSIM_ASSERT(deformableCollisionRepresentation != nullptr)
+	auto deformableCollision = std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
+	SURGSIM_ASSERT(deformableCollision != nullptr)
 			<< "Localization cannot be created if the DeformableCollisionRepresentation is not correctly set.";
 
 	// Find the vertex ids of the triangle.
 	size_t triangleId = location.meshLocalCoordinate.getValue().index;
-	auto triangleVertices = deformableCollisionRepresentation->getMesh()->getTriangle(triangleId).verticesId;
+	auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(deformableCollision->getShape());
+	auto triangleVertices = mesh->getTriangle(triangleId).verticesId;
 
 	// Find the vertex ids of the corresponding FemNode.
 	// Get FemElement id from the triangle id.

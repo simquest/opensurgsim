@@ -21,11 +21,17 @@ set(UNIT_TEST_SOURCES
 	ForceScaleTest.cpp
 	PoseIntegratorTest.cpp
 	PoseTransformTest.cpp
+	VelocityFromPoseTest.cpp
 )
 
 set(LIBS
 	IdentityPoseDevice
+	SurgSimDataStructures
 	SurgSimDeviceFilters
+	SurgSimFramework
+	SurgSimInput
+	SurgSimMath
+	${Boost_LIBRARIES}
 )
 
 surgsim_add_unit_tests(SurgSimDeviceFiltersTest)

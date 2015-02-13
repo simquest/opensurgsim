@@ -37,7 +37,6 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
 
-
 namespace
 {
 

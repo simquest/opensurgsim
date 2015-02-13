@@ -95,21 +95,13 @@ TEST(OsgMeshRepresentationTests, InitialisationTest)
 
 }
 
-TEST(OsgMeshRepresentationTests, FilenameTest)
-{
-	auto meshRepresentation = std::make_shared<OsgMeshRepresentation>("TestMesh");
-	std::string filename = "Geometry/arm_collision.ply";
-
-	meshRepresentation->setFilename(filename);
-	EXPECT_EQ(filename, meshRepresentation->getFilename());
-}
-
 TEST(OsgMeshRepresentationTests, SerializationTest)
 {
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	std::shared_ptr<SurgSim::Framework::Component> osgMesh = std::make_shared<OsgMeshRepresentation>("TestMesh");
-	std::string filename = "Geometry/arm_collision.ply";
+	std::string filename = "OsgMeshRepresentationTests/Cube.ply";
 
-	osgMesh->setValue("Filename", filename);
+	osgMesh->setValue("MeshFileName", filename);
 	osgMesh->setValue("UpdateOptions", 2);
 	osgMesh->setValue("DrawAsWireFrame", true);
 
@@ -127,7 +119,7 @@ TEST(OsgMeshRepresentationTests, SerializationTest)
 					node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	EXPECT_EQ("SurgSim::Graphics::OsgMeshRepresentation", newOsgMesh->getClassName());
-	EXPECT_EQ(filename, newOsgMesh->getValue<std::string>("Filename"));
+	EXPECT_EQ(filename, newOsgMesh->getMesh()->getFileName());
 	EXPECT_EQ(2u, newOsgMesh->getValue<int>("UpdateOptions"));
 	EXPECT_TRUE(newOsgMesh->getValue<bool>("DrawAsWireFrame"));
 }

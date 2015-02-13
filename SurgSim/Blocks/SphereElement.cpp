@@ -17,7 +17,7 @@
 
 #include "SurgSim/Blocks/SphereElement.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
@@ -26,7 +26,7 @@
 
 using SurgSim::Blocks::SphereElement;
 using SurgSim::Graphics::OsgMaterial;
-using SurgSim::Graphics::OsgShader;
+using SurgSim::Graphics::OsgProgram;
 using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Math::SphereShape;
 using SurgSim::Physics::RigidCollisionRepresentation;
@@ -58,9 +58,9 @@ bool SphereElement::doInitialize()
 	graphicsRepresentation->setRadius(shape->getRadius());
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+	std::shared_ptr<OsgProgram> program = std::make_shared<OsgProgram>();
 
-	shader->setVertexShaderSource(
+	program->setVertexShaderSource(
 		"varying vec4 color;\n"
 		"void main(void)\n"
 		"{\n"
@@ -68,13 +68,13 @@ bool SphereElement::doInitialize()
 		"	color.rgb = gl_Normal;\n"
 		"	color.a = 1.0;\n"
 		"}");
-	shader->setFragmentShaderSource(
+	program->setFragmentShaderSource(
 		"varying vec4 color;\n"
 		"void main(void)\n"
 		"{\n"
 		"	gl_FragColor = color;\n"
 		"}");
-	material->setShader(shader);
+	material->setProgram(program);
 	graphicsRepresentation->setMaterial(material);
 
 	addComponent(physicsRepresentation);

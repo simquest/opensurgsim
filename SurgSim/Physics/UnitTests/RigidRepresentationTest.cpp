@@ -1014,7 +1014,7 @@ TEST_F(RigidRepresentationTest, WithMeshShape)
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 
 	std::shared_ptr<SurgSim::Math::MeshShape> shape = std::make_shared<SurgSim::Math::MeshShape>();
-	shape->loadInitialMesh("MeshShapeData/staple_collision.ply");
+	shape->load("MeshShapeData/staple_collision.ply");
 	EXPECT_TRUE(shape->isValid());
 
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");

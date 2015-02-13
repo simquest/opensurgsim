@@ -29,17 +29,17 @@ set(LIBS
 	SurgSimFramework
 	SurgSimDataStructures
 	${Boost_LIBRARIES}
-	${SIXENSE_SDK_LIBRARIES}
+	${SIXENSESDK_LIBRARIES}
 )
 
 set(UNIT_TEST_SHARED_RELEASE_LIBS
-	${SIXENSE_SDK_sixense_SHARED_RELEASE}
-	${SIXENSE_SDK_sixense_utils_SHARED_RELEASE}
+	${SIXENSESDK_sixense_SHARED_RELEASE}
+	${SIXENSESDK_sixense_utils_SHARED_RELEASE}
 )
 set(UNIT_TEST_SHARED_DEBUG_LIBS
-	${SIXENSE_SDK_sixense_SHARED_DEBUG}
-	${SIXENSE_SDK_sixense_utils_SHARED_DEBUG}
-	${SIXENSE_SDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
+	${SIXENSESDK_sixense_SHARED_DEBUG}
+	${SIXENSESDK_sixense_utils_SHARED_DEBUG}
+	${SIXENSESDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
 )
 
 surgsim_add_unit_tests(SixenseDeviceTest)

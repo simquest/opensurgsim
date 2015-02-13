@@ -25,12 +25,9 @@ surgsim_add_executable(TrackIRVisualTest
 
 set(LIBS
 	IdentityPoseDevice
+	SurgSimInput 
 	TrackIRDevice  
 	VisualTestCommon
-	SurgSimDataStructures
-	SurgSimFramework 
-	SurgSimInput 
-	${OPENGL_LIBRARIES}
 	${OPTITRACK_LIBRARY}
 )
 

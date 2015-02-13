@@ -32,7 +32,7 @@ class AssetTest;
 /// in SurgSim::Framework::Runtime to load file.
 /// Classes not in SurgSim::Framework::Component hierarchy should inherit this class in
 /// order to load a file.
-class Asset : public Accessible
+class Asset : virtual public Accessible
 {
 	friend AssetTest;
 public:

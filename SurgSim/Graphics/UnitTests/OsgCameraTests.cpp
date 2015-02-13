@@ -20,6 +20,8 @@
 #include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgGroup.h"
@@ -136,12 +138,14 @@ TEST(OsgCameraTests, GroupTest)
 
 TEST(OsgCameraTests, PoseTest)
 {
+	auto runtime = std::make_shared<Framework::Runtime>();
+	auto scene = runtime->getScene();
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
 	camera->setRenderGroupReference("Test");
 	std::shared_ptr<BasicSceneElement> element = std::make_shared<BasicSceneElement>("element");
 	element->addComponent(camera);
-	element->initialize();
+	scene->addSceneElement(element);
 	camera->wakeUp();
 
 	RigidTransform3d elementPose = SurgSim::Math::makeRigidTransform(
@@ -245,10 +249,10 @@ TEST(OsgCameraTests, Serialization)
 
 	// Verify.
 	EXPECT_TRUE(boost::any_cast<SurgSim::Math::Matrix44d>(camera->getValue("ProjectionMatrix")).isApprox(
-				boost::any_cast<SurgSim::Math::Matrix44d>(newCamera->getValue("ProjectionMatrix"))));
+					boost::any_cast<SurgSim::Math::Matrix44d>(newCamera->getValue("ProjectionMatrix"))));
 
 	EXPECT_TRUE(boost::any_cast<SurgSim::Math::Vector4d>(camera->getValue("AmbientColor")).isApprox(
-				boost::any_cast<SurgSim::Math::Vector4d>(newCamera->getValue("AmbientColor"))));
+					boost::any_cast<SurgSim::Math::Vector4d>(newCamera->getValue("AmbientColor"))));
 }
 
 }  // namespace Graphics

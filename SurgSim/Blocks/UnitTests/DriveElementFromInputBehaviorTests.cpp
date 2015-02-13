@@ -21,11 +21,13 @@
 
 #include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
-#include "SurgSim/Input/InputComponent.h"
-#include "SurgSim/Input/OutputComponent.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/OutputComponent.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -72,6 +74,9 @@ TEST(DriveElementFromInputBehaviorTest, SetGetName)
 
 TEST(DriveElementFromInputBehaviorTest, Update)
 {
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	auto scene = runtime->getScene();
+
 	auto behavior = std::make_shared<DriveElementFromInputBehavior>("DriveElementFromInputBehavior");
 	auto element = std::make_shared<BasicSceneElement>("SceneElement");
 	auto device = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
@@ -82,7 +87,8 @@ TEST(DriveElementFromInputBehaviorTest, Update)
 	element->addComponent(behavior);
 	element->addComponent(inputComponent);
 
-	element->initialize();
+	scene->addSceneElement(element);
+
 	behavior->wakeUp();
 	inputComponent->wakeUp();
 
@@ -103,7 +109,7 @@ TEST(DriveElementFromInputBehaviorTest, Serialization)
 
 	auto inputComponent = std::make_shared<InputComponent>("InputComponent");
 	EXPECT_NO_THROW(behavior->setValue("Source",
-				std::static_pointer_cast<SurgSim::Framework::Component>(inputComponent)));
+									   std::static_pointer_cast<SurgSim::Framework::Component>(inputComponent)));
 	EXPECT_NO_THROW(behavior->setValue("PoseName", std::string("Test")));
 
 	YAML::Node node;
@@ -113,10 +119,10 @@ TEST(DriveElementFromInputBehaviorTest, Serialization)
 
 	std::shared_ptr<DriveElementFromInputBehavior> decodedBehavior;
 	EXPECT_NO_THROW(decodedBehavior = std::dynamic_pointer_cast<DriveElementFromInputBehavior>(
-		node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+										  node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	EXPECT_EQ("InputComponent", SurgSim::Framework::convert<std::shared_ptr<SurgSim::Framework::Component>>(
-					decodedBehavior->getValue("Source"))->getName());
+				  decodedBehavior->getValue("Source"))->getName());
 	EXPECT_EQ("Test", SurgSim::Framework::convert<std::string>(decodedBehavior->getValue("PoseName")));
 }
 

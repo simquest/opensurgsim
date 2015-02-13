@@ -34,14 +34,18 @@ namespace Framework
 {
 
 Scene::Scene(std::weak_ptr<Runtime> runtime) :
-	m_runtime(runtime)
+	m_runtime(runtime),
+	m_groups(new GroupsType())
 {
 	SURGSIM_ASSERT(!m_runtime.expired()) << "Can't create scene with empty runtime.";
 }
 
 Scene::~Scene()
 {
-
+	/// Clear out the groups references, this is needed because otherwise there will be circular references
+	/// between the SceneElements and themselves therefore preventing the release of the the sceneelement
+	/// instances, as it is shared with the sceneElements
+	m_groups->clear();
 }
 
 void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
@@ -145,6 +149,11 @@ bool Scene::decode(const YAML::Node& node)
 		result = true;
 	}
 	return result;
+}
+
+std::shared_ptr<Scene::GroupsType> Scene::getGroups()
+{
+	return m_groups;
 }
 
 }; // namespace Framework

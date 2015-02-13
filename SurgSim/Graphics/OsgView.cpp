@@ -319,7 +319,7 @@ void SurgSim::Graphics::OsgView::enableManipulator(bool val)
 
 	if (val)
 	{
-		getOsgView()->setCameraManipulator(m_manipulator);
+		getOsgView()->setCameraManipulator(m_manipulator, false);
 	}
 	else
 	{

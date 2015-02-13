@@ -56,7 +56,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Add the graphics mesh used to display the Fem3d
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("fem graphics");
-	graphics->setFilename(filename);
+	graphics->loadMesh(filename);
 	graphics->setDrawAsWireFrame(true);
 	sceneElement->addComponent(graphics);
 

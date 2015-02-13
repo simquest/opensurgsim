@@ -17,8 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/Mesh.h"
@@ -35,7 +34,6 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::DataStructures::loadTriangleMesh;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgMeshRepresentation;
@@ -139,21 +137,19 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedPlaneSceneElement(c
 std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	const std::string& name, std::string plyFilename, double scale = 1.0)
 {
-	const SurgSim::Framework::ApplicationData data("config.txt");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
-	std::string foundFilename = data.findFile(plyFilename);
-	SURGSIM_ASSERT(!foundFilename.empty()) << "Ply file '" << plyFilename << "' could not be located";
-	auto mesh = loadTriangleMesh(foundFilename);
-	for (size_t vertexId = 0; vertexId < mesh->getNumVertices(); ++vertexId)
+	auto mesh = std::make_shared<MeshShape>();
+	mesh->load(plyFilename);
+	for (auto& vertex : mesh->getVertices())
 	{
-		mesh->setVertexPosition(vertexId, mesh->getVertexPosition(vertexId) * scale);
+		vertex.position *= scale;
 	}
 
 	// Physics representation
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>("Physics");
-	std::shared_ptr<MeshShape> shape = std::make_shared<MeshShape>(*mesh);
-	physicsRepresentation->setShape(shape);
+	physicsRepresentation->setShape(mesh);
 	physicsRepresentation->setDensity(750.0); // Average mass density of oak wood
 	physicsRepresentation->setLinearDamping(1e-2);
 	physicsRepresentation->setAngularDamping(1e-4);
@@ -166,7 +162,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	// Graphic representation of the physics model
 	std::shared_ptr<OsgMeshRepresentation> osgRepresentation =
 		std::make_shared<OsgMeshRepresentation>("OsgRepresentation");
-	*osgRepresentation->getMesh() = *(std::make_shared<SurgSim::Graphics::Mesh>(*mesh));
+	osgRepresentation->setShape(mesh);
 	osgRepresentation->setDrawAsWireFrame(true);
 
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);

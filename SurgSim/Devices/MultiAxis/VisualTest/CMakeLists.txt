@@ -14,14 +14,6 @@
 # limitations under the License.
 
 
-link_directories(
-	${Boost_LIBRARY_DIRS}
-)
-
-include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
 set(EXAMPLE_SOURCES
 	main.cpp
 )
@@ -37,19 +29,11 @@ set(RAW_EXAMPLE_HEADERS
 )
 
 set(LIBS
-	MultiAxisDevice
 	IdentityPoseDevice
-	VisualTestCommon
+	MultiAxisDevice
 	SurgSimInput
-	SurgSimFramework
-	SurgSimDataStructures
-	${Boost_LIBRARIES}
-	${OPENGL_LIBRARIES}
+	VisualTestCommon
 )
-
-if(WDK_FOUND)
-	list(APPEND LIBS ${WDK_LIBRARIES})
-endif()
 
 surgsim_add_executable(MultiAxisVisualTest
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")

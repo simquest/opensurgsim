@@ -6,6 +6,6 @@ The Razer Hydra (by Sixense Entertainment and Razer USA) is a device that tracks
 
 Dependencies:
 - Requires the Sixense SDK, available through Steam http://sixense.com/hardware/sixensesdk
-- An environment variable named SIXENSE_SDK_PATH or SIXENSE_ROOT must be set to the directory containing <tt>(include\\)sixense.h</tt>
+- An environment variable named SIXENSESDK_PATH or SIXENSE_ROOT must be set to the directory containing <tt>(include\\)sixense.h</tt>
 
 */

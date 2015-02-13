@@ -38,10 +38,10 @@ using SurgSim::Math::Matrix44f;
 /// \file
 /// This example creates a simple graphics scene and use the RenderPass object to show
 /// a simple shadowing algorithm. For the algorithm see http://en.wikipedia.org/wiki/Shadow_mapping
-/// There are two preprocessing passes that use specific shaders, plus a main pass that renders the
-/// objects using a shaders that can process the output from the preprocessing steps.
-/// Each shaders output becomes the input for the next shader, some parameters from other scene elements
-/// is passed into the shaders as uniforms.
+/// There are two preprocessing passes that use specific program, plus a main pass that renders the
+/// objects using a program that can process the output from the preprocessing steps.
+/// Each program output becomes the input for the next shader, some parameters from other scene elements
+/// is passed into the program as uniforms.
 /// All of the information is kept up to date using a \sa TransferPropertiesBehavior
 /// Both the light and the main camera are being moved through a \sa PoseInterpolator to demonstrate
 /// dynamic changes and how to handle them in the rendering pipeline
@@ -92,13 +92,13 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createMaterialWithShaders(
 	const std::string& name)
 {
 
-	auto shader = SurgSim::Graphics::loadShader(data, name);
+	auto program = SurgSim::Graphics::loadProgram(data, name);
 
 	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material;
-	if (shader != nullptr)
+	if (program != nullptr)
 	{
 		material = std::make_shared<SurgSim::Graphics::OsgMaterial>(name);
-		material->setShader(shader);
+		material->setProgram(program);
 	}
 
 	return material;
@@ -144,7 +144,7 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> createLightMapPass()
 	auto renderTarget = std::make_shared<SurgSim::Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
 	pass->setRenderTarget(renderTarget);
 	pass->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
-	materials["depthMap"]->getShader()->setGlobalScope(true);
+	materials["depthMap"]->getProgram()->setGlobalScope(true);
 	pass->setMaterial(materials["depthMap"]);
 
 	return pass;
@@ -159,7 +159,7 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> createShadowMapPass()
 	auto renderTarget = std::make_shared<SurgSim::Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
 	pass->setRenderTarget(renderTarget);
 	pass->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
-	materials["shadowMap"]->getShader()->setGlobalScope(true);
+	materials["shadowMap"]->getProgram()->setGlobalScope(true);
 	pass->setMaterial(materials["shadowMap"]);
 	return pass;
 }

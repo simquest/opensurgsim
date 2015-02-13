@@ -28,9 +28,9 @@
 namespace SurgSim
 {
 
-namespace DataStructures
+namespace Math
 {
-class TriangleMesh;
+class MeshShape;
 }
 
 namespace Physics
@@ -80,7 +80,7 @@ private:
 	/// \param mesh The mesh used to produce the mapping.
 	/// \return A map from the mesh's triangle ids to this object's fem elements.
 	std::unordered_map<size_t, size_t> createTriangleIdToElementIdMap(
-		const SurgSim::DataStructures::TriangleMesh& mesh);
+			std::shared_ptr<const SurgSim::Math::MeshShape> mesh);
 
 	/// Mapping from collision triangle's id to fem element id.
 	std::unordered_map<size_t, size_t> m_triangleIdToElementIdMap;

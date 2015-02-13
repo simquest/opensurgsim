@@ -22,6 +22,9 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
 
 namespace SurgSim
 {
@@ -31,7 +34,9 @@ namespace Framework
 SceneElement::SceneElement(const std::string& name) :
 	m_name(name),
 	m_isInitialized(false),
-	m_isActive(true)
+	m_isActive(true),
+	/// Local groups for serialization local handling
+	m_groups(new SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>())
 {
 	m_pose = std::make_shared<SurgSim::Framework::PoseComponent>("Pose");
 	m_pose->setPose(SurgSim::Math::RigidTransform3d::Identity());
@@ -114,6 +119,10 @@ bool SceneElement::initialize()
 
 	// For completeness
 	m_pose->setSceneElement(getSharedPtr());
+
+	// Get my groups into the scenegroups and then copy from the scene
+	getScene()->getGroups()->add(*m_groups);
+	m_groups = getScene()->getGroups();
 
 	if (m_isInitialized)
 	{
@@ -218,6 +227,14 @@ YAML::Node SceneElement::encode(bool standalone) const
 	data["Name"] = getName();
 	data["IsActive"] = isActive();
 
+	// Only encode groups when they are there, also encode them using the flow style i.e. with []
+	auto groups = getGroups();
+	if (groups.size() > 0)
+	{
+		data["Groups"] = groups;
+		data["Groups"].SetStyle(YAML::FlowStyle);
+	}
+
 	for (auto component = std::begin(m_components); component != std::end(m_components); ++component)
 	{
 		if (standalone)
@@ -260,6 +277,11 @@ bool SceneElement::decode(const YAML::Node& node)
 			m_isActive = data["IsActive"].as<bool>();
 		}
 
+		if (data["Groups"].IsDefined())
+		{
+			setGroups(data["Groups"].as<std::vector<std::string>>());
+		}
+
 		if (data["Components"].IsSequence())
 		{
 			for (auto nodeIt = data["Components"].begin(); nodeIt != data["Components"].end(); ++nodeIt)
@@ -295,6 +317,27 @@ void SceneElement::setActive(bool val)
 bool SceneElement::isActive() const
 {
 	return m_isActive;
+}
+
+void SceneElement::addToGroup(const std::string& group)
+{
+	m_groups->add(group, getSharedPtr());
+}
+
+void SceneElement::removeFromGroup(const std::string& group)
+{
+	m_groups->remove(group, getSharedPtr());
+}
+
+void SceneElement::setGroups(const std::vector<std::string>& groups)
+{
+	m_groups->remove(getSharedPtr());
+	m_groups->add(groups, getSharedPtr());
+}
+
+std::vector<std::string> SceneElement::getGroups() const
+{
+	return m_groups->getGroups(std::const_pointer_cast<SceneElement>(shared_from_this()));
 }
 
 }; // namespace Framework
