@@ -364,7 +364,6 @@ void Runtime::addSceneElements(const std::string& fileName)
 		if (tryConvertElements(fileName, node, &elements))
 		{
 			m_scene->addSceneElements(elements);
-			result = true;
 		}
 	}
 	else
