@@ -42,35 +42,23 @@ class Spring
 {
 public:
 	/// Virtual destructor
-	virtual ~Spring()
-	{}
+	virtual ~Spring();
 
 	/// Initialize the Spring once everything has been set
 	/// \param state The state to initialize the Spring with
-	virtual void initialize(const SurgSim::Math::OdeState& state)
-	{
-	}
+	virtual void initialize(const SurgSim::Math::OdeState& state);
 
 	/// Gets the number of nodes the spring is connecting
 	/// \return The number of nodes
-	size_t getNumNodes() const
-	{
-		return m_nodeIds.size();
-	}
+	size_t getNumNodes() const;
 
 	/// Gets the springNodeId-th node id
 	/// \return The requested node id
-	size_t getNodeId(size_t springNodeId) const
-	{
-		return m_nodeIds[springNodeId];
-	}
+	size_t getNodeId(size_t springNodeId) const;
 
 	/// Gets the node ids for this spring
 	/// \return A vector containing the node ids on which the spring is attached
-	const std::vector<size_t>& getNodeIds() const
-	{
-		return m_nodeIds;
-	}
+	const std::vector<size_t>& getNodeIds() const;
 
 	/// Adds the spring force (computed for a given state) to a complete system force vector F (assembly)
 	/// \param state The state to compute the force with
