@@ -93,7 +93,7 @@ const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
 void PhysicsManagerState::setActiveCollisionRepresentations(
 	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val)
 {
-	m_activeCollisionRepresentations = std::move(val);
+	m_activeCollisionRepresentations = val;
 }
 
 const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
