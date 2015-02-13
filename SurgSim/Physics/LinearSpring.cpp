@@ -113,7 +113,10 @@ void LinearSpring::addDamping(const OdeState& state, Matrix* D, double scale)
 	//                                    (-dF2/dv1 -dF2/dv2)   ( dF1/dv1 -dF1/dv1)
 
 	// Let's compute De = -dF1/dv1
-	computeDampingAndStiffness(state, &De, nullptr);
+	if (!computeDampingAndStiffness(state, &De, nullptr))
+	{
+		return;
+	}
 	De *= scale;
 
 	// Assembly stage in D
@@ -134,7 +137,10 @@ void LinearSpring::addStiffness(const OdeState& state, Matrix* K, double scale)
 	//                                      (-dF2/dx1 -dF2/dx2)   ( dF1/dx1 -dF1/dx1)
 
 	// Let's compute Ke = -dF1/dx1
-	computeDampingAndStiffness(state, nullptr, &Ke);
+	if (!computeDampingAndStiffness(state, nullptr, &Ke))
+	{
+		return;
+	}
 	Ke *= scale;
 
 	// Assembly stage in K
@@ -148,6 +154,9 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, Matrix* D, Matrix* K
 {
 	Matrix33d De, Ke;
 
+	// Assembly stage in F. Note that the force calculation does not rely on any matrices.
+	addForce(state, F);
+
 	// The spring has 2 nodes with positions {x1, x2}, velocities {v1, v2} and force {F1, F2=-F1}
 	// Also note from addForce that the positions and velocities play a symmetric role in the force calculation
 	// i.e. dFi/dx1 = -dFi/dx2 and dFi/dv1 = -dFi/dv2
@@ -157,10 +166,10 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, Matrix* D, Matrix* K
 	//                                    (-dF2/dv1 -dF2/dv2)   ( dF1/dv1 -dF1/dv1)
 
 	// Let's compute De = -dF1/dv1 and Ke = -dF1/dx1
-	computeDampingAndStiffness(state, &De, &Ke);
-
-	// Assembly stage in F. Note that the force calculation does not rely on any matrices.
-	addForce(state, F);
+	if (!computeDampingAndStiffness(state, &De, &Ke))
+	{
+		return;
+	}
 
 	// Assembly stage in K
 	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += Ke; // -dF1/dx1 = Ke
@@ -184,7 +193,10 @@ void LinearSpring::addMatVec(const OdeState& state, double alphaD, double alphaK
 	}
 
 	Matrix33d De, Ke;
-	computeDampingAndStiffness(state, (alphaD != 0 ? &De : nullptr), (alphaK != 0 ? &Ke : nullptr));
+	if (!computeDampingAndStiffness(state, (alphaD != 0 ? &De : nullptr), (alphaK != 0 ? &Ke : nullptr)))
+	{
+		return;
+	}
 
 	// Shared data: the 2x 3D vectors to multiply the matrices with
 	const auto& vector1 = vector.segment<3>(3 * m_nodeIds[0]);
@@ -205,7 +217,7 @@ void LinearSpring::addMatVec(const OdeState& state, double alphaD, double alphaK
 	}
 }
 
-void LinearSpring::computeDampingAndStiffness(const OdeState& state, Matrix33d* De, Matrix33d* Ke)
+bool LinearSpring::computeDampingAndStiffness(const OdeState& state, Matrix33d* De, Matrix33d* Ke)
 {
 	const auto& x0 = state.getPositions().segment<3>(3 * m_nodeIds[0]);
 	const auto& x1 = state.getPositions().segment<3>(3 * m_nodeIds[1]);
@@ -218,7 +230,7 @@ void LinearSpring::computeDampingAndStiffness(const OdeState& state, Matrix33d* 
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
 			"Spring (initial length = " << m_restLength <<
 			") became degenerated with 0 length => force derivative degenerated";
-		return;
+		return false;
 	}
 	u /= length;
 	double lRatio = (length - m_restLength) / length;
@@ -238,6 +250,8 @@ void LinearSpring::computeDampingAndStiffness(const OdeState& state, Matrix33d* 
 	{
 		*De = m_damping * uuT;
 	}
+
+	return true;
 }
 
 
