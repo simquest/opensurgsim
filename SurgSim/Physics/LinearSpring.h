@@ -117,7 +117,7 @@ protected:
 	/// where this spring is defined by its 2 nodes positions {x1, x2}, velocities {v1, v2} and forces {F1, F2=-F1}.
 	/// \param state The state to compute the jacobians from
 	/// \param [out] De, Ke Respectively the damping and stiffness matrices De and Ke
-	/// \note This method calculate only the 3x3 parts related to the force applied on the first node,
+	/// \note This method calculates only the 3x3 parts related to the force applied on the first node,
 	/// \note derived w.r.t. first node. By nature, we have dF2/dx2 = dF1/dx1 = -dF1/dx2 = -dF2/dx1.
 	void computeDampingAndStiffness(const SurgSim::Math::OdeState& state,
 		SurgSim::Math::Matrix33d* De,
