@@ -76,21 +76,6 @@ public:
 	void removeExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
 									 std::shared_ptr<SurgSim::Collision::Representation> representation2);
 
-	/// Add a computation to this PhysicsManager's computation list.
-	/// Order is important: computation added first will be carried out by PhysicsManager first.
-	/// Same computation could be added multiple times.
-	/// \param computation The computation to be added into this PhysicsManager's computation pipeline.
-	void addComputation(std::shared_ptr<Computation> computation);
-
-	/// Set a list of computations to be carried out by this PhysicsManager.
-	/// \note The old computation pipeline will be discarded.
-	/// \param computations A list of computations to be carried out in this PhysicsManager's doUpdate() call.
-	void setComputations(std::list<std::shared_ptr<Computation>> computations);
-
-	/// Get the list of computations carried out in this PhysicsManager's doUpdate() call.
-	/// \return A list of computations.
-	const std::list<std::shared_ptr<Computation>> getComputations() const;
-
 protected:
 	///@{
 	/// Overridden from ComponentManager
@@ -105,6 +90,7 @@ protected:
 	bool doUpdate(double dt) override;
 	///@}
 
+private:
 	/// Initialize the list of computations.
 	/// Derived class(es) could override this method to have a customized list of computations.
 	virtual void initializeComputations(bool copyState);

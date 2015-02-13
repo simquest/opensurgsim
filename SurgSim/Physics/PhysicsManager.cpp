@@ -153,28 +153,14 @@ void PhysicsManager::initializeComputations(bool copyState)
 {
 	m_computations.push_back(std::make_shared<PreUpdate>(copyState));
 	m_computations.push_back(std::make_shared<FreeMotion>(copyState));
+	m_computations.push_back(std::make_shared<UpdateCollisionRepresentations>(copyState));
 	m_computations.push_back(std::make_shared<DcdCollision>(copyState));
 	m_computations.push_back(std::make_shared<ContactConstraintGeneration>(copyState));
 	m_computations.push_back(std::make_shared<BuildMlcp>(copyState));
 	m_computations.push_back(std::make_shared<SolveMlcp>(copyState));
 	m_computations.push_back(std::make_shared<PushResults>(copyState));
-	m_computations.push_back(std::make_shared<PostUpdate>(copyState));
 	m_computations.push_back(std::make_shared<UpdateCollisionRepresentations>(copyState));
-}
-
-void PhysicsManager::addComputation(std::shared_ptr<Computation> computation)
-{
-	m_computations.push_back(computation);
-}
-
-void PhysicsManager::setComputations(std::list<std::shared_ptr<Computation>> computations)
-{
-	m_computations = computations;
-}
-
-const std::list<std::shared_ptr<Computation>> PhysicsManager::getComputations() const
-{
-	return m_computations;
+	m_computations.push_back(std::make_shared<PostUpdate>(copyState));
 }
 
 }; // Physics
