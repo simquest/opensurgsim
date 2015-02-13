@@ -299,13 +299,13 @@ std::shared_ptr<OsgViewElement> createViewElement()
 
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
 	const SurgSim::Framework::ApplicationData& data,
-	std::shared_ptr<SurgSim::Graphics::OsgShader> shader,
+	std::shared_ptr<SurgSim::Graphics::OsgProgram> program,
 	std::string defaultTextureName = "Textures/checkered.png")
 {
 	// Default Material with shader
 	// using scopes to keep from having to introduce new variables with different types
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("shiny");
-	material->setShader(shader);
+	material->setProgram(program);
 
 	{
 		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
@@ -386,7 +386,7 @@ int main(int argc, char* argv[])
 	inputManager->addDevice(view->getKeyboardDevice());
 
 	// Shader should be shared between all materials using the same shader
-	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	auto shader = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
 	SURGSIM_ASSERT(shader != nullptr) << "Shader could not be loaded.";
 
 	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));

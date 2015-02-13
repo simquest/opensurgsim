@@ -29,7 +29,7 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -226,9 +226,9 @@ TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
 	// Create material to transport the Textures
 
 	auto material = std::make_shared<OsgMaterial>("material");
-	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
-	ASSERT_TRUE(shader != nullptr);
-	material->setShader(shader);
+	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	ASSERT_TRUE(program != nullptr);
+	material->setProgram(program);
 	{
 		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
 		material->addUniform(uniform);

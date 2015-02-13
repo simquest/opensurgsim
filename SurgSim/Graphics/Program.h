@@ -13,27 +13,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_SHADER_H
-#define SURGSIM_GRAPHICS_SHADER_H
+#ifndef SURGSIM_GRAPHICS_PROGRAM_H
+#define SURGSIM_GRAPHICS_PROGRAM_H
 
 #include <string>
+#include "SurgSim/Framework/Accessible.h"
 
 namespace SurgSim
 {
 
+namespace Framework
+{
+class Asset;
+}
+
 namespace Graphics
 {
 
-/// Base class that defines the interface for graphics shaders.
+/// Base class that defines the interface for graphics programs.
 ///
-/// Shaders are the programs executed on the GPU to render the scene geometry.
-class Shader
+/// A program in OSS is a collection of 'shaders' that are usually executed in sequence  (Geometry,
+/// Vertex and Fragment). Each shader itself is software that is executed on the GPU, shaders are usually introduced
+/// as source. The concept is similar to the use of program in
+/// OpenGL see https://www.opengl.org/sdk/docs/man4/html/glCreateProgram.xhtml
+class Program
 {
 public:
-	/// Destructor
-	virtual ~Shader() = 0;
 
-	/// Returns true if the vertex shader has been set, otherwise false.
+	/// Destructor
+	virtual ~Program() = 0;
+
+	/// \return true if the vertex shader has been set, otherwise false.
 	virtual bool hasVertexShader() const = 0;
 
 	/// Removes the vertex shader, returning that portion of the shader program to fixed-function.
@@ -42,7 +52,7 @@ public:
 	/// Loads the vertex shader source code from a file
 	/// \param	filePath	Path to file containing shader source code
 	/// \return	True if the source is successfully loaded, otherwise false.
-	virtual bool loadVertexShaderSource(const std::string& filePath) = 0;
+	virtual bool loadVertexShader(const std::string& filePath) = 0;
 
 	/// Set the vertex shader source code
 	/// \param	source	Shader source code
@@ -52,7 +62,7 @@ public:
 	/// \return	Shader source code
 	virtual bool getVertexShaderSource(std::string* source) const = 0;
 
-	/// Returns true if the geometry shader has been set, otherwise false.
+	/// \return true if the geometry shader has been set, otherwise false.
 	virtual bool hasGeometryShader() const = 0;
 
 	/// Removes the geometry shader, returning that portion of the shader program to fixed-function.
@@ -61,7 +71,7 @@ public:
 	/// Loads the geometry shader source code from a file
 	/// \param	filePath	Path to file containing shader source code
 	/// \return	True if the source is successfully loaded, otherwise false.
-	virtual bool loadGeometryShaderSource(const std::string& filePath) = 0;
+	virtual bool loadGeometryShader(const std::string& filePath) = 0;
 
 	/// Set the geometry shader source code
 	/// \param	source	Shader source code
@@ -72,16 +82,16 @@ public:
 	virtual bool getGeometryShaderSource(std::string* source) const = 0;
 
 
-	/// Returns true if the fragment shader has been set, otherwise false.
+	/// \return true if the fragment shader has been set, otherwise false.
 	virtual bool hasFragmentShader() const = 0;
 
-	/// Removes the fragment shader, returning that portion of the shader program to fixed-function.
+	/// \return the fragment shader, returning that portion of the shader program to fixed-function.
 	virtual void clearFragmentShader() = 0;
 
 	/// Loads the fragment shader source code from a file
 	/// \param	filePath	Path to file containing shader source code
 	/// \return	True if the source is successfully loaded, otherwise false.
-	virtual bool loadFragmentShaderSource(const std::string& filePath) = 0;
+	virtual bool loadFragmentShader(const std::string& filePath) = 0;
 
 	/// Set the fragment shader source code
 	/// \param	source	Shader source code
@@ -112,7 +122,7 @@ public:
 
 };
 
-inline Shader::~Shader()
+inline Program::~Program()
 {
 }
 
