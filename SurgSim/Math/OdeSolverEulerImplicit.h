@@ -44,12 +44,16 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit OdeSolverEulerImplicit(OdeEquation* equation);
 
+	/// \param maximumIteration The Newton-Raphson algorithm maximum number of iterations
 	virtual void setNewtonRaphsonMaximumIteration(size_t maximumIteration);
 
+	/// \return The Newton-Raphson algorithm maximum number of iterations
 	size_t getNewtonRaphsonMaximumIteration() const;
 
+	/// \param epsilonConvergence The Newton-Raphson algorithm epsilon convergence
 	void setNewtonRaphsonEpsilonConvergence(double epsilonConvergence);
 
+	/// \return The Newton-Raphson algorithm epsilon convergence
 	double getNewtonRaphsonEpsilonConvergence() const;
 
 	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
