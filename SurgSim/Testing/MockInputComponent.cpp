@@ -13,16 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Graphics/MeshUtilities.h"
+#include "SurgSim/Testing/MockInputComponent.h"
 
-template <>
-std::shared_ptr<SurgSim::Graphics::Mesh> SurgSim::DataStructures::loadTriangleMesh(const std::string& fileName)
+#include "SurgSim/Input/InputConsumerInterface.h"
+
+namespace SurgSim
 {
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
-	SURGSIM_ASSERT(reader.setDelegate(delegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
+namespace Testing
+{
 
-	return delegate->getMesh();
+MockInputComponent::MockInputComponent(const std::string& name) : SurgSim::Input::InputComponent(name)
+{
 }
 
+void MockInputComponent::setData(const SurgSim::DataStructures::DataGroup& data)
+{
+	getConsumer()->handleInput("fake device", data);
+	m_deviceConnected = true;
+}
+
+}; // Testing
+}; // SurgSim

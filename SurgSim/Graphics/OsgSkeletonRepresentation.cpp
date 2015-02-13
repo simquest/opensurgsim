@@ -39,7 +39,7 @@
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgModel.h"
 #include "SurgSim/Graphics/OsgRigidTransformConversions.h"
-#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 
 namespace
 {
@@ -92,8 +92,8 @@ public:
 			callback->getStackedTransforms().push_back(data.translation);
 
 			SURGSIM_ASSERT(m_boneData.find(bone->getName()) == m_boneData.end())
-				<< "There already exists a bone with name, " << bone->getName()
-				<< ", in this skeleton. Cannot create a duplicate.";
+					<< "There already exists a bone with name, " << bone->getName()
+					<< ", in this skeleton. Cannot create a duplicate.";
 
 			m_boneData[bone->getName()] = data;
 		}
@@ -101,7 +101,7 @@ public:
 		// Setup for hardware skinning.
 		if (m_shader != nullptr)
 		{
-			osg::Geode* meshGeode= dynamic_cast<osg::Geode*>(&node);
+			osg::Geode* meshGeode = dynamic_cast<osg::Geode*>(&node);
 			if (nullptr != meshGeode)
 			{
 				osgAnimation::RigTransformHardware* rigTransform = new osgAnimation::RigTransformHardware();
@@ -159,7 +159,7 @@ OsgSkeletonRepresentation::OsgSkeletonRepresentation(const std::string& name) :
 	SkeletonRepresentation(name)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgSkeletonRepresentation, std::string,
-		SkinningShaderFileName, getSkinningShaderFileName, setSkinningShaderFileName);
+									  SkinningShaderFileName, getSkinningShaderFileName, setSkinningShaderFileName);
 }
 
 void OsgSkeletonRepresentation::loadModel(const std::string& fileName)
@@ -208,8 +208,8 @@ void OsgSkeletonRepresentation::setBonePose(const std::string& name, const SurgS
 	else
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "OsgSkeletonRepresentation::setBonePose(): Bone with name, " << name << ", is not present in mesh."
-			<< "Cannot set pose.";
+				<< "OsgSkeletonRepresentation::setBonePose(): Bone with name, " << name << ", is not present in mesh."
+				<< "Cannot set pose.";
 	}
 }
 
@@ -240,7 +240,7 @@ bool OsgSkeletonRepresentation::doInitialize()
 	if (m_skinningShaderFileName.empty())
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "OsgSkeletonRepresentation::doInitialize(): Skinning shader file not set.";
+				<< "OsgSkeletonRepresentation::doInitialize(): Skinning shader file not set.";
 		result = false;
 	}
 	else
@@ -253,8 +253,8 @@ bool OsgSkeletonRepresentation::doInitialize()
 		if (shaderFilename.empty())
 		{
 			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "OsgSkeletonRepresentation::doInitialize(): Skinning shader file (" << m_skinningShaderFileName
-				<< ") not found.";
+					<< "OsgSkeletonRepresentation::doInitialize(): Skinning shader file (" << m_skinningShaderFileName
+					<< ") not found.";
 			result = false;
 		}
 		else
@@ -269,7 +269,7 @@ bool OsgSkeletonRepresentation::doInitialize()
 		if (m_model == nullptr || std::dynamic_pointer_cast<OsgModel>(m_model) == nullptr)
 		{
 			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "OsgSkeletonRepresentation::doInitialize(): model is not set.";
+					<< "OsgSkeletonRepresentation::doInitialize(): model is not set.";
 			result = false;
 		}
 		else
@@ -277,7 +277,7 @@ bool OsgSkeletonRepresentation::doInitialize()
 			m_skeleton = dynamic_cast<osg::Node*>(std::dynamic_pointer_cast<OsgModel>(m_model)->getOsgNode().get());
 			result = nullptr != m_skeleton;
 			SURGSIM_ASSERT(result)
-				<< "OsgSkeletonRepresentation::doInitialize(): model does not have a valid osgNode.";
+					<< "OsgSkeletonRepresentation::doInitialize(): model does not have a valid osgNode.";
 		}
 	}
 
@@ -290,7 +290,7 @@ bool OsgSkeletonRepresentation::doInitialize()
 		if (m_boneData.size() == 0)
 		{
 			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Could not find any osgAnimation::Bone nodes in tree with root <" + m_skeleton->getName() + ">";
+					<< "Could not find any osgAnimation::Bone nodes in tree with root <" + m_skeleton->getName() + ">";
 		}
 		m_base = mapCreator.getRootTransform();
 

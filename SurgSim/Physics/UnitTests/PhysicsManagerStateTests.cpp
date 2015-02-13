@@ -158,6 +158,32 @@ TEST(PhysicsManagerStateTest, SetGetCollisionRepresentations)
 	EXPECT_EQ(collision2, actualRepresentations.back());
 }
 
+TEST(PhysicsManagerStateTest, SetGetActiveCollisionRepresentations)
+{
+	auto physicsState = std::make_shared<PhysicsManagerState>();
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> expectedRepresentations;
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> actualRepresentations;
+
+	// Add a collision representation.
+	std::shared_ptr<SurgSim::Collision::Representation> collision1 =
+		std::make_shared<RigidCollisionRepresentation>("collision1");
+
+	expectedRepresentations.push_back(collision1);
+	physicsState->setActiveCollisionRepresentations(expectedRepresentations);
+	actualRepresentations = physicsState->getActiveCollisionRepresentations();
+	ASSERT_EQ(1, actualRepresentations.size());
+	EXPECT_EQ(collision1, actualRepresentations.back());
+
+	// Add a second collision representation.
+	std::shared_ptr<SurgSim::Collision::Representation> collision2 =
+		std::make_shared<RigidCollisionRepresentation>("collision2");
+	expectedRepresentations.push_back(collision2);
+	physicsState->setActiveCollisionRepresentations(expectedRepresentations);
+	actualRepresentations = physicsState->getActiveCollisionRepresentations();
+	ASSERT_EQ(2, actualRepresentations.size());
+	EXPECT_EQ(collision2, actualRepresentations.back());
+}
+
 TEST(PhysicsManagerStateTest, SetGetCollisionPairs)
 {
 	auto physicsState = std::make_shared<PhysicsManagerState>();

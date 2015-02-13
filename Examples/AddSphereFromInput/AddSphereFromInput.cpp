@@ -34,19 +34,19 @@ using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
-using SurgSim::Graphics::OsgShader;
+using SurgSim::Graphics::OsgProgram;
 using SurgSim::Graphics::OsgUniform;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
-using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4f;
+using SurgSim::Math::makeRigidTransform;
 using SurgSim::Physics::FixedRepresentation;
-using SurgSim::Physics::Representation;
 using SurgSim::Physics::PhysicsManager;
+using SurgSim::Physics::Representation;
 
 
 std::shared_ptr<SceneElement> createPlane(const std::string& name)
@@ -61,19 +61,19 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+	std::shared_ptr<OsgProgram> program = std::make_shared<OsgProgram>();
 
 	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
 	uniform->set(Vector4f(0.0f, 0.6f, 1.0f, 0.0f));
 	material->addUniform(uniform);
 
-	shader->setFragmentShaderSource(
+	program->setFragmentShaderSource(
 		"uniform vec4 color;\n"
 		"void main(void)\n"
 		"{\n"
 		"	gl_FragColor = color;\n"
 		"}");
-	material->setShader(shader);
+	material->setProgram(program);
 	graphicsRepresentation->setMaterial(material);
 
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);

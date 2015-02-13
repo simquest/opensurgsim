@@ -25,8 +25,8 @@
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgSkeletonRepresentation.h"
-#include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -68,9 +68,9 @@ TEST_F(OsgSkeletonRepresentationRenderTests, BasicTest)
 	scene->addSceneElement(sceneElement);
 
 	viewElement->setPose(SurgSim::Math::makeRigidTransform(
-		Vector3d(-0.3, 0.3, -0.3),
-		Vector3d(0.0, 0.0, 0.0),
-		Vector3d(0.0, 0.0, 1.0)));
+							 Vector3d(-0.3, 0.3, -0.3),
+							 Vector3d(0.0, 0.0, 0.0),
+							 Vector3d(0.0, 0.0, 1.0)));
 
 	runtime->start();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));

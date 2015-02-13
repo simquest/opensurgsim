@@ -13,18 +13,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
+#include "SurgSim/Physics/Spring.h"
 
 namespace SurgSim
 {
-namespace DataStructures
+namespace Physics
 {
 
-std::shared_ptr<TriangleMeshPlain> loadTriangleMesh(const std::string& filename)
+Spring::~Spring()
+{}
+
+void Spring::initialize(const SurgSim::Math::OdeState& state)
 {
-	return loadTriangleMesh<TriangleMeshPlain>(filename);
 }
 
-}
+size_t Spring::getNumNodes() const
+{
+	return m_nodeIds.size();
 }
 
+size_t Spring::getNodeId(size_t springNodeId) const
+{
+	return m_nodeIds[springNodeId];
+}
+
+const std::vector<size_t>& Spring::getNodeIds() const
+{
+	return m_nodeIds;
+}
+
+} // namespace Physics
+} // namespace SurgSim

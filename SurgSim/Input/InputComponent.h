@@ -33,6 +33,7 @@ namespace Input
 {
 class DeviceInterface;
 class InputConsumer;
+class InputConsumerInterface;
 
 SURGSIM_STATIC_REGISTRATION(InputComponent);
 
@@ -83,11 +84,18 @@ public:
 	/// \return	The device name.
 	std::string getDeviceName() const;
 
+protected:
+	/// Gets the InputConsumerInterface that actually holds the data.
+	/// \return An InputConsumerInterface.
+	std::shared_ptr<InputConsumerInterface> getConsumer();
+
+	/// Indicates if this input component is connected to a device
+	bool m_deviceConnected;
+
 private:
 	/// Name of the device to which this input component connects
 	std::string m_deviceName;
-	/// Indicates if this input component is connected to a device
-	bool m_deviceConnected;
+
 	/// Input consumer which brings in information from hardware device
 	std::shared_ptr<InputConsumer> m_input;
 };

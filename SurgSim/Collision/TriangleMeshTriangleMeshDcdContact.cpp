@@ -138,14 +138,11 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 
 void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	auto meshShapeA = std::static_pointer_cast<MeshShape>(pair->getFirst()->getShape());
-	auto meshShapeB = std::static_pointer_cast<MeshShape>(pair->getSecond()->getShape());
-
-	std::shared_ptr<TriangleMesh> collisionMeshA = meshShapeA->getMesh();
-	std::shared_ptr<TriangleMesh> collisionMeshB = meshShapeB->getMesh();
+	auto meshA = std::static_pointer_cast<MeshShape>(pair->getFirst()->getShape());
+	auto meshB = std::static_pointer_cast<MeshShape>(pair->getSecond()->getShape());
 
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
-		= meshShapeA->getAabbTree()->spatialJoin(*meshShapeB->getAabbTree());
+		= meshA->getAabbTree()->spatialJoin(*meshB->getAabbTree());
 
 	double depth = 0.0;
 	Vector3d normal;
@@ -164,23 +161,23 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 
 		for (auto i = triangleListA.begin(); i != triangleListA.end(); ++i)
 		{
-			const Vector3d& normalA = collisionMeshA->getNormal(*i);
+			const Vector3d& normalA = meshA->getNormal(*i);
 			if (normalA.isZero())
 			{
 				continue;
 			}
 
-			auto verticesA = collisionMeshA->getTrianglePositions(*i);
+			auto verticesA = meshA->getTrianglePositions(*i);
 
 			for (auto j = triangleListB.begin(); j != triangleListB.end(); ++j)
 			{
-				const Vector3d& normalB = collisionMeshB->getNormal(*j);
+				const Vector3d& normalB = meshB->getNormal(*j);
 				if (normalB.isZero())
 				{
 					continue;
 				}
 
-				auto verticesB = collisionMeshB->getTrianglePositions(*j);
+				auto verticesB = meshB->getTrianglePositions(*j);
 
 				// Check if the triangles intersect.
 				if (SurgSim::Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],

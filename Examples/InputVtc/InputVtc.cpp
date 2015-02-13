@@ -31,7 +31,7 @@ using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
-using SurgSim::Graphics::OsgShader;
+using SurgSim::Graphics::OsgProgram;
 using SurgSim::Graphics::OsgUniform;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::ViewElement;
@@ -58,19 +58,19 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+	std::shared_ptr<OsgProgram> program = std::make_shared<OsgProgram>();
 
 	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
 	uniform->set(Vector4f(0.0f, 0.6f, 1.0f, 0.0f));
 	material->addUniform(uniform);
 
-	shader->setFragmentShaderSource(
+	program->setFragmentShaderSource(
 		"uniform vec4 color;\n"
 		"void main(void)\n"
 		"{\n"
 		"	gl_FragColor = color;\n"
 		"}");
-	material->setShader(shader);
+	material->setProgram(program);
 	graphicsRepresentation->setMaterial(material);
 
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
@@ -162,18 +162,18 @@ std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, cons
 	graphicsRepresentation = std::make_shared<OsgBoxRepresentation>(name + " Graphics");
 	graphicsRepresentation->setSizeXYZ(0.8, 2.0, 0.2);
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
-	shader->setVertexShaderSource(
+	std::shared_ptr<OsgProgram> program = std::make_shared<OsgProgram>();
+	program->setVertexShaderSource(
 		"void main(void)\n"
 		"{\n"
 		"    gl_Position = ftransform();\n"
 		"}");
-	shader->setFragmentShaderSource(
+	program->setFragmentShaderSource(
 		"void main(void)\n"
 		"{\n"
 		"    gl_FragColor = vec4(0.2, 0.2, 0.2, 1.0);\n"
 		"}");
-	material->setShader(shader);
+	material->setProgram(program);
 	graphicsRepresentation->setMaterial(material);
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent;
