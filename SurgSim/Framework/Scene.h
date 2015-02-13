@@ -54,6 +54,10 @@ public:
 	/// \param	element	The element.
 	void addSceneElement(std::shared_ptr<SceneElement> element);
 
+	/// Invokes addSceneElement() for each element in the list.
+	/// \param elements the list of elements to be added.
+	void addSceneElements(std::vector<std::shared_ptr<SceneElement>> elements);
+
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
 	const std::vector<std::shared_ptr<SceneElement>>& getSceneElements() const;

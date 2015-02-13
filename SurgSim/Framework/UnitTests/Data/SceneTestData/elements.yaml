@@ -1,0 +1,20 @@
+- SurgSim::Framework::BasicSceneElement:
+    IsActive: true
+    Name: element0
+    Components:
+      - MockComponent:
+          Name: component0
+          Id: 394ca44f-6117-4eef-90a1-52b81e430e3a
+          IsLocalActive: true
+          SucceedWithInit: true
+          SucceedWithWakeUp: true
+- SurgSim::Framework::BasicSceneElement:
+    Name: element1
+    IsActive: true
+    Components:
+      - MockComponent:
+          Name: component1
+          Id: 2d27d6e1-2628-40a7-9e1d-da8b5032228f
+          IsLocalActive: true
+          SucceedWithInit: true
+          SucceedWithWakeUp: true
