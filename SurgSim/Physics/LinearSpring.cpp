@@ -31,7 +31,7 @@ namespace Physics
 {
 
 LinearSpring::LinearSpring(size_t nodeId0, size_t nodeId1) :
-	Spring(), m_restLength(0.0), m_stiffness(0.0), m_damping(0.0)
+	Spring(), m_restLength(-1.0), m_stiffness(-1.0), m_damping(0.0)
 {
 	m_nodeIds.push_back(nodeId0);
 	m_nodeIds.push_back(nodeId1);
@@ -41,10 +41,8 @@ void LinearSpring::initialize(const OdeState& state)
 {
 	Spring::initialize(state);
 
-	SURGSIM_LOG_IF(m_restLength == 0.0, SurgSim::Framework::Logger::getLogger("Physics/MassSpring"), WARNING) <<
-		"Spring rest length is null";
-	SURGSIM_LOG_IF(m_stiffness == 0.0, SurgSim::Framework::Logger::getLogger("Physics/MassSpring"), WARNING) <<
-		"Spring stiffness is null";
+	SURGSIM_ASSERT(m_restLength >= 0.0) << "Spring rest length was not set, please call setRestLength()";
+	SURGSIM_ASSERT(m_stiffness >= 0.0) << "Spring stiffness was not set, please call setStiffness()";
 }
 
 void LinearSpring::setStiffness(double stiffness)
