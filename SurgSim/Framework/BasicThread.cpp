@@ -162,13 +162,13 @@ void BasicThread::operator()()
 		totalFrameTime += Clock::now() - start;
 		numUpdates++;
 
-		if (m_logger->getThreshold() >= SURGSIM_LOG_LEVEL(INFO))
+		if (m_logger->getThreshold() <= SURGSIM_LOG_LEVEL(INFO))
 		{
 			if (totalFrameTime.count() > 5.0)
 			{
 				SURGSIM_LOG_INFO(m_logger) << std::setprecision(4)
-					<< "Rate: " << numUpdates / totalFrameTime.count() << "Hz "
-					<< "(Requested " << 1.0 / m_period.count() << "Hz), "
+					<< "Rate: " << numUpdates / totalFrameTime.count() << " / "
+					<<  1.0 / m_period.count() << " Hz, "
 					<< "Average doUpdate: " << (totalFrameTime.count() - totalSleepTime.count()) / numUpdates << "s, "
 					<< "Sleep: " << 100.0 * totalSleepTime.count() / totalFrameTime.count() << "%";
 				totalFrameTime = boost::chrono::duration<double>::zero();
