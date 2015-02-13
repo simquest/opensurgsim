@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
