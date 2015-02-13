@@ -339,7 +339,6 @@ void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 void Runtime::loadScene(const std::string& fileName)
 {
 	YAML::Node node;
-	bool result = false;
 	boost::lock_guard<boost::mutex> lock(m_sceneHandling);
 	if (tryLoadNode(fileName, &node))
 	{
@@ -357,7 +356,6 @@ void Runtime::loadScene(const std::string& fileName)
 void Runtime::addSceneElements(const std::string& fileName)
 {
 	YAML::Node node;
-	bool result = false;
 	boost::lock_guard<boost::mutex> lock(m_sceneHandling);
 
 	if (tryLoadNode(fileName, &node))
