@@ -114,12 +114,13 @@ void LinearSpring::addDamping(const OdeState& state, Matrix* D, double scale)
 
 	// Let's compute De = -dF1/dv1
 	computeMatrices(state, &De, nullptr);
+	De *= scale;
 
 	// Assembly stage in D
-	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += scale * De; // -dF1/dv1 = De
-	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= scale * De; // -dF1/dv2 =-De
-	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= scale * De; // -dF2/dv1 =-De
-	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += scale * De; // -dF2/dv2 = De
+	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += De; // -dF1/dv1 = De
+	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= De; // -dF1/dv2 =-De
+	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= De; // -dF2/dv1 =-De
+	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += De; // -dF2/dv2 = De
 }
 
 void LinearSpring::addStiffness(const OdeState& state, Matrix* K, double scale)
@@ -134,12 +135,13 @@ void LinearSpring::addStiffness(const OdeState& state, Matrix* K, double scale)
 
 	// Let's compute Ke = -dF1/dx1
 	computeMatrices(state, nullptr, &Ke);
+	Ke *= scale;
 
 	// Assembly stage in K
-	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += scale * Ke; // -dF1/dx1 = Ke
-	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= scale * Ke; // -dF1/dx2 =-Ke
-	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= scale * Ke; // -dF2/dx1 =-Ke
-	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += scale * Ke; // -dF2/dx2 = Ke
+	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += Ke; // -dF1/dx1 = Ke
+	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= Ke; // -dF1/dx2 =-Ke
+	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= Ke; // -dF2/dx1 =-Ke
+	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += Ke; // -dF2/dx2 = Ke
 }
 
 void LinearSpring::addFDK(const OdeState& state, Vector* F, Matrix* D, Matrix* K)
