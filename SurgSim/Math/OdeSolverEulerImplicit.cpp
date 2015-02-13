@@ -23,7 +23,7 @@ namespace Math
 {
 
 OdeSolverEulerImplicit::OdeSolverEulerImplicit(OdeEquation* equation)
-	: OdeSolver(equation), m_maximumIteration(3), m_epsilonConvergence(1e-5)
+	: OdeSolver(equation), m_maximumIteration(1), m_epsilonConvergence(1e-5)
 {
 	m_name = "Ode Solver Euler Implicit";
 }
