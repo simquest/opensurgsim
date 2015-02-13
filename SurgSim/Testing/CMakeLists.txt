@@ -20,6 +20,7 @@ include_directories(
 
 set(SURGSIM_TESTING_SOURCES
 	MathUtilities.cpp
+	MockInputComponent.cpp
 	MockInputOutput.cpp
 	SerializationMockComponent.cpp
 	TestCube.cpp
@@ -28,6 +29,7 @@ set(SURGSIM_TESTING_SOURCES
 
 set(SURGSIM_TESTING_HEADERS
 	MathUtilities.h
+	MockInputComponent.h
 	MockInputOutput.h
 	MockPhysicsManager.h
 	SerializationMockComponent.h
