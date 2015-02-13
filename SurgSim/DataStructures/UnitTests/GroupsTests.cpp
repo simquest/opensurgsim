@@ -24,8 +24,6 @@ namespace SurgSim
 namespace DataStructures
 {
 
-
-
 TEST(GroupsTests, InitTest)
 {
 	// The comma in the template is throwing off the macro, predefine the types for testing
