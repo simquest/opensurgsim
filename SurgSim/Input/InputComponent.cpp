@@ -71,8 +71,8 @@ private:
 
 InputComponent::InputComponent(const std::string& name) :
 	Representation(name),
-	m_deviceName(),
 	m_deviceConnected(false),
+	m_deviceName(),
 	m_input(std::make_shared<InputConsumer>())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(InputComponent, std::string, DeviceName,
