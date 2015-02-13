@@ -128,7 +128,7 @@ namespace SurgSim
 namespace Physics
 {
 
-TEST_F(RenderTests, VisualTestFem3DCorotatioal)
+TEST_F(RenderTests, VisualTestFem3DCorotational)
 {
 	using SurgSim::Math::makeRigidTranslation;
 
