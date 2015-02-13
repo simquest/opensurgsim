@@ -32,6 +32,7 @@ set(SURGSIM_TESTING_HEADERS
 	MockPhysicsManager.h
 	SerializationMockComponent.h
 	TestCube.h
+	Utilities.h
 )
 surgsim_create_library_header(Testing.h "${SURGSIM_TESTING_HEADERS}")
 
