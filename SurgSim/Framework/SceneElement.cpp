@@ -242,13 +242,13 @@ bool SceneElement::decode(const YAML::Node& node)
 	{
 		std::string className = node.begin()->first.as<std::string>();
 
-		SURGSIM_ASSERT(className == getClassName()) << "Type in node does not match class, wanted <" <<
-				className << ">" << " but this is a <" << getClassName() << ">.";
+		SURGSIM_ASSERT(className == getClassName()) << "Type in node does not match class, wanted <"
+				<< className << ">" << " but this is a <" << getClassName() << ">.";
 
 		YAML::Node data = node[getClassName()];
 
-		SURGSIM_ASSERT(data.IsDefined() && !data.IsNull()) 
-			<< "Content of node is empty, for class " << className << ". This is probably an indentation issue.";
+		SURGSIM_ASSERT(data.IsDefined() && !data.IsNull())
+				<< "Content of node is empty, for class " << className << ". This is probably an indentation issue.";
 
 		if (data["Name"].IsScalar())
 		{

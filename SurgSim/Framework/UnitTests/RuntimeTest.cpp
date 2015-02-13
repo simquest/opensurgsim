@@ -243,21 +243,21 @@ TEST(RuntimeTest, LoadAndAddScene)
 {
 	auto runtime = std::make_shared<Runtime>("config.txt");
 
-	EXPECT_TRUE(runtime->loadScene("SceneTestData/scene.yaml"));
+	EXPECT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
 
 	auto scene0 = runtime->getScene();
 
 	EXPECT_NE(nullptr, scene0);
 	EXPECT_EQ(2L, scene0->getSceneElements().size());
 
-	EXPECT_TRUE(runtime->loadScene("SceneTestData/scene.yaml"));
+	EXPECT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
 
 	auto scene1 = runtime->getScene();
 
 	EXPECT_NE(nullptr, scene1);
 	EXPECT_NE(scene0, scene1);
 
-	EXPECT_TRUE(runtime->addSceneElements("SceneTestData/elements.yaml"));
+	EXPECT_NO_THROW(runtime->addSceneElements("SceneTestData/elements.yaml"));
 
 	auto scene2 = runtime->getScene();
 
@@ -270,7 +270,7 @@ TEST(RuntimeTest, LoadAndAddScene)
 TEST(RuntimeTest, LoadAndDuplicate)
 {
 	auto runtime = std::make_shared<Runtime>("config.txt");
-	EXPECT_TRUE(runtime->loadScene("SceneTestData/scene.yaml"));
+	EXPECT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
 	auto scene0 = runtime->getScene();
 
 	auto elements0 = runtime->duplicateSceneElements("SceneTestData/element.yaml");
@@ -295,7 +295,7 @@ TEST(RuntimeTest, LoadAndDuplicate)
 TEST(RuntimeTest, DuplicateBadYaml)
 {
 	auto runtime = std::make_shared<Runtime>("config.txt");
-	EXPECT_TRUE(runtime->loadScene("SceneTestData/scene.yaml"));
+	EXPECT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
 	auto scene0 = runtime->getScene();
 
 	EXPECT_ANY_THROW(auto elements0 = runtime->duplicateSceneElements("SceneTestData/bad.yaml"););

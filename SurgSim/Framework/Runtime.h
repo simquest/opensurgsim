@@ -127,8 +127,8 @@ public:
 	/// Loads the scene from the given file, clears all the elements in the scene, the old scene will be
 	/// overwritten.
 	/// \param fileName the filename of the scene to be loaded, needs to be found
-	/// \return true if the loading succeeded and the scene was found
-	bool loadScene(const std::string& fileName);
+	/// \throws If the file cannot be found or is an invalid YAML file
+	void loadScene(const std::string& fileName);
 
 	/// Adds the scene elements from the file to the current scene
 	/// The file format should be just a list of sceneElements
@@ -149,15 +149,15 @@ public:
 	///	          Id: 1de26315-82a7-46b2-ae38-324d25009629
 	/// \endcode
 	/// \param fileName the filename of the scene to be loaded, needs to be found
-	/// \return true if the loading succeeded and the scene was found, the loaded scene elements will have been added
-	///         to the scene.
-	bool addSceneElements(const std::string& fileName);
+	/// \throws If the file cannot be found or is an invalid file
+	void addSceneElements(const std::string& fileName);
 
 	/// Loads and duplicates the scene elements from the file, the elements will not have common ids
 	/// with any other cloned elements, this lets you repeatedly load a set of elements to replicate this
 	/// set. The format is a list of scene elements \sa addSceneElements().
 	/// \param fileName the filename of the scene to be loaded, needs to be found
-	/// \return a vector of scene elements with the loaded elements, is empty if loading failed
+	/// \throws if loading failed
+	/// \return a vector of scene elements with the loaded elements
 	std::vector<std::shared_ptr<SceneElement>> duplicateSceneElements(const std::string& fileName);
 
 
