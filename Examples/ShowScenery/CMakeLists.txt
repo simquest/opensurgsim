@@ -44,7 +44,7 @@ SET(LIBS
 	${Boost_LIBRARIES}
 	${YAML_CPP_LIBRARIES}
 )
- 
+
 target_link_libraries(ShowScenery ${LIBS})
 
 # Put ShowScenery into folder "Examples"

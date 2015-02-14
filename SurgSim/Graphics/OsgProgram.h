@@ -152,4 +152,4 @@ std::shared_ptr<SurgSim::Graphics::OsgProgram> loadProgram(const SurgSim::Framew
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_OSGSHADER_H
+#endif  // SURGSIM_GRAPHICS_OSGPROGRAM_H

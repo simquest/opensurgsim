@@ -130,4 +130,4 @@ inline Program::~Program()
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_SHADER_H
+#endif  // SURGSIM_GRAPHICS_PROGRAM_H
