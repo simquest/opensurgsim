@@ -90,6 +90,9 @@ protected:
 	bool doUpdate(double dt) override;
 	///@}
 
+	/// A list of computations, to perform the physics update.
+	std::list<std::shared_ptr<SurgSim::Physics::Computation>> m_computations;
+
 private:
 	/// Initialize the list of computations.
 	/// Derived class(es) could override this method to have a customized list of computations.
@@ -118,9 +121,6 @@ private:
 
 	/// Mutex to protect m_excludedCollisionPairs from being read/written simultaneously.
 	boost::mutex m_excludedCollisionPairMutex;
-
-	/// A list of computations, to perform the physics update.
-	std::list<std::shared_ptr<SurgSim::Physics::Computation>> m_computations;
 
 	/// A thread-safe copy of the last PhysicsManagerState in the previous update.
 	SurgSim::Framework::LockedContainer<SurgSim::Physics::PhysicsManagerState> m_finalState;
