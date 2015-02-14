@@ -60,13 +60,16 @@ public:
 
 	std::shared_ptr<Mesh> getMesh() override;
 
+	void setMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh) override;
+
+	void loadMesh(const std::string& fileName) override;
+
+	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape) override;
+
 	void setUpdateOptions(int val) override;
 	int getUpdateOptions() const override;
 
 	osg::ref_ptr<osg::Geometry> getOsgGeometry();
-
-	void setFilename(std::string filename) override;
-	std::string getFilename() const override;
 
 protected:
 	void doUpdate(double dt) override;

@@ -59,6 +59,7 @@ void doSolveTest()
 		MassPoint m;
 		MassPointState defaultState, state0, state1, state2;
 		T solver(&m);
+		solver.setNewtonRaphsonMaximumIteration(1);
 
 		// ma = mg <=> a = g
 		// v(1) = g.dt + v(0)
@@ -83,6 +84,7 @@ void doSolveTest()
 		MassPoint m(0.1);
 		MassPointState defaultState, state0, state1, state2;
 		T solver(&m);
+		solver.setNewtonRaphsonMaximumIteration(1);
 
 		// ma = mg - c.v <=> a = g - c/m.v
 		// v(1) = (g - c/m.v(1)).dt + v(0) <=> v(1) = I.(1.0 + dt.c/m)^-1.(g.dt + v(0))

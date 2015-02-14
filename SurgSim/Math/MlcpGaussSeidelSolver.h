@@ -93,35 +93,34 @@ public:
 	void setMaxIterations(size_t maxIterations);
 
 private:
-	void computeEnforcementSystem(size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA,
+	void computeEnforcementSystem(size_t problemSize, const MlcpProblem::Matrix& A,
 								  const MlcpProblem::Vector& b,
-								  const MlcpSolution::Vector& initialGuess_and_solution,
-								  const MlcpProblem::Vector& frictionCoefs,
+								  const MlcpSolution::Vector& initialGuessAndSolution,
 								  const std::vector<MlcpConstraintType>& constraintsType,
 								  size_t constraintID, size_t matrixEntryForConstraintID);
 
-	void calculateConvergenceCriteria(size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA,
+	void calculateConvergenceCriteria(size_t problemSize, const MlcpProblem::Matrix& A,
 									  const MlcpProblem::Vector& b,
-									  const MlcpSolution::Vector& initialGuess_and_solution,
+									  const MlcpSolution::Vector& initialGuessAndSolution,
 									  const std::vector<MlcpConstraintType>& constraintsType,
-									  double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
-									  double* convergence_criteria,
-									  bool* signoriniVerified, bool* signoriniValid);
+									  double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES],
+									  double* convergenceCriteria,
+									  bool* validSignorini);
 
-	void doOneIteration(size_t problemSize, const MlcpProblem::Matrix& A, size_t nbColumnInA,
+	void doOneIteration(size_t problemSize, const MlcpProblem::Matrix& A,
 						const MlcpProblem::Vector& b,
-						MlcpSolution::Vector* initialGuess_and_solution,
+						MlcpSolution::Vector* initialGuessAndSolution,
 						const MlcpProblem::Vector& frictionCoefs,
 						const std::vector<MlcpConstraintType>& constraintsType,
-						double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double* convergence_criteria,
-						bool* signoriniVerified);
+						double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES], double* convergenceCriteria,
+						bool* validSignorini);
 
 	void printViolationsAndConvergence(size_t problemSize, const MlcpProblem::Matrix& A,
 									   const MlcpProblem::Vector& b,
-									   const MlcpSolution::Vector& initialGuess_and_solution,
+									   const MlcpSolution::Vector& initialGuessAndSolution,
 									   const std::vector<MlcpConstraintType>& constraintsType,
-									   double convergence_criteria,
-									   bool signorini_verified, size_t nbLoop);
+									   double convergenceCriteria,
+									   bool validSignorini, size_t iterations);
 
 	/// The precision.
 	double m_epsilonConvergence;

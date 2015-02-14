@@ -100,11 +100,6 @@ double FemElement::getMass(const SurgSim::Math::OdeState& state) const
 	return getVolume(state) * m_rho;
 }
 
-bool FemElement::update(const SurgSim::Math::OdeState& state)
-{
-	return true;
-}
-
 bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)

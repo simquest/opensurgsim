@@ -71,8 +71,8 @@ private:
 
 InputComponent::InputComponent(const std::string& name) :
 	Representation(name),
-	m_deviceName(),
 	m_deviceConnected(false),
+	m_deviceName(),
 	m_input(std::make_shared<InputConsumer>())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(InputComponent, std::string, DeviceName,
@@ -125,6 +125,11 @@ void InputComponent::disconnectDevice(std::shared_ptr<SurgSim::Input::DeviceInte
 {
 	device->removeInputConsumer(m_input);
 	m_deviceConnected = false;
+}
+
+std::shared_ptr<InputConsumerInterface> InputComponent::getConsumer()
+{
+	return m_input;
 }
 
 }; // namespace Input

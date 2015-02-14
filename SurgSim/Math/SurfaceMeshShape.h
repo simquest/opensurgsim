@@ -17,8 +17,8 @@
 #define SURGSIM_MATH_SURFACEMESHSHAPE_H
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -50,7 +50,7 @@ SURGSIM_STATIC_REGISTRATION(SurfaceMeshShape);
 /// \note SurgSim::Physics::DcdCollision so far.
 ///
 /// \sa MeshShape
-class SurfaceMeshShape : public Shape
+class SurfaceMeshShape : public MeshShape
 {
 public:
 	/// Constructor
@@ -62,7 +62,7 @@ public:
 	/// \exception Raise an exception if the mesh is invalid
 	template <class VertexData, class EdgeData, class TriangleData>
 	SurfaceMeshShape(
-		const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh,
+		const SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>& mesh,
 		double thickness = 1e-2);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::SurfaceMeshShape);
@@ -70,63 +70,19 @@ public:
 	/// \return the type of the shape
 	int getType() const override;
 
-	/// Get mesh
-	/// \return The collision mesh associated to this MeshShape
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh();
-
-	/// Get the volume of the shape
-	/// \return The volume of the shape (in m-3)
-	double getVolume() const override;
-
-	/// Get the volumetric center of the shape
-	/// \return The center of the shape
-	Vector3d getCenter() const override;
-
-	/// Get the second central moment of the volume, commonly used
-	/// to calculate the moment of inertia matrix
-	/// \return The 3x3 symmetric second moment matrix
-	Matrix33d getSecondMomentOfVolume() const override;
-
-	/// Set loading filename
-	/// \param fileName	The filename to load
-	/// \note The mesh will be loaded right after the file name is set,
-	///       if 'fileName' indicates a file containing a valid mesh.
-	/// \note If the valid file contains an empty mesh, i.e. no vertex is specified in that file,
-	///       a empty mesh will be held by this mesh shape.
-	void setFileName(const std::string& fileName);
-
-	/// Get the file name of the external file which contains the triangle mesh.
-	/// \return File name of the external file which contains the triangle mesh.
-	std::string getFileName() const;
-
 	/// Check if this shape contains a valid mesh and the thickness is at least 1e-5 (in meter,
 	/// to avoid formal and numerical issues).
 	/// \return True if this shape contains a valid mesh and thickness is at least 1e-5; Otherwise, false.
 	bool isValid() const override;
 
-private:
-
+protected:
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.
-	void computeVolumeIntegrals();
+	void computeVolumeIntegrals() override;
 
-	/// Center (considering a uniform distribution in the mesh volume)
-	SurgSim::Math::Vector3d m_center;
-
-	/// Volume (in m-3)
-	double m_volume;
-
-	/// Second moment of volume
-	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
-
-	/// Collision mesh associated to this MeshShape
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
-
+private:
 	/// Surface mesh thickness
 	double m_thickness;
-
-	/// File name of the external file which contains the triangle mesh.
-	std::string m_fileName;
 };
 
 }; // Math

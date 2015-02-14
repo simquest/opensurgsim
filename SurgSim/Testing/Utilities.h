@@ -13,27 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_MESHUTILITIES_H
-#define SURGSIM_GRAPHICS_MESHUTILITIES_H
-
-#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
-#include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
+#ifndef SURGSIM_TESTING_UTILITIES_H
+#define SURGSIM_TESTING_UTILITIES_H
 
 namespace SurgSim
 {
-namespace DataStructures
+
+namespace Testing
 {
 
-/// Specialization for Graphics::Mesh
-/// Helper function to load a mesh from a given filename, does NOT do path resolution.
-/// \throws SurgSim::Framework::AssertionFailure if the reader does not contain mesh information.
-/// \param filename Path to the file that is to be read.
-/// \return the filled mesh a filled mesh if the reading succeeds, nullptr otherwise
-template <>
-std::shared_ptr<SurgSim::Graphics::Mesh> loadTriangleMesh(const std::string& fileName);
+/// Predicate to use to test whether a container contains a certain element
+/// \tparam Container type, can usually be deduced
+/// \param container the container to be tested
+/// \param value the value to check for
+/// \return true when the container contains the given value
+/// \note for maps the value type is std::pair<key, mapped_type>
+template <class Container>
+bool doesContain(const Container& container, const typename Container::value_type& value)
+{
+	return std::find(container.begin(), container.end(), value) != container.end();
+}
 
 }
 }
-
 
 #endif

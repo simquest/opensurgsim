@@ -151,16 +151,11 @@ protected:
 	void clearMlcpPhysicsProblem(size_t numDof, size_t numConstraint)
 	{
 		// Resize and zero all Eigen types
-		m_mlcpPhysicsProblem.A.resize(numConstraint, numConstraint);
-		m_mlcpPhysicsProblem.A.setZero();
-		m_mlcpPhysicsProblem.b.resize(numConstraint);
-		m_mlcpPhysicsProblem.b.setZero();
-		m_mlcpPhysicsProblem.mu.resize(numConstraint);
-		m_mlcpPhysicsProblem.mu.setZero();
-		m_mlcpPhysicsProblem.CHt.resize(numDof, numConstraint);
-		m_mlcpPhysicsProblem.CHt.setZero();
-		m_mlcpPhysicsProblem.H.resize(numConstraint, numDof);
-		m_mlcpPhysicsProblem.H.setZero();
+		m_mlcpPhysicsProblem.A.setZero(numConstraint, numConstraint);
+		m_mlcpPhysicsProblem.b.setZero(numConstraint);
+		m_mlcpPhysicsProblem.mu.setZero(numConstraint);
+		m_mlcpPhysicsProblem.CHt.setZero(numDof, numConstraint);
+		m_mlcpPhysicsProblem.H.setZero(numConstraint, numDof);
 
 		// Empty all std::vector types
 		m_mlcpPhysicsProblem.constraintTypes.clear();

@@ -70,6 +70,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentationContact.cpp
 	RigidRepresentationState.cpp
 	SolveMlcp.cpp
+	Spring.cpp
 	UpdateCollisionRepresentations.cpp
 	VirtualToolCoupler.cpp
 )

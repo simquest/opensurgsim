@@ -20,6 +20,7 @@
 #include <memory>
 #include <algorithm>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "SurgSim/Math/RigidTransform.h"
@@ -31,6 +32,13 @@ class Node;
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+template <typename Key, typename T>
+class Groups;
+}
+
 namespace Framework
 {
 
@@ -38,6 +46,7 @@ class Component;
 class PoseComponent;
 class Scene;
 class Runtime;
+
 
 /// SceneElement is the basic part of a scene, it is a container of components. When a
 /// SceneElement is added to a Scene, the Scene will call initialize() on the SceneElement,
@@ -81,12 +90,27 @@ public:
 
 	/// Gets all the components of this SceneElement.
 	/// \return	The components.
-	std::vector<std::shared_ptr<Component> > getComponents() const;
+	std::vector<std::shared_ptr<Component>> getComponents() const;
 
 	/// Template version of getComponents method to get all the components with type T
 	/// \return The type T components
 	template <class T>
 	std::vector<std::shared_ptr<T>> getComponents() const;
+
+	/// Add this scene element to the given group
+	/// \param group name of the group
+	void addToGroup(const std::string& group);
+
+	/// Remove this scene element from the given group
+	/// \param group name of the group
+	void removeFromGroup(const std::string& group);
+
+	/// Set the groups of this scene element
+	/// \param groups all the groups that this scene element should be in
+	void setGroups(const std::vector<std::string>& groups);
+
+	/// \return all the groups of this scene element
+	std::vector<std::string> getGroups() const;
 
 	/// Executes the initialize operation.
 	/// \return	true if it succeeds, false if it fails.
@@ -188,6 +212,10 @@ private:
 
 	/// Indicates if this SceneElement is active or not.
 	bool m_isActive;
+
+	/// Local groups for serialization local handling
+	std::shared_ptr<SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>> m_groups;
+
 };
 
 }; // namespace Framework

@@ -29,10 +29,8 @@ void MlcpPhysicsProblem::setZero(size_t numDof, size_t numConstraintDof, size_t 
 {
 	MlcpProblem::setZero(numDof, numConstraintDof, numConstraints);
 
-	H.resize(numConstraintDof, numDof);
-	H.setZero();
-	CHt.resize(numDof, numConstraintDof);
-	CHt.setZero();
+	H.setZero(numConstraintDof, numDof);
+	CHt.setZero(numDof, numConstraintDof);
 }
 
 MlcpPhysicsProblem MlcpPhysicsProblem::Zero(size_t numDof, size_t numConstraintDof, size_t numConstraints)

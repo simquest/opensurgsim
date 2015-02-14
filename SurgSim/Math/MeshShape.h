@@ -13,36 +13,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This code is based on David Eberly's paper:
-// http://www.geometrictools.com/Documentation/PolyhedralMassProperties.pdf
-// which is improving Brian Mirtich previous work (http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html)
-// by making the assumption that the polyhedral mesh is composed of triangles.
-
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
-#include "SurgSim/DataStructures/AabbTree.h"
+#include <memory>
+
+#include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/DataStructures/NormalData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
+namespace DataStructures
+{
+class AabbTree;
+}
 
 namespace Math
 {
-SURGSIM_STATIC_REGISTRATION(MeshShape);
 
+SURGSIM_STATIC_REGISTRATION(MeshShape);
 
 /// Mesh shape: shape made of a triangle mesh
 /// The triangle mesh needs to be watertight to produce valid volume, center and second moment of
 /// volume. If it is not the case and you need valid geometric properties, use SurfaceMeshShape instead.
 /// Various geometrical properties (volume based) are computed from the triangle mesh using
-/// David Eberly's work:
-/// http://www.geometrictools.com/Documentation/PolyhedralMassProperties.pdf
+/// David Eberly's work (http://www.geometrictools.com/Documentation/PolyhedralMassProperties.pdf)
+/// which is improving Brian Mirtich previous work (http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html)
+/// by making the assumption that the polyhedral mesh is composed of triangles.
 ///
 /// \note The internal mesh should not be modified, otherwise the geometric properties will be invalid.
 /// \note Practical use cases:
@@ -50,42 +51,33 @@ SURGSIM_STATIC_REGISTRATION(MeshShape);
 /// \note * Deformable  object, the mesh will be updated, but the geometric properties will not be used.
 ///
 /// \sa SurfaceMeshShape
-class MeshShape : public Shape
+class MeshShape : public Shape, public SurgSim::DataStructures::TriangleMesh<SurgSim::DataStructures::EmptyData,
+	SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::NormalData>
 {
 public:
 	/// Constructor
 	MeshShape();
 
-	/// Constructor
-	/// \param mesh The triangle mesh to build the shape from
-	/// \exception Raise an exception if the mesh is invalid
+	/// Copy constructor when the template data is a different type
+	/// \tparam	VertexData Type of extra data stored in each vertex
+	/// \tparam	EdgeData Type of extra data stored in each edge
+	/// \tparam	TriangleData Type of extra data stored in each triangle
+	/// \param other The mesh to be copied from. Vertex, edge and triangle data will not be copied
 	template <class VertexData, class EdgeData, class TriangleData>
-	explicit MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh);
+	explicit MeshShape(const SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>& other);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::MeshShape);
 
-	/// \return the type of the shape
 	int getType() const override;
 
-	/// Gets the initial mesh
-	/// \return The collision mesh associated to this MeshShape
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getInitialMesh();
+	/// Get normal for triangle.
+	/// \param triangleId The triangle to get normal.
+	/// \return The normal for the triangle with given ID.
+	const SurgSim::Math::Vector3d& getNormal(size_t triangleId);
 
-	/// Sets the mesh, alternatively you can use \sa load() to just load a mesh with a given name
-	/// \param mesh the mesh asset to be used here
-	void setInitialMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh);
-
-
-	/// Utility function, will create a mesh and load it if the path is correct
-	/// \param filePath the name of the mesh
-	/// \return whether the mesh was successfully loaded
-	void loadInitialMesh(const std::string& filePath);
-
-
-
-	/// Get mesh
-	/// \return The collision mesh associated to this MeshShape
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh();
+	/// Calculate normals for all triangles.
+	/// \note Normals will be normalized.
+	void calculateNormals();
 
 	/// Get the volume of the shape
 	/// \note this parameter is valid with respect to the initial mesh
@@ -114,15 +106,17 @@ public:
 	/// \return The object's associated AabbTree
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree();
 
-	/// Check if this shape contains a valid mesh.
-	/// Equals 'MeshShape::getMesh() != nullptr && MeshShape::getMesh()->isValid()'
-	/// \return true if this shape contains a valid mesh; otherwise, false.
-	bool isValid() const;
+	bool isValid() const override;
 
-private:
+protected:
+	void doUpdate() override;
+
+	bool doLoad(const std::string& fileName) override;
+
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.
-	void computeVolumeIntegrals();
+	virtual void computeVolumeIntegrals();
+
 	/// Center (considering a uniform distribution in the mesh volume)
 	SurgSim::Math::Vector3d m_center;
 
@@ -132,11 +126,9 @@ private:
 	/// Second moment of volume
 	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
 
-	/// The triangle mesh contained by this shape.
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
-
+private:
 	/// The initial triangle mesh contained by this shape.
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_initialMesh;
+	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlain> m_initialMesh;
 
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;

@@ -122,3 +122,35 @@ TEST(DcdCollisionTest, FixedRigidCollisionTest)
 	ASSERT_EQ(1u, newState->getCollisionPairs().size());
 	EXPECT_TRUE(newState->getCollisionPairs().at(0)->hasContacts());
 }
+
+TEST(DcdCollisionTest, InactiveCollisionTest)
+{
+	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
+
+	std::shared_ptr<RigidRepresentation> sphere1 = createSphere("Sphere1", Vector3d(0.0,0.0,0.0));
+	std::shared_ptr<RigidRepresentation> sphere2 = createSphere("Sphere2", Vector3d(0.0,0.0,0.5));
+
+	std::shared_ptr<SurgSim::Collision::Representation> sphere1Collision =
+		std::make_shared<RigidCollisionRepresentation>("Sphere1 Collision");
+	sphere1Collision->setLocalActive(false);
+	sphere1->setCollisionRepresentation(sphere1Collision);
+
+	std::shared_ptr<SurgSim::Collision::Representation> sphere2Collision =
+		std::make_shared<RigidCollisionRepresentation>("Sphere2 Collision");
+	sphere2->setCollisionRepresentation(sphere2Collision);
+
+	std::vector<std::shared_ptr<Representation>> representations;
+	representations.push_back(sphere1);
+	representations.push_back(sphere2);
+	state->setRepresentations(representations);
+
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> collisions;
+	collisions.push_back(sphere1Collision);
+	collisions.push_back(sphere2Collision);
+	state->setCollisionRepresentations(collisions);
+
+	SurgSim::Physics::DcdCollision computation;
+	std::shared_ptr<PhysicsManagerState> newState = computation.update(1.0, state);
+
+	ASSERT_EQ(0u, newState->getCollisionPairs().size());
+}

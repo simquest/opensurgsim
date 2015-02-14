@@ -44,6 +44,19 @@ MassSpringRepresentation::~MassSpringRepresentation()
 {
 }
 
+bool MassSpringRepresentation::doInitialize()
+{
+	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
+
+	// Initialize the Springs
+	for (auto spring : m_springs)
+	{
+		spring->initialize(*m_initialState);
+	}
+
+	return true;
+}
+
 void MassSpringRepresentation::addMass(const std::shared_ptr<Mass> mass)
 {
 	m_masses.push_back(mass);
@@ -154,8 +167,7 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
-	m_f.resize(state.getNumDof());
-	m_f.setZero();
+	m_f.setZero(state.getNumDof());
 
 	addGravityForce(&m_f, state);
 	addRayleighDampingForce(&m_f, state);
@@ -184,8 +196,7 @@ const Matrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& 
 	using SurgSim::Math::setSubVector;
 
 	// Make sure the mass matrix has been properly allocated
-	m_M.resize(state.getNumDof(), state.getNumDof());
-	m_M.setZero();
+	m_M.setZero(state.getNumDof(), state.getNumDof());
 
 	Eigen::MatrixBase<Matrix>::DiagonalReturnType diagonal = m_M.diagonal();
 
@@ -215,8 +226,7 @@ const Matrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& 
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.resize(state.getNumDof(), state.getNumDof());
-	m_D.setZero();
+	m_D.setZero(state.getNumDof(), state.getNumDof());
 
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
@@ -268,8 +278,7 @@ const Matrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& 
 	using SurgSim::Math::addSubMatrix;
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.resize(state.getNumDof(), state.getNumDof());
-	m_K.setZero();
+	m_K.setZero(state.getNumDof(), state.getNumDof());
 
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
@@ -302,20 +311,16 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 	using SurgSim::Math::addSubMatrix;
 
 	// Make sure the force vector has been properly allocated and zeroed out
-	m_f.resize(state.getNumDof());
-	m_f.setZero();
+	m_f.setZero(state.getNumDof());
 
 	// Make sure the mass matrix has been properly allocated
-	m_M.resize(state.getNumDof(), state.getNumDof());
-	m_M.setZero();
+	m_M.setZero(state.getNumDof(), state.getNumDof());
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.resize(state.getNumDof(), state.getNumDof());
-	m_D.setZero();
+	m_D.setZero(state.getNumDof(), state.getNumDof());
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.resize(state.getNumDof(), state.getNumDof());
-	m_K.setZero();
+	m_K.setZero(state.getNumDof(), state.getNumDof());
 
 	// Computes the mass matrix m_M
 	computeM(state);
@@ -413,7 +418,7 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Surg
 	{
 		if (useGlobalStiffnessMatrix)
 		{
-			*force -= scale * rayleighStiffness * (m_K * v);
+			*force -= (scale * rayleighStiffness) * (m_K * v);
 		}
 		else
 		{

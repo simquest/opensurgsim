@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
+#include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/FemPlyReaderDelegate.h"
 
 namespace SurgSim
@@ -367,12 +368,6 @@ bool MockFemElement::isInitialized() const
 	return m_isInitialized;
 }
 
-bool InvalidMockFemElement::update(const SurgSim::Math::OdeState& state)
-{
-	return false;
-}
-
-
 MockFemRepresentation::MockFemRepresentation(const std::string& name) : FemRepresentation(name)
 {
 	this->m_numDofPerNode = 3;
@@ -601,6 +596,31 @@ const SurgSim::DataStructures::DataGroup& MockVirtualToolCoupler::getOutputData(
 	return m_outputData;
 }
 
+MockCollisionRepresentation::MockCollisionRepresentation(const std::string& name)
+	: SurgSim::Collision::Representation(name), m_numberOfTimesUpdateCalled(0)
+{}
+
+int MockCollisionRepresentation::getShapeType() const
+{
+	return -1;
+}
+
+const std::shared_ptr<SurgSim::Math::Shape> MockCollisionRepresentation::getShape() const
+{
+	return nullptr;
+}
+
+void MockCollisionRepresentation::update(const double& dt)
+{
+	++m_numberOfTimesUpdateCalled;
+}
+
+/// \return The number of times update method has been invoked.
+int MockCollisionRepresentation::getNumberOfTimesUpdateCalled() const
+{
+	return m_numberOfTimesUpdateCalled;
+}
+
 MockComputation::MockComputation(bool doCopyState) : Computation(doCopyState)
 {
 }
@@ -610,6 +630,5 @@ std::shared_ptr<PhysicsManagerState> MockComputation::doUpdate(const double& dt,
 {
 	return state;
 }
-
 }; // Physics
 }; // SurgSim

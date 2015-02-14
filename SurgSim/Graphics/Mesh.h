@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "SurgSim/DataStructures/EmptyData.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -52,21 +52,23 @@ struct VertexData
 	}
 };
 
-class Mesh : public SurgSim::DataStructures::TriangleMeshBase<VertexData, SurgSim::DataStructures::EmptyData,
+SURGSIM_STATIC_REGISTRATION(Mesh);
+
+class Mesh : public SurgSim::DataStructures::TriangleMesh<VertexData, SurgSim::DataStructures::EmptyData,
 	SurgSim::DataStructures::EmptyData>
 {
 public:
 	/// Default constructor
 	Mesh();
 
-	/// Copy constructor
+	/// Copy constructor when the template data is a different type
 	/// \tparam	VertexDataSource	Type of extra data stored in each vertex
 	/// \tparam	EdgeDataSource	Type of extra data stored in each edge
 	/// \tparam	TriangleDataSource	Type of extra data stored in each triangle
-	/// \param mesh The mesh to be copied from. Vertex, edge and triangle data will be emptied.
+	/// \param other The mesh to be copied from. Vertex, edge and triangle data will not be copied
 	/// \note: Data of the input mesh, i.e. VertexDataSource, EdgeDataSource and TrianleDataSource will not be copied.
 	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-	explicit Mesh(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh);
+	explicit Mesh(const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& other);
 
 	/// Utility function to initialize a mesh with plain data,
 	/// \param	vertices 	An array of vertex coordinates.
@@ -80,6 +82,9 @@ public:
 					const std::vector<SurgSim::Math::Vector4d>& colors,
 					const std::vector<SurgSim::Math::Vector2d>& textures,
 					const std::vector<size_t>& triangles);
+
+protected:
+	bool doLoad(const std::string& fileName) override;
 };
 
 

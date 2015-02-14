@@ -23,9 +23,29 @@ namespace Math
 {
 
 OdeSolverEulerImplicit::OdeSolverEulerImplicit(OdeEquation* equation)
-	: OdeSolver(equation)
+	: OdeSolver(equation), m_maximumIteration(1), m_epsilonConvergence(1e-5)
 {
 	m_name = "Ode Solver Euler Implicit";
+}
+
+void OdeSolverEulerImplicit::setNewtonRaphsonMaximumIteration(size_t maximumIteration)
+{
+	m_maximumIteration = maximumIteration;
+}
+
+size_t OdeSolverEulerImplicit::getNewtonRaphsonMaximumIteration() const
+{
+	return m_maximumIteration;
+}
+
+void OdeSolverEulerImplicit::setNewtonRaphsonEpsilonConvergence(double epsilonConvergence)
+{
+	m_epsilonConvergence = epsilonConvergence;
+}
+
+double OdeSolverEulerImplicit::getNewtonRaphsonEpsilonConvergence() const
+{
+	return m_epsilonConvergence;
 }
 
 void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
@@ -38,36 +58,73 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 	//   (M.deltaV)/dt = f(t) - K.(dt.v(t) + dt.deltaV) - D.deltaV
 	//   (M/dt + D + dt.K).deltaV = f(t) - dt.K.v(t)
 
-	// Computes f(t, x(t), v(t)), M, D, K all at the same time
-	Matrix* M;
-	Matrix* D;
-	Matrix* K;
-	Vector* f;
-	m_equation.computeFMDK(currentState, &f, &M, &D, &K);
+	// Note that this system is non-linear as K and D are  non-linear in absence of information on the nature
+	// of the model. We use a Newton-Raphson algorithm (http://en.wikipedia.org/wiki/Newton%27s_method) to solve
+	// this non-linear problem. Note that each iteration will re-evaluate the complete system (forces and matrices).
+	// Also note that this method converges quadratically around the root. In our case, the solution is deltaV, which
+	// should be close to 0. This makes our problem well suited for this method.
 
-	// Adds the Euler Implicit terms on the right-hand-side
-	*f -= ((*K) * currentState.getVelocities()) * dt;
+	m_deltaV.resize(currentState.getPositions().size());
+	if (m_maximumIteration > 1)
+	{
+		m_previousDeltaV = Vector::Zero(m_deltaV.size());
+	}
 
-	// Computes the system matrix (left-hand-side matrix)
-	m_systemMatrix  = (*M) * (1.0 / dt);
-	m_systemMatrix += (*D);
-	m_systemMatrix += (*K) * dt;
+	// Prepare the newState to be used in the loop, it starts as the current state.
+	*newState = currentState;
 
-	// Apply boundary conditions to the linear system
-	currentState.applyBoundaryConditionsToVector(f);
-	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
+	size_t numIteration = 0;
+	while (numIteration < m_maximumIteration)
+	{
+		Matrix* M;
+		Matrix* D;
+		Matrix* K;
+		Vector* f;
 
-	// Computes deltaV (stored in the velocities) and m_compliance = 1/m_systemMatrix
-	Vector& deltaV = newState->getVelocities();
-	(*m_linearSolver)(m_systemMatrix, *f, &deltaV, &m_compliance);
+		// Computes f(t, x(t), v(t)), M, D, K all at the same time
+		m_equation.computeFMDK(*newState, &f, &M, &D, &K);
+
+		// Adds the Euler Implicit terms on the right-hand-side
+		*f -= ((*K) * newState->getVelocities()) * dt;
+
+		// Computes the system matrix (left-hand-side matrix)
+		m_systemMatrix  = (*M) * (1.0 / dt);
+		m_systemMatrix += (*D);
+		m_systemMatrix += (*K) * dt;
+
+		// Apply boundary conditions to the linear system
+		currentState.applyBoundaryConditionsToVector(f);
+		currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
+
+		// Computes deltaV
+		(*m_linearSolver)(m_systemMatrix, *f, &m_deltaV);
+
+		// Compute the new state using the Euler Implicit scheme:
+		newState->getVelocities() = currentState.getVelocities() + m_deltaV;
+		newState->getPositions()  = currentState.getPositions() + dt * newState->getVelocities();
+
+		if (m_maximumIteration > 1)
+		{
+			// Use the infinity norm, to treat models with small or large number of dof the same way.
+			double solutionVariation = (m_deltaV - m_previousDeltaV).lpNorm<Eigen::Infinity>();
+
+			if (solutionVariation < m_epsilonConvergence)
+			{
+				break;
+			}
+
+			m_previousDeltaV = m_deltaV;
+		}
+
+		numIteration++;
+	}
+
+	// Only compute the compliance matrix once, around the root
+	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_compliance);
 
 	// Remove the boundary conditions compliance from the compliance matrix
 	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
 	currentState.applyBoundaryConditionsToMatrix(&m_compliance, false);
-
-	// Compute the new state using the Euler Implicit scheme:
-	newState->getVelocities() = currentState.getVelocities() + deltaV;
-	newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();
 }
 
 }; // namespace Math

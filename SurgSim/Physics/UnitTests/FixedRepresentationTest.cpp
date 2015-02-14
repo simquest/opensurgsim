@@ -19,6 +19,8 @@
 
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
@@ -56,14 +58,23 @@ public:
 			q.normalize();
 			t.setRandom();
 			m_currentTransformation = SurgSim::Math::makeRigidTransform(q, t);
-		} while (m_initialTransformation.isApprox(m_currentTransformation));
+		}
+		while (m_initialTransformation.isApprox(m_currentTransformation));
 
 		m_identityTransformation.setIdentity();
 
 		m_fixedRepresentation = std::make_shared<FixedRepresentation>("FixedRepresentation");
 		m_element = std::make_shared<BasicSceneElement>("element");
 		m_element->addComponent(m_fixedRepresentation);
+
+		m_runtime = std::make_shared<SurgSim::Framework::Runtime>();
+		m_scene = m_runtime->getScene();
+
+		m_scene->addSceneElement(m_element);
 	}
+
+	std::shared_ptr<SurgSim::Framework::Runtime> m_runtime;
+	std::shared_ptr<SurgSim::Framework::Scene> m_scene;
 
 	std::shared_ptr<FixedRepresentation> m_fixedRepresentation;
 	std::shared_ptr<BasicSceneElement> m_element;
@@ -76,6 +87,7 @@ public:
 
 	// Identity pose (no translation/rotation)
 	RigidTransform3d m_identityTransformation;
+
 };
 
 TEST_F(FixedRepresentationTest, ConstructorTest)
@@ -89,7 +101,6 @@ TEST_F(FixedRepresentationTest, ResetStateTest)
 	m_fixedRepresentation->setIsGravityEnabled(false);
 	m_fixedRepresentation->setLocalPose(m_initialTransformation);
 
-	m_element->initialize();
 	m_fixedRepresentation->wakeUp();
 
 	// Initial = Current = Previous = m_initialTransformation
@@ -164,7 +175,6 @@ TEST_F(FixedRepresentationTest, UpdateTest)
 	double dt = 1.0;
 
 	m_fixedRepresentation->setLocalPose(m_initialTransformation);
-	m_element->initialize();
 	m_fixedRepresentation->wakeUp();
 
 	m_fixedRepresentation->setLocalPose(m_currentTransformation);
@@ -186,11 +196,11 @@ TEST_F(FixedRepresentationTest, SerializationTest)
 		auto rigidRepresentation = std::make_shared<FixedRepresentation>("TestFixedRepresentation");
 		YAML::Node node;
 		ASSERT_NO_THROW(node =
-			YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(rigidRepresentation));
+							YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(rigidRepresentation));
 
 		std::shared_ptr<FixedRepresentation> newRepresentation;
 		EXPECT_NO_THROW(newRepresentation =
-			std::dynamic_pointer_cast<FixedRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+							std::dynamic_pointer_cast<FixedRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 		EXPECT_NE(nullptr, newRepresentation);
 	}
 

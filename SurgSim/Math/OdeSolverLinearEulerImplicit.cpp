@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/OdeSolverLinearEulerImplicit.h"
 #include "SurgSim/Math/OdeState.h"
 
@@ -26,6 +27,17 @@ OdeSolverLinearEulerImplicit::OdeSolverLinearEulerImplicit(OdeEquation* equation
 	: OdeSolverEulerImplicit(equation), m_initialized(false)
 {
 	m_name = "Ode Solver Linear Euler Implicit";
+
+	// The system being linear, only 1 iteration is necessary to find the exact solution.
+	setNewtonRaphsonMaximumIteration(1);
+}
+
+void OdeSolverLinearEulerImplicit::setNewtonRaphsonMaximumIteration(size_t maximumIteration)
+{
+	OdeSolverEulerImplicit::setNewtonRaphsonMaximumIteration(maximumIteration);
+	SURGSIM_LOG_IF(maximumIteration != 1, SurgSim::Framework::Logger::getLogger("OdeSolver"), WARNING) <<
+		"OdeSolverLinearEulerImplicit should have a maximum number of iteration of 1 for the Newton-Raphson. " <<
+		"As the model is (supposed to be) linear, a single iteration will find the exact solution.";
 }
 
 void OdeSolverLinearEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState)

@@ -36,7 +36,7 @@ find_library(LABJACK_LIBRARY
 mark_as_advanced(LABJACK_LIBRARY)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(LABJACK
+find_package_handle_standard_args(LabJack
 	DEFAULT_MSG LABJACK_ROOT_DIR LABJACK_INCLUDE_DIR
 	LABJACK_LIBRARY)
 
