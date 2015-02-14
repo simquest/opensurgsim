@@ -26,6 +26,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/Computation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
@@ -445,6 +446,16 @@ public:
 private:
 	/// Number of times update method has been invoked.
 	int m_numberOfTimesUpdateCalled;
+};
+
+class MockComputation : public Computation
+{
+public:
+	explicit MockComputation(bool doCopyState = false);
+
+protected:
+	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
+												  const std::shared_ptr<PhysicsManagerState>& state) override;
 };
 
 }; // Physics

@@ -200,7 +200,7 @@ TEST_F(FixedRepresentationTest, SerializationTest)
 
 		std::shared_ptr<FixedRepresentation> newRepresentation;
 		EXPECT_NO_THROW(newRepresentation =
-							std::dynamic_pointer_cast<FixedRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+			std::dynamic_pointer_cast<FixedRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 		EXPECT_NE(nullptr, newRepresentation);
 	}
 

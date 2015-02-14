@@ -621,5 +621,14 @@ int MockCollisionRepresentation::getNumberOfTimesUpdateCalled() const
 	return m_numberOfTimesUpdateCalled;
 }
 
+MockComputation::MockComputation(bool doCopyState) : Computation(doCopyState)
+{
+}
+
+std::shared_ptr<PhysicsManagerState> MockComputation::doUpdate(const double& dt,
+															   const std::shared_ptr<PhysicsManagerState>& state)
+{
+	return state;
+}
 }; // Physics
 }; // SurgSim
