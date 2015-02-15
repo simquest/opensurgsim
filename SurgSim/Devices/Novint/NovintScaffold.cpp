@@ -744,11 +744,7 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-
-	// Set the DeviceData's force to the nominal force, if provided.
-	Vector3d nominalForce = Vector3d::Zero();
-	outputData.vectors().get(SurgSim::DataStructures::Names::FORCE, &nominalForce);
-	info->force = nominalForce;
+	outputData.vectors().get(SurgSim::DataStructures::Names::FORCE, &(info->force));
 
 	// If the springJacobian was provided, multiply with the change in position since the output data was set,
 	// to get a delta force.  This way a linearized output force is calculated at haptic update rates.
