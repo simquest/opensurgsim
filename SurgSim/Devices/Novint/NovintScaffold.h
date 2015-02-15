@@ -110,6 +110,10 @@ private:
 	/// \return	true on success.
 	bool updateDeviceOutput(DeviceData* info);
 
+	/// Displays/renders zero force and torque.
+	/// \param info	The device data.
+	/// \return	true on success.
+	bool zeroDeviceOutput(DeviceData* info);
 
 	/// Checks whether a device has been homed.  If the position and/or orientation have not been homed, zeros the
 	/// respective Values.  Call this before setting the data to send to the Input Component.  The DeviceData's

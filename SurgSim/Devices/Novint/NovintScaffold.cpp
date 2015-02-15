@@ -654,6 +654,25 @@ bool NovintScaffold::updateDeviceOutput(DeviceData* info)
 	return !fatalError;
 }
 
+bool NovintScaffold::zeroDeviceOutput(DeviceData* info)
+{
+	hdlMakeCurrent(info->deviceHandle->get());	// This device is now "current", and all hdlXxx calls apply to it.
+	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
+
+	info->force.setZero();
+	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data());
+	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
+
+	if (info->isDevice7Dof)
+	{
+		info->torque.setZero();
+		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torque.data());
+		fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+	}
+
+	return !fatalError;
+}
+
 bool NovintScaffold::updateDeviceInput(DeviceData* info)
 {
 	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
@@ -740,7 +759,6 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 
 void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 {
-	typedef Eigen::Matrix<double, 6, 1> Vector6d;
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
 	// Set the DeviceData's force to the nominal force, if provided.
@@ -750,7 +768,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 
 	// If the springJacobian was provided, multiply with the change in position since the output data was set,
 	// to get a delta force.  This way a linearized output force is calculated at haptic update rates.
-	Vector6d deltaPosition;
+	SurgSim::Math::Vector6d deltaPosition;
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
 	bool havespringJacobian =
 		outputData.matrices().get(SurgSim::DataStructures::Names::SPRING_JACOBIAN, &springJacobian);
@@ -770,7 +788,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	}
 
 	// If the damperJacobian was provided, calculate a delta force based on the change in velocity.
-	Vector6d deltaVelocity;
+	SurgSim::Math::Vector6d deltaVelocity;
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType damperJacobian;
 	bool havedamperJacobian =
 		outputData.matrices().get(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, &damperJacobian);
@@ -794,9 +812,8 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	// Calculate the torque command if applicable (and convert newton-meters to command counts).
 	if (info->isDevice7Dof)
 	{
-		Vector3d nominalTorque = Vector3d::Zero();
-		outputData.vectors().get(SurgSim::DataStructures::Names::TORQUE, &nominalTorque);
-		Vector3d torque = nominalTorque;
+		Vector3d torque = Vector3d::Zero();
+		outputData.vectors().get(SurgSim::DataStructures::Names::TORQUE, &torque);
 
 		if (havespringJacobian)
 		{
@@ -1039,9 +1056,13 @@ bool NovintScaffold::runHapticFrame()
 	}
 	for (auto& it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
 	{
-		if (updateDeviceOutput((*it).get()))
+		if ((*it)->deviceObject->pullOutput())
 		{
-			(*it)->deviceObject->pullOutput();
+			updateDeviceOutput((*it).get());
+		}
+		else
+		{
+			zeroDeviceOutput((*it).get());
 		}
 	}
 
