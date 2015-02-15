@@ -624,14 +624,14 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 	return result;
 }
 
-bool NovintScaffold::updateDeviceOutput(DeviceData* info)
+bool NovintScaffold::updateDeviceOutput(DeviceData* info, bool pulledOutput)
 {
 	hdlMakeCurrent(info->deviceHandle->get());	// This device is now "current", and all hdlXxx calls apply to it.
 	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
 
 	info->force.setZero();
 	info->torque.setZero();
-	if (info->isDeviceHomed)
+	if (info->isDeviceHomed && pulledOutput)
 	{
 		bool desiredGravityCompensation = false;
 		if (info->deviceObject->getOutputData().booleans().get("gravityCompensation", &desiredGravityCompensation))
@@ -645,27 +645,11 @@ bool NovintScaffold::updateDeviceOutput(DeviceData* info)
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
 	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
-	// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not used
-	// anywhere at the moment.
-	// The 2nd arg to this call is the count; we're setting 4 doubles.
-	hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torque.data());
-	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
-
-	return !fatalError;
-}
-
-bool NovintScaffold::zeroDeviceOutput(DeviceData* info)
-{
-	hdlMakeCurrent(info->deviceHandle->get());	// This device is now "current", and all hdlXxx calls apply to it.
-	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
-
-	info->force.setZero();
-	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data());
-	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
-
 	if (info->isDevice7Dof)
 	{
-		info->torque.setZero();
+		// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not
+		// used anywhere at the moment.
+		// The 2nd arg to this call is the count; we're setting 4 doubles.
 		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torque.data());
 		fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 	}
@@ -1056,14 +1040,8 @@ bool NovintScaffold::runHapticFrame()
 	}
 	for (auto& it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
 	{
-		if ((*it)->deviceObject->pullOutput())
-		{
-			updateDeviceOutput((*it).get());
-		}
-		else
-		{
-			zeroDeviceOutput((*it).get());
-		}
+		bool pulledOutput = (*it)->deviceObject->pullOutput();
+		updateDeviceOutput((*it).get(), pulledOutput);
 	}
 
 	bool desiredGravityCompensation = false;
