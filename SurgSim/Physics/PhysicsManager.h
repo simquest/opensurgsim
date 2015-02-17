@@ -77,29 +77,25 @@ public:
 									 std::shared_ptr<SurgSim::Collision::Representation> representation2);
 
 protected:
-	///@{
-	/// Overridden from ComponentManager
 	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
+
 	bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
-	///@}
 
-	///@{
-	/// Overridden from BasicThread
+	/// Initialize the Physics Manager
+	/// Derived class(es) should override this method to have a customized list of computations.
+	/// \sa SurgSim::Physics::Computation
 	bool doInitialize() override;
-	bool doStartUp() override;
-	bool doUpdate(double dt) override;
-	///@}
 
-	/// A list of computations, to perform the physics update.
-	std::list<std::shared_ptr<SurgSim::Physics::Computation>> m_computations;
+	bool doStartUp() override;
+
+	bool doUpdate(double dt) override;
+
+	/// Add a computation to the list of computations to perform each update
+	/// \note The computations will be run in order they were added.
+	/// \param computation The Computation to add
+	void addComputation(std::shared_ptr<SurgSim::Physics::Computation> computation);
 
 private:
-	/// Initialize the list of computations.
-	/// Derived class(es) could override this method to have a customized list of computations.
-	/// \param copyState Indicates if the output state in Computation::Update() is a copy or not of the input state
-	/// \sa SurgSim::Physics::Computation
-	virtual void initializeComputations(bool copyState);
-
 	/// Get an iterator to an excluded collision pair.
 	/// \note Lock m_excludedCollisionPairMutex before calling
 	/// \param representation1 The first Collision::Representation for the pair
@@ -121,6 +117,9 @@ private:
 
 	/// Mutex to protect m_excludedCollisionPairs from being read/written simultaneously.
 	boost::mutex m_excludedCollisionPairMutex;
+
+	/// A list of computations, to perform the physics update.
+	std::list<std::shared_ptr<SurgSim::Physics::Computation>> m_computations;
 
 	/// A thread-safe copy of the last PhysicsManagerState in the previous update.
 	SurgSim::Framework::LockedContainer<SurgSim::Physics::PhysicsManagerState> m_finalState;

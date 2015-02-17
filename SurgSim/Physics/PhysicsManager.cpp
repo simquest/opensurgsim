@@ -52,10 +52,25 @@ int PhysicsManager::getType() const
 
 bool PhysicsManager::doInitialize()
 {
-	initializeComputations(false);
-	return m_logger != nullptr;
+	bool copyState = false;
+	addComputation(std::make_shared<PreUpdate>(copyState));
+	addComputation(std::make_shared<FreeMotion>(copyState));
+	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
+	addComputation(std::make_shared<DcdCollision>(copyState));
+	addComputation(std::make_shared<ContactConstraintGeneration>(copyState));
+	addComputation(std::make_shared<BuildMlcp>(copyState));
+	addComputation(std::make_shared<SolveMlcp>(copyState));
+	addComputation(std::make_shared<PushResults>(copyState));
+	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
+	addComputation(std::make_shared<PostUpdate>(copyState));
+
+	return true;
 }
 
+void PhysicsManager::addComputation(std::shared_ptr<SurgSim::Physics::Computation> computation)
+{
+	m_computations.push_back(computation);
+}
 
 bool PhysicsManager::doStartUp()
 {
@@ -147,20 +162,6 @@ bool PhysicsManager::doUpdate(double dt)
 	m_finalState.set(*(stateList.back()));
 
 	return true;
-}
-
-void PhysicsManager::initializeComputations(bool copyState)
-{
-	m_computations.push_back(std::make_shared<PreUpdate>(copyState));
-	m_computations.push_back(std::make_shared<FreeMotion>(copyState));
-	m_computations.push_back(std::make_shared<UpdateCollisionRepresentations>(copyState));
-	m_computations.push_back(std::make_shared<DcdCollision>(copyState));
-	m_computations.push_back(std::make_shared<ContactConstraintGeneration>(copyState));
-	m_computations.push_back(std::make_shared<BuildMlcp>(copyState));
-	m_computations.push_back(std::make_shared<SolveMlcp>(copyState));
-	m_computations.push_back(std::make_shared<PushResults>(copyState));
-	m_computations.push_back(std::make_shared<UpdateCollisionRepresentations>(copyState));
-	m_computations.push_back(std::make_shared<PostUpdate>(copyState));
 }
 
 }; // Physics
