@@ -59,7 +59,7 @@ std::shared_ptr<PhysicsManagerState>
 	result->setConstraintsMapping(constraintsMapping);
 
 	// Calculate numDof size
-	auto const activeRepresentations = result->getActiveRepresentations();
+	auto& const activeRepresentations = result->getActiveRepresentations();
 	for (auto it = activeRepresentations.cbegin(); it != activeRepresentations.cend(); it++)
 	{
 		representationsMapping.setValue((*it).get(), numDof);

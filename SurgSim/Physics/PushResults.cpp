@@ -48,7 +48,7 @@ std::shared_ptr<PhysicsManagerState>
 
 	// 2nd step
 	// Push the dof displacement correction to all representation, using their assigned index
-	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
+	auto& representations = result->getRepresentations();
 	auto const itEnd = representations.end();
 	for (auto it = representations.begin(); it != itEnd; ++it)
 	{

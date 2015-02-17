@@ -126,7 +126,7 @@ const std::vector<std::shared_ptr<ConstraintComponent>>& PhysicsManagerState::ge
 	return m_constraintComponents;
 }
 
-void PhysicsManagerState::setCollisionPairs(std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> val)
+void PhysicsManagerState::setCollisionPairs(const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& val)
 {
 	m_collisionPairs = val;
 }
