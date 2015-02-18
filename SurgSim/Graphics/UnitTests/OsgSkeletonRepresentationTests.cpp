@@ -27,13 +27,12 @@
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgModel.h"
 
-using namespace SurgSim;
-using Graphics::OsgSkeletonRepresentation;
-using Graphics::OsgViewElement;
-using Graphics::SkeletonRepresentation;
-using Math::makeRigidTransform;
-using Math::makeRotationQuaternion;
-using Math::Vector3d;
+using SurgSim::Graphics::OsgSkeletonRepresentation;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::SkeletonRepresentation;
+using SurgSim::Math::makeRigidTransform;
+using SurgSim::Math::makeRotationQuaternion;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -45,7 +44,7 @@ class OsgSkeletonRepresentationTest: public ::testing::Test
 public:
 	void SetUp() override
 	{
-		runtime = std::make_shared<Framework::Runtime>("config.txt");
+		runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		manager = std::make_shared<OsgManager>();
 		scene = runtime->getScene();
 		view = std::make_shared<OsgViewElement>("view element");
@@ -58,9 +57,9 @@ public:
 	{
 	}
 
-	std::shared_ptr<Framework::Runtime> runtime;
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
 	std::shared_ptr<OsgManager> manager;
-	std::shared_ptr<Framework::Scene> scene;
+	std::shared_ptr<SurgSim::Framework::Scene> scene;
 	std::shared_ptr<OsgViewElement> view;
 };
 
@@ -140,7 +139,7 @@ TEST_F(OsgSkeletonRepresentationTest, NeutralPosesTest)
 	skeleton->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
 	skeleton->setSkinningShaderFileName("Shaders/skinning.vert");
 
-	Math::RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(0.6, Vector3d::UnitY().eval()),
+	SurgSim::Math::RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(0.6, Vector3d::UnitY().eval()),
 			Vector3d(-2.3, -4.5, -6.7));
 
 	skeleton->setNeutralBonePose("Bone", pose);
@@ -163,8 +162,8 @@ TEST_F(OsgSkeletonRepresentationTest, NeutralPosesTest)
 
 TEST_F(OsgSkeletonRepresentationTest, AccessibleTest)
 {
-	std::shared_ptr<Framework::Component> component;
-	ASSERT_NO_THROW(component = Framework::Component::getFactory().create(
+	std::shared_ptr<SurgSim::Framework::Component> component;
+	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
 		"SurgSim::Graphics::OsgSkeletonRepresentation", "skeleton"));
 
 	std::string fileName("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
@@ -186,7 +185,7 @@ TEST_F(OsgSkeletonRepresentationTest, SerializationTests)
 	skeleton->loadModel(fileName);
 	std::string skinningShaderFileName("Shaders/skinning.vert");
 	skeleton->setSkinningShaderFileName(skinningShaderFileName);
-	Math::RigidTransform3d pose = makeRigidTransform(
+	SurgSim::Math::RigidTransform3d pose = makeRigidTransform(
 		makeRotationQuaternion(2.143, Vector3d(2.463, 6.346, 7.135).normalized()), Vector3d(2.3, 4.5, 6.7));
 	skeleton->setNeutralBonePose("Bone", pose);
 
