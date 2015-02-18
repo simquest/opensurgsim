@@ -33,6 +33,7 @@
 
 namespace osg
 {
+class Geode;
 class Geometry;
 class DrawElementsUInt;
 }
@@ -90,6 +91,7 @@ private:
 	///@{
 	/// Osg structures
 	osg::ref_ptr<osg::Geometry> m_geometry;
+	osg::ref_ptr<osg::Geode> m_geode;
 	osg::ref_ptr<osg::Vec3Array> m_vertices;
 	osg::ref_ptr<osg::Vec4Array> m_colors;
 	osg::ref_ptr<osg::Vec3Array> m_normals;
