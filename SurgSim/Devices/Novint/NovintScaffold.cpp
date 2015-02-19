@@ -1036,8 +1036,7 @@ bool NovintScaffold::runHapticFrame()
 	}
 	for (auto& it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
 	{
-		bool pulledOutput = (*it)->deviceObject->pullOutput();
-		updateDeviceOutput((*it).get(), pulledOutput);
+		updateDeviceOutput(it->get(), (*it)->deviceObject->pullOutput());
 	}
 
 	bool desiredGravityCompensation = false;
