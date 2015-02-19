@@ -1,14 +1,12 @@
 /*!
 	\class SurgSim::Math::OdeSolverEulerImplicit
-	<br>
 
 	This class aims at implementing the Euler implicit ODE solver. The ODE to be solved is of the form:
 	\f[ \displaystyle M.a(t) = f(t, x(t), v(t)) \f]
-	\note \f$f\f$ is supposed to be continuous with partial derivatives
-	\note \f$\displaystyle\frac{\partial f}{\partial x} = -K\f$ and \f$\displaystyle\frac{\partial f}{\partial v} = -D\f$.<br>
-	\note We note the system matrix \f$\displaystyle S = \frac{M}{dt} + D + dt.K\f$.
+	\note \f$f\f$ is supposed to be continuous with partial derivatives \f$\displaystyle\frac{\partial f}{\partial x} = -K\f$ and \f$\displaystyle\frac{\partial f}{\partial v} = -D\f$.<br>
+	\note Also, we define the system matrix \f$\displaystyle S = \frac{M}{dt} + D + dt.K\f$.
 
-	<bu>ODE of order 1</bu><br>
+	<b>ODE of order 1</b><br>
 	This ODE is solved as an ODE of order 1 by defining the state vector
 	\f$y = \left(\begin{array}{c} x \\ v \end{array}\right)\f$:
 	\f[ \displaystyle
@@ -17,9 +15,13 @@
 		\left(\begin{array}{c} v \\ M^{-1}.f(x, v) \end{array}\right) = f(t, y)
 	\f]
 
+	Integrating this equation gives:
+	\f[ \displaystyle y(t+dt) - y(t) = \int_{t}^{t+dt} f(t, y) dt \f]
+
 	<b>Backward Euler to numerically integrate the ODE</b><br>
-	Euler Implicit is also called backward Euler as it solves this integral using a backward evaluation of the tangent:<br>
-	\f$y'(t) = (y(t) - y(t-dt)) / dt\f$
+	Euler Implicit (also called backward Euler) uses a rectangular numerical integration evaluated on the right: \f$\int_{t}^{t+dt} f(t, y) dt \simeq dt. f(t+dt, y(t+dt))\f$.
+	Unlike Explicit Euler (a.k.a. forward Euler) which uses a rectangular numerical integration evaluated on the left: \f$\int_{t}^{t+dt} f(t, y) dt \simeq dt. f(t, y(t))\f$.<br>
+	Another way to look at it, is that the tangent evaluation is numerically evaluated using a backward evaluation: \f$y'(t) = (y(t) - y(t-dt)) / dt\f$
 	which leads to the well known integration scheme (written using the state vector \f$y\f$ or the variables \f$x\f$ and \f$v\f$:
 	\f[
 	\begin{array}{ccc}
@@ -33,10 +35,9 @@
 	\end{array}
 	\f]
 	This system of equations is non-linear w.r.t. to the unknown \f$y(t+dt)\f$.
-	\f$x(t+dt)\f$ and \f$v(t+dt)\f$ are dependent and need to be solved together, they cannot be solved independently.
 
 	<b>Newton-Raphson to solve the non-linear resulting equations</b><br>
-	We use Newton-Raphson to solve this problem http://en.wikipedia.org/wiki/Newton%27s_method.
+	We use Newton-Raphson to solve this non-liner problem http://en.wikipedia.org/wiki/Newton%27s_method.
 	Let's pose the non-linear problem to solve as:
 	\f[
 	F(y) = y - y(t) - dt.f(t+dt, y) = 0
