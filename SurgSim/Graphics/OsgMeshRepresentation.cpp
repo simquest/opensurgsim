@@ -117,7 +117,7 @@ void OsgMeshRepresentation::doUpdate(double dt)
 
 	if (m_mesh->getNumVertices() > 0)
 	{
-		if (m_geode->getNumParents() <= 0) // m_transform->getChildIndex(m_geode) >= m_transform->getNumChildren())
+		if (m_geode->getNumParents() <= 0)
 		{
 			m_transform->addChild(m_geode);
 		}
@@ -140,7 +140,7 @@ void OsgMeshRepresentation::doUpdate(double dt)
 	}
 	else
 	{
-		if (m_geode->getNumParents() > 0) // m_transform->getChildIndex(m_geode) < m_transform->getNumChildren())
+		if (m_geode->getNumParents() > 0)
 		{
 			m_transform->removeChild(m_geode);
 		}
