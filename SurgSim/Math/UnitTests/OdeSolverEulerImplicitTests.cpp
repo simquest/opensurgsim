@@ -169,7 +169,7 @@ void doComplexNonLinearOdeTest(size_t numNewtonRaphsonIteration, bool expectExac
 
 TEST(OdeSolverEulerImplicit, VerifyComplexNonLinearOdeTest)
 {
-	// OdeSolverEulerImplicit should successed with enough number of Newton-Raphson iterations.
+	// OdeSolverEulerImplicit should succeed with enough number of Newton-Raphson iterations.
 	{
 		SCOPED_TRACE("A single Newton-Raphson iteration, using OdeSolverEulerImplicit");
 
