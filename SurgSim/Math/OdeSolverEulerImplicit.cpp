@@ -84,8 +84,9 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 		// Computes f(t, x(t), v(t)), M, D, K all at the same time
 		m_equation.computeFMDK(*newState, &f, &M, &D, &K);
 
-		// Adds the Euler Implicit terms on the right-hand-side
-		*f -= ((*K) * newState->getVelocities()) * dt;
+		// Adds the Euler Implicit/Newton-Raphson terms on the right-hand-side
+		*f += (*K) * (newState->getPositions() - currentState.getPositions() - newState->getVelocities() * dt);
+		*f -= ((*M) * (newState->getVelocities() - currentState.getVelocities())) / dt;
 
 		// Computes the system matrix (left-hand-side matrix)
 		m_systemMatrix  = (*M) * (1.0 / dt);
@@ -100,7 +101,7 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 		(*m_linearSolver)(m_systemMatrix, *f, &m_deltaV);
 
 		// Compute the new state using the Euler Implicit scheme:
-		newState->getVelocities() = currentState.getVelocities() + m_deltaV;
+		newState->getVelocities() += m_deltaV;
 		newState->getPositions()  = currentState.getPositions() + dt * newState->getVelocities();
 
 		if (m_maximumIteration > 1)

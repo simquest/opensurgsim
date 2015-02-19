@@ -1,0 +1,91 @@
+/*!
+	\class SurgSim::Math::OdeSolverEulerImplicit
+	<br>
+
+	This class aims at implementing the Euler implicit ODE solver. The ODE to be solved is of the form:
+	\f[ \displaystyle M.a(t) = f(t, x(t), v(t)) \f]
+	\note \f$f\f$ is supposed to be continuous with partial derivatives
+	\note \f$\displaystyle\frac{\partial f}{\partial x} = -K\f$ and \f$\displaystyle\frac{\partial f}{\partial v} = -D\f$.<br>
+	\note We note the system matrix \f$\displaystyle S = \frac{M}{dt} + D + dt.K\f$.
+
+	<bu>ODE of order 1</bu><br>
+	This ODE is solved as an ODE of order 1 by defining the state vector
+	\f$y = \left(\begin{array}{c} x \\ v \end{array}\right)\f$:
+	\f[ \displaystyle
+		y' =
+		\left(\begin{array}{c} x' \\ v' \end{array}\right) =
+		\left(\begin{array}{c} v \\ M^{-1}.f(x, v) \end{array}\right) = f(t, y)
+	\f]
+
+	<b>Backward Euler to numerically integrate the ODE</b><br>
+	Euler Implicit is also called backward Euler as it solves this integral using a backward evaluation of the tangent:<br>
+	\f$y'(t) = (y(t) - y(t-dt)) / dt\f$
+	which leads to the well known integration scheme (written using the state vector \f$y\f$ or the variables \f$x\f$ and \f$v\f$:
+	\f[
+	\begin{array}{ccc}
+	y(t+dt) = y(t) + dt. f(t+dt, y(t+dt)) & or &
+	\left\{
+	\begin{array}{ccccl}
+	  x(t+dt) &=& x(t) &+& dt.v(t+dt) \\
+	  v(t+dt) &=& v(t) &+& dt.M^{-1}.f(t+dt, x(t+dt), v(t+dt))
+	\end{array}
+	\right.
+	\end{array}
+	\f]
+	This system of equations is non-linear w.r.t. to the unknown \f$y(t+dt)\f$.
+	\f$x(t+dt)\f$ and \f$v(t+dt)\f$ are dependent and need to be solved together, they cannot be solved independently.
+
+	<b>Newton-Raphson to solve the non-linear resulting equations</b><br>
+	We use Newton-Raphson to solve this problem http://en.wikipedia.org/wiki/Newton%27s_method.
+	Let's pose the non-linear problem to solve as:
+	\f[
+	F(y) = y - y(t) - dt.f(t+dt, y) = 0
+	\f]
+	The solution to this non-linear equation is \f$y(t+dt)\f$.
+
+	The Newton-Raphson algorithm calculates iterative solutions converging (if the problem has a solution and
+	the initial solution is close enough) to the solution \f$y(t+dt)\f$.<br>
+	Each iteration computes:
+	\f[
+	y_{n+1} = y_{n} - \frac{\partial F}{\partial y}(y_{n})^{-1} F(y_{n})
+	\f]
+	\note The initial solution \f$y_0\f$ is set to be \f$y(t)\f$ as it is the latest solution and should by nature be close to the solution \f$y(t+dt)\f$.
+	\note Therefore, on the first iteration, \f$F(y_0)\f$ will evaluate to exactly \f$-dt.f(t+dt, y(t))\f$ which is the force evaluation from the previous time step.
+
+	\f[
+	\frac{\partial F}{\partial y} = \left( I - dt.\frac{\partial f}{\partial y}\right) =
+	\left(
+	\begin{array}{cc}
+		I & -dt.I \\
+		dt.M^{-1}K & I + dt.M^{-1}D
+	\end{array}
+	\right)
+	\f]
+
+	It can be easily shown using a Gauss pivot technique that the inverse is:
+	\f[
+	\frac{\partial F}{\partial y}^{-1} =
+	\left(
+	\begin{array}{cc}
+		I - dt.S^{-1}K & S^{-1}M \\
+		-S^{-1}K & \frac{S^{-1}M}{dt}
+	\end{array}
+	\right)
+	\f]
+
+	Therefore, we can formally develop the solution:
+	\f[
+	y_{n+1} =
+	\left\{
+	\begin{array}{ccccl}
+	x_{n+1} &=& x_n &-& \left[\left(I - dt.S^{-1}K\right).\left(x_n - x(t) - dt.v_n\right) + S^{-1}M.\left(v_n - v(t) - dt.M^{-1}.f(x_n, v_n)\right)\right] \\
+	        &=& x_n &-& x_n + x(t) + dt.v_n + dt.S^{-1}K\left(x_n - x(t) - dt.v_n\right) - S^{-1}M.\left(v_n - v(t) - dt.M^{-1}.f(x_n, v_n)\right) \\
+	        &=& x(t) &+& dt.\left[v_n + S^{-1}\left(f(x_n, v_n) +  K(x_n - dt.v_n - x(t)) - \frac{M}{dt}(v_n - v(t))\right)\right] \\
+	        &=& x(t) &+& dt.v_{n+1} \\
+	v_{n+1} &=& v_n &-& \left[-S^{-1}K.\left(x_n - x(t) - dt.v_n\right) + \frac{S^{-1}M}{dt}.\left(v_n - v(t) - dt.M^{-1}.f(x_n, v_n)\right)\right] \\
+	        &=& v_n &+& S^{-1}\left(f(x_n, v_n) + K(x_n - dt.v_n - x(t)) - \frac{M}{dt}(v_n - v(t)) \right)
+	\end{array}
+	\right.
+	\f]
+	We simply need to solve the system to find the velocity variation and we can deduct the new position from there.
+*/
