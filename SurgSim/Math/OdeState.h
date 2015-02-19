@@ -28,7 +28,8 @@ namespace Math
 {
 
 /// The state \f$y\f$ of an ode of 2nd order of the form \f$M(x,v).a = F(x, v)\f$ with boundary conditions.
-/// This ode equation is solved as an ode of order 1 by defining the state vector \f$y = \left(\begin{array}{c}x\\v\end{array}\right)\f$:
+/// This ode equation is solved as an ode of order 1 by defining the state vector
+/// \f$y = \left(\begin{array}{c}x\\v\end{array}\right)\f$:
 /// \f[
 ///   y' = \left(\begin{array}{c} x' \\ v' \end{array}\right) =
 ///   \left(\begin{array}{c} v \\ M(x, v)^{-1}.F(x, v) \end{array}\right)

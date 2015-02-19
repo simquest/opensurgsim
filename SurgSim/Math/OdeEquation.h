@@ -74,7 +74,8 @@ public:
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
 	virtual const Matrix& computeK(const OdeState& state) = 0;
 
-	/// Evaluation of \f$f(x,v)\f$, \f$M(x,v)\f$, \f$D = -\frac{\partial f}{\partial v}(x,v)\f$, \f$K = -\frac{\partial f}{\partial x}(x,v)\f$
+	/// Evaluation of \f$f(x,v)\f$, \f$M(x,v)\f$, \f$D = -\frac{\partial f}{\partial v}(x,v)\f$ and
+	/// \f$K = -\frac{\partial f}{\partial x}(x,v)\f$.
 	/// When all the terms are needed, this method can perform optimization in evaluating everything together
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
 	/// \param[out] f The RHS \f$f(x,v)\f$
