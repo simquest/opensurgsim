@@ -59,15 +59,18 @@ const std::unordered_map<IntegrationScheme, std::string, std::hash<int>> Integra
 	(INTEGRATIONSCHEME_RUNGE_KUTTA_4, "INTEGRATIONSCHEME_RUNGE_KUTTA_4")
 	(INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4, "INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4");
 
-/// Base class for all solvers of ode equation of order 2 of the form M(x(t), v(t)).a(t) = f(t, x(t), v(t))
-/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
-/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
-/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.f(x, v) )
-/// \note To allow the use of explicit and implicit solver, we need to be able to evaluate
-/// \note M(x(t), v(t))
-/// \note f(t, x(t), v(t)) but also
-/// \note K = -df/dx(x(t), v(t))
-/// \note D = -df/dv(x(t), v(t))
+/// Base class for all solvers of ode equation of order 2 of the form \f$M(x(t), v(t)).a(t) = f(t, x(t), v(t))\f$. <br>
+/// This ode equation is solved as an ode of order 1 by defining the state vector
+/// \f$y = \left(\begin{array}{c}x\\v\end{array}\right)\f$:
+/// \f[
+///   y' = \left(\begin{array}{c} x' \\ v' \end{array}\right) =
+///   \left(\begin{array}{c} v \\ M(x, v)^{-1}.f(t, x, v) \end{array}\right)
+/// \f]
+/// \note To allow the use of explicit and implicit solver, we need to be able to evaluate:
+/// \note \f$M(x(t), v(t))\f$
+/// \note \f$f(t, x(t), v(t))\f$ but also
+/// \note \f$K = -\frac{\partial f}{\partial x}(x(t), v(t))\f$
+/// \note \f$D = -\frac{\partial f}{\partial v}(x(t), v(t))\f$
 /// \note Models wanting the use of implicit solvers will need to compute these Jacobian matrices.
 /// \note Matrices all have dense storage, but a specialized linear solver can be set per solver.
 class OdeSolver
@@ -123,9 +126,9 @@ protected:
 	std::shared_ptr<LinearSolveAndInverse> m_linearSolver;
 
 	/// System matrix (can be M, K, combination of MDK depending on the solver)
-	/// A static solver will have K for system matrix
-	/// A dynamic explicit solver will have M for system matrix
-	/// A dynamic implicit solver will have a combination of M, D and K for system matrix
+	/// \note A static solver will have K for system matrix
+	/// \note A dynamic explicit solver will have M for system matrix
+	/// \note A dynamic implicit solver will have a combination of M, D and K for system matrix
 	Matrix m_systemMatrix;
 
 	/// Compliance matrix which is the inverse of the system matrix
