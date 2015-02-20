@@ -75,7 +75,7 @@ public:
 	/// Constructor
 	/// \param hardwareShader The shader which does the skinning.
 	/// \param bones The data structure to store the found bones
-	explicit BoneBuilder(osg::Shader* hardwareShader,
+	BoneBuilder(osg::Shader* hardwareShader,
 			std::shared_ptr<std::map<std::string, SurgSim::Graphics::BoneData>> bones) :
 		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN),
 		m_shader(hardwareShader),
@@ -314,6 +314,8 @@ void OsgSkeletonRepresentation::setNeutralBonePoses(const std::map<std::string, 
 std::map<std::string, SurgSim::Math::RigidTransform3d> OsgSkeletonRepresentation::getNeutralBonePoses() const
 {
 	std::map<std::string, SurgSim::Math::RigidTransform3d> neutralBonePoses;
+	boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+
 	for (auto& bone : *m_bones)
 	{
 		neutralBonePoses[bone.first] = bone.second.neutralPose;
@@ -327,7 +329,7 @@ void OsgSkeletonRepresentation::doUpdate(double dt)
 		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
 		for (auto& bone : *m_bones)
 		{
-			std::pair<osg::Quat, osg::Vec3d> pose = toOsg(bone.second.neutralPose * bone.second.pose);
+			std::pair<osg::Quat, osg::Vec3d> pose = toOsg(bone.second.pose * bone.second.neutralPose);
 			bone.second.osgRotation->setQuaternion(pose.first);
 			bone.second.osgTranslation->setTranslate(pose.second);
 		}
