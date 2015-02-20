@@ -78,6 +78,12 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Scene");
 	scene->addSceneElement(element);
 
+	// make an empty mesh
+	auto meshRepresentation0 = makeRepresentation("emptymesh");
+	meshRepresentation0->getMesh()->initialize(cubeVertices, cubeColors, std::vector<Vector2d>(), cubeTriangles);
+	meshRepresentation0->setUpdateOptions(MeshRepresentation::UPDATE_OPTION_COLORS |
+		MeshRepresentation::UPDATE_OPTION_VERTICES);
+
 	SurgSim::Testing::Cube::makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
 
 	// make a colored cube
@@ -100,6 +106,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 	meshRepresentation2->setMaterial(material);
 
 	element->addComponent(material);
+	element->addComponent(meshRepresentation0);
 	element->addComponent(meshRepresentation1);
 	element->addComponent(meshRepresentation2);
 
@@ -141,7 +148,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 
 	int numSteps = 1000;
 
@@ -168,116 +175,12 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 		{
 			for (size_t v = 0; v < cubeColors.size(); ++v)
 			{
-				//meshes[0]->getVertex(v).data.color.setValue(cubeColors[(v+numSteps)%cubeColors.size()]);
 				meshes[0]->getVertex(v).data.color.setValue(Vector4d(1.0, 0.0, 0.5, 1.0));
 			}
 		}
 
-		/// The total number of steps should complete in 1 second
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps) * 4);
-	}
-}
-
-TEST_F(OsgMeshRepresentationRenderTests, EmptyMeshTest)
-{
-	// Empty mesh with no vertices.
-	// Doing the whole interpolation exactly the same as BasicCubeTest, to make sure nothing crashes.
-	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Scene");
-	scene->addSceneElement(element);
-
-	auto meshRepresentation1 = makeRepresentation("emptymesh1");
-	meshRepresentation1->getMesh()->initialize(cubeVertices, cubeColors, std::vector<Vector2d>(), cubeTriangles);
-	meshRepresentation1->setUpdateOptions(MeshRepresentation::UPDATE_OPTION_COLORS |
-		MeshRepresentation::UPDATE_OPTION_VERTICES);
-
-	auto meshRepresentation2 = makeRepresentation("emptymesh2");
-	meshRepresentation2->getMesh()->initialize(cubeVertices, std::vector<Vector4d>(), cubeTextures, cubeTriangles);
-
-	auto material = std::make_shared<OsgMaterial>("material");
-	auto texture = std::make_shared<OsgTexture2d>();
-	texture->loadImage(applicationData->findFile("OsgMeshRepresentationRenderTests/cube.png"));
-
-	auto uniform2d = std::make_shared<OsgUniform<std::shared_ptr<SurgSim::Graphics::OsgTexture2d>>>("oss_diffuseMap");
-	uniform2d->set(texture);
-	material->addUniform(uniform2d);
-	meshRepresentation2->setMaterial(material);
-
-	element->addComponent(material);
-	element->addComponent(meshRepresentation1);
-	element->addComponent(meshRepresentation2);
-
-	auto axes = std::make_shared<OsgAxesRepresentation>("Origin");
-	viewElement->addComponent(axes);
-
-	struct InterpolationData
-	{
-	public:
-		std::pair<RigidTransform3d, RigidTransform3d> transform;
-		std::pair<double, double> scale;
-	};
-
-	std::vector<InterpolationData> interpolators;
-	InterpolationData interpolator;
-
-	interpolator.transform.first =
-		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 1.0, 1.0)), Vector3d(-0.1, 0.0, -0.2));
-	interpolator.scale.first = 0.001;
-	interpolator.transform.second =
-		makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d(1.0, -1.0, 1.0)), Vector3d(0.1, 0.0, -0.2));
-	interpolator.scale.second = 0.03;
-	interpolators.push_back(interpolator);
-
-	interpolator.transform.first =
-		makeRigidTransform(makeRotationQuaternion(-M_PI_2, Vector3d(-1.0, -1.0, 0.0)), Vector3d(0.0, -0.1, -0.2));
-	interpolator.scale.first = 0.001;
-	interpolator.transform.second =
-		makeRigidTransform(makeRotationQuaternion(-M_PI_2, Vector3d(-1.0, 1.0 , 0.0)), Vector3d(0.0, 0.1, -0.2));
-	interpolator.scale.second = 0.03;
-	interpolators.push_back(interpolator);
-
-	std::vector<std::shared_ptr<Mesh>> meshes;
-	meshes.push_back(meshRepresentation1->getMesh());
-	meshes.push_back(meshRepresentation2->getMesh());
-
-	/// Run the thread
-	runtime->start();
-	EXPECT_TRUE(graphicsManager->isInitialized());
-	EXPECT_TRUE(viewElement->isInitialized());
-
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
-
-	int numSteps = 1000;
-
-	std::vector<Vector3d> newVertices(cubeVertices.size());
-
-	for (int i = 0; i < numSteps; ++i)
-	{
-		double t = static_cast<double>(i) / numSteps;
-
-		for (size_t j = 0; j < interpolators.size(); ++j)
-		{
-			InterpolationData data = interpolators[j];
-
-			double scale = interpolate(data.scale, t);
-			RigidTransform3d transform = interpolate(data.transform, t);
-			for (size_t index = 0; index < cubeVertices.size(); ++index)
-			{
-				newVertices[index] =  transform * (cubeVertices[index] * scale);
-			}
-			meshes[j]->setVertexPositions(newVertices, true);
-		}
-
-		if (i == 500)
-		{
-			for (size_t v = 0; v < cubeColors.size(); ++v)
-			{
-				//meshes[0]->getVertex(v).data.color.setValue(cubeColors[(v+numSteps)%cubeColors.size()]);
-				meshes[0]->getVertex(v).data.color.setValue(Vector4d(1.0, 0.0, 0.5, 1.0));
-			}
-		}
-
-		/// The total number of steps should complete in 1 second
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps) * 4);
+		/// The total number of steps should complete in 4 seconds
+		boost::this_thread::sleep(boost::posix_time::milliseconds(4000 / numSteps));
 	}
 }
 
