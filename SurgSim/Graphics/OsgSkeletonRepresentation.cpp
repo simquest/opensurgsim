@@ -359,7 +359,7 @@ bool OsgSkeletonRepresentation::doInitialize()
 	}
 
 	m_skinningShader = new osg::Shader(osg::Shader::VERTEX);
-	if (! m_skinningShader->loadShaderSourceFromFile(shaderFilename))
+	if (!m_skinningShader->loadShaderSourceFromFile(shaderFilename))
 	{
 		SURGSIM_LOG_SEVERE(m_logger) << getName() << ": Error loading shader (" << shaderFilename << ").";
 		return false;
