@@ -24,17 +24,7 @@ namespace SurgSim
 namespace Math
 {
 
-/// Euler Implicit ode solver
-/// \note M(x(t), v(t)).a(t) = f(t, x(t), v(t))
-/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
-/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
-/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.f(x, v) )
-/// \note y' = f(t, y)
-/// \note Euler Implicit is also called backward Euler as it solves this integral using a backward evaluation:
-/// \note y' = (y(t) - y(t-dt)) / dt
-/// \note which leads to the integration scheme:
-/// \note { x(t+dt) = x(t) + dt.v(t+dt)
-/// \note { v(t+dt) = v(t) + dt.a(t+dt)
+/// Euler implicit (a.k.a backward Euler) ode solver (see %OdeSolverEulerImplicit.dox for more details).
 class OdeSolverEulerImplicit : public OdeSolver
 {
 public:
@@ -42,7 +32,29 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit OdeSolverEulerImplicit(OdeEquation* equation);
 
+	/// \param maximumIteration The Newton-Raphson algorithm maximum number of iterations
+	virtual void setNewtonRaphsonMaximumIteration(size_t maximumIteration);
+
+	/// \return The Newton-Raphson algorithm maximum number of iterations
+	size_t getNewtonRaphsonMaximumIteration() const;
+
+	/// \param epsilonConvergence The Newton-Raphson algorithm epsilon convergence
+	void setNewtonRaphsonEpsilonConvergence(double epsilonConvergence);
+
+	/// \return The Newton-Raphson algorithm epsilon convergence
+	double getNewtonRaphsonEpsilonConvergence() const;
+
 	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+
+protected:
+	/// Newton-Raphson maximum number of iteration (1 => linearization)
+	size_t m_maximumIteration;
+
+	/// Newton-Raphson convergence criteria (variation of the solution over time)
+	double m_epsilonConvergence;
+
+	/// Newton-Raphson current and previous solution (we solve a problem to find deltaV, the variation in velocity)
+	Vector m_deltaV, m_previousDeltaV;
 };
 
 }; // namespace Math

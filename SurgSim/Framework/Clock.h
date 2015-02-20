@@ -17,6 +17,7 @@
 #define SURGSIM_FRAMEWORK_CLOCK_H
 
 #include <boost/chrono.hpp>
+#include <boost/thread.hpp>
 
 /// \file
 /// Place for a simple wrapper around boost
@@ -27,8 +28,30 @@ namespace SurgSim
 namespace Framework
 {
 
-	/// Wraps around the actual clock we are using.
-	typedef boost::chrono::system_clock Clock;
+/// Wraps around the actual clock we are using.
+typedef boost::chrono::high_resolution_clock Clock;
+
+/// A more accurate sleep_until that accounts for scheduler errors
+/// \tparam C Clock type
+/// \tparam D Duration type
+/// \param time The time point in absolute time to sleep until
+template <class C, class D>
+void sleep_until(const boost::chrono::time_point<C, D>& time)
+{
+	// 2ms gives good results on windows and linux
+	static const boost::chrono::duration<double> schedulerError(0.002);
+
+	boost::chrono::time_point<C, D> earlierTime = time - schedulerError;
+	if (earlierTime > C::now())
+	{
+		boost::this_thread::sleep_until(earlierTime);
+	}
+
+	while (C::now() < time)
+	{
+		boost::this_thread::yield();
+	}
+}
 
 }; // Framework
 }; // SurgSim

@@ -19,9 +19,11 @@
 #include "SurgSim/Blocks/PoseInterpolator.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Quaternion.h"
 
 
 using SurgSim::Math::RigidTransform3d;
@@ -32,8 +34,8 @@ using SurgSim::Math::interpolate;
 
 namespace
 {
-	RigidTransform3d startPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(1.0, 2.0, 3.0));
-	RigidTransform3d endPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(3.0, 2.0, 1.0));
+RigidTransform3d startPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(1.0, 2.0, 3.0));
+RigidTransform3d endPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(3.0, 2.0, 1.0));
 }
 
 namespace SurgSim
@@ -41,12 +43,29 @@ namespace SurgSim
 namespace Blocks
 {
 
-TEST(PoseInterpolatorTests, InitTest)
+class PoseInterpolatorTests : public ::testing::Test
+{
+public:
+	void SetUp()
+	{
+		runtime = std::make_shared<Framework::Runtime>("");
+		scene = runtime->getScene();
+	}
+
+	void TearDown()
+	{
+	}
+
+	std::shared_ptr<Framework::Runtime> runtime;
+	std::shared_ptr<Framework::Scene> scene;
+};
+
+TEST_F(PoseInterpolatorTests, InitTest)
 {
 	ASSERT_NO_THROW({auto interpolator = std::make_shared<PoseInterpolator>("test");});
 }
 
-TEST(PoseInterpolatorTests, StartAndEndPose)
+TEST_F(PoseInterpolatorTests, StartAndEndPose)
 {
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
 	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
@@ -57,7 +76,9 @@ TEST(PoseInterpolatorTests, StartAndEndPose)
 
 	element->addComponent(representation);
 	element->addComponent(interpolator);
-	element->initialize();
+
+	scene->addSceneElement(element);
+
 
 	interpolator->wakeUp();
 	representation->wakeUp();
@@ -68,10 +89,10 @@ TEST(PoseInterpolatorTests, StartAndEndPose)
 
 	RigidTransform3d pose = interpolate(startPose, endPose, 0.5);
 	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
-																			<< representation->getPose().matrix();
+			<< representation->getPose().matrix();
 }
 
-TEST(PoseInterpolatorTests, UseOptionalStartPose)
+TEST_F(PoseInterpolatorTests, UseOptionalStartPose)
 {
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
 	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
@@ -83,7 +104,7 @@ TEST(PoseInterpolatorTests, UseOptionalStartPose)
 
 	element->addComponent(representation);
 	element->addComponent(interpolator);
-	element->initialize();
+	scene->addSceneElement(element);
 
 	interpolator->wakeUp();
 	representation->wakeUp();
@@ -94,10 +115,10 @@ TEST(PoseInterpolatorTests, UseOptionalStartPose)
 
 	RigidTransform3d pose = interpolate(startPose, endPose, 0.5);
 	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
-																			<< representation->getPose().matrix();
+			<< representation->getPose().matrix();
 }
 
-TEST(PoseInterpolatorTests, UseLoop)
+TEST_F(PoseInterpolatorTests, UseLoop)
 {
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
 	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
@@ -108,7 +129,7 @@ TEST(PoseInterpolatorTests, UseLoop)
 
 	element->addComponent(representation);
 	element->addComponent(interpolator);
-	element->initialize();
+	scene->addSceneElement(element);
 
 	interpolator->setPingPong(true);
 	interpolator->setLoop(true);
@@ -126,16 +147,16 @@ TEST(PoseInterpolatorTests, UseLoop)
 
 	RigidTransform3d pose = interpolate(startPose, endPose, 0.25);
 	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
-																			<< representation->getPose().matrix();
+			<< representation->getPose().matrix();
 
 	// We advance by 1.0, this should wrap around to 0.25 again and the poses should be the same
 	interpolator->update(1.0);
 	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
-																			<< representation->getPose().matrix();
+			<< representation->getPose().matrix();
 
 }
 
-TEST(PoseInterpolatorTests, UsePingPong)
+TEST_F(PoseInterpolatorTests, UsePingPong)
 {
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
 	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
@@ -146,7 +167,7 @@ TEST(PoseInterpolatorTests, UsePingPong)
 
 	element->addComponent(representation);
 	element->addComponent(interpolator);
-	element->initialize();
+	scene->addSceneElement(element);
 
 	interpolator->setLoop(true);
 	interpolator->setPingPong(true);
@@ -164,13 +185,13 @@ TEST(PoseInterpolatorTests, UsePingPong)
 
 	RigidTransform3d pose = interpolate(startPose, endPose, 0.25);
 	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
-																			<< representation->getPose().matrix();
+			<< representation->getPose().matrix();
 
 	// We advance by 1.0, this should wrap around to 0.25 and the poses should be flipped
 	pose = interpolate(endPose, startPose, 0.25);
 	interpolator->update(1.0);
 	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
-																			<< representation->getPose().matrix();
+			<< representation->getPose().matrix();
 
 }
 

@@ -59,6 +59,7 @@ void doSolveTest()
 		MassPoint m;
 		MassPointState defaultState, state0, state1, state2;
 		T solver(&m);
+		solver.setNewtonRaphsonMaximumIteration(1);
 
 		// ma = mg <=> a = g
 		// v(1) = g.dt + v(0)
@@ -83,6 +84,7 @@ void doSolveTest()
 		MassPoint m(0.1);
 		MassPointState defaultState, state0, state1, state2;
 		T solver(&m);
+		solver.setNewtonRaphsonMaximumIteration(1);
 
 		// ma = mg - c.v <=> a = g - c/m.v
 		// v(1) = (g - c/m.v(1)).dt + v(0) <=> v(1) = I.(1.0 + dt.c/m)^-1.(g.dt + v(0))
@@ -114,6 +116,84 @@ TEST(OdeSolverEulerImplicit, SolveTest)
 	{
 		SCOPED_TRACE("LinearEulerImplicit");
 		doSolveTest<OdeSolverLinearEulerImplicit>();
+	}
+}
+
+template<class T>
+void doComplexNonLinearOdeTest(size_t numNewtonRaphsonIteration, bool expectExactSolution)
+{
+	OdeComplexNonLinear odeEquation;
+	MassPointState state0, state1, state2;
+	state0.getPositions().setLinSpaced(1.4, 5.67);
+	state0.getVelocities().setLinSpaced(-0.4, -0.3);
+	double dt = 1e-3;
+	T solver(&odeEquation);
+	solver.setNewtonRaphsonMaximumIteration(numNewtonRaphsonIteration);
+	solver.setNewtonRaphsonEpsilonConvergence(1e-13);
+
+	ASSERT_NO_THROW({solver.solve(dt, state0, &state1);});
+	// We do 2 iterations as Linear ode solver will do the 1st iteration as a normal non-linear ode solver
+	ASSERT_NO_THROW({solver.solve(dt, state1, &state2);});
+
+	EXPECT_NE(state0, state1);
+	EXPECT_NE(state1, state2);
+
+	// The new state should verify the following equation:
+	// {x(t+dt) = x(t) + dt.v(t+dt)
+	// {v(t+dt) = v(t) + dt.M^-1.f(x(t+dt), v(t+dt))
+	// with the notes that M = Id and f(x,v)=x.v^2
+	// BUT the function f is non-linear enough that a single iteration of the Newton-Raphson won't produce
+	// a solution close enough to the real solution of the problem. More iterations would be required to
+	// refine the solution.
+	auto xt = state1.getPositions();
+	auto vt = state1.getVelocities();
+	auto xt_plus_dt = state2.getPositions();
+	auto vt_plus_dt = state2.getVelocities();
+	auto ft_plus_dt = odeEquation.computeF(state2);
+	Vector expectedVelocity = vt + dt * ft_plus_dt;
+
+	// This is always true by construction
+	EXPECT_TRUE(xt_plus_dt.isApprox(xt + dt * vt_plus_dt));
+
+	if (!expectExactSolution)
+	{
+		EXPECT_FALSE(xt_plus_dt.isApprox(xt + dt * expectedVelocity));
+		EXPECT_FALSE(vt_plus_dt.isApprox(expectedVelocity));
+	}
+	else
+	{
+		EXPECT_TRUE(xt_plus_dt.isApprox(xt + dt * expectedVelocity));
+		EXPECT_TRUE(vt_plus_dt.isApprox(expectedVelocity));
+	}
+}
+
+TEST(OdeSolverEulerImplicit, VerifyComplexNonLinearOdeTest)
+{
+	// OdeSolverEulerImplicit should succeed with enough number of Newton-Raphson iterations.
+	{
+		SCOPED_TRACE("A single Newton-Raphson iteration, using OdeSolverEulerImplicit");
+
+		doComplexNonLinearOdeTest<OdeSolverEulerImplicit>(1, false);
+	}
+
+	{
+		SCOPED_TRACE("Multiple Newton-Raphson iterations, using OdeSolverEulerImplicit");
+
+		doComplexNonLinearOdeTest<OdeSolverEulerImplicit>(10, true);
+	}
+
+	// OdeSolverLinearEulerImplicit should fail no matter the number of Newton-Raphson iterations
+	// it just does not handle non-linear problems.
+	{
+		SCOPED_TRACE("A single Newton-Raphson iteration, using OdeSolverLinearEulerImplicit");
+
+		doComplexNonLinearOdeTest<OdeSolverLinearEulerImplicit>(1, false);
+	}
+
+	{
+		SCOPED_TRACE("Multiple Newton-Raphson iterations, using OdeSolverLinearEulerImplicit");
+
+		doComplexNonLinearOdeTest<OdeSolverLinearEulerImplicit>(10, false);
 	}
 }
 

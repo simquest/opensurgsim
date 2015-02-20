@@ -16,18 +16,18 @@
 #ifndef SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
 
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/Group.h"
 #include "SurgSim/Graphics/Manager.h"
 #include "SurgSim/Graphics/Material.h"
+#include "SurgSim/Graphics/Program.h"
 #include "SurgSim/Graphics/RenderTarget.h"
 #include "SurgSim/Graphics/Representation.h"
-#include "SurgSim/Graphics/Shader.h"
+#include "SurgSim/Graphics/Texture.h"
 #include "SurgSim/Graphics/UniformBase.h"
 #include "SurgSim/Graphics/View.h"
 #include "SurgSim/Graphics/ViewElement.h"
-#include "SurgSim/Graphics/Texture.h"
+#include "SurgSim/Math/Vector.h"
 
 #include <array>
 

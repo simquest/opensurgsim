@@ -17,7 +17,6 @@
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Math/Vector.h"
 

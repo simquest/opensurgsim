@@ -17,6 +17,8 @@
 #define SURGSIM_PHYSICS_PHYSICSMANAGER_H
 
 #include <boost/thread/mutex.hpp>
+
+#include <list>
 #include <memory>
 #include <vector>
 
@@ -40,17 +42,7 @@ class Representation;
 namespace Physics
 {
 
-class BuildMlcp;
-class ConstraintComponent;
-class ContactConstraintGeneration;
-class DcdCollision;
-class FreeMotion;
-class PostUpdate;
-class PreUpdate;
-class PushResults;
-class Representation;
-class SolveMlcp;
-class UpdateCollisionRepresentations;
+class Computation;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
@@ -85,20 +77,24 @@ public:
 									 std::shared_ptr<SurgSim::Collision::Representation> representation2);
 
 protected:
-	///@{
-	/// Overridden from ComponentManager
 	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
+
 	bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
-	///@}
 
-	///@{
-	/// Overridden from BasicThread
+	/// Initialize the Physics Manager
+	/// Derived class(es) should override this method to have a customized list of computations.
+	/// \sa SurgSim::Physics::Computation
 	bool doInitialize() override;
-	bool doStartUp() override;
-	bool doUpdate(double dt) override;
-	///@}
 
-	void initializeComputations(bool copyState);
+	bool doStartUp() override;
+
+	bool doUpdate(double dt) override;
+
+	/// Add a computation to the list of computations to perform each update
+	/// \note The computations will be run in order they were added.
+	/// \param computation The Computation to add
+	void addComputation(std::shared_ptr<SurgSim::Physics::Computation> computation);
+
 private:
 	/// Get an iterator to an excluded collision pair.
 	/// \note Lock m_excludedCollisionPairMutex before calling
@@ -122,18 +118,8 @@ private:
 	/// Mutex to protect m_excludedCollisionPairs from being read/written simultaneously.
 	boost::mutex m_excludedCollisionPairMutex;
 
-	///@{
-	/// Steps to perform the physics update
-	std::unique_ptr<PreUpdate> m_preUpdateStep;
-	std::unique_ptr<FreeMotion> m_freeMotionStep;
-	std::unique_ptr<DcdCollision> m_dcdCollisionStep;
-	std::unique_ptr<ContactConstraintGeneration> m_constraintGenerationStep;
-	std::unique_ptr<BuildMlcp> m_buildMlcpStep;
-	std::unique_ptr<SolveMlcp> m_solveMlcpStep;
-	std::unique_ptr<PushResults> m_pushResultsStep;
-	std::unique_ptr<PostUpdate> m_postUpdateStep;
-	std::unique_ptr<UpdateCollisionRepresentations> m_updateCollisionRepresentationsStep;
-	///@}
+	/// A list of computations, to perform the physics update.
+	std::list<std::shared_ptr<SurgSim::Physics::Computation>> m_computations;
 
 	/// A thread-safe copy of the last PhysicsManagerState in the previous update.
 	SurgSim::Framework::LockedContainer<SurgSim::Physics::PhysicsManagerState> m_finalState;
@@ -141,7 +127,5 @@ private:
 
 }; // namespace Physics
 }; // namespace SurgSim
-
-
 
 #endif

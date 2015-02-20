@@ -56,7 +56,7 @@ typedef enum
 /// Generic rigid shape class defining a shape
 /// \note This class gives the ability to analyze the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
-class Shape : public SurgSim::Framework::Accessible
+class Shape : virtual public SurgSim::Framework::Accessible
 {
 public:
 	typedef ::SurgSim::Math::Vector3d Vector3d;

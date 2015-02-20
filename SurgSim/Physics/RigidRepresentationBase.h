@@ -49,8 +49,8 @@ public:
 	/// \param state The initial state (pose + lin/ang velocities)
 	/// This will also set the current/previous states to the initial state
 	void setInitialState(const RigidRepresentationState& state);
-	/// Reset the rigid representation state to its initial state
-	void resetState();
+
+	void resetState() override;
 
 	/// Get the initial state of the rigid representation
 	/// \return The initial state (pose + lin/ang velocities)
@@ -62,7 +62,7 @@ public:
 	/// \return The previous state (pose + lin/ang velocities)
 	const RigidRepresentationState& getPreviousState() const;
 
-	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location);
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
 
 	/// Set the mass density of the rigid representation
 	/// \param rho The density (in Kg.m-3)

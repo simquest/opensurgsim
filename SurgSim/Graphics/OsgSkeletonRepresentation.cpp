@@ -41,7 +41,7 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgModel.h"
 #include "SurgSim/Graphics/OsgRigidTransformConversions.h"
-#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 
 
 /// Local data structure to store the bones and their references to the transforms.
@@ -135,7 +135,7 @@ public:
 		// Setup for hardware skinning.
 		if (m_shader != nullptr)
 		{
-			osg::Geode* meshGeode= dynamic_cast<osg::Geode*>(&node);
+			osg::Geode* meshGeode = dynamic_cast<osg::Geode*>(&node);
 			if (nullptr != meshGeode)
 			{
 				osgAnimation::RigTransformHardware* rigTransform = new osgAnimation::RigTransformHardware();
@@ -190,7 +190,7 @@ OsgSkeletonRepresentation::OsgSkeletonRepresentation(const std::string& name) :
 	m_bones(std::make_shared<std::map<std::string, BoneData>>())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgSkeletonRepresentation, std::string,
-		SkinningShaderFileName, getSkinningShaderFileName, setSkinningShaderFileName);
+									  SkinningShaderFileName, getSkinningShaderFileName, setSkinningShaderFileName);
 }
 
 void OsgSkeletonRepresentation::loadModel(const std::string& fileName)

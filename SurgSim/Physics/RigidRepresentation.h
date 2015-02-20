@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 
+#include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Vector.h"
@@ -85,7 +86,7 @@ public:
 									 const SurgSim::Math::Matrix66d& D = SurgSim::Math::Matrix66d::Zero());
 
 	/// \return the current external generalized 6D force
-	const SurgSim::Math::Vector6d& getExternalGeneralizedForce() const;
+	SurgSim::DataStructures::BufferedValue<SurgSim::Math::Vector6d>& getExternalGeneralizedForce();
 
 	/// \return the current external generalized stiffness 6x6 matrix
 	const SurgSim::Math::Matrix66d& getExternalGeneralizedStiffness() const;
@@ -122,7 +123,7 @@ protected:
 	/// External generalized force, stiffness and damping applied on the rigid representation
 	/// @{
 	bool m_hasExternalGeneralizedForce;
-	SurgSim::Math::Vector6d m_externalGeneralizedForce;
+	SurgSim::DataStructures::BufferedValue<SurgSim::Math::Vector6d> m_externalGeneralizedForce;
 	SurgSim::Math::Matrix66d m_externalGeneralizedStiffness;
 	SurgSim::Math::Matrix66d m_externalGeneralizedDamping;
 	/// @}

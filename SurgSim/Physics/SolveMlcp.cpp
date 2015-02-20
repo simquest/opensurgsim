@@ -13,16 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <memory>
-#include <vector>
-
-#include <Eigen/Core>
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
-
-#include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/SolveMlcp.h"
-#include "SurgSim/Math/MlcpGaussSeidelSolver.h"
+
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
 
 namespace SurgSim
 {
@@ -30,7 +24,8 @@ namespace Physics
 {
 
 SolveMlcp::SolveMlcp(bool doCopyState) : Computation(doCopyState)
-{}
+{
+}
 
 SolveMlcp::~SolveMlcp()
 {}
@@ -46,19 +41,34 @@ std::shared_ptr<PhysicsManagerState> SolveMlcp::doUpdate(const double& dt,
 	return result;
 }
 
-void SolveMlcp::setMaxIterations(int maxIterations)
+void SolveMlcp::setMaxIterations(size_t maxIterations)
 {
 	m_gaussSeidelSolver.setMaxIterations(maxIterations);
 }
 
-void SolveMlcp::setSolverPrecision(double epsilon)
+size_t SolveMlcp::getMaxIterations() const
+{
+	return m_gaussSeidelSolver.getMaxIterations();
+}
+
+void SolveMlcp::setPrecision(double epsilon)
 {
 	m_gaussSeidelSolver.setEpsilonConvergence(epsilon);
+}
+
+double SolveMlcp::getPrecision() const
+{
+	return m_gaussSeidelSolver.getEpsilonConvergence();
 }
 
 void SolveMlcp::setContactTolerance(double epsilon)
 {
 	m_gaussSeidelSolver.setContactTolerance(epsilon);
+}
+
+double SolveMlcp::getContactTolerance() const
+{
+	return m_gaussSeidelSolver.getContactTolerance();
 }
 
 }; // Physics

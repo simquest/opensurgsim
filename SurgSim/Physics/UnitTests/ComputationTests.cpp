@@ -16,35 +16,18 @@
 
 #include <gtest/gtest.h>
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Physics/Computation.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
-
-class MockComputation : public Computation
-{
-public:
-	explicit MockComputation(bool doCopyState = false) : Computation(doCopyState)
-	{
-
-	}
-
-protected:
-	std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt,
-		const std::shared_ptr<PhysicsManagerState>& state) override
-	{
-		return state;
-	}
-};
 
 TEST(ComputationTests, InitTest)
 {
@@ -79,6 +62,7 @@ TEST(ComputationTests, PreparePhysicsState)
 
 	// Setup the state.
 	std::vector<std::shared_ptr<Representation>> expectedRepresentations;
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> expectedCollisionRepresentations;
 
 	// Add a representation.
 	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
@@ -89,6 +73,7 @@ TEST(ComputationTests, PreparePhysicsState)
 	auto collisionRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("rigid2 collision");
 	rigid2->setCollisionRepresentation(collisionRepresentation);
 	expectedRepresentations.push_back(rigid2);
+	expectedCollisionRepresentations.push_back(collisionRepresentation);
 	physicsState->setRepresentations(expectedRepresentations);
 
 	// Add a constraint.
@@ -121,6 +106,12 @@ TEST(ComputationTests, PreparePhysicsState)
 		physicsState->setConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT, expectedConstraints);
 	}
 
+	// Add a collision representation.
+	auto collisionRepresentation2 = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("collision2");
+	collisionRepresentation2->setLocalActive(false);
+	expectedCollisionRepresentations.push_back(collisionRepresentation2);
+	physicsState->setCollisionRepresentations(expectedCollisionRepresentations);
+
 	// Call update on Computation.
 	MockComputation c;
 	physicsState = c.update(0.0, physicsState);
@@ -137,6 +128,12 @@ TEST(ComputationTests, PreparePhysicsState)
 	actualConstraints = physicsState->getActiveConstraints();
 	ASSERT_EQ(1, actualConstraints.size());
 	EXPECT_EQ(expectedConstraints.front(), actualConstraints.front());
+
+	// Check the active collisions list.
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> actualCollisionRepresentations;
+	actualCollisionRepresentations = physicsState->getActiveCollisionRepresentations();
+	ASSERT_EQ(1, actualCollisionRepresentations.size());
+	EXPECT_EQ(collisionRepresentation, actualCollisionRepresentations.front());
 }
 
 }; // namespace Physics

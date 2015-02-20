@@ -32,7 +32,11 @@ class AssetTest;
 /// in SurgSim::Framework::Runtime to load file.
 /// Classes not in SurgSim::Framework::Component hierarchy should inherit this class in
 /// order to load a file.
-class Asset : public Accessible
+/// Components that take assets as parameters should, in addition to their general `set<Asset>()` and `get<Asset>()`
+/// functions, implement a helper function `load<Asset>()`, that creates and loads the specified asset.
+/// Additionally, a special YAML parameter (`<Asset>FileName`) should be implemented, that can be used to specify
+/// the asset, without having to specify the whole asset in serialized form.
+class Asset : virtual public Accessible
 {
 	friend AssetTest;
 public:

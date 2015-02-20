@@ -14,14 +14,6 @@
 # limitations under the License.
 
 
-link_directories(
-	${Boost_LIBRARY_DIRS}
-)
-
-include_directories( 
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
 set(EXAMPLE_SOURCES
 	main.cpp
 )
@@ -33,15 +25,10 @@ surgsim_add_executable(PhantomVisualTest
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
 set(LIBS
-	PhantomDevice
 	IdentityPoseDevice
-	VisualTestCommon
+	PhantomDevice
 	SurgSimInput
-	SurgSimFramework
-	SurgSimDataStructures
-	${OPENHAPTICS_LIBRARIES}
-	${Boost_LIBRARIES}
-	${OPENGL_LIBRARIES}
+	VisualTestCommon
 )
 
 target_link_libraries(PhantomVisualTest ${LIBS})

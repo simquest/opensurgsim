@@ -23,10 +23,10 @@ namespace Graphics
 {
 
 template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-Mesh::Mesh(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh)
-	: SurgSim::DataStructures::TriangleMeshBase<VertexData,
-												SurgSim::DataStructures::EmptyData,
-												SurgSim::DataStructures::EmptyData>(mesh)
+Mesh::Mesh(const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& other)
+	: SurgSim::DataStructures::TriangleMesh<VertexData,
+											SurgSim::DataStructures::EmptyData,
+											SurgSim::DataStructures::EmptyData>(other)
 {
 }
 

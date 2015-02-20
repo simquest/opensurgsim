@@ -15,6 +15,7 @@
 
 #include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Matrix.h"

@@ -24,7 +24,6 @@ set(SURGSIM_GRAPHICS_SOURCES
 	Manager.cpp
 	Mesh.cpp
 	MeshPlyReaderDelegate.cpp
-	MeshUtilities.cpp
 	OsgAxesRepresentation.cpp
 	OsgBoxRepresentation.cpp
 	OsgCamera.cpp
@@ -41,11 +40,11 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgOctreeRepresentation.cpp
 	OsgPlaneRepresentation.cpp
 	OsgPointCloudRepresentation.cpp
+	OsgProgram.cpp
 	OsgRepresentation.cpp
 	OsgSceneryRepresentation.cpp
 	OsgScreenSpacePass.cpp
 	OsgScreenSpaceQuadRepresentation.cpp
-	OsgShader.cpp
 	OsgSkeletonRepresentation.cpp
 	OsgSphereRepresentation.cpp
 	OsgTextRepresentation.cpp
@@ -87,7 +86,6 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Mesh-inl.h
 	MeshPlyReaderDelegate.h
 	MeshRepresentation.h
-	MeshUtilities.h
 	Model.h
 	OctreeRepresentation.h
 	OsgAxesRepresentation.h
@@ -109,6 +107,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgPointCloudRepresentation.h
+	OsgProgram.h
 	OsgQuaternionConversions.h
 	OsgRenderTarget.h
 	OsgRenderTarget-inl.h
@@ -117,7 +116,6 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgSceneryRepresentation.h
 	OsgScreenSpacePass.h
 	OsgScreenSpaceQuadRepresentation.h
-	OsgShader.h
 	OsgSkeletonRepresentation.h
 	OsgSphereRepresentation.h
 	OsgTextRepresentation.h
@@ -145,12 +143,12 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgViewElement.h
 	PlaneRepresentation.h
 	PointCloudRepresentation.h
+	Program.h
 	RenderPass.h
 	RenderTarget.h
 	Representation.h
 	SceneryRepresentation.h
 	ScreenSpaceQuadRepresentation.h
-	Shader.h
 	SkeletonRepresentation.h
 	SphereRepresentation.h
 	TextRepresentation.h

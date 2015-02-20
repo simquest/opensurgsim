@@ -41,9 +41,8 @@ std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const 
 
 	// First check for a Falcon.  Did we build NovintDevice, and will the device initialize?
 #ifdef NOVINT_LIBRARY_AVAILABLE
-	SURGSIM_LOG_INFO(logger) << "DeviceFactory is going to try using a NovintDevice, a default Falcon.";
-	std::shared_ptr<SurgSim::Device::NovintDevice> novintDevice =
-		std::make_shared<SurgSim::Device::NovintDevice>(name, "");
+	SURGSIM_LOG_INFO(logger) << "DeviceFactory is going to try using a NovintDevice, the first available Falcon.";
+	std::shared_ptr<SurgSim::Device::NovintDevice> novintDevice = std::make_shared<SurgSim::Device::NovintDevice>(name);
 	novintDevice->setPositionScale(novintDevice->getPositionScale() * 10.0);
 
 	if (novintDevice->initialize())

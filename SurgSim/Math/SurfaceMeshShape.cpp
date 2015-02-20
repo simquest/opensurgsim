@@ -15,8 +15,9 @@
 //
 
 #include "SurgSim/Math/SurfaceMeshShape.h"
-#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
+
 #include "SurgSim/Framework/Log.h"
+
 
 namespace
 {
@@ -29,62 +30,13 @@ namespace Math
 {
 SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SurfaceMeshShape, SurfaceMeshShape);
 
-SurfaceMeshShape::SurfaceMeshShape() : m_volume(0.0), m_thickness(1e-2)
+SurfaceMeshShape::SurfaceMeshShape() : m_thickness(1e-2)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurfaceMeshShape, std::string, FileName, getFileName, setFileName);
 }
 
 int SurfaceMeshShape::getType() const
 {
 	return SHAPE_TYPE_SURFACEMESH;
-}
-
-
-void SurfaceMeshShape::setFileName(const std::string& fileName)
-{
-	using SurgSim::DataStructures::TriangleMesh;
-	m_fileName = fileName;
-	m_mesh = SurgSim::DataStructures::loadTriangleMesh<SurgSim::DataStructures::TriangleMesh>(fileName);
-}
-
-std::string SurfaceMeshShape::getFileName() const
-{
-	return m_fileName;
-}
-
-std::shared_ptr<SurgSim::DataStructures::TriangleMesh> SurfaceMeshShape::getMesh()
-{
-	return m_mesh;
-}
-
-double SurfaceMeshShape::getVolume() const
-{
-	if (nullptr == m_mesh)
-	{
-		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-				"No mesh set for SurfaceMeshShape, so it cannot compute volume.";
-	}
-	return m_volume;
-}
-
-SurgSim::Math::Vector3d SurfaceMeshShape::getCenter() const
-{
-	if (nullptr == m_mesh)
-	{
-		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-				"No mesh set for SurfaceMeshShape, so it cannot compute center.";
-	}
-	return m_center;
-}
-
-SurgSim::Math::Matrix33d SurfaceMeshShape::getSecondMomentOfVolume() const
-{
-	if (nullptr == m_mesh)
-	{
-		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-				"No mesh set for SurfaceMeshShape, so it cannot compute second moment of volume.";
-	}
-	return m_secondMomentOfVolume;
 }
 
 void SurfaceMeshShape::computeVolumeIntegrals()
@@ -128,16 +80,16 @@ void SurfaceMeshShape::computeVolumeIntegrals()
 	Eigen::VectorXd integral(10);
 	integral.setZero();
 
-	for (auto const& triangle : m_mesh->getTriangles())
+	for (auto const& triangle : getTriangles())
 	{
 		if (!triangle.isValid)
 		{
 			continue;
 		}
 
-		auto A = m_mesh->getVertexPosition(triangle.verticesId[0]);
-		auto B = m_mesh->getVertexPosition(triangle.verticesId[1]);
-		auto C = m_mesh->getVertexPosition(triangle.verticesId[2]);
+		auto A = getVertexPosition(triangle.verticesId[0]);
+		auto B = getVertexPosition(triangle.verticesId[1]);
+		auto C = getVertexPosition(triangle.verticesId[2]);
 
 		// Triangle parametrization P(a, b) = A + u.a + v.b  with u=AB and v=AC
 		const Vector3d u = B - A;
@@ -190,7 +142,7 @@ void SurfaceMeshShape::computeVolumeIntegrals()
 
 bool SurfaceMeshShape::isValid() const
 {
-	return (nullptr != m_mesh) && (m_thickness > 1e-5) && (m_mesh->isValid());
+	return (m_thickness > 1e-5) && isValid();
 }
 
 }; // namespace Math

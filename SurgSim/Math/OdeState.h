@@ -27,10 +27,13 @@ namespace SurgSim
 namespace Math
 {
 
-/// OdeState defines the state y of an ode of 2nd order of the form M(x,v).a = F(x, v) with boundary conditions
-/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
-/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
-/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.F(x, v) )
+/// The state \f$y\f$ of an ode of 2nd order of the form \f$M(x,v).a = F(x, v)\f$ with boundary conditions.
+/// This ode equation is solved as an ode of order 1 by defining the state vector
+/// \f$y = \left(\begin{array}{c}x\\v\end{array}\right)\f$:
+/// \f[
+///   y' = \left(\begin{array}{c} x' \\ v' \end{array}\right) =
+///   \left(\begin{array}{c} v \\ M(x, v)^{-1}.F(x, v) \end{array}\right)
+/// \f]
 class OdeState
 {
 public:
@@ -121,7 +124,8 @@ public:
 
 	/// Apply boundary conditions to a given vector
 	/// \param vector The vector to apply the boundary conditions on
-	/// \return vector. This enables chained use like the pseudo-code U = K^1 * applyBoundaryConditionsToVector(x)
+	/// \return The parameter vector. This enables chained use like
+	/// \f$U = K^1 * \text{applyBoundaryConditionsToVector}(x)\f$
 	Vector* applyBoundaryConditionsToVector(Vector* vector) const;
 
 	/// Apply boundary conditions to a given matrix

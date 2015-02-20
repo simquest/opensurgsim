@@ -19,7 +19,7 @@
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgUniformFactory.h"
 
@@ -163,37 +163,37 @@ bool OsgMaterial::hasUniform(const std::string& name) const
 	return (getUniform(name) != nullptr);
 }
 
-bool OsgMaterial::setShader(std::shared_ptr<Shader> shader)
+bool OsgMaterial::setProgram(std::shared_ptr<Program> program)
 {
 	bool didSucceed = false;
 
-	std::shared_ptr<OsgShader> osgShader = std::dynamic_pointer_cast<OsgShader>(shader);
-	if (osgShader)
+	std::shared_ptr<OsgProgram> osgProgram = std::dynamic_pointer_cast<OsgProgram>(program);
+	if (osgProgram)
 	{
-		if (m_shader)
+		if (m_program)
 		{
-			m_shader->removeFromStateSet(m_stateSet.get());
+			m_program->removeFromStateSet(m_stateSet.get());
 		}
-		osgShader->addToStateSet(m_stateSet);
-		m_shader = osgShader;
+		osgProgram->addToStateSet(m_stateSet);
+		m_program = osgProgram;
 		didSucceed = true;
 	}
 
 	return didSucceed;
 }
 
-std::shared_ptr<Shader> OsgMaterial::getShader() const
+std::shared_ptr<Program> OsgMaterial::getProgram() const
 {
-	return m_shader;
+	return m_program;
 }
 
-void OsgMaterial::clearShader()
+void OsgMaterial::clearProgram()
 {
-	if (m_shader)
+	if (m_program)
 	{
-		m_shader->removeFromStateSet(m_stateSet.get());
+		m_program->removeFromStateSet(m_stateSet.get());
 	}
-	m_shader = nullptr;
+	m_program = nullptr;
 }
 
 bool OsgMaterial::doInitialize()
@@ -221,10 +221,10 @@ std::shared_ptr<OsgMaterial> buildMaterial(const std::string& vertexShaderName, 
 
 	std::shared_ptr<OsgMaterial> material;
 
-	auto shader = std::make_shared<OsgShader>();
+	auto program = std::make_shared<OsgProgram>();
 	std::string fileName;
 	fileName = SurgSim::Framework::Runtime::getApplicationData()->findFile(vertexShaderName);
-	if (!shader->loadVertexShaderSource(fileName))
+	if (!program->loadVertexShader(fileName))
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
 				<< "Shader " << vertexShaderName << ", could not "
@@ -233,7 +233,7 @@ std::shared_ptr<OsgMaterial> buildMaterial(const std::string& vertexShaderName, 
 	}
 
 	fileName = SurgSim::Framework::Runtime::getApplicationData()->findFile(fragmentShaderName);
-	if (!shader->loadFragmentShaderSource(fileName))
+	if (!program->loadFragmentShader(fileName))
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
 				<< "Shader " << fragmentShaderName << " , could not "
@@ -244,7 +244,7 @@ std::shared_ptr<OsgMaterial> buildMaterial(const std::string& vertexShaderName, 
 	if (result)
 	{
 		material = std::make_shared<OsgMaterial>("material");
-		material->setShader(shader);
+		material->setProgram(program);
 	}
 
 	return material;

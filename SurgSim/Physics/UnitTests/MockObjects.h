@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Matrix.h"
@@ -25,6 +26,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/Computation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
@@ -270,12 +272,6 @@ private:
 	bool m_isInitialized;
 };
 
-class InvalidMockFemElement : public MockFemElement
-{
-public:
-	bool update(const SurgSim::Math::OdeState& state) override;
-};
-
 // Concrete class for testing
 class MockFemRepresentation : public FemRepresentation
 {
@@ -431,6 +427,36 @@ inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepres
 		std::make_shared<MockConstraintImplementation>(),
 		std::make_shared<MockLocalization>(secondRepresentation));
 }
+
+/// Class to represent a mock collision representation to test if update gets called from the Computation.
+class MockCollisionRepresentation : public SurgSim::Collision::Representation
+{
+public:
+	/// Default constructor
+	/// \param name The name of the collision representation.
+	explicit MockCollisionRepresentation(const std::string& name);
+
+	int getShapeType() const override;
+	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	void update(const double& dt) override;
+
+	/// \return The number of times update method has been invoked.
+	int getNumberOfTimesUpdateCalled() const;
+
+private:
+	/// Number of times update method has been invoked.
+	int m_numberOfTimesUpdateCalled;
+};
+
+class MockComputation : public Computation
+{
+public:
+	explicit MockComputation(bool doCopyState = false);
+
+protected:
+	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
+												  const std::shared_ptr<PhysicsManagerState>& state) override;
+};
 
 }; // Physics
 }; // SurgSim
