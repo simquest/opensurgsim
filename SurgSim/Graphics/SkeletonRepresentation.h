@@ -81,7 +81,7 @@ public:
 	/// Get the pose for a given bone.
 	/// \param name The name of the bone.
 	/// \return pose The pose of the bone.
-	virtual SurgSim::Math::RigidTransform3d getBonePose(const std::string& name) = 0;
+	virtual SurgSim::Math::RigidTransform3d getBonePose(const std::string& name) const = 0;
 
 	/// Set the neutral pose for a given bone.
 	/// \param name The name of the bone.
@@ -91,7 +91,7 @@ public:
 	/// Get the neutral pose for a given bone.
 	/// \param name The name of the bone.
 	/// \return pose The neutral pose of the bone.
-	virtual SurgSim::Math::RigidTransform3d getNeutralBonePose(const std::string& name) = 0;
+	virtual SurgSim::Math::RigidTransform3d getNeutralBonePose(const std::string& name) const = 0;
 
 protected:
 	/// Set neutral poses for a set of bones.
@@ -100,7 +100,7 @@ protected:
 
 	/// Get all the neutral poses
 	/// \return A map of bone names and neutral poses
-	virtual std::map<std::string, SurgSim::Math::RigidTransform3d> getNeutralBonePoses() = 0;
+	virtual std::map<std::string, SurgSim::Math::RigidTransform3d> getNeutralBonePoses() const = 0;
 };
 
 };  // namespace Graphics

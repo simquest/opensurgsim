@@ -71,20 +71,20 @@ public:
 	void setSkinningShaderFileName(std::string fileName);
 
 	/// \return The file containing the skinning shader.
-	std::string getSkinningShaderFileName();
+	std::string getSkinningShaderFileName() const;
 
 	void setBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) override;
 
-	SurgSim::Math::RigidTransform3d getBonePose(const std::string& name) override;
+	SurgSim::Math::RigidTransform3d getBonePose(const std::string& name) const override;
 
 	void setNeutralBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) override;
 
-	SurgSim::Math::RigidTransform3d getNeutralBonePose(const std::string& name) override;
+	SurgSim::Math::RigidTransform3d getNeutralBonePose(const std::string& name) const override;
 
 protected:
 	void setNeutralBonePoses(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poses) override;
 
-	std::map<std::string, SurgSim::Math::RigidTransform3d> getNeutralBonePoses() override;
+	std::map<std::string, SurgSim::Math::RigidTransform3d> getNeutralBonePoses() const override;
 
 	void doUpdate(double dt) override;
 

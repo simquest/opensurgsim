@@ -221,7 +221,7 @@ void OsgSkeletonRepresentation::setSkinningShaderFileName(std::string fileName)
 	m_skinningShaderFileName = fileName;
 }
 
-std::string OsgSkeletonRepresentation::getSkinningShaderFileName()
+std::string OsgSkeletonRepresentation::getSkinningShaderFileName() const
 {
 	return m_skinningShaderFileName;
 }
@@ -246,7 +246,7 @@ void OsgSkeletonRepresentation::setBonePose(const std::string& name, const SurgS
 	}
 }
 
-SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getBonePose(const std::string& name)
+SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getBonePose(const std::string& name) const
 {
 	SurgSim::Math::RigidTransform3d pose = SurgSim::Math::RigidTransform3d::Identity();
 	boost::shared_lock<boost::shared_mutex> lock(m_mutex);
@@ -285,7 +285,7 @@ void OsgSkeletonRepresentation::setNeutralBonePose(const std::string& name,
 	}
 }
 
-SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getNeutralBonePose(const std::string& name)
+SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getNeutralBonePose(const std::string& name) const
 {
 	SurgSim::Math::RigidTransform3d pose = SurgSim::Math::RigidTransform3d::Identity();
 	boost::shared_lock<boost::shared_mutex> lock(m_mutex);
@@ -311,7 +311,7 @@ void OsgSkeletonRepresentation::setNeutralBonePoses(const std::map<std::string, 
 	}
 }
 
-std::map<std::string, SurgSim::Math::RigidTransform3d> OsgSkeletonRepresentation::getNeutralBonePoses()
+std::map<std::string, SurgSim::Math::RigidTransform3d> OsgSkeletonRepresentation::getNeutralBonePoses() const
 {
 	std::map<std::string, SurgSim::Math::RigidTransform3d> neutralBonePoses;
 	for (auto& bone : *m_bones)
