@@ -58,20 +58,12 @@ public:
 		m_gravity.setZero();
 	}
 
-	/// Evaluation of the RHS function f(x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
-	/// \return The vector containing f(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
 	Vector& computeF(const OdeState& state) override
 	{
 		m_f = m_mass * m_gravity - m_viscosity * state.getVelocities();
 		return m_f;
 	}
 
-	/// Evaluation of the LHS matrix M(x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
-	/// \return The matrix M(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
 	const Matrix& computeM(const OdeState& state) override
 	{
 		m_M.setIdentity();
@@ -79,10 +71,6 @@ public:
 		return m_M;
 	}
 
-	/// Evaluation of D = -df/dv (x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \return The matrix D = -df/dv(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
 	const Matrix& computeD(const OdeState& state) override
 	{
 		m_D.setIdentity();
@@ -90,25 +78,12 @@ public:
 		return m_D;
 	}
 
-	/// Evaluation of K = -df/dx (x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \return The matrix K = -df/dx(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	const Matrix& computeK(const OdeState& state)
+	const Matrix& computeK(const OdeState& state) override
 	{
 		m_K.setZero();
 		return m_K;
 	}
 
-	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
-	/// When all the terms are needed, this method can perform optimization in evaluating everything together
-	/// \param state (x, v) the current position and velocity to evaluate the various terms with
-	/// \param[out] f The RHS f(x,v)
-	/// \param[out] M The matrix M(x,v)
-	/// \param[out] D The matrix D = -df/dv(x,v)
-	/// \param[out] K The matrix K = -df/dx(x,v)
-	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
-	/// \note computeF(), computeM(), computeD(), computeK()
 	void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override
 	{
 		m_M.setIdentity();
@@ -192,7 +167,7 @@ public:
 		return m_D;
 	}
 
-	virtual const Matrix& computeK(const OdeState& state)
+	virtual const Matrix& computeK(const OdeState& state) override
 	{
 		// A fake but valid stiffness matrix (node 0 fixed)
 		m_K.setIdentity();
@@ -216,6 +191,59 @@ public:
 
 private:
 	Vector m_f, m_gravityForce;
+	Matrix m_M, m_D, m_K;
+};
+
+/// Class for the complex non-linear ODE a = x.v^2
+class OdeComplexNonLinear : public OdeEquation
+{
+public:
+	/// Constructor
+	OdeComplexNonLinear() : m_f(3), m_M(3, 3), m_D(3, 3), m_K(3, 3)
+	{
+		this->m_initialState = std::make_shared<MassPointState>();
+	}
+
+	Vector& computeF(const OdeState& state) override
+	{
+		double v2 = state.getVelocities().dot(state.getVelocities());
+		m_f = v2 * state.getPositions();
+		return m_f;
+	}
+
+	const Matrix& computeM(const OdeState& state) override
+	{
+		m_M.setIdentity();
+		return m_M;
+	}
+
+	const Matrix& computeD(const OdeState& state) override
+	{
+		m_D = 2.0 * state.getPositions() * state.getVelocities().transpose();
+		return m_D;
+	}
+
+	const Matrix& computeK(const OdeState& state) override
+	{
+		m_K = Matrix::Identity(state.getNumDof(), state.getNumDof()) * state.getVelocities().squaredNorm();
+		return m_K;
+	}
+
+	void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override
+	{
+		computeF(state);
+		computeM(state);
+		computeD(state);
+		computeK(state);
+
+		*f = &m_f;
+		*K = &m_K;
+		*D = &m_D;
+		*M = &m_M;
+	}
+
+private:
+	Vector m_f;
 	Matrix m_M, m_D, m_K;
 };
 
