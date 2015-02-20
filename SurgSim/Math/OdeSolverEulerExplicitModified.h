@@ -43,8 +43,8 @@ namespace Math
 /// \f[
 ///   \left\{
 ///   \begin{array}{ccccl}
-///     x(t+dt) &=& x(t) &+& dt.v(t+dt) \\
-///     v(t+dt) &=& v(t) &+& dt.a(t)
+///     x(t+dt) &=& x(t) &+& dt.v(t+dt)
+///     \\ v(t+dt) &=& v(t) &+& dt.a(t)
 ///   \end{array}
 ///   \right.
 /// \f]

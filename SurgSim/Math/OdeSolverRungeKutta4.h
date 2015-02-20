@@ -41,14 +41,14 @@ namespace Math
 /// Runge Kutta 4 evaluates the integral term using 4 dependents evaluations of \f$f\f$ at different times and states:
 /// \f[
 ///   \begin{array}{l}
-///     y(t+dt) = y(t) + \frac{dt}{6} (k_1 + 2k_2 + 2k_3 + k_4) \\
-///     \text{with:} \\
-///     \quad
+///     y(t+dt) = y(t) + \frac{dt}{6} (k_1 + 2k_2 + 2k_3 + k_4)
+///     \\ \text{with:}
+///     \\ \quad
 ///     \begin{array}{lllllll}
-///       k_1 &=& f(& t              &,& y(t)                    &) \\
-///       k_2 &=& f(& t+\frac{dt}{2} &,& y(t) + \frac{dt}{2} k_1 &) \\
-///       k_3 &=& f(& t+\frac{dt}{2} &,& y(t) + \frac{dt}{2} k_2 &) \\
-///       k_4 &=& f(& t+dt           &,& y(t) + dt k_3           &)
+///       k_1 &=& f(& t              &,& y(t)                    &)
+///       \\ k_2 &=& f(& t+\frac{dt}{2} &,& y(t) + \frac{dt}{2} k_1 &)
+///       \\ k_3 &=& f(& t+\frac{dt}{2} &,& y(t) + \frac{dt}{2} k_2 &)
+///       \\ k_4 &=& f(& t+dt           &,& y(t) + dt k_3           &)
 ///     \end{array}
 ///   \end{array}
 /// \f]
