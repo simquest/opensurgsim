@@ -40,10 +40,10 @@ std::shared_ptr<PhysicsManagerState> PreUpdate::doUpdate(
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
-	auto& representations = result->getRepresentations();
-	for (auto it = representations.begin(); it != representations.end(); ++it)
+	auto& representations = result->getActiveRepresentations();
+	for (auto& representation : representations)
 	{
-		(*it)->beforeUpdate(dt);
+		representation->beforeUpdate(dt);
 	}
 
 	return result;
