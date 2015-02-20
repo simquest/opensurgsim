@@ -24,6 +24,7 @@ namespace SurgSim
 namespace Math
 {
 
+/// Euler implicit (a.k.a backward Euler) ode solver (see %OdeSolverEulerImplicit.dox for more details).
 class OdeSolverEulerImplicit : public OdeSolver
 {
 public:
