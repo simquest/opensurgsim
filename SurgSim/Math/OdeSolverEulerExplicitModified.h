@@ -24,14 +24,31 @@ namespace SurgSim
 namespace Math
 {
 
-/// Euler Explicit Modified ode solver
-/// \note M(x(t), v(t)).a(t) = f(t, x(t), v(t))
-/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
-/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
-/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.f(x, v) )
-/// \note By simply using the newly computed velocity in the position update, the method gains in stability:
-/// \note { x(t+dt) = x(t) + dt.v(t+dt)
-/// \note { v(t+dt) = v(t) + dt.a(t)
+/// Modified Euler Explicit ode solver solves the following \f$2^{nd}\f$ order ode
+/// \f$M(x(t), v(t)).a(t) = f(t, x(t), v(t))\f$.
+/// This ode is solved as an ode of order 1 by defining the state vector
+/// \f$y = \left(\begin{array}{c}x\\v\end{array}\right)\f$:
+/// \f[
+///   y' = \left(\begin{array}{c} x' \\ v' \end{array}\right) =
+///   \left(\begin{array}{c} v \\ M(x, v)^{-1}.f(t,x, v) \end{array}\right) =
+///   f(t, y)
+/// \f]
+/// After integrating this equation, we get:
+/// \f[ y(t+dt) - y(t) = \int_t^{t+dt} f(t,y) dt \f]
+/// \note The modified Euler explicit is the same as Euler explicit, but simply using the newly calculated velocity
+/// to update the position with instead of using the velocity from the previous time-step.
+/// \note This makes this solver explicit on the velocity and implicit on the position, it improves the stability
+/// of the method compare to the Euler explicit but is still an explicit method.
+/// \note The numerical integration scheme becomes:
+/// \f[
+///   \left\{
+///   \begin{array}{ccccl}
+///     x(t+dt) &=& x(t) &+& dt.v(t+dt) \\
+///     v(t+dt) &=& v(t) &+& dt.a(t)
+///   \end{array}
+///   \right.
+/// \f]
+/// \sa OdeSolverEulerExplicit
 class OdeSolverEulerExplicitModified : public OdeSolver
 {
 public:
