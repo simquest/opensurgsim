@@ -237,7 +237,7 @@ void OsgSkeletonRepresentation::setBonePose(const std::string& name, const SurgS
 	}
 	else if (isInitialized())
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Bone with name " << name << " is not present in mesh.";
+		SURGSIM_FAILURE() << "Bone with name " << name << " is not present in mesh.";
 	}
 	else
 	{
@@ -258,7 +258,7 @@ SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getBonePose(const std
 	}
 	else if (isInitialized())
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Bone with name " << name << " is not present in mesh.";
+		SURGSIM_FAILURE() << "Bone with name " << name << " is not present in mesh.";
 	}
 
 	return std::move(pose);
@@ -276,7 +276,7 @@ void OsgSkeletonRepresentation::setNeutralBonePose(const std::string& name,
 	}
 	else if (isInitialized())
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Bone with name " << name << " is not present in mesh.";
+		SURGSIM_FAILURE() << "Bone with name " << name << " is not present in mesh.";
 	}
 	else
 	{
@@ -297,7 +297,7 @@ SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getNeutralBonePose(co
 	}
 	else if (isInitialized())
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Bone with name " << name << " is not present in mesh.";
+		SURGSIM_FAILURE() << "Bone with name " << name << " is not present in mesh.";
 	}
 
 	return std::move(pose);
@@ -408,7 +408,7 @@ bool OsgSkeletonRepresentation::setupBones()
 	{
 		if (bone->second.osgBone == nullptr)
 		{
-			SURGSIM_LOG_WARNING(m_logger) << "Bone with name " << bone->first << " is not present in mesh.";
+			SURGSIM_FAILURE() << "Bone with name " << bone->first << " is not present in mesh.";
 			bone = m_bones->erase(bone);
 		}
 		else
