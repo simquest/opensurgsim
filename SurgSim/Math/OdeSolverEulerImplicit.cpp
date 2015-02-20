@@ -52,13 +52,10 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 {
 	// General equation to solve:
 	//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
-	//   M.a(t+dt) = f(t) + df/dx.deltaX + df/dv.deltaV
-	// Note that K = -df/dx and D = -df/dv
-	// Compliance matrix on the velocity level:
-	//   (M.deltaV)/dt = f(t) - K.(dt.v(t) + dt.deltaV) - D.deltaV
-	//   (M/dt + D + dt.K).deltaV = f(t) - dt.K.v(t)
+	// Let's note K = -df/dx and D = -df/dv.
+	// The compliance matrix on the velocity level is (M/dt + D + dt.K)
 
-	// Note that this system is non-linear as K and D are  non-linear in absence of information on the nature
+	// Note that the resulting system is non-linear as K and D are  non-linear in absence of information on the nature
 	// of the model. We use a Newton-Raphson algorithm (http://en.wikipedia.org/wiki/Newton%27s_method) to solve
 	// this non-linear problem. Note that each iteration will re-evaluate the complete system (forces and matrices).
 	// Also note that this method converges quadratically around the root. In our case, the solution is deltaV, which
@@ -73,6 +70,10 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 	// Prepare the newState to be used in the loop, it starts as the current state.
 	*newState = currentState;
 
+	// See the class doxygen documentation (.dox) for explanation of the algorithm.
+	// * currentState is y(t) = (x(t), v(t)).
+	// * newState is the current estimate, y_n = (x_n, v_n) (with y_0 = y(t))
+	// * Each iteration search for the next estimate y_{n+1} = (x_{n+1}, v_{n+1}).
 	size_t numIteration = 0;
 	while (numIteration < m_maximumIteration)
 	{
