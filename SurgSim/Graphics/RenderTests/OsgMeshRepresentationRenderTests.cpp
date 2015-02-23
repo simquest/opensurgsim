@@ -78,6 +78,12 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Scene");
 	scene->addSceneElement(element);
 
+	// make an empty mesh
+	auto meshRepresentation0 = makeRepresentation("emptymesh");
+	meshRepresentation0->getMesh()->initialize(cubeVertices, cubeColors, std::vector<Vector2d>(), cubeTriangles);
+	meshRepresentation0->setUpdateOptions(MeshRepresentation::UPDATE_OPTION_COLORS |
+		MeshRepresentation::UPDATE_OPTION_VERTICES);
+
 	SurgSim::Testing::Cube::makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
 
 	// make a colored cube
@@ -100,6 +106,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 	meshRepresentation2->setMaterial(material);
 
 	element->addComponent(material);
+	element->addComponent(meshRepresentation0);
 	element->addComponent(meshRepresentation1);
 	element->addComponent(meshRepresentation2);
 
@@ -141,7 +148,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 
 	int numSteps = 1000;
 
@@ -168,13 +175,12 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 		{
 			for (size_t v = 0; v < cubeColors.size(); ++v)
 			{
-				//meshes[0]->getVertex(v).data.color.setValue(cubeColors[(v+numSteps)%cubeColors.size()]);
 				meshes[0]->getVertex(v).data.color.setValue(Vector4d(1.0, 0.0, 0.5, 1.0));
 			}
 		}
 
-		/// The total number of steps should complete in 1 second
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps) * 4);
+		/// The total number of steps should complete in 4 seconds
+		boost::this_thread::sleep(boost::posix_time::milliseconds(4000 / numSteps));
 	}
 }
 

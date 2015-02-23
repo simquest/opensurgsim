@@ -76,10 +76,8 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	m_normals->setDataVariance(osg::Object::DYNAMIC);
 	m_geometry->setNormalArray(m_normals, osg::Array::BIND_PER_VERTEX);
 
-	osg::ref_ptr<osg::Geode> geode = new osg::Geode();
-	geode->addDrawable(m_geometry);
-
-	m_transform->addChild(geode);
+	m_geode = new osg::Geode();
+	m_geode->addDrawable(m_geometry);
 }
 
 OsgMeshRepresentation::~OsgMeshRepresentation()
@@ -117,20 +115,35 @@ void OsgMeshRepresentation::doUpdate(double dt)
 {
 	SURGSIM_ASSERT(m_mesh->isValid()) << "The mesh in the OsgMeshRepresentation " << getName() << " is invalid.";
 
-	int updateOptions = updateOsgArrays();
-	updateOptions |= m_updateOptions;
-
-	if ((updateOptions & (UPDATE_OPTION_VERTICES | UPDATE_OPTION_TEXTURES | UPDATE_OPTION_COLORS)) != 0)
+	if (m_mesh->getNumVertices() > 0)
 	{
-		updateVertices(updateOptions);
-		m_geometry->dirtyDisplayList();
-		m_geometry->dirtyBound();
+		if (m_geode->getNumParents() <= 0)
+		{
+			m_transform->addChild(m_geode);
+		}
+
+		int updateOptions = updateOsgArrays();
+		updateOptions |= m_updateOptions;
+
+		if ((updateOptions & (UPDATE_OPTION_VERTICES | UPDATE_OPTION_TEXTURES | UPDATE_OPTION_COLORS)) != 0)
+		{
+			updateVertices(updateOptions);
+			m_geometry->dirtyDisplayList();
+			m_geometry->dirtyBound();
+		}
+
+		if ((updateOptions & UPDATE_OPTION_TRIANGLES) != 0)
+		{
+			updateTriangles();
+			m_triangles->dirty();
+		}
 	}
-
-	if ((updateOptions & UPDATE_OPTION_TRIANGLES) != 0)
+	else
 	{
-		updateTriangles();
-		m_triangles->dirty();
+		if (m_geode->getNumParents() > 0)
+		{
+			m_transform->removeChild(m_geode);
+		}
 	}
 }
 
