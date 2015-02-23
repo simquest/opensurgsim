@@ -24,17 +24,35 @@ namespace SurgSim
 namespace Math
 {
 
-/// Euler Explicit ode solver
-/// \note M(x(t), v(t)).a(t) = f(t, x(t), v(t))
-/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
-/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
-/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.f(x, v) )
-/// \note y' = f(t, y)
-/// \note Euler Explicit is also called forward Euler as it solves this integral using a forward evaluation:
-/// \note y' = (y(t+dt) - y(t)) / dt
-/// \note which leads to the integration scheme:
-/// \note { x(t+dt) = x(t) + dt.v(t)
-/// \note { v(t+dt) = v(t) + dt.a(t)
+/// Euler Explicit ode solver solves the following \f$2^{nd}\f$ order ode
+/// \f$M(x(t), v(t)).a(t) = f(t, x(t), v(t))\f$.
+/// This ode is solved as an ode of order 1 by defining the state vector
+/// \f$y = \left(\begin{array}{c}x\\v\end{array}\right)\f$:
+/// \f[
+///   y' = \left(\begin{array}{c} x' \\ v' \end{array}\right) =
+///   \left(\begin{array}{c} v \\ M(x, v)^{-1}.f(t,x, v) \end{array}\right) =
+///   f(t, y)
+/// \f]
+/// After integrating this equation, we get:
+/// \f[ y(t+dt) - y(t) = \int_t^{t+dt} f(t,y) dt \f]
+/// \note Euler explicit uses a rectangular numerical integration on the left to evaluate this integral, leading to
+/// \f$ \int_t^{t+dt} f(t,y) dt \simeq dt.f(t, y(t))\f$, therefore:
+/// \f[
+///   \begin{array}{ccc}
+///   y(t+dt) - y(t) = dt.f(t, y(t))
+///   &
+///   \Leftrightarrow
+///   &
+///   \left\{
+///   \begin{array}{ccccl}
+///     x(t+dt) &=& x(t) &+& dt.v(t)
+///     \\ v(t+dt) &=& v(t) &+& dt.a(t)
+///   \end{array}
+///   \right.
+///   \end{array}
+/// \f]
+/// \note Euler Explicit is also known as forward Euler as it uses a forward evaluation of the derivative
+/// \f$y' = (y(t+dt) - y(t)) / dt\f$ which leads to the same result.
 class OdeSolverEulerExplicit : public OdeSolver
 {
 public:

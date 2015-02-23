@@ -26,20 +26,32 @@ namespace SurgSim
 namespace Math
 {
 
-/// Runge Kutta 4 ode solver
-/// See http://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods
-/// \note M(x(t), v(t)).a(t) = f(t, x(t), v(t))
-/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
-/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
-/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.f(x, v) )
-/// \note y' = f(t, y)
-/// \note Runge Kutta 4 solves it via 4 dependents evaluation of f at different times
-/// \note y(n+1) = y(n) + 1/6.dt (k1 + 2*k2 + 2*k3 + k4)
-/// \note with:
-/// \note k1 = f(t     , y(n))
-/// \note k2 = f(t+dt/2, y(n) + k1.dt/2)
-/// \note k3 = f(t+dt/2, y(n) + k2.dt/2)
-/// \note k4 = f(t+dt  , y(n) + k3.dt)
+/// Runge Kutta 4 ode solver (See http://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods)
+/// solves the following \f$2^{nd}\f$ order ode
+/// \f$M(x(t), v(t)).a(t) = f(t, x(t), v(t))\f$.
+/// This ode is solved as an ode of order 1 by defining the state vector
+/// \f$y = \left(\begin{array}{c}x\\v\end{array}\right)\f$:
+/// \f[
+///   y' = \left(\begin{array}{c} x' \\ v' \end{array}\right) =
+///   \left(\begin{array}{c} v \\ M(x, v)^{-1}.f(t,x, v) \end{array}\right) =
+///   f(t, y)
+/// \f]
+/// After integrating this equation, we get:
+/// \f[ y(t+dt) - y(t) = \int_t^{t+dt} f(t,y) dt \f]
+/// Runge Kutta 4 evaluates the integral term using 4 dependents evaluations of \f$f\f$ at different times and states:
+/// \f[
+///   \begin{array}{l}
+///     y(t+dt) = y(t) + \frac{dt}{6} (k_1 + 2k_2 + 2k_3 + k_4)
+///     \\ \text{with:}
+///     \\ \quad
+///     \begin{array}{lllllll}
+///       k_1 &=& f(& t              &,& y(t)                    &)
+///       \\ k_2 &=& f(& t+\frac{dt}{2} &,& y(t) + \frac{dt}{2} k_1 &)
+///       \\ k_3 &=& f(& t+\frac{dt}{2} &,& y(t) + \frac{dt}{2} k_2 &)
+///       \\ k_4 &=& f(& t+dt           &,& y(t) + dt k_3           &)
+///     \end{array}
+///   \end{array}
+/// \f]
 class OdeSolverRungeKutta4 : public OdeSolver
 {
 public:
@@ -54,9 +66,6 @@ public:
 	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
 protected:
-	/// Temporary vectors to store the 4 intermediates evaluations
-	Vector m_force;
-
 	/// Internal structure to hold the 4 temporary evaluations
 	struct RungeKuttaDerivedState
 	{
@@ -65,8 +74,11 @@ protected:
 		Vector velocity;
 		Vector acceleration;
 	};
-	/// Runge kutta 4 intermediate system evaluations
+
+	///@{
+	/// Runge kutta 4 intermediate system evaluation
 	RungeKuttaDerivedState m_k1, m_k2, m_k3, m_k4;
+	///@}
 };
 
 }; // namespace Math

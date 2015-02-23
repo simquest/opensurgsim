@@ -16,12 +16,14 @@
 #ifndef SURGSIM_GRAPHICS_SKELETONREPRESENTATION_H
 #define SURGSIM_GRAPHICS_SKELETONREPRESENTATION_H
 
+#include <string>
+
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Graphics/Model.h"
 #include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-#include <string>
 
 namespace SurgSim
 {
@@ -53,6 +55,10 @@ public:
 			std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1));
 
 		setSetter("ModelFileName", setter);
+
+		typedef std::map<std::string, SurgSim::Math::RigidTransform3d> PoseMap;
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(SkeletonRepresentation, PoseMap,
+			NeutralPoses, getNeutralBonePoses, setNeutralBonePoses);
 	}
 
 	/// Convenience function to trigger the load of the model with the given filename, if successful, this will
@@ -71,6 +77,30 @@ public:
 	/// \param name The name of the bone.
 	/// \param pose The pose of the bone.
 	virtual void setBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) = 0;
+
+	/// Get the pose for a given bone.
+	/// \param name The name of the bone.
+	/// \return pose The pose of the bone.
+	virtual SurgSim::Math::RigidTransform3d getBonePose(const std::string& name) const = 0;
+
+	/// Set the neutral pose for a given bone.
+	/// \param name The name of the bone.
+	/// \param pose The neutral pose of the bone.
+	virtual void setNeutralBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) = 0;
+
+	/// Get the neutral pose for a given bone.
+	/// \param name The name of the bone.
+	/// \return pose The neutral pose of the bone.
+	virtual SurgSim::Math::RigidTransform3d getNeutralBonePose(const std::string& name) const = 0;
+
+protected:
+	/// Set neutral poses for a set of bones.
+	/// \param poses A map of bone names and neutral poses
+	virtual void setNeutralBonePoses(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poses) = 0;
+
+	/// Get all the neutral poses
+	/// \return A map of bone names and neutral poses
+	virtual std::map<std::string, SurgSim::Math::RigidTransform3d> getNeutralBonePoses() const = 0;
 };
 
 };  // namespace Graphics

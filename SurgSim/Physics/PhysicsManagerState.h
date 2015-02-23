@@ -100,7 +100,7 @@ public:
 	/// Sets collision pairs that should be considered, while this is not being verified the collision pairs
 	/// should only be from the list of representations that are in this state.
 	/// \param	val	The list of collision pairs.
-	void setCollisionPairs(std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> val);
+	void setCollisionPairs(const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& val);
 
 	/// Gets collision pairs.
 	/// \return	The collision pairs.

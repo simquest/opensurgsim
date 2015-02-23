@@ -48,7 +48,7 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 		const std::shared_ptr<PhysicsManagerState>& state)
 {
 	auto result = state;
-	auto pairs = result->getCollisionPairs();
+	auto& pairs = result->getCollisionPairs();
 
 	auto pairsIt = std::begin(pairs);
 	auto pairsEnd = std::end(pairs);

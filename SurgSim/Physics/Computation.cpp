@@ -51,13 +51,13 @@ std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std:
 {
 	// Compile the list of active representations and set it on the state.
 	std::vector<std::shared_ptr<Representation>> activeRepresentations;
-	auto representations = state->getRepresentations();
+	auto& representations = state->getRepresentations();
 	activeRepresentations.reserve(representations.size());
-	for (auto it = representations.begin(); it != representations.end(); ++it)
+	for (auto& representation : representations)
 	{
-		if ((*it)->isActive())
+		if (representation->isActive())
 		{
-			activeRepresentations.push_back(*it);
+			activeRepresentations.push_back(representation);
 		}
 	}
 	state->setActiveRepresentations(activeRepresentations);

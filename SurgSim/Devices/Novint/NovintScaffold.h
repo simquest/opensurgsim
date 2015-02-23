@@ -105,11 +105,11 @@ private:
 	/// \return	true on success.
 	bool updateDeviceInput(DeviceData* info);
 
-	/// Updates the device information for a single device's output.
+	/// Updates the device information for a single device's output.  If pullOutput failed, zeros forces & torques.
 	/// \param info	The device data.
+	/// \param pulledOutput true if the most recent pullOutput succeeded.
 	/// \return	true on success.
-	bool updateDeviceOutput(DeviceData* info);
-
+	bool updateDeviceOutput(DeviceData* info, bool pulledOutput);
 
 	/// Checks whether a device has been homed.  If the position and/or orientation have not been homed, zeros the
 	/// respective Values.  Call this before setting the data to send to the Input Component.  The DeviceData's

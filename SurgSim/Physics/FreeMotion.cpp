@@ -43,15 +43,12 @@ std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
 {
 	// Copy state to new state
 	std::shared_ptr<PhysicsManagerState> result = state;
-	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
+	auto& representations = result->getActiveRepresentations();
 
-	auto const itEnd = representations.end();
-	for (auto it = representations.begin(); it != itEnd; ++it)
+	for (auto& representation : representations)
 	{
-		(*it)->update(dt);
+		representation->update(dt);
 	}
-
-	result->setRepresentations(representations);
 
 	return result;
 }

@@ -624,14 +624,14 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 	return result;
 }
 
-bool NovintScaffold::updateDeviceOutput(DeviceData* info)
+bool NovintScaffold::updateDeviceOutput(DeviceData* info, bool pulledOutput)
 {
 	hdlMakeCurrent(info->deviceHandle->get());	// This device is now "current", and all hdlXxx calls apply to it.
 	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
 
 	info->force.setZero();
 	info->torque.setZero();
-	if (info->isDeviceHomed)
+	if (info->isDeviceHomed && pulledOutput)
 	{
 		bool desiredGravityCompensation = false;
 		if (info->deviceObject->getOutputData().booleans().get("gravityCompensation", &desiredGravityCompensation))
@@ -645,11 +645,14 @@ bool NovintScaffold::updateDeviceOutput(DeviceData* info)
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
 	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
-	// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not used
-	// anywhere at the moment.
-	// The 2nd arg to this call is the count; we're setting 4 doubles.
-	hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torque.data());
-	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+	if (info->isDevice7Dof)
+	{
+		// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not
+		// used anywhere at the moment.
+		// The 2nd arg to this call is the count; we're setting 4 doubles.
+		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torque.data());
+		fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+	}
 
 	return !fatalError;
 }
@@ -740,17 +743,12 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 
 void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 {
-	typedef Eigen::Matrix<double, 6, 1> Vector6d;
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-
-	// Set the DeviceData's force to the nominal force, if provided.
-	Vector3d nominalForce = Vector3d::Zero();
-	outputData.vectors().get(SurgSim::DataStructures::Names::FORCE, &nominalForce);
-	info->force = nominalForce;
+	outputData.vectors().get(SurgSim::DataStructures::Names::FORCE, &(info->force));
 
 	// If the springJacobian was provided, multiply with the change in position since the output data was set,
 	// to get a delta force.  This way a linearized output force is calculated at haptic update rates.
-	Vector6d deltaPosition;
+	SurgSim::Math::Vector6d deltaPosition;
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
 	bool havespringJacobian =
 		outputData.matrices().get(SurgSim::DataStructures::Names::SPRING_JACOBIAN, &springJacobian);
@@ -770,7 +768,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	}
 
 	// If the damperJacobian was provided, calculate a delta force based on the change in velocity.
-	Vector6d deltaVelocity;
+	SurgSim::Math::Vector6d deltaVelocity;
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType damperJacobian;
 	bool havedamperJacobian =
 		outputData.matrices().get(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, &damperJacobian);
@@ -794,9 +792,8 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	// Calculate the torque command if applicable (and convert newton-meters to command counts).
 	if (info->isDevice7Dof)
 	{
-		Vector3d nominalTorque = Vector3d::Zero();
-		outputData.vectors().get(SurgSim::DataStructures::Names::TORQUE, &nominalTorque);
-		Vector3d torque = nominalTorque;
+		Vector3d torque = Vector3d::Zero();
+		outputData.vectors().get(SurgSim::DataStructures::Names::TORQUE, &torque);
 
 		if (havespringJacobian)
 		{
@@ -1039,10 +1036,7 @@ bool NovintScaffold::runHapticFrame()
 	}
 	for (auto& it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)
 	{
-		if (updateDeviceOutput((*it).get()))
-		{
-			(*it)->deviceObject->pullOutput();
-		}
+		updateDeviceOutput(it->get(), (*it)->deviceObject->pullOutput());
 	}
 
 	bool desiredGravityCompensation = false;

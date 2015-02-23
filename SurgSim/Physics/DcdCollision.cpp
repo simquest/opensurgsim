@@ -45,7 +45,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	std::shared_ptr<PhysicsManagerState> result = state;
 	updatePairs(result);
 
-	std::vector<std::shared_ptr<CollisionPair>> pairs = result->getCollisionPairs();
+	auto& pairs = result->getCollisionPairs();
 
 	auto it = pairs.cbegin();
 	auto itEnd = pairs.cend();
@@ -123,7 +123,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 			}
 		}
 
-		std::vector<std::shared_ptr<CollisionPair>> excludedPairs = state->getExcludedCollisionPairs();
+		auto& excludedPairs = state->getExcludedCollisionPairs();
 		for (auto it = excludedPairs.cbegin(); it != excludedPairs.cend(); ++it)
 		{
 			auto candidate = std::find_if(pairs.begin(), pairs.end(), [&it](const std::shared_ptr<CollisionPair> &pair)
