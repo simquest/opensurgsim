@@ -21,7 +21,6 @@ set(UNIT_TEST_SOURCES
 	ForceScaleTest.cpp
 	PoseIntegratorTest.cpp
 	PoseTransformTest.cpp
-	VelocityFromPoseTest.cpp
 )
 
 set(LIBS
