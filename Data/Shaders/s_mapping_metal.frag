@@ -1,23 +1,53 @@
-uniform float SpecularPercent;
-uniform float DiffusePercent;
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-uniform samplerCube SpecularEnvMap;
-uniform samplerCube DiffuseEnvMap;
+/// \file s_mapping.frag
+/// Modulate the outgoing color by the amount fetched from the shadowMap, intended for use
+/// with simple vertex colors, does not do any texturing
+
+/// map for modulation, needs to be rendered with the same modelview and projection
+/// matrices as the ones that are used for this shader.
+
+uniform float specularPercent;
+uniform float diffusePercent;
+uniform float shininess;
+
+uniform vec4 specularColor;
+uniform samplerCube specularEnvMap;
+uniform samplerCube diffuseEnvMap;
 uniform sampler2D shadowMap;
 
-uniform vec3 _lightColor;
+// OSS provided uniforms
+uniform vec4 ambientColor;
 
-uniform float osg_shine;
+struct LightSource {
+    vec4 diffuse; 
+    vec4 specular; 
+    vec4 position; 
+    float constantAttenuation; 
+    float linearAttenuation; 
+    float quadraticAttenuation; 
+};
 
-uniform vec3 osg_ambientColor;
-uniform vec3 osg_specularColor;
+uniform LightSource lightSource;
 
+// From Vertex Shader
 varying vec3 lightDir;
 varying vec3 eyeDir;
 varying vec3 reflectDir;
 varying vec3 normalDir;
-
-varying vec3 specular;
 
 varying vec4 clipCoord;
 
@@ -25,30 +55,30 @@ varying float attenuation;
 
 void main()
 {
+	// Calculate Shadowing
 	vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
 	float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
 
-	vec3 ambientColor = osg_ambientColor;
-	
-	vec3 lightDir_normalized = normalize(lightDir);
-	vec3 normalDir_normalized = normalize(normalDir);
-	vec3 eyeDir_normalized = normalize(eyeDir);
+	// Look up environment map values in cube maps
+	vec3 mappedDiffuseColor = vec3(textureCube(diffuseEnvMap,  normalDir)) * 
+			(lightSource.diffuse * attenuation * shadowAmount).rgb;
+	vec3 mappedSpecularColor = vec3(textureCube(specularEnvMap, reflectDir)) *
+			(lightSource.specular * attenuation).rgb;
 
-    // Look up environment map values in cube maps
-    vec3 diffuseColor = vec3(textureCube(DiffuseEnvMap,  normalDir)) * _lightColor * attenuation * shadowAmount;
+	// Add lighting to base color and mix
+	vec3 color = mix(ambientColor.rgb, mappedDiffuseColor, diffusePercent);
 
-    vec3 specularColor = vec3(textureCube(SpecularEnvMap, reflectDir)) * _lightColor * attenuation;
-        
-    // Add lighting to base color and mix
-    vec3 color = mix(ambientColor, diffuseColor, DiffusePercent);
-	
-	float temp = max(dot(reflect(lightDir_normalized, normalDir_normalized), eyeDir_normalized), 0.0);
-    float specular = temp / (osg_shine - temp * osg_shine + temp);
-    //float specular = max(pow(dot(reflect(lightDir_normalized, normalDir_normalized), eyeDir_normalized), osg_shine), 0.0);
-	
-    color = mix(color, specularColor + color, SpecularPercent) + specular * osg_specularColor * _lightColor * attenuation * shadowAmount;
+	vec3 normalizedLightDir = normalize(lightDir);
+	vec3 normalizedNormalDir = normalize(normalDir);
+	vec3 normalizedEyeDir = normalize(eyeDir);
+
+	float temp = max(dot(reflect(normalizedLightDir, normalizedNormalDir), normalizedEyeDir), 0.0);
+	float specular = temp / (shininess - temp * shininess + temp);
+
+	color = mix(color, mappedSpecularColor + color, specularPercent) + 
+			(specular * specularColor * lightSource.specular * attenuation * shadowAmount).rgb;
 
 	gl_FragColor.rgb = color;
-    gl_FragColor.a = 1.0;
+	gl_FragColor.a = 1.0;
 }
 

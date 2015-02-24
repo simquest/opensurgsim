@@ -15,6 +15,7 @@
 
 /// \file unlit_text.frag
 /// Fragment Shader to do text rendering
+/// use with unlit_texture.vert
 
 uniform sampler2D texture;
 

@@ -69,7 +69,7 @@ bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 
 bool OsgMaterial::addUniform(const std::string& type, const std::string& name)
 {
-	OsgUniformFactory factory;
+	static OsgUniformFactory factory;
 
 	bool result = false;
 	if (factory.isRegistered(type))
