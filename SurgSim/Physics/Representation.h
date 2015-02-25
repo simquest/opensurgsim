@@ -17,8 +17,10 @@
 #define SURGSIM_PHYSICS_REPRESENTATION_H
 
 #include <string>
+#include <typeindex>
 
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -29,6 +31,11 @@ namespace DataStructures
 struct Location;
 }
 
+namespace Framework
+{
+class Logger;
+}
+
 namespace Collision
 {
 class Representation;
@@ -37,20 +44,10 @@ class Representation;
 namespace Physics
 {
 
+class Constraint;
+class ConstraintData;
+class ConstraintImplementation;
 class Localization;
-
-enum RepresentationType
-{
-	REPRESENTATION_TYPE_INVALID = -1,
-	REPRESENTATION_TYPE_FIXED = 0,
-	REPRESENTATION_TYPE_RIGID,
-	REPRESENTATION_TYPE_VTC_RIGID,
-	REPRESENTATION_TYPE_MASSSPRING,
-	REPRESENTATION_TYPE_FEM1D,
-	REPRESENTATION_TYPE_FEM2D,
-	REPRESENTATION_TYPE_FEM3D,
-	REPRESENTATION_TYPE_COUNT
-};
 
 /// The Representation class defines the base class for all physics objects
 class Representation : public SurgSim::Framework::Representation
@@ -62,10 +59,6 @@ public:
 
 	/// Destructor
 	virtual ~Representation();
-
-	/// Query the representation type
-	/// \return the RepresentationType for this representation
-	virtual RepresentationType getType() const = 0;
 
 	/// Reset the representation to its initial/default state
 	virtual void resetState();
@@ -114,6 +107,16 @@ public:
 	/// \return A localization object for the given location.
 	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location);
 
+	/// Create a constraint of the given type for this representation.
+	/// \param type The type of constraint.
+	/// \param thisLocalization Localization for this representation.
+	/// \param otherLocalization Localization for the other representation.
+	/// \param constraintData The constraint data.
+	/// \return A contact constraint or nullptr.
+	std::shared_ptr<Constraint> createConstraint(SurgSim::Math::MlcpConstraintType type,
+		std::shared_ptr<Localization> thisLocalization, std::shared_ptr<Localization> otherLocalization,
+		std::shared_ptr<ConstraintData> constraintData = nullptr);
+
 	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
 	/// deltaVelocity.
 	///
@@ -150,6 +153,11 @@ protected:
 	/// \param pose New pose for the SceneElement
 	void driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose);
 
+	/// Get a constraint implementation of the given type for this representation.
+	/// \param type The type of constraint.
+	/// \return A contact constraint implementation or nullptr.
+	std::shared_ptr<ConstraintImplementation> getConstraintImplementation(SurgSim::Math::MlcpConstraintType type);
+
 private:
 	/// NO copy constructor
 	Representation(const Representation&);
@@ -169,6 +177,8 @@ private:
 	/// Is this representation driving the sceneElement pose
 	bool m_isDrivingSceneElementPose;
 
+	/// Logger for this class.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 };  // namespace Physics

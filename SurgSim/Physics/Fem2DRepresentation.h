@@ -51,8 +51,6 @@ public:
 		const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 		const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
-	RepresentationType getType() const override;
-
 protected:
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 			const SurgSim::Math::RigidTransform3d& transform) override;

@@ -40,12 +40,6 @@ TEST(Fem2DRepresentationTests, ConstructorTest)
 	ASSERT_NO_THROW({std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem2D");});
 }
 
-TEST(Fem2DRepresentationTests, GetTypeTest)
-{
-	std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem2D");
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM2D, fem->getType());
-}
-
 TEST(Fem2DRepresentationTests, GetNumDofPerNodeTest)
 {
 	std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem2D");
@@ -208,7 +202,6 @@ TEST(Fem2DRepresentationTests, SerializationTest)
 	ASSERT_NE(nullptr, newRepresentation);
 
 	EXPECT_EQ("SurgSim::Physics::Fem2DRepresentation", newRepresentation->getClassName());
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM2D, newRepresentation->getType());
 }
 
 } // namespace Physics

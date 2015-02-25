@@ -13,32 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/FixedRepresentation.h"
+#include <gtest/gtest.h>
+
+#include "SurgSim/Physics/ConstraintImplementation.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::FixedRepresentation, FixedRepresentation);
 
-FixedRepresentation::FixedRepresentation(const std::string& name) :
-	RigidRepresentationBase(name)
+TEST(ConstraintImplementationTest, FactoryTest)
 {
+	ASSERT_NO_THROW(ConstraintImplementation::getFactory(););
 }
 
-FixedRepresentation::~FixedRepresentation()
-{
-}
-
-void FixedRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
-{
-	// Do Nothing it is a fixed object
-}
-
-void FixedRepresentation::update(double dt)
-{
-	m_currentState.setPose(getPose());
-}
-
-}; // Physics
-}; // SurgSim
+} // namespace Physics
+} // namespace SurgSim

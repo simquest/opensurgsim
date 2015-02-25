@@ -15,8 +15,12 @@
 
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/Location.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
 
@@ -31,7 +35,8 @@ Representation::Representation(const std::string& name) :
 	m_gravity(0.0, -9.81, 0.0),
 	m_numDof(0),
 	m_isGravityEnabled(true),
-	m_isDrivingSceneElementPose(true)
+	m_isDrivingSceneElementPose(true),
+	m_logger(SurgSim::Framework::Logger::getLogger("Physics/Representation"))
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, size_t, NumDof, getNumDof, setNumDof);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, IsGravityEnabled, isGravityEnabled, setIsGravityEnabled);
@@ -93,6 +98,59 @@ std::shared_ptr<Localization> Representation::createLocalization(const SurgSim::
 	return nullptr;
 }
 
+std::shared_ptr<Constraint> Representation::createConstraint(
+	SurgSim::Math::MlcpConstraintType type,
+	std::shared_ptr<Localization> thisLocalization,
+	std::shared_ptr<Localization> otherLocalization,
+	std::shared_ptr<ConstraintData> constraintData)
+{
+	if (thisLocalization == nullptr || otherLocalization == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getClassName() << ": Constraint cannot be created without localizations.";
+		return nullptr;
+	}
+
+	if (thisLocalization->getRepresentation() == nullptr || thisLocalization->getRepresentation().get() != this)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getClassName() <<
+			": thisLocalization has to have a representation attached to it, and the representation" <<
+			"should be the object on which this createConstraint() is called.";
+		return nullptr;
+	}
+
+	if (otherLocalization->getRepresentation() == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getClassName() <<
+			": otherLocalization has to have a representation attached to it.";
+		return nullptr;
+	}
+
+	if (otherLocalization.get() == thisLocalization.get())
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getClassName() <<
+			": otherLocalization has to be different from thisLocalization.";
+		return nullptr;
+	}
+
+	auto thisImplementation = thisLocalization->getRepresentation()->getConstraintImplementation(type);
+	auto otherImplementation = otherLocalization->getRepresentation()->getConstraintImplementation(type);
+	if (thisImplementation != nullptr && otherImplementation != nullptr)
+	{
+		if (constraintData == nullptr)
+		{
+			constraintData = std::make_shared<ConstraintData>();
+		}
+		return std::make_shared<Constraint>(
+			constraintData,
+			thisImplementation,
+			thisLocalization,
+			otherImplementation,
+			otherLocalization);
+	}
+
+	return nullptr;
+}
+
 void Representation::applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
 {
 }
@@ -127,6 +185,17 @@ void Representation::driveSceneElementPose(const SurgSim::Math::RigidTransform3d
 			sceneElement->setPose(pose);
 		}
 	}
+}
+
+std::shared_ptr<ConstraintImplementation> Representation::getConstraintImplementation(
+	SurgSim::Math::MlcpConstraintType type)
+{
+	auto implementation = ConstraintImplementation::getFactory().getImplementation(typeid(*this), type);
+	if (implementation == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getClassName() << ": Does not support constraint type (" << type << ").";
+	}
+	return implementation;
 }
 
 }; // namespace Physics

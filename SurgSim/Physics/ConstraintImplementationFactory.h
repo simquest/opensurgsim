@@ -16,7 +16,10 @@
 #ifndef SURGSIM_PHYSICS_CONSTRAINTIMPLEMENTATIONFACTORY_H
 #define SURGSIM_PHYSICS_CONSTRAINTIMPLEMENTATIONFACTORY_H
 
+#include <array>
 #include <memory>
+#include <typeindex>
+#include <unordered_map>
 
 #include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Physics/Representation.h"
@@ -44,24 +47,24 @@ public:
 
 	/// Get the instance of a ConstraintImplementation for a specific representation and
 	/// constraint type.
-	/// \param	representationType	Type of the representation.
+	/// \param	representationTypeIndex	Type index of the representation.
 	/// \param	constraintType	  	Type of the constraint.
 	/// \return	a pointer to an implementation if the implementation can be found, nullptr otherwise.
 	std::shared_ptr<ConstraintImplementation> getImplementation(
-		RepresentationType representationType,
-		SurgSim::Math::MlcpConstraintType constraintType) const;
+		std::type_index representationTypeIndex,
+		SurgSim::Math::MlcpConstraintType constraintType);
+
+	/// Add an implementation to the internal directory.
+	/// \param typeIndex The type of representation associated with the implementation.
+	/// \param	implementation	The ConstraintImplementation to add.
+	void addImplementation(std::type_index typeIndex, std::shared_ptr<ConstraintImplementation> implementation);
 
 private:
 
-	/// Add an implementation to the internal directory.
-	/// \param	implementation	The ConstraintImplementation to add.
-	void addImplementation(std::shared_ptr<ConstraintImplementation> implementation);
-
-	/// Lookup table for constrain implementations
-	std::shared_ptr<ConstraintImplementation>
-		m_implementations[REPRESENTATION_TYPE_COUNT][SurgSim::Math::MLCP_NUM_CONSTRAINT_TYPES];
-
-
+	/// Lookup table for constraint implementations
+	std::unordered_map<std::type_index,
+		std::array<std::shared_ptr<ConstraintImplementation>, SurgSim::Math::MLCP_NUM_CONSTRAINT_TYPES>>
+		m_implementations;
 };
 
 }; // Physics

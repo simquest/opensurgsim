@@ -120,11 +120,6 @@ SurgSim::Math::MlcpConstraintType RigidRepresentationBilateral3D::getMlcpConstra
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-SurgSim::Physics::RepresentationType RigidRepresentationBilateral3D::getRepresentationType() const
-{
-	return REPRESENTATION_TYPE_RIGID;
-}
-
 size_t RigidRepresentationBilateral3D::doGetNumDof() const
 {
 	return 3;

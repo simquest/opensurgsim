@@ -19,7 +19,6 @@
 #include  <memory>
 
 #include "SurgSim/Physics/Computation.h"
-#include "SurgSim/Physics/ConstraintImplementationFactory.h"
 
 
 namespace SurgSim
@@ -42,8 +41,9 @@ class Representation;
 namespace Physics
 {
 
-class PhysicsManagerState;
 class Localization;
+class PhysicsManagerState;
+class Representation;
 
 /// Generate a constraint for every contact that was calculated.
 /// The general algorithm is such, for each pair of Collision Representations that has Contacts
@@ -66,10 +66,6 @@ public:
 	~ContactConstraintGeneration();
 
 private:
-
-	/// For looking up instances of constrain implementations
-	ConstraintImplementationFactory m_factory;
-
 	/// The logger for this class
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 

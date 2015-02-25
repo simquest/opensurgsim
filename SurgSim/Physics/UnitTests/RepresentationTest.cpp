@@ -184,3 +184,63 @@ TEST(RepresentationTest, SerializationTest)
 		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsDrivingSceneElementPose"));
 	}
 }
+
+TEST(RepresentationTest, ConstraintTest)
+{
+	using SurgSim::Physics::ConstraintImplementation;
+	using SurgSim::Physics::MockConstraintImplementation;
+	using SurgSim::Physics::MockLocalization;
+
+	auto implementation = std::make_shared<MockConstraintImplementation>();
+
+	auto representation1 = std::make_shared<MockRepresentation>("rep1");
+	auto representation2 = std::make_shared<MockRepresentation>("rep2");
+
+	auto localization1 = std::make_shared<MockLocalization>(representation1);
+	auto localization2 = std::make_shared<MockLocalization>(representation2);
+	auto localization3 = std::make_shared<MockLocalization>(nullptr);
+
+	// Fails to create constraint because, one of the localizations is sent as null.
+	EXPECT_TRUE(representation1->createConstraint(implementation->getMlcpConstraintType(),
+		nullptr, nullptr) == nullptr);
+	EXPECT_TRUE(representation1->createConstraint(implementation->getMlcpConstraintType(),
+		localization1, nullptr) == nullptr);
+	EXPECT_TRUE(representation1->createConstraint(implementation->getMlcpConstraintType(),
+		nullptr, localization1) == nullptr);
+
+	// Fails to create constraint because, the first localization does not have a representation attached.
+	EXPECT_TRUE(representation1->createConstraint(implementation->getMlcpConstraintType(),
+		localization3, localization1) == nullptr);
+
+	// Fails to create constraint because, the first localization does not belong to the calling representation.
+	EXPECT_TRUE(representation1->createConstraint(implementation->getMlcpConstraintType(),
+		localization2, localization1) == nullptr);
+
+	// Fails to create constraint because, the second localization does not have a representation attached.
+	EXPECT_TRUE(representation1->createConstraint(implementation->getMlcpConstraintType(),
+		localization1, localization3) == nullptr);
+
+	// Fails to create constraint because both localizations are the same.
+	EXPECT_TRUE(representation1->createConstraint(implementation->getMlcpConstraintType(),
+		localization1, localization1) == nullptr);
+
+	// Fails to create constraint because there is no constraint implementation.
+	EXPECT_TRUE(representation1->createConstraint(implementation->getMlcpConstraintType(),
+		localization1, localization2) == nullptr);
+
+	// Test the getConstraintImplementation
+	EXPECT_TRUE(representation1->getConstraintImplementation(implementation->getMlcpConstraintType())
+		== nullptr);
+
+	// Add the constraint implementation.
+	ConstraintImplementation::getFactory().addImplementation(typeid(MockRepresentation),
+		implementation);
+
+	// Successfully creates constraint.
+	EXPECT_TRUE(representation1->createConstraint(implementation->getMlcpConstraintType(),
+		localization1, localization2) != nullptr);
+
+	// Test the getConstraintImplementation
+	EXPECT_TRUE(representation1->getConstraintImplementation(implementation->getMlcpConstraintType())
+		!= nullptr);
+}

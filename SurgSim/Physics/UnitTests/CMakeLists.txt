@@ -21,6 +21,8 @@ set(UNIT_TEST_SOURCES
 	BuildMlcpTests.cpp
 	ComputationTests.cpp
 	ConstraintComponentTests.cpp
+	ConstraintImplementationFactoryTests.cpp
+	ConstraintImplementationTests.cpp
 	ConstraintTests.cpp
 	ContactConstraintDataTests.cpp
 	ContactConstraintGenerationTests.cpp

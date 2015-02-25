@@ -101,32 +101,20 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 						(*contactsIt)->penetrationPoints.second);
 				if (localizations.first != nullptr && localizations.second != nullptr)
 				{
-					std::pair< std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>
-						implementations;
-
 					// HS-2013-jul-12 The type of constraint is fixed here right now, to get to a constraint
 					// that we can change we probably will need to predefine collision pairs and their appropriate
 					// contact constraints so we can look up which constraint to use here
 
-					implementations.first = m_factory.getImplementation(
-						localizations.first->getRepresentation()->getType(),
-						SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT);
+					auto data = std::make_shared<ContactConstraintData>();
+					data->setPlaneEquation((*contactsIt)->normal, (*contactsIt)->depth);
 
-					implementations.second = m_factory.getImplementation(
-						localizations.second->getRepresentation()->getType(),
-						SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT);
+					auto constraint = localizations.first->getRepresentation()->createConstraint(
+						SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT,
+						localizations.first, localizations.second, data);
 
-					if (implementations.first != nullptr && implementations.second != nullptr)
+					if (constraint != nullptr)
 					{
-						std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
-						data->setPlaneEquation((*contactsIt)->normal, (*contactsIt)->depth);
-
-						constraints.push_back(std::make_shared<Constraint>(
-							data,
-							implementations.first,
-							localizations.first,
-							implementations.second,
-							localizations.second));
+						constraints.push_back(constraint);
 					}
 				}
 			}
