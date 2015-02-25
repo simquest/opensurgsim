@@ -313,7 +313,8 @@ TEST_F(OsgProgramRenderTests, Metal)
 		// Provide the Diffuse environment map
 		// Axis map is used for testing mapping
 //		auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "OsgShaderRenderTests/axis/");
-		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile("OsgShaderRenderTests/reflectionDiffuse.png", &filename));
+		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile(
+						"OsgShaderRenderTests/reflectionDiffuse.png", &filename));
 		auto texture = std::make_shared<OsgTextureCubeMap>();
 		texture->loadImage(filename);
 		material->addUniform("samplerCube", "diffuseEnvMap");
@@ -325,7 +326,8 @@ TEST_F(OsgProgramRenderTests, Metal)
 		// Provide the Specular environment map
 		// Axis map is used for testing mapping
 //		auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "OsgShaderRenderTests/axis/");
-		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile("OsgShaderRenderTests/reflectionSpecular.png", &filename));
+		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile(
+						"OsgShaderRenderTests/reflectionSpecular.png", &filename));
 		auto texture = std::make_shared<OsgTextureCubeMap>();
 		texture->loadImage(filename);
 		material->addUniform("samplerCube", "specularEnvMap");
