@@ -13,26 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS
 	${Boost_LIBRARIES}
 	SurgSimDataStructures
 	SurgSimFramework
 	SurgSimInput
+	SurgSimMath
 )
 
 set(DEVICE_FILTERS_SOURCES
 	ForceScale.cpp
 	PoseIntegrator.cpp
 	PoseTransform.cpp
-	VelocityFromPose.cpp
 )
 
 set(DEVICE_FILTERS_HEADERS
 	ForceScale.h
 	PoseIntegrator.h
 	PoseTransform.h
-	VelocityFromPose.h
 )
 
 surgsim_add_library(
