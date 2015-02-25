@@ -104,6 +104,9 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_ambientColorUniform->addToStateSet(state);
 
 	setAmbientColor(Vector4d(0.0, 0.0, 0.0, 0.0));
+
+	// We will want this in all cases
+	m_camera->getOrCreateStateSet()->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS, osg::StateAttribute::ON);
 }
 
 bool OsgCamera::setRenderGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
