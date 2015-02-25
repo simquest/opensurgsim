@@ -268,30 +268,28 @@ TEST_F(OsgProgramRenderTests, TexturedShiny)
 
 TEST_F(OsgProgramRenderTests, Metal)
 {
-	// The textured Sphere
+	// Multiple objects used for testing the shader, utilize if needed
 	std::shared_ptr<SphereRepresentation> sphere = std::make_shared<OsgSphereRepresentation>("sphere");
 	sphere->setRadius(0.25);
 
-	std::shared_ptr<BoxRepresentation> boxRepresentation = std::make_shared<OsgBoxRepresentation>("box");
+	std::shared_ptr<BoxRepresentation> cube = std::make_shared<OsgBoxRepresentation>("box");
 
 	auto scenery = std::make_shared<OsgSceneryRepresentation>("scenery");
 	scenery->loadModel("OsgShaderRenderTests/L_forcep.obj");
 
-	auto representation = std::dynamic_pointer_cast<Representation>(scenery);
+	// Assign the object used for testing to the representation
+	auto representation = std::dynamic_pointer_cast<Representation>(sphere);
 
 	auto material = std::make_shared<OsgMaterial>("material");
 	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/s_mapping_metal");
 	ASSERT_TRUE(program != nullptr);
 	material->setProgram(program);
 
-	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.1, 1.0));
-
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 0.4, 1.0));
+	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
 
 	material->addUniform("float", "shininess");
-	material->setValue("shininess", 1.0f);
+	material->setValue("shininess", 1024.0f);
 
 	material->addUniform("float", "specularPercent");
 	material->setValue("specularPercent", 1.0f);
@@ -313,7 +311,8 @@ TEST_F(OsgProgramRenderTests, Metal)
 
 	{
 		// Provide the Diffuse environment map
-// 		auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "OsgShaderRenderTests/axis/");
+		// Axis map is used for testing mapping
+//		auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "OsgShaderRenderTests/axis/");
 		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile("OsgShaderRenderTests/reflectionDiffuse.png", &filename));
 		auto texture = std::make_shared<OsgTextureCubeMap>();
 		texture->loadImage(filename);
@@ -324,6 +323,7 @@ TEST_F(OsgProgramRenderTests, Metal)
 
 	{
 		// Provide the Specular environment map
+		// Axis map is used for testing mapping
 //		auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "OsgShaderRenderTests/axis/");
 		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile("OsgShaderRenderTests/reflectionSpecular.png", &filename));
 		auto texture = std::make_shared<OsgTextureCubeMap>();
@@ -358,10 +358,10 @@ TEST_F(OsgProgramRenderTests, Metal)
 											Vector3d(0.0, 0.0, 0.0),
 											Vector3d(0.0, 1.0, 0.0)));
 
-	//viewElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+	viewElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	runtime->stop();
 }
 
