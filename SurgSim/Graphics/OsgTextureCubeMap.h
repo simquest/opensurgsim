@@ -88,12 +88,14 @@ public:
 protected:
 	/// Makes a copy of an image block
 	/// \param	source	Source image to copy from
-	/// \param	column	First column of block in the source image
-	/// \param	row	First row of block in the source image
+	/// \param	startColumn	First column of block in the source image
+	/// \param	startRow	First row of block in the source image
 	/// \param	width	Width of the block
 	/// \param	height	Height of the block
 	/// \return	Copy of the image block
-	osg::ref_ptr<osg::Image> copyImageBlock(const osg::Image& source, int column, int row, int width, int height);
+	osg::ref_ptr<osg::Image> copyImageBlock(const osg::Image& source,
+											size_t startColumn, size_t startRow,
+											size_t width, size_t height);
 };
 
 };  // namespace Graphics

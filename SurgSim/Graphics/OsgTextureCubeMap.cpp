@@ -110,22 +110,24 @@ bool OsgTextureCubeMap::loadImageFaces(const std::string& negativeX, const std::
 	}
 }
 
-osg::ref_ptr<osg::Image> OsgTextureCubeMap::copyImageBlock(const osg::Image& source, int column, int row,
-	int width, int height)
+osg::ref_ptr<osg::Image> OsgTextureCubeMap::copyImageBlock(
+	const osg::Image& source,
+	size_t startColumn, size_t startRow,
+	size_t width, size_t height)
 {
-	int pixelSize = source.getPixelSizeInBits() / 8;
+	size_t pixelSize = source.getPixelSizeInBits() / 8;
 
-	unsigned char* buffer = new unsigned char[(width*height) * pixelSize];
+	unsigned char* buffer = new unsigned char[(width * height) * pixelSize];
 
-	int index = 0;
+	size_t index = 0;
 
-	for(int i = row; i < row + height; ++i)
+	for (size_t row = startRow; row < startRow + height; ++row)
 	{
-		for(int j = column; j < column + width; ++j)
+		for (size_t column = startColumn; column < startColumn + width; ++column)
 		{
 			const unsigned char* pixel = source.data(column, row, 0);
 
-			for (int p = 0; p < pixelSize; ++p)
+			for (size_t p = 0; p < pixelSize; ++p)
 			{
 				buffer[index] = pixel[p];
 				index++;
@@ -137,7 +139,7 @@ osg::ref_ptr<osg::Image> OsgTextureCubeMap::copyImageBlock(const osg::Image& sou
 
 	subImage->allocateImage(width, height, 1, source.getPixelFormat(), GL_UNSIGNED_BYTE, 1);
 	subImage->setImage(width, height, 1, source.getInternalTextureFormat(), source.getPixelFormat(),
-		GL_UNSIGNED_BYTE, buffer, osg::Image::NO_DELETE, 1);
+					   GL_UNSIGNED_BYTE, buffer, osg::Image::NO_DELETE, 1);
 
 	return subImage;
 }
