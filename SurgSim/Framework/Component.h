@@ -16,9 +16,9 @@
 #ifndef SURGSIM_FRAMEWORK_COMPONENT_H
 #define SURGSIM_FRAMEWORK_COMPONENT_H
 
-
-#include <string>
 #include <memory>
+#include <string>
+#include <typeindex>
 
 #include <boost/uuid/uuid.hpp>
 
@@ -56,6 +56,10 @@ public:
 	/// Sets the name of component.
 	/// \param	name	The name of this component.
 	void setName(const std::string& name);
+
+	/// Query the object type index.
+	/// \return The type index for an object of this class or a derived class.
+	std::type_index getTypeIndex() const;
 
 	/// Gets the id of the component
 	boost::uuids::uuid getUuid() const;

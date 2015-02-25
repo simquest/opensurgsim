@@ -133,6 +133,11 @@ std::shared_ptr<PoseComponent> Component::getPoseComponent()
 	return m_sceneElement.lock()->getPoseComponent();
 }
 
+std::type_index Component::getTypeIndex() const
+{
+	return typeid(*this);
+}
+
 boost::uuids::uuid Component::getUuid() const
 {
 	return m_uuid;
