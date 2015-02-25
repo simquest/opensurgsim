@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file s_mapping.frag
-/// Modulate the outgoing color by the amount fetched from the shadowMap, intended for use
-/// with simple vertex colors, does not do any texturing
+/// \file s_mapping_metal.frag
+/// Metallic material, environment maps plus shadow maps
+/// for use with s_mapping_metal.vert.
+/// Ported from legacy SimQuest code, the origin of the material and lighting
+/// calculation is unkown
 
-/// map for modulation, needs to be rendered with the same modelview and projection
-/// matrices as the ones that are used for this shader.
-
+// These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform float specularPercent;
 uniform float diffusePercent;
 uniform float shininess;

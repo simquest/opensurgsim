@@ -14,6 +14,9 @@
 // limitations under the License.
 
 
+/// \file s_mapping_metal.vert
+/// Metallic material, environment maps plus shadow maps
+
 // Oss provided uniforms
 uniform mat4 viewMatrix;
 
@@ -45,20 +48,17 @@ void main()
     clipCoord = gl_Position;
 
     vec4 eyeDir4 = gl_ModelViewMatrix * gl_Vertex;
+    eyeDir = eyeDir4.xyz;
 
     lightDir = (viewMatrix * lightSource.position).xyz - eyeDir4.xyz;
-
     float lightDistance = length(lightDir);
-    float eyeDistance = length(eyeDir4.xyz);
-
-    lightDir = normalize(lightDir);
-    eyeDir = normalize(eyeDir4.xyz);
-
-    normalDir = normalize(gl_NormalMatrix * gl_Normal);
-    vec4 pos = gl_ModelViewMatrix * gl_Vertex;
-    reflectDir = reflect(pos.xyz, normalDir);
 
     attenuation = 1.0 / (lightSource.constantAttenuation + 
         lightSource.linearAttenuation*lightDistance + 
         lightSource.quadraticAttenuation*lightDistance*lightDistance);
+ 
+    normalDir = gl_NormalMatrix * gl_Normal;
+
+    // normalDir needs to be normalized for reflect to work
+    reflectDir = reflect(eyeDir4, normalize(normalDir));
 }
