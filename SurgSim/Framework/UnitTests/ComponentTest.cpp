@@ -567,8 +567,8 @@ TEST(ComponentTests, TypeIndexTest)
 	std::type_index typeIndexComponent1Object(typeid(*component1));
 
 	EXPECT_FALSE(typeIndexComponent1Class == typeIndexComponentClass);
-	EXPECT_FALSE(typeIndexComponent1Class == typeIndexComponentClass);
-	EXPECT_FALSE(typeIndexComponent1Object == typeIndexComponentObject);
+	EXPECT_FALSE(typeIndexComponent1Class == typeIndexComponentObject);
+	EXPECT_FALSE(typeIndexComponent1Object == typeIndexComponentClass);
 	EXPECT_FALSE(typeIndexComponent1Object == typeIndexComponentObject);
 	EXPECT_TRUE(typeIndexComponent1Class == typeIndexComponent1Object);
 
@@ -578,12 +578,12 @@ TEST(ComponentTests, TypeIndexTest)
 	std::type_index typeIndexComponent2Object(typeid(*component2));
 
 	EXPECT_FALSE(typeIndexComponent2Class == typeIndexComponentClass);
-	EXPECT_FALSE(typeIndexComponent2Class == typeIndexComponentClass);
-	EXPECT_FALSE(typeIndexComponent2Object == typeIndexComponentObject);
+	EXPECT_FALSE(typeIndexComponent2Class == typeIndexComponentObject);
+	EXPECT_FALSE(typeIndexComponent2Object == typeIndexComponentClass);
 	EXPECT_FALSE(typeIndexComponent2Object == typeIndexComponentObject);
 	EXPECT_FALSE(typeIndexComponent2Class == typeIndexComponent1Class);
-	EXPECT_FALSE(typeIndexComponent2Class == typeIndexComponent1Class);
-	EXPECT_FALSE(typeIndexComponent2Object == typeIndexComponent1Object);
+	EXPECT_FALSE(typeIndexComponent2Class == typeIndexComponent1Object);
+	EXPECT_FALSE(typeIndexComponent2Object == typeIndexComponent1Class);
 	EXPECT_FALSE(typeIndexComponent2Object == typeIndexComponent1Object);
 	EXPECT_TRUE(typeIndexComponent2Class == typeIndexComponent2Object);
 }
