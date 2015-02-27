@@ -42,13 +42,13 @@ class ConstraintImplementation
 {
 public:
 	/// Constructor
-	/// \note Localization embbed the representation, so it is fully defined
+	/// \note Localization embed the representation, so it is fully defined
 	ConstraintImplementation();
 
 	/// Destructor
 	virtual ~ConstraintImplementation();
 
-	/// \return The static class factory that contains the implementations for a given .
+	/// \return The static class factory that contains the implementations for a given Representation type.
 	static ConstraintImplementationFactory& getFactory();
 
 	/// Gets the number of degree of freedom for this implementation

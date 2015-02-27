@@ -47,11 +47,11 @@ public:
 
 	/// Get the instance of a ConstraintImplementation for a specific representation and
 	/// constraint type.
-	/// \param	representationTypeIndex	Type index of the representation.
+	/// \param	representationType	Type index of the representation.
 	/// \param	constraintType	  	Type of the constraint.
 	/// \return	a pointer to an implementation if the implementation can be found, nullptr otherwise.
 	std::shared_ptr<ConstraintImplementation> getImplementation(
-		std::type_index representationTypeIndex,
+		std::type_index representationType,
 		SurgSim::Math::MlcpConstraintType constraintType);
 
 	/// Add an implementation to the internal directory.

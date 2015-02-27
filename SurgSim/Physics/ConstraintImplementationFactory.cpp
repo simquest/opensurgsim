@@ -45,15 +45,15 @@ ConstraintImplementationFactory::~ConstraintImplementationFactory()
 }
 
 std::shared_ptr<ConstraintImplementation> ConstraintImplementationFactory::getImplementation(
-	std::type_index representationTypeIndex,
+	std::type_index representationType,
 	SurgSim::Math::MlcpConstraintType constraintType)
 {
 	SURGSIM_ASSERT(constraintType >= 0 && constraintType < SurgSim::Math::MLCP_NUM_CONSTRAINT_TYPES) <<
 		"Invalid constraint type " << constraintType;
 
-	auto implementation = m_implementations[representationTypeIndex][constraintType];
+	auto implementation = m_implementations[representationType][constraintType];
 	SURGSIM_LOG_IF(implementation == nullptr, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
-		"No constraint implementation for representation type (" << representationTypeIndex.name() <<
+		"No constraint implementation for representation type (" << representationType.name() <<
 		") and constraint type (" << constraintType << ")";
 
 	return implementation;
