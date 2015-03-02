@@ -115,7 +115,7 @@ public:
 	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale = 1.0) = 0;
+	virtual void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M, double scale = 1.0) = 0;
 
 	/// Adds the element damping matrix D (= -df/dv) (comuted for a given state)
 	/// to a complete system damping matrix D (assembly)
@@ -125,8 +125,8 @@ public:
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
-		double scale = 1.0) = 0;
+	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
+							double scale = 1.0) = 0;
 
 	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
 	/// to a complete system stiffness matrix K (assembly)
@@ -136,8 +136,8 @@ public:
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
-		double scale = 1.0) = 0;
+	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+							  double scale = 1.0) = 0;
 
 	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
 	/// into a complete system data structure F, M, D, K (assembly)
@@ -149,10 +149,10 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
 	virtual void addFMDK(const SurgSim::Math::OdeState& state,
-		SurgSim::Math::Vector* F,
-		SurgSim::Math::Matrix* M,
-		SurgSim::Math::Matrix* D,
-		SurgSim::Math::Matrix* K) = 0;
+						 SurgSim::Math::Vector* F,
+						 SurgSim::Math::SparseMatrix* M,
+						 SurgSim::Math::SparseMatrix* D,
+						 SurgSim::Math::SparseMatrix* K) = 0;
 
 	/// Adds the element matrix-vector contribution F += (alphaM.M + alphaD.D + alphaK.K).x (computed for a given state)
 	/// into a complete system data structure F (assembly)
@@ -165,7 +165,7 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
 	virtual void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
-		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) = 0;
+						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) = 0;
 
 	/// Determines whether a given natural coordinate is valid
 	/// \param naturalCoordinate Coordinate to check

@@ -34,7 +34,7 @@ void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
 	IndexType numNodes = x->size() / 6;
 
 	SURGSIM_ASSERT(numNodes * 6 == x->size())
-		<< "Unexpected number of dof in a Fem1D state vector (not a multiple of 6)";
+			<< "Unexpected number of dof in a Fem1D state vector (not a multiple of 6)";
 
 	for (IndexType nodeId = 0; nodeId < numNodes; nodeId++)
 	{
@@ -70,22 +70,22 @@ RepresentationType Fem1DRepresentation::getType() const
 }
 
 void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-										 const SurgSim::Math::Vector& generalizedForce,
-										 const SurgSim::Math::Matrix& K,
-										 const SurgSim::Math::Matrix& D)
+		const SurgSim::Math::Vector& generalizedForce,
+		const SurgSim::Math::SparseMatrix& K,
+		const SurgSim::Math::SparseMatrix& D)
 {
 	const size_t dofPerNode = getNumDofPerNode();
 	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
 
 	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
 	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
-		"Generalized force has an invalid size of " << generalizedForce.size() << ". Expected " << dofPerNode;
+			"Generalized force has an invalid size of " << generalizedForce.size() << ". Expected " << dofPerNode;
 	SURGSIM_ASSERT(K.size() == 0 || (K.rows() == expectedSize && K.cols() == expectedSize)) <<
-		"Stiffness matrix K has an invalid size (" << K.rows() << "," << K.cols() <<
-		") was expecting a square matrix of size " << dofPerNode;
+			"Stiffness matrix K has an invalid size (" << K.rows() << "," << K.cols() <<
+			") was expecting a square matrix of size " << dofPerNode;
 	SURGSIM_ASSERT(D.size() == 0 || (D.rows() == expectedSize && D.cols() == expectedSize)) <<
-		"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
-		") was expecting a square matrix of size " << dofPerNode;
+			"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
+			") was expecting a square matrix of size " << dofPerNode;
 
 	std::shared_ptr<Fem1DRepresentationLocalization> localization1D =
 		std::dynamic_pointer_cast<Fem1DRepresentationLocalization>(localization);
@@ -112,13 +112,15 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			{
 				if (K.size() != 0)
 				{
-					m_externalGeneralizedStiffness.block(dofPerNode * nodeId1, dofPerNode * nodeId2,
-						dofPerNode, dofPerNode) += coordinate[index1] * coordinate[index2] * K;
+					Math::SparseMatrix scaledK = coordinate[index1] * coordinate[index2] * K;
+					Math::addSubMatrix(scaledK, dofPerNode * nodeId1, dofPerNode * nodeId2,
+									   dofPerNode, dofPerNode, &m_externalGeneralizedStiffness);
 				}
 				if (D.size() != 0)
 				{
-					m_externalGeneralizedDamping.block(dofPerNode * nodeId1, dofPerNode * nodeId2,
-						dofPerNode, dofPerNode) += coordinate[index1] * coordinate[index2] * D;
+					Math::SparseMatrix scaledD = coordinate[index1] * coordinate[index2] * D;
+					SurgSim::Math::addSubMatrix(scaledD, dofPerNode * nodeId1, dofPerNode * nodeId2,
+												dofPerNode, dofPerNode, &m_externalGeneralizedDamping);
 				}
 				index2++;
 			}
@@ -145,7 +147,7 @@ bool Fem1DRepresentation::doWakeUp()
 }
 
 void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-										 const SurgSim::Math::RigidTransform3d& transform)
+		const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);

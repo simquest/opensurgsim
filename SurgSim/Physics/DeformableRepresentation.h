@@ -84,18 +84,18 @@ public:
 	/// \param K The stiffness matrix associated with the generalized force (Jacobian of the force w.r.t dof's position)
 	/// \param D The damping matrix associated with the generalized force (Jacobian of the force w.r.t dof's velocity)
 	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-											 const SurgSim::Math::Vector& generalizedForce,
-											 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
-											 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) = 0;
+			const SurgSim::Math::Vector& generalizedForce,
+			const SurgSim::Math::SparseMatrix& K = SurgSim::Math::SparseMatrix(),
+			const SurgSim::Math::SparseMatrix& D = SurgSim::Math::SparseMatrix()) = 0;
 
 	/// \return the external generalized force vector
 	const SurgSim::Math::Vector& getExternalGeneralizedForce() const;
 
 	/// \return the external generalized stiffness matrix
-	const SurgSim::Math::Matrix& getExternalGeneralizedStiffness() const;
+	const SurgSim::Math::SparseMatrix& getExternalGeneralizedStiffness() const;
 
 	/// \return the external generalized damping matrix
-	const SurgSim::Math::Matrix& getExternalGeneralizedDamping() const;
+	const SurgSim::Math::SparseMatrix& getExternalGeneralizedDamping() const;
 
 	/// Gets the compliance matrix associated with motion
 	/// \return The compliance matrix
@@ -145,21 +145,21 @@ protected:
 	/// @{
 	bool m_hasExternalGeneralizedForce;
 	SurgSim::Math::Vector m_externalGeneralizedForce;
-	SurgSim::Math::Matrix m_externalGeneralizedStiffness;
-	SurgSim::Math::Matrix m_externalGeneralizedDamping;
+	SurgSim::Math::SparseMatrix m_externalGeneralizedStiffness;
+	SurgSim::Math::SparseMatrix m_externalGeneralizedDamping;
 	/// @}
 
 	/// Force applied on the deformable representation
 	SurgSim::Math::Vector m_f;
 
 	/// Mass matrix
-	SurgSim::Math::Matrix m_M;
+	SurgSim::Math::SparseMatrix m_M;
 
 	/// Damping matrix
-	SurgSim::Math::Matrix m_D;
+	SurgSim::Math::SparseMatrix m_D;
 
 	/// Stiffness matrix
-	SurgSim::Math::Matrix m_K;
+	SurgSim::Math::SparseMatrix m_K;
 
 	/// Number of degrees of freedom per node (varies per deformable model)
 	/// \note MUST be set by the derived classes

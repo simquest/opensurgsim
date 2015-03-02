@@ -90,7 +90,7 @@ void Fem1DElementBeam::initialize(const SurgSim::Math::OdeState& state)
 	FemElement::initialize(state);
 
 	SURGSIM_ASSERT(m_radius > 0) << "Fem1DElementBeam radius should be positive and non-zero.  Did you call "
-									"setCrossSectionCircular(radius) ?";
+								 "setCrossSectionCircular(radius) ?";
 
 	m_A = M_PI * (m_radius * m_radius);
 	m_Iz = M_PI * (m_radius * m_radius * m_radius * m_radius) / 4.0;
@@ -122,22 +122,29 @@ void Fem1DElementBeam::addForce(const SurgSim::Math::OdeState& state, SurgSim::M
 	addSubVector(f, m_nodeIds, 6, F);
 }
 
-void Fem1DElementBeam::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
+void Fem1DElementBeam::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
+							   double scale /*= 1.0*/)
 {
+	/* TODO
 	addSubMatrix(m_M * scale, m_nodeIds, 6, M);
+	*/
 }
 
-void Fem1DElementBeam::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale)
+void Fem1DElementBeam::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
+								  double scale /*= 1.0*/)
 {
 }
 
-void Fem1DElementBeam::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale)
+void Fem1DElementBeam::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+									double scale /*= 1.0*/)
 {
+	/* TODO:
 	addSubMatrix(m_K * scale, getNodeIds(), 6, K);
+	*/
 }
 
 void Fem1DElementBeam::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
-							   SurgSim::Math::Matrix* M, SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K)
+							   SurgSim::Math::SparseMatrix* M, SurgSim::Math::SparseMatrix* D, SurgSim::Math::SparseMatrix* K)
 {
 	// Assemble the mass matrix
 	addMass(state, M);
@@ -341,7 +348,7 @@ void Fem1DElementBeam::computeInitialRotation(const SurgSim::Math::OdeState& sta
 	Vector3d j, k;
 
 	SURGSIM_ASSERT(SurgSim::Math::buildOrthonormalBasis(&i, &j, &k))
-		<< "Invalid beam formed by extremities A=(" << A.transpose() << ") B=(" << B.transpose() << ")";
+			<< "Invalid beam formed by extremities A=(" << A.transpose() << ") B=(" << B.transpose() << ")";
 
 	// Set up a temporary 3x3 initial rotation matrix
 	SurgSim::Math::Matrix33d rotation3x3;

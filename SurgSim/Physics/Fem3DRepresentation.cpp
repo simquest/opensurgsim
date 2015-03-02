@@ -82,8 +82,8 @@ RepresentationType Fem3DRepresentation::getType() const
 
 void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,
-		const SurgSim::Math::Matrix& K,
-		const SurgSim::Math::Matrix& D)
+		const SurgSim::Math::SparseMatrix& K,
+		const SurgSim::Math::SparseMatrix& D)
 {
 	const size_t dofPerNode = getNumDofPerNode();
 	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
@@ -123,17 +123,21 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			{
 				if (K.size() != 0)
 				{
+					/* TODO
 					m_externalGeneralizedStiffness.block(dofPerNode * nodeId1,
 														 dofPerNode * nodeId2,
 														 dofPerNode, dofPerNode)
 					+= coordinate[index1] * coordinate[index2] * K;
+					*/
 				}
 				if (D.size() != 0)
 				{
+					/* TODO:
 					m_externalGeneralizedDamping.block(dofPerNode * nodeId1,
 													   dofPerNode * nodeId2,
 													   dofPerNode, dofPerNode)
 					+= coordinate[index1] * coordinate[index2] * D;
+					*/
 				}
 				index2++;
 			}

@@ -72,7 +72,7 @@ public:
 	/// \param state The state to compute the damping matrix with
 	/// \param[in,out] D The complete system damping matrix to add the spring damping matrix into
 	/// \param scale A factor to scale the added damping matrix with
-	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
+	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
 							double scale = 1.0) = 0;
 
 	/// Adds the spring stiffness matrix K (= -df/dx) (computed for a given state) to a complete system stiffness
@@ -80,7 +80,7 @@ public:
 	/// \param state The state to compute the stiffness matrix with
 	/// \param[in,out] K The complete system stiffness matrix to add the spring stiffness matrix into
 	/// \param scale A factor to scale the added stiffness matrix with
-	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
+	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
 							  double scale = 1.0) = 0;
 
 	/// Adds the spring force vector, mass, stiffness and damping matrices (computed for a given state) into a
@@ -90,7 +90,7 @@ public:
 	/// \param[in,out] D The complete system damping matrix to add the spring damping matrix into
 	/// \param[in,out] K The complete system stiffness matrix to add the spring stiffness matrix into
 	virtual void addFDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
-						 SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) = 0;
+						SurgSim::Math::SparseMatrix* D, SurgSim::Math::SparseMatrix* K) = 0;
 
 	/// Adds the spring matrix-vector contribution F += (alphaD.D + alphaK.K).x (computed for a given
 	/// state) into a complete system data structure F (assembly)

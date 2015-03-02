@@ -19,6 +19,7 @@
 #include "SurgSim/Physics/LinearSpring.h"
 
 using SurgSim::Math::Matrix;
+using SurgSim::Math::SparseMatrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::OdeState;
 using SurgSim::Math::Vector;
@@ -89,20 +90,20 @@ void LinearSpring::addForce(const OdeState& state, Vector* F, double scale)
 	if (length < SurgSim::Math::Geometry::DistanceEpsilon)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
+				"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
 		return;
 	}
 	u /= length;
 	double elongationPosition = length - m_restLength;
 	double elongationVelocity = (v1 - v0).dot(u);
-	const Vector3d f = scale * (m_stiffness* elongationPosition + m_damping * elongationVelocity) * u;
+	const Vector3d f = scale * (m_stiffness * elongationPosition + m_damping * elongationVelocity) * u;
 
 	// Assembly stage in F
 	F->segment<3>(3 * m_nodeIds[0]) += f;
 	F->segment<3>(3 * m_nodeIds[1]) -= f;
 }
 
-void LinearSpring::addDamping(const OdeState& state, Matrix* D, double scale)
+void LinearSpring::addDamping(const OdeState& state, SparseMatrix* D, double scale)
 {
 	Matrix33d De;
 
@@ -120,13 +121,14 @@ void LinearSpring::addDamping(const OdeState& state, Matrix* D, double scale)
 	De *= scale;
 
 	// Assembly stage in D
-	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += De; // -dF1/dv1 = De
-	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= De; // -dF1/dv2 =-De
-	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= De; // -dF2/dv1 =-De
-	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += De; // -dF2/dv2 = De
+	SparseMatrix dSparse(state.getNumDof(), state.getNumDof());
+	dSparse.setZero();
+	distributeBlocks(De, &dSparse);
+	*D += dSparse;
 }
 
-void LinearSpring::addStiffness(const OdeState& state, Matrix* K, double scale)
+void LinearSpring::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+								double scale /*= 1.0*/)
 {
 	Matrix33d Ke;
 
@@ -144,13 +146,13 @@ void LinearSpring::addStiffness(const OdeState& state, Matrix* K, double scale)
 	Ke *= scale;
 
 	// Assembly stage in K
-	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += Ke; // -dF1/dx1 = Ke
-	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= Ke; // -dF1/dx2 =-Ke
-	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= Ke; // -dF2/dx1 =-Ke
-	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += Ke; // -dF2/dx2 = Ke
+	SparseMatrix kSparse(state.getNumDof(), state.getNumDof());
+	kSparse.setZero();
+	distributeBlocks(Ke, &kSparse);
+	*K += kSparse;
 }
 
-void LinearSpring::addFDK(const OdeState& state, Vector* F, Matrix* D, Matrix* K)
+void LinearSpring::addFDK(const OdeState& state, Vector* F, SparseMatrix* D, SparseMatrix* K)
 {
 	Matrix33d De, Ke;
 
@@ -172,16 +174,16 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, Matrix* D, Matrix* K
 	}
 
 	// Assembly stage in K
-	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += Ke; // -dF1/dx1 = Ke
-	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= Ke; // -dF1/dx2 =-Ke
-	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= Ke; // -dF2/dx1 =-Ke
-	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += Ke; // -dF2/dx2 = Ke
+	SparseMatrix kSparse(state.getNumDof(), state.getNumDof());
+	kSparse.setZero();
+	distributeBlocks(Ke, &kSparse);
+	*K += kSparse;
 
 	// Assembly stage in D
-	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += De; // -dF1/dv1 = De
-	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= De; // -dF1/dv2 =-De
-	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= De; // -dF2/dv1 =-De
-	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += De; // -dF2/dv2 = De
+	SparseMatrix dSparse(state.getNumDof(), state.getNumDof());
+	dSparse.setZero();
+	distributeBlocks(De, &dSparse);
+	*D += dSparse;
 }
 
 void LinearSpring::addMatVec(const OdeState& state, double alphaD, double alphaK, const Vector& vector, Vector* F)
@@ -228,8 +230,8 @@ bool LinearSpring::computeDampingAndStiffness(const OdeState& state, Matrix33d* 
 	if (length < SurgSim::Math::Geometry::DistanceEpsilon)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"Spring (initial length = " << m_restLength <<
-			") became degenerated with 0 length => force derivative degenerated";
+				"Spring (initial length = " << m_restLength <<
+				") became degenerated with 0 length => force derivative degenerated";
 		return false;
 	}
 	u /= length;
@@ -254,21 +256,40 @@ bool LinearSpring::computeDampingAndStiffness(const OdeState& state, Matrix33d* 
 	return true;
 }
 
+void LinearSpring::distributeBlocks(const SurgSim::Math::Matrix33d& block,
+									SurgSim::Math::SparseMatrix* matrix)
+{
+	typedef Eigen::Triplet<double> T;
+	std::vector<T> tripletList;
+	tripletList.reserve(36);
+
+	for (int row = 0; row < 3; ++row)
+	{
+		for (int col = 0; col < 3; ++col)
+		{
+			tripletList.push_back(T(3 * m_nodeIds[0] + row,  3 * m_nodeIds[0] + col, block(row, col)));
+			tripletList.push_back(T(3 * m_nodeIds[0] + row,  3 * m_nodeIds[1] + col, -block(row, col)));
+			tripletList.push_back(T(3 * m_nodeIds[1] + row,  3 * m_nodeIds[0] + col, -block(row, col)));
+			tripletList.push_back(T(3 * m_nodeIds[1] + row,  3 * m_nodeIds[1] + col, block(row, col)));
+		}
+	}
+	matrix->setFromTriplets(tripletList.begin(), tripletList.end());
+}
 
 bool LinearSpring::operator ==(const Spring& spring) const
 {
-	const LinearSpring *ls = dynamic_cast<const LinearSpring*>(&spring);
+	const LinearSpring* ls = dynamic_cast<const LinearSpring*>(&spring);
 	if (! ls)
 	{
 		return false;
 	}
 	return m_nodeIds == ls->m_nodeIds &&
-		m_restLength == ls->m_restLength && m_stiffness == ls->m_stiffness && m_damping == ls->m_damping;
+		   m_restLength == ls->m_restLength && m_stiffness == ls->m_stiffness && m_damping == ls->m_damping;
 }
 
 bool LinearSpring::operator !=(const Spring& spring) const
 {
-	return ! ((*this) == spring);
+	return !((*this) == spring);
 }
 
 } // namespace Physics

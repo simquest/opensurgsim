@@ -102,8 +102,9 @@ public:
 	RepresentationType getType() const override;
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-			const SurgSim::Math::Vector& generalizedForce, const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
-			const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
+									 const SurgSim::Math::Vector& generalizedForce,
+									 const SurgSim::Math::SparseMatrix& K = SurgSim::Math::SparseMatrix(),
+									 const SurgSim::Math::SparseMatrix& D = SurgSim::Math::SparseMatrix()) override;
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
@@ -119,19 +120,19 @@ public:
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
 	/// \return The matrix M(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	const SurgSim::Math::Matrix& computeM(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::SparseMatrix& computeM(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of D = -df/dv (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix D = -df/dv(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	const SurgSim::Math::Matrix& computeD(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::SparseMatrix& computeD(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of K = -df/dx (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix K = -df/dx(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	const SurgSim::Math::Matrix& computeK(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::SparseMatrix& computeK(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
 	/// When all the terms are needed, this method can perform optimization in evaluating everything together
@@ -143,7 +144,8 @@ public:
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
 	void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
-		SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
+					 SurgSim::Math::SparseMatrix** M, SurgSim::Math::SparseMatrix** D,
+					 SurgSim::Math::SparseMatrix** K) override;
 
 protected:
 	/// Add the Rayleigh damping forces
@@ -157,7 +159,7 @@ protected:
 	/// \note If {useGlobalMassMatrix | useGlobalStiffnessMatrix} is True, {M | K} will be used, otherwise
 	/// \note    the {mass|stiffness} component will be computed FemElement by FemElement
 	void addRayleighDampingForce(SurgSim::Math::Vector* f, const SurgSim::Math::OdeState& state,
-		bool useGlobalStiffnessMatrix = false, bool useGlobalMassMatrix = false, double scale = 1.0);
+								 bool useGlobalStiffnessMatrix = false, bool useGlobalMassMatrix = false, double scale = 1.0);
 
 	/// Add the springs force to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the spring forces into
@@ -170,13 +172,13 @@ protected:
 	/// \param state The state vector containing positions and velocities
 	/// \param scale A scaling factor to scale the gravity force with
 	/// \note This method does not do anything if gravity is disabled
-	void addGravityForce(SurgSim::Math::Vector *f, const SurgSim::Math::OdeState& state, double scale = 1.0);
+	void addGravityForce(SurgSim::Math::Vector* f, const SurgSim::Math::OdeState& state, double scale = 1.0);
 
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-		const SurgSim::Math::RigidTransform3d& transform);
+						const SurgSim::Math::RigidTransform3d& transform);
 
 	bool doInitialize() override;
 
@@ -190,7 +192,8 @@ private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)
 	/// D = massCoefficient.M + stiffnessCoefficient.K
 	/// Matrices: D = damping, M = mass, K = stiffness
-	struct {
+	struct
+	{
 		double massCoefficient;
 		double stiffnessCoefficient;
 	} m_rayleighDamping;

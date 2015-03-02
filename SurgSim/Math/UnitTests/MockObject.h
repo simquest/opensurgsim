@@ -64,27 +64,27 @@ public:
 		return m_f;
 	}
 
-	const Matrix& computeM(const OdeState& state) override
+	const SparseMatrix& computeM(const OdeState& state) override
 	{
 		m_M.setIdentity();
 		m_M *= m_mass;
 		return m_M;
 	}
 
-	const Matrix& computeD(const OdeState& state) override
+	const SparseMatrix& computeD(const OdeState& state) override
 	{
 		m_D.setIdentity();
 		m_D *= m_viscosity;
 		return m_D;
 	}
 
-	const Matrix& computeK(const OdeState& state) override
+	const SparseMatrix& computeK(const OdeState& state) override
 	{
 		m_K.setZero();
 		return m_K;
 	}
 
-	void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override
+	void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) override
 	{
 		m_M.setIdentity();
 		m_M *= m_mass;
@@ -102,7 +102,7 @@ public:
 	double m_mass, m_viscosity;
 	Vector3d m_gravity;
 	Vector m_f;
-	Matrix m_M, m_D, m_K;
+	SparseMatrix m_M, m_D, m_K;
 };
 
 
@@ -146,7 +146,7 @@ public:
 
 	Vector& computeF(const OdeState& state) override
 	{
-		// Internale deformation forces
+		// Internal deformation forces
 		m_f = -computeK(state) * (state.getPositions() - m_initialState->getPositions());
 
 		// Gravity pulling on the free nodes
@@ -155,28 +155,63 @@ public:
 		return m_f;
 	}
 
-	const Matrix& computeM(const OdeState& state) override
+	const SparseMatrix& computeM(const OdeState& state) override
 	{
 		m_M.setZero();
 		return m_M;
 	}
 
-	const Matrix& computeD(const OdeState& state) override
+	const SparseMatrix& computeD(const OdeState& state) override
 	{
 		m_D.setZero();
 		return m_D;
 	}
 
-	virtual const Matrix& computeK(const OdeState& state) override
+	virtual const SparseMatrix& computeK(const OdeState& state) override
 	{
 		// A fake but valid stiffness matrix (node 0 fixed)
-		m_K.setIdentity();
-		m_K.block<6, 6>(3, 3).setConstant(2.0); // This adds coupling between nodes 1 and 2
-		m_K.block<6, 6>(3, 3).diagonal().setConstant(10);
+		// Desired matrix is:
+		//
+		// 1  0  0  0  0  0  0  0  0
+		// 0  1  0  0  0  0  0  0  0
+		// 0  0  1  0  0  0  0  0  0
+		// 0  0  0 10  2  2  2  2  2
+		// 0  0  0  2 10  2  2  2  2
+		// 0  0  0  2  2 10  2  2  2
+		// 0  0  0  2  2  2 10  2  2
+		// 0  0  0  2  2  2  2 10  2
+		// 0  0  0  2  2  2  2  2 10
+		//
+		// Generate it using sparse matrix notation.
+
+		m_K.resize(9, 9);
+		typedef Eigen::Triplet<double> T;
+		std::vector<T> tripletList;
+		tripletList.reserve(39);
+
+		// Upper 3x3 identity block
+		for (int counter = 0; counter < 3; ++counter)
+		{
+			tripletList.push_back(T(counter, counter, 1.0));
+		}
+
+		for (int row = 3; row < 9; ++row)
+		{
+			// Diagonal is 8 more than the rest of the 6x6 block
+			tripletList.push_back(T(row, row, 8.0));
+
+			// Now add in the 2's over the entire block
+			for (int col = 3; col < 9; ++col)
+			{
+				tripletList.push_back(T(row, col, 2.0));
+			}
+		}
+		m_K.setFromTriplets(tripletList.begin(), tripletList.end());
+		std::cout << "m_K: " << std::endl << m_K << std::endl;
 		return m_K;
 	}
 
-	void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override
+	void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) override
 	{
 		m_f = computeF(state);
 		m_M = computeM(state);
@@ -191,7 +226,7 @@ public:
 
 private:
 	Vector m_f, m_gravityForce;
-	Matrix m_M, m_D, m_K;
+	SparseMatrix m_M, m_D, m_K;
 };
 
 /// Class for the complex non-linear ODE a = x.v^2
@@ -211,25 +246,39 @@ public:
 		return m_f;
 	}
 
-	const Matrix& computeM(const OdeState& state) override
+	const SparseMatrix& computeM(const OdeState& state) override
 	{
 		m_M.setIdentity();
 		return m_M;
 	}
 
-	const Matrix& computeD(const OdeState& state) override
+	const SparseMatrix& computeD(const OdeState& state) override
 	{
-		m_D = 2.0 * state.getPositions() * state.getVelocities().transpose();
+		auto position = 2.0 * state.getPositions();
+		auto velocity = state.getVelocities();
+
+		m_D.resize(state.getNumDof(), state.getNumDof());
+		m_D.reserve(state.getNumDof());
+		for (int row = 0; row < state.getNumDof(); ++row)
+		{
+			for (int col = 0; col < state.getNumDof(); ++col)
+			{
+				m_D.insert(row, col) = position[row] * velocity[col];
+			}
+		}
+
 		return m_D;
 	}
 
-	const Matrix& computeK(const OdeState& state) override
+	const SparseMatrix& computeK(const OdeState& state) override
 	{
-		m_K = Matrix::Identity(state.getNumDof(), state.getNumDof()) * state.getVelocities().squaredNorm();
+		m_K.resize(state.getNumDof(), state.getNumDof());
+		m_K.setIdentity();
+		m_K *= state.getVelocities().squaredNorm();
 		return m_K;
 	}
 
-	void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) override
+	void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) override
 	{
 		computeF(state);
 		computeM(state);
@@ -244,7 +293,7 @@ public:
 
 private:
 	Vector m_f;
-	Matrix m_M, m_D, m_K;
+	SparseMatrix m_M, m_D, m_K;
 };
 
 }; // Math

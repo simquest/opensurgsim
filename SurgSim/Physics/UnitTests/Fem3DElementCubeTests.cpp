@@ -25,6 +25,7 @@
 #include "SurgSim/Physics/Fem3DElementCube.h"
 
 using SurgSim::Math::Matrix;
+using SurgSim::Math::SparseMatrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem3DElementCube;
@@ -81,7 +82,7 @@ public:
 	double m_expectedVolume;
 	Eigen::Matrix<double, 24, 1> m_expectedX0;
 	double m_rho, m_E, m_nu;
-	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix, m_expectedStiffnessMatrix;
+	SurgSim::Math::SparseMatrix m_expectedMassMatrix, m_expectedDampingMatrix, m_expectedStiffnessMatrix;
 	SurgSim::Math::Vector m_vectorOnes;
 
 	std::shared_ptr<MockFem3DElementCube> getCubeElement(const std::array<size_t, 8>& nodeIds)
@@ -101,7 +102,13 @@ public:
 		using SurgSim::Math::getSubMatrix;
 		using SurgSim::Math::addSubMatrix;
 
-		Eigen::Matrix<double, 24, 24> K = Eigen::Matrix<double, 24, 24>::Zero();
+		typedef Eigen::Triplet<double> T;
+		std::vector<T> tripletList;
+		tripletList.reserve(36);
+		SparseMatrix K(24, 24);
+		K.setZero();
+
+		int blockIdRow, blockIdCol;
 		{
 			// Expected stiffness matrix given in
 			// "Physically-Based Simulation of Objects Represented by Surface Meshes"
@@ -116,42 +123,141 @@ public:
 			double e = (b + c) / 12.0;
 			double n = -e;
 			// Fill up the diagonal sub-matrices (3x3)
+			/*
 			getSubMatrix(K, 0, 0, 3, 3).setConstant(e);
 			getSubMatrix(K, 0, 0, 3, 3).diagonal().setConstant(d);
+			*/
+			blockIdRow = blockIdCol = 0;
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 1, e));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 2, e));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 0, e));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 2, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 0, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 1, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
+			/*
 			getSubMatrix(K, 1, 1, 3, 3).setConstant(n);
 			getSubMatrix(K, 1, 1, 3, 3).diagonal().setConstant(d);
-			getSubMatrix(K, 1, 1, 3, 3)(1,2) = e;
-			getSubMatrix(K, 1, 1, 3, 3)(2,1) = e;
+			getSubMatrix(K, 1, 1, 3, 3)(1, 2) = e;
+			getSubMatrix(K, 1, 1, 3, 3)(2, 1) = e;
+			*/
+			blockIdRow = blockIdCol = 1;
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 1, n));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 2, n));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 0, n));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 0, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
+			/*
 			getSubMatrix(K, 2, 2, 3, 3).setConstant(n);
 			getSubMatrix(K, 2, 2, 3, 3).diagonal().setConstant(d);
-			getSubMatrix(K, 2, 2, 3, 3)(0,1) = e;
-			getSubMatrix(K, 2, 2, 3, 3)(1,0) = e;
+			getSubMatrix(K, 2, 2, 3, 3)(0, 1) = e;
+			getSubMatrix(K, 2, 2, 3, 3)(1, 0) = e;
+			*/
+			blockIdRow = blockIdCol = 2;
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 2, n));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 0, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
+
+			/*
 			getSubMatrix(K, 3, 3, 3, 3).setConstant(n);
 			getSubMatrix(K, 3, 3, 3, 3).diagonal().setConstant(d);
-			getSubMatrix(K, 3, 3, 3, 3)(0,2) = e;
-			getSubMatrix(K, 3, 3, 3, 3)(2,0) = e;
+			getSubMatrix(K, 3, 3, 3, 3)(0, 2) = e;
+			getSubMatrix(K, 3, 3, 3, 3)(2, 0) = e;
+			*/
+			blockIdRow = blockIdCol = 3;
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
+			/*
 			getSubMatrix(K, 4, 4, 3, 3).setConstant(n);
 			getSubMatrix(K, 4, 4, 3, 3).diagonal().setConstant(d);
 			//getSubMatrix(K, 4, 4, 3, 3)(0,0) = e; // BUG IN THE PAPER !!!
-			getSubMatrix(K, 4, 4, 3, 3)(0,1) = e;
-			getSubMatrix(K, 4, 4, 3, 3)(1,0) = e;
+			getSubMatrix(K, 4, 4, 3, 3)(0, 1) = e;
+			getSubMatrix(K, 4, 4, 3, 3)(1, 0) = e;
+			*/
+			blockIdRow = blockIdCol = 4;
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
+			/*
 			getSubMatrix(K, 5, 5, 3, 3).setConstant(n);
 			getSubMatrix(K, 5, 5, 3, 3).diagonal().setConstant(d);
-			getSubMatrix(K, 5, 5, 3, 3)(0,2) = e;
-			getSubMatrix(K, 5, 5, 3, 3)(2,0) = e;
+			getSubMatrix(K, 5, 5, 3, 3)(0, 2) = e;
+			getSubMatrix(K, 5, 5, 3, 3)(2, 0) = e;
+			*/
+			blockIdRow = blockIdCol = 5;
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
+
+			/*
 			getSubMatrix(K, 6, 6, 3, 3).setConstant(e);
 			getSubMatrix(K, 6, 6, 3, 3).diagonal().setConstant(d);
+			*/
+			blockIdRow = blockIdCol = 6;
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 1, e));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 2, e));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 0, e));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 2, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 0, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 1, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
+			/*
 			getSubMatrix(K, 7, 7, 3, 3).setConstant(n);
 			getSubMatrix(K, 7, 7, 3, 3).diagonal().setConstant(d);
-			getSubMatrix(K, 7, 7, 3, 3)(1,2) = e;
-			getSubMatrix(K, 7, 7, 3, 3)(2,1) = e;
+			getSubMatrix(K, 7, 7, 3, 3)(1, 2) = e;
+			getSubMatrix(K, 7, 7, 3, 3)(2, 1) = e;
+			*/
+			blockIdRow = blockIdCol = 7;
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n));
+			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
+			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e));
+			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
+
 
 			// Edges
 			{
@@ -163,6 +269,7 @@ public:
 				double n2 = -e2;
 
 				// Edge in x-direction
+				/*
 				getSubMatrix(K, 0, 1, 3, 3)(0, 0) = d1;
 				getSubMatrix(K, 0, 1, 3, 3)(0, 1) = e1;
 				getSubMatrix(K, 0, 1, 3, 3)(0, 2) = e1;
@@ -172,18 +279,70 @@ public:
 				getSubMatrix(K, 0, 1, 3, 3)(2, 0) = n1;
 				getSubMatrix(K, 0, 1, 3, 3)(2, 1) = e2;
 				getSubMatrix(K, 0, 1, 3, 3)(2, 2) = d2;
+				*/
+				blockIdRow = 0;
+				blockIdCol = 1;
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e2));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e2));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
+				/*
 				getSubMatrix(K, 2, 3, 3, 3) = getSubMatrix(K, 0, 1, 3, 3);
 				getSubMatrix(K, 2, 3, 3, 3)(0, 2) = n1;
 				getSubMatrix(K, 2, 3, 3, 3)(1, 2) = n2;
 				getSubMatrix(K, 2, 3, 3, 3)(2, 0) = e1;
 				getSubMatrix(K, 2, 3, 3, 3)(2, 1) = n2;
+				*/
+				blockIdRow = 2;
+				blockIdCol = 3;
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n2));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n2));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
+				/*
 				getSubMatrix(K, 4, 5, 3, 3) = getSubMatrix(K, 2, 3, 3, 3);
+				*/
+				blockIdRow = 4;
+				blockIdCol = 5;
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n2));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n2));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
+				/*
 				getSubMatrix(K, 6, 7, 3, 3) = getSubMatrix(K, 0, 1, 3, 3);
+				*/
+				blockIdRow = 6;
+				blockIdCol = 7;
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e2));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e2));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
 				// Edge in y-direction
+				/*
 				getSubMatrix(K, 0, 3, 3, 3)(0, 0) = d2;
 				getSubMatrix(K, 0, 3, 3, 3)(0, 1) = n1;
 				getSubMatrix(K, 0, 3, 3, 3)(0, 2) = e2;
@@ -193,12 +352,37 @@ public:
 				getSubMatrix(K, 0, 3, 3, 3)(2, 0) = e2;
 				getSubMatrix(K, 0, 3, 3, 3)(2, 1) = n1;
 				getSubMatrix(K, 0, 3, 3, 3)(2, 2) = d2;
+				*/
+				blockIdRow = 0;
+				blockIdCol = 3;
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e2));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e2));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
+				/*
 				getSubMatrix(K, 1, 2, 3, 3) = getSubMatrix(K, 0, 3, 3, 3);
 				getSubMatrix(K, 1, 2, 3, 3)(0, 1) = e1;
 				getSubMatrix(K, 1, 2, 3, 3)(0, 2) = n2;
 				getSubMatrix(K, 1, 2, 3, 3)(1, 0) = n1;
 				getSubMatrix(K, 1, 2, 3, 3)(2, 0) = n2;
+				*/
+				blockIdRow = 1;
+				blockIdCol = 2;
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n2));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
+				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e1));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n2));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n1));
+				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
 				getSubMatrix(K, 4, 7, 3, 3) = getSubMatrix(K, 1, 2, 3, 3);
 				getSubMatrix(K, 4, 7, 3, 3)(0, 1) = n1;
@@ -362,7 +546,7 @@ public:
 			}
 
 			// Use symmetry to complete the triangular inferior part of K
-			K.triangularView<Eigen::StrictlyLower>().setZero();
+//			K.triangularView<Eigen::StrictlyLower>().setZero();
 			K += K.triangularView<Eigen::StrictlyUpper>().adjoint();
 		}
 		addSubMatrix(K, nodeIdsVectorForm, 3 , &m_expectedStiffnessMatrix);
@@ -389,14 +573,14 @@ public:
 		M.diagonal().setConstant(a);
 
 		M.block(0, 3, 21, 21).diagonal().setConstant(b);
-		M.block(3*3, 3*4, 3, 3).diagonal().setConstant(c); // block (3, 4)
+		M.block(3 * 3, 3 * 4, 3, 3).diagonal().setConstant(c); // block (3, 4)
 
 		M.block(0, 6, 18, 18).diagonal().setConstant(c);
-		M.block(3*2, 3*4, 6, 6).diagonal().setConstant(d); // block (2, 4) and block (3, 5)
+		M.block(3 * 2, 3 * 4, 6, 6).diagonal().setConstant(d); // block (2, 4) and block (3, 5)
 
 		M.block(0, 9, 15, 15).diagonal().setConstant(c);
-		M.block(3*0, 3*3, 3, 3).diagonal().setConstant(b); // block (0, 3)
-		M.block(3*4, 3*7, 3, 3).diagonal().setConstant(b); // block (4, 7)
+		M.block(3 * 0, 3 * 3, 3, 3).diagonal().setConstant(b); // block (0, 3)
+		M.block(3 * 4, 3 * 7, 3, 3).diagonal().setConstant(b); // block (4, 7)
 
 		M.block(0, 12, 12, 12).diagonal().setConstant(b);
 
@@ -409,7 +593,7 @@ public:
 		// Symmetry
 		for (size_t row = 0; row < 24; ++row)
 		{
-			for (size_t col = row+1; col < 24; ++col)
+			for (size_t col = row + 1; col < 24; ++col)
 			{
 				M(col, row) = M(row, col);
 			}
@@ -436,14 +620,14 @@ public:
 		//     |  0        |  *1     *->x
 		//     |           | /      /
 		//    4*-----------*5       z
-		getSubVector(x0, 0, 3) = Vector3d(-0.5,-0.5,-0.5);
-		getSubVector(x0, 1, 3) = Vector3d( 0.5,-0.5,-0.5);
-		getSubVector(x0, 2, 3) = Vector3d(-0.5, 0.5,-0.5);
-		getSubVector(x0, 3, 3) = Vector3d( 0.5, 0.5,-0.5);
-		getSubVector(x0, 4, 3) = Vector3d(-0.5,-0.5, 0.5);
-		getSubVector(x0, 5, 3) = Vector3d( 0.5,-0.5, 0.5);
+		getSubVector(x0, 0, 3) = Vector3d(-0.5, -0.5, -0.5);
+		getSubVector(x0, 1, 3) = Vector3d(0.5, -0.5, -0.5);
+		getSubVector(x0, 2, 3) = Vector3d(-0.5, 0.5, -0.5);
+		getSubVector(x0, 3, 3) = Vector3d(0.5, 0.5, -0.5);
+		getSubVector(x0, 4, 3) = Vector3d(-0.5, -0.5, 0.5);
+		getSubVector(x0, 5, 3) = Vector3d(0.5, -0.5, 0.5);
 		getSubVector(x0, 6, 3) = Vector3d(-0.5, 0.5, 0.5);
-		getSubVector(x0, 7, 3) = Vector3d( 0.5, 0.5, 0.5);
+		getSubVector(x0, 7, 3) = Vector3d(0.5, 0.5, 0.5);
 
 		// Ordering following the description in
 		// "Physically-Based Simulation of Objects Represented by Surface Meshes"
@@ -467,10 +651,10 @@ public:
 		m_E = 1e6;
 		m_nu = 0.45;
 
-		m_expectedMassMatrix.setZero(3*8, 3*8);
-		m_expectedDampingMatrix.setZero(3*8, 3*8);
-		m_expectedStiffnessMatrix.setZero(3*8, 3*8);
-		m_vectorOnes.setOnes(3*8);
+		m_expectedMassMatrix.resize(3 * 8, 3 * 8);
+		m_expectedDampingMatrix.resize(3 * 8, 3 * 8);
+		m_expectedStiffnessMatrix.resize(3 * 8, 3 * 8);
+		m_vectorOnes.setOnes(3 * 8);
 
 		computeExpectedMassMatrix(nodeIdsVectorForm);
 		computeExpectedStiffnessMatrix(nodeIdsVectorForm);
@@ -479,9 +663,9 @@ public:
 	// This method tests all node permutations for both face definition (2 groups of 4 indices)
 	// keeping their ordering intact (CW or CCW)
 	void testNodeOrderingAllPermutations(const SurgSim::Math::OdeState& m_restState,
-		size_t id0, size_t id1, size_t id2, size_t id3,
-		size_t id4, size_t id5, size_t id6, size_t id7,
-		bool expectThrow)
+										 size_t id0, size_t id1, size_t id2, size_t id3,
+										 size_t id4, size_t id5, size_t id6, size_t id7,
+										 bool expectThrow)
 	{
 		std::array<size_t, 4> face1 = {{id0, id1, id2, id3}};
 		std::array<size_t, 4> face2 = {{id4, id5, id6, id7}};
@@ -520,7 +704,8 @@ TEST_F(Fem3DElementCubeTests, ConstructorTest)
 	ASSERT_NO_THROW({MockFem3DElementCube cube(m_nodeIds);});
 	ASSERT_NO_THROW({MockFem3DElementCube* cube = new MockFem3DElementCube(m_nodeIds); delete cube;});
 	ASSERT_NO_THROW({std::shared_ptr<MockFem3DElementCube> cube =
-		std::make_shared<MockFem3DElementCube>(m_nodeIds);});
+						 std::make_shared<MockFem3DElementCube>(m_nodeIds);
+					});
 }
 
 TEST_F(Fem3DElementCubeTests, InitializeTest)
@@ -652,7 +837,7 @@ TEST_F(Fem3DElementCubeTests, ShapeFunctionsTest)
 	cube->initialize(m_restState);
 
 	EXPECT_TRUE(cube->getInitialPosition().isApprox(m_expectedX0)) <<
-		"x0 = " << cube->getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
+			"x0 = " << cube->getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
 
 	// We should have by construction:
 	// { N0(p0) = 1    N1(p0)=N2(p0)=N3(p0)=0
@@ -682,66 +867,90 @@ TEST_F(Fem3DElementCubeTests, ShapeFunctionsTest)
 	EXPECT_NEAR(Ni_p0[0], 1.0, 1e-12);
 	for (size_t i = 0; i < 8; ++i)
 	{
-		if (i == 0) continue;
+		if (i == 0)
+		{
+			continue;
+		}
 		EXPECT_NEAR(Ni_p0[i], 0.0, 1e-12);
 	}
 
 	EXPECT_NEAR(Ni_p1[1], 1.0, 1e-12);
 	for (size_t i = 0; i < 8; ++i)
 	{
-		if (i == 1) continue;
+		if (i == 1)
+		{
+			continue;
+		}
 		EXPECT_NEAR(Ni_p1[i], 0.0, 1e-12);
 	}
 
 	EXPECT_NEAR(Ni_p2[2], 1.0, 1e-12);
 	for (size_t i = 0; i < 8; ++i)
 	{
-		if (i == 2) continue;
+		if (i == 2)
+		{
+			continue;
+		}
 		EXPECT_NEAR(Ni_p2[i], 0.0, 1e-12);
 	}
 
 	EXPECT_NEAR(Ni_p3[3], 1.0, 1e-12);
 	for (size_t i = 0; i < 8; ++i)
 	{
-		if (i == 3) continue;
+		if (i == 3)
+		{
+			continue;
+		}
 		EXPECT_NEAR(Ni_p3[i], 0.0, 1e-12);
 	}
 
 	EXPECT_NEAR(Ni_p4[4], 1.0, 1e-12);
 	for (size_t i = 0; i < 8; ++i)
 	{
-		if (i == 4) continue;
+		if (i == 4)
+		{
+			continue;
+		}
 		EXPECT_NEAR(Ni_p4[i], 0.0, 1e-12);
 	}
 
 	EXPECT_NEAR(Ni_p5[5], 1.0, 1e-12);
 	for (size_t i = 0; i < 8; ++i)
 	{
-		if (i == 5) continue;
+		if (i == 5)
+		{
+			continue;
+		}
 		EXPECT_NEAR(Ni_p5[i], 0.0, 1e-12);
 	}
 
 	EXPECT_NEAR(Ni_p6[6], 1.0, 1e-12);
 	for (size_t i = 0; i < 8; ++i)
 	{
-		if (i == 6) continue;
+		if (i == 6)
+		{
+			continue;
+		}
 		EXPECT_NEAR(Ni_p6[i], 0.0, 1e-12);
 	}
 
 	EXPECT_NEAR(Ni_p7[7], 1.0, 1e-12);
 	for (size_t i = 0; i < 8; ++i)
 	{
-		if (i == 7) continue;
+		if (i == 7)
+		{
+			continue;
+		}
 		EXPECT_NEAR(Ni_p7[i], 0.0, 1e-12);
 	}
 
 	// We should have the relation sum(Ni(x,y,z) = 1) for all points in the volume
 	// We verify that relation by sampling the tetrahedron volume
-	for (double epsilon = -1.0; epsilon <= 1.0; epsilon+=0.1)
+	for (double epsilon = -1.0; epsilon <= 1.0; epsilon += 0.1)
 	{
-		for (double eta = -1.0; eta <= 1.0; eta+=0.1)
+		for (double eta = -1.0; eta <= 1.0; eta += 0.1)
 		{
-			for (double mu = -1.0; mu <= 1.0; mu+=0.1)
+			for (double mu = -1.0; mu <= 1.0; mu += 0.1)
 			{
 				double Ni_p[8];
 				double sum = 0.0;
@@ -751,11 +960,11 @@ TEST_F(Fem3DElementCubeTests, ShapeFunctionsTest)
 					sum += Ni_p[i];
 				}
 				EXPECT_NEAR(sum, 1.0, 1e-10) <<
-					" for epsilon = " << epsilon << ", eta = " << eta << ", mu = " << mu << std::endl <<
-					" N0(epsilon,eta,mu) = " << Ni_p[0] << " N1(epsilon,eta,mu) = " << Ni_p[1] <<
-					" N2(epsilon,eta,mu) = " << Ni_p[2] << " N3(epsilon,eta,mu) = " << Ni_p[3] <<
-					" N4(epsilon,eta,mu) = " << Ni_p[4] << " N5(epsilon,eta,mu) = " << Ni_p[5] <<
-					" N6(epsilon,eta,mu) = " << Ni_p[6] << " N7(epsilon,eta,mu) = " << Ni_p[7];
+											 " for epsilon = " << epsilon << ", eta = " << eta << ", mu = " << mu << std::endl <<
+											 " N0(epsilon,eta,mu) = " << Ni_p[0] << " N1(epsilon,eta,mu) = " << Ni_p[1] <<
+											 " N2(epsilon,eta,mu) = " << Ni_p[2] << " N3(epsilon,eta,mu) = " << Ni_p[3] <<
+											 " N4(epsilon,eta,mu) = " << Ni_p[4] << " N5(epsilon,eta,mu) = " << Ni_p[5] <<
+											 " N6(epsilon,eta,mu) = " << Ni_p[6] << " N7(epsilon,eta,mu) = " << Ni_p[7];
 			}
 		}
 	}
@@ -804,7 +1013,7 @@ TEST_F(Fem3DElementCubeTests, CoordinateTests)
 		nodePositions << 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
 		EXPECT_TRUE(cube->isValidCoordinate(nodePositions));
 		EXPECT_TRUE(SurgSim::Math::Vector3d(0.0, 0.0, 0.0).isApprox(
-					cube->computeCartesianCoordinate(m_restState, nodePositions), epsilon));
+						cube->computeCartesianCoordinate(m_restState, nodePositions), epsilon));
 	}
 
 	{
@@ -812,7 +1021,7 @@ TEST_F(Fem3DElementCubeTests, CoordinateTests)
 		nodePositions << 0.01, 0.07, 0.11, 0.05, 0.0, 0.23, 0.13, 0.4;
 		EXPECT_TRUE(cube->isValidCoordinate(nodePositions));
 		EXPECT_TRUE(SurgSim::Math::Vector3d(0.04, 0.19, 0.26).isApprox(
-					cube->computeCartesianCoordinate(m_restState, nodePositions), epsilon));
+						cube->computeCartesianCoordinate(m_restState, nodePositions), epsilon));
 		// 0.01 * (-0.5,-0.5,-0.5) => (-0.005, -0.005, -0.005)
 		// 0.07 * ( 0.5,-0.5,-0.5) => ( 0.035, -0.035, -0.035)
 		// 0.11 * ( 0.5, 0.5,-0.5) => ( 0.055,  0.055, -0.055)
@@ -836,10 +1045,13 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	auto cube = getCubeElement(m_nodeIds);
 	cube->initialize(m_restState);
 
-	Vector forceVector = Vector::Zero(3*8);
-	Matrix massMatrix = Matrix::Zero(3*8, 3*8);
-	Matrix dampingMatrix = Matrix::Zero(3*8, 3*8);
-	Matrix stiffnessMatrix = Matrix::Zero(3*8, 3*8);
+	Vector forceVector = Vector::Zero(3 * 8);
+	SparseMatrix massMatrix(3 * 8, 3 * 8);
+	SparseMatrix dampingMatrix(3 * 8, 3 * 8);
+	SparseMatrix stiffnessMatrix(3 * 8, 3 * 8);
+	massMatrix.setZero();
+	dampingMatrix.setZero();
+	stiffnessMatrix.setZero();
 
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
 	cube->addForce(m_restState, &forceVector);
@@ -847,16 +1059,16 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 
 	cube->addMass(m_restState, &massMatrix);
 	EXPECT_TRUE(massMatrix.isApprox(m_expectedMassMatrix)) <<
-		"Expected mass matrix :" << std::endl << m_expectedMassMatrix  << std::endl << std::endl <<
-		"Mass matrix :"  << std::endl << massMatrix << std::endl << std::endl <<
-		"Error on the mass matrix is "  << std::endl << m_expectedMassMatrix - massMatrix << std::endl;
+			"Expected mass matrix :" << std::endl << m_expectedMassMatrix  << std::endl << std::endl <<
+			"Mass matrix :"  << std::endl << massMatrix << std::endl << std::endl <<
+			"Error on the mass matrix is "  << std::endl << m_expectedMassMatrix - massMatrix << std::endl;
 
 	cube->addDamping(m_restState, &dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
 
 	cube->addStiffness(m_restState, &stiffnessMatrix);
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix)) <<
-		"Error on the stiffness matrix is " << std::endl << m_expectedStiffnessMatrix - stiffnessMatrix << std::endl;
+			"Error on the stiffness matrix is " << std::endl << m_expectedStiffnessMatrix - stiffnessMatrix << std::endl;
 
 	forceVector.setZero();
 	massMatrix.setZero();
@@ -896,8 +1108,8 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		double expectedCoef = 1.0 * m_expectedMassMatrix.row(rowId).sum() +
-			2.0 * m_expectedDampingMatrix.row(rowId).sum() +
-			3.0 * m_expectedStiffnessMatrix.row(rowId).sum();
+							  2.0 * m_expectedDampingMatrix.row(rowId).sum() +
+							  3.0 * m_expectedStiffnessMatrix.row(rowId).sum();
 		EXPECT_NEAR(expectedCoef, forceVector[rowId], epsilon);
 	}
 }

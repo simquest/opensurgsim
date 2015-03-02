@@ -133,6 +133,9 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 
 	fem->setInitialState(initialState);
 
+	Math::SparseMatrix zeroMat(fem->getNumDof(), fem->getNumDof());
+	zeroMat.setZero();
+
 	// Vector initialized (properly sized and zeroed)
 	EXPECT_NE(0, fem->getExternalGeneralizedForce().size());
 	EXPECT_NE(0, fem->getExternalGeneralizedStiffness().rows());
@@ -145,8 +148,8 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 	EXPECT_EQ(fem->getNumDof(), fem->getExternalGeneralizedDamping().cols());
 	EXPECT_EQ(fem->getNumDof(), fem->getExternalGeneralizedDamping().rows());
 	EXPECT_TRUE(fem->getExternalGeneralizedForce().isZero());
-	EXPECT_TRUE(fem->getExternalGeneralizedStiffness().isZero());
-	EXPECT_TRUE(fem->getExternalGeneralizedDamping().isZero());
+	EXPECT_TRUE(fem->getExternalGeneralizedStiffness().isApprox(zeroMat));
+	EXPECT_TRUE(fem->getExternalGeneralizedDamping().isApprox(zeroMat));
 
 	std::array<size_t, 2> element1NodeIds = {{0, 1}};
 	auto element1 = std::make_shared<Fem1DElementBeam>(element1NodeIds);
@@ -177,25 +180,25 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 
 	// Test invalid localization nullptr
 	ASSERT_THROW(fem->addExternalGeneralizedForce(nullptr, Flocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(fem->addExternalGeneralizedForce(nullptr, Flocal, Klocal, Dlocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	// Test invalid localization type
 	ASSERT_THROW(fem->addExternalGeneralizedForce(wrongLocalizationType, Flocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(fem->addExternalGeneralizedForce(wrongLocalizationType, Flocal, Klocal, Dlocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	// Test invalid force size
 	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, FLocalWrongSize),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, FLocalWrongSize, Klocal, Dlocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	// Test invalid stiffness size
 	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, Flocal, KLocalWrongSize, Dlocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	// Test invalid damping size
 	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, Flocal, Klocal, DLocalWrongSize),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 
 	// Test valid call to addExternalGeneralizedForce
 	fem->addExternalGeneralizedForce(localization, Flocal, Klocal, Dlocal);
@@ -227,7 +230,7 @@ TEST(Fem1DRepresentationTests, SerializationTest)
 
 	std::shared_ptr<Fem1DRepresentation> newRepresentation;
 	ASSERT_NO_THROW(newRepresentation =
-		std::dynamic_pointer_cast<Fem1DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+						std::dynamic_pointer_cast<Fem1DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	ASSERT_NE(nullptr, newRepresentation);
 
 	EXPECT_EQ("SurgSim::Physics::Fem1DRepresentation", newRepresentation->getClassName());

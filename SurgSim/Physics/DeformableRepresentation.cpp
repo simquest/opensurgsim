@@ -80,8 +80,8 @@ void DeformableRepresentation::setInitialState(
 
 	m_hasExternalGeneralizedForce = false;
 	m_externalGeneralizedForce.setZero(getNumDof());
-	m_externalGeneralizedStiffness.setZero(getNumDof(), getNumDof());
-	m_externalGeneralizedDamping.setZero(getNumDof(), getNumDof());
+	m_externalGeneralizedStiffness.setZero();
+	m_externalGeneralizedDamping.setZero();
 }
 
 const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const
@@ -120,12 +120,12 @@ const SurgSim::Math::Vector& DeformableRepresentation::getExternalGeneralizedFor
 	return m_externalGeneralizedForce;
 }
 
-const SurgSim::Math::Matrix& DeformableRepresentation::getExternalGeneralizedStiffness() const
+const SurgSim::Math::SparseMatrix& DeformableRepresentation::getExternalGeneralizedStiffness() const
 {
 	return m_externalGeneralizedStiffness;
 }
 
-const SurgSim::Math::Matrix& DeformableRepresentation::getExternalGeneralizedDamping() const
+const SurgSim::Math::SparseMatrix& DeformableRepresentation::getExternalGeneralizedDamping() const
 {
 	return m_externalGeneralizedDamping;
 }

@@ -70,7 +70,7 @@ bool FemRepresentation::loadFile()
 		if (filePath.empty())
 		{
 			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
-				"File " << m_filename << " can not be found.";
+					"File " << m_filename << " can not be found.";
 			result = false;
 		}
 
@@ -78,7 +78,7 @@ bool FemRepresentation::loadFile()
 		if (result && !reader->isValid())
 		{
 			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
-				"File " << m_filename << " is invalid.";
+					"File " << m_filename << " is invalid.";
 			result = false;
 		}
 
@@ -97,7 +97,7 @@ bool FemRepresentation::doInitialize()
 	if (!m_filename.empty() && !loadFile())
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"Failed to initialize from file " << m_filename;
+				"Failed to initialize from file " << m_filename;
 		return false;
 	}
 
@@ -208,10 +208,10 @@ SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState
 	return m_f;
 }
 
-const SurgSim::Math::Matrix& FemRepresentation::computeM(const SurgSim::Math::OdeState& state)
+const SurgSim::Math::SparseMatrix& FemRepresentation::computeM(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the mass matrix has been properly allocated and zeroed out
-	m_M.setZero(state.getNumDof(), state.getNumDof());
+	m_M.setZero();
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
@@ -221,13 +221,13 @@ const SurgSim::Math::Matrix& FemRepresentation::computeM(const SurgSim::Math::Od
 	return m_M;
 }
 
-const SurgSim::Math::Matrix& FemRepresentation::computeD(const SurgSim::Math::OdeState& state)
+const SurgSim::Math::SparseMatrix& FemRepresentation::computeD(const SurgSim::Math::OdeState& state)
 {
 	const double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.setZero(state.getNumDof(), state.getNumDof());
+	m_D.setZero();
 
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
@@ -262,10 +262,10 @@ const SurgSim::Math::Matrix& FemRepresentation::computeD(const SurgSim::Math::Od
 	return m_D;
 }
 
-const SurgSim::Math::Matrix& FemRepresentation::computeK(const SurgSim::Math::OdeState& state)
+const SurgSim::Math::SparseMatrix& FemRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.setZero(state.getNumDof(), state.getNumDof());
+	m_K.setZero();
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
@@ -282,19 +282,20 @@ const SurgSim::Math::Matrix& FemRepresentation::computeK(const SurgSim::Math::Od
 }
 
 void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
-									SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K)
+									SurgSim::Math::SparseMatrix** M, SurgSim::Math::SparseMatrix** D,
+									SurgSim::Math::SparseMatrix** K)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
 	m_f.setZero(state.getNumDof());
 
 	// Make sure the mass matrix has been properly allocated and zeroed out
-	m_M.setZero(state.getNumDof(), state.getNumDof());
+	m_M.setZero();
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.setZero(state.getNumDof(), state.getNumDof());
+	m_D.setZero();
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.setZero(state.getNumDof(), state.getNumDof());
+	m_K.setZero();
 
 	// Add all the FemElement contribution to f, M, D, K
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
@@ -389,8 +390,8 @@ void FemRepresentation::addFemElementsForce(SurgSim::Math::Vector* force,
 }
 
 void FemRepresentation::addGravityForce(SurgSim::Math::Vector* f,
-		const SurgSim::Math::OdeState& state,
-		double scale)
+										const SurgSim::Math::OdeState& state,
+										double scale)
 {
 	using SurgSim::Math::addSubVector;
 

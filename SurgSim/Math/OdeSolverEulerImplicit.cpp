@@ -77,9 +77,9 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 	size_t numIteration = 0;
 	while (numIteration < m_maximumIteration)
 	{
-		Matrix* M;
-		Matrix* D;
-		Matrix* K;
+		SparseMatrix* M;
+		SparseMatrix* D;
+		SparseMatrix* K;
 		Vector* f;
 
 		// Computes f(t, x(t), v(t)), M, D, K all at the same time

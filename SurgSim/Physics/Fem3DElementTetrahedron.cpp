@@ -34,7 +34,8 @@ namespace
 /// \return |a b c|, The determinant of the 3 vectors a, b and c
 double det(const Vector3d& a, const Vector3d& b, const Vector3d& c)
 {
-	return a[0]*b[1]*c[2] + a[2]*b[0]*c[1] + a[1]*b[2]*c[0] - a[2]*b[1]*c[0] - a[1]*b[0]*c[2] - a[0]*b[2]*c[1];
+	return a[0] * b[1] * c[2] + a[2] * b[0] * c[1] + a[1] * b[2] * c[0] - a[2] * b[1] * c[0] - a[1] * b[0] * c[2] - a[0] *
+		   b[2] * c[1];
 }
 
 };
@@ -60,7 +61,7 @@ void Fem3DElementTetrahedron::initialize(const SurgSim::Math::OdeState& state)
 	for (auto nodeId = m_nodeIds.cbegin(); nodeId != m_nodeIds.cend(); nodeId++)
 	{
 		SURGSIM_ASSERT(*nodeId >= 0 && *nodeId < state.getNumNodes())
-			<< "Invalid nodeId " << *nodeId << " expected in range [0.." << state.getNumNodes() - 1 << "]";
+				<< "Invalid nodeId " << *nodeId << " expected in range [0.." << state.getNumNodes() - 1 << "]";
 	}
 
 	// Compute the fem tetrahedron shape functions Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
@@ -78,8 +79,8 @@ void Fem3DElementTetrahedron::initialize(const SurgSim::Math::OdeState& state)
 	SurgSim::Math::Vector3d AC = C - A;
 	SurgSim::Math::Vector3d AD = D - A;
 	SURGSIM_LOG_IF(AB.cross(AC).dot(AD) < 0, SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
-		<< "Tetrahedron ill-defined (ABC defined counter clock viewed from D) with node ids[" << m_nodeIds[0] << ", "
-		<< m_nodeIds[1] << ", " << m_nodeIds[2] << ", " << m_nodeIds[3] << "]";
+			<< "Tetrahedron ill-defined (ABC defined counter clock viewed from D) with node ids[" << m_nodeIds[0] << ", "
+			<< m_nodeIds[1] << ", " << m_nodeIds[2] << ", " << m_nodeIds[3] << "]";
 
 	// Pre-compute the mass and stiffness matrix
 	computeMass(state, &m_M);
@@ -106,7 +107,7 @@ void Fem3DElementTetrahedron::addForce(const SurgSim::Math::OdeState& state, Sur
 }
 
 void Fem3DElementTetrahedron::computeMass(const SurgSim::Math::OdeState& state,
-										  Eigen::Matrix<double, 12, 12>* M)
+		Eigen::Matrix<double, 12, 12>* M)
 {
 	// From Przemieniecki book
 	// -> section 11 "Inertia properties of structural elements
@@ -151,33 +152,37 @@ void Fem3DElementTetrahedron::computeMass(const SurgSim::Math::OdeState& state,
 }
 
 
-void Fem3DElementTetrahedron::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale)
+void Fem3DElementTetrahedron::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
+									  double scale /*= 1.0*/)
 {
+	/* TODO:
 	addSubMatrix(m_M * scale, m_nodeIds, 3, M);
+	*/
 }
 
-void Fem3DElementTetrahedron::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale)
+void Fem3DElementTetrahedron::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
+		double scale /*= 1.0*/)
 {
 }
 
 void Fem3DElementTetrahedron::computeStiffness(const SurgSim::Math::OdeState& state,
-											   Eigen::Matrix<double, 12, 12>* k)
+		Eigen::Matrix<double, 12, 12>* k)
 {
 	m_Em.setZero();
 	m_strain.setZero();
 
 	// Compute the strain matrix
 	double coef = 1.0 / (6.0 * m_restVolume);
-	for(int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		m_strain(0, 3 * i    ) = coef * m_bi[i];
+		m_strain(0, 3 * i) = coef * m_bi[i];
 		m_strain(1, 3 * i + 1) = coef * m_ci[i];
 		m_strain(2, 3 * i + 2) = coef * m_di[i];
-		m_strain(3, 3 * i    ) = coef * m_ci[i];
+		m_strain(3, 3 * i) = coef * m_ci[i];
 		m_strain(3, 3 * i + 1) = coef * m_bi[i];
-		m_strain(4 ,3 * i + 1) = coef * m_di[i];
+		m_strain(4 , 3 * i + 1) = coef * m_di[i];
 		m_strain(4, 3 * i + 2) = coef * m_ci[i];
-		m_strain(5 ,3 * i    ) = coef * m_di[i];
+		m_strain(5 , 3 * i) = coef * m_di[i];
 		m_strain(5, 3 * i + 2) = coef * m_bi[i];
 	}
 
@@ -199,17 +204,19 @@ void Fem3DElementTetrahedron::computeStiffness(const SurgSim::Math::OdeState& st
 	*k = ((*k) + (*k).transpose()) * 0.5;
 }
 
-void Fem3DElementTetrahedron::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
-										   double scale)
+void Fem3DElementTetrahedron::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+		double scale /*= 1.0*/)
 {
+	/* TODO:
 	addSubMatrix(m_K * scale, getNodeIds(), 3, K);
+	*/
 }
 
 void Fem3DElementTetrahedron::addFMDK(const SurgSim::Math::OdeState& state,
 									  SurgSim::Math::Vector* F,
-									  SurgSim::Math::Matrix* M,
-									  SurgSim::Math::Matrix* D,
-									  SurgSim::Math::Matrix* K)
+									  SurgSim::Math::SparseMatrix* M,
+									  SurgSim::Math::SparseMatrix* D,
+									  SurgSim::Math::SparseMatrix* K)
 {
 	// Assemble the mass matrix
 	addMass(state, M);
@@ -275,11 +282,11 @@ double Fem3DElementTetrahedron::getVolume(const SurgSim::Math::OdeState& state) 
 }
 
 void Fem3DElementTetrahedron::computeShapeFunctions(const SurgSim::Math::OdeState& state,
-													double* volume,
-													std::array<double, 4>* ai,
-													std::array<double, 4>* bi,
-													std::array<double, 4>* ci,
-													std::array<double, 4>* di) const
+		double* volume,
+		std::array<double, 4>* ai,
+		std::array<double, 4>* bi,
+		std::array<double, 4>* ci,
+		std::array<double, 4>* di) const
 {
 	// The tetrahedron nodes 3D position {a,b,c,d}
 	Vector3d a = getSubVector(state.getPositions(), m_nodeIds[0], 3);
@@ -403,7 +410,7 @@ SurgSim::Math::Vector Fem3DElementTetrahedron::computeCartesianCoordinate(
 	const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
-		<< "naturalCoordinate must be normalized and length 4.";
+			<< "naturalCoordinate must be normalized and length 4.";
 
 	const Vector& x = state.getPositions();
 	Vector3d p0 = getSubVector(x, m_nodeIds[0], 3);
@@ -412,9 +419,9 @@ SurgSim::Math::Vector Fem3DElementTetrahedron::computeCartesianCoordinate(
 	Vector3d p3 = getSubVector(x, m_nodeIds[3], 3);
 
 	return naturalCoordinate(0) * p0
-		 + naturalCoordinate(1) * p1
-		 + naturalCoordinate(2) * p2
-		 + naturalCoordinate(3) * p3;
+		   + naturalCoordinate(1) * p1
+		   + naturalCoordinate(2) * p2
+		   + naturalCoordinate(3) * p3;
 }
 
 SurgSim::Math::Vector Fem3DElementTetrahedron::computeNaturalCoordinate(
@@ -434,8 +441,8 @@ SurgSim::Math::Vector Fem3DElementTetrahedron::computeNaturalCoordinate(
 	for (size_t i = 0; i < 4; ++i)
 	{
 		result[i] = ai[i] + bi[i] * cartesianCoordinate[0]
-						  + ci[i] * cartesianCoordinate[1]
-						  + di[i] * cartesianCoordinate[2];
+					+ ci[i] * cartesianCoordinate[1]
+					+ di[i] * cartesianCoordinate[2];
 	}
 	result /= 6.0 * volume;
 

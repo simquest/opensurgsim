@@ -24,6 +24,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/LU> 		// needed for determinant() and inverse()
+#include <Eigen/Sparse>
 
 namespace SurgSim
 {
@@ -63,6 +64,9 @@ typedef Eigen::DiagonalMatrix<double, Eigen::Dynamic> DiagonalMatrix;
 
 /// A dynamic size matrix
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+
+/// A sparse matrix
+typedef Eigen::SparseMatrix<double> SparseMatrix;
 
 /// Create a rotation matrix corresponding to the specified angle (in radians) and axis.
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
@@ -155,9 +159,40 @@ inline T computeAngle(const Eigen::Matrix<T, 3, 3, MOpt>& matrix)
 /// \param[out] matrix The matrix to add the sub-matrix into
 template <class Matrix, class SubMatrix>
 void addSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdCol,
-	size_t blockSizeRow, size_t blockSizeCol, Matrix* matrix)
+				  size_t blockSizeRow, size_t blockSizeCol, Matrix* matrix)
 {
 	matrix->block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol) += subMatrix;
+}
+
+/// Helper method to add a sub-matrix into a matrix, for the sake of clarity
+/// \tparam Matrix The matrix type
+/// \tparam SubMatrix The sub-matrix type
+/// \param subMatrix The sub-matrix
+/// \param blockIdRow, blockIdCol The block indices in matrix
+/// \param blockSizeRow, blockSizeCol The block size (size of the sub-matrix)
+/// \param[out] matrix The matrix to add the sub-matrix into
+/// \note This is a specialization of addSubMatrix for sparse matrices.
+template <>
+inline void addSubMatrix(const SparseMatrix& subMatrix, size_t blockIdRow, size_t blockIdCol,
+						 size_t blockSizeRow, size_t blockSizeCol, SparseMatrix* matrix)
+{
+	typedef Eigen::Triplet<double> T;
+	std::vector<T> tripletList;
+	tripletList.reserve(36);
+
+	SurgSim::Math::SparseMatrix dSparse(matrix->rows(), matrix->cols());
+
+	for (size_t row = 0; row < blockSizeRow; ++row)
+	{
+		for (size_t col = 0; col < blockSizeCol; ++col)
+		{
+			tripletList.push_back(T((blockSizeRow * blockIdRow) + row, (blockSizeCol * blockIdCol) + col,
+									subMatrix.coeff(row, col)));
+		}
+	}
+
+	dSparse.setFromTriplets(tripletList.begin(), tripletList.end());
+	*matrix += dSparse;
 }
 
 /// Helper method to add a sub-matrix made of squared-blocks into a matrix, for the sake of clarity
@@ -181,9 +216,52 @@ void addSubMatrix(const SubMatrix& subMatrix, const std::vector<size_t> blockIds
 			size_t blockId1 = blockIds[block1];
 
 			matrix->block(blockSize * blockId0, blockSize * blockId1, blockSize, blockSize)
-				+= subMatrix.block(blockSize * block0, blockSize * block1, blockSize, blockSize);
+			+= subMatrix.block(blockSize * block0, blockSize * block1, blockSize, blockSize);
 		}
 	}
+}
+
+/// Helper method to add a sub-matrix made of squared-blocks into a matrix, for the sake of clarity
+/// \tparam Matrix The matrix type
+/// \tparam SubMatrix The sub-matrix type
+/// \param subMatrix The sub-matrix (containing all the squared-blocks)
+/// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
+/// \param blockSize The blocks size
+/// \param[out] matrix The matrix to add the sub-matrix blocks into
+/// \note This is a specialization of addSubMatrix for sparse matrices.
+template <>
+inline void addSubMatrix(const SparseMatrix& subMatrix, const std::vector<size_t> blockIds,
+						 size_t blockSize, SparseMatrix* matrix)
+{
+	const size_t numBlocks = blockIds.size();
+
+	typedef Eigen::Triplet<double> T;
+	std::vector<T> tripletList;
+	tripletList.reserve(36);
+
+	SurgSim::Math::SparseMatrix dSparse(matrix->rows(), matrix->cols());
+
+	for (size_t block0 = 0; block0 < numBlocks; block0++)
+	{
+		size_t blockId0 = blockIds[block0];
+
+		for (size_t block1 = 0; block1 < numBlocks; block1++)
+		{
+			size_t blockId1 = blockIds[block1];
+
+			for (int row = 0; row < blockSize; ++row)
+			{
+				for (int col = 0; col < blockSize; ++col)
+				{
+					tripletList.push_back(T(blockSize * blockId0 + row,  blockSize * blockId1 + col,
+											subMatrix.coeff(row, col)));
+				}
+			}
+		}
+	}
+
+	dSparse.setFromTriplets(tripletList.begin(), tripletList.end());
+	*matrix += dSparse;
 }
 
 /// Helper method to set a sub-matrix into a matrix, for the sake of clarity
@@ -195,10 +273,10 @@ void addSubMatrix(const SubMatrix& subMatrix, const std::vector<size_t> blockIds
 /// \param[out] matrix The matrix to set the sub-matrix into
 template <class Matrix, class SubMatrix>
 void setSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdCol,
-	size_t blockSizeRow, size_t blockSizeCol, Matrix* matrix)
+				  size_t blockSizeRow, size_t blockSizeCol, Matrix* matrix)
 {
 	matrix->block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol,
-		blockSizeRow, blockSizeCol) = subMatrix;
+				  blockSizeRow, blockSizeCol) = subMatrix;
 }
 
 /// Helper method to access a sub-matrix from a matrix, for the sake of clarity
@@ -212,7 +290,7 @@ void setSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdC
 /// \note therefore the Matrix from which the Block is built from must not be const
 template <class Matrix>
 Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, size_t blockIdRow, size_t blockIdCol,  // NOLINT
-	size_t blockSizeRow, size_t blockSizeCol)
+								  size_t blockSizeRow, size_t blockSizeCol)
 {
 	return matrix.block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol);
 }

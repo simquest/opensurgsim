@@ -30,7 +30,7 @@ set(UNIT_TEST_SOURCES
 	OdeSolverEulerExplicitTests.cpp
 	OdeSolverEulerImplicitTests.cpp
 	OdeSolverRungeKutta4Tests.cpp
-	OdeSolverStaticTests.cpp
+	#OdeSolverStaticTests.cpp
 	OdeSolverTests.cpp
 	OdeStateTests.cpp
 	ShapeTests.cpp
@@ -57,13 +57,12 @@ set(UNIT_TEST_EIGEN_TYPE_SOURCES
 set(UNIT_TEST_EIGEN_TYPE_HEADERS
 )
 
-option(BUILD_TESTING_EIGEN
-	"Include basic tests for Eigen math class typedefs, which build very slowly."
-	OFF)
+set(BUILD_TESTING_EIGEN
+	CACHE BOOL OFF "Include basic tests for Eigen math class typedefs, which build very slowly."
+	)
 if(BUILD_TESTING_EIGEN)
 	set(UNIT_TEST_SOURCES ${UNIT_TEST_SOURCES} ${UNIT_TEST_EIGEN_TYPE_SOURCES})
 	set(UNIT_TEST_HEADERS ${UNIT_TEST_HEADERS} ${UNIT_TEST_EIGEN_TYPE_HEADERS})
-
 	# Fix a problem with 64-bit builds running out of sections.
 	if(MSVC AND CMAKE_CL_64)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
