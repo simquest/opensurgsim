@@ -50,15 +50,15 @@ const Matrix& OdeSolver::getSystemMatrix() const
 	return m_systemMatrix;
 }
 
-const Matrix& OdeSolver::getCompliance() const
+const Matrix& OdeSolver::getComplianceMatrix() const
 {
-	return m_compliance;
+	return m_complianceMatrix;
 }
 
 void OdeSolver::allocate(size_t size)
 {
 	m_systemMatrix.resize(size, size);
-	m_compliance.resize(size, size);
+	m_complianceMatrix.resize(size, size);
 }
 
 }; // namespace Math

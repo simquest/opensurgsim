@@ -39,7 +39,7 @@ void OdeSolverLinearEulerExplicit::solve(double dt, const OdeState& currentState
 	{
 		Vector& f = m_equation.computeF(currentState);
 		currentState.applyBoundaryConditionsToVector(&f);
-		Vector deltaV = m_compliance * f;
+		Vector deltaV = m_complianceMatrix * f;
 
 		newState->getPositions()  = currentState.getPositions()  + dt * currentState.getVelocities();
 		newState->getVelocities() = currentState.getVelocities() + deltaV;

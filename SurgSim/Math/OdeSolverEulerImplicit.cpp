@@ -122,11 +122,11 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 	}
 
 	// Only compute the compliance matrix once, around the root
-	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_compliance);
+	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_complianceMatrix);
 
 	// Remove the boundary conditions compliance from the compliance matrix
 	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-	currentState.applyBoundaryConditionsToMatrix(&m_compliance, false);
+	currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
 }
 
 }; // namespace Math

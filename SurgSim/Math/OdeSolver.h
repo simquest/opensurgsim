@@ -108,7 +108,7 @@ public:
 
 	/// Queries the current compliance matrix
 	/// \return The latest compliance matrix calculated
-	const Matrix& getCompliance() const;
+	const Matrix& getComplianceMatrix() const;
 
 protected:
 	/// Allocates the system and compliance matrices
@@ -132,7 +132,7 @@ protected:
 	Matrix m_systemMatrix;
 
 	/// Compliance matrix which is the inverse of the system matrix
-	Matrix m_compliance;
+	Matrix m_complianceMatrix;
 };
 
 }; // namespace Math

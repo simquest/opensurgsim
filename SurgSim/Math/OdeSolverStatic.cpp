@@ -46,13 +46,13 @@ void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* n
 	currentState.applyBoundaryConditionsToVector(&f);
 	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
-	// Computes deltaX (stored in the positions) and m_compliance = 1/m_systemMatrix
+	// Computes deltaX (stored in the positions) and m_complianceMatrix = 1/m_systemMatrix
 	Vector& deltaX = newState->getPositions();
-	(*m_linearSolver)(m_systemMatrix, f, &deltaX, &m_compliance);
+	(*m_linearSolver)(m_systemMatrix, f, &deltaX, &m_complianceMatrix);
 
 	// Remove the boundary conditions compliance from the compliance matrix
 	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-	currentState.applyBoundaryConditionsToMatrix(&m_compliance, false);
+	currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
 
 	// Compute the new state using the static scheme:
 	newState->getPositions()  = currentState.getPositions()  + deltaX;

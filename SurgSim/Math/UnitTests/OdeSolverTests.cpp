@@ -57,7 +57,7 @@ public:
 	virtual void solve(double dt, const OdeState& currentState, OdeState* newState)
 	{
 		this->m_systemMatrix.setIdentity();
-		this->m_compliance.setIdentity();
+		this->m_complianceMatrix.setIdentity();
 	}
 };
 
@@ -69,8 +69,8 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({MockOdeSolver solver(&m);});
 	{
 		MockOdeSolver solver(&m);
-		EXPECT_EQ(3, solver.getCompliance().rows());
-		EXPECT_EQ(3, solver.getCompliance().cols());
+		EXPECT_EQ(3, solver.getComplianceMatrix().rows());
+		EXPECT_EQ(3, solver.getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver.getSystemMatrix().rows());
 		EXPECT_EQ(3, solver.getSystemMatrix().cols());
 	}
@@ -78,8 +78,8 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({MockOdeSolver* solver = new MockOdeSolver(&m); delete solver;});
 	{
 		MockOdeSolver* solver = new MockOdeSolver(&m);
-		EXPECT_EQ(3, solver->getCompliance().rows());
-		EXPECT_EQ(3, solver->getCompliance().cols());
+		EXPECT_EQ(3, solver->getComplianceMatrix().rows());
+		EXPECT_EQ(3, solver->getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver->getSystemMatrix().rows());
 		EXPECT_EQ(3, solver->getSystemMatrix().cols());
 		delete solver;
@@ -88,8 +88,8 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m); });
 	{
 		std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m);
-		EXPECT_EQ(3, solver->getCompliance().rows());
-		EXPECT_EQ(3, solver->getCompliance().cols());
+		EXPECT_EQ(3, solver->getComplianceMatrix().rows());
+		EXPECT_EQ(3, solver->getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver->getSystemMatrix().rows());
 		EXPECT_EQ(3, solver->getSystemMatrix().cols());
 	}
@@ -103,7 +103,7 @@ TEST(OdeSolver, GetTest)
 
 	solver.solve(1e-3, currentState, &newState);
 	EXPECT_TRUE(solver.getSystemMatrix().isIdentity());
-	EXPECT_TRUE(solver.getCompliance().isIdentity());
+	EXPECT_TRUE(solver.getComplianceMatrix().isIdentity());
 	EXPECT_EQ(name, solver.getName());
 }
 
