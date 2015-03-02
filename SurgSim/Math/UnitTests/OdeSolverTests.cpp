@@ -50,14 +50,12 @@ public:
 	{
 	}
 
-	/// Solves the equation
-	/// \param dt The time step
-	/// \param currentState State at time t
-	/// \param[out] newState State at time t+dt
-	virtual void solve(double dt, const OdeState& currentState, OdeState* newState)
+	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override
 	{
-		this->m_systemMatrix.setIdentity();
-		this->m_complianceMatrix.setIdentity();
+	}
+
+	void computeMatrices(double dt, const OdeState& state) override
+	{
 	}
 };
 
@@ -98,13 +96,16 @@ TEST(OdeSolver, ConstructorTest)
 TEST(OdeSolver, GetTest)
 {
 	MassPoint m;
-	MassPointState currentState, newState;
 	MockOdeSolver solver(&m);
 
-	solver.solve(1e-3, currentState, &newState);
-	EXPECT_TRUE(solver.getSystemMatrix().isIdentity());
-	EXPECT_TRUE(solver.getComplianceMatrix().isIdentity());
 	EXPECT_EQ(name, solver.getName());
+
+	EXPECT_NE(nullptr, solver.getLinearSolver());
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDenseMatrix>(solver.getLinearSolver()));
+	EXPECT_NO_THROW(solver.setLinearSolver(std::make_shared<LinearSolveAndInverseDiagonalMatrix>()));
+	EXPECT_NE(nullptr, solver.getLinearSolver());
+	EXPECT_EQ(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDenseMatrix>(solver.getLinearSolver()));
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDiagonalMatrix>(solver.getLinearSolver()));
 }
 
 }; // namespace Math

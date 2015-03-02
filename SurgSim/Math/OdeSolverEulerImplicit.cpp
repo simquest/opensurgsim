@@ -48,12 +48,15 @@ double OdeSolverEulerImplicit::getNewtonRaphsonEpsilonConvergence() const
 	return m_epsilonConvergence;
 }
 
-void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
 {
 	// General equation to solve:
 	//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
 	// Let's note K = -df/dx and D = -df/dv.
-	// The compliance matrix on the velocity level is (M/dt + D + dt.K)
+	//  For a single linearization, we get the following linear system:
+	//  M/dt.deltaV = f(t, x(t), v(t)) - K.deltaX - D.deltaV
+	//  (M/dt + D + dt.K).deltaV = f(t, x(t), v(t)) - dt.K.v(t)
+	// Therefore the system matrix is (M/dt + D + dt.K)
 
 	// Note that the resulting system is non-linear as K and D are  non-linear in absence of information on the nature
 	// of the model. We use a Newton-Raphson algorithm (http://en.wikipedia.org/wiki/Newton%27s_method) to solve
@@ -121,13 +124,34 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 		numIteration++;
 	}
 
-	// Only compute the compliance matrix once, around the root
-	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_complianceMatrix);
+	// The compliance matrix (if requested) is computed w.r.t. the latest state.
+	if (computeCompliance)
+	{
+		(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_complianceMatrix);
+		// Remove the boundary conditions compliance from the compliance matrix
+		// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
+		currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
+	}
+}
 
+void OdeSolverEulerImplicit::computeMatrices(double dt, const OdeState& state)
+{
+	// Computes the system matrix M/dt + D + dt.K
+	Vector* f;
+	Matrix* M, * D, * K;
+	m_equation.computeFMDK(state, &f, &M, &D, &K);
+	m_systemMatrix  = (*M) * (1.0 / dt);
+	m_systemMatrix += (*D);
+	m_systemMatrix += (*K) * dt;
+	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
+
+	// Computes the compliance matrix as the inverse of the system matrix
+	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_complianceMatrix);
 	// Remove the boundary conditions compliance from the compliance matrix
 	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-	currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
+	state.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
 }
+
 
 }; // namespace Math
 

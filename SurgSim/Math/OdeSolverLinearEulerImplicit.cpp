@@ -40,11 +40,13 @@ void OdeSolverLinearEulerImplicit::setNewtonRaphsonMaximumIteration(size_t maxim
 		"As the model is (supposed to be) linear, a single iteration will find the exact solution.";
 }
 
-void OdeSolverLinearEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverLinearEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState,
+										 bool computeCompliance)
 {
 	if (!m_initialized)
 	{
-		OdeSolverEulerImplicit::solve(dt, currentState, newState);
+		// The compliance matrix is constant and used in all following calls, so we force its calculation on 1st pass.
+		OdeSolverEulerImplicit::solve(dt, currentState, newState, true);
 		m_constantK = m_equation.computeK(currentState);
 		m_initialized = true;
 	}

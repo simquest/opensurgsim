@@ -28,12 +28,13 @@ OdeSolverEulerExplicit::OdeSolverEulerExplicit(OdeEquation* equation)
 	m_name = "Ode Solver Euler Explicit";
 }
 
-void OdeSolverEulerExplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverEulerExplicit::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
 {
 	// General equation to solve:
 	//   M.a(t) = f(t, x(t), v(t))
 	// System on the velocity level:
 	//   (M/dt).deltaV = f(t, x(t), v(t))
+	// Therefore, the system matrix is M/dt
 
 	// Computes f(t, x(t), v(t)) and M
 	Vector& f = m_equation.computeF(currentState);
@@ -46,17 +47,36 @@ void OdeSolverEulerExplicit::solve(double dt, const OdeState& currentState, OdeS
 	currentState.applyBoundaryConditionsToVector(&f);
 	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
-	// Computes deltaV (stored in the velocities) and m_complianceMatrix = 1/m_systemMatrix
+	// Computes deltaV (stored in the velocities) and m_complianceMatrix = 1/m_systemMatrix if requested
 	Vector& deltaV = newState->getVelocities();
-	(*m_linearSolver)(m_systemMatrix, f, &deltaV, &m_complianceMatrix);
-
-	// Remove the boundary conditions compliance from the compliance matrix
-	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-	currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
+	if (computeCompliance)
+	{
+		(*m_linearSolver)(m_systemMatrix, f, &deltaV, &m_complianceMatrix);
+		// Remove the boundary conditions compliance from the compliance matrix
+		// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
+		currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
+	}
+	else
+	{
+		(*m_linearSolver)(m_systemMatrix, f, &deltaV);
+	}
 
 	// Compute the new state using the Euler Explicit scheme:
 	newState->getPositions()  = currentState.getPositions()  + dt * currentState.getVelocities();
 	newState->getVelocities() = currentState.getVelocities() + deltaV;
+}
+
+void OdeSolverEulerExplicit::computeMatrices(double dt, const OdeState& state)
+{
+	// Computes the system matrix M/dt
+	m_systemMatrix = m_equation.computeM(state) / dt;
+	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
+
+	// Computes the compliance matrix as the inverse of the system matrix
+	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_complianceMatrix);
+	// Remove the boundary conditions compliance from the compliance matrix
+	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
+	state.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
 }
 
 }; // namespace Math

@@ -28,13 +28,14 @@ OdeSolverStatic::OdeSolverStatic(OdeEquation* equation)
 	m_name = "Ode Solver Static";
 }
 
-void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
 {
 	// General equation to solve:
 	//   K.deltaX = Fext + Fint(t)
 	// which in the case of a linear model will derive in the expected equation:
 	//   K.(x(t+dt) - x(t)) = Fext - K.(x(t) - x(0))
 	//   K.(x(t+dt) - x(0)) = Fext
+	// Therefore the system matrix is K
 
 	// Computes f(t, x(t), v(t)) and K
 	const Matrix& K = m_equation.computeK(currentState);
@@ -46,18 +47,36 @@ void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* n
 	currentState.applyBoundaryConditionsToVector(&f);
 	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
-	// Computes deltaX (stored in the positions) and m_complianceMatrix = 1/m_systemMatrix
+	// Computes deltaX (stored in the positions) and m_complianceMatrix = 1/m_systemMatrix if requested
 	Vector& deltaX = newState->getPositions();
-	(*m_linearSolver)(m_systemMatrix, f, &deltaX, &m_complianceMatrix);
-
-	// Remove the boundary conditions compliance from the compliance matrix
-	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-	currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
+	if (computeCompliance)
+	{
+		(*m_linearSolver)(m_systemMatrix, f, &deltaX, &m_complianceMatrix);
+		// Remove the boundary conditions compliance from the compliance matrix
+		// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
+		currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
+	}
+	else
+	{
+		(*m_linearSolver)(m_systemMatrix, f, &deltaX);
+	}
 
 	// Compute the new state using the static scheme:
-	newState->getPositions()  = currentState.getPositions()  + deltaX;
+	newState->getPositions() = currentState.getPositions() + deltaX;
 	// Velocities are null in static mode (no time dependency)
 	newState->getVelocities().setZero();
+}
+
+void OdeSolverStatic::computeMatrices(double dt, const OdeState& state)
+{
+	// Computes the system matrix K
+	m_systemMatrix = m_equation.computeK(state);
+	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
+
+	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_complianceMatrix);
+	// Remove the boundary conditions compliance from the compliance matrix
+	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
+	state.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
 }
 
 }; // namespace Math

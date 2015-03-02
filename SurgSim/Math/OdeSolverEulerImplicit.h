@@ -44,7 +44,9 @@ public:
 	/// \return The Newton-Raphson algorithm epsilon convergence
 	double getNewtonRaphsonEpsilonConvergence() const;
 
-	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
+
+	void computeMatrices(double dt, const OdeState& state) override;
 
 protected:
 	/// Newton-Raphson maximum number of iteration (1 => linearization)

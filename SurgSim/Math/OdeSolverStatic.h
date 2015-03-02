@@ -39,7 +39,9 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit OdeSolverStatic(OdeEquation* equation);
 
-	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
+
+	void computeMatrices(double dt, const OdeState& state) override;
 };
 
 }; // namespace Math

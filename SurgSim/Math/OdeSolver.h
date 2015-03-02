@@ -100,14 +100,19 @@ public:
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) = 0;
+	/// \param computeCompliance True if the compliance matrix needs to be computed, False otherwise
+	/// \note Regardless of 'computeCompliance', the system matrix will be computed by this method.
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) = 0;
 
-	/// Queries the current system matrix
-	/// \return The latest system matrix calculated
+	/// Computes the system and compliance matrices for a given state
+	/// \param dt The time step
+	/// \param state The state to compute the system and compliance matrices for
+	virtual void computeMatrices(double dt, const OdeState& state) = 0;
+
+	/// \return The latest system matrix computed (either by calling solve or computeMatrices)
 	const Matrix& getSystemMatrix() const;
 
-	/// Queries the current compliance matrix
-	/// \return The latest compliance matrix calculated
+	/// \return The latest compliance matrix computed (either by calling solve or computeMatrices)
 	const Matrix& getComplianceMatrix() const;
 
 protected:

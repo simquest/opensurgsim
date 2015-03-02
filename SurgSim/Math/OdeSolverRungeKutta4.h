@@ -59,11 +59,9 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit OdeSolverRungeKutta4(OdeEquation* equation);
 
-	/// Solves the equation
-	/// \param dt The time step
-	/// \param currentState State at time t
-	/// \param[out] newState State at time t+dt
-	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
+
+	void computeMatrices(double dt, const OdeState& state) override;
 
 protected:
 	/// Internal structure to hold the 4 temporary evaluations
