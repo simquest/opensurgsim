@@ -36,6 +36,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	SamplingMetricBase.cpp
 	Scene.cpp
 	SceneElement.cpp
+	ThreadPool.cpp
 	Timer.cpp
 	TransferPropertiesBehavior.cpp
 )
@@ -80,6 +81,8 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	SceneElement-inl.h
 	SharedInstance.h
 	SharedInstance-inl.h
+	ThreadPool.h
+	ThreadPool-inl.h
 	Timer.h
 	TransferPropertiesBehavior.h
 )
