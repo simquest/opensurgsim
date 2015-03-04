@@ -290,16 +290,20 @@ public :
 	CheckTangentsVisitor() :
 		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN)
 	{
-	};
 
-	virtual ~CheckTangentsVisitor() {};
+	}
 
-	void apply(osg::Node& node)
+	virtual ~CheckTangentsVisitor()
+	{
+
+	}
+
+	void apply(osg::Node& node) // NOLINT
 	{
 		traverse(node);
 	}
 
-	void apply(osg::Geode& geode)
+	void apply(osg::Geode& geode) // NOLINT
 	{
 		osg::StateSet* state = nullptr;
 		unsigned int vertNum = 0;

@@ -143,16 +143,16 @@ public :
 		m_normalsScale(0.1),
 		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN)
 	{
-	};
+	}
 
-	virtual ~LineGeometryVisitor() {};
+	virtual ~LineGeometryVisitor() {}
 
-	void apply(osg::Node& node)
+	void apply(osg::Node& node) // NOLINT
 	{
 		traverse(node);
 	}
 
-	void apply(osg::Geode& geode)
+	void apply(osg::Geode& geode) // NOLINT
 	{
 		osg::StateSet* state = nullptr;
 		unsigned int vertNum = 0;

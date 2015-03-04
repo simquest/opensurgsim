@@ -1,7 +1,20 @@
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-
-#ifndef SURGSIM_GRAPHICS_OSGTANGENTSPACEGENERATOR_H
-#define SURGSIM_GRAPHICS_OSGTANGENTSPACEGENERATOR_H
+#ifndef SURGSIM_GRAPHICS_TANGENTSPACEGENERATOR_H
+#define SURGSIM_GRAPHICS_TANGENTSPACEGENERATOR_H
 
 #include <osg/NodeVisitor>
 #include <osg/Geode>
@@ -100,7 +113,7 @@ public:
 
 	//! Generates tangent space vectors for all geometry in the geode
 	/// \param geode Geode to generate tangent space vectors
-	virtual void apply(osg::Geode& geode);
+	void apply(osg::Geode& geode) override; // NOLINT
 
 	//! Generates tangent space basis vectors for the geometry
 	/// \param geometry Geometry to generate normals

@@ -71,19 +71,19 @@ void GenerateTangentSpaceTriangleIndexFunctor::set(
 			<< "Size of bitangent array must match the number of vertices to generate tangent space!";
 }
 
-inline void orthnormalize(const osg::Vec3& normal, osg::Vec4& tangent, osg::Vec4& bitangent,
+inline void orthnormalize(const osg::Vec3& normal, osg::Vec4* tangent, osg::Vec4* bitangent,
 						  bool createOrthonormalBasis = false)
 {
 	osg::Vec4 normal4(normal, 0.0);
 
 	// Gram-Schmidt orthogonalize the tangent
-	tangent = tangent - normal4 * (normal4 * tangent);
-	tangent.normalize();
+	(*tangent) = (*tangent) - normal4 * (normal4 * (*tangent));
+	tangent->normalize();
 
 	if (createOrthonormalBasis)
 	{
-		osg::Vec3 tangent3 = osg::Vec3(tangent.x(), tangent.y(), tangent.z());
-		osg::Vec3 bitangent3 = osg::Vec3(bitangent.x(), bitangent.y(), bitangent.z());
+		osg::Vec3 tangent3 = osg::Vec3(tangent->x(), tangent->y(), tangent->z());
+		osg::Vec3 bitangent3 = osg::Vec3(bitangent->x(), bitangent->y(), bitangent->z());
 
 		// Calculate handedness
 		float handedness = 1.0f;
@@ -92,13 +92,13 @@ inline void orthnormalize(const osg::Vec3& normal, osg::Vec4& tangent, osg::Vec4
 			handedness = -1.0f;
 		}
 
-		bitangent = osg::Vec4((normal ^ tangent3) * handedness, 0.0f);
+		(*bitangent) = osg::Vec4((normal ^ tangent3) * handedness, 0.0f);
 	}
 	else
 	{
 		// Gram-Schmidt orthogonalize the bitangent
-		bitangent = bitangent - normal4 * (normal4 * bitangent);
-		bitangent.normalize();
+		(*bitangent) = (*bitangent) - normal4 * (normal4 * (*bitangent));
+		bitangent->normalize();
 	}
 }
 
@@ -108,7 +108,7 @@ void GenerateTangentSpaceTriangleIndexFunctor::orthonormalize()
 
 	for (size_t vertexIndex = 0; vertexIndex < numVertices; ++vertexIndex)
 	{
-		orthnormalize((*m_normalArray)[vertexIndex], (*m_tangentArray)[vertexIndex], (*m_bitangentArray)[vertexIndex],
+		orthnormalize((*m_normalArray)[vertexIndex], &(*m_tangentArray)[vertexIndex], &(*m_bitangentArray)[vertexIndex],
 					  m_createOrthonormalBasis);
 	}
 }
@@ -222,14 +222,16 @@ void TangentSpaceGenerator::generateTangentSpace(osg::Geometry* geometry, int te
 		return;
 	}
 
-	osg::Vec2Array* textureCoordArray = dynamic_cast<osg::Vec2Array*>(geometry->getTexCoordArray(textureCoordUnit));
+	osg::Vec2Array* textureCoordArray =
+		dynamic_cast<osg::Vec2Array*>(geometry->getTexCoordArray(textureCoordUnit));
 	if (!textureCoordArray || textureCoordArray->size() != vertexArray->size())
 	{
 		SURGSIM_LOG_WARNING(logger) << "No Texture Coordinates found, could not produce tangents.";
 		return;
 	}
 
-	osg::Vec4Array* tangentArray = dynamic_cast<osg::Vec4Array*>(geometry->getVertexAttribArray(tangentAttribIndex));
+	osg::Vec4Array* tangentArray =
+		dynamic_cast<osg::Vec4Array*>(geometry->getVertexAttribArray(tangentAttribIndex));
 	if (!tangentArray || (tangentArray && tangentArray->size() != vertexArray->size()))
 	{
 		tangentArray = new osg::Vec4Array(vertexArray->size());
@@ -237,7 +239,8 @@ void TangentSpaceGenerator::generateTangentSpace(osg::Geometry* geometry, int te
 		geometry->setVertexAttribBinding(tangentAttribIndex, osg::Geometry::BIND_PER_VERTEX);
 	}
 
-	osg::Vec4Array* bitangentArray = dynamic_cast<osg::Vec4Array*>(geometry->getVertexAttribArray(bitangentAttribIndex));
+	osg::Vec4Array* bitangentArray =
+		dynamic_cast<osg::Vec4Array*>(geometry->getVertexAttribArray(bitangentAttribIndex));
 	if (!bitangentArray || (bitangentArray && bitangentArray->size() != vertexArray->size()))
 	{
 		bitangentArray = new osg::Vec4Array(vertexArray->size());
