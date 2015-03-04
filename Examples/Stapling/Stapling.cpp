@@ -152,16 +152,24 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	physicsRepresentation->setDensity(8050); // Stainless steel (in Kg.m-3)
 	physicsRepresentation->setShape(meshShapeForCollision);
 
-
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	std::shared_ptr<InputComponent> inputComponent = std::make_shared<InputComponent>("InputComponent");
 	inputComponent->setDeviceName(deviceName);
+	SurgSim::Math::RigidTransform3d deviceTransform =
+		SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.0, 0.01, 0.0));
+	inputComponent->setLocalPose(deviceTransform);
+
+	std::shared_ptr<SurgSim::Input::OutputComponent> outputComponent =
+		std::make_shared<SurgSim::Input::OutputComponent>("OutputComponent");
+	outputComponent->setDeviceName(deviceName);
+	outputComponent->setLocalPose(deviceTransform);
 
 	std::shared_ptr<VirtualToolCoupler> inputVTC = std::make_shared<VirtualToolCoupler>("VTC");
 	inputVTC->setInput(inputComponent);
+	inputVTC->setOutput(outputComponent);
 	inputVTC->setRepresentation(physicsRepresentation);
 	inputVTC->overrideAttachmentPoint(Vector3d::Zero());
 	inputVTC->setCalculateInertialTorques(false);
@@ -187,9 +195,11 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(collisionRepresentation);
 	sceneElement->addComponent(meshShapeVisualization);
 	sceneElement->addComponent(inputComponent);
+	sceneElement->addComponent(outputComponent);
 	sceneElement->addComponent(inputVTC);
 	sceneElement->addComponent(staplerBehavior);
 	sceneElement->addComponent(visualizeContactsBehavior);
+	sceneElement->setPose(deviceTransform);
 
 	// Load the graphical parts of a stapler.
 	sceneElement->addComponent(createSceneryObject("Handle",    "Geometry/stapler_handle.obj"));
@@ -284,7 +294,7 @@ std::shared_ptr<OsgViewElement> createViewElement()
 {
 	auto result = std::make_shared<OsgViewElement>("StaplingDemoView");
 	result->enableManipulator(true);
-	result->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
+	result->setManipulatorParameters(Vector3d(0.0, 0.3, 0.3), Vector3d::Zero());
 	result->enableKeyboardDevice(true);
 
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
@@ -389,13 +399,10 @@ int main(int argc, char* argv[])
 	auto shader = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
 	SURGSIM_ASSERT(shader != nullptr) << "Shader could not be loaded.";
 
-	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
 	auto material = createShinyMaterial(*runtime->getApplicationData(), shader);
 	std::shared_ptr<SceneElement> arm = createArmSceneElement("arm", material);
-	arm->setPose(armPose);
 
 	std::shared_ptr<SceneElement> stapler = createStaplerSceneElement("stapler", deviceName);
-	stapler->setPose(RigidTransform3d::Identity());
 
 	std::string woundFilename = std::string("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
@@ -410,7 +417,6 @@ int main(int argc, char* argv[])
 							  woundFilename,
 							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
 							  material);
-	wound->setPose(armPose);
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
 	keyboardComponent->setDeviceName("Keyboard"); // Name of device is case sensitive.
