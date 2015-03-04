@@ -70,6 +70,13 @@ public:
 	/// \return	True if this representation is rendered as a wireframe; false if not.
 	virtual bool getDrawAsWireFrame() const = 0;
 
+	/// Enable or disable the generation of tangents.
+	/// \param value true enables tangent generation, false otherwise
+	virtual void setGenerateTangents(bool value) = 0;
+
+	/// \return whether tangent generation is on or off
+	virtual bool isGeneratingTangents() const = 0;
+
 	/// Updates the representation
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt) = 0;

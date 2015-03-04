@@ -35,6 +35,9 @@ Representation::Representation(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, DrawAsWireFrame,
 									  getDrawAsWireFrame, setDrawAsWireFrame);
 
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, GenerateTangents,
+									  isGeneratingTangents, setGenerateTangents);
+
 	addGroupReference(DefaultGroupName);
 }
 
