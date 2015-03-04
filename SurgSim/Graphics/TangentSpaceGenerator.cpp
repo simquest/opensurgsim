@@ -31,7 +31,6 @@ GenerateTangentSpaceTriangleIndexFunctor::GenerateTangentSpaceTriangleIndexFunct
 	m_textureCoordArray(0),
 	m_tangentArray(0),
 	m_bitangentArray(0),
-	m_isDeformableArray(0),
 	m_createOrthonormalBasis(false)
 {
 }
@@ -45,17 +44,18 @@ bool GenerateTangentSpaceTriangleIndexFunctor::getBasisOrthonormality()
 	return m_createOrthonormalBasis;
 }
 
-void GenerateTangentSpaceTriangleIndexFunctor::set(const osg::Vec3Array* vertexArray, const osg::Vec3Array* normalArray,
-		const osg::Vec2Array* textureCoordArray,
-		osg::Vec4Array* tangentArray, osg::Vec4Array* bitangentArray,
-		const osg::UShortArray* isDeformable)
+void GenerateTangentSpaceTriangleIndexFunctor::set(
+	const osg::Vec3Array* vertexArray,
+	const osg::Vec3Array* normalArray,
+	const osg::Vec2Array* textureCoordArray,
+	osg::Vec4Array* tangentArray,
+	osg::Vec4Array* bitangentArray)
 {
 	m_vertexArray = vertexArray;
 	m_normalArray = normalArray;
 	m_textureCoordArray = textureCoordArray;
 	m_tangentArray = tangentArray;
 	m_bitangentArray = bitangentArray;
-	m_isDeformableArray = isDeformable;
 
 	size_t numVertices = m_vertexArray->size();
 
@@ -69,12 +69,6 @@ void GenerateTangentSpaceTriangleIndexFunctor::set(const osg::Vec3Array* vertexA
 	SURGSIM_ASSERT(m_bitangentArray != nullptr) <<  "Need bitangent array to store tangent space!";
 	SURGSIM_ASSERT(m_bitangentArray->size() == numVertices)
 			<< "Size of bitangent array must match the number of vertices to generate tangent space!";
-	if (m_isDeformableArray != nullptr)
-	{
-		SURGSIM_ASSERT(m_isDeformableArray->size() == numVertices)
-				<< "Size of vertex deformability array must match the number of vertices!";
-
-	}
 }
 
 inline void orthnormalize(const osg::Vec3& normal, osg::Vec4& tangent, osg::Vec4& bitangent,
@@ -112,24 +106,10 @@ void GenerateTangentSpaceTriangleIndexFunctor::orthonormalize()
 {
 	size_t numVertices = m_vertexArray->size();
 
-	if (m_isDeformableArray)
+	for (size_t vertexIndex = 0; vertexIndex < numVertices; ++vertexIndex)
 	{
-		for (size_t vertexIndex = 0; vertexIndex < numVertices; ++vertexIndex)
-		{
-			if ((*m_isDeformableArray)[vertexIndex])
-			{
-				orthnormalize((*m_normalArray)[vertexIndex], (*m_tangentArray)[vertexIndex], (*m_bitangentArray)[vertexIndex],
-							  m_createOrthonormalBasis);
-			}
-		}
-	}
-	else
-	{
-		for (size_t vertexIndex = 0; vertexIndex < numVertices; ++vertexIndex)
-		{
-			orthnormalize((*m_normalArray)[vertexIndex], (*m_tangentArray)[vertexIndex], (*m_bitangentArray)[vertexIndex],
-						  m_createOrthonormalBasis);
-		}
+		orthnormalize((*m_normalArray)[vertexIndex], (*m_tangentArray)[vertexIndex], (*m_bitangentArray)[vertexIndex],
+					  m_createOrthonormalBasis);
 	}
 }
 
@@ -137,24 +117,10 @@ void GenerateTangentSpaceTriangleIndexFunctor::reset()
 {
 	size_t numVertices = m_vertexArray->size();
 
-	if (m_isDeformableArray)
+	for (size_t vertexIndex = 0; vertexIndex < numVertices; ++vertexIndex)
 	{
-		for (size_t vertexIndex = 0; vertexIndex < numVertices; ++vertexIndex)
-		{
-			if ((*m_isDeformableArray)[vertexIndex])
-			{
-				(*m_tangentArray)[vertexIndex].set(0.0f, 0.0f, 0.0f, 0.0f);
-				(*m_bitangentArray)[vertexIndex].set(0.0f, 0.0f, 0.0f, 0.0f);
-			}
-		}
-	}
-	else
-	{
-		for (size_t vertexIndex = 0; vertexIndex < numVertices; ++vertexIndex)
-		{
-			(*m_tangentArray)[vertexIndex].set(0.0f, 0.0f, 0.0f, 0.0f);
-			(*m_bitangentArray)[vertexIndex].set(0.0f, 0.0f, 0.0f, 0.0f);
-		}
+		(*m_tangentArray)[vertexIndex].set(0.0f, 0.0f, 0.0f, 0.0f);
+		(*m_bitangentArray)[vertexIndex].set(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 }
 
@@ -190,32 +156,21 @@ void GenerateTangentSpaceTriangleIndexFunctor::operator()(unsigned int vertexInd
 	osg::Vec4 tangent((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r, 0.0f);
 	osg::Vec4 bitangent((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r, 0.0f);
 
-	if (!m_isDeformableArray || (m_isDeformableArray && (*m_isDeformableArray)[vertexIndex1]))
-	{
-		(*m_tangentArray)[vertexIndex1] += tangent;
-		(*m_bitangentArray)[vertexIndex1] += bitangent;
-	}
+	(*m_tangentArray)[vertexIndex1] += tangent;
+	(*m_bitangentArray)[vertexIndex1] += bitangent;
 
-	if (!m_isDeformableArray || (m_isDeformableArray && (*m_isDeformableArray)[vertexIndex2]))
-	{
-		(*m_tangentArray)[vertexIndex2] += tangent;
-		(*m_bitangentArray)[vertexIndex2] += bitangent;
-	}
+	(*m_tangentArray)[vertexIndex2] += tangent;
+	(*m_bitangentArray)[vertexIndex2] += bitangent;
 
-	if (!m_isDeformableArray || (m_isDeformableArray && (*m_isDeformableArray)[vertexIndex3]))
-	{
-		(*m_tangentArray)[vertexIndex3] += tangent;
-		(*m_bitangentArray)[vertexIndex3] += bitangent;
-	}
+	(*m_tangentArray)[vertexIndex3] += tangent;
+	(*m_bitangentArray)[vertexIndex3] += bitangent;
 }
 
-TangentSpaceGenerator::TangentSpaceGenerator(int textureCoordUnit, int tangentAttribIndex, int bitangentAttribIndex,
-		int isDeformableAttribIndex) :
+TangentSpaceGenerator::TangentSpaceGenerator(int textureCoordUnit, int tangentAttribIndex, int bitangentAttribIndex) :
 	osg::NodeVisitor(),
 	m_textureCoordUnit(textureCoordUnit),
 	m_tangentAttribIndex(tangentAttribIndex),
-	m_bitangentAttribIndex(bitangentAttribIndex),
-	m_isDeformableAttribIndex(isDeformableAttribIndex)
+	m_bitangentAttribIndex(bitangentAttribIndex)
 {
 	setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 }
@@ -241,14 +196,14 @@ void TangentSpaceGenerator::apply(osg::Geode& geode)
 		if (geometry)
 		{
 			generateTangentSpace(geometry, m_textureCoordUnit, m_tangentAttribIndex, m_bitangentAttribIndex,
-								 m_createOrthonormalBasis, m_isDeformableAttribIndex);
+								 m_createOrthonormalBasis);
 		}
 	}
 }
 
 void TangentSpaceGenerator::generateTangentSpace(osg::Geometry* geometry, int textureCoordUnit, int tangentAttribIndex,
 		int bitangentAttribIndex,
-		bool orthonormal, int isDeformableAttribIndex)
+		bool orthonormal)
 {
 
 	auto logger = SurgSim::Framework::Logger::getLogger("Graphics/TangetSpaceGenerator");
@@ -274,15 +229,12 @@ void TangentSpaceGenerator::generateTangentSpace(osg::Geometry* geometry, int te
 		return;
 	}
 
-	bool needToGenerateAllTangents = false;
-
 	osg::Vec4Array* tangentArray = dynamic_cast<osg::Vec4Array*>(geometry->getVertexAttribArray(tangentAttribIndex));
 	if (!tangentArray || (tangentArray && tangentArray->size() != vertexArray->size()))
 	{
 		tangentArray = new osg::Vec4Array(vertexArray->size());
 		geometry->setVertexAttribArray(tangentAttribIndex, tangentArray);
 		geometry->setVertexAttribBinding(tangentAttribIndex, osg::Geometry::BIND_PER_VERTEX);
-		needToGenerateAllTangents = true;
 	}
 
 	osg::Vec4Array* bitangentArray = dynamic_cast<osg::Vec4Array*>(geometry->getVertexAttribArray(bitangentAttribIndex));
@@ -291,18 +243,11 @@ void TangentSpaceGenerator::generateTangentSpace(osg::Geometry* geometry, int te
 		bitangentArray = new osg::Vec4Array(vertexArray->size());
 		geometry->setVertexAttribArray(bitangentAttribIndex, bitangentArray);
 		geometry->setVertexAttribBinding(bitangentAttribIndex, osg::Geometry::BIND_PER_VERTEX);
-		needToGenerateAllTangents = true;
-	}
-
-	const osg::UShortArray* isDeformableArray = 0;
-	if (isDeformableAttribIndex >= 0 && !needToGenerateAllTangents)
-	{
-		isDeformableArray = static_cast<osg::UShortArray*>(geometry->getVertexAttribArray(isDeformableAttribIndex));
 	}
 
 	osg::TriangleIndexFunctor<GenerateTangentSpaceTriangleIndexFunctor> tangentSpaceGenerator;
 	tangentSpaceGenerator.setBasisOrthonormality(orthonormal);
-	tangentSpaceGenerator.set(vertexArray, normalArray, textureCoordArray, tangentArray, bitangentArray, isDeformableArray);
+	tangentSpaceGenerator.set(vertexArray, normalArray, textureCoordArray, tangentArray, bitangentArray);
 	tangentSpaceGenerator.reset();
 	geometry->accept(tangentSpaceGenerator);
 	tangentSpaceGenerator.orthonormalize();

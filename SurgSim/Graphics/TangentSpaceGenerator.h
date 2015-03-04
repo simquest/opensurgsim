@@ -24,6 +24,7 @@ public:
 	/// otherwise, each tangent is separately orthonormal to the normal, but not to each other
 	/// \param orthonomal Whether or not to create a fully orthonormal basis
 	void setBasisOrthonormality(bool orthonormal);
+
 	/// \return Gets whether the three tangent space basis vectors are made to be orthonormal; otherwise,
 	/// each tangent is separately orthonormal to the normal, but not to each other
 	bool getBasisOrthonormality();
@@ -34,14 +35,11 @@ public:
 	/// \param textureCoordArray Array containing texture coordinates
 	/// \param tangentArray Array to store calculated tangents
 	/// \param bitangentArray Array to store calculated bitangents
-	/// \param isDeformableArray Array containing whether each vertex is deformable and should have its tangent space
-	///        updated; if not provided all vertex tangent space basis vectors are updated
 	void set(const osg::Vec3Array* vertexArray,
 			 const osg::Vec3Array* normalArray,
 			 const osg::Vec2Array* textureCoordArray,
 			 osg::Vec4Array* tangentArray,
-			 osg::Vec4Array* bitangentArray,
-			 const osg::UShortArray* isDeformableArray = 0);
+			 osg::Vec4Array* bitangentArray);
 
 	/// Orthogonalize and normalize the calculated tangent space basis vectors
 	void orthonormalize();
@@ -72,10 +70,6 @@ private:
 	/// Array storing calculated bitangents
 	osg::Vec4Array* m_bitangentArray;
 
-	/// Array containing whether each vertex is deformable and should have its tangent space vectors updated;
-	/// if not specified all vertex tangent space vectors are updated
-	const osg::UShortArray* m_isDeformableArray;
-
 	/// Whether or not to create a fully orthonormal basis; otherwise, each tangent is separately orthonormal
 	/// to the normal, but not to eachother
 	bool m_createOrthonormalBasis;
@@ -90,12 +84,9 @@ public:
 	/// \param textureCoordUnit Texture unit of texture coordinates to use for calculating the tangent space
 	/// \param tangentAttribIndex Index of the vertex attribute array to store the calculated tangents
 	/// \param bitangentAttribIndex Index of the vertex attribute array to store the calculated bitangents
-	/// \param isDeformableAttribIndex Vertex attribute index for the array containing whether each vertex is deformable
-	///		If isDeformableAttribIndex is negative, all vertex normals are calculated, replacing any existing normals.
-	///		Otherwise, only deformable vertices, as specified in the specified vertex attribute array, have their normals updated.
-	TangentSpaceGenerator(int textureCoordUnit, int tangentAttribIndex, int bitangentAttribIndex,
-						  int isDeformableAttribIndex = -1);
-	//! Destructor
+	TangentSpaceGenerator(int textureCoordUnit, int tangentAttribIndex, int bitangentAttribIndex);
+
+	/// Destructor
 	virtual ~TangentSpaceGenerator();
 
 	/// Sets whether the three tangent space basis vectors are made to be orthonormal;
@@ -118,16 +109,11 @@ public:
 	/// \param bitangentAttribIndex Index of the vertex attribute array to store the calculated bi-tangents
 	/// \param orthonormal  Whether or not to create a fully orthonormal basis; otherwise, each tangent is separately
 	///        orthonormal to the normal, but not to each other
-	/// \param isDeformableAttribIndex Index of the vertex attribute array containing whether each vertex is deformable
-	///			If isDeformableAttribIndex is negative, all vertex tangent space basis vectors are calculated,
-	///         replacing any existing tangent space basis vectors.
-	///         Otherwise, only deformable vertices have their tangent space basis vectors updated.
 	static void generateTangentSpace(osg::Geometry* geometry,
 									 int textureCoordUnit,
 									 int tangentAttribIndex,
 									 int bitangentAttribIndex,
-									 bool orthonormal,
-									 int isDeformableAttribIndex = -1);
+									 bool orthonormal);
 
 private:
 	/// Texture unit of texture coordinates to use for calculating the tangent space
@@ -138,11 +124,6 @@ private:
 
 	/// Index of the vertex attribute array to store the calculated bitangents
 	int m_bitangentAttribIndex;
-
-	/// Index of the vertex attribute array containing whether each vertex is deformable
-	/// If negative, all vertex tangent space basis vectors are calculated, replacing any existing tangent space
-	///  basis vectors. Otherwise, only deformable vertices have their tangent space basis vectors updated.
-	int m_isDeformableAttribIndex;
 
 	/// Whether or not to create a fully orthonormal basis; otherwise, each tangent is separately orthonormal to
 	/// the normal, but not to eachother
