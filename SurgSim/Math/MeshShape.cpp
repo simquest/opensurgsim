@@ -73,6 +73,7 @@ bool MeshShape::calculateNormals()
 
 bool MeshShape::doUpdate()
 {
+	updateAabbTree();
 	return calculateNormals();
 }
 

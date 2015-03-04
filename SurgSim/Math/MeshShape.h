@@ -96,9 +96,6 @@ public:
 	/// \return true on success.
 	bool setPose(const SurgSim::Math::RigidTransform3d& pose);
 
-	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
-	void updateAabbTree();
-
 	/// Get the AabbTree
 	/// \return The object's associated AabbTree
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree();
@@ -113,6 +110,9 @@ protected:
 	/// \note Normals will be normalized.
 	/// \return true on success, or false if any triangle has an indeterminate normal.
 	bool calculateNormals();
+
+	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void updateAabbTree();
 
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.

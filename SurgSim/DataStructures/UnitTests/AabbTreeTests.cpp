@@ -210,8 +210,9 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
 	meshB->setPose(rhsPose);
 
-	meshA->updateAabbTree();
-	meshB->updateAabbTree();
+	// update the AABB trees
+	meshA->update();
+	meshB->update();
 
 	auto aabbA = meshA->getAabbTree();
 	auto aabbB = meshB->getAabbTree();

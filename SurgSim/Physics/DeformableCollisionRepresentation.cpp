@@ -58,7 +58,6 @@ void DeformableCollisionRepresentation::update(const double& dt)
 	{
 		m_shape->setVertexPosition(nodeId, odeState->getPosition(nodeId));
 	}
-	m_shape->updateAabbTree();
 	if (!m_shape->update())
 	{
 		setLocalActive(false);
