@@ -165,8 +165,6 @@ void addSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdC
 }
 
 /// Helper method to add a sub-matrix into a matrix, for the sake of clarity
-/// \tparam Matrix The matrix type
-/// \tparam SubMatrix The sub-matrix type
 /// \param subMatrix The sub-matrix
 /// \param blockIdRow, blockIdCol The block indices in matrix
 /// \param blockSizeRow, blockSizeCol The block size (size of the sub-matrix)
@@ -174,6 +172,36 @@ void addSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdC
 /// \note This is a specialization of addSubMatrix for sparse matrices.
 template <>
 inline void addSubMatrix(const SparseMatrix& subMatrix, size_t blockIdRow, size_t blockIdCol,
+						 size_t blockSizeRow, size_t blockSizeCol, SparseMatrix* matrix)
+{
+	typedef Eigen::Triplet<double> T;
+	std::vector<T> tripletList;
+	tripletList.reserve(36);
+
+	SurgSim::Math::SparseMatrix dSparse(matrix->rows(), matrix->cols());
+
+	for (size_t row = 0; row < blockSizeRow; ++row)
+	{
+		for (size_t col = 0; col < blockSizeCol; ++col)
+		{
+			tripletList.push_back(T((blockSizeRow * blockIdRow) + row, (blockSizeCol * blockIdCol) + col,
+									subMatrix.coeff(row, col)));
+		}
+	}
+
+	dSparse.setFromTriplets(tripletList.begin(), tripletList.end());
+	*matrix += dSparse;
+}
+
+
+/// Helper method to add a sub-matrix into a matrix, for the sake of clarity
+/// \param subMatrix The sub-matrix
+/// \param blockIdRow, blockIdCol The block indices in matrix
+/// \param blockSizeRow, blockSizeCol The block size (size of the sub-matrix)
+/// \param[out] matrix The matrix to add the sub-matrix into
+/// \note This is a specialization of addSubMatrix for sparse matrices with a dense submatrix.
+template <>
+inline void addSubMatrix(const Matrix& subMatrix, size_t blockIdRow, size_t blockIdCol,
 						 size_t blockSizeRow, size_t blockSizeCol, SparseMatrix* matrix)
 {
 	typedef Eigen::Triplet<double> T;
@@ -222,8 +250,6 @@ void addSubMatrix(const SubMatrix& subMatrix, const std::vector<size_t> blockIds
 }
 
 /// Helper method to add a sub-matrix made of squared-blocks into a matrix, for the sake of clarity
-/// \tparam Matrix The matrix type
-/// \tparam SubMatrix The sub-matrix type
 /// \param subMatrix The sub-matrix (containing all the squared-blocks)
 /// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
 /// \param blockSize The blocks size
@@ -231,6 +257,44 @@ void addSubMatrix(const SubMatrix& subMatrix, const std::vector<size_t> blockIds
 /// \note This is a specialization of addSubMatrix for sparse matrices.
 template <>
 inline void addSubMatrix(const SparseMatrix& subMatrix, const std::vector<size_t> blockIds,
+						 size_t blockSize, SparseMatrix* matrix)
+{
+	const size_t numBlocks = blockIds.size();
+
+	typedef Eigen::Triplet<double> T;
+	std::vector<T> tripletList;
+	tripletList.reserve(36);
+
+	SurgSim::Math::SparseMatrix dSparse(matrix->rows(), matrix->cols());
+
+	for (size_t block0 = 0; block0 < numBlocks; block0++)
+	{
+		size_t blockId0 = blockIds[block0];
+
+		for (size_t block1 = 0; block1 < numBlocks; block1++)
+		{
+			size_t blockId1 = blockIds[block1];
+
+			for (int row = 0; row < blockSize; ++row)
+			{
+				for (int col = 0; col < blockSize; ++col)
+				{
+					tripletList.push_back(T(blockSize * blockId0 + row,  blockSize * blockId1 + col,
+											subMatrix.coeff(row, col)));
+				}
+			}
+		}
+	}
+}
+
+/// Helper method to add a sub-matrix made of squared-blocks into a matrix, for the sake of clarity
+/// \param subMatrix The sub-matrix (containing all the squared-blocks)
+/// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
+/// \param blockSize The blocks size
+/// \param[out] matrix The matrix to add the sub-matrix blocks into
+/// \note This is a specialization of addSubMatrix for sparse matrices with a dense submatrix.
+template <>
+inline void addSubMatrix(const Matrix& subMatrix, const std::vector<size_t> blockIds,
 						 size_t blockSize, SparseMatrix* matrix)
 {
 	const size_t numBlocks = blockIds.size();
@@ -293,6 +357,64 @@ Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, size_t blockIdRow, size_t bloc
 								  size_t blockSizeRow, size_t blockSizeCol)
 {
 	return matrix.block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol);
+}
+
+/// Helper method to zero a row of a matrix.
+/// \tparam Matrix The matrix type
+/// \param row The row to set to zero
+/// \param[out] matrix The matrix to set the zero row on.
+template <class Matrix>
+void zeroRow(size_t row, Matrix* matrix)
+{
+	matrix->middleRows(row, 1).setZero();
+}
+
+/// Helper method to zero a row of a matrix specialized for Sparse Matrices
+/// \param row The row to set to zero
+/// \param[out] matrix The matrix to set the zero row on.
+/// \note TODO: This can be made more efficient for either Compressed Sparse Row, or
+/// \note Compressed Sparse Column by taking better advantage of the storage format.
+/// \note Alternately, moving the boundary condition calculation so that it is determined
+/// \note before the sparse matrix is generates could also improve performance.
+template <>
+inline void zeroRow(size_t row, SparseMatrix* matrix)
+{
+	for (int column = 0; column < matrix->cols(); ++column)
+	{
+		if (matrix->coeff(row, column))
+		{
+			matrix->coeffRef(row, column) = 0;
+		}
+	}
+}
+
+/// Helper method to zero a row of a matrix.
+/// \tparam Matrix The matrix type
+/// \param row The row to set to zero
+/// \param[out] matrix The matrix to set the zero row on.
+template <class Matrix>
+void zeroColumn(size_t column, Matrix* matrix)
+{
+	(*matrix).middleCols(column, 1).setZero();
+}
+
+/// Helper method to zero a row of a matrix specialized for Sparse Matrices
+/// \param row The row to set to zero
+/// \param[out] matrix The matrix to set the zero row on.
+/// \note TODO: This can be made more efficient for either Compressed Sparse Row, or
+/// \note Compressed Sparse Column by taking better advantage of the storage format.
+/// \note Alternately, moving the boundary condition calculation so that it is determined
+/// \note before the sparse matrix is generates could also improve performance.
+template <>
+inline void zeroColumn(size_t column, SparseMatrix* matrix)
+{
+	for (int row = 0; row < matrix->rows(); ++row)
+	{
+		if (matrix->coeff(row, column))
+		{
+			matrix->coeffRef(row, column) = 0;
+		}
+	}
 }
 
 };  // namespace Math

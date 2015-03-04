@@ -128,7 +128,9 @@ public:
 	MassPointsForStatic() :
 		m_f(9),
 		m_gravityForce(9),
-		m_K(9, 9)
+		m_D(9, 9),
+		m_K(9, 9),
+		m_M(9, 9)
 	{
 		m_f.setZero();
 		m_K.setZero();

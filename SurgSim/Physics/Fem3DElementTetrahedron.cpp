@@ -155,9 +155,10 @@ void Fem3DElementTetrahedron::computeMass(const SurgSim::Math::OdeState& state,
 void Fem3DElementTetrahedron::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
 									  double scale /*= 1.0*/)
 {
-	/* TODO:
-	addSubMatrix(m_M * scale, m_nodeIds, 3, M);
-	*/
+	// TODO:
+	//	addSubMatrix((Eigen::Ref<Eigen::Matrix<double, 12, 12>>&)(m_M * scale), m_nodeIds, 3, M);
+	Math::Matrix scaledMatrix = m_M * scale;
+	addSubMatrix(scaledMatrix, m_nodeIds, 3, M);
 }
 
 void Fem3DElementTetrahedron::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,

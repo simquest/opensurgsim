@@ -37,9 +37,10 @@ void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* n
 	//   K.(x(t+dt) - x(0)) = Fext
 
 	// Computes f(t, x(t), v(t)) and K
-	const Matrix& K = m_equation.computeK(currentState);
+	const SparseMatrix& K = m_equation.computeK(currentState);
 	Vector& f = m_equation.computeF(currentState);
 
+	//m_systemMatrix.resize(K.rows(), K.cols());
 	m_systemMatrix = K;
 
 	// Apply boundary conditions to the linear system

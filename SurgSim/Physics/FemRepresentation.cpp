@@ -211,8 +211,10 @@ SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState
 const SurgSim::Math::SparseMatrix& FemRepresentation::computeM(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the mass matrix has been properly allocated and zeroed out
-	m_M.setZero();
+	m_M.resize(state.getNumDof(), state.getNumDof());
 
+	std::cout << "State has " << state.getNumDof() << " matrix is: " << m_M.rows() << "x" << m_M.cols() <<
+			  std::endl;
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
 		(*femElement)->addMass(state, &m_M);
@@ -227,7 +229,7 @@ const SurgSim::Math::SparseMatrix& FemRepresentation::computeD(const SurgSim::Ma
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.setZero();
+	m_D.resize(state.getNumDof(), state.getNumDof());
 
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
@@ -265,7 +267,7 @@ const SurgSim::Math::SparseMatrix& FemRepresentation::computeD(const SurgSim::Ma
 const SurgSim::Math::SparseMatrix& FemRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.setZero();
+	m_K.resize(state.getNumDof(), state.getNumDof());
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
@@ -289,13 +291,13 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSi
 	m_f.setZero(state.getNumDof());
 
 	// Make sure the mass matrix has been properly allocated and zeroed out
-	m_M.setZero();
+	m_M.resize(state.getNumDof(), state.getNumDof());
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.setZero();
+	m_D.resize(state.getNumDof(), state.getNumDof());
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.setZero();
+	m_K.resize(state.getNumDof(), state.getNumDof());
 
 	// Add all the FemElement contribution to f, M, D, K
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)

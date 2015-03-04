@@ -45,7 +45,7 @@ std::shared_ptr<LinearSolveAndInverse> OdeSolver::getLinearSolver() const
 	return m_linearSolver;
 }
 
-const Matrix& OdeSolver::getSystemMatrix() const
+const SparseMatrix& OdeSolver::getSystemMatrix() const
 {
 	return m_systemMatrix;
 }

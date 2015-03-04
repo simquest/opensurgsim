@@ -21,6 +21,8 @@
 
 #include <gtest/gtest.h>
 
+#include <Eigen/LU> 		// needed for determinant() and inverse()
+
 #include "SurgSim/Math/OdeSolverStatic.h"
 #include "SurgSim/Math/OdeSolverLinearStatic.h"
 #include "SurgSim/Math/UnitTests/MockObject.h"
@@ -62,8 +64,10 @@ void doSolveTest()
 	EXPECT_NE(defaultState, newState);
 
 	// Solve manually K.(x - x0) = Fext
-	const Vector &Fext = m.getExternalForces();
-	Vector expectedDeltaX = m.computeK(currentState).inverse() * Fext;
+	Eigen::SparseLU<SparseMatrix> eigenSolver;
+	const Vector& Fext = m.getExternalForces();
+	eigenSolver.compute(m.computeK(currentState));
+	Eigen::VectorXd expectedDeltaX = eigenSolver.solve(Fext);
 	Vector expectedX = defaultState.getPositions() + expectedDeltaX;
 	EXPECT_TRUE(newState.getPositions().isApprox(expectedX));
 }

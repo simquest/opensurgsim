@@ -33,7 +33,8 @@ namespace Math
 
 /// The diverse numerical integration scheme supported
 /// Each Ode Solver should have its own entry in this enum
-enum IntegrationScheme {
+enum IntegrationScheme
+{
 	INTEGRATIONSCHEME_STATIC = 0,
 	INTEGRATIONSCHEME_LINEAR_STATIC,
 	INTEGRATIONSCHEME_EXPLICIT_EULER,
@@ -47,17 +48,17 @@ enum IntegrationScheme {
 };
 
 const std::unordered_map<IntegrationScheme, std::string, std::hash<int>> IntegrationSchemeNames =
-	boost::assign::map_list_of
-	(INTEGRATIONSCHEME_STATIC, "INTEGRATIONSCHEME_STATIC")
-	(INTEGRATIONSCHEME_LINEAR_STATIC, "INTEGRATIONSCHEME_LINEAR_STATIC")
-	(INTEGRATIONSCHEME_EXPLICIT_EULER, "INTEGRATIONSCHEME_EXPLICIT_EULER")
-	(INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER")
-	(INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER, "INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER")
-	(INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER")
-	(INTEGRATIONSCHEME_IMPLICIT_EULER, "INTEGRATIONSCHEME_IMPLICIT_EULER")
-	(INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER")
-	(INTEGRATIONSCHEME_RUNGE_KUTTA_4, "INTEGRATIONSCHEME_RUNGE_KUTTA_4")
-	(INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4, "INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4");
+			boost::assign::map_list_of
+			(INTEGRATIONSCHEME_STATIC, "INTEGRATIONSCHEME_STATIC")
+			(INTEGRATIONSCHEME_LINEAR_STATIC, "INTEGRATIONSCHEME_LINEAR_STATIC")
+			(INTEGRATIONSCHEME_EXPLICIT_EULER, "INTEGRATIONSCHEME_EXPLICIT_EULER")
+			(INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER")
+			(INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER, "INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER")
+			(INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER")
+			(INTEGRATIONSCHEME_IMPLICIT_EULER, "INTEGRATIONSCHEME_IMPLICIT_EULER")
+			(INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER")
+			(INTEGRATIONSCHEME_RUNGE_KUTTA_4, "INTEGRATIONSCHEME_RUNGE_KUTTA_4")
+			(INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4, "INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4");
 
 /// Base class for all solvers of ode equation of order 2 of the form \f$M(x(t), v(t)).a(t) = f(t, x(t), v(t))\f$. <br>
 /// This ode equation is solved as an ode of order 1 by defining the state vector
@@ -104,7 +105,7 @@ public:
 
 	/// Queries the current system matrix
 	/// \return The latest system matrix calculated
-	const Matrix& getSystemMatrix() const;
+	const SparseMatrix& getSystemMatrix() const;
 
 	/// Queries the current compliance matrix
 	/// \return The latest compliance matrix calculated
@@ -129,7 +130,7 @@ protected:
 	/// \note A static solver will have K for system matrix
 	/// \note A dynamic explicit solver will have M for system matrix
 	/// \note A dynamic implicit solver will have a combination of M, D and K for system matrix
-	Matrix m_systemMatrix;
+	SparseMatrix m_systemMatrix;
 
 	/// Compliance matrix which is the inverse of the system matrix
 	Matrix m_compliance;

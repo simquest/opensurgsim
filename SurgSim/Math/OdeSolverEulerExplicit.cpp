@@ -37,7 +37,7 @@ void OdeSolverEulerExplicit::solve(double dt, const OdeState& currentState, OdeS
 
 	// Computes f(t, x(t), v(t)) and M
 	Vector& f = m_equation.computeF(currentState);
-	const Matrix& M = m_equation.computeM(currentState);
+	const SparseMatrix& M = m_equation.computeM(currentState);
 
 	// Computes the system matrix (left-hand-side matrix)
 	m_systemMatrix = M / dt;

@@ -80,8 +80,8 @@ void DeformableRepresentation::setInitialState(
 
 	m_hasExternalGeneralizedForce = false;
 	m_externalGeneralizedForce.setZero(getNumDof());
-	m_externalGeneralizedStiffness.setZero();
-	m_externalGeneralizedDamping.setZero();
+	m_externalGeneralizedStiffness.resize(getNumDof(), getNumDof());
+	m_externalGeneralizedDamping.resize(getNumDof(), getNumDof());
 }
 
 const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const

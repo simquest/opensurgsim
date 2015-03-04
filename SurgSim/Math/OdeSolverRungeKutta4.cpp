@@ -44,7 +44,7 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
 
 	// Computes M (stores it in m_systemMatrix to avoid dynamic re-allocation)
-	Matrix &M = (m_systemMatrix = m_equation.computeM(currentState));
+	SparseMatrix& M = (m_systemMatrix = m_equation.computeM(currentState));
 
 	// Apply the boundary conditions to the mass matrix
 	currentState.applyBoundaryConditionsToMatrix(&M);
@@ -52,7 +52,7 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	// 1st evaluate k1 (note that y(n) is currentState)
 	m_k1.velocity = currentState.getVelocities();
 	(*m_linearSolver)(M, *currentState.applyBoundaryConditionsToVector(&m_equation.computeF(currentState)),
-		&m_k1.acceleration, &(m_compliance));
+					  &m_k1.acceleration, &(m_compliance));
 
 	// Remove the boundary conditions compliance from the compliance matrix
 	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
@@ -81,9 +81,9 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 
 	// Compute the new state using Runge Kutta 4 integration scheme:
 	newState->getPositions()  = currentState.getPositions() +
-		(m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
+								(m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
 	newState->getVelocities() = currentState.getVelocities() +
-		(m_k1.acceleration + m_k4.acceleration + 2.0 * (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
+								(m_k1.acceleration + m_k4.acceleration + 2.0 * (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
 
 	// Computes the system matrix and compliance matrix
 	m_systemMatrix = M / dt;
