@@ -21,6 +21,7 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -28,6 +29,8 @@
 #include <gtest/gtest.h>
 
 #include <random>
+#include <osg/Geode>
+#include <osg/Geometry>
 
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Quaterniond;
@@ -50,6 +53,20 @@ TEST(OsgRepresentationTests, InitTest)
 
 	EXPECT_EQ("test name", representation->getName());
 	EXPECT_TRUE(representation->isActive());
+}
+
+TEST(OsgRepresentationsTests, ParameterTests)
+{
+	auto representation = std::make_shared<MockOsgRepresentation>("name");
+
+	ASSERT_NO_THROW(representation->setValue("GroupReferences", std::vector<std::string>()));
+	ASSERT_NO_THROW(representation->getValue("GroupReferences"));
+
+	ASSERT_NO_THROW(representation->setValue("DrawAsWireFrame", true));
+	ASSERT_NO_THROW(representation->getValue("DrawAsWireFrame"));
+
+	ASSERT_NO_THROW(representation->setValue("GenerateTangents", true));
+	ASSERT_NO_THROW(representation->getValue("GenerateTangents"));
 }
 
 TEST(OsgRepresentationTests, OsgNodeTest)
@@ -265,6 +282,69 @@ TEST(OsgRepresentationTests, SetGroupsTests)
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group1"));
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group2"));
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group3"));
+}
+
+class  CheckTangentsVisitor : public osg::NodeVisitor
+{
+public :
+	CheckTangentsVisitor() :
+		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN)
+	{
+	};
+
+	virtual ~CheckTangentsVisitor() {};
+
+	void apply(osg::Node& node)
+	{
+		traverse(node);
+	}
+
+	void apply(osg::Geode& geode)
+	{
+		osg::StateSet* state = nullptr;
+		unsigned int vertNum = 0;
+		unsigned int numGeoms = geode.getNumDrawables();
+
+		// Test object only has 1 geometry ...
+		if (geode.getNumDrawables() > 0)
+		{
+			osg::Geometry* curGeom = geode.getDrawable(0)->asGeometry();
+			if (curGeom)
+			{
+				osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(curGeom->getVertexArray());
+
+				auto tangents =
+					dynamic_cast<osg::Vec4Array*>(curGeom->getVertexAttribArray(TANGENT_VERTEX_ATTRIBUTE_ID));
+				ASSERT_NE(nullptr, tangents)
+						<< "Looks like no tangents where produced, or they are not of type osg::Vec4Array";
+				ASSERT_EQ(vertices->size(), tangents->size())
+						<< "Looks like number of tangents does not match number of vertices";
+
+				auto bitangents =
+					dynamic_cast<osg::Vec4Array*>(curGeom->getVertexAttribArray(BITANGENT_VERTEX_ATTRIBUTE_ID));
+				ASSERT_NE(nullptr, bitangents)
+						<< "Looks like no bitangents tangents where produced, or they are not of type osg::Vec4Array";
+				ASSERT_EQ(vertices->size(), bitangents->size())
+						<< "Looks like number of bitangents does not match number of vertices";
+
+			}
+		}
+	}
+};
+
+TEST(OsgRepresentationTests, TangentGenerationTest)
+{
+	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
+	auto scenery = std::make_shared<OsgSceneryRepresentation>("scenery");
+	scenery->loadModel("OsgRepresentationTests/sphere0_5.obj");
+
+	EXPECT_FALSE(scenery->isGeneratingTangents());
+	scenery->setGenerateTangents(true);
+	EXPECT_TRUE(scenery->isGeneratingTangents());
+
+	CheckTangentsVisitor visitor;
+
+	scenery->getOsgNode()->accept(visitor);
 }
 
 
