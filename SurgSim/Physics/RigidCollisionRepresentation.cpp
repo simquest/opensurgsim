@@ -17,6 +17,7 @@
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
@@ -44,7 +45,13 @@ void RigidCollisionRepresentation::update(const double& dt)
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getShape());
 	if (meshShape != nullptr && meshShape->isValid())
 	{
-		meshShape->setPose(getPose());
+		if (!meshShape->setPose(getPose()))
+		{
+			setLocalActive(false);
+			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/RigidCollisionRepresentation")) <<
+				"Collision representation '" << getName() <<
+				"' went inactive because its shape failed in moving to a pose of:" << std::endl << getPose().matrix();
+		}
 	}
 }
 

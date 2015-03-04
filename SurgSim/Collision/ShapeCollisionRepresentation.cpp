@@ -68,7 +68,13 @@ void ShapeCollisionRepresentation::update(const double& dt)
 	{
 		SURGSIM_LOG_IF(!meshShape->isValid(), SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
 			"Try to update an invalid MeshShape.";
-		meshShape->setPose(getPose());
+		if (!meshShape->setPose(getPose()))
+		{
+			setLocalActive(false);
+			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/ShapeCollisionRepresentation")) <<
+				"Collision representation '" << getName() <<
+				"' went inactive because its shape failed in moving to a pose of:" << std::endl << getPose().matrix();
+		}
 	}
 }
 

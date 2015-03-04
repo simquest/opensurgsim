@@ -77,7 +77,8 @@ public:
 
 	/// Calculate normals for all triangles.
 	/// \note Normals will be normalized.
-	void calculateNormals();
+	/// \return true on success, or false if any triangle has an indeterminate normal.
+	bool calculateNormals();
 
 	/// Get the volume of the shape
 	/// \note this parameter is valid with respect to the initial mesh
@@ -97,7 +98,8 @@ public:
 
 	/// Set the object's global pose
 	/// \param pose the rigid transform to apply
-	void setPose(const SurgSim::Math::RigidTransform3d& pose);
+	/// \return true on success.
+	bool setPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
 	void updateAabbTree();
@@ -109,8 +111,7 @@ public:
 	bool isValid() const override;
 
 protected:
-	void doUpdate() override;
-
+	bool doUpdate() override;
 	bool doLoad(const std::string& fileName) override;
 
 	/// Compute useful volume integrals based on the triangle mesh, which

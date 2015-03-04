@@ -58,8 +58,13 @@ void DeformableCollisionRepresentation::update(const double& dt)
 	{
 		m_shape->setVertexPosition(nodeId, odeState->getPosition(nodeId));
 	}
-	m_shape->update();
 	m_shape->updateAabbTree();
+	if (!m_shape->update())
+	{
+		setLocalActive(false);
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
+			"Collision representation '" << getName() << "' went inactive because its shape failed to update.";
+	}
 }
 
 bool DeformableCollisionRepresentation::doInitialize()
