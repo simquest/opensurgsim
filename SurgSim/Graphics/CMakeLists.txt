@@ -65,6 +65,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	RenderPass.cpp
 	Representation.cpp
 	SceneryRepresentation.cpp
+	TangentSpaceGenerator.cpp
 	TextRepresentation.cpp
 	TriangleNormalGenerator.cpp
 	View.cpp
@@ -151,6 +152,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	ScreenSpaceQuadRepresentation.h
 	SkeletonRepresentation.h
 	SphereRepresentation.h
+	TangentSpaceGenerator.h
 	TextRepresentation.h
 	Texture.h
 	Texture1d.h
