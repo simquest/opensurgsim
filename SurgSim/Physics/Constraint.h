@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_CONSTRAINT_H
 #define SURGSIM_PHYSICS_CONSTRAINT_H
 
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
@@ -32,32 +33,36 @@ namespace Physics
 class Constraint
 {
 public:
-	/// Sets all the values for this constraints, does validation on the parameters and will throw it something
+	/// Sets all the values for this constraints, does validation on the parameters and will throw if something
 	/// is wrong with the constraint.
+	/// \param constraintType The constraint type.
 	/// \param data The data for this constraint.
-	/// \param implementation0, implementation1 Both sides implementation of the constraint.
-	/// \param localization0, localization1 Both localizations of the representations involved in this constraint.
+	/// \param representation0, representation1 Both representations in this constraint.
+	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	Constraint(
+		SurgSim::Math::MlcpConstraintType constraintType,
 		std::shared_ptr<ConstraintData> data,
-		std::shared_ptr<ConstraintImplementation> implementation0,
-		std::shared_ptr<Localization> localization0,
-		std::shared_ptr<ConstraintImplementation> implementation1,
-		std::shared_ptr<Localization> localization1);
+		std::shared_ptr<Representation> representation0,
+		const SurgSim::DataStructures::Location& location0,
+		std::shared_ptr<Representation> representation1,
+		const SurgSim::DataStructures::Location& location1);
 
 	/// Destructor
 	virtual ~Constraint();
 
-	/// Sets all the values for this constraints, does validation on the parameters and will throw it something
+	/// Sets all the values for this constraints, does validation on the parameters and will throw if something
 	/// is wrong with the constraint.
+	/// \param constraintType The constraint type.
 	/// \param data The data for this constraint.
-	/// \param implementation0, implementation1 Both sides implementation of the constraint.
-	/// \param localization0, localization1 Both localizations of the representations involved in this constraint.
+	/// \param representation0, representation1 Both representations in this constraint.
+	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	void setInformation(
+		SurgSim::Math::MlcpConstraintType constraintType,
 		std::shared_ptr<ConstraintData> data,
-		std::shared_ptr<ConstraintImplementation> implementation0,
-		std::shared_ptr<Localization> localization0,
-		std::shared_ptr<ConstraintImplementation> implementation1,
-		std::shared_ptr<Localization> localization1);
+		std::shared_ptr<Representation> representation0,
+		const SurgSim::DataStructures::Location& location0,
+		std::shared_ptr<Representation> representation1,
+		const SurgSim::DataStructures::Location& location1);
 
 	/// Gets both sides implementation as a pair.
 	/// \return the pair of implementations forming this constraint.

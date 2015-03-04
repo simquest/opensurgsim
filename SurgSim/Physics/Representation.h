@@ -52,6 +52,9 @@ class Localization;
 /// The Representation class defines the base class for all physics objects
 class Representation : public SurgSim::Framework::Representation
 {
+	// Constraint is a friend to access the getConstraintImplementation().
+	friend class Constraint;
+
 public:
 	/// Constructor
 	/// \param name The representation's name
@@ -106,16 +109,6 @@ public:
 	/// \param location A location in 3d space.
 	/// \return A localization object for the given location.
 	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location);
-
-	/// Create a constraint of the given type for this representation.
-	/// \param type The type of constraint.
-	/// \param thisLocalization Localization for this representation.
-	/// \param otherLocalization Localization for the other representation.
-	/// \param constraintData The constraint data.
-	/// \return A contact constraint or nullptr.
-	std::shared_ptr<Constraint> createConstraint(SurgSim::Math::MlcpConstraintType type,
-		std::shared_ptr<Localization> thisLocalization, std::shared_ptr<Localization> otherLocalization,
-		std::shared_ptr<ConstraintData> constraintData = nullptr);
 
 	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
 	/// deltaVelocity.

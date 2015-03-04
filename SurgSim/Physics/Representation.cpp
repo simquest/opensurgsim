@@ -98,59 +98,6 @@ std::shared_ptr<Localization> Representation::createLocalization(const SurgSim::
 	return nullptr;
 }
 
-std::shared_ptr<Constraint> Representation::createConstraint(
-	SurgSim::Math::MlcpConstraintType type,
-	std::shared_ptr<Localization> thisLocalization,
-	std::shared_ptr<Localization> otherLocalization,
-	std::shared_ptr<ConstraintData> constraintData)
-{
-	if (thisLocalization == nullptr || otherLocalization == nullptr)
-	{
-		SURGSIM_LOG_SEVERE(m_logger) << getClassName() << ": Constraint cannot be created without localizations.";
-		return nullptr;
-	}
-
-	if (thisLocalization->getRepresentation() == nullptr || thisLocalization->getRepresentation().get() != this)
-	{
-		SURGSIM_LOG_SEVERE(m_logger) << getClassName() <<
-			": thisLocalization has to have a representation attached to it, and the representation" <<
-			"should be the object on which this createConstraint() is called.";
-		return nullptr;
-	}
-
-	if (otherLocalization->getRepresentation() == nullptr)
-	{
-		SURGSIM_LOG_SEVERE(m_logger) << getClassName() <<
-			": otherLocalization has to have a representation attached to it.";
-		return nullptr;
-	}
-
-	if (otherLocalization.get() == thisLocalization.get())
-	{
-		SURGSIM_LOG_SEVERE(m_logger) << getClassName() <<
-			": otherLocalization has to be different from thisLocalization.";
-		return nullptr;
-	}
-
-	auto thisImplementation = thisLocalization->getRepresentation()->getConstraintImplementation(type);
-	auto otherImplementation = otherLocalization->getRepresentation()->getConstraintImplementation(type);
-	if (thisImplementation != nullptr && otherImplementation != nullptr)
-	{
-		if (constraintData == nullptr)
-		{
-			constraintData = std::make_shared<ConstraintData>();
-		}
-		return std::make_shared<Constraint>(
-			constraintData,
-			thisImplementation,
-			thisLocalization,
-			otherImplementation,
-			otherLocalization);
-	}
-
-	return nullptr;
-}
-
 void Representation::applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
 {
 }

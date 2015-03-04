@@ -67,6 +67,12 @@ int MockRepresentation::getPostUpdateCount() const
 	return m_postUpdateCount;
 }
 
+std::shared_ptr<Localization> MockRepresentation::createLocalization(
+	const SurgSim::DataStructures::Location& location)
+{
+	return std::make_shared<MockLocalization>();
+}
+
 std::shared_ptr<ConstraintImplementation> MockRepresentation::getConstraintImplementation(
 	SurgSim::Math::MlcpConstraintType type)
 {

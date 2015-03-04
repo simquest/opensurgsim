@@ -36,6 +36,13 @@ public:
 	{
 	}
 
+	/// Copy constructor
+	/// \param other The location to be copied while constructing.
+	Location(const Location& other)
+		: rigidLocalPosition(other.rigidLocalPosition), octreeNodePath(other.octreeNodePath),
+		meshLocalCoordinate(other.meshLocalCoordinate)
+	{}
+
 	/// Constructor for rigid local position
 	/// \param localPosition The 3D local position to set this location to
 	explicit Location(const SurgSim::Math::Vector3d& localPosition)

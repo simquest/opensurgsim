@@ -86,6 +86,8 @@ public:
 
 	int getPostUpdateCount() const;
 
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
+
 	std::shared_ptr<ConstraintImplementation> getConstraintImplementation(SurgSim::Math::MlcpConstraintType type);
 };
 
@@ -405,11 +407,18 @@ public:
 inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepresentation> firstRepresentation,
 	std::shared_ptr<MockRepresentation> secondRepresentation)
 {
-	return std::make_shared<Constraint>(std::make_shared<ConstraintData>(),
-		std::make_shared<MockConstraintImplementation>(),
-		std::make_shared<MockLocalization>(firstRepresentation),
-		std::make_shared<MockConstraintImplementation>(),
-		std::make_shared<MockLocalization>(secondRepresentation));
+	using SurgSim::DataStructures::Location;
+
+	static auto type = (new MockConstraintImplementation())->getMlcpConstraintType();
+	if (firstRepresentation->getConstraintImplementation(type) == nullptr)
+	{
+		ConstraintImplementation::getFactory().addImplementation(typeid(MockRepresentation),
+			std::make_shared<MockConstraintImplementation>());
+	}
+
+	return std::make_shared<Constraint>(type, std::make_shared<ConstraintData>(),
+		firstRepresentation, Location(),
+		secondRepresentation, Location());
 }
 
 /// Class to represent a mock collision representation to test if update gets called from the Computation.
