@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
 	${gtest_SOURCE_DIR}/include
 )
@@ -25,21 +24,6 @@ set(UNIT_TEST_SOURCES
 
 set(LIBS 
 	SixenseDevice
-	SurgSimInput
-	SurgSimFramework
-	SurgSimDataStructures
-	${Boost_LIBRARIES}
-	${SIXENSESDK_LIBRARIES}
-)
-
-set(UNIT_TEST_SHARED_RELEASE_LIBS
-	${SIXENSESDK_sixense_SHARED_RELEASE}
-	${SIXENSESDK_sixense_utils_SHARED_RELEASE}
-)
-set(UNIT_TEST_SHARED_DEBUG_LIBS
-	${SIXENSESDK_sixense_SHARED_DEBUG}
-	${SIXENSESDK_sixense_utils_SHARED_DEBUG}
-	${SIXENSESDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
 )
 
 surgsim_add_unit_tests(SixenseDeviceTest)
