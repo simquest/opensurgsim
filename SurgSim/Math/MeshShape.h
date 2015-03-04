@@ -75,11 +75,6 @@ public:
 	/// \return The normal for the triangle with given ID.
 	const SurgSim::Math::Vector3d& getNormal(size_t triangleId);
 
-	/// Calculate normals for all triangles.
-	/// \note Normals will be normalized.
-	/// \return true on success, or false if any triangle has an indeterminate normal.
-	bool calculateNormals();
-
 	/// Get the volume of the shape
 	/// \note this parameter is valid with respect to the initial mesh
 	/// \return The volume of the shape (in m-3)
@@ -113,6 +108,11 @@ public:
 protected:
 	bool doUpdate() override;
 	bool doLoad(const std::string& fileName) override;
+
+	/// Calculate normals for all triangles.
+	/// \note Normals will be normalized.
+	/// \return true on success, or false if any triangle has an indeterminate normal.
+	bool calculateNormals();
 
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.

@@ -367,12 +367,12 @@ TEST_F(MeshShapeTest, NormalTest)
 	v2p = v3;
 
 	// Recompute normals for meshWithNormal
-	EXPECT_TRUE(meshWithNormal->calculateNormals());
+	EXPECT_TRUE(meshWithNormal->update());
 	Vector3d expectedXNormal(0.0, -1.0, 0.0);
 	EXPECT_EQ(expectedXNormal, meshWithNormal->getNormal(0));
 
 	v2p = v1;
-	EXPECT_FALSE(meshWithNormal->calculateNormals());
+	EXPECT_FALSE(meshWithNormal->update());
 }
 
 
