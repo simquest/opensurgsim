@@ -43,6 +43,9 @@ surgsim_add_executable(SerializedStapling "${SERIALIZEDSTAPLING_SOURCES}" "${SER
 set(LIBS 
 	IdentityPoseDevice
 	MultiAxisDevice
+	NovintDevice
+	PhantomDevice
+	SixenseDevice
 	SurgSimBlocks
 	SurgSimFramework
 	SurgSimGraphics
