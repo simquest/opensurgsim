@@ -378,6 +378,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
 	physicsManager->setRate(100.0);
+	SurgSim::Framework::Logger::getLogger("Physics Manager")->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	runtime->addManager(behaviorManager);
