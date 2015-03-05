@@ -234,7 +234,7 @@ void MeshShape::updateAabbTree()
 	{
 		if (triangles[id].isValid)
 		{
-			auto& vertices = getTrianglePositions(id);
+			const auto& vertices = getTrianglePositions(id);
 			m_aabbTree->add(SurgSim::Math::makeAabb(vertices[0], vertices[1], vertices[2]), id);
 		}
 	}
