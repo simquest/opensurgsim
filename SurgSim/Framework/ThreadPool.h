@@ -75,8 +75,9 @@ public:
 	/// Queue a task to be run by the ThreadPool
 	/// \note The task must not take any arguments. To add a function that does
 	/// require arguments use std::bind.
+	/// \tparam R return type of the task
 	/// \param function The task to be queued
-	/// \return a std::future that holds the results once completed
+	/// \return a std::future that holds the results (of type R) once completed
 	template <class R>
 	std::future<R> enqueue(std::function<R()> function);
 

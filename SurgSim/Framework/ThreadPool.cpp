@@ -24,31 +24,28 @@ namespace Framework
 ThreadPool::ThreadPool(size_t numThreads) :
 	m_destructing(false)
 {
+	// Main loop for each worker thread.
 	auto threadLoop = [this] ()
 	{
 		std::unique_ptr<TaskBase> task;
-		while (!m_destructing)
+		for (;;)
 		{
 			{
 				boost::unique_lock<boost::mutex> lock(m_tasksMutex);
-				if (m_tasks.empty())
+				m_threadSignaler.wait(lock, [this] { return m_destructing || !m_tasks.empty(); });
+				if (m_destructing)
 				{
-					m_threadSignaler.wait(lock);
+					return;
 				}
 
-				if (!m_tasks.empty())
-				{
-					task = std::move(m_tasks.front());
-					m_tasks.pop();
-				}
+				task = std::move(m_tasks.front());
+				m_tasks.pop();
 			}
-			if (task)
-			{
-				task->execute();
-			}
+			task->execute();
 			task.release();
 		}
 	};
+
 	for (size_t i = 0; i < numThreads; i++)
 	{
 		m_threads.emplace_back(threadLoop);
@@ -57,8 +54,12 @@ ThreadPool::ThreadPool(size_t numThreads) :
 
 ThreadPool::~ThreadPool()
 {
-	m_destructing = true;
+	{
+		boost::unique_lock<boost::mutex> lock(m_tasksMutex);
+		m_destructing = true;
+	}
 	m_threadSignaler.notify_all();
+
 	for (auto& thread : m_threads)
 	{
 		thread.join();
