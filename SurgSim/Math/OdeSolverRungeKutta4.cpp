@@ -105,10 +105,7 @@ void OdeSolverRungeKutta4::computeMatrices(double dt, const OdeState& state)
 	m_systemMatrix = m_equation.computeM(state) / dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
-	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &(m_complianceMatrix));
-	// Remove the boundary conditions compliance from the compliance matrix
-	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-	state.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
+	computeComplianceMatrixFromSystemMatrix(state);
 }
 
 }; // namespace Math

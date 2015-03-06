@@ -120,6 +120,11 @@ protected:
 	/// \param size The size to account for in the data structure
 	void allocate(size_t size);
 
+	/// Helper method computing the compliance matrix from the system matrix and setting the boundary conditions
+	/// \param state The state describing the boundary conditions
+	/// \note The full system is not re-evaluated from the state, the current system matrix is directly used.
+	void computeComplianceMatrixFromSystemMatrix(const OdeState& state);
+
 	/// Name for this solver
 	/// \note MUST be set by the derived classes
 	std::string m_name;

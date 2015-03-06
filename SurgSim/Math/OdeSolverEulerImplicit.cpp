@@ -127,10 +127,7 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 	// The compliance matrix (if requested) is computed w.r.t. the latest state.
 	if (computeCompliance)
 	{
-		(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_complianceMatrix);
-		// Remove the boundary conditions compliance from the compliance matrix
-		// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-		currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
+		computeComplianceMatrixFromSystemMatrix(currentState);
 	}
 }
 
@@ -145,11 +142,7 @@ void OdeSolverEulerImplicit::computeMatrices(double dt, const OdeState& state)
 	m_systemMatrix += (*K) * dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
-	// Computes the compliance matrix as the inverse of the system matrix
-	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_complianceMatrix);
-	// Remove the boundary conditions compliance from the compliance matrix
-	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-	state.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
+	computeComplianceMatrixFromSystemMatrix(state);
 }
 
 

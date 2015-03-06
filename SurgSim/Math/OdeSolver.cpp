@@ -61,6 +61,16 @@ void OdeSolver::allocate(size_t size)
 	m_complianceMatrix.resize(size, size);
 }
 
+void OdeSolver::computeComplianceMatrixFromSystemMatrix(const OdeState& state)
+{
+	// The compliance matrix is the inverse of the system matrix
+	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_complianceMatrix);
+
+	// The boundary conditions needs to be set on the compliance matrix and no compliance should be used for the nodes
+	// Which means that the compliance matrix has entire rows and columns of zeros for the boundary conditions.
+	state.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
+}
+
 }; // namespace Math
 
 }; // namespace SurgSim
