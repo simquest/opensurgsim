@@ -32,47 +32,54 @@ void OdeSolverEulerExplicit::solve(double dt, const OdeState& currentState, OdeS
 {
 	// General equation to solve:
 	//   M.a(t) = f(t, x(t), v(t))
-	// System on the velocity level:
-	//   (M/dt).deltaV = f(t, x(t), v(t))
-	// Therefore, the system matrix is M/dt
+	// Using Euler explicit { v(t+dt) = v(t) + dt.a(t)
+	//                      { x(t+dt) = x(t) + dt.v(t)
+	// The resulting linear system on the velocity level is:
+	//   (M/dt)       . deltaV   = f(t, x(t), v(t))
+	//   systemMatrix . solution = rhs
+	// Therefore, systemMatrix = M/dt, solution = deltaV and rhs = f
 
-	// Computes f(t, x(t), v(t)) and M
-	Vector& f = m_equation.computeF(currentState);
-	const Matrix& M = m_equation.computeM(currentState);
+	// Assemble the linear system systemMatrix.solution = rhs
+	assembleLinearSystem(dt, currentState, *newState);
 
-	// Computes the system matrix (left-hand-side matrix)
-	m_systemMatrix = M / dt;
-
-	// Apply boundary conditions to the linear system
-	currentState.applyBoundaryConditionsToVector(&f);
-	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
-
-	// Computes deltaV (stored in the velocities) and m_complianceMatrix = 1/m_systemMatrix if requested
-	Vector& deltaV = newState->getVelocities();
-	if (computeCompliance)
-	{
-		(*m_linearSolver)(m_systemMatrix, f, &deltaV, &m_complianceMatrix);
-		// Remove the boundary conditions compliance from the compliance matrix
-		// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-		currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
-	}
-	else
-	{
-		(*m_linearSolver)(m_systemMatrix, f, &deltaV);
-	}
+	// Solve the linear system to find solution = deltaV
+	m_linearSolver->solve(m_rhs, &m_solution);
 
 	// Compute the new state using the Euler Explicit scheme:
 	newState->getPositions()  = currentState.getPositions()  + dt * currentState.getVelocities();
-	newState->getVelocities() = currentState.getVelocities() + deltaV;
+	newState->getVelocities() = currentState.getVelocities() + m_solution;
+
+	if (computeCompliance)
+	{
+		computeComplianceMatrixFromSystemMatrix(currentState);
+	}
 }
 
-void OdeSolverEulerExplicit::computeMatrices(double dt, const OdeState& state)
+void OdeSolverEulerExplicit::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
+												  bool computeRHS)
 {
-	// Computes the system matrix M/dt
+	// General equation to solve:
+	//   M.a(t) = f(t, x(t), v(t))
+	// Using Euler explicit { v(t+dt) = v(t) + dt.a(t)
+	//                      { x(t+dt) = x(t) + dt.v(t)
+	// The resulting linear system on the velocity level is:
+	//   (M/dt)       . deltaV   = f(t, x(t), v(t))
+	//   systemMatrix . solution = rhs
+	// Therefore, systemMatrix = M/dt, solution = deltaV and rhs = f
+
+	// Computes the LHS systemMatrix
 	m_systemMatrix = m_equation.computeM(state) / dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
-	computeComplianceMatrixFromSystemMatrix(state);
+	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
+	m_linearSolver->update(m_systemMatrix);
+
+	// Computes the RHS vector
+	if (computeRHS)
+	{
+		m_rhs = m_equation.computeF(state);
+		state.applyBoundaryConditionsToVector(&m_rhs);
+	}
 }
 
 }; // namespace Math

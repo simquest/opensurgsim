@@ -45,47 +45,32 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	// with k3 = f(t(n) + dt/2, y(n) + k2 * dt/2)
 	// with k4 = f(t(n) + dt  , y(n) + k3 * dt  )
 
-	// Computes M (stores it in m_systemMatrix to avoid dynamic re-allocation)
-	Matrix &M = (m_systemMatrix = m_equation.computeM(currentState));
-
-	// Apply the boundary conditions to the mass matrix
-	currentState.applyBoundaryConditionsToMatrix(&M);
+	// Assemble the linear system systemMatrix.solution = rhs
+	assembleLinearSystem(dt, currentState, *newState);
 
 	// 1st evaluate k1 (note that y(n) is currentState)
 	m_k1.velocity = currentState.getVelocities();
-	if (computeCompliance)
-	{
-		(*m_linearSolver)(M, *currentState.applyBoundaryConditionsToVector(&m_equation.computeF(currentState)),
-			&m_k1.acceleration, &(m_complianceMatrix));
-		// Remove the boundary conditions compliance from the compliance matrix
-		// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-		currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
-	}
-	else
-	{
-		(*m_linearSolver)(M, *currentState.applyBoundaryConditionsToVector(&m_equation.computeF(currentState)),
-			&m_k1.acceleration);
-	}
+	m_linearSolver->solve(m_rhs / dt, &m_k1.acceleration);
 
 	// 2nd evaluate k2
 	newState->getPositions()  = currentState.getPositions()  + m_k1.velocity * dt / 2.0;
 	newState->getVelocities() = currentState.getVelocities() + m_k1.acceleration * dt / 2.0;
 	m_k2.velocity = newState->getVelocities();
-	(*m_linearSolver)(M, *currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)),
+	m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt,
 		&m_k2.acceleration);
 
 	// 3rd evaluate k3
 	newState->getPositions()  = currentState.getPositions()  + m_k2.velocity * dt / 2.0;
 	newState->getVelocities() = currentState.getVelocities() + m_k2.acceleration * dt / 2.0;
 	m_k3.velocity = newState->getVelocities();
-	(*m_linearSolver)(M, *currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)),
+	m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt,
 		&m_k3.acceleration);
 
 	// 4th evaluate k4
 	newState->getPositions()  = currentState.getPositions()  + m_k3.velocity * dt;
 	newState->getVelocities() = currentState.getVelocities() + m_k3.acceleration * dt;
 	m_k4.velocity = newState->getVelocities();
-	(*m_linearSolver)(M, *currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)),
+	m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt,
 		&m_k4.acceleration);
 
 	// Compute the new state using Runge Kutta 4 integration scheme:
@@ -94,18 +79,28 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	newState->getVelocities() = currentState.getVelocities() +
 		(m_k1.acceleration + m_k4.acceleration + 2.0 * (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
 
-	// Computes the system matrix and compliance matrix
-	m_systemMatrix = M / dt;
-	m_complianceMatrix *= dt;
+	if (computeCompliance)
+	{
+		computeComplianceMatrixFromSystemMatrix(currentState);
+	}
 }
 
-void OdeSolverRungeKutta4::computeMatrices(double dt, const OdeState& state)
+void OdeSolverRungeKutta4::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
+												bool computeRHS)
 {
-	// Computes the system matrix M/dt
+	// Computes the LHS systemMatrix
 	m_systemMatrix = m_equation.computeM(state) / dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
-	computeComplianceMatrixFromSystemMatrix(state);
+	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
+	m_linearSolver->update(m_systemMatrix);
+
+	// Computes the RHS vector
+	if (computeRHS)
+	{
+		m_rhs = m_equation.computeF(state);
+		state.applyBoundaryConditionsToVector(&m_rhs);
+	}
 }
 
 }; // namespace Math

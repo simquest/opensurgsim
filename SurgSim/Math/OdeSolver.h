@@ -107,7 +107,7 @@ public:
 	/// Computes the system and compliance matrices for a given state
 	/// \param dt The time step
 	/// \param state The state to compute the system and compliance matrices for
-	virtual void computeMatrices(double dt, const OdeState& state) = 0;
+	void computeMatrices(double dt, const OdeState& state);
 
 	/// \return The latest system matrix computed (either by calling solve or computeMatrices)
 	const Matrix& getSystemMatrix() const;
@@ -120,9 +120,20 @@ protected:
 	/// \param size The size to account for in the data structure
 	void allocate(size_t size);
 
+	/// Assemble the linear system (A.x=b) to be solved for the state and new states (useful for certain ode solver).
+	/// \param dt The time step used in the system
+	/// \param state, newState The state and newState to be used to evaluate the system
+	/// \param computeRHS True to compute the RHS vector, False otherwise
+	/// \note The method should fill up the LHS matrix in m_systemMatrix and the RHS vector in m_b (if requested)
+	/// \note The method should take care of the boundary conditions properly on both the matrix and the vector.
+	/// \note The method should prepare the linear solver m_linearSolver to be used with the m_systemMatrix
+	virtual void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
+		bool computeRHS = true) = 0;
+
 	/// Helper method computing the compliance matrix from the system matrix and setting the boundary conditions
 	/// \param state The state describing the boundary conditions
-	/// \note The full system is not re-evaluated from the state, the current system matrix is directly used.
+	/// \note The full system is not re-evaluated from the state, the current m_systemMatrix is directly used.
+	/// \note This method supposes that the linear solver has been updated with the current m_systemMatrix.
 	void computeComplianceMatrixFromSystemMatrix(const OdeState& state);
 
 	/// Name for this solver
@@ -135,13 +146,16 @@ protected:
 	/// The specialized linear solver to use when solving the ode equation
 	std::shared_ptr<LinearSolveAndInverse> m_linearSolver;
 
-	/// System matrix (can be M, K, combination of MDK depending on the solver)
+	/// Linear system matrix (can be M, K, combination of MDK depending on the solver), including boundary conditions
 	/// \note A static solver will have K for system matrix
 	/// \note A dynamic explicit solver will have M for system matrix
 	/// \note A dynamic implicit solver will have a combination of M, D and K for system matrix
 	Matrix m_systemMatrix;
 
-	/// Compliance matrix which is the inverse of the system matrix
+	/// Linear system solution and rhs vectors (including boundary conditions)
+	Vector m_solution, m_rhs;
+
+	/// Compliance matrix which is the inverse of the system matrix, including boundary conditions
 	Matrix m_complianceMatrix;
 };
 

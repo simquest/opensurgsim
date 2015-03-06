@@ -31,49 +31,53 @@ OdeSolverStatic::OdeSolverStatic(OdeEquation* equation)
 void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
 {
 	// General equation to solve:
+	//   K.deltaX = f(t) = Fext + Fint(t)
+	// which in the case of a linear model will derive in the expected equation:
+	//   K.(x(t+dt) - x(t)) = Fext - K.(x(t) - x(0))
+	//   K.(x(t+dt) - x(0)) = Fext
+	//   systemMatrix . solution   = rhs
+	// Therefore systemMatrix = K, solution = deltaX, rhs = f(t)
+
+	// Assemble the linear system systemMatrix.solution = rhs
+	assembleLinearSystem(dt, currentState, *newState);
+
+	// Solve the linear system to find solution = deltaX
+	m_linearSolver->solve(m_rhs, &m_solution);
+
+	// Compute the new state using the static scheme:
+	newState->getPositions() = currentState.getPositions() + m_solution;
+	// Velocities are null in static mode (no time dependency)
+	newState->getVelocities().setZero();
+
+	if (computeCompliance)
+	{
+		computeComplianceMatrixFromSystemMatrix(currentState);
+	}
+}
+
+void OdeSolverStatic::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState, bool computeRHS)
+{
+	// General equation to solve:
 	//   K.deltaX = Fext + Fint(t)
 	// which in the case of a linear model will derive in the expected equation:
 	//   K.(x(t+dt) - x(t)) = Fext - K.(x(t) - x(0))
 	//   K.(x(t+dt) - x(0)) = Fext
-	// Therefore the system matrix is K
+	//   systemMatrix . solution   = rhs
+	// Therefore systemMatrix = K, solution = deltaX, rhs = f(t)
 
-	// Computes f(t, x(t), v(t)) and K
-	const Matrix& K = m_equation.computeK(currentState);
-	Vector& f = m_equation.computeF(currentState);
-
-	m_systemMatrix = K;
-
-	// Apply boundary conditions to the linear system
-	currentState.applyBoundaryConditionsToVector(&f);
-	currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
-
-	// Computes deltaX (stored in the positions) and m_complianceMatrix = 1/m_systemMatrix if requested
-	Vector& deltaX = newState->getPositions();
-	if (computeCompliance)
-	{
-		(*m_linearSolver)(m_systemMatrix, f, &deltaX, &m_complianceMatrix);
-		// Remove the boundary conditions compliance from the compliance matrix
-		// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-		currentState.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
-	}
-	else
-	{
-		(*m_linearSolver)(m_systemMatrix, f, &deltaX);
-	}
-
-	// Compute the new state using the static scheme:
-	newState->getPositions() = currentState.getPositions() + deltaX;
-	// Velocities are null in static mode (no time dependency)
-	newState->getVelocities().setZero();
-}
-
-void OdeSolverStatic::computeMatrices(double dt, const OdeState& state)
-{
-	// Computes the system matrix K
+	// Computes the LHS systemMatrix
 	m_systemMatrix = m_equation.computeK(state);
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
-	computeComplianceMatrixFromSystemMatrix(state);
+	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
+	m_linearSolver->update(m_systemMatrix);
+
+	// Computes the RHS vector
+	if (computeRHS)
+	{
+		m_rhs = m_equation.computeF(state);
+		state.applyBoundaryConditionsToVector(&m_rhs);
+	}
 }
 
 }; // namespace Math

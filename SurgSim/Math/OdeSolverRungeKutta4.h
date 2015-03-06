@@ -61,9 +61,10 @@ public:
 
 	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
 
-	void computeMatrices(double dt, const OdeState& state) override;
-
 protected:
+	void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
+		bool computeRHS = true) override;
+
 	/// Internal structure to hold the 4 temporary evaluations
 	struct RungeKuttaDerivedState
 	{
