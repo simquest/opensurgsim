@@ -211,6 +211,17 @@ public:
 		return m_drawAsWireFrame;
 	}
 
+
+	void setGenerateTangents(bool value)
+	{
+
+	}
+
+	bool isGeneratingTangents() const
+	{
+		return false;
+	}
+
 private:
 	/// Initializes the representation
 	/// \post m_isInitialized is set to true
@@ -226,6 +237,7 @@ private:
 		m_isAwoken = true;
 		return true;
 	}
+
 
 	/// Number of times the representation has been updated
 	int m_numUpdates;
@@ -394,6 +406,17 @@ public:
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
+
+	void setGenerateTangents(bool value)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	bool isGeneratingTangents() const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
 
 
 private:
