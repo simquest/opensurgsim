@@ -26,12 +26,10 @@ namespace SurgSim
 namespace Collision
 {
 
-/// Base class responsible for calculating contact data between two given shapes, calculateContact needs to
-/// determine whether the two shapes intersect, and if yes calculate the correct data for this contact, which
-/// consists of, the normal to displace the first shape so that the two shapes just barely touch. And the
-/// penetration point (the point that is furthest inside the other object) for each shape.
-/// This base class also handles the swapping of the shapes if the pair is asymmetric. The sub classes
-/// assume that the pair is always in correct order.
+/// Base class responsible for calculating contact data between two objects.
+/// It is used for determining whether two objects intersect. If there is
+/// contact, new Contacts are calculated.
+/// \sa Contact
 class ContactCalculation
 {
 public:
@@ -42,8 +40,8 @@ public:
 	/// Destructor
 	virtual ~ContactCalculation();
 
-	/// Function that handles asymmetric pair and calls the actual contact calculation routine of the sub class.
-	/// \param	pair	The pair that is under consideration.
+	/// Calculate the contacts
+	/// \param	pair	A CollisionPair that is under consideration, new contacts will be added to this pair
 	void calculateContact(std::shared_ptr<CollisionPair> pair);
 
 	/// Virtual function that returns the shapes that this ContactCalculation class handles.

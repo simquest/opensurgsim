@@ -74,25 +74,18 @@ void DcdCollision::populateCalculationTable()
 			m_contactCalculations[i][j].reset(new SurgSim::Collision::DefaultContactCalculation(false));
 		}
 	}
-	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereSphereDcdContact>());
-	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereDoubleSidedPlaneDcdContact>());
-	setDcdContactInTable(std::make_shared<SurgSim::Collision::SpherePlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxCapsuleDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxDoubleSidedPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxSphereDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::CapsuleSphereDcdContact>());
-
-	// Add the Octree contact calculations using the box contact calculations
-	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeDcdContact>(
-				std::make_shared<SurgSim::Collision::BoxCapsuleDcdContact>()));
-	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeDcdContact>(
-				std::make_shared<SurgSim::Collision::BoxDoubleSidedPlaneDcdContact>()));
-	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeDcdContact>(
-				std::make_shared<SurgSim::Collision::BoxPlaneDcdContact>()));
-	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeDcdContact>(
-				std::make_shared<SurgSim::Collision::BoxSphereDcdContact>()));
-
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeCapsuleDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeDoubleSidedPlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreePlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereDoubleSidedPlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::SpherePlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::TriangleMeshPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::TriangleMeshTriangleMeshDcdContact>());
 }

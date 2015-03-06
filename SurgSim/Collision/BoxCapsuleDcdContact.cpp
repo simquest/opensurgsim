@@ -19,10 +19,7 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Math/BoxShape.h"
-#include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::Location;
@@ -34,6 +31,7 @@ using SurgSim::Math::doesIntersectBoxCapsule;
 using SurgSim::Math::distancePointSegment;
 using SurgSim::Math::intersectionsSegmentBox;
 using SurgSim::Math::Geometry::DistanceEpsilon;
+
 
 namespace {
 
@@ -73,20 +71,31 @@ std::pair<int,int> BoxCapsuleDcdContact::getShapeTypes()
 
 void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	std::shared_ptr<Representation> boxRepresentation = pair->getFirst();
-	std::shared_ptr<Representation> capsuleRepresentation = pair->getSecond();
+	std::shared_ptr<Representation> box = pair->getFirst();
+	std::shared_ptr<Representation> capsule = pair->getSecond();
 
-	std::shared_ptr<CapsuleShape> capsuleShape =
-		std::static_pointer_cast<CapsuleShape>(capsuleRepresentation->getShape());
-	std::shared_ptr<BoxShape> boxShape = std::static_pointer_cast<BoxShape>(boxRepresentation->getShape());
+	auto boxShape = std::static_pointer_cast<BoxShape>(box->getShape());
+	auto capsuleShape = std::static_pointer_cast<CapsuleShape>(capsule->getShape());
 
-	RigidTransform3d boxPose = boxRepresentation->getPose();
-	RigidTransform3d capsuleToBoxTransform = boxPose.inverse() * capsuleRepresentation->getPose();
-	Vector3d capsuleBottom = capsuleToBoxTransform * capsuleShape->bottomCenter();
-	Vector3d capsuleTop = capsuleToBoxTransform * capsuleShape->topCenter();
-	double capsuleRadius = capsuleShape->getRadius();
+	auto contacts = calculateContact(*boxShape, box->getPose(), *capsuleShape, capsule->getPose());
+	for (auto& contact : contacts)
+	{
+		pair->addContact(contact);
+	}
+}
 
-	Vector3d boxRadii = boxShape->getSize() / 2.0;
+std::list<std::shared_ptr<Contact>> BoxCapsuleDcdContact::calculateContact(
+		const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
+		const SurgSim::Math::CapsuleShape& capsuleShape, const SurgSim::Math::RigidTransform3d& capsulePose)
+{
+	std::list<std::shared_ptr<Contact>> contacts;
+
+	RigidTransform3d capsuleToBoxTransform = boxPose.inverse() * capsulePose;
+	Vector3d capsuleBottom = capsuleToBoxTransform * capsuleShape.bottomCenter();
+	Vector3d capsuleTop = capsuleToBoxTransform * capsuleShape.topCenter();
+	double capsuleRadius = capsuleShape.getRadius();
+
+	Vector3d boxRadii = boxShape.getSize() / 2.0;
 	Eigen::AlignedBox<double, 3> box(-boxRadii, boxRadii);
 
 	if (doesIntersectBoxCapsule(capsuleBottom, capsuleTop, capsuleRadius, box))
@@ -182,12 +191,12 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 		}
 
 		double distance = (deepestCapsulePoint - deepestBoxPoint).dot(normal);
-		std::pair<Location, Location> penetrationPoints;
-		penetrationPoints.first.rigidLocalPosition.setValue(deepestBoxPoint);
-		penetrationPoints.second.rigidLocalPosition.setValue(
-			capsuleRepresentation->getPose().inverse() * boxPose * deepestCapsulePoint);
-		pair->addContact(distance, boxPose.linear() * normal, penetrationPoints);
+		normal = boxPose.linear() * normal;
+		std::pair<Location, Location> penetrationPoints = std::make_pair(Location(deepestBoxPoint),
+				Location(capsulePose.inverse() * boxPose * deepestCapsulePoint));
+		contacts.push_back(std::make_shared<Contact>(distance, Vector3d::Zero(), normal, penetrationPoints));
 	}
+	return std::move(contacts);
 }
 
 }; // namespace Collision
