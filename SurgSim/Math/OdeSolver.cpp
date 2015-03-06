@@ -75,7 +75,7 @@ void OdeSolver::computeMatrices(double dt, const OdeState& state)
 void OdeSolver::computeComplianceMatrixFromSystemMatrix(const OdeState& state)
 {
 	// The compliance matrix is the inverse of the system matrix
-	m_linearSolver->getInverse(&m_complianceMatrix);
+	m_complianceMatrix = m_linearSolver->getInverse();
 
 	// The boundary conditions needs to be set on the compliance matrix and no compliance should be used for the nodes
 	// Which means that the compliance matrix has entire rows and columns of zeros for the boundary conditions.

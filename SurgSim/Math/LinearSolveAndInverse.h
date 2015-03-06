@@ -37,32 +37,31 @@ class LinearSolveAndInverse
 public:
 	virtual ~LinearSolveAndInverse(){}
 
-	/// Update the linear solver with a new matrix
-	/// \param A the new matrix to solve/inverse for
-	virtual void update(const Matrix& A) = 0;
+	/// Set the linear solver matrix
+	/// \param matrix the new matrix to solve/inverse for
+	virtual void setMatrix(const Matrix& matrix) = 0;
 
-	/// Solve a linear system A.x=b using matrix A provided by the latest update call
+	/// Solve the linear system (matrix.x=b) using the matrix provided by the latest setMatrix call
 	/// \param b The rhs vector
-	/// \param [out] x The solution vector
-	virtual void solve(const Vector& b, Vector* x) = 0;
+	/// \return The solution vector
+	virtual Vector solve(const Vector& b) = 0;
 
-	/// Get the inverse matrix of the linear system , i.e. the inverse of the matrix provided on the last update call
-	/// \param [out] Ainv The inverse matrix of A
-	virtual void getInverse(Matrix* Ainv) = 0;
+	/// \return The linear system's inverse matrix, i.e. the inverse of the matrix provided on the last setMatrix call
+	virtual Matrix getInverse() = 0;
 };
 
 /// Derivation for dense matrix type
 class LinearSolveAndInverseDenseMatrix : public LinearSolveAndInverse
 {
+public:
+	void setMatrix(const Matrix& matrix) override;
+
+	Vector solve(const Vector& b) override;
+
+	Matrix getInverse() override;
+
 private:
 	Eigen::PartialPivLU<typename Eigen::MatrixBase<Matrix>::PlainObject> m_luDecomposition;
-
-public:
-	void update(const Matrix& A) override;
-
-	void solve(const Vector& b, Vector* x) override;
-
-	void getInverse(Matrix* Ainv) override;
 };
 
 /// Derivation for diagonal matrix type
@@ -72,11 +71,11 @@ private:
 	Vector m_inverseDiagonal;
 
 public:
-	void update(const Matrix& A) override;
+	void setMatrix(const Matrix& matrix) override;
 
-	void solve(const Vector& b, Vector* x) override;
+	Vector solve(const Vector& b) override;
 
-	void getInverse(Matrix* Ainv) override;
+	Matrix getInverse() override;
 };
 
 /// Derivation for tri-diagonal block matrix type
@@ -85,11 +84,11 @@ template <size_t BlockSize>
 class LinearSolveAndInverseTriDiagonalBlockMatrix : public LinearSolveAndInverse
 {
 public:
-	void update(const Matrix& A) override;
+	void setMatrix(const Matrix& matrix) override;
 
-	void solve(const Vector& b, Vector* x) override;
+	Vector solve(const Vector& b) override;
 
-	void getInverse(Matrix* Ainv) override;
+	Matrix getInverse() override;
 
 protected:
 	/// Computes the inverse matrix
@@ -139,7 +138,7 @@ class LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix :
 	public LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>
 {
 public:
-	void update(const Matrix& A) override;
+	void setMatrix(const Matrix& matrix) override;
 
 	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalBlock;
 	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::m_inverse;

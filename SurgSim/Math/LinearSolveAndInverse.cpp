@@ -21,38 +21,38 @@ namespace SurgSim
 namespace Math
 {
 
-void LinearSolveAndInverseDiagonalMatrix::update(const Matrix& A)
+void LinearSolveAndInverseDiagonalMatrix::setMatrix(const Matrix& matrix)
 {
-	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
+	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
 
-	m_inverseDiagonal = A.diagonal().cwiseInverse();
+	m_inverseDiagonal = matrix.diagonal().cwiseInverse();
 }
 
-void LinearSolveAndInverseDiagonalMatrix::solve(const Vector& b, Vector* x)
+Vector LinearSolveAndInverseDiagonalMatrix::solve(const Vector& b)
 {
-	*x = m_inverseDiagonal.cwiseProduct(b);
+	return m_inverseDiagonal.cwiseProduct(b);
 }
 
-void LinearSolveAndInverseDiagonalMatrix::getInverse(Matrix* Ainv)
+Matrix LinearSolveAndInverseDiagonalMatrix::getInverse()
 {
-	*Ainv = m_inverseDiagonal.asDiagonal();
+	return m_inverseDiagonal.asDiagonal();
 }
 
-void LinearSolveAndInverseDenseMatrix::update(const Matrix& A)
+void LinearSolveAndInverseDenseMatrix::setMatrix(const Matrix& matrix)
 {
-	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
+	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
 
-	m_luDecomposition = A.partialPivLu();
+	m_luDecomposition = matrix.partialPivLu();
 }
 
-void LinearSolveAndInverseDenseMatrix::solve(const Vector& b, Vector* x)
+Vector LinearSolveAndInverseDenseMatrix::solve(const Vector& b)
 {
-	*x = m_luDecomposition.solve(b);
+	return m_luDecomposition.solve(b);
 }
 
-void LinearSolveAndInverseDenseMatrix::getInverse(Matrix* Ainv)
+Matrix LinearSolveAndInverseDenseMatrix::getInverse()
 {
-	*Ainv = m_luDecomposition.inverse();
+	return m_luDecomposition.inverse();
 }
 
 }; // namespace Math

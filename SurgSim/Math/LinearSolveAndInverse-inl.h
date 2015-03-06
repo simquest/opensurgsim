@@ -152,27 +152,27 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 }
 
 template <size_t BlockSize>
-void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::update(const Matrix& A)
+void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::setMatrix(const Matrix& matrix)
 {
-	inverseTriDiagonalBlock(A, &m_inverse);
+	inverseTriDiagonalBlock(matrix, &m_inverse);
 }
 
 template <size_t BlockSize>
-void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::solve(const Vector& b, Vector* x)
+Vector LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::solve(const Vector& b)
 {
-	(*x) = m_inverse * b;
+	return m_inverse * b;
 }
 
 template <size_t BlockSize>
-void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::getInverse(Matrix* Ainv)
+Matrix LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::getInverse()
 {
-	*Ainv = m_inverse;
+	return m_inverse;
 }
 
 template <size_t BlockSize>
-void LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<BlockSize>::update(const Matrix& A)
+void LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<BlockSize>::setMatrix(const Matrix& matrix)
 {
-	inverseTriDiagonalBlock(A, &m_inverse, true);
+	inverseTriDiagonalBlock(matrix, &m_inverse, true);
 }
 
 };  // namespace Math

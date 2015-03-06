@@ -50,28 +50,28 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 
 	// 1st evaluate k1 (note that y(n) is currentState)
 	m_k1.velocity = currentState.getVelocities();
-	m_linearSolver->solve(m_rhs / dt, &m_k1.acceleration);
+	m_k1.acceleration = m_linearSolver->solve(m_rhs / dt);
 
 	// 2nd evaluate k2
 	newState->getPositions()  = currentState.getPositions()  + m_k1.velocity * dt / 2.0;
 	newState->getVelocities() = currentState.getVelocities() + m_k1.acceleration * dt / 2.0;
 	m_k2.velocity = newState->getVelocities();
-	m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt,
-		&m_k2.acceleration);
+	m_k2.acceleration =
+		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt);
 
 	// 3rd evaluate k3
 	newState->getPositions()  = currentState.getPositions()  + m_k2.velocity * dt / 2.0;
 	newState->getVelocities() = currentState.getVelocities() + m_k2.acceleration * dt / 2.0;
 	m_k3.velocity = newState->getVelocities();
-	m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt,
-		&m_k3.acceleration);
+	m_k3.acceleration =
+		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt);
 
 	// 4th evaluate k4
 	newState->getPositions()  = currentState.getPositions()  + m_k3.velocity * dt;
 	newState->getVelocities() = currentState.getVelocities() + m_k3.acceleration * dt;
 	m_k4.velocity = newState->getVelocities();
-	m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt,
-		&m_k4.acceleration);
+	m_k4.acceleration =
+		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt);
 
 	// Compute the new state using Runge Kutta 4 integration scheme:
 	newState->getPositions()  = currentState.getPositions() +
@@ -93,7 +93,7 @@ void OdeSolverRungeKutta4::assembleLinearSystem(double dt, const OdeState& state
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
-	m_linearSolver->update(m_systemMatrix);
+	m_linearSolver->setMatrix(m_systemMatrix);
 
 	// Computes the RHS vector
 	if (computeRHS)

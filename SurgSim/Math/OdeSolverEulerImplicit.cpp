@@ -92,7 +92,7 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 		assembleLinearSystem(dt, currentState, *newState);
 
 		// Solve the linear system to find solution = deltaV
-		m_linearSolver->solve(m_rhs, &m_solution);
+		m_solution = m_linearSolver->solve(m_rhs);
 
 		// Compute the new state using the Euler Implicit scheme:
 		newState->getVelocities() += m_solution;
@@ -152,7 +152,7 @@ void OdeSolverEulerImplicit::assembleLinearSystem(double dt, const OdeState& sta
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
-	m_linearSolver->update(m_systemMatrix);
+	m_linearSolver->setMatrix(m_systemMatrix);
 
 	// Computes the RHS vector by adding the Euler Implicit/Newton-Raphson terms
 	if (computeRHS)

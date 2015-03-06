@@ -44,7 +44,7 @@ void OdeSolverEulerExplicitModified::solve(double dt, const OdeState& currentSta
 	assembleLinearSystem(dt, currentState, *newState);
 
 	// Solve the linear system to find solution = deltaV
-	m_linearSolver->solve(m_rhs, &m_solution);
+	m_solution = m_linearSolver->solve(m_rhs);
 
 	// Compute the new state using the Modified Euler Explicit scheme:
 	newState->getVelocities() = currentState.getVelocities() + m_solution;
@@ -73,7 +73,7 @@ void OdeSolverEulerExplicitModified::assembleLinearSystem(double dt, const OdeSt
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
-	m_linearSolver->update(m_systemMatrix);
+	m_linearSolver->setMatrix(m_systemMatrix);
 
 	// Computes the RHS vector
 	if (computeRHS)

@@ -42,7 +42,7 @@ void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* n
 	assembleLinearSystem(dt, currentState, *newState);
 
 	// Solve the linear system to find solution = deltaX
-	m_linearSolver->solve(m_rhs, &m_solution);
+	m_solution = m_linearSolver->solve(m_rhs);
 
 	// Compute the new state using the static scheme:
 	newState->getPositions() = currentState.getPositions() + m_solution;
@@ -70,7 +70,7 @@ void OdeSolverStatic::assembleLinearSystem(double dt, const OdeState& state, con
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
-	m_linearSolver->update(m_systemMatrix);
+	m_linearSolver->setMatrix(m_systemMatrix);
 
 	// Computes the RHS vector
 	if (computeRHS)
