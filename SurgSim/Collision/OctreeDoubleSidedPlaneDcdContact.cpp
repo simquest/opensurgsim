@@ -23,14 +23,6 @@ namespace SurgSim
 namespace Collision
 {
 
-OctreeDoubleSidedPlaneDcdContact::OctreeDoubleSidedPlaneDcdContact()
-{
-}
-
-OctreeDoubleSidedPlaneDcdContact::~OctreeDoubleSidedPlaneDcdContact()
-{
-}
-
 std::pair<int, int> OctreeDoubleSidedPlaneDcdContact::getShapeTypes()
 {
 	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_OCTREE, SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE);

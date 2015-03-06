@@ -37,13 +37,6 @@ class ShapeCollisionRepresentation;
 /// OctreeSphereDcdContact).
 class OctreeDcdContact : public ContactCalculation
 {
-public:
-	/// Constructor.
-	OctreeDcdContact();
-
-	/// Destructor.
-	virtual ~OctreeDcdContact();
-
 protected:
 	/// Do the calculation between an octree node (BoxShape) and the other shape
 	/// \param boxShape the box shape

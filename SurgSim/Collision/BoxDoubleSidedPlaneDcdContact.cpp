@@ -64,8 +64,7 @@ std::list<std::shared_ptr<Contact>> BoxDoubleSidedPlaneDcdContact::calculateCont
 	std::list<std::shared_ptr<Contact>> contacts;
 
 	// Transform the plane normal to box co-ordinate system.
-	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = boxPose.inverse() *
-														   planePose;
+	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = boxPose.inverse() * planePose;
 	Vector3d planeNormal = planeLocalToBoxLocal.linear() * planeShape.getNormal();
 	Vector3d planeNormalScaled = planeShape.getNormal() * -planeShape.getD();
 	Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;

@@ -27,12 +27,6 @@ namespace Collision
 class OctreePlaneDcdContact : public OctreeDcdContact
 {
 public:
-	/// Constructor.
-	OctreePlaneDcdContact();
-
-	/// Destructor.
-	virtual ~OctreePlaneDcdContact();
-
 	std::pair<int, int> getShapeTypes() override;
 
 protected:

@@ -35,14 +35,6 @@ size_t OctreeDcdContact::Vector3dHash::operator()(const SurgSim::Math::Vector3d&
 	return boost::hash_range(id.data(), id.data() + 3);
 }
 
-OctreeDcdContact::OctreeDcdContact()
-{
-}
-
-OctreeDcdContact::~OctreeDcdContact()
-{
-}
-
 void OctreeDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	typedef SurgSim::Math::OctreeShape OctreeShapeType;
