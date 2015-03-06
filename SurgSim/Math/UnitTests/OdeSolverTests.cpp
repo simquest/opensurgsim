@@ -32,7 +32,7 @@ namespace Math
 
 namespace
 {
-	const std::string name = "MockOdeSolver";
+const std::string name = "MockOdeSolver";
 };
 
 class MockOdeSolver : public OdeSolver

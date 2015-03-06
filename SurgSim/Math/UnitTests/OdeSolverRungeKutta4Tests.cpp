@@ -30,7 +30,7 @@ namespace SurgSim
 namespace Math
 {
 
-namespace anonymous
+namespace
 {
 template<class T>
 void doConstructorTest()
@@ -44,15 +44,15 @@ TEST(OdeSolverRungeKutta4, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("OdeSolverRungeKutta4");
-		anonymous::doConstructorTest<OdeSolverRungeKutta4>();
+		doConstructorTest<OdeSolverRungeKutta4>();
 	}
 	{
 		SCOPED_TRACE("OdeSolverLinearRungeKutta4");
-		anonymous::doConstructorTest<OdeSolverLinearRungeKutta4>();
+		doConstructorTest<OdeSolverLinearRungeKutta4>();
 	}
 }
 
-namespace anonymous
+namespace
 {
 struct RungeKuttaState
 {
@@ -242,24 +242,24 @@ TEST(OdeSolverRungeKutta4, SolveTest)
 {
 	{
 		SCOPED_TRACE("OdeSolverRungeKutta4 computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverRungeKutta4>(true);
+		doSolveTest<OdeSolverRungeKutta4>(true);
 	}
 	{
 		SCOPED_TRACE("OdeSolverRungeKutta4 not computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverRungeKutta4>(false);
+		doSolveTest<OdeSolverRungeKutta4>(false);
 	}
 
 	{
 		SCOPED_TRACE("OdeSolverLinearRungeKutta4 computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverLinearRungeKutta4>(true);
+		doSolveTest<OdeSolverLinearRungeKutta4>(true);
 	}
 	{
 		SCOPED_TRACE("OdeSolverLinearRungeKutta4 not computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverLinearRungeKutta4>(false);
+		doSolveTest<OdeSolverLinearRungeKutta4>(false);
 	}
 }
 
-namespace anonymous
+namespace
 {
 template <class T>
 void doComputeMatricesTest()
@@ -280,12 +280,12 @@ TEST(OdeSolverRungeKutta4, ComputeMatricesTest)
 {
 	{
 		SCOPED_TRACE("RungeKutta4");
-		anonymous::doComputeMatricesTest<OdeSolverRungeKutta4>();
+		doComputeMatricesTest<OdeSolverRungeKutta4>();
 	}
 
 	{
 		SCOPED_TRACE("LinearRungeKutta4");
-		anonymous::doComputeMatricesTest<OdeSolverLinearRungeKutta4>();
+		doComputeMatricesTest<OdeSolverLinearRungeKutta4>();
 	}
 }
 

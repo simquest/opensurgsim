@@ -31,7 +31,7 @@ namespace SurgSim
 namespace Math
 {
 
-namespace anonymous
+namespace
 {
 template<class T>
 void doConstructorTest()
@@ -45,15 +45,15 @@ TEST(OdeSolverEulerExplicit, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("EulerExplicit");
-		anonymous::doConstructorTest<OdeSolverEulerExplicit>();
+		doConstructorTest<OdeSolverEulerExplicit>();
 	}
 	{
 		SCOPED_TRACE("LinearEulerExplicit");
-		anonymous::doConstructorTest<OdeSolverLinearEulerExplicit>();
+		doConstructorTest<OdeSolverLinearEulerExplicit>();
 	}
 }
 
-namespace anonymous
+namespace
 {
 template<class T>
 void doSolveTest(bool computeCompliance)
@@ -116,23 +116,23 @@ TEST(OdeSolverEulerExplicit, SolveTest)
 {
 	{
 		SCOPED_TRACE("EulerExplicit computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverEulerExplicit>(true);
+		doSolveTest<OdeSolverEulerExplicit>(true);
 	}
 	{
 		SCOPED_TRACE("EulerExplicit not computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverEulerExplicit>(false);
+		doSolveTest<OdeSolverEulerExplicit>(false);
 	}
 	{
 		SCOPED_TRACE("LinearEulerExplicit computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverLinearEulerExplicit>(true);
+		doSolveTest<OdeSolverLinearEulerExplicit>(true);
 	}
 	{
 		SCOPED_TRACE("LinearEulerExplicit not computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverLinearEulerExplicit>(false);
+		doSolveTest<OdeSolverLinearEulerExplicit>(false);
 	}
 }
 
-namespace anonymous
+namespace
 {
 template <class T>
 void doComputeMatricesTest()
@@ -153,12 +153,12 @@ TEST(OdeSolverEulerExplicit, ComputeMatricesTest)
 {
 	{
 		SCOPED_TRACE("EulerExplicit");
-		anonymous::doComputeMatricesTest<OdeSolverEulerExplicit>();
+		doComputeMatricesTest<OdeSolverEulerExplicit>();
 	}
 
 	{
 		SCOPED_TRACE("LinearEulerExplicit");
-		anonymous::doComputeMatricesTest<OdeSolverLinearEulerExplicit>();
+		doComputeMatricesTest<OdeSolverLinearEulerExplicit>();
 	}
 }
 

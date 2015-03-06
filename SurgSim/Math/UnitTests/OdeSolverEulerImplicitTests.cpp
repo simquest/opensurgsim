@@ -31,7 +31,7 @@ namespace SurgSim
 namespace Math
 {
 
-namespace anonymous
+namespace
 {
 template<class T>
 void doConstructorTest()
@@ -45,15 +45,15 @@ TEST(OdeSolverEulerImplicit, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("EulerImplicit");
-		anonymous::doConstructorTest<OdeSolverEulerImplicit>();
+		doConstructorTest<OdeSolverEulerImplicit>();
 	}
 	{
 		SCOPED_TRACE("LinearEulerImplicit");
-		anonymous::doConstructorTest<OdeSolverLinearEulerImplicit>();
+		doConstructorTest<OdeSolverLinearEulerImplicit>();
 	}
 }
 
-namespace anonymous
+namespace
 {
 template<class T>
 void doSolveTest(bool computeCompliance)
@@ -117,24 +117,24 @@ TEST(OdeSolverEulerImplicit, SolveTest)
 {
 	{
 		SCOPED_TRACE("EulerImplicit computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverEulerImplicit>(true);
+		doSolveTest<OdeSolverEulerImplicit>(true);
 	}
 	{
 		SCOPED_TRACE("EulerImplicit not computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverEulerImplicit>(false);
+		doSolveTest<OdeSolverEulerImplicit>(false);
 	}
 
 	{
 		SCOPED_TRACE("LinearEulerImplicit computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverLinearEulerImplicit>(true);
+		doSolveTest<OdeSolverLinearEulerImplicit>(true);
 	}
 	{
 		SCOPED_TRACE("LinearEulerImplicit not computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverLinearEulerImplicit>(false);
+		doSolveTest<OdeSolverLinearEulerImplicit>(false);
 	}
 }
 
-namespace anonymous
+namespace
 {
 template<class T>
 void doComplexNonLinearOdeTest(size_t numNewtonRaphsonIteration, bool expectExactSolution)
@@ -191,13 +191,13 @@ TEST(OdeSolverEulerImplicit, VerifyComplexNonLinearOdeTest)
 	{
 		SCOPED_TRACE("A single Newton-Raphson iteration, using OdeSolverEulerImplicit");
 
-		anonymous::doComplexNonLinearOdeTest<OdeSolverEulerImplicit>(1, false);
+		doComplexNonLinearOdeTest<OdeSolverEulerImplicit>(1, false);
 	}
 
 	{
 		SCOPED_TRACE("Multiple Newton-Raphson iterations, using OdeSolverEulerImplicit");
 
-		anonymous::doComplexNonLinearOdeTest<OdeSolverEulerImplicit>(10, true);
+		doComplexNonLinearOdeTest<OdeSolverEulerImplicit>(10, true);
 	}
 
 	// OdeSolverLinearEulerImplicit should fail no matter the number of Newton-Raphson iterations
@@ -205,17 +205,17 @@ TEST(OdeSolverEulerImplicit, VerifyComplexNonLinearOdeTest)
 	{
 		SCOPED_TRACE("A single Newton-Raphson iteration, using OdeSolverLinearEulerImplicit");
 
-		anonymous::doComplexNonLinearOdeTest<OdeSolverLinearEulerImplicit>(1, false);
+		doComplexNonLinearOdeTest<OdeSolverLinearEulerImplicit>(1, false);
 	}
 
 	{
 		SCOPED_TRACE("Multiple Newton-Raphson iterations, using OdeSolverLinearEulerImplicit");
 
-		anonymous::doComplexNonLinearOdeTest<OdeSolverLinearEulerImplicit>(10, false);
+		doComplexNonLinearOdeTest<OdeSolverLinearEulerImplicit>(10, false);
 	}
 }
 
-namespace anonymous
+namespace
 {
 template <class T>
 void doComputeMatricesTest()
@@ -236,12 +236,12 @@ TEST(OdeSolverEulerImplicit, ComputeMatricesTest)
 {
 	{
 		SCOPED_TRACE("EulerImplicit");
-		anonymous::doComputeMatricesTest<OdeSolverEulerImplicit>();
+		doComputeMatricesTest<OdeSolverEulerImplicit>();
 	}
 
 	{
 		SCOPED_TRACE("LinearEulerImplicit");
-		anonymous::doComputeMatricesTest<OdeSolverLinearEulerImplicit>();
+		doComputeMatricesTest<OdeSolverLinearEulerImplicit>();
 	}
 }
 

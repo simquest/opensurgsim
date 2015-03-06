@@ -31,7 +31,7 @@ namespace SurgSim
 namespace Math
 {
 
-namespace anonymous
+namespace
 {
 template<class T>
 void doConstructorTest()
@@ -45,15 +45,15 @@ TEST(OdeSolverEulerExplicitModified, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("EulerExplicitModified");
-		anonymous::doConstructorTest<OdeSolverEulerExplicitModified>();
+		doConstructorTest<OdeSolverEulerExplicitModified>();
 	}
 	{
 		SCOPED_TRACE("LinearEulerExplicitModified");
-		anonymous::doConstructorTest<OdeSolverLinearEulerExplicitModified>();
+		doConstructorTest<OdeSolverLinearEulerExplicitModified>();
 	}
 }
 
-namespace anonymous
+namespace
 {
 template<class T>
 void doSolveTest(bool computeCompliance)
@@ -116,24 +116,24 @@ TEST(OdeSolverEulerExplicitModified, SolveTest)
 {
 	{
 		SCOPED_TRACE("EulerExplicitModified computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverEulerExplicitModified>(true);
+		doSolveTest<OdeSolverEulerExplicitModified>(true);
 	}
 	{
 		SCOPED_TRACE("EulerExplicitModified not computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverEulerExplicitModified>(false);
+		doSolveTest<OdeSolverEulerExplicitModified>(false);
 	}
 
 	{
 		SCOPED_TRACE("LinearEulerExplicitModified computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverLinearEulerExplicitModified>(true);
+		doSolveTest<OdeSolverLinearEulerExplicitModified>(true);
 	}
 	{
 		SCOPED_TRACE("LinearEulerExplicitModified not computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverLinearEulerExplicitModified>(false);
+		doSolveTest<OdeSolverLinearEulerExplicitModified>(false);
 	}
 }
 
-namespace anonymous
+namespace
 {
 template <class T>
 void doComputeMatricesTest()
@@ -154,12 +154,12 @@ TEST(OdeSolverEulerExplicitModified, ComputeMatricesTest)
 {
 	{
 		SCOPED_TRACE("EulerExplicitModified");
-		anonymous::doComputeMatricesTest<OdeSolverEulerExplicitModified>();
+		doComputeMatricesTest<OdeSolverEulerExplicitModified>();
 	}
 
 	{
 		SCOPED_TRACE("LinearEulerExplicitModified");
-		anonymous::doComputeMatricesTest<OdeSolverLinearEulerExplicitModified>();
+		doComputeMatricesTest<OdeSolverLinearEulerExplicitModified>();
 	}
 }
 

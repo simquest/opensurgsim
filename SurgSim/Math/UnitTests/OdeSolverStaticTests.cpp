@@ -31,7 +31,7 @@ namespace SurgSim
 namespace Math
 {
 
-namespace anonymous
+namespace
 {
 template<class T>
 void doConstructorTest()
@@ -44,15 +44,15 @@ TEST(OdeSolverStatic, ConstructorTest)
 {
 	{
 		SCOPED_TRACE("Static");
-		anonymous::doConstructorTest<OdeSolverStatic>();
+		doConstructorTest<OdeSolverStatic>();
 	}
 	{
 		SCOPED_TRACE("LinearStatic");
-		anonymous::doConstructorTest<OdeSolverLinearStatic>();
+		doConstructorTest<OdeSolverLinearStatic>();
 	}
 }
 
-namespace anonymous
+namespace
 {
 template<class T>
 void doSolveTest(bool computeCompliance)
@@ -77,24 +77,24 @@ TEST(OdeSolverStatic, SolveTest)
 {
 	{
 		SCOPED_TRACE("Static computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverStatic>(true);
+		doSolveTest<OdeSolverStatic>(true);
 	}
 	{
 		SCOPED_TRACE("Static not computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverStatic>(false);
+		doSolveTest<OdeSolverStatic>(false);
 	}
 
 	{
 		SCOPED_TRACE("LinearStatic computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverLinearStatic>(true);
+		doSolveTest<OdeSolverLinearStatic>(true);
 	}
 	{
 		SCOPED_TRACE("LinearStatic not computing the compliance matrix");
-		anonymous::doSolveTest<OdeSolverLinearStatic>(false);
+		doSolveTest<OdeSolverLinearStatic>(false);
 	}
 }
 
-namespace anonymous
+namespace
 {
 template <class T>
 void doComputeMatricesTest()
@@ -115,12 +115,12 @@ TEST(OdeSolverStatic, ComputeMatricesTest)
 {
 	{
 		SCOPED_TRACE("Static");
-		anonymous::doComputeMatricesTest<OdeSolverStatic>();
+		doComputeMatricesTest<OdeSolverStatic>();
 	}
 
 	{
 		SCOPED_TRACE("LinearStatic");
-		anonymous::doComputeMatricesTest<OdeSolverLinearStatic>();
+		doComputeMatricesTest<OdeSolverLinearStatic>();
 	}
 }
 
