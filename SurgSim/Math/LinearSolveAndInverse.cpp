@@ -35,8 +35,7 @@ void LinearSolveAndInverseDiagonalMatrix::solve(const Vector& b, Vector* x)
 
 void LinearSolveAndInverseDiagonalMatrix::getInverse(Matrix* Ainv)
 {
-	Ainv->setZero();
-	Ainv->diagonal() = m_inverseDiagonal;
+	*Ainv = m_inverseDiagonal.asDiagonal();
 }
 
 void LinearSolveAndInverseDenseMatrix::update(const Matrix& A)
