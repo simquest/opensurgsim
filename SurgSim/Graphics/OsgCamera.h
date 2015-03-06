@@ -99,6 +99,8 @@ public:
 
 	SurgSim::Math::Vector4d getAmbientColor() override;
 
+	void setGenerateTangents(bool value) override;
+
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;

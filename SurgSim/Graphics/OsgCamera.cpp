@@ -264,8 +264,8 @@ void OsgCamera::attachRenderTargetTexture(osg::Camera::BufferComponent buffer, s
 	}
 
 	std::shared_ptr<OsgTexture> osgTexture = std::dynamic_pointer_cast<OsgTexture>(texture);
-	SURGSIM_ASSERT(osgTexture != nullptr) <<
-										  "RenderTarget used a texture that was not an OsgTexture subclass";
+	SURGSIM_ASSERT(osgTexture != nullptr)
+			<< "RenderTarget used a texture that was not an OsgTexture subclass";
 
 	osg::Texture* actualTexture = osgTexture->getOsgTexture();
 	SURGSIM_ASSERT(actualTexture != nullptr) <<
@@ -308,7 +308,10 @@ SurgSim::Math::Vector4d OsgCamera::getAmbientColor()
 	return m_ambientColor;
 }
 
-
+void OsgCamera::setGenerateTangents(bool value)
+{
+	SURGSIM_ASSERT(value == false) << "Generate Tangents is not supported on Cameras.";
+}
 
 }; // namespace Graphics
 }; // namespace SurgSim
