@@ -42,7 +42,7 @@ public:
 	/// each tangent is separately orthonormal to the normal, but not to each other
 	bool getBasisOrthonormality();
 
-	//! Sets the arrays required to generate tangent space basis vectors
+	/// Sets the arrays required to generate tangent space basis vectors
 	/// \param vertexArray Array containing vertex positions
 	/// \param normalArray Array containing vertex normals
 	/// \param textureCoordArray Array containing texture coordinates
@@ -55,7 +55,7 @@ public:
 			 osg::Vec4Array* bitangentArray);
 
 	/// Orthogonalize and normalize the calculated tangent space basis vectors
-	void orthonormalize();
+	void orthogonalize();
 
 	/// Resets all calculated tangent space basis vectors to 0.
 	void reset();
@@ -84,7 +84,7 @@ private:
 	osg::Vec4Array* m_bitangentArray;
 
 	/// Whether or not to create a fully orthonormal basis; otherwise, each tangent is separately orthonormal
-	/// to the normal, but not to eachother
+	/// to the normal, but not to each other
 	bool m_createOrthonormalBasis;
 };
 
@@ -111,11 +111,11 @@ public:
 	/// each tangent is separately orthonormal to the normal, but not to each other
 	bool getBasisOrthonormality();
 
-	//! Generates tangent space vectors for all geometry in the geode
+	/// Generates tangent space vectors for all geometry in the geode
 	/// \param geode Geode to generate tangent space vectors
 	void apply(osg::Geode& geode) override; // NOLINT
 
-	//! Generates tangent space basis vectors for the geometry
+	/// Generates tangent space basis vectors for the geometry
 	/// \param geometry Geometry to generate normals
 	/// \param textureCoordUnit Texture unit of texture coordinates to use for calculating the tangent space
 	/// \param tangentAttribIndex Index of the vertex attribute array to store the calculated tangents
@@ -139,7 +139,7 @@ private:
 	int m_bitangentAttribIndex;
 
 	/// Whether or not to create a fully orthonormal basis; otherwise, each tangent is separately orthonormal to
-	/// the normal, but not to eachother
+	/// the normal, but not to each other
 	bool m_createOrthonormalBasis;
 };
 

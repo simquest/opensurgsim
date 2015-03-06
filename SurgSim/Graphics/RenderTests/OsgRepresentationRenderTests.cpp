@@ -140,8 +140,8 @@ class  LineGeometryVisitor : public osg::NodeVisitor
 {
 public :
 	LineGeometryVisitor() :
-		m_normalsScale(0.1),
-		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN)
+		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN),
+		m_normalsScale(0.1)
 	{
 	}
 
@@ -154,10 +154,6 @@ public :
 
 	void apply(osg::Geode& geode) // NOLINT
 	{
-		osg::StateSet* state = nullptr;
-		unsigned int vertNum = 0;
-		unsigned int numGeoms = geode.getNumDrawables();
-
 		// Only deal with 1 geometry for now ...
 		if (geode.getNumDrawables() > 0)
 		{
@@ -193,7 +189,7 @@ public :
 
 		osg::Vec3Array* vertices = new osg::Vec3Array(geomVertices->size() * 2);
 		osg::Vec3 direction;
-		for (int i = 0; i < geomVertices->size(); ++i)
+		for (size_t i = 0; i < geomVertices->size(); ++i)
 		{
 
 			(*vertices)[i * 2] = (*geomVertices)[i];
@@ -254,8 +250,6 @@ TEST_F(OsgRepresentationRenderTests, TangentTest)
 							 Vector3d(0.0, 0.0, 0.0),
 							 Vector3d(0.0, 1.0, 0.0)));
 
-
-	bool done = false;
 	osg::ref_ptr<osg::Node> node = graphics->getOsgNode();
 	// Generate normals
 	osgUtil::SmoothingVisitor sv;

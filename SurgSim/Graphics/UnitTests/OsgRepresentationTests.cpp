@@ -305,10 +305,6 @@ public :
 
 	void apply(osg::Geode& geode) // NOLINT
 	{
-		osg::StateSet* state = nullptr;
-		unsigned int vertNum = 0;
-		unsigned int numGeoms = geode.getNumDrawables();
-
 		// Test object only has 1 geometry ...
 		if (geode.getNumDrawables() > 0)
 		{
