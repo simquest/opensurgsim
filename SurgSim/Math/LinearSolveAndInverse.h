@@ -37,13 +37,6 @@ class LinearSolveAndInverse
 public:
 	virtual ~LinearSolveAndInverse(){}
 
-	/// Solve a linear system A.x=b and compute the matrix A^-1
-	/// \param A Linear system matrix
-	/// \param b Linear system right-hand-side
-	/// \param[out] x Linear system unknown (if requested)
-	/// \param[out] Ainv Linear system matrix inverse = A^-1 (if requested)
-	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) = 0;
-
 	/// Update the linear solver with a new matrix
 	/// \param A the new matrix to solve/inverse for
 	virtual void update(const Matrix& A) = 0;
@@ -65,8 +58,6 @@ private:
 	Eigen::PartialPivLU<typename Eigen::MatrixBase<Matrix>::PlainObject> m_luDecomposition;
 
 public:
-	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
-
 	void update(const Matrix& A) override;
 
 	void solve(const Vector& b, Vector* x) override;
@@ -81,8 +72,6 @@ private:
 	Vector m_inverseDiagonal;
 
 public:
-	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
-
 	void update(const Matrix& A) override;
 
 	void solve(const Vector& b, Vector* x) override;
@@ -96,8 +85,6 @@ template <size_t BlockSize>
 class LinearSolveAndInverseTriDiagonalBlockMatrix : public LinearSolveAndInverse
 {
 public:
-	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
-
 	void update(const Matrix& A) override;
 
 	void solve(const Vector& b, Vector* x) override;
@@ -152,8 +139,6 @@ class LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix :
 	public LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>
 {
 public:
-	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
-
 	void update(const Matrix& A) override;
 
 	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalBlock;

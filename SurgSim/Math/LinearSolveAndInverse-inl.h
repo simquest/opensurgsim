@@ -152,27 +152,6 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalB
 }
 
 template <size_t BlockSize>
-void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::operator ()(const Matrix& A, const Vector& b, Vector* x,
-																		 Matrix* Ainv)
-{
-	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
-
-	if (Ainv != nullptr)
-	{
-		inverseTriDiagonalBlock(A, Ainv);
-		if (x != nullptr)
-		{
-			(*x) = (*Ainv) * b;
-		}
-	}
-	else if (x != nullptr)
-	{
-		inverseTriDiagonalBlock(A, &m_inverse);
-		(*x) = m_inverse * b;
-	}
-}
-
-template <size_t BlockSize>
 void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::update(const Matrix& A)
 {
 	inverseTriDiagonalBlock(A, &m_inverse);
@@ -188,28 +167,6 @@ template <size_t BlockSize>
 void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::getInverse(Matrix* Ainv)
 {
 	*Ainv = m_inverse;
-}
-
-template <size_t BlockSize>
-void LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<BlockSize>::operator ()(const Matrix& A, const Vector& b,
-																				  Vector* x,
-																				  Matrix* Ainv)
-{
-	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
-
-	if (Ainv != nullptr)
-	{
-		inverseTriDiagonalBlock(A, Ainv, true);
-		if (x != nullptr)
-		{
-			(*x) = (*Ainv) * b;
-		}
-	}
-	else if (x != nullptr)
-	{
-		inverseTriDiagonalBlock(A, &m_inverse, true);
-		(*x) = m_inverse * b;
-	}
 }
 
 template <size_t BlockSize>
