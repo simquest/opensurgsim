@@ -28,10 +28,10 @@ ThreadPool::ThreadPool(size_t numThreads) :
 	auto threadLoop = [this] ()
 	{
 		std::unique_ptr<TaskBase> task;
-		for (;;)
+		while (true)
 		{
 			{
-				boost::unique_lock<boost::mutex> lock(m_tasksMutex);
+				boost::unique_lock<boost::mutex> lock(m_mutex);
 				m_threadSignaler.wait(lock, [this] { return m_destructing || !m_tasks.empty(); });
 				if (m_destructing)
 				{
@@ -55,7 +55,7 @@ ThreadPool::ThreadPool(size_t numThreads) :
 ThreadPool::~ThreadPool()
 {
 	{
-		boost::unique_lock<boost::mutex> lock(m_tasksMutex);
+		boost::unique_lock<boost::mutex> lock(m_mutex);
 		m_destructing = true;
 	}
 	m_threadSignaler.notify_all();

@@ -20,9 +20,9 @@
 #include <boost/thread.hpp>
 #include <functional>
 #include <future>
+#include <list>
 #include <memory>
 #include <queue>
-#include <vector>
 
 
 namespace SurgSim
@@ -96,13 +96,13 @@ private:
 	class Task;
 
 	/// The worker threads
-	std::vector<boost::thread> m_threads;
+	std::list<boost::thread> m_threads;
 
 	/// Queued tasks waiting for an available thread
 	std::queue<std::unique_ptr<TaskBase>> m_tasks;
 
 	/// Mutex for protecting the tasks queue
-	boost::mutex m_tasksMutex;
+	boost::mutex m_mutex;
 
 	/// Signaler for waking up threads waiting for tasks
 	boost::condition_variable m_threadSignaler;

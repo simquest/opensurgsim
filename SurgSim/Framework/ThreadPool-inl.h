@@ -57,7 +57,7 @@ std::future<R> ThreadPool::enqueue(std::function<R()> function)
 	std::unique_ptr<Task<R>> task = std::unique_ptr<Task<R>>(new Task<R>(function));
 	std::future<R> future = task->getFuture();
 	{
-		boost::unique_lock<boost::mutex> lock(m_tasksMutex);
+		boost::unique_lock<boost::mutex> lock(m_mutex);
 		m_tasks.push(std::move(task));
 	}
 	m_threadSignaler.notify_one();
