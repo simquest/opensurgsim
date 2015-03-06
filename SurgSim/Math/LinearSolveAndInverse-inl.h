@@ -173,6 +173,24 @@ void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::operator ()(const M
 }
 
 template <size_t BlockSize>
+void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::update(const Matrix& A)
+{
+	inverseTriDiagonalBlock(A, &m_inverse);
+}
+
+template <size_t BlockSize>
+void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::solve(const Vector& b, Vector* x)
+{
+	(*x) = m_inverse * b;
+}
+
+template <size_t BlockSize>
+void LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::getInverse(Matrix* Ainv)
+{
+	*Ainv = m_inverse;
+}
+
+template <size_t BlockSize>
 void LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<BlockSize>::operator ()(const Matrix& A, const Vector& b,
 																				  Vector* x,
 																				  Matrix* Ainv)
@@ -192,6 +210,12 @@ void LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<BlockSize>::operator (
 		inverseTriDiagonalBlock(A, &m_inverse, true);
 		(*x) = m_inverse * b;
 	}
+}
+
+template <size_t BlockSize>
+void LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<BlockSize>::update(const Matrix& A)
+{
+	inverseTriDiagonalBlock(A, &m_inverse, true);
 }
 
 };  // namespace Math

@@ -45,6 +45,22 @@ void LinearSolveAndInverseDiagonalMatrix::operator ()(const Matrix& A, const Vec
 	}
 }
 
+void LinearSolveAndInverseDiagonalMatrix::update(const Matrix& A)
+{
+	m_inverseDiagonal = A.diagonal().cwiseInverse();
+}
+
+void LinearSolveAndInverseDiagonalMatrix::solve(const Vector& b, Vector* x)
+{
+	*x = m_inverseDiagonal.cwiseProduct(b);
+}
+
+void LinearSolveAndInverseDiagonalMatrix::getInverse(Matrix* Ainv)
+{
+	Ainv->setZero();
+	Ainv->diagonal() = m_inverseDiagonal;
+}
+
 void LinearSolveAndInverseDenseMatrix::operator ()(const Matrix& A, const Vector& b, Vector* x, Matrix* Ainv)
 {
 	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
@@ -61,6 +77,23 @@ void LinearSolveAndInverseDenseMatrix::operator ()(const Matrix& A, const Vector
 			(*Ainv) = lu.inverse();
 		}
 	}
+}
+
+void LinearSolveAndInverseDenseMatrix::update(const Matrix& A)
+{
+	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
+
+	m_luDecomposition = A.partialPivLu();
+}
+
+void LinearSolveAndInverseDenseMatrix::solve(const Vector& b, Vector* x)
+{
+	*x = m_luDecomposition.solve(b);
+}
+
+void LinearSolveAndInverseDenseMatrix::getInverse(Matrix* Ainv)
+{
+	*Ainv = m_luDecomposition.inverse();
 }
 
 }; // namespace Math

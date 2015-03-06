@@ -43,20 +43,51 @@ public:
 	/// \param[out] x Linear system unknown (if requested)
 	/// \param[out] Ainv Linear system matrix inverse = A^-1 (if requested)
 	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) = 0;
+
+	/// Update the linear solver with a new matrix
+	/// \param A the new matrix to solve/inverse for
+	virtual void update(const Matrix& A) = 0;
+
+	/// Solve a linear system A.x=b using matrix A provided by the latest update call
+	/// \param b The rhs vector
+	/// \param [out] x The solution vector
+	virtual void solve(const Vector& b, Vector* x) = 0;
+
+	/// Get the inverse matrix of the linear system , i.e. the inverse of the matrix provided on the last update call
+	/// \param [out] Ainv The inverse matrix of A
+	virtual void getInverse(Matrix* Ainv) = 0;
 };
 
 /// Derivation for dense matrix type
 class LinearSolveAndInverseDenseMatrix : public LinearSolveAndInverse
 {
+private:
+	Eigen::PartialPivLU<typename Eigen::MatrixBase<Matrix>::PlainObject> m_luDecomposition;
+
 public:
 	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+
+	void update(const Matrix& A) override;
+
+	void solve(const Vector& b, Vector* x) override;
+
+	void getInverse(Matrix* Ainv) override;
 };
 
 /// Derivation for diagonal matrix type
 class LinearSolveAndInverseDiagonalMatrix : public LinearSolveAndInverse
 {
+private:
+	Vector m_inverseDiagonal;
+
 public:
 	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+
+	void update(const Matrix& A) override;
+
+	void solve(const Vector& b, Vector* x) override;
+
+	void getInverse(Matrix* Ainv) override;
 };
 
 /// Derivation for tri-diagonal block matrix type
@@ -66,6 +97,12 @@ class LinearSolveAndInverseTriDiagonalBlockMatrix : public LinearSolveAndInverse
 {
 public:
 	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+
+	void update(const Matrix& A) override;
+
+	void solve(const Vector& b, Vector* x) override;
+
+	void getInverse(Matrix* Ainv) override;
 
 protected:
 	/// Computes the inverse matrix
@@ -116,6 +153,8 @@ class LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix :
 {
 public:
 	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+
+	void update(const Matrix& A) override;
 
 	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalBlock;
 	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::m_inverse;
