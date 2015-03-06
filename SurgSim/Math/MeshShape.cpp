@@ -57,13 +57,14 @@ bool MeshShape::calculateNormals()
 
 		// Calculate normal vector
 		SurgSim::Math::Vector3d normal = (vertex1 - vertex0).cross(vertex2 - vertex0);
-		if (normal.isZero() && result)
+		if (normal.isZero())
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Math/MeshShape")) <<
 				"MeshShape::calculateNormals unable to calculate normals. For example, for triangle #" << i <<
 				" with vertices:" << std::endl << "1: " << vertex0.transpose() << std::endl <<
 				"2: " << vertex1.transpose() << std::endl << "3: " << vertex2.transpose();
 			result = false;
+			break;
 		}
 		normal.normalize();
 		getTriangle(i).data.normal = normal;
@@ -215,9 +216,7 @@ bool MeshShape::setPose(const SurgSim::Math::RigidTransform3d& pose)
 		targetVertex->position = pose * it->position;
 		++targetVertex;
 	}
-
-	updateAabbTree();
-	return calculateNormals();
+	return doUpdate();
 }
 
 std::shared_ptr<SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree()

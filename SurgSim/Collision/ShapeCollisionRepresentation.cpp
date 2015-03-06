@@ -15,6 +15,7 @@
 
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
@@ -72,7 +73,7 @@ void ShapeCollisionRepresentation::update(const double& dt)
 		{
 			setLocalActive(false);
 			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/ShapeCollisionRepresentation")) <<
-				"Collision representation '" << getName() <<
+				"SceneElement '" << getSceneElement()->getName() << "', Collision representation '" << getName() <<
 				"' went inactive because its shape failed in moving to a pose of:" << std::endl << getPose().matrix();
 		}
 	}

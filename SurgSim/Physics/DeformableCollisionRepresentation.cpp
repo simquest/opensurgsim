@@ -16,6 +16,7 @@
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
@@ -62,7 +63,8 @@ void DeformableCollisionRepresentation::update(const double& dt)
 	{
 		setLocalActive(false);
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-			"Collision representation '" << getName() << "' went inactive because its shape failed to update.";
+			"SceneElement '" << getSceneElement()->getName() << "', Collision representation '" << getName() <<
+			"' went inactive because its shape failed to update.";
 	}
 }
 

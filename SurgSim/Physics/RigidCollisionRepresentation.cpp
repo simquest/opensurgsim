@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 
@@ -49,7 +50,7 @@ void RigidCollisionRepresentation::update(const double& dt)
 		{
 			setLocalActive(false);
 			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/RigidCollisionRepresentation")) <<
-				"Collision representation '" << getName() <<
+				"SceneElement '" << getSceneElement()->getName() << "', Collision representation '" << getName() <<
 				"' went inactive because its shape failed in moving to a pose of:" << std::endl << getPose().matrix();
 		}
 	}

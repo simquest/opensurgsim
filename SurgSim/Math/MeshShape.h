@@ -91,9 +91,9 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	Matrix33d getSecondMomentOfVolume() const override;
 
-	/// Set the object's global pose
+	/// Set the object's global pose, then updates the shape (AABB tree and normals).
 	/// \param pose the rigid transform to apply
-	/// \return true on success.
+	/// \return true if the update succeeds.
 	bool setPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Get the AabbTree
