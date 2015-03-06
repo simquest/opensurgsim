@@ -57,10 +57,6 @@ public:
 	/// \param	name	The name of this component.
 	void setName(const std::string& name);
 
-	/// Query the object type index.
-	/// \return The type index for an object of this class or a derived class.
-	std::type_index getTypeIndex() const;
-
 	/// Gets the id of the component
 	boost::uuids::uuid getUuid() const;
 

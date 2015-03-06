@@ -126,11 +126,9 @@ void Constraint::setInformation(
 	SURGSIM_ASSERT(representation1 != nullptr) << "Second representation can't be nullptr";
 
 	auto localization0 = representation0->createLocalization(location0);
-	localization0->setRepresentation(representation0);
 	SURGSIM_ASSERT(localization0 != nullptr) << "Could not create localization for " << representation0->getName();
 
 	auto localization1 = representation1->createLocalization(location1);
-	localization1->setRepresentation(representation1);
 	SURGSIM_ASSERT(localization1 != nullptr) << "Could not create localization for " << representation1->getName();
 
 	auto implementation0 = representation0->getConstraintImplementation(m_constraintType);

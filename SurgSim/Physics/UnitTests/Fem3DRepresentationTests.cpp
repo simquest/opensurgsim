@@ -243,6 +243,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 							std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
 							m_fem->createLocalization(location)););
 			EXPECT_TRUE(localization != nullptr);
+			EXPECT_TRUE(localization->getRepresentation() == m_fem);
 
 			SurgSim::Math::Vector globalPosition;
 			SurgSim::DataStructures::IndexedLocalCoordinate coordinate = localization->getLocalPosition();

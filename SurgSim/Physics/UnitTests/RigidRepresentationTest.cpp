@@ -986,7 +986,7 @@ TEST_F(RigidRepresentationTest, LocalizationCreation)
 	Location loc(Vector3d(3.0, 2.0, 1.0));
 
 	std::shared_ptr<Localization> localization = rigidBody->createLocalization(loc);
-	localization->setRepresentation(rigidBody);
+	EXPECT_TRUE(localization->getRepresentation() == rigidBody);
 
 	Vector3d globalPos = rigidBody->getCurrentState().getPose() * loc.rigidLocalPosition.getValue();
 
