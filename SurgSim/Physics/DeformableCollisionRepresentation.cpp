@@ -63,8 +63,10 @@ void DeformableCollisionRepresentation::update(const double& dt)
 	{
 		setLocalActive(false);
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-			"SceneElement '" << getSceneElement()->getName() << "', Collision representation '" << getName() <<
-			"' went inactive because its shape failed to update.";
+			"CollisionRepresentation '" << getName() << "' " <<
+			(getSceneElement() == nullptr ?
+			"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
+			"went inactive because its shape failed to update.";
 	}
 }
 
