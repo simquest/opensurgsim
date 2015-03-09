@@ -13,15 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-link_directories(
-	${Boost_LIBRARY_DIRS}
-)
-
-include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
 set(EXAMPLE_SOURCES
 	main.cpp
 )
@@ -30,18 +21,15 @@ set(EXAMPLE_HEADERS
 )
 
 surgsim_add_executable(SixenseVisualTest
-	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+	"${EXAMPLE_SOURCES}" 
+	"${EXAMPLE_HEADERS}"
+)
 
 set(LIBS
-	SixenseDevice
 	IdentityPoseDevice
-	VisualTestCommon
+	SixenseDevice
 	SurgSimInput
-	SurgSimFramework
-	SurgSimDataStructures
-	${Boost_LIBRARIES}
-	${SIXENSESDK_LIBRARIES}
-	${OPENGL_LIBRARIES}
+	VisualTestCommon
 )
 
 target_link_libraries(SixenseVisualTest ${LIBS})
