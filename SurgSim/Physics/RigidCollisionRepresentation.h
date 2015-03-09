@@ -75,6 +75,7 @@ public:
 private:
 	std::weak_ptr<SurgSim::Physics::RigidRepresentationBase> m_physicsRepresentation;
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
+	SurgSim::Math::RigidTransform3d m_lastPose;
 };
 
 }; // namespace Collision
