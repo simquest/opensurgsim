@@ -28,6 +28,7 @@
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgRigidTransformConversions.h"
 #include "SurgSim/Graphics/OsgUnitBox.h"
+#include "SurgSim/Graphics/TangentSpaceGenerator.h"
 
 namespace SurgSim
 {
@@ -134,6 +135,36 @@ bool OsgRepresentation::getDrawAsWireFrame() const
 void OsgRepresentation::setVisible(bool val)
 {
 	m_switch->setChildValue(m_transform, val);
+}
+
+
+
+void OsgRepresentation::setGenerateTangents(bool value)
+{
+	if (value && m_tangentGenerator == nullptr)
+	{
+		m_tangentGenerator =
+			new TangentSpaceGenerator(DIFFUSE_TEXTURE_UNIT, TANGENT_VERTEX_ATTRIBUTE_ID, BITANGENT_VERTEX_ATTRIBUTE_ID);
+		m_tangentGenerator->setBasisOrthonormality(true);
+		updateTangents();
+	}
+	if (!value)
+	{
+		m_tangentGenerator = nullptr;
+	}
+}
+
+bool OsgRepresentation::isGeneratingTangents() const
+{
+	return m_tangentGenerator != nullptr;
+}
+
+void OsgRepresentation::updateTangents()
+{
+	if (m_tangentGenerator != nullptr)
+	{
+		m_switch->accept(*m_tangentGenerator);
+	}
 }
 
 }; // Graphics

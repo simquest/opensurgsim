@@ -19,6 +19,7 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
@@ -36,6 +37,8 @@
 #include <gtest/gtest.h>
 
 #include <random>
+#include <array>
+#include "../OsgSceneryRepresentation.h"
 
 
 using SurgSim::Framework::Runtime;
@@ -91,6 +94,26 @@ std::shared_ptr<Material> createShinyMaterial(const SurgSim::Framework::Applicat
 	return material;
 }
 
+std::shared_ptr<OsgTextureCubeMap> loadAxisCubeMap(
+	const SurgSim::Framework::ApplicationData& data,
+	const std::string& prefix)
+{
+	std::array<std::string, 6> filenames;
+
+	bool success = data.tryFindFile(prefix + "negx.png", &filenames[0]);
+	success = data.tryFindFile(prefix + "posx.png", &filenames[1]) && success;
+	success = data.tryFindFile(prefix + "negy.png", &filenames[2]) && success;
+	success = data.tryFindFile(prefix + "posy.png", &filenames[3]) && success;
+	success = data.tryFindFile(prefix + "negz.png", &filenames[4]) && success;
+	success = data.tryFindFile(prefix + "posz.png", &filenames[5]) && success;
+
+	EXPECT_TRUE(success) << "One or more files are missing";
+
+	auto result = std::make_shared<OsgTextureCubeMap>();
+	result->loadImageFaces(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5]);
+	return result;
+}
+
 struct OsgProgramRenderTests : public RenderTest
 {
 
@@ -122,7 +145,7 @@ TEST_F(OsgProgramRenderTests, SphereShaderTest)
 	runtime->stop();
 }
 
-TEST_F(OsgProgramRenderTests, ShinyShaderTest)
+TEST_F(OsgProgramRenderTests, Shiny)
 {
 	/// Add the sphere representation to the view element, no need to make another scene element
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Sphere");
@@ -163,7 +186,7 @@ TEST_F(OsgProgramRenderTests, ShinyShaderTest)
 	runtime->stop();
 }
 
-TEST_F(OsgProgramRenderTests, TexturedShinyShaderTest)
+TEST_F(OsgProgramRenderTests, TexturedShiny)
 {
 	// The textured Sphere
 	std::shared_ptr<SphereRepresentation> sphereRepresentation =
@@ -229,6 +252,109 @@ TEST_F(OsgProgramRenderTests, TexturedShinyShaderTest)
 
 	viewElement->enableManipulator(true);
 	viewElement->getCamera()->setAmbientColor(SurgSim::Math::Vector4d(0.2, 0.2, 0.2, 1.0));
+
+	viewElement->setPose(makeRigidTransform(Vector3d(0.0, 0.0, -2.0),
+											Vector3d(0.0, 0.0, 0.0),
+											Vector3d(0.0, 1.0, 0.0)));
+
+	viewElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+	runtime->stop();
+}
+
+
+
+TEST_F(OsgProgramRenderTests, Metal)
+{
+	// Multiple objects used for testing the shader, utilize if needed
+	std::shared_ptr<SphereRepresentation> sphere = std::make_shared<OsgSphereRepresentation>("sphere");
+	sphere->setRadius(0.25);
+
+	std::shared_ptr<BoxRepresentation> cube = std::make_shared<OsgBoxRepresentation>("box");
+
+	auto scenery = std::make_shared<OsgSceneryRepresentation>("scenery");
+	scenery->loadModel("OsgShaderRenderTests/L_forcep.obj");
+
+	// Assign the object used for testing to the representation
+	auto representation = std::dynamic_pointer_cast<Representation>(sphere);
+
+	auto material = std::make_shared<OsgMaterial>("material");
+	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/s_mapping_metal");
+	ASSERT_TRUE(program != nullptr);
+	material->setProgram(program);
+
+	material->addUniform("vec4", "specularColor");
+	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+
+	material->addUniform("float", "shininess");
+	material->setValue("shininess", 1024.0f);
+
+	material->addUniform("float", "specularPercent");
+	material->setValue("specularPercent", 1.0f);
+
+	material->addUniform("float", "diffusePercent");
+	material->setValue("diffusePercent", 0.0f);
+
+	std::string filename;
+	// Provide a fake shadow map, it's all black so no shadow contribution
+	{
+		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/black.png", &filename));
+		auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+		texture->loadImage(filename);
+		auto textureUniform = std::make_shared<OsgTextureUniform<OsgTexture2d>>("shadowMap");
+		textureUniform->set(texture);
+		textureUniform->setMinimumTextureUnit(8);
+		material->addUniform(textureUniform);
+	}
+
+	{
+		// Provide the Diffuse environment map
+		// Axis map is used for testing mapping
+//		auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "OsgShaderRenderTests/axis/");
+		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile(
+						"OsgShaderRenderTests/reflectionDiffuse.png", &filename));
+		auto texture = std::make_shared<OsgTextureCubeMap>();
+		texture->loadImage(filename);
+		material->addUniform("samplerCube", "diffuseEnvMap");
+		material->setValue("diffuseEnvMap", texture);
+	}
+
+
+	{
+		// Provide the Specular environment map
+		// Axis map is used for testing mapping
+//		auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "OsgShaderRenderTests/axis/");
+		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile(
+						"OsgShaderRenderTests/reflectionSpecular.png", &filename));
+		auto texture = std::make_shared<OsgTextureCubeMap>();
+		texture->loadImage(filename);
+		material->addUniform("samplerCube", "specularEnvMap");
+		material->setValue("specularEnvMap", texture);
+	}
+
+	representation->setMaterial(material);
+
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Sphere");
+	sceneElement->addComponent(representation);
+	sceneElement->addComponent(material);
+	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+
+	scene->addSceneElement(sceneElement);
+
+	sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
+	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
+	light->setDiffuseColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
+	light->setSpecularColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
+	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
+	sceneElement->addComponent(light);
+	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+	sceneElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-2.0, -2.0, -4.0)));
+	scene->addSceneElement(sceneElement);
+
+	viewElement->enableManipulator(true);
+	viewElement->getCamera()->setAmbientColor(SurgSim::Math::Vector4d(0.1, 0.1, 0.1, 1.0));
 
 	viewElement->setPose(makeRigidTransform(Vector3d(0.0, 0.0, -2.0),
 											Vector3d(0.0, 0.0, 0.0),

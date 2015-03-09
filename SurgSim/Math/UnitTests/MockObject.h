@@ -146,7 +146,7 @@ public:
 
 	Vector& computeF(const OdeState& state) override
 	{
-		// Internale deformation forces
+		// Internal deformation forces
 		m_f = -computeK(state) * (state.getPositions() - m_initialState->getPositions());
 
 		// Gravity pulling on the free nodes
@@ -167,7 +167,7 @@ public:
 		return m_D;
 	}
 
-	virtual const Matrix& computeK(const OdeState& state) override
+	const Matrix& computeK(const OdeState& state) override
 	{
 		// A fake but valid stiffness matrix (node 0 fixed)
 		m_K.setIdentity();

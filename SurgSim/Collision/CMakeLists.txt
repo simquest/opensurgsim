@@ -22,7 +22,11 @@ set(SURGSIM_COLLISION_SOURCES
 	CollisionPair.cpp
 	ContactCalculation.cpp
 	DefaultContactCalculation.cpp
+	OctreeCapsuleDcdContact.cpp
 	OctreeDcdContact.cpp
+	OctreeDoubleSidedPlaneDcdContact.cpp
+	OctreePlaneDcdContact.cpp
+	OctreeSphereDcdContact.cpp
 	Representation.cpp
 	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
@@ -42,7 +46,11 @@ set(SURGSIM_COLLISION_HEADERS
 	ContactCalculation.h
 	DcdCollision.h
 	DefaultContactCalculation.h
+	OctreeCapsuleDcdContact.h
 	OctreeDcdContact.h
+	OctreeDoubleSidedPlaneDcdContact.h
+	OctreePlaneDcdContact.h
+	OctreeSphereDcdContact.h
 	Representation.h
 	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h

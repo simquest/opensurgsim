@@ -40,6 +40,7 @@ set(UNIT_TEST_SOURCES
 	SceneElementTest.cpp
 	SceneTest.cpp
 	SharedInstanceTest.cpp
+	ThreadPoolTest.cpp
 	TimerTest.cpp
 	TransferPropertiesBehaviorTests.cpp
 )
