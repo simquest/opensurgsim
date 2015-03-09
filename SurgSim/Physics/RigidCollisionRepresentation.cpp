@@ -29,7 +29,8 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidCollision
 				 RigidCollisionRepresentation);
 
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
-	Representation(name)
+	Representation(name),
+	m_lastPose(SurgSim::Math::RigidTransform3d::Identity())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
 									  Shape, getShape, setShape);
@@ -44,7 +45,12 @@ void RigidCollisionRepresentation::update(const double& dt)
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getShape());
 	if (meshShape != nullptr && meshShape->isValid())
 	{
-		meshShape->setPose(getPose());
+		SurgSim::Math::RigidTransform3d pose = getPose();
+		if (!pose.isApprox(m_lastPose))
+		{
+			m_lastPose = pose;
+			meshShape->setPose(pose);
+		}
 	}
 }
 
