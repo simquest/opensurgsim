@@ -350,7 +350,8 @@ void FemRepresentation::addRayleighDampingForce(
 		// If we have the mass matrix, we can compute directly F = -rayleighMass.M.v(t)
 		if (useGlobalMassMatrix)
 		{
-			*force -= (scale * rayleighMass) * (m_M * v);
+			Math::Vector tempForce = (scale * rayleighMass) * (m_M * v);
+			*force -= tempForce;
 		}
 		else
 		{
@@ -368,7 +369,8 @@ void FemRepresentation::addRayleighDampingForce(
 	{
 		if (useGlobalStiffnessMatrix)
 		{
-			*force -= scale * rayleighStiffness * (m_K * v);
+			Math::Vector tempForce = scale * rayleighStiffness * (m_K * v);
+			*force -= tempForce;
 		}
 		else
 		{

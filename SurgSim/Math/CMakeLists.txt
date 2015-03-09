@@ -22,6 +22,7 @@ set(SURGSIM_MATH_SOURCES
 	DoubleSidedPlaneShape.cpp
 	GaussLegendreQuadrature.cpp
 	LinearSolveAndInverse.cpp
+	LinearSparseSolveAndInverse.cpp
 	MathConvert.cpp
 	MeshShape.cpp
 	MlcpGaussSeidelSolver.cpp
@@ -58,6 +59,7 @@ set(SURGSIM_MATH_HEADERS
 	KalmanFilter-inl.h
 	LinearSolveAndInverse.h
 	LinearSolveAndInverse-inl.h
+	LinearSparseSolveAndInverse.h
 	MathConvert.h
 	MathConvert-inl.h
 	Matrix.h

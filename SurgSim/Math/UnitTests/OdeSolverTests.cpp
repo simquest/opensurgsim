@@ -22,6 +22,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/UnitTests/MockObject.h"
 
 namespace SurgSim
@@ -32,7 +33,7 @@ namespace Math
 
 namespace
 {
-	const std::string name = "MockOdeSolver";
+const std::string name = "MockOdeSolver";
 };
 
 class MockOdeSolver : public OdeSolver
@@ -101,8 +102,10 @@ TEST(OdeSolver, GetTest)
 	MassPointState currentState, newState;
 	MockOdeSolver solver(&m);
 
+	Math::SparseMatrix identityMatrix(currentState.getNumDof(), currentState.getNumDof());
+	identityMatrix.setIdentity();
 	solver.solve(1e-3, currentState, &newState);
-	EXPECT_TRUE(solver.getSystemMatrix().isIdentity());
+	EXPECT_TRUE(solver.getSystemMatrix().isApprox(identityMatrix));
 	EXPECT_TRUE(solver.getCompliance().isIdentity());
 	EXPECT_EQ(name, solver.getName());
 }

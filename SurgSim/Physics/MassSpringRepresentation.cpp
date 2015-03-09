@@ -142,10 +142,13 @@ void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Local
 			". Valid range is {0.." << getNumMasses() << "}";
 
 	m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce;
-	/* TODO
+	/* Replaced:
 	m_externalGeneralizedStiffness.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += K;
 	m_externalGeneralizedDamping.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += D;
 	*/
+	// Replaced the above with:
+	Math::addSubMatrix(K, nodeId, nodeId, dofPerNode, dofPerNode, &m_externalGeneralizedStiffness);
+	Math::addSubMatrix(D, nodeId, nodeId, dofPerNode, dofPerNode, &m_externalGeneralizedDamping);
 	m_hasExternalGeneralizedForce = true;
 }
 
@@ -199,15 +202,22 @@ const SparseMatrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeS
 	using SurgSim::Math::setSubVector;
 
 	// Make sure the mass matrix has been properly allocated
-	m_M.setZero();
+	m_M.resize(state.getNumDof(), state.getNumDof());
 
+	/* Replaced:
 	Eigen::MatrixBase<const Eigen::SparseMatrix<double>>::DiagonalReturnType diagonal = m_M.diagonal();
 
 	for (size_t massId = 0; massId < getNumMasses(); massId++)
 	{
-		/*
 		setSubVector(Vector3d::Ones() * getMass(massId)->getMass(), massId, 3, &diagonal);
-		*/
+	}
+	*/
+	// Replace the above loop with the following:
+	for (size_t massId = 0; massId < getNumMasses(); massId++)
+	{
+		m_M.coeffRef(3 * massId, 3 * massId) = getMass(massId)->getMass();
+		m_M.coeffRef((3 * massId) + 1, (3 * massId) + 1) = getMass(massId)->getMass();
+		m_M.coeffRef((3 * massId) + 2, (3 * massId) + 2) = getMass(massId)->getMass();
 	}
 
 	// Apply boundary conditions globally
@@ -215,9 +225,11 @@ const SparseMatrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeS
 		 boundaryCondition != std::end(state.getBoundaryConditions());
 		 boundaryCondition++)
 	{
-		/* TODO
+		/* Replaced:
 		diagonal[*boundaryCondition] = 1e9;
 		*/
+		// Replaced the above with:
+		m_M.coeffRef(*boundaryCondition, *boundaryCondition) = 1e9;
 	}
 
 	return m_M;
@@ -241,10 +253,14 @@ const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeS
 		for (size_t massId = 0; massId < getNumMasses(); massId++)
 		{
 			double coef = rayleighMass * getMass(massId)->getMass();
+			/* Replaced:
 			Eigen::MatrixBase<const Eigen::SparseMatrix<double>>::DiagonalReturnType Ddiagonal = m_D.diagonal();
-			/* TODO:
 			setSubVector(Vector3d::Ones() * coef, massId, 3, &Ddiagonal);
 			*/
+			// Replaced the above with ...
+			m_D.coeffRef(3 * massId, 3 * massId) = coef;
+			m_D.coeffRef((3 * massId) + 1, (3 * massId) + 1) = coef;
+			m_D.coeffRef((3 * massId) + 2, (3 * massId) + 2) = coef;
 		}
 	}
 
@@ -274,11 +290,14 @@ const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeS
 		 boundaryCondition != std::end(state.getBoundaryConditions());
 		 boundaryCondition++)
 	{
-		/* TODO:
+		/* Replaced:
 		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
 		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
 		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
 		*/
+		Math::zeroRow(*boundaryCondition, &m_D);
+		Math::zeroColumn(*boundaryCondition, &m_D);
+		m_D.coeffRef(*boundaryCondition, *boundaryCondition) = 1e9;
 	}
 
 	return m_D;
@@ -308,11 +327,14 @@ const SparseMatrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeS
 		 boundaryCondition != std::end(state.getBoundaryConditions());
 		 boundaryCondition++)
 	{
-		/* TODO:
+		/* Replaced:
 		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
 		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
 		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
 		*/
+		Math::zeroRow(*boundaryCondition, &m_K);
+		Math::zeroColumn(*boundaryCondition, &m_K);
+		m_K.coeffRef(*boundaryCondition, *boundaryCondition) = 1e9;
 	}
 
 	return m_K;
@@ -350,9 +372,13 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 	// Add the Rayleigh damping matrix
 	if (m_rayleighDamping.massCoefficient)
 	{
-		/* TODO:
+		/* Replaced:
 		m_D.diagonal() += m_M.diagonal() * m_rayleighDamping.massCoefficient;
 		*/
+		for (size_t diagonal = 0; diagonal < state.getNumDof(); ++diagonal)
+		{
+			m_D.coeffRef(diagonal, diagonal) = m_D.coeff(diagonal, diagonal) * m_rayleighDamping.massCoefficient;
+		}
 	}
 	if (m_rayleighDamping.stiffnessCoefficient)
 	{
@@ -378,7 +404,7 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 		 boundaryCondition != std::end(state.getBoundaryConditions());
 		 boundaryCondition++)
 	{
-		/* TODO:
+		/* Replaced:
 		m_M.diagonal()[*boundaryCondition] = 1e9;
 
 		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
@@ -389,6 +415,15 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
 		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
 		*/
+		m_M.coeffRef(*boundaryCondition, *boundaryCondition) = 1e9;
+
+		Math::zeroRow(*boundaryCondition, &m_D);
+		Math::zeroColumn(*boundaryCondition, &m_D);
+		m_D.coeffRef(*boundaryCondition, *boundaryCondition) = 1e9;
+
+		Math::zeroRow(*boundaryCondition, &m_K);
+		Math::zeroColumn(*boundaryCondition, &m_K);
+		m_K.coeffRef(*boundaryCondition, *boundaryCondition) = 1e9;
 
 		m_f[*boundaryCondition] = 0.0;
 	}
@@ -436,7 +471,8 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Surg
 	{
 		if (useGlobalStiffnessMatrix)
 		{
-			*force -= (scale * rayleighStiffness) * (m_K * v);
+			Math::Vector tempVector = (scale * rayleighStiffness) * (m_K * v);
+			*force -= tempVector;
 		}
 		else
 		{
