@@ -59,13 +59,12 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit OdeSolverRungeKutta4(OdeEquation* equation);
 
-	/// Solves the equation
-	/// \param dt The time step
-	/// \param currentState State at time t
-	/// \param[out] newState State at time t+dt
-	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
 
 protected:
+	void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
+		bool computeRHS = true) override;
+
 	/// Internal structure to hold the 4 temporary evaluations
 	struct RungeKuttaDerivedState
 	{

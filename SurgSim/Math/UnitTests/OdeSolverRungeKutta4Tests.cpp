@@ -30,12 +30,15 @@ namespace SurgSim
 namespace Math
 {
 
+namespace
+{
 template<class T>
 void doConstructorTest()
 {
 	MassPoint m;
 	ASSERT_NO_THROW({T solver(&m);});
 }
+};
 
 TEST(OdeSolverRungeKutta4, ConstructorTest)
 {
@@ -105,10 +108,9 @@ void integrateRK4(double dt, const MassPoint& m, const RungeKuttaState& yn, Rung
 	yn_plus_1->velocity = yn.velocity + dt / 6.0 *
 		(k1.acceleration + k4.acceleration + 2.0 * (k2.acceleration + k3.acceleration));
 }
-};
 
 template<class T>
-void doSolveTest()
+void doSolveTest(bool computeCompliance)
 {
 	Vector deltaWithoutViscosity;
 	Vector deltaWithViscosity;
@@ -124,7 +126,7 @@ void doSolveTest()
 		newState = defaultState;
 
 		T solver(&m);
-		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
+		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState, computeCompliance);});
 		EXPECT_EQ(defaultState, currentState);
 		EXPECT_NE(defaultState, newState);
 
@@ -150,7 +152,7 @@ void doSolveTest()
 		newState = defaultState;
 
 		T solver(&m);
-		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
+		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState, computeCompliance);});
 		EXPECT_EQ(defaultState, currentState);
 		EXPECT_NE(defaultState, newState);
 
@@ -190,14 +192,14 @@ void doSolveTest()
 
 		// 1st time step
 		integrateRK4(dt, m, yn, &yn_plus_1);
-		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
+		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState, computeCompliance);});
 
 		EXPECT_TRUE(newState.getPositions().isApprox(yn_plus_1.position));
 		EXPECT_TRUE(newState.getVelocities().isApprox(yn_plus_1.velocity));
 
 		// 2nd time step
 		integrateRK4(dt, m, yn_plus_1, &yn_plus_2);
-		ASSERT_NO_THROW({solver.solve(dt, newState, &newState2);});
+		ASSERT_NO_THROW({solver.solve(dt, newState, &newState2, computeCompliance);});
 
 		EXPECT_TRUE(newState2.getPositions().isApprox(yn_plus_2.position));
 		EXPECT_TRUE(newState2.getVelocities().isApprox(yn_plus_2.velocity));
@@ -223,27 +225,67 @@ void doSolveTest()
 
 		// 1st time step
 		integrateRK4(dt, m, yn, &yn_plus_1);
-		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState);});
+		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState, computeCompliance);});
 		EXPECT_TRUE(newState.getPositions().isApprox(yn_plus_1.position));
 		EXPECT_TRUE(newState.getVelocities().isApprox(yn_plus_1.velocity));
 
 		// 2nd time step
 		integrateRK4(dt, m, yn_plus_1, &yn_plus_2);
-		ASSERT_NO_THROW({solver.solve(dt, newState, &newState2);});
+		ASSERT_NO_THROW({solver.solve(dt, newState, &newState2, computeCompliance);});
 		EXPECT_TRUE(newState2.getPositions().isApprox(yn_plus_2.position));
 		EXPECT_TRUE(newState2.getVelocities().isApprox(yn_plus_2.velocity));
 	}
 }
+};
 
 TEST(OdeSolverRungeKutta4, SolveTest)
 {
 	{
-		SCOPED_TRACE("OdeSolverRungeKutta4");
-		doSolveTest<OdeSolverRungeKutta4>();
+		SCOPED_TRACE("OdeSolverRungeKutta4 computing the compliance matrix");
+		doSolveTest<OdeSolverRungeKutta4>(true);
 	}
 	{
-		SCOPED_TRACE("OdeSolverLinearRungeKutta4");
-		doSolveTest<OdeSolverLinearRungeKutta4>();
+		SCOPED_TRACE("OdeSolverRungeKutta4 not computing the compliance matrix");
+		doSolveTest<OdeSolverRungeKutta4>(false);
+	}
+
+	{
+		SCOPED_TRACE("OdeSolverLinearRungeKutta4 computing the compliance matrix");
+		doSolveTest<OdeSolverLinearRungeKutta4>(true);
+	}
+	{
+		SCOPED_TRACE("OdeSolverLinearRungeKutta4 not computing the compliance matrix");
+		doSolveTest<OdeSolverLinearRungeKutta4>(false);
+	}
+}
+
+namespace
+{
+template <class T>
+void doComputeMatricesTest()
+{
+	MassPoint m;
+	T solver(&m);
+	MassPointState state;
+	double dt = 1e-3;
+
+	Matrix expectedSystemMatrix = m.computeM(state) / dt;
+	EXPECT_NO_THROW(solver.computeMatrices(dt, state));
+	EXPECT_TRUE(solver.getSystemMatrix().isApprox(expectedSystemMatrix));
+	EXPECT_TRUE(solver.getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));
+}
+};
+
+TEST(OdeSolverRungeKutta4, ComputeMatricesTest)
+{
+	{
+		SCOPED_TRACE("RungeKutta4");
+		doComputeMatricesTest<OdeSolverRungeKutta4>();
+	}
+
+	{
+		SCOPED_TRACE("LinearRungeKutta4");
+		doComputeMatricesTest<OdeSolverLinearRungeKutta4>();
 	}
 }
 

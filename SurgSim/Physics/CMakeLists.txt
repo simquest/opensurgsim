@@ -151,7 +151,10 @@ surgsim_add_library(
 
 SET(LIBS
 	SurgSimCollision
+	SurgSimDataStructures
+	SurgSimFramework
 	SurgSimInput
+	SurgSimMath
 )
 
 target_link_libraries(SurgSimPhysics ${LIBS})
