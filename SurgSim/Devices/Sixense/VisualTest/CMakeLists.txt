@@ -26,7 +26,9 @@ surgsim_add_executable(SixenseVisualTest
 )
 
 set(LIBS
+	IdentityPoseDevice
 	SixenseDevice
+	SurgSimInput
 	VisualTestCommon
 )
 

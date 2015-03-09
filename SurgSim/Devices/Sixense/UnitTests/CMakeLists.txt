@@ -24,6 +24,9 @@ set(UNIT_TEST_SOURCES
 
 set(LIBS 
 	SixenseDevice
+	SurgSimDataStructures
+	SurgSimMath
+	SurgSimTesting
 )
 
 surgsim_add_unit_tests(SixenseDeviceTest)
