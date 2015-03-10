@@ -302,8 +302,8 @@ void setSparseMatrix(const Eigen::SparseMatrixBase<Derived>& subMatrix,
 /// \note If the structure of the matrix is known and constant through time, it is recommended to
 /// \note pre-allocate the matrix structure and use an optimized dedicated setXXX method.
 template <typename Derived, typename Derived2>
-void addSparseMatrix(const Eigen::SparseMatrixBase<Derived>& subMatrix,
-					 Eigen::SparseMatrixBase<Derived2>* matrix,
+void addSparseMatrix(const Derived& subMatrix,
+					 Derived2* matrix,
 					 typename Derived2::Index i,
 					 typename Derived2::Index j)
 {
