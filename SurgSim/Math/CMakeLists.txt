@@ -61,6 +61,7 @@ set(SURGSIM_MATH_HEADERS
 	MathConvert.h
 	MathConvert-inl.h
 	Matrix.h
+	MatrixSparse.h
 	MeshShape.h
 	MeshShape-inl.h
 	MlcpConstraintType.h
