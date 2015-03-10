@@ -177,6 +177,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	inputVTC->setRepresentation(physicsRepresentation);
 	inputVTC->overrideAttachmentPoint(Vector3d::Zero());
 	inputVTC->setCalculateInertialTorques(false);
+	inputVTC->overrideAngularStiffness(4.0);
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
 	// Also, it is aware of collisions of the stapler.
@@ -372,13 +373,15 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
 int main(int argc, char* argv[])
 {
 	const std::string deviceName = "MultiAxisDevice";
+	SurgSim::Framework::Logger::getLogger("Physics Manager")->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
+	SurgSim::Framework::Logger::getLogger(
+		"Physics/VirtualToolCoupler")->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
 
 	std::shared_ptr<BehaviorManager> behaviorManager = std::make_shared<BehaviorManager>();
 	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
 	std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
 	physicsManager->setRate(100.0);
-	SurgSim::Framework::Logger::getLogger("Physics Manager")->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	runtime->addManager(behaviorManager);
@@ -387,7 +390,7 @@ int main(int argc, char* argv[])
 	runtime->addManager(physicsManager);
 
 	std::shared_ptr<DeviceInterface> device;
-	device = std::make_shared<MultiAxisDevice>(deviceName);
+	device = std::make_shared<SurgSim::Device::MultiAxisDevice>(deviceName);
 	if (!device->initialize())
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
