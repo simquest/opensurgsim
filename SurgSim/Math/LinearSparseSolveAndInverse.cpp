@@ -38,6 +38,10 @@ void LinearSparseSolveAndInverseLU::operator()(const SparseMatrix& A, const Vect
 		}
 		if (Ainv != nullptr)
 		{
+			if ((Ainv->rows() != A.rows()) || (Ainv->cols() != A.cols()))
+			{
+				Ainv->resize(A.rows(), A.cols());
+			}
 			Ainv->setIdentity();
 			(*Ainv) = lu.solve((*Ainv));
 		}
