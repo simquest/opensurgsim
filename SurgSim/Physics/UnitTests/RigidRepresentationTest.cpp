@@ -429,14 +429,16 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		Vector6d Fnumeric = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofV);
 		Matrix66d Knumeric = computeExtraStiffness(inputForce, anchorLocalPoint, dofX, dofV);
+		std::cout << "Knumeric:" << std::endl << Knumeric << std::endl;
 		Matrix66d Dnumeric = computeExtraDamping(inputForce, anchorLocalPoint, dofX, dofV);
-
 		Vector6d F = inputForce;
 		Matrix66d K = Matrix66d::Zero(), D = Matrix66d::Zero();
 		rigidBody->addExternalGeneralizedForce(location, F, K, D);
 		F = rigidBody->getExternalGeneralizedForce().unsafeGet();
 		K = rigidBody->getExternalGeneralizedStiffness();
 		D = rigidBody->getExternalGeneralizedDamping();
+		std::cout << "K:" << std::endl << K << std::endl << "Knumeric:" <<
+				  std::endl << Knumeric << std::endl;
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
 		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2.2e-7); // Epsilon set by trial and error
