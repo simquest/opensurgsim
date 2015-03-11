@@ -15,10 +15,12 @@
 
 #include "SurgSim/Particles/ParticleSystemRepresentation.h"
 
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/Particle.h"
 #include "SurgSim/Particles/ParticleReference.h"
+#include "SurgSim/Particles/ParticlesCollisionRepresentation.h"
 #include "SurgSim/Particles/ParticlesState.h"
 
 
@@ -151,6 +153,37 @@ void ParticleSystemRepresentation::update(double dt)
 		SURGSIM_LOG_WARNING(m_logger) << "Particle System " << getName() << " failed to update.";
 	}
 }
+
+std::shared_ptr<SurgSim::Collision::Representation> ParticleSystemRepresentation::getCollisionRepresentation() const
+{
+	return m_collisionRepresentation;
+}
+
+void ParticleSystemRepresentation::setCollisionRepresentation(
+	std::shared_ptr<SurgSim::Collision::Representation> representation)
+{
+	if (m_collisionRepresentation != representation)
+	{
+		// If we have an old collision representation clear the dependency if it was a deformable collision
+		// representation
+		auto oldCollisionRep =
+			std::dynamic_pointer_cast<ParticlesCollisionRepresentation>(m_collisionRepresentation);
+		if (oldCollisionRep != nullptr)
+		{
+			oldCollisionRep->setParticleSystem(nullptr);
+		}
+
+		m_collisionRepresentation = representation;
+
+		// If its a ParticlesCollisionRepresentation connect with this representation
+		auto newCollisionRep = std::dynamic_pointer_cast<ParticlesCollisionRepresentation>(representation);
+		if (newCollisionRep != nullptr)
+		{
+			newCollisionRep->setParticleSystem(std::static_pointer_cast<ParticleSystemRepresentation>(getSharedPtr()));
+		}
+	}
+}
+
 
 }; // namespace Particles
 }; // namespace SurgSim

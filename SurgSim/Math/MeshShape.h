@@ -73,7 +73,7 @@ public:
 	/// Get normal for triangle.
 	/// \param triangleId The triangle to get normal.
 	/// \return The normal for the triangle with given ID.
-	const SurgSim::Math::Vector3d& getNormal(size_t triangleId);
+	const SurgSim::Math::Vector3d& getNormal(size_t triangleId) const;
 
 	/// Calculate normals for all triangles.
 	/// \note Normals will be normalized.
@@ -104,7 +104,7 @@ public:
 
 	/// Get the AabbTree
 	/// \return The object's associated AabbTree
-	std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree();
+	const std::shared_ptr<const SurgSim::DataStructures::AabbTree> getAabbTree() const;
 
 	bool isValid() const override;
 

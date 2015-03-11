@@ -15,6 +15,8 @@
 
 #include "SurgSim/Particles/SphRepresentation.h"
 
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/Grid.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Vector.h"
@@ -332,24 +334,44 @@ void SphRepresentation::computeAccelerations()
 
 void SphRepresentation::handleCollisions()
 {
-	for (auto planeConstraint : m_planeConstraints)
+	const double stiffness = 50000.0;
+	const double damping = 100.0;
+	if (m_collisionRepresentation != nullptr)
 	{
-		auto n = planeConstraint.planeEquation.segment<3>(0);
-
-		for (auto& particleI : getParticleReferences())
+		auto collisions = m_collisionRepresentation->getCollisions().safeGet();
+		for (auto& collision : *collisions)
 		{
-			const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
-			double penetration = xI.dot(n) + planeConstraint.planeEquation[3];
-
-			if (penetration < 0.0)
+			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getName()
+				<< ": # of collision = " << collision.second.size() << std::endl;
+			for (auto& contact : collision.second)
 			{
-				const Eigen::VectorBlock<const Vector, 3> vI = particleI.getVelocity();
-				double forceIntensity = planeConstraint.stiffness * penetration +
-										planeConstraint.damping * vI.dot(n);
-				particleI.setAcceleration(particleI.getAcceleration() - forceIntensity * n);
+				ParticleReference particle(m_state,
+						contact->penetrationPoints.first.meshLocalCoordinate.getValue().index);
+				double forceIntensity = stiffness * contact->depth +
+										damping * particle.getVelocity().dot(contact->normal);
+				particle.setAcceleration(particle.getAcceleration() + forceIntensity * contact->normal);
 			}
 		}
 	}
+
+	//for (auto planeConstraint : m_planeConstraints)
+	//{
+	//    auto n = planeConstraint.planeEquation.segment<3>(0);
+
+	//    for (auto& particleI : getParticleReferences())
+	//    {
+	//        const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
+	//        double penetration = xI.dot(n) + planeConstraint.planeEquation[3];
+
+	//        if (penetration < 0.0)
+	//        {
+	//            const Eigen::VectorBlock<const Vector, 3> vI = particleI.getVelocity();
+	//            double forceIntensity = planeConstraint.stiffness * penetration +
+	//                                    planeConstraint.damping * vI.dot(n);
+	//            particleI.setAcceleration(particleI.getAcceleration() - forceIntensity * n);
+	//        }
+	//    }
+	//}
 }
 
 double SphRepresentation::kernelPoly6(const SurgSim::Math::Vector3d& rij)

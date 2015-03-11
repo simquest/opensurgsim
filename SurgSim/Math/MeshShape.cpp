@@ -41,7 +41,7 @@ MeshShape::MeshShape() :
 {
 }
 
-const SurgSim::Math::Vector3d& MeshShape::getNormal(size_t triangleId)
+const SurgSim::Math::Vector3d& MeshShape::getNormal(size_t triangleId) const
 {
 	return getTriangle(triangleId).data.normal;
 }
@@ -213,7 +213,7 @@ void MeshShape::setPose(const SurgSim::Math::RigidTransform3d& pose)
 	updateAabbTree();
 }
 
-std::shared_ptr<SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree()
+const std::shared_ptr<const SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree() const
 {
 	return m_aabbTree;
 }

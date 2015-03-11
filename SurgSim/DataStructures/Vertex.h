@@ -52,6 +52,10 @@ struct Vertex
 	{
 	}
 
+	Vertex()
+	{
+	}
+
 	/// Position of the vertex.
 	SurgSim::Math::Vector3d position;
 	/// Extra vertex data.
