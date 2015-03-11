@@ -22,10 +22,12 @@ set(STAPLING_SOURCES
 	StapleElement.cpp
 	StaplerBehavior.cpp
 	Stapling.cpp
+	StaplingPhysicsManager.cpp
 )
 set(STAPLING_HEADERS
 	StapleElement.h
 	StaplerBehavior.h
+	StaplingPhysicsManager.h
 )
 surgsim_add_executable(Stapling "${STAPLING_SOURCES}" "${STAPLING_HEADERS}")
 
@@ -33,10 +35,12 @@ set(SERIALIZEDSTAPLING_SOURCES
 	SerializedStapling.cpp
 	StapleElement.cpp
 	StaplerBehavior.cpp
+	StaplingPhysicsManager.cpp
 )
 set(SERIALIZEDSTAPLING_HEADERS
 	StapleElement.h
 	StaplerBehavior.h
+	StaplingPhysicsManager.h
 )
 surgsim_add_executable(SerializedStapling "${SERIALIZEDSTAPLING_SOURCES}" "${SERIALIZEDSTAPLING_HEADERS}")
 

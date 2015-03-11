@@ -17,6 +17,7 @@
 #include <string>
 
 #include "Examples/Stapling/StaplerBehavior.h"
+#include "Examples/Stapling/StaplingPhysicsManager.h"
 #include "SurgSim/Blocks/Blocks.h"
 #include "SurgSim/Collision/Collision.h"
 #include "SurgSim/DataStructures/DataStructures.h"
@@ -362,8 +363,8 @@ int main(int argc, char* argv[])
 	std::shared_ptr<BehaviorManager> behaviorManager = std::make_shared<BehaviorManager>();
 	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
 	std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
-	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
-	physicsManager->setRate(100.0);
+	std::shared_ptr<StaplingPhysicsManager> physicsManager = std::make_shared<StaplingPhysicsManager>();
+	physicsManager->setRate(150.0);
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	runtime->addManager(behaviorManager);
