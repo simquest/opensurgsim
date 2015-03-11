@@ -24,7 +24,7 @@ namespace Math
 {
 
 ParticlesShape::ParticlesShape() :
-	m_radius(0.01)
+	m_radius(0.005)
 {
 }
 

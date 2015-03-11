@@ -347,31 +347,12 @@ void SphRepresentation::handleCollisions()
 			{
 				ParticleReference particle(m_state,
 						contact->penetrationPoints.first.meshLocalCoordinate.getValue().index);
-				double forceIntensity = stiffness * contact->depth +
+				double forceIntensity = stiffness * contact->depth -
 										damping * particle.getVelocity().dot(contact->normal);
 				particle.setAcceleration(particle.getAcceleration() + forceIntensity * contact->normal);
 			}
 		}
 	}
-
-	//for (auto planeConstraint : m_planeConstraints)
-	//{
-	//    auto n = planeConstraint.planeEquation.segment<3>(0);
-
-	//    for (auto& particleI : getParticleReferences())
-	//    {
-	//        const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
-	//        double penetration = xI.dot(n) + planeConstraint.planeEquation[3];
-
-	//        if (penetration < 0.0)
-	//        {
-	//            const Eigen::VectorBlock<const Vector, 3> vI = particleI.getVelocity();
-	//            double forceIntensity = planeConstraint.stiffness * penetration +
-	//                                    planeConstraint.damping * vI.dot(n);
-	//            particleI.setAcceleration(particleI.getAcceleration() - forceIntensity * n);
-	//        }
-	//    }
-	//}
 }
 
 double SphRepresentation::kernelPoly6(const SurgSim::Math::Vector3d& rij)
