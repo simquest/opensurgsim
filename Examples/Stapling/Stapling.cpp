@@ -17,6 +17,7 @@
 #include <string>
 
 #include "Examples/Stapling/StaplerBehavior.h"
+#include "Examples/Stapling/StaplingPhysicsManager.h"
 #include "SurgSim/Blocks/Blocks.h"
 #include "SurgSim/Collision/Collision.h"
 #include "SurgSim/DataStructures/DataStructures.h"
@@ -177,7 +178,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	inputVTC->setRepresentation(physicsRepresentation);
 	inputVTC->overrideAttachmentPoint(Vector3d::Zero());
 	inputVTC->setCalculateInertialTorques(false);
-	inputVTC->overrideAngularStiffness(4.0);
+	inputVTC->overrideAngularStiffness(2.0);
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
 	// Also, it is aware of collisions of the stapler.
@@ -380,8 +381,8 @@ int main(int argc, char* argv[])
 	std::shared_ptr<BehaviorManager> behaviorManager = std::make_shared<BehaviorManager>();
 	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
 	std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
-	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
-	physicsManager->setRate(100.0);
+	std::shared_ptr<StaplingPhysicsManager> physicsManager = std::make_shared<StaplingPhysicsManager>();
+	physicsManager->setRate(150.0);
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	runtime->addManager(behaviorManager);
