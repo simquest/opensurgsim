@@ -149,7 +149,8 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape> mesh,
 	calcContact.calculateContact(pair);
 
 	const Vector3d globalPlaneNormal = planeRep->getPose().linear() * plane->getNormal();
-	mesh->updateAabbTree();
+	// update the AABB tree
+	mesh->update();
 	const double maxRadius = mesh->getAabbTree()->getAabb().diagonal().norm() / 2.0;
 	const Vector3d planeToMesh = mesh->getCenter() - planeTrans;
 	Vector3d nearestPointOnPlane;

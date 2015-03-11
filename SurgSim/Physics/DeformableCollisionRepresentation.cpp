@@ -16,6 +16,7 @@
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
@@ -58,8 +59,15 @@ void DeformableCollisionRepresentation::update(const double& dt)
 	{
 		m_shape->setVertexPosition(nodeId, odeState->getPosition(nodeId));
 	}
-	m_shape->update();
-	m_shape->updateAabbTree();
+	if (!m_shape->update())
+	{
+		setLocalActive(false);
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
+			"CollisionRepresentation '" << getName() << "' " <<
+			(getSceneElement() == nullptr ?
+			"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
+			"went inactive because its shape failed to update.";
+	}
 }
 
 bool DeformableCollisionRepresentation::doInitialize()
