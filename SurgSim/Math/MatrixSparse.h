@@ -275,7 +275,7 @@ void setSubMatrixWithSearch(const Derived& subMatrix,
 /// \note pre-allocate the matrix structure and use an optimized dedicated setXXX method.
 template <typename Derived, typename Derived2>
 void setSparseMatrix(const Eigen::SparseMatrixBase<Derived>& subMatrix,
-					 Eigen::SparseMatrixBase<Derived2>* matrix,
+					 Derived2* matrix,
 					 typename Derived2::Index i,
 					 typename Derived2::Index j)
 {

@@ -46,7 +46,7 @@ void MlcpPhysicsProblem::updateConstraint(
 
 	Vector newCHt = subC * newSubH;
 	A.col(indexNewSubH) += H.middleCols(indexSubC, subC.rows()) * newCHt;
-	H.block(indexNewSubH, indexSubC, 1, subC.rows()) += newSubH.transpose();
+	SurgSim::Math::setSparseMatrix(newSubH.transpose().eval(), &H, indexNewSubH, indexSubC);
 	CHt.block(indexSubC, indexNewSubH, subC.rows(), 1) += newCHt;
 	A.row(indexNewSubH) += newSubH.transpose() * CHt.middleRows(indexSubC, subC.rows());
 }
