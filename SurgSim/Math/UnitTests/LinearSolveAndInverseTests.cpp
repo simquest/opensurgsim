@@ -16,7 +16,6 @@
 /// \file
 /// Tests for the LinearSolveAndInverse.cpp functions.
 
-#include <windows.h>
 #include <gtest/gtest.h>
 
 #include "SurgSim/Math/LinearSolveAndInverse.h"

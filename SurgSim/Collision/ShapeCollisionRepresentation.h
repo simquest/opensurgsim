@@ -54,6 +54,8 @@ public:
 	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
 	void update(const double& dt) override;
+
+protected:
 	bool doInitialize() override;
 
 private:
