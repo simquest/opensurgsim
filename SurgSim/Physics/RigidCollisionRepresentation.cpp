@@ -31,8 +31,7 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidCollision
 				 RigidCollisionRepresentation);
 
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
-	Representation(name),
-	m_lastPose(SurgSim::Math::RigidTransform3d::Identity())
+	Representation(name)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
 									  Shape, getShape, setShape);
@@ -47,19 +46,14 @@ void RigidCollisionRepresentation::update(const double& dt)
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getShape());
 	if (meshShape != nullptr && meshShape->isValid())
 	{
-		SurgSim::Math::RigidTransform3d pose = getPose();
-		if (!pose.isApprox(m_lastPose))
+		if (!meshShape->setPose(getPose()))
 		{
-			m_lastPose = pose;
-			if (!meshShape->setPose(pose))
-			{
-				setLocalActive(false);
-				SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/RigidCollisionRepresentation")) <<
-					"CollisionRepresentation '" << getName() << "' " <<
-					(getSceneElement() == nullptr ?
-					"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
-					"went inactive because its shape failed in moving to a pose of:" << std::endl << getPose().matrix();
-			}
+			setLocalActive(false);
+			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/RigidCollisionRepresentation")) <<
+				"CollisionRepresentation '" << getName() << "' " <<
+				(getSceneElement() == nullptr ?
+				"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
+				"went inactive because its shape failed in moving to a pose of:" << std::endl << getPose().matrix();
 		}
 	}
 }
