@@ -33,7 +33,17 @@ class AabbTree;
 namespace Math
 {
 
-class ParticlesShape : public Shape, public SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData>
+struct ParticleData
+{
+	size_t index;
+
+	bool operator==(const ParticleData& data) const
+	{
+		return index == data.index;
+	}
+};
+
+class ParticlesShape : public Shape, public SurgSim::DataStructures::Vertices<ParticleData>
 {
 public:
 	/// Constructor

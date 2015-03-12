@@ -18,6 +18,7 @@
 #include "SurgSim/Math/ParticlesShape.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Particles/Particle.h"
+#include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/ParticleSystemRepresentation.h"
 
 namespace SurgSim
@@ -38,15 +39,16 @@ ParticlesCollisionRepresentation::~ParticlesCollisionRepresentation()
 void ParticlesCollisionRepresentation::update(const double& dt)
 {
 	auto particleSystem = getParticleSystem();
-	auto particles = particleSystem->getParticles();
+	std::list<ParticleReference> particles = particleSystem->getParticleReferences();
 
-	m_shape->getVertices().resize(particles->size());
+	m_shape->getVertices().resize(particles.size());
 
 	auto vertex = m_shape->getVertices().begin();
-	auto particle = particles->begin();
-	for (; particle != particles->end(); ++particle, ++vertex)
+	auto particle = particles.begin();
+	for (; particle != particles.end(); ++particle, ++vertex)
 	{
 		vertex->position = particle->getPosition();
+		vertex->data.index = particle->getIndex();
 	}
 	m_shape->update();
 

@@ -19,6 +19,7 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/Grid.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/Particle.h"
 #include "SurgSim/Particles/ParticleReference.h"
@@ -188,11 +189,12 @@ bool SphRepresentation::doInitialize()
 	m_density.resize(m_maxParticles);
 	m_pressure.resize(m_maxParticles);
 	m_mass.resize(m_maxParticles);
-	m_mass.assign(m_mass.size(), m_massPerParticle);
+	//m_mass.assign(m_mass.size(), m_massPerParticle);
+	m_mass.fill(m_massPerParticle);
 
 	// The 3d grid is composed of 2^10 cubic cells on each dimension of size m_h each.
 	// This covers a volume of (m_h * 2^10)^3 cubic meter centered on the origin.
-	SurgSim::Math::Vector3d aabbSize(1024 * m_h, 1024 * m_h, 1024 * m_h);
+	SurgSim::Math::Vector3d aabbSize = SurgSim::Math::Vector3d::Constant(10240 * m_h);
 	Eigen::AlignedBox<double, 3> aabb;
 	aabb.min() = -aabbSize / 2.0;
 	aabb.max() = aabbSize / 2.0;
@@ -226,8 +228,11 @@ void SphRepresentation::computeAcceleration(double dt)
 
 void SphRepresentation::computeVelocityAndPosition(double dt)
 {
-	m_state->getVelocities() += dt * m_state->getAccelerations();
-	m_state->getPositions() += dt * m_state->getVelocities();
+	for (auto& particle : getParticleReferences())
+	{
+		particle.setVelocity(particle.getVelocity() + dt * particle.getAcceleration());
+		particle.setPosition(particle.getPosition() + dt * particle.getVelocity());
+	}
 }
 
 void SphRepresentation::computeNeighbors()
@@ -254,11 +259,16 @@ void SphRepresentation::computeDensityAndPressureField()
 			const Eigen::VectorBlock<Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
 			densityI += m_mass[indexJ] * kernelPoly6(xI - xJ);
 		}
+		SURGSIM_ASSERT(densityI != 0.0) << "zero density";
 		m_density[indexI] = densityI;
 
 		// Calculate the particle's pressure
 		m_pressure[indexI] = m_gasStiffness * (m_density[indexI] - m_densityReference);
 	}
+	SURGSIM_ASSERT(SurgSim::Math::isValid(m_pressure)) << "Invalid pressure";
+	SURGSIM_ASSERT(SurgSim::Math::isValid(m_density)) << "Invalid density";
+	SURGSIM_ASSERT(SurgSim::Math::isValid(m_mass)) << "Invalid mass";
+	SURGSIM_ASSERT((m_mass.array() != 0.0).all()) << "zero mass";
 }
 
 void SphRepresentation::computeNormalField()
@@ -275,6 +285,7 @@ void SphRepresentation::computeNormalField()
 			const Eigen::VectorBlock<Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
 			normalI += m_mass[indexJ] / m_density[indexJ] * kernelPoly6Gradient(xI - xJ);
 		}
+		SURGSIM_ASSERT(SurgSim::Math::isValid(normalI)) << indexI << " normal is invalid";
 		m_normal[indexI] = normalI;
 	}
 }
@@ -324,12 +335,14 @@ void SphRepresentation::computeAccelerations()
 			m_state->getAccelerations().segment<3>(3 * indexJ) -= f;
 		}
 
+		SURGSIM_ASSERT(m_density[indexI] != 0.0) << "zero density";
 		// Compute the acceleration from the forces
 		particleI.setAcceleration(particleI.getAcceleration() / m_density[indexI]);
 
 		// Adding the gravity term (F = rho.g)
 		particleI.setAcceleration(particleI.getAcceleration() + m_gravity);
 	}
+	SURGSIM_ASSERT(SurgSim::Math::isValid(m_state->getAccelerations())) << "Accelerations invalid";
 }
 
 void SphRepresentation::handleCollisions()

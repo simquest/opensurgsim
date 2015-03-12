@@ -135,6 +135,9 @@ void ParticleSystemRepresentation::update(double dt)
 		particleIter->setLifetime(particleIter->getLifetime() - dt);
 		if (particleIter->getLifetime() <= 0)
 		{
+			particleIter->setPosition(SurgSim::Math::Vector3d::Zero());
+			particleIter->setVelocity(SurgSim::Math::Vector3d::Zero());
+			particleIter->setAcceleration(SurgSim::Math::Vector3d::Zero());
 			m_unusedParticles.splice(m_unusedParticles.end(), m_particles, particleIter);
 		}
 		particleIter = nextIter;
