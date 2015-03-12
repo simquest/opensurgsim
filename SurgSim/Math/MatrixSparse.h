@@ -47,15 +47,15 @@ namespace Math
 /// \exception SurgSim::Framework::AssertionFailure If performChecks is true and one of the condition is met: <br>
 /// * if 'sub' is smaller than (n x m) in any dimension <br>
 /// * if 'matrix' is nullptr or smaller than (n x m) in any dimension <br>
-/// * if the requested block is out of range in 'matrix'.
+/// * if the requested block is out of range in 'matrix'. <br>
 /// * if 'matrix' does not fulfill the requirement (i.e. has more elements on the block rows/columns than the block
 ///   itself, or is missing elements within the block).
-/// \note The SparseMatrix 'matrix' must have a structure like the following:
-/// (xx 00 x)
-/// (xx 00 x)
-/// (00[xx]0) -> The block must already contain all the coefficients and no other coefficients should exist on
-/// (00[xx]0)    these rows and columns.
-/// (xx 00 x)
+/// \note The SparseMatrix 'matrix' must have a structure like the following: <br>
+/// (xx 00 x) <br>
+/// (xx 00 x) <br>
+/// (00[xx]0) -> The block must already contain all the coefficients and no other coefficients should exist on <br>
+/// (00[xx]0) -> these rows and columns. <br>
+/// (xx 00 x) <br>
 template <size_t n, size_t m, bool performChecks, typename DerivedSub, typename T, int Opt, typename I>
 void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 							   I rowStart,
@@ -166,14 +166,14 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 /// \exception SurgSim::Framework::AssertionFailure If performChecks is true and one of the condition is met: <br>
 /// * if 'sub' is smaller than (n x m) in any dimension <br>
 /// * if 'matrix' is nullptr or smaller than (n x m) in any dimension <br>
-/// * if the requested block is out of range in 'matrix'.
-/// * if 'matrix' does not fulfill the requirement (i.e. is missing elements within the block).
-/// \note The receiving SparseMatrix must have a structure like the following:
-/// (xx x0 x)
-/// (xx 0x x)
-/// (x0[xx]x) -> The block must already contain all the coefficients but these rows and columns may
-/// (0x[xx]0)    contains more coefficients before and after the block.
-/// (xx 00 x)
+/// * if the requested block is out of range in 'matrix'. <br>
+/// * if 'matrix' does not fulfill the requirement (i.e. is missing elements within the block). <br>
+/// \note The receiving SparseMatrix must have a structure like the following: <br>
+/// (xx x0 x) <br>
+/// (xx 0x x) <br>
+/// (x0[xx]x) -> The block must already contain all the coefficients but these rows and columns may <br>
+/// (0x[xx]0) -> contains more coefficients before and after the block. <br>
+/// (xx 00 x) <br>
 template <size_t n, size_t m, bool performChecks, typename DerivedSub, typename T, int Opt, typename I>
 void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 							I rowStart,
