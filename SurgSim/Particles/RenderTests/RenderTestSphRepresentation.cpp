@@ -74,7 +74,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createParticleSystem()
 	// c.f. "Lagrangian Fluid Dynamics Using Smoothed Particle Hydrodynamics", Micky Kelager, January 9th 2006.
 	// for input data to simulate water.
 	auto particles = std::make_shared<SurgSim::Particles::SphRepresentation>("physics");
-	particles->setMaxParticles(20);
+	particles->setMaxParticles(5000);
 	particles->setMassPerParticle(0.02);
 	particles->setDensity(998.29);
 	particles->setGasStiffness(3.0);
@@ -107,8 +107,8 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createParticleSystem()
 	sphereEmitter->setTarget(particles);
 	sphereEmitter->setShape(std::make_shared<SurgSim::Math::SphereShape>(0.1));
 	sphereEmitter->setMode(SurgSim::Particles::EMIT_MODE_SURFACE);
-	sphereEmitter->setRate(20.0); /// 2000 particles per second (maximum is 5000)
-	sphereEmitter->setLifetimeRange(std::make_pair(0.5, 1.0));
+	sphereEmitter->setRate(200.0); /// 2000 particles per second (maximum is 5000)
+	sphereEmitter->setLifetimeRange(std::make_pair(0.2, 0.4));
 	sphereEmitter->setVelocityRange(std::make_pair(SurgSim::Math::Vector3d::Zero(), SurgSim::Math::Vector3d::Zero()));
 	element->addComponent(sphereEmitter);
 

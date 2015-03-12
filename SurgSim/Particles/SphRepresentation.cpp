@@ -259,7 +259,7 @@ void SphRepresentation::computeDensityAndPressureField()
 			const Eigen::VectorBlock<Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
 			densityI += m_mass[indexJ] * kernelPoly6(xI - xJ);
 		}
-		SURGSIM_ASSERT(densityI != 0.0) << "zero density";
+		//SURGSIM_ASSERT(densityI != 0.0) << "zero density";
 		m_density[indexI] = densityI;
 
 		// Calculate the particle's pressure
@@ -335,7 +335,7 @@ void SphRepresentation::computeAccelerations()
 			m_state->getAccelerations().segment<3>(3 * indexJ) -= f;
 		}
 
-		SURGSIM_ASSERT(m_density[indexI] != 0.0) << "zero density";
+		//SURGSIM_ASSERT(m_density[indexI] != 0.0) << "zero density";
 		// Compute the acceleration from the forces
 		particleI.setAcceleration(particleI.getAcceleration() / m_density[indexI]);
 
