@@ -533,8 +533,18 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 
 		// Setup the initial state
 		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
-		initialState->setNumDof(fem->getNumDofPerNode(), 8);
+		initialState->setNumDof(fem->getNumDofPerNode(), 3);
 		fem->setInitialState(initialState);
+
+		// Add one element
+		std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		element->addNode(0);
+		element->addNode(1);
+		element->addNode(2);
+		fem->addFemElement(element);
 
 		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		fem->wakeUp();
@@ -560,8 +570,18 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 
 		// Setup the initial state
 		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
-		initialState->setNumDof(fem->getNumDofPerNode(), 8);
+		initialState->setNumDof(fem->getNumDofPerNode(), 3);
 		fem->setInitialState(initialState);
+
+		// Add one element
+		std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		element->addNode(0);
+		element->addNode(1);
+		element->addNode(2);
+		fem->addFemElement(element);
 
 		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		fem->wakeUp();
@@ -574,7 +594,7 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		// This method has been overridden.
 		EXPECT_NO_THROW(fem->update(1e-3));
 
-		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceMatrix().isIdentity()));
+		EXPECT_NO_THROW(EXPECT_TRUE((fem->getComplianceMatrix() / 1e-3).isIdentity()));
 	}
 }
 
