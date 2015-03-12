@@ -137,7 +137,16 @@ TEST_F(DeformableCollisionRepresentationTest, UpdateAndInitializationTest)
 	// Set the shape used by Collision representation.
 	m_deformableCollisionRepresentation->setShape(m_meshShape);
 	EXPECT_NO_THROW(m_deformableCollisionRepresentation->initialize(m_runtime));
+	EXPECT_NO_THROW(m_deformableCollisionRepresentation->wakeUp());
 	EXPECT_NO_THROW(m_deformableCollisionRepresentation->update(0.0));
+	EXPECT_TRUE(m_deformableCollisionRepresentation->isActive());
+
+	// The MeshShape fails to update due to the normal calculation, making the collision rep inactive
+	auto state = fem3DRepresentation->getCurrentState();
+	state->getPositions().setConstant(0.0);
+	fem3DRepresentation->setInitialState(state);
+	EXPECT_NO_THROW(m_deformableCollisionRepresentation->update(0.0));
+	EXPECT_FALSE(m_deformableCollisionRepresentation->isActive());
 }
 
 } // namespace Physics

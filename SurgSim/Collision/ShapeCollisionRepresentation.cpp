@@ -15,6 +15,7 @@
 
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
@@ -68,7 +69,15 @@ void ShapeCollisionRepresentation::update(const double& dt)
 	{
 		SURGSIM_LOG_IF(!meshShape->isValid(), SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
 			"Try to update an invalid MeshShape.";
-		meshShape->setPose(getPose());
+		if (!meshShape->setPose(getPose()))
+		{
+			setLocalActive(false);
+			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/ShapeCollisionRepresentation")) <<
+				"CollisionRepresentation '" << getName() << "' " <<
+				(getSceneElement() == nullptr ?
+				"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
+				"went inactive because its shape failed in moving to a pose of:" << std::endl << getPose().matrix();
+		}
 	}
 }
 
