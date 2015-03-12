@@ -70,9 +70,10 @@ public:
 
 	/// Performs any updates that are required when the vertices are modified.
 	/// Calls doUpdate() to perform the updates.
-	void update()
+	/// \return true on success.
+	bool update()
 	{
-		doUpdate();
+		return doUpdate();
 	}
 
 	/// Adds a vertex to the mesh.
@@ -190,8 +191,10 @@ private:
 	/// Performs any updates that are required when the vertices are modified.
 	/// Override this method to implement update functionality.
 	/// For example, this could be overridden to calculate normals for each Vertex.
-	virtual void doUpdate()
+	/// \return true on success.
+	virtual bool doUpdate()
 	{
+		return true;
 	}
 
 	/// Vertices
