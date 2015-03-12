@@ -101,7 +101,7 @@ public:
 	/// \return The compliance matrix
 	/// \note The compliance matrix is computed automatically by the ode solver in the method 'update'
 	/// \note So one iteration needs to happen before retrieving a compliance matrix
-	const SurgSim::Math::Matrix& getComplianceMatrix() const;
+	virtual const SurgSim::Math::Matrix& getComplianceMatrix() const;
 
 	void update(double dt) override;
 

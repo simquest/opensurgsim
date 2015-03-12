@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
@@ -31,10 +32,15 @@ namespace Physics
 class FemElement;
 class FemPlyReaderDelegate;
 
-/// Finite Element Model (a.k.a. fem) is a deformable model (a set of nodes connected by FemElement).
-/// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
-/// \note Therefore, it defines a dynamic system M.a=F(x,v)
-/// \note The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
+/// Finite Element Model (a.k.a FEM) is a deformable model (a set of nodes connected by FemElement).
+/// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation), therefore it defines
+/// a dynamic system \f$M.a=F(x,v)\f$
+/// \note + The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
+/// \note + The model handles compliance warping (optional) from the paper:
+/// \note  "Efficient Contact Modeling using Compliance Warping", G Saupin, C Duriez, S Cotin, L Grisoni;
+/// Computer %Graphics International (CGI), Istanbul, Turkey, june 2008.
+/// \note  To use compliance warping, it needs to be turned on by calling setComplianceWarping(true) and the method
+/// updateNodesRotations() needs to be overloaded properly.
 class FemRepresentation : public DeformableRepresentation
 {
 public:
@@ -100,6 +106,19 @@ public:
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	void beforeUpdate(double dt) override;
+
+	void update(double dt) override;
+
+	/// Set the compliance warping flag
+	/// \param useComplianceWarping True to use compliance warping, False otherwise
+	/// \exception SurgSim::Framework::AssertionFailure If the call is done after initialization
+	void setComplianceWarping(bool useComplianceWarping);
+
+	/// Get the compliance warping flag (default = false)
+	/// \return True if compliance warping is used, False otherwise
+	bool getComplianceWarping() const;
+
+	const SurgSim::Math::Matrix& getComplianceMatrix() const override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
@@ -167,6 +186,17 @@ protected:
 
 	bool doInitialize() override;
 
+	/// Method used to update the nodes rotation (necessary to use compliance warping)
+	/// \param state The state to compute the nodes rotations w.r.t. initial state
+	/// \note It should provides all the nodes rotations using the helper method updateRotationPerNode(node, rotation)
+	/// \exception SurgSim::Framework::AssertionFailure if this method is called without being overriden.
+	virtual void updateNodesRotations(const SurgSim::Math::OdeState& state);
+
+	/// Helper method to update a specific node rotation (useful for compliance warping)
+	/// \param nodeId The node to update the rotation for
+	/// \param rotation The new rotation for this node
+	void updateRotationPerNode(size_t nodeId, const SurgSim::Math::Quaterniond& rotation);
+
 	/// Useful information per node
 	std::vector<double> m_massPerNode; ///< Useful in setting up the gravity force F=mg
 
@@ -188,6 +218,15 @@ private:
 		double massCoefficient;
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
+
+	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
+
+	bool m_isInitialComplianceMatrixComputed; ///< For compliance warping: Is the initial compliance matrix computed ?
+
+	SurgSim::Math::Matrix m_complianceWarpingMatrix; ///< The compliance warping matrix if compliance warping in use
+
+	Eigen::SparseMatrix<double> m_rotation; ///< The system-size rotation matrix used for compliance warping.
+	                                        ///< It contains nodes' rotation on the diagonal blocks.
 };
 
 } // namespace Physics

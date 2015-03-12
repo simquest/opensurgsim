@@ -200,7 +200,7 @@ TEST(Fem2DRepresentationTests, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 
 	YAML::Node data = node["SurgSim::Physics::Fem2DRepresentation"];
-	EXPECT_EQ(10u, data.size());
+	EXPECT_EQ(11u, data.size());
 
 	std::shared_ptr<Fem2DRepresentation> newRepresentation;
 	ASSERT_NO_THROW(newRepresentation =
