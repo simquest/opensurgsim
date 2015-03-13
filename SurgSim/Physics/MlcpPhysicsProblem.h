@@ -17,7 +17,7 @@
 #define SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H
 
 #include "SurgSim/Math/MlcpProblem.h"
-#include <Eigen/SparseCore>
+#include "SurgSim/Math/SparseMatrix.h"
 
 namespace SurgSim
 {

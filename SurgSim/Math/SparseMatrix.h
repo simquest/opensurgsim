@@ -22,6 +22,7 @@
 #include <Eigen/Sparse>
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {
