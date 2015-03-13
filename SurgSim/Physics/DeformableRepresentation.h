@@ -98,9 +98,10 @@ public:
 	const SurgSim::Math::Matrix& getExternalGeneralizedDamping() const;
 
 	/// Gets the compliance matrix associated with motion
-	/// \return The compliance matrix
+	/// \return The compliance matrix after the first call to update, an undefined matrix otherwise
 	/// \note The compliance matrix is computed automatically by the ode solver in the method 'update'
 	/// \note So one iteration needs to happen before retrieving a compliance matrix
+	/// \exception SurgSim::Framework::AssertionFailure if called prior to wakeUp
 	virtual const SurgSim::Math::Matrix& getComplianceMatrix() const;
 
 	void update(double dt) override;
