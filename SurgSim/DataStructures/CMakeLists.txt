@@ -62,6 +62,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	NamedDataBuilder.h
 	NamedVariantData.h
 	NamedVariantData-inl.h
+	NormalData.h
 	OctreeNode.h
 	OctreeNode-inl.h
 	OctreeNodePlyReaderDelegate.h
