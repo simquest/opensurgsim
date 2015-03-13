@@ -28,6 +28,59 @@ namespace SurgSim
 namespace Math
 {
 
+namespace
+{
+/// Helper class to assign a column/row of a matrix to a chunk of memory
+/// \tparam T The type of data in the chunk of memory
+/// \tparam Opt The option of the matrix/vector alignment
+/// \tparam Index The index type to access the chunk of memory
+/// \tparam n, m The number of elements to treat (n for ColMajor, m for RowMajor)
+/// \tparam DerivedSub The class of the matrix from which the data are copied
+template <class T, int Opt, class Index, int n, int m, class DerivedSub>
+class op
+{
+public:
+	/// Do the assignment of a row/column of a matrix to a chunk of memory
+	/// \param ptr The chunk of memory
+	/// \param start Where the assignment starts in the chunk of memory
+	/// \param subMatrix The matrix from which the row/column is copied
+	/// \param colRowId The column or row id depending on the template parameter Opt
+	void assign(T* ptr, Index start, const DerivedSub& subMatrix, Index colRowId){}
+};
+
+/// Specialization for column major storage
+template <class T, class Index, int n, int m, class DerivedSub>
+class op<T, Eigen::ColMajor, Index, n, m, DerivedSub>
+{
+public:
+	void assign(T* ptr, Index start, const DerivedSub& subMatrix, Index colId)
+	{
+		typedef Eigen::Matrix<T, n, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
+
+		// ptr[start] is the 1st element in the column
+		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the copy
+		Eigen::Map<ColVector>(&ptr[start]).operator=(
+			subMatrix.col(static_cast<typename DerivedSub::Index>(colId)).template segment<n>(0));
+	}
+};
+
+/// Specialization for row major storage
+template <class T, class Index, int n, int m, class DerivedSub>
+class op<T, Eigen::RowMajor, Index, n, m, DerivedSub>
+{
+public:
+	void assign(T* ptr, Index start, const DerivedSub& subMatrix, Index rowId)
+	{
+		typedef Eigen::Matrix<T, 1, m, Eigen::DontAlign | Eigen::RowMajor> RowVector;
+
+		// ptr[start] is the 1st element in the row
+		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the copy
+		Eigen::Map<RowVector>(&ptr[start]).operator=(
+			subMatrix.row(static_cast<typename DerivedSub::Index>(rowId)).template segment<m>(0));
+	}
+};
+}
+
 /// Set a SparseMatrix block<n, m>(i, j) from a (n x m) 'subMatrix' without searching for the block elements.<br>
 /// It supposes: <br>
 /// + that the SparseMatrix already contains all the elements within the block (no insertion necessary) <br>
@@ -82,8 +135,6 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 	{
 		for (Index colId = 0; colId < static_cast<Index>(m); ++colId)
 		{
-			typedef Eigen::Matrix<T, n, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
-
 			// outerIndices[columnStart + colId] is the index in ptr and innerIndices of the first non-zero element in
 			// the column (columnStart + colId)
 			const Index currentColumnRowStart = outerIndices[columnStart + colId];
@@ -102,18 +153,13 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 			SURGSIM_ASSERT(rowStart + static_cast<Index>(n) - 1 == innerIndices[nextColumnRowStart - 1]) <<
 				"matrix column " << colId << " doesn't end at the block end location";
 
-			// ptr[outerIndices[columnStart + colId]] is the 1st element in the column columnStart + colId
-			// The n elements exist and are contiguous in memory, we use Eigen::Map functionality to optimize the copy
-			Eigen::Map<ColVector>(&ptr[currentColumnRowStart]).operator=(
-				subMatrix.col(static_cast<DerivedSubIndexType>(colId)).template segment<n>(0));
+			op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, currentColumnRowStart, subMatrix, colId);
 		}
 	}
 	else
 	{
 		for (Index rowId = 0; rowId < static_cast<Index>(n); ++rowId)
 		{
-			typedef Eigen::Matrix<T, 1, m, Eigen::DontAlign | Eigen::RowMajor> RowVector;
-
 			// outerIndices[rowStart + rowId] is the index in ptr and innerIndices of the first non-zero element in
 			// the row (rowStart + rowId)
 			const Index currentRowColumnStart = outerIndices[rowStart + rowId];
@@ -132,10 +178,7 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 			SURGSIM_ASSERT(columnStart + static_cast<Index>(m) - 1 == innerIndices[nextRowColumnStart - 1]) <<
 				"matrix row " << rowId << " doesn't end at the block end location";
 
-			// ptr[outerIndices[rowStart + rowId]] is the 1st element in the row rowStart + rowId
-			// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the copy
-			Eigen::Map<RowVector>(&ptr[currentRowColumnStart]).operator=(
-				subMatrix.row(static_cast<DerivedSubIndexType>(rowId)).template segment<m>(0));
+			op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, currentRowColumnStart, subMatrix, rowId);
 		}
 	}
 }
@@ -194,8 +237,6 @@ void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 	{
 		for (Index colId = 0; colId < static_cast<Index>(m); ++colId)
 		{
-			typedef Eigen::Matrix<T, n, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
-
 			// outerIndices[columnStart + colId] is the index in ptr and innerIndices of the first non-zero element in
 			// the column (columnStart + colId)
 			const Index currentColumnRowStart = outerIndices[columnStart + colId];
@@ -227,19 +268,13 @@ void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 				innerIndices[indexFirstRow + static_cast<Index>(n) - 1]) <<
 				"matrix column " << colId << " is missing elements in the block";
 
-			// ptr[outerIndices[columnStart + colId]] is the 1st element in the column columnStart + colId
-			// ptr[indexFirstRow] is the 1st element in the column within the requested block
-			// The n elements exist and are contiguous in memory, we use Eigen::Map functionality to optimize the copy
-			Eigen::Map<ColVector>(&ptr[indexFirstRow]).operator=(
-				subMatrix.col(static_cast<DerivedSubIndexType>(colId)).template segment<n>(0));
+			op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, indexFirstRow, subMatrix, colId);
 		}
 	}
 	else
 	{
 		for (Index rowId = 0; rowId < static_cast<Index>(n); ++rowId)
 		{
-			typedef Eigen::Matrix<T, 1, m, Eigen::DontAlign | Eigen::RowMajor> RowVector;
-
 			// outerIndices[rowStart + rowId] is the index in ptr and innerIndices of the first non-zero element in
 			// the column (rowStart + rowId)
 			const Index currentRowColumnStart = outerIndices[rowStart + rowId];
@@ -271,11 +306,7 @@ void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 				innerIndices[indexFirstColumn + static_cast<Index>(m) - 1]) <<
 				"matrix row " << rowId << " is missing elements in the block";
 
-			// ptr[outerIndices[rowStart + rowId]] is the 1st element in the row rowStart + rowId
-			// ptr[indexFirstColumn] is the 1st element in the row within the requested block
-			// The m elements exist and are contiguous in memory, we use Eigen::Map functionality to optimize the copy
-			Eigen::Map<RowVector>(&ptr[indexFirstColumn]).operator=(
-				subMatrix.row(static_cast<DerivedSubIndexType>(rowId)).template segment<m>(0));
+			op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, indexFirstColumn, subMatrix, rowId);
 		}
 	}
 }
