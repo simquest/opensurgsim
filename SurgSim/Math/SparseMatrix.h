@@ -131,55 +131,32 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 	const Index* innerIndices = matrix->innerIndexPtr();
 	const Index* outerIndices = matrix->outerIndexPtr();
 
-	if (Opt == Eigen::ColMajor)
+	Index outerStart = (Opt == Eigen::ColMajor ? columnStart : rowStart);
+	Index innerStart = (Opt == Eigen::ColMajor ? rowStart: columnStart);
+	Index outerSize = static_cast<Index>(Opt == Eigen::ColMajor ? m : n);
+	Index innerSize = static_cast<Index>(Opt == Eigen::ColMajor ? n : m);
+
+	for (Index outerLoop = 0; outerLoop < outerSize; ++outerLoop)
 	{
-		for (Index colId = 0; colId < static_cast<Index>(m); ++colId)
-		{
-			// outerIndices[columnStart + colId] is the index in ptr and innerIndices of the first non-zero element in
-			// the column (columnStart + colId)
-			const Index currentColumnRowStart = outerIndices[columnStart + colId];
-			const Index nextColumnRowStart = outerIndices[columnStart + colId + 1];
+		// outerIndices[outerStart + outerLoop] is the index in ptr and innerIndices of the first non-zero element in
+		// the outer element (outerStart + outerLoop)
+		const Index innerStartIdInCurrentOuter = outerIndices[outerStart + outerLoop];
+		const Index innerStartIdInNextOuter = outerIndices[outerStart + outerLoop + 1];
 
-			// Make sure that we are not going to write out of the range...
-			// i.e. The column has at least n elements
-			SURGSIM_ASSERT(static_cast<Index>(n) <= nextColumnRowStart - currentColumnRowStart) <<
-				"matrix column " << colId << " doesn't have enough coefficients";
+		// Make sure that we are not going to write out of the range...
+		// i.e. The column has at least n elements
+		SURGSIM_ASSERT(static_cast<Index>(innerSize) <= innerStartIdInNextOuter - innerStartIdInCurrentOuter) <<
+			"matrix column/row " << outerStart + outerLoop << " doesn't have enough coefficients";
 
-			// Make sure that the 1st element in this column is the requested row
-			SURGSIM_ASSERT(rowStart == innerIndices[currentColumnRowStart]) <<
-				"matrix column " << colId << " doesn't start at the block start location";
+		// Make sure that the 1st element in this column is the requested row
+		SURGSIM_ASSERT(innerStart == innerIndices[innerStartIdInCurrentOuter]) <<
+			"matrix column/row " << outerStart + outerLoop << " doesn't start at the block start location";
 
-			// Make sure that the last element corresponding to the block size is the expected row index
-			SURGSIM_ASSERT(rowStart + static_cast<Index>(n) - 1 == innerIndices[nextColumnRowStart - 1]) <<
-				"matrix column " << colId << " doesn't end at the block end location";
+		// Make sure that the last element corresponding to the block size is the expected row index
+		SURGSIM_ASSERT(innerStart + static_cast<Index>(innerSize) - 1 == innerIndices[innerStartIdInNextOuter - 1]) <<
+			"matrix column/row " << outerStart + outerLoop << " doesn't end at the block end location";
 
-			op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, currentColumnRowStart, subMatrix, colId);
-		}
-	}
-	else
-	{
-		for (Index rowId = 0; rowId < static_cast<Index>(n); ++rowId)
-		{
-			// outerIndices[rowStart + rowId] is the index in ptr and innerIndices of the first non-zero element in
-			// the row (rowStart + rowId)
-			const Index currentRowColumnStart = outerIndices[rowStart + rowId];
-			const Index nextRowColumnStart = outerIndices[rowStart + rowId + 1];
-
-			// Make sure that we are not going to write out of the range...
-			// i.e. The column has at least n elements
-			SURGSIM_ASSERT(static_cast<Index>(m) <= nextRowColumnStart - currentRowColumnStart) <<
-				"matrix row " << rowId << " doesn't have enough coefficients";
-
-			// Make sure that the 1st element in this row is the requested column
-			SURGSIM_ASSERT(columnStart == innerIndices[currentRowColumnStart]) <<
-				"matrix row " << rowId << " doesn't start at the block start location";
-
-			// Make sure that the last element corresponding to the block size is the expected column index
-			SURGSIM_ASSERT(columnStart + static_cast<Index>(m) - 1 == innerIndices[nextRowColumnStart - 1]) <<
-				"matrix row " << rowId << " doesn't end at the block end location";
-
-			op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, currentRowColumnStart, subMatrix, rowId);
-		}
+		op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, innerStartIdInCurrentOuter, subMatrix, outerLoop);
 	}
 }
 
@@ -233,81 +210,45 @@ void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 	const Index* innerIndices = matrix->innerIndexPtr();
 	const Index* outerIndices = matrix->outerIndexPtr();
 
-	if (Opt == Eigen::ColMajor)
+	Index outerStart = (Opt == Eigen::ColMajor ? columnStart : rowStart);
+	Index innerStart = (Opt == Eigen::ColMajor ? rowStart: columnStart);
+	Index outerSize = static_cast<Index>(Opt == Eigen::ColMajor ? m : n);
+	Index innerSize = static_cast<Index>(Opt == Eigen::ColMajor ? n : m);
+
+	for (Index outerLoop = 0; outerLoop < outerSize; ++outerLoop)
 	{
-		for (Index colId = 0; colId < static_cast<Index>(m); ++colId)
+		// outerIndices[outerStart + outerLoop] is the index in ptr and innerIndices of the first non-zero element in
+		// the outer element (outerStart + outerLoop)
+		const Index innerStartIdInCurrentOuter = outerIndices[outerStart + outerLoop];
+		const Index innerStartIdInNextOuter = outerIndices[outerStart + outerLoop + 1];
+
+		// Look for the index of innerStart in this outer (the column/row may contain elements before)
+		Index innerFirstElement;
+		if (innerIndices[innerStartIdInCurrentOuter] == innerStart)
 		{
-			// outerIndices[columnStart + colId] is the index in ptr and innerIndices of the first non-zero element in
-			// the column (columnStart + colId)
-			const Index currentColumnRowStart = outerIndices[columnStart + colId];
-			const Index nextColumnRowStart = outerIndices[columnStart + colId + 1];
-
-			// Look for the index of rowStart in this column (the column may contain elements before)
-			Index indexFirstRow;
-			if (innerIndices[currentColumnRowStart] == rowStart)
-			{
-				indexFirstRow = currentColumnRowStart;
-			}
-			else
-			{
-				indexFirstRow = matrix->data().searchLowerIndex(
-					currentColumnRowStart, nextColumnRowStart - 1, rowStart);
-			}
-
-			// Make sure we actually found the element (rowStart, columnStart + colId) in matrix
-			SURGSIM_ASSERT(innerIndices[indexFirstRow] == rowStart) <<
-				"matrix (" << rowStart << "," << columnStart + colId << ") could not be located";
-
-			// Make sure that we are not going to write out of the range...
-			// i.e. The column (starting at the beginning of the block) has at least n elements
-			SURGSIM_ASSERT(static_cast<Index>(n) <= nextColumnRowStart - indexFirstRow) <<
-				"matrix column " << colId << " doesn't have enough coefficients";
-
-			// Make sure that the last element corresponding to the block size is the expected row index
-			SURGSIM_ASSERT(rowStart + static_cast<Index>(n) - 1 == \
-				innerIndices[indexFirstRow + static_cast<Index>(n) - 1]) <<
-				"matrix column " << colId << " is missing elements in the block";
-
-			op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, indexFirstRow, subMatrix, colId);
+			innerFirstElement = innerStartIdInCurrentOuter;
 		}
-	}
-	else
-	{
-		for (Index rowId = 0; rowId < static_cast<Index>(n); ++rowId)
+		else
 		{
-			// outerIndices[rowStart + rowId] is the index in ptr and innerIndices of the first non-zero element in
-			// the column (rowStart + rowId)
-			const Index currentRowColumnStart = outerIndices[rowStart + rowId];
-			const Index nextRowColumnStart = outerIndices[rowStart + rowId + 1];
-
-			// Look for the index of columnStart in this row (the row may contain elements before)
-			Index indexFirstColumn;
-			if (innerIndices[currentRowColumnStart] == columnStart)
-			{
-				indexFirstColumn = currentRowColumnStart;
-			}
-			else
-			{
-				indexFirstColumn = matrix->data().searchLowerIndex(
-					currentRowColumnStart, nextRowColumnStart - 1, columnStart);
-			}
-
-			// Make sure we actually found the element (rowStart + rowId, columnStart) in matrix
-			SURGSIM_ASSERT(innerIndices[indexFirstColumn] == columnStart) <<
-				"matrix (" << rowStart + rowId << "," << columnStart << ") could not be located";
-
-			// Make sure that we are not going to write out of the range...
-			// i.e. The row (starting at the beginning of the block) has at least m elements
-			SURGSIM_ASSERT(static_cast<Index>(m) <= nextRowColumnStart - indexFirstColumn) <<
-				"matrix row " << rowId << " doesn't have enough coefficients";
-
-			// Make sure that the last element corresponding to the block size is the expected column index
-			SURGSIM_ASSERT(columnStart + static_cast<Index>(m) - 1 == \
-				innerIndices[indexFirstColumn + static_cast<Index>(m) - 1]) <<
-				"matrix row " << rowId << " is missing elements in the block";
-
-			op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, indexFirstColumn, subMatrix, rowId);
+			innerFirstElement = matrix->data().searchLowerIndex(
+				innerStartIdInCurrentOuter, innerStartIdInNextOuter - 1, innerStart);
 		}
+
+		// Make sure we actually found the 1st element of the block in this outer
+		SURGSIM_ASSERT(innerIndices[innerFirstElement] == innerStart) <<
+			"matrix is missing an element of the block (1st element on a row/column)";
+
+		// Make sure that we are not going to write out of the range...
+		// i.e. The column/row (starting at the beginning of the block) has at least innerSize elements
+		SURGSIM_ASSERT(static_cast<Index>(innerSize) <= innerStartIdInNextOuter - innerFirstElement) <<
+			"matrix is missing elements of the block (but not the 1st element on a row/column)";
+
+		// Make sure that the last element corresponding to the block size has the expected index
+		SURGSIM_ASSERT(innerStart + static_cast<Index>(innerSize) - 1 == \
+			innerIndices[innerFirstElement + static_cast<Index>(innerSize) - 1]) <<
+			"matrix is missing elements of the block (but not the 1st element on a row/column)";
+
+		op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, innerFirstElement, subMatrix, outerLoop);
 	}
 }
 
