@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file MatrixSparseTests.cpp
+/// \file SparseMatrixTests.cpp
 /// Tests that exercise the functionality of our sparse matrices, which come
 /// straight from Eigen.
 
@@ -21,8 +21,8 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Math/MathConvert.h"
-#include "SurgSim/Math/Matrix.h"
+//#include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/SparseMatrix.h"
 
 using std::tuple;
 using std::tuple_element;
@@ -76,7 +76,8 @@ public:
 					m_matrixMissingCoefficients.insert(i, j) = 1.0;
 				}
 				m_matrixWithoutExtraCoefficientsExpected.insert(i, j) =
-					static_cast<T>(i - m_rowId + 1) * static_cast<T>(j - m_columnId + 1);
+					(i - m_rowId == 0 && j - m_columnId == 3 ? 2 :
+					static_cast<T>(i - m_rowId + 1) * static_cast<T>(j - m_columnId + 1));
 			}
 		}
 		for (I i = m_rowId + 4; i < 18; i++)
@@ -317,7 +318,12 @@ public:
 	{
 		Eigen::Matrix<T, n, 1> vec1 = Eigen::Matrix<T, n, 1>::LinSpaced(1.0, n);
 		Eigen::Matrix<T, 1, m> vec2 = Eigen::Matrix<T, 1, m>::LinSpaced(1.0, m);
-		return vec1 * vec2;
+		Eigen::Matrix<T, n, m, Opt> result = vec1 * vec2;
+		if (m >= 4)
+		{
+			result(0, 3) = 2;
+		}
+		return result;
 	}
 
 	template <class T, int n, int m, int Opt>
@@ -325,7 +331,12 @@ public:
 	{
 		Eigen::Matrix<T, Eigen::Dynamic, 1> vec1 = Eigen::Matrix<T, Eigen::Dynamic, 1>::LinSpaced(n, 1.0, n);
 		Eigen::Matrix<T, 1, Eigen::Dynamic> vec2 = Eigen::Matrix<T, 1, Eigen::Dynamic>::LinSpaced(m, 1.0, m);
-		return vec1 * vec2;
+		Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Opt> result = vec1 * vec2;
+		if (m >= 4)
+		{
+			result(0, 3) = 2;
+		}
+		return result;
 	}
 
 	template <class T, int n, int m, int Opt>
@@ -345,7 +356,12 @@ public:
 			vec2.insert(i) = static_cast<T>(i+1);
 		}
 
-		return Eigen::SparseMatrix<T, Opt>(vec1 * vec2);
+		Eigen::SparseMatrix<T, Opt> result(vec1 * vec2);
+		if (m >= 4)
+		{
+			result.coeffRef(0, 3) = 2;
+		}
+		return result;
 	}
 
 	template <class T, int n, int Opt>

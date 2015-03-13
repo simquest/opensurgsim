@@ -61,7 +61,6 @@ set(SURGSIM_MATH_HEADERS
 	MathConvert.h
 	MathConvert-inl.h
 	Matrix.h
-	MatrixSparse.h
 	MeshShape.h
 	MeshShape-inl.h
 	MlcpConstraintType.h
@@ -90,6 +89,7 @@ set(SURGSIM_MATH_HEADERS
 	RigidTransform.h
 	Shape.h
 	Shapes.h
+	SparseMatrix.h
 	SphereShape.h
 	SurfaceMeshShape.h
 	SurfaceMeshShape-inl.h
