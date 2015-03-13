@@ -596,6 +596,23 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 	}
 }
 
+TEST_F(FemRepresentationTests, SerializationTest)
+{
+	auto fem = std::make_shared<MockFemRepresentation>("Test-Fem");
+
+	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", true));
+	EXPECT_TRUE(fem->getComplianceWarping());
+	EXPECT_TRUE(fem->getValue<bool>("ComplianceWarping"));
+	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", false));
+	EXPECT_FALSE(fem->getComplianceWarping());
+	EXPECT_FALSE(fem->getValue<bool>("ComplianceWarping"));
+
+	std::string filename("thisIsTheFilename.extension");
+	EXPECT_NO_THROW(fem->setValue("Filename", filename));
+	EXPECT_EQ(filename, fem->getFilename());
+	EXPECT_EQ(filename, fem->getValue<std::string>("Filename"));
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

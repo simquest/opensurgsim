@@ -222,9 +222,6 @@ TEST(Fem1DRepresentationTests, SerializationTest)
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(1u, node.size());
 
-	YAML::Node data = node["SurgSim::Physics::Fem1DRepresentation"];
-	EXPECT_EQ(11u, data.size());
-
 	std::shared_ptr<Fem1DRepresentation> newRepresentation;
 	ASSERT_NO_THROW(newRepresentation =
 		std::dynamic_pointer_cast<Fem1DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
