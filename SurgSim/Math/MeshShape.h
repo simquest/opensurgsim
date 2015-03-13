@@ -133,6 +133,12 @@ private:
 
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
+
+	/// The pose.
+	SurgSim::Math::RigidTransform3d m_pose;
+
+	/// true if the pose is valid.
+	bool m_validPose;
 };
 
 }; // Math
