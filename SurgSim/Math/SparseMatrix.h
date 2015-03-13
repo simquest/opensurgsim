@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file MatrixSparse.h
+/// \file SparseMatrix.h
 /// Definitions of useful sparse matrix functions
 
-#ifndef SURGSIM_MATH_MATRIXSPARSE_H
-#define SURGSIM_MATH_MATRIXSPARSE_H
+#ifndef SURGSIM_MATH_SPARSEMATRIX_H
+#define SURGSIM_MATH_SPARSEMATRIX_H
 
 #include <Eigen/Sparse>
 
@@ -371,4 +371,4 @@ void addSparseMatrixBlock(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix,
 };  // namespace Math
 };  // namespace SurgSim
 
-#endif  // SURGSIM_MATH_MATRIXSPARSE_H
+#endif  // SURGSIM_MATH_SPARSEMATRIX_H

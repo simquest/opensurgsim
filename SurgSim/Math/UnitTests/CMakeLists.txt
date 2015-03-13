@@ -48,10 +48,10 @@ set(UNIT_TEST_HEADERS
 
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
 	LinearSolveAndInverseTests.cpp
-	MatrixSparseTests.cpp
 	MatrixTests.cpp
 	QuaternionTests.cpp
 	RigidTransformTests.cpp
+	SparseMatrixTests.cpp
 	VectorTests.cpp
 )
 

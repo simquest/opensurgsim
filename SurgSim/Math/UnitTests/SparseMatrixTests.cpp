@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file MatrixSparseTests.cpp
+/// \file SparseMatrixTests.cpp
 /// Tests that exercise the functionality of our sparse matrices, which come
 /// straight from Eigen.
 
@@ -21,8 +21,8 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Math/MathConvert.h"
-#include "SurgSim/Math/Matrix.h"
+//#include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/SparseMatrix.h"
 
 using std::tuple;
 using std::tuple_element;

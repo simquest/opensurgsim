@@ -220,6 +220,4 @@ Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, size_t blockIdRow, size_t bloc
 };  // namespace Math
 };  // namespace SurgSim
 
-#include "SurgSim/Math/MatrixSparse.h"
-
 #endif  // SURGSIM_MATH_MATRIX_H
