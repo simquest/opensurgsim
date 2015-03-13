@@ -36,7 +36,6 @@ namespace Math
 /// This function will not change anything to the structure of the SparseMatrix, only change the values of the
 /// corresponding coefficients.
 /// \tparam n, m The block size (Derived may be bigger but cannot be smaller in both dimension)
-/// \tparam performChecks Performs the necessary range checks to ensure no data violation if True
 /// \tparam DerivedSub The type of the sub matrix (can usually be inferred). Can be any type, but does not
 /// support Eigen expression. If it is a Sparse storage type the alignment must be the same as the SparseMatrix: Opt.
 /// Note that no assertion or verification is done on this type.
@@ -44,7 +43,7 @@ namespace Math
 /// \param subMatrix The 'sub' matrix that will be copied into the SparseMatrix block
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
 /// \param[in,out] matrix The sparse matrix in which the block needs to be set by 'sub'
-/// \exception SurgSim::Framework::AssertionFailure If performChecks is true and one of the condition is met: <br>
+/// \exception SurgSim::Framework::AssertionFailure If one of the following conditions is met: <br>
 /// * if 'sub' is smaller than (n x m) in any dimension <br>
 /// * if 'matrix' is nullptr or smaller than (n x m) in any dimension <br>
 /// * if the requested block is out of range in 'matrix'. <br>
@@ -67,16 +66,13 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
 		"Both matrices should use the same Scalar type");
 
-	if (performChecks)
-	{
-		SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
+	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
-		SURGSIM_ASSERT(subMatrix.rows() >= static_cast<ISub>(n));
-		SURGSIM_ASSERT(subMatrix.cols() >= static_cast<ISub>(m));
+	SURGSIM_ASSERT(subMatrix.rows() >= static_cast<ISub>(n));
+	SURGSIM_ASSERT(subMatrix.cols() >= static_cast<ISub>(m));
 
-		SURGSIM_ASSERT(matrix->rows() >= static_cast<I>(n));
-		SURGSIM_ASSERT(matrix->cols() >= static_cast<I>(m));
-	}
+	SURGSIM_ASSERT(matrix->rows() >= static_cast<I>(n));
+	SURGSIM_ASSERT(matrix->cols() >= static_cast<I>(m));
 
 	T* ptr = matrix->valuePtr();
 	const I* innerIndices = matrix->innerIndexPtr();
@@ -92,20 +88,17 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 			// both arrays ptr and innerIndices
 
 			const I startIndexCurrentColumn = outerIndices[columnStart + colId];
-			if (performChecks)
-			{
-				const I startIndexNextColumn = outerIndices[columnStart + colId + 1];
+			const I startIndexNextColumn = outerIndices[columnStart + colId + 1];
 
-				// Make sure that we are not going to write out of the range...
-				// i.e. The column has at least n elements
-				SURGSIM_ASSERT(static_cast<I>(n) <= startIndexNextColumn - startIndexCurrentColumn);
+			// Make sure that we are not going to write out of the range...
+			// i.e. The column has at least n elements
+			SURGSIM_ASSERT(static_cast<I>(n) <= startIndexNextColumn - startIndexCurrentColumn);
 
-				// Make sure that the 1st element in this column is the requested row
-				SURGSIM_ASSERT(rowStart == innerIndices[startIndexCurrentColumn]);
+			// Make sure that the 1st element in this column is the requested row
+			SURGSIM_ASSERT(rowStart == innerIndices[startIndexCurrentColumn]);
 
-				// Make sure that the last element corresponding to the block size is the expected row index
-				SURGSIM_ASSERT(rowStart + static_cast<I>(n) - 1 == innerIndices[startIndexNextColumn - 1]);
-			}
+			// Make sure that the last element corresponding to the block size is the expected row index
+			SURGSIM_ASSERT(rowStart + static_cast<I>(n) - 1 == innerIndices[startIndexNextColumn - 1]);
 
 			// ptr[outerIndices[columnStart + colId]] is the 1st element in the column columnStart + colId
 			// The n elements exist and are contiguous in memory, we use Eigen::Map functionality to optimize the copy
@@ -123,20 +116,17 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 			// arrays ptr and innerIndices
 
 			const I startIndexCurrentRow = outerIndices[rowStart + rowId];
-			if (performChecks)
-			{
-				const I startIndexNextRow = outerIndices[rowStart + rowId + 1];
+			const I startIndexNextRow = outerIndices[rowStart + rowId + 1];
 
-				// Make sure that we are not going to write out of the range...
-				// i.e. The column has at least n elements
-				SURGSIM_ASSERT(static_cast<I>(m) <= startIndexNextRow - startIndexCurrentRow);
+			// Make sure that we are not going to write out of the range...
+			// i.e. The column has at least n elements
+			SURGSIM_ASSERT(static_cast<I>(m) <= startIndexNextRow - startIndexCurrentRow);
 
-				// Make sure that the 1st element in this row is the requested column
-				SURGSIM_ASSERT(columnStart == innerIndices[startIndexCurrentRow]);
+			// Make sure that the 1st element in this row is the requested column
+			SURGSIM_ASSERT(columnStart == innerIndices[startIndexCurrentRow]);
 
-				// Make sure that the last element corresponding to the block size is the expected column index
-				SURGSIM_ASSERT(columnStart + static_cast<I>(m) - 1 == innerIndices[startIndexNextRow - 1]);
-			}
+			// Make sure that the last element corresponding to the block size is the expected column index
+			SURGSIM_ASSERT(columnStart + static_cast<I>(m) - 1 == innerIndices[startIndexNextRow - 1]);
 
 			// ptr[outerIndices[rowStart + rowId]] is the 1st element in the row rowStart + rowId
 			// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the copy
@@ -155,7 +145,6 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 /// This function will not change anything to the structure of the SparseMatrix, only change the values of the
 /// corresponding coefficients.
 /// \tparam n, m The block size (Derived may be bigger but cannot be smaller in both dimension)
-/// \tparam performChecks Performs the necessary range checks to ensure no data violation if True
 /// \tparam DerivedSub The type of the sub matrix (can usually be inferred). Can be any type, but does not
 /// support Eigen expression. If it is a Sparse storage type the alignment must be the same as the SparseMatrix: Opt.
 /// Note that no assertion or verification is done on this type.
@@ -163,7 +152,7 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 /// \param subMatrix The 'sub' matrix that will be copied into the SparseMatrix block
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
 /// \param[in,out] matrix The sparse matrix in which the block needs to be set by 'sub'
-/// \exception SurgSim::Framework::AssertionFailure If performChecks is true and one of the condition is met: <br>
+/// \exception SurgSim::Framework::AssertionFailure If one of the following conditions is met: <br>
 /// * if 'sub' is smaller than (n x m) in any dimension <br>
 /// * if 'matrix' is nullptr or smaller than (n x m) in any dimension <br>
 /// * if the requested block is out of range in 'matrix'. <br>
@@ -185,16 +174,13 @@ void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
 		"Both matrices should use the same Scalar type");
 
-	if (performChecks)
-	{
-		SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
+	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
-		SURGSIM_ASSERT(subMatrix.rows() >= static_cast<ISub>(n));
-		SURGSIM_ASSERT(subMatrix.cols() >= static_cast<ISub>(m));
+	SURGSIM_ASSERT(subMatrix.rows() >= static_cast<ISub>(n));
+	SURGSIM_ASSERT(subMatrix.cols() >= static_cast<ISub>(m));
 
-		SURGSIM_ASSERT(matrix->rows() >= static_cast<I>(n));
-		SURGSIM_ASSERT(matrix->cols() >= static_cast<I>(m));
-	}
+	SURGSIM_ASSERT(matrix->rows() >= static_cast<I>(n));
+	SURGSIM_ASSERT(matrix->cols() >= static_cast<I>(m));
 
 	T* ptr = matrix->valuePtr();
 	const I* innerIndices = matrix->innerIndexPtr();
@@ -229,19 +215,16 @@ void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 					startIndexCurrentColumn, startIndexNextColumn - 1, rowStart);
 			}
 
-			if (performChecks)
-			{
-				// Make sure we actually found the element (rowStart, columnStart + colId) in matrix
-				SURGSIM_ASSERT(innerIndices[indexFirstRow] == rowStart);
+			// Make sure we actually found the element (rowStart, columnStart + colId) in matrix
+			SURGSIM_ASSERT(innerIndices[indexFirstRow] == rowStart);
 
-				// Make sure that we are not going to write out of the range...
-				// i.e. The column (starting at the beginning of the block) has at least n elements
-				SURGSIM_ASSERT(static_cast<I>(n) <= startIndexNextColumn - indexFirstRow);
+			// Make sure that we are not going to write out of the range...
+			// i.e. The column (starting at the beginning of the block) has at least n elements
+			SURGSIM_ASSERT(static_cast<I>(n) <= startIndexNextColumn - indexFirstRow);
 
-				// Make sure that the last element corresponding to the block size is the expected row index
-				SURGSIM_ASSERT(rowStart + static_cast<I>(n) - 1 == \
-					innerIndices[indexFirstRow + static_cast<I>(n) - 1]);
-			}
+			// Make sure that the last element corresponding to the block size is the expected row index
+			SURGSIM_ASSERT(rowStart + static_cast<I>(n) - 1 == \
+				innerIndices[indexFirstRow + static_cast<I>(n) - 1]);
 
 			// ptr[outerIndices[columnStart + colId]] is the 1st element in the column columnStart + colId
 			// ptr[indexFirstRow] is the 1st element in the column within the requested block
@@ -279,19 +262,16 @@ void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 					startIndexCurrentRow, startIndexNextRow - 1, columnStart);
 			}
 
-			if (performChecks)
-			{
-				// Make sure we actually found the element (rowStart + rowId, columnStart) in matrix
-				SURGSIM_ASSERT(innerIndices[indexFirstColumn] == columnStart);
+			// Make sure we actually found the element (rowStart + rowId, columnStart) in matrix
+			SURGSIM_ASSERT(innerIndices[indexFirstColumn] == columnStart);
 
-				// Make sure that we are not going to write out of the range...
-				// i.e. The row (starting at the beginning of the block) has at least m elements
-				SURGSIM_ASSERT(static_cast<I>(m) <= startIndexNextRow - indexFirstColumn);
+			// Make sure that we are not going to write out of the range...
+			// i.e. The row (starting at the beginning of the block) has at least m elements
+			SURGSIM_ASSERT(static_cast<I>(m) <= startIndexNextRow - indexFirstColumn);
 
-				// Make sure that the last element corresponding to the block size is the expected column index
-				SURGSIM_ASSERT(columnStart + static_cast<I>(m) - 1 == \
-					innerIndices[indexFirstColumn + static_cast<I>(m) - 1]);
-			}
+			// Make sure that the last element corresponding to the block size is the expected column index
+			SURGSIM_ASSERT(columnStart + static_cast<I>(m) - 1 == \
+				innerIndices[indexFirstColumn + static_cast<I>(m) - 1]);
 
 			// ptr[outerIndices[rowStart + rowId]] is the 1st element in the row rowStart + rowId
 			// ptr[indexFirstColumn] is the 1st element in the row within the requested block
