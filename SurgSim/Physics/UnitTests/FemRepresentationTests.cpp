@@ -556,8 +556,6 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		// update() will call updateNodesRotations() which will raise an exception in this case.
 		// This method has not been overridden.
 		EXPECT_THROW(fem->update(1e-3), SurgSim::Framework::AssertionFailure);
-
-		EXPECT_NO_THROW(fem->getComplianceMatrix().isIdentity());
 	}
 
 	{

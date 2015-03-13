@@ -20,6 +20,7 @@
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
@@ -186,16 +187,17 @@ protected:
 
 	bool doInitialize() override;
 
-	/// Method used to update the nodes rotation (necessary to use compliance warping)
-	/// \param state The state to compute the nodes rotations w.r.t. initial state
-	/// \note It should provides all the nodes rotations using the helper method updateRotationPerNode(node, rotation)
-	/// \exception SurgSim::Framework::AssertionFailure if this method is called without being overriden.
-	virtual void updateNodesRotations(const SurgSim::Math::OdeState& state);
-
-	/// Helper method to update a specific node rotation (useful for compliance warping)
+	/// Retrieve a specific node transformation (useful for compliance warping)
+	/// \param state The state to extra the node transformation from
 	/// \param nodeId The node to update the rotation for
-	/// \param rotation The new rotation for this node
-	void updateRotationPerNode(size_t nodeId, const SurgSim::Math::Quaterniond& rotation);
+	/// \return The node transformation. i.e. a numDofPerNode x numDofPerNode matrix
+	void updateNodesTransformation(const SurgSim::Math::OdeState& state);
+
+	/// Retrieve a specific node transformation (useful for compliance warping)
+	/// \param state The state to extra the node transformation from
+	/// \param nodeId The node to update the rotation for
+	/// \return The node transformation. i.e. a numDofPerNode x numDofPerNode matrix
+	virtual SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId);
 
 	/// Useful information per node
 	std::vector<double> m_massPerNode; ///< Useful in setting up the gravity force F=mg
@@ -225,8 +227,8 @@ private:
 
 	SurgSim::Math::Matrix m_complianceWarpingMatrix; ///< The compliance warping matrix if compliance warping in use
 
-	Eigen::SparseMatrix<double> m_rotation; ///< The system-size rotation matrix used for compliance warping.
-	                                        ///< It contains nodes' rotation on the diagonal blocks.
+	/// The system-size transformation matrix. It contains nodes transformation on the diagonal blocks.
+	Eigen::SparseMatrix<double> m_complianceWarpingTransformation;
 };
 
 } // namespace Physics

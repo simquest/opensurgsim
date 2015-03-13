@@ -140,25 +140,28 @@ bool FemRepresentation::doInitialize()
 		Index numDof = static_cast<Index>(getNumDof());
 
 		// Rotation matrix allocation and creation of the sparse matrix pattern.
-		m_rotation.resize(numDof, numDof);
-		m_rotation.reserve(Eigen::VectorXi::Constant(numDof, 3)); // n columns with 3 non-zero each
+		m_complianceWarpingTransformation.resize(numDof, numDof);
+		// n columns with numDofPerNode non-zero elements each
+		m_complianceWarpingTransformation.reserve(Eigen::VectorXi::Constant(numDof, numDofPerNode));
 
 		auto logger = SurgSim::Framework::Logger::getLogger("Physics/FemRepresentation");
 		SURGSIM_LOG_IF(numDofPerNode % 3 != 0, logger, SEVERE) << "Using compliance warping with representation " <<
 			getName() << " which has " << numDofPerNode << " dof per node (not a factor of 3)";
 
 		// Use a mask of 1 to setup the sparse matrix pattern
-		for(Index dofId = 0; dofId < numDof; dofId += 3)
+		for(Index nodeId = 0; nodeId < m_initialState->getNumNodes(); ++nodeId)
 		{
-			for (Index axisId = 0; axisId < 3; ++axisId)
+			for (Index i = 0; i < numDofPerNode; ++i)
 			{
-				m_rotation.insert(dofId + axisId, dofId + 0) = 1.0;
-				m_rotation.insert(dofId + axisId, dofId + 1) = 1.0;
-				m_rotation.insert(dofId + axisId, dofId + 2) = 1.0;
+				for (Index j = 0; j < numDofPerNode; ++j)
+				{
+					m_complianceWarpingTransformation.insert(nodeId * numDofPerNode + i, nodeId * numDofPerNode + j) =
+						1.0;
+				}
 			}
 		}
 
-		m_rotation.makeCompressed();
+		m_complianceWarpingTransformation.makeCompressed();
 	}
 
 	return true;
@@ -228,7 +231,7 @@ void FemRepresentation::beforeUpdate(double dt)
 
 void FemRepresentation::update(double dt)
 {
-	if (! isActive())
+	if (!isActive())
 	{
 		return;
 	}
@@ -248,10 +251,11 @@ void FemRepresentation::update(double dt)
 		}
 		m_odeSolver->solve(dt, *m_currentState, m_newState.get(), false);
 
-		// Update the compliance matrix by first updating the node's rotation
-		updateNodesRotations(*m_newState);
+		// Update the compliance matrix by first updating the nodes transformation
+		updateNodesTransformation(*m_newState);
 		// Then, update the compliance matrix using compliance warping
-		m_complianceWarpingMatrix = m_rotation * m_odeSolver->getComplianceMatrix() * m_rotation.transpose();
+		m_complianceWarpingMatrix = m_complianceWarpingTransformation * m_odeSolver->getComplianceMatrix() *
+			m_complianceWarpingTransformation.transpose();
 	}
 	else
 	{
@@ -298,29 +302,27 @@ const SurgSim::Math::Matrix& FemRepresentation::getComplianceMatrix() const
 	return m_odeSolver->getComplianceMatrix();
 }
 
-void FemRepresentation::updateRotationPerNode(size_t nodeId, const SurgSim::Math::Quaterniond& rotation)
-{
-	typedef SurgSim::Math::Matrix33d Matrix33d;
-	typedef Eigen::SparseMatrix<double>::Index Index;
-
-	Index numDofPerNode = static_cast<Index>(getNumDofPerNode());
-	Index startDiagonalIndex = numDofPerNode * static_cast<Index>(nodeId);
-	const Matrix33d R = rotation.toRotationMatrix();
-	if (getNumDofPerNode() == 3)
-	{
-		SurgSim::Math::setSubMatrixWithoutSearch<3, 3, false>(R, startDiagonalIndex, startDiagonalIndex, &m_rotation);
-	}
-	if (getNumDofPerNode() == 6)
-	{
-		startDiagonalIndex += 3;
-		SurgSim::Math::setSubMatrixWithoutSearch<3, 3, false>(R, startDiagonalIndex, startDiagonalIndex, &m_rotation);
-	}
-}
-
-void FemRepresentation::updateNodesRotations(const SurgSim::Math::OdeState& state)
+SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)
 {
 	SURGSIM_FAILURE() << "Any representation using compliance warping should override this method to provide the " <<
-		"proper nodes rotation";
+		"proper nodes transformation";
+
+	return SurgSim::Math::Matrix();
+}
+
+void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState& state)
+{
+	using SurgSim::Math::setSubMatrixWithoutSearch;
+	using SurgSim::Math::Matrix;
+
+	typedef Eigen::SparseMatrix<double>::Index Index;
+	Index numDofPerNode = static_cast<Index>(getNumDofPerNode());
+	for (size_t nodeId = 0; nodeId < state.getNumNodes(); ++nodeId)
+	{
+		Index startDiagonalIndex = numDofPerNode * static_cast<Index>(nodeId);
+		setSubMatrixWithoutSearch<Matrix, double>(getNodeTransformation(state, nodeId),
+			startDiagonalIndex, startDiagonalIndex, numDofPerNode, numDofPerNode, &m_complianceWarpingTransformation);
+	}
 }
 
 SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState& state)

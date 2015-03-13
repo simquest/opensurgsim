@@ -418,12 +418,10 @@ void MockFemRepresentation::transformState(std::shared_ptr<OdeState> state, cons
 {
 }
 
-void MockFemRepresentationValidComplianceWarping::updateNodesRotations(const SurgSim::Math::OdeState& state)
+SurgSim::Math::Matrix
+MockFemRepresentationValidComplianceWarping::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)
 {
-	for (size_t nodeId = 0; nodeId < state.getNumNodes(); nodeId++)
-	{
-		updateRotationPerNode(nodeId, SurgSim::Math::Quaterniond::Identity());
-	}
+	return SurgSim::Math::Matrix::Identity(getNumDofPerNode(), getNumDofPerNode());
 }
 
 MockFem1DRepresentation::MockFem1DRepresentation(const std::string& name) : SurgSim::Physics::Fem1DRepresentation(name)

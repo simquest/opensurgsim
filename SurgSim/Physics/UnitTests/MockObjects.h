@@ -311,7 +311,7 @@ public:
 	{}
 
 protected:
-	void updateNodesRotations(const SurgSim::Math::OdeState& state) override;
+	SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) override;
 };
 
 class MockFem1DRepresentation : public SurgSim::Physics::Fem1DRepresentation
