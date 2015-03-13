@@ -44,15 +44,18 @@ surgsim_add_executable(SerializedStapling "${SERIALIZEDSTAPLING_SOURCES}" "${SER
 
 set(LIBS 
 	IdentityPoseDevice
-	MultiAxisDevice
-	NovintDevice
-	PhantomDevice
-	SixenseDevice
 	SurgSimBlocks
 	SurgSimFramework
 	SurgSimGraphics
 	${YAML_CPP_LIBRARIES}
 )
+if(BUILD_DEVICE_MULTIAXIS)
+	LIST(APPEND LIBS MultiAxisDevice)
+endif()
+if(BUILD_DEVICE_NOVINT)
+	LIST(APPEND LIBS NovintDevice)
+endif()
+
 target_link_libraries(Stapling ${LIBS})
 target_link_libraries(SerializedStapling ${LIBS})
 
