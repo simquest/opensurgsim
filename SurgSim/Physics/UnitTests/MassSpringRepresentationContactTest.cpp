@@ -20,6 +20,7 @@
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/MassSpringRepresentationContact.h"
@@ -164,9 +165,10 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpTest)
 	//       = n^t.(p(1) - p(0)) / dt
 	//       = n^t.(dp/dt)
 	// => H = n^t
-	EXPECT_NEAR(m_n[0], mlcpPhysicsProblem.H(0, 0), epsilon);
-	EXPECT_NEAR(m_n[1], mlcpPhysicsProblem.H(0, 1), epsilon);
-	EXPECT_NEAR(m_n[2], mlcpPhysicsProblem.H(0, 2), epsilon);
+	SurgSim::Math::Matrix h = mlcpPhysicsProblem.H;
+	EXPECT_NEAR(m_n[0], h(0, 0), epsilon);
+	EXPECT_NEAR(m_n[1], h(0, 1), epsilon);
+	EXPECT_NEAR(m_n[2], h(0, 2), epsilon);
 
 	// We define C as the matrix which transforms F -> v (which differs from treatments which define it as F -> p)
 	// v(1) = v(0) + a(0)*dt
@@ -200,10 +202,18 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(11, 2, 2);
 
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
-	Eigen::Matrix<double, 1, 5> localH;
-	localH <<
-		0.9478,  -0.3807,  0.5536, -0.6944,  0.1815;
-	mlcpPhysicsProblem.H.block<1, 5>(0, 0) = localH;
+	Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t> localH;
+	localH.resize(5);
+	localH.reserve(5);
+	localH.insert(0) = 0.9478;
+	localH.insert(1) = -0.3807;
+	localH.insert(2) = 0.5536;
+	localH.insert(3) = -0.6944;
+	localH.insert(4) = 0.1815;
+	typedef Math::Dynamic::Operation<double, Eigen::RowMajor, ptrdiff_t,
+		Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>> Operation;
+	Math::blockOperation<Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>, double, Eigen::RowMajor, ptrdiff_t>(
+		localH, 1, 5, &mlcpPhysicsProblem.H, &Operation::assign);
 
 	Eigen::Matrix<double, 5, 5> localC;
 	localC <<
@@ -235,9 +245,10 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
 	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
 
 	// H -> [#constraints, #dof]
-	EXPECT_NEAR(m_n[0], mlcpPhysicsProblem.H(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 0), epsilon);
-	EXPECT_NEAR(m_n[1], mlcpPhysicsProblem.H(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 1), epsilon);
-	EXPECT_NEAR(m_n[2], mlcpPhysicsProblem.H(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 2), epsilon);
+	SurgSim::Math::Matrix h = mlcpPhysicsProblem.H;
+	EXPECT_NEAR(m_n[0], h(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 0), epsilon);
+	EXPECT_NEAR(m_n[1], h(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 1), epsilon);
+	EXPECT_NEAR(m_n[2], h(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 2), epsilon);
 
 	// C -> [#dof, #dof]
 	// CHt -> [#dof, #constraints]

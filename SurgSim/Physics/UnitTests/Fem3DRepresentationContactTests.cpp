@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
@@ -226,10 +227,18 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpIndiciesTest)
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof() + 5, 2, 1);
 
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
-	Eigen::Matrix<double, 1, 5> localH;
-	localH <<
-		0.9478,  -0.3807,  0.5536, -0.6944,  0.1815;
-	mlcpPhysicsProblem.H.block<1, 5>(0, 0) = localH;
+	Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t> localH;
+	localH.resize(5);
+	localH.reserve(5);
+	localH.insert(0) = 0.9478;
+	localH.insert(1) = -0.3807;
+	localH.insert(2) = 0.5536;
+	localH.insert(3) = -0.6944;
+	localH.insert(4) = 0.1815;
+	typedef SurgSim::Math::Dynamic::Operation<double, Eigen::RowMajor, ptrdiff_t,
+		Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>> Operation;
+	SurgSim::Math::blockOperation<Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>,
+		double, Eigen::RowMajor, ptrdiff_t>(localH, 1, 5, &mlcpPhysicsProblem.H, &Operation::assign);
 
 	Eigen::Matrix<double, 5, 5> localC;
 	localC <<

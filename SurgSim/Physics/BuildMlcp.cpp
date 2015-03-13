@@ -70,7 +70,7 @@ std::shared_ptr<PhysicsManagerState>
 	// Resize the Mlcp problem
 	result->getMlcpProblem().A.setZero(numAtomicConstraint, numAtomicConstraint);
 	result->getMlcpProblem().b.setZero(numAtomicConstraint);
-	result->getMlcpProblem().H.setZero(numAtomicConstraint, numDof);
+	result->getMlcpProblem().H.resize(numAtomicConstraint, numDof);
 	result->getMlcpProblem().CHt.setZero(numDof, numAtomicConstraint);
 	result->getMlcpProblem().mu.setZero(numConstraint);
 	result->getMlcpProblem().constraintTypes.clear();
@@ -104,6 +104,7 @@ std::shared_ptr<PhysicsManagerState>
 		(*it)->build(dt, &result->getMlcpProblem(), indexRepresentation0, indexRepresentation1, indexConstraint);
 	}
 
+	result->getMlcpProblem().H.makeCompressed();
 	return result;
 }
 
