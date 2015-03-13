@@ -108,7 +108,7 @@ public:
 /// (00[xx]0) -> The block must already contain all the coefficients and no other coefficients should exist on <br>
 /// (00[xx]0) -> these rows and columns. <br>
 /// (xx 00 x) <br>
-template <size_t n, size_t m, bool performChecks, typename DerivedSub, typename T, int Opt, typename Index>
+template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
 void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 							   Index rowStart,
 							   Index columnStart,
@@ -187,7 +187,7 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 /// (x0[xx]x) -> The block must already contain all the coefficients but these rows and columns may <br>
 /// (0x[xx]0) -> contains more coefficients before and after the block. <br>
 /// (xx 00 x) <br>
-template <size_t n, size_t m, bool performChecks, typename DerivedSub, typename T, int Opt, typename Index>
+template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
 void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 							Index rowStart,
 							Index columnStart,
