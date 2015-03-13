@@ -123,34 +123,34 @@ public:
 		if (subTooSmall)
 		{
 			EXPECT_THROW(\
-				(setSubMatrixWithoutSearch<4, 4, true>(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients)),\
+				(setSubMatrixWithoutSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients)),\
 				SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
 			EXPECT_THROW(\
-				(setSubMatrixWithoutSearch<4, 4, true, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)),\
+				(setSubMatrixWithoutSearch<4, 4, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
 			EXPECT_THROW(\
-				(setSubMatrixWithoutSearch<4, 4, true>(sub, m_rowId, m_columnId, &m_matrixTooSmall)),\
+				(setSubMatrixWithoutSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixTooSmall)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
 			EXPECT_THROW(\
-				(setSubMatrixWithoutSearch<4, 4, true>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients)),\
+				(setSubMatrixWithoutSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient has extra coefficients on the block rows/columns
 			EXPECT_THROW(\
-				(setSubMatrixWithoutSearch<4, 4, true>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)),\
+				(setSubMatrixWithoutSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
 			EXPECT_NO_THROW(\
-				(setSubMatrixWithoutSearch<4, 4, true>(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients)));
+				(setSubMatrixWithoutSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients)));
 
 			if (success)
 			{
@@ -171,29 +171,29 @@ public:
 		if (subTooSmall)
 		{
 			EXPECT_THROW(\
-				(setSubMatrixWithSearch<4, 4, true>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)),\
+				(setSubMatrixWithSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)),\
 				SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
 			EXPECT_THROW(\
-				(setSubMatrixWithSearch<4, 4, true, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)),\
+				(setSubMatrixWithSearch<4, 4, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
 			EXPECT_THROW(\
-				(setSubMatrixWithSearch<4, 4, true>(sub, m_rowId, m_columnId, &m_matrixTooSmall)),\
+				(setSubMatrixWithSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixTooSmall)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
 			EXPECT_THROW(\
-				(setSubMatrixWithSearch<4, 4, true>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients)),\
+				(setSubMatrixWithSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
 			EXPECT_NO_THROW(\
-				(setSubMatrixWithSearch<4, 4, true>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)));
+				(setSubMatrixWithSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)));
 
 			if (success)
 			{

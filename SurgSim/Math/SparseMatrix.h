@@ -108,13 +108,15 @@ public:
 /// (00[xx]0) -> The block must already contain all the coefficients and no other coefficients should exist on <br>
 /// (00[xx]0) -> these rows and columns. <br>
 /// (xx 00 x) <br>
-template <size_t n, size_t m, bool performChecks, typename DerivedSub, typename T, int Opt, typename Index>
+template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
 void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 							   Index rowStart,
 							   Index columnStart,
 							   Eigen::SparseMatrix<T, Opt, Index>* matrix)
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
+
+	static op<T, Opt, Index, n, m, DerivedSub> operation;
 
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
 		"Both matrices should use the same Scalar type");
@@ -156,7 +158,7 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 		SURGSIM_ASSERT(innerStart + static_cast<Index>(innerSize) - 1 == innerIndices[innerStartIdInNextOuter - 1]) <<
 			"matrix column/row " << outerStart + outerLoop << " doesn't end at the block end location";
 
-		op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, innerStartIdInCurrentOuter, subMatrix, outerLoop);
+		operation.assign(ptr, innerStartIdInCurrentOuter, subMatrix, outerLoop);
 	}
 }
 
@@ -187,13 +189,15 @@ void setSubMatrixWithoutSearch(const DerivedSub& subMatrix,
 /// (x0[xx]x) -> The block must already contain all the coefficients but these rows and columns may <br>
 /// (0x[xx]0) -> contains more coefficients before and after the block. <br>
 /// (xx 00 x) <br>
-template <size_t n, size_t m, bool performChecks, typename DerivedSub, typename T, int Opt, typename Index>
+template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
 void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 							Index rowStart,
 							Index columnStart,
 							Eigen::SparseMatrix<T, Opt, Index>* matrix)
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
+
+	static op<T, Opt, Index, n, m, DerivedSub> operation;
 
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
 		"Both matrices should use the same Scalar type");
@@ -248,7 +252,7 @@ void setSubMatrixWithSearch(const DerivedSub& subMatrix,
 			innerIndices[innerFirstElement + static_cast<Index>(innerSize) - 1]) <<
 			"matrix is missing elements of the block (but not the 1st element on a row/column)";
 
-		op<T, Opt, Index, n, m, DerivedSub>().assign(ptr, innerFirstElement, subMatrix, outerLoop);
+		operation.assign(ptr, innerFirstElement, subMatrix, outerLoop);
 	}
 }
 
