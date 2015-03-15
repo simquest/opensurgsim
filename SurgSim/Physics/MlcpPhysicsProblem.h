@@ -67,7 +67,7 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 	/// \tparam SubCDerivedType the CRTP derived type of the passed subC matrix, which usually can be deduced
 	template <typename SubCDerivedType>
 	void updateConstraint(
-		const Eigen::SparseVector<double>& newSubH,
+		const Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>& newSubH,
 		const Eigen::MatrixBase<SubCDerivedType>& subC,
 		size_t indexSubC,
 		size_t indexNewSubH);

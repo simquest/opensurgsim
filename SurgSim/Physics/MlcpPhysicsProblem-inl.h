@@ -25,7 +25,7 @@ namespace Physics
 
 template <typename SubCDerivedType>
 void MlcpPhysicsProblem::updateConstraint(
-	const Eigen::SparseVector<double>& newSubH,
+	const Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>& newSubH,
 	const Eigen::MatrixBase<SubCDerivedType>& subC,
 	size_t indexSubC,
 	size_t indexNewSubH)
@@ -44,12 +44,12 @@ void MlcpPhysicsProblem::updateConstraint(
 	// (H+H')C(H+H')t = HCHt + HCH't + H'C(H+H')t
 	// => HCHt += H(CH't) + H'[C(H+H')t];
 
-	Vector newCHt = subC * newSubH;
+	Vector newCHt = subC * newSubH.transpose();
 	A.col(indexNewSubH) += H.middleCols(indexSubC, subC.rows()) * newCHt;
-	SurgSim::Math::setSparseMatrixBlock<Eigen::MatrixBase<SubCDerivedType>, double, Eigen::RowMajor, ptrdiff_t>(
-		newSubH.transpose().eval(), indexNewSubH, indexSubC, &H);
+	SurgSim::Math::setSparseMatrixBlock<Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>,
+		double, Eigen::RowMajor, ptrdiff_t>(newSubH, indexNewSubH, indexSubC, &H);
 	CHt.block(indexSubC, indexNewSubH, subC.rows(), 1) += newCHt;
-	A.row(indexNewSubH) += newSubH.transpose() * CHt.middleRows(indexSubC, subC.rows());
+	A.row(indexNewSubH) += newSubH * CHt.middleRows(indexSubC, subC.rows());
 }
 
 }
