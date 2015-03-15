@@ -81,7 +81,7 @@ void MlcpGaussSeidelSolver::setMaxIterations(size_t maxIterations)
 bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solution)
 {
 	const size_t problemSize = problem.getSize();
-	const MlcpProblem::Matrix& A = problem.A;
+	MlcpProblem::Matrix A = problem.A;
 	const MlcpProblem::Vector& b = problem.b;
 	MlcpSolution::Vector& initialGuessAndSolution = solution->x;
 	const std::vector<MlcpConstraintType>& constraintsType = problem.constraintTypes;
@@ -128,6 +128,22 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 				") is NaN, infinite, or greater than 1.0! MLCP is exploding after " << *iteration <<
 				" Gauss Seidel iterations!!";
 			break;
+		}
+		if ((*iteration >= m_maxIterations) && !(*validSignorini) &&
+			(!isValid(initialGuessAndSolution) || (initialGuessAndSolution.cwiseAbs().maxCoeff() > 1e5)))
+		{
+			SURGSIM_LOG_WARNING(m_logger) << "Failed to find a solution. " <<
+				(!isValid(initialGuessAndSolution) ? "At least one invalid result." : "Maximum result too big.") <<
+				" Re-solving without conflicting constraints.";
+			*iteration = 0;
+			for (MlcpSolution::Vector::Index i = 0; i < initialGuessAndSolution.size(); ++i)
+			{
+				if (!SurgSim::Math::isValid(initialGuessAndSolution[i]) || (initialGuessAndSolution[i] > 1e5))
+				{
+					A.col(i).setZero();
+				}
+			}
+			initialGuessAndSolution.setZero();
 		}
 	}
 	while ((!(*validSignorini) || (*convergenceCriteria > m_epsilonConvergence)) && *iteration < m_maxIterations);
