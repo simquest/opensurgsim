@@ -165,14 +165,14 @@ public :
 				auto normals = curGeom->getNormalArray();
 				geode.addDrawable(buildGeometry(vertices, normals, osg::Vec4(0.0, 0.0, 1.0, 1.0)));
 
-				auto tangents = curGeom->getVertexAttribArray(7);
+				auto tangents = curGeom->getVertexAttribArray(TANGENT_VERTEX_ATTRIBUTE_ID);
 
 				auto cast = dynamic_cast<osg::Vec4Array*>(tangents);
 				ASSERT_NE(nullptr, cast);
 				ASSERT_EQ(vertices->size(), cast->size());
 				geode.addDrawable(buildGeometry(vertices, tangents, osg::Vec4(1.0, 0.0, 0.0, 1.0)));
 
-				auto bitangents = curGeom->getVertexAttribArray(8);
+				auto bitangents = curGeom->getVertexAttribArray(BITANGENT_VERTEX_ATTRIBUTE_ID);
 				cast = dynamic_cast<osg::Vec4Array*>(bitangents);
 				ASSERT_NE(nullptr, cast);
 				ASSERT_EQ(vertices->size(), cast->size());
