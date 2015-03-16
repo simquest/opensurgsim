@@ -89,6 +89,7 @@ set(SURGSIM_MATH_HEADERS
 	RigidTransform.h
 	Shape.h
 	Shapes.h
+	SparseMatrix.h
 	SphereShape.h
 	SurfaceMeshShape.h
 	SurfaceMeshShape-inl.h
