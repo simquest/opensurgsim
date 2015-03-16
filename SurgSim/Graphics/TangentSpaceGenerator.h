@@ -35,7 +35,7 @@ public:
 
 	/// Sets whether the three tangent space basis vectors are made to be orthonormal;
 	/// otherwise, each tangent is separately orthonormal to the normal, but not to each other
-	/// \param orthonomal Whether or not to create a fully orthonormal basis
+	/// \param orthonormal Whether or not to create a fully orthonormal basis
 	void setBasisOrthonormality(bool orthonormal);
 
 	/// \return Gets whether the three tangent space basis vectors are made to be orthonormal; otherwise,
@@ -104,7 +104,7 @@ public:
 
 	/// Sets whether the three tangent space basis vectors are made to be orthonormal;
 	/// otherwise, each tangent is separately orthonormal to the normal, but not to each other
-	/// \param orthonomal Whether or not to create a fully orthonormal basis
+	/// \param orthonormal Whether or not to create a fully orthonormal basis
 	void setBasisOrthonormality(bool orthonormal);
 
 	/// Gets whether the three tangent space basis vectors are made to be orthonormal; otherwise,
