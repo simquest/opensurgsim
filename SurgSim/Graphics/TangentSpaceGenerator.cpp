@@ -20,7 +20,7 @@
 #include <osg/Vec3>
 #include <osg/Array>
 
-namespace 
+namespace
 {
 
 void orthogonalize(const osg::Vec3& normal, osg::Vec4* tangent, osg::Vec4* bitangent,
@@ -28,7 +28,7 @@ void orthogonalize(const osg::Vec3& normal, osg::Vec4* tangent, osg::Vec4* bitan
 {
 	SURGSIM_ASSERT(tangent != nullptr) << "Tanget parameter can't be nullptr.";
 	SURGSIM_ASSERT(bitangent != nullptr) << "BiTangent parameter can't be nullptr.";
-	
+
 	osg::Vec4 normal4(normal, 0.0);
 	// Gram-Schmidt orthogonalize the tangent
 	(*tangent) = (*tangent) - normal4 * (normal4 * (*tangent));
@@ -119,10 +119,10 @@ void GenerateTangentSpaceTriangleIndexFunctor::orthogonalize()
 
 	for (size_t vertexIndex = 0; vertexIndex < numVertices; ++vertexIndex)
 	{
-		::orthogonalize((*m_normalArray)[vertexIndex], 
-						 &(*m_tangentArray)[vertexIndex], 
+		::orthogonalize((*m_normalArray)[vertexIndex],
+						 &(*m_tangentArray)[vertexIndex],
 						 &(*m_bitangentArray)[vertexIndex],
-					     m_createOrthonormalBasis);
+						 m_createOrthonormalBasis);
 	}
 }
 
