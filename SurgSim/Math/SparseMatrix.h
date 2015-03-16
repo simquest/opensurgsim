@@ -95,7 +95,7 @@ public:
 	/// Do the assignment of a row/column of a matrix to a chunk of memory
 	/// \param ptr The chunk of memory
 	/// \param start Where the assignment starts in the chunk of memory
-	/// \tparam n, m The size of the block (n rows, m columns)
+	/// \param n, m The size of the block (n rows, m columns)
 	/// \param subMatrix The matrix from which the row/column is copied
 	/// \param colRowId The column or row id depending on the template parameter Opt
 	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colRowId){}
@@ -143,8 +143,8 @@ public:
 /// corresponding coefficients.
 /// \tparam n, m The block size (Derived may be bigger but cannot be smaller in both dimension)
 /// \tparam DerivedSub The type of the 'subMatrix' (can usually be inferred). Can be any type, but does not
-/// support Eigen expression. If it is a Sparse storage type the alignment must be the same as the SparseMatrix: Opt.
-/// Note that no assertion or verification is done on this type.
+/// support Eigen expression. If it is a Sparse storage type, the storage (RowMajor or ColMajor) must be the same as
+/// in the SparseMatrix: Opt. Note that no assertion or verification is done on this type.
 /// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
 /// \param subMatrix The sub matrix that will be copied into the SparseMatrix block
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
