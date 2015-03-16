@@ -43,6 +43,11 @@ TEST(LocationTests, Constructor)
 		EXPECT_FALSE(location.octreeNodePath.hasValue());
 		EXPECT_TRUE(location.rigidLocalPosition.hasValue());
 		EXPECT_TRUE(location.rigidLocalPosition.getValue().isApprox(rigidLocalPosition));
+		Location location1(location);
+		EXPECT_FALSE(location1.meshLocalCoordinate.hasValue());
+		EXPECT_FALSE(location1.octreeNodePath.hasValue());
+		EXPECT_TRUE(location1.rigidLocalPosition.hasValue());
+		EXPECT_TRUE(location1.rigidLocalPosition.getValue().isApprox(rigidLocalPosition));
 	}
 
 	{
@@ -52,6 +57,11 @@ TEST(LocationTests, Constructor)
 		EXPECT_TRUE(location.octreeNodePath.hasValue());
 		EXPECT_FALSE(location.rigidLocalPosition.hasValue());
 		EXPECT_EQ(octreeNodePath, location.octreeNodePath.getValue());
+		Location location1(location);
+		EXPECT_FALSE(location1.meshLocalCoordinate.hasValue());
+		EXPECT_TRUE(location1.octreeNodePath.hasValue());
+		EXPECT_FALSE(location1.rigidLocalPosition.hasValue());
+		EXPECT_EQ(octreeNodePath, location1.octreeNodePath.getValue());
 	}
 
 	{
@@ -62,6 +72,12 @@ TEST(LocationTests, Constructor)
 		EXPECT_FALSE(location.rigidLocalPosition.hasValue());
 		EXPECT_EQ(meshLocalCoordinate.index, location.meshLocalCoordinate.getValue().index);
 		EXPECT_TRUE(location.meshLocalCoordinate.getValue().coordinate.isApprox(meshLocalCoordinate.coordinate));
+		Location location1(location);
+		EXPECT_TRUE(location1.meshLocalCoordinate.hasValue());
+		EXPECT_FALSE(location1.octreeNodePath.hasValue());
+		EXPECT_FALSE(location1.rigidLocalPosition.hasValue());
+		EXPECT_EQ(meshLocalCoordinate.index, location1.meshLocalCoordinate.getValue().index);
+		EXPECT_TRUE(location1.meshLocalCoordinate.getValue().coordinate.isApprox(meshLocalCoordinate.coordinate));
 	}
 }
 

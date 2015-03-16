@@ -89,36 +89,21 @@ TEST_F(PushResultsTests, OneRepresentationOneConstraintTest)
 	m_usedRepresentations.push_back(m_fixedWorldRepresentation);
 	// Set the representation list in the Physics Manager State
 	m_physicsManagerState->setRepresentations(m_usedRepresentations);
+	// The type of constraint.
+	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 
 	// Prep the list of constraints: use only 1 constraint
 	{
-		std::shared_ptr<Localization> rigidLocalization;
-		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
-			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
-			rigidLocalization = rigidLocalizationTyped;
-		}
-		std::shared_ptr<RigidRepresentationContact> rigidSideContact;
-		rigidSideContact = std::make_shared<RigidRepresentationContact>();
-
-		std::shared_ptr<Localization> fixedLocalization;
-		{
-			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
-			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
-			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
-			fixedLocalization = fixedLocalizationTyped;
-		}
-		std::shared_ptr<FixedRepresentationContact> fixedSideContact;
-		fixedSideContact = std::make_shared<FixedRepresentationContact>();
-
 		// Define the constraint specific data
 		std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
 		data->setPlaneEquation(SurgSim::Math::Vector3d(0.0, 1.0, 0.0), 0.0);
 
 		// Set up the constraint
-		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(
-			data, rigidSideContact, rigidLocalization, fixedSideContact, fixedLocalization);
+		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
+			data, m_usedRepresentations[0],
+			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+			m_fixedWorldRepresentation,
+			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);
@@ -183,68 +168,36 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 	m_usedRepresentations.push_back(m_fixedWorldRepresentation);
 	// Set the representation list in the Physics Manager State
 	m_physicsManagerState->setRepresentations(m_usedRepresentations);
+	// The type of constraint.
+	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 
 	// Prep the list of constraints: use 2 constraints
 	{
-		std::shared_ptr<Localization> rigidLocalization;
-		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
-			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
-			rigidLocalization = rigidLocalizationTyped;
-		}
-		std::shared_ptr<RigidRepresentationContact> rigidSideContact;
-		rigidSideContact = std::make_shared<RigidRepresentationContact>();
-
-		std::shared_ptr<Localization> fixedLocalization;
-		{
-			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
-			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
-			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
-			fixedLocalization = fixedLocalizationTyped;
-		}
-		std::shared_ptr<FixedRepresentationContact> fixedSideContact;
-		fixedSideContact = std::make_shared<FixedRepresentationContact>();
-
 		// Define the constraint specific data
 		std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
 		data->setPlaneEquation(SurgSim::Math::Vector3d(0.0, 1.0, 0.0), 0.0);
 
 		// Set up the constraint
-		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(
-			data, rigidSideContact, rigidLocalization, fixedSideContact, fixedLocalization);
+		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
+			data, m_usedRepresentations[0],
+			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+			m_fixedWorldRepresentation,
+			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);
 	}
 	{
-		std::shared_ptr<Localization> rigidLocalization;
-		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
-			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Ones());
-			rigidLocalization = rigidLocalizationTyped;
-		}
-		std::shared_ptr<RigidRepresentationContact> rigidSideContact;
-		rigidSideContact = std::make_shared<RigidRepresentationContact>();
-
-		std::shared_ptr<Localization> fixedLocalization;
-		{
-			auto fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
-			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
-			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Ones());
-			fixedLocalization = fixedLocalizationTyped;
-		}
-		std::shared_ptr<FixedRepresentationContact> fixedSideContact;
-		fixedSideContact = std::make_shared<FixedRepresentationContact>();
-
 		// Define the constraint specific data
 		std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
 		data->setPlaneEquation(SurgSim::Math::Vector3d(0.0, 1.0, 0.0), 0.0);
 
 		// Set up the constraint
-		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(
-			data, rigidSideContact, rigidLocalization, fixedSideContact, fixedLocalization);
+		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
+			data, m_usedRepresentations[0],
+			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Ones()),
+			m_fixedWorldRepresentation,
+			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Ones()));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);
@@ -321,68 +274,36 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 	m_usedRepresentations.push_back(m_allRepresentations[1]);
 	// Set the representation list in the Physics Manager State
 	m_physicsManagerState->setRepresentations(m_usedRepresentations);
+	// The type of constraint.
+	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 
 	// Prep the list of constraints: use 2 constraints
 	{
-		std::shared_ptr<Localization> rigid1Localization;
-		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
-			rigidLocalizationTyped->setLocalPosition(pointOrigin);
-			rigid1Localization = rigidLocalizationTyped;
-		}
-		std::shared_ptr<RigidRepresentationContact> rigidSide1Contact;
-		rigidSide1Contact = std::make_shared<RigidRepresentationContact>();
-
-		std::shared_ptr<Localization> rigid2Localization;
-		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[1]);
-			rigidLocalizationTyped->setLocalPosition(pointOrigin);
-			rigid2Localization = rigidLocalizationTyped;
-		}
-		std::shared_ptr<RigidRepresentationContact> rigidSide2Contact;
-		rigidSide2Contact = std::make_shared<RigidRepresentationContact>();
-
 		// Define the constraint specific data
 		std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
 		data->setPlaneEquation(planeDirection, planeDistance);
 
 		// Set up the constraint
-		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(
-			data, rigidSide1Contact, rigid1Localization, rigidSide2Contact, rigid2Localization);
+		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
+			data, m_usedRepresentations[0],
+			SurgSim::DataStructures::Location(pointOrigin),
+			m_usedRepresentations[1],
+			SurgSim::DataStructures::Location(pointOrigin));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);
 	}
 	{
-		std::shared_ptr<Localization> rigid1Localization;
-		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
-			rigidLocalizationTyped->setLocalPosition(pointOrigin);
-			rigid1Localization = rigidLocalizationTyped;
-		}
-		std::shared_ptr<RigidRepresentationContact> rigidSide1Contact;
-		rigidSide1Contact = std::make_shared<RigidRepresentationContact>();
-
-		std::shared_ptr<Localization> rigid2Localization;
-		{
-			auto rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[1]);
-			rigidLocalizationTyped->setLocalPosition(pointOne);
-			rigid2Localization = rigidLocalizationTyped;
-		}
-		std::shared_ptr<RigidRepresentationContact> rigidSide2Contact;
-		rigidSide2Contact = std::make_shared<RigidRepresentationContact>();
-
 		// Define the constraint specific data
 		std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
 		data->setPlaneEquation(planeDirection, planeDistance);
 
 		// Set up the constraint
-		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(
-			data, rigidSide1Contact, rigid1Localization, rigidSide2Contact, rigid2Localization);
+		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
+			data, m_usedRepresentations[0],
+			SurgSim::DataStructures::Location(pointOrigin),
+			m_usedRepresentations[1],
+			SurgSim::DataStructures::Location(pointOne));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);

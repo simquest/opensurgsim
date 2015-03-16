@@ -121,11 +121,6 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	m_hasExternalGeneralizedForce = true;
 }
 
-RepresentationType Fem2DRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_FEM2D;
-}
-
 std::shared_ptr<FemPlyReaderDelegate> Fem2DRepresentation::getDelegate()
 {
 	auto thisAsSharedPtr = std::static_pointer_cast<Fem2DRepresentation>(shared_from_this());

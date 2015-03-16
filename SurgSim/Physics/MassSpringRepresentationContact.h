@@ -45,10 +45,6 @@ public:
 	/// \return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
-	/// Gets the Type of representation that this implementation is concerned with
-	/// \return SurgSim::Physics::REPRESENTATION_TYPE_MASSSPRING
-	RepresentationType getRepresentationType() const override;
-
 private:
 	/// Gets the number of degrees of freedom for a frictionless contact.
 	/// \return 1, as a frictionless contact only has 1 equation of constraint (along the normal direction).

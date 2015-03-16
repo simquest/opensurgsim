@@ -97,12 +97,6 @@ TEST_F(Fem3DRepresentationTests, ConstructorTest)
 	ASSERT_NO_THROW(std::shared_ptr<Fem3DRepresentation> fem = std::make_shared<Fem3DRepresentation>("Fem3D"));
 }
 
-TEST_F(Fem3DRepresentationTests, GetTypeTest)
-{
-	createFem();
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM3D, m_fem->getType());
-}
-
 TEST_F(Fem3DRepresentationTests, GetNumDofPerNodeTest)
 {
 	createFem();
@@ -249,6 +243,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 							std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
 							m_fem->createLocalization(location)););
 			EXPECT_TRUE(localization != nullptr);
+			EXPECT_TRUE(localization->getRepresentation() == m_fem);
 
 			SurgSim::Math::Vector globalPosition;
 			SurgSim::DataStructures::IndexedLocalCoordinate coordinate = localization->getLocalPosition();

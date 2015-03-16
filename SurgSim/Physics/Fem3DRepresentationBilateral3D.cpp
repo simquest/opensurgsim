@@ -113,11 +113,6 @@ SurgSim::Math::MlcpConstraintType Fem3DRepresentationBilateral3D::getMlcpConstra
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-SurgSim::Physics::RepresentationType Fem3DRepresentationBilateral3D::getRepresentationType() const
-{
-	return REPRESENTATION_TYPE_FEM3D;
-}
-
 size_t Fem3DRepresentationBilateral3D::doGetNumDof() const
 {
 	return 3;
