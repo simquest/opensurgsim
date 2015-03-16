@@ -13,18 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 find_package(SixenseSdk REQUIRED)
 
-link_directories(${Boost_LIBRARY_DIRS})
-
-set(LIBS
-	${Boost_LIBRARIES}
+include_directories(
+	${SIXENSESDK_INCLUDE_DIR}
 )
 
-include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${SIXENSESDK_INCLUDE_DIR}"
+set(LIBS
+	${SIXENSESDK_LIBRARIES}
 )
 
 set(SIXENSE_DEVICE_SOURCES

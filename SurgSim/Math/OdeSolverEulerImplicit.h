@@ -44,17 +44,20 @@ public:
 	/// \return The Newton-Raphson algorithm epsilon convergence
 	double getNewtonRaphsonEpsilonConvergence() const;
 
-	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
 
 protected:
+	void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
+		bool computeRHS = true) override;
+
 	/// Newton-Raphson maximum number of iteration (1 => linearization)
 	size_t m_maximumIteration;
 
 	/// Newton-Raphson convergence criteria (variation of the solution over time)
 	double m_epsilonConvergence;
 
-	/// Newton-Raphson current and previous solution (we solve a problem to find deltaV, the variation in velocity)
-	Vector m_deltaV, m_previousDeltaV;
+	/// Newton-Raphson previous solution (we solve a problem to find deltaV, the variation in velocity)
+	Vector m_previousSolution;
 };
 
 }; // namespace Math

@@ -20,6 +20,7 @@
 #include "SurgSim/Graphics/OsgTexture1d.h"
 #include "SurgSim/Graphics/OsgTexture2d.h"
 #include "SurgSim/Graphics/OsgTexture3d.h"
+#include "SurgSim/Graphics/OsgTextureCubeMap.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 
 #include "SurgSim/Math/Vector.h"
@@ -60,6 +61,7 @@ OsgUniformFactory::OsgUniformFactory()
 	registerClass<OsgTextureUniform<OsgTexture1d>>("sampler1D");
 	registerClass<OsgTextureUniform<OsgTexture2d>>("sampler2D");
 	registerClass<OsgTextureUniform<OsgTexture3d>>("sampler3D");
+	registerClass<OsgTextureUniform<OsgTextureCubeMap>>("samplerCube");
 }
 
 OsgUniformFactory::~OsgUniformFactory()

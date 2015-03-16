@@ -31,12 +31,15 @@ namespace SurgSim
 namespace Math
 {
 
+namespace
+{
 template<class T>
 void doConstructorTest()
 {
 	MassPoint m;
 	ASSERT_NO_THROW({T solver(&m);});
 }
+};
 
 TEST(OdeSolverEulerImplicit, ConstructorTest)
 {
@@ -50,8 +53,10 @@ TEST(OdeSolverEulerImplicit, ConstructorTest)
 	}
 }
 
+namespace
+{
 template<class T>
-void doSolveTest()
+void doSolveTest(bool computeCompliance)
 {
 	// Test 2 iterations because Linear solvers have a different algorithm on the 1st pass from the following passes.
 
@@ -64,7 +69,7 @@ void doSolveTest()
 		// ma = mg <=> a = g
 		// v(1) = g.dt + v(0)
 		// x(1) = v(1).dt + x(0)
-		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1);});
+		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1, computeCompliance);});
 		EXPECT_EQ(defaultState, state0);
 		EXPECT_NE(defaultState, state1);
 		EXPECT_TRUE(state1.getVelocities().isApprox(m.m_gravity * 1e-3 + state0.getVelocities()));
@@ -72,7 +77,7 @@ void doSolveTest()
 
 		// v(2) = g.dt + v(1)
 		// x(2) = v(2).dt + x(1)
-		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2);});
+		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2, computeCompliance);});
 		EXPECT_NE(defaultState, state1);
 		EXPECT_NE(defaultState, state2);
 		EXPECT_NE(state2, state1);
@@ -89,7 +94,7 @@ void doSolveTest()
 		// ma = mg - c.v <=> a = g - c/m.v
 		// v(1) = (g - c/m.v(1)).dt + v(0) <=> v(1) = I.(1.0 + dt.c/m)^-1.(g.dt + v(0))
 		// x(1) = v(1).dt + x(0)
-		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1);});
+		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1, computeCompliance);});
 		EXPECT_EQ(defaultState, state0);
 		EXPECT_NE(defaultState, state1);
 		Matrix33d systemInverse = Matrix33d::Identity() * 1.0 / (1.0 + 1e-3 * 0.1 / m.m_mass);
@@ -98,7 +103,7 @@ void doSolveTest()
 
 		// v(2) = (g - c/m.v(2)).dt + v(1) <=> v(2) = I.(1.0 + dt.c/m)^-1.(g.dt + v(1))
 		// x(2) = v(2).dt + x(1)
-		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2);});
+		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2, computeCompliance);});
 		EXPECT_NE(defaultState, state1);
 		EXPECT_NE(defaultState, state2);
 		EXPECT_NE(state1, state2);
@@ -106,19 +111,31 @@ void doSolveTest()
 		EXPECT_TRUE(state2.getPositions().isApprox(state2.getVelocities() * 1e-3 + state1.getPositions()));
 	}
 }
+};
 
 TEST(OdeSolverEulerImplicit, SolveTest)
 {
 	{
-		SCOPED_TRACE("EulerImplicit");
-		doSolveTest<OdeSolverEulerImplicit>();
+		SCOPED_TRACE("EulerImplicit computing the compliance matrix");
+		doSolveTest<OdeSolverEulerImplicit>(true);
 	}
 	{
-		SCOPED_TRACE("LinearEulerImplicit");
-		doSolveTest<OdeSolverLinearEulerImplicit>();
+		SCOPED_TRACE("EulerImplicit not computing the compliance matrix");
+		doSolveTest<OdeSolverEulerImplicit>(false);
+	}
+
+	{
+		SCOPED_TRACE("LinearEulerImplicit computing the compliance matrix");
+		doSolveTest<OdeSolverLinearEulerImplicit>(true);
+	}
+	{
+		SCOPED_TRACE("LinearEulerImplicit not computing the compliance matrix");
+		doSolveTest<OdeSolverLinearEulerImplicit>(false);
 	}
 }
 
+namespace
+{
 template<class T>
 void doComplexNonLinearOdeTest(size_t numNewtonRaphsonIteration, bool expectExactSolution)
 {
@@ -166,6 +183,7 @@ void doComplexNonLinearOdeTest(size_t numNewtonRaphsonIteration, bool expectExac
 		EXPECT_TRUE(vt_plus_dt.isApprox(expectedVelocity));
 	}
 }
+};
 
 TEST(OdeSolverEulerImplicit, VerifyComplexNonLinearOdeTest)
 {
@@ -194,6 +212,36 @@ TEST(OdeSolverEulerImplicit, VerifyComplexNonLinearOdeTest)
 		SCOPED_TRACE("Multiple Newton-Raphson iterations, using OdeSolverLinearEulerImplicit");
 
 		doComplexNonLinearOdeTest<OdeSolverLinearEulerImplicit>(10, false);
+	}
+}
+
+namespace
+{
+template <class T>
+void doComputeMatricesTest()
+{
+	MassPoint m;
+	T solver(&m);
+	MassPointState state;
+	double dt = 1e-3;
+
+	Matrix expectedSystemMatrix = m.computeM(state) / dt + m.computeD(state) + dt * m.computeK(state);
+	EXPECT_NO_THROW(solver.computeMatrices(dt, state));
+	EXPECT_TRUE(solver.getSystemMatrix().isApprox(expectedSystemMatrix));
+	EXPECT_TRUE(solver.getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));
+}
+};
+
+TEST(OdeSolverEulerImplicit, ComputeMatricesTest)
+{
+	{
+		SCOPED_TRACE("EulerImplicit");
+		doComputeMatricesTest<OdeSolverEulerImplicit>();
+	}
+
+	{
+		SCOPED_TRACE("LinearEulerImplicit");
+		doComputeMatricesTest<OdeSolverLinearEulerImplicit>();
 	}
 }
 

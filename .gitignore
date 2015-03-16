@@ -9,7 +9,6 @@
 
 ## object files and other build output
 *.o
-*.obj
 *.pdb
 *.so
 *.a

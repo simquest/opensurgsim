@@ -76,8 +76,8 @@ public:
 	/// When enabled it is up to the subclasses responsibility to react to changes and trigger the regeneration of
 	/// Tangents. Tangents will be stored for every geometry node that contains a vertex, normal and texture array.
 	/// \note the \sa TangentSpaceGenerator is used to create the appropriate vertex attribute arrays.
-	/// These are stored as vertex attribute arrays at the indices indicated by TANGENT_ARRAY_ATTRIBUTE_ID, 
-	/// and BITANGENT_ARRAY_ATTRIBUTE_ID with the format osg::ArrayVec4. 
+	/// These are stored as vertex attribute arrays at the indices indicated by TANGENT_ARRAY_ATTRIBUTE_ID,
+	/// and BITANGENT_ARRAY_ATTRIBUTE_ID with the format osg::ArrayVec4.
 	/// The tangents will be made orthonormal by default.
 	/// tangents via \sa updateTangents()
 	void setGenerateTangents(bool value) override;

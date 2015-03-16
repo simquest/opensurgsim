@@ -21,6 +21,7 @@ using SurgSim::Graphics::OsgTextureCubeMap;
 
 OsgTextureCubeMap::OsgTextureCubeMap() : OsgTexture(new osg::TextureCubeMap())
 {
+
 }
 
 void OsgTextureCubeMap::setSize(int width, int height)
@@ -60,16 +61,16 @@ bool OsgTextureCubeMap::loadImage(const std::string& filePath)
 	osg::ref_ptr<osg::Image> negativeY = copyImageBlock(*imageNode, width, height, width, height);
 	negativeY->flipVertical();
 
-	osg::ref_ptr<osg::Image> negativeX = copyImageBlock(*imageNode, 0, height*2, width, height);
+	osg::ref_ptr<osg::Image> negativeX = copyImageBlock(*imageNode, 0, height * 2, width, height);
 	negativeX->flipVertical();
 
-	osg::ref_ptr<osg::Image> positiveZ = copyImageBlock(*imageNode, width, height*2, width, height);
+	osg::ref_ptr<osg::Image> positiveZ = copyImageBlock(*imageNode, width, height * 2, width, height);
 	positiveZ->flipVertical();
 
-	osg::ref_ptr<osg::Image> positiveX = copyImageBlock(*imageNode, width*2, height*2, width, height);
+	osg::ref_ptr<osg::Image> positiveX = copyImageBlock(*imageNode, width * 2, height * 2, width, height);
 	positiveX->flipVertical();
 
-	osg::ref_ptr<osg::Image> positiveY = copyImageBlock(*imageNode, width, height*3, width, height);
+	osg::ref_ptr<osg::Image> positiveY = copyImageBlock(*imageNode, width, height * 3, width, height);
 	positiveY->flipVertical();
 
 	getOsgTexture()->setImage(osg::TextureCubeMap::POSITIVE_X, positiveX);
@@ -83,8 +84,8 @@ bool OsgTextureCubeMap::loadImage(const std::string& filePath)
 }
 
 bool OsgTextureCubeMap::loadImageFaces(const std::string& negativeX, const std::string& positiveX,
-	const std::string& negativeY, const std::string& positiveY,
-	const std::string& negativeZ, const std::string& positiveZ)
+									   const std::string& negativeY, const std::string& positiveY,
+									   const std::string& negativeZ, const std::string& positiveZ)
 {
 	osg::ref_ptr<osg::Image> negativeXImage = osgDB::readImageFile(negativeX);
 	osg::ref_ptr<osg::Image> positiveXImage = osgDB::readImageFile(positiveX);
@@ -110,22 +111,24 @@ bool OsgTextureCubeMap::loadImageFaces(const std::string& negativeX, const std::
 	}
 }
 
-osg::ref_ptr<osg::Image> OsgTextureCubeMap::copyImageBlock(const osg::Image& source, int column, int row,
-	int width, int height)
+osg::ref_ptr<osg::Image> OsgTextureCubeMap::copyImageBlock(
+	const osg::Image& source,
+	size_t startColumn, size_t startRow,
+	size_t width, size_t height)
 {
-	int pixelSize = source.getPixelSizeInBits() / 8;
+	size_t pixelSize = source.getPixelSizeInBits() / 8;
 
-	unsigned char* buffer = new unsigned char[(width*height) * pixelSize];
+	unsigned char* buffer = new unsigned char[(width * height) * pixelSize];
 
-	int index = 0;
+	size_t index = 0;
 
-	for(int i = row; i < row + height; ++i)
+	for (size_t row = startRow; row < startRow + height; ++row)
 	{
-		for(int j = column; j < column + width; ++j)
+		for (size_t column = startColumn; column < startColumn + width; ++column)
 		{
 			const unsigned char* pixel = source.data(column, row, 0);
 
-			for (int p = 0; p < pixelSize; ++p)
+			for (size_t p = 0; p < pixelSize; ++p)
 			{
 				buffer[index] = pixel[p];
 				index++;
@@ -137,7 +140,12 @@ osg::ref_ptr<osg::Image> OsgTextureCubeMap::copyImageBlock(const osg::Image& sou
 
 	subImage->allocateImage(width, height, 1, source.getPixelFormat(), GL_UNSIGNED_BYTE, 1);
 	subImage->setImage(width, height, 1, source.getInternalTextureFormat(), source.getPixelFormat(),
-		GL_UNSIGNED_BYTE, buffer, osg::Image::NO_DELETE, 1);
+					   GL_UNSIGNED_BYTE, buffer, osg::Image::NO_DELETE, 1);
 
 	return subImage;
+}
+
+osg::ref_ptr<osg::TextureCubeMap> SurgSim::Graphics::OsgTextureCubeMap::getOsgTextureCubeMap() const
+{
+	return static_cast<osg::TextureCubeMap*>(getOsgTexture().get());
 }

@@ -32,7 +32,7 @@ namespace Math
 
 namespace
 {
-	const std::string name = "MockOdeSolver";
+const std::string name = "MockOdeSolver";
 };
 
 class MockOdeSolver : public OdeSolver
@@ -50,14 +50,13 @@ public:
 	{
 	}
 
-	/// Solves the equation
-	/// \param dt The time step
-	/// \param currentState State at time t
-	/// \param[out] newState State at time t+dt
-	virtual void solve(double dt, const OdeState& currentState, OdeState* newState)
+	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override
 	{
-		this->m_systemMatrix.setIdentity();
-		this->m_compliance.setIdentity();
+	}
+
+	void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState, bool computeRHS) override
+	{
+
 	}
 };
 
@@ -69,8 +68,8 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({MockOdeSolver solver(&m);});
 	{
 		MockOdeSolver solver(&m);
-		EXPECT_EQ(3, solver.getCompliance().rows());
-		EXPECT_EQ(3, solver.getCompliance().cols());
+		EXPECT_EQ(3, solver.getComplianceMatrix().rows());
+		EXPECT_EQ(3, solver.getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver.getSystemMatrix().rows());
 		EXPECT_EQ(3, solver.getSystemMatrix().cols());
 	}
@@ -78,8 +77,8 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({MockOdeSolver* solver = new MockOdeSolver(&m); delete solver;});
 	{
 		MockOdeSolver* solver = new MockOdeSolver(&m);
-		EXPECT_EQ(3, solver->getCompliance().rows());
-		EXPECT_EQ(3, solver->getCompliance().cols());
+		EXPECT_EQ(3, solver->getComplianceMatrix().rows());
+		EXPECT_EQ(3, solver->getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver->getSystemMatrix().rows());
 		EXPECT_EQ(3, solver->getSystemMatrix().cols());
 		delete solver;
@@ -88,8 +87,8 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m); });
 	{
 		std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m);
-		EXPECT_EQ(3, solver->getCompliance().rows());
-		EXPECT_EQ(3, solver->getCompliance().cols());
+		EXPECT_EQ(3, solver->getComplianceMatrix().rows());
+		EXPECT_EQ(3, solver->getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver->getSystemMatrix().rows());
 		EXPECT_EQ(3, solver->getSystemMatrix().cols());
 	}
@@ -98,13 +97,16 @@ TEST(OdeSolver, ConstructorTest)
 TEST(OdeSolver, GetTest)
 {
 	MassPoint m;
-	MassPointState currentState, newState;
 	MockOdeSolver solver(&m);
 
-	solver.solve(1e-3, currentState, &newState);
-	EXPECT_TRUE(solver.getSystemMatrix().isIdentity());
-	EXPECT_TRUE(solver.getCompliance().isIdentity());
 	EXPECT_EQ(name, solver.getName());
+
+	EXPECT_NE(nullptr, solver.getLinearSolver());
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDenseMatrix>(solver.getLinearSolver()));
+	EXPECT_NO_THROW(solver.setLinearSolver(std::make_shared<LinearSolveAndInverseDiagonalMatrix>()));
+	EXPECT_NE(nullptr, solver.getLinearSolver());
+	EXPECT_EQ(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDenseMatrix>(solver.getLinearSolver()));
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDiagonalMatrix>(solver.getLinearSolver()));
 }
 
 }; // namespace Math
