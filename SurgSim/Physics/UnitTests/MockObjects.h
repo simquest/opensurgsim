@@ -304,6 +304,16 @@ protected:
 	void transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform) override;
 };
 
+class MockFemRepresentationValidComplianceWarping : public MockFemRepresentation
+{
+public:
+	MockFemRepresentationValidComplianceWarping(const std::string& name) : MockFemRepresentation(name)
+	{}
+
+protected:
+	SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) override;
+};
+
 class MockFem1DRepresentation : public SurgSim::Physics::Fem1DRepresentation
 {
 public:

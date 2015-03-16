@@ -418,6 +418,12 @@ void MockFemRepresentation::transformState(std::shared_ptr<OdeState> state, cons
 {
 }
 
+SurgSim::Math::Matrix
+MockFemRepresentationValidComplianceWarping::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)
+{
+	return SurgSim::Math::Matrix::Identity(getNumDofPerNode(), getNumDofPerNode());
+}
+
 MockFem1DRepresentation::MockFem1DRepresentation(const std::string& name) : SurgSim::Physics::Fem1DRepresentation(name)
 {
 }
@@ -460,7 +466,6 @@ void MockFixedConstraintBilateral3D::doBuild(double dt,
 											 ConstraintSideSign sign)
 {
 }
-
 
 MockRigidConstraintBilateral3D::MockRigidConstraintBilateral3D() : ConstraintImplementation()
 {
