@@ -68,8 +68,6 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::MockRepresentation);
 
-	RepresentationType getType() const override;
-
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	void beforeUpdate(double dt) override;
@@ -87,6 +85,8 @@ public:
 	int getUpdateCount() const;
 
 	int getPostUpdateCount() const;
+
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
 };
 
 class MockRigidRepresentation : public RigidRepresentation
@@ -159,12 +159,6 @@ class MockDeformableRepresentation : public SurgSim::Physics::DeformableRepresen
 {
 public:
 	explicit MockDeformableRepresentation(const std::string& name = "MockDeformableRepresentation");
-
-	/// Query the representation type
-	/// \return the RepresentationType for this representation
-	/// \note DeformableRepresentation is abstract because there is really no deformable behind this class !
-	/// \note For the test, we simply set the type to INVALID
-	SurgSim::Physics::RepresentationType getType() const override;
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::MockDeformableRepresentation);
 
@@ -289,10 +283,6 @@ public:
 
 	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
 
-	/// Query the representation type
-	/// \return the RepresentationType for this representation
-	RepresentationType getType() const override;
-
 	std::shared_ptr<OdeSolver> getOdeSolver() const;
 
 	const std::vector<double>& getMassPerNode() const;
@@ -302,6 +292,16 @@ protected:
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
 	void transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform) override;
+};
+
+class MockFemRepresentationValidComplianceWarping : public MockFemRepresentation
+{
+public:
+	MockFemRepresentationValidComplianceWarping(const std::string& name) : MockFemRepresentation(name)
+	{}
+
+protected:
+	SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) override;
 };
 
 class MockFem1DRepresentation : public SurgSim::Physics::Fem1DRepresentation
@@ -319,8 +319,6 @@ public:
 	virtual ~MockFixedConstraintBilateral3D();
 
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
-
-	RepresentationType getRepresentationType() const override;
 
 private:
 	size_t doGetNumDof() const override;
@@ -341,8 +339,6 @@ public:
 	virtual ~MockRigidConstraintBilateral3D();
 
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
-
-	RepresentationType getRepresentationType() const override;
 
 private:
 	size_t doGetNumDof() const override;
@@ -384,8 +380,6 @@ class MockConstraintImplementation : public ConstraintImplementation
 public:
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
-	RepresentationType getRepresentationType() const override;
-
 private:
 	size_t doGetNumDof() const override;
 
@@ -421,11 +415,18 @@ public:
 inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepresentation> firstRepresentation,
 	std::shared_ptr<MockRepresentation> secondRepresentation)
 {
-	return std::make_shared<Constraint>(std::make_shared<ConstraintData>(),
-		std::make_shared<MockConstraintImplementation>(),
-		std::make_shared<MockLocalization>(firstRepresentation),
-		std::make_shared<MockConstraintImplementation>(),
-		std::make_shared<MockLocalization>(secondRepresentation));
+	using SurgSim::DataStructures::Location;
+
+	static auto type = (new MockConstraintImplementation())->getMlcpConstraintType();
+	if (firstRepresentation->getConstraintImplementation(type) == nullptr)
+	{
+		ConstraintImplementation::getFactory().addImplementation(typeid(MockRepresentation),
+			std::make_shared<MockConstraintImplementation>());
+	}
+
+	return std::make_shared<Constraint>(type, std::make_shared<ConstraintData>(),
+		firstRepresentation, Location(),
+		secondRepresentation, Location());
 }
 
 /// Class to represent a mock collision representation to test if update gets called from the Computation.

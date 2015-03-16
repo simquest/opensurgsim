@@ -15,9 +15,15 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
-#include "SurgSim/Physics/FixedRepresentationContact.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
 #include "SurgSim/Physics/Fem3DRepresentationContact.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
+#include "SurgSim/Physics/FixedRepresentationContact.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
+#include "SurgSim/Physics/RigidRepresentationContact.h"
 
 namespace SurgSim
 {
@@ -26,9 +32,12 @@ namespace Physics
 
 ConstraintImplementationFactory::ConstraintImplementationFactory()
 {
-	addImplementation(std::make_shared<FixedRepresentationContact>());
-	addImplementation(std::make_shared<RigidRepresentationContact>());
-	addImplementation(std::make_shared<Fem3DRepresentationContact>());
+	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedRepresentationContact>());
+	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidRepresentationContact>());
+	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DRepresentationContact>());
+	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedRepresentationBilateral3D>());
+	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidRepresentationBilateral3D>());
+	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DRepresentationBilateral3D>());
 }
 
 ConstraintImplementationFactory::~ConstraintImplementationFactory()
@@ -36,25 +45,24 @@ ConstraintImplementationFactory::~ConstraintImplementationFactory()
 }
 
 std::shared_ptr<ConstraintImplementation> ConstraintImplementationFactory::getImplementation(
-	RepresentationType representationType,
-	SurgSim::Math::MlcpConstraintType constraintType) const
+	std::type_index representationType,
+	SurgSim::Math::MlcpConstraintType constraintType)
 {
-	SURGSIM_ASSERT(representationType >= 0 && representationType < REPRESENTATION_TYPE_COUNT) <<
-		"Invalid representation type " << representationType;
 	SURGSIM_ASSERT(constraintType >= 0 && constraintType < SurgSim::Math::MLCP_NUM_CONSTRAINT_TYPES) <<
 		"Invalid constraint type " << constraintType;
 
 	auto implementation = m_implementations[representationType][constraintType];
 	SURGSIM_LOG_IF(implementation == nullptr, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
-		"No constraint implementation for representation type (" << representationType <<
+		"No constraint implementation for representation type (" << representationType.name() <<
 		") and constraint type (" << constraintType << ")";
 
 	return implementation;
 }
 
-void ConstraintImplementationFactory::addImplementation(std::shared_ptr<ConstraintImplementation> implementation)
+void ConstraintImplementationFactory::addImplementation(
+	std::type_index typeIndex, std::shared_ptr<ConstraintImplementation> implementation)
 {
-	m_implementations[implementation->getRepresentationType()][implementation->getMlcpConstraintType()] =
+	m_implementations[typeIndex][implementation->getMlcpConstraintType()] =
 		implementation;
 }
 

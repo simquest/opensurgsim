@@ -75,11 +75,6 @@ Fem3DRepresentation::~Fem3DRepresentation()
 {
 }
 
-RepresentationType Fem3DRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_FEM3D;
-}
-
 void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,
 		const SurgSim::Math::Matrix& K,

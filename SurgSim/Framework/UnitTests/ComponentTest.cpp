@@ -550,5 +550,4 @@ TEST(ComponentTests, CheckAndConvertTest)
 
 
 	EXPECT_ANY_THROW(result = checkAndConvert<MockComponent>(other, "MockBehavior"));
-
 }

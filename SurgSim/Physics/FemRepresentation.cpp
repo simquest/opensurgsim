@@ -32,12 +32,17 @@ namespace Physics
 {
 
 FemRepresentation::FemRepresentation(const std::string& name) :
-	DeformableRepresentation(name)
+	DeformableRepresentation(name),
+	m_useComplianceWarping(false),
+	m_isInitialComplianceMatrixComputed(false)
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, Filename, getFilename, setFilename);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, Filename,
+		getFilename, setFilename);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, bool, ComplianceWarping,
+		getComplianceWarping, setComplianceWarping);
 }
 
 FemRepresentation::~FemRepresentation()
@@ -125,6 +130,40 @@ bool FemRepresentation::doInitialize()
 		}
 	}
 
+	typedef Eigen::SparseMatrix<double>::Index Index;
+
+	// If we are using compliance warping for this representation, let's pre-allocate the rotation matrix
+	// and pre-define its pattern, so we only access existing elements later on.
+	if (m_useComplianceWarping)
+	{
+		Index numDofPerNode = static_cast<Index>(getNumDofPerNode());
+		Index numDof = static_cast<Index>(getNumDof());
+
+		// Rotation matrix allocation and creation of the sparse matrix pattern.
+		m_complianceWarpingTransformation.resize(numDof, numDof);
+		// n columns with numDofPerNode non-zero elements each
+		m_complianceWarpingTransformation.reserve(Eigen::VectorXi::Constant(numDof, numDofPerNode));
+
+		auto logger = SurgSim::Framework::Logger::getLogger("Physics/FemRepresentation");
+		SURGSIM_LOG_IF(numDofPerNode % 3 != 0, logger, SEVERE) << "Using compliance warping with representation " <<
+			getName() << " which has " << numDofPerNode << " dof per node (not a factor of 3)";
+
+		// Use a mask of 1 to setup the sparse matrix pattern
+		for(Index nodeId = 0; nodeId < m_initialState->getNumNodes(); ++nodeId)
+		{
+			for (Index i = 0; i < numDofPerNode; ++i)
+			{
+				for (Index j = 0; j < numDofPerNode; ++j)
+				{
+					m_complianceWarpingTransformation.insert(nodeId * numDofPerNode + i, nodeId * numDofPerNode + j) =
+						1.0;
+				}
+			}
+		}
+
+		m_complianceWarpingTransformation.makeCompressed();
+	}
+
 	return true;
 }
 
@@ -188,6 +227,102 @@ void FemRepresentation::beforeUpdate(double dt)
 			<< "No fem element specified yet, call addFemElement() prior to running the simulation";
 	SURGSIM_ASSERT(getNumDof())
 			<<	"State has not been initialized yet, call setInitialState() prior to running the simulation";
+}
+
+void FemRepresentation::update(double dt)
+{
+	if (!isActive())
+	{
+		return;
+	}
+
+	SURGSIM_ASSERT(m_odeSolver != nullptr) <<
+		"Ode solver has not been set yet. Did you call beforeUpdate() ?";
+	SURGSIM_ASSERT(m_initialState != nullptr) <<
+		"Initial state has not been set yet. Did you call setInitialState() ?";
+
+	// Solve the ode and compute the requested compliance matrix
+	if (m_useComplianceWarping)
+	{
+		if (!m_isInitialComplianceMatrixComputed)
+		{
+			m_odeSolver->computeMatrices(dt, *m_initialState);
+			m_isInitialComplianceMatrixComputed = true;
+		}
+		m_odeSolver->solve(dt, *m_currentState, m_newState.get(), false);
+
+		// Update the compliance matrix by first updating the nodes transformation
+		updateNodesTransformation(*m_newState);
+		// Then, update the compliance matrix using compliance warping
+		m_complianceWarpingMatrix = m_complianceWarpingTransformation * m_odeSolver->getComplianceMatrix() *
+			m_complianceWarpingTransformation.transpose();
+	}
+	else
+	{
+		m_odeSolver->solve(dt, *m_currentState, m_newState.get());
+	}
+
+	// Back up the current state into the previous state (by swapping)
+	m_currentState.swap(m_previousState);
+	// Make the new state, the current state (by swapping)
+	m_currentState.swap(m_newState);
+
+	if (!m_currentState->isValid())
+	{
+		SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
+			<< getName() << " deactivated :" << std::endl
+			<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
+			<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
+
+		setLocalActive(false);
+	}
+}
+
+void FemRepresentation::setComplianceWarping(bool useComplianceWarping)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Compliance warping cannot be modified once the component is initialized";
+
+	m_useComplianceWarping = useComplianceWarping;
+}
+
+bool FemRepresentation::getComplianceWarping() const
+{
+	return m_useComplianceWarping;
+}
+
+const SurgSim::Math::Matrix& FemRepresentation::getComplianceMatrix() const
+{
+	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
+
+	if (m_useComplianceWarping)
+	{
+		return m_complianceWarpingMatrix;
+	}
+
+	return m_odeSolver->getComplianceMatrix();
+}
+
+SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)
+{
+	SURGSIM_FAILURE() << "Any representation using compliance warping should override this method to provide the " <<
+		"proper nodes transformation";
+
+	return SurgSim::Math::Matrix();
+}
+
+void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState& state)
+{
+	using SurgSim::Math::setSubMatrixWithoutSearch;
+	using SurgSim::Math::Matrix;
+
+	typedef Eigen::SparseMatrix<double>::Index Index;
+	Index numDofPerNode = static_cast<Index>(getNumDofPerNode());
+	for (size_t nodeId = 0; nodeId < state.getNumNodes(); ++nodeId)
+	{
+		Index startDiagonalIndex = numDofPerNode * static_cast<Index>(nodeId);
+		setSubMatrixWithoutSearch<Matrix, double>(getNodeTransformation(state, nodeId),
+			startDiagonalIndex, startDiagonalIndex, numDofPerNode, numDofPerNode, &m_complianceWarpingTransformation);
+	}
 }
 
 SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState& state)

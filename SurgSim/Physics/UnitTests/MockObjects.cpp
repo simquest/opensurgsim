@@ -37,11 +37,6 @@ MockRepresentation::~MockRepresentation()
 {
 }
 
-RepresentationType MockRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_FIXED;
-}
-
 void MockRepresentation::beforeUpdate(double dt)
 {
 	m_preUpdateCount++;
@@ -72,6 +67,11 @@ int MockRepresentation::getPostUpdateCount() const
 	return m_postUpdateCount;
 }
 
+std::shared_ptr<Localization> MockRepresentation::createLocalization(
+	const SurgSim::DataStructures::Location& location)
+{
+	return std::make_shared<MockLocalization>();
+}
 
 MockRigidRepresentation::MockRigidRepresentation() : RigidRepresentation("MockRigidRepresentation")
 {
@@ -119,11 +119,6 @@ MockDeformableRepresentation::MockDeformableRepresentation(const std::string& na
 	m_M = Matrix::Identity(3, 3);
 	m_D = Matrix::Identity(3, 3);
 	m_K = Matrix::Identity(3, 3);
-}
-
-RepresentationType MockDeformableRepresentation::getType() const
-{
-	return SurgSim::Physics::REPRESENTATION_TYPE_INVALID;
 }
 
 void MockDeformableRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
@@ -399,11 +394,6 @@ std::shared_ptr<FemPlyReaderDelegate> MockFemRepresentation::getDelegate()
 	return nullptr;
 }
 
-RepresentationType MockFemRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_INVALID;
-}
-
 std::shared_ptr<OdeSolver> MockFemRepresentation::getOdeSolver() const
 {
 	return this->m_odeSolver;
@@ -416,6 +406,12 @@ const std::vector<double>& MockFemRepresentation::getMassPerNode() const
 
 void MockFemRepresentation::transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform)
 {
+}
+
+SurgSim::Math::Matrix
+MockFemRepresentationValidComplianceWarping::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)
+{
+	return SurgSim::Math::Matrix::Identity(getNumDofPerNode(), getNumDofPerNode());
 }
 
 MockFem1DRepresentation::MockFem1DRepresentation(const std::string& name) : SurgSim::Physics::Fem1DRepresentation(name)
@@ -441,11 +437,6 @@ SurgSim::Math::MlcpConstraintType MockFixedConstraintBilateral3D::getMlcpConstra
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-RepresentationType MockFixedConstraintBilateral3D::getRepresentationType() const
-{
-	return REPRESENTATION_TYPE_FIXED;
-}
-
 size_t MockFixedConstraintBilateral3D::doGetNumDof() const
 {
 	return 3;
@@ -461,7 +452,6 @@ void MockFixedConstraintBilateral3D::doBuild(double dt,
 {
 }
 
-
 MockRigidConstraintBilateral3D::MockRigidConstraintBilateral3D() : ConstraintImplementation()
 {
 }
@@ -473,11 +463,6 @@ MockRigidConstraintBilateral3D::~MockRigidConstraintBilateral3D()
 SurgSim::Math::MlcpConstraintType MockRigidConstraintBilateral3D::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
-}
-
-RepresentationType MockRigidConstraintBilateral3D::getRepresentationType() const
-{
-	return REPRESENTATION_TYPE_RIGID;
 }
 
 size_t MockRigidConstraintBilateral3D::doGetNumDof() const
@@ -513,11 +498,6 @@ Vector3d MockLocalization::doCalculatePosition(double time)
 SurgSim::Math::MlcpConstraintType MockConstraintImplementation::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
-}
-
-RepresentationType MockConstraintImplementation::getRepresentationType() const
-{
-	return SurgSim::Physics::REPRESENTATION_TYPE_FIXED;
 }
 
 size_t MockConstraintImplementation::doGetNumDof() const

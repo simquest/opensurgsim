@@ -37,8 +37,8 @@ namespace Graphics
 class OsgMaterial;
 class TangentSpaceGenerator;
 
-static const int TANGENT_VERTEX_ATTRIBUTE_ID = 7;
-static const int BITANGENT_VERTEX_ATTRIBUTE_ID = 8;
+static const int TANGENT_VERTEX_ATTRIBUTE_ID = 6;
+static const int BITANGENT_VERTEX_ATTRIBUTE_ID = 7;
 static const int DIFFUSE_TEXTURE_UNIT = 0;
 
 /// Base OSG implementation of a graphics representation.

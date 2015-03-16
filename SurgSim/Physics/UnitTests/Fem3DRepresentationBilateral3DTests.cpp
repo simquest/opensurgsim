@@ -111,7 +111,6 @@ TEST(Fem3DRepresentationBilateral3DTests, Constants)
 	Fem3DRepresentationBilateral3D constraint;
 
 	EXPECT_EQ(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT, constraint.getMlcpConstraintType());
-	EXPECT_EQ(SurgSim::Physics::REPRESENTATION_TYPE_FEM3D, constraint.getRepresentationType());
 	EXPECT_EQ(3u, constraint.getNumDof());
 }
 

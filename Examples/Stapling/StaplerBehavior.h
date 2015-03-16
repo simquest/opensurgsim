@@ -136,18 +136,6 @@ private:
 	/// \param [in,out] collisionsMap The collision map to be filtered.
 	void filterCollisionMapForSupportedRepresentationTypes(SurgSim::Collision::ContactMapType* collisionsMap);
 
-	/// Create a bilateral constraint given two Physics::Representation and a constraint (global) location.
-	/// \param stapleRep The physics representation of the staple element. This is known to be RigidRepresentation.
-	/// \param otherRep The physics representation of the object stapled to. This could be Rigid, Fixed or Fem3D.
-	/// \param stapleConstraintLocation The location where the constraint is created on the staple.
-	/// \param otherConstraintLocation The location where the constraint is created on the object staples to.
-	/// \return The shared_ptr of the constraint created.
-	std::shared_ptr<SurgSim::Physics::Constraint> createBilateral3DConstraint(
-		std::shared_ptr<SurgSim::Physics::Representation> stapleRep,
-		std::shared_ptr<SurgSim::Physics::Representation> otherRep,
-		SurgSim::DataStructures::Location stapleConstraintLocation,
-		SurgSim::DataStructures::Location otherConstraintLocation);
-
 	/// Function to create the staple element.
 	/// \note This function also checks for collision with stapling enabled objects in the scene to create
 	/// bilateral constraint between the staple element and the object.
