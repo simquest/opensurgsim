@@ -132,18 +132,26 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 		if ((*iteration >= m_maxIterations) && !(*validSignorini) &&
 			(!isValid(initialGuessAndSolution) || (initialGuessAndSolution.cwiseAbs().maxCoeff() > 1e5)))
 		{
-			SURGSIM_LOG_WARNING(m_logger) << "Failed to find a solution. " <<
-				(!isValid(initialGuessAndSolution) ? "At least one invalid result." : "Maximum result too big.") <<
-				" Re-solving without conflicting constraints.";
-			*iteration = 0;
+			MlcpSolution::Vector::Index count = 0;
 			for (MlcpSolution::Vector::Index i = 0; i < initialGuessAndSolution.size(); ++i)
 			{
 				if (!SurgSim::Math::isValid(initialGuessAndSolution[i]) || (initialGuessAndSolution[i] > 1e5))
 				{
 					A.col(i).setZero();
+					++count;
 				}
 			}
 			initialGuessAndSolution.setZero();
+			if (count == initialGuessAndSolution.size())
+			{
+				SURGSIM_LOG_WARNING(m_logger) << "Failed to find a solution: all entries are invalid or too big.";
+			}
+			else
+			{
+				*iteration = 0;
+				SURGSIM_LOG_WARNING(m_logger) <<
+					"Failed to find a solution. Re-solving without conflicting constraints.";
+			}
 		}
 	}
 	while ((!(*validSignorini) || (*convergenceCriteria > m_epsilonConvergence)) && *iteration < m_maxIterations);
