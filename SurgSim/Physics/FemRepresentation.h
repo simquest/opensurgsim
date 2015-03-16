@@ -187,14 +187,13 @@ protected:
 
 	bool doInitialize() override;
 
-	/// Retrieve a specific node transformation (useful for compliance warping)
-	/// \param state The state to extra the node transformation from
-	/// \param nodeId The node to update the rotation for
-	/// \return The node transformation. i.e. a numDofPerNode x numDofPerNode matrix
+	/// Updates the nodes transformation (useful for compliance warping)
+	/// \param state The state to compute the nodes transformation from
+	/// \note This computes the diagonal block matrix m_complianceWarpingTransformation
 	void updateNodesTransformation(const SurgSim::Math::OdeState& state);
 
-	/// Retrieve a specific node transformation (useful for compliance warping)
-	/// \param state The state to extra the node transformation from
+	/// Retrieves a specific node transformation (useful for compliance warping)
+	/// \param state The state to extract the node transformation from
 	/// \param nodeId The node to update the rotation for
 	/// \return The node transformation. i.e. a numDofPerNode x numDofPerNode matrix
 	virtual SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId);
