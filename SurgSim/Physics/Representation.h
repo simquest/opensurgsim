@@ -52,9 +52,6 @@ class Localization;
 /// The Representation class defines the base class for all physics objects
 class Representation : public SurgSim::Framework::Representation
 {
-	// Constraint is a friend to access the getConstraintImplementation().
-	friend class Constraint;
-
 public:
 	/// Constructor
 	/// \param name The representation's name
@@ -127,6 +124,11 @@ public:
 	/// \param representation The appropriate collision representation for this object.
 	virtual void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
 
+	/// Get a constraint implementation of the given type for this representation.
+	/// \param type The type of constraint.
+	/// \return A contact constraint implementation or nullptr.
+	std::shared_ptr<ConstraintImplementation> getConstraintImplementation(SurgSim::Math::MlcpConstraintType type);
+
 protected:
 	/// Set the number of degrees of freedom
 	/// \param numDof The number of degrees of freedom
@@ -145,11 +147,6 @@ protected:
 	/// The update gets exectuded if the representation actually has  sceneelement and isDrivingScenElement() is true
 	/// \param pose New pose for the SceneElement
 	void driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose);
-
-	/// Get a constraint implementation of the given type for this representation.
-	/// \param type The type of constraint.
-	/// \return A contact constraint implementation or nullptr.
-	std::shared_ptr<ConstraintImplementation> getConstraintImplementation(SurgSim::Math::MlcpConstraintType type);
 
 private:
 	/// NO copy constructor

@@ -87,8 +87,6 @@ public:
 	int getPostUpdateCount() const;
 
 	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
-
-	std::shared_ptr<ConstraintImplementation> getConstraintImplementation(SurgSim::Math::MlcpConstraintType type);
 };
 
 class MockRigidRepresentation : public RigidRepresentation

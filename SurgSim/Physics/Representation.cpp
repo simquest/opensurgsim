@@ -122,6 +122,17 @@ void Representation::setCollisionRepresentation(std::shared_ptr<SurgSim::Collisi
 	m_collisionRepresentation = val;
 }
 
+std::shared_ptr<ConstraintImplementation> Representation::getConstraintImplementation(
+	SurgSim::Math::MlcpConstraintType type)
+{
+	auto implementation = ConstraintImplementation::getFactory().getImplementation(typeid(*this), type);
+	if (implementation == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getClassName() << ": Does not support constraint type (" << type << ").";
+	}
+	return implementation;
+}
+
 void Representation::driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	if (isDrivingSceneElementPose())
@@ -132,17 +143,6 @@ void Representation::driveSceneElementPose(const SurgSim::Math::RigidTransform3d
 			sceneElement->setPose(pose);
 		}
 	}
-}
-
-std::shared_ptr<ConstraintImplementation> Representation::getConstraintImplementation(
-	SurgSim::Math::MlcpConstraintType type)
-{
-	auto implementation = ConstraintImplementation::getFactory().getImplementation(typeid(*this), type);
-	if (implementation == nullptr)
-	{
-		SURGSIM_LOG_SEVERE(m_logger) << getClassName() << ": Does not support constraint type (" << type << ").";
-	}
-	return implementation;
 }
 
 }; // namespace Physics

@@ -126,6 +126,8 @@ std::shared_ptr<SurgSim::DataStructures::Location> ContactConstraintGeneration::
 	const SurgSim::DataStructures::Location& location)
 {
 	auto physicsLocation = std::make_shared<SurgSim::DataStructures::Location>(location);
+	SURGSIM_ASSERT(physicsLocation != nullptr) << "Cannot create Location object.";
+
 	if (location.rigidLocalPosition.hasValue())
 	{
 		// Move the local position from the collision representation that created the location

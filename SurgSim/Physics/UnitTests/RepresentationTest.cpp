@@ -189,7 +189,7 @@ TEST(RepresentationTest, SerializationTest)
 class MockRigidRepresentation : public SurgSim::Physics::RigidRepresentation
 {
 public:
-	MockRigidRepresentation(const std::string& name) : RigidRepresentation(name)
+	explicit MockRigidRepresentation(const std::string& name) : RigidRepresentation(name)
 	{}
 
 	std::shared_ptr<SurgSim::Physics::ConstraintImplementation>

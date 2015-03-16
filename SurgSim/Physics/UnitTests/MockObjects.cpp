@@ -73,12 +73,6 @@ std::shared_ptr<Localization> MockRepresentation::createLocalization(
 	return std::make_shared<MockLocalization>();
 }
 
-std::shared_ptr<ConstraintImplementation> MockRepresentation::getConstraintImplementation(
-	SurgSim::Math::MlcpConstraintType type)
-{
-	return Representation::getConstraintImplementation(type);
-}
-
 MockRigidRepresentation::MockRigidRepresentation() : RigidRepresentation("MockRigidRepresentation")
 {
 }

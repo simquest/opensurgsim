@@ -137,6 +137,9 @@ void Constraint::setInformation(
 	auto implementation1 = representation1->getConstraintImplementation(m_constraintType);
 	SURGSIM_ASSERT(implementation1 != nullptr) << "Could not get implementation for " << representation1->getName();
 
+	SURGSIM_ASSERT(implementation0->getNumDof() == implementation1->getNumDof())
+		<< "The number of DOFs does not match between the two implementations";
+
 	m_data = data;
 	m_implementations = std::make_pair(implementation0, implementation1);
 	m_localizations = std::make_pair(localization0, localization1);

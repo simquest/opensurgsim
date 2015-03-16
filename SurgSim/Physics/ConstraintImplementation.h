@@ -42,7 +42,6 @@ class ConstraintImplementation
 {
 public:
 	/// Constructor
-	/// \note Localization embed the representation, so it is fully defined
 	ConstraintImplementation();
 
 	/// Destructor

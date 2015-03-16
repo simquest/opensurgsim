@@ -18,7 +18,6 @@
 
 #include <memory>
 #include <string>
-#include <typeindex>
 
 #include <boost/uuid/uuid.hpp>
 
