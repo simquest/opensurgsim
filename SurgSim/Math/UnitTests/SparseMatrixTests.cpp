@@ -329,14 +329,14 @@ public:
 
 			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> dense(m_matrixWithExtraCoefficients);
 			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> denseSub(sub);
-			auto expectedMatrix = denseSub.block<m_n, m_m>(0, 0) + Eigen::Matrix<T, m_n, m_m>::Ones();
+			auto expectedMatrix = denseSub.template block<m_n, m_m>(0, 0) + Eigen::Matrix<T, m_n, m_m>::Ones();
 			if (success)
 			{
-				EXPECT_TRUE((dense.block<m_n, m_m>(m_rowId, m_columnId).isApprox(expectedMatrix)));
+				EXPECT_TRUE((dense.template block<m_n, m_m>(m_rowId, m_columnId).isApprox(expectedMatrix)));
 			}
 			else
 			{
-				EXPECT_FALSE((dense.block<m_n, m_m>(m_rowId, m_columnId).isApprox(expectedMatrix)));
+				EXPECT_FALSE((dense.template block<m_n, m_m>(m_rowId, m_columnId).isApprox(expectedMatrix)));
 			}
 		}
 	}

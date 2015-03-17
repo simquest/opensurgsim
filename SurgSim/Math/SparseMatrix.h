@@ -184,7 +184,7 @@ public:
 	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colId)
 	{
 		typedef Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
-		typedef Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor>::Index IndexVector;
+		typedef typename Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor>::Index IndexVector;
 		typedef typename DerivedSub::Index IndexSub;
 
 		// ptr[start] is the 1st element in the column
@@ -201,7 +201,7 @@ public:
 	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colId)
 	{
 		typedef Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
-		typedef Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor>::Index IndexVector;
+		typedef typename Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor>::Index IndexVector;
 		typedef typename DerivedSub::Index IndexSub;
 
 		// ptr[start] is the 1st element in the column
@@ -224,7 +224,7 @@ public:
 	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index rowId)
 	{
 		typedef Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor> RowVector;
-		typedef Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor>::Index IndexVector;
+		typedef typename Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor>::Index IndexVector;
 		typedef typename DerivedSub::Index IndexSub;
 
 		// ptr[start] is the 1st element in the row
@@ -241,7 +241,7 @@ public:
 	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index rowId)
 	{
 		typedef Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor> RowVector;
-		typedef Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor>::Index IndexVector;
+		typedef typename Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor>::Index IndexVector;
 		typedef typename DerivedSub::Index IndexSub;
 
 		// ptr[start] is the 1st element in the row
