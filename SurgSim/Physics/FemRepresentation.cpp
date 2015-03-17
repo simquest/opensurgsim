@@ -149,7 +149,7 @@ bool FemRepresentation::doInitialize()
 			getName() << " which has " << numDofPerNode << " dof per node (not a factor of 3)";
 
 		// Use a mask of 1 to setup the sparse matrix pattern
-		for(Index nodeId = 0; nodeId < m_initialState->getNumNodes(); ++nodeId)
+		for(Index nodeId = 0; nodeId < static_cast<Index>(m_initialState->getNumNodes()); ++nodeId)
 		{
 			for (Index i = 0; i < numDofPerNode; ++i)
 			{
