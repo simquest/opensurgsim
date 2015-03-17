@@ -46,11 +46,17 @@ public:
 		m_columnId = 6;
 		m_rowId = 11;
 
-		m_matrixTooSmall.resize(3, 3);
+		m_matrixTooSmall.resize(m_n - 1, m_m - 1);
+		m_matrixTooSmall.setZero();
 
 		m_matrixWithoutExtraCoefficients.resize(18, 18);
+		m_matrixWithoutExtraCoefficients.setZero();
 		m_matrixMissingCoefficients.resize(18, 18);
+		m_matrixMissingCoefficients.setZero();
 		m_matrixWithoutExtraCoefficientsExpected.resize(18, 18);
+		m_matrixWithoutExtraCoefficientsExpected.setZero();
+		//m_matrixWithExtraCoefficientsBlockAddExpected.resize(18, 18);
+		//m_matrixWithExtraCoefficientsBlockAddExpected.setZero();
 		for (I i = 0; i < m_rowId; i++)
 		{
 			for (I j = 0; j < m_columnId; j++)
@@ -58,17 +64,18 @@ public:
 				m_matrixWithoutExtraCoefficients.insert(i, j) = 1.0;
 				m_matrixMissingCoefficients.insert(i, j) = 1.0;
 				m_matrixWithoutExtraCoefficientsExpected.insert(i, j) = 1.0;
+				//m_matrixWithExtraCoefficientsBlockAddExpected.insert(i, j) = 1.0;
 			}
-			for (I j = m_columnId + 4; j < 18; j++)
+			for (I j = m_columnId + m_m; j < 18; j++)
 			{
 				m_matrixWithoutExtraCoefficients.insert(i, j) = 1.0;
 				m_matrixMissingCoefficients.insert(i, j) = 1.0;
 				m_matrixWithoutExtraCoefficientsExpected.insert(i, j) = 1.0;
 			}
 		}
-		for (I i = m_rowId; i < m_rowId + 4; i++)
+		for (I i = m_rowId; i < m_rowId + m_n; i++)
 		{
-			for (I j = m_columnId; j < m_columnId + 4; j++)
+			for (I j = m_columnId; j < m_columnId + m_m; j++)
 			{
 				m_matrixWithoutExtraCoefficients.insert(i , j) = 1.0;
 				if (i % 2 == 0 || j % 2 == 0)
@@ -80,7 +87,7 @@ public:
 					static_cast<T>(i - m_rowId + 1) * static_cast<T>(j - m_columnId + 1));
 			}
 		}
-		for (I i = m_rowId + 4; i < 18; i++)
+		for (I i = m_rowId + m_n; i < 18; i++)
 		{
 			for (I j = 0; j < m_columnId; j++)
 			{
@@ -88,7 +95,7 @@ public:
 				m_matrixMissingCoefficients.insert(i, j) = 1.0;
 				m_matrixWithoutExtraCoefficientsExpected.insert(i, j) = 1.0;
 			}
-			for (I j = m_columnId + 4; j < 18; j++)
+			for (I j = m_columnId + m_m; j < 18; j++)
 			{
 				m_matrixWithoutExtraCoefficients.insert(i, j) = 1.0;
 				m_matrixMissingCoefficients.insert(i, j) = 1.0;
@@ -116,41 +123,43 @@ public:
 	}
 
 	template <class Derived>
-	void TestSetWithoutSearch(const Derived& sub, bool subTooSmall= false, bool success = true)
+	void TestSetWithoutSearchStatic(const Derived& sub, bool subTooSmall= false, bool success = true)
 	{
 		using SurgSim::Math::setSubMatrixWithoutSearch;
+
+		SetUp();
 
 		if (subTooSmall)
 		{
 			EXPECT_THROW(\
-				(setSubMatrixWithoutSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients)),\
+				(setSubMatrixWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients)),\
 				SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
 			EXPECT_THROW(\
-				(setSubMatrixWithoutSearch<4, 4, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)),\
+				(setSubMatrixWithoutSearch<m_n, m_m, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
 			EXPECT_THROW(\
-				(setSubMatrixWithoutSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixTooSmall)),\
+				(setSubMatrixWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixTooSmall)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
 			EXPECT_THROW(\
-				(setSubMatrixWithoutSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients)),\
+				(setSubMatrixWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient has extra coefficients on the block rows/columns
 			EXPECT_THROW(\
-				(setSubMatrixWithoutSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)),\
+				(setSubMatrixWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
 			EXPECT_NO_THROW(\
-				(setSubMatrixWithoutSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients)));
+				(setSubMatrixWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients)));
 
 			if (success)
 			{
@@ -164,36 +173,88 @@ public:
 	}
 
 	template <class Derived>
-	void TestSetWithSearch(const Derived& sub, bool subTooSmall= false, bool success = true)
+	void TestSetWithoutSearchDynamic(const Derived& sub, bool subTooSmall= false, bool success = true)
 	{
-		using SurgSim::Math::setSubMatrixWithSearch;
+		using SurgSim::Math::setSubMatrixWithoutSearch;
+
+		SetUp();
 
 		if (subTooSmall)
 		{
 			EXPECT_THROW(\
-				(setSubMatrixWithSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)),\
+				(setSubMatrixWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithoutExtraCoefficients)),\
 				SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
 			EXPECT_THROW(\
-				(setSubMatrixWithSearch<4, 4, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)),\
+				(setSubMatrixWithoutSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
 			EXPECT_THROW(\
-				(setSubMatrixWithSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixTooSmall)),\
+				(setSubMatrixWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
 			EXPECT_THROW(\
-				(setSubMatrixWithSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients)),\
+				(setSubMatrixWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixMissingCoefficients)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient has extra coefficients on the block rows/columns
+			EXPECT_THROW(\
+				(setSubMatrixWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients)),\
 				SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
 			EXPECT_NO_THROW(\
-				(setSubMatrixWithSearch<4, 4>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)));
+				(setSubMatrixWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithoutExtraCoefficients)));
+
+			if (success)
+			{
+				EXPECT_TRUE(m_matrixWithoutExtraCoefficients.isApprox(m_matrixWithoutExtraCoefficientsExpected));
+			}
+			else
+			{
+				EXPECT_FALSE(m_matrixWithoutExtraCoefficients.isApprox(m_matrixWithoutExtraCoefficientsExpected));
+			}
+		}
+	}
+
+	template <class Derived>
+	void TestSetWithSearchStatic(const Derived& sub, bool subTooSmall= false, bool success = true)
+	{
+		using SurgSim::Math::setSubMatrixWithSearch;
+
+		SetUp();
+
+		if (subTooSmall)
+		{
+			EXPECT_THROW(\
+				(setSubMatrixWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)),\
+				SurgSim::Framework::AssertionFailure);
+		}
+		else
+		{
+			// No recipient specified
+			EXPECT_THROW(\
+				(setSubMatrixWithSearch<m_n, m_m, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient too small
+			EXPECT_THROW(\
+				(setSubMatrixWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixTooSmall)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient does not have all the block coefficients (missing coefficients in the block)
+			EXPECT_THROW(\
+				(setSubMatrixWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient is correct and sub is correct
+			EXPECT_NO_THROW(\
+				(setSubMatrixWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)));
 
 			if (success)
 			{
@@ -206,10 +267,154 @@ public:
 		}
 	}
 
+	template <class Derived>
+	void TestSetWithSearchDynamic(const Derived& sub, bool subTooSmall= false, bool success = true)
+	{
+		using SurgSim::Math::setSubMatrixWithSearch;
+
+		SetUp();
+
+		if (subTooSmall)
+		{
+			EXPECT_THROW(\
+				(setSubMatrixWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients)),\
+				SurgSim::Framework::AssertionFailure);
+		}
+		else
+		{
+			// No recipient specified
+			EXPECT_THROW(\
+				(setSubMatrixWithSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient too small
+			EXPECT_THROW(\
+				(setSubMatrixWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient does not have all the block coefficients (missing coefficients in the block)
+			EXPECT_THROW(\
+				(setSubMatrixWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixMissingCoefficients)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient is correct and sub is correct
+			EXPECT_NO_THROW(\
+				(setSubMatrixWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients)));
+
+			if (success)
+			{
+				EXPECT_TRUE(m_matrixWithExtraCoefficients.isApprox(m_matrixWithExtraCoefficientsExpected));
+			}
+			else
+			{
+				EXPECT_FALSE(m_matrixWithExtraCoefficients.isApprox(m_matrixWithExtraCoefficientsExpected));
+			}
+		}
+	}
+
+	template <class Derived>
+	void TestAddWithSearchStatic(const Derived& sub, bool subTooSmall= false, bool success = true)
+	{
+		using SurgSim::Math::addSubMatrixWithSearch;
+
+		SetUp();
+
+		if (subTooSmall)
+		{
+			EXPECT_THROW(\
+				(addSubMatrixWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)),\
+				SurgSim::Framework::AssertionFailure);
+		}
+		else
+		{
+			// No recipient specified
+			EXPECT_THROW(\
+				(addSubMatrixWithSearch<m_n, m_m, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient too small
+			EXPECT_THROW(\
+				(addSubMatrixWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixTooSmall)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient does not have all the block coefficients (missing coefficients in the block)
+			EXPECT_THROW(\
+				(addSubMatrixWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient is correct and sub is correct
+			EXPECT_NO_THROW(\
+				(addSubMatrixWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)));
+
+			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> dense(m_matrixWithExtraCoefficients);
+			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> denseSub(sub);
+			auto expectedMatrix = denseSub.block<m_n, m_m>(0, 0) + Eigen::Matrix<T, m_n, m_m>::Ones();
+			if (success)
+			{
+				EXPECT_TRUE((dense.block<m_n, m_m>(m_rowId, m_columnId).isApprox(expectedMatrix)));
+			}
+			else
+			{
+				EXPECT_FALSE((dense.block<m_n, m_m>(m_rowId, m_columnId).isApprox(expectedMatrix)));
+			}
+		}
+	}
+
+	template <class Derived>
+	void TestAddWithSearchDynamic(const Derived& sub, bool subTooSmall= false, bool success = true)
+	{
+		using SurgSim::Math::addSubMatrixWithSearch;
+
+		SetUp();
+
+		if (subTooSmall)
+		{
+			EXPECT_THROW(\
+				(addSubMatrixWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients)),\
+				SurgSim::Framework::AssertionFailure);
+		}
+		else
+		{
+			// No recipient specified
+			EXPECT_THROW(\
+				(addSubMatrixWithSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient too small
+			EXPECT_THROW(\
+				(addSubMatrixWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient does not have all the block coefficients (missing coefficients in the block)
+			EXPECT_THROW(\
+				(addSubMatrixWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixMissingCoefficients)),\
+				SurgSim::Framework::AssertionFailure);
+
+			// Recipient is correct and sub is correct
+			EXPECT_NO_THROW(\
+				(addSubMatrixWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients)));
+
+			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> dense(m_matrixWithExtraCoefficients);
+			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> denseSub(sub);
+			auto ones = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>::Ones(m_n, m_m);
+			auto expectedMatrix = denseSub.block(0, 0, m_n, m_m) + ones;
+			if (success)
+			{
+				EXPECT_TRUE((dense.block(m_rowId, m_columnId, m_n, m_m).isApprox(expectedMatrix)));
+			}
+			else
+			{
+				EXPECT_FALSE((dense.block(m_rowId, m_columnId, m_n, m_m).isApprox(expectedMatrix)));
+			}
+		}
+	}
+
 	template <typename Derived>
 	void TestSetSparseMatrixBlock(const Eigen::SparseMatrixBase<Derived>& sub)
 	{
 		using SurgSim::Math::setSparseMatrixBlock;
+
+		SetUp();
 
 		// No recipient specified
 		EXPECT_THROW((setSparseMatrixBlock<Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)), \
@@ -245,6 +450,8 @@ public:
 	{
 		using SurgSim::Math::setSparseMatrixBlock;
 
+		SetUp();
+
 		// With an empty recipient
 		Eigen::SparseMatrix<T, Opt, I> m_matrixEmpty(18, 18);
 		EXPECT_NO_THROW((setSparseMatrixBlock(sub, m_rowId, m_columnId, &m_matrixEmpty)));
@@ -259,6 +466,8 @@ public:
 		typedef typename Derived::Scalar TSub;
 		const int OptSub = Eigen::SparseMatrixBase<Derived>::IsRowMajor ? Eigen::RowMajor : Eigen::ColMajor;
 		typedef typename Derived::Index ISub;
+
+		SetUp();
 
 		Eigen::SparseMatrix<TSub, OptSub, ISub> one(sub.rows(), sub.cols());
 		for(ISub i = 0; i < sub.rows(); i++)
@@ -292,6 +501,8 @@ public:
 		typedef typename Derived::Scalar TSub;
 		const int OptSub = Eigen::SparseMatrixBase<Derived>::IsRowMajor ? Eigen::RowMajor : Eigen::ColMajor;
 		typedef typename Derived::Index ISub;
+
+		SetUp();
 
 		Eigen::SparseVector<TSub, OptSub, ISub> one(sub.size());
 		for(ISub i = 0; i < sub.size(); i++)
@@ -383,11 +594,16 @@ protected:
 	Eigen::SparseMatrix<T, Opt, I> m_matrixWithoutExtraCoefficientsExpected;
 	Eigen::SparseMatrix<T, Opt, I> m_matrixWithExtraCoefficients;
 	Eigen::SparseMatrix<T, Opt, I> m_matrixWithExtraCoefficientsExpected;
+	//Eigen::SparseMatrix<T, Opt, I> m_matrixWithExtraCoefficientsBlockAddExpected;
 	Eigen::SparseMatrix<T, Opt, I> m_matrixTooSmall;
 	Eigen::SparseMatrix<T, Opt, I> m_matrixMissingCoefficients;
 
 	I m_rowId, m_columnId;
+	static const I m_n = 4;
+	static const I m_m = 4;
 };
+template <typename Tuple> const typename tuple_element<2, Tuple>::type SparseMatrices<Tuple>::m_n;
+template <typename Tuple> const typename tuple_element<2, Tuple>::type SparseMatrices<Tuple>::m_m;
 
 template <typename Tuple>
 const int SparseMatrices<Tuple>::Opt;
@@ -403,7 +619,7 @@ typedef ::testing::Types<
 	tuple<float, TypeValue<Eigen::RowMajor>, ptrdiff_t>> MyTypes;
 TYPED_TEST_CASE(SparseMatrices, MyTypes);
 
-TYPED_TEST(SparseMatrices, setSubMatrixWithoutSearch)
+TYPED_TEST(SparseMatrices, setSubMatrixWithoutSearchStaticCall)
 {
 	typedef typename tuple_element<0, TypeParam>::type T;
 	const int Opt = tuple_element<1, TypeParam>::type::value;
@@ -411,37 +627,37 @@ TYPED_TEST(SparseMatrices, setSubMatrixWithoutSearch)
 
 	{
 		SCOPED_TRACE("Test with static dense input sub-matrix");
-		this->TestSetWithoutSearch(this->template getStaticMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
-		this->TestSetWithoutSearch(this->template getStaticMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
-		this->TestSetWithoutSearch(this->template getStaticMatrix<T, 4, 4, Opt>());
-		this->TestSetWithoutSearch(this->template getStaticMatrix<T, 4, 4, OtherOpt>());
-		this->TestSetWithoutSearch(this->template getStaticMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
-		this->TestSetWithoutSearch(this->template getStaticMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+		this->TestSetWithoutSearchStatic(this->template getStaticMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithoutSearchStatic(this->template getStaticMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithoutSearchStatic(this->template getStaticMatrix<T, 4, 4, Opt>());
+		this->TestSetWithoutSearchStatic(this->template getStaticMatrix<T, 4, 4, OtherOpt>());
+		this->TestSetWithoutSearchStatic(this->template getStaticMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithoutSearchStatic(this->template getStaticMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
 	}
 
 	{
 		SCOPED_TRACE("Test with dynamic dense input sub-matrix");
-		this->TestSetWithoutSearch(this->template getDynamicMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
-		this->TestSetWithoutSearch(this->template getDynamicMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
-		this->TestSetWithoutSearch(this->template getDynamicMatrix<T, 4, 4, Opt>());
-		this->TestSetWithoutSearch(this->template getDynamicMatrix<T, 4, 4, OtherOpt>());
-		this->TestSetWithoutSearch(this->template getDynamicMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
-		this->TestSetWithoutSearch(this->template getDynamicMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+		this->TestSetWithoutSearchStatic(this->template getDynamicMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithoutSearchStatic(this->template getDynamicMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithoutSearchStatic(this->template getDynamicMatrix<T, 4, 4, Opt>());
+		this->TestSetWithoutSearchStatic(this->template getDynamicMatrix<T, 4, 4, OtherOpt>());
+		this->TestSetWithoutSearchStatic(this->template getDynamicMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithoutSearchStatic(this->template getDynamicMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
 	}
 
 	{
 		SCOPED_TRACE("Test with sparse input sub-matrix");
-		this->TestSetWithoutSearch(this->template getSparseMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
-		this->TestSetWithoutSearch(this->template getSparseMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
-		this->TestSetWithoutSearch(this->template getSparseMatrix<T, 4, 4, Opt>());
+		this->TestSetWithoutSearchStatic(this->template getSparseMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithoutSearchStatic(this->template getSparseMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithoutSearchStatic(this->template getSparseMatrix<T, 4, 4, Opt>());
 		/// Wrong SparseMatrix alignment: in general, this may lead to Eigen failure (program exit).
-		//this->TestSetWithoutSearch(this->template getSparseMatrix<T, 4, 4, OtherOpt>(), false, false);
-		this->TestSetWithoutSearch(this->template getSparseMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
-		this->TestSetWithoutSearch(this->template getSparseMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+		//this->TestSetWithoutSearchStatic(this->template getSparseMatrix<T, 4, 4, OtherOpt>(), false, false);
+		this->TestSetWithoutSearchStatic(this->template getSparseMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithoutSearchStatic(this->template getSparseMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
 	}
 }
 
-TYPED_TEST(SparseMatrices, setSubMatrixWithSearch)
+TYPED_TEST(SparseMatrices, setSubMatrixWithoutSearchDynamicCall)
 {
 	typedef typename tuple_element<0, TypeParam>::type T;
 	const int Opt = tuple_element<1, TypeParam>::type::value;
@@ -449,33 +665,185 @@ TYPED_TEST(SparseMatrices, setSubMatrixWithSearch)
 
 	{
 		SCOPED_TRACE("Test with static dense input sub-matrix");
-		this->TestSetWithSearch(this->template getStaticMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
-		this->TestSetWithSearch(this->template getStaticMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
-		this->TestSetWithSearch(this->template getStaticMatrix<T, 4, 4, Opt>());
-		this->TestSetWithSearch(this->template getStaticMatrix<T, 4, 4, OtherOpt>());
-		this->TestSetWithSearch(this->template getStaticMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
-		this->TestSetWithSearch(this->template getStaticMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 4, 4, Opt>());
+		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 4, 4, OtherOpt>());
+		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
 	}
 
 	{
 		SCOPED_TRACE("Test with dynamic dense input sub-matrix");
-		this->TestSetWithSearch(this->template getDynamicMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
-		this->TestSetWithSearch(this->template getDynamicMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
-		this->TestSetWithSearch(this->template getDynamicMatrix<T, 4, 4, Opt>());
-		this->TestSetWithSearch(this->template getDynamicMatrix<T, 4, 4, OtherOpt>());
-		this->TestSetWithSearch(this->template getDynamicMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
-		this->TestSetWithSearch(this->template getDynamicMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 4, 4, Opt>());
+		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 4, 4, OtherOpt>());
+		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
 	}
 
 	{
 		SCOPED_TRACE("Test with sparse input sub-matrix");
-		this->TestSetWithSearch(this->template getSparseMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
-		this->TestSetWithSearch(this->template getSparseMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
-		this->TestSetWithSearch(this->template getSparseMatrix<T, 4, 4, Opt>());
+		this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 4, 4, Opt>());
 		/// Wrong SparseMatrix alignment: in general, this may lead to Eigen failure (program exit).
-		//this->TestSetWithSearch(this->template getSparseMatrix<T, 4, 4, OtherOpt>(), false, false);
-		this->TestSetWithSearch(this->template getSparseMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
-		this->TestSetWithSearch(this->template getSparseMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+		//this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 4, 4, OtherOpt>(), false, false);
+		this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+}
+
+TYPED_TEST(SparseMatrices, setSubMatrixWithSearchStaticCall)
+{
+	typedef typename tuple_element<0, TypeParam>::type T;
+	const int Opt = tuple_element<1, TypeParam>::type::value;
+	const int OtherOpt = (Opt == Eigen::ColMajor ? Eigen::RowMajor : Eigen::ColMajor);
+
+	{
+		SCOPED_TRACE("Test with static dense input sub-matrix");
+		this->TestSetWithSearchStatic(this->template getStaticMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithSearchStatic(this->template getStaticMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithSearchStatic(this->template getStaticMatrix<T, 4, 4, Opt>());
+		this->TestSetWithSearchStatic(this->template getStaticMatrix<T, 4, 4, OtherOpt>());
+		this->TestSetWithSearchStatic(this->template getStaticMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithSearchStatic(this->template getStaticMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+
+	{
+		SCOPED_TRACE("Test with dynamic dense input sub-matrix");
+		this->TestSetWithSearchStatic(this->template getDynamicMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithSearchStatic(this->template getDynamicMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithSearchStatic(this->template getDynamicMatrix<T, 4, 4, Opt>());
+		this->TestSetWithSearchStatic(this->template getDynamicMatrix<T, 4, 4, OtherOpt>());
+		this->TestSetWithSearchStatic(this->template getDynamicMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithSearchStatic(this->template getDynamicMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+
+	{
+		SCOPED_TRACE("Test with sparse input sub-matrix");
+		this->TestSetWithSearchStatic(this->template getSparseMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithSearchStatic(this->template getSparseMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithSearchStatic(this->template getSparseMatrix<T, 4, 4, Opt>());
+		/// Wrong SparseMatrix alignment: in general, this may lead to Eigen failure (program exit).
+		//this->TestSetWithSearchStatic(this->template getSparseMatrix<T, 4, 4, OtherOpt>(), false, false);
+		this->TestSetWithSearchStatic(this->template getSparseMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithSearchStatic(this->template getSparseMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+}
+
+TYPED_TEST(SparseMatrices, setSubMatrixWithSearchDynamicCall)
+{
+	typedef typename tuple_element<0, TypeParam>::type T;
+	const int Opt = tuple_element<1, TypeParam>::type::value;
+	const int OtherOpt = (Opt == Eigen::ColMajor ? Eigen::RowMajor : Eigen::ColMajor);
+
+	{
+		SCOPED_TRACE("Test with static dense input sub-matrix");
+		this->TestSetWithSearchDynamic(this->template getStaticMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithSearchDynamic(this->template getStaticMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithSearchDynamic(this->template getStaticMatrix<T, 4, 4, Opt>());
+		this->TestSetWithSearchDynamic(this->template getStaticMatrix<T, 4, 4, OtherOpt>());
+		this->TestSetWithSearchDynamic(this->template getStaticMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithSearchDynamic(this->template getStaticMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+
+	{
+		SCOPED_TRACE("Test with dynamic dense input sub-matrix");
+		this->TestSetWithSearchDynamic(this->template getDynamicMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithSearchDynamic(this->template getDynamicMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithSearchDynamic(this->template getDynamicMatrix<T, 4, 4, Opt>());
+		this->TestSetWithSearchDynamic(this->template getDynamicMatrix<T, 4, 4, OtherOpt>());
+		this->TestSetWithSearchDynamic(this->template getDynamicMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithSearchDynamic(this->template getDynamicMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+
+	{
+		SCOPED_TRACE("Test with sparse input sub-matrix");
+		this->TestSetWithSearchDynamic(this->template getSparseMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestSetWithSearchDynamic(this->template getSparseMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestSetWithSearchDynamic(this->template getSparseMatrix<T, 4, 4, Opt>());
+		/// Wrong SparseMatrix alignment: in general, this may lead to Eigen failure (program exit).
+		//this->TestSetWithSearchDynamic(this->template getSparseMatrix<T, 4, 4, OtherOpt>(), false, false);
+		this->TestSetWithSearchDynamic(this->template getSparseMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestSetWithSearchDynamic(this->template getSparseMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+}
+
+TYPED_TEST(SparseMatrices, addSubMatrixWithSearchStaticCall)
+{
+	typedef typename tuple_element<0, TypeParam>::type T;
+	const int Opt = tuple_element<1, TypeParam>::type::value;
+	const int OtherOpt = (Opt == Eigen::ColMajor ? Eigen::RowMajor : Eigen::ColMajor);
+
+	{
+		SCOPED_TRACE("Test with static dense input sub-matrix");
+		this->TestAddWithSearchStatic(this->template getStaticMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestAddWithSearchStatic(this->template getStaticMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestAddWithSearchStatic(this->template getStaticMatrix<T, 4, 4, Opt>());
+		this->TestAddWithSearchStatic(this->template getStaticMatrix<T, 4, 4, OtherOpt>());
+		this->TestAddWithSearchStatic(this->template getStaticMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestAddWithSearchStatic(this->template getStaticMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+
+	{
+		SCOPED_TRACE("Test with dynamic dense input sub-matrix");
+		this->TestAddWithSearchStatic(this->template getDynamicMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestAddWithSearchStatic(this->template getDynamicMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestAddWithSearchStatic(this->template getDynamicMatrix<T, 4, 4, Opt>());
+		this->TestAddWithSearchStatic(this->template getDynamicMatrix<T, 4, 4, OtherOpt>());
+		this->TestAddWithSearchStatic(this->template getDynamicMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestAddWithSearchStatic(this->template getDynamicMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+
+	{
+		SCOPED_TRACE("Test with sparse input sub-matrix");
+		this->TestAddWithSearchStatic(this->template getSparseMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestAddWithSearchStatic(this->template getSparseMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestAddWithSearchStatic(this->template getSparseMatrix<T, 4, 4, Opt>());
+		/// Wrong SparseMatrix alignment: in general, this may lead to Eigen failure (program exit).
+		//this->TestAddWithSearchStatic(this->template getSparseMatrix<T, 4, 4, OtherOpt>(), false, false);
+		this->TestAddWithSearchStatic(this->template getSparseMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestAddWithSearchStatic(this->template getSparseMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+}
+
+TYPED_TEST(SparseMatrices, addSubMatrixWithSearchDynamicCall)
+{
+	typedef typename tuple_element<0, TypeParam>::type T;
+	const int Opt = tuple_element<1, TypeParam>::type::value;
+	const int OtherOpt = (Opt == Eigen::ColMajor ? Eigen::RowMajor : Eigen::ColMajor);
+
+	{
+		SCOPED_TRACE("Test with static dense input sub-matrix");
+		this->TestAddWithSearchDynamic(this->template getStaticMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestAddWithSearchDynamic(this->template getStaticMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestAddWithSearchDynamic(this->template getStaticMatrix<T, 4, 4, Opt>());
+		this->TestAddWithSearchDynamic(this->template getStaticMatrix<T, 4, 4, OtherOpt>());
+		this->TestAddWithSearchDynamic(this->template getStaticMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestAddWithSearchDynamic(this->template getStaticMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+
+	{
+		SCOPED_TRACE("Test with dynamic dense input sub-matrix");
+		this->TestAddWithSearchDynamic(this->template getDynamicMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestAddWithSearchDynamic(this->template getDynamicMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestAddWithSearchDynamic(this->template getDynamicMatrix<T, 4, 4, Opt>());
+		this->TestAddWithSearchDynamic(this->template getDynamicMatrix<T, 4, 4, OtherOpt>());
+		this->TestAddWithSearchDynamic(this->template getDynamicMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestAddWithSearchDynamic(this->template getDynamicMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
+	}
+
+	{
+		SCOPED_TRACE("Test with sparse input sub-matrix");
+		this->TestAddWithSearchDynamic(this->template getSparseMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
+		this->TestAddWithSearchDynamic(this->template getSparseMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
+		this->TestAddWithSearchDynamic(this->template getSparseMatrix<T, 4, 4, Opt>());
+		/// Wrong SparseMatrix alignment: in general, this may lead to Eigen failure (program exit).
+		//this->TestAddWithSearchDynamic(this->template getSparseMatrix<T, 4, 4, OtherOpt>(), false, false);
+		this->TestAddWithSearchDynamic(this->template getSparseMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
+		this->TestAddWithSearchDynamic(this->template getSparseMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
 	}
 }
 
