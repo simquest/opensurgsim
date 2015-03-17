@@ -47,12 +47,22 @@ public:
 	/// \param colRowId The column or row id depending on the template parameter Opt
 	void assign(T* ptr, Index start, const DerivedSub& subMatrix, Index colRowId){}
 
+	/// Do the assignment of a single matrix element (operator =)
+	/// \param ptr The matrix element to be assigned
+	/// \param value The value to assign to
+	void assign(T* ptr, const T& value){}
+
 	/// Do the addition of a row/column of a matrix to a chunk of memory (operator +=)
 	/// \param ptr The chunk of memory
 	/// \param start Where the addition starts in the chunk of memory
 	/// \param subMatrix The matrix from which the row/column is added
 	/// \param colRowId The column or row id depending on the template parameter Opt
 	void add(T* ptr, Index start, const DerivedSub& subMatrix, Index colRowId){}
+
+	/// Do the addition of a single matrix element with another element (operator +=)
+	/// \param ptr The matrix element to be increased by the value
+	/// \param value The value to add
+	void add(T* ptr, const T& value){}
 };
 
 /// Specialization for column major storage
@@ -70,6 +80,11 @@ public:
 			subMatrix.col(static_cast<typename DerivedSub::Index>(colId)).template segment<n>(0));
 	}
 
+	void assign(T* ptr, const T& value)
+	{
+		*ptr = value;
+	}
+
 	void add(T* ptr, Index start, const DerivedSub& subMatrix, Index colId)
 	{
 		typedef Eigen::Matrix<T, n, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
@@ -78,6 +93,11 @@ public:
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
 		Eigen::Map<ColVector>(&ptr[start]).operator+=(
 			subMatrix.col(static_cast<typename DerivedSub::Index>(colId)).template segment<n>(0));
+	}
+
+	void add(T* ptr, const T& value)
+	{
+		*ptr += value;
 	}
 };
 
@@ -96,6 +116,11 @@ public:
 			subMatrix.row(static_cast<typename DerivedSub::Index>(rowId)).template segment<m>(0));
 	}
 
+	void assign(T* ptr, const T& value)
+	{
+		*ptr = value;
+	}
+
 	void add(T* ptr, Index start, const DerivedSub& subMatrix, Index rowId)
 	{
 		typedef Eigen::Matrix<T, 1, m, Eigen::DontAlign | Eigen::RowMajor> RowVector;
@@ -104,6 +129,11 @@ public:
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
 		Eigen::Map<RowVector>(&ptr[start]).operator+=(
 			subMatrix.row(static_cast<typename DerivedSub::Index>(rowId)).template segment<m>(0));
+	}
+
+	void add(T* ptr, const T& value)
+	{
+		*ptr += value;
 	}
 };
 }
@@ -127,6 +157,11 @@ public:
 	/// \param colRowId The column or row id depending on the template parameter Opt
 	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colRowId){}
 
+	/// Do the assignment of a single matrix element (operator =)
+	/// \param ptr The matrix element to be assigned
+	/// \param value The value to assign to
+	void assign(T* ptr, const T& value){}
+
 	/// Do the addition of a row/column of a matrix to a chunk of memory
 	/// \param ptr The chunk of memory
 	/// \param start Where the addition starts in the chunk of memory
@@ -134,6 +169,11 @@ public:
 	/// \param subMatrix The matrix from which the row/column is added
 	/// \param colRowId The column or row id depending on the template parameter Opt
 	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colRowId){}
+
+	/// Do the addition of a single matrix element (operator +=)
+	/// \param ptr The matrix element to be increased
+	/// \param value The value to add
+	void add(T* ptr, const T& value){}
 };
 
 /// Specialization for column major storage
@@ -153,6 +193,11 @@ public:
 			subMatrix.col(static_cast<IndexSub>(colId)).segment(0, static_cast<IndexSub>(n)));
 	}
 
+	void assign(T* ptr, const T& value)
+	{
+		*ptr = value;
+	}
+
 	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colId)
 	{
 		typedef Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
@@ -163,6 +208,11 @@ public:
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
 		Eigen::Map<ColVector>(&ptr[start], static_cast<IndexVector>(n)).operator+=(
 			subMatrix.col(static_cast<IndexSub>(colId)).segment(0, static_cast<IndexSub>(n)));
+	}
+
+	void add(T* ptr, const T& value)
+	{
+		*ptr += value;
 	}
 };
 
@@ -183,6 +233,11 @@ public:
 			subMatrix.row(static_cast<IndexSub>(rowId)).segment(0, static_cast<IndexSub>(m)));
 	}
 
+	void assign(T* ptr, const T& value)
+	{
+		*ptr = value;
+	}
+
 	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index rowId)
 	{
 		typedef Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor> RowVector;
@@ -193,6 +248,11 @@ public:
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
 		Eigen::Map<RowVector>(&ptr[start], static_cast<IndexVector>(m)).operator+=(
 			subMatrix.row(static_cast<IndexSub>(rowId)).segment(0, static_cast<IndexSub>(m)));
+	}
+
+	void add(T* ptr, const T& value)
+	{
+		*ptr += value;
 	}
 };
 }
@@ -543,24 +603,25 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 	}
 }
 
-/// Assign a SparseMatrix/SparseVector/Sparse expression to a SparseMatrix block
+/// Runs a given operation on a SparseMatrix block using a SparseMatrix/SparseVector/Sparse expression as input
 /// \tparam DerivedSub Type of the sub matrix/vector (any SparseMatrix, SparseVector or sparse expression)
 /// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
-/// \param subMatrix The sub-matrix/vector to set
+/// \param subMatrix The sub-matrix/vector to use as input
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
-/// \param[in,out] matrix The sparse matrix in which the block needs to be set by 'subMatrix'
+/// \param[in,out] matrix The sparse matrix in which the block will be altered.
 /// \exception SurgSim::Framework::AssertionFailure If 'matrix' is a nullptr or the block is out of 'matrix' range
-/// \note The size of the block to set is directly given by 'subMatrix' size. <br>
+/// \note The size of the block is directly given by 'subMatrix' size. <br>
 /// \note No assumption is made on any matrix/vector, it executes a slow insertion/search. <br>
 /// \note If the structure of the matrix is known and constant through time, it is recommended to
-/// \note pre-allocate the matrix structure and use an optimized dedicated setXXX method.
+/// \note pre-allocate the matrix structure and use an optimized dedicated blockXXX method.
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void setSparseMatrixBlock(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix,
-						  Index rowStart,
-						  Index columnStart,
-						  Eigen::SparseMatrix<T, Opt, Index>* matrix)
+void block(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index rowStart, Index columnStart,
+		   Eigen::SparseMatrix<T, Opt, Index>* matrix,
+		   void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*fnc)(T*, const T&))
 {
 	typedef typename DerivedSub::InnerIterator InnerIterator;
+
+	static Dynamic::Operation<T, Opt, Index, DerivedSub> operation;
 
 	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
@@ -571,40 +632,9 @@ void setSparseMatrixBlock(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix,
 	{
 		for (InnerIterator it(subMatrix.const_cast_derived(), outer); it; ++it)
 		{
-			matrix->coeffRef(rowStart + static_cast<Index>(it.row()), columnStart + static_cast<Index>(it.col())) =
-				static_cast<T>(it.value());
-		}
-	}
-}
-
-/// Add a SparseMatrix/SparseVector/Sparse expression to a SparseMatrix block
-/// \tparam DerivedSub Type of the sub matrix/vector (any SparseMatrix, SparseVector or sparse expression)
-/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
-/// \param subMatrix The sub-matrix/vector to add to the output
-/// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
-/// \param[in,out] matrix The sparse matrix in which the block needs to be incremented by 'subMatrix'
-/// \exception SurgSim::Framework::AssertionFailure If 'matrix' is a nullptr or the block is out of 'matrix' range
-/// \note The size of the block to set is directly given by subMatrix size. <br>
-/// \note No assumption is made on any matrix/vector, it executes a slow insertion/search. <br>
-template <typename DerivedSub, typename T, int Opt, typename Index>
-void addSparseMatrixBlock(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix,
-						  Index rowStart,
-						  Index columnStart,
-						  Eigen::SparseMatrix<T, Opt, Index>* matrix)
-{
-	typedef typename DerivedSub::InnerIterator InnerIterator;
-
-	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
-
-	SURGSIM_ASSERT(matrix->rows() >= rowStart + subMatrix.rows()) << "The block is out of range in matrix";
-	SURGSIM_ASSERT(matrix->cols() >= columnStart + subMatrix.cols()) << "The block is out of range in matrix";
-
-	for (auto outer = 0; outer < subMatrix.outerSize(); outer++)
-	{
-		for (InnerIterator it(subMatrix.const_cast_derived(), outer); it; ++it)
-		{
-			matrix->coeffRef(rowStart + static_cast<Index>(it.row()), columnStart + static_cast<Index>(it.col())) +=
-				static_cast<T>(it.value());
+			(operation.*fnc)(
+				&matrix->coeffRef(rowStart + static_cast<Index>(it.row()), columnStart + static_cast<Index>(it.col())),
+				static_cast<T>(it.value()));
 		}
 	}
 }

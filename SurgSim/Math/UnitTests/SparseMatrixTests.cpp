@@ -55,8 +55,6 @@ public:
 		m_matrixMissingCoefficients.setZero();
 		m_matrixWithoutExtraCoefficientsExpected.resize(18, 18);
 		m_matrixWithoutExtraCoefficientsExpected.setZero();
-		//m_matrixWithExtraCoefficientsBlockAddExpected.resize(18, 18);
-		//m_matrixWithExtraCoefficientsBlockAddExpected.setZero();
 		for (I i = 0; i < m_rowId; i++)
 		{
 			for (I j = 0; j < m_columnId; j++)
@@ -64,7 +62,6 @@ public:
 				m_matrixWithoutExtraCoefficients.insert(i, j) = 1.0;
 				m_matrixMissingCoefficients.insert(i, j) = 1.0;
 				m_matrixWithoutExtraCoefficientsExpected.insert(i, j) = 1.0;
-				//m_matrixWithExtraCoefficientsBlockAddExpected.insert(i, j) = 1.0;
 			}
 			for (I j = m_columnId + m_m; j < 18; j++)
 			{
@@ -387,56 +384,61 @@ public:
 	template <typename Derived>
 	void TestSetSparseMatrixBlock(const Eigen::SparseMatrixBase<Derived>& sub)
 	{
-		using SurgSim::Math::setSparseMatrixBlock;
+		using namespace SurgSim::Math;
 
 		SetUp();
 
 		// No recipient specified
-		EXPECT_THROW((setSparseMatrixBlock<Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr)), \
-			SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW((block<Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr,\
+			&Dynamic::Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 		// Recipient too small
-		EXPECT_THROW((setSparseMatrixBlock(sub, m_rowId, m_columnId, &m_matrixTooSmall)), \
-			SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW((block(sub, m_rowId, m_columnId, &m_matrixTooSmall,\
+			&Dynamic::Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 		// With a recipient that has all the coefficients and no other on the rows/columns
-		EXPECT_NO_THROW((setSparseMatrixBlock(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients)));
+		EXPECT_NO_THROW((block(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients,\
+			&Dynamic::Operation<T, Opt, I, Derived>::assign)));
 		EXPECT_TRUE((m_matrixWithoutExtraCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 		EXPECT_TRUE(m_matrixWithoutExtraCoefficientsExpected.isApprox(m_matrixWithoutExtraCoefficients));
 
 		// With a recipient that has all the coefficients and others on the rows/columns
-		EXPECT_NO_THROW((setSparseMatrixBlock(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients)));
+		EXPECT_NO_THROW((block(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients,\
+			&Dynamic::Operation<T, Opt, I, Derived>::assign)));
 		EXPECT_TRUE((m_matrixWithExtraCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 		EXPECT_TRUE(m_matrixWithExtraCoefficientsExpected.isApprox(m_matrixWithExtraCoefficients));
 
 		// With a recipient that does not have all the block coefficients (missing coefficients in the block)
-		EXPECT_NO_THROW((setSparseMatrixBlock(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients)));
+		EXPECT_NO_THROW((block(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients,\
+			&Dynamic::Operation<T, Opt, I, Derived>::assign)));
 		EXPECT_TRUE((m_matrixMissingCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 		EXPECT_TRUE(m_matrixWithoutExtraCoefficientsExpected.isApprox(m_matrixMissingCoefficients));
 
 		// With an empty recipient
 		Eigen::SparseMatrix<T, Opt, I> m_matrixEmpty(18, 18);
-		EXPECT_NO_THROW((setSparseMatrixBlock(sub, m_rowId, m_columnId, &m_matrixEmpty)));
+		EXPECT_NO_THROW((block(sub, m_rowId, m_columnId, &m_matrixEmpty,\
+			&Dynamic::Operation<T, Opt, I, Derived>::assign)));
 		EXPECT_TRUE((m_matrixEmpty.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 	}
 
 	template <typename Derived>
 	void TestSetSparseMatrixSegment(const Eigen::SparseMatrixBase<Derived>& sub)
 	{
-		using SurgSim::Math::setSparseMatrixBlock;
+		using namespace SurgSim::Math;
 
 		SetUp();
 
 		// With an empty recipient
 		Eigen::SparseMatrix<T, Opt, I> m_matrixEmpty(18, 18);
-		EXPECT_NO_THROW((setSparseMatrixBlock(sub, m_rowId, m_columnId, &m_matrixEmpty)));
+		EXPECT_NO_THROW((block(sub, m_rowId, m_columnId, &m_matrixEmpty,\
+			&Dynamic::Operation<T, Opt, I, Derived>::assign)));
 		EXPECT_TRUE(m_matrixEmpty.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub));
 	}
 
 	template <typename Derived>
 	void TestAddSparseMatrixBlock(const Eigen::SparseMatrixBase<Derived>& sub)
 	{
-		using SurgSim::Math::addSparseMatrixBlock;
+		using namespace SurgSim::Math;
 
 		typedef typename Derived::Scalar TSub;
 		const int OptSub = Eigen::SparseMatrixBase<Derived>::IsRowMajor ? Eigen::RowMajor : Eigen::ColMajor;
@@ -464,14 +466,15 @@ public:
 		}
 		m_matrixOne.makeCompressed();
 
-		EXPECT_NO_THROW((addSparseMatrixBlock(sub, m_rowId, m_columnId, &m_matrixOne)));
+		EXPECT_NO_THROW((block(sub, m_rowId, m_columnId, &m_matrixOne,\
+			&Dynamic::Operation<T, Opt, I, Derived>::add)));
 		EXPECT_TRUE(m_matrixOne.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub + one));
 	}
 
 	template <typename Derived>
 	void TestAddSparseMatrixSegment(const Eigen::SparseMatrixBase<Derived>& sub)
 	{
-		using SurgSim::Math::addSparseMatrixBlock;
+		using namespace SurgSim::Math;
 
 		typedef typename Derived::Scalar TSub;
 		const int OptSub = Eigen::SparseMatrixBase<Derived>::IsRowMajor ? Eigen::RowMajor : Eigen::ColMajor;
@@ -495,7 +498,8 @@ public:
 		}
 		m_matrixOne.makeCompressed();
 
-		EXPECT_NO_THROW((addSparseMatrixBlock(sub, m_rowId, m_columnId, &m_matrixOne)));
+		EXPECT_NO_THROW((block(sub, m_rowId, m_columnId, &m_matrixOne,\
+			&Dynamic::Operation<T, Opt, I, Derived>::add)));
 		EXPECT_TRUE(m_matrixOne.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub + one));
 	}
 
@@ -569,7 +573,6 @@ protected:
 	Eigen::SparseMatrix<T, Opt, I> m_matrixWithoutExtraCoefficientsExpected;
 	Eigen::SparseMatrix<T, Opt, I> m_matrixWithExtraCoefficients;
 	Eigen::SparseMatrix<T, Opt, I> m_matrixWithExtraCoefficientsExpected;
-	//Eigen::SparseMatrix<T, Opt, I> m_matrixWithExtraCoefficientsBlockAddExpected;
 	Eigen::SparseMatrix<T, Opt, I> m_matrixTooSmall;
 	Eigen::SparseMatrix<T, Opt, I> m_matrixMissingCoefficients;
 
