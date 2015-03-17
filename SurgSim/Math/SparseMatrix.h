@@ -273,6 +273,7 @@ public:
 /// \param subMatrix The sub matrix that will be copied into the SparseMatrix block
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
 /// \param[in,out] matrix The sparse matrix in which the block needs to be set by 'subMatrix'
+/// \param op The operation to run on the block
 /// \exception SurgSim::Framework::AssertionFailure If one of the following conditions is met: <br>
 /// * if 'subMatrix' is smaller than (n x m) in any dimension <br>
 /// * if 'matrix' is nullptr or smaller than (n x m) in any dimension <br>
@@ -288,7 +289,8 @@ public:
 template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
 void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
 						Eigen::SparseMatrix<T, Opt, Index>* matrix,
-						void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*fnc)(T* , Index, const DerivedSub&, Index))
+						void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T* , Index,
+						  const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -334,7 +336,7 @@ void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index colum
 		SURGSIM_ASSERT(innerStart + static_cast<Index>(innerSize) - 1 == innerIndices[innerStartIdInNextOuter - 1]) <<
 			"matrix column/row " << outerStart + outerLoop << " doesn't end at the block end location";
 
-		(operation.*fnc)(ptr, innerStartIdInCurrentOuter, subMatrix, outerLoop);
+		(operation.*op)(ptr, innerStartIdInCurrentOuter, subMatrix, outerLoop);
 	}
 }
 
@@ -354,6 +356,7 @@ void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index colum
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
 /// \param n, m The block size, respectively number of rows and columns
 /// \param[in,out] matrix The sparse matrix in which the block needs to be set by 'subMatrix'
+/// \param op The operation to run on the block
 /// \exception SurgSim::Framework::AssertionFailure If one of the following conditions is met: <br>
 /// * if 'subMatrix' is smaller than (n x m) in any dimension <br>
 /// * if 'matrix' is nullptr or smaller than (n x m) in any dimension <br>
@@ -368,8 +371,9 @@ void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index colum
 /// (xx 00 x) <br>
 template <typename DerivedSub, typename T, int Opt, typename Index>
 void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
-							   Eigen::SparseMatrix<T, Opt, Index>* matrix,
-							   void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*fnc)(T*, Index, Index, Index, const DerivedSub&, Index))
+						Eigen::SparseMatrix<T, Opt, Index>* matrix,
+						void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
+						  const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -415,7 +419,7 @@ void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index colum
 		SURGSIM_ASSERT(innerStart + static_cast<Index>(innerSize) - 1 == innerIndices[innerStartIdInNextOuter - 1]) <<
 			"matrix column/row " << outerStart + outerLoop << " doesn't end at the block end location";
 
-		(operation.*fnc)(ptr, innerStartIdInCurrentOuter, n, m, subMatrix, outerLoop);
+		(operation.*op)(ptr, innerStartIdInCurrentOuter, n, m, subMatrix, outerLoop);
 	}
 }
 
@@ -434,6 +438,7 @@ void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index colum
 /// \param subMatrix The sub matrix that will be copied into the SparseMatrix block
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
 /// \param[in,out] matrix The sparse matrix in which the block needs to be set by 'subMatrix'
+/// \param op The operation to run on the block
 /// \exception SurgSim::Framework::AssertionFailure If one of the following conditions is met: <br>
 /// * if 'subMatrix' is smaller than (n x m) in any dimension <br>
 /// * if 'matrix' is nullptr or smaller than (n x m) in any dimension <br>
@@ -448,7 +453,8 @@ void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index colum
 template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
 void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
 					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					 void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*fnc)(T* , Index, const DerivedSub&, Index))
+					 void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T* , Index,
+					   const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -507,7 +513,7 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 			innerIndices[innerFirstElement + static_cast<Index>(innerSize) - 1]) <<
 			"matrix is missing elements of the block (but not the 1st element on a row/column)";
 
-		(operation.*fnc)(ptr, innerFirstElement, subMatrix, outerLoop);
+		(operation.*op)(ptr, innerFirstElement, subMatrix, outerLoop);
 	}
 }
 
@@ -526,6 +532,7 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
 /// \param n, m The block size (Derived may be bigger but cannot be smaller in both dimension)
 /// \param[in,out] matrix The sparse matrix in which the block needs to be set by 'subMatrix'
+/// \param op The operation to run on the block
 /// \exception SurgSim::Framework::AssertionFailure If one of the following conditions is met: <br>
 /// * if 'subMatrix' is smaller than (n x m) in any dimension <br>
 /// * if 'matrix' is nullptr or smaller than (n x m) in any dimension <br>
@@ -540,7 +547,8 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 template <typename DerivedSub, typename T, int Opt, typename Index>
 void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
 					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					 void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*fnc)(T*, Index, Index, Index, const DerivedSub&, Index))
+					 void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
+					   const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -599,7 +607,7 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 			innerIndices[innerFirstElement + static_cast<Index>(innerSize) - 1]) <<
 			"matrix is missing elements of the block (but not the 1st element on a row/column)";
 
-		(operation.*fnc)(ptr, innerFirstElement, n, m, subMatrix, outerLoop);
+		(operation.*op)(ptr, innerFirstElement, n, m, subMatrix, outerLoop);
 	}
 }
 
@@ -609,6 +617,7 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 /// \param subMatrix The sub-matrix/vector to use as input
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
 /// \param[in,out] matrix The sparse matrix in which the block will be altered.
+/// \param op The operation to run on the block
 /// \exception SurgSim::Framework::AssertionFailure If 'matrix' is a nullptr or the block is out of 'matrix' range
 /// \note The size of the block is directly given by 'subMatrix' size. <br>
 /// \note No assumption is made on any matrix/vector, it executes a slow insertion/search. <br>
@@ -617,7 +626,7 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 template <typename DerivedSub, typename T, int Opt, typename Index>
 void block(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index rowStart, Index columnStart,
 		   Eigen::SparseMatrix<T, Opt, Index>* matrix,
-		   void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*fnc)(T*, const T&))
+		   void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, const T&))
 {
 	typedef typename DerivedSub::InnerIterator InnerIterator;
 
@@ -632,7 +641,7 @@ void block(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index rowStart,
 	{
 		for (InnerIterator it(subMatrix.const_cast_derived(), outer); it; ++it)
 		{
-			(operation.*fnc)(
+			(operation.*op)(
 				&matrix->coeffRef(rowStart + static_cast<Index>(it.row()), columnStart + static_cast<Index>(it.col())),
 				static_cast<T>(it.value()));
 		}
