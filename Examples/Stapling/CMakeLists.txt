@@ -55,6 +55,22 @@ endif()
 if(BUILD_DEVICE_NOVINT)
 	LIST(APPEND LIBS NovintDevice)
 endif()
+if(BUILD_DEVICE_SIXENSE)
+	LIST(APPEND LIBS SixenseDevice)
+	surgsim_copy_to_target_directory_for_release(Stapling
+		${SIXENSESDK_sixense_SHARED_RELEASE}
+		${SIXENSESDK_sixense_utils_SHARED_RELEASE}
+	)
+
+	surgsim_copy_to_target_directory_for_debug(Stapling
+		${SIXENSESDK_sixense_SHARED_DEBUG}
+		${SIXENSESDK_sixense_utils_SHARED_DEBUG}
+		${SIXENSESDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
+	)
+endif()
+if(BUILD_DEVICE_PHANTOM)
+	LIST(APPEND LIBS PhantomDevice)
+endif()
 
 target_link_libraries(Stapling ${LIBS})
 target_link_libraries(SerializedStapling ${LIBS})
