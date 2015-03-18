@@ -287,10 +287,10 @@ public:
 /// (00[xx]0) -> these rows and columns. <br>
 /// (xx 00 x) <br>
 template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
-void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
-						Eigen::SparseMatrix<T, Opt, Index>* matrix,
-						void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
-						  const DerivedSub&, Index))
+void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
+								 Eigen::SparseMatrix<T, Opt, Index>* matrix,
+								 void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
+								   const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -370,10 +370,10 @@ void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index colum
 /// (00[xx]0) -> these rows and columns. <br>
 /// (xx 00 x) <br>
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
-						Eigen::SparseMatrix<T, Opt, Index>* matrix,
-						void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
-						  const DerivedSub&, Index))
+void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
+								 Eigen::SparseMatrix<T, Opt, Index>* matrix,
+								 void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
+								   const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -451,10 +451,10 @@ void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index colum
 /// (0x[xx]0) -> contains more coefficients before and after the block. <br>
 /// (xx 00 x) <br>
 template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
-void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
-					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					 void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
-					   const DerivedSub&, Index))
+void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
+							  Eigen::SparseMatrix<T, Opt, Index>* matrix,
+							  void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
+							   const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -545,10 +545,10 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 /// (0x[xx]0) -> contains more coefficients before and after the block. <br>
 /// (xx 00 x) <br>
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
-					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					 void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
-					   const DerivedSub&, Index))
+void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
+							  Eigen::SparseMatrix<T, Opt, Index>* matrix,
+							  void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
+							   const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -625,9 +625,9 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 /// \note If the structure of the matrix is known and constant through time, it is recommended to
 /// \note pre-allocate the matrix structure and use an optimized dedicated blockXXX method.
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void block(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index rowStart, Index columnStart,
-		   Eigen::SparseMatrix<T, Opt, Index>* matrix,
-		   void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, const T&))
+void blockOperation(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index rowStart, Index columnStart,
+					Eigen::SparseMatrix<T, Opt, Index>* matrix,
+					void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, const T&))
 {
 	typedef typename DerivedSub::InnerIterator InnerIterator;
 

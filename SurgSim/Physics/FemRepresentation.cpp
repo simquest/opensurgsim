@@ -312,7 +312,7 @@ SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Ma
 
 void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState& state)
 {
-	using SurgSim::Math::blockWithoutSearch;
+	using SurgSim::Math::blockOperationWithoutSearch;
 	using SurgSim::Math::Matrix;
 	using SurgSim::Math::Dynamic::Operation;
 
@@ -321,7 +321,7 @@ void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState&
 	for (size_t nodeId = 0; nodeId < state.getNumNodes(); ++nodeId)
 	{
 		Index startDiagonalIndex = numDofPerNode * static_cast<Index>(nodeId);
-		blockWithoutSearch<Matrix, double>(getNodeTransformation(state, nodeId),
+		blockOperationWithoutSearch<Matrix, double>(getNodeTransformation(state, nodeId),
 			startDiagonalIndex, startDiagonalIndex, numDofPerNode, numDofPerNode, &m_complianceWarpingTransformation,
 			&Operation<double, 0, int, Matrix>::assign);
 	}
