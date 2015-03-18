@@ -209,7 +209,6 @@ public:
 			}
 		}
 		m_K.setFromTriplets(tripletList.begin(), tripletList.end());
-		std::cout << "m_K: " << std::endl << m_K << std::endl;
 		return m_K;
 	}
 

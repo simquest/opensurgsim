@@ -213,8 +213,6 @@ const SurgSim::Math::SparseMatrix& FemRepresentation::computeM(const SurgSim::Ma
 	// Make sure the mass matrix has been properly allocated and zeroed out
 	m_M.resize(state.getNumDof(), state.getNumDof());
 
-	std::cout << "State has " << state.getNumDof() << " matrix is: " << m_M.rows() << "x" << m_M.cols() <<
-			  std::endl;
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
 		(*femElement)->addMass(state, &m_M);

@@ -21,7 +21,7 @@
 
 #include <boost/assign/list_of.hpp> // for 'map_list_of()'
 
-#include "SurgSim/Math/LinearSolveAndInverse.h"
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeEquation.h"
 
@@ -91,11 +91,11 @@ public:
 
 	/// Sets the specialized linear solver to use with this Ode solver
 	/// \param linearSolver the linear solver to use when solving the ode equation
-	void setLinearSolver(std::shared_ptr<LinearSolveAndInverse> linearSolver);
+	void setLinearSolver(std::shared_ptr<LinearSparseSolveAndInverse> linearSolver);
 
 	/// Gets the specialized linear solver used with this Ode solver
 	/// \return The linear solver used when solving the ode equation
-	std::shared_ptr<LinearSolveAndInverse> getLinearSolver() const;
+	std::shared_ptr<LinearSparseSolveAndInverse> getLinearSolver() const;
 
 	/// Solves the equation
 	/// \param dt The time step
@@ -124,7 +124,7 @@ protected:
 	OdeEquation& m_equation;
 
 	/// The specialized linear solver to use when solving the ode equation
-	std::shared_ptr<LinearSolveAndInverse> m_linearSolver;
+	std::shared_ptr<LinearSparseSolveAndInverse> m_linearSolver;
 
 	/// System matrix (can be M, K, combination of MDK depending on the solver)
 	/// \note A static solver will have K for system matrix

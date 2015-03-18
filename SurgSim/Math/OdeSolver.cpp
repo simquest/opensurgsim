@@ -27,7 +27,7 @@ OdeSolver::OdeSolver(OdeEquation* equation) : m_equation(*equation)
 	allocate(m_equation.getInitialState()->getPositions().size());
 
 	// Default linear solver
-	setLinearSolver(std::make_shared<LinearSolveAndInverseDenseMatrix>());
+	setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
 }
 
 const std::string OdeSolver::getName() const
@@ -35,12 +35,12 @@ const std::string OdeSolver::getName() const
 	return m_name;
 }
 
-void OdeSolver::setLinearSolver(std::shared_ptr<LinearSolveAndInverse> linearSolver)
+void OdeSolver::setLinearSolver(std::shared_ptr<LinearSparseSolveAndInverse> linearSolver)
 {
 	m_linearSolver = linearSolver;
 }
 
-std::shared_ptr<LinearSolveAndInverse> OdeSolver::getLinearSolver() const
+std::shared_ptr<LinearSparseSolveAndInverse> OdeSolver::getLinearSolver() const
 {
 	return m_linearSolver;
 }

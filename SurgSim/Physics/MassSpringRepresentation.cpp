@@ -127,8 +127,8 @@ RepresentationType MassSpringRepresentation::getType() const
 
 void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,
-		const SurgSim::Math::SparseMatrix& K,
-		const SurgSim::Math::SparseMatrix& D)
+		const SurgSim::Math::Matrix& K,
+		const SurgSim::Math::Matrix& D)
 {
 	std::shared_ptr<MassSpringRepresentationLocalization> localization3D =
 		std::dynamic_pointer_cast<MassSpringRepresentationLocalization>(localization);
@@ -245,7 +245,7 @@ const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeS
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.setZero();
+	m_D.resize(state.getNumDof(), state.getNumDof());
 
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
@@ -309,7 +309,6 @@ const SparseMatrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeS
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
 	m_K.resize(state.getNumDof(), state.getNumDof());
-	m_K.setZero();
 
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
@@ -377,7 +376,7 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 		*/
 		for (size_t diagonal = 0; diagonal < state.getNumDof(); ++diagonal)
 		{
-			m_D.coeffRef(diagonal, diagonal) = m_D.coeff(diagonal, diagonal) * m_rayleighDamping.massCoefficient;
+			m_D.coeffRef(diagonal, diagonal) += m_M.coeff(diagonal, diagonal) * m_rayleighDamping.massCoefficient;
 		}
 	}
 	if (m_rayleighDamping.stiffnessCoefficient)

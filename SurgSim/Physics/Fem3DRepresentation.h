@@ -58,8 +58,8 @@ public:
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 									 const SurgSim::Math::Vector& generalizedForce,
-									 const SurgSim::Math::SparseMatrix& K = SurgSim::Math::SparseMatrix(),
-									 const SurgSim::Math::SparseMatrix& D = SurgSim::Math::SparseMatrix()) override;
+									 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+									 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
 	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location&) override;
 

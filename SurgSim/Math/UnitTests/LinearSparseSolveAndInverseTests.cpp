@@ -50,6 +50,7 @@ private:
 				(*m).insert(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
 			}
 		}
+		m->makeCompressed();
 	}
 
 	void initializeDenseMatrix(Matrix* m)
@@ -92,7 +93,6 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixTests)
 	setupSparseMatrixTest();
 
 	LinearSparseSolveAndInverseLU solveAndInverse;
-	std::cout << matrix << std::endl;
 	solveAndInverse(matrix, b, &x, &inverseMatrix);
 
 	EXPECT_TRUE(x.isApprox(expectedX));

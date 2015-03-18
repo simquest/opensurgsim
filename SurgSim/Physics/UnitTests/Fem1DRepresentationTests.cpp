@@ -96,8 +96,8 @@ TEST(Fem1DRepresentationTests, TransformInitialStateTest)
 
 TEST(Fem1DRepresentationTests, DoWakeUpTest)
 {
-	using SurgSim::Math::LinearSolveAndInverse;
-	using SurgSim::Math::LinearSolveAndInverseTriDiagonalBlockMatrix;
+	using SurgSim::Math::LinearSparseSolveAndInverse;
+	using SurgSim::Math::LinearSparseSolveAndInverseLU;
 
 	std::shared_ptr<MockFem1DRepresentation> fem = std::make_shared<MockFem1DRepresentation>("Fem1D");
 	std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
@@ -111,10 +111,10 @@ TEST(Fem1DRepresentationTests, DoWakeUpTest)
 
 	// Test that the OdeSolver has the proper linear solver type
 	EXPECT_NE(nullptr, fem->getOdeSolver());
-	std::shared_ptr<LinearSolveAndInverse> linearSolver = fem->getOdeSolver()->getLinearSolver();
+	std::shared_ptr<LinearSparseSolveAndInverse> linearSolver = fem->getOdeSolver()->getLinearSolver();
 	EXPECT_NE(nullptr, linearSolver);
-	std::shared_ptr<LinearSolveAndInverseTriDiagonalBlockMatrix<6>> expectedLinearSolverType;
-	expectedLinearSolverType = std::dynamic_pointer_cast<LinearSolveAndInverseTriDiagonalBlockMatrix<6>>(linearSolver);
+	std::shared_ptr<LinearSparseSolveAndInverseLU> expectedLinearSolverType;
+	expectedLinearSolverType = std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>(linearSolver);
 	EXPECT_NE(nullptr, expectedLinearSolverType);
 }
 
@@ -168,15 +168,19 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 	Vector FLocalWrongSize = Vector::Ones(2 * fem->getNumDofPerNode());
 	Matrix KLocalWrongSize = Matrix::Ones(3 * fem->getNumDofPerNode(), 3 * fem->getNumDofPerNode());
 	Matrix DLocalWrongSize = Matrix::Ones(4 * fem->getNumDofPerNode(), 4 * fem->getNumDofPerNode());
+
 	Vector Flocal = Vector::LinSpaced(fem->getNumDofPerNode(), -3.12, 4.09);
 	Matrix Klocal = Matrix::Ones(fem->getNumDofPerNode(), fem->getNumDofPerNode()) * 0.34;
 	Matrix Dlocal = Klocal + Matrix::Identity(fem->getNumDofPerNode(), fem->getNumDofPerNode());
+
 	Vector F = Vector::Zero(fem->getNumDof());
 	F.segment(0, fem->getNumDofPerNode()) = Flocal;
-	Matrix K = Matrix::Zero(fem->getNumDof(), fem->getNumDof());
-	K.block(0, 0, fem->getNumDofPerNode(), fem->getNumDofPerNode()) = Klocal;
-	Matrix D = Matrix::Zero(fem->getNumDof(), fem->getNumDof());
-	D.block(0, 0, fem->getNumDofPerNode(), fem->getNumDofPerNode()) = Dlocal;
+	SparseMatrix K(fem->getNumDof(), fem->getNumDof());
+	K.setZero();
+	Math::addSubMatrix(Klocal, 0, 0, fem->getNumDofPerNode(), fem->getNumDofPerNode(), &K);
+	SparseMatrix D(fem->getNumDof(), fem->getNumDof());
+	D.setZero();
+	Math::addSubMatrix(Dlocal, 0, 0, fem->getNumDofPerNode(), fem->getNumDofPerNode(), &D);
 
 	// Test invalid localization nullptr
 	ASSERT_THROW(fem->addExternalGeneralizedForce(nullptr, Flocal),
@@ -202,9 +206,11 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 
 	// Test valid call to addExternalGeneralizedForce
 	fem->addExternalGeneralizedForce(localization, Flocal, Klocal, Dlocal);
+	SparseMatrix zeroMatrix(K.rows(), K.cols());
+	zeroMatrix.setZero();
 	EXPECT_FALSE(fem->getExternalGeneralizedForce().isZero());
-	EXPECT_FALSE(fem->getExternalGeneralizedStiffness().isZero());
-	EXPECT_FALSE(fem->getExternalGeneralizedDamping().isZero());
+	EXPECT_FALSE(fem->getExternalGeneralizedStiffness().isApprox(zeroMatrix));
+	EXPECT_FALSE(fem->getExternalGeneralizedDamping().isApprox(zeroMatrix));
 	EXPECT_TRUE(fem->getExternalGeneralizedForce().isApprox(F));
 	EXPECT_TRUE(fem->getExternalGeneralizedStiffness().isApprox(K));
 	EXPECT_TRUE(fem->getExternalGeneralizedDamping().isApprox(D));
