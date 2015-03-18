@@ -21,7 +21,6 @@
 
 #include <gtest/gtest.h>
 
-//#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/SparseMatrix.h"
 
 using std::tuple;
@@ -120,7 +119,7 @@ public:
 	}
 
 	template <class Derived>
-	void TestSetWithoutSearchStatic(const Derived& sub, bool subTooSmall= false, bool success = true)
+	void TestSetWithoutSearchStatic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
 		using SurgSim::Math::blockWithoutSearch;
 		using SurgSim::Math::Static::Operation;
@@ -166,7 +165,7 @@ public:
 	}
 
 	template <class Derived>
-	void TestSetWithoutSearchDynamic(const Derived& sub, bool subTooSmall= false, bool success = true)
+	void TestSetWithoutSearchDynamic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
 		using SurgSim::Math::blockWithoutSearch;
 		using SurgSim::Math::Dynamic::Operation;
@@ -212,7 +211,7 @@ public:
 	}
 
 	template <class Derived>
-	void TestSetWithSearchStatic(const Derived& sub, bool subTooSmall= false, bool success = true)
+	void TestSetWithSearchStatic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
 		using SurgSim::Math::blockWithSearch;
 		using SurgSim::Math::Static::Operation;
@@ -255,7 +254,7 @@ public:
 	}
 
 	template <class Derived>
-	void TestSetWithSearchDynamic(const Derived& sub, bool subTooSmall= false, bool success = true)
+	void TestSetWithSearchDynamic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
 		using SurgSim::Math::blockWithSearch;
 		using SurgSim::Math::Dynamic::Operation;
@@ -297,7 +296,7 @@ public:
 	}
 
 	template <class Derived>
-	void TestAddWithSearchStatic(const Derived& sub, bool subTooSmall= false, bool success = true)
+	void TestAddWithSearchStatic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
 		using SurgSim::Math::blockWithSearch;
 		using SurgSim::Math::Static::Operation;
@@ -342,7 +341,7 @@ public:
 	}
 
 	template <class Derived>
-	void TestAddWithSearchDynamic(const Derived& sub, bool subTooSmall= false, bool success = true)
+	void TestAddWithSearchDynamic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
 		using SurgSim::Math::blockWithSearch;
 		using SurgSim::Math::Dynamic::Operation;

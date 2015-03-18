@@ -289,7 +289,7 @@ public:
 template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
 void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
 						Eigen::SparseMatrix<T, Opt, Index>* matrix,
-						void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T* , Index,
+						void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
 						  const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
@@ -453,7 +453,7 @@ void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index colum
 template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
 void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
 					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					 void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T* , Index,
+					 void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
 					   const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
@@ -605,7 +605,8 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 		// Make sure that the last element corresponding to the block size has the expected index
 		SURGSIM_ASSERT(innerStart + static_cast<Index>(innerSize) - 1 == \
 			innerIndices[innerFirstElement + static_cast<Index>(innerSize) - 1]) <<
-			"matrix is missing elements of the block (but not the 1st element on a row/column)";
+			"The last element of the block does not have the expected index. " <<
+			"The matrix is missing elements of the block (but not the 1st element on a row/column)";
 
 		(operation.*op)(ptr, innerFirstElement, n, m, subMatrix, outerLoop);
 	}
