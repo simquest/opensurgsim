@@ -78,6 +78,10 @@ target_link_libraries(SurgSimCollision ${LIBS}
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
+
+	if(BUILD_PERFORMANCE_TESTING)
+		add_subdirectory(PerformanceTests)
+	endif()
 endif()
 
 # Put SurgSimCollision into folder "Collision"
