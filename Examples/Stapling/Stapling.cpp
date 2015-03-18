@@ -33,6 +33,8 @@
 #include "SurgSim/Input/Input.h"
 #include "SurgSim/Math/Math.h"
 #include "SurgSim/Physics/Physics.h"
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Devices/DeviceFilters/Posetransform.h"
 
 using SurgSim::Blocks::KeyboardTogglesComponentBehavior;
 using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
@@ -146,6 +148,12 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	auto meshShapeForCollision = std::make_shared<MeshShape>();
 	meshShapeForCollision->load(filename);
 
+	SurgSim::Math::RigidTransform3d initialPose = 
+		SurgSim::Math::makeRigidTransform(
+			SurgSim::Math::makeRotationQuaternion(-M_PI_2, SurgSim::Math::Vector3d::UnitX().eval()) *
+			SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d::UnitZ().eval()),
+			SurgSim::Math::Vector3d::Zero());
+
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
 		std::make_shared<OsgMeshRepresentation>("Collision Mesh");
 	meshShapeVisualization->setShape(meshShapeForCollision);
@@ -156,6 +164,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	physicsRepresentation->setIsGravityEnabled(false);
 	physicsRepresentation->setDensity(8050); // Stainless steel (in Kg.m-3)
 	physicsRepresentation->setShape(meshShapeForCollision);
+	physicsRepresentation->setLocalPose(initialPose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
@@ -178,7 +187,11 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	inputVTC->setRepresentation(physicsRepresentation);
 	inputVTC->overrideAttachmentPoint(Vector3d::Zero());
 	inputVTC->setCalculateInertialTorques(false);
-	inputVTC->overrideAngularStiffness(2.0);
+
+	// Parameters to be used with Phantom Device
+	inputVTC->overrideAngularStiffness(1.0);
+	inputVTC->overrideAngularDamping(0.13);
+	inputVTC->overrideLinearStiffness(100.0);
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
 	// Also, it is aware of collisions of the stapler.
@@ -212,6 +225,10 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(createSceneryObject("Indicator", "Geometry/stapler_indicator.obj"));
 	sceneElement->addComponent(createSceneryObject("Markings",  "Geometry/stapler_markings.obj"));
 	sceneElement->addComponent(createSceneryObject("Trigger",   "Geometry/stapler_trigger.obj"));
+
+
+	auto axis = std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axis");
+	sceneElement->addComponent(axis);
 
 	auto meshShapeForVirtualStaple1 = std::make_shared<MeshShape>();
 	auto meshShapeForVirtualStaple2 = std::make_shared<MeshShape>();
@@ -391,7 +408,9 @@ int main(int argc, char* argv[])
 	runtime->addManager(physicsManager);
 
 	std::shared_ptr<DeviceInterface> device;
-	device = std::make_shared<SurgSim::Device::MultiAxisDevice>(deviceName);
+	//device = std::make_shared<SurgSim::Device::PhantomDevice>(deviceName, "Default PHANToM");
+	//device = std::make_shared<SurgSim::Device::IdentityPoseDevice>(deviceName);
+	device = std::make_shared<SurgSim::Device::MultiAxisDevice>("RawDevice");
 	if (!device->initialize())
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
@@ -399,6 +418,12 @@ int main(int argc, char* argv[])
 
 		device = std::make_shared<IdentityPoseDevice>(deviceName);
 	}
+	auto transform = std::make_shared<SurgSim::Device::PoseTransform>(deviceName);
+	//transform->setTransform(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.06, 0.05))); // Phantom
+	//transform->setTransform(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.1, -0.1))); // Sixense
+	device->addInputConsumer(transform);
+	device->setOutputProducer(transform);
+	inputManager->addDevice(transform);
 	inputManager->addDevice(device);
 
 	std::shared_ptr<OsgViewElement> view = createViewElement();
@@ -455,6 +480,11 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(stapler);
 	scene->addSceneElement(wound);
 	scene->addSceneElement(keyboard);
+
+	auto sceneElement = std::make_shared<BasicSceneElement>("AxisSceneElement");
+	auto axis = std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("GlobalAxis");
+	sceneElement->addComponent(axis);
+	scene->addSceneElement(sceneElement);
 
 	// Exclude collision between certain Collision::Representations
 	physicsManager->addExcludedCollisionPair(
