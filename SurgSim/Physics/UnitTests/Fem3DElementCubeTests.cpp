@@ -82,7 +82,7 @@ public:
 	double m_expectedVolume;
 	Eigen::Matrix<double, 24, 1> m_expectedX0;
 	double m_rho, m_E, m_nu;
-	SurgSim::Math::SparseMatrix m_expectedMassMatrix, m_expectedDampingMatrix, m_expectedStiffnessMatrix;
+	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix, m_expectedStiffnessMatrix;
 	SurgSim::Math::Vector m_vectorOnes;
 
 	std::shared_ptr<MockFem3DElementCube> getCubeElement(const std::array<size_t, 8>& nodeIds)
@@ -102,13 +102,7 @@ public:
 		using SurgSim::Math::getSubMatrix;
 		using SurgSim::Math::addSubMatrix;
 
-		typedef Eigen::Triplet<double> T;
-		std::vector<T> tripletList;
-		tripletList.reserve(9 * 36);
-		SparseMatrix K(24, 24);
-		K.setZero();
-
-		int blockIdRow, blockIdCol;
+		Eigen::Matrix<double, 24, 24> K = Eigen::Matrix<double, 24, 24>::Zero();
 		{
 			// Expected stiffness matrix given in
 			// "Physically-Based Simulation of Objects Represented by Surface Meshes"
@@ -123,141 +117,42 @@ public:
 			double e = (b + c) / 12.0;
 			double n = -e;
 			// Fill up the diagonal sub-matrices (3x3)
-			/*
 			getSubMatrix(K, 0, 0, 3, 3).setConstant(e);
 			getSubMatrix(K, 0, 0, 3, 3).diagonal().setConstant(d);
-			*/
-			blockIdRow = blockIdCol = 0;
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 1, e));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 2, e));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 0, e));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 2, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 0, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 1, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
-			/*
 			getSubMatrix(K, 1, 1, 3, 3).setConstant(n);
 			getSubMatrix(K, 1, 1, 3, 3).diagonal().setConstant(d);
 			getSubMatrix(K, 1, 1, 3, 3)(1, 2) = e;
 			getSubMatrix(K, 1, 1, 3, 3)(2, 1) = e;
-			*/
-			blockIdRow = blockIdCol = 1;
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 1, n));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 2, n));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 0, n));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 0, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
-			/*
 			getSubMatrix(K, 2, 2, 3, 3).setConstant(n);
 			getSubMatrix(K, 2, 2, 3, 3).diagonal().setConstant(d);
 			getSubMatrix(K, 2, 2, 3, 3)(0, 1) = e;
 			getSubMatrix(K, 2, 2, 3, 3)(1, 0) = e;
-			*/
-			blockIdRow = blockIdCol = 2;
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 2, n));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 0, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
-
-			/*
 			getSubMatrix(K, 3, 3, 3, 3).setConstant(n);
 			getSubMatrix(K, 3, 3, 3, 3).diagonal().setConstant(d);
 			getSubMatrix(K, 3, 3, 3, 3)(0, 2) = e;
 			getSubMatrix(K, 3, 3, 3, 3)(2, 0) = e;
-			*/
-			blockIdRow = blockIdCol = 3;
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
-			/*
 			getSubMatrix(K, 4, 4, 3, 3).setConstant(n);
 			getSubMatrix(K, 4, 4, 3, 3).diagonal().setConstant(d);
 			//getSubMatrix(K, 4, 4, 3, 3)(0,0) = e; // BUG IN THE PAPER !!!
 			getSubMatrix(K, 4, 4, 3, 3)(0, 1) = e;
 			getSubMatrix(K, 4, 4, 3, 3)(1, 0) = e;
-			*/
-			blockIdRow = blockIdCol = 4;
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
-			/*
 			getSubMatrix(K, 5, 5, 3, 3).setConstant(n);
 			getSubMatrix(K, 5, 5, 3, 3).diagonal().setConstant(d);
 			getSubMatrix(K, 5, 5, 3, 3)(0, 2) = e;
 			getSubMatrix(K, 5, 5, 3, 3)(2, 0) = e;
-			*/
-			blockIdRow = blockIdCol = 5;
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
-
-			/*
 			getSubMatrix(K, 6, 6, 3, 3).setConstant(e);
 			getSubMatrix(K, 6, 6, 3, 3).diagonal().setConstant(d);
-			*/
-			blockIdRow = blockIdCol = 6;
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 1, e));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 2, e));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 0, e));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 2, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 0, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 1, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
-			/*
 			getSubMatrix(K, 7, 7, 3, 3).setConstant(n);
 			getSubMatrix(K, 7, 7, 3, 3).diagonal().setConstant(d);
 			getSubMatrix(K, 7, 7, 3, 3)(1, 2) = e;
 			getSubMatrix(K, 7, 7, 3, 3)(2, 1) = e;
-			*/
-			blockIdRow = blockIdCol = 7;
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n));
-			tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-			tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e));
-			tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
-
 
 			// Edges
 			{
@@ -269,7 +164,6 @@ public:
 				double n2 = -e2;
 
 				// Edge in x-direction
-				/*
 				getSubMatrix(K, 0, 1, 3, 3)(0, 0) = d1;
 				getSubMatrix(K, 0, 1, 3, 3)(0, 1) = e1;
 				getSubMatrix(K, 0, 1, 3, 3)(0, 2) = e1;
@@ -279,70 +173,18 @@ public:
 				getSubMatrix(K, 0, 1, 3, 3)(2, 0) = n1;
 				getSubMatrix(K, 0, 1, 3, 3)(2, 1) = e2;
 				getSubMatrix(K, 0, 1, 3, 3)(2, 2) = d2;
-				*/
-				blockIdRow = 0;
-				blockIdCol = 1;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
-				/*
 				getSubMatrix(K, 2, 3, 3, 3) = getSubMatrix(K, 0, 1, 3, 3);
 				getSubMatrix(K, 2, 3, 3, 3)(0, 2) = n1;
 				getSubMatrix(K, 2, 3, 3, 3)(1, 2) = n2;
 				getSubMatrix(K, 2, 3, 3, 3)(2, 0) = e1;
 				getSubMatrix(K, 2, 3, 3, 3)(2, 1) = n2;
-				*/
-				blockIdRow = 2;
-				blockIdCol = 3;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
-				/*
 				getSubMatrix(K, 4, 5, 3, 3) = getSubMatrix(K, 2, 3, 3, 3);
-				*/
-				blockIdRow = 4;
-				blockIdCol = 5;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
-				/*
 				getSubMatrix(K, 6, 7, 3, 3) = getSubMatrix(K, 0, 1, 3, 3);
-				*/
-				blockIdRow = 6;
-				blockIdCol = 7;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
 				// Edge in y-direction
-				/*
 				getSubMatrix(K, 0, 3, 3, 3)(0, 0) = d2;
 				getSubMatrix(K, 0, 3, 3, 3)(0, 1) = n1;
 				getSubMatrix(K, 0, 3, 3, 3)(0, 2) = e2;
@@ -352,78 +194,26 @@ public:
 				getSubMatrix(K, 0, 3, 3, 3)(2, 0) = e2;
 				getSubMatrix(K, 0, 3, 3, 3)(2, 1) = n1;
 				getSubMatrix(K, 0, 3, 3, 3)(2, 2) = d2;
-				*/
-				blockIdRow = 0;
-				blockIdCol = 3;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
-				/*
 				getSubMatrix(K, 1, 2, 3, 3) = getSubMatrix(K, 0, 3, 3, 3);
 				getSubMatrix(K, 1, 2, 3, 3)(0, 1) = e1;
 				getSubMatrix(K, 1, 2, 3, 3)(0, 2) = n2;
 				getSubMatrix(K, 1, 2, 3, 3)(1, 0) = n1;
 				getSubMatrix(K, 1, 2, 3, 3)(2, 0) = n2;
-				*/
-				blockIdRow = 1;
-				blockIdCol = 2;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
-				/*
 				getSubMatrix(K, 4, 7, 3, 3) = getSubMatrix(K, 1, 2, 3, 3);
 				getSubMatrix(K, 4, 7, 3, 3)(0, 1) = n1;
 				getSubMatrix(K, 4, 7, 3, 3)(1, 0) = e1;
 				getSubMatrix(K, 4, 7, 3, 3)(1, 2) = n1;
 				getSubMatrix(K, 4, 7, 3, 3)(2, 1) = e1;
-				*/
-				blockIdRow = 4;
-				blockIdCol = 7;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
-				/*
 				getSubMatrix(K, 5, 6, 3, 3) = getSubMatrix(K, 0, 3, 3, 3);
 				getSubMatrix(K, 5, 6, 3, 3)(0, 1) = e1;
 				getSubMatrix(K, 5, 6, 3, 3)(1, 0) = n1;
 				getSubMatrix(K, 5, 6, 3, 3)(1, 2) = n1;
 				getSubMatrix(K, 5, 6, 3, 3)(2, 1) = e1;
-				*/
-				blockIdRow = 5;
-				blockIdCol = 6;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
 				// Edge in z-direction
-				/*
 				getSubMatrix(K, 0, 4, 3, 3)(0, 0) = d2;
 				getSubMatrix(K, 0, 4, 3, 3)(0, 1) = e2;
 				getSubMatrix(K, 0, 4, 3, 3)(0, 2) = n1;
@@ -433,75 +223,24 @@ public:
 				getSubMatrix(K, 0, 4, 3, 3)(2, 0) = e1;
 				getSubMatrix(K, 0, 4, 3, 3)(2, 1) = e1;
 				getSubMatrix(K, 0, 4, 3, 3)(2, 2) = d1;
-				*/
-				blockIdRow = 0;
-				blockIdCol = 4;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 1, 5, 3, 3) = getSubMatrix(K, 0, 4, 3, 3);
 				getSubMatrix(K, 1, 5, 3, 3)(0, 1) = n2;
 				getSubMatrix(K, 1, 5, 3, 3)(0, 2) = e1;
 				getSubMatrix(K, 1, 5, 3, 3)(1, 0) = n2;
 				getSubMatrix(K, 1, 5, 3, 3)(2, 0) = n1;
-				*/
-				blockIdRow = 1;
-				blockIdCol = 5;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 2, 6, 3, 3) = getSubMatrix(K, 0, 4, 3, 3);
 				getSubMatrix(K, 2, 6, 3, 3)(0, 2) = e1;
 				getSubMatrix(K, 2, 6, 3, 3)(1, 2) = e1;
 				getSubMatrix(K, 2, 6, 3, 3)(2, 0) = n1;
 				getSubMatrix(K, 2, 6, 3, 3)(2, 1) = n1;
-				*/
-				blockIdRow = 2;
-				blockIdCol = 6;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 3, 7, 3, 3) = getSubMatrix(K, 0, 4, 3, 3);
 				getSubMatrix(K, 3, 7, 3, 3)(0, 1) = n2;
 				getSubMatrix(K, 3, 7, 3, 3)(1, 0) = n2;
 				getSubMatrix(K, 3, 7, 3, 3)(1, 2) = e1;
 				getSubMatrix(K, 3, 7, 3, 3)(2, 1) = n1;
-				*/
-				blockIdRow = 3;
-				blockIdCol = 7;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 			}
 
 			// Faces diagonals
@@ -513,7 +252,6 @@ public:
 				double n1 = -e1;
 				double n2 = -e2;
 
-				/*
 				getSubMatrix(K, 0, 5, 3, 3)(0, 0) = d1;
 				getSubMatrix(K, 0, 5, 3, 3)(0, 1) = e2;
 				getSubMatrix(K, 0, 5, 3, 3)(0, 2) = n1;
@@ -523,77 +261,25 @@ public:
 				getSubMatrix(K, 0, 5, 3, 3)(2, 0) = n1;
 				getSubMatrix(K, 0, 5, 3, 3)(2, 1) = e2;
 				getSubMatrix(K, 0, 5, 3, 3)(2, 2) = d1;
-				*/
-				blockIdRow = 0;
-				blockIdCol = 5;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 1, 4, 3, 3) = getSubMatrix(K, 0, 5, 3, 3);
 				getSubMatrix(K, 1, 4, 3, 3)(0, 1) = n2;
 				getSubMatrix(K, 1, 4, 3, 3)(0, 2) = e1;
 				getSubMatrix(K, 1, 4, 3, 3)(1, 0) = e2;
 				getSubMatrix(K, 1, 4, 3, 3)(2, 0) = e1;
-				*/
-				blockIdRow = 1;
-				blockIdCol = 4;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 2, 7, 3, 3) = getSubMatrix(K, 0, 5, 3, 3);
 				getSubMatrix(K, 2, 7, 3, 3)(0, 2) = e1;
 				getSubMatrix(K, 2, 7, 3, 3)(1, 2) = e2;
 				getSubMatrix(K, 2, 7, 3, 3)(2, 0) = e1;
 				getSubMatrix(K, 2, 7, 3, 3)(2, 1) = n2;
-				*/
-				blockIdRow = 2;
-				blockIdCol = 7;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 3, 6, 3, 3) = getSubMatrix(K, 0, 5, 3, 3);
 				getSubMatrix(K, 3, 6, 3, 3)(0, 1) = n2;
 				getSubMatrix(K, 3, 6, 3, 3)(1, 0) = e2;
 				getSubMatrix(K, 3, 6, 3, 3)(1, 2) = e2;
 				getSubMatrix(K, 3, 6, 3, 3)(2, 1) = n2;
-				*/
-				blockIdRow = 3;
-				blockIdCol = 6;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 1, 6, 3, 3)(0, 0) = d2;
 				getSubMatrix(K, 1, 6, 3, 3)(0, 1) = e2;
 				getSubMatrix(K, 1, 6, 3, 3)(0, 2) = e2;
@@ -603,77 +289,25 @@ public:
 				getSubMatrix(K, 1, 6, 3, 3)(2, 0) = n2;
 				getSubMatrix(K, 1, 6, 3, 3)(2, 1) = n1;
 				getSubMatrix(K, 1, 6, 3, 3)(2, 2) = d1;
-				*/
-				blockIdRow = 1;
-				blockIdCol = 6;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 2, 5, 3, 3) = getSubMatrix(K, 1, 6, 3, 3);
 				getSubMatrix(K, 2, 5, 3, 3)(0, 1) = n2;
 				getSubMatrix(K, 2, 5, 3, 3)(1, 0) = e2;
 				getSubMatrix(K, 2, 5, 3, 3)(1, 2) = e1;
 				getSubMatrix(K, 2, 5, 3, 3)(2, 1) = e1;
-				*/
-				blockIdRow = 2;
-				blockIdCol = 5;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 0, 7, 3, 3) = getSubMatrix(K, 1, 6, 3, 3);
 				getSubMatrix(K, 0, 7, 3, 3)(0, 1) = n2;
 				getSubMatrix(K, 0, 7, 3, 3)(0, 2) = n2;
 				getSubMatrix(K, 0, 7, 3, 3)(1, 0) = e2;
 				getSubMatrix(K, 0, 7, 3, 3)(2, 0) = e2;
-				*/
-				blockIdRow = 0;
-				blockIdCol = 7;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 3, 4, 3, 3) = getSubMatrix(K, 1, 6, 3, 3);
 				getSubMatrix(K, 3, 4, 3, 3)(0, 2) = n2;
 				getSubMatrix(K, 3, 4, 3, 3)(1, 2) = e1;
 				getSubMatrix(K, 3, 4, 3, 3)(2, 0) = e2;
 				getSubMatrix(K, 3, 4, 3, 3)(2, 1) = e1;
-				*/
-				blockIdRow = 3;
-				blockIdCol = 4;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d1));
 
-				/*
 				getSubMatrix(K, 0, 2, 3, 3)(0, 0) = d1;
 				getSubMatrix(K, 0, 2, 3, 3)(0, 1) = n1;
 				getSubMatrix(K, 0, 2, 3, 3)(0, 2) = e2;
@@ -683,75 +317,24 @@ public:
 				getSubMatrix(K, 0, 2, 3, 3)(2, 0) = n2;
 				getSubMatrix(K, 0, 2, 3, 3)(2, 1) = n2;
 				getSubMatrix(K, 0, 2, 3, 3)(2, 2) = d2;
-				*/
-				blockIdRow = 0;
-				blockIdCol = 2;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
-				/*
 				getSubMatrix(K, 1, 3, 3, 3) = getSubMatrix(K, 0, 2, 3, 3);
 				getSubMatrix(K, 1, 3, 3, 3)(0, 1) = e1;
 				getSubMatrix(K, 1, 3, 3, 3)(0, 2) = n2;
 				getSubMatrix(K, 1, 3, 3, 3)(1, 0) = e1;
 				getSubMatrix(K, 1, 3, 3, 3)(2, 0) = e2;
-				*/
-				blockIdRow = 1;
-				blockIdCol = 3;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
-				/*
 				getSubMatrix(K, 4, 6, 3, 3) = getSubMatrix(K, 0, 2, 3, 3);
 				getSubMatrix(K, 4, 6, 3, 3)(0, 2) = n2;
 				getSubMatrix(K, 4, 6, 3, 3)(1, 2) = n2;
 				getSubMatrix(K, 4, 6, 3, 3)(2, 0) = e2;
 				getSubMatrix(K, 4, 6, 3, 3)(2, 1) = e2;
-				*/
-				blockIdRow = 4;
-				blockIdCol = 6;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 
-				/*
 				getSubMatrix(K, 5, 7, 3, 3) = getSubMatrix(K, 0, 2, 3, 3);
 				getSubMatrix(K, 5, 7, 3, 3)(0, 1) = e1;
 				getSubMatrix(K, 5, 7, 3, 3)(1, 0) = e1;
 				getSubMatrix(K, 5, 7, 3, 3)(1, 2) = n2;
 				getSubMatrix(K, 5, 7, 3, 3)(2, 1) = e2;
-				*/
-				blockIdRow = 5;
-				blockIdCol = 7;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d1));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e2));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d2));
 			}
 
 			// Cube diagonals
@@ -760,84 +343,28 @@ public:
 				double e = (b + c) / 24.0;
 				double n = -e;
 
-				/*
 				getSubMatrix(K, 0, 6, 3, 3).setConstant(n);
 				getSubMatrix(K, 0, 6, 3, 3).diagonal().setConstant(d);
-				*/
-				blockIdRow = 0;
-				blockIdCol = 6;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
-				/*
 				getSubMatrix(K, 1, 7, 3, 3).setConstant(e);
 				getSubMatrix(K, 1, 7, 3, 3).diagonal().setConstant(d);
 				getSubMatrix(K, 1, 7, 3, 3)(1, 2) = n;
 				getSubMatrix(K, 1, 7, 3, 3)(2, 1) = n;
-				*/
-				blockIdRow = 1;
-				blockIdCol = 7;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, n));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, n));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
-				/*
 				getSubMatrix(K, 2, 4, 3, 3).setConstant(e);
 				getSubMatrix(K, 2, 4, 3, 3).diagonal().setConstant(d);
 				getSubMatrix(K, 2, 4, 3, 3)(0, 1) = n;
 				getSubMatrix(K, 2, 4, 3, 3)(1, 0) = n;
-				*/
-				blockIdRow = 2;
-				blockIdCol = 4;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, n));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, e));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, n));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, e));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 
-				/*
 				getSubMatrix(K, 3, 5, 3, 3).setConstant(e);
 				getSubMatrix(K, 3, 5, 3, 3).diagonal().setConstant(d);
 				getSubMatrix(K, 3, 5, 3, 3)(0, 2) = n;
 				getSubMatrix(K, 3, 5, 3, 3)(2, 0) = n;
-				*/
-				blockIdRow = 3;
-				blockIdCol = 5;
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdCol) + 0, d));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 1, e));
-				tripletList.push_back(T((3 * blockIdRow) + 0, (3 * blockIdRow) + 2, n));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 0, e));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdCol) + 1, d));
-				tripletList.push_back(T((3 * blockIdRow) + 1, (3 * blockIdRow) + 2, e));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 0, n));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdRow) + 1, e));
-				tripletList.push_back(T((3 * blockIdRow) + 2, (3 * blockIdCol) + 2, d));
 			}
 
 			// Use symmetry to complete the triangular inferior part of K
-			K.setFromTriplets(tripletList.begin(), tripletList.end());
-			SparseMatrix adjointK = K.triangularView<Eigen::StrictlyUpper>().adjoint();
-			SparseMatrix upperK = K.triangularView<Eigen::Upper>();
-			K = adjointK + upperK;
-			//			K.triangularView<Eigen::StrictlyLower>().setZero();
-			//			K += K.triangularView<Eigen::StrictlyUpper>().adjoint();
+			K.triangularView<Eigen::StrictlyLower>().setZero();
+			K += K.triangularView<Eigen::StrictlyUpper>().adjoint();
 		}
 		addSubMatrix(K, nodeIdsVectorForm, 3 , &m_expectedStiffnessMatrix);
 	}
@@ -846,11 +373,7 @@ public:
 	{
 		using SurgSim::Math::addSubMatrix;
 
-		typedef Eigen::Triplet<double> T;
-		std::vector<T> tripletList;
-		tripletList.reserve(9 * 36);
-		SparseMatrix M(24, 24);
-		M.setZero();
+		Eigen::Matrix<double, 24, 24> M = Eigen::Matrix<double, 24, 24>::Zero();
 
 		// "Physically-Based Simulation of Objects Represented by Surface Meshes"
 		// Muller, Techner, Gross, CGI 2004
@@ -864,114 +387,26 @@ public:
 		double c = a / 4.0;
 		double d = a / 8.0;
 
-		/*
 		M.diagonal().setConstant(a);
-		*/
-		for (int counter = 0; counter < 24; ++counter)
-		{
-			tripletList.push_back(T(counter, counter, a));
-		}
 
-		/*
 		M.block(0, 3, 21, 21).diagonal().setConstant(b);
-		*/
-		for (int counter = 0; counter < 21; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 3, b));
-			tripletList.push_back(T(counter + 3, counter, b));
-		}
-
-		/*
 		M.block(3 * 3, 3 * 4, 3, 3).diagonal().setConstant(c); // block (3, 4)
-		*/
-		for (int counter = 9; counter < 12; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 3, c - b));
-			tripletList.push_back(T(counter + 3, counter, c - b));
-		}
 
-		/*
 		M.block(0, 6, 18, 18).diagonal().setConstant(c);
-		*/
-		for (int counter = 0; counter < 6; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 6, c));
-			tripletList.push_back(T(counter + 6, counter, c));
-		}
-
-		/*
 		M.block(3 * 2, 3 * 4, 6, 6).diagonal().setConstant(d); // block (2, 4) and block (3, 5)
-		*/
-		for (int counter = 6; counter < 12; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 6, d));
-			tripletList.push_back(T(counter + 6, counter, d));
-		}
 
-		/*
 		M.block(0, 9, 15, 15).diagonal().setConstant(c);
-		*/
-		for (int counter = 3; counter < 12; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 9, c));
-			tripletList.push_back(T(counter + 9, counter, c));
-		}
-
-		/*
 		M.block(3 * 0, 3 * 3, 3, 3).diagonal().setConstant(b); // block (0, 3)
-		*/
-		for (int counter = 0; counter < 3; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 9, b));
-			tripletList.push_back(T(counter + 9, counter, b));
-		}
-
-		/*
 		M.block(3 * 4, 3 * 7, 3, 3).diagonal().setConstant(b); // block (4, 7)
-		*/
-		for (int counter = 12; counter < 15; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 9, b));
-			tripletList.push_back(T(counter + 9, counter, b));
-		}
 
-		/*
 		M.block(0, 12, 12, 12).diagonal().setConstant(b);
-		*/
-		for (int counter = 0; counter < 12; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 12, b));
-			tripletList.push_back(T(counter + 12, counter, b));
-		}
 
-		/*
 		M.block(0, 15, 9, 9).diagonal().setConstant(c);
-		*/
-		for (int counter = 0; counter < 9; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 15, c));
-			tripletList.push_back(T(counter + 15, counter, c));
-		}
 
-		/*
 		M.block(0, 18, 6, 6).diagonal().setConstant(d);
-		*/
-		for (int counter = 0; counter < 6; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 18, d));
-			tripletList.push_back(T(counter + 18, counter, d));
-		}
 
-		/*
 		M.block(0, 21, 3, 3).diagonal().setConstant(c);
-		*/
-		for (int counter = 0; counter < 3; ++counter)
-		{
-			tripletList.push_back(T(counter, counter + 21, c));
-			tripletList.push_back(T(counter + 21, counter, c));
-		}
 
-		/*
 		// Symmetry
 		for (size_t row = 0; row < 24; ++row)
 		{
@@ -980,9 +415,7 @@ public:
 				M(col, row) = M(row, col);
 			}
 		}
-		*/
 
-		M.setFromTriplets(tripletList.begin(), tripletList.end());
 		M *= m_rho;
 		addSubMatrix(M, nodeIdsVectorForm, 3 , &m_expectedMassMatrix);
 	}
@@ -1035,9 +468,9 @@ public:
 		m_E = 1e6;
 		m_nu = 0.45;
 
-		m_expectedMassMatrix.resize(3 * 8, 3 * 8);
-		m_expectedDampingMatrix.resize(3 * 8, 3 * 8);
-		m_expectedStiffnessMatrix.resize(3 * 8, 3 * 8);
+		m_expectedMassMatrix.setZero(3 * 8, 3 * 8);
+		m_expectedDampingMatrix.setZero(3 * 8, 3 * 8);
+		m_expectedStiffnessMatrix.setZero(3 * 8, 3 * 8);
 		m_vectorOnes.setOnes(3 * 8);
 
 		computeExpectedMassMatrix(nodeIdsVectorForm);
@@ -1444,15 +877,15 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	cube->addMass(m_restState, &massMatrix);
 	EXPECT_TRUE(massMatrix.isApprox(m_expectedMassMatrix)) <<
 			"Expected mass matrix :" << std::endl << m_expectedMassMatrix  << std::endl << std::endl <<
-			"Mass matrix :"  << std::endl << massMatrix << std::endl << std::endl <<
-			"Error on the mass matrix is "  << std::endl << m_expectedMassMatrix - massMatrix << std::endl;
+			"Mass matrix :"  << std::endl << massMatrix << std::endl;
 
 	cube->addDamping(m_restState, &dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
 
 	cube->addStiffness(m_restState, &stiffnessMatrix);
-	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix)) <<
-			"Error on the stiffness matrix is " << std::endl << m_expectedStiffnessMatrix - stiffnessMatrix << std::endl;
+	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix))  <<
+			"Expected stiffness matrix :" << std::endl << m_expectedStiffnessMatrix  << std::endl << std::endl <<
+			"Stiffness matrix :"  << std::endl << stiffnessMatrix << std::endl;
 
 	forceVector.setZero();
 	massMatrix.setZero();

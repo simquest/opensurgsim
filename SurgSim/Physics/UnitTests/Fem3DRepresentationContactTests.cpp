@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
@@ -210,7 +211,13 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpCoordinateTest)
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
 	// C = dt * m^{-1}
-	Eigen::Matrix<double, 18, 18> C = dt * m_fem->computeM(*m_fem->getPreviousState()).inverse();
+	SurgSim::Math::Matrix C;
+	SurgSim::Math::SparseMatrix M(18, 18);
+	M = m_fem->computeM(*m_fem->getPreviousState());
+	SurgSim::Math::LinearSparseSolveAndInverseLU solver;
+	SurgSim::Math::Vector b = SurgSim::Math::Vector::Zero(18);
+	solver(M, b, nullptr, &C);
+	C *= dt;
 
 	EXPECT_NEAR_EIGEN(C * H.transpose(), mlcpPhysicsProblem.CHt, epsilon);
 
@@ -277,7 +284,13 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpIndiciesTest)
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H.block(indexOfConstraint, indexOfRepresentation, 1, 18), epsilon);
 
-	Eigen::Matrix<double, 18, 18> C = dt * m_fem->computeM(*m_fem->getPreviousState()).inverse();
+	SurgSim::Math::Matrix C;
+	SurgSim::Math::SparseMatrix M(18, 18);
+	M = m_fem->computeM(*m_fem->getPreviousState());
+	SurgSim::Math::LinearSparseSolveAndInverseLU solver;
+	SurgSim::Math::Vector b = SurgSim::Math::Vector::Zero(18);
+	solver(M, b, nullptr, &C);
+	C *= dt;
 
 	EXPECT_NEAR_EIGEN(
 		C * H.transpose(), mlcpPhysicsProblem.CHt.block(indexOfRepresentation, indexOfConstraint, 18, 1), epsilon);

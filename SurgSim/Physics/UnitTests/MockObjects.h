@@ -177,8 +177,8 @@ public:
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 									 const SurgSim::Math::Vector& generalizedForce,
-									 const SurgSim::Math::SparseMatrix& K,
-									 const SurgSim::Math::SparseMatrix& D) override;
+									 const SurgSim::Math::Matrix& K,
+									 const SurgSim::Math::Matrix& D) override;
 
 	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
 	/// This API will be tested in derived classes when the API will be provided
@@ -301,8 +301,8 @@ public:
 	virtual ~MockFemRepresentation();
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-									 const SurgSim::Math::Vector& generalizedForce, const SurgSim::Math::SparseMatrix& K,
-									 const SurgSim::Math::SparseMatrix& D) override;
+									 const SurgSim::Math::Vector& generalizedForce, const SurgSim::Math::Matrix& K,
+									 const SurgSim::Math::Matrix& D) override;
 
 	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
 

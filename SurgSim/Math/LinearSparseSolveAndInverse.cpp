@@ -24,10 +24,6 @@ namespace Math
 void LinearSparseSolveAndInverseLU::operator()(const SparseMatrix& A, const Vector& b, Vector* x, Matrix* Ainv)
 {
 	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
-
-	std::cout << "In Solver:" << std::endl;
-	std::cout << A << std::endl;
-
 	if (x != nullptr || Ainv != nullptr)
 	{
 		Eigen::SparseLU<SparseMatrix> lu;

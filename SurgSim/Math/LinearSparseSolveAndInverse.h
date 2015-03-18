@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_LINEARSOLVEANDINVERSE_H
-#define SURGSIM_MATH_LINEARSOLVEANDINVERSE_H
+#ifndef SURGSIM_MATH_LINEARSPARSESOLVEANDINVERSE_H
+#define SURGSIM_MATH_LINEARSPARSESOLVEANDINVERSE_H
 
 #include <Eigen/SparseCore>
 
@@ -56,4 +56,4 @@ public:
 
 }; // namespace SurgSim
 
-#endif // SURGSIM_MATH_LINEARSOLVEANDINVERSE_H
+#endif // SURGSIM_MATH_LINEARSPARSESOLVEANDINVERSE_H

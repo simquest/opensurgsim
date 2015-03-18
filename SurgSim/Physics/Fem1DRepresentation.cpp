@@ -16,7 +16,7 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Math/LinearSolveAndInverse.h"
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
@@ -71,8 +71,8 @@ RepresentationType Fem1DRepresentation::getType() const
 
 void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,
-		const SurgSim::Math::SparseMatrix& K,
-		const SurgSim::Math::SparseMatrix& D)
+		const SurgSim::Math::Matrix& K,
+		const SurgSim::Math::Matrix& D)
 {
 	const size_t dofPerNode = getNumDofPerNode();
 	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
@@ -112,15 +112,15 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			{
 				if (K.size() != 0)
 				{
-					Math::SparseMatrix scaledK = coordinate[index1] * coordinate[index2] * K;
-					Math::addSubMatrix(scaledK, dofPerNode * nodeId1, dofPerNode * nodeId2,
-									   dofPerNode, dofPerNode, &m_externalGeneralizedStiffness);
+					Math::Matrix scaledK = coordinate[index1] * coordinate[index2] * K;
+					Math::addSubMatrix(scaledK, nodeId1, nodeId2, dofPerNode, dofPerNode,
+									   &m_externalGeneralizedStiffness);
 				}
 				if (D.size() != 0)
 				{
-					Math::SparseMatrix scaledD = coordinate[index1] * coordinate[index2] * D;
-					SurgSim::Math::addSubMatrix(scaledD, dofPerNode * nodeId1, dofPerNode * nodeId2,
-												dofPerNode, dofPerNode, &m_externalGeneralizedDamping);
+					Math::Matrix scaledD = coordinate[index1] * coordinate[index2] * D;
+					SurgSim::Math::addSubMatrix(scaledD, nodeId1, nodeId2, dofPerNode, dofPerNode,
+												&m_externalGeneralizedDamping);
 				}
 				index2++;
 			}
@@ -133,7 +133,7 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 
 bool Fem1DRepresentation::doWakeUp()
 {
-	using SurgSim::Math::LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix;
+	using SurgSim::Math::LinearSparseSolveAndInverseLU;
 
 	if (!FemRepresentation::doWakeUp())
 	{
@@ -141,7 +141,10 @@ bool Fem1DRepresentation::doWakeUp()
 	}
 
 	// Make use of a specialized linear solver for symmetric tri-diagonal block matrix of block size 6
+	/* TODO: Replace SparseLU solve with targeted solver.
 	m_odeSolver->setLinearSolver(std::make_shared<LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<6>>());
+	*/
+	m_odeSolver->setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
 
 	return true;
 }

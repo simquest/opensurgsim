@@ -254,7 +254,9 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, ComputeRotationMassAndStiffness
 
 		ASSERT_NO_THROW(tet.computeRotationMassAndStiffness(m_state, &R, &M, &K));
 		EXPECT_TRUE(R.isIdentity());
-		EXPECT_TRUE(K.isApprox(tet.getNonRotatedStiffnessMatrix()));
+		EXPECT_TRUE(K.isApprox(tet.getNonRotatedStiffnessMatrix())) << std::endl << "K:" << std::endl <<
+				K << std::endl << "NonRotatedStiffnessMatrix:" << std::endl <<
+				tet.getNonRotatedStiffnessMatrix() << std::endl;
 		EXPECT_TRUE(M.isApprox(tet.getNonRotatedMassMatrix()));
 	}
 
@@ -288,7 +290,10 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, ComputeRotationMassAndStiffness
 		// But, these terms are in the order of epsilon is no scaling is involved in the transformation.
 		// They seem to account for the deformation part of the transformation and not the rigid transformation.
 		// A pure transformation (rotation + translation) is fully taken into account by the term R.K0.R^t
-		EXPECT_TRUE(K.isApprox(m_R12x12 * tet.getNonRotatedStiffnessMatrix() * m_R12x12.transpose()));
+		EXPECT_TRUE(K.isApprox(m_R12x12 * tet.getNonRotatedStiffnessMatrix() * m_R12x12.transpose()))
+				<< std::endl << "K:" << std::endl <<
+				K << std::endl << "NonRotatedStiffnessMatrix:" << std::endl <<
+				(m_R12x12 * tet.getNonRotatedStiffnessMatrix() * m_R12x12.transpose()) << std::endl;
 		EXPECT_FALSE(K.isApprox(tet.getNonRotatedStiffnessMatrix()));
 		EXPECT_TRUE(M.isApprox(m_R12x12 * tet.getNonRotatedMassMatrix() * m_R12x12.transpose()));
 	}

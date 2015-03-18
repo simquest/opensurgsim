@@ -446,7 +446,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 	{
 		SCOPED_TRACE("Almost Identity pose, limitted development in use");
 
-		Eigen::AngleAxisd angleAxis(0.2e-8, Vector3d(1.1, -1.4, 3.23).normalized());
+		Eigen::AngleAxisd angleAxis(5e-8, Vector3d(1.1, -1.4, 3.23).normalized());
 		Vector3d t(1.1, 2.2, 3.3);
 		RigidTransform3d transform = makeRigidTransform(Quaterniond(angleAxis), t);
 
@@ -477,7 +477,8 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
-		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7) << "K:" << std::endl << K << std::endl << "Knumeric:" <<
+				std::endl << Knumeric << std::endl;
 		EXPECT_LE((D - Dnumeric).cwiseAbs().maxCoeff(), 2e-7);
 	}
 }

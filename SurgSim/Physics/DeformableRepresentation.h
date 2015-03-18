@@ -85,8 +85,8 @@ public:
 	/// \param D The damping matrix associated with the generalized force (Jacobian of the force w.r.t dof's velocity)
 	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 			const SurgSim::Math::Vector& generalizedForce,
-			const SurgSim::Math::SparseMatrix& K = SurgSim::Math::SparseMatrix(),
-			const SurgSim::Math::SparseMatrix& D = SurgSim::Math::SparseMatrix()) = 0;
+			const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+			const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) = 0;
 
 	/// \return the external generalized force vector
 	const SurgSim::Math::Vector& getExternalGeneralizedForce() const;
