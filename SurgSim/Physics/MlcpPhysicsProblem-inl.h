@@ -49,7 +49,7 @@ void MlcpPhysicsProblem::updateConstraint(
 	typedef Math::Dynamic::Operation<double, Eigen::RowMajor, ptrdiff_t,
 		Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>> Operation;
 	Math::blockOperation<Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>, double, Eigen::RowMajor, ptrdiff_t>(
-		newSubH, indexNewSubH, indexSubC, &H, &Operation::assign);
+		newSubH, indexNewSubH, indexSubC, &H, &Operation::add);
 	CHt.block(indexSubC, indexNewSubH, subC.rows(), 1) += newCHt;
 	A.row(indexNewSubH) += newSubH * CHt.middleRows(indexSubC, subC.rows());
 }
