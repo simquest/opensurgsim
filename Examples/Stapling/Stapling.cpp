@@ -394,6 +394,8 @@ int main(int argc, char* argv[])
 	SurgSim::Framework::Logger::getLogger("Physics Manager")->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
 	SurgSim::Framework::Logger::getLogger(
 		"Physics/VirtualToolCoupler")->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
+	SurgSim::Framework::Logger::getLogger(
+		"Math/MlcpGaussSeidelSolver")->setThreshold(SurgSim::Framework::LOG_LEVEL_SEVERE);
 
 	std::shared_ptr<BehaviorManager> behaviorManager = std::make_shared<BehaviorManager>();
 	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
