@@ -67,11 +67,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationPerformanceTests, IntersectionTes
 		contacts += pair->getContacts().size();
 	}
 
-	RecordProperty("ContactsPerLoop", boost::to_string(pair->getContacts().size()));
-	RecordProperty("DurationPerLoop", boost::to_string(timer.getCumulativeTime() / loops));
-	RecordProperty("Loops", boost::to_string(loops));
-	RecordProperty("TotalContacts", boost::to_string(contacts));
-	RecordProperty("TotalDuration", boost::to_string(timer.getCumulativeTime()));
+	RecordProperty("FrameRate", boost::to_string(timer.getCumulativeTime() / loops));
+	RecordProperty("Duration", boost::to_string(timer.getCumulativeTime()));
 }
 
 }
