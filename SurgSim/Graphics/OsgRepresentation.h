@@ -37,9 +37,14 @@ namespace Graphics
 class OsgMaterial;
 class TangentSpaceGenerator;
 
+/// OSS default value for opengl values that have to be assigned a fixed number
+///@{
 static const int TANGENT_VERTEX_ATTRIBUTE_ID = 6;
 static const int BITANGENT_VERTEX_ATTRIBUTE_ID = 7;
 static const int DIFFUSE_TEXTURE_UNIT = 0;
+static const int NORMAL_TEXTURE_UNIT = 1;
+static const int SHADOW_TEXTURE_UNIT = 8;
+///@}
 
 /// Base OSG implementation of a graphics representation.
 ///
