@@ -34,7 +34,7 @@ using SurgSim::Math::Vector3d;
 
 namespace
 {
-	
+
 RigidTransform3d makeRigidTransform(const Leap::Matrix& rotation, const Leap::Vector& translation,
 		bool isRightHanded = true)
 {
@@ -43,7 +43,7 @@ RigidTransform3d makeRigidTransform(const Leap::Matrix& rotation, const Leap::Ve
 	{
 		matrix.zBasis *= -1.0;
 	}
-	
+
 	// Convert milimeters to meters
 	matrix.origin = translation * 0.001;
 
@@ -241,7 +241,7 @@ void LeapScaffold::handleFrame()
 
 	std::list<Leap::HandList::const_iterator> newHands;
 	Leap::HandList hands = m_state->controller.frame().hands();
-  	for (auto hand = hands.begin(); hand != hands.end(); ++hand)
+	for (auto hand = hands.begin(); hand != hands.end(); ++hand)
 	{
 		auto sameHandId = [hand](const std::unique_ptr<DeviceData>& info)
 		{
