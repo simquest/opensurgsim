@@ -15,14 +15,11 @@
 
 #include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
-#include "SurgSim/DataStructures/EmptyData.h"
-#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Timer.h"
-#include "SurgSim/Math/Vector.h"
 
-using SurgSim::DataStructures::TriangleMeshPlain;
+using SurgSim::Math::MeshShape;
+using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
 namespace SurgSim
@@ -30,18 +27,8 @@ namespace SurgSim
 namespace Collision
 {
 
-void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
-	const RigidTransform3d& meshATransform,
-	std::shared_ptr<MeshShape> meshB,
-	const RigidTransform3d& meshBTransform)
-{
-}
-
 TEST(TriangleMeshTriangleMeshContactCalculationPerformanceTests, IntersectionTest)
 {
-	using SurgSim::Math::MeshShape;
-	using SurgSim::Math::Vector3d;
-	using SurgSim::Math::RigidTransform3d;
 
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	auto meshA = std::make_shared<MeshShape>();
@@ -69,6 +56,11 @@ TEST(TriangleMeshTriangleMeshContactCalculationPerformanceTests, IntersectionTes
 		pair->clearContacts();
 		meshARep->getCollisions().unsafeGet().clear();
 		meshBRep->getCollisions().unsafeGet().clear();
+		RigidTransform3d pose = 
+			Math::makeRigidTransform(Math::makeRotationQuaternion(2.0 * M_PI * i / loops, Vector3d::UnitX().eval()),
+			Vector3d(i, -1.5 * i, 0.0));
+		meshARep->setLocalPose(pose);
+		meshBRep->setLocalPose(pose);
 		timer.beginFrame();
 		calcContact.calculateContact(pair);
 		timer.endFrame();
