@@ -213,7 +213,7 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
 	typedef Math::Dynamic::Operation<double, Eigen::RowMajor, ptrdiff_t,
 		Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>> Operation;
 	Math::blockOperation<Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>, double, Eigen::RowMajor, ptrdiff_t>(
-		localH, 1, 5, &mlcpPhysicsProblem.H, &Operation::assign);
+		localH, 1, 5, &mlcpPhysicsProblem.H, &Operation::add);
 
 	Eigen::Matrix<double, 5, 5> localC;
 	localC <<
