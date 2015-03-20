@@ -19,10 +19,10 @@ namespace Blocks
 
 /// Load and add a given texture to the material
 /// \param material The material for adding the texture
-/// \param uniform The name of the unifor to use
+/// \param uniform The name of the uniform to use
 /// \param unit The texture unit to use
 /// \param filename The file to use for the texture,
-/// \param repead whether to create the texture as repeating
+/// \param repeat whether to create the texture as repeating
 void add2DTexture(std::shared_ptr<SurgSim::Graphics::OsgMaterial> material,
 				  const std::string& uniform,
 				  int unit,
