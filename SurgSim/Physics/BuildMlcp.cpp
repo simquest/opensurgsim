@@ -104,7 +104,6 @@ std::shared_ptr<PhysicsManagerState>
 		(*it)->build(dt, &result->getMlcpProblem(), indexRepresentation0, indexRepresentation1, indexConstraint);
 	}
 
-	result->getMlcpProblem().H.makeCompressed();
 	return result;
 }
 
