@@ -19,7 +19,7 @@
 #include <list>
 
 #include "SurgSim/DataStructures/Tree.h"
-
+#include "SurgSim/DataStructures/AabbTreeData.h"
 #include "SurgSim/Math/Aabb.h"
 
 namespace SurgSim
@@ -50,13 +50,17 @@ public:
 	/// \return the number of objects per node that will trigger a split for this tree
 	size_t getMaxObjectsPerNode() const;
 
-
 	/// Add a give object identified by objectId to the tree, this id should be unqiue on the users side, but no
 	/// checks are made in the inside of the tree
 	/// \param aabb AABB of this object.
 	/// \param objectId Id for the object to be identified with this bounding box
 	void add(const SurgSim::Math::Aabbd& aabb, size_t objectId);
 
+	/// Create the tree from a list of tree items, all the tree information will be deleted
+	/// \param items list of items to insert into the tree
+	void set(const std::list<AabbTreeData::Item>& items);
+
+	/// \return the AABB for the tree
 	const SurgSim::Math::Aabbd& getAabb() const;
 
 	/// Type indicating a relationship between two AabbTreeNodes
