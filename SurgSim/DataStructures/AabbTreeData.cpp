@@ -102,10 +102,10 @@ std::shared_ptr<AabbTreeData> AabbTreeData::takeLargerElements()
 	int axis;
 	m_aabb.sizes().maxCoeff(&axis);
 	double centerValue = m_aabb.center()(axis);
-	/// HS-2015-03-20
-	/// The new left and right aabb extents can probably be calculated here
-	/// Only the separating axis extents would change the other two axis are unaffected
-	/// #performance
+	// HS-2015-03-20
+	// The new left and right aabb extents can probably be calculated here
+	// Only the separating axis extents would change the other two axis are unaffected
+	// #performance
 	auto functor = [centerValue, axis](const Item & item)
 	{
 		return item.first.center()(axis) < centerValue;
