@@ -16,7 +16,7 @@
 #include "SurgSim/DataStructures/AabbTreeNode.h"
 #include "SurgSim/DataStructures/AabbTreeData.h"
 
-#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {
@@ -32,19 +32,43 @@ AabbTreeNode::~AabbTreeNode()
 
 }
 
-void AabbTreeNode::splitNode()
+void AabbTreeNode::splitNode(size_t maxNodeData)
 {
 	auto leftData = std::static_pointer_cast<AabbTreeData>(getData());
-	if (leftData->getSize() > 0)
+	if (leftData->getSize() > maxNodeData)
 	{
 		std::shared_ptr<AabbTreeData> rightData = leftData->takeLargerElements();
+		std::shared_ptr<AabbTreeNode> leftChild;
+		std::shared_ptr<AabbTreeNode> rightChild;
+
+		// Early exit, takeLargerElements() may not be able to split the list, in this
+		// case we abort the splitNode.
+		if (leftData->getSize() == 0 || rightData->getSize() == 0)
+		{
+			auto count = std::max(leftData->getSize(), rightData->getSize());
+
+			// Arbitrary value 10
+			if (maxNodeData > 0 && count > 2 * maxNodeData)
+			{
+				SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
+						<< "The aabb tree build process encountered some items that could not be split anymore "
+						<< "this may cause suboptimal behavior when querying the aabb tree.";
+			}
+			return;
+		}
+
 		if (getNumChildren() != 2)
 		{
-			std::shared_ptr<TreeNode> child = std::make_shared<AabbTreeNode>();
-			addChild(std::move(child));
+			leftChild = std::make_shared<AabbTreeNode>();
+			addChild(leftChild);
 
-			child = std::make_shared<AabbTreeNode>();
-			addChild(std::move(child));
+			rightChild = std::make_shared<AabbTreeNode>();
+			addChild(rightChild);
+		}
+		else
+		{
+			leftChild = std::static_pointer_cast<AabbTreeNode>(getChild(0));
+			rightChild = std::static_pointer_cast<AabbTreeNode>(getChild(1));
 		}
 
 		// Update the local aabb
@@ -53,9 +77,22 @@ void AabbTreeNode::splitNode()
 		m_aabb.extend(rightData->getAabb());
 		m_aabb.sizes().maxCoeff(&m_axis);
 
-		getChild(0)->setData(std::move(leftData));
-		getChild(1)->setData(std::move(rightData));
 		setData(nullptr);
+
+		size_t leftCount = leftData->getSize();
+		size_t rightCount = rightData->getSize();
+
+		leftChild->setData(std::move(leftData));
+		if (maxNodeData > 0 && leftCount > maxNodeData)
+		{
+			leftChild->splitNode(maxNodeData);
+		}
+
+		rightChild->setData(std::move(rightData));
+		if (maxNodeData > 0 && rightCount > maxNodeData)
+		{
+			rightChild->splitNode(maxNodeData);
+		}
 	}
 }
 
@@ -96,6 +133,26 @@ void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t m
 			splitNode();
 		}
 	}
+}
+
+void AabbTreeNode::setData(const std::list<AabbTreeData::Item>& items, size_t maxNodeData)
+{
+	SURGSIM_ASSERT(getNumChildren() == 0) << "Can't call setData on a node that already has nodes";
+	SURGSIM_ASSERT(getData() == nullptr) << "Can't call setData on a node that already has data.";
+
+	auto data = std::make_shared<AabbTreeData>(items);
+	setData(data);
+	splitNode(maxNodeData);
+}
+
+void AabbTreeNode::setData(std::list<AabbTreeData::Item>&& items, size_t maxNodeData)
+{
+	SURGSIM_ASSERT(getNumChildren() == 0) << "Can't call setData on a node that already has nodes";
+	SURGSIM_ASSERT(getData() == nullptr) << "Can't call setData on a node that already has data.";
+
+	auto data = std::make_shared<AabbTreeData>(items);
+	setData(data);
+	splitNode(maxNodeData);
 }
 
 bool AabbTreeNode::doAccept(TreeVisitor* visitor)

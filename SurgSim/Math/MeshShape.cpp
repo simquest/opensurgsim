@@ -16,6 +16,7 @@
 #include "SurgSim/Math/MeshShape.h"
 
 #include "SurgSim/DataStructures/AabbTree.h"
+#include "SurgSim/DataStructures/AabbTreeData.h"
 #include "SurgSim/Framework/Assert.h"
 
 using SurgSim::DataStructures::EmptyData;
@@ -63,9 +64,9 @@ bool MeshShape::calculateNormals()
 		if (normal.isZero())
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Math/MeshShape")) <<
-				"MeshShape::calculateNormals unable to calculate normals. For example, for triangle #" << i <<
-				" with vertices:" << std::endl << "1: " << vertex0.transpose() << std::endl <<
-				"2: " << vertex1.transpose() << std::endl << "3: " << vertex2.transpose();
+					"MeshShape::calculateNormals unable to calculate normals. For example, for triangle #" << i <<
+					" with vertices:" << std::endl << "1: " << vertex0.transpose() << std::endl <<
+					"2: " << vertex1.transpose() << std::endl << "3: " << vertex2.transpose();
 			result = false;
 			break;
 		}
@@ -236,15 +237,20 @@ void MeshShape::updateAabbTree()
 {
 	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
 
+	std::list<DataStructures::AabbTreeData::Item> items;
+
 	auto const& triangles = getTriangles();
-	for (size_t id = 0; id < triangles.size(); ++id)
+
+	for (size_t id = 0, count = triangles.size(); id < count; ++id)
 	{
 		if (triangles[id].isValid)
 		{
 			const auto& vertices = getTrianglePositions(id);
-			m_aabbTree->add(SurgSim::Math::makeAabb(vertices[0], vertices[1], vertices[2]), id);
+			Aabbd aabb(SurgSim::Math::makeAabb(vertices[0], vertices[1], vertices[2]));
+			items.emplace_back(std::make_pair(std::move(aabb), id));
 		}
 	}
+	m_aabbTree->set(std::move(items));
 }
 
 }; // namespace Math
