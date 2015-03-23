@@ -45,7 +45,7 @@ SurgSim::Framework::Scene:
               ScreenDistance: 1
               ScreenWidth: 0
               CameraManipulatorEnabled: true
-              CameraPosition: [0, 0.5, 0.5]
+              CameraPosition: [0, 0.35, 0.35]
               CameraLookAt: [0, 0, 0]
               OsgMapUniforms: false
               KeyboardDeviceEnabled: true
@@ -60,7 +60,7 @@ SurgSim::Framework::Scene:
           - SurgSim::Framework::PoseComponent:
               Pose:
                 Quaternion: [0, 0, 0, 1]
-                Translation: [0, -0.2, 0]
+                Translation: [0, 0, 0]
               IsLocalActive: true
               Id: 194f4f32-bfc6-4b22-bc42-b80ee0414edd
               Name: Pose
@@ -214,6 +214,9 @@ SurgSim::Framework::Scene:
               DeviceName: MultiAxisDevice
               Id: 94c01580-98ac-49b1-b8c7-626ace6dbbfd
               IsLocalActive: true
+              LocalPose:
+                Quaternion: [0, 0, 0, 1]
+                Translation: [0, 0.01, 0]
               Name: InputComponent
           - SurgSim::Physics::RigidCollisionRepresentation:
               IsLocalActive: true
@@ -332,7 +335,7 @@ SurgSim::Framework::Scene:
               Name: Pose
               Pose:
                 Quaternion: [0, 0, 0, 1]
-                Translation: [0, -0.2, 0]
+                Translation: [0, 0, 0]
           - SurgSim::Graphics::OsgMeshRepresentation:
               IsLocalActive: false
               MeshFileName: Geometry/wound_deformable.ply
