@@ -298,6 +298,47 @@ bool calculateContactTriangleTriangle(
 											penetrationPoint0, penetrationPoint1, contactNormal);
 }
 
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangle2(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0n,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
+	T* penetrationDepth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
+{
+	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
+
+	// Check if the triangles intersect.
+	if (!doesIntersectTriangleTriangle(t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t0n, t1n))
+	{
+		return false;
+	}
+
+	// When control reaches here, the two triangles are definitely intersecting.
+	// Calculate the deepest penetration along each of the triangle normals.
+
+	TriangleHelper<T, MOpt> triangle1(t0v0, t0v1, t0v2, t0n);
+	TriangleHelper<T, MOpt> triangle2(t1v0, t1v1, t1v2, t1n);
+
+	// Calculate deepest penetration for each of the triangle.
+	triangle1.findDeepestPenetrationWithTriangle(
+		triangle2, &penetrationDepth[0], &penetrationPoint0[0], &penetrationPoint0[1]);
+	contactNormal[0] = t1n;
+
+	triangle2.findDeepestPenetrationWithTriangle(
+		triangle1, &penetrationDepth[1], &penetrationPoint1[1], &penetrationPoint1[0]);
+	contactNormal[1] = -t0n;
+
+	return true;
+}
+
 
 } // namespace Math
 

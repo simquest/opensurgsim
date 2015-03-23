@@ -129,6 +129,11 @@ public:
 	/// \return A contact constraint implementation or nullptr.
 	std::shared_ptr<ConstraintImplementation> getConstraintImplementation(SurgSim::Math::MlcpConstraintType type);
 
+	/// Get the velocity at the given localization.
+	/// \param localization The localization of the point at which velocity needs to be found.
+	/// \return The velocity at the given point.
+	virtual Math::Vector3d getVelocityAt(std::shared_ptr<Localization> localization);
+
 protected:
 	/// Set the number of degrees of freedom
 	/// \param numDof The number of degrees of freedom

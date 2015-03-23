@@ -133,6 +133,12 @@ std::shared_ptr<ConstraintImplementation> Representation::getConstraintImplement
 	return implementation;
 }
 
+Math::Vector3d Representation::getVelocityAt(std::shared_ptr<Localization> localization)
+{
+	SURGSIM_LOG_SEVERE(m_logger) << getClassName() << ": getVelocityAt() not defined.";
+	return Math::Vector3d::Zero();
+}
+
 void Representation::driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	if (isDrivingSceneElementPose())

@@ -118,6 +118,7 @@ public:
 
 	void beforeUpdate(double dt) override;
 	void afterUpdate(double dt) override;
+	Math::Vector3d getVelocityAt(std::shared_ptr<Localization> localization) override;
 
 protected:
 	bool doInitialize() override;

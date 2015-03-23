@@ -284,6 +284,24 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 	return result;
 }
 
+Math::Vector3d Fem3DRepresentation::getVelocityAt(std::shared_ptr<Localization> localization)
+{
+	Math::Vector3d velocity(0.0, 0.0, 0.0);
+	auto femLocalization = std::dynamic_pointer_cast<Fem3DRepresentationLocalization>(localization);
+	if (femLocalization != nullptr)
+	{
+		auto& coordinate = femLocalization->getLocalPosition();
+		auto element = getFemElement(coordinate.index);
+		auto& elementVertices = element->getNodeIds();
+
+		for (size_t i = 0; i < elementVertices.size(); ++i)
+		{
+			velocity += m_currentState->getVelocity(elementVertices[i]) * coordinate.coordinate[i];
+		}
+	}
+	return velocity;
+}
+
 void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 		const SurgSim::Math::RigidTransform3d& transform)
 {

@@ -211,6 +211,18 @@ void SurgSim::Physics::RigidRepresentationBase::afterUpdate(double dt)
 	driveSceneElementPose(m_finalState.getPose() * getLocalPose().inverse());
 }
 
+Math::Vector3d RigidRepresentationBase::getVelocityAt(std::shared_ptr<Localization> localization)
+{
+	Math::Vector3d velocity(0.0, 0.0, 0.0);
+	auto rigidBaseLocalization = std::dynamic_pointer_cast<RigidRepresentationBaseLocalization>(localization);
+	if (rigidBaseLocalization != nullptr)
+	{
+		Math::Vector3d localPosition = rigidBaseLocalization->getLocalPosition() - getMassCenter();
+		velocity = m_currentState.getLinearVelocity() + m_currentState.getAngularVelocity().cross(localPosition);
+	}
+	return velocity;
+}
+
 void RigidRepresentationBase::setCollisionRepresentation(
 	std::shared_ptr<SurgSim::Collision::Representation> representation)
 {

@@ -58,6 +58,7 @@ public:
 			const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
 	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location&) override;
+	Math::Vector3d getVelocityAt(std::shared_ptr<Localization> localization) override;
 
 protected:
 	bool doWakeUp() override;

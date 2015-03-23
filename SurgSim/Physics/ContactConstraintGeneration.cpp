@@ -107,10 +107,18 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 				auto data = std::make_shared<ContactConstraintData>();
 				data->setPlaneEquation((*contactsIt)->normal, (*contactsIt)->depth);
 
-				constraints.push_back(std::make_shared<Constraint>(
+				auto constraint = std::make_shared<Constraint>(
 					SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, data,
 					physicsRepresentations.first, *locations.first,
-					physicsRepresentations.second, *locations.second));
+					physicsRepresentations.second, *locations.second);
+
+				auto localizations = constraint->getLocalizations();
+				auto velocity = (physicsRepresentations.first->getVelocityAt(localizations.first) -
+								 physicsRepresentations.second->getVelocityAt(localizations.second)).normalized();
+				if (velocity.dot(data->getNormal()) < -1e-9)
+				{
+					constraints.push_back(constraint);
+				}
 			}
 		}
 	}
