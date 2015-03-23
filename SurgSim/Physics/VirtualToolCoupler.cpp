@@ -246,14 +246,14 @@ bool VirtualToolCoupler::doWakeUp()
 {
 	if (m_input == nullptr)
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "VirtualToolCoupler named " <<
-				getName() << " does not have an Input Component.";
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Physics/VirtualToolCoupler")) <<
+			"VirtualToolCoupler named " << getName() << " does not have an Input Component.";
 		return false;
 	}
 	if (m_rigid == nullptr)
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "VirtualToolCoupler named " <<
-				getName() << " does not have a Representation.";
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Physics/VirtualToolCoupler")) <<
+			"VirtualToolCoupler named " << getName() << " does not have a Representation.";
 		return false;
 	}
 
@@ -328,7 +328,10 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-
+	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Physics/VirtualToolCoupler")) <<
+		"VirtualToolCoupler named '" << getName() << "' has linear stiffness " << m_linearStiffness <<
+		", linear damping " << m_linearDamping << ", angular stiffness " << m_angularStiffness <<
+		", and angular damping " << m_angularDamping << ". Its Physics Representation has mass " << m_rigid->getMass();
 	return true;
 }
 
