@@ -76,7 +76,7 @@ public:
 
 protected:
 	/// Preallocated variable for derived implementations of doBuild.
-	Eigen::SparseVector<double, 0, ptrdiff_t> m_newH;
+	Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t> m_newH;
 
 private:
 
