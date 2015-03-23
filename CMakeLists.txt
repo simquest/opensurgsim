@@ -54,7 +54,7 @@ find_package(OpenThreads)
 find_package(OpenGL)
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	find_package(Eigen3 3.2.1 REQUIRED)
-else(WIN32)
+elseif(WIN32)
 	find_package(Eigen3 3.2.3 REQUIRED)
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
