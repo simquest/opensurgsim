@@ -39,7 +39,7 @@ if(MSVC)
 		"${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_RELWITHDEBINFO
 		"${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}")
-	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_MINSIZREL
+	set_target_properties(yaml-cpp-lib PROPERTIES IMPORTED_LOCATION_MINSIZEREL
 		"${install_dir}/lib/libyaml-cppmd${CMAKE_STATIC_LIBRARY_SUFFIX}")
 		
 else()
