@@ -1,0 +1,92 @@
+Group {
+  UniqueID Group_0
+  DataVariance STATIC
+  nodeMask 0xffffffff
+  cullingActive TRUE
+  StateSet {
+    rendering_hint DEFAULT_BIN
+    renderBinMode INHERIT
+    GL_NORMALIZE ON
+  }
+  num_children 1
+  Group {
+    name "floor.obj"
+    nodeMask 0xffffffff
+    cullingActive TRUE
+    num_children 1
+    Geode {
+      nodeMask 0xffffffff
+      cullingActive TRUE
+      num_drawables 1
+      Geometry {
+        DataVariance STATIC
+        StateSet {
+          DataVariance STATIC
+          rendering_hint DEFAULT_BIN
+          renderBinMode INHERIT
+          Material {
+            name "floor_mat_floor.png"
+            ColorMode OFF
+            ambientColor 0 0 0 1
+            diffuseColor 0.4096 0.4096 0.4096 1
+            specularColor 1 1 1 1
+            emissionColor 0 0 0 1
+            shininess 24.832
+          }
+          textureUnit 0 {
+            GL_TEXTURE_2D ON
+            Texture2D {
+              file "floor.png"
+              wrap_s REPEAT
+              wrap_t REPEAT
+              wrap_r REPEAT
+              min_filter LINEAR_MIPMAP_LINEAR
+              mag_filter LINEAR
+              maxAnisotropy 1
+              borderColor 0 0 0 0
+              borderWidth 0
+              useHardwareMipMapGeneration TRUE
+              unRefImageDataAfterApply TRUE
+              internalFormatMode USE_IMAGE_DATA_FORMAT
+              resizeNonPowerOfTwo TRUE
+              shadowComparison FALSE
+              shadowCompareFunc GL_LEQUAL
+              shadowTextureMode GL_LUMINANCE
+            }
+          }
+        }
+        useDisplayList TRUE
+        useVertexBufferObjects FALSE
+        PrimitiveSets 1
+        {
+          DrawElementsUShort TRIANGLE_STRIP 4
+          {
+            1 2 0 3 
+          }
+        }
+        VertexArray Vec3Array 4
+        {
+          -3.42059 -0.646821 -4.83612
+          -3.42059 -0.646821 3.66316
+          3.35483 -0.646821 3.66316
+          3.35483 -0.646821 -4.83612
+        }
+        NormalBinding PER_VERTEX
+        NormalArray Vec3Array 4
+        {
+          0 1 0
+          0 1 0
+          0 1 0
+          0 1 0
+        }
+        TexCoordArray 0 Vec2Array 4
+        {
+          0.101424 0
+          0.101424 1
+          0.898576 1
+          0.898576 0
+        }
+      }
+    }
+  }
+}
