@@ -330,6 +330,13 @@ void Fem3DElementCorotationalTetrahedron::computeRotationMassAndStiffness(const 
 	}
 }
 
+SurgSim::Math::Quaterniond Fem3DElementCorotationalTetrahedron::getOrientation(const SurgSim::Math::OdeState& state) const
+{
+	SurgSim::Math::Matrix33d R;
+	computeRotationMassAndStiffness(state, &R, nullptr, nullptr);
+	return SurgSim::Math::Quaterniond(R);
+}
+
 }; // namespace Physics
 
 }; // namespace SurgSim

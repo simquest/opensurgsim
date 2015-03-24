@@ -198,6 +198,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 		}
 
 		case MLCP_BILATERAL_3D_CONSTRAINT:
+		case MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT:
 		{
 			const double criteria = (b.segment<3>(currentAtomicIndex) +
 				A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution).norm();
@@ -312,6 +313,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 			}
 
 			case MLCP_BILATERAL_3D_CONSTRAINT:
+			case MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT:
 			{
 				systemSize += 3;
 				systemSizeWithoutConstraintID += 3;
@@ -352,6 +354,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 		}
 
 		case MLCP_BILATERAL_3D_CONSTRAINT:
+		case MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT:
 		{
 			systemSize += 3;
 			break;
@@ -419,6 +422,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 		}
 
 		case MLCP_BILATERAL_3D_CONSTRAINT:
+		case MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT:
 		{
 			// Coupling part (fill up LHS and RHS)
 			m_rhsEnforcedLocalSystem.segment<3>(systemSizeWithoutConstraintID) =
@@ -498,6 +502,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 		}
 
 		case MLCP_BILATERAL_3D_CONSTRAINT:
+		case MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT:
 		{
 			(*initialGuessAndSolution).segment<3>(currentAtomicIndex) -=
 				A.block<3, 3>(currentAtomicIndex, currentAtomicIndex).inverse() *
@@ -683,6 +688,7 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 		}
 
 		case MLCP_BILATERAL_3D_CONSTRAINT:
+		case MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT:
 		{
 			Vector3d violation = b.segment<3>(currentAtomicIndex) +
 				A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution;

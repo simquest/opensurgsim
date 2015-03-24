@@ -36,6 +36,8 @@ inline std::string getMlcpConstraintTypeName(MlcpConstraintType constraintType)
 		return "MLCP_BILATERAL_2D_CONSTRAINT";
 	case MLCP_BILATERAL_3D_CONSTRAINT:
 		return "MLCP_BILATERAL_3D_CONSTRAINT";
+	case MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT:
+		return "MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT";
 //	case MLCP_BILATERAL_4D_CONSTRAINT:
 //		return "MLCP_BILATERAL_4D_CONSTRAINT";
 	case MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
@@ -66,6 +68,10 @@ inline MlcpConstraintType getMlcpConstraintTypeValue(const std::string& typeName
 	else if (typeName == "MLCP_BILATERAL_3D_CONSTRAINT")
 	{
 		return MLCP_BILATERAL_3D_CONSTRAINT;
+	}
+	else if (typeName == "MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT")
+	{
+		return MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT;
 	}
 // 	else if (typeName == "MLCP_BILATERAL_4D_CONSTRAINT")
 // 	{

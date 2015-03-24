@@ -65,6 +65,8 @@ public:
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result) override;
 
+	SurgSim::Math::Quaterniond getOrientation(const SurgSim::Math::OdeState& state) const override;
+
 protected:
 	/// Compute the rotation, mass and stiffness matrices of the element from the given state
 	/// \param state The state to compute the rotation and jacobians from

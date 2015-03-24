@@ -20,6 +20,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Constraint.cpp
 	ConstraintComponent.cpp
 	ConstraintData.cpp
+	ConstraintDataRotationVector.cpp
 	ConstraintImplementation.cpp
 	ConstraintImplementationFactory.cpp
 	ContactConstraintGeneration.cpp
@@ -40,6 +41,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DPlyReaderDelegate.cpp
 	Fem3DRepresentation.cpp
 	Fem3DRepresentationBilateral3D.cpp
+	Fem3DRepresentationConstraintRotationVector.cpp
 	Fem3DRepresentationContact.cpp
 	Fem3DRepresentationLocalization.cpp
 	FemElement.cpp
@@ -67,6 +69,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentationBase.cpp
 	RigidRepresentationBaseLocalization.cpp
 	RigidRepresentationBilateral3D.cpp
+	RigidRepresentationConstraintRotationVector.cpp
 	RigidRepresentationContact.cpp
 	RigidRepresentationState.cpp
 	SolveMlcp.cpp
@@ -81,6 +84,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Constraint.h
 	ConstraintComponent.h
 	ConstraintData.h
+	ConstraintDataRotationVector.h
 	ConstraintImplementation.h
 	ConstraintImplementationFactory.h
 	ContactConstraintData.h
@@ -102,6 +106,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DPlyReaderDelegate.h
 	Fem3DRepresentation.h
 	Fem3DRepresentationBilateral3D.h
+	Fem3DRepresentationConstraintRotationVector.h
 	Fem3DRepresentationContact.h
 	Fem3DRepresentationLocalization.h
 	FemElement.h
@@ -134,6 +139,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationBase-inl.h
 	RigidRepresentationBaseLocalization.h
 	RigidRepresentationBilateral3D.h
+	RigidRepresentationConstraintRotationVector.h
 	RigidRepresentationContact.h
 	RigidRepresentationState.h
 	SolveMlcp.h

@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -187,6 +188,11 @@ public:
 	virtual SurgSim::Math::Vector computeNaturalCoordinate(
 		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& cartesianCoordinate) const = 0;
+
+	/// Computes the element orientation for a given state
+	/// \param state The state to compute the element orientation from
+	/// \return the element orientation in state
+	virtual SurgSim::Math::Quaterniond getOrientation(const SurgSim::Math::OdeState& state) const = 0;
 
 protected:
 	/// Sets the number of degrees of freedom per node

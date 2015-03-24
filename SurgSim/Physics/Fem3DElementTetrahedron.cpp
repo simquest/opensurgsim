@@ -442,6 +442,26 @@ SurgSim::Math::Vector Fem3DElementTetrahedron::computeNaturalCoordinate(
 	return result;
 }
 
+SurgSim::Math::Quaterniond Fem3DElementTetrahedron::getOrientation(const SurgSim::Math::OdeState& state) const
+{
+	std::array<Vector3d, 4> nodes =
+	{{
+		state.getPosition(getNodeId(0)),
+		state.getPosition(getNodeId(1)),
+		state.getPosition(getNodeId(2)),
+		state.getPosition(getNodeId(3))
+	}};
+	Vector3d i = (nodes[1] - nodes[0]).normalized(), j = (nodes[2] - nodes[0]).normalized(), k;
+	k = i.cross(j).normalized();
+	j = k.cross(i).normalized();
+	SurgSim::Math::Matrix33d R;
+	R.col(0) = i;
+	R.col(1) = j;
+	R.col(2) = k;
+
+	return SurgSim::Math::Quaterniond(R);
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

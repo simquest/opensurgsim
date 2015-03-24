@@ -114,6 +114,23 @@ inline T computeAngle(const Eigen::Quaternion<T, QOpt>& quaternion)
 	}
 }
 
+/// Get the vector corresponding to the rotation between 2 quaternions.
+/// \tparam Derived the Quaternion type.  Can usually be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the vector argument.  Can be deduced.
+/// \param end the quaternion after the rotation.
+/// \param start the quaternion before the rotation.
+/// \param[out] rotationVector a vector describing the rotation.
+template <typename Derived, int VOpt>
+void computeRotationVector(const Eigen::QuaternionBase<Derived>& end,
+						   const Eigen::QuaternionBase<Derived>& start,
+						   Eigen::Matrix<typename Derived::Scalar, 3, 1, VOpt>* rotationVector)
+{
+	typename Derived::Scalar angle;
+	Eigen::Matrix<typename Derived::Scalar, 3, 1, VOpt> axis;
+	computeAngleAndAxis((end * start.inverse()).normalized(), &angle, &axis);
+	*rotationVector = angle * axis;
+}
+
 /// Get the vector corresponding to the rotation between transforms.
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
 /// \tparam TOpt the option flags (alignment etc.) used for the transform arguments.  Can be deduced.
@@ -126,12 +143,7 @@ void computeRotationVector(const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& 
 						   const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& start,
 						   Eigen::Matrix<T, 3, 1, VOpt>* rotationVector)
 {
-	Eigen::Quaternion<T> q1(end.linear());
-	Eigen::Quaternion<T> q2(start.linear());
-	double angle;
-	Eigen::Matrix<T, 3, 1, VOpt> axis;
-	computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
-	*rotationVector = angle * axis;
+	computeRotationVector(Eigen::Quaternion<T>(end.linear()), Eigen::Quaternion<T>(start.linear()), rotationVector);
 }
 
 /// Interpolate (slerp) between 2 quaternions

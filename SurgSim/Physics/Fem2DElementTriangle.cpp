@@ -317,7 +317,7 @@ void Fem2DElementTriangle::computeStiffness(const SurgSim::Math::OdeState& state
 	}
 }
 
-SurgSim::Math::Matrix33d Fem2DElementTriangle::computeRotation(const SurgSim::Math::OdeState& state)
+SurgSim::Math::Matrix33d Fem2DElementTriangle::computeRotation(const SurgSim::Math::OdeState& state) const
 {
 	SurgSim::Math::Matrix33d rotation;
 
@@ -377,6 +377,11 @@ SurgSim::Math::Vector Fem2DElementTriangle::computeNaturalCoordinate(
 {
 	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
 	return SurgSim::Math::Vector3d::Zero();
+}
+
+SurgSim::Math::Quaterniond Fem2DElementTriangle::getOrientation(const SurgSim::Math::OdeState& state) const
+{
+	return SurgSim::Math::Quaterniond(computeRotation(state));
 }
 
 void Fem2DElementTriangle::computeIntegral_dTd()

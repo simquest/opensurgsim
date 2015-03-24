@@ -17,12 +17,14 @@
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
+#include "SurgSim/Physics/Fem3DRepresentationConstraintRotationVector.h"
 #include "SurgSim/Physics/Fem3DRepresentationContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
 #include "SurgSim/Physics/FixedRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
+#include "SurgSim/Physics/RigidRepresentationConstraintRotationVector.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
 
 namespace SurgSim
@@ -38,6 +40,8 @@ ConstraintImplementationFactory::ConstraintImplementationFactory()
 	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedRepresentationBilateral3D>());
 	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidRepresentationBilateral3D>());
 	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DRepresentationBilateral3D>());
+	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidRepresentationConstraintRotationVector>());
+	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DRepresentationConstraintRotationVector>());
 }
 
 ConstraintImplementationFactory::~ConstraintImplementationFactory()

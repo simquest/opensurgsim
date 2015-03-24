@@ -31,6 +31,8 @@ enum MlcpConstraintType
 	MLCP_BILATERAL_2D_CONSTRAINT,
 	// Fixing 3 DOF (could be a fixed point in 3D space for example)
 	MLCP_BILATERAL_3D_CONSTRAINT,
+	// Fixing 3 DOF (Rotation vector)
+	MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT,
 	// Fixing 4 DOF (could be a fixed point with twist included for the MechanicalSpline for example)
 	//	MLCP_BILATERAL_4D_CONSTRAINT,
 	// Frictionless contact (could be in 2D or 3D => only 1 atomic unilateral constraint)

@@ -149,11 +149,13 @@ public:
 	SurgSim::Math::Vector computeNaturalCoordinate(const SurgSim::Math::OdeState& state,
 			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
+	SurgSim::Math::Quaterniond getOrientation(const SurgSim::Math::OdeState& state) const override;
+
 protected:
 	/// Computes the triangle element's rotation given a state
 	/// \param state The state to compute the rotation from
 	/// \return The rotation matrix of the element in the given state
-	SurgSim::Math::Matrix33d computeRotation(const SurgSim::Math::OdeState& state);
+	SurgSim::Math::Matrix33d computeRotation(const SurgSim::Math::OdeState& state) const;
 
 	/// Computes the triangle's local stiffness matrix
 	/// \param state The state to compute the local stiffness matrix from

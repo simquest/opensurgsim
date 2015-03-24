@@ -383,6 +383,14 @@ SurgSim::Math::Vector Fem1DElementBeam::computeNaturalCoordinate(
 	return SurgSim::Math::Vector3d::Zero();
 }
 
+SurgSim::Math::Quaterniond Fem1DElementBeam::getOrientation(const SurgSim::Math::OdeState& state) const
+{
+	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
+	SurgSim::Math::Quaterniond identity;
+	identity.setIdentity();
+	return identity;
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

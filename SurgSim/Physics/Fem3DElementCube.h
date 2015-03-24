@@ -136,6 +136,8 @@ public:
 	SurgSim::Math::Vector computeNaturalCoordinate( const SurgSim::Math::OdeState& state,
 			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
+	SurgSim::Math::Quaterniond getOrientation(const SurgSim::Math::OdeState& state) const override;
+
 protected:
 	/// Build the constitutive material 6x6 matrix
 	/// \param[out] constitutiveMatrix The 6x6 constitutive material matrix

@@ -132,6 +132,8 @@ public:
 	SurgSim::Math::Vector computeNaturalCoordinate(const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
+	SurgSim::Math::Quaterniond getOrientation(const SurgSim::Math::OdeState& state) const override;
+
 protected:
 	/// Computes the tetrahedron shape functions
 	/// \param state The deformable rest state to compute the shape function from

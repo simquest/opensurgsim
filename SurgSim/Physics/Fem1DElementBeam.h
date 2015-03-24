@@ -140,6 +140,8 @@ public:
 		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
+	SurgSim::Math::Quaterniond getOrientation(const SurgSim::Math::OdeState& state) const override;
+
 protected:
 	/// Computes the beam element's initial rotation
 	/// \param state The state to compute the rotation from
