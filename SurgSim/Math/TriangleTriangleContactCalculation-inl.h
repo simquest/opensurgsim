@@ -327,14 +327,29 @@ bool calculateContactTriangleTriangle2(
 	TriangleHelper<T, MOpt> triangle1(t0v0, t0v1, t0v2, t0n);
 	TriangleHelper<T, MOpt> triangle2(t1v0, t1v1, t1v2, t1n);
 
+	// Penetration info to be calculated.
+	T penetrationDepths[2] = {T(0), T(0)};
+	Vector3 penetrationPoints[2][2];
+
 	// Calculate deepest penetration for each of the triangle.
 	triangle1.findDeepestPenetrationWithTriangle(
-		triangle2, &penetrationDepth[0], &penetrationPoint0[0], &penetrationPoint0[1]);
-	contactNormal[0] = t1n;
+		triangle2, &penetrationDepths[0], &penetrationPoints[0][0], &penetrationPoints[0][1]);
 
 	triangle2.findDeepestPenetrationWithTriangle(
-		triangle1, &penetrationDepth[1], &penetrationPoint1[1], &penetrationPoint1[0]);
-	contactNormal[1] = -t0n;
+		triangle1, &penetrationDepths[1], &penetrationPoints[1][1], &penetrationPoints[1][0]);
+
+	{
+		penetrationDepth[0] = penetrationDepths[0];
+		contactNormal[0] = t1n;
+		penetrationPoint0[0] = penetrationPoints[0][0];
+		penetrationPoint1[0] = penetrationPoints[0][1];
+	}
+	{
+		penetrationDepth[1] = penetrationDepths[1];
+		contactNormal[1] = -t0n;
+		penetrationPoint0[1] = penetrationPoints[1][0];
+		penetrationPoint1[1] = penetrationPoints[1][1];
+	}
 
 	return true;
 }

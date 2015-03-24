@@ -115,7 +115,7 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 				auto localizations = constraint->getLocalizations();
 				auto velocity = (physicsRepresentations.first->getVelocityAt(localizations.first) -
 								 physicsRepresentations.second->getVelocityAt(localizations.second)).normalized();
-				if (velocity.dot(data->getNormal()) < -1e-9)
+				if (velocity.dot(data->getNormal()) < -1e-3)
 				{
 					constraints.push_back(constraint);
 				}
