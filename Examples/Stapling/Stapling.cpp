@@ -344,15 +344,12 @@ int main(int argc, char* argv[])
 	auto shader = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
 	SURGSIM_ASSERT(shader != nullptr) << "Shader could not be loaded.";
 
-	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
 
 	std::shared_ptr<SceneElement> arm = createArmSceneElement("arm");
-	arm->setPose(armPose);
 
 	std::shared_ptr<SceneElement> stapler = createStaplerSceneElement("stapler", deviceName);
-	stapler->setPose(RigidTransform3d::Identity());
-
-
+	RigidTransform3d offset = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.2, 0.0));
+	stapler->setPose(offset);
 
 	std::string woundFilename = std::string("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
@@ -370,7 +367,6 @@ int main(int argc, char* argv[])
 							  woundFilename,
 							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
 							  material);
-	wound->setPose(armPose);
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
 	keyboardComponent->setDeviceName("Keyboard"); // Name of device is case sensitive.
@@ -400,6 +396,8 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(stapler);
 	scene->addSceneElement(wound);
 	scene->addSceneElement(keyboard);
+
+	runtime->addSceneElements("Scenery.yaml");
 
 	// Exclude collision between certain Collision::Representations
 	physicsManager->addExcludedCollisionPair(
