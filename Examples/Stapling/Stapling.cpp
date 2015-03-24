@@ -142,24 +142,20 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	auto meshShapeForCollision = std::make_shared<MeshShape>();
 	meshShapeForCollision->load(filename);
 
-	SurgSim::Math::RigidTransform3d initialPose =
-		SurgSim::Math::makeRigidTransform(
-			SurgSim::Math::makeRotationQuaternion(-M_PI_2, SurgSim::Math::Vector3d::UnitX().eval()) *
-			SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d::UnitZ().eval()),
-			SurgSim::Math::Vector3d::Zero());
-
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
 		std::make_shared<OsgMeshRepresentation>("Collision Mesh");
 	meshShapeVisualization->setShape(meshShapeForCollision);
 	meshShapeVisualization->setDrawAsWireFrame(true);
 	meshShapeVisualization->setLocalActive(false);
-	meshShapeVisualization->setLocalPose(initialPose);
 
 	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	physicsRepresentation->setIsGravityEnabled(false);
 	physicsRepresentation->setDensity(8050); // Stainless steel (in Kg.m-3)
 	physicsRepresentation->setShape(meshShapeForCollision);
-	physicsRepresentation->setLocalPose(initialPose);
+	physicsRepresentation->setLocalPose(SurgSim::Math::makeRigidTransform(
+		SurgSim::Math::makeRotationQuaternion(-M_PI_2, SurgSim::Math::Vector3d::UnitX().eval()) *
+		SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d::UnitZ().eval()),
+		SurgSim::Math::Vector3d::Zero()));
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
