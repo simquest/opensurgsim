@@ -64,11 +64,6 @@ Fem1DRepresentation::~Fem1DRepresentation()
 {
 }
 
-RepresentationType Fem1DRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_FEM1D;
-}
-
 void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,
 		const SurgSim::Math::Matrix& K,
@@ -112,15 +107,17 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			{
 				if (K.size() != 0)
 				{
-					Math::Matrix scaledK = coordinate[index1] * coordinate[index2] * K;
-					Math::addSubMatrix(scaledK, nodeId1, nodeId2, dofPerNode, dofPerNode,
+					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * K,
+									   static_cast<int>(nodeId1), static_cast<int>(nodeId2),
+									   static_cast<int>(dofPerNode), static_cast<int>(dofPerNode),
 									   &m_externalGeneralizedStiffness);
 				}
 				if (D.size() != 0)
 				{
-					Math::Matrix scaledD = coordinate[index1] * coordinate[index2] * D;
-					SurgSim::Math::addSubMatrix(scaledD, nodeId1, nodeId2, dofPerNode, dofPerNode,
-												&m_externalGeneralizedDamping);
+					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * D,
+									   static_cast<int>(nodeId1), static_cast<int>(nodeId2),
+									   static_cast<int>(dofPerNode), static_cast<int>(dofPerNode),
+									   &m_externalGeneralizedDamping);
 				}
 				index2++;
 			}

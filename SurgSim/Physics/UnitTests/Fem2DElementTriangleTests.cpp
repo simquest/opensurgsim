@@ -1324,7 +1324,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
-	const size_t numDof = 6 * m_restState.getNumNodes();
+	const int numDof = 6 * static_cast<int>(m_restState.getNumNodes());
 	Vector forceVector(numDof);
 	Vector ones(numDof);
 	SparseMatrix massMatrix(numDof, numDof);

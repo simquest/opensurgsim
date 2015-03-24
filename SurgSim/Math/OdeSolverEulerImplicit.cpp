@@ -30,6 +30,8 @@ OdeSolverEulerImplicit::OdeSolverEulerImplicit(OdeEquation* equation)
 
 void OdeSolverEulerImplicit::setNewtonRaphsonMaximumIteration(size_t maximumIteration)
 {
+	SURGSIM_ASSERT(maximumIteration >= 1) << "The maximum iteration needs to be at least 1";
+
 	m_maximumIteration = maximumIteration;
 }
 
@@ -40,6 +42,8 @@ size_t OdeSolverEulerImplicit::getNewtonRaphsonMaximumIteration() const
 
 void OdeSolverEulerImplicit::setNewtonRaphsonEpsilonConvergence(double epsilonConvergence)
 {
+	SURGSIM_ASSERT(epsilonConvergence >= 0.0) << "The epsilon convergence cannot be negative";
+
 	m_epsilonConvergence = epsilonConvergence;
 }
 
@@ -48,12 +52,20 @@ double OdeSolverEulerImplicit::getNewtonRaphsonEpsilonConvergence() const
 	return m_epsilonConvergence;
 }
 
-void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
 {
 	// General equation to solve:
 	//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
 	// Let's note K = -df/dx and D = -df/dv.
-	// The compliance matrix on the velocity level is (M/dt + D + dt.K)
+	// Using Euler implicit { v(t+dt) = v(t) + dt.a(t+dt)
+	//                      { x(t+dt) = x(t) + dt.v(t+dt)
+	// For a single linearization, we get the following linear system:
+	//  M/dt.deltaV = f(t, x(t), v(t)) - K.deltaX - D.deltaV
+	//  (M/dt + D + dt.K) . deltaV   = f(t, x(t), v(t)) - dt.K.v(t)
+	//  systemMatrix      . solution = rhs
+	// Therefore systemMatrix = (M/dt + D + dt.K), solution = deltaV, rhs = f - dt.K.v(t)
+	// More terms are coming from the Newton-Raphson iterations (see class OdeSolverEulerImplicit doxygen doc for
+	// more details)
 
 	// Note that the resulting system is non-linear as K and D are  non-linear in absence of information on the nature
 	// of the model. We use a Newton-Raphson algorithm (http://en.wikipedia.org/wiki/Newton%27s_method) to solve
@@ -61,10 +73,9 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 	// Also note that this method converges quadratically around the root. In our case, the solution is deltaV, which
 	// should be close to 0. This makes our problem well suited for this method.
 
-	m_deltaV.resize(currentState.getPositions().size());
 	if (m_maximumIteration > 1)
 	{
-		m_previousDeltaV = Vector::Zero(m_deltaV.size());
+		m_previousSolution = Vector::Zero(m_solution.size());
 	}
 
 	// Prepare the newState to be used in the loop, it starts as the current state.
@@ -77,56 +88,79 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 	size_t numIteration = 0;
 	while (numIteration < m_maximumIteration)
 	{
-		SparseMatrix* M;
-		SparseMatrix* D;
-		SparseMatrix* K;
-		Vector* f;
+		// Assemble the linear system systemMatrix*solution = rhs
+		assembleLinearSystem(dt, currentState, *newState);
 
-		// Computes f(t, x(t), v(t)), M, D, K all at the same time
-		m_equation.computeFMDK(*newState, &f, &M, &D, &K);
-
-		// Adds the Euler Implicit/Newton-Raphson terms on the right-hand-side
-		*f += (*K) * (newState->getPositions() - currentState.getPositions() - newState->getVelocities() * dt);
-		*f -= ((*M) * (newState->getVelocities() - currentState.getVelocities())) / dt;
-
-		// Computes the system matrix (left-hand-side matrix)
-		m_systemMatrix  = (*M) * (1.0 / dt);
-		m_systemMatrix += (*D);
-		m_systemMatrix += (*K) * dt;
-
-		// Apply boundary conditions to the linear system
-		currentState.applyBoundaryConditionsToVector(f);
-		currentState.applyBoundaryConditionsToMatrix(&m_systemMatrix);
-
-		// Computes deltaV
-		(*m_linearSolver)(m_systemMatrix, *f, &m_deltaV);
+		// Solve the linear system to find solution = deltaV
+		m_solution = m_linearSolver->solve(m_rhs);
 
 		// Compute the new state using the Euler Implicit scheme:
-		newState->getVelocities() += m_deltaV;
+		newState->getVelocities() += m_solution;
 		newState->getPositions()  = currentState.getPositions() + dt * newState->getVelocities();
 
 		if (m_maximumIteration > 1)
 		{
 			// Use the infinity norm, to treat models with small or large number of dof the same way.
-			double solutionVariation = (m_deltaV - m_previousDeltaV).lpNorm<Eigen::Infinity>();
+			double solutionVariation = (m_solution - m_previousSolution).lpNorm<Eigen::Infinity>();
 
 			if (solutionVariation < m_epsilonConvergence)
 			{
 				break;
 			}
 
-			m_previousDeltaV = m_deltaV;
+			m_previousSolution = m_solution;
 		}
 
 		numIteration++;
 	}
 
-	// Only compute the compliance matrix once, around the root
-	(*m_linearSolver)(m_systemMatrix, Vector(), nullptr, &m_compliance);
+	// The compliance matrix (if requested) is computed w.r.t. the latest state.
+	if (computeCompliance)
+	{
+		computeComplianceMatrixFromSystemMatrix(currentState);
+	}
+}
 
-	// Remove the boundary conditions compliance from the compliance matrix
-	// This helps to prevent potential exterior LCP type calculation to violates the boundary conditions
-	currentState.applyBoundaryConditionsToMatrix(&m_compliance, false);
+void OdeSolverEulerImplicit::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
+		bool computeRHS)
+{
+	// General equation to solve:
+	//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
+	// Let's note K = -df/dx and D = -df/dv.
+	// Using Euler implicit { v(t+dt) = v(t) + dt.a(t+dt)
+	//                      { x(t+dt) = x(t) + dt.v(t+dt)
+	// For a single linearization, we get the following linear system:
+	//  M/dt.deltaV = f(t, x(t), v(t)) - K.deltaX - D.deltaV
+	//  (M/dt + D + dt.K) . deltaV   = f(t, x(t), v(t)) - dt.K.v(t)
+	//  systemMatrix      . solution = rhs
+	// Therefore systemMatrix = (M/dt + D + dt.K), solution = deltaV, rhs = f - dt.K.v(t)
+	// More terms are coming from the Newton-Raphson iterations (see class OdeSolverEulerImplicit doxygen doc for
+	// more details)
+
+	SparseMatrix* M;
+	SparseMatrix* D;
+	SparseMatrix* K;
+	Vector* f;
+
+	// Computes f, M, D, K all at the same time (on newState)
+	m_equation.computeFMDK(newState, &f, &M, &D, &K);
+
+	// Computes the LHS systemMatrix
+	m_systemMatrix  = (*M) * (1.0 / dt);
+	m_systemMatrix += (*D);
+	m_systemMatrix += (*K) * dt;
+	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
+
+	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
+	m_linearSolver->setMatrix(m_systemMatrix);
+
+	// Computes the RHS vector by adding the Euler Implicit/Newton-Raphson terms
+	if (computeRHS)
+	{
+		m_rhs = *f + (*K) * (newState.getPositions() - state.getPositions() - newState.getVelocities() * dt);
+		m_rhs -= ((*M) * (newState.getVelocities() - state.getVelocities())) / dt;
+		state.applyBoundaryConditionsToVector(&m_rhs);
+	}
 }
 
 }; // namespace Math

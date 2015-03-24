@@ -354,7 +354,7 @@ void testAddStiffness(MockFem3DElementCorotationalTet* tet,
 	Matrix expectedK = Matrix::Zero(state.getNumDof(), state.getNumDof());
 	SurgSim::Math::addSubMatrix(scale * tet->getRotatedStiffnessMatrix(state), tet->getNodeIds(), 3, &expectedK);
 
-	SparseMatrix K(state.getNumDof(), state.getNumDof());
+	SparseMatrix K(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	K.setZero();
 	tet->addStiffness(state, &K, scale);
 
@@ -379,7 +379,7 @@ void testAddMass(MockFem3DElementCorotationalTet* tet,
 	Matrix expectedM = Matrix::Zero(state.getNumDof(), state.getNumDof());
 	SurgSim::Math::addSubMatrix(scale * R12x12 * M0 * R12x12.transpose(), tet->getNodeIds(), 3, &expectedM);
 
-	SparseMatrix M(state.getNumDof(), state.getNumDof());
+	SparseMatrix M(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	M.setZero();
 	tet->addMass(state, &M, scale);
 
@@ -413,10 +413,10 @@ void testAddFMDK(MockFem3DElementCorotationalTet* tet,
 	SurgSim::Math::addSubVector(f, tet->getNodeIds(), 3, &expectedF);
 
 	Vector F = Vector::Zero(state.getNumDof());
-	SparseMatrix M(state.getNumDof(), state.getNumDof());
-	SparseMatrix D(state.getNumDof(), state.getNumDof());
-	SparseMatrix K(state.getNumDof(), state.getNumDof());
-	SparseMatrix zeroMatrix(state.getNumDof(), state.getNumDof());
+	SparseMatrix M(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	SparseMatrix D(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	SparseMatrix K(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	SparseMatrix zeroMatrix(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	M.setZero();
 	D.setZero();
 	K.setZero();

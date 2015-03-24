@@ -184,3 +184,38 @@ TEST(RepresentationTest, SerializationTest)
 		EXPECT_FALSE(newRepresentation4->getValue<bool>("IsDrivingSceneElementPose"));
 	}
 }
+
+// Local class to test constraint registration.
+class MockRigidRepresentation : public SurgSim::Physics::RigidRepresentation
+{
+public:
+	explicit MockRigidRepresentation(const std::string& name) : RigidRepresentation(name)
+	{}
+
+	std::shared_ptr<SurgSim::Physics::ConstraintImplementation>
+		getConstraintImplementation(SurgSim::Math::MlcpConstraintType type)
+	{
+		return RigidRepresentation::getConstraintImplementation(type);
+	}
+};
+
+TEST(RepresentationTest, ConstraintTest)
+{
+	using SurgSim::Physics::ConstraintImplementation;
+	using SurgSim::Physics::MockConstraintImplementation;
+
+	auto implementation = std::make_shared<MockConstraintImplementation>();
+	auto representation = std::make_shared<MockRigidRepresentation>("rep");
+
+	// Test the getConstraintImplementation
+	EXPECT_TRUE(representation->getConstraintImplementation(implementation->getMlcpConstraintType())
+		== nullptr);
+
+	// Add the constraint implementation.
+	ConstraintImplementation::getFactory().addImplementation(typeid(MockRigidRepresentation),
+		implementation);
+
+	// Test the getConstraintImplementation
+	EXPECT_TRUE(representation->getConstraintImplementation(implementation->getMlcpConstraintType())
+		!= nullptr);
+}

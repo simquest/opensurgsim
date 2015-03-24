@@ -37,8 +37,11 @@ MeshShape::MeshShape() :
 	m_center(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN())),
 	m_volume(std::numeric_limits<double>::quiet_NaN()),
 	m_secondMomentOfVolume(Matrix33d::Constant(std::numeric_limits<double>::quiet_NaN())),
-	m_initialMesh(std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>())
+	m_initialMesh(std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>()),
+	m_validPose(false)
 {
+	m_pose.linear() = Matrix33d::Constant(std::numeric_limits<double>::quiet_NaN());
+	m_pose.translation() = Vector3d::Constant(std::numeric_limits<double>::quiet_NaN());
 }
 
 const SurgSim::Math::Vector3d& MeshShape::getNormal(size_t triangleId)
@@ -46,8 +49,9 @@ const SurgSim::Math::Vector3d& MeshShape::getNormal(size_t triangleId)
 	return getTriangle(triangleId).data.normal;
 }
 
-void MeshShape::calculateNormals()
+bool MeshShape::calculateNormals()
 {
+	bool result = true;
 	for (size_t i = 0; i < getNumTriangles(); ++i)
 	{
 		const SurgSim::Math::Vector3d& vertex0 = getVertexPosition(getTriangle(i).verticesId[0]);
@@ -56,30 +60,37 @@ void MeshShape::calculateNormals()
 
 		// Calculate normal vector
 		SurgSim::Math::Vector3d normal = (vertex1 - vertex0).cross(vertex2 - vertex0);
+		if (normal.isZero())
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Math/MeshShape")) <<
+				"MeshShape::calculateNormals unable to calculate normals. For example, for triangle #" << i <<
+				" with vertices:" << std::endl << "1: " << vertex0.transpose() << std::endl <<
+				"2: " << vertex1.transpose() << std::endl << "3: " << vertex2.transpose();
+			result = false;
+			break;
+		}
 		normal.normalize();
-
 		getTriangle(i).data.normal = normal;
 	}
+	return result;
 }
 
-void MeshShape::doUpdate()
+bool MeshShape::doUpdate()
 {
-	calculateNormals();
+	updateAabbTree();
+	return calculateNormals();
 }
 
 bool MeshShape::doLoad(const std::string& fileName)
 {
-	if(! SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, NormalData>::doLoad(fileName))
+	if (!SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, NormalData>::doLoad(fileName))
 	{
 		return false;
 	}
-
 	m_initialMesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>(*shared_from_this());
-	calculateNormals();
 	updateAabbTree();
 	computeVolumeIntegrals();
-
-	return true;
+	return calculateNormals();
 }
 
 int MeshShape::getType() const
@@ -197,20 +208,23 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
 
-void MeshShape::setPose(const SurgSim::Math::RigidTransform3d& pose)
+bool MeshShape::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	SURGSIM_ASSERT(getNumVertices() == m_initialMesh->getNumVertices())
-			<< "The inital mesh must have the same number of vertices as the MeshShape for setPose.";
-	auto targetVertex = getVertices().begin();
-	auto const& vertices = m_initialMesh->getVertices();
-	for (auto it = vertices.cbegin(); it != vertices.cend(); ++it)
+			<< "The initial mesh must have the same number of vertices as the MeshShape for setPose.";
+	if (!m_validPose || !pose.isApprox(m_pose))
 	{
-		targetVertex->position = pose * it->position;
-		++targetVertex;
+		m_pose = pose;
+		auto targetVertex = getVertices().begin();
+		auto const& vertices = m_initialMesh->getVertices();
+		for (auto it = vertices.cbegin(); it != vertices.cend(); ++it)
+		{
+			targetVertex->position = pose * it->position;
+			++targetVertex;
+		}
+		m_validPose = doUpdate();
 	}
-
-	calculateNormals();
-	updateAabbTree();
+	return m_validPose;
 }
 
 std::shared_ptr<SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree()
@@ -227,7 +241,7 @@ void MeshShape::updateAabbTree()
 	{
 		if (triangles[id].isValid)
 		{
-			auto vertices = getTrianglePositions(id);
+			const auto& vertices = getTrianglePositions(id);
 			m_aabbTree->add(SurgSim::Math::makeAabb(vertices[0], vertices[1], vertices[2]), id);
 		}
 	}

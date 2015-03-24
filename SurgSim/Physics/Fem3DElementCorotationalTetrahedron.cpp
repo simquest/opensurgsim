@@ -82,24 +82,16 @@ void Fem3DElementCorotationalTetrahedron::addStiffness(const SurgSim::Math::OdeS
 		double scale /*= 1.0*/)
 {
 	Eigen::Matrix<double, 12, 12> RKRt;
-
 	computeRotationMassAndStiffness(state, nullptr, nullptr, &RKRt);
-
-	Math::Matrix scaledDense(12, 12);
-	scaledDense = RKRt * scale;
-	addSubMatrix(scaledDense, getNodeIds(), 3, K);
+	addSubMatrix(RKRt * scale, getNodeIds(), 3, K);
 }
 
 void Fem3DElementCorotationalTetrahedron::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
 		double scale /*= 1.0*/)
 {
 	Eigen::Matrix<double, 12, 12> RMRt;
-
 	computeRotationMassAndStiffness(state, nullptr, &RMRt, nullptr);
-
-	Math::Matrix scaledDense(12, 12);
-	scaledDense = RMRt * scale;
-	addSubMatrix(scaledDense, getNodeIds(), 3, M);
+	addSubMatrix(RMRt * scale, getNodeIds(), 3, M);
 }
 
 void Fem3DElementCorotationalTetrahedron::addFMDK(const SurgSim::Math::OdeState& state,

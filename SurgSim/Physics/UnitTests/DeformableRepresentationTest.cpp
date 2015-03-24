@@ -21,6 +21,7 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/OdeSolver.h" // Need access to the enum IntegrationScheme
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
@@ -132,7 +133,7 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_EQ(0, getExternalGeneralizedDamping().rows());
 	EXPECT_EQ(0, getExternalGeneralizedDamping().cols());
 	setInitialState(m_localInitialState);
-	SparseMatrix zeroMatrix(getNumDof(), getNumDof());
+	SparseMatrix zeroMatrix(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedForce().size());
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedStiffness().rows());
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedStiffness().cols());
@@ -316,7 +317,7 @@ TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 {
 	// setInitialState sets all 4 states (tested in method above !)
 	setInitialState(m_localInitialState);
-	SparseMatrix zeroMatrix(getNumDof(), getNumDof());
+	SparseMatrix zeroMatrix(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
 
 	// Initialize and wake-up the deformable component
 	EXPECT_NO_THROW(EXPECT_TRUE(initialize(std::make_shared<SurgSim::Framework::Runtime>())));
@@ -327,15 +328,8 @@ TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 	EXPECT_TRUE(getExternalGeneralizedStiffness().isApprox(zeroMatrix));
 	EXPECT_TRUE(getExternalGeneralizedDamping().isApprox(zeroMatrix));
 	SurgSim::Math::Vector F = SurgSim::Math::Vector::LinSpaced(getNumDofPerNode(), -2.34, 4.41);
-	SurgSim::Math::SparseMatrix K(getNumDofPerNode(), getNumDofPerNode());
-	for (int row = 0; row < getNumDofPerNode(); ++row)
-	{
-		for (int col = 0; col < getNumDofPerNode(); ++col)
-		{
-			K.insert(row, col) = 1.0;
-		}
-	}
-	SurgSim::Math::SparseMatrix D = 2.3 * K;
+	SurgSim::Math::Matrix K = SurgSim::Math::Matrix::Ones(getNumDofPerNode(), getNumDofPerNode());
+	SurgSim::Math::Matrix D = 2.3 * K;
 	addExternalGeneralizedForce(m_localization0, F, K, D);
 	EXPECT_FALSE(getExternalGeneralizedForce().isZero());
 	EXPECT_FALSE(getExternalGeneralizedStiffness().isApprox(zeroMatrix));

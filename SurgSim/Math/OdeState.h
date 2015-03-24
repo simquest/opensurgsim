@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim

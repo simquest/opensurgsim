@@ -42,10 +42,10 @@ private:
 
 	void initializeSparseMatrix(SparseMatrix* m)
 	{
-		m->resize(size, size);
-		for (size_t row = 0; row < size; row++)
+		m->resize(static_cast<int>(size), static_cast<int>(size));
+		for (int row = 0; row < size; row++)
 		{
-			for (size_t col = 0; col < size; col++)
+			for (int col = 0; col < size; col++)
 			{
 				(*m).insert(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
 			}

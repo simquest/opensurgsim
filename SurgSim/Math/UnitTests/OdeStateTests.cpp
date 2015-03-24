@@ -24,7 +24,7 @@ using SurgSim::Math::OdeState;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 TEST(OdeStateTest, ConstructorTest)

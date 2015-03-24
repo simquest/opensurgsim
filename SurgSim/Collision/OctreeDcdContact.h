@@ -19,33 +19,34 @@
 #include <memory>
 
 #include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/OctreeShape.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {
-namespace Math
-{
-class BoxShape;
-};
-
 namespace Collision
 {
 
 class CollisionPair;
 class ShapeCollisionRepresentation;
 
-/// Class to calculate intersections between an Octree and other shapes
+/// Abstract base class to calculate intersections between an Octree and other shapes
+///
+/// Derived classes handle the calculation for specific shape types (ie
+/// OctreeSphereDcdContact).
 class OctreeDcdContact : public ContactCalculation
 {
-public:
-
-	/// Constructor.
-	/// \param calculator The contact calculator to use on each octree node
-	explicit OctreeDcdContact(std::shared_ptr<ContactCalculation> calculator);
-
-	/// Function that returns the shapes between which this class performs collision detection.
-	/// \return A pair of shape type ids
-	std::pair<int, int> getShapeTypes() override;
+protected:
+	/// Do the calculation between an octree node (BoxShape) and the other shape
+	/// \param boxShape the box shape
+	/// \param boxPose the pose of the box
+	/// \param otherShape the other shape
+	/// \param otherPose the pose of the other shape
+	/// \return a list of contacts between the shapes, if any
+	virtual std::list<std::shared_ptr<Contact>> boxContactCalculation(
+			const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
+			const SurgSim::Math::Shape& otherShape, const SurgSim::Math::RigidTransform3d& otherPose) = 0;
 
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
@@ -64,15 +65,6 @@ private:
 								  std::shared_ptr<CollisionPair> pair,
 								  std::shared_ptr<SurgSim::DataStructures::OctreePath> nodePath);
 
-	/// The contact calculator to use on each octree node
-	const std::shared_ptr<ContactCalculation> m_calculator;
-
-	/// The shape types that this contact calculation handles
-	std::pair<int, int> m_shapeTypes;
-
-	/// Collision Representation used to detect contacts with each octree node
-	std::shared_ptr<ShapeCollisionRepresentation> m_nodeCollisionRepresentation;
-
 	/// Enable a Vector3d to be used as a key in an unordered map.
 	class Vector3dHash
 	{
@@ -81,7 +73,7 @@ private:
 	};
 
 	/// The shapes used for the contact calculations are cached for performance.
-	std::unordered_map<SurgSim::Math::Vector3d, std::shared_ptr<SurgSim::Math::Shape>, Vector3dHash> m_shapes;
+	std::unordered_map<SurgSim::Math::Vector3d, std::shared_ptr<SurgSim::Math::BoxShape>, Vector3dHash> m_shapes;
 };
 
 };

@@ -39,12 +39,6 @@ TEST(Fem1DRepresentationTests, ConstructorTest)
 	ASSERT_NO_THROW({std::shared_ptr<Fem1DRepresentation> fem = std::make_shared<Fem1DRepresentation>("Fem1D");});
 }
 
-TEST(Fem1DRepresentationTests, GetTypeTest)
-{
-	std::shared_ptr<Fem1DRepresentation> fem = std::make_shared<Fem1DRepresentation>("Fem1D");
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM1D, fem->getType());
-}
-
 TEST(Fem1DRepresentationTests, GetNumDofPerNodeTest)
 {
 	std::shared_ptr<Fem1DRepresentation> fem = std::make_shared<Fem1DRepresentation>("Fem1D");
@@ -133,7 +127,7 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 
 	fem->setInitialState(initialState);
 
-	Math::SparseMatrix zeroMat(fem->getNumDof(), fem->getNumDof());
+	Math::SparseMatrix zeroMat(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
 	zeroMat.setZero();
 
 	// Vector initialized (properly sized and zeroed)
@@ -175,12 +169,14 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 
 	Vector F = Vector::Zero(fem->getNumDof());
 	F.segment(0, fem->getNumDofPerNode()) = Flocal;
-	SparseMatrix K(fem->getNumDof(), fem->getNumDof());
+	SparseMatrix K(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
 	K.setZero();
-	Math::addSubMatrix(Klocal, 0, 0, fem->getNumDofPerNode(), fem->getNumDofPerNode(), &K);
-	SparseMatrix D(fem->getNumDof(), fem->getNumDof());
+	Math::addSubMatrix(Klocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
+					   static_cast<int>(fem->getNumDofPerNode()), &K);
+	SparseMatrix D(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
 	D.setZero();
-	Math::addSubMatrix(Dlocal, 0, 0, fem->getNumDofPerNode(), fem->getNumDofPerNode(), &D);
+	Math::addSubMatrix(Dlocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
+					   static_cast<int>(fem->getNumDofPerNode()), &D);
 
 	// Test invalid localization nullptr
 	ASSERT_THROW(fem->addExternalGeneralizedForce(nullptr, Flocal),
@@ -231,16 +227,12 @@ TEST(Fem1DRepresentationTests, SerializationTest)
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(1u, node.size());
 
-	YAML::Node data = node["SurgSim::Physics::Fem1DRepresentation"];
-	EXPECT_EQ(10u, data.size());
-
 	std::shared_ptr<Fem1DRepresentation> newRepresentation;
 	ASSERT_NO_THROW(newRepresentation =
 						std::dynamic_pointer_cast<Fem1DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	ASSERT_NE(nullptr, newRepresentation);
 
 	EXPECT_EQ("SurgSim::Physics::Fem1DRepresentation", newRepresentation->getClassName());
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM1D, newRepresentation->getType());
 }
 
 } // namespace Physics

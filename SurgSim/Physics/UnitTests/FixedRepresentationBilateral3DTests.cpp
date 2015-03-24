@@ -48,7 +48,6 @@ TEST(FixedRepresentationBilateral3DTests, Constants)
 	FixedRepresentationBilateral3D constraint;
 
 	EXPECT_EQ(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT, constraint.getMlcpConstraintType());
-	EXPECT_EQ(SurgSim::Physics::REPRESENTATION_TYPE_FIXED, constraint.getRepresentationType());
 	EXPECT_EQ(3u, constraint.getNumDof());
 }
 

@@ -169,7 +169,7 @@ public:
 		return m_D;
 	}
 
-	virtual const SparseMatrix& computeK(const OdeState& state) override
+	const SparseMatrix& computeK(const OdeState& state) override
 	{
 		// A fake but valid stiffness matrix (node 0 fixed)
 		// Desired matrix is:
@@ -258,8 +258,8 @@ public:
 		auto position = 2.0 * state.getPositions();
 		auto velocity = state.getVelocities();
 
-		m_D.resize(state.getNumDof(), state.getNumDof());
-		m_D.reserve(state.getNumDof());
+		m_D.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+		m_D.reserve(static_cast<int>(state.getNumDof()));
 		for (int row = 0; row < state.getNumDof(); ++row)
 		{
 			for (int col = 0; col < state.getNumDof(); ++col)
@@ -273,7 +273,7 @@ public:
 
 	const SparseMatrix& computeK(const OdeState& state) override
 	{
-		m_K.resize(state.getNumDof(), state.getNumDof());
+		m_K.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 		m_K.setIdentity();
 		m_K *= state.getVelocities().squaredNorm();
 		return m_K;

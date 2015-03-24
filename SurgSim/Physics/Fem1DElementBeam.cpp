@@ -125,9 +125,7 @@ void Fem1DElementBeam::addForce(const SurgSim::Math::OdeState& state, SurgSim::M
 void Fem1DElementBeam::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
 							   double scale /*= 1.0*/)
 {
-	Math::Matrix scaledSub(m_M.rows(), m_M.cols());
-	scaledSub = m_M * scale;
-	Math::addSubMatrix(scaledSub, m_nodeIds, 6, M);
+	Math::addSubMatrix(m_M * scale, m_nodeIds, 6, M);
 }
 
 void Fem1DElementBeam::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
@@ -138,9 +136,7 @@ void Fem1DElementBeam::addDamping(const SurgSim::Math::OdeState& state, SurgSim:
 void Fem1DElementBeam::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
 									double scale /*= 1.0*/)
 {
-	Math::Matrix scaledSub(m_K.rows(), m_K.cols());
-	scaledSub = m_K * scale;
-	Math::addSubMatrix(scaledSub, getNodeIds(), 6, K);
+	Math::addSubMatrix(m_K * scale, getNodeIds(), 6, K);
 }
 
 void Fem1DElementBeam::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
@@ -169,14 +165,13 @@ void Fem1DElementBeam::addMatVec(const SurgSim::Math::OdeState& state, double al
 		return;
 	}
 
-	Eigen::Matrix<double, 12, 1> extractedX, extractedResult;
+	Eigen::Matrix<double, 12, 1> extractedX;
 	getSubVector(x, m_nodeIds, 6, &extractedX);
 
 	// Adds the mass contribution
 	if (alphaM != 0.0)
 	{
-		extractedResult = alphaM * (m_M * extractedX);
-		addSubVector(extractedResult, m_nodeIds, 6, F);
+		addSubVector(alphaM * (m_M * extractedX), m_nodeIds, 6, F);
 	}
 
 	// Adds the damping contribution (No damping)
@@ -184,8 +179,7 @@ void Fem1DElementBeam::addMatVec(const SurgSim::Math::OdeState& state, double al
 	// Adds the stiffness contribution
 	if (alphaK != 0.0)
 	{
-		extractedResult = alphaK * (m_K * extractedX);
-		addSubVector(extractedResult, m_nodeIds, 6, F);
+		addSubVector(alphaK * (m_K * extractedX), m_nodeIds, 6, F);
 	}
 }
 

@@ -200,9 +200,6 @@ TEST_F(MassSpringRepresentationTests, SetGetMethods)
 	EXPECT_DOUBLE_EQ(5.5, massSpring->getRayleighDampingMass());
 	massSpring->setRayleighDampingStiffness(5.4);
 	EXPECT_DOUBLE_EQ(5.4, massSpring->getRayleighDampingStiffness());
-
-	// set/get Type
-	EXPECT_EQ(SurgSim::Physics::REPRESENTATION_TYPE_MASSSPRING, massSpring->getType());
 }
 
 TEST_F(MassSpringRepresentationTests, BeforeUpdateTest)
@@ -298,7 +295,7 @@ TEST_F(MassSpringRepresentationTests, ExternalForceAPITest)
 	massSpring->addSpring(std::make_shared<SurgSim::Physics::LinearSpring>(0, 1));
 
 	// Vector initialized (properly sized and zeroed)
-	SparseMatrix zeroMatrix(massSpring->getNumDof(), massSpring->getNumDof());
+	SparseMatrix zeroMatrix(static_cast<int>(massSpring->getNumDof()), static_cast<int>(massSpring->getNumDof()));
 	zeroMatrix.setZero();
 	EXPECT_NE(0, massSpring->getExternalForce().size());
 	EXPECT_NE(0, massSpring->getExternalStiffness().size());

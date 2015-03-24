@@ -19,6 +19,10 @@
 #include <memory>
 
 #include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/RigidTransform.h"
+
 
 namespace SurgSim
 {
@@ -31,12 +35,21 @@ class CollisionPair;
 class BoxSphereDcdContact : public ContactCalculation
 {
 public:
-
 	/// Constructor.
 	BoxSphereDcdContact();
 
-	/// Function that returns the shapes between which this class performs collision detection.
-	/// \return int std::pair containing the shape types.
+	using ContactCalculation::calculateContact;
+
+	/// Calculate the contacts using the typed shapes directly
+	/// \param boxShape the box shape
+	/// \param boxPose the pose of the box
+	/// \param sphereShape the sphere shape
+	/// \param spherePose the pose of the sphere
+	/// \return a list of contacts between the shapes, if any
+	std::list<std::shared_ptr<Contact>> calculateContact(
+			const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
+			const SurgSim::Math::SphereShape& sphereShape, const SurgSim::Math::RigidTransform3d& spherePose);
+
 	std::pair<int,int> getShapeTypes() override;
 
 private:

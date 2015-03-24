@@ -101,7 +101,7 @@ TEST_F(OsgSkeletonRepresentationTest, InitTest)
 TEST_F(OsgSkeletonRepresentationTest, PosesTest)
 {
 	RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(2.143, Vector3d::UnitZ().eval()),
-			Vector3d(2.3, 4.5, 6.7));
+							Vector3d(2.3, 4.5, 6.7));
 	{
 		auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");
 		skeleton->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
@@ -146,7 +146,7 @@ TEST_F(OsgSkeletonRepresentationTest, PosesTest)
 TEST_F(OsgSkeletonRepresentationTest, NeutralPosesTest)
 {
 	RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(2.143, Vector3d::UnitZ().eval()),
-			Vector3d(2.3, 4.5, 6.7));
+							Vector3d(2.3, 4.5, 6.7));
 	{
 		auto skeleton = std::make_shared<OsgSkeletonRepresentation>("test");
 		skeleton->loadModel("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
@@ -192,7 +192,7 @@ TEST_F(OsgSkeletonRepresentationTest, AccessibleTest)
 {
 	std::shared_ptr<SurgSim::Framework::Component> component;
 	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
-		"SurgSim::Graphics::OsgSkeletonRepresentation", "skeleton"));
+									"SurgSim::Graphics::OsgSkeletonRepresentation", "skeleton"));
 
 	std::string fileName("OsgSkeletonRepresentationTests/rigged_cylinder.osgt");
 	component->setValue("ModelFileName", fileName);
@@ -213,17 +213,17 @@ TEST_F(OsgSkeletonRepresentationTest, SerializationTests)
 	skeleton->loadModel(fileName);
 	std::string skinningShaderFileName("Shaders/skinning.vert");
 	skeleton->setSkinningShaderFileName(skinningShaderFileName);
-	RigidTransform3d pose = makeRigidTransform(
-		makeRotationQuaternion(2.143, Vector3d(2.463, 6.346, 7.135).normalized()), Vector3d(2.3, 4.5, 6.7));
+	RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(2.143,
+							Vector3d(2.463, 6.346, 7.135).normalized()),
+							Vector3d(2.3, 4.5, 6.7));
 	skeleton->setNeutralBonePose("Bone", pose);
 
 	YAML::Node node;
 	node = skeleton->encode();
 	ASSERT_NO_THROW(node = skeleton->encode());
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(7u, node.size());
 
-	std::shared_ptr<OsgSkeletonRepresentation> result = std::make_shared<OsgSkeletonRepresentation>("OsgScenery");
+	std::shared_ptr<OsgSkeletonRepresentation> result = std::make_shared<OsgSkeletonRepresentation>("Skeleton");
 	ASSERT_NO_THROW(result->decode(node));
 	EXPECT_EQ("SurgSim::Graphics::OsgSkeletonRepresentation", result->getClassName());
 	EXPECT_EQ(fileName, result->getModel()->getFileName());

@@ -111,9 +111,7 @@ void Fem2DElementTriangle::addForce(const SurgSim::Math::OdeState& state, SurgSi
 void Fem2DElementTriangle::addMass(const Math::OdeState& state, Math::SparseMatrix* M,
 								   double scale /*= 1.0*/)
 {
-	Math::Matrix scaledDense(m_M.rows(), m_M.cols());
-	scaledDense = scale * m_M;
-	Math::addSubMatrix(scaledDense, m_nodeIds, 6, M);
+	Math::addSubMatrix(scale * m_M, m_nodeIds, 6, M);
 }
 
 void Fem2DElementTriangle::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
@@ -124,9 +122,7 @@ void Fem2DElementTriangle::addDamping(const SurgSim::Math::OdeState& state, Surg
 void Fem2DElementTriangle::addStiffness(const Math::OdeState& state, Math::SparseMatrix* K,
 										double scale /*= 1.0*/)
 {
-	Math::Matrix scaledDense(m_K.rows(), m_K.cols());
-	scaledDense = scale * m_K;
-	Math::addSubMatrix(scaledDense, getNodeIds(), 6, K);
+	Math::addSubMatrix(scale * m_K, getNodeIds(), 6, K);
 }
 
 void Fem2DElementTriangle::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,

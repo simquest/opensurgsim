@@ -21,6 +21,22 @@ namespace SurgSim
 namespace Math
 {
 
+void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
+{
+	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
+	m_lu.compute(matrix);
+}
+
+Vector LinearSparseSolveAndInverseLU::solve(const Vector& b)
+{
+	return m_lu.solve(b);
+}
+
+Matrix LinearSparseSolveAndInverseLU::getInverse()
+{
+	return m_lu.solve(Matrix::Identity(m_lu.rows(), m_lu.cols()));
+}
+
 void LinearSparseSolveAndInverseLU::operator()(const SparseMatrix& A, const Vector& b, Vector* x, Matrix* Ainv)
 {
 	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";

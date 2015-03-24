@@ -99,11 +99,6 @@ SurgSim::Math::MlcpConstraintType RigidRepresentationContact::getMlcpConstraintT
 	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 }
 
-SurgSim::Physics::RepresentationType RigidRepresentationContact::getRepresentationType() const
-{
-	return REPRESENTATION_TYPE_RIGID;
-}
-
 size_t RigidRepresentationContact::doGetNumDof() const
 {
 	return 1;

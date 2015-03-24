@@ -122,9 +122,7 @@ void Fem3DElementCube::computeMass(const SurgSim::Math::OdeState& state,
 void Fem3DElementCube::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
 							   double scale /*= 1.0*/)
 {
-	Math::Matrix scaledDense(m_mass.rows(), m_mass.cols());
-	scaledDense = m_mass * scale;
-	addSubMatrix(scaledDense, m_nodeIds, 3, M);
+	addSubMatrix(m_mass * scale, m_nodeIds, 3, M);
 }
 
 void Fem3DElementCube::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
@@ -312,9 +310,7 @@ void Fem3DElementCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state
 void Fem3DElementCube::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
 									double scale /*= 1.0*/)
 {
-	Math::Matrix scaledDense(m_stiffness.rows(), m_stiffness.cols());
-	scaledDense = m_stiffness * scale;
-	addSubMatrix(scaledDense, getNodeIds(), 3, K);
+	addSubMatrix(m_stiffness * scale, getNodeIds(), 3, K);
 }
 
 void Fem3DElementCube::addFMDK(const SurgSim::Math::OdeState& state,

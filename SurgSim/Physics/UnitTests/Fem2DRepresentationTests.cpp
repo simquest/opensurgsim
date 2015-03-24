@@ -40,12 +40,6 @@ TEST(Fem2DRepresentationTests, ConstructorTest)
 	ASSERT_NO_THROW({std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem2D");});
 }
 
-TEST(Fem2DRepresentationTests, GetTypeTest)
-{
-	std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem2D");
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM2D, fem->getType());
-}
-
 TEST(Fem2DRepresentationTests, GetNumDofPerNodeTest)
 {
 	std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem2D");
@@ -110,7 +104,7 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 
 	fem->setInitialState(initialState);
 
-	Math::SparseMatrix zeroMat(fem->getNumDof(), fem->getNumDof());
+	Math::SparseMatrix zeroMat(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
 	zeroMat.setZero();
 
 	// Vector initialized (properly sized and zeroed)
@@ -150,12 +144,14 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 	Matrix Dlocal = Klocal + Matrix::Identity(fem->getNumDofPerNode(), fem->getNumDofPerNode());
 	Vector F = Vector::Zero(fem->getNumDof());
 	F.segment(0, fem->getNumDofPerNode()) = Flocal;
-	SparseMatrix K(fem->getNumDof(), fem->getNumDof());
+	SparseMatrix K(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
 	K.setZero();
-	Math::addSubMatrix(Klocal, 0, 0, fem->getNumDofPerNode(), fem->getNumDofPerNode(), &K);
-	SparseMatrix D(fem->getNumDof(), fem->getNumDof());
+	Math::addSubMatrix(Klocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
+					   static_cast<int>(fem->getNumDofPerNode()), &K);
+	SparseMatrix D(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
 	D.setZero();
-	Math::addSubMatrix(Dlocal, 0, 0, fem->getNumDofPerNode(), fem->getNumDofPerNode(), &D);
+	Math::addSubMatrix(Dlocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
+					   static_cast<int>(fem->getNumDofPerNode()), &D);
 
 	// Test invalid localization nullptr
 	ASSERT_THROW(fem->addExternalGeneralizedForce(nullptr, Flocal),
@@ -180,7 +176,7 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 				 SurgSim::Framework::AssertionFailure);
 
 	// Test valid call to addExternalGeneralizedForce
-	Math::SparseMatrix zeroMatrix(fem->getNumDof(), fem->getNumDof());
+	Math::SparseMatrix zeroMatrix(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
 	zeroMatrix.setZero();
 	fem->addExternalGeneralizedForce(localization, Flocal, Klocal, Dlocal);
 	EXPECT_FALSE(fem->getExternalGeneralizedForce().isZero());
@@ -206,16 +202,12 @@ TEST(Fem2DRepresentationTests, SerializationTest)
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(1u, node.size());
 
-	YAML::Node data = node["SurgSim::Physics::Fem2DRepresentation"];
-	EXPECT_EQ(10u, data.size());
-
 	std::shared_ptr<Fem2DRepresentation> newRepresentation;
 	ASSERT_NO_THROW(newRepresentation =
 						std::dynamic_pointer_cast<Fem2DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	ASSERT_NE(nullptr, newRepresentation);
 
 	EXPECT_EQ("SurgSim::Physics::Fem2DRepresentation", newRepresentation->getClassName());
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM2D, newRepresentation->getType());
 }
 
 } // namespace Physics

@@ -121,7 +121,7 @@ void LinearSpring::addDamping(const OdeState& state, SparseMatrix* D, double sca
 	De *= scale;
 
 	// Assembly stage in D
-	SparseMatrix dSparse(state.getNumDof(), state.getNumDof());
+	SparseMatrix dSparse(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	dSparse.setZero();
 	distributeBlocks(De, &dSparse);
 	*D += dSparse;
@@ -146,7 +146,7 @@ void LinearSpring::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::M
 	Ke *= scale;
 
 	// Assembly stage in K
-	SparseMatrix kSparse(state.getNumDof(), state.getNumDof());
+	SparseMatrix kSparse(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	kSparse.setZero();
 	distributeBlocks(Ke, &kSparse);
 	*K += kSparse;
@@ -174,13 +174,13 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, SparseMatrix* D, Spa
 	}
 
 	// Assembly stage in K
-	SparseMatrix kSparse(state.getNumDof(), state.getNumDof());
+	SparseMatrix kSparse(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	kSparse.setZero();
 	distributeBlocks(Ke, &kSparse);
 	*K += kSparse;
 
 	// Assembly stage in D
-	SparseMatrix dSparse(state.getNumDof(), state.getNumDof());
+	SparseMatrix dSparse(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	dSparse.setZero();
 	distributeBlocks(De, &dSparse);
 	*D += dSparse;
@@ -267,10 +267,12 @@ void LinearSpring::distributeBlocks(const SurgSim::Math::Matrix33d& block,
 	{
 		for (int col = 0; col < 3; ++col)
 		{
-			tripletList.push_back(T(3 * m_nodeIds[0] + row,  3 * m_nodeIds[0] + col, block(row, col)));
-			tripletList.push_back(T(3 * m_nodeIds[0] + row,  3 * m_nodeIds[1] + col, -block(row, col)));
-			tripletList.push_back(T(3 * m_nodeIds[1] + row,  3 * m_nodeIds[0] + col, -block(row, col)));
-			tripletList.push_back(T(3 * m_nodeIds[1] + row,  3 * m_nodeIds[1] + col, block(row, col)));
+			int nodeId0 = static_cast<int>(m_nodeIds[0]);
+			int nodeId1 = static_cast<int>(m_nodeIds[1]);
+			tripletList.push_back(T(3 * nodeId0 + row,  3 * nodeId0 + col, block(row, col)));
+			tripletList.push_back(T(3 * nodeId0 + row,  3 * nodeId1 + col, -block(row, col)));
+			tripletList.push_back(T(3 * nodeId1 + row,  3 * nodeId0 + col, -block(row, col)));
+			tripletList.push_back(T(3 * nodeId1 + row,  3 * nodeId1 + col, block(row, col)));
 		}
 	}
 	matrix->setFromTriplets(tripletList.begin(), tripletList.end());

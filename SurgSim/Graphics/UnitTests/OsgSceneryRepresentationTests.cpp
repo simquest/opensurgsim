@@ -99,7 +99,6 @@ TEST_F(OsgSceneryRepresentationTest, SerializationTests)
 	YAML::Node node;
 	ASSERT_NO_THROW(node = scenery->encode());
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(5u, node.size());
 
 	std::shared_ptr<SceneryRepresentation> result = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
 	ASSERT_NO_THROW(result->decode(node));

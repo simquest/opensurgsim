@@ -1,0 +1,162 @@
+#Ascii Scene 
+#Version 100 
+#Generator OpenSceneGraph 3.2.1 
+
+osg::Group {
+  UniqueID 1 
+  Name "cube.obj" 
+  Children 1 {
+    osg::Geode {
+      UniqueID 2 
+      Name "Cube" 
+      Drawables 1 {
+        osg::Geometry {
+          UniqueID 3 
+          DataVariance STATIC 
+          StateSet TRUE {
+            osg::StateSet {
+              UniqueID 4 
+              DataVariance STATIC 
+              AttributeList 1 {
+                osg::Material {
+                  UniqueID 5 
+                  Name "Material" 
+                  Ambient TRUE Front 0 0 0 1 Back 0 0 0 1 
+                  Diffuse TRUE Front 0.64 0.64 0.64 1 Back 0.64 0.64 0.64 1 
+                  Specular TRUE Front 0.5 0.5 0.5 1 Back 0.5 0.5 0.5 1 
+                  Emission TRUE Front 0 0 0 1 Back 0 0 0 1 
+                  Shininess TRUE Front 12.288 Back 12.288 
+                }
+                Value OFF 
+              }
+            }
+          }
+          PrimitiveSetList 6 {
+            DrawElementsUShort GL_TRIANGLE_STRIP 0 4 {
+              1 2 0 3 
+            }
+            DrawElementsUShort GL_TRIANGLE_STRIP 0 4 {
+              7 4 6 5 
+            }
+            DrawElementsUShort GL_TRIANGLE_STRIP 0 4 {
+              23 20 22 21 
+            }
+            DrawElementsUShort GL_TRIANGLE_STRIP 0 4 {
+              19 16 18 17 
+            }
+            DrawElementsUShort GL_TRIANGLE_STRIP 0 4 {
+              13 14 12 15 
+            }
+            DrawElementsUShort GL_TRIANGLE_STRIP 0 4 {
+              9 10 8 11 
+            }
+            
+          }
+          VertexData {
+            Array TRUE ArrayID 1 Vec3fArray 24 {
+              0.1 0.1 -0.1 
+              0.1 -0.1 -0.1 
+              -0.1 -0.1 -0.1 
+              -0.1 0.1 -0.1 
+              0.1 0.0999999 0.1 
+              -0.1 0.1 0.1 
+              -0.1 -0.1 0.1 
+              0.0999999 -0.1 0.1 
+              0.1 0.1 -0.1 
+              0.1 0.0999999 0.1 
+              0.0999999 -0.1 0.1 
+              0.1 -0.1 -0.1 
+              0.1 -0.1 -0.1 
+              0.0999999 -0.1 0.1 
+              -0.1 -0.1 0.1 
+              -0.1 -0.1 -0.1 
+              -0.1 -0.1 -0.1 
+              -0.1 -0.1 0.1 
+              -0.1 0.1 0.1 
+              -0.1 0.1 -0.1 
+              0.1 0.0999999 0.1 
+              0.1 0.1 -0.1 
+              -0.1 0.1 -0.1 
+              -0.1 0.1 0.1 
+            }
+            Indices FALSE 
+            Binding BIND_PER_VERTEX 
+            Normalize 0 
+          }
+          NormalData {
+            Array TRUE ArrayID 2 Vec3fArray 24 {
+              0 -0 -1 
+              0 -0 -1 
+              0 -0 -1 
+              0 -0 -1 
+              0 -0 1 
+              0 -0 1 
+              0 -0 1 
+              0 -0 1 
+              1 -0 0 
+              1 -0 0 
+              1 -0 0 
+              1 -0 0 
+              -0 -1 -0 
+              -0 -1 -0 
+              -0 -1 -0 
+              -0 -1 -0 
+              -1 0 -0 
+              -1 0 -0 
+              -1 0 -0 
+              -1 0 -0 
+              0 1 0 
+              0 1 0 
+              0 1 0 
+              0 1 0 
+            }
+            Indices FALSE 
+            Binding BIND_PER_VERTEX 
+            Normalize 0 
+          }
+          ColorData {
+            Array TRUE ArrayID 3 Vec4fArray 1 {
+              1 1 1 1 
+            }
+            Indices FALSE 
+            Binding BIND_OVERALL 
+            Normalize 0 
+          }
+          TexCoordData 1 {
+            Data {
+              Array TRUE ArrayID 4 Vec2fArray 24 {
+                0.9999 0.9999 
+                0.0001 0.9999 
+                0.0001 0.0001 
+                0.9999 0.0001 
+                0.9999 0.9999 
+                0.0001 0.9999 
+                0.0001 0.0001 
+                0.9999 0.0001 
+                0.9999 0.0001 
+                0.9999 0.9999 
+                0.0001 0.9999 
+                0.0001 0.0001 
+                0.9999 0.0001 
+                0.9999 0.9999 
+                0.0001 0.9999 
+                0.0001 0.0001 
+                0.0001 0.9999 
+                0.0001 0.0001 
+                0.9999 0.0001 
+                0.9999 0.9999 
+                0.9999 0.0001 
+                0.9999 0.9999 
+                0.0001 0.9999 
+                0.0001 0.0001 
+              }
+              Indices FALSE 
+              Binding BIND_PER_VERTEX 
+              Normalize 0 
+            }
+          }
+        }
+      }
+    }
+  }
+}

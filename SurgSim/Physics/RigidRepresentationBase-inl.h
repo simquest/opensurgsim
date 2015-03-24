@@ -23,11 +23,12 @@ namespace Physics
 {
 
 template <class T>
-std::shared_ptr<T> SurgSim::Physics::RigidRepresentationBase::createTypedLocalization(
+std::shared_ptr<T> RigidRepresentationBase::createTypedLocalization(
 	const SurgSim::DataStructures::Location& location)
 {
 	// Change when we deal with the meshes as shapes
-	std::shared_ptr<T> result = std::make_shared<T>();
+	std::shared_ptr<T> result = std::make_shared<T>(
+		std::static_pointer_cast<Representation>(getSharedPtr()));
 
 	SURGSIM_ASSERT(location.rigidLocalPosition.hasValue()) <<
 		"Tried to create a rigid localization without valid position information";

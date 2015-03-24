@@ -341,9 +341,10 @@ public:
 
 private:
 	/// Provides update functionality, which just increments the number of updates
-	virtual void doUpdate()
+	bool doUpdate() override
 	{
 		++m_numUpdates;
+		return true;
 	}
 
 	/// Number of updates performed on the mesh
@@ -439,9 +440,10 @@ public:
 
 private:
 	/// Provides update functionality, which just increments the number of updates
-	virtual void doUpdate()
+	bool doUpdate() override
 	{
 		++m_numUpdates;
+		return true;
 	}
 
 	/// Number of updates performed on the mesh

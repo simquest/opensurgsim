@@ -209,9 +209,9 @@ void OdeState::applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCom
 		 it != getBoundaryConditions().cend();
 		 ++it)
 	{
-		Math::zeroRow(*it, matrix);
-		Math::zeroColumn(*it, matrix);
-		(*matrix).coeffRef(*it, *it) = complianceValue;
+		Math::zeroRow(static_cast<int>(*it), matrix);
+		Math::zeroColumn(static_cast<int>(*it), matrix);
+		(*matrix).coeffRef(static_cast<int>(*it), static_cast<int>(*it)) = complianceValue;
 	}
 }
 

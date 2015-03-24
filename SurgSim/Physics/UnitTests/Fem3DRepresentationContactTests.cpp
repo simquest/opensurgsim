@@ -139,7 +139,6 @@ TEST_F(Fem3DRepresentationContactTests, ConstraintConstantsTest)
 	auto implementation = std::make_shared<Fem3DRepresentationContact>();
 
 	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
-	EXPECT_EQ(SurgSim::Physics::REPRESENTATION_TYPE_FEM3D, implementation->getRepresentationType());
 	EXPECT_EQ(1u, implementation->getNumDof());
 }
 

@@ -52,6 +52,7 @@ set(UNIT_TEST_EIGEN_TYPE_SOURCES
 	MatrixTests.cpp
 	QuaternionTests.cpp
 	RigidTransformTests.cpp
+	SparseMatrixTests.cpp
 	VectorTests.cpp
 )
 

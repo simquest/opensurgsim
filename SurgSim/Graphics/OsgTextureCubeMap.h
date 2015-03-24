@@ -17,12 +17,13 @@
 #define SURGSIM_GRAPHICS_OSGTEXTURECUBEMAP_H
 
 #include "SurgSim/Graphics/OsgTexture.h"
+#include "SurgSim/Graphics/TextureCubeMap.h"
 
 #include <osg/TextureCubeMap>
 
 #if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable:4250)
+	#pragma warning(push)
+	#pragma warning(disable:4250)
 #endif
 
 namespace SurgSim
@@ -34,23 +35,16 @@ namespace Graphics
 /// OSG implementation of a Cube Map Texture
 ///
 /// Wraps an osg::TextureCubeMap
-class OsgTextureCubeMap : public OsgTexture
+class OsgTextureCubeMap : public OsgTexture, public TextureCubeMap
 {
 public:
 	/// Constructor
 	/// \post	No image is loaded in the texture.
 	OsgTextureCubeMap();
 
-	/// Sets the size of the texture
-	/// \param	width	Width of the texture
-	/// \param	height	Height of the texture
-	/// \note	Use this to setup a texture as a render target rather than loading from file.
-	virtual void setSize(int width, int height);
+	void setSize(int width, int height) override;
 
-	/// Gets the size of the texture
-	/// \param[out]	width	Width of the texture
-	/// \param[out]	height	Height of the texture
-	virtual void getSize(int* width, int* height) const;
+	void getSize(int* width, int* height) const override;
 
 	/// Loads an image into the texture from a file
 	/// \param	filePath	Path to the image file
@@ -65,35 +59,26 @@ public:
 	/// (+Z): (width * 1/3, height * 1/2) to (width * 2/3, height * 3/4)
 	/// (+X): (width * 2/3, height * 1/2) to (width,       height * 3/4)
 	/// (+Y): (width * 1/3, height * 3/4) to (width * 2/3, height      )
-	virtual bool loadImage(const std::string& filePath);
+	bool loadImage(const std::string& filePath) override;
 
-	/// Loads images from files into the faces of the cube map
-	/// \param	negativeX	Path to the image for the (-X) face
-	/// \param	positiveX	Path to the image for the (+X) face
-	/// \param	negativeY	Path to the image for the (-Y) face
-	/// \param	positiveY	Path to the image for the (+Y) face
-	/// \param	negativeZ	Path to the image for the (-Z) face
-	/// \param	positiveZ	Path to the image for the (+Z) face
-	/// \return	True if the image is successfully loaded, otherwise false
-	virtual bool loadImageFaces(const std::string& negativeX, const std::string& positiveX,
-		const std::string& negativeY, const std::string& positiveY,
-		const std::string& negativeZ, const std::string& positiveZ);
+	bool loadImageFaces(const std::string& negativeX, const std::string& positiveX,
+						const std::string& negativeY, const std::string& positiveY,
+						const std::string& negativeZ, const std::string& positiveZ) override;
 
 	/// Returns the osg::TextureCubeMap
-	osg::ref_ptr<osg::TextureCubeMap> getOsgTextureCubeMap() const
-	{
-		return static_cast<osg::TextureCubeMap*>(getOsgTexture().get());
-	}
+	osg::ref_ptr<osg::TextureCubeMap> getOsgTextureCubeMap() const;
 
 protected:
 	/// Makes a copy of an image block
 	/// \param	source	Source image to copy from
-	/// \param	column	First column of block in the source image
-	/// \param	row	First row of block in the source image
+	/// \param	startColumn	First column of block in the source image
+	/// \param	startRow	First row of block in the source image
 	/// \param	width	Width of the block
 	/// \param	height	Height of the block
 	/// \return	Copy of the image block
-	osg::ref_ptr<osg::Image> copyImageBlock(const osg::Image& source, int column, int row, int width, int height);
+	osg::ref_ptr<osg::Image> copyImageBlock(const osg::Image& source,
+											size_t startColumn, size_t startRow,
+											size_t width, size_t height);
 };
 
 };  // namespace Graphics
@@ -101,7 +86,7 @@ protected:
 };  // namespace SurgSim
 
 #if defined(_MSC_VER)
-#pragma warning(pop)
+	#pragma warning(pop)
 #endif
 
 #endif  // SURGSIM_GRAPHICS_OSGTEXTURECUBEMAP_H

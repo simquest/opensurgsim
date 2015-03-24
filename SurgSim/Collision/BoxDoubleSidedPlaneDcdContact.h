@@ -19,6 +19,9 @@
 #include <memory>
 
 #include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/DoubleSidedPlaneShape.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {
@@ -31,18 +34,25 @@ class CollisionPair;
 class BoxDoubleSidedPlaneDcdContact : public ContactCalculation
 {
 public:
-
 	/// Constructor.
 	BoxDoubleSidedPlaneDcdContact();
 
-	/// Function that returns the shapes between which this class performs collision detection.
-	/// \return int std::pair containing the shape types.
+	using ContactCalculation::calculateContact;
+
+	/// Calculate the contacts using the typed shapes directly
+	/// \param boxShape the box shape
+	/// \param boxPose the pose of the box
+	/// \param planeShape the double sided plane shape
+	/// \param planePose the pose of the plane
+	/// \return a list of contacts between the shapes, if any
+	std::list<std::shared_ptr<Contact>> calculateContact(
+			const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
+			const SurgSim::Math::DoubleSidedPlaneShape& planeShape, const SurgSim::Math::RigidTransform3d& planePose);
+
 	std::pair<int,int> getShapeTypes() override;
 
 private:
-	/// Calculate the actual contact between two shapes of the given CollisionPair.
-	/// \param	pair	The symmetric pair that is under consideration.
-	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair);
+	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 };
 

@@ -80,8 +80,8 @@ void DeformableRepresentation::setInitialState(
 
 	m_hasExternalGeneralizedForce = false;
 	m_externalGeneralizedForce.setZero(getNumDof());
-	m_externalGeneralizedStiffness.resize(getNumDof(), getNumDof());
-	m_externalGeneralizedDamping.resize(getNumDof(), getNumDof());
+	m_externalGeneralizedStiffness.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
+	m_externalGeneralizedDamping.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
 }
 
 const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const
@@ -134,7 +134,7 @@ const SurgSim::Math::Matrix& DeformableRepresentation::getComplianceMatrix() con
 {
 	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
 
-	return m_odeSolver->getCompliance();
+	return m_odeSolver->getComplianceMatrix();
 }
 
 void DeformableRepresentation::update(double dt)

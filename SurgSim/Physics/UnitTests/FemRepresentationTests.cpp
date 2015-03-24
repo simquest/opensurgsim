@@ -524,6 +524,98 @@ TEST_F(FemRepresentationTests, DoInitializeTest)
 	}
 }
 
+TEST_F(FemRepresentationTests, ComplianceWarpingTest)
+{
+	{
+		SCOPED_TRACE("MockFemRepresentation incomplete for compliance warping");
+		auto fem = std::make_shared<MockFemRepresentation>("fem");
+
+		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(fem->setComplianceWarping(true));
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+
+		// Setup the initial state
+		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
+		initialState->setNumDof(fem->getNumDofPerNode(), 3);
+		fem->setInitialState(initialState);
+
+		// Add one element
+		std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		element->addNode(0);
+		element->addNode(1);
+		element->addNode(2);
+		fem->addFemElement(element);
+
+		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem->wakeUp();
+
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
+
+		// update() will call updateNodesRotations() which will raise an exception in this case.
+		// This method has not been overridden.
+		EXPECT_THROW(fem->update(1e-3), SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		SCOPED_TRACE("MockFemRepresentation complete for compliance warping");
+		auto fem = std::make_shared<MockFemRepresentationValidComplianceWarping>("fem");
+
+		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(fem->setComplianceWarping(true));
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+
+		// Setup the initial state
+		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
+		initialState->setNumDof(fem->getNumDofPerNode(), 3);
+		fem->setInitialState(initialState);
+
+		// Add one element
+		std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		element->addNode(0);
+		element->addNode(1);
+		element->addNode(2);
+		fem->addFemElement(element);
+
+		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem->wakeUp();
+
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
+
+		// update() will call updateNodesRotations() which will not raise an exception in this case.
+		// This method has been overridden.
+		EXPECT_NO_THROW(fem->update(1e-3));
+
+		EXPECT_NO_THROW(EXPECT_TRUE((fem->getComplianceMatrix() / 1e-3).isIdentity()));
+	}
+}
+
+TEST_F(FemRepresentationTests, SerializationTest)
+{
+	auto fem = std::make_shared<MockFemRepresentation>("Test-Fem");
+
+	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", true));
+	EXPECT_TRUE(fem->getComplianceWarping());
+	EXPECT_TRUE(fem->getValue<bool>("ComplianceWarping"));
+	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", false));
+	EXPECT_FALSE(fem->getComplianceWarping());
+	EXPECT_FALSE(fem->getValue<bool>("ComplianceWarping"));
+
+	std::string filename("thisIsTheFilename.extension");
+	EXPECT_NO_THROW(fem->setValue("Filename", filename));
+	EXPECT_EQ(filename, fem->getFilename());
+	EXPECT_EQ(filename, fem->getValue<std::string>("Filename"));
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

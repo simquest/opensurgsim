@@ -28,6 +28,11 @@ namespace SurgSim
 namespace DataStructures
 {
 
+/// A Location defines a local position w.r.t. any shape. Depending on the type of shape,
+/// different data is needed to specify a location on it. This structure supports:
+/// - Any rigid shape (location identified by a local position)
+/// - Octree (location identified by an octree path)
+/// - A triangle mesh (location identified by the triangle id, and the barycentric coordinate of a point in it)
 struct Location
 {
 public:
@@ -35,6 +40,13 @@ public:
 	Location()
 	{
 	}
+
+	/// Copy constructor
+	/// \param other The location to be copied while constructing.
+	Location(const Location& other)
+		: rigidLocalPosition(other.rigidLocalPosition), octreeNodePath(other.octreeNodePath),
+		meshLocalCoordinate(other.meshLocalCoordinate)
+	{}
 
 	/// Constructor for rigid local position
 	/// \param localPosition The 3D local position to set this location to
