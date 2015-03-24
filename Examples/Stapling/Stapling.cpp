@@ -79,6 +79,8 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	std::shared_ptr<Fem3DRepresentation> physicsRepresentation = std::make_shared<Fem3DRepresentation>("Physics");
 	physicsRepresentation->setFilename(filename);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
+	physicsRepresentation->setRayleighDampingMass(0.2);
+	physicsRepresentation->setRayleighDampingStiffness(0.2);
 	sceneElement->addComponent(physicsRepresentation);
 
 	// Load the surface triangle mesh of the finite element model
