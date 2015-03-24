@@ -64,11 +64,6 @@ Fem1DRepresentation::~Fem1DRepresentation()
 {
 }
 
-RepresentationType Fem1DRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_FEM1D;
-}
-
 void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 										 const SurgSim::Math::Vector& generalizedForce,
 										 const SurgSim::Math::Matrix& K,

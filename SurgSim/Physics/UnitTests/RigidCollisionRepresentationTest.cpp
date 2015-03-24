@@ -203,11 +203,19 @@ TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 								 Vector3d(8.7, -4.7, -3.1));
 	collisionRepresentation->setLocalPose(transform);
 	collisionRepresentation->update(dt);
+	EXPECT_TRUE(collisionRepresentation->isActive());
 
 	actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getShape());
 	expectedMesh->setPose(transform);
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
+
+	// The MeshShape fails to update due to the normal calculation's numerical precision, inactivating the collision rep
+	auto state = physicsRepresentation->getCurrentState();
+	state.setPose(SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(1e100, 1e100, 1e100)));
+	physicsRepresentation->setInitialState(state);
+	EXPECT_NO_THROW(collisionRepresentation->update(0.0));
+	EXPECT_FALSE(collisionRepresentation->isActive());
 }
 
 } // namespace Physics

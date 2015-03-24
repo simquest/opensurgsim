@@ -300,7 +300,7 @@ TEST_F(MeshShapeTest, SetPoseTest)
 
 	RigidTransform3d transform = makeRigidTransform(Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5),
 			Vector3d(8.7, -4.7, -3.1));
-	actualMesh->setPose(transform);
+	EXPECT_TRUE(actualMesh->setPose(transform));
 
 	Vector3d expectedPosition;
 	ASSERT_EQ(originalMesh->getNumVertices(), actualMesh->getNumVertices());
@@ -319,6 +319,9 @@ TEST_F(MeshShapeTest, SetPoseTest)
 		ASSERT_TRUE(expectedNormal.isApprox(actualMesh->getTriangle(i).data.normal, epsilon)) <<
 			"Normal #" << i << " is not as expected, remaining normals may also be incorrect.";
 	}
+
+	// Expect indeterminate normals due to numerical precision.
+	EXPECT_FALSE(actualMesh->setPose(makeRigidTranslation(Vector3d(1e100, 1e100, 1e100))));
 }
 
 TEST_F(MeshShapeTest, NormalTest)
@@ -364,9 +367,12 @@ TEST_F(MeshShapeTest, NormalTest)
 	v2p = v3;
 
 	// Recompute normals for meshWithNormal
-	meshWithNormal->calculateNormals();
+	EXPECT_TRUE(meshWithNormal->update());
 	Vector3d expectedXNormal(0.0, -1.0, 0.0);
 	EXPECT_EQ(expectedXNormal, meshWithNormal->getNormal(0));
+
+	v2p = v1;
+	EXPECT_FALSE(meshWithNormal->update());
 }
 
 

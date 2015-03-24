@@ -40,10 +40,6 @@ public:
 	/// \return The MLCP constraint type corresponding to this constraint implementation
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
-	/// Gets the Type of representation that this implementation is concerned with
-	/// \return RepresentationType for this implementation
-	RepresentationType getRepresentationType() const override;
-
 private:
 	/// Gets the number of degree of freedom.
 	/// \return 3 A bilateral 3d constraint enforces equality in the x, y, and z dimensions between 2 points.

@@ -114,9 +114,52 @@ std::shared_ptr<OsgTextureCubeMap> loadAxisCubeMap(
 	return result;
 }
 
+void add2DTexture(std::shared_ptr<OsgMaterial> material,
+				  const std::string& uniform,
+				  int unit,
+				  const std::string& filename)
+{
+	std::string path;
+	EXPECT_TRUE(Framework::Runtime::getApplicationData()->tryFindFile(filename, &path));
+	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+	texture->loadImage(path);
+	auto textureUniform = std::make_shared<OsgTextureUniform<OsgTexture2d>>(uniform);
+	textureUniform->set(texture);
+	textureUniform->setMinimumTextureUnit(unit);
+	material->addUniform(textureUniform);
+}
+
+
 struct OsgProgramRenderTests : public RenderTest
 {
+	void SetUp()
+	{
+		RenderTest::SetUp();
 
+		// Light
+		auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
+		auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
+		light->setDiffuseColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
+		light->setSpecularColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
+		light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
+		sceneElement->addComponent(light);
+		sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
+		sceneElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-2.0, -2.0, -4.0)));
+		scene->addSceneElement(sceneElement);
+
+		// Camera
+		viewElement->getCamera()->setAmbientColor(SurgSim::Math::Vector4d(0.1, 0.1, 0.1, 1.0));
+		viewElement->setPose(
+			makeRigidTransform(Vector3d(0.0, 0.0, -2.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
+	}
+
+	void run()
+	{
+		// Action
+		runtime->start();
+		boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
+		runtime->stop();
+	}
 };
 
 /// Pops up a window with a sphere colored by its normals and its mirror along the x-axis is also drawn using the
@@ -139,10 +182,7 @@ TEST_F(OsgProgramRenderTests, SphereShaderTest)
 	viewElement->addComponent(sphereRepresentation);
 	viewElement->addComponent(material);
 
-	/// Run the thread
-	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-	runtime->stop();
+	run();
 }
 
 TEST_F(OsgProgramRenderTests, Shiny)
@@ -163,27 +203,7 @@ TEST_F(OsgProgramRenderTests, Shiny)
 	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
 	scene->addSceneElement(sceneElement);
 
-
-	sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
-	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
-	light->setDiffuseColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
-	light->setSpecularColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
-	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
-	sceneElement->addComponent(light);
-	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
-	sceneElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-2.0, -2.0, -4.0)));
-
-	scene->addSceneElement(sceneElement);
-
-	viewElement->setPose(
-		makeRigidTransform(Vector3d(0.0, 0.0, -2.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
-	viewElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
-
-
-	/// Run the thread
-	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
-	runtime->stop();
+	run();
 }
 
 TEST_F(OsgProgramRenderTests, TexturedShiny)
@@ -230,38 +250,15 @@ TEST_F(OsgProgramRenderTests, TexturedShiny)
 	textureUniform->set(texture);
 	textureUniform->setMinimumTextureUnit(8);
 	material->addUniform(textureUniform);
-
 	sphereRepresentation->setMaterial(material);
 
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Sphere");
 	sceneElement->addComponent(sphereRepresentation);
 	sceneElement->addComponent(material);
 	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
-
 	scene->addSceneElement(sceneElement);
 
-	sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
-	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
-	light->setDiffuseColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
-	light->setSpecularColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
-	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
-	sceneElement->addComponent(light);
-	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
-	sceneElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-2.0, -2.0, -4.0)));
-	scene->addSceneElement(sceneElement);
-
-	viewElement->enableManipulator(true);
-	viewElement->getCamera()->setAmbientColor(SurgSim::Math::Vector4d(0.2, 0.2, 0.2, 1.0));
-
-	viewElement->setPose(makeRigidTransform(Vector3d(0.0, 0.0, -2.0),
-											Vector3d(0.0, 0.0, 0.0),
-											Vector3d(0.0, 1.0, 0.0)));
-
-	viewElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
-
-	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
-	runtime->stop();
+	run();
 }
 
 
@@ -340,31 +337,53 @@ TEST_F(OsgProgramRenderTests, Metal)
 	sceneElement->addComponent(representation);
 	sceneElement->addComponent(material);
 	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
-
 	scene->addSceneElement(sceneElement);
 
-	sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
-	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
-	light->setDiffuseColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
-	light->setSpecularColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
-	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
-	sceneElement->addComponent(light);
+	run();
+}
+
+TEST_F(OsgProgramRenderTests, NormalMap)
+{
+	// Assign the object used for testing to the representation
+	auto graphics = std::make_shared<OsgSceneryRepresentation>("scenery");
+	graphics->loadModel("OsgShaderRenderTests/cube.osgt");
+
+	auto representation = std::dynamic_pointer_cast<Representation>(graphics);
+	representation->setGenerateTangents(true);
+
+	auto material = std::make_shared<OsgMaterial>("material");
+	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/dns_mapping_material");
+	ASSERT_TRUE(program != nullptr);
+	material->setProgram(program);
+
+	material->addUniform("vec4", "specularColor");
+	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+
+	material->addUniform("vec4", "diffuseColor");
+	material->setValue("diffuseColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+
+	material->addUniform("float", "shininess");
+	material->setValue("shininess", 1.0f);
+
+	std::string filename;
+
+	add2DTexture(material, "shadowMap", 8, "Textures/black.png");
+	add2DTexture(material, "diffuseMap", 0, "Textures/checkered.png");
+	add2DTexture(material, "normalMap", 1, "OsgShaderRenderTests/bricks.png");
+	representation->setMaterial(material);
+
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Graphics");
+	sceneElement->addComponent(representation);
+	sceneElement->addComponent(material);
 	sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
-	sceneElement->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-2.0, -2.0, -4.0)));
 	scene->addSceneElement(sceneElement);
 
-	viewElement->enableManipulator(true);
-	viewElement->getCamera()->setAmbientColor(SurgSim::Math::Vector4d(0.1, 0.1, 0.1, 1.0));
 
-	viewElement->setPose(makeRigidTransform(Vector3d(0.0, 0.0, -2.0),
+	viewElement->setPose(makeRigidTransform(Vector3d(0.5, 0.5, -0.5),
 											Vector3d(0.0, 0.0, 0.0),
 											Vector3d(0.0, 1.0, 0.0)));
 
-	viewElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
-
-	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
-	runtime->stop();
+	run();
 }
 
 };  // namespace Graphics

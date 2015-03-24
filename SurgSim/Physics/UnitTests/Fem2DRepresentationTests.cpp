@@ -40,12 +40,6 @@ TEST(Fem2DRepresentationTests, ConstructorTest)
 	ASSERT_NO_THROW({std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem2D");});
 }
 
-TEST(Fem2DRepresentationTests, GetTypeTest)
-{
-	std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem2D");
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM2D, fem->getType());
-}
-
 TEST(Fem2DRepresentationTests, GetNumDofPerNodeTest)
 {
 	std::shared_ptr<Fem2DRepresentation> fem = std::make_shared<Fem2DRepresentation>("Fem2D");
@@ -199,16 +193,12 @@ TEST(Fem2DRepresentationTests, SerializationTest)
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(1u, node.size());
 
-	YAML::Node data = node["SurgSim::Physics::Fem2DRepresentation"];
-	EXPECT_EQ(10u, data.size());
-
 	std::shared_ptr<Fem2DRepresentation> newRepresentation;
 	ASSERT_NO_THROW(newRepresentation =
 		std::dynamic_pointer_cast<Fem2DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	ASSERT_NE(nullptr, newRepresentation);
 
 	EXPECT_EQ("SurgSim::Physics::Fem2DRepresentation", newRepresentation->getClassName());
-	EXPECT_EQ(REPRESENTATION_TYPE_FEM2D, newRepresentation->getType());
 }
 
 } // namespace Physics

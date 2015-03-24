@@ -75,10 +75,6 @@ public:
 	/// \return The normal for the triangle with given ID.
 	const SurgSim::Math::Vector3d& getNormal(size_t triangleId) const;
 
-	/// Calculate normals for all triangles.
-	/// \note Normals will be normalized.
-	void calculateNormals();
-
 	/// Get the volume of the shape
 	/// \note this parameter is valid with respect to the initial mesh
 	/// \return The volume of the shape (in m-3)
@@ -95,12 +91,10 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	Matrix33d getSecondMomentOfVolume() const override;
 
-	/// Set the object's global pose
+	/// Set the object's global pose, then update the shape.
 	/// \param pose the rigid transform to apply
-	void setPose(const SurgSim::Math::RigidTransform3d& pose);
-
-	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
-	void updateAabbTree();
+	/// \return true if the update succeeds.
+	bool setPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Get the AabbTree
 	/// \return The object's associated AabbTree
@@ -109,9 +103,16 @@ public:
 	bool isValid() const override;
 
 protected:
-	void doUpdate() override;
-
+	bool doUpdate() override;
 	bool doLoad(const std::string& fileName) override;
+
+	/// Calculate normals for all triangles.
+	/// \note Normals will be normalized.
+	/// \return true on success, or false if any triangle has an indeterminate normal.
+	bool calculateNormals();
+
+	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void updateAabbTree();
 
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.
@@ -132,6 +133,12 @@ private:
 
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
+
+	/// The pose.
+	SurgSim::Math::RigidTransform3d m_pose;
+
+	/// true if the pose is valid.
+	bool m_validPose;
 };
 
 }; // Math
