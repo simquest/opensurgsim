@@ -32,21 +32,28 @@
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
+#include "SurgSim/Physics/ConstraintDataRotationVector.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
 #include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
+#include "SurgSim/Physics/RigidRepresentationConstraintRotationVector.h"
 
 using SurgSim::Collision::ContactMapType;
 using SurgSim::Physics::ConstraintImplementation;
 using SurgSim::Physics::FixedRepresentationBilateral3D;
 using SurgSim::Physics::RigidRepresentationBilateral3D;
+using SurgSim::Physics::RigidRepresentationConstraintRotationVector;
+using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::Fem3DRepresentationBilateral3D;
+using SurgSim::Physics::FemElement;
 using SurgSim::Physics::Localization;
 using SurgSim::Framework::checkAndConvert;
 
@@ -265,17 +272,53 @@ void StaplerBehavior::createStaple()
 					targetContact->penetrationPoints.second.rigidLocalPosition.getValue()));
 
 		// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
-		auto constraint = std::make_shared<SurgSim::Physics::Constraint>(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT,
-			std::make_shared<SurgSim::Physics::ConstraintData>(), stapleRepresentation,
-			stapleConstraintLocation, targetPhysicsRepresentation, targetContact->penetrationPoints.second);
+		{
+			auto constraint = std::make_shared<SurgSim::Physics::Constraint>(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT,
+				std::make_shared<SurgSim::Physics::ConstraintData>(), stapleRepresentation,
+				stapleConstraintLocation, targetPhysicsRepresentation, targetContact->penetrationPoints.second);
 
-		// Create a component to store this constraint.
-		std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
-			std::make_shared<SurgSim::Physics::ConstraintComponent>(
-				"Bilateral3DConstraint" + boost::to_string(toothId++));
+			// Create a component to store this constraint.
+			std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
+				std::make_shared<SurgSim::Physics::ConstraintComponent>(
+				"Bilateral3DConstraint" + boost::to_string(toothId));
 
-		constraintComponent->setConstraint(constraint);
-		staple->addComponent(constraintComponent);
+			constraintComponent->setConstraint(constraint);
+			staple->addComponent(constraintComponent);
+		}
+
+		// Create a rotation vector constraint for the staple.
+		{
+			SurgSim::Math::Vector3d axis, rotationVector;
+			double angle;
+			SurgSim::Math::computeAngleAndAxis(SurgSim::Math::Quaterniond(stapleRepresentation->getPose().linear()), &angle, &axis);
+			rotationVector = angle * axis;
+
+			auto constraintData = std::make_shared<SurgSim::Physics::ConstraintDataRotationVector>();
+			constraintData->setInitialRotationVector(rotationVector);
+
+			std::shared_ptr<Fem3DRepresentation> fem3d = std::dynamic_pointer_cast<Fem3DRepresentation>(targetPhysicsRepresentation);
+			if (fem3d != nullptr && targetContact->penetrationPoints.second.meshLocalCoordinate.hasValue())
+			{
+				auto element = fem3d->getFemElement(targetContact->penetrationPoints.second.meshLocalCoordinate.getValue().index);
+				constraintData->setInitialOrientation(element->getOrientation(*fem3d->getCurrentState()));
+			}
+
+			auto constraintRotationVector = std::make_shared<SurgSim::Physics::Constraint>(SurgSim::Math::MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT,
+				constraintData, stapleRepresentation,
+				stapleConstraintLocation, targetPhysicsRepresentation, targetContact->penetrationPoints.second);
+
+			// Create a component to store this constraint.
+			std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintRotationVectorComponent =
+				std::make_shared<SurgSim::Physics::ConstraintComponent>(
+				"RotationVectorConstraint" + boost::to_string(toothId));
+
+			constraintRotationVectorComponent->setConstraint(constraintRotationVector);
+			staple->addComponent(constraintRotationVectorComponent);
+		}
+
+		toothId++;
+
+		break;
 	}
 
 	if (!stapleAdded)
