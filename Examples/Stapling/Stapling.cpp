@@ -91,6 +91,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Create material to transport the Textures
 	graphicalFem->setMaterial(material);
+	graphicalFem->setGenerateTangents(true);
 	sceneElement->addComponent(material);
 
 	// Create the collision mesh for the surface of the finite element model
@@ -126,9 +127,9 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 /// \param name Name of this scenery representation.
 /// \param fileName Name of the file from which the scenery representation will be loaded.
 /// \return A scenery representation.
-std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& name, const std::string& fileName)
+std::shared_ptr<OsgSceneryRepresentation> createSceneryObject(const std::string& name, const std::string& fileName)
 {
-	std::shared_ptr<SceneryRepresentation> sceneryRepresentation = std::make_shared<OsgSceneryRepresentation>(name);
+	auto sceneryRepresentation = std::make_shared<OsgSceneryRepresentation>(name);
 	sceneryRepresentation->loadModel(fileName);
 	return sceneryRepresentation;
 }
@@ -192,10 +193,13 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(visualizeContactsBehavior);
 
 	// Load the graphical parts of a stapler.
-	sceneElement->addComponent(createSceneryObject("Handle",    "Geometry/stapler_handle.obj"));
-	sceneElement->addComponent(createSceneryObject("Indicator", "Geometry/stapler_indicator.obj"));
-	sceneElement->addComponent(createSceneryObject("Markings",  "Geometry/stapler_markings.obj"));
-	sceneElement->addComponent(createSceneryObject("Trigger",   "Geometry/stapler_trigger.obj"));
+
+	auto graphics = createSceneryObject("Stapler", "Geometry/stapler.osgb");
+	auto material = SurgSim::Blocks::createTexturedMaterial("material",
+					Vector4f(1.0, 1.0, 1.0, 1.0),
+					Vector4f(0.8, 0.8, 0.8, 1.0), 32.0);
+	sceneElement->addComponent(graphics);
+	sceneElement->addComponent(material);
 
 	auto meshShapeForVirtualStaple1 = std::make_shared<MeshShape>();
 	auto meshShapeForVirtualStaple2 = std::make_shared<MeshShape>();
@@ -224,47 +228,55 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	return sceneElement;
 }
 
-std::shared_ptr<SceneElement> createArmSceneElement(
-	const std::string& armName,
-	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material)
+std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 {
-	const std::string filename = std::string("Geometry/arm_collision.ply");
+	auto element = std::make_shared<BasicSceneElement>(armName);
+	const std::string filename = "Geometry/arm_collision.ply";
 
 	// Graphic representation for arm
-	std::shared_ptr<SceneryRepresentation> forearmSceneryRepresentation =
-		createSceneryObject("Forearm", "Geometry/forearm.osgb");
-	forearmSceneryRepresentation->setMaterial(material);
-	std::shared_ptr<SceneryRepresentation> upperarmSceneryRepresentation =
-		createSceneryObject("Upperarm", "Geometry/upperarm.osgb");
-	upperarmSceneryRepresentation->setMaterial(material);
+	auto material = SurgSim::Blocks::createNormalMappedMaterial("forearm material",
+					Vector4f(1.0, 1.0, 1.0, 1.0),
+					Vector4f(0.4, 0.4, 0.4, 1.0), 10.0,
+					"",
+					"Geometry/forearm_normal.png");
+	auto forearm = createSceneryObject("Forearm", "Geometry/forearm.osgb");
+	forearm->setMaterial(material);
+	forearm->setGenerateTangents(true);
+	element->addComponent(forearm);
+	element->addComponent(material);
+
+	material = SurgSim::Blocks::createNormalMappedMaterial("upperarm material",
+			   Vector4f(1.0, 1.0, 1.0, 1.0),
+			   Vector4f(0.4, 0.4, 0.4, 1.0), 10.0,
+			   "",
+			   "Geometry/upperarm_normal.png");
+	auto upperArm = createSceneryObject("Upperarm", "Geometry/upperarm.osgb");
+	upperArm->setMaterial(material);
+	upperArm->setGenerateTangents(true);
+	element->addComponent(upperArm);
+	element->addComponent(material);
 
 	// Arm collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>();
 	meshShape->load(filename);
 
 	// Visualization of arm collision mesh
-	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
-		std::make_shared<OsgMeshRepresentation>("Collision Mesh");
+	auto meshShapeVisualization = std::make_shared<OsgMeshRepresentation>("Collision Mesh");
 	meshShapeVisualization->setShape(meshShape);
 	meshShapeVisualization->setDrawAsWireFrame(true);
 	meshShapeVisualization->setLocalActive(false);
 
-	std::shared_ptr<FixedRepresentation> physicsRepresentation = std::make_shared<FixedRepresentation>("Physics");
+	auto physicsRepresentation = std::make_shared<FixedRepresentation>("Physics");
 	physicsRepresentation->setShape(meshShape);
 
-	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<RigidCollisionRepresentation>("Collision");
+	auto  collisionRepresentation = std::make_shared<RigidCollisionRepresentation>("Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
-	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>(armName);
-	armSceneElement->addComponent(forearmSceneryRepresentation);
-	armSceneElement->addComponent(meshShapeVisualization);
-	armSceneElement->addComponent(upperarmSceneryRepresentation);
-	armSceneElement->addComponent(collisionRepresentation);
-	armSceneElement->addComponent(physicsRepresentation);
-	armSceneElement->addComponent(material);
+	element->addComponent(meshShapeVisualization);
+	element->addComponent(collisionRepresentation);
+	element->addComponent(physicsRepresentation);
 
-	return armSceneElement;
+	return element;
 }
 
 template <typename Type>
@@ -292,67 +304,10 @@ std::shared_ptr<OsgViewElement> createViewElement()
 	light->setSpecularColor(Vector4d(1.0, 1.0, 1.0, 1.0));
 	result->addComponent(light);
 
-	result->getCamera()->setAmbientColor(Vector4d(0.2, 0.2, 0.2, 1.0));
+	result->getCamera()->setAmbientColor(Vector4d(0.1, 0.1, 0.1, 1.0));
+// 	result->setPose(makeRigidTransform(Vector3d(0.0, 0.5, 0.5), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
 
 	return result;
-}
-
-std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
-	const SurgSim::Framework::ApplicationData& data,
-	std::shared_ptr<SurgSim::Graphics::OsgProgram> program,
-	std::string defaultTextureName = "Textures/checkered.png")
-{
-	// Default Material with shader
-	// using scopes to keep from having to introduce new variables with different types
-	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("shiny");
-	material->setProgram(program);
-
-	{
-		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
-		material->addUniform(uniform);
-		material->setValue("diffuseColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
-	}
-
-	{
-		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("specularColor");
-		material->addUniform(uniform);
-		material->setValue("specularColor", SurgSim::Math::Vector4f(0.01, 0.01, 0.01, 1.0));
-	}
-
-	{
-		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<float>>("shininess");
-		material->addUniform(uniform);
-		material->setValue("shininess", 32.0f);
-	}
-
-	std::string blackTexture;
-	SURGSIM_ASSERT(data.tryFindFile("Textures/black.png", &blackTexture));
-
-	std::string defaultTexture;
-	SURGSIM_ASSERT(data.tryFindFile(defaultTextureName, &defaultTexture));
-
-	{
-		// As a default color for the texture map use white
-		auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
-		texture->loadImage(defaultTexture);
-		auto uniform =
-			std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("diffuseMap");
-		uniform->set(texture);
-		material->addUniform(uniform);
-	}
-
-	{
-		// The neutral color for the shadow map is black
-		auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
-		texture->loadImage(blackTexture);
-		auto uniform =
-			std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("shadowMap");
-		uniform->set(texture);
-		uniform->setMinimumTextureUnit(8);
-		material->addUniform(uniform);
-	}
-
-	return material;
 }
 
 int main(int argc, char* argv[])
@@ -390,20 +345,25 @@ int main(int argc, char* argv[])
 	SURGSIM_ASSERT(shader != nullptr) << "Shader could not be loaded.";
 
 	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
-	auto material = createShinyMaterial(*runtime->getApplicationData(), shader);
-	std::shared_ptr<SceneElement> arm = createArmSceneElement("arm", material);
+
+	std::shared_ptr<SceneElement> arm = createArmSceneElement("arm");
 	arm->setPose(armPose);
 
 	std::shared_ptr<SceneElement> stapler = createStaplerSceneElement("stapler", deviceName);
 	stapler->setPose(RigidTransform3d::Identity());
 
+
+
 	std::string woundFilename = std::string("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
 	// Dynamic Optical Coherence Elastography", IEEE Transactions on Biomedical Engineering, Vol 57, No 4.
 
-
 	// Material for the wound
-	material = createShinyMaterial(*runtime->getApplicationData(), shader, "Geometry/wound.png");
+	auto material = SurgSim::Blocks::createNormalMappedMaterial("woundmaterial",
+					Vector4f(1.0, 1.0, 1.0, 1.0),
+					Vector4f(0.4, 0.4, 0.4, 1.0), 10.0,
+					"Geometry/wound.png",
+					"Geometry/wound_normal.png");
 
 	std::shared_ptr<SceneElement> wound =
 		createFemSceneElement("wound",
