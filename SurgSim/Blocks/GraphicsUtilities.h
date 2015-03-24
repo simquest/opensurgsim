@@ -29,18 +29,21 @@ void add2DTexture(std::shared_ptr<SurgSim::Graphics::OsgMaterial> material,
 				  const std::string& filename, bool repeat = false);
 
 /// Create a basic textured material
+/// \param name name of the material
 /// \param diffuseColor Base diffuse color to use
 /// \param specularColor Base specular color to use
 /// \param shininess Phong shininess exponent
 /// \param diffuseMap Diffuse texture map name to use, if the texture is embedded in the object
 ///        pass an empty string here, it has to occupy the correct texture unit though.
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> createTexturedMaterial(
+	const std::string& name,
 	SurgSim::Math::Vector4f diffuseColor,
 	SurgSim::Math::Vector4f specularColor,
-	double shininess,
+	float shininess,
 	const std::string& diffuseMap = "");
 
 /// Create a basic textured material
+/// \param name name of the material
 /// \param diffuseColor Base diffuse color to use
 /// \param specularColor Base specular color to use
 /// \param shininess Phong shininess exponent
@@ -48,10 +51,11 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createTexturedMaterial(
 ///        pass an empty string here, it has to occupy the correct texture unit as defined by \sa DIFFUSE_TEXTURE_UNIT.
 /// \param normalMap Normal texture map to use, if the texture is embedded in the object pass an empty string here,
 ///        it has to occupy the correct texture unit as defined by \sa NORMAL_TEXTURE_UNIT.
-std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappMaterial(
+std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
+	const std::string& name,
 	SurgSim::Math::Vector4f diffuseColor,
 	SurgSim::Math::Vector4f specularColor,
-	double shininess,
+	float shininess,
 	const std::string& diffuseMap = "",
 	const std::string& normalMap = "");
 }

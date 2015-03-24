@@ -40,13 +40,14 @@ void add2DTexture(
 	material->addUniform(textureUniform);
 }
 
-std::shared_ptr<Graphics::OsgMaterial> createTexturedMaterial(
-	Math::Vector4f diffuseColor,
-	Math::Vector4f specularColor,
-	double shininess,
+std::shared_ptr<SurgSim::Graphics::OsgMaterial> createTexturedMaterial(
+	const std::string& name,
+	SurgSim::Math::Vector4f diffuseColor,
+	SurgSim::Math::Vector4f specularColor,
+	float shininess,
 	const std::string& diffuseMap)
 {
-	auto material = std::make_shared<Graphics::OsgMaterial>("material");
+	auto material = std::make_shared<Graphics::OsgMaterial>(name);
 
 	auto program = Graphics::loadProgram(*Framework::Runtime::getApplicationData(), "Shaders/ds_mapping_material");
 	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/ds_mapping_material" ;
@@ -76,14 +77,15 @@ std::shared_ptr<Graphics::OsgMaterial> createTexturedMaterial(
 	return material;
 }
 
-std::shared_ptr<Graphics::OsgMaterial> createNormalMappedMaterial(
-	Math::Vector4f diffuseColor,
-	Math::Vector4f specularColor,
-	double shininess,
+std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
+	const std::string& name,
+	SurgSim::Math::Vector4f diffuseColor,
+	SurgSim::Math::Vector4f specularColor,
+	float shininess,
 	const std::string& diffuseMap,
 	const std::string& normalMap)
 {
-	auto material = std::make_shared<Graphics::OsgMaterial>("material");
+	auto material = std::make_shared<Graphics::OsgMaterial>(name);
 
 	auto program = Graphics::loadProgram(*Framework::Runtime::getApplicationData(), "Shaders/dns_mapping_material");
 	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/dns_mapping_material" ;
