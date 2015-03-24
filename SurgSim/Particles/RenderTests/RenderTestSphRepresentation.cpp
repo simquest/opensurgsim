@@ -140,5 +140,5 @@ TEST_F(RenderTests, SphRenderTest)
 	// Particle manager runs at 500Hz
 	particlesManager->setRate(500.0);
 
-	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 200000.0);
+	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 20000000.0);
 }
