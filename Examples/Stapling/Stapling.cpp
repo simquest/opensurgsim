@@ -65,6 +65,95 @@ using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
 
+std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>
+		createMaterials(std::shared_ptr<Scene> scene)
+{
+	std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> result;
+	auto element = std::make_shared<BasicSceneElement>("materials");
+	scene->addSceneElement(element);
+
+	// Skin
+	auto material = SurgSim::Blocks::createNormalMappedMaterial("skin",
+					Vector4f(1.0, 1.0, 1.0, 1.0), Vector4f(0.4, 0.4, 0.4, 1.0), 10.0, "", "");
+	result[material->getName()] = material;
+	element->addComponent(material);
+
+	// Plain Normal Map
+	material = SurgSim::Blocks::createNormalMappedMaterial("normalmapped",
+			   Vector4f(1.0, 1.0, 1.0, 1.0), Vector4f(1.0, 1.0, 1.0, 1.0), 1.0, "", "");
+	result[material->getName()] = material;
+	element->addComponent(material);
+
+	// Plain Textured
+	material = SurgSim::Blocks::createTexturedMaterial("textured",
+			   Vector4f(1.0, 1.0, 1.0, 1.0),
+			   Vector4f(1.0, 1.0, 1.0, 1.0), 1.0);
+	result[material->getName()] = material;
+	element->addComponent(material);
+
+	// Plain
+
+	return result;
+}
+
+void applyMaterials(
+	std::shared_ptr<Scene> scene,
+	std::unordered_map <std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> materials)
+{
+	static SurgSim::Graphics::OsgUniformFactory uniformFactory;
+	const std::string materialFilename = "Materials.yaml";
+	YAML::Node nodes;
+	if (SurgSim::Framework::tryLoadNode(materialFilename, &nodes))
+	{
+		for (auto node = nodes.begin(); node != nodes.end(); ++node)
+		{
+			std::string name = node->begin()->first.as<std::string>();
+			std::string materialName = node->begin()->second["Material"].as<std::string>();
+			auto found = name.find("/");
+			std::string elementName = name.substr(0, found);
+			std::string componentName = name.substr(found + 1);
+
+			auto element = scene->getSceneElement(elementName);
+			SURGSIM_ASSERT(element != nullptr)
+					<< "SceneElement " << elementName << " not found in scene.";
+
+			auto component = std::dynamic_pointer_cast<SurgSim::Graphics::OsgRepresentation>(
+								 element->getComponent(componentName));
+			SURGSIM_ASSERT(component != nullptr)
+					<< "Component " << componentName << " not found or not an OsgRepresentation.";
+
+			if (component != nullptr)
+			{
+				auto material = materials[materialName];
+
+				SURGSIM_ASSERT(material != nullptr)
+						<< "Could not find material " << materialName << " in the prebuilt materials.";
+
+				component->setMaterial(material);
+
+				auto propertyNodes = node->begin()->second["Properties"];
+				for (auto nodeIt = propertyNodes.begin(); nodeIt != propertyNodes.end(); ++nodeIt)
+				{
+					auto& node = *nodeIt;
+					auto rawUniform = uniformFactory.create(node[0].as<std::string>(), node[1].as<std::string>());
+					SURGSIM_ASSERT(rawUniform != nullptr)
+							<< "Could not create uniform " << node[1].as<std::string>() << " of type "
+							<< node[0].as<std::string>() << ".";
+					auto uniform = std::dynamic_pointer_cast<SurgSim::Graphics::OsgUniformBase>(rawUniform);
+					uniform->set(node[2]);
+					component->addUniform(uniform);
+				}
+			}
+		}
+	}
+	else
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Stapling"))
+				<< "Could not find material definitions, visuals are going to be compromised.";
+	}
+
+}
+
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
@@ -195,11 +284,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	// Load the graphical parts of a stapler.
 
 	auto graphics = createSceneryObject("Stapler", "Geometry/stapler.osgb");
-	auto material = SurgSim::Blocks::createTexturedMaterial("material",
-					Vector4f(1.0, 1.0, 1.0, 1.0),
-					Vector4f(0.8, 0.8, 0.8, 1.0), 32.0);
 	sceneElement->addComponent(graphics);
-	sceneElement->addComponent(material);
 
 	auto meshShapeForVirtualStaple1 = std::make_shared<MeshShape>();
 	auto meshShapeForVirtualStaple2 = std::make_shared<MeshShape>();
@@ -398,6 +483,9 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(keyboard);
 
 	runtime->addSceneElements("Scenery.yaml");
+
+	auto materials = createMaterials(runtime->getScene());
+	applyMaterials(runtime->getScene(), materials);
 
 	// Exclude collision between certain Collision::Representations
 	physicsManager->addExcludedCollisionPair(
