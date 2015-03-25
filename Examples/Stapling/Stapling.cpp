@@ -187,6 +187,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	inputVTC->setRepresentation(physicsRepresentation);
 	inputVTC->overrideAttachmentPoint(Vector3d::Zero());
 	inputVTC->setCalculateInertialTorques(false);
+	inputVTC->setCollisionRepresentation(collisionRepresentation);
 
 	// Parameters to be used with Phantom Device
 	inputVTC->overrideAngularStiffness(1.0);
