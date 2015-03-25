@@ -15,6 +15,8 @@
 
 #include <Eigen/Eigenvalues>
 
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
@@ -86,6 +88,8 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 									  Output, getOutput, setOutput);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 									  Representation, getRepresentation, setRepresentation);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
+									  CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
 }
 
 VirtualToolCoupler::~VirtualToolCoupler()
@@ -198,16 +202,24 @@ void VirtualToolCoupler::update(double dt)
 			RigidTransform3d outputAlignment = m_output->getLocalPose().inverse();
 			Matrix33d outputAlignmentUnScaled = outputAlignment.rotation();
 
-			m_outputData.vectors().set(m_forceIndex, outputAlignmentUnScaled * (-force));
-			m_outputData.vectors().set(m_torqueIndex, outputAlignmentUnScaled * (-torque));
+			if ((m_collision != nullptr) && (m_collision->getCollisions().unsafeGet().size() == 0))
+			{
+				m_outputData.vectors().set(m_forceIndex, Vector3d::Zero());
+				m_outputData.vectors().set(m_torqueIndex, Vector3d::Zero());
+				m_outputData.matrices().reset(m_springJacobianIndex);
+				m_outputData.matrices().reset(m_damperJacobianIndex);
+			}
+			else
+			{
+				m_outputData.vectors().set(m_forceIndex, outputAlignmentUnScaled * (-force));
+				m_outputData.vectors().set(m_torqueIndex, outputAlignmentUnScaled * (-torque));
+				m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
+				m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
+			}
 
-			m_outputData.poses().set(m_inputPoseIndex, outputAlignment * inputPose);
 			m_outputData.vectors().set(m_inputLinearVelocityIndex, outputAlignment.linear() * inputLinearVelocity);
 			m_outputData.vectors().set(m_inputAngularVelocityIndex, outputAlignmentUnScaled * inputAngularVelocity);
-
-			m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
-			m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
-
+			m_outputData.poses().set(m_inputPoseIndex, outputAlignment * inputPose);
 			m_output->setData(m_outputData);
 		}
 	}
@@ -482,6 +494,16 @@ void VirtualToolCoupler::setCalculateInertialTorques(bool calculateInertialTorqu
 bool VirtualToolCoupler::getCalculateInertialTorques() const
 {
 	return m_calculateInertialTorques;
+}
+
+const std::shared_ptr<SurgSim::Collision::Representation> VirtualToolCoupler::getCollisionRepresentation()
+{
+	return m_collision;
+}
+
+void VirtualToolCoupler::setCollisionRepresentation(const std::shared_ptr<SurgSim::Framework::Component> collision)
+{
+	m_collision = std::dynamic_pointer_cast<SurgSim::Collision::Representation>(collision);;
 }
 
 }; /// Physics

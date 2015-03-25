@@ -27,6 +27,11 @@
 namespace SurgSim
 {
 
+namespace Collision
+{
+class Representation;
+}
+
 namespace Input
 {
 class InputComponent;
@@ -85,6 +90,16 @@ public:
 	/// Set the Physics Representation which follows the input
 	/// \param rigid Rigid Representation that provides state and receives external forces and torques
 	void setRepresentation(const std::shared_ptr<SurgSim::Framework::Component> rigid);
+
+	/// Get the Collision Representation.  If this is set, the VTC will not output haptic forces except when the
+	/// collision representation has collisions.
+	/// \return Collision Representation used to not output haptic forces when there are no collisions.
+	const std::shared_ptr<SurgSim::Collision::Representation> getCollisionRepresentation();
+
+	/// Set the Collision Representation.  If this is set, the VTC will not output haptic forces except when the
+	/// collision representation has collisions.
+	/// \param collision Collision Representation used to not output haptic forces when there are no collisions.
+	void setCollisionRepresentation(const std::shared_ptr<SurgSim::Framework::Component> collision);
 
 	/// \return Name of the pose data in the input to transfer
 	const std::string& getPoseName();
@@ -257,6 +272,9 @@ private:
 	/// Whether or not the calculated torques will simulate inertia.  This setting only has an effect if the device
 	/// input point is not the mass center.
 	bool m_calculateInertialTorques;
+
+	/// The collision representation used to not output haptic forces when there are no collisions.
+	std::shared_ptr<SurgSim::Collision::Representation> m_collision;
 
 	///@{
 	/// Cached DataGroup indices.
