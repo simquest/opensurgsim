@@ -27,6 +27,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
@@ -424,6 +425,15 @@ TEST_F(VirtualToolCouplerTest, SetAngularDamping)
 	checkAngularIsCriticallyDamped();
 }
 
+TEST_F(VirtualToolCouplerTest, SetCollisionRepresentation)
+{
+	auto collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("collision");
+	virtualToolCoupler->setCollisionRepresentation(collision);
+	auto newCollision = virtualToolCoupler->getCollisionRepresentation();
+	EXPECT_NE(nullptr, newCollision);
+	EXPECT_EQ("collision", newCollision->getName());
+}
+
 TEST_F(VirtualToolCouplerTest, GetInput)
 {
 	EXPECT_EQ(input, virtualToolCoupler->getInput());
@@ -538,6 +548,9 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	virtualToolCoupler->setOptionalAttachmentPoint(optionalVec);
 	virtualToolCoupler->setCalculateInertialTorques(true);
 
+	auto collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("collision");
+	virtualToolCoupler->setCollisionRepresentation(collision);
+
 	// Encode
 	YAML::Node node;
 	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*virtualToolCoupler););
@@ -558,6 +571,7 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	EXPECT_TRUE(vec.isApprox(newVirtualToolCoupler->getAttachmentPoint()));
 	EXPECT_TRUE(newVirtualToolCoupler->getCalculateInertialTorques());
 
+	EXPECT_NE(nullptr, newVirtualToolCoupler->getCollisionRepresentation());
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getInput());
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getRepresentation());
 	EXPECT_EQ(nullptr, newVirtualToolCoupler->getOutput());
