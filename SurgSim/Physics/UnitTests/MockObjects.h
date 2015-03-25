@@ -297,7 +297,7 @@ protected:
 class MockFemRepresentationValidComplianceWarping : public MockFemRepresentation
 {
 public:
-	MockFemRepresentationValidComplianceWarping(const std::string& name) : MockFemRepresentation(name)
+	explicit MockFemRepresentationValidComplianceWarping(const std::string& name) : MockFemRepresentation(name)
 	{}
 
 protected:

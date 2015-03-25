@@ -117,28 +117,9 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	outputComponent = std::make_shared<SurgSim::Input::OutputComponent>(name + " Output");
 	outputComponent->setDeviceName(toolDeviceName);
 
-	// A VTC (virtual tool coupler, aka "god object") is used to couple an input/output thread and a physics thread,
-	// running at different rates.  Picture a user holding a haptic device (e.g., Falcon or Omni).  The
-	// device's pose is used to position a simulated tool, but that pose may cause collisions and the resulting forces
-	// are to be displayed to the user via the device.  If the collisions and physics response can be determined in the
-	// callback from the device's API, the appropriate forces can be calculated there.  Unfortunately, typically physics
-	// threads update much slower than the ~1000 Hz used for threads controlling haptic devices.  For example, if the
-	// physics thread updates at 100 Hz, there will be ~10 haptic callbacks that each receive the same force, which
-	// tends to create an unstable response in the haptic device (delays in feedback loops often cause limit cycles and
-	// other instabilities), and reduces the fidelity of the haptic "feel".
-	//
-	// Instead, we couple the pose coming from the haptic device to a "virtual tool".  The virtual tool follows the
-	// input pose exactly as long as it is not colliding.  As soon as the virtual tool collides, it interacts with the
-	// scene normally (through collisions and physics), plus the virtual tool and haptic device are connected via spring
-	// & damper forces.
-	//
-	// The spring forces attempt to pull the haptic device and the virtual tool together (pulling against the user on
-	// one side and the physics scene on the other).  The damping forces remove energy from the system to increase
-	// stability.  Note that the forces applied to the haptic device come solely from the spring & damper connected to
-	// the virtual tool, should be zero when the tool is not colliding, and should be calculated in a high update rate
-	// thread.  We pass the device forces&torques and the derivatives (Jacobians) of forces&torques with respect to
-	// position and velocity, so that the device's Scaffold can make those calculations.  The forces on the device can
-	// be scaled up or down from the forces on the virtual tool.
+	// A virtual tool coupler can be used to connect an input/output device with the physics thread.
+	// The physics representation follows the pose provided by the device, and the representation's collisions
+	// generate forces and torques on the device.
 	std::shared_ptr<VirtualToolCoupler> inputCoupler = std::make_shared<VirtualToolCoupler>(name + " Input Coupler");
 	inputCoupler->setInput(inputComponent);
 	inputCoupler->setOutput(outputComponent);

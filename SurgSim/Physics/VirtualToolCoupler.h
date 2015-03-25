@@ -40,9 +40,20 @@ class RigidRepresentation;
 
 SURGSIM_STATIC_REGISTRATION(VirtualToolCoupler);
 
-/// The VirtualToolCoupler couples a rigid object to an input/output device through a spring and damper.  If the device
-/// will output forces and/or torques, we pass it a force (and/or torque) as well as the derivatives (Jacobians) of
-/// the force with respect to position and velocity, so that the device can recalculate its forces at its update rate.
+/// The VirtualToolCoupler couples a rigid object to an input/output device through a spring and damper.
+/// The object will follow the pose provided by the device. If an Output is connected, it is provided
+/// forces and torques that will push the device towards matching the object's pose and velocity.
+/// This "virtual coupling" or "god-object" paradigm is common for haptic applications utilizing a device that
+/// may update significantly faster than the physics computation thread.
+///
+/// For an overview of haptics see:
+///		Salisbury, Kenneth, Francois Conti, and Federico Barbagli. "Haptic rendering: introductory concepts."
+///		Computer Graphics and Applications, IEEE 24.2 (2004): 24-32.
+///
+/// For an introduction to virtual coupling see:
+///		Colgate, J. Edward, Michael C. Stanley, and J. Michael Brown. "Issues in the haptic display of tool use."
+///		Intelligent Robots and Systems 95.'Human Robot Interaction and Cooperative Robots',
+///		Proceedings. 1995 IEEE/RSJ International Conference on. Vol. 3. IEEE, 1995.
 class VirtualToolCoupler : public SurgSim::Framework::Behavior
 {
 public:

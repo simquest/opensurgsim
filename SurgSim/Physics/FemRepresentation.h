@@ -36,7 +36,7 @@ class FemPlyReaderDelegate;
 /// Finite Element Model (a.k.a FEM) is a deformable model (a set of nodes connected by FemElement).
 /// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation), therefore it defines
 /// a dynamic system \f$M.a=F(x,v)\f$
-/// \note + The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
+/// \note + The model handles damping through the Rayleigh damping (it is a combination of mass and stiffness)
 /// \note + The model handles compliance warping (optional) from the paper:
 /// \note  "Efficient Contact Modeling using Compliance Warping", G Saupin, C Duriez, S Cotin, L Grisoni;
 /// Computer %Graphics International (CGI), Istanbul, Turkey, june 2008.
