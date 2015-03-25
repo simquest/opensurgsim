@@ -331,7 +331,7 @@ bool VirtualToolCoupler::doWakeUp()
 	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Physics/VirtualToolCoupler")) <<
 		"VirtualToolCoupler named '" << getName() << "' has linear stiffness " << m_linearStiffness <<
 		", linear damping " << m_linearDamping << ", angular stiffness " << m_angularStiffness <<
-		", and angular damping " << m_angularDamping << ".";
+		", and angular damping " << m_angularDamping << ".  Its physics representation has mass " << m_rigid->getMass();
 	return true;
 }
 

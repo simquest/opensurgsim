@@ -365,6 +365,9 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
 int main(int argc, char* argv[])
 {
 	const std::string deviceName = "MultiAxisDevice";
+	SurgSim::Framework::Logger::getLogger("Physics/VirtualToolCoupler")->setThreshold(
+		SurgSim::Framework::LOG_LEVEL_INFO);
+	SurgSim::Framework::Logger::getLogger("Physics Manager")->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
 
 	std::shared_ptr<BehaviorManager> behaviorManager = std::make_shared<BehaviorManager>();
 	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
@@ -396,10 +399,10 @@ int main(int argc, char* argv[])
 	auto shader = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
 	SURGSIM_ASSERT(shader != nullptr) << "Shader could not be loaded.";
 
+	std::shared_ptr<SceneElement> stapler = createStaplerSceneElement("stapler", deviceName);
+
 	auto material = createShinyMaterial(*runtime->getApplicationData(), shader);
 	std::shared_ptr<SceneElement> arm = createArmSceneElement("arm", material);
-
-	std::shared_ptr<SceneElement> stapler = createStaplerSceneElement("stapler", deviceName);
 
 	std::string woundFilename = std::string("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
@@ -438,8 +441,8 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(view);
-	scene->addSceneElement(arm);
 	scene->addSceneElement(stapler);
+	scene->addSceneElement(arm);
 	scene->addSceneElement(wound);
 	scene->addSceneElement(keyboard);
 
