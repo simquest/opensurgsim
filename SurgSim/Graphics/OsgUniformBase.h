@@ -21,6 +21,11 @@
 #include <osg/StateSet>
 #include <osg/Uniform>
 
+namespace YAML
+{
+class Node;
+}
+
 namespace SurgSim
 {
 
@@ -41,6 +46,9 @@ public:
 	{
 		return m_uniform->getName();
 	}
+
+	/// Sets the value of the uniform from a YAML Node doing the correct conversion
+	virtual void set(const YAML::Node& node) = 0;
 
 	/// Adds this uniform to the OSG state set
 	/// \param	stateSet	OSG state set

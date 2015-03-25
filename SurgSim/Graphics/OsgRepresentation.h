@@ -24,6 +24,7 @@
 
 namespace osg
 {
+class Group;
 class Node;
 class PositionAttitudeTransform;
 class Switch;
@@ -36,6 +37,7 @@ namespace Graphics
 
 class OsgMaterial;
 class TangentSpaceGenerator;
+class UniformBase;
 
 /// OSS default value for opengl values that have to be assigned a fixed number
 ///@{
@@ -93,6 +95,8 @@ public:
 	/// \param	dt	The time in seconds of the preceding timestep.
 	void update(double dt) override;
 
+	void addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform);
+
 protected:
 	virtual void doUpdate(double dt);
 
@@ -109,6 +113,9 @@ protected:
 
 	/// Transform used to pose the representation
 	osg::ref_ptr<osg::PositionAttitudeTransform> m_transform;
+
+	/// Holder for attributes coming from OsgMaterial
+	osg::ref_ptr<osg::Group> m_materialProxy;
 
 	/// Material defining the visual appearance of the representation
 	std::shared_ptr<OsgMaterial> m_material;

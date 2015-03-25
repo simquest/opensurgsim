@@ -55,6 +55,12 @@ void OsgTextureUniform<T>::set(const std::shared_ptr<T>& value)
 }
 
 template <class T>
+void OsgTextureUniform<T>::set(const YAML::Node& value)
+{
+	m_unit = value.as<int>();
+}
+
+template <class T>
 const std::shared_ptr<T>& OsgTextureUniform<T>::get() const
 {
 	return m_texture;
