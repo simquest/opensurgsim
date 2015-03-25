@@ -316,8 +316,8 @@ void SphRepresentation::computeNormalField()
 		SURGSIM_ASSERT(SurgSim::Math::isValid(normalI)) << indexI << " normal is invalid";
 		m_normal[indexI] = normalI;
 	}
-	SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getName()
-		<< ": minimum rij " << minimumRij;
+	//SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getName()
+	//    << ": minimum rij " << minimumRij;
 }
 
 void SphRepresentation::computeAccelerations()
@@ -410,9 +410,9 @@ void SphRepresentation::computeAccelerations()
 		particleI.setAcceleration(particleI.getAcceleration() + m_gravity);
 	}
 	SURGSIM_ASSERT(SurgSim::Math::isValid(m_state->getAccelerations())) << "Accelerations invalid";
-	SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getName()
-		<< ": maxVij=" << maxVji << ", maxPressure=" << maxPressure << ", maxViscosity=" << maxViscosity
-		<< ", maxSurface=" << maxSurface;
+	//SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getName()
+	//    << ": maxVij=" << maxVji << ", maxPressure=" << maxPressure << ", maxViscosity=" << maxViscosity
+	//    << ", maxSurface=" << maxSurface;
 }
 
 void SphRepresentation::handleCollisions()

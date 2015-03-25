@@ -76,7 +76,7 @@ public:
 	void setRadius(double radius);
 
 private:
-	void doUpdate() override;
+	bool doUpdate() override;
 
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
 	double m_radius;

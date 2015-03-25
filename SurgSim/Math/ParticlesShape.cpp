@@ -65,7 +65,7 @@ void ParticlesShape::setRadius(double radius)
 	m_radius = radius;
 }
 
-void ParticlesShape::doUpdate()
+bool ParticlesShape::doUpdate()
 {
 	auto aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
 	auto const& vertices = getVertices();
@@ -78,6 +78,7 @@ void ParticlesShape::doUpdate()
 	}
 
 	m_aabbTree = aabbTree;
+	return true;
 }
 
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> ParticlesShape::getAabbTree() const
