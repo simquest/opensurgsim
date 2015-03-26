@@ -50,7 +50,7 @@ void AabbTreeNode::splitNode(size_t maxNodeData)
 			// Arbitrary value 10
 			if (maxNodeData > 0 && count > 2 * maxNodeData)
 			{
-				SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
+				SURGSIM_LOG_DEBUG(Framework::Logger::getDefaultLogger())
 						<< "The aabb tree build process encountered some items that could not be split anymore "
 						<< "this may cause suboptimal behavior when querying the aabb tree.";
 			}

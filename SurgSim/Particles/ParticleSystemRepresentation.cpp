@@ -77,8 +77,8 @@ bool ParticleSystemRepresentation::addParticle(const Particle& particle)
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Unable to add another particle, maximum has been reached ("
-			<< m_maxParticles << ").";
+		SURGSIM_LOG_DEBUG(m_logger) << "Unable to add another particle, maximum has been reached ("
+		   << m_maxParticles << ").";
 		result = false;
 	}
 	return result;
