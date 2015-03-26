@@ -16,6 +16,7 @@
 #include "SurgSim/Math/ParticlesShape.h"
 
 #include "SurgSim/DataStructures/AabbTree.h"
+#include "SurgSim/DataStructures/AabbTreeData.h"
 
 
 namespace SurgSim
@@ -67,15 +68,19 @@ void ParticlesShape::setRadius(double radius)
 
 bool ParticlesShape::doUpdate()
 {
-	auto aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
+	std::list<DataStructures::AabbTreeData::Item> items;
+
 	auto const& vertices = getVertices();
 	const Vector3d radius = Vector3d::Constant(m_radius);
 
 	for (size_t id = 0; id < vertices.size(); ++id)
 	{
 		const Vector3d& position = vertices[id].position;
-		aabbTree->add(SurgSim::Math::Aabbd(position - radius, position + radius), id);
+		SurgSim::Math::Aabbd aabb(position - radius, position + radius);
+		items.emplace_back(std::make_pair(std::move(aabb), id));
 	}
+	auto aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
+	aabbTree->set(std::move(items));
 
 	m_aabbTree = aabbTree;
 	return true;
