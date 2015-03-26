@@ -121,6 +121,10 @@ public:
 	double m_rho, m_E, m_nu, m_L;
 	double m_radius;
 	Quaterniond m_orientation;
+	Vector forceVector;
+	SparseMatrix massMatrix;
+	SparseMatrix dampingMatrix;
+	SparseMatrix stiffnessMatrix;
 
 	void SetUp() override
 	{
@@ -148,6 +152,24 @@ public:
 		Vector& x = m_restState.getPositions();
 		getSubVector(x, m_nodeIds[0], 6).segment<3>(0) = firstExtremity;
 		getSubVector(x, m_nodeIds[1], 6).segment<3>(0) = secondExtremity;
+
+		// Initialize the global matrices for calculations.
+		std::vector<size_t> nodeIdsVectorForm(m_nodeIds.begin(), m_nodeIds.end());
+		forceVector = Vector::Zero(6 * m_numberNodes);
+		massMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
+		SurgSim::Math::addSubMatrixAndInitialize(SurgSim::Math::Matrix::Zero(12, 12),
+				nodeIdsVectorForm, 6, &massMatrix);
+		massMatrix.makeCompressed();
+
+		dampingMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
+		SurgSim::Math::addSubMatrixAndInitialize(SurgSim::Math::Matrix::Zero(12, 12),
+				nodeIdsVectorForm, 6, &dampingMatrix);
+		dampingMatrix.makeCompressed();
+
+		stiffnessMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
+		SurgSim::Math::addSubMatrixAndInitialize(SurgSim::Math::Matrix::Zero(12, 12),
+				nodeIdsVectorForm, 6, &stiffnessMatrix);
+		stiffnessMatrix.makeCompressed();
 	}
 
 	void getExpectedMassMatrix(Eigen::Ref<SurgSim::Math::Matrix> mass)
@@ -555,13 +577,10 @@ TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 
 	Vector vectorOnes = Vector::Ones(6 * m_numberNodes);
 
-	Vector forceVector = Vector::Zero(6 * m_numberNodes);
-	SparseMatrix massMatrix(6 * m_numberNodes, 6 * m_numberNodes);
-	SparseMatrix dampingMatrix(6 * m_numberNodes, 6 * m_numberNodes);
-	SparseMatrix stiffnessMatrix(6 * m_numberNodes, 6 * m_numberNodes);
-	massMatrix.setZero();
-	dampingMatrix.setZero();
-	stiffnessMatrix.setZero();
+	forceVector.setZero();
+	SurgSim::Math::clearMatrix(&massMatrix);
+	SurgSim::Math::clearMatrix(&dampingMatrix);
+	SurgSim::Math::clearMatrix(&stiffnessMatrix);
 
 	Matrix expectedMass(6 * m_numberNodes, 6 * m_numberNodes);
 	Matrix expectedMass2(6 * m_numberNodes, 6 * m_numberNodes);
@@ -577,8 +596,10 @@ TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 	EXPECT_TRUE(forceVector.isZero());
 
 	beam->addMass(m_restState, &massMatrix);
-	EXPECT_TRUE(massMatrix.isApprox(expectedMass));
-	EXPECT_TRUE(massMatrix.isApprox(expectedMass2, 1e-6));
+	EXPECT_TRUE(massMatrix.isApprox(expectedMass)) << "Expected Mass:" << std::endl << expectedMass << std::endl <<
+			"Mass Matrix:" << std::endl << massMatrix << std::endl;
+	EXPECT_TRUE(massMatrix.isApprox(expectedMass2, 1e-6)) << "Expected Mass 2:" << std::endl << expectedMass <<
+			std::endl << "Mass Matrix:" << std::endl << massMatrix << std::endl;
 
 	beam->addDamping(m_restState, &dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isApprox(expectedDamping));
@@ -587,9 +608,9 @@ TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 	EXPECT_TRUE(stiffnessMatrix.isApprox(expectedStiffness));
 
 	forceVector.setZero();
-	massMatrix.setZero();
-	dampingMatrix.setZero();
-	stiffnessMatrix.setZero();
+	SurgSim::Math::clearMatrix(&massMatrix);
+	SurgSim::Math::clearMatrix(&dampingMatrix);
+	SurgSim::Math::clearMatrix(&stiffnessMatrix);
 
 	beam->addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());

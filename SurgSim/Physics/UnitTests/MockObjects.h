@@ -279,7 +279,7 @@ public:
 
 private:
 	Vector m_F;
-	SparseMatrix m_M, m_D, m_K;
+	Matrix m_M, m_D, m_K;
 	bool m_isInitialized;
 };
 
@@ -327,6 +327,8 @@ public:
 	explicit MockFem1DRepresentation(const std::string& name);
 
 	const std::shared_ptr<OdeSolver> getOdeSolver() const;
+
+	bool doInitialize() override;
 };
 
 class MockFixedConstraintBilateral3D : public ConstraintImplementation

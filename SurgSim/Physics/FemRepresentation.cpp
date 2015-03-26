@@ -132,6 +132,25 @@ bool FemRepresentation::doInitialize()
 
 	typedef Eigen::SparseMatrix<double>::Index Index;
 
+	// Precompute the sparsity pattern for the global arrays.
+	m_M.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
+	m_D.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
+	m_K.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
+	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
+	{
+		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode() * (*femElement)->getNumNodes(),
+												getNumDofPerNode() * (*femElement)->getNumNodes());
+		Math::addSubMatrixAndInitialize(block, (*femElement)->getNodeIds(),
+										static_cast<int>(getNumDofPerNode()), &m_M);
+		Math::addSubMatrixAndInitialize(block, (*femElement)->getNodeIds(),
+										static_cast<int>(getNumDofPerNode()), &m_D);
+		Math::addSubMatrixAndInitialize(block, (*femElement)->getNodeIds(),
+										static_cast<int>(getNumDofPerNode()), &m_K);
+	}
+	m_M.makeCompressed();
+	m_D.makeCompressed();
+	m_K.makeCompressed();
+
 	// If we are using compliance warping for this representation, let's pre-allocate the rotation matrix
 	// and pre-define its pattern, so we only access existing elements later on.
 	if (m_useComplianceWarping)
@@ -348,7 +367,7 @@ SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState
 const SurgSim::Math::SparseMatrix& FemRepresentation::computeM(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the mass matrix has been properly allocated and zeroed out
-	m_M.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_M);
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
@@ -364,7 +383,7 @@ const SurgSim::Math::SparseMatrix& FemRepresentation::computeD(const SurgSim::Ma
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_D);
 
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
@@ -402,7 +421,7 @@ const SurgSim::Math::SparseMatrix& FemRepresentation::computeD(const SurgSim::Ma
 const SurgSim::Math::SparseMatrix& FemRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_K);
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
@@ -426,13 +445,13 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSi
 	m_f.setZero(state.getNumDof());
 
 	// Make sure the mass matrix has been properly allocated and zeroed out
-	m_M.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_M);
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_D);
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_K);
 
 	// Add all the FemElement contribution to f, M, D, K
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)

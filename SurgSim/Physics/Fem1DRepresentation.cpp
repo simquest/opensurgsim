@@ -107,17 +107,17 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			{
 				if (K.size() != 0)
 				{
-					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * K,
-									   static_cast<int>(nodeId1), static_cast<int>(nodeId2),
-									   static_cast<int>(dofPerNode), static_cast<int>(dofPerNode),
-									   &m_externalGeneralizedStiffness);
+					Math::addSubMatrixAndInitialize(coordinate[index1] * coordinate[index2] * K,
+													static_cast<int>(nodeId1), static_cast<int>(nodeId2),
+													static_cast<int>(dofPerNode), static_cast<int>(dofPerNode),
+													&m_externalGeneralizedStiffness);
 				}
 				if (D.size() != 0)
 				{
-					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * D,
-									   static_cast<int>(nodeId1), static_cast<int>(nodeId2),
-									   static_cast<int>(dofPerNode), static_cast<int>(dofPerNode),
-									   &m_externalGeneralizedDamping);
+					Math::addSubMatrixAndInitialize(coordinate[index1] * coordinate[index2] * D,
+													static_cast<int>(nodeId1), static_cast<int>(nodeId2),
+													static_cast<int>(dofPerNode), static_cast<int>(dofPerNode),
+													&m_externalGeneralizedDamping);
 				}
 				index2++;
 			}

@@ -24,6 +24,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 
+using SurgSim::Math::clearMatrix;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::SparseMatrix;
 using SurgSim::Math::Vector;
@@ -866,9 +867,20 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	SparseMatrix massMatrix(3 * 8, 3 * 8);
 	SparseMatrix dampingMatrix(3 * 8, 3 * 8);
 	SparseMatrix stiffnessMatrix(3 * 8, 3 * 8);
+	Matrix zeroMatrix = Matrix::Zero(cube->getNumDofPerNode() * cube->getNumNodes(),
+									 cube->getNumDofPerNode() * cube->getNumNodes());
 	massMatrix.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, cube->getNodeIds(),
+			static_cast<int>(cube->getNumDofPerNode()), &massMatrix);
+	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, cube->getNodeIds(),
+			static_cast<int>(cube->getNumDofPerNode()), &dampingMatrix);
+	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, cube->getNodeIds(),
+			static_cast<int>(cube->getNumDofPerNode()), &stiffnessMatrix);
+	stiffnessMatrix.makeCompressed();
 
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
 	cube->addForce(m_restState, &forceVector);
@@ -888,9 +900,9 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 			"Stiffness matrix :"  << std::endl << stiffnessMatrix << std::endl;
 
 	forceVector.setZero();
-	massMatrix.setZero();
-	dampingMatrix.setZero();
-	stiffnessMatrix.setZero();
+	clearMatrix(&massMatrix);
+	clearMatrix(&dampingMatrix);
+	clearMatrix(&stiffnessMatrix);
 
 	cube->addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());

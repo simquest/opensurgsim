@@ -124,14 +124,6 @@ protected:
 									SurgSim::Math::Matrix33d* De,
 									SurgSim::Math::Matrix33d* Ke);
 
-	/// Distribute the block 3x3 matrices to the correct location in the sparse matrix.
-	/// \param mBlock the dense block submatrix.
-	/// \param [out] matrix the component block matrix distributed to the correct locations.
-	/// \note This method calculates required the 3x3 parts related to the force applied on the first node,
-	/// \note derived w.r.t. first node. By nature, we have dF2/dx2 = dF1/dx1 = -dF1/dx2 = -dF2/dx1.
-	void distributeBlocks(const SurgSim::Math::Matrix33d& mBlock,
-						  SurgSim::Math::SparseMatrix* matrix);
-
 private:
 	/// Rest length (in m)
 	double m_restLength;

@@ -16,10 +16,10 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
 using SurgSim::Math::Matrix;
-using SurgSim::Math::SparseMatrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::OdeState;
 using SurgSim::Math::Vector;
@@ -103,7 +103,7 @@ void LinearSpring::addForce(const OdeState& state, Vector* F, double scale)
 	F->segment<3>(3 * m_nodeIds[1]) -= f;
 }
 
-void LinearSpring::addDamping(const OdeState& state, SparseMatrix* D, double scale)
+void LinearSpring::addDamping(const OdeState& state, Math::SparseMatrix* D, double scale)
 {
 	Matrix33d De;
 
@@ -120,15 +120,21 @@ void LinearSpring::addDamping(const OdeState& state, SparseMatrix* D, double sca
 	}
 	De *= scale;
 
+	/* Replaced with below
+	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += De; // -dF1/dv1 = De
+	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= De; // -dF1/dv2 =-De
+	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= De; // -dF2/dv1 =-De
+	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += De; // -dF2/dv2 = De
+	*/
+
 	// Assembly stage in D
-	SparseMatrix dSparse(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
-	dSparse.setZero();
-	distributeBlocks(De, &dSparse);
-	*D += dSparse;
+	Math::addSubMatrix(De, static_cast<int>(3 * m_nodeIds[0]), static_cast<int>(3 * m_nodeIds[0]), 3, 3, D);
+	Math::addSubMatrix(-De, static_cast<int>(3 * m_nodeIds[0]), static_cast<int>(3 * m_nodeIds[1]), 3, 3, D);
+	Math::addSubMatrix(-De, static_cast<int>(3 * m_nodeIds[1]), static_cast<int>(3 * m_nodeIds[0]), 3, 3, D);
+	Math::addSubMatrix(De, static_cast<int>(3 * m_nodeIds[1]), static_cast<int>(3 * m_nodeIds[1]), 3, 3, D);
 }
 
-void LinearSpring::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-								double scale /*= 1.0*/)
+void LinearSpring::addStiffness(const OdeState& state, Math::SparseMatrix* K, double scale)
 {
 	Matrix33d Ke;
 
@@ -145,14 +151,21 @@ void LinearSpring::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::M
 	}
 	Ke *= scale;
 
+	/* Replaced with below
+	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += Ke; // -dF1/dx1 = Ke
+	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= Ke; // -dF1/dx2 =-Ke
+	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= Ke; // -dF2/dx1 =-Ke
+	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += Ke; // -dF2/dx2 = Ke
+	*/
+
 	// Assembly stage in K
-	SparseMatrix kSparse(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
-	kSparse.setZero();
-	distributeBlocks(Ke, &kSparse);
-	*K += kSparse;
+	Math::addSubMatrix(Ke, static_cast<int>(3 * m_nodeIds[0]), static_cast<int>(3 * m_nodeIds[0]), 3, 3, K);
+	Math::addSubMatrix(-Ke, static_cast<int>(3 * m_nodeIds[0]), static_cast<int>(3 * m_nodeIds[1]), 3, 3, K);
+	Math::addSubMatrix(-Ke, static_cast<int>(3 * m_nodeIds[1]), static_cast<int>(3 * m_nodeIds[0]), 3, 3, K);
+	Math::addSubMatrix(Ke, static_cast<int>(3 * m_nodeIds[1]), static_cast<int>(3 * m_nodeIds[1]), 3, 3, K);
 }
 
-void LinearSpring::addFDK(const OdeState& state, Vector* F, SparseMatrix* D, SparseMatrix* K)
+void LinearSpring::addFDK(const OdeState& state, Vector* F, Math::SparseMatrix* D, Math::SparseMatrix* K)
 {
 	Matrix33d De, Ke;
 
@@ -173,17 +186,31 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, SparseMatrix* D, Spa
 		return;
 	}
 
+	/* Replaced with below
 	// Assembly stage in K
-	SparseMatrix kSparse(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
-	kSparse.setZero();
-	distributeBlocks(Ke, &kSparse);
-	*K += kSparse;
+	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += Ke; // -dF1/dx1 = Ke
+	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= Ke; // -dF1/dx2 =-Ke
+	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= Ke; // -dF2/dx1 =-Ke
+	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += Ke; // -dF2/dx2 = Ke
 
 	// Assembly stage in D
-	SparseMatrix dSparse(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
-	dSparse.setZero();
-	distributeBlocks(De, &dSparse);
-	*D += dSparse;
+	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += De; // -dF1/dv1 = De
+	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= De; // -dF1/dv2 =-De
+	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= De; // -dF2/dv1 =-De
+	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += De; // -dF2/dv2 = De
+	*/
+
+	// Assembly stage in K
+	Math::addSubMatrix(Ke, static_cast<int>(3 * m_nodeIds[0]), static_cast<int>(3 * m_nodeIds[0]), 3, 3, K);
+	Math::addSubMatrix(-Ke, static_cast<int>(3 * m_nodeIds[0]), static_cast<int>(3 * m_nodeIds[1]), 3, 3, K);
+	Math::addSubMatrix(-Ke, static_cast<int>(3 * m_nodeIds[1]), static_cast<int>(3 * m_nodeIds[0]), 3, 3, K);
+	Math::addSubMatrix(Ke, static_cast<int>(3 * m_nodeIds[1]), static_cast<int>(3 * m_nodeIds[1]), 3, 3, K);
+
+	// Assembly stage in D
+	Math::addSubMatrix(De, static_cast<int>(3 * m_nodeIds[0]), static_cast<int>(3 * m_nodeIds[0]), 3, 3, D);
+	Math::addSubMatrix(-De, static_cast<int>(3 * m_nodeIds[0]), static_cast<int>(3 * m_nodeIds[1]), 3, 3, D);
+	Math::addSubMatrix(-De, static_cast<int>(3 * m_nodeIds[1]), static_cast<int>(3 * m_nodeIds[0]), 3, 3, D);
+	Math::addSubMatrix(De, static_cast<int>(3 * m_nodeIds[1]), static_cast<int>(3 * m_nodeIds[1]), 3, 3, D);
 }
 
 void LinearSpring::addMatVec(const OdeState& state, double alphaD, double alphaK, const Vector& vector, Vector* F)
@@ -256,27 +283,6 @@ bool LinearSpring::computeDampingAndStiffness(const OdeState& state, Matrix33d* 
 	return true;
 }
 
-void LinearSpring::distributeBlocks(const SurgSim::Math::Matrix33d& block,
-									SurgSim::Math::SparseMatrix* matrix)
-{
-	typedef Eigen::Triplet<double> T;
-	std::vector<T> tripletList;
-	tripletList.reserve(36);
-
-	for (int row = 0; row < 3; ++row)
-	{
-		for (int col = 0; col < 3; ++col)
-		{
-			int nodeId0 = static_cast<int>(m_nodeIds[0]);
-			int nodeId1 = static_cast<int>(m_nodeIds[1]);
-			tripletList.push_back(T(3 * nodeId0 + row,  3 * nodeId0 + col, block(row, col)));
-			tripletList.push_back(T(3 * nodeId0 + row,  3 * nodeId1 + col, -block(row, col)));
-			tripletList.push_back(T(3 * nodeId1 + row,  3 * nodeId0 + col, -block(row, col)));
-			tripletList.push_back(T(3 * nodeId1 + row,  3 * nodeId1 + col, block(row, col)));
-		}
-	}
-	matrix->setFromTriplets(tripletList.begin(), tripletList.end());
-}
 
 bool LinearSpring::operator ==(const Spring& spring) const
 {

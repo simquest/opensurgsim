@@ -146,12 +146,12 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 	F.segment(0, fem->getNumDofPerNode()) = Flocal;
 	SparseMatrix K(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
 	K.setZero();
-	Math::addSubMatrix(Klocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
-					   static_cast<int>(fem->getNumDofPerNode()), &K);
+	Math::addSubMatrixAndInitialize(Klocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
+									static_cast<int>(fem->getNumDofPerNode()), &K);
 	SparseMatrix D(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
 	D.setZero();
-	Math::addSubMatrix(Dlocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
-					   static_cast<int>(fem->getNumDofPerNode()), &D);
+	Math::addSubMatrixAndInitialize(Dlocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
+									static_cast<int>(fem->getNumDofPerNode()), &D);
 
 	// Test invalid localization nullptr
 	ASSERT_THROW(fem->addExternalGeneralizedForce(nullptr, Flocal),

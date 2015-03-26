@@ -25,6 +25,7 @@
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 
 using SurgSim::Physics::Fem3DElementTetrahedron;
+using SurgSim::Math::clearMatrix;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
@@ -482,9 +483,21 @@ TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 	SparseMatrix massMatrix(3 * 15, 3 * 15);
 	SparseMatrix dampingMatrix(3 * 15, 3 * 15);
 	SparseMatrix stiffnessMatrix(3 * 15, 3 * 15);
+	Matrix zeroMatrix = Matrix::Zero(tet.getNumDofPerNode() * tet.getNumNodes(),
+									 tet.getNumDofPerNode() * tet.getNumNodes());
 	massMatrix.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, tet.getNodeIds(),
+			static_cast<int>(tet.getNumDofPerNode()), &massMatrix);
+	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, tet.getNodeIds(),
+			static_cast<int>(tet.getNumDofPerNode()), &dampingMatrix);
+	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, tet.getNodeIds(),
+			static_cast<int>(tet.getNumDofPerNode()), &stiffnessMatrix);
+	stiffnessMatrix.makeCompressed();
+
 
 	// Make sure that the 2 ways of computing the expected stiffness matrix gives the same result
 	EXPECT_TRUE(m_expectedStiffnessMatrix.isApprox(m_expectedStiffnessMatrix2));
@@ -504,9 +517,9 @@ TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix2));
 
 	forceVector.setZero();
-	massMatrix.setZero();
-	dampingMatrix.setZero();
-	stiffnessMatrix.setZero();
+	clearMatrix(&massMatrix);
+	clearMatrix(&dampingMatrix);
+	clearMatrix(&stiffnessMatrix);
 
 	tet.addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());

@@ -55,6 +55,26 @@ bool MassSpringRepresentation::doInitialize()
 		spring->initialize(*m_initialState);
 	}
 
+	// Precompute the sparsity pattern for the global arrays. M is diagonal, the
+	// rest need to be calculated.
+	m_M.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
+	m_D.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
+	m_K.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
+	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
+	{
+		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode() * (*spring)->getNumNodes(),
+												getNumDofPerNode() * (*spring)->getNumNodes());
+		Math::addSubMatrixAndInitialize(block, (*spring)->getNodeIds(),
+										static_cast<int>(getNumDofPerNode()), &m_D);
+		Math::addSubMatrixAndInitialize(block, (*spring)->getNodeIds(),
+										static_cast<int>(getNumDofPerNode()), &m_K);
+	}
+	m_M.setIdentity();
+	m_M.makeCompressed();
+	Math::clearMatrix(&m_M);
+	m_D.makeCompressed();
+	m_K.makeCompressed();
+
 	return true;
 }
 
@@ -142,10 +162,10 @@ void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Local
 	m_externalGeneralizedDamping.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += D;
 	*/
 	// Replaced the above with:
-	Math::addSubMatrix(K, static_cast<int>(nodeId), static_cast<int>(nodeId), static_cast<int>(dofPerNode),
-					   static_cast<int>(dofPerNode), &m_externalGeneralizedStiffness);
-	Math::addSubMatrix(D, static_cast<int>(nodeId), static_cast<int>(nodeId), static_cast<int>(dofPerNode),
-					   static_cast<int>(dofPerNode), &m_externalGeneralizedDamping);
+	Math::addSubMatrixAndInitialize(K, static_cast<int>(nodeId), static_cast<int>(nodeId), static_cast<int>(dofPerNode),
+									static_cast<int>(dofPerNode), &m_externalGeneralizedStiffness);
+	Math::addSubMatrixAndInitialize(D, static_cast<int>(nodeId), static_cast<int>(nodeId), static_cast<int>(dofPerNode),
+									static_cast<int>(dofPerNode), &m_externalGeneralizedDamping);
 	m_hasExternalGeneralizedForce = true;
 }
 
@@ -199,7 +219,7 @@ const SparseMatrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeS
 	using SurgSim::Math::setSubVector;
 
 	// Make sure the mass matrix has been properly allocated
-	m_M.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_M);
 
 	/* Replaced:
 	Eigen::MatrixBase<const Eigen::SparseMatrix<double>>::DiagonalReturnType diagonal = m_M.diagonal();
@@ -242,7 +262,7 @@ const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeS
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_D);
 
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
@@ -305,7 +325,7 @@ const SparseMatrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeS
 	using SurgSim::Math::addSubMatrix;
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_K);
 
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
@@ -346,13 +366,13 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 	m_f.setZero(state.getNumDof());
 
 	// Make sure the mass matrix has been properly allocated
-	m_M.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_M);
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_D);
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Math::clearMatrix(&m_K);
 
 	// Computes the mass matrix m_M
 	computeM(state);

@@ -322,8 +322,13 @@ TEST(LinearSpringTests, computeMethods)
 	setSubMatrix(-expectedStiffness33, 0, 1, 3, 3, &expectedK);
 	setSubMatrix(-expectedStiffness33, 1, 0, 3, 3, &expectedK);
 	setSubMatrix(expectedStiffness33, 1, 1, 3, 3, &expectedK);
+
+	Matrix zeroBlock = Matrix::Zero(6, 6);
 	SparseMatrix K(6, 6);
 	K.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &K);
+	K.makeCompressed();
+
 	ls.addStiffness(state, &K);
 	EXPECT_TRUE(K.isApprox(expectedK)) << " K = " << std::endl << K << std::endl <<
 									   "expectedK = " << std::endl << expectedK << std::endl;
@@ -338,8 +343,12 @@ TEST(LinearSpringTests, computeMethods)
 	setSubMatrix(-expectedDamping33, 0, 1, 3, 3, &expectedD);
 	setSubMatrix(-expectedDamping33, 1, 0, 3, 3, &expectedD);
 	setSubMatrix(expectedDamping33, 1, 1, 3, 3, &expectedD);
+
 	SparseMatrix D(6, 6);
 	D.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &D);
+	D.makeCompressed();
+
 	ls.addDamping(state, &D);
 	EXPECT_TRUE(D.isApprox(expectedD)) << " D = " << std::endl << D << std::endl <<
 									   "expectedD = " << std::endl << expectedD << std::endl;
@@ -348,10 +357,8 @@ TEST(LinearSpringTests, computeMethods)
 	{
 		SCOPED_TRACE("Testing addFDK method call");
 		Vector f = Vector::Zero(6);
-		SparseMatrix K(6, 6);
-		K.setZero();
-		SparseMatrix D(6, 6);
-		D.setZero();
+		SurgSim::Math::clearMatrix(&K);
+		SurgSim::Math::clearMatrix(&D);
 		ls.addFDK(state, &f, &D, &K);
 		EXPECT_TRUE(f.isApprox(expectedF)) << " F = " << f.transpose() << std::endl <<
 										   "expectedF = " << expectedF.transpose() << std::endl;
@@ -454,8 +461,12 @@ TEST(LinearSpringTests, addStiffnessNumericalTest)
 	state.getVelocities().segment(0, 3) = v0;
 	state.getVelocities().segment(3, 3) = v1;
 
+	Matrix zeroBlock = Matrix::Zero(6, 6);
 	SparseMatrix K(6, 6);
 	K.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &K);
+	K.makeCompressed();
+
 	ls.addStiffness(state, &K);
 
 	Eigen::Matrix<double, 6, 6> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
@@ -488,8 +499,12 @@ TEST(LinearSpringTests, addDampingNumericalTest)
 	state.getVelocities().segment(0, 3) = v0;
 	state.getVelocities().segment(3, 3) = v1;
 
+	Matrix zeroBlock = Matrix::Zero(6, 6);
 	SparseMatrix D(6, 6);
 	D.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &D);
+	D.makeCompressed();
+
 	ls.addDamping(state, &D);
 
 	Eigen::Matrix<double, 6, 6> Dnumeric = DNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
@@ -522,10 +537,17 @@ TEST(LinearSpringTests, addFDKNumericalTest)
 	state.getVelocities().segment(3, 3) = v1;
 
 	Vector F = Vector::Zero(6);
+	Matrix zeroBlock = Matrix::Zero(6, 6);
 	SparseMatrix K(6, 6);
 	K.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &K);
+	K.makeCompressed();
+
 	SparseMatrix D(6, 6);
 	D.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &D);
+	D.makeCompressed();
+
 	ls.addFDK(state, &F, &D, &K);
 
 	Eigen::Matrix<double, 6, 6> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);

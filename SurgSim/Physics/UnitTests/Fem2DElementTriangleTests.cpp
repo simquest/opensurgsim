@@ -28,6 +28,7 @@
 
 using SurgSim::Math::gaussQuadrature2DTriangle6Points;
 using SurgSim::Math::gaussQuadrature2DTriangle12Points;
+using SurgSim::Math::clearMatrix;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
@@ -1334,6 +1335,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	Matrix expectedMassMatrix(numDof, numDof);
 	Matrix expectedDampingMatrix(numDof, numDof);
 	Matrix expectedStiffnessMatrix(numDof, numDof);
+	Matrix zeros18x18 = SurgSim::Math::Matrix::Zero(18, 18);
 
 	// Assemble manually the expectedStiffnessMatrix
 	Eigen::Matrix<double, 18 , 18> R0 = tri->getInitialRotationTimes6();
@@ -1350,8 +1352,14 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	forceVector.setZero();
 	massMatrix.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeros18x18, tri->getNodeIds(), 6, &massMatrix);
+	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeros18x18, tri->getNodeIds(), 6, &dampingMatrix);
+	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeros18x18, tri->getNodeIds(), 6, &stiffnessMatrix);
+	stiffnessMatrix.makeCompressed();
 	zeroMatrix.setZero();
 
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
@@ -1369,13 +1377,14 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	EXPECT_TRUE(stiffnessMatrix.isApprox(expectedStiffnessMatrix));
 
 	forceVector.setZero();
-	massMatrix.setZero();
-	dampingMatrix.setZero();
-	stiffnessMatrix.setZero();
+	clearMatrix(&massMatrix);
+	clearMatrix(&dampingMatrix);
+	clearMatrix(&stiffnessMatrix);
 
 	tri->addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());
-	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix));
+	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix)) << "MassMatrix = " << std::endl << massMatrix << std::endl <<
+			"ExpectedMassMatrix = " << std::endl << expectedMassMatrix << std::endl;
 	EXPECT_TRUE(dampingMatrix.isApprox(zeroMatrix));
 	EXPECT_TRUE(stiffnessMatrix.isApprox(expectedStiffnessMatrix));
 

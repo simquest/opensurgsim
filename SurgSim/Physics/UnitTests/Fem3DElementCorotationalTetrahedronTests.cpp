@@ -356,6 +356,11 @@ void testAddStiffness(MockFem3DElementCorotationalTet* tet,
 
 	SparseMatrix K(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	K.setZero();
+	Matrix zeroMatrix = Matrix::Zero(tet->getNumDofPerNode() * tet->getNumNodes(),
+									 tet->getNumDofPerNode() * tet->getNumNodes());
+	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, tet->getNodeIds(),
+			static_cast<int>(tet->getNumDofPerNode()), &K);
+	K.makeCompressed();
 	tet->addStiffness(state, &K, scale);
 
 	EXPECT_TRUE(K.isApprox(expectedK));
@@ -381,6 +386,11 @@ void testAddMass(MockFem3DElementCorotationalTet* tet,
 
 	SparseMatrix M(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	M.setZero();
+	Matrix zeroMatrix = Matrix::Zero(tet->getNumDofPerNode() * tet->getNumNodes(),
+									 tet->getNumDofPerNode() * tet->getNumNodes());
+	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, tet->getNodeIds(),
+			static_cast<int>(tet->getNumDofPerNode()), &M);
+	M.makeCompressed();
 	tet->addMass(state, &M, scale);
 
 	EXPECT_TRUE(M.isApprox(expectedM));
@@ -417,9 +427,20 @@ void testAddFMDK(MockFem3DElementCorotationalTet* tet,
 	SparseMatrix D(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	SparseMatrix K(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
 	SparseMatrix zeroMatrix(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	Matrix zeroElementMatrix = Matrix::Zero(tet->getNumDofPerNode() * tet->getNumNodes(),
+											tet->getNumDofPerNode() * tet->getNumNodes());
 	M.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroElementMatrix, tet->getNodeIds(),
+			static_cast<int>(tet->getNumDofPerNode()), &M);
+	M.makeCompressed();
 	D.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroElementMatrix, tet->getNodeIds(),
+			static_cast<int>(tet->getNumDofPerNode()), &D);
+	D.makeCompressed();
 	K.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroElementMatrix, tet->getNodeIds(),
+			static_cast<int>(tet->getNumDofPerNode()), &K);
+	K.makeCompressed();
 	zeroMatrix.setZero();
 
 	tet->addFMDK(state, &F, &M, &D, &K);
