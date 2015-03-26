@@ -198,8 +198,8 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	auto meshShapeForVirtualStaple1 = std::make_shared<MeshShape>();
 	auto meshShapeForVirtualStaple2 = std::make_shared<MeshShape>();
-	meshShapeForVirtualStaple1->load("Geometry/virtual_staple_1.ply");
-	meshShapeForVirtualStaple2->load("Geometry/virtual_staple_2.ply");
+	meshShapeForVirtualStaple1->load("Tools/Stapler/virtual_staple_1.ply");
+	meshShapeForVirtualStaple2->load("Tools/Stapler/virtual_staple_2.ply");
 
 	std::vector<std::shared_ptr<MeshShape>> virtualTeethShapes;
 	virtualTeethShapes.push_back(meshShapeForVirtualStaple1);
