@@ -425,13 +425,11 @@ TEST_F(VirtualToolCouplerTest, SetAngularDamping)
 	checkAngularIsCriticallyDamped();
 }
 
-TEST_F(VirtualToolCouplerTest, SetCollisionRepresentation)
+TEST_F(VirtualToolCouplerTest, SetHapticOutputOnlyWhenColliding)
 {
-	auto collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("collision");
-	virtualToolCoupler->setCollisionRepresentation(collision);
-	auto newCollision = virtualToolCoupler->getCollisionRepresentation();
-	EXPECT_NE(nullptr, newCollision);
-	EXPECT_EQ("collision", newCollision->getName());
+	EXPECT_FALSE(virtualToolCoupler->isHapticOutputOnlyWhenColliding());
+	virtualToolCoupler->setHapticOutputOnlyWhenColliding(true);
+	EXPECT_TRUE(virtualToolCoupler->isHapticOutputOnlyWhenColliding());
 }
 
 TEST_F(VirtualToolCouplerTest, GetInput)
@@ -549,7 +547,7 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	virtualToolCoupler->setCalculateInertialTorques(true);
 
 	auto collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("collision");
-	virtualToolCoupler->setCollisionRepresentation(collision);
+	virtualToolCoupler->setHapticOutputOnlyWhenColliding(true);
 
 	// Encode
 	YAML::Node node;
@@ -570,8 +568,8 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	EXPECT_EQ(num, newVirtualToolCoupler->getAngularDamping());
 	EXPECT_TRUE(vec.isApprox(newVirtualToolCoupler->getAttachmentPoint()));
 	EXPECT_TRUE(newVirtualToolCoupler->getCalculateInertialTorques());
+	EXPECT_TRUE(virtualToolCoupler->isHapticOutputOnlyWhenColliding());
 
-	EXPECT_NE(nullptr, newVirtualToolCoupler->getCollisionRepresentation());
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getInput());
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getRepresentation());
 	EXPECT_EQ(nullptr, newVirtualToolCoupler->getOutput());
