@@ -154,10 +154,6 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	physicsRepresentation->setIsGravityEnabled(false);
 	physicsRepresentation->setDensity(80500); // Stainless steel (in Kg.m-3)
 	physicsRepresentation->setShape(meshShapeForCollision);
-	physicsRepresentation->setLocalPose(SurgSim::Math::makeRigidTransform(
-		SurgSim::Math::makeRotationQuaternion(-M_PI_2, SurgSim::Math::Vector3d::UnitX().eval()) *
-		SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d::UnitZ().eval()),
-		SurgSim::Math::Vector3d::Zero()));
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
