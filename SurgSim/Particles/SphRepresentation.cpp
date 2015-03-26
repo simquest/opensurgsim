@@ -418,7 +418,7 @@ void SphRepresentation::computeAccelerations()
 void SphRepresentation::handleCollisions()
 {
 	const double stiffness = 50000.0;
-	const double damping = 500.0;
+	const double damping = 200.0;
 	if (m_collisionRepresentation != nullptr)
 	{
 		auto collisions = m_collisionRepresentation->getCollisions().safeGet();
