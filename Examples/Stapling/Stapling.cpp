@@ -225,7 +225,7 @@ std::shared_ptr<OsgSceneryRepresentation> createSceneryObject(const std::string&
 
 std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName, const std::string& deviceName)
 {
-	const std::string filename = std::string("Geometry/stapler_collision.ply");
+	const std::string filename = std::string("Tools/Stapler/stapler_collision.ply");
 
 	// Stapler collision mesh
 	auto meshShapeForCollision = std::make_shared<MeshShape>();
@@ -282,9 +282,9 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(visualizeContactsBehavior);
 
 	// Load the graphical parts of a stapler.
-
-	auto graphics = createSceneryObject("Stapler", "Geometry/stapler.osgb");
-	sceneElement->addComponent(graphics);
+	sceneElement->addComponent(createSceneryObject("Stapler",    "Tools/Stapler/stapler.osg"));
+	sceneElement->addComponent(createSceneryObject("Handle",   "Tools/Stapler/handle.osg"));
+	sceneElement->addComponent(createSceneryObject("Footplate",   "Tools/Stapler/footplate.osg"));
 
 	auto meshShapeForVirtualStaple1 = std::make_shared<MeshShape>();
 	auto meshShapeForVirtualStaple2 = std::make_shared<MeshShape>();
