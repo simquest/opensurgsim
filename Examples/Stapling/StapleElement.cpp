@@ -43,7 +43,7 @@ void StapleElement::setHasCollisionRepresentation(bool flag)
 bool StapleElement::doInitialize()
 {
 	auto meshShape = std::make_shared<MeshShape>();
-	const std::string file = "/Geometry/staple_collision.ply";
+	const std::string file = "Tools/Stapler/staple_collision.ply";
 	meshShape->load(file);
 
 	auto physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
@@ -54,7 +54,7 @@ bool StapleElement::doInitialize()
 
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSceneryRepresentation>("Graphics");
-	graphicsRepresentation->loadModel("Geometry/staple.obj");
+	graphicsRepresentation->loadModel("Tools/Stapler/staple.obj");
 
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
