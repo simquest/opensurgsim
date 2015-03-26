@@ -69,12 +69,18 @@ std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>
 		createMaterials(std::shared_ptr<Scene> scene)
 {
 	std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> result;
-	auto element = std::make_shared<BasicSceneElement>("materials");
+	auto element = std::make_shared<BasicSceneElement>("Materials");
 	scene->addSceneElement(element);
 
 	// Skin
 	auto material = SurgSim::Blocks::createNormalMappedMaterial("skin",
 					Vector4f(1.0, 1.0, 1.0, 1.0), Vector4f(0.4, 0.4, 0.4, 1.0), 10.0, "", "");
+	result[material->getName()] = material;
+	element->addComponent(material);
+
+	// Staple
+	material = SurgSim::Blocks::createPlainMaterial("staple",
+			   Vector4f(0.5, 0.5, 0.5, 1.0), Vector4f(0.4, 0.4, 0.4, 1.0), 2.0);
 	result[material->getName()] = material;
 	element->addComponent(material);
 
@@ -84,10 +90,10 @@ std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>
 	result[material->getName()] = material;
 	element->addComponent(material);
 
-	// Plain Textured
+	// Textured
 	material = SurgSim::Blocks::createTexturedMaterial("textured",
-			   Vector4f(1.0, 1.0, 1.0, 1.0),
-			   Vector4f(1.0, 1.0, 1.0, 1.0), 1.0);
+			   Vector4f(0.8, 0.8, 0.8, 1.0),
+			   Vector4f(0.5, 0.5, 0.5, 1.0), 1.0);
 	result[material->getName()] = material;
 	element->addComponent(material);
 
@@ -389,7 +395,7 @@ std::shared_ptr<OsgViewElement> createViewElement()
 	light->setSpecularColor(Vector4d(1.0, 1.0, 1.0, 1.0));
 	result->addComponent(light);
 
-	result->getCamera()->setAmbientColor(Vector4d(0.1, 0.1, 0.1, 1.0));
+	result->getCamera()->setAmbientColor(Vector4d(0.2, 0.2, 0.2, 1.0));
 // 	result->setPose(makeRigidTransform(Vector3d(0.0, 0.5, 0.5), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
 
 	return result;

@@ -1,5 +1,17 @@
 - Body/torso:
     Material: skin
+- stapler/Stapler:
+    Material: textured
+    Properties:
+        - [float, shininess, 5.0]
+        - [vec4, specularColor, [0.5,0.5,0.5,1.0]]
+- stapler/Handle:
+    Material: textured
+    Properties:
+        - [float, shininess, 5.0]
+        - [vec4, specularColor, [0.5,0.5,0.5,1.0]]
+- stapler/Footplate:
+    Material: textured
 - OR/drape:
     Material: normalmapped
     Properties:
@@ -11,7 +23,7 @@
     Properties:
         - [float, shininess, 0.896]
         - [vec4, diffuseColor, [0.4096,0.4096,0.4096,1]]
-        - [vec4, specularColor, [1.0,1.0,1.0,1.0]]
+        - [vec4, specularColor, [0.4,0.4,0.4,1.0]]
 - OR/pillow:
     Material: normalmapped
     Properties:
