@@ -487,10 +487,10 @@ TEST_F(VirtualToolCouplerTest, SetHapticOutputOnlyWhenColliding)
 	rigidBody->setCollisionRepresentation(collision);
 	virtualToolCoupler->update(0.1);
 	data = virtualToolCoupler->getOutputData();
-	ASSERT_TRUE(data.vectors().get("force", &force));
-	EXPECT_NEAR(force.norm(), 0.0, 1e-9);
+	ASSERT_TRUE(data.vectors().get(DataStructures::Names::FORCE, &force));
+	EXPECT_EQ(force, Vector3d::Zero());
 	ASSERT_TRUE(data.vectors().get(DataStructures::Names::TORQUE, &torque));
-	EXPECT_NEAR(torque.norm(), 0.0, 1e-9);
+	EXPECT_EQ(torque, Vector3d::Zero());
 	EXPECT_FALSE(data.matrices().hasData(DataStructures::Names::DAMPER_JACOBIAN));
 	EXPECT_FALSE(data.matrices().hasData(DataStructures::Names::SPRING_JACOBIAN));
 
@@ -506,7 +506,7 @@ TEST_F(VirtualToolCouplerTest, SetHapticOutputOnlyWhenColliding)
 	EXPECT_TRUE(data.matrices().hasData(DataStructures::Names::SPRING_JACOBIAN));
 
 	// forces enabled if any collisions
-	virtualToolCoupler->setHapticOutputOnlyWhenColliding(false);
+	virtualToolCoupler->setHapticOutputOnlyWhenColliding(true);
 	auto& collisions = collision->getCollisions().unsafeGet();
 	collisions[std::make_shared<RigidCollisionRepresentation>("collision2")].push_back(
 		std::make_shared<Collision::Contact>(0.1, Vector3d::UnitX().eval(), Vector3d::UnitY().eval(),

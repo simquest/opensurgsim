@@ -28,11 +28,6 @@
 namespace SurgSim
 {
 
-namespace Collision
-{
-class Representation;
-}
-
 namespace Input
 {
 class InputComponent;
