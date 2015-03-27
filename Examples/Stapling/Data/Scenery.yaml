@@ -4,47 +4,61 @@
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: torso
           ModelFileName: Anatomy/torso.osg
+          GroupReferences: [__OssDefault__, shadowing, shadowed]
 - SurgSim::Framework::BasicSceneElement:
     Name: OR
     Components:
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: drape
           ModelFileName: OR/drape.osg
+          GroupReferences: [__OssDefault__, shadowing, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: table_extension
           ModelFileName: OR/table_extension.osg
+          GroupReferences: [__OssDefault__, shadowing, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: table
           ModelFileName: OR/table.osg
+          GroupReferences: [__OssDefault__, shadowing, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: pillow
           ModelFileName: OR/pillow.osg
+          GroupReferences: [__OssDefault__, shadowing, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: lights
           ModelFileName: OR/lights.osg
+          GroupReferences: [__OssDefault__, shadowing, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: floor
           ModelFileName: OR/floor.osg
+          GroupReferences: [__OssDefault__, shadowing, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: walls
           ModelFileName: OR/walls.osg
+          GroupReferences: [__OssDefault__, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: ceiling
           ModelFileName: OR/ceiling.osg
+          GroupReferences: [__OssDefault__, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: door
           ModelFileName: OR/door.osg
+          GroupReferences: [__OssDefault__, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: window
           ModelFileName: OR/window.osg
+          GroupReferences: [__OssDefault__, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: handle
           ModelFileName: OR/handle.osg
+          GroupReferences: [__OssDefault__, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: frame
           ModelFileName: OR/frame.osg
+          GroupReferences: [__OssDefault__, shadowed]
       - SurgSim::Graphics::OsgSceneryRepresentation:
           Name: outlets
           ModelFileName: OR/outlets.osg
+          GroupReferences: [__OssDefault__, shadowed]
 
 

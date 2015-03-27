@@ -16,7 +16,6 @@
 #include <memory>
 #include <string>
 
-#include "Examples/Stapling/StaplerBehavior.h"
 #include "SurgSim/Blocks/Blocks.h"
 #include "SurgSim/Collision/Collision.h"
 #include "SurgSim/DataStructures/DataStructures.h"
@@ -28,6 +27,9 @@
 #include "SurgSim/Input/Input.h"
 #include "SurgSim/Math/Math.h"
 #include "SurgSim/Physics/Physics.h"
+
+#include "Examples/Stapling/StaplerBehavior.h"
+#include "Examples/Stapling/Graphics.h"
 
 using SurgSim::Blocks::KeyboardTogglesComponentBehavior;
 using SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior;
@@ -65,101 +67,6 @@ using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
 
-std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>
-		createMaterials(std::shared_ptr<Scene> scene)
-{
-	std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> result;
-	auto element = std::make_shared<BasicSceneElement>("Materials");
-	scene->addSceneElement(element);
-
-	// Skin
-	auto material = SurgSim::Blocks::createNormalMappedMaterial("skin",
-					Vector4f(1.0, 1.0, 1.0, 1.0), Vector4f(0.4, 0.4, 0.4, 1.0), 10.0, "", "");
-	result[material->getName()] = material;
-	element->addComponent(material);
-
-	// Staple
-	material = SurgSim::Blocks::createPlainMaterial("staple",
-			   Vector4f(0.5, 0.5, 0.5, 1.0), Vector4f(0.4, 0.4, 0.4, 1.0), 2.0);
-	result[material->getName()] = material;
-	element->addComponent(material);
-
-	// Plain Normal Map
-	material = SurgSim::Blocks::createNormalMappedMaterial("normalmapped",
-			   Vector4f(1.0, 1.0, 1.0, 1.0), Vector4f(1.0, 1.0, 1.0, 1.0), 1.0, "", "");
-	result[material->getName()] = material;
-	element->addComponent(material);
-
-	// Textured
-	material = SurgSim::Blocks::createTexturedMaterial("textured",
-			   Vector4f(0.8, 0.8, 0.8, 1.0),
-			   Vector4f(0.5, 0.5, 0.5, 1.0), 1.0);
-	result[material->getName()] = material;
-	element->addComponent(material);
-
-	// Plain
-
-	return result;
-}
-
-void applyMaterials(
-	std::shared_ptr<Scene> scene,
-	std::unordered_map <std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> materials)
-{
-	static SurgSim::Graphics::OsgUniformFactory uniformFactory;
-	const std::string materialFilename = "Materials.yaml";
-	YAML::Node nodes;
-	if (SurgSim::Framework::tryLoadNode(materialFilename, &nodes))
-	{
-		for (auto node = nodes.begin(); node != nodes.end(); ++node)
-		{
-			std::string name = node->begin()->first.as<std::string>();
-			std::string materialName = node->begin()->second["Material"].as<std::string>();
-			auto found = name.find("/");
-			std::string elementName = name.substr(0, found);
-			std::string componentName = name.substr(found + 1);
-
-			auto element = scene->getSceneElement(elementName);
-			SURGSIM_ASSERT(element != nullptr)
-					<< "SceneElement " << elementName << " not found in scene.";
-
-			auto component = std::dynamic_pointer_cast<SurgSim::Graphics::OsgRepresentation>(
-								 element->getComponent(componentName));
-			SURGSIM_ASSERT(component != nullptr)
-					<< "Component " << componentName << " not found or not an OsgRepresentation.";
-
-			if (component != nullptr)
-			{
-				auto material = materials[materialName];
-
-				SURGSIM_ASSERT(material != nullptr)
-						<< "Could not find material " << materialName << " in the prebuilt materials.";
-
-				component->setMaterial(material);
-
-				auto propertyNodes = node->begin()->second["Properties"];
-				for (auto nodeIt = propertyNodes.begin(); nodeIt != propertyNodes.end(); ++nodeIt)
-				{
-					auto& node = *nodeIt;
-					auto rawUniform = uniformFactory.create(node[0].as<std::string>(), node[1].as<std::string>());
-					SURGSIM_ASSERT(rawUniform != nullptr)
-							<< "Could not create uniform " << node[1].as<std::string>() << " of type "
-							<< node[0].as<std::string>() << ".";
-					auto uniform = std::dynamic_pointer_cast<SurgSim::Graphics::OsgUniformBase>(rawUniform);
-					uniform->set(node[2]);
-					component->addUniform(uniform);
-				}
-			}
-		}
-	}
-	else
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Stapling"))
-				<< "Could not find material definitions, visuals are going to be compromised.";
-	}
-
-}
-
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
@@ -182,6 +89,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	auto graphicalFem = std::make_shared<OsgMeshRepresentation>("Graphics");
 	graphicalFem->loadMesh(filename);
+	graphicalFem->addGroupReference("shadowed");
 	sceneElement->addComponent(graphicalFem);
 
 	// Create material to transport the Textures
@@ -288,9 +196,20 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(visualizeContactsBehavior);
 
 	// Load the graphical parts of a stapler.
-	sceneElement->addComponent(createSceneryObject("Stapler",    "Tools/Stapler/stapler.osg"));
-	sceneElement->addComponent(createSceneryObject("Handle",   "Tools/Stapler/handle.osg"));
-	sceneElement->addComponent(createSceneryObject("Footplate",   "Tools/Stapler/footplate.osg"));
+	auto component = createSceneryObject("Stapler", "Tools/Stapler/stapler.osg");
+	component->addGroupReference("shadowed");
+	component->addGroupReference("shadowing");
+	sceneElement->addComponent(component);
+
+	component = createSceneryObject("Handle", "Tools/Stapler/handle.osg");
+	component->addGroupReference("shadowed");
+	component->addGroupReference("shadowing");
+	sceneElement->addComponent(component);
+
+	component = createSceneryObject("Footplate", "Tools/Stapler/footplate.osg");
+	component->addGroupReference("shadowed");
+	component->addGroupReference("shadowing");
+	sceneElement->addComponent(component);
 
 	auto meshShapeForVirtualStaple1 = std::make_shared<MeshShape>();
 	auto meshShapeForVirtualStaple2 = std::make_shared<MeshShape>();
@@ -332,6 +251,8 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 					"Geometry/forearm_normal.png");
 	auto forearm = createSceneryObject("Forearm", "Geometry/forearm.osgb");
 	forearm->setMaterial(material);
+	forearm->addGroupReference("shadowing");
+	forearm->addGroupReference("shadowed");
 	forearm->setGenerateTangents(true);
 	element->addComponent(forearm);
 	element->addComponent(material);
@@ -344,6 +265,8 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName)
 	auto upperArm = createSceneryObject("Upperarm", "Geometry/upperarm.osgb");
 	upperArm->setMaterial(material);
 	upperArm->setGenerateTangents(true);
+	upperArm->addGroupReference("shadowing");
+	upperArm->addGroupReference("shadowed");
 	element->addComponent(upperArm);
 	element->addComponent(material);
 
@@ -385,18 +308,47 @@ std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::Sc
 
 std::shared_ptr<OsgViewElement> createViewElement()
 {
-	auto result = std::make_shared<OsgViewElement>("StaplingDemoView");
-	result->enableManipulator(true);
-	result->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
+	auto result = std::make_shared<OsgViewElement>("View");
+	// result->enableManipulator(true);
+	// result->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
 	result->enableKeyboardDevice(true);
-
-	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
-	light->setDiffuseColor(Vector4d(1.0, 1.0, 1.0, 1.0));
-	light->setSpecularColor(Vector4d(1.0, 1.0, 1.0, 1.0));
-	result->addComponent(light);
+	result->setPose(
+		SurgSim::Math::makeRigidTransform(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
 
 	result->getCamera()->setAmbientColor(Vector4d(0.2, 0.2, 0.2, 1.0));
-// 	result->setPose(makeRigidTransform(Vector3d(0.0, 0.5, 0.5), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
+	result->setPose(makeRigidTransform(Vector3d(0.0, 0.5, 0.5), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
+
+
+	return result;
+}
+
+std::shared_ptr<SurgSim::Framework::SceneElement> createLightElement()
+{
+	auto result = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
+
+	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
+	light->setDiffuseColor(Vector4d(0.5, 0.5, 0.5, 1.0));
+	light->setSpecularColor(Vector4d(0.8, 0.8, 0.8, 1.0));
+	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
+	result->addComponent(light);
+
+	// Move the light from left to right over along the scene
+	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator");
+	RigidTransform3d from = makeRigidTransform(Vector3d(1.0, 1.0, -1.0),
+							Vector3d(0.0, 0.0, 0.0),
+							Vector3d(0.0, 1.0, 0.0));
+	RigidTransform3d to = makeRigidTransform(Vector3d(-1.0, 1.0, -1.0),
+						  Vector3d(0.0, 0.0, 0.0),
+						  Vector3d(0.0, 1.0, 0.0));
+	interpolator->setTarget(result);
+	interpolator->setStartingPose(from);
+	interpolator->setDuration(10.0);
+	interpolator->setEndingPose(to);
+	interpolator->setPingPong(true);
+
+	result->setPose(from);
+
+	result->addComponent(interpolator);
 
 	return result;
 }
@@ -487,11 +439,14 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(stapler);
 	scene->addSceneElement(wound);
 	scene->addSceneElement(keyboard);
+	scene->addSceneElement(createLightElement());
 
 	runtime->addSceneElements("Scenery.yaml");
 
 	auto materials = createMaterials(runtime->getScene());
 	applyMaterials(runtime->getScene(), materials);
+
+	setupShadowMapping(materials, scene);
 
 	// Exclude collision between certain Collision::Representations
 	physicsManager->addExcludedCollisionPair(

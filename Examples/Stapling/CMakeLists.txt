@@ -19,11 +19,13 @@ include_directories(
 )
 
 set(STAPLING_SOURCES
+	Graphics.cpp
 	StapleElement.cpp
 	StaplerBehavior.cpp
 	Stapling.cpp
 )
 set(STAPLING_HEADERS
+	Graphics.h
 	StapleElement.h
 	StaplerBehavior.h
 )
