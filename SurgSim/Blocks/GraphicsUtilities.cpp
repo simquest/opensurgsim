@@ -95,7 +95,6 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createTexturedMaterial(
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", shininess);
 
-	enable2DTexture(material, "shadowMap", Graphics::SHADOW_TEXTURE_UNIT, "Textures/black.png");
 	enable2DTexture(material, "diffuseMap", Graphics::DIFFUSE_TEXTURE_UNIT, diffuseMap, false);
 
 	return material;
@@ -124,7 +123,6 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", shininess);
 
-	enable2DTexture(material, "shadowMap", Graphics::SHADOW_TEXTURE_UNIT, "Textures/black.png");
 	enable2DTexture(material, "diffuseMap", Graphics::DIFFUSE_TEXTURE_UNIT, diffuseMap, false);
 	enable2DTexture(material, "normalMap", Graphics::NORMAL_TEXTURE_UNIT, normalMap, false);
 
