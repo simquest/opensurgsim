@@ -22,6 +22,7 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
@@ -85,6 +86,16 @@ public:
 	/// Set the Physics Representation which follows the input
 	/// \param rigid Rigid Representation that provides state and receives external forces and torques
 	void setRepresentation(const std::shared_ptr<SurgSim::Framework::Component> rigid);
+
+	/// Get whether or not the haptic forces should be provided only during collisions.
+	/// \return false if the VTC forces and torques are sent to the output device (if any) at all times.  true if
+	///		zeros are sent for the forces and torques unless the tool is colliding.
+	bool isHapticOutputOnlyWhenColliding() const;
+
+	/// Set whether or not the haptic forces should be provided only during collisions.
+	/// \param haptic false to send the VTC forces and torques to the output device (if any) at all times.  true to
+	///		send zeros for the forces and torques unless the tool is colliding.
+	void setHapticOutputOnlyWhenColliding(bool haptic);
 
 	/// \return Name of the pose data in the input to transfer
 	const std::string& getPoseName();
@@ -257,6 +268,12 @@ private:
 	/// Whether or not the calculated torques will simulate inertia.  This setting only has an effect if the device
 	/// input point is not the mass center.
 	bool m_calculateInertialTorques;
+
+	/// The logger.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
+	/// Whether or not the VTC sends forces and torques to the output device (if any) only when the tool is colliding.
+	bool m_hapticOutputOnlyWhenColliding;
 
 	///@{
 	/// Cached DataGroup indices.
