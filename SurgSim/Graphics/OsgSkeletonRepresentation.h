@@ -20,6 +20,7 @@
 #include <map>
 #include <osg/MatrixTransform>
 #include <osg/ref_ptr>
+#include <osgUtil/UpdateVisitor>
 #include <string>
 
 #include "SurgSim/Graphics/OsgRepresentation.h"
