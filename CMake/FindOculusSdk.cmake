@@ -9,12 +9,20 @@
 #  OCULUSSDK_INCLUDE_DIR - the OculusSDK include directory
 
 # Attempt to define OCULUSSDK_INCLUDE_DIR if undefined
-find_path(OCULUSSDK_INCLUDE_DIR
-	NAMES OVR.h
-	PATHS "$ENV{OCULUSSDK_DIR}/LibOVR" "/usr/local/LibOVR"
-	PATH_SUFFIXES "Include"
-	NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
+#
+# Once done this will define
+
+set(OCULUSSDK_DIR CACHE PATH "The directory containing the OCULUS SDK.")
+mark_as_advanced(OCULUSSDK_DIR)
+
+find_path(OCULUSSDK_INCLUDE_DIR OVR.h
+    HINTS
+        ENV OCULUSSDK_DIR
+        ${OCULUSSDK_DIR}
+    PATH_SUFFIXES Include
+    PATHS /usr/local/LibOVR
 )
+mark_as_advanced(OCULUSSDK_INCLUDE_DIR)
 
 if(OCULUSSDK_INCLUDE_DIR)
 	get_filename_component(OCULUSSDK_ROOT_DIR
