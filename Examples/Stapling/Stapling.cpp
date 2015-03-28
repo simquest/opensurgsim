@@ -419,9 +419,8 @@ int main(int argc, char* argv[])
 	keyboardBehavior->setInputComponent(keyboardComponent);
 
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Handle"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Indicator"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Markings"));
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Trigger"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Stapler"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Footplate"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, stapler->getComponent("Contacts"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, stapler->getComponent("Collision Mesh"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, arm->getComponent("Forearm"));
