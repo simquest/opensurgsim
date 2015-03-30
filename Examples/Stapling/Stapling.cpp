@@ -178,7 +178,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	inputVTC->setCalculateInertialTorques(false);
 	inputVTC->overrideAngularStiffness(1.0);
 	inputVTC->overrideAngularDamping(0.13);
-	inputVTC->overrideLinearStiffness(100.0);
+	inputVTC->overrideLinearStiffness(400.0);
 	inputVTC->setHapticOutputOnlyWhenColliding(true);
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
