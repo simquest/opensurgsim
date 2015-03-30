@@ -368,7 +368,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
 	std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
 	std::shared_ptr<StaplingPhysicsManager> physicsManager = std::make_shared<StaplingPhysicsManager>();
-	physicsManager->setRate(150.0);
+	physicsManager->setRate(170.0);
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	runtime->addManager(behaviorManager);
