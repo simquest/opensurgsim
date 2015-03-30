@@ -232,6 +232,13 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 		virtualTeeth[i] = virtualToothCollision;
 		sceneElement->addComponent(virtualToothCollision);
+
+		std::shared_ptr<MeshRepresentation> toothShapeVisualization =
+			std::make_shared<OsgMeshRepresentation>("Tooth Graphics" + boost::to_string(i));
+		toothShapeVisualization->setShape(*it);
+		toothShapeVisualization->setDrawAsWireFrame(true);
+		toothShapeVisualization->setLocalActive(false);
+		sceneElement->addComponent(toothShapeVisualization);
 	}
 
 	staplerBehavior->setVirtualTeeth(virtualTeeth);
@@ -435,6 +442,8 @@ int main(int argc, char* argv[])
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_E, arm->getComponent("Collision Mesh"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_F, wound->getComponent("Graphics"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_G, wound->getComponent("Wire Frame"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_H, stapler->getComponent("Tooth Graphics0"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_H, stapler->getComponent("Tooth Graphics1"));
 
 	std::shared_ptr<SceneElement> keyboard = std::make_shared<BasicSceneElement>("SceneElement");
 	keyboard->addComponent(keyboardComponent);
