@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 
+#include "Examples/Stapling/DeviceFactory.h"
 #include "Examples/Stapling/StaplerBehavior.h"
 #include "Examples/Stapling/StaplingPhysicsManager.h"
 #include "SurgSim/Blocks/Blocks.h"
@@ -47,6 +48,10 @@ using SurgSim::Graphics::OsgManager;
 using SurgSim::Graphics::OsgMeshRepresentation;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
+using SurgSim::Input::DeviceInterface;
+using SurgSim::Input::InputComponent;
+using SurgSim::Input::InputManager;
+using SurgSim::Input::OutputComponent;
 using SurgSim::Math::MeshShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationMatrix;
@@ -55,9 +60,6 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
 using SurgSim::Math::Vector4f;
-using SurgSim::Input::DeviceInterface;
-using SurgSim::Input::InputComponent;
-using SurgSim::Input::InputManager;
 using SurgSim::Physics::DeformableCollisionRepresentation;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::FixedRepresentation;
@@ -161,13 +163,23 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	std::shared_ptr<InputComponent> inputComponent = std::make_shared<InputComponent>("InputComponent");
 	inputComponent->setDeviceName(deviceName);
-	inputComponent->setLocalPose(SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.0, 0.01, 0.0)));
+	auto deviceTransform = SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.0, 0.01, 0.0));
+	inputComponent->setLocalPose(deviceTransform);
+
+	std::shared_ptr<OutputComponent> outputComponent = std::make_shared<OutputComponent>("OutputComponent");
+	outputComponent->setDeviceName(deviceName);
+	outputComponent->setLocalPose(deviceTransform);
 
 	std::shared_ptr<VirtualToolCoupler> inputVTC = std::make_shared<VirtualToolCoupler>("VTC");
 	inputVTC->setInput(inputComponent);
+	inputVTC->setOutput(outputComponent);
 	inputVTC->setRepresentation(physicsRepresentation);
 	inputVTC->overrideAttachmentPoint(Vector3d::Zero());
 	inputVTC->setCalculateInertialTorques(false);
+	inputVTC->overrideAngularStiffness(1.0);
+	inputVTC->overrideAngularDamping(0.13);
+	inputVTC->overrideLinearStiffness(100.0);
+	inputVTC->setHapticOutputOnlyWhenColliding(true);
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
 	// Also, it is aware of collisions of the stapler.
@@ -190,6 +202,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(collisionRepresentation);
 	sceneElement->addComponent(meshShapeVisualization);
 	sceneElement->addComponent(inputComponent);
+	sceneElement->addComponent(outputComponent);
 	sceneElement->addComponent(inputVTC);
 	sceneElement->addComponent(staplerBehavior);
 	sceneElement->addComponent(visualizeContactsBehavior);
@@ -376,15 +389,9 @@ int main(int argc, char* argv[])
 	runtime->addManager(inputManager);
 	runtime->addManager(physicsManager);
 
-	std::shared_ptr<DeviceInterface> device;
-	device = std::make_shared<MultiAxisDevice>(deviceName);
-	if (!device->initialize())
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Could not initialize device " << device->getName() << " for the tool.";
-
-		device = std::make_shared<IdentityPoseDevice>(deviceName);
-	}
+	DeviceFactory deviceFactory;
+	std::shared_ptr<DeviceInterface> device = deviceFactory.getDevice(deviceName);
+	SURGSIM_ASSERT(device != nullptr) << "Unable to get a device, is one connected?";
 	inputManager->addDevice(device);
 
 	std::shared_ptr<OsgViewElement> view = createViewElement();

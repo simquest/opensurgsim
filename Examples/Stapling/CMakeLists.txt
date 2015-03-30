@@ -19,12 +19,14 @@ include_directories(
 )
 
 set(STAPLING_SOURCES
+	DeviceFactory.cpp
 	StapleElement.cpp
 	StaplerBehavior.cpp
 	Stapling.cpp
 	StaplingPhysicsManager.cpp
 )
 set(STAPLING_HEADERS
+	DeviceFactory.h
 	StapleElement.h
 	StaplerBehavior.h
 	StaplingPhysicsManager.h
@@ -48,10 +50,36 @@ set(LIBS
 	IdentityPoseDevice
 	MultiAxisDevice
 	SurgSimBlocks
+	SurgSimDeviceFilters
 	SurgSimFramework
 	SurgSimGraphics
 	${YAML_CPP_LIBRARIES}
 )
+
+if(BUILD_DEVICE_PHANTOM)
+	list(APPEND LIBS PhantomDevice)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPHANTOM_LIBRARY_AVAILABLE")
+endif(BUILD_DEVICE_PHANTOM)
+
+if(BUILD_DEVICE_SIXENSE)
+	list(APPEND LIBS SixenseDevice)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSIXENSE_LIBRARY_AVAILABLE")
+    surgsim_copy_to_target_directory_for_release(Stapling
+        ${SIXENSESDK_sixense_SHARED_RELEASE}
+        ${SIXENSESDK_sixense_utils_SHARED_RELEASE}
+    )
+    surgsim_copy_to_target_directory_for_debug(Stapling
+        ${SIXENSESDK_sixense_SHARED_DEBUG}
+        ${SIXENSESDK_sixense_utils_SHARED_DEBUG}
+        ${SIXENSESDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
+    )
+endif(BUILD_DEVICE_SIXENSE)
+
+if(BUILD_DEVICE_NOVINT)
+	list(APPEND LIBS NovintDevice)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOVINT_LIBRARY_AVAILABLE")
+endif(BUILD_DEVICE_NOVINT)
+
 target_link_libraries(Stapling ${LIBS})
 target_link_libraries(SerializedStapling ${LIBS})
 
