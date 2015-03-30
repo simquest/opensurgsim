@@ -15,20 +15,36 @@
 
 #include <memory>
 
-#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
+#include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Devices/Novint/NovintDevice.h"
+#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
+
 #include "SurgSim/Testing/VisualTestCommon/ToolSquareTest.h"
 
-// The initialization name of the NovintDevice.  An empty string will use the first available Falcon.
-static const char* const NOVINT_DEVICE_NAME = "";
+using SurgSim::Input::DeviceInterface;
+using SurgSim::Device::NovintDevice;
+using SurgSim::Device::IdentityPoseDevice;
+
+
+// Define the HDAL name of the device to use.
+static const char* const NOVINT_DEVICE_NAME = ""; // An empty name will instantiate the default falcon.
+//static const char* const NOVINT_DEVICE_NAME = "FALCON_HTHR_R";
+//static const char* const NOVINT_DEVICE_NAME = "FALCON_FRANKEN_L";
+//static const char* const NOVINT_DEVICE_NAME = "FALCON_BURRv3_1";
+//static const char* const NOVINT_DEVICE_NAME = "FALCON_BURRv3_2";
+
 
 int main(int argc, char** argv)
 {
-	auto toolDevice = std::make_shared<SurgSim::Device::NovintDevice>("NovintDevice");
-	toolDevice->setInitializationName(NOVINT_DEVICE_NAME);
-	auto squareDevice = std::make_shared<SurgSim::Device::IdentityPoseDevice>("IdentityPoseDevice");
+	std::shared_ptr<NovintDevice> toolDevice = std::make_shared<NovintDevice>("NovintDevice", NOVINT_DEVICE_NAME);
 
-	runToolSquareTest(toolDevice, squareDevice, "Move the Novint Falcon device to move the sphere tool.");
+	// The square is controlled by a second device.  For a simple test, we're using an IdentityPoseDevice--
+	// a pretend device that doesn't actually move.
+	std::shared_ptr<DeviceInterface> squareDevice = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
+
+	runToolSquareTest(toolDevice, squareDevice,
+					  //2345678901234567890123456789012345678901234567890123456789012345678901234567890
+					  "Move the Novint Falcon device to move the sphere tool.");
 
 	std::cout << std::endl << "Exiting." << std::endl;
 	// Cleanup and shutdown will happen automatically as objects go out of scope.

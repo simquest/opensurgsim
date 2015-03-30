@@ -18,7 +18,6 @@
 
 #include <string>
 
-#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Input/CommonDevice.h"
 
 namespace SurgSim
@@ -36,39 +35,24 @@ class NovintCommonDevice : public SurgSim::Input::CommonDevice
 {
 public:
 	/// Constructor.
-	/// \param name A unique name for the device that will be used by the application.
-	explicit NovintCommonDevice(const std::string& name);
+	///
+	/// \param uniqueName A unique name for the device that will be used by the application.
+	/// \param initializationName The name passed to HDAL when initializing the device.  This should match a
+	/// 	configured Novint device; alternately, an empty string indicates the default device.
+	NovintCommonDevice(const std::string& uniqueName, const std::string& initializationName);
 
 	/// Destructor.
 	virtual ~NovintCommonDevice();
 
-	/// Sets the serial number used to register this device with the hardware library.
-	/// An empty string indicates the first available device.
-	/// \param serialNumber The serial number.
-	/// \sa setInitializationName
-	void setSerialNumber(const std::string& serialNumber);
+	/// Gets the name used by the Novint device configuration to refer to this device.
+	/// Note that this may or may not be the same as the device name retrieved by getName().
+	/// An empty string indicates the default device.
+	/// \return	The initialization name.
+	std::string getInitializationName() const;
 
-	/// Gets the serial number used to register this device with the hardware library.
-	/// \param [out] serialNumber The serial number, if set.
-	/// \return	true if the serialNumber has been set.
-	bool getSerialNumber(std::string* serialNumber) const;
+	virtual bool initialize() override;
 
-	/// Sets the name used to register this device with the hardware library.
-	/// To use an initialization name, the 'devices.yaml' file must be in the working directory,
-	/// (see example at Data/devices.yaml) with an entry of the form "initializationName: serialNumber".
-	/// An empty string indicates the first available device.
-	/// \param initializationName The initialization name.
-	/// \sa setSerialNumber
-	void setInitializationName(const std::string& initializationName);
-
-	/// Gets the name used to register this device with the hardware library.
-	/// \param [out] initializationName The initialization name, if set.
-	/// \return	true if the initializationName has been set
-	bool getInitializationName(std::string* initializationName) const;
-
-	bool initialize() override;
-
-	bool finalize() override;
+	virtual bool finalize() override;
 
 	/// Check whether this device is initialized.
 	bool isInitialized() const;
@@ -98,12 +82,7 @@ private:
 
 	/// The scaffold handles all the communication with the SDK.
 	std::shared_ptr<NovintScaffold> m_scaffold;
-
-	/// The name passed to the SDK to specify which hardware device should be used.
-	SurgSim::DataStructures::OptionalValue<std::string> m_initializationName;
-
-	/// The serial number passed to the SDK to specify which hardware device should be used.
-	SurgSim::DataStructures::OptionalValue<std::string> m_serialNumber;
+	std::string m_initializationName;
 
 	/// Scale factor for the position axes; stored locally before the device is initialized.
 	double m_positionScale;

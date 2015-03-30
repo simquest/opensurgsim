@@ -54,7 +54,9 @@ public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	explicit Novint7DofDevice(const std::string& uniqueName);
+	/// \param initializationName The name passed to HDAL when initializing the device.  This should match a
+	/// 	configured Novint device; alternately, an empty string indicates the default device.
+	Novint7DofDevice(const std::string& uniqueName, const std::string& initializationName);
 
 	/// Destructor.
 	virtual ~Novint7DofDevice();

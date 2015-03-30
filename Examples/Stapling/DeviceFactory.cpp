@@ -49,7 +49,7 @@ std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const 
 
 #ifdef NOVINT_LIBRARY_AVAILABLE
 	SURGSIM_LOG_INFO(logger) << "DeviceFactory is going to try using a Novint7DofDevice, the first available Falcon.";
-	auto novintDevice = std::make_shared<SurgSim::Device::Novint7DofDevice>(name);
+	auto novintDevice = std::make_shared<SurgSim::Device::Novint7DofDevice>(name, "");
 	//novintDevice->setPositionScale(novintDevice->getPositionScale() * 10.0);
 	if (novintDevice->initialize())
 	{

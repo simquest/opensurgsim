@@ -41,7 +41,9 @@ class NovintScaffold
 {
 public:
 	/// Constructor.
-	NovintScaffold();
+	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
+	/// 			  If unspecified or empty, a console logger will be created and used.
+	explicit NovintScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
 
 	/// Destructor.
 	~NovintScaffold();
@@ -55,9 +57,12 @@ public:
 	/// \return the scaffold object.
 	static std::shared_ptr<NovintScaffold> getOrCreateSharedInstance();
 
+	/// Sets the default log level.
+	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
+	/// \param logLevel The log level.
+	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
+
 private:
-	NovintScaffold(const NovintScaffold&) /*= delete*/;
-	NovintScaffold& operator=(const NovintScaffold&) /*= delete*/;
 
 	/// Internal shared state data type.
 	struct StateData;
@@ -90,26 +95,15 @@ private:
 	/// \return	true on success.
 	bool initializeDeviceState(DeviceData* info);
 
-	/// Get the Handle associated with an initialization name, if any.
-	/// \param initializationName The initialization name (from the configuration file).
-	/// \return Shared pointer to Handle, or nullptr if not found.
-	std::shared_ptr<NovintScaffold::Handle> findHandleByInitializationName(const std::string& initializationName);
-
 	/// Finalizes a single device, destroying the necessary HDAL resources.
 	/// \param [in,out] info	The device data.
 	/// \return	true on success.
 	bool finalizeDeviceState(DeviceData* info);
 
-	/// Updates the device information for a single device's input.
+	/// Updates the device information for a single device.
 	/// \param info	The device data.
 	/// \return	true on success.
-	bool updateDeviceInput(DeviceData* info);
-
-	/// Updates the device information for a single device's output.  If pullOutput failed, zeros forces & torques.
-	/// \param info	The device data.
-	/// \param pulledOutput true if the most recent pullOutput succeeded.
-	/// \return	true on success.
-	bool updateDeviceOutput(DeviceData* info, bool pulledOutput);
+	bool updateDevice(DeviceData* info);
 
 	/// Checks whether a device has been homed.  If the position and/or orientation have not been homed, zeros the
 	/// respective Values.  Call this before setting the data to send to the Input Component.  The DeviceData's
@@ -137,19 +131,9 @@ private:
 	/// \return true on success.
 	bool initializeSdk();
 
-	/// Gets the map from name to serial number.
-	/// \return The map.
-	std::map<std::string, std::string> getNameMap();
-
-	/// Creates a NovintScaffold::Handle for each device connected when the first registerDevice is called.
-	void createAllHandles();
-
 	/// Finalizes (de-initializes) the HDAL SDK.
 	/// \return true on success.
 	bool finalizeSdk();
-
-	/// Destroys all the initialized handles.
-	void destroyAllHandles();
 
 	/// Executes the operations for a single haptic frame.
 	/// Should only be called from the context of a HDAL callback.
@@ -230,9 +214,11 @@ private:
 
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
+
+	/// The default logging level.
+	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 };
 
 };  // namespace Device

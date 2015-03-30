@@ -20,8 +20,8 @@ namespace SurgSim
 namespace Device
 {
 
-NovintDevice::NovintDevice(const std::string& uniqueName) :
-	NovintCommonDevice(uniqueName)
+NovintDevice::NovintDevice(const std::string& uniqueName, const std::string& initializationName) :
+	NovintCommonDevice(uniqueName, initializationName)
 {
 }
 

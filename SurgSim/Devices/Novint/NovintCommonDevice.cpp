@@ -16,15 +16,16 @@
 #include "SurgSim/Devices/Novint/NovintCommonDevice.h"
 
 #include "SurgSim/Devices/Novint/NovintScaffold.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {
 namespace Device
 {
 
-NovintCommonDevice::NovintCommonDevice(const std::string& uniqueName) :
+NovintCommonDevice::NovintCommonDevice(const std::string& uniqueName, const std::string& initializationName) :
 	SurgSim::Input::CommonDevice(uniqueName, NovintScaffold::buildDeviceInputData()),
-	m_positionScale(1.0), m_orientationScale(1.0)
+	m_initializationName(initializationName), m_positionScale(1.0), m_orientationScale(1.0)
 {
 }
 
@@ -36,43 +37,12 @@ NovintCommonDevice::~NovintCommonDevice()
 	}
 }
 
-void NovintCommonDevice::setSerialNumber(const std::string& serialNumber)
+
+std::string NovintCommonDevice::getInitializationName() const
 {
-	SURGSIM_ASSERT(!m_initializationName.hasValue()) << "Cannot set serialNumber for a NovintCommonDevice named " <<
-		getName() << ", which already has an initializationName.";
-	SURGSIM_ASSERT(!isInitialized()) <<
-		"Cannot setSerialNumber after the device named " << getName() << " has been initialized.";
-	m_serialNumber.setValue(serialNumber);
+	return m_initializationName;
 }
 
-bool NovintCommonDevice::getSerialNumber(std::string* serialNumber) const
-{
-	const bool hasValue = m_serialNumber.hasValue();
-	if (hasValue)
-	{
-		*serialNumber = m_serialNumber.getValue();
-	}
-	return hasValue;
-}
-
-void NovintCommonDevice::setInitializationName(const std::string& initializationName)
-{
-	SURGSIM_ASSERT(!m_serialNumber.hasValue()) << "Cannot set initializationName for a NovintCommonDevice named " <<
-		getName() << ", which already has a serialNumber.";
-	SURGSIM_ASSERT(!isInitialized()) <<
-		"Cannot setInitializationName after the device named " << getName() << " has been initialized.";
-	m_initializationName.setValue(initializationName);
-}
-
-bool NovintCommonDevice::getInitializationName(std::string* initializationName) const
-{
-	const bool hasValue = m_initializationName.hasValue();
-	if (hasValue)
-	{
-		*initializationName = m_initializationName.getValue();
-	}
-	return hasValue;
-}
 
 bool NovintCommonDevice::initialize()
 {
@@ -86,15 +56,17 @@ bool NovintCommonDevice::initialize()
 	}
 
 	m_scaffold = std::move(scaffold);
+	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
 	return true;
 }
 
 bool NovintCommonDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
-	bool result = m_scaffold->unregisterDevice(this);
+	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
+	bool ok = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
-	return result;
+	return ok;
 }
 
 bool NovintCommonDevice::isInitialized() const
