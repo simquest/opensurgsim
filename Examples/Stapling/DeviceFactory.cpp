@@ -46,28 +46,29 @@ DeviceFactory::~DeviceFactory()
 std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const std::string& name)
 {
 	auto logger = Logger::getLogger("Stapling/DeviceFactory");
+	static std::shared_ptr<SurgSim::Input::DeviceInterface> device;
 
 #ifdef NOVINT_LIBRARY_AVAILABLE
 	SURGSIM_LOG_INFO(logger) << "DeviceFactory is going to try using a Novint7DofDevice, the first available Falcon.";
-	auto novintDevice = std::make_shared<SurgSim::Device::Novint7DofDevice>(name, "");
+	device = std::make_shared<SurgSim::Device::Novint7DofDevice>(name, "");
 	//novintDevice->setPositionScale(novintDevice->getPositionScale() * 10.0);
-	if (novintDevice->initialize())
+	if (device->initialize())
 	{
-		return novintDevice;
+		return device;
 	}
 	SURGSIM_LOG_WARNING(logger) << "Could not initialize the NovintDevice.";
 #endif // NOVINT_LIBRARY_AVAILABLE
 
 #ifdef PHANTOM_LIBRARY_AVAILABLE
 	SURGSIM_LOG_INFO(logger) << "DeviceFactory is going to try using a PhantomDevice.";
-	auto phantomDevice = std::make_shared<SurgSim::Device::PhantomDevice>(name + " raw", "Default PHANToM");
-	if (phantomDevice->initialize())
+	device = std::make_shared<SurgSim::Device::PhantomDevice>(name + " raw", "Default PHANToM");
+	if (device->initialize())
 	{
 		auto transform = std::make_shared<SurgSim::Device::PoseTransform>(name);
 		transform->setTransform(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
-			SurgSim::Math::Vector3d(0.0, 0.06, 0.05)));
-		phantomDevice->addInputConsumer(transform);
-		phantomDevice->setOutputProducer(transform);
+			SurgSim::Math::Vector3d(0.0, 0.05, 0.05)));
+		device->addInputConsumer(transform);
+		device->setOutputProducer(transform);
 		return transform;
 	}
 	SURGSIM_LOG_WARNING(logger) << "Could not initialize the PhantomDevice.";
@@ -75,26 +76,26 @@ std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const 
 
 #ifdef SIXENSE_LIBRARY_AVAILABLE
 	SURGSIM_LOG_INFO(logger) << "DeviceFactory is going to try using a SixenseDevice.";
-	auto sixenseDevice = std::make_shared<SurgSim::Device::SixenseDevice>(name + " raw");
-	if (sixenseDevice->initialize())
+	device = std::make_shared<SurgSim::Device::SixenseDevice>(name + " raw");
+	if (device->initialize())
 	{
 		auto transform = std::make_shared<SurgSim::Device::PoseTransform>(name);
 		transform->setTransform(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
 			SurgSim::Math::Vector3d(0.0, -0.1, -0.1)));
-		sixenseDevice->addInputConsumer(transform);
-		sixenseDevice->setOutputProducer(transform);
+		device->addInputConsumer(transform);
+		device->setOutputProducer(transform);
 		return transform;
 	}
 	SURGSIM_LOG_WARNING(logger) << "Could not initialize the SixenseDevice.";
 #endif // SIXENSE_LIBRARY_AVAILABLE
 
 	SURGSIM_LOG_INFO(logger) << "DeviceFactory is going to try using a MultiAxisDevice.";
-	auto multiAxisDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>(name);
+	device = std::make_shared<SurgSim::Device::MultiAxisDevice>(name);
 	//multiAxisDevice->setPositionScale(multiAxisDevice->getPositionScale() * 10.0);
 	//multiAxisDevice->setOrientationScale(multiAxisDevice->getOrientationScale() * 3.0);
-	if (multiAxisDevice->initialize())
+	if (device->initialize())
 	{
-		return multiAxisDevice;
+		return device;
 	}
 	SURGSIM_LOG_WARNING(logger) << "Could not initialize the MultiAxisDevice.";
 
