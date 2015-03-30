@@ -20,8 +20,11 @@
 #include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
-#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 using SurgSim::Blocks::VisualizeContactsBehavior;
 using SurgSim::Physics::RigidCollisionRepresentation;
@@ -78,4 +81,28 @@ TEST(VisualizeContactsBehaviorTests, Serialization)
 	EXPECT_EQ(name, SurgSim::Framework::convert<std::shared_ptr<SurgSim::Framework::Component>>(
 					newVisualizeContactsBehavior->getValue("CollisionRepresentation"))->getName());
 	EXPECT_EQ(scale, SurgSim::Framework::convert<double>(newVisualizeContactsBehavior->getValue("VectorFieldScale")));
+}
+
+TEST(VisualizeContactsBehaviorTests, MultipleInstances)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	auto manager = std::make_shared<SurgSim::Graphics::OsgManager>();
+	runtime->addManager(manager);
+
+	auto visualizeContactsBehavior1 = std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior1");
+	auto visualizeContactsBehavior2 = std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior2");
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("SceneElement");
+	sceneElement->addComponent(visualizeContactsBehavior1);
+	sceneElement->addComponent(visualizeContactsBehavior2);
+
+	auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>("CollisionRepresentation");
+
+	EXPECT_NO_THROW(visualizeContactsBehavior1->setCollisionRepresentation(collisionRepresentation));
+	EXPECT_NO_THROW(visualizeContactsBehavior2->setCollisionRepresentation(collisionRepresentation));
+
+	EXPECT_TRUE(visualizeContactsBehavior1->initialize(runtime));
+	EXPECT_TRUE(visualizeContactsBehavior2->initialize(runtime));
+
+	EXPECT_TRUE(visualizeContactsBehavior1->wakeUp());
+	EXPECT_TRUE(visualizeContactsBehavior2->wakeUp());
 }
