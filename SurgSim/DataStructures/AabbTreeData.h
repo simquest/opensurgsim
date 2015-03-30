@@ -35,16 +35,23 @@ class AabbTreeData : public TreeData
 {
 public:
 
+	typedef std::pair<SurgSim::Math::Aabbd, size_t> Item;
+
 	/// Constructor
 	AabbTreeData();
 
 	/// Copy Constructor
 	AabbTreeData(const AabbTreeData& data);
 
+	/// Constructor with list of items
+	AabbTreeData(const std::list<Item>& data);
+
+	/// Constructor with moveable list of items
+	AabbTreeData(std::list<Item>&& data);
+
 	/// Destructor
 	~AabbTreeData();
 
-	typedef std::pair<SurgSim::Math::Aabbd, size_t> Item;
 
 	/// Add an item to the data
 	/// \param aabb the AABB of the item
