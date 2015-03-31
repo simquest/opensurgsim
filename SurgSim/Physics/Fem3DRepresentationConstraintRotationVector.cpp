@@ -134,8 +134,8 @@ void Fem3DRepresentationConstraintRotationVector::doBuild(double dt,
 	}
 
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
-	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
-		= std::static_pointer_cast<Fem3DRepresentationLocalization>(localization)->getLocalPosition();
+	auto fem3dLocalization = std::static_pointer_cast<Fem3DRepresentationLocalization>(localization);
+	const SurgSim::DataStructures::IndexedLocalCoordinate& coord = fem3dLocalization->getLocalPosition();
 
 	const ConstraintDataRotationVector* dataRotationVector = dynamic_cast<const ConstraintDataRotationVector*>(&data);
 	SURGSIM_ASSERT(dataRotationVector != nullptr) << "Invalid constraint data type";
@@ -151,50 +151,49 @@ void Fem3DRepresentationConstraintRotationVector::doBuild(double dt,
 	Vector3d rotationVector = numericalEvaluationRotVector(fem3d, femElement.get(), originalRigidOrientation,
 		dataRotationVector->getInitialOrientation(), currentFemElementOrientation);
 
-	SurgSim::Math::Matrix jacobian(3, femElement->getNumDofPerNode() * femElement->getNumNodes());
-	size_t elementNodeId = 0;
-	double epsilon = 1e-7;
-	for (size_t nodeId : femElement->getNodeIds())
-	{
-		for (size_t axis = 0; axis < 3; axis++)
-		{
-			jacobian.col(elementNodeId * 3 + axis) = numericalEvaluationRotVectorJacobian(fem3d, femElement.get(), originalRigidOrientation,
-				dataRotationVector->getInitialOrientation(), currentFemElementOrientation, nodeId * 3 + axis, epsilon);
-		}
-		elementNodeId++;
-	}
-
-	//std::cout << "rotVec = " << rotationVector.transpose() << std::endl;
-	//std::cout << "d(rotVec)/d(dofs) = " << jacobian << std::endl;
-
 	// Update b with new violation: P(free motion)
-	//mlcp->b.segment<3>(indexOfConstraint) += dataRotationVector.getInitialRotationVector() * scale;
 	mlcp->b.segment<3>(indexOfConstraint) +=  rotationVector * scale;
 
-	// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
-	m_newH.resize(fem3d->getNumDof());
-	// m_newH is a member variable, so 'reserve' only needs to allocate memory on the first run.
-	size_t numNodeToConstrain = coord.coordinate.size();
-	m_newH.reserve(3 * numNodeToConstrain);
 
-	size_t numNodes = femElement->getNumNodes();
-	for (size_t constraint = 0; constraint < 3; constraint++)
-	{
-		m_newH.setZero();
-		for (size_t index = 0; index < numNodes; index++)
-		{
-			size_t nodeIndex = femElement->getNodeId(index);
-			for (size_t axis = 0; axis < 3; axis++)
-			{
-				//if (coord.coordinate[index] != 0.0)
-				{
-					m_newH.insert(3 * nodeIndex + axis) =
-						jacobian(constraint, 3 * index + axis) * scale * dt * coord.coordinate[index];
-				}
-			}
-		}
-		mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + constraint);
-	}
+	return;
+
+	//SurgSim::Math::Matrix jacobian(3, femElement->getNumDofPerNode() * femElement->getNumNodes());
+	//size_t elementNodeId = 0;
+	//double epsilon = 1e-7;
+	//for (size_t nodeId : femElement->getNodeIds())
+	//{
+	//	for (size_t axis = 0; axis < 3; axis++)
+	//	{
+	//		jacobian.col(elementNodeId * 3 + axis) = numericalEvaluationRotVectorJacobian(fem3d, femElement.get(), originalRigidOrientation,
+	//			dataRotationVector->getInitialOrientation(), currentFemElementOrientation, nodeId * 3 + axis, epsilon);
+	//	}
+	//	elementNodeId++;
+	//}
+
+	//// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
+	//m_newH.resize(fem3d->getNumDof());
+	//// m_newH is a member variable, so 'reserve' only needs to allocate memory on the first run.
+	//size_t numNodeToConstrain = coord.coordinate.size();
+	//m_newH.reserve(3 * numNodeToConstrain);
+
+	//size_t numNodes = femElement->getNumNodes();
+	//for (size_t constraint = 0; constraint < 3; constraint++)
+	//{
+	//	m_newH.setZero();
+	//	for (size_t index = 0; index < numNodes; index++)
+	//	{
+	//		size_t nodeIndex = femElement->getNodeId(index);
+	//		for (size_t axis = 0; axis < 3; axis++)
+	//		{
+	//			//if (coord.coordinate[index] != 0.0)
+	//			{
+	//				m_newH.insert(3 * nodeIndex + axis) =
+	//					jacobian(constraint, 3 * index + axis) * scale * dt * coord.coordinate[index];
+	//			}
+	//		}
+	//	}
+	//	mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + constraint);
+	//}
 }
 
 SurgSim::Math::MlcpConstraintType Fem3DRepresentationConstraintRotationVector::getMlcpConstraintType() const

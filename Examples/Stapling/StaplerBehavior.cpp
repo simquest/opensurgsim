@@ -22,6 +22,7 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Scene.h"
@@ -33,11 +34,13 @@
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/ConstraintDataRotationVector.h"
+#include "SurgSim/Physics/ConstraintDataFem3DDistancePoints.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
 #include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
+#include "SurgSim/Physics/Fem3DRepresentationConstraint2Fem3DPoints.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/Localization.h"
@@ -47,12 +50,14 @@
 #include "SurgSim/Physics/RigidRepresentationConstraintRotationVector.h"
 
 using SurgSim::Collision::ContactMapType;
+using SurgSim::Physics::ConstraintDataFem3DDistancePoints;
 using SurgSim::Physics::ConstraintImplementation;
 using SurgSim::Physics::FixedRepresentationBilateral3D;
 using SurgSim::Physics::RigidRepresentationBilateral3D;
 using SurgSim::Physics::RigidRepresentationConstraintRotationVector;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::Fem3DRepresentationBilateral3D;
+using SurgSim::Physics::Fem3DRepresentationConstraint2Fem3DPoints;
 using SurgSim::Physics::FemElement;
 using SurgSim::Physics::Localization;
 using SurgSim::Framework::checkAndConvert;
@@ -194,6 +199,12 @@ void StaplerBehavior::createStaple()
 	auto staple = std::make_shared<StapleElement>("staple_" + boost::to_string(m_numElements++));
 	staple->setPose(m_representation->getPose());
 
+	std::array<std::shared_ptr<SurgSim::Physics::Representation>, 2> reps;
+	std::array<SurgSim::DataStructures::Location, 2> locations;
+
+	std::shared_ptr<SurgSim::Physics::Representation> stapleRep;
+	std::array<SurgSim::DataStructures::Location, 2> stapleLocations;
+
 	int toothId = 0;
 	bool stapleAdded = false;
 	for (auto virtualTooth = m_virtualTeeth.cbegin(); virtualTooth != m_virtualTeeth.cend(); ++virtualTooth)
@@ -271,16 +282,54 @@ void StaplerBehavior::createStaple()
 					stapleRepresentation->getPose().inverse() * targetPhysicsRepresentation->getPose() *
 					targetContact->penetrationPoints.second.rigidLocalPosition.getValue()));
 
+		reps[toothId] = targetPhysicsRepresentation;
+		locations[toothId] = targetContact->penetrationPoints.second;
+
+		stapleRep = stapleRepresentation;
+		stapleLocations[toothId] = stapleConstraintLocation;
+
+		toothId++;
+	}
+
+	// If we have 2 collisions against the same Fem3DRepresentation, let's create a distance constraint
+	if (toothId >= 2 && std::dynamic_pointer_cast<Fem3DRepresentation>(reps[0]) != nullptr && reps[0] == reps[1])
+	{
+		auto data = std::make_shared<SurgSim::Physics::ConstraintDataFem3DDistancePoints>();
+
+		data->setPoint(0, std::static_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(reps[0]->createLocalization(locations[0])));
+		data->setPoint(1, std::static_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(reps[1]->createLocalization(locations[1])));
+		auto P0 = data->getPoint(0)->calculatePosition();
+		auto P1 = data->getPoint(1)->calculatePosition();
+		data->setDistance((P1-P0).norm());
+
+		auto constraint = std::make_shared<SurgSim::Physics::Constraint>(
+			SurgSim::Math::MLCP_BILATERAL_1D_CONSTRAINT, data,
+			reps[0], locations[0],
+			reps[1], locations[1]);
+
+		// Create a component to store this constraint.
+		std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
+			std::make_shared<SurgSim::Physics::ConstraintComponent>(
+			"DistanceConstraint" + boost::to_string(toothId));
+
+		constraintComponent->setConstraint(constraint);
+		staple->addComponent(constraintComponent);
+	}
+
+	// If we have 2 collisions against the same Fem3DRepresentation, let's constrained the staple to the deforming Fem3D
+	if (toothId >= 2 && std::dynamic_pointer_cast<Fem3DRepresentation>(reps[0]) != nullptr && reps[0] == reps[1])
+	{
 		// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
 		{
 			auto constraint = std::make_shared<SurgSim::Physics::Constraint>(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT,
-				std::make_shared<SurgSim::Physics::ConstraintData>(), stapleRepresentation,
-				stapleConstraintLocation, targetPhysicsRepresentation, targetContact->penetrationPoints.second);
+				std::make_shared<SurgSim::Physics::ConstraintData>(),
+				stapleRep, stapleLocations[0],
+				reps[0], locations[0]);
 
 			// Create a component to store this constraint.
 			std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
 				std::make_shared<SurgSim::Physics::ConstraintComponent>(
-				"Bilateral3DConstraint" + boost::to_string(toothId));
+				"Bilateral3DConstraint" + boost::to_string(0));
 
 			constraintComponent->setConstraint(constraint);
 			staple->addComponent(constraintComponent);
@@ -290,22 +339,25 @@ void StaplerBehavior::createStaple()
 		{
 			SurgSim::Math::Vector3d axis, rotationVector;
 			double angle;
-			SurgSim::Math::computeAngleAndAxis(SurgSim::Math::Quaterniond(stapleRepresentation->getPose().linear()), &angle, &axis);
+			SurgSim::Math::computeAngleAndAxis(SurgSim::Math::Quaterniond(stapleRep->getPose().linear()), &angle, &axis);
 			rotationVector = angle * axis;
 
 			auto constraintData = std::make_shared<SurgSim::Physics::ConstraintDataRotationVector>();
 			constraintData->setInitialRotationVector(rotationVector);
 
-			std::shared_ptr<Fem3DRepresentation> fem3d = std::dynamic_pointer_cast<Fem3DRepresentation>(targetPhysicsRepresentation);
-			if (fem3d != nullptr && targetContact->penetrationPoints.second.meshLocalCoordinate.hasValue())
+			std::shared_ptr<Fem3DRepresentation> fem3d = std::dynamic_pointer_cast<Fem3DRepresentation>(reps[0]);
+			if (fem3d != nullptr && locations[0].meshLocalCoordinate.hasValue())
 			{
-				auto element = fem3d->getFemElement(targetContact->penetrationPoints.second.meshLocalCoordinate.getValue().index);
+				// We create a temporary localization to translate the triangleId to an elementId, this feature is not directly accessible
+				auto localization = std::static_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(fem3d->createLocalization(locations[0]));
+				auto element = fem3d->getFemElement(localization->getLocalPosition().index);
 				constraintData->setInitialOrientation(element->getOrientation(*fem3d->getCurrentState()));
 			}
 
 			auto constraintRotationVector = std::make_shared<SurgSim::Physics::Constraint>(SurgSim::Math::MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT,
-				constraintData, stapleRepresentation,
-				stapleConstraintLocation, targetPhysicsRepresentation, targetContact->penetrationPoints.second);
+				constraintData,
+				stapleRep, stapleLocations[0],
+				reps[0], locations[0]);
 
 			// Create a component to store this constraint.
 			std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintRotationVectorComponent =
@@ -315,10 +367,6 @@ void StaplerBehavior::createStaple()
 			constraintRotationVectorComponent->setConstraint(constraintRotationVector);
 			staple->addComponent(constraintRotationVectorComponent);
 		}
-
-		toothId++;
-
-		break;
 	}
 
 	if (!stapleAdded)

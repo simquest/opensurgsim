@@ -15,6 +15,7 @@
 
 #include "SurgSim/Math/Valid.h"
 
+#include "SurgSim/Physics/ConstraintDataRotationVector.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationConstraintRotationVector.h"

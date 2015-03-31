@@ -20,6 +20,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Constraint.cpp
 	ConstraintComponent.cpp
 	ConstraintData.cpp
+	ConstraintDataFem3DDistancePoints.cpp
 	ConstraintDataRotationVector.cpp
 	ConstraintImplementation.cpp
 	ConstraintImplementationFactory.cpp
@@ -84,6 +85,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Constraint.h
 	ConstraintComponent.h
 	ConstraintData.h
+	ConstraintDataFem3DDistancePoints.h
 	ConstraintDataRotationVector.h
 	ConstraintImplementation.h
 	ConstraintImplementationFactory.h
@@ -106,6 +108,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DPlyReaderDelegate.h
 	Fem3DRepresentation.h
 	Fem3DRepresentationBilateral3D.h
+	Fem3DRepresentationConstraint2Fem3DPoints.h
 	Fem3DRepresentationConstraintRotationVector.h
 	Fem3DRepresentationContact.h
 	Fem3DRepresentationLocalization.h
