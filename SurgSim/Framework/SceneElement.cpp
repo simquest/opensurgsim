@@ -92,8 +92,16 @@ bool SceneElement::removeComponent(std::shared_ptr<Component> component)
 bool SceneElement::removeComponent(const std::string& name)
 {
 	bool result = false;
-	if (m_components.find(name) != m_components.end())
+	auto found = m_components.find(name);
+	if (found != m_components.end())
 	{
+		if (isInitialized())
+		{
+			auto runtime = getRuntime();
+			SURGSIM_ASSERT(nullptr != runtime) << "Runtime cannot be expired when removing a component " << getName();
+			runtime->removeComponent(found->second);
+		}
+
 		size_t count = m_components.erase(name);
 		result = (count == 1);
 	}
