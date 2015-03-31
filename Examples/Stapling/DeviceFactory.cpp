@@ -66,7 +66,7 @@ std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const 
 	{
 		auto transform = std::make_shared<SurgSim::Device::PoseTransform>(name);
 		transform->setTransform(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
-			SurgSim::Math::Vector3d(0.0, 0.05, 0.05)));
+			SurgSim::Math::Vector3d(0.0, 0.04, 0.05)));
 		device->addInputConsumer(transform);
 		device->setOutputProducer(transform);
 		return transform;
