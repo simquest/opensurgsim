@@ -173,6 +173,51 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> createPass(
 	return pass;
 }
 
+std::shared_ptr<Graphics::RenderPass> setupBlurPasses(
+	Materials materials,
+	std::shared_ptr<Framework::Scene> scene,
+	std::shared_ptr<Graphics::RenderPass> previousPass)
+{
+	// Input of Horizontal and Vertical Blur passes is sampler2D 'texture'
+	// Output is result of rendertarget
+	// Set up the horizontal blur pass
+	auto horizontalBlur = createPass(materials, "HorizontalBlur", "horizontalBlur");
+	horizontalBlur->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 2);
+	scene->addSceneElement(horizontalBlur);
+
+	// Put the result of the last pass into the first blur pass to make it accessible
+	auto material =  horizontalBlur->getMaterial();
+	material->setValue("texture", previousPass->getRenderTarget()->getColorTarget(0));
+
+	auto quad = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");
+	quad->clearGroupReferences();
+	quad->addGroupReference("HorizontalBlur");
+	quad->setSize(1024, 1024);
+	quad->setTexture(previousPass->getRenderTarget()->getColorTarget(0));
+	horizontalBlur->addComponent(quad);
+
+	// Set up the vertical blurr pass
+	auto verticalBlur = createPass(materials, "VerticalBlur", "verticalBlur");
+	verticalBlur->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 3);
+	scene->addSceneElement(verticalBlur);
+
+	material = verticalBlur->getMaterial();
+	material->setValue("texture", verticalBlur->getRenderTarget()->getColorTarget(0));
+
+	quad = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");
+	quad->clearGroupReferences();
+	quad->addGroupReference("VerticalBlur");
+	quad->setSize(1024, 1024);
+	quad->setTexture(horizontalBlur->getRenderTarget()->getColorTarget(0));
+	verticalBlur->addComponent(quad);
+
+	// Take the output of previousPass and put it into horizontalBlur
+	// route output of horizontalPass and route it into verticalPass
+
+	return verticalBlur;
+}
+
+
 void setupShadowMapping(const std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>&
 						materials, std::shared_ptr<Framework::Scene> scene)
 {
@@ -216,7 +261,7 @@ void setupShadowMapping(const std::unordered_map<std::string, std::shared_ptr<Su
 	// whole scene
 	auto mainCamera = std::dynamic_pointer_cast<Graphics::OsgCamera>(viewElement->getComponent("Camera"));
 	SURGSIM_ASSERT(mainCamera != nullptr);
-	copier->connect(viewElement->getPoseComponent(), "Pose", shadowMapPass->getPoseComponent(), "Pose");
+	copier->connect(mainCamera, "Pose", shadowMapPass->getPoseComponent(), "Pose");
 	copier->connect(mainCamera, "ProjectionMatrix", shadowMapPass->getCamera() , "ProjectionMatrix");
 
 	// Put the result of the last pass into the main camera to make it accessible

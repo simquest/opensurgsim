@@ -309,14 +309,30 @@ std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::Sc
 std::shared_ptr<OsgViewElement> createViewElement()
 {
 	auto result = std::make_shared<OsgViewElement>("View");
-	// result->enableManipulator(true);
-	// result->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
+// 	result->enableManipulator(true);
+// 	result->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
 	result->enableKeyboardDevice(true);
 	result->setPose(
 		SurgSim::Math::makeRigidTransform(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
 
 	result->getCamera()->setAmbientColor(Vector4d(0.2, 0.2, 0.2, 1.0));
 	result->setPose(makeRigidTransform(Vector3d(0.0, 0.5, 0.5), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
+
+	// Move the light from left to right over along the scene
+	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator");
+	RigidTransform3d from = makeRigidTransform(Vector3d(1.0, 1.0, 0.5),
+							Vector3d(0.0, 0.0, 0.0),
+							Vector3d(0.0, 1.0, 0.0));
+	RigidTransform3d to = makeRigidTransform(Vector3d(-1.0, 1.0, 0.5),
+						  Vector3d(0.0, 0.0, 0.0),
+						  Vector3d(0.0, 1.0, 0.0));
+	interpolator->setTarget(result);
+	interpolator->setStartingPose(from);
+	interpolator->setDuration(2.5);
+	interpolator->setEndingPose(to);
+	interpolator->setPingPong(true);
+
+	result->addComponent(interpolator);
 
 
 	return result;
@@ -334,10 +350,10 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createLightElement()
 
 	// Move the light from left to right over along the scene
 	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator");
-	RigidTransform3d from = makeRigidTransform(Vector3d(1.0, 1.0, -1.0),
+	RigidTransform3d from = makeRigidTransform(Vector3d(0.1, 1.0, 0.0),
 							Vector3d(0.0, 0.0, 0.0),
 							Vector3d(0.0, 1.0, 0.0));
-	RigidTransform3d to = makeRigidTransform(Vector3d(-1.0, 1.0, -1.0),
+	RigidTransform3d to = makeRigidTransform(Vector3d(0.1, 1.0, 0.0),
 						  Vector3d(0.0, 0.0, 0.0),
 						  Vector3d(0.0, 1.0, 0.0));
 	interpolator->setTarget(result);
@@ -345,6 +361,10 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createLightElement()
 	interpolator->setDuration(10.0);
 	interpolator->setEndingPose(to);
 	interpolator->setPingPong(true);
+
+	auto component = std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes");
+	component->setSize(0.1);
+	result->addComponent(component);
 
 	result->setPose(from);
 
