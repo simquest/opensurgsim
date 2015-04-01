@@ -98,6 +98,13 @@ std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>
 	material = createMaterial("shadowMap", "Shaders/shadow_map");
 	material->getProgram()->setGlobalScope(true);
 	result[material->getName()] = material;
+	element->addComponent(material);
+
+	// ShadowMap placeholder
+	material = std::make_shared<Graphics::OsgMaterial>("placeholder");
+	Blocks::enable2DTexture(material, "shadowMap", Graphics::SHADOW_TEXTURE_UNIT, "Textures/black.png");
+	result[material->getName()] = material;
+	element->addComponent(material);
 
 	return result;
 }

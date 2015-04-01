@@ -343,7 +343,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createLightElement()
 	auto result = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
 
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
-	light->setDiffuseColor(Vector4d(0.5, 0.5, 0.5, 1.0));
+	light->setDiffuseColor(Vector4d(0.9, 0.9, 0.9, 1.0));
 	light->setSpecularColor(Vector4d(0.8, 0.8, 0.8, 1.0));
 	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 	result->addComponent(light);
@@ -466,7 +466,12 @@ int main(int argc, char* argv[])
 	auto materials = createMaterials(runtime->getScene());
 	applyMaterials(runtime->getScene(), materials);
 
+#define STAPLING_SHADOWS
+#ifdef STAPLING_SHADOWS
 	setupShadowMapping(materials, scene);
+#else
+	view->getCamera()->setMaterial(materials["placeholder"]);
+#endif
 
 	// Exclude collision between certain Collision::Representations
 	physicsManager->addExcludedCollisionPair(
