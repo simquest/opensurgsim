@@ -419,6 +419,7 @@ void SphRepresentation::handleCollisions()
 {
 	const double stiffness = 50000.0;
 	const double damping = 200.0;
+	const double friction = 0.1;
 	if (m_collisionRepresentation != nullptr)
 	{
 		auto collisions = m_collisionRepresentation->getCollisions().safeGet();
@@ -430,9 +431,11 @@ void SphRepresentation::handleCollisions()
 			{
 				ParticleReference particle(m_state,
 						contact->penetrationPoints.first.meshLocalCoordinate.getValue().index);
-				double forceIntensity = stiffness * contact->depth -
-										damping * particle.getVelocity().dot(contact->normal);
-				particle.setAcceleration(particle.getAcceleration() + forceIntensity * contact->normal);
+				double velocityAlongNormal = particle.getVelocity().dot(contact->normal);
+				double forceIntensity = stiffness * contact->depth - damping * velocityAlongNormal;
+				Math::Vector3d tangentVelocity = particle.getVelocity() - velocityAlongNormal * contact->normal;
+				particle.setAcceleration(particle.getAcceleration() +
+						forceIntensity * (contact->normal - friction * tangentVelocity.normalized()));
 			}
 		}
 	}
