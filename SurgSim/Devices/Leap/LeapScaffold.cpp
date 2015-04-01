@@ -61,7 +61,8 @@ void updateDataGroup(const Leap::Hand& hand, SurgSim::DataStructures::DataGroup*
 	inputData->poses().set("pose", makeRigidTransform(hand.basis(), hand.palmPosition(), hand.isRight()));
 
 	std::string name;
-	for (const Leap::Finger& finger : hand.fingers())
+	const Leap::FingerList fingers = hand.fingers();
+	for (const Leap::Finger& finger : fingers)
 	{
 		for (int boneType = Leap::Bone::TYPE_PROXIMAL; boneType <= Leap::Bone::TYPE_DISTAL; ++boneType)
 		{
@@ -243,7 +244,8 @@ void LeapScaffold::handleFrame()
 	}
 
 	std::list<Leap::HandList::const_iterator> newHands;
-	Leap::HandList hands = m_state->controller.frame().hands();
+	const Leap::Frame frame = m_state->controller.frame();
+	Leap::HandList hands = frame.hands();
 	for (auto hand = hands.begin(); hand != hands.end(); ++hand)
 	{
 		auto sameHandId = [hand](const std::unique_ptr<DeviceData>& info)
