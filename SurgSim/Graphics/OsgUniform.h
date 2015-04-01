@@ -19,6 +19,11 @@
 #include "SurgSim/Graphics/OsgUniformBase.h"
 #include "SurgSim/Graphics/Uniform.h"
 
+namespace YAML
+{
+class Node;
+}
+
 namespace SurgSim
 {
 
@@ -37,6 +42,9 @@ public:
 
 	/// Sets the value of the uniform
 	virtual void set(const T& value);
+
+	/// Sets the value of the uniform from a YAML Node doing the correct conversion
+	virtual void set(const YAML::Node& node);
 
 	/// Returns the value of the uniform
 	virtual const T& get() const;

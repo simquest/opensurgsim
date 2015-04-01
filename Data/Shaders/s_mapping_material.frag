@@ -13,66 +13,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file dns_mapping_material.frag
-/// Phong material with diffuse, shadow and normal map
+/// \file ds_mapping_material.frag
+/// Phong material with diffuse and shadow map
 
-/// Material supplied values
-uniform sampler2D diffuseMap;
-uniform sampler2D normalMap;
+// These are 'free' uniforms to be set for this shader, they won't be provided by OSS
+uniform float shininess;
 uniform sampler2D shadowMap;
 
-uniform float shininess;
+// Oss provided uniforms
+uniform vec4 ambientColor;
 
-/// Oss supplied values
-struct LightSource {
-	vec4 diffuse; 
-	vec4 specular; 
-	vec4 position; 
-	float constantAttenuation; 
-	float linearAttenuation; 
-	float quadraticAttenuation;	
-};
-
-uniform LightSource lightSource;
-
-uniform vec3 ambientColor;
-
-
-/// Fragment shader supplied values
+// Incoming from the vertex shader
 varying vec3 lightDir;
 varying vec3 eyeDir;
+varying vec3 normalDir;
 
 varying vec2 texCoord0;
-varying vec4 clipCoord;
 
 varying vec3 vertexDiffuseColor;
 varying vec3 vertexSpecularColor;
 
+varying vec4 clipCoord;
+
 void main(void) 
 {	
+	vec3 vAmbient = ambientColor.xyz; // Old Term ...  osg_ambientColor * _lightColor;
+
 	vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
 	float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
-
-	vec3 normalDir = texture2D(normalMap, texCoord0).rgb * 2.0 - 1.0;
-	normalDir.g = -normalDir.g;
-
-	vec3 vAmbient = ambientColor;
     
 	vec3 lightDirNorm = normalize(lightDir);
 	vec3 eyeDirNorm = normalize(eyeDir);
 	vec3 normalDirNorm = normalize(normalDir);
-
-	float diffuse = max(dot(lightDirNorm, normalDirNorm), 0.0);
 	
+	float diffuse = max(dot(lightDirNorm, normalDirNorm), 0.0);
 	vec3 vDiffuse = vertexDiffuseColor * diffuse * shadowAmount;	
- 
+    
     float temp = max(dot(reflect(lightDirNorm, normalDirNorm), eyeDirNorm), 0.0);
-    float specular = temp / (shininess - temp * shininess + temp);   
-	vec3 vSpecular = vertexSpecularColor * specular * shadowAmount;		
+    float specular = temp / (shininess - temp * shininess + temp);
+ 	vec3 vSpecular = vertexSpecularColor * specular * shadowAmount;		
 
-	vec3 base = texture2D(diffuseMap, texCoord0).rgb;
-	vec3 color = (vAmbient + vDiffuse) * base + vSpecular;
-
+	vec3 color = (vAmbient + vDiffuse) + vSpecular;
+	
 	gl_FragColor.rgb = color;
 	gl_FragColor.a = 1.0;
 }
