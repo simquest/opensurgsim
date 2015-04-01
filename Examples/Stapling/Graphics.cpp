@@ -218,7 +218,7 @@ std::shared_ptr<Graphics::RenderPass> setupBlurPasses(
 }
 
 
-void setupShadowMapping(const std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>&
+void setupShadowMapping(std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>
 						materials, std::shared_ptr<Framework::Scene> scene)
 {
 	auto viewElement = scene->getSceneElement("View");
@@ -226,7 +226,18 @@ void setupShadowMapping(const std::unordered_map<std::string, std::shared_ptr<Su
 	auto osgCamera = std::dynamic_pointer_cast<Graphics::OsgCamera>(lightMapPass->getCamera());
 	osgCamera->getOsgCamera()->setProjectionMatrixAsPerspective(100, 1.0, 0.01, 10.0);
 
+	// Setup shadow map pass by hand ...
 	auto shadowMapPass = createPass(materials, "shadowed", "shadowMap");
+	auto shadowCamera = std::make_shared<Graphics::OsgCamera>("ShadowCamera");
+	shadowCamera->setRenderGroupReference("shadowing");
+
+	auto shadowMaterial = materials["shadowMap"];
+	shadowCamera->setMaterial(shadowMaterial);
+	auto renderTarget = std::make_shared<SurgSim::Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
+	shadowCamera->setRenderTarget(renderTarget);
+	shadowCamera->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
+
+
 
 	auto copier = std::make_shared<Framework::TransferPropertiesBehavior>("Copier");
 	copier->setTargetManagerType(Framework::MANAGER_TYPE_GRAPHICS);
@@ -244,43 +255,44 @@ void setupShadowMapping(const std::unordered_map<std::string, std::shared_ptr<Su
 					shadowMapPass->getMaterial(), "lightViewMatrix");
 
 	// The projection matrix of the camera used to render the light map
-	shadowMapPass->getMaterial()->addUniform("mat4", "lightProjectionMatrix");
+	shadowMaterial->addUniform("mat4", "lightProjectionMatrix");
 	copier->connect(lightMapPass->getCamera(), "FloatProjectionMatrix",
-					shadowMapPass->getMaterial(), "lightProjectionMatrix");
+					shadowMaterial, "lightProjectionMatrix");
 
 	// Get the result of the lightMapPass and pass it on to the shadowMapPass, because it is used
 	// in a pass we ask the system to use a higher than normal texture unit (in this case 8) for
 	// this texture, this prevents the texture from being overwritten by other textures
-	auto material = std::dynamic_pointer_cast<SurgSim::Graphics::OsgMaterial>(shadowMapPass->getMaterial());
 
-	material->addUniform("sampler2D", "encodedLightDepthMap");
-	material->setValue("encodedLightDepthMap", lightMapPass->getRenderTarget()->getColorTarget(0));
-	material->getUniform("encodedLightDepthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
+	shadowMaterial->addUniform("sampler2D", "encodedLightDepthMap");
+	shadowMaterial->setValue("encodedLightDepthMap", lightMapPass->getRenderTarget()->getColorTarget(0));
+	shadowMaterial->getUniform("encodedLightDepthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
 
 	// Make the camera in the shadowMapPass follow the main camera that is being used to render the
 	// whole scene
 	auto mainCamera = std::dynamic_pointer_cast<Graphics::OsgCamera>(viewElement->getComponent("Camera"));
 	SURGSIM_ASSERT(mainCamera != nullptr);
-	copier->connect(mainCamera, "Pose", shadowMapPass->getPoseComponent(), "Pose");
-	copier->connect(mainCamera, "ProjectionMatrix", shadowMapPass->getCamera() , "ProjectionMatrix");
+	copier->connect(mainCamera, "ProjectionMatrix", shadowCamera , "ProjectionMatrix");
 
 	// Put the result of the last pass into the main camera to make it accessible
-	material = std::make_shared<SurgSim::Graphics::OsgMaterial>("camera material");
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("camera material");
 
 	material->addUniform("sampler2D", "shadowMap");
-	material->setValue("shadowMap", shadowMapPass->getRenderTarget()->getColorTarget(0));
+	material->setValue("shadowMap", shadowCamera->getRenderTarget()->getColorTarget(0));
 	material->getUniform("shadowMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
 	mainCamera->setMaterial(material);
 	viewElement->addComponent(material);
 
 	// Needs to be last to delay setting up of uniforms
 	scene->addSceneElement(lightMapPass);
-	scene->addSceneElement(shadowMapPass);
+	viewElement->addComponent(shadowCamera);
+	viewElement->addComponent(shadowMaterial);
+
+	//scene->addSceneElement(shadowMapPass);
 
 	auto debug = std::make_shared<SurgSim::Framework::BasicSceneElement>("debug");
 	debug->addComponent(
 		makeDebugQuad("light", lightMapPass->getRenderTarget()->getColorTarget(0), 0, 0, 256, 256));
 	debug->addComponent(
-		makeDebugQuad("shadow", shadowMapPass->getRenderTarget()->getColorTarget(0), 1024 - 256, 0, 256, 256));
+		makeDebugQuad("shadow", shadowCamera->getRenderTarget()->getColorTarget(0), 1024 - 256, 0, 256, 256));
 	scene->addSceneElement(debug);
 }

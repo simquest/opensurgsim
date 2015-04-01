@@ -309,8 +309,8 @@ std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::Sc
 std::shared_ptr<OsgViewElement> createViewElement()
 {
 	auto result = std::make_shared<OsgViewElement>("View");
-// 	result->enableManipulator(true);
-// 	result->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
+	result->enableManipulator(true);
+	result->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
 	result->enableKeyboardDevice(true);
 	result->setPose(
 		SurgSim::Math::makeRigidTransform(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
@@ -332,7 +332,7 @@ std::shared_ptr<OsgViewElement> createViewElement()
 	interpolator->setEndingPose(to);
 	interpolator->setPingPong(true);
 
-	result->addComponent(interpolator);
+	// result->addComponent(interpolator);
 
 
 	return result;

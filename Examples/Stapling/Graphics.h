@@ -35,7 +35,7 @@ Materials createMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene);
 
 void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, Materials materials);
 
-void setupShadowMapping(const std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>&
+void setupShadowMapping(std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>
 						materials, std::shared_ptr<SurgSim::Framework::Scene> scene);
 
 #endif

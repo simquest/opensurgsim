@@ -69,7 +69,7 @@ const std::shared_ptr<T>& OsgTextureUniform<T>::get() const
 template <class T>
 void OsgTextureUniform<T>::addToStateSet(osg::StateSet* stateSet)
 {
-	SURGSIM_ASSERT(m_stateset == nullptr) << "Unexpected addToStateSet for OsgTextureUniform.";
+	SURGSIM_ASSERT(m_stateset == nullptr) << "Unexpected addToStateSet for OsgTextureUniform " << getName() << ".";
 
 	const osg::StateSet::TextureAttributeList& textures = stateSet->getTextureAttributeList();
 
@@ -90,7 +90,7 @@ void OsgTextureUniform<T>::addToStateSet(osg::StateSet* stateSet)
 
 	m_unit = availableUnit;
 
-	SURGSIM_ASSERT(m_texture != nullptr) << "Tried to add this uniform without a valid Texture";
+	SURGSIM_ASSERT(m_texture != nullptr) << "Tried to add uniform " << getName() << " without a valid Texture";
 	stateSet->setTextureAttributeAndModes(m_unit, m_texture->getOsgTexture(),
 										  osg::StateAttribute::ON);
 	SURGSIM_ASSERT(m_uniform->set(static_cast<int>(m_unit))) << "Failed to set OSG texture uniform unit!" <<
