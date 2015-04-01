@@ -20,6 +20,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <osg/Geode>
+#include <osg/Group>
 #include <osg/Switch>
 #include <osg/PolygonMode>
 #include <osg/PositionAttitudeTransform>
@@ -28,6 +29,7 @@
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgRigidTransformConversions.h"
 #include "SurgSim/Graphics/OsgUnitBox.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/TangentSpaceGenerator.h"
 
 namespace SurgSim
@@ -42,10 +44,13 @@ OsgRepresentation::OsgRepresentation(const std::string& name) :
 	m_switch = new osg::Switch;
 	m_switch->setName(name + " Representation Switch");
 
+	m_materialProxy = new osg::Group;
+	m_switch->addChild(m_materialProxy);
+
 	m_transform = new osg::PositionAttitudeTransform();
 	m_transform->setName(name + " Transform");
 
-	m_switch->addChild(m_transform);
+	m_materialProxy->addChild(m_transform);
 
 	m_transform->setAttitude(osg::Quat(0.0, 0.0, 0.0, 1.0));
 	m_transform->setPosition(osg::Vec3d(0.0, 0.0, 0.0));
@@ -81,7 +86,7 @@ bool OsgRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Material>
 	std::shared_ptr<OsgMaterial> osgMaterial = std::dynamic_pointer_cast<OsgMaterial>(material);
 	if (osgMaterial != nullptr)
 	{
-		m_transform->setStateSet(osgMaterial->getOsgStateSet());
+		m_materialProxy->setStateSet(osgMaterial->getOsgStateSet());
 		didSucceed = true;
 		m_material = osgMaterial;
 	}
@@ -95,7 +100,7 @@ std::shared_ptr<Material> OsgRepresentation::getMaterial() const
 
 void OsgRepresentation::clearMaterial()
 {
-	m_transform->setStateSet(new osg::StateSet()); // Reset to empty state set
+	m_materialProxy->setStateSet(new osg::StateSet()); // Reset to empty state set
 	m_material = nullptr;
 }
 
@@ -165,6 +170,15 @@ void OsgRepresentation::updateTangents()
 	{
 		m_switch->accept(*m_tangentGenerator);
 	}
+}
+
+void OsgRepresentation::addUniform(std::shared_ptr<UniformBase> uniform)
+{
+	SURGSIM_ASSERT(uniform != nullptr);
+	auto osgUniform = std::dynamic_pointer_cast<OsgUniformBase>(uniform);
+	SURGSIM_ASSERT(osgUniform != nullptr);
+
+	m_transform->getOrCreateStateSet()->addUniform(osgUniform->getOsgUniform());
 }
 
 }; // Graphics

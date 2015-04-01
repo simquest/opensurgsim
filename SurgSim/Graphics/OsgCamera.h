@@ -29,8 +29,8 @@
 #include <osg/Switch>
 
 #if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable:4250)
+	#pragma warning(push)
+	#pragma warning(disable:4250)
 #endif
 
 namespace SurgSim
@@ -104,7 +104,6 @@ public:
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
-	osg::ref_ptr<osg::Group> m_materialProxy;
 
 	/// Projection matrix of the camera
 	SurgSim::Math::Matrix44d m_projectionMatrix;
@@ -139,7 +138,7 @@ private:
 };  // namespace SurgSim
 
 #if defined(_MSC_VER)
-#pragma warning(pop)
+	#pragma warning(pop)
 #endif
 
 #endif  // SURGSIM_GRAPHICS_OSGCAMERA_H

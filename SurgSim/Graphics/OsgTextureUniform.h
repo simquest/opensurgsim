@@ -46,6 +46,8 @@ public:
 	///       the texture that was used to create this uniform
 	virtual void set(const std::shared_ptr<T>& value);
 
+	virtual void set(const YAML::Node& node);
+
 	/// Returns the value of the uniform
 	virtual const std::shared_ptr<T>& get() const;
 
