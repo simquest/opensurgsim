@@ -195,6 +195,35 @@ TEST(SphRepresentationTest, DoUpdate1ParticleTest)
 	EXPECT_DOUBLE_EQ(0.0, sph->getParticleReferences().front().getVelocity()[2]);
 }
 
+TEST(SphRepresentationTest, ParticleOutsideGridTest)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	auto sph = std::make_shared<SphRepresentation>("representation");
+	double dt = 1e-3; // 1ms
+
+	sph->setMaxParticles(1);
+	sph->setMassPerParticle(0.02);
+	sph->setDensity(1000.0);
+	sph->setGasStiffness(3.0);
+	sph->setKernelSupport(0.01);
+	sph->setViscosity(0.01);
+	sph->setSurfaceTension(0.0);
+
+	sph->initialize(runtime);
+
+	Particle p;
+	p.setLifetime(10);
+	p.setPosition(SurgSim::Math::Vector3d::Ones() * 1e10);
+	p.setVelocity(SurgSim::Math::Vector3d::Zero());
+	sph->addParticle(p); // Add 1 particle in the sph system
+	EXPECT_EQ(1u, sph->getParticleReferences().size());
+
+	EXPECT_NO_THROW(sph->update(dt));
+	EXPECT_EQ(1u, sph->getParticleReferences().size());
+	EXPECT_NO_THROW(sph->update(dt));
+	EXPECT_EQ(0u, sph->getParticleReferences().size());
+}
+
 namespace
 {
 /// Set up a Unit Test where 2 particles interact with a radius R (h/2) of null interaction

@@ -58,12 +58,12 @@ public:
 	/// Reset the grid content and the neighbors' mapping
 	void reset();
 
-	/// Add an element in the grid
+	/// Add an element to the grid if the element's position is inside the grid's bounds.
 	/// \param element to be added at this position
 	/// \param position of the element in the n-D space
-	/// \note If the position is outside of the grid, the element is simply not added to the grid
+	/// \return true if the element is added to the grid.
 	template <class Derived>
-	void addElement(const T element, const Eigen::MatrixBase<Derived>& position);
+	bool addElement(const T element, const Eigen::MatrixBase<Derived>& position);
 
 	/// Retrieve an elements' neighbors
 	/// \param element The element for which the neighbors are requested

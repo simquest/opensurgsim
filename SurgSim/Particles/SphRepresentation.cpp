@@ -241,9 +241,12 @@ void SphRepresentation::computeNeighbors()
 {
 	m_grid->reset();
 
-	for (auto const& particleI : getParticleReferences())
+	for (auto& particleI : getParticleReferences())
 	{
-		m_grid->addElement(particleI.getIndex(), particleI.getPosition());
+		if (!m_grid->addElement(particleI.getIndex(), particleI.getPosition()))
+		{
+			particleI.setLifetime(-1.0);
+		}
 	}
 }
 
