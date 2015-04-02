@@ -15,10 +15,12 @@
 
 #include <memory>
 #include <string>
+#include <atomic>
 
 #include "Examples/Stapling/DeviceFactory.h"
 #include "Examples/Stapling/StaplerBehavior.h"
 #include "Examples/Stapling/StaplingPhysicsManager.h"
+#include "Examples/Stapling/KeyToQuitBehavior.h"
 #include "SurgSim/Blocks/Blocks.h"
 #include "SurgSim/Collision/Collision.h"
 #include "SurgSim/DataStructures/DataStructures.h"
@@ -70,6 +72,27 @@ using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
+
+namespace
+{
+std::atomic<bool> keepRunning = true;
+
+void stopRunning(int)
+{
+	keepRunning = false;
+}
+
+void run(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
+{
+	runtime->start();
+	while (keepRunning)
+	{
+		boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+	}
+	runtime->stop();
+}
+
+}
 
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
@@ -360,10 +383,10 @@ std::shared_ptr<OsgViewElement> createViewElement()
 
 
 	return result;
-	}
+}
 
 std::shared_ptr<SurgSim::Framework::SceneElement> createLightElement()
-	{
+{
 	auto result = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
 
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
@@ -458,6 +481,9 @@ int main(int argc, char* argv[])
 		std::make_shared<KeyboardTogglesComponentBehavior>("KeyboardBehavior");
 	keyboardBehavior->setInputComponent(keyboardComponent);
 
+
+	// This should be changed to do lookup by name rather than use direct references, it will become easier to
+	// setup
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Handle"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Stapler"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Footplate"));
@@ -471,9 +497,18 @@ int main(int argc, char* argv[])
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_H, stapler->getComponent("Tooth Graphics0"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_H, stapler->getComponent("Tooth Graphics1"));
 
-	std::shared_ptr<SceneElement> keyboard = std::make_shared<BasicSceneElement>("SceneElement");
+	auto quitter = std::make_shared<KeyToQuitBehavior>("Quitter");
+	quitter->setCallback(stopRunning);
+	quitter->setInputComponent(keyboardComponent);
+
+	auto keyboard = std::make_shared<BasicSceneElement>("Keyboard");
 	keyboard->addComponent(keyboardComponent);
 	keyboard->addComponent(keyboardBehavior);
+	keyboard->addComponent(quitter);
+
+
+
+
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(view);
@@ -508,6 +543,7 @@ int main(int argc, char* argv[])
 		getComponentChecked<SurgSim::Collision::Representation>(wound, "Collision"),
 		getComponentChecked<SurgSim::Collision::Representation>(arm, "Collision"));
 
-	runtime->execute();
+	run(runtime);
+
 	return 0;
 }

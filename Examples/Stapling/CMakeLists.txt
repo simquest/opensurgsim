@@ -21,6 +21,7 @@ include_directories(
 set(STAPLING_SOURCES
 	DeviceFactory.cpp
 	Graphics.cpp
+	KeyToQuitBehavior.cpp
 	StapleElement.cpp
 	StaplerBehavior.cpp
 	Stapling.cpp
@@ -29,6 +30,7 @@ set(STAPLING_SOURCES
 set(STAPLING_HEADERS
 	DeviceFactory.h
 	Graphics.h
+	KeyToQuitBehavior.cpp
 	StapleElement.h
 	StaplerBehavior.h
 	StaplingPhysicsManager.h
