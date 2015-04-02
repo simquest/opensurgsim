@@ -377,7 +377,7 @@ void Runtime::addSceneElements(const std::string& fileName)
 		std::vector<std::shared_ptr<SceneElement>> elements;
 		if (tryConvertElements(fileName, node, &elements))
 		{
-			m_scene->addSceneElements(elements);
+			getScene()->addSceneElements(elements);
 		}
 	}
 	else
@@ -414,12 +414,12 @@ std::vector<std::shared_ptr<SceneElement>> Runtime::duplicateSceneElements(const
 	return result;
 }
 
-bool Runtime::tryLoadNode(const std::string& fileName, YAML::Node* node)
+bool tryLoadNode(const std::string& fileName, YAML::Node* node)
 {
 	bool result = false;
 	std::string path;
 	SURGSIM_ASSERT(node != nullptr) << "Can't load node into nullptr.";
-	if (m_applicationData->tryFindFile(fileName, &path))
+	if (Runtime::getApplicationData()->tryFindFile(fileName, &path))
 	{
 		try
 		{

@@ -186,12 +186,6 @@ private:
 	/// 						"." will be used as default path.
 	void initSearchPaths(const std::string& configFilePath);
 
-	/// Perform the actual load operation
-	/// \param fileName the filename of the scene to be loaded, needs to be found
-	/// \param [out] node pointer to the nodes structure to receive the newly loaded nodes
-	/// \return true if the loading succeeded
-	bool tryLoadNode(const std::string& fileName, YAML::Node* node);
-
 	/// Convert nodes to vector of elements
 	/// \param fileName the original filename for error reporting
 	/// \param node the node to be converted
@@ -215,6 +209,13 @@ private:
 
 	bool m_isStopped;
 };
+
+/// Perform a YAML load operation
+/// \param fileName the filename of the scene to be loaded, needs to be found
+/// \param [out] node pointer to the nodes structure to receive the newly loaded nodes
+/// \return true if the loading succeeded
+bool tryLoadNode(const std::string& fileName, YAML::Node* node);
+
 
 }; // namespace Framework
 }; // namespace SurgSim

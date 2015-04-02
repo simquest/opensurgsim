@@ -20,9 +20,18 @@
 
 #include "SurgSim/Framework/BasicSceneElement.h"
 
+namespace SurgSim
+{
+namespace Graphics
+{
+class Material;
+}
+}
+
 class StapleElement : public SurgSim::Framework::BasicSceneElement
 {
 public:
+
 	/// Constructor
 	/// \param name Name of the staple element.
 	explicit StapleElement(const std::string& name);
@@ -37,8 +46,14 @@ protected:
 	bool doInitialize() override;
 
 private:
+	std::shared_ptr<SurgSim::Graphics::Material> findMaterial(
+		const std::string& elementName,
+		const std::string& materialName);
+
+
 	/// Flag to specify if the stapleElement was created with a collision representation.
 	bool m_hasCollisionRepresentation;
+
 };
 
 #endif //EXAMPLES_STAPLING_STAPLEELEMENT_H
