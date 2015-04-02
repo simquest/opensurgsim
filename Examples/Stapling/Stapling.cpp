@@ -486,9 +486,9 @@ int main(int argc, char* argv[])
 	runtime->addSceneElements("Scenery.yaml");
 
 	auto materials = createMaterials(runtime->getScene());
-	applyMaterials(runtime->getScene(), materials);
+	SurgSim::Blocks::applyMaterials(runtime->getScene(), "Materials.yaml", materials);
 
-#define STAPLING_SHADOWS
+#undef STAPLING_SHADOWS
 #ifdef STAPLING_SHADOWS
 	setupShadowMapping(materials, scene);
 #else

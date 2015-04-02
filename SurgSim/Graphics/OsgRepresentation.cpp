@@ -139,7 +139,7 @@ bool OsgRepresentation::getDrawAsWireFrame() const
 
 void OsgRepresentation::setVisible(bool val)
 {
-	m_switch->setChildValue(m_transform, val);
+	m_switch->setChildValue(m_materialProxy, val);
 }
 
 

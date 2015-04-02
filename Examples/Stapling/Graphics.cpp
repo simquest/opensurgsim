@@ -98,7 +98,7 @@ std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>
 	material = createMaterial("shadowMap", "Shaders/shadow_map");
 	material->getProgram()->setGlobalScope(true);
 	result[material->getName()] = material;
-	element->addComponent(material);
+	// element->addComponent(material);
 
 	// ShadowMap placeholder
 	material = std::make_shared<Graphics::OsgMaterial>("placeholder");
@@ -108,62 +108,6 @@ std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>>
 
 	return result;
 }
-
-void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, Materials materials)
-{
-	static SurgSim::Graphics::OsgUniformFactory uniformFactory;
-	const std::string materialFilename = "Materials.yaml";
-	YAML::Node nodes;
-	if (Framework::tryLoadNode(materialFilename, &nodes))
-	{
-		for (auto node = nodes.begin(); node != nodes.end(); ++node)
-		{
-			auto name = node->begin()->first.as<std::string>();
-			auto materialName = node->begin()->second["Material"].as<std::string>();
-			auto found = name.find("/");
-			auto elementName = name.substr(0, found);
-			auto componentName = name.substr(found + 1);
-
-			auto element = scene->getSceneElement(elementName);
-			SURGSIM_ASSERT(element != nullptr)
-					<< "SceneElement " << elementName << " not found in scene.";
-
-			auto component = std::dynamic_pointer_cast<Graphics::OsgRepresentation>(
-								 element->getComponent(componentName));
-			SURGSIM_ASSERT(component != nullptr)
-					<< "Component " << componentName << " not found or not an OsgRepresentation.";
-
-			if (component != nullptr)
-			{
-				auto material = materials[materialName];
-
-				SURGSIM_ASSERT(material != nullptr)
-						<< "Could not find material " << materialName << " in the prebuilt materials.";
-
-				component->setMaterial(material);
-
-				auto propertyNodes = node->begin()->second["Properties"];
-				for (auto nodeIt = propertyNodes.begin(); nodeIt != propertyNodes.end(); ++nodeIt)
-				{
-					auto& node = *nodeIt;
-					auto rawUniform = uniformFactory.create(node[0].as<std::string>(), node[1].as<std::string>());
-					SURGSIM_ASSERT(rawUniform != nullptr)
-							<< "Could not create uniform " << node[1].as<std::string>() << " of type "
-							<< node[0].as<std::string>() << ".";
-					auto uniform = std::dynamic_pointer_cast<Graphics::OsgUniformBase>(rawUniform);
-					uniform->set(node[2]);
-					component->addUniform(uniform);
-				}
-			}
-		}
-	}
-	else
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Stapling"))
-				<< "Could not find material definitions, visuals are going to be compromised.";
-	}
-}
-
 
 std::shared_ptr<SurgSim::Graphics::RenderPass> createPass(
 	Materials materials,
@@ -243,8 +187,6 @@ void setupShadowMapping(std::unordered_map<std::string, std::shared_ptr<SurgSim:
 	auto renderTarget = std::make_shared<SurgSim::Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
 	shadowCamera->setRenderTarget(renderTarget);
 	shadowCamera->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
-
-
 
 	auto copier = std::make_shared<Framework::TransferPropertiesBehavior>("Copier");
 	copier->setTargetManagerType(Framework::MANAGER_TYPE_GRAPHICS);
