@@ -58,26 +58,26 @@ TYPED_TEST(Grid1DTestBase, addElementTest)
 
 	// Add an element outside of the grid
 	auto positionMin =  this->m_aabb.max() - this->m_aabb.sizes() * 1.001;
-	EXPECT_FALSE(grid.addElement(TypeElement(), positionMin));
+	grid.addElement(TypeElement(), positionMin);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
 
 	// Add an element outside of the grid
 	auto positionMax =  this->m_aabb.min() + this->m_aabb.sizes() * 1.001;
-	EXPECT_FALSE(grid.addElement(TypeElement(), positionMax));
+	grid.addElement(TypeElement(), positionMax);
 	ASSERT_EQ(0u, grid.getActiveCells().size());
 	ASSERT_EQ(0u, grid.getCellIds().size());
 
 	// Add an element inside of the grid
 	TypeElement e0(0), e1(1);
-	EXPECT_TRUE(grid.addElement(e0, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero()));
+	grid.addElement(e0, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
 	ASSERT_EQ(1u, grid.getActiveCells().size());
 	ASSERT_EQ(1u, grid.getCellIds().size());
 	ASSERT_NO_THROW(grid.getCellIds().at(e0));
 	ASSERT_ANY_THROW(grid.getCellIds().at(e1));
 
 	// Add an element inside of the grid, in the same cell
-	EXPECT_TRUE(grid.addElement(e1, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero()));
+	grid.addElement(e1, Eigen::Matrix<double, TestFixture::dimension, 1>::Zero());
 	ASSERT_EQ(1u, grid.getActiveCells().size());
 	ASSERT_EQ(2u, grid.getCellIds().size());
 	ASSERT_NO_THROW(grid.getCellIds().at(e0));
@@ -86,7 +86,7 @@ TYPED_TEST(Grid1DTestBase, addElementTest)
 
 	// Add an element inside of the grid, in a different cell
 	TypeElement e2(2);
-	EXPECT_TRUE(grid.addElement(e2, this->m_size * 1.5));
+	grid.addElement(e2, this->m_size * 1.5);
 	ASSERT_EQ(2u, grid.getActiveCells().size());
 	ASSERT_EQ(3u, grid.getCellIds().size());
 	ASSERT_NO_THROW(grid.getCellIds().at(e0));

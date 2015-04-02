@@ -193,7 +193,7 @@ protected:
 	virtual void computeVelocityAndPosition(double dt);
 
 private:
-	/// Compute neighbors and expire particles outside the grid's bounds.
+	/// Compute the neighbors
 	virtual void computeNeighbors();
 
 	/// Compute the density and pressure field

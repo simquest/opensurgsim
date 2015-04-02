@@ -128,12 +128,12 @@ void Grid<T, N>::reset()
 
 template <typename T, size_t N>
 template <class Derived>
-bool Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& position)
+void Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& position)
 {
 	// Only add element that are located in the grid
 	if (!m_aabb.contains(position))
 	{
-		return false;
+		return;
 	}
 
 	// Find the dimension-N cell id from the location
@@ -150,7 +150,6 @@ bool Grid<T, N>::addElement(const T element, const Eigen::MatrixBase<Derived>& p
 
 	/// Flag that the neighbors list will need to be recomputed on the next access
 	m_neighborsDirtyFlag = true;
-	return true;
 }
 
 template <typename T, size_t N>
