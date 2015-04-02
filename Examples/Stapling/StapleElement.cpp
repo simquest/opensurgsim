@@ -17,8 +17,11 @@
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/Model.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/Material.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
@@ -55,6 +58,7 @@ bool StapleElement::doInitialize()
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSceneryRepresentation>("Graphics");
 	graphicsRepresentation->loadModel("Tools/Stapler/staple.obj");
+	graphicsRepresentation->setMaterial(findMaterial("Materials", "staple"));
 
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
@@ -68,4 +72,18 @@ bool StapleElement::doInitialize()
 	}
 
 	return true;
+}
+
+std::shared_ptr<SurgSim::Graphics::Material> StapleElement::findMaterial(const std::string& elementName,
+		const std::string& materialName)
+{
+	auto element = getScene()->getSceneElement(elementName);
+	SURGSIM_ASSERT(element != nullptr);
+	auto component = element->getComponent(materialName);
+	SURGSIM_ASSERT(component != nullptr);
+
+	auto result = std::dynamic_pointer_cast<SurgSim::Graphics::Material>(component);
+	SURGSIM_ASSERT(result != nullptr);
+
+	return result;
 }

@@ -1,0 +1,87 @@
+Group {
+  UniqueID Group_0
+  DataVariance STATIC
+  nodeMask 0xffffffff
+  cullingActive TRUE
+  StateSet {
+    rendering_hint DEFAULT_BIN
+    renderBinMode INHERIT
+    GL_NORMALIZE ON
+  }
+  num_children 1
+  Group {
+    name "window.obj"
+    nodeMask 0xffffffff
+    cullingActive TRUE
+    num_children 1
+    Geode {
+      nodeMask 0xffffffff
+      cullingActive TRUE
+      num_drawables 1
+      Geometry {
+        DataVariance STATIC
+        StateSet {
+          DataVariance STATIC
+          rendering_hint DEFAULT_BIN
+          renderBinMode INHERIT
+          Material {
+            name "window_mat"
+            ColorMode OFF
+            ambientColor 0 0 0 1
+            diffuseColor 0.4096 0.4096 0.4096 1
+            specularColor 0.125 0.125 0.125 1
+            emissionColor 0 0 0 1
+            shininess 12.288
+          }
+        }
+        useDisplayList TRUE
+        useVertexBufferObjects FALSE
+        PrimitiveSets 2
+        {
+          DrawElementsUShort TRIANGLE_STRIP 4
+          {
+            1 2 0 3 
+          }
+          DrawElementsUShort TRIANGLE_STRIP 4
+          {
+            7 4 6 5 
+          }
+        }
+        VertexArray Vec3Array 8
+        {
+          3.41166 0.298392 -2.12196
+          3.41166 0.740383 -2.12196
+          3.41166 0.740383 -1.79104
+          3.41166 0.298392 -1.79104
+          3.37025 0.298392 -2.12196
+          3.37025 0.298392 -1.79104
+          3.37025 0.740383 -1.79104
+          3.37025 0.740383 -2.12196
+        }
+        NormalBinding PER_VERTEX
+        NormalArray Vec3Array 8
+        {
+          1 0 0
+          1 0 0
+          1 0 0
+          1 0 0
+          -1 0 0
+          -1 0 0
+          -1 0 0
+          -1 0 0
+        }
+        TexCoordArray 0 Vec2Array 8
+        {
+          0.823825 0.041483
+          0.823825 0.972249
+          0.074841 0.972249
+          0.074841 0.041483
+          0.829274 0.04121
+          0.069457 0.04121
+          0.069457 0.971976
+          0.829274 0.971976
+        }
+      }
+    }
+  }
+}
