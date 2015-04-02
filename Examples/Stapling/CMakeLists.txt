@@ -57,6 +57,7 @@ set(LIBS
 	SurgSimDeviceFilters
 	SurgSimFramework
 	SurgSimGraphics
+	${Boost_LIBRARIES}
 	${YAML_CPP_LIBRARIES}
 )
 
