@@ -69,7 +69,8 @@ StaplerBehavior::StaplerBehavior(const std::string& name):
 	m_numElements(0),
 	m_button1Index(-1),
 	m_button1IndexCached(false),
-	m_buttonPreviouslyPressed(false)
+	m_buttonPreviouslyPressed(false),
+	m_keyPressedLastUpdate(false)
 {
 	typedef std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> VirtualTeethArray;
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(StaplerBehavior, std::shared_ptr<SurgSim::Framework::Component>,
@@ -259,12 +260,23 @@ void StaplerBehavior::createStaple()
 		// The staple is created with no collision representation, because it is going to be constrained.
 		if (!stapleAdded)
 		{
+			// Keep a maximum of 10 staples at all times
+			if (m_staples.size() >= 10)
+			{
+				std::cout << "########## Removing a staple from the scene" << std::endl;
+				getScene()->removeSceneElement(m_staples.front());
+				m_staples.pop_front();
+				std::cout << "Staple removed ##########" << std::endl;
+			}
+
 			staple->setHasCollisionRepresentation(false);
 			getScene()->addSceneElement(staple);
 			// The gravity of the staple is disabled to prevent it from rotating about the line
 			// connecting the two points of constraints on the staple.
 			staple->getComponents<SurgSim::Physics::Representation>()[0]->setIsGravityEnabled(false);
 			stapleAdded = true;
+			m_staples.push_back(staple);
+			std::cout << "We have " << m_staples.size() << " staples (1 properly deployed staple was just created)" << std::endl;
 		}
 
 		// Find the corresponding Phsyics::Representation for the target Collision::Representation.
@@ -371,14 +383,82 @@ void StaplerBehavior::createStaple()
 
 	if (!stapleAdded)
 	{
+		// Keep a maximum of 10 staples at all times
+		if (m_staples.size() >= 10)
+		{
+			std::cout << "########## Removing a staple from the scene" << std::endl;
+			getScene()->removeSceneElement(m_staples.front());
+			m_staples.pop_front();
+			std::cout << "Staple removed ##########" << std::endl;
+		}
+
 		// Create the staple element.
 		staple->setHasCollisionRepresentation(true);
 		getScene()->addSceneElement(staple);
+		m_staples.push_back(staple);
+
+		std::cout << "We have " << m_staples.size() << " staples (1 free staple was just created)" << std::endl;
 	}
+}
+
+void StaplerBehavior::setInputComponentKeyboard(std::shared_ptr<SurgSim::Framework::Component> inputComponentKeyboard)
+{
+	SURGSIM_ASSERT(nullptr != inputComponentKeyboard) << "'inputComponent' cannot be 'nullptr'";
+
+	m_inputComponentKeyboard = checkAndConvert<SurgSim::Input::InputComponent>(
+		inputComponentKeyboard, "SurgSim::Input::InputComponent");
+}
+
+std::shared_ptr<SurgSim::Input::InputComponent> StaplerBehavior::getInputComponentKeyboard() const
+{
+	return m_inputComponentKeyboard;
+}
+
+void StaplerBehavior::registerKeyToClearStaples(SurgSim::Device::KeyCode key)
+{
+	m_keyToClearAllStaples = static_cast<int>(key);
 }
 
 void StaplerBehavior::update(double dt)
 {
+	{
+		SurgSim::DataStructures::DataGroup dataGroup;
+		m_inputComponentKeyboard->getData(&dataGroup);
+
+		int key;
+		if (dataGroup.integers().get("key", &key))
+		{
+			if (key == m_keyToClearAllStaples && !m_keyPressedLastUpdate)
+			{
+				for (auto it = std::begin(m_staples); it != std::end(m_staples); it++)
+				{
+					getScene()->removeSceneElement(*it);
+				}
+				m_staples.clear();
+			}
+			m_keyPressedLastUpdate = (SurgSim::Device::KeyCode::NONE != key);
+		}
+	}
+
+	// Remove all staples that have gone inactive
+	for (auto it = m_staples.begin(); it != m_staples.end(); )
+	{
+		//std::weak_ptr<RigidRepresentation> physics = std::static_pointer_cast<RigidRepresentation>((*it)->getComponent("Physics"));
+		//if (!(physics.lock()->isActive()))
+		if (!(*it)->isActive())
+		{
+			std::cout << "########## Removing an inactive staple from the scene" << std::endl;
+			getScene()->removeSceneElement(*it);
+			it = m_staples.erase(it);
+			std::cout << "Staple removed ##########" << std::endl;
+			std::cout << "We have " << m_staples.size() << " staples" << std::endl;
+		}
+		else
+		{
+			it++;
+		}
+	}
+
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_from->getData(&dataGroup);
 

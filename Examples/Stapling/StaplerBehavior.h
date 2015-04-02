@@ -17,13 +17,15 @@
 #define EXAMPLES_STAPLING_STAPLERBEHAVIOR_H
 
 #include <array>
+#include <deque>
 #include <memory>
 #include <string>
 #include <unordered_map>
 
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/ObjectFactory.h"
-#include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
 {
@@ -75,6 +77,18 @@ public:
 
 	/// \return	The input component which sends the pose.
 	std::shared_ptr<SurgSim::Input::InputComponent> getInputComponent();
+
+	/// Set the keyboard input component from which pressed keys come.
+	/// \param	inputComponentKeyboard	The input component which contains the pressed key(s).
+	void setInputComponentKeyboard(std::shared_ptr<SurgSim::Framework::Component> inputComponentKeyboard);
+
+	/// Get the keyboard input component of this behavior
+	/// \return The input component which sends keyboard information to this behavior.
+	std::shared_ptr<SurgSim::Input::InputComponent> getInputComponentKeyboard() const;
+
+	/// Register a key with a component in this behavior.
+	/// \param key A key used to clear the staples
+	void registerKeyToClearStaples(SurgSim::Device::KeyCode key);
 
 	/// Set the representation of the stapler
 	/// \param	staplerRepresentation The representation of a stapler
@@ -164,6 +178,18 @@ private:
 
 	/// The list of scene element names that this behavior can staple.
 	std::list<std::string> m_stapleEnabledSceneElements;
+
+	/// The list of staples
+	std::deque<std::shared_ptr<SurgSim::Framework::SceneElement>> m_staples;
+
+	/// Record if any key is pressed in last update() call.
+	bool m_keyPressedLastUpdate;
+
+	/// Input component from which pressed keys come.
+	std::shared_ptr<SurgSim::Input::InputComponent> m_inputComponentKeyboard;
+
+	/// The key registered to clear all staples
+	int m_keyToClearAllStaples;
 };
 
 #endif  // EXAMPLES_STAPLING_STAPLERBEHAVIOR_H

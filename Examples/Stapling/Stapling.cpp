@@ -166,6 +166,9 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	auto deviceTransform = SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.0, 0.01, 0.0));
 	inputComponent->setLocalPose(deviceTransform);
 
+	std::shared_ptr<InputComponent> inputComponentKeyboard = std::make_shared<InputComponent>("KeyboardInputComponent1");
+	inputComponentKeyboard->setDeviceName("Keyboard"); // Name of device is case sensitive.
+
 	std::shared_ptr<OutputComponent> outputComponent = std::make_shared<OutputComponent>("OutputComponent");
 	outputComponent->setDeviceName(deviceName);
 	outputComponent->setLocalPose(deviceTransform);
@@ -188,6 +191,9 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	staplerBehavior->setRepresentation(physicsRepresentation);
 	staplerBehavior->enableStaplingForSceneElement("wound");
 
+	staplerBehavior->setInputComponentKeyboard(inputComponentKeyboard);
+	staplerBehavior->registerKeyToClearStaples(SurgSim::Device::KEY_Z);
+
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
 		std::make_shared<VisualizeContactsBehavior>("Contacts");
 	visualizeContactsBehavior->setCollisionRepresentation(collisionRepresentation);
@@ -201,6 +207,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(physicsRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
 	sceneElement->addComponent(meshShapeVisualization);
+	sceneElement->addComponent(inputComponentKeyboard);
 	sceneElement->addComponent(inputComponent);
 	sceneElement->addComponent(outputComponent);
 	sceneElement->addComponent(inputVTC);
