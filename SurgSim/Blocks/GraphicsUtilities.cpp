@@ -167,13 +167,12 @@ void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, std::strin
 				auto propertyNodes = node->begin()->second["Properties"];
 				for (auto nodeIt = propertyNodes.begin(); nodeIt != propertyNodes.end(); ++nodeIt)
 				{
-					auto& node = *nodeIt;
-					auto rawUniform = uniformFactory.create(node[0].as<std::string>(), node[1].as<std::string>());
+					auto rawUniform = uniformFactory.create((*nodeIt)[0].as<std::string>(), (*nodeIt)[1].as<std::string>());
 					SURGSIM_ASSERT(rawUniform != nullptr)
-						<< "Could not create uniform " << node[1].as<std::string>() << " of type "
-						<< node[0].as<std::string>() << ".";
+						<< "Could not create uniform " << (*nodeIt)[1].as<std::string>() << " of type "
+						<< (*nodeIt)[0].as<std::string>() << ".";
 					auto uniform = std::dynamic_pointer_cast<Graphics::OsgUniformBase>(rawUniform);
-					uniform->set(node[2]);
+					uniform->set((*nodeIt)[2]);
 					component->addUniform(uniform);
 				}
 			}

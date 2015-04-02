@@ -54,7 +54,7 @@ bool OsgKeyboardHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 			break;
 	}
 
-	return false;
+	return result;
 }
 
 };  // namespace Device
