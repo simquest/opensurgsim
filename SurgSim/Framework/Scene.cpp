@@ -68,6 +68,15 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 	}
 }
 
+void Scene::removeSceneElement(std::shared_ptr<SceneElement> element)
+{
+	SURGSIM_ASSERT(!m_runtime.expired()) << "Runtime pointer is expired, cannot remove SceneElement to Scene.";
+	SURGSIM_ASSERT(element->getScene() == getSharedPtr()) << "The scene element " << element->getName() << " does not belong to the scene";
+
+	element->setActive(false);
+	element->getRuntime()->removeSceneElement(element);
+}
+
 void Scene::addSceneElements(std::vector<std::shared_ptr<SceneElement>> elements)
 {
 	for (auto element : elements)

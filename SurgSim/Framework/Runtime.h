@@ -120,6 +120,10 @@ public:
 	/// \param	component	The component.
 	void addComponent(const std::shared_ptr<Component>& component);
 
+	/// Removes the scene element described by element.
+	/// \param	element	The element.
+	void removeSceneElement(const std::shared_ptr<SceneElement>& element);
+
 	/// Removes the component described by component.
 	/// \param	component	The component.
 	void removeComponent(const std::shared_ptr<Component>& component);

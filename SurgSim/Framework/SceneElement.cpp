@@ -86,6 +86,7 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 
 bool SceneElement::removeComponent(std::shared_ptr<Component> component)
 {
+	component->setLocalActive(false);
 	return removeComponent(component->getName());
 }
 

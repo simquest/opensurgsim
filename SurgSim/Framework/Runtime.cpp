@@ -325,6 +325,20 @@ void Runtime::addComponent(const std::shared_ptr<Component>& component)
 	}
 }
 
+void Runtime::removeSceneElement(const std::shared_ptr<SceneElement>& element)
+{
+	if (m_isRunning)
+	{
+		for (auto component : element->getComponents())
+		{
+			for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+			{
+				(*it)->enqueueRemoveComponent(component);
+			}
+		}
+	}
+}
+
 void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 {
 	if (m_isRunning)
