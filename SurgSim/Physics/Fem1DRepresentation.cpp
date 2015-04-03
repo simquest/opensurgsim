@@ -20,7 +20,7 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
-#include "SurgSim/Physics/Fem1DRepresentationLocalization.h"
+#include "SurgSim/Physics/Fem1DLocalization.h"
 #include "SurgSim/Physics/FemElement.h"
 
 namespace
@@ -82,9 +82,9 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 		"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
 		") was expecting a square matrix of size " << dofPerNode;
 
-	std::shared_ptr<Fem1DRepresentationLocalization> localization1D =
-		std::dynamic_pointer_cast<Fem1DRepresentationLocalization>(localization);
-	SURGSIM_ASSERT(localization1D != nullptr) << "Invalid localization type (not a Fem1DRepresentationLocalization)";
+	std::shared_ptr<Fem1DLocalization> localization1D =
+		std::dynamic_pointer_cast<Fem1DLocalization>(localization);
+	SURGSIM_ASSERT(localization1D != nullptr) << "Invalid localization type (not a Fem1DLocalization)";
 
 	const size_t elementId = localization1D->getLocalPosition().index;
 	const SurgSim::Math::Vector& coordinate = localization1D->getLocalPosition().coordinate;

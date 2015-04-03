@@ -21,7 +21,7 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidState.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/ContactCalculation.h"

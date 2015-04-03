@@ -20,7 +20,7 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidState.h"
 
 namespace
 {
@@ -435,7 +435,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 	m_C.block<3, 3>(3, 3) = systemMatrix.block<3, 3>(3, 3).inverse();
 }
 
-void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
+void RigidRepresentation::updateGlobalInertiaMatrices(const RigidState& state)
 {
 	if (!m_parametersValid)
 	{

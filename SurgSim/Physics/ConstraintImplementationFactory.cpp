@@ -16,14 +16,14 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
-#include "SurgSim/Physics/Fem3DRepresentationContact.h"
+#include "SurgSim/Physics/Fem3DBilateral3D.h"
+#include "SurgSim/Physics/Fem3DContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
-#include "SurgSim/Physics/FixedRepresentationContact.h"
+#include "SurgSim/Physics/FixedBilateral3D.h"
+#include "SurgSim/Physics/FixedContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
+#include "SurgSim/Physics/RigidBilateral3D.h"
+#include "SurgSim/Physics/RigidContact.h"
 
 namespace SurgSim
 {
@@ -32,12 +32,12 @@ namespace Physics
 
 ConstraintImplementationFactory::ConstraintImplementationFactory()
 {
-	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedRepresentationContact>());
-	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidRepresentationContact>());
-	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DRepresentationContact>());
-	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedRepresentationBilateral3D>());
-	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidRepresentationBilateral3D>());
-	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DRepresentationBilateral3D>());
+	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedContact>());
+	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidContact>());
+	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DContact>());
+	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedBilateral3D>());
+	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidBilateral3D>());
+	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DBilateral3D>());
 }
 
 ConstraintImplementationFactory::~ConstraintImplementationFactory()

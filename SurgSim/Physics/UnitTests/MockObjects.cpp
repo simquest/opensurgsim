@@ -77,17 +77,17 @@ MockRigidRepresentation::MockRigidRepresentation() : RigidRepresentation("MockRi
 {
 }
 
-RigidRepresentationState& MockRigidRepresentation::getInitialState()
+RigidState& MockRigidRepresentation::getInitialState()
 {
 	return m_initialState;
 }
 
-RigidRepresentationState& MockRigidRepresentation::getCurrentState()
+RigidState& MockRigidRepresentation::getCurrentState()
 {
 	return m_currentState;
 }
 
-RigidRepresentationState& MockRigidRepresentation::getPreviousState()
+RigidState& MockRigidRepresentation::getPreviousState()
 {
 	return m_previousState;
 }
@@ -96,17 +96,17 @@ MockFixedRepresentation::MockFixedRepresentation() : FixedRepresentation("MockFi
 {
 }
 
-RigidRepresentationState& MockFixedRepresentation::getInitialState()
+RigidState& MockFixedRepresentation::getInitialState()
 {
 	return m_initialState;
 }
 
-RigidRepresentationState& MockFixedRepresentation::getCurrentState()
+RigidState& MockFixedRepresentation::getCurrentState()
 {
 	return m_currentState;
 }
 
-RigidRepresentationState& MockFixedRepresentation::getPreviousState()
+RigidState& MockFixedRepresentation::getPreviousState()
 {
 	return m_previousState;
 }

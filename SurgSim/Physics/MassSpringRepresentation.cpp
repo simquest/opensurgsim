@@ -18,7 +18,7 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
-#include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
+#include "SurgSim/Physics/MassSpringLocalization.h"
 
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
@@ -124,10 +124,10 @@ void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Local
 														   const SurgSim::Math::Matrix& K,
 														   const SurgSim::Math::Matrix& D)
 {
-	std::shared_ptr<MassSpringRepresentationLocalization> localization3D =
-		std::dynamic_pointer_cast<MassSpringRepresentationLocalization>(localization);
+	std::shared_ptr<MassSpringLocalization> localization3D =
+		std::dynamic_pointer_cast<MassSpringLocalization>(localization);
 	SURGSIM_ASSERT(localization3D != nullptr) <<
-		"Invalid localization type (not a MassSpringRepresentationLocalization)";
+		"Invalid localization type (not a MassSpringLocalization)";
 
 	const size_t dofPerNode = getNumDofPerNode();
 

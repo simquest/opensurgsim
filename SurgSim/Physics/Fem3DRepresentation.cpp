@@ -24,7 +24,7 @@
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
+#include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/FemElement.h"
 
 using SurgSim::Framework::Logger;
@@ -93,9 +93,9 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
 			") was expecting a square matrix of size " << dofPerNode;
 
-	std::shared_ptr<Fem3DRepresentationLocalization> localization3D =
-		std::dynamic_pointer_cast<Fem3DRepresentationLocalization>(localization);
-	SURGSIM_ASSERT(localization3D != nullptr) << "Invalid localization type (not a Fem3DRepresentationLocalization)";
+	std::shared_ptr<Fem3DLocalization> localization3D =
+		std::dynamic_pointer_cast<Fem3DLocalization>(localization);
+	SURGSIM_ASSERT(localization3D != nullptr) << "Invalid localization type (not a Fem3DLocalization)";
 
 	const size_t elementId = localization3D->getLocalPosition().index;
 	const SurgSim::Math::Vector& coordinate = localization3D->getLocalPosition().coordinate;
@@ -276,9 +276,9 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 		coordinate.coordinate[i] = barycentricCoordinate[indices[i]];
 	}
 
-	// Fem3DRepresentationLocalization will verify the coordinate (2nd parameter) based on
+	// Fem3DLocalization will verify the coordinate (2nd parameter) based on
 	// the Fem3DRepresentation passed as 1st parameter.
-	auto result = std::make_shared<Fem3DRepresentationLocalization>(
+	auto result = std::make_shared<Fem3DLocalization>(
 					  std::static_pointer_cast<SurgSim::Physics::Representation>(getSharedPtr()), coordinate);
 
 	return result;

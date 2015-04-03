@@ -37,7 +37,7 @@
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Mass.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
-#include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
+#include "SurgSim/Physics/MassSpringLocalization.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
@@ -95,9 +95,9 @@ public:
 	MockRigidRepresentation();
 
 	// Non constant access to the states
-	RigidRepresentationState& getInitialState();
-	RigidRepresentationState& getCurrentState();
-	RigidRepresentationState& getPreviousState();
+	RigidState& getInitialState();
+	RigidState& getCurrentState();
+	RigidState& getPreviousState();
 };
 
 class MockFixedRepresentation : public FixedRepresentation
@@ -106,9 +106,9 @@ public:
 	MockFixedRepresentation();
 
 	// Non constant access to the states
-	RigidRepresentationState& getInitialState();
-	RigidRepresentationState& getCurrentState();
-	RigidRepresentationState& getPreviousState();
+	RigidState& getInitialState();
+	RigidState& getCurrentState();
+	RigidState& getPreviousState();
 };
 
 class MockDeformableRepresentationLocalization : public SurgSim::Physics::Localization

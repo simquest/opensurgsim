@@ -31,7 +31,7 @@
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
+#include "SurgSim/Physics/RigidContact.h"
 
 using SurgSim::Physics::Constraint;
 using SurgSim::Physics::ContactConstraintData;
@@ -41,7 +41,7 @@ using SurgSim::Physics::PhysicsManagerState;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationContact;
+using SurgSim::Physics::RigidContact;
 using SurgSim::Physics::RigidRepresentationLocalization;
 
 TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)

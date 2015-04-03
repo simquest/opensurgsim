@@ -22,13 +22,13 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
-#include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
+#include "SurgSim/Physics/MassSpringLocalization.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
 using SurgSim::Physics::MassSpringRepresentation;
-using SurgSim::Physics::MassSpringRepresentationLocalization;
+using SurgSim::Physics::MassSpringLocalization;
 using SurgSim::Physics::MockLocalization;
 using SurgSim::Physics::MockMassSpring;
 using SurgSim::Physics::MockSpring;
@@ -56,7 +56,7 @@ protected:
 
 	std::shared_ptr<MockMassSpring> m_massSpring;
 	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
-	std::shared_ptr<SurgSim::Physics::MassSpringRepresentationLocalization> m_localization;
+	std::shared_ptr<SurgSim::Physics::MassSpringLocalization> m_localization;
 
 	void SetUp() override
 	{
@@ -124,7 +124,7 @@ protected:
 
 	void createLocalization()
 	{
-		m_localization = std::make_shared<SurgSim::Physics::MassSpringRepresentationLocalization>();
+		m_localization = std::make_shared<SurgSim::Physics::MassSpringLocalization>();
 		m_localization->setRepresentation(m_massSpring);
 		m_localization->setLocalNode(0);
 	}
@@ -277,8 +277,8 @@ TEST_F(MassSpringRepresentationTests, ExternalForceAPITest)
 	using SurgSim::Math::Matrix;
 
 	std::shared_ptr<MockMassSpring> massSpring = std::make_shared<MockMassSpring>();
-	std::shared_ptr<MassSpringRepresentationLocalization> localization =
-		std::make_shared<MassSpringRepresentationLocalization>();
+	std::shared_ptr<MassSpringLocalization> localization =
+		std::make_shared<MassSpringLocalization>();
 	std::shared_ptr<MockLocalization> wrongLocalizationType =
 		std::make_shared<MockLocalization>();
 

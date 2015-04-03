@@ -120,10 +120,10 @@ public:
 	std::shared_ptr<SphereShape> m_sphere;
 
 	// Rigid representation state
-	RigidRepresentationState m_state;
+	RigidState m_state;
 
 	// Rigid representation default state
-	RigidRepresentationState m_defaultState;
+	RigidState m_defaultState;
 
 	// Max number of simulation step for testing
 	int m_maxNumSimulationStepTest;
@@ -356,7 +356,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		rigidBody->setShape(m_sphere);
-		SurgSim::Physics::RigidRepresentationState initialState;
+		SurgSim::Physics::RigidState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
 		SurgSim::DataStructures::Location location(anchorLocalPoint);
@@ -422,7 +422,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		rigidBody->setShape(m_sphere);
-		SurgSim::Physics::RigidRepresentationState initialState;
+		SurgSim::Physics::RigidState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
 		SurgSim::DataStructures::Location location(anchorLocalPoint);
@@ -460,7 +460,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		rigidBody->setShape(m_sphere);
-		SurgSim::Physics::RigidRepresentationState initialState;
+		SurgSim::Physics::RigidState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
 		SurgSim::DataStructures::Location location(anchorLocalPoint);
@@ -664,7 +664,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		rigidBody->setShape(m_sphere);
-		SurgSim::Physics::RigidRepresentationState initialState;
+		SurgSim::Physics::RigidState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
 		SurgSim::DataStructures::Location location(localAnchorPoint);
@@ -710,7 +710,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		rigidBody->setShape(m_sphere);
-		SurgSim::Physics::RigidRepresentationState initialState;
+		SurgSim::Physics::RigidState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
 		SurgSim::DataStructures::Location location(localAnchorPoint);
@@ -748,7 +748,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceTest)
 
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		rigidBody->setShape(m_sphere);
-		SurgSim::Physics::RigidRepresentationState initialState;
+		SurgSim::Physics::RigidState initialState;
 		initialState.setPose(transform);
 		rigidBody->setInitialState(initialState);
 		SurgSim::DataStructures::Location location(localAnchorPoint);
@@ -857,7 +857,7 @@ TEST_F(RigidRepresentationTest, PreviousStateDifferentFromCurrentTest)
 }
 
 void disableWhenDivergeTest(std::shared_ptr<RigidRepresentation> rigidBody,
-							const RigidRepresentationState& state, double dt)
+							const RigidState& state, double dt)
 {
 	// Setup phase
 	rigidBody->setLocalActive(true);
