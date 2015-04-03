@@ -18,17 +18,21 @@
 #include <memory>
 
 #include "SurgSim/Blocks/TransferParticlesToPointCloudBehavior.h"
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/EmitterRepresentation.h"
 #include "SurgSim/Particles/Particle.h"
+#include "SurgSim/Particles/ParticlesCollisionRepresentation.h"
 #include "SurgSim/Particles/RandomSpherePointGenerator.h"
 #include "SurgSim/Particles/RenderTests/RenderTest.h"
 #include "SurgSim/Particles/SphRepresentation.h"
@@ -44,80 +48,97 @@ using SurgSim::Particles::SphRepresentation;
 namespace
 {
 
-std::shared_ptr<SurgSim::Framework::SceneElement> createParticleSystem(const std::string& name,
-		SurgSim::Math::Vector4d color)
+std::shared_ptr<SurgSim::Framework::SceneElement> createCube()
 {
-	// Create the scene element that will contain all the necessary object (phx, gfx, behaviors...)
-	std::shared_ptr<SurgSim::Framework::BasicSceneElement> sceneElement =
-		std::make_shared<SurgSim::Framework::BasicSceneElement>(name);
+	auto mesh = std::make_shared<SurgSim::Math::MeshShape>();
+	mesh->load("Cube.ply");
 
-	// Create the particle physics object and add it to the element
-	std::shared_ptr<SurgSim::Particles::SphRepresentation> particlesRepresentation =
-		std::make_shared<SurgSim::Particles::SphRepresentation>(name + " Particles");
+	auto collision = std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>("collision");
+	collision->setShape(mesh);
+
+	auto graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("graphics");
+	graphics->setShape(mesh);
+	graphics->setDrawAsWireFrame(true);
+
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("cube");
+	element->addComponent(collision);
+	element->addComponent(graphics);
+
+	return element;
+}
+
+std::shared_ptr<SurgSim::Framework::SceneElement> createParticleSystem()
+{
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("particles");
 
 	// c.f. "Lagrangian Fluid Dynamics Using Smoothed Particle Hydrodynamics", Micky Kelager, January 9th 2006.
 	// for input data to simulate water.
-	particlesRepresentation->setMaxParticles(5000);
-	particlesRepresentation->setMassPerParticle(0.02);
-	particlesRepresentation->setDensity(998.29);
-	particlesRepresentation->setGasStiffness(3.0);
-	particlesRepresentation->setGravity(SurgSim::Math::Vector3d(0.0, -9.81, 0.0));
-	particlesRepresentation->setKernelSupport(0.0457);
-	particlesRepresentation->setSurfaceTension(0.0728);
-	particlesRepresentation->setViscosity(3.5);
+	auto particles = std::make_shared<SurgSim::Particles::SphRepresentation>("physics");
+	particles->setMaxParticles(5000);
+	particles->setMassPerParticle(0.02);
+	particles->setDensity(998.29);
+	particles->setGasStiffness(3.0);
+	particles->setGravity(SurgSim::Math::Vector3d(0.0, -9.81, 0.0));
+	particles->setKernelSupport(0.0457);
+	particles->setSurfaceTension(0.0728);
+	particles->setViscosity(3.5);
+	element->addComponent(particles);
 
-	SphRepresentation::PlaneConstraint planeConstraint;
-	planeConstraint.stiffness = 50000.0;
-	planeConstraint.damping = 100.0;
-	planeConstraint.planeEquation = SurgSim::Math::Vector4d(0.0, 1.0, 0.0, 0.0);
-	particlesRepresentation->addPlaneConstraint(planeConstraint);
-	planeConstraint.planeEquation.segment<3>(0) = Vector3d(-1,0.9,0).normalized();
-	particlesRepresentation->addPlaneConstraint(planeConstraint);
-	planeConstraint.planeEquation.segment<3>(0) = Vector3d(+1,0.9,0).normalized();
-	particlesRepresentation->addPlaneConstraint(planeConstraint);
-	planeConstraint.planeEquation.segment<3>(0) = Vector3d(0,0.9,+1).normalized();
-	particlesRepresentation->addPlaneConstraint(planeConstraint);
-	planeConstraint.planeEquation.segment<3>(0) = Vector3d(0,0.9,-1).normalized();
-	particlesRepresentation->addPlaneConstraint(planeConstraint);
-	sceneElement->addComponent(particlesRepresentation);
+	auto collision = std::make_shared<SurgSim::Particles::ParticlesCollisionRepresentation>("collision");
+	particles->setCollisionRepresentation(collision);
+	element->addComponent(collision);
 
-	std::shared_ptr<SurgSim::Particles::EmitterRepresentation> sphereEmitter;
-	sphereEmitter = std::make_shared<SurgSim::Particles::EmitterRepresentation>("sphereEmitter");
+	//SphRepresentation::PlaneConstraint planeConstraint;
+	//planeConstraint.stiffness = 50000.0;
+	//planeConstraint.damping = 100.0;
+	//planeConstraint.planeEquation = SurgSim::Math::Vector4d(0.0, 1.0, 0.0, 0.0);
+	//particles->addPlaneConstraint(planeConstraint);
+	//planeConstraint.planeEquation.segment<3>(0) = Vector3d(-1,0.9,0).normalized();
+	//particles->addPlaneConstraint(planeConstraint);
+	//planeConstraint.planeEquation.segment<3>(0) = Vector3d(+1,0.9,0).normalized();
+	//particles->addPlaneConstraint(planeConstraint);
+	//planeConstraint.planeEquation.segment<3>(0) = Vector3d(0,0.9,+1).normalized();
+	//particles->addPlaneConstraint(planeConstraint);
+	//planeConstraint.planeEquation.segment<3>(0) = Vector3d(0,0.9,-1).normalized();
+	//particles->addPlaneConstraint(planeConstraint);
+
+	auto sphereEmitter = std::make_shared<SurgSim::Particles::EmitterRepresentation>("emitter");
 	sphereEmitter->setLocalPose(SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.5, 1.0, 0.5)));
-	sphereEmitter->setTarget(particlesRepresentation);
+	sphereEmitter->setTarget(particles);
 	sphereEmitter->setShape(std::make_shared<SurgSim::Math::SphereShape>(0.1));
 	sphereEmitter->setMode(SurgSim::Particles::EMIT_MODE_SURFACE);
-	sphereEmitter->setRate(2000.0); /// 2000 particles per second (maximum is 5000)
-	sphereEmitter->setLifetimeRange(std::make_pair(30000, 600000));
+	sphereEmitter->setRate(200.0); /// 2000 particles per second (maximum is 5000)
+	sphereEmitter->setLifetimeRange(std::make_pair(0.2, 0.4));
 	sphereEmitter->setVelocityRange(std::make_pair(SurgSim::Math::Vector3d::Zero(), SurgSim::Math::Vector3d::Zero()));
-	sceneElement->addComponent(sphereEmitter);
+	element->addComponent(sphereEmitter);
 
-	// Create the particle graphics object and add it to the element
-	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation =
-				std::make_shared<OsgPointCloudRepresentation>("Graphics object");
-	graphicsRepresentation->setColor(color);
-	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setLocalActive(true);
-	sceneElement->addComponent(graphicsRepresentation);
+	auto graphics = std::make_shared<OsgPointCloudRepresentation>("graphics");
+	graphics->setColor(Vector4d::Ones());
+	graphics->setPointSize(3.0f);
+	element->addComponent(graphics);
 
-	// Create the transfer behavior from particle physics to graphics and add it to the element
 	auto particlesToGraphics =
-		std::make_shared<SurgSim::Blocks::TransferParticlesToPointCloudBehavior>("Particles to Graphics");
-	particlesToGraphics->setSource(particlesRepresentation);
-	particlesToGraphics->setTarget(graphicsRepresentation);
-	sceneElement->addComponent(particlesToGraphics);
+		std::make_shared<SurgSim::Blocks::TransferParticlesToPointCloudBehavior>("particles to graphics");
+	particlesToGraphics->setSource(particles);
+	particlesToGraphics->setTarget(graphics);
+	element->addComponent(particlesToGraphics);
 
-	return sceneElement;
+	return element;
 }
 
-}; // namespace anonymous
+};
 
 TEST_F(RenderTests, SphRenderTest)
 {
-	scene->addSceneElement(createParticleSystem("Particles", Vector4d::Ones()));
+	auto particles = createParticleSystem();
+	scene->addSceneElement(particles);
+
+	auto cube = createCube();
+	cube->setPose(SurgSim::Math::makeRigidTranslation(Vector3d(0.0, -0.2, 0.0)));
+	scene->addSceneElement(cube);
 
 	// Particle manager runs at 500Hz
 	particlesManager->setRate(500.0);
 
-	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 20000.0);
+	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 20000000.0);
 }

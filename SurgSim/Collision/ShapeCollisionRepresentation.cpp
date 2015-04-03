@@ -64,21 +64,21 @@ const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getSha
 
 void ShapeCollisionRepresentation::update(const double& dt)
 {
-	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
-	if (nullptr != meshShape)
-	{
-		SURGSIM_LOG_IF(!meshShape->isValid(), SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
-			"Try to update an invalid MeshShape.";
-		if (!meshShape->setPose(getPose()))
-		{
-			setLocalActive(false);
-			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/ShapeCollisionRepresentation")) <<
-				"CollisionRepresentation '" << getName() << "' " <<
-				(getSceneElement() == nullptr ?
-				"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
-				"went inactive because its shape failed in moving to a pose of:" << std::endl << getPose().matrix();
-		}
-	}
+	//auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
+	//if (nullptr != meshShape)
+	//{
+	//    SURGSIM_LOG_IF(!meshShape->isValid(), SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
+	//        "Try to update an invalid MeshShape.";
+	//    if (!meshShape->setPose(getPose()))
+	//    {
+	//        setLocalActive(false);
+	//        SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/ShapeCollisionRepresentation")) <<
+	//            "CollisionRepresentation '" << getName() << "' " <<
+	//            (getSceneElement() == nullptr ?
+	//            "(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
+	//            "went inactive because its shape failed in moving to a pose of:" << std::endl << getPose().matrix();
+	//    }
+	//}
 }
 
 bool ShapeCollisionRepresentation::doInitialize()

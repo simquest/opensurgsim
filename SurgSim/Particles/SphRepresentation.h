@@ -157,9 +157,9 @@ public:
 
 protected:
 	std::vector<SurgSim::Math::Vector3d> m_normal;  ///< Particles' normal
-	std::vector<double> m_density;                  ///< Particles' density
-	std::vector<double> m_pressure;                 ///< Particles' pressure
-	std::vector<double> m_mass;                     ///< Particles' mass
+	SurgSim::Math::Vector m_density;                  ///< Particles' density
+	SurgSim::Math::Vector m_pressure;                 ///< Particles' pressure
+	SurgSim::Math::Vector m_mass;                     ///< Particles' mass
 	double m_massPerParticle;                       ///< Mass per particle (determine the density of particle per m3)
 	double m_densityReference;                      ///< Density of the reference gas
 	double m_gasStiffness;                          ///< Stiffness of the gas considered

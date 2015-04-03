@@ -79,8 +79,31 @@ TEST(AabbTreeTests, BuildTest)
 					   mesh->getVertex(triangle.verticesId[0]).position,
 					   mesh->getVertex(triangle.verticesId[1]).position,
 					   mesh->getVertex(triangle.verticesId[2]).position));
-		tree->add(aabb, i);
+		tree->add(std::move(aabb), i);
 	}
+	timer.endFrame();
+}
+
+TEST(AabbTreeTests, BatchBuildTest)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	auto tree = std::make_shared<AabbTree>(3);
+
+	auto mesh = std::make_shared<TriangleMeshPlain>();
+	mesh->load("Geometry/arm_collision.ply");
+
+	SurgSim::Framework::Timer timer;
+	std::list<AabbTreeData::Item> items;
+	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
+	{
+		auto triangle = mesh->getTriangle(i);
+		Aabbd aabb(SurgSim::Math::makeAabb(
+					   mesh->getVertex(triangle.verticesId[0]).position,
+					   mesh->getVertex(triangle.verticesId[1]).position,
+					   mesh->getVertex(triangle.verticesId[2]).position));
+		items.emplace_back(std::make_pair(std::move(aabb), i));
+	}
+	tree->set(std::move(items));
 	timer.endFrame();
 }
 

@@ -60,13 +60,17 @@ void updateDataGroup(const Leap::Hand& hand, SurgSim::DataStructures::DataGroup*
 
 	inputData->poses().set("pose", makeRigidTransform(hand.basis(), hand.palmPosition(), hand.isRight()));
 
-	for (const Leap::Finger& finger : hand.fingers())
+	std::string name;
+	const Leap::FingerList fingers = hand.fingers();
+	for (const Leap::Finger& finger : fingers)
 	{
 		for (int boneType = Leap::Bone::TYPE_PROXIMAL; boneType <= Leap::Bone::TYPE_DISTAL; ++boneType)
 		{
 			Leap::Bone bone = finger.bone(static_cast<Leap::Bone::Type>(boneType));
-			inputData->poses().set(fingerNames[finger.type()] + boneNames[boneType],
-					makeRigidTransform(bone.basis(), bone.prevJoint(), hand.isRight()));
+			name = fingerNames[finger.type()] + boneNames[boneType];
+			inputData->poses().set(name, makeRigidTransform(bone.basis(), bone.prevJoint(), hand.isRight()));
+			inputData->scalars().set(name + "Length", bone.length() / 1000.0);
+			inputData->scalars().set(name + "Width", bone.width() / 1000.0);
 		}
 	}
 }
@@ -240,7 +244,8 @@ void LeapScaffold::handleFrame()
 	}
 
 	std::list<Leap::HandList::const_iterator> newHands;
-	Leap::HandList hands = m_state->controller.frame().hands();
+	const Leap::Frame frame = m_state->controller.frame();
+	Leap::HandList hands = frame.hands();
 	for (auto hand = hands.begin(); hand != hands.end(); ++hand)
 	{
 		auto sameHandId = [hand](const std::unique_ptr<DeviceData>& info)
@@ -320,6 +325,40 @@ SurgSim::DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 	builder.addPose("SmallFingerProximal");
 	builder.addPose("SmallFingerIntermediate");
 	builder.addPose("SmallFingerDistal");
+
+	builder.addScalar("ThumbProximalWidth");
+	builder.addScalar("ThumbIntermediateWidth");
+	builder.addScalar("ThumbDistalWidth");
+	builder.addScalar("IndexFingerProximalWidth");
+	builder.addScalar("IndexFingerIntermediateWidth");
+	builder.addScalar("IndexFingerDistalWidth");
+	builder.addScalar("MiddleFingerProximalWidth");
+	builder.addScalar("MiddleFingerIntermediateWidth");
+	builder.addScalar("MiddleFingerDistalWidth");
+	builder.addScalar("RingFingerProximalWidth");
+	builder.addScalar("RingFingerIntermediateWidth");
+	builder.addScalar("RingFingerDistalWidth");
+	builder.addScalar("SmallFingerProximalWidth");
+	builder.addScalar("SmallFingerIntermediateWidth");
+	builder.addScalar("SmallFingerDistalWidth");
+
+	builder.addScalar("ThumbProximalLength");
+	builder.addScalar("ThumbIntermediateLength");
+	builder.addScalar("ThumbDistalLength");
+	builder.addScalar("IndexFingerProximalLength");
+	builder.addScalar("IndexFingerIntermediateLength");
+	builder.addScalar("IndexFingerDistalLength");
+	builder.addScalar("MiddleFingerProximalLength");
+	builder.addScalar("MiddleFingerIntermediateLength");
+	builder.addScalar("MiddleFingerDistalLength");
+	builder.addScalar("RingFingerProximalLength");
+	builder.addScalar("RingFingerIntermediateLength");
+	builder.addScalar("RingFingerDistalLength");
+	builder.addScalar("SmallFingerProximalLength");
+	builder.addScalar("SmallFingerIntermediateLength");
+	builder.addScalar("SmallFingerDistalLength");
+
+
 	return builder.createData();
 }
 

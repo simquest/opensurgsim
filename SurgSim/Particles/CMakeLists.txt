@@ -19,6 +19,7 @@ set(SURGSIM_PARTICLES_SOURCES
 	Particle.cpp
 	ParticleManager.cpp
 	ParticleReference.cpp
+	ParticlesCollisionRepresentation.cpp
 	ParticlesState.cpp
 	ParticleSystemRepresentation.cpp
 	PointGenerator.cpp
@@ -34,6 +35,7 @@ set(SURGSIM_PARTICLES_HEADERS
 	Particle.h
 	ParticleManager.h
 	ParticleReference.h
+	ParticlesCollisionRepresentation.h
 	ParticlesState.h
 	ParticleSystemRepresentation.h
 	PointGenerator.h
@@ -48,6 +50,8 @@ surgsim_add_library(
 	"${SURGSIM_PARTICLES_SOURCES}"
 	"${SURGSIM_PARTICLES_HEADERS}"
 )
+
+surgsim_create_library_header(Particles.h "${SURGSIM_PARTICLES_HEADERS}")
 
 SET(LIBS SurgSimMath)
 target_link_libraries(SurgSimParticles ${LIBS})

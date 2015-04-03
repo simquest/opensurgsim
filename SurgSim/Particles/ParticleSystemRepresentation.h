@@ -28,6 +28,11 @@
 namespace SurgSim
 {
 
+namespace Collision
+{
+class Representation;
+};
+
 namespace Framework
 {
 class Logger;
@@ -89,6 +94,10 @@ public:
 	/// \param dt The time step.
 	void update(double dt);
 
+	std::shared_ptr<SurgSim::Collision::Representation> getCollisionRepresentation() const;
+
+	virtual void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
+
 protected:
 	/// Maximum amount of particles allowed in this particle system.
 	size_t m_maxParticles;
@@ -116,6 +125,8 @@ protected:
 	virtual bool doUpdate(double dt) = 0;
 
 	bool doInitialize() override;
+
+	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 };
 
 };  // namespace Particles

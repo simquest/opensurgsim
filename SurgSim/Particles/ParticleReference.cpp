@@ -36,6 +36,7 @@ void ParticleReference::operator=(const Particle& other)
 	setPosition(other.getPosition());
 	setVelocity(other.getVelocity());
 	setLifetime(other.getLifetime());
+	setAcceleration(SurgSim::Math::Vector3d::Zero());
 }
 
 bool ParticleReference::operator==(const ParticleReference& other) const

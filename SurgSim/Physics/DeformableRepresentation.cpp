@@ -239,7 +239,7 @@ void DeformableRepresentation::setCollisionRepresentation(
 
 		Representation::setCollisionRepresentation(representation);
 
-		// If its a RigidCollisionRepresentation connect with this representation
+		// If its a DeformableCollisionRepresentation connect with this representation
 		auto newCollisionRep = std::dynamic_pointer_cast<DeformableCollisionRepresentation>(representation);
 		if (newCollisionRep != nullptr)
 		{

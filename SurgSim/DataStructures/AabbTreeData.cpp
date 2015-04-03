@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/AabbTreeData.h"
+#include "SurgSim/Framework/Assert.h"
 
 #include <algorithm>
 
@@ -25,6 +26,18 @@ namespace DataStructures
 AabbTreeData::AabbTreeData()
 {
 
+}
+
+AabbTreeData::AabbTreeData(const std::list<Item>& data)
+{
+	m_data = data;
+	recalculateAabb();
+}
+
+AabbTreeData::AabbTreeData(std::list<Item>&& data)
+{
+	std::swap(m_data, data);
+	recalculateAabb();
 }
 
 AabbTreeData::~AabbTreeData()
@@ -89,14 +102,23 @@ std::shared_ptr<AabbTreeData> AabbTreeData::takeLargerElements()
 	int axis;
 	m_aabb.sizes().maxCoeff(&axis);
 	double centerValue = m_aabb.center()(axis);
+	// HS-2015-03-20
+	// The new left and right aabb extents can probably be calculated here
+	// Only the separating axis extents would change the other two axis are unaffected
+	// #performance
 	auto functor = [centerValue, axis](const Item & item)
 	{
 		return item.first.center()(axis) < centerValue;
 	};
 	auto split = std::partition(m_data.begin(), m_data.end(), functor);
-	result->m_data.splice(result->m_data.end(), m_data, split, m_data.end());
-	recalculateAabb();
-	result->recalculateAabb();
+
+	// In some cases all pieces may end up on one or the other side of the split, make this a noop
+	if (split != m_data.begin() && split != m_data.end())
+	{
+		result->m_data.splice(result->m_data.end(), m_data, split, m_data.end());
+		recalculateAabb();
+		result->recalculateAabb();
+	}
 
 	return std::move(result);
 }

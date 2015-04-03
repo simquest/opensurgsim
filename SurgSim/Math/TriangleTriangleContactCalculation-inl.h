@@ -179,10 +179,10 @@ private:
 	{
 		const Vertices& originalVertices = m_clippedVerticesBuffer[(m_receiverBufferIndex + 1) % 2];
 
-		SURGSIM_ASSERT(originalVertices.size() > 0)
-				<< "There are no vertices under the plane. This scenario should not arise according to the"
-				<< " Triangle-Triangle Contact Calculation algorithm, because of the circumstances under which"
-				<< " this function is set to be called.";
+		//SURGSIM_ASSERT(originalVertices.size() > 0)
+		//       << "There are no vertices under the plane. This scenario should not arise according to the"
+		//       << " Triangle-Triangle Contact Calculation algorithm, because of the circumstances under which"
+		//       << " this function is set to be called.";
 
 		T signedDistanceFromPlane;
 		*depth = T(0);
