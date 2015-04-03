@@ -21,8 +21,8 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/MassSpringLocalization.h"
+#include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Math::Vector;

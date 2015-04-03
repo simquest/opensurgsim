@@ -24,8 +24,8 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
-#include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem1DLocalization.h"
+#include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim

@@ -20,9 +20,9 @@
 
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/Fem2DLocalization.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
+#include "SurgSim/Physics/Fem2DLocalization.h"
+#include "SurgSim/Physics/Fem2DRepresentation.h"
 
 using SurgSim::DataStructures::IndexedLocalCoordinate;
 

@@ -14,8 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidBilateral3D.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
 using SurgSim::Math::Vector3d;
 

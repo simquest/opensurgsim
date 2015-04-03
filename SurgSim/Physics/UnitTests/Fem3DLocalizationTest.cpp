@@ -20,10 +20,10 @@
 
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
+#include "SurgSim/Physics/Fem3DLocalization.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
 
 using SurgSim::DataStructures::IndexedLocalCoordinate;
 using SurgSim::Math::getSubVector;

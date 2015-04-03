@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedBilateral3D.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/Localization.h"
 
 using SurgSim::Math::Vector3d;

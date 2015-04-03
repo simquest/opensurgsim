@@ -15,15 +15,15 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
-#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DBilateral3D.h"
 #include "SurgSim/Physics/Fem3DContact.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FixedBilateral3D.h"
 #include "SurgSim/Physics/FixedContact.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidBilateral3D.h"
 #include "SurgSim/Physics/RigidContact.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
 namespace SurgSim
 {

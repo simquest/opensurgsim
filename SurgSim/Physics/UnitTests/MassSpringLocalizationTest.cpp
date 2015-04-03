@@ -20,8 +20,8 @@
 
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/MassSpringLocalization.h"
+#include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 

@@ -20,10 +20,10 @@
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
-#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DContact.h"
-#include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
+#include "SurgSim/Physics/Fem3DLocalization.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 

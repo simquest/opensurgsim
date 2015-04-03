@@ -14,8 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/ContactConstraintData.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedContact.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
 

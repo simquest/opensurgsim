@@ -20,8 +20,8 @@
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidContact.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"

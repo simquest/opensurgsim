@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DBilateral3D.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/Localization.h"
 

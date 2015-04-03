@@ -19,8 +19,8 @@
 
 #include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedContact.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 namespace SurgSim

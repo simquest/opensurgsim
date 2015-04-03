@@ -18,9 +18,9 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/LinearSolveAndInverse.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/Fem1DLocalization.h"
 #include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
-#include "SurgSim/Physics/Fem1DLocalization.h"
 #include "SurgSim/Physics/FemElement.h"
 
 namespace

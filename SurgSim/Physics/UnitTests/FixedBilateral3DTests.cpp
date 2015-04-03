@@ -20,8 +20,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/FixedBilateral3D.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
 using SurgSim::Math::Vector3d;

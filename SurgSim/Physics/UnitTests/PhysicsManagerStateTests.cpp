@@ -30,8 +30,8 @@
 #include "SurgSim/Physics/MlcpMapping.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidContact.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
 using SurgSim::Physics::Constraint;
 using SurgSim::Physics::ContactConstraintData;

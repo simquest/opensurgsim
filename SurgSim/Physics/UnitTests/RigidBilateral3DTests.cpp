@@ -24,8 +24,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidBilateral3D.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 

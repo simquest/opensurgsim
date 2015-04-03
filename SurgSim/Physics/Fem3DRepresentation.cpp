@@ -22,9 +22,9 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/FemElement.h"
 
 using SurgSim::Framework::Logger;

@@ -17,9 +17,9 @@
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Physics/Fem2DLocalization.h"
 #include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/Fem2DLocalization.h"
 #include "SurgSim/Physics/FemElement.h"
 
 namespace

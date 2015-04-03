@@ -17,8 +17,8 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/MassSpringLocalization.h"
+#include "SurgSim/Physics/MassSpringRepresentation.h"
 
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
