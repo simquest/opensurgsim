@@ -443,7 +443,7 @@ int main(int argc, char* argv[])
 	po::options_description visible("Allowed options");
 	visible.add_options()("help", "Produce help message")
 	("fullscreen",  "Run fullscreen")
-	("targetscreen", po::value<int>(&targetScreen)->default_value(1), "place window at specific screen");
+	("targetscreen", po::value<int>(&targetScreen)->default_value(0), "place window at specific screen");
 
 	po::options_description all("All options");
 	all.add(visible);
