@@ -17,7 +17,7 @@ mark_as_advanced(OCULUSSDK_DIR)
 
 find_path(OCULUSSDK_INCLUDE_DIR OVR.h
     HINTS
-        ENV OCULUSSDK_DIR
+        "$ENV{OCULUSSDK_DIR}/LibOVR"
         ${OCULUSSDK_DIR}
     PATH_SUFFIXES Include
     PATHS /usr/local/LibOVR
