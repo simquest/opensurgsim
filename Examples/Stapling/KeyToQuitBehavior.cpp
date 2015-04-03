@@ -21,7 +21,7 @@
 
 KeyToQuitBehavior::KeyToQuitBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
-	m_quitKey('q')
+	m_quitKey(SurgSim::Device::KEY_Q)
 {
 
 }
@@ -39,7 +39,7 @@ void KeyToQuitBehavior::update(double dt)
 	int key;
 	if (dataGroup.integers().get("key", &key))
 	{
-		if (m_quitKey == key && m_callback != nullptr)
+		if ((m_quitKey == key || SurgSim::Device::KEY_ESCAPE == key)  && m_callback != nullptr)
 		{
 			m_callback(0);
 		}
@@ -75,9 +75,9 @@ char KeyToQuitBehavior::getQuitKey() const
 	return m_quitKey;
 }
 
-void KeyToQuitBehavior::setQuitKey(const char& val)
+void KeyToQuitBehavior::setQuitKey(int val)
 {
-	m_quitKey = val;
+	m_quitKey = static_cast<SurgSim::Device::KeyCode>(val);
 }
 
 void KeyToQuitBehavior::setCallback(CallbackType callback)

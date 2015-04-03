@@ -18,6 +18,8 @@
 
 #include <SurgSim/Framework/Behavior.h>
 
+#include <SurgSim/Devices/Keyboard/KeyCode.h>
+
 #include <functional>
 
 namespace SurgSim
@@ -61,13 +63,13 @@ public:
 
 	char getQuitKey() const;
 
-	void setQuitKey(const char& val);
+	void setQuitKey(int val);
 
 	void setCallback(CallbackType callback);
 
 private:
 
-	char m_quitKey;
+	SurgSim::Device::KeyCode m_quitKey;
 
 	/// Input component from which pressed keys come.
 	std::shared_ptr<SurgSim::Input::InputComponent> m_inputComponent;
