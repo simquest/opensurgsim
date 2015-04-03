@@ -135,7 +135,7 @@ void Fem3DRepresentationConstraint2Fem3DPoints::doBuild(double dt,
 		size_t nodeIndex = femElement1->getNodeId(index);
 		for (size_t axis = 0; axis < 3; axis++)
 		{
-			m_newH.insert(3 * nodeIndex + axis) = -dt * 2.0 * coord1.coordinate[axis] * P1P0[axis];
+			m_newH.coeffRef(3 * nodeIndex + axis) -= dt * 2.0 * coord1.coordinate[axis] * P1P0[axis];
 		}
 	}
 
