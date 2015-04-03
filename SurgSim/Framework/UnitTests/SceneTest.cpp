@@ -69,6 +69,21 @@ TEST(SceneTest, AddAndTestScene)
 	EXPECT_EQ(scene, element->getScene());
 }
 
+TEST(SceneTest, Removal)
+{
+	auto runtime(std::make_shared<Runtime>());
+	std::shared_ptr<Scene> scene = runtime->getScene();
+
+	scene->addSceneElement(std::make_shared<MockSceneElement>("element1"));
+	scene->addSceneElement(std::make_shared<MockSceneElement>("element2"));
+	scene->addSceneElement(std::make_shared<MockSceneElement>("element3"));
+
+	EXPECT_EQ(3L, scene->getSceneElements().size());
+	EXPECT_NO_THROW(scene->removeSceneElement(scene->getSceneElement("element1")));
+	EXPECT_EQ(2L, scene->getSceneElements().size());
+
+}
+
 TEST(SceneTest, CheckForExpiredRuntime)
 {
 	auto runtime = std::make_shared<Runtime>();
