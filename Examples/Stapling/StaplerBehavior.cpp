@@ -196,6 +196,15 @@ void StaplerBehavior::filterCollisionMapForSupportedRepresentationTypes(ContactM
 
 void StaplerBehavior::createStaple()
 {
+	// Keep a maximum of 10 staples at all times
+	if (m_staples.size() >= 10)
+	{
+		std::cout << "You reached the limit of staples, please press 'Z' to reset/reload" << std::endl;
+		//getScene()->removeSceneElement(m_staples.front());
+		//m_staples.pop_front();
+		return;
+	}
+
 	// Create the staple (not added to the scene right now).
 	auto staple = std::make_shared<StapleElement>("staple_" + boost::to_string(m_numElements++));
 	staple->setPose(m_representation->getPose());
@@ -260,14 +269,7 @@ void StaplerBehavior::createStaple()
 		// The staple is created with no collision representation, because it is going to be constrained.
 		if (!stapleAdded)
 		{
-			// Keep a maximum of 10 staples at all times
-			if (m_staples.size() >= 10)
-			{
-				std::cout << "########## Removing a staple from the scene" << std::endl;
-				getScene()->removeSceneElement(m_staples.front());
-				m_staples.pop_front();
-				std::cout << "Staple removed ##########" << std::endl;
-			}
+			
 
 			staple->setHasCollisionRepresentation(false);
 			getScene()->addSceneElement(staple);
@@ -276,7 +278,7 @@ void StaplerBehavior::createStaple()
 			staple->getComponents<SurgSim::Physics::Representation>()[0]->setIsGravityEnabled(false);
 			stapleAdded = true;
 			m_staples.push_back(staple);
-			std::cout << "We have " << m_staples.size() << " staples (1 properly deployed staple was just created)" << std::endl;
+			//std::cout << "We have " << m_staples.size() << " staples (1 properly deployed staple was just created)" << std::endl;
 		}
 
 		// Find the corresponding Phsyics::Representation for the target Collision::Representation.
@@ -383,21 +385,21 @@ void StaplerBehavior::createStaple()
 
 	if (!stapleAdded)
 	{
-		// Keep a maximum of 10 staples at all times
-		if (m_staples.size() >= 10)
-		{
-			std::cout << "########## Removing a staple from the scene" << std::endl;
-			getScene()->removeSceneElement(m_staples.front());
-			m_staples.pop_front();
-			std::cout << "Staple removed ##########" << std::endl;
-		}
+		//// Keep a maximum of 10 staples at all times
+		//if (m_staples.size() >= 10)
+		//{
+		//	std::cout << "You reached the maximum number of staples, press 'Z' to reset/reload" << std::endl;
+		//	//getScene()->removeSceneElement(m_staples.front());
+		//	//m_staples.pop_front();
+		//	//std::cout << "Staple removed ##########" << std::endl;
+		//}
 
 		// Create the staple element.
 		staple->setHasCollisionRepresentation(true);
 		getScene()->addSceneElement(staple);
 		m_staples.push_back(staple);
 
-		std::cout << "We have " << m_staples.size() << " staples (1 free staple was just created)" << std::endl;
+		//std::cout << "We have " << m_staples.size() << " staples (1 free staple was just created)" << std::endl;
 	}
 }
 
@@ -440,24 +442,24 @@ void StaplerBehavior::update(double dt)
 		}
 	}
 
-	// Remove all staples that have gone inactive
-	for (auto it = m_staples.begin(); it != m_staples.end(); )
-	{
-		//std::weak_ptr<RigidRepresentation> physics = std::static_pointer_cast<RigidRepresentation>((*it)->getComponent("Physics"));
-		//if (!(physics.lock()->isActive()))
-		if (!(*it)->isActive())
-		{
-			std::cout << "########## Removing an inactive staple from the scene" << std::endl;
-			getScene()->removeSceneElement(*it);
-			it = m_staples.erase(it);
-			std::cout << "Staple removed ##########" << std::endl;
-			std::cout << "We have " << m_staples.size() << " staples" << std::endl;
-		}
-		else
-		{
-			it++;
-		}
-	}
+	//// Remove all staples that have gone inactive
+	//for (auto it = m_staples.begin(); it != m_staples.end(); )
+	//{
+	//	//std::weak_ptr<RigidRepresentation> physics = std::static_pointer_cast<RigidRepresentation>((*it)->getComponent("Physics"));
+	//	//if (!(physics.lock()->isActive()))
+	//	if (!(*it)->isActive())
+	//	{
+	//		std::cout << "########## Removing an inactive staple from the scene" << std::endl;
+	//		getScene()->removeSceneElement(*it);
+	//		it = m_staples.erase(it);
+	//		std::cout << "Staple removed ##########" << std::endl;
+	//		std::cout << "We have " << m_staples.size() << " staples" << std::endl;
+	//	}
+	//	else
+	//	{
+	//		it++;
+	//	}
+	//}
 
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_from->getData(&dataGroup);
