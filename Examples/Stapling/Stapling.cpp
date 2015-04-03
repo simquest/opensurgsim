@@ -15,10 +15,15 @@
 
 #include <memory>
 #include <string>
+#include <atomic>
+
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
 
 #include "Examples/Stapling/DeviceFactory.h"
 #include "Examples/Stapling/StaplerBehavior.h"
 #include "Examples/Stapling/StaplingPhysicsManager.h"
+#include "Examples/Stapling/KeyToQuitBehavior.h"
 #include "SurgSim/Blocks/Blocks.h"
 #include "SurgSim/Collision/Collision.h"
 #include "SurgSim/DataStructures/DataStructures.h"
@@ -70,6 +75,27 @@ using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
+
+namespace
+{
+std::atomic<bool> keepRunning = true;
+
+void stopRunning(int)
+{
+	keepRunning = false;
+}
+
+void run(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
+{
+	runtime->start();
+	while (keepRunning)
+	{
+		boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+	}
+	runtime->stop();
+}
+
+}
 
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
@@ -337,7 +363,7 @@ std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::Sc
 	return result;
 }
 
-std::shared_ptr<OsgViewElement> createViewElement()
+std::shared_ptr<OsgViewElement> createViewElement(bool fullscreen, int screenNumber)
 {
 	auto result = std::make_shared<OsgViewElement>("View");
 	result->enableManipulator(true);
@@ -345,6 +371,9 @@ std::shared_ptr<OsgViewElement> createViewElement()
 	result->enableKeyboardDevice(true);
 	result->setPose(
 		SurgSim::Math::makeRigidTransform(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
+
+	result->getView()->setFullScreen(fullscreen);
+	result->getView()->setTargetScreen(screenNumber);
 
 	result->getCamera()->setAmbientColor(Vector4d(0.2, 0.2, 0.2, 1.0));
 	result->setPose(makeRigidTransform(Vector3d(0.0, 0.5, 0.5), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
@@ -367,10 +396,10 @@ std::shared_ptr<OsgViewElement> createViewElement()
 
 
 	return result;
-	}
+}
 
 std::shared_ptr<SurgSim::Framework::SceneElement> createLightElement()
-	{
+{
 	auto result = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
 
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
@@ -406,6 +435,42 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createLightElement()
 
 int main(int argc, char* argv[])
 {
+
+	// Do command line options
+	int targetScreen = 1;
+	bool fullscreen = false;
+
+	po::options_description visible("Allowed options");
+	visible.add_options()("help", "Produce help message")
+	("fullscreen",  "Run fullscreen")
+	("targetscreen", po::value<int>(&targetScreen)->default_value(1), "place window at specific screen");
+
+	po::options_description all("All options");
+	all.add(visible);
+
+	try
+	{
+		po::variables_map variables;
+		po::store(po::command_line_parser(argc, argv).options(all).run(), variables);
+
+		if (variables.count("help"))
+		{
+			std::cout << visible << "\n";
+			return 1;
+		}
+
+		po::notify(variables); // throws on error, so do after help in case
+
+		fullscreen = (variables.count("fullscreen") != 0);
+	}
+	catch (po::error& e)
+	{
+
+		std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
+		std::cerr << visible << std::endl;
+		return 1;
+	}
+
 	const std::string deviceName = "MultiAxisDevice";
 	SurgSim::Framework::Logger::getLogger("Physics/VirtualToolCoupler")->setThreshold(
 		SurgSim::Framework::LOG_LEVEL_INFO);
@@ -428,7 +493,7 @@ int main(int argc, char* argv[])
 	SURGSIM_ASSERT(device != nullptr) << "Unable to get a device, is one connected?";
 	inputManager->addDevice(device);
 
-	std::shared_ptr<OsgViewElement> view = createViewElement();
+	std::shared_ptr<OsgViewElement> view = createViewElement(fullscreen, targetScreen);
 	inputManager->addDevice(view->getKeyboardDevice());
 
 	// Shader should be shared between all materials using the same shader
@@ -465,6 +530,9 @@ int main(int argc, char* argv[])
 		std::make_shared<KeyboardTogglesComponentBehavior>("KeyboardBehavior");
 	keyboardBehavior->setInputComponent(keyboardComponent);
 
+
+	// This should be changed to do lookup by name rather than use direct references, it will become easier to
+	// setup
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Handle"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Stapler"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, stapler->getComponent("Footplate"));
@@ -478,9 +546,18 @@ int main(int argc, char* argv[])
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_H, stapler->getComponent("Tooth Graphics0"));
 	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_H, stapler->getComponent("Tooth Graphics1"));
 
-	std::shared_ptr<SceneElement> keyboard = std::make_shared<BasicSceneElement>("SceneElement");
+	auto quitter = std::make_shared<KeyToQuitBehavior>("Quitter");
+	quitter->setCallback(stopRunning);
+	quitter->setInputComponent(keyboardComponent);
+
+	auto keyboard = std::make_shared<BasicSceneElement>("Keyboard");
 	keyboard->addComponent(keyboardComponent);
 	keyboard->addComponent(keyboardBehavior);
+	keyboard->addComponent(quitter);
+
+
+
+
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(view);
@@ -515,6 +592,7 @@ int main(int argc, char* argv[])
 		getComponentChecked<SurgSim::Collision::Representation>(wound, "Collision"),
 		getComponentChecked<SurgSim::Collision::Representation>(arm, "Collision"));
 
-	runtime->execute();
+	run(runtime);
+
 	return 0;
 }

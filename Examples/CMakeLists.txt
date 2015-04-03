@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Not Required components
+find_package(Boost 1.54 COMPONENTS program_options)
+
 if(BUILD_DEVICE_MULTIAXIS)
 	add_subdirectory(AddSphereFromInput)
 	add_subdirectory(Stapling)
@@ -25,9 +28,6 @@ endif(BUILD_DEVICE_MULTIAXIS OR BUILD_DEVICE_NOVINT)
 add_subdirectory(DroppingBalls)
 
 add_subdirectory(GraphicsScene)
-
-# Not Required components
-find_package(Boost 1.54 COMPONENTS program_options)
 
 if(Boost_PROGRAM_OPTIONS_FOUND)
 add_subdirectory(ShowScenery)
