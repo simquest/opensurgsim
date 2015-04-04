@@ -550,14 +550,20 @@ int main(int argc, char* argv[])
 	quitter->setCallback(stopRunning);
 	quitter->setInputComponent(keyboardComponent);
 
+	auto text = std::make_shared<SurgSim::Graphics::OsgTextRepresentation>("Warning");
+	text->setText("The stapler is out of staples, please press 'Z' to reload");
+	text->setLocation(50, 50);
+	text->setMaximumWidth(1024);
+	text->setLocalActive(false);
+
 	auto keyboard = std::make_shared<BasicSceneElement>("Keyboard");
 	keyboard->addComponent(keyboardComponent);
 	keyboard->addComponent(keyboardBehavior);
 	keyboard->addComponent(quitter);
+	keyboard->addComponent(text);
 
-
-
-
+	auto behavior = std::dynamic_pointer_cast<StaplerBehavior>(stapler->getComponent("Behavior"));
+	behavior->setWarningText(text);
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(view);

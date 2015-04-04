@@ -29,6 +29,7 @@
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/SceneryRepresentation.h"
 #include "SurgSim/Graphics/Model.h"
+#include "SurgSim/Graphics/TextRepresentation.h"
 #include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Physics/Constraint.h"
@@ -199,9 +200,8 @@ void StaplerBehavior::createStaple()
 	// Keep a maximum of 10 staples at all times
 	if (m_staples.size() >= 10)
 	{
+		m_text->setLocalActive(true);
 		std::cout << "You reached the limit of staples, please press 'Z' to reset/reload" << std::endl;
-		//getScene()->removeSceneElement(m_staples.front());
-		//m_staples.pop_front();
 		return;
 	}
 
@@ -269,7 +269,7 @@ void StaplerBehavior::createStaple()
 		// The staple is created with no collision representation, because it is going to be constrained.
 		if (!stapleAdded)
 		{
-			
+
 
 			staple->setHasCollisionRepresentation(false);
 			getScene()->addSceneElement(staple);
@@ -310,21 +310,23 @@ void StaplerBehavior::createStaple()
 	{
 		auto data = std::make_shared<SurgSim::Physics::ConstraintDataFem3DDistancePoints>();
 
-		data->setPoint(0, std::static_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(reps[0]->createLocalization(locations[0])));
-		data->setPoint(1, std::static_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(reps[1]->createLocalization(locations[1])));
+		data->setPoint(0, std::static_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>
+					   (reps[0]->createLocalization(locations[0])));
+		data->setPoint(1, std::static_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>
+					   (reps[1]->createLocalization(locations[1])));
 		auto P0 = data->getPoint(0)->calculatePosition();
 		auto P1 = data->getPoint(1)->calculatePosition();
-		data->setDistance((P1-P0).norm());
+		data->setDistance((P1 - P0).norm());
 
 		auto constraint = std::make_shared<SurgSim::Physics::Constraint>(
-			SurgSim::Math::MLCP_BILATERAL_1D_CONSTRAINT, data,
-			reps[0], locations[0],
-			reps[1], locations[1]);
+							  SurgSim::Math::MLCP_BILATERAL_1D_CONSTRAINT, data,
+							  reps[0], locations[0],
+							  reps[1], locations[1]);
 
 		// Create a component to store this constraint.
 		std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
 			std::make_shared<SurgSim::Physics::ConstraintComponent>(
-			"DistanceConstraint" + boost::to_string(toothId));
+				"DistanceConstraint" + boost::to_string(toothId));
 
 		constraintComponent->setConstraint(constraint);
 		staple->addComponent(constraintComponent);
@@ -336,14 +338,14 @@ void StaplerBehavior::createStaple()
 		// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
 		{
 			auto constraint = std::make_shared<SurgSim::Physics::Constraint>(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT,
-				std::make_shared<SurgSim::Physics::ConstraintData>(),
-				stapleRep, stapleLocations[0],
-				reps[0], locations[0]);
+							  std::make_shared<SurgSim::Physics::ConstraintData>(),
+							  stapleRep, stapleLocations[0],
+							  reps[0], locations[0]);
 
 			// Create a component to store this constraint.
 			std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
 				std::make_shared<SurgSim::Physics::ConstraintComponent>(
-				"Bilateral3DConstraint" + boost::to_string(0));
+					"Bilateral3DConstraint" + boost::to_string(0));
 
 			constraintComponent->setConstraint(constraint);
 			staple->addComponent(constraintComponent);
@@ -363,20 +365,22 @@ void StaplerBehavior::createStaple()
 			if (fem3d != nullptr && locations[0].meshLocalCoordinate.hasValue())
 			{
 				// We create a temporary localization to translate the triangleId to an elementId, this feature is not directly accessible
-				auto localization = std::static_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(fem3d->createLocalization(locations[0]));
+				auto localization = std::static_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>
+									(fem3d->createLocalization(locations[0]));
 				auto element = fem3d->getFemElement(localization->getLocalPosition().index);
 				constraintData->setInitialOrientation(element->getOrientation(*fem3d->getCurrentState()));
 			}
 
-			auto constraintRotationVector = std::make_shared<SurgSim::Physics::Constraint>(SurgSim::Math::MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT,
-				constraintData,
-				stapleRep, stapleLocations[0],
-				reps[0], locations[0]);
+			auto constraintRotationVector = std::make_shared<SurgSim::Physics::Constraint>
+											(SurgSim::Math::MLCP_BILATERAL_3D_ROTATION_VECTOR_CONSTRAINT,
+											 constraintData,
+											 stapleRep, stapleLocations[0],
+											 reps[0], locations[0]);
 
 			// Create a component to store this constraint.
 			std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintRotationVectorComponent =
 				std::make_shared<SurgSim::Physics::ConstraintComponent>(
-				"RotationVectorConstraint" + boost::to_string(toothId));
+					"RotationVectorConstraint" + boost::to_string(toothId));
 
 			constraintRotationVectorComponent->setConstraint(constraintRotationVector);
 			staple->addComponent(constraintRotationVectorComponent);
@@ -385,21 +389,10 @@ void StaplerBehavior::createStaple()
 
 	if (!stapleAdded)
 	{
-		//// Keep a maximum of 10 staples at all times
-		//if (m_staples.size() >= 10)
-		//{
-		//	std::cout << "You reached the maximum number of staples, press 'Z' to reset/reload" << std::endl;
-		//	//getScene()->removeSceneElement(m_staples.front());
-		//	//m_staples.pop_front();
-		//	//std::cout << "Staple removed ##########" << std::endl;
-		//}
-
 		// Create the staple element.
 		staple->setHasCollisionRepresentation(true);
 		getScene()->addSceneElement(staple);
 		m_staples.push_back(staple);
-
-		//std::cout << "We have " << m_staples.size() << " staples (1 free staple was just created)" << std::endl;
 	}
 }
 
@@ -408,7 +401,7 @@ void StaplerBehavior::setInputComponentKeyboard(std::shared_ptr<SurgSim::Framewo
 	SURGSIM_ASSERT(nullptr != inputComponentKeyboard) << "'inputComponent' cannot be 'nullptr'";
 
 	m_inputComponentKeyboard = checkAndConvert<SurgSim::Input::InputComponent>(
-		inputComponentKeyboard, "SurgSim::Input::InputComponent");
+								   inputComponentKeyboard, "SurgSim::Input::InputComponent");
 }
 
 std::shared_ptr<SurgSim::Input::InputComponent> StaplerBehavior::getInputComponentKeyboard() const
@@ -437,29 +430,11 @@ void StaplerBehavior::update(double dt)
 					getScene()->removeSceneElement(*it);
 				}
 				m_staples.clear();
+				m_text->setLocalActive(false);
 			}
 			m_keyPressedLastUpdate = (SurgSim::Device::KeyCode::NONE != key);
 		}
 	}
-
-	//// Remove all staples that have gone inactive
-	//for (auto it = m_staples.begin(); it != m_staples.end(); )
-	//{
-	//	//std::weak_ptr<RigidRepresentation> physics = std::static_pointer_cast<RigidRepresentation>((*it)->getComponent("Physics"));
-	//	//if (!(physics.lock()->isActive()))
-	//	if (!(*it)->isActive())
-	//	{
-	//		std::cout << "########## Removing an inactive staple from the scene" << std::endl;
-	//		getScene()->removeSceneElement(*it);
-	//		it = m_staples.erase(it);
-	//		std::cout << "Staple removed ##########" << std::endl;
-	//		std::cout << "We have " << m_staples.size() << " staples" << std::endl;
-	//	}
-	//	else
-	//	{
-	//		it++;
-	//	}
-	//}
 
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_from->getData(&dataGroup);
@@ -500,4 +475,10 @@ bool StaplerBehavior::doInitialize()
 bool StaplerBehavior::doWakeUp()
 {
 	return true;
+}
+
+void StaplerBehavior::setWarningText(std::shared_ptr<SurgSim::Framework::Representation> text)
+{
+	m_text = checkAndConvert<SurgSim::Graphics::TextRepresentation>(text, "SurgSim::Graphics::TextRepresentation");
+	m_text->setLocalActive(false);
 }

@@ -43,6 +43,7 @@ class Representation;
 namespace Graphics
 {
 class SceneryRepresentation;
+class TextRepresentation;
 }
 
 namespace Input
@@ -94,6 +95,10 @@ public:
 	/// \param	staplerRepresentation The representation of a stapler
 	void setRepresentation(std::shared_ptr<SurgSim::Framework::Component> staplerRepresentation);
 
+	/// Set the display text
+	/// \param the text component to be used to warn the user
+	void setWarningText(std::shared_ptr<SurgSim::Framework::Representation> text);
+
 	/// \return The representation of a stapler
 	std::shared_ptr<SurgSim::Framework::Representation> getRepresentation();
 
@@ -138,7 +143,7 @@ private:
 	/// Given a collision map, remove entries whose representations are not part of
 	/// enabled scene element lists.
 	/// \param [in,out] collisionsMap The collision map to be filtered.
-	void filterCollisionMapForStapleEnabledRepresentations(SurgSim::Collision::ContactMapType *collisionsMap);
+	void filterCollisionMapForStapleEnabledRepresentations(SurgSim::Collision::ContactMapType* collisionsMap);
 
 	/// Given a Collision::Representation, get the corresponding Physics::Representation.
 	/// \param collisionRepresentation shared_ptr to the collision representation.
@@ -190,6 +195,8 @@ private:
 
 	/// The key registered to clear all staples
 	int m_keyToClearAllStaples;
+
+	std::shared_ptr<SurgSim::Graphics::TextRepresentation> m_text;
 };
 
 #endif  // EXAMPLES_STAPLING_STAPLERBEHAVIOR_H
