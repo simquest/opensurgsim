@@ -66,6 +66,16 @@ public:
 	/// \return A SceneElement with given name; Empty share_ptr<> will be returned if no such SceneElement found.
 	const std::shared_ptr<SceneElement> getSceneElement(const std::string& name) const;
 
+	/// Look through the scene to find a component of a named element
+	/// \param elementName The name of the element to find
+	/// \param componentName The name of the component to find
+	/// \param out component Address of a shared pointer, if the component is found, this is used for the result
+	/// \return true if the component was found and was assigned to the component parameter
+	bool tryFindComponent(
+		const std::string& elementName,
+		const std::string& componentName,
+		std::shared_ptr<Component>* component) const;
+
 	/// Gets the runtime.
 	/// \return runtime The runtime for this scene.
 	std::shared_ptr<Runtime> getRuntime();

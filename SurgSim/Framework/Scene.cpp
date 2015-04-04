@@ -156,6 +156,36 @@ std::shared_ptr<Scene::GroupsType> Scene::getGroups()
 	return m_groups;
 }
 
+bool Scene::tryFindComponent(const std::string& elementName,
+							 const std::string& componentName,
+							 std::shared_ptr<Component>* component) const
+{
+	SURGSIM_ASSERT(component != nullptr);
+
+	bool result = false;
+	auto element = getSceneElement(elementName);
+	if (element != nullptr)
+	{
+		auto found  = element->getComponent(componentName);
+		if (found != nullptr)
+		{
+			(*component) = found;
+			result = true;
+		}
+		else
+		{
+			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/Scene"))
+					<< "Could not find component '" << componentName << "' in Element '" << elementName << "'.";
+		}
+	}
+	else
+	{
+		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/Scene"))
+				<< "Could not find element '" << elementName << "'.";
+	}
+	return result;
+}
+
 }; // namespace Framework
 }; // namespace SurgSim
 
