@@ -149,7 +149,7 @@ void AabbTreeNode::setData(std::list<AabbTreeData::Item>&& items, size_t maxNode
 	SURGSIM_ASSERT(getNumChildren() == 0) << "Can't call setData on a node that already has nodes";
 	SURGSIM_ASSERT(getData() == nullptr) << "Can't call setData on a node that already has data.";
 
-	auto data = std::make_shared<AabbTreeData>(items);
+	auto data = std::make_shared<AabbTreeData>(std::move(items));
 	setData(data);
 	splitNode(maxNodeData);
 }

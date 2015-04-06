@@ -54,6 +54,13 @@ void AabbTree::set(const std::list<AabbTreeData::Item>& items)
 	m_typedRoot->setData(items, m_maxObjectsPerNode);
 }
 
+void AabbTree::set(std::list<AabbTreeData::Item>&& items)
+{
+	m_typedRoot = std::make_shared<AabbTreeNode>();
+	setRoot(m_typedRoot);
+	m_typedRoot->setData(std::move(items), m_maxObjectsPerNode);
+}
+
 size_t AabbTree::getMaxObjectsPerNode() const
 {
 	return m_maxObjectsPerNode;

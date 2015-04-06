@@ -60,6 +60,10 @@ public:
 	/// \param items list of items to insert into the tree
 	void set(const std::list<AabbTreeData::Item>& items);
 
+	/// Create the tree from a list of tree items, all the tree information will be deleted
+	/// \param items rvalue reference to list of items to insert into the tree
+	void set(std::list<AabbTreeData::Item>&& items);
+
 	/// \return the AABB for the tree
 	const SurgSim::Math::Aabbd& getAabb() const;
 

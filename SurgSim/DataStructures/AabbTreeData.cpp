@@ -28,15 +28,13 @@ AabbTreeData::AabbTreeData()
 
 }
 
-AabbTreeData::AabbTreeData(const std::list<Item>& data)
+AabbTreeData::AabbTreeData(const std::list<Item>& data) : m_data(data)
 {
-	m_data = data;
 	recalculateAabb();
 }
 
-AabbTreeData::AabbTreeData(std::list<Item>&& data)
+AabbTreeData::AabbTreeData(std::list<Item>&& data) : m_data(std::move(data))
 {
-	std::swap(m_data, data);
 	recalculateAabb();
 }
 
@@ -120,7 +118,7 @@ std::shared_ptr<AabbTreeData> AabbTreeData::takeLargerElements()
 		result->recalculateAabb();
 	}
 
-	return std::move(result);
+	return result;
 }
 
 void AabbTreeData::recalculateAabb()
