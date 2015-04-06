@@ -141,8 +141,6 @@ bool PhysicsManager::doUpdate(double dt)
 	// Add all components that came in before the last update
 	processComponents();
 
-	processBehaviors(dt);
-
 	auto state = std::make_shared<PhysicsManagerState>();
 	std::list<std::shared_ptr<PhysicsManagerState>> stateList(1, state);
 	state->setRepresentations(m_representations);
@@ -160,6 +158,9 @@ bool PhysicsManager::doUpdate(double dt)
 	}
 
 	m_finalState.set(*(stateList.back()));
+
+	// Add/remove all components that were treated by the behaviors
+	processBehaviors(dt);
 
 	return true;
 }
