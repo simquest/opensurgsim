@@ -1,0 +1,15 @@
+/*!
+
+\page Oculus Oculus: Oculus Rift DK2
+
+Supported devices:
+- Windows:
+  - Jan 28, 2015, SDK version 0.4.4-beta is used.
+
+Dependencies:
+  - Windows: Requires Oculus VR's Oculus SDK https://developer.oculus.com/downloads/
+	- An environment variable named OculusSDK_DIR must be set to the directory containing <tt>(include\\)OVR.h</tt>
+	- In order to develop applications using the latest SDK you must download the Oculus SDK package and 
+	also install the Oculus Runtime package. The latest version of both of these packages is available at 
+	https://developer.oculus.com/
+*/

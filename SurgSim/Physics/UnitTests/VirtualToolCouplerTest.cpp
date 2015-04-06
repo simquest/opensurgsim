@@ -18,8 +18,11 @@
 
 #include <math.h>
 
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/OutputComponent.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Matrix.h"
@@ -27,10 +30,12 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
+#include "SurgSim/Testing/MockInputComponent.h"
 
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Input::InputComponent;
@@ -424,6 +429,98 @@ TEST_F(VirtualToolCouplerTest, SetAngularDamping)
 	checkAngularIsCriticallyDamped();
 }
 
+TEST_F(VirtualToolCouplerTest, SetHapticOutputOnlyWhenColliding)
+{
+	RigidTransform3d initialPose =
+		Math::makeRigidTransform(Math::makeRotationQuaternion(10.0, Vector3d::UnitX().eval()), Vector3d(0.1, 0.0, 0.0));
+	rigidBody->setLocalPose(initialPose);
+	rigidBody->setIsGravityEnabled(false);
+	auto input = std::make_shared<Testing::MockInputComponent>("input");
+	DataStructures::DataGroupBuilder builder;
+	builder.addPose(DataStructures::Names::POSE);
+	DataStructures::DataGroup inputData = builder.createData();
+	inputData.poses().set(DataStructures::Names::POSE, RigidTransform3d::Identity());
+	input->setData(inputData);
+	virtualToolCoupler->setInput(input);
+	auto output = std::make_shared<Input::OutputComponent>("output");
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
+	input->initialize(runtime);
+	output->initialize(runtime);
+	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
+	input->wakeUp();
+	output->wakeUp();
+
+	EXPECT_FALSE(virtualToolCoupler->isHapticOutputOnlyWhenColliding());
+	virtualToolCoupler->setHapticOutputOnlyWhenColliding(true);
+	EXPECT_TRUE(virtualToolCoupler->isHapticOutputOnlyWhenColliding());
+
+	// no OutputComponent
+	virtualToolCoupler->update(0.1);
+	DataStructures::DataGroup data = virtualToolCoupler->getOutputData();
+	ASSERT_TRUE(data.vectors().hasEntry(DataStructures::Names::FORCE));
+	EXPECT_FALSE(data.vectors().hasData(DataStructures::Names::FORCE));
+	ASSERT_TRUE(data.vectors().hasEntry(DataStructures::Names::TORQUE));
+	EXPECT_FALSE(data.vectors().hasData(DataStructures::Names::TORQUE));
+	ASSERT_TRUE(data.matrices().hasEntry(DataStructures::Names::DAMPER_JACOBIAN));
+	EXPECT_FALSE(data.matrices().hasData(DataStructures::Names::DAMPER_JACOBIAN));
+	ASSERT_TRUE(data.matrices().hasEntry(DataStructures::Names::SPRING_JACOBIAN));
+	EXPECT_FALSE(data.matrices().hasData(DataStructures::Names::SPRING_JACOBIAN));
+
+	// no collision representation
+	virtualToolCoupler->setOutput(output);
+	virtualToolCoupler->update(0.1);
+	data = virtualToolCoupler->getOutputData();
+	Vector3d force;
+	Vector3d torque;
+	ASSERT_TRUE(data.vectors().get(DataStructures::Names::FORCE, &force));
+	EXPECT_GT(force.norm(), 0.0);
+	ASSERT_TRUE(data.vectors().get(DataStructures::Names::TORQUE, &torque));
+	EXPECT_GT(torque.norm(), 0.0);
+	EXPECT_TRUE(data.matrices().hasData(SurgSim::DataStructures::Names::DAMPER_JACOBIAN));
+	EXPECT_TRUE(data.matrices().hasData(SurgSim::DataStructures::Names::SPRING_JACOBIAN));
+
+	// forces disabled in free motion
+	auto collision = std::make_shared<RigidCollisionRepresentation>("collision");
+	rigidBody->setCollisionRepresentation(collision);
+	virtualToolCoupler->update(0.1);
+	data = virtualToolCoupler->getOutputData();
+	ASSERT_TRUE(data.vectors().get(DataStructures::Names::FORCE, &force));
+	EXPECT_EQ(force, Vector3d::Zero());
+	ASSERT_TRUE(data.vectors().get(DataStructures::Names::TORQUE, &torque));
+	EXPECT_EQ(torque, Vector3d::Zero());
+	EXPECT_FALSE(data.matrices().hasData(DataStructures::Names::DAMPER_JACOBIAN));
+	EXPECT_FALSE(data.matrices().hasData(DataStructures::Names::SPRING_JACOBIAN));
+
+	// no flag
+	virtualToolCoupler->setHapticOutputOnlyWhenColliding(false);
+	virtualToolCoupler->update(0.1);
+	data = virtualToolCoupler->getOutputData();
+	ASSERT_TRUE(data.vectors().get(DataStructures::Names::FORCE, &force));
+	EXPECT_GT(force.norm(), 0.0);
+	ASSERT_TRUE(data.vectors().get(DataStructures::Names::TORQUE, &torque));
+	EXPECT_GT(torque.norm(), 0.0);
+	EXPECT_TRUE(data.matrices().hasData(DataStructures::Names::DAMPER_JACOBIAN));
+	EXPECT_TRUE(data.matrices().hasData(DataStructures::Names::SPRING_JACOBIAN));
+
+	// forces enabled if any collisions
+	virtualToolCoupler->setHapticOutputOnlyWhenColliding(true);
+	auto& collisions = collision->getCollisions().unsafeGet();
+	collisions[std::make_shared<RigidCollisionRepresentation>("collision2")].push_back(
+		std::make_shared<Collision::Contact>(0.1, Vector3d::UnitX().eval(), Vector3d::UnitY().eval(),
+		std::make_pair(DataStructures::Location(), DataStructures::Location())));
+	virtualToolCoupler->update(0.1);
+	data = virtualToolCoupler->getOutputData();
+	ASSERT_TRUE(data.vectors().get(DataStructures::Names::FORCE, &force));
+	EXPECT_GT(force.norm(), 0.0);
+	ASSERT_TRUE(data.vectors().get(DataStructures::Names::TORQUE, &torque));
+	EXPECT_GT(torque.norm(), 0.0);
+	EXPECT_TRUE(data.matrices().hasData(DataStructures::Names::DAMPER_JACOBIAN));
+	EXPECT_TRUE(data.matrices().hasData(DataStructures::Names::SPRING_JACOBIAN));
+}
+
 TEST_F(VirtualToolCouplerTest, GetInput)
 {
 	EXPECT_EQ(input, virtualToolCoupler->getInput());
@@ -538,6 +635,8 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	virtualToolCoupler->setOptionalAttachmentPoint(optionalVec);
 	virtualToolCoupler->setCalculateInertialTorques(true);
 
+	virtualToolCoupler->setHapticOutputOnlyWhenColliding(true);
+
 	// Encode
 	YAML::Node node;
 	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*virtualToolCoupler););
@@ -557,6 +656,7 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	EXPECT_EQ(num, newVirtualToolCoupler->getAngularDamping());
 	EXPECT_TRUE(vec.isApprox(newVirtualToolCoupler->getAttachmentPoint()));
 	EXPECT_TRUE(newVirtualToolCoupler->getCalculateInertialTorques());
+	EXPECT_TRUE(virtualToolCoupler->isHapticOutputOnlyWhenColliding());
 
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getInput());
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getRepresentation());

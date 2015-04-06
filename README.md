@@ -116,7 +116,8 @@ Required Dependencies
 
 * Eigen  
   Homepage: http://eigen.tuxfamily.org/  
-  Minimum Version: 3.2.0  
+  Minimum Version: 3.2.1 (GNU/Linux)  
+  Minimum Version: 3.2.3 (Windows)  
 
 * Git  
   Homepage: http://www.git-scm.com/  

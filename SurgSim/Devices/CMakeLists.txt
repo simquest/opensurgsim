@@ -24,6 +24,7 @@ set(DEVICES
 	MultiAxis
 	Nimble
 	Novint
+	Oculus
 	OpenNI
 	Phantom
 	Sixense
