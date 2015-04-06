@@ -123,7 +123,7 @@ public:
 	/// Get the range of velocities of the emitted particles.
 	const std::pair<SurgSim::Math::Vector3d, SurgSim::Math::Vector3d>& getVelocityRange() const;
 
-private:
+protected:
 	bool doInitialize() override;
 	bool doWakeUp() override;
 
