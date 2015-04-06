@@ -42,6 +42,7 @@ namespace Graphics
 OsgManager::OsgManager() : SurgSim::Graphics::Manager(),
 	m_viewer(new osgViewer::CompositeViewer())
 {
+	m_viewer->setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
 }
 
 OsgManager::~OsgManager()
