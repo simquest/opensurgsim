@@ -210,7 +210,9 @@ void StaplerBehavior::createStaple()
 	auto staple = std::make_shared<StapleElement>("staple_" + boost::to_string(m_numElements++));
 	staple->setPose(m_representation->getPose());
 
+	// The 2 PhysicsRep being stapled (for a proper stapling, they should be both the same Fem3D)
 	std::array<std::shared_ptr<SurgSim::Physics::Representation>, 2> reps;
+	// The 2 locations on the stapled Physics reps
 	std::array<SurgSim::DataStructures::Location, 2> locations;
 
 	std::shared_ptr<SurgSim::Physics::Representation> stapleRep;
@@ -270,16 +272,13 @@ void StaplerBehavior::createStaple()
 		// The staple is created with no collision representation, because it is going to be constrained.
 		if (!stapleAdded)
 		{
-
-
 			staple->setHasCollisionRepresentation(false);
 			getScene()->addSceneElement(staple);
 			// The gravity of the staple is disabled to prevent it from rotating about the line
 			// connecting the two points of constraints on the staple.
 			staple->getComponents<SurgSim::Physics::Representation>()[0]->setIsGravityEnabled(false);
-			stapleAdded = true;
 			m_staples.push_back(staple);
-			//std::cout << "We have " << m_staples.size() << " staples (1 properly deployed staple was just created)" << std::endl;
+			stapleAdded = true;
 		}
 
 		// Find the corresponding Phsyics::Representation for the target Collision::Representation.
@@ -306,8 +305,15 @@ void StaplerBehavior::createStaple()
 		toothId++;
 	}
 
+	// If the staple was added but did not collide properly with 2 locations of the wound, we let the staple free
+	if (stapleAdded && ! (std::dynamic_pointer_cast<Fem3DRepresentation>(reps[0]) != nullptr && reps[0] == reps[1]))
+	{
+		staple->setHasCollisionRepresentation(true);
+		staple->getComponents<SurgSim::Physics::Representation>()[0]->setIsGravityEnabled(true);
+	}
+
 	// If we have 2 collisions against the same Fem3DRepresentation, let's create a distance constraint
-	if (toothId >= 2 && std::dynamic_pointer_cast<Fem3DRepresentation>(reps[0]) != nullptr && reps[0] == reps[1])
+	if (stapleAdded && std::dynamic_pointer_cast<Fem3DRepresentation>(reps[0]) != nullptr && reps[0] == reps[1])
 	{
 		auto data = std::make_shared<SurgSim::Physics::ConstraintDataFem3DDistancePoints>();
 
@@ -334,7 +340,7 @@ void StaplerBehavior::createStaple()
 	}
 
 	// If we have 2 collisions against the same Fem3DRepresentation, let's constrained the staple to the deforming Fem3D
-	if (toothId >= 2 && std::dynamic_pointer_cast<Fem3DRepresentation>(reps[0]) != nullptr && reps[0] == reps[1])
+	if (stapleAdded && std::dynamic_pointer_cast<Fem3DRepresentation>(reps[0]) != nullptr && reps[0] == reps[1])
 	{
 		// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
 		{
