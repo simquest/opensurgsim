@@ -31,6 +31,7 @@
 #include "SurgSim/Graphics/Model.h"
 #include "SurgSim/Graphics/TextRepresentation.h"
 #include "SurgSim/Math/MlcpConstraintType.h"
+#include "SurgSim/Math/Valid.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
@@ -416,6 +417,32 @@ void StaplerBehavior::registerKeyToClearStaples(SurgSim::Device::KeyCode key)
 
 void StaplerBehavior::update(double dt)
 {
+	/// Check if any staple is inactive or unstable
+	for(auto it = m_staples.begin(); it != m_staples.end();)
+	{
+		auto physicsComponent = (*it)->getComponent("Physics");
+		SURGSIM_ASSERT(physicsComponent != nullptr) << "Could not locate the Physics component of a staple";
+
+		auto physicsRepresentation = std::static_pointer_cast<SurgSim::Physics::RigidRepresentation>(physicsComponent);
+
+		bool linearVelocityValid = SurgSim::Math::isValid(physicsRepresentation->getCurrentState().getLinearVelocity());
+		bool angularVelocityValid = SurgSim::Math::isValid(physicsRepresentation->getCurrentState().getAngularVelocity());
+
+		double linearVelocity = physicsRepresentation->getCurrentState().getLinearVelocity().norm();
+		double angularVelocity = physicsRepresentation->getCurrentState().getAngularVelocity().norm();
+
+		if (!(*it)->isActive() || !linearVelocityValid || !angularVelocityValid || linearVelocity > 100.0 || angularVelocity > 100.0)
+		{
+			std::cout << "A staple has been found inactive or getting unstable, it is being removed from the simulation" << std::endl;
+			getScene()->removeSceneElement(*it);
+			it = m_staples.erase(it);
+		}
+		else
+		{
+			it++;
+		}
+	}
+
 	{
 		SurgSim::DataStructures::DataGroup dataGroup;
 		m_inputComponentKeyboard->getData(&dataGroup);
@@ -452,7 +479,12 @@ void StaplerBehavior::update(double dt)
 
 	if (button1 && !m_buttonPreviouslyPressed)
 	{
-		createStaple();
+		// Staple only if the stapler still have staples
+		// (i.e. the related text message (about the stapler being empty) is not active)
+		if (!m_text->isActive())
+		{
+			createStaple();
+		}
 	}
 
 	m_buttonPreviouslyPressed = button1;
