@@ -57,13 +57,14 @@ TEST(OdeSolverStatic, ConstructorTest)
 namespace
 {
 template<class T>
-void doSolveTest(bool computeCompliance)
+void doSolveTest()
 {
 	MassPointsForStatic m;
 	MassPointsStateForStatic defaultState, currentState, newState;
+	auto solver = std::make_shared<T>(&m);
+	EXPECT_NO_THROW(m.setOdeSolver(solver));
 
-	T solver(&m);
-	ASSERT_NO_THROW({solver.solve(1e-3, currentState, &newState, computeCompliance);});
+	ASSERT_NO_THROW({solver->solve(1e-3, currentState, &newState);});
 	EXPECT_EQ(defaultState, currentState);
 	EXPECT_NE(defaultState, newState);
 
@@ -81,20 +82,11 @@ TEST(OdeSolverStatic, SolveTest)
 {
 	{
 		SCOPED_TRACE("Static computing the compliance matrix");
-		doSolveTest<OdeSolverStatic>(true);
+		doSolveTest<OdeSolverStatic>();
 	}
-	{
-		SCOPED_TRACE("Static not computing the compliance matrix");
-		doSolveTest<OdeSolverStatic>(false);
-	}
-
 	{
 		SCOPED_TRACE("LinearStatic computing the compliance matrix");
-		doSolveTest<OdeSolverLinearStatic>(true);
-	}
-	{
-		SCOPED_TRACE("LinearStatic not computing the compliance matrix");
-		doSolveTest<OdeSolverLinearStatic>(false);
+		doSolveTest<OdeSolverLinearStatic>();
 	}
 }
 
@@ -104,14 +96,17 @@ template <class T>
 void doComputeMatricesTest()
 {
 	MassPointsForStatic m;
-	T solver(&m);
+	auto solver = std::make_shared<T>(&m);
+	EXPECT_NO_THROW(m.setOdeSolver(solver));
 	MassPointsStateForStatic state;
 	double dt = 1e-3;
 
 	Matrix expectedSystemMatrix = m.computeK(state);
-	EXPECT_NO_THROW(solver.computeMatrices(dt, state));
-	EXPECT_TRUE(solver.getSystemMatrix().isApprox(expectedSystemMatrix));
-	EXPECT_TRUE(solver.getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));
+	EXPECT_NO_THROW(solver->computeMatrices(dt, state));
+	EXPECT_TRUE(solver->getSystemMatrix().isApprox(expectedSystemMatrix));
+	EXPECT_TRUE(m.applyCompliance(state, Matrix::Identity(state.getNumDof(),
+								  state.getNumDof())).isApprox(expectedSystemMatrix.inverse()));
+
 }
 };
 

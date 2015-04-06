@@ -173,10 +173,12 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 	K.setZero();
 	Math::addSubMatrixAndInitialize(Klocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
 									static_cast<int>(fem->getNumDofPerNode()), &K);
+	K.makeCompressed();
 	SparseMatrix D(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
 	D.setZero();
 	Math::addSubMatrixAndInitialize(Dlocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
 									static_cast<int>(fem->getNumDofPerNode()), &D);
+	D.makeCompressed();
 
 	// Test invalid localization nullptr
 	ASSERT_THROW(fem->addExternalGeneralizedForce(nullptr, Flocal),

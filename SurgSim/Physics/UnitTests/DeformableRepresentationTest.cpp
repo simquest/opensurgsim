@@ -198,7 +198,8 @@ TEST_F(DeformableRepresentationTest, GetComplianceMatrix)
 	// In our case, M = Identity, so the compliance matrix will be Identity*dt
 	EXPECT_NO_THROW(update(dt));
 
-	EXPECT_NO_THROW(EXPECT_TRUE(getComplianceMatrix().isApprox(Matrix::Identity(3, 3) * dt)));
+	EXPECT_NO_THROW(EXPECT_TRUE(applyCompliance(*m_localInitialState, Matrix::Identity(3,
+								3)).isApprox(Matrix::Identity(3, 3) * dt)));
 }
 
 TEST_F(DeformableRepresentationTest, ResetStateTest)

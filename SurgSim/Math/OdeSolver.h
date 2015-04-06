@@ -103,7 +103,7 @@ public:
 	/// \param[out] newState State at time t+dt
 	/// \param computeCompliance True if the compliance matrix needs to be computed, False otherwise
 	/// \note Regardless of 'computeCompliance', the system matrix will be computed by this method.
-	virtual void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) = 0;
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) = 0;
 
 	/// Computes the system and compliance matrices for a given state
 	/// \param dt The time step
@@ -114,8 +114,28 @@ public:
 	/// \return The latest system matrix calculated
 	const SparseMatrix& getSystemMatrix() const;
 
+	/*
+	/// Calculate the product C * b where C is the compliance matrix with boundary conditions
+	/// applied. Note that this can be rewritten as (B^T M^-1 B) * b = B^T * (M^-1 * (B * b)) = x,
+	/// where M^-1 * (B * b) = x is simply the solution to MX = Bb.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param b The input vector \b
+	/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
+	/// when the compliance matrix would have been generated in the initial version.
+	virtual Vector applyCompliance(const OdeState& state, Vector b);
+
+	/// Calculate the product C * b where C is the compliance matrix with boundary conditions
+	/// applied. Note that this can be rewritten as (B^T M^-1 B) * b = B^T * (M^-1 * (B * b)) = x,
+	/// where M^-1 * (B * b) = x is simply the solution to MX = Bb.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param b The input vector \b
+	/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
+	/// when the compliance matrix would have been generated in the initial version.
+	virtual Matrix applyCompliance(const OdeState& state, Matrix b);
+	*/
+
 	/// \return The latest compliance matrix computed (either by calling solve or computeMatrices)
-	const Matrix& getComplianceMatrix() const;
+	// const Matrix& getComplianceMatrix() const;
 
 protected:
 	/// Allocates the system and compliance matrices
@@ -130,13 +150,13 @@ protected:
 	/// \note The method should take care of the boundary conditions properly on both the matrix and the vector.
 	/// \note The method should prepare the linear solver m_linearSolver to be used with the m_systemMatrix
 	virtual void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
-		bool computeRHS = true) = 0;
+									  bool computeRHS = true) = 0;
 
 	/// Helper method computing the compliance matrix from the system matrix and setting the boundary conditions
 	/// \param state The state describing the boundary conditions
 	/// \note The full system is not re-evaluated from the state, the current m_systemMatrix is directly used.
 	/// \note This method supposes that the linear solver has been updated with the current m_systemMatrix.
-	void computeComplianceMatrixFromSystemMatrix(const OdeState& state);
+	/// void computeComplianceMatrixFromSystemMatrix(const OdeState& state);
 
 	/// Name for this solver
 	/// \note MUST be set by the derived classes
@@ -158,7 +178,7 @@ protected:
 	Vector m_solution, m_rhs;
 
 	/// Compliance matrix which is the inverse of the system matrix, including boundary conditions
-	Matrix m_complianceMatrix;
+	// Matrix m_complianceMatrix;
 };
 
 }; // namespace Math

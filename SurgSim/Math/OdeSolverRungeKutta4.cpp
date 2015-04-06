@@ -28,7 +28,7 @@ OdeSolverRungeKutta4::OdeSolverRungeKutta4(OdeEquation* equation)
 	m_name = "Ode Solver Runge Kutta 4";
 }
 
-void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
+void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	// General equation to solve:
 	//   M.a(t) = F(t, x(t), v(t)), which is an ode of order 2 that can be reduced to an ode of order 1:
@@ -79,14 +79,10 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	newState->getVelocities() = currentState.getVelocities() +
 								(m_k1.acceleration + m_k4.acceleration + 2.0 * (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
 
-	if (computeCompliance)
-	{
-		computeComplianceMatrixFromSystemMatrix(currentState);
-	}
 }
 
 void OdeSolverRungeKutta4::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
-												bool computeRHS)
+		bool computeRHS)
 {
 	// Computes the LHS systemMatrix
 	m_systemMatrix = m_equation.computeM(state) / dt;

@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 
 namespace SurgSim
@@ -39,6 +40,33 @@ MlcpPhysicsProblem MlcpPhysicsProblem::Zero(size_t numDof, size_t numConstraintD
 	result.setZero(numDof, numConstraintDof, numConstraints);
 
 	return result;
+}
+
+void MlcpPhysicsProblem::updateConstraint(
+	const Eigen::SparseVector<double>& newSubH,
+	const Vector& newCHt,
+	size_t indexSubC,
+	size_t indexNewSubH)
+{
+	using SurgSim::Math::Vector;
+
+	// Update H, CHt, and HCHt with newSubH, denoted H'.
+	//
+	// Note that updates are linear for H and CHt, but not for HCHt:
+	// (H+H') = H+H'
+	// => H += H';
+	//
+	// C(H+H')t = CHt + CH't
+	// => CHt += CH't;
+	//
+	// (H+H')C(H+H')t = HCHt + HCH't + H'C(H+H')t
+	// => HCHt += H(CH't) + H'[C(H+H')t];
+
+	// Vector newCHt = subC * newSubH;
+	A.col(indexNewSubH) += H.middleCols(indexSubC, newCHt.rows()) * newCHt;
+	H.block(indexNewSubH, indexSubC, 1, newCHt.rows()) += newSubH.transpose();
+	CHt.block(indexSubC, indexNewSubH, newCHt.rows(), 1) += newCHt;
+	A.row(indexNewSubH) += newSubH.transpose() * CHt.middleRows(indexSubC, newCHt.rows());
 }
 
 }; // namespace Physics

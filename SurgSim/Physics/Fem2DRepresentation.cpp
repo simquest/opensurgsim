@@ -122,6 +122,8 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			index1++;
 		}
 	}
+	m_externalGeneralizedStiffness.makeCompressed();
+	m_externalGeneralizedDamping.makeCompressed();
 	m_hasExternalGeneralizedForce = true;
 }
 

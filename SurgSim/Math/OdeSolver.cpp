@@ -50,15 +50,39 @@ const SparseMatrix& OdeSolver::getSystemMatrix() const
 	return m_systemMatrix;
 }
 
+/*
+///
+/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
+/// when the compliance matrix would have been generated.
+/// m_k1.acceleration = m_complianceMatrix * m_equation.computeF(currentState) / dt;
+Vector OdeSolver::applyCompliance(const OdeState& state, Vector b)
+{
+	return std::move(*(state.applyBoundaryConditionsToVector(&getLinearSolver()->
+		solve(*(state.applyBoundaryConditionsToVector(&b))))));
+}
+
+///
+/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
+/// when the compliance matrix would have been generated.
+/// m_k1.acceleration = m_complianceMatrix * m_equation.computeF(currentState) / dt;
+Matrix OdeSolver::applyCompliance(const OdeState& state, Matrix b)
+{
+	return std::move(*(state.applyBoundaryConditionsToMatrix(&getLinearSolver()->
+		solve(*(state.applyBoundaryConditionsToMatrix(&b), false)), false)));
+}
+*/
+
+/*
 const Matrix& OdeSolver::getComplianceMatrix() const
 {
 	return m_complianceMatrix;
 }
+*/
 
 void OdeSolver::allocate(size_t size)
 {
 	m_systemMatrix.resize(static_cast<int>(size), static_cast<int>(size));
-	m_complianceMatrix.resize(size, size);
+	//	m_complianceMatrix.resize(size, size);
 	m_solution.resize(size);
 	m_rhs.resize(size);
 }
@@ -69,9 +93,10 @@ void OdeSolver::computeMatrices(double dt, const OdeState& state)
 	assembleLinearSystem(dt, state, state, false);
 
 	/// Compute the compliance matrix
-	computeComplianceMatrixFromSystemMatrix(state);
+	/// computeComplianceMatrixFromSystemMatrix(state);
 }
 
+/*
 void OdeSolver::computeComplianceMatrixFromSystemMatrix(const OdeState& state)
 {
 	// The compliance matrix is the inverse of the system matrix
@@ -81,7 +106,7 @@ void OdeSolver::computeComplianceMatrixFromSystemMatrix(const OdeState& state)
 	// Which means that the compliance matrix has entire rows and columns of zeros for the boundary conditions.
 	state.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);
 }
-
+*/
 }; // namespace Math
 
 }; // namespace SurgSim

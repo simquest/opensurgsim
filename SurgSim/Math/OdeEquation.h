@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/Math/SparseMatrix.h"
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -85,6 +86,15 @@ public:
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
 	virtual void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) = 0;
+
+	/// Calculate the product C * b where C is the compliance matrix with boundary conditions
+	/// applied. Note that this can be rewritten as (B^T M^-1 B) * b = B^T * (M^-1 * (B * b)) = x,
+	/// where M^-1 * (B * b) = x is simply the solution to MX = Bb.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param b The input matrix \b
+	/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
+	/// when the compliance matrix would have been generated in the initial version.
+	virtual Matrix applyCompliance(const OdeState& state, Matrix b) = 0;
 
 protected:
 	/// The initial state (which defines the ODE initial conditions \f$(x0, v0)\f$)

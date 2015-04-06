@@ -17,6 +17,7 @@
 #define SURGSIM_MATH_UNITTESTS_MOCKOBJECT_H
 
 #include "SurgSim/Math/OdeEquation.h"
+#include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/OdeState.h"
 
 namespace SurgSim
@@ -99,6 +100,29 @@ public:
 		*M = &m_M;
 	}
 
+	Matrix applyCompliance(const OdeState& state, Matrix b) override
+	{
+		SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
+
+		for (auto condition : state.getBoundaryConditions())
+		{
+			Math::zeroRow(condition, &b);
+		}
+		b = m_odeSolver->getLinearSolver()->solve(b);
+		for (auto condition : state.getBoundaryConditions())
+		{
+			Math::zeroRow(condition, &b);
+		}
+		return std::move(b);
+	}
+
+	void setOdeSolver(std::shared_ptr<SurgSim::Math::OdeSolver> solver)
+	{
+		m_odeSolver = solver;
+	}
+
+	/// Ode solver (its type depends on the numerical integration scheme)
+	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;
 	double m_mass, m_viscosity;
 	Vector3d m_gravity;
 	Vector m_f;
@@ -225,7 +249,30 @@ public:
 		*M = &m_M;
 	}
 
+	Matrix applyCompliance(const OdeState& state, Matrix b) override
+	{
+		SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
+
+		for (auto condition : state.getBoundaryConditions())
+		{
+			Math::zeroRow(condition, &b);
+		}
+		b = m_odeSolver->getLinearSolver()->solve(b);
+		for (auto condition : state.getBoundaryConditions())
+		{
+			Math::zeroRow(condition, &b);
+		}
+		return std::move(b);
+	}
+
+	void setOdeSolver(std::shared_ptr<SurgSim::Math::OdeSolver> solver)
+	{
+		m_odeSolver = solver;
+	}
+
 private:
+	/// Ode solver (its type depends on the numerical integration scheme)
+	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;
 	Vector m_f, m_gravityForce;
 	SparseMatrix m_M, m_D, m_K;
 };
@@ -292,7 +339,30 @@ public:
 		*M = &m_M;
 	}
 
+	Matrix applyCompliance(const OdeState& state, Matrix b) override
+	{
+		SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
+
+		for (auto condition : state.getBoundaryConditions())
+		{
+			Math::zeroRow(condition, &b);
+		}
+		b = m_odeSolver->getLinearSolver()->solve(b);
+		for (auto condition : state.getBoundaryConditions())
+		{
+			Math::zeroRow(condition, &b);
+		}
+		return std::move(b);
+	}
+
+	void setOdeSolver(std::shared_ptr<SurgSim::Math::OdeSolver> solver)
+	{
+		m_odeSolver = solver;
+	}
+
 private:
+	/// Ode solver (its type depends on the numerical integration scheme)
+	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;
 	Vector m_f;
 	SparseMatrix m_M, m_D, m_K;
 };

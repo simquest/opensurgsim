@@ -39,12 +39,12 @@ RigidRepresentationContact::~RigidRepresentationContact()
 }
 
 void RigidRepresentationContact::doBuild(double dt,
-			const ConstraintData& data,
-			const std::shared_ptr<Localization>& localization,
-			MlcpPhysicsProblem* mlcp,
-			size_t indexOfRepresentation,
-			size_t indexOfConstraint,
-			ConstraintSideSign sign)
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign)
 {
 	std::shared_ptr<Representation> representation = localization->getRepresentation();
 	std::shared_ptr<RigidRepresentation> rigid = std::static_pointer_cast<RigidRepresentation>(representation);
@@ -55,7 +55,7 @@ void RigidRepresentationContact::doBuild(double dt,
 	}
 
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE ? 1.0 : -1.0);
-	const Eigen::Matrix<double, 6,6, Eigen::RowMajor>& C = rigid->getComplianceMatrix();
+	const Eigen::Matrix<double, 6, 6, Eigen::RowMajor>& C = rigid->getComplianceMatrix();
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
 	const Vector3d& n = contactData.getNormal();
 
@@ -91,7 +91,7 @@ void RigidRepresentationContact::doBuild(double dt,
 	m_newH.insert(4) = dt * scale * rotation[1];
 	m_newH.insert(5) = dt * scale * rotation[2];
 
-	mlcp->updateConstraint(m_newH, C, indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraint(m_newH, C * m_newH, indexOfRepresentation, indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType RigidRepresentationContact::getMlcpConstraintType() const

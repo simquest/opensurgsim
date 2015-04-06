@@ -46,7 +46,7 @@ public:
 	/// Solve the linear system (matrix.x=b) using the matrix provided by the latest setMatrix call
 	/// \param b The rhs vector
 	/// \return The solution vector
-	virtual Vector solve(const Vector& b) = 0;
+	virtual Matrix solve(const Matrix& b) = 0;
 
 	/// \return The linear system's inverse matrix, i.e. the inverse of the matrix provided on the last setMatrix call
 	virtual Matrix getInverse() = 0;
@@ -65,8 +65,10 @@ class LinearSparseSolveAndInverseLU : public LinearSparseSolveAndInverse
 public:
 	void setMatrix(const SparseMatrix& matrix) override;
 
-	Vector solve(const Vector& b) override;
-
+	Matrix solve(const Matrix& b) override;
+	/*
+		Matrix solveMatrix(const Matrix& b) override;
+	*/
 	Matrix getInverse() override;
 
 	void operator()(const SparseMatrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;

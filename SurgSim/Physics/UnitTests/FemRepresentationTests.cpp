@@ -595,7 +595,8 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		// This method has been overridden.
 		EXPECT_NO_THROW(fem->update(1e-3));
 
-		EXPECT_NO_THROW(EXPECT_TRUE((fem->getComplianceMatrix() / 1e-3).isIdentity()));
+		EXPECT_NO_THROW(EXPECT_TRUE((fem->applyCompliance(*initialState, Matrix::Identity(initialState->getNumDof(),
+									 initialState->getNumDof())) / 1e-3).isIdentity()));
 	}
 }
 

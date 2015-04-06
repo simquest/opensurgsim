@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override
+	void solve(double dt, const OdeState& currentState, OdeState* newState) override
 	{
 	}
 
@@ -69,8 +69,6 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({MockOdeSolver solver(&m);});
 	{
 		MockOdeSolver solver(&m);
-		EXPECT_EQ(3, solver.getComplianceMatrix().rows());
-		EXPECT_EQ(3, solver.getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver.getSystemMatrix().rows());
 		EXPECT_EQ(3, solver.getSystemMatrix().cols());
 	}
@@ -78,8 +76,6 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({MockOdeSolver* solver = new MockOdeSolver(&m); delete solver;});
 	{
 		MockOdeSolver* solver = new MockOdeSolver(&m);
-		EXPECT_EQ(3, solver->getComplianceMatrix().rows());
-		EXPECT_EQ(3, solver->getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver->getSystemMatrix().rows());
 		EXPECT_EQ(3, solver->getSystemMatrix().cols());
 		delete solver;
@@ -88,8 +84,6 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m); });
 	{
 		std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m);
-		EXPECT_EQ(3, solver->getComplianceMatrix().rows());
-		EXPECT_EQ(3, solver->getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver->getSystemMatrix().rows());
 		EXPECT_EQ(3, solver->getSystemMatrix().cols());
 	}

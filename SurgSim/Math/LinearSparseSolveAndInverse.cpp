@@ -27,14 +27,17 @@ void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
 	m_lu.compute(matrix);
 }
 
-Vector LinearSparseSolveAndInverseLU::solve(const Vector& b)
+Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b)
 {
 	return m_lu.solve(b);
 }
 
 Matrix LinearSparseSolveAndInverseLU::getInverse()
 {
-	return m_lu.solve(Matrix::Identity(m_lu.rows(), m_lu.cols()));
+	SparseMatrix eye(m_lu.rows(), m_lu.cols());
+	eye.setIdentity();
+	eye = m_lu.solve((eye));
+	return std::move(eye.toDense());
 }
 
 void LinearSparseSolveAndInverseLU::operator()(const SparseMatrix& A, const Vector& b, Vector* x, Matrix* Ainv)
@@ -50,11 +53,7 @@ void LinearSparseSolveAndInverseLU::operator()(const SparseMatrix& A, const Vect
 		}
 		if (Ainv != nullptr)
 		{
-			if ((Ainv->rows() != A.rows()) || (Ainv->cols() != A.cols()))
-			{
-				Ainv->resize(A.rows(), A.cols());
-			}
-			Ainv->setIdentity();
+			Ainv->setIdentity(A.rows(), A.cols());
 			(*Ainv) = lu.solve((*Ainv));
 		}
 	}

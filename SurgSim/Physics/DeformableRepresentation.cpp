@@ -32,6 +32,9 @@
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
+using SurgSim::Math::Vector;
+using SurgSim::Math::OdeState;
+
 namespace SurgSim
 {
 
@@ -53,6 +56,7 @@ DeformableRepresentation::DeformableRepresentation(const std::string& name) :
 DeformableRepresentation::~DeformableRepresentation()
 {
 }
+
 void DeformableRepresentation::resetState()
 {
 	Representation::resetState();
@@ -130,12 +134,48 @@ const SurgSim::Math::SparseMatrix& DeformableRepresentation::getExternalGenerali
 	return m_externalGeneralizedDamping;
 }
 
+/*
 const SurgSim::Math::Matrix& DeformableRepresentation::getComplianceMatrix() const
 {
 	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
 
 	return m_odeSolver->getComplianceMatrix();
 }
+*/
+/*
+///
+/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
+/// when the compliance matrix would have been generated.
+/// m_k1.acceleration = m_complianceMatrix * m_equation.computeF(currentState) / dt;
+Vector DeformableRepresentation::applyCompliance(const OdeState& state, Vector b)
+{
+	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
+
+//	return std::move(*(state.applyBoundaryConditionsToVector(&m_odeSolver->getLinearSolver()->
+//					   solve(*(state.applyBoundaryConditionsToVector(&b))))));
+	return applyComplianceToMatrix(state, b);
+}
+*/
+///
+/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
+/// when the compliance matrix would have been generated.
+/// m_k1.acceleration = m_complianceMatrix * m_equation.computeF(currentState) / dt;
+Matrix DeformableRepresentation::applyCompliance(const OdeState& state, Matrix b)
+{
+	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
+
+	for (auto condition : state.getBoundaryConditions())
+	{
+		Math::zeroRow(condition, &b);
+	}
+	b = m_odeSolver->getLinearSolver()->solve(b);
+	for (auto condition : state.getBoundaryConditions())
+	{
+		Math::zeroRow(condition, &b);
+	}
+	return std::move(b);
+}
+
 
 void DeformableRepresentation::update(double dt)
 {
@@ -318,7 +358,7 @@ bool DeformableRepresentation::doWakeUp()
 			return false;
 	}
 
-	// No assumption is made on the linear solver, we instantiate a general dense matrix solver
+	// No assumption is made on the linear solver, we instantiate a general sparse matrix solver
 	m_odeSolver->setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
 
 	return true;
