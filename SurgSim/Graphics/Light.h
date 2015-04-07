@@ -53,12 +53,18 @@ public:
 	/// Constructor
 	explicit Light(const std::string& name) : Representation(name)
 	{
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, SurgSim::Math::Vector4d, DiffuseColor, getDiffuseColor, setDiffuseColor);
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, SurgSim::Math::Vector4d, SpecularColor, getSpecularColor, setSpecularColor);
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, double, ConstantAttenuation, getConstantAttenuation, setConstantAttenuation);
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, double, LinearAttenuation, getLinearAttenuation, setLinearAttenuation);
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, double, QuadraticAttenuation, getQuadraticAttenuation, setQuadraticAttenuation);
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, std::string, LightGroupReference, getLightGroupReference, setLightGroupReference);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, SurgSim::Math::Vector4d, DiffuseColor,
+											getDiffuseColor, setDiffuseColor);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, SurgSim::Math::Vector4d, SpecularColor,
+											getSpecularColor, setSpecularColor);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, double, ConstantAttenuation,
+											getConstantAttenuation, setConstantAttenuation);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, double, LinearAttenuation,
+											getLinearAttenuation, setLinearAttenuation);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, double, QuadraticAttenuation,
+											getQuadraticAttenuation, setQuadraticAttenuation);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, std::string, LightGroupReference,
+											getLightGroupReference, setLightGroupReference);
 	}
 
 	virtual ~Light()
