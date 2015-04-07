@@ -42,6 +42,8 @@ namespace SurgSim
 namespace Graphics
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgLight, OsgLight);
+
 /// \note HS-2013-sep-09 Right now we are implementing all the shader uniforms as floats, this
 /// 	  means that they all have to be downconverted from double, i don't know what the hit
 /// 	  of going to double in the shaders would be

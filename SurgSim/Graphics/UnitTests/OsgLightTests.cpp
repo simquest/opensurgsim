@@ -17,6 +17,8 @@
 ///	Basic logic tests for OsgLight
 
 #include <gtest/gtest.h>
+#include "SurgSim/Framework/FrameworkConvert.h"
+
 #include "SurgSim/Graphics/Light.h"
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgGroup.h"
@@ -83,7 +85,6 @@ TEST_F(OsgLightTests, InitTest)
 
 	ASSERT_EQ(nullptr, light->getGroup());
 }
-
 
 
 TEST_F(OsgLightTests, GroupAccessorTest)
@@ -168,6 +169,41 @@ TEST_F(OsgLightTests, AttenuationAccessorTests)
 	EXPECT_NEAR(quadraticAttenuation, light->getQuadraticAttenuation(), epsilon);
 	getUniform(light, 5)->get(osgValue);
 	EXPECT_NEAR(quadraticAttenuation, static_cast<double>(osgValue), epsilon);
+}
+
+TEST_F(OsgLightTests, Serialization)
+{
+	std::shared_ptr<SurgSim::Framework::Component> component;
+	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
+		"SurgSim::Graphics::OsgLight",
+		"light"));
+
+	SurgSim::Math::Vector4d diffuse(0.1, 0.2, 0.3, 0.4);
+	SurgSim::Math::Vector4d specular(0.4, 0.3, 0.2, 0.1);
+	double constant = 0.1;
+	double linear = 0.2;
+	double quadratic = 0.3;
+	std::string lightGroupRef = "test";
+
+	component->setValue("DiffuseColor", diffuse);
+	component->setValue("SpecularColor", specular);
+	component->setValue("ConstantAttenuation", constant);
+	component->setValue("LinearAttenuation", linear);
+	component->setValue("QuadraticAttenuation", quadratic);
+	component->setValue("LightGroupReference", lightGroupRef);
+
+	YAML::Node node(YAML::convert<SurgSim::Framework::Component>::encode(*component));
+
+	auto decode = std::dynamic_pointer_cast<OsgLight>(
+					node.as<std::shared_ptr<OsgLight>>());
+
+	EXPECT_NE(nullptr, decode);
+	EXPECT_EQ(diffuse, decode->getValue<SurgSim::Math::Vector4d>("DiffuseColor"));
+	EXPECT_EQ(specular, decode->getValue<SurgSim::Math::Vector4d>("SpecularColor"));
+	EXPECT_EQ(constant, decode->getValue<double>("ConstantAttenuation"));
+	EXPECT_EQ(linear, decode->getValue<double>("LinearAttenuation"));
+	EXPECT_EQ(quadratic, decode->getValue<double>("QuadraticAttenuation"));
+	EXPECT_EQ(lightGroupRef, decode->getValue<std::string>("LightGroupReference"));
 }
 
 }; // namespace Graphics
