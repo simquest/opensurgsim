@@ -24,6 +24,9 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/LU> 		// needed for determinant() and inverse()
+#include <Eigen/Sparse>
+
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {
@@ -155,7 +158,7 @@ inline T computeAngle(const Eigen::Matrix<T, 3, 3, MOpt>& matrix)
 /// \param[out] matrix The matrix to add the sub-matrix into
 template <class Matrix, class SubMatrix>
 void addSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdCol,
-	size_t blockSizeRow, size_t blockSizeCol, Matrix* matrix)
+				  size_t blockSizeRow, size_t blockSizeCol, Matrix* matrix)
 {
 	matrix->block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol) += subMatrix;
 }
@@ -180,8 +183,8 @@ void addSubMatrix(const SubMatrix& subMatrix, const std::vector<size_t> blockIds
 		{
 			size_t blockId1 = blockIds[block1];
 
-			matrix->block(blockSize * blockId0, blockSize * blockId1, blockSize, blockSize)
-				+= subMatrix.block(blockSize * block0, blockSize * block1, blockSize, blockSize);
+			matrix->block(blockSize * blockId0, blockSize * blockId1, blockSize, blockSize) +=
+				subMatrix.block(blockSize * block0, blockSize * block1, blockSize, blockSize);
 		}
 	}
 }
@@ -195,10 +198,10 @@ void addSubMatrix(const SubMatrix& subMatrix, const std::vector<size_t> blockIds
 /// \param[out] matrix The matrix to set the sub-matrix into
 template <class Matrix, class SubMatrix>
 void setSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdCol,
-	size_t blockSizeRow, size_t blockSizeCol, Matrix* matrix)
+				  size_t blockSizeRow, size_t blockSizeCol, Matrix* matrix)
 {
 	matrix->block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol,
-		blockSizeRow, blockSizeCol) = subMatrix;
+				  blockSizeRow, blockSizeCol) = subMatrix;
 }
 
 /// Helper method to access a sub-matrix from a matrix, for the sake of clarity
@@ -212,9 +215,29 @@ void setSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdC
 /// \note therefore the Matrix from which the Block is built from must not be const
 template <class Matrix>
 Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, size_t blockIdRow, size_t blockIdCol,  // NOLINT
-	size_t blockSizeRow, size_t blockSizeCol)
+								  size_t blockSizeRow, size_t blockSizeCol)
 {
 	return matrix.block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol);
+}
+
+/// Helper method to zero a row of a matrix.
+/// \tparam Matrix The matrix type
+/// \param row The row to set to zero
+/// \param[out] matrix The matrix to set the zero row on.
+template <class Matrix>
+void zeroRow(size_t row, Matrix* matrix)
+{
+	matrix->middleRows(row, 1).setZero();
+}
+
+/// Helper method to zero a row of a matrix.
+/// \tparam Matrix The matrix type
+/// \param row The row to set to zero
+/// \param[out] matrix The matrix to set the zero row on.
+template <class Matrix>
+void zeroColumn(size_t column, Matrix* matrix)
+{
+	(*matrix).middleCols(column, 1).setZero();
 }
 
 };  // namespace Math

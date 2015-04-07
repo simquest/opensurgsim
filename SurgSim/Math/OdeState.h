@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -135,6 +136,14 @@ public:
 	/// \note in an architecture of type LCP. It ensures that a separate constraint resolution will never violates the
 	/// \note boundary conditions.
 	void applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasCompliance = true) const;
+
+	/// Apply boundary conditions to a given matrix
+	/// \param matrix The matrix to apply the boundary conditions on
+	/// \param hasCompliance True if the fixed dofs should have a compliance of 1 with themselves in the matrix or not.
+	/// \note hasCompliance is practical to remove all compliance, which is helpful when the compliance matrix is used
+	/// \note in an architecture of type LCP. It ensures that a separate constraint resolution will never violates the
+	/// \note boundary conditions.
+	void applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCompliance = true) const;
 
 	/// Check if this state is numerically valid
 	/// \return True if all positions and velocities are valid numerical values, False otherwise

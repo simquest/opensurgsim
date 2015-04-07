@@ -70,8 +70,8 @@ void MassSpring1DRepresentation::init1D(
 
 	// Sets the boundary conditions
 	for (auto boundaryCondition = std::begin(nodeBoundaryConditions);
-		boundaryCondition != std::end(nodeBoundaryConditions);
-		boundaryCondition++)
+		 boundaryCondition != std::end(nodeBoundaryConditions);
+		 boundaryCondition++)
 	{
 		state->addBoundaryCondition(*boundaryCondition);
 	}
@@ -82,7 +82,7 @@ void MassSpring1DRepresentation::init1D(
 
 bool MassSpring1DRepresentation::doWakeUp()
 {
-	using SurgSim::Math::LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix;
+	using SurgSim::Math::LinearSparseSolveAndInverseLU;
 
 	if (!MassSpringRepresentation::doWakeUp())
 	{
@@ -119,19 +119,19 @@ bool MassSpring1DRepresentation::doWakeUp()
 
 	switch (m_integrationScheme)
 	{
-	case SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER:
-	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER:
-		if (getInitialState()->getNumNodes() % 2 == 0)
-		{
-			m_odeSolver->setLinearSolver(std::make_shared<LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<6>>());
-		}
-		else
-		{
-			// We should use a band matrix solver here in general when available
-		}
-		break;
-	default:
-		break;
+		case SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER:
+		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER:
+			if (getInitialState()->getNumNodes() % 2 == 0)
+			{
+				m_odeSolver->setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
+			}
+			else
+			{
+				// We should use a band matrix solver here in general when available
+			}
+			break;
+		default:
+			break;
 	}
 
 	return true;

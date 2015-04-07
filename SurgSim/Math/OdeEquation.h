@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -44,7 +45,7 @@ class OdeEquation
 {
 public:
 	/// Virtual destructor
-	virtual ~OdeEquation(){}
+	virtual ~OdeEquation() {}
 
 	/// Retrieves the ode initial conditions \f$(x0, v0)\f$ (i.e the initial state)
 	/// \return The initial state
@@ -60,19 +61,19 @@ public:
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the matrix \f$M(x,v)\f$ with
 	/// \return The matrix \f$M(x,v)\f$
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	virtual const Matrix& computeM(const OdeState& state) = 0;
+	virtual const SparseMatrix& computeM(const OdeState& state) = 0;
 
 	/// Evaluation of \f$D = -\frac{\partial f}{\partial v}(x,v)\f$ for a given state
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix \f$D = -\frac{\partial f}{\partial v}(x,v)\f$
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	virtual const Matrix& computeD(const OdeState& state) = 0;
+	virtual const SparseMatrix& computeD(const OdeState& state) = 0;
 
 	/// Evaluation of \f$K = -\frac{\partial f}{\partial x}(x,v)\f$ for a given state
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix \f$K = -\frac{\partial f}{\partial x}(x,v)\f$
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	virtual const Matrix& computeK(const OdeState& state) = 0;
+	virtual const SparseMatrix& computeK(const OdeState& state) = 0;
 
 	/// Evaluation of \f$f(x,v)\f$, \f$M(x,v)\f$, \f$D = -\frac{\partial f}{\partial v}(x,v)\f$ and
 	/// \f$K = -\frac{\partial f}{\partial x}(x,v)\f$.
@@ -84,7 +85,16 @@ public:
 	/// \param[out] K The matrix \f$K = -\frac{\partial f}{\partial x}(x,v)\f$
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) = 0;
+	virtual void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) = 0;
+
+	/// Calculate the product C * b where C is the compliance matrix with boundary conditions
+	/// applied. Note that this can be rewritten as (B^T M^-1 B) * b = B^T * (M^-1 * (B * b)) = x,
+	/// where M^-1 * (B * b) = x is simply the solution to MX = Bb.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param b The input matrix \b
+	/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
+	/// when the compliance matrix would have been generated in the initial version.
+	virtual Matrix applyCompliance(const OdeState& state, Matrix b) = 0;
 
 protected:
 	/// The initial state (which defines the ODE initial conditions \f$(x0, v0)\f$)

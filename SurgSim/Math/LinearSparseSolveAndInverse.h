@@ -66,7 +66,6 @@ public:
 	void setMatrix(const SparseMatrix& matrix) override;
 
 	Matrix solve(const Matrix& b) override;
-
 	Matrix getInverse() override;
 
 	void operator()(const SparseMatrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;

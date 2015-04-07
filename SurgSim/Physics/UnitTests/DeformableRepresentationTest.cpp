@@ -21,6 +21,7 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/OdeSolver.h" // Need access to the enum IntegrationScheme
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
@@ -36,6 +37,7 @@
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Math::Matrix;
+using SurgSim::Math::SparseMatrix;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector;
 using SurgSim::Physics::DeformableCollisionRepresentation;
@@ -65,7 +67,7 @@ public:
 	{
 		m_localInitialState = std::make_shared<SurgSim::Math::OdeState>();
 		m_localInitialState->setNumDof(getNumDofPerNode(), numNodes);
-		m_localInitialState->getPositions().setLinSpaced(0.0, static_cast<double>(getNumDofPerNode() * numNodes- 1));
+		m_localInitialState->getPositions().setLinSpaced(0.0, static_cast<double>(getNumDofPerNode() * numNodes - 1));
 		m_localInitialState->getVelocities().setOnes();
 
 		SurgSim::Math::Quaterniond q(0.1, 0.4, 0.5, 0.2);
@@ -99,12 +101,14 @@ TEST_F(DeformableRepresentationTest, ConstructorTest)
 	ASSERT_NO_THROW({MockDeformableRepresentation* deformable = new MockDeformableRepresentation; delete deformable;});
 
 	// Test the object creation through the operator new []
-	ASSERT_NO_THROW({MockDeformableRepresentation* deformable = new MockDeformableRepresentation[10];\
-		delete [] deformable;});
+	ASSERT_NO_THROW({MockDeformableRepresentation* deformable = new MockDeformableRepresentation[10]; \
+					 delete [] deformable;
+					});
 
 	// Test the object creation through a shared_ptr
-	ASSERT_NO_THROW({std::shared_ptr<MockDeformableRepresentation> deformable =\
-		std::make_shared<MockDeformableRepresentation>(); });
+	ASSERT_NO_THROW({std::shared_ptr<MockDeformableRepresentation> deformable = \
+					 std::make_shared<MockDeformableRepresentation>();
+					});
 }
 
 TEST_F(DeformableRepresentationTest, SetGetTest)
@@ -129,14 +133,15 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_EQ(0, getExternalGeneralizedDamping().rows());
 	EXPECT_EQ(0, getExternalGeneralizedDamping().cols());
 	setInitialState(m_localInitialState);
+	SparseMatrix zeroMatrix(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedForce().size());
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedStiffness().rows());
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedStiffness().cols());
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedDamping().rows());
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedDamping().cols());
 	EXPECT_TRUE(getExternalGeneralizedForce().isZero());
-	EXPECT_TRUE(getExternalGeneralizedStiffness().isZero());
-	EXPECT_TRUE(getExternalGeneralizedDamping().isZero());
+	EXPECT_TRUE(getExternalGeneralizedStiffness().isApprox(zeroMatrix));
+	EXPECT_TRUE(getExternalGeneralizedDamping().isApprox(zeroMatrix));
 
 	doWakeUp();
 
@@ -193,7 +198,8 @@ TEST_F(DeformableRepresentationTest, GetComplianceMatrix)
 	// In our case, M = Identity, so the compliance matrix will be Identity*dt
 	EXPECT_NO_THROW(update(dt));
 
-	EXPECT_NO_THROW(EXPECT_TRUE(getComplianceMatrix().isApprox(Matrix::Identity(3,3) * dt)));
+	EXPECT_NO_THROW(EXPECT_TRUE(applyCompliance(*m_localInitialState, Matrix::Identity(3,
+								3)).isApprox(Matrix::Identity(3, 3) * dt)));
 }
 
 TEST_F(DeformableRepresentationTest, ResetStateTest)
@@ -312,6 +318,7 @@ TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 {
 	// setInitialState sets all 4 states (tested in method above !)
 	setInitialState(m_localInitialState);
+	SparseMatrix zeroMatrix(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
 
 	// Initialize and wake-up the deformable component
 	EXPECT_NO_THROW(EXPECT_TRUE(initialize(std::make_shared<SurgSim::Framework::Runtime>())));
@@ -319,15 +326,15 @@ TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 
 	// Set external generalized force/stiffness/damping
 	EXPECT_TRUE(getExternalGeneralizedForce().isZero());
-	EXPECT_TRUE(getExternalGeneralizedStiffness().isZero());
-	EXPECT_TRUE(getExternalGeneralizedDamping().isZero());
+	EXPECT_TRUE(getExternalGeneralizedStiffness().isApprox(zeroMatrix));
+	EXPECT_TRUE(getExternalGeneralizedDamping().isApprox(zeroMatrix));
 	SurgSim::Math::Vector F = SurgSim::Math::Vector::LinSpaced(getNumDofPerNode(), -2.34, 4.41);
 	SurgSim::Math::Matrix K = SurgSim::Math::Matrix::Ones(getNumDofPerNode(), getNumDofPerNode());
 	SurgSim::Math::Matrix D = 2.3 * K;
 	addExternalGeneralizedForce(m_localization0, F, K, D);
 	EXPECT_FALSE(getExternalGeneralizedForce().isZero());
-	EXPECT_FALSE(getExternalGeneralizedStiffness().isZero());
-	EXPECT_FALSE(getExternalGeneralizedDamping().isZero());
+	EXPECT_FALSE(getExternalGeneralizedStiffness().isApprox(zeroMatrix));
+	EXPECT_FALSE(getExternalGeneralizedDamping().isApprox(zeroMatrix));
 	EXPECT_TRUE(getExternalGeneralizedForce().isApprox(F));
 	EXPECT_TRUE(getExternalGeneralizedStiffness().isApprox(K));
 	EXPECT_TRUE(getExternalGeneralizedDamping().isApprox(D));
@@ -339,8 +346,8 @@ TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 
 	// External generalized force/stiffness/damping should have been reset
 	EXPECT_TRUE(getExternalGeneralizedForce().isZero());
-	EXPECT_TRUE(getExternalGeneralizedStiffness().isZero());
-	EXPECT_TRUE(getExternalGeneralizedDamping().isZero());
+	EXPECT_TRUE(getExternalGeneralizedStiffness().isApprox(zeroMatrix));
+	EXPECT_TRUE(getExternalGeneralizedDamping().isApprox(zeroMatrix));
 
 	EXPECT_TRUE(*m_localInitialState  == *m_initialState);
 	EXPECT_TRUE(*m_localInitialState  == *m_previousState);
@@ -421,7 +428,7 @@ TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 	using SurgSim::Math::OdeSolverLinearEulerExplicitModified;
 	using SurgSim::Math::OdeSolverLinearEulerImplicit;
 	using SurgSim::Math::OdeSolverLinearStatic;
-	using SurgSim::Math::LinearSolveAndInverseDenseMatrix;
+	using SurgSim::Math::LinearSparseSolveAndInverseLU;
 
 	// setInitialState sets all 4 states (tested in method above !)
 	setLocalPose(m_nonIdentityTransform);
@@ -447,9 +454,9 @@ TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 	// Test the Ode Solver
 	ASSERT_NE(nullptr, m_odeSolver);
 	ASSERT_NE(nullptr, m_odeSolver->getLinearSolver());
-	std::shared_ptr<LinearSolveAndInverseDenseMatrix> expectedLinearSolverType;
-	expectedLinearSolverType = std::dynamic_pointer_cast<LinearSolveAndInverseDenseMatrix>
-		(m_odeSolver->getLinearSolver());
+	std::shared_ptr<LinearSparseSolveAndInverseLU> expectedLinearSolverType;
+	expectedLinearSolverType = std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>
+							   (m_odeSolver->getLinearSolver());
 	ASSERT_NE(nullptr, expectedLinearSolverType);
 
 	typedef OdeSolverEulerExplicit EESolver;

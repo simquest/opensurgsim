@@ -28,6 +28,7 @@
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Quaterniond;
+using SurgSim::Math::SparseMatrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem1DElementBeam;
@@ -120,6 +121,10 @@ public:
 	double m_rho, m_E, m_nu, m_L;
 	double m_radius;
 	Quaterniond m_orientation;
+	Vector forceVector;
+	SparseMatrix massMatrix;
+	SparseMatrix dampingMatrix;
+	SparseMatrix stiffnessMatrix;
 
 	void SetUp() override
 	{
@@ -147,6 +152,24 @@ public:
 		Vector& x = m_restState.getPositions();
 		getSubVector(x, m_nodeIds[0], 6).segment<3>(0) = firstExtremity;
 		getSubVector(x, m_nodeIds[1], 6).segment<3>(0) = secondExtremity;
+
+		// Initialize the global matrices for calculations.
+		std::vector<size_t> nodeIdsVectorForm(m_nodeIds.begin(), m_nodeIds.end());
+		forceVector = Vector::Zero(6 * m_numberNodes);
+		massMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
+		SurgSim::Math::addSubMatrixAndInitialize(SurgSim::Math::Matrix::Zero(12, 12),
+				nodeIdsVectorForm, 6, &massMatrix);
+		massMatrix.makeCompressed();
+
+		dampingMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
+		SurgSim::Math::addSubMatrixAndInitialize(SurgSim::Math::Matrix::Zero(12, 12),
+				nodeIdsVectorForm, 6, &dampingMatrix);
+		dampingMatrix.makeCompressed();
+
+		stiffnessMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
+		SurgSim::Math::addSubMatrixAndInitialize(SurgSim::Math::Matrix::Zero(12, 12),
+				nodeIdsVectorForm, 6, &stiffnessMatrix);
+		stiffnessMatrix.makeCompressed();
 	}
 
 	void getExpectedMassMatrix(Eigen::Ref<SurgSim::Math::Matrix> mass)
@@ -162,52 +185,52 @@ public:
 		Eigen::Matrix<double, 12, 12> untransformedMass;
 
 		untransformedMass.col(0) <<
-			1.0 / 3.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-			1.0 / 6.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+								 1.0 / 3.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+									 1.0 / 6.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
 		untransformedMass.col(1) <<
-			0.0, 13.0 / 35.0 + 6.0 * Iz / (5.0 * A * L2), 0.0, 0.0, 0.0,  11.0 * L / 210.0 + Iz / (10.0 * A * L),
-			0.0,  9.0 / 70.0 - 6.0 * Iz / (5.0 * A * L2), 0.0, 0.0, 0.0, -13.0 * L / 420.0 + Iz / (10.0 * A * L);
+								 0.0, 13.0 / 35.0 + 6.0 * Iz / (5.0 * A * L2), 0.0, 0.0, 0.0,  11.0 * L / 210.0 + Iz / (10.0 * A * L),
+									  0.0,  9.0 / 70.0 - 6.0 * Iz / (5.0 * A * L2), 0.0, 0.0, 0.0, -13.0 * L / 420.0 + Iz / (10.0 * A * L);
 
 		untransformedMass.col(2) <<
-			0.0, 0.0, 13.0 / 35.0 + 6.0 * Iy / (5.0 * A * L2), 0.0, -11.0 * L / 210.0 - Iy / (10.0 * A * L), 0.0,
-			0.0, 0.0,  9.0 / 70.0 - 6.0 * Iy / (5.0 * A * L2), 0.0,  13.0 * L / 420.0 - Iy / (10.0 * A * L), 0.0;
+								 0.0, 0.0, 13.0 / 35.0 + 6.0 * Iy / (5.0 * A * L2), 0.0, -11.0 * L / 210.0 - Iy / (10.0 * A * L), 0.0,
+									  0.0, 0.0,  9.0 / 70.0 - 6.0 * Iy / (5.0 * A * L2), 0.0,  13.0 * L / 420.0 - Iy / (10.0 * A * L), 0.0;
 
 		untransformedMass.col(3) <<
-			0.0, 0.0, 0.0, I / (3.0 * A), 0.0, 0.0,
-			0.0, 0.0, 0.0, I / (6.0 * A), 0.0, 0.0;
+								 0.0, 0.0, 0.0, I / (3.0 * A), 0.0, 0.0,
+									  0.0, 0.0, 0.0, I / (6.0 * A), 0.0, 0.0;
 
 		untransformedMass.col(4) <<
-			0.0, 0.0, -11.0 * L / 210.0 - Iy / (10.0 * A * L), 0.0,  L2 / 105.0 + 2.0 * Iy / (15.0 * A), 0.0,
-			0.0, 0.0, -13.0 * L / 420.0 + Iy / (10.0 * A * L), 0.0, -L2 / 140.0 - Iy / (30.0 * A), 0.0;
+								 0.0, 0.0, -11.0 * L / 210.0 - Iy / (10.0 * A * L), 0.0,  L2 / 105.0 + 2.0 * Iy / (15.0 * A), 0.0,
+									  0.0, 0.0, -13.0 * L / 420.0 + Iy / (10.0 * A * L), 0.0, -L2 / 140.0 - Iy / (30.0 * A), 0.0;
 
 		untransformedMass.col(5) <<
-			0.0, 11.0 * L / 210.0 + Iz / (10.0 * A * L), 0.0, 0.0, 0.0,  L2 / 105.0 + 2.0 * Iz / (15.0 * A),
-			0.0, 13.0 * L / 420.0 - Iz / (10.0 * A * L), 0.0, 0.0, 0.0, -L2 / 140.0 - Iz / (30.0 * A);
+								 0.0, 11.0 * L / 210.0 + Iz / (10.0 * A * L), 0.0, 0.0, 0.0,  L2 / 105.0 + 2.0 * Iz / (15.0 * A),
+									  0.0, 13.0 * L / 420.0 - Iz / (10.0 * A * L), 0.0, 0.0, 0.0, -L2 / 140.0 - Iz / (30.0 * A);
 
 		untransformedMass.col(6) <<
-			1.0 / 6.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-			1.0 / 3.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+								 1.0 / 6.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+									 1.0 / 3.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
 		untransformedMass.col(7) <<
-			0.0,  9.0 / 70.0 - 6.0 * Iz / (5.0 * A * L2), 0.0, 0.0, 0.0,  13.0 * L / 420.0 - Iz / (10.0 * A * L),
-			0.0, 13.0 / 35.0 + 6.0 * Iz / (5.0 * A * L2), 0.0, 0.0, 0.0, -11.0 * L / 210.0 - Iz / (10.0 * A * L);
+								 0.0,  9.0 / 70.0 - 6.0 * Iz / (5.0 * A * L2), 0.0, 0.0, 0.0,  13.0 * L / 420.0 - Iz / (10.0 * A * L),
+									   0.0, 13.0 / 35.0 + 6.0 * Iz / (5.0 * A * L2), 0.0, 0.0, 0.0, -11.0 * L / 210.0 - Iz / (10.0 * A * L);
 
 		untransformedMass.col(8) <<
-			0.0, 0.0,  9.0 / 70.0 - 6.0 * Iy / (5.0 * A * L2), 0.0, -13.0 * L / 420.0 + Iy / (10.0 * A * L), 0.0,
-			0.0, 0.0, 13.0 / 35.0 + 6.0 * Iy / (5.0 * A * L2), 0.0,  11.0 * L / 210.0 + Iy / (10.0 * A * L), 0.0;
+								 0.0, 0.0,  9.0 / 70.0 - 6.0 * Iy / (5.0 * A * L2), 0.0, -13.0 * L / 420.0 + Iy / (10.0 * A * L), 0.0,
+									  0.0, 0.0, 13.0 / 35.0 + 6.0 * Iy / (5.0 * A * L2), 0.0,  11.0 * L / 210.0 + Iy / (10.0 * A * L), 0.0;
 
 		untransformedMass.col(9) <<
-			0.0, 0.0, 0.0, I / (6.0 * A), 0.0, 0.0,
-			0.0, 0.0, 0.0, I / (3.0 * A), 0.0, 0.0;
+								 0.0, 0.0, 0.0, I / (6.0 * A), 0.0, 0.0,
+									  0.0, 0.0, 0.0, I / (3.0 * A), 0.0, 0.0;
 
 		untransformedMass.col(10) <<
-			0.0, 0.0, 13.0 * L / 420.0 - Iy / (10.0 * A * L), 0.0, -L2 / 140.0 - Iy / (30.0 * A), 0.0,
-			0.0, 0.0, 11.0 * L / 210.0 + Iy / (10.0 * A * L), 0.0,  L2 / 105.0 + 2 * Iy / (15.0 * A), 0.0;
+								  0.0, 0.0, 13.0 * L / 420.0 - Iy / (10.0 * A * L), 0.0, -L2 / 140.0 - Iy / (30.0 * A), 0.0,
+									   0.0, 0.0, 11.0 * L / 210.0 + Iy / (10.0 * A * L), 0.0,  L2 / 105.0 + 2 * Iy / (15.0 * A), 0.0;
 
 		untransformedMass.col(11) <<
-			0.0, -13.0 * L / 420.0 + Iz / (10.0 * A * L), 0.0, 0.0, 0.0, -L2 / 140.0 - Iz / (30.0 * A),
-			0.0, -11.0 * L / 210.0 - Iz / (10.0 * A * L), 0.0, 0.0, 0.0,  L2 / 105.0 + 2 * Iz / (15.0 * A);
+								  0.0, -13.0 * L / 420.0 + Iz / (10.0 * A * L), 0.0, 0.0, 0.0, -L2 / 140.0 - Iz / (30.0 * A),
+									   0.0, -11.0 * L / 210.0 - Iz / (10.0 * A * L), 0.0, 0.0, 0.0,  L2 / 105.0 + 2 * Iz / (15.0 * A);
 
 		untransformedMass *= m_rho * m_expectedVolume;
 
@@ -314,52 +337,52 @@ public:
 		Eigen::Matrix<double, 12, 12> untransformedStiffness;
 
 		untransformedStiffness.col(0) <<
-			 m_E * A / L, 0.0, 0.0, 0.0, 0.0, 0.0,
-			-m_E * A / L, 0.0, 0.0, 0.0, 0.0, 0.0;
+									  m_E* A / L, 0.0, 0.0, 0.0, 0.0, 0.0,
+										   -m_E* A / L, 0.0, 0.0, 0.0, 0.0, 0.0;
 
 		untransformedStiffness.col(1) <<
-			0.0,  12.0 * m_E * Iz / L3 / (1 + phi_y), 0.0, 0.0, 0.0, 6.0 * m_E * Iz / L2 / (1 + phi_y),
-			0.0, -12.0 * m_E * Iz / L3 / (1 + phi_y), 0.0, 0.0, 0.0, 6.0 * m_E * Iz / L2 / (1 + phi_y);
+									  0.0,  12.0 * m_E* Iz / L3 / (1 + phi_y), 0.0, 0.0, 0.0, 6.0 * m_E* Iz / L2 / (1 + phi_y),
+											0.0, -12.0 * m_E* Iz / L3 / (1 + phi_y), 0.0, 0.0, 0.0, 6.0 * m_E* Iz / L2 / (1 + phi_y);
 
 		untransformedStiffness.col(2) <<
-			0.0, 0.0,  12.0 * m_E * Iy / L3 / (1 + phi_z), 0.0, -6.0 * m_E * Iy / L2 / (1 + phi_z), 0.0,
-			0.0, 0.0, -12.0 * m_E * Iy / L3 / (1 + phi_z), 0.0, -6.0 * m_E * Iy / L2 / (1 + phi_z), 0.0;
+									  0.0, 0.0,  12.0 * m_E* Iy / L3 / (1 + phi_z), 0.0, -6.0 * m_E* Iy / L2 / (1 + phi_z), 0.0,
+										   0.0, 0.0, -12.0 * m_E* Iy / L3 / (1 + phi_z), 0.0, -6.0 * m_E* Iy / L2 / (1 + phi_z), 0.0;
 
 		untransformedStiffness.col(3) <<
-			0.0, 0.0, 0.0, G * I / L, 0.0, 0.0,
-			0.0, 0.0, 0.0, -G * I / L, 0.0, 0.0;
+									  0.0, 0.0, 0.0, G* I / L, 0.0, 0.0,
+										   0.0, 0.0, 0.0, -G* I / L, 0.0, 0.0;
 
 		untransformedStiffness.col(4) <<
-			0.0, 0.0, -6.0 * m_E * Iy / L2 / (1 + phi_z), 0.0, (4.0 + phi_z) * m_E * Iy / L / (1 + phi_z), 0.0,
-			0.0, 0.0,  6.0 * m_E * Iy / L2 / (1 + phi_z), 0.0, (2.0 - phi_z) * m_E * Iy / L / (1 + phi_z), 0.0;
+									  0.0, 0.0, -6.0 * m_E* Iy / L2 / (1 + phi_z), 0.0, (4.0 + phi_z) * m_E* Iy / L / (1 + phi_z), 0.0,
+										   0.0, 0.0,  6.0 * m_E* Iy / L2 / (1 + phi_z), 0.0, (2.0 - phi_z) * m_E* Iy / L / (1 + phi_z), 0.0;
 
 		untransformedStiffness.col(5) <<
-			0.0,  6.0 * m_E * Iz / L2 / (1 + phi_y), 0.0, 0.0, 0.0, (4.0 + phi_y) * m_E * Iz / L / (1 + phi_y),
-			0.0, -6.0 * m_E * Iz / L2 / (1 + phi_y), 0.0, 0.0, 0.0, (2.0 - phi_y) * m_E * Iz / L / (1 + phi_y);
+									  0.0,  6.0 * m_E* Iz / L2 / (1 + phi_y), 0.0, 0.0, 0.0, (4.0 + phi_y) * m_E* Iz / L / (1 + phi_y),
+											0.0, -6.0 * m_E* Iz / L2 / (1 + phi_y), 0.0, 0.0, 0.0, (2.0 - phi_y) * m_E* Iz / L / (1 + phi_y);
 
 		untransformedStiffness.col(6) <<
-			-m_E * A / L, 0.0, 0.0, 0.0, 0.0, 0.0,
-			 m_E * A / L, 0.0, 0.0, 0.0, 0.0, 0.0;
+									  -m_E* A / L, 0.0, 0.0, 0.0, 0.0, 0.0,
+									  m_E* A / L, 0.0, 0.0, 0.0, 0.0, 0.0;
 
 		untransformedStiffness.col(7) <<
-			0.0, -12.0 * m_E * Iz / L3 / (1 + phi_y), 0.0, 0.0, 0.0, -6.0 * m_E * Iz / L2 / (1 + phi_y),
-			0.0,  12.0 * m_E * Iz / L3 / (1 + phi_y), 0.0, 0.0, 0.0, -6.0 * m_E * Iz / L2 / (1 + phi_y);
+									  0.0, -12.0 * m_E* Iz / L3 / (1 + phi_y), 0.0, 0.0, 0.0, -6.0 * m_E* Iz / L2 / (1 + phi_y),
+										   0.0,  12.0 * m_E* Iz / L3 / (1 + phi_y), 0.0, 0.0, 0.0, -6.0 * m_E* Iz / L2 / (1 + phi_y);
 
 		untransformedStiffness.col(8) <<
-			0.0, 0.0, -12.0 * m_E * Iy / L3 / (1 + phi_z), 0.0, 6.0 * m_E * Iy / L2 / (1 + phi_z), 0.0,
-			0.0, 0.0,  12.0 * m_E * Iy / L3 / (1 + phi_z), 0.0, 6.0 * m_E * Iy / L2 / (1 + phi_z), 0.0;
+									  0.0, 0.0, -12.0 * m_E* Iy / L3 / (1 + phi_z), 0.0, 6.0 * m_E* Iy / L2 / (1 + phi_z), 0.0,
+										   0.0, 0.0,  12.0 * m_E* Iy / L3 / (1 + phi_z), 0.0, 6.0 * m_E* Iy / L2 / (1 + phi_z), 0.0;
 
 		untransformedStiffness.col(9) <<
-			0.0, 0.0, 0.0, -G * I / L, 0.0, 0.0,
-			0.0, 0.0, 0.0,  G * I / L, 0.0, 0.0;
+									  0.0, 0.0, 0.0, -G* I / L, 0.0, 0.0,
+										   0.0, 0.0, 0.0,  G* I / L, 0.0, 0.0;
 
 		untransformedStiffness.col(10) <<
-			0.0, 0.0, -6.0 * m_E * Iy / L2 / (1 + phi_z), 0.0, (2.0 - phi_z) * m_E * Iy / L / (1 + phi_z), 0.0,
-			0.0, 0.0,  6.0 * m_E * Iy / L2 / (1 + phi_z), 0.0, (4.0 + phi_z) * m_E * Iy / L / (1 + phi_z), 0.0;
+									   0.0, 0.0, -6.0 * m_E* Iy / L2 / (1 + phi_z), 0.0, (2.0 - phi_z) * m_E* Iy / L / (1 + phi_z), 0.0,
+											0.0, 0.0,  6.0 * m_E* Iy / L2 / (1 + phi_z), 0.0, (4.0 + phi_z) * m_E* Iy / L / (1 + phi_z), 0.0;
 
 		untransformedStiffness.col(11) <<
-			0.0,  6.0 * m_E * Iz / L2 / (1 + phi_y), 0.0, 0.0, 0.0, (2.0 - phi_y) * m_E * Iz / L / (1 + phi_y),
-			0.0, -6.0 * m_E * Iz / L2 / (1 + phi_y), 0.0, 0.0, 0.0, (4.0 + phi_y) * m_E * Iz / L / (1 + phi_y);
+									   0.0,  6.0 * m_E* Iz / L2 / (1 + phi_y), 0.0, 0.0, 0.0, (2.0 - phi_y) * m_E* Iz / L / (1 + phi_y),
+											 0.0, -6.0 * m_E* Iz / L2 / (1 + phi_y), 0.0, 0.0, 0.0, (4.0 + phi_y) * m_E* Iz / L / (1 + phi_y);
 
 		stiffness.setZero();
 		placeIntoAssembly(untransformedStiffness, stiffness);
@@ -391,7 +414,7 @@ public:
 TEST_F(Fem1DElementBeamTests, ConstructorTest)
 {
 	ASSERT_NO_THROW(
-		{ MockFem1DElement beam(m_nodeIds); });
+	{ MockFem1DElement beam(m_nodeIds); });
 }
 
 TEST_F(Fem1DElementBeamTests, NodeIdsTest)
@@ -526,13 +549,13 @@ TEST_F(Fem1DElementBeamTests, CoordinateTests)
 	naturalCoordinateB << 0.0, 1.0;
 	naturalCoordinateMiddle << 1.0 / 2.0, 1.0 / 2.0;
 	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateNegativeValue), \
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSize1), \
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSize3), \
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSumNot1), \
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	EXPECT_NO_THROW(ptA = element.computeCartesianCoordinate(m_restState, naturalCoordinateA));
 	EXPECT_NO_THROW(ptB = element.computeCartesianCoordinate(m_restState, naturalCoordinateB));
 	EXPECT_NO_THROW(ptMiddle = element.computeCartesianCoordinate(m_restState, naturalCoordinateMiddle));
@@ -554,10 +577,10 @@ TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 
 	Vector vectorOnes = Vector::Ones(6 * m_numberNodes);
 
-	Vector forceVector = Vector::Zero(6 * m_numberNodes);
-	Matrix massMatrix = Matrix::Zero(6 * m_numberNodes, 6 * m_numberNodes);
-	Matrix dampingMatrix = Matrix::Zero(6 * m_numberNodes, 6 * m_numberNodes);
-	Matrix stiffnessMatrix = Matrix::Zero(6 * m_numberNodes, 6 * m_numberNodes);
+	forceVector.setZero();
+	SurgSim::Math::clearMatrix(&massMatrix);
+	SurgSim::Math::clearMatrix(&dampingMatrix);
+	SurgSim::Math::clearMatrix(&stiffnessMatrix);
 
 	Matrix expectedMass(6 * m_numberNodes, 6 * m_numberNodes);
 	Matrix expectedMass2(6 * m_numberNodes, 6 * m_numberNodes);
@@ -573,8 +596,10 @@ TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 	EXPECT_TRUE(forceVector.isZero());
 
 	beam->addMass(m_restState, &massMatrix);
-	EXPECT_TRUE(massMatrix.isApprox(expectedMass));
-	EXPECT_TRUE(massMatrix.isApprox(expectedMass2, 1e-6));
+	EXPECT_TRUE(massMatrix.isApprox(expectedMass)) << "Expected Mass:" << std::endl << expectedMass << std::endl <<
+			"Mass Matrix:" << std::endl << massMatrix << std::endl;
+	EXPECT_TRUE(massMatrix.isApprox(expectedMass2, 1e-6)) << "Expected Mass 2:" << std::endl << expectedMass <<
+			std::endl << "Mass Matrix:" << std::endl << massMatrix << std::endl;
 
 	beam->addDamping(m_restState, &dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isApprox(expectedDamping));
@@ -583,9 +608,9 @@ TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 	EXPECT_TRUE(stiffnessMatrix.isApprox(expectedStiffness));
 
 	forceVector.setZero();
-	massMatrix.setZero();
-	dampingMatrix.setZero();
-	stiffnessMatrix.setZero();
+	SurgSim::Math::clearMatrix(&massMatrix);
+	SurgSim::Math::clearMatrix(&dampingMatrix);
+	SurgSim::Math::clearMatrix(&stiffnessMatrix);
 
 	beam->addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());

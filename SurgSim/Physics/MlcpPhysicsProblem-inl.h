@@ -22,11 +22,11 @@ namespace SurgSim
 {
 namespace Physics
 {
-
+/*
 template <typename SubCDerivedType>
 void MlcpPhysicsProblem::updateConstraint(
-	const Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>& newSubH,
-	const Eigen::MatrixBase<SubCDerivedType>& subC,
+	const Eigen::SparseVector<double>& newSubH,
+	const Eigen::MatrixBase<SubCDerivedType>& newCHt,
 	size_t indexSubC,
 	size_t indexNewSubH)
 {
@@ -44,16 +44,13 @@ void MlcpPhysicsProblem::updateConstraint(
 	// (H+H')C(H+H')t = HCHt + HCH't + H'C(H+H')t
 	// => HCHt += H(CH't) + H'[C(H+H')t];
 
-	Vector newCHt = subC * newSubH.transpose();
-	A.col(indexNewSubH) += H.middleCols(indexSubC, subC.rows()) * newCHt;
-	typedef Math::Dynamic::Operation<double, Eigen::RowMajor, ptrdiff_t,
-		Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>> Operation;
-	Math::blockOperation<Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>, double, Eigen::RowMajor, ptrdiff_t>(
-		newSubH, indexNewSubH, indexSubC, &H, &Operation::add);
-	CHt.block(indexSubC, indexNewSubH, subC.rows(), 1) += newCHt;
-	A.row(indexNewSubH) += newSubH * CHt.middleRows(indexSubC, subC.rows());
+	// Vector newCHt = subC * newSubH;
+	A.col(indexNewSubH) += H.middleCols(indexSubC, newCHt.rows()) * newCHt;
+	H.block(indexNewSubH, indexSubC, 1, newCHt.rows()) += newSubH.transpose();
+	CHt.block(indexSubC, indexNewSubH, newCHt.rows(), 1) += newCHt;
+	A.row(indexNewSubH) += newSubH.transpose() * CHt.middleRows(indexSubC, newCHt.rows());
 }
-
+*/
 }
 }
 

@@ -289,10 +289,10 @@ public:
 /// (00[xx]0) -> these rows and columns. <br>
 /// (xx 00 x) <br>
 template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
-void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
-								 Eigen::SparseMatrix<T, Opt, Index>* matrix,
-								 void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
-										 const DerivedSub&, Index))
+void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
+						Eigen::SparseMatrix<T, Opt, Index>* matrix,
+						void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
+								const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -308,6 +308,7 @@ void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, In
 
 	SURGSIM_ASSERT(matrix->rows() >= rowStart + static_cast<Index>(n)) << "The block is out of range in matrix";
 	SURGSIM_ASSERT(matrix->cols() >= columnStart + static_cast<Index>(m)) << "The block is out of range in matrix";
+	SURGSIM_ASSERT(matrix->valuePtr() != nullptr) << "The matrix is not initialized correctly, null pointer to values";
 
 	T* ptr = matrix->valuePtr();
 	const Index* innerIndices = matrix->innerIndexPtr();
@@ -372,10 +373,10 @@ void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, In
 /// (00[xx]0) -> these rows and columns. <br>
 /// (xx 00 x) <br>
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
-								 Eigen::SparseMatrix<T, Opt, Index>* matrix,
-								 void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
-										 const DerivedSub&, Index))
+void blockWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
+						Eigen::SparseMatrix<T, Opt, Index>* matrix,
+						void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
+								const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -391,6 +392,7 @@ void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, In
 
 	SURGSIM_ASSERT(matrix->rows() >= rowStart + static_cast<Index>(n)) << "The block is out of range in matrix";
 	SURGSIM_ASSERT(matrix->cols() >= columnStart + static_cast<Index>(m)) << "The block is out of range in matrix";
+	SURGSIM_ASSERT(matrix->valuePtr() != nullptr) << "The matrix is not initialized correctly, null pointer to values";
 
 	T* ptr = matrix->valuePtr();
 	const Index* innerIndices = matrix->innerIndexPtr();
@@ -453,10 +455,10 @@ void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, In
 /// (0x[xx]0) -> contains more coefficients before and after the block. <br>
 /// (xx 00 x) <br>
 template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename Index>
-void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
-							  Eigen::SparseMatrix<T, Opt, Index>* matrix,
-							  void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
-									  const DerivedSub&, Index))
+void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
+					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
+					 void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
+							 const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -472,6 +474,7 @@ void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index
 
 	SURGSIM_ASSERT(matrix->rows() >= rowStart + static_cast<Index>(n)) << "The block is out of range in matrix";
 	SURGSIM_ASSERT(matrix->cols() >= columnStart + static_cast<Index>(m)) << "The block is out of range in matrix";
+	SURGSIM_ASSERT(matrix->valuePtr() != nullptr) << "The matrix is not initialized correctly, null pointer to values";
 
 	T* ptr = matrix->valuePtr();
 	const Index* innerIndices = matrix->innerIndexPtr();
@@ -547,10 +550,10 @@ void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index
 /// (0x[xx]0) -> contains more coefficients before and after the block. <br>
 /// (xx 00 x) <br>
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
-							  Eigen::SparseMatrix<T, Opt, Index>* matrix,
-							  void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
-									  const DerivedSub&, Index))
+void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
+					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
+					 void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
+							 const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -566,6 +569,7 @@ void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index
 
 	SURGSIM_ASSERT(matrix->rows() >= rowStart + static_cast<Index>(n)) << "The block is out of range in matrix";
 	SURGSIM_ASSERT(matrix->cols() >= columnStart + static_cast<Index>(m)) << "The block is out of range in matrix";
+	SURGSIM_ASSERT(matrix->valuePtr() != nullptr) << "The matrix is not initialized correctly, null pointer to values";
 
 	T* ptr = matrix->valuePtr();
 	const Index* innerIndices = matrix->innerIndexPtr();
@@ -648,6 +652,223 @@ void blockOperation(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index 
 				&matrix->coeffRef(rowStart + static_cast<Index>(it.row()), columnStart + static_cast<Index>(it.col())),
 				static_cast<T>(it.value()));
 		}
+	}
+}
+
+/// Runs a given operation on a SparseMatrix block(i, j, n, m) from a (n x m) 'subMatrix' with searching for the
+/// block 1st element. <br>
+/// It supposes: <br>
+/// + that the SparseMatrix already contains all the elements within the block (no insertion necessary) <br>
+/// + that both the SparseMatrix and the 'subMatrix' are using the same Scalar type <br>
+/// This function will not change anything to the structure of the SparseMatrix, only change the values of the
+/// corresponding coefficients.
+/// \tparam DerivedSub The type of the 'subMatrix' (can usually be inferred). Can be any type, but does not
+/// support Eigen expression. If it is a Sparse storage type the alignment must be the same as the SparseMatrix: Opt.
+/// Note that no assertion or verification is done on this type.
+/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+/// \param subMatrix The sub matrix that will be copied into the SparseMatrix block
+/// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
+/// \param n, m The block size (Derived may be bigger but cannot be smaller in both dimension)
+/// \param[in,out] matrix The sparse matrix in which the block needs to be set by 'subMatrix'
+/// \param op The operation to run on the block
+/// \exception SurgSim::Framework::AssertionFailure If one of the following conditions is met: <br>
+/// * if 'subMatrix' is smaller than (n x m) in any dimension <br>
+/// * if 'matrix' is nullptr or smaller than (n x m) in any dimension <br>
+/// * if the requested block is out of range in 'matrix'. <br>
+/// * if 'matrix' does not fulfill the requirement (i.e. is missing elements within the block). <br>
+/// \note The receiving SparseMatrix must have a structure like the following: <br>
+/// (xx x0 x) <br>
+/// (xx 0x x) <br>
+/// (x0[xx]x) -> The block must already contain all the coefficients but these rows and columns may <br>
+/// (0x[xx]0) -> contains more coefficients before and after the block. <br>
+/// (xx 00 x) <br>
+template <typename DerivedSub, typename T, int Opt, typename Index>
+void blockWithInitialize(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
+						 Eigen::SparseMatrix<T, Opt, Index>* matrix,
+						 void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, const T&))
+{
+	typedef typename DerivedSub::Index DerivedSubIndexType;
+
+	static Dynamic::Operation<T, Opt, Index, DerivedSub> operation;
+
+	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
+				  "Both matrices should use the same Scalar type");
+
+	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
+
+	SURGSIM_ASSERT(subMatrix.rows() >= static_cast<DerivedSubIndexType>(n)) << "subMatrix doesn't have enough rows";
+	SURGSIM_ASSERT(subMatrix.cols() >= static_cast<DerivedSubIndexType>(m)) << "subMatrix doesn't have enough columns";
+
+	SURGSIM_ASSERT(matrix->rows() >= rowStart + static_cast<Index>(n)) << "The block is out of range in matrix";
+	SURGSIM_ASSERT(matrix->cols() >= columnStart + static_cast<Index>(m)) << "The block is out of range in matrix";
+
+	for (int row = 0; row < n; ++row)
+	{
+		for (int column = 0; column < m; ++column)
+		{
+			(operation.*op)(
+				&matrix->coeffRef(rowStart + row, columnStart + column),
+				static_cast<T>(subMatrix(row, column)));
+		}
+	}
+}
+
+/// Helper method to add a sub-matrix into a matrix, for the sake of clarity
+/// \tparam DerivedSub The type of the 'subMatrix' (can usually be inferred). Can be any type, but does not
+/// support Eigen expression. If it is a Sparse storage type the alignment must be the same as the SparseMatrix: Opt.
+/// Note that no assertion or verification is done on this type.
+/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+/// \param subMatrix The sub-matrix
+/// \param blockIdRow, blockIdCol The block indices in matrix
+/// \param blockSizeRow, blockSizeCol The block size (size of the sub-matrix)
+/// \param[out] matrix The matrix to add the sub-matrix into
+/// \note This is a specialization of addSubMatrix for sparse matrices.
+template <typename DerivedSub, typename T, int Opt, typename Index>
+void addSubMatrix(const DerivedSub& subMatrix, Index blockIdRow, Index blockIdCol,
+				  Index blockSizeRow, Index blockSizeCol, Eigen::SparseMatrix<T, Opt, Index>* matrix)
+{
+	blockWithSearch(subMatrix, blockIdRow, blockIdCol, blockSizeRow, blockSizeCol, matrix,
+					&Dynamic::Operation<T, Opt, Index, DerivedSub>::add);
+}
+
+/// Helper method to add a sub-matrix made of squared-blocks into a matrix, for the sake of clarity
+/// \tparam DerivedSub The type of the 'subMatrix' (can usually be inferred). Can be any type, but does not
+/// support Eigen expression. If it is a Sparse storage type the alignment must be the same as the SparseMatrix: Opt.
+/// Note that no assertion or verification is done on this type.
+/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+/// \param subMatrix The sub-matrix (containing all the squared-blocks)
+/// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
+/// \param blockSize The blocks size
+/// \param[out] matrix The matrix to add the sub-matrix blocks into
+/// \note This is a specialization of addSubMatrix for sparse matrices.
+template <typename DerivedSub, typename T, int Opt, typename Index>
+void addSubMatrix(DerivedSub& subMatrix, const std::vector<size_t> blockIds,
+				  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix)
+{
+	const Index numBlocks = static_cast<Index>(blockIds.size());
+	for (Index block0 = 0; block0 < numBlocks; block0++)
+	{
+		Index subRow = blockSize * block0;
+		Index matrixRow = blockSize * static_cast<Index>(blockIds[block0]);
+		for (Index block1 = 0; block1 < numBlocks; block1++)
+		{
+			Index subCol = blockSize * block1;
+			Index matrixCol = blockSize * static_cast<Index>(blockIds[block1]);
+			/*
+			blockWithSearch(subMatrix, matrixRow, matrixCol, blockSize, blockSize, matrix,
+							&Dynamic::Operation<T, Opt, Index, DerivedSub>::add);
+			*/
+			blockWithSearch(subMatrix.block(subRow, subCol, blockSize, blockSize),
+							matrixRow, matrixCol, blockSize, blockSize, matrix,
+							&Dynamic::Operation<T, Opt, Index, Eigen::Block<DerivedSub>>::add);
+		}
+	}
+}
+
+/// Helper method to add a sub-matrix into a matrix, for the sake of clarity
+/// \tparam DerivedSub The type of the 'subMatrix' (can usually be inferred). Can be any type, but does not
+/// support Eigen expression. If it is a Sparse storage type the alignment must be the same as the SparseMatrix: Opt.
+/// Note that no assertion or verification is done on this type.
+/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+/// \param subMatrix The sub-matrix
+/// \param blockIdRow, blockIdCol The block indices in matrix
+/// \param blockSizeRow, blockSizeCol The block size (size of the sub-matrix)
+/// \param[out] matrix The matrix to add the sub-matrix into
+/// \note This is a specialization of addSubMatrix for sparse matrices.
+template <typename DerivedSub, typename T, int Opt, typename Index>
+void addSubMatrixAndInitialize(const DerivedSub& subMatrix, Index blockIdRow, Index blockIdCol,
+							   Index blockSizeRow, Index blockSizeCol, Eigen::SparseMatrix<T, Opt, Index>* matrix)
+{
+	blockWithInitialize(subMatrix, blockIdRow, blockIdCol, blockSizeRow, blockSizeCol, matrix,
+						&Dynamic::Operation<T, Opt, Index, DerivedSub>::add);
+}
+
+/// Helper method to add a sub-matrix made of squared-blocks into a matrix, for the sake of clarity
+/// \tparam DerivedSub The type of the 'subMatrix' (can usually be inferred). Can be any type, but does not
+/// support Eigen expression. If it is a Sparse storage type the alignment must be the same as the SparseMatrix: Opt.
+/// Note that no assertion or verification is done on this type.
+/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+/// \param subMatrix The sub-matrix (containing all the squared-blocks)
+/// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
+/// \param blockSize The blocks size
+/// \param[out] matrix The matrix to add the sub-matrix blocks into
+/// \note This is a specialization of addSubMatrix for sparse matrices.
+template <typename DerivedSub, typename T, int Opt, typename Index>
+void addSubMatrixAndInitialize(DerivedSub& subMatrix, const std::vector<size_t> blockIds,
+							   Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix)
+{
+	const Index numBlocks = static_cast<Index>(blockIds.size());
+	for (Index block0 = 0; block0 < numBlocks; block0++)
+	{
+		Index subRow = blockSize * block0;
+		Index matrixRow = blockSize * static_cast<Index>(blockIds[block0]);
+		for (Index block1 = 0; block1 < numBlocks; block1++)
+		{
+			Index subCol = blockSize * block1;
+			Index matrixCol = blockSize * static_cast<Index>(blockIds[block1]);
+			/* Compiles, but doesn't work for multiple blocks.
+			blockWithInitialize(subMatrix, matrixRow, matrixCol, blockSize, blockSize, matrix,
+								&Dynamic::Operation<T, Opt, Index, DerivedSub>::add);
+			*/
+			blockWithInitialize(subMatrix.block(subRow, subCol, blockSize, blockSize),
+								matrixRow, matrixCol, blockSize, blockSize, matrix,
+								&Dynamic::Operation<T, Opt, Index, Eigen::Block<DerivedSub>>::add);
+		}
+	}
+}
+
+/// Helper method to zero a row of a matrix specialized for Sparse Matrices
+/// \param row The row to set to zero
+/// \param[out] matrix The matrix to set the zero row on.
+/// \note TODO: This can be made more efficient for either Compressed Sparse Row, or
+/// \note Compressed Sparse Column by taking better advantage of the storage format.
+/// \note Alternately, moving the boundary condition calculation so that it is determined
+/// \note before the sparse matrix is generates could also improve performance.
+template <typename T, int Opt, typename Index>
+void zeroRow(Index row, Eigen::SparseMatrix<T, Opt, Index>* matrix)
+{
+	for (Index column = 0; column < matrix->cols(); ++column)
+	{
+		if (matrix->coeff(row, column))
+		{
+			matrix->coeffRef(row, column) = 0;
+		}
+	}
+}
+
+/// Helper method to zero a row of a matrix specialized for Sparse Matrices
+/// \param row The row to set to zero
+/// \param[out] matrix The matrix to set the zero row on.
+/// \note TODO: This can be made more efficient for either Compressed Sparse Row, or
+/// \note Compressed Sparse Column by taking better advantage of the storage format.
+/// \note Alternately, moving the boundary condition calculation so that it is determined
+/// \note before the sparse matrix is generates could also improve performance.
+template <typename T, int Opt, typename Index>
+inline void zeroColumn(Index column, Eigen::SparseMatrix<T, Opt, Index>* matrix)
+{
+	for (Index row = 0; row < matrix->rows(); ++row)
+	{
+		if (matrix->coeff(row, column))
+		{
+			matrix->coeffRef(row, column) = 0;
+		}
+	}
+}
+
+/// Helper method to zero a row of a matrix specialized for Sparse Matrices
+/// \param[out] matrix The matrix to set the zero row on.
+/// \note TODO: This can be made more efficient for either Compressed Sparse Row, or
+/// \note Compressed Sparse Column by taking better advantage of the storage format.
+/// \note Alternately, moving the boundary condition calculation so that it is determined
+/// \note before the sparse matrix is generates could also improve performance.
+template <typename T, int Opt, typename Index>
+inline void clearMatrix(Eigen::SparseMatrix<T, Opt, Index>* matrix)
+{
+	T* ptr = matrix->valuePtr();
+	for (Index value = 0; value < matrix->nonZeros(); ++value)
+	{
+		*ptr = 0;
+		++ptr;
 	}
 }
 

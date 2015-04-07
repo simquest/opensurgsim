@@ -24,18 +24,17 @@ namespace Math
 
 OdeSolverLinearRungeKutta4::OdeSolverLinearRungeKutta4(OdeEquation* equation)
 	: OdeSolverRungeKutta4(equation),
-	m_initialized(false)
+	  m_initialized(false)
 {
 	m_name = "Ode Solver Linear Runge Kutta 4";
 }
 
-void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, OdeState* newState,
-									   bool computeCompliance)
+void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	if (!m_initialized)
 	{
 		// The compliance matrix is constant and used in all following calls, so we force its calculation on 1st pass.
-		OdeSolverRungeKutta4::solve(dt, currentState, newState, true);
+		OdeSolverRungeKutta4::solve(dt, currentState, newState);
 		m_initialized = true;
 	}
 	else
@@ -56,31 +55,35 @@ void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, 
 		// 1st evaluate k1 (note that y(n) is currentState)
 		m_k1.velocity = currentState.getVelocities();
 		// Reminder: m_complianceMatrix = dt.M^-1 (including 0 compliance for all boundary conditions)
-		m_k1.acceleration = m_complianceMatrix * m_equation.computeF(currentState) / dt;
+		//
+		// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
+		// when the compliance matrix would have been generated.
+		// m_k1.acceleration = m_complianceMatrix * m_equation.computeF(currentState) / dt;
+		m_k1.acceleration = m_equation.applyCompliance(currentState, m_equation.computeF(currentState) / dt);
 
 		// 2nd evaluate k2
 		newState->getPositions()  = currentState.getPositions()  + m_k1.velocity * dt / 2.0;
 		newState->getVelocities() = currentState.getVelocities() + m_k1.acceleration * dt / 2.0;
 		m_k2.velocity = newState->getVelocities();
-		m_k2.acceleration = m_complianceMatrix * m_equation.computeF(*newState) / dt;
+		m_k2.acceleration = m_equation.applyCompliance(*newState, m_equation.computeF(*newState) / dt);
 
 		// 3rd evaluate k3
 		newState->getPositions()  = currentState.getPositions()  + m_k2.velocity * dt / 2.0;
 		newState->getVelocities() = currentState.getVelocities() + m_k2.acceleration * dt / 2.0;
 		m_k3.velocity = newState->getVelocities();
-		m_k3.acceleration = m_complianceMatrix * m_equation.computeF(*newState) / dt;
+		m_k3.acceleration = m_equation.applyCompliance(*newState, m_equation.computeF(*newState) / dt);
 
 		// 4th evaluate k4
 		newState->getPositions()  = currentState.getPositions()  + m_k3.velocity * dt;
 		newState->getVelocities() = currentState.getVelocities() + m_k3.acceleration * dt;
 		m_k4.velocity = newState->getVelocities();
-		m_k4.acceleration = m_complianceMatrix * m_equation.computeF(*newState) / dt;
+		m_k4.acceleration = m_equation.applyCompliance(*newState, m_equation.computeF(*newState) / dt);
 
 		// Compute the new state using Runge Kutta 4 integration scheme:
 		newState->getPositions()  = currentState.getPositions() +
-			(m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
+									(m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
 		newState->getVelocities() = currentState.getVelocities() +
-			(m_k1.acceleration + m_k4.acceleration + 2.0 * (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
+									(m_k1.acceleration + m_k4.acceleration + 2.0 * (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
 	}
 }
 

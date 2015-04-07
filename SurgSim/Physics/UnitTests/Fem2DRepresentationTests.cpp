@@ -104,6 +104,9 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 
 	fem->setInitialState(initialState);
 
+	Math::SparseMatrix zeroMat(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	zeroMat.setZero();
+
 	// Vector initialized (properly sized and zeroed)
 	EXPECT_NE(0, fem->getExternalGeneralizedForce().size());
 	EXPECT_NE(0, fem->getExternalGeneralizedStiffness().rows());
@@ -116,8 +119,8 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 	EXPECT_EQ(fem->getNumDof(), fem->getExternalGeneralizedDamping().cols());
 	EXPECT_EQ(fem->getNumDof(), fem->getExternalGeneralizedDamping().rows());
 	EXPECT_TRUE(fem->getExternalGeneralizedForce().isZero());
-	EXPECT_TRUE(fem->getExternalGeneralizedStiffness().isZero());
-	EXPECT_TRUE(fem->getExternalGeneralizedDamping().isZero());
+	EXPECT_TRUE(fem->getExternalGeneralizedStiffness().isApprox(zeroMat));
+	EXPECT_TRUE(fem->getExternalGeneralizedDamping().isApprox(zeroMat));
 
 	std::array<size_t, 3> element1NodeIds = {{0, 1, 2}};
 	auto element1 = std::make_shared<Fem2DElementTriangle>(element1NodeIds);
@@ -141,38 +144,46 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 	Matrix Dlocal = Klocal + Matrix::Identity(fem->getNumDofPerNode(), fem->getNumDofPerNode());
 	Vector F = Vector::Zero(fem->getNumDof());
 	F.segment(0, fem->getNumDofPerNode()) = Flocal;
-	Matrix K = Matrix::Zero(fem->getNumDof(), fem->getNumDof());
-	K.block(0, 0, fem->getNumDofPerNode(), fem->getNumDofPerNode()) = Klocal;
-	Matrix D = Matrix::Zero(fem->getNumDof(), fem->getNumDof());
-	D.block(0, 0, fem->getNumDofPerNode(), fem->getNumDofPerNode()) = Dlocal;
+	SparseMatrix K(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	K.setZero();
+	Math::addSubMatrixAndInitialize(Klocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
+									static_cast<int>(fem->getNumDofPerNode()), &K);
+	K.makeCompressed();
+	SparseMatrix D(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	D.setZero();
+	Math::addSubMatrixAndInitialize(Dlocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
+									static_cast<int>(fem->getNumDofPerNode()), &D);
+	D.makeCompressed();
 
 	// Test invalid localization nullptr
 	ASSERT_THROW(fem->addExternalGeneralizedForce(nullptr, Flocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(fem->addExternalGeneralizedForce(nullptr, Flocal, Klocal, Dlocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	// Test invalid localization type
 	ASSERT_THROW(fem->addExternalGeneralizedForce(wrongLocalizationType, Flocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(fem->addExternalGeneralizedForce(wrongLocalizationType, Flocal, Klocal, Dlocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	// Test invalid force size
 	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, FLocalWrongSize),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, FLocalWrongSize, Klocal, Dlocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	// Test invalid stiffness size
 	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, Flocal, KLocalWrongSize, Dlocal),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	// Test invalid damping size
 	ASSERT_THROW(fem->addExternalGeneralizedForce(localization, Flocal, Klocal, DLocalWrongSize),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 
 	// Test valid call to addExternalGeneralizedForce
+	Math::SparseMatrix zeroMatrix(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	zeroMatrix.setZero();
 	fem->addExternalGeneralizedForce(localization, Flocal, Klocal, Dlocal);
 	EXPECT_FALSE(fem->getExternalGeneralizedForce().isZero());
-	EXPECT_FALSE(fem->getExternalGeneralizedStiffness().isZero());
-	EXPECT_FALSE(fem->getExternalGeneralizedDamping().isZero());
+	EXPECT_FALSE(fem->getExternalGeneralizedStiffness().isApprox(zeroMatrix));
+	EXPECT_FALSE(fem->getExternalGeneralizedDamping().isApprox(zeroMatrix));
 	EXPECT_TRUE(fem->getExternalGeneralizedForce().isApprox(F));
 	EXPECT_TRUE(fem->getExternalGeneralizedStiffness().isApprox(K));
 	EXPECT_TRUE(fem->getExternalGeneralizedDamping().isApprox(D));
@@ -195,7 +206,7 @@ TEST(Fem2DRepresentationTests, SerializationTest)
 
 	std::shared_ptr<Fem2DRepresentation> newRepresentation;
 	ASSERT_NO_THROW(newRepresentation =
-		std::dynamic_pointer_cast<Fem2DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+						std::dynamic_pointer_cast<Fem2DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	ASSERT_NE(nullptr, newRepresentation);
 
 	EXPECT_EQ("SurgSim::Physics::Fem2DRepresentation", newRepresentation->getClassName());

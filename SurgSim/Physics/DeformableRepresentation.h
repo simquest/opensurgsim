@@ -21,9 +21,16 @@
 
 #include <memory>
 
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Representation.h"
+
+using SurgSim::Math::Matrix;
+using SurgSim::Math::Vector;
+using SurgSim::Math::OdeState;
 
 namespace SurgSim
 {
@@ -84,25 +91,36 @@ public:
 	/// \param K The stiffness matrix associated with the generalized force (Jacobian of the force w.r.t dof's position)
 	/// \param D The damping matrix associated with the generalized force (Jacobian of the force w.r.t dof's velocity)
 	virtual void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-											 const SurgSim::Math::Vector& generalizedForce,
-											 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
-											 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) = 0;
+			const SurgSim::Math::Vector& generalizedForce,
+			const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+			const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) = 0;
 
 	/// \return the external generalized force vector
 	const SurgSim::Math::Vector& getExternalGeneralizedForce() const;
 
 	/// \return the external generalized stiffness matrix
-	const SurgSim::Math::Matrix& getExternalGeneralizedStiffness() const;
+	const SurgSim::Math::SparseMatrix& getExternalGeneralizedStiffness() const;
 
 	/// \return the external generalized damping matrix
-	const SurgSim::Math::Matrix& getExternalGeneralizedDamping() const;
+	const SurgSim::Math::SparseMatrix& getExternalGeneralizedDamping() const;
 
+	/*
 	/// Gets the compliance matrix associated with motion
 	/// \return The compliance matrix after the first call to update, an undefined matrix otherwise
 	/// \note The compliance matrix is computed automatically by the ode solver in the method 'update'
 	/// \note So one iteration needs to happen before retrieving a compliance matrix
 	/// \exception SurgSim::Framework::AssertionFailure if called prior to wakeUp
 	virtual const SurgSim::Math::Matrix& getComplianceMatrix() const;
+	*/
+
+	/// Calculate the product C * b where C is the compliance matrix with boundary conditions
+	/// applied. Note that this can be rewritten as (B^T M^-1 B) * b = B^T * (M^-1 * (B * b)) = x,
+	/// where M^-1 * (B * b) = x is simply the solution to MX = Bb.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param b The input matrix \b
+	/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
+	/// when the compliance matrix would have been generated in the initial version.
+	Matrix applyCompliance(const OdeState& state, Matrix b) override;
 
 	void update(double dt) override;
 
@@ -146,21 +164,21 @@ protected:
 	/// @{
 	bool m_hasExternalGeneralizedForce;
 	SurgSim::Math::Vector m_externalGeneralizedForce;
-	SurgSim::Math::Matrix m_externalGeneralizedStiffness;
-	SurgSim::Math::Matrix m_externalGeneralizedDamping;
+	SurgSim::Math::SparseMatrix m_externalGeneralizedStiffness;
+	SurgSim::Math::SparseMatrix m_externalGeneralizedDamping;
 	/// @}
 
 	/// Force applied on the deformable representation
 	SurgSim::Math::Vector m_f;
 
 	/// Mass matrix
-	SurgSim::Math::Matrix m_M;
+	SurgSim::Math::SparseMatrix m_M;
 
 	/// Damping matrix
-	SurgSim::Math::Matrix m_D;
+	SurgSim::Math::SparseMatrix m_D;
 
 	/// Stiffness matrix
-	SurgSim::Math::Matrix m_K;
+	SurgSim::Math::SparseMatrix m_K;
 
 	/// Number of degrees of freedom per node (varies per deformable model)
 	/// \note MUST be set by the derived classes

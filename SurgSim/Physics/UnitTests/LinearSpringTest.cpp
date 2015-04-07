@@ -25,6 +25,7 @@
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Matrix66d;
+using SurgSim::Math::SparseMatrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector6d;
@@ -44,19 +45,19 @@ Matrix66d KFormal(const Vector3d p0, const Vector3d p1,
 	double m_l = u.norm();
 	u /= m_l;
 	double lRatio = (m_l - l0) / m_l;
-	double vRatio = (v1 -v0).dot(u) / m_l;
+	double vRatio = (v1 - v0).dot(u) / m_l;
 
 	Matrix33d K00 = Matrix33d::Identity() * (stiffness * lRatio + damping * vRatio);
 	K00 -= (u * u.transpose()) * (stiffness * (lRatio - 1.0) + 2.0 * damping * vRatio);
-	K00 += damping * (u * (v1 -v0).transpose()) / m_l;
+	K00 += damping * (u * (v1 - v0).transpose()) / m_l;
 
 	Matrix66d K = Matrix66d::Zero();
 
 	// Assembly stage in K
-	SurgSim::Math::addSubMatrix( K00, 0, 0, 3, 3, &K);
+	SurgSim::Math::addSubMatrix(K00, 0, 0, 3, 3, &K);
 	SurgSim::Math::addSubMatrix(-K00, 0, 1, 3, 3, &K);
 	SurgSim::Math::addSubMatrix(-K00, 1, 0, 3, 3, &K);
-	SurgSim::Math::addSubMatrix( K00, 1, 1, 3, 3, &K);
+	SurgSim::Math::addSubMatrix(K00, 1, 1, 3, 3, &K);
 
 	return K;
 }
@@ -71,10 +72,10 @@ Matrix66d DFormal(const Vector3d p0, const Vector3d p1,
 
 	// Assembly stage in D
 	Matrix66d D = Matrix66d::Zero();
-	SurgSim::Math::addSubMatrix( D00, 0, 0, 3, 3, &D);
+	SurgSim::Math::addSubMatrix(D00, 0, 0, 3, 3, &D);
 	SurgSim::Math::addSubMatrix(-D00, 0, 1, 3, 3, &D);
 	SurgSim::Math::addSubMatrix(-D00, 1, 0, 3, 3, &D);
-	SurgSim::Math::addSubMatrix( D00, 1, 1, 3, 3, &D);
+	SurgSim::Math::addSubMatrix(D00, 1, 1, 3, 3, &D);
 
 	return D;
 }
@@ -88,7 +89,7 @@ double f(size_t axis, const Vector3d p0, const Vector3d p1,
 	u /= m_l;
 	double elongationPosition = m_l - l0;
 	double elongationVelocity = (v1 - v0).dot(u);
-	if (axis <=2)
+	if (axis <= 2)
 	{
 		return (stiffness * elongationPosition + damping * elongationVelocity) * u[axis];
 	}
@@ -116,9 +117,9 @@ Matrix66d KNumerical(const Vector3d p0, const Vector3d p1,
 			Vector6d delta6D = Vector6d::Zero();
 			delta6D[col] = epsilonNumericalEvaluation;
 			double f_plus_delta = f(row, p0 + delta6D.segment(0, 3), p1 + delta6D.segment(3, 3), v0, v1,
-				l0, stiffness, damping);
+									l0, stiffness, damping);
 			double f_minus_delta = f(row, p0 - delta6D.segment(0, 3), p1 - delta6D.segment(3, 3), v0, v1,
-				l0, stiffness, damping);
+									 l0, stiffness, damping);
 			dfdx(row, col) = (f_plus_delta - f_minus_delta) / (2.0 * epsilonNumericalEvaluation);
 		}
 	}
@@ -144,9 +145,9 @@ Matrix66d DNumerical(const Vector3d p0, const Vector3d p1,
 			Vector6d delta6D = Vector6d::Zero();
 			delta6D[col] = epsilonNumericalEvaluation;
 			double f_plus_delta = f(row, p0, p1, v0 + delta6D.segment(0, 3), v1 + delta6D.segment(3, 3),
-				l0, stiffness, damping);
+									l0, stiffness, damping);
 			double f_moins_delta = f(row, p0, p1, v0 - delta6D.segment(0, 3), v1 - delta6D.segment(3, 3),
-				l0, stiffness, damping);
+									 l0, stiffness, damping);
 			dfdv(row, col) = (f_plus_delta - f_moins_delta) / (2.0 * epsilonNumericalEvaluation);
 		}
 	}
@@ -159,7 +160,7 @@ Matrix66d DNumerical(const Vector3d p0, const Vector3d p1,
 TEST(LinearSpringTests, Constructor)
 {
 	ASSERT_NO_THROW({LinearSpring ls(0, 1);});
-	ASSERT_NO_THROW({LinearSpring *ls = new LinearSpring(0, 1); delete ls;});
+	ASSERT_NO_THROW({LinearSpring* ls = new LinearSpring(0, 1); delete ls;});
 	ASSERT_NO_THROW({std::shared_ptr<LinearSpring> ls = std::make_shared<LinearSpring>(0, 1);});
 }
 
@@ -309,51 +310,62 @@ TEST(LinearSpringTests, computeMethods)
 	f.setZero();
 	ls.addForce(state, &f);
 	EXPECT_TRUE(f.isApprox(expectedF)) << " F = " << f.transpose() << std::endl <<
-		"expectedF = " << expectedF.transpose() << std::endl;
+									   "expectedF = " << expectedF.transpose() << std::endl;
 
 	// Calculate stiffness matrix
 	Matrix33d expectedStiffness33;
 	expectedStiffness33 << 0.224919570941728960, 0.064210544149390564, 0.0011847965179350647,
-		0.047808674990512064, 0.312562344690556770, 0.0021120285754494608,
-		0.013992782924052311, 0.033501153469247251, 0.1987182250423049600;
+						0.047808674990512064, 0.312562344690556770, 0.0021120285754494608,
+						0.013992782924052311, 0.033501153469247251, 0.1987182250423049600;
 	Matrix66d expectedK;
-	setSubMatrix( expectedStiffness33, 0, 0, 3, 3, &expectedK);
+	setSubMatrix(expectedStiffness33, 0, 0, 3, 3, &expectedK);
 	setSubMatrix(-expectedStiffness33, 0, 1, 3, 3, &expectedK);
 	setSubMatrix(-expectedStiffness33, 1, 0, 3, 3, &expectedK);
-	setSubMatrix( expectedStiffness33, 1, 1, 3, 3, &expectedK);
-	Matrix K = Matrix::Zero(6, 6);
+	setSubMatrix(expectedStiffness33, 1, 1, 3, 3, &expectedK);
+
+	Matrix zeroBlock = Matrix::Zero(6, 6);
+	SparseMatrix K(6, 6);
+	K.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &K);
+	K.makeCompressed();
+
 	ls.addStiffness(state, &K);
 	EXPECT_TRUE(K.isApprox(expectedK)) << " K = " << std::endl << K << std::endl <<
-		"expectedK = " << std::endl << expectedK << std::endl;
+									   "expectedK = " << std::endl << expectedK << std::endl;
 
 	// Calculate damping matrix
 	Matrix33d expectedDamping33;
 	expectedDamping33 << 0.101125743415463040, 0.180267629566694950, 0.052761257434154628,
-		0.180267629566694950, 0.321346644010195360, 0.094052676295666937,
-		0.052761257434154628, 0.094052676295666937, 0.027527612574341543;
+					  0.180267629566694950, 0.321346644010195360, 0.094052676295666937,
+					  0.052761257434154628, 0.094052676295666937, 0.027527612574341543;
 	Matrix66d expectedD;
-	setSubMatrix( expectedDamping33, 0, 0, 3, 3, &expectedD);
+	setSubMatrix(expectedDamping33, 0, 0, 3, 3, &expectedD);
 	setSubMatrix(-expectedDamping33, 0, 1, 3, 3, &expectedD);
 	setSubMatrix(-expectedDamping33, 1, 0, 3, 3, &expectedD);
-	setSubMatrix( expectedDamping33, 1, 1, 3, 3, &expectedD);
-	Matrix D = Matrix::Zero(6, 6);
+	setSubMatrix(expectedDamping33, 1, 1, 3, 3, &expectedD);
+
+	SparseMatrix D(6, 6);
+	D.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &D);
+	D.makeCompressed();
+
 	ls.addDamping(state, &D);
 	EXPECT_TRUE(D.isApprox(expectedD)) << " D = " << std::endl << D << std::endl <<
-		"expectedD = " << std::endl << expectedD << std::endl;
+									   "expectedD = " << std::endl << expectedD << std::endl;
 
 	// Compute all together
 	{
 		SCOPED_TRACE("Testing addFDK method call");
 		Vector f = Vector::Zero(6);
-		Matrix K = Matrix::Zero(6, 6);
-		Matrix D = Matrix::Zero(6, 6);
+		SurgSim::Math::clearMatrix(&K);
+		SurgSim::Math::clearMatrix(&D);
 		ls.addFDK(state, &f, &D, &K);
 		EXPECT_TRUE(f.isApprox(expectedF)) << " F = " << f.transpose() << std::endl <<
-			"expectedF = " << expectedF.transpose() << std::endl;
+										   "expectedF = " << expectedF.transpose() << std::endl;
 		EXPECT_TRUE(K.isApprox(expectedK)) << " K = " << std::endl << K << std::endl <<
-			"expectedK = " << std::endl << expectedK << std::endl;
+										   "expectedK = " << std::endl << expectedK << std::endl;
 		EXPECT_TRUE(D.isApprox(expectedD)) << " D = " << std::endl << D << std::endl <<
-			"expectedD = " << std::endl << expectedD << std::endl;
+										   "expectedD = " << std::endl << expectedD << std::endl;
 	}
 
 	// Test addMatVec method
@@ -367,8 +379,8 @@ TEST(LinearSpringTests, computeMethods)
 		for (size_t row = 0; row < 6; ++row)
 		{
 			EXPECT_NEAR(expectedD.row(row).sum(), f[row], epsilon) <<
-				"f[" << row << "] = " << f[row] <<
-				" expectedValue = " << expectedD.row(row).sum();
+					"f[" << row << "] = " << f[row] <<
+					" expectedValue = " << expectedD.row(row).sum();
 		}
 	}
 	f.setZero();
@@ -378,8 +390,8 @@ TEST(LinearSpringTests, computeMethods)
 		for (size_t row = 0; row < 6; ++row)
 		{
 			EXPECT_NEAR(expectedD.row(row).dot(oneToSix), f[row], epsilon) <<
-				"f[" << row << "] = " << f[row] <<
-				" expectedValue = " << expectedD.row(row).dot(oneToSix);
+					"f[" << row << "] = " << f[row] <<
+					" expectedValue = " << expectedD.row(row).dot(oneToSix);
 		}
 	}
 	f.setZero();
@@ -389,8 +401,8 @@ TEST(LinearSpringTests, computeMethods)
 		for (size_t row = 0; row < 6; ++row)
 		{
 			EXPECT_NEAR(expectedK.row(row).sum(), f[row], epsilon) <<
-				"f[" << row << "] = " << f[row] <<
-				" expectedValue = " << expectedK.row(row).sum();
+					"f[" << row << "] = " << f[row] <<
+					" expectedValue = " << expectedK.row(row).sum();
 		}
 	}
 	f.setZero();
@@ -400,8 +412,8 @@ TEST(LinearSpringTests, computeMethods)
 		for (size_t row = 0; row < 6; ++row)
 		{
 			EXPECT_NEAR(expectedK.row(row).dot(oneToSix), f[row], epsilon) <<
-				"f[" << row << "] = " << f[row] <<
-				" expectedValue = " << expectedK.row(row).dot(oneToSix);
+					"f[" << row << "] = " << f[row] <<
+					" expectedValue = " << expectedK.row(row).dot(oneToSix);
 		}
 	}
 
@@ -412,8 +424,8 @@ TEST(LinearSpringTests, computeMethods)
 		for (size_t row = 0; row < 6; ++row)
 		{
 			EXPECT_NEAR(1.4 * expectedD.row(row).sum() + 4.1 * expectedK.row(row).sum(), f[row], epsilon) <<
-				"f[" << row << "] = " << f[row] <<
-				" expectedValue = " << 1.4 * expectedD.row(row).sum() + 4.1 * expectedK.row(row).sum();
+					"f[" << row << "] = " << f[row] <<
+					" expectedValue = " << 1.4 * expectedD.row(row).sum() + 4.1 * expectedK.row(row).sum();
 		}
 	}
 	f.setZero();
@@ -423,9 +435,9 @@ TEST(LinearSpringTests, computeMethods)
 		for (size_t row = 0; row < 6; ++row)
 		{
 			EXPECT_NEAR(\
-				1.4 * expectedD.row(row).dot(oneToSix) + 4.1 * expectedK.row(row).dot(oneToSix), f[row], epsilon) <<
-				"f[" << row << "] = " << f[row] <<
-				" expectedValue = " << 1.4 * expectedD.row(row).dot(oneToSix) + 4.1 * expectedK.row(row).dot(oneToSix);
+						1.4 * expectedD.row(row).dot(oneToSix) + 4.1 * expectedK.row(row).dot(oneToSix), f[row], epsilon) <<
+								"f[" << row << "] = " << f[row] <<
+								" expectedValue = " << 1.4 * expectedD.row(row).dot(oneToSix) + 4.1 * expectedK.row(row).dot(oneToSix);
 		}
 	}
 }
@@ -449,19 +461,23 @@ TEST(LinearSpringTests, addStiffnessNumericalTest)
 	state.getVelocities().segment(0, 3) = v0;
 	state.getVelocities().segment(3, 3) = v1;
 
-	Matrix K = Matrix::Zero(6, 6);
+	Matrix zeroBlock = Matrix::Zero(6, 6);
+	SparseMatrix K(6, 6);
+	K.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &K);
+	K.makeCompressed();
+
 	ls.addStiffness(state, &K);
 
 	Eigen::Matrix<double, 6, 6> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
 	Eigen::Matrix<double, 6, 6> Kformal = KFormal(x0, x1, v0, v1, restLength, stiffness, damping);
 	EXPECT_TRUE(Kformal.isApprox(Knumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
-		"Kformal = " << std::endl << Kformal << std::endl <<
-		"Knumeric = " << std::endl << Knumeric << std::endl <<
-		"Kformal - Knumeric= " << std::endl << Kformal - Knumeric << std::endl;
+			"Kformal = " << std::endl << Kformal << std::endl <<
+			"Knumeric = " << std::endl << Knumeric << std::endl <<
+			"Kformal - Knumeric= " << std::endl << Kformal - Knumeric << std::endl;
 	EXPECT_TRUE(K.isApprox(Kformal)) << std::endl <<
-		"K = " << std::endl << K << std::endl <<
-		"Knumeric = " << std::endl << Knumeric << std::endl <<
-		"K - Knumeric= " << std::endl << K - Knumeric << std::endl;
+									 "K = " << std::endl << K << std::endl <<
+									 "Knumeric = " << std::endl << Knumeric << std::endl;
 }
 
 TEST(LinearSpringTests, addDampingNumericalTest)
@@ -483,19 +499,22 @@ TEST(LinearSpringTests, addDampingNumericalTest)
 	state.getVelocities().segment(0, 3) = v0;
 	state.getVelocities().segment(3, 3) = v1;
 
-	Matrix D = Matrix::Zero(6, 6);
+	Matrix zeroBlock = Matrix::Zero(6, 6);
+	SparseMatrix D(6, 6);
+	D.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &D);
+	D.makeCompressed();
+
 	ls.addDamping(state, &D);
 
 	Eigen::Matrix<double, 6, 6> Dnumeric = DNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
 	Eigen::Matrix<double, 6, 6> Dformal = DFormal(x0, x1, v0, v1, restLength, stiffness, damping);
 	EXPECT_TRUE(Dformal.isApprox(Dnumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
-		"Dformal = " << std::endl << Dformal << std::endl <<
-		"Dnumeric = " << std::endl << Dnumeric << std::endl <<
-		"Dformal - Dnumeric= " << std::endl << Dformal - Dnumeric << std::endl;
+			"Dformal = " << std::endl << Dformal << std::endl <<
+			"Dnumeric = " << std::endl << Dnumeric << std::endl;
 	EXPECT_TRUE(D.isApprox(Dformal)) << std::endl <<
-		"D = " << std::endl << D << std::endl <<
-		"Dnumeric = " << std::endl << Dnumeric << std::endl <<
-		"D - Dnumeric= " << std::endl << D - Dnumeric << std::endl;
+									 "D = " << std::endl << D << std::endl <<
+									 "Dnumeric = " << std::endl << Dnumeric << std::endl;
 }
 
 TEST(LinearSpringTests, addFDKNumericalTest)
@@ -518,29 +537,36 @@ TEST(LinearSpringTests, addFDKNumericalTest)
 	state.getVelocities().segment(3, 3) = v1;
 
 	Vector F = Vector::Zero(6);
-	Matrix K = Matrix::Zero(6, 6);
-	Matrix D = Matrix::Zero(6, 6);
+	Matrix zeroBlock = Matrix::Zero(6, 6);
+	SparseMatrix K(6, 6);
+	K.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &K);
+	K.makeCompressed();
+
+	SparseMatrix D(6, 6);
+	D.setZero();
+	SurgSim::Math::addSubMatrixAndInitialize(zeroBlock, 0, 0, 6, 6, &D);
+	D.makeCompressed();
+
 	ls.addFDK(state, &F, &D, &K);
 
 	Eigen::Matrix<double, 6, 6> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
 	Eigen::Matrix<double, 6, 6> Kformal = KFormal(x0, x1, v0, v1, restLength, stiffness, damping);
 	EXPECT_TRUE(Kformal.isApprox(Knumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
-		"Kformal = " << std::endl << Kformal << std::endl <<
-		"Knumeric = " << std::endl << Knumeric << std::endl <<
-		"Kformal - Knumeric= " << std::endl << Kformal - Knumeric << std::endl;
+			"Kformal = " << std::endl << Kformal << std::endl <<
+			"Knumeric = " << std::endl << Knumeric << std::endl <<
+			"Kformal - Knumeric= " << std::endl << Kformal - Knumeric << std::endl;
 	EXPECT_TRUE(K.isApprox(Kformal)) << std::endl <<
-		"K = " << std::endl << K << std::endl <<
-		"Knumeric = " << std::endl << Knumeric << std::endl <<
-		"K - Knumeric= " << std::endl << K - Knumeric << std::endl;
+									 "K = " << std::endl << K << std::endl <<
+									 "Knumeric = " << std::endl << Knumeric << std::endl;
 
 	Eigen::Matrix<double, 6, 6> Dnumeric = DNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
 	Eigen::Matrix<double, 6, 6> Dformal = DFormal(x0, x1, v0, v1, restLength, stiffness, damping);
 	EXPECT_TRUE(Dformal.isApprox(Dnumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
-		"Dformal = " << std::endl << Dformal << std::endl <<
-		"Dnumeric = " << std::endl << Dnumeric << std::endl <<
-		"Dformal - Dnumeric= " << std::endl << Dformal - Dnumeric << std::endl;
+			"Dformal = " << std::endl << Dformal << std::endl <<
+			"Dnumeric = " << std::endl << Dnumeric << std::endl <<
+			"Dformal - Dnumeric= " << std::endl << Dformal - Dnumeric << std::endl;
 	EXPECT_TRUE(D.isApprox(Dformal)) << std::endl <<
-		"D = " << std::endl << D << std::endl <<
-		"Dnumeric = " << std::endl << Dnumeric << std::endl <<
-		"D - Dnumeric= " << std::endl << D - Dnumeric << std::endl;
+									 "D = " << std::endl << D << std::endl <<
+									 "Dnumeric = " << std::endl << Dnumeric << std::endl;
 }

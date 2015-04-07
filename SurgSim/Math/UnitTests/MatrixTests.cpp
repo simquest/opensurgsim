@@ -18,8 +18,10 @@
 /// straight from Eigen.
 
 #include <math.h>
+#include <vector>
 
 #include <Eigen/Geometry>  // SurgSim/Math/Matrix.h by itself does not provide cross()
+#include <Eigen/SparseCore>
 #include <gtest/gtest.h>
 
 #include "SurgSim/Math/MathConvert.h"
@@ -46,7 +48,7 @@ public:
 
 // This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Matrix22d,
-						 SurgSim::Math::Matrix22f> Matrix22Variants;
+		SurgSim::Math::Matrix22f> Matrix22Variants;
 TYPED_TEST_CASE(Matrix22Tests, Matrix22Variants);
 
 
@@ -59,7 +61,7 @@ public:
 
 // This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Matrix33d,
-						 SurgSim::Math::Matrix33f> Matrix33Variants;
+		SurgSim::Math::Matrix33f> Matrix33Variants;
 TYPED_TEST_CASE(Matrix33Tests, Matrix33Variants);
 
 
@@ -72,7 +74,7 @@ public:
 
 // This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Matrix44d,
-						 SurgSim::Math::Matrix44f> Matrix44Variants;
+		SurgSim::Math::Matrix44f> Matrix44Variants;
 TYPED_TEST_CASE(Matrix44Tests, Matrix44Variants);
 
 
@@ -93,16 +95,16 @@ public:
 
 // This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Matrix22d,
-						 SurgSim::Math::Matrix22f,
-						 SurgSim::Math::Matrix33d,
-						 SurgSim::Math::Matrix33f,
-						 SurgSim::Math::Matrix44d,
-						 SurgSim::Math::Matrix44f> AllMatrixVariants;
+		SurgSim::Math::Matrix22f,
+		SurgSim::Math::Matrix33d,
+		SurgSim::Math::Matrix33f,
+		SurgSim::Math::Matrix44d,
+		SurgSim::Math::Matrix44f> AllMatrixVariants;
 TYPED_TEST_CASE(AllMatrixTests, AllMatrixVariants);
 
 typedef ::testing::Types<Eigen::MatrixXd,
-						 Eigen::MatrixXf,
-						 SurgSim::Math::Matrix> AllDynamicMatrixVariants;
+		Eigen::MatrixXf,
+		SurgSim::Math::Matrix> AllDynamicMatrixVariants;
 TYPED_TEST_CASE(AllDynamicMatrixTests, AllDynamicMatrixVariants);
 
 template <class T>
@@ -120,16 +122,16 @@ public:
 };
 
 typedef ::testing::Types<SurgSim::Math::Matrix22d,
-						 SurgSim::Math::Matrix22f,
-						 SurgSim::Math::Matrix33d,
-						 SurgSim::Math::Matrix33f,
-						 SurgSim::Math::Matrix44d,
-						 SurgSim::Math::Matrix44f> UnalignedMatrixVariants;
+		SurgSim::Math::Matrix22f,
+		SurgSim::Math::Matrix33d,
+		SurgSim::Math::Matrix33f,
+		SurgSim::Math::Matrix44d,
+		SurgSim::Math::Matrix44f> UnalignedMatrixVariants;
 TYPED_TEST_CASE(UnalignedMatrixTests, UnalignedMatrixVariants);
 
 typedef ::testing::Types<Eigen::MatrixXd,
-						 Eigen::MatrixXf,
-						 SurgSim::Math::Matrix> UnalignedDynamicMatrixVariants;
+		Eigen::MatrixXf,
+		SurgSim::Math::Matrix> UnalignedDynamicMatrixVariants;
 TYPED_TEST_CASE(UnalignedDynamicMatrixTests, UnalignedDynamicMatrixVariants);
 
 
@@ -229,14 +231,14 @@ TYPED_TEST(Matrix22Tests, ShiftCommaInitialization)
 	Matrix22 matrix;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
 	matrix <<
-		1.1f, 1.2f,
-		1.3f, 1.4f;
+		   1.1f, 1.2f,
+				 1.3f, 1.4f;
 	for (int row = 0;  row < 2;  ++row)
 	{
 		for (int col = 0;  col < 2;  ++col)
 		{
-			EXPECT_NEAR(1.1 + 0.2*row + 0.1*col, matrix(row, col), 1e-6) <<
-				row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(1.1 + 0.2 * row + 0.1 * col, matrix(row, col), 1e-6) <<
+					row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -249,15 +251,15 @@ TYPED_TEST(Matrix33Tests, ShiftCommaInitialization)
 	Matrix33 matrix;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
 	matrix <<
-		1.1f, 1.2f, 1.3f,
-		1.4f, 1.5f, 1.6f,
-		1.7f, 1.8f, 1.9f;
+		   1.1f, 1.2f, 1.3f,
+				 1.4f, 1.5f, 1.6f,
+				 1.7f, 1.8f, 1.9f;
 	for (int row = 0;  row < 3;  ++row)
 	{
 		for (int col = 0;  col < 3;  ++col)
 		{
-			EXPECT_NEAR(1.1 + 0.3*row + 0.1*col, matrix(row, col), 1e-6) <<
-				row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(1.1 + 0.3 * row + 0.1 * col, matrix(row, col), 1e-6) <<
+					row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -270,16 +272,16 @@ TYPED_TEST(Matrix44Tests, ShiftCommaInitialization)
 	Matrix44 matrix;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
 	matrix <<
-		1.1f, 1.2f, 1.3f, 1.4f,
-		1.5f, 1.6f, 1.7f, 1.8f,
-		1.9f, 2.0f, 2.1f, 2.2f,
-		2.3f, 2.4f, 2.5f, 2.6f;
+		   1.1f, 1.2f, 1.3f, 1.4f,
+				 1.5f, 1.6f, 1.7f, 1.8f,
+				 1.9f, 2.0f, 2.1f, 2.2f,
+				 2.3f, 2.4f, 2.5f, 2.6f;
 	for (int row = 0;  row < 4;  ++row)
 	{
 		for (int col = 0;  col < 4;  ++col)
 		{
-			EXPECT_NEAR(1.1 + 0.4*row + 0.1*col, matrix(row, col), 1e-6) <<
-				row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(1.1 + 0.4 * row + 0.1 * col, matrix(row, col), 1e-6) <<
+					row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -357,7 +359,7 @@ TYPED_TEST(AllMatrixTests, InitializeRowMajorFromArray)
 	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
-	typedef Eigen::Matrix<T, SIZE, SIZE, Eigen::AutoAlign | Eigen::RowMajor> RMatrix;
+	typedef Eigen::Matrix < T, SIZE, SIZE, Eigen::AutoAlign | Eigen::RowMajor > RMatrix;
 
 	// This array has more elements than we will need.
 	// The element type must match the matrix!
@@ -372,8 +374,8 @@ TYPED_TEST(AllMatrixTests, InitializeRowMajorFromArray)
 	{
 		for (int col = 0;  col < SIZE;  ++col)
 		{
-			EXPECT_NEAR(0.01 + (row*SIZE + col) * 1.01, matrix(row, col), 1e-6) <<
-				row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(0.01 + (row * SIZE + col) * 1.01, matrix(row, col), 1e-6) <<
+					row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -385,7 +387,7 @@ TYPED_TEST(AllMatrixTests, InitializeColumnMajorFromArray)
 	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
-	typedef Eigen::Matrix<T, SIZE, SIZE, Eigen::AutoAlign | Eigen::ColMajor> CMatrix;
+	typedef Eigen::Matrix < T, SIZE, SIZE, Eigen::AutoAlign | Eigen::ColMajor > CMatrix;
 
 	// This array has more elements than we will need.
 	// The element type must match the matrix!
@@ -400,8 +402,8 @@ TYPED_TEST(AllMatrixTests, InitializeColumnMajorFromArray)
 	{
 		for (int col = 0;  col < SIZE;  ++col)
 		{
-			EXPECT_NEAR(0.01 + (col*SIZE + row) * 1.01, matrix(row, col), 1e-6) <<
-				row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(0.01 + (col * SIZE + row) * 1.01, matrix(row, col), 1e-6) <<
+					row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -427,8 +429,8 @@ TYPED_TEST(AllMatrixTests, InitializeFromArray)
 	{
 		for (int col = 0;  col < SIZE;  ++col)
 		{
-			EXPECT_NEAR(0.01 + (row*SIZE + col) * 1.01, matrix(row, col), 1e-6) <<
-				row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(0.01 + (row * SIZE + col) * 1.01, matrix(row, col), 1e-6) <<
+					row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -497,7 +499,7 @@ TYPED_TEST(AllMatrixTests, RowsAndColumns)
 		Vector rowVector = a.row(i);
 		EXPECT_NEAR((i + 1.f) * SIZE, rowVector.sum(), 1e-6);
 		Vector columnVector = a.col(i);
-		EXPECT_NEAR(SIZE * (SIZE+1) / 2., columnVector.sum(), 1e-6);
+		EXPECT_NEAR(SIZE * (SIZE + 1) / 2., columnVector.sum(), 1e-6);
 	}
 
 	for (int i = 0;  i < SIZE;  ++i)
@@ -511,7 +513,7 @@ TYPED_TEST(AllMatrixTests, RowsAndColumns)
 		Vector columnVector = a.col(i);
 		EXPECT_NEAR((i + 1.f) * SIZE, columnVector.sum(), 1e-6);
 		Vector rowVector = a.row(i);
-		EXPECT_NEAR(SIZE * (SIZE+1) / 2., rowVector.sum(), 1e-6);
+		EXPECT_NEAR(SIZE * (SIZE + 1) / 2., rowVector.sum(), 1e-6);
 	}
 }
 
@@ -554,9 +556,9 @@ TYPED_TEST(Matrix33Tests, FromAngleAxis)
 	T sinAngle = std::sin(angle);
 	T cosAngle = std::cos(angle);
 	expectedMatrix <<
-		cosAngle, -sinAngle, 0,
-		sinAngle, cosAngle, 0,
-		0, 0, 1;
+				   cosAngle, -sinAngle, 0,
+							 sinAngle, cosAngle, 0,
+							 0, 0, 1;
 
 	using SurgSim::Math::makeRotationMatrix;
 
@@ -580,9 +582,9 @@ TYPED_TEST(Matrix33Tests, ToAngleAxis)
 	T sinAngle = std::sin(angle);
 	T cosAngle = std::cos(angle);
 	matrix <<
-		cosAngle, -sinAngle, 0,
-		sinAngle, cosAngle, 0,
-		0, 0, 1;
+		   cosAngle, -sinAngle, 0,
+					 sinAngle, cosAngle, 0,
+					 0, 0, 1;
 
 	using SurgSim::Math::computeAngleAndAxis;
 	using SurgSim::Math::computeAngle;
@@ -882,7 +884,7 @@ TYPED_TEST(AllMatrixTests, MinAndMax)
 
 	Matrix m(inputArray);
 	EXPECT_NEAR(inputArray[0], m.minCoeff(), 1e-6);
-	EXPECT_NEAR(inputArray[SIZE*SIZE-1], m.maxCoeff(), 1e-6);
+	EXPECT_NEAR(inputArray[SIZE * SIZE - 1], m.maxCoeff(), 1e-6);
 }
 
 /// Trace.
@@ -940,8 +942,8 @@ TYPED_TEST(Matrix22Tests, Extend2to3)
 
 	Matrix22 matrix2;
 	matrix2 <<
-		1.1f, 1.2f,
-		1.3f, 1.4f;
+			1.1f, 1.2f,
+				  1.3f, 1.4f;
 
 	Matrix33 matrix3 = Matrix33::Identity();
 	// Ugh, this is efficient but "template" is required to get it to parse
@@ -962,8 +964,8 @@ TYPED_TEST(Matrix22Tests, DynamicExtend2to3)
 
 	Matrix22 matrix2;
 	matrix2 <<
-		1.1f, 1.2f,
-		1.3f, 1.4f;
+			1.1f, 1.2f,
+				  1.3f, 1.4f;
 
 	Matrix33 matrix3 = Matrix33::Identity();
 	matrix3.block(0, 0, 2, 2) = matrix2;
@@ -981,9 +983,9 @@ TYPED_TEST(Matrix22Tests, Shrink3to2)
 
 	Matrix33 matrix3;
 	matrix3 <<
-		1.1f, 1.2f, 1.3f,
-		1.4f, 1.5f, 1.6f,
-		1.7f, 1.8f, 1.9f;
+			1.1f, 1.2f, 1.3f,
+				  1.4f, 1.5f, 1.6f,
+				  1.7f, 1.8f, 1.9f;
 
 	Matrix22 matrix2;
 	// Ugh, this is efficient but "template" is required to get it to parse
@@ -1004,8 +1006,8 @@ TYPED_TEST(Matrix33Tests, Extend2to3)
 
 	Matrix22 matrix2;
 	matrix2 <<
-		1.1f, 1.2f,
-		1.3f, 1.4f;
+			1.1f, 1.2f,
+				  1.3f, 1.4f;
 
 	Matrix33 matrix3 = Matrix33::Identity();
 	// Ugh, this is efficient but "template" is required to get it to parse
@@ -1026,9 +1028,9 @@ TYPED_TEST(Matrix33Tests, Shrink3to2)
 
 	Matrix33 matrix3;
 	matrix3 <<
-		1.1f, 1.2f, 1.3f,
-		1.4f, 1.5f, 1.6f,
-		1.7f, 1.8f, 1.9f;
+			1.1f, 1.2f, 1.3f,
+				  1.4f, 1.5f, 1.6f,
+				  1.7f, 1.8f, 1.9f;
 
 	Matrix22 matrix2;
 	// Ugh, this is efficient but "template" is required to get it to parse
@@ -1049,9 +1051,9 @@ TYPED_TEST(Matrix33Tests, Extend3to4)
 
 	Matrix33 matrix3;
 	matrix3 <<
-		1.1f, 1.2f, 1.3f,
-		1.4f, 1.5f, 1.6f,
-		1.7f, 1.8f, 1.9f;
+			1.1f, 1.2f, 1.3f,
+				  1.4f, 1.5f, 1.6f,
+				  1.7f, 1.8f, 1.9f;
 
 	Matrix44 matrix4 = Matrix44::Identity();
 	// Ugh, this is efficient but "template" is required to get it to parse
@@ -1072,10 +1074,10 @@ TYPED_TEST(Matrix33Tests, Shrink4to3)
 
 	Matrix44 matrix4;
 	matrix4 <<
-		1.1f, 1.2f, 1.3f, 1.4f,
-		1.5f, 1.6f, 1.7f, 1.8f,
-		1.9f, 2.0f, 2.1f, 2.2f,
-		2.3f, 2.4f, 2.5f, 2.6f;
+			1.1f, 1.2f, 1.3f, 1.4f,
+				  1.5f, 1.6f, 1.7f, 1.8f,
+				  1.9f, 2.0f, 2.1f, 2.2f,
+				  2.3f, 2.4f, 2.5f, 2.6f;
 
 	Matrix33 matrix3;
 	// Ugh, this is efficient but "template" is required to get it to parse
@@ -1096,9 +1098,9 @@ TYPED_TEST(Matrix44Tests, Extend3to4)
 
 	Matrix33 matrix3;
 	matrix3 <<
-		1.1f, 1.2f, 1.3f,
-		1.4f, 1.5f, 1.6f,
-		1.7f, 1.8f, 1.9f;
+			1.1f, 1.2f, 1.3f,
+				  1.4f, 1.5f, 1.6f,
+				  1.7f, 1.8f, 1.9f;
 
 	Matrix44 matrix4 = Matrix44::Identity();
 	// Ugh, this is efficient but "template" is required to get it to parse
@@ -1119,10 +1121,10 @@ TYPED_TEST(Matrix44Tests, Shrink4to3)
 
 	Matrix44 matrix4;
 	matrix4 <<
-		1.1f, 1.2f, 1.3f, 1.4f,
-		1.5f, 1.6f, 1.7f, 1.8f,
-		1.9f, 2.0f, 2.1f, 2.2f,
-		2.3f, 2.4f, 2.5f, 2.6f;
+			1.1f, 1.2f, 1.3f, 1.4f,
+				  1.5f, 1.6f, 1.7f, 1.8f,
+				  1.9f, 2.0f, 2.1f, 2.2f,
+				  2.3f, 2.4f, 2.5f, 2.6f;
 
 	Matrix33 matrix3;
 	// Ugh, this is efficient but "template" is required to get it to parse
@@ -1193,20 +1195,20 @@ TYPED_TEST(AllMatrixTests, ArrayReadWrite)
 
 namespace
 {
-	template <class T>
-	void testScalar(T valueExpected, T value){}
+template <class T>
+void testScalar(T valueExpected, T value) {}
 
-	template <>
-	void testScalar<double>(double valueExpected, double value)
-	{
-		EXPECT_DOUBLE_EQ(valueExpected, value);
-	}
+template <>
+void testScalar<double>(double valueExpected, double value)
+{
+	EXPECT_DOUBLE_EQ(valueExpected, value);
+}
 
-	template <>
-	void testScalar<float>(float valueExpected, float value)
-	{
-		EXPECT_FLOAT_EQ(valueExpected, value);
-	}
+template <>
+void testScalar<float>(float valueExpected, float value)
+{
+	EXPECT_FLOAT_EQ(valueExpected, value);
+}
 };
 
 TYPED_TEST(AllDynamicMatrixTests, addSubMatrix)
@@ -1214,10 +1216,14 @@ TYPED_TEST(AllDynamicMatrixTests, addSubMatrix)
 	typedef typename TestFixture::Matrix Matrix;
 
 	Matrix m, mInit, m2, m2Init;
-	m.resize(18, 18);   m.setRandom();   mInit  = m;
-	m2.resize(18, 18);  m2.setRandom();  m2Init = m2;
+	m.resize(18, 18);
+	m.setRandom();
+	mInit  = m;
+	m2.resize(18, 18);
+	m2.setRandom();
+	m2Init = m2;
 
-	ASSERT_NO_THROW(SurgSim::Math::addSubMatrix(m2.block(3,3, 3,3), 2,2, 3,3, &m););
+	ASSERT_NO_THROW(SurgSim::Math::addSubMatrix(m2.block(3, 3, 3, 3), 2, 2, 3, 3, &m););
 
 	EXPECT_TRUE(m2.isApprox(m2Init));
 	EXPECT_FALSE(m.isApprox(mInit));
@@ -1230,7 +1236,7 @@ TYPED_TEST(AllDynamicMatrixTests, addSubMatrix)
 	{
 		for (int colId = 6; colId < 9; colId++)
 		{
-			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-6, 3 + colId-6), m(rowId, colId));
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId - 6, 3 + colId - 6), m(rowId, colId));
 		}
 	}
 	for (int rowId = 9; rowId < 18; rowId++)
@@ -1246,13 +1252,17 @@ TYPED_TEST(AllDynamicMatrixTests, addSubMatrixBlocks)
 
 	Matrix m, mInit, m2, m2Init;
 	std::vector<size_t> nodeIds;
-	m.resize(18, 18);   m.setRandom();   mInit = m;
-	m2.resize(18, 18);  m2.setRandom();  m2Init = m2;
+	m.resize(18, 18);
+	m.setRandom();
+	mInit = m;
+	m2.resize(18, 18);
+	m2.setRandom();
+	m2Init = m2;
 	nodeIds.push_back(1);
 	nodeIds.push_back(3);
 	nodeIds.push_back(5);
 
-	ASSERT_NO_THROW(SurgSim::Math::addSubMatrix(m2.block(3,3, 9,9), nodeIds, 3, &m););
+	ASSERT_NO_THROW(SurgSim::Math::addSubMatrix(m2.block(3, 3, 9, 9), nodeIds, 3, &m););
 	EXPECT_TRUE(m2.isApprox(m2Init));
 	EXPECT_FALSE(m.isApprox(mInit));
 	for (int rowId = 0; rowId < 3; rowId++)
@@ -1264,15 +1274,15 @@ TYPED_TEST(AllDynamicMatrixTests, addSubMatrixBlocks)
 	{
 		for (int colId = 3; colId < 6; colId++)
 		{
-			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-3, 3 + colId-3), m(rowId, colId));
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId - 3, 3 + colId - 3), m(rowId, colId));
 		}
 		for (int colId = 9; colId < 12; colId++)
 		{
-			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-3, 3 + colId-6), m(rowId, colId));
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId - 3, 3 + colId - 6), m(rowId, colId));
 		}
 		for (int colId = 15; colId < 18; colId++)
 		{
-			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-3, 3 + colId-9), m(rowId, colId));
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId - 3, 3 + colId - 9), m(rowId, colId));
 		}
 	}
 	for (int rowId = 6; rowId < 9; rowId++)
@@ -1284,15 +1294,15 @@ TYPED_TEST(AllDynamicMatrixTests, addSubMatrixBlocks)
 	{
 		for (int colId = 3; colId < 6; colId++)
 		{
-			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-6, 3 + colId-3), m(rowId, colId));
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId - 6, 3 + colId - 3), m(rowId, colId));
 		}
 		for (int colId = 9; colId < 12; colId++)
 		{
-			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-6, 3 + colId-6), m(rowId, colId));
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId - 6, 3 + colId - 6), m(rowId, colId));
 		}
 		for (int colId = 15; colId < 18; colId++)
 		{
-			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-6, 3 + colId-9), m(rowId, colId));
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId - 6, 3 + colId - 9), m(rowId, colId));
 		}
 	}
 	for (int rowId = 12; rowId < 15; rowId++)
@@ -1304,15 +1314,15 @@ TYPED_TEST(AllDynamicMatrixTests, addSubMatrixBlocks)
 	{
 		for (int colId = 3; colId < 6; colId++)
 		{
-			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-9, 3 + colId-3), m(rowId, colId));
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId - 9, 3 + colId - 3), m(rowId, colId));
 		}
 		for (int colId = 9; colId < 12; colId++)
 		{
-			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-9, 3 + colId-6), m(rowId, colId));
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId - 9, 3 + colId - 6), m(rowId, colId));
 		}
 		for (int colId = 15; colId < 18; colId++)
 		{
-			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-9, 3 + colId-9), m(rowId, colId));
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId - 9, 3 + colId - 9), m(rowId, colId));
 		}
 	}
 }
@@ -1322,10 +1332,14 @@ TYPED_TEST(AllDynamicMatrixTests, setSubMatrix)
 	typedef typename TestFixture::Matrix Matrix;
 
 	Matrix m, mInit, m2, m2Init;
-	m.resize(18, 18);   m.setRandom();   mInit  = m;
-	m2.resize(18, 18);  m2.setRandom();  m2Init = m2;
+	m.resize(18, 18);
+	m.setRandom();
+	mInit  = m;
+	m2.resize(18, 18);
+	m2.setRandom();
+	m2Init = m2;
 
-	ASSERT_NO_THROW(SurgSim::Math::setSubMatrix(m2.block(3,3, 3,3), 2,2, 3,3, &m););
+	ASSERT_NO_THROW(SurgSim::Math::setSubMatrix(m2.block(3, 3, 3, 3), 2, 2, 3, 3, &m););
 	EXPECT_TRUE(m2.isApprox(m2Init));
 	EXPECT_FALSE(m.isApprox(mInit));
 	for (int rowId = 0; rowId < 6; rowId++)
@@ -1333,14 +1347,14 @@ TYPED_TEST(AllDynamicMatrixTests, setSubMatrix)
 		EXPECT_TRUE(m.row(rowId).isApprox(mInit.row(rowId)));
 		EXPECT_TRUE(m.col(rowId).isApprox(mInit.col(rowId)));
 	}
-	for (int rowId = 6; rowId < 6+3; rowId++)
+	for (int rowId = 6; rowId < 6 + 3; rowId++)
 	{
-		for (int colId = 6; colId < 6+3; colId++)
+		for (int colId = 6; colId < 6 + 3; colId++)
 		{
-			testScalar(m2Init(3 + rowId-6, 3 + colId-6), m(rowId, colId));
+			testScalar(m2Init(3 + rowId - 6, 3 + colId - 6), m(rowId, colId));
 		}
 	}
-	for (int rowId = 6+3; rowId < 18; rowId++)
+	for (int rowId = 6 + 3; rowId < 18; rowId++)
 	{
 		EXPECT_TRUE(m.row(rowId).isApprox(mInit.row(rowId)));
 		EXPECT_TRUE(m.col(rowId).isApprox(mInit.col(rowId)));
@@ -1352,9 +1366,11 @@ TYPED_TEST(AllDynamicMatrixTests, getSubMatrix)
 	typedef typename TestFixture::Matrix Matrix;
 
 	Matrix m, mInit;
-	m.resize(18, 18); m.setRandom(); mInit = m;
+	m.resize(18, 18);
+	m.setRandom();
+	mInit = m;
 
-	Eigen::Block<Matrix> subMatrix = SurgSim::Math::getSubMatrix(m, 2,2, 3,3);
+	Eigen::Block<Matrix> subMatrix = SurgSim::Math::getSubMatrix(m, 2, 2, 3, 3);
 	EXPECT_TRUE(m.isApprox(mInit));
 	for (int rowId = 0; rowId < 3; rowId++)
 	{
@@ -1366,3 +1382,44 @@ TYPED_TEST(AllDynamicMatrixTests, getSubMatrix)
 		}
 	}
 }
+
+TEST(SparseMatrixTest, initializeFromTriples)
+{
+	using SurgSim::Math::SparseMatrix;
+
+	SparseMatrix mInit(10, 10);
+	mInit.reserve(3);
+	mInit.insert(0, 0) = 1.0;
+	mInit.insert(0, 1) = 1.0;
+	mInit.insert(9, 8) = 1.0;
+	mInit.insert(9, 9) = 1.0;
+	for (int row = 1; row < 9; ++row)
+	{
+		mInit.insert(row, row - 1) = 1.0;
+		mInit.insert(row, row) = 2.0;
+		mInit.insert(row, row + 1) = 1.0;
+	}
+	mInit.makeCompressed();
+
+	typedef Eigen::Triplet<double> T;
+	std::vector<T> tripletList;
+	tripletList.reserve(36);
+	// Each triplet represents a 2x2 matrix along the diagonal
+	for (int counter = 0; counter < 9; ++counter)
+	{
+		tripletList.push_back(T(counter, counter, 1.0));
+		tripletList.push_back(T(counter, counter + 1, 1.0));
+		tripletList.push_back(T(counter + 1, counter, 1.0));
+		tripletList.push_back(T(counter + 1, counter + 1, 1.0));
+	}
+	SparseMatrix m(10, 10);
+	m.setFromTriplets(tripletList.begin(), tripletList.end());
+	EXPECT_TRUE(m.isApprox(mInit));
+	SparseMatrix n(10, 10);
+	n.setFromTriplets(tripletList.begin(), tripletList.end());
+	m += n;
+	EXPECT_FALSE(m.isApprox(mInit));
+	mInit += mInit;
+	EXPECT_TRUE(m.isApprox(mInit));
+}
+

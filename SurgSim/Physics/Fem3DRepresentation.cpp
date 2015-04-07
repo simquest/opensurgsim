@@ -118,17 +118,17 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			{
 				if (K.size() != 0)
 				{
-					m_externalGeneralizedStiffness.block(dofPerNode * nodeId1,
-														 dofPerNode * nodeId2,
-														 dofPerNode, dofPerNode)
-					+= coordinate[index1] * coordinate[index2] * K;
+					Math::addSubMatrixAndInitialize(coordinate[index1] * coordinate[index2] * K,
+													static_cast<int>(nodeId1), static_cast<int>(nodeId2),
+													static_cast<int>(dofPerNode), static_cast<int>(dofPerNode),
+													&m_externalGeneralizedStiffness);
 				}
 				if (D.size() != 0)
 				{
-					m_externalGeneralizedDamping.block(dofPerNode * nodeId1,
-													   dofPerNode * nodeId2,
-													   dofPerNode, dofPerNode)
-					+= coordinate[index1] * coordinate[index2] * D;
+					Math::addSubMatrixAndInitialize(coordinate[index1] * coordinate[index2] * D,
+													static_cast<int>(nodeId1), static_cast<int>(nodeId2),
+													static_cast<int>(dofPerNode), static_cast<int>(dofPerNode),
+													&m_externalGeneralizedDamping);
 				}
 				index2++;
 			}
