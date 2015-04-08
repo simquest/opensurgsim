@@ -30,7 +30,7 @@ void MlcpPhysicsProblem::setZero(size_t numDof, size_t numConstraintDof, size_t 
 {
 	MlcpProblem::setZero(numDof, numConstraintDof, numConstraints);
 
-	H.resize(numConstraintDof, numDof);
+	H.setZero(numConstraintDof, numDof);
 	CHt.setZero(numDof, numConstraintDof);
 }
 

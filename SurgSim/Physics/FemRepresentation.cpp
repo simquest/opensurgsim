@@ -343,7 +343,7 @@ SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Ma
 
 void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState& state)
 {
-	using SurgSim::Math::blockOperationWithoutSearch;
+	using SurgSim::Math::blockWithoutSearch;
 	using SurgSim::Math::Matrix;
 	using SurgSim::Math::Dynamic::Operation;
 

@@ -26,7 +26,8 @@
 using std::tuple;
 using std::tuple_element;
 
-template <size_t N> class TypeValue {
+template <size_t N> class TypeValue
+{
 public:
 	static const size_t value = N;
 };
@@ -80,7 +81,7 @@ public:
 				}
 				m_matrixWithoutExtraCoefficientsExpected.insert(i, j) =
 					(i - m_rowId == 0 && j - m_columnId == 3 ? 2 :
-					static_cast<T>(i - m_rowId + 1) * static_cast<T>(j - m_columnId + 1));
+					 static_cast<T>(i - m_rowId + 1) * static_cast<T>(j - m_columnId + 1));
 			}
 		}
 		for (I i = m_rowId + m_n; i < 18; i++)
@@ -121,40 +122,40 @@ public:
 	template <class Derived>
 	void TestSetWithoutSearchStatic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
-		using SurgSim::Math::blockOperationWithoutSearch;
+		using SurgSim::Math::blockWithoutSearch;
 		using SurgSim::Math::Static::Operation;
 
 		SetUp();
 
 		if (subTooSmall)
 		{
-			EXPECT_THROW((blockOperationWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId,\
-				&m_matrixWithoutExtraCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::assign)),\
-				SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, \
+						  &m_matrixWithoutExtraCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::assign)), \
+						 SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockOperationWithoutSearch<m_n, m_m, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr,\
-				&Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithoutSearch<m_n, m_m, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr, \
+						  &Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
-			EXPECT_THROW((blockOperationWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixTooSmall,\
-				&Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixTooSmall, \
+						  &Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
-			EXPECT_THROW((blockOperationWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId,\
-				&m_matrixMissingCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::assign)),\
-				SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, \
+						  &m_matrixMissingCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::assign)), \
+						 SurgSim::Framework::AssertionFailure);
 
 			// Recipient has extra coefficients on the block rows/columns
-			EXPECT_THROW((blockOperationWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId,\
-				&m_matrixWithExtraCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::assign)),\
-				SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, \
+						  &m_matrixWithExtraCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::assign)), \
+						 SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
-			EXPECT_NO_THROW((blockOperationWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId,\
-				&m_matrixWithoutExtraCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::assign)));
+			EXPECT_NO_THROW((blockWithoutSearch<m_n, m_m>(sub, m_rowId, m_columnId, \
+							 &m_matrixWithoutExtraCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::assign)));
 
 			if (success)
 			{
@@ -170,40 +171,40 @@ public:
 	template <class Derived>
 	void TestSetWithoutSearchDynamic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
-		using SurgSim::Math::blockOperationWithoutSearch;
+		using SurgSim::Math::blockWithoutSearch;
 		using SurgSim::Math::Dynamic::Operation;
 
 		SetUp();
 
 		if (subTooSmall)
 		{
-			EXPECT_THROW((blockOperationWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m,\
-				&m_matrixWithoutExtraCoefficients, &Operation<T, Opt, I, Derived>::assign)),\
-				SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
+											 &m_matrixWithoutExtraCoefficients, &Operation<T, Opt, I, Derived>::assign)), \
+						 SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockOperationWithoutSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr,\
-				&Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithoutSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr, \
+						  &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
-			EXPECT_THROW((blockOperationWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall,\
-				&Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall, \
+											 &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
-			EXPECT_THROW((blockOperationWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m,\
-				&m_matrixMissingCoefficients, &Operation<T, Opt, I, Derived>::assign)),\
-				SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
+											 &m_matrixMissingCoefficients, &Operation<T, Opt, I, Derived>::assign)), \
+						 SurgSim::Framework::AssertionFailure);
 
 			// Recipient has extra coefficients on the block rows/columns
-			EXPECT_THROW((blockOperationWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m,\
-				&m_matrixWithExtraCoefficients, &Operation<T, Opt, I, Derived>::assign)),\
-				SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
+											 &m_matrixWithExtraCoefficients, &Operation<T, Opt, I, Derived>::assign)), \
+						 SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
-			EXPECT_NO_THROW((blockOperationWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m,\
-				&m_matrixWithoutExtraCoefficients, &Operation<T, Opt, I, Derived>::assign)));
+			EXPECT_NO_THROW((blockWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
+												&m_matrixWithoutExtraCoefficients, &Operation<T, Opt, I, Derived>::assign)));
 
 			if (success)
 			{
@@ -219,33 +220,33 @@ public:
 	template <class Derived>
 	void TestSetWithSearchStatic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
-		using SurgSim::Math::blockOperationWithSearch;
+		using SurgSim::Math::blockWithSearch;
 		using SurgSim::Math::Static::Operation;
 
 		SetUp();
 
 		if (subTooSmall)
 		{
-			EXPECT_THROW((blockOperationWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients,\
-				&Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients, \
+													&Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockOperationWithSearch<m_n, m_m, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr,\
-				&Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch<m_n, m_m, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr, \
+						  &Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
-			EXPECT_THROW((blockOperationWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixTooSmall,\
-				&Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixTooSmall, \
+													&Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
-			EXPECT_THROW((blockOperationWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients,\
-				&Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients, \
+													&Operation<T, Opt, I, m_n, m_m, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
-			EXPECT_NO_THROW((blockOperationWithSearch<m_n, m_m>(sub, m_rowId, m_columnId,\
-				&m_matrixWithExtraCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::assign)));
+			EXPECT_NO_THROW((blockWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, \
+							 &m_matrixWithExtraCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::assign)));
 
 			if (success)
 			{
@@ -261,33 +262,33 @@ public:
 	template <class Derived>
 	void TestSetWithSearchDynamic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
-		using SurgSim::Math::blockOperationWithSearch;
+		using SurgSim::Math::blockWithSearch;
 		using SurgSim::Math::Dynamic::Operation;
 
 		SetUp();
 
 		if (subTooSmall)
 		{
-			EXPECT_THROW((blockOperationWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients,\
-				&Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients, \
+										  &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockOperationWithSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr,\
-				&Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr, \
+						  &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
-			EXPECT_THROW((blockOperationWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall,\
-				&Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall, \
+										  &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
-			EXPECT_THROW((blockOperationWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixMissingCoefficients,\
-				&Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixMissingCoefficients, \
+										  &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
-			EXPECT_NO_THROW((blockOperationWithSearch(sub, m_rowId, m_columnId, m_n, m_m,\
-				&m_matrixWithExtraCoefficients, &Operation<T, Opt, I, Derived>::assign)));
+			EXPECT_NO_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, \
+											 &m_matrixWithExtraCoefficients, &Operation<T, Opt, I, Derived>::assign)));
 
 			if (success)
 			{
@@ -303,33 +304,33 @@ public:
 	template <class Derived>
 	void TestAddWithSearchStatic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
-		using SurgSim::Math::blockOperationWithSearch;
+		using SurgSim::Math::blockWithSearch;
 		using SurgSim::Math::Static::Operation;
 
 		SetUp();
 
 		if (subTooSmall)
 		{
-			EXPECT_THROW((blockOperationWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients,\
-				&Operation<T, Opt, I, m_n, m_m, Derived>::add)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients, \
+													&Operation<T, Opt, I, m_n, m_m, Derived>::add)), SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockOperationWithSearch<m_n, m_m, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr,\
-				&Operation<T, Opt, I, m_n, m_m, Derived>::add)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch<m_n, m_m, Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr, \
+						  &Operation<T, Opt, I, m_n, m_m, Derived>::add)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
-			EXPECT_THROW((blockOperationWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixTooSmall,\
-				&Operation<T, Opt, I, m_n, m_m, Derived>::add)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixTooSmall, \
+													&Operation<T, Opt, I, m_n, m_m, Derived>::add)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
-			EXPECT_THROW((blockOperationWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients,\
-				&Operation<T, Opt, I, m_n, m_m, Derived>::add)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients, \
+													&Operation<T, Opt, I, m_n, m_m, Derived>::add)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
-			EXPECT_NO_THROW((blockOperationWithSearch<m_n, m_m>(sub, m_rowId, m_columnId,\
-				&m_matrixWithExtraCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::add)));
+			EXPECT_NO_THROW((blockWithSearch<m_n, m_m>(sub, m_rowId, m_columnId, \
+							 &m_matrixWithExtraCoefficients, &Operation<T, Opt, I, m_n, m_m, Derived>::add)));
 
 			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> dense(m_matrixWithExtraCoefficients);
 			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> denseSub(sub);
@@ -348,33 +349,33 @@ public:
 	template <class Derived>
 	void TestAddWithSearchDynamic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{
-		using SurgSim::Math::blockOperationWithSearch;
+		using SurgSim::Math::blockWithSearch;
 		using SurgSim::Math::Dynamic::Operation;
 
 		SetUp();
 
 		if (subTooSmall)
 		{
-			EXPECT_THROW((blockOperationWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients,\
-				&Operation<T, Opt, I, Derived>::add)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients, \
+										  &Operation<T, Opt, I, Derived>::add)), SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockOperationWithSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr,\
-				&Operation<T, Opt, I, Derived>::add)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr, \
+						  &Operation<T, Opt, I, Derived>::add)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
-			EXPECT_THROW((blockOperationWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall,\
-				&Operation<T, Opt, I, Derived>::add)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall, \
+										  &Operation<T, Opt, I, Derived>::add)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
-			EXPECT_THROW((blockOperationWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixMissingCoefficients,\
-				&Operation<T, Opt, I, Derived>::add)), SurgSim::Framework::AssertionFailure);
+			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixMissingCoefficients, \
+										  &Operation<T, Opt, I, Derived>::add)), SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
-			EXPECT_NO_THROW((blockOperationWithSearch(sub, m_rowId, m_columnId, m_n, m_m,\
-				&m_matrixWithExtraCoefficients, &Operation<T, Opt, I, Derived>::add)));
+			EXPECT_NO_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, \
+											 &m_matrixWithExtraCoefficients, &Operation<T, Opt, I, Derived>::add)));
 
 			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> dense(m_matrixWithExtraCoefficients);
 			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> denseSub(sub);
@@ -400,35 +401,35 @@ public:
 		SetUp();
 
 		// No recipient specified
-		EXPECT_THROW((blockOperation<Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr,\
-			&Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW((blockOperation<Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr, \
+					  &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 		// Recipient too small
-		EXPECT_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixTooSmall,\
-			&Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixTooSmall, \
+									 &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
 
 		// With a recipient that has all the coefficients and no other on the rows/columns
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients,\
-			&Operation<T, Opt, I, Derived>::assign)));
+		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients, \
+										&Operation<T, Opt, I, Derived>::assign)));
 		EXPECT_TRUE((m_matrixWithoutExtraCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 		EXPECT_TRUE(m_matrixWithoutExtraCoefficientsExpected.isApprox(m_matrixWithoutExtraCoefficients));
 
 		// With a recipient that has all the coefficients and others on the rows/columns
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients,\
-			&Operation<T, Opt, I, Derived>::assign)));
+		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients, \
+										&Operation<T, Opt, I, Derived>::assign)));
 		EXPECT_TRUE((m_matrixWithExtraCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 		EXPECT_TRUE(m_matrixWithExtraCoefficientsExpected.isApprox(m_matrixWithExtraCoefficients));
 
 		// With a recipient that does not have all the block coefficients (missing coefficients in the block)
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients,\
-			&Operation<T, Opt, I, Derived>::assign)));
+		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients, \
+										&Operation<T, Opt, I, Derived>::assign)));
 		EXPECT_TRUE((m_matrixMissingCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 		EXPECT_TRUE(m_matrixWithoutExtraCoefficientsExpected.isApprox(m_matrixMissingCoefficients));
 
 		// With an empty recipient
 		Eigen::SparseMatrix<T, Opt, I> m_matrixEmpty(18, 18);
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixEmpty,\
-			&Operation<T, Opt, I, Derived>::assign)));
+		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixEmpty, \
+										&Operation<T, Opt, I, Derived>::assign)));
 		EXPECT_TRUE((m_matrixEmpty.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 	}
 
@@ -442,8 +443,8 @@ public:
 
 		// With an empty recipient
 		Eigen::SparseMatrix<T, Opt, I> m_matrixEmpty(18, 18);
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixEmpty,\
-			&Operation<T, Opt, I, Derived>::assign)));
+		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixEmpty, \
+										&Operation<T, Opt, I, Derived>::assign)));
 		EXPECT_TRUE(m_matrixEmpty.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub));
 	}
 
@@ -460,9 +461,9 @@ public:
 		SetUp();
 
 		Eigen::SparseMatrix<TSub, OptSub, ISub> one(sub.rows(), sub.cols());
-		for(ISub i = 0; i < sub.rows(); i++)
+		for (ISub i = 0; i < sub.rows(); i++)
 		{
-			for(ISub j = 0; j < sub.cols(); j++)
+			for (ISub j = 0; j < sub.cols(); j++)
 			{
 				one.insert(i, j) = 1.0;
 			}
@@ -470,17 +471,17 @@ public:
 		one.makeCompressed();
 
 		Eigen::SparseMatrix<T, Opt, I> m_matrixOne(18, 18);
-		for(I i = 0; i < 18; i++)
+		for (I i = 0; i < 18; i++)
 		{
-			for(I j = 0; j < 18; j++)
+			for (I j = 0; j < 18; j++)
 			{
 				m_matrixOne.insert(i, j) = 1.0;
 			}
 		}
 		m_matrixOne.makeCompressed();
 
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixOne,\
-			&Operation<T, Opt, I, Derived>::add)));
+		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixOne, \
+										&Operation<T, Opt, I, Derived>::add)));
 		EXPECT_TRUE(m_matrixOne.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub + one));
 	}
 
@@ -497,23 +498,23 @@ public:
 		SetUp();
 
 		Eigen::SparseVector<TSub, OptSub, ISub> one(sub.size());
-		for(ISub i = 0; i < sub.size(); i++)
+		for (ISub i = 0; i < sub.size(); i++)
 		{
 			one.insert(i) = 1.0;
 		}
 
 		Eigen::SparseMatrix<T, Opt, I> m_matrixOne(18, 18);
-		for(I i = 0; i < 18; i++)
+		for (I i = 0; i < 18; i++)
 		{
-			for(I j = 0; j < 18; j++)
+			for (I j = 0; j < 18; j++)
 			{
 				m_matrixOne.insert(i, j) = 1.0;
 			}
 		}
 		m_matrixOne.makeCompressed();
 
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixOne,\
-			&Operation<T, Opt, I, Derived>::add)));
+		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixOne, \
+										&Operation<T, Opt, I, Derived>::add)));
 		EXPECT_TRUE(m_matrixOne.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub + one));
 	}
 
@@ -553,11 +554,11 @@ public:
 		Eigen::SparseVector<T, Eigen::RowMajor> vec2(m);
 		for (Index1 i = 0; i < n; i++)
 		{
-			vec1.insert(i) = static_cast<T>(i+1);
+			vec1.insert(i) = static_cast<T>(i + 1);
 		}
 		for (Index2 i = 0; i < m; i++)
 		{
-			vec2.insert(i) = static_cast<T>(i+1);
+			vec2.insert(i) = static_cast<T>(i + 1);
 		}
 
 		Eigen::SparseMatrix<T, Opt> result(vec1 * vec2);
@@ -576,7 +577,7 @@ public:
 		Eigen::SparseVector<T, Opt> vec(n);
 		for (Index i = 0; i < n; i++)
 		{
-			vec.insert(i) = static_cast<T>(i+1);
+			vec.insert(i) = static_cast<T>(i + 1);
 		}
 
 		return vec;
@@ -600,15 +601,15 @@ template <typename Tuple> const typename tuple_element<2, Tuple>::type SparseMat
 template <typename Tuple>
 const int SparseMatrices<Tuple>::Opt;
 
-typedef ::testing::Types<
-	tuple<double, TypeValue<Eigen::ColMajor>, int>,
-	tuple<double, TypeValue<Eigen::RowMajor>, int>,
-	tuple<double, TypeValue<Eigen::ColMajor>, ptrdiff_t>,
-	tuple<double, TypeValue<Eigen::RowMajor>, ptrdiff_t>,
-	tuple<float, TypeValue<Eigen::ColMajor>, int>,
-	tuple<float, TypeValue<Eigen::RowMajor>, int>,
-	tuple<float, TypeValue<Eigen::ColMajor>, ptrdiff_t>,
-	tuple<float, TypeValue<Eigen::RowMajor>, ptrdiff_t>> MyTypes;
+typedef ::testing::Types <
+tuple<double, TypeValue<Eigen::ColMajor>, int>,
+	  tuple<double, TypeValue<Eigen::RowMajor>, int>,
+	  tuple<double, TypeValue<Eigen::ColMajor>, ptrdiff_t>,
+	  tuple<double, TypeValue<Eigen::RowMajor>, ptrdiff_t>,
+	  tuple<float, TypeValue<Eigen::ColMajor>, int>,
+	  tuple<float, TypeValue<Eigen::RowMajor>, int>,
+	  tuple<float, TypeValue<Eigen::ColMajor>, ptrdiff_t>,
+	  tuple<float, TypeValue<Eigen::RowMajor>, ptrdiff_t >> MyTypes;
 TYPED_TEST_CASE(SparseMatrices, MyTypes);
 
 TYPED_TEST(SparseMatrices, setSubMatrixWithoutSearchStaticCall)
