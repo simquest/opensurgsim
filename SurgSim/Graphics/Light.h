@@ -16,7 +16,6 @@
 #ifndef SURGSIM_GRAPHICS_LIGHT_H
 #define SURGSIM_GRAPHICS_LIGHT_H
 
-#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Vector.h"
