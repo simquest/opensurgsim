@@ -107,22 +107,27 @@ static bool readEigenRowVector(const std::string& fileName, FILE* in, const char
 
 		if (std::string(label) == "")
 		{
-			fscanf(in, " (");
+			if (fscanf(in, " (") != 0)
+			{
+				fprintf(stderr, "Unable to read label for Eigen input in '%s'\n  near text '%s'\n",
+						fileName.c_str(), getRawLine(in).c_str());
+				return false;
+			}
 		}
 		else
 		{
 			char readLabel[100];
 			if (fscanf(in, " %[^(](", readLabel) != 1)
 			{
-			fprintf(stderr, "Unable to read label for Eigen input in '%s'\n  near text '%s'\n",
-					fileName.c_str(), getRawLine(in).c_str());
-			return false;
+				fprintf(stderr, "Unable to read label for Eigen input in '%s'\n  near text '%s'\n",
+						fileName.c_str(), getRawLine(in).c_str());
+				return false;
 			}
 			if (std::string(label) + " " != std::string(readLabel))
 			{
-			fprintf(stderr, "Bad label for Eigen input in '%s'\n  near text '%s'\n",
-					fileName.c_str(), getRawLine(in).c_str());
-			return false;
+				fprintf(stderr, "Bad label for Eigen input in '%s'\n  near text '%s'\n",
+						fileName.c_str(), getRawLine(in).c_str());
+				return false;
 			}
 		}
 	}
