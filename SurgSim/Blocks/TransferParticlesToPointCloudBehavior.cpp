@@ -83,7 +83,7 @@ void TransferParticlesToPointCloudBehavior::update(double dt)
 
 	for (; nodeId < m_source->getMaxParticles(); ++nodeId)
 	{
-		target->setVertexPosition(nodeId, SurgSim::Math::Vector3d::Zero());
+		target->setVertexPosition(nodeId, SurgSim::Math::Vector3d::Constant(100.0));
 	}
 }
 
@@ -112,7 +112,7 @@ bool TransferParticlesToPointCloudBehavior::doWakeUp()
 
 		for (; nodeId < m_source->getMaxParticles(); ++nodeId)
 		{
-			SurgSim::Graphics::PointCloud::VertexType vertex(SurgSim::Math::Vector3d::Zero());
+			SurgSim::Graphics::PointCloud::VertexType vertex(SurgSim::Math::Vector3d::Constant(100.0));
 			target->addVertex(vertex);
 		}
 	}
