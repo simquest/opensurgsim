@@ -16,6 +16,11 @@
 #ifndef SURGSIM_MATH_LINEARSPARSESOLVEANDINVERSE_H
 #define SURGSIM_MATH_LINEARSPARSESOLVEANDINVERSE_H
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4244)
+#endif
+
 #include <Eigen/SparseCore>
 
 #include "SurgSim/Framework/Assert.h"
@@ -77,5 +82,9 @@ private:
 }; // namespace Math
 
 }; // namespace SurgSim
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif // SURGSIM_MATH_LINEARSPARSESOLVEANDINVERSE_H
