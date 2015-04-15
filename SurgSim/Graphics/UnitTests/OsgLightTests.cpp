@@ -20,8 +20,8 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 
 #include "SurgSim/Graphics/Light.h"
-#include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 
 #include "SurgSim/Graphics/UnitTests/MockObjects.h"
@@ -198,13 +198,13 @@ TEST_F(OsgLightTests, Serialization)
 					node.as<std::shared_ptr<OsgLight>>());
 
 	EXPECT_NE(nullptr, decode);
-	EXPECT_EQ(diffuse, decode->getValue<SurgSim::Math::Vector4d>("DiffuseColor"));
-	EXPECT_EQ(specular, decode->getValue<SurgSim::Math::Vector4d>("SpecularColor"));
-	EXPECT_EQ(constant, decode->getValue<double>("ConstantAttenuation"));
-	EXPECT_EQ(linear, decode->getValue<double>("LinearAttenuation"));
-	EXPECT_EQ(quadratic, decode->getValue<double>("QuadraticAttenuation"));
+	EXPECT_TRUE(diffuse.isApprox(decode->getValue<SurgSim::Math::Vector4d>("DiffuseColor")));
+	EXPECT_TRUE(specular.isApprox(decode->getValue<SurgSim::Math::Vector4d>("SpecularColor")));
+	EXPECT_NEAR(constant, decode->getValue<double>("ConstantAttenuation"), 1e-9);
+	EXPECT_NEAR(linear, decode->getValue<double>("LinearAttenuation"), 1e-9);
+	EXPECT_NEAR(quadratic, decode->getValue<double>("QuadraticAttenuation"), 1e-9);
 	EXPECT_EQ(lightGroupRef, decode->getValue<std::string>("LightGroupReference"));
 }
 
-}; // namespace Graphics
-}; // namespace SurgSim
+} // namespace Graphics
+} // namespace SurgSim
