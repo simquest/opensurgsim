@@ -151,6 +151,15 @@ public:
 
 TEST_F(Fem3DRepresentationLocalizationTest, ConstructorTest)
 {
+	SurgSim::DataStructures::IndexedLocalCoordinate m_OneNodeValid, m_OneNodeInvalid;
+	m_OneNodeValid.index = 0;
+	m_OneNodeInvalid.index = 1000;
+
+	ASSERT_NO_THROW(std::make_shared<Fem3DRepresentationLocalization>(m_fem, m_OneNodeValid));
+
+	ASSERT_THROW(std::make_shared<Fem3DRepresentationLocalization>(m_fem, m_OneNodeInvalid),
+		SurgSim::Framework::AssertionFailure);
+
 	ASSERT_THROW(std::make_shared<Fem3DRepresentationLocalization>(m_fem, m_invalidIndexLocalPosition),
 		SurgSim::Framework::AssertionFailure);
 
