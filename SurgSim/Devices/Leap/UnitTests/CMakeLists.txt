@@ -24,6 +24,8 @@ set(UNIT_TEST_SOURCES
 
 set(LIBS
 	LeapDevice
+	SurgSimDataStructures
+	SurgSimInput
 )
 
 surgsim_add_unit_tests(LeapDeviceTest)

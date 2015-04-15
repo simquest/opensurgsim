@@ -20,6 +20,8 @@ include_directories(SYSTEM
 )
 
 set(LIBS
+	SurgSimDataStructures
+	SurgSimFramework
 	SurgSimInput
 	${LEAPSDK_LIBRARY}
 )

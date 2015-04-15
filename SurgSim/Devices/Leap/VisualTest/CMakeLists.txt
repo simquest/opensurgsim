@@ -29,7 +29,6 @@ surgsim_add_executable(LeapVisualTest
 
 set(LIBS
 	LeapDevice
-	SurgSimDeviceFilters
 	SurgSimInput
 	VisualTestCommon
 	${GLUT_LIBRARIES}
