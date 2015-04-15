@@ -117,11 +117,11 @@ void doSolveTest()
 TEST(OdeSolverEulerExplicit, SolveTest)
 {
 	{
-		SCOPED_TRACE("EulerExplicit computing the compliance matrix");
+		SCOPED_TRACE("EulerExplicit solve test");
 		doSolveTest<OdeSolverEulerExplicit>();
 	}
 	{
-		SCOPED_TRACE("LinearEulerExplicit computing the compliance matrix");
+		SCOPED_TRACE("LinearEulerExplicit solve test");
 		doSolveTest<OdeSolverLinearEulerExplicit>();
 	}
 }

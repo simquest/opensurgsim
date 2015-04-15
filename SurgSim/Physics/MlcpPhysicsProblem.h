@@ -87,6 +87,4 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 };  // namespace Physics
 };  // namespace SurgSim
 
-//#include "SurgSim/Physics/MlcpPhysicsProblem-inl.h"
-
 #endif  // SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H

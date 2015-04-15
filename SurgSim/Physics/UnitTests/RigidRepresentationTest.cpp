@@ -476,8 +476,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
-		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7) << "K:" << std::endl << K << std::endl << "Knumeric:" <<
-				std::endl << Knumeric << std::endl;
+		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
 		EXPECT_LE((D - Dnumeric).cwiseAbs().maxCoeff(), 2e-7);
 	}
 }

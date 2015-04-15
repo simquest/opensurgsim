@@ -354,12 +354,13 @@ void testAddStiffness(MockFem3DElementCorotationalTet* tet,
 	Matrix expectedK = Matrix::Zero(state.getNumDof(), state.getNumDof());
 	SurgSim::Math::addSubMatrix(scale * tet->getRotatedStiffnessMatrix(state), tet->getNodeIds(), 3, &expectedK);
 
-	SparseMatrix K(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	SparseMatrix K(static_cast<SparseMatrix::Index>(state.getNumDof()),
+				   static_cast<SparseMatrix::Index>(state.getNumDof()));
 	K.setZero();
 	Matrix zeroMatrix = Matrix::Zero(tet->getNumDofPerNode() * tet->getNumNodes(),
 									 tet->getNumDofPerNode() * tet->getNumNodes());
-	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, tet->getNodeIds(),
-			static_cast<int>(tet->getNumDofPerNode()), &K);
+	tet->assembleMatrixBlocks(zeroMatrix, tet->getNodeIds(),
+							  static_cast<SparseMatrix::Index>(tet->getNumDofPerNode()), &K, true);
 	K.makeCompressed();
 	tet->addStiffness(state, &K, scale);
 
@@ -384,12 +385,13 @@ void testAddMass(MockFem3DElementCorotationalTet* tet,
 	Matrix expectedM = Matrix::Zero(state.getNumDof(), state.getNumDof());
 	SurgSim::Math::addSubMatrix(scale * R12x12 * M0 * R12x12.transpose(), tet->getNodeIds(), 3, &expectedM);
 
-	SparseMatrix M(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	SparseMatrix M(static_cast<SparseMatrix::Index>(state.getNumDof()),
+				   static_cast<SparseMatrix::Index>(state.getNumDof()));
 	M.setZero();
 	Matrix zeroMatrix = Matrix::Zero(tet->getNumDofPerNode() * tet->getNumNodes(),
 									 tet->getNumDofPerNode() * tet->getNumNodes());
-	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, tet->getNodeIds(),
-			static_cast<int>(tet->getNumDofPerNode()), &M);
+	tet->assembleMatrixBlocks(zeroMatrix, tet->getNodeIds(),
+							  static_cast<SparseMatrix::Index>(tet->getNumDofPerNode()), &M, true);
 	M.makeCompressed();
 	tet->addMass(state, &M, scale);
 
@@ -423,23 +425,27 @@ void testAddFMDK(MockFem3DElementCorotationalTet* tet,
 	SurgSim::Math::addSubVector(f, tet->getNodeIds(), 3, &expectedF);
 
 	Vector F = Vector::Zero(state.getNumDof());
-	SparseMatrix M(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
-	SparseMatrix D(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
-	SparseMatrix K(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
-	SparseMatrix zeroMatrix(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+	SparseMatrix M(static_cast<SparseMatrix::Index>(state.getNumDof()),
+				   static_cast<SparseMatrix::Index>(state.getNumDof()));
+	SparseMatrix D(static_cast<SparseMatrix::Index>(state.getNumDof()),
+				   static_cast<SparseMatrix::Index>(state.getNumDof()));
+	SparseMatrix K(static_cast<SparseMatrix::Index>(state.getNumDof()),
+				   static_cast<SparseMatrix::Index>(state.getNumDof()));
+	SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(state.getNumDof()),
+							static_cast<SparseMatrix::Index>(state.getNumDof()));
 	Matrix zeroElementMatrix = Matrix::Zero(tet->getNumDofPerNode() * tet->getNumNodes(),
 											tet->getNumDofPerNode() * tet->getNumNodes());
 	M.setZero();
-	SurgSim::Math::addSubMatrixAndInitialize(zeroElementMatrix, tet->getNodeIds(),
-			static_cast<int>(tet->getNumDofPerNode()), &M);
+	tet->assembleMatrixBlocks(zeroElementMatrix, tet->getNodeIds(),
+							  static_cast<SparseMatrix::Index>(tet->getNumDofPerNode()), &M, true);
 	M.makeCompressed();
 	D.setZero();
-	SurgSim::Math::addSubMatrixAndInitialize(zeroElementMatrix, tet->getNodeIds(),
-			static_cast<int>(tet->getNumDofPerNode()), &D);
+	tet->assembleMatrixBlocks(zeroElementMatrix, tet->getNodeIds(),
+							  static_cast<SparseMatrix::Index>(tet->getNumDofPerNode()), &D, true);
 	D.makeCompressed();
 	K.setZero();
-	SurgSim::Math::addSubMatrixAndInitialize(zeroElementMatrix, tet->getNodeIds(),
-			static_cast<int>(tet->getNumDofPerNode()), &K);
+	tet->assembleMatrixBlocks(zeroElementMatrix, tet->getNodeIds(),
+							  static_cast<SparseMatrix::Index>(tet->getNumDofPerNode()), &K, true);
 	K.makeCompressed();
 	zeroMatrix.setZero();
 

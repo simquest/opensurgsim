@@ -18,7 +18,6 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 
-using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::Vector;
@@ -120,13 +119,13 @@ void Fem3DElementCube::computeMass(const SurgSim::Math::OdeState& state,
 }
 
 void Fem3DElementCube::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
-							   double scale /*= 1.0*/)
+							   double scale)
 {
-	addSubMatrix(m_mass * scale, m_nodeIds, 3, M);
+	assembleMatrixBlocks(m_mass * scale, m_nodeIds, 3, M, false);
 }
 
 void Fem3DElementCube::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
-								  double scale /*= 1.0*/)
+								  double scale)
 {
 }
 
@@ -308,9 +307,9 @@ void Fem3DElementCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state
 }
 
 void Fem3DElementCube::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-									double scale /*= 1.0*/)
+									double scale)
 {
-	addSubMatrix(m_stiffness * scale, getNodeIds(), 3, K);
+	assembleMatrixBlocks(m_stiffness * scale, getNodeIds(), 3, K, false);
 }
 
 void Fem3DElementCube::addFMDK(const SurgSim::Math::OdeState& state,

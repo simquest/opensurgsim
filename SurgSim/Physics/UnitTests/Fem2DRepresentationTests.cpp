@@ -104,7 +104,8 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 
 	fem->setInitialState(initialState);
 
-	Math::SparseMatrix zeroMat(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	Math::SparseMatrix zeroMat(static_cast<SparseMatrix::Index>(fem->getNumDof()),
+							   static_cast<SparseMatrix::Index>(fem->getNumDof()));
 	zeroMat.setZero();
 
 	// Vector initialized (properly sized and zeroed)
@@ -144,15 +145,13 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 	Matrix Dlocal = Klocal + Matrix::Identity(fem->getNumDofPerNode(), fem->getNumDofPerNode());
 	Vector F = Vector::Zero(fem->getNumDof());
 	F.segment(0, fem->getNumDofPerNode()) = Flocal;
-	SparseMatrix K(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	SparseMatrix K(static_cast<SparseMatrix::Index>(fem->getNumDof()), static_cast<SparseMatrix::Index>(fem->getNumDof()));
 	K.setZero();
-	Math::addSubMatrixAndInitialize(Klocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
-									static_cast<int>(fem->getNumDofPerNode()), &K);
+	Math::addSubMatrix(Klocal, 0, 0, &K, true);
 	K.makeCompressed();
-	SparseMatrix D(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	SparseMatrix D(static_cast<SparseMatrix::Index>(fem->getNumDof()), static_cast<SparseMatrix::Index>(fem->getNumDof()));
 	D.setZero();
-	Math::addSubMatrixAndInitialize(Dlocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
-									static_cast<int>(fem->getNumDofPerNode()), &D);
+	Math::addSubMatrix(Dlocal, 0, 0, &D, true);
 	D.makeCompressed();
 
 	// Test invalid localization nullptr
@@ -178,7 +177,8 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 				 SurgSim::Framework::AssertionFailure);
 
 	// Test valid call to addExternalGeneralizedForce
-	Math::SparseMatrix zeroMatrix(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	Math::SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(fem->getNumDof()),
+								  static_cast<SparseMatrix::Index>(fem->getNumDof()));
 	zeroMatrix.setZero();
 	fem->addExternalGeneralizedForce(localization, Flocal, Klocal, Dlocal);
 	EXPECT_FALSE(fem->getExternalGeneralizedForce().isZero());

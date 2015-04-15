@@ -156,19 +156,20 @@ public:
 		// Initialize the global matrices for calculations.
 		std::vector<size_t> nodeIdsVectorForm(m_nodeIds.begin(), m_nodeIds.end());
 		forceVector = Vector::Zero(6 * m_numberNodes);
+		Fem1DElementBeam beam(m_nodeIds);
 		massMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
-		SurgSim::Math::addSubMatrixAndInitialize(SurgSim::Math::Matrix::Zero(12, 12),
-				nodeIdsVectorForm, 6, &massMatrix);
+		beam.assembleMatrixBlocks(SurgSim::Math::Matrix::Zero(12, 12),
+								  nodeIdsVectorForm, 6, &massMatrix, true);
 		massMatrix.makeCompressed();
 
 		dampingMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
-		SurgSim::Math::addSubMatrixAndInitialize(SurgSim::Math::Matrix::Zero(12, 12),
-				nodeIdsVectorForm, 6, &dampingMatrix);
+		beam.assembleMatrixBlocks(SurgSim::Math::Matrix::Zero(12, 12),
+								  nodeIdsVectorForm, 6, &dampingMatrix, true);
 		dampingMatrix.makeCompressed();
 
 		stiffnessMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
-		SurgSim::Math::addSubMatrixAndInitialize(SurgSim::Math::Matrix::Zero(12, 12),
-				nodeIdsVectorForm, 6, &stiffnessMatrix);
+		beam.assembleMatrixBlocks(SurgSim::Math::Matrix::Zero(12, 12),
+								  nodeIdsVectorForm, 6, &stiffnessMatrix, true);
 		stiffnessMatrix.makeCompressed();
 	}
 

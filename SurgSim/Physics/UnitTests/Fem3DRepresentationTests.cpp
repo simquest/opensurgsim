@@ -271,7 +271,8 @@ TEST_F(Fem3DRepresentationTests, ExternalForceAPITest)
 	m_fem->setInitialState(m_initialState);
 
 	// Vector initialized (properly sized and zeroed)
-	Math::SparseMatrix zeroMatrix(static_cast<int>(m_fem->getNumDof()), static_cast<int>(m_fem->getNumDof()));
+	Math::SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(m_fem->getNumDof()),
+								  static_cast<SparseMatrix::Index>(m_fem->getNumDof()));
 	zeroMatrix.setZero();
 	EXPECT_NE(0, m_fem->getExternalGeneralizedForce().size());
 	EXPECT_NE(0, m_fem->getExternalGeneralizedStiffness().rows());

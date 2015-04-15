@@ -135,12 +135,12 @@ void MockDeformableRepresentation::addExternalGeneralizedForce(std::shared_ptr<L
 		std::dynamic_pointer_cast<MockDeformableRepresentationLocalization>(localization);
 
 	m_externalGeneralizedForce.segment<3>(3 * loc->getLocalNode()) += generalizedForce;
-	Math::addSubMatrixAndInitialize(K, static_cast<int>(loc->getLocalNode()),
-									static_cast<int>(loc->getLocalNode()), 3, 3,
-									&m_externalGeneralizedStiffness);
-	Math::addSubMatrixAndInitialize(D, static_cast<int>(loc->getLocalNode()),
-									static_cast<int>(loc->getLocalNode()), 3, 3,
-									&m_externalGeneralizedDamping);
+	Math::addSubMatrix(K, static_cast<SparseMatrix::Index>(loc->getLocalNode()),
+					   static_cast<SparseMatrix::Index>(loc->getLocalNode()),
+					   &m_externalGeneralizedStiffness, true);
+	Math::addSubMatrix(D, static_cast<SparseMatrix::Index>(loc->getLocalNode()),
+					   static_cast<SparseMatrix::Index>(loc->getLocalNode()),
+					   &m_externalGeneralizedDamping, true);
 	m_hasExternalGeneralizedForce = true;
 }
 
@@ -219,19 +219,43 @@ void MockSpring::addForce(const OdeState& state, Vector* F, double scale)
 	SurgSim::Math::addSubVector(scale * m_F, m_nodeIds, 3, F);
 }
 
-void MockSpring::addDamping(const OdeState& state, SparseMatrix* D, double scale /*= 1.0*/)
+void MockSpring::addDamping(const OdeState& state, SparseMatrix* D, double scale)
 {
 	Matrix scaledDense(m_D.rows(), m_D.cols());
 	scaledDense = scale * m_D;
-	SurgSim::Math::addSubMatrix(scaledDense, m_nodeIds, 3, D);
+
+	int index1 = 0;
+	for (auto nodeId1 : m_nodeIds)
+	{
+		int index2 = 0;
+		for (auto nodeId2 : m_nodeIds)
+		{
+			Math::addSubMatrix(scaledDense.block(3 * index1, 3 * index2, 3, 3),
+							   static_cast<SparseMatrix::Index>(nodeId1), static_cast<SparseMatrix::Index>(nodeId2), D, false);
+			++index2;
+		}
+		++index1;
+	}
 }
 
 void MockSpring::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-							  double scale /*= 1.0*/)
+							  double scale)
 {
 	Matrix scaledDense(m_K.rows(), m_K.cols());
 	scaledDense = scale * m_K;
-	SurgSim::Math::addSubMatrix(scaledDense, m_nodeIds, 3, K);
+
+	int index1 = 0;
+	for (auto nodeId1 : m_nodeIds)
+	{
+		int index2 = 0;
+		for (auto nodeId2 : m_nodeIds)
+		{
+			Math::addSubMatrix(scaledDense.block(3 * index1, 3 * index2, 3, 3),
+							   static_cast<SparseMatrix::Index>(nodeId1), static_cast<SparseMatrix::Index>(nodeId2), K, false);
+			++index2;
+		}
+		++index1;
+	}
 }
 
 void MockSpring::addFDK(const OdeState& state, Vector* f, SparseMatrix* D, SparseMatrix* K)
@@ -326,19 +350,19 @@ void MockFemElement::addForce(const OdeState& state, Vector* F,    double scale)
 }
 
 void MockFemElement::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
-							 double scale /*= 1.0*/)
+							 double scale)
 {
-	SurgSim::Math::addSubMatrix(scale * m_M, m_nodeIds, 3, M);
+	assembleMatrixBlocks(scale * m_M, m_nodeIds, 3, M, false);
 }
 
 void MockFemElement::addDamping(const OdeState& state, SparseMatrix* D, double scale)
 {
-	SurgSim::Math::addSubMatrix(scale * m_D, m_nodeIds, 3, D);
+	assembleMatrixBlocks(scale * m_D, m_nodeIds, 3, D, false);
 }
 
 void MockFemElement::addStiffness(const OdeState& state, SparseMatrix* K, double scale)
 {
-	SurgSim::Math::addSubMatrix(scale * m_K, m_nodeIds, 3, K);
+	assembleMatrixBlocks(scale * m_K, m_nodeIds, 3, K, false);
 }
 
 void MockFemElement::addFMDK(const OdeState& state, Vector* f, SparseMatrix* M, SparseMatrix* D, SparseMatrix* K)
@@ -373,14 +397,14 @@ void MockFemElement::initialize(const OdeState& state)
 	FemElement::initialize(state);
 	const size_t numDof = 3 * m_nodeIds.size();
 	m_F = Vector::LinSpaced(numDof, 1.0, static_cast<double>(numDof));
-	m_M.resize(static_cast<int>(numDof), static_cast<int>(numDof));
+	m_M.resize(static_cast<SparseMatrix::Index>(numDof), static_cast<SparseMatrix::Index>(numDof));
 	m_M.setIdentity();
 
-	m_D.resize(static_cast<int>(numDof), static_cast<int>(numDof));
+	m_D.resize(static_cast<SparseMatrix::Index>(numDof), static_cast<SparseMatrix::Index>(numDof));
 	m_D.setIdentity();
 	m_D *= 2.0;
 
-	m_K.resize(static_cast<int>(numDof), static_cast<int>(numDof));
+	m_K.resize(static_cast<SparseMatrix::Index>(numDof), static_cast<SparseMatrix::Index>(numDof));
 	m_K.setIdentity();
 	m_K *= 3.0;
 
@@ -411,14 +435,12 @@ void MockFemRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localiza
 
 	size_t numDofPerNode = getNumDofPerNode();
 	m_externalGeneralizedForce.segment(numDofPerNode * loc->getLocalNode(), numDofPerNode) += generalizedForce;
-	SurgSim::Math::addSubMatrixAndInitialize(K, static_cast<int>(loc->getLocalNode()),
-			static_cast<int>(loc->getLocalNode()),
-			static_cast<int>(numDofPerNode), static_cast<int>(numDofPerNode),
-			&m_externalGeneralizedStiffness);
-	SurgSim::Math::addSubMatrixAndInitialize(D, static_cast<int>(loc->getLocalNode()),
-			static_cast<int>(loc->getLocalNode()),
-			static_cast<int>(numDofPerNode), static_cast<int>(numDofPerNode),
-			&m_externalGeneralizedDamping);
+	SurgSim::Math::addSubMatrix(K, static_cast<SparseMatrix::Index>(loc->getLocalNode()),
+								static_cast<SparseMatrix::Index>(loc->getLocalNode()),
+								&m_externalGeneralizedStiffness, true);
+	SurgSim::Math::addSubMatrix(D, static_cast<SparseMatrix::Index>(loc->getLocalNode()),
+								static_cast<SparseMatrix::Index>(loc->getLocalNode()),
+								&m_externalGeneralizedDamping, true);
 	m_hasExternalGeneralizedForce = true;
 }
 

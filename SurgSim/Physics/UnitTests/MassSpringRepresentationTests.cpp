@@ -295,7 +295,8 @@ TEST_F(MassSpringRepresentationTests, ExternalForceAPITest)
 	massSpring->addSpring(std::make_shared<SurgSim::Physics::LinearSpring>(0, 1));
 
 	// Vector initialized (properly sized and zeroed)
-	SparseMatrix zeroMatrix(static_cast<int>(massSpring->getNumDof()), static_cast<int>(massSpring->getNumDof()));
+	SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(massSpring->getNumDof()),
+							static_cast<SparseMatrix::Index>(massSpring->getNumDof()));
 	zeroMatrix.setZero();
 	EXPECT_NE(0, massSpring->getExternalForce().size());
 	EXPECT_NE(0, massSpring->getExternalStiffness().size());

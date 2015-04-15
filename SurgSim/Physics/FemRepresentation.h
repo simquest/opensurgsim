@@ -121,14 +121,10 @@ public:
 	bool getComplianceWarping() const;
 
 	/// Calculate the product C * b where C is the compliance matrix with boundary conditions
-	/// applied. Note that this can be rewritten as (B^T M^-1 B) * b = B^T * (M^-1 * (B * b)) = x,
-	/// where M^-1 * (B * b) = x is simply the solution to MX = Bb.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
 	/// \param b The input matrix \b
 	/// \return The matrix after application of the compliance matrix.
-	/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
-	/// when the compliance matrix would have been generated in the initial version.
-	Matrix applyCompliance(const OdeState& state, Matrix b) override;
+	Math::Matrix applyCompliance(const Math::OdeState& state, const Math::Matrix& b) override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
@@ -233,10 +229,6 @@ private:
 	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
 
 	bool m_isInitialComplianceMatrixComputed; ///< For compliance warping: Is the initial compliance matrix computed ?
-
-	/*
-	SurgSim::Math::Matrix m_complianceWarpingMatrix; ///< The compliance warping matrix if compliance warping in use
-	*/
 
 	/// The system-size transformation matrix. It contains nodes transformation on the diagonal blocks.
 	Eigen::SparseMatrix<double> m_complianceWarpingTransformation;

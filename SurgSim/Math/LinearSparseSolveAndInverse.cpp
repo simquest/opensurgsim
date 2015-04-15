@@ -27,12 +27,12 @@ void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
 	m_lu.compute(matrix);
 }
 
-Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b)
+Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const
 {
 	return m_lu.solve(b);
 }
 
-Matrix LinearSparseSolveAndInverseLU::getInverse()
+Matrix LinearSparseSolveAndInverseLU::getInverse() const
 {
 	Matrix eye(Matrix::Identity(m_lu.rows(), m_lu.cols()));
 	return (m_lu.solve(eye));

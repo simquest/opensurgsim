@@ -16,6 +16,7 @@
 #ifndef SURGSIM_MATH_UNITTESTS_MOCKOBJECT_H
 #define SURGSIM_MATH_UNITTESTS_MOCKOBJECT_H
 
+#include <Eigen/Core>
 #include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/OdeState.h"
@@ -100,20 +101,21 @@ public:
 		*M = &m_M;
 	}
 
-	Matrix applyCompliance(const OdeState& state, Matrix b) override
+	Matrix applyCompliance(const OdeState& state, const Matrix& b) override
 	{
 		SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
 
+		Math::Matrix bTemp = b;
 		for (auto condition : state.getBoundaryConditions())
 		{
-			Math::zeroRow(condition, &b);
+			Math::zeroRow(condition, &bTemp);
 		}
-		b = m_odeSolver->getLinearSolver()->solve(b);
+		auto solution = m_odeSolver->getLinearSolver()->solve(bTemp);
 		for (auto condition : state.getBoundaryConditions())
 		{
-			Math::zeroRow(condition, &b);
+			Math::zeroRow(condition, &solution);
 		}
-		return std::move(b);
+		return solution;
 	}
 
 	void setOdeSolver(std::shared_ptr<SurgSim::Math::OdeSolver> solver)
@@ -249,20 +251,21 @@ public:
 		*M = &m_M;
 	}
 
-	Matrix applyCompliance(const OdeState& state, Matrix b) override
+	Matrix applyCompliance(const OdeState& state, const Matrix& b) override
 	{
 		SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
 
+		Math::Matrix bTemp = b;
 		for (auto condition : state.getBoundaryConditions())
 		{
-			Math::zeroRow(condition, &b);
+			Math::zeroRow(condition, &bTemp);
 		}
-		b = m_odeSolver->getLinearSolver()->solve(b);
+		auto solution = m_odeSolver->getLinearSolver()->solve(bTemp);
 		for (auto condition : state.getBoundaryConditions())
 		{
-			Math::zeroRow(condition, &b);
+			Math::zeroRow(condition, &solution);
 		}
-		return std::move(b);
+		return solution;
 	}
 
 	void setOdeSolver(std::shared_ptr<SurgSim::Math::OdeSolver> solver)
@@ -302,25 +305,13 @@ public:
 
 	const SparseMatrix& computeD(const OdeState& state) override
 	{
-		auto position = 2.0 * state.getPositions();
-		auto velocity = state.getVelocities();
-
-		m_D.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
-		m_D.reserve(static_cast<int>(state.getNumDof()));
-		for (int row = 0; row < state.getNumDof(); ++row)
-		{
-			for (int col = 0; col < state.getNumDof(); ++col)
-			{
-				m_D.insert(row, col) = position[row] * velocity[col];
-			}
-		}
-
+		m_D = 2.0 * state.getPositions() * state.getVelocities().transpose().sparseView();
 		return m_D;
 	}
 
 	const SparseMatrix& computeK(const OdeState& state) override
 	{
-		m_K.resize(static_cast<int>(state.getNumDof()), static_cast<int>(state.getNumDof()));
+		m_K.resize(static_cast<SparseMatrix::Index>(state.getNumDof()), static_cast<SparseMatrix::Index>(state.getNumDof()));
 		m_K.setIdentity();
 		m_K *= state.getVelocities().squaredNorm();
 		return m_K;
@@ -339,20 +330,21 @@ public:
 		*M = &m_M;
 	}
 
-	Matrix applyCompliance(const OdeState& state, Matrix b) override
+	Matrix applyCompliance(const OdeState& state, const Matrix& b) override
 	{
 		SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
 
+		Math::Matrix bTemp = b;
 		for (auto condition : state.getBoundaryConditions())
 		{
-			Math::zeroRow(condition, &b);
+			Math::zeroRow(condition, &bTemp);
 		}
-		b = m_odeSolver->getLinearSolver()->solve(b);
+		auto solution = m_odeSolver->getLinearSolver()->solve(bTemp);
 		for (auto condition : state.getBoundaryConditions())
 		{
-			Math::zeroRow(condition, &b);
+			Math::zeroRow(condition, &solution);
 		}
-		return std::move(b);
+		return solution;
 	}
 
 	void setOdeSolver(std::shared_ptr<SurgSim::Math::OdeSolver> solver)

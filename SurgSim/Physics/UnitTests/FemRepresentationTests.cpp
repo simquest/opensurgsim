@@ -560,7 +560,7 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		// This method has not been overridden.
 		// This has been disabled. No assertion will be thrown until compliance warping is back
 		// in the code.
-		EXPECT_NO_THROW(fem->update(1e-3), SurgSim::Framework::AssertionFailure);
+		EXPECT_NO_THROW(fem->update(1e-3));
 	}
 
 	{

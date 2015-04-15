@@ -169,8 +169,7 @@ Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 
 void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasCompliance) const
 {
-	SURGSIM_ASSERT(matrix != nullptr && matrix->rows() >= 0 && matrix->cols() >= 0
-				   && static_cast<size_t>(matrix->rows()) == getNumDof()
+	SURGSIM_ASSERT(matrix != nullptr && static_cast<size_t>(matrix->rows()) == getNumDof()
 				   && static_cast<size_t>(matrix->cols()) == getNumDof())
 			<< "Invalid matrix to apply boundary conditions on";
 
@@ -193,8 +192,7 @@ void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasComplianc
 
 void OdeState::applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCompliance) const
 {
-	SURGSIM_ASSERT(matrix != nullptr && matrix->rows() >= 0 && matrix->cols() >= 0
-				   && static_cast<size_t>(matrix->rows()) == getNumDof()
+	SURGSIM_ASSERT(matrix != nullptr && static_cast<size_t>(matrix->rows()) == getNumDof()
 				   && static_cast<size_t>(matrix->cols()) == getNumDof())
 			<< "Invalid matrix to apply boundary conditions on";
 
@@ -209,9 +207,9 @@ void OdeState::applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCom
 		 it != getBoundaryConditions().cend();
 		 ++it)
 	{
-		Math::zeroRow(static_cast<int>(*it), matrix);
-		Math::zeroColumn(static_cast<int>(*it), matrix);
-		(*matrix).coeffRef(static_cast<int>(*it), static_cast<int>(*it)) = complianceValue;
+		Math::zeroRow(static_cast<SparseMatrix::Index>(*it), matrix);
+		Math::zeroColumn(static_cast<SparseMatrix::Index>(*it), matrix);
+		(*matrix).coeffRef(static_cast<SparseMatrix::Index>(*it), static_cast<SparseMatrix::Index>(*it)) = complianceValue;
 	}
 }
 

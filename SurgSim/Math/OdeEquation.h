@@ -87,14 +87,13 @@ public:
 	/// \note computeF(), computeM(), computeD(), computeK()
 	virtual void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) = 0;
 
-	/// Calculate the product C * b where C is the compliance matrix with boundary conditions
-	/// applied. Note that this can be rewritten as (B^T M^-1 B) * b = B^T * (M^-1 * (B * b)) = x,
-	/// where M^-1 * (B * b) = x is simply the solution to MX = Bb.
+	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
+	/// applied. Note that this can be rewritten as (Bt)(M^-1)(B.b) = (Bt)(M^-1)(B.b) = x,
+	/// where (M^-1)(B.b) = x is simply the solution to M.x = B.b.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
 	/// \param b The input matrix \b
-	/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
-	/// when the compliance matrix would have been generated in the initial version.
-	virtual Matrix applyCompliance(const OdeState& state, Matrix b) = 0;
+	/// \return C.b
+	virtual Matrix applyCompliance(const OdeState& state, const Matrix& b) = 0;
 
 protected:
 	/// The initial state (which defines the ODE initial conditions \f$(x0, v0)\f$)

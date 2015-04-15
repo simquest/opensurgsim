@@ -56,9 +56,6 @@ void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, 
 		m_k1.velocity = currentState.getVelocities();
 		// Reminder: m_complianceMatrix = dt.M^-1 (including 0 compliance for all boundary conditions)
 		//
-		// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
-		// when the compliance matrix would have been generated.
-		// m_k1.acceleration = m_complianceMatrix * m_equation.computeF(currentState) / dt;
 		m_k1.acceleration = m_equation.applyCompliance(currentState, m_equation.computeF(currentState) / dt);
 
 		// 2nd evaluate k2

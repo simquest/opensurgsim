@@ -48,8 +48,6 @@ void MlcpPhysicsProblem::updateConstraint(
 	size_t indexSubC,
 	size_t indexNewSubH)
 {
-	using SurgSim::Math::Vector;
-
 	// Update H, CHt, and HCHt with newSubH, denoted H'.
 	//
 	// Note that updates are linear for H and CHt, but not for HCHt:

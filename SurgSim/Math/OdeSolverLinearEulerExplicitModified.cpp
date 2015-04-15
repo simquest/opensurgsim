@@ -39,8 +39,6 @@ void OdeSolverLinearEulerExplicitModified::solve(double dt, const OdeState& curr
 	else
 	{
 		Vector& f = m_equation.computeF(currentState);
-		/// Redundant? Compliance already has BC applied ...
-		currentState.applyBoundaryConditionsToVector(&f);
 		Vector deltaV = m_equation.applyCompliance(currentState, f);
 
 		newState->getVelocities() = currentState.getVelocities() + deltaV;

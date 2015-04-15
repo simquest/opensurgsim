@@ -20,6 +20,7 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
@@ -28,6 +29,7 @@
 #include "SurgSim/Physics/FemElement.h"
 
 using SurgSim::Framework::Logger;
+using SurgSim::Math::SparseMatrix;
 
 namespace
 {
@@ -118,17 +120,15 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			{
 				if (K.size() != 0)
 				{
-					Math::addSubMatrixAndInitialize(coordinate[index1] * coordinate[index2] * K,
-													static_cast<int>(nodeId1), static_cast<int>(nodeId2),
-													static_cast<int>(dofPerNode), static_cast<int>(dofPerNode),
-													&m_externalGeneralizedStiffness);
+					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * K,
+									   static_cast<SparseMatrix::Index>(nodeId1), static_cast<SparseMatrix::Index>(nodeId2),
+									   &m_externalGeneralizedStiffness, true);
 				}
 				if (D.size() != 0)
 				{
-					Math::addSubMatrixAndInitialize(coordinate[index1] * coordinate[index2] * D,
-													static_cast<int>(nodeId1), static_cast<int>(nodeId2),
-													static_cast<int>(dofPerNode), static_cast<int>(dofPerNode),
-													&m_externalGeneralizedDamping);
+					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * D,
+									   static_cast<SparseMatrix::Index>(nodeId1), static_cast<SparseMatrix::Index>(nodeId2),
+									   &m_externalGeneralizedDamping, true);
 				}
 				index2++;
 			}

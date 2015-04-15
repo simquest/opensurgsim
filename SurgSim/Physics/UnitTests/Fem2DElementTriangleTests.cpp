@@ -1325,7 +1325,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
-	const int numDof = 6 * static_cast<int>(m_restState.getNumNodes());
+	const SparseMatrix::Index numDof = 6 * static_cast<SparseMatrix::Index>(m_restState.getNumNodes());
 	Vector forceVector(numDof);
 	Vector ones(numDof);
 	SparseMatrix massMatrix(numDof, numDof);
@@ -1352,13 +1352,13 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	forceVector.setZero();
 	massMatrix.setZero();
-	SurgSim::Math::addSubMatrixAndInitialize(zeros18x18, tri->getNodeIds(), 6, &massMatrix);
+	tri->assembleMatrixBlocks(zeros18x18, tri->getNodeIds(), 6, &massMatrix, true);
 	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
-	SurgSim::Math::addSubMatrixAndInitialize(zeros18x18, tri->getNodeIds(), 6, &dampingMatrix);
+	tri->assembleMatrixBlocks(zeros18x18, tri->getNodeIds(), 6, &dampingMatrix, true);
 	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
-	SurgSim::Math::addSubMatrixAndInitialize(zeros18x18, tri->getNodeIds(), 6, &stiffnessMatrix);
+	tri->assembleMatrixBlocks(zeros18x18, tri->getNodeIds(), 6, &stiffnessMatrix, true);
 	stiffnessMatrix.makeCompressed();
 	zeroMatrix.setZero();
 

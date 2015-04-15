@@ -18,7 +18,6 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 
-using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
 using SurgSim::Math::getSubMatrix;
 using SurgSim::Math::getSubVector;
@@ -123,20 +122,20 @@ void Fem1DElementBeam::addForce(const SurgSim::Math::OdeState& state, SurgSim::M
 }
 
 void Fem1DElementBeam::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
-							   double scale /*= 1.0*/)
+							   double scale)
 {
-	Math::addSubMatrix(m_M * scale, m_nodeIds, 6, M);
+	assembleMatrixBlocks(m_M * scale, m_nodeIds, 6, M, false);
 }
 
 void Fem1DElementBeam::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
-								  double scale /*= 1.0*/)
+								  double scale)
 {
 }
 
 void Fem1DElementBeam::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-									double scale /*= 1.0*/)
+									double scale)
 {
-	Math::addSubMatrix(m_K * scale, getNodeIds(), 6, K);
+	assembleMatrixBlocks(m_K * scale, getNodeIds(), 6, K, false);
 }
 
 void Fem1DElementBeam::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,

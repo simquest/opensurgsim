@@ -38,8 +38,6 @@ void OdeSolverLinearStatic::solve(double dt, const OdeState& currentState, OdeSt
 	else
 	{
 		Vector& f = m_equation.computeF(currentState);
-		/// Redundant? Compliance already has BC applied.
-		currentState.applyBoundaryConditionsToVector(&f);
 		Vector deltaX = m_equation.applyCompliance(currentState, f);
 
 		// Compute the new state using the static scheme:

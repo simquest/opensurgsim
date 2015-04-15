@@ -130,7 +130,7 @@ public:
 	Vector* applyBoundaryConditionsToVector(Vector* vector) const;
 
 	/// Apply boundary conditions to a given matrix
-	/// \param matrix The matrix to apply the boundary conditions on
+	/// \param matrix The dense matrix to apply the boundary conditions on
 	/// \param hasCompliance True if the fixed dofs should have a compliance of 1 with themselves in the matrix or not.
 	/// \note hasCompliance is practical to remove all compliance, which is helpful when the compliance matrix is used
 	/// \note in an architecture of type LCP. It ensures that a separate constraint resolution will never violates the
@@ -138,7 +138,7 @@ public:
 	void applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasCompliance = true) const;
 
 	/// Apply boundary conditions to a given matrix
-	/// \param matrix The matrix to apply the boundary conditions on
+	/// \param matrix The sparse matrix to apply the boundary conditions on
 	/// \param hasCompliance True if the fixed dofs should have a compliance of 1 with themselves in the matrix or not.
 	/// \note hasCompliance is practical to remove all compliance, which is helpful when the compliance matrix is used
 	/// \note in an architecture of type LCP. It ensures that a separate constraint resolution will never violates the

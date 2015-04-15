@@ -57,17 +57,23 @@ bool MassSpringRepresentation::doInitialize()
 
 	// Precompute the sparsity pattern for the global arrays. M is diagonal, the
 	// rest need to be calculated.
-	m_M.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
-	m_D.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
-	m_K.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
-	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
+	m_M.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	m_D.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	m_K.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	for (auto& spring : m_springs)
 	{
-		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode() * (*spring)->getNumNodes(),
-												getNumDofPerNode() * (*spring)->getNumNodes());
-		Math::addSubMatrixAndInitialize(block, (*spring)->getNodeIds(),
-										static_cast<int>(getNumDofPerNode()), &m_D);
-		Math::addSubMatrixAndInitialize(block, (*spring)->getNodeIds(),
-										static_cast<int>(getNumDofPerNode()), &m_K);
+		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode(),
+												getNumDofPerNode());
+		for (auto nodeId1 : spring->getNodeIds())
+		{
+			for (auto nodeId2 : spring->getNodeIds())
+			{
+				Math::addSubMatrix(block, static_cast<SparseMatrix::Index>(nodeId1),
+								   static_cast<SparseMatrix::Index>(nodeId2), &m_D, true);
+				Math::addSubMatrix(block, static_cast<SparseMatrix::Index>(nodeId1),
+								   static_cast<SparseMatrix::Index>(nodeId2), &m_K, true);
+			}
+		}
 	}
 	m_M.setIdentity();
 	m_M.makeCompressed();
@@ -157,15 +163,10 @@ void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Local
 			". Valid range is {0.." << getNumMasses() << "}";
 
 	m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce;
-	/* Replaced:
-	m_externalGeneralizedStiffness.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += K;
-	m_externalGeneralizedDamping.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += D;
-	*/
-	// Replaced the above with:
-	Math::addSubMatrixAndInitialize(K, static_cast<int>(nodeId), static_cast<int>(nodeId), static_cast<int>(dofPerNode),
-									static_cast<int>(dofPerNode), &m_externalGeneralizedStiffness);
-	Math::addSubMatrixAndInitialize(D, static_cast<int>(nodeId), static_cast<int>(nodeId), static_cast<int>(dofPerNode),
-									static_cast<int>(dofPerNode), &m_externalGeneralizedDamping);
+	Math::addSubMatrix(K, static_cast<SparseMatrix::Index>(nodeId), static_cast<SparseMatrix::Index>(nodeId),
+					   &m_externalGeneralizedStiffness, true);
+	Math::addSubMatrix(D, static_cast<SparseMatrix::Index>(nodeId), static_cast<SparseMatrix::Index>(nodeId),
+					   &m_externalGeneralizedDamping, true);
 	m_hasExternalGeneralizedForce = true;
 }
 
@@ -221,20 +222,11 @@ const SparseMatrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeS
 	// Make sure the mass matrix has been properly allocated
 	Math::clearMatrix(&m_M);
 
-	/* Replaced:
-	Eigen::MatrixBase<const Eigen::SparseMatrix<double>>::DiagonalReturnType diagonal = m_M.diagonal();
-
-	for (size_t massId = 0; massId < getNumMasses(); massId++)
-	{
-		setSubVector(Vector3d::Ones() * getMass(massId)->getMass(), massId, 3, &diagonal);
-	}
-	*/
-	// Replace the above loop with the following:
 	for (int massId = 0; massId < getNumMasses(); massId++)
 	{
 		m_M.coeffRef(3 * massId, 3 * massId) = getMass(massId)->getMass();
-		m_M.coeffRef((3 * massId) + 1, (3 * massId) + 1) = getMass(massId)->getMass();
-		m_M.coeffRef((3 * massId) + 2, (3 * massId) + 2) = getMass(massId)->getMass();
+		m_M.coeffRef(3 * massId + 1, 3 * massId + 1) = getMass(massId)->getMass();
+		m_M.coeffRef(3 * massId + 2, 3 * massId + 2) = getMass(massId)->getMass();
 	}
 
 	// Apply boundary conditions globally
@@ -242,11 +234,8 @@ const SparseMatrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeS
 		 boundaryCondition != std::end(state.getBoundaryConditions());
 		 boundaryCondition++)
 	{
-		/* Replaced:
-		diagonal[*boundaryCondition] = 1e9;
-		*/
-		// Replaced the above with:
-		m_M.coeffRef(static_cast<int>(*boundaryCondition), static_cast<int>(*boundaryCondition)) = 1e9;
+		m_M.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
 
 	return m_M;
@@ -256,7 +245,6 @@ const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeS
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::setSubVector;
-	using SurgSim::Math::addSubMatrix;
 
 	const double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
@@ -270,14 +258,9 @@ const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeS
 		for (int massId = 0; massId < getNumMasses(); massId++)
 		{
 			double coef = rayleighMass * getMass(massId)->getMass();
-			/* Replaced:
-			Eigen::MatrixBase<const Eigen::SparseMatrix<double>>::DiagonalReturnType Ddiagonal = m_D.diagonal();
-			setSubVector(Vector3d::Ones() * coef, massId, 3, &Ddiagonal);
-			*/
-			// Replaced the above with ...
 			m_D.coeffRef(3 * massId, 3 * massId) = coef;
-			m_D.coeffRef((3 * massId) + 1, (3 * massId) + 1) = coef;
-			m_D.coeffRef((3 * massId) + 2, (3 * massId) + 2) = coef;
+			m_D.coeffRef(3 * massId + 1, 3 * massId + 1) = coef;
+			m_D.coeffRef(3 * massId + 2, 3 * massId + 2) = coef;
 		}
 	}
 
@@ -307,14 +290,10 @@ const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeS
 		 boundaryCondition != std::end(state.getBoundaryConditions());
 		 boundaryCondition++)
 	{
-		/* Replaced:
-		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
-		*/
-		Math::zeroRow(static_cast<int>(*boundaryCondition), &m_D);
-		Math::zeroColumn(static_cast<int>(*boundaryCondition), &m_D);
-		m_D.coeffRef(static_cast<int>(*boundaryCondition), static_cast<int>(*boundaryCondition)) = 1e9;
+		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
+		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
+		m_D.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
 
 	return m_D;
@@ -322,8 +301,6 @@ const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeS
 
 const SparseMatrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
-	using SurgSim::Math::addSubMatrix;
-
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
 	Math::clearMatrix(&m_K);
 
@@ -343,14 +320,10 @@ const SparseMatrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeS
 		 boundaryCondition != std::end(state.getBoundaryConditions());
 		 boundaryCondition++)
 	{
-		/* Replaced:
-		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
-		*/
-		Math::zeroRow(static_cast<int>(*boundaryCondition), &m_K);
-		Math::zeroColumn(static_cast<int>(*boundaryCondition), &m_K);
-		m_K.coeffRef(static_cast<int>(*boundaryCondition), static_cast<int>(*boundaryCondition)) = 1e9;
+		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
+		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
+		m_K.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
 
 	return m_K;
@@ -360,7 +333,6 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 		Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K)
 {
 	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::addSubMatrix;
 
 	// Make sure the force vector has been properly allocated and zeroed out
 	m_f.setZero(state.getNumDof());
@@ -388,9 +360,6 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 	// Add the Rayleigh damping matrix
 	if (m_rayleighDamping.massCoefficient)
 	{
-		/* Replaced:
-		m_D.diagonal() += m_M.diagonal() * m_rayleighDamping.massCoefficient;
-		*/
 		for (int diagonal = 0; diagonal < state.getNumDof(); ++diagonal)
 		{
 			m_D.coeffRef(diagonal, diagonal) += m_M.coeff(diagonal, diagonal) * m_rayleighDamping.massCoefficient;
@@ -420,26 +389,18 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 		 boundaryCondition != std::end(state.getBoundaryConditions());
 		 boundaryCondition++)
 	{
-		/* Replaced:
-		m_M.diagonal()[*boundaryCondition] = 1e9;
+		m_M.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 
-		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
+		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
+		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
+		m_D.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 
-		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
-		*/
-		m_M.coeffRef(static_cast<int>(*boundaryCondition), static_cast<int>(*boundaryCondition)) = 1e9;
-
-		Math::zeroRow(static_cast<int>(*boundaryCondition), &m_D);
-		Math::zeroColumn(static_cast<int>(*boundaryCondition), &m_D);
-		m_D.coeffRef(static_cast<int>(*boundaryCondition), static_cast<int>(*boundaryCondition)) = 1e9;
-
-		Math::zeroRow(static_cast<int>(*boundaryCondition), &m_K);
-		Math::zeroColumn(static_cast<int>(*boundaryCondition), &m_K);
-		m_K.coeffRef(static_cast<int>(*boundaryCondition), static_cast<int>(*boundaryCondition)) = 1e9;
+		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
+		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
+		m_K.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 
 		m_f[*boundaryCondition] = 0.0;
 	}

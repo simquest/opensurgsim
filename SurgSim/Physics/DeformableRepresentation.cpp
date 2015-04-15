@@ -32,8 +32,10 @@
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
-using SurgSim::Math::Vector;
+using SurgSim::Math::Matrix;
 using SurgSim::Math::OdeState;
+using SurgSim::Math::SparseMatrix;
+using SurgSim::Math::Vector;
 
 namespace SurgSim
 {
@@ -84,8 +86,10 @@ void DeformableRepresentation::setInitialState(
 
 	m_hasExternalGeneralizedForce = false;
 	m_externalGeneralizedForce.setZero(getNumDof());
-	m_externalGeneralizedStiffness.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
-	m_externalGeneralizedDamping.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
+	m_externalGeneralizedStiffness.resize(static_cast<SparseMatrix::Index>(getNumDof()),
+										  static_cast<SparseMatrix::Index>(getNumDof()));
+	m_externalGeneralizedDamping.resize(static_cast<SparseMatrix::Index>(getNumDof()),
+										static_cast<SparseMatrix::Index>(getNumDof()));
 }
 
 const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const
@@ -134,48 +138,22 @@ const SurgSim::Math::SparseMatrix& DeformableRepresentation::getExternalGenerali
 	return m_externalGeneralizedDamping;
 }
 
-/*
-const SurgSim::Math::Matrix& DeformableRepresentation::getComplianceMatrix() const
+Math::Matrix DeformableRepresentation::applyCompliance(const Math::OdeState& state, const Math::Matrix& b)
 {
 	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
 
-	return m_odeSolver->getComplianceMatrix();
-}
-*/
-/*
-///
-/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
-/// when the compliance matrix would have been generated.
-/// m_k1.acceleration = m_complianceMatrix * m_equation.computeF(currentState) / dt;
-Vector DeformableRepresentation::applyCompliance(const OdeState& state, Vector b)
-{
-	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
-
-//	return std::move(*(state.applyBoundaryConditionsToVector(&m_odeSolver->getLinearSolver()->
-//					   solve(*(state.applyBoundaryConditionsToVector(&b))))));
-	return applyComplianceToMatrix(state, b);
-}
-*/
-///
-/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
-/// when the compliance matrix would have been generated.
-/// m_k1.acceleration = m_complianceMatrix * m_equation.computeF(currentState) / dt;
-Matrix DeformableRepresentation::applyCompliance(const OdeState& state, Matrix b)
-{
-	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
-
+	Math::Matrix bTemp = b;
 	for (auto condition : state.getBoundaryConditions())
 	{
-		Math::zeroRow(condition, &b);
+		Math::zeroRow(condition, &bTemp);
 	}
-	b = m_odeSolver->getLinearSolver()->solve(b);
+	auto solution = m_odeSolver->getLinearSolver()->solve(bTemp);
 	for (auto condition : state.getBoundaryConditions())
 	{
-		Math::zeroRow(condition, &b);
+		Math::zeroRow(condition, &solution);
 	}
-	return std::move(b);
+	return solution;
 }
-
 
 void DeformableRepresentation::update(double dt)
 {

@@ -28,10 +28,6 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Representation.h"
 
-using SurgSim::Math::Matrix;
-using SurgSim::Math::Vector;
-using SurgSim::Math::OdeState;
-
 namespace SurgSim
 {
 
@@ -104,23 +100,7 @@ public:
 	/// \return the external generalized damping matrix
 	const SurgSim::Math::SparseMatrix& getExternalGeneralizedDamping() const;
 
-	/*
-	/// Gets the compliance matrix associated with motion
-	/// \return The compliance matrix after the first call to update, an undefined matrix otherwise
-	/// \note The compliance matrix is computed automatically by the ode solver in the method 'update'
-	/// \note So one iteration needs to happen before retrieving a compliance matrix
-	/// \exception SurgSim::Framework::AssertionFailure if called prior to wakeUp
-	virtual const SurgSim::Math::Matrix& getComplianceMatrix() const;
-	*/
-
-	/// Calculate the product C * b where C is the compliance matrix with boundary conditions
-	/// applied. Note that this can be rewritten as (B^T M^-1 B) * b = B^T * (M^-1 * (B * b)) = x,
-	/// where M^-1 * (B * b) = x is simply the solution to MX = Bb.
-	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
-	/// \param b The input matrix \b
-	/// ToDo: Wes: verify that the boundary conditions for the current state are the same as for
-	/// when the compliance matrix would have been generated in the initial version.
-	Matrix applyCompliance(const OdeState& state, Matrix b) override;
+	Math::Matrix applyCompliance(const Math::OdeState& state, const Math::Matrix& b) override;
 
 	void update(double dt) override;
 

@@ -20,7 +20,6 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 
-using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
 using SurgSim::Math::gaussQuadrature2DTriangle3Points;
 using SurgSim::Math::getSubMatrix;
@@ -109,20 +108,20 @@ void Fem2DElementTriangle::addForce(const SurgSim::Math::OdeState& state, SurgSi
 }
 
 void Fem2DElementTriangle::addMass(const Math::OdeState& state, Math::SparseMatrix* M,
-								   double scale /*= 1.0*/)
+								   double scale)
 {
-	Math::addSubMatrix(scale * m_M, m_nodeIds, 6, M);
+	assembleMatrixBlocks(scale * m_M, m_nodeIds, 6, M, false);
 }
 
 void Fem2DElementTriangle::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
-									  double scale /*= 1.0*/)
+									  double scale)
 {
 }
 
 void Fem2DElementTriangle::addStiffness(const Math::OdeState& state, Math::SparseMatrix* K,
-										double scale /*= 1.0*/)
+										double scale)
 {
-	Math::addSubMatrix(scale * m_K, getNodeIds(), 6, K);
+	assembleMatrixBlocks(scale * m_K, getNodeIds(), 6, K, false);
 }
 
 void Fem2DElementTriangle::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,

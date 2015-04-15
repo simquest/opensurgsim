@@ -127,7 +127,8 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 
 	fem->setInitialState(initialState);
 
-	Math::SparseMatrix zeroMat(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	Math::SparseMatrix zeroMat(static_cast<SparseMatrix::Index>(fem->getNumDof()),
+							   static_cast<SparseMatrix::Index>(fem->getNumDof()));
 	zeroMat.setZero();
 
 	// Vector initialized (properly sized and zeroed)
@@ -169,15 +170,13 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 
 	Vector F = Vector::Zero(fem->getNumDof());
 	F.segment(0, fem->getNumDofPerNode()) = Flocal;
-	SparseMatrix K(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	SparseMatrix K(static_cast<SparseMatrix::Index>(fem->getNumDof()), static_cast<SparseMatrix::Index>(fem->getNumDof()));
 	K.setZero();
-	Math::addSubMatrixAndInitialize(Klocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
-									static_cast<int>(fem->getNumDofPerNode()), &K);
+	Math::addSubMatrix(Klocal, 0, 0, &K, true);
 	K.makeCompressed();
-	SparseMatrix D(static_cast<int>(fem->getNumDof()), static_cast<int>(fem->getNumDof()));
+	SparseMatrix D(static_cast<SparseMatrix::Index>(fem->getNumDof()), static_cast<SparseMatrix::Index>(fem->getNumDof()));
 	D.setZero();
-	Math::addSubMatrixAndInitialize(Dlocal, 0, 0, static_cast<int>(fem->getNumDofPerNode()),
-									static_cast<int>(fem->getNumDofPerNode()), &D);
+	Math::addSubMatrix(Dlocal, 0, 0, &D, true);
 	D.makeCompressed();
 
 	// Test invalid localization nullptr

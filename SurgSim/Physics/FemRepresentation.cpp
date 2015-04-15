@@ -21,9 +21,14 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemRepresentation.h"
+
+using SurgSim::Math::Matrix;
+using SurgSim::Math::OdeState;
+using SurgSim::Math::SparseMatrix;
 
 namespace SurgSim
 {
@@ -133,23 +138,18 @@ bool FemRepresentation::doInitialize()
 	typedef Eigen::SparseMatrix<double>::Index Index;
 
 	// Precompute the sparsity pattern for the global arrays.
-	m_M.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
-	m_D.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
-	m_K.resize(static_cast<int>(getNumDof()), static_cast<int>(getNumDof()));
+	m_M.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	m_D.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	m_K.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
 		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode() * (*femElement)->getNumNodes(),
 												getNumDofPerNode() * (*femElement)->getNumNodes());
-		Math::addSubMatrixAndInitialize(block, (*femElement)->getNodeIds(),
-										static_cast<int>(getNumDofPerNode()), &m_M);
-		Math::addSubMatrixAndInitialize(block, (*femElement)->getNodeIds(),
-										static_cast<int>(getNumDofPerNode()), &m_D);
-		Math::addSubMatrixAndInitialize(block, (*femElement)->getNodeIds(),
-										static_cast<int>(getNumDofPerNode()), &m_K);
+		(*femElement)->assembleMatrixBlocks(block, (*femElement)->getNodeIds(),
+											static_cast<SparseMatrix::Index>(getNumDofPerNode()), &m_M, true);
 	}
 	m_M.makeCompressed();
-	m_D.makeCompressed();
-	m_K.makeCompressed();
+	m_D = m_K = m_M;
 
 	// If we are using compliance warping for this representation, let's pre-allocate the rotation matrix
 	// and pre-define its pattern, so we only access existing elements later on.
@@ -307,29 +307,15 @@ bool FemRepresentation::getComplianceWarping() const
 	return m_useComplianceWarping;
 }
 
-/*
-const SurgSim::Math::Matrix& FemRepresentation::getComplianceMatrix() const
-{
-	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
-
-	if (m_useComplianceWarping)
-	{
-		return m_complianceWarpingMatrix;
-	}
-
-	return m_odeSolver->getComplianceMatrix();
-}
-*/
-
-Matrix FemRepresentation::applyCompliance(const OdeState& state, Matrix b)
+Math::Matrix FemRepresentation::applyCompliance(const Math::OdeState& state, const Math::Matrix& b)
 {
 	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
 
 	if (m_useComplianceWarping)
 	{
 		// Then, update the compliance matrix using compliance warping
-		return std::move(m_complianceWarpingTransformation * DeformableRepresentation::applyCompliance(state,
-						 m_complianceWarpingTransformation.transpose() * b));
+		return (m_complianceWarpingTransformation * DeformableRepresentation::applyCompliance(state,
+				m_complianceWarpingTransformation.transpose() * b));
 	}
 	return DeformableRepresentation::applyCompliance(state, b);
 }
@@ -346,7 +332,7 @@ void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState&
 {
 	using SurgSim::Math::blockWithoutSearch;
 	using SurgSim::Math::Matrix;
-	using SurgSim::Math::Dynamic::Operation;
+	using SurgSim::Math::Operation;
 
 	typedef Eigen::SparseMatrix<double>::Index Index;
 	Index numDofPerNode = static_cast<Index>(getNumDofPerNode());

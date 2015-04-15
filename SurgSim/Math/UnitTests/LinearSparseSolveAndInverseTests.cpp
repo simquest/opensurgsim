@@ -42,7 +42,7 @@ private:
 
 	void initializeSparseMatrix(SparseMatrix* m)
 	{
-		m->resize(static_cast<int>(size), static_cast<int>(size));
+		m->resize(static_cast<SparseMatrix::Index>(size), static_cast<SparseMatrix::Index>(size));
 		for (int row = 0; row < size; row++)
 		{
 			for (int col = 0; col < size; col++)

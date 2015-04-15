@@ -24,9 +24,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/LU> 		// needed for determinant() and inverse()
-#include <Eigen/Sparse>
-
-#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {

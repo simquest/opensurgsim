@@ -53,7 +53,6 @@ void OdeSolverLinearEulerImplicit::solve(double dt, const OdeState& currentState
 	{
 		Vector& f = m_equation.computeF(currentState);
 		f -= m_constantK * currentState.getVelocities() * dt;
-		currentState.applyBoundaryConditionsToVector(&f);
 		Vector deltaV = m_equation.applyCompliance(currentState, f);
 
 		newState->getVelocities() = currentState.getVelocities() + deltaV;

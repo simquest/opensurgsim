@@ -21,7 +21,6 @@
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::getSubMatrix;
 using SurgSim::Math::addSubVector;
-using SurgSim::Math::addSubMatrix;
 
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
@@ -34,8 +33,8 @@ namespace
 /// \return |a b c|, The determinant of the 3 vectors a, b and c
 double det(const Vector3d& a, const Vector3d& b, const Vector3d& c)
 {
-	return a[0] * b[1] * c[2] + a[2] * b[0] * c[1] + a[1] * b[2] * c[0] - a[2] * b[1] * c[0] - a[1] * b[0] * c[2] - a[0] *
-		   b[2] * c[1];
+	return a[0] * b[1] * c[2] + a[2] * b[0] * c[1] + a[1] * b[2] * c[0] - a[2] * b[1] * c[0] - a[1] * b[0] *
+		   c[2] - a[0] * b[2] * c[1];
 }
 
 };
@@ -153,13 +152,13 @@ void Fem3DElementTetrahedron::computeMass(const SurgSim::Math::OdeState& state,
 
 
 void Fem3DElementTetrahedron::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
-									  double scale /*= 1.0*/)
+									  double scale)
 {
-	addSubMatrix(m_M * scale, m_nodeIds, 3, M);
+	assembleMatrixBlocks(m_M * scale, m_nodeIds, 3, M, false);
 }
 
 void Fem3DElementTetrahedron::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
-		double scale /*= 1.0*/)
+		double scale)
 {
 }
 
@@ -178,9 +177,9 @@ void Fem3DElementTetrahedron::computeStiffness(const SurgSim::Math::OdeState& st
 		m_strain(2, 3 * i + 2) = coef * m_di[i];
 		m_strain(3, 3 * i) = coef * m_ci[i];
 		m_strain(3, 3 * i + 1) = coef * m_bi[i];
-		m_strain(4 , 3 * i + 1) = coef * m_di[i];
+		m_strain(4, 3 * i + 1) = coef * m_di[i];
 		m_strain(4, 3 * i + 2) = coef * m_ci[i];
-		m_strain(5 , 3 * i) = coef * m_di[i];
+		m_strain(5, 3 * i) = coef * m_di[i];
 		m_strain(5, 3 * i + 2) = coef * m_bi[i];
 	}
 
@@ -203,9 +202,9 @@ void Fem3DElementTetrahedron::computeStiffness(const SurgSim::Math::OdeState& st
 }
 
 void Fem3DElementTetrahedron::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-		double scale /*= 1.0*/)
+		double scale)
 {
-	addSubMatrix(m_K * scale, getNodeIds(), 3, K);
+	assembleMatrixBlocks(m_K * scale, getNodeIds(), 3, K, false);
 }
 
 void Fem3DElementTetrahedron::addFMDK(const SurgSim::Math::OdeState& state,

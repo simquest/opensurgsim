@@ -425,7 +425,6 @@ public:
 	{
 		using SurgSim::Math::getSubVector;
 		using SurgSim::Math::getSubMatrix;
-		using SurgSim::Math::addSubMatrix;
 
 		m_restState.setNumDof(3, 8);
 		Vector& x0 = m_restState.getPositions();
@@ -870,16 +869,16 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	Matrix zeroMatrix = Matrix::Zero(cube->getNumDofPerNode() * cube->getNumNodes(),
 									 cube->getNumDofPerNode() * cube->getNumNodes());
 	massMatrix.setZero();
-	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, cube->getNodeIds(),
-			static_cast<int>(cube->getNumDofPerNode()), &massMatrix);
+	cube->assembleMatrixBlocks(zeroMatrix, cube->getNodeIds(),
+							   static_cast<SparseMatrix::Index>(cube->getNumDofPerNode()), &massMatrix, true);
 	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
-	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, cube->getNodeIds(),
-			static_cast<int>(cube->getNumDofPerNode()), &dampingMatrix);
+	cube->assembleMatrixBlocks(zeroMatrix, cube->getNodeIds(),
+							   static_cast<SparseMatrix::Index>(cube->getNumDofPerNode()), &dampingMatrix, true);
 	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
-	SurgSim::Math::addSubMatrixAndInitialize(zeroMatrix, cube->getNodeIds(),
-			static_cast<int>(cube->getNumDofPerNode()), &stiffnessMatrix);
+	cube->assembleMatrixBlocks(zeroMatrix, cube->getNodeIds(),
+							   static_cast<SparseMatrix::Index>(cube->getNumDofPerNode()), &stiffnessMatrix, true);
 	stiffnessMatrix.makeCompressed();
 
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0

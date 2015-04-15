@@ -53,9 +53,9 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-									 const SurgSim::Math::Vector& generalizedForce,
-									 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
-									 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
+			const SurgSim::Math::Vector& generalizedForce,
+			const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+			const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
 	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location&) override;
 
@@ -66,7 +66,7 @@ protected:
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-						const SurgSim::Math::RigidTransform3d& transform) override;
+			const SurgSim::Math::RigidTransform3d& transform) override;
 
 private:
 	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
@@ -76,7 +76,7 @@ private:
 	/// \param mesh The mesh used to produce the mapping.
 	/// \return A map from the mesh's triangle ids to this object's fem elements.
 	std::unordered_map<size_t, size_t> createTriangleIdToElementIdMap(
-		std::shared_ptr<const SurgSim::Math::MeshShape> mesh);
+			std::shared_ptr<const SurgSim::Math::MeshShape> mesh);
 
 	/// Mapping from collision triangle's id to fem element id.
 	std::unordered_map<size_t, size_t> m_triangleIdToElementIdMap;
