@@ -180,6 +180,10 @@ bool LeapScaffold::registerDevice(LeapDevice* device)
 			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": Registered";
 			m_state->activeDevices.emplace_back(std::move(info));
 		}
+		else
+		{
+			SURGSIM_LOG_SEVERE(m_logger) << "Device " << device->getName() << ": Not registered";
+		}
 	}
 	else
 	{
@@ -213,12 +217,8 @@ bool LeapScaffold::unregisterDevice(const LeapDevice* device)
 	auto info = std::find_if(m_state->activeDevices.begin(), m_state->activeDevices.end(), sameDevice);
 	if (info != m_state->activeDevices.end())
 	{
-		success = doUnregisterDevice((*info).get());
-		if (success)
-		{
-			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": Unregistered";
-			m_state->activeDevices.erase(info);
-		}
+		m_state->activeDevices.erase(info);
+		SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": Unregistered";
 	}
 	else
 	{
@@ -228,11 +228,6 @@ bool LeapScaffold::unregisterDevice(const LeapDevice* device)
 	}
 
 	return success;
-}
-
-bool LeapScaffold::doUnregisterDevice(DeviceData* info)
-{
-	return true;
 }
 
 void LeapScaffold::handleFrame()
@@ -266,7 +261,7 @@ void LeapScaffold::handleFrame()
 		}
 	}
 
-	auto higherConfidence = [](const Leap::HandList::const_iterator &a, const Leap::HandList::const_iterator &b)
+	static auto higherConfidence = [](const Leap::HandList::const_iterator &a, const Leap::HandList::const_iterator &b)
 	{
 		return (*a).confidence() > (*b).confidence();
 	};
