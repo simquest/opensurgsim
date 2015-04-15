@@ -87,9 +87,9 @@ public:
 		m_validLocalPosition.coordinate[1] = 0.6;
 
 		m_invalidIndexLocalPosition.index = 3;
-		m_validLocalPosition.coordinate = SurgSim::Math::Vector::Zero(3);
-		m_validLocalPosition.coordinate[0] = 0.4;
-		m_validLocalPosition.coordinate[1] = 0.6;
+		m_invalidIndexLocalPosition.coordinate = SurgSim::Math::Vector::Zero(3);
+		m_invalidIndexLocalPosition.coordinate[0] = 0.4;
+		m_invalidIndexLocalPosition.coordinate[1] = 0.6;
 
 		m_invalidCoordinateLocalPosition.index = 1;
 		m_invalidCoordinateLocalPosition.coordinate = SurgSim::Math::Vector::Zero(3);
