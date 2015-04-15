@@ -27,9 +27,9 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
-#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
@@ -253,6 +253,105 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 			EXPECT_EQ(3, globalPosition.size());
 			EXPECT_TRUE(globalPosition.isApprox(*point));
 		}
+	}
+
+	// Localization on an invalid node
+	{
+		SCOPED_TRACE("Invalid node");
+
+		SurgSim::DataStructures::Location location(SurgSim::DataStructures::IndexedLocalCoordinate(1000, Vector()));
+		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
+		EXPECT_THROW(localization =
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
+			m_fem->createLocalization(location)), SurgSim::Framework::AssertionFailure);
+	}
+
+	// Localization on a valid node
+	{
+		SCOPED_TRACE("Valid node");
+
+		SurgSim::DataStructures::Location location(SurgSim::DataStructures::IndexedLocalCoordinate(0, Vector()));
+		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
+		EXPECT_NO_THROW(localization =
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
+			m_fem->createLocalization(location)););
+		EXPECT_TRUE(localization != nullptr);
+		EXPECT_TRUE(localization->getRepresentation() == m_fem);
+
+		SurgSim::Math::Vector3d globalPosition;
+		SurgSim::DataStructures::IndexedLocalCoordinate coordinate = localization->getLocalPosition();
+		EXPECT_NO_THROW(globalPosition = m_fem->getCurrentState()->getPosition(coordinate.index););
+		EXPECT_TRUE(globalPosition.isApprox(localization->calculatePosition()));
+	}
+
+	// Localization on an invalid tetrahedron
+	{
+		SCOPED_TRACE("Invalid tetrahedron index");
+
+		SurgSim::DataStructures::IndexedLocalCoordinate coord;
+		coord.index = 10000;
+		coord.coordinate.setZero(4);
+		coord.coordinate[0] = 1.0;
+
+		SurgSim::DataStructures::Location location(coord);
+		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
+		EXPECT_THROW(localization =
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
+			m_fem->createLocalization(location)), SurgSim::Framework::AssertionFailure);
+	}
+
+	// Localization on an valid tetrahedron but invalid barycentric coordinate size
+	{
+		SCOPED_TRACE("Invalid tetrahedron barycentric coordinate size");
+
+		SurgSim::DataStructures::IndexedLocalCoordinate coord;
+		coord.index = 0;
+		coord.coordinate.setZero(5);
+		coord.coordinate[0] = 1.0;
+
+		SurgSim::DataStructures::Location location(coord);
+		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
+		EXPECT_THROW(localization =
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
+			m_fem->createLocalization(location)), SurgSim::Framework::AssertionFailure);
+	}
+
+	// Localization on an valid tetrahedron but invalid barycentric coordinate
+	{
+		SCOPED_TRACE("Invalid tetrahedron barycentric coordinate");
+
+		SurgSim::DataStructures::IndexedLocalCoordinate coord;
+		coord.index = 0;
+		coord.coordinate.setOnes(4);
+
+		SurgSim::DataStructures::Location location(coord);
+		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
+		EXPECT_THROW(localization =
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
+			m_fem->createLocalization(location)), SurgSim::Framework::AssertionFailure);
+	}
+
+	// Localization on a valid tetrahedron
+	{
+		SCOPED_TRACE("Valid tetrahedron");
+
+		SurgSim::DataStructures::IndexedLocalCoordinate coord;
+		coord.index = 0;
+		coord.coordinate.setZero(4);
+		coord.coordinate[0] = 1.0;
+
+		SurgSim::DataStructures::Location location(coord);
+		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
+		EXPECT_NO_THROW(localization =
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
+			m_fem->createLocalization(location)));
+		EXPECT_TRUE(localization != nullptr);
+		EXPECT_TRUE(localization->getRepresentation() == m_fem);
+
+		SurgSim::DataStructures::IndexedLocalCoordinate coordinate = localization->getLocalPosition();
+		auto element = m_fem->getFemElement(coordinate.index);
+		SurgSim::Math::Vector3d globalPosition = m_fem->getCurrentState()->getPosition(element->getNodeId(0));
+		EXPECT_TRUE(globalPosition.isApprox(localization->calculatePosition()));
 	}
 }
 
