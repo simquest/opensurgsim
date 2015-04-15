@@ -69,12 +69,8 @@ public:
 	/// Look through the scene to find a component of a named element
 	/// \param elementName The name of the element to find
 	/// \param componentName The name of the component to find
-	/// \param out component Address of a shared pointer, if the component is found, this is used for the result
-	/// \return true if the component was found and was assigned to the component parameter
-	bool tryFindComponent(
-		const std::string& elementName,
-		const std::string& componentName,
-		std::shared_ptr<Component>* component) const;
+	/// \return the component that was found, nullptr if no component was found
+	std::shared_ptr<Component> getComponent(const std::string& elementName, const std::string& componentName) const;
 
 	/// Gets the runtime.
 	/// \return runtime The runtime for this scene.

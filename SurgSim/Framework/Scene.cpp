@@ -156,23 +156,14 @@ std::shared_ptr<Scene::GroupsType> Scene::getGroups()
 	return m_groups;
 }
 
-bool Scene::tryFindComponent(const std::string& elementName,
-							 const std::string& componentName,
-							 std::shared_ptr<Component>* component) const
+std::shared_ptr<Component> Scene::getComponent(const std::string& elementName, const std::string& componentName) const
 {
-	SURGSIM_ASSERT(component != nullptr);
-
-	bool result = false;
+	std::shared_ptr<Component> result;
 	auto element = getSceneElement(elementName);
 	if (element != nullptr)
 	{
-		auto found  = element->getComponent(componentName);
-		if (found != nullptr)
-		{
-			(*component) = found;
-			result = true;
-		}
-		else
+		result = element->getComponent(componentName);
+		if (result == nullptr)
 		{
 			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/Scene"))
 					<< "Could not find component '" << componentName << "' in Element '" << elementName << "'.";
