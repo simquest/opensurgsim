@@ -15,6 +15,7 @@
 
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
 
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
@@ -67,11 +68,22 @@ SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(dou
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
 
-	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
-	const Vector3d currentPosition = femElement->computeCartesianCoordinate(*femRepresentation->getCurrentState(),
-		m_position.coordinate);
-	const Vector3d previousPosition = femElement->computeCartesianCoordinate(*femRepresentation->getPreviousState(),
-		m_position.coordinate);
+	Vector3d currentPosition, previousPosition;
+
+	// If only an index is given, it points directly to the node
+	if (m_position.coordinate.size() == 0)
+	{
+		currentPosition = femRepresentation->getCurrentState()->getPosition(m_position.index);
+		previousPosition = femRepresentation->getPreviousState()->getPosition(m_position.index);
+	}
+	else // otherwise, it points to a FemElement
+	{
+		std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
+		currentPosition = femElement->computeCartesianCoordinate(*femRepresentation->getCurrentState(),
+			m_position.coordinate);
+		previousPosition = femElement->computeCartesianCoordinate(*femRepresentation->getPreviousState(),
+			m_position.coordinate);
+	}
 
 	if (time == 0.0)
 	{
