@@ -45,7 +45,7 @@ RigidTransform3d makeRigidTransform(const Leap::Matrix& rotation, const Leap::Ve
 	}
 
 	// Convert milimeters to meters
-	matrix.origin = translation * 0.001;
+	matrix.origin = translation * 0.001f;
 
 	SurgSim::Math::Matrix44d transform;
 	matrix.toArray4x4(transform.data());
