@@ -43,14 +43,9 @@ void LeapDevice::setHandType(HandType type)
 	m_handType = type;
 }
 
-bool LeapDevice::isRightHand()
+HandType LeapDevice::getHandType() const
 {
-	return (m_handType == HANDTYPE_RIGHT);
-}
-
-bool LeapDevice::isLeftHand()
-{
-	return (m_handType == HANDTYPE_LEFT);
+	return m_handType;
 }
 
 bool LeapDevice::initialize()

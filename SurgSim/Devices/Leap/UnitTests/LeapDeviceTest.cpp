@@ -61,16 +61,13 @@ TEST(LeapDeviceTest, HandType)
 	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 
-	EXPECT_TRUE(device->isRightHand());
-	EXPECT_FALSE(device->isLeftHand());
+	EXPECT_EQ(SurgSim::Device::HANDTYPE_RIGHT, device->getHandType());
 
 	device->setHandType(SurgSim::Device::HANDTYPE_LEFT);
-	EXPECT_FALSE(device->isRightHand());
-	EXPECT_TRUE(device->isLeftHand());
+	EXPECT_EQ(SurgSim::Device::HANDTYPE_LEFT, device->getHandType());
 
 	device->setHandType(SurgSim::Device::HANDTYPE_RIGHT);
-	EXPECT_TRUE(device->isRightHand());
-	EXPECT_FALSE(device->isLeftHand());
+	EXPECT_EQ(SurgSim::Device::HANDTYPE_RIGHT, device->getHandType());
 }
 
 TEST(LeapDeviceTest, CreateDevicesWithSameName)

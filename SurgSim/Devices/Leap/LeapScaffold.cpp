@@ -276,7 +276,7 @@ void LeapScaffold::handleFrame()
 	{
 		auto sameHandType = [newHand](DeviceData* info)
 		{
-			return info->deviceObject->isLeftHand() == (*newHand).isLeft();
+			return (info->deviceObject->getHandType() == HANDTYPE_LEFT) == (*newHand).isLeft();
 		};
 		auto unassignedDevice = std::find_if(unassignedDevices.begin(), unassignedDevices.end(), sameHandType);
 
