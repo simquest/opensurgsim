@@ -73,7 +73,7 @@ public:
 
 	/// Copy constructor when the template data is the same type
 	/// \param other the mesh to copy from
-	explicit TriangleMesh(const TriangleMesh<VertexData, EdgeData, TriangleData>& other);
+	TriangleMesh(const TriangleMesh<VertexData, EdgeData, TriangleData>& other);
 
 	/// Copy constructor when the template data is a different type
 	/// \tparam	VertexDataSource	Type of extra data stored in each vertex
