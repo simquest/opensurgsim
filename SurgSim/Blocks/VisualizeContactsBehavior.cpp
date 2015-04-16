@@ -44,7 +44,7 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::VisualizeContac
 
 VisualizeContactsBehavior::VisualizeContactsBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),
-	m_vectorField(std::make_shared<OsgVectorFieldRepresentation>("VisualizeContacts"))
+	m_vectorField(std::make_shared<OsgVectorFieldRepresentation>(name + std::string("_VectorField")))
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VisualizeContactsBehavior, std::shared_ptr<SurgSim::Framework::Component>,
 									  CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
@@ -124,8 +124,7 @@ bool VisualizeContactsBehavior::doInitialize()
 
 bool VisualizeContactsBehavior::doWakeUp()
 {
-	getSceneElement()->addComponent(m_vectorField);
-	return true;
+	return getSceneElement()->addComponent(m_vectorField);
 }
 
 double VisualizeContactsBehavior::getVectorFieldScale()
