@@ -71,7 +71,6 @@ TEST(AabbTreeTests, BuildTest)
 	auto mesh = std::make_shared<TriangleMeshPlain>();
 	mesh->load("Geometry/arm_collision.ply");
 
-	SurgSim::Framework::Timer timer;
 	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
 	{
 		auto triangle = mesh->getTriangle(i);
@@ -81,7 +80,6 @@ TEST(AabbTreeTests, BuildTest)
 					   mesh->getVertex(triangle.verticesId[2]).position));
 		tree->add(std::move(aabb), i);
 	}
-	timer.endFrame();
 }
 
 TEST(AabbTreeTests, BatchBuildTest)
@@ -92,7 +90,6 @@ TEST(AabbTreeTests, BatchBuildTest)
 	auto mesh = std::make_shared<TriangleMeshPlain>();
 	mesh->load("Geometry/arm_collision.ply");
 
-	SurgSim::Framework::Timer timer;
 	std::list<AabbTreeData::Item> items;
 	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
 	{
@@ -104,7 +101,6 @@ TEST(AabbTreeTests, BatchBuildTest)
 		items.emplace_back(std::make_pair(std::move(aabb), i));
 	}
 	tree->set(std::move(items));
-	timer.endFrame();
 }
 
 TEST(AabbTreeTests, EasyIntersectionTest)
