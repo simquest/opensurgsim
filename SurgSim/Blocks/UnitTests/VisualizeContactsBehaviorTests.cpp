@@ -20,9 +20,9 @@
 #include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Blocks/VisualizeContactsBehavior.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
