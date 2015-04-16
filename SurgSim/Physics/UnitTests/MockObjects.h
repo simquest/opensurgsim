@@ -111,17 +111,17 @@ public:
 	RigidState& getPreviousState();
 };
 
-class MockDeformableRepresentationLocalization : public SurgSim::Physics::Localization
+class MockDeformableLocalization : public SurgSim::Physics::Localization
 {
 public:
-	MockDeformableRepresentationLocalization(){}
+	MockDeformableLocalization(){}
 
-	explicit MockDeformableRepresentationLocalization(std::shared_ptr<Representation> representation) : Localization()
+	explicit MockDeformableLocalization(std::shared_ptr<Representation> representation) : Localization()
 	{
 		setRepresentation(representation);
 	}
 
-	virtual ~MockDeformableRepresentationLocalization(){}
+	virtual ~MockDeformableLocalization(){}
 
 	void setLocalNode(size_t nodeID){ m_nodeID = nodeID; }
 

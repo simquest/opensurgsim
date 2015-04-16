@@ -126,8 +126,8 @@ void MockDeformableRepresentation::addExternalGeneralizedForce(std::shared_ptr<L
 										 const SurgSim::Math::Matrix& K,
 										 const SurgSim::Math::Matrix& D)
 {
-	std::shared_ptr<MockDeformableRepresentationLocalization> loc =
-		std::dynamic_pointer_cast<MockDeformableRepresentationLocalization>(localization);
+	std::shared_ptr<MockDeformableLocalization> loc =
+		std::dynamic_pointer_cast<MockDeformableLocalization>(localization);
 
 	m_externalGeneralizedForce.segment<3>(3 * loc->getLocalNode()) += generalizedForce;
 	m_externalGeneralizedStiffness.block<3, 3>(3 * loc->getLocalNode(), 3 * loc->getLocalNode()) += K;
@@ -377,8 +377,8 @@ void MockFemRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localiza
 														const SurgSim::Math::Matrix& K,
 														const SurgSim::Math::Matrix& D)
 {
-	std::shared_ptr<MockDeformableRepresentationLocalization> loc =
-		std::dynamic_pointer_cast<MockDeformableRepresentationLocalization>(localization);
+	std::shared_ptr<MockDeformableLocalization> loc =
+		std::dynamic_pointer_cast<MockDeformableLocalization>(localization);
 
 	size_t numDofPerNode = getNumDofPerNode();
 	m_externalGeneralizedForce.segment(numDofPerNode * loc->getLocalNode(), numDofPerNode) += generalizedForce;

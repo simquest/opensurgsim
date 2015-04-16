@@ -26,7 +26,7 @@ namespace Physics
 {
 class RigidState;
 
-typedef RigidLocalization FixedRepresentationLocalization;
+typedef RigidLocalization FixedLocalization;
 
 SURGSIM_STATIC_REGISTRATION(FixedRepresentation);
 

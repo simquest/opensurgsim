@@ -59,7 +59,7 @@ TEST (RigidContactTests, SetGet_BuildMlcp_Test)
 	rigid->setDensity(1000.0);
 	rigid->setShape(std::make_shared<SphereShape>(radius));
 
-	auto loc = std::make_shared<RigidRepresentationLocalization>(rigid);
+	auto loc = std::make_shared<RigidLocalization>(rigid);
 	loc->setLocalPosition(contactPosition);
 	std::shared_ptr<RigidContact> implementation = std::make_shared<RigidContact>();
 

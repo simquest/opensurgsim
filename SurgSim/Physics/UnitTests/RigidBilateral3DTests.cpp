@@ -76,7 +76,7 @@ TEST(RigidBilateral3DTests, BuildMlcp)
 	// Setup parameters for RigidBilateral3D::build
 	auto representation = std::make_shared<MockRigidRepresentation>();
 	representation->setShape(std::make_shared<SurgSim::Math::SphereShape>(1.0));
-	auto localization = std::make_shared<RigidRepresentationLocalization>(representation);
+	auto localization = std::make_shared<RigidLocalization>(representation);
 	localization->setLocalPosition(objectPose.inverse() * constraintPoint);
 	representation->getCurrentState().setPose(objectPose);
 
@@ -128,7 +128,7 @@ TEST(RigidBilateral3DTests, BuildMlcpTwoStep)
 
 	auto representation = std::make_shared<MockRigidRepresentation>();
 	representation->setShape(std::make_shared<SurgSim::Math::SphereShape>(1.0));
-	auto localization = std::make_shared<RigidRepresentationLocalization>(representation);
+	auto localization = std::make_shared<RigidLocalization>(representation);
 
 	localization->setLocalPosition(objectPoseLhs.inverse() * constraintPointLhs);
 	representation->getCurrentState().setPose(objectPoseLhs);

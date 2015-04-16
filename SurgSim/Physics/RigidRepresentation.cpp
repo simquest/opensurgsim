@@ -76,7 +76,7 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 
 	SURGSIM_ASSERT(location.rigidLocalPosition.hasValue()) << "Invalid location (no rigid local position)";
 
-	RigidRepresentationLocalization localization;
+	RigidLocalization localization;
 	localization.setRepresentation(std::static_pointer_cast<Representation>(shared_from_this()));
 	localization.setLocalPosition(location.rigidLocalPosition.getValue());
 	const Vector3d point = localization.calculatePosition();

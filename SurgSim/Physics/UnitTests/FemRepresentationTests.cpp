@@ -263,8 +263,8 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -326,8 +326,8 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -387,8 +387,8 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndNoDampingTest)
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -451,8 +451,8 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());

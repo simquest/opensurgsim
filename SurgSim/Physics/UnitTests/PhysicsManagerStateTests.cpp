@@ -40,9 +40,9 @@ using SurgSim::Physics::MlcpMapping;
 using SurgSim::Physics::PhysicsManagerState;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidCollisionRepresentation;
-using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidContact;
-using SurgSim::Physics::RigidRepresentationLocalization;
+using SurgSim::Physics::RigidLocalization;
+using SurgSim::Physics::RigidRepresentation;
 
 TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 {
