@@ -38,10 +38,14 @@ void main(void)
 {	
 	vec3 vAmbient = ambientColor.xyz; // Old Term ...  osg_ambientColor * _lightColor;
     
-	float diffuse = max(dot(lightDir, normalDir), 0.0);
+    vec3 lightDirNorm = normalize(lightDir);
+	vec3 eyeDirNorm = normalize(eyeDir);
+	vec3 normalDirNorm = normalize(normalDir);
+
+	float diffuse = max(dot(lightDirNorm, normalDirNorm), 0.0);
 	vec3 vDiffuse = vertexDiffuseColor * diffuse;	
     
-    float temp = max(dot(reflect(lightDir, normalDir), eyeDir), 0.0);
+    float temp = max(dot(reflect(lightDirNorm, normalDirNorm), eyeDirNorm), 0.0);
     float specular = temp / (shininess - temp * shininess + temp);
  	vec3 vSpecular = vertexSpecularColor * specular;		
 	
