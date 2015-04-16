@@ -68,11 +68,11 @@ void main()
 	// Add lighting to base color and mix
 	vec3 color = mix(ambientColor.rgb, mappedDiffuseColor, diffusePercent);
 
-	vec3 normalizedLightDir = normalize(lightDir);
-	vec3 normalizedNormalDir = normalize(normalDir);
-	vec3 normalizedEyeDir = normalize(eyeDir);
+	vec3 lightDirNorm = normalize(lightDir);
+	vec3 normalDirNorm = normalize(normalDir);
+	vec3 eyeDirNorm = normalize(eyeDir);
 
-	float temp = max(dot(reflect(normalizedLightDir, normalizedNormalDir), normalizedEyeDir), 0.0);
+	float temp = max(dot(reflect(lightDirNorm, normalDirNorm), eyeDirNorm), 0.0);
 	float specular = temp / (shininess - temp * shininess + temp);
 
 	color = mix(color, mappedSpecularColor + color, specularPercent) + 
