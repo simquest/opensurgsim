@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,36 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${OSG_INCLUDE_DIR}
-	${OPENTHREADS_INCLUDE_DIR}
+	"${GLUT_INCLUDE_DIR}"
 )
 
-set(UNIT_TEST_SOURCES
-	DivisibleCubeRepresentation.cpp
-	Fem3DPerformanceTest.cpp
-	Fem3DSolutionComponentsTest.cpp
+set(EXAMPLE_SOURCES
+	main.cpp
 )
 
-set(UNIT_TEST_HEADERS
-	DivisibleCubeRepresentation.h
+set(EXAMPLE_HEADERS
 )
+
+surgsim_add_executable(LeapVisualTest
+	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
 set(LIBS
+	LeapDevice
 	SurgSimInput
-	SurgSimPhysics
+	VisualTestCommon
+	${GLUT_LIBRARIES}
 )
 
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(LeapVisualTest ${LIBS})
 
-# Configure the path for the data files
-configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
-)
-
-surgsim_add_unit_tests(SurgSimPhysicsPerformanceTest)
-
-set_target_properties(SurgSimPhysicsPerformanceTest PROPERTIES FOLDER "Physics")
+set_target_properties(LeapVisualTest PROPERTIES FOLDER "Devices")

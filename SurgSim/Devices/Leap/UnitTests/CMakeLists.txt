@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,33 +16,18 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${OSG_INCLUDE_DIR}
-	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
-	DivisibleCubeRepresentation.cpp
-	Fem3DPerformanceTest.cpp
-	Fem3DSolutionComponentsTest.cpp
-)
-
-set(UNIT_TEST_HEADERS
-	DivisibleCubeRepresentation.h
+	LeapDeviceTest.cpp
 )
 
 set(LIBS
+	LeapDevice
+	SurgSimDataStructures
 	SurgSimInput
-	SurgSimPhysics
 )
 
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+surgsim_add_unit_tests(LeapDeviceTest)
 
-# Configure the path for the data files
-configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
-)
-
-surgsim_add_unit_tests(SurgSimPhysicsPerformanceTest)
-
-set_target_properties(SurgSimPhysicsPerformanceTest PROPERTIES FOLDER "Physics")
+set_target_properties(LeapDeviceTest PROPERTIES FOLDER "Devices")
