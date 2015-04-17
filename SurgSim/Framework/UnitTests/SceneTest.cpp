@@ -89,19 +89,13 @@ TEST(SceneTest, TryFind)
 
 	std::shared_ptr<Component> result;
 
-	EXPECT_ANY_THROW(scene->tryFindComponent("element0", "component0", nullptr));
+	EXPECT_EQ(component0, scene->getComponent("element0", "component0"));
+	EXPECT_EQ(component1, scene->getComponent("element1", "component1"));
 
-	EXPECT_TRUE(scene->tryFindComponent("element0", "component0", &result));
-	EXPECT_EQ(result, component0);
-	EXPECT_TRUE(scene->tryFindComponent("element1", "component1", &result));
-	EXPECT_EQ(result, component1);
-
-	EXPECT_FALSE(scene->tryFindComponent("element1", "xxx", &result));
-	EXPECT_EQ(result, component1);
-	result = nullptr;
-	EXPECT_FALSE(scene->tryFindComponent("xxx", "component0", &result));
-	EXPECT_EQ(result, nullptr);
+	EXPECT_EQ(nullptr, scene->getComponent("element1", "xxx"));
+	EXPECT_EQ(nullptr, scene->getComponent("xxx", "component0"));
 }
+
 TEST(SceneTest, CheckForExpiredRuntime)
 {
 	auto runtime = std::make_shared<Runtime>();
