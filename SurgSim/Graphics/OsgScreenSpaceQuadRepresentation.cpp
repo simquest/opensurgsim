@@ -82,7 +82,9 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(const std::st
 	m_transform->setCullingActive(false);
 	m_transform->addChild(m_geode);
 
-	m_switch->addChild(m_transform);
+
+	m_switch->addChild(m_materialProxy);
+	m_materialProxy->addChild(m_transform);
 
 	m_textureUniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("texture");
 	m_rectangleTextureUniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTextureRectangle>>>("texture");
