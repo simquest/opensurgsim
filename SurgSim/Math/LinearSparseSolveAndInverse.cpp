@@ -32,29 +32,14 @@ Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b)
 	return m_lu.solve(b);
 }
 
-Matrix LinearSparseSolveAndInverseLU::getInverse()
+Vector LinearSparseSolveAndInverseLU::solve(const Vector& b)
 {
-	Matrix eye(Matrix::Identity(m_lu.rows(), m_lu.cols()));
-	return (m_lu.solve(eye));
+	return m_lu.solve(b);
 }
 
-void LinearSparseSolveAndInverseLU::operator()(const SparseMatrix& A, const Vector& b, Vector* x, Matrix* Ainv)
+Matrix LinearSparseSolveAndInverseLU::getInverse()
 {
-	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
-	if (x != nullptr || Ainv != nullptr)
-	{
-		Eigen::SparseLU<SparseMatrix> lu;
-		lu.compute(A);
-		if (x != nullptr)
-		{
-			(*x) = lu.solve(b);
-		}
-		if (Ainv != nullptr)
-		{
-			Ainv->setIdentity(A.rows(), A.cols());
-			(*Ainv) = lu.solve((*Ainv));
-		}
-	}
+	return (m_lu.solve(Matrix::Identity(m_lu.rows(), m_lu.cols())));
 }
 
 }; // namespace Math

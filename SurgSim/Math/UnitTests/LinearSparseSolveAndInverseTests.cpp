@@ -96,19 +96,7 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseLUInitializationTests)
 	nonSquare.setZero();
 
 	LinearSparseSolveAndInverseLU solveAndInverse;
-	EXPECT_ANY_THROW(solveAndInverse(nonSquare, b, &x, &inverseMatrix));
 	EXPECT_ANY_THROW(solveAndInverse.setMatrix(nonSquare));
-};
-
-TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixOperatorTests)
-{
-	setupSparseMatrixTest();
-
-	LinearSparseSolveAndInverseLU solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
-
-	EXPECT_TRUE(x.isApprox(expectedX));
-	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
 };
 
 TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixComponentsTest)
@@ -122,6 +110,9 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixComponentsTest)
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+
+	inverseMatrix = solveAndInverse.solve(denseMatrix);
+	EXPECT_TRUE(inverseMatrix.isApprox(Matrix::Identity(18, 18)));
 };
 
 
