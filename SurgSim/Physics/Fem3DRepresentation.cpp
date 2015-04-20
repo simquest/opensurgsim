@@ -318,12 +318,6 @@ std::shared_ptr<Localization> Fem3DRepresentation::createElementLocalization(
 
 std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::DataStructures::Location& location)
 {
-	SurgSim::DataStructures::IndexedLocalCoordinate coordinate;
-
-	SURGSIM_ASSERT(location.triangleMeshLocalCoordinate.hasValue() ||
-		location.nodeMeshLocalCoordinate.hasValue() || location.elementMeshLocalCoordinate.hasValue())
-			<< "Localization cannot be created without a mesh coordinate.";
-
 	if (location.nodeMeshLocalCoordinate.hasValue())
 	{
 		return createNodeLocalization(location.nodeMeshLocalCoordinate.getValue());
@@ -337,7 +331,7 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 		return createElementLocalization(location.elementMeshLocalCoordinate.getValue());
 	}
 
-	SURGSIM_ASSERT("Location not handled (neither a node, nor a triangle, nor an element");
+	SURGSIM_FAILURE() << "Localization cannot be created without a mesh-based location (node, triangle or element).";
 
 	return nullptr;
 }
