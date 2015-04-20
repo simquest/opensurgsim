@@ -1,3 +1,6 @@
+#ifndef SURGSIM_PHYSICS_PERFORMANCETESTS_DIVISIBLECUBEREPRESENTATION_H
+#define SURGSIM_PHYSICS_PERFORMANCETESTS_DIVISIBLECUBEREPRESENTATION_H
+
 // This file is a part of the OpenSurgSim project.
 // Copyright 2013, SimQuest Solutions Inc.
 //
@@ -75,3 +78,5 @@ private:
 
 } // namespace Physics
 } // namespace SurgSim
+
+#endif // SURGSIM_PHYSICS_PERFORMANCETESTS_DIVISIBLECUBEREPRESENTATION_H
