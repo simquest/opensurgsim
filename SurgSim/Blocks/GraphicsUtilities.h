@@ -1,10 +1,25 @@
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #ifndef SURGSIM_BLOCKS_GRAPHICSUTILITIES_H
 #define SURGSIM_BLOCKS_GRAPHICSUTILITIES_H
 
 #include <memory>
 #include <unordered_map>
 #include <string>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 /// \file GraphicsUtilities.h
 /// The code in here is supposed to help create materials correctly, a lot of it is boilerplate that is repeated over
@@ -83,15 +98,15 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 /// Reads a material file, iterates over the components listed up in the material file and applies the materials and
 /// the appropriate material properties (if present) to the component, if the component is not found it will be ignored
 /// The material file is a yaml file with the following format
-/// <pre>
-/// - <SceneElementName>/<ComponentName>
-///     Material: <MaterialName>
-///     Properties:
-///         - [<GLSLUniformType>, <UniformName>, <YamlEncodedValue>]
-///         - [<GLSLUniformType>, <UniformName>, <YamlEncodedValue>]
-/// - <SceneElementName>/<ComponentName>
-///     Material: ...
-/// </pre>
+///
+///     - <SceneElementName>/<ComponentName>
+///         Material: <MaterialName>
+///         Properties:
+///             - [<GLSLUniformType>, <UniformName>, <YamlEncodedValue>]
+///             - [<GLSLUniformType>, <UniformName>, <YamlEncodedValue>]
+///     - <SceneElementName>/<ComponentName>
+///         Material: ...
+///
 /// The name of the SceneElement and the Component addressed need to be be separated by a '/' character.
 /// For each of the properties a uniform is created with the given GLSL type, name, and the YAML node will be passed
 /// to the uniform setter for conversion. If the type does not match what the appropriate GLSL type is, there will

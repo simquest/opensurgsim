@@ -1,4 +1,17 @@
-
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "SurgSim/Blocks/GraphicsUtilities.h"
 
@@ -61,7 +74,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createPlainMaterial(
 	auto material = std::make_shared<Graphics::OsgMaterial>(name);
 
 	auto program = Graphics::loadProgram(*Framework::Runtime::getApplicationData(), "Shaders/s_mapping_material");
-	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/s_mapping_material" ;
+	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/s_mapping_material";
 	material->setProgram(program);
 
 	material->addUniform("vec4", "specularColor");
@@ -86,7 +99,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createTexturedMaterial(
 	auto material = std::make_shared<Graphics::OsgMaterial>(name);
 
 	auto program = Graphics::loadProgram(*Framework::Runtime::getApplicationData(), "Shaders/ds_mapping_material");
-	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/ds_mapping_material" ;
+	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/ds_mapping_material";
 	material->setProgram(program);
 
 	material->addUniform("vec4", "specularColor");
@@ -114,7 +127,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 	auto material = std::make_shared<Graphics::OsgMaterial>(name);
 
 	auto program = Graphics::loadProgram(*Framework::Runtime::getApplicationData(), "Shaders/dns_mapping_material");
-	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/dns_mapping_material" ;
+	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/dns_mapping_material";
 	material->setProgram(program);
 
 	material->addUniform("vec4", "specularColor");
@@ -161,7 +174,9 @@ void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, std::strin
 				auto propertyNodes = node->begin()->second["Properties"];
 				for (auto nodeIt = propertyNodes.begin(); nodeIt != propertyNodes.end(); ++nodeIt)
 				{
-					auto rawUniform = uniformFactory.create((*nodeIt)[0].as<std::string>(), (*nodeIt)[1].as<std::string>());
+					auto rawUniform = uniformFactory.create(
+										  (*nodeIt)[0].as<std::string>(), (*nodeIt)[1].as<std::string>()
+									  );
 					SURGSIM_ASSERT(rawUniform != nullptr)
 							<< "Could not create uniform " << (*nodeIt)[1].as<std::string>() << " of type "
 							<< (*nodeIt)[0].as<std::string>() << ".";
