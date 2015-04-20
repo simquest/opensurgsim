@@ -185,13 +185,6 @@ std::shared_ptr<FemElement> FemRepresentation::getFemElement(size_t femElementId
 
 bool FemRepresentation::isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const
 {
-	// IndexedLocalCoordinate can be on a single node
-	if (coordinate.coordinate.size() == 0)
-	{
-		return coordinate.index < getCurrentState()->getNumNodes();
-	}
-
-	// or IndexedLocalCoordinate can be on a FemElement
 	return (coordinate.index < m_femElements.size())
 		   && m_femElements[coordinate.index]->isValidCoordinate(coordinate.coordinate);
 }
