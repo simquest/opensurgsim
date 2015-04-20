@@ -37,6 +37,7 @@ namespace Graphics
 
 class OsgMaterial;
 class TangentSpaceGenerator;
+class UniformBase;
 
 /// OSS default value for opengl values that have to be assigned a fixed number
 ///@{
@@ -93,6 +94,8 @@ public:
 	/// Updates the representation.
 	/// \param	dt	The time in seconds of the preceding timestep.
 	void update(double dt) override;
+
+	void addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform);
 
 protected:
 	virtual void doUpdate(double dt);

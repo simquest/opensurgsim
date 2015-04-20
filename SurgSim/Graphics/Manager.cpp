@@ -181,15 +181,17 @@ bool Manager::doUpdate(double dt)
 	processComponents();
 	processBehaviors(dt);
 
+	for (auto it = m_views.begin(); it != m_views.end(); ++it)
+	{
+		(*it)->update(dt);
+	}
+
 	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
 	{
 		(*it)->update(dt);
 	}
 
-	for (auto it = m_views.begin(); it != m_views.end(); ++it)
-	{
-		(*it)->update(dt);
-	}
+
 
 	return true;
 }
