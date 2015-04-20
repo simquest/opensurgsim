@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/Fem3DBilateral3D.h"
+#include "SurgSim/Physics/Fem3DConstraintBilateral3D.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
@@ -27,15 +27,15 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DBilateral3D::Fem3DBilateral3D()
+Fem3DConstraintBilateral3D::Fem3DConstraintBilateral3D()
 {
 }
 
-Fem3DBilateral3D::~Fem3DBilateral3D()
+Fem3DConstraintBilateral3D::~Fem3DConstraintBilateral3D()
 {
 }
 
-void Fem3DBilateral3D::doBuild(double dt,
+void Fem3DConstraintBilateral3D::doBuild(double dt,
 											 const ConstraintData& data,
 											 const std::shared_ptr<Localization>& localization,
 											 MlcpPhysicsProblem* mlcp,
@@ -108,12 +108,12 @@ void Fem3DBilateral3D::doBuild(double dt,
 	}
 }
 
-SurgSim::Math::MlcpConstraintType Fem3DBilateral3D::getMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType Fem3DConstraintBilateral3D::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-size_t Fem3DBilateral3D::doGetNumDof() const
+size_t Fem3DConstraintBilateral3D::doGetNumDof() const
 {
 	return 3;
 }

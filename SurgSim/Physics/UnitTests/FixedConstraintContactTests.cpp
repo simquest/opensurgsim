@@ -19,17 +19,16 @@
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
+#include "SurgSim/Physics/FixedConstraintContact.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
-#include "SurgSim/Physics/RigidContact.h"
+#include "SurgSim/Physics/RigidConstraintContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
-
-using SurgSim::Math::SphereShape;
-using SurgSim::Math::Vector3d;
 
 namespace
 {
@@ -40,28 +39,24 @@ namespace SurgSim
 {
 namespace Physics
 {
-
-TEST (RigidContactTests, SetGet_BuildMlcp_Test)
+TEST (FixedConstraintContactTests, SetGet_BuildMlcp_Test)
 {
-	Vector3d n(0.0, 1.0, 0.0);
+	SurgSim::Math::Vector3d n(0.0, 1.0, 0.0);
 	double d = 0.0;
-	double radius = 0.01;
-	double violation = -radius;
+	double violation = -0.01;
 
-	Vector3d contactPosition = -n * (d - violation);
-	SurgSim::Math::RigidTransform3d poseRigid;
-	poseRigid.setIdentity();
+	SurgSim::Math::Vector3d contactPosition = -n * (d - violation);
+	SurgSim::Math::RigidTransform3d poseFixed;
+	poseFixed.setIdentity();
 
-	std::shared_ptr<RigidRepresentation> rigid = std::make_shared<RigidRepresentation>("Rigid");
-	rigid->setLocalActive(true);
-	rigid->setIsGravityEnabled(false);
-	rigid->setLocalPose(poseRigid);
-	rigid->setDensity(1000.0);
-	rigid->setShape(std::make_shared<SphereShape>(radius));
+	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("Fixed");
+	fixed->setLocalActive(true);
+	fixed->setIsGravityEnabled(false);
+	fixed->setLocalPose(poseFixed);
 
-	auto loc = std::make_shared<RigidLocalization>(rigid);
+	auto loc = std::make_shared<FixedLocalization>(fixed);
 	loc->setLocalPosition(contactPosition);
-	std::shared_ptr<RigidContact> implementation = std::make_shared<RigidContact>();
+	std::shared_ptr<FixedConstraintContact> implementation = std::make_shared<FixedConstraintContact>();
 
 	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
 	EXPECT_EQ(1u, implementation->getNumDof());
@@ -69,26 +64,17 @@ TEST (RigidContactTests, SetGet_BuildMlcp_Test)
 	ContactConstraintData constraintData;
 	constraintData.setPlaneEquation(n, d);
 
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(rigid->getNumDof(), 1, 1);
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(fixed->getNumDof(), 1, 1);
 
 	// Fill up the Mlcp
 	double dt = 1e-3;
-	implementation->build(dt, constraintData, loc,
-		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+	implementation->build(dt, constraintData, loc, &mlcpPhysicsProblem,
+						  0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	// Violation b should be exactly violation = -radius (the sphere center is on the plane)
+	// b should be exactly the violation
 	EXPECT_NEAR(violation, mlcpPhysicsProblem.b[0], epsilon);
 
-	// Constraint H should be
-	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
-	Vector3d n_GP = n.cross(Vector3d(0.0, 0.0, 0.0));
-	SurgSim::Math::Matrix h = mlcpPhysicsProblem.H;
-	EXPECT_NEAR(dt * n[0]   , h(0, 0), epsilon);
-	EXPECT_NEAR(dt * n[1]   , h(0, 1), epsilon);
-	EXPECT_NEAR(dt * n[2]   , h(0, 2), epsilon);
-	EXPECT_NEAR(dt * n_GP[0], h(0, 3), epsilon);
-	EXPECT_NEAR(dt * n_GP[1], h(0, 4), epsilon);
-	EXPECT_NEAR(dt * n_GP[2], h(0, 5), epsilon);
+	// Constraint H should be [] (a fixed representation has no dof !)
 
 	// ConstraintTypes should contain 0 entry as it is setup by the constraint and not the ConstraintImplementation
 	// This way, the constraint can verify that both ConstraintImplementation are the same type

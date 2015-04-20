@@ -15,7 +15,7 @@
 
 #include <memory>
 
-#include "SurgSim/Physics/RigidContact.h"
+#include "SurgSim/Physics/RigidConstraintContact.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/Localization.h"
@@ -28,17 +28,17 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidContact::RigidContact()
+RigidConstraintContact::RigidConstraintContact()
 {
 
 }
 
-RigidContact::~RigidContact()
+RigidConstraintContact::~RigidConstraintContact()
 {
 
 }
 
-void RigidContact::doBuild(double dt,
+void RigidConstraintContact::doBuild(double dt,
 			const ConstraintData& data,
 			const std::shared_ptr<Localization>& localization,
 			MlcpPhysicsProblem* mlcp,
@@ -94,12 +94,12 @@ void RigidContact::doBuild(double dt,
 	mlcp->updateConstraint(m_newH, C, indexOfRepresentation, indexOfConstraint);
 }
 
-SurgSim::Math::MlcpConstraintType RigidContact::getMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType RigidConstraintContact::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 }
 
-size_t RigidContact::doGetNumDof() const
+size_t RigidConstraintContact::doGetNumDof() const
 {
 	return 1;
 }

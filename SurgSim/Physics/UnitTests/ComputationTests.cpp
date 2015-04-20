@@ -20,7 +20,7 @@
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
-#include "SurgSim/Physics/RigidContact.h"
+#include "SurgSim/Physics/RigidConstraintContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 

@@ -20,7 +20,7 @@
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
-#include "SurgSim/Physics/Fem3DContact.h"
+#include "SurgSim/Physics/Fem3DConstraintContact.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
@@ -31,7 +31,7 @@ using SurgSim::DataStructures::IndexedLocalCoordinate;
 using SurgSim::Framework::Runtime;
 using SurgSim::Physics::ContactConstraintData;
 using SurgSim::Physics::Fem3DRepresentation;
-using SurgSim::Physics::Fem3DContact;
+using SurgSim::Physics::Fem3DConstraintContact;
 using SurgSim::Physics::Fem3DLocalization;
 using SurgSim::Physics::Fem3DElementTetrahedron;
 using SurgSim::Physics::MlcpPhysicsProblem;
@@ -63,7 +63,7 @@ static void addTetraheadron(Fem3DRepresentation *fem,
 	fem->addFemElement(element);
 }
 
-class Fem3DContactTests : public ::testing::Test
+class Fem3DConstraintContactTests : public ::testing::Test
 {
 public:
 	void SetUp()
@@ -126,26 +126,26 @@ public:
 	ContactConstraintData m_constraintData;
 };
 
-TEST_F(Fem3DContactTests, ConstructorTest)
+TEST_F(Fem3DConstraintContactTests, ConstructorTest)
 {
 	ASSERT_NO_THROW({
-		Fem3DContact femContact;
+		Fem3DConstraintContact femContact;
 	});
 }
 
-TEST_F(Fem3DContactTests, ConstraintConstantsTest)
+TEST_F(Fem3DConstraintContactTests, ConstraintConstantsTest)
 {
-	auto implementation = std::make_shared<Fem3DContact>();
+	auto implementation = std::make_shared<Fem3DConstraintContact>();
 
 	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
 	EXPECT_EQ(1u, implementation->getNumDof());
 }
 
-TEST_F(Fem3DContactTests, BuildMlcpTest)
+TEST_F(Fem3DConstraintContactTests, BuildMlcpTest)
 {
 	// This test verifies the build mlcp function works for a simple case.
 
-	auto implementation = std::make_shared<Fem3DContact>();
+	auto implementation = std::make_shared<Fem3DConstraintContact>();
 
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 1, 1);
@@ -175,11 +175,11 @@ TEST_F(Fem3DContactTests, BuildMlcpTest)
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
 
-TEST_F(Fem3DContactTests, BuildMlcpCoordinateTest)
+TEST_F(Fem3DConstraintContactTests, BuildMlcpCoordinateTest)
 {
 	// This test verifies the build mlcp function works for a more complicated case with different nodes.
 
-	auto implementation = std::make_shared<Fem3DContact>();
+	auto implementation = std::make_shared<Fem3DConstraintContact>();
 
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 1, 1);
@@ -217,11 +217,11 @@ TEST_F(Fem3DContactTests, BuildMlcpCoordinateTest)
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
 
-TEST_F(Fem3DContactTests, BuildMlcpIndiciesTest)
+TEST_F(Fem3DConstraintContactTests, BuildMlcpIndiciesTest)
 {
 	// This test verifies the build mlcp function works given a hypothetical, preexisting mlcp problem.
 
-	auto implementation = std::make_shared<Fem3DContact>();
+	auto implementation = std::make_shared<Fem3DConstraintContact>();
 
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof() + 5, 2, 1);

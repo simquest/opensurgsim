@@ -15,7 +15,7 @@
 
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/Fem3DContact.h"
+#include "SurgSim/Physics/Fem3DConstraintContact.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/Localization.h"
@@ -27,15 +27,15 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DContact::Fem3DContact()
+Fem3DConstraintContact::Fem3DConstraintContact()
 {
 }
 
-Fem3DContact::~Fem3DContact()
+Fem3DConstraintContact::~Fem3DConstraintContact()
 {
 }
 
-void Fem3DContact::doBuild(double dt,
+void Fem3DConstraintContact::doBuild(double dt,
 	const ConstraintData& data,
 	const std::shared_ptr<Localization>& localization,
 	MlcpPhysicsProblem* mlcp,
@@ -112,12 +112,12 @@ void Fem3DContact::doBuild(double dt,
 	mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
 }
 
-SurgSim::Math::MlcpConstraintType Fem3DContact::getMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType Fem3DConstraintContact::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 }
 
-size_t Fem3DContact::doGetNumDof() const
+size_t Fem3DConstraintContact::doGetNumDof() const
 {
 	return 1;
 }

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDBILATERAL3D_H
-#define SURGSIM_PHYSICS_RIGIDBILATERAL3D_H
+#ifndef SURGSIM_PHYSICS_FEM3DCONSTRAINTBILATERAL3D_H
+#define SURGSIM_PHYSICS_FEM3DCONSTRAINTBILATERAL3D_H
 
 #include "SurgSim/Physics/ConstraintImplementation.h"
 
@@ -24,17 +24,17 @@ namespace SurgSim
 namespace Physics
 {
 
-/// RigidRepresentation bilateral 3d constraint implementation.
+/// Fem3DRepresentation bilateral 3d constraint implementation.
 ///
 /// The family of bilateral3D constraints enforce equality between two points.
-class RigidBilateral3D : public ConstraintImplementation
+class Fem3DConstraintBilateral3D : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	RigidBilateral3D();
+	Fem3DConstraintBilateral3D();
 
 	/// Destructor
-	virtual ~RigidBilateral3D();
+	virtual ~Fem3DConstraintBilateral3D();
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return The MLCP constraint type corresponding to this constraint implementation
@@ -53,7 +53,7 @@ private:
 	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp.
 	/// \param indexOfConstraint The index of the constraint in the mlcp.
 	/// \param sign The sign of this implementation in the constraint (positive or negative side).
-	/// \note Empty for a Rigid Representation
+	/// \note Empty for a Fixed Representation
 	void doBuild(double dt,
 				 const ConstraintData& data,
 				 const std::shared_ptr<Localization>& localization,
@@ -67,4 +67,4 @@ private:
 
 }; // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_RIGIDBILATERAL3D_H
+#endif // SURGSIM_PHYSICS_FEM3DCONSTRAINTBILATERAL3D_H

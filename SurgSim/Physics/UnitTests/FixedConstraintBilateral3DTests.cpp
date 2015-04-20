@@ -20,7 +20,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/FixedBilateral3D.h"
+#include "SurgSim/Physics/FixedConstraintBilateral3D.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
@@ -37,30 +37,30 @@ namespace SurgSim
 namespace Physics
 {
 
-TEST(FixedBilateral3DTests, Constructor)
+TEST(FixedConstraintBilateral3DTests, Constructor)
 {
 	ASSERT_NO_THROW(
-		{ FixedBilateral3D constraint; });
+		{ FixedConstraintBilateral3D constraint; });
 }
 
-TEST(FixedBilateral3DTests, Constants)
+TEST(FixedConstraintBilateral3DTests, Constants)
 {
-	FixedBilateral3D constraint;
+	FixedConstraintBilateral3D constraint;
 
 	EXPECT_EQ(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT, constraint.getMlcpConstraintType());
 	EXPECT_EQ(3u, constraint.getNumDof());
 }
 
-TEST(FixedBilateral3DTests, BuildMlcp)
+TEST(FixedConstraintBilateral3DTests, BuildMlcp)
 {
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
 	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
 	// necessary to supply a realistic C.  It only checks H and b.
-	FixedBilateral3D constraint;
+	FixedConstraintBilateral3D constraint;
 
 	Vector3d actual = Vector3d(8.0, 6.4, 3.5);
 
-	// Setup parameters for FixedBilateral3D::build
+	// Setup parameters for FixedConstraintBilateral3D::build
 	auto localization = std::make_shared<FixedLocalization>(
 		std::make_shared<FixedRepresentation>("representation"));
 	localization->setLocalPosition(actual);
@@ -79,17 +79,17 @@ TEST(FixedBilateral3DTests, BuildMlcp)
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
 
-TEST(FixedBilateral3DTests, BuildMlcpTwoStep)
+TEST(FixedConstraintBilateral3DTests, BuildMlcpTwoStep)
 {
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
 	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
 	// necessary to supply a realistic C.  It only checks H and b.
-	FixedBilateral3D constraint;
+	FixedConstraintBilateral3D constraint;
 
 	Vector3d actual = Vector3d(8.0, 6.4, 3.5);
 	Vector3d desired = Vector3d(3.0, 7.7, 0.0);
 
-	// Setup parameters for FixedBilateral3D::build
+	// Setup parameters for FixedConstraintBilateral3D::build
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(0, 3, 1);
 
 	ConstraintData emptyConstraint;

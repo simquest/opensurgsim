@@ -40,8 +40,8 @@ set(UNIT_TEST_SOURCES
 	Fem2DMechanicalValidationTests.cpp
 	Fem2DPlyReaderDelegateTests.cpp
 	Fem2DRepresentationTests.cpp
-	Fem3DBilateral3DTests.cpp
-	Fem3DContactTests.cpp
+	Fem3DConstraintBilateral3DTests.cpp
+	Fem3DConstraintContactTests.cpp
 	Fem3DElementCorotationalTetrahedronTests.cpp
 	Fem3DElementCubeTests.cpp
 	Fem3DElementTetrahedronTests.cpp
@@ -50,12 +50,12 @@ set(UNIT_TEST_SOURCES
 	Fem3DRepresentationTests.cpp
 	FemElementTests.cpp
 	FemRepresentationTests.cpp
-	FixedBilateral3DTests.cpp
-	FixedContactTests.cpp
+	FixedConstraintBilateral3DTests.cpp
+	FixedConstraintContactTests.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
-	MassSpringContactTest.cpp
+	MassSpringConstraintContactTest.cpp
 	MassSpringLocalizationTest.cpp
 	MassSpringMechanicalValidationTests.cpp
 	MassSpringRepresentationTests.cpp
@@ -67,9 +67,9 @@ set(UNIT_TEST_SOURCES
 	PreUpdateTests.cpp
 	PushResultsTests.cpp
 	RepresentationTest.cpp
-	RigidBilateral3DTests.cpp
 	RigidCollisionRepresentationTest.cpp
-	RigidContactTests.cpp
+	RigidConstraintBilateral3DTests.cpp
+	RigidConstraintContactTests.cpp
 	RigidLocalizationTest.cpp
 	RigidRepresentationTest.cpp
 	RigidStateTest.cpp

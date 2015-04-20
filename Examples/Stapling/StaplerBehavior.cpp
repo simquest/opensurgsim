@@ -35,19 +35,19 @@
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/Fem3DBilateral3D.h"
-#include "SurgSim/Physics/FixedBilateral3D.h"
+#include "SurgSim/Physics/Fem3DConstraintBilateral3D.h"
+#include "SurgSim/Physics/FixedConstraintBilateral3D.h"
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/RigidBilateral3D.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidConstraintBilateral3D.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 using SurgSim::Collision::ContactMapType;
 using SurgSim::Physics::ConstraintImplementation;
-using SurgSim::Physics::Fem3DBilateral3D;
-using SurgSim::Physics::FixedBilateral3D;
+using SurgSim::Physics::Fem3DConstraintBilateral3D;
+using SurgSim::Physics::FixedConstraintBilateral3D;
 using SurgSim::Physics::Localization;
-using SurgSim::Physics::RigidBilateral3D;
+using SurgSim::Physics::RigidConstraintBilateral3D;
 using SurgSim::Framework::checkAndConvert;
 
 SURGSIM_REGISTER(SurgSim::Framework::Component, StaplerBehavior, StaplerBehavior);

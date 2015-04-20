@@ -34,8 +34,8 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem2DLocalization.cpp
 	Fem2DPlyReaderDelegate.cpp
 	Fem2DRepresentation.cpp
-	Fem3DBilateral3D.cpp
-	Fem3DContact.cpp
+	Fem3DConstraintBilateral3D.cpp
+	Fem3DConstraintContact.cpp
 	Fem3DElementCorotationalTetrahedron.cpp
 	Fem3DElementCube.cpp
 	Fem3DElementTetrahedron.cpp
@@ -45,13 +45,13 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemElement.cpp
 	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
-	FixedBilateral3D.cpp
-	FixedContact.cpp
+	FixedConstraintBilateral3D.cpp
+	FixedConstraintContact.cpp
 	FixedRepresentation.cpp
 	FreeMotion.cpp
 	LinearSpring.cpp
 	Localization.cpp
-	MassSpringContact.cpp
+	MassSpringConstraintContact.cpp
 	MassSpringLocalization.cpp
 	MassSpringRepresentation.cpp
 	MlcpPhysicsProblem.cpp
@@ -62,9 +62,9 @@ set(SURGSIM_PHYSICS_SOURCES
 	PreUpdate.cpp
 	PushResults.cpp
 	Representation.cpp
-	RigidBilateral3D.cpp
 	RigidCollisionRepresentation.cpp
-	RigidContact.cpp
+	RigidConstraintBilateral3D.cpp
+	RigidConstraintContact.cpp
 	RigidLocalization.cpp
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
@@ -96,8 +96,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem2DLocalization.h
 	Fem2DPlyReaderDelegate.h
 	Fem2DRepresentation.h
-	Fem3DBilateral3D.h
-	Fem3DContact.h
+	Fem3DConstraintBilateral3D.h
+	Fem3DConstraintContact.h
 	Fem3DElementCorotationalTetrahedron.h
 	Fem3DElementCube.h
 	Fem3DElementTetrahedron.h
@@ -107,14 +107,14 @@ set(SURGSIM_PHYSICS_HEADERS
 	FemElement.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
-	FixedBilateral3D.h
-	FixedContact.h
+	FixedConstraintBilateral3D.h
+	FixedConstraintContact.h
 	FixedRepresentation.h
 	FreeMotion.h
 	LinearSpring.h
 	Localization.h
 	Mass.h
-	MassSpringContact.h
+	MassSpringConstraintContact.h
 	MassSpringLocalization.h
 	MassSpringRepresentation.h
 	MlcpMapping.h
@@ -128,9 +128,9 @@ set(SURGSIM_PHYSICS_HEADERS
 	PreUpdate.h
 	PushResults.h
 	Representation.h
-	RigidBilateral3D.h
 	RigidCollisionRepresentation.h
-	RigidContact.h
+	RigidConstraintBilateral3D.h
+	RigidConstraintContact.h
 	RigidLocalization.h
 	RigidRepresentation.h
 	RigidRepresentationBase.h

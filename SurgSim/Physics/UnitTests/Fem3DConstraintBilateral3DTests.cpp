@@ -24,7 +24,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/Fem3DBilateral3D.h"
+#include "SurgSim/Physics/Fem3DConstraintBilateral3D.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
@@ -100,30 +100,30 @@ static std::shared_ptr<Fem3DRepresentation> getTestingFem3d(const std::string &n
 	return fem;
 }
 
-TEST(Fem3DBilateral3DTests, Constructor)
+TEST(Fem3DConstraintBilateral3DTests, Constructor)
 {
 	ASSERT_NO_THROW(
-		{ Fem3DBilateral3D constraint; });
+		{ Fem3DConstraintBilateral3D constraint; });
 }
 
-TEST(Fem3DBilateral3DTests, Constants)
+TEST(Fem3DConstraintBilateral3DTests, Constants)
 {
-	Fem3DBilateral3D constraint;
+	Fem3DConstraintBilateral3D constraint;
 
 	EXPECT_EQ(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT, constraint.getMlcpConstraintType());
 	EXPECT_EQ(3u, constraint.getNumDof());
 }
 
-TEST(Fem3DBilateral3DTests, BuildMlcpBasic)
+TEST(Fem3DConstraintBilateral3DTests, BuildMlcpBasic)
 {
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
 	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
 	// necessary to supply a realistic C.  It only checks H and b.
-	Fem3DBilateral3D constraint;
+	Fem3DConstraintBilateral3D constraint;
 
 	Vector3d actual;
 
-	// Setup parameters for Fem3DBilateral3D::build
+	// Setup parameters for Fem3DConstraintBilateral3D::build
 	auto localization = std::make_shared<Fem3DLocalization>(
 		getTestingFem3d("representation"),
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.0, 0.0, 1.0, 0.0)));
@@ -149,16 +149,16 @@ TEST(Fem3DBilateral3DTests, BuildMlcpBasic)
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
 
-TEST(Fem3DBilateral3DTests, BuildMlcp)
+TEST(Fem3DConstraintBilateral3DTests, BuildMlcp)
 {
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
 	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
 	// necessary to supply a realistic C.  It only checks H and b.
-	Fem3DBilateral3D constraint;
+	Fem3DConstraintBilateral3D constraint;
 
 	Vector3d actual;
 
-	// Setup parameters for Fem3DBilateral3D::build
+	// Setup parameters for Fem3DConstraintBilateral3D::build
 	auto localization = std::make_shared<Fem3DLocalization>(
 		getTestingFem3d("representation"),
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.11, 0.02, 0.33, 0.54)));
@@ -187,17 +187,17 @@ TEST(Fem3DBilateral3DTests, BuildMlcp)
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
 
-TEST(Fem3DBilateral3DTests, BuildMlcpTwoStep)
+TEST(Fem3DConstraintBilateral3DTests, BuildMlcpTwoStep)
 {
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
 	// CHt and HCHt can be correctly built given H, so it does not neccessarily construct the physical parameters
 	// neccessary to supply a realistic C.  It only checks H and b.
-	Fem3DBilateral3D constraint;
+	Fem3DConstraintBilateral3D constraint;
 
 	Vector3d actual;
 	Vector3d desired;
 
-	// Setup parameters for Fem3DBilateral3D::build
+	// Setup parameters for Fem3DConstraintBilateral3D::build
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(18, 3, 1);
 
 	ConstraintData emptyConstraint;

@@ -13,10 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEM3DCONTACT_H
-#define SURGSIM_PHYSICS_FEM3DCONTACT_H
+#ifndef SURGSIM_PHYSICS_MASSSPRINGCONSTRAINTCONTACT_H
+#define SURGSIM_PHYSICS_MASSSPRINGCONSTRAINTCONTACT_H
 
+#include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/MassSpringRepresentation.h"
+#include "SurgSim/Physics/Localization.h"
 
 namespace SurgSim
 {
@@ -24,34 +27,37 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Fem3DRepresentation frictionless contact implementation.
-class Fem3DContact : public ConstraintImplementation
+/// MassSpring frictionless contact implementation.
+///
+/// MassSpringConstraintContact implements the frictionless contact constraint for the MassSpringRepresentation,
+/// which prevents nodes from passing through a surface.  See MassSpringConstraintContact::doBuild for more
+/// information.
+class MassSpringConstraintContact : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	Fem3DContact();
+	MassSpringConstraintContact();
 
 	/// Destructor
-	virtual ~Fem3DContact();
+	virtual ~MassSpringConstraintContact();
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
-	/// \return The MLCP constraint type corresponding to this constraint implementation
+	/// \return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
 private:
-	/// Gets the number of degree of freedom.
-	/// \return 1 as a frictionless contact is formed of 1 equation of constraint (along the normal direction).
+	/// Gets the number of degrees of freedom for a frictionless contact.
+	/// \return 1, as a frictionless contact only has 1 equation of constraint (along the normal direction).
 	size_t doGetNumDof() const override;
 
-	/// Builds the subset of an Mlcp physics problem associated to this implementation.
+	/// Adds a mass-spring frictionless contact constraint to an MlcpPhysicsProblem.
 	/// \param dt The time step.
-	/// \param data The data associated to the constraint.
-	/// \param localization The localization for the representation.
+	/// \param data [ContactConstraintData] Plane defining the constraint.
+	/// \param localization [MassSpringRepresentationLocalization] Location and Representation to be constrained.
 	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up.
 	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp.
 	/// \param indexOfConstraint The index of the constraint in the mlcp.
 	/// \param sign The sign of this implementation in the constraint (positive or negative side).
-	/// \note Empty for a Fixed Representation
 	void doBuild(double dt,
 		const ConstraintData& data,
 		const std::shared_ptr<Localization>& localization,
@@ -66,4 +72,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_FEM3DCONTACT_H
+#endif  // SURGSIM_PHYSICS_MASSSPRINGCONSTRAINTCONTACT_H
