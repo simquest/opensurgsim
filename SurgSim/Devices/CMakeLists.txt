@@ -20,6 +20,7 @@ add_subdirectory(Mouse)
 
 set(DEVICES
 	LabJack
+	Leap
 	MultiAxis
 	Nimble
 	Novint
