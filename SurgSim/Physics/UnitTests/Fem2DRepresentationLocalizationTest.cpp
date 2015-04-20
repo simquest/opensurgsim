@@ -109,15 +109,9 @@ public:
 
 TEST_F(Fem2DRepresentationLocalizationTest, ConstructorTest)
 {
-	SurgSim::DataStructures::IndexedLocalCoordinate m_OneNodeValid, m_OneNodeInvalid;
-	m_OneNodeValid.index = 0;
-	m_OneNodeInvalid.index = 1000;
-
-	ASSERT_NO_THROW(std::make_shared<Fem2DRepresentationLocalization>(m_fem, m_OneNodeValid));
-
-	ASSERT_THROW(std::make_shared<Fem2DRepresentationLocalization>(m_fem, m_OneNodeInvalid),
-		SurgSim::Framework::AssertionFailure);
-
+	// IndexedLocalCoordinate pointing to a node (node index + empty coordinate) are invalid. It will failed,
+	// either because the index is out of bound or because the coordinates are the wrong size (empty)
+	// This is tested by m_invalidIndexLocalPosition and m_invalidCoordinateLocalPosition
 	ASSERT_THROW(std::make_shared<Fem2DRepresentationLocalization>(m_fem, m_invalidIndexLocalPosition),
 		SurgSim::Framework::AssertionFailure);
 
