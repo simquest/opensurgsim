@@ -35,19 +35,19 @@
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/Fem3DConstraintBilateral3D.h"
-#include "SurgSim/Physics/FixedConstraintBilateral3D.h"
+#include "SurgSim/Physics/Fem3DConstraintFixedPoint.h"
+#include "SurgSim/Physics/FixedConstraintFixedPoint.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
-#include "SurgSim/Physics/RigidConstraintBilateral3D.h"
+#include "SurgSim/Physics/RigidConstraintFixedPoint.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 using SurgSim::Collision::ContactMapType;
 using SurgSim::Physics::ConstraintImplementation;
-using SurgSim::Physics::Fem3DConstraintBilateral3D;
-using SurgSim::Physics::FixedConstraintBilateral3D;
+using SurgSim::Physics::Fem3DConstraintFixedPoint;
+using SurgSim::Physics::FixedConstraintFixedPoint;
 using SurgSim::Physics::Localization;
-using SurgSim::Physics::RigidConstraintBilateral3D;
+using SurgSim::Physics::RigidConstraintFixedPoint;
 using SurgSim::Framework::checkAndConvert;
 
 SURGSIM_REGISTER(SurgSim::Framework::Component, StaplerBehavior, StaplerBehavior);
@@ -272,7 +272,7 @@ void StaplerBehavior::createStaple()
 		// Create a component to store this constraint.
 		std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
 			std::make_shared<SurgSim::Physics::ConstraintComponent>(
-				"Bilateral3DConstraint" + boost::to_string(toothId++));
+				"FixedPointConstraint" + boost::to_string(toothId++));
 
 		constraintComponent->setConstraint(constraint);
 		staple->addComponent(constraintComponent);

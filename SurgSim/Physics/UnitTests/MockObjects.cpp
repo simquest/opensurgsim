@@ -424,25 +424,25 @@ const std::shared_ptr<OdeSolver> MockFem1DRepresentation::getOdeSolver() const
 }
 
 
-MockFixedConstraintBilateral3D::MockFixedConstraintBilateral3D() : ConstraintImplementation()
+MockFixedConstraintFixedPoint::MockFixedConstraintFixedPoint() : ConstraintImplementation()
 {
 }
 
-MockFixedConstraintBilateral3D::~MockFixedConstraintBilateral3D()
+MockFixedConstraintFixedPoint::~MockFixedConstraintFixedPoint()
 {
 }
 
-SurgSim::Math::MlcpConstraintType MockFixedConstraintBilateral3D::getMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType MockFixedConstraintFixedPoint::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-size_t MockFixedConstraintBilateral3D::doGetNumDof() const
+size_t MockFixedConstraintFixedPoint::doGetNumDof() const
 {
 	return 3;
 }
 
-void MockFixedConstraintBilateral3D::doBuild(double dt,
+void MockFixedConstraintFixedPoint::doBuild(double dt,
 											 const ConstraintData& data,
 											 const std::shared_ptr<Localization>& localization,
 											 MlcpPhysicsProblem* mlcp,
@@ -452,25 +452,25 @@ void MockFixedConstraintBilateral3D::doBuild(double dt,
 {
 }
 
-MockRigidConstraintBilateral3D::MockRigidConstraintBilateral3D() : ConstraintImplementation()
+MockRigidConstraintFixedPoint::MockRigidConstraintFixedPoint() : ConstraintImplementation()
 {
 }
 
-MockRigidConstraintBilateral3D::~MockRigidConstraintBilateral3D()
+MockRigidConstraintFixedPoint::~MockRigidConstraintFixedPoint()
 {
 }
 
-SurgSim::Math::MlcpConstraintType MockRigidConstraintBilateral3D::getMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType MockRigidConstraintFixedPoint::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-size_t MockRigidConstraintBilateral3D::doGetNumDof() const
+size_t MockRigidConstraintFixedPoint::doGetNumDof() const
 {
 	return 3;
 }
 
-void MockRigidConstraintBilateral3D::doBuild(double dt,
+void MockRigidConstraintFixedPoint::doBuild(double dt,
 											 const ConstraintData& data,
 											 const std::shared_ptr<Localization>& localization,
 											 MlcpPhysicsProblem* mlcp,

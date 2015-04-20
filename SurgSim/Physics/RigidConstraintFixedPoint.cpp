@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/RigidConstraintBilateral3D.h"
+#include "SurgSim/Physics/RigidConstraintFixedPoint.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 using SurgSim::Math::Vector3d;
@@ -25,15 +25,15 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidConstraintBilateral3D::RigidConstraintBilateral3D()
+RigidConstraintFixedPoint::RigidConstraintFixedPoint()
 {
 }
 
-RigidConstraintBilateral3D::~RigidConstraintBilateral3D()
+RigidConstraintFixedPoint::~RigidConstraintFixedPoint()
 {
 }
 
-void RigidConstraintBilateral3D::doBuild(double dt,
+void RigidConstraintFixedPoint::doBuild(double dt,
 											 const ConstraintData& data,
 											 const std::shared_ptr<Localization>& localization,
 											 MlcpPhysicsProblem* mlcp,
@@ -115,12 +115,12 @@ void RigidConstraintBilateral3D::doBuild(double dt,
 	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + 2);
 }
 
-SurgSim::Math::MlcpConstraintType RigidConstraintBilateral3D::getMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType RigidConstraintFixedPoint::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-size_t RigidConstraintBilateral3D::doGetNumDof() const
+size_t RigidConstraintFixedPoint::doGetNumDof() const
 {
 	return 3;
 }

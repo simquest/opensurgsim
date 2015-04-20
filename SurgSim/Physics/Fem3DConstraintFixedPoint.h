@@ -13,14 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDCONSTRAINTCONTACT_H
-#define SURGSIM_PHYSICS_RIGIDCONSTRAINTCONTACT_H
+#ifndef SURGSIM_PHYSICS_FEM3DCONSTRAINTFIXEDPOINT_H
+#define SURGSIM_PHYSICS_FEM3DCONSTRAINTFIXEDPOINT_H
 
-#include "SurgSim/Physics/Constraint.h"
-#include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/Localization.h"
 
 namespace SurgSim
 {
@@ -28,23 +24,25 @@ namespace SurgSim
 namespace Physics
 {
 
-/// RigidRepresentation frictionless contact implementation.
-class RigidConstraintContact : public ConstraintImplementation
+/// Fem3DRepresentation bilateral 3d constraint implementation.
+///
+/// The family of FixedPoint constraints enforce equality between two points.
+class Fem3DConstraintFixedPoint : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	RigidConstraintContact();
+	Fem3DConstraintFixedPoint();
 
 	/// Destructor
-	virtual ~RigidConstraintContact();
+	virtual ~Fem3DConstraintFixedPoint();
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return The MLCP constraint type corresponding to this constraint implementation
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
 private:
-	/// Gets the number of degree of freedom for a frictionless contact.
-	/// \return 1 as a frictionless contact only has 1 equation of constraint (along the normal direction).
+	/// Gets the number of degree of freedom.
+	/// \return 3 A bilateral 3d constraint enforces equality in the x, y, and z dimensions between 2 points.
 	size_t doGetNumDof() const override;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation.
@@ -55,17 +53,18 @@ private:
 	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp.
 	/// \param indexOfConstraint The index of the constraint in the mlcp.
 	/// \param sign The sign of this implementation in the constraint (positive or negative side).
+	/// \note Empty for a Fixed Representation
 	void doBuild(double dt,
-		const ConstraintData& data,
-		const std::shared_ptr<Localization>& localization,
-		MlcpPhysicsProblem* mlcp,
-		size_t indexOfRepresentation,
-		size_t indexOfConstraint,
-		ConstraintSideSign sign) override;
+				 const ConstraintData& data,
+				 const std::shared_ptr<Localization>& localization,
+				 MlcpPhysicsProblem* mlcp,
+				 size_t indexOfRepresentation,
+				 size_t indexOfConstraint,
+				 ConstraintSideSign sign) override;
 };
 
-};  // namespace Physics
+}; // namespace Physics
 
-};  // namespace SurgSim
+}; // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_RIGIDCONSTRAINTCONTACT_H
+#endif // SURGSIM_PHYSICS_FEM3DCONSTRAINTFIXEDPOINT_H

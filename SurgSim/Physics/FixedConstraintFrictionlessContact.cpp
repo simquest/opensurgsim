@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/ContactConstraintData.h"
-#include "SurgSim/Physics/FixedConstraintContact.h"
+#include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
@@ -25,15 +25,15 @@ namespace SurgSim
 namespace Physics
 {
 
-FixedConstraintContact::FixedConstraintContact()
+FixedConstraintFrictionlessContact::FixedConstraintFrictionlessContact()
 {
 }
 
-FixedConstraintContact::~FixedConstraintContact()
+FixedConstraintFrictionlessContact::~FixedConstraintFrictionlessContact()
 {
 }
 
-void FixedConstraintContact::doBuild(double dt,
+void FixedConstraintFrictionlessContact::doBuild(double dt,
 	const ConstraintData& data,
 	const std::shared_ptr<Localization>& localization,
 	MlcpPhysicsProblem* mlcp,
@@ -69,12 +69,12 @@ void FixedConstraintContact::doBuild(double dt,
 	b[indexOfConstraint] += violation * scale;
 }
 
-SurgSim::Math::MlcpConstraintType FixedConstraintContact::getMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType FixedConstraintFrictionlessContact::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 }
 
-size_t FixedConstraintContact::doGetNumDof() const
+size_t FixedConstraintFrictionlessContact::doGetNumDof() const
 {
 	return 1;
 }

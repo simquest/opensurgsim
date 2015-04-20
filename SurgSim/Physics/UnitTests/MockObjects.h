@@ -312,11 +312,11 @@ public:
 	const std::shared_ptr<OdeSolver> getOdeSolver() const;
 };
 
-class MockFixedConstraintBilateral3D : public ConstraintImplementation
+class MockFixedConstraintFixedPoint : public ConstraintImplementation
 {
 public:
-	MockFixedConstraintBilateral3D();
-	virtual ~MockFixedConstraintBilateral3D();
+	MockFixedConstraintFixedPoint();
+	virtual ~MockFixedConstraintFixedPoint();
 
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
@@ -332,11 +332,11 @@ private:
 		ConstraintSideSign sign) override;
 };
 
-class MockRigidConstraintBilateral3D : public ConstraintImplementation
+class MockRigidConstraintFixedPoint : public ConstraintImplementation
 {
 public:
-	MockRigidConstraintBilateral3D();
-	virtual ~MockRigidConstraintBilateral3D();
+	MockRigidConstraintFixedPoint();
+	virtual ~MockRigidConstraintFixedPoint();
 
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 

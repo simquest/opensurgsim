@@ -23,7 +23,7 @@
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
-#include "SurgSim/Physics/MassSpringConstraintContact.h"
+#include "SurgSim/Physics/MassSpringConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/MassSpringLocalization.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 
@@ -39,7 +39,7 @@ namespace Physics
 {
 using SurgSim::Math::Vector3d;
 
-class MassSpringConstraintContactTest : public ::testing::Test
+class MassSpringConstraintFrictionlessContactTest : public ::testing::Test
 {
 public:
 	void SetUp() {
@@ -101,25 +101,25 @@ public:
 	std::shared_ptr<MassSpringLocalization> m_localization;
 };
 
-TEST_F(MassSpringConstraintContactTest, ConstructorTest)
+TEST_F(MassSpringConstraintFrictionlessContactTest, ConstructorTest)
 {
-	ASSERT_NO_THROW({ MassSpringConstraintContact massSpring; });
+	ASSERT_NO_THROW({ MassSpringConstraintFrictionlessContact massSpring; });
 
-	ASSERT_NE(nullptr, std::make_shared<MassSpringConstraintContact>());
+	ASSERT_NE(nullptr, std::make_shared<MassSpringConstraintFrictionlessContact>());
 }
 
-TEST_F(MassSpringConstraintContactTest, ConstraintConstantsTest)
+TEST_F(MassSpringConstraintFrictionlessContactTest, ConstraintConstantsTest)
 {
-	auto implementation = std::make_shared<MassSpringConstraintContact>();
+	auto implementation = std::make_shared<MassSpringConstraintFrictionlessContact>();
 
 	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
 	EXPECT_EQ(1u, implementation->getNumDof());
 }
 
-TEST_F(MassSpringConstraintContactTest, BuildMlcpTest)
+TEST_F(MassSpringConstraintFrictionlessContactTest, BuildMlcpTest)
 {
 	// Define constraint (frictionless non-penetration)
-	auto implementation = std::make_shared<MassSpringConstraintContact>();
+	auto implementation = std::make_shared<MassSpringConstraintFrictionlessContact>();
 
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_massSpring->getNumDof(), 1, 1);
@@ -195,9 +195,9 @@ TEST_F(MassSpringConstraintContactTest, BuildMlcpTest)
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
 
-TEST_F(MassSpringConstraintContactTest, BuildMlcpIndiciesTest)
+TEST_F(MassSpringConstraintFrictionlessContactTest, BuildMlcpIndiciesTest)
 {
-	auto implementation = std::make_shared<MassSpringConstraintContact>();
+	auto implementation = std::make_shared<MassSpringConstraintFrictionlessContact>();
 
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(11, 2, 2);
 

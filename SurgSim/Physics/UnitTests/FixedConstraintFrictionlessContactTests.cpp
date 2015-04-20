@@ -19,10 +19,10 @@
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
-#include "SurgSim/Physics/FixedConstraintContact.h"
+#include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
-#include "SurgSim/Physics/RigidConstraintContact.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 #include "SurgSim/Math/Quaternion.h"
@@ -39,7 +39,7 @@ namespace SurgSim
 {
 namespace Physics
 {
-TEST (FixedConstraintContactTests, SetGet_BuildMlcp_Test)
+TEST (FixedConstraintFrictionlessContactTests, SetGet_BuildMlcp_Test)
 {
 	SurgSim::Math::Vector3d n(0.0, 1.0, 0.0);
 	double d = 0.0;
@@ -56,7 +56,8 @@ TEST (FixedConstraintContactTests, SetGet_BuildMlcp_Test)
 
 	auto loc = std::make_shared<FixedLocalization>(fixed);
 	loc->setLocalPosition(contactPosition);
-	std::shared_ptr<FixedConstraintContact> implementation = std::make_shared<FixedConstraintContact>();
+	std::shared_ptr<FixedConstraintFrictionlessContact> implementation =
+			std::make_shared<FixedConstraintFrictionlessContact>();
 
 	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
 	EXPECT_EQ(1u, implementation->getNumDof());

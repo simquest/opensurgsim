@@ -24,7 +24,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/RigidConstraintBilateral3D.h"
+#include "SurgSim/Physics/RigidConstraintFixedPoint.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
@@ -46,26 +46,26 @@ namespace SurgSim
 namespace Physics
 {
 
-TEST(RigidConstraintBilateral3DTests, Constructor)
+TEST(RigidConstraintFixedPointTests, Constructor)
 {
 	ASSERT_NO_THROW(
-		{ RigidConstraintBilateral3D constraint; });
+		{ RigidConstraintFixedPoint constraint; });
 }
 
-TEST(RigidConstraintBilateral3DTests, Constants)
+TEST(RigidConstraintFixedPointTests, Constants)
 {
-	RigidConstraintBilateral3D constraint;
+	RigidConstraintFixedPoint constraint;
 
 	EXPECT_EQ(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT, constraint.getMlcpConstraintType());
 	EXPECT_EQ(3u, constraint.getNumDof());
 }
 
-TEST(RigidConstraintBilateral3DTests, BuildMlcp)
+TEST(RigidConstraintFixedPointTests, BuildMlcp)
 {
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
 	// CHt and HCHt can be correctly built given H, so it does not neccessarily construct the physical parameters
 	// neccessary to supply a realistic C.  It only checks H and b.
-	RigidConstraintBilateral3D constraint;
+	RigidConstraintFixedPoint constraint;
 
 	Vector3d centerOfMass = Vector3d(3.0, 2.42, 9.54);
 	Quaterniond objectRotation = Quaterniond(0.1, 0.35, 4.2, 5.0).normalized();
@@ -73,7 +73,7 @@ TEST(RigidConstraintBilateral3DTests, BuildMlcp)
 	RigidTransform3d objectPose = makeRigidTransform(objectRotation, centerOfMass);
 	Vector3d constraintPoint = Vector3d(8.0, 6.4, 3.5);
 
-	// Setup parameters for RigidConstraintBilateral3D::build
+	// Setup parameters for RigidConstraintFixedPoint::build
 	auto representation = std::make_shared<MockRigidRepresentation>();
 	representation->setShape(std::make_shared<SurgSim::Math::SphereShape>(1.0));
 	auto localization = std::make_shared<RigidLocalization>(representation);
@@ -102,12 +102,12 @@ TEST(RigidConstraintBilateral3DTests, BuildMlcp)
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
 
-TEST(RigidConstraintBilateral3DTests, BuildMlcpTwoStep)
+TEST(RigidConstraintFixedPointTests, BuildMlcpTwoStep)
 {
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
 	// CHt and HCHt can be correctly built given H, so it does not neccessarily construct the physical parameters
 	// neccessary to supply a realistic C.  It only checks H and b.
-	RigidConstraintBilateral3D constraint;
+	RigidConstraintFixedPoint constraint;
 
 	Vector3d centerOfMassLhs = Vector3d(3.0, 2.42, 9.54);
 	Vector3d centerOfMassRhs = Vector3d(1.0, 24.52, 8.00);
@@ -121,7 +121,7 @@ TEST(RigidConstraintBilateral3DTests, BuildMlcpTwoStep)
 	Vector3d constraintPointLhs = Vector3d(8.0, 6.4, 3.5);
 	Vector3d constraintPointRhs = Vector3d(3.0, 7.7, 0.0);
 
-	// Setup parameters for RigidConstraintBilateral3D::build
+	// Setup parameters for RigidConstraintFixedPoint::build
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(12, 3, 1);
 
 	ConstraintData emptyConstraint;

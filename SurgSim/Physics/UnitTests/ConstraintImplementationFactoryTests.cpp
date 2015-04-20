@@ -19,7 +19,7 @@
 
 #include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/FixedConstraintContact.h"
+#include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
@@ -60,14 +60,14 @@ TEST(ConstraintImplementationFactoryTest, AddImplementationTest)
 
 	// Add implementation for TestRepresentation.
 	EXPECT_NO_THROW(
-		factory.addImplementation(typeid(TestRepresentation), std::make_shared<FixedConstraintContact>()));
+		factory.addImplementation(typeid(TestRepresentation), std::make_shared<FixedConstraintFrictionlessContact>()));
 
 	EXPECT_TRUE(factory.getImplementation(typeid(TestRepresentation), MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
 		!= nullptr);
 
 	// Adding it again to make sure everything works, even if duplicate implementations are added.
 	EXPECT_NO_THROW(
-		factory.addImplementation(typeid(TestRepresentation), std::make_shared<FixedConstraintContact>()));
+		factory.addImplementation(typeid(TestRepresentation), std::make_shared<FixedConstraintFrictionlessContact>()));
 
 	EXPECT_TRUE(factory.getImplementation(typeid(TestRepresentation), MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
 		!= nullptr);

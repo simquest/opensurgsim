@@ -15,7 +15,7 @@
 
 #include <memory>
 
-#include "SurgSim/Physics/MassSpringConstraintContact.h"
+#include "SurgSim/Physics/MassSpringConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
 
@@ -28,17 +28,17 @@ namespace SurgSim
 namespace Physics
 {
 
-MassSpringConstraintContact::MassSpringConstraintContact()
+MassSpringConstraintFrictionlessContact::MassSpringConstraintFrictionlessContact()
 {
 
 }
 
-MassSpringConstraintContact::~MassSpringConstraintContact()
+MassSpringConstraintFrictionlessContact::~MassSpringConstraintFrictionlessContact()
 {
 
 }
 
-void MassSpringConstraintContact::doBuild(double dt,
+void MassSpringConstraintFrictionlessContact::doBuild(double dt,
 			const ConstraintData& data,
 			const std::shared_ptr<Localization>& localization,
 			MlcpPhysicsProblem* mlcp,
@@ -90,12 +90,12 @@ void MassSpringConstraintContact::doBuild(double dt,
 	mlcp->updateConstraint(m_newH, massSpring->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
 }
 
-SurgSim::Math::MlcpConstraintType MassSpringConstraintContact::getMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType MassSpringConstraintFrictionlessContact::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 }
 
-size_t MassSpringConstraintContact::doGetNumDof() const
+size_t MassSpringConstraintFrictionlessContact::doGetNumDof() const
 {
 	return 1;
 }

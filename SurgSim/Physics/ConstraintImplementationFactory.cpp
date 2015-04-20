@@ -15,14 +15,14 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
-#include "SurgSim/Physics/Fem3DConstraintBilateral3D.h"
-#include "SurgSim/Physics/Fem3DConstraintContact.h"
+#include "SurgSim/Physics/Fem3DConstraintFixedPoint.h"
+#include "SurgSim/Physics/Fem3DConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
-#include "SurgSim/Physics/FixedConstraintBilateral3D.h"
-#include "SurgSim/Physics/FixedConstraintContact.h"
+#include "SurgSim/Physics/FixedConstraintFixedPoint.h"
+#include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/RigidConstraintBilateral3D.h"
-#include "SurgSim/Physics/RigidConstraintContact.h"
+#include "SurgSim/Physics/RigidConstraintFixedPoint.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 namespace SurgSim
@@ -32,12 +32,12 @@ namespace Physics
 
 ConstraintImplementationFactory::ConstraintImplementationFactory()
 {
-	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintContact>());
-	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintContact>());
-	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DConstraintContact>());
-	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintBilateral3D>());
-	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintBilateral3D>());
-	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DConstraintBilateral3D>());
+	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintFrictionlessContact>());
+	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintFrictionlessContact>());
+	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DConstraintFrictionlessContact>());
+	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintFixedPoint>());
+	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintFixedPoint>());
+	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DConstraintFixedPoint>());
 }
 
 ConstraintImplementationFactory::~ConstraintImplementationFactory()

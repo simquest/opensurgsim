@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_MASSSPRINGCONSTRAINTCONTACT_H
-#define SURGSIM_PHYSICS_MASSSPRINGCONSTRAINTCONTACT_H
+#ifndef SURGSIM_PHYSICS_MASSSPRINGCONSTRAINTFRICTIONLESSCONTACT_H
+#define SURGSIM_PHYSICS_MASSSPRINGCONSTRAINTFRICTIONLESSCONTACT_H
 
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
@@ -29,17 +29,17 @@ namespace Physics
 
 /// MassSpring frictionless contact implementation.
 ///
-/// MassSpringConstraintContact implements the frictionless contact constraint for the MassSpringRepresentation,
-/// which prevents nodes from passing through a surface.  See MassSpringConstraintContact::doBuild for more
-/// information.
-class MassSpringConstraintContact : public ConstraintImplementation
+/// MassSpringConstraintFrictionlessContact implements the frictionless contact constraint for the
+/// MassSpringRepresentation, which prevents nodes from passing through a surface.
+/// See MassSpringConstraintFrictionlessContact::doBuild for more information.
+class MassSpringConstraintFrictionlessContact : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	MassSpringConstraintContact();
+	MassSpringConstraintFrictionlessContact();
 
 	/// Destructor
-	virtual ~MassSpringConstraintContact();
+	virtual ~MassSpringConstraintFrictionlessContact();
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
@@ -72,4 +72,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_MASSSPRINGCONSTRAINTCONTACT_H
+#endif  // SURGSIM_PHYSICS_MASSSPRINGCONSTRAINTFRICTIONLESSCONTACT_H

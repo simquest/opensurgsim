@@ -30,7 +30,7 @@
 #include "SurgSim/Physics/MlcpMapping.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
-#include "SurgSim/Physics/RigidConstraintContact.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 using SurgSim::Physics::Constraint;
@@ -40,7 +40,7 @@ using SurgSim::Physics::MlcpMapping;
 using SurgSim::Physics::PhysicsManagerState;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidCollisionRepresentation;
-using SurgSim::Physics::RigidConstraintContact;
+using SurgSim::Physics::RigidConstraintFrictionlessContact;
 using SurgSim::Physics::RigidLocalization;
 using SurgSim::Physics::RigidRepresentation;
 

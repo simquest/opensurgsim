@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/Fem3DConstraintBilateral3D.h"
+#include "SurgSim/Physics/Fem3DConstraintFixedPoint.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
@@ -27,15 +27,15 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DConstraintBilateral3D::Fem3DConstraintBilateral3D()
+Fem3DConstraintFixedPoint::Fem3DConstraintFixedPoint()
 {
 }
 
-Fem3DConstraintBilateral3D::~Fem3DConstraintBilateral3D()
+Fem3DConstraintFixedPoint::~Fem3DConstraintFixedPoint()
 {
 }
 
-void Fem3DConstraintBilateral3D::doBuild(double dt,
+void Fem3DConstraintFixedPoint::doBuild(double dt,
 											 const ConstraintData& data,
 											 const std::shared_ptr<Localization>& localization,
 											 MlcpPhysicsProblem* mlcp,
@@ -80,7 +80,7 @@ void Fem3DConstraintBilateral3D::doBuild(double dt,
 	// So the transform from node-velocity to constraint space is
 	//    dt * sum(v_i * b_i)
 	//
-	// See RigidRepresentationBilateral3D for more implementation details.
+	// See RigidRepresentationFixedPoint for more implementation details.
 
 	// Update b with new violation: P(free motion)
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
@@ -108,12 +108,12 @@ void Fem3DConstraintBilateral3D::doBuild(double dt,
 	}
 }
 
-SurgSim::Math::MlcpConstraintType Fem3DConstraintBilateral3D::getMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType Fem3DConstraintFixedPoint::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-size_t Fem3DConstraintBilateral3D::doGetNumDof() const
+size_t Fem3DConstraintFixedPoint::doGetNumDof() const
 {
 	return 3;
 }
