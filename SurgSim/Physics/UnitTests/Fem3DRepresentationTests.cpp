@@ -236,7 +236,8 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 		for (auto point = points.cbegin(); point != points.cend(); ++point, ++barycentricCoordinate)
 		{
 			SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition(triangleId, *barycentricCoordinate);
-			SurgSim::DataStructures::Location location(triangleLocalPosition);
+			SurgSim::DataStructures::Location location(triangleLocalPosition,
+				SurgSim::DataStructures::Location::TRIANGLE);
 			std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 
 			EXPECT_NO_THROW(localization =
@@ -259,7 +260,9 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 	{
 		SCOPED_TRACE("Invalid node");
 
-		SurgSim::DataStructures::Location location(SurgSim::DataStructures::IndexedLocalCoordinate(1000, Vector()));
+		SurgSim::DataStructures::Location location(
+			SurgSim::DataStructures::IndexedLocalCoordinate(1000, Vector()),
+			SurgSim::DataStructures::Location::NODE);
 		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 		EXPECT_THROW(localization =
 			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
@@ -270,7 +273,9 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 	{
 		SCOPED_TRACE("Valid node");
 
-		SurgSim::DataStructures::Location location(SurgSim::DataStructures::IndexedLocalCoordinate(0, Vector()));
+		SurgSim::DataStructures::Location location(
+			SurgSim::DataStructures::IndexedLocalCoordinate(0, Vector()),
+			SurgSim::DataStructures::Location::NODE);
 		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 		EXPECT_NO_THROW(localization =
 			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
@@ -293,7 +298,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 		coord.coordinate.setZero(4);
 		coord.coordinate[0] = 1.0;
 
-		SurgSim::DataStructures::Location location(coord);
+		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::ELEMENT);
 		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 		EXPECT_THROW(localization =
 			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
@@ -309,7 +314,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 		coord.coordinate.setZero(5);
 		coord.coordinate[0] = 1.0;
 
-		SurgSim::DataStructures::Location location(coord);
+		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::ELEMENT);
 		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 		EXPECT_THROW(localization =
 			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
@@ -324,7 +329,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 		coord.index = 0;
 		coord.coordinate.setOnes(4);
 
-		SurgSim::DataStructures::Location location(coord);
+		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::ELEMENT);
 		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 		EXPECT_THROW(localization =
 			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(
@@ -340,7 +345,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 		coord.coordinate.setZero(4);
 		coord.coordinate[0] = 1.0;
 
-		SurgSim::DataStructures::Location location(coord);
+		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::ELEMENT);
 		std::shared_ptr<SurgSim::Physics::Fem3DRepresentationLocalization> localization;
 		EXPECT_NO_THROW(localization =
 			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DRepresentationLocalization>(

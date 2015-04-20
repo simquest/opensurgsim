@@ -33,9 +33,13 @@ namespace DataStructures
 /// - Any rigid shape (location identified by a local position)
 /// - Octree (location identified by an octree path)
 /// - A triangle mesh (location identified by the triangle id, and the barycentric coordinate of a point in it)
+/// - A node in a mesh (location identified by the node id)
+/// - An element in a mesh (location identified by the element id, and the barycentric coordinate of a point in it)
 struct Location
 {
 public:
+	enum Type {NODE, TRIANGLE, ELEMENT};
+
 	/// Default constructor
 	Location()
 	{
@@ -44,8 +48,11 @@ public:
 	/// Copy constructor
 	/// \param other The location to be copied while constructing.
 	Location(const Location& other)
-		: rigidLocalPosition(other.rigidLocalPosition), octreeNodePath(other.octreeNodePath),
-		meshLocalCoordinate(other.meshLocalCoordinate)
+		: rigidLocalPosition(other.rigidLocalPosition),
+		octreeNodePath(other.octreeNodePath),
+		triangleMeshLocalCoordinate(other.triangleMeshLocalCoordinate),
+		nodeMeshLocalCoordinate(other.nodeMeshLocalCoordinate),
+		elementMeshLocalCoordinate(other.elementMeshLocalCoordinate)
 	{}
 
 	/// Constructor for rigid local position
@@ -62,16 +69,25 @@ public:
 		octreeNodePath.setValue(nodePath);
 	}
 
-	/// Constructor for mesh local coordinate
-	/// \param localCoordinate The mesh local coordinate
-	explicit Location(const SurgSim::DataStructures::IndexedLocalCoordinate& localCoordinate)
+	/// Constructor for mesh-based location
+	/// \param localCoordinate index-based local coordinate
+	/// \param meshType the type of location (a node, a triangle or an element)
+	Location(const SurgSim::DataStructures::IndexedLocalCoordinate& localCoordinate, Type meshType)
 	{
-		meshLocalCoordinate.setValue(localCoordinate);
+		switch(meshType)
+		{
+		case NODE: nodeMeshLocalCoordinate.setValue(localCoordinate); break;
+		case TRIANGLE: triangleMeshLocalCoordinate.setValue(localCoordinate); break;
+		case ELEMENT: elementMeshLocalCoordinate.setValue(localCoordinate); break;
+		default: SURGSIM_FAILURE() << "Unknown location"; break;
+		}
 	}
 
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::OctreePath> octreeNodePath;
-	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> meshLocalCoordinate;
+	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> triangleMeshLocalCoordinate;
+	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> nodeMeshLocalCoordinate;
+	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> elementMeshLocalCoordinate;
 };
 
 }; // namespace DataStructures

@@ -70,20 +70,11 @@ SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(dou
 
 	Vector3d currentPosition, previousPosition;
 
-	// If only an index is given, it points directly to the node
-	if (m_position.coordinate.size() == 0)
-	{
-		currentPosition = femRepresentation->getCurrentState()->getPosition(m_position.index);
-		previousPosition = femRepresentation->getPreviousState()->getPosition(m_position.index);
-	}
-	else // otherwise, it points to a FemElement
-	{
-		std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
-		currentPosition = femElement->computeCartesianCoordinate(*femRepresentation->getCurrentState(),
-			m_position.coordinate);
-		previousPosition = femElement->computeCartesianCoordinate(*femRepresentation->getPreviousState(),
-			m_position.coordinate);
-	}
+	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
+	currentPosition = femElement->computeCartesianCoordinate(*femRepresentation->getCurrentState(),
+		m_position.coordinate);
+	previousPosition = femElement->computeCartesianCoordinate(*femRepresentation->getPreviousState(),
+		m_position.coordinate);
 
 	if (time == 0.0)
 	{
