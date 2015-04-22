@@ -128,6 +128,12 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 
 	auto program = Graphics::loadProgram(*Framework::Runtime::getApplicationData(), "Shaders/dns_mapping_material");
 	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/dns_mapping_material";
+
+	// Prepare vertex attributes
+	auto osgProgram = program->getOsgProgram();
+	osgProgram->addBindAttribLocation("tangent", Graphics::TANGENT_VERTEX_ATTRIBUTE_ID);
+	osgProgram->addBindAttribLocation("bitangent", Graphics::BITANGENT_VERTEX_ATTRIBUTE_ID);
+
 	material->setProgram(program);
 
 	material->addUniform("vec4", "specularColor");
