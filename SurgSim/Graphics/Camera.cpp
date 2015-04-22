@@ -15,6 +15,7 @@
 
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
 
 namespace SurgSim
 {
@@ -34,6 +35,15 @@ Camera::Camera(const std::string& name) : Representation(name)
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatViewMatrix, getViewMatrix);
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatProjectionMatrix, getProjectionMatrix);
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatInverseViewMatrix, getInverseViewMatrix);
+
+	{
+		typedef std::array<double, 4> ParamType;
+		SURGSIM_ADD_SETTER(Camera, ParamType, PerspectiveProjection, setPerspectiveProjection);
+	}
+	{
+		typedef std::array<double, 6> ParamType;
+		SURGSIM_ADD_SETTER(Camera, ParamType, OrthogonalProjection, setOrthogonalProjection);
+	}
 }
 
 void Camera::setRenderGroupReference(const std::string& name)
@@ -66,6 +76,17 @@ bool Camera::addGroupReference(const std::string& name)
 		result = Representation::addGroupReference(name);
 	}
 	return result;
+}
+
+void Camera::setPerspectiveProjection(std::array<double, 4> val)
+{
+	setPerspectiveProjection(val[0], val[1], val[2], val[3]);
+}
+
+void Camera::setOrthogonalProjection(std::array<double, 6> val)
+{
+
+	setOrthogonalProjection(val[0], val[1], val[2], val[3], val[4], val[5]);
 }
 
 bool Camera::doInitialize()
