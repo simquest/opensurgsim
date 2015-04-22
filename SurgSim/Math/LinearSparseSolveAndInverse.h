@@ -51,7 +51,7 @@ public:
 	/// Solve the linear system (matrix.x=b) using the matrix provided by the latest setMatrix call
 	/// for all columns of the rhs matrix b.
 	/// \param b The rhs matrix
-	/// \return The solution vector
+	/// \return The solution matrix
 	virtual Matrix solve(const Matrix& b) = 0;
 
 	/// Solve the linear system (matrix.x=b) using the matrix provided by the latest setMatrix call
