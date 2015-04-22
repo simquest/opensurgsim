@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_PHYSICS_PERFORMANCETESTS_DIVISIBLECUBEREPRESENTATION_H
+#define SURGSIM_PHYSICS_PERFORMANCETESTS_DIVISIBLECUBEREPRESENTATION_H
+
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
@@ -68,3 +71,5 @@ private:
 
 } // namespace Physics
 } // namespace SurgSim
+
+#endif // SURGSIM_PHYSICS_PERFORMANCETESTS_DIVISIBLECUBEREPRESENTATION_H
