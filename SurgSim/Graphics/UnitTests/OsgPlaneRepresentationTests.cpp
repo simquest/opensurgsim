@@ -59,7 +59,7 @@ TEST(OsgPlaneRepresentationTests, AccessibleTest)
 	std::shared_ptr<SurgSim::Framework::Component> component;
 	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
 									"SurgSim::Graphics::OsgPlaneRepresentation",
-									"capsule"));
+									"plane"));
 
 	EXPECT_EQ("SurgSim::Graphics::OsgPlaneRepresentation", component->getClassName());
 
@@ -69,27 +69,6 @@ TEST(OsgPlaneRepresentationTests, AccessibleTest)
 					   node.as<std::shared_ptr<SurgSim::Framework::Component>>());
 
 	EXPECT_NE(nullptr, decoded);
-}
-
-TEST(OsgPlaneRepresentationTests, OsgNodeTest)
-{
-	std::shared_ptr<OsgRepresentation> representation = std::make_shared<OsgPlaneRepresentation>("test name");
-
-	ASSERT_NE(nullptr, representation->getOsgNode());
-
-	osg::Switch* switchNode = dynamic_cast<osg::Switch*>(representation->getOsgNode().get());
-	ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
-
-	ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
-
-	osg::PositionAttitudeTransform* transformNode =
-		dynamic_cast<osg::PositionAttitudeTransform*>(switchNode->getChild(0));
-	ASSERT_NE(nullptr, transformNode) << "Could not get OSG transform node!";
-
-	ASSERT_EQ(1u, transformNode->getNumChildren()) << "OSG transform node should have 1 child, the geode!";
-
-	osg::Geode* geode = dynamic_cast<osg::Geode*>(transformNode->getChild(0));
-	ASSERT_NE(nullptr, geode) << "Could not get OSG geode!";
 }
 
 };  // namespace Graphics

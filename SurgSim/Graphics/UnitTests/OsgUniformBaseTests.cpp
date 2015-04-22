@@ -34,6 +34,11 @@ public:
 	explicit MockOsgUniformBase(const std::string& name) : OsgUniformBase(name)
 	{
 	}
+
+	void set(const YAML::Node&)
+	{
+
+	}
 };
 
 TEST(OsgUniformBaseTests, InitTest)
@@ -60,13 +65,13 @@ TEST(OsgUniformBaseTests, StateSetTest)
 
 	EXPECT_EQ(1u, uniforms.size()) << "State set has no uniforms, one should have been added!";
 	EXPECT_EQ(uniform.getOsgUniform(), uniforms.at("test name").first) <<
-		"First uniform in state set should be the added uniform!";
+			"First uniform in state set should be the added uniform!";
 
 	/// Remove the uniform from the state set
 	uniform.removeFromStateSet(stateSet.get());
 
 	EXPECT_EQ(0u, uniforms.size()) <<
-		"State set should no longer have any uniforms, the uniform should have been removed!";
+								   "State set should no longer have any uniforms, the uniform should have been removed!";
 }
 
 }  // namespace Graphics

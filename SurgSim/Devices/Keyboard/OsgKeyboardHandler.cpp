@@ -34,23 +34,36 @@ bool OsgKeyboardHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 {
 	bool result = false;
 
-	switch(ea.getEventType())
+	switch (ea.getEventType())
 	{
-	case(osgGA::GUIEventAdapter::KEYDOWN) :
-	{// Note that we are setting the modifier mask here instead of the modifier itself
-		m_keyboardScaffold.lock()->updateDevice(ea.getUnmodifiedKey(), ea.getModKeyMask());
-		result = true;
-		break;
+		case (osgGA::GUIEventAdapter::KEYDOWN) :
+			{
+				// Note that we are setting the modifier mask here instead of the modifier itself
+				m_keyboardScaffold.lock()->updateDevice(ea.getUnmodifiedKey(), ea.getModKeyMask());
+				result = true;
+				break;
+			}
+		case (osgGA::GUIEventAdapter::KEYUP) :
+			{
+				m_keyboardScaffold.lock()->updateDevice(KeyCode::NONE, ModKeyMask::MODKEY_NONE);
+				result = true;
+				break;
+			}
+		default:
+			result = false;
+			break;
 	}
-	case(osgGA::GUIEventAdapter::KEYUP) :
+
+	// We wan to to support some of the osg viewer keys, pass these through, we will still receive the event, but osg
+	// will also react here
+	int key = ea.getUnmodifiedKey();
+	if (key == 's' || key == 't' || key == 'v' || key == 'w')
 	{
-		m_keyboardScaffold.lock()->updateDevice(KeyCode::NONE, ModKeyMask::MODKEY_NONE);
-		result = true;
-		break;
-	}
-	default:
+		// s: Stats Display
+		// t: texturing
+		// v: vsync
+		// w: wireframe
 		result = false;
-		break;
 	}
 
 	return result;

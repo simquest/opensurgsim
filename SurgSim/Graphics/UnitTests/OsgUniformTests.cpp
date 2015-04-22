@@ -19,6 +19,7 @@
 #include "SurgSim/Graphics/OsgUniform.h"
 
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/MathConvert.h"
 
 #include <gtest/gtest.h>
 
@@ -82,6 +83,15 @@ std::pair<Type, boost::any> testAccessible(const Type& value)
 	return std::make_pair(osgUniform->get(), osgUniform->getValue("Value"));
 }
 
+template <class Type>
+Type testYamlSetter(const Type& value)
+{
+	YAML::Node node = YAML::convert<Type>::encode(value);
+	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
+	osgUniform->set(node);
+	return osgUniform->get();
+}
+
 /// Constructs an OsgUniform that stores a vector of values, sets it to the given vector values, and returns the result
 /// of Uniform::get() and the wrapped osg::Uniform::get().
 /// \tparam	Type	Uniform's value type
@@ -127,10 +137,14 @@ void testUniformFloat(FloatType min, FloatType max)
 	EXPECT_NEAR(value, result.second, Eigen::NumTraits<FloatType>::dummy_precision());
 
 	auto accessibleResult = testAccessible<FloatType>(value);
-	FloatType resultValue;
+	FloatType accessibleValue;
 	ASSERT_NO_THROW({boost::any_cast<FloatType>(accessibleResult.second);});
-	resultValue = boost::any_cast<FloatType>(accessibleResult.second);
-	EXPECT_NEAR(value, resultValue, Eigen::NumTraits<FloatType>::dummy_precision());
+	accessibleValue = boost::any_cast<FloatType>(accessibleResult.second);
+	EXPECT_NEAR(value, accessibleValue, Eigen::NumTraits<FloatType>::dummy_precision());
+
+	FloatType nodeValue;
+	EXPECT_NO_THROW(nodeValue = testYamlSetter<FloatType>(value));
+	EXPECT_NEAR(value, nodeValue, Eigen::NumTraits<FloatType>::dummy_precision());
 }
 
 /// Tests OsgUniform with a vector of random floating point type values.
@@ -175,9 +189,13 @@ void testUniformInt(IntType min, IntType max)
 	EXPECT_EQ(value, result.second);
 
 	auto accessibleResult = testAccessible<IntType>(value);
-	IntType resultValue;
-	ASSERT_NO_THROW({resultValue = boost::any_cast<IntType>(accessibleResult.second);});
-	EXPECT_EQ(value, resultValue);
+	IntType accessibleValue;
+	ASSERT_NO_THROW({accessibleValue = boost::any_cast<IntType>(accessibleResult.second);});
+	EXPECT_EQ(value, accessibleValue);
+
+	IntType nodeValue;
+	EXPECT_NO_THROW(nodeValue = testYamlSetter<IntType>(value));
+	EXPECT_EQ(value, nodeValue);
 }
 
 /// Tests OsgUniform with a vector of random integer type values.
@@ -220,10 +238,14 @@ void testUniformEigen()
 	EXPECT_TRUE(fromOsg(result.second).isApprox(value));
 
 	auto accessibleResult = testAccessible<Type>(value);
-	Type resultValue;
+	Type accessibleValue;
 	ASSERT_NO_THROW({boost::any_cast<Type>(accessibleResult.second);});
-	resultValue = boost::any_cast<Type>(accessibleResult.second);
-	EXPECT_TRUE(value.isApprox(resultValue));
+	accessibleValue = boost::any_cast<Type>(accessibleResult.second);
+	EXPECT_TRUE(value.isApprox(accessibleValue));
+
+	Type nodeValue;
+	EXPECT_NO_THROW(nodeValue = testYamlSetter<Type>(value));
+	EXPECT_TRUE(value.isApprox(nodeValue));
 }
 
 /// Tests OsgUniform with a vector of random Eigen type values.
