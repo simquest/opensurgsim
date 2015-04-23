@@ -113,6 +113,7 @@ public:
 	/// Set the compliance warping flag
 	/// \param useComplianceWarping True to use compliance warping, False otherwise
 	/// \exception SurgSim::Framework::AssertionFailure If the call is done after initialization
+	/// \note Compliance warping is currently disabled in this version.
 	void setComplianceWarping(bool useComplianceWarping);
 
 	/// Get the compliance warping flag (default = false)
