@@ -78,12 +78,12 @@ bool Camera::addGroupReference(const std::string& name)
 	return result;
 }
 
-void Camera::setPerspectiveProjection(std::array<double, 4> val)
+void Camera::setPerspectiveProjection(const std::array<double, 4>& val)
 {
 	setPerspectiveProjection(val[0], val[1], val[2], val[3]);
 }
 
-void Camera::setOrthogonalProjection(std::array<double, 6> val)
+void Camera::setOrthogonalProjection(const std::array<double, 6>& val)
 {
 
 	setOrthogonalProjection(val[0], val[1], val[2], val[3], val[4], val[5]);

@@ -266,11 +266,7 @@ TEST(OsgCameraTests, SetProjection)
 
 
 	// Windows does not support initializer lists ...
-	std::array<double, 4> persp;
-	persp[0] = 90.0;
-	persp[1] = 1.0;
-	persp[2] = 0.01;
-	persp[3] = 10.0;
+	std::array<double, 4> persp = {{90.0, 1.0, 0.01, 10.0}};
 
 	osgCamera->setProjectionMatrixAsPerspective(persp[0], persp[1], persp[2], persp[3]);
 	auto expectedPerspective = Graphics::fromOsg(osgCamera->getProjectionMatrix());
@@ -285,14 +281,7 @@ TEST(OsgCameraTests, SetProjection)
 
 	camera->setProjectionMatrix(identity);
 
-
-	std::array<double, 6> ortho;
-	ortho[0] = -1.0;
-	ortho[1] = 1.0;
-	ortho[2] = 2.0;
-	ortho[3] = -2.0;
-	ortho[4] = 3.0;
-	ortho[5] = -3.0;
+	std::array<double, 6> ortho = {{ -1.0, 1.0, 2.0, -2.0, 3.0, -3.0}};
 
 	osgCamera->setProjectionMatrixAsOrtho(ortho[0], ortho[1], ortho[2], ortho[3], ortho[4], ortho[5]);
 	auto expectedOrtho = Graphics::fromOsg(osgCamera->getProjectionMatrix());

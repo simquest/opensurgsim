@@ -144,9 +144,9 @@ public:
 
 private:
 
-	void setPerspectiveProjection(std::array<double, 4> val);
+	void setPerspectiveProjection(const std::array<double, 4>& val);
 
-	void setOrthogonalProjection(std::array<double, 6> val);
+	void setOrthogonalProjection(const std::array<double, 6>& val);
 
 	bool doInitialize() override;
 
