@@ -158,6 +158,10 @@ macro(surgsim_add_unit_tests TEST_NAME)
             VERBATIM)
     endif()
 
+	# Enable bigobj for unit tests, this lets us buid the bigger templated unit tests without problems
+	if(MSVC)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+	endif()
 
 	# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
 	surgsim_copy_to_target_directory(${TEST_NAME}
