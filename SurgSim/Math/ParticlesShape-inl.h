@@ -12,20 +12,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 
-#ifndef SURGSIM_MATH_SHAPES_H
-#define SURGSIM_MATH_SHAPES_H
+#ifndef SURGSIM_MATH_PARTICLESSHAPE_INL_H
+#define SURGSIM_MATH_PARTICLESSHAPE_INL_H
 
-/// This file includes all the shapes
-#include "SurgSim/Math/BoxShape.h"
-#include "SurgSim/Math/CapsuleShape.h"
-#include "SurgSim/Math/CylinderShape.h"
-#include "SurgSim/Math/DoubleSidedPlaneShape.h"
-#include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/Math/OctreeShape.h"
-#include "SurgSim/Math/ParticlesShape.h"
-#include "SurgSim/Math/PlaneShape.h"
-#include "SurgSim/Math/SphereShape.h"
-#include "SurgSim/Math/SurfaceMeshShape.h"
+namespace SurgSim
+{
+namespace Math
+{
 
-#endif // SURGSIM_MATH_SHAPES_H
+template <class VertexData>
+ParticlesShape::ParticlesShape(const SurgSim::DataStructures::Vertices<VertexData>& other)
+{
+	getVertices().reserve(other.getVertices().size());
+	for (auto& otherVertex : other.getVertices())
+	{
+		addVertex(VertexType(otherVertex.position));
+	}
+	update();
+}
+
+}; // namespace Math
+}; // namespace SurgSim
+
+#endif

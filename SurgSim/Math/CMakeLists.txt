@@ -40,6 +40,7 @@ set(SURGSIM_MATH_SOURCES
 	OdeSolverRungeKutta4.cpp
 	OdeSolverStatic.cpp
 	OdeState.cpp
+	ParticlesShape.cpp
 	PlaneShape.cpp
 	Shape.cpp
 	SphereShape.cpp
@@ -84,6 +85,8 @@ set(SURGSIM_MATH_HEADERS
 	OdeSolverRungeKutta4.h
 	OdeSolverStatic.h
 	OdeState.h
+	ParticlesShape.h
+	ParticlesShape-inl.h
 	PlaneShape.h
 	Quaternion.h
 	RigidTransform.h
