@@ -417,6 +417,15 @@ public:
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
+	void setPerspectiveProjection(double fovy, double aspect, double near, double far)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void setOrthogonalProjection(double left, double right, double bottom, double top, double near, double far)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
 
 
 private:
