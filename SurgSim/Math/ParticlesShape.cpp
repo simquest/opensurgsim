@@ -69,7 +69,7 @@ void ParticlesShape::setRadius(double radius)
 
 bool ParticlesShape::doUpdate()
 {
-	const size_t numParticles = getVertices().size();
+	const double numParticles = static_cast<double>(getVertices().size());
 	const Vector3d radius = Vector3d::Constant(m_radius);
 
 	std::list<DataStructures::AabbTreeData::Item> items;

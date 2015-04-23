@@ -33,11 +33,28 @@ namespace Math
 
 TEST(ParticlesShapeTests, CanConstruct)
 {
-	ASSERT_NO_THROW(ParticlesShape particles());
-	ASSERT_NO_THROW(ParticlesShape particles(0.01));
+	ASSERT_NO_THROW({ ParticlesShape particles; });
+	ASSERT_NO_THROW({ ParticlesShape particles(0.01); });
+}
 
-	ASSERT_NO_THROW(ParticlesShape particles(DataStructures::Vertices<DataStructures::NormalData>()));
-	ASSERT_NO_THROW(ParticlesShape particles(DataStructures::Vertices<DataStructures::EmptyData>()));
+TEST(ParticlesShapeTests, CopyConstruct)
+{
+	{
+		DataStructures::Vertices<DataStructures::EmptyData> otherVertices;
+		otherVertices.addVertex(DataStructures::Vertex<DataStructures::EmptyData>(Vector3d::Constant(3.0)));
+
+		ParticlesShape particles(otherVertices);
+		EXPECT_EQ(1, particles.getNumVertices());
+		EXPECT_TRUE(particles.getVertex(0).position.isApprox(Vector3d::Constant(3.0)));
+	}
+	{
+		DataStructures::Vertices<DataStructures::NormalData> otherVertices;
+		otherVertices.addVertex(DataStructures::Vertex<DataStructures::NormalData>(Vector3d::Constant(3.0)));
+
+		ParticlesShape particles(otherVertices);
+		EXPECT_EQ(1, particles.getNumVertices());
+		EXPECT_TRUE(particles.getVertex(0).position.isApprox(Vector3d::Constant(3.0)));
+	}
 }
 
 TEST(ParticlesShapeTests, DefaultProperties)
@@ -52,16 +69,6 @@ TEST(ParticlesShapeTests, SetGetRadius)
 	ParticlesShape particles;
 	particles.setRadius(0.1);
 	EXPECT_NEAR(0.1, particles.getRadius(), epsilon);
-}
-
-TEST(ParticlesShapeTests, CopyVertices)
-{
-	DataStructures::Vertices<DataStructures::NormalData> otherVertices;
-	otherVertices.addVertex(DataStructures::Vertex<DataStructures::NormalData>(Vector3d::Constant(3.0)));
-
-	ParticlesShape particles(otherVertices);
-	EXPECT_EQ(1, particles.getNumVertices());
-	EXPECT_TRUE(particles.getVertex(0).position.isApprox(Vector3d::Constant(3.0)));
 }
 
 TEST(ParticlesShapeTests, GeometricProperties)
