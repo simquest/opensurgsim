@@ -52,10 +52,6 @@ void Representation::resetState()
 {
 }
 
-void Representation::resetParameters()
-{
-}
-
 size_t Representation::getNumDof() const
 {
 	return m_numDof;
