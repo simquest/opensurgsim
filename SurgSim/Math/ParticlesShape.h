@@ -78,14 +78,19 @@ public:
 private:
 	bool doUpdate() override;
 
+	/// The aabb tree of the ParticlesShape
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
 
+	/// Particles' radius
 	double m_radius;
 
+	/// Volumetric center of particles
 	Vector3d m_center;
 
+	/// Total volume of particles
 	double m_volume;
 
+	/// Second moment of volume
 	Matrix33d m_secondMomentOfVolume;
 };
 
