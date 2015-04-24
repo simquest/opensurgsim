@@ -59,9 +59,9 @@ set(UNIT_TEST_EIGEN_TYPE_SOURCES
 set(UNIT_TEST_EIGEN_TYPE_HEADERS
 )
 
-set(BUILD_TESTING_EIGEN
-	CACHE BOOL OFF "Include basic tests for Eigen math class typedefs, which build very slowly."
-	)
+option(BUILD_TESTING_EIGEN
+	"Include basic tests for Eigen math class typedefs, which build very slowly."
+	OFF)
 if(BUILD_TESTING_EIGEN)
 	set(UNIT_TEST_SOURCES ${UNIT_TEST_SOURCES} ${UNIT_TEST_EIGEN_TYPE_SOURCES})
 	set(UNIT_TEST_HEADERS ${UNIT_TEST_HEADERS} ${UNIT_TEST_EIGEN_TYPE_HEADERS})

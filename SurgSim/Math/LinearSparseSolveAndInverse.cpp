@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 
 namespace SurgSim
@@ -27,17 +28,17 @@ void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
 	m_lu.compute(matrix);
 }
 
-Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b)
+Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const
 {
 	return m_lu.solve(b);
 }
 
-Vector LinearSparseSolveAndInverseLU::solve(const Vector& b)
+Vector LinearSparseSolveAndInverseLU::solve(const Vector& b) const
 {
 	return m_lu.solve(b);
 }
 
-Matrix LinearSparseSolveAndInverseLU::getInverse()
+Matrix LinearSparseSolveAndInverseLU::getInverse() const
 {
 	return (m_lu.solve(Matrix::Identity(m_lu.rows(), m_lu.cols())));
 }
