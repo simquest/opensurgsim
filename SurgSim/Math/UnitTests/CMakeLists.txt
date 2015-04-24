@@ -49,6 +49,7 @@ set(UNIT_TEST_HEADERS
 
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
 	LinearSolveAndInverseTests.cpp
+	LinearSparseSolveAndInverseTests.cpp
 	MatrixTests.cpp
 	QuaternionTests.cpp
 	RigidTransformTests.cpp
@@ -65,7 +66,6 @@ option(BUILD_TESTING_EIGEN
 if(BUILD_TESTING_EIGEN)
 	set(UNIT_TEST_SOURCES ${UNIT_TEST_SOURCES} ${UNIT_TEST_EIGEN_TYPE_SOURCES})
 	set(UNIT_TEST_HEADERS ${UNIT_TEST_HEADERS} ${UNIT_TEST_EIGEN_TYPE_HEADERS})
-
 	# Fix a problem with 64-bit builds running out of sections.
 	if(MSVC AND CMAKE_CL_64)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
