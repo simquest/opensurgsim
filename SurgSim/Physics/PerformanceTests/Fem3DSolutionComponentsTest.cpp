@@ -83,7 +83,7 @@ public:
 		totalTime.beginFrame();
 		for (int i = 0; i < frameCount; i++)
 		{
-			fem->noSetInitialize();
+			fem->initializeNoWakeUp();
 		}
 		totalTime.endFrame();
 		RecordProperty("Duration", boost::to_string(totalTime.getCumulativeTime()));
