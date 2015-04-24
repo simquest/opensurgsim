@@ -68,7 +68,8 @@ SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(dou
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
 
-	Vector3d currentPosition, previousPosition;
+	Vector3d currentPosition;
+	Vector3d previousPosition;
 
 	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
 	currentPosition = femElement->computeCartesianCoordinate(*femRepresentation->getCurrentState(),
