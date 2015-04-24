@@ -203,11 +203,11 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 					Vector3d barycentricCoordinate;
 					SurgSim::Math::barycentricCoordinates(penetrationPointA, verticesA[0], verticesA[1], verticesA[2],
 						normalA, &barycentricCoordinate);
-					penetrationPoints.first.meshLocalCoordinate.setValue(
+					penetrationPoints.first.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
 					SurgSim::Math::barycentricCoordinates(penetrationPointB, verticesB[0], verticesB[1], verticesB[2],
 						normalB, &barycentricCoordinate);
-					penetrationPoints.second.meshLocalCoordinate.setValue(
+					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate));
 
 					penetrationPoints.first.rigidLocalPosition.setValue(
