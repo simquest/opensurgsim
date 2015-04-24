@@ -51,7 +51,8 @@ public:
 
 	void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) override;
 
-	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K, double scale = 1.0) override;
+	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+					  double scale = 1.0) override;
 
 	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M, double scale = 1.0) override;
 

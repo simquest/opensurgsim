@@ -79,7 +79,8 @@ public:
 	/// \param state The state to compute the stiffness matrix with
 	/// \param[in,out] K The complete system stiffness matrix to add the spring stiffness matrix into
 	/// \param scale A factor to scale the added stiffness matrix with
-	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K, double scale = 1.0) override;
+	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+					  double scale = 1.0) override;
 
 	/// Adds the spring force vector, mass, stiffness and damping matrices (computed for a given state) into a
 	/// complete system data structure F, D, K (assembly)

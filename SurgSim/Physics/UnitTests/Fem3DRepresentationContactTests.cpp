@@ -237,7 +237,7 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpIndiciesTest)
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
 	Eigen::Matrix<double, 1, 5> localH;
 	localH <<
-		0.9478,  -0.3807,  0.5536, -0.6944,  0.1815;
+		   0.9478,  -0.3807,  0.5536, -0.6944,  0.1815;
 	mlcpPhysicsProblem.H.block<1, 5>(0, 0) = localH;
 
 	Eigen::Matrix<double, 5, 5> localC;
@@ -266,7 +266,8 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpIndiciesTest)
 	setContactAt(coord);
 
 	implementation->build(dt, m_constraintData, m_localization,
-						  &mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+						  &mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint,
+						  SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	const Vector3d newPosition = (Vector3d(0.30, -0.57,  0.40) * barycentric[0] +
 								  Vector3d(0.06,  0.63, -0.32) * barycentric[1] +

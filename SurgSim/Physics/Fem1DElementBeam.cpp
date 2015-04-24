@@ -139,7 +139,8 @@ void Fem1DElementBeam::addStiffness(const SurgSim::Math::OdeState& state, SurgSi
 }
 
 void Fem1DElementBeam::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
-							   SurgSim::Math::SparseMatrix* M, SurgSim::Math::SparseMatrix* D, SurgSim::Math::SparseMatrix* K)
+							   SurgSim::Math::SparseMatrix* M, SurgSim::Math::SparseMatrix* D,
+							   SurgSim::Math::SparseMatrix* K)
 {
 	// Assemble the mass matrix
 	addMass(state, M);

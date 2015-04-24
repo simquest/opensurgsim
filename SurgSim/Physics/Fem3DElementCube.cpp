@@ -112,7 +112,8 @@ void Fem3DElementCube::computeMass(const SurgSim::Math::OdeState& state,
 			for (int k = 0; k < 2; ++k)
 			{
 				addMassMatrixAtPoint(state,
-									 gaussQuadrature2Points[i], gaussQuadrature2Points[j], gaussQuadrature2Points[k], M);
+									 gaussQuadrature2Points[i], gaussQuadrature2Points[j],
+									 gaussQuadrature2Points[k], M);
 			}
 		}
 	}
@@ -147,7 +148,8 @@ void Fem3DElementCube::computeStiffness(const SurgSim::Math::OdeState& state,
 			for (int k = 0; k < 2; ++k)
 			{
 				addStrainStressStiffnessAtPoint(state,
-												gaussQuadrature2Points[i], gaussQuadrature2Points[j], gaussQuadrature2Points[k],
+												gaussQuadrature2Points[i], gaussQuadrature2Points[j],
+												gaussQuadrature2Points[k],
 												strain, stress, stiffness);
 			}
 		}
@@ -401,8 +403,10 @@ double Fem3DElementCube::getVolume(const SurgSim::Math::OdeState& state) const
 	SURGSIM_ASSERT(v > 1e-12) << "Fem3DElementCube ill-defined, its volume is " << v << std::endl <<
 							  "Please make sure the element is not degenerate and " <<
 							  "check the node ordering of your element formed by node ids " <<
-							  m_nodeIds[0] << " " << m_nodeIds[1] << " " << m_nodeIds[2] << " " << m_nodeIds[3] << " " <<
-							  m_nodeIds[4] << " " << m_nodeIds[5] << " " << m_nodeIds[6] << " " << m_nodeIds[7] << std::endl;
+							  m_nodeIds[0] << " " << m_nodeIds[1] << " " << m_nodeIds[2] << " " <<
+							  m_nodeIds[3] << " " <<
+							  m_nodeIds[4] << " " << m_nodeIds[5] << " " << m_nodeIds[6] << " " <<
+							  m_nodeIds[7] << std::endl;
 
 	return v;
 }

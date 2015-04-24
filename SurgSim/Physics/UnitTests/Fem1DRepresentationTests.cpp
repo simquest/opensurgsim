@@ -170,11 +170,13 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 
 	Vector F = Vector::Zero(fem->getNumDof());
 	F.segment(0, fem->getNumDofPerNode()) = Flocal;
-	SparseMatrix K(static_cast<SparseMatrix::Index>(fem->getNumDof()), static_cast<SparseMatrix::Index>(fem->getNumDof()));
+	SparseMatrix K(static_cast<SparseMatrix::Index>(fem->getNumDof()),
+				   static_cast<SparseMatrix::Index>(fem->getNumDof()));
 	K.setZero();
 	Math::addSubMatrix(Klocal, 0, 0, &K, true);
 	K.makeCompressed();
-	SparseMatrix D(static_cast<SparseMatrix::Index>(fem->getNumDof()), static_cast<SparseMatrix::Index>(fem->getNumDof()));
+	SparseMatrix D(static_cast<SparseMatrix::Index>(fem->getNumDof()),
+				   static_cast<SparseMatrix::Index>(fem->getNumDof()));
 	D.setZero();
 	Math::addSubMatrix(Dlocal, 0, 0, &D, true);
 	D.makeCompressed();
@@ -229,8 +231,8 @@ TEST(Fem1DRepresentationTests, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 
 	std::shared_ptr<Fem1DRepresentation> newRepresentation;
-	ASSERT_NO_THROW(newRepresentation =
-						std::dynamic_pointer_cast<Fem1DRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	ASSERT_NO_THROW(newRepresentation = std::dynamic_pointer_cast<Fem1DRepresentation>
+										(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	ASSERT_NE(nullptr, newRepresentation);
 
 	EXPECT_EQ("SurgSim::Physics::Fem1DRepresentation", newRepresentation->getClassName());

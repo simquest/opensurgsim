@@ -211,7 +211,8 @@ public:
 
 	void addForce(const OdeState& state, Vector* F, double scale = 1.0) override;
 	void addDamping(const OdeState& state, SparseMatrix* D, double scale = 1.0) override;
-	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K, double scale = 1.0) override;
+	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+					  double scale = 1.0) override;
 
 	void addFDK(const OdeState& state, Vector* f, SparseMatrix* D, SparseMatrix* K) override;
 	void addMatVec(const OdeState& state, double alphaD, double alphaK, const Vector& x, Vector* F) override;

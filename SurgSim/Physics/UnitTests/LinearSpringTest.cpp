@@ -435,9 +435,11 @@ TEST(LinearSpringTests, computeMethods)
 		for (size_t row = 0; row < 6; ++row)
 		{
 			EXPECT_NEAR(\
-						1.4 * expectedD.row(row).dot(oneToSix) + 4.1 * expectedK.row(row).dot(oneToSix), f[row], epsilon) <<
-								"f[" << row << "] = " << f[row] <<
-								" expectedValue = " << 1.4 * expectedD.row(row).dot(oneToSix) + 4.1 * expectedK.row(row).dot(oneToSix);
+						1.4 * expectedD.row(row).dot(oneToSix) + 4.1 * expectedK.row(row).dot(oneToSix),
+						f[row], epsilon) <<
+										 "f[" << row << "] = " << f[row] <<
+										 " expectedValue = " << 1.4 * expectedD.row(row).dot(oneToSix) +
+										 4.1 * expectedK.row(row).dot(oneToSix);
 		}
 	}
 }

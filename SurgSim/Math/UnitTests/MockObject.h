@@ -311,7 +311,8 @@ public:
 
 	const SparseMatrix& computeK(const OdeState& state) override
 	{
-		m_K.resize(static_cast<SparseMatrix::Index>(state.getNumDof()), static_cast<SparseMatrix::Index>(state.getNumDof()));
+		m_K.resize(static_cast<SparseMatrix::Index>(state.getNumDof()),
+				   static_cast<SparseMatrix::Index>(state.getNumDof()));
 		m_K.setIdentity();
 		m_K *= state.getVelocities().squaredNorm();
 		return m_K;

@@ -125,7 +125,8 @@ void Fem2DElementTriangle::addStiffness(const Math::OdeState& state, Math::Spars
 }
 
 void Fem2DElementTriangle::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
-								   SurgSim::Math::SparseMatrix* M, SurgSim::Math::SparseMatrix* D, SurgSim::Math::SparseMatrix* K)
+								   SurgSim::Math::SparseMatrix* M, SurgSim::Math::SparseMatrix* D,
+								   SurgSim::Math::SparseMatrix* K)
 {
 	// Assemble the mass matrix
 	addMass(state, M);
@@ -278,7 +279,8 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 
 		Matrix39Type strainDisplacementAtGaussPoint = batozStrainDisplacement(xi , eta);
 		plateKLocal += ((2.0 * m_restArea) * 0.5 * weight) *
-					   strainDisplacementAtGaussPoint.transpose() * plateElasticMaterial * strainDisplacementAtGaussPoint;
+					   strainDisplacementAtGaussPoint.transpose() * plateElasticMaterial *
+					   strainDisplacementAtGaussPoint;
 	}
 
 	// Assemble shell stiffness as combination of membrane (Ux Uy) and plate stiffnesses (Uz ThetaX ThetaY)
@@ -770,7 +772,8 @@ void Fem2DElementTriangle::computeShapeFunctionsParameters(const SurgSim::Math::
 
 	// Also note that x1>=0 and y2>=0 by construction
 	SURGSIM_ASSERT(x1 >= 0 && y2 >= 0) <<
-									   "Membrane local transform problem. We should have x1>=0 and y2>=0, but we have x1=" << x1 <<
+									   "Membrane local transform problem. We should have " <<
+									   "x1>=0 and y2>=0, but we have x1=" << x1 <<
 									   " y2=" << y2;
 
 	// Note: 2Area(ABC) = 2A = (x0y1 + x1y2 + x2y0 - x0y2 - x1y0 - x2y1) =
@@ -781,7 +784,8 @@ void Fem2DElementTriangle::computeShapeFunctionsParameters(const SurgSim::Math::
 	SURGSIM_ASSERT(m_restArea != 0.0) << "Triangle with null area, A=(" << a.transpose() <<
 									  "), B=(" << b.transpose() << "), C=(" << c.transpose() << ")";
 	SURGSIM_ASSERT(m_restArea > 0.0) << "Triangle with negtive area, Area = " << m_restArea <<
-									 ", A=(" << a.transpose() << "), B=(" << b.transpose() << "), C=(" << c.transpose() << ")";
+									 ", A=(" << a.transpose() << "), B=(" << b.transpose() << "), C=(" <<
+									 c.transpose() << ")";
 
 	// Membrane shape functions
 	// Notation: yij = yi - yj (reminder Przemieniecki use  1-based indexing, while we use 0-based)

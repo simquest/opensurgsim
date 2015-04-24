@@ -175,7 +175,8 @@ protected:
 	/// \note If {useGlobalMassMatrix | useGlobalStiffnessMatrix} is False
 	/// \note    the {mass|stiffness} component will be computed FemElement by FemElement
 	void addRayleighDampingForce(SurgSim::Math::Vector* f, const SurgSim::Math::OdeState& state,
-								 bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false, double scale = 1.0);
+								 bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false,
+								 double scale = 1.0);
 
 	/// Adds the FemElements forces to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the FemElements forces into

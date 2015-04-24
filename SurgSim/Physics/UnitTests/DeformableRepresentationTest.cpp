@@ -133,7 +133,8 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_EQ(0, getExternalGeneralizedDamping().rows());
 	EXPECT_EQ(0, getExternalGeneralizedDamping().cols());
 	setInitialState(m_localInitialState);
-	SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(getNumDof()),
+							static_cast<SparseMatrix::Index>(getNumDof()));
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedForce().size());
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedStiffness().rows());
 	EXPECT_EQ(getNumDof(), getExternalGeneralizedStiffness().cols());
@@ -318,7 +319,8 @@ TEST_F(DeformableRepresentationTest, AfterUpdateTest)
 {
 	// setInitialState sets all 4 states (tested in method above !)
 	setInitialState(m_localInitialState);
-	SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(getNumDof()),
+							static_cast<SparseMatrix::Index>(getNumDof()));
 
 	// Initialize and wake-up the deformable component
 	EXPECT_NO_THROW(EXPECT_TRUE(initialize(std::make_shared<SurgSim::Framework::Runtime>())));

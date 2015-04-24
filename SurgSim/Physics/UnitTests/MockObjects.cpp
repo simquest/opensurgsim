@@ -231,7 +231,8 @@ void MockSpring::addDamping(const OdeState& state, SparseMatrix* D, double scale
 		for (auto nodeId2 : m_nodeIds)
 		{
 			Math::addSubMatrix(scaledDense.block(3 * index1, 3 * index2, 3, 3),
-							   static_cast<SparseMatrix::Index>(nodeId1), static_cast<SparseMatrix::Index>(nodeId2), D, false);
+							   static_cast<SparseMatrix::Index>(nodeId1),
+							   static_cast<SparseMatrix::Index>(nodeId2), D, false);
 			++index2;
 		}
 		++index1;
@@ -251,7 +252,8 @@ void MockSpring::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Mat
 		for (auto nodeId2 : m_nodeIds)
 		{
 			Math::addSubMatrix(scaledDense.block(3 * index1, 3 * index2, 3, 3),
-							   static_cast<SparseMatrix::Index>(nodeId1), static_cast<SparseMatrix::Index>(nodeId2), K, false);
+							   static_cast<SparseMatrix::Index>(nodeId1),
+							   static_cast<SparseMatrix::Index>(nodeId2), K, false);
 			++index2;
 		}
 		++index1;

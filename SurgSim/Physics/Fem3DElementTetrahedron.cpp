@@ -78,8 +78,8 @@ void Fem3DElementTetrahedron::initialize(const SurgSim::Math::OdeState& state)
 	SurgSim::Math::Vector3d AC = C - A;
 	SurgSim::Math::Vector3d AD = D - A;
 	SURGSIM_LOG_IF(AB.cross(AC).dot(AD) < 0, SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
-			<< "Tetrahedron ill-defined (ABC defined counter clock viewed from D) with node ids[" << m_nodeIds[0] << ", "
-			<< m_nodeIds[1] << ", " << m_nodeIds[2] << ", " << m_nodeIds[3] << "]";
+			<< "Tetrahedron ill-defined (ABC defined counter clock viewed from D) with node ids[" <<
+			m_nodeIds[0] << ", " << m_nodeIds[1] << ", " << m_nodeIds[2] << ", " << m_nodeIds[3] << "]";
 
 	// Pre-compute the mass and stiffness matrix
 	computeMass(state, &m_M);

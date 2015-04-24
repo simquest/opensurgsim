@@ -28,7 +28,7 @@ namespace Physics
 {
 
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void FemElement::assembleMatrixBlocks(DerivedSub& subMatrix, const std::vector<size_t> blockIds,
+void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
 									  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
 									  bool initialize)
 {
@@ -45,13 +45,13 @@ void FemElement::assembleMatrixBlocks(DerivedSub& subMatrix, const std::vector<s
 			{
 				Math::blockOperation(subMatrix.block(subRow, subCol, blockSize, blockSize),
 									 matrixRow, matrixCol, matrix,
-									 &Math::Operation<T, Opt, Index, Eigen::Block<DerivedSub>>::add);
+									 &Math::Operation<T, Opt, Index, Eigen::Block<const DerivedSub>>::add);
 			}
 			else
 			{
 				Math::blockWithSearch(subMatrix.block(subRow, subCol, blockSize, blockSize),
 									  matrixRow, matrixCol, blockSize, blockSize, matrix,
-									  &Math::Operation<T, Opt, Index, Eigen::Block<DerivedSub>>::add);
+									  &Math::Operation<T, Opt, Index, Eigen::Block<const DerivedSub>>::add);
 			}
 		}
 	}

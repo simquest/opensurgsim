@@ -181,11 +181,12 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 	}
 
 	SURGSIM_ASSERT(3 * getNumMasses() == getNumDof()) <<
-			"Mismatch between the number of masses (" << getNumMasses() << ") and the number of dof (" << getNumDof() << ")";
+			"Mismatch between the number of masses (" << getNumMasses() <<
+			") and the number of dof (" << getNumDof() << ")";
 	SURGSIM_ASSERT(getNumMasses()) << "No masses specified yet, call addMass() prior to running the simulation";
 	SURGSIM_ASSERT(getNumSprings()) << "No springs specified yet, call addSpring() prior to running the simulation";
-	SURGSIM_ASSERT(getNumDof()) <<
-								"State has not been initialized yet, call setInitialState() prior to running the simulation";
+	SURGSIM_ASSERT(getNumDof()) << "State has not been initialized yet, call setInitialState() " <<
+								"prior to running the simulation";
 }
 
 Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)

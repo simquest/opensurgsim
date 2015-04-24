@@ -404,7 +404,8 @@ public:
 			res(0, i) = coefficient * (m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_deta[i]);
 			res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_deta[i]);
 			res(2, i) = coefficient *
-						(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_deta[i]);
+						(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] +
+						 m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_deta[i]);
 		}
 
 		return res;
@@ -485,16 +486,20 @@ public:
 		double coefficient = 1.0 / (2.0 * m_restArea);
 
 		dHx_dxi = batozFx(xi, eta, &MockFem2DElement::batozDN1Dxi , &MockFem2DElement::batozDN2Dxi ,
-						  &MockFem2DElement::batozDN3Dxi , &MockFem2DElement::batozDN4Dxi , &MockFem2DElement::batozDN5Dxi ,
+						  &MockFem2DElement::batozDN3Dxi , &MockFem2DElement::batozDN4Dxi ,
+						  &MockFem2DElement::batozDN5Dxi ,
 						  &MockFem2DElement::batozDN6Dxi);
 		dHx_deta = batozFx(xi, eta, &MockFem2DElement::batozDN1Deta, &MockFem2DElement::batozDN2Deta,
-						   &MockFem2DElement::batozDN3Deta, &MockFem2DElement::batozDN4Deta, &MockFem2DElement::batozDN5Deta,
+						   &MockFem2DElement::batozDN3Deta, &MockFem2DElement::batozDN4Deta,
+						   &MockFem2DElement::batozDN5Deta,
 						   &MockFem2DElement::batozDN6Deta);
 		dHy_dxi = batozFy(xi, eta, &MockFem2DElement::batozDN1Dxi, &MockFem2DElement::batozDN2Dxi ,
-						  &MockFem2DElement::batozDN3Dxi, &MockFem2DElement::batozDN4Dxi, &MockFem2DElement::batozDN5Dxi,
+						  &MockFem2DElement::batozDN3Dxi, &MockFem2DElement::batozDN4Dxi,
+						  &MockFem2DElement::batozDN5Dxi,
 						  &MockFem2DElement::batozDN6Dxi);
 		dHy_deta = batozFy(xi, eta, &MockFem2DElement::batozDN1Deta, &MockFem2DElement::batozDN2Deta,
-						   &MockFem2DElement::batozDN3Deta, &MockFem2DElement::batozDN4Deta, &MockFem2DElement::batozDN5Deta,
+						   &MockFem2DElement::batozDN3Deta, &MockFem2DElement::batozDN4Deta,
+						   &MockFem2DElement::batozDN5Deta,
 						   &MockFem2DElement::batozDN6Deta);
 
 		for (size_t i = 0; i < 9; ++i)
@@ -505,7 +510,8 @@ public:
 			res(0, i) = coefficient * (m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_deta[i]);
 			res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_deta[i]);
 			res(2, i) = coefficient *
-						(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_deta[i]);
+						(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] + m_yij[1] * dHy_dxi[i] +
+						 m_yij[2] * dHy_deta[i]);
 		}
 
 		return res;
@@ -1071,7 +1077,8 @@ TEST_F(Fem2DElementTriangleTests, MembraneShapeFunctionsTest)
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
 	EXPECT_TRUE(tri->getInitialPosition().isApprox(m_expectedX0)) <<
-			"x0 = " << tri->getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
+			"x0 = " << tri->getInitialPosition().transpose() << std::endl <<
+			"x0 expected = " << m_expectedX0.transpose();
 
 	// Ni(x,y) = (ai + bi.x + ci.y)
 	std::array<double, 3> ai, bi, ci;

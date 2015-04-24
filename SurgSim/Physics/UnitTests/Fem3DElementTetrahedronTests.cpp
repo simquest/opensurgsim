@@ -369,7 +369,8 @@ TEST_F(Fem3DElementTetrahedronTests, ShapeFunctionsTest)
 	tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
 	EXPECT_TRUE(tet.getInitialPosition().isApprox(m_expectedX0)) <<
-			"x0 = " << tet.getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
+			"x0 = " << tet.getInitialPosition().transpose() << std::endl << "x0 expected = " <<
+			m_expectedX0.transpose();
 
 	double ai[4], bi[4], ci[4], di[4];
 	double sumAi = 0.0;

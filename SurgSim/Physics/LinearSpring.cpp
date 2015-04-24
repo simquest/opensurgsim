@@ -91,7 +91,8 @@ void LinearSpring::addForce(const OdeState& state, Vector* F, double scale)
 	if (length < SurgSim::Math::Geometry::DistanceEpsilon)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-				"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
+				"Spring (initial length = " << m_restLength << ") became degenerated " <<
+				"with 0 length => no force generated";
 		return;
 	}
 	u /= length;
@@ -122,13 +123,17 @@ void LinearSpring::addDamping(const OdeState& state, Math::SparseMatrix* D, doub
 	De *= scale;
 
 	// Assembly stage in D
-	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[0]), static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   D, false);
-	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[0]), static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   D, false);
-	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[1]), static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   D, false);
-	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[1]), static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   D, false);
 }
 
@@ -150,13 +155,17 @@ void LinearSpring::addStiffness(const OdeState& state, Math::SparseMatrix* K, do
 	Ke *= scale;
 
 	// Assembly stage in K
-	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]), static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   K, false);
-	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]), static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   K, false);
-	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]), static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   K, false);
-	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]), static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   K, false);
 }
 
@@ -182,23 +191,31 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, Math::SparseMatrix* 
 	}
 
 	// Assembly stage in K
-	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]), static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   K, false);
-	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]), static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   K, false);
-	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]), static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   K, false);
-	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]), static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   K, false);
 
 	// Assembly stage in D
-	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[0]), static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   D, false);
-	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[0]), static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   D, false);
-	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[1]), static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   D, false);
-	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[1]), static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   D, false);
 }
 

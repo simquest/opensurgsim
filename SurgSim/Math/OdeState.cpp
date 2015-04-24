@@ -113,7 +113,8 @@ const SurgSim::Math::Vector3d OdeState::getVelocity(size_t nodeId) const
 void OdeState::addBoundaryCondition(size_t nodeId)
 {
 	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
-										  "Number of dof per node = 0. Make sure to call setNumDof() prior to adding boundary conditions.";
+										  "Number of dof per node = 0. Make sure to call setNumDof() " <<
+										  "prior to adding boundary conditions.";
 
 	for (size_t nodeDofId = 0; nodeDofId < m_numDofPerNode; ++nodeDofId)
 	{
@@ -124,7 +125,8 @@ void OdeState::addBoundaryCondition(size_t nodeId)
 void OdeState::addBoundaryCondition(size_t nodeId, size_t nodeDofId)
 {
 	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
-										  "Number of dof per node = 0. Make sure to call setNumDof() prior to adding boundary conditions.";
+										  "Number of dof per node = 0. Make sure to call setNumDof() " <<
+										  "prior to adding boundary conditions.";
 	SURGSIM_ASSERT(nodeId < m_numNodes) << "Invalid nodeId " << nodeId << " number of nodes is " << m_numNodes;
 	SURGSIM_ASSERT(nodeDofId < m_numDofPerNode) <<
 			"Invalid nodeDofId " << nodeDofId << " number of dof per node is " << m_numDofPerNode;
@@ -209,7 +211,8 @@ void OdeState::applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCom
 	{
 		Math::zeroRow(static_cast<SparseMatrix::Index>(*it), matrix);
 		Math::zeroColumn(static_cast<SparseMatrix::Index>(*it), matrix);
-		(*matrix).coeffRef(static_cast<SparseMatrix::Index>(*it), static_cast<SparseMatrix::Index>(*it)) = complianceValue;
+		(*matrix).coeffRef(static_cast<SparseMatrix::Index>(*it),
+						   static_cast<SparseMatrix::Index>(*it)) = complianceValue;
 	}
 }
 

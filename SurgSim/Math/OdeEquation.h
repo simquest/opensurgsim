@@ -85,7 +85,8 @@ public:
 	/// \param[out] K The matrix \f$K = -\frac{\partial f}{\partial x}(x,v)\f$
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) = 0;
+	virtual void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D,
+							 SparseMatrix** K) = 0;
 
 	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
 	/// applied. Note that this can be rewritten as (Bt)(M^-1)(B.b) = (Bt)(M^-1)(B.b) = x,

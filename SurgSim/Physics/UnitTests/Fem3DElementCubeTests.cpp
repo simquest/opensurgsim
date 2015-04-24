@@ -654,7 +654,8 @@ TEST_F(Fem3DElementCubeTests, ShapeFunctionsTest)
 	cube->initialize(m_restState);
 
 	EXPECT_TRUE(cube->getInitialPosition().isApprox(m_expectedX0)) <<
-			"x0 = " << cube->getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
+			"x0 = " << cube->getInitialPosition().transpose() << std::endl <<
+			"x0 expected = " << m_expectedX0.transpose();
 
 	// We should have by construction:
 	// { N0(p0) = 1    N1(p0)=N2(p0)=N3(p0)=0
@@ -777,11 +778,16 @@ TEST_F(Fem3DElementCubeTests, ShapeFunctionsTest)
 					sum += Ni_p[i];
 				}
 				EXPECT_NEAR(sum, 1.0, 1e-10) <<
-											 " for epsilon = " << epsilon << ", eta = " << eta << ", mu = " << mu << std::endl <<
-											 " N0(epsilon,eta,mu) = " << Ni_p[0] << " N1(epsilon,eta,mu) = " << Ni_p[1] <<
-											 " N2(epsilon,eta,mu) = " << Ni_p[2] << " N3(epsilon,eta,mu) = " << Ni_p[3] <<
-											 " N4(epsilon,eta,mu) = " << Ni_p[4] << " N5(epsilon,eta,mu) = " << Ni_p[5] <<
-											 " N6(epsilon,eta,mu) = " << Ni_p[6] << " N7(epsilon,eta,mu) = " << Ni_p[7];
+											 " for epsilon = " << epsilon << ", eta = " <<
+											 eta << ", mu = " << mu << std::endl <<
+											 " N0(epsilon,eta,mu) = " << Ni_p[0] <<
+											 " N1(epsilon,eta,mu) = " << Ni_p[1] <<
+											 " N2(epsilon,eta,mu) = " << Ni_p[2] <<
+											 " N3(epsilon,eta,mu) = " << Ni_p[3] <<
+											 " N4(epsilon,eta,mu) = " << Ni_p[4] <<
+											 " N5(epsilon,eta,mu) = " << Ni_p[5] <<
+											 " N6(epsilon,eta,mu) = " << Ni_p[6] <<
+											 " N7(epsilon,eta,mu) = " << Ni_p[7];
 			}
 		}
 	}

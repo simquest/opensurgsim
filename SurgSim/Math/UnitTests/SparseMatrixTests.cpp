@@ -130,7 +130,8 @@ public:
 		if (subTooSmall)
 		{
 			EXPECT_THROW((blockWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
-											 &m_matrixWithoutExtraCoefficients, &Operation<T, Opt, I, Derived>::assign)), \
+											 &m_matrixWithoutExtraCoefficients, \
+											 &Operation<T, Opt, I, Derived>::assign)), \
 						 SurgSim::Framework::AssertionFailure);
 		}
 		else
@@ -141,7 +142,8 @@ public:
 
 			// Recipient too small
 			EXPECT_THROW((blockWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall, \
-											 &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+											 &Operation<T, Opt, I, Derived>::assign)), \
+						 SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
 			EXPECT_THROW((blockWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
@@ -155,7 +157,8 @@ public:
 
 			// Recipient is correct and sub is correct
 			EXPECT_NO_THROW((blockWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
-												&m_matrixWithoutExtraCoefficients, &Operation<T, Opt, I, Derived>::assign)));
+												&m_matrixWithoutExtraCoefficients,
+												&Operation<T, Opt, I, Derived>::assign)));
 
 			if (success)
 			{
@@ -179,7 +182,8 @@ public:
 		if (subTooSmall)
 		{
 			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients, \
-										  &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+										  &Operation<T, Opt, I, Derived>::assign)),
+						 SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
@@ -189,11 +193,13 @@ public:
 
 			// Recipient too small
 			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall, \
-										  &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+										  &Operation<T, Opt, I, Derived>::assign)),
+						 SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
 			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixMissingCoefficients, \
-										  &Operation<T, Opt, I, Derived>::assign)), SurgSim::Framework::AssertionFailure);
+										  &Operation<T, Opt, I, Derived>::assign)),
+						 SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
 			EXPECT_NO_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, \
@@ -624,44 +630,3 @@ TYPED_TEST(SparseMatrices, addSparseMatrixBlockTest)
 	this->TestAddSparseMatrixSegment(this->template getSparseVector<T, 7, Eigen::ColMajor>().segment(0, 4));
 	this->TestAddSparseMatrixSegment(this->template getSparseVector<T, 7, Eigen::RowMajor>().segment(0, 4));
 }
-
-TEST(SparseMatrices, initializeFromTriples)
-{
-	using SurgSim::Math::SparseMatrix;
-
-	SparseMatrix mInit(10, 10);
-	mInit.reserve(3);
-	mInit.insert(0, 0) = 1.0;
-	mInit.insert(0, 1) = 1.0;
-	mInit.insert(9, 8) = 1.0;
-	mInit.insert(9, 9) = 1.0;
-	for (int row = 1; row < 9; ++row)
-	{
-		mInit.insert(row, row - 1) = 1.0;
-		mInit.insert(row, row) = 2.0;
-		mInit.insert(row, row + 1) = 1.0;
-	}
-	mInit.makeCompressed();
-
-	typedef Eigen::Triplet<double> T;
-	std::vector<T> tripletList;
-	tripletList.reserve(36);
-	// Each triplet represents a 2x2 matrix along the diagonal
-	for (int counter = 0; counter < 9; ++counter)
-	{
-		tripletList.push_back(T(counter, counter, 1.0));
-		tripletList.push_back(T(counter, counter + 1, 1.0));
-		tripletList.push_back(T(counter + 1, counter, 1.0));
-		tripletList.push_back(T(counter + 1, counter + 1, 1.0));
-	}
-	SparseMatrix m(10, 10);
-	m.setFromTriplets(tripletList.begin(), tripletList.end());
-	EXPECT_TRUE(m.isApprox(mInit));
-	SparseMatrix n(10, 10);
-	n.setFromTriplets(tripletList.begin(), tripletList.end());
-	m += n;
-	EXPECT_FALSE(m.isApprox(mInit));
-	mInit += mInit;
-	EXPECT_TRUE(m.isApprox(mInit));
-}
-

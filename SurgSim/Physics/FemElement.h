@@ -191,7 +191,8 @@ public:
 
 	/// Helper method to add a sub-matrix made of squared-blocks into a matrix, for the sake of clarity
 	/// \tparam DerivedSub The type of the 'subMatrix' (can usually be inferred). Can be any type, but does not
-	/// support Eigen expression. If it is a Sparse storage type the alignment must be the same as the SparseMatrix: Opt.
+	/// support Eigen expression. If it is a Sparse storage type the alignment must be the same
+	/// as the SparseMatrix: Opt.
 	/// Note that no assertion or verification is done on this type.
 	/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
 	/// \param subMatrix The sub-matrix (containing all the squared-blocks)
@@ -201,7 +202,7 @@ public:
 	/// \param initialize=true Option parameter. If true, the matrix form is assumed to be undefined and is initialized
 	/// when necessary. If false, the matrix form is assumed to be previously defined.
 	template <typename DerivedSub, typename T, int Opt, typename Index>
-	void assembleMatrixBlocks(DerivedSub& subMatrix, const std::vector<size_t> blockIds,
+	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
 							  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true);
 
 protected:

@@ -77,7 +77,8 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	newState->getPositions()  = currentState.getPositions() +
 								(m_k1.velocity + m_k4.velocity + 2.0 * (m_k2.velocity + m_k3.velocity)) * dt / 6.0;
 	newState->getVelocities() = currentState.getVelocities() +
-								(m_k1.acceleration + m_k4.acceleration + 2.0 * (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
+								(m_k1.acceleration + m_k4.acceleration + 2.0 *
+								 (m_k2.acceleration + m_k3.acceleration)) * dt / 6.0;
 
 }
 
