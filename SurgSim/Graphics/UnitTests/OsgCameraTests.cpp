@@ -255,5 +255,45 @@ TEST(OsgCameraTests, Serialization)
 					boost::any_cast<SurgSim::Math::Vector4d>(newCamera->getValue("AmbientColor"))));
 }
 
+TEST(OsgCameraTests, SetProjection)
+{
+	std::shared_ptr<OsgCamera> camera = std::make_shared<OsgCamera>("TestOsgCamera");
+
+	Math::Matrix44d identity = Math::Matrix44d::Identity();
+
+	camera->setProjectionMatrix(identity);
+	auto osgCamera = new osg::Camera;
+
+
+	// Windows does not support initializer lists ...
+	std::array<double, 4> persp = {{90.0, 1.0, 0.01, 10.0}};
+
+	osgCamera->setProjectionMatrixAsPerspective(persp[0], persp[1], persp[2], persp[3]);
+	auto expectedPerspective = Graphics::fromOsg(osgCamera->getProjectionMatrix());
+
+	camera->setPerspectiveProjection(persp[0], persp[1], persp[2], persp[3]);
+	EXPECT_TRUE(expectedPerspective.isApprox(camera->getProjectionMatrix()));
+
+	camera->setProjectionMatrix(identity);
+
+	EXPECT_NO_THROW(camera->setValue("PerspectiveProjection", persp));
+	EXPECT_TRUE(expectedPerspective.isApprox(camera->getProjectionMatrix()));
+
+	camera->setProjectionMatrix(identity);
+
+	std::array<double, 6> ortho = {{ -1.0, 1.0, 2.0, -2.0, 3.0, -3.0}};
+
+	osgCamera->setProjectionMatrixAsOrtho(ortho[0], ortho[1], ortho[2], ortho[3], ortho[4], ortho[5]);
+	auto expectedOrtho = Graphics::fromOsg(osgCamera->getProjectionMatrix());
+
+	camera->setOrthogonalProjection(ortho[0], ortho[1], ortho[2], ortho[3], ortho[4], ortho[5]);
+	EXPECT_TRUE(expectedOrtho.isApprox(camera->getProjectionMatrix()));
+
+	camera->setProjectionMatrix(identity);
+
+	EXPECT_NO_THROW(camera->setValue("OrthogonalProjection", ortho));
+	EXPECT_TRUE(expectedOrtho.isApprox(camera->getProjectionMatrix()));
+}
+
 }  // namespace Graphics
 }  // namespace SurgSim
