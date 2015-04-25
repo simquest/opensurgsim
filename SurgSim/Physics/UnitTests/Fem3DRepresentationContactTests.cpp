@@ -215,7 +215,8 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpCoordinateTest)
 	M = m_fem->computeM(*m_fem->getPreviousState());
 	SurgSim::Math::LinearSparseSolveAndInverseLU solver;
 	SurgSim::Math::Vector b = SurgSim::Math::Vector::Zero(18);
-	solver(M, b, nullptr, &C);
+	solver.setMatrix(M);
+	C = solver.getInverse();
 	C *= dt;
 
 	EXPECT_NEAR_EIGEN(C * H.transpose(), mlcpPhysicsProblem.CHt, epsilon);
@@ -289,7 +290,8 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpIndiciesTest)
 	M = m_fem->computeM(*m_fem->getPreviousState());
 	SurgSim::Math::LinearSparseSolveAndInverseLU solver;
 	SurgSim::Math::Vector b = SurgSim::Math::Vector::Zero(18);
-	solver(M, b, nullptr, &C);
+	solver.setMatrix(M);
+	C = solver.getInverse();
 	C *= dt;
 
 	EXPECT_NEAR_EIGEN(

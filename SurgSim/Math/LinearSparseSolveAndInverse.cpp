@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 
 namespace SurgSim
@@ -34,27 +35,7 @@ Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const
 
 Matrix LinearSparseSolveAndInverseLU::getInverse() const
 {
-	Matrix eye(Matrix::Identity(m_lu.rows(), m_lu.cols()));
-	return (m_lu.solve(eye));
-}
-
-void LinearSparseSolveAndInverseLU::operator()(const SparseMatrix& A, const Vector& b, Vector* x, Matrix* Ainv)
-{
-	SURGSIM_ASSERT(A.cols() == A.rows()) << "Cannot inverse a non square matrix";
-	if (x != nullptr || Ainv != nullptr)
-	{
-		Eigen::SparseLU<SparseMatrix> lu;
-		lu.compute(A);
-		if (x != nullptr)
-		{
-			(*x) = lu.solve(b);
-		}
-		if (Ainv != nullptr)
-		{
-			Ainv->setIdentity(A.rows(), A.cols());
-			(*Ainv) = lu.solve((*Ainv));
-		}
-	}
+	return (m_lu.solve(Matrix::Identity(m_lu.rows(), m_lu.cols())));
 }
 
 }; // namespace Math

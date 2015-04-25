@@ -28,6 +28,29 @@ namespace Math
 
 class LinearSparseSolveAndInverseTests : public ::testing::Test
 {
+public:
+
+	void setupSparseMatrixTest()
+	{
+		inverseMatrix.resize(size, size);
+		initializeSparseMatrix(&matrix);
+	}
+
+	SparseMatrix matrix;
+	Matrix denseMatrix, inverseMatrix, expectedInverse;
+	Vector b;
+	Vector x, expectedX;
+
+protected:
+	void SetUp() override
+	{
+		size = 18;
+		initializeVector(&b);
+		initializeDenseMatrix(&denseMatrix);
+		expectedInverse = denseMatrix.inverse();
+		expectedX = expectedInverse * b;
+	}
+
 private:
 	size_t size;
 
@@ -36,18 +59,19 @@ private:
 		v->resize(size);
 		for (size_t row = 0; row < size; row++)
 		{
-			(*v)(row) = fmod(-4.1 * row * row + 3.46, 5.0);
+			(*v)(row) = std::fmod(-4.1 * row * row + 3.46, 5.0);
 		}
 	}
 
 	void initializeSparseMatrix(SparseMatrix* m)
 	{
 		m->resize(static_cast<SparseMatrix::Index>(size), static_cast<SparseMatrix::Index>(size));
-		for (int row = 0; row < size; row++)
+		for (SparseMatrix::Index row = 0; row < size; row++)
 		{
-			for (int col = 0; col < size; col++)
+			for (SparseMatrix::Index col = 0; col < size; col++)
 			{
-				(*m).insert(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
+				(*m).insert(row, col) =
+					std::fmod((10.3 * std::cos(static_cast<double>(row * col)) + 3.24), 10.0);
 			}
 		}
 		m->makeCompressed();
@@ -60,33 +84,10 @@ private:
 		{
 			for (size_t col = 0; col < size; col++)
 			{
-				(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
+				(*m)(row, col) = std::fmod((10.3 * std::cos(static_cast<double>(row * col)) + 3.24), 10.0);
 			}
 		}
 	}
-
-	void setupTest()
-	{
-		initializeVector(&b);
-		initializeDenseMatrix(&denseMatrix);
-		expectedInverse = denseMatrix.inverse();
-		expectedX = expectedInverse * b;
-	}
-
-public:
-
-	void setupSparseMatrixTest()
-	{
-		size = 18;
-		inverseMatrix.resize(size, size);
-		initializeSparseMatrix(&matrix);
-		setupTest();
-	}
-
-	SparseMatrix matrix;
-	Matrix denseMatrix, inverseMatrix, expectedInverse;
-	Vector b;
-	Vector x, expectedX;
 };
 
 TEST_F(LinearSparseSolveAndInverseTests, SparseLUInitializationTests)
@@ -95,19 +96,7 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseLUInitializationTests)
 	nonSquare.setZero();
 
 	LinearSparseSolveAndInverseLU solveAndInverse;
-	EXPECT_ANY_THROW(solveAndInverse(nonSquare, b, &x, &inverseMatrix));
-	EXPECT_ANY_THROW(solveAndInverse.setMatrix(nonSquare));
-};
-
-TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixOperatorTests)
-{
-	setupSparseMatrixTest();
-
-	LinearSparseSolveAndInverseLU solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
-
-	EXPECT_TRUE(x.isApprox(expectedX));
-	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+	EXPECT_THROW(solveAndInverse.setMatrix(nonSquare), SurgSim::Framework::AssertionFailure);
 };
 
 TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixComponentsTest)
@@ -121,6 +110,9 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixComponentsTest)
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
+
+	inverseMatrix = solveAndInverse.solve(denseMatrix);
+	EXPECT_TRUE(inverseMatrix.isApprox(Matrix::Identity(18, 18)));
 };
 
 
