@@ -15,24 +15,23 @@
 
 #include "SurgSim/Devices/Oculus/OculusScaffold.h"
 
-#include <list>
-#include <memory>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
+#include <list>
+#include <memory>
 #include <OVR_CAPI_0_5_0.h>
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/Devices/Oculus/OculusDevice.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-#include "OculusDevice.h"
-
-using SurgSim::Framework::Logger;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
+using SurgSim::Framework::Logger;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -76,20 +75,11 @@ private:
 
 struct OculusScaffold::StateData
 {
-	StateData()
-	{
-	}
-
 	/// List of registered devices.
 	std::list<std::unique_ptr<OculusScaffold::DeviceData>> registeredDevices;
 
 	/// The mutex that protects the list of registered devices.
 	boost::mutex mutex;
-
-private:
-	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
-	StateData(const StateData&) /*= delete*/;
-	StateData& operator=(const StateData&) /*= delete*/;
 };
 
 OculusScaffold::OculusScaffold() :
@@ -123,7 +113,6 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 	else
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-		// HW-Mar-2-2015-OculusScaffold only supports one device right now.
 		SURGSIM_ASSERT(m_state->registeredDevices.size() < 1) << "There is one registered Oculus device already." <<
 																 "OculusScaffold only supports one device right now";
 

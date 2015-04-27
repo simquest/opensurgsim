@@ -15,18 +15,19 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
 	OculusDeviceTest.cpp
-	OculusScaffoldTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
 )
 
 set(LIBS
+	SurgSimDataStructures
+	SurgSimInput
+	SurgSimTesting
 	OculusDevice
 )
 

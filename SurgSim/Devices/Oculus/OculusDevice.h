@@ -41,7 +41,6 @@ class OculusScaffold;
 ///       By default the tracking origin is located one meter away from the positional tracking camera in the direction
 ///       of the optical axis but with the same height as the camera.
 /// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
-
 class OculusDevice : public SurgSim::Input::CommonDevice
 {
 public:

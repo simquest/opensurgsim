@@ -18,15 +18,11 @@
 
 #include <memory>
 
+#include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/BasicThread.h"
 
 namespace SurgSim
 {
-namespace DataStructures
-{
-class DataGroup;
-};
-
 namespace Framework
 {
 class Logger;
@@ -49,11 +45,6 @@ public:
 	/// Destructor.
 	~OculusScaffold();
 
-	/// Gets or creates the scaffold shared by all OculusDevice instances.
-	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
-	/// \return the scaffold object.
-	static std::shared_ptr<OculusScaffold> getOrCreateSharedInstance();
-
 protected:
 	bool doInitialize() override;
 	bool doStartUp() override;
@@ -62,6 +53,7 @@ protected:
 private:
 	/// Internal shared state data type.
 	struct StateData;
+
 	/// Internal per-device information.
 	struct DeviceData;
 
@@ -70,10 +62,16 @@ private:
 	/// Constructor.
 	OculusScaffold();
 
+	/// Gets or creates the scaffold shared by all OculusDevice instances.
+	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
+	/// \return the scaffold object.
+	static std::shared_ptr<OculusScaffold> getOrCreateSharedInstance();
+
 	/// Registers the specified device object.
 	/// \param device The device object to be used, which should have a unique name.
 	/// \return True if the initialization succeeds, false if it fails.
 	bool registerDevice(OculusDevice* device);
+
 	/// Unregisters the specified device object.
 	/// \param device The device object.
 	/// \return true on success, false on failure.
@@ -82,6 +80,7 @@ private:
 	/// Initializes Oculus SDK.
 	/// \return true on success; false otherwise.
 	bool initializeSdk();
+
 	/// Finalizes (de-initializes) Oculus SDK.
 	/// \return true on success; false otherwise.
 	bool finalizeSdk();

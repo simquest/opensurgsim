@@ -12,18 +12,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 #include <memory>
 
 #include <SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h>
+#include <SurgSim/Devices/Oculus/OculusDevice.h>
 #include <SurgSim/Input/DeviceInterface.h>
 #include <SurgSim/Testing/VisualTestCommon/ToolSquareTest.h>
 
-#include "SurgSim/Devices/Oculus/OculusDevice.h"
-
+using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Device::OculusDevice;
 using SurgSim::Input::DeviceInterface;
-using SurgSim::Device::IdentityPoseDevice;
 
 int main(int argc, char** argv)
 {
