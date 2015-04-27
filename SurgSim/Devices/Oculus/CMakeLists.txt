@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(OculusSdk REQUIRED)
+find_package(OculusSdk 0.5.0.1 EXACT REQUIRED)
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
@@ -40,7 +40,7 @@ set(LIBS
 	SurgSimDataStructures
 	SurgSimFramework 
 	SurgSimInput
-	${OCULUSSDK_LIBRARIES}
+	${OCULUSSDK_LIBRARY}
 )
 
 target_link_libraries(OculusDevice ${LIBS})

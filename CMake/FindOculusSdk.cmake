@@ -12,126 +12,114 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#  Find Oculus Rift DK2 SDK
-#  Supported version(s):  0.5.0.1 beta
-#  https://developer.oculus.com/
-#
-#  Script will define:
-#  OCULUSSDK_FOUND       - TRUE/FALSE if Oculus SDK directory was found
-#  OCULUSSDK_DIR         - Oculus SDK root directory
-#  OCULUSSDK_INCLUDE_DIR - the Oculus SDK include directory
-#  OCULUSSDK_LIBRARY     - the Oculus SDK library
-#
-#  Default OCULUSSDK_DIR is under /usr/local/. Set OCULUSSDK_DIR
-#  environmental variable to override this default.
+set(OCULUSSDK_DIR CACHE PATH "The directory containing the Oculus SDK.")
+mark_as_advanced(OCULUSSDK_DIR)
 
-# Step 1. Search for Oculus SDK Include directory which contains OVR.h
 find_path(OCULUSSDK_INCLUDE_DIR
 	NAMES OVR.h
-	PATH_SUFFIXES Include
-	HINTS $ENV{OCULUSSDK_DIR} /usr/local
+	PATH_SUFFIXES LibOVR/Include
+	HINTS
+		${OCULUSSDK_DIR}
+		$ENV{OCULUSSDK_DIR}
+	PATHS /usr /usr/local
 )
 mark_as_advanced(OCULUSSDK_INCLUDE_DIR)
 
-# Step 2. Define Oculus Root directory then set Cached OCULUSSDK_DIR variable
-if($ENV{OCULUSSDK_DIR})
-	set(OCULUSSDK_ROOT_DIR $ENV{OCULUSSDK_DIR})
-else()
-	get_filename_component(OCULUSSDK_ROOT_DIR ${OCULUSSDK_INCLUDE_DIR} PATH)
+set(OCULUSSDK_VERSION_H "${OCULUSSDK_INCLUDE_DIR}/OVR_Version.h")
+if(EXISTS "${OCULUSSDK_VERSION_H}")
+	file(READ "${OCULUSSDK_VERSION_H}" _oculussdk_version_header)
+
+	string(REGEX MATCH "define[ \t]+OVR_PRODUCT_VERSION[ \t]+([0-9]+)" _oculussdk_product_version_match "${_oculussdk_version_header}")
+	set(OVR_PRODUCT_VERSION "${CMAKE_MATCH_1}")
+
+	string(REGEX MATCH "define[ \t]+OVR_MAJOR_VERSION[ \t]+([0-9]+)" _oculussdk_major_version_match "${_oculussdk_version_header}")
+	set(OVR_MAJOR_VERSION "${CMAKE_MATCH_1}")
+
+	string(REGEX MATCH "define[ \t]+OVR_MINOR_VERSION[ \t]+([0-9]+)" _oculussdk_minor_version_match "${_oculussdk_version_header}")
+	set(OVR_MINOR_VERSION "${CMAKE_MATCH_1}")
+	
+	string(REGEX MATCH "define[ \t]+OVR_PATCH_VERSION[ \t]+([0-9]+)" _oculussdk_patch_version_match "${_oculussdk_version_header}")
+	set(OVR_PATCH_VERSION "${CMAKE_MATCH_1}")
+
+	set(OCULUSSDK_VERSION ${OVR_PRODUCT_VERSION}.${OVR_MAJOR_VERSION}.${OVR_MINOR_VERSION}.${OVR_PATCH_VERSION})
 endif()
 
-set(OCULUSSDK_DIR ${OCULUSSDK_ROOT_DIR} CACHE PATH "The OCULUS SDK directory.")
-mark_as_advanced(OCULUSSDK_DIR)
-
-# Step 3. Define Macro to search for Oculus Libraries
-macro(oculussdk_find_library LIB_NAME)
-	if(WIN32)
-		if(CMAKE_CL_64)
-			set(SEARCH_PATH ${OCULUSSDK_ROOT_DIR}/Lib/Windows/x64)
-		else()
-			set(SEARCH_PATH ${OCULUSSDK_ROOT_DIR}/Lib/Windows/Win32)
-		endif()
-		
-		set(DEBUG_LIB_PATH ${SEARCH_PATH}/Debug)
-		set(RELEASE_LIB_PATH ${SEARCH_PATH}/Release)
-		
-		if     (MSVC_VERSION EQUAL 1600)
-			set(DEBUG_LIB_PATH ${DEBUG_LIB_PATH}/VS2010)
-			set(RELEASE_LIB_PATH ${RELEASE_LIB_PATH}/VS2010)
-		elseif (MSVC_VERSION EQUAL 1700)
-			set(DEBUG_LIB_PATH ${DEBUG_LIB_PATH}/VS2012)
-			set(RELEASE_LIB_PATH ${RELEASE_LIB_PATH}/VS2012)
-		elseif (MSVC_VERSION EQUAL 1800)
-			set(DEBUG_LIB_PATH ${DEBUG_LIB_PATH}/VS2013)
-			set(RELEASE_LIB_PATH ${RELEASE_LIB_PATH}/VS2013)
-		endif()
-
-		find_library(OCULUSSDK_LIBRARY_RELEASE
-			NAMES ${LIB_NAME}
-			HINTS ${RELEASE_LIB_PATH}
-			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
-			)
-		find_library(OCULUSSDK_LIBRARY_DEBUG
-			NAMES ${LIB_NAME}
-			HINTS ${DEBUG_LIB_PATH}/usr/local
-			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
-			)
+if(WIN32)
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(ARCH x64)
 	else()
-		find_library(OCULUSSDK_LIBRARY_RELEASE
-			NAMES "${LIB_NAME}.a"
-			HINTS
-				${OCULUSSDK_ROOT_DIR}/lib
-				${OCULUSSDK_ROOT_DIR}/Lib/Linux/x86_64/Release
-			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
-			)
-
-		find_library(OCULUSSDK_LIBRARY_DEBUG
-			NAMES "${LIB_NAME}.a"
-			HINTS
-				${OCULUSSDK_ROOT_DIR}/lib
-				${OCULUSSDK_ROOT_DIR}/Lib/Linux/x86_64/Debug
-			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
-			)
+		set(ARCH Win32)
 	endif()
 
-	if(NOT OCULUSSDK_LIBRARY)
-		if(OCULUSSDK_LIBRARY_RELEASE AND OCULUSSDK_LIBRARY_DEBUG)
-			set(OCULUSSDK_LIBRARY
-				optimized ${OCULUSSDK_LIBRARY_RELEASE}
-				debug     ${OCULUSSDK_LIBRARY_DEBUG}
-				CACHE STRING "Oculus Release and Debug libraries were FOUND.")
-		endif()
-
-		if(OCULUSSDK_LIBRARY_RELEASE AND NOT OCULUSSDK_LIBRARY_DEBUG)
-			set(OCULUSSDK_LIBRARY
-				${OCULUSSDK_LIBRARY_RELEASE}
-				CACHE STRING "ONLY the Release version of Oculus library was found.")
-		endif()
-
-		if(NOT OCULUSSDK_LIBRARY_RELEASE AND OCULUSSDK_LIBRARY_DEBUG)
-			set(OCULUSSDK_LIBRARY
-				${OCULUSSDK_LIBRARY_DEBUG}
-				CACHE STRING "ONLY the Debug version of the Oculus library was found.")
-		endif()
-
-		mark_as_advanced(OCULUSSDK_LIBRARY)
+	set(WIN_DEBUG   Lib/Windows/${ARCH}/Debug/VS2012)
+	set(WIN_RELEASE Lib/Windows/${ARCH}/Release/VS2012)
+else()
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(ARCH x86_64)
+	else()
+		set(ARCH i386)
 	endif()
-endmacro()
+	
+	set(LINUX_DEBUG Lib/Linux/${ARCH}/Debug)
+	set(LINUX_RELEASE Lib/Linux/${ARCH}/Release)
+endif()
 
-# Step 4. Search for Oculus libraries
-oculussdk_find_library("libOVR")
+find_library(OCULUSSDK_LIBRARY_RELEASE
+	NAMES libOVR libOVR.a
+	HINTS
+		${OCULUSSDK_DIR}/LibOVR/${LINUX_RELEASE}
+		${OCULUSSDK_DIR}/LibOVR/${WIN_RELEASE}
+		$ENV{OCULUSSDK_DIR}/LibOVR/${LINUX_RELEASE}
+		$ENV{OCULUSSDK_DIR}/LibOVR/${WIN_RELEASE}
+	PATHS /usr /usr/local
+)
 
-# Step 5. Set OCULUSSDK_FOUND variable
+find_library(OCULUSSDK_LIBRARY_DEBUG
+	NAMES libOVR libOVR.a
+	HINTS
+		${OCULUSSDK_DIR}/LibOVR/${LINUX_DEBUG}
+		${OCULUSSDK_DIR}/LibOVR/${WIN_DEBUG}
+		$ENV{OCULUSSDK_DIR}/LibOVR/${LINUX_DEBUG}
+		$ENV{OCULUSSDK_DIR}/LibOVR/${WIN_DEBUG}
+)
+
+if(NOT OCULUSSDK_LIBRARY)
+	if(OCULUSSDK_LIBRARY_RELEASE AND OCULUSSDK_LIBRARY_DEBUG)
+		set(OCULUSSDK_LIBRARY
+			optimized ${OCULUSSDK_LIBRARY_RELEASE}
+			debug     ${OCULUSSDK_LIBRARY_DEBUG}
+			CACHE STRING "Oculus Release and Debug libraries were FOUND.")
+	endif()
+
+	if(OCULUSSDK_LIBRARY_RELEASE AND NOT OCULUSSDK_LIBRARY_DEBUG)
+		set(OCULUSSDK_LIBRARY
+			${OCULUSSDK_LIBRARY_RELEASE}
+			CACHE STRING "Oculus Release library version was found.")
+	endif()
+
+	if(NOT OCULUSSDK_LIBRARY_RELEASE AND OCULUSSDK_LIBRARY_DEBUG)
+		set(OCULUSSDK_LIBRARY
+			${OCULUSSDK_LIBRARY_DEBUG}
+			CACHE STRING "Oculus Debug library version was found.")
+	endif()
+
+	mark_as_advanced(OCULUSSDK_LIBRARY)
+endif()
+
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(OculusSdk DEFAULT_MSG
-	OCULUSSDK_DIR OCULUSSDK_INCLUDE_DIR OCULUSSDK_LIBRARY)
+find_package_handle_standard_args(OculusSdk 
+	FAIL_MESSAGE "OculusSDK was not found, this could be due to a missing \
+environment variable or a change in library structure.\
+ Please make sure version 0.5.0.1 beta is installed." 
+	REQUIRED_VARS OCULUSSDK_INCLUDE_DIR OCULUSSDK_VERSION_H OCULUSSDK_LIBRARY
+	VERSION_VAR OCULUSSDK_VERSION
+)
 
-# Step 6. Work around for library dependencies in OculusSDK 0.5+ on Windows and Linux. Feb-9-2015
+#Workaround, appending missing 3rd party libraries
 if(OCULUSSDK_LIBRARY)
 	if(WIN32)
-		set(OCULUSSDK_LIBRARIES ${OCULUSSDK_LIBRARY} winmm.lib; ws2_32.lib)
+		set(OCULUSSDK_LIBRARY ${OCULUSSDK_LIBRARY} winmm.lib; ws2_32.lib)
 	else()
-		set(OCULUSSDK_LIBRARIES ${OCULUSSDK_LIBRARY} X11 GL Xrandr dl) # Linux
+		set(OCULUSSDK_LIBRARY ${OCULUSSDK_LIBRARY} X11 GL Xrandr dl)
 	endif()
 endif(OCULUSSDK_LIBRARY)
