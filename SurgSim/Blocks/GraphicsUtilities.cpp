@@ -15,17 +15,17 @@
 
 #include "SurgSim/Blocks/GraphicsUtilities.h"
 
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgTexture2d.h"
-#include "SurgSim/Graphics/OsgUniform.h"
-#include "SurgSim/Graphics/OsgTextureUniform.h"
 #include "SurgSim/Graphics/OsgProgram.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgUniformFactory.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Graphics/OsgTextureUniform.h"
 
 namespace SurgSim
 {
@@ -151,7 +151,8 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 	return material;
 }
 
-void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, std::string materialFilename, Materials materials)
+void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, std::string materialFilename,
+					const Materials& materials)
 {
 	static SurgSim::Graphics::OsgUniformFactory uniformFactory;
 	YAML::Node nodes;
@@ -170,11 +171,13 @@ void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, std::strin
 
 			if (component != nullptr)
 			{
-				auto material = materials[materialName];
 
-				SURGSIM_ASSERT(material != nullptr)
+				auto materialIt = materials.find(materialName);
+
+				SURGSIM_ASSERT(materialIt != materials.end())
 						<< "Could not find material " << materialName << " in the prebuilt materials.";
 
+				auto material = materialIt->second;
 				component->setMaterial(material);
 
 				auto propertyNodes = node->begin()->second["Properties"];

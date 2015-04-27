@@ -82,7 +82,6 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_ambientColorUniform(std::make_shared<OsgUniform<Vector4f>>("ambientColor"))
 {
 	m_switch->removeChildren(0, m_switch->getNumChildren());
-	m_materialProxy = new osg::Group();
 	m_camera->setName(name + " Camera");
 
 	m_switch->addChild(m_camera);

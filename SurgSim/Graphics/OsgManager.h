@@ -55,7 +55,7 @@ public:
 	/// \param val enables or disables multithreading in the viewer
 	void setMultiThreading(bool val);
 
-	/// \return wether the viewer is multithreading
+	/// \return true when the viewer is multithreading
 	bool isMultiThreading() const;
 
 	friend class OsgManagerTest;

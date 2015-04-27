@@ -40,14 +40,15 @@ namespace Blocks
 
 typedef std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> Materials;
 
-/// Load and add a given texture to the material
+/// Provide a consistent interface to add texture uniforms on materials, adds the actual texture with a given minimum
+/// unit, or provides a placeholder uniform for the unit
 /// \param material The material for adding the texture
 /// \param uniform The name of the uniform to use
 /// \param unit The texture unit to use
 /// \param filename The file to use for the texture,
 /// \param repeat whether to create the texture as repeating
 /// \note if the texture filename is empty a placeholder uniform will be created using the unit as a value
-/// this us use objects with textures builtin without having to assign the texture to the material on creation
+/// this for using objects with textures built in without having to assign the texture to the material on creation
 void enable2DTexture(std::shared_ptr<SurgSim::Graphics::OsgMaterial> material,
 					 const std::string& uniform,
 					 int unit,
@@ -117,7 +118,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 /// \param materials lookup table for all the materials that are available
 void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene,
 					std::string materialFilename,
-					Materials materials);
+					const Materials& materials);
 }
 }
 #endif
