@@ -241,6 +241,7 @@ class MockFemElement : public FemElement
 {
 public:
 	MockFemElement();
+    MockFemElement(std::vector<size_t> nodeIds);
 
 	void addNode(size_t nodeId);
 

@@ -61,6 +61,8 @@ public:
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem2DElementTriangle(std::array<size_t, 3> nodeIds);
 
+    explicit Fem2DElementTriangle(std::vector<size_t> nodeIds);
+
 	/// Sets the triangle's thickness
 	/// \param thickness The thickness of the triangle
 	void setThickness(double thickness);

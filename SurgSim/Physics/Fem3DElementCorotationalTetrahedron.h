@@ -47,6 +47,8 @@ public:
 	/// simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
 	explicit Fem3DElementCorotationalTetrahedron(std::array<size_t, 4> nodeIds);
 
+    explicit Fem3DElementCorotationalTetrahedron(std::vector<size_t> nodeIds);
+
 	void initialize(const SurgSim::Math::OdeState& state) override;
 
 	void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) override;

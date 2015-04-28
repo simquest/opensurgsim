@@ -40,6 +40,8 @@ public:
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
 
+    explicit Fem1DElementBeam(std::vector<size_t> nodeIds);
+
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam
 	void setRadius(double radius);

@@ -48,7 +48,17 @@ Fem2DElementTriangle::Fem2DElementTriangle(std::array<size_t, 3> nodeIds)
 	// 6 dof per node (x, y, z, thetaX, thetaY, thetaZ)
 	setNumDofPerNode(6);
 
-	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
+    m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
+}
+
+Fem2DElementTriangle::Fem2DElementTriangle(std::vector<size_t> nodeIds)
+    : m_restArea(0.0),
+      m_thickness(0.0)
+{
+    setNumDofPerNode(6);
+
+    SURGSIM_ASSERT(nodeIds.size() == 3) << "Incorrect nodes for Fem2D Triangle";
+    m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 
 void Fem2DElementTriangle::setThickness(double thickness)

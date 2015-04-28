@@ -46,6 +46,8 @@ public:
 	/// \note simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
 	explicit Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds);
 
+    explicit Fem3DElementTetrahedron(std::vector<size_t> nodeIds);
+
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
 	/// \note We use the theory of linear elasticity, so this method pre-compute the stiffness and mass matrices

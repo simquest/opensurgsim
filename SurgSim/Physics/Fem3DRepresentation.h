@@ -21,7 +21,7 @@
 #include <unordered_map>
 
 #include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Framework/ObjectFactory.h"
+//#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 

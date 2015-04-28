@@ -20,6 +20,11 @@
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Framework/Runtime.h" ///< Used to initialize the Component Fem3DRepresentation
+#include "SurgSim/Physics/Fem1DElementBeam.h"
+#include "SurgSim/Physics/Fem2DElementTriangle.h"
+#include "SurgSim/Physics/Fem3DElementCorotationalTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
@@ -611,6 +616,38 @@ TEST_F(FemRepresentationTests, SerializationTest)
 	EXPECT_NO_THROW(fem->setValue("Filename", filename));
 	EXPECT_EQ(filename, fem->getFilename());
 	EXPECT_EQ(filename, fem->getValue<std::string>("Filename"));
+}
+
+TEST_F(FemRepresentationTests, FactoryTest)
+{
+    std::vector<size_t> mockNodes{2, 2};
+    FemRepresentation::getFactory().registerClass<MockFemElement>("MockFemElement");
+    auto mockFem = FemRepresentation::getFactory().create("MockFemElement", mockNodes);
+    EXPECT_NE(nullptr, mockFem);
+
+    std::vector<size_t> beamNodes{1, 2};
+    FemRepresentation::getFactory().registerClass<Fem1DElementBeam>("Fem1DElementBeam");
+    auto beamFem = FemRepresentation::getFactory().create("Fem1DElementBeam", beamNodes);
+    EXPECT_NE(nullptr, beamFem);
+
+    std::vector<size_t> triNodes{1, 2, 3};
+    FemRepresentation::getFactory().registerClass<Fem2DElementTriangle>("Fem2DElementTriangle");
+    auto triFem = FemRepresentation::getFactory().create("Fem2DElementTriangle", triNodes);
+    EXPECT_NE(nullptr, triFem);
+
+    std::vector<size_t> tetNodes{1, 2, 3, 1};
+    FemRepresentation::getFactory().registerClass<Fem3DElementCorotationalTetrahedron>("Fem3DElementCoTet");
+    auto coTetFem = FemRepresentation::getFactory().create("Fem3DElementCoTet", tetNodes);
+    EXPECT_NE(nullptr, coTetFem);
+
+    std::vector<size_t> cubeNodes{1, 2, 3, 4, 5, 6, 7, 8};
+    FemRepresentation::getFactory().registerClass<Fem3DElementCube>("Fem3DElementCube");
+    auto cubeFem = FemRepresentation::getFactory().create("Fem3DElementCube", cubeNodes);
+    EXPECT_NE(nullptr, cubeFem);
+
+    FemRepresentation::getFactory().registerClass<Fem3DElementTetrahedron>("Fem3DElementTet");
+    auto tetFem = FemRepresentation::getFactory().create("Fem3DElementTet", tetNodes);
+    EXPECT_NE(nullptr, tetFem);
 }
 
 } // namespace Physics

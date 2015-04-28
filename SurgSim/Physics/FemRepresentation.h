@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
@@ -78,6 +79,10 @@ public:
 	/// \note The FemElement is returned with read/write access
 	/// \note Out of range femElementId will raise an exception
 	std::shared_ptr<FemElement> getFemElement(size_t femElementId);
+
+    typedef SurgSim::Framework::ObjectFactory1<FemElement, std::vector<size_t>> FactoryType;
+
+    static FactoryType& getFactory();
 
 	/// Gets the total mass of the fem
 	/// \return The total mass of the fem (in Kg)
