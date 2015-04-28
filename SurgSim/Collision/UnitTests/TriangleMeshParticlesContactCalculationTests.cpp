@@ -56,7 +56,7 @@ void doCollisionTest(std::shared_ptr<ParticlesShape> particles, std::shared_ptr<
 	std::unordered_set<size_t> contactingParticles;
 	for (auto& contact : pair->getContacts())
 	{
-		size_t particleIndex = contact->penetrationPoints.second.nodeMeshLocalCoordinate.getValue().index;
+		size_t particleIndex = contact->penetrationPoints.second.index.getValue();
 		ASSERT_LE(0, particleIndex);
 		ASSERT_GT(particles->getVertices().size(), particleIndex);
 		contactingParticles.insert(particleIndex);

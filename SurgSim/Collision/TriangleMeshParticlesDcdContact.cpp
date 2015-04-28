@@ -92,7 +92,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshParticlesDcdContact::calculateCo
 					barycentricCoordinates(closestPoint, vertices[0], vertices[1], vertices[2], normal, &coordinates);
 					auto penetrationPoints = std::make_pair(
 							Location(IndexedLocalCoordinate(triangle, coordinates), DataStructures::Location::TRIANGLE),
-							Location(IndexedLocalCoordinate(particle, Vector()), DataStructures::Location::NODE));
+							Location(particle));
 					contacts.push_back(std::make_shared<Contact>(depth, Vector3d::Zero(), -normal, penetrationPoints));
 				}
 			}
