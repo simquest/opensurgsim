@@ -51,8 +51,8 @@ if(WIN32)
 		set(ARCH Win32)
 	endif()
 
-	set(WIN_DEBUG   Lib/Windows/${ARCH}/Debug/VS2012)
-	set(WIN_RELEASE Lib/Windows/${ARCH}/Release/VS2012)
+	set(DEBUG_LIB_DIR   LibOVR/Lib/Windows/${ARCH}/Debug/VS2012)
+	set(RELEASE_DIR_DIR LibOVR/Lib/Windows/${ARCH}/Release/VS2012)
 else()
 	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 		set(ARCH x86_64)
@@ -60,27 +60,25 @@ else()
 		set(ARCH i386)
 	endif()
 	
-	set(LINUX_DEBUG Lib/Linux/${ARCH}/Debug)
-	set(LINUX_RELEASE Lib/Linux/${ARCH}/Release)
+	set(DEBUG_LIB_DIR   LibOVR/Lib/Linux/${ARCH}/Debug)
+	set(RELEASE_LIB_DIR LibOVR/Lib/Linux/${ARCH}/Release)
 endif()
 
 find_library(OCULUSSDK_LIBRARY_RELEASE
 	NAMES libOVR libOVR.a
+	PATH_SUFFIXES ${RELEASE_LIB_DIR}
 	HINTS
-		${OCULUSSDK_DIR}/LibOVR/${LINUX_RELEASE}
-		${OCULUSSDK_DIR}/LibOVR/${WIN_RELEASE}
-		$ENV{OCULUSSDK_DIR}/LibOVR/${LINUX_RELEASE}
-		$ENV{OCULUSSDK_DIR}/LibOVR/${WIN_RELEASE}
+		${OCULUSSDK_DIR}
+		$ENV{OCULUSSDK_DIR}
 	PATHS /usr /usr/local
 )
 
 find_library(OCULUSSDK_LIBRARY_DEBUG
 	NAMES libOVR libOVR.a
+	PATH_SUFFIXES ${DEBUG_LIB_DIR}
 	HINTS
-		${OCULUSSDK_DIR}/LibOVR/${LINUX_DEBUG}
-		${OCULUSSDK_DIR}/LibOVR/${WIN_DEBUG}
-		$ENV{OCULUSSDK_DIR}/LibOVR/${LINUX_DEBUG}
-		$ENV{OCULUSSDK_DIR}/LibOVR/${WIN_DEBUG}
+		${OCULUSSDK_DIR}
+		$ENV{OCULUSSDK_DIR}
 )
 
 if(NOT OCULUSSDK_LIBRARY)
@@ -107,12 +105,9 @@ if(NOT OCULUSSDK_LIBRARY)
 endif()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(OculusSdk 
-	FAIL_MESSAGE "OculusSDK was not found, this could be due to a missing \
-environment variable or a change in library structure.\
- Please make sure version 0.5.0.1 beta is installed." 
+find_package_handle_standard_args(OculusSdk
 	REQUIRED_VARS OCULUSSDK_INCLUDE_DIR OCULUSSDK_VERSION_H OCULUSSDK_LIBRARY
-	VERSION_VAR OCULUSSDK_VERSION
+	VERSION_VAR   OCULUSSDK_VERSION
 )
 
 #Workaround, appending missing 3rd party libraries
