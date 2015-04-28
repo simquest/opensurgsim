@@ -30,6 +30,8 @@ class LinearSparseSolveAndInverseTests : public ::testing::Test
 {
 public:
 
+	typedef SparseMatrix::Index Index;
+
 	void setupSparseMatrixTest()
 	{
 		inverseMatrix.resize(size, size);
@@ -65,12 +67,12 @@ private:
 
 	void initializeSparseMatrix(SparseMatrix* m)
 	{
-		m->resize(static_cast<SparseMatrix::Index>(size), static_cast<SparseMatrix::Index>(size));
-		for (SparseMatrix::Index row = 0; row < size; row++)
+		m->resize(static_cast<Index>(size), static_cast<Index>(size));
+		for (size_t row = 0; row < size; row++)
 		{
-			for (SparseMatrix::Index col = 0; col < size; col++)
+			for (size_t col = 0; col < size; col++)
 			{
-				(*m).insert(row, col) =
+				(*m).insert(static_cast<Index>(row), static_cast<Index>(col)) =
 					std::fmod((10.3 * std::cos(static_cast<double>(row * col)) + 3.24), 10.0);
 			}
 		}
