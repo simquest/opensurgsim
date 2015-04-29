@@ -22,14 +22,10 @@ namespace SurgSim
 namespace Math
 {
 
-template <class VertexData>
-ParticlesShape::ParticlesShape(const SurgSim::DataStructures::Vertices<VertexData>& other)
+template <class T>
+ParticlesShape::ParticlesShape(const SurgSim::DataStructures::Vertices<T>& other) :
+	DataStructures::Vertices<DataStructures::EmptyData>(other)
 {
-	getVertices().reserve(other.getVertices().size());
-	for (auto& otherVertex : other.getVertices())
-	{
-		addVertex(VertexType(otherVertex.position));
-	}
 	update();
 }
 

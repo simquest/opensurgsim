@@ -52,8 +52,15 @@ public:
 	/// Vertex type for convenience
 	typedef Vertex<VertexData> VertexType;
 
-	/// Constructor. The mesh is initially empty (no vertices).
+	/// Constructor
 	Vertices();
+
+	/// Copy constructor when the template data is a different type
+	/// In this case, no data will be copied
+	/// \tparam T type of data stored in the other Vertices
+	/// \param other the Vertices to copy from
+	template <class T>
+	explicit Vertices(const Vertices<T>& other);
 
 	/// Destructor
 	virtual ~Vertices();
