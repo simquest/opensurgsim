@@ -29,6 +29,7 @@
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -154,11 +155,11 @@ struct OsgProgramRenderTests : public RenderTest
 		viewElement->enableManipulator(true);
 	}
 
-	void run()
+	void run(size_t time = 500)
 	{
 		// Action
 		runtime->start();
-		boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(time));
 		runtime->stop();
 	}
 };
@@ -383,6 +384,64 @@ TEST_F(OsgProgramRenderTests, NormalMap)
 	viewElement->setPose(makeRigidTransform(Vector3d(0.5, 0.5, -0.5),
 											Vector3d(0.0, 0.0, 0.0),
 											Vector3d(0.0, 1.0, 0.0)));
+
+	run();
+}
+
+TEST_F(OsgProgramRenderTests, BlurShader)
+{
+	auto element = std::make_shared<Framework::BasicSceneElement>("Graphics");
+
+	auto texture1 = std::make_shared<Graphics::OsgTexture2d>();
+	std::string filename;
+	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("OsgScreenSpaceQuadRenderTests/CheckerBoard.png", &filename));
+	texture1->loadImage(filename);
+
+
+	auto texture2 = std::make_shared<Graphics::OsgTexture2d>();
+	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("Textures/checkered.png", &filename));
+	texture2->loadImage(filename);
+
+	auto material = std::make_shared<OsgMaterial>("Material");
+	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/horizontalBlurPass");
+	ASSERT_TRUE(program != nullptr);
+	material->setProgram(program);
+
+	material->addUniform("float", "width");
+	material->setValue("width", 1024.0f);
+	material->addUniform("float", "blurRadius");
+	material->setValue("blurRadius", 16.0f);
+	material->getProgram()->setGlobalScope(true);
+
+	auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");
+	graphics->setSize(1024, 1024);
+	graphics->setLocation(0, 0);
+	graphics->setTexture(texture1);
+	graphics->setGroupReference("BlurrPass");
+	element->addComponent(graphics);
+
+	auto passCamera = std::make_shared<Graphics::OsgCamera>("BlurrPassCamera");
+	auto osgCamera = passCamera->getOsgCamera();
+	passCamera->setRenderGroupReference("BlurrPass");
+	passCamera->setGroupReference(Graphics::Representation::DefaultGroupName);
+	osgCamera->setViewport(0, 0, 1024, 1024);
+	osgCamera->setProjectionMatrixAsOrtho2D(0, 1024, 0, 1024);
+	passCamera->setMaterial(material);
+
+	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
+	passCamera->setRenderTarget(renderTarget);
+	element->addComponent(passCamera);
+
+
+	graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("DebugQuad");
+	graphics->setLocation(512, 512);
+	graphics->setSize(256, 256);
+	graphics->setTexture(passCamera->getRenderTarget()->getColorTarget(0));
+	element->addComponent(graphics);
+
+	element->addComponent(material);
+
+	scene->addSceneElement(element);
 
 	run();
 }
