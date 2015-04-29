@@ -17,8 +17,10 @@
 #define SURGSIM_GRAPHICS_OSGUNIFORM_INL_H
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/OsgUniformTypes.h"
+
 
 namespace SurgSim
 {
@@ -53,6 +55,12 @@ void OsgUniform<T>::set(const T& value)
 	SURGSIM_ASSERT(m_uniform->set(toOsg(value))) << "Failed to set OSG uniform value!" <<
 			" Uniform: " << getName() << " value: " << value;
 	m_value = value;
+}
+
+template <class T>
+void OsgUniform<T>::set(const YAML::Node& node)
+{
+	set(node.as<T>());
 }
 
 template <class T>
@@ -96,6 +104,13 @@ void OsgUniform<std::vector<T>>::set(const std::vector<T>& value)
 	{
 		setElement(i, value[i]);
 	}
+}
+
+template <class T>
+void OsgUniform<std::vector<T>>::set(const YAML::Node& node)
+{
+	SURGSIM_ASSERT(node.IsSequence()) << "Yaml setter called on vector uniform with non-sequence yaml node.";
+	set(node.as<std::vector<T>>());
 }
 
 template <class T>

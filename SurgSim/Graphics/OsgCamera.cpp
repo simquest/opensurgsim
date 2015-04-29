@@ -77,7 +77,6 @@ OsgCamera::OsgCamera(const std::string& name) :
 	OsgRepresentation(name),
 	Camera(name),
 	m_camera(new osg::Camera()),
-	m_materialProxy(new osg::Group()),
 	m_viewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("viewMatrix")),
 	m_inverseViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix")),
 	m_ambientColorUniform(std::make_shared<OsgUniform<Vector4f>>("ambientColor"))

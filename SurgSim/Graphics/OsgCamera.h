@@ -111,7 +111,6 @@ public:
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
-	osg::ref_ptr<osg::Group> m_materialProxy;
 
 	/// Projection matrix of the camera
 	SurgSim::Math::Matrix44d m_projectionMatrix;

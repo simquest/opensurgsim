@@ -33,8 +33,8 @@ OsgViewElement::OsgViewElement(const std::string& name) :
 	m_keyboardEnabled(false),
 	m_mouseEnabled(false)
 {
-	setView(std::make_shared<OsgView>(name + " View"));
-	setCamera(std::make_shared<OsgCamera>(name + " Camera"));
+	setView(std::make_shared<OsgView>("View"));
+	setCamera(std::make_shared<OsgCamera>("Camera"));
 	getCamera()->setRenderGroupReference(Representation::DefaultGroupName);
 }
 
@@ -97,7 +97,7 @@ std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgViewElement:
 
 
 void SurgSim::Graphics::OsgViewElement::setManipulatorParameters(const SurgSim::Math::Vector3d& position,
-																 const SurgSim::Math::Vector3d& lookat)
+		const SurgSim::Math::Vector3d& lookat)
 {
 	std::shared_ptr<OsgView> osgView = std::static_pointer_cast<OsgView>(getView());
 	osgView->setManipulatorParameters(position, lookat);

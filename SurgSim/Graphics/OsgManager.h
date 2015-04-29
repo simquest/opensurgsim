@@ -51,6 +51,13 @@ public:
 	/// Destructor
 	virtual ~OsgManager();
 
+	/// Change the threading model of the graphics manager viewer
+	/// \param val enables or disables multithreading in the viewer
+	void setMultiThreading(bool val);
+
+	/// \return true when the viewer is multithreading
+	bool isMultiThreading() const;
+
 	friend class OsgManagerTest;
 
 	/// Returns the OSG CompositeViewer used to manage and render the views
