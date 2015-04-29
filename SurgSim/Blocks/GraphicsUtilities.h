@@ -100,12 +100,12 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 /// the appropriate material properties (if present) to the component, if the component is not found it will be ignored
 /// The material file is a yaml file with the following format
 ///
-///     - <SceneElementName>/<ComponentName>
-///         Material: <MaterialName>
+///     - SceneElementName/ComponentName>
+///         Material: MaterialName
 ///         Properties:
-///             - [<GLSLUniformType>, <UniformName>, <YamlEncodedValue>]
-///             - [<GLSLUniformType>, <UniformName>, <YamlEncodedValue>]
-///     - <SceneElementName>/<ComponentName>
+///             - [GLSLUniformType, UniformName, YamlEncodedValue]
+///             - [GLSLUniformType, UniformName, YamlEncodedValue]
+///     - SceneElementName/ComponentName
 ///         Material: ...
 ///
 /// The name of the SceneElement and the Component addressed need to be be separated by a '/' character.

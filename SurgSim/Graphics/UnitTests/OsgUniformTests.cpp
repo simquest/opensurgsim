@@ -142,8 +142,8 @@ void testUniformFloat(FloatType min, FloatType max)
 	accessibleValue = boost::any_cast<FloatType>(accessibleResult.second);
 	EXPECT_NEAR(value, accessibleValue, Eigen::NumTraits<FloatType>::dummy_precision());
 
-	FloatType nodeValue;
-	EXPECT_NO_THROW(nodeValue = testYamlSetter<FloatType>(value));
+	FloatType nodeValue = 0.0;
+	ASSERT_NO_THROW(nodeValue = testYamlSetter<FloatType>(value));
 	EXPECT_NEAR(value, nodeValue, Eigen::NumTraits<FloatType>::dummy_precision());
 }
 
