@@ -43,6 +43,8 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DRepresentationContact.cpp
 	Fem3DRepresentationLocalization.cpp
 	FemElement.cpp
+	FemElement1DMeshPlyReaderDelegate.cpp
+	FemElementMesh.cpp
 	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
 	FixedRepresentation.cpp
@@ -105,6 +107,9 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DRepresentationContact.h
 	Fem3DRepresentationLocalization.h
 	FemElement.h
+	FemElement1DMeshPlyReaderDelegate.h
+	FemElementMesh.h
+	FemElementMesh-inl.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
 	FixedRepresentation.h
