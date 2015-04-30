@@ -31,15 +31,6 @@ set(LIBS
 	OculusDevice
 )
 
-# The unit tests will be built whenever the library is built, but
-# running them at build time requires hardware and is disabled by
-# default.
-option(SURGSIM_TESTS_RUN_DEVICE_OCULUS
-	"Run the Oculus tests as part of unit tests.  (Requires hardware and Oculus SDK!)"
-	OFF)
-surgsim_add_unit_tests(OculusDeviceTest
-	RUN ${SURGSIM_TESTS_RUN_DEVICE_OCULUS})
-
 target_link_libraries(OculusDeviceTest ${LIBS})
 
 # Put OculusDeviceTest into folder "Devices"

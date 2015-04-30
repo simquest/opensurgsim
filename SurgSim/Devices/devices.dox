@@ -10,10 +10,10 @@ Devices with Dependencies:
 - \subpage MultiAxis
 - \subpage Nimble
 - \subpage Novint
+- \subpage Oculus
 - \subpage OpenNI
 - \subpage Phantom
 - \subpage Sixense
 - \subpage TrackIR
-- \subpage Oculus
 
 */

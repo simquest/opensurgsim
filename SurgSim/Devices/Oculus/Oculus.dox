@@ -16,8 +16,8 @@ Oculus Rift SDK: SDK is available for Windows and GNU/Linux on Oculus Rift Devel
 For Windows, you must download the Oculus SDK package and install the Oculus Runtime package. 
 Then set an environment variable OCULUSSDK_DIR to the directory containing <tt>LibOVR</tt> (but
 do not include 'LibOVR' in the variable).
-For GNU/Linux, download the SDK package, exact it, run its configuration script FIRST, build the
-library, then install it. If SDK is in a custom location, you must set an environment variable 
+For GNU/Linux, download the SDK package, extract it, run its configuration script FIRST, build the
+library, then install it. If the SDK is in a custom location, you must set an environment variable
 OCULUSSDK_DIR pointing to the install path. The default installed one will be picked if both exist.
 
 Then, in CMake, enable BUILD_DEVICE_OCULUS.

@@ -66,11 +66,6 @@ struct OculusScaffold::DeviceData
 
 	/// Device handle
 	ovrHmd handle;
-
-private:
-	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
-	DeviceData(const DeviceData&) /*= delete*/;
-	DeviceData& operator=(const DeviceData&) /*= delete*/;
 };
 
 struct OculusScaffold::StateData
