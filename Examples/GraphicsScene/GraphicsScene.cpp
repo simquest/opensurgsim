@@ -23,6 +23,7 @@
 #include "SurgSim/Graphics/Graphics.h"
 #include "SurgSim/Math/Math.h"
 #include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Blocks/GraphicsUtilities.h"
 
 using SurgSim::Framework::Logger;
 using SurgSim::Graphics::OsgTextureUniform;
@@ -62,7 +63,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->getView()->setDimensions(dimensions);
 
 	/// It's an OsgViewElement, we have an OsgView, turn on mapping of uniform and attribute values
-	std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->setOsgMapsUniforms(true);
+	std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->setOsgMapsUniforms(false);
 
 	// Move the camera from left to right over along the scene
 	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator_2");
@@ -82,7 +83,8 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 
 	viewElement->setPose(from);
 
-	viewElement->addComponent(interpolator);
+	viewElement->enableManipulator(true);
+	// viewElement->addComponent(interpolator);
 
 	return viewElement;
 }
@@ -109,7 +111,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createLight()
 	auto result = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
 
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
-	light->setDiffuseColor(Vector4d(0.5, 0.5, 0.5, 1.0));
+	light->setDiffuseColor(Vector4d(1.0, 1.0, 1.0, 1.0));
 	light->setSpecularColor(Vector4d(0.8, 0.8, 0.8, 1.0));
 	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 	result->addComponent(light);
@@ -308,9 +310,6 @@ std::shared_ptr<SurgSim::Graphics::ScreenSpaceQuadRepresentation> makeDebugQuad(
 
 void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 {
-	configureShinyMaterial();
-	configureTexturedMaterial(runtime->getApplicationData()->findFile("Textures/CheckerBoard.png"));
-
 	auto scene = runtime->getScene();
 	auto box = std::make_shared<SimpleBox>("Plane");
 	box->setSize(3.0, 0.01, 3.0);
@@ -355,6 +354,7 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	copier->connect(lightElement->getPoseComponent(), "Pose", lightMapPass->getPoseComponent(), "Pose");
 
 	auto shadowMapPass = createShadowMapPass();
+	shadowMapPass->getCamera()->setOrthogonalProjection(-4, 4, -2, 2, 0, 4);
 
 	// The following three uniforms in the shadowMapPass, carry the information from the
 	// lightMapPass. They are used to project the incoming point into the space of the lightMap
@@ -411,6 +411,42 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	scene->addSceneElement(debug);
 }
 
+void createSceneWithUtilities(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
+{
+	auto scene = runtime->getScene();
+	auto box = std::make_shared<SimpleBox>("Plane");
+	box->setSize(3.0, 0.01, 3.0);
+	box->setPose(RigidTransform3d::Identity());
+	box->setMaterial(materials["texturedShadowed"]);
+	scene->addSceneElement(box);
+
+	box = std::make_shared<SimpleBox>("Box 1");
+	box->setSize(0.25, 1.0, 0.25);
+	box->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(1.0, 0.5, -1.0)));
+	scene->addSceneElement(box);
+
+	addSpheres(scene);
+
+	auto sphere = std::make_shared<SimpleSphere>("Shiny Sphere");
+	sphere->setRadius(0.25);
+	sphere->setMaterial(materials["shiny"]);
+
+	scene->addSceneElement(sphere);
+
+	std::shared_ptr<SurgSim::Graphics::ViewElement> viewElement = createView("View", 40, 40, 1024, 768);
+	scene->addSceneElement(viewElement);
+	auto mainCamera = viewElement->getCamera();
+
+	viewElement->addComponent(materials["shiny"]);
+	viewElement->addComponent(materials["texturedShadowed"]);
+
+	auto lightElement = createLight();
+	scene->addSceneElement(lightElement);
+
+
+	SurgSim::Blocks::setupShadowMapping(materials, scene);
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -425,11 +461,18 @@ int main(int argc, char* argv[])
 	materials["depthMap"] = createMaterialWithShaders(*data, "Shaders/depth_map");
 	materials["shadowMap"] = createMaterialWithShaders(*data, "Shaders/shadow_map");
 	materials["default"] = materials["basic_lit"];
+	materials["horizontalBlur"] = createMaterialWithShaders(*data, "Shaders/horizontalBlurPass");
+	materials["verticalBlur"] = createMaterialWithShaders(*data, "Shaders/verticalBlurPass");
 
-	runtime->addManager(std::make_shared<SurgSim::Graphics::OsgManager>());
+	auto graphics = std::make_shared<SurgSim::Graphics::OsgManager>();
+	graphics->setRate(60.0);
+	runtime->addManager(graphics);
 	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
 
-	createScene(runtime);
+	configureShinyMaterial();
+	configureTexturedMaterial(runtime->getApplicationData()->findFile("Textures/CheckerBoard.png"));
+
+	createSceneWithUtilities(runtime);
 
 	runtime->execute();
 
