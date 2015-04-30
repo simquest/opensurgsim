@@ -13,11 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// \file verticalBlurPass.vert
+/// Vertex Shader, for a simple 2-pass Blur vertical pass
+
+/// Height of the Texture that is incoming
 uniform float height;
+
+/// Sampling radius
 uniform float blurRadius;
 
+/// Prepopulate coordinates for sampling, HW will interpolate
 varying vec2 taps[7];
-varying float weights[7];
 
 void main(void) 
 {
@@ -34,13 +40,5 @@ void main(void)
     taps[4] = texCoord0 - vec2(0.0, 1.0) * dy;
     taps[5] = texCoord0 - vec2(0.0, 2.0) * dy;
     taps[6] = texCoord0 - vec2(0.0, 3.0) * dy;
-
-    weights[0] = 0.04779035227281;
-    weights[1] = 0.11086490165864;
-    weights[2] = 0.21078608625031;
-    weights[3] = 0.26111731963647;
-    weights[4] = 0.21078608625031;
-    weights[5] = 0.11086490165864;
-    weights[6] = 0.04779035227281;
 } 
  

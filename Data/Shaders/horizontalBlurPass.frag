@@ -13,10 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// \file horizontalBlurPass.frag
+/// Fragment Shader, for a simple 2-pass Blur horizontal pass
+
+/// Use version 120 for const array capability
+#version 120
+
+/// Texture to sample, e.g. on a ScreenSpaceQuad
 uniform sampler2D texture;
 
+/// Texture coordinates for sampling
 varying vec2 taps[7];
-varying float weights[7];
+
+/// Fixed weights for blur
+const float weights[7] = float[](
+    0.04779035227281,
+    0.11086490165864,
+    0.21078608625031,
+    0.26111731963647,
+    0.21078608625031,
+    0.11086490165864,
+    0.04779035227281);
 
 void main(void) 
 {	
