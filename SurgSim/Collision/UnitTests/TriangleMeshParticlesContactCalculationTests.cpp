@@ -62,7 +62,7 @@ void doCollisionTest(std::shared_ptr<ParticlesShape> particles, std::shared_ptr<
 		contactingParticles.insert(particleIndex);
 
 		Vector3d particlesToMesh = meshPose * mesh->getCenter() - particles->getVertex(particleIndex).position;
-		if (! particlesToMesh.isZero())
+		if (!particlesToMesh.isZero())
 		{
 			// Check that each normal is pointing into the mesh
 			EXPECT_LT(0.0, contact->normal.dot(particlesToMesh));
