@@ -32,7 +32,6 @@
 #include <osgAnimation/StackedTranslateElement>
 #include <osgAnimation/UpdateBone>
 #include <osgDB/ReadFile>
-#include <osgUtil/UpdateVisitor>
 
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
