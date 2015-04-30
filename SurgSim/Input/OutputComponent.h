@@ -72,7 +72,7 @@ public:
 	void setData(const SurgSim::DataStructures::DataGroup& dataGroup);
 
 	/// \return The data which may be empty.
-	DataStructures::DataGroup OutputComponent::getData() const;
+	DataStructures::DataGroup getData() const;
 
 	/// Overridden from Component, do nothing
 	virtual bool doInitialize();
