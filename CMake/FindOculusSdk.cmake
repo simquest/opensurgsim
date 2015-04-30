@@ -52,7 +52,7 @@ if(WIN32)
 	endif()
 
 	set(DEBUG_LIB_DIR   LibOVR/Lib/Windows/${ARCH}/Debug/VS2012)
-	set(RELEASE_DIR_DIR LibOVR/Lib/Windows/${ARCH}/Release/VS2012)
+	set(RELEASE_LIB_DIR LibOVR/Lib/Windows/${ARCH}/Release/VS2012)
 else()
 	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 		set(ARCH x86_64)
