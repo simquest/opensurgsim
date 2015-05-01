@@ -31,6 +31,9 @@ set(LIBS
 	OculusDevice
 )
 
+surgsim_add_unit_tests(OculusDeviceTest
+	RUN ${SURGSIM_TESTS_RUN_DEVICE_OCULUS})
+
 target_link_libraries(OculusDeviceTest ${LIBS})
 
 # Put OculusDeviceTest into folder "Devices"
