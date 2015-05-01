@@ -80,9 +80,9 @@ public:
 	/// \note Out of range femElementId will raise an exception
 	std::shared_ptr<FemElement> getFemElement(size_t femElementId);
 
-    typedef SurgSim::Framework::ObjectFactory1<FemElement, std::vector<size_t>> FactoryType;
+	typedef SurgSim::Framework::ObjectFactory1<FemElement, std::vector<size_t>> FactoryType;
 
-    static FactoryType& getFactory();
+	static FactoryType& getFactory();
 
 	/// Gets the total mass of the fem
 	/// \return The total mass of the fem (in Kg)

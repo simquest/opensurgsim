@@ -180,13 +180,13 @@ size_t FemRepresentation::getNumFemElements() const
 std::shared_ptr<FemElement> FemRepresentation::getFemElement(size_t femElementId)
 {
 	SURGSIM_ASSERT(femElementId < getNumFemElements()) << "Invalid femElement id";
-    return m_femElements[femElementId];
+	return m_femElements[femElementId];
 }
 
 FemRepresentation::FactoryType& FemRepresentation::getFactory()
 {
-    static FactoryType factory;
-    return factory;
+	static FactoryType factory;
+	return factory;
 }
 
 bool FemRepresentation::isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const

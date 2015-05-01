@@ -287,14 +287,14 @@ const Vector3d& MockMassSpring::getGravityVector() const
 
 MockFemElement::MockFemElement() : FemElement(), m_isInitialized(false)
 {
-    setNumDofPerNode(3);
+	setNumDofPerNode(3);
 }
 
 MockFemElement::MockFemElement(std::vector<size_t> nodeIds) : FemElement(), m_isInitialized(false)
 {
-    setNumDofPerNode(3);
+	setNumDofPerNode(3);
 
-    m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 
 void MockFemElement::addNode(size_t nodeId)
