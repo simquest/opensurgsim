@@ -97,7 +97,7 @@ TEST(OdeSolver, GetTest)
 	EXPECT_EQ(name, solver.getName());
 
 	EXPECT_NE(nullptr, solver.getLinearSolver());
-	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>(solver.getLinearSolver()));
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSparseSolveAndInverseCG>(solver.getLinearSolver()));
 	EXPECT_NO_THROW(solver.setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>()));
 	EXPECT_NE(nullptr, solver.getLinearSolver());
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>(solver.getLinearSolver()));

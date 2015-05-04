@@ -40,7 +40,7 @@ using SurgSim::Math::Vector4d;
 
 namespace
 {
-const double epsilon = 1e-10;
+const double epsilon = 1e-8;
 const double dt = 1e-3;
 };
 

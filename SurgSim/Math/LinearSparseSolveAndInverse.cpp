@@ -38,6 +38,42 @@ Matrix LinearSparseSolveAndInverseLU::getInverse() const
 	return (m_lu.solve(Matrix::Identity(m_lu.rows(), m_lu.cols())));
 }
 
+void LinearSparseSolveAndInverseCG::setTolerance(double tolerance)
+{
+	m_cg.setTolerance(tolerance);
+}
+
+double LinearSparseSolveAndInverseCG::getTolerance()
+{
+	return m_cg.tolerance();
+}
+
+void LinearSparseSolveAndInverseCG::setMaxIterations(size_t iterations)
+{
+	m_cg.setMaxIterations(iterations);
+}
+
+size_t LinearSparseSolveAndInverseCG::getMaxIterations()
+{
+	return m_cg.maxIterations();
+}
+
+void LinearSparseSolveAndInverseCG::setMatrix(const SparseMatrix& matrix)
+{
+	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
+	m_cg.compute(matrix);
+}
+
+Matrix LinearSparseSolveAndInverseCG::solve(const Matrix& b) const
+{
+	return m_cg.solve(b);
+}
+
+Matrix LinearSparseSolveAndInverseCG::getInverse() const
+{
+	return (m_cg.solve(Matrix::Identity(m_cg.rows(), m_cg.cols())));
+}
+
 }; // namespace Math
 
 }; // namespace SurgSim

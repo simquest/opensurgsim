@@ -71,6 +71,36 @@ private:
 	Eigen::SparseLU<SparseMatrix> m_lu;
 };
 
+/// Derivation for sparse LU solver
+class LinearSparseSolveAndInverseCG : public LinearSparseSolveAndInverse
+{
+public:
+	/// Set the conjugate gradient convergence tolerance
+	/// \param tolerance the new convergence tolerance
+	void setTolerance(double tolerance);
+
+	/// Get the conjugate gradient convergence tolerance
+	/// \return the convergence tolerance
+	double getTolerance();
+
+	/// Set the maximum number fo iterations for conjugate gradient
+	/// \param iterations the new maximum number of iterations
+	void setMaxIterations(size_t iterations);
+
+	/// Get the conjugate gradient maximum iterations
+	/// \return the maimum number of iterations allowed
+	size_t getMaxIterations();
+
+	void setMatrix(const SparseMatrix& matrix) override;
+
+	Matrix solve(const Matrix& b) const override;
+
+	Matrix getInverse() const override;
+
+private:
+	Eigen::ConjugateGradient<SparseMatrix> m_cg;
+};
+
 }; // namespace Math
 
 }; // namespace SurgSim

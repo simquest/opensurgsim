@@ -280,7 +280,7 @@ bool DeformableRepresentation::doWakeUp()
 	using SurgSim::Math::OdeSolverLinearRungeKutta4;
 	using SurgSim::Math::OdeSolverLinearStatic;
 
-	using SurgSim::Math::LinearSparseSolveAndInverseLU;
+	using SurgSim::Math::LinearSparseSolveAndInverseCG;
 
 	// Transform the state with the initial pose
 	transformState(m_initialState, getPose());
@@ -337,7 +337,7 @@ bool DeformableRepresentation::doWakeUp()
 	}
 
 	// No assumption is made on the linear solver, we instantiate a general sparse matrix solver
-	m_odeSolver->setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
+	m_odeSolver->setLinearSolver(std::make_shared<LinearSparseSolveAndInverseCG>());
 
 	return true;
 }

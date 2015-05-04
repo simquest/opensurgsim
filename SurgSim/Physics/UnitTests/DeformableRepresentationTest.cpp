@@ -430,6 +430,7 @@ TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 	using SurgSim::Math::OdeSolverLinearEulerExplicitModified;
 	using SurgSim::Math::OdeSolverLinearEulerImplicit;
 	using SurgSim::Math::OdeSolverLinearStatic;
+	using SurgSim::Math::LinearSparseSolveAndInverseCG;
 	using SurgSim::Math::LinearSparseSolveAndInverseLU;
 
 	// setInitialState sets all 4 states (tested in method above !)
@@ -456,8 +457,8 @@ TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 	// Test the Ode Solver
 	ASSERT_NE(nullptr, m_odeSolver);
 	ASSERT_NE(nullptr, m_odeSolver->getLinearSolver());
-	std::shared_ptr<LinearSparseSolveAndInverseLU> expectedLinearSolverType;
-	expectedLinearSolverType = std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>
+	std::shared_ptr<LinearSparseSolveAndInverseCG> expectedLinearSolverType;
+	expectedLinearSolverType = std::dynamic_pointer_cast<LinearSparseSolveAndInverseCG>
 							   (m_odeSolver->getLinearSolver());
 	ASSERT_NE(nullptr, expectedLinearSolverType);
 

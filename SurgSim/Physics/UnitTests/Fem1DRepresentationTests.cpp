@@ -91,6 +91,7 @@ TEST(Fem1DRepresentationTests, TransformInitialStateTest)
 TEST(Fem1DRepresentationTests, DoWakeUpTest)
 {
 	using SurgSim::Math::LinearSparseSolveAndInverse;
+	using SurgSim::Math::LinearSparseSolveAndInverseCG;
 	using SurgSim::Math::LinearSparseSolveAndInverseLU;
 
 	std::shared_ptr<MockFem1DRepresentation> fem = std::make_shared<MockFem1DRepresentation>("Fem1D");
@@ -107,8 +108,8 @@ TEST(Fem1DRepresentationTests, DoWakeUpTest)
 	EXPECT_NE(nullptr, fem->getOdeSolver());
 	std::shared_ptr<LinearSparseSolveAndInverse> linearSolver = fem->getOdeSolver()->getLinearSolver();
 	EXPECT_NE(nullptr, linearSolver);
-	std::shared_ptr<LinearSparseSolveAndInverseLU> expectedLinearSolverType;
-	expectedLinearSolverType = std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>(linearSolver);
+	std::shared_ptr<LinearSparseSolveAndInverseCG> expectedLinearSolverType;
+	expectedLinearSolverType = std::dynamic_pointer_cast<LinearSparseSolveAndInverseCG>(linearSolver);
 	EXPECT_NE(nullptr, expectedLinearSolverType);
 }
 

@@ -27,7 +27,7 @@ OdeSolver::OdeSolver(OdeEquation* equation) : m_equation(*equation)
 	allocate(m_equation.getInitialState()->getPositions().size());
 
 	// Default linear solver
-	setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
+	setLinearSolver(std::make_shared<LinearSparseSolveAndInverseCG>());
 }
 
 const std::string OdeSolver::getName() const

@@ -230,7 +230,7 @@ TEST_F(MassSpringMechanicalValidationTests, OneSpringFrequencyTest)
 		const Vector3d& currentPosition = SurgSim::Math::getSubVector(m.getCurrentState()->getPositions(), 1, 3);
 		EXPECT_TRUE(finalPosition.isApprox(currentPosition));
 		EXPECT_TRUE(finalPosition.isApprox(x, 1e-8));
-		EXPECT_TRUE(finalVelocity.isApprox(v, 1e-8));
+		EXPECT_TRUE(finalVelocity.isApprox(v, 1e-7));
 
 		Vector3d deltaCompare = finalPosition - x0;
 		EXPECT_FALSE(deltaCompare.isZero(1e-11)) << "Error is " << deltaCompare.norm();
