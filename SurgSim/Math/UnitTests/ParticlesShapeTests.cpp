@@ -19,6 +19,7 @@
 #include "SurgSim/DataStructures/NormalData.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Shapes.h"
+#include "SurgSim/Math/Valid.h"
 
 
 namespace
@@ -62,6 +63,10 @@ TEST(ParticlesShapeTests, DefaultProperties)
 	ParticlesShape particles;
 	EXPECT_NEAR(0.0, particles.getRadius(), epsilon);
 	EXPECT_EQ(SHAPE_TYPE_PARTICLES, particles.getType());
+	EXPECT_NEAR(0.0, particles.getVolume(), epsilon);
+	EXPECT_FALSE(isValid(particles.getCenter()));
+	EXPECT_TRUE(particles.getSecondMomentOfVolume().isZero());
+	EXPECT_NE(nullptr, particles.getAabbTree());
 }
 
 TEST(ParticlesShapeTests, SetGetRadius)

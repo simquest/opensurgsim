@@ -32,6 +32,7 @@ namespace DataStructures
 /// different data is needed to specify a location on it. This structure supports:
 /// - Any rigid shape (location identified by a local position)
 /// - Octree (location identified by an octree path)
+/// - Index (location indentified by an index)
 /// - A triangle mesh (location identified by the triangle id, and the barycentric coordinate of a point in it)
 /// - A node in a mesh (location identified by the node id)
 /// - An element in a mesh (location identified by the element id, and the barycentric coordinate of a point in it)
@@ -50,6 +51,7 @@ public:
 	Location(const Location& other)
 		: rigidLocalPosition(other.rigidLocalPosition),
 		octreeNodePath(other.octreeNodePath),
+		index(other.index),
 		triangleMeshLocalCoordinate(other.triangleMeshLocalCoordinate),
 		nodeMeshLocalCoordinate(other.nodeMeshLocalCoordinate),
 		elementMeshLocalCoordinate(other.elementMeshLocalCoordinate)
@@ -69,6 +71,13 @@ public:
 		octreeNodePath.setValue(nodePath);
 	}
 
+	/// Constructor for an index
+	/// \param val The index to set this location to
+	explicit Location(const size_t val)
+	{
+		index.setValue(val);
+	}
+
 	/// Constructor for mesh-based location
 	/// \param localCoordinate index-based local coordinate
 	/// \param meshType the type of location (a node, a triangle or an element)
@@ -85,6 +94,7 @@ public:
 
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::OctreePath> octreeNodePath;
+	SurgSim::DataStructures::OptionalValue<size_t> index;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> triangleMeshLocalCoordinate;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> nodeMeshLocalCoordinate;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> elementMeshLocalCoordinate;

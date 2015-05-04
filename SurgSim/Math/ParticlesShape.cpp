@@ -30,6 +30,7 @@ ParticlesShape::ParticlesShape(double radius) :
 	m_radius(radius)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
+	update();
 }
 
 int ParticlesShape::getType() const
