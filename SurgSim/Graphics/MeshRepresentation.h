@@ -51,18 +51,9 @@ public:
 	explicit MeshRepresentation(const std::string& name) : Representation(name)
 	{
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, std::shared_ptr<SurgSim::Framework::Asset>, Mesh, getMesh,
-			setMesh);
-
-		// Enables the alternative use of the mesh file instead of the actual mesh object
-		DecoderType decoder = std::bind(&MeshRepresentation::loadMesh, this,
-										std::bind(&YAML::Node::as<std::string>, std::placeholders::_1));
-		setDecoder("MeshFileName", decoder);
-
-		SetterType setter = std::bind(&MeshRepresentation::loadMesh, this,
-									  std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1));
-		setSetter("MeshFileName", setter);
-
+										  setMesh);
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, int, UpdateOptions, getUpdateOptions, setUpdateOptions);
+		SURGSIM_ADD_SETTER(MeshRepresentation, std::string, MeshFileName, loadMesh);
 	}
 
 	/// Destructor

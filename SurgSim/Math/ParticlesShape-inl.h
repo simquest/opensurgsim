@@ -12,27 +12,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 
-#include "SurgSim/Graphics/SceneryRepresentation.h"
-
-#include "SurgSim/Framework/Asset.h"
-#include "SurgSim/Graphics/Model.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
+#ifndef SURGSIM_MATH_PARTICLESSHAPE_INL_H
+#define SURGSIM_MATH_PARTICLESSHAPE_INL_H
 
 namespace SurgSim
 {
-namespace Graphics
+namespace Math
 {
 
-
-SceneryRepresentation::SceneryRepresentation(const std::string& name) : Representation(name)
+template <class VertexData>
+ParticlesShape::ParticlesShape(const SurgSim::DataStructures::Vertices<VertexData>& other)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SceneryRepresentation, std::shared_ptr<SurgSim::Framework::Asset>,
-									  Model , getModel, setModel);
-	SURGSIM_ADD_SETTER(SceneryRepresentation, std::string, ModelFileName, loadModel);
+	getVertices().reserve(other.getVertices().size());
+	for (auto& otherVertex : other.getVertices())
+	{
+		addVertex(VertexType(otherVertex.position));
+	}
+	update();
 }
 
+}; // namespace Math
+}; // namespace SurgSim
 
-}
-}
-
+#endif

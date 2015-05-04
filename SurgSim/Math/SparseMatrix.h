@@ -27,6 +27,8 @@ namespace SurgSim
 {
 namespace Math
 {
+/// A sparse matrix
+typedef Eigen::SparseMatrix<double> SparseMatrix;
 
 namespace Static
 {
@@ -45,24 +47,24 @@ public:
 	/// \param start Where the assignment starts in the chunk of memory
 	/// \param subMatrix The matrix from which the row/column is copied
 	/// \param colRowId The column or row id depending on the template parameter Opt
-	void assign(T* ptr, Index start, const DerivedSub& subMatrix, Index colRowId){}
+	void assign(T* ptr, Index start, const DerivedSub& subMatrix, Index colRowId) {}
 
 	/// Do the assignment of a single matrix element (operator =)
 	/// \param ptr The matrix element to be assigned
 	/// \param value The value to assign to
-	void assign(T* ptr, const T& value){}
+	void assign(T* ptr, const T& value) {}
 
 	/// Do the addition of a row/column of a matrix to a chunk of memory (operator +=)
 	/// \param ptr The chunk of memory
 	/// \param start Where the addition starts in the chunk of memory
 	/// \param subMatrix The matrix from which the row/column is added
 	/// \param colRowId The column or row id depending on the template parameter Opt
-	void add(T* ptr, Index start, const DerivedSub& subMatrix, Index colRowId){}
+	void add(T* ptr, Index start, const DerivedSub& subMatrix, Index colRowId) {}
 
 	/// Do the addition of a single matrix element with another element (operator +=)
 	/// \param ptr The matrix element to be increased by the value
 	/// \param value The value to add
-	void add(T* ptr, const T& value){}
+	void add(T* ptr, const T& value) {}
 };
 
 /// Specialization for column major storage
@@ -72,12 +74,12 @@ class Operation<T, Eigen::ColMajor, Index, n, m, DerivedSub>
 public:
 	void assign(T* ptr, Index start, const DerivedSub& subMatrix, Index colId)
 	{
-		typedef Eigen::Matrix<T, n, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
+		typedef Eigen::Matrix < T, n, 1, Eigen::DontAlign | Eigen::ColMajor > ColVector;
 
 		// ptr[start] is the 1st element in the column
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
-		Eigen::Map<ColVector>(&ptr[start]).operator=(
-			subMatrix.col(static_cast<typename DerivedSub::Index>(colId)).template segment<n>(0));
+		Eigen::Map<ColVector>(&ptr[start]).operator = (
+					subMatrix.col(static_cast<typename DerivedSub::Index>(colId)).template segment<n>(0));
 	}
 
 	void assign(T* ptr, const T& value)
@@ -87,12 +89,12 @@ public:
 
 	void add(T* ptr, Index start, const DerivedSub& subMatrix, Index colId)
 	{
-		typedef Eigen::Matrix<T, n, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
+		typedef Eigen::Matrix < T, n, 1, Eigen::DontAlign | Eigen::ColMajor > ColVector;
 
 		// ptr[start] is the 1st element in the column
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
-		Eigen::Map<ColVector>(&ptr[start]).operator+=(
-			subMatrix.col(static_cast<typename DerivedSub::Index>(colId)).template segment<n>(0));
+		Eigen::Map<ColVector>(&ptr[start]).operator += (
+					subMatrix.col(static_cast<typename DerivedSub::Index>(colId)).template segment<n>(0));
 	}
 
 	void add(T* ptr, const T& value)
@@ -108,12 +110,12 @@ class Operation<T, Eigen::RowMajor, Index, n, m, DerivedSub>
 public:
 	void assign(T* ptr, Index start, const DerivedSub& subMatrix, Index rowId)
 	{
-		typedef Eigen::Matrix<T, 1, m, Eigen::DontAlign | Eigen::RowMajor> RowVector;
+		typedef Eigen::Matrix < T, 1, m, Eigen::DontAlign | Eigen::RowMajor > RowVector;
 
 		// ptr[start] is the 1st element in the row
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
-		Eigen::Map<RowVector>(&ptr[start]).operator=(
-			subMatrix.row(static_cast<typename DerivedSub::Index>(rowId)).template segment<m>(0));
+		Eigen::Map<RowVector>(&ptr[start]).operator = (
+					subMatrix.row(static_cast<typename DerivedSub::Index>(rowId)).template segment<m>(0));
 	}
 
 	void assign(T* ptr, const T& value)
@@ -123,12 +125,12 @@ public:
 
 	void add(T* ptr, Index start, const DerivedSub& subMatrix, Index rowId)
 	{
-		typedef Eigen::Matrix<T, 1, m, Eigen::DontAlign | Eigen::RowMajor> RowVector;
+		typedef Eigen::Matrix < T, 1, m, Eigen::DontAlign | Eigen::RowMajor > RowVector;
 
 		// ptr[start] is the 1st element in the row
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
-		Eigen::Map<RowVector>(&ptr[start]).operator+=(
-			subMatrix.row(static_cast<typename DerivedSub::Index>(rowId)).template segment<m>(0));
+		Eigen::Map<RowVector>(&ptr[start]).operator += (
+					subMatrix.row(static_cast<typename DerivedSub::Index>(rowId)).template segment<m>(0));
 	}
 
 	void add(T* ptr, const T& value)
@@ -155,12 +157,12 @@ public:
 	/// \param n, m The size of the block (n rows, m columns)
 	/// \param subMatrix The matrix from which the row/column is copied
 	/// \param colRowId The column or row id depending on the template parameter Opt
-	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colRowId){}
+	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colRowId) {}
 
 	/// Do the assignment of a single matrix element (operator =)
 	/// \param ptr The matrix element to be assigned
 	/// \param value The value to assign to
-	void assign(T* ptr, const T& value){}
+	void assign(T* ptr, const T& value) {}
 
 	/// Do the addition of a row/column of a matrix to a chunk of memory
 	/// \param ptr The chunk of memory
@@ -168,12 +170,12 @@ public:
 	/// \param n, m The size of the block (n rows, m columns)
 	/// \param subMatrix The matrix from which the row/column is added
 	/// \param colRowId The column or row id depending on the template parameter Opt
-	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colRowId){}
+	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colRowId) {}
 
 	/// Do the addition of a single matrix element (operator +=)
 	/// \param ptr The matrix element to be increased
 	/// \param value The value to add
-	void add(T* ptr, const T& value){}
+	void add(T* ptr, const T& value) {}
 };
 
 /// Specialization for column major storage
@@ -183,14 +185,14 @@ class Operation<T, Eigen::ColMajor, Index, DerivedSub>
 public:
 	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colId)
 	{
-		typedef Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
-		typedef typename Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor>::Index IndexVector;
+		typedef Eigen::Matrix < T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor > ColVector;
+		typedef typename Eigen::Matrix < T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor >::Index IndexVector;
 		typedef typename DerivedSub::Index IndexSub;
 
 		// ptr[start] is the 1st element in the column
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
-		Eigen::Map<ColVector>(&ptr[start], static_cast<IndexVector>(n)).operator=(
-			subMatrix.col(static_cast<IndexSub>(colId)).segment(0, static_cast<IndexSub>(n)));
+		Eigen::Map<ColVector>(&ptr[start], static_cast<IndexVector>(n)).operator = (
+					subMatrix.col(static_cast<IndexSub>(colId)).segment(0, static_cast<IndexSub>(n)));
 	}
 
 	void assign(T* ptr, const T& value)
@@ -200,14 +202,14 @@ public:
 
 	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colId)
 	{
-		typedef Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor> ColVector;
-		typedef typename Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor>::Index IndexVector;
+		typedef Eigen::Matrix < T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor > ColVector;
+		typedef typename Eigen::Matrix < T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor >::Index IndexVector;
 		typedef typename DerivedSub::Index IndexSub;
 
 		// ptr[start] is the 1st element in the column
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
-		Eigen::Map<ColVector>(&ptr[start], static_cast<IndexVector>(n)).operator+=(
-			subMatrix.col(static_cast<IndexSub>(colId)).segment(0, static_cast<IndexSub>(n)));
+		Eigen::Map<ColVector>(&ptr[start], static_cast<IndexVector>(n)).operator += (
+					subMatrix.col(static_cast<IndexSub>(colId)).segment(0, static_cast<IndexSub>(n)));
 	}
 
 	void add(T* ptr, const T& value)
@@ -223,14 +225,14 @@ class Operation<T, Eigen::RowMajor, Index, DerivedSub>
 public:
 	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index rowId)
 	{
-		typedef Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor> RowVector;
-		typedef typename Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor>::Index IndexVector;
+		typedef Eigen::Matrix < T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor > RowVector;
+		typedef typename Eigen::Matrix < T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor >::Index IndexVector;
 		typedef typename DerivedSub::Index IndexSub;
 
 		// ptr[start] is the 1st element in the row
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
-		Eigen::Map<RowVector>(&ptr[start], static_cast<IndexVector>(m)).operator=(
-			subMatrix.row(static_cast<IndexSub>(rowId)).segment(0, static_cast<IndexSub>(m)));
+		Eigen::Map<RowVector>(&ptr[start], static_cast<IndexVector>(m)).operator = (
+					subMatrix.row(static_cast<IndexSub>(rowId)).segment(0, static_cast<IndexSub>(m)));
 	}
 
 	void assign(T* ptr, const T& value)
@@ -240,14 +242,14 @@ public:
 
 	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index rowId)
 	{
-		typedef Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor> RowVector;
-		typedef typename Eigen::Matrix<T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor>::Index IndexVector;
+		typedef Eigen::Matrix < T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor > RowVector;
+		typedef typename Eigen::Matrix < T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor >::Index IndexVector;
 		typedef typename DerivedSub::Index IndexSub;
 
 		// ptr[start] is the 1st element in the row
 		// The elements exists and are contiguous in memory, we use Eigen::Map functionality to optimize the operation
-		Eigen::Map<RowVector>(&ptr[start], static_cast<IndexVector>(m)).operator+=(
-			subMatrix.row(static_cast<IndexSub>(rowId)).segment(0, static_cast<IndexSub>(m)));
+		Eigen::Map<RowVector>(&ptr[start], static_cast<IndexVector>(m)).operator += (
+					subMatrix.row(static_cast<IndexSub>(rowId)).segment(0, static_cast<IndexSub>(m)));
 	}
 
 	void add(T* ptr, const T& value)
@@ -290,14 +292,14 @@ template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename
 void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
 								 Eigen::SparseMatrix<T, Opt, Index>* matrix,
 								 void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
-								   const DerivedSub&, Index))
+										 const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
 	static Static::Operation<T, Opt, Index, n, m, DerivedSub> operation;
 
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
-		"Both matrices should use the same Scalar type");
+				  "Both matrices should use the same Scalar type");
 
 	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
@@ -312,7 +314,7 @@ void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, In
 	const Index* outerIndices = matrix->outerIndexPtr();
 
 	Index outerStart = (Opt == Eigen::ColMajor ? columnStart : rowStart);
-	Index innerStart = (Opt == Eigen::ColMajor ? rowStart: columnStart);
+	Index innerStart = (Opt == Eigen::ColMajor ? rowStart : columnStart);
 	Index outerSize = static_cast<Index>(Opt == Eigen::ColMajor ? m : n);
 	Index innerSize = static_cast<Index>(Opt == Eigen::ColMajor ? n : m);
 
@@ -326,15 +328,15 @@ void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, In
 		// Make sure that we are not going to write out of the range...
 		// i.e. The column has at least n elements
 		SURGSIM_ASSERT(static_cast<Index>(innerSize) <= innerStartIdInNextOuter - innerStartIdInCurrentOuter) <<
-			"matrix column/row " << outerStart + outerLoop << " doesn't have enough coefficients";
+				"matrix column/row " << outerStart + outerLoop << " doesn't have enough coefficients";
 
 		// Make sure that the 1st element in this column is the requested row
 		SURGSIM_ASSERT(innerStart == innerIndices[innerStartIdInCurrentOuter]) <<
-			"matrix column/row " << outerStart + outerLoop << " doesn't start at the block start location";
+				"matrix column/row " << outerStart + outerLoop << " doesn't start at the block start location";
 
 		// Make sure that the last element corresponding to the block size is the expected row index
 		SURGSIM_ASSERT(innerStart + static_cast<Index>(innerSize) - 1 == innerIndices[innerStartIdInNextOuter - 1]) <<
-			"matrix column/row " << outerStart + outerLoop << " doesn't end at the block end location";
+				"matrix column/row " << outerStart + outerLoop << " doesn't end at the block end location";
 
 		(operation.*op)(ptr, innerStartIdInCurrentOuter, subMatrix, outerLoop);
 	}
@@ -373,14 +375,14 @@ template <typename DerivedSub, typename T, int Opt, typename Index>
 void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
 								 Eigen::SparseMatrix<T, Opt, Index>* matrix,
 								 void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
-								   const DerivedSub&, Index))
+										 const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
 	static Dynamic::Operation<T, Opt, Index, DerivedSub> operation;
 
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
-		"Both matrices should use the same Scalar type");
+				  "Both matrices should use the same Scalar type");
 
 	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
@@ -395,7 +397,7 @@ void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, In
 	const Index* outerIndices = matrix->outerIndexPtr();
 
 	Index outerStart = (Opt == Eigen::ColMajor ? columnStart : rowStart);
-	Index innerStart = (Opt == Eigen::ColMajor ? rowStart: columnStart);
+	Index innerStart = (Opt == Eigen::ColMajor ? rowStart : columnStart);
 	Index outerSize = static_cast<Index>(Opt == Eigen::ColMajor ? m : n);
 	Index innerSize = static_cast<Index>(Opt == Eigen::ColMajor ? n : m);
 
@@ -409,15 +411,15 @@ void blockOperationWithoutSearch(const DerivedSub& subMatrix, Index rowStart, In
 		// Make sure that we are not going to write out of the range...
 		// i.e. The column has at least n elements
 		SURGSIM_ASSERT(static_cast<Index>(innerSize) <= innerStartIdInNextOuter - innerStartIdInCurrentOuter) <<
-			"matrix column/row " << outerStart + outerLoop << " doesn't have enough coefficients";
+				"matrix column/row " << outerStart + outerLoop << " doesn't have enough coefficients";
 
 		// Make sure that the 1st element in this column is the requested row
 		SURGSIM_ASSERT(innerStart == innerIndices[innerStartIdInCurrentOuter]) <<
-			"matrix column/row " << outerStart + outerLoop << " doesn't start at the block start location";
+				"matrix column/row " << outerStart + outerLoop << " doesn't start at the block start location";
 
 		// Make sure that the last element corresponding to the block size is the expected row index
 		SURGSIM_ASSERT(innerStart + static_cast<Index>(innerSize) - 1 == innerIndices[innerStartIdInNextOuter - 1]) <<
-			"matrix column/row " << outerStart + outerLoop << " doesn't end at the block end location";
+				"matrix column/row " << outerStart + outerLoop << " doesn't end at the block end location";
 
 		(operation.*op)(ptr, innerStartIdInCurrentOuter, n, m, subMatrix, outerLoop);
 	}
@@ -454,14 +456,14 @@ template <size_t n, size_t m, typename DerivedSub, typename T, int Opt, typename
 void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
 							  Eigen::SparseMatrix<T, Opt, Index>* matrix,
 							  void (Static::Operation<T, Opt, Index, n, m, DerivedSub>::*op)(T*, Index,
-							   const DerivedSub&, Index))
+									  const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
 	static Static::Operation<T, Opt, Index, n, m, DerivedSub> operation;
 
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
-		"Both matrices should use the same Scalar type");
+				  "Both matrices should use the same Scalar type");
 
 	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
@@ -476,7 +478,7 @@ void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index
 	const Index* outerIndices = matrix->outerIndexPtr();
 
 	Index outerStart = (Opt == Eigen::ColMajor ? columnStart : rowStart);
-	Index innerStart = (Opt == Eigen::ColMajor ? rowStart: columnStart);
+	Index innerStart = (Opt == Eigen::ColMajor ? rowStart : columnStart);
 	Index outerSize = static_cast<Index>(Opt == Eigen::ColMajor ? m : n);
 	Index innerSize = static_cast<Index>(Opt == Eigen::ColMajor ? n : m);
 
@@ -496,22 +498,22 @@ void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index
 		else
 		{
 			innerFirstElement = matrix->data().searchLowerIndex(
-				innerStartIdInCurrentOuter, innerStartIdInNextOuter - 1, innerStart);
+									innerStartIdInCurrentOuter, innerStartIdInNextOuter - 1, innerStart);
 		}
 
 		// Make sure we actually found the 1st element of the block in this outer
 		SURGSIM_ASSERT(innerIndices[innerFirstElement] == innerStart) <<
-			"matrix is missing an element of the block (1st element on a row/column)";
+				"matrix is missing an element of the block (1st element on a row/column)";
 
 		// Make sure that we are not going to write out of the range...
 		// i.e. The column/row (starting at the beginning of the block) has at least innerSize elements
 		SURGSIM_ASSERT(static_cast<Index>(innerSize) <= innerStartIdInNextOuter - innerFirstElement) <<
-			"matrix is missing elements of the block (but not the 1st element on a row/column)";
+				"matrix is missing elements of the block (but not the 1st element on a row/column)";
 
 		// Make sure that the last element corresponding to the block size has the expected index
 		SURGSIM_ASSERT(innerStart + static_cast<Index>(innerSize) - 1 == \
-			innerIndices[innerFirstElement + static_cast<Index>(innerSize) - 1]) <<
-			"matrix is missing elements of the block (but not the 1st element on a row/column)";
+					   innerIndices[innerFirstElement + static_cast<Index>(innerSize) - 1]) <<
+							   "matrix is missing elements of the block (but not the 1st element on a row/column)";
 
 		(operation.*op)(ptr, innerFirstElement, subMatrix, outerLoop);
 	}
@@ -548,14 +550,14 @@ template <typename DerivedSub, typename T, int Opt, typename Index>
 void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
 							  Eigen::SparseMatrix<T, Opt, Index>* matrix,
 							  void (Dynamic::Operation<T, Opt, Index, DerivedSub>::*op)(T*, Index, Index, Index,
-							   const DerivedSub&, Index))
+									  const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
 	static Dynamic::Operation<T, Opt, Index, DerivedSub> operation;
 
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
-		"Both matrices should use the same Scalar type");
+				  "Both matrices should use the same Scalar type");
 
 	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
@@ -570,7 +572,7 @@ void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index
 	const Index* outerIndices = matrix->outerIndexPtr();
 
 	Index outerStart = (Opt == Eigen::ColMajor ? columnStart : rowStart);
-	Index innerStart = (Opt == Eigen::ColMajor ? rowStart: columnStart);
+	Index innerStart = (Opt == Eigen::ColMajor ? rowStart : columnStart);
 	Index outerSize = static_cast<Index>(Opt == Eigen::ColMajor ? m : n);
 	Index innerSize = static_cast<Index>(Opt == Eigen::ColMajor ? n : m);
 
@@ -590,23 +592,23 @@ void blockOperationWithSearch(const DerivedSub& subMatrix, Index rowStart, Index
 		else
 		{
 			innerFirstElement = matrix->data().searchLowerIndex(
-				innerStartIdInCurrentOuter, innerStartIdInNextOuter - 1, innerStart);
+									innerStartIdInCurrentOuter, innerStartIdInNextOuter - 1, innerStart);
 		}
 
 		// Make sure we actually found the 1st element of the block in this outer
 		SURGSIM_ASSERT(innerIndices[innerFirstElement] == innerStart) <<
-			"matrix is missing an element of the block (1st element on a row/column)";
+				"matrix is missing an element of the block (1st element on a row/column)";
 
 		// Make sure that we are not going to write out of the range...
 		// i.e. The column/row (starting at the beginning of the block) has at least innerSize elements
 		SURGSIM_ASSERT(static_cast<Index>(innerSize) <= innerStartIdInNextOuter - innerFirstElement) <<
-			"matrix is missing elements of the block (but not the 1st element on a row/column)";
+				"matrix is missing elements of the block (but not the 1st element on a row/column)";
 
 		// Make sure that the last element corresponding to the block size has the expected index
 		SURGSIM_ASSERT(innerStart + static_cast<Index>(innerSize) - 1 == \
-			innerIndices[innerFirstElement + static_cast<Index>(innerSize) - 1]) <<
-			"The last element of the block does not have the expected index. " <<
-			"The matrix is missing elements of the block (but not the 1st element on a row/column)";
+					   innerIndices[innerFirstElement + static_cast<Index>(innerSize) - 1]) <<
+							   "The last element of the block does not have the expected index. " <<
+							   "The matrix is missing elements of the block (but not the 1st element on a row/column)";
 
 		(operation.*op)(ptr, innerFirstElement, n, m, subMatrix, outerLoop);
 	}

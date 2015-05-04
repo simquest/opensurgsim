@@ -228,12 +228,12 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 
 /// A macro to register a setter that can be used from YAML, and as a writeable property
 /// use this to provide alternatives to more complicated values, e.g. setModelFilename() vs generate and set Model
-// Enables the alternative use of the model file instead of the actual mesh object
+/// Enables the alternative use of the model file instead of the actual mesh object
 #define SURGSIM_ADD_SETTER(class, type, property, setter) \
 	{\
-		setDecoder(#property, std::bind((void(class::*)(type))&class::setter, this,\
+		setDecoder(#property, std::bind((void(class::*)(const type&))&class::setter, this,\
 					std::bind(&YAML::Node::as<type>,std::placeholders::_1))); \
-		setSetter(#property, std::bind((void(class::*)(type))&class::setter, this,\
+		setSetter(#property, std::bind((void(class::*)(const type&))&class::setter, this,\
 					std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)));\
 	}
 }; // Framework

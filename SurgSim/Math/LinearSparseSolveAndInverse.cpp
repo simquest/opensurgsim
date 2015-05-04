@@ -13,26 +13,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Graphics/SceneryRepresentation.h"
-
-#include "SurgSim/Framework/Asset.h"
-#include "SurgSim/Graphics/Model.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 
 namespace SurgSim
 {
-namespace Graphics
+
+namespace Math
 {
 
-
-SceneryRepresentation::SceneryRepresentation(const std::string& name) : Representation(name)
+void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SceneryRepresentation, std::shared_ptr<SurgSim::Framework::Asset>,
-									  Model , getModel, setModel);
-	SURGSIM_ADD_SETTER(SceneryRepresentation, std::string, ModelFileName, loadModel);
+	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
+	m_lu.compute(matrix);
 }
 
-
+Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const
+{
+	return m_lu.solve(b);
 }
+
+Vector LinearSparseSolveAndInverseLU::solve(const Vector& b) const
+{
+	return m_lu.solve(b);
 }
 
+Matrix LinearSparseSolveAndInverseLU::getInverse() const
+{
+	return (m_lu.solve(Matrix::Identity(m_lu.rows(), m_lu.cols())));
+}
+
+}; // namespace Math
+
+}; // namespace SurgSim
