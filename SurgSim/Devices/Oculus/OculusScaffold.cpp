@@ -134,11 +134,11 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 																" Registration failed";
 			}
 		}
-	}
 
-	if (result && !isRunning())
-	{
-		start(); // Start the scaffold thread if not running.
+		if (result && !isRunning())
+		{
+			start(); // Start the scaffold thread if not running.
+		}
 	}
 
 	return result;
@@ -160,14 +160,15 @@ bool OculusScaffold::unregisterDevice(const OculusDevice* const device)
 			SURGSIM_LOG_INFO(m_logger) << "Device " << getName() << ": unregistered.";
 			result = true;
 		}
+
+		if (isRunning() && m_state->registeredDevices.size() == 0)
+		{
+			stop();
+		}
+
 	}
 
 	SURGSIM_LOG_IF(!result, m_logger, SEVERE) << __FUNCTION__ << "Attempted to release a non-registered device.";
-
-	if (isRunning() && m_state->registeredDevices.size() == 0)
-	{
-		stop();
-	}
 
 	return result;
 }
