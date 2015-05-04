@@ -63,8 +63,8 @@ public:
 	/// \tparam	EdgeData Type of extra data stored in each edge
 	/// \tparam	TriangleData Type of extra data stored in each triangle
 	/// \param other The mesh to be copied from. Vertex, edge and triangle data will not be copied
-	template <class VertexData, class EdgeData, class TriangleData>
-	explicit MeshShape(const SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>& other);
+	template <class V, class E, class T>
+	explicit MeshShape(const SurgSim::DataStructures::TriangleMesh<V, E, T>& other);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::MeshShape);
 

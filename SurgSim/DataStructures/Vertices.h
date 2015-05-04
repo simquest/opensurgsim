@@ -16,12 +16,11 @@
 #ifndef SURGSIM_DATASTRUCTURES_VERTICES_H
 #define SURGSIM_DATASTRUCTURES_VERTICES_H
 
-#include "SurgSim/DataStructures/Vertex.h"
-#include "SurgSim/Framework/Assert.h"
-
-#include <array>
-#include <typeinfo>
 #include <vector>
+
+#include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/Math/Vector.h"
+
 
 namespace SurgSim
 {
@@ -53,28 +52,26 @@ public:
 	/// Vertex type for convenience
 	typedef Vertex<VertexData> VertexType;
 
-	/// Constructor. The mesh is initially empty (no vertices).
-	Vertices()
-	{
-	}
+	/// Constructor
+	Vertices();
+
+	/// Copy constructor when the template data is a different type
+	/// In this case, no data will be copied
+	/// \tparam V type of data stored in the other Vertices
+	/// \param other the Vertices to copy from
+	template <class V>
+	explicit Vertices(const Vertices<V>& other);
+
 	/// Destructor
-	virtual ~Vertices()
-	{
-	}
+	virtual ~Vertices();
 
 	/// Clear mesh to return to an empty state (no vertices).
-	void clear()
-	{
-		doClear();
-	}
+	void clear();
 
 	/// Performs any updates that are required when the vertices are modified.
 	/// Calls doUpdate() to perform the updates.
 	/// \return true on success.
-	bool update()
-	{
-		return doUpdate();
-	}
+	bool update();
 
 	/// Adds a vertex to the mesh.
 	/// Recommend that subclasses with a specific purpose (such as for use in collision detection), have a
@@ -82,127 +79,75 @@ public:
 	/// based on the other parameters.
 	/// \param	vertex	Vertex to add to the mesh
 	/// \return	Unique ID of the new vertex.
-	size_t addVertex(const VertexType& vertex)
-	{
-		m_vertices.push_back(vertex);
-		return m_vertices.size() - 1;
-	}
+	size_t addVertex(const VertexType& vertex);
 
 	/// Returns the number of vertices in this mesh.
-	size_t getNumVertices() const
-	{
-		return m_vertices.size();
-	}
+	size_t getNumVertices() const;
 
 	/// Returns the specified vertex.
-	const VertexType& getVertex(size_t id) const
-	{
-		return m_vertices[id];
-	}
+	const VertexType& getVertex(size_t id) const;
+
 	/// Returns the specified vertex (non const version).
-	VertexType& getVertex(size_t id)
-	{
-		return m_vertices[id];
-	}
+	VertexType& getVertex(size_t id);
 
 	/// Returns a vector containing the position of each vertex.
-	const std::vector<VertexType>& getVertices() const
-	{
-		return m_vertices;
-	}
+	const std::vector<VertexType>& getVertices() const;
+
 	/// Returns a vector containing the position of each vertex (non const version).
-	std::vector<VertexType>& getVertices()
-	{
-		return m_vertices;
-	}
+	std::vector<VertexType>& getVertices();
 
 	/// Sets the position of a vertex.
 	/// \param	id	Unique ID of the vertex
 	/// \param	position	Position of the vertex
-	void setVertexPosition(size_t id, const SurgSim::Math::Vector3d& position)
-	{
-		m_vertices[id].position = position;
-	}
+	void setVertexPosition(size_t id, const SurgSim::Math::Vector3d& position);
+
 	/// Returns the position of a vertex.
 	/// \param	id	Unique ID of the vertex
 	/// \return	Position of the vertex
-	const SurgSim::Math::Vector3d& getVertexPosition(size_t id) const
-	{
-		return m_vertices[id].position;
-	}
+	const SurgSim::Math::Vector3d& getVertexPosition(size_t id) const;
 
 	/// Sets the position of each vertex.
 	/// \param	positions	Vector containing new position for each vertex
 	/// \param	doUpdate	True to perform an update after setting the vertices, false to skip update; default is true.
-	void setVertexPositions(const std::vector<SurgSim::Math::Vector3d>& positions, bool doUpdate = true)
-	{
-		SURGSIM_ASSERT(m_vertices.size() == positions.size()) << "Number of positions must match number of vertices.";
-
-		for (size_t i = 0; i < m_vertices.size(); ++i)
-		{
-			m_vertices[i].position = positions[i];
-		}
-
-		if (doUpdate)
-		{
-			update();
-		}
-	}
+	void setVertexPositions(const std::vector<SurgSim::Math::Vector3d>& positions, bool doUpdate = true);
 
 	/// Compares the mesh with another one (equality)
 	/// \param mesh The Vertices to compare it to
 	/// \return True if the two vertices are equals, False otherwise
-	bool operator==(const Vertices& mesh) const
-	{
-		return (typeid(*this) == typeid(mesh)) && isEqual(mesh);
-	}
+	bool operator==(const Vertices& mesh) const;
 
 	/// Compares the mesh with another one (inequality)
 	/// \param mesh The Vertices to compare it to
 	/// \return False if the two vertices are equals, True otherwise
-	bool operator!=(const Vertices& mesh) const
-	{
-		return (typeid(*this) != typeid(mesh)) || ! isEqual(mesh);
-	}
+	bool operator!=(const Vertices& mesh) const;
 
 protected:
 	/// Remove all vertices from the mesh.
-	virtual void doClearVertices()
-	{
-		m_vertices.clear();
-	}
+	virtual void doClearVertices();
 
 	/// Internal comparison of meshes of the same type: returns true if equal, false if not equal.
 	/// Override this method to provide custom comparison. Base Mesh implementation compares vertices:
 	/// the order of vertices must also match to be considered equal.
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
-	virtual bool isEqual(const Vertices& mesh) const
-	{
-		return m_vertices == mesh.m_vertices;
-	}
+	virtual bool isEqual(const Vertices& mesh) const;
 
 private:
 	/// Clear mesh to return to an empty state (no vertices).
-	virtual void doClear()
-	{
-		doClearVertices();
-	}
+	virtual void doClear();
 
 	/// Performs any updates that are required when the vertices are modified.
 	/// Override this method to implement update functionality.
 	/// For example, this could be overridden to calculate normals for each Vertex.
 	/// \return true on success.
-	virtual bool doUpdate()
-	{
-		return true;
-	}
+	virtual bool doUpdate();
 
 	/// Vertices
 	std::vector<VertexType> m_vertices;
 };
 
 };  // namespace DataStructures
-
 };  // namespace SurgSim
+
+#include "SurgSim/DataStructures/Vertices-inl.h"
 
 #endif  // SURGSIM_DATASTRUCTURES_VERTICES_H
