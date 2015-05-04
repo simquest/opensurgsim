@@ -57,10 +57,10 @@ public:
 
 	/// Copy constructor when the template data is a different type
 	/// In this case, no data will be copied
-	/// \tparam T type of data stored in the other Vertices
+	/// \tparam V type of data stored in the other Vertices
 	/// \param other the Vertices to copy from
-	template <class T>
-	explicit Vertices(const Vertices<T>& other);
+	template <class V>
+	explicit Vertices(const Vertices<V>& other);
 
 	/// Destructor
 	virtual ~Vertices();

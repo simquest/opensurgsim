@@ -32,8 +32,8 @@ Vertices<VertexData>::Vertices()
 }
 
 template <class VertexData>
-template <class T>
-Vertices<VertexData>::Vertices(const Vertices<T>& other)
+template <class V>
+Vertices<VertexData>::Vertices(const Vertices<V>& other)
 {
 	m_vertices.reserve(other.getVertices().size());
 	for (auto& otherVertex : other.getVertices())

@@ -22,8 +22,8 @@ namespace SurgSim
 namespace Math
 {
 
-template <class T>
-ParticlesShape::ParticlesShape(const SurgSim::DataStructures::Vertices<T>& other) :
+template <class V>
+ParticlesShape::ParticlesShape(const SurgSim::DataStructures::Vertices<V>& other) :
 	DataStructures::Vertices<DataStructures::EmptyData>(other)
 {
 	update();

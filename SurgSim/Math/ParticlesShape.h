@@ -46,10 +46,10 @@ public:
 	explicit ParticlesShape(double radius = 0.0);
 
 	/// Copy constructor from another Vertices type
-	/// \tparam T type of data stored in the other vertices
+	/// \tparam V type of data stored in the other vertices
 	/// \param other The vertices to be copied from. Vertex data will not be copied
-	template <class T>
-	explicit ParticlesShape(const SurgSim::DataStructures::Vertices<T>& other);
+	template <class V>
+	explicit ParticlesShape(const SurgSim::DataStructures::Vertices<V>& other);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::ParticlesShape);
 
