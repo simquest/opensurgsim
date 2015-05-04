@@ -115,6 +115,51 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixComponentsTest)
 	EXPECT_TRUE(inverseMatrix.isApprox(Matrix::Identity(18, 18)));
 };
 
+TEST_F(LinearSparseSolveAndInverseTests, SparseCGInitializationTests)
+{
+	SparseMatrix nonSquare(9, 18);
+	nonSquare.setZero();
+
+	LinearSparseSolveAndInverseCG solveAndInverse;
+	EXPECT_THROW(solveAndInverse.setMatrix(nonSquare), SurgSim::Framework::AssertionFailure);
+};
+
+TEST_F(LinearSparseSolveAndInverseTests, SparseCGMatrixComponentsTest)
+{
+	setupSparseMatrixTest();
+	double lowPrecision = 1.0e-05;
+	double highPrecision = 1.0e-10;
+
+	LinearSparseSolveAndInverseCG solveAndInverse;
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
+
+	EXPECT_TRUE(x.isApprox(expectedX, lowPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
+			"Expected: " << expectedX.transpose() << std::endl;
+	EXPECT_FALSE(x.isApprox(expectedX, highPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
+			"Expected: " << expectedX.transpose() << std::endl;
+
+	inverseMatrix = solveAndInverse.solve(denseMatrix);
+	EXPECT_TRUE(inverseMatrix.isApprox(Matrix::Identity(18, 18), lowPrecision)) << std::endl << "Identity: " <<
+			inverseMatrix << std::endl;
+	EXPECT_FALSE(inverseMatrix.isApprox(Matrix::Identity(18, 18), highPrecision)) << std::endl << "Identity: " <<
+			inverseMatrix << std::endl;
+
+	solveAndInverse.setTolerance(highPrecision);
+	solveAndInverse.setMaxIterations(20);
+	x = solveAndInverse.solve(b);
+	EXPECT_TRUE(x.isApprox(expectedX, lowPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
+			"Expected: " << expectedX.transpose() << std::endl;
+	EXPECT_FALSE(x.isApprox(expectedX, highPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
+			"Expected: " << expectedX.transpose() << std::endl;
+
+	solveAndInverse.setMaxIterations(50);
+	x = solveAndInverse.solve(b);
+	EXPECT_TRUE(x.isApprox(expectedX, highPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
+			"Expected: " << expectedX.transpose() << std::endl;
+
+};
 
 }; // namespace Math
 
