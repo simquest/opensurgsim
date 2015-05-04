@@ -108,6 +108,11 @@ public:
 		double bottom, double top,
 		double near, double far) override;
 
+
+	void setViewport(int x, int y, int width, int height) override;
+
+	void getViewport(int* x, int* y, int* width, int* height) const override;
+
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
