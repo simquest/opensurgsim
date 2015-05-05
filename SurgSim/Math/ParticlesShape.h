@@ -45,6 +45,10 @@ public:
 	/// \param radius The particles' radius (in m)
 	explicit ParticlesShape(double radius = 0.0);
 
+	/// Copy constructor
+	/// \param other The ParticleShape to be copied from
+	explicit ParticlesShape(const ParticlesShape& other);
+
 	/// Copy constructor from another Vertices type
 	/// \tparam V type of data stored in the other vertices
 	/// \param other The vertices to be copied from. Vertex data will not be copied
@@ -72,6 +76,8 @@ public:
 	Vector3d getCenter() const override;
 
 	Matrix33d getSecondMomentOfVolume() const override;
+
+	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
 
 	bool isValid() const override;
 

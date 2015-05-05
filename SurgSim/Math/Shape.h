@@ -18,8 +18,9 @@
 
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/ObjectFactory.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
@@ -81,6 +82,11 @@ public:
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const = 0;
+
+	/// Get a copy of this shape with an applied rigid transform
+	/// \param pose The pose to transform the shape by
+	/// \return the posed shape
+	virtual std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose);
 
 	typedef SurgSim::Framework::ObjectFactory<SurgSim::Math::Shape> FactoryType;
 

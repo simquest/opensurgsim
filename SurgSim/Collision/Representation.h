@@ -67,6 +67,10 @@ public:
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const = 0;
 
+	/// Get the shape, posed
+	/// \return The shape transformed by the pose of this representation
+	virtual const std::shared_ptr<SurgSim::Math::Shape> getPosedShape() const;
+
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
@@ -82,10 +86,20 @@ public:
 	virtual void update(const double& dt);
 
 protected:
+	/// Invalidate the cached posed shape
+	void invalidatePosedShape();
+
+private:
 	/// A map which associates a list of contacts with each collision representation.
 	/// Every contact added to this map follows the convention of pointing the contact normal toward this
 	/// representation. And the first penetration point is on this representation.
 	SurgSim::DataStructures::BufferedValue<ContactMapType> m_collisions;
+
+	/// Cached posed shape
+	mutable std::shared_ptr<Math::Shape> m_posedShape;
+
+	/// Pose of m_posedShape
+	mutable Math::RigidTransform3d m_posedShapePose;
 };
 
 

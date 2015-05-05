@@ -27,6 +27,12 @@ Shape::~Shape()
 {
 }
 
+std::shared_ptr<Shape> Shape::getTransformed(const RigidTransform3d& pose)
+{
+	SURGSIM_FAILURE() << "getTransformed not implemented for " << getClassName();
+	return nullptr;
+}
+
 Shape::FactoryType& Shape::getFactory()
 {
 	static FactoryType factory;
