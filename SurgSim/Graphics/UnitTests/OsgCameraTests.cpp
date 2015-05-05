@@ -302,7 +302,6 @@ TEST(OsgCameraTests, Viewport)
 
 	std::array<int, 4> original = {10, 20, 30, 40};
 	std::array<int, 4> result = {0, 0, 0, 0};
-	std::array<int, 4> zero = {0, 0, 0, 0};
 
 	camera->setViewport(original[0], original[1], original[2], original[3]);
 	camera->getViewport(&result[0], &result[1], &result[2], &result[3]);
