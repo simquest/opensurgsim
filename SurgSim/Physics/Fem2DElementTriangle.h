@@ -25,6 +25,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem2DElementTriangle);
 
 /// 2D FemElement based on a triangle with a constant thickness
 ///
@@ -62,6 +63,8 @@ public:
 	explicit Fem2DElementTriangle(std::array<size_t, 3> nodeIds);
 
 	explicit Fem2DElementTriangle(std::vector<size_t> nodeIds);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DElementTriangle);
 
 	/// Sets the triangle's thickness
 	/// \param thickness The thickness of the triangle

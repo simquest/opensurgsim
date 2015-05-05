@@ -183,12 +183,6 @@ std::shared_ptr<FemElement> FemRepresentation::getFemElement(size_t femElementId
 	return m_femElements[femElementId];
 }
 
-FemRepresentation::FactoryType& FemRepresentation::getFactory()
-{
-	static FactoryType factory;
-	return factory;
-}
-
 bool FemRepresentation::isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const
 {
 	return (coordinate.index < m_femElements.size())

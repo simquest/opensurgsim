@@ -31,6 +31,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem1DElementBeam, Fem1DElementBeam);
 
 Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds)
 	: m_G(0.0),

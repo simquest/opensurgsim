@@ -29,6 +29,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementCube, Fem3DElementCube);
 
 Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 {

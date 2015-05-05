@@ -27,6 +27,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem3DElementTetrahedron);
 
 /// Class for Fem Element 3D based on a tetrahedron volume discretization
 /// \note The inertia property (mass) of the tetrahedron is derived from
@@ -47,6 +48,8 @@ public:
 	explicit Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds);
 
 	explicit Fem3DElementTetrahedron(std::vector<size_t> nodeIds);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementTetrahedron);
 
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with

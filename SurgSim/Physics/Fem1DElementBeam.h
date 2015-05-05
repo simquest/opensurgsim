@@ -26,6 +26,8 @@ namespace SurgSim
 namespace Physics
 {
 
+SURGSIM_STATIC_REGISTRATION(Fem1DElementBeam);
+
 /// 1D FemElement based on a beam volume discretization with a fixed cross section
 ///
 /// The inertia property (mass) and the stiffness matrices are derived from "Theory of Matrix Structural Analysis" from
@@ -41,6 +43,8 @@ public:
 	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
 
 	explicit Fem1DElementBeam(std::vector<size_t> nodeIds);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam);
 
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam

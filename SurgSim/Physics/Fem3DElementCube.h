@@ -26,6 +26,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem3DElementCube);
 
 /// Class for Fem Element 3D based on a cube volume discretization
 /// \note The stiffness property of the cube is derived from
@@ -51,6 +52,8 @@ public:
 	explicit Fem3DElementCube(std::array<size_t, 8> nodeIds);
 
 	explicit Fem3DElementCube(std::vector<size_t> nodeIds);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementCube);
 
 	/// Initializes the element once everything has been set
 	/// \param state The state to initialize the FemElement with

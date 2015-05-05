@@ -24,6 +24,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem3DElementCorotationalTetrahedron);
 
 /// Fem Element 3D co-rotational based on a tetrahedron volume discretization
 /// \note This class derives from the linear version of the FEM 3D element tetrahedron, adding a rigid frame
@@ -48,6 +49,8 @@ public:
 	explicit Fem3DElementCorotationalTetrahedron(std::array<size_t, 4> nodeIds);
 
 	explicit Fem3DElementCorotationalTetrahedron(std::vector<size_t> nodeIds);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementCorotationalTetrahedron);
 
 	void initialize(const SurgSim::Math::OdeState& state) override;
 
