@@ -115,6 +115,19 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixComponentsTest)
 	EXPECT_TRUE(inverseMatrix.isApprox(Matrix::Identity(18, 18)));
 };
 
+TEST_F(LinearSparseSolveAndInverseTests, SparseCGSetGetTests)
+{
+	LinearSparseSolveAndInverseCG solveAndInverse;
+
+	EXPECT_NE(solveAndInverse.getMaxIterations(), 100);
+	solveAndInverse.setMaxIterations(100);
+	EXPECT_EQ(solveAndInverse.getMaxIterations(), 100);
+
+	EXPECT_NE(solveAndInverse.getTolerance(), 1.0e-03);
+	solveAndInverse.setTolerance(1.0e-03);
+	EXPECT_EQ(solveAndInverse.getTolerance(), 1.0e-03);
+};
+
 TEST_F(LinearSparseSolveAndInverseTests, SparseCGInitializationTests)
 {
 	SparseMatrix nonSquare(9, 18);

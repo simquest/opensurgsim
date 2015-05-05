@@ -85,11 +85,11 @@ public:
 
 	/// Set the maximum number fo iterations for conjugate gradient
 	/// \param iterations the new maximum number of iterations
-	void setMaxIterations(size_t iterations);
+	void setMaxIterations(SparseMatrix::Index iterations);
 
 	/// Get the conjugate gradient maximum iterations
-	/// \return the maimum number of iterations allowed
-	size_t getMaxIterations();
+	/// \return the maximum number of iterations allowed
+	SparseMatrix::Index getMaxIterations();
 
 	void setMatrix(const SparseMatrix& matrix) override;
 
