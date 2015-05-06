@@ -160,12 +160,12 @@ bool OculusScaffold::unregisterDevice(const OculusDevice* const device)
 			SURGSIM_LOG_INFO(m_logger) << "Device " << getName() << ": unregistered.";
 			result = true;
 		}
+	}
 
-		if (isRunning() && m_state->registeredDevices.size() == 0)
-		{
-			stop();
-		}
-
+	// #threadsafety After unregistering, another thread could be in the process of registering.
+	if (isRunning() && m_state->registeredDevices.size() == 0)
+	{
+		stop();
 	}
 
 	SURGSIM_LOG_IF(!result, m_logger, SEVERE) << __FUNCTION__ << "Attempted to release a non-registered device.";
