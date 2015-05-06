@@ -223,7 +223,7 @@ const SparseMatrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeS
 	// Make sure the mass matrix has been properly allocated
 	Math::clearMatrix(&m_M);
 
-	for (int massId = 0; massId < getNumMasses(); massId++)
+	for (SparseMatrix::Index massId = 0; massId < getNumMasses(); massId++)
 	{
 		m_M.coeffRef(3 * massId, 3 * massId) = getMass(massId)->getMass();
 		m_M.coeffRef(3 * massId + 1, 3 * massId + 1) = getMass(massId)->getMass();
@@ -256,7 +256,7 @@ const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeS
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
 	{
-		for (int massId = 0; massId < getNumMasses(); massId++)
+		for (SparseMatrix::Index massId = 0; massId < getNumMasses(); massId++)
 		{
 			double coef = rayleighMass * getMass(massId)->getMass();
 			m_D.coeffRef(3 * massId, 3 * massId) = coef;
@@ -361,7 +361,7 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 	// Add the Rayleigh damping matrix
 	if (m_rayleighDamping.massCoefficient)
 	{
-		for (int diagonal = 0; diagonal < state.getNumDof(); ++diagonal)
+		for (SparseMatrix::Index diagonal = 0; diagonal < state.getNumDof(); ++diagonal)
 		{
 			m_D.coeffRef(diagonal, diagonal) += m_M.coeff(diagonal, diagonal) * m_rayleighDamping.massCoefficient;
 		}

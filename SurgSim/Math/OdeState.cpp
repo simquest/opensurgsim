@@ -159,7 +159,7 @@ Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 	SURGSIM_ASSERT(vector != nullptr && vector->size() >= 0 && static_cast<size_t>(vector->size()) == getNumDof())
 			<< "Invalid vector to apply boundary conditions on";
 
-	for (std::vector<size_t>::const_iterator it = getBoundaryConditions().cbegin();
+	for (auto it = getBoundaryConditions().cbegin();
 		 it != getBoundaryConditions().cend();
 		 ++it)
 	{
@@ -182,7 +182,7 @@ void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasComplianc
 		complianceValue = 1.0;
 	}
 
-	for (std::vector<size_t>::const_iterator it = getBoundaryConditions().cbegin();
+	for (auto it = getBoundaryConditions().cbegin();
 		 it != getBoundaryConditions().cend();
 		 ++it)
 	{
@@ -205,7 +205,7 @@ void OdeState::applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCom
 		complianceValue = 1.0;
 	}
 
-	for (std::vector<size_t>::const_iterator it = getBoundaryConditions().cbegin();
+	for (auto it = getBoundaryConditions().cbegin();
 		 it != getBoundaryConditions().cend();
 		 ++it)
 	{

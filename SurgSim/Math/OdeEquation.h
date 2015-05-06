@@ -89,8 +89,8 @@ public:
 							 SparseMatrix** K) = 0;
 
 	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
-	/// applied. Note that this can be rewritten as (Bt)(M^-1)(B.b) = (Bt)(M^-1)(B.b) = x,
-	/// where (M^-1)(B.b) = x is simply the solution to M.x = B.b.
+	/// applied. Note that this can be rewritten as (Bt)(M^-1)(B.b) = (Bt)((M^-1)(B.b)) = x,
+	/// where (M^-1)(B.b) = y is simply the solution to M.y = B.b and Bt.y = x.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
 	/// \param b The input matrix \b
 	/// \return C.b

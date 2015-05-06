@@ -452,7 +452,7 @@ void addSubMatrix(const DerivedSub& subMatrix, Index blockIdRow, Index blockIdCo
 
 /// Helper method to zero a row of a matrix specialized for Sparse Matrices
 /// \param row The row to set to zero
-/// \param[out] matrix The matrix to set the zero row on.
+/// \param[in,out] matrix The matrix to set the zero row on.
 template <typename T, int Opt, typename Index>
 void zeroRow(Index row, Eigen::SparseMatrix<T, Opt, Index>* matrix)
 {
@@ -467,7 +467,7 @@ void zeroRow(Index row, Eigen::SparseMatrix<T, Opt, Index>* matrix)
 
 /// Helper method to zero a column of a matrix specialized for Sparse Matrices
 /// \param column The column to set to zero
-/// \param[out] matrix The matrix to set the zero row on.
+/// \param[in,out] matrix The matrix to set the zero column on.
 template <typename T, int Opt, typename Index>
 inline void zeroColumn(Index column, Eigen::SparseMatrix<T, Opt, Index>* matrix)
 {
@@ -483,7 +483,7 @@ inline void zeroColumn(Index column, Eigen::SparseMatrix<T, Opt, Index>* matrix)
 /// Helper method to zero all entries of a matrix specialized for Sparse Matrices. This
 /// allows the preservation of the the matrix form while still allowing the reset of
 /// the matrix entries to zero.
-/// \param[out] matrix The matrix to set the zero row on.
+/// \param[in,out] matrix The matrix to set to zero
 template <typename T, int Opt, typename Index>
 inline void clearMatrix(Eigen::SparseMatrix<T, Opt, Index>* matrix)
 {

@@ -120,7 +120,7 @@ public:
 	/// \return True if compliance warping is used, False otherwise
 	bool getComplianceWarping() const;
 
-	/// Calculate the product C * b where C is the compliance matrix with boundary conditions
+	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
 	/// \param b The input matrix \b
 	/// \return The matrix after application of the compliance matrix.

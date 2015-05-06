@@ -220,17 +220,17 @@ Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, size_t blockIdRow, size_t bloc
 /// Helper method to zero a row of a matrix.
 /// \tparam Matrix The matrix type
 /// \param row The row to set to zero
-/// \param[out] matrix The matrix to set the zero row on.
+/// \param[in,out] matrix The matrix to set the zero row on.
 template <class Matrix>
 void zeroRow(size_t row, Matrix* matrix)
 {
 	matrix->middleRows(row, 1).setZero();
 }
 
-/// Helper method to zero a row of a matrix.
+/// Helper method to zero a column of a matrix.
 /// \tparam Matrix The matrix type
-/// \param row The row to set to zero
-/// \param[out] matrix The matrix to set the zero row on.
+/// \param column The column to set to zero
+/// \param[in,out] matrix The matrix to set the zero column on.
 template <class Matrix>
 void zeroColumn(size_t column, Matrix* matrix)
 {
