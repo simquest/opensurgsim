@@ -74,27 +74,6 @@ TEST(OsgSphereRepresentationTests, AccessibleTest)
 	EXPECT_DOUBLE_EQ(radius, decoded->getValue<double>("Radius"));
 }
 
-TEST(OsgSphereRepresentationTests, OsgNodeTest)
-{
-	std::shared_ptr<OsgRepresentation> representation = std::make_shared<OsgSphereRepresentation>("test name");
-
-	ASSERT_NE(nullptr, representation->getOsgNode());
-
-	osg::Switch* switchNode = dynamic_cast<osg::Switch*>(representation->getOsgNode().get());
-	ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
-
-	ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
-
-	osg::PositionAttitudeTransform* transformNode =
-		dynamic_cast<osg::PositionAttitudeTransform*>(switchNode->getChild(0));
-	ASSERT_NE(nullptr, transformNode) << "Could not get OSG transform node!";
-
-	ASSERT_EQ(1u, transformNode->getNumChildren()) << "OSG transform node should have 1 child, the geode!";
-
-	osg::Node* node = dynamic_cast<osg::Node*>(transformNode->getChild(0));
-	ASSERT_NE(nullptr, node) << "Could not get unit sphere OSG node!";
-}
-
 TEST(OsgSphereRepresentationTests, RadiusTest)
 {
 	std::shared_ptr<SphereRepresentation> sphereRepresentation = std::make_shared<OsgSphereRepresentation>("test name");

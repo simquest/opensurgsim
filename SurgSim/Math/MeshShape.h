@@ -63,8 +63,8 @@ public:
 	/// \tparam	EdgeData Type of extra data stored in each edge
 	/// \tparam	TriangleData Type of extra data stored in each triangle
 	/// \param other The mesh to be copied from. Vertex, edge and triangle data will not be copied
-	template <class VertexData, class EdgeData, class TriangleData>
-	explicit MeshShape(const SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>& other);
+	template <class V, class E, class T>
+	explicit MeshShape(const SurgSim::DataStructures::TriangleMesh<V, E, T>& other);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::MeshShape);
 
@@ -73,7 +73,7 @@ public:
 	/// Get normal for triangle.
 	/// \param triangleId The triangle to get normal.
 	/// \return The normal for the triangle with given ID.
-	const SurgSim::Math::Vector3d& getNormal(size_t triangleId);
+	const SurgSim::Math::Vector3d& getNormal(size_t triangleId) const;
 
 	/// Get the volume of the shape
 	/// \note this parameter is valid with respect to the initial mesh
@@ -98,7 +98,7 @@ public:
 
 	/// Get the AabbTree
 	/// \return The object's associated AabbTree
-	std::shared_ptr<SurgSim::DataStructures::AabbTree> getAabbTree();
+	const std::shared_ptr<const SurgSim::DataStructures::AabbTree> getAabbTree() const;
 
 	bool isValid() const override;
 

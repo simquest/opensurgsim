@@ -127,9 +127,9 @@ public:
 		m_validLocalPositionForCube.coordinate[1] = 0.6;
 
 		m_invalidIndexLocalPosition.index = 3;
-		m_validLocalPosition.coordinate = SurgSim::Math::Vector::Zero(4);
-		m_validLocalPosition.coordinate[0] = 0.4;
-		m_validLocalPosition.coordinate[1] = 0.6;
+		m_invalidIndexLocalPosition.coordinate = SurgSim::Math::Vector::Zero(4);
+		m_invalidIndexLocalPosition.coordinate[0] = 0.4;
+		m_invalidIndexLocalPosition.coordinate[1] = 0.6;
 
 		m_invalidCoordinateLocalPosition.index = 1;
 		m_invalidCoordinateLocalPosition.coordinate = SurgSim::Math::Vector::Zero(4);
@@ -151,6 +151,10 @@ public:
 
 TEST_F(Fem3DRepresentationLocalizationTest, ConstructorTest)
 {
+	// IndexedLocalCoordinate pointing to a node (node index + empty coordinate) or a triangle
+	// (triangleID + coordinate of size 2) are invalid. Both will failed, either because the index is out of bound,
+	// or because the coordinates are the wrong size (empty or of size 2 do not correspond to any valid 3d FemElements)
+	// This is tested by m_invalidIndexLocalPosition and m_invalidCoordinateLocalPosition
 	ASSERT_THROW(std::make_shared<Fem3DRepresentationLocalization>(m_fem, m_invalidIndexLocalPosition),
 		SurgSim::Framework::AssertionFailure);
 
@@ -158,6 +162,8 @@ TEST_F(Fem3DRepresentationLocalizationTest, ConstructorTest)
 		SurgSim::Framework::AssertionFailure);
 
 	ASSERT_NO_THROW(std::make_shared<Fem3DRepresentationLocalization>(m_fem, m_validLocalPosition););
+
+	ASSERT_NO_THROW(std::make_shared<Fem3DRepresentationLocalization>(m_fem3DCube, m_validLocalPositionForCube););
 }
 
 TEST_F(Fem3DRepresentationLocalizationTest, SetGetRepresentation)

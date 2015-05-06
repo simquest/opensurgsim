@@ -83,6 +83,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	TriangleMeshPlyReaderDelegate-inl.h
 	Vertex.h
 	Vertices.h
+	Vertices-inl.h
 )
 surgsim_create_library_header(DataStructures.h "${SURGSIM_DATA_STRUCTURES_HEADERS}")
 

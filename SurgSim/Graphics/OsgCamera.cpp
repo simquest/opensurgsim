@@ -77,7 +77,6 @@ OsgCamera::OsgCamera(const std::string& name) :
 	OsgRepresentation(name),
 	Camera(name),
 	m_camera(new osg::Camera()),
-	m_materialProxy(new osg::Group()),
 	m_viewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("viewMatrix")),
 	m_inverseViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix")),
 	m_ambientColorUniform(std::make_shared<OsgUniform<Vector4f>>("ambientColor"))
@@ -90,7 +89,7 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_materialProxy->setName(name + " MaterialProxy");
 
 	m_camera->setViewMatrix(toOsg(getLocalPose().inverse().matrix()));
-	m_camera->setProjectionMatrixAsPerspective(45.0, 1.0, 0.01, 10.0);
+	setPerspectiveProjection(45.0, 1.0, 0.01, 10.0);
 
 	m_camera->setComputeNearFarMode(osgUtil::CullVisitor::DO_NOT_COMPUTE_NEAR_FAR);
 
@@ -257,6 +256,19 @@ void OsgCamera::detachCurrentRenderTarget()
 		}
 	}
 	m_renderTarget = nullptr;
+}
+
+void OsgCamera::setPerspectiveProjection(double fovy, double aspect, double near, double far)
+{
+	m_camera->setProjectionMatrixAsPerspective(fovy, aspect, near, far);
+	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+}
+
+
+void OsgCamera::setOrthogonalProjection(double left, double right, double bottom, double top, double near, double far)
+{
+	m_camera->setProjectionMatrixAsOrtho(left, right, bottom, top, near, far);
+	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 }
 
 void OsgCamera::attachRenderTargetTexture(osg::Camera::BufferComponent buffer, std::shared_ptr<Texture> texture)
