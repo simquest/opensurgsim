@@ -15,10 +15,10 @@
 
 #include <memory>
 
-#include <SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h>
-#include <SurgSim/Devices/Oculus/OculusDevice.h>
-#include <SurgSim/Input/DeviceInterface.h>
-#include <SurgSim/Testing/VisualTestCommon/ToolSquareTest.h>
+#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
+#include "SurgSim/Devices/Oculus/OculusDevice.h"
+#include "SurgSim/Input/DeviceInterface.h"
+#include "SurgSim/Testing/VisualTestCommon/ToolSquareTest.h"
 
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Device::OculusDevice;

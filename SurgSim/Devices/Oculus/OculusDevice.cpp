@@ -17,7 +17,7 @@
 
 #include "SurgSim/Devices/Oculus/OculusScaffold.h"
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Device
 {

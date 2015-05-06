@@ -37,7 +37,7 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Device
 {
@@ -130,7 +130,7 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 			}
 			else
 			{
-				SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "Failed to configure an Oculus Device." << 
+				SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "Failed to configure an Oculus Device." <<
 																" Registration failed";
 			}
 		}
@@ -190,7 +190,7 @@ bool OculusScaffold::doUpdate(double dt)
 	for (auto& device : m_state->registeredDevices)
 	{
 		DataGroup& inputData = device->deviceObject->getInputData();
-		
+
 		// Query the HMD for the current tracking state.
 		// If time in 2nd parameter is now or earlier, no pose prediction is made.
 		// Pose is reported in a right handed coordinate system, X->RIGHT, Y->UP, Z->OUT.
@@ -203,7 +203,7 @@ bool OculusScaffold::doUpdate(double dt)
 			ovrPosef ovrPose = ts.HeadPose.ThePose;
 
 			Vector3d position(ovrPose.Position.x, ovrPose.Position.y, ovrPose.Position.z);
-			Quaterniond orientation(ovrPose.Orientation.w, ovrPose.Orientation.x, 
+			Quaterniond orientation(ovrPose.Orientation.w, ovrPose.Orientation.x,
 									ovrPose.Orientation.y, ovrPose.Orientation.z);
 			RigidTransform3d pose = makeRigidTransform(orientation, position);
 
@@ -238,4 +238,4 @@ std::shared_ptr<OculusScaffold> OculusScaffold::getOrCreateSharedInstance()
 }
 
 };  // namespace Device
-};  // namespace SurgSim 
+};  // namespace SurgSim

@@ -18,9 +18,9 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Devices/Oculus/OculusDevice.h>
-#include <SurgSim/Testing/MockInputOutput.h>
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Devices/Oculus/OculusDevice.h"
+#include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::Device::OculusDevice;
 using SurgSim::DataStructures::DataGroup;

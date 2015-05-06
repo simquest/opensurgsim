@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICE_OCULUSSCAFFOLD_H
-#define SURGSIM_DEVICE_OCULUSSCAFFOLD_H
+#ifndef SURGSIM_DEVICES_OCULUS_OCULUSSCAFFOLD_H
+#define SURGSIM_DEVICES_OCULUS_OCULUSSCAFFOLD_H
 
 #include <memory>
 
@@ -96,6 +96,6 @@ private:
 };
 
 };  // namespace Device
-};  // namespace SurgSim 
+};  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICE_OCULUSSCAFFOLD_H
+#endif  // SURGSIM_DEVICES_OCULUS_OCULUSSCAFFOLD_H

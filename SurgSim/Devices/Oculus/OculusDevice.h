@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICE_OCULUSDEVICE_H
-#define SURGSIM_DEVICE_OCULUSDEVICE_H
+#ifndef SURGSIM_DEVICES_OCULUS_OCULUSDEVICE_H
+#define SURGSIM_DEVICES_OCULUS_OCULUSDEVICE_H
 
 #include <memory>
 #include <string>
@@ -36,7 +36,7 @@ class OculusScaffold;
 ///
 /// \par Application output used by the device: none.
 /// \note The axes of the pose of the HMD are a right-handed system: X & Z are in the plane of the floor,
-///       with X pointing to the camera's left (i.e. to the HMD's right) and Z pointing towards the camera, 
+///       with X pointing to the camera's left (i.e. to the HMD's right) and Z pointing towards the camera,
 ///       while Y points up from the floor.
 ///       By default the tracking origin is located one meter away from the positional tracking camera in the direction
 ///       of the optical axis but with the same height as the camera.
@@ -68,4 +68,4 @@ private:
 }; // namespace Device
 }; // namespace SurgSim
 
-#endif  // SURGSIM_DEVICE_OCULUSDEVICE_H
+#endif  // SURGSIM_DEVICES_OCULUS_OCULUSDEVICE_H
