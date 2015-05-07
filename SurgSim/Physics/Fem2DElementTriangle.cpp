@@ -42,7 +42,7 @@ namespace Physics
 {
 SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem2DElementTriangle, Fem2DElementTriangle);
 
-Fem2DElementTriangle::Fem2DElementTriangle(std::array<size_t, 3> nodeIds) : 
+Fem2DElementTriangle::Fem2DElementTriangle(std::array<size_t, 3> nodeIds) :
 	m_restArea(0.0),
 	m_thickness(0.0)
 {

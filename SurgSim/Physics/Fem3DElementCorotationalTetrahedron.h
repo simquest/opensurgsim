@@ -49,7 +49,7 @@ public:
 	explicit Fem3DElementCorotationalTetrahedron(std::array<size_t, 4> nodeIds);
 
 	/// Constructor for FemElement object factory
-	/// \param nodeIds A vector of node ids, expecting 4 (A, B, C, D), defining this tetrahedron element in 
+	/// \param nodeIds A vector of node ids, expecting 4 (A, B, C, D), defining this tetrahedron element in
 	/// a overall mesh
 	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
 	/// \note This is required from the signed volume calculation method getVolume()

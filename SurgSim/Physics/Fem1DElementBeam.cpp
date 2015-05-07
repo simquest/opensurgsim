@@ -33,7 +33,7 @@ namespace Physics
 {
 SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem1DElementBeam, Fem1DElementBeam);
 
-Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds) : 
+Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds) :
 	m_G(0.0),
 	m_restLength(0.0),
 	m_radius(0.0),
@@ -51,7 +51,7 @@ Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds) :
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-Fem1DElementBeam::Fem1DElementBeam(std::vector<size_t> nodeIds) : 
+Fem1DElementBeam::Fem1DElementBeam(std::vector<size_t> nodeIds) :
 	m_G(0.0),
 	m_restLength(0.0),
 	m_radius(0.0),
