@@ -94,7 +94,7 @@ public:
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
 	/// \param b The input matrix \b
 	/// \return C.b
-	virtual Matrix applyCompliance(const OdeState& state, const Matrix& b) = 0;
+	virtual Math::Matrix applyCompliance(const Math::OdeState& state, const Math::Matrix& b) = 0;
 
 protected:
 	/// The initial state (which defines the ODE initial conditions \f$(x0, v0)\f$)

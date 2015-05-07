@@ -91,6 +91,7 @@ void OdeSolverRungeKutta4::assembleLinearSystem(double dt, const OdeState& state
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
 	m_linearSolver->setMatrix(m_systemMatrix);
+	computeComplianceMatrixFromSystemMatrix(state);
 
 	// Computes the RHS vector
 	if (computeRHS)

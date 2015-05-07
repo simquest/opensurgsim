@@ -155,6 +155,11 @@ Math::Matrix DeformableRepresentation::applyCompliance(const Math::OdeState& sta
 	return solution;
 }
 
+const SurgSim::Math::Matrix& DeformableRepresentation::getComplianceMatrix() const
+{
+	return m_odeSolver->getComplianceMatrix();
+}
+
 void DeformableRepresentation::update(double dt)
 {
 	if (! isActive())
