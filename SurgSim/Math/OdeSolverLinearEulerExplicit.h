@@ -36,7 +36,7 @@ public:
 
 	/// The parameter computeCompliance is irrelevant for any Linear solver as it is a constant matrix.
 	/// It will be precomputed on the first call and use in the following calls, no matter what the parameter value is.
-	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
 private:
 	/// Has the solver been initialized

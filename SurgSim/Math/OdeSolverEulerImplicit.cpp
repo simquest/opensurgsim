@@ -52,7 +52,7 @@ double OdeSolverEulerImplicit::getNewtonRaphsonEpsilonConvergence() const
 	return m_epsilonConvergence;
 }
 
-void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
+void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	// General equation to solve:
 	//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
@@ -113,16 +113,10 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 
 		numIteration++;
 	}
-
-	// The compliance matrix (if requested) is computed w.r.t. the latest state.
-	if (computeCompliance)
-	{
-		computeComplianceMatrixFromSystemMatrix(currentState);
-	}
 }
 
 void OdeSolverEulerImplicit::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
-												  bool computeRHS)
+		bool computeRHS)
 {
 	// General equation to solve:
 	//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
@@ -137,9 +131,9 @@ void OdeSolverEulerImplicit::assembleLinearSystem(double dt, const OdeState& sta
 	// More terms are coming from the Newton-Raphson iterations (see class OdeSolverEulerImplicit doxygen doc for
 	// more details)
 
-	Matrix* M;
-	Matrix* D;
-	Matrix* K;
+	SparseMatrix* M;
+	SparseMatrix* D;
+	SparseMatrix* K;
 	Vector* f;
 
 	// Computes f, M, D, K all at the same time (on newState)

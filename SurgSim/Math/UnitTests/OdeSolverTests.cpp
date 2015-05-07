@@ -22,6 +22,7 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/UnitTests/MockObject.h"
 
 namespace SurgSim
@@ -50,7 +51,7 @@ public:
 	{
 	}
 
-	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override
+	void solve(double dt, const OdeState& currentState, OdeState* newState) override
 	{
 	}
 
@@ -68,8 +69,6 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({MockOdeSolver solver(&m);});
 	{
 		MockOdeSolver solver(&m);
-		EXPECT_EQ(3, solver.getComplianceMatrix().rows());
-		EXPECT_EQ(3, solver.getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver.getSystemMatrix().rows());
 		EXPECT_EQ(3, solver.getSystemMatrix().cols());
 	}
@@ -77,8 +76,6 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({MockOdeSolver* solver = new MockOdeSolver(&m); delete solver;});
 	{
 		MockOdeSolver* solver = new MockOdeSolver(&m);
-		EXPECT_EQ(3, solver->getComplianceMatrix().rows());
-		EXPECT_EQ(3, solver->getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver->getSystemMatrix().rows());
 		EXPECT_EQ(3, solver->getSystemMatrix().cols());
 		delete solver;
@@ -87,8 +84,6 @@ TEST(OdeSolver, ConstructorTest)
 	ASSERT_NO_THROW({std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m); });
 	{
 		std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m);
-		EXPECT_EQ(3, solver->getComplianceMatrix().rows());
-		EXPECT_EQ(3, solver->getComplianceMatrix().cols());
 		EXPECT_EQ(3, solver->getSystemMatrix().rows());
 		EXPECT_EQ(3, solver->getSystemMatrix().cols());
 	}
@@ -102,11 +97,10 @@ TEST(OdeSolver, GetTest)
 	EXPECT_EQ(name, solver.getName());
 
 	EXPECT_NE(nullptr, solver.getLinearSolver());
-	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDenseMatrix>(solver.getLinearSolver()));
-	EXPECT_NO_THROW(solver.setLinearSolver(std::make_shared<LinearSolveAndInverseDiagonalMatrix>()));
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>(solver.getLinearSolver()));
+	EXPECT_NO_THROW(solver.setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>()));
 	EXPECT_NE(nullptr, solver.getLinearSolver());
-	EXPECT_EQ(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDenseMatrix>(solver.getLinearSolver()));
-	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDiagonalMatrix>(solver.getLinearSolver()));
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>(solver.getLinearSolver()));
 }
 
 }; // namespace Math

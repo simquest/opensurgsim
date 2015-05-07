@@ -28,9 +28,11 @@
 
 using SurgSim::Math::gaussQuadrature2DTriangle6Points;
 using SurgSim::Math::gaussQuadrature2DTriangle12Points;
+using SurgSim::Math::clearMatrix;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
+using SurgSim::Math::SparseMatrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem2DElementTriangle;
@@ -118,7 +120,7 @@ public:
 	/// \param i The ith shape function
 	/// \param ai, bi, ci The ith shape function parameters
 	/// \note fi(x,y) = ai + x.bi + y.ci
-	void getMembraneShapeFunction(int i, double *ai, double *bi, double *ci) const
+	void getMembraneShapeFunction(int i, double* ai, double* bi, double* ci) const
 	{
 		*ai = m_membraneShapeFunctionsParameters(i, 0);
 		*bi = m_membraneShapeFunctionsParameters(i, 1);
@@ -127,43 +129,97 @@ public:
 
 	// The Thin-Plate shape functions (Batoz shape functions)
 	// N1(xi, eta) = 2(1-xi-eta)(0.5-xi-eta)
-	double batozN1(double xi, double eta) const { return 2.0 * (1.0 - xi - eta) * (0.5 - xi - eta); }
+	double batozN1(double xi, double eta) const
+	{
+		return 2.0 * (1.0 - xi - eta) * (0.5 - xi - eta);
+	}
 	// N2(xi, eta) = xi(2 xi-1)
-	double batozN2(double xi, double eta) const { return xi * (2.0 * xi - 1.0);                       }
+	double batozN2(double xi, double eta) const
+	{
+		return xi * (2.0 * xi - 1.0);
+	}
 	// N3(xi, eta) = eta(2 eta-1)
-	double batozN3(double xi, double eta) const { return eta * (2.0 * eta - 1.0);                   }
+	double batozN3(double xi, double eta) const
+	{
+		return eta * (2.0 * eta - 1.0);
+	}
 	// N4(xi, eta) = 4 xi eta
-	double batozN4(double xi, double eta) const { return 4.0 * xi * eta;                             }
+	double batozN4(double xi, double eta) const
+	{
+		return 4.0 * xi * eta;
+	}
 	// N5(xi, eta) = 4 eta(1-xi-eta)
-	double batozN5(double xi, double eta) const { return 4.0 * eta * (1.0 - xi - eta);              }
+	double batozN5(double xi, double eta) const
+	{
+		return 4.0 * eta * (1.0 - xi - eta);
+	}
 	// N6(xi, eta) = 4 xi(1-xi-eta)
-	double batozN6(double xi, double eta) const { return 4.0 * xi * (1.0 - xi - eta);                }
+	double batozN6(double xi, double eta) const
+	{
+		return 4.0 * xi * (1.0 - xi - eta);
+	}
 
 	// dN1/dxi(xi, eta) = 2[(-0.5+xi+eta) + (-1+xi+eta)] = 2(-3/2+2(xi+eta)) = 4(xi+eta) - 3
-	double batozDN1Dxi(double xi, double eta) const { return 4.0 * (xi + eta) - 3.0;       }
+	double batozDN1Dxi(double xi, double eta) const
+	{
+		return 4.0 * (xi + eta) - 3.0;
+	}
 	// dN2/dxi(xi, eta) = (2xi-1) + 2xi = 4xi-1
-	double batozDN2Dxi(double xi, double eta) const { return 4.0 * xi - 1.0;                }
+	double batozDN2Dxi(double xi, double eta) const
+	{
+		return 4.0 * xi - 1.0;
+	}
 	// dN3/dxi(xi, eta) = 0
-	double batozDN3Dxi(double xi, double eta) const { return 0.0;                           }
+	double batozDN3Dxi(double xi, double eta) const
+	{
+		return 0.0;
+	}
 	// dN4/dxi(xi, eta) = 4 eta
-	double batozDN4Dxi(double xi, double eta) const { return 4.0 * eta;                    }
+	double batozDN4Dxi(double xi, double eta) const
+	{
+		return 4.0 * eta;
+	}
 	// dN5/dxi(xi,eta) = -4 eta
-	double batozDN5Dxi(double xi, double eta) const { return -4.0 * eta;                   }
+	double batozDN5Dxi(double xi, double eta) const
+	{
+		return -4.0 * eta;
+	}
 	// dN6/dxi(xi,eta) = 4(1-xi-eta) -4xi = 4(1-2xi-eta)
-	double batozDN6Dxi(double xi, double eta) const { return 4.0 * (1.0 - 2.0 * xi - eta); }
+	double batozDN6Dxi(double xi, double eta) const
+	{
+		return 4.0 * (1.0 - 2.0 * xi - eta);
+	}
 
 	// dN1/deta(xi, eta) = 2[(-0.5+xi+eta) + (-1+xi+eta)] = 2(-3/2 + 2xi + 2eta) = 4(xi+eta) - 3
-	double batozDN1Deta(double xi, double eta) const { return 4.0 * (xi + eta) - 3.0;       }
+	double batozDN1Deta(double xi, double eta) const
+	{
+		return 4.0 * (xi + eta) - 3.0;
+	}
 	// dN2/deta(xi, eta) = 0
-	double batozDN2Deta(double xi, double eta) const { return 0.0;                           }
+	double batozDN2Deta(double xi, double eta) const
+	{
+		return 0.0;
+	}
 	// dN3/deta(xi, eta) = 2eta-1 + 2eta = 4eta-1
-	double batozDN3Deta(double xi, double eta) const { return 4.0 * eta - 1.0;              }
+	double batozDN3Deta(double xi, double eta) const
+	{
+		return 4.0 * eta - 1.0;
+	}
 	// dN4/deta(xi, eta) = 4xi
-	double batozDN4Deta(double xi, double eta) const { return 4.0 * xi;                      }
+	double batozDN4Deta(double xi, double eta) const
+	{
+		return 4.0 * xi;
+	}
 	// dN5/deta(xi, eta) = 4[(1-xi-eta) - eta] = 4(1-xi-2eta)
-	double batozDN5Deta(double xi, double eta) const { return 4.0 * (1.0 - xi - 2.0 * eta); }
+	double batozDN5Deta(double xi, double eta) const
+	{
+		return 4.0 * (1.0 - xi - 2.0 * eta);
+	}
 	// dN6/deta(xi, eta) = -4xi
-	double batozDN6Deta(double xi, double eta) const { return -4.0 * xi;                     }
+	double batozDN6Deta(double xi, double eta) const
+	{
+		return -4.0 * xi;
+	}
 
 	std::array<double, 9> batozHx(double xi, double eta) const
 	{
@@ -340,27 +396,28 @@ public:
 		dHy_dxi   = batozDhyDxiAlternative(xi, eta);
 		dHy_deta = batozDhyDetaAlternative(xi, eta);
 
-		for(size_t i = 0; i < 9; ++i)
+		for (size_t i = 0; i < 9; ++i)
 		{
 			//  4 -> mid-edge 12
 			//  5 -> mid-edge 20
 			//  6 -> mid-edge 01
-			res(0, i) = coefficient * ( m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_deta[i]);
+			res(0, i) = coefficient * (m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_deta[i]);
 			res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_deta[i]);
 			res(2, i) = coefficient *
-				(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_deta[i]);
+						(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] +
+						 m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_deta[i]);
 		}
 
 		return res;
 	}
 
 	std::array<double, 9> batozFx(double xi, double eta,
-		double (MockFem2DElement::*f1)(double,double) const,
-		double (MockFem2DElement::*f2)(double,double) const,
-		double (MockFem2DElement::*f3)(double,double) const,
-		double (MockFem2DElement::*f4)(double,double) const,
-		double (MockFem2DElement::*f5)(double,double) const,
-		double (MockFem2DElement::*f6)(double,double) const) const
+								  double (MockFem2DElement::*f1)(double, double) const,
+								  double (MockFem2DElement::*f2)(double, double) const,
+								  double (MockFem2DElement::*f3)(double, double) const,
+								  double (MockFem2DElement::*f4)(double, double) const,
+								  double (MockFem2DElement::*f5)(double, double) const,
+								  double (MockFem2DElement::*f6)(double, double) const) const
 	{
 		std::array<double, 9> res;
 
@@ -389,12 +446,12 @@ public:
 	}
 
 	std::array<double, 9> batozFy(double xi, double eta,
-		double (MockFem2DElement::*f1)(double,double) const,
-		double (MockFem2DElement::*f2)(double,double) const,
-		double (MockFem2DElement::*f3)(double,double) const,
-		double (MockFem2DElement::*f4)(double,double) const,
-		double (MockFem2DElement::*f5)(double,double) const,
-		double (MockFem2DElement::*f6)(double,double) const) const
+								  double (MockFem2DElement::*f1)(double, double) const,
+								  double (MockFem2DElement::*f2)(double, double) const,
+								  double (MockFem2DElement::*f3)(double, double) const,
+								  double (MockFem2DElement::*f4)(double, double) const,
+								  double (MockFem2DElement::*f5)(double, double) const,
+								  double (MockFem2DElement::*f6)(double, double) const) const
 	{
 		std::array<double, 9> res;
 
@@ -429,27 +486,32 @@ public:
 		double coefficient = 1.0 / (2.0 * m_restArea);
 
 		dHx_dxi = batozFx(xi, eta, &MockFem2DElement::batozDN1Dxi , &MockFem2DElement::batozDN2Dxi ,
-			&MockFem2DElement::batozDN3Dxi , &MockFem2DElement::batozDN4Dxi , &MockFem2DElement::batozDN5Dxi ,
-			&MockFem2DElement::batozDN6Dxi);
+						  &MockFem2DElement::batozDN3Dxi , &MockFem2DElement::batozDN4Dxi ,
+						  &MockFem2DElement::batozDN5Dxi ,
+						  &MockFem2DElement::batozDN6Dxi);
 		dHx_deta = batozFx(xi, eta, &MockFem2DElement::batozDN1Deta, &MockFem2DElement::batozDN2Deta,
-			&MockFem2DElement::batozDN3Deta, &MockFem2DElement::batozDN4Deta, &MockFem2DElement::batozDN5Deta,
-			&MockFem2DElement::batozDN6Deta);
+						   &MockFem2DElement::batozDN3Deta, &MockFem2DElement::batozDN4Deta,
+						   &MockFem2DElement::batozDN5Deta,
+						   &MockFem2DElement::batozDN6Deta);
 		dHy_dxi = batozFy(xi, eta, &MockFem2DElement::batozDN1Dxi, &MockFem2DElement::batozDN2Dxi ,
-			&MockFem2DElement::batozDN3Dxi, &MockFem2DElement::batozDN4Dxi, &MockFem2DElement::batozDN5Dxi,
-			&MockFem2DElement::batozDN6Dxi);
+						  &MockFem2DElement::batozDN3Dxi, &MockFem2DElement::batozDN4Dxi,
+						  &MockFem2DElement::batozDN5Dxi,
+						  &MockFem2DElement::batozDN6Dxi);
 		dHy_deta = batozFy(xi, eta, &MockFem2DElement::batozDN1Deta, &MockFem2DElement::batozDN2Deta,
-			&MockFem2DElement::batozDN3Deta, &MockFem2DElement::batozDN4Deta, &MockFem2DElement::batozDN5Deta,
-			&MockFem2DElement::batozDN6Deta);
+						   &MockFem2DElement::batozDN3Deta, &MockFem2DElement::batozDN4Deta,
+						   &MockFem2DElement::batozDN5Deta,
+						   &MockFem2DElement::batozDN6Deta);
 
-		for(size_t i = 0; i < 9; ++i)
+		for (size_t i = 0; i < 9; ++i)
 		{
 			//  4 -> mid-edge 12
 			//  5 -> mid-edge 20
 			//  6 -> mid-edge 01
-			res(0, i) = coefficient * ( m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_deta[i]);
+			res(0, i) = coefficient * (m_yij[1] * dHx_dxi[i] + m_yij[2] * dHx_deta[i]);
 			res(1, i) = coefficient * (-m_xij[1] * dHy_dxi[i] - m_xij[2] * dHy_deta[i]);
 			res(2, i) = coefficient *
-				(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] + m_yij[1] * dHy_dxi[i] + m_yij[2] * dHy_deta[i]);
+						(-m_xij[1] * dHx_dxi[i] - m_xij[2] * dHx_deta[i] + m_yij[1] * dHy_dxi[i] +
+						 m_yij[2] * dHy_deta[i]);
 		}
 
 		return res;
@@ -541,7 +603,7 @@ public:
 		const double x2 = fem2DElement.get_xij(1); // x2 - x0 = x2
 		const double y2 = fem2DElement.get_yij(1); // y2 - y0 = y2
 
-		d << N1, N3 * y2, -N2 * x1 - N3 * x2, N4, N6 * y2, -N5 * x1 - N6 * x2, N7, N9 * y2, -N8 * x1 - N9 * x2;
+		d << N1, N3* y2, -N2* x1 - N3* x2, N4, N6* y2, -N5* x1 - N6* x2, N7, N9* y2, -N8* x1 - N9* x2;
 
 		return d * d.transpose();
 	}
@@ -552,8 +614,8 @@ public:
 		auto Hx_array = fem2DElement.batozHx(xi, eta);
 		SurgSim::Math::Vector Hx(9); // column vector
 		Hx << Hx_array[0], Hx_array[1], Hx_array[2],
-			Hx_array[3], Hx_array[4], Hx_array[5],
-			Hx_array[6], Hx_array[7], Hx_array[8];
+		Hx_array[3], Hx_array[4], Hx_array[5],
+		Hx_array[6], Hx_array[7], Hx_array[8];
 		return Hx * Hx.transpose();
 	}
 
@@ -563,15 +625,15 @@ public:
 		auto Hy_array = fem2DElement.batozHy(xi, eta);
 		SurgSim::Math::Vector Hy(9); // column vector
 		Hy << Hy_array[0], Hy_array[1], Hy_array[2],
-			Hy_array[3], Hy_array[4], Hy_array[5],
-			Hy_array[6], Hy_array[7], Hy_array[8];
+		Hy_array[3], Hy_array[4], Hy_array[5],
+		Hy_array[6], Hy_array[7], Hy_array[8];
 		return Hy * Hy.transpose();
 	}
 
 	// Useful method to numerically evaluate the plate mass matrix of an element
 	// This method uses a Gauss quadrature rules on the triangle to numerically evaluate the vaious integral terms.
 	void numericallyEvaluatePlateMassMatrix(const MockFem2DElement& fem2DElement,
-		Eigen::Ref<Matrix> mass)
+											Eigen::Ref<Matrix> mass)
 	{
 		// M = 2.A.rho.h \int_0^1 \int_0^{1-eta} d^T.d dxi deta
 		//  + 2.A.h^3/12.rho \int_0^1 \int_0^{1-eta} Hx.Hx^T dxi deta
@@ -620,9 +682,9 @@ public:
 
 		// Assemble the membrane and plane stiffness
 		mass.setIdentity(); // The drilling dof will have an independent dof of mass 1kg.
-		for(size_t row = 0; row < 3; ++row)
+		for (size_t row = 0; row < 3; ++row)
 		{
-			for(size_t column = 0; column < 3; ++column)
+			for (size_t column = 0; column < 3; ++column)
 			{
 				// Membrane part
 				mass.block<2, 2>(6 * row, 6 * column) = membraneMass.block<2, 2>(2 * row, 2 * column);
@@ -643,9 +705,9 @@ public:
 
 		// Assemble the membrane and plane stiffness
 		stiffness.setIdentity();
-		for(size_t row = 0; row < 3; ++row)
+		for (size_t row = 0; row < 3; ++row)
 		{
-			for(size_t column = 0; column < 3; ++column)
+			for (size_t column = 0; column < 3; ++column)
 			{
 				// Membrane part
 				stiffness.block<2, 2>(6 * row, 6 * column) = membraneStiffness.block<2, 2>(2 * row, 2 * column);
@@ -684,9 +746,9 @@ public:
 		// Therefore uy = 1/(2A) [x.(y23.u1y - y13.u2y + y12.u3y) + y.(-x23.u1y + x13.u2y - x12.u3y) + constant]
 		// Eyy = duy/dy = 1/(2A) (-x23.u1y + x13.u2y - x12.u3y) = b.u
 		// Exy = dux/dy + duy/dx = 1/(2A) (-x23.u1x + x13.u2x - x12.u3x + y23.u1y - y13.u2y + y12.u3y) = b.u
-		Vector3d A2D = m_expectedRotation.inverse()._transformVector(m_expectedX0.segment(0,3));
-		Vector3d B2D = m_expectedRotation.inverse()._transformVector(m_expectedX0.segment(6,3));
-		Vector3d C2D = m_expectedRotation.inverse()._transformVector(m_expectedX0.segment(12,3));
+		Vector3d A2D = m_expectedRotation.inverse()._transformVector(m_expectedX0.segment(0, 3));
+		Vector3d B2D = m_expectedRotation.inverse()._transformVector(m_expectedX0.segment(6, 3));
+		Vector3d C2D = m_expectedRotation.inverse()._transformVector(m_expectedX0.segment(12, 3));
 		double x12 = A2D[0] - B2D[0];
 		double x13 = A2D[0] - C2D[0];
 		double x23 = B2D[0] - C2D[0];
@@ -890,15 +952,15 @@ TEST_F(Fem2DElementTriangleTests, CoordinateTests)
 	naturalCoordinateC << 0.0, 0.0, 1.0;
 	naturalCoordinateMiddle << 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0;
 	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateBiggerThan1Value), \
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateNegativeValue), \
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSize2), \
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSize4), \
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSumNot1), \
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	EXPECT_NO_THROW(ptA = element.computeCartesianCoordinate(m_restState, naturalCoordinateA));
 	EXPECT_NO_THROW(ptB = element.computeCartesianCoordinate(m_restState, naturalCoordinateB));
 	EXPECT_NO_THROW(ptC = element.computeCartesianCoordinate(m_restState, naturalCoordinateC));
@@ -961,36 +1023,36 @@ TEST_F(Fem2DElementTriangleTests, StrainDisplacementPlateAtGaussPointTest)
 
 	// Validate the alternative technique against the numerical evaluation
 	EXPECT_TRUE(strainDisplacementExpected1[0].isApprox(strainDisplacementExpected2[0])) <<
-		strainDisplacementExpected1[0] << std::endl <<
-		strainDisplacementExpected2[0] << std::endl;
+			strainDisplacementExpected1[0] << std::endl <<
+			strainDisplacementExpected2[0] << std::endl;
 	EXPECT_TRUE(strainDisplacementExpected1[1].isApprox(strainDisplacementExpected2[1])) <<
-		strainDisplacementExpected1[1] << std::endl <<
-		strainDisplacementExpected2[1] << std::endl;
+			strainDisplacementExpected1[1] << std::endl <<
+			strainDisplacementExpected2[1] << std::endl;
 	EXPECT_TRUE(strainDisplacementExpected1[2].isApprox(strainDisplacementExpected2[2])) <<
-		strainDisplacementExpected1[2] << std::endl <<
-		strainDisplacementExpected2[2] << std::endl;
+			strainDisplacementExpected1[2] << std::endl <<
+			strainDisplacementExpected2[2] << std::endl;
 
 	// Validate the Fem2DElementTriangle internal calculation against both technique
 	EXPECT_TRUE(strainDisplacement[0].isApprox(strainDisplacementExpected1[0])) <<
-		strainDisplacement[0] << std::endl <<
-		strainDisplacementExpected1[0] << std::endl;
+			strainDisplacement[0] << std::endl <<
+			strainDisplacementExpected1[0] << std::endl;
 	EXPECT_TRUE(strainDisplacement[0].isApprox(strainDisplacementExpected2[0])) <<
-		strainDisplacement[0] << std::endl <<
-		strainDisplacementExpected2[0] << std::endl;
+			strainDisplacement[0] << std::endl <<
+			strainDisplacementExpected2[0] << std::endl;
 
 	EXPECT_TRUE(strainDisplacement[1].isApprox(strainDisplacementExpected1[1])) <<
-		strainDisplacement[1] << std::endl <<
-		strainDisplacementExpected1[1] << std::endl;
+			strainDisplacement[1] << std::endl <<
+			strainDisplacementExpected1[1] << std::endl;
 	EXPECT_TRUE(strainDisplacement[1].isApprox(strainDisplacementExpected2[1])) <<
-		strainDisplacement[1] << std::endl <<
-		strainDisplacementExpected2[1] << std::endl;
+			strainDisplacement[1] << std::endl <<
+			strainDisplacementExpected2[1] << std::endl;
 
 	EXPECT_TRUE(strainDisplacement[2].isApprox(strainDisplacementExpected1[2])) <<
-		strainDisplacement[2] << std::endl <<
-		strainDisplacementExpected1[2] << std::endl;
+			strainDisplacement[2] << std::endl <<
+			strainDisplacementExpected1[2] << std::endl;
 	EXPECT_TRUE(strainDisplacement[2].isApprox(strainDisplacementExpected2[2])) <<
-		strainDisplacement[2] << std::endl <<
-		strainDisplacementExpected2[2] << std::endl;
+			strainDisplacement[2] << std::endl <<
+			strainDisplacementExpected2[2] << std::endl;
 }
 
 namespace
@@ -1001,8 +1063,8 @@ namespace
 /// \param p The 2D point (x, y) to evaluate the shape function at
 /// \return The shape function evaluation ai + bi.x + ci.y
 double N(size_t i,
-	const std::array<double, 3>& ai, const std::array<double, 3>& bi, const std::array<double, 3>& ci,
-	const SurgSim::Math::Vector2d& p)
+		 const std::array<double, 3>& ai, const std::array<double, 3>& bi, const std::array<double, 3>& ci,
+		 const SurgSim::Math::Vector2d& p)
 {
 	return ai[i] + bi[i] * p[0] + ci[i] * p[1];
 }
@@ -1015,7 +1077,8 @@ TEST_F(Fem2DElementTriangleTests, MembraneShapeFunctionsTest)
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
 	EXPECT_TRUE(tri->getInitialPosition().isApprox(m_expectedX0)) <<
-		"x0 = " << tri->getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
+			"x0 = " << tri->getInitialPosition().transpose() << std::endl <<
+			"x0 expected = " << m_expectedX0.transpose();
 
 	// Ni(x,y) = (ai + bi.x + ci.y)
 	std::array<double, 3> ai, bi, ci;
@@ -1056,9 +1119,9 @@ TEST_F(Fem2DElementTriangleTests, MembraneShapeFunctionsTest)
 
 	// We should have the relation sum(Ni(x,y) = 1) for all points in the triangle
 	// We verify that relation by sampling the tetrahedron volume
-	for (double sp0p1 = 0; sp0p1 <= 1.0; sp0p1+=0.1)
+	for (double sp0p1 = 0; sp0p1 <= 1.0; sp0p1 += 0.1)
 	{
-		for (double sp0p2 = 0; sp0p1 + sp0p2 <= 1.0; sp0p2+=0.1)
+		for (double sp0p2 = 0; sp0p1 + sp0p2 <= 1.0; sp0p2 += 0.1)
 		{
 			Vector3d p = p0 + sp0p1 * (p1 - p0) + sp0p2 * (p2 - p0);
 			SurgSim::Math::Vector2d p2D = m_expectedRotation.inverse()._transformVector(p).segment(0, 2);
@@ -1068,8 +1131,8 @@ TEST_F(Fem2DElementTriangleTests, MembraneShapeFunctionsTest)
 				Ni_p[i] = N(i, ai, bi, ci, p2D);
 			}
 			EXPECT_NEAR(Ni_p[0] + Ni_p[1] + Ni_p[2], 1.0, 1e-10) <<
-				" for sp0p1 = " << sp0p1 << ", sp0p2 = " << sp0p2 << std::endl <<
-				" N0(x,y,z) = " << Ni_p[0] << " N1(x,y,z) = " << Ni_p[1] << " N2(x,y,z) = " << Ni_p[2];
+					" for sp0p1 = " << sp0p1 << ", sp0p2 = " << sp0p2 << std::endl <<
+					" N0(x,y,z) = " << Ni_p[0] << " N1(x,y,z) = " << Ni_p[1] << " N2(x,y,z) = " << Ni_p[2];
 		}
 	}
 }
@@ -1132,17 +1195,17 @@ TEST_F(Fem2DElementTriangleTests, PlateShapeFunctionsTest)
 		for (double eta = 0.0; xi + eta <= 1.0; eta += 0.1)
 		{
 			EXPECT_DOUBLE_EQ(1.0, tri->batozN1(xi, eta) + tri->batozN2(xi, eta) + tri->batozN3(xi, eta) + \
-				tri->batozN4(xi, eta) + tri->batozN5(xi, eta) + tri->batozN6(xi, eta)) <<
-				"For (xi = " << xi << ", eta = " << eta << "), " << std::endl <<
-				" N1 = " << tri->batozN1(xi, eta) << std::endl <<
-				" N2 = " << tri->batozN2(xi, eta) << std::endl <<
-				" N3 = " << tri->batozN3(xi, eta) << std::endl <<
-				" N4 = " << tri->batozN4(xi, eta) << std::endl <<
-				" N5 = " << tri->batozN5(xi, eta) << std::endl <<
-				" N6 = " << tri->batozN6(xi, eta) << std::endl <<
-				" N1+N2+N3+N4+N5+N6 = " <<
-				tri->batozN1(xi, eta) + tri->batozN2(xi, eta) + tri->batozN3(xi, eta) +
-				tri->batozN4(xi, eta) + tri->batozN5(xi, eta) + tri->batozN6(xi, eta);
+							 tri->batozN4(xi, eta) + tri->batozN5(xi, eta) + tri->batozN6(xi, eta)) <<
+									 "For (xi = " << xi << ", eta = " << eta << "), " << std::endl <<
+									 " N1 = " << tri->batozN1(xi, eta) << std::endl <<
+									 " N2 = " << tri->batozN2(xi, eta) << std::endl <<
+									 " N3 = " << tri->batozN3(xi, eta) << std::endl <<
+									 " N4 = " << tri->batozN4(xi, eta) << std::endl <<
+									 " N5 = " << tri->batozN5(xi, eta) << std::endl <<
+									 " N6 = " << tri->batozN6(xi, eta) << std::endl <<
+									 " N1+N2+N3+N4+N5+N6 = " <<
+									 tri->batozN1(xi, eta) + tri->batozN2(xi, eta) + tri->batozN3(xi, eta) +
+									 tri->batozN4(xi, eta) + tri->batozN5(xi, eta) + tri->batozN6(xi, eta);
 		}
 	}
 }
@@ -1151,17 +1214,17 @@ TEST_F(Fem2DElementTriangleTests, StiffnessMatrixTest)
 {
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
-	Eigen::Matrix<double, 18 ,18> expectedLocalStiffness;
+	Eigen::Matrix<double, 18 , 18> expectedLocalStiffness;
 	getExpectedLocalStiffnessMatrix(expectedLocalStiffness);
 	EXPECT_TRUE(tri->getLocalStiffnessMatrix().isApprox(expectedLocalStiffness)) <<
-		"KLocal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
-		"KLocal expected = " << std::endl << expectedLocalStiffness << std::endl;
+			"KLocal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
+			"KLocal expected = " << std::endl << expectedLocalStiffness << std::endl;
 
-	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
+	Eigen::Matrix<double, 18 , 18> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalStiffnessMatrix().isApprox(R0 * expectedLocalStiffness * R0.transpose())) <<
-		"R0 = " << std::endl << R0 << std::endl <<
-		"KGlobal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
-		"KGlobal expected = " << std::endl << expectedLocalStiffness << std::endl;
+			"R0 = " << std::endl << R0 << std::endl <<
+			"KGlobal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
+			"KGlobal expected = " << std::endl << expectedLocalStiffness << std::endl;
 }
 
 /// Evaluate a given polynomial at the given coordinates (x, y)
@@ -1173,9 +1236,9 @@ TEST_F(Fem2DElementTriangleTests, StiffnessMatrixTest)
 static double evaluatePolynomial(size_t degree, const SurgSim::Math::Vector& coefficients, double x, double y)
 {
 	SURGSIM_ASSERT((degree + 1) * (degree + 2) / 2 == static_cast<size_t>(coefficients.size())) <<
-		"Invalid coefficients vector (of size " << coefficients.size() <<
-		") provided for a polynomial of degree " << degree <<
-		". Was expecting " << (degree + 1) * (degree + 2) / 2 << " coefficients";
+			"Invalid coefficients vector (of size " << coefficients.size() <<
+			") provided for a polynomial of degree " << degree <<
+			". Was expecting " << (degree + 1) * (degree + 2) / 2 << " coefficients";
 
 	SurgSim::Math::Vector monomials = SurgSim::Math::Vector::Zero(coefficients.size());
 
@@ -1257,9 +1320,9 @@ TEST_F(Fem2DElementTriangleTests, MassMatrixTest)
 	Eigen::Matrix<double, 18, 18> expectedMassMatrix;
 	getExpectedLocalMassMatrix(expectedMassMatrix);
 	EXPECT_TRUE(tri->getLocalMassMatrix().isApprox(expectedMassMatrix)) <<
-		"Error = " << std::endl << tri->getLocalMassMatrix() - expectedMassMatrix << std::endl;
+			"Error = " << std::endl << tri->getLocalMassMatrix() - expectedMassMatrix << std::endl;
 
-	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
+	Eigen::Matrix<double, 18 , 18> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalMassMatrix().isApprox(R0 * expectedMassMatrix * R0.transpose()));
 }
 
@@ -1269,18 +1332,20 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
-	const size_t numDof = 6 * m_restState.getNumNodes();
+	const SparseMatrix::Index numDof = 6 * static_cast<SparseMatrix::Index>(m_restState.getNumNodes());
 	Vector forceVector(numDof);
 	Vector ones(numDof);
-	Matrix massMatrix(numDof, numDof);
-	Matrix dampingMatrix(numDof, numDof);
-	Matrix stiffnessMatrix(numDof, numDof);
+	SparseMatrix massMatrix(numDof, numDof);
+	SparseMatrix dampingMatrix(numDof, numDof);
+	SparseMatrix stiffnessMatrix(numDof, numDof);
+	SparseMatrix zeroMatrix(numDof, numDof);
 	Matrix expectedMassMatrix(numDof, numDof);
 	Matrix expectedDampingMatrix(numDof, numDof);
 	Matrix expectedStiffnessMatrix(numDof, numDof);
+	Matrix zeros18x18 = SurgSim::Math::Matrix::Zero(18, 18);
 
 	// Assemble manually the expectedStiffnessMatrix
-	Eigen::Matrix<double, 18 ,18> R0 = tri->getInitialRotationTimes6();
+	Eigen::Matrix<double, 18 , 18> R0 = tri->getInitialRotationTimes6();
 	Eigen::Matrix<double, 18, 18> expected18x18StiffnessMatrix;
 	getExpectedLocalStiffnessMatrix(expected18x18StiffnessMatrix);
 	expectedStiffnessMatrix.setZero();
@@ -1294,8 +1359,15 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	forceVector.setZero();
 	massMatrix.setZero();
+	tri->assembleMatrixBlocks(zeros18x18, tri->getNodeIds(), 6, &massMatrix, true);
+	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
+	tri->assembleMatrixBlocks(zeros18x18, tri->getNodeIds(), 6, &dampingMatrix, true);
+	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
+	tri->assembleMatrixBlocks(zeros18x18, tri->getNodeIds(), 6, &stiffnessMatrix, true);
+	stiffnessMatrix.makeCompressed();
+	zeroMatrix.setZero();
 
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
 	tri->addForce(m_restState, &forceVector);
@@ -1303,23 +1375,24 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	tri->addMass(m_restState, &massMatrix);
 	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix)) << "MassMatrix = " << std::endl << massMatrix << std::endl <<
-		"ExpectedMassMatrix = " << std::endl << expectedMassMatrix << std::endl;
+			"ExpectedMassMatrix = " << std::endl << expectedMassMatrix << std::endl;
 
 	tri->addDamping(m_restState, &dampingMatrix);
-	EXPECT_TRUE(dampingMatrix.isZero());
+	EXPECT_TRUE(dampingMatrix.isApprox(zeroMatrix));
 
 	tri->addStiffness(m_restState, &stiffnessMatrix);
 	EXPECT_TRUE(stiffnessMatrix.isApprox(expectedStiffnessMatrix));
 
 	forceVector.setZero();
-	massMatrix.setZero();
-	dampingMatrix.setZero();
-	stiffnessMatrix.setZero();
+	clearMatrix(&massMatrix);
+	clearMatrix(&dampingMatrix);
+	clearMatrix(&stiffnessMatrix);
 
 	tri->addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());
-	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix));
-	EXPECT_TRUE(dampingMatrix.isZero());
+	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix)) << "MassMatrix = " << std::endl << massMatrix << std::endl <<
+			"ExpectedMassMatrix = " << std::endl << expectedMassMatrix << std::endl;
+	EXPECT_TRUE(dampingMatrix.isApprox(zeroMatrix));
 	EXPECT_TRUE(stiffnessMatrix.isApprox(expectedStiffnessMatrix));
 
 	// Test addMatVec API with Mass component only
@@ -1354,7 +1427,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	{
 		SCOPED_TRACE("Test addMatVec API with mix Mass/Damping/Stiffness components");
 		double expectedCoef = 1.0 * expectedMassMatrix.row(rowId).sum() +
-			3.0 * expectedStiffnessMatrix.row(rowId).sum();
+							  3.0 * expectedStiffnessMatrix.row(rowId).sum();
 		EXPECT_NEAR(expectedCoef, forceVector[rowId], epsilon * 10);
 	}
 }
