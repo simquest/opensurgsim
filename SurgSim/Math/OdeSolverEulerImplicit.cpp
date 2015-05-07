@@ -147,6 +147,7 @@ void OdeSolverEulerImplicit::assembleLinearSystem(double dt, const OdeState& sta
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
 	m_linearSolver->setMatrix(m_systemMatrix);
+	computeComplianceMatrixFromSystemMatrix(state);
 
 	// Computes the RHS vector by adding the Euler Implicit/Newton-Raphson terms
 	if (computeRHS)
