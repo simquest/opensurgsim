@@ -17,6 +17,7 @@
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
+#include <Eigen/core>
 #include <list>
 #include <memory>
 #include <OVR_CAPI_0_5_0.h>
@@ -37,7 +38,7 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
-namespace SurgSim
+namespace SurgSim 
 {
 namespace Device
 {
@@ -130,7 +131,7 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 			}
 			else
 			{
-				SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "Failed to configure an Oculus Device." <<
+				SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "Failed to configure an Oculus Device." << 
 																" Registration failed";
 			}
 		}
@@ -190,7 +191,7 @@ bool OculusScaffold::doUpdate(double dt)
 	for (auto& device : m_state->registeredDevices)
 	{
 		DataGroup& inputData = device->deviceObject->getInputData();
-
+		
 		// Query the HMD for the current tracking state.
 		// If time in 2nd parameter is now or earlier, no pose prediction is made.
 		// Pose is reported in a right handed coordinate system, X->RIGHT, Y->UP, Z->OUT.
@@ -203,7 +204,7 @@ bool OculusScaffold::doUpdate(double dt)
 			ovrPosef ovrPose = ts.HeadPose.ThePose;
 
 			Vector3d position(ovrPose.Position.x, ovrPose.Position.y, ovrPose.Position.z);
-			Quaterniond orientation(ovrPose.Orientation.w, ovrPose.Orientation.x,
+			Quaterniond orientation(ovrPose.Orientation.w, ovrPose.Orientation.x, 
 									ovrPose.Orientation.y, ovrPose.Orientation.z);
 			RigidTransform3d pose = makeRigidTransform(orientation, position);
 
@@ -237,5 +238,31 @@ std::shared_ptr<OculusScaffold> OculusScaffold::getOrCreateSharedInstance()
 	return sharedInstance.get();
 }
 
+std::pair<SurgSim::Math::Matrix44d, SurgSim::Math::Matrix44d>&&
+	OculusScaffold::getProjectionMatrix(const std::string& deviceName) const
+{
+	const auto& match = std::find_if(std::begin(m_state->registeredDevices), 
+									 std::end(m_state->registeredDevices),
+									 [&deviceName](const std::unique_ptr<DeviceData>& info)
+									 { return info->deviceObject->getName() == deviceName;}
+									);
+
+	SURGSIM_ASSERT(match != std::end(m_state->registeredDevices)) <<
+		"Can not find an Oculus deivce named: '" << deviceName << "', no projection matrix can be retrieved.";
+
+	ovrFovPort defaultLeftFOV = (*match)->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
+	ovrFovPort defaultRightFOV = (*match)->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
+
+	ovrMatrix4f leftProjMatrix = 
+		ovrMatrix4f_Projection(defaultLeftFOV, 1.0f, 0.001f, ovrProjectionModifier::ovrProjection_RightHanded);
+	ovrMatrix4f rightProjMatrix = 
+		ovrMatrix4f_Projection(defaultRightFOV, 1.0f, 0.001f, ovrProjectionModifier::ovrProjection_RightHanded);
+
+	return std::make_pair(
+				Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>(&leftProjMatrix.M[0][0]).cast<double>(),
+		        Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>(&rightProjMatrix.M[0][0]).cast<double>()
+		   );
+}
+
 };  // namespace Device
-};  // namespace SurgSim
+};  // namespace SurgSim 

@@ -20,6 +20,7 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/BasicThread.h"
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {
@@ -58,6 +59,7 @@ private:
 	struct DeviceData;
 
 	friend class OculusDevice;
+	friend class OculusDisplaySettings;
 
 	/// Constructor.
 	OculusScaffold();
@@ -84,6 +86,13 @@ private:
 	/// Finalizes (de-initializes) Oculus SDK.
 	/// \return true on success; false otherwise.
 	bool finalizeSdk();
+	
+	/// Return the left and right projection matrices of an Oculus device with given name.
+	/// Assertion will fail if 'deviceName' is not found.
+	/// \param deviceName Name of the device of which project matrices will be returned.
+	/// \return Projection matrices for left and right eye.
+	std::pair<SurgSim::Math::Matrix44d, SurgSim::Math::Matrix44d>&&
+		getProjectionMatrix(const std::string& deviceName) const;
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
@@ -96,6 +105,6 @@ private:
 };
 
 };  // namespace Device
-};  // namespace SurgSim
+};  // namespace SurgSim 
 
 #endif  // SURGSIM_DEVICES_OCULUS_OCULUSSCAFFOLD_H

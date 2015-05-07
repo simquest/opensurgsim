@@ -18,15 +18,18 @@ find_package(OculusSdk 0.5.0.1 EXACT REQUIRED)
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${OCULUSSDK_INCLUDE_DIR}"
+	"${OSG_INCLUDE_DIR}"
 )
 
 set(OCULUS_DEVICE_SOURCES
 	OculusDevice.cpp
+	OculusDisplaySettings.cpp
 	OculusScaffold.cpp
 )
 
 set(OCULUS_DEVICE_HEADERS
 	OculusDevice.h
+	OculusDisplaySettings.h
 	OculusScaffold.h
 )
 
@@ -41,6 +44,7 @@ set(LIBS
 	SurgSimFramework 
 	SurgSimInput
 	${OCULUSSDK_LIBRARY}
+	${OPENSCENEGRAPH_LIBRARIES}
 )
 
 target_link_libraries(OculusDevice ${LIBS})
