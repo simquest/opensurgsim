@@ -42,6 +42,9 @@ public:
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
 
+	/// Constructor for FemElement object factory
+	/// \param nodeIds A vector of node ids, expecting 2 (A, B), defining this beam element with respect to a
+	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem1DElementBeam(std::vector<size_t> nodeIds);
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam);

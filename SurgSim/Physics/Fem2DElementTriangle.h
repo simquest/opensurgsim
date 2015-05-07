@@ -62,6 +62,9 @@ public:
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem2DElementTriangle(std::array<size_t, 3> nodeIds);
 
+	/// Constructor for FemElement object factory
+	/// \param nodeIds A vector of node ids, expecting 3 (A, B, C), defining this triangle element with respect to a
+	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem2DElementTriangle(std::vector<size_t> nodeIds);
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DElementTriangle);

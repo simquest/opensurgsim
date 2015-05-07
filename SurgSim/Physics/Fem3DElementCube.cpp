@@ -33,35 +33,11 @@ SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementCub
 
 Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 {
-	// Set the number of dof per node (3 in this case)
-	setNumDofPerNode(3);
-
-	// Set the shape functions coefficients
-	// Ni(epsilon, eta, mu) = (1 + epsilon * sign(epsilon_i))(1 + eta * sign(eta_i))(1 + mu * sign(mu_i))/8
-	std::array<double, 8> tmpEpsilon = {{-1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0, -1.0}};
-	std::array<double, 8> tmpEta     = {{-1.0, -1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0}};
-	std::array<double, 8> tmpMu      = {{-1.0, -1.0, -1.0, -1.0, +1.0, +1.0, +1.0, +1.0}};
-	m_shapeFunctionsEpsilonSign = tmpEpsilon;
-	m_shapeFunctionsEtaSign     = tmpEta;
-	m_shapeFunctionsMuSign      = tmpMu;
-
 	m_nodeIds.assign( nodeIds.cbegin(), nodeIds.cend());
 }
 
 Fem3DElementCube::Fem3DElementCube(std::vector<size_t> nodeIds)
 {
-	// Set the number of dof per node (3 in this case)
-	setNumDofPerNode(3);
-
-	// Set the shape functions coefficients
-	// Ni(epsilon, eta, mu) = (1 + epsilon * sign(epsilon_i))(1 + eta * sign(eta_i))(1 + mu * sign(mu_i))/8
-	std::array<double, 8> tmpEpsilon = {{-1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0, -1.0}};
-	std::array<double, 8> tmpEta     = {{-1.0, -1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0}};
-	std::array<double, 8> tmpMu      = {{-1.0, -1.0, -1.0, -1.0, +1.0, +1.0, +1.0, +1.0}};
-	m_shapeFunctionsEpsilonSign = tmpEpsilon;
-	m_shapeFunctionsEtaSign     = tmpEta;
-	m_shapeFunctionsMuSign      = tmpMu;
-
 	SURGSIM_ASSERT(nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
@@ -70,6 +46,18 @@ void Fem3DElementCube::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Test the validity of the physical parameters
 	FemElement::initialize(state);
+
+	// Set the number of dof per node (3 in this case)
+	setNumDofPerNode(3);
+
+	// Set the shape functions coefficients
+	// Ni(epsilon, eta, mu) = (1 + epsilon * sign(epsilon_i))(1 + eta * sign(eta_i))(1 + mu * sign(mu_i))/8
+	std::array<double, 8> tmpEpsilon = {{-1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0, -1.0}};
+	std::array<double, 8> tmpEta     = {{-1.0, -1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0}};
+	std::array<double, 8> tmpMu      = {{-1.0, -1.0, -1.0, -1.0, +1.0, +1.0, +1.0, +1.0}};
+	m_shapeFunctionsEpsilonSign = tmpEpsilon;
+	m_shapeFunctionsEtaSign     = tmpEta;
+	m_shapeFunctionsMuSign      = tmpMu;
 
 	// Store the 8 nodeIds in order
 	for (auto nodeId = m_nodeIds.cbegin(); nodeId != m_nodeIds.cend(); ++nodeId)
