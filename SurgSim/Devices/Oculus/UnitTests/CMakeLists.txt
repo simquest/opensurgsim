@@ -19,7 +19,8 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	OculusDeviceTest.cpp
-        OculusDisplaySettings.cpp
+	OculusDisplaySettings.cpp
+	OculusViewTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

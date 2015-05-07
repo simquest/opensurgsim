@@ -25,12 +25,14 @@ set(OCULUS_DEVICE_SOURCES
 	OculusDevice.cpp
 	OculusDisplaySettings.cpp
 	OculusScaffold.cpp
+	OculusView.cpp
 )
 
 set(OCULUS_DEVICE_HEADERS
 	OculusDevice.h
 	OculusDisplaySettings.h
 	OculusScaffold.h
+	OculusView.h
 )
 
 surgsim_add_library(
@@ -41,7 +43,8 @@ surgsim_add_library(
 
 set(LIBS
 	SurgSimDataStructures
-	SurgSimFramework 
+	SurgSimFramework
+	SurgSimGraphics
 	SurgSimInput
 	${OCULUSSDK_LIBRARY}
 	${OPENSCENEGRAPH_LIBRARIES}
