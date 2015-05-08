@@ -92,8 +92,8 @@ public:
 	/// applied. Note that this can be rewritten as (Bt)(M^-1)(B.b) = (Bt)((M^-1)(B.b)) = x,
 	/// where (M^-1)(B.b) = y is simply the solution to M.y = B.b and Bt.y = x.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
-	/// \param b The input matrix \b
-	/// \return C.b
+	/// \param b The input matrix
+	/// \return The matrix \f$C.b\f$
 	virtual Matrix applyCompliance(const OdeState& state, const Matrix& b) = 0;
 
 protected:

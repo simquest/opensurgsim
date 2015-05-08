@@ -375,7 +375,6 @@ void blockOperation(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index 
 /// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
 /// \param subMatrix The sub matrix that will be copied into the SparseMatrix block
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
-/// \param n, m The block size (Derived may be bigger but cannot be smaller in both dimension)
 /// \param[in,out] matrix The sparse matrix in which the block needs to be set by 'subMatrix'
 /// \param op The operation to run on the block
 /// \exception SurgSim::Framework::AssertionFailure If one of the following conditions is met: <br>
@@ -394,8 +393,6 @@ void blockOperation(const DerivedSub& subMatrix, Index rowStart, Index columnSta
 					Eigen::SparseMatrix<T, Opt, Index>* matrix,
 					void (Operation<T, Opt, Index, DerivedSub>::*op)(T*, const T&))
 {
-	typedef typename DerivedSub::Index DerivedSubIndexType;
-
 	static Operation<T, Opt, Index, DerivedSub> operation;
 
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
@@ -426,10 +423,9 @@ void blockOperation(const DerivedSub& subMatrix, Index rowStart, Index columnSta
 /// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
 /// \param subMatrix The sub-matrix
 /// \param blockIdRow, blockIdCol The block indices in matrix
-/// \param blockSizeRow, blockSizeCol The block size (size of the sub-matrix)
-/// \param[out] matrix The matrix to add the sub-matrix into
-/// \param initialize=true Option parameter. If true, the matrix form is assumed to be undefined and is initialized
-/// when necessary. If false, the matrix form is assumed to be previously defined.
+/// \param[in,out] matrix The matrix to add the sub-matrix into
+/// \param initialize Option parameter, default=true. If true, the matrix form is assumed to be undefined
+/// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
 /// \note This is a specialization of addSubMatrix for sparse matrices.
 template <typename DerivedSub, typename T, int Opt, typename Index>
 void addSubMatrix(const DerivedSub& subMatrix, Index blockIdRow, Index blockIdCol,
