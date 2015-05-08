@@ -36,12 +36,12 @@ Fem3DRepresentationContact::~Fem3DRepresentationContact()
 }
 
 void Fem3DRepresentationContact::doBuild(double dt,
-	const ConstraintData& data,
-	const std::shared_ptr<Localization>& localization,
-	MlcpPhysicsProblem* mlcp,
-	size_t indexOfRepresentation,
-	size_t indexOfConstraint,
-	ConstraintSideSign sign)
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign)
 {
 	using SurgSim::Math::Vector3d;
 
@@ -109,7 +109,8 @@ void Fem3DRepresentationContact::doBuild(double dt,
 		}
 	}
 
-	mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraint(m_newH, fem3d->applyCompliance(*(fem3d->getCurrentState()), m_newH), indexOfRepresentation,
+						   indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType Fem3DRepresentationContact::getMlcpConstraintType() const

@@ -53,12 +53,6 @@ public:
 	/// \return The solution matrix
 	virtual Matrix solve(const Matrix& b) const = 0;
 
-	/// Solve the linear system (matrix.x=b) using the matrix provided by the latest setMatrix call
-	/// for the single vector b
-	/// \param b The rhs vector
-	/// \return The solution vector
-	virtual Vector solve(const Vector& b) const = 0;
-
 	/// \return The linear system's inverse matrix, i.e. the inverse of the matrix provided on the last setMatrix call
 	virtual Matrix getInverse() const = 0;
 };
@@ -70,7 +64,6 @@ public:
 	void setMatrix(const SparseMatrix& matrix) override;
 
 	Matrix solve(const Matrix& b) const override;
-	Vector solve(const Vector& b) const override;
 
 	Matrix getInverse() const override;
 
