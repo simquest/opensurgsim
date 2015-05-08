@@ -48,7 +48,6 @@ static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::ha
 	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER);
 	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER);
-	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_STATIC);
 	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC);
 	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4);
 	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4);
@@ -138,6 +137,7 @@ TEST_P(IntegrationSchemeAndCountParamTest, CubeTest)
 	std::tie(integrationScheme, numCubes) = GetParam();
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
 	RecordProperty("CubeDivisions", boost::to_string(numCubes));
+std::cout << "Testing: " <<  IntegrationSchemeNames[integrationScheme] << " for nodes = " << numCubes << std::endl;
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(integrationScheme);
@@ -154,7 +154,6 @@ INSTANTIATE_TEST_CASE_P(Fem3DPerformanceTest,
 								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER,
 								SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER,
 								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
-								SurgSim::Math::INTEGRATIONSCHEME_STATIC,
 								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
 								SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
 								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4));
@@ -168,7 +167,6 @@ INSTANTIATE_TEST_CASE_P(
 					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER,
 					   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER,
 					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
-					   SurgSim::Math::INTEGRATIONSCHEME_STATIC,
 					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
 					   SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
 					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4),
