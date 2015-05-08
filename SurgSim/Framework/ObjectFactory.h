@@ -114,6 +114,42 @@ private:
 	mutable boost::mutex m_mutex;
 };
 
+
+/// CTRTP Base class to implement Object Factory functionality on a base class, use this rather than writing
+/// your own functions to return the factory
+/// \tparam T base class of the generated objects
+template <class T>
+class FactoryBase
+{
+public:
+	typedef ObjectFactory<T> Factory;
+
+	/// \return a reference to the factory
+	static Factory& getFactory()
+	{
+		static Factory factory;
+		return factory;
+	}
+};
+
+/// CTRTP Base class to implement Object Factory functionality on a base class, use this rather than writing
+/// your own functions to return the factory
+/// \tparam T base class of the generated objects
+/// \tparam P constructor parameter for object generation
+template <class T, class P>
+class BaseFactory1
+{
+public:
+	typedef ObjectFactory1<T, P> Factory;
+
+	/// \return a reference to the factory
+	static Factory& getFactory()
+	{
+		static Factory factory;
+		return factory;
+	}
+};
+
 };
 };
 

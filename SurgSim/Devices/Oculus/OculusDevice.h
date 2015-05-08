@@ -27,6 +27,8 @@ namespace Device
 {
 class OculusScaffold;
 
+SURGSIM_STATIC_REGISTRATION(OculusDevice);
+
 /// A class implementing the communication with Oculus Rift DK2.
 ///
 /// \par Application input provided by the device:
@@ -47,6 +49,8 @@ public:
 	/// Constructor.
 	/// \param name A unique name for the device.
 	explicit OculusDevice(const std::string& name);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::OculusDevice);
 
 	/// Destructor.
 	virtual ~OculusDevice();
