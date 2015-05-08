@@ -31,11 +31,14 @@ OculusDisplaySettings::OculusDisplaySettings(const osg::DisplaySettings* display
 {
 }
 
-void OculusDisplaySettings::retrieveDeviceProjectionMatrix(const std::string& name)
+void OculusDisplaySettings::setLeftEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
 {
-	auto projectionMatrices = SurgSim::Device::OculusScaffold::getOrCreateSharedInstance()->getProjectionMatrix(name);
-	m_leftEyeProjectionMatrix = SurgSim::Graphics::toOsg(projectionMatrices.first);
-	m_rightEyeProjectionMatrix = SurgSim::Graphics::toOsg(projectionMatrices.second);
+	m_leftEyeProjectionMatrix = SurgSim::Graphics::toOsg(matrix);
+}
+
+void OculusDisplaySettings::setRightEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
+{
+	m_rightEyeProjectionMatrix = SurgSim::Graphics::toOsg(matrix);
 }
 
 osg::Matrixd OculusDisplaySettings::computeLeftEyeProjectionImplementation(const osg::Matrixd&) const

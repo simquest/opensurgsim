@@ -125,8 +125,27 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 													   ovrTrackingCap_MagYawCorrection |
 													   ovrTrackingCap_Position, 0))
 			{
+				DataGroup& inputData = info->deviceObject->getInputData();
+
+				// Query the HMD for the left and right projection matrices.
+				ovrFovPort defaultLeftFOV = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
+				ovrFovPort defaultRightFOV = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
+
+				ovrMatrix4f leftProjMatrix = ovrMatrix4f_Projection(defaultLeftFOV, 1.0f, 0.001f, 
+																	ovrProjectionModifier::ovrProjection_RightHanded);
+				ovrMatrix4f rightProjMatrix = ovrMatrix4f_Projection(defaultRightFOV, 1.0f, 0.001f, 
+																	ovrProjectionModifier::ovrProjection_RightHanded);
+
+				inputData.matrices().set(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX,
+											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
+												(&leftProjMatrix.M[0][0]).cast<double>());
+				inputData.matrices().set(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX, 
+											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
+												(&rightProjMatrix.M[0][0]).cast<double>());
+
 				m_state->registeredDevices.emplace_back(std::move(info));
 				SURGSIM_LOG_INFO(m_logger) << "Device " << getName() << ": registered.";
+
 				result = true;
 			}
 			else
@@ -225,6 +244,7 @@ SurgSim::DataStructures::DataGroup OculusScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
 	builder.addPose(SurgSim::DataStructures::Names::POSE);
+	builder.addMatrix(SurgSim::DataStructures::Names::PROJECTION_MATRIX);
 	return builder.createData();
 }
 
@@ -236,32 +256,6 @@ std::shared_ptr<OculusScaffold> OculusScaffold::getOrCreateSharedInstance()
 	};
 	static SurgSim::Framework::SharedInstance<OculusScaffold> sharedInstance(creator);
 	return sharedInstance.get();
-}
-
-std::pair<SurgSim::Math::Matrix44d, SurgSim::Math::Matrix44d>&&
-	OculusScaffold::getProjectionMatrix(const std::string& deviceName) const
-{
-	const auto& match = std::find_if(std::begin(m_state->registeredDevices), 
-									 std::end(m_state->registeredDevices),
-									 [&deviceName](const std::unique_ptr<DeviceData>& info)
-									 { return info->deviceObject->getName() == deviceName;}
-									);
-
-	SURGSIM_ASSERT(match != std::end(m_state->registeredDevices)) <<
-		"Can not find an Oculus deivce named: '" << deviceName << "', no projection matrix can be retrieved.";
-
-	ovrFovPort defaultLeftFOV = (*match)->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
-	ovrFovPort defaultRightFOV = (*match)->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
-
-	ovrMatrix4f leftProjMatrix = 
-		ovrMatrix4f_Projection(defaultLeftFOV, 1.0f, 0.001f, ovrProjectionModifier::ovrProjection_RightHanded);
-	ovrMatrix4f rightProjMatrix = 
-		ovrMatrix4f_Projection(defaultRightFOV, 1.0f, 0.001f, ovrProjectionModifier::ovrProjection_RightHanded);
-
-	return std::make_pair(
-				Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>(&leftProjMatrix.M[0][0]).cast<double>(),
-		        Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>(&rightProjMatrix.M[0][0]).cast<double>()
-		   );
 }
 
 };  // namespace Device

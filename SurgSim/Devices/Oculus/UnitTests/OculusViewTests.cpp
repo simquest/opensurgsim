@@ -20,14 +20,16 @@
 
 #include "SurgSim/Devices/Oculus/OculusView.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Input/InputComponent.h"
 
 using SurgSim::Device::OculusView;
 
 TEST(OculusViewTests, Serialization)
 {
 	auto view = std::make_shared<SurgSim::Device::OculusView>("test name");
-	std::string deviceName("Test");
-	view->setValue("DeviceName", deviceName);
+	std::shared_ptr<SurgSim::Framework::Component> inputComponent = 
+		std::make_shared<SurgSim::Input::InputComponent>("InputComponent");
+	view->setValue("InputComponent", inputComponent);
 
 	/// Serialize
 	YAML::Node node;
@@ -38,5 +40,6 @@ TEST(OculusViewTests, Serialization)
 	EXPECT_NO_THROW(newView = std::dynamic_pointer_cast<OculusView>(
 		node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	EXPECT_NE(nullptr, newView);
-	EXPECT_EQ(deviceName, newView->getDeviceName());
+	EXPECT_NE(nullptr, newView->getInputComponent());
+	EXPECT_EQ(inputComponent->getName(), newView->getInputComponent()->getName());
 }

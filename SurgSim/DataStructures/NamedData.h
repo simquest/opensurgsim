@@ -65,6 +65,10 @@ static const char* const TIMER_INPUT_PREFIX = "timerInput";
 static const char* const TIMER_OUTPUT_PREFIX = "timerOutput";
 static const char* const ANALOG_INPUT_PREFIX = "analogInput";
 static const char* const ANALOG_OUTPUT_PREFIX = "analogOutput";
+
+static const char* const PROJECTION_MATRIX = "projectionMatix";
+static const char* const LEFT_PROJECTION_MATRIX = "leftProjectionMatix";
+static const char* const RIGHT_PROJECTION_MATRIX = "rightProjectionMatix";
 };
 
 /// A templated dictionary in which data can be accessed by name or index, with immutable names & indices.

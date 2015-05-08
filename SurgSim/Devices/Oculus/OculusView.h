@@ -20,6 +20,17 @@
 
 namespace SurgSim
 {
+
+namespace Framework
+{
+class Component;
+}
+
+namespace Input
+{
+class InputComponent;
+}
+
 namespace Device
 {
 
@@ -38,20 +49,18 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Device::OculusView);
 
-	/// Set name of the device this view connects to.
-	/// \param deviceName Name of the device this view connects
-	void setDeviceName(const std::string& deviceName);
+	/// Set the InputComponent this view connects to.
+	/// \param input The InputComponent
+	void setInputComponent(std::shared_ptr<Framework::Component> input);
 
-	/// \return Name of the Oculus device, to which this view connects.
-	std::string getDeviceName() const;
-
+	/// \return The InputComponnet this view connects
+	std::shared_ptr<Input::InputComponent> getInputComponent() const;
 protected:
 	/// Wake up the view
 	bool doWakeUp() override;
 
 private:
-	/// Name of the device to which this view connects
-	std::string m_deviceName;
+	std::shared_ptr<Input::InputComponent> m_inputComponent;
 };
 
 };  // namespace Graphics

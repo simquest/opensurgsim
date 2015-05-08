@@ -15,9 +15,11 @@
 
 #include "SurgSim/Devices/Oculus/OculusView.h"
 
+#include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Oculus/OculusDisplaySettings.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Input/InputComponent.h"
 
 namespace SurgSim
 {
@@ -25,9 +27,10 @@ namespace Device
 {
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Device::OculusView, OculusView);
 
-OculusView::OculusView(const std::string& name) : OsgView(name), m_deviceName()
+OculusView::OculusView(const std::string& name) : OsgView(name)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OculusView, std::string, DeviceName, getDeviceName, setDeviceName);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OculusView, std::shared_ptr<SurgSim::Framework::Component>, InputComponent, 
+									  getInputComponent, setInputComponent);
 }
 
 OculusView::~OculusView()
@@ -36,27 +39,37 @@ OculusView::~OculusView()
 
 bool OculusView::doWakeUp()
 {
-	SURGSIM_ASSERT(!m_deviceName.empty()) <<
-		"This view must be used with an Oculus device. But no name of Oculus device is set.";
-
 	OsgView::doWakeUp();
 	osg::ref_ptr<SurgSim::Device::OculusDisplaySettings> displaySeetings =
 		new SurgSim::Device::OculusDisplaySettings(getOsgView()->getDisplaySettings());
-	displaySeetings->retrieveDeviceProjectionMatrix(m_deviceName);
+	
+	SurgSim::DataStructures::DataGroup dataGroup;
+	m_inputComponent->getData(&dataGroup);
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType projectionMatrix;
+
+	SURGSIM_ASSERT(
+		dataGroup.matrices().get(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX, &projectionMatrix)) <<
+		"No left projection matrix can be retrieved for device: " << m_inputComponent->getDeviceName();
+	displaySeetings->setLeftEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
+
+	SURGSIM_ASSERT(dataGroup.matrices().get(
+		SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX, &projectionMatrix)) <<
+		"No right projection matrix can be retrieved for device: " << m_inputComponent->getDeviceName();
+	displaySeetings->setLeftEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
 
 	getOsgView()->setDisplaySettings(displaySeetings);
 
 	return true;
 }
 
-void OculusView::setDeviceName(const std::string& deviceName)
+void OculusView::setInputComponent(std::shared_ptr<Framework::Component> input)
 {
-	m_deviceName = deviceName;
+	m_inputComponent = Framework::checkAndConvert<Input::InputComponent>(input, "SurgSim::Input::InputComponent");
 }
 
-std::string OculusView::getDeviceName() const
+std::shared_ptr<Input::InputComponent> OculusView::getInputComponent() const
 {
-	return m_deviceName;
+	return m_inputComponent;
 }
 
 }; // namespace Device

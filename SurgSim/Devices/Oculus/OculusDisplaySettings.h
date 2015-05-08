@@ -19,6 +19,7 @@
 #include <string>
 
 #include <osg/DisplaySettings>
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {
@@ -36,9 +37,8 @@ public:
 	/// \param displaySettings An instance of osg::DisplaySettings
 	OculusDisplaySettings(const osg::DisplaySettings* displaySettings);
 
-	/// Given a name of Oculus device, ask the scaffold to retrieve the left and right projection matrices.
-	/// \param name Name of the Oculus device, of which project matrices are pulled.
-	void retrieveDeviceProjectionMatrix(const std::string& name);
+	void setLeftEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
+	void setRightEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
 
 	/// This method returns the projection matrix for the left eye pulled from OculusSDK.
 	/// The parameter passed in is NOT used.
