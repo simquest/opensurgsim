@@ -49,8 +49,7 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 	representationTriangleMesh = pair->getFirst();
 	representationPlane = pair->getSecond();
 
-	std::shared_ptr<MeshShape> mesh =
-		std::static_pointer_cast<MeshShape>(representationTriangleMesh->getShape());
+	auto mesh = std::static_pointer_cast<MeshShape>(representationTriangleMesh->getPosedShape());
 
 	std::shared_ptr<PlaneShape> plane(std::static_pointer_cast<PlaneShape>(representationPlane->getShape()));
 

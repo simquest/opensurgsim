@@ -47,8 +47,8 @@ std::pair<int,int> TriangleMeshParticlesDcdContact::getShapeTypes()
 
 void TriangleMeshParticlesDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	auto mesh = std::static_pointer_cast<Math::MeshShape>(pair->getFirst()->getShape());
-	auto particles = std::static_pointer_cast<Math::ParticlesShape>(pair->getSecond()->getShape());
+	auto mesh = std::static_pointer_cast<Math::MeshShape>(pair->getFirst()->getPosedShape());
+	auto particles = std::static_pointer_cast<Math::ParticlesShape>(pair->getSecond()->getPosedShape());
 
 	auto contacts = calculateContact(*mesh, *particles);
 	for (auto& contact : contacts)

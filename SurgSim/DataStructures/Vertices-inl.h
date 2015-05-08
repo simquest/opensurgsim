@@ -125,6 +125,15 @@ void Vertices<VertexData>::setVertexPositions(const std::vector<SurgSim::Math::V
 }
 
 template <class VertexData>
+void Vertices<VertexData>::transform(const Math::RigidTransform3d& pose)
+{
+	for (auto& vertex : m_vertices)
+	{
+		vertex.position = pose * vertex.position;
+	}
+}
+
+template <class VertexData>
 bool Vertices<VertexData>::operator==(const Vertices& mesh) const
 {
 	return (typeid(*this) == typeid(mesh)) && isEqual(mesh);
