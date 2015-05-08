@@ -101,8 +101,6 @@ public:
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	/// \param computeCompliance True if the compliance matrix needs to be computed, False otherwise
-	/// \note Regardless of 'computeCompliance', the system matrix will be computed by this method.
 	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) = 0;
 
 	/// Computes the system and compliance matrices for a given state

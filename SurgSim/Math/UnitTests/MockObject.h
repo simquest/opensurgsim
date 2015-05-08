@@ -277,7 +277,7 @@ private:
 	/// Ode solver (its type depends on the numerical integration scheme)
 	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;
 	Vector m_f, m_gravityForce;
-	SparseMatrix m_M, m_D, m_K;
+	SparseMatrix m_D, m_K, m_M;
 };
 
 /// Class for the complex non-linear ODE a = x.v^2
