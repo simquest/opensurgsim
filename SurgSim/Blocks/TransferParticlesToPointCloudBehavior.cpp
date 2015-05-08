@@ -22,7 +22,6 @@
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/ParticleSystemRepresentation.h"
 
 using SurgSim::Framework::checkAndConvert;
@@ -75,9 +74,9 @@ void TransferParticlesToPointCloudBehavior::update(double dt)
 	auto target = m_target->getVertices();
 	size_t nodeId = 0;
 
-	for (auto particle : m_source->getParticleReferences())
+	for (auto& particle : m_source->getParticles().getVertices())
 	{
-		target->setVertexPosition(nodeId, particle.getPosition());
+		target->setVertexPosition(nodeId, particle.position);
 		nodeId++;
 	}
 
@@ -103,9 +102,9 @@ bool TransferParticlesToPointCloudBehavior::doWakeUp()
 	{
 		size_t nodeId = 0;
 
-		for (auto particle : m_source->getParticleReferences())
+		for (auto& particle : m_source->getParticles().getVertices())
 		{
-			SurgSim::Graphics::PointCloud::VertexType vertex(particle.getPosition());
+			SurgSim::Graphics::PointCloud::VertexType vertex(particle.position);
 			target->addVertex(vertex);
 			nodeId++;
 		}

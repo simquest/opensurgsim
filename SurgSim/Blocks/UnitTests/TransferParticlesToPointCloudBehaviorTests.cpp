@@ -26,8 +26,6 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Particles/Particle.h"
-#include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/SphRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
@@ -39,7 +37,6 @@ using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Particles::Particle;
-using SurgSim::Particles::ParticleReference;
 using SurgSim::Particles::ParticleSystemRepresentation;
 using SurgSim::Particles::SphRepresentation;
 using SurgSim::Physics::RigidRepresentation;
@@ -162,54 +159,41 @@ TEST(TransferParticlesToPointCloudBehaviorTests, UpdateTest)
 
 	for (size_t particleId = 0; particleId < 10; particleId++)
 	{
-		Particle p;
-		p.setLifetime(100000);
-		p.setPosition(Vector3d(static_cast<double>(particleId), 0.0, 0.0));
-		p.setVelocity(Vector3d::Zero());
-		particles->addParticle(p);
+		particles->addParticle(Vector3d(static_cast<double>(particleId), 0.0, 0.0), Vector3d::Zero(), 100000);
 	}
 
 	// Test doInitialize(), doWakeUP()
 	EXPECT_NO_THROW(runtime->start());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 
-	auto& allParticles = particles->getParticleReferences();
+	auto& allParticles = particles->getParticles();
 	auto target = pointCloud->getVertices();
 	ASSERT_NE(0, target->getNumVertices());
-	ASSERT_NE(0, allParticles.size());
+	ASSERT_NE(0, allParticles.getNumVertices());
 	ASSERT_EQ(particles->getMaxParticles(), target->getNumVertices());
 
 	size_t nodeId = 0;
-	for (std::list<ParticleReference>::iterator particle = allParticles.begin();
-		particle != allParticles.end();
-		particle++)
+	for (; nodeId < allParticles.getNumVertices(); nodeId++)
 	{
-		EXPECT_TRUE(particle->getPosition().isApprox(target->getVertex(nodeId).position));
-		nodeId++;
+		EXPECT_TRUE(allParticles.getVertex(nodeId).position.isApprox(target->getVertex(nodeId).position));
 	}
 	for (; nodeId < particles->getMaxParticles(); nodeId++)
 	{
 		EXPECT_TRUE(target->getVertex(nodeId).position.isZero());
-		nodeId++;
 	}
 
 	// Test TransferParticlesToGraphicsBehavior::update()
-	particles->removeParticle(allParticles.front());
-	particles->removeParticle(allParticles.back());
+	allParticles.getVertices().pop_back();
+	allParticles.getVertices().pop_back();
 	behavior->update(1.0);
 
-	nodeId = 0;
-	for (std::list<ParticleReference>::const_iterator particle = allParticles.cbegin();
-		particle != allParticles.cend();
-		particle++)
+	for (nodeId = 0; nodeId < allParticles.getNumVertices(); nodeId++)
 	{
-		EXPECT_TRUE(particle->getPosition().isApprox(target->getVertex(nodeId).position));
-		nodeId++;
+		EXPECT_TRUE(allParticles.getVertex(nodeId).position.isApprox(target->getVertex(nodeId).position));
 	}
 	for (; nodeId < particles->getMaxParticles(); nodeId++)
 	{
 		EXPECT_TRUE(target->getVertex(nodeId).position.isZero());
-		nodeId++;
 	}
 
 	runtime->stop();

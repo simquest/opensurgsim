@@ -23,6 +23,8 @@
 #include <vector>
 
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Particles/Particles.h"
 
 
 namespace SurgSim
@@ -35,11 +37,6 @@ class Logger;
 
 namespace Particles
 {
-
-class Particle;
-class ParticleReference;
-class ParticlesState;
-
 
 /// The ParticleSystemRepresentation class defines the base class for all Particle System.
 class ParticleSystemRepresentation : public SurgSim::Framework::Representation
@@ -61,61 +58,39 @@ public:
 	size_t getMaxParticles() const;
 
 	/// Add a particle
-	/// Copy the particle into the particle system
-	/// \param particle the particle to be added
+	/// \param position The position of the new particle
+	/// \param velocity The velocity of the new particle
+	/// \param lifetime The lenght of time the particle will exist
 	/// \return True if the particle was successfully added, false otherwise
-	bool addParticle(const Particle& particle);
+	bool addParticle(const Math::Vector3d& position, const Math::Vector3d& velocity, double lifetime);
 
-	/// Add multiple particles
-	/// Copy the particles into the particle system
-	/// \param particles the particles to be added
-	/// \return True if the particles were successfully added, false otherwise
-	bool addParticles(const std::vector<Particle>& particles);
+	/// Get the particles
+	/// \return The particles
+	Particles& getParticles();
 
-	/// Remove particle
-	/// \param particle A reference to a particle to remove
-	bool removeParticle(const ParticleReference& particle);
-
-	/// Get references to the internal particles
-	/// \note this is thread unsafe access to the internal state of the particle system
-	/// \return A list of ParticleReference
-	std::list<ParticleReference>& getParticleReferences();
-
-	/// Get a copy of the particles in a thread safe manner
-	/// \return A vector of particles
-	std::shared_ptr<const std::vector<Particle>> getParticles() const;
+	/// Get the particles, const version
+	/// \return The particles
+	const Particles& getParticles() const;
 
 	/// Update the particle system
 	/// \param dt The time step.
 	void update(double dt);
 
 protected:
-	/// Maximum amount of particles allowed in this particle system.
-	size_t m_maxParticles;
-
-	/// List of particles.
-	std::list<ParticleReference> m_particles;
-
-	/// List of unused particles.
-	std::list<ParticleReference> m_unusedParticles;
-
-	/// Thread safe copy of the particles
-	std::shared_ptr<std::vector<Particle>> m_safeParticles;
-
-	/// The particle system state.
-	std::shared_ptr<ParticlesState> m_state;
-
-	/// Logger used by the particle system.
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-
-	/// The mutex used to lock the particles
-	mutable boost::shared_mutex m_mutex;
-
 	/// Implementation of the specific behavior of the particle system
 	/// \return True if update succeeded, False otherwise.
 	virtual bool doUpdate(double dt) = 0;
 
 	bool doInitialize() override;
+
+	/// Maximum amount of particles allowed in this particle system.
+	size_t m_maxParticles;
+
+	/// List of particles.
+	Particles m_particles;
+
+	/// Logger used by the particle system.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 };  // namespace Particles

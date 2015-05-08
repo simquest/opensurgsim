@@ -17,9 +17,6 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/Particle.h"
-#include "SurgSim/Particles/ParticleReference.h"
-#include "SurgSim/Particles/ParticlesState.h"
 
 
 namespace SurgSim
@@ -30,8 +27,6 @@ namespace Particles
 ParticleSystemRepresentation::ParticleSystemRepresentation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
 	m_maxParticles(0u),
-	m_safeParticles(std::make_shared<std::vector<Particle>>()),
-	m_state(std::make_shared<ParticlesState>()),
 	m_logger(SurgSim::Framework::Logger::getLogger("Particles"))
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticleSystemRepresentation, size_t, MaxParticles, getMaxParticles,
@@ -44,17 +39,12 @@ ParticleSystemRepresentation::~ParticleSystemRepresentation()
 
 bool ParticleSystemRepresentation::doInitialize()
 {
-	m_state->setNumDof(3, m_maxParticles);
-	for (size_t index = 0; index < m_maxParticles; index++)
-	{
-		m_unusedParticles.emplace_back(m_state, index);
-	}
 	return true;
 }
 
 void ParticleSystemRepresentation::setMaxParticles(size_t maxParticles)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "Can not set number of particles after initialization";
+	m_particles.getVertices().reserve(maxParticles);
 	m_maxParticles = maxParticles;
 }
 
@@ -63,14 +53,24 @@ size_t ParticleSystemRepresentation::getMaxParticles() const
 	return m_maxParticles;
 }
 
-bool ParticleSystemRepresentation::addParticle(const Particle& particle)
+Particles& ParticleSystemRepresentation::getParticles()
 {
-	SURGSIM_ASSERT(isInitialized()) << "Cannot add particles before initialization";
+	return m_particles;
+}
+
+const Particles& ParticleSystemRepresentation::getParticles() const
+{
+	return m_particles;
+}
+
+bool ParticleSystemRepresentation::addParticle(const Math::Vector3d& position, const Math::Vector3d& velocity,
+		double lifetime)
+{
 	bool result;
-	if (!m_unusedParticles.empty())
+	auto& particles = m_particles.getVertices();
+	if (particles.size() < m_maxParticles)
 	{
-		(*m_unusedParticles.begin()) = particle;
-		m_particles.splice(m_particles.end(), m_unusedParticles, m_unusedParticles.begin());
+		particles.emplace_back(position, ParticleData{lifetime, velocity});
 		result = true;
 	}
 	else
@@ -82,71 +82,21 @@ bool ParticleSystemRepresentation::addParticle(const Particle& particle)
 	return result;
 }
 
-bool ParticleSystemRepresentation::addParticles(const std::vector<Particle>& particles)
-{
-	bool result = true;
-	for (auto particle : particles)
-	{
-		if (!addParticle(particle))
-		{
-			result = false;
-			break;
-		}
-	}
-	return result;
-}
-
-bool ParticleSystemRepresentation::removeParticle(const ParticleReference& particle)
-{
-	bool result;
-	auto found = std::find(m_particles.begin(), m_particles.end(), particle);
-	if (found != m_particles.end())
-	{
-		m_unusedParticles.splice(m_unusedParticles.end(), m_particles, found);
-		result = true;
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(m_logger) << "Particle not found, unable to remove";
-		result = false;
-	}
-	return result;
-}
-
-std::list<ParticleReference>& ParticleSystemRepresentation::getParticleReferences()
-{
-	return m_particles;
-}
-
-std::shared_ptr<const std::vector<Particle>> ParticleSystemRepresentation::getParticles() const
-{
-	boost::shared_lock<boost::shared_mutex> sharedLock(m_mutex);
-	return m_safeParticles;
-}
-
 void ParticleSystemRepresentation::update(double dt)
 {
-	for(auto particleIter = m_particles.begin(); particleIter != m_particles.end(); )
+	auto& particles = m_particles.getVertices();
+	for (auto& particle : particles)
 	{
-		auto nextIter = particleIter;
-		nextIter++;
-		particleIter->setLifetime(particleIter->getLifetime() - dt);
-		if (particleIter->getLifetime() <= 0)
-		{
-			m_unusedParticles.splice(m_unusedParticles.end(), m_particles, particleIter);
-		}
-		particleIter = nextIter;
+		particle.data.lifetime -= dt;
 	}
 
-	if (doUpdate(dt))
+	auto isDead = [](Particle& particle)
 	{
-		auto particles = std::make_shared<std::vector<Particle>>(m_particles.cbegin(), m_particles.cend());
-		{
-			boost::unique_lock<boost::shared_mutex> uniqueLock(m_mutex);
-			std::swap(particles, m_safeParticles);
-		}
-	}
-	else
+		return particle.data.lifetime <= 0.0;
+	};
+	particles.erase(std::remove_if(particles.begin(), particles.end(), isDead), particles.end());
+
+	if (!doUpdate(dt))
 	{
 		SURGSIM_LOG_WARNING(m_logger) << "Particle System " << getName() << " failed to update.";
 	}
