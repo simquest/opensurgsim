@@ -199,8 +199,8 @@ public:
 	/// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
 	/// \param blockSize The blocks size
 	/// \param[out] matrix The matrix to add the sub-matrix blocks into
-	/// \param initialize=true Option parameter. If true, the matrix form is assumed to be undefined and is initialized
-	/// when necessary. If false, the matrix form is assumed to be previously defined.
+	/// \param initialize Optional parameter, default true. If true, the matrix form is assumed to be undefined and is
+	/// initialized when necessary. If false, the matrix form is assumed to be previously defined.
 	template <typename DerivedSub, typename T, int Opt, typename Index>
 	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
 							  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true);

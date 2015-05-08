@@ -122,8 +122,8 @@ public:
 
 	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
-	/// \param b The input matrix \b
-	/// \return The matrix after application of the compliance matrix.
+	/// \param b The input matrix b
+	/// \return Returns the matrix \f$C.b\f$
 	Math::Matrix applyCompliance(const Math::OdeState& state, const Math::Matrix& b) override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
