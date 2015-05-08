@@ -69,7 +69,7 @@ public:
 
 	/// Get the shape, posed
 	/// \return The shape transformed by the pose of this representation
-	virtual const std::shared_ptr<SurgSim::Math::Shape> getPosedShape() const;
+	virtual const std::shared_ptr<SurgSim::Math::Shape> getPosedShape();
 
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
@@ -96,10 +96,10 @@ private:
 	SurgSim::DataStructures::BufferedValue<ContactMapType> m_collisions;
 
 	/// Cached posed shape
-	mutable std::shared_ptr<Math::Shape> m_posedShape;
+	std::shared_ptr<Math::Shape> m_posedShape;
 
 	/// Pose of m_posedShape
-	mutable Math::RigidTransform3d m_posedShapePose;
+	Math::RigidTransform3d m_posedShapePose;
 };
 
 

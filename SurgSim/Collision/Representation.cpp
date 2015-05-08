@@ -33,7 +33,7 @@ Representation::~Representation()
 
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape() const
+const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape()
 {
 	Math::RigidTransform3d pose = getPose();
 	if (pose.isApprox(Math::RigidTransform3d::Identity()))
