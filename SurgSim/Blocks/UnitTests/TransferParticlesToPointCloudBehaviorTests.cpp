@@ -170,16 +170,11 @@ TEST(TransferParticlesToPointCloudBehaviorTests, UpdateTest)
 	auto target = pointCloud->getVertices();
 	ASSERT_NE(0, target->getNumVertices());
 	ASSERT_NE(0, allParticles.getNumVertices());
-	ASSERT_EQ(particles->getMaxParticles(), target->getNumVertices());
 
 	size_t nodeId = 0;
 	for (; nodeId < allParticles.getNumVertices(); nodeId++)
 	{
 		EXPECT_TRUE(allParticles.getVertex(nodeId).position.isApprox(target->getVertex(nodeId).position));
-	}
-	for (; nodeId < particles->getMaxParticles(); nodeId++)
-	{
-		EXPECT_TRUE(target->getVertex(nodeId).position.isZero());
 	}
 
 	// Test TransferParticlesToGraphicsBehavior::update()
@@ -190,10 +185,6 @@ TEST(TransferParticlesToPointCloudBehaviorTests, UpdateTest)
 	for (nodeId = 0; nodeId < allParticles.getNumVertices(); nodeId++)
 	{
 		EXPECT_TRUE(allParticles.getVertex(nodeId).position.isApprox(target->getVertex(nodeId).position));
-	}
-	for (; nodeId < particles->getMaxParticles(); nodeId++)
-	{
-		EXPECT_TRUE(target->getVertex(nodeId).position.isZero());
 	}
 
 	runtime->stop();

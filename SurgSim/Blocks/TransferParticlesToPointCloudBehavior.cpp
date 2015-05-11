@@ -71,19 +71,7 @@ std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation>
 
 void TransferParticlesToPointCloudBehavior::update(double dt)
 {
-	auto target = m_target->getVertices();
-	size_t nodeId = 0;
-
-	for (auto& particle : m_source->getParticles().getVertices())
-	{
-		target->setVertexPosition(nodeId, particle.position);
-		nodeId++;
-	}
-
-	for (; nodeId < m_source->getMaxParticles(); ++nodeId)
-	{
-		target->setVertexPosition(nodeId, SurgSim::Math::Vector3d::Zero());
-	}
+	*m_target->getVertices() = m_source->getParticles();
 }
 
 bool TransferParticlesToPointCloudBehavior::doInitialize()
@@ -96,26 +84,6 @@ bool TransferParticlesToPointCloudBehavior::doInitialize()
 
 bool TransferParticlesToPointCloudBehavior::doWakeUp()
 {
-	auto target = m_target->getVertices();
-
-	if (target->getNumVertices() == 0)
-	{
-		size_t nodeId = 0;
-
-		for (auto& particle : m_source->getParticles().getVertices())
-		{
-			SurgSim::Graphics::PointCloud::VertexType vertex(particle.position);
-			target->addVertex(vertex);
-			nodeId++;
-		}
-
-		for (; nodeId < m_source->getMaxParticles(); ++nodeId)
-		{
-			SurgSim::Graphics::PointCloud::VertexType vertex(SurgSim::Math::Vector3d::Zero());
-			target->addVertex(vertex);
-		}
-	}
-
 	return true;
 }
 
