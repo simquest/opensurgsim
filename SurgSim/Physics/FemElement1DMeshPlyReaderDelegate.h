@@ -68,6 +68,20 @@ public:
 	/// \param elementName Name of the element.
 	void endVertices(const std::string& elementName);
 
+	/// Callback function, begin the processing of FemElements.
+	/// \param elementName Name of the element.
+	/// \param elementCount Number of elements.
+	/// \return memory for FemElement data to the reader.
+	void* beginFemElements(const std::string& elementName, size_t elementCount);
+
+	/// Callback function to process one FemElement.
+	/// \param elementName Name of the element.
+	void processFemElement(const std::string& elementName);
+
+	/// Callback function to finalize processing of FemElements.
+	/// \param elementName Name of the element.
+	void endFemElements(const std::string& elementName);
+
 	/// Callback function, begin the processing of materials.
 	/// \param elementName Name of the element.
 	/// \param materialCount Number of materials.
@@ -106,7 +120,8 @@ private:
 		unsigned int type;   // “LinearBeam”, “CorotationalTetrahedron”…
 		int64_t overrun1; ///< Used to check for buffer overruns
 
-		std::vector<size_t> nodeIds;
+		unsigned int* indices;
+		unsigned int vertexCount;
 		int64_t overrun2; ///< Used to check for buffer overruns
 	} m_elementData;
 

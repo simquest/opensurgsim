@@ -69,11 +69,9 @@ class FemElementMesh : public SurgSim::DataStructures::TriangleMesh<VertexData, 
 public:
 	FemElementMesh();
 
-	std::string getClassName() const override;
-
 	size_t addFemElement(const Element& element);
 
-	size_t getNumElement() const;
+	size_t getNumElements() const;
 
 	const std::vector<Element>& getFemElements() const;
 	std::vector<Element>& getFemElements();
@@ -107,14 +105,13 @@ protected:
 	double m_massDensity;
 };
 
-//template <class VertexData, class EdgeData, class TriangleData, class Element>
-//std::string FemElementMesh<VertexData, EdgeData, TriangleData, Element>::m_className = "SurgSim::Physics::FemElementMesh";
-
 class FemElement1DMesh : public FemElementMesh<FemElementStructs::RotationVectorData,
 												EmptyData, EmptyData, FemElementStructs::FemElement1D>
 {
 public:
 	FemElement1DMesh();
+
+	void load(const std::string& fileName);
 
 	bool isEnableShear() const;
 	double getRadius() const;

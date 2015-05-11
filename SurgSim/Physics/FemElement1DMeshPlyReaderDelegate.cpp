@@ -48,6 +48,22 @@ bool FemElement1DMeshPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, y));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, z));
 
+	// Element Processing
+	reader->requestElement(
+		"1d_element",
+		std::bind(&FemElement1DMeshPlyReaderDelegate::beginFemElements,
+		this,
+		std::placeholders::_1,
+		std::placeholders::_2),
+		std::bind(&FemElement1DMeshPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
+		std::bind(&FemElement1DMeshPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
+	reader->requestListProperty("1d_element",
+		"vertex_indices",
+		PlyReader::TYPE_UNSIGNED_INT,
+		offsetof(FemElement1D, indices),
+		PlyReader::TYPE_UNSIGNED_INT,
+		offsetof(FemElement1D, vertexCount));
+
 	// 6DOF processing
 	m_hasRotationDOF = reader->hasProperty("vertex", "thetaX") && reader->hasProperty("vertex", "thetaY") &&
 							  reader->hasProperty("vertex", "thetaZ");
@@ -141,6 +157,31 @@ void FemElement1DMeshPlyReaderDelegate::endVertices(const std::string &elementNa
 	SURGSIM_ASSERT(m_vertexData.overrun1 == 0l && m_vertexData.overrun2 == 0l) <<
 			"There was an overrun while reading the vertex structures, it is likely that data " <<
 			"has become corrupted.";
+}
+
+void* FemElement1DMeshPlyReaderDelegate::beginFemElements(const std::string& elementName, size_t elementCount)
+{
+	m_elementData.overrun1 = 0l;
+	m_elementData.overrun2 = 0l;
+	return &m_elementData;
+}
+
+void FemElement1DMeshPlyReaderDelegate::processFemElement(const std::string& elementName)
+{
+	SURGSIM_ASSERT(m_elementData.vertexCount == 2) << "Cannot process 1D Element with "
+		<< m_elementData.vertexCount << " vertices.";
+
+	FemElementStructs::FemElement1D femElement;
+	std::copy(m_elementData.indices, m_elementData.indices + 2, femElement.nodeIds.begin());
+	m_mesh->addFemElement(femElement);
+}
+
+void FemElement1DMeshPlyReaderDelegate::endFemElements(const std::string& elementName)
+{
+	SURGSIM_ASSERT(m_elementData.overrun1 == 0 && m_elementData.overrun2) <<
+		"There was an overrun while reading the element structures, it is likely that data " <<
+		"has become corrupted.";
+	m_elementData.indices = nullptr;
 }
 
 void* FemElement1DMeshPlyReaderDelegate::beginRadius(const std::string& elementName, size_t radiusCount)

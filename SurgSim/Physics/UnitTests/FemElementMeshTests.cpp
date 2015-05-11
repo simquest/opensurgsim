@@ -15,9 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Physics/FemElementMesh.h"
-#include "SurgSim/Physics/FemElement1DMeshPlyReaderDelegate.h"
 
 using SurgSim::DataStructures::PlyReader;
 
@@ -28,8 +26,14 @@ namespace Physics
 
 TEST(FemElement1DMeshReaderTests, DelegateTest)
 {
-	// Just making sure it can compile and create the object
-	FemElement1DMeshPlyReaderDelegate delegate;
+	FemElement1DMesh mesh;
+	mesh.load("FemElementMeshTests/Fem1D.ply");
+
+	EXPECT_EQ(4, mesh.getNumElements());
+	EXPECT_EQ(0.11, mesh.getRadius());
+	EXPECT_EQ(0.21, mesh.getMassDensity());
+	EXPECT_EQ(0.31, mesh.getPoissonRatio());
+	EXPECT_EQ(0.41, mesh.getYoungModulus());
 }
 
 } // namespace Physics

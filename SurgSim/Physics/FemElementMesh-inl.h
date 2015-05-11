@@ -39,7 +39,7 @@ size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::addFemElemen
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getNumElement() const
+size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getNumElements() const
 {
 	return m_femElements.size();
 }

@@ -17,18 +17,23 @@
 #include "SurgSim/Physics/FemElementMesh.h"
 #include "SurgSim/Physics/FemElement1DMeshPlyReaderDelegate.h"
 
+template<>
+std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Physics::FemElementStructs::RotationVectorData,
+	EmptyData, EmptyData>::m_className = "SurgSim::Physics::FemElementMesh";
+
 namespace SurgSim
 {
 
 namespace Physics
 {
 
-template<>
-std::string SurgSim::DataStructures::TriangleMesh<FemElementStructs::RotationVectorData,
-EmptyData, EmptyData>::m_className = "SurgSim::Physics::FemElementMesh";
-
 FemElement1DMesh::FemElement1DMesh()
 {
+}
+
+void FemElement1DMesh::load(const std::string& fileName)
+{
+	doLoad(fileName);
 }
 
 bool FemElement1DMesh::isEnableShear() const
@@ -54,7 +59,7 @@ void FemElement1DMesh::setRadius(double radius)
 bool FemElement1DMesh::doLoad(const std::string& filePath)
 {
 	SurgSim::DataStructures::PlyReader reader(filePath);
-	if (! reader.isValid())
+	if (!reader.isValid())
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
 			<< "'" << filePath << "' is an invalid .ply file.";
@@ -62,7 +67,7 @@ bool FemElement1DMesh::doLoad(const std::string& filePath)
 	}
 
 	auto delegate = std::make_shared<FemElement1DMeshPlyReaderDelegate>(std::dynamic_pointer_cast<FemElement1DMesh>(shared_from_this()));
-	if (! reader.parseWithDelegate(delegate))
+	if (!reader.parseWithDelegate(delegate))
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
 			<< "The input file '" << filePath << "' does not have the property required by FEM element mesh.";
