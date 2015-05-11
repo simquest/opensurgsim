@@ -147,7 +147,7 @@ void DivisibleCubeRepresentation::addFemCubes(std::shared_ptr<SurgSim::Math::Ode
 				// Add Fem3DElementCube for each cube
 				std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(cube);
 				femElement->setMassDensity(980.0);   // 0.98 g/cm^-3 (2-part silicone rubber a.k.a. RTV6166)
-				femElement->setPoissonRatio(0.499);  // From the paper (near 0.5)
+				femElement->setPoissonRatio(0.4995);  // From the paper (near 0.5)
 				femElement->setYoungModulus(15.3e3); // 15.3 kPa (From the paper)
 				femElement->initialize(*state);
 				addFemElement(femElement);
