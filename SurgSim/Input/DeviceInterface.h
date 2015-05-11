@@ -37,7 +37,7 @@ namespace Input
 ///
 /// Derived classes will likely want to hide their constructor and only
 /// allow creation through a manager object for that type of device.
-class DeviceInterface : public Framework::BaseFactory1<DeviceInterface, std::string>
+class DeviceInterface : public Framework::FactoryBase1<DeviceInterface, std::string>
 {
 public:
 	/// Virtual destructor (empty).

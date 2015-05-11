@@ -115,37 +115,37 @@ private:
 };
 
 
-/// CTRTP Base class to implement Object Factory functionality on a base class, use this rather than writing
+/// CRTP Base class to implement Object Factory functionality on a base class, use this rather than writing
 /// your own functions to return the factory
 /// \tparam T base class of the generated objects
 template <class T>
 class FactoryBase
 {
 public:
-	typedef ObjectFactory<T> Factory;
+	typedef ObjectFactory<T> FactoryType;
 
 	/// \return a reference to the factory
-	static Factory& getFactory()
+	static FactoryType& getFactory()
 	{
-		static Factory factory;
+		static FactoryType factory;
 		return factory;
 	}
 };
 
-/// CTRTP Base class to implement Object Factory functionality on a base class, use this rather than writing
+/// CRTP Base class to implement Object Factory functionality on a base class, use this rather than writing
 /// your own functions to return the factory
 /// \tparam T base class of the generated objects
 /// \tparam P constructor parameter for object generation
 template <class T, class P>
-class BaseFactory1
+class FactoryBase1
 {
 public:
-	typedef ObjectFactory1<T, P> Factory;
+	typedef ObjectFactory1<T, P> FactoryType;
 
 	/// \return a reference to the factory
-	static Factory& getFactory()
+	static FactoryType& getFactory()
 	{
-		static Factory factory;
+		static FactoryType factory;
 		return factory;
 	}
 };
