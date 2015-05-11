@@ -36,8 +36,6 @@ using SurgSim::Framework::Runtime;
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
-using SurgSim::Particles::Particle;
-using SurgSim::Particles::ParticleSystemRepresentation;
 using SurgSim::Particles::SphRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 
@@ -70,67 +68,44 @@ TEST(TransferParticlesToPointCloudBehaviorTests, SetGetTargetTest)
 	EXPECT_EQ(pointCloud, behavior->getTarget());
 }
 
-namespace anonymous
-{
-void testdoInitialize(bool setSource, bool setTarget, bool expectedValidation)
+TEST(TransferParticlesToPointCloudBehaviorTests, WakeUpTest)
 {
 	auto runtime = std::make_shared<Runtime>("config.txt");
-	auto behaviorManager = std::make_shared<BehaviorManager>();
-	runtime->addManager(behaviorManager);
 
-	auto sceneElement = std::make_shared<BasicSceneElement>("scene element");
-	auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+	auto particles = std::make_shared<SphRepresentation>("Particles");
+	particles->setMassPerParticle(1.0);
+	particles->setDensity(1.0);
+	particles->setGasStiffness(1.0);
+	particles->setKernelSupport(1.0);
 
-	if (setSource)
+	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
+
 	{
-		auto particles = std::make_shared<SphRepresentation>("Particles");
-		particles->setMassPerParticle(1.0);
-		particles->setDensity(1.0);
-		particles->setGasStiffness(1.0);
-		particles->setKernelSupport(1.0);
-		behavior->setSource(particles);
+		auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+		EXPECT_TRUE(behavior->initialize(runtime));
+		EXPECT_FALSE(behavior->wakeUp());
 	}
 
-	if (setTarget)
 	{
-		auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
+		auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
 		behavior->setTarget(pointCloud);
-	}
-
-	sceneElement->addComponent(behavior);
-
-	// Add the scene element into the runtime->scene trigger a calls to doInitialize
-	if (expectedValidation)
-	{
-		EXPECT_NO_THROW(runtime->getScene()->addSceneElement(sceneElement));
-	}
-	else
-	{
-		EXPECT_THROW(runtime->getScene()->addSceneElement(sceneElement), SurgSim::Framework::AssertionFailure);
-	}
-}
-}; // namespace anonymous
-
-TEST(TransferParticlesToPointCloudBehaviorTests, DoInitializeTest)
-{
-	{
-		SCOPED_TRACE("Unset Source and Target");
-		anonymous::testdoInitialize(false, false, false);
+		EXPECT_TRUE(behavior->initialize(runtime));
+		EXPECT_FALSE(behavior->wakeUp());
 	}
 
 	{
-		SCOPED_TRACE("Unset Source and set Target");
-		anonymous::testdoInitialize(false, true, false);
+		auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+		behavior->setSource(particles);
+		EXPECT_TRUE(behavior->initialize(runtime));
+		EXPECT_FALSE(behavior->wakeUp());
 	}
 
 	{
-		SCOPED_TRACE("Set Source and unset Target");
-		anonymous::testdoInitialize(true, false, false);
-	}
-
-	{
-		SCOPED_TRACE("Set Source and set Target");
-		anonymous::testdoInitialize(true, true, true);
+		auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+		behavior->setSource(particles);
+		behavior->setTarget(pointCloud);
+		EXPECT_TRUE(behavior->initialize(runtime));
+		EXPECT_TRUE(behavior->wakeUp());
 	}
 }
 

@@ -76,14 +76,24 @@ void TransferParticlesToPointCloudBehavior::update(double dt)
 
 bool TransferParticlesToPointCloudBehavior::doInitialize()
 {
-	SURGSIM_ASSERT(m_source != nullptr) << "SetSource must be called prior to initialization";
-	SURGSIM_ASSERT(m_target != nullptr) << "SetTarget must be called prior to initialization";
-
 	return true;
 }
 
 bool TransferParticlesToPointCloudBehavior::doWakeUp()
 {
+	if (m_source == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
+				getName() + "' must have a source.";
+		return false;
+	}
+	if (m_target == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
+				getName() + "' must have a target.";
+		return false;
+	}
+
 	return true;
 }
 

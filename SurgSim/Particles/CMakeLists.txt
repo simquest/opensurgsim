@@ -28,8 +28,8 @@ set(SURGSIM_PARTICLES_SOURCES
 set(SURGSIM_PARTICLES_HEADERS
 	DefaultPointGenerator.h
 	EmitterRepresentation.h
-	Particles.h
 	ParticleManager.h
+	Particles.h
 	ParticleSystemRepresentation.h
 	PointGenerator.h
 	RandomBoxPointGenerator.h
