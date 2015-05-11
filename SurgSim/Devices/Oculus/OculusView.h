@@ -55,6 +55,7 @@ public:
 
 	/// \return The InputComponnet this view connects
 	std::shared_ptr<Input::InputComponent> getInputComponent() const;
+
 protected:
 	/// Wake up the view
 	bool doWakeUp() override;

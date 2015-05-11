@@ -37,7 +37,12 @@ public:
 	/// \param displaySettings An instance of osg::DisplaySettings
 	explicit OculusDisplaySettings(const osg::DisplaySettings* displaySettings);
 
+	/// Set the projection matrix of the left eye
+	/// \param matrix Projection matrix for left eye
 	void setLeftEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
+
+	/// Set the projection matrix of the right eye
+	/// \param matrix Projection matrix for right eye
 	void setRightEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
 
 	/// This method returns the projection matrix for the left eye pulled from OculusSDK.

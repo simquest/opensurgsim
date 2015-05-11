@@ -59,7 +59,6 @@ private:
 	struct DeviceData;
 
 	friend class OculusDevice;
-	friend class OculusDisplaySettings;
 
 	/// Constructor.
 	OculusScaffold();

@@ -15,7 +15,6 @@
 
 #include "SurgSim/Devices/Oculus/OculusDisplaySettings.h"
 
-#include "SurgSim/Devices/Oculus/OculusScaffold.h"
 #include "SurgSim/Graphics/OsgMatrixConversions.h"
 
 namespace SurgSim

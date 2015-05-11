@@ -52,8 +52,8 @@ bool OculusView::doWakeUp()
 		"No left projection matrix can be retrieved for device: " << m_inputComponent->getDeviceName();
 	displaySeetings->setLeftEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
 
-	SURGSIM_ASSERT(dataGroup.matrices().get(
-		SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX, &projectionMatrix)) <<
+	SURGSIM_ASSERT(
+		dataGroup.matrices().get(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX, &projectionMatrix)) <<
 		"No right projection matrix can be retrieved for device: " << m_inputComponent->getDeviceName();
 	displaySeetings->setLeftEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
 
